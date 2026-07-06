@@ -226,6 +226,8 @@ return [
     'newsletter_send_failed' => 'Failed to send newsletter. Please try again or check logs.',
     'newsletter_segment_required' => 'このニュースレターはセグメント向けですが、セグメントが選択されていません。送信する前にセグメントを選択してください。',
     'invalid_content_format' => 'コンテンツ形式が無効です',
+    'design_json_too_large' => 'Page builder design data is too large',
+    'invalid_design_json' => 'Invalid page builder design data',
     'newsletter_content_too_large' => 'ニュースレターの内容が大きすぎます（最大512KB）',
     'newsletter_duplicated' => 'Newsletter duplicated successfully',
     'ab_winner_must_be_a_or_b' => 'Winner must be "a" or "b"',

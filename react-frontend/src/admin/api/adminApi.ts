@@ -1324,6 +1324,14 @@ export const adminNewsletters = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+export const adminBuilderAssets = {
+  uploadImage: (file: File) =>
+    api.upload<{ url: string; path: string }>('/v2/upload', file, 'file'),
+
+  listImages: () =>
+    api.get<{ images: { url: string; path: string; name: string }[] }>('/v2/upload/list'),
+};
+
 // Volunteering
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1657,8 +1665,8 @@ export const adminFederation = {
 
 export const adminPages = {
   list: () => api.get<Array<{ id: number; title: string; slug: string; status: string; sort_order: number; show_in_menu: number; menu_location: string; menu_order: number; created_at: string }>>('/v2/admin/pages'),
-  get: (id: number) => api.get<{ id: number; title: string; slug: string; content: string; status: string; meta_description?: string; show_in_menu: number; menu_location: string; menu_order: number; created_at: string }>(`/v2/admin/pages/${id}`),
-  create: (data: { title: string; content?: string; meta_description?: string; status?: string; show_in_menu?: number; menu_location?: string; menu_order?: number }) =>
+  get: (id: number) => api.get<{ id: number; title: string; slug: string; content: string; content_format?: 'plaintext' | 'richtext' | 'html' | 'builder'; design_json?: string | null; status: string; meta_description?: string; show_in_menu: number; menu_location: string; menu_order: number; created_at: string }>(`/v2/admin/pages/${id}`),
+  create: (data: { title: string; content?: string; content_format?: 'plaintext' | 'richtext' | 'html' | 'builder'; design_json?: string | null; meta_description?: string; status?: string; show_in_menu?: number; menu_location?: string; menu_order?: number }) =>
     api.post<{ id: number }>('/v2/admin/pages', data),
   update: (id: number, data: Record<string, unknown>) =>
     api.put<{ success: boolean }>(`/v2/admin/pages/${id}`, data),
@@ -1879,6 +1887,9 @@ export interface PrerenderSummary {
 export interface PrerenderInventoryItem {
   host: string;
   route: string;
+  tenant_id: number | null;
+  tenant_slug: string | null;
+  tenant_route: string;
   cache_path: string;
   size_bytes: number;
   mtime: number;
@@ -1902,6 +1913,47 @@ export interface PrerenderCoverageRow {
   missing_routes: string[];
   stale_routes: string[];
   asset_invalid_routes: string[];
+}
+
+export interface PrerenderTenantSafety {
+  tenant: {
+    tenant_id: number;
+    slug: string;
+    host: string;
+    prefix: string;
+  };
+  counts: {
+    expected: number;
+    static: number;
+    sitemap: number;
+    snapshots: number;
+    missing: number;
+    stale: number;
+    asset_invalid: number;
+    unexpected: number;
+  };
+  static_routes: string[];
+  sitemap_routes: string[];
+  expected_routes: string[];
+  missing_routes: string[];
+  stale_routes: string[];
+  asset_invalid_routes: string[];
+  unexpected_routes: string[];
+  snapshots: Array<{
+    route: string;
+    cache_path: string;
+    host_route: string;
+    source: 'static' | 'sitemap' | 'unexpected';
+    expected: boolean;
+    reason: {
+      key: 'sitemap' | 'unexpected' | 'always_public' | 'feature_enabled' | 'feature_disabled' | 'module_enabled' | 'module_disabled' | 'expected';
+      value: string | null;
+    };
+    staleness: 'fresh' | 'warn' | 'stale';
+    http_status: number;
+    content_stale: boolean;
+    asset_issues: string[];
+  }>;
 }
 
 export interface PrerenderInspect {
@@ -2026,6 +2078,11 @@ export const adminPrerender = {
   getCoverage: () =>
     api.get<{ expected_routes: string[]; rows: PrerenderCoverageRow[] }>('/v2/admin/prerender/coverage'),
 
+  getTenantSafety: (tenant: string) =>
+    api.get<PrerenderTenantSafety>(
+      `/v2/admin/prerender/tenant-safety?tenant=${encodeURIComponent(tenant)}`,
+    ),
+
   getEvents: (limit = 200) =>
     api.get<{ events: PrerenderEvent[] }>(`/v2/admin/prerender/events?limit=${limit}`),
 
@@ -2058,7 +2115,7 @@ export const adminPrerender = {
   realtimeChannel: () =>
     api.get<{ channel: string; event: string }>('/v2/admin/prerender/realtime-channel'),
 
-  purge: (payload: { pattern: string; tenant_slug?: string; dry_run?: boolean; recache?: boolean }) =>
+  purge: (payload: { pattern: string; tenant_slug?: string; dry_run?: boolean; recache?: boolean; confirm_all_tenants?: boolean }) =>
     api.post<{
       pattern: string;
       tenant_slug: string | null;

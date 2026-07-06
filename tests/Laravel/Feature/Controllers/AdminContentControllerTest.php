@@ -64,7 +64,7 @@ class AdminContentControllerTest extends TestCase
 
         $response = $this->apiPost('/v2/admin/pages', [
             'title' => 'Test Page',
-            'slug' => 'test-page',
+            'slug' => 'custom-test-page',
             'content' => '<p>Test content</p>',
             'status' => 'published',
         ]);
@@ -72,6 +72,66 @@ class AdminContentControllerTest extends TestCase
         // Accept 200 or 201 depending on implementation
         $this->assertContains($response->getStatusCode(), [200, 201]);
         $response->assertJsonStructure(['data']);
+        $response->assertJsonPath('data.slug', 'custom-test-page');
+
+        $pageId = (int) $response->json('data.id');
+        $this->assertSame('custom-test-page', DB::table('pages')->where('id', $pageId)->value('slug'));
+    }
+
+    public function test_create_page_generates_slug_from_title_when_slug_is_blank(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/pages', [
+            'title' => 'Title Derived Slug',
+            'slug' => '',
+            'content' => '<p>Test content</p>',
+            'status' => 'draft',
+        ]);
+
+        $this->assertContains($response->getStatusCode(), [200, 201]);
+        $response->assertJsonPath('data.slug', 'title-derived-slug');
+    }
+
+    public function test_create_page_uses_existing_unique_slug_convention_for_duplicates(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $first = $this->apiPost('/v2/admin/pages', [
+            'title' => 'Existing Slug',
+            'slug' => 'shared-slug',
+            'content' => '<p>One</p>',
+            'status' => 'draft',
+        ]);
+        $this->assertContains($first->getStatusCode(), [200, 201]);
+
+        $second = $this->apiPost('/v2/admin/pages', [
+            'title' => 'Another Page',
+            'slug' => 'shared-slug',
+            'content' => '<p>Two</p>',
+            'status' => 'draft',
+        ]);
+
+        $this->assertContains($second->getStatusCode(), [200, 201]);
+        $second->assertJsonPath('data.slug', 'shared-slug-1');
+    }
+
+    public function test_create_page_rejects_reserved_slug(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/pages', [
+            'title' => 'Reserved Slug',
+            'slug' => 'login',
+            'content' => '<p>Test content</p>',
+            'status' => 'draft',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.0.field', 'slug');
     }
 
     public function test_create_page_returns_403_for_regular_member(): void
@@ -84,6 +144,109 @@ class AdminContentControllerTest extends TestCase
         ]);
 
         $response->assertStatus(403);
+    }
+
+    public function test_create_builder_page_rejects_invalid_design_json(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/pages', [
+            'title' => 'Invalid Builder Page',
+            'content' => '<section>Broken</section>',
+            'content_format' => 'builder',
+            'design_json' => '{not valid json',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.0.field', 'design_json');
+    }
+
+    public function test_create_builder_page_rejects_design_json_with_invalid_project_shape(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/pages', [
+            'title' => 'Invalid Builder Shape',
+            'content' => '<section>Broken shape</section>',
+            'content_format' => 'builder',
+            'design_json' => '{"notGrapesJs":"payload"}',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.0.field', 'design_json');
+
+        $listResponse = $this->apiPost('/v2/admin/pages', [
+            'title' => 'Invalid Builder List Shape',
+            'content' => '<section>Broken list shape</section>',
+            'content_format' => 'builder',
+            'design_json' => '[{"pages":[]}]',
+        ]);
+
+        $listResponse->assertStatus(422);
+        $listResponse->assertJsonPath('errors.0.field', 'design_json');
+    }
+
+    public function test_create_builder_page_rejects_oversized_design_json(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost('/v2/admin/pages', [
+            'title' => 'Oversized Builder Page',
+            'content' => '<section>Too big</section>',
+            'content_format' => 'builder',
+            'design_json' => str_repeat('x', 2_000_001),
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.0.field', 'design_json');
+    }
+
+    public function test_builder_design_json_is_persisted_only_for_builder_pages(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $validDesignJson = json_encode([
+            'pages' => [
+                [
+                    'frames' => [
+                        [
+                            'component' => [
+                                'type' => 'wrapper',
+                                'components' => [
+                                    ['tagName' => 'section', 'classes' => ['hero']],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'assets' => [],
+            'styles' => [],
+        ], JSON_THROW_ON_ERROR);
+
+        $response = $this->apiPost('/v2/admin/pages', [
+            'title' => 'Valid Builder Page',
+            'content' => '<section>Builder</section>',
+            'content_format' => 'builder',
+            'design_json' => $validDesignJson,
+        ]);
+
+        $this->assertContains($response->getStatusCode(), [200, 201]);
+        $pageId = (int) $response->json('data.id');
+        $this->assertSame($validDesignJson, DB::table('pages')->where('id', $pageId)->value('design_json'));
+
+        $update = $this->apiPut("/v2/admin/pages/{$pageId}", [
+            'content_format' => 'html',
+            'content' => '<p>HTML now</p>',
+            'design_json' => $validDesignJson,
+        ]);
+
+        $update->assertStatus(200);
+        $this->assertNull(DB::table('pages')->where('id', $pageId)->value('design_json'));
     }
 
     // ================================================================

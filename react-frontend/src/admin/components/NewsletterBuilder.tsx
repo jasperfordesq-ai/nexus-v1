@@ -682,7 +682,13 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
         isOpen={libraryOpen}
         onClose={() => setLibraryOpen(false)}
         onSelect={handleLibrarySelect}
-        t={t}
+        labels={{
+          title: t('newsletter_builder.library_title'),
+          upload: t('newsletter_builder.library_upload'),
+          empty: t('newsletter_builder.library_empty'),
+          loadFailed: t('newsletter_builder.library_failed'),
+          uploadFailed: t('newsletter_content_editor.image_upload_failed'),
+        }}
       />
 
       <Modal isOpen={codeOpen} onOpenChange={setCodeOpen} size="3xl" scrollBehavior="inside">

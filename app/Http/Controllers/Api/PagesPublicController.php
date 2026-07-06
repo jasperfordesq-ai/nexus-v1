@@ -53,6 +53,7 @@ class PagesPublicController extends BaseApiController
             'title' => $page->title ?? '',
             'slug' => $page->slug ?? '',
             'content' => $page->content ?? '',
+            'content_format' => $page->content_format ?? 'richtext',
             'meta_description' => $page->meta_description ?? '',
             'created_at' => $page->created_at,
             'updated_at' => $page->updated_at,

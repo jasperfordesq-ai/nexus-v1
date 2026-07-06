@@ -53,6 +53,21 @@ interface BuilderToolbarProps {
   onViewCode: () => void;
   onClear: () => void;
   t: (key: string) => string;
+  labels?: Partial<{
+    toolbarLabel: string;
+    deviceDesktop: string;
+    deviceTablet: string;
+    deviceMobile: string;
+    undo: string;
+    redo: string;
+    borders: string;
+    code: string;
+    insertImage: string;
+    library: string;
+    preview: string;
+    templates: string;
+    clear: string;
+  }>;
 }
 
 function ToolButton({
@@ -105,24 +120,25 @@ export function BuilderToolbar({
   onViewCode,
   onClear,
   t,
+  labels,
 }: BuilderToolbarProps) {
   const frozen = !ready || Boolean(readOnly);
   const devices: { id: BuilderDevice; icon: ReactNode; label: string }[] = [
-    { id: 'Desktop', icon: <Monitor size={16} />, label: t('newsletter_content_editor.tip_device_desktop') },
-    { id: 'Tablet', icon: <Tablet size={16} />, label: t('newsletter_content_editor.tip_device_tablet') },
-    { id: 'Mobile portrait', icon: <Smartphone size={16} />, label: t('newsletter_content_editor.tip_device_mobile') },
+    { id: 'Desktop', icon: <Monitor size={16} />, label: labels?.deviceDesktop ?? t('newsletter_content_editor.tip_device_desktop') },
+    { id: 'Tablet', icon: <Tablet size={16} />, label: labels?.deviceTablet ?? t('newsletter_content_editor.tip_device_tablet') },
+    { id: 'Mobile portrait', icon: <Smartphone size={16} />, label: labels?.deviceMobile ?? t('newsletter_content_editor.tip_device_mobile') },
   ];
 
   return (
     <div
       role="toolbar"
-      aria-label={t('newsletter_content_editor.toolbar_label')}
+      aria-label={labels?.toolbarLabel ?? t('newsletter_content_editor.toolbar_label')}
       className="flex h-12 items-center gap-1 overflow-x-auto border-b border-border bg-surface px-2"
     >
-      <ToolButton label={t('newsletter_content_editor.tip_undo')} onPress={onUndo} disabled={frozen || !canUndo}>
+      <ToolButton label={labels?.undo ?? t('newsletter_content_editor.tip_undo')} onPress={onUndo} disabled={frozen || !canUndo}>
         <Undo2 size={16} />
       </ToolButton>
-      <ToolButton label={t('newsletter_content_editor.tip_redo')} onPress={onRedo} disabled={frozen || !canRedo}>
+      <ToolButton label={labels?.redo ?? t('newsletter_content_editor.tip_redo')} onPress={onRedo} disabled={frozen || !canRedo}>
         <Redo2 size={16} />
       </ToolButton>
 
@@ -143,28 +159,28 @@ export function BuilderToolbar({
       <span className="mx-1 h-6 w-px shrink-0 bg-border" aria-hidden="true" />
 
       <ToolButton
-        label={t('newsletter_content_editor.tip_borders')}
+        label={labels?.borders ?? t('newsletter_content_editor.tip_borders')}
         onPress={onToggleBorders}
         disabled={!ready}
         active={showBorders}
       >
         <Scan size={16} />
       </ToolButton>
-      <ToolButton label={t('newsletter_content_editor.tip_code')} onPress={onViewCode} disabled={!ready}>
+      <ToolButton label={labels?.code ?? t('newsletter_content_editor.tip_code')} onPress={onViewCode} disabled={!ready}>
         <CodeIcon size={16} />
       </ToolButton>
 
       <span className="mx-1 h-6 w-px shrink-0 bg-border" aria-hidden="true" />
 
       <ToolButton
-        label={t('newsletter_builder.insert_image')}
+        label={labels?.insertImage ?? t('newsletter_builder.insert_image')}
         onPress={onInsertImage}
         disabled={frozen || Boolean(insertingImage)}
       >
         <ImageIcon size={16} />
       </ToolButton>
 
-      <ToolButton label={t('newsletter_builder.library_title')} onPress={onOpenLibrary} disabled={frozen}>
+      <ToolButton label={labels?.library ?? t('newsletter_builder.library_title')} onPress={onOpenLibrary} disabled={frozen}>
         <Images size={16} />
       </ToolButton>
 
@@ -176,7 +192,7 @@ export function BuilderToolbar({
         onPress={onPreview}
         className="shrink-0"
       >
-        {t('newsletter_builder.preview')}
+        {labels?.preview ?? t('newsletter_builder.preview')}
       </Button>
 
       {showTemplates && (
@@ -188,13 +204,13 @@ export function BuilderToolbar({
           onPress={onOpenTemplates}
           className="shrink-0"
         >
-          {t('newsletter_builder.templates')}
+          {labels?.templates ?? t('newsletter_builder.templates')}
         </Button>
       )}
 
       <span className="flex-1" />
 
-      <ToolButton label={t('newsletter_content_editor.tip_clear')} onPress={onClear} disabled={frozen}>
+      <ToolButton label={labels?.clear ?? t('newsletter_content_editor.tip_clear')} onPress={onClear} disabled={frozen}>
         <Trash2 size={16} />
       </ToolButton>
     </div>

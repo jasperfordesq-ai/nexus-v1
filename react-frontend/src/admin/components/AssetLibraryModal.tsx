@@ -4,13 +4,12 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * AssetLibraryModal — browse + reuse the tenant's previously-uploaded images (and
- * upload a new one) for the newsletter builder. Picking an image hands its
- * absolute, email-safe URL back to the caller, which applies it to the current
- * target (hero background / image src / new mj-image) via the shared pipeline.
+ * AssetLibraryModal - browse and reuse tenant builder images, or upload a new
+ * one. Picking an image returns its absolute URL; the caller decides whether to
+ * replace the current image target or insert a fresh component.
  *
- * A custom HeroUI modal rather than GrapesJS's default AssetManager (which depends
- * on Font Awesome glyphs this app doesn't ship — the same reason the toolbar is ours).
+ * A custom HeroUI modal rather than GrapesJS's default AssetManager keeps the
+ * toolbar consistent with the React admin UI while still sharing the upload API.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -18,7 +17,7 @@ import { Button, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@/
 import Upload from 'lucide-react/icons/upload';
 import { useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
-import { adminNewsletters } from '../api/adminApi';
+import { adminBuilderAssets } from '../api/adminApi';
 import { resolveUploadedUrl } from './builderImage';
 
 interface LibraryImage {
@@ -32,10 +31,16 @@ interface AssetLibraryModalProps {
   onClose: () => void;
   /** Called with the chosen image's absolute URL. */
   onSelect: (url: string) => void;
-  t: (key: string) => string;
+  labels: {
+    title: string;
+    upload: string;
+    empty: string;
+    loadFailed: string;
+    uploadFailed: string;
+  };
 }
 
-export function AssetLibraryModal({ isOpen, onClose, onSelect, t }: AssetLibraryModalProps) {
+export function AssetLibraryModal({ isOpen, onClose, onSelect, labels }: AssetLibraryModalProps) {
   const toast = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const [images, setImages] = useState<LibraryImage[]>([]);
@@ -45,7 +50,7 @@ export function AssetLibraryModal({ isOpen, onClose, onSelect, t }: AssetLibrary
   useEffect(() => {
     if (!isOpen) return;
     setLoading(true);
-    adminNewsletters
+    adminBuilderAssets
       .listImages()
       .then((res) => {
         const imgs = res.success && res.data?.images ? res.data.images : [];
@@ -53,10 +58,10 @@ export function AssetLibraryModal({ isOpen, onClose, onSelect, t }: AssetLibrary
       })
       .catch((err) => {
         logError('AssetLibraryModal: failed to load images', err);
-        toast.error(t('newsletter_builder.library_failed'));
+        toast.error(labels.loadFailed);
       })
       .finally(() => setLoading(false));
-  }, [isOpen, t, toast]);
+  }, [isOpen, labels.loadFailed, toast]);
 
   const pick = (url: string) => {
     onSelect(url);
@@ -69,12 +74,12 @@ export function AssetLibraryModal({ isOpen, onClose, onSelect, t }: AssetLibrary
     if (!file) return;
     setUploading(true);
     try {
-      const url = resolveUploadedUrl(await adminNewsletters.uploadImage(file));
+      const url = resolveUploadedUrl(await adminBuilderAssets.uploadImage(file));
       if (url) pick(url);
-      else toast.error(t('newsletter_content_editor.image_upload_failed'));
+      else toast.error(labels.uploadFailed);
     } catch (err) {
       logError('AssetLibraryModal: upload failed', err);
-      toast.error(t('newsletter_content_editor.image_upload_failed'));
+      toast.error(labels.uploadFailed);
     } finally {
       setUploading(false);
     }
@@ -84,7 +89,7 @@ export function AssetLibraryModal({ isOpen, onClose, onSelect, t }: AssetLibrary
     <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()} size="3xl" scrollBehavior="inside">
       <ModalContent>
         <ModalHeader className="flex items-center justify-between gap-4">
-          <span>{t('newsletter_builder.library_title')}</span>
+          <span>{labels.title}</span>
           <Button
             size="sm"
             variant="primary"
@@ -92,7 +97,7 @@ export function AssetLibraryModal({ isOpen, onClose, onSelect, t }: AssetLibrary
             isLoading={uploading}
             onPress={() => inputRef.current?.click()}
           >
-            {t('newsletter_builder.library_upload')}
+            {labels.upload}
           </Button>
         </ModalHeader>
         <ModalBody className="min-h-[240px]">
@@ -101,7 +106,7 @@ export function AssetLibraryModal({ isOpen, onClose, onSelect, t }: AssetLibrary
               <Spinner size="sm" />
             </div>
           ) : images.length === 0 ? (
-            <p className="px-4 py-10 text-center text-sm text-muted">{t('newsletter_builder.library_empty')}</p>
+            <p className="px-4 py-10 text-center text-sm text-muted">{labels.empty}</p>
           ) : (
             <div className="grid grid-cols-3 gap-2 py-2 sm:grid-cols-4 md:grid-cols-5">
               {images.map((img) => (

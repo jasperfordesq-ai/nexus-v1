@@ -4,25 +4,30 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * HtmlSourceEditor — verbatim raw-HTML editor (CodeMirror 6).
+ * HtmlSourceEditor - verbatim raw-HTML editor (CodeMirror 6).
  *
- * This is the mode that finally lets admins paste/author designed email HTML:
- * CodeMirror holds the document as a plain string, so — unlike the Lexical
- * rich-text editor — it CANNOT drop tables, inline styles, or MSO comments.
- * Lazy-loaded so the ~200KB editor chunk only ships when HTML mode is opened.
+ * This mode lets admins paste or author designed HTML without round-tripping
+ * through Lexical. CodeMirror holds the document as a plain string, so tables,
+ * inline styles, custom sections, and pasted page fragments stay intact.
+ * Lazy-loaded so the editor chunk only ships when HTML mode is opened.
  */
 
 import { useRef } from 'react';
 import CodeMirror, { type ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { html as htmlLang } from '@codemirror/lang-html';
 import { EditorView } from '@codemirror/view';
-import { useTranslation } from 'react-i18next';
 import { InsertImageButton } from './InsertImageButton';
 
 interface HtmlSourceEditorProps {
   value: string;
   onChange: (html: string) => void;
   isDisabled?: boolean;
+  labels: {
+    label: string;
+    hint: string;
+    insertImage: string;
+    uploadFailed: string;
+  };
 }
 
 // Theme mapped to the project's CSS tokens so it respects light/dark mode
@@ -43,8 +48,7 @@ const nexusTheme = EditorView.theme({
   '&.cm-focused': { outline: 'none' },
 });
 
-export function HtmlSourceEditor({ value, onChange, isDisabled }: HtmlSourceEditorProps) {
-  const { t } = useTranslation('admin');
+export function HtmlSourceEditor({ value, onChange, isDisabled, labels }: HtmlSourceEditorProps) {
   const cmRef = useRef<ReactCodeMirrorRef>(null);
 
   const insertAtCursor = (snippet: string) => {
@@ -61,13 +65,20 @@ export function HtmlSourceEditor({ value, onChange, isDisabled }: HtmlSourceEdit
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-sm font-medium text-foreground">
-        {t('newsletter_content_editor.label_html')}
+        {labels.label}
       </label>
       <div className="rounded-lg border-2 border-border focus-within:border-accent transition-colors overflow-hidden">
         <div className="flex flex-wrap items-center gap-1 border-b border-border bg-surface px-2 py-1.5">
-          <InsertImageButton onInsert={insertAtCursor} isDisabled={isDisabled} />
+          <InsertImageButton
+            onInsert={insertAtCursor}
+            isDisabled={isDisabled}
+            labels={{
+              insertImage: labels.insertImage,
+              uploadFailed: labels.uploadFailed,
+            }}
+          />
           <span className="ml-auto text-xs text-muted">
-            {t('newsletter_content_editor.html_hint')}
+            {labels.hint}
           </span>
         </div>
         <CodeMirror
@@ -84,7 +95,7 @@ export function HtmlSourceEditor({ value, onChange, isDisabled }: HtmlSourceEdit
             highlightActiveLine: !isDisabled,
             autocompletion: true,
           }}
-          aria-label={t('newsletter_content_editor.label_html')}
+          aria-label={labels.label}
         />
       </div>
     </div>

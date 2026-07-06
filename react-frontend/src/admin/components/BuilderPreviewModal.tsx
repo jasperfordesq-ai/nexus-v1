@@ -25,6 +25,12 @@ interface BuilderPreviewModalProps {
   /** Compiled, inbox-safe HTML to render (from the builder's exportHtml). */
   html: string;
   t: (key: string) => string;
+  labels?: Partial<{
+    title: string;
+    deviceLabel: string;
+    desktop: string;
+    mobile: string;
+  }>;
 }
 
 const FRAME_WIDTH: Record<PreviewDevice, string> = {
@@ -32,15 +38,15 @@ const FRAME_WIDTH: Record<PreviewDevice, string> = {
   mobile: 'w-[375px]',
 };
 
-export function BuilderPreviewModal({ isOpen, onClose, html, t }: BuilderPreviewModalProps) {
+export function BuilderPreviewModal({ isOpen, onClose, html, t, labels }: BuilderPreviewModalProps) {
   const [device, setDevice] = useState<PreviewDevice>('desktop');
 
   return (
     <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()} size="5xl" scrollBehavior="inside">
       <ModalContent>
         <ModalHeader className="flex items-center justify-between gap-4">
-          <span>{t('newsletter_builder.preview_title')}</span>
-          <div className="flex items-center gap-1" role="group" aria-label={t('newsletter_builder.preview_device_label')}>
+          <span>{labels?.title ?? t('newsletter_builder.preview_title')}</span>
+          <div className="flex items-center gap-1" role="group" aria-label={labels?.deviceLabel ?? t('newsletter_builder.preview_device_label')}>
             <Button
               size="sm"
               variant={device === 'desktop' ? 'primary' : 'light'}
@@ -48,7 +54,7 @@ export function BuilderPreviewModal({ isOpen, onClose, html, t }: BuilderPreview
               onPress={() => setDevice('desktop')}
               aria-pressed={device === 'desktop'}
             >
-              {t('newsletter_builder.preview_desktop')}
+              {labels?.desktop ?? t('newsletter_builder.preview_desktop')}
             </Button>
             <Button
               size="sm"
@@ -57,14 +63,14 @@ export function BuilderPreviewModal({ isOpen, onClose, html, t }: BuilderPreview
               onPress={() => setDevice('mobile')}
               aria-pressed={device === 'mobile'}
             >
-              {t('newsletter_builder.preview_mobile')}
+              {labels?.mobile ?? t('newsletter_builder.preview_mobile')}
             </Button>
           </div>
         </ModalHeader>
         <ModalBody className="bg-surface-secondary">
           <div className="flex justify-center py-4">
             <iframe
-              title={t('newsletter_builder.preview_title')}
+              title={labels?.title ?? t('newsletter_builder.preview_title')}
               srcDoc={html}
               sandbox=""
               className={`h-[70vh] max-w-full rounded-lg border border-border bg-white shadow-sm transition-[width] ${FRAME_WIDTH[device]}`}

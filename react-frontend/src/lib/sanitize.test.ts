@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, expect, it } from 'vitest';
-import { __testing, sanitizeInline, sanitizeRichText, stripHtmlToText } from './sanitize';
+import { __testing, sanitizeCustomPageHtml, sanitizeInline, sanitizeRichText, stripHtmlToText } from './sanitize';
 
 const { isSafeUrl } = __testing;
 
@@ -68,6 +68,100 @@ describe('sanitizeInline', () => {
     expect(out).toContain('only text');
     expect(out).not.toContain('<div');
     expect(out).not.toContain('<p>');
+  });
+});
+
+describe('sanitizeCustomPageHtml', () => {
+  it('wraps builder content and scopes style rules to the custom page container', () => {
+    const out = sanitizeCustomPageHtml('<style>.hero{color:red}@media(max-width:600px){.hero{color:blue}}</style><section class="hero">Hi</section>');
+    const doc = new DOMParser().parseFromString(out, 'text/html');
+
+    expect(out).toContain('class="nexus-custom-page-builder"');
+    expect(doc.querySelectorAll('div.nexus-custom-page-builder')).toHaveLength(1);
+    expect(doc.querySelector('.nexus-custom-page-builder .nexus-custom-page-builder')).toBeNull();
+    expect(out).toContain('.nexus-custom-page-builder .hero{color:red}');
+    expect(out).toMatch(/@media\s*\(max-width:\s*600px\)\{\.nexus-custom-page-builder \.hero\{color:blue\}/);
+    expect(out).toContain('<section class="hero">Hi</section>');
+  });
+
+  it('drops global selectors and inline styles so builder pages cannot restyle the app shell', () => {
+    const out = sanitizeCustomPageHtml('<style>body{display:none}.safe{color:green;position:fixed;inset:0;z-index:9999}#root{opacity:0}</style><div class="safe" style="position:fixed;inset:0">Safe</div>');
+
+    expect(out).toContain('.nexus-custom-page-builder .safe{color:green}');
+    expect(out).not.toContain('body{');
+    expect(out).not.toContain('#root');
+    expect(out).not.toContain('style="');
+    expect(out).not.toContain('position:fixed');
+    expect(out).not.toContain('z-index');
+  });
+
+  it('strips app-shell escape declarations even when they use important priorities', () => {
+    const out = sanitizeCustomPageHtml(`
+      <style>
+        .overlay {
+          color: green;
+          position: fixed !important;
+          inset: 0 !important;
+          z-index: 2147483647 !important;
+        }
+        .sticky { position: sticky !important; top: 0; }
+      </style>
+      <section class="overlay"><div class="sticky">Safe</div></section>
+    `);
+
+    expect(out).toContain('.nexus-custom-page-builder .overlay{color:green}');
+    expect(out).not.toContain('position:fixed');
+    expect(out).not.toContain('position:sticky');
+    expect(out).not.toContain('inset:0');
+    expect(out).not.toContain('z-index');
+    expect(out).toContain('top:0');
+  });
+
+  it('keeps parsed declaration values with semicolons inside strings', () => {
+    const out = sanitizeCustomPageHtml('<style>.quote::before{content:"a;b";color:purple}</style><p class="quote">Quote</p>');
+
+    expect(out).toContain('.nexus-custom-page-builder .quote::before{content:"a;b";color:purple}');
+  });
+
+  it('scopes selector lists and nested media/supports rules while dropping app globals', () => {
+    const out = sanitizeCustomPageHtml(`
+      <style>
+        .hero, main .panel, body { color: red; }
+        @media (min-width: 800px) {
+          .hero { display: grid; }
+          #root { display: none; }
+        }
+        @supports (display: grid) {
+          .grid { display: grid; }
+        }
+        @font-face { font-family: Bad; src: url(/bad.woff2); }
+      </style>
+      <main><section class="hero"><div class="grid">Grid</div></section></main>
+    `);
+
+    expect(out).toContain('.nexus-custom-page-builder .hero,.nexus-custom-page-builder main .panel{color:red}');
+    expect(out).toMatch(/@media\s*\(min-width:\s*800px\)\{\.nexus-custom-page-builder \.hero\{display:grid\}/);
+    expect(out).toMatch(/@supports\s*\(display:\s*grid\)\{\.nexus-custom-page-builder \.grid\{display:grid\}/);
+    expect(out).not.toContain('body{');
+    expect(out).not.toContain('#root');
+    expect(out).not.toContain('@font-face');
+  });
+
+  it('drops malformed CSS instead of leaking unscoped rules', () => {
+    const out = sanitizeCustomPageHtml('<style>.safe{color:green}.broken{position:fixed</style><section class="safe">Safe</section>');
+
+    expect(out).not.toContain('.broken');
+    expect(out).not.toContain('position:fixed');
+    expect(out).toContain('<section class="safe">Safe</section>');
+  });
+
+  it('strips scripts, event handlers, unsafe URLs and dangerous CSS constructs', () => {
+    const out = sanitizeCustomPageHtml('<style>.x{background:url(javascript:alert(1))}</style><a href="javascript:alert(1)" onclick="bad()">x</a><script>alert(1)</script>');
+
+    expect(out).not.toContain('javascript:');
+    expect(out).not.toContain('onclick');
+    expect(out).not.toContain('<script');
+    expect(out).not.toContain('alert(1)');
   });
 });
 

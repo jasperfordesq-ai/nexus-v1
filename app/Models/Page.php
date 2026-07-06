@@ -18,8 +18,9 @@ class Page extends Model
     protected $table = 'pages';
 
     protected $fillable = [
-        'tenant_id', 'title', 'slug', 'content', 'is_published',
+        'tenant_id', 'title', 'slug', 'content', 'content_format', 'design_json', 'is_published',
         'publish_at', 'show_in_menu', 'menu_location', 'sort_order',
+        'meta_description', 'menu_order',
     ];
 
     protected $casts = [

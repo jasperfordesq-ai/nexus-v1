@@ -4,18 +4,16 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * InsertImageButton — upload an image to our own domain and hand back an
- * <img> tag to insert at the caller's cursor. Reused by the HTML source editor
- * (Phase 1) and the GrapesJS asset manager (Phase 2), so image hosting has a
- * single path: POST /v2/upload (same-domain URL, server-side html/svg block).
+ * InsertImageButton - upload an image to our own domain and hand back an
+ * <img> tag to insert at the caller's cursor. Reused by raw HTML editors so
+ * image hosting has a single path: POST /v2/upload.
  */
 
 import { useRef, useState } from 'react';
 import { Button, Tooltip } from '@/components/ui';
 import ImagePlus from 'lucide-react/icons/image-plus';
-import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
-import { adminNewsletters } from '../api/adminApi';
+import { adminBuilderAssets } from '../api/adminApi';
 import { resolveUploadedUrl } from './builderImage';
 import { logError } from '@/lib/logger';
 
@@ -23,12 +21,15 @@ interface InsertImageButtonProps {
   /** Called with a ready-to-insert <img> tag using the uploaded same-domain URL. */
   onInsert: (imgTag: string) => void;
   isDisabled?: boolean;
+  labels: {
+    insertImage: string;
+    uploadFailed: string;
+  };
 }
 
 const ACCEPT = 'image/png,image/jpeg,image/gif,image/webp';
 
-export function InsertImageButton({ onInsert, isDisabled }: InsertImageButtonProps) {
-  const { t } = useTranslation('admin');
+export function InsertImageButton({ onInsert, isDisabled, labels }: InsertImageButtonProps) {
   const toast = useToast();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -40,17 +41,17 @@ export function InsertImageButton({ onInsert, isDisabled }: InsertImageButtonPro
 
     setUploading(true);
     try {
-      // Only the absolute url is inserted — a relative /storage path renders in
-      // the editor preview but is a dead reference in a delivered email.
-      const url = resolveUploadedUrl(await adminNewsletters.uploadImage(file));
+      // Only the absolute URL is inserted; relative upload paths break outside
+      // the editor's current route context.
+      const url = resolveUploadedUrl(await adminBuilderAssets.uploadImage(file));
       if (url) {
         onInsert(`<img src="${url}" alt="" style="max-width:100%;height:auto;" />`);
       } else {
-        toast.error(t('newsletter_content_editor.image_upload_failed'));
+        toast.error(labels.uploadFailed);
       }
     } catch (err) {
       logError('InsertImageButton: upload failed', err);
-      toast.error(t('newsletter_content_editor.image_upload_failed'));
+      toast.error(labels.uploadFailed);
     } finally {
       setUploading(false);
     }
@@ -58,7 +59,7 @@ export function InsertImageButton({ onInsert, isDisabled }: InsertImageButtonPro
 
   return (
     <>
-      <Tooltip content={t('newsletter_content_editor.insert_image')} size="sm" delay={500}>
+      <Tooltip content={labels.insertImage} size="sm" delay={500}>
         <Button
           size="sm"
           variant="tertiary"
@@ -68,7 +69,7 @@ export function InsertImageButton({ onInsert, isDisabled }: InsertImageButtonPro
           startContent={!uploading ? <ImagePlus size={15} /> : undefined}
           className="h-8 gap-1 text-xs px-2"
         >
-          {t('newsletter_content_editor.insert_image')}
+          {labels.insertImage}
         </Button>
       </Tooltip>
       <input

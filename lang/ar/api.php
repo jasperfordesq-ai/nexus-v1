@@ -226,6 +226,8 @@ return [
     'newsletter_send_failed' => 'Failed to send newsletter. Please try again or check logs.',
     'newsletter_segment_required' => 'تستهدف هذه النشرة الإخبارية شريحة محددة، ولكن لم يتم اختيار أي شريحة. يرجى اختيار شريحة قبل الإرسال.',
     'invalid_content_format' => 'تنسيق المحتوى غير صالح',
+    'design_json_too_large' => 'Page builder design data is too large',
+    'invalid_design_json' => 'Invalid page builder design data',
     'newsletter_content_too_large' => 'محتوى النشرة الإخبارية كبير جدًا (الحد الأقصى 512 كيلوبايت)',
     'newsletter_duplicated' => 'Newsletter duplicated successfully',
     'ab_winner_must_be_a_or_b' => 'Winner must be "a" or "b"',

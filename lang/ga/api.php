@@ -1192,6 +1192,8 @@ return [
     'newsletter_send_failed' => 'Failed to send newsletter. Please try again or check logs.',
     'newsletter_segment_required' => 'Díríonn an nuachtlitir seo ar dheighleog, ach níl aon deighleog roghnaithe. Roghnaigh deighleog sula seolann tú í.',
     'invalid_content_format' => 'Formáid ábhair neamhbhailí',
+    'design_json_too_large' => 'Page builder design data is too large',
+    'invalid_design_json' => 'Invalid page builder design data',
     'newsletter_content_too_large' => 'Tá ábhar an nuachtlitreach rómhór (uasmhéid 512 KB)',
     'config_load_failed' => 'Failed to load configuration',
     'external_user_fallback' => 'External User',

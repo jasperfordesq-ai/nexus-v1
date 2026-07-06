@@ -7,6 +7,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import userEvent from '@testing-library/user-event';
+import { ConfirmDialogProvider } from '@/components/ui';
 
 // ── admin api mock ────────────────────────────────────────────────────────
 const { mockAdminPages } = vi.hoisted(() => ({
@@ -16,6 +17,18 @@ const { mockAdminPages } = vi.hoisted(() => ({
     update: vi.fn(),
     delete: vi.fn(),
     list: vi.fn(),
+  },
+}));
+
+const { mockContentEditorState } = vi.hoisted(() => ({
+  mockContentEditorState: {
+    flushPayload: null as null | { content: string; content_format: 'plaintext' | 'richtext' | 'html' | 'builder'; design_json?: string | null },
+  },
+}));
+
+const { mockRouterState } = vi.hoisted(() => ({
+  mockRouterState: {
+    params: { id: undefined as string | undefined },
   },
 }));
 
@@ -34,6 +47,40 @@ vi.mock('../../components/RichTextEditor', () => ({
     />
   ),
 }));
+
+vi.mock('../../components/PageContentEditor', async () => {
+  const React = await import('react');
+  return {
+    PageContentEditor: React.forwardRef(function MockPageContentEditor(
+      {
+        value,
+        format,
+        designJson,
+        onChange,
+      }: {
+        value: string;
+        format: 'plaintext' | 'richtext' | 'html' | 'builder';
+        designJson?: string | null;
+        onChange: (next: { content: string; content_format: 'plaintext' | 'richtext' | 'html' | 'builder'; design_json?: string | null }) => void;
+      },
+      ref,
+    ) {
+      React.useImperativeHandle(ref, () => ({
+        flush: () => mockContentEditorState.flushPayload ?? { content: value, content_format: format },
+      }), [format, value]);
+      return (
+        <textarea
+          data-testid="rich-text-editor"
+          data-format={format}
+          data-design-json={designJson ?? ''}
+          value={value}
+          onChange={(e) => onChange({ content: e.target.value, content_format: format })}
+          aria-label="Content"
+        />
+      );
+    }),
+  };
+});
 
 // ── contexts ──────────────────────────────────────────────────────────────
 const mockNavigate = vi.fn();
@@ -72,7 +119,7 @@ vi.mock('react-router-dom', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react-router-dom')>();
   return {
     ...actual,
-    useParams: () => ({ id: undefined }),
+    useParams: () => mockRouterState.params,
     useNavigate: () => mockNavigate,
   };
 });
@@ -82,13 +129,21 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 // ── component ─────────────────────────────────────────────────────────────
 import { PageBuilder } from './PageBuilder';
 
+const renderPageBuilder = () => render(
+  <ConfirmDialogProvider>
+    <PageBuilder />
+  </ConfirmDialogProvider>,
+);
+
 describe('PageBuilder — create mode (id=undefined)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockContentEditorState.flushPayload = null;
+    mockRouterState.params = { id: undefined };
   });
 
   it('renders create form with title and slug inputs', async () => {
-    render(<PageBuilder />);
+    renderPageBuilder();
     // Wait for Suspense to resolve lazy RichTextEditor
     await screen.findByTestId('rich-text-editor');
     expect(screen.getAllByRole('textbox').length).toBeGreaterThan(0);
@@ -96,7 +151,7 @@ describe('PageBuilder — create mode (id=undefined)', () => {
 
   it('auto-slugifies title as user types', async () => {
     const user = userEvent.setup();
-    render(<PageBuilder />);
+    renderPageBuilder();
     await screen.findByTestId('rich-text-editor');
 
     // Find the title input (first required textbox)
@@ -121,7 +176,7 @@ describe('PageBuilder — create mode (id=undefined)', () => {
 
   it('shows warning toast when saving with empty title', async () => {
     const user = userEvent.setup();
-    render(<PageBuilder />);
+    renderPageBuilder();
     await screen.findByTestId('rich-text-editor');
 
     // Attempt to save without a title
@@ -138,7 +193,7 @@ describe('PageBuilder — create mode (id=undefined)', () => {
     const user = userEvent.setup();
     mockAdminPages.create.mockResolvedValueOnce({ success: true, data: { id: 5 } });
 
-    render(<PageBuilder />);
+    renderPageBuilder();
     await screen.findByTestId('rich-text-editor');
 
     const inputs = screen.getAllByRole('textbox');
@@ -157,6 +212,27 @@ describe('PageBuilder — create mode (id=undefined)', () => {
     expect(mockNavigate).toHaveBeenCalled();
   });
 
+  it('sends the manually edited slug when creating a page', async () => {
+    const user = userEvent.setup();
+    mockAdminPages.create.mockResolvedValueOnce({ success: true, data: { id: 8 } });
+
+    renderPageBuilder();
+    await screen.findByTestId('rich-text-editor');
+
+    const inputs = screen.getAllByRole('textbox');
+    await user.type(inputs[0]!, 'Beautiful Public Page');
+    await user.clear(inputs[1]!);
+    await user.type(inputs[1]!, 'tenant-two-style');
+
+    await user.click(screen.getByRole('button', { name: /create|save/i }));
+
+    await waitFor(() => expect(mockAdminPages.create).toHaveBeenCalled());
+    expect(mockAdminPages.create).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'Beautiful Public Page',
+      slug: 'tenant-two-style',
+    }));
+  });
+
   it('shows error toast when create fails', async () => {
     const user = userEvent.setup();
     mockAdminPages.create.mockResolvedValueOnce({
@@ -164,7 +240,7 @@ describe('PageBuilder — create mode (id=undefined)', () => {
       error: 'Duplicate slug',
     });
 
-    render(<PageBuilder />);
+    renderPageBuilder();
     await screen.findByTestId('rich-text-editor');
 
     const inputs = screen.getAllByRole('textbox');
@@ -178,29 +254,149 @@ describe('PageBuilder — create mode (id=undefined)', () => {
     });
     expect(mockNavigate).not.toHaveBeenCalled();
   });
+
+  it('submits the latest flushed builder HTML and design_json when saving immediately', async () => {
+    const user = userEvent.setup();
+    mockContentEditorState.flushPayload = {
+      content: '<style>.hero{color:red}</style><section class="hero">Latest</section>',
+      content_format: 'builder',
+      design_json: '{"pages":[{"frames":[]}]}',
+    };
+    mockAdminPages.create.mockResolvedValueOnce({ success: true, data: { id: 6 } });
+
+    renderPageBuilder();
+    await screen.findByTestId('rich-text-editor');
+
+    await user.type(screen.getAllByRole('textbox')[0]!, 'Builder Page');
+    await user.click(screen.getByRole('button', { name: /create|save/i }));
+
+    await waitFor(() => expect(mockAdminPages.create).toHaveBeenCalled());
+    expect(mockAdminPages.create).toHaveBeenCalledWith(expect.objectContaining({
+      content: '<style>.hero{color:red}</style><section class="hero">Latest</section>',
+      content_format: 'builder',
+      design_json: '{"pages":[{"frames":[]}]}',
+    }));
+  });
+
+  it('clears design_json in the payload when the flushed content is no longer builder mode', async () => {
+    const user = userEvent.setup();
+    mockContentEditorState.flushPayload = {
+      content: '<p>Plain saved content</p>',
+      content_format: 'html',
+      design_json: '{"pages":[{"frames":[]}]}',
+    };
+    mockAdminPages.create.mockResolvedValueOnce({ success: true, data: { id: 7 } });
+
+    renderPageBuilder();
+    await screen.findByTestId('rich-text-editor');
+
+    await user.type(screen.getAllByRole('textbox')[0]!, 'HTML Page');
+    await user.click(screen.getByRole('button', { name: /create|save/i }));
+
+    await waitFor(() => expect(mockAdminPages.create).toHaveBeenCalled());
+    expect(mockAdminPages.create).toHaveBeenCalledWith(expect.objectContaining({
+      content_format: 'html',
+      design_json: null,
+    }));
+  });
 });
 
 describe('PageBuilder — edit mode (id=3)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Override useParams for edit mode
-    vi.doMock('react-router-dom', async (importOriginal) => {
-      const actual = await importOriginal<typeof import('react-router-dom')>();
-      return {
-        ...actual,
-        useParams: () => ({ id: '3' }),
-        useNavigate: () => mockNavigate,
-      };
-    });
+    mockContentEditorState.flushPayload = null;
+    mockRouterState.params = { id: '3' };
   });
 
-  it('shows loading spinner while fetching page data', async () => {
-    // We test with the already-mocked params (id undefined) and verify no
-    // spinner appears in create mode — the edit-mode spinner is implementation
-    // detail that requires re-rendering with id param.
-    // Skip: edit-mode spinner requires dynamic vi.mock re-evaluation which is
-    // not supported in this harness. Covered by integration tests.
-    // (Note to reviewer: vi.doMock in beforeEach does NOT take effect for
-    //  already-imported modules in the same test file.)
+  it('loads existing builder content and design_json into the editor', async () => {
+    mockAdminPages.get.mockResolvedValueOnce({
+      success: true,
+      data: {
+        title: 'Existing Builder Page',
+        slug: 'existing-builder-page',
+        content: '<section>Saved builder HTML</section>',
+        content_format: 'builder',
+        design_json: '{"pages":[{"frames":[{"component":{"type":"wrapper"}}]}]}',
+        meta_description: 'Existing meta',
+        status: 'published',
+        show_in_menu: true,
+        menu_location: 'footer',
+        menu_order: 2,
+      },
+    });
+
+    renderPageBuilder();
+
+    const editor = await screen.findByTestId('rich-text-editor');
+    expect(mockAdminPages.get).toHaveBeenCalledWith(3);
+    expect(editor).toHaveValue('<section>Saved builder HTML</section>');
+    expect(editor).toHaveAttribute('data-format', 'builder');
+    expect(editor).toHaveAttribute('data-design-json', '{"pages":[{"frames":[{"component":{"type":"wrapper"}}]}]}');
+  });
+
+  it('saves the latest flushed builder HTML and design_json in edit mode', async () => {
+    const user = userEvent.setup();
+    mockAdminPages.get.mockResolvedValueOnce({
+      success: true,
+      data: {
+        title: 'Existing Builder Page',
+        slug: 'existing-builder-page',
+        content: '<section>Old</section>',
+        content_format: 'builder',
+        design_json: '{"pages":[{"frames":[]}]}',
+        status: 'draft',
+      },
+    });
+    mockContentEditorState.flushPayload = {
+      content: '<style>.hero{color:red}</style><section class="hero">Latest edit</section>',
+      content_format: 'builder',
+      design_json: '{"pages":[{"frames":[{"component":{"tagName":"section"}}]}]}',
+    };
+    mockAdminPages.update.mockResolvedValueOnce({ success: true, data: { id: 3 } });
+
+    renderPageBuilder();
+    await screen.findByTestId('rich-text-editor');
+
+    await user.click(screen.getByRole('button', { name: /save/i }));
+
+    await waitFor(() => expect(mockAdminPages.update).toHaveBeenCalled());
+    expect(mockAdminPages.update).toHaveBeenCalledWith(3, expect.objectContaining({
+      content: '<style>.hero{color:red}</style><section class="hero">Latest edit</section>',
+      content_format: 'builder',
+      design_json: '{"pages":[{"frames":[{"component":{"tagName":"section"}}]}]}',
+    }));
+  });
+
+  it('clears design_json when edit mode saves a non-builder format', async () => {
+    const user = userEvent.setup();
+    mockAdminPages.get.mockResolvedValueOnce({
+      success: true,
+      data: {
+        title: 'Existing Builder Page',
+        slug: 'existing-builder-page',
+        content: '<section>Old</section>',
+        content_format: 'builder',
+        design_json: '{"pages":[{"frames":[]}]}',
+        status: 'draft',
+      },
+    });
+    mockContentEditorState.flushPayload = {
+      content: '<p>HTML now</p>',
+      content_format: 'html',
+      design_json: '{"pages":[{"frames":[]}]}',
+    };
+    mockAdminPages.update.mockResolvedValueOnce({ success: true, data: { id: 3 } });
+
+    renderPageBuilder();
+    await screen.findByTestId('rich-text-editor');
+
+    await user.click(screen.getByRole('button', { name: /save/i }));
+
+    await waitFor(() => expect(mockAdminPages.update).toHaveBeenCalled());
+    expect(mockAdminPages.update).toHaveBeenCalledWith(3, expect.objectContaining({
+      content: '<p>HTML now</p>',
+      content_format: 'html',
+      design_json: null,
+    }));
   });
 });

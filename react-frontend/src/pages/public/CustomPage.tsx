@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';import ArrowLeft from 'lucide-react/icons/arrow-left';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import FileText from 'lucide-react/icons/file-text';
-import { sanitizeRichText } from '@/lib/sanitize';
+import { sanitizeCustomPageHtml, sanitizeRichText } from '@/lib/sanitize';
 import { GlassCard, Button, Spinner } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
@@ -29,6 +29,7 @@ interface PageData {
   title: string;
   slug: string;
   content: string;
+  content_format?: 'plaintext' | 'richtext' | 'html' | 'builder';
   meta_description: string;
   created_at: string;
   updated_at: string;
@@ -124,6 +125,7 @@ export function CustomPage() {
   }
 
   const metaDescription = page.meta_description?.trim() || plainTextExcerpt(page.content);
+  const rendersAsCustomHtml = page.content_format === 'builder' || page.content_format === 'html';
 
   return (
     <>
@@ -135,43 +137,59 @@ export function CustomPage() {
         modifiedTime={page.updated_at || page.created_at}
       />
 
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-        <Breadcrumbs items={[
-          { label: t('not_found.go_home'), href: '/' },
-          { label: page.title },
-        ]} />
+      <div className={rendersAsCustomHtml ? 'py-8 space-y-6' : 'max-w-4xl mx-auto px-4 py-8 space-y-6'}>
+        <div className={rendersAsCustomHtml ? 'mx-auto max-w-6xl px-4' : undefined}>
+          <Breadcrumbs items={[
+            { label: t('not_found.go_home'), href: '/' },
+            { label: page.title },
+          ]} />
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <GlassCard className="p-6 sm:p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <FileText className="w-6 h-6 text-accent" />
-              <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">
-                {page.title}
-              </h1>
-            </div>
-
-            {page.content && (
+          {rendersAsCustomHtml ? (
+            page.content && (
               <div
-                className="
-                  prose prose-neutral dark:prose-invert max-w-none
-                  [&_a]:text-accent [&_a]:underline
-                  [&_img]:rounded-xl [&_img]:max-w-full
-                  [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mt-8 [&_h2]:mb-4
-                  [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-3
-                  [&_ul]:list-disc [&_ul]:pl-6
-                  [&_ol]:list-decimal [&_ol]:pl-6
-                  [&_blockquote]:border-l-4 [&_blockquote]:border-accent [&_blockquote]:pl-4 [&_blockquote]:italic
-                  [&_code]:bg-theme-elevated [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm
-                  [&_pre]:bg-theme-elevated [&_pre]:p-4 [&_pre]:rounded-xl [&_pre]:overflow-x-auto
-                "
-                dangerouslySetInnerHTML={{ __html: sanitizeRichText(page.content) }}
+                dangerouslySetInnerHTML={{ __html: sanitizeCustomPageHtml(page.content) }}
               />
-            )}
-          </GlassCard>
+            )
+          ) : (
+            <GlassCard className="p-6 sm:p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <FileText className="w-6 h-6 text-accent" />
+                <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">
+                  {page.title}
+                </h1>
+              </div>
+
+              {page.content_format === 'plaintext' && page.content && (
+                <div className="whitespace-pre-wrap text-theme-primary">
+                  {page.content}
+                </div>
+              )}
+
+              {page.content_format !== 'plaintext' && page.content && (
+                <div
+                  className="
+                    prose prose-neutral dark:prose-invert max-w-none
+                    [&_a]:text-accent [&_a]:underline
+                    [&_img]:rounded-xl [&_img]:max-w-full
+                    [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mt-8 [&_h2]:mb-4
+                    [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-3
+                    [&_ul]:list-disc [&_ul]:pl-6
+                    [&_ol]:list-decimal [&_ol]:pl-6
+                    [&_blockquote]:border-l-4 [&_blockquote]:border-accent [&_blockquote]:pl-4 [&_blockquote]:italic
+                    [&_code]:bg-theme-elevated [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm
+                    [&_pre]:bg-theme-elevated [&_pre]:p-4 [&_pre]:rounded-xl [&_pre]:overflow-x-auto
+                  "
+                  dangerouslySetInnerHTML={{ __html: sanitizeRichText(page.content) }}
+                />
+              )}
+            </GlassCard>
+          )}
         </motion.div>
       </div>
     </>

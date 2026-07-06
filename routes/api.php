@@ -2365,6 +2365,7 @@ Route::get('/v2/admin/prerender/summary',          [\App\Http\Controllers\Api\Ad
 Route::get('/v2/admin/prerender/inventory',        [\App\Http\Controllers\Api\AdminPrerenderController::class, 'inventory']);
 Route::get('/v2/admin/prerender/inspect',          [\App\Http\Controllers\Api\AdminPrerenderController::class, 'inspect']);
 Route::get('/v2/admin/prerender/coverage',         [\App\Http\Controllers\Api\AdminPrerenderController::class, 'coverage']);
+Route::get('/v2/admin/prerender/tenant-safety',    [\App\Http\Controllers\Api\AdminPrerenderController::class, 'tenantSafety']);
 Route::get('/v2/admin/prerender/events',           [\App\Http\Controllers\Api\AdminPrerenderController::class, 'events']);
 Route::get('/v2/admin/prerender/failures',         [\App\Http\Controllers\Api\AdminPrerenderController::class, 'failures']);
 Route::get('/v2/admin/prerender/jobs',             [\App\Http\Controllers\Api\AdminPrerenderController::class, 'jobs']);

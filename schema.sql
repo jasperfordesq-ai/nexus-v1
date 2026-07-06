@@ -5538,6 +5538,8 @@ CREATE TABLE `pages` (
   `title` varchar(255) NOT NULL,
   `slug` varchar(255) NOT NULL,
   `content` longtext DEFAULT NULL,
+  `content_format` enum('plaintext','richtext','html','builder') NOT NULL DEFAULT 'richtext',
+  `design_json` longtext DEFAULT NULL,
   `builder_version` varchar(10) DEFAULT 'v2',
   `is_published` tinyint(1) DEFAULT 0,
   `sort_order` int(11) DEFAULT 0,

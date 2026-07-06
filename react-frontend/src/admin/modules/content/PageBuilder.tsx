@@ -1,5 +1,10 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Input, Button, Spinner, Select, SelectItem, Switch } from '@/components/ui';
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import FileText from 'lucide-react/icons/file-text';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -12,11 +17,9 @@ import { useTenant, useToast, useAuth } from '@/contexts';
 import { adminPages } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { PageContentEditor } from '../../components/PageContentEditor';
+import type { PageContentEditorHandle } from '../../components/PageContentEditor';
+import type { ContentFormat } from '../../components/contentFormat';
 /**
  * Page Builder
  * Create or edit a CMS page with real API integration.
@@ -24,14 +27,12 @@ import { useTranslation } from 'react-i18next';
  */
 
 
-const RichTextEditor = lazy(() =>
-  import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
-);
-
 interface PageFormData {
   title: string;
   slug: string;
   content: string;
+  content_format: ContentFormat;
+  design_json: string | null;
   meta_description: string;
   status: string;
   show_in_menu: boolean;
@@ -48,6 +49,13 @@ const toSlug = (text: string): string =>
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
 
+const toSlugInput = (text: string): string =>
+  text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-');
+
 export function PageBuilder() {
   const { t } = useTranslation('admin');
   const { id } = useParams<{ id: string }>();
@@ -57,11 +65,14 @@ export function PageBuilder() {
   const { tenantPath, tenant, refreshTenant } = useTenant();
   const { user } = useAuth();
   const toast = useToast();
+  const contentEditorRef = useRef<PageContentEditorHandle | null>(null);
 
   const [formData, setFormData] = useState<PageFormData>({
     title: '',
     slug: '',
     content: '',
+    content_format: 'richtext',
+    design_json: null,
     meta_description: '',
     status: 'draft',
     show_in_menu: false,
@@ -97,6 +108,8 @@ export function PageBuilder() {
               title: (page.title as string) || '',
               slug: (page.slug as string) || '',
               content: (page.content as string) || '',
+              content_format: ((page.content_format as ContentFormat) || 'richtext'),
+              design_json: (page.design_json as string) || null,
               meta_description: (page.meta_description as string) || '',
               status: (page.status as string) || 'draft',
               show_in_menu: !!(page.show_in_menu),
@@ -111,7 +124,7 @@ export function PageBuilder() {
   }, [id, isEdit, t, toast])
 
 
-  const handleChange = (field: keyof PageFormData, value: string | boolean | number) => {
+  const handleChange = (field: keyof PageFormData, value: string | boolean | number | null) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -130,9 +143,14 @@ export function PageBuilder() {
     }
     setSaving(true);
     try {
+      const flushed = contentEditorRef.current?.flush();
+      const dataToSave = flushed
+        ? { ...formData, content: flushed.content, content_format: flushed.content_format, design_json: flushed.design_json ?? null }
+        : formData;
       const payload = {
-        ...formData,
-        show_in_menu: formData.show_in_menu ? 1 : 0,
+        ...dataToSave,
+        design_json: dataToSave.content_format === 'builder' ? dataToSave.design_json : null,
+        show_in_menu: dataToSave.show_in_menu ? 1 : 0,
       };
       if (isEdit) {
         const res = await adminPages.update(Number(id), payload as Record<string, unknown>);
@@ -227,18 +245,23 @@ export function PageBuilder() {
               value={formData.slug}
               onValueChange={(v) => {
                 setSlugTouched(true);
-                handleChange('slug', toSlug(v));
+                handleChange('slug', toSlugInput(v));
               }}
             />
-            <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('common.loading')}><Spinner size="sm" className="m-4" /></div>}>
-              <RichTextEditor
-                label={t('content.label_content')}
-                placeholder={t('content.placeholder_content')}
-                value={formData.content}
-                onChange={(html) => handleChange('content', html)}
-                isDisabled={saving}
-              />
-            </Suspense>
+            <PageContentEditor
+              ref={contentEditorRef}
+              value={formData.content}
+              format={formData.content_format}
+              designJson={formData.design_json}
+              isDisabled={saving}
+              onChange={(next) => {
+                handleChange('content', next.content);
+                handleChange('content_format', next.content_format);
+                if ('design_json' in next) {
+                  handleChange('design_json', next.design_json ?? null);
+                }
+              }}
+            />
             <Input
               label={t('content.label_meta_description')}
               placeholder={t('content.placeholder_meta_description')}

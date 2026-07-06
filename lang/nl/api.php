@@ -226,6 +226,8 @@ return [
     'newsletter_send_failed' => 'Failed to send newsletter. Please try again or check logs.',
     'newsletter_segment_required' => 'Deze nieuwsbrief richt zich op een segment, maar er is geen segment geselecteerd. Kies een segment voordat je verzendt.',
     'invalid_content_format' => 'Ongeldig inhoudsformaat',
+    'design_json_too_large' => 'Page builder design data is too large',
+    'invalid_design_json' => 'Invalid page builder design data',
     'newsletter_content_too_large' => 'De inhoud van de nieuwsbrief is te groot (maximaal 512 KB)',
     'newsletter_duplicated' => 'Newsletter duplicated successfully',
     'ab_winner_must_be_a_or_b' => 'Winner must be "a" or "b"',

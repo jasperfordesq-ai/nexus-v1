@@ -32,6 +32,7 @@
  */
 
 import DOMPurify from 'dompurify';
+import { scopePageBuilderHtml } from './pageBuilderHtml';
 
 /* ───────────────────────── Allow-lists ───────────────────────── */
 
@@ -52,11 +53,24 @@ const RICH_TEXT_ALLOWED_TAGS = [
   'ins', 'del',
 ];
 
+const PAGE_BUILDER_ALLOWED_TAGS = [
+  ...RICH_TEXT_ALLOWED_TAGS,
+  'section', 'article', 'aside', 'header', 'footer', 'main', 'nav',
+  'form', 'label', 'input', 'textarea', 'select', 'option', 'button',
+];
+
 const RICH_TEXT_ALLOWED_ATTR = [
   'href', 'src', 'alt', 'title', 'class', 'id',
   'colspan', 'rowspan', 'scope',
   'width', 'height', 'loading',
   'target', 'rel',
+];
+
+const PAGE_BUILDER_ALLOWED_ATTR = [
+  ...RICH_TEXT_ALLOWED_ATTR,
+  'role', 'aria-label', 'aria-labelledby', 'aria-describedby',
+  'type', 'name', 'value', 'placeholder', 'checked', 'selected', 'disabled',
+  'required', 'for', 'action', 'method',
 ];
 
 const INLINE_ALLOWED_TAGS = [
@@ -160,6 +174,33 @@ export function sanitizeRichText(html: string | null | undefined): string {
     ALLOW_UNKNOWN_PROTOCOLS: false,
     KEEP_CONTENT: true,
   });
+}
+
+/**
+ * Sanitize admin-authored custom page builder HTML.
+ *
+ * This is intentionally broader than rich text so GrapesJS pages keep their
+ * exported CSS, semantic sections, and basic form markup. Scripts and unsafe
+ * URL schemes are still stripped by DOMPurify and the shared URL hook.
+ */
+export function sanitizeCustomPageHtml(html: string | null | undefined): string {
+  if (!html) return '';
+  installHooksOnce();
+  const scoped = scopePageBuilderHtml(html);
+  const doc = new DOMParser().parseFromString(scoped, 'text/html');
+  const scopedCss = Array.from(doc.querySelectorAll('style'))
+    .map((style) => style.textContent || '')
+    .filter(Boolean)
+    .join('\n');
+  doc.querySelectorAll('style').forEach((node) => node.remove());
+  const sanitizedBody = DOMPurify.sanitize(doc.body.innerHTML, {
+    ALLOWED_TAGS: PAGE_BUILDER_ALLOWED_TAGS,
+    ALLOWED_ATTR: PAGE_BUILDER_ALLOWED_ATTR,
+    ALLOW_DATA_ATTR: false,
+    ALLOW_UNKNOWN_PROTOCOLS: false,
+    KEEP_CONTENT: true,
+  });
+  return `${scopedCss ? `<style>${scopedCss}</style>` : ''}${sanitizedBody}`;
 }
 
 /**

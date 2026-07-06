@@ -2281,6 +2281,51 @@
     "provider_smtp": "SMTP",
     "prerender": {
       "description": "Bot-only server-rendered snapshots. Monitor coverage, detect staleness, and force refreshes.",
+      "guide": {
+        "title": "Plain-English guide",
+        "intro": "The prerender engine makes saved HTML copies of public pages for search engines and social previews. Members use the normal app; these snapshots are only for crawlers.",
+        "bot_only": {
+          "title": "What gets rendered",
+          "body": "Public tenant pages, such as about pages, listings, blog posts, and public groups. Private member areas are not supposed to be rendered."
+        },
+        "tenant_scope": {
+          "title": "Tenant safety",
+          "body": "When a page belongs to one tenant, actions should include that tenant slug. The engine now checks host and tenant path before touching snapshots."
+        },
+        "dry_run": {
+          "title": "Preview first",
+          "body": "A dry run shows what would happen without deleting files or queuing work. Use it before purge or repair actions."
+        },
+        "repair": {
+          "title": "Repair stuck queue",
+          "body": "This is not a content reset. It only releases jobs that look abandoned and lets the worker resume after repeated failures."
+        }
+      },
+      "workflows": {
+        "title": "What are you trying to do?",
+        "description": "Start with the plain task, then use the tab it opens. This keeps routine work away from the risky controls.",
+        "open": "Open",
+        "refresh_one_tenant": {
+          "title": "Refresh one tenant",
+          "body": "Use when public content changed for a single community. Enter its tenant slug before queuing work."
+        },
+        "find_stale_pages": {
+          "title": "Find stale or missing pages",
+          "body": "Check coverage first to see which tenants have old snapshots, missing pages, or broken assets."
+        },
+        "inspect_cache": {
+          "title": "Inspect saved pages",
+          "body": "Search the cache, inspect SEO tags, and recache selected snapshots using tenant-safe routes."
+        },
+        "investigate_failures": {
+          "title": "Investigate failed renders",
+          "body": "Review routes in the backoff window before retrying, purging, or repairing the queue."
+        },
+        "check_tenant_safety": {
+          "title": "Check one tenant is safe",
+          "body": "Inspect exactly what this tenant should have, what is saved, and whether any snapshots belong elsewhere."
+        }
+      },
       "analytics": {
         "actions": {
           "reload": "Reload"
@@ -2373,16 +2418,16 @@
       },
       "freshness": {
         "actions": {
-          "apply": "Apply",
-          "dry_run": "Dry run"
+          "apply": "Run now",
+          "dry_run": "Preview only"
         },
         "auto_recache": {
-          "description": "Scans every snapshot. Enqueues low-priority recaches for routes whose source content has changed or whose TTL has expired. Runs on cron every 15-30 minutes; use this to trigger one immediately.",
-          "title": "Auto-recache (TTL + content drift)"
+          "description": "Looks for snapshots that are old or whose source content changed, then queues safe background refreshes. This normally runs automatically; use this button when you want to check immediately.",
+          "title": "Find pages that need refreshing"
         },
         "drift": {
-          "description": "Walks each tenant sitemap, compares lastmod against snapshot mtimes, and catches stale pages from raw writes, migrations, or queued jobs. Runs every 2 minutes and enqueues high-priority recaches.",
-          "title": "Detect drift (sitemap vs snapshots)"
+          "description": "Compares each tenant sitemap with saved snapshots so pages missing from the cache, or older than the sitemap says they should be, can be refreshed.",
+          "title": "Compare sitemap with cache"
         },
         "errors": {
           "auto_recache": "Failed to trigger auto-recache",
@@ -2399,8 +2444,8 @@
         },
         "no_output": "(no output)",
         "purge_ungated": {
-          "description": "Sweep snapshots whose route is not in a tenant expected set. Common after toggling a feature off, or for cleanup of static routes prerendered without feature flags. Dynamic content routes are left alone.",
-          "title": "Purge ungated snapshots (per-tenant 404 cleanup)"
+          "description": "Removes saved pages that the tenant should not have, such as pages left behind after a feature was turned off. Use preview first; tenant-owned dynamic pages are protected.",
+          "title": "Remove snapshots that should not exist"
         },
         "result": {
           "deleted": "Deleted {{count}} snapshots across {{tenants}} tenants",
@@ -2411,22 +2456,22 @@
       "health_banner": {
         "actions": {
           "cancel": "Cancel",
-          "close_breaker_now": "Close breaker now",
+          "close_breaker_now": "Resume queue now",
           "details": "Details",
-          "emergency_reset": "Emergency reset",
+          "emergency_reset": "Repair stuck queue",
           "hide": "Hide",
           "hide_details": "Hide details",
-          "reset_queue": "Reset queue"
+          "reset_queue": "Repair queue"
         },
         "engine_healthy": "Engine healthy",
         "issue_count_one": "{{count}} issue",
         "issue_count_other": "{{count}} issues",
         "modal": {
           "body_middle": "or",
-          "body_prefix": "This will requeue every",
-          "body_suffix": "row whose worker has been silent for >30 min, and clear the circuit breaker.",
-          "title": "Emergency: reset stuck queue",
-          "warning": "Only use this if you've confirmed the queue is stuck. If a healthy worker is still running, this will create duplicate work."
+          "body_prefix": "This will put every",
+          "body_suffix": "job whose worker has been silent for more than 30 minutes back in the queue, and allow the queue to run again.",
+          "title": "Repair stuck prerender queue",
+          "warning": "Use this only when the queue appears stuck. It does not delete content or change tenant data, but a still-running worker could duplicate work."
         },
         "toasts": {
           "breaker_reset": "Circuit breaker reset",
@@ -2434,6 +2479,22 @@
           "queue_reset_other": "Reset {{count}} stuck rows; breaker cleared",
           "queue_reset_failed": "Queue reset failed",
           "reset_failed": "Reset failed"
+        },
+        "checks": {
+          "cache_readable": "Cache can be read",
+          "cache_writable": "Cache can be written",
+          "cache_filesystem": "Cache storage",
+          "route_planner": "Tenant route planner",
+          "job_table": "Job queue table",
+          "circuit_breaker": "Circuit breaker",
+          "queue_age": "Queue age",
+          "recent_failures": "Recent failures",
+          "stuck_jobs": "Stuck jobs",
+          "last_successful_pass": "Last successful run",
+          "last_failed_pass": "Last failed run",
+          "sched_prerender-detect-drift": "Drift detector heartbeat",
+          "sched_prerender-auto-recache": "Auto-recache heartbeat",
+          "sched_prerender-reap-stale": "Stale-job cleanup heartbeat"
         }
       },
       "inventory": {
@@ -2644,15 +2705,15 @@
       "live_connected": "Live updates connected",
       "audit": {
         "actions": {
-          "auto_recache": "auto_recache",
-          "cancel": "cancel",
-          "detect_drift": "detect_drift",
-          "enqueue": "enqueue",
-          "invalidate": "invalidate",
-          "purge": "purge",
-          "purge_unexpected": "purge_unexpected",
-          "reset_breaker": "reset_breaker",
-          "reset_queue": "reset_queue"
+          "auto_recache": "Auto-recache",
+          "cancel": "Cancel job",
+          "detect_drift": "Detect drift",
+          "enqueue": "Queue refresh",
+          "invalidate": "Invalidate route",
+          "purge": "Delete snapshots",
+          "purge_unexpected": "Clean unexpected snapshots",
+          "reset_breaker": "Reset safety breaker",
+          "reset_queue": "Repair stuck queue"
         },
         "buttons": {
           "export_csv": "Export CSV",
@@ -2676,7 +2737,13 @@
           "action": "Action filter",
           "all": "All"
         },
-        "table_aria": "Audit history"
+        "table_aria": "Audit history",
+        "outcomes": {
+          "ok": "Completed",
+          "denied": "Denied",
+          "failed": "Failed"
+        },
+        "details_empty": "No extra details"
       },
       "overview": {
         "actions": {
@@ -2693,10 +2760,10 @@
           "tenant_slug": "Tenant slug"
         },
         "force_refresh": {
-          "description": "Queue a re-render. Leave both fields empty to refresh every tenant and route. The host processor picks the job up within about 60 seconds.",
-          "dry_run": "Dry run (plan only)",
-          "force": "Force (ignore cache)",
-          "title": "Force refresh"
+          "description": "Queue fresh snapshots. Add a tenant slug to refresh only one tenant; leave both fields empty only when you deliberately want every tenant refreshed.",
+          "dry_run": "Preview only",
+          "force": "Refresh even if a snapshot already exists",
+          "title": "Queue a refresh"
         },
         "health": {
           "cache_unreachable": "Cache unreachable",
@@ -2742,21 +2809,31 @@
       "polling_fallback": "Polling fallback",
       "purge": {
         "actions": {
-          "auto_recache": "Auto-recache after purge",
-          "dry_run": "Dry run",
-          "preview_purge": "Preview purge",
-          "purge_now": "Purge now"
+          "auto_recache": "Refresh after deleting",
+          "dry_run": "Preview only",
+          "preview_purge": "Preview delete",
+          "purge_now": "Delete snapshots",
+          "continue_to_delete": "Continue to live delete"
         },
         "description_middle": "for one path segment,",
-        "description_prefix": "Delete snapshots matching a glob pattern. Use",
-        "description_suffix": "for any descendant. Examples:",
+        "description_prefix": "Delete saved HTML snapshots that match a path pattern. Add a tenant slug when the route belongs to one tenant. Use",
+        "description_suffix": "for any descendant. Preview before deleting. Examples:",
+        "all_tenants_warning": {
+          "body": "Leaving tenant slug blank will delete matching snapshots across every tenant. This is only for platform-wide cleanup after you have previewed the exact files.",
+          "confirm": "I understand this delete applies to every tenant",
+          "title": "All-tenant delete"
+        },
         "errors": {
+          "confirm_all_tenants": "Confirm the all-tenant delete before continuing",
           "pattern_required": "Pattern is required (e.g. /blog/*)",
-          "purge_failed": "Purge failed"
+          "purge_failed": "Purge failed",
+          "preview_required": "Run a matching preview before deleting snapshots.",
+          "confirm_text": "Type {{phrase}} to confirm this live delete."
         },
         "fields": {
           "pattern": "Pattern",
-          "tenant_slug": "Tenant slug"
+          "tenant_slug": "Tenant slug",
+          "confirm_text": "Type {{phrase}} to confirm"
         },
         "messages": {
           "dry_run": "Dry run: {{count}} snapshots would be purged",
@@ -2764,20 +2841,25 @@
         },
         "placeholders": {
           "pattern": "/blog/* or /listings/**",
-          "tenant_slug": "optional - leave blank for all"
+          "tenant_slug": "recommended for tenant-owned pages"
         },
         "result": {
           "deleted": "Deleted {{count}} snapshots",
           "would_delete": "Would delete {{count}} snapshots"
         },
-        "title": "Wildcard cache purge"
+        "title": "Delete snapshots by route pattern",
+        "preview_gate": {
+          "title": "Preview required before live delete",
+          "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
+          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
+        }
       },
       "ttl_inspector": {
         "actions": {
           "inspect": "Inspect"
         },
-        "description_prefix": "See which",
-        "description_suffix": "pattern owns a route and what TTL it gets, without grepping config. Used to tune the freshness policy.",
+        "description_prefix": "Check how long a route is allowed to stay cached before it is considered old. The matching",
+        "description_suffix": "pattern decides the time limit.",
         "error": "Lookup failed - check the route format (must start with \"/\")",
         "fields": {
           "route": "Route"
@@ -2792,7 +2874,7 @@
           "other_patterns": "Other patterns that match this route:",
           "ttl": "TTL: {{ttl}} ({{seconds}}s)"
         },
-        "title": "TTL inspector",
+        "title": "Freshness rule lookup",
         "units": {
           "days": "{{count}} d",
           "hours": "{{count}} h",
@@ -2808,8 +2890,8 @@
           "static": "{{count}} static",
           "total": "{{count}} total"
         },
-        "description_prefix": "See exactly which routes the engine plans to render for a tenant - static floor (feature/module gated) plus the dynamic URLs from",
-        "description_suffix": "The Playwright worker visits this list.",
+        "description_prefix": "See the public routes the engine believes belong to this tenant: built-in public pages plus dynamic URLs from",
+        "description_suffix": "The worker uses this list when it refreshes snapshots.",
         "error": "Lookup failed - check the tenant slug",
         "fields": {
           "tenant_slug": "Tenant slug"
@@ -2822,7 +2904,7 @@
           "dynamic_routes": "Dynamic routes (capped at 1,000)",
           "static_routes": "Static routes"
         },
-        "title": "Sitemap explorer"
+        "title": "Tenant route list"
       },
       "readonly": {
         "prefix": "Read-only view - action buttons are disabled because the prerender engine operates across every tenant. Sign in with a",
@@ -2837,10 +2919,90 @@
         "history": "History",
         "inventory": "Inventory",
         "jobs": "Jobs",
-        "overview": "Overview"
+        "overview": "Overview",
+        "tenant_safety": "Tenant safety"
       },
       "tabs_aria": "Prerender tabs",
-      "title": "Prerender Engine"
+      "title": "Prerender Engine",
+      "tenant_safety": {
+        "title": "Tenant safety inspector",
+        "description": "Check one community before refreshing or deleting anything. This view compares the tenant route plan with the saved cache and explains why each snapshot exists.",
+        "fields": {
+          "tenant_slug": "Tenant slug"
+        },
+        "placeholders": {
+          "tenant_slug": "hour-timebank"
+        },
+        "actions": {
+          "inspect": "Inspect tenant",
+          "open_inventory": "Open inventory"
+        },
+        "errors": {
+          "tenant_required": "Enter a tenant slug first.",
+          "load": "Failed to load tenant safety report."
+        },
+        "messages": {
+          "loaded": "Loaded safety report for {{slug}}."
+        },
+        "status": {
+          "clean": "No issues found",
+          "needs_attention": "{{count}} item needs attention"
+        },
+        "counts": {
+          "expected": "Expected",
+          "snapshots": "Saved",
+          "missing": "Missing",
+          "unexpected": "Unexpected",
+          "stale": "Stale",
+          "asset_invalid": "Assets",
+          "static": "Static",
+          "sitemap": "Sitemap"
+        },
+        "sections": {
+          "attention": "Items needing attention"
+        },
+        "empty": "Enter a tenant slug to inspect its route plan and saved snapshots.",
+        "empty_attention": "This tenant has no missing, stale, asset-broken, or unexpected snapshots.",
+        "columns": {
+          "route": "Route",
+          "source": "Source",
+          "status": "Status",
+          "why": "Why it is here"
+        },
+        "tables": {
+          "attention_aria": "Tenant snapshot items needing attention"
+        },
+        "sources": {
+          "static": "Static route",
+          "sitemap": "Sitemap route",
+          "unexpected": "Unexpected"
+        },
+        "badges": {
+          "unexpected": "Unexpected",
+          "assets": "Asset issue",
+          "content": "Content stale"
+        },
+        "reasons": {
+          "sitemap": "Published by this tenant sitemap as public content.",
+          "unexpected": "Saved for this tenant, but not present in the current static route set or sitemap plan.",
+          "always_public": "Always-public tenant route.",
+          "feature_enabled": "Enabled by the {{value}} tenant feature.",
+          "feature_disabled": "Would require the {{value}} tenant feature, which is currently off.",
+          "module_enabled": "Enabled by the {{value}} tenant module.",
+          "module_disabled": "Would require the {{value}} tenant module, which is currently off.",
+          "expected": "Expected for this tenant."
+        },
+        "help": {
+          "title": "How to read this",
+          "expected": "Expected routes are pages the engine believes this tenant should expose publicly.",
+          "unexpected": "Unexpected snapshots are saved files that no longer match the tenant plan. They are the highest-risk items to clean up.",
+          "next_step": "Use preview-only cleanup first. Only delete after the preview shows the tenant and routes you expect."
+        },
+        "cleanup": {
+          "title": "Cleanup available",
+          "body": "Unexpected snapshots can usually be removed with the cleanup tool in Overview. Preview first, then apply only when the tenant list is correct."
+        }
+      }
     },
     "running_audit": "Running Audit",
     "security_heading": "Security",
@@ -16440,6 +16602,94 @@
       "nav_link_label": "Navigation link",
       "nav_link_desc": "A single menu link"
     }
+  },
+  "page_builder": {
+    "builder_error": "The page builder could not load. Please use HTML mode instead.",
+    "hint_design": "Design a responsive web page with GrapesJS blocks, sections, forms, tabs, images and custom code.",
+    "hint_html": "Paste or write full HTML for this page.",
+    "hint_plaintext": "Write a simple text-only page. Line breaks are preserved when published.",
+    "hint_richtext": "Write and format a page with the rich text toolbar.",
+    "legacy_notice": "This page design could not be reopened as a GrapesJS project. The saved HTML is still available, and you can rebuild from blocks.",
+    "plaintext_placeholder": "Write the plain-text page content here...",
+    "preview_title": "Page preview",
+    "reset": "Start from blank",
+    "reset_confirm": "Clear the current page design and start from a blank canvas?",
+    "section_title": "Page content",
+    "switch_to_design_warning": "Switching to the visual page builder may not preserve hand-written HTML exactly. Continue?",
+    "blocks": {
+      "category_nexus": "NEXUS sections",
+      "feature_grid_label": "Feature grid",
+      "hero_label": "Hero section",
+      "story_band_label": "Story band",
+      "hero_kicker": "Community story",
+      "hero_title": "A page headline with presence",
+      "hero_body": "Add a clear introduction that feels specific to your timebank.",
+      "hero_cta": "Call to action",
+      "feature_one_title": "Feature one",
+      "feature_one_body": "Describe an outcome, service or promise.",
+      "feature_two_title": "Feature two",
+      "feature_two_body": "Keep the copy concrete and easy to scan.",
+      "story_kicker": "Local impact",
+      "story_title": "Tell the story in a generous content band",
+      "story_body": "Use this for reports, programme explainers, partner pages or guidance."
+    },
+    "starter": {
+      "kicker": "Community page",
+      "hero_title": "Build a beautiful custom page",
+      "hero_body": "Use sections, cards, images and calls to action to tell your tenant's story.",
+      "cta": "Explore the community",
+      "card_one_title": "Share what matters",
+      "card_one_body": "Introduce projects, services, partners, reports, policies or local opportunities.",
+      "card_two_title": "Keep it responsive",
+      "card_two_body": "Preview desktop, tablet and mobile while you design."
+    },
+    "switch_confirm_title": "Switch editor mode?",
+    "switch_to_plain_warning": "Switching to Plain text will remove page formatting and HTML from your content. This cannot be undone.",
+    "switch_to_richtext_warning": "Switching to Rich text will simplify your page HTML. Custom layout CSS, forms and unsupported tags may be removed.",
+    "switch_confirm": "Switch mode",
+    "mode_plaintext": "Plain text",
+    "mode_richtext": "Rich text",
+    "mode_html": "HTML",
+    "mode_design": "Design",
+    "loading": "Loading page editor",
+    "mode_switcher": "Page editor mode",
+    "label_plaintext": "Plain text page content",
+    "toolbar_label": "Page builder toolbar",
+    "tip_device_desktop": "Desktop preview width",
+    "tip_device_tablet": "Tablet preview width",
+    "tip_device_mobile": "Mobile preview width",
+    "tip_undo": "Undo",
+    "tip_redo": "Redo",
+    "tip_borders": "Show block outlines",
+    "tip_code": "View page HTML",
+    "tip_clear": "Reset page design",
+    "insert_image": "Insert image",
+    "library_title": "Image library",
+    "preview": "Preview",
+    "templates": "Templates",
+    "palette_title": "Page blocks",
+    "show_blocks": "Show page blocks",
+    "hide_blocks": "Hide page blocks",
+    "show_inspector": "Show page inspector",
+    "hide_inspector": "Hide page inspector",
+    "inspector_label": "Page inspector",
+    "inspector_style": "Style",
+    "inspector_settings": "Settings",
+    "inspector_layers": "Layers",
+    "empty_inspector": "Select an element on the page to edit its styles or settings.",
+    "code_modal_title": "Page HTML",
+    "code_copy": "Copy HTML",
+    "code_copied": "Page HTML copied",
+    "image_upload_failed": "Image upload failed",
+    "dismiss": "Dismiss",
+    "preview_device_label": "Preview device",
+    "preview_desktop": "Desktop",
+    "preview_mobile": "Mobile",
+    "label_html": "HTML source",
+    "html_hint": "Published exactly as written after page sanitisation.",
+    "library_upload": "Upload new",
+    "library_empty": "No images yet. Upload one to get started.",
+    "library_failed": "Couldn’t load your images."
   },
   "newsletter_content_editor": {
     "builder_error": "The visual builder could not load. Please use the HTML mode instead.",

@@ -4,7 +4,7 @@
 Regenerate with `node scripts/check-licenses.mjs --write`. Summary and human-facing
 attribution live in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
-composer prod: 117 · npm prod: 362
+composer prod: 117 · npm prod: 371
 
 | Package | Version | Licence | Ecosystem | Source |
 |---|---|---|---|---|
@@ -320,7 +320,13 @@ composer prod: 117 · npm prod: 362
 | fast-equals@5.4.0 | — | MIT | npm | https://github.com/planttheidea/fast-equals |
 | fast-png@6.4.0 | — | MIT | npm | https://github.com/image-js/fast-png |
 | fflate@0.8.2 | — | MIT | npm | https://github.com/101arrowz/fflate |
+| grapesjs-blocks-basic@1.0.2 | — | BSD-3-Clause | npm | https://github.com/GrapesJS/blocks-basic |
+| grapesjs-custom-code@1.0.2 | — | BSD-3-Clause | npm | https://github.com/GrapesJS/components-custom-code |
 | grapesjs-mjml@1.0.8 | — | BSD-3-Clause | npm | https://github.com/GrapesJS/mjml |
+| grapesjs-plugin-forms@2.0.6 | — | BSD-3-Clause | npm | https://github.com/GrapesJS/components-forms |
+| grapesjs-preset-webpage@1.0.3 | — | BSD-3-Clause | npm | https://github.com/GrapesJS/preset-webpage |
+| grapesjs-tabs@1.0.6 | — | BSD-3-Clause | npm | https://github.com/artf/grapesjs-tabs |
+| grapesjs-tooltip@0.1.8 | — | BSD-3-Clause | npm | https://github.com/GrapesJS/components-tooltip |
 | grapesjs@0.21.13 | — | BSD-3-Clause | npm | https://github.com/GrapesJS/grapesjs |
 | hast-util-to-jsx-runtime@2.3.6 | — | MIT | npm | https://github.com/syntax-tree/hast-util-to-jsx-runtime |
 | hast-util-whitespace@3.0.0 | — | MIT | npm | https://github.com/syntax-tree/hast-util-whitespace |
@@ -404,6 +410,7 @@ composer prod: 117 · npm prod: 362
 | micromark@4.0.2 | — | MIT | npm | https://github.com/micromark/micromark/tree/main/packages/micromark |
 | mjml-browser@4.18.0 | — | MIT | npm | https://github.com/mjmlio/mjml |
 | ms@2.1.3 | — | MIT | npm | https://github.com/vercel/ms |
+| nanoid@3.3.11 | — | MIT | npm | https://github.com/ai/nanoid |
 | nexus-react-frontend@1.5.4 | — | UNLICENSED | npm |  |
 | node-fetch@2.7.0 | — | MIT | npm | https://github.com/bitinn/node-fetch |
 | object-assign@4.1.1 | — | MIT | npm | https://github.com/sindresorhus/object-assign |
@@ -411,6 +418,8 @@ composer prod: 117 · npm prod: 362
 | papaparse@5.5.3 | — | MIT | npm | https://github.com/mholt/PapaParse |
 | parse-entities@4.0.2 | — | MIT | npm | https://github.com/wooorm/parse-entities |
 | performance-now@2.1.0 | — | MIT | npm | https://github.com/braveg1rl/performance-now |
+| picocolors@1.1.1 | — | ISC | npm | https://github.com/alexeyraspopov/picocolors |
+| postcss@8.5.14 | — | MIT | npm | https://github.com/postcss/postcss |
 | promise-polyfill@8.1.3 | — | MIT | npm | https://github.com/taylorhakes/promise-polyfill |
 | prop-types@15.8.1 | — | MIT | npm | https://github.com/facebook/prop-types |
 | property-information@7.1.0 | — | MIT | npm | https://github.com/wooorm/property-information |
@@ -445,6 +454,7 @@ composer prod: 117 · npm prod: 362
 | rgbcolor@1.0.1 | — | MIT* | npm | https://github.com/yetzt/node-rgbcolor |
 | scheduler@0.27.0 | — | MIT | npm | https://github.com/facebook/react |
 | shallowequal@1.1.0 | — | MIT | npm | https://github.com/dashed/shallowequal |
+| source-map-js@1.2.1 | — | BSD-3-Clause | npm | https://github.com/7rulnik/source-map-js |
 | space-separated-tokens@2.0.2 | — | MIT | npm | https://github.com/wooorm/space-separated-tokens |
 | stackblur-canvas@2.7.0 | — | MIT | npm | https://github.com/flozz/StackBlur |
 | stringify-entities@4.0.4 | — | MIT | npm | https://github.com/wooorm/stringify-entities |
@@ -466,7 +476,6 @@ composer prod: 117 · npm prod: 362
 | tw-animate-css@1.4.0 | — | MIT | npm | https://github.com/Wombosvideo/tw-animate-css |
 | tweetnacl@1.0.3 | — | Unlicense | npm | https://github.com/dchest/tweetnacl-js |
 | typescript@5.7.2 | — | Apache-2.0 | npm | https://github.com/microsoft/TypeScript |
-| underscore@1.13.1 | — | MIT | npm | https://github.com/jashkenas/underscore |
 | underscore@1.13.8 | — | MIT | npm | https://github.com/jashkenas/underscore |
 | undici-types@7.18.2 | — | MIT | npm | https://github.com/nodejs/undici |
 | unified@11.0.5 | — | MIT | npm | https://github.com/unifiedjs/unified |

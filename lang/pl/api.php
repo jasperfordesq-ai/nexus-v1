@@ -226,6 +226,8 @@ return [
     'newsletter_send_failed' => 'Failed to send newsletter. Please try again or check logs.',
     'newsletter_segment_required' => 'Ten biuletyn jest kierowany do segmentu, ale nie wybrano żadnego segmentu. Wybierz segment przed wysyłką.',
     'invalid_content_format' => 'Nieprawidłowy format treści',
+    'design_json_too_large' => 'Page builder design data is too large',
+    'invalid_design_json' => 'Invalid page builder design data',
     'newsletter_content_too_large' => 'Treść biuletynu jest zbyt duża (maksymalnie 512 KB)',
     'newsletter_duplicated' => 'Newsletter duplicated successfully',
     'ab_winner_must_be_a_or_b' => 'Winner must be "a" or "b"',

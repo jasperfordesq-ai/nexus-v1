@@ -9839,6 +9839,8 @@ CREATE TABLE `pages` (
   `title` varchar(255) NOT NULL,
   `slug` varchar(255) NOT NULL,
   `content` longtext DEFAULT NULL,
+  `content_format` enum('plaintext','richtext','html','builder') NOT NULL DEFAULT 'richtext',
+  `design_json` longtext DEFAULT NULL,
   `builder_version` varchar(10) DEFAULT 'v2',
   `is_published` tinyint(1) DEFAULT 0,
   `sort_order` int(11) DEFAULT 0,
@@ -15129,4 +15131,3 @@ INSERT INTO `migrations` VALUES
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-

@@ -23,6 +23,7 @@ use App\Services\StripeSubscriptionService;
 class AdminContentController extends BaseApiController
 {
     protected bool $isV2Api = true;
+    private const PAGE_DESIGN_JSON_MAX_BYTES = 2_000_000;
 
     public function __construct(
         private readonly RedisCache $redisCache,
@@ -100,7 +101,7 @@ class AdminContentController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         $rows = array_map(fn($r) => (array)$r, DB::select(
-            "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
+            "SELECT id, tenant_id, title, slug, content, content_format, design_json, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages WHERE tenant_id = ? ORDER BY sort_order ASC, created_at DESC",
             [$tenantId]
         ));
@@ -125,7 +126,7 @@ class AdminContentController extends BaseApiController
         }
 
         $result = DB::selectOne(
-            "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
+            "SELECT id, tenant_id, title, slug, content, content_format, design_json, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         );
@@ -153,8 +154,11 @@ class AdminContentController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.title_required'), 'title', 422);
         }
 
-        $slug = $this->generateSlug($title);
+        $slugInput = trim((string) ($input['slug'] ?? ''));
+        $slug = $this->generateSlug($slugInput !== '' ? $slugInput : $title);
         $content = $input['content'] ?? '';
+        $contentFormat = $input['content_format'] ?? 'richtext';
+        $designJson = $input['design_json'] ?? null;
         $metaDescription = $input['meta_description'] ?? '';
         $status = $input['status'] ?? 'draft';
         $sortOrder = (int)($input['sort_order'] ?? 0);
@@ -166,6 +170,15 @@ class AdminContentController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.status_must_be_draft_or_published'), 'status', 422);
         }
 
+        if (!in_array($contentFormat, ['plaintext', 'richtext', 'html', 'builder'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_content_format'), 'content_format', 422);
+        }
+
+        $designJson = $this->validatedPageDesignJson($contentFormat, $designJson);
+        if ($designJson instanceof JsonResponse) {
+            return $designJson;
+        }
+
         if ($this->isReservedPageSlug($slug)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.slug_reserved', ['slug' => $slug]), 'slug', 422);
         }
@@ -174,15 +187,15 @@ class AdminContentController extends BaseApiController
         $slug = $this->ensureUniqueSlug('pages', $slug, $tenantId);
 
         DB::insert(
-            "INSERT INTO pages (tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, created_at, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
-            [$tenantId, $title, $slug, $content, $metaDescription, $isPublished, $sortOrder, $showInMenu, $menuLocation, $menuOrder]
+            "INSERT INTO pages (tenant_id, title, slug, content, content_format, design_json, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+            [$tenantId, $title, $slug, $content, $contentFormat, $contentFormat === 'builder' ? $designJson : null, $metaDescription, $isPublished, $sortOrder, $showInMenu, $menuLocation, $menuOrder]
         );
 
         $newId = DB::getPdo()->lastInsertId();
 
         $result = DB::selectOne(
-            "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
+            "SELECT id, tenant_id, title, slug, content, content_format, design_json, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages WHERE id = ? AND tenant_id = ?", [$newId, $tenantId]
         );
 
@@ -233,6 +246,24 @@ class AdminContentController extends BaseApiController
             $data['slug'] = $slug;
         }
         if (array_key_exists('content', $input)) { $data['content'] = $input['content']; }
+        if (isset($input['content_format'])) {
+            if (!in_array($input['content_format'], ['plaintext', 'richtext', 'html', 'builder'], true)) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_content_format'), 'content_format', 422);
+            }
+            $data['content_format'] = $input['content_format'];
+            if ($input['content_format'] !== 'builder') {
+                $data['design_json'] = null;
+            }
+        }
+        if (array_key_exists('design_json', $input)) {
+            $format = $data['content_format']
+                ?? (string) (DB::table('pages')->where('id', $id)->where('tenant_id', $tenantId)->value('content_format') ?: 'richtext');
+            $designJson = $this->validatedPageDesignJson($format, $input['design_json'] ?? null);
+            if ($designJson instanceof JsonResponse) {
+                return $designJson;
+            }
+            $data['design_json'] = $designJson;
+        }
         if (isset($input['status'])) {
             if (!in_array($input['status'], ['draft', 'published'], true)) {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.status_must_be_draft_or_published'), 'status', 422);
@@ -255,7 +286,7 @@ class AdminContentController extends BaseApiController
         Page::where('id', $id)->where('tenant_id', $tenantId)->update($data);
 
         $result = DB::selectOne(
-            "SELECT id, tenant_id, title, slug, content, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
+            "SELECT id, tenant_id, title, slug, content, content_format, design_json, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]
         );
 
@@ -941,6 +972,68 @@ class AdminContentController extends BaseApiController
             $slug = $originalSlug . '-' . $counter;
         }
         return $slug;
+    }
+
+    private function validatedPageDesignJson(string $contentFormat, mixed $designJson): string|null|JsonResponse
+    {
+        if ($contentFormat !== 'builder') {
+            return null;
+        }
+
+        if ($designJson === null || $designJson === '') {
+            return null;
+        }
+
+        if (!is_string($designJson)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_design_json'), 'design_json', 422);
+        }
+
+        if (strlen($designJson) > self::PAGE_DESIGN_JSON_MAX_BYTES) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.design_json_too_large'), 'design_json', 422);
+        }
+
+        try {
+            $decoded = json_decode($designJson, true, flags: JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_design_json'), 'design_json', 422);
+        }
+
+        if (!is_array($decoded) || !$this->isPlausiblePageDesignProject($decoded)) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_design_json'), 'design_json', 422);
+        }
+
+        return $designJson;
+    }
+
+    private function isPlausiblePageDesignProject(array $project): bool
+    {
+        if (array_is_list($project)) {
+            return false;
+        }
+
+        $knownKeys = ['pages', 'assets', 'styles', 'symbols', 'dataSources', 'custom', 'components', 'css'];
+        if (count(array_intersect(array_keys($project), $knownKeys)) === 0) {
+            return false;
+        }
+
+        foreach (['pages', 'assets', 'styles', 'symbols', 'dataSources'] as $listKey) {
+            if (array_key_exists($listKey, $project) && !is_array($project[$listKey])) {
+                return false;
+            }
+        }
+
+        if (isset($project['pages']) && is_array($project['pages'])) {
+            foreach ($project['pages'] as $page) {
+                if (!is_array($page) || array_is_list($page)) {
+                    return false;
+                }
+                if (isset($page['frames']) && !is_array($page['frames'])) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private function buildMenuItemTree(int $menuId): array

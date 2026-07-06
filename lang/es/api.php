@@ -1195,6 +1195,8 @@ return [
     'newsletter_send_failed' => 'Failed to send newsletter. Please try again or check logs.',
     'newsletter_segment_required' => 'Este boletín está dirigido a un segmento, pero no hay ninguno seleccionado. Elige un segmento antes de enviarlo.',
     'invalid_content_format' => 'Formato de contenido no válido',
+    'design_json_too_large' => 'Page builder design data is too large',
+    'invalid_design_json' => 'Invalid page builder design data',
     'newsletter_content_too_large' => 'El contenido del boletín es demasiado grande (máximo 512 KB)',
     'config_load_failed' => 'Failed to load configuration',
     'external_user_fallback' => 'External User',

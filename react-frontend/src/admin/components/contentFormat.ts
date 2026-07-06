@@ -4,12 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Content-format primitives shared by the multi-mode newsletter editor.
+ * Content-format primitives shared by multi-mode content editors.
  *
- * A newsletter's `content` is one string, but its meaning depends on the
- * authoring format. These pure helpers describe how content converts between
- * formats and which conversions lose information (and therefore need a confirm
- * dialog). No React — trivially unit-testable.
+ * The content field is one string, but its meaning depends on the authoring
+ * format. These helpers describe how content converts between formats and which
+ * conversions lose information and therefore need a confirm dialog.
  */
 
 export type ContentFormat = 'plaintext' | 'richtext' | 'html' | 'builder';

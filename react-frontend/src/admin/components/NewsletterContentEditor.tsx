@@ -208,7 +208,17 @@ export function NewsletterContentEditor({
         )}
         {format === 'html' && (
           <Suspense fallback={editorFallback}>
-            <HtmlSourceEditor value={value} onChange={(htmlValue) => emit(htmlValue, 'html')} isDisabled={isDisabled} />
+            <HtmlSourceEditor
+              value={value}
+              onChange={(htmlValue) => emit(htmlValue, 'html')}
+              isDisabled={isDisabled}
+              labels={{
+                label: t('newsletter_content_editor.label_html'),
+                hint: t('newsletter_content_editor.html_hint'),
+                insertImage: t('newsletter_content_editor.insert_image'),
+                uploadFailed: t('newsletter_content_editor.image_upload_failed'),
+              }}
+            />
           </Suspense>
         )}
         {format === 'builder' && onOpenDesigner && (

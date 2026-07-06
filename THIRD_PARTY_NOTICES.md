@@ -31,6 +31,7 @@ The newsletter email builder and the wider platform build on, among others:
 | Component | Licence | Source |
 |---|---|---|
 | **GrapesJS** (drag-and-drop builder core) | BSD-3-Clause | <https://github.com/GrapesJS/grapesjs> |
+| **GrapesJS webpage preset and plugins** (CMS page builder blocks, forms, tooltips, custom code) | BSD-3-Clause | <https://github.com/GrapesJS/preset-webpage>, <https://github.com/GrapesJS/blocks-basic>, <https://github.com/GrapesJS/components-forms>, <https://github.com/GrapesJS/components-tooltip>, <https://github.com/GrapesJS/components-custom-code>, <https://github.com/artf/grapesjs-tabs> |
 | **grapesjs-mjml** (MJML mode) | BSD-3-Clause | <https://github.com/GrapesJS/mjml> |
 | **MJML / mjml-browser** (email markup compiler) | MIT | <https://github.com/mjmlio/mjml> |
 | **React** | MIT | <https://github.com/facebook/react> |

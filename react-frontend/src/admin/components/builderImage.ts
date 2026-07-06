@@ -4,16 +4,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * builderImage — pure, GrapesJS-agnostic helpers for the newsletter builder's
- * image pipeline. Extracted from NewsletterBuilder so the tricky bits (URL
- * resolution + MJML component insertion) are unit-testable WITHOUT mounting the
- * full GrapesJS editor.
+ * builderImage - pure, GrapesJS-agnostic helpers for builder image pipelines.
+ * Extracted so the tricky bits (URL resolution + component insertion decisions)
+ * are unit-testable WITHOUT mounting the full GrapesJS editor.
  *
  * Two invariants this module enforces (the source of the original bugs):
- *  1. Only an ABSOLUTE upload url is ever inserted — never the relative `path`,
- *     which renders in the in-browser preview but is dead in a delivered email.
+ *  1. Only an ABSOLUTE upload url is ever inserted - never the relative `path`,
+ *     which renders in preview but is dead when served from the wrong context.
  *  2. Insertion uses the GrapesJS component-definition OBJECT api, never a raw
- *     markup string, so appending an image can't corrupt sibling MJML nesting.
+ *     markup string, so appending an image can't corrupt sibling nesting.
  */
 
 /** Minimal structural view of a grapesjs Component (avoids its heavy generics). */
@@ -55,7 +54,7 @@ export type EditorLike = {
   getWrapper?: () => unknown;
 };
 
-/** The response shape returned by adminNewsletters.uploadImage(). */
+/** The response shape returned by the shared builder image upload endpoint. */
 export type UploadResult =
   | { success?: boolean; data?: { url?: string; path?: string } | null }
   | null
