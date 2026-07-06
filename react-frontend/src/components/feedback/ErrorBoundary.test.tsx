@@ -104,4 +104,15 @@ describe('ErrorBoundary', () => {
 
     expect(screen.getByRole('button', { name: 'Report a problem' })).toBeInTheDocument();
   });
+
+  it('can render provider-safe fallback UI without the report problem action', () => {
+    render(
+      <ErrorBoundary showReportProblem={false}>
+        <ThrowingComponent />
+      </ErrorBoundary>
+    );
+
+    expect(screen.queryByRole('button', { name: 'Report a problem' })).not.toBeInTheDocument();
+    expect(screen.getByText('Try Again')).toBeInTheDocument();
+  });
 });

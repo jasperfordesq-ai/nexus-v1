@@ -24,6 +24,7 @@ interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
   onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  showReportProblem?: boolean;
 }
 
 interface ErrorBoundaryState {
@@ -157,7 +158,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                   </Button>
 
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <ReportProblemButton className="w-full" />
+                    {this.props.showReportProblem !== false ? (
+                      <ReportProblemButton className="w-full" />
+                    ) : null}
 
                     <Button
                       onPress={this.handleGoHome}

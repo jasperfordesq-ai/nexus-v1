@@ -1807,13 +1807,13 @@ function AppRoutes() {
 
 function App() {
   return (
-    <ErrorBoundary>
-      <HelmetProvider>
-        <ThemeProvider>
-          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <ScrollToTop />
-            <CookieConsentProvider>
-              <ToastProvider>
+    <HelmetProvider>
+      <ThemeProvider>
+        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <ScrollToTop />
+          <CookieConsentProvider>
+            <ToastProvider>
+              <ErrorBoundary>
                 <ConfirmDialogProvider>
                 <Suspense fallback={<LoadingScreen />}>
                   <Routes>
@@ -1830,12 +1830,12 @@ function App() {
                   </Routes>
                 </Suspense>
                 </ConfirmDialogProvider>
-              </ToastProvider>
-            </CookieConsentProvider>
-          </BrowserRouter>
-        </ThemeProvider>
-      </HelmetProvider>
-    </ErrorBoundary>
+              </ErrorBoundary>
+            </ToastProvider>
+          </CookieConsentProvider>
+        </BrowserRouter>
+      </ThemeProvider>
+    </HelmetProvider>
   );
 }
 
