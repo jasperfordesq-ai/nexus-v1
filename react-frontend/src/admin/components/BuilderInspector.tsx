@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * BuilderInspector — the right column of the newsletter Design builder. It hosts
+ * BuilderInspector - the right column for GrapesJS design builders. It hosts
  * three GrapesJS managers (Style / Settings-traits / Layers) that the editor
  * appends into `stylesRef` / `traitsRef` / `layersRef` at init time.
  *

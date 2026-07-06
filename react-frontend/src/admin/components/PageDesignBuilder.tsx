@@ -489,7 +489,7 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
         </div>
       )}
 
-      <div className="flex min-h-0 flex-1">
+      <div className="relative flex min-h-0 flex-1">
         <BuilderBlockPalette
           blocksRef={blocksRef}
           title={t('page_builder.palette_title')}
@@ -520,6 +520,18 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
             empty: t('page_builder.empty_inspector'),
           }}
         />
+        {readOnly && (
+          <div
+            role="status"
+            aria-live="polite"
+            aria-label={t('saving')}
+            className="absolute inset-0 z-20 flex items-start justify-center bg-surface/35 px-4 pt-4 backdrop-blur-[1px]"
+          >
+            <span className="rounded-full border border-border bg-surface px-3 py-1 text-xs font-medium text-muted shadow-sm">
+              {t('saving')}
+            </span>
+          </div>
+        )}
       </div>
 
       <input

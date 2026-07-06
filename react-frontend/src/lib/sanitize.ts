@@ -32,7 +32,7 @@
  */
 
 import DOMPurify from 'dompurify';
-import { scopePageBuilderHtml } from './pageBuilderHtml';
+import { sanitizePageBuilderInlineStyle, scopePageBuilderHtml } from './pageBuilderHtml';
 
 /* ───────────────────────── Allow-lists ───────────────────────── */
 
@@ -68,6 +68,7 @@ const RICH_TEXT_ALLOWED_ATTR = [
 
 const PAGE_BUILDER_ALLOWED_ATTR = [
   ...RICH_TEXT_ALLOWED_ATTR,
+  'style',
   'role', 'aria-label', 'aria-labelledby', 'aria-describedby',
   'type', 'name', 'value', 'placeholder', 'checked', 'selected', 'disabled',
   'required', 'for', 'action', 'method',
@@ -130,6 +131,17 @@ function installHooksOnce(): void {
   // Per-attribute scheme check — runs after DOMPurify's own checks.
   DOMPurify.addHook('uponSanitizeAttribute', (_node, data) => {
     const attrName = data.attrName?.toLowerCase() ?? '';
+    if (attrName === 'style') {
+      const safeStyle = sanitizePageBuilderInlineStyle(String(data.attrValue ?? ''));
+      if (!safeStyle) {
+        data.keepAttr = false;
+        data.attrValue = '';
+      } else {
+        data.attrValue = safeStyle;
+      }
+      return;
+    }
+
     if (!URL_BEARING_ATTRS.has(attrName)) return;
 
     const value = String(data.attrValue ?? '');

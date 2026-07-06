@@ -61,7 +61,7 @@ describe('BuilderToolbar', () => {
     expect(screen.getByRole('button', { name: label('tip_undo') })).toBeDisabled();
   });
 
-  it('freezes mutating controls when readOnly (already-sent newsletter)', () => {
+  it('freezes mutating controls when readOnly', () => {
     setup({ readOnly: true });
     expect(screen.getByRole('button', { name: label('tip_clear') })).toBeDisabled();
     expect(screen.getByRole('button', { name: label('tip_undo') })).toBeDisabled();

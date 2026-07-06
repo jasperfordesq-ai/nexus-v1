@@ -197,11 +197,19 @@ export function PageBuilder() {
         description={t('content.pages_admin_desc')}
         actions={
           <div className="flex gap-2">
-            <Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/pages'))}>{t('content.back')}</Button>
+            <Button
+              variant="tertiary"
+              startContent={<ArrowLeft size={16} />}
+              isDisabled={saving}
+              onPress={() => navigate(tenantPath('/admin/pages'))}
+            >
+              {t('content.back')}
+            </Button>
             {isEdit && formData.slug && (
               <Button
                 variant="tertiary"
                 startContent={<ExternalLink size={16} />}
+                isDisabled={saving}
                 onPress={() => {
                   // Use tenant.slug (from TenantContext) or user.tenant_slug (from auth JWT)
                   // so the preview URL always includes the tenant prefix, even when the admin
@@ -230,6 +238,7 @@ export function PageBuilder() {
               isRequired
               variant="secondary"
               value={formData.title}
+              isDisabled={saving}
               onValueChange={(v) => {
                 handleChange('title', v);
                 if (!slugTouched) handleChange('slug', toSlug(v));
@@ -243,6 +252,7 @@ export function PageBuilder() {
               isInvalid={isReservedSlug}
               errorMessage={isReservedSlug ? t('content.slug_reserved_error', { slug: formData.slug }) : undefined}
               value={formData.slug}
+              isDisabled={saving}
               onValueChange={(v) => {
                 setSlugTouched(true);
                 handleChange('slug', toSlugInput(v));
@@ -267,12 +277,14 @@ export function PageBuilder() {
               placeholder={t('content.placeholder_meta_description')}
               variant="secondary"
               value={formData.meta_description}
+              isDisabled={saving}
               onValueChange={(v) => handleChange('meta_description', v)}
             />
             <Select
               label={t('content.label_status')}
               variant="secondary"
               selectedKeys={[formData.status]}
+              isDisabled={saving}
               onSelectionChange={(keys) => {
                 const selected = Array.from(keys)[0] as string;
                 if (selected) handleChange('status', selected);
@@ -289,6 +301,7 @@ export function PageBuilder() {
           <CardBody className="gap-4">
             <Switch
               isSelected={formData.show_in_menu}
+              isDisabled={saving}
               onValueChange={(v) => handleChange('show_in_menu', v)}
             >
               {t('content.show_in_menu')}
@@ -300,6 +313,7 @@ export function PageBuilder() {
                   variant="secondary"
                   description={t('content.page_menu_location_desc')}
                   selectedKeys={[formData.menu_location]}
+                  isDisabled={saving}
                   onSelectionChange={(keys) => {
                     const selected = Array.from(keys)[0] as string;
                     if (selected) handleChange('menu_location', selected);
@@ -314,6 +328,7 @@ export function PageBuilder() {
                   variant="secondary"
                   description={t('content.page_menu_order_desc')}
                   value={String(formData.menu_order)}
+                  isDisabled={saving}
                   onValueChange={(v) => handleChange('menu_order', parseInt(v, 10) || 0)}
                 />
               </>
@@ -322,7 +337,7 @@ export function PageBuilder() {
         </Card>
 
         <div className="flex justify-end gap-2">
-          <Button variant="tertiary" onPress={() => navigate(tenantPath('/admin/pages'))}>{t('content.cancel')}</Button>
+          <Button variant="tertiary" isDisabled={saving} onPress={() => navigate(tenantPath('/admin/pages'))}>{t('content.cancel')}</Button>
           <Button
             startContent={<Save size={16} />}
             onPress={handleSave}

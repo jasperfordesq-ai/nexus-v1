@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * BuilderToolbar — the labelled top toolbar of the newsletter Design builder.
+ * BuilderToolbar - the labelled top toolbar for GrapesJS design builders.
  *
  * GrapesJS's own default toolbar buttons render as blank squares in this app
  * (no Font Awesome; the app uses lucide-react), so we drive the editor from our
@@ -32,7 +32,7 @@ export type BuilderDevice = 'Desktop' | 'Tablet' | 'Mobile portrait';
 interface BuilderToolbarProps {
   /** False until the editor instance is ready — keeps buttons inert. */
   ready: boolean;
-  /** Already-sent newsletter — mutating actions are frozen. */
+  /** Read-only builder state - mutating actions are frozen. */
   readOnly?: boolean;
   device: BuilderDevice;
   showBorders: boolean;

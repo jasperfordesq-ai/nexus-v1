@@ -13,7 +13,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from '@/lib/motion';import ArrowLeft from 'lucide-react/icons/arrow-left';
+import { motion } from '@/lib/motion';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import FileText from 'lucide-react/icons/file-text';
 import { sanitizeCustomPageHtml, sanitizeRichText } from '@/lib/sanitize';
@@ -140,7 +141,7 @@ export function CustomPage() {
       <div className={rendersAsCustomHtml ? 'py-8 space-y-6' : 'max-w-4xl mx-auto px-4 py-8 space-y-6'}>
         <div className={rendersAsCustomHtml ? 'mx-auto max-w-6xl px-4' : undefined}>
           <Breadcrumbs items={[
-            { label: t('not_found.go_home'), href: '/' },
+            { label: t('not_found.go_home'), href: tenantPath('/') },
             { label: page.title },
           ]} />
         </div>

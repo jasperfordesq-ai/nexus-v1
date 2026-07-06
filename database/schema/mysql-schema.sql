@@ -14820,7 +14820,8 @@ INSERT INTO `laravel_migrations` VALUES
 (317,'2026_07_03_000001_harden_podcast_media_pipeline',86),
 (318,'2026_07_03_100000_add_content_format_to_newsletters',86),
 (319,'2026_07_03_110000_seed_email_safe_starter_templates',87),
-(320,'2026_07_04_120000_seed_newsletter_builder_starter_templates',88);
+(320,'2026_07_04_120000_seed_newsletter_builder_starter_templates',88),
+(321,'2026_07_06_090000_add_builder_format_to_pages',89);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

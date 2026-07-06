@@ -4,11 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * BuilderBlockPalette — the always-available left column of the newsletter
- * Design builder. It is a thin host: GrapesJS renders its MJML BlockManager (the
- * draggable text/button/image/columns/… blocks) into `blocksRef` via the
- * editor's `blockManager.appendTo`. We only supply the labelled, scrollable
- * container so the palette can never be stranded behind a hidden toggle again.
+ * BuilderBlockPalette - the always-available left column for GrapesJS design
+ * builders. It is a thin host: GrapesJS renders its BlockManager into
+ * `blocksRef` via the editor's `blockManager.appendTo`. We only supply the
+ * labelled, scrollable container so the palette can never be stranded behind a
+ * hidden toggle again.
  *
  * The panel collapses to a slim rail (a chevron) so the canvas can take the full
  * width when the author wants room — the blocks DOM stays mounted either way.

@@ -65,8 +65,14 @@ export const PageContentEditor = forwardRef<PageContentEditorHandle, PageContent
   };
 
   const requestModeChange = async (next: ContentFormat) => {
+    if (isDisabled) return;
     if (next === format) return;
-    if (isDestructiveSwitch(format, next, value)) {
+
+    const flushedBuilder = format === 'builder' ? designBuilderRef.current?.flush() : null;
+    const currentContent = flushedBuilder?.html ?? value;
+    const currentDesignJson = flushedBuilder?.designJson ?? designJson ?? null;
+
+    if (isDestructiveSwitch(format, next, currentContent)) {
       const ok = await confirm({
         title: t('page_builder.switch_confirm_title'),
         body:
@@ -80,7 +86,7 @@ export const PageContentEditor = forwardRef<PageContentEditorHandle, PageContent
       });
       if (!ok) return;
     }
-    emit(transformContent(value, format, next), next, next === 'builder' ? designJson : null);
+    emit(transformContent(currentContent, format, next), next, next === 'builder' ? currentDesignJson : null);
   };
 
   const modeLabel = (mode: ContentFormat) =>
@@ -133,6 +139,7 @@ export const PageContentEditor = forwardRef<PageContentEditorHandle, PageContent
               <Tab
                 key={mode}
                 id={mode}
+                isDisabled={isDisabled}
                 title={
                   <span className="flex items-center gap-1.5">
                     {MODE_ICON[mode]}

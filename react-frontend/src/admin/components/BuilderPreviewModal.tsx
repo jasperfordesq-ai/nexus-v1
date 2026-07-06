@@ -4,12 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * BuilderPreviewModal — a device-framed preview of the compiled email HTML.
+ * BuilderPreviewModal - a device-framed preview of compiled builder HTML.
  *
- * The builder canvas shows the editable MJML; this shows what the *sent* email
- * looks like, rendered from `exportHtml()` into a sandboxed iframe (no scripts)
- * at a desktop or mobile width. This is preview-only — the authoritative
- * server-parity preview still lives on the send/preview endpoint.
+ * The builder canvas shows editable content; this renders the exported HTML
+ * into a sandboxed iframe (no scripts) at a desktop or mobile width.
  */
 
 import { useState } from 'react';
@@ -22,7 +20,7 @@ type PreviewDevice = 'desktop' | 'mobile';
 interface BuilderPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
-  /** Compiled, inbox-safe HTML to render (from the builder's exportHtml). */
+  /** Compiled HTML to render (from the builder's exportHtml). */
   html: string;
   t: (key: string) => string;
   labels?: Partial<{

@@ -8,12 +8,14 @@ import postcss, { type AtRule, type Container, type Declaration, type Rule } fro
 const BUILDER_SCOPE = '.nexus-custom-page-builder';
 
 const UNSAFE_CSS_PATTERNS = [
-  /@import\b/gi,
-  /expression\s*\(/gi,
-  /javascript\s*:/gi,
-  /vbscript\s*:/gi,
-  /behavior\s*:/gi,
-  /-moz-binding\s*:/gi,
+  /@import\b/i,
+  /expression\s*\(/i,
+  /javascript\s*:/i,
+  /vbscript\s*:/i,
+  /data\s*:/i,
+  /file\s*:/i,
+  /behavior\s*:/i,
+  /-moz-binding\s*:/i,
 ];
 
 const GLOBAL_SELECTOR_PARTS = [
@@ -147,6 +149,19 @@ export function scopePageBuilderCss(css: string | null | undefined): string {
   if (isUnsafeCss(withoutComments)) return '';
   try {
     return scopeCssContainer(postcss.parse(withoutComments)).trim();
+  } catch {
+    return '';
+  }
+}
+
+export function sanitizePageBuilderInlineStyle(style: string | null | undefined): string {
+  if (!style) return '';
+  const withoutComments = style.replace(/\/\*[\s\S]*?\*\//g, '');
+  try {
+    const root = postcss.parse(`.x{${withoutComments}}`);
+    const firstRule = root.nodes?.find((node): node is Rule => node.type === 'rule');
+    if (!firstRule) return '';
+    return serializeSafeDeclarations(firstRule);
   } catch {
     return '';
   }

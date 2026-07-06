@@ -84,7 +84,7 @@ describe('sanitizeCustomPageHtml', () => {
     expect(out).toContain('<section class="hero">Hi</section>');
   });
 
-  it('drops global selectors and inline styles so builder pages cannot restyle the app shell', () => {
+  it('drops global selectors and unsafe inline styles so builder pages cannot restyle the app shell', () => {
     const out = sanitizeCustomPageHtml('<style>body{display:none}.safe{color:green;position:fixed;inset:0;z-index:9999}#root{opacity:0}</style><div class="safe" style="position:fixed;inset:0">Safe</div>');
 
     expect(out).toContain('.nexus-custom-page-builder .safe{color:green}');
@@ -93,6 +93,27 @@ describe('sanitizeCustomPageHtml', () => {
     expect(out).not.toContain('style="');
     expect(out).not.toContain('position:fixed');
     expect(out).not.toContain('z-index');
+  });
+
+  it('keeps safe inline styles from pasted custom HTML', () => {
+    const out = sanitizeCustomPageHtml(
+      '<section style="background:#f7faf8;color:#10201a;padding:32px;border-radius:12px"><h1 style="font-size:42px;line-height:1.1">Hello</h1></section>',
+    );
+
+    expect(out).toContain('style="background:#f7faf8;color:#10201a;padding:32px;border-radius:12px"');
+    expect(out).toContain('style="font-size:42px;line-height:1.1"');
+  });
+
+  it('removes dangerous inline CSS while preserving safe declarations in the same attribute', () => {
+    const out = sanitizeCustomPageHtml(
+      '<div style="color:green;position:fixed;inset:0;z-index:9999;background:url(javascript:alert(1))">Safe text</div>',
+    );
+
+    expect(out).toContain('style="color:green"');
+    expect(out).not.toContain('position:fixed');
+    expect(out).not.toContain('inset:0');
+    expect(out).not.toContain('z-index');
+    expect(out).not.toContain('javascript:');
   });
 
   it('strips app-shell escape declarations even when they use important priorities', () => {
@@ -162,6 +183,14 @@ describe('sanitizeCustomPageHtml', () => {
     expect(out).not.toContain('onclick');
     expect(out).not.toContain('<script');
     expect(out).not.toContain('alert(1)');
+  });
+
+  it('consistently strips unsafe CSS across repeated sanitization calls', () => {
+    const html = '<style>.x{background:url(javascript:alert(1))}</style><section class="x">Safe</section>';
+
+    expect(sanitizeCustomPageHtml(html)).not.toContain('javascript:');
+    expect(sanitizeCustomPageHtml(html)).not.toContain('javascript:');
+    expect(sanitizeCustomPageHtml(html)).not.toContain('javascript:');
   });
 });
 

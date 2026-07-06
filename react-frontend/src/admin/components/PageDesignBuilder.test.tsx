@@ -72,12 +72,13 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 import { PageDesignBuilder } from './PageDesignBuilder';
 
-function renderBuilder(designJson: string | null) {
+function renderBuilder(designJson: string | null, readOnly = false) {
   return render(
     <ConfirmDialogProvider>
       <PageDesignBuilder
         html="<style>.saved{color:red}</style><section>Saved fallback</section>"
         designJson={designJson}
+        readOnly={readOnly}
         onChange={vi.fn()}
       />
     </ConfirmDialogProvider>,
@@ -180,5 +181,11 @@ describe('PageDesignBuilder', () => {
       type: 'image',
       attributes: { src: 'https://cdn.example.test/uploads/dropped.jpg', alt: '' },
     });
+  });
+
+  it('blocks direct canvas interaction while the builder is read-only', async () => {
+    renderBuilder(null, true);
+
+    expect(await screen.findByRole('status', { name: /saving/i })).toBeInTheDocument();
   });
 });
