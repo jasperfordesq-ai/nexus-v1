@@ -185,7 +185,7 @@ class PrerenderDetectDriftTest extends TestCase
             ->andReturn([
                 [
                     'host'  => self::TENANT_HOST,
-                    'route' => '/about',
+                    'route' => '/' . self::TENANT_SLUG . '/about',
                     'mtime' => $snapMtime,
                 ],
             ]);
@@ -226,7 +226,7 @@ class PrerenderDetectDriftTest extends TestCase
             ->andReturn([
                 [
                     'host'  => self::TENANT_HOST,
-                    'route' => '/about',
+                    'route' => '/' . self::TENANT_SLUG . '/about',
                     'mtime' => $snapMtime,
                 ],
             ]);
@@ -343,7 +343,7 @@ class PrerenderDetectDriftTest extends TestCase
             ->once()
             ->with(null, false)
             ->andReturn([
-                ['host' => self::TENANT_HOST, 'route' => '/about', 'mtime' => $snapMtime],
+                ['host' => self::TENANT_HOST, 'route' => '/' . self::TENANT_SLUG . '/about', 'mtime' => $snapMtime],
             ]);
 
         $this->sitemapMock
@@ -491,7 +491,7 @@ class PrerenderDetectDriftTest extends TestCase
             ->once()
             ->with(null, false)
             ->andReturn([
-                ['host' => self::TENANT_HOST, 'route' => '/about', 'mtime' => $snapMtime],
+                ['host' => self::TENANT_HOST, 'route' => '/' . self::TENANT_SLUG . '/about', 'mtime' => $snapMtime],
             ]);
 
         $this->sitemapMock
@@ -533,7 +533,7 @@ class PrerenderDetectDriftTest extends TestCase
             ->with(null, false)
             ->andReturn([
                 // /about is stale.
-                ['host' => self::TENANT_HOST, 'route' => '/about', 'mtime' => $snapMtime],
+                ['host' => self::TENANT_HOST, 'route' => '/' . self::TENANT_SLUG . '/about', 'mtime' => $snapMtime],
             ]);
 
         // Sitemap has /about (stale) and /jobs (missing).

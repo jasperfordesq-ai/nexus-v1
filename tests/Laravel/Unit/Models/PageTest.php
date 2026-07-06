@@ -29,8 +29,9 @@ class PageTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'title', 'slug', 'content', 'is_published',
+            'tenant_id', 'title', 'slug', 'content', 'content_format', 'design_json', 'is_published',
             'publish_at', 'show_in_menu', 'menu_location', 'sort_order',
+            'meta_description', 'menu_order',
         ];
         $this->assertEquals($expected, $this->model->getFillable());
     }

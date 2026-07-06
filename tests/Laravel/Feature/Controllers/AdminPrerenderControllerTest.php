@@ -79,7 +79,7 @@ class AdminPrerenderControllerTest extends TestCase
     {
         Sanctum::actingAs($this->makeSuperAdmin());
         $r = $this->apiPost('/v2/admin/prerender/jobs', [
-            'routes' => '/about,/blog',
+            'routes' => '/about,/faq',
             'force'  => true,
         ]);
         $r->assertStatus(200);
@@ -88,7 +88,7 @@ class AdminPrerenderControllerTest extends TestCase
         $this->assertDatabaseHas('prerender_jobs', [
             'id'           => $id,
             'status'       => 'queued',
-            'routes'       => '/about,/blog',
+            'routes'       => '/about,/faq',
             'force_render' => 1,
         ]);
     }
