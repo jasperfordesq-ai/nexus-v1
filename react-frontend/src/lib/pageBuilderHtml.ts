@@ -11,8 +11,15 @@ const PAGE_BUILDER_BASELINE_CSS = `
 .nexus-custom-page-builder{background:var(--background,#ffffff);color:var(--foreground,#111827);color-scheme:inherit}
 .nexus-custom-page-builder a{color:var(--accent-color,var(--color-accent,#0891b2))}
 .nexus-custom-page-builder img{max-width:100%;height:auto}
+`.trim();
+
+const PAGE_BUILDER_THEME_OVERRIDE_CSS = `
 .nexus-custom-page-builder .nexus-page-section{background:var(--background,#ffffff);color:var(--foreground,#111827)}
 .nexus-custom-page-builder .nexus-page-section:nth-child(even){background:var(--surface-elevated,rgba(255,255,255,.9))}
+.nexus-custom-page-builder .nexus-page-hero{background:linear-gradient(135deg,var(--surface-elevated,rgba(255,255,255,.9)) 0%,color-mix(in srgb,var(--accent-color,var(--color-accent,#0891b2)) 12%,var(--background,#ffffff)) 55%,color-mix(in srgb,var(--color-warning,#d97706) 10%,var(--background,#ffffff)) 100%)}
+.nexus-custom-page-builder .nexus-page-kicker{color:var(--accent-color,var(--color-accent,#0891b2))}
+.nexus-custom-page-builder .nexus-page-hero h1,.nexus-custom-page-builder .nexus-page-card h2{color:var(--foreground,#111827)}
+.nexus-custom-page-builder .nexus-page-lede,.nexus-custom-page-builder .nexus-page-card p{color:var(--foreground-muted,var(--foreground,#4b5563))}
 .nexus-custom-page-builder .nexus-page-card{background:var(--surface-elevated,rgba(255,255,255,.9));border-color:var(--border-default,rgba(17,24,39,.12));color:var(--foreground,#111827)}
 .nexus-custom-page-builder .nexus-page-button{background:var(--accent-color,var(--color-accent,#0891b2));color:var(--accent-foreground,#ffffff)}
 `.trim();
@@ -233,7 +240,7 @@ export function scopePageBuilderHtml(html: string | null | undefined): string {
 
   doc.querySelectorAll('style, script').forEach((node) => node.remove());
   const body = doc.body.innerHTML.trim();
-  const css = [PAGE_BUILDER_BASELINE_CSS, scopedCss].filter(Boolean).join('\n');
+  const css = [PAGE_BUILDER_BASELINE_CSS, scopedCss, PAGE_BUILDER_THEME_OVERRIDE_CSS].filter(Boolean).join('\n');
   return `${css ? `<style>${css}</style>` : ''}<div class="nexus-custom-page-builder">${body}</div>`;
 }
 
@@ -244,6 +251,7 @@ export function exportScopedPageBuilderHtml(bodyHtml: string, css: string): stri
 export const __pageBuilderHtmlTesting = {
   BUILDER_SCOPE,
   PAGE_BUILDER_BASELINE_CSS,
+  PAGE_BUILDER_THEME_OVERRIDE_CSS,
   isSafeCssDeclaration,
   scopeSelector,
   tokenizeLegacyNexusPageValue,

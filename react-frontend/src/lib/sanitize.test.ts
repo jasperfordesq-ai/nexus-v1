@@ -131,6 +131,44 @@ describe('sanitizeCustomPageHtml', () => {
     expect(out).not.toContain('color:#111827');
   });
 
+  it('emits NEXUS starter theme overrides after saved CSS so legacy pages can follow dark mode', () => {
+    const out = sanitizeCustomPageHtml(`
+      <style>
+        .nexus-page-section{padding:88px 18%;background:#ffffff;color:#111827}
+        .nexus-page-hero{background:linear-gradient(135deg,#f6fbf8 0%,#eef6ff 55%,#fff7ed 100%)}
+        .nexus-page-kicker{color:#047857}
+        .nexus-page-hero h1{color:#10201a}
+        .nexus-page-lede{color:#40524a}
+        .nexus-page-button{background:#047857;color:#fff}
+      </style>
+      <section class="nexus-page-section nexus-page-hero">
+        <p class="nexus-page-kicker">Community Page</p>
+        <h1>Build a beautiful custom page</h1>
+        <p class="nexus-page-lede">Use sections, cards, images and calls to action.</p>
+        <a class="nexus-page-button" href="/">Explore the community</a>
+      </section>
+    `);
+
+    const savedHeroRuleIndex = out.indexOf(
+      '.nexus-custom-page-builder .nexus-page-hero{background:linear-gradient(135deg,var(--surface-elevated,rgba(255,255,255,.9))',
+    );
+    const overrideHeroRuleIndex = out.lastIndexOf(
+      '.nexus-custom-page-builder .nexus-page-hero{background:linear-gradient(135deg,var(--surface-elevated,rgba(255,255,255,.9))',
+    );
+    const savedHeadingRuleIndex = out.indexOf('.nexus-custom-page-builder .nexus-page-hero h1{color:var(--foreground,#111827)}');
+    const overrideHeadingRuleIndex = out.indexOf(
+      '.nexus-custom-page-builder .nexus-page-hero h1,.nexus-custom-page-builder .nexus-page-card h2{color:var(--foreground,#111827)}',
+    );
+
+    expect(savedHeroRuleIndex).toBeGreaterThanOrEqual(0);
+    expect(overrideHeroRuleIndex).toBeGreaterThan(savedHeroRuleIndex);
+    expect(overrideHeadingRuleIndex).toBeGreaterThan(savedHeadingRuleIndex);
+    expect(out).not.toContain('#f6fbf8');
+    expect(out).not.toContain('#eef6ff');
+    expect(out).not.toContain('#fff7ed');
+    expect(out).not.toContain('#10201a');
+  });
+
   it('removes dangerous inline CSS while preserving safe declarations in the same attribute', () => {
     const out = sanitizeCustomPageHtml(
       '<div style="color:green;position:fixed;inset:0;z-index:9999;background:url(javascript:alert(1))">Safe text</div>',
