@@ -36,6 +36,55 @@ class AdminContentControllerTest extends TestCase
         $response->assertJsonStructure(['data']);
     }
 
+    public function test_get_pages_list_omits_large_editor_payloads(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        DB::table('pages')->insert([
+            'tenant_id' => $this->testTenantId,
+            'title' => 'Large Builder Page',
+            'slug' => 'large-builder-page',
+            'content' => str_repeat('<section>Large page section</section>', 1000),
+            'content_format' => 'builder',
+            'design_json' => json_encode([
+                'pages' => [
+                    [
+                        'frames' => [
+                            [
+                                'component' => [
+                                    'type' => 'wrapper',
+                                    'components' => [
+                                        ['tagName' => 'section', 'classes' => ['hero']],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'assets' => [],
+                'styles' => [],
+            ], JSON_THROW_ON_ERROR),
+            'meta_description' => 'List payload test',
+            'is_published' => 0,
+            'sort_order' => 0,
+            'show_in_menu' => 0,
+            'menu_location' => 'about',
+            'menu_order' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiGet('/v2/admin/pages');
+
+        $response->assertStatus(200);
+        $page = collect($response->json('data'))->firstWhere('slug', 'large-builder-page');
+        $this->assertIsArray($page);
+        $this->assertArrayNotHasKey('content', $page);
+        $this->assertArrayNotHasKey('content_format', $page);
+        $this->assertArrayNotHasKey('design_json', $page);
+    }
+
     public function test_get_pages_returns_403_for_regular_member(): void
     {
         $member = User::factory()->forTenant($this->testTenantId)->create();

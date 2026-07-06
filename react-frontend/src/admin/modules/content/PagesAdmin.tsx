@@ -9,7 +9,8 @@
  * Wired to adminPages API for full CRUD.
  */
 
-import { useState, useEffect, useCallback } from 'react';import FileText from 'lucide-react/icons/file-text';
+import { useState, useEffect, useCallback } from 'react';
+import FileText from 'lucide-react/icons/file-text';
 import Plus from 'lucide-react/icons/plus';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';

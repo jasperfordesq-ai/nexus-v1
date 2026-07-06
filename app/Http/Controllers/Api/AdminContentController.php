@@ -101,7 +101,7 @@ class AdminContentController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         $rows = array_map(fn($r) => (array)$r, DB::select(
-            "SELECT id, tenant_id, title, slug, content, content_format, design_json, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
+            "SELECT id, tenant_id, title, slug, meta_description, is_published, sort_order, show_in_menu, menu_location, menu_order, publish_at, created_at, updated_at
              FROM pages WHERE tenant_id = ? ORDER BY sort_order ASC, created_at DESC",
             [$tenantId]
         ));
