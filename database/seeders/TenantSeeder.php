@@ -33,6 +33,8 @@ class TenantSeeder extends Seeder
                 'accessible_domain' => null,
                 'tenant_category'   => 'platform',
                 'tagline'           => 'Project NEXUS master tenant',
+                'parent_id'         => null,
+                'path'              => '/' . $tenantId . '/',
                 'is_active'         => 1,
                 'depth'             => 0,
                 'allows_subtenants' => true,

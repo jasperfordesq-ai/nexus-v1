@@ -70,6 +70,7 @@ const { mockApiGet, mockApiClearInflight, mockFetchCsrfToken, mockTokenManager }
     hasRefreshToken: vi.fn().mockReturnValue(false),
     setTenantId: vi.fn(),
     setTenantSlug: vi.fn(),
+    clearTokens: vi.fn(),
   };
   return { mockApiGet, mockApiClearInflight, mockFetchCsrfToken, mockTokenManager };
 });
@@ -171,6 +172,7 @@ describe('TenantContext', () => {
     mockTokenManager.hasAccessToken.mockReturnValue(false);
     mockTokenManager.hasRefreshToken.mockReturnValue(false);
     mockTokenManager.setTenantSlug.mockClear();
+    mockTokenManager.clearTokens.mockClear();
     mockApiGet.mockResolvedValue({ success: true, data: mockTenantConfig });
   });
 
@@ -264,6 +266,18 @@ describe('TenantContext', () => {
 
       await waitFor(() => expect(result.current.isLoading).toBe(false));
 
+      expect(mockTokenManager.setTenantId).toHaveBeenCalledWith(2);
+    });
+
+    it('clears tenant-bound auth tokens when bootstrap resolves a different tenant', async () => {
+      mockTokenManager.getTenantId.mockReturnValue('1');
+
+      const { result } = renderHook(() => useTenant(), { wrapper: tenantWrapper });
+
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      expect(mockTokenManager.clearTokens).toHaveBeenCalledOnce();
+      expect(mockApiClearInflight).toHaveBeenCalledOnce();
       expect(mockTokenManager.setTenantId).toHaveBeenCalledWith(2);
     });
   });

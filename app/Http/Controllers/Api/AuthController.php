@@ -278,6 +278,7 @@ class AuthController extends BaseApiController
                 'email' => $user['email'],
                 'is_super_admin' => !empty($user['is_super_admin']),
                 'is_tenant_super_admin' => !empty($user['is_tenant_super_admin']),
+                'is_god' => !empty($user['is_god']),
             ], $isMobile);
             $refreshToken = $this->tokenService->generateRefreshToken((int)$user['id'], (int)$user['tenant_id'], $isMobile);
 
@@ -299,7 +300,7 @@ class AuthController extends BaseApiController
                     // Stamp the tenant_id on the token record so the middleware can
                     // validate cross-tenant token usage (tenant_id column is nullable
                     // for backwards compatibility with tokens created before migration).
-                    $tokenResult->accessToken->forceFill(['tenant_id' => TenantContext::getId()])->save();
+                    $tokenResult->accessToken->forceFill(['tenant_id' => (int) $user['tenant_id']])->save();
                 }
             } catch (\Throwable $e) {
                 // Sanctum token creation may fail if personal_access_tokens table

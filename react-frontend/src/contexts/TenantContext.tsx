@@ -376,7 +376,8 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
               `[TenantContext] Overriding stale localStorage tenant_id. ` +
               `Stored: ${storedTenantId}, URL-resolved: ${tenant.id}`
             );
-            // Clear cached API requests when tenant switches to prevent stale cross-tenant data
+            // Tokens are tenant-bound server-side; a tenant switch needs a fresh login.
+            tokenManager.clearTokens();
             api.clearInflightRequests();
           }
           tokenManager.setTenantId(tenant.id);

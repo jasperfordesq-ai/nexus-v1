@@ -88,6 +88,7 @@ class SuperPanelAccess
                 u.role,
                 u.is_super_admin,
                 u.is_tenant_super_admin,
+                u.is_god,
                 t.name as tenant_name,
                 t.path as tenant_path,
                 t.depth as tenant_depth,
@@ -104,31 +105,36 @@ class SuperPanelAccess
             return self::$currentAccess;
         }
 
-        // RULE 1: Must have tenant_super_admin flag OR is_super_admin (legacy)
-        if (!$user['is_tenant_super_admin'] && !$user['is_super_admin']) {
+        $isGod = !empty($user['is_god']) || $user['role'] === 'god';
+        $hasSuperAdminFlag = !empty($user['is_tenant_super_admin']) || !empty($user['is_super_admin']);
+
+        // RULE 1: Must have tenant_super_admin flag, platform super flag, or god mode.
+        if (!$hasSuperAdminFlag && !$isGod) {
             self::$currentAccess['reason'] = 'Not a Super Admin for any tenant';
             return self::$currentAccess;
         }
 
-        // RULE 2: Their tenant must allow sub-tenants OR be Master
+        // RULE 2: Tenant admins need a hub/master tenant; god mode is platform-global.
         $isMaster = ((int)$user['tenant_id'] === 1);
 
-        if (!$isMaster && !$user['allows_subtenants']) {
+        if (!$isGod && !$isMaster && !$user['allows_subtenants']) {
             self::$currentAccess['reason'] = 'Tenant does not have sub-tenant capability';
             return self::$currentAccess;
         }
 
+        $hasGlobalAccess = $isGod || $isMaster;
+
         // ACCESS GRANTED - determine scope
         self::$currentAccess = [
             'granted' => true,
-            'level' => $isMaster ? 'master' : 'regional',
+            'level' => $hasGlobalAccess ? 'master' : 'regional',
             'user_id' => (int)$user['user_id'],
             'tenant_id' => (int)$user['tenant_id'],
             'tenant_name' => $user['tenant_name'],
             'tenant_path' => $user['tenant_path'],
             'tenant_depth' => (int)$user['tenant_depth'],
-            'scope' => $isMaster ? 'global' : 'subtree',
-            'can_create_tenants' => (bool)$user['allows_subtenants'],
+            'scope' => $hasGlobalAccess ? 'global' : 'subtree',
+            'can_create_tenants' => $hasGlobalAccess || (bool)$user['allows_subtenants'],
             'max_depth' => (int)$user['max_depth'],
             'reason' => 'Access granted'
         ];

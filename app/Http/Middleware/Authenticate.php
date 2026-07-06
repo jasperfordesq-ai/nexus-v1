@@ -77,17 +77,19 @@ class Authenticate
 
                     if ($tokenTenantId !== null && $currentTenantId !== null
                         && (int) $tokenTenantId !== (int) $currentTenantId) {
-                        \Illuminate\Support\Facades\Log::debug('[Auth] Sanctum token tenant mismatch', [
-                            'user_id'        => $user->id,
-                            'token_tenant'   => $tokenTenantId,
-                            'request_tenant' => $currentTenantId,
-                        ]);
-                        return response()->json([
-                            'errors' => [
-                                ['code' => 'token_tenant_mismatch', 'message' => 'Token was not issued for this community'],
-                            ],
-                            'success' => false,
-                        ], 403, ['API-Version' => '2.0']);
+                        if (!$user->is_super_admin && !$user->is_god && !in_array($user->role ?? '', ['super_admin', 'god'], true)) {
+                            \Illuminate\Support\Facades\Log::debug('[Auth] Sanctum token tenant mismatch', [
+                                'user_id'        => $user->id,
+                                'token_tenant'   => $tokenTenantId,
+                                'request_tenant' => $currentTenantId,
+                            ]);
+                            return response()->json([
+                                'errors' => [
+                                    ['code' => 'token_tenant_mismatch', 'message' => 'Token was not issued for this community'],
+                                ],
+                                'success' => false,
+                            ], 403, ['API-Version' => '2.0']);
+                        }
                     }
                 }
 

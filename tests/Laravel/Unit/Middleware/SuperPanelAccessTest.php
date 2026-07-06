@@ -210,6 +210,47 @@ class SuperPanelAccessTest extends TestCase
         $this->assertEquals('Tenant does not have sub-tenant capability', $access['reason']);
     }
 
+    public function test_getAccess_grants_global_access_to_god_user_on_standard_tenant(): void
+    {
+        DB::table('tenants')->updateOrInsert(
+            ['id' => 51],
+            [
+                'name' => 'Standard God Tenant',
+                'slug' => 'standard-god',
+                'path' => '/1/51/',
+                'depth' => 1,
+                'allows_subtenants' => false,
+                'max_depth' => 0,
+                'is_active' => true,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        $userId = DB::table('users')->insertGetId([
+            'tenant_id' => 51,
+            'first_name' => 'Platform',
+            'last_name' => 'God',
+            'email' => 'platform-god-standard@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'god',
+            'is_super_admin' => false,
+            'is_tenant_super_admin' => false,
+            'is_god' => true,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        SuperPanelAccess::reset();
+        $access = SuperPanelAccess::getAccess($userId);
+
+        $this->assertTrue($access['granted']);
+        $this->assertEquals('master', $access['level']);
+        $this->assertEquals('global', $access['scope']);
+        $this->assertTrue($access['can_create_tenants']);
+    }
+
     public function test_getAccess_caches_result_per_request(): void
     {
         SuperPanelAccess::reset();
