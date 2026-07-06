@@ -125,8 +125,8 @@ function NewOrganisationInner() {
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       showToast({ title: t('register.successTitle'), description: t('register.successMessage'), variant: 'success' });
       router.replace({
-        pathname: '/(modals)/organisation-detail',
-        params: { id: String(organisation.id) },
+        pathname: '/(modals)/volunteering',
+        params: { tab: 'organisations', submitted: String(organisation.id) },
       });
     } catch (error) {
       const message = error instanceof Error ? error.message : t('register.saveFailedMessage');

@@ -1,5 +1,3 @@
-import { Chip, CloseButton } from '@/components/ui';
-import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tooltip, CardRowsSkeleton, NumberField, Label, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,6 +10,8 @@ import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu,
  * Uses HeroUI form components with validation.
  */
 
+import { Chip, CloseButton } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tooltip, CardRowsSkeleton, NumberField, Label, useConfirm } from '@/components/ui';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 

@@ -403,9 +403,67 @@ public function test_apply_requires_auth(): void
             'description' => 'A detailed organisation profile for a community kitchen.',
             'website' => 'https://example.test/kitchen',
         ]);
+        $volunteer = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $opportunityId = (int) DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $orgId,
+            'created_by' => $owner->id,
+            'title' => 'Kitchen helper',
+            'description' => 'Help prepare community meals.',
+            'location' => 'Community kitchen',
+            'status' => 'open',
+            'is_active' => 1,
+            'created_at' => now(),
+        ]);
+        DB::table('vol_applications')->insert([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $opportunityId,
+            'user_id' => $volunteer->id,
+            'status' => 'approved',
+            'created_at' => now(),
+        ]);
+        DB::table('vol_logs')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $volunteer->id,
+            'organization_id' => $orgId,
+            'opportunity_id' => $opportunityId,
+            'date_logged' => now()->toDateString(),
+            'hours' => 3.5,
+            'description' => 'Kitchen shift',
+            'status' => 'approved',
+            'created_at' => now(),
+        ]);
+        DB::table('vol_reviews')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'reviewer_id' => $volunteer->id,
+                'target_type' => 'organization',
+                'target_id' => $orgId,
+                'rating' => 5,
+                'comment' => 'Excellent.',
+                'created_at' => now(),
+            ],
+            [
+                'tenant_id' => $this->testTenantId,
+                'reviewer_id' => $owner->id,
+                'target_type' => 'organization',
+                'target_id' => $orgId,
+                'rating' => 4,
+                'comment' => 'Well run.',
+                'created_at' => now(),
+            ],
+        ]);
 
         $defaultResponse = $this->apiGet("/v2/volunteering/organisations/{$orgId}");
         $defaultResponse->assertOk();
+        $defaultResponse->assertJsonPath('data.opportunity_count', 1);
+        $defaultResponse->assertJsonPath('data.volunteer_count', 1);
+        $defaultResponse->assertJsonPath('data.total_hours', 3.5);
+        $defaultResponse->assertJsonPath('data.review_count', 2);
+        $defaultResponse->assertJsonPath('data.average_rating', 4.5);
         $this->assertArrayNotHasKey('public_contract', $defaultResponse->json('data'));
         $this->assertArrayNotHasKey('balance', $defaultResponse->json('data'));
         $this->assertArrayNotHasKey('auto_pay_enabled', $defaultResponse->json('data'));
@@ -422,8 +480,34 @@ public function test_apply_requires_auth(): void
         $this->assertSame('A detailed organisation profile for a community kitchen.', $contract['description']);
         $this->assertSame('https://example.test/kitchen', $contract['website']);
         $this->assertSame('Detail Owner', $contract['owner']['display_name']);
+        $this->assertSame(1, $contract['stats']['opportunity_count']);
+        $this->assertSame(1, $contract['stats']['volunteer_count']);
+        $this->assertSame(3.5, $contract['stats']['total_hours']);
+        $this->assertSame(2, $contract['stats']['review_count']);
+        $this->assertSame(4.5, $contract['stats']['average_rating']);
         $this->assertArrayNotHasKey('balance', $contract);
         $this->assertArrayNotHasKey('auto_pay_enabled', $contract);
+    }
+
+    public function test_show_organisation_hides_pending_and_suspended_profiles(): void
+    {
+        $this->enableVolunteeringFeature();
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $pendingOrgId = $this->createPublicOrganisation($owner, [
+            'name' => 'Pending Kitchen',
+            'status' => 'pending',
+        ]);
+        $suspendedOrgId = $this->createPublicOrganisation($owner, [
+            'name' => 'Suspended Kitchen',
+            'status' => 'suspended',
+        ]);
+
+        $this->apiGet("/v2/volunteering/organisations/{$pendingOrgId}")->assertStatus(404);
+        $this->apiGet("/v2/volunteering/organisations/{$suspendedOrgId}")->assertStatus(404);
     }
 
     // ------------------------------------------------------------------

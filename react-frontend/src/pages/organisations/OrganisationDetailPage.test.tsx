@@ -130,17 +130,6 @@ const mockReviews = [
   },
 ];
 
-const mockJobs = [
-  {
-    id: 55,
-    title: 'Community Tool Library Helper',
-    type: 'timebank',
-    location: 'Cork',
-    is_remote: false,
-    deadline: null,
-  },
-];
-
 function setupSuccessfulMocks() {
   vi.mocked(api.get).mockImplementation((url: string) => {
     if (url.includes('/reviews/organization/')) {
@@ -151,9 +140,6 @@ function setupSuccessfulMocks() {
     }
     if (url.includes('/organisations/')) {
       return Promise.resolve({ success: true, data: mockOrganisation });
-    }
-    if (url.includes('/v2/jobs')) {
-      return Promise.resolve({ success: true, data: [] });
     }
     return Promise.resolve({ success: true, data: null });
   });
@@ -204,7 +190,7 @@ describe('OrganisationDetailPage', () => {
     expect(screen.getByText('organisation_detail.try_again')).toBeInTheDocument();
   });
 
-  it('calls all three API endpoints in parallel on mount', async () => {
+  it('calls the volunteering organisation endpoints in parallel on mount', async () => {
     setupSuccessfulMocks();
     render(<OrganisationDetailPage />);
     await waitFor(() => {
@@ -213,6 +199,7 @@ describe('OrganisationDetailPage', () => {
     expect(api.get).toHaveBeenCalledWith(expect.stringContaining('/v2/volunteering/organisations/7'));
     expect(api.get).toHaveBeenCalledWith(expect.stringContaining('/v2/volunteering/opportunities'));
     expect(api.get).toHaveBeenCalledWith(expect.stringContaining('/v2/volunteering/reviews/organization/7'));
+    expect(vi.mocked(api.get).mock.calls.some(([url]) => String(url).includes('/v2/jobs'))).toBe(false);
   });
 
   it('shows organisation stats (volunteer count, hours, rating)', async () => {
@@ -252,27 +239,4 @@ describe('OrganisationDetailPage', () => {
     expect(screen.getByText('organisation_detail.no_active_opportunities')).toBeInTheDocument();
   });
 
-  it('renders translated job type labels instead of raw backend values', async () => {
-    vi.mocked(api.get).mockImplementation((url: string) => {
-      if (url.includes('/reviews/organization/')) {
-        return Promise.resolve({ success: true, data: { reviews: [] } });
-      }
-      if (url.includes('/opportunities')) {
-        return Promise.resolve({ success: true, data: [] });
-      }
-      if (url.includes('/v2/jobs')) {
-        return Promise.resolve({ success: true, data: mockJobs });
-      }
-      return Promise.resolve({ success: true, data: mockOrganisation });
-    });
-
-    render(<OrganisationDetailPage />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Community Tool Library Helper')).toBeInTheDocument();
-    });
-
-    expect(screen.getByText('jobs:type.timebank')).toBeInTheDocument();
-    expect(screen.queryByText('timebank')).not.toBeInTheDocument();
-  });
 });

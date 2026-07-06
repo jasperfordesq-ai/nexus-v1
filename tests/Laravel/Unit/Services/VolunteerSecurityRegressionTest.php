@@ -33,10 +33,87 @@ class VolunteerSecurityRegressionTest extends \Tests\Laravel\TestCase
 
         $publicView = VolunteerService::getOrganizationById($orgId);
         $ownerView = VolunteerService::getOrganizationById($orgId, true);
+        $publicBritishView = VolunteerService::getOrganisationById($orgId);
+        $ownerBritishView = VolunteerService::getOrganisationById($orgId, true);
 
         $this->assertNull($publicView);
         $this->assertNotNull($ownerView);
         $this->assertSame($orgId, $ownerView['id']);
+        $this->assertNull($publicBritishView);
+        $this->assertNotNull($ownerBritishView);
+        $this->assertSame($orgId, $ownerBritishView['id']);
+    }
+
+    public function testLogHoursRejectsNonApprovedOrganizations(): void
+    {
+        $ownerId = $this->createUser('suspended-org-owner');
+        $volunteerId = $this->createUser('suspended-org-volunteer');
+        $orgId = $this->createOrganization($ownerId, 'suspended');
+
+        Database::query(
+            "INSERT INTO org_members (tenant_id, organization_id, org_type, user_id, role, status, created_at, updated_at) VALUES (?, ?, 'volunteer', ?, 'member', 'active', NOW(), NOW())",
+            [self::TENANT_ID, $orgId, $volunteerId]
+        );
+
+        $logId = VolunteerService::logHours($volunteerId, [
+            'organization_id' => $orgId,
+            'date' => date('Y-m-d'),
+            'hours' => 1,
+            'description' => 'Attempted suspended organisation log',
+        ]);
+
+        $this->assertNull($logId);
+        $errors = VolunteerService::getErrors();
+        $this->assertNotEmpty($errors);
+        $this->assertSame('NOT_FOUND', $errors[0]['code']);
+    }
+
+    public function testOrganizationDetailHelpersSharePublicStatsContract(): void
+    {
+        $ownerId = $this->createUser('stats-owner');
+        $volunteerId = $this->createUser('stats-volunteer');
+        $orgId = $this->createOrganization($ownerId, 'approved');
+
+        Database::query(
+            "INSERT INTO vol_opportunities (tenant_id, organization_id, created_by, title, description, location, status, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, 'open', 1, NOW())",
+            [self::TENANT_ID, $orgId, $ownerId, 'Stats opportunity', 'Volunteer stats test', 'Remote']
+        );
+        $openOpportunityId = (int)Database::getInstance()->lastInsertId();
+
+        Database::query(
+            "INSERT INTO vol_opportunities (tenant_id, organization_id, created_by, title, description, location, status, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, 'closed', 1, NOW())",
+            [self::TENANT_ID, $orgId, $ownerId, 'Closed opportunity', 'Not public', 'Remote']
+        );
+
+        Database::query(
+            "INSERT INTO vol_applications (tenant_id, opportunity_id, user_id, status, created_at) VALUES (?, ?, ?, 'approved', NOW())",
+            [self::TENANT_ID, $openOpportunityId, $volunteerId]
+        );
+
+        Database::query(
+            "INSERT INTO vol_logs (tenant_id, user_id, organization_id, opportunity_id, date_logged, hours, description, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, 'approved', NOW())",
+            [self::TENANT_ID, $volunteerId, $orgId, $openOpportunityId, date('Y-m-d'), 2.5, 'Stats hours']
+        );
+
+        Database::query(
+            "INSERT INTO vol_reviews (tenant_id, reviewer_id, target_type, target_id, rating, comment, created_at) VALUES (?, ?, 'organization', ?, 5, 'Great', NOW()), (?, ?, 'organization', ?, 3, 'Good', NOW())",
+            [self::TENANT_ID, $volunteerId, $orgId, self::TENANT_ID, $ownerId, $orgId]
+        );
+
+        $legacy = VolunteerService::getOrganizationById($orgId);
+        $modern = VolunteerService::getOrganisationById($orgId);
+
+        $this->assertIsArray($legacy);
+        $this->assertIsArray($modern);
+        foreach (['opportunity_count', 'volunteer_count', 'total_hours', 'review_count', 'average_rating'] as $key) {
+            $this->assertSame($modern[$key], $legacy[$key], "{$key} differs between organization detail helpers");
+        }
+        $this->assertSame(1, $legacy['opportunity_count']);
+        $this->assertSame(1, $legacy['volunteer_count']);
+        $this->assertSame(2.5, $legacy['total_hours']);
+        $this->assertSame(2, $legacy['review_count']);
+        $this->assertSame(4.0, $legacy['average_rating']);
+        $this->assertSame(1, $legacy['stats']['volunteer_count']);
     }
 
     public function testGenerateTokenRequiresApprovedShiftAssignment(): void

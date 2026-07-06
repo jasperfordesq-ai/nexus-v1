@@ -209,9 +209,12 @@ describe('BiasAuditPage', () => {
   });
 
   it('shows loading state when API is pending', () => {
-    vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
-    render(<BiasAuditPage />);
+    vi.mocked(api.get).mockReturnValue(new Promise((resolve) => {
+      window.setTimeout(() => resolve({ success: true, data: makeReport(), meta: {} }), 25);
+    }));
+    const { unmount } = render(<BiasAuditPage />);
     expect(document.querySelectorAll('[role="status"]').length).toBeGreaterThan(0);
+    unmount();
   });
 
   it('renders funnel section when report data is loaded', async () => {

@@ -159,7 +159,7 @@ describe('NewOrganisationScreen', () => {
     expect(getByText('Confirm you are authorised to register this organisation.')).toBeTruthy();
   });
 
-  it('submits a valid organisation registration and opens the detail route', async () => {
+  it('submits a valid organisation registration and opens the managed organisations route', async () => {
     const { getByText, getByPlaceholderText } = render(<NewOrganisationScreen />);
 
     fireEvent.changeText(getByPlaceholderText('Community skills network'), 'Neighbourhood Skills Network');
@@ -176,8 +176,8 @@ describe('NewOrganisationScreen', () => {
       website: 'https://example.org',
     }));
     await waitFor(() => expect(mockReplace).toHaveBeenCalledWith({
-      pathname: '/(modals)/organisation-detail',
-      params: { id: '44' },
+      pathname: '/(modals)/volunteering',
+      params: { tab: 'organisations', submitted: '44' },
     }));
     expect(mockShowToast).toHaveBeenCalledWith(expect.objectContaining({ title: 'Organisation submitted', variant: 'success' }));
   });

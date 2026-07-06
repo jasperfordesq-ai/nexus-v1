@@ -156,10 +156,13 @@ describe('JobKanbanPage', () => {
   });
 
   it('shows loading state initially when API is pending', () => {
-    vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
-    render(<JobKanbanPage />);
+    vi.mocked(api.get).mockReturnValue(new Promise((resolve) => {
+      window.setTimeout(() => resolve({ success: true, data: makeVacancy(), meta: {} }), 25);
+    }));
+    const { unmount } = render(<JobKanbanPage />);
     // When loading, the kanban columns are not rendered yet
     expect(screen.queryByText('Applied')).not.toBeInTheDocument();
+    unmount();
   });
 
   it('renders the job title when data is loaded', async () => {

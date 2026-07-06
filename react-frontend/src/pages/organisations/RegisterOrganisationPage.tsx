@@ -125,7 +125,7 @@ export default function RegisterOrganisationPage() {
           t('organisations.form_success_title'),
           t('organisations.form_success_message'),
         );
-        navigate(tenantPath(`/organisations/${response.data.id}`));
+        navigate(tenantPath('/volunteering/my-organisations'));
       } else {
         toast.error(t('organisations.form_save_error'));
       }

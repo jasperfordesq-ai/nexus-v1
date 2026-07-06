@@ -151,7 +151,7 @@ describe('RegisterOrganisationPage', () => {
         expect.objectContaining({ name: 'My Green Organisation' }),
       );
     });
-    expect(mockNavigate).toHaveBeenCalledWith('/test/organisations/55');
+    expect(mockNavigate).toHaveBeenCalledWith('/test/volunteering/my-organisations');
   });
 
   it('does not register twice on a rapid double-submit', async () => {

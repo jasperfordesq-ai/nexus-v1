@@ -2639,24 +2639,29 @@ class JobVacanciesController extends BaseApiController
             ->find($interviewId);
 
         if (!$interview) {
-            return response('Not found', 404);
+            return response(__('api.job_interview_not_found'), 404);
         }
 
         // Must be the candidate or the job poster
         $isCandidate = $interview->application && (int) $interview->application->user_id === $userId;
         $isPoster = $interview->vacancy && (int) $interview->vacancy->user_id === $userId;
         if (!$isCandidate && !$isPoster) {
-            return response('Forbidden', 403);
+            return response(__('api.job_access_denied'), 403);
         }
 
-        $title = $this->icsText('Interview: ' . ($interview->vacancy->title ?? 'Job Interview'));
+        $title = $this->icsText(__('api.job_interview_calendar_title', [
+            'title' => $interview->vacancy->title ?? __('api.job_interview_fallback_title'),
+        ]));
         $start = $interview->scheduled_at;
         $end = $start->copy()->addMinutes($interview->duration_mins ?? 60);
         $location = $this->icsText($interview->location_notes ?? $interview->vacancy->location ?? '');
         $type = $this->icsText(ucfirst($interview->interview_type ?? 'video'));
-        $description = "Type: {$type}\nDuration: " . ($interview->duration_mins ?? 60) . " minutes";
+        $description = __('api.job_interview_calendar_description', [
+            'type' => $type,
+            'duration' => $interview->duration_mins ?? 60,
+        ]);
         if ($interview->location_notes) {
-            $description .= "\nNotes: " . $interview->location_notes;
+            $description .= "\n" . __('api.job_interview_calendar_notes', ['notes' => $interview->location_notes]);
         }
         $description = $this->icsText($description);
 
@@ -2682,12 +2687,12 @@ class JobVacanciesController extends BaseApiController
             . "BEGIN:VALARM\r\n"
             . "TRIGGER:-PT1H\r\n"
             . "ACTION:DISPLAY\r\n"
-            . "DESCRIPTION:Interview reminder\r\n"
+            . "DESCRIPTION:" . $this->icsText(__('api.job_interview_calendar_reminder_1h')) . "\r\n"
             . "END:VALARM\r\n"
             . "BEGIN:VALARM\r\n"
             . "TRIGGER:-PT15M\r\n"
             . "ACTION:DISPLAY\r\n"
-            . "DESCRIPTION:Interview in 15 minutes\r\n"
+            . "DESCRIPTION:" . $this->icsText(__('api.job_interview_calendar_reminder_15m')) . "\r\n"
             . "END:VALARM\r\n"
             . "END:VEVENT\r\n"
             . "END:VCALENDAR\r\n";
@@ -2733,11 +2738,15 @@ class JobVacanciesController extends BaseApiController
             return $this->respondWithError('FORBIDDEN', __('api_controllers_2.job_vacancies.access_denied'), null, 403);
         }
 
-        $title = 'Interview: ' . ($interview->vacancy->title ?? 'Job Interview');
+        $title = __('api.job_interview_calendar_title', [
+            'title' => $interview->vacancy->title ?? __('api.job_interview_fallback_title'),
+        ]);
         $start = $interview->scheduled_at;
         $end = $start->copy()->addMinutes($interview->duration_mins ?? 60);
         $location = $interview->location_notes ?? '';
-        $details = ucfirst($interview->interview_type ?? 'video') . ' interview';
+        $details = __('api.job_interview_calendar_link_details', [
+            'type' => ucfirst($interview->interview_type ?? 'video'),
+        ]);
 
         // Google Calendar link
         $googleParams = http_build_query([
@@ -2807,13 +2816,17 @@ class JobVacanciesController extends BaseApiController
             ->get();
 
         foreach ($appHistory as $h) {
-            $actorName = $h->changer ? trim(($h->changer->first_name ?? '') . ' ' . ($h->changer->last_name ?? '')) : 'System';
-            $candidateName = ($h->application && $h->application->applicant) ? trim(($h->application->applicant->first_name ?? '') . ' ' . ($h->application->applicant->last_name ?? '')) : 'Unknown';
+            $actorName = $h->changer ? trim(($h->changer->first_name ?? '') . ' ' . ($h->changer->last_name ?? '')) : __('api.job_audit_actor_system');
+            $candidateName = ($h->application && $h->application->applicant) ? trim(($h->application->applicant->first_name ?? '') . ' ' . ($h->application->applicant->last_name ?? '')) : __('api.job_audit_unknown_candidate');
             $events->push([
                 'type' => 'status_change',
                 'timestamp' => $h->changed_at,
                 'actor' => $actorName,
-                'description' => "{$candidateName}: {$h->from_status} → {$h->to_status}",
+                'description' => __('api.job_audit_status_change', [
+                    'candidate' => $candidateName,
+                    'from' => $h->from_status,
+                    'to' => $h->to_status,
+                ]),
                 'details' => $h->notes,
             ]);
         }
@@ -2826,13 +2839,19 @@ class JobVacanciesController extends BaseApiController
             ->get();
 
         foreach ($interviews as $iv) {
-            $candidateName = ($iv->application && $iv->application->applicant) ? trim(($iv->application->applicant->first_name ?? '') . ' ' . ($iv->application->applicant->last_name ?? '')) : 'Unknown';
+            $candidateName = ($iv->application && $iv->application->applicant) ? trim(($iv->application->applicant->first_name ?? '') . ' ' . ($iv->application->applicant->last_name ?? '')) : __('api.job_audit_unknown_candidate');
             $events->push([
                 'type' => 'interview',
                 'timestamp' => $iv->created_at,
-                'actor' => 'System',
-                'description' => "Interview ({$iv->interview_type}) scheduled with {$candidateName} — status: {$iv->status}",
-                'details' => $iv->scheduled_at ? "Scheduled: " . $iv->scheduled_at->format('M j, Y g:i A') : null,
+                'actor' => __('api.job_audit_actor_system'),
+                'description' => __('api.job_audit_interview_scheduled', [
+                    'type' => $iv->interview_type,
+                    'candidate' => $candidateName,
+                    'status' => $iv->status,
+                ]),
+                'details' => $iv->scheduled_at ? __('api.job_audit_scheduled_at', [
+                    'date' => $iv->scheduled_at->format('M j, Y g:i A'),
+                ]) : null,
             ]);
         }
 
@@ -2844,13 +2863,17 @@ class JobVacanciesController extends BaseApiController
             ->get();
 
         foreach ($offers as $offer) {
-            $candidateName = ($offer->application && $offer->application->applicant) ? trim(($offer->application->applicant->first_name ?? '') . ' ' . ($offer->application->applicant->last_name ?? '')) : 'Unknown';
+            $candidateName = ($offer->application && $offer->application->applicant) ? trim(($offer->application->applicant->first_name ?? '') . ' ' . ($offer->application->applicant->last_name ?? '')) : __('api.job_audit_unknown_candidate');
             $salary = $offer->salary_offered ? '$' . number_format($offer->salary_offered, 0) : '';
             $events->push([
                 'type' => 'offer',
                 'timestamp' => $offer->created_at,
-                'actor' => 'Employer',
-                'description' => "Offer sent to {$candidateName} {$salary} — status: {$offer->status}",
+                'actor' => __('api.job_audit_actor_employer'),
+                'description' => __('api.job_audit_offer_sent', [
+                    'candidate' => $candidateName,
+                    'salary' => $salary,
+                    'status' => $offer->status,
+                ]),
                 'details' => $offer->details,
             ]);
         }
@@ -2887,36 +2910,33 @@ class JobVacanciesController extends BaseApiController
         }
 
         // Build job context for the system prompt
-        $jobContext = "Job Title: {$vacancy->title}\n"
-            . "Type: {$vacancy->type}\n"
-            . "Commitment: {$vacancy->commitment}\n"
-            . "Location: " . ($vacancy->location ?? 'Not specified') . "\n"
-            . "Remote: " . ($vacancy->is_remote ? 'Yes' : 'No') . "\n"
-            . "Skills Required: " . ($vacancy->skills_required ?? 'Not specified') . "\n"
-            . "Salary: " . ($vacancy->salary_min ? "$" . number_format($vacancy->salary_min) . " - $" . number_format($vacancy->salary_max ?? 0) : 'Not disclosed') . "\n"
-            . "Description:\n" . substr($vacancy->description ?? '', 0, 1500);
+        $jobContext = __('api.job_ai_chat_context', [
+            'title' => $vacancy->title,
+            'type' => $vacancy->type,
+            'commitment' => $vacancy->commitment,
+            'location' => $vacancy->location ?? __('api.job_ai_not_specified'),
+            'remote' => $vacancy->is_remote ? __('api.job_ai_yes') : __('api.job_ai_no'),
+            'skills' => $vacancy->skills_required ?? __('api.job_ai_not_specified'),
+            'salary' => $vacancy->salary_min
+                ? '$' . number_format($vacancy->salary_min) . ' - $' . number_format($vacancy->salary_max ?? 0)
+                : __('api.job_ai_salary_not_disclosed'),
+            'description' => substr($vacancy->description ?? '', 0, 1500),
+        ]);
 
         // Get user's profile for personalized advice
         $user = \App\Models\User::find($userId);
         $userContext = '';
         if ($user) {
-            $userContext = "\n\nAbout the user asking:\n"
-                . "Skills: " . ($user->skills ?? 'Not listed') . "\n"
-                . "Bio: " . substr($user->bio ?? '', 0, 300);
+            $userContext = "\n\n" . __('api.job_ai_chat_user_context', [
+                'skills' => $user->skills ?? __('api.job_ai_not_listed'),
+                'bio' => substr($user->bio ?? '', 0, 300),
+            ]);
         }
 
-        $systemPrompt = "You are a friendly, expert career advisor for a community timebanking platform called Project NEXUS. "
-            . "You are helping a community member learn about a specific job opportunity and prepare their application.\n\n"
-            . "JOB DETAILS:\n{$jobContext}\n"
-            . $userContext . "\n\n"
-            . "Guidelines:\n"
-            . "- Be encouraging and supportive\n"
-            . "- Give specific, actionable advice based on the actual job details\n"
-            . "- If the user asks about qualifications, compare their skills to the requirements\n"
-            . "- Help them craft application messages if asked\n"
-            . "- Keep responses concise (under 300 words)\n"
-            . "- If asked about salary, discuss what's listed; if undisclosed, suggest researching market rates\n"
-            . "- Mention relevant community aspects (timebanking, volunteering) when appropriate";
+        $systemPrompt = __('api.job_ai_chat_system_prompt', [
+            'job_context' => $jobContext,
+            'user_context' => $userContext,
+        ]);
 
         // Include conversation history if provided
         $messages = [['role' => 'system', 'content' => $systemPrompt]];
@@ -3002,7 +3022,7 @@ class JobVacanciesController extends BaseApiController
                 'your_salary' => $vacancy->salary_min,
                 'market_avg' => round($avgSalary, 0),
                 'diff_percent' => $diff,
-                'label' => $diff > 0 ? 'above average' : ($diff < 0 ? 'below average' : 'at average'),
+                'label' => $diff > 0 ? __('api.job_prediction_above_average_lower') : ($diff < 0 ? __('api.job_prediction_below_average_lower') : __('api.job_prediction_at_average_lower')),
             ];
         }
 
@@ -3011,17 +3031,20 @@ class JobVacanciesController extends BaseApiController
             'expected_applications' => [
                 'value' => max(1, round($avgApplications)),
                 'current' => $currentApps,
-                'label' => $currentApps >= $avgApplications ? 'Above average' : 'Below average',
+                'label' => $currentApps >= $avgApplications ? __('api.job_prediction_above_average') : __('api.job_prediction_below_average'),
             ],
             'estimated_time_to_fill' => [
                 'value' => $avgDaysToFill ? round($avgDaysToFill) : null,
                 'days_posted' => $daysPosted,
-                'label' => $avgDaysToFill ? round($avgDaysToFill) . ' days (based on ' . $similarJobs->count() . ' similar jobs)' : 'Insufficient data',
+                'label' => $avgDaysToFill ? __('api.job_prediction_days_based_on_similar', [
+                    'days' => round($avgDaysToFill),
+                    'count' => $similarJobs->count(),
+                ]) : __('api.job_prediction_insufficient_data'),
             ],
             'conversion_rate' => [
                 'yours' => $currentConversion,
                 'average' => $avgConversion,
-                'label' => $currentConversion > $avgConversion ? 'Above average' : 'Below average',
+                'label' => $currentConversion > $avgConversion ? __('api.job_prediction_above_average') : __('api.job_prediction_below_average'),
             ],
             'salary_comparison' => $salaryComparison,
             'similar_jobs_analyzed' => $similarJobs->count(),
@@ -3030,15 +3053,22 @@ class JobVacanciesController extends BaseApiController
         // If AI is enabled, generate narrative insights
         if (\App\Services\AI\AIServiceFactory::isEnabled()) {
             try {
-                $prompt = "Given these job posting metrics, write 3 brief, actionable insights (1 sentence each) as a JSON array of strings:\n\n"
-                    . "Job: {$vacancy->title} ({$vacancy->type})\n"
-                    . "Days posted: {$daysPosted}\n"
-                    . "Applications: {$currentApps} (avg for similar: " . round($avgApplications) . ")\n"
-                    . "Views: {$currentViews} (avg: " . round($avgViews) . ")\n"
-                    . "Conversion: {$currentConversion}% (avg: {$avgConversion}%)\n"
-                    . ($salaryComparison ? "Salary: {$salaryComparison['diff_percent']}% " . $salaryComparison['label'] . "\n" : "")
-                    . "Similar filled jobs analyzed: " . $similarJobs->count() . "\n\n"
-                    . "Return ONLY a JSON array of 3 strings. No markdown.";
+                $prompt = __('api.job_prediction_ai_prompt', [
+                    'title' => $vacancy->title,
+                    'type' => $vacancy->type,
+                    'days' => $daysPosted,
+                    'applications' => $currentApps,
+                    'avg_applications' => round($avgApplications),
+                    'views' => $currentViews,
+                    'avg_views' => round($avgViews),
+                    'conversion' => $currentConversion,
+                    'avg_conversion' => $avgConversion,
+                    'salary_line' => $salaryComparison ? __('api.job_prediction_ai_salary_line', [
+                        'diff' => $salaryComparison['diff_percent'],
+                        'label' => $salaryComparison['label'],
+                    ]) : '',
+                    'similar_count' => $similarJobs->count(),
+                ]);
 
                 $aiRes = \App\Services\AI\AIServiceFactory::chatWithFallback(
                     [['role' => 'user', 'content' => $prompt]],

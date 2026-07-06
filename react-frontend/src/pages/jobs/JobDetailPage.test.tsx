@@ -149,9 +149,12 @@ describe('JobDetailPage', () => {
   });
 
   it('renders loading state initially', () => {
-    vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
-    render(<JobDetailPage />);
+    vi.mocked(api.get).mockReturnValue(new Promise((resolve) => {
+      window.setTimeout(() => resolve({ success: true, data: baseVacancy, meta: {} }), 25);
+    }));
+    const { unmount } = render(<JobDetailPage />);
     expect(document.querySelectorAll('[role="status"]').length).toBeGreaterThan(0);
+    unmount();
   });
 
   it('renders not-found empty state when API returns no data', async () => {

@@ -601,6 +601,7 @@ class VolunteerService
         $volCounts = [];
         $hourTotals = [];
         $avgRatings = [];
+        $reviewCounts = [];
         if (! empty($orgIds)) {
             $tenantId = self::getTenantId();
 
@@ -644,15 +645,25 @@ class VolunteerService
                 ->selectRaw('target_id, AVG(rating) as avg_rating')
                 ->pluck('avg_rating', 'target_id')
                 ->all();
+
+            $reviewCounts = DB::table('vol_reviews')
+                ->where('tenant_id', $tenantId)
+                ->where('target_type', 'organization')
+                ->whereIn('target_id', $orgIds)
+                ->groupBy('target_id')
+                ->selectRaw('target_id, COUNT(*) as cnt')
+                ->pluck('cnt', 'target_id')
+                ->all();
         }
 
-        $itemsArray = $items->map(function ($org) use ($oppCounts, $volCounts, $hourTotals, $avgRatings) {
+        $itemsArray = $items->map(function ($org) use ($oppCounts, $volCounts, $hourTotals, $avgRatings, $reviewCounts) {
             $data = $org->toArray();
             $id = (int) $org->id;
             $data['opportunity_count'] = (int) ($oppCounts[$id] ?? 0);
             $data['volunteer_count'] = (int) ($volCounts[$id] ?? 0);
             $data['total_hours'] = (float) ($hourTotals[$id] ?? 0);
             $data['average_rating'] = isset($avgRatings[$id]) ? round((float) $avgRatings[$id], 1) : 0.0;
+            $data['review_count'] = (int) ($reviewCounts[$id] ?? 0);
 
             return $data;
         })->all();
@@ -667,7 +678,7 @@ class VolunteerService
     /**
      * Get a single organisation by ID with stats.
      */
-    public static function getOrganisationById(int $id): ?array
+    public static function getOrganisationById(int $id, bool $includeNonApproved = false): ?array
     {
         $org = VolOrganization::with('owner:id,first_name,last_name,avatar_url')
             ->find($id);
@@ -676,11 +687,16 @@ class VolunteerService
             return null;
         }
 
+        if (! $includeNonApproved && ! self::isApprovedOrganizationStatus($org->status ?? null)) {
+            return null;
+        }
+
         $data = $org->toArray();
         $tenantId = self::getTenantId();
         $data['opportunities_count'] = (int) VolOpportunity::where('organization_id', $id)
             ->where('tenant_id', $tenantId)
             ->where('is_active', true)
+            ->whereIn('status', ['open', 'active'])
             ->count();
         $data['total_volunteers'] = (int) DB::table('vol_applications')
             ->where('tenant_id', $tenantId)
@@ -694,9 +710,26 @@ class VolunteerService
             ->distinct('user_id')
             ->count('user_id');
 
-        // Aliases matching getOrganisations() — keep the old keys for back-compat.
+        $data['total_hours'] = (float) (DB::table('vol_logs')
+            ->where('tenant_id', $tenantId)
+            ->where('organization_id', $id)
+            ->where('status', 'approved')
+            ->sum('hours') ?? 0);
+
+        $reviewStats = DB::table('vol_reviews')
+            ->where('tenant_id', $tenantId)
+            ->where('target_type', 'organization')
+            ->where('target_id', $id)
+            ->selectRaw('COUNT(*) as review_count, AVG(rating) as average_rating')
+            ->first();
+
+        // Aliases matching getOrganisations(); keep the old keys for back-compat.
         $data['opportunity_count'] = $data['opportunities_count'];
         $data['volunteer_count'] = $data['total_volunteers'];
+        $data['review_count'] = (int) ($reviewStats->review_count ?? 0);
+        $data['average_rating'] = $reviewStats && $reviewStats->average_rating !== null
+            ? round((float) $reviewStats->average_rating, 1)
+            : 0.0;
 
         return $data;
     }
@@ -1446,8 +1479,8 @@ class VolunteerService
         $oppId = !empty($data['opportunity_id']) ? (int) $data['opportunity_id'] : null;
 
         // Verify organization exists and the user has a real volunteering relationship with it.
-        $org = DB::selectOne("SELECT id, user_id, auto_pay_enabled FROM vol_organizations WHERE id = ? AND tenant_id = ?", [$organizationId, $tenantId]);
-        if (!$org) {
+        $org = DB::selectOne("SELECT id, user_id, status, auto_pay_enabled FROM vol_organizations WHERE id = ? AND tenant_id = ?", [$organizationId, $tenantId]);
+        if (!$org || !self::isApprovedOrganizationStatus($org->status ?? null)) {
             self::$errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.organization_not_found'), 'field' => 'organization_id'];
             return null;
         }
@@ -2032,7 +2065,19 @@ class VolunteerService
         }
 
         $oppCount = (int) DB::selectOne(
-            "SELECT COUNT(*) as cnt FROM vol_opportunities WHERE organization_id = ? AND is_active = 1 AND tenant_id = ?",
+            "SELECT COUNT(*) as cnt FROM vol_opportunities WHERE organization_id = ? AND is_active = 1 AND status IN ('open', 'active') AND tenant_id = ?",
+            [$id, $tenantId]
+        )->cnt;
+
+        $volunteerCount = (int) DB::selectOne(
+            "SELECT COUNT(DISTINCT a.user_id) as cnt
+             FROM vol_applications a
+             JOIN vol_opportunities o
+               ON o.id = a.opportunity_id
+              AND o.tenant_id = a.tenant_id
+             WHERE o.organization_id = ?
+               AND a.status = 'approved'
+               AND a.tenant_id = ?",
             [$id, $tenantId]
         )->cnt;
 
@@ -2062,12 +2107,15 @@ class VolunteerService
             'created_at'       => $org->created_at ?? null,
             'status'           => $org->status,
             'opportunity_count' => $oppCount,
-            'total_hours'      => $totalHours,
-            'volunteer_count'  => null,
-            'review_count'     => count($reviews),
-            'average_rating'   => round($avgRating, 1),
+            'opportunities_count' => $oppCount,
+            'total_hours'         => $totalHours,
+            'volunteer_count'     => $volunteerCount,
+            'total_volunteers'    => $volunteerCount,
+            'review_count'        => count($reviews),
+            'average_rating'      => round($avgRating, 1),
             'stats'            => [
                 'opportunity_count'  => $oppCount,
+                'volunteer_count'    => $volunteerCount,
                 'total_hours_logged' => $totalHours,
                 'total_hours'        => $totalHours,
                 'review_count'       => count($reviews),

@@ -2110,6 +2110,7 @@ Route::post('/v2/admin/newsletters/{id}/ab-winner', [\App\Http\Controllers\Api\A
 Route::put('/v2/admin/newsletters/{id}', [\App\Http\Controllers\Api\AdminNewsletterController::class, 'update']);
 Route::delete('/v2/admin/newsletters/{id}', [\App\Http\Controllers\Api\AdminNewsletterController::class, 'destroy']);
 Route::get('/v2/admin/volunteering', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'index']);
+Route::get('/v2/admin/volunteering/opportunities', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'opportunities']);
 Route::get('/v2/admin/volunteering/applications', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'applications']);
 Route::get('/v2/admin/volunteering/approvals', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'approvals']);
 Route::get('/v2/admin/volunteering/organizations', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'organizations']);

@@ -6749,6 +6749,36 @@ class GovukAlphaFrontendTest extends TestCase
         $res->assertNotFound();
     }
 
+    public function test_o_organisation_detail_404_for_non_public_org_statuses(): void
+    {
+        $owner = $this->authenticatedUser(['name' => 'Pending Org Owner']);
+
+        $pendingOrgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'Pending Accessible Org',
+            'slug' => 'pending-accessible-org-' . $owner->id,
+            'description' => 'Pending organisations should not have public detail pages.',
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $suspendedOrgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'Suspended Accessible Org',
+            'slug' => 'suspended-accessible-org-' . $owner->id,
+            'description' => 'Suspended organisations should not have public detail pages.',
+            'status' => 'suspended',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->get("/{$this->testTenantSlug}/alpha/organisations/{$pendingOrgId}")->assertNotFound();
+        $this->get("/{$this->testTenantSlug}/alpha/organisations/{$suspendedOrgId}")->assertNotFound();
+    }
+
     public function test_register_organisation_requires_terms_agreement(): void
     {
         // Bona-fide gating: a complete, valid submission that omits the mandatory

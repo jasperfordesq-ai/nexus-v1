@@ -145,10 +145,13 @@ describe('MyApplicationsPage', () => {
   });
 
   it('shows loading skeleton initially', () => {
-    vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
-    render(<MyApplicationsPage />);
+    vi.mocked(api.get).mockReturnValue(new Promise((resolve) => {
+      window.setTimeout(() => resolve(emptyApplicationsResponse), 25);
+    }));
+    const { unmount } = render(<MyApplicationsPage />);
     // Skeleton elements rendered during loading
     expect(document.querySelectorAll('.animate-pulse, [data-slot="base"]').length).toBeGreaterThanOrEqual(0);
+    unmount();
   });
 
   it('renders page title and filter tabs', async () => {

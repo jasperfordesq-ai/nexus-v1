@@ -109,6 +109,205 @@ class JobVacancyService
         return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? false;
     }
 
+    private function activeFeaturedRankExpression(): string
+    {
+        return '(CASE WHEN job_vacancies.is_featured = 1 AND (job_vacancies.featured_until IS NULL OR job_vacancies.featured_until > NOW()) THEN 0 ELSE 1 END)';
+    }
+
+    private function applyPublicVisibility(Builder $query): void
+    {
+        $query->where('job_vacancies.status', 'open')
+            ->where(function (Builder $q) {
+                $q->whereNull('job_vacancies.deadline')
+                    ->orWhere('job_vacancies.deadline', '>=', now()->startOfDay());
+            })
+            ->where(function (Builder $q) {
+                $q->whereNull('job_vacancies.moderation_status')
+                    ->orWhere('job_vacancies.moderation_status', 'approved');
+            });
+    }
+
+    private function decodeVacancyCursor(?string $cursor): ?array
+    {
+        if ($cursor === null || $cursor === '') {
+            return null;
+        }
+
+        $decoded = base64_decode($cursor, true);
+        if ($decoded === false) {
+            return null;
+        }
+
+        $payload = json_decode($decoded, true);
+        if (is_array($payload) && isset($payload['v'], $payload['id'])) {
+            return $payload;
+        }
+
+        if (ctype_digit($decoded)) {
+            return ['v' => 0, 'id' => (int) $decoded];
+        }
+
+        return null;
+    }
+
+    private function encodeVacancyCursor(array $data): string
+    {
+        return base64_encode(json_encode(array_merge(['v' => 1], $data), JSON_THROW_ON_ERROR));
+    }
+
+    private function sortableDate(mixed $value): ?string
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('Y-m-d H:i:s');
+        }
+
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return date('Y-m-d H:i:s', strtotime((string) $value));
+    }
+
+    private function activeFeaturedRank(mixed $item): int
+    {
+        $data = is_array($item) ? $item : $item->toArray();
+        $isFeatured = (bool) ($data['is_featured'] ?? false);
+        $featuredUntil = $data['featured_until'] ?? null;
+
+        if (!$isFeatured) {
+            return 1;
+        }
+
+        if ($featuredUntil === null || $featuredUntil === '') {
+            return 0;
+        }
+
+        return strtotime((string) $featuredUntil) > time() ? 0 : 1;
+    }
+
+    private function encodeCursorForVacancy(mixed $item, string $sort): string
+    {
+        $data = is_array($item) ? $item : $item->toArray();
+        $payload = [
+            'sort' => $sort,
+            'rank' => $this->activeFeaturedRank($data),
+            'id' => (int) ($data['id'] ?? 0),
+        ];
+
+        if ($sort === 'deadline') {
+            $deadline = $this->sortableDate($data['deadline'] ?? null);
+            $payload['deadline_null'] = $deadline === null ? 1 : 0;
+            $payload['deadline'] = $deadline;
+        } elseif ($sort === 'salary_desc') {
+            $salary = $data['salary_max'] ?? $data['salary_min'] ?? null;
+            $payload['salary_null'] = $salary === null ? 1 : 0;
+            $payload['salary'] = $salary === null ? null : (float) $salary;
+        } else {
+            $payload['created_at'] = $this->sortableDate($data['created_at'] ?? null);
+        }
+
+        return $this->encodeVacancyCursor($payload);
+    }
+
+    private function applyVacancyCursor(Builder $query, ?string $cursor, string $sort): void
+    {
+        $payload = $this->decodeVacancyCursor($cursor);
+        if (!$payload) {
+            return;
+        }
+
+        // Backward-compatible legacy cursor, valid only for the old newest-by-id path.
+        if (($payload['v'] ?? null) === 0) {
+            $query->where('job_vacancies.id', '<', (int) $payload['id']);
+            return;
+        }
+
+        if (($payload['sort'] ?? 'newest') !== $sort) {
+            return;
+        }
+
+        $rankExpr = $this->activeFeaturedRankExpression();
+        $rank = (int) ($payload['rank'] ?? 1);
+        $id = (int) ($payload['id'] ?? 0);
+
+        $query->where(function (Builder $q) use ($sort, $payload, $rankExpr, $rank, $id) {
+            $q->whereRaw("{$rankExpr} > ?", [$rank]);
+
+            if ($sort === 'deadline') {
+                $nullRank = (int) ($payload['deadline_null'] ?? 1);
+                $deadline = $payload['deadline'] ?? null;
+                $deadlineNullExpr = '(CASE WHEN job_vacancies.deadline IS NULL THEN 1 ELSE 0 END)';
+
+                $q->orWhere(function (Builder $sameRank) use ($rankExpr, $rank, $deadlineNullExpr, $nullRank, $deadline, $id) {
+                    $sameRank->whereRaw("{$rankExpr} = ?", [$rank])
+                        ->where(function (Builder $after) use ($deadlineNullExpr, $nullRank, $deadline, $id) {
+                            $after->whereRaw("{$deadlineNullExpr} > ?", [$nullRank])
+                                ->orWhere(function (Builder $sameNullRank) use ($deadlineNullExpr, $nullRank, $deadline, $id) {
+                                    $sameNullRank->whereRaw("{$deadlineNullExpr} = ?", [$nullRank])
+                                        ->where(function (Builder $deadlineOrder) use ($deadline, $id) {
+                                            if ($deadline !== null) {
+                                                $deadlineOrder->where('job_vacancies.deadline', '>', $deadline)
+                                                    ->orWhere(function (Builder $sameDeadline) use ($deadline, $id) {
+                                                        $sameDeadline->where('job_vacancies.deadline', '=', $deadline)
+                                                            ->where('job_vacancies.id', '<', $id);
+                                                    });
+                                            } else {
+                                                $deadlineOrder->where('job_vacancies.id', '<', $id);
+                                            }
+                                        });
+                                });
+                        });
+                });
+                return;
+            }
+
+            if ($sort === 'salary_desc') {
+                $nullRank = (int) ($payload['salary_null'] ?? 1);
+                $salary = $payload['salary'] ?? null;
+                $salaryNullExpr = '(CASE WHEN job_vacancies.salary_max IS NULL AND job_vacancies.salary_min IS NULL THEN 1 ELSE 0 END)';
+                $salaryExpr = 'COALESCE(job_vacancies.salary_max, job_vacancies.salary_min, 0)';
+
+                $q->orWhere(function (Builder $sameRank) use ($rankExpr, $rank, $salaryNullExpr, $nullRank, $salaryExpr, $salary, $id) {
+                    $sameRank->whereRaw("{$rankExpr} = ?", [$rank])
+                        ->where(function (Builder $after) use ($salaryNullExpr, $nullRank, $salaryExpr, $salary, $id) {
+                            $after->whereRaw("{$salaryNullExpr} > ?", [$nullRank])
+                                ->orWhere(function (Builder $sameNullRank) use ($salaryNullExpr, $nullRank, $salaryExpr, $salary, $id) {
+                                    $sameNullRank->whereRaw("{$salaryNullExpr} = ?", [$nullRank])
+                                        ->where(function (Builder $salaryOrder) use ($salaryExpr, $salary, $id) {
+                                            if ($salary !== null) {
+                                                $salaryOrder->whereRaw("{$salaryExpr} < ?", [(float) $salary])
+                                                    ->orWhere(function (Builder $sameSalary) use ($salaryExpr, $salary, $id) {
+                                                        $sameSalary->whereRaw("{$salaryExpr} = ?", [(float) $salary])
+                                                            ->where('job_vacancies.id', '<', $id);
+                                                    });
+                                            } else {
+                                                $salaryOrder->where('job_vacancies.id', '<', $id);
+                                            }
+                                        });
+                                });
+                        });
+                });
+                return;
+            }
+
+            $createdAt = $payload['created_at'] ?? null;
+            $q->orWhere(function (Builder $sameRank) use ($rankExpr, $rank, $createdAt, $id) {
+                $sameRank->whereRaw("{$rankExpr} = ?", [$rank])
+                    ->where(function (Builder $newestOrder) use ($createdAt, $id) {
+                        if ($createdAt !== null) {
+                            $newestOrder->where('job_vacancies.created_at', '<', $createdAt)
+                                ->orWhere(function (Builder $sameCreatedAt) use ($createdAt, $id) {
+                                    $sameCreatedAt->where('job_vacancies.created_at', '=', $createdAt)
+                                        ->where('job_vacancies.id', '<', $id);
+                                });
+                        } else {
+                            $newestOrder->where('job_vacancies.id', '<', $id);
+                        }
+                    });
+            });
+        });
+    }
+
     private function isAdminUser(int $userId): bool
     {
         $user = User::where('id', $userId)
@@ -193,15 +392,7 @@ class JobVacancyService
             ->select('job_vacancies.*', 'o.name as organization_name', 'o.logo_url as organization_logo');
 
         if (!empty($filters['public_only'])) {
-            $query->where('job_vacancies.status', 'open')
-                ->where(function (Builder $q) {
-                    $q->whereNull('job_vacancies.deadline')
-                        ->orWhere('job_vacancies.deadline', '>=', now()->startOfDay());
-                })
-                ->where(function (Builder $q) {
-                    $q->whereNull('job_vacancies.moderation_status')
-                        ->orWhere('job_vacancies.moderation_status', 'approved');
-                });
+            $this->applyPublicVisibility($query);
         } elseif (!empty($filters['status'])) {
             $status = $filters['status'];
             if ($status === 'expired') {
@@ -289,20 +480,22 @@ class JobVacancyService
                 );
         }
 
-        // Featured jobs always first, then apply requested sort
-        $query->orderByRaw('(CASE WHEN job_vacancies.is_featured = 1 AND (job_vacancies.featured_until IS NULL OR job_vacancies.featured_until > NOW()) THEN 0 ELSE 1 END) ASC');
+        // Featured jobs always first, then apply requested sort.
+        $query->orderByRaw($this->activeFeaturedRankExpression() . ' ASC');
 
         $sort = $filters['sort'] ?? 'newest';
         switch ($sort) {
             case 'deadline':
                 // Soonest deadlines first, nulls last
                 $query->orderByRaw('CASE WHEN job_vacancies.deadline IS NULL THEN 1 ELSE 0 END ASC')
-                      ->orderBy('job_vacancies.deadline', 'asc');
+                      ->orderBy('job_vacancies.deadline', 'asc')
+                      ->orderByDesc('job_vacancies.id');
                 break;
             case 'salary_desc':
                 // Highest salary first, nulls last
                 $query->orderByRaw('CASE WHEN job_vacancies.salary_max IS NULL AND job_vacancies.salary_min IS NULL THEN 1 ELSE 0 END ASC')
-                      ->orderByRaw('COALESCE(job_vacancies.salary_max, job_vacancies.salary_min, 0) DESC');
+                      ->orderByRaw('COALESCE(job_vacancies.salary_max, job_vacancies.salary_min, 0) DESC')
+                      ->orderByDesc('job_vacancies.id');
                 break;
             default: // 'newest'
                 $query->orderByDesc('job_vacancies.created_at')
@@ -328,13 +521,10 @@ class JobVacancyService
         // Total count for the unpaginated query (used by UI for pagination display)
         $total = (clone $query)->count();
 
-        // Cursor-based pagination (default for all other callers)
-        if ($cursor !== null) {
-            $cursorId = base64_decode($cursor, true);
-            if ($cursorId !== false) {
-                $query->where('job_vacancies.id', '<', (int) $cursorId);
-            }
-        }
+        // Cursor-based pagination (default for all other callers). The cursor
+        // captures the active sort keys, so changing sort/filter state cannot
+        // reuse an incompatible position and alternate sorts do not skip rows.
+        $this->applyVacancyCursor($query, $cursor, $sort);
 
         $items = $query->limit($limit + 1)->get();
         $hasMore = $items->count() > $limit;
@@ -346,7 +536,7 @@ class JobVacancyService
 
         return [
             'items' => $enriched,
-            'cursor' => $hasMore && $items->isNotEmpty() ? base64_encode((string) $items->last()->id) : null,
+            'cursor' => $hasMore && $items->isNotEmpty() ? $this->encodeCursorForVacancy($items->last(), $sort) : null,
             'has_more' => $hasMore,
             'total' => $total,
         ];
@@ -1961,8 +2151,9 @@ class JobVacancyService
         $query = $this->vacancy->newQuery()
             ->leftJoin('organizations as o', 'job_vacancies.organization_id', '=', 'o.id')
             ->select('job_vacancies.*', 'o.name as organization_name', 'o.logo_url as organization_logo')
-            ->where('job_vacancies.status', 'open')
             ->where('job_vacancies.user_id', '!=', $userId);
+
+        $this->applyPublicVisibility($query);
 
         if (!empty($appliedIds)) {
             $query->whereNotIn('job_vacancies.id', $appliedIds);

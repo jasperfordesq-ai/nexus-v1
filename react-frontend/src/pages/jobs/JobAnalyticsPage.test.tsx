@@ -125,9 +125,12 @@ describe('JobAnalyticsPage', () => {
   });
 
   it('renders loading state initially when API is pending', () => {
-    vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
-    render(<JobAnalyticsPage />);
+    vi.mocked(api.get).mockReturnValue(new Promise((resolve) => {
+      window.setTimeout(() => resolve({ success: true, data: makeAnalytics(), meta: {} }), 25);
+    }));
+    const { unmount } = render(<JobAnalyticsPage />);
     expect(document.querySelectorAll('[role="status"]').length).toBeGreaterThan(0);
+    unmount();
   });
 
   it('renders error empty state when API fails', async () => {

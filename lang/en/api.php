@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -2639,4 +2639,38 @@ return [
     'member_premium_tier_not_found' => 'Support level not found.',
     'member_premium_invalid_slug' => 'Use lowercase letters, numbers, hyphens, or underscores for the support level slug.',
     'member_premium_features_array' => 'Recognition notes must be sent as an array of strings.',
+    'job_interview_not_found'              => 'Interview not found',
+    'job_interview_fallback_title'         => 'Job Interview',
+    'job_interview_calendar_title'         => 'Interview: :title',
+    'job_interview_calendar_description'   => "Type: :type\nDuration: :duration minutes",
+    'job_interview_calendar_notes'         => 'Notes: :notes',
+    'job_interview_calendar_reminder_1h'   => 'Interview reminder',
+    'job_interview_calendar_reminder_15m'  => 'Interview in 15 minutes',
+    'job_interview_calendar_link_details'  => ':type interview',
+    'job_audit_actor_system'               => 'System',
+    'job_audit_actor_employer'             => 'Employer',
+    'job_audit_unknown_candidate'          => 'Unknown',
+    'job_audit_status_change'              => ':candidate: :from -> :to',
+    'job_audit_interview_scheduled'        => 'Interview (:type) scheduled with :candidate - status: :status',
+    'job_audit_scheduled_at'               => 'Scheduled: :date',
+    'job_audit_offer_sent'                 => 'Offer sent to :candidate :salary - status: :status',
+    'job_ai_not_specified'                 => 'Not specified',
+    'job_ai_not_listed'                    => 'Not listed',
+    'job_ai_salary_not_disclosed'          => 'Not disclosed',
+    'job_ai_yes'                           => 'Yes',
+    'job_ai_no'                            => 'No',
+    'job_ai_chat_context'                  => "Job Title: :title\nType: :type\nCommitment: :commitment\nLocation: :location\nRemote: :remote\nSkills Required: :skills\nSalary: :salary\nDescription:\n:description",
+    'job_ai_chat_user_context'             => "About the user asking:\nSkills: :skills\nBio: :bio",
+    'job_ai_chat_system_prompt'            => "You are a friendly, expert career advisor for a community timebanking platform called Project NEXUS. You are helping a community member learn about a specific job opportunity and prepare their application.\n\nJOB DETAILS:\n:job_context:user_context\n\nGuidelines:\n- Be encouraging and supportive\n- Give specific, actionable advice based on the actual job details\n- If the user asks about qualifications, compare their skills to the requirements\n- Help them craft application messages if asked\n- Keep responses concise (under 300 words)\n- If asked about salary, discuss what is listed; if undisclosed, suggest researching market rates\n- Mention relevant community aspects (timebanking, volunteering) when appropriate",
+    'job_prediction_above_average'         => 'Above average',
+    'job_prediction_below_average'         => 'Below average',
+    'job_prediction_above_average_lower'   => 'above average',
+    'job_prediction_below_average_lower'   => 'below average',
+    'job_prediction_at_average_lower'      => 'at average',
+    'job_prediction_days_based_on_similar' => ':days days (based on :count similar jobs)',
+    'job_prediction_insufficient_data'     => 'Insufficient data',
+    'job_prediction_ai_salary_line'        => "Salary: :diff% :label\n",
+    'job_prediction_ai_prompt'             => "Given these job posting metrics, write 3 brief, actionable insights (1 sentence each) as a JSON array of strings:\n\nJob: :title (:type)\nDays posted: :days\nApplications: :applications (avg for similar: :avg_applications)\nViews: :views (avg: :avg_views)\nConversion: :conversion% (avg: :avg_conversion%)\n:salary_lineSimilar filled jobs analyzed: :similar_count\n\nReturn ONLY a JSON array of 3 strings. No markdown.",
+    'job_time_credits_earned_description'  => 'Time credits earned: :title',
+
 ];

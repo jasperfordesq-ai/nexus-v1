@@ -220,7 +220,7 @@ class JobOfferService
                         'receiver_id'      => $candidateId,
                         'amount'           => $creditAmount,
                         'transaction_type' => 'job_completion',
-                        'description'      => "Time credits earned: {$jobTitle}",
+                        'description'      => __('api.job_time_credits_earned_description', ['title' => $jobTitle]),
                         'status'           => 'completed',
                     ]);
 

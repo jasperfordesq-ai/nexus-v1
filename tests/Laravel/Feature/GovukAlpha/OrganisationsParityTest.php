@@ -203,7 +203,9 @@ class OrganisationsParityTest extends TestCase
         $this->authenticatedUser();
         $this->enableAlphaFeatures(['volunteering']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/organisations/register", [
+        $token = 'test-csrf-token';
+        $res = $this->withSession(['_token' => $token])->post("/{$this->testTenantSlug}/alpha/organisations/register", [
+            '_token'       => $token,
             'name'         => 'no',
             'description'  => 'This description is definitely long enough to pass.',
             'email'        => 'valid@example.org',
@@ -219,7 +221,9 @@ class OrganisationsParityTest extends TestCase
         $this->authenticatedUser();
         $this->enableAlphaFeatures(['volunteering']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/organisations/register", [
+        $token = 'test-csrf-token';
+        $res = $this->withSession(['_token' => $token])->post("/{$this->testTenantSlug}/alpha/organisations/register", [
+            '_token'      => $token,
             'name'        => 'A Valid Organisation Name',
             'description' => 'This description is definitely long enough to pass validation.',
             'email'       => 'valid@example.org',
@@ -237,7 +241,9 @@ class OrganisationsParityTest extends TestCase
 
         $name = 'My Parity Community Group ' . uniqid();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/organisations/register", [
+        $token = 'test-csrf-token';
+        $res = $this->withSession(['_token' => $token])->post("/{$this->testTenantSlug}/alpha/organisations/register", [
+            '_token'       => $token,
             'name'         => $name,
             'description'  => 'We organise community litter picks and gardening days.',
             'email'        => 'group@example.org',
@@ -320,6 +326,17 @@ class OrganisationsParityTest extends TestCase
         $this->authenticatedUser();
         $this->enableAlphaFeatures(['volunteering', 'job_vacancies']);
         $orgId = $this->seedOrganisation(['tenant_id' => 999, 'name' => 'Other Tenant Org']);
+
+        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/{$orgId}/jobs");
+
+        $res->assertStatus(404);
+    }
+
+    public function test_organisations_jobs_404_for_non_public_org_status(): void
+    {
+        $this->authenticatedUser();
+        $this->enableAlphaFeatures(['volunteering', 'job_vacancies']);
+        $orgId = $this->seedOrganisation(['name' => 'Pending Jobs Org', 'status' => 'pending']);
 
         $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/{$orgId}/jobs");
 

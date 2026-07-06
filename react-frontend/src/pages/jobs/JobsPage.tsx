@@ -1,5 +1,3 @@
-import { Select, SelectItem, GlassCard, Button, SearchField, Switch, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
-import { Chip as HeroChip, ToggleButton, ToggleButtonGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -24,6 +22,8 @@ import { Chip as HeroChip, ToggleButton, ToggleButtonGroup } from '@/components/
  * - Featured jobs visual distinction (ring + gradient bg)
  */
 
+import { Select, SelectItem, GlassCard, Button, SearchField, Switch, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
+import { Chip as HeroChip, ToggleButton, ToggleButtonGroup } from '@/components/ui';
 import { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';

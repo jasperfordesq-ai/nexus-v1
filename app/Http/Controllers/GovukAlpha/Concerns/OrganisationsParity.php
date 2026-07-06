@@ -113,7 +113,8 @@ trait OrganisationsParity
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('volunteering'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
@@ -239,11 +240,11 @@ trait OrganisationsParity
     /**
      * GET /organisations/{id}/jobs
      *
-     * An organisation's open paid/volunteer/timebank job vacancies. The React
-     * detail page fetches /v2/jobs?organization_id={id}&status=open and renders
-     * a "Job openings" section; the accessible detail page has none. This mirrors
-     * that query via JobVacancyService::getAll(). Gated on job_vacancies (the
-     * feature that owns vacancies) AND the org must exist in this tenant (404).
+     * Placeholder for an organisation's open paid/volunteer/timebank job vacancies.
+     * The jobs module keys vacancies to the separate organizations table, not
+     * vol_organizations, so this route must not pass a volunteer org id into
+     * JobVacancyService. Gated on job_vacancies AND the volunteering org must
+     * exist in this tenant (404).
      */
     public function organisationsJobs(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
     {
@@ -268,16 +269,6 @@ trait OrganisationsParity
         abort_if($org === null, 404);
 
         $jobs = [];
-        try {
-            $result = app(\App\Services\JobVacancyService::class)->getAll([
-                'organization_id' => $id,
-                'status' => 'open',
-                'limit' => self::ORGANISATIONS_JOBS_PER_PAGE,
-            ], $userId);
-            $jobs = is_array($result['items'] ?? null) ? $result['items'] : [];
-        } catch (\Throwable $e) {
-            report($e);
-        }
 
         return $this->view('accessible-frontend::organisations-jobs', [
             'title' => __('govuk_alpha_organisations.jobs.title'),

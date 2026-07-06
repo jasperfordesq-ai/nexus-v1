@@ -124,15 +124,26 @@ describe('EmployerBrandPage', () => {
   });
 
   it('renders without crashing', () => {
-    vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
+    vi.mocked(api.get).mockResolvedValue({
+      success: true,
+      data: { employer: makeEmployer(), jobs: [] },
+      meta: {},
+    });
     render(<EmployerBrandPage />);
     expect(document.body).toBeTruthy();
   });
 
   it('shows loading screen while data is loading', () => {
-    vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
-    render(<EmployerBrandPage />);
+    vi.mocked(api.get).mockReturnValue(new Promise((resolve) => {
+      window.setTimeout(() => resolve({
+        success: true,
+        data: { employer: makeEmployer(), jobs: [] },
+        meta: {},
+      }), 25);
+    }));
+    const { unmount } = render(<EmployerBrandPage />);
     expect(screen.getByTestId('loading-screen')).toBeInTheDocument();
+    unmount();
   });
 
   it.skip('shows error message when API fails', async () => {

@@ -3,8 +3,6 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import postcss, { type AtRule, type Container, type Declaration, type Rule } from 'postcss';
-
 const BUILDER_SCOPE = '.nexus-custom-page-builder';
 
 const PAGE_BUILDER_BASELINE_CSS = `
@@ -58,6 +56,27 @@ const GLOBAL_SELECTOR_PARTS = [
   '#root',
   '#app',
 ];
+
+type CssDeclaration = {
+  prop: string;
+  value: string;
+  important: boolean;
+};
+
+type CssRule = {
+  type: 'rule';
+  selector: string;
+  declarations: CssDeclaration[];
+};
+
+type CssAtRule = {
+  type: 'atrule';
+  name: string;
+  params: string;
+  nodes: CssNode[];
+};
+
+type CssNode = CssRule | CssAtRule;
 
 function isUnsafeCss(css: string): boolean {
   return UNSAFE_CSS_PATTERNS.some((pattern) => pattern.test(css));
@@ -130,7 +149,7 @@ function isSafeCssDeclaration(property: string, value: string): boolean {
   return true;
 }
 
-function shouldTokenizeLegacyNexusRule(rule: Rule): boolean {
+function shouldTokenizeLegacyNexusRule(rule: CssRule): boolean {
   return splitSelectorList(rule.selector).some((selector) => selector.includes('nexus-page-'));
 }
 
@@ -154,13 +173,138 @@ function tokenizeLegacyNexusPageValue(property: string, value: string, shouldTok
   return next;
 }
 
-function serializeSafeDeclarations(rule: Rule): string {
+function splitCssList(value: string, delimiter: string): string[] {
+  const parts: string[] = [];
+  let current = '';
+  let depth = 0;
+  let quote: string | null = null;
+
+  for (const char of value) {
+    if (quote) {
+      current += char;
+      if (char === quote) quote = null;
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      quote = char;
+      current += char;
+      continue;
+    }
+    if (char === '(' || char === '[') depth += 1;
+    if (char === ')' || char === ']') depth = Math.max(0, depth - 1);
+    if (char === delimiter && depth === 0) {
+      if (current.trim()) parts.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += char;
+  }
+
+  if (current.trim()) parts.push(current.trim());
+  return parts;
+}
+
+function findTopLevelColon(value: string): number {
+  let depth = 0;
+  let quote: string | null = null;
+
+  for (let i = 0; i < value.length; i += 1) {
+    const char = value[i];
+    if (quote) {
+      if (char === quote) quote = null;
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      quote = char;
+      continue;
+    }
+    if (char === '(' || char === '[') depth += 1;
+    if (char === ')' || char === ']') depth = Math.max(0, depth - 1);
+    if (char === ':' && depth === 0) return i;
+  }
+
+  return -1;
+}
+
+function parseDeclarations(css: string): CssDeclaration[] {
+  return splitCssList(css, ';')
+    .map((part) => {
+      const colonIndex = findTopLevelColon(part);
+      if (colonIndex <= 0) return null;
+      const prop = part.slice(0, colonIndex).trim();
+      let value = part.slice(colonIndex + 1).trim();
+      const important = /\s*!important\s*$/i.test(value);
+      value = value.replace(/\s*!important\s*$/i, '').trim();
+      if (!prop || !value) return null;
+      return { prop, value, important };
+    })
+    .filter((declaration): declaration is CssDeclaration => Boolean(declaration));
+}
+
+function findMatchingBrace(css: string, openIndex: number): number {
+  let depth = 0;
+  let quote: string | null = null;
+
+  for (let i = openIndex; i < css.length; i += 1) {
+    const char = css[i];
+    if (quote) {
+      if (char === quote) quote = null;
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      quote = char;
+      continue;
+    }
+    if (char === '{') depth += 1;
+    if (char === '}') {
+      depth -= 1;
+      if (depth === 0) return i;
+    }
+  }
+
+  return -1;
+}
+
+function parseCssNodes(css: string): CssNode[] {
+  const nodes: CssNode[] = [];
+  let index = 0;
+
+  while (index < css.length) {
+    const openIndex = css.indexOf('{', index);
+    if (openIndex === -1) break;
+
+    const prelude = css.slice(index, openIndex).trim();
+    const closeIndex = findMatchingBrace(css, openIndex);
+    if (!prelude || closeIndex === -1) break;
+
+    const body = css.slice(openIndex + 1, closeIndex);
+    if (prelude.startsWith('@')) {
+      const [, name = '', params = ''] = prelude.match(/^@([\w-]+)\s*([\s\S]*)$/) ?? [];
+      nodes.push({
+        type: 'atrule',
+        name: name.toLowerCase(),
+        params: params.trim(),
+        nodes: parseCssNodes(body),
+      });
+    } else {
+      nodes.push({
+        type: 'rule',
+        selector: prelude,
+        declarations: parseDeclarations(body),
+      });
+    }
+
+    index = closeIndex + 1;
+  }
+
+  return nodes;
+}
+
+function serializeSafeDeclarations(rule: CssRule): string {
   const declarations: string[] = [];
   const shouldTokenize = shouldTokenizeLegacyNexusRule(rule);
 
-  rule.nodes?.forEach((node) => {
-    if (node.type !== 'decl') return;
-    const declaration = node as Declaration;
+  rule.declarations.forEach((declaration) => {
     if (!isSafeCssDeclaration(declaration.prop, declaration.value)) return;
     const value = tokenizeLegacyNexusPageValue(declaration.prop, declaration.value, shouldTokenize);
     declarations.push(`${declaration.prop}:${value}${declaration.important ? ' !important' : ''}`);
@@ -169,16 +313,15 @@ function serializeSafeDeclarations(rule: Rule): string {
   return declarations.join(';');
 }
 
-function scopeCssContainer(container: Container): string {
+function scopeCssContainer(nodes: CssNode[]): string {
   const output: string[] = [];
 
-  container.nodes?.forEach((node) => {
+  nodes.forEach((node) => {
     if (node.type === 'rule') {
-      const rule = node as Rule;
-      const scopedSelectors = splitSelectorList(rule.selector)
+      const scopedSelectors = splitSelectorList(node.selector)
         .map(scopeSelector)
         .filter((selector): selector is string => Boolean(selector));
-      const safeBody = serializeSafeDeclarations(rule);
+      const safeBody = serializeSafeDeclarations(node);
 
       if (scopedSelectors.length > 0 && safeBody) {
         output.push(`${scopedSelectors.join(',')}{${safeBody}}`);
@@ -187,12 +330,11 @@ function scopeCssContainer(container: Container): string {
     }
 
     if (node.type === 'atrule') {
-      const atRule = node as AtRule;
-      const atRuleName = atRule.name.toLowerCase();
+      const atRuleName = node.name.toLowerCase();
       if (!['media', 'supports'].includes(atRuleName)) return;
 
-      const nested = scopeCssContainer(atRule);
-      if (nested) output.push(`@${atRuleName} ${atRule.params}{${nested}}`);
+      const nested = scopeCssContainer(node.nodes);
+      if (nested) output.push(`@${atRuleName} ${node.params}{${nested}}`);
     }
   });
 
@@ -204,7 +346,7 @@ export function scopePageBuilderCss(css: string | null | undefined): string {
   const withoutComments = css.replace(/\/\*[\s\S]*?\*\//g, '');
   if (isUnsafeCss(withoutComments)) return '';
   try {
-    return scopeCssContainer(postcss.parse(withoutComments)).trim();
+    return scopeCssContainer(parseCssNodes(withoutComments)).trim();
   } catch {
     return '';
   }
@@ -214,10 +356,11 @@ export function sanitizePageBuilderInlineStyle(style: string | null | undefined)
   if (!style) return '';
   const withoutComments = style.replace(/\/\*[\s\S]*?\*\//g, '');
   try {
-    const root = postcss.parse(`.x{${withoutComments}}`);
-    const firstRule = root.nodes?.find((node): node is Rule => node.type === 'rule');
-    if (!firstRule) return '';
-    return serializeSafeDeclarations(firstRule);
+    return serializeSafeDeclarations({
+      type: 'rule',
+      selector: '.x',
+      declarations: parseDeclarations(withoutComments),
+    });
   } catch {
     return '';
   }

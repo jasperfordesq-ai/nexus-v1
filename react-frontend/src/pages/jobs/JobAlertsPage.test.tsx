@@ -127,9 +127,12 @@ describe('JobAlertsPage', () => {
   });
 
   it('shows loading state initially when API is pending', () => {
-    vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
-    render(<JobAlertsPage />);
+    vi.mocked(api.get).mockReturnValue(new Promise((resolve) => {
+      window.setTimeout(() => resolve({ success: true, data: [], meta: {} }), 25);
+    }));
+    const { unmount } = render(<JobAlertsPage />);
     expect(document.querySelectorAll('[role="status"]').length).toBeGreaterThan(0);
+    unmount();
   });
 
   it('shows empty state when no alerts exist', async () => {
