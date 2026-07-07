@@ -85,17 +85,17 @@ const howItWorksCards = [
   {
     key: 'discover',
     icon: Search,
-    gradient: 'from-indigo-500 to-blue-500',
+    tone: 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200',
   },
   {
     key: 'connect',
     icon: Users,
-    gradient: 'from-purple-500 to-pink-500',
+    tone: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200',
   },
   {
     key: 'exchange',
     icon: ArrowRightLeft,
-    gradient: 'from-cyan-500 to-teal-500',
+    tone: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-200',
   },
 ];
 
@@ -103,32 +103,32 @@ const quickLinks = [
   {
     icon: Globe,
     href: '/federation/partners',
-    gradient: 'from-indigo-500 to-blue-500',
+    tone: 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200',
   },
   {
     icon: Users,
     href: '/federation/members',
-    gradient: 'from-purple-500 to-pink-500',
+    tone: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200',
   },
   {
     icon: MessageSquare,
     href: '/federation/messages',
-    gradient: 'from-cyan-500 to-teal-500',
+    tone: 'bg-cyan-50 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-200',
   },
   {
     icon: ListTodo,
     href: '/federation/listings',
-    gradient: 'from-amber-500 to-orange-500',
+    tone: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-200',
   },
   {
     icon: Calendar,
     href: '/federation/events',
-    gradient: 'from-rose-500 to-pink-500',
+    tone: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-200',
   },
   {
     icon: Settings,
     href: '/federation/settings',
-    gradient: 'from-gray-500 to-slate-500',
+    tone: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200',
   },
 ];
 
@@ -185,9 +185,9 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="mx-auto mb-6 w-20 h-20 rounded-2xl bg-indigo-500/10 flex items-center justify-center"
+            className="mx-auto mb-6 w-20 h-20 rounded-2xl bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200 flex items-center justify-center"
           >
-            <Network className="w-10 h-10 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+            <Network className="w-10 h-10" aria-hidden="true" />
           </motion.div>
 
           <h1 className="text-3xl md:text-4xl font-bold text-theme-primary mb-4">
@@ -226,9 +226,9 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
                 <GlassCard className="p-6 h-full text-center">
                   <div className="relative mx-auto mb-4">
                     <div
-                      className={`w-14 h-14 rounded-xl bg-gradient-to-br ${card.gradient} flex items-center justify-center mx-auto`}
+                      className={`w-14 h-14 rounded-xl ${card.tone} flex items-center justify-center mx-auto`}
                     >
-                      <Icon className="w-7 h-7 text-white" aria-hidden="true" />
+                      <Icon className="w-7 h-7" aria-hidden="true" />
                     </div>
                     <span
                       className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-foreground text-background text-xs font-bold flex items-center justify-center"
@@ -264,7 +264,7 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
             </p>
           </div>
           <div>
-            <Handshake className="w-8 h-8 text-indigo-500 mx-auto mb-2" aria-hidden="true" />
+            <Handshake className="w-8 h-8 text-sky-600 dark:text-sky-300 mx-auto mb-2" aria-hidden="true" />
             <h4 className="font-semibold text-foreground mb-1">{t('hub.feature_network_title')}</h4>
             <p className="text-sm text-muted">
               {t('hub.feature_network_description')}
@@ -287,25 +287,25 @@ function StatsRow({ stats, enabled }: { stats: FederationDashboardData['stats'];
       label: t('hub.stat_partners'),
       value: stats.partners_count,
       icon: Globe,
-      gradient: 'from-indigo-500 to-blue-500',
+      tone: 'bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200',
     },
     {
       label: t('hub.stat_messages'),
       value: stats.messages_count,
       icon: MessageSquare,
-      gradient: 'from-purple-500 to-pink-500',
+      tone: 'bg-cyan-50 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-200',
     },
     {
       label: t('hub.stat_exchanges'),
       value: stats.transactions_count,
       icon: ArrowRightLeft,
-      gradient: 'from-cyan-500 to-teal-500',
+      tone: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-200',
     },
     {
       label: t('hub.stat_status'),
       value: null,
       icon: Activity,
-      gradient: 'from-emerald-500 to-green-500',
+      tone: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200',
       chipContent: enabled ? t('hub.status_active') : t('hub.status_inactive'),
       chipColor: enabled ? ('success' as const) : ('default' as const),
     },
@@ -325,9 +325,9 @@ function StatsRow({ stats, enabled }: { stats: FederationDashboardData['stats'];
             <GlassCard className="p-5">
               <div className="flex items-start justify-between mb-3">
                 <div
-                  className={`w-10 h-10 rounded-lg bg-gradient-to-br ${card.gradient} flex items-center justify-center flex-shrink-0`}
+                  className={`w-10 h-10 rounded-lg ${card.tone} flex items-center justify-center flex-shrink-0`}
                 >
-                  <Icon className="w-5 h-5 text-white" aria-hidden="true" />
+                  <Icon className="w-5 h-5" aria-hidden="true" />
                 </div>
               </div>
               {card.value !== null ? (
@@ -381,9 +381,9 @@ function QuickLinksSection() {
                 <GlassCard className="p-4 h-full transition-all duration-200 group-hover:shadow-lg group-hover:scale-[1.02]">
                   <div className="flex items-start gap-3">
                     <div
-                      className={`w-10 h-10 rounded-lg bg-gradient-to-br ${link.gradient} flex items-center justify-center flex-shrink-0`}
+                      className={`w-10 h-10 rounded-lg ${link.tone} flex items-center justify-center flex-shrink-0`}
                     >
-                      <Icon className="w-5 h-5 text-white" aria-hidden="true" />
+                      <Icon className="w-5 h-5" aria-hidden="true" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="font-semibold text-foreground text-sm leading-tight mb-1 group-hover:text-accent transition-colors">

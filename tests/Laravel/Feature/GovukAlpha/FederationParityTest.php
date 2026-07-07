@@ -198,10 +198,13 @@ class FederationParityTest extends TestCase
     {
         $this->enableFederationForTenant();
         $user = $this->authenticatedUser(['name' => 'Advance Member']);
+        $csrfToken = 'test-csrf-token';
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/federation/onboarding", [
-            'step' => 'welcome',
-        ]);
+        $response = $this->withSession(['_token' => $csrfToken])
+            ->post("/{$this->testTenantSlug}/alpha/federation/onboarding", [
+                'step' => 'welcome',
+                '_token' => $csrfToken,
+            ]);
 
         $response->assertRedirect(
             route('govuk-alpha.federation.onboarding', ['tenantSlug' => $this->testTenantSlug, 'step' => 'privacy'])
@@ -215,20 +218,24 @@ class FederationParityTest extends TestCase
     {
         $this->enableFederationForTenant();
         $user = $this->authenticatedUser(['name' => 'Finish Member']);
+        $csrfToken = 'test-csrf-token';
 
         // Walk the privacy + communication steps so the session bag carries the
         // member's choices into the final confirm submit.
-        $this->post("/{$this->testTenantSlug}/alpha/federation/onboarding", [
-            'step' => 'privacy',
-            'profile_visible_federated' => '1',
-            'appear_in_federated_search' => '1',
-            'show_skills_federated' => '1',
-            // location deliberately left off
-            'show_reviews_federated' => '1',
-        ])->assertRedirect();
+        $this->withSession(['_token' => $csrfToken])
+            ->post("/{$this->testTenantSlug}/alpha/federation/onboarding", [
+                'step' => 'privacy',
+                '_token' => $csrfToken,
+                'profile_visible_federated' => '1',
+                'appear_in_federated_search' => '1',
+                'show_skills_federated' => '1',
+                // location deliberately left off
+                'show_reviews_federated' => '1',
+            ])->assertRedirect();
 
         $this->post("/{$this->testTenantSlug}/alpha/federation/onboarding", [
             'step' => 'communication',
+            '_token' => $csrfToken,
             'messaging_enabled_federated' => '1',
             'transactions_enabled_federated' => '1',
             'email_notifications' => '1',
@@ -238,6 +245,7 @@ class FederationParityTest extends TestCase
 
         $finish = $this->post("/{$this->testTenantSlug}/alpha/federation/onboarding", [
             'step' => 'confirm',
+            '_token' => $csrfToken,
         ]);
 
         $finish->assertRedirect(

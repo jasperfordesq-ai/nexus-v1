@@ -74,10 +74,7 @@ class FederationCreditCommonsController extends BaseApiController
             COALESCE(SUM(amount), 0) as volume
         ')->first();
 
-        $accountCount = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
-            ->count();
+        $accountCount = $this->discoverableFederatedAccountQuery($tenantId)->count('users.id');
 
         return response()->json([
             'format' => $nodeConfig->currency_format ?? '<quantity> hours',
@@ -106,36 +103,27 @@ class FederationCreditCommonsController extends BaseApiController
 
         $nodeSlug = $this->getNodeSlug($tenantId);
 
-        $query = DB::table('users')
-            ->where('users.tenant_id', $tenantId)
-            ->where('users.status', 'active')
-            ->whereIn('users.id', function ($sub) use ($tenantId) {
-                $sub->select('fus.user_id')
-                    ->from('federation_user_settings as fus')
-                    ->join('users as u', 'u.id', '=', 'fus.user_id')
-                    ->where('u.tenant_id', $tenantId)
-                    ->where('fus.federation_optin', 1);
-            });
+        $query = $this->discoverableFederatedAccountQuery($tenantId);
 
         if ($accPath) {
             // Strip node prefix if present
             $search = str_contains($accPath, '/') ? explode('/', $accPath, 2)[1] : $accPath;
             $query->where(function ($q) use ($search) {
-                $q->where('username', 'LIKE', "{$search}%")
-                    ->orWhere('name', 'LIKE', "{$search}%");
+                $q->where('users.username', 'LIKE', "{$search}%")
+                    ->orWhere('users.name', 'LIKE', "{$search}%");
             });
         }
 
         if ($filterTag) {
             $query->where(function ($q) use ($filterTag) {
-                $q->where('tags', 'LIKE', "%{$filterTag}%")
-                    ->orWhere('skills', 'LIKE', "%{$filterTag}%");
+                $q->where('users.tags', 'LIKE', "%{$filterTag}%")
+                    ->orWhere('users.skills', 'LIKE', "%{$filterTag}%");
             });
         }
 
-        $users = $query->orderBy('username')
+        $users = $query->orderBy('users.username')
             ->limit($limit)
-            ->get(['id', 'username', 'name']);
+            ->get(['users.id', 'users.username', 'users.name']);
 
         // Return as array of account paths (CC format)
         $paths = $users->map(function ($user) use ($nodeSlug) {
@@ -156,7 +144,7 @@ class FederationCreditCommonsController extends BaseApiController
         $since = $request->query('since');
 
         // Resolve user
-        $userId = $accId ? $this->resolveAccountId($accId, $tenantId) : null;
+        $userId = $accId ? $this->resolveAccountId($accId, $tenantId, true) : null;
 
         if ($accId && !$userId) {
             return $this->ccError('UnresolvedAccountnameViolation', "Account '{$accId}' not found", 400);
@@ -210,7 +198,7 @@ class FederationCreditCommonsController extends BaseApiController
     public function accountHistory(Request $request, ?string $accId = null): JsonResponse
     {
         $tenantId = TenantContext::getId();
-        $userId = $accId ? $this->resolveAccountId($accId, $tenantId) : null;
+        $userId = $accId ? $this->resolveAccountId($accId, $tenantId, true) : null;
 
         if ($accId && !$userId) {
             return $this->ccError('UnresolvedAccountnameViolation', "Account '{$accId}' not found", 400);
@@ -282,8 +270,8 @@ class FederationCreditCommonsController extends BaseApiController
             return $this->ccError('MissingParameter', 'Amount exceeds maximum', 400);
         }
 
-        $payerId = $this->resolveAccountId($payerPath, $tenantId);
-        $payeeId = $this->resolveAccountId($payeePath, $tenantId);
+        $payerId = $this->resolveAccountId($payerPath, $tenantId, true);
+        $payeeId = $this->resolveAccountId($payeePath, $tenantId, true);
 
         if (!$payerId) {
             return $this->ccError('UnresolvedAccountnameViolation', "Payer account not found", 400);
@@ -335,7 +323,7 @@ class FederationCreditCommonsController extends BaseApiController
             if ($initialState === CreditCommonsAdapter::STATE_COMPLETED) {
                 // Lock payer row and check balance atomically
                 $updated = DB::update(
-                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND status = 'active' AND balance >= ?",
                     [$quant, $payerId, $tenantId, $quant]
                 );
 
@@ -344,20 +332,10 @@ class FederationCreditCommonsController extends BaseApiController
                     return $this->ccError('InsufficientBalance', 'Payer has insufficient balance', 400);
                 }
 
-                DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ? AND status = 'active'",
                     [$quant, $payeeId, $tenantId]);
 
-                DB::table('transactions')->insertGetId([
-                    'tenant_id' => $tenantId,
-                    'sender_id' => $payerId,
-                    'receiver_id' => $payeeId,
-                    'amount' => $quant,
-                    'description' => $description,
-                    'status' => 'completed',
-                    'is_federated' => 1,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+                $this->recordFederatedTransactionLedger($tenantId, $payerId, $payeeId, $quant, $description);
             }
 
             // Create CC entry
@@ -600,15 +578,14 @@ class FederationCreditCommonsController extends BaseApiController
                 "Cannot transition from {$entry->state} to {$destState}", 400);
         }
 
+        if ($destState === CreditCommonsAdapter::STATE_COMPLETED) {
+            return $this->completeTransactionEntry($entry, $tenantId, 201);
+        }
+
         $updates = [
             'state' => $destState,
             'updated_at' => now(),
         ];
-
-        // Handle state-specific side effects
-        if ($destState === CreditCommonsAdapter::STATE_COMPLETED) {
-            $updates['written_at'] = now();
-        }
 
         if ($destState === CreditCommonsAdapter::STATE_ERASED) {
             // Reverse the balance changes and update state atomically whenever the
@@ -863,6 +840,10 @@ class FederationCreditCommonsController extends BaseApiController
                 return $this->ccError('UnresolvedAccountnameViolation',
                     "Payee '{$payeePath}' not found on this node", 400);
             }
+            if (!$this->localAccountCanTransact($payeeId, $tenantId)) {
+                return $this->ccError('PermissionViolation',
+                    'Payee does not accept federated transactions', 403);
+            }
 
             // Idempotency: a relayed transaction carries the originating node's
             // UUID. A repeat delivery of the same UUID must NOT credit the payee
@@ -884,6 +865,7 @@ class FederationCreditCommonsController extends BaseApiController
                 // Credit the local payee
                 DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
                     [$quant, $payeeId, $tenantId]);
+                $this->recordFederatedTransactionLedger($tenantId, null, $payeeId, $quant, $description);
 
                 // Record the CC entry. The UNIQUE(tenant_id, transaction_uuid)
                 // index makes a concurrent duplicate delivery fail here (caught
@@ -1171,83 +1153,7 @@ class FederationCreditCommonsController extends BaseApiController
                 "Cannot transition from {$entry->state} to C", 400);
         }
 
-        $payerId = $this->resolveAccountId($entry->payer, $tenantId);
-        $payeeId = $this->resolveAccountId($entry->payee, $tenantId);
-        $quant = (float) $entry->quant;
-
-        if (!SecurityBounds::isAcceptableHourAmount($quant)) {
-            return $this->ccError('MissingParameter', 'Amount exceeds maximum', 400);
-        }
-
-        if (!$payerId && $payeeId) {
-            return $this->ccError('PermissionViolation',
-                'Remote-only payer cannot credit a local payee without a local debit branch', 403);
-        }
-
-        DB::beginTransaction();
-        try {
-            // Atomically claim the state transition FIRST, conditioned on the
-            // state we validated above. With two concurrent commits of the same
-            // UUID, exactly one claim succeeds; the loser affects 0 rows and
-            // must NOT apply balances again (double-credit window otherwise —
-            // the balance UPDATEs alone do not protect against double-apply).
-            $claimed = DB::table('federation_cc_entries')
-                ->where('id', $entry->id)
-                ->where('state', $entry->state)
-                ->update([
-                    'state' => CreditCommonsAdapter::STATE_COMPLETED,
-                    'written_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            if ($claimed === 0) {
-                DB::rollBack();
-                return $this->ccError('InvalidStateTransition',
-                    "Cannot transition from {$entry->state} to C (transaction was concurrently transitioned)", 400);
-            }
-
-            // Authorization: only debit a local payer who has opted into federation
-            // (mirrors createTransaction — prevents debiting a non-consenting member).
-            if ($payerId && !$this->payerMayBeDebited($payerId, $tenantId)) {
-                DB::rollBack();
-                return $this->ccError('PermissionViolation',
-                    'Payer has not opted into federation; their balance cannot be debited by a federated transaction', 403);
-            }
-
-            // Apply balances only when accounts are local. Remote-only entries
-            // are recorded as audit rows (relay case).
-            if ($payerId) {
-                $updated = DB::update(
-                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
-                    [$quant, $payerId, $tenantId, $quant]
-                );
-                if ($updated === 0) {
-                    DB::rollBack();
-                    return $this->ccError('InsufficientBalance', 'Payer has insufficient balance', 400);
-                }
-            }
-            if ($payeeId) {
-                DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
-                    [$quant, $payeeId, $tenantId]);
-            }
-
-            $newHash = CreditCommonsNodeService::advanceHashchain(
-                $tenantId, $uuid, $quant, $entry->payer, $entry->payee
-            );
-
-            DB::commit();
-
-            return response()->json([
-                'data' => [
-                    'uuid' => $uuid,
-                    'state' => CreditCommonsAdapter::STATE_COMPLETED,
-                    'written' => now()->format('Y-m-d'),
-                ],
-            ], 200, ['Last-hash' => $newHash]);
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            Log::error('[FederationCC] Commit failed', ['error' => $e->getMessage()]);
-            return $this->ccError('Other', 'Commit processing failed', 500);
-        }
+        return $this->completeTransactionEntry($entry, $tenantId, 200);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -1338,19 +1244,37 @@ class FederationCreditCommonsController extends BaseApiController
     }
 
     /**
-     * Federation consent gate: a local member's balance may only be debited by a
-     * federated transaction if they have explicitly opted into federation. Without
-     * this, a transactions:write caller could move credits out of an arbitrary
-     * member's wallet (the per-account authorization the CC transfer endpoints
-     * otherwise lacked).
+     * Federation consent gate: a local member's balance may only be touched by a
+     * federated transaction when they have opted in and enabled federated
+     * transactions.
      */
     private function payerMayBeDebited(int $payerId, int $tenantId): bool
     {
         return DB::table('users')
-            ->where('id', $payerId)
-            ->where('tenant_id', $tenantId)
-            ->where('federation_optin', 1)
+            ->join('federation_user_settings as fus', 'fus.user_id', '=', 'users.id')
+            ->where('users.id', $payerId)
+            ->where('users.tenant_id', $tenantId)
+            ->where('users.status', 'active')
+            ->where('fus.federation_optin', 1)
+            ->where('fus.transactions_enabled_federated', 1)
             ->exists();
+    }
+
+    private function localAccountCanTransact(int $userId, int $tenantId): bool
+    {
+        return $this->payerMayBeDebited($userId, $tenantId);
+    }
+
+    private function discoverableFederatedAccountQuery(int $tenantId)
+    {
+        return DB::table('users')
+            ->join('federation_user_settings as fus', 'fus.user_id', '=', 'users.id')
+            ->where('users.tenant_id', $tenantId)
+            ->where('users.status', 'active')
+            ->where('fus.federation_optin', 1)
+            ->where('fus.profile_visible_federated', 1)
+            ->where('fus.appear_in_federated_search', 1)
+            ->where('fus.transactions_enabled_federated', 1);
     }
 
     /**
@@ -1358,14 +1282,18 @@ class FederationCreditCommonsController extends BaseApiController
      *
      * Accepts: "node-slug/username", "username", or numeric user ID.
      */
-    private function resolveAccountId(string $accountRef, int $tenantId): ?int
+    private function resolveAccountId(string $accountRef, int $tenantId, bool $requireFederatedAccount = false): ?int
     {
+        $baseQuery = $requireFederatedAccount
+            ? $this->discoverableFederatedAccountQuery($tenantId)
+            : DB::table('users')
+                ->where('users.tenant_id', $tenantId)
+                ->where('users.status', 'active');
+
         // If numeric, treat as user ID
         if (is_numeric($accountRef)) {
-            $exists = DB::table('users')
-                ->where('id', (int) $accountRef)
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'active')
+            $exists = (clone $baseQuery)
+                ->where('users.id', (int) $accountRef)
                 ->exists();
             return $exists ? (int) $accountRef : null;
         }
@@ -1375,13 +1303,121 @@ class FederationCreditCommonsController extends BaseApiController
             ? explode('/', $accountRef, 2)[1]
             : $accountRef;
 
-        $user = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
-            ->where('username', $username)
-            ->first(['id']);
+        $user = (clone $baseQuery)
+            ->where('users.username', $username)
+            ->first(['users.id']);
 
         return $user ? (int) $user->id : null;
+    }
+
+    private function completeTransactionEntry(object $entry, int $tenantId, int $status): JsonResponse
+    {
+        $uuid = (string) $entry->transaction_uuid;
+        $payerId = $this->resolveAccountId((string) $entry->payer, $tenantId);
+        $payeeId = $this->resolveAccountId((string) $entry->payee, $tenantId);
+        $quant = (float) $entry->quant;
+
+        if (!SecurityBounds::isAcceptableHourAmount($quant)) {
+            return $this->ccError('MissingParameter', 'Amount exceeds maximum', 400);
+        }
+
+        if (!$payerId && $payeeId) {
+            return $this->ccError('PermissionViolation',
+                'Remote-only payer cannot credit a local payee without a local debit branch', 403);
+        }
+        if ($payerId && !$this->payerMayBeDebited($payerId, $tenantId)) {
+            return $this->ccError('PermissionViolation',
+                'Payer has not enabled federated transactions; their balance cannot be debited by a federated transaction', 403);
+        }
+        if ($payeeId && !$this->localAccountCanTransact($payeeId, $tenantId)) {
+            return $this->ccError('PermissionViolation',
+                'Payee does not accept federated transactions', 403);
+        }
+
+        DB::beginTransaction();
+        try {
+            $writtenAt = now();
+            $claimed = DB::table('federation_cc_entries')
+                ->where('id', $entry->id)
+                ->where('state', $entry->state)
+                ->update([
+                    'state' => CreditCommonsAdapter::STATE_COMPLETED,
+                    'written_at' => $writtenAt,
+                    'updated_at' => $writtenAt,
+                ]);
+            if ($claimed === 0) {
+                DB::rollBack();
+                return $this->ccError('InvalidStateTransition',
+                    "Cannot transition from {$entry->state} to C (transaction was concurrently transitioned)", 400);
+            }
+
+            if ($payerId) {
+                $updated = DB::update(
+                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND status = 'active' AND balance >= ?",
+                    [$quant, $payerId, $tenantId, $quant]
+                );
+                if ($updated === 0) {
+                    DB::rollBack();
+                    return $this->ccError('InsufficientBalance', 'Payer has insufficient balance', 400);
+                }
+            }
+            if ($payeeId) {
+                DB::update(
+                    "UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ? AND status = 'active'",
+                    [$quant, $payeeId, $tenantId]
+                );
+            }
+
+            $this->recordFederatedTransactionLedger(
+                $tenantId,
+                $payerId,
+                $payeeId,
+                $quant,
+                (string) ($entry->description ?? '')
+            );
+
+            $newHash = CreditCommonsNodeService::advanceHashchain(
+                $tenantId, $uuid, $quant, (string) $entry->payer, (string) $entry->payee
+            );
+
+            DB::commit();
+
+            return response()->json([
+                'data' => [
+                    'uuid' => $uuid,
+                    'state' => CreditCommonsAdapter::STATE_COMPLETED,
+                    'written' => $writtenAt->format('Y-m-d'),
+                ],
+            ], $status, ['Last-hash' => $newHash]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            Log::error('[FederationCC] Completion failed', ['error' => $e->getMessage()]);
+            return $this->ccError('Other', 'Completion processing failed', 500);
+        }
+    }
+
+    private function recordFederatedTransactionLedger(
+        int $tenantId,
+        ?int $payerId,
+        ?int $payeeId,
+        float $quant,
+        string $description
+    ): void {
+        if (!$payerId && !$payeeId) {
+            return;
+        }
+
+        DB::table('transactions')->insertGetId([
+            'tenant_id' => $tenantId,
+            'sender_id' => $payerId,
+            'receiver_id' => $payeeId,
+            'amount' => $quant,
+            'description' => $description,
+            'status' => 'completed',
+            'is_federated' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 
     /**
@@ -1419,9 +1455,11 @@ class FederationCreditCommonsController extends BaseApiController
         $payerId = $this->resolveAccountId($entry->payer, $tenantId);
         $payeeId = $this->resolveAccountId($entry->payee, $tenantId);
 
-        if ($payerId && $payeeId) {
+        if ($payerId) {
             DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
                 [(float) $entry->quant, $payerId, $tenantId]);
+        }
+        if ($payeeId) {
             DB::update("UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
                 [(float) $entry->quant, $payeeId, $tenantId]);
         }

@@ -64,6 +64,25 @@ class CreditCommonsReplaySafetyTest extends TestCase
             'federation_optin' => 1,
             'balance' => 100.00,
         ]);
+
+        foreach ([$this->payer->id, $this->payee->id] as $userId) {
+            DB::table('federation_user_settings')->updateOrInsert(
+                ['user_id' => $userId],
+                [
+                    'federation_optin' => 1,
+                    'profile_visible_federated' => 1,
+                    'messaging_enabled_federated' => 1,
+                    'transactions_enabled_federated' => 1,
+                    'appear_in_federated_search' => 1,
+                    'show_skills_federated' => 1,
+                    'show_location_federated' => 0,
+                    'service_reach' => 'local_only',
+                    'opted_in_at' => now(),
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+        }
     }
 
     protected function tearDown(): void
@@ -97,6 +116,17 @@ class CreditCommonsReplaySafetyTest extends TestCase
         ];
     }
 
+    private function replaySafetyLedgerRows(): int
+    {
+        return DB::table('transactions')
+            ->where('tenant_id', $this->tenantId)
+            ->where('sender_id', $this->payer->id)
+            ->where('receiver_id', $this->payee->id)
+            ->where('description', 'replay-safety test')
+            ->where('is_federated', 1)
+            ->count();
+    }
+
     public function test_commit_applies_balances_once_and_replay_does_not_reapply(): void
     {
         $uuid = (string) \Illuminate\Support\Str::uuid();
@@ -107,11 +137,31 @@ class CreditCommonsReplaySafetyTest extends TestCase
         $first = $controller->commitTransaction(Request::create('/', 'POST'), $uuid);
         $this->assertSame(200, $first->getStatusCode(), $first->getContent());
         $this->assertSame([95.0, 105.0], $this->balances(), 'Commit must move the amount exactly once');
+        $this->assertSame(1, $this->replaySafetyLedgerRows(), 'Commit must write exactly one federated ledger row');
 
         // Replay (redelivery): must NOT re-apply balances.
         $second = $controller->commitTransaction(Request::create('/', 'POST'), $uuid);
         $this->assertSame(400, $second->getStatusCode(), 'Replayed commit must be rejected');
         $this->assertSame([95.0, 105.0], $this->balances(), 'Replayed commit must not double-apply balances');
+        $this->assertSame(1, $this->replaySafetyLedgerRows(), 'Replayed commit must not duplicate the ledger row');
+    }
+
+    public function test_patch_to_completed_applies_balances_and_ledger_once(): void
+    {
+        $uuid = (string) \Illuminate\Support\Str::uuid();
+        $this->insertEntry($uuid, CreditCommonsAdapter::STATE_PENDING);
+
+        $controller = new FederationCreditCommonsController();
+
+        $first = $controller->transitionTransaction(Request::create('/', 'PATCH'), $uuid, 'C');
+        $this->assertSame(201, $first->getStatusCode(), $first->getContent());
+        $this->assertSame([95.0, 105.0], $this->balances(), 'PATCH-to-C must move the amount exactly once');
+        $this->assertSame(1, $this->replaySafetyLedgerRows(), 'PATCH-to-C must write exactly one federated ledger row');
+
+        $second = $controller->transitionTransaction(Request::create('/', 'PATCH'), $uuid, 'C');
+        $this->assertSame(400, $second->getStatusCode(), 'Replayed PATCH-to-C must be rejected');
+        $this->assertSame([95.0, 105.0], $this->balances(), 'Replayed PATCH-to-C must not double-apply balances');
+        $this->assertSame(1, $this->replaySafetyLedgerRows(), 'Replayed PATCH-to-C must not duplicate the ledger row');
     }
 
     public function test_erase_reverses_balances_once_and_replay_does_not_rereverse(): void

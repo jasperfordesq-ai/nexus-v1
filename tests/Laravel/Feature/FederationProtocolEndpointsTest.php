@@ -388,27 +388,54 @@ class FederationProtocolEndpointsTest extends TestCase
         $this->assertTrue((bool) $response->json('data.processed'));
     }
 
-    public function test_cc_create_transaction_rejects_debit_of_non_opted_in_payer(): void
+    public function test_cc_create_transaction_rejects_non_transaction_enabled_payer(): void
     {
-        // A member who has NOT opted into federation must not be debitable via the
-        // CC protocol — guards the cross-account-debit IDOR on createTransaction.
-        $payer = DB::table('users')->where('tenant_id', $this->testTenantId)->where('status', 'active')->where('federation_optin', 0)->value('id');
+        // A member who has not enabled federated transactions must not be
+        // debitable via the CC protocol.
+        $payer = DB::table('users')->where('tenant_id', $this->testTenantId)->where('status', 'active')->value('id');
         $payee = DB::table('users')->where('tenant_id', $this->testTenantId)->where('status', 'active')->when($payer, fn ($q) => $q->where('id', '!=', $payer))->value('id');
         if (!$payer || !$payee) {
             $this->markTestSkipped('Need two active users to exercise the payer-consent gate');
         }
+        DB::table('users')->whereIn('id', [$payer, $payee])->update(['balance' => 10.00]);
+        $this->enableFederatedTransactions((int) $payer, ['transactions_enabled_federated' => 0]);
+        $this->enableFederatedTransactions((int) $payee);
+
         $response = $this->json('POST', '/api/v2/federation/cc/transaction', [
             'payer' => (string) $payer,
             'payee' => (string) $payee,
             'quant' => 1,
             'workflow' => '0|PC-CE=',
         ], $this->authHeaders());
-        $response->assertStatus(403);
+        $response->assertStatus(400);
+        $this->assertSame('UnresolvedAccountnameViolation', $response->json('class'));
+        $this->assertSame(10.00, (float) DB::table('users')->where('id', $payer)->value('balance'));
+        $this->assertSame(10.00, (float) DB::table('users')->where('id', $payee)->value('balance'));
     }
 
     public function test_native_ingest_rejects_empty_body(): void
     {
         $response = $this->json('POST', '/api/v2/federation/ingest/reviews', [], $this->authHeaders());
         $response->assertStatus(400);
+    }
+
+    private function enableFederatedTransactions(int $userId, array $overrides = []): void
+    {
+        DB::table('federation_user_settings')->updateOrInsert(
+            ['user_id' => $userId],
+            array_merge([
+                'federation_optin' => 1,
+                'profile_visible_federated' => 1,
+                'messaging_enabled_federated' => 1,
+                'transactions_enabled_federated' => 1,
+                'appear_in_federated_search' => 1,
+                'show_skills_federated' => 1,
+                'show_location_federated' => 0,
+                'service_reach' => 'local_only',
+                'opted_in_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ], $overrides)
+        );
     }
 }

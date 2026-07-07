@@ -1685,7 +1685,7 @@ class AdminUsersController extends BaseApiController
                                 messaging_enabled_federated, transactions_enabled_federated,
                                 appear_in_federated_search, show_skills_federated,
                                 show_location_federated, service_reach, opted_in_at, created_at
-                            ) VALUES (?, 1, 1, 1, 1, 1, 1, 0, 'local_only', NOW(), NOW())",
+                            ) VALUES (?, 0, 0, 0, 0, 0, 0, 0, 'local_only', NULL, NOW())",
                             [$newUserId]
                         );
                     } catch (\Exception $e) {

@@ -151,8 +151,8 @@ export function FederationConnectionsPage() {
         variant="underlined"
         classNames={{
           tabList: 'gap-4',
-          tab: 'text-theme-muted data-[selected=true]:text-indigo-500',
-          cursor: 'bg-indigo-500',
+          tab: 'text-theme-muted data-[selected=true]:text-accent',
+          cursor: 'bg-accent',
         }}
       >
         <Tab key="accepted" title={<div className="flex items-center gap-2"><UserCheck className="w-4 h-4" />{t('connections.tab_connected')}</div>} />
@@ -169,7 +169,7 @@ export function FederationConnectionsPage() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{t('connections.load_error')}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            color="primary"
             onPress={() => loadConnections(activeTab)}
           >
             {t('connections.try_again')}
@@ -177,10 +177,10 @@ export function FederationConnectionsPage() {
         </GlassCard>
       ) : connections.length === 0 ? (
         <GlassCard className="p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center mx-auto mb-4">
-            {activeTab === 'accepted' && <UserCheck className="w-8 h-8 text-indigo-500" aria-hidden="true" />}
-            {activeTab === 'pending_received' && <UserPlus className="w-8 h-8 text-indigo-500" aria-hidden="true" />}
-            {activeTab === 'pending_sent' && <Send className="w-8 h-8 text-indigo-500" aria-hidden="true" />}
+          <div className="w-16 h-16 rounded-full bg-sky-50 text-sky-700 dark:bg-sky-950/40 dark:text-sky-200 flex items-center justify-center mx-auto mb-4">
+            {activeTab === 'accepted' && <UserCheck className="w-8 h-8" aria-hidden="true" />}
+            {activeTab === 'pending_received' && <UserPlus className="w-8 h-8" aria-hidden="true" />}
+            {activeTab === 'pending_sent' && <Send className="w-8 h-8" aria-hidden="true" />}
           </div>
           <h3 className="text-lg font-semibold text-theme-primary mb-2">
             {activeTab === 'accepted' && t('connections.empty_connected')}
@@ -193,7 +193,7 @@ export function FederationConnectionsPage() {
             {activeTab === 'pending_sent' && t('connections.empty_sent_desc')}
           </p>
           {activeTab === 'accepted' && (
-            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<Globe className="w-4 h-4" aria-hidden="true" />} onPress={() => navigate(tenantPath('/federation/members'))}>
+            <Button color="primary" startContent={<Globe className="w-4 h-4" aria-hidden="true" />} onPress={() => navigate(tenantPath('/federation/members'))}>
               {t('connections.browse_members')}
             </Button>
           )}
@@ -233,8 +233,8 @@ function ConnectionCard({ connection, tab, actionLoading, onAction, onMessage, o
       <div className="flex flex-col sm:flex-row items-start gap-4">
         <div className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer" onClick={() => onViewProfile(connection.user_id, connection.tenant_id)} role="button" tabIndex={0} aria-label={displayName} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onViewProfile(connection.user_id, connection.tenant_id); } }}>
           <div className="relative flex-shrink-0">
-            <Avatar src={resolveAvatarUrl(connection.avatar_url)} name={displayName} className="w-12 h-12 ring-2 ring-indigo-500/20" />
-            <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center ring-1 ring-white dark:ring-gray-900" title={connection.tenant_name}>
+            <Avatar src={resolveAvatarUrl(connection.avatar_url)} name={displayName} className="w-12 h-12 ring-2 ring-accent/20" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-accent flex items-center justify-center ring-1 ring-white dark:ring-gray-900" title={connection.tenant_name}>
               <Globe className="w-3 h-3 text-white" aria-hidden="true" />
             </div>
           </div>
@@ -253,7 +253,7 @@ function ConnectionCard({ connection, tab, actionLoading, onAction, onMessage, o
         <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto">
           {tab === 'accepted' && (
             <>
-              <Button size="sm" variant="flat" className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400" startContent={<MessageSquare className="w-3.5 h-3.5" />} onPress={() => onMessage(connection.user_id, connection.tenant_id)}>
+              <Button size="sm" variant="flat" color="primary" startContent={<MessageSquare className="w-3.5 h-3.5" />} onPress={() => onMessage(connection.user_id, connection.tenant_id)}>
                 {t('connections.message')}
               </Button>
               <Button size="sm" variant="flat" className="text-danger" isIconOnly isLoading={isActioning} onPress={() => onAction(connection.id, 'remove')} aria-label={t('connections.remove')}>
@@ -263,7 +263,7 @@ function ConnectionCard({ connection, tab, actionLoading, onAction, onMessage, o
           )}
           {tab === 'pending_received' && (
             <>
-              <Button size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<Check className="w-3.5 h-3.5" />} isLoading={isActioning} onPress={() => onAction(connection.id, 'accept')}>
+              <Button size="sm" color="primary" startContent={<Check className="w-3.5 h-3.5" />} isLoading={isActioning} onPress={() => onAction(connection.id, 'accept')}>
                 {t('connections.accept')}
               </Button>
               <Button size="sm" variant="flat" className="text-danger" startContent={<X className="w-3.5 h-3.5" />} isLoading={isActioning} onPress={() => onAction(connection.id, 'reject')}>

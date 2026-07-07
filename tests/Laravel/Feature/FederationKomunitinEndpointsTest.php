@@ -185,17 +185,6 @@ class FederationKomunitinEndpointsTest extends TestCase
 
     public function test_accounts_endpoint_scopes_to_tenant(): void
     {
-        // Skip if test schema is missing federation_user_settings.tenant_id
-        // (the controller queries it to apply the opt-in filter).
-        try {
-            $cols = DB::getSchemaBuilder()->getColumnListing('federation_user_settings');
-            if ($cols && !in_array('tenant_id', $cols, true)) {
-                $this->markTestSkipped('federation_user_settings.tenant_id column missing in test DB');
-            }
-        } catch (\Throwable $e) {
-            // table likely missing too — test tolerates that
-        }
-
         $response = $this->json('GET', '/api/v2/federation/komunitin/HOURS/accounts', [], $this->authHeaders());
         if ($response->getStatusCode() === 500) {
             $body = $response->getContent();
@@ -211,6 +200,34 @@ class FederationKomunitinEndpointsTest extends TestCase
         foreach ($response->json('data') ?? [] as $resource) {
             $this->assertSame('accounts', $resource['type']);
         }
+    }
+
+    public function test_accounts_endpoint_honours_federation_visibility_settings(): void
+    {
+        $visible = \App\Models\User::factory()->forTenant($this->testTenantId)->create([
+            'balance' => 3.00,
+            'status' => 'active',
+        ]);
+        $hidden = \App\Models\User::factory()->forTenant($this->testTenantId)->create([
+            'balance' => 3.00,
+            'status' => 'active',
+        ]);
+
+        $this->enableFederatedTransactions((int) $visible->id);
+        $this->enableFederatedTransactions((int) $hidden->id, [
+            'profile_visible_federated' => 0,
+        ]);
+
+        $response = $this->json('GET', '/api/v2/federation/komunitin/HOURS/accounts', [], $this->authHeaders());
+
+        $response->assertStatus(200);
+        $ids = array_map(
+            static fn (array $resource): string => (string) ($resource['id'] ?? ''),
+            $response->json('data') ?? []
+        );
+
+        $this->assertContains((string) $visible->id, $ids);
+        $this->assertNotContains((string) $hidden->id, $ids);
     }
 
     public function test_transfers_endpoint_returns_paginated_envelope(): void
@@ -275,6 +292,8 @@ class FederationKomunitinEndpointsTest extends TestCase
         ]);
         $payerId = $payer->id;
         $payeeId = $payee->id;
+        $this->enableFederatedTransactions((int) $payerId);
+        $this->enableFederatedTransactions((int) $payeeId);
 
         $payload = [
             'data' => [
@@ -392,5 +411,25 @@ class FederationKomunitinEndpointsTest extends TestCase
 
         $this->assertContains(429, $statuses,
             'Rate limit should fire within 4 requests when limit=3. Got: ' . json_encode($statuses));
+    }
+
+    private function enableFederatedTransactions(int $userId, array $overrides = []): void
+    {
+        DB::table('federation_user_settings')->updateOrInsert(
+            ['user_id' => $userId],
+            array_merge([
+                'federation_optin' => 1,
+                'profile_visible_federated' => 1,
+                'messaging_enabled_federated' => 1,
+                'transactions_enabled_federated' => 1,
+                'appear_in_federated_search' => 1,
+                'show_skills_federated' => 1,
+                'show_location_federated' => 0,
+                'service_reach' => 'local_only',
+                'opted_in_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ], $overrides)
+        );
     }
 }

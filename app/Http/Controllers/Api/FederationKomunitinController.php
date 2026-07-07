@@ -224,42 +224,36 @@ class FederationKomunitinController extends BaseApiController
         $filterTag = $request->query('filter')['tag'] ?? $request->query('filter_tag');
         $baseUrl = $request->getSchemeAndHttpHost();
 
-        $query = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active');
-
-        // Federation opt-in filter
-        if (DB::table('federation_user_settings')
-            ->where('tenant_id', $tenantId)->exists()) {
-            $query->whereIn('id', function ($sub) use ($tenantId) {
-                $sub->select('user_id')
-                    ->from('federation_user_settings')
-                    ->where('tenant_id', $tenantId)
-                    ->where('federation_optin', 1);
-            });
-        }
+        $query = $this->discoverableFederatedAccountQuery($tenantId);
 
         if ($filterCode) {
             $query->where(function ($q) use ($filterCode) {
-                $q->where('username', 'LIKE', "%{$filterCode}%")
-                    ->orWhere('name', 'LIKE', "%{$filterCode}%");
+                $q->where('users.username', 'LIKE', "%{$filterCode}%")
+                    ->orWhere('users.name', 'LIKE', "%{$filterCode}%");
             });
         }
 
         if ($filterTag) {
             $query->where(function ($q) use ($filterTag) {
-                $q->where('tags', 'LIKE', "%{$filterTag}%")
-                    ->orWhere('skills', 'LIKE', "%{$filterTag}%");
+                $q->where('users.tags', 'LIKE', "%{$filterTag}%")
+                    ->orWhere('users.skills', 'LIKE', "%{$filterTag}%");
             });
         }
 
         // Cursor pagination: decode opaque cursor
         $offset = $this->decodeOffsetCursor($afterCursor);
 
-        $users = $query->orderBy('id')
+        $users = $query->orderBy('users.id')
             ->offset($offset)
             ->limit($pageSize + 1) // Fetch one extra to check for next page
-            ->get(['id', 'name', 'username', 'balance', 'created_at', 'updated_at']);
+            ->get([
+                'users.id',
+                'users.name',
+                'users.username',
+                'users.balance',
+                'users.created_at',
+                'users.updated_at',
+            ]);
 
         $hasNext = $users->count() > $pageSize;
         if ($hasNext) {
@@ -293,11 +287,16 @@ class FederationKomunitinController extends BaseApiController
         $tenantId = TenantContext::getId();
         $baseUrl = $request->getSchemeAndHttpHost();
 
-        $user = DB::table('users')
-            ->where('id', (int) $id)
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
-            ->first(['id', 'name', 'username', 'balance', 'created_at', 'updated_at']);
+        $user = $this->discoverableFederatedAccountQuery($tenantId)
+            ->where('users.id', (int) $id)
+            ->first([
+                'users.id',
+                'users.name',
+                'users.username',
+                'users.balance',
+                'users.created_at',
+                'users.updated_at',
+            ]);
 
         if (!$user) {
             return $this->jsonApiError('NotFound', 'Not Found',
@@ -683,32 +682,26 @@ class FederationKomunitinController extends BaseApiController
                 "Payer account not found in currency {$code}", 404);
         }
 
+        if (!$this->localAccountCanTransact((int) $payerId, $tenantId)) {
+            return $this->jsonApiError('Forbidden', 'Forbidden',
+                'Payer has not enabled federated transactions; their balance cannot be debited by a federated transfer', 403);
+        }
+
+        if (!$this->localAccountCanTransact((int) $payeeId, $tenantId)) {
+            return $this->jsonApiError('Forbidden', 'Forbidden',
+                'Payee does not accept federated transactions', 403);
+        }
+
         // Execute transfer — only settle balances when the requested state
         // is 'committed'/'completed'; pending/accepted/etc. just record the intent.
         $shouldSettle = ($nexusStatus === 'completed');
-
-        // Authorization: a federated transfer may only debit a local payer who has
-        // opted into federation. Without this, a transactions:write caller could
-        // move credits out of an arbitrary member's wallet (cross-account IDOR) —
-        // mirrors the Credit Commons createTransaction consent gate.
-        if ($shouldSettle) {
-            $payerOptedIn = DB::table('users')
-                ->where('id', (int) $payerId)
-                ->where('tenant_id', $tenantId)
-                ->where('federation_optin', 1)
-                ->exists();
-            if (!$payerOptedIn) {
-                return $this->jsonApiError('Forbidden', 'Forbidden',
-                    'Payer has not opted into federation; their balance cannot be debited by a federated transfer', 403);
-            }
-        }
 
         DB::beginTransaction();
         try {
             if ($shouldSettle) {
                 // Deduct from payer atomically — WHERE balance >= amount prevents overdraw
                 $updated = DB::update(
-                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND balance >= ?",
+                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND status = 'active' AND balance >= ?",
                     [$amount, (int) $payerId, $tenantId, $amount]
                 );
 
@@ -718,7 +711,7 @@ class FederationKomunitinController extends BaseApiController
                         'Insufficient balance for this transfer', 403);
                 }
 
-                DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?",
+                DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ? AND status = 'active'",
                     [$amount, (int) $payeeId, $tenantId]);
             }
 
@@ -824,20 +817,20 @@ class FederationKomunitinController extends BaseApiController
                     'Amount exceeds maximum allowed value', 400);
             }
 
-            $payer = DB::table('users')
+            $payerExists = DB::table('users')
                 ->where('id', $payerId)
                 ->where('tenant_id', $tenantId)
                 ->where('status', 'active')
-                ->first(['id', 'federation_optin']);
+                ->exists();
 
-            if (!$payer) {
+            if (!$payerExists) {
                 return $this->jsonApiError('NotFound', 'Not Found',
                     "Payer account not found in currency {$code}", 404);
             }
 
-            if ((int) ($payer->federation_optin ?? 0) !== 1) {
+            if (!$this->localAccountCanTransact($payerId, $tenantId)) {
                 return $this->jsonApiError('Forbidden', 'Forbidden',
-                    'Payer has not opted into federation; their balance cannot be debited by a federated transfer', 403);
+                    'Payer has not enabled federated transactions; their balance cannot be debited by a federated transfer', 403);
             }
 
             $payeeExists = DB::table('users')
@@ -849,6 +842,11 @@ class FederationKomunitinController extends BaseApiController
             if (!$payeeExists) {
                 return $this->jsonApiError('NotFound', 'Not Found',
                     "Payee account not found in currency {$code}", 404);
+            }
+
+            if (!$this->localAccountCanTransact($payeeId, $tenantId)) {
+                return $this->jsonApiError('Forbidden', 'Forbidden',
+                    'Payee does not accept federated transactions', 403);
             }
         }
 
@@ -875,7 +873,7 @@ class FederationKomunitinController extends BaseApiController
                 $payeeId = (int) $tx->receiver_id;
 
                 $debited = DB::update(
-                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND status = 'active' AND federation_optin = 1 AND balance >= ?",
+                    "UPDATE users SET balance = balance - ? WHERE id = ? AND tenant_id = ? AND status = 'active' AND balance >= ?",
                     [$amount, $payerId, $tenantId, $amount]
                 );
 
@@ -1087,6 +1085,30 @@ class FederationKomunitinController extends BaseApiController
                 'self' => "{$baseUrl}/api/v2/federation/komunitin/{$code}/transfers/{$tx->id}",
             ],
         ];
+    }
+
+    private function discoverableFederatedAccountQuery(int $tenantId): \Illuminate\Database\Query\Builder
+    {
+        return DB::table('users')
+            ->join('federation_user_settings as fus', 'fus.user_id', '=', 'users.id')
+            ->where('users.tenant_id', $tenantId)
+            ->where('users.status', 'active')
+            ->where('fus.federation_optin', 1)
+            ->where('fus.profile_visible_federated', 1)
+            ->where('fus.appear_in_federated_search', 1)
+            ->where('fus.transactions_enabled_federated', 1);
+    }
+
+    private function localAccountCanTransact(int $userId, int $tenantId): bool
+    {
+        return DB::table('users')
+            ->join('federation_user_settings as fus', 'fus.user_id', '=', 'users.id')
+            ->where('users.id', $userId)
+            ->where('users.tenant_id', $tenantId)
+            ->where('users.status', 'active')
+            ->where('fus.federation_optin', 1)
+            ->where('fus.transactions_enabled_federated', 1)
+            ->exists();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
