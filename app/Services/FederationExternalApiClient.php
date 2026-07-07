@@ -261,7 +261,7 @@ class FederationExternalApiClient
      *
      * @return array|null Null on failure
      */
-    public static function fetchMember(int $partnerId, int $memberId): ?array
+    public static function fetchMember(int $partnerId, int|string $memberId): ?array
     {
         $adapter = self::resolveAdapter($partnerId);
         $endpoint = $adapter->mapEndpoint('member', ['id' => $memberId]);
@@ -279,7 +279,7 @@ class FederationExternalApiClient
      *
      * @return array|null Null on failure
      */
-    public static function fetchListing(int $partnerId, int $listingId): ?array
+    public static function fetchListing(int $partnerId, int|string $listingId): ?array
     {
         $adapter = self::resolveAdapter($partnerId);
         $endpoint = $adapter->mapEndpoint('listing', ['id' => $listingId]);

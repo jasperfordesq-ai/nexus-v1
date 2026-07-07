@@ -31,6 +31,7 @@ class FederationAggregateService
 {
     public const ALGORITHM = 'HMAC-SHA256';
     private const LOG_RETENTION_DAYS = 365;
+    private const SUPPRESSION_THRESHOLD = 5;
 
     /**
      * Build the aggregate payload for the *current* TenantContext over the given period.
@@ -38,9 +39,9 @@ class FederationAggregateService
      * @return array{
      *   period: array{from: string, to: string},
      *   tenant: array{slug: string, name: string},
-     *   hours: array{total_approved: float, by_month: array<int,array{month:string,hours:float}>, by_category: array<int,array{category:string,hours:float,count:int}>},
+     *   hours: array{total_approved: ?float, by_month: array<int,array{month:string,hours:float,count:int}>, by_category: array<int,array{category:string,hours:float,count:int}>},
      *   members: array{bracket: string},
-     *   partner_orgs: array{count: int},
+     *   partner_orgs: array{count: ?int, bracket: string, suppressed: bool},
      *   generated_at: string
      * }
      */
@@ -50,13 +51,15 @@ class FederationAggregateService
         $tenant = $this->resolveTenantMeta($tenantId);
 
         $totalApproved = 0.0;
+        $approvedLogCount = 0;
         $byMonth = [];
         $byCategory = [];
 
         if (Schema::hasTable('vol_logs') && Schema::hasColumn('vol_logs', 'status')) {
             // Total approved hours
             $row = DB::selectOne(
-                "SELECT COALESCE(SUM(hours), 0) AS total
+                "SELECT COALESCE(SUM(hours), 0) AS total,
+                        COUNT(*) AS cnt
                    FROM vol_logs
                   WHERE tenant_id = ?
                     AND status = 'approved'
@@ -64,11 +67,13 @@ class FederationAggregateService
                 [$tenantId, $periodFrom, $periodTo]
             );
             $totalApproved = (float) ($row->total ?? 0);
+            $approvedLogCount = (int) ($row->cnt ?? 0);
 
             // By month
             $monthRows = DB::select(
                 "SELECT DATE_FORMAT(date_logged, '%Y-%m') AS month,
-                        COALESCE(SUM(hours), 0) AS hours
+                        COALESCE(SUM(hours), 0) AS hours,
+                        COUNT(*) AS cnt
                    FROM vol_logs
                   WHERE tenant_id = ?
                     AND status = 'approved'
@@ -78,9 +83,13 @@ class FederationAggregateService
                 [$tenantId, $periodFrom, $periodTo]
             );
             foreach ($monthRows as $r) {
+                if ((int) ($r->cnt ?? 0) > 0 && (int) ($r->cnt ?? 0) < self::SUPPRESSION_THRESHOLD) {
+                    continue;
+                }
                 $byMonth[] = [
                     'month' => (string) $r->month,
                     'hours' => round((float) $r->hours, 2),
+                    'count' => (int) $r->cnt,
                 ];
             }
 
@@ -89,7 +98,8 @@ class FederationAggregateService
                 $catRows = DB::select(
                     "SELECT COALESCE(c.name, 'uncategorised') AS category,
                             COALESCE(SUM(vl.hours), 0)        AS hours,
-                            COUNT(*)                          AS cnt
+                            COUNT(*)                          AS cnt,
+                            COUNT(DISTINCT vl.user_id)        AS contributors
                        FROM vol_logs vl
                   LEFT JOIN vol_opportunities vo ON vo.id = vl.opportunity_id
                   LEFT JOIN categories c         ON c.id = vo.category_id
@@ -102,6 +112,10 @@ class FederationAggregateService
                     [$tenantId, $periodFrom, $periodTo]
                 );
                 foreach ($catRows as $r) {
+                    $contributorCount = (int) ($r->contributors ?? 0);
+                    if ($contributorCount > 0 && $contributorCount < self::SUPPRESSION_THRESHOLD) {
+                        continue;
+                    }
                     $byCategory[] = [
                         'category' => (string) $r->category,
                         'hours'    => round((float) $r->hours, 2),
@@ -160,6 +174,7 @@ class FederationAggregateService
                 $partnerOrgsCount = 0;
             }
         }
+        $partnerOrgsSuppressed = $partnerOrgsCount > 0 && $partnerOrgsCount < self::SUPPRESSION_THRESHOLD;
 
         return [
             'period' => [
@@ -171,15 +186,21 @@ class FederationAggregateService
                 'name' => (string) ($tenant['name'] ?? ''),
             ],
             'hours' => [
-                'total_approved' => round($totalApproved, 2),
+                'total_approved' => ($approvedLogCount > 0 && $approvedLogCount < self::SUPPRESSION_THRESHOLD) ? null : round($totalApproved, 2),
                 'by_month'       => $byMonth,
                 'by_category'    => $byCategory,
+                'suppressed'     => $approvedLogCount > 0 && $approvedLogCount < self::SUPPRESSION_THRESHOLD,
             ],
             'members' => [
                 'bracket' => $bracket,
             ],
             'partner_orgs' => [
-                'count' => $partnerOrgsCount,
+                'count' => $partnerOrgsSuppressed ? null : $partnerOrgsCount,
+                'bracket' => $this->bucketSmallCount($partnerOrgsCount),
+                'suppressed' => $partnerOrgsSuppressed,
+            ],
+            'privacy' => [
+                'suppression_threshold' => self::SUPPRESSION_THRESHOLD,
             ],
             'generated_at' => gmdate('c'),
         ];
@@ -194,6 +215,16 @@ class FederationAggregateService
         if ($count < 200)  return '50-200';
         if ($count < 1000) return '200-1000';
         return '>1000';
+    }
+
+    private function bucketSmallCount(int $count): string
+    {
+        if ($count === 0) return '0';
+        if ($count < self::SUPPRESSION_THRESHOLD) return '<' . self::SUPPRESSION_THRESHOLD;
+        if ($count < 10) return '5-9';
+        if ($count < 50) return '10-49';
+        if ($count < 200) return '50-199';
+        return '200+';
     }
 
     /**

@@ -509,6 +509,8 @@
     "cancel": "Cealaigh",
     "tx_success": "Idirbheart seolta",
     "tx_success_detail": "{{amount}} hour(s) sent to {{name}}",
+    "tx_pending": "Aistriú ar feitheamh",
+    "tx_pending_detail": "Táimid ag réiteach an aistrithe seo le hardán comhpháirtí {{name}}. Ní chruthóidh triail eile dochair eile.",
     "tx_failed": "Theip ar an idirbheart",
     "tx_unknown_error": "Earráid anaithnid",
     "reach_local_only": "Áitiúil amháin",

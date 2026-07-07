@@ -64,12 +64,22 @@ class ReconcileFederationPendingTxJob implements ShouldQueue
     {
         $cutoff = now()->subMinutes(self::STALE_AFTER_MINUTES);
 
-        $stale = DB::table('transactions')
-            ->where('status', 'pending')
-            ->where('is_federated', 1)
-            ->where('created_at', '<', $cutoff)
-            ->orderBy('created_at')
+        $stale = DB::table('transactions as tx')
+            ->leftJoin('federation_external_partners as ep', function ($join): void {
+                $join->on('ep.id', '=', 'tx.receiver_tenant_id')
+                    ->on('ep.tenant_id', '=', 'tx.tenant_id');
+            })
+            ->where('tx.status', 'pending')
+            ->where('tx.is_federated', 1)
+            ->where('tx.created_at', '<', $cutoff)
+            ->orderBy('tx.created_at')
             ->limit(self::MAX_PER_RUN)
+            ->select([
+                'tx.*',
+                'ep.id as external_partner_id',
+                'ep.name as external_partner_name',
+                'ep.protocol_type as external_partner_protocol',
+            ])
             ->get();
 
         if ($stale->isEmpty()) {
@@ -82,6 +92,12 @@ class ReconcileFederationPendingTxJob implements ShouldQueue
             'count' => $stale->count(),
             'cutoff' => $cutoff->toIso8601String(),
             'sample_ids' => $sampleIds,
+            'external_partner_ids' => $stale
+                ->pluck('external_partner_id')
+                ->filter()
+                ->unique()
+                ->values()
+                ->all(),
         ]);
 
         // Page a human. A Log::critical only reaches Sentry if LOG_STACK includes
@@ -107,6 +123,11 @@ class ReconcileFederationPendingTxJob implements ShouldQueue
                         'amount' => $tx->amount,
                         'created_at' => $tx->created_at,
                         'minutes_stale' => self::STALE_AFTER_MINUTES,
+                        'external_partner_id' => isset($tx->external_partner_id) ? (int) $tx->external_partner_id : null,
+                        'external_partner_name' => $tx->external_partner_name ?? null,
+                        'external_partner_protocol' => $tx->external_partner_protocol ?? null,
+                        'partner_idempotency_key' => $tx->federation_partner_idempotency_key ?? null,
+                        'external_transaction_id' => $tx->external_transaction_id ?? null,
                     ]
                 );
             } catch (\Throwable $e) {

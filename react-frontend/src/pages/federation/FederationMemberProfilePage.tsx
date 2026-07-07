@@ -54,6 +54,12 @@ const SERVICE_REACH_META: Record<string, { icon: typeof Home }> = {
   travel_ok: { icon: Car },
 };
 
+function createFederationTransferIdempotencyKey(): string {
+  return typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `fed-tx-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
 export function FederationMemberProfilePage() {
   const { t } = useTranslation('federation');
   usePageTitle(t('member_profile.page_title'));
@@ -557,7 +563,7 @@ export function FederationMemberProfilePage() {
                     {t('member_profile.cancel')}
                   </Button>
                   <Button
-                    className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
+                    color="primary"
                     startContent={<Coins className="w-4 h-4" />}
                     isLoading={txSending}
                     isDisabled={!canTransactWithMember || !txAmount || parseInt(txAmount) < 1 || parseInt(txAmount) > 100 || !txDescription.trim()}
@@ -565,20 +571,29 @@ export function FederationMemberProfilePage() {
                       if (!canTransactWithMember) return;
                       setTxSending(true);
                       try {
+                        const idempotencyKey = createFederationTransferIdempotencyKey();
                         const res = await api.post('/v2/federation/transactions', {
                           receiver_id: member.id,
                           receiver_tenant_id: member.timebank?.id ?? member.tenant_id,
                           amount: parseInt(txAmount),
                           description: txDescription.trim(),
-                        });
+                        }, { headers: { 'Idempotency-Key': idempotencyKey } });
                         if (res.success) {
-                          toast.success(
-                            t('member_profile.tx_success'),
-                            t('member_profile.tx_success_detail', {
-                              amount: txAmount,
-                              name: member.name,
-                            })
-                          );
+                          const status = (res.data as { status?: string } | undefined)?.status;
+                          if (status === 'pending') {
+                            toast.info(
+                              t('member_profile.tx_pending'),
+                              t('member_profile.tx_pending_detail', { name: member.name }),
+                            );
+                          } else {
+                            toast.success(
+                              t('member_profile.tx_success'),
+                              t('member_profile.tx_success_detail', {
+                                amount: txAmount,
+                                name: member.name,
+                              })
+                            );
+                          }
                           setTxAmount('');
                           setTxDescription('');
                           onClose();

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { fireEvent, render, screen, waitFor } from '@/test/test-utils';
 import { api } from '@/lib/api';
 import type { ReactNode } from 'react';
 
@@ -45,6 +45,13 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 
+const toastMock = vi.hoisted(() => ({
+  success: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  warning: vi.fn(),
+}));
+
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
     user: { id: 1, first_name: 'Test', name: 'Test User', role: 'member' },
@@ -56,12 +63,7 @@ vi.mock('@/contexts', () => ({
     hasFeature: vi.fn(() => true),
     hasModule: vi.fn(() => true),
   })),
-  useToast: vi.fn(() => ({
-    success: vi.fn(),
-    error: vi.fn(),
-    info: vi.fn(),
-    warning: vi.fn(),
-  })),
+  useToast: vi.fn(() => toastMock),
 
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
   useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
@@ -98,6 +100,8 @@ const mockMember = {
   timebank: { id: 5, name: 'Cork Timebank', slug: 'cork' },
   average_rating: 4.8,
   total_exchanges: 22,
+  messaging_enabled: true,
+  transactions_enabled: true,
   show_skills_federated: true,
   show_location_federated: true,
   show_reviews_federated: true,
@@ -181,5 +185,55 @@ describe('FederationMemberProfilePage', () => {
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith('/v2/federation/members/20?tenant_id=5', expect.any(Object));
     });
+  });
+
+  it('posts federation transfers with an Idempotency-Key header', async () => {
+    setupMocks();
+    vi.mocked(api.post).mockResolvedValue({ success: true, data: { transaction_id: 123 } });
+
+    render(<FederationMemberProfilePage />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Maria Green').length).toBeGreaterThanOrEqual(1);
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'member_profile.send_credits' }));
+    fireEvent.change(screen.getByLabelText('member_profile.amount_hours'), { target: { value: '2' } });
+    fireEvent.change(screen.getByLabelText('member_profile.description'), { target: { value: '  Helped with setup  ' } });
+    const sendButtons = screen.getAllByRole('button', { name: 'member_profile.send_credits' });
+    fireEvent.click(sendButtons[sendButtons.length - 1]);
+
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith(
+      '/v2/federation/transactions',
+      {
+        receiver_id: 20,
+        receiver_tenant_id: 5,
+        amount: 2,
+        description: 'Helped with setup',
+      },
+      { headers: { 'Idempotency-Key': expect.any(String) } },
+    ));
+  });
+
+  it('shows a translated pending toast for external transfer reconciliation', async () => {
+    setupMocks();
+    vi.mocked(api.post).mockResolvedValue({ success: true, data: { transaction_id: 123, status: 'pending' } });
+
+    render(<FederationMemberProfilePage />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Maria Green').length).toBeGreaterThanOrEqual(1);
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'member_profile.send_credits' }));
+    fireEvent.change(screen.getByLabelText('member_profile.amount_hours'), { target: { value: '2' } });
+    fireEvent.change(screen.getByLabelText('member_profile.description'), { target: { value: 'Helped with setup' } });
+    const sendButtons = screen.getAllByRole('button', { name: 'member_profile.send_credits' });
+    fireEvent.click(sendButtons[sendButtons.length - 1]);
+
+    await waitFor(() => expect(toastMock.info).toHaveBeenCalledWith(
+      'member_profile.tx_pending',
+      'member_profile.tx_pending_detail',
+    ));
   });
 });

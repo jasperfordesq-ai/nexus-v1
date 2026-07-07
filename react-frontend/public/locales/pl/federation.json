@@ -509,6 +509,8 @@
     "cancel": "Anulować",
     "tx_success": "Transakcja wysłana",
     "tx_success_detail": "{{amount}} hour(s) sent to {{name}}",
+    "tx_pending": "Transfer oczekuje",
+    "tx_pending_detail": "Uzgadniamy ten transfer z platformą partnerską użytkownika {{name}}. Ponowna próba nie utworzy drugiego obciążenia.",
     "tx_failed": "Transakcja nie powiodła się",
     "tx_unknown_error": "Nieznany błąd",
     "reach_local_only": "Tylko lokalnie",

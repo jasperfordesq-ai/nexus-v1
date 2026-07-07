@@ -49,16 +49,20 @@ class PartnerV1Controller extends BaseApiController
 
         $hasPii = in_array('users.pii', $this->scopes($request), true);
 
-        $columns = ['id', 'name', 'username', 'created_at', 'status'];
+        $columns = ['users.id', 'users.name', 'users.username', 'users.created_at', 'users.status'];
         if ($hasPii) {
-            $columns[] = 'email';
+            $columns[] = 'users.email';
         }
 
         $rows = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
+            ->join('federation_user_settings as fus', 'fus.user_id', '=', 'users.id')
+            ->where('users.tenant_id', $tenantId)
+            ->where('users.status', 'active')
+            ->where('fus.federation_optin', 1)
+            ->where('fus.profile_visible_federated', 1)
+            ->where('fus.appear_in_federated_search', 1)
             ->select($columns)
-            ->orderBy('id')
+            ->orderBy('users.id')
             ->offset($offset)
             ->limit($perPage)
             ->get()
@@ -66,8 +70,12 @@ class PartnerV1Controller extends BaseApiController
             ->all();
 
         $total = (int) DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
+            ->join('federation_user_settings as fus', 'fus.user_id', '=', 'users.id')
+            ->where('users.tenant_id', $tenantId)
+            ->where('users.status', 'active')
+            ->where('fus.federation_optin', 1)
+            ->where('fus.profile_visible_federated', 1)
+            ->where('fus.appear_in_federated_search', 1)
             ->count();
 
         return $this->respondWithPaginatedCollection($rows, $total, $page, $perPage);
@@ -78,19 +86,24 @@ class PartnerV1Controller extends BaseApiController
         $tenantId = TenantContext::getId();
         $hasPii = in_array('users.pii', $this->scopes($request), true);
 
-        $columns = ['id', 'name', 'username', 'created_at', 'status'];
+        $columns = ['users.id', 'users.name', 'users.username', 'users.created_at', 'users.status'];
         if ($hasPii) {
-            $columns[] = 'email';
+            $columns[] = 'users.email';
         }
 
         $user = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('id', $id)
+            ->join('federation_user_settings as fus', 'fus.user_id', '=', 'users.id')
+            ->where('users.tenant_id', $tenantId)
+            ->where('users.id', $id)
+            ->where('users.status', 'active')
+            ->where('fus.federation_optin', 1)
+            ->where('fus.profile_visible_federated', 1)
+            ->where('fus.appear_in_federated_search', 1)
             ->select($columns)
             ->first();
 
         if (! $user) {
-            return $this->respondNotFound('User not found.', 'USER_NOT_FOUND');
+            return $this->respondNotFound(__('api.partner_api_user_not_found'), 'USER_NOT_FOUND');
         }
 
         return $this->respondWithData(['user' => (array) $user]);
@@ -105,20 +118,30 @@ class PartnerV1Controller extends BaseApiController
         $perPage = min(100, max(1, (int) $request->query('per_page', 25)));
         $offset = ($page - 1) * $perPage;
 
-        $rows = DB::table('listings')
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
-            ->select(['id', 'user_id', 'title', 'type', 'created_at'])
-            ->orderBy('id', 'desc')
+        $rows = DB::table('listings as l')
+            ->join('federation_user_settings as fus', 'fus.user_id', '=', 'l.user_id')
+            ->where('l.tenant_id', $tenantId)
+            ->where('l.status', 'active')
+            ->whereIn('l.federated_visibility', ['listed', 'bookable'])
+            ->where('fus.federation_optin', 1)
+            ->where('fus.profile_visible_federated', 1)
+            ->where('fus.appear_in_federated_search', 1)
+            ->select(['l.id', 'l.user_id', 'l.title', 'l.type', 'l.created_at'])
+            ->orderBy('l.id', 'desc')
             ->offset($offset)
             ->limit($perPage)
             ->get()
             ->map(fn ($r) => (array) $r)
             ->all();
 
-        $total = (int) DB::table('listings')
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
+        $total = (int) DB::table('listings as l')
+            ->join('federation_user_settings as fus', 'fus.user_id', '=', 'l.user_id')
+            ->where('l.tenant_id', $tenantId)
+            ->where('l.status', 'active')
+            ->whereIn('l.federated_visibility', ['listed', 'bookable'])
+            ->where('fus.federation_optin', 1)
+            ->where('fus.profile_visible_federated', 1)
+            ->where('fus.appear_in_federated_search', 1)
             ->count();
 
         return $this->respondWithPaginatedCollection($rows, $total, $page, $perPage);
@@ -135,7 +158,7 @@ class PartnerV1Controller extends BaseApiController
             ->first();
 
         if (! $user) {
-            return $this->respondNotFound('User not found.', 'USER_NOT_FOUND');
+            return $this->respondNotFound(__('api.partner_api_user_not_found'), 'USER_NOT_FOUND');
         }
 
         return $this->respondWithData([

@@ -509,6 +509,8 @@
     "cancel": "キャンセル",
     "tx_success": "トランザクションが送信されました",
     "tx_success_detail": "{{amount}} hour(s) sent to {{name}}",
+    "tx_pending": "送信は保留中です",
+    "tx_pending_detail": "{{name}} のパートナープラットフォームとこの送信を照合しています。再試行しても二重に引き落とされることはありません。",
     "tx_failed": "トランザクションが失敗しました",
     "tx_unknown_error": "不明なエラー",
     "reach_local_only": "ローカルのみ",

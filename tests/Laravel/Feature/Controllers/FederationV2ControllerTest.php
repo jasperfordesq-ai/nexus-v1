@@ -12,6 +12,7 @@ use Tests\Laravel\TestCase;
 use Tests\Laravel\Concerns\FederationIntegrationHarness;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -235,6 +236,40 @@ class FederationV2ControllerTest extends TestCase
         $response = $this->apiGet('/v2/federation/listings');
 
         $response->assertStatus(401);
+    }
+
+    public function test_direct_external_member_search_requires_partner_allow_flag(): void
+    {
+        $this->enableFederationForTenant($this->testTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        $partner = $this->setupPartner('nexus', $this->testTenantId);
+        DB::table('federation_external_partners')
+            ->where('id', $partner->id)
+            ->update(['allow_member_search' => 0]);
+        Http::fake();
+
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->apiGet('/v2/federation/members?partner_id=ext-' . $partner->id);
+
+        $response->assertStatus(403);
+        Http::assertNothingSent();
+    }
+
+    public function test_direct_external_listing_search_requires_partner_allow_flag(): void
+    {
+        $this->enableFederationForTenant($this->testTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        $partner = $this->setupPartner('nexus', $this->testTenantId);
+        DB::table('federation_external_partners')
+            ->where('id', $partner->id)
+            ->update(['allow_listing_search' => 0]);
+        Http::fake();
+
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->apiGet('/v2/federation/listings?partner_id=ext-' . $partner->id);
+
+        $response->assertStatus(403);
+        Http::assertNothingSent();
     }
 
     // ------------------------------------------------------------------

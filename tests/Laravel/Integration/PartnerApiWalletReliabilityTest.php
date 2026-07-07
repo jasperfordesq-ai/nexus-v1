@@ -20,6 +20,104 @@ class PartnerApiWalletReliabilityTest extends TestCase
 {
     use DatabaseTransactions;
 
+    public function test_partner_api_users_respect_federation_visibility_and_consent(): void
+    {
+        $tenantId = $this->testTenantId;
+        $visible = User::factory()->forTenant($tenantId)->create([
+            'name' => 'Visible Partner API User',
+            'status' => 'active',
+        ]);
+        $hidden = User::factory()->forTenant($tenantId)->create([
+            'name' => 'Hidden Partner API User',
+            'status' => 'active',
+        ]);
+
+        $this->upsertFederationSettings((int) $visible->id, [
+            'federation_optin' => 1,
+            'profile_visible_federated' => 1,
+            'appear_in_federated_search' => 1,
+        ]);
+        $this->upsertFederationSettings((int) $hidden->id, [
+            'federation_optin' => 0,
+            'profile_visible_federated' => 0,
+            'appear_in_federated_search' => 0,
+        ]);
+
+        $response = TenantContext::runForTenant($tenantId, fn () => (new PartnerV1Controller())->listUsers(
+            $this->partnerRequest(['users.read', 'users.pii'])
+        ));
+        $payload = $response->getData(true);
+        $ids = array_column($payload['data'] ?? [], 'id');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertContains((int) $visible->id, $ids);
+        $this->assertNotContains((int) $hidden->id, $ids);
+    }
+
+    public function test_partner_api_listings_respect_owner_consent_and_listing_visibility(): void
+    {
+        $tenantId = $this->testTenantId;
+        $visibleOwner = User::factory()->forTenant($tenantId)->create(['status' => 'active']);
+        $hiddenOwner = User::factory()->forTenant($tenantId)->create(['status' => 'active']);
+        $this->upsertFederationSettings((int) $visibleOwner->id, [
+            'federation_optin' => 1,
+            'profile_visible_federated' => 1,
+            'appear_in_federated_search' => 1,
+        ]);
+        $this->upsertFederationSettings((int) $hiddenOwner->id, [
+            'federation_optin' => 0,
+            'profile_visible_federated' => 0,
+            'appear_in_federated_search' => 0,
+        ]);
+
+        $visibleListingId = (int) DB::table('listings')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $visibleOwner->id,
+            'title' => 'Federated partner listing',
+            'description' => 'Visible to partner APIs.',
+            'type' => 'offer',
+            'status' => 'active',
+            'federated_visibility' => 'listed',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('listings')->insert([
+            [
+                'tenant_id' => $tenantId,
+                'user_id' => $visibleOwner->id,
+                'title' => 'Private partner listing',
+                'description' => 'Not visible to partner APIs.',
+                'type' => 'offer',
+                'status' => 'active',
+                'federated_visibility' => 'none',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tenant_id' => $tenantId,
+                'user_id' => $hiddenOwner->id,
+                'title' => 'Hidden owner partner listing',
+                'description' => 'Owner opted out.',
+                'type' => 'offer',
+                'status' => 'active',
+                'federated_visibility' => 'listed',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        $response = TenantContext::runForTenant($tenantId, fn () => (new PartnerV1Controller())->listListings(
+            $this->partnerRequest(['listings.read'])
+        ));
+        $payload = $response->getData(true);
+        $ids = array_column($payload['data'] ?? [], 'id');
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertContains($visibleListingId, $ids);
+        $this->assertNotContains('Private partner listing', array_column($payload['data'] ?? [], 'title'));
+        $this->assertNotContains('Hidden owner partner listing', array_column($payload['data'] ?? [], 'title'));
+    }
+
     public function test_partner_wallet_balance_reads_live_user_balance(): void
     {
         $tenantId = $this->testTenantId;
@@ -137,6 +235,29 @@ class PartnerApiWalletReliabilityTest extends TestCase
         ]);
 
         return $request;
+    }
+
+    private function partnerRequest(array $scopes = []): Request
+    {
+        $request = Request::create('/api/partner/v1/users', 'GET');
+        $request->attributes->set('partner_scopes', $scopes);
+
+        return $request;
+    }
+
+    private function upsertFederationSettings(int $userId, array $overrides): void
+    {
+        DB::table('federation_user_settings')->updateOrInsert(
+            ['user_id' => $userId],
+            array_merge([
+                'federation_optin' => 1,
+                'profile_visible_federated' => 1,
+                'appear_in_federated_search' => 1,
+                'messaging_enabled_federated' => 1,
+                'transactions_enabled_federated' => 1,
+                'updated_at' => now(),
+            ], $overrides)
+        );
     }
 
     private function fakeMailer(): EmailDispatchService

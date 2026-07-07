@@ -152,6 +152,67 @@ final class FederationAggregateTest extends TestCase
         );
     }
 
+    public function test_low_volume_volunteering_and_partner_org_metrics_are_suppressed(): void
+    {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('vol_logs')) {
+            $this->markTestSkipped('vol_logs table is not available.');
+        }
+
+        $tenantId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'Aggregate Privacy Tenant',
+            'slug' => 'aggregate-privacy-' . substr(uniqid(), -8),
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $userId = (int) DB::table('users')->insertGetId([
+            'tenant_id' => $tenantId,
+            'name' => 'Aggregate Privacy User',
+            'email' => 'agg-privacy-' . uniqid('', true) . '@example.test',
+            'username' => 'agg_privacy_' . substr(md5(uniqid('', true)), 0, 10),
+            'status' => 'active',
+            'created_at' => now(),
+        ]);
+
+        foreach ([1, 2, 3] as $i) {
+            DB::table('vol_logs')->insert([
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'date_logged' => '2040-01-0' . $i,
+                'hours' => 1,
+                'status' => 'approved',
+                'created_at' => now(),
+            ]);
+        }
+
+        if (\Illuminate\Support\Facades\Schema::hasTable('vol_organizations')) {
+            foreach ([1, 2] as $i) {
+                DB::table('vol_organizations')->insert([
+                    'tenant_id' => $tenantId,
+                    'user_id' => $userId,
+                    'name' => 'Aggregate Privacy Org ' . $i,
+                    'status' => 'approved',
+                    'created_at' => now(),
+                ]);
+            }
+        }
+
+        TenantContext::setById($tenantId);
+        $payload = $this->service->compute('2040-01-01', '2040-01-31');
+        TenantContext::setById($this->testTenantId);
+
+        $this->assertNull($payload['hours']['total_approved']);
+        $this->assertTrue($payload['hours']['suppressed']);
+        $this->assertSame([], $payload['hours']['by_month']);
+        $this->assertSame(5, $payload['privacy']['suppression_threshold']);
+
+        if (\Illuminate\Support\Facades\Schema::hasTable('vol_organizations')) {
+            $this->assertNull($payload['partner_orgs']['count']);
+            $this->assertTrue($payload['partner_orgs']['suppressed']);
+            $this->assertSame('<5', $payload['partner_orgs']['bracket']);
+        }
+    }
+
     public function test_query_is_logged_to_audit_trail(): void
     {
         $this->service->setEnabled($this->testTenantId, true);

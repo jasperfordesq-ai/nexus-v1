@@ -142,8 +142,8 @@ const EMPTY_FORM: PartnerFormData = {
   oauth_client_id: '',
   oauth_client_secret: '',
   oauth_token_url: '',
-  allow_member_search: true,
-  allow_listing_search: true,
+  allow_member_search: false,
+  allow_listing_search: false,
   allow_messaging: false,
   allow_transactions: false,
   allow_events: false,
@@ -155,7 +155,7 @@ const EMPTY_FORM: PartnerFormData = {
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function ExternalPartners() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   usePageTitle(t('federation.page_title'));
   const toast = useToast();
 

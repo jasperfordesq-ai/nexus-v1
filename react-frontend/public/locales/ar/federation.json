@@ -509,6 +509,8 @@
     "cancel": "يلغي",
     "tx_success": "تم إرسال المعاملة",
     "tx_success_detail": "{{amount}} hour(s) sent to {{name}}",
+    "tx_pending": "التحويل قيد الانتظار",
+    "tx_pending_detail": "نقوم بتسوية هذا التحويل مع منصة الشريك الخاصة بـ {{name}}. لن تؤدي إعادة المحاولة إلى خصم ثانٍ.",
     "tx_failed": "فشلت المعاملة",
     "tx_unknown_error": "خطأ غير معروف",
     "reach_local_only": "محلي فقط",

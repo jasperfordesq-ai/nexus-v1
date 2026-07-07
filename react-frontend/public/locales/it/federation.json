@@ -509,6 +509,8 @@
     "cancel": "Cancellare",
     "tx_success": "Transazione inviata",
     "tx_success_detail": "{{amount}} hour(s) sent to {{name}}",
+    "tx_pending": "Trasferimento in sospeso",
+    "tx_pending_detail": "Stiamo riconciliando questo trasferimento con la piattaforma partner di {{name}}. Riprovare non creerà un secondo addebito.",
     "tx_failed": "Transazione fallita",
     "tx_unknown_error": "Errore sconosciuto",
     "reach_local_only": "Solo locale",

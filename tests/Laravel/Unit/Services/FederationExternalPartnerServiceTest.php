@@ -226,7 +226,7 @@ class FederationExternalPartnerServiceTest extends \Tests\Laravel\TestCase
             );
 
             $this->assertFalse($result['success']);
-            $this->assertEquals('Partner not found', $result['error']);
+            $this->assertEquals(__('api.external_partner_not_found'), $result['error']);
         } catch (\Exception $e) {
             $this->markTestSkipped('federation_external_partners table may not exist');
         }

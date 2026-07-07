@@ -509,6 +509,8 @@
     "cancel": "Stornieren",
     "tx_success": "Transaktion gesendet",
     "tx_success_detail": "{{amount}} hour(s) sent to {{name}}",
+    "tx_pending": "Transfer ausstehend",
+    "tx_pending_detail": "Wir gleichen diesen Transfer mit der Partnerplattform von {{name}} ab. Ein erneuter Versuch erstellt keine zweite Abbuchung.",
     "tx_failed": "Die Transaktion ist fehlgeschlagen",
     "tx_unknown_error": "Unbekannter Fehler",
     "reach_local_only": "Nur lokal",

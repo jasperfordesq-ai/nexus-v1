@@ -509,6 +509,8 @@
     "cancel": "Annuleren",
     "tx_success": "Transactie verzonden",
     "tx_success_detail": "{{amount}} hour(s) sent to {{name}}",
+    "tx_pending": "Overdracht in behandeling",
+    "tx_pending_detail": "We stemmen deze overdracht af met het partnerplatform van {{name}}. Opnieuw proberen maakt geen tweede afschrijving.",
     "tx_failed": "Transactie mislukt",
     "tx_unknown_error": "Onbekende fout",
     "reach_local_only": "Alleen lokaal",

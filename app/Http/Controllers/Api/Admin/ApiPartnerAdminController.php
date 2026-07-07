@@ -55,7 +55,7 @@ class ApiPartnerAdminController extends BaseApiController
             ->first();
 
         if (! $partner) {
-            return $this->respondNotFound('Partner not found.', 'PARTNER_NOT_FOUND');
+            return $this->respondNotFound(__('api.federation.partner_not_found'), 'PARTNER_NOT_FOUND');
         }
 
         $credentials = DB::table('api_partner_credentials')
@@ -78,7 +78,7 @@ class ApiPartnerAdminController extends BaseApiController
 
         $name = trim((string) $request->input('name', ''));
         if ($name === '') {
-            return $this->respondWithError('invalid_request', 'name is required.', 'name', 422);
+            return $this->respondWithError('invalid_request', __('api.name_required'), 'name', 422);
         }
 
         $slug = trim((string) $request->input('slug', ''));
@@ -130,7 +130,7 @@ class ApiPartnerAdminController extends BaseApiController
             ->where('id', $id)
             ->first();
         if (! $partner) {
-            return $this->respondNotFound('Partner not found.', 'PARTNER_NOT_FOUND');
+            return $this->respondNotFound(__('api.federation.partner_not_found'), 'PARTNER_NOT_FOUND');
         }
 
         $update = ['updated_at' => now()];
@@ -181,7 +181,7 @@ class ApiPartnerAdminController extends BaseApiController
             ->update(['status' => $status, 'updated_at' => now()]);
 
         if ($updated === 0) {
-            return $this->respondNotFound('Partner not found.', 'PARTNER_NOT_FOUND');
+            return $this->respondNotFound(__('api.federation.partner_not_found'), 'PARTNER_NOT_FOUND');
         }
 
         return $this->respondWithData(['partner_id' => $id, 'status' => $status]);
@@ -197,7 +197,7 @@ class ApiPartnerAdminController extends BaseApiController
             ->where('id', $id)
             ->first();
         if (! $partner) {
-            return $this->respondNotFound('Partner not found.', 'PARTNER_NOT_FOUND');
+            return $this->respondNotFound(__('api.federation.partner_not_found'), 'PARTNER_NOT_FOUND');
         }
 
         // Revoke all existing credentials AND outstanding tokens.
@@ -223,7 +223,7 @@ class ApiPartnerAdminController extends BaseApiController
             ->where('id', $id)
             ->first();
         if (! $partner) {
-            return $this->respondNotFound('Partner not found.', 'PARTNER_NOT_FOUND');
+            return $this->respondNotFound(__('api.federation.partner_not_found'), 'PARTNER_NOT_FOUND');
         }
 
         $page = max(1, (int) $request->query('page', 1));

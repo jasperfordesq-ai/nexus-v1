@@ -509,6 +509,8 @@
     "cancel": "Annuler",
     "tx_success": "Transaction envoyée",
     "tx_success_detail": "{{amount}} hour(s) sent to {{name}}",
+    "tx_pending": "Transfert en attente",
+    "tx_pending_detail": "Nous rapprochons ce transfert avec la plateforme partenaire de {{name}}. Réessayer ne créera pas un second débit.",
     "tx_failed": "La transaction a échoué",
     "tx_unknown_error": "Erreur inconnue",
     "reach_local_only": "Local uniquement",

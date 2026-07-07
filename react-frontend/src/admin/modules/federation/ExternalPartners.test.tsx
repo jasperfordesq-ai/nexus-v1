@@ -249,7 +249,14 @@ describe('ExternalPartners', () => {
       fireEvent.click(saveBtn);
       await waitFor(() => expect(mockApi.post).toHaveBeenCalledWith(
         '/v2/admin/federation/external-partners',
-        expect.objectContaining({ name: expect.any(String), base_url: expect.any(String) })
+        expect.objectContaining({
+          name: expect.any(String),
+          base_url: expect.any(String),
+          allow_member_search: false,
+          allow_listing_search: false,
+          allow_messaging: false,
+          allow_transactions: false,
+        })
       ));
     }
   });

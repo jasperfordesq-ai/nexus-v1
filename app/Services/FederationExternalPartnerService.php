@@ -161,11 +161,11 @@ class FederationExternalPartnerService
     {
         // Validate required fields
         if (empty($data['name'])) {
-            return ['success' => false, 'error' => 'Partner name is required'];
+            return ['success' => false, 'error' => __('api.name_required')];
         }
 
         if (empty($data['base_url'])) {
-            return ['success' => false, 'error' => 'Base URL is required'];
+            return ['success' => false, 'error' => __('api.valid_url_required')];
         }
 
         // SSRF protection: validate base_url is not an internal/private address
@@ -183,7 +183,7 @@ class FederationExternalPartnerService
 
         // Check URL uniqueness
         if (self::urlExists($data['base_url'], $tenantId)) {
-            return ['success' => false, 'error' => 'A partner with this URL already exists for this tenant'];
+            return ['success' => false, 'error' => __('api.external_partner_update_failed')];
         }
 
         try {
@@ -196,7 +196,7 @@ class FederationExternalPartnerService
             $validProtocols = ['nexus', 'timeoverflow', 'komunitin', 'credit_commons'];
             $protocolType = $data['protocol_type'] ?? 'nexus';
             if (!in_array($protocolType, $validProtocols, true)) {
-                return ['success' => false, 'error' => 'Invalid protocol_type. Must be one of: ' . implode(', ', $validProtocols)];
+                return ['success' => false, 'error' => __('api.invalid_status')];
             }
 
             DB::insert(
@@ -221,10 +221,10 @@ class FederationExternalPartnerService
                     $data['oauth_client_id'] ?? null,
                     $oauthClientSecret,
                     $data['oauth_token_url'] ?? null,
-                    (int) ($data['allow_member_search'] ?? 1),
-                    (int) ($data['allow_listing_search'] ?? 1),
-                    (int) ($data['allow_messaging'] ?? 1),
-                    (int) ($data['allow_transactions'] ?? 1),
+                    (int) ($data['allow_member_search'] ?? 0),
+                    (int) ($data['allow_listing_search'] ?? 0),
+                    (int) ($data['allow_messaging'] ?? 0),
+                    (int) ($data['allow_transactions'] ?? 0),
                     (int) ($data['allow_events'] ?? 0),
                     (int) ($data['allow_groups'] ?? 0),
                     (int) ($data['allow_connections'] ?? 0),
@@ -258,7 +258,7 @@ class FederationExternalPartnerService
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
             ]);
-            return ['success' => false, 'error' => 'Failed to create external partner: ' . $e->getMessage()];
+            return ['success' => false, 'error' => __('api.external_partner_create_failed')];
         }
     }
 
@@ -276,7 +276,7 @@ class FederationExternalPartnerService
         // Verify partner exists and belongs to tenant
         $existing = self::getById($id, $tenantId);
         if (!$existing) {
-            return ['success' => false, 'error' => 'Partner not found'];
+            return ['success' => false, 'error' => __('api.external_partner_not_found')];
         }
 
         // If base_url is being changed, validate and check uniqueness
@@ -286,7 +286,7 @@ class FederationExternalPartnerService
                 return ['success' => false, 'error' => $ssrfError];
             }
             if (self::urlExists($data['base_url'], $tenantId, $id)) {
-                return ['success' => false, 'error' => 'A partner with this URL already exists for this tenant'];
+                return ['success' => false, 'error' => __('api.external_partner_update_failed')];
             }
         }
 
@@ -299,19 +299,19 @@ class FederationExternalPartnerService
 
         // Validate status if provided
         if (array_key_exists('status', $data) && !in_array($data['status'], self::VALID_STATUSES, true)) {
-            return ['success' => false, 'error' => 'Invalid status value. Must be one of: ' . implode(', ', self::VALID_STATUSES)];
+            return ['success' => false, 'error' => __('api.invalid_status_allowed', ['statuses' => implode(', ', self::VALID_STATUSES)])];
         }
 
         // Validate auth_method if provided
         $validAuthMethods = ['api_key', 'hmac', 'oauth2'];
         if (array_key_exists('auth_method', $data) && !in_array($data['auth_method'], $validAuthMethods, true)) {
-            return ['success' => false, 'error' => 'Invalid auth_method. Must be one of: ' . implode(', ', $validAuthMethods)];
+            return ['success' => false, 'error' => __('api.invalid_status')];
         }
 
         // Validate protocol_type if provided
         $validProtocols = ['nexus', 'timeoverflow', 'komunitin', 'credit_commons'];
         if (array_key_exists('protocol_type', $data) && !in_array($data['protocol_type'], $validProtocols, true)) {
-            return ['success' => false, 'error' => 'Invalid protocol_type. Must be one of: ' . implode(', ', $validProtocols)];
+            return ['success' => false, 'error' => __('api.invalid_status')];
         }
 
         try {
@@ -343,7 +343,7 @@ class FederationExternalPartnerService
             }
 
             if (empty($sets)) {
-                return ['success' => false, 'error' => 'No fields to update'];
+                return ['success' => false, 'error' => __('api.no_fields_to_update')];
             }
 
             $sets[] = "updated_at = NOW()";
@@ -377,7 +377,7 @@ class FederationExternalPartnerService
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
             ]);
-            return ['success' => false, 'error' => 'Failed to update external partner: ' . $e->getMessage()];
+            return ['success' => false, 'error' => __('api.external_partner_update_failed')];
         }
     }
 
@@ -394,7 +394,7 @@ class FederationExternalPartnerService
         // Verify partner exists and belongs to tenant
         $existing = self::getById($id, $tenantId);
         if (!$existing) {
-            return ['success' => false, 'error' => 'Partner not found'];
+            return ['success' => false, 'error' => __('api.external_partner_not_found')];
         }
 
         try {
@@ -476,7 +476,7 @@ class FederationExternalPartnerService
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
             ]);
-            return ['success' => false, 'error' => 'Failed to delete external partner: ' . $e->getMessage()];
+            return ['success' => false, 'error' => __('api.external_partner_delete_failed')];
         }
     }
 
@@ -494,14 +494,14 @@ class FederationExternalPartnerService
         if (!in_array($status, self::VALID_STATUSES, true)) {
             return [
                 'success' => false,
-                'error' => 'Invalid status. Must be one of: ' . implode(', ', self::VALID_STATUSES),
+                'error' => __('api.invalid_status_allowed', ['statuses' => implode(', ', self::VALID_STATUSES)]),
             ];
         }
 
         // Verify partner exists and belongs to tenant
         $existing = self::getById($id, $tenantId);
         if (!$existing) {
-            return ['success' => false, 'error' => 'Partner not found'];
+            return ['success' => false, 'error' => __('api.external_partner_not_found')];
         }
 
         try {
@@ -535,7 +535,7 @@ class FederationExternalPartnerService
                 'tenant_id' => $tenantId,
                 'error' => $e->getMessage(),
             ]);
-            return ['success' => false, 'error' => 'Failed to update partner status: ' . $e->getMessage()];
+            return ['success' => false, 'error' => __('api.external_partner_update_failed')];
         }
     }
 
@@ -751,19 +751,19 @@ class FederationExternalPartnerService
         $parsed = parse_url($url);
 
         if (!$parsed || empty($parsed['scheme']) || empty($parsed['host'])) {
-            return 'Invalid URL format';
+            return __('api.valid_url_required');
         }
 
         if (!in_array($parsed['scheme'], ['https', 'http'], true)) {
-            return 'URL scheme must be http or https';
+            return __('api.url_http_https_only');
         }
 
         if ($requireHttps && strtolower((string) $parsed['scheme']) !== 'https') {
-            return 'URL scheme must be https';
+            return __('api.url_must_use_https');
         }
 
         if (! OutboundUrlGuard::isSafeHttpUrl($url, $requireHttps)) {
-            return 'URL resolves to a private, reserved, or unresolvable host';
+            return __('api.url_no_private_ip');
         }
 
         return null;

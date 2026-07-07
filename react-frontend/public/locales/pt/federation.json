@@ -509,6 +509,8 @@
     "cancel": "Cancelar",
     "tx_success": "Transação enviada",
     "tx_success_detail": "{{amount}} hour(s) sent to {{name}}",
+    "tx_pending": "Transferência pendente",
+    "tx_pending_detail": "Estamos reconciliando esta transferência com a plataforma parceira de {{name}}. Tentar novamente não criará um segundo débito.",
     "tx_failed": "Falha na transação",
     "tx_unknown_error": "Erro desconhecido",
     "reach_local_only": "Somente locais",
