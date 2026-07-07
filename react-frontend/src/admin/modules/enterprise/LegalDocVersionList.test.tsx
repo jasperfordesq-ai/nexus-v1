@@ -160,10 +160,9 @@ describe('LegalDocVersionList', () => {
     render(<LegalDocVersionList />);
 
     await waitFor(() => {
-      const btn = screen.getAllByRole('button').find((b) =>
-        b.textContent?.toLowerCase().includes('new') || b.textContent?.toLowerCase().includes('creat')
-      );
+      const btn = screen.getByRole('button', { name: /create new version/i });
       expect(btn).toBeInTheDocument();
+      expect(screen.queryByText('enterprise.create_new_version')).not.toBeInTheDocument();
     });
   });
 
@@ -173,11 +172,8 @@ describe('LegalDocVersionList', () => {
 
     await waitFor(() => screen.getAllByRole('button'));
 
-    const createBtn = screen.getAllByRole('button').find((b) =>
-      b.textContent?.toLowerCase().includes('new') || b.textContent?.toLowerCase().includes('creat')
-    );
-    expect(createBtn).toBeTruthy();
-    fireEvent.click(createBtn!);
+    const createBtn = screen.getByRole('button', { name: /create new version/i });
+    fireEvent.click(createBtn);
     expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/legal-documents/5/versions/new'));
   });
 

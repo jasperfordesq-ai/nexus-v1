@@ -29,7 +29,7 @@ import { useAdminPageMeta } from '../../AdminMetaContext';
 
 
 export default function LegalDocVersionList() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   useAdminPageMeta({ title: t('enterprise.legal_versions_title') });
 
   const { id } = useParams<{ id: string }>();
@@ -187,7 +187,7 @@ export default function LegalDocVersionList() {
             startContent={<Plus size={18} />}
             onPress={() => navigate(tenantPath(`/admin/legal-documents/${documentId}/versions/new`))}
           >
-            {t('enterprise.create_new_version')}
+            {t('legal_versions.create_new_version')}
           </Button>
           <Button
             variant="secondary"
