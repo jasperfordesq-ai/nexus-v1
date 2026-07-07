@@ -1980,6 +1980,7 @@ return [
     'shift_swap_target_not_signed_up' => 'Der Zielbenutzer ist für die angefragte Schicht nicht angemeldet',
     'shift_swap_shifts_not_found' => 'Eine oder beide Schichten wurden nicht gefunden',
     'shift_swap_shift_started' => 'Bereits begonnene Schichten können nicht getauscht werden',
+    'shift_swap_different_opportunity' => 'Beide Schichten müssen zur selben Gelegenheit gehören',
     'shift_swap_already_exists' => 'Für diese Schichten existiert bereits eine Tauschanfrage',
     'shift_swap_create_failed' => 'Tauschanfrage konnte nicht erstellt werden',
     'shift_swap_not_found_or_processed' => 'Tauschanfrage nicht gefunden oder bereits bearbeitet',

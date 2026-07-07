@@ -1980,6 +1980,7 @@ return [
     'shift_swap_target_not_signed_up' => 'المستخدم المستهدف غير مسجّل في المناوبة المطلوبة',
     'shift_swap_shifts_not_found' => 'لم يتم العثور على إحدى المناوبتين أو كلتيهما',
     'shift_swap_shift_started' => 'لا يمكن تبديل مناوبات بدأت بالفعل',
+    'shift_swap_different_opportunity' => 'يجب أن تنتمي كلتا الورديتين إلى نفس الفرصة',
     'shift_swap_already_exists' => 'يوجد بالفعل طلب تبديل لهاتين المناوبتين',
     'shift_swap_create_failed' => 'فشل إنشاء طلب التبديل',
     'shift_swap_not_found_or_processed' => 'لم يتم العثور على طلب التبديل أو تمت معالجته بالفعل',

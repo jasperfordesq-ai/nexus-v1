@@ -50,7 +50,9 @@
         </dl>
     @endif
 
-    @if ((int) ($organisation['id'] ?? 0) > 0)
+    @if ((int) ($organisation['id'] ?? 0) > 0 && \App\Core\TenantContext::hasFeature('job_vacancies'))
+        {{-- The jobs listing route 403s when job_vacancies is disabled, so only
+             surface the link on tenants that actually have the feature. --}}
         <p class="govuk-body">
             <a class="govuk-link" href="{{ route('govuk-alpha.organisations.jobs', ['tenantSlug' => $tenantSlug, 'id' => (int) $organisation['id']]) }}">{{ __('govuk_alpha_organisations.nav.jobs') }}</a>
         </p>

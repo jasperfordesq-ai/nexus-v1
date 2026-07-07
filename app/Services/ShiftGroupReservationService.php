@@ -186,6 +186,18 @@ class ShiftGroupReservationService
             return false;
         }
 
+        // The member being added must be a real user of THIS tenant. Without this
+        // guard a leader could add an arbitrary user id — including one from another
+        // tenant, which then leaked that user's name/avatar through the roster join.
+        $targetIsTenantUser = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->exists();
+        if (! $targetIsTenantUser) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.invalid_user')];
+            return false;
+        }
+
         try {
             return DB::transaction(function () use ($reservationId, $userId, $tenantId) {
                 // Lock the reservation row so concurrent addMember calls can't
@@ -391,7 +403,12 @@ class ShiftGroupReservationService
                 // nested {user: {...}} shape rendered blank member lists).
                 $memberRows = DB::table('vol_shift_group_members as gm')
                     ->join('vol_shift_group_reservations as r', 'gm.reservation_id', '=', 'r.id')
-                    ->join('users as u', 'gm.user_id', '=', 'u.id')
+                    ->join('users as u', function ($join) use ($tenantId) {
+                        // Tenant-scope the users join so a stray cross-tenant member
+                        // row can never leak another tenant's name/avatar.
+                        $join->on('gm.user_id', '=', 'u.id')
+                             ->where('u.tenant_id', '=', $tenantId);
+                    })
                     ->where('gm.reservation_id', $row->id)
                     ->where('r.tenant_id', $tenantId)
                     ->orderBy('gm.created_at')

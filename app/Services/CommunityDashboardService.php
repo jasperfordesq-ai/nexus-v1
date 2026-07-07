@@ -313,7 +313,7 @@ class CommunityDashboardService
 
         // Volunteer hours
         $volHours = (float) VolLog::where('tenant_id', $tenantId)
-            ->where('user_id', $userId)->where('status', 'verified')->sum('hours');
+            ->where('user_id', $userId)->where('status', 'approved')->sum('hours');
         if ($volHours > 0) {
             $milestones[] = [
                 'type' => 'volunteer',
@@ -337,7 +337,7 @@ class CommunityDashboardService
             'total_listings' => (int) Listing::where('tenant_id', $tenantId)
                 ->where('user_id', $userId)->count(),
             'volunteer_hours' => round((float) VolLog::where('tenant_id', $tenantId)
-                ->where('user_id', $userId)->where('status', 'verified')->sum('hours'), 1),
+                ->where('user_id', $userId)->where('status', 'approved')->sum('hours'), 1),
             'total_connections' => (int) Connection::where('tenant_id', $tenantId)
                 ->where('status', 'accepted')
                 ->where(function ($q) use ($userId) {

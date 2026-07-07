@@ -1980,6 +1980,7 @@ return [
     'shift_swap_target_not_signed_up' => 'De doelgebruiker is niet ingeschreven voor de gevraagde dienst',
     'shift_swap_shifts_not_found' => 'Eén of beide diensten niet gevonden',
     'shift_swap_shift_started' => 'Diensten die al zijn begonnen kunnen niet worden geruild',
+    'shift_swap_different_opportunity' => 'Beide diensten moeten bij dezelfde kans horen',
     'shift_swap_already_exists' => 'Er bestaat al een ruilverzoek voor deze diensten',
     'shift_swap_create_failed' => 'Aanmaken van het ruilverzoek is mislukt',
     'shift_swap_not_found_or_processed' => 'Ruilverzoek niet gevonden of al verwerkt',

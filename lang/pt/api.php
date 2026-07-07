@@ -1980,6 +1980,7 @@ return [
     'shift_swap_target_not_signed_up' => 'O utilizador de destino não está inscrito no turno solicitado',
     'shift_swap_shifts_not_found' => 'Um ou ambos os turnos não foram encontrados',
     'shift_swap_shift_started' => 'Não é possível trocar turnos que já começaram',
+    'shift_swap_different_opportunity' => 'Ambos os turnos devem pertencer à mesma oportunidade',
     'shift_swap_already_exists' => 'Já existe um pedido de troca para estes turnos',
     'shift_swap_create_failed' => 'Não foi possível criar o pedido de troca',
     'shift_swap_not_found_or_processed' => 'Pedido de troca não encontrado ou já processado',

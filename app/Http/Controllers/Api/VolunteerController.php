@@ -151,6 +151,14 @@ class VolunteerController extends BaseApiController
         }
         if ($this->input('is_remote') !== null) $data['is_remote'] = $this->inputBool('is_remote');
         if ($this->input('category_id') !== null) $data['category_id'] = $this->inputInt('category_id') ?: null;
+        // Geo-coordinates are validated by UpdateOpportunityRequest and supported by
+        // the service, but were previously never forwarded — editing an opportunity
+        // silently wiped its lat/lng. Pass them through as numeric (never trimmed).
+        foreach (['latitude', 'longitude'] as $geoField) {
+            if ($this->input($geoField) !== null) {
+                $data[$geoField] = $this->input($geoField) === '' ? null : $this->input($geoField);
+            }
+        }
         if ($this->input('federated_visibility') !== null) $data['federated_visibility'] = $this->input('federated_visibility');
 
         $success = $this->volunteerService->updateOpportunity((int) $id, $userId, $data);
@@ -375,7 +383,9 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_my_shifts', 60, 60);
-        $shifts = $this->volunteerService->getMyShifts($userId);
+        $filters = ['limit' => $this->queryInt('per_page', 20, 1, 50)];
+        if ($this->query('cursor')) $filters['cursor'] = $this->query('cursor');
+        $shifts = $this->volunteerService->getMyShifts($userId, $filters);
         return $this->respondWithData($shifts);
     }
 
@@ -488,7 +498,9 @@ class VolunteerController extends BaseApiController
         $this->ensureFeature();
         $userId = $this->getUserId();
         $this->rateLimit('volunteering_my_hours', 60, 60);
-        $hours = $this->volunteerService->getMyHours($userId);
+        $filters = ['limit' => $this->queryInt('per_page', 20, 1, 50)];
+        if ($this->query('cursor')) $filters['cursor'] = $this->query('cursor');
+        $hours = $this->volunteerService->getMyHours($userId, $filters);
         return $this->respondWithData($hours);
     }
 

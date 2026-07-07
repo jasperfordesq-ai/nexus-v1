@@ -1980,6 +1980,7 @@ return [
     'shift_swap_target_not_signed_up' => 'Docelowy użytkownik nie jest zapisany na żądaną zmianę',
     'shift_swap_shifts_not_found' => 'Nie znaleziono jednej lub obu zmian',
     'shift_swap_shift_started' => 'Nie można wymieniać zmian, które już się rozpoczęły',
+    'shift_swap_different_opportunity' => 'Obie zmiany muszą należeć do tej samej okazji',
     'shift_swap_already_exists' => 'Wniosek o wymianę dla tych zmian już istnieje',
     'shift_swap_create_failed' => 'Nie udało się utworzyć wniosku o wymianę',
     'shift_swap_not_found_or_processed' => 'Nie znaleziono wniosku o wymianę lub został już przetworzony',

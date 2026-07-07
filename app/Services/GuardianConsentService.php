@@ -167,6 +167,10 @@ class GuardianConsentService
             // Don't fail the request — consent record is still created
         }
 
+        // SECURITY: never return the consent_token to the requester. The requester
+        // is the MINOR; handing them the token would let them open the public verify
+        // page and grant their own guardian consent, defeating the safeguarding gate.
+        // The token is delivered only in the email to the guardian's address above.
         return [
             'id' => $id,
             'minor_user_id' => $minorUserId,
@@ -174,7 +178,6 @@ class GuardianConsentService
             'guardian_email' => $guardianData['guardian_email'],
             'relationship' => $guardianData['relationship'],
             'opportunity_id' => $opportunityId,
-            'consent_token' => $consentToken,
             'status' => 'pending',
             'expires_at' => $expiresAt,
         ];

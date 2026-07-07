@@ -48,7 +48,15 @@ class RecurringShiftService
         );
 
         if (!$opp) {
-            $this->errors[] = 'Opportunity not found';
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.opportunity_not_found')];
+            return null;
+        }
+
+        // Only the opportunity creator, the owning org's owner/admins, or a site
+        // admin may manage its recurring patterns. Previously ANY tenant member
+        // could create patterns for any opportunity.
+        if (!VolunteerService::userCanManageOpportunityById($opportunityId, $createdBy)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.forbidden')];
             return null;
         }
 
@@ -56,14 +64,14 @@ class RecurringShiftService
         $frequency = $data['frequency'] ?? 'weekly';
         $validFrequencies = ['daily', 'weekly', 'biweekly', 'monthly'];
         if (!in_array($frequency, $validFrequencies, true)) {
-            $this->errors[] = 'Invalid frequency. Must be one of: ' . implode(', ', $validFrequencies);
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.invalid_frequency')];
             return null;
         }
 
         $startTime = $data['start_time'] ?? null;
         $endTime = $data['end_time'] ?? null;
         if (!$startTime || !$endTime) {
-            $this->errors[] = 'Start time and end time are required';
+            $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.invalid_input')];
             return null;
         }
 
@@ -109,7 +117,7 @@ class RecurringShiftService
             return $patternId;
         } catch (\Exception $e) {
             Log::error('[RecurringShift] createPattern failed', ['error' => $e->getMessage()]);
-            $this->errors[] = 'Failed to create recurring shift pattern';
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.server_error')];
             return null;
         }
     }
@@ -129,7 +137,7 @@ class RecurringShiftService
             );
 
             if (!$pattern) {
-                $this->errors[] = 'Pattern not found or inactive';
+                $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.not_found')];
                 return 0;
             }
 
@@ -230,7 +238,7 @@ class RecurringShiftService
             return $generated;
         } catch (\Exception $e) {
             Log::error('[RecurringShift] generateOccurrences failed', ['error' => $e->getMessage()]);
-            $this->errors[] = 'Failed to generate occurrences';
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.server_error')];
             return 0;
         }
     }
@@ -269,7 +277,7 @@ class RecurringShiftService
             return $results;
         } catch (\Exception $e) {
             Log::error('[RecurringShift] processAllPatterns failed', ['error' => $e->getMessage()]);
-            $this->errors[] = 'Failed to process patterns';
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.server_error')];
             return $results;
         }
     }
@@ -321,7 +329,7 @@ class RecurringShiftService
             }, $rows);
         } catch (\Exception $e) {
             Log::error('[RecurringShift] getPatternsForOpportunity failed', ['error' => $e->getMessage()]);
-            $this->errors[] = 'Failed to load patterns';
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.server_error')];
             return [];
         }
     }
@@ -386,12 +394,18 @@ class RecurringShiftService
         $tenantId = TenantContext::getId();
 
         $pattern = DB::selectOne(
-            "SELECT id, created_by FROM recurring_shift_patterns WHERE id = ? AND tenant_id = ?",
+            "SELECT id, created_by, opportunity_id FROM recurring_shift_patterns WHERE id = ? AND tenant_id = ?",
             [$patternId, $tenantId]
         );
 
         if (!$pattern) {
-            $this->errors[] = 'Pattern not found';
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.not_found')];
+            return false;
+        }
+
+        // Only managers of the owning opportunity may edit its patterns.
+        if (!VolunteerService::userCanManageOpportunityById((int) $pattern->opportunity_id, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.forbidden')];
             return false;
         }
 
@@ -415,7 +429,7 @@ class RecurringShiftService
                 if ($field === 'frequency') {
                     $validFrequencies = ['daily', 'weekly', 'biweekly', 'monthly'];
                     if (!in_array($data[$field], $validFrequencies, true)) {
-                        $this->errors[] = 'Invalid frequency';
+                        $this->errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.invalid_frequency')];
                         return false;
                     }
                 }
@@ -446,7 +460,7 @@ class RecurringShiftService
             return true;
         } catch (\Exception $e) {
             Log::error('[RecurringShift] updatePattern failed', ['error' => $e->getMessage()]);
-            $this->errors[] = 'Failed to update pattern';
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.server_error')];
             return false;
         }
     }
@@ -459,22 +473,32 @@ class RecurringShiftService
         $this->errors = [];
         $tenantId = TenantContext::getId();
 
+        $pattern = DB::selectOne(
+            "SELECT id, opportunity_id FROM recurring_shift_patterns WHERE id = ? AND tenant_id = ?",
+            [$patternId, $tenantId]
+        );
+        if (!$pattern) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.not_found')];
+            return false;
+        }
+
+        // Only managers of the owning opportunity may deactivate its patterns.
+        if (!VolunteerService::userCanManageOpportunityById((int) $pattern->opportunity_id, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.forbidden')];
+            return false;
+        }
+
         try {
-            $updated = DB::update(
+            DB::update(
                 "UPDATE recurring_shift_patterns SET is_active = 0, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
                 [$patternId, $tenantId]
             );
-
-            if ($updated === 0) {
-                $this->errors[] = 'Pattern not found';
-                return false;
-            }
 
             Log::info('[RecurringShift] Pattern deactivated', ['id' => $patternId, 'by' => $userId]);
             return true;
         } catch (\Exception $e) {
             Log::error('[RecurringShift] deactivatePattern failed', ['error' => $e->getMessage()]);
-            $this->errors[] = 'Failed to deactivate pattern';
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.server_error')];
             return false;
         }
     }
@@ -487,6 +511,21 @@ class RecurringShiftService
     {
         $this->errors = [];
         $tenantId = TenantContext::getId();
+
+        $pattern = DB::selectOne(
+            "SELECT id, opportunity_id FROM recurring_shift_patterns WHERE id = ? AND tenant_id = ?",
+            [$patternId, $tenantId]
+        );
+        if (!$pattern) {
+            $this->errors[] = ['code' => 'NOT_FOUND', 'message' => __('api.not_found')];
+            return 0;
+        }
+
+        // Only managers of the owning opportunity may delete its generated shifts.
+        if (!VolunteerService::userCanManageOpportunityById((int) $pattern->opportunity_id, $userId)) {
+            $this->errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.forbidden')];
+            return 0;
+        }
 
         try {
             $deleted = DB::delete(
@@ -504,7 +543,7 @@ class RecurringShiftService
             return $deleted;
         } catch (\Exception $e) {
             Log::error('[RecurringShift] deleteFutureShifts failed', ['error' => $e->getMessage()]);
-            $this->errors[] = 'Failed to delete future shifts';
+            $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.server_error')];
             return 0;
         }
     }

@@ -1980,6 +1980,7 @@ return [
     'shift_swap_target_not_signed_up' => 'L\'utilisateur cible n\'est pas inscrit au créneau demandé',
     'shift_swap_shifts_not_found' => 'Un des créneaux ou les deux sont introuvables',
     'shift_swap_shift_started' => 'Impossible d\'échanger des créneaux déjà commencés',
+    'shift_swap_different_opportunity' => 'Les deux créneaux doivent appartenir à la même mission',
     'shift_swap_already_exists' => 'Une demande d\'échange existe déjà pour ces créneaux',
     'shift_swap_create_failed' => 'Échec de la création de la demande d\'échange',
     'shift_swap_not_found_or_processed' => 'Demande d\'échange introuvable ou déjà traitée',

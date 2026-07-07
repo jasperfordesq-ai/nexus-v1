@@ -1980,6 +1980,7 @@ return [
     'shift_swap_target_not_signed_up' => 'Níl an sprioc-úsáideoir cláraithe don seal iarrtha',
     'shift_swap_shifts_not_found' => 'Níor aimsíodh ceann amháin nó an dá sheal',
     'shift_swap_shift_started' => 'Ní féidir sealanna atá tosaithe cheana a mhalartú',
+    'shift_swap_different_opportunity' => 'Ní mór don dá sheal a bheith ag baint leis an deis chéanna',
     'shift_swap_already_exists' => 'Tá iarratas malartaithe ann cheana do na sealanna seo',
     'shift_swap_create_failed' => 'Theip ar an iarratas malartaithe a chruthú',
     'shift_swap_not_found_or_processed' => 'Níor aimsíodh an t-iarratas malartaithe nó próiseáladh cheana é',

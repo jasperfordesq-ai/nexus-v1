@@ -526,8 +526,11 @@ trait VolunteeringParity
             'start_date' => self::asStr($request->input('start_date')) ?: null,
             'end_date' => self::asStr($request->input('end_date')) ?: null,
             'category_id' => $categoryId > 0 ? $categoryId : null,
+            // The service only accepts 'listed'/'none' (see sanitizeFederatedVisibility
+            // + UpdateOpportunityRequest in:none,listed). 'network'/'local' were
+            // silently sanitized away, so the federation-share checkbox never worked.
             'federated_visibility' => $request->input('federated_visibility') === '1' || $request->boolean('federated_visibility')
-                ? 'network' : 'local',
+                ? 'listed' : 'none',
         ];
 
         $opportunity = null;

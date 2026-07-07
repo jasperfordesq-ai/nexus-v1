@@ -313,10 +313,25 @@ class SafeguardingService
                 ->map(fn ($row) => (array) $row)
                 ->all();
 
-            return ['items' => $items, 'total' => $total, 'page' => $page, 'per_page' => $perPage];
+            // Status counts across ALL tenant records (not just the current page)
+            // so the admin stat cards reflect real totals under pagination.
+            $statusCounts = DB::table('vol_safeguarding_training')
+                ->where('tenant_id', $tenantId)
+                ->selectRaw('status, COUNT(*) as c')
+                ->groupBy('status')
+                ->pluck('c', 'status');
+
+            $stats = [
+                'total_submissions'    => $total,
+                'pending_verification' => (int) ($statusCounts['pending'] ?? 0),
+                'verified'             => (int) ($statusCounts['verified'] ?? 0),
+                'expired'              => (int) ($statusCounts['expired'] ?? 0),
+            ];
+
+            return ['items' => $items, 'stats' => $stats, 'total' => $total, 'page' => $page, 'per_page' => $perPage];
         } catch (\Throwable $e) {
             Log::error('SafeguardingService::getTrainingForAdmin error: ' . $e->getMessage());
-            return ['items' => [], 'total' => 0, 'page' => $page, 'per_page' => $perPage];
+            return ['items' => [], 'stats' => ['total_submissions' => 0, 'pending_verification' => 0, 'verified' => 0, 'expired' => 0], 'total' => 0, 'page' => $page, 'per_page' => $perPage];
         }
     }
 

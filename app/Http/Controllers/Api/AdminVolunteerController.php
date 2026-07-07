@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\VolLogStatusChanged;
 use App\Services\VolunteerService;
 use App\Services\VolunteerReminderService;
 use Illuminate\Http\JsonResponse;
@@ -447,6 +448,17 @@ class AdminVolunteerController extends BaseApiController
             // without minting again or sending a duplicate notification.
             if ($alreadyProcessed) {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.only_pending_can_be_verified'), null, 422);
+            }
+
+            // Notify the reward/feed/regional-points cascade of the status change.
+            // Mirrors VolunteerService::verifyHours() so admin-panel approvals award
+            // XP and volunteering badges and post feed activity just like the member
+            // self-verify path (previously they did neither).
+            try {
+                VolLogStatusChanged::dispatch($tenantId, (int) $id, 'pending', $newStatus);
+            } catch (\Throwable $e) {
+                // Event dispatch failure must not break the parent flow.
+                Log::warning('AdminVolunteerController: VolLogStatusChanged dispatch failed: ' . $e->getMessage());
             }
 
             // Send hours approved/declined notification after the data mutation.
@@ -1138,9 +1150,9 @@ class AdminVolunteerController extends BaseApiController
                 "UPDATE vol_organizations SET status = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
                 [$status, $id, $tenantId]
             );
-
             app(\App\Services\PrerenderContentInvalidator::class)
                 ->refreshVolunteerOrganisation((int) $tenantId, (int) $id);
+
             return $this->respondWithData([
                 'id' => $id,
                 'status' => $status,

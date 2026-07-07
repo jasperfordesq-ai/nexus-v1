@@ -129,7 +129,9 @@ class GuardianConsentServiceTest extends TestCase
         $this->assertEquals(5, $result['id']);
         $this->assertEquals('pending', $result['status']);
         $this->assertEquals('Parent Name', $result['guardian_name']);
-        $this->assertNotEmpty($result['consent_token']);
+        // SECURITY: the consent token must NOT be returned to the requesting minor;
+        // it is delivered only to the guardian via email.
+        $this->assertArrayNotHasKey('consent_token', $result);
         $this->assertEquals(10, $result['opportunity_id']);
     }
 

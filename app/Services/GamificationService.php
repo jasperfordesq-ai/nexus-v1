@@ -879,7 +879,7 @@ class GamificationService
     private static function checkVolunteeringBadges(int $userId): void
     {
         $totalHours = (int) VolLog::where('user_id', $userId)
-            ->where('status', 'verified')
+            ->where('status', 'approved')
             ->sum('hours');
 
         foreach (self::getBadgeDefinitions() as $def) {
@@ -1366,7 +1366,7 @@ class GamificationService
             'reciprocity' => 0, 'community_champion' => 0,
         ];
 
-        try { $stats['vol'] = (int) VolLog::where('user_id', $userId)->where('status', 'verified')->sum('hours'); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[vol] failed', ['error' => $e->getMessage()]); }
+        try { $stats['vol'] = (int) VolLog::where('user_id', $userId)->where('status', 'approved')->sum('hours'); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[vol] failed', ['error' => $e->getMessage()]); }
         // Batch: listings table (2 → 1 query)
         try {
             $listingCounts = Listing::where('user_id', $userId)

@@ -1980,6 +1980,7 @@ return [
     'shift_swap_target_not_signed_up' => '相手のユーザーは希望のシフトに登録していません',
     'shift_swap_shifts_not_found' => '一方または両方のシフトが見つかりません',
     'shift_swap_shift_started' => 'すでに開始したシフトは交代できません',
+    'shift_swap_different_opportunity' => '両方のシフトは同じ機会に属している必要があります',
     'shift_swap_already_exists' => 'これらのシフトの交代リクエストはすでに存在します',
     'shift_swap_create_failed' => '交代リクエストの作成に失敗しました',
     'shift_swap_not_found_or_processed' => '交代リクエストが見つからないか、すでに処理されています',

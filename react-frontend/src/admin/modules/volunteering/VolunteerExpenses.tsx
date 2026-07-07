@@ -85,16 +85,29 @@ function parsePayload<T>(raw: unknown): T {
   return raw as T;
 }
 
+/**
+ * Coerce a monetary value to a number. MySQL DECIMAL columns serialize as JSON
+ * strings (e.g. "12.00"), so `amount` arrives as a string at runtime despite the
+ * `number` type — calling `.toFixed()` on it throws and `+=` concatenates.
+ */
+function toNum(value: unknown): number {
+  const n = typeof value === 'number' ? value : parseFloat(String(value ?? ''));
+  return Number.isFinite(n) ? n : 0;
+}
+
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export function VolunteerExpenses() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.expenses_page_title'));
   const toast = useToast();
 
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [stats, setStats] = useState<ExpenseStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
   // Review modal
@@ -127,23 +140,40 @@ export function VolunteerExpenses() {
 
   // ── Data loading ───────────────────────────────────────────────────────────
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
+  const loadData = useCallback(async (opts?: { cursor?: string; append?: boolean }) => {
+    const append = opts?.append ?? false;
+    if (append) setLoadingMore(true); else setLoading(true);
     try {
-      const res = await adminVolunteering.getExpenses();
+      const res = await adminVolunteering.getExpenses(opts?.cursor);
       if (res.success && res.data) {
-        const payload = parsePayload<{ items?: Expense[]; expenses?: Expense[]; stats?: ExpenseStats } | Expense[]>(res.data);
+        const payload = parsePayload<{ items?: Expense[]; expenses?: Expense[]; stats?: ExpenseStats; cursor?: string | null; has_more?: boolean } | Expense[]>(res.data);
         const rows = Array.isArray(payload) ? payload : payload.items || payload.expenses || [];
-        setExpenses(rows);
-        setStats(Array.isArray(payload) ? null : payload.stats || null);
+        setExpenses((prev) => (append ? [...prev, ...rows] : rows));
+        if (Array.isArray(payload)) {
+          if (!append) setStats(null);
+          setCursor(null);
+          setHasMore(false);
+        } else {
+          if (!append) setStats(payload.stats || null);
+          setCursor(payload.cursor ?? null);
+          setHasMore(Boolean(payload.has_more));
+        }
       }
     } catch {
       toast.error(t('volunteering.failed_to_load_expenses'));
-      setExpenses([]);
-      setStats(null);
+      if (!append) {
+        setExpenses([]);
+        setStats(null);
+        setCursor(null);
+        setHasMore(false);
+      }
     }
-    setLoading(false);
+    if (append) setLoadingMore(false); else setLoading(false);
   }, [toast, t]);
+
+  const loadMore = useCallback(() => {
+    if (cursor) loadData({ cursor, append: true });
+  }, [cursor, loadData]);
 
 
   const loadPolicies = useCallback(async () => {
@@ -189,10 +219,11 @@ export function VolunteerExpenses() {
       const orgName = item.organization_name || t('volunteering.unknown_org');
       if (!map.has(orgName)) map.set(orgName, { total: 0, count: 0, pending: 0, approved: 0 });
       const entry = map.get(orgName)!;
-      entry.total += item.amount;
+      const amount = toNum(item.amount);
+      entry.total += amount;
       entry.count += 1;
-      if (item.status === 'pending') entry.pending += item.amount;
-      if (item.status === 'approved' || item.status === 'paid') entry.approved += item.amount;
+      if (item.status === 'pending') entry.pending += amount;
+      if (item.status === 'approved' || item.status === 'paid') entry.approved += amount;
     });
     return Array.from(map.entries())
       .map(([name, data]) => ({ name, ...data }))
@@ -317,7 +348,7 @@ export function VolunteerExpenses() {
       sortable: true,
       render: (item) => (
         <span className="font-semibold">
-          {item.currency || '\u20AC'}{item.amount.toFixed(2)}
+          {item.currency || '\u20AC'}{toNum(item.amount).toFixed(2)}
         </span>
       ),
     },
@@ -410,7 +441,7 @@ export function VolunteerExpenses() {
             <Button
               variant="tertiary"
               startContent={<RefreshCw aria-hidden="true" size={16} />}
-              onPress={loadData}
+              onPress={() => loadData()}
               isLoading={loading}
             >
               {t('volunteering.refresh')}
@@ -490,7 +521,20 @@ export function VolunteerExpenses() {
           description={t('volunteering.no_expenses_desc')}
         />
       ) : (
-        <DataTable columns={columns} data={filteredExpenses} isLoading={loading} onRefresh={loadData} />
+        <>
+          <DataTable columns={columns} data={filteredExpenses} isLoading={loading} onRefresh={() => loadData()} />
+          {hasMore && (
+            <div className="flex justify-center pt-2">
+              <Button
+                variant="tertiary"
+                onPress={loadMore}
+                isLoading={loadingMore}
+              >
+                {t('volunteering.load_more')}
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Per-org expense breakdown */}
@@ -632,7 +676,7 @@ export function VolunteerExpenses() {
                   </div>
                   <div>
                     <span className="text-muted/80">{t('volunteering.col_amount')}:</span>
-                    <p className="font-semibold">{reviewExpense.currency || '\u20AC'}{reviewExpense.amount.toFixed(2)}</p>
+                    <p className="font-semibold">{reviewExpense.currency || '\u20AC'}{toNum(reviewExpense.amount).toFixed(2)}</p>
                   </div>
                   <div>
                     <span className="text-muted/80">{t('volunteering.col_type')}:</span>

@@ -94,6 +94,14 @@ class ShiftSwapService
             return null;
         }
 
+        // Both shifts must belong to the same opportunity. Swapping across
+        // opportunities would move a volunteer onto a shift of an opportunity they
+        // were never approved for, bypassing per-opportunity application approval.
+        if ((int) $fromShift->opportunity_id !== (int) $toShift->opportunity_id) {
+            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_swap_different_opportunity')];
+            return null;
+        }
+
         if ($fromShift->start_time->isPast() || $toShift->start_time->isPast()) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.shift_swap_shift_started')];
             return null;

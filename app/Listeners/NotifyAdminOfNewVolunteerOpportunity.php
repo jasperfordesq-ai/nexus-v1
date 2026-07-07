@@ -64,11 +64,13 @@ class NotifyAdminOfNewVolunteerOpportunity implements ShouldQueue
 
                 $oppTitle = $opportunity->title ?? __('emails_misc.admin_notify.new_vol_opp_fallback_title');
 
-                // Load the poster's name
+                // Load the poster's name. vol_opportunities stores the poster in
+                // created_by (there is no user_id column), so reading user_id always
+                // fell through to the fallback name.
                 $posterName = __('emails.common.fallback_member_name');
-                if (!empty($opportunity->user_id)) {
+                if (!empty($opportunity->created_by)) {
                     $poster = DB::table('users')
-                        ->where('id', $opportunity->user_id)
+                        ->where('id', $opportunity->created_by)
                         ->where('tenant_id', $event->tenantId)
                         ->select(['first_name', 'last_name', 'name'])
                         ->first();

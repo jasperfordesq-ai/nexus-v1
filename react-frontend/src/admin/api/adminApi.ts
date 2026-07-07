@@ -1392,7 +1392,8 @@ export const adminVolunteering = {
   },
 
   // Expenses
-  getExpenses: () => api.get('/v2/admin/volunteering/expenses'),
+  getExpenses: (cursor?: string) =>
+    api.get('/v2/admin/volunteering/expenses' + (cursor ? `?cursor=${encodeURIComponent(cursor)}` : '')),
   reviewExpense: (id: number, data: { status: string; review_notes?: string; payment_reference?: string }) =>
     api.put(`/v2/admin/volunteering/expenses/${id}`, data),
   exportExpenses: (filename?: string) => api.download('/v2/admin/volunteering/expenses/export', { filename }),

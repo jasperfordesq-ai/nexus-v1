@@ -161,6 +161,11 @@ class NotificationDispatcher
             'vol_application_approved',
             'vol_application_declined',
             'vol_hours_approved',
+            // A waitlist spot offer is time-sensitive (the offer expires and passes
+            // to the next person). It was previously neither instant nor a curated
+            // push type, so with the default 'off' digest it reached nobody by email
+            // OR push. Marking it instant delivers both (push uses the generic title).
+            'vol_waitlist_spot',
         ];
         if (in_array($activityType, $criticalInstantTypes, true)) {
             $frequency = 'instant';
@@ -2768,7 +2773,11 @@ HTML;
         $volHoursPaidBody = __('emails_notifications.volunteering.hours_paid_body');
         $volLabelHoursApproved = __('emails_notifications.volunteering.label_hours_approved');
         $volLabelCreditsEarned = __('emails_notifications.volunteering.label_credits_earned');
-        $volHoursPaidDetail = __('emails_notifications.volunteering.hours_paid_detail', ['org' => "<strong>{$orgNameHtml}</strong>", 'hours' => "<strong>{$hours} time credits</strong>"]);
+        // The translated hours_paid_detail template already contains the
+        // "time credits" wording around the :hours placeholder, so pass only the
+        // number — appending "time credits" here duplicated it in English and
+        // injected untranslated English into every other locale.
+        $volHoursPaidDetail = __('emails_notifications.volunteering.hours_paid_detail', ['org' => "<strong>{$orgNameHtml}</strong>", 'hours' => "<strong>{$hours}</strong>"]);
         $volBtnViewWallet = __('emails_notifications.volunteering.btn_view_wallet');
 
         return <<<HTML

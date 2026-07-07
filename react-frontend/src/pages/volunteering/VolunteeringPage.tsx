@@ -1111,7 +1111,7 @@ function ApplicationsTab() {
             <EmptyState
               icon={<Send className="w-12 h-12" aria-hidden="true" />}
               title={t('no_applications')}
-              description={statusFilter ? t('no_status_applications', { status: statusFilter }) : t('no_applications_yet')}
+              description={statusFilter ? t('no_status_applications', { status: t(`status_${statusFilter}`, { defaultValue: statusFilter }) }) : t('no_applications_yet')}
               action={!statusFilter ? (
                 <Button
                   as={Link}

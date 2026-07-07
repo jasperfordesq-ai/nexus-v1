@@ -65,10 +65,37 @@ function parsePayload<T>(raw: unknown): T {
   return raw as T;
 }
 
+/**
+ * Normalize a raw training row to the component's shape. The backend selects
+ * `st.*` from vol_safeguarding_training (columns user_name, completed_at,
+ * expires_at, certificate_reference), which does NOT match the field names this
+ * component reads — previously the volunteer name, dates and certificate all
+ * rendered blank. Accept both spellings so either envelope works.
+ */
+function normalizeTraining(row: Record<string, unknown>): TrainingRecord {
+  const val = (...keys: string[]): unknown => {
+    for (const k of keys) {
+      if (row[k] !== undefined && row[k] !== null) return row[k];
+    }
+    return undefined;
+  };
+  return {
+    id: Number(val('id') ?? 0),
+    user_id: Number(val('user_id') ?? 0),
+    volunteer_name: String(val('volunteer_name', 'user_name') ?? ''),
+    training_type: (val('training_type') as TrainingRecord['training_type']) ?? 'other',
+    completed_date: String(val('completed_date', 'completed_at') ?? ''),
+    expires_date: (val('expires_date', 'expires_at') as string | null) ?? null,
+    certificate_ref: String(val('certificate_ref', 'certificate_reference') ?? ''),
+    status: (val('status') as TrainingRecord['status']) ?? 'pending',
+    description: (val('description', 'notes') as string | undefined) ?? undefined,
+  };
+}
+
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export function VolunteerTraining() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.training_page_title'));
   const toast = useToast();
 
@@ -92,8 +119,9 @@ export function VolunteerTraining() {
     try {
       const res = await adminVolunteering.getTraining();
       if (res.success && res.data) {
-        const payload = parsePayload<{ items?: TrainingRecord[]; records?: TrainingRecord[]; stats?: TrainingStats } | TrainingRecord[]>(res.data);
-        const rows = Array.isArray(payload) ? payload : payload.items || payload.records || [];
+        const payload = parsePayload<{ items?: Record<string, unknown>[]; records?: Record<string, unknown>[]; stats?: TrainingStats } | Record<string, unknown>[]>(res.data);
+        const rawRows = Array.isArray(payload) ? payload : payload.items || payload.records || [];
+        const rows = rawRows.map(normalizeTraining);
         setRecords(rows);
         setStats(Array.isArray(payload) ? null : payload.stats || null);
       }

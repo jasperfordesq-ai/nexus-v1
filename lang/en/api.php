@@ -2576,6 +2576,7 @@ return [
     'shift_swap_target_not_signed_up' => 'Target user is not signed up for the requested shift',
     'shift_swap_shifts_not_found' => 'One or both shifts not found',
     'shift_swap_shift_started' => 'Cannot swap shifts that have already started',
+    'shift_swap_different_opportunity' => 'Both shifts must belong to the same opportunity',
     'shift_swap_already_exists' => 'A swap request already exists for these shifts',
     'shift_swap_create_failed' => 'Failed to create swap request',
     'shift_swap_not_found_or_processed' => 'Swap request not found or already processed',

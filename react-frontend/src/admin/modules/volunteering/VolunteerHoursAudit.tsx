@@ -33,6 +33,16 @@ import { useTranslation } from 'react-i18next';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+/**
+ * Coerce a numeric value to a number. MySQL DECIMAL columns (vol_logs.hours,
+ * vol_org_transactions.amount) serialize as JSON strings, so `hours`/`paid_amount`
+ * arrive as strings at runtime — `.toFixed()` throws and `+` concatenates.
+ */
+function toNum(value: unknown): number {
+  const n = typeof value === 'number' ? value : parseFloat(String(value ?? ''));
+  return Number.isFinite(n) ? n : 0;
+}
+
 // Prefix cells that spreadsheet apps would treat as formulas (=, +, -, @)
 // so member-supplied text can't execute when the CSV is opened in Excel.
 function csvCell(value: unknown): string {
@@ -84,7 +94,7 @@ const STATUS_COLORS: Record<string, 'success' | 'danger' | 'warning' | 'default'
 };
 
 export function VolunteerHoursAudit() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.hours_audit_title'));
   const toast = useToast();
 
@@ -570,7 +580,7 @@ export function VolunteerHoursAudit() {
                         <TableCell>{entry.org_name || '--'}</TableCell>
                         <TableCell className="font-mono">{entry.hours}</TableCell>
                         <TableCell className="font-mono text-success">
-                          {entry.paid_amount > 0 ? entry.paid_amount.toFixed(2) : '--'}
+                          {toNum(entry.paid_amount) > 0 ? toNum(entry.paid_amount).toFixed(2) : '--'}
                         </TableCell>
                         <TableCell className="text-muted">
                           {entry.created_at ? new Date(entry.created_at).toLocaleDateString() : '--'}
@@ -582,10 +592,10 @@ export function VolunteerHoursAudit() {
                 <div className="mt-3 grid grid-cols-1 gap-2 border-t border-divider pt-3 text-sm sm:grid-cols-[1fr_auto_auto] sm:items-center">
                   <span className="font-semibold">{t('volunteering.total')}</span>
                   <span className="font-mono font-semibold">
-                    {paidEntries.reduce((sum, e) => sum + e.hours, 0)}
+                    {Number(paidEntries.reduce((sum, e) => sum + toNum(e.hours), 0).toFixed(2))}
                   </span>
                   <span className="font-mono font-semibold text-success">
-                    {paidEntries.reduce((sum, e) => sum + (e.paid_amount || 0), 0).toFixed(2)}
+                    {paidEntries.reduce((sum, e) => sum + toNum(e.paid_amount), 0).toFixed(2)}
                   </span>
                 </div>
               </div>

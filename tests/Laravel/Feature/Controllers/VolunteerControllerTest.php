@@ -237,15 +237,15 @@ public function test_apply_requires_auth(): void
 
     public function test_auto_approved_hours_with_auto_pay_credit_wallets_and_write_audit_entries(): void
     {
-        $this->markTestSkipped(
-            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
-        );
-
         $owner = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
         $volunteer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 3]);
         $orgId = $this->createVolunteerOrganisation($owner->id, 20.00, true);
         $this->addVolunteerToOrganisation($volunteer->id, $orgId);
         $this->setCaringWorkflowApprovalRequired(false);
+
+        // User::factory()->forTenant() drifts TenantContext to tenant 1; re-pin it
+        // so the direct (non-HTTP) service call scopes to the test tenant.
+        TenantContext::setById($this->testTenantId);
 
         $logId = VolunteerService::logHours($volunteer->id, [
             'organization_id' => $orgId,
@@ -276,17 +276,22 @@ public function test_apply_requires_auth(): void
         $this->assertSame(2, (int) $walletTransaction->amount);
     }
 
-    public function test_auto_approved_hours_with_insufficient_org_balance_stay_approved_without_wallet_credit(): void
+    public function test_auto_approved_hours_with_insufficient_org_balance_still_credit_volunteer_and_go_negative(): void
     {
-        $this->markTestSkipped(
-            'Quarantine [isolation-debt]: order-dependent — passes in full-suite run order, fails when run in a sharded subset under CI. Re-enable after fixing test isolation. Tracked in PR #130.'
-        );
-
+        // Credit conservation: approved hours are ALWAYS minted to the volunteer,
+        // even when the org wallet is short — the org wallet is a reconciliation
+        // figure, not a spending limit, and is allowed to go negative. This mirrors
+        // verifyHours(). Previously the auto-pay path silently skipped payment on
+        // insufficient balance, permanently stranding the volunteer's hours unpaid.
         $owner = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
         $volunteer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 1]);
         $orgId = $this->createVolunteerOrganisation($owner->id, 1.00, true);
         $this->addVolunteerToOrganisation($volunteer->id, $orgId);
         $this->setCaringWorkflowApprovalRequired(false);
+
+        // User::factory()->forTenant() drifts TenantContext to tenant 1; re-pin it
+        // so the direct (non-HTTP) service call scopes to the test tenant.
+        TenantContext::setById($this->testTenantId);
 
         $logId = VolunteerService::logHours($volunteer->id, [
             'organization_id' => $orgId,
@@ -297,10 +302,20 @@ public function test_apply_requires_auth(): void
 
         $this->assertNotNull($logId);
         $this->assertSame('approved', DB::table('vol_logs')->where('id', $logId)->value('status'));
-        $this->assertEquals(1.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
-        $this->assertEquals(1, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
-        $this->assertSame(0, DB::table('vol_org_transactions')->where('vol_log_id', $logId)->count());
-        $this->assertSame(0, DB::table('transactions')->where('receiver_id', $volunteer->id)->where('transaction_type', 'volunteer')->count());
+        // floor(3.00) = 3 minted to the volunteer; org wallet 1.00 - 3 = -2.00.
+        $this->assertEquals(-2.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertEquals(4, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
+
+        $orgTransaction = DB::table('vol_org_transactions')->where('vol_log_id', $logId)->first();
+        $this->assertNotNull($orgTransaction);
+        $this->assertSame('volunteer_payment', $orgTransaction->type);
+        $this->assertEquals(-3.00, (float) $orgTransaction->amount);
+        $this->assertEquals(-2.00, (float) $orgTransaction->balance_after);
+
+        $this->assertSame(1, DB::table('transactions')
+            ->where('receiver_id', $volunteer->id)
+            ->where('transaction_type', 'volunteer')
+            ->count());
     }
 
     // ------------------------------------------------------------------
@@ -698,5 +713,71 @@ public function test_apply_requires_auth(): void
         $response = $this->apiPut('/v2/volunteering/hours/1/verify', []);
 
         $response->assertStatus(422);
+    }
+
+    // ------------------------------------------------------------------
+    //  POST /v2/volunteering/organisations/{id}/wallet/deposit
+    //  (money-moving endpoint — authorization + conservation)
+    // ------------------------------------------------------------------
+
+    public function test_org_wallet_deposit_moves_credits_from_owner_to_org(): void
+    {
+        $this->enableVolunteeringFeature();
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true, 'balance' => 10,
+        ]);
+        Sanctum::actingAs($owner, ['*']);
+        $orgId = $this->createVolunteerOrganisation($owner->id, 5.00, false);
+
+        $response = $this->apiPost("/v2/volunteering/organisations/{$orgId}/wallet/deposit", ['amount' => 4]);
+
+        $response->assertStatus(200);
+        // Conservation: the owner loses exactly what the org gains (whole credits).
+        $this->assertEquals(9.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertEquals(6, (int) DB::table('users')->where('id', $owner->id)->value('balance'));
+        $this->assertSame(1, DB::table('vol_org_transactions')
+            ->where('vol_organization_id', $orgId)->where('type', 'deposit')->count());
+    }
+
+    public function test_org_wallet_deposit_forbidden_for_non_manager(): void
+    {
+        $this->enableVolunteeringFeature();
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true, 'balance' => 0,
+        ]);
+        $orgId = $this->createVolunteerOrganisation($owner->id, 5.00, false);
+
+        // A different authenticated user who is neither owner, org admin, nor site admin.
+        $outsider = $this->authenticatedUser();
+        DB::table('users')->where('id', $outsider->id)->update(['balance' => 10]);
+
+        $response = $this->apiPost("/v2/volunteering/organisations/{$orgId}/wallet/deposit", ['amount' => 4]);
+
+        $response->assertStatus(403);
+        // No credits moved for a forbidden request.
+        $this->assertEquals(5.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertEquals(10, (int) DB::table('users')->where('id', $outsider->id)->value('balance'));
+    }
+
+    public function test_org_wallet_deposit_requires_auth(): void
+    {
+        $response = $this->apiPost('/v2/volunteering/organisations/1/wallet/deposit', ['amount' => 4]);
+
+        $response->assertStatus(401);
+    }
+
+    public function test_org_wallet_deposit_rejects_non_positive_amount(): void
+    {
+        $this->enableVolunteeringFeature();
+        $owner = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'is_approved' => true, 'balance' => 10,
+        ]);
+        Sanctum::actingAs($owner, ['*']);
+        $orgId = $this->createVolunteerOrganisation($owner->id, 5.00, false);
+
+        $response = $this->apiPost("/v2/volunteering/organisations/{$orgId}/wallet/deposit", ['amount' => 0]);
+
+        $response->assertStatus(400);
+        $this->assertEquals(5.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
     }
 }

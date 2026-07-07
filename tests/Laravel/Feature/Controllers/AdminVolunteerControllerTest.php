@@ -200,4 +200,91 @@ class AdminVolunteerControllerTest extends TestCase
         $this->assertEquals(8.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
         $this->assertSame(1, DB::table('vol_org_transactions')->where('vol_log_id', $logId)->where('type', 'volunteer_payment')->count());
     }
+
+    // ================================================================
+    // ADJUST ORG WALLET — PUT /v2/admin/volunteering/organizations/{id}/wallet/adjust
+    // Money-moving admin endpoint: authorization + conservation + guards.
+    // ================================================================
+
+    private function createAdjustableOrg(int $ownerId, float $balance): int
+    {
+        return (int) DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $ownerId,
+            'name' => 'Adjust Org',
+            'slug' => 'adjust-org-' . uniqid(),
+            'description' => 'Organisation used for admin wallet-adjust coverage.',
+            'status' => 'active',
+            'auto_pay_enabled' => 0,
+            'balance' => $balance,
+            'created_at' => now(),
+        ]);
+    }
+
+    public function test_admin_adjust_org_wallet_topup_increases_balance(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+        TenantContext::setById($this->testTenantId);
+        $orgId = $this->createAdjustableOrg($admin->id, 5.00);
+
+        $response = $this->apiPut("/v2/admin/volunteering/organizations/{$orgId}/wallet/adjust", [
+            'amount' => 10,
+            'reason' => 'Grant top-up',
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals(15.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertSame(1, DB::table('vol_org_transactions')
+            ->where('vol_organization_id', $orgId)->where('type', 'admin_adjustment')->count());
+    }
+
+    public function test_admin_adjust_org_wallet_forbidden_for_regular_member(): void
+    {
+        $member = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($member);
+        TenantContext::setById($this->testTenantId);
+        $orgId = $this->createAdjustableOrg($member->id, 5.00);
+
+        $response = $this->apiPut("/v2/admin/volunteering/organizations/{$orgId}/wallet/adjust", [
+            'amount' => 10,
+            'reason' => 'Should be blocked',
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertEquals(5.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+    }
+
+    public function test_admin_adjust_org_wallet_rejects_zero_amount(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+        TenantContext::setById($this->testTenantId);
+        $orgId = $this->createAdjustableOrg($admin->id, 5.00);
+
+        $response = $this->apiPut("/v2/admin/volunteering/organizations/{$orgId}/wallet/adjust", [
+            'amount' => 0,
+            'reason' => 'No-op',
+        ]);
+
+        $response->assertStatus(400);
+    }
+
+    public function test_admin_adjust_org_wallet_blocks_negative_result(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+        TenantContext::setById($this->testTenantId);
+        $orgId = $this->createAdjustableOrg($admin->id, 5.00);
+
+        // Deducting more than the balance would drive the wallet negative — the
+        // admin-adjustment path (unlike the auto-mint path) blocks that.
+        $response = $this->apiPut("/v2/admin/volunteering/organizations/{$orgId}/wallet/adjust", [
+            'amount' => -10,
+            'reason' => 'Over-deduct',
+        ]);
+
+        $response->assertStatus(400);
+        $this->assertEquals(5.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+    }
 }

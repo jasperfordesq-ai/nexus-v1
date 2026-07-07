@@ -2301,6 +2301,44 @@ class AlphaController extends Controller
             }
         }
 
+        // Notify the applicant of the decision — parity with the React API path
+        // (VolunteerController::handleApplication). Previously the accessible
+        // approve/decline flow updated the record but never told the volunteer.
+        if ($ok) {
+            try {
+                $tenantId = TenantContext::getId();
+                $application = \App\Models\VolApplication::where('tenant_id', $tenantId)->find($appId);
+                if ($application && $application->user_id) {
+                    $opportunityId = (int) $application->opportunity_id;
+                    $opportunity = \App\Models\VolOpportunity::where('tenant_id', $tenantId)->find($opportunityId);
+                    $applicant = \App\Models\User::find((int) $application->user_id);
+                    \App\I18n\LocaleContext::withLocale($applicant, function () use ($application, $opportunity, $opportunityId, $action) {
+                        $oppTitle = $opportunity->title ?? __('notifications.vol_application_fallback_opportunity');
+                        if ($action === 'approve') {
+                            $message = __('notifications.vol_application_approved_body', ['title' => $oppTitle]);
+                            $notifType = 'vol_application_approved';
+                            $htmlContent = \App\Services\NotificationDispatcher::buildVolApplicationApprovedEmail($oppTitle, $opportunityId);
+                        } else {
+                            $message = __('notifications.vol_application_declined_body', ['title' => $oppTitle]);
+                            $notifType = 'vol_application_declined';
+                            $htmlContent = \App\Services\NotificationDispatcher::buildVolApplicationDeclinedEmail($oppTitle);
+                        }
+                        \App\Services\NotificationDispatcher::dispatch(
+                            (int) $application->user_id,
+                            'global',
+                            0,
+                            $notifType,
+                            $message,
+                            "/volunteering/opportunities/{$opportunityId}",
+                            $htmlContent
+                        );
+                    });
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+        }
+
         $status = $ok
             ? ($action === 'approve' ? 'application-approved' : 'application-declined')
             : 'application-failed';

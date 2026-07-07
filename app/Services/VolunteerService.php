@@ -1649,6 +1649,19 @@ class VolunteerService
 
             self::$lastLogStatus = $status;
 
+            // Auto-approved logs (trusted reviewers / no-verification tenants) skip
+            // the verify endpoint entirely. Dispatch the same status-change event the
+            // verify path fires so XP, volunteering badges and feed activity are
+            // awarded consistently across ALL approval paths (previously the
+            // auto-approve path awarded none of them).
+            if ($status === 'approved' && $logId !== null) {
+                try {
+                    VolLogStatusChanged::dispatch($tenantId, (int) $logId, 'pending', 'approved');
+                } catch (\Throwable $eventEx) {
+                    Log::warning('VolunteerService::logHours VolLogStatusChanged dispatch failed: ' . $eventEx->getMessage());
+                }
+            }
+
             return $logId;
         } catch (\Exception $e) {
             Log::warning("VolunteerService::logHours error: " . $e->getMessage());
@@ -2394,6 +2407,42 @@ class VolunteerService
         return $orgRole && in_array($orgRole->role, ['owner', 'admin'], true);
     }
 
+    /**
+     * Public, tenant-scoped authorization gate: may $userId manage the given
+     * opportunity (create/edit/delete its shifts and recurring patterns)?
+     *
+     * Grants to the opportunity creator, the owning organisation's owner, an
+     * active owner/admin member of that organisation, or a site admin. Returns
+     * false for a missing/cross-tenant opportunity. Used by RecurringShiftService
+     * (which previously had NO permission check on any of its endpoints).
+     */
+    public static function userCanManageOpportunityById(int $opportunityId, int $userId): bool
+    {
+        $tenantId = self::getTenantId();
+
+        $opp = DB::selectOne(
+            "SELECT o.id, o.created_by, o.organization_id, org.user_id AS org_owner_id
+             FROM vol_opportunities o
+             LEFT JOIN vol_organizations org
+                    ON org.id = o.organization_id AND org.tenant_id = o.tenant_id
+             WHERE o.id = ? AND o.tenant_id = ?",
+            [$opportunityId, $tenantId]
+        );
+
+        if (!$opp) {
+            return false;
+        }
+
+        if ((int) ($opp->created_by ?? 0) === $userId) {
+            return true;
+        }
+
+        return self::canManageOpportunity([
+            'org_owner_id'    => (int) ($opp->org_owner_id ?? 0),
+            'organization_id' => (int) ($opp->organization_id ?? 0),
+        ], $userId);
+    }
+
     private static function canManageOrganization(array $org, int $userId): bool
     {
         if ((int) ($org['user_id'] ?? 0) === $userId) {
@@ -2513,16 +2562,21 @@ class VolunteerService
             [$organizationId, $tenantId]
         );
 
-        if (!$orgLocked || (float) $orgLocked->balance < $orgDebit) {
-            return 'insufficient_balance';
+        if (!$orgLocked) {
+            return 'no_org';
         }
 
-        if ($orgDebit > 0) {
-            DB::update(
-                "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
-                [$orgDebit, $organizationId, $tenantId]
-            );
-        }
+        // Debit the org wallet UNCONDITIONALLY — allow it to go NEGATIVE. The org
+        // wallet is a reconciliation figure, not a spending limit; approved hours
+        // are always minted (classic timebanking), mirroring verifyHours() and
+        // AdminVolunteerController::verifyHours(). Previously this path returned
+        // 'insufficient_balance' and paid nothing, silently leaving the volunteer's
+        // approved hours permanently unpaid (the log is committed 'approved' and
+        // verifyHours only reprocesses 'pending' logs, so they were never paid).
+        DB::update(
+            "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
+            [$orgDebit, $organizationId, $tenantId]
+        );
         $newOrgBalance = (float) $orgLocked->balance - $orgDebit;
 
         if ($intHours > 0) {
