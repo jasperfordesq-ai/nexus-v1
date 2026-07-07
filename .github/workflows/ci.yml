@@ -450,6 +450,7 @@ jobs:
   react-build:
     name: React Build & Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 35
     needs: changes
     if: needs.changes.outputs.frontend == 'true' || github.event_name == 'workflow_dispatch'
 
