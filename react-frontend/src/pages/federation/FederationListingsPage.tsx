@@ -1,8 +1,9 @@
-import { Autocomplete, AutocompleteItem, GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, SearchField, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+
+import { Autocomplete, AutocompleteItem, GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, SearchField, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton } from '@/components/ui';
 
 /**
  * Federation Listings Page - Browse listings from partner communities
@@ -95,7 +96,7 @@ export function FederationListingsPage() {
     return `/federation/members/${listing.author.id}${tenantParam}`;
   }, []);
 
-  // ── Debounce search ──────────────────────────────────────────────────────
+  // â”€â”€ Debounce search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     searchTimeoutRef.current = setTimeout(() => {
@@ -107,7 +108,7 @@ export function FederationListingsPage() {
     };
   }, [searchQuery]);
 
-  // ── Load partners for dropdown ───────────────────────────────────────────
+  // â”€â”€ Load partners for dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const loadPartners = useCallback(async () => {
     try {
       const response = await api.get<FederationPartner[]>('/v2/federation/partners');
@@ -123,7 +124,7 @@ export function FederationListingsPage() {
     loadPartners();
   }, [loadPartners]);
 
-  // ── Load listings ────────────────────────────────────────────────────────
+  // â”€â”€ Load listings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const loadListings = useCallback(
     async (append = false) => {
       abortRef.current?.abort();
@@ -274,7 +275,7 @@ export function FederationListingsPage() {
           </Autocomplete>
         </div>
 
-        {/* Type filter — single-select ToggleButtonGroup */}
+        {/* Type filter â€” single-select ToggleButtonGroup */}
         <ToggleButtonGroup
           aria-label={t('listings.filter_by_type')}
           selectionMode="single"
@@ -584,9 +585,9 @@ export function FederationListingsPage() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Federated Listing Card
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface FederatedListingCardProps {
   listing: FederatedListing;

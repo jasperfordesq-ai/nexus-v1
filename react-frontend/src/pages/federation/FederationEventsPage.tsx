@@ -1,8 +1,9 @@
-import { Autocomplete, AutocompleteItem, GlassCard, Button, Chip, SearchField, Avatar, MediaRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+
+import { Autocomplete, AutocompleteItem, GlassCard, Button, Chip, SearchField, Avatar, MediaRowsSkeleton } from '@/components/ui';
 
 /**
  * Federation Events Page - Browse events from partner communities
@@ -78,7 +79,7 @@ export function FederationEventsPage() {
   toastRef.current = toast;
   const loadEventsRef = useRef<(append?: boolean) => Promise<void>>(null!);
 
-  // ── Debounce search ──────────────────────────────────────────────────────
+  // â”€â”€ Debounce search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     searchTimeoutRef.current = setTimeout(() => {
@@ -90,7 +91,7 @@ export function FederationEventsPage() {
     };
   }, [searchQuery]);
 
-  // ── Load partners for dropdown ───────────────────────────────────────────
+  // â”€â”€ Load partners for dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const loadPartners = useCallback(async () => {
     try {
       const response = await api.get<FederationPartner[]>('/v2/federation/partners');
@@ -106,7 +107,7 @@ export function FederationEventsPage() {
     loadPartners();
   }, [loadPartners]);
 
-  // ── Load events ──────────────────────────────────────────────────────────
+  // â”€â”€ Load events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const loadEvents = useCallback(
     async (append = false) => {
       abortRef.current?.abort();
@@ -350,9 +351,9 @@ export function FederationEventsPage() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Federated Event Card
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface FederatedEventCardProps {
   event: FederatedEvent;

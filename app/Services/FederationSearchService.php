@@ -94,6 +94,7 @@ class FederationSearchService
                 WHERE u.tenant_id IN ({$placeholders})
                 AND u.status = 'active'
                 AND fus.federation_optin = 1
+                AND fus.profile_visible_federated = 1
                 AND fus.appear_in_federated_search = 1";
 
         if (!empty($filters['tenant_id']) && in_array($filters['tenant_id'], $partnerTenantIds)) {
@@ -543,6 +544,7 @@ class FederationSearchService
                 WHERE u.tenant_id IN ({$placeholders})
                 AND u.status = 'active'
                 AND fus.federation_optin = 1
+                AND fus.profile_visible_federated = 1
                 AND fus.appear_in_federated_search = 1
             ", $partnerTenantIds);
 

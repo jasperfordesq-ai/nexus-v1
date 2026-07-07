@@ -1,8 +1,9 @@
-import { Autocomplete, AutocompleteItem, GlassCard, Button, Chip, SearchField, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+
+import { Autocomplete, AutocompleteItem, GlassCard, Button, Chip, SearchField, CardRowsSkeleton } from '@/components/ui';
 
 /**
  * Federation Groups Page - Browse groups from partner communities
@@ -70,7 +71,7 @@ export function FederationGroupsPage() {
   toastRef.current = toast;
   const loadGroupsRef = useRef<(append?: boolean) => Promise<void>>(null!);
 
-  // ── Debounce search ──────────────────────────────────────────────────────
+  // â”€â”€ Debounce search â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   useEffect(() => {
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
     searchTimeoutRef.current = setTimeout(() => {
@@ -82,7 +83,7 @@ export function FederationGroupsPage() {
     };
   }, [searchQuery]);
 
-  // ── Load partners for dropdown ───────────────────────────────────────────
+  // â”€â”€ Load partners for dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const loadPartners = useCallback(async () => {
     try {
       const response = await api.get<FederationPartner[]>('/v2/federation/partners');
@@ -98,7 +99,7 @@ export function FederationGroupsPage() {
     loadPartners();
   }, [loadPartners]);
 
-  // ── Load groups ──────────────────────────────────────────────────────────
+  // â”€â”€ Load groups â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const loadGroups = useCallback(
     async (append = false) => {
       abortRef.current?.abort();
@@ -319,9 +320,9 @@ export function FederationGroupsPage() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Federated Group Card
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface FederatedGroupCardProps {
   group: FederatedGroup;

@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Button, Card, CardBody, CardHeader, Input, Spinner, Chip } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { Separator } from '@/components/ui';
@@ -13,10 +18,6 @@ import { logError } from '@/lib/logger';
 import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * Credit Commons Node Configuration

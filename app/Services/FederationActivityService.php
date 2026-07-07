@@ -191,16 +191,22 @@ class FederationActivityService
     private static function buildActivityTitle(string $actionType, string $category, bool $isIncoming): string
     {
         $titles = [
-            'partnership_requested' => $isIncoming ? 'New partnership request received' : 'Partnership request sent',
-            'partnership_approved' => 'Partnership approved',
-            'partnership_rejected' => 'Partnership request declined',
-            'api_message_sent' => $isIncoming ? 'New federated message received' : 'Federated message sent',
-            'api_transaction_initiated' => $isIncoming ? 'Cross-community transaction received' : 'Cross-community transaction sent',
-            'member_search' => 'Cross-community member search',
-            'listing_viewed' => 'Federation listing viewed',
-            'connection_request' => $isIncoming ? 'New federation connection request' : 'Federation connection request sent',
+            'partnership_requested' => $isIncoming ? 'activity.partnership_requested_incoming' : 'activity.partnership_requested_outgoing',
+            'partnership_approved' => 'activity.partnership_approved',
+            'partnership_rejected' => 'activity.partnership_rejected',
+            'api_message_sent' => $isIncoming ? 'activity.api_message_sent_incoming' : 'activity.api_message_sent_outgoing',
+            'api_transaction_initiated' => $isIncoming ? 'activity.api_transaction_initiated_incoming' : 'activity.api_transaction_initiated_outgoing',
+            'member_search' => 'activity.member_search',
+            'listing_viewed' => 'activity.listing_viewed',
+            'connection_request' => $isIncoming ? 'activity.connection_request_incoming' : 'activity.connection_request_outgoing',
         ];
 
-        return $titles[$actionType] ?? ucfirst(str_replace('_', ' ', $actionType));
+        if (isset($titles[$actionType])) {
+            return __('federation.' . $titles[$actionType]);
+        }
+
+        return __('federation.activity.unknown', [
+            'action' => ucfirst(str_replace('_', ' ', $actionType)),
+        ]);
     }
 }

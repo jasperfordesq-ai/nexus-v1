@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Button, Chip, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useCallback, useEffect, useRef } from 'react';
 
@@ -31,10 +36,6 @@ import { BrokerEmptyState } from '@/broker/components';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * Federation Analytics
@@ -319,7 +320,7 @@ export function FederationAnalytics() {
                       color={row.response_code >= 500 ? 'danger' : 'warning'}
                       variant="tertiary"
                     >
-                      {row.response_code || '—'}
+                      {row.response_code || 'â€”'}
                     </Chip>
                   </TableCell>
                   <TableCell>

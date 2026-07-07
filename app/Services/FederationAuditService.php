@@ -373,24 +373,30 @@ class FederationAuditService
     public static function getActionLabel(string $actionType): string
     {
         $labels = [
-            'emergency_lockdown_triggered' => 'Emergency Lockdown Triggered',
-            'emergency_lockdown_lifted' => 'Emergency Lockdown Lifted',
-            'system_feature_changed' => 'System Feature Changed',
-            'tenant_feature_changed' => 'Tenant Feature Changed',
-            'tenant_whitelisted' => 'Tenant Whitelisted',
-            'tenant_removed_from_whitelist' => 'Tenant Removed from Whitelist',
-            'partnership_requested' => 'Partnership Requested',
-            'partnership_approved' => 'Partnership Approved',
-            'partnership_rejected' => 'Partnership Rejected',
-            'partnership_status_changed' => 'Partnership Status Changed',
-            'cross_tenant_profile_view' => 'Cross-Tenant Profile View',
-            'cross_tenant_message' => 'Cross-Tenant Message',
-            'cross_tenant_transaction' => 'Cross-Tenant Transaction',
-            'federated_search' => 'Federated Search',
-            'audit_log_purged' => 'Audit Log Purged',
+            'emergency_lockdown_triggered' => 'audit.emergency_lockdown_triggered',
+            'emergency_lockdown_lifted' => 'audit.emergency_lockdown_lifted',
+            'system_feature_changed' => 'audit.system_feature_changed',
+            'tenant_feature_changed' => 'audit.tenant_feature_changed',
+            'tenant_whitelisted' => 'audit.tenant_whitelisted',
+            'tenant_removed_from_whitelist' => 'audit.tenant_removed_from_whitelist',
+            'partnership_requested' => 'audit.partnership_requested',
+            'partnership_approved' => 'audit.partnership_approved',
+            'partnership_rejected' => 'audit.partnership_rejected',
+            'partnership_status_changed' => 'audit.partnership_status_changed',
+            'cross_tenant_profile_view' => 'audit.cross_tenant_profile_view',
+            'cross_tenant_message' => 'audit.cross_tenant_message',
+            'cross_tenant_transaction' => 'audit.cross_tenant_transaction',
+            'federated_search' => 'audit.federated_search',
+            'audit_log_purged' => 'audit.audit_log_purged',
         ];
 
-        return $labels[$actionType] ?? ucwords(str_replace('_', ' ', $actionType));
+        if (isset($labels[$actionType])) {
+            return __('federation.' . $labels[$actionType]);
+        }
+
+        return __('federation.audit.unknown', [
+            'action' => ucwords(str_replace('_', ' ', $actionType)),
+        ]);
     }
 
     /**

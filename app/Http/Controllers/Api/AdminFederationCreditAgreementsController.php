@@ -6,8 +6,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\I18n\LocaleContext;
 use App\Models\Notification;
 use App\Services\FederationAuditService;
+use App\Services\FederationInternalLedgerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -177,29 +179,32 @@ class AdminFederationCreditAgreementsController extends BaseApiController
                 }
 
                 $actionLabels = [
-                    'approve'    => 'approved',
-                    'reject'     => 'rejected',
-                    'suspend'    => 'suspended',
-                    'activate'   => 'activated',
-                    'reactivate' => 'reactivated',
-                    'terminate'  => 'terminated',
+                    'approve'    => 'federation.credit_agreement.action_approved',
+                    'reject'     => 'federation.credit_agreement.action_rejected',
+                    'suspend'    => 'federation.credit_agreement.action_suspended',
+                    'activate'   => 'federation.credit_agreement.action_activated',
+                    'reactivate' => 'federation.credit_agreement.action_reactivated',
+                    'terminate'  => 'federation.credit_agreement.action_terminated',
                 ];
-                $label = $actionLabels[$action] ?? $action;
 
                 $admins = DB::select(
-                    "SELECT id FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin') AND status = 'active'",
+                    "SELECT id, preferred_language FROM users WHERE tenant_id = ? AND role IN ('admin', 'tenant_admin') AND status = 'active'",
                     [$partnerTenantId]
                 );
                 foreach ($admins as $admin) {
-                    Notification::createNotification(
-                        (int) $admin->id,
-                        __('api_controllers_3.federation_credit.action_taken', ['tenant' => $tenantName, 'action' => $label]),
-                        '/admin/federation',
-                        'federation_credit_agreement_' . $action,
-                        true,
-                        $partnerTenantId
-                    );
-                    \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $admin->id), 'federation_credit_agreement_' . $action, __('api_controllers_3.federation_credit.action_taken', ['tenant' => $tenantName, 'action' => $label]), '/admin/federation');
+                    LocaleContext::withLocale($admin, function () use ($admin, $partnerTenantId, $tenantName, $actionLabels, $action): void {
+                        $label = isset($actionLabels[$action]) ? __($actionLabels[$action]) : $action;
+                        $message = __('api_controllers_3.federation_credit.action_taken', ['tenant' => $tenantName, 'action' => $label]);
+                        Notification::createNotification(
+                            (int) $admin->id,
+                            $message,
+                            '/admin/federation',
+                            'federation_credit_agreement_' . $action,
+                            true,
+                            $partnerTenantId
+                        );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) $admin->id, 'federation_credit_agreement_' . $action, $message, '/admin/federation');
+                    });
                 }
             } catch (\Exception $e) {
                 Log::warning('[FederationCreditAgreement] Failed to notify partner admins', [
@@ -239,42 +244,20 @@ class AdminFederationCreditAgreementsController extends BaseApiController
             $fromId = (int) $agreement->from_tenant_id;
             $toId = (int) $agreement->to_tenant_id;
 
-            // Query federation_transactions between the two tenants
             try {
-                $transactions = DB::select(
-                    "SELECT ft.id, ft.sender_tenant_id, ft.receiver_tenant_id,
-                            ft.sender_user_id, ft.receiver_user_id,
-                            ft.amount, ft.description, ft.status,
-                            ft.created_at, ft.completed_at,
-                            t1.name as sender_tenant_name, t2.name as receiver_tenant_name
-                     FROM federation_transactions ft
-                     LEFT JOIN tenants t1 ON ft.sender_tenant_id = t1.id
-                     LEFT JOIN tenants t2 ON ft.receiver_tenant_id = t2.id
-                     WHERE ((ft.sender_tenant_id = ? AND ft.receiver_tenant_id = ?)
-                         OR (ft.sender_tenant_id = ? AND ft.receiver_tenant_id = ?))
-                     ORDER BY ft.created_at DESC
-                     LIMIT 50",
-                    [$fromId, $toId, $toId, $fromId]
-                );
+                $transactions = FederationInternalLedgerService::recentBetweenTenants($fromId, $toId, 50);
 
                 // Calculate usage this month
-                $monthUsage = DB::selectOne(
-                    "SELECT COALESCE(SUM(amount), 0) as total
-                     FROM federation_transactions
-                     WHERE ((sender_tenant_id = ? AND receiver_tenant_id = ?)
-                         OR (sender_tenant_id = ? AND receiver_tenant_id = ?))
-                       AND status = 'completed'
-                       AND created_at >= DATE_FORMAT(NOW(), '%Y-%m-01')",
-                    [$fromId, $toId, $toId, $fromId]
-                );
+                $monthStart = date('Y-m-01 00:00:00');
+                $monthUsage = FederationInternalLedgerService::sumCompletedBetweenTenants($fromId, $toId, $monthStart)
+                    + FederationInternalLedgerService::sumCompletedBetweenTenants($toId, $fromId, $monthStart);
 
                 return $this->respondWithData([
-                    'transactions' => array_map(fn($r) => (array) $r, $transactions),
-                    'month_usage' => (float) ($monthUsage->total ?? 0),
+                    'transactions' => $transactions,
+                    'month_usage' => (float) $monthUsage,
                     'monthly_limit' => $agreement->max_monthly_credits !== null ? (float) $agreement->max_monthly_credits : null,
                 ]);
             } catch (\Exception $e) {
-                // federation_transactions table may not exist
                 return $this->respondWithData([
                     'transactions' => [],
                     'month_usage' => 0,
@@ -322,23 +305,8 @@ class AdminFederationCreditAgreementsController extends BaseApiController
                 $sent = 0.0;
                 $received = 0.0;
 
-                try {
-                    $sentRow = DB::selectOne(
-                        "SELECT COALESCE(SUM(amount), 0) as total FROM federation_transactions
-                         WHERE sender_tenant_id = ? AND receiver_tenant_id = ? AND status = 'completed'",
-                        [$tenantId, $partnerId]
-                    );
-                    $sent = (float) ($sentRow->total ?? 0);
-
-                    $receivedRow = DB::selectOne(
-                        "SELECT COALESCE(SUM(amount), 0) as total FROM federation_transactions
-                         WHERE sender_tenant_id = ? AND receiver_tenant_id = ? AND status = 'completed'",
-                        [$partnerId, $tenantId]
-                    );
-                    $received = (float) ($receivedRow->total ?? 0);
-                } catch (\Exception $e) {
-                    // federation_transactions may not exist
-                }
+                $sent = FederationInternalLedgerService::sumCompletedBetweenTenants($tenantId, $partnerId);
+                $received = FederationInternalLedgerService::sumCompletedBetweenTenants($partnerId, $tenantId);
 
                 $balance = $received - $sent; // positive = they sent us more than we sent them
                 $netTotal += $balance;

@@ -31,8 +31,8 @@ class FederatedConnectionService
     {
         $requesterTenantId = TenantContext::getId();
 
-        // Sanitize and limit the message
-        $message = $message ? htmlspecialchars(substr($message, 0, 1000), ENT_QUOTES, 'UTF-8') : null;
+        // Store plain text; React/Blade output layers escape it for their contexts.
+        $message = $message ? mb_substr(trim($message), 0, 1000) : null;
 
         if ($requesterId === $receiverId && $requesterTenantId === $receiverTenantId) {
             return ['success' => false, 'error' => __('api.cannot_connect_with_yourself')];

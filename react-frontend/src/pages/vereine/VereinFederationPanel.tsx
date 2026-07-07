@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useConfirm } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,13 +14,9 @@ import Calendar from 'lucide-react/icons/calendar';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
- * VereinFederationPanel — AG55
+ * VereinFederationPanel â€” AG55
  *
  * Verein admin panel for federation consent, network browsing, event sharing, * and viewing incoming/outgoing shared events.
  *
@@ -299,7 +300,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
                     <TableCell>
                       <Chip size="sm" variant="flat">{t(`verein_federation.scope_${row.sharing_scope}`)}</Chip>
                     </TableCell>
-                    <TableCell>{row.municipality_code ?? '—'}</TableCell>
+                    <TableCell>{row.municipality_code ?? 'â€”'}</TableCell>
                     <TableCell>
                       {(consent?.sharing_scope === 'events' || consent?.sharing_scope === 'both') ? (
                         <Button
@@ -344,8 +345,8 @@ export default function VereinFederationPanel({ organizationId }: Props) {
                       <div className="flex-1">
                         <p className="font-medium">{s.title}</p>
                         <p className="text-xs text-muted">
-                          {t('verein_federation.calendar.from_label')}: {s.source_name ?? '—'}
-                          {s.start_time ? ` · ${new Date(s.start_time).toLocaleString()}` : ''}
+                          {t('verein_federation.calendar.from_label')}: {s.source_name ?? 'â€”'}
+                          {s.start_time ? ` Â· ${new Date(s.start_time).toLocaleString()}` : ''}
                         </p>
                       </div>
                     </li>
@@ -365,8 +366,8 @@ export default function VereinFederationPanel({ organizationId }: Props) {
                       <div className="flex-1">
                         <p className="font-medium">{s.title}</p>
                         <p className="text-xs text-muted">
-                          → {s.target_name ?? '—'}
-                          {s.start_time ? ` · ${new Date(s.start_time).toLocaleString()}` : ''}
+                          â†’ {s.target_name ?? 'â€”'}
+                          {s.start_time ? ` Â· ${new Date(s.start_time).toLocaleString()}` : ''}
                         </p>
                       </div>
                       <Button size="sm" variant="flat" color="danger" onPress={() => void handleWithdraw(s.id)}>

@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Input, Button, Checkbox, Snippet } from '@/components/ui';
 import { useState } from 'react';
 
@@ -13,10 +18,6 @@ import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * Create Federation API Key

@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Button, Card, CardBody, CardFooter, Chip, Input, Textarea, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Skeleton } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
@@ -22,10 +27,6 @@ import { PageHeader } from '../../components/PageHeader';
 import { EmptyState } from '../../components/EmptyState';
 import { useTranslation } from 'react-i18next';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
-// Copyright Â© 2024â€“2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * Partner Directory
@@ -146,7 +147,7 @@ export function PartnerDirectory() {
     setLoading(false);
   }, []);
 
-  // Debounced search â€” also handles initial load on mount (300ms delay)
+  // Debounced search Ã¢â‚¬â€ also handles initial load on mount (300ms delay)
   useEffect(() => {
     const timer = setTimeout(() => {
       loadData({

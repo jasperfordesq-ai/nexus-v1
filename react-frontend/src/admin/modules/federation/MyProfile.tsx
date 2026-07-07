@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner, Chip, Skeleton } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 
@@ -11,10 +16,6 @@ import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * Federation Profile (My Listing)
@@ -136,7 +137,7 @@ export function MyProfile() {
         setPrimaryTopicIds(new Set(myTopics.filter((t) => t.is_primary).map((t) => t.id)));
       }
     } catch {
-      // Topics are optional — fail silently
+      // Topics are optional â€” fail silently
     }
     setTopicsLoading(false);
   }, []);
@@ -192,7 +193,7 @@ export function MyProfile() {
           description,
           contact_email: contactEmail,
           website,
-          categories: [], // Legacy field — topics replace this
+          categories: [], // Legacy field â€” topics replace this
         },
       });
       if (res.success) {

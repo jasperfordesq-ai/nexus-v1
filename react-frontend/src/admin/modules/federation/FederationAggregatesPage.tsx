@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Button, Card, CardBody, CardHeader, Chip, Spinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,13 +18,9 @@ import { adminFederation } from '../../api/adminApi';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { PageHeader } from '../../components/PageHeader';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
- * Federation Aggregates — admin self-service for cross-node aggregate sharing.
+ * Federation Aggregates â€” admin self-service for cross-node aggregate sharing.
  *
  * Lets a tenant admin enable/disable the public /federation/aggregates feed, * rotate the HMAC signing secret, preview the JSON payload that would be
  * exposed, and inspect the audit trail of recent queries.

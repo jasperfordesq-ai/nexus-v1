@@ -45,6 +45,16 @@ class AdminFederationDataController extends BaseApiController
         'federation_reputation',
         'federation_api_logs',
         'federation_api_keys',
+        'federation_user_settings',
+        'federation_messages',
+        'federation_connections',
+        'transactions',
+        'federation_directory_profiles',
+        'federation_neighborhoods',
+        'federation_neighborhood_members',
+        'federation_neighborhood_tenants',
+        'federation_credit_agreements',
+        'federation_audit_log',
     ];
 
     /** Hard safety cap on api_logs rows emitted per export. */
@@ -98,6 +108,24 @@ class AdminFederationDataController extends BaseApiController
             $this->streamExternalPartners($out, $tenantId);
             fwrite($out, ',');
             $this->streamReputation($out, $tenantId);
+            fwrite($out, ',');
+            $this->streamUserSettings($out, $tenantId);
+            fwrite($out, ',');
+            $this->streamMessages($out, $tenantId);
+            fwrite($out, ',');
+            $this->streamConnections($out, $tenantId);
+            fwrite($out, ',');
+            $this->streamInternalTransactions($out, $tenantId);
+            fwrite($out, ',');
+            $this->streamDirectoryProfile($out, $tenantId);
+            fwrite($out, ',');
+            $this->streamNeighborhoodMemberships($out, $tenantId);
+            fwrite($out, ',');
+            $this->streamCreditAgreements($out, $tenantId);
+            fwrite($out, ',');
+            $this->streamAuditLog($out, $tenantId);
+            fwrite($out, ',');
+            $this->streamApiKeys($out, $tenantId);
             fwrite($out, ',');
             $this->streamApiLogs($out, $tenantId, 90);
 
@@ -158,6 +186,7 @@ class AdminFederationDataController extends BaseApiController
 
         // Partnerships: only import rows where tenant_id or partner_tenant_id == current tenant.
         if (!empty($data['partnerships']) && is_array($data['partnerships'])) {
+            $hasCanonicalPair = $this->columnExists('federation_partnerships', 'canonical_pair');
             foreach ($data['partnerships'] as $row) {
                 if (!is_array($row) || !isset($row['tenant_id'], $row['partner_tenant_id'], $row['status'])) {
                     $summary['partnerships']['invalid']++;
@@ -169,12 +198,28 @@ class AdminFederationDataController extends BaseApiController
                     $summary['partnerships']['skipped']++;
                     continue;
                 }
-                // Deduplicate on unique_partnership key
+                $firstTenantId = (int) $row['tenant_id'];
+                $secondTenantId = (int) $row['partner_tenant_id'];
+                $canonicalPair = min($firstTenantId, $secondTenantId) . '-' . max($firstTenantId, $secondTenantId);
+
+                // Deduplicate on canonical tenant pair, then fall back to the old directional key.
                 try {
-                    $exists = DB::selectOne(
-                        'SELECT id FROM federation_partnerships WHERE tenant_id = ? AND partner_tenant_id = ?',
-                        [(int) $row['tenant_id'], (int) $row['partner_tenant_id']]
-                    );
+                    if ($hasCanonicalPair) {
+                        $exists = DB::selectOne(
+                            'SELECT id FROM federation_partnerships
+                             WHERE canonical_pair = ?
+                                OR (tenant_id = ? AND partner_tenant_id = ?)
+                                OR (tenant_id = ? AND partner_tenant_id = ?)',
+                            [$canonicalPair, $firstTenantId, $secondTenantId, $secondTenantId, $firstTenantId]
+                        );
+                    } else {
+                        $exists = DB::selectOne(
+                            'SELECT id FROM federation_partnerships
+                             WHERE (tenant_id = ? AND partner_tenant_id = ?)
+                                OR (tenant_id = ? AND partner_tenant_id = ?)',
+                            [$firstTenantId, $secondTenantId, $secondTenantId, $firstTenantId]
+                        );
+                    }
                 } catch (\Throwable) {
                     $summary['partnerships']['invalid']++;
                     continue;
@@ -188,25 +233,33 @@ class AdminFederationDataController extends BaseApiController
                 $summary['partnerships']['new']++;
                 if (!$dryRun) {
                     try {
+                        $columns = [
+                            'tenant_id', 'partner_tenant_id', 'status', 'federation_level',
+                            'messaging_enabled', 'transactions_enabled', 'profiles_enabled',
+                            'listings_enabled', 'events_enabled', 'groups_enabled', 'notes', 'created_at',
+                        ];
+                        $values = [
+                            $firstTenantId,
+                            $secondTenantId,
+                            $status,
+                            (int) ($row['federation_level'] ?? 1),
+                            (int) !empty($row['messaging_enabled']),
+                            (int) !empty($row['transactions_enabled']),
+                            (int) !empty($row['profiles_enabled']),
+                            (int) !empty($row['listings_enabled']),
+                            (int) !empty($row['events_enabled']),
+                            (int) !empty($row['groups_enabled']),
+                            isset($row['notes']) ? (string) $row['notes'] : null,
+                            now(),
+                        ];
+                        if ($hasCanonicalPair) {
+                            array_splice($columns, 2, 0, ['canonical_pair']);
+                            array_splice($values, 2, 0, [$canonicalPair]);
+                        }
+                        $placeholders = implode(', ', array_fill(0, count($columns), '?'));
                         DB::insert(
-                            'INSERT INTO federation_partnerships
-                             (tenant_id, partner_tenant_id, status, federation_level,
-                              messaging_enabled, transactions_enabled, profiles_enabled,
-                              listings_enabled, events_enabled, groups_enabled, notes, created_at)
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())',
-                            [
-                                (int) $row['tenant_id'],
-                                (int) $row['partner_tenant_id'],
-                                $status,
-                                (int) ($row['federation_level'] ?? 1),
-                                (int) !empty($row['messaging_enabled']),
-                                (int) !empty($row['transactions_enabled']),
-                                (int) !empty($row['profiles_enabled']),
-                                (int) !empty($row['listings_enabled']),
-                                (int) !empty($row['events_enabled']),
-                                (int) !empty($row['groups_enabled']),
-                                isset($row['notes']) ? (string) $row['notes'] : null,
-                            ]
+                            'INSERT INTO federation_partnerships (' . implode(', ', $columns) . ") VALUES ({$placeholders})",
+                            $values
                         );
                     } catch (\Throwable $e) {
                         $summary['partnerships']['new']--;
@@ -445,6 +498,197 @@ class AdminFederationDataController extends BaseApiController
     }
 
     /** @param resource $out */
+    private function streamUserSettings($out, int $tenantId): void
+    {
+        $this->streamArraySection($out, 'user_settings', function (callable $emit) use ($tenantId): void {
+            if (!$this->tableExists('federation_user_settings')) {
+                return;
+            }
+            DB::table('federation_user_settings as fus')
+                ->join('users as u', 'u.id', '=', 'fus.user_id')
+                ->where('u.tenant_id', $tenantId)
+                ->select('fus.*')
+                ->orderBy('fus.user_id')
+                ->chunk(self::STREAM_CHUNK_SIZE, function ($rows) use ($emit): void {
+                    foreach ($rows as $r) {
+                        $emit((array) $r);
+                    }
+                });
+        });
+    }
+
+    /** @param resource $out */
+    private function streamMessages($out, int $tenantId): void
+    {
+        $this->streamArraySection($out, 'messages', function (callable $emit) use ($tenantId): void {
+            if (!$this->tableExists('federation_messages')) {
+                return;
+            }
+            DB::table('federation_messages')
+                ->where(function ($q) use ($tenantId): void {
+                    $q->where('sender_tenant_id', $tenantId)
+                      ->orWhere('receiver_tenant_id', $tenantId);
+                })
+                ->orderBy('id')
+                ->chunkById(self::STREAM_CHUNK_SIZE, function ($rows) use ($emit): void {
+                    foreach ($rows as $r) {
+                        $emit((array) $r);
+                    }
+                });
+        });
+    }
+
+    /** @param resource $out */
+    private function streamConnections($out, int $tenantId): void
+    {
+        $this->streamArraySection($out, 'connections', function (callable $emit) use ($tenantId): void {
+            if (!$this->tableExists('federation_connections')) {
+                return;
+            }
+            DB::table('federation_connections')
+                ->where(function ($q) use ($tenantId): void {
+                    $q->where('requester_tenant_id', $tenantId)
+                      ->orWhere('receiver_tenant_id', $tenantId);
+                })
+                ->orderBy('id')
+                ->chunkById(self::STREAM_CHUNK_SIZE, function ($rows) use ($emit): void {
+                    foreach ($rows as $r) {
+                        $emit((array) $r);
+                    }
+                });
+        });
+    }
+
+    /** @param resource $out */
+    private function streamInternalTransactions($out, int $tenantId): void
+    {
+        $this->streamArraySection($out, 'internal_transactions', function (callable $emit) use ($tenantId): void {
+            if (!$this->tableExists('transactions')) {
+                return;
+            }
+            DB::table('transactions')
+                ->where('is_federated', 1)
+                ->where(function ($q) use ($tenantId): void {
+                    $q->where('sender_tenant_id', $tenantId)
+                      ->orWhere('receiver_tenant_id', $tenantId);
+                })
+                ->select([
+                    'id', 'tenant_id', 'sender_id', 'receiver_id', 'amount', 'description',
+                    'status', 'is_federated', 'sender_tenant_id', 'receiver_tenant_id',
+                    'listing_id', 'transaction_type', 'created_at', 'updated_at',
+                ])
+                ->orderBy('id')
+                ->chunkById(self::STREAM_CHUNK_SIZE, function ($rows) use ($emit): void {
+                    foreach ($rows as $r) {
+                        $emit((array) $r);
+                    }
+                });
+        });
+    }
+
+    /** @param resource $out */
+    private function streamDirectoryProfile($out, int $tenantId): void
+    {
+        $this->streamArraySection($out, 'directory_profile', function (callable $emit) use ($tenantId): void {
+            if (!$this->tableExists('federation_directory_profiles')) {
+                return;
+            }
+            $row = DB::table('federation_directory_profiles')->where('tenant_id', $tenantId)->first();
+            if ($row) {
+                $emit((array) $row);
+            }
+        });
+    }
+
+    /** @param resource $out */
+    private function streamNeighborhoodMemberships($out, int $tenantId): void
+    {
+        $this->streamArraySection($out, 'neighborhood_memberships', function (callable $emit) use ($tenantId): void {
+            foreach (['federation_neighborhood_tenants', 'federation_neighborhood_members'] as $table) {
+                if (!$this->tableExists($table)) {
+                    continue;
+                }
+                DB::table($table)
+                    ->where('tenant_id', $tenantId)
+                    ->orderBy('id')
+                    ->chunkById(self::STREAM_CHUNK_SIZE, function ($rows) use ($emit, $table): void {
+                        foreach ($rows as $r) {
+                            $row = (array) $r;
+                            $row['membership_source'] = $table;
+                            $emit($row);
+                        }
+                    });
+            }
+        });
+    }
+
+    /** @param resource $out */
+    private function streamCreditAgreements($out, int $tenantId): void
+    {
+        $this->streamArraySection($out, 'credit_agreements', function (callable $emit) use ($tenantId): void {
+            if (!$this->tableExists('federation_credit_agreements')) {
+                return;
+            }
+            DB::table('federation_credit_agreements')
+                ->where(function ($q) use ($tenantId): void {
+                    $q->where('from_tenant_id', $tenantId)
+                      ->orWhere('to_tenant_id', $tenantId);
+                })
+                ->orderBy('id')
+                ->chunkById(self::STREAM_CHUNK_SIZE, function ($rows) use ($emit): void {
+                    foreach ($rows as $r) {
+                        $emit((array) $r);
+                    }
+                });
+        });
+    }
+
+    /** @param resource $out */
+    private function streamAuditLog($out, int $tenantId): void
+    {
+        $this->streamArraySection($out, 'audit_log', function (callable $emit) use ($tenantId): void {
+            if (!$this->tableExists('federation_audit_log')) {
+                return;
+            }
+            DB::table('federation_audit_log')
+                ->where(function ($q) use ($tenantId): void {
+                    $q->where('source_tenant_id', $tenantId)
+                      ->orWhere('target_tenant_id', $tenantId);
+                })
+                ->orderBy('id')
+                ->chunkById(self::STREAM_CHUNK_SIZE, function ($rows) use ($emit): void {
+                    foreach ($rows as $r) {
+                        $emit((array) $r);
+                    }
+                });
+        });
+    }
+
+    /** @param resource $out */
+    private function streamApiKeys($out, int $tenantId): void
+    {
+        $this->streamArraySection($out, 'api_keys', function (callable $emit) use ($tenantId): void {
+            if (!$this->tableExists('federation_api_keys')) {
+                return;
+            }
+            DB::table('federation_api_keys')
+                ->where('tenant_id', $tenantId)
+                ->orderBy('id')
+                ->chunkById(self::STREAM_CHUNK_SIZE, function ($rows) use ($emit): void {
+                    foreach ($rows as $r) {
+                        $arr = (array) $r;
+                        foreach (['key_hash', 'signing_secret'] as $field) {
+                            if (array_key_exists($field, $arr)) {
+                                $arr[$field] = null;
+                            }
+                        }
+                        $emit($arr);
+                    }
+                });
+        });
+    }
+
+    /** @param resource $out */
     private function streamApiLogs($out, int $tenantId, int $days): void
     {
         $this->streamArraySection($out, 'api_logs', function (callable $emit) use ($tenantId, $days): void {
@@ -494,7 +738,12 @@ class AdminFederationDataController extends BaseApiController
     private function validateImportShape(array $data): array
     {
         $errors = [];
-        $allowedKeys = ['meta', 'partnerships', 'external_partners', 'reputation', 'api_logs'];
+        $allowedKeys = [
+            'meta', 'partnerships', 'external_partners', 'reputation',
+            'user_settings', 'messages', 'connections', 'internal_transactions',
+            'directory_profile', 'neighborhood_memberships', 'credit_agreements',
+            'audit_log', 'api_keys', 'api_logs',
+        ];
         foreach ($data as $key => $value) {
             if (!in_array((string) $key, $allowedKeys, true)) {
                 $errors[] = [
@@ -530,6 +779,20 @@ class AdminFederationDataController extends BaseApiController
             return $cache[$table] = true;
         } catch (\Throwable) {
             return $cache[$table] = false;
+        }
+    }
+
+    private function columnExists(string $table, string $column): bool
+    {
+        if (!$this->tableExists($table)) {
+            return false;
+        }
+
+        try {
+            $columns = DB::select("SHOW COLUMNS FROM `{$table}` LIKE ?", [$column]);
+            return !empty($columns);
+        } catch (\Throwable) {
+            return false;
         }
     }
 

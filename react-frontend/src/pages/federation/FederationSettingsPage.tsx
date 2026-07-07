@@ -1,8 +1,9 @@
-import { Select, SelectItem, GlassCard, Button, Spinner, Input, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+
+import { Select, SelectItem, GlassCard, Button, Spinner, Input, Switch } from '@/components/ui';
 
 /**
  * Federation Settings Page - Configure federation preferences
@@ -40,9 +41,9 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { FederationSettings } from '@/types/api';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type ServiceReach = FederationSettings['service_reach'];
 
@@ -98,9 +99,9 @@ const selectClassNames = {
   label: 'text-theme-muted',
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Component
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function FederationSettingsPage() {
   const { t } = useTranslation('federation');
@@ -111,7 +112,7 @@ export function FederationSettingsPage() {
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
 
-  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  // Stable refs for t/toast â€” avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
   tRef.current = t;
   const toastRef = useRef(toast);
@@ -125,14 +126,14 @@ export function FederationSettingsPage() {
   const [settings, setSettings] = useState<SettingsFormData>(DEFAULT_SETTINGS);
   const [originalSettings, setOriginalSettings] = useState<SettingsFormData>(DEFAULT_SETTINGS);
 
-  // Track dirty state — only enable save when changes exist
+  // Track dirty state â€” only enable save when changes exist
   const isDirty = useMemo(() => {
     return JSON.stringify(settings) !== JSON.stringify(originalSettings);
   }, [settings, originalSettings]);
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Data Loading
-  // ───────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const loadSettings = useCallback(async () => {
     abortRef.current?.abort();
@@ -180,9 +181,9 @@ export function FederationSettingsPage() {
     loadSettings();
   }, [loadSettings]);
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Handlers
-  // ───────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const handleToggleFederation = useCallback(async () => {
     const endpoint = federationOptedIn ? '/v2/federation/opt-out' : '/v2/federation/opt-in';
@@ -230,9 +231,9 @@ export function FederationSettingsPage() {
     setSettings((prev) => ({ ...prev, [key]: value }));
   }, []);
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Loading / Error States
-  // ───────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   if (isLoading) {
     return (
@@ -278,9 +279,9 @@ export function FederationSettingsPage() {
     );
   }
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Render
-  // ───────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   return (
     <motion.div
@@ -307,7 +308,7 @@ export function FederationSettingsPage() {
         </p>
       </motion.div>
 
-      {/* ─── Status Banner ─── */}
+      {/* â”€â”€â”€ Status Banner â”€â”€â”€ */}
       <motion.div variants={itemVariants}>
         {federationOptedIn ? (
           <GlassCard className="p-4 border-l-4 border-l-emerald-500">
@@ -359,7 +360,7 @@ export function FederationSettingsPage() {
         )}
       </motion.div>
 
-      {/* ─── 1. Profile Visibility ─── */}
+      {/* â”€â”€â”€ 1. Profile Visibility â”€â”€â”€ */}
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
@@ -408,7 +409,7 @@ export function FederationSettingsPage() {
         </GlassCard>
       </motion.div>
 
-      {/* ─── 2. Communication ─── */}
+      {/* â”€â”€â”€ 2. Communication â”€â”€â”€ */}
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
@@ -442,7 +443,7 @@ export function FederationSettingsPage() {
         </GlassCard>
       </motion.div>
 
-      {/* ─── 3. Service Reach ─── */}
+      {/* â”€â”€â”€ 3. Service Reach â”€â”€â”€ */}
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
@@ -495,7 +496,7 @@ export function FederationSettingsPage() {
         </GlassCard>
       </motion.div>
 
-      {/* ─── Save Button ─── */}
+      {/* â”€â”€â”€ Save Button â”€â”€â”€ */}
       <motion.div variants={itemVariants} className="flex justify-end">
         <Button
           onPress={handleSave}
@@ -511,9 +512,9 @@ export function FederationSettingsPage() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Sub-components
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface SettingToggleProps {
   label: string;

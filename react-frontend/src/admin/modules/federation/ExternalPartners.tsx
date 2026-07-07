@@ -1,8 +1,9 @@
-import { Select, SelectItem, useDisclosure, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+
+import { Select, SelectItem, useDisclosure, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 
 /**
  * Federation External Partners
@@ -34,9 +35,9 @@ import { BrokerEmptyState } from '@/broker/components';
 import { useTranslation } from 'react-i18next';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface ExternalPartner {
   id: number;
@@ -96,9 +97,9 @@ interface PartnerLog {
   created_at: string;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Helpers
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const STATUS_COLORS: Record<string, 'success' | 'default' | 'warning' | 'danger'> = {
   active: 'success',
@@ -149,9 +150,9 @@ const EMPTY_FORM: PartnerFormData = {
   allow_groups: false,
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Component
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function ExternalPartners() {
   const { t } = useTranslation('admin');
@@ -179,11 +180,11 @@ export function ExternalPartners() {
   const [logsLoading, setLogsLoading] = useState(false);
   const [logsPartnerName, setLogsPartnerName] = useState('');
 
-  // ─── Load data ───
+  // â”€â”€â”€ Load data â”€â”€â”€
   const loadData = useCallback(async () => {
     // NOTE: We intentionally do NOT pass an AbortController signal here.
     // The api.get() deduplication cache keys on endpoint only (not signal),
-    // so in React StrictMode's mount→unmount→remount cycle, aborting the
+    // so in React StrictMode's mountâ†’unmountâ†’remount cycle, aborting the
     // first request would poison the cached promise for the second caller.
     setLoading(true);
     try {
@@ -204,14 +205,14 @@ export function ExternalPartners() {
     loadData();
   }, [loadData]);
 
-  // ─── Open create modal ───
+  // â”€â”€â”€ Open create modal â”€â”€â”€
   const openCreate = useCallback(() => {
     setEditingId(null);
     setForm({ ...EMPTY_FORM });
     formModal.onOpen();
   }, [formModal]);
 
-  // ─── Open edit modal ───
+  // â”€â”€â”€ Open edit modal â”€â”€â”€
   const openEdit = useCallback((partner: ExternalPartner) => {
     setEditingId(partner.id);
     setForm({
@@ -237,7 +238,7 @@ export function ExternalPartners() {
     formModal.onOpen();
   }, [formModal]);
 
-  // ─── Save (create or update) ───
+  // â”€â”€â”€ Save (create or update) â”€â”€â”€
   const handleSave = useCallback(async () => {
     if (!form.name.trim() || !form.base_url.trim()) {
       toast.error(t('federation.name_and_url_required'));
@@ -294,7 +295,7 @@ export function ExternalPartners() {
     setSaving(false);
   }, [form, editingId, toast, t, formModal, loadData]);
 
-  // ─── Delete ───
+  // â”€â”€â”€ Delete â”€â”€â”€
   const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -314,7 +315,7 @@ export function ExternalPartners() {
     setDeleting(false);
   }, [deleteTarget, toast, t, loadData]);
 
-  // ─── Health check ───
+  // â”€â”€â”€ Health check â”€â”€â”€
   const handleHealthCheck = useCallback(async (partner: ExternalPartner) => {
     setHealthCheckLoading(partner.id);
     try {
@@ -348,7 +349,7 @@ export function ExternalPartners() {
     setHealthCheckLoading(null);
   }, [toast, t, loadData]);
 
-  // ─── View logs ───
+  // â”€â”€â”€ View logs â”€â”€â”€
   const handleViewLogs = useCallback(async (partner: ExternalPartner) => {
     setLogsPartnerName(partner.name);
     setLogsLoading(true);
@@ -368,12 +369,12 @@ export function ExternalPartners() {
     setLogsLoading(false);
   }, [toast, t, logsModal]);
 
-  // ─── Update form field ───
+  // â”€â”€â”€ Update form field â”€â”€â”€
   const updateForm = useCallback((field: keyof PartnerFormData, value: string | boolean) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  // ─── Render ───
+  // â”€â”€â”€ Render â”€â”€â”€
   if (loading) {
     return (
       <div>
@@ -589,7 +590,7 @@ export function ExternalPartners() {
                   minRows={2}
                 />
 
-                {/* Status — only shown when editing */}
+                {/* Status â€” only shown when editing */}
                 {editingId && (
                   <Select
                     label={t('federation.label_status')}
@@ -619,7 +620,7 @@ export function ExternalPartners() {
                   ))}
                 </Select>
 
-                {/* Credential fields — shown based on auth_method */}
+                {/* Credential fields â€” shown based on auth_method */}
                 {(form.auth_method === 'api_key' || form.auth_method === 'oauth2') && (
                   <Input
                     label={t('federation.label_api_key')}

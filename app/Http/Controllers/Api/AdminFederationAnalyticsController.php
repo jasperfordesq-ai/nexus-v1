@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Services\FederationInternalLedgerService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -95,27 +96,31 @@ class AdminFederationAnalyticsController extends BaseApiController
             }
         }
 
-        if ($this->tableExists('federation_transactions')) {
-            try {
-                $row = DB::selectOne(
-                    'SELECT COUNT(*) AS total FROM federation_transactions
-                     WHERE (sender_tenant_id = ? OR receiver_tenant_id = ?)
-                       AND created_at >= ?',
-                    [$tenantId, $tenantId, $since]
-                );
-                $kpis['federated_transactions'] = (int) ($row->total ?? 0);
-            } catch (\Throwable) {
-                // ignore
-            }
+        try {
+            $kpis['federated_transactions'] = FederationInternalLedgerService::countForTenant($tenantId, $since);
+        } catch (\Throwable) {
+            // ignore
         }
 
         if ($this->tableExists('federation_messages')) {
             try {
                 $row = DB::selectOne(
                     'SELECT COUNT(*) AS total FROM federation_messages
-                     WHERE (sender_tenant_id = ? OR receiver_tenant_id = ?)
+                     WHERE (
+                        (
+                            external_partner_id IS NULL
+                            AND direction = \'outbound\'
+                            AND (sender_tenant_id = ? OR receiver_tenant_id = ?)
+                        ) OR (
+                            external_partner_id IS NOT NULL
+                            AND (
+                                (direction = \'outbound\' AND sender_tenant_id = ?)
+                                OR (direction = \'inbound\' AND receiver_tenant_id = ?)
+                            )
+                        )
+                     )
                        AND created_at >= ?',
-                    [$tenantId, $tenantId, $since]
+                    [$tenantId, $tenantId, $tenantId, $tenantId, $since]
                 );
                 $kpis['federated_messages'] = (int) ($row->total ?? 0);
             } catch (\Throwable) {
@@ -126,19 +131,10 @@ class AdminFederationAnalyticsController extends BaseApiController
         // Federated listings: count listings that are flagged as
         // federated (or public to federation) — schema dependent.
         // Defensive: use listing_tenant_id link from transactions as a proxy.
-        if ($this->tableExists('federation_transactions')) {
-            try {
-                $row = DB::selectOne(
-                    'SELECT COUNT(DISTINCT listing_id) AS total
-                     FROM federation_transactions
-                     WHERE listing_id IS NOT NULL
-                       AND (sender_tenant_id = ? OR receiver_tenant_id = ? OR listing_tenant_id = ?)',
-                    [$tenantId, $tenantId, $tenantId]
-                );
-                $kpis['federated_listings'] = (int) ($row->total ?? 0);
-            } catch (\Throwable) {
-                // ignore
-            }
+        try {
+            $kpis['federated_listings'] = FederationInternalLedgerService::countDistinctListingsForTenant($tenantId);
+        } catch (\Throwable) {
+            // ignore
         }
 
         if ($this->tableExists('federation_reputation')) {
@@ -225,6 +221,12 @@ class AdminFederationAnalyticsController extends BaseApiController
                         CASE WHEN p.tenant_id = ? THEN p.partner_tenant_id ELSE p.tenant_id END AS partner_id,
                         t.name AS partner_name,
                         (
+                          (SELECT COUNT(*) FROM transactions tx
+                            WHERE tx.is_federated = 1
+                              AND ((tx.sender_tenant_id = ? AND tx.receiver_tenant_id = CASE WHEN p.tenant_id = ? THEN p.partner_tenant_id ELSE p.tenant_id END)
+                                OR (tx.receiver_tenant_id = ? AND tx.sender_tenant_id = CASE WHEN p.tenant_id = ? THEN p.partner_tenant_id ELSE p.tenant_id END))
+                              AND tx.created_at >= ?)
+                          +
                           (SELECT COUNT(*) FROM federation_transactions ft
                             WHERE ((ft.sender_tenant_id = ? AND ft.receiver_tenant_id = CASE WHEN p.tenant_id = ? THEN p.partner_tenant_id ELSE p.tenant_id END)
                                 OR (ft.receiver_tenant_id = ? AND ft.sender_tenant_id = CASE WHEN p.tenant_id = ? THEN p.partner_tenant_id ELSE p.tenant_id END))
@@ -233,6 +235,8 @@ class AdminFederationAnalyticsController extends BaseApiController
                           (SELECT COUNT(*) FROM federation_messages fm
                             WHERE ((fm.sender_tenant_id = ? AND fm.receiver_tenant_id = CASE WHEN p.tenant_id = ? THEN p.partner_tenant_id ELSE p.tenant_id END)
                                 OR (fm.receiver_tenant_id = ? AND fm.sender_tenant_id = CASE WHEN p.tenant_id = ? THEN p.partner_tenant_id ELSE p.tenant_id END))
+                              AND fm.direction = \'outbound\'
+                              AND fm.external_partner_id IS NULL
                               AND fm.created_at >= ?)
                         ) AS activity
                  FROM federation_partnerships p
@@ -243,6 +247,7 @@ class AdminFederationAnalyticsController extends BaseApiController
                  LIMIT 10',
                 [
                     $tenantId,
+                    $tenantId, $tenantId, $tenantId, $tenantId, $since,
                     $tenantId, $tenantId, $tenantId, $tenantId, $since,
                     $tenantId, $tenantId, $tenantId, $tenantId, $since,
                     $tenantId,

@@ -109,6 +109,24 @@ class AdminFederationNeighborhoodsController extends BaseApiController
         }
 
         try {
+            $neighborhood = DB::selectOne("SELECT id FROM federation_neighborhoods WHERE id = ?", [$id]);
+            if (!$neighborhood) {
+                return $this->respondWithError('NOT_FOUND', __('api.neighborhood_not_found'), null, 404);
+            }
+
+            $tenant = DB::selectOne("SELECT id FROM tenants WHERE id = ? AND is_active = 1", [$tenantId]);
+            if (!$tenant) {
+                return $this->respondWithError('NOT_FOUND', __('api.tenant_not_found'), null, 404);
+            }
+
+            $existing = DB::selectOne(
+                "SELECT id FROM federation_neighborhood_tenants WHERE neighborhood_id = ? AND tenant_id = ?",
+                [$id, $tenantId]
+            );
+            if ($existing) {
+                return $this->respondWithData(['success' => true, 'already_member' => true]);
+            }
+
             DB::insert(
                 "INSERT INTO federation_neighborhood_tenants (neighborhood_id, tenant_id) VALUES (?, ?)",
                 [$id, $tenantId]
@@ -154,11 +172,20 @@ class AdminFederationNeighborhoodsController extends BaseApiController
     {
         $this->requirePlatformSuperAdmin();
         $currentTenantId = $this->getTenantId();
+        $neighborhoodId = (int) request()->query('neighborhood_id', 0);
 
         try {
+            $sql = "SELECT id, name, slug, domain FROM tenants WHERE is_active = 1 AND id != ?";
+            $params = [$currentTenantId];
+            if ($neighborhoodId > 0) {
+                $sql .= " AND id NOT IN (SELECT tenant_id FROM federation_neighborhood_tenants WHERE neighborhood_id = ?)";
+                $params[] = $neighborhoodId;
+            }
+            $sql .= " ORDER BY name";
+
             $tenants = DB::select(
-                "SELECT id, name, slug, domain FROM tenants WHERE is_active = 1 AND id != ? ORDER BY name",
-                [$currentTenantId]
+                $sql,
+                $params
             );
 
             return $this->respondWithData(array_map(fn($r) => (array) $r, $tenants));

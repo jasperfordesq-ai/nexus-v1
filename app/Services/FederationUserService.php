@@ -142,7 +142,7 @@ class FederationUserService
                     : 'local_only';
             }
             if (isset($settings['travel_radius_km'])) {
-                $data['travel_radius_km'] = max(0, (int) $settings['travel_radius_km']);
+                $data['travel_radius_km'] = min(500, max(0, (int) $settings['travel_radius_km']));
             }
             if (isset($settings['email_notifications'])) {
                 $data['email_notifications'] = $settings['email_notifications'] ? 1 : 0;
@@ -214,6 +214,8 @@ class FederationUserService
                     'appear_in_federated_search'     => 0,
                     'show_skills_federated'          => 0,
                     'show_location_federated'        => 0,
+                    'show_reviews_federated'         => 0,
+                    'email_notifications'            => 0,
                     'updated_at'                     => now(),
                 ]
             );
@@ -338,8 +340,16 @@ class FederationUserService
             $crossTenant = 0;
             try {
                 $crossTenant = (int) DB::table('federation_messages')
-                    ->where(function ($q) use ($userId) {
-                        $q->where('sender_user_id', $userId)->orWhere('receiver_user_id', $userId);
+                    ->where(function ($q) use ($userId, $tenantId) {
+                        $q->where(function ($outbound) use ($userId, $tenantId) {
+                            $outbound->where('direction', 'outbound')
+                                ->where('sender_user_id', $userId)
+                                ->where('sender_tenant_id', $tenantId);
+                        })->orWhere(function ($inbound) use ($userId, $tenantId) {
+                            $inbound->where('direction', 'inbound')
+                                ->where('receiver_user_id', $userId)
+                                ->where('receiver_tenant_id', $tenantId);
+                        });
                     })
                     ->count();
             } catch (\Throwable $e) {

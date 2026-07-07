@@ -1,8 +1,9 @@
-import { Select, SelectItem, GlassCard, Progress, Button, Chip, Spinner, Input, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+
+import { Select, SelectItem, GlassCard, Progress, Button, Chip, Spinner, Input, Switch } from '@/components/ui';
 
 /**
  * Federation Onboarding Page - Step-by-step wizard for first-time federation setup
@@ -46,20 +47,20 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { FederationPartner } from '@/types/api';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 type ServiceReach = 'local_only' | 'remote_ok' | 'travel_ok';
 
 interface OnboardingSettings {
-  // Step 2 — Privacy
+  // Step 2 â€” Privacy
   profile_visible_federated: boolean;
   appear_in_federated_search: boolean;
   show_skills_federated: boolean;
   show_location_federated: boolean;
   show_reviews_federated: boolean;
-  // Step 3 — Communication
+  // Step 3 â€” Communication
   messaging_enabled_federated: boolean;
   transactions_enabled_federated: boolean;
   email_notifications: boolean;
@@ -95,9 +96,9 @@ const inputClassNames = {
   label: 'text-theme-muted',
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Component
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function FederationOnboardingPage() {
   const { t } = useTranslation('federation');
@@ -110,7 +111,7 @@ export function FederationOnboardingPage() {
   // AbortController ref to cancel stale requests
   const abortRef = useRef<AbortController | null>(null);
 
-  // Stable refs for t/toast — avoids re-creating callbacks when i18n namespace loads
+  // Stable refs for t/toast â€” avoids re-creating callbacks when i18n namespace loads
   const tRef = useRef(t);
   tRef.current = t;
   const toastRef = useRef(toast);
@@ -135,13 +136,13 @@ export function FederationOnboardingPage() {
         }
       }
     }).catch(() => {
-      // Non-critical — if the check fails, let the wizard proceed normally
+      // Non-critical â€” if the check fails, let the wizard proceed normally
     });
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Step 4 — partner data
+  // Step 4 â€” partner data
   const [partners, setPartners] = useState<FederationPartner[]>([]);
   const [partnersLoading, setPartnersLoading] = useState(false);
 
@@ -208,9 +209,9 @@ export function FederationOnboardingPage() {
     navigate(tenantPath('/federation'));
   }, [navigate, tenantPath]);
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Animation
-  // ───────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   const slideVariants = {
     enter: (direction: number) => ({
@@ -237,9 +238,9 @@ export function FederationOnboardingPage() {
     goBack();
   }, [goBack]);
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   // Render
-  // ───────────────────────────────────────────────────────────────────────────
+  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   return (
     <div className="max-w-2xl mx-auto py-6 space-y-6">
@@ -290,7 +291,7 @@ export function FederationOnboardingPage() {
           exit="exit"
           transition={{ duration: 0.25, ease: 'easeInOut' }}
         >
-          {/* ─── Step 1: Welcome ─── */}
+          {/* â”€â”€â”€ Step 1: Welcome â”€â”€â”€ */}
           {currentStep === 1 && (
             <div className="space-y-6">
               {/* Hero icons */}
@@ -360,7 +361,7 @@ export function FederationOnboardingPage() {
             </div>
           )}
 
-          {/* ─── Step 2: Privacy Settings ─── */}
+          {/* â”€â”€â”€ Step 2: Privacy Settings â”€â”€â”€ */}
           {currentStep === 2 && (
             <div className="space-y-6">
               <GlassCard className="p-6">
@@ -418,7 +419,7 @@ export function FederationOnboardingPage() {
             </div>
           )}
 
-          {/* ─── Step 3: Communication Preferences ─── */}
+          {/* â”€â”€â”€ Step 3: Communication Preferences â”€â”€â”€ */}
           {currentStep === 3 && (
             <div className="space-y-6">
               <GlassCard className="p-6">
@@ -515,7 +516,7 @@ export function FederationOnboardingPage() {
             </div>
           )}
 
-          {/* ─── Step 4: Confirmation ─── */}
+          {/* â”€â”€â”€ Step 4: Confirmation â”€â”€â”€ */}
           {currentStep === 4 && (
             <div className="space-y-6">
               <GlassCard className="p-6">
@@ -694,9 +695,9 @@ export function FederationOnboardingPage() {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Sub-components
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface OnboardingToggleProps {
   label: string;

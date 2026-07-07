@@ -140,9 +140,20 @@ class FederationV2Controller extends BaseApiController
             try {
                 $msgResult = DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM federation_messages
-                     WHERE (sender_user_id = ? AND sender_tenant_id = ?)
-                        OR (receiver_user_id = ? AND receiver_tenant_id = ?)",
-                    [$userId, $tenantId, $userId, $tenantId]
+                     WHERE (
+                        external_partner_id IS NULL
+                        AND (
+                            (direction = 'outbound' AND sender_user_id = ? AND sender_tenant_id = ?)
+                            OR (direction = 'inbound' AND receiver_user_id = ? AND receiver_tenant_id = ?)
+                        )
+                     ) OR (
+                        external_partner_id IS NOT NULL
+                        AND (
+                            (direction = 'outbound' AND sender_user_id = ? AND sender_tenant_id = ?)
+                            OR (direction = 'inbound' AND receiver_user_id = ? AND receiver_tenant_id = ?)
+                        )
+                     )",
+                    [$userId, $tenantId, $userId, $tenantId, $userId, $tenantId, $userId, $tenantId]
                 );
                 $messagesCount = (int) ($msgResult->cnt ?? 0);
             } catch (\Exception $e) {
@@ -151,8 +162,12 @@ class FederationV2Controller extends BaseApiController
             try {
                 $txResult = DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM transactions
-                     WHERE is_federated = 1 AND (sender_id = ? OR receiver_id = ?) AND tenant_id = ?",
-                    [$userId, $userId, $tenantId]
+                     WHERE is_federated = 1
+                       AND (
+                           (sender_id = ? AND sender_tenant_id = ?)
+                           OR (receiver_id = ? AND receiver_tenant_id = ?)
+                       )",
+                    [$userId, $tenantId, $userId, $tenantId]
                 );
                 $transactionsCount = (int) ($txResult->cnt ?? 0);
             } catch (\Exception $e) {
@@ -572,9 +587,10 @@ class FederationV2Controller extends BaseApiController
                     (fp.tenant_id = :tid1 AND fp.partner_tenant_id = e.tenant_id)
                     OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = e.tenant_id)
                 )
-                JOIN federation_user_settings fus ON fus.user_id = e.user_id AND fus.federation_optin = 1 AND fus.appear_in_federated_search = 1
+                JOIN federation_user_settings fus ON fus.user_id = e.user_id AND fus.federation_optin = 1 AND fus.profile_visible_federated = 1 AND fus.appear_in_federated_search = 1
                 WHERE fp.status = 'active' AND fp.events_enabled = 1
                 AND e.tenant_id != :tid3 AND e.status = 'active'
+                AND e.federated_visibility IN ('listed', 'joinable')
             ";
             $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
 
@@ -864,7 +880,8 @@ class FederationV2Controller extends BaseApiController
                 JOIN federation_user_settings fus ON fus.user_id = l.user_id
                 WHERE fp.status = 'active' AND fp.listings_enabled = 1
                 AND l.status = 'active' AND l.tenant_id != :tid3
-                AND fus.federation_optin = 1 AND fus.appear_in_federated_search = 1
+                AND l.federated_visibility IN ('listed', 'bookable')
+                AND fus.federation_optin = 1 AND fus.profile_visible_federated = 1 AND fus.appear_in_federated_search = 1
             ";
             $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
 
@@ -1094,7 +1111,7 @@ class FederationV2Controller extends BaseApiController
                     OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = u.tenant_id)
                 )
                 WHERE fp.status = 'active' AND fp.profiles_enabled = 1
-                AND fus.federation_optin = 1 AND fus.appear_in_federated_search = 1
+                AND fus.federation_optin = 1 AND fus.profile_visible_federated = 1 AND fus.appear_in_federated_search = 1
                 AND u.status = 'active' AND u.tenant_id != :tid3
             ";
             $filterParams = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
@@ -1418,6 +1435,7 @@ class FederationV2Controller extends BaseApiController
                      FROM listings l
                      LEFT JOIN categories c ON c.id = l.category_id
                      WHERE l.user_id = ? AND l.tenant_id = ? AND l.status = 'active'
+                       AND l.federated_visibility IN ('listed', 'bookable')
                      ORDER BY l.created_at DESC LIMIT 10",
                     [(int) $m['id'], (int) $m['tenant_id']]
                 );
@@ -1653,10 +1671,17 @@ class FederationV2Controller extends BaseApiController
                 LEFT JOIN tenants rt ON rt.id = fm.receiver_tenant_id
                 LEFT JOIN federation_external_partners ep ON ep.id = fm.external_partner_id
                 WHERE (
-                    (fm.sender_tenant_id = ? AND fm.sender_user_id = ?)
-                    OR (fm.receiver_tenant_id = ? AND fm.receiver_user_id = ?)
-                    OR (fm.external_partner_id IS NOT NULL AND fm.direction = 'outbound' AND fm.sender_user_id = ? AND fm.sender_tenant_id = ?)
-                    OR (fm.external_partner_id IS NOT NULL AND fm.direction = 'inbound' AND fm.receiver_user_id = ? AND fm.receiver_tenant_id = ?)
+                    fm.external_partner_id IS NULL
+                    AND (
+                        (fm.direction = 'outbound' AND fm.sender_tenant_id = ? AND fm.sender_user_id = ?)
+                        OR (fm.direction = 'inbound' AND fm.receiver_tenant_id = ? AND fm.receiver_user_id = ?)
+                    )
+                ) OR (
+                    fm.external_partner_id IS NOT NULL
+                    AND (
+                        (fm.direction = 'outbound' AND fm.sender_user_id = ? AND fm.sender_tenant_id = ?)
+                        OR (fm.direction = 'inbound' AND fm.receiver_user_id = ? AND fm.receiver_tenant_id = ?)
+                    )
                 )
                 ORDER BY fm.created_at DESC LIMIT 200
             ", [$tenantId, $userId, $tenantId, $userId, $userId, $tenantId, $userId, $tenantId]);
@@ -1799,9 +1824,12 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithErrors($errors);
         }
 
-        // Sanitize subject and body to prevent stored XSS
-        $subject = htmlspecialchars($subject, ENT_QUOTES, 'UTF-8');
-        $body = htmlspecialchars($body, ENT_QUOTES, 'UTF-8');
+        // Store plain text; output and email rendering escape for their context.
+        $subject = mb_substr(trim((string) $subject), 0, 255);
+        $body = trim((string) $body);
+        if ($body === '') {
+            return $this->respondWithErrors([['code' => 'VALIDATION_ERROR', 'message' => __('api_controllers_1.federation_v2.message_body_required'), 'field' => 'body']]);
+        }
 
         // ── External partner message routing ──
         // If receiver_tenant_id starts with "ext-", route via FederationExternalApiClient
@@ -1816,7 +1844,7 @@ class FederationV2Controller extends BaseApiController
         try {
             // Verify the receiver exists and accepts federated messages
             $receiverRow = DB::selectOne("
-                SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.tenant_id,
+                SELECT u.id, u.first_name, u.last_name, u.avatar_url, u.tenant_id, u.preferred_language,
                        fus.messaging_enabled_federated, fus.federation_optin,
                        t.name as tenant_name
                 FROM users u
@@ -1942,7 +1970,8 @@ class FederationV2Controller extends BaseApiController
                     (int)$receiverId,
                     (int)$receiverTenantId,
                     [
-                        'message_id' => $outboundId,
+                        'message_id' => $inboundId,
+                        'outbound_message_id' => $outboundId,
                         'sender_name' => $senderName,
                         'sender_tenant_name' => $senderTenantName,
                         'subject' => $subject,
@@ -1955,25 +1984,27 @@ class FederationV2Controller extends BaseApiController
 
             // 3. In-app notification + push notification
             try {
-                $subjectPreview = mb_substr($subject ?: __('api.federation_no_subject'), 0, 50);
-                if (mb_strlen($subject) > 50) {
-                    $subjectPreview .= '...';
-                }
-                $notifMessage = __('api.federation_new_message_notif', [
-                    'sender' => $senderName,
-                    'community' => $senderTenantName,
-                    'subject' => $subjectPreview,
-                ]);
+                LocaleContext::withLocale($receiver['preferred_language'] ?? null, function () use ($receiverId, $receiverTenantId, $senderName, $senderTenantName, $subject) {
+                    $subjectPreview = mb_substr($subject ?: __('api.federation_no_subject'), 0, 50);
+                    if (mb_strlen($subject) > 50) {
+                        $subjectPreview .= '...';
+                    }
+                    $notifMessage = __('api.federation_new_message_notif', [
+                        'sender' => $senderName,
+                        'community' => $senderTenantName,
+                        'subject' => $subjectPreview,
+                    ]);
 
-                Notification::createNotification(
-                    (int)$receiverId,
-                    $notifMessage,
-                    '/federation/messages',
-                    'federation_message',
-                    true,
-                    (int)$receiverTenantId  // Receiver's tenant, not sender's
-                );
-                \App\Services\NotificationDispatcher::fanOutPush((int) (int)$receiverId, 'federation_message', $notifMessage, '/federation/messages');
+                    Notification::createNotification(
+                        (int)$receiverId,
+                        $notifMessage,
+                        '/federation/messages',
+                        'federation_message',
+                        true,
+                        (int)$receiverTenantId  // Receiver's tenant, not sender's
+                    );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $receiverId, 'federation_message', $notifMessage, '/federation/messages');
+                });
 
                 DB::update(
                     "UPDATE federation_messages
@@ -2262,10 +2293,20 @@ class FederationV2Controller extends BaseApiController
             FROM federation_messages
             WHERE id = ?
               AND (
-                (sender_tenant_id = ? AND sender_user_id = ?)
-                OR (receiver_tenant_id = ? AND receiver_user_id = ?)
-                OR (external_partner_id IS NOT NULL AND direction = 'outbound' AND sender_user_id = ? AND sender_tenant_id = ?)
-                OR (external_partner_id IS NOT NULL AND direction = 'inbound' AND receiver_user_id = ? AND receiver_tenant_id = ?)
+                (
+                    external_partner_id IS NULL
+                    AND (
+                        (direction = 'outbound' AND sender_tenant_id = ? AND sender_user_id = ?)
+                        OR (direction = 'inbound' AND receiver_tenant_id = ? AND receiver_user_id = ?)
+                    )
+                )
+                OR (
+                    external_partner_id IS NOT NULL
+                    AND (
+                        (direction = 'outbound' AND sender_user_id = ? AND sender_tenant_id = ?)
+                        OR (direction = 'inbound' AND receiver_user_id = ? AND receiver_tenant_id = ?)
+                    )
+                )
               )
         ", [$id, $tenantId, $userId, $tenantId, $userId, $userId, $tenantId, $userId, $tenantId]);
 
@@ -2573,7 +2614,10 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithError('INVALID_AMOUNT', __('api.fed_amount_range'), null, 400);
         }
 
-        $description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+        $description = trim((string) $description);
+        if ($description === '') {
+            return $this->respondWithErrors([['code' => 'VALIDATION_ERROR', 'message' => __('api.fed_description_required'), 'field' => 'description']]);
+        }
 
         $receiverTenantStr = (string) $receiverTenantId;
         $isExternal = str_starts_with($receiverTenantStr, 'ext-');

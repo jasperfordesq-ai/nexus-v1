@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Button, Spinner, Chip, Input, Select, SelectItem, useDisclosure, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
@@ -29,10 +34,6 @@ import { ConfirmModal } from '../../components/ConfirmModal';
 import { BrokerEmptyState, BrokerStatusChip } from '@/broker/components';
 import { useTranslation } from 'react-i18next';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * Federation Credit Agreements (FD1)
@@ -41,9 +42,9 @@ import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
  */
 
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface CreditAgreement {
   id: number;
@@ -99,9 +100,9 @@ interface AgreementTransaction {
   completed_at?: string;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Helpers
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function getPartnerName(agreement: CreditAgreement, unknownLabel: string): string {
   if (agreement.partner_tenant?.name) return agreement.partner_tenant.name;
@@ -117,9 +118,9 @@ function getMonthlyLimit(agreement: CreditAgreement): number | null {
   return agreement.monthly_limit ?? agreement.max_monthly_credits ?? null;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Component
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function CreditAgreements() {
   const { t } = useTranslation('admin');
@@ -162,7 +163,7 @@ export function CreditAgreements() {
   const [detailMonthlyLimit, setDetailMonthlyLimit] = useState<number | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  // ─── Load data ───
+  // â”€â”€â”€ Load data â”€â”€â”€
   const loadData = useCallback(async () => {
     if (abortControllerRef.current) abortControllerRef.current.abort();
     const controller = new AbortController();
@@ -223,7 +224,7 @@ export function CreditAgreements() {
     }
   }, [activeTab, balances.length, loadBalances]);
 
-  // ─── Create agreement ───
+  // â”€â”€â”€ Create agreement â”€â”€â”€
   const handleCreate = useCallback(async () => {
     if (!selectedPartner) return;
     const rate = parseFloat(exchangeRate);
@@ -261,7 +262,7 @@ export function CreditAgreements() {
   }, [selectedPartner, exchangeRate, monthlyLimit, toast, createModal, loadData, t]);
 
 
-  // ─── Status change ───
+  // â”€â”€â”€ Status change â”€â”€â”€
   const handleStatusChange = useCallback(async (agreementId: number, action: 'approve' | 'suspend' | 'terminate' | 'reactivate') => {
     try {
       const res = await api.post(`/v2/admin/federation/credit-agreements/${agreementId}/${action}`);
@@ -278,7 +279,7 @@ export function CreditAgreements() {
   }, [toast, loadData, t]);
 
 
-  // ─── Detail modal ───
+  // â”€â”€â”€ Detail modal â”€â”€â”€
   const openDetail = async (agreement: CreditAgreement) => {
     setSelectedAgreement(agreement);
     setDetailTransactions([]);
@@ -306,13 +307,13 @@ export function CreditAgreements() {
     }
   };
 
-  // ─── Stats ───
+  // â”€â”€â”€ Stats â”€â”€â”€
   const activeCount = agreements.filter((a) => a.status === 'active').length;
   const pendingCount = agreements.filter((a) => a.status === 'pending').length;
   const totalSent = agreements.reduce((sum, a) => sum + (a.credits_sent || 0), 0);
   const totalReceived = agreements.reduce((sum, a) => sum + (a.credits_received || 0), 0);
 
-  // ─── Render ───
+  // â”€â”€â”€ Render â”€â”€â”€
   if (loading) {
     return (
       <div>

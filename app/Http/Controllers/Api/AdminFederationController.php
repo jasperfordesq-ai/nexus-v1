@@ -10,6 +10,8 @@ use App\I18n\LocaleContext;
 use App\Services\FederationActivityService;
 use App\Services\FederationAuditService;
 use App\Services\FederationDirectoryService;
+use App\Services\FederationFeatureService;
+use App\Services\FederationInternalLedgerService;
 use App\Services\FederationPartnershipService;
 use App\Models\Notification;
 use Illuminate\Http\JsonResponse;
@@ -35,12 +37,29 @@ class AdminFederationController extends BaseApiController
     private const ALLOWED_TABLES = [
         'federation_partnerships', 'federation_transactions', 'federation_messages',
         'federation_api_keys', 'federation_user_settings', 'federation_audit_log',
+        'federation_connections', 'transactions',
     ];
 
     private function tableExists(string $table): bool
     {
         if (!in_array($table, self::ALLOWED_TABLES, true)) { return false; }
         try { DB::select("SELECT 1 FROM `{$table}` LIMIT 1"); return true; } catch (\Exception $e) { return false; }
+    }
+
+    private function setTenantFeature(int $tenantId, string $feature, bool $enabled, ?int $adminId = null): void
+    {
+        DB::statement(
+            "REPLACE INTO federation_tenant_features
+             (tenant_id, feature_key, is_enabled, updated_at, updated_by)
+             VALUES (?, ?, ?, NOW(), ?)",
+            [$tenantId, $feature, $enabled ? 1 : 0, $adminId]
+        );
+
+        try {
+            app(FederationFeatureService::class)->clearCache();
+        } catch (\Throwable) {
+            // Best-effort cache clear; the DB row is the source of truth.
+        }
     }
 
     /**
@@ -168,9 +187,13 @@ class AdminFederationController extends BaseApiController
     {
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
+        $featureService = app(FederationFeatureService::class);
+        $tenantFeatures = $featureService->getAllTenantFeatures($tenantId);
 
         $data = [
-            'federation_enabled' => TenantContext::hasFeature('federation'),
+            'federation_enabled' => (bool) ($tenantFeatures[FederationFeatureService::TENANT_FEDERATION_ENABLED]['enabled'] ?? false),
+            'system_federation_enabled' => $featureService->isGloballyEnabled(),
+            'tenant_features' => $tenantFeatures,
             'tenant_id' => $tenantId,
             'settings' => ['allow_inbound_partnerships' => true, 'auto_approve_partners' => false, 'shared_categories' => [], 'max_partnerships' => 10],
         ];
@@ -181,7 +204,6 @@ class AdminFederationController extends BaseApiController
                 $config = json_decode($row->configuration, true);
                 if (isset($config['federation']) && is_array($config['federation'])) {
                     $fc = $config['federation'];
-                    if (isset($fc['federation_enabled'])) { $data['federation_enabled'] = (bool)$fc['federation_enabled']; }
                     $data['settings'] = array_merge($data['settings'], array_diff_key($fc, ['federation_enabled' => '']));
                 }
             }
@@ -192,9 +214,19 @@ class AdminFederationController extends BaseApiController
 
     public function updateSettings(): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         $tenantId = TenantContext::getId();
         $input = $this->getAllInput();
+        $featureMap = [
+            'appear_in_directory' => FederationFeatureService::TENANT_APPEAR_IN_DIRECTORY,
+            'auto_accept_hierarchy' => FederationFeatureService::TENANT_AUTO_ACCEPT_HIERARCHY,
+            'profiles_enabled' => FederationFeatureService::TENANT_PROFILES_ENABLED,
+            'messaging_enabled' => FederationFeatureService::TENANT_MESSAGING_ENABLED,
+            'transactions_enabled' => FederationFeatureService::TENANT_TRANSACTIONS_ENABLED,
+            'listings_enabled' => FederationFeatureService::TENANT_LISTINGS_ENABLED,
+            'events_enabled' => FederationFeatureService::TENANT_EVENTS_ENABLED,
+            'groups_enabled' => FederationFeatureService::TENANT_GROUPS_ENABLED,
+        ];
 
         try {
             $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
@@ -203,27 +235,33 @@ class AdminFederationController extends BaseApiController
             $federationSettings = $config['federation'] ?? [];
             if (isset($input['settings']) && is_array($input['settings'])) {
                 $allowedSettingKeys = [
-                    'profile_visible_federated', 'appear_in_federated_search',
-                    'show_skills_federated', 'show_location_federated',
-                    'show_reviews_federated', 'messaging_enabled_federated',
-                    'transactions_enabled_federated', 'email_notifications',
-                    'service_reach', 'travel_radius_km',
                     'allow_inbound_partnerships', 'auto_approve_partners',
                     'shared_categories', 'max_partnerships',
                 ];
                 $filtered = array_intersect_key($input['settings'], array_flip($allowedSettingKeys));
                 $federationSettings = array_merge($federationSettings, $filtered);
+
+                foreach ($featureMap as $inputKey => $featureKey) {
+                    if (array_key_exists($inputKey, $input['settings'])) {
+                        $this->setTenantFeature($tenantId, $featureKey, (bool) $input['settings'][$inputKey], $adminId);
+                    }
+                }
             }
             if (isset($input['federation_enabled'])) {
-                $federationSettings['federation_enabled'] = $input['federation_enabled'];
+                $this->setTenantFeature($tenantId, FederationFeatureService::TENANT_FEDERATION_ENABLED, (bool) $input['federation_enabled'], $adminId);
             }
             $config['federation'] = $federationSettings;
 
             DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
             try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
 
+            $featureService = app(FederationFeatureService::class);
+            $tenantFeatures = $featureService->getAllTenantFeatures($tenantId);
+
             return $this->respondWithData([
-                'federation_enabled' => $federationSettings['federation_enabled'] ?? false,
+                'federation_enabled' => (bool) ($tenantFeatures[FederationFeatureService::TENANT_FEDERATION_ENABLED]['enabled'] ?? false),
+                'system_federation_enabled' => $featureService->isGloballyEnabled(),
+                'tenant_features' => $tenantFeatures,
                 'tenant_id' => $tenantId,
                 'settings' => array_diff_key($federationSettings, ['federation_enabled' => '']),
             ]);
@@ -245,8 +283,12 @@ class AdminFederationController extends BaseApiController
 
         try {
             $items = DB::select(
-                "SELECT fp.*, t.name as partner_name, t.slug as partner_slug FROM federation_partnerships fp LEFT JOIN tenants t ON (fp.partner_tenant_id = t.id) WHERE fp.tenant_id = ? OR fp.partner_tenant_id = ? ORDER BY fp.created_at DESC",
-                [$tenantId, $tenantId]
+                "SELECT fp.*, t.name as partner_name, t.slug as partner_slug
+                 FROM federation_partnerships fp
+                 LEFT JOIN tenants t ON t.id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
+                 WHERE fp.tenant_id = ? OR fp.partner_tenant_id = ?
+                 ORDER BY fp.created_at DESC",
+                [$tenantId, $tenantId, $tenantId]
             );
             return $this->respondWithData(array_map(fn($r) => (array)$r, $items) ?: []);
         } catch (\Exception $e) { return $this->respondWithData([]); }
@@ -574,20 +616,35 @@ class AdminFederationController extends BaseApiController
             if ($this->tableExists('federation_messages')) {
                 try {
                     $row = DB::selectOne(
-                        "SELECT COUNT(*) as total FROM federation_messages WHERE (sender_tenant_id = ? AND receiver_tenant_id = ?) OR (sender_tenant_id = ? AND receiver_tenant_id = ?)",
+                        "SELECT COUNT(*) as total FROM federation_messages
+                         WHERE direction = 'outbound'
+                           AND external_partner_id IS NULL
+                           AND (
+                            (sender_tenant_id = ? AND receiver_tenant_id = ?)
+                            OR (sender_tenant_id = ? AND receiver_tenant_id = ?)
+                           )",
                         [$t1, $t2, $t2, $t1]
                     );
                     $stats['messages_exchanged'] = (int) ($row->total ?? 0);
                 } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
             }
 
-            if ($this->tableExists('federation_transactions')) {
+            try {
+                $stats['transactions_completed'] = FederationInternalLedgerService::countCompletedBetweenTenants($t1, $t2);
+            } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
+
+            if ($this->tableExists('federation_connections')) {
                 try {
                     $row = DB::selectOne(
-                        "SELECT COUNT(*) as total FROM federation_transactions WHERE (sender_tenant_id = ? AND receiver_tenant_id = ?) OR (sender_tenant_id = ? AND receiver_tenant_id = ?)",
+                        "SELECT COUNT(*) as total FROM federation_connections
+                         WHERE status = 'accepted'
+                           AND (
+                            (requester_tenant_id = ? AND receiver_tenant_id = ?)
+                            OR (requester_tenant_id = ? AND receiver_tenant_id = ?)
+                           )",
                         [$t1, $t2, $t2, $t1]
                     );
-                    $stats['transactions_completed'] = (int) ($row->total ?? 0);
+                    $stats['connections_made'] = (int) ($row->total ?? 0);
                 } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
             }
 
@@ -619,15 +676,8 @@ class AdminFederationController extends BaseApiController
             $topics = $this->federationDirectoryService->getActiveTopics();
             return $this->respondWithData(['communities' => $communities, 'regions' => $regions, 'categories' => $categories, 'topics' => $topics]);
         } catch (\Exception $e) {
-            try {
-                $fallback = DB::select(
-                    "SELECT t.id, t.name, t.slug, t.is_active, t.created_at, (SELECT COUNT(*) FROM users u WHERE u.tenant_id = t.id AND u.status = 'active') as member_count FROM tenants t WHERE t.is_active = 1 AND t.id != ? ORDER BY t.name ASC LIMIT 100",
-                    [$tenantId]
-                );
-                return $this->respondWithData(['communities' => array_map(fn($r) => (array)$r, $fallback) ?: [], 'regions' => [], 'categories' => []]);
-            } catch (\Exception $e2) {
-                return $this->respondWithData(['communities' => [], 'regions' => [], 'categories' => []]);
-            }
+            Log::warning('[FederationDirectory] Admin directory failed closed', ['tenant_id' => $tenantId, 'error' => $e->getMessage()]);
+            return $this->respondWithData(['communities' => [], 'regions' => [], 'categories' => [], 'topics' => []]);
         }
     }
 
@@ -636,15 +686,38 @@ class AdminFederationController extends BaseApiController
         $this->requireAdmin();
         $tenantId = TenantContext::getId();
         try {
-            $tenantRow = DB::selectOne("SELECT t.id, t.name, t.slug, t.is_active, t.configuration, t.created_at FROM tenants t WHERE t.id = ?", [$tenantId]);
-            if ($tenantRow) {
-                $tenant = (array)$tenantRow;
-                $config = json_decode($tenant['configuration'] ?? '{}', true);
-                $tenant['federation_profile'] = $config['federation_profile'] ?? ['description' => '', 'contact_email' => '', 'website' => '', 'categories' => []];
-                unset($tenant['configuration']);
-            } else {
-                $tenant = [];
+            $profile = FederationDirectoryService::getTimebankProfile($tenantId);
+            if (!$profile) {
+                return $this->respondWithData([]);
             }
+
+            $tenantRow = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
+            $config = json_decode($tenantRow->configuration ?? '{}', true) ?: [];
+            $legacy = $config['federation_profile'] ?? [];
+
+            $tenant = [
+                'id' => $profile['id'],
+                'name' => $profile['name'],
+                'slug' => $profile['slug'],
+                'is_active' => $profile['is_active'],
+                'status' => $profile['is_active'] ? 'active' : 'inactive',
+                'created_at' => $profile['created_at'],
+                'tagline' => $profile['tagline'] ?? null,
+                'logo_url' => $profile['logo_url'] ?? null,
+                'cover_image_url' => $profile['cover_image_url'] ?? null,
+                'country_code' => $profile['country_code'] ?? null,
+                'region' => $profile['region'] ?? null,
+                'city' => $profile['city'] ?? null,
+                'show_member_count' => $profile['show_member_count'] ?? true,
+                'show_activity_stats' => $profile['show_activity_stats'] ?? false,
+                'show_location' => $profile['show_location'] ?? true,
+                'federation_profile' => [
+                    'description' => $profile['description'] ?? '',
+                    'contact_email' => $legacy['contact_email'] ?? '',
+                    'website' => $profile['website_url'] ?? ($legacy['website'] ?? ''),
+                    'categories' => $legacy['categories'] ?? [],
+                ],
+            ];
             return $this->respondWithData($tenant);
         } catch (\Exception $e) { return $this->respondWithData([]); }
     }
@@ -658,15 +731,36 @@ class AdminFederationController extends BaseApiController
         try {
             $row = DB::selectOne("SELECT configuration FROM tenants WHERE id = ?", [$tenantId]);
             $config = json_decode($row->configuration ?? '{}', true) ?: [];
-            $allowedProfileKeys = ['description', 'contact_email', 'website', 'categories'];
             $profileInput = isset($input['federation_profile']) && is_array($input['federation_profile'])
                 ? $input['federation_profile']
                 : $input;
-            $filtered = array_intersect_key($profileInput, array_flip($allowedProfileKeys));
-            $config['federation_profile'] = array_merge($config['federation_profile'] ?? [], $filtered);
+
+            $directoryUpdate = [];
+            if (isset($input['name'])) {
+                $directoryUpdate['display_name'] = substr(trim((string) $input['name']), 0, 200);
+            }
+            if (isset($profileInput['description'])) {
+                $directoryUpdate['description'] = trim((string) $profileInput['description']);
+            }
+            if (isset($profileInput['website'])) {
+                $directoryUpdate['website_url'] = substr(trim((string) $profileInput['website']), 0, 500);
+            }
+            if (isset($profileInput['website_url'])) {
+                $directoryUpdate['website_url'] = substr(trim((string) $profileInput['website_url']), 0, 500);
+            }
+
+            if (!empty($directoryUpdate) && !FederationDirectoryService::updateDirectoryProfile($tenantId, $directoryUpdate)) {
+                return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'federation profile']), null, 500);
+            }
+
+            $legacyAllowedProfileKeys = ['contact_email', 'categories'];
+            $filtered = array_intersect_key($profileInput, array_flip($legacyAllowedProfileKeys));
+            if (!empty($filtered)) {
+                $config['federation_profile'] = array_merge($config['federation_profile'] ?? [], $filtered);
+            }
             DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
             try { app(\App\Services\RedisCache::class)->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
-            return $this->respondWithData($config['federation_profile']);
+            return $this->profile();
         } catch (\Exception $e) {
             return $this->respondWithError('UPDATE_FAILED', __('api.update_failed', ['resource' => 'federation profile']), null, 500);
         }
@@ -727,11 +821,28 @@ class AdminFederationController extends BaseApiController
         if ($this->tableExists('federation_partnerships')) {
             try { $row = DB::selectOne("SELECT COUNT(*) as total, SUM(CASE WHEN status='active' THEN 1 ELSE 0 END) as active_count, SUM(CASE WHEN status='pending' THEN 1 ELSE 0 END) as pending FROM federation_partnerships WHERE tenant_id = ? OR partner_tenant_id = ?", [$tenantId, $tenantId]); $data['total_partnerships'] = (int)($row->total ?? 0); $data['active_partnerships'] = (int)($row->active_count ?? 0); $data['pending_requests'] = (int)($row->pending ?? 0); } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
-        if ($this->tableExists('federation_transactions')) {
-            try { $row = DB::selectOne("SELECT COUNT(*) as total FROM federation_transactions WHERE sender_tenant_id = ? OR receiver_tenant_id = ?", [$tenantId, $tenantId]); $data['cross_community_transactions'] = (int)($row->total ?? 0); } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
-        }
+        try {
+            $data['cross_community_transactions'] = FederationInternalLedgerService::countForTenant($tenantId);
+        } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         if ($this->tableExists('federation_messages')) {
-            try { $row = DB::selectOne("SELECT COUNT(*) as total FROM federation_messages WHERE sender_tenant_id = ? OR receiver_tenant_id = ?", [$tenantId, $tenantId]); $data['cross_community_messages'] = (int)($row->total ?? 0); } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
+            try {
+                $row = DB::selectOne(
+                    "SELECT COUNT(*) as total FROM federation_messages
+                     WHERE (
+                        external_partner_id IS NULL
+                        AND direction = 'outbound'
+                        AND (sender_tenant_id = ? OR receiver_tenant_id = ?)
+                     ) OR (
+                        external_partner_id IS NOT NULL
+                        AND (
+                            (direction = 'outbound' AND sender_tenant_id = ?)
+                            OR (direction = 'inbound' AND receiver_tenant_id = ?)
+                        )
+                     )",
+                    [$tenantId, $tenantId, $tenantId, $tenantId]
+                );
+                $data['cross_community_messages'] = (int)($row->total ?? 0);
+            } catch (\Exception $e) { Log::warning('Stats query failed in ' . __METHOD__, ['error' => $e->getMessage()]); }
         }
         return $this->respondWithData($data);
     }
@@ -1022,18 +1133,37 @@ class AdminFederationController extends BaseApiController
                     break;
 
                 case 'transactions':
-                    if (!$this->tableExists('federation_transactions')) {
+                    if (!$this->tableExists('transactions') && !$this->tableExists('federation_transactions')) {
                         return $this->respondWithError('NO_DATA', __('api_controllers_1.admin_federation.federation_transactions_not_found'), null, 404);
                     }
-                    $rows = array_map(fn($r) => (array)$r, DB::select("
-                        SELECT ft.id, ft.sender_user_id, ft.receiver_user_id,
-                               ft.amount, ft.description, ft.status,
-                               ft.created_at, ft.completed_at
-                        FROM federation_transactions ft
-                        WHERE ft.sender_tenant_id = ? OR ft.receiver_tenant_id = ?
-                        ORDER BY ft.created_at DESC
-                    ", [$tenantId, $tenantId]));
-                    $headers = ['ID', 'Sender ID', 'Receiver ID', 'Amount', 'Description', 'Status', 'Created', 'Completed'];
+                    $rows = [];
+                    if ($this->tableExists('transactions')) {
+                        $rows = array_merge($rows, array_map(fn($r) => (array)$r, DB::select("
+                            SELECT tx.id, tx.sender_id AS sender_user_id, tx.receiver_id AS receiver_user_id,
+                                   tx.amount, tx.description, tx.status,
+                                   tx.created_at, tx.updated_at AS completed_at,
+                                   'transactions' AS ledger_source
+                            FROM transactions tx
+                            WHERE tx.is_federated = 1
+                              AND (tx.sender_tenant_id = ? OR tx.receiver_tenant_id = ?)
+                            ORDER BY tx.created_at DESC
+                            LIMIT 5000
+                        ", [$tenantId, $tenantId])));
+                    }
+                    if ($this->tableExists('federation_transactions')) {
+                        $rows = array_merge($rows, array_map(fn($r) => (array)$r, DB::select("
+                            SELECT ft.id, ft.sender_user_id, ft.receiver_user_id,
+                                   ft.amount, ft.description, ft.status,
+                                   ft.created_at, ft.completed_at,
+                                   'federation_transactions' AS ledger_source
+                            FROM federation_transactions ft
+                            WHERE ft.sender_tenant_id = ? OR ft.receiver_tenant_id = ?
+                            ORDER BY ft.created_at DESC
+                            LIMIT 5000
+                        ", [$tenantId, $tenantId])));
+                    }
+                    usort($rows, static fn(array $a, array $b): int => strcmp((string) ($b['created_at'] ?? ''), (string) ($a['created_at'] ?? '')));
+                    $headers = ['ID', 'Sender ID', 'Receiver ID', 'Amount', 'Description', 'Status', 'Created', 'Completed', 'Ledger Source'];
                     break;
 
                 case 'audit':

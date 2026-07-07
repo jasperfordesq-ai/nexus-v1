@@ -1,8 +1,9 @@
-import { CardBody, Card, Select, SelectItem, Button, Chip, Input, Tooltip, Skeleton, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+
+import { CardBody, Card, Select, SelectItem, Button, Chip, Input, Tooltip, Skeleton, Checkbox } from '@/components/ui';
 
 /**
  * Federation Activity Feed
@@ -35,9 +36,9 @@ import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface ActivityItem {
   id: number;
@@ -56,9 +57,9 @@ interface ActivityItem {
   data: Record<string, unknown>;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Event type configuration
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface EventTypeConfig {
   label: string;
@@ -67,7 +68,7 @@ interface EventTypeConfig {
   bgClass: string;
 }
 
-// Event type i18n keys — labels resolved at render time via t()
+// Event type i18n keys â€” labels resolved at render time via t()
 const EVENT_TYPE_I18N_KEYS: Record<string, string> = {
   cross_tenant_message: 'federation.event_type_message_sent',
   api_message_sent: 'federation.event_type_message_sent',
@@ -104,7 +105,7 @@ const EVENT_TYPE_STYLES: Record<string, Omit<EventTypeConfig, 'label'>> = {
   federated_search: { icon: Search, color: 'default', bgClass: 'bg-surface-secondary text-muted dark:bg-surface-secondary dark:text-muted' },
 };
 
-// Filter option i18n keys — resolved at render time via t()
+// Filter option i18n keys â€” resolved at render time via t()
 const EVENT_TYPE_OPTION_KEYS = [
   { key: 'cross_tenant_message', i18nKey: 'federation.filter_messages' },
   { key: 'cross_tenant_transaction', i18nKey: 'federation.filter_transactions' },
@@ -134,9 +135,9 @@ function getEventConfig(type: string, t: (key: string, defaultValue?: string) =>
   };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Timeline Item Component
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function TimelineItem({ item }: { item: ActivityItem }) {
   const { t } = useTranslation('admin');
@@ -222,13 +223,13 @@ function TimelineItem({ item }: { item: ActivityItem }) {
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Main Component
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function ActivityFeed() {
   const { t } = useTranslation('admin');
-  usePageTitle("Federation");
+  usePageTitle(t('federation.activity_feed_title'));
 
   // Data
   const [items, setItems] = useState<ActivityItem[]>([]);
@@ -246,7 +247,7 @@ export function ActivityFeed() {
   const [selectedTypes, setSelectedTypes] = useState<Set<string>>(new Set());
   const [partnerFilter, setPartnerFilter] = useState('');
 
-  // Partner tenant list (derived from results) — use ref to avoid infinite loop
+  // Partner tenant list (derived from results) â€” use ref to avoid infinite loop
   const knownPartnersRef = useRef(new Map<number, { id: number; name: string }>());
   const [knownPartners, setKnownPartners] = useState<
     Array<{ id: number; name: string }>

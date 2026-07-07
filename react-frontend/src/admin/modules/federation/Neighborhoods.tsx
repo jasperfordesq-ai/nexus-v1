@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Button, Spinner, Input, Textarea, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -21,10 +26,6 @@ import { PageHeader } from '../../components/PageHeader';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { StatCard } from '../../components/StatCard';
 import { useTranslation } from 'react-i18next';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * Federation Neighborhoods (FD2)
@@ -33,9 +34,9 @@ import { useTranslation } from 'react-i18next';
  */
 
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface NeighborhoodTenant {
   id: number;
@@ -60,9 +61,9 @@ interface AvailableTenant {
   slug: string;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Component
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function Neighborhoods() {
   const { t } = useTranslation('admin');
@@ -88,7 +89,7 @@ export function Neighborhoods() {
   const [removeTenantTarget, setRemoveTenantTarget] = useState<{ neighborhoodId: number; tenantId: number } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null);
 
-  // ─── Load data ───
+  // â”€â”€â”€ Load data â”€â”€â”€
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
@@ -119,7 +120,7 @@ export function Neighborhoods() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  // ─── Create neighborhood ───
+  // â”€â”€â”€ Create neighborhood â”€â”€â”€
   const handleCreate = useCallback(async () => {
     if (!newName.trim()) return;
     setCreating(true);
@@ -142,7 +143,7 @@ export function Neighborhoods() {
     setCreating(false);
   }, [newName, newDescription, t, toast, createModal, loadData]);
 
-  // ─── Add tenant to neighborhood ───
+  // â”€â”€â”€ Add tenant to neighborhood â”€â”€â”€
   const handleAddTenant = useCallback(async () => {
     if (!addToNeighborhood || !selectedTenantId) return;
     setAddingTenant(true);
@@ -164,7 +165,7 @@ export function Neighborhoods() {
     setAddingTenant(false);
   }, [addToNeighborhood, selectedTenantId, t, toast, addTenantModal, loadData]);
 
-  // ─── Remove tenant from neighborhood ───
+  // â”€â”€â”€ Remove tenant from neighborhood â”€â”€â”€
   const confirmRemoveTenant = useCallback(async () => {
     if (!removeTenantTarget) return;
     const { neighborhoodId, tenantId } = removeTenantTarget;
@@ -183,7 +184,7 @@ export function Neighborhoods() {
     setRemoveTenantTarget(null);
   }, [t, toast, loadData, removeTenantTarget]);
 
-  // ─── Delete neighborhood ───
+  // â”€â”€â”€ Delete neighborhood â”€â”€â”€
   const confirmDelete = useCallback(async () => {
     if (deleteTarget === null) return;
     try {
@@ -201,13 +202,13 @@ export function Neighborhoods() {
     setDeleteTarget(null);
   }, [t, toast, loadData, deleteTarget]);
 
-  // ─── Stats ───
+  // â”€â”€â”€ Stats â”€â”€â”€
   const totalNeighborhoods = neighborhoods.length;
   const totalMembers = neighborhoods.reduce((sum, n) => sum + n.total_members, 0);
   const totalSharedEvents = neighborhoods.reduce((sum, n) => sum + n.shared_events_count, 0);
   const totalTenants = neighborhoods.reduce((sum, n) => sum + n.tenants.length, 0);
 
-  // ─── Render ───
+  // â”€â”€â”€ Render â”€â”€â”€
   if (loading) {
     return (
       <div>
@@ -334,7 +335,7 @@ export function Neighborhoods() {
                             <div>
                               <p className="text-sm font-medium">{tenant.name}</p>
                               <p className="text-xs text-muted">
-                                {t('federation.members_count_value', { count: tenant.member_count })} · {tenant.slug}
+                                {t('federation.members_count_value', { count: tenant.member_count })} Â· {tenant.slug}
                               </p>
                             </div>
                           </div>

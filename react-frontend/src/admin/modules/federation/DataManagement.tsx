@@ -1,12 +1,13 @@
-import { Card, CardBody, CardHeader, Button, Input, Chip, Progress, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Card, CardBody, CardHeader, Button, Input, Chip, Progress, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
+
 /**
  * Federation Data Management
- * Full-JSON export, JSON import (with dry-run), and stale log purge.
+ * Tenant-scoped JSON export, supported JSON import (with dry-run), and stale log purge.
  */
 
 import { useState, useCallback, useRef } from 'react';
@@ -123,6 +124,7 @@ export function DataManagement() {
             <ul className="text-xs text-muted list-disc pl-5 space-y-0.5">
               <li>{t('federation.export_item_partnerships')}</li>
               <li>{t('federation.export_item_external_partners')}</li>
+              <li>{t('federation.export_item_internal_activity')}</li>
               <li>{t('federation.export_item_reputation')}</li>
               <li>{t('federation.export_item_api_logs')}</li>
             </ul>
