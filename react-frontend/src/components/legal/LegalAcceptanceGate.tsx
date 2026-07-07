@@ -17,12 +17,13 @@
 
 import FileText from 'lucide-react/icons/file-text';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { Chip } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { PendingDocument } from '@/hooks/useLegalGate';
 import { useTenant } from '@/contexts';
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
 
 // Label keys are resolved via i18n below; this map serves as fallback
 const TYPE_LABEL_KEYS: Record<string, string> = {

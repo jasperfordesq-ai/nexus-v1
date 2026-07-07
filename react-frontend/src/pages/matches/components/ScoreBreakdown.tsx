@@ -4,7 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useTranslation } from 'react-i18next';
-import { Disclosure, DisclosureTrigger, DisclosureContent, DisclosureIndicator, Meter } from '@/components/ui';
+import { Disclosure, DisclosureTrigger, DisclosureContent, DisclosureIndicator } from '@/components/ui/Disclosure';
+import { Meter } from '@/components/ui/Meter';
 import type { ScoreBreakdown as ScoreBreakdownData } from '../types';
 
 export interface ScoreBreakdownProps {

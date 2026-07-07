@@ -13,7 +13,7 @@
  */
 
 import { Component, createElement } from 'react';
-import { readStoredConsent } from '@/contexts/CookieConsentContext';
+import { readStoredConsent } from '@/lib/cookieConsentStorage';
 import type { User } from '@/types';
 import type { ComponentType, ErrorInfo, ReactElement, ReactNode } from 'react';
 
@@ -42,6 +42,15 @@ let IS_ENABLED = checkEnabled();
 let sentryModule: SentryModule | null = null;
 let sentryLoading: Promise<SentryModule | null> | null = null;
 let hasInitialized = false;
+let idleInitHandle: number | null = null;
+
+type IdleWindow = Window & {
+  requestIdleCallback?: (
+    callback: IdleRequestCallback,
+    options?: IdleRequestOptions,
+  ) => number;
+  cancelIdleCallback?: (handle: number) => void;
+};
 
 function getReplayOnErrorSampleRate(): number {
   return Number.isFinite(REPLAY_ON_ERROR_SAMPLE_RATE)
@@ -149,6 +158,31 @@ export function initSentry(): void {
   IS_ENABLED = checkEnabled();
   if (!IS_ENABLED) return;
   void loadAndInitializeSentry();
+}
+
+export function initSentryAfterIdle(): void {
+  IS_ENABLED = checkEnabled();
+  if (!IS_ENABLED || hasInitialized || idleInitHandle !== null) return;
+
+  const scheduleAfterFirstPaint = () => {
+    const idleWindow = window as IdleWindow;
+    if (typeof idleWindow.requestIdleCallback === 'function') {
+      idleInitHandle = idleWindow.requestIdleCallback(() => {
+        idleInitHandle = null;
+        initSentry();
+      }, { timeout: 5000 });
+      return;
+    }
+
+    idleInitHandle = window.setTimeout(() => {
+      idleInitHandle = null;
+      initSentry();
+    }, 3000);
+  };
+
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(scheduleAfterFirstPaint);
+  });
 }
 
 export function setSentryUser(user: User | null): void {

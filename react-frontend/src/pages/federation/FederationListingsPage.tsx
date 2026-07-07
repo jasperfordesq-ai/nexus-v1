@@ -3,7 +3,16 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Autocomplete, AutocompleteItem, GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, SearchField, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton } from '@/components/ui';
+import { Autocomplete } from '@/components/ui/Autocomplete';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { SearchField } from '@/components/ui/SearchField';
+import { CardRowsSkeleton } from '@/components/ui/Skeletons';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 
 /**
  * Federation Listings Page - Browse listings from partner communities

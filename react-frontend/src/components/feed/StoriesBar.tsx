@@ -23,7 +23,9 @@ import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { StoryViewer } from '@/components/stories/StoryViewer';
 import { StoryCreator } from '@/components/stories/StoryCreator';
-import { Button, Avatar, Skeleton } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 export interface StoryUser {
   user_id: number;

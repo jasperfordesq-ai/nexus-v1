@@ -3,7 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { CardBody, Card, Button, Textarea } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * AiReplySuggestion -- AI-powered reply suggestion for marketplace sellers.
  *

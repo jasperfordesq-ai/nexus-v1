@@ -3,6 +3,15 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * Group Wiki Tab (GR-WIKI)
  * Collaborative knowledge base with hierarchical pages, revision history,
@@ -19,7 +28,6 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import History from 'lucide-react/icons/history';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, Select, SelectItem, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

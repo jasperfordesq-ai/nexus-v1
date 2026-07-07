@@ -19,7 +19,7 @@ import BarChart3 from 'lucide-react/icons/chart-column';
 import Compass from 'lucide-react/icons/compass';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { useTenant } from '@/contexts';
 
 interface AboutLink {

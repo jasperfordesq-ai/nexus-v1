@@ -11,7 +11,9 @@ import { Link } from 'react-router-dom';
 
 import UserPlus from 'lucide-react/icons/user-plus';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Avatar } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 

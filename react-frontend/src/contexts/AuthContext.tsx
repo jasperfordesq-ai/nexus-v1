@@ -29,7 +29,6 @@ import { logError, logWarn } from '@/lib/logger';
 import i18n from '@/i18n';
 import { validateResponseIfPresent } from '@/lib/api-validation';
 import { loginResponseSchema, userSchema } from '@/lib/api-schemas';
-import { setSentryUser, captureAuthEvent } from '@/lib/sentry';
 import type {
   User,
   LoginRequest,
@@ -101,6 +100,20 @@ interface LoginResult {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+function setTelemetryUser(user: User | null): void {
+  void import('@/lib/sentry').then(({ setSentryUser }) => setSentryUser(user));
+}
+
+function captureTelemetryAuthEvent(
+  event: string,
+  userId?: number,
+  context?: Record<string, unknown>,
+): void {
+  void import('@/lib/sentry').then(({ captureAuthEvent }) => {
+    captureAuthEvent(event, userId, context);
+  });
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Provider
@@ -176,7 +189,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
 
         // Set Sentry user context
-        setSentryUser(response.data);
+        setTelemetryUser(response.data);
 
         // Apply user's server-side language preference (overrides browser detection)
         if (response.data.preferred_language) {
@@ -194,7 +207,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else {
         // Token invalid or expired
         tokenManager.clearTokens();
-        setSentryUser(null);
+        setTelemetryUser(null);
         setState({
           user: null,
           status: 'idle',
@@ -225,7 +238,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     );
 
     if (!response.success) {
-      captureAuthEvent('failed_login', undefined, {
+      captureTelemetryAuthEvent('failed_login', undefined, {
         error: response.error,
         code: response.code,
       });
@@ -284,8 +297,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
 
     // Set Sentry user context and capture login event
-    setSentryUser(loginData.user);
-    captureAuthEvent('login', loginData.user.id);
+    setTelemetryUser(loginData.user);
+    captureTelemetryAuthEvent('login', loginData.user.id);
 
     // Apply user's server-side language preference (overrides browser detection)
     if (loginData.user?.preferred_language) {
@@ -335,8 +348,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     tokenManager.setRefreshToken(refresh_token);
 
     // Set Sentry user context
-    setSentryUser(user satisfies User);
-    captureAuthEvent('biometric_login', user.id);
+    setTelemetryUser(user satisfies User);
+    captureTelemetryAuthEvent('biometric_login', user.id);
 
     wasAuthenticated.current = true;
 
@@ -598,8 +611,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.removeItem('nexus_tenant_slug');
 
       // Clear Sentry user context and capture logout event
-      captureAuthEvent('logout', userId);
-      setSentryUser(null);
+      captureTelemetryAuthEvent('logout', userId);
+      setTelemetryUser(null);
 
       setState({
         user: null,

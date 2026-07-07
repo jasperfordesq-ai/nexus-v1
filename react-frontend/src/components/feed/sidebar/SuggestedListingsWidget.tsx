@@ -11,7 +11,8 @@ import { Link } from 'react-router-dom';import Sparkles from 'lucide-react/icons
 import Heart from 'lucide-react/icons/heart';
 import HandHelping from 'lucide-react/icons/hand-helping';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Chip } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { useTenant } from '@/contexts';
 
 export interface SuggestedListing {

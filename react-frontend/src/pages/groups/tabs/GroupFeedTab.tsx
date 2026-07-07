@@ -3,6 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Separator } from '@/components/ui/Separator';
+import { Skeleton } from '@/components/ui/Skeleton';
 /**
  * Group Feed Tab
  * Displays the group activity feed with create-post prompt, feed cards, and load-more.
@@ -10,13 +15,11 @@
 
 import { motion, AnimatePresence } from '@/lib/motion';
 
-import { Separator } from '@/components/ui';
 import Lock from 'lucide-react/icons/lock';
 import Newspaper from 'lucide-react/icons/newspaper';
 import Plus from 'lucide-react/icons/plus';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
-import { GlassCard, Button, Avatar, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';

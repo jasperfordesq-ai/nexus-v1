@@ -311,7 +311,7 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
 };
 
 export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_nav');
   const location = useLocation();
   const { tenantSlug } = useTenant();
 

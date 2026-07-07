@@ -1,5 +1,3 @@
-import { Card, Chip } from '@/components/ui';
-import { Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,6 +17,9 @@ import MapPin from 'lucide-react/icons/map-pin';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';

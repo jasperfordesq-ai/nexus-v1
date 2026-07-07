@@ -3,6 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { ExchangeCardSkeleton } from '@/components/ui/Skeletons';
+import { Tabs, Tab } from '@/components/ui/Tabs';
 /**
  * Exchanges Page - View and manage exchange requests
  */
@@ -18,7 +24,6 @@ import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, ExchangeCardSkeleton, Button, Chip, Avatar, Tabs, Tab } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { PageMeta } from '@/components/seo';

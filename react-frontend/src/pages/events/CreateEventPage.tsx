@@ -1,19 +1,29 @@
-import { Select, SelectItem, TimeInput, type TimeInputValue, GlassCard, Button, Chip, Input, Textarea, Switch, CheckboxGroup, Checkbox, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { CheckboxGroup, Checkbox } from '@/components/ui/Checkbox';
+import { Chip } from '@/components/ui/Chip';
+import { DatePicker } from '@/components/ui/DatePicker';
+import type { DateInputValue } from '@/components/ui/DatePicker';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Switch } from '@/components/ui/Switch';
+import { Textarea } from '@/components/ui/Textarea';
+import { TimeInput } from '@/components/ui/TimeInput';
+import type { TimeInputValue } from '@/components/ui/TimeInput';
 /**
  * Create/Edit Event Page with image upload, category selection, * and HeroUI DatePicker + app-local TimeInput components.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { DateInputValue } from '@/components/ui';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';
-import { DatePicker } from '@/components/ui';
 import { parseDate, parseTime, today, getLocalTimeZone } from '@internationalized/date';
 import Save from 'lucide-react/icons/save';
 import Calendar from 'lucide-react/icons/calendar';

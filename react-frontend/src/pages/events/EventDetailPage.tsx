@@ -1,9 +1,20 @@
-import { Button, ToggleButton, ToggleButtonGroup, Chip, Card, CardBody, Textarea, GlassCard, Surface, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup, Badge, Tabs, Tab, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Surface } from '@/components/ui/Surface';
+import { Tabs, Tab } from '@/components/ui/Tabs';
+import { Textarea } from '@/components/ui/Textarea';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 /**
  * Event Detail Page - Single event view with enhanced RSVP, sharing, and organizer check-in
  */

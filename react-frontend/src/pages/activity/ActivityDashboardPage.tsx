@@ -32,7 +32,9 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Sparkles from 'lucide-react/icons/sparkles';
 import BarChart3 from 'lucide-react/icons/chart-column';
-import { GlassCard, Button, Spinner } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/feedback';
 // No context imports needed - standalone dashboard
 import { usePageTitle } from '@/hooks';

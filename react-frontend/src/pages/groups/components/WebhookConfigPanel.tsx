@@ -3,6 +3,15 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Chip } from '@/components/ui/Chip';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
+import { Switch } from '@/components/ui/Switch';
 /**
  * Webhook Config Panel
  * Admin panel for managing group webhooks (add, toggle, delete).
@@ -16,7 +25,6 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
-import { GlassCard, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Checkbox, useConfirm } from '@/components/ui';
 import { formatDateValue } from '@/lib/helpers';
 import { useTranslation } from 'react-i18next';
 

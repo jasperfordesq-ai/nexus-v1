@@ -7,7 +7,14 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { CardBody, Card, Progress, Button, Chip, SearchField, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Progress } from '@/components/ui/Progress';
+import { SearchField } from '@/components/ui/SearchField';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Tabs, Tab } from '@/components/ui/Tabs';
 import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';

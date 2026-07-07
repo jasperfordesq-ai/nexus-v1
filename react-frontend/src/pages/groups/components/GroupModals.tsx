@@ -3,6 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
+import { Switch } from '@/components/ui/Switch';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * GroupModals — all dialog overlays for GroupDetailPage:
  * - NewDiscussionModal
@@ -31,7 +38,6 @@ import MapPin from 'lucide-react/icons/map-pin';
 import Flag from 'lucide-react/icons/flag';
 import { ErrorBoundary } from '@/components/feedback';
 import type { Group } from '@/types/api';
-import { Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Avatar } from '@/components/ui';
 import { resolveThumbnailUrl } from '@/lib/helpers';
 
 const RichTextEditor = lazy(() => import('@/admin/components/RichTextEditor'));

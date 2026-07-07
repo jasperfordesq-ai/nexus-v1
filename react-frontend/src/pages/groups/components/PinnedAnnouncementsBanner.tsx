@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Chip } from '@/components/ui/Chip';
 /**
  * Pinned Announcements Banner
  * Shows pinned announcements at top of group page (above tabs).
@@ -13,7 +14,6 @@ import { useState, useEffect } from 'react';import Megaphone from 'lucide-react/
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { api } from '@/lib/api';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
 
 interface PinnedAnnouncement {
   id: number;

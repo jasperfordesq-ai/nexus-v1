@@ -1,4 +1,11 @@
-import { Select, SelectItem, GlassCard, Button, TagGroup, Tag, Chip, Spinner, SearchField, Tabs, Tab } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { SearchField } from '@/components/ui/SearchField';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Tabs, Tab } from '@/components/ui/Tabs';
+import { TagGroup, Tag } from '@/components/ui/TagGroup';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

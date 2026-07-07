@@ -3,6 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Progress } from '@/components/ui/Progress';
+import { Spinner } from '@/components/ui/Spinner';
 /**
  * NexusScore Page — personal reputation score breakdown with 6-category detail
  */
@@ -25,7 +30,6 @@ import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { Link } from 'react-router-dom';
-import { GlassCard, Progress, Button, Chip, Spinner } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { useAuth } from '@/contexts/AuthContext';

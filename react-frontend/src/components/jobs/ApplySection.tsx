@@ -3,12 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { Link, useNavigate } from 'react-router-dom';
-import { Chip } from '@/components/ui';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { JobVacancy } from './JobDetailTypes';

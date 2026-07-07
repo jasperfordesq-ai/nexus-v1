@@ -17,7 +17,11 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { Button, Spinner, SearchField, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { SearchField } from '@/components/ui/SearchField';
+import { Spinner } from '@/components/ui/Spinner';
 
 interface ShareViaDMModalProps {
   isOpen: boolean;

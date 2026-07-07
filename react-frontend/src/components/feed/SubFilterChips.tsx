@@ -5,7 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 import type { Key } from '@heroui/react';
-import { TagGroup, Tag } from '@/components/ui';
+import { TagGroup, Tag } from '@/components/ui/TagGroup';
 
 interface SubFilterChipsProps {
   filter: string;

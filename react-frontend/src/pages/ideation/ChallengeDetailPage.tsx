@@ -1,4 +1,15 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
+import { Tooltip } from '@/components/ui/Tooltip';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

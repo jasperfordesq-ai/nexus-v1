@@ -3,6 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
 /**
  * SkillTagsInput - Tag input for listing skill tags
  *
@@ -13,7 +15,6 @@ import { useState, useCallback, useRef, useEffect, useId } from 'react';import T
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { Chip, Input } from '@/components/ui';
 
 interface SkillTagsInputProps {
   tags: string[];

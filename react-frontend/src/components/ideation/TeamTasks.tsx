@@ -1,9 +1,19 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * Team Tasks Component (I5)
  *

@@ -1,9 +1,13 @@
-import { CardBody, Card, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { CardBody, Card } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Switch } from '@/components/ui/Switch';
 /**
  * SOC10 — MyCollectionsPage at /me/collections
  * Grid of saved collections owned by the authenticated user.

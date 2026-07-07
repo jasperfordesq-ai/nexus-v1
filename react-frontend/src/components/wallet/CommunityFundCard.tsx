@@ -3,6 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { CardRowsSkeleton } from '@/components/ui/Skeletons';
 /**
  * CommunityFundCard - Displays community fund balance and recent activity
  */
@@ -14,7 +17,6 @@ import Heart from 'lucide-react/icons/heart';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, CardRowsSkeleton } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { CommunityFundBalance } from '@/types/api';

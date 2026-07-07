@@ -3,6 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Skeleton } from '@/components/ui/Skeleton';
 /**
  * PersonalJourneyTab — shows the user's own growth over time.
  *
@@ -19,7 +21,6 @@ import Target from 'lucide-react/icons/target';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Milestone from 'lucide-react/icons/milestone';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Skeleton } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 

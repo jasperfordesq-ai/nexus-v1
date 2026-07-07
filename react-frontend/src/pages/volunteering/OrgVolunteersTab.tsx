@@ -7,7 +7,10 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 
 import Users from 'lucide-react/icons/users';
 import ChevronDown from 'lucide-react/icons/chevron-down';
-import { GlassCard, Button, Spinner, Avatar } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

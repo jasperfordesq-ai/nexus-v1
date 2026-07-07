@@ -3,6 +3,15 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Tabs, Tab } from '@/components/ui/Tabs';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion } from '@/lib/motion';
@@ -32,7 +41,6 @@ import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import ShieldOff from 'lucide-react/icons/shield-off';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip, Skeleton } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { LocationMapCard } from '@/components/location';

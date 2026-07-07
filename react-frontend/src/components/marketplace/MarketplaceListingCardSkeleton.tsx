@@ -3,7 +3,6 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Card, CardBody, Skeleton } from '@/components/ui';
 /**
  * MarketplaceListingCardSkeleton — Loading placeholder matching the
  * exact dimensions and layout of MarketplaceListingCard.
@@ -11,6 +10,8 @@ import { Card, CardBody, Skeleton } from '@/components/ui';
  * Uses HeroUI Skeleton for consistent pulse animation.
  */
 
+import { Card, CardBody } from '@/components/ui/Card';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 
 export function MarketplaceListingCardSkeleton() {

@@ -3,7 +3,6 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, SearchField, Checkbox, CheckboxGroup } from '@/components/ui';
 /**
  * MarketplaceCategoryPage — Browse listings within a specific category.
  *
@@ -20,7 +19,15 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
-import { Separator } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Checkbox, CheckboxGroup } from '@/components/ui/Checkbox';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { SearchField } from '@/components/ui/SearchField';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Separator } from '@/components/ui/Separator';
+import { Spinner } from '@/components/ui/Spinner';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';

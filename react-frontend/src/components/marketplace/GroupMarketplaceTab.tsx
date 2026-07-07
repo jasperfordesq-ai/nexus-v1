@@ -23,7 +23,9 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useTenant } from '@/contexts';
 import type { MarketplaceListingItem } from '@/types/marketplace';
-import { Button, Chip, Spinner } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Spinner } from '@/components/ui/Spinner';
 
 interface GroupMarketplaceStats {
   active_listings: number;

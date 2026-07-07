@@ -3,6 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Separator } from '@/components/ui/Separator';
+import { Slider } from '@/components/ui/Slider';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * G3 - Goal Check-in Modal
  *
@@ -17,8 +25,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from '@/lib/motion';
-import { Slider } from '@/components/ui';
-import { Separator } from '@/components/ui';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import Smile from 'lucide-react/icons/smile';
 import Frown from 'lucide-react/icons/frown';
@@ -30,7 +36,6 @@ import Clock from 'lucide-react/icons/clock';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import MessageSquare from 'lucide-react/icons/message-square';
-import { GlassCard, Button, Chip, Spinner, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

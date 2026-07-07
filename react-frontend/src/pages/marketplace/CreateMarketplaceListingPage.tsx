@@ -22,7 +22,16 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, Chip, Spinner, Input, Textarea, RadioGroup, Radio } from '@/components/ui';
+import { Autocomplete } from '@/components/ui/Autocomplete';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
+import { RadioGroup, Radio } from '@/components/ui/Radio';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 
 import Camera from 'lucide-react/icons/camera';
 import X from 'lucide-react/icons/x';

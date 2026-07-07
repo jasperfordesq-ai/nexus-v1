@@ -16,7 +16,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { Chip, Avatar } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Chip } from '@/components/ui/Chip';
 
 interface SellerCardProps {
   seller: {

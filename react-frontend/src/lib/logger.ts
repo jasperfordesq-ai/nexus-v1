@@ -16,8 +16,8 @@ const isDev = import.meta.env.DEV;
  * Dev: prints to the console. Production: forwards to Sentry so error-level logs
  * scattered across the app are not silently lost (warn/info/debug stay dev-only).
  * The forward is consent-gated — the capture helpers no-op unless the user
- * granted analytics consent (see lib/sentry.ts). The Sentry module is imported
- * lazily so this widely-imported logger keeps no eager Sentry dependency.
+ * granted analytics consent (see lib/sentry.ts). The Sentry wrapper is a
+ * lightweight facade; it loads the SDK lazily only after consent.
  */
 export function logError(message: string, error?: unknown): void {
   if (isDev) {
@@ -25,21 +25,19 @@ export function logError(message: string, error?: unknown): void {
     return;
   }
 
-  void import('@/lib/sentry')
-    .then(({ captureSentryException, captureSentryMessage }) => {
-      if (error instanceof Error) {
-        captureSentryException(error, { source: 'logger', message });
-      } else {
-        captureSentryMessage(
-          message,
-          'error',
-          error !== undefined ? { detail: error } : undefined,
-        );
-      }
-    })
-    .catch(() => {
-      /* never let logging throw */
+  if (error instanceof Error) {
+    void import('@/lib/sentry').then(({ captureSentryException }) => {
+      captureSentryException(error, { source: 'logger', message });
     });
+  } else {
+    void import('@/lib/sentry').then(({ captureSentryMessage }) => {
+      captureSentryMessage(
+        message,
+        'error',
+        error !== undefined ? { detail: error } : undefined,
+      );
+    });
+  }
 }
 
 /**

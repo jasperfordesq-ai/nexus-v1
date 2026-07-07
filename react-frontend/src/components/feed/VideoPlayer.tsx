@@ -19,7 +19,7 @@ import VideoOff from 'lucide-react/icons/video-off';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 
 interface VideoPlayerProps {
   media: PostMedia;

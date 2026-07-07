@@ -3,6 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useState, useEffect } from 'react';
 import { motion } from '@/lib/motion';
 
@@ -17,7 +20,6 @@ import Handshake from 'lucide-react/icons/handshake';
 import Zap from 'lucide-react/icons/zap';
 import Heart from 'lucide-react/icons/heart';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Chip, Skeleton } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 

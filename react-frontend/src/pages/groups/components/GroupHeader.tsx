@@ -3,6 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
 import { useTranslation } from 'react-i18next';
 
 import Users from 'lucide-react/icons/users';
@@ -18,7 +23,6 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Megaphone from 'lucide-react/icons/megaphone';
-import { GlassCard, Button, Chip, Spinner, Avatar } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { LocationMapCard } from '@/components/location';
 import { resolveAvatarUrl, resolveThumbnailUrl, formatDateValue, formatRelativeTime } from '@/lib/helpers';

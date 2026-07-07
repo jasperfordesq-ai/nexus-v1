@@ -3,6 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * Group Discussion Tab
  * Thread-based discussions with expand/collapse and inline replies.
@@ -18,7 +23,6 @@ import Send from 'lucide-react/icons/send';
 import Clock from 'lucide-react/icons/clock';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronUp from 'lucide-react/icons/chevron-up';
-import { GlassCard, Button, Spinner, Textarea, Avatar } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { SocialInteractionPanel } from '@/components/social';

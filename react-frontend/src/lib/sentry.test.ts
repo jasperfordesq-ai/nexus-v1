@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { isValidElement } from 'react';
 
-// Mock Sentry and the consent context before importing sentry.ts
+// Mock Sentry and consent storage before importing sentry.ts.
 vi.mock('@sentry/react', () => ({
   init: vi.fn(),
   setUser: vi.fn(),
@@ -24,11 +24,11 @@ vi.mock('@sentry/react', () => ({
   withProfiler: vi.fn((fn) => fn),
 }));
 
-vi.mock('@/contexts/CookieConsentContext', () => ({
+vi.mock('@/lib/cookieConsentStorage', () => ({
   readStoredConsent: vi.fn(),
 }));
 
-import { readStoredConsent } from '@/contexts/CookieConsentContext';
+import { readStoredConsent } from '@/lib/cookieConsentStorage';
 const mockReadStoredConsent = readStoredConsent as ReturnType<typeof vi.fn>;
 
 describe('sentry (disabled - no DSN)', () => {
@@ -113,6 +113,55 @@ describe('sentry (disabled - no DSN)', () => {
 });
 
 describe('sentry analytics consent checks', () => {
+  it('defers SDK initialization until after first paint and idle time', async () => {
+    vi.useFakeTimers();
+    vi.resetModules();
+    vi.stubEnv('VITE_SENTRY_DSN', 'https://public@example.sentry.io/1');
+    mockReadStoredConsent.mockReturnValue({ analytics: true });
+    const Sentry = await import('@sentry/react');
+    vi.clearAllMocks();
+
+    const animationCallbacks: FrameRequestCallback[] = [];
+    const idleCallbacks: IdleRequestCallback[] = [];
+    Object.defineProperty(window, 'requestIdleCallback', {
+      configurable: true,
+      value: (() => 0) as typeof window.requestIdleCallback,
+    });
+    const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      animationCallbacks.push(callback);
+      return animationCallbacks.length;
+    });
+    const idleSpy = vi.spyOn(window, 'requestIdleCallback').mockImplementation((callback) => {
+      idleCallbacks.push(callback);
+      return idleCallbacks.length;
+    });
+
+    const { initSentryAfterIdle } = await import('./sentry');
+    initSentryAfterIdle();
+
+    expect(Sentry.init).not.toHaveBeenCalled();
+    expect(animationCallbacks).toHaveLength(1);
+
+    animationCallbacks.shift()?.(0);
+    expect(Sentry.init).not.toHaveBeenCalled();
+    expect(animationCallbacks).toHaveLength(1);
+
+    animationCallbacks.shift()?.(16);
+    expect(Sentry.init).not.toHaveBeenCalled();
+    expect(idleCallbacks).toHaveLength(1);
+
+    idleCallbacks.shift()?.({
+      didTimeout: false,
+      timeRemaining: () => 10,
+    });
+
+    await vi.waitFor(() => expect(Sentry.init).toHaveBeenCalled());
+
+    rafSpy.mockRestore();
+    idleSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
   it('is disabled when no consent stored', async () => {
     mockReadStoredConsent.mockReturnValue(null);
     // Since sentry module is cached and IS_ENABLED is computed at module load time,

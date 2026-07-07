@@ -301,7 +301,7 @@ import Globe from 'lucide-react/icons/globe';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 
 function CommunityNotFound({ slug }: { slug: string }) {
   const { t } = useTranslation('errors');

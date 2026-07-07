@@ -3,9 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { GlassCard } from '@/components/ui/GlassCard';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 
 interface InterviewSlotsSectionProps {
   isOwner: boolean;

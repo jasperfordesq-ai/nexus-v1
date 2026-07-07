@@ -21,7 +21,11 @@ import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Flag from 'lucide-react/icons/flag';
-import { GlassCard, useDisclosure, Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Textarea } from '@/components/ui/Textarea';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 import { PageMeta } from '@/components/seo';
 import { FeedCard } from '@/components/feed/FeedCard';
 import { FeedSkeleton } from '@/components/feed/FeedSkeleton';

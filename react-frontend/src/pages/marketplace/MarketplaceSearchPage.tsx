@@ -3,7 +3,6 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, Chip, Input, SearchField, Checkbox, CheckboxGroup, TagGroup, Tag } from '@/components/ui';
 /**
  * MarketplaceSearchPage — Advanced search with filters.
  *
@@ -23,6 +22,16 @@ import Search from 'lucide-react/icons/search';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import { useTranslation } from 'react-i18next';
+import { Autocomplete } from '@/components/ui/Autocomplete';
+import { Button } from '@/components/ui/Button';
+import { Checkbox, CheckboxGroup } from '@/components/ui/Checkbox';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
+import { SearchField } from '@/components/ui/SearchField';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { TagGroup, Tag } from '@/components/ui/TagGroup';
 import { EmptyState } from '@/components/feedback';
 import { MarketplaceListingGrid, MarketplaceListingGridSkeleton } from '@/components/marketplace';
 import type { MarketplaceListingItem } from '@/types/marketplace';

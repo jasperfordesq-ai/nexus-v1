@@ -31,7 +31,16 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Languages from 'lucide-react/icons/languages';
 
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, Input, SearchField, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { SearchField } from '@/components/ui/SearchField';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';

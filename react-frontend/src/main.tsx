@@ -3,20 +3,52 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { StrictMode, Suspense } from 'react';
+import { Component, StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
 import i18n from './i18n'; // Initialize i18n before App renders
+import type { ErrorInfo, ReactNode } from 'react';
 
 // Log build version to console for deployment verification
 console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
 
-// Initialize Sentry error tracking (before React renders)
-import { initSentry, SentryErrorBoundary, addSentryBreadcrumb } from '@/lib/sentry';
+// Initialize telemetry after first paint/idle. The local error boundary stays
+// active immediately, but Sentry must not compete with login/register startup.
 import { installSupportDiagnosticsCapture } from '@/lib/supportDiagnostics';
-initSentry();
 installSupportDiagnosticsCapture();
+
+function scheduleAfterFirstPaint(callback: () => void): void {
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      const idleWindow = window as Window & {
+        requestIdleCallback?: (idleCallback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+      };
+      if (typeof idleWindow.requestIdleCallback === 'function') {
+        idleWindow.requestIdleCallback(callback, { timeout: 5000 });
+        return;
+      }
+      window.setTimeout(callback, 3000);
+    });
+  });
+}
+
+function initTelemetryAfterIdle(): void {
+  scheduleAfterFirstPaint(() => {
+    void import('@/lib/sentry').then(({ initSentryAfterIdle }) => initSentryAfterIdle());
+  });
+}
+
+function addTelemetryBreadcrumb(
+  message: string,
+  category: string,
+  data: Record<string, unknown>,
+  level: 'info' | 'warning' | 'error' = 'info',
+): void {
+  void import('@/lib/sentry').then(({ addSentryBreadcrumb }) => {
+    addSentryBreadcrumb(message, category, data, level);
+  });
+}
 
 // Initialise the prerender readiness signal. Routes that load data and want a
 // truthful snapshot should call usePrerenderReady(dataLoaded). Static pages
@@ -61,7 +93,7 @@ if (import.meta.env.PROD) {
   function performReload(reason: string): void {
     if (_nexusRefreshing) return;
     _nexusRefreshing = true;
-    addSentryBreadcrumb('SW controllerchange — reloading', 'pwa', { reason }, 'info');
+    addTelemetryBreadcrumb('SW controllerchange — reloading', 'pwa', { reason }, 'info');
     const url = new URL(window.location.href);
     url.searchParams.set('nexus_refresh', String(Date.now()));
     try {
@@ -77,7 +109,7 @@ if (import.meta.env.PROD) {
       performReload('immediate');
       return;
     }
-    addSentryBreadcrumb('SW controllerchange — reload deferred (user editing)', 'pwa', {}, 'info');
+    addTelemetryBreadcrumb('SW controllerchange — reload deferred (user editing)', 'pwa', {}, 'info');
     // Reload at the next natural break-point: blur of the active element,
     // tab hidden, page hide, or a 5-minute ceiling so we don't wait forever.
     const ceiling = window.setTimeout(() => performReload('deferred-ceiling'), 5 * 60 * 1000);
@@ -145,15 +177,43 @@ if (import.meta.env.PROD) {
   }
 })();
 
+class RootErrorBoundary extends Component<{
+  children: ReactNode;
+  fallback?: ReactNode;
+}, { hasError: boolean }> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError(): { hasError: boolean } {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    void import('@/lib/sentry').then(({ captureSentryException }) => {
+      captureSentryException(error, {
+        componentStack: errorInfo.componentStack,
+      });
+    });
+  }
+
+  render(): ReactNode {
+    if (this.state.hasError) {
+      return this.props.fallback ?? null;
+    }
+
+    return this.props.children;
+  }
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <SentryErrorBoundary fallback={<ErrorFallback />}>
+    <RootErrorBoundary fallback={<ErrorFallback />}>
       <Suspense fallback={null}>
         <App />
       </Suspense>
-    </SentryErrorBoundary>
+    </RootErrorBoundary>
   </StrictMode>
 );
+initTelemetryAfterIdle();
 
 // Error fallback component
 function ErrorFallback() {

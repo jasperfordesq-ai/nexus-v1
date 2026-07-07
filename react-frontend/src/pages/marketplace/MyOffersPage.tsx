@@ -3,7 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useDisclosure, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tab, Tabs } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
+import { Tab, Tabs } from '@/components/ui/Tabs';
+import { Textarea } from '@/components/ui/Textarea';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * MyOffersPage — View and manage marketplace offers as buyer/seller.
  *

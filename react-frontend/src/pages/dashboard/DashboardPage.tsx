@@ -3,6 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Progress } from '@/components/ui/Progress';
+import { Skeleton } from '@/components/ui/Skeleton';
 /**
  * Dashboard Page - Main user dashboard
  * Theme-aware styling for light and dark modes
@@ -36,7 +42,6 @@ import MessageCircle from 'lucide-react/icons/message-circle';
 import UserPlus from 'lucide-react/icons/user-plus';
 import Award from 'lucide-react/icons/award';
 import ThumbsUp from 'lucide-react/icons/thumbs-up';
-import { GlassCard, Progress, Button, Chip, Avatar, Skeleton } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useFeature, useModule, useNotifications } from '@/contexts';
 import { usePageTitle } from '@/hooks';

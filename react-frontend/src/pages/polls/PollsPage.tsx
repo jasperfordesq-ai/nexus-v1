@@ -1,9 +1,25 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, ToggleButton, ToggleButtonGroup, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { DatePicker } from '@/components/ui/DatePicker';
+import type { DateInputValue } from '@/components/ui/DatePicker';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Progress } from '@/components/ui/Progress';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Separator } from '@/components/ui/Separator';
+import { CardRowsSkeleton } from '@/components/ui/Skeletons';
+import { Switch } from '@/components/ui/Switch';
+import { Tabs, Tab } from '@/components/ui/Tabs';
+import { Textarea } from '@/components/ui/Textarea';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * PollsPage — Standalone polls listing with inline voting, creation, and tabs.
  *
@@ -17,11 +33,8 @@ import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, ToggleB
  */
 
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
-import type { DateInputValue } from '@/components/ui';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from '@/lib/motion';
-import { DatePicker } from '@/components/ui';
-import { Separator } from '@/components/ui';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Plus from 'lucide-react/icons/plus';
 import Clock from 'lucide-react/icons/clock';

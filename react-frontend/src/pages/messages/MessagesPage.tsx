@@ -3,6 +3,16 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Badge } from '@/components/ui/Badge';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui/Modal';
+import { SearchField } from '@/components/ui/SearchField';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Spinner } from '@/components/ui/Spinner';
+import { Tabs, Tab } from '@/components/ui/Tabs';
 /**
  * Messages Page - Conversation list
  *
@@ -15,7 +25,6 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from '@/lib/motion';
-import { Badge } from '@/components/ui';
 import Search from 'lucide-react/icons/search';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Circle from 'lucide-react/icons/circle';
@@ -27,7 +36,6 @@ import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import UsersIcon from 'lucide-react/icons/users';
 import { CreateGroupModal } from './components/CreateGroupModal';
-import { GlassCard, Button, Chip, SearchField, Modal, ModalContent, ModalHeader, ModalBody, Avatar, Tabs, Tab, Skeleton, Spinner } from '@/components/ui';
 import { PresenceIndicator } from '@/components/social';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, usePusherOptional, useToast, useTenant } from '@/contexts';

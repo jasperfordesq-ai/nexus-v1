@@ -3,6 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
 /**
  * ListingAnalyticsPanel - Shows analytics for a listing owner
  *
@@ -17,7 +20,6 @@ import TrendingDown from 'lucide-react/icons/trending-down';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Spinner } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { ListingAnalytics } from '@/types/api';

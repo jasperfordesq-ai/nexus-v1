@@ -3,6 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Separator } from '@/components/ui/Separator';
+import { Skeleton } from '@/components/ui/Skeleton';
 /**
  * ProfileFeed — displays a user's activity feed on their profile page.
  * Reuses FeedCard from the main feed system for consistent rendering.
@@ -10,7 +14,6 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 
-import { Separator } from '@/components/ui';
 import Rss from 'lucide-react/icons/rss';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -18,7 +21,6 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { motion, AnimatePresence } from '@/lib/motion';
 import { useTranslation } from 'react-i18next';
 import { FeedCard } from '@/components/feed/FeedCard';
-import { GlassCard, Button, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast } from '@/contexts';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';

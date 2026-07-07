@@ -12,7 +12,8 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
-import { Chip, Separator } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
+import { Separator } from '@/components/ui/Separator';
 import Cookie from 'lucide-react/icons/cookie';
 import Shield from 'lucide-react/icons/shield';
 import Settings from 'lucide-react/icons/settings';
@@ -26,7 +27,9 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Info from 'lucide-react/icons/info';
 import Monitor from 'lucide-react/icons/monitor';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Spinner } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant } from '@/contexts';

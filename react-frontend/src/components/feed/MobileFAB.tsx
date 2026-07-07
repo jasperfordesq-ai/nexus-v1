@@ -6,7 +6,7 @@
 import PenSquare from 'lucide-react/icons/square-pen';
 import { motion } from '@/lib/motion';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 
 interface MobileFABProps {
   onPress: () => void;

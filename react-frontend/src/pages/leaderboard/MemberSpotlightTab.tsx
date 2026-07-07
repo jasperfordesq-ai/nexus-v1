@@ -3,6 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Skeleton } from '@/components/ui/Skeleton';
 /**
  * MemberSpotlightTab — daily rotating spotlight of active community members.
  *
@@ -17,7 +20,6 @@ import { motion } from '@/lib/motion';
 import Sparkles from 'lucide-react/icons/sparkles';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Avatar, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';

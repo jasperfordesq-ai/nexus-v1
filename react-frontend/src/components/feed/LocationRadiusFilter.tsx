@@ -7,11 +7,12 @@
  * LocationRadiusFilter — location proximity filter with radius slider.
  */
 
-import { Slider } from '@/components/ui';
+import { Slider } from '@/components/ui/Slider';
 import MapPin from 'lucide-react/icons/map-pin';
 import Globe from 'lucide-react/icons/globe';
 import { useTranslation } from 'react-i18next';
-import { Button, Tooltip } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface LocationRadiusFilterProps {
   isNearby: boolean;

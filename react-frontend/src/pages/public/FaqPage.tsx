@@ -23,7 +23,9 @@ import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
-import { GlassCard, Accordion, AccordionItem, SearchField } from '@/components/ui';
+import { Accordion, AccordionItem } from '@/components/ui/Accordion';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { SearchField } from '@/components/ui/SearchField';
 
 interface FaqItem {
   question: string;

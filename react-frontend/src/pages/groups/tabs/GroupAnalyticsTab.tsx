@@ -1,4 +1,16 @@
-import { Button, ToggleButton, ToggleButtonGroup, Spinner, Card, CardBody, CardHeader, Chip, GlassCard, Avatar, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui/Table';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 import { useState, useEffect, useCallback } from 'react';
 
 import TrendingUp from 'lucide-react/icons/trending-up';
@@ -26,11 +38,6 @@ import { useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
 import { CHART_COLORS, CHART_COLOR_MAP, CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { resolveAvatarUrl } from '@/lib/helpers';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
 /**
  * Group Analytics Tab
  * Dashboard for group admins/owners showing KPIs, growth, engagement, * top contributors, activity breakdown, retention cohorts, and comparative stats.

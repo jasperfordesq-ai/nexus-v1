@@ -6,7 +6,10 @@
 import { useState } from 'react';
 import Save from 'lucide-react/icons/save';
 import Building2 from 'lucide-react/icons/building-2';
-import { GlassCard, Button, Input, Textarea } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

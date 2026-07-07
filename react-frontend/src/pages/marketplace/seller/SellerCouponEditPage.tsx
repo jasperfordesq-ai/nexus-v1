@@ -3,7 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Textarea } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Input } from '@/components/ui/Input';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * SellerCouponEditPage — AG63 create/edit coupon form.
  */

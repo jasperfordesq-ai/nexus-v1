@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { GlassCard } from '@/components/ui';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { SubAccountsManager } from '@/components/subaccounts/SubAccountsManager';
 
 // ─────────────────────────────────────────────────────────────────────────────

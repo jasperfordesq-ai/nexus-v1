@@ -17,7 +17,8 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import X from 'lucide-react/icons/x';
 import Search from 'lucide-react/icons/search';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { useTenant } from '@/contexts';
 
 const STORAGE_KEY = 'nexus_vol_welcome_dismissed_v1';

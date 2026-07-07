@@ -3,11 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Spinner } from '@/components/ui/Spinner';
 import { useRef, useEffect } from 'react';import Sparkles from 'lucide-react/icons/sparkles';
 import X from 'lucide-react/icons/x';
 import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
-import { Button, Spinner, Input } from '@/components/ui';
 
 interface AiChatMessage {
   role: 'user' | 'assistant';

@@ -3,7 +3,6 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { CardBody, Card, ImagePlaceholder, Button, Chip } from '@/components/ui';
 /**
  * MarketplaceListingCard - Grid card for marketplace listing display
  *
@@ -17,6 +16,10 @@ import MapPin from 'lucide-react/icons/map-pin';
 import Megaphone from 'lucide-react/icons/megaphone';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
 import { useTenant } from '@/contexts';
 import { resolveThumbnailUrl } from '@/lib/helpers';
 import { PriceBadge } from './PriceBadge';

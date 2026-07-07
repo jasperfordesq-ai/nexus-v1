@@ -15,7 +15,12 @@ import { useTranslation } from 'react-i18next';
 
 import CheckCircle from 'lucide-react/icons/check-circle';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
-import { GlassCard, Button, Spinner, Textarea, CheckboxGroup, Checkbox, RadioGroup, Radio } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { CheckboxGroup, Checkbox } from '@/components/ui/Checkbox';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { RadioGroup, Radio } from '@/components/ui/Radio';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 import { PageMeta } from '@/components/seo';
 import { useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';

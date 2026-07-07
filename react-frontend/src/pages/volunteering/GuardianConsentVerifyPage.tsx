@@ -16,7 +16,9 @@
 
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Button, Card, Spinner } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Spinner } from '@/components/ui/Spinner';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';

@@ -3,6 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { CardRowsSkeleton } from '@/components/ui/Skeletons';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * Job Detail Page - Full vacancy detail with apply, save, match, pipeline
  *
@@ -28,7 +32,6 @@ import Briefcase from 'lucide-react/icons/briefcase';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, CardRowsSkeleton } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { EmptyState } from '@/components/feedback';
 import { SocialInteractionPanel } from '@/components/social';

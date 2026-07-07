@@ -1,4 +1,6 @@
-import { Card, CardBody, Spinner, Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

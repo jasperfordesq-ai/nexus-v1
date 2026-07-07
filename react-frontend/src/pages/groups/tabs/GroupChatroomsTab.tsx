@@ -3,12 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { GlassCard } from '@/components/ui/GlassCard';
 /**
  * Group Chatrooms Tab (I4)
  * Renders the TeamChatrooms ideation component for a group.
  */
 
-import { GlassCard } from '@/components/ui';
 import { TeamChatrooms } from '@/components/ideation';
 
 interface GroupChatroomsTabProps {

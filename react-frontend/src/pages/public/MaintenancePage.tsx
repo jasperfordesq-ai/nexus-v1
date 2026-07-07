@@ -1,5 +1,3 @@
-import { Card } from '@/components/ui';
-import { Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,6 +14,8 @@ import LogIn from 'lucide-react/icons/log-in';
 import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks/usePageTitle';

@@ -3,6 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 /**
  * Notifications Page - User notifications center
  */
@@ -29,7 +35,6 @@ import Eye from 'lucide-react/icons/eye';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronUp from 'lucide-react/icons/chevron-up';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, Avatar, AvatarGroup, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast, useTenant, useNotifications, useAuth } from '@/contexts';
 import { usePusherOptional } from '@/contexts/PusherContext';

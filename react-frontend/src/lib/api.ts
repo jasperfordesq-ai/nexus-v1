@@ -20,7 +20,6 @@
 
 import { validateResponse } from '@/lib/api-validation';
 import { apiResponseSchema } from '@/lib/api-schemas';
-import { captureApiCall, addSentryBreadcrumb, captureSentryMessage } from '@/lib/sentry';
 import { recordApiDiagnostic } from '@/lib/supportDiagnostics';
 import { safeLocalStorageSet } from '@/lib/safeStorage';
 
@@ -54,6 +53,38 @@ const DEFAULT_TENANT_ID = import.meta.env.VITE_DEFAULT_TENANT_ID || null;
 export const SESSION_EXPIRED_EVENT = 'nexus:session_expired';
 export const SESSION_EXPIRING_EVENT = 'nexus:session_expiring';
 export const API_ERROR_EVENT = 'nexus:api_error';
+
+function captureTelemetryApiCall(
+  method: string,
+  endpoint: string,
+  status: number,
+  duration: number,
+): void {
+  void import('@/lib/sentry').then(({ captureApiCall }) => {
+    captureApiCall(method, endpoint, status, duration);
+  });
+}
+
+function addTelemetryBreadcrumb(
+  message: string,
+  category: string,
+  data: Record<string, unknown>,
+  level: 'info' | 'warning' | 'error' = 'info',
+): void {
+  void import('@/lib/sentry').then(({ addSentryBreadcrumb }) => {
+    addSentryBreadcrumb(message, category, data, level);
+  });
+}
+
+function captureTelemetryMessage(
+  message: string,
+  level: 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug',
+  context?: Record<string, unknown>,
+): void {
+  void import('@/lib/sentry').then(({ captureSentryMessage }) => {
+    captureSentryMessage(message, level, context);
+  });
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Stale-client gate
@@ -116,7 +147,7 @@ function checkStaleBuild(response: Response): void {
     // (b) a user-initiated navigation hits NetworkFirst and pulls in the
     //     fresh shell, or (c) the timer below fires the hard recovery.
     safeLocalStorageSet(BUILD_MISMATCH_KEY, String(now));
-    addSentryBreadcrumb(
+    addTelemetryBreadcrumb(
       'Stale client detected',
       'pwa',
       { client_build: clientBuild, server_build: serverBuild },
@@ -136,7 +167,7 @@ function checkStaleBuild(response: Response): void {
     // force-recoveries in Sentry's discover/issues UI. This event is rare
     // by design — every occurrence means the soft-update path failed for
     // 10+ minutes, which is worth investigating.
-    captureSentryMessage(
+    captureTelemetryMessage(
       'Stale client force-recovered via /api/sw-reset',
       'warning',
       {
@@ -677,7 +708,7 @@ class ApiClient {
 
       // Capture API call in Sentry (success or error)
       const duration = performance.now() - startTime;
-      captureApiCall(method, endpoint, response.status, duration);
+      captureTelemetryApiCall(method, endpoint, response.status, duration);
       recordApiDiagnostic({ method, endpoint, status: response.status, durationMs: duration });
 
       // Stale-client gate — every response carries the server's build SHA.
@@ -803,7 +834,7 @@ class ApiClient {
       // Handle timeout abort
       if (error instanceof DOMException && error.name === 'AbortError') {
         const duration = performance.now() - startTime;
-        captureApiCall(method, endpoint, 408, duration); // 408 Request Timeout
+        captureTelemetryApiCall(method, endpoint, 408, duration); // 408 Request Timeout
         recordApiDiagnostic({ method, endpoint, status: 408, durationMs: duration });
         const message = 'Request timed out. Please try again.';
         this.dispatchApiError(message, 'TIMEOUT', endpoint);

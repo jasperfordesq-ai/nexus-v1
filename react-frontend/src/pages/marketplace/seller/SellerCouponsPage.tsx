@@ -3,7 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { CardBody, Card, Button, Chip, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useConfirm } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
+import { Spinner } from '@/components/ui/Spinner';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui/Table';
 /**
  * SellerCouponsPage — AG63 seller-side list of own coupons.
  */

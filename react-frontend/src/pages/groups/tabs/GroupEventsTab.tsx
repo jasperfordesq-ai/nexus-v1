@@ -3,6 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
 /**
  * Group Events Tab
  * Lists upcoming and past events for the group, with create-event shortcut for members.
@@ -14,7 +18,6 @@ import Clock from 'lucide-react/icons/clock';
 import MapPin from 'lucide-react/icons/map-pin';
 import Users from 'lucide-react/icons/users';
 import ChevronRight from 'lucide-react/icons/chevron-right';
-import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';

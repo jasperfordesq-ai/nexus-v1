@@ -3,6 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,7 +19,6 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import type { User } from '@/types/api';
-import { Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Spinner } from '@/components/ui';
 
 interface CreateGroupModalProps {
   isOpen: boolean;

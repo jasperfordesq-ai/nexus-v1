@@ -1,4 +1,3 @@
-import { Chip, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,6 +18,8 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ScrollText from 'lucide-react/icons/scroll-text';
 import ExternalLink from 'lucide-react/icons/external-link';
+import { Chip } from '@/components/ui/Chip';
+import { Spinner } from '@/components/ui/Spinner';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { MarkdownRenderer } from '@/components/content/MarkdownRenderer';

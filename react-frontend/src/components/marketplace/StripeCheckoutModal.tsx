@@ -15,7 +15,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 
-import { Separator } from '@/components/ui';
+import { Separator } from '@/components/ui/Separator';
 import CreditCard from 'lucide-react/icons/credit-card';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import AlertCircle from 'lucide-react/icons/circle-alert';
@@ -33,7 +33,9 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

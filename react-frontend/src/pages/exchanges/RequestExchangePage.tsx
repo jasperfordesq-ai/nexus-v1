@@ -3,6 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * Request Exchange Page - Create a new exchange request for a listing
  */
@@ -17,7 +23,6 @@ import User from 'lucide-react/icons/user';
 import Tag from 'lucide-react/icons/tag';
 import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Input, Textarea, Avatar } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';

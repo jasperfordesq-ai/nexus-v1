@@ -3,7 +3,16 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { CardBody, Card, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
+import { Tooltip } from '@/components/ui/Tooltip';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * CommunityDeliveryCard - Community-powered delivery option for marketplace.
  *

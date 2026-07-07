@@ -1,8 +1,21 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Label, NumberField, Spinner, Textarea, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
+import { NumberField } from '@/components/ui/NumberField';
+import { Separator } from '@/components/ui/Separator';
+import { Spinner } from '@/components/ui/Spinner';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui/Table';
+import { Textarea } from '@/components/ui/Textarea';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@/components/ui';
 import Coins from 'lucide-react/icons/coins';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Send from 'lucide-react/icons/send';
@@ -14,11 +27,6 @@ import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
 /**
  * RegionalPointsPage — AG28 member-facing UI for the third currency.
  *

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Input } from '@/components/ui';
+import { Input } from '@/components/ui/Input';
 
 export interface DeleteConfirmationFieldProps {
   /** Controlled value of the confirmation text. */

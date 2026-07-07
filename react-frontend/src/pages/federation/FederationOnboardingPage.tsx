@@ -3,7 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Select, SelectItem, GlassCard, Progress, Button, Chip, Spinner, Input, Switch } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Progress } from '@/components/ui/Progress';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Switch } from '@/components/ui/Switch';
 
 /**
  * Federation Onboarding Page - Step-by-step wizard for first-time federation setup

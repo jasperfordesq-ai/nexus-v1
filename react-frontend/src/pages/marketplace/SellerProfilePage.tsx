@@ -16,7 +16,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 
-import { Separator } from '@/components/ui';
+import { Separator } from '@/components/ui/Separator';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Star from 'lucide-react/icons/star';
 import Clock from 'lucide-react/icons/clock';
@@ -27,7 +27,12 @@ import Shield from 'lucide-react/icons/shield';
 import Package from 'lucide-react/icons/package';
 import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, Avatar, Tabs, Tab } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
+import { Tabs, Tab } from '@/components/ui/Tabs';
 import { EmptyState } from '@/components/feedback';
 import { MarketplaceListingGrid } from '@/components/marketplace';
 import { MarketplacePartnerBadge } from '@/components/marketplace/MarketplacePartnerBadge';

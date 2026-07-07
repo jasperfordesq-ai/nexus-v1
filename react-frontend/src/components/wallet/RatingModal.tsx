@@ -3,6 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * RatingModal - Modal for rating a completed exchange (W10)
  */
@@ -14,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
-import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 interface RatingModalProps {
   isOpen: boolean;

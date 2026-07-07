@@ -1,9 +1,17 @@
-import { useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
+import { Tooltip } from '@/components/ui/Tooltip';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * Team Chatrooms Component (I4)
  *

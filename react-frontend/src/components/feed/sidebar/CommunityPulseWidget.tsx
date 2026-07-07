@@ -14,7 +14,7 @@ import Tag from 'lucide-react/icons/tag';
 import CalendarDays from 'lucide-react/icons/calendar-days';
 import UsersRound from 'lucide-react/icons/users-round';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { useTenant } from '@/contexts';
 
 export interface CommunityStats {

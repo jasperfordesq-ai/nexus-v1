@@ -5,7 +5,9 @@
 
 import { useTranslation } from 'react-i18next';
 import ThumbsDown from 'lucide-react/icons/thumbs-down';
-import { Button, Popover, PopoverTrigger, PopoverContent, BottomSheet } from '@/components/ui';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { Button } from '@/components/ui/Button';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
 import { useMediaQuery } from '@/hooks';
 import type { DismissReason } from '../types';
 

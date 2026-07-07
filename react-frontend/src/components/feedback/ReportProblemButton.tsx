@@ -24,7 +24,6 @@ import {
 } from '@/components/ui';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { captureSentryFeedback, captureSentryMessage } from '@/lib/sentry';
 import { getSupportDiagnosticsSnapshot } from '@/lib/supportDiagnostics';
 
 type Impact = 'blocked' | 'major' | 'minor' | 'cosmetic';
@@ -87,6 +86,7 @@ export function ReportProblemButton({ className, mode = 'button' }: ReportProble
     const diagnostics = includeDiagnostics ? getSupportDiagnosticsSnapshot() : undefined;
     const pageUrl = typeof window === 'undefined' ? undefined : window.location.href;
     const route = typeof window === 'undefined' ? undefined : `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    const { captureSentryMessage } = await import('@/lib/sentry');
     const sentryEventId = captureSentryMessage('Support report submitted', 'info', {
       impact,
       route,
@@ -110,16 +110,19 @@ export function ReportProblemButton({ className, mode = 'button' }: ReportProble
       return;
     }
 
-    setReference(response.data.report.reference);
-    captureSentryFeedback({
-      message: `${response.data.report.reference}: ${response.data.report.summary}`,
-      source: 'support_report',
-      associatedEventId: sentryEventId,
-      url: pageUrl,
-      tags: {
-        support_report_reference: response.data.report.reference,
-        impact: response.data.report.impact,
-      },
+    const report = response.data.report;
+    setReference(report.reference);
+    void import('@/lib/sentry').then(({ captureSentryFeedback }) => {
+      captureSentryFeedback({
+        message: `${report.reference}: ${report.summary}`,
+        source: 'support_report',
+        associatedEventId: sentryEventId,
+        url: pageUrl,
+        tags: {
+          support_report_reference: report.reference,
+          impact: report.impact,
+        },
+      });
     });
     toast.success(t('report_problem.submit_success'));
   };

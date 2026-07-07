@@ -1,4 +1,3 @@
-import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Progress, Button, Input, Checkbox, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,10 +15,19 @@ import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Progress
  * Desktop shows all fields, mobile shows one step at a time
  */
 
-import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
+import { lazy, Suspense, useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
-import { Separator } from '@/components/ui';
+import { Autocomplete } from '@/components/ui/Autocomplete';
+import { Button } from '@/components/ui/Button';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
+import { Progress } from '@/components/ui/Progress';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Separator } from '@/components/ui/Separator';
+import { Spinner } from '@/components/ui/Spinner';
 import { motion,
   AnimatePresence } from '@/lib/motion';
 import User from 'lucide-react/icons/user';
@@ -48,11 +56,16 @@ import { usePageTitle } from '@/hooks';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
 import { SsoButtons } from '@/components/auth/SsoButtons';
 import { PageMeta } from '@/components/seo';
-import { PlaceAutocompleteInput } from '@/components/location';
 import { api, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePasswordCheck } from '@/hooks/usePasswordCheck';
 import { PasswordStrength } from '@/components/auth/PasswordStrength';
+
+const PlaceAutocompleteInput = lazy(() =>
+  import('@/components/location/PlaceAutocompleteInput').then((module) => ({
+    default: module.PlaceAutocompleteInput,
+  }))
+);
 
 interface Tenant {
   id: number;
@@ -701,34 +714,59 @@ export function RegisterPage() {
             </div>
 
             {/* Location */}
-            <PlaceAutocompleteInput
-              label={requiredLabel(t('register.location_label'))}
-              placeholder={t('register.location_placeholder')}
-              value={location}
-              onChange={(val) => {
-                setLocation(val);
-                setLocationTouched(true);
-              }}
-              onPlaceSelect={(place) => {
-                setLocation(place.formattedAddress);
-                setLatitude(place.lat);
-                setLongitude(place.lng);
-                setLocationTouched(true);
-              }}
-              onClear={() => {
-                setLocation('');
-                setLatitude(undefined);
-                setLongitude(undefined);
-                setLocationTouched(true);
-              }}
-              isRequired
-              isInvalid={locationTouched && !!locationError}
-              errorMessage={locationTouched ? locationError : ''}
-              classNames={{
-                inputWrapper: 'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
-                label: 'text-theme-muted',
-                input: 'text-theme-primary placeholder:text-theme-subtle',
-              }} />
+            <Suspense
+              fallback={
+                <Input
+                  type="text"
+                  label={requiredLabel(t('register.location_label'))}
+                  placeholder={t('register.location_placeholder')}
+                  value={location}
+                  onChange={(e) => {
+                    setLocation(e.target.value);
+                    setLocationTouched(true);
+                  }}
+                  isRequired
+                  isInvalid={locationTouched && !!locationError}
+                  errorMessage={locationTouched ? locationError : ''}
+                  autoComplete="address-level2"
+                  classNames={{
+                    inputWrapper: 'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
+                    label: 'text-theme-muted',
+                    input: 'text-theme-primary placeholder:text-theme-subtle',
+                  }}
+                />
+              }
+            >
+              <PlaceAutocompleteInput
+                label={requiredLabel(t('register.location_label'))}
+                placeholder={t('register.location_placeholder')}
+                value={location}
+                onChange={(val) => {
+                  setLocation(val);
+                  setLocationTouched(true);
+                }}
+                onPlaceSelect={(place) => {
+                  setLocation(place.formattedAddress);
+                  setLatitude(place.lat);
+                  setLongitude(place.lng);
+                  setLocationTouched(true);
+                }}
+                onClear={() => {
+                  setLocation('');
+                  setLatitude(undefined);
+                  setLongitude(undefined);
+                  setLocationTouched(true);
+                }}
+                isRequired
+                isInvalid={locationTouched && !!locationError}
+                errorMessage={locationTouched ? locationError : ''}
+                classNames={{
+                  inputWrapper: 'glass-card backdrop-blur-lg border-glass-border hover:border-glass-border-hover',
+                  label: 'text-theme-muted',
+                  input: 'text-theme-primary placeholder:text-theme-subtle',
+                }}
+              />
+            </Suspense>
 
             {/* Phone */}
             <Input

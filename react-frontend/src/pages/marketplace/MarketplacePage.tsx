@@ -26,7 +26,9 @@ import Package from 'lucide-react/icons/package';
 import HandCoins from 'lucide-react/icons/hand-coins';
 import Truck from 'lucide-react/icons/truck';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, SearchField } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { SearchField } from '@/components/ui/SearchField';
 import { EmptyState } from '@/components/feedback';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import {

@@ -3,6 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
+import { Tooltip } from '@/components/ui/Tooltip';
 /**
  * AvailabilityGrid - Weekly availability calendar grid
  *
@@ -17,7 +21,6 @@ import Save from 'lucide-react/icons/save';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Spinner, Tooltip } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

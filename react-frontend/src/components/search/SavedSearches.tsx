@@ -3,6 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
+import { Input } from '@/components/ui/Input';
+import { Spinner } from '@/components/ui/Spinner';
+import { Tooltip } from '@/components/ui/Tooltip';
 /**
  * SavedSearches - Component for managing saved/bookmarked searches
  *
@@ -19,7 +24,6 @@ import { useToast, useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { SavedSearch } from '@/types/api';
-import { Button, Spinner, Input, Tooltip, useConfirm } from '@/components/ui';
 
 interface SavedSearchesProps {
   /** Called when a saved search is run — parent should execute the search */

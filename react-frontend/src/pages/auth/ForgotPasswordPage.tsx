@@ -13,7 +13,9 @@ import { motion } from '@/lib/motion';import Mail from 'lucide-react/icons/mail'
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Input } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

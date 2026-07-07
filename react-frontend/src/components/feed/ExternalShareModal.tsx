@@ -15,7 +15,9 @@ import Check from 'lucide-react/icons/check';
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, Tooltip } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui/Modal';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface ExternalShareModalProps {
   isOpen: boolean;

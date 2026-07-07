@@ -3,6 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
 /**
  * G1 - Goal Template Picker Modal
  *
@@ -24,7 +29,6 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Layers from 'lucide-react/icons/layers';
-import { GlassCard, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

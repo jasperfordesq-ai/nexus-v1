@@ -1,10 +1,25 @@
-import { Select, SelectItem, useDisclosure, GlassCard, ConfettiCelebration, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, ToggleButton, ToggleButtonGroup, DatePicker, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Skeleton } from '@/components/ui';
-import { parseDate } from '@internationalized/date';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { ConfettiCelebration } from '@/components/ui/ConfettiCelebration';
+import { DatePicker } from '@/components/ui/DatePicker';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Progress } from '@/components/ui/Progress';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Switch } from '@/components/ui/Switch';
+import { Textarea } from '@/components/ui/Textarea';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
+import { useDisclosure } from '@/components/ui/useDisclosure';
+import { parseDate } from '@internationalized/date';
 /**
  * Goals Page - Personal and community goal tracking
  *

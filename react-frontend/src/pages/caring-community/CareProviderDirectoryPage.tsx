@@ -1,4 +1,9 @@
-import { CardBody, Card, Button, Chip, SearchField, Tab, Tabs, Skeleton } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { CardBody, Card } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { SearchField } from '@/components/ui/SearchField';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Tab, Tabs } from '@/components/ui/Tabs';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

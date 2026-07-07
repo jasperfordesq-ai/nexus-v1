@@ -12,7 +12,7 @@ import CalendarDays from 'lucide-react/icons/calendar-days';
 import Clock from 'lucide-react/icons/clock';
 import MapPin from 'lucide-react/icons/map-pin';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { useTenant } from '@/contexts';
 import { formatDayOfMonth, formatMonthShort, formatTime } from '@/lib/helpers';
 

@@ -11,7 +11,13 @@ import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import CheckCircle from 'lucide-react/icons/circle-check';
 import Globe from 'lucide-react/icons/globe';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, Input, Textarea, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Spinner } from '@/components/ui/Spinner';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui/Table';
+import { Textarea } from '@/components/ui/Textarea';
 import { PageMeta } from '@/components/seo';
 import {
   FederationCommunityPicker,

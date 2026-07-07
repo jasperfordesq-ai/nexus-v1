@@ -3,7 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Button, Card, CardBody, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
 /**
  * PromotionSelector — Modal for selecting a promotion type for a marketplace listing.
  * Shows available promotion products, prices, durations, and a confirm button.

@@ -5,7 +5,7 @@
 
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
 
 interface BusinessSellerBadgeProps {
   sellerType: string;

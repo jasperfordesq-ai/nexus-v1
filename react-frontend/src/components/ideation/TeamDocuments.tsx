@@ -3,6 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * Team Documents Component (I6)
  *
@@ -24,7 +31,6 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import Download from 'lucide-react/icons/download';
 import Upload from 'lucide-react/icons/upload';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';

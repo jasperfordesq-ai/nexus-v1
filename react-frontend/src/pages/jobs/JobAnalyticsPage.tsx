@@ -3,6 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Progress } from '@/components/ui/Progress';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { CardRowsSkeleton } from '@/components/ui/Skeletons';
+import { Spinner } from '@/components/ui/Spinner';
+import { Tooltip } from '@/components/ui/Tooltip';
 /**
  * Job Analytics Page (J8) - Analytics dashboard for job posters
  *
@@ -29,8 +37,6 @@ import Share2 from 'lucide-react/icons/share-2';
 import Star from 'lucide-react/icons/star';
 import Sparkles from 'lucide-react/icons/sparkles';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
-import { GlassCard, Progress, Button, Spinner, Tooltip, CardRowsSkeleton, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api, API_BASE } from '@/lib/api';

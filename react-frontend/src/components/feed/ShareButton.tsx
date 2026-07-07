@@ -33,7 +33,8 @@ import { QuotePostModal } from './QuotePostModal';
 import { ExternalShareModal } from './ExternalShareModal';
 import { ShareViaDMModal } from './ShareViaDMModal';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
 export interface ShareButtonProps {
   /**
    * Legacy: pass when `type` is omitted — resolves to type='post'. Prefer `type` + `id`.

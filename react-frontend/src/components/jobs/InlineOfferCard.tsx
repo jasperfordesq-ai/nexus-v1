@@ -3,12 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
 import DollarSign from 'lucide-react/icons/dollar-sign';
 import Calendar from 'lucide-react/icons/calendar';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button } from '@/components/ui';
 import { formatDateValue } from '@/lib/helpers';
 import type { InlineOffer } from './JobDetailTypes';
 

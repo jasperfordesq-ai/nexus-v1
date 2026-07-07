@@ -3,7 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Autocomplete, AutocompleteItem, GlassCard, Button, Chip, SearchField, CardRowsSkeleton } from '@/components/ui';
+import { Autocomplete } from '@/components/ui/Autocomplete';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
+import { SearchField } from '@/components/ui/SearchField';
+import { CardRowsSkeleton } from '@/components/ui/Skeletons';
 
 /**
  * Federation Groups Page - Browse groups from partner communities

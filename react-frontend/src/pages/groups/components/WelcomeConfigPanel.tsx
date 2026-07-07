@@ -3,6 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
+import { Switch } from '@/components/ui/Switch';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * Welcome Config Panel
  * Admin panel for configuring group welcome messages sent to new members.
@@ -14,7 +19,6 @@ import HandHeart from 'lucide-react/icons/hand-heart';
 import Save from 'lucide-react/icons/save';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
-import { GlassCard, Button, Spinner, Textarea, Switch } from '@/components/ui';
 import { useTranslation } from 'react-i18next';
 
 interface WelcomeConfigPanelProps {

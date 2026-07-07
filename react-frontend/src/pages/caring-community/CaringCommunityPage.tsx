@@ -32,7 +32,9 @@ import Target from 'lucide-react/icons/target';
 import Users from 'lucide-react/icons/users';
 import Wallet from 'lucide-react/icons/wallet';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { PageMeta } from '@/components/seo';
 import {
   OnboardingChoiceModal,

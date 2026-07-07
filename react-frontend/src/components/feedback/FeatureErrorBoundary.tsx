@@ -14,7 +14,6 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';import i18n from 'i18next';
 import { GlassCard, Button } from '@/components/ui';
 import { logError } from '@/lib/logger';
-import { captureSentryException } from '@/lib/sentry';
 
 interface FeatureErrorBoundaryProps {
   children: ReactNode;
@@ -58,10 +57,12 @@ export class FeatureErrorBoundary extends Component<
     // Groups, Messages — the ~169 <FeatureErrorBoundary> wraps) surfaces in
     // Sentry instead of vanishing. The feature tag makes crashes filterable per
     // module.
-    captureSentryException(error, {
-      feature: this.props.featureName,
-      componentStack: errorInfo.componentStack ?? undefined,
-      source: 'FeatureErrorBoundary',
+    void import('@/lib/sentry').then(({ captureSentryException }) => {
+      captureSentryException(error, {
+        feature: this.props.featureName,
+        componentStack: errorInfo.componentStack ?? undefined,
+        source: 'FeatureErrorBoundary',
+      });
     });
   }
 

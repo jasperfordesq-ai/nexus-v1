@@ -1,4 +1,3 @@
-import { Select, SelectItem, GlassCard, Button, Input, Textarea, CheckboxGroup, Checkbox, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -21,6 +20,13 @@ import XCircle from 'lucide-react/icons/x-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/Button';
+import { Checkbox, CheckboxGroup } from '@/components/ui/Checkbox';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';

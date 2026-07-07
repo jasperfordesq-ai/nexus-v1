@@ -3,6 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { RadioGroup, Radio } from '@/components/ui/Radio';
+import { Spinner } from '@/components/ui/Spinner';
+import { Switch } from '@/components/ui/Switch';
 /**
  * Group Notification Preferences
  * Modal for per-group notification settings (frequency, email, push).
@@ -15,7 +20,6 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';
-import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, RadioGroup, Radio } from '@/components/ui';
 
 interface GroupNotificationPrefsProps {
   groupId: number;

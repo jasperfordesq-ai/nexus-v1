@@ -12,13 +12,15 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
-import { Chip } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
 import Building from 'lucide-react/icons/building';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
-import { GlassCard, Button, Spinner } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

@@ -3,6 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Progress } from '@/components/ui/Progress';
+import { Spinner } from '@/components/ui/Spinner';
 /**
  * G5 - Goal Progress History Timeline
  *
@@ -38,7 +42,6 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
-import { Progress, Button, Chip, Spinner } from '@/components/ui';
 
 /* ───────────────────────── Types ───────────────────────── */
 

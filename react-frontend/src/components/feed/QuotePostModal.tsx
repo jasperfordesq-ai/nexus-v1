@@ -18,7 +18,9 @@ import { logError } from '@/lib/logger';
 import { QuotedPostEmbed, type QuotedPostData } from './QuotedPostEmbed';
 import type { FeedItem } from './types';
 import { getAuthor } from './types';
-import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Textarea } from '@/components/ui/Textarea';
 
 interface QuotePostModalProps {
   isOpen: boolean;

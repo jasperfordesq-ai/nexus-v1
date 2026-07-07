@@ -5,7 +5,7 @@
 
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
 
 interface MarketplacePartnerBadgeProps {
   grantedAt?: string | null;

@@ -8,7 +8,8 @@ import { Link, Navigate } from 'react-router-dom';import ArrowLeft from 'lucide-
 import Download from 'lucide-react/icons/download';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { useToast } from '@/contexts';

@@ -3,6 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Progress } from '@/components/ui/Progress';
+import { Skeleton } from '@/components/ui/Skeleton';
 /**
  * GoalDetailPage — single-goal view at /goals/:id.
  *
@@ -26,7 +32,6 @@ import Lock from 'lucide-react/icons/lock';
 import History from 'lucide-react/icons/history';
 import Sparkles from 'lucide-react/icons/sparkles';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import { GlassCard, Progress, Button, Chip, Avatar, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { SocialInteractionPanel } from '@/components/social';

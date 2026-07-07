@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Link as HeroLink, Tooltip } from '@/components/ui';
+import { Link as HeroLink } from '@/components/ui/Link';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { useTranslation } from 'react-i18next';
 import Github from 'lucide-react/icons/github';
 import ExternalLink from 'lucide-react/icons/external-link';

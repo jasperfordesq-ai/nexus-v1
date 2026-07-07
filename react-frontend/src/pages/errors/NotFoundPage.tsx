@@ -3,6 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
 /**
  * 404 Not Found Page
  */
@@ -13,7 +15,6 @@ import Home from 'lucide-react/icons/house';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Search from 'lucide-react/icons/search';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

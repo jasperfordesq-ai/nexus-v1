@@ -12,7 +12,8 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
-import { Chip, Separator } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
+import { Separator } from '@/components/ui/Separator';
 import Shield from 'lucide-react/icons/shield';
 import Database from 'lucide-react/icons/database';
 import PieChart from 'lucide-react/icons/chart-pie';
@@ -30,7 +31,9 @@ import MessageSquare from 'lucide-react/icons/message-square';
 import Send from 'lucide-react/icons/send';
 import CalendarDays from 'lucide-react/icons/calendar-days';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Spinner } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant } from '@/contexts';

@@ -3,7 +3,15 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Select, SelectItem, useDisclosure, GlassCard, Button, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tab, Tabs } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Tab, Tabs } from '@/components/ui/Tabs';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * SellerOrdersPage — View and manage marketplace sales orders from the seller perspective.
  *

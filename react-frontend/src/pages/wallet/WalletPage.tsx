@@ -3,6 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Tabs, Tab } from '@/components/ui/Tabs';
 /**
  * Wallet Page - Time credit balance and transactions
  */
@@ -23,7 +28,6 @@ import Send from 'lucide-react/icons/send';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Tabs, Tab, Skeleton } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { EmptyState } from '@/components/feedback';
 import { TransferModal, DonateModal, CommunityFundCard } from '@/components/wallet';

@@ -11,11 +11,18 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import type { DateInputValue } from '@/components/ui';
+import type { DateInputValue } from '@/components/ui/DatePicker';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';
-import { Autocomplete, AutocompleteItem, DatePicker, GlassCard, Button, Input, Switch, Textarea } from '@/components/ui';
+import { Autocomplete } from '@/components/ui/Autocomplete';
+import { Button } from '@/components/ui/Button';
+import { DatePicker } from '@/components/ui/DatePicker';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
+import { Switch } from '@/components/ui/Switch';
+import { Textarea } from '@/components/ui/Textarea';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import Save from 'lucide-react/icons/save';
 import Heart from 'lucide-react/icons/heart';

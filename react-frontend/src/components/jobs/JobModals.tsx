@@ -3,8 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Progress } from '@/components/ui/Progress';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 import { useRef } from 'react';
-import { Chip } from '@/components/ui';
 import { useToast } from '@/contexts/ToastContext';
 
 import Target from 'lucide-react/icons/target';
@@ -16,7 +22,6 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import type { QualificationResult } from './JobDetailTypes';
-import { Progress, Button, Spinner, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Skeleton } from '@/components/ui';
 
 interface ApplyModalProps {
   isOpen: boolean;

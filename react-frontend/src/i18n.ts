@@ -99,13 +99,9 @@ const isStrictMissingKeyMode = () => {
 };
 
 const captureMissingKeyWarning = (identifier: string) => {
-  void import('@/lib/sentry')
-    .then(({ captureSentryMessage }) => {
-      captureSentryMessage(`[i18n] Missing translation key: ${identifier}`, 'warning');
-    })
-    .catch(() => {
-      // Sentry is diagnostics-only here; missing key reporting must not affect UI.
-    });
+  void import('@/lib/sentry').then(({ captureSentryMessage }) => {
+    captureSentryMessage(`[i18n] Missing translation key: ${identifier}`, 'warning');
+  });
 };
 
 const reportMissingKey = (identifier: string) => {

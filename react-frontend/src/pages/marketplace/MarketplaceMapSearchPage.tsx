@@ -3,7 +3,6 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, Spinner, SearchField } from '@/components/ui';
 /**
  * MarketplaceMapSearchPage — Map-based marketplace search.
  *
@@ -25,6 +24,15 @@ import MapIcon from 'lucide-react/icons/map';
 import List from 'lucide-react/icons/list';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
+import { Autocomplete } from '@/components/ui/Autocomplete';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
+import { SearchField } from '@/components/ui/SearchField';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 import { EmptyState } from '@/components/feedback';
 import { MapSearchView } from '@/components/marketplace/MapSearchView';
 import { MarketplaceListingGrid } from '@/components/marketplace';

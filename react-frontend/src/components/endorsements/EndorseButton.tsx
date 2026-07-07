@@ -17,7 +17,8 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { Button, Tooltip } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 export interface EndorseButtonProps {
   memberId: number;

@@ -3,6 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
+import { Separator } from '@/components/ui/Separator';
 /**
  * G4 - Goal Reminder Toggle
  *
@@ -15,8 +18,6 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
-import { Separator } from '@/components/ui';
 import Bell from 'lucide-react/icons/bell';
 import BellOff from 'lucide-react/icons/bell-off';
 import BellRing from 'lucide-react/icons/bell-ring';
@@ -26,7 +27,6 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui';
 /* ───────────────────────── Types ───────────────────────── */
 
 interface GoalReminder {

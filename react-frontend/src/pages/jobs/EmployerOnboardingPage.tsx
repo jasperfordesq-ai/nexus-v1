@@ -1,9 +1,17 @@
-import { Select, SelectItem, GlassCard, Progress, Button, Input, Textarea, Switch, NumberField, Label } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
+import { NumberField } from '@/components/ui/NumberField';
+import { Progress } from '@/components/ui/Progress';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Switch } from '@/components/ui/Switch';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * Employer Onboarding Wizard - Guided first-time setup for employers.
  *

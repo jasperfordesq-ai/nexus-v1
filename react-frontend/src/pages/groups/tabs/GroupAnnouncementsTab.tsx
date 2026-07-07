@@ -3,6 +3,15 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * Group Announcements Tab (GR3)
  * Announcements with pinning, creation for admins.
@@ -18,7 +27,6 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';

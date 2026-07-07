@@ -8,7 +8,8 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveThumbnailUrl } from '@/lib/helpers';
-import { Button, Chip } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
 
 export interface AdItem {
   campaign_id: number;

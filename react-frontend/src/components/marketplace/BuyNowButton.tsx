@@ -10,7 +10,10 @@
 import { lazy, Suspense, useState, useCallback, useEffect, useMemo } from 'react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import { useTranslation } from 'react-i18next';
-import { Select, SelectItem, useDisclosure, Button, Input } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

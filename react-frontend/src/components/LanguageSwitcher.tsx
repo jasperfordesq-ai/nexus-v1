@@ -17,7 +17,13 @@ import { logError } from '@/lib/logger';
 import { safeLocalStorageSet } from '@/lib/safeStorage';
 import { useTenantLanguages } from '@/contexts/TenantContext';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from '@/components/ui/Dropdown';
 interface Language {
   code: string;
   label: string;

@@ -3,6 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { RadioGroup, Radio } from '@/components/ui/Radio';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * DonateModal - Modal for donating credits to community fund or another member
  */
@@ -21,7 +28,6 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
 import type { WalletUserSearchResult } from '@/types/api';
-import { Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, RadioGroup, Radio } from '@/components/ui';
 
 interface DonateModalProps {
   isOpen: boolean;

@@ -15,7 +15,9 @@ import { Link } from 'react-router-dom';import Gift from 'lucide-react/icons/gif
 import Plus from 'lucide-react/icons/plus';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Spinner } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
 import { EmptyState } from '@/components/feedback';
 import { MarketplaceListingGrid } from '@/components/marketplace';
 import type { MarketplaceListingItem } from '@/types/marketplace';

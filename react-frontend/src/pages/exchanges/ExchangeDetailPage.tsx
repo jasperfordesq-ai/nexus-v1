@@ -3,6 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * Exchange Detail Page - View and manage a single exchange
  *
@@ -32,7 +39,6 @@ import Ban from 'lucide-react/icons/ban';
 import UserCheck from 'lucide-react/icons/user-check';
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { RatingModal } from '@/components/wallet';

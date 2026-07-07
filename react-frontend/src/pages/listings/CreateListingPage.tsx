@@ -1,4 +1,3 @@
-import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, Chip, Input, Textarea, Radio, RadioGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -26,6 +25,15 @@ import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import HelpCircle from 'lucide-react/icons/circle-help';
 import Sparkles from 'lucide-react/icons/sparkles';
 import Info from 'lucide-react/icons/info';
+import { Autocomplete } from '@/components/ui/Autocomplete';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
+import { Radio, RadioGroup } from '@/components/ui/Radio';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
 import { SkillTagsInput } from '@/components/listings/SkillTagsInput';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';

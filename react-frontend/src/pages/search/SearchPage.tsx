@@ -3,6 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { AlgorithmLabel } from '@/components/ui/AlgorithmLabel';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { SearchField } from '@/components/ui/SearchField';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Tabs, Tab } from '@/components/ui/Tabs';
 /**
  * Search Page - Global search across content
  */
@@ -20,7 +27,6 @@ import Clock from 'lucide-react/icons/clock';
 import MapPin from 'lucide-react/icons/map-pin';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, AlgorithmLabel, Button, SearchField, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { SavedSearches } from '@/components/search/SavedSearches';

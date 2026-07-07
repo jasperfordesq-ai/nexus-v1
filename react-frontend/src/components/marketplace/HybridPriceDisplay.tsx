@@ -17,7 +17,8 @@ import HelpCircle from 'lucide-react/icons/circle-help';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useTenant } from '@/contexts';
-import { Chip, Tooltip } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 interface HybridPriceDisplayProps {
   /** Cash price amount */

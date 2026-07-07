@@ -11,7 +11,20 @@ import React, { useState, useEffect, useCallback, useRef, Suspense, type Key } f
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
-import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Spinner, SearchField, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, CardRowsSkeleton, ToggleButtonGroup, ToggleButton } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Progress } from '@/components/ui/Progress';
+import { SearchField } from '@/components/ui/SearchField';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { CardRowsSkeleton } from '@/components/ui/Skeletons';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
+import { ToggleButtonGroup, ToggleButton } from '@/components/ui/ToggleButtonGroup';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 
 import Heart from 'lucide-react/icons/heart';
 import Plus from 'lucide-react/icons/plus';

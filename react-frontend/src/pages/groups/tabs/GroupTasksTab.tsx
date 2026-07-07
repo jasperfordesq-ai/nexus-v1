@@ -3,13 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { GlassCard } from '@/components/ui/GlassCard';
 /**
  * Group Tasks Tab (I5)
  * Renders the TeamTasks ideation component for a group.
  */
 
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { TeamTasks } from '@/components/ideation';
 import type { GroupMember } from './GroupMembersTab';
 

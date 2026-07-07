@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
 import { ImageLightbox } from './ImageLightbox';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 
 interface MediaGridProps {
   media: PostMedia[];

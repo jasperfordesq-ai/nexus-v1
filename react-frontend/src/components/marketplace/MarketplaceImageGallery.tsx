@@ -13,7 +13,7 @@
 
 import { useState, useRef, useCallback } from 'react';import Image from 'lucide-react/icons/image';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { resolveThumbnailUrl } from '@/lib/helpers';
 
 interface GalleryImage {

@@ -21,7 +21,10 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Checkbox } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Textarea } from '@/components/ui/Textarea';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

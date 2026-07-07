@@ -1,4 +1,7 @@
-import { Select, SelectItem, GlassCard, Button, Switch } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Switch } from '@/components/ui/Switch';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

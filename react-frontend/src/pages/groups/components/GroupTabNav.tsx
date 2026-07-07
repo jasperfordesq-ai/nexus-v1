@@ -3,6 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
+import { ScrollShadow } from '@/components/ui/ScrollShadow';
 import { useTranslation } from 'react-i18next';import Users from 'lucide-react/icons/users';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Calendar from 'lucide-react/icons/calendar';
@@ -18,7 +21,6 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTenant } from '@/contexts';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, ScrollShadow } from '@/components/ui';
 interface GroupTabNavProps {
   activeTab: string;
   userIsAdmin: boolean;

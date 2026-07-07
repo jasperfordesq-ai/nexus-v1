@@ -14,8 +14,9 @@
  */
 
 
-import { Separator } from '@/components/ui';
-import { GlassCard, Skeleton } from '@/components/ui';
+import { Separator } from '@/components/ui/Separator';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 type SkeletonVariant =
   | 'with-image'

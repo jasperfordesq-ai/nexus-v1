@@ -19,7 +19,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { motion } from '@/lib/motion';
-import { Chip } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
 import { sanitizeRichText } from '@/lib/sanitize';
 import FileText from 'lucide-react/icons/file-text';
 import CalendarDays from 'lucide-react/icons/calendar-days';
@@ -27,7 +27,8 @@ import Send from 'lucide-react/icons/send';
 import List from 'lucide-react/icons/list';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import History from 'lucide-react/icons/history';
-import { GlassCard, Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { useTenant } from '@/contexts';
 import type { LegalDocument } from '@/hooks/useLegalDocument';
 

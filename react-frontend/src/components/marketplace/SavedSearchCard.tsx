@@ -3,7 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Card, CardBody, Chip, Button, Switch } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Switch } from '@/components/ui/Switch';
 /**
  * SavedSearchCard — Displays a saved marketplace search with filters summary,
  * alert frequency, active toggle, and delete button.

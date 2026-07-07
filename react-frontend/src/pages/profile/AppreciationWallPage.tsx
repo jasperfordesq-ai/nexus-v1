@@ -1,9 +1,12 @@
-import { Button, Card, CardBody, Avatar, Pagination } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Pagination } from '@/components/ui/Pagination';
 /**
  * SOC14 — AppreciationWallPage at /users/:userId/appreciations
  * Public feed of thank-you notes received by a user, with reaction buttons.

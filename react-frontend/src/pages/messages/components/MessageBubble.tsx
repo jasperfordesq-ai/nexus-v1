@@ -3,6 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { useState, useEffect, useRef, useCallback, memo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';
@@ -21,7 +24,6 @@ import { useTenant } from '@/contexts/TenantContext';
 import type { Message } from '@/types/api';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
 import { MessageLinkPreview } from './MessageLinkPreview';
-import { Button, Input, Avatar } from '@/components/ui';
 
 // Available reaction emojis
 const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];

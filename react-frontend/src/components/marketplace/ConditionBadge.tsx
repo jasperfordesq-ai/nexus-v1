@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
 
 interface ConditionBadgeProps {
   condition: string | null;

@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Card, CardBody, Chip } from '@/components/ui';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
 /**
  * CollectionCard — Displays a marketplace collection with name, item count,
  * thumbnail grid (first 4 item images), and public/private badge.

@@ -3,6 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { ColorPicker } from '@/components/ui/ColorPicker';
+import { GlassCard } from '@/components/ui/GlassCard';
 /**
  * Group Branding Picker
  * Color picker for group custom branding (primary + accent colors).
@@ -15,7 +17,6 @@
 
 import { useState, useCallback, type ReactNode } from 'react';
 import Paintbrush from 'lucide-react/icons/paintbrush';
-import { GlassCard, ColorPicker } from '@/components/ui';
 import {
   ColorArea,
   ColorField,

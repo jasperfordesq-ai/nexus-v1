@@ -13,7 +13,19 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
-import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, SearchField, Switch, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Checkbox, ToggleButton, ToggleButtonGroup } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { SearchField } from '@/components/ui/SearchField';
+import { Spinner } from '@/components/ui/Spinner';
+import { Switch } from '@/components/ui/Switch';
+import { Textarea } from '@/components/ui/Textarea';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 
 import MapPin from 'lucide-react/icons/map-pin';
 import Calendar from 'lucide-react/icons/calendar';

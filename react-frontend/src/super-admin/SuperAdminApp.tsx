@@ -20,7 +20,7 @@ import { SuperAdminLayout } from './SuperAdminLayout';
 import { SuperAdminRoutes } from './SuperAdminRoutes';
 
 function SuperAdminAppInner() {
-  const { ready, t } = useTranslation(['super_admin', 'admin', 'admin_nav']);
+  const { ready, t } = useTranslation(['super_admin', 'admin_nav']);
 
   if (!ready) {
     return <LoadingScreen message={t('super_admin:layout.loading')} />;

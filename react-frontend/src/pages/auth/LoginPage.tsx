@@ -1,4 +1,3 @@
-import { Autocomplete, AutocompleteItem, GlassCard, Button, Input, Checkbox, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -17,7 +16,14 @@ import { Autocomplete, AutocompleteItem, GlassCard, Button, Input, Checkbox, Spi
 import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 
-import { Separator } from '@/components/ui';
+import { Autocomplete } from '@/components/ui/Autocomplete';
+import { Button } from '@/components/ui/Button';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
+import { Separator } from '@/components/ui/Separator';
+import { Spinner } from '@/components/ui/Spinner';
 import { motion, AnimatePresence } from '@/lib/motion';
 import Mail from 'lucide-react/icons/mail';
 import Lock from 'lucide-react/icons/lock';

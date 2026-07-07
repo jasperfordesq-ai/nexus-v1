@@ -1,20 +1,25 @@
-import { Button, Input, Spinner } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Card, Chip, Separator } from '@/components/ui';
 import Calendar from 'lucide-react/icons/calendar';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Separator } from '@/components/ui/Separator';
+import { Spinner } from '@/components/ui/Spinner';
 import { PageMeta } from '@/components/seo';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * MunicipalityCalendarPage — AG55

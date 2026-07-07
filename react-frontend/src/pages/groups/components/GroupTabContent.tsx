@@ -3,8 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { useTranslation } from 'react-i18next';import Lock from 'lucide-react/icons/lock';
-import { GlassCard, Button } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth } from '@/contexts';
 import type { Event } from '@/types/api';

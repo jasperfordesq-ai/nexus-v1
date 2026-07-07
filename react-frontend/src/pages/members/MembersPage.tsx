@@ -3,11 +3,20 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { AlgorithmLabel, useAlgorithmInfo } from '@/components/ui/AlgorithmLabel';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { SearchField } from '@/components/ui/SearchField';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { MemberCardSkeleton } from '@/components/ui/Skeletons';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
+import { Tooltip } from '@/components/ui/Tooltip';
 /**
  * Members Page - Community member directory
  */
 
-import { Select, SelectItem, GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo, Button, ToggleButton, ToggleButtonGroup, Chip, SearchField, Avatar, Tooltip } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';

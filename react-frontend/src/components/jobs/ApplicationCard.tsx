@@ -3,9 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useState } from 'react';
 import { motion } from '@/lib/motion';
-import { Chip } from '@/components/ui';
 
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -17,7 +20,6 @@ import { formatDateTime, formatDateValue, resolveAvatarUrl } from '@/lib/helpers
 import { api } from '@/lib/api';
 import type { Application, HistoryEntry } from './JobDetailTypes';
 import { STATUS_CHIP_COLORS, STATUS_COLORS } from './JobDetailTypes';
-import { Button, Avatar, Skeleton } from '@/components/ui';
 
 interface ApplicationCardProps {
   application: Application;

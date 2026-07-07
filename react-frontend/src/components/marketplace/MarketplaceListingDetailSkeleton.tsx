@@ -12,7 +12,8 @@
  */
 
 
-import { GlassCard, Skeleton } from '@/components/ui';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 export function MarketplaceListingDetailSkeleton() {
   return (

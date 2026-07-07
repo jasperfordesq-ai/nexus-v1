@@ -3,13 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { GlassCard } from '@/components/ui/GlassCard';
 import { motion } from '@/lib/motion';
 import UserPlus from 'lucide-react/icons/user-plus';
 import Search from 'lucide-react/icons/search';
 import Handshake from 'lucide-react/icons/handshake';
 import Coins from 'lucide-react/icons/coins';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { getIcon } from './iconMap';
 import type { LucideIcon } from 'lucide-react';
 import type { HowItWorksContent } from '@/types';

@@ -3,6 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * Transfer Credits Modal
  * Allows users to send time credits to other members
@@ -23,7 +29,6 @@ import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
 import { CategorySelect } from './CategorySelect';
 import type { WalletUserSearchResult, Transaction } from '@/types/api';
-import { Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

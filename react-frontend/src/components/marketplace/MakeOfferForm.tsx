@@ -16,7 +16,10 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { Button, NumberField, Label, Textarea } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Label } from '@/components/ui/Label';
+import { NumberField } from '@/components/ui/NumberField';
+import { Textarea } from '@/components/ui/Textarea';
 
 interface MakeOfferFormProps {
   listingId: number;

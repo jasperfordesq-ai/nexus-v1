@@ -3,6 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Progress } from '@/components/ui/Progress';
+import { Slider } from '@/components/ui/Slider';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * Employer Brand Page - View an employer's open jobs, branding, and culture.
  * Route: /jobs/employers/:userId
@@ -11,8 +18,6 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
-import { Chip } from '@/components/ui';
-import { Slider } from '@/components/ui';
 import Briefcase from 'lucide-react/icons/briefcase';
 import MapPin from 'lucide-react/icons/map-pin';
 import Wifi from 'lucide-react/icons/wifi';
@@ -21,7 +26,6 @@ import ChevronRight from 'lucide-react/icons/chevron-right';
 import Star from 'lucide-react/icons/star';
 import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Progress, Button, Textarea, Avatar } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useTenant, useAuth } from '@/contexts';

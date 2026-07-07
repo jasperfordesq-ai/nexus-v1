@@ -3,7 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Autocomplete, AutocompleteItem, GlassCard, Button, Chip, SearchField, Avatar, MediaRowsSkeleton } from '@/components/ui';
+import { Autocomplete } from '@/components/ui/Autocomplete';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
+import { SearchField } from '@/components/ui/SearchField';
+import { MediaRowsSkeleton } from '@/components/ui/Skeletons';
 
 /**
  * Federation Events Page - Browse events from partner communities

@@ -1,4 +1,11 @@
-import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Switch } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { CardBody, Card } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Switch } from '@/components/ui/Switch';
+import { Textarea } from '@/components/ui/Textarea';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,7 +13,7 @@ import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Texta
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { Separator } from '@/components/ui';
+import { Separator } from '@/components/ui/Separator';
 import Inbox from 'lucide-react/icons/inbox';
 import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';

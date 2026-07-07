@@ -3,11 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { CardRowsSkeleton } from '@/components/ui/Skeletons';
 import Users from 'lucide-react/icons/users';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, CardRowsSkeleton } from '@/components/ui';
 import { ApplicationCard } from './ApplicationCard';
 import type { Application, JobVacancy } from './JobDetailTypes';
 

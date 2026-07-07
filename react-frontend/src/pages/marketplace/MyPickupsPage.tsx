@@ -10,7 +10,9 @@
 import { useEffect, useState } from 'react';import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import QrCode from 'lucide-react/icons/qr-code';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Chip, Spinner } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useAuth } from '@/contexts';
 import { api } from '@/lib/api';

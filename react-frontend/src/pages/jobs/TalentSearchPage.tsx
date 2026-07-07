@@ -3,6 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { CloseButton } from '@/components/ui/CloseButton';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { SearchField } from '@/components/ui/SearchField';
+import { Spinner } from '@/components/ui/Spinner';
 /**
  * Talent Search Page — Candidate Resume Database Search
  *
@@ -13,7 +21,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
-import { Chip, CloseButton } from '@/components/ui';
 
 import MapPin from 'lucide-react/icons/map-pin';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -23,7 +30,6 @@ import Filter from 'lucide-react/icons/filter';
 import X from 'lucide-react/icons/x';
 import UserSearch from 'lucide-react/icons/user-search';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Spinner, Input, SearchField, Avatar } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';

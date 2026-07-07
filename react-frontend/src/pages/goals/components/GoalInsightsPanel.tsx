@@ -3,6 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Progress } from '@/components/ui/Progress';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
@@ -18,7 +22,6 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
-import { Progress, Button, Chip, Skeleton } from '@/components/ui';
 
 interface GoalMilestone {
   id: number;

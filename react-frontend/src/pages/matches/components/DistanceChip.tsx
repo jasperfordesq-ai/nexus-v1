@@ -6,7 +6,7 @@
 import { useTranslation } from 'react-i18next';
 import MapPin from 'lucide-react/icons/map-pin';
 import Globe from 'lucide-react/icons/globe';
-import { Chip } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
 
 export interface DistanceChipProps {
   distanceKm?: number | null;

@@ -16,7 +16,10 @@ import { useTranslation } from 'react-i18next';
 
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Coins from 'lucide-react/icons/coins';
-import { GlassCard, Chip, Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui/Table';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';

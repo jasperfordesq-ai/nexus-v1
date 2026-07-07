@@ -1,5 +1,3 @@
-import { Card } from '@/components/ui';
-import { Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -22,6 +20,8 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldOff from 'lucide-react/icons/shield-off';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
 import { useTenant } from '@/contexts';
 import api from '@/lib/api';
 import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';

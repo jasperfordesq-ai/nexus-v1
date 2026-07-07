@@ -3,12 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';import Play from 'lucide-react/icons/play';
 import Pause from 'lucide-react/icons/pause';
 import FileText from 'lucide-react/icons/file-text';
 import { resolveAssetUrl } from '@/lib/helpers';
-import { Button } from '@/components/ui';
 
 export interface VoiceMessagePlayerProps {
   audioUrl?: string;

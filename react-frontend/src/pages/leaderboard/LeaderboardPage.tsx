@@ -1,9 +1,15 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Tabs, Tab } from '@/components/ui/Tabs';
 /**
  * Leaderboard Page — Community dashboard with 4 tabs.
  *

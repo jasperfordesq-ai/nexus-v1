@@ -13,7 +13,13 @@ import { useState, useCallback } from 'react';
 
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import { useTranslation } from 'react-i18next';
-import { Select, SelectItem, Accordion, AccordionItem, Button, NumberField, Label, CheckboxGroup, Checkbox, RadioGroup, Radio } from '@/components/ui';
+import { Accordion, AccordionItem } from '@/components/ui/Accordion';
+import { Button } from '@/components/ui/Button';
+import { CheckboxGroup, Checkbox } from '@/components/ui/Checkbox';
+import { Label } from '@/components/ui/Label';
+import { NumberField } from '@/components/ui/NumberField';
+import { RadioGroup, Radio } from '@/components/ui/Radio';
+import { Select, SelectItem } from '@/components/ui/Select';
 import type { MarketplaceFilters,
   MarketplaceCategory } from '@/types/marketplace';
 

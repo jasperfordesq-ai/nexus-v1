@@ -1,4 +1,13 @@
-import { Button, Chip, Card, CardBody, GlassCard, BottomSheet, ConfettiCelebration, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Avatar, Tooltip, Skeleton } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { ConfettiCelebration } from '@/components/ui/ConfettiCelebration';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Tooltip } from '@/components/ui/Tooltip';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +24,7 @@ import {
 import { motion,
   AnimatePresence } from '@/lib/motion';
 
-import { Separator } from '@/components/ui';
+import { Separator } from '@/components/ui/Separator';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import MoreHorizontal from 'lucide-react/icons/ellipsis';

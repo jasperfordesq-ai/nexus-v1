@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import Sparkles from 'lucide-react/icons/sparkles';
 import MapPin from 'lucide-react/icons/map-pin';
 import ListChecks from 'lucide-react/icons/list-checks';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 

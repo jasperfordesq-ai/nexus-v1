@@ -78,7 +78,7 @@ import { useTranslation } from 'react-i18next';
 
 // Contexts (app-wide only — tenant-scoped contexts are inside TenantShell)
 import { ToastProvider } from '@/contexts/ToastContext';
-import { ConfirmDialogProvider } from '@/components/ui';
+import { ConfirmDialogProvider } from '@/components/ui/ConfirmDialog';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { CookieConsentProvider } from '@/contexts/CookieConsentContext';
 import { useTenant } from '@/contexts/TenantContext';
@@ -86,7 +86,7 @@ import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
 
 
 // Layout Components
-import { Layout, AuthLayout } from '@/components/layout/Layout';
+import { AuthLayout } from '@/components/layout/AuthLayout';
 import { ProtectedRoute } from '@/components/routing/ProtectedRoute';
 import { FeatureGate } from '@/components/routing/FeatureGate';
 import { ScrollToTop } from '@/components/routing/ScrollToTop';
@@ -106,6 +106,10 @@ const VerifyEmailPage = lazyWithRetry(() => import('./pages/auth/VerifyEmailPage
 const VerifyIdentityPage = lazyWithRetry(() => import('./pages/auth/VerifyIdentityPage'));
 const VerifyIdentityOptionalPage = lazyWithRetry(() => import('./pages/settings/VerifyIdentityOptionalPage'));
 const OauthCallbackPage = lazyWithRetry(() => import('./pages/auth/OauthCallbackPage'));
+
+// Full app shell (navbar, drawers, footer, podcast, session/update UI) is not
+// needed for login/register startup. Keep it in its own route chunk.
+const Layout = lazyWithRetry(() => import('@/components/layout/Layout'));
 
 // Admin Panel (lazy-loaded — keeps recharts, jsPDF, admin sidebar/header out of main bundle)
 const AdminApp = lazyWithRetry(() => import('@/admin/AdminApp'));

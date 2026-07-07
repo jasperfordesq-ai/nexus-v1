@@ -21,18 +21,19 @@
 
 import { createContext, use, useState, useCallback, useMemo, useEffect, useRef, type ReactNode } from 'react';
 import { api, tokenManager } from '@/lib/api';
-import { safeLocalStorageGet, safeLocalStorageRemove, safeLocalStorageSetJSON } from '@/lib/safeStorage';
+import {
+  clearStoredConsent,
+  readStoredConsent,
+  writeStoredConsent,
+  type CookieConsent,
+} from '@/lib/cookieConsentStorage';
+
+export { readStoredConsent };
+export type { CookieConsent };
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
-
-export interface CookieConsent {
-  essential: true; // Always on
-  analytics: boolean;
-  preferences: boolean;
-  timestamp: string; // ISO 8601
-}
 
 interface CookieConsentContextValue {
   /** Current consent state, or null if user hasn't decided yet */
@@ -55,9 +56,6 @@ interface CookieConsentContextValue {
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = 'nexus_cookie_consent';
-/** GDPR recommends re-asking consent every 6–12 months */
-const CONSENT_MAX_AGE_MS = 6 * 30 * 24 * 60 * 60 * 1000; // ~6 months
 const AHREFS_ANALYTICS_KEY = 'dQCLnhFgNF6rOd6nvIEc9Q';
 
 let ahrefsAnalyticsLoading = false;
@@ -89,31 +87,6 @@ function loadAhrefsAnalytics(): void {
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers (also used by sentry.ts before React mounts)
 // ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Read consent from localStorage (works outside React).
- * Used by sentry.ts to check consent before initialization.
- * Returns null if consent is expired (older than 6 months).
- */
-export function readStoredConsent(): CookieConsent | null {
-  try {
-    const raw = safeLocalStorageGet(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed.essential === 'boolean' && typeof parsed.timestamp === 'string') {
-      // Check expiry — re-prompt after 6 months
-      const age = Date.now() - new Date(parsed.timestamp).getTime();
-      if (age > CONSENT_MAX_AGE_MS) {
-        safeLocalStorageRemove(STORAGE_KEY);
-        return null;
-      }
-      return parsed as CookieConsent;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Server sync helpers
@@ -179,7 +152,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
 
   const persist = useCallback((newConsent: CookieConsent) => {
     setConsent(newConsent);
-    safeLocalStorageSetJSON(STORAGE_KEY, newConsent);
+    writeStoredConsent(newConsent);
     syncConsentToServer(newConsent);
   }, []);
 
@@ -197,7 +170,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
       // If no local consent, use server consent (e.g. new device)
       if (!localConsent) {
         setConsent(serverConsent);
-        safeLocalStorageSetJSON(STORAGE_KEY, serverConsent);
+        writeStoredConsent(serverConsent);
         return;
       }
 
@@ -206,7 +179,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
       const serverTime = new Date(serverConsent.timestamp).getTime();
       if (serverTime > localTime) {
         setConsent(serverConsent);
-        safeLocalStorageSetJSON(STORAGE_KEY, serverConsent);
+        writeStoredConsent(serverConsent);
       }
     });
   }, []);
@@ -215,9 +188,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
     if (consent?.analytics) {
       loadAhrefsAnalytics();
       if (!prevAnalytics.current) {
-        import('@/lib/sentry').then(({ initSentry }) => initSentry()).catch(() => {
-          // Sentry initialization is optional
-        });
+        void import('@/lib/sentry').then(({ initSentryAfterIdle }) => initSentryAfterIdle());
       }
     }
     prevAnalytics.current = consent?.analytics ?? false;
@@ -257,7 +228,7 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
 
   const resetConsent = useCallback(() => {
     setConsent(null);
-    safeLocalStorageRemove(STORAGE_KEY);
+    clearStoredConsent();
   }, []);
 
   const showBanner = consent === null;

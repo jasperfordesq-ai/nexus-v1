@@ -18,7 +18,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from '@/lib/motion';import { Separator } from '@/components/ui';
+import { motion } from '@/lib/motion';import { Separator } from '@/components/ui/Separator';
 import BookOpen from 'lucide-react/icons/book-open';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import ThumbsUp from 'lucide-react/icons/thumbs-up';
@@ -40,7 +40,11 @@ import { lazy, Suspense } from 'react';
 const MarkdownRenderer = lazy(() =>
   import('@/components/content/MarkdownRenderer').then((m) => ({ default: m.MarkdownRenderer })),
 );
-import { GlassCard, Breadcrumbs, Button, Chip, Spinner } from '@/components/ui';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Spinner } from '@/components/ui/Spinner';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';

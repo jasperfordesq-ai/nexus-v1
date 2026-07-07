@@ -11,7 +11,7 @@ import { Link } from 'react-router-dom';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Truck from 'lucide-react/icons/truck';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { ShippingOptionsManager } from '@/components/marketplace/ShippingOptionsManager';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useAuth, useTenant } from '@/contexts';

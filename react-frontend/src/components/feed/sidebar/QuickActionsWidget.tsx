@@ -13,7 +13,8 @@ import BarChart3 from 'lucide-react/icons/chart-column';
 import Target from 'lucide-react/icons/target';
 import UsersRound from 'lucide-react/icons/users-round';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { useAuth, useTenant } from '@/contexts';
 
 export function QuickActionsWidget() {

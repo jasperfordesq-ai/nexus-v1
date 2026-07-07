@@ -3,6 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
 import Calendar from 'lucide-react/icons/calendar';
 import Clock from 'lucide-react/icons/clock';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -11,8 +14,6 @@ import XCircle from 'lucide-react/icons/circle-x';
 import Video from 'lucide-react/icons/video';
 import CalendarPlus from 'lucide-react/icons/calendar-plus';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
-import { GlassCard, Button } from '@/components/ui';
 import { API_BASE } from '@/lib/api';
 import { formatDateTime } from '@/lib/helpers';
 import type { InlineInterview } from './JobDetailTypes';

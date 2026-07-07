@@ -1,10 +1,16 @@
-import { Chip } from '@/components/ui';
-import { Autocomplete, AutocompleteItem, GlassCard, Button, Input, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Autocomplete } from '@/components/ui/Autocomplete';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
+import { CardRowsSkeleton } from '@/components/ui/Skeletons';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui/Table';
 /**
  * Bias Audit Page — Hiring process analytics to detect potential bias.
  *

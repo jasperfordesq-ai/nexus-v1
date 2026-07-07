@@ -11,7 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from '@/lib/motion';import { Separator } from '@/components/ui';
+import { motion } from '@/lib/motion';import { Separator } from '@/components/ui/Separator';
 import Scale from 'lucide-react/icons/scale';
 import Shield from 'lucide-react/icons/shield';
 import FileText from 'lucide-react/icons/file-text';
@@ -28,7 +28,8 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Building from 'lucide-react/icons/building';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

@@ -3,6 +3,15 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip as HeroChip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { SearchField } from '@/components/ui/SearchField';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { CardRowsSkeleton } from '@/components/ui/Skeletons';
+import { Switch } from '@/components/ui/Switch';
+import { Tabs, Tab } from '@/components/ui/Tabs';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 /**
  * Jobs Page - Community job vacancies listing with type/commitment filtering
  *
@@ -22,8 +31,6 @@
  * - Featured jobs visual distinction (ring + gradient bg)
  */
 
-import { Select, SelectItem, GlassCard, Button, SearchField, Switch, Tabs, Tab, CardRowsSkeleton } from '@/components/ui';
-import { Chip as HeroChip, ToggleButton, ToggleButtonGroup } from '@/components/ui';
 import { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';

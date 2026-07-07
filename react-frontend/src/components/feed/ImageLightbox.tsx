@@ -22,7 +22,8 @@ import Download from 'lucide-react/icons/download';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
-import { Button, Modal, ModalBody, ModalContent } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Modal, ModalBody, ModalContent } from '@/components/ui/Modal';
 
 interface ImageLightboxProps {
   media: PostMedia[];

@@ -21,7 +21,9 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { MarketplaceShippingOption } from '@/types/marketplace';
-import { Chip, Spinner, RadioGroup, Radio } from '@/components/ui';
+import { Chip } from '@/components/ui/Chip';
+import { RadioGroup, Radio } from '@/components/ui/Radio';
+import { Spinner } from '@/components/ui/Spinner';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

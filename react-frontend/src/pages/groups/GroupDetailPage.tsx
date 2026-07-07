@@ -3,6 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * Group Detail Page - Single group view
  * Full discussions UI, admin features, events tab, member management
@@ -14,7 +17,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from '@/lib/motion';import AlertCircle from 'lucide-react/icons/circle-alert';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
-import { GlassCard, useDisclosure, Button } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
 import { ComposeHub } from '@/components/compose';

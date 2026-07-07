@@ -3,6 +3,16 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { SearchField } from '@/components/ui/SearchField';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Spinner } from '@/components/ui/Spinner';
+import { Tooltip } from '@/components/ui/Tooltip';
 /**
  * Conversation Page - Individual message thread
  *
@@ -30,7 +40,6 @@ import Languages from 'lucide-react/icons/languages';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { useToast,
   useNotifications } from '@/contexts';
-import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, SearchField, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, Skeleton, Spinner } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
 import { useAuth, usePresenceOptional, usePusherOptional, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

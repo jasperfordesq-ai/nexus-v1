@@ -3,6 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Switch } from '@/components/ui/Switch';
+import { Textarea } from '@/components/ui/Textarea';
 /**
  * Create/Edit Group Page
  * Includes image upload, location, and privacy settings
@@ -23,7 +30,6 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ImagePlus from 'lucide-react/icons/image-plus';
 import X from 'lucide-react/icons/x';
-import { GlassCard, Button, Chip, Input, Textarea, Avatar, Switch } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
 import { PlaceAutocompleteInput } from '@/components/location';

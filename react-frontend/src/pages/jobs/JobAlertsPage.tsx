@@ -1,10 +1,17 @@
-import { Chip } from '@/components/ui';
-import { Select, SelectItem, useDisclosure, GlassCard, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, CardRowsSkeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { CardRowsSkeleton } from '@/components/ui/Skeletons';
+import { Switch } from '@/components/ui/Switch';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * Job Alerts Page (J6) - Manage job alert subscriptions
  *

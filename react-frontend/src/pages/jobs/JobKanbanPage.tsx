@@ -1,10 +1,22 @@
-import { Chip } from '@/components/ui';
-import { Select, SelectItem, GlassCard, Button, Spinner, Input, Textarea, NumberField, Label, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { NumberField } from '@/components/ui/NumberField';
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Spinner } from '@/components/ui/Spinner';
+import { Tabs, Tab } from '@/components/ui/Tabs';
+import { Textarea } from '@/components/ui/Textarea';
+import { Tooltip } from '@/components/ui/Tooltip';
 /**
  * Job Kanban Pipeline Page
  *

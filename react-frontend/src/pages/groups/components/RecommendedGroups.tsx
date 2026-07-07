@@ -3,6 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
 /**
  * RecommendedGroups — authed-only horizontal strip of the top Smart
  * Matching group suggestions, shown above the main groups grid. Renders
@@ -15,7 +19,6 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Users from 'lucide-react/icons/users';
 import Sparkles from 'lucide-react/icons/sparkles';
-import { GlassCard, Button, Chip, Avatar } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

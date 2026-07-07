@@ -3,6 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Modal, ModalContent, ModalBody } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 /**
  * Group Media Tab
  * Photo/video gallery with grid layout, lightbox modal, upload, and delete.
@@ -18,7 +25,6 @@ import X from 'lucide-react/icons/x';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, ToggleButton, ToggleButtonGroup, Spinner, Modal, ModalContent, ModalBody, useConfirm } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

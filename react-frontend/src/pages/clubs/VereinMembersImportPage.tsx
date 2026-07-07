@@ -1,4 +1,10 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Spinner } from '@/components/ui/Spinner';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui/Table';
+import { Textarea } from '@/components/ui/Textarea';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -22,7 +28,7 @@ import { ChangeEvent, useCallback, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@/components/ui';
+import { Separator } from '@/components/ui/Separator';
 import Upload from 'lucide-react/icons/upload';
 import FileText from 'lucide-react/icons/file-text';
 import CheckCircle2 from 'lucide-react/icons/circle-check';

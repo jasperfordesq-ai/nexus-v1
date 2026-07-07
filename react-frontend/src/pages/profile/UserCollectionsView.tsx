@@ -1,9 +1,9 @@
-import { CardBody, Card } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { CardBody, Card } from '@/components/ui/Card';
 /**
  * SOC10 — UserCollectionsView at /users/:userId/collections
  * Public collections of another user.

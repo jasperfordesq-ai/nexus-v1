@@ -15,7 +15,8 @@ import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl, resolveThumbnailUrl, formatRelativeTime } from '@/lib/helpers';
-import { Button, Avatar } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
 
 export interface QuotedPostData {
   id: number;

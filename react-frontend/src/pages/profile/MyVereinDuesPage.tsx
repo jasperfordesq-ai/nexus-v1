@@ -3,7 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Spinner } from '@/components/ui/Spinner';
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Receipt from 'lucide-react/icons/receipt';

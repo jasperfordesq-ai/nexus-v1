@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Separator } from '@/components/ui';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Separator } from '@/components/ui/Separator';
 import MapPin from 'lucide-react/icons/map-pin';
 import Clock from 'lucide-react/icons/clock';
 import DollarSign from 'lucide-react/icons/dollar-sign';
@@ -13,7 +14,6 @@ import Timer from 'lucide-react/icons/timer';
 import Tag from 'lucide-react/icons/tag';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import type { JobVacancy } from './JobDetailTypes';
 
 interface SalaryBenchmark {

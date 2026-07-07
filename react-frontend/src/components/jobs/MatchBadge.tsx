@@ -3,9 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Chip } from '@/components/ui/Chip';
 import Target from 'lucide-react/icons/target';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
 import type { MatchResult } from './JobDetailTypes';
 
 interface MatchBadgeProps {

@@ -1,6 +1,9 @@
-import { Card, Chip } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { type ReactNode } from 'react';
-import { Separator } from '@/components/ui';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -10,14 +13,12 @@ import Shield from 'lucide-react/icons/shield';
 import Github from 'lucide-react/icons/github';
 import Bug from 'lucide-react/icons/bug';
 import ExternalLink from 'lucide-react/icons/external-link';
+import { Card } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { Separator } from '@/components/ui/Separator';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTenant } from '@/contexts';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
 /**
  * Features Page
  *

@@ -24,7 +24,15 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Package from 'lucide-react/icons/package';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tabs, Tab } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
+import { Switch } from '@/components/ui/Switch';
+import { Tabs, Tab } from '@/components/ui/Tabs';
+import { Textarea } from '@/components/ui/Textarea';
 import { EmptyState } from '@/components/feedback';
 import { CollectionCard, SavedSearchCard } from '@/components/marketplace';
 import type {

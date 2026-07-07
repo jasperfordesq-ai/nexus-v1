@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { GlassCard } from '@/components/ui/GlassCard';
 /**
  * Group Subgroups Tab
  * Lists sub-groups of a parent group with navigation links.
@@ -11,7 +12,6 @@
 import { Link } from 'react-router-dom';
 import Users from 'lucide-react/icons/users';
 import ChevronRight from 'lucide-react/icons/chevron-right';
-import { GlassCard } from '@/components/ui';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 

@@ -32,7 +32,6 @@ import { api, tokenManager, fetchCsrfToken } from '@/lib/api';
 import { detectTenantFromUrl, tenantPath as buildTenantPath } from '@/lib/tenant-routing';
 import { validateResponseIfPresent } from '@/lib/api-validation';
 import { tenantBootstrapSchema } from '@/lib/api-schemas';
-import { setSentryTenant } from '@/lib/sentry';
 import { DEFAULT_LANDING_PAGE_CONFIG } from '@/types';
 import type { TenantConfig, TenantFeatures, TenantModules, TenantBranding, GroupTabConfig, ListingConfig, VolunteeringConfig, JobConfig, LandingPageConfig } from '@/types';
 
@@ -80,6 +79,10 @@ export type GeocodingProvider = 'google' | 'nominatim' | 'os_places';
 
 const ALLOWED_MAP_PROVIDERS: readonly MapProvider[] = ['google', 'openstreetmap', 'ordnance_survey'];
 const ALLOWED_GEOCODING_PROVIDERS: readonly GeocodingProvider[] = ['google', 'nominatim', 'os_places'];
+
+function setTelemetryTenant(tenant: { id: number; name: string; slug: string } | null): void {
+  void import('@/lib/sentry').then(({ setSentryTenant }) => setSentryTenant(tenant));
+}
 
 // Default features — synced with PHP TenantFeatureConfig::FEATURE_DEFAULTS
 const defaultFeatures: TenantFeatures = {
@@ -396,7 +399,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
 
         // Set Sentry tenant context
         if (tenant.id && tenant.name && tenant.slug) {
-          setSentryTenant({
+          setTelemetryTenant({
             id: tenant.id,
             name: tenant.name,
             slug: tenant.slug,
@@ -411,7 +414,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
         });
       } else if (response.code === 'SERVICE_UNAVAILABLE') {
         // API is in maintenance mode — synthesise a tenant that triggers MaintenancePage
-        setSentryTenant(null);
+        setTelemetryTenant(null);
         setState({
           tenant: { settings: { maintenance_mode: true } } as unknown as TenantConfig,
           isLoading: false,
@@ -420,7 +423,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
         });
       } else {
         // Bootstrap failed — if we had a slug, this is an unknown tenant (soft 404)
-        setSentryTenant(null);
+        setTelemetryTenant(null);
         setState({
           tenant: null,
           isLoading: false,

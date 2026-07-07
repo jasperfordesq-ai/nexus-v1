@@ -3,6 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { SearchField } from '@/components/ui/SearchField';
+import { GroupCardSkeleton } from '@/components/ui/Skeletons';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
+import { Tooltip } from '@/components/ui/Tooltip';
 /**
  * Groups Page - Community groups listing
  */
@@ -20,7 +28,6 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, GroupCardSkeleton, Button, ToggleButton, ToggleButtonGroup, Chip, SearchField, Avatar, AvatarGroup, Tooltip } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';

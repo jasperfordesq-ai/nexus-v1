@@ -84,14 +84,14 @@ describe('FeatureErrorBoundary', () => {
     expect(screen.getByText('Try Again')).toBeInTheDocument();
   });
 
-  it('reports the crash to Sentry tagged with the feature name', () => {
+  it('reports the crash to Sentry tagged with the feature name', async () => {
     render(
       <FeatureErrorBoundary featureName="Wallet">
         <ThrowingComponent />
       </FeatureErrorBoundary>
     );
 
-    expect(captureSentryException).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(captureSentryException).toHaveBeenCalledTimes(1));
     const [reportedError, context] = vi.mocked(captureSentryException).mock.calls[0];
     expect(reportedError).toBeInstanceOf(Error);
     expect(reportedError.message).toBe('Feature error');

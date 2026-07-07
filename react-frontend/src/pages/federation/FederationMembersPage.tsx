@@ -3,7 +3,16 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Autocomplete, AutocompleteItem, GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, Spinner, Input, SearchField, Avatar } from '@/components/ui';
+import { Autocomplete } from '@/components/ui/Autocomplete';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Input } from '@/components/ui/Input';
+import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
+import { SearchField } from '@/components/ui/SearchField';
+import { Spinner } from '@/components/ui/Spinner';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 
 /**
  * Federation Members Page

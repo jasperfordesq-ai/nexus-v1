@@ -17,7 +17,6 @@ import Home from 'lucide-react/icons/house';
 import { GlassCard, Button } from '@/components/ui';
 import { ReportProblemButton } from '@/components/feedback/ReportProblemButton';
 import { logError } from '@/lib/logger';
-import { captureSentryException } from '@/lib/sentry';
 import i18n from 'i18next';
 
 interface ErrorBoundaryProps {
@@ -59,9 +58,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     }
 
     // Report to Sentry in production
-    captureSentryException(error, {
-      componentStack: errorInfo.componentStack ?? undefined,
-      source: 'ErrorBoundary',
+    void import('@/lib/sentry').then(({ captureSentryException }) => {
+      captureSentryException(error, {
+        componentStack: errorInfo.componentStack ?? undefined,
+        source: 'ErrorBoundary',
+      });
     });
   }
 
