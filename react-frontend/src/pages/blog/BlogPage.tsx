@@ -27,7 +27,7 @@ import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl, resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 
@@ -344,7 +344,9 @@ interface PostCardProps {
 function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
   const { t } = useTranslation('blog');
   const { tenantPath } = useTenant();
-  const imageUrl = post.featured_image ? resolveAssetUrl(post.featured_image) : null;
+  const imageUrl = post.featured_image
+    ? resolveThumbnailUrl(post.featured_image, { width: 720, height: 420 })
+    : null;
 
   return (
     <Link to={tenantPath(`/blog/${post.slug}`)} className="block group mb-6">
@@ -358,6 +360,7 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
                 alt={post.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
+                decoding="async"
                 width={600}
                 height={288}
               />
@@ -408,7 +411,9 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
 function BlogPostCard({ post, categoryColors }: PostCardProps) {
   const { t } = useTranslation('blog');
   const { tenantPath } = useTenant();
-  const imageUrl = post.featured_image ? resolveAssetUrl(post.featured_image) : null;
+  const imageUrl = post.featured_image
+    ? resolveThumbnailUrl(post.featured_image, { width: 420, height: 260 })
+    : null;
 
   return (
     <Link to={tenantPath(`/blog/${post.slug}`)} className="block group h-full">
@@ -421,6 +426,7 @@ function BlogPostCard({ post, categoryColors }: PostCardProps) {
               alt={post.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
+              decoding="async"
             />
           ) : (
             <BookOpen className="w-12 h-12 text-blue-300 opacity-30" aria-hidden="true" />

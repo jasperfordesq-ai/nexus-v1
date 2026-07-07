@@ -35,6 +35,7 @@ import type {
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
@@ -285,10 +286,11 @@ export function MarketplaceCollectionsPage() {
                     <div className="aspect-square bg-surface-secondary overflow-hidden">
                       {item.listing.image ? (
                         <img
-                          src={item.listing.image.thumbnail_url || item.listing.image.url}
+                          src={resolveThumbnailUrl(item.listing.image.thumbnail_url || item.listing.image.url, { width: 360, height: 360 })}
                           alt={item.listing.title}
                           className="w-full h-full object-cover"
                           loading="lazy"
+                          decoding="async"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">

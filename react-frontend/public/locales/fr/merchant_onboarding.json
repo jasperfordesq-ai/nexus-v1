@@ -37,6 +37,7 @@
   "closed": "Fermé",
   "upload_photo": "Télécharger une photo de profil",
   "upload_cover": "Télécharger une image de couverture (optionnel)",
+  "paste_image_url": "ou collez l’URL de l’image",
   "next": "Suivant",
   "back": "Retour",
   "saving": "Enregistrement…",

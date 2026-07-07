@@ -23,7 +23,7 @@ import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { formatRelativeTime } from '@/lib/helpers';
+import { formatRelativeTime, resolveThumbnailUrl } from '@/lib/helpers';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -325,7 +325,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                   <div className="w-full h-full bg-surface-secondary flex items-center justify-center">
                     {item.thumbnail_url ? (
                       <img
-                        src={item.thumbnail_url}
+                        src={resolveThumbnailUrl(item.thumbnail_url, { width: 640, height: 640 })}
                         alt={item.caption || t('media.video_thumbnail')}
                         className="w-full h-full object-cover"
                       />
@@ -340,7 +340,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                   </div>
                 ) : (
                   <img
-                    src={item.thumbnail_url || item.url}
+                    src={resolveThumbnailUrl(item.thumbnail_url || item.url, { width: 640, height: 640 })}
                     alt={item.caption || t('media.photo_alt')}
                     className="w-full h-full object-cover"
                   />
@@ -452,7 +452,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                 <div className="max-h-[80vh] flex items-center justify-center w-full">
                   {currentItem.type === 'video' ? (
                     <video
-                      src={currentItem.url}
+                      src={resolveThumbnailUrl(currentItem.thumbnail_url || currentItem.url, { width: 1200, height: 900, fit: 'contain' })}
                       controls
                       className="max-h-[80vh] max-w-full rounded-lg"
                       aria-label={currentItem.caption || t('media.video_player')}

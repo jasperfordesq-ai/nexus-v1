@@ -31,7 +31,7 @@ import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl, resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAssetUrl, resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -230,7 +230,9 @@ export function BlogPostPage() {
     );
   }
 
-  const imageUrl = post.featured_image ? resolveAssetUrl(post.featured_image) : null;
+  const imageUrl = post.featured_image
+    ? resolveThumbnailUrl(post.featured_image, { width: 1200, height: 675 })
+    : null;
   const canonicalUrl = post.canonical_url
     ? new URL(post.canonical_url, window.location.origin).href
     : `${window.location.origin}${window.location.pathname}`;

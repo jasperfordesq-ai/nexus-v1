@@ -49,6 +49,7 @@ vi.mock('@/lib/logger', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: (url: string) => url || '',
+  resolveThumbnailUrl: (url: string) => url || '',
 }));
 
 import { MessageContextCard } from '../MessageContextCard';

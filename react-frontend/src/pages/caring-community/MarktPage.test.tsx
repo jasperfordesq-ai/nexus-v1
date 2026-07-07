@@ -78,6 +78,7 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url?: string) => url ?? null,
   resolveAssetUrl: (url: string) => url,
+  resolveThumbnailUrl: (url: string) => url,
 }));
 
 // ── react-router-dom ──────────────────────────────────────────────────────────

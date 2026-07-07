@@ -97,9 +97,9 @@ import { FeatureErrorBoundary } from '@/components/feedback/FeatureErrorBoundary
 
 // Auth Pages (critical path - eager loaded)
 import { LoginPage } from '@/pages/auth/LoginPage';
-import { RegisterPage } from '@/pages/auth/RegisterPage';
 
 // Auth Pages (rarely used - lazy loaded)
+const RegisterPage = lazyWithRetry(() => import('@/pages/auth/RegisterPage'));
 const ForgotPasswordPage = lazyWithRetry(() => import('./pages/auth/ForgotPasswordPage'));
 const ResetPasswordPage = lazyWithRetry(() => import('./pages/auth/ResetPasswordPage'));
 const VerifyEmailPage = lazyWithRetry(() => import('./pages/auth/VerifyEmailPage'));

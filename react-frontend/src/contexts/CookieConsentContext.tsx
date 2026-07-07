@@ -58,6 +58,33 @@ interface CookieConsentContextValue {
 const STORAGE_KEY = 'nexus_cookie_consent';
 /** GDPR recommends re-asking consent every 6–12 months */
 const CONSENT_MAX_AGE_MS = 6 * 30 * 24 * 60 * 60 * 1000; // ~6 months
+const AHREFS_ANALYTICS_KEY = 'dQCLnhFgNF6rOd6nvIEc9Q';
+
+let ahrefsAnalyticsLoading = false;
+
+function loadAhrefsAnalytics(): void {
+  if (typeof document === 'undefined' || ahrefsAnalyticsLoading) return;
+  if (document.querySelector('script[data-nexus-ahrefs="true"]')) {
+    ahrefsAnalyticsLoading = true;
+    return;
+  }
+
+  const appendScript = () => {
+    const script = document.createElement('script');
+    script.src = 'https://analytics.ahrefs.com/analytics.js';
+    script.async = true;
+    script.dataset.key = AHREFS_ANALYTICS_KEY;
+    script.dataset.nexusAhrefs = 'true';
+    document.head.appendChild(script);
+    ahrefsAnalyticsLoading = true;
+  };
+
+  if (typeof window.requestIdleCallback === 'function') {
+    window.requestIdleCallback(appendScript, { timeout: 5000 });
+  } else {
+    globalThis.setTimeout(appendScript, 1500);
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers (also used by sentry.ts before React mounts)
@@ -184,12 +211,14 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  // If user grants analytics consent mid-session, initialize Sentry
   useEffect(() => {
-    if (consent?.analytics && !prevAnalytics.current) {
-      import('@/lib/sentry').then(({ initSentry }) => initSentry()).catch(() => {
-        // Sentry initialization is optional
-      });
+    if (consent?.analytics) {
+      loadAhrefsAnalytics();
+      if (!prevAnalytics.current) {
+        import('@/lib/sentry').then(({ initSentry }) => initSentry()).catch(() => {
+          // Sentry initialization is optional
+        });
+      }
     }
     prevAnalytics.current = consent?.analytics ?? false;
   }, [consent?.analytics]);

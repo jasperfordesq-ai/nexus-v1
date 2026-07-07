@@ -27,7 +27,10 @@ vi.mock('@/lib/api', () => ({
 }));
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({ formatRelativeTime: () => '2 days ago' }));
+vi.mock('@/lib/helpers', () => ({
+  formatRelativeTime: () => '2 days ago',
+  resolveThumbnailUrl: (url: string | null | undefined) => url ?? '',
+}));
 
 // ── Contexts ──────────────────────────────────────────────────────────────────
 const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() };

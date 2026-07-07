@@ -390,6 +390,21 @@ export function PlaceAutocompleteInput(props: PlaceAutocompleteInputProps) {
     return <OsPlacesAutocomplete {...props} />;
   }
 
+  return <DeferredGooglePlaceAutocomplete {...props} />;
+}
+
+function DeferredGooglePlaceAutocomplete(props: PlaceAutocompleteInputProps) {
+  const [isActive, setIsActive] = useState(false);
+
+  if (!isActive) {
+    return (
+      <PlaceAutocompleteFallback
+        {...props}
+        onActivate={() => setIsActive(true)}
+      />
+    );
+  }
+
   return (
     <GoogleMapsProvider fallback={<PlaceAutocompleteFallback {...props} />}>
       <PlaceAutocompleteWithGoogle {...props} />
@@ -400,7 +415,7 @@ export function PlaceAutocompleteInput(props: PlaceAutocompleteInputProps) {
 /**
  * Plain text fallback when Google Maps API is not available.
  */
-function PlaceAutocompleteFallback(props: PlaceAutocompleteInputProps) {
+function PlaceAutocompleteFallback(props: PlaceAutocompleteInputProps & { onActivate?: () => void }) {
   const {
     value,
     onChange,
@@ -413,6 +428,7 @@ function PlaceAutocompleteFallback(props: PlaceAutocompleteInputProps) {
     classNames,
     className,
     showIcon = true,
+    onActivate,
   } = props;
 
   const { t } = useTranslation('common');
@@ -424,7 +440,11 @@ function PlaceAutocompleteFallback(props: PlaceAutocompleteInputProps) {
         label={label}
         placeholder={placeholder}
         value={value}
-        onChange={(e) => onChange?.(e.target.value)}
+        onFocus={onActivate}
+        onChange={(e) => {
+          onActivate?.();
+          onChange?.(e.target.value);
+        }}
         isRequired={isRequired}
         errorMessage={errorMessage}
         isInvalid={isInvalid}

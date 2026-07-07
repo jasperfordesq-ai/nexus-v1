@@ -20,7 +20,7 @@ import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Download from 'lucide-react/icons/download';
 import { useTranslation } from 'react-i18next';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveAssetUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
 import { Button, Modal, ModalBody, ModalContent } from '@/components/ui';
 
@@ -207,7 +207,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
             {current.media_type === 'video' ? (
               <video
                 src={resolveAssetUrl(current.file_url)}
-                poster={current.thumbnail_url ? resolveAssetUrl(current.thumbnail_url) : undefined}
+                poster={current.thumbnail_url ? resolveThumbnailUrl(current.thumbnail_url, { width: 1200, height: 675 }) : undefined}
                 controls
                 autoPlay
                 playsInline
@@ -217,7 +217,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
               />
             ) : (
               <img
-                src={resolveAssetUrl(current.file_url)}
+                src={resolveThumbnailUrl(current.thumbnail_url || current.file_url, { width: 1600, height: 1200, fit: 'contain' })}
                 alt={current.alt_text || ''}
                 className="max-w-full max-h-full object-contain select-none rounded-lg"
                 draggable={false}

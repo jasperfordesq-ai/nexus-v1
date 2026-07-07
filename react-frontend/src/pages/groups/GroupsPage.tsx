@@ -28,7 +28,7 @@ import { RecommendedGroups } from './components/RecommendedGroups';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl, resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import type { Group } from '@/types/api';
@@ -454,7 +454,9 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
   const { tenantPath } = useTenant();
   const memberCount = group.member_count ?? group.members_count ?? 0;
   const groupImageSource = group.cover_image_url || group.cover_image || group.image_url;
-  const imageUrl = groupImageSource ? resolveAssetUrl(groupImageSource) : '';
+  const imageUrl = groupImageSource
+    ? resolveThumbnailUrl(groupImageSource, { width: 360, height: 160 })
+    : '';
 
   return (
     <Link to={tenantPath(`/groups/${group.id}`)} aria-label={`${group.name} - ${t('members', { count: memberCount })}`} className="block h-full">
@@ -467,6 +469,7 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
                 alt=""
                 className="h-full w-full object-cover"
                 loading="lazy"
+                decoding="async"
               />
             ) : (
               <div className="flex h-full items-center justify-center bg-theme-elevated text-theme-subtle">

@@ -32,7 +32,7 @@ import { LoadingScreen } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import type { Listing, Category } from '@/types/api';
@@ -782,7 +782,7 @@ export function CreateListingPage() {
             {(imagePreview || existingImageUrl) ? (
               <div className="relative inline-block">
                 <img
-                  src={imagePreview || resolveAssetUrl(existingImageUrl) || ''}
+                  src={imagePreview || resolveThumbnailUrl(existingImageUrl, { width: 640, height: 360 }) || ''}
                   alt={t('form.image_preview_alt')}
                   className="h-56 w-full max-w-md rounded-xl border border-theme-default object-cover"
                 />

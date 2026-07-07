@@ -46,7 +46,7 @@ import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { dispatchFeedSync } from '@/lib/feedSync';
-import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
 import { useFeedTracking } from '@/hooks/useFeedTracking';
 import { useSharedFeedObserver } from '@/hooks/useSharedFeedObserver';
 import { useLongPress } from '@/hooks/useLongPress';
@@ -1117,7 +1117,7 @@ const FeedCard = React.memo(function FeedCard({
             {detailPath ? (
               <Link to={tenantPath(detailPath)}>
                 <img
-                  src={resolveAssetUrl(item.image_url)}
+                  src={resolveThumbnailUrl(item.image_url, { width: 960, height: 540 })}
                   alt={t('card.image_alt', { type: typeLabel ?? t('card.type_post'), name: author.name })}
                   className="w-full max-h-[28rem] object-cover group-hover:scale-[1.02] transition-transform duration-500"
                   loading="lazy"
@@ -1128,7 +1128,7 @@ const FeedCard = React.memo(function FeedCard({
               </Link>
             ) : (
               <img
-                src={resolveAssetUrl(item.image_url)}
+                src={resolveThumbnailUrl(item.image_url, { width: 960, height: 540 })}
                 alt={t('card.image_alt', { type: t('card.type_post'), name: author.name })}
                 className="w-full max-h-[28rem] object-cover group-hover:scale-[1.02] transition-transform duration-500"
                 loading="lazy"

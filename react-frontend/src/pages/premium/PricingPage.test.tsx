@@ -195,7 +195,7 @@ describe('PricingPage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /make a one-off donation/i }));
 
-    expect(screen.getByTestId('donation-checkout')).toBeInTheDocument();
+    expect(await screen.findByTestId('donation-checkout')).toBeInTheDocument();
   });
 
   it('renders tier descriptions', async () => {

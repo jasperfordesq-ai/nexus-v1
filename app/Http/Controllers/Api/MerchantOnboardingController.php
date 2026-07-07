@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Core\TenantContext;
+use App\Services\ImageUploadService;
 use App\Services\MerchantOnboardingService;
 use Illuminate\Http\JsonResponse;
 
@@ -30,6 +31,10 @@ use Illuminate\Http\JsonResponse;
 class MerchantOnboardingController extends BaseApiController
 {
     protected bool $isV2Api = true;
+
+    public function __construct(private readonly ImageUploadService $imageUploadService)
+    {
+    }
 
     // ─────────────────────────────────────────────────────────────────────────
     //  Guards
@@ -219,6 +224,54 @@ class MerchantOnboardingController extends BaseApiController
     // ─────────────────────────────────────────────────────────────────────────
     //  POST /v2/merchant-onboarding/complete
     // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * POST /v2/merchant-onboarding/image - Upload an image for step 3.
+     */
+    public function uploadImage(): JsonResponse
+    {
+        if ($err = $this->ensureAuth()) {
+            return $err;
+        }
+        if ($err = $this->ensureFeature()) {
+            return $err;
+        }
+
+        $this->rateLimit('merchant_onboarding_image_upload', 20, 60);
+
+        $request = request();
+        $field = match (true) {
+            $request->hasFile('avatar') => 'avatar',
+            $request->hasFile('cover_image') => 'cover_image',
+            $request->hasFile('image') => 'image',
+            default => null,
+        };
+
+        if ($field === null) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.no_image_uploaded'),
+                'image',
+                422
+            );
+        }
+
+        try {
+            $uploaded = $this->imageUploadService->upload(
+                $request->file($field),
+                'marketplace/sellers'
+            );
+        } catch (\InvalidArgumentException) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.failed_upload_image'),
+                $field,
+                422
+            );
+        }
+
+        return $this->respondWithData($uploaded);
+    }
 
     /**
      * Finalise the onboarding wizard.

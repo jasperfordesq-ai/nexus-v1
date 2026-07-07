@@ -34,7 +34,7 @@ import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { formatDateTime, formatDateValue, formatMonthShort, resolveAssetUrl } from '@/lib/helpers';
+import { formatDateTime, formatDateValue, formatMonthShort, resolveThumbnailUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { ProximityFilter, type ProximityFilterParams } from '@/components/proximity/ProximityFilter';
@@ -509,7 +509,9 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
   const monthLabel = formatMonthShort(startDate, true);
   const weekdayLabel = formatDateValue(startDate, { weekday: 'short' });
   const timeLabel = formatDateTime(startDate, { hour: '2-digit', minute: '2-digit' });
-  const coverImage = event.cover_image ? resolveAssetUrl(event.cover_image) : null;
+  const coverImage = event.cover_image
+    ? resolveThumbnailUrl(event.cover_image, { width: 360, height: 220 })
+    : null;
   const freq = event.recurrence_frequency;
   const repeatsLabel = freq && ['daily', 'weekly', 'monthly', 'yearly'].includes(freq)
     ? t(`card.repeats_${freq}`)
@@ -526,6 +528,7 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
               alt={t('detail.cover_alt', { title: event.title })}
               className="h-36 w-full object-cover sm:hidden"
               loading="lazy"
+              decoding="async"
             />
           )}
           <div className="flex gap-3 p-4 sm:gap-4 sm:p-5">
@@ -564,6 +567,7 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                     alt={t('detail.cover_alt', { title: event.title })}
                     className="hidden h-20 w-28 flex-shrink-0 rounded-lg object-cover sm:block"
                     loading="lazy"
+                    decoding="async"
                   />
                 )}
               </div>

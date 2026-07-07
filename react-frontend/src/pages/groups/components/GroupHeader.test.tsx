@@ -27,6 +27,7 @@ vi.mock('@/lib/helpers', async (importOriginal) => {
   return {
     ...actual,
     resolveAvatarUrl: (url: string | undefined | null) => url ?? '',
+    resolveThumbnailUrl: (url: string | undefined | null) => url ?? '',
     formatDateValue: (d: string) => d,
     formatRelativeTime: (d: string) => d,
   };

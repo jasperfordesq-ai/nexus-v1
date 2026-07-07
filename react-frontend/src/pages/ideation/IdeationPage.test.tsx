@@ -81,6 +81,7 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: (url: string | null) => url ?? '',
   resolveAvatarUrl: (url: string | null) => url ?? '',
+  resolveThumbnailUrl: (url: string | null) => url ?? '',
 }));
 
 import { IdeationPage } from './IdeationPage';

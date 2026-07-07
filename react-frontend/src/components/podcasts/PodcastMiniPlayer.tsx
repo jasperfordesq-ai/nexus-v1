@@ -26,6 +26,7 @@ import Pause from 'lucide-react/icons/pause';
 import Play from 'lucide-react/icons/play';
 import Podcast from 'lucide-react/icons/podcast';
 import X from 'lucide-react/icons/x';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 
 interface PodcastMiniPlayerProps {
   /** Whether the layout renders the mobile tab bar at all (Layout's showNavbar). */
@@ -60,6 +61,9 @@ export function PodcastMiniPlayer({ tabBarMayShow = true }: PodcastMiniPlayerPro
     ? tenantPath(`/podcasts/${track.showSlug}/${track.episodeSlug}`)
     : tenantPath('/podcasts');
   const progressPercent = duration > 0 ? Math.min(100, (currentTime / duration) * 100) : 0;
+  const artworkSrc = track.artworkUrl
+    ? resolveThumbnailUrl(track.artworkUrl, { width: 96, height: 96 })
+    : '';
 
   return (
     <>
@@ -83,8 +87,8 @@ export function PodcastMiniPlayer({ tabBarMayShow = true }: PodcastMiniPlayerPro
           </div>
 
           <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-3 sm:px-4">
-            {track.artworkUrl ? (
-              <img src={track.artworkUrl} alt="" className="size-10 shrink-0 rounded-md object-cover" />
+            {artworkSrc ? (
+              <img src={artworkSrc} alt="" className="size-10 shrink-0 rounded-md object-cover" loading="lazy" decoding="async" />
             ) : (
               <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-surface-secondary text-muted">
                 <Podcast size={20} aria-hidden="true" />

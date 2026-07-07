@@ -56,6 +56,7 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url: string | undefined) => url || '/default-avatar.png'),
   resolveAssetUrl: vi.fn((url: string | undefined) => url || ''),
+  resolveThumbnailUrl: vi.fn((url: string | undefined) => url || ''),
 }));
 
 vi.mock('@/lib/logger', () => ({

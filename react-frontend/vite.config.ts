@@ -8,6 +8,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
+import { visualizer } from 'rollup-plugin-visualizer'
 import path from 'path'
 import { execSync } from 'child_process'
 import { createRequire } from 'module'
@@ -37,6 +38,7 @@ const canOptimizeImages = (() => {
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_')
   const apiUrl = process.env.VITE_API_URL || env.VITE_API_URL || 'http://localhost:8090'
+  const analyzeBundle = process.env.VITE_BUNDLE_ANALYZE === '1' || env.VITE_BUNDLE_ANALYZE === '1'
 
   return {
   cacheDir: path.resolve(__dirname, 'node_modules/.vite'),
@@ -137,6 +139,15 @@ export default defineConfig(({ command, mode }) => {
               expiration: { maxEntries: 50, maxAgeSeconds: 86400 },
             },
           },
+          {
+            urlPattern: ({ url }) => url.pathname === '/api/v2/media/thumbnail',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'nexus-media-thumbnails',
+              expiration: { maxEntries: 750, maxAgeSeconds: 365 * 86400 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
         ],
         // Explicitly disable the default NavigationRoute. vite-plugin-pwa
         // defaults navigateFallback to 'index.html', which registers a
@@ -165,6 +176,12 @@ export default defineConfig(({ command, mode }) => {
         console.warn('[vite] Skipping image optimization because sharp is not resolvable in this workspace.')
       },
     }] : []),
+    ...(command === 'build' && analyzeBundle ? [visualizer({
+      filename: 'dist/bundle-stats.html',
+      gzipSize: true,
+      brotliSize: true,
+      template: 'treemap',
+    })] : []),
   ],
   define: {
     __BUILD_COMMIT__: JSON.stringify(commitHash),

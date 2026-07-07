@@ -37,6 +37,11 @@ RewriteBase /
 
 # Add Vary header for proper caching of WebP
 <IfModule mod_headers.c>
+    # /api/v2/media/thumbnail returns immutable derivative images from Laravel.
+    # API routes are rewritten to index.php, so the generic PHP no-store rule
+    # below must not overwrite that controller's Cache-Control header.
+    SetEnvIfNoCase Request_URI "^/api/v2/media/thumbnail" nexus_cacheable_api_asset=1
+
     <FilesMatch "\.(jpe?g|png)$">
         Header append Vary Accept
     </FilesMatch>
@@ -99,9 +104,9 @@ RewriteBase /
 
     # HTML/PHP (no cache)
     <FilesMatch "\.(html|php)$">
-        Header set Cache-Control "no-cache, no-store, must-revalidate"
-        Header set Pragma "no-cache"
-        Header set Expires "0"
+        Header set Cache-Control "no-cache, no-store, must-revalidate" env=!nexus_cacheable_api_asset
+        Header set Pragma "no-cache" env=!nexus_cacheable_api_asset
+        Header set Expires "0" env=!nexus_cacheable_api_asset
     </FilesMatch>
 
     # Security Headers

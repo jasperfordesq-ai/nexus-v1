@@ -84,12 +84,12 @@ class TenantBootstrapController extends BaseApiController
             // Try cache first
             $cached = $this->redisCache->get(self::CACHE_KEY, $tenantId);
             if ($cached !== null) {
-                return $this->respondWithData($cached);
+                return $this->withPublicCache($this->respondWithData($cached), self::CACHE_TTL, 300);
             }
 
             $data = $this->buildBootstrapData($slugTenant);
             $this->redisCache->set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
-            return $this->respondWithData($data);
+            return $this->withPublicCache($this->respondWithData($data), self::CACHE_TTL, 300);
         }
 
         // Host-based resolution takes priority — TenantContext was resolved from
@@ -122,12 +122,12 @@ class TenantBootstrapController extends BaseApiController
 
                         $cached = $this->redisCache->get(self::CACHE_KEY, $tenantId);
                         if ($cached !== null) {
-                            return $this->respondWithData($cached);
+                            return $this->withPublicCache($this->respondWithData($cached), self::CACHE_TTL, 300);
                         }
 
                         $data = $this->buildBootstrapData($originTenant);
                         $this->redisCache->set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
-                        return $this->respondWithData($data);
+                        return $this->withPublicCache($this->respondWithData($data), self::CACHE_TTL, 300);
                     }
                 }
             }
@@ -135,7 +135,7 @@ class TenantBootstrapController extends BaseApiController
 
         $cached = $this->redisCache->get(self::CACHE_KEY, $tenantId);
         if ($cached !== null) {
-            return $this->respondWithData($cached);
+            return $this->withPublicCache($this->respondWithData($cached), self::CACHE_TTL, 300);
         }
 
         $tenant = TenantContext::get();
@@ -153,7 +153,7 @@ class TenantBootstrapController extends BaseApiController
         $data = $this->buildBootstrapData($tenant);
         $this->redisCache->set(self::CACHE_KEY, $data, self::CACHE_TTL, $tenantId);
 
-        return $this->respondWithData($data);
+        return $this->withPublicCache($this->respondWithData($data), self::CACHE_TTL, 300);
     }
 
     /**
@@ -170,7 +170,7 @@ class TenantBootstrapController extends BaseApiController
         $cached = $this->redisCache->get($cacheKey);
 
         if ($cached !== null) {
-            return $this->respondWithData($cached);
+            return $this->withPublicCache($this->respondWithData($cached), 300, 60);
         }
 
         $query = DB::table('tenants')
@@ -203,7 +203,7 @@ class TenantBootstrapController extends BaseApiController
 
         $this->redisCache->set($cacheKey, $data, 300);
 
-        return $this->respondWithData($data);
+        return $this->withPublicCache($this->respondWithData($data), 300, 60);
     }
 
     /**
@@ -251,7 +251,7 @@ class TenantBootstrapController extends BaseApiController
         $cached = $this->redisCache->get($cacheKey);
 
         if ($cached !== null) {
-            return $this->respondWithData($cached);
+            return $this->withPublicCache($this->respondWithData($cached), 300, 60);
         }
 
         $membersQuery = DB::table('users')->where('status', 'active');
@@ -294,7 +294,7 @@ class TenantBootstrapController extends BaseApiController
 
         $this->redisCache->set($cacheKey, $data, 300);
 
-        return $this->respondWithData($data);
+        return $this->withPublicCache($this->respondWithData($data), 300, 60);
     }
 
     // ========================================================================

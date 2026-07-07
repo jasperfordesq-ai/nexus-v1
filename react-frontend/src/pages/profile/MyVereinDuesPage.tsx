@@ -1,5 +1,10 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@/components/ui';
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Receipt from 'lucide-react/icons/receipt';
 import CreditCard from 'lucide-react/icons/credit-card';
@@ -10,11 +15,9 @@ import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { StripeCheckoutModal } from '@/components/marketplace/StripeCheckoutModal';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
+const StripeCheckoutModal = lazy(() =>
+  import('@/components/marketplace/StripeCheckoutModal').then((module) => ({ default: module.StripeCheckoutModal }))
+);
 
 /**
  * MyVereinDuesPage — AG54
@@ -208,15 +211,17 @@ export function MyVereinDuesPage() {
       </div>
 
       {activePayDuesId !== null && clientSecret && (
-        <StripeCheckoutModal
-          isOpen={true}
-          clientSecret={clientSecret}
-          amount={payAmount}
-          currency={payCurrency}
-          listingTitle={payTitle}
-          onSuccess={onPaymentSuccess}
-          onClose={onPaymentClose}
-        />
+        <Suspense fallback={null}>
+          <StripeCheckoutModal
+            isOpen={true}
+            clientSecret={clientSecret}
+            amount={payAmount}
+            currency={payCurrency}
+            listingTitle={payTitle}
+            onSuccess={onPaymentSuccess}
+            onClose={onPaymentClose}
+          />
+        </Suspense>
       )}
       </div>
     </>

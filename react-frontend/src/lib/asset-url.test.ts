@@ -14,7 +14,7 @@
  */
 
 import { afterEach, describe, it, expect, vi } from 'vitest';
-import { resolveAssetUrl, resolveAvatarUrl, getUserDisplayName, getUserInitials } from './helpers';
+import { resolveAssetUrl, resolveAvatarUrl, resolveThumbnailUrl, getUserDisplayName, getUserInitials } from './helpers';
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -114,5 +114,22 @@ describe('resolveAvatarUrl', () => {
   it('returns resolved URL for valid avatar path', () => {
     const result = resolveAvatarUrl('/uploads/avatars/user123.jpg');
     expect(result).toContain('/uploads/avatars/user123.jpg');
+  });
+});
+
+describe('resolveThumbnailUrl', () => {
+  it('routes local upload paths through the thumbnail endpoint', () => {
+    const result = resolveThumbnailUrl('/uploads/tenants/test/listings/image.jpg', { width: 640, height: 360 });
+
+    expect(result).toContain('/v2/media/thumbnail?');
+    expect(result).toContain('src=%2Fuploads%2Ftenants%2Ftest%2Flistings%2Fimage.jpg');
+    expect(result).toContain('w=640');
+    expect(result).toContain('h=360');
+  });
+
+  it('leaves external media untouched', () => {
+    const url = 'https://example.com/image.jpg';
+
+    expect(resolveThumbnailUrl(url, { width: 640, height: 360 })).toBe(url);
   });
 });

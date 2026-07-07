@@ -9,7 +9,6 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import ChainedBackend from 'i18next-chained-backend';
 import HttpBackend from 'i18next-http-backend';
 import LocalStorageBackend from 'i18next-localstorage-backend';
-import { captureMessage } from '@sentry/react';
 
 export const SUPPORTED_LOCALE_CODES = [
   'ar',
@@ -59,6 +58,17 @@ const localeBackendOptions = import.meta.env.DEV
 // QuotaExceededError and can crash a page. Purge every orphaned i18n_ cache
 // whose prefix doesn't match the current build so storage stays bounded.
 const I18N_CACHE_PREFIX = `i18n_${__BUILD_COMMIT__}_`;
+const STARTUP_NAMESPACES = [
+  'common',
+  'auth',
+  'broker',
+  'errors',
+  'legal',
+  'public',
+  'settings',
+  'utility',
+] as const;
+
 const purgeOrphanedI18nCaches = () => {
   if (import.meta.env.DEV) return; // LocalStorageBackend is not used in dev
   try {
@@ -88,6 +98,16 @@ const isStrictMissingKeyMode = () => {
   }
 };
 
+const captureMissingKeyWarning = (identifier: string) => {
+  void import('@/lib/sentry')
+    .then(({ captureSentryMessage }) => {
+      captureSentryMessage(`[i18n] Missing translation key: ${identifier}`, 'warning');
+    })
+    .catch(() => {
+      // Sentry is diagnostics-only here; missing key reporting must not affect UI.
+    });
+};
+
 const reportMissingKey = (identifier: string) => {
   if (isInteractiveDev && !loggedMissingKeys.has(identifier)) {
     loggedMissingKeys.add(identifier);
@@ -104,7 +124,7 @@ const reportMissingKey = (identifier: string) => {
   // Production: report to Sentry once per session so missing keys surface as alerts
   if (!import.meta.env.DEV && !sentryReportedKeys.has(identifier)) {
     sentryReportedKeys.add(identifier);
-    captureMessage(`[i18n] Missing translation key: ${identifier}`, 'warning');
+    captureMissingKeyWarning(identifier);
   }
 };
 
@@ -137,22 +157,10 @@ i18n
     // Tenant-aware filtering still happens in LanguageSwitcher. supportedLngs keeps
     // detection and fallback behavior constrained to the locales we actually ship.
     defaultNS: 'common',
-    ns: [
-      'common', 'events', 'groups', 'profile', 'wallet',
-      'exchanges', 'group_exchanges', 'feed', 'notifications',
-      'search_page', 'onboarding', 'gamification', 'blog',
-      'community', 'utility', 'public', 'legal', 'about',
-      'federation', 'connections', 'chat', 'activity', 'admin', 'stories',
-      'admin_dashboard', 'admin_nav', 'auth', 'dashboard',
-      'emails', 'emails_listings', 'emails_misc', 'emails_notifications',
-      'errors', 'goals', 'ideation', 'jobs', 'kb',
-      'listings', 'marketplace', 'matches', 'messages', 'polls', 'settings',
-      'social', 'volunteering', 'explore', 'broker', 'partners', 'caring_community',
-      'municipality_survey', 'civic_digest', 'municipality_feedback',
-      'success_stories', 'pilot_inquiry', 'project_announcements', 'project_announcements_admin',
-      'api_controllers_1', 'api_controllers_2', 'api_controllers_3',
-      'svc_notifications', 'svc_notifications_2', 'courses', 'super_admin',
-    ],
+    // Keep startup lean. Passing every known namespace here makes i18next fetch
+    // all locale JSON files before login can settle. Component-level
+    // useTranslation('namespace') calls still lazy-load their own namespaces.
+    ns: [...STARTUP_NAMESPACES],
     debug: isInteractiveDev,
 
     interpolation: {

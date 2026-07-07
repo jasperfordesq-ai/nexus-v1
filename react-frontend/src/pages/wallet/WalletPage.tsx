@@ -8,7 +8,6 @@
  */
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import Papa from 'papaparse';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
@@ -189,7 +188,7 @@ export function WalletPage() {
   }), [balance]);
 
   // Export transactions to CSV using papaparse
-  function handleExport() {
+  async function handleExport() {
     if (transactions.length === 0) {
       toast.info(t('toast.no_data'));
       return;
@@ -204,7 +203,8 @@ export function WalletPage() {
       [t('csv.status')]: tx.status,
     }));
 
-    const csvContent = Papa.unparse(data);
+    const Papa = await import('papaparse');
+    const csvContent = Papa.default.unparse(data);
 
     // Create and download file
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -387,7 +387,7 @@ export function WalletPage() {
               size="sm"
               className="bg-theme-elevated text-theme-muted"
               startContent={<Download className="w-4 h-4" aria-hidden="true" />}
-              onPress={handleExport}
+              onPress={() => { void handleExport(); }}
               isDisabled={transactions.length === 0}
               aria-label={t('aria.export_csv')}
             >

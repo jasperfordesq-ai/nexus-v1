@@ -14,6 +14,7 @@ import { useTenant } from '@/contexts';
 import GraduationCap from 'lucide-react/icons/graduation-cap';
 import Users from 'lucide-react/icons/users';
 import { normalizeCourseMediaUrl } from '@/lib/courseContentSecurity';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import type { Course } from '@/lib/api/courses';
 
 interface CourseCardProps {
@@ -24,13 +25,16 @@ export function CourseCard({ course }: CourseCardProps) {
   const { t } = useTranslation('courses');
   const { tenantPath } = useTenant();
   const coverImage = normalizeCourseMediaUrl(course.cover_image);
+  const coverThumbnail = coverImage
+    ? resolveThumbnailUrl(coverImage, { width: 640, height: 360 })
+    : '';
 
   return (
     <Card className="h-full overflow-hidden transition-shadow hover:shadow-md">
       <Link to={tenantPath(`/courses/${course.slug}`)} className="block">
         <div className="aspect-video w-full bg-[var(--color-surface-2)] flex items-center justify-center overflow-hidden">
           {coverImage ? (
-            <img src={coverImage} alt={course.title} className="w-full h-full object-cover" />
+            <img src={coverThumbnail} alt={course.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
           ) : (
             <GraduationCap size={40} className="text-muted" aria-hidden="true" />
           )}

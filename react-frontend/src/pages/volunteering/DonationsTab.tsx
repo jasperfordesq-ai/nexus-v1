@@ -7,7 +7,7 @@
  * DonationsTab - Active giving days with progress and donation history
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from '@/lib/motion';
 
 import Heart from 'lucide-react/icons/heart';
@@ -26,7 +26,10 @@ import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
-import { DonationCheckout } from '@/components/donations/DonationCheckout';
+
+const DonationCheckout = lazy(() =>
+  import('@/components/donations/DonationCheckout').then((module) => ({ default: module.DonationCheckout })),
+);
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -471,12 +474,16 @@ export function DonationsTab() {
       )}
 
       {/* Stripe Checkout Modal */}
-      <DonationCheckout
-        isOpen={isCheckoutOpen}
-        onClose={onCheckoutClose}
-        givingDayId={checkoutGivingDayId}
-        onDonationComplete={load}
-      />
+      {isCheckoutOpen && (
+        <Suspense fallback={null}>
+          <DonationCheckout
+            isOpen={isCheckoutOpen}
+            onClose={onCheckoutClose}
+            givingDayId={checkoutGivingDayId}
+            onDonationComplete={load}
+          />
+        </Suspense>
+      )}
 
       {/* Donate Modal */}
       <Modal

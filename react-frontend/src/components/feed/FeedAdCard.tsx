@@ -7,6 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';import ExternalLink f
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import { Button, Chip } from '@/components/ui';
 
 export interface AdItem {
@@ -97,7 +98,7 @@ export function FeedAdCard({ ad }: Props) {
       {ad.image_url && (
         <div className="mx-4 mb-3 overflow-hidden rounded-lg">
           <img
-            src={ad.image_url}
+            src={resolveThumbnailUrl(ad.image_url, { width: 960, height: 540 })}
             alt={ad.title}
             className="w-full object-cover max-h-64"
             loading="lazy"

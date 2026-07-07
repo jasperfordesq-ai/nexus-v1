@@ -57,7 +57,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl, resolveThumbnailUrl, formatRelativeTime } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -826,10 +826,11 @@ export function ChallengeDetailPage() {
       {challenge.cover_image && (
         <div className="w-full h-48 sm:h-64 rounded-xl overflow-hidden mb-6">
           <img
-            src={resolveAssetUrl(challenge.cover_image)}
+            src={resolveThumbnailUrl(challenge.cover_image, { width: 1200, height: 675 })}
             alt={challenge.title}
             className="w-full h-full object-cover"
             loading="lazy"
+            decoding="async"
           />
         </div>
       )}
@@ -1207,10 +1208,11 @@ export function ChallengeDetailPage() {
                       {idea.image_url && (
                         <div className="mb-2">
                           <img
-                            src={resolveAssetUrl(idea.image_url)}
+                            src={resolveThumbnailUrl(idea.image_url, { width: 160, height: 160 })}
                             alt={t('idea_image')}
                             className="w-24 h-24 object-cover rounded-lg"
                             loading="lazy"
+                            decoding="async"
                           />
                         </div>
                       )}
@@ -1223,10 +1225,11 @@ export function ChallengeDetailPage() {
                             return m.type === 'image' ? (
                               <img
                                 key={m.id}
-                                src={resolveAssetUrl(m.url)}
+                                src={resolveThumbnailUrl(m.url, { width: 160, height: 160 })}
                                 alt={m.caption ?? ''}
                                 className="w-16 h-16 object-cover rounded-lg border border-[var(--color-border)]"
                                 loading="lazy"
+                                decoding="async"
                               />
                             ) : (
                               <div

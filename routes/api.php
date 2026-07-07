@@ -45,6 +45,8 @@ Route::get('/v2/platform/stats', [\App\Http\Controllers\Api\TenantBootstrapContr
 Route::get('/v2/config/algorithms', [\App\Http\Controllers\Api\AdminConfigController::class, 'getAlgorithmInfo']);
 Route::get('/v2/config/google-maps', [\App\Http\Controllers\Api\MapsConfigController::class, 'show'])
     ->middleware('throttle:60,1');
+Route::get('/v2/media/thumbnail', [\App\Http\Controllers\Api\MediaThumbnailController::class, 'show'])
+    ->middleware('throttle:300,1');
 // UPRN-backed UK address lookup (OS Places API proxy; active only when
 // the tenant's geocoding_provider is os_places)
 Route::get('/v2/geo/os-places/search', [\App\Http\Controllers\Api\OsPlacesController::class, 'search'])
@@ -95,7 +97,21 @@ Route::get('/v2/categories', function (\Illuminate\Http\Request $request) {
         ->where('tenant_id', \App\Core\TenantContext::getId())
         ->orderBy('name')
         ->get();
-    return response()->json(['data' => $categories]);
+    $response = response()->json(['data' => $categories], 200, [], JSON_UNESCAPED_UNICODE);
+    $etag = '"' . sha1((string) $response->getContent()) . '"';
+    $response->headers->set('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
+    $response->headers->set('ETag', $etag);
+
+    $ifNoneMatch = $request->headers->get('If-None-Match');
+    if ($ifNoneMatch !== null) {
+        $candidateEtags = array_map('trim', explode(',', $ifNoneMatch));
+        if (in_array($etag, $candidateEtags, true) || in_array(trim($etag, '"'), $candidateEtags, true)) {
+            $response->setStatusCode(304);
+            $response->setContent('');
+        }
+    }
+
+    return $response;
 });
 
 // ============================================
@@ -1044,6 +1060,7 @@ Route::get('/v2/merchant-onboarding/status', [\App\Http\Controllers\Api\Merchant
 Route::post('/v2/merchant-onboarding/step-1', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'saveStep1']);
 Route::post('/v2/merchant-onboarding/step-2', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'saveStep2']);
 Route::post('/v2/merchant-onboarding/step-3', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'saveStep3']);
+Route::post('/v2/merchant-onboarding/image', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'uploadImage']);
 Route::post('/v2/merchant-onboarding/complete', [\App\Http\Controllers\Api\MerchantOnboardingController::class, 'complete']);
 
 // SOC13 — Social login (OAuth) authenticated endpoints (link/unlink/identities)
@@ -1169,6 +1186,7 @@ Route::get('/v2/marketplace/categories/{slug}/listings', [\App\Http\Controllers\
 Route::get('/v2/marketplace/categories/{id}/template', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'categoryTemplate']);
 Route::get('/v2/marketplace/sellers/{id}', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'show']);
 Route::get('/v2/marketplace/sellers/{id}/listings', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'listings']);
+Route::get('/v2/marketplace/sellers/{id}/shipping-options', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'shippingOptionsForSeller']);
 Route::get('/v2/marketplace/listings/{id}/pickup-slots', [\App\Http\Controllers\Api\MarketplacePickupSlotController::class, 'listForListing']);
 
 // ============================================

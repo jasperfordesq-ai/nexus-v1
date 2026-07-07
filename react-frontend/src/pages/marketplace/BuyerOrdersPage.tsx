@@ -33,6 +33,7 @@ import type { MarketplaceOrderItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
@@ -96,10 +97,11 @@ function OrderCard({
         >
           {order.listing.image?.url ? (
             <img
-              src={order.listing.image.url}
+              src={resolveThumbnailUrl(order.listing.image.thumbnail_url || order.listing.image.url, { width: 160, height: 160 })}
               alt={order.listing.title}
               className="w-full h-full object-cover"
               loading="lazy"
+              decoding="async"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

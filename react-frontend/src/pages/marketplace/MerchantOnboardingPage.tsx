@@ -382,7 +382,7 @@ export function MerchantOnboardingPage() {
     async (file: File) => {
       setUploadingAvatar(true);
       try {
-        const res = await api.upload<{ url: string }>('/v2/marketplace/seller/profile', file, 'avatar');
+        const res = await api.upload<{ url: string }>('/v2/merchant-onboarding/image', file, 'avatar');
         const url = res.data?.url ?? '';
         setAvatarUrl(url);
         setAvatarPreview(URL.createObjectURL(file));
@@ -400,7 +400,7 @@ export function MerchantOnboardingPage() {
     async (file: File) => {
       setUploadingCover(true);
       try {
-        const res = await api.upload<{ url: string }>('/v2/marketplace/seller/profile', file, 'cover_image');
+        const res = await api.upload<{ url: string }>('/v2/merchant-onboarding/image', file, 'cover_image');
         const url = res.data?.url ?? '';
         setCoverImageUrl(url);
         setCoverPreview(URL.createObjectURL(file));
@@ -698,7 +698,7 @@ export function MerchantOnboardingPage() {
               {/* Fallback: manual URL input if upload fails */}
               {!avatarPreview && (
                 <Input
-                  label="or paste image URL"
+                  label={t('paste_image_url')}
                   variant="secondary"
                   size="sm"
                   value={avatarUrl}

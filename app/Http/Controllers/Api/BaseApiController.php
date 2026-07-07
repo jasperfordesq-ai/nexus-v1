@@ -231,6 +231,36 @@ abstract class BaseApiController extends Controller
         ]);
     }
 
+    /**
+     * Add browser/CDN cache validators to public, tenant-scoped GET responses.
+     *
+     * These payloads are already safe to expose anonymously; the helper only
+     * avoids repeatedly transferring identical JSON during startup/navigation.
+     */
+    protected function withPublicCache(JsonResponse $response, int $maxAge = 300, int $staleWhileRevalidate = 60): JsonResponse
+    {
+        if (!$this->isGet() || $response->getStatusCode() !== 200) {
+            return $response;
+        }
+
+        $etag = '"' . sha1((string) $response->getContent()) . '"';
+        $cacheControl = "public, max-age={$maxAge}, stale-while-revalidate={$staleWhileRevalidate}";
+
+        $response->headers->set('Cache-Control', $cacheControl);
+        $response->headers->set('ETag', $etag);
+
+        $ifNoneMatch = request()->headers->get('If-None-Match');
+        if ($ifNoneMatch !== null) {
+            $candidateEtags = array_map('trim', explode(',', $ifNoneMatch));
+            if (in_array($etag, $candidateEtags, true) || in_array(trim($etag, '"'), $candidateEtags, true)) {
+                $response->setStatusCode(304);
+                $response->setContent('');
+            }
+        }
+
+        return $response;
+    }
+
     // ============================================
     // V1 (LEGACY) RESPONSE METHODS
     // ============================================

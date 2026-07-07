@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { isValidElement } from 'react';
 
 // Mock Sentry and the consent context before importing sentry.ts
 vi.mock('@sentry/react', () => ({
@@ -103,11 +104,11 @@ describe('sentry (disabled - no DSN)', () => {
     expect(result).toBeUndefined();
   });
 
-  it('SentryErrorBoundary returns children when disabled', async () => {
+  it('SentryErrorBoundary uses the local crash boundary even when the SDK is disabled', async () => {
     const { SentryErrorBoundary } = await import('./sentry');
     const children = 'test-children';
     const result = SentryErrorBoundary({ children });
-    expect(result).toBe(children);
+    expect(isValidElement(result)).toBe(true);
   });
 });
 
@@ -131,10 +132,12 @@ describe('sentry analytics consent checks', () => {
     vi.stubEnv('VITE_SENTRY_DSN', 'https://public@example.sentry.io/1');
     mockReadStoredConsent.mockReturnValue({ analytics: true });
     const Sentry = await import('@sentry/react');
+    vi.clearAllMocks();
     vi.mocked(Sentry.captureMessage).mockReturnValue('event-id-123');
 
     const { initSentry, captureSentryMessage } = await import('./sentry');
     initSentry();
+    await vi.waitFor(() => expect(Sentry.init).toHaveBeenCalled());
 
     const eventId = captureSentryMessage('Support report submitted', 'info', {
       route: '/messages',
@@ -152,9 +155,11 @@ describe('sentry analytics consent checks', () => {
     vi.stubEnv('VITE_SENTRY_DSN', 'https://public@example.sentry.io/1');
     mockReadStoredConsent.mockReturnValue({ analytics: true });
     const Sentry = await import('@sentry/react');
+    vi.clearAllMocks();
 
     const { initSentry } = await import('./sentry');
     initSentry();
+    await vi.waitFor(() => expect(Sentry.init).toHaveBeenCalled());
 
     expect(Sentry.feedbackIntegration).toHaveBeenCalledWith(expect.objectContaining({
       colorScheme: 'system',
@@ -173,10 +178,12 @@ describe('sentry analytics consent checks', () => {
     vi.stubEnv('VITE_SENTRY_DSN', 'https://public@example.sentry.io/1');
     mockReadStoredConsent.mockReturnValue({ analytics: true });
     const Sentry = await import('@sentry/react');
+    vi.clearAllMocks();
     vi.mocked(Sentry.captureFeedback).mockReturnValue('feedback-id-123');
 
     const { initSentry, captureSentryFeedback } = await import('./sentry');
     initSentry();
+    await vi.waitFor(() => expect(Sentry.init).toHaveBeenCalled());
 
     const feedbackId = captureSentryFeedback({
       message: 'NXR-260527-RAASDS: Checkout button does not respond',
@@ -206,9 +213,11 @@ describe('sentry analytics consent checks', () => {
     vi.stubEnv('VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE', '1');
     mockReadStoredConsent.mockReturnValue({ analytics: true });
     const Sentry = await import('@sentry/react');
+    vi.clearAllMocks();
 
     const { initSentry } = await import('./sentry');
     initSentry();
+    await vi.waitFor(() => expect(Sentry.init).toHaveBeenCalled());
 
     expect(Sentry.replayIntegration).toHaveBeenCalledWith(expect.objectContaining({
       maskAllText: true,

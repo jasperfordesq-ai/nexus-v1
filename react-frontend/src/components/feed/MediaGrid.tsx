@@ -17,7 +17,7 @@
 
 import { useState } from 'react';import Play from 'lucide-react/icons/play';
 import { useTranslation } from 'react-i18next';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveAssetUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
 import { ImageLightbox } from './ImageLightbox';
 import { Button } from '@/components/ui';
@@ -51,7 +51,7 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
         <>
           <video
             src={resolveAssetUrl(item.file_url)}
-            poster={item.thumbnail_url ? resolveAssetUrl(item.thumbnail_url) : undefined}
+            poster={item.thumbnail_url ? resolveThumbnailUrl(item.thumbnail_url, { width: 640, height: 640 }) : undefined}
             muted
             playsInline
             preload="metadata"
@@ -66,7 +66,7 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
         </>
       ) : (
         <img
-          src={resolveAssetUrl(item.thumbnail_url || item.file_url)}
+          src={resolveThumbnailUrl(item.thumbnail_url || item.file_url, { width: 640, height: 640 })}
           alt={item.alt_text || t('carousel.image_of', { current: index + 1, total })}
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           loading={index === 0 ? 'eager' : 'lazy'}
@@ -75,7 +75,7 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
             const img = e.target as HTMLImageElement;
             if (img.dataset.retried) return;
             img.dataset.retried = '1';
-            img.src = resolveAssetUrl(item.file_url);
+            img.src = resolveThumbnailUrl(item.file_url, { width: 640, height: 640 });
           }}
         />
       )}

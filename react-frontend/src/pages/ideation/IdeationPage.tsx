@@ -43,7 +43,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -514,10 +514,11 @@ export function IdeationPage() {
                   {challenge.cover_image && (
                     <div className="w-full h-40 overflow-hidden">
                       <img
-                        src={resolveAssetUrl(challenge.cover_image)}
+                        src={resolveThumbnailUrl(challenge.cover_image, { width: 640, height: 360 })}
                         alt={challenge.title}
                         className="w-full h-full object-cover"
                         loading="lazy"
+                        decoding="async"
                       />
                     </div>
                   )}

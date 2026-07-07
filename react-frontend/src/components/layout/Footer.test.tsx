@@ -152,7 +152,7 @@ describe('Footer', () => {
       render(<Footer />);
       const images = screen.getAllByAltText('Logo Tenant');
       expect(images.length).toBeGreaterThan(0);
-      images.forEach((img) => expect(img).toHaveAttribute('src', '/logo.png'));
+      images.forEach((img) => expect(img.getAttribute('src')).toMatch(/\/logo\.png$/));
     });
 
     it('renders tagline', () => {
@@ -194,7 +194,7 @@ describe('Footer', () => {
       expect(screen.getByText('Local partner')).toBeInTheDocument();
       const images = screen.getAllByRole('img', { name: 'Local partner' });
       expect(images.length).toBeGreaterThan(0);
-      images.forEach((img) => expect(img).toHaveAttribute('src', '/partner.svg'));
+      images.forEach((img) => expect(img.getAttribute('src')).toMatch(/\/partner\.svg$/));
     });
   });
 

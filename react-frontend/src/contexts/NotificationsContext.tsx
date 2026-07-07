@@ -23,7 +23,8 @@ import {
   useRef,
   type ReactNode,
 } from 'react';
-import Pusher, { type Channel } from 'pusher-js';
+import type Pusher from 'pusher-js';
+import type { Channel } from 'pusher-js';
 import i18n from 'i18next';
 import { api, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -275,8 +276,14 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         }
       };
     }
+    let didCancel = false;
+
+    void import('pusher-js')
+      .then(({ default: PusherClient }) => {
+    if (didCancel) return;
+
     try {
-      const pusher = new Pusher(pusherKey, {
+      const pusher = new PusherClient(pusherKey, {
         cluster: getPusherCluster(),
         // Use a custom authorizer instead of authEndpoint so that the request
         // goes through our api client, which handles CORS, content-type, and
@@ -388,6 +395,14 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
         connectionError: 'Failed to initialize real-time notifications',
       }));
     }
+      })
+      .catch((error) => {
+        logError('Pusher client failed to load', error);
+        setState((prev) => ({
+          ...prev,
+          connectionError: 'Failed to initialize real-time notifications',
+        }));
+      });
 
     // Set up polling fallback — uses ref so interval doesn't need to be recreated
     // when refreshCounts identity changes (e.g., after isAuthenticated toggles)
@@ -398,6 +413,7 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
     // in CLOSING or CLOSED state" warnings because unsubscribe queues an
     // async send that fires after disconnect starts closing the socket.
     return () => {
+      didCancel = true;
       if (pusherRef.current) {
         if (channelRef.current) {
           channelRef.current.unbind_all();

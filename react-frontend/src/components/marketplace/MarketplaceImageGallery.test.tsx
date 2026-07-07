@@ -51,7 +51,7 @@ describe('MarketplaceImageGallery — single image', () => {
     render(<MarketplaceImageGallery images={[IMAGES[0]]} />);
     const imgs = screen.getAllByRole('img');
     const src = imgs.map((i) => i.getAttribute('src'));
-    expect(src).toContain('https://example.com/img1.jpg');
+    expect(src).toContain('https://example.com/thumb1.jpg');
   });
 
   it('does not render thumbnail strip when there is only one image', () => {
@@ -74,10 +74,10 @@ describe('MarketplaceImageGallery — multiple images', () => {
 
   it('renders the first image as the active image on mount', () => {
     render(<MarketplaceImageGallery images={IMAGES} />);
-    // The desktop primary img shows the first image's url
+    // The rendered gallery prefers the API-provided thumbnail URL.
     const imgs = screen.getAllByRole('img');
     const primaryImgSrcs = imgs.map((i) => i.getAttribute('src'));
-    expect(primaryImgSrcs).toContain('https://example.com/img1.jpg');
+    expect(primaryImgSrcs).toContain('https://example.com/thumb1.jpg');
   });
 
   it('renders thumbnail buttons for each image', () => {
@@ -102,10 +102,10 @@ describe('MarketplaceImageGallery — multiple images', () => {
     // Click the second thumbnail (index 1 → image 2)
     fireEvent.click(thumbBtns[1]);
 
-    // The desktop primary image should now show the second image URL
+    // The desktop primary image should now show the second image thumbnail.
     const imgs = screen.getAllByRole('img');
     const srcs = imgs.map((i) => i.getAttribute('src'));
-    expect(srcs).toContain('https://example.com/img2.jpg');
+    expect(srcs).toContain('https://example.com/thumb2.jpg');
   });
 
   it('changes the primary image when the third thumbnail is clicked', () => {
@@ -116,7 +116,7 @@ describe('MarketplaceImageGallery — multiple images', () => {
 
     const imgs = screen.getAllByRole('img');
     const srcs = imgs.map((i) => i.getAttribute('src'));
-    expect(srcs).toContain('https://example.com/img3.jpg');
+    expect(srcs).toContain('https://example.com/thumb3.jpg');
   });
 
   it('renders image count badge showing 1/3 initially', () => {

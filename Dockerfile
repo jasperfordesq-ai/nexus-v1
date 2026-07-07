@@ -33,6 +33,7 @@ RUN apt-get -o Acquire::Retries=3 update && apt-get -o Acquire::Retries=3 -y upg
     git \
     unzip \
     default-mysql-client \
+    webp \
     # Clean up
     && rm -rf /var/lib/apt/lists/*
 

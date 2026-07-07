@@ -55,8 +55,8 @@ vi.mock('@/contexts/TenantContext', async (importOriginal) => {
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 vi.mock('@/lib/helpers', () => ({
-  resolveAssetUrl: (url: string | null | undefined) => url ?? '',
   resolveAvatarUrl: (url: string | null | undefined) => url ?? '',
+  resolveThumbnailUrl: (url: string | null | undefined) => url ?? '',
 }));
 
 vi.mock('@/lib/motion', () => ({

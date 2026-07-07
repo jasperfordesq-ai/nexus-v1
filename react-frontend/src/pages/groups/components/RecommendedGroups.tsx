@@ -19,7 +19,7 @@ import { GlassCard, Button, Chip, Avatar } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 
 interface GroupMatch {
   module: string;
@@ -103,7 +103,7 @@ export function RecommendedGroups() {
             <GlassCard key={group.group_id} className="p-3 flex flex-col gap-2">
               <div className="flex items-center gap-2 min-w-0">
                 <Avatar
-                  src={resolveAssetUrl(group.image_url)}
+                  src={resolveThumbnailUrl(group.image_url, { width: 96, height: 96 })}
                   name={group.title}
                   size="sm"
                   className="w-8 h-8"

@@ -18,7 +18,7 @@ import { motion, AnimatePresence, type PanInfo } from '@/lib/motion';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveAssetUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
 import { ImageLightbox } from './ImageLightbox';
 import { Button } from '@/components/ui';
@@ -133,7 +133,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
               {current.media_type === 'video' ? (
                 <video
                   src={resolveAssetUrl(current.file_url)}
-                  poster={current.thumbnail_url ? resolveAssetUrl(current.thumbnail_url) : undefined}
+                  poster={current.thumbnail_url ? resolveThumbnailUrl(current.thumbnail_url, { width: 960, height: 540 }) : undefined}
                   controls
                   playsInline
                   preload="metadata"
@@ -143,7 +143,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
                 />
               ) : (
                 <img
-                  src={resolveAssetUrl(current.file_url)}
+                  src={resolveThumbnailUrl(current.thumbnail_url || current.file_url, { width: 1200, height: 675, fit: 'contain' })}
                   alt={current.alt_text || t('carousel.image_of', { current: currentIndex + 1, total })}
                   className="w-full max-h-[500px] sm:max-h-[500px] max-sm:max-h-[400px] object-contain select-none"
                   draggable={false}

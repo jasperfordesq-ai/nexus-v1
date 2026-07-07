@@ -14,6 +14,7 @@ import {
   type Ref,
 } from 'react';
 import { Avatar as HeroUIAvatar } from '@heroui/react';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 
 type HeroUIAvatarProps = ComponentPropsWithoutRef<typeof HeroUIAvatar>;
 type AvatarSize = 'sm' | 'md' | 'lg' | string;
@@ -142,6 +143,7 @@ export function Avatar({
   ...props
 }: AvatarProps & { ref?: Ref<HTMLDivElement> }) {
   const fallbackContent = fallback ?? icon ?? (getInitials && name ? getInitials(name) : initialsFromName(name));
+  const imageSrc = src ? resolveThumbnailUrl(src, { width: 96, height: 96 }) : null;
 
   return (
     <HeroUIAvatar
@@ -162,7 +164,9 @@ export function Avatar({
         <HeroUIAvatar.Image
           alt={imgProps?.alt ?? alt ?? name ?? ''}
           className={combineClasses(classNames?.img, radiusClass(radius), imgProps?.className)}
-          src={src}
+          loading="lazy"
+          decoding="async"
+          src={imageSrc ?? undefined}
           {...imgProps}
         />
       ) : null}

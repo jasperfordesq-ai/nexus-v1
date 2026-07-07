@@ -37,7 +37,7 @@ import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { FederatedEvent, FederationPartner } from '@/types/api';
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -364,7 +364,9 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
   const startDate = new Date(event.start_date);
   const isPast = startDate < new Date();
   const avatarSrc = resolveAvatarUrl(event.organizer?.avatar);
-  const coverSrc = event.cover_image ? resolveAssetUrl(event.cover_image) : null;
+  const coverSrc = event.cover_image
+    ? resolveThumbnailUrl(event.cover_image, { width: 240, height: 240 })
+    : null;
 
   const formattedDate = startDate.toLocaleDateString(undefined, {
     weekday: 'short',
@@ -388,6 +390,7 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
                 alt={event.title}
                 className="w-full h-full object-cover"
                 loading="lazy"
+                decoding="async"
               />
             </div>
           ) : (

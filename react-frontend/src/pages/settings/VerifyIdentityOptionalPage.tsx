@@ -10,7 +10,7 @@
  * Payment is one-time per tenant. Retries after failure skip DOB and payment steps.
  */
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -27,7 +27,10 @@ import { PageMeta } from '@/components/seo';
 import { useTenant, useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
-import { StripePaymentForm } from '@/components/donations/StripePaymentForm';
+
+const StripePaymentForm = lazy(() =>
+  import('@/components/donations/StripePaymentForm').then((module) => ({ default: module.StripePaymentForm }))
+);
 
 interface VerificationStatusResponse {
   has_id_verified_badge: boolean;
@@ -425,10 +428,12 @@ export function VerifyIdentityOptionalPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <StripePaymentForm
-                  clientSecret={clientSecret}
-                  onSuccess={handlePaymentSuccess}
-                  onError={handlePaymentError} />
+                <Suspense fallback={null}>
+                  <StripePaymentForm
+                    clientSecret={clientSecret}
+                    onSuccess={handlePaymentSuccess}
+                    onError={handlePaymentError} />
+                </Suspense>
               </div>
             )}
           </GlassCard>

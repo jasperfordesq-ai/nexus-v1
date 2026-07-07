@@ -1,9 +1,9 @@
-import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, Spinner, SearchField } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, ToggleButton, ToggleButtonGroup, Chip, Spinner, SearchField } from '@/components/ui';
 /**
  * MarketplaceMapSearchPage — Map-based marketplace search.
  *
@@ -33,6 +33,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { MAPS_ENABLED } from '@/lib/map-config';
 
@@ -424,10 +425,11 @@ export function MarketplaceMapSearchPage() {
                           <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-surface-secondary">
                             {listing.image ? (
                               <img
-                                src={listing.image.thumbnail_url || listing.image.url}
+                                src={resolveThumbnailUrl(listing.image.thumbnail_url || listing.image.url, { width: 160, height: 160 })}
                                 alt={listing.title}
                                 className="w-full h-full object-cover"
                                 loading="lazy"
+                                decoding="async"
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center bg-surface-secondary">

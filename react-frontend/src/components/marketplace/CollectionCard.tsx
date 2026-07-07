@@ -1,9 +1,9 @@
-import { Card, CardBody, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Card, CardBody, Chip } from '@/components/ui';
 /**
  * CollectionCard — Displays a marketplace collection with name, item count,
  * thumbnail grid (first 4 item images), and public/private badge.
@@ -15,6 +15,7 @@ import Lock from 'lucide-react/icons/lock';
 import Globe from 'lucide-react/icons/globe';
 import Package from 'lucide-react/icons/package';
 import { useTranslation } from 'react-i18next';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import type { MarketplaceCollection } from '@/types/marketplace';
 
 interface CollectionCardProps {
@@ -42,7 +43,7 @@ export function CollectionCard({ collection, thumbnails = [], onClick }: Collect
                 <div key={i} className="bg-surface-tertiary overflow-hidden">
                   {thumbnails[i] ? (
                     <img
-                      src={thumbnails[i]}
+                      src={resolveThumbnailUrl(thumbnails[i], { width: 320, height: 240 })}
                       alt={t('collection_image', { number: i + 1 })}
                       className="w-full h-full object-cover"
                       loading="lazy"

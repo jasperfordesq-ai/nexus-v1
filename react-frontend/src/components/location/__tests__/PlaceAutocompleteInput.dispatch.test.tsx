@@ -55,9 +55,10 @@ function W({ children }: { children: React.ReactNode }) {
 }
 
 describe('PlaceAutocompleteInput — provider dispatch', () => {
-  it('mounts the Google branch (APIProvider) when geocodingProvider=google', async () => {
+  it('defers the Google branch until focus when geocodingProvider=google', async () => {
     resetGoogleMapsConfigForTests();
     vi.stubGlobal('fetch', fetchSpy);
+    fetchSpy.mockClear();
     mockUseTenant.mockReturnValueOnce({
       hasFeature: () => true,
       mapProvider: 'google' as const,
@@ -70,15 +71,18 @@ describe('PlaceAutocompleteInput — provider dispatch', () => {
       </W>
     );
 
-    // The Google branch fetches /v2/config/google-maps. With config disabled,
-    // it falls back to PlaceAutocompleteFallback (plain Input). The Nominatim
-    // branch never queries that endpoint.
+    expect(container.querySelector('input')).toBeTruthy();
+    expect(fetchSpy).not.toHaveBeenCalled();
+
+    fireEvent.focus(container.querySelector('input')!);
+
+    // The Google branch fetches /v2/config/google-maps after activation. With
+    // config disabled, it falls back to PlaceAutocompleteFallback (plain Input).
+    // The Nominatim branch never queries that endpoint.
     await waitFor(() => {
       const calls = fetchSpy.mock.calls.map((c) => String(c[0]));
       expect(calls.some((u) => u.includes('/v2/config/google-maps'))).toBe(true);
     });
-    // Sanity: the input is rendered.
-    expect(container.querySelector('input')).toBeTruthy();
   });
 
   it('does NOT mount the Google branch when geocodingProvider=nominatim', async () => {

@@ -19,7 +19,15 @@ type DateValue = Date | number | string;
  * This is the PHP backend URL where uploads are stored
  */
 const API_BASE_ENV = import.meta.env.VITE_API_BASE || import.meta.env.VITE_API_URL || '';
+const API_ROUTE_BASE = API_BASE_ENV || (import.meta.env.DEV ? '/api' : 'https://api.project-nexus.ie/api');
 const API_ASSET_BASE = API_BASE_ENV.replace(/\/api$/, '') || (import.meta.env.DEV ? '' : 'https://api.project-nexus.ie');
+
+interface ThumbnailOptions {
+  width: number;
+  height: number;
+  fit?: 'cover' | 'contain';
+  fallback?: string;
+}
 
 /**
  * Resolve a relative URL to an absolute URL pointing to the API server.
@@ -69,6 +77,40 @@ export function resolveAssetUrl(url: string | null | undefined, fallback?: strin
  */
 export function resolveAvatarUrl(url: string | null | undefined): string {
   return resolveAssetUrl(url, `${API_ASSET_BASE}/assets/img/defaults/default_avatar.png`);
+}
+
+/**
+ * Resolve local uploaded media through the API thumbnail cache.
+ * External/federated media stays untouched so partner URLs keep working.
+ */
+export function resolveThumbnailUrl(url: string | null | undefined, options: ThumbnailOptions): string {
+  const resolved = resolveAssetUrl(url, options.fallback);
+  if (!resolved) {
+    return options.fallback || '';
+  }
+
+  try {
+    const asset = new URL(resolved, window.location.origin);
+    const assetBase = API_ASSET_BASE ? new URL(API_ASSET_BASE, window.location.origin) : new URL(window.location.origin);
+    const isLocalAsset = asset.host === assetBase.host || (!API_ASSET_BASE && asset.origin === window.location.origin);
+    const isSupportedPath = asset.pathname.startsWith('/uploads/') || asset.pathname.startsWith('/storage/');
+
+    if (!isLocalAsset || !isSupportedPath) {
+      return resolved;
+    }
+
+    const routeBase = new URL(API_ROUTE_BASE, window.location.origin);
+    const params = new URLSearchParams({
+      src: asset.pathname,
+      w: String(options.width),
+      h: String(options.height),
+      fit: options.fit ?? 'cover',
+    });
+
+    return `${routeBase.origin}${routeBase.pathname.replace(/\/$/, '')}/v2/media/thumbnail?${params.toString()}`;
+  } catch {
+    return resolved;
+  }
 }
 
 /**

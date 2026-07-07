@@ -21,7 +21,7 @@ import Megaphone from 'lucide-react/icons/megaphone';
 import { GlassCard, Button, Chip, Spinner, Avatar } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { LocationMapCard } from '@/components/location';
-import { resolveAvatarUrl, formatDateValue, formatRelativeTime } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl, formatDateValue, formatRelativeTime } from '@/lib/helpers';
 import type { Group } from '@/types/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -100,6 +100,9 @@ export function GroupHeader({
   const { t } = useTranslation('groups');
   const createdDateLabel = formatDateValue(group.created_at);
   const coverImage = group.cover_image_url || group.cover_image || null;
+  const coverImageUrl = coverImage
+    ? resolveThumbnailUrl(coverImage, { width: 1200, height: 360 })
+    : null;
   const avatarImage = resolveAvatarUrl(group.image_url);
   const visibilityLabel = group.visibility === 'private' || group.visibility === 'secret'
     ? t('detail.private_chip')
@@ -111,11 +114,13 @@ export function GroupHeader({
   return (
     <GlassCard className="overflow-hidden">
       <div className="relative min-h-32 bg-gradient-to-br from-[var(--color-primary)]/18 via-[var(--surface-elevated)] to-[var(--color-secondary)]/16">
-        {coverImage && (
+        {coverImageUrl && (
           <img
-            src={coverImage}
+            src={coverImageUrl}
             alt={t('detail.cover_image_alt', { name: group.name })}
             className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--surface-elevated)] via-[var(--surface-elevated)]/55 to-transparent" />

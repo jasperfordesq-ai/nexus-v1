@@ -17,7 +17,7 @@ import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import Undo2 from 'lucide-react/icons/undo-2';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, Button, Chip, Avatar } from '@/components/ui';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { MarketplaceOffer } from '@/types/marketplace';
 import { BuyNowButton } from './BuyNowButton';
 
@@ -89,7 +89,7 @@ export function OfferCard({
         {offer.listing?.image?.url && (
           <div className="shrink-0 w-16 h-16 rounded-md overflow-hidden">
             <img
-              src={offer.listing.image.thumbnail_url || offer.listing.image.url}
+              src={resolveThumbnailUrl(offer.listing.image.thumbnail_url || offer.listing.image.url, { width: 160, height: 160 })}
               alt={offer.listing.title}
               className="w-full h-full object-cover"
               loading="lazy"

@@ -27,7 +27,7 @@ import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import { ProximityFilter } from '@/components/caring-community/ProximityFilter';
 import { SubRegionFilter } from '@/components/caring-community/SubRegionFilter';
 
@@ -100,7 +100,7 @@ function MarktCard({ item }: MarktCardProps) {
   const [imgError, setImgError] = useState(false);
 
   const isListing = item.source === 'listing';
-  const imageUrl = item.image_url ? resolveAssetUrl(item.image_url) : null;
+  const imageUrl = item.image_url ? resolveThumbnailUrl(item.image_url, { width: 640, height: 360 }) : null;
   const avatarSrc = resolveAvatarUrl(item.user_avatar ?? undefined);
   const detailHref = tenantPath(item.detail_path);
 

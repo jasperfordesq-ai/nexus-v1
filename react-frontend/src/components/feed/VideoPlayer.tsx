@@ -17,7 +17,7 @@ import Volume2 from 'lucide-react/icons/volume-2';
 import VolumeX from 'lucide-react/icons/volume-x';
 import VideoOff from 'lucide-react/icons/video-off';
 import { useTranslation } from 'react-i18next';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveAssetUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
 import { Button } from '@/components/ui';
 
@@ -108,7 +108,9 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
     [hasError, handlePlayPause]
   );
 
-  const posterUrl = media.thumbnail_url ? resolveAssetUrl(media.thumbnail_url) : undefined;
+  const posterUrl = media.thumbnail_url
+    ? resolveThumbnailUrl(media.thumbnail_url, { width: 1200, height: 675 })
+    : undefined;
 
   if (hasError) {
     return (

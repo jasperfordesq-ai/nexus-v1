@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import { StoryViewer } from '@/components/stories/StoryViewer';
 import type { StoryUser } from '@/components/feed/StoriesBar';
 
@@ -336,10 +336,11 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                 <div className="w-full h-full rounded-full bg-[var(--surface-elevated)] p-[2px]">
                   {highlight.cover_url ? (
                     <img
-                      src={resolveAssetUrl(highlight.cover_url)}
+                      src={resolveThumbnailUrl(highlight.cover_url, { width: 160, height: 160 })}
                       alt={highlight.title}
                       className="w-full h-full rounded-full object-cover"
                       loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     <div className="w-full h-full rounded-full bg-[var(--surface-elevated)] flex items-center justify-center">
@@ -468,9 +469,11 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                       <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-[var(--surface-elevated)]">
                         {story.media_url ? (
                           <img
-                            src={resolveAssetUrl(story.media_url)}
+                            src={resolveThumbnailUrl(story.media_url, { width: 96, height: 96 })}
                             alt={t('creator.preview_alt')}
                             className="w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
                           />
                         ) : (
                           <div

@@ -446,7 +446,7 @@ class MarketplaceListingController extends BaseApiController
 
                 $uploadedImages[] = [
                     'url'           => $result['url'],
-                    'thumbnail_url' => $result['url'], // thumbnail generation handled separately if needed
+                    'thumbnail_url' => $result['thumbnail_url'] ?? $result['url'],
                     'alt_text'      => $file->getClientOriginalName(),
                 ];
             } catch (\InvalidArgumentException $e) {
@@ -928,7 +928,7 @@ class MarketplaceListingController extends BaseApiController
 
         $categories = MarketplaceListingService::getCategories();
 
-        return $this->respondWithData($categories);
+        return $this->withPublicCache($this->respondWithData($categories), 300, 60);
     }
 
     /**
@@ -945,19 +945,19 @@ class MarketplaceListingController extends BaseApiController
         $template = MarketplaceCategoryTemplate::where('category_id', $id)->first();
 
         if (!$template) {
-            return $this->respondWithData([
+            return $this->withPublicCache($this->respondWithData([
                 'category_id' => $id,
                 'name'        => null,
                 'fields'      => [],
-            ]);
+            ]), 600, 300);
         }
 
-        return $this->respondWithData([
+        return $this->withPublicCache($this->respondWithData([
             'id'          => $template->id,
             'category_id' => $template->category_id,
             'name'        => $template->name,
             'fields'      => $template->fields ?? [],
-        ]);
+        ]), 600, 300);
     }
 
     // =====================================================================

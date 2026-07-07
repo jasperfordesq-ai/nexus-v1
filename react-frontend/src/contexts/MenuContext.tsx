@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { createContext, use, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { useTenant } from './TenantContext';
 import { useMenus } from '@/hooks/useMenus';
@@ -41,9 +42,18 @@ const MenuContext = createContext<MenuContextValue | null>(null);
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MenuProvider({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
-  const { tenant } = useTenant();
-  const { menus, isLoading, hasCustomMenus, refresh } = useMenus(isAuthenticated, tenant?.id);
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { tenant, isLoading: tenantLoading } = useTenant();
+  const location = useLocation();
+  const isAuthRoute = /(^|\/)(login|register|verify-email|password\/forgot|password\/reset)(\/|$)/.test(
+    location.pathname
+  );
+  const shouldLoadMenus = !isAuthRoute && !authLoading && !tenantLoading;
+  const { menus, isLoading, hasCustomMenus, refresh } = useMenus(
+    isAuthenticated,
+    tenant?.id,
+    shouldLoadMenus
+  );
 
   const value = useMemo<MenuContextValue>(
     () => ({

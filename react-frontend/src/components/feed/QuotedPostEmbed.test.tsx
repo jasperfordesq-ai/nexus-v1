@@ -34,6 +34,7 @@ vi.mock('@/contexts', () =>
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null | undefined) => url ?? '',
   resolveAssetUrl: (url: string | null | undefined) => url ?? '',
+  resolveThumbnailUrl: (url: string | null | undefined) => url ?? '',
   formatRelativeTime: () => '5m ago',
 }));
 

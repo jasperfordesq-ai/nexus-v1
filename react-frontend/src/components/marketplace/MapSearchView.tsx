@@ -26,6 +26,7 @@ import { MAPS_ENABLED } from '@/lib/map-config';
 import { PriceBadge } from './PriceBadge';
 import { ConditionBadge } from './ConditionBadge';
 import { useTenant } from '@/contexts';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import type { MarketplaceListingItem } from '@/types/marketplace';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -74,7 +75,7 @@ function ListingInfoContent({ listing }: { listing: MarketplaceListingItem }) {
         <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-surface-secondary">
           {imageUrl ? (
             <img
-              src={imageUrl}
+              src={resolveThumbnailUrl(imageUrl, { width: 160, height: 160 })}
               alt={listing.title}
               className="w-full h-full object-cover"
               loading="lazy"

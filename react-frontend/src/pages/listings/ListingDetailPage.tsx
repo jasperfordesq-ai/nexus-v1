@@ -46,7 +46,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle, useSocialInteractions } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { Listing, ListingDetail, ExchangeConfig } from '@/types/api';
 
 interface ListingStructuredDataOptions {
@@ -491,7 +491,7 @@ export function ListingDetailPage() {
         <div className="relative overflow-hidden bg-theme-hover">
           {listing.image_url && !imageError ? (
             <img
-              src={resolveAssetUrl(listing.image_url)}
+              src={resolveThumbnailUrl(listing.image_url, { width: 1200, height: 675, fit: 'contain' })}
               alt={t('detail_image_alt', { title: listing.title })}
               className="h-64 w-full object-cover sm:h-80 lg:h-[24rem]"
               loading="lazy"

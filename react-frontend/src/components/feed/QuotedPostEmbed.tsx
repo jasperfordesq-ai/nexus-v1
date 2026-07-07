@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
-import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl, formatRelativeTime } from '@/lib/helpers';
 import { Button, Avatar } from '@/components/ui';
 
 export interface QuotedPostData {
@@ -54,9 +54,9 @@ export function QuotedPostEmbed({ post, isPreview = false }: QuotedPostEmbedProp
 
   const firstMedia = post.media && post.media.length > 0 ? post.media[0] : null;
   const thumbnailUrl = firstMedia
-    ? resolveAssetUrl(firstMedia.thumbnail_url || firstMedia.file_url)
+    ? resolveThumbnailUrl(firstMedia.thumbnail_url || firstMedia.file_url, { width: 320, height: 180 })
     : post.image_url
-      ? resolveAssetUrl(post.image_url)
+      ? resolveThumbnailUrl(post.image_url, { width: 320, height: 180 })
       : null;
 
   const cardContent = (

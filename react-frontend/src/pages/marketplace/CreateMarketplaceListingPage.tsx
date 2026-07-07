@@ -1,4 +1,3 @@
-import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, Chip, Spinner, Input, Textarea, RadioGroup, Radio } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -23,6 +22,7 @@ import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, 
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { Select, SelectItem, Autocomplete, AutocompleteItem, GlassCard, Button, Chip, Spinner, Input, Textarea, RadioGroup, Radio } from '@/components/ui';
 
 import Camera from 'lucide-react/icons/camera';
 import X from 'lucide-react/icons/x';

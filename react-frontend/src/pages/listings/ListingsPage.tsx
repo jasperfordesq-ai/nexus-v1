@@ -50,7 +50,7 @@ import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { MAPS_ENABLED } from '@/lib/map-config';
-import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import { ProximityFilter, type ProximityFilterParams } from '@/components/proximity/ProximityFilter';
 import type { Listing, Category } from '@/types/api';
 
@@ -913,7 +913,10 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
   const isGrid = viewMode === 'grid';
   const [imgError, setImgError] = useState(false);
   const hours = listing.estimated_hours || listing.hours_estimate;
-  const avatarSrc = resolveAvatarUrl(listing.author_avatar || listing.user?.avatar);
+  const avatarSource = listing.author_avatar || listing.user?.avatar;
+  const avatarSrc = avatarSource
+    ? resolveThumbnailUrl(avatarSource, { width: 96, height: 96, fallback: resolveAvatarUrl(null) })
+    : resolveAvatarUrl(null);
   const isFavorited = listing.is_favorited === true;
   const fallbackUserName = t('user_fallback');
   const imageAlt = listing.title || t('listing_image_alt');
@@ -929,7 +932,9 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
     }
   }
 
-  const imageUrl = listing.image_url ? resolveAssetUrl(listing.image_url) : null;
+  const imageUrl = listing.image_url
+    ? resolveThumbnailUrl(listing.image_url, { width: isGrid ? 640 : 160, height: isGrid ? 360 : 160 })
+    : null;
 
   if (!isGrid) {
     // ─── List View ───
@@ -945,6 +950,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 height={160}
                 loading="lazy"
                 decoding="async"
+                fetchPriority="low"
                 onError={() => setImgError(true)}
               />
             ) : (
@@ -1052,6 +1058,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               height={450}
               loading="lazy"
               decoding="async"
+              fetchPriority="low"
               onError={() => setImgError(true)}
             />
           ) : (

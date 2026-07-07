@@ -54,6 +54,7 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: vi.fn((url) => url || ''),
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
+  resolveThumbnailUrl: vi.fn((url) => url || ''),
 }));
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,

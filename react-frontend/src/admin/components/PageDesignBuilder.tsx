@@ -9,8 +9,11 @@
  * This deliberately uses the web/page GrapesJS ecosystem, not the newsletter
  * MJML preset. The exported `content` is normal responsive HTML plus CSS, while
  * `design_json` stores the full project state for lossless reopening.
+ * GrapesJS chrome CSS stays in this lazy builder chunk, not the public app shell.
  */
 
+import 'grapesjs/dist/css/grapes.min.css';
+import '@/styles/newsletter-builder.css';
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import grapesjs, { type Editor } from 'grapesjs';
 import presetWebpage from 'grapesjs-preset-webpage';

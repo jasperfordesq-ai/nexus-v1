@@ -98,6 +98,28 @@ class MarketplaceSellerController extends BaseApiController
         );
     }
 
+    /**
+     * GET /v2/marketplace/sellers/{id}/shipping-options - Public active shipping options.
+     */
+    public function shippingOptionsForSeller(int $id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('marketplace_seller_shipping_public', 60, 60);
+
+        // Buyer-facing components pass user_id from listing.seller, while
+        // seller profile links may pass the marketplace profile id.
+        $profile = MarketplaceSellerService::getByUserId($id)
+            ?? MarketplaceSellerService::getById($id);
+
+        if (!$profile) {
+            return $this->respondWithError('NOT_FOUND', 'Seller profile not found.', null, 404);
+        }
+
+        $options = MarketplaceShippingOptionService::getSellerOptions($profile->id);
+
+        return $this->respondWithData($options);
+    }
+
     // -----------------------------------------------------------------
     //  POST /v2/marketplace/seller/profile
     // -----------------------------------------------------------------

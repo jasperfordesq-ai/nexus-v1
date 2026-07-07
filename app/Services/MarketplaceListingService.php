@@ -144,8 +144,9 @@ class MarketplaceListingService
                     ->with([
                         'user:id,first_name,last_name,avatar_url,is_verified',
                         'category:id,name,slug,icon',
-                        'images' => fn ($qq) => $qq->orderBy('sort_order')->limit(5),
+                        'images' => fn ($qq) => $qq->orderByDesc('is_primary')->orderBy('sort_order')->limit(1),
                     ])
+                    ->withCount('images')
                     ->whereIn('id', $ids)
                     ->where('status', 'active')
                     ->where('moderation_status', 'approved');
@@ -187,8 +188,9 @@ class MarketplaceListingService
             ->with([
                 'user:id,first_name,last_name,avatar_url,is_verified',
                 'category:id,name,slug,icon',
-                'images' => fn ($q) => $q->orderBy('sort_order')->limit(5),
+                'images' => fn ($q) => $q->orderByDesc('is_primary')->orderBy('sort_order')->limit(1),
             ])
+            ->withCount('images')
             ;
 
         // When browsing own listings, show all statuses; otherwise only active+approved
@@ -414,8 +416,9 @@ class MarketplaceListingService
             ->with([
                 'user:id,first_name,last_name,avatar_url',
                 'category:id,name,slug,icon',
-                'images' => fn ($q) => $q->where('is_primary', true)->limit(1),
+                'images' => fn ($q) => $q->orderByDesc('is_primary')->orderBy('sort_order')->limit(1),
             ])
+            ->withCount('images')
             ->where('status', 'active')
             ->where('moderation_status', 'approved')
             ->whereNotNull('latitude')
@@ -698,8 +701,9 @@ class MarketplaceListingService
             ->with([
                 'user:id,first_name,last_name,avatar_url',
                 'category:id,name,slug,icon',
-                'images' => fn ($q) => $q->where('is_primary', true)->limit(1),
+                'images' => fn ($q) => $q->orderByDesc('is_primary')->orderBy('sort_order')->limit(1),
             ])
+            ->withCount('images')
             ->whereIn('id', $listingIds)
             ->get()
             ->keyBy('id');

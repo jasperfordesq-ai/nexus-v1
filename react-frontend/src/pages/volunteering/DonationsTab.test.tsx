@@ -130,11 +130,15 @@ describe('DonationsTab', () => {
   });
 
   it('shows loading skeleton while data is being fetched', () => {
-    vi.mocked(api.get).mockReturnValue(new Promise(() => {}));
+    let resolveRequest!: (value: { success: boolean; data: never[] }) => void;
+    vi.mocked(api.get).mockReturnValue(new Promise((resolve) => {
+      resolveRequest = resolve;
+    }));
     render(<DonationsTab />);
     // The loading skeleton renders inside a role="status" container.
     const loadingContainers = screen.getAllByRole('status');
     expect(loadingContainers.length).toBeGreaterThan(0);
+    resolveRequest({ success: true, data: [] });
   });
 
   it('displays giving day cards with progress when data is loaded', async () => {

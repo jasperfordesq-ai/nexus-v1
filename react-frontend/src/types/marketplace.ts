@@ -304,7 +304,7 @@ export interface MarketplaceOrderItem {
   order_number: string;
   buyer: { id: number; name: string; avatar_url?: string };
   seller: { id: number; name: string; avatar_url?: string };
-  listing: { id: number; title: string; image?: { url: string } };
+  listing: { id: number; title: string; image?: { url: string; thumbnail_url?: string } };
   quantity: number;
   unit_price: number;
   total_price: number;

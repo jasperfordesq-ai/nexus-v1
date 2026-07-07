@@ -7,7 +7,7 @@
  * BuyNowButton — Creates a marketplace order and starts Stripe payment.
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { lazy, Suspense, useState, useCallback, useEffect, useMemo } from 'react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import { useTranslation } from 'react-i18next';
 import { Select, SelectItem, useDisclosure, Button, Input } from '@/components/ui';
@@ -15,7 +15,10 @@ import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { MarketplaceShippingOption } from '@/types/marketplace';
-import { StripeCheckoutModal } from './StripeCheckoutModal';
+
+const StripeCheckoutModal = lazy(() =>
+  import('./StripeCheckoutModal').then((module) => ({ default: module.StripeCheckoutModal })),
+);
 
 interface BuyNowButtonProps {
   listingId: number;
@@ -324,22 +327,24 @@ export function BuyNowButton({
       )}
 
       {clientSecret && checkoutModal.isOpen && (
-        <StripeCheckoutModal
-          isOpen={checkoutModal.isOpen}
-          clientSecret={clientSecret}
-          amount={orderTotal}
-          currency={currency}
-          listingTitle={listingTitle}
-          onSuccess={() => {
-            checkoutModal.onClose();
-            setClientSecret(null);
-            onSuccess();
-          }}
-          onClose={() => {
-            checkoutModal.onClose();
-            setClientSecret(null);
-          }}
-        />
+        <Suspense fallback={null}>
+          <StripeCheckoutModal
+            isOpen={checkoutModal.isOpen}
+            clientSecret={clientSecret}
+            amount={orderTotal}
+            currency={currency}
+            listingTitle={listingTitle}
+            onSuccess={() => {
+              checkoutModal.onClose();
+              setClientSecret(null);
+              onSuccess();
+            }}
+            onClose={() => {
+              checkoutModal.onClose();
+              setClientSecret(null);
+            }}
+          />
+        </Suspense>
       )}
     </>
   );

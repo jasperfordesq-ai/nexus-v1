@@ -13,7 +13,7 @@ import { Select, SelectItem, Button, Input, Textarea, Modal, ModalContent, Modal
  * Step 3: Success confirmation with receipt link
  */
 
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Banknote from 'lucide-react/icons/banknote';
@@ -25,7 +25,10 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { detectTenantFromUrl, tenantPath } from '@/lib/tenant-routing';
 import { useToast } from '@/contexts';
-import { StripePaymentForm } from './StripePaymentForm';
+
+const StripePaymentForm = lazy(() =>
+  import('./StripePaymentForm').then((module) => ({ default: module.StripePaymentForm }))
+);
 
 /* ───────────────────────── Props ───────────────────────── */
 
@@ -381,11 +384,13 @@ export function DonationCheckout({
                   <div className="text-center text-sm text-theme-muted mb-2">
                     {t('donations.paying_amount', { amount: formattedAmount })}
                   </div>
-                  <StripePaymentForm
-                    clientSecret={clientSecret}
-                    onSuccess={handlePaymentSuccess}
-                    onError={handlePaymentError}
-                  />
+                  <Suspense fallback={null}>
+                    <StripePaymentForm
+                      clientSecret={clientSecret}
+                      onSuccess={handlePaymentSuccess}
+                      onError={handlePaymentError}
+                    />
+                  </Suspense>
                 </div>
               )}
 

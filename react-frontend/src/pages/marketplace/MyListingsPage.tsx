@@ -36,6 +36,7 @@ import type { MarketplaceListingItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
@@ -429,10 +430,11 @@ export function MyListingsPage() {
                     <div className="aspect-square bg-surface-secondary relative overflow-hidden">
                       {listing.image?.url ? (
                         <img
-                          src={listing.image.thumbnail_url || listing.image.url}
+                          src={resolveThumbnailUrl(listing.image.thumbnail_url || listing.image.url, { width: 360, height: 360 })}
                           alt={listing.title}
                           className="w-full h-full object-cover"
                           loading="lazy"
+                          decoding="async"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">

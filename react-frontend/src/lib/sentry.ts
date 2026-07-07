@@ -1,4 +1,4 @@
-// Copyright © 2024–2026 Jasper Ford
+// Copyright (C) 2024-2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -6,16 +6,16 @@
 /**
  * Sentry Error Tracking - React Frontend
  *
- * Provides real-time error tracking and performance monitoring.
- * Reads DSN from VITE_SENTRY_DSN env var — if empty, all exports are safe no-ops.
+ * This wrapper deliberately avoids a static @sentry/react import. Public routes
+ * import these helpers for breadcrumbs and error capture, so loading the SDK at
+ * module evaluation time would put Sentry in the startup bundle even before the
+ * visitor has granted analytics consent.
  */
 
-import * as Sentry from '@sentry/react';
-import type { Integration } from '@sentry/core';
-import { createElement } from 'react';
+import { Component, createElement } from 'react';
 import { readStoredConsent } from '@/contexts/CookieConsentContext';
 import type { User } from '@/types';
-import type { ReactNode, ComponentType, ReactElement } from 'react';
+import type { ComponentType, ErrorInfo, ReactElement, ReactNode } from 'react';
 
 interface TenantInfo {
   id: number;
@@ -24,47 +24,74 @@ interface TenantInfo {
 }
 
 type SeverityLevel = 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug';
+type SentryModule = typeof import('@sentry/react');
+type SentrySpan = ReturnType<SentryModule['startInactiveSpan']>;
 
 const DSN = import.meta.env.VITE_SENTRY_DSN as string | undefined;
 const REPLAY_ON_ERROR_SAMPLE_RATE = Number.parseFloat(
   (import.meta.env.VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE as string | undefined) || '0',
 );
 
-/**
- * Sentry is enabled only if DSN is set AND the user has granted analytics consent.
- * On first visit (no consent stored), Sentry is NOT initialized.
- * When the user accepts analytics cookies, Sentry starts on the next page load.
- */
 function checkEnabled(): boolean {
   if (!DSN) return false;
   const consent = readStoredConsent();
-  // No consent stored yet → don't track (GDPR default: opt-in)
-  if (!consent) return false;
-  return consent.analytics === true;
+  return consent?.analytics === true;
 }
 
 let IS_ENABLED = checkEnabled();
+let sentryModule: SentryModule | null = null;
+let sentryLoading: Promise<SentryModule | null> | null = null;
+let hasInitialized = false;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Initialization
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Initialize Sentry SDK. Called from main.tsx on page load, and can be
- * called again if the user grants analytics consent mid-session.
- * Safe to call multiple times — Sentry.init is idempotent.
- */
-export function initSentry(): void {
-  // Re-check consent in case it was granted after initial load
-  IS_ENABLED = checkEnabled();
-  if (!IS_ENABLED) {
-    return;
-  }
-
-  const replayOnErrorSampleRate = Number.isFinite(REPLAY_ON_ERROR_SAMPLE_RATE)
+function getReplayOnErrorSampleRate(): number {
+  return Number.isFinite(REPLAY_ON_ERROR_SAMPLE_RATE)
     ? Math.max(0, Math.min(1, REPLAY_ON_ERROR_SAMPLE_RATE))
     : 0;
-  const integrations: Integration[] = [
+}
+
+function sensitiveFields(): string[] {
+  return [
+    'password',
+    'password_confirmation',
+    'current_password',
+    'token',
+    'api_key',
+    'secret',
+    'csrf_token',
+    'email',
+    'phone',
+    'credit_card',
+    'card_number',
+    'cvv',
+    'refresh_token',
+    'access_token',
+  ];
+}
+
+async function loadSentry(): Promise<SentryModule | null> {
+  if (!IS_ENABLED) return null;
+  if (sentryModule) return sentryModule;
+  if (sentryLoading) return sentryLoading;
+
+  sentryLoading = import('@sentry/react')
+    .then((mod) => {
+      sentryModule = mod;
+      return mod;
+    })
+    .catch(() => null)
+    .finally(() => {
+      sentryLoading = null;
+    });
+
+  return sentryLoading;
+}
+
+async function loadAndInitializeSentry(): Promise<void> {
+  const Sentry = await loadSentry();
+  if (!Sentry || hasInitialized || !IS_ENABLED) return;
+
+  const replayOnErrorSampleRate = getReplayOnErrorSampleRate();
+  const integrations: unknown[] = [
     Sentry.browserTracingIntegration(),
     Sentry.feedbackIntegration({
       colorScheme: 'system',
@@ -82,40 +109,20 @@ export function initSentry(): void {
   Sentry.init({
     dsn: DSN,
     environment: (import.meta.env.VITE_SENTRY_ENVIRONMENT as string) || 'production',
-    // Release uses the build commit injected at compile time by vite.config.ts
-    // (__BUILD_COMMIT__ is the source of truth — VITE_BUILD_COMMIT is a soft
-    // legacy alias that's often unset). The build_commit tag below mirrors
-    // this so events are queryable by exact build SHA in Sentry's UI.
     release: `nexus-react@${__BUILD_COMMIT__}`,
-
-    // Error sampling — capture all errors
     sampleRate: 1.0,
-
-    // Performance sampling — configurable via env
     tracesSampleRate: parseFloat(
-      (import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE as string) || '0.1'
+      (import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE as string) || '0.1',
     ),
-
-    // Session replay (disabled by default — enable if needed)
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: replayOnErrorSampleRate,
-
-    // Breadcrumbs
     maxBreadcrumbs: 50,
-
-    // Privacy — don't send PII by default
     sendDefaultPii: false,
-
-    // Integration config
-    integrations,
-
-    // Filter sensitive data before sending
+    integrations: integrations as Parameters<SentryModule['init']>[0]['integrations'],
     beforeSend(event) {
-      // Strip sensitive fields from request data
       if (event.request?.data && typeof event.request.data === 'object') {
         const data = event.request.data as Record<string, unknown>;
-        const sensitiveFields = ['password', 'password_confirmation', 'current_password', 'token', 'api_key', 'secret', 'csrf_token', 'email', 'phone', 'credit_card', 'card_number', 'cvv', 'refresh_token', 'access_token'];
-        for (const field of sensitiveFields) {
+        for (const field of sensitiveFields()) {
           if (field in data) {
             data[field] = '[FILTERED]';
           }
@@ -123,10 +130,7 @@ export function initSentry(): void {
       }
       return event;
     },
-
-    // Filter breadcrumbs
     beforeBreadcrumb(breadcrumb) {
-      // Don't send console.debug breadcrumbs
       if (breadcrumb.category === 'console' && breadcrumb.level === 'debug') {
         return null;
       }
@@ -134,43 +138,31 @@ export function initSentry(): void {
     },
   });
 
-  // Set global tags
+  hasInitialized = true;
   Sentry.setTag('platform', 'react');
   Sentry.setTag('app_component', 'frontend');
-  // Tag every event with the exact build SHA so we can answer "what % of
-  // events come from build X" in Sentry's discover/issues UI. Critical for
-  // tracking how a stale-client cohort drains over time after a deploy.
   Sentry.setTag('build_commit', __BUILD_COMMIT__);
   Sentry.setTag('build_time', __BUILD_TIME__);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Context setters (called from AuthContext / TenantContext)
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Set user context after login. Pass null on logout to clear.
- */
-export function setSentryUser(user: User | null): void {
+export function initSentry(): void {
+  IS_ENABLED = checkEnabled();
   if (!IS_ENABLED) return;
-
-  if (user) {
-    // Only send user ID and role — no PII (email, name) to Sentry
-    Sentry.setUser({
-      id: String(user.id),
-    });
-  } else {
-    Sentry.setUser(null);
-  }
+  void loadAndInitializeSentry();
 }
 
-/**
- * Set tenant context after tenant detection.
- */
-export function setSentryTenant(tenant: TenantInfo | null): void {
+export function setSentryUser(user: User | null): void {
   if (!IS_ENABLED) return;
+  void loadSentry().then((Sentry) => {
+    if (!Sentry) return;
+    Sentry.setUser(user ? { id: String(user.id) } : null);
+  });
+}
 
-  if (tenant) {
+export function setSentryTenant(tenant: TenantInfo | null): void {
+  if (!IS_ENABLED || !tenant) return;
+  void loadSentry().then((Sentry) => {
+    if (!Sentry) return;
     Sentry.setTag('tenant_id', String(tenant.id));
     Sentry.setTag('tenant_name', tenant.name);
     Sentry.setTag('tenant_slug', tenant.slug);
@@ -179,54 +171,38 @@ export function setSentryTenant(tenant: TenantInfo | null): void {
       name: tenant.name,
       slug: tenant.slug,
     });
-  }
+  });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Manual capture functions
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Add breadcrumb for debugging
- */
 export function addSentryBreadcrumb(
   message: string,
   category: string = 'default',
   data: Record<string, unknown> = {},
-  level: SeverityLevel = 'info'
+  level: SeverityLevel = 'info',
 ): void {
   if (!IS_ENABLED) return;
-
-  Sentry.addBreadcrumb({
-    message,
-    category,
-    data,
-    level,
+  void loadSentry().then((Sentry) => {
+    Sentry?.addBreadcrumb({ message, category, data, level });
   });
 }
 
-/**
- * Capture an exception manually
- */
 export function captureSentryException(error: Error, context?: Record<string, unknown>): void {
   if (!IS_ENABLED) return;
-
-  Sentry.captureException(error, {
-    contexts: context ? { additional: context } : undefined,
+  void loadSentry().then((Sentry) => {
+    Sentry?.captureException(error, {
+      contexts: context ? { additional: context } : undefined,
+    });
   });
 }
 
-/**
- * Capture a message
- */
 export function captureSentryMessage(
   message: string,
   level: SeverityLevel = 'error',
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ): string | null {
-  if (!IS_ENABLED) return null;
+  if (!IS_ENABLED || !sentryModule) return null;
 
-  return Sentry.captureMessage(message, {
+  return sentryModule.captureMessage(message, {
     level,
     contexts: context ? { additional: context } : undefined,
   });
@@ -239,9 +215,9 @@ export function captureSentryFeedback(params: {
   url?: string;
   tags?: Record<string, string | number | boolean | null>;
 }, options: { includeReplay?: boolean } = {}): string | null {
-  if (!IS_ENABLED) return null;
+  if (!IS_ENABLED || !sentryModule) return null;
 
-  return Sentry.captureFeedback({
+  return sentryModule.captureFeedback({
     message: params.message,
     source: params.source,
     associatedEventId: params.associatedEventId ?? undefined,
@@ -254,88 +230,89 @@ export function captureSentryFeedback(params: {
   });
 }
 
-/**
- * Start a performance span (returns the active span or undefined)
- */
-export function startSentrySpan(name: string, op: string = 'function'): ReturnType<typeof Sentry.startInactiveSpan> | undefined {
-  if (!IS_ENABLED) return undefined;
-
-  return Sentry.startInactiveSpan({ name, op });
+export function startSentrySpan(name: string, op: string = 'function'): SentrySpan | undefined {
+  if (!IS_ENABLED || !sentryModule) return undefined;
+  return sentryModule.startInactiveSpan({ name, op });
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Breadcrumb helpers (called from api.ts, AuthContext, etc.)
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Capture navigation breadcrumb
- */
 export function captureNavigation(from: string, to: string): void {
-  addSentryBreadcrumb(`Navigate: ${from} → ${to}`, 'navigation', { from, to });
+  addSentryBreadcrumb(`Navigate: ${from} -> ${to}`, 'navigation', { from, to });
 }
 
-/**
- * Capture API call breadcrumb
- */
 export function captureApiCall(
   method: string,
   endpoint: string,
   status: number,
-  duration: number
+  duration: number,
 ): void {
   addSentryBreadcrumb(
-    `${method} ${endpoint} → ${status}`,
+    `${method} ${endpoint} -> ${status}`,
     'http',
     { method, url: endpoint, status_code: status, duration_ms: Math.round(duration) },
-    status >= 400 ? 'error' : 'info'
+    status >= 400 ? 'error' : 'info',
   );
 }
 
-/**
- * Capture authentication event
- */
 export function captureAuthEvent(
   event: string,
   userId?: number,
-  data?: Record<string, unknown>
+  data?: Record<string, unknown>,
 ): void {
   addSentryBreadcrumb(
     `Auth: ${event}`,
     'auth',
     { event, user_id: userId, ...data },
-    event.includes('fail') ? 'warning' : 'info'
+    event.includes('fail') ? 'warning' : 'info',
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// React components
-// ─────────────────────────────────────────────────────────────────────────────
+class LocalErrorBoundary extends Component<{
+  children?: ReactNode;
+  fallback?: ReactNode | ComponentType<{ error: Error }>;
+}, { error: Error | null }> {
+  state = { error: null };
 
-/**
- * React Error Boundary — wraps the app to catch render errors and report to Sentry.
- * Falls back to passthrough if Sentry is disabled.
- */
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo): void {
+    captureSentryException(error, {
+      source: 'root_error_boundary',
+      componentStack: info.componentStack,
+    });
+  }
+
+  render(): ReactNode {
+    if (!this.state.error) {
+      return this.props.children;
+    }
+
+    const { fallback } = this.props;
+    if (!fallback) {
+      return null;
+    }
+
+    if (typeof fallback === 'function') {
+      return createElement(fallback, { error: this.state.error });
+    }
+
+    return fallback;
+  }
+}
+
 export function SentryErrorBoundary({ children, fallback }: {
   children: ReactNode;
   fallback?: ReactNode | ComponentType<{ error: Error }>;
 }): ReactNode {
-  if (!IS_ENABLED) {
-    return children;
-  }
-
-  return createElement(Sentry.ErrorBoundary, {
-    fallback: fallback as Sentry.ErrorBoundaryProps["fallback"],
-  }, children);
+  return createElement(LocalErrorBoundary, { fallback, children });
 }
 
-/**
- * Sentry profiler wrapper
- */
 export function SentryProfiler({ children }: { children: ReactNode }): ReactNode {
-  if (!IS_ENABLED) {
+  if (!IS_ENABLED || !sentryModule) {
     return children;
   }
 
-  const Profiled = Sentry.withProfiler(() => children as ReactElement);
+  const Profiled = sentryModule.withProfiler(() => children as ReactElement);
   return createElement(Profiled);
 }

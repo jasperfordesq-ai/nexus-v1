@@ -28,7 +28,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -225,10 +225,11 @@ export function CampaignsPage() {
                 {campaign.cover_image && (
                   <div className="w-full h-32 overflow-hidden">
                     <img
-                      src={resolveAssetUrl(campaign.cover_image)}
+                      src={resolveThumbnailUrl(campaign.cover_image, { width: 640, height: 320 })}
                       alt={campaign.title}
                       className="w-full h-full object-cover"
                       loading="lazy"
+                      decoding="async"
                     />
                   </div>
                 )}

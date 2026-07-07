@@ -10,6 +10,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ReactNode } from 'react';
+import { MemoryRouter } from 'react-router-dom';
 
 // Mock dependencies used by MenuContext
 const mockRefresh = vi.fn().mockResolvedValue(undefined);
@@ -66,7 +67,11 @@ function TestConsumer() {
 }
 
 function renderWithProvider(ui: ReactNode) {
-  return render(<MenuProvider>{ui}</MenuProvider>);
+  return render(
+    <MemoryRouter initialEntries={['/test/dashboard']}>
+      <MenuProvider>{ui}</MenuProvider>
+    </MemoryRouter>
+  );
 }
 
 describe('MenuContext', () => {

@@ -179,14 +179,18 @@ export function PartnerPage() {
           >
             <h2 className="sr-only">{t('partner.together_banner_heading')}</h2>
             <div className="rounded-2xl bg-white p-3 sm:p-5 shadow-xl ring-1 ring-black/5">
-              <img
-                src="/images/Timebanking-UK-and-Timebank-Ireland-Partners.png"
-                alt={t('partner.together_banner_alt')}
-                className="w-full h-auto rounded-lg"
-                loading="eager"
-                width={1900}
-                height={800}
-              />
+              <picture>
+                <source srcSet="/images/Timebanking-UK-and-Timebank-Ireland-Partners.webp" type="image/webp" />
+                <img
+                  src="/images/Timebanking-UK-and-Timebank-Ireland-Partners.png"
+                  alt={t('partner.together_banner_alt')}
+                  className="w-full h-auto rounded-lg"
+                  loading="eager"
+                  decoding="async"
+                  width={1900}
+                  height={800}
+                />
+              </picture>
             </div>
           </motion.div>
         </div>
@@ -241,11 +245,18 @@ export function PartnerPage() {
               <p className="text-sm font-semibold uppercase tracking-widest text-indigo-500 dark:text-indigo-400 mb-4">
                 {t('partner.tech_partner_label')}
               </p>
-              <img
-                src="/images/project-nexus-logo.png"
-                alt={t('partner.tech_partner_logo_alt')}
-                className="w-64 sm:w-80 mx-auto mb-6"
-              />
+              <picture>
+                <source srcSet="/images/project-nexus-logo.webp" type="image/webp" />
+                <img
+                  src="/images/project-nexus-logo.png"
+                  alt={t('partner.tech_partner_logo_alt')}
+                  className="w-64 sm:w-80 mx-auto mb-6"
+                  loading="lazy"
+                  decoding="async"
+                  width={900}
+                  height={900}
+                />
+              </picture>
               <h2 className="text-xl sm:text-2xl font-bold text-theme-primary mb-3">
                 {t('partner.tech_partner_heading')}
               </h2>
@@ -355,11 +366,18 @@ export function PartnerPage() {
               <h2 className="text-xl sm:text-2xl font-bold text-theme-primary mb-6">
                 {t('partner.our_partners_heading')}
               </h2>
-              <img
-                src="/images/timebank_ireland_west_cork_partnership.jpg"
-                alt={t('partner.partners_banner_alt')}
-                className="w-full max-w-3xl mx-auto rounded-lg bg-white p-4"
-              />
+              <picture>
+                <source srcSet="/images/timebank_ireland_west_cork_partnership.webp" type="image/webp" />
+                <img
+                  src="/images/timebank_ireland_west_cork_partnership.jpg"
+                  alt={t('partner.partners_banner_alt')}
+                  className="w-full max-w-3xl mx-auto rounded-lg bg-white p-4"
+                  loading="lazy"
+                  decoding="async"
+                  width={700}
+                  height={200}
+                />
+              </picture>
             </GlassCard>
           </motion.div>
         </div>

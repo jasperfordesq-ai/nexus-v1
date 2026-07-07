@@ -32,6 +32,7 @@ import Flag from 'lucide-react/icons/flag';
 import { ErrorBoundary } from '@/components/feedback';
 import type { Group } from '@/types/api';
 import { Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Avatar } from '@/components/ui';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 
 const RichTextEditor = lazy(() => import('@/admin/components/RichTextEditor'));
 
@@ -302,7 +303,15 @@ export function GroupSettingsModal({
                     {t('detail.settings_cover_label')}
                   </p>
                   {group?.cover_image_url && (
-                    <img src={group.cover_image_url} alt={t('detail.image_alt_cover')} className="w-full h-10 rounded object-cover mb-2" width={400} height={40} loading="lazy" />
+                    <img
+                      src={resolveThumbnailUrl(group.cover_image_url, { width: 400, height: 80 })}
+                      alt={t('detail.image_alt_cover')}
+                      className="w-full h-10 rounded object-cover mb-2"
+                      width={400}
+                      height={40}
+                      loading="lazy"
+                      decoding="async"
+                    />
                   )}
                   <Button
                     as="label"

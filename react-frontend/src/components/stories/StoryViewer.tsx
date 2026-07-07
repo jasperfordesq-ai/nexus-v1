@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { StoryUser } from '@/components/feed/StoriesBar';
 import { Button, Avatar, Modal, ModalBody, ModalContent, useConfirm } from '@/components/ui';
 
@@ -241,9 +241,9 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
   useEffect(() => {
     if (currentStoryIdx < stories.length - 1) {
       const nextStory = stories[currentStoryIdx + 1];
-      if (nextStory?.media_url && !preloadedImages.current.has(nextStory.media_url)) {
+      if (nextStory?.media_type === 'image' && nextStory.media_url && !preloadedImages.current.has(nextStory.media_url)) {
         const img = new Image();
-        img.src = resolveAssetUrl(nextStory.media_url);
+        img.src = resolveThumbnailUrl(nextStory.media_url, { width: 1080, height: 1920 });
         preloadedImages.current.add(nextStory.media_url);
       }
     }
@@ -618,10 +618,11 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                 {currentStory.media_type === 'image' && currentStory.media_url && (
                   <div className="w-full h-full bg-black">
                     <img
-                      src={resolveAssetUrl(currentStory.media_url)}
+                      src={resolveThumbnailUrl(currentStory.media_url, { width: 1080, height: 1920 })}
                       alt={`Story from ${currentUserStory.name}`}
                       className="w-full h-full object-cover"
                       loading="eager"
+                      decoding="async"
                     />
                     {/* Text overlay */}
                     {currentStory.text_content && (

@@ -314,4 +314,30 @@ describe('MerchantOnboardingPage', () => {
       });
     }
   });
+
+  it('uploads profile images through the merchant onboarding image endpoint', async () => {
+    const { MerchantOnboardingPage } = await import('./MerchantOnboardingPage');
+    const { container } = render(<MerchantOnboardingPage />);
+    await waitFor(() => screen.getAllByRole('button').length > 0);
+
+    for (let i = 0; i < 2; i++) {
+      const nextBtn = screen.getAllByRole('button').find(
+        (b) => b.textContent?.toLowerCase().includes('next') ||
+               b.textContent?.toLowerCase().includes('continue')
+      );
+      expect(nextBtn).toBeDefined();
+      fireEvent.click(nextBtn as HTMLElement);
+      await waitFor(() => expect(mockApi.post.mock.calls.length).toBeGreaterThanOrEqual(i + 1));
+    }
+
+    const avatarInput = container.querySelector('input[type="file"]') as HTMLInputElement | null;
+    expect(avatarInput).toBeTruthy();
+
+    const file = new File(['avatar'], 'avatar.jpg', { type: 'image/jpeg' });
+    fireEvent.change(avatarInput as HTMLInputElement, { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(mockApi.upload).toHaveBeenCalledWith('/v2/merchant-onboarding/image', file, 'avatar');
+    });
+  });
 });

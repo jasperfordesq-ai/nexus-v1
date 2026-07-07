@@ -39,7 +39,7 @@ import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { FederatedListing, FederationPartner } from '@/types/api';
 
 type ListingTypeFilter = 'all' | 'offer' | 'request';
@@ -399,7 +399,9 @@ export function FederationListingsPage() {
             const isOffer = selectedListing.type === 'offer';
             const isExternal = !!selectedListing.is_external;
             const authorAvatar = resolveAvatarUrl(selectedListing.author?.avatar);
-            const listingImage = selectedListing.image_url ? resolveAssetUrl(selectedListing.image_url) : null;
+            const listingImage = selectedListing.image_url
+              ? resolveThumbnailUrl(selectedListing.image_url, { width: 960, height: 540 })
+              : null;
             const authorName = selectedListing.author?.name || t('listings.anonymous_user');
             const canNavigateToProfile = !isExternal && selectedListing.author?.id;
 
@@ -461,6 +463,7 @@ export function FederationListingsPage() {
                           alt={selectedListing.title}
                           className="w-full h-full object-cover"
                           loading="lazy"
+                          decoding="async"
                         />
                       </div>
                     )}
@@ -598,7 +601,9 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
   const { t } = useTranslation('federation');
   const isOffer = listing.type === 'offer';
   const avatarSrc = resolveAvatarUrl(listing.author?.avatar);
-  const imageSrc = listing.image_url ? resolveAssetUrl(listing.image_url) : null;
+  const imageSrc = listing.image_url
+    ? resolveThumbnailUrl(listing.image_url, { width: 640, height: 360 })
+    : null;
 
   return (
     <GlassCard
@@ -613,6 +618,7 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
             alt={listing.title}
             className="w-full h-full object-cover"
             loading="lazy"
+            decoding="async"
           />
         </div>
       ) : (

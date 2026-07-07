@@ -28,6 +28,7 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: (url: string) => url,
   resolveAvatarUrl: (url: string) => url,
+  resolveThumbnailUrl: (url: string) => url,
 }));
 
 // ─── Contexts ────────────────────────────────────────────────────────────────

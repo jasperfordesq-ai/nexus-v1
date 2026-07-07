@@ -12,7 +12,7 @@ import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { useTenant } from '@/contexts';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 
 export interface PopularGroup {
   id: number;
@@ -59,7 +59,7 @@ export function PopularGroupsWidget({ groups }: PopularGroupsWidgetProps) {
             <div className="w-9 h-9 rounded-lg bg-[var(--surface-elevated)] border border-[var(--border-default)] flex items-center justify-center flex-shrink-0 overflow-hidden">
               {group.image_url ? (
                 <img
-                  src={resolveAssetUrl(group.image_url)}
+                  src={resolveThumbnailUrl(group.image_url, { width: 96, height: 96 })}
                   alt={group.name}
                   className="w-full h-full object-cover"
                   width={36}

@@ -25,7 +25,11 @@ interface UseMenusReturn {
  * Re-fetches when authentication state or tenant changes (menus are role-filtered
  * and tenant-scoped server-side).
  */
-export function useMenus(isAuthenticated: boolean, tenantId?: number | null): UseMenusReturn {
+export function useMenus(
+  isAuthenticated: boolean,
+  tenantId?: number | null,
+  enabled = true
+): UseMenusReturn {
   const [menus, setMenus] = useState<MenusByLocation>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +37,12 @@ export function useMenus(isAuthenticated: boolean, tenantId?: number | null): Us
   const mountedRef = useRef(true);
 
   const fetchMenus = useCallback(async () => {
+    if (!enabled) {
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -87,15 +97,24 @@ export function useMenus(isAuthenticated: boolean, tenantId?: number | null): Us
         setIsLoading(false);
       }
     }
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
     mountedRef.current = true;
+    if (!enabled) {
+      setMenus({});
+      setHasCustomMenus(false);
+      setIsLoading(false);
+      setError(null);
+      return () => {
+        mountedRef.current = false;
+      };
+    }
     fetchMenus();
     return () => {
       mountedRef.current = false;
     };
-  }, [fetchMenus, isAuthenticated, tenantId]);
+  }, [fetchMenus, isAuthenticated, tenantId, enabled]);
 
   return { menus, isLoading, error, hasCustomMenus, refresh: fetchMenus };
 }

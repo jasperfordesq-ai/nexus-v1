@@ -23,7 +23,7 @@ vi.mock('@/lib/api', () => ({
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
-  resolveAssetUrl: (url: string | null) => url || '',
+  resolveThumbnailUrl: (url: string | null) => url || '',
 }));
 
 let isAuthenticated = true;

@@ -22,7 +22,7 @@ import LinkIcon from 'lucide-react/icons/link';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import { Chip, Skeleton } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -122,7 +122,7 @@ export function MessageContextCard({ contextType, contextId }: MessageContextCar
         <div className="flex-shrink-0">
           {context.image_url ? (
             <img
-              src={resolveAssetUrl(context.image_url)}
+              src={resolveThumbnailUrl(context.image_url, { width: 96, height: 96 })}
               alt={context.title}
               className="w-10 h-10 rounded-lg object-cover"
               loading="lazy"

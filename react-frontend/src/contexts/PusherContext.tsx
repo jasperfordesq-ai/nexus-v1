@@ -16,7 +16,8 @@
  */
 
 import { createContext, use, useEffect, useState, useCallback, useMemo, useRef, type ReactNode } from 'react';
-import Pusher, { type Channel } from 'pusher-js';
+import type Pusher from 'pusher-js';
+import type { Channel } from 'pusher-js';
 import { useAuth } from './AuthContext';
 import { api, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -144,7 +145,15 @@ export function PusherProvider({ children }: PusherProviderProps) {
     const accessToken = tokenManager.getAccessToken();
     if (!accessToken) return;
 
-    const pusher = new Pusher(config.key, {
+    let didCancel = false;
+    let reconnectAttempts = 0;
+    const reconnectTimeouts: ReturnType<typeof setTimeout>[] = [];
+
+    void import('pusher-js')
+      .then(({ default: PusherClient }) => {
+    if (didCancel) return;
+
+    const pusher = new PusherClient(config.key, {
       cluster: config.cluster,
       // Use a custom authorizer instead of authEndpoint so that the request
       // goes through our api client, which handles CORS, content-type, and
@@ -190,10 +199,6 @@ export function PusherProvider({ children }: PusherProviderProps) {
         },
       }),
     });
-
-    // H7: Exponential backoff reconnection on connection errors
-    let reconnectAttempts = 0;
-    const reconnectTimeouts: ReturnType<typeof setTimeout>[] = [];
 
     pusher.connection.bind('connected', () => {
       reconnectAttempts = 0; // Reset on successful connection
@@ -259,6 +264,11 @@ export function PusherProvider({ children }: PusherProviderProps) {
       feedPostListenersRef.current.forEach((listener) => listener(data));
     });
     feedChannelRef.current = feedChannel;
+      })
+      .catch((error) => {
+        logError('Pusher client failed to load', error);
+        setIsConnected(false);
+      });
 
     // Cleanup on unmount — unbind all handlers first, then disconnect().
     // Do NOT call unsubscribe() before disconnect() — it queues an async send
@@ -267,6 +277,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
     // Copy ref values into local variables for the cleanup function
     const currentConversationChannels = conversationChannelsRef.current;
     return () => {
+      didCancel = true;
       // H7: Clear any pending reconnect timeouts
       reconnectTimeouts.forEach(clearTimeout);
       if (userChannelRef.current) {
@@ -276,7 +287,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
         feedChannelRef.current.unbind_all();
       }
       currentConversationChannels.forEach((ch) => ch.unbind_all());
-      pusher.disconnect();
+      pusherRef.current?.disconnect();
       pusherRef.current = null;
       userChannelRef.current = null;
       feedChannelRef.current = null;

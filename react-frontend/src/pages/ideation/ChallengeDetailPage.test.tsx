@@ -87,6 +87,7 @@ vi.mock('@/lib/helpers', () => ({
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: (url: string | null) => url ?? '',
   resolveAssetUrl: (url: string | null) => url ?? '',
+  resolveThumbnailUrl: (url: string | null) => url ?? '',
   formatRelativeTime: (d: string) => d,
 }));
 

@@ -9,6 +9,7 @@ namespace App\Services;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * ImageUploadService — Laravel DI-based service for image upload operations.
@@ -20,11 +21,14 @@ class ImageUploadService
 {
     private const MAX_FILE_SIZE = 10485760; // 10 MB
     private const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    private const THUMBNAIL_WIDTH = 640;
+    private const THUMBNAIL_HEIGHT = 480;
+    private const THUMBNAIL_QUALITY = 78;
 
     /**
      * Upload an image file.
      *
-     * @return array{path: string, url: string, filename: string}
+     * @return array{path: string, url: string, filename: string, thumbnail_path?: string, thumbnail_url?: string}
      * @throws \InvalidArgumentException
      */
     public function upload(UploadedFile $file, string $directory = 'uploads'): array
@@ -51,12 +55,20 @@ class ImageUploadService
 
         $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
         $path = $file->storeAs($tenantDir, $filename, 'public');
+        $thumbnail = $this->createThumbnail($path, $filename);
 
-        return [
+        $result = [
             'path'     => $path,
             'url'      => $this->getUrl($path),
             'filename' => $filename,
         ];
+
+        if ($thumbnail !== null) {
+            $result['thumbnail_path'] = $thumbnail['path'];
+            $result['thumbnail_url'] = $thumbnail['url'];
+        }
+
+        return $result;
     }
 
     /**
@@ -118,5 +130,111 @@ class ImageUploadService
         }
 
         return Storage::disk('public')->url($path);
+    }
+
+    /**
+     * Create an upload-time WebP/JPEG derivative for list cards and galleries.
+     *
+     * @return array{path: string, url: string}|null
+     */
+    private function createThumbnail(string $path, string $filename): ?array
+    {
+        try {
+            $disk = Storage::disk('public');
+            $sourcePath = $disk->path($path);
+            $info = @getimagesize($sourcePath);
+            if ($info === false) {
+                return null;
+            }
+
+            [$srcWidth, $srcHeight] = $info;
+            if ($srcWidth <= 0 || $srcHeight <= 0) {
+                return null;
+            }
+
+            $source = $this->createImageResource($sourcePath, (string) ($info['mime'] ?? ''));
+            if ($source === null) {
+                return null;
+            }
+
+            [$srcX, $srcY, $copyWidth, $copyHeight] = $this->coverGeometry($srcWidth, $srcHeight);
+            $thumb = imagecreatetruecolor(self::THUMBNAIL_WIDTH, self::THUMBNAIL_HEIGHT);
+            imagefill($thumb, 0, 0, imagecolorallocate($thumb, 255, 255, 255));
+            imagecopyresampled(
+                $thumb,
+                $source,
+                0,
+                0,
+                $srcX,
+                $srcY,
+                self::THUMBNAIL_WIDTH,
+                self::THUMBNAIL_HEIGHT,
+                $copyWidth,
+                $copyHeight
+            );
+
+            $format = function_exists('imagewebp') ? 'webp' : 'jpg';
+            $baseName = pathinfo($filename, PATHINFO_FILENAME);
+            $thumbPath = trim(dirname($path), '.') . '/thumbnails/' . $baseName . '-' . self::THUMBNAIL_WIDTH . 'x' . self::THUMBNAIL_HEIGHT . '.' . $format;
+            $fullThumbPath = $disk->path($thumbPath);
+            if (! is_dir(dirname($fullThumbPath))) {
+                mkdir(dirname($fullThumbPath), 0755, true);
+            }
+
+            if ($format === 'webp') {
+                imagewebp($thumb, $fullThumbPath, self::THUMBNAIL_QUALITY);
+            } else {
+                imagejpeg($thumb, $fullThumbPath, 82);
+            }
+
+            imagedestroy($source);
+            imagedestroy($thumb);
+
+            return [
+                'path' => $thumbPath,
+                'url' => (string) $this->getUrl($thumbPath),
+            ];
+        } catch (Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Image thumbnail generation failed', [
+                'path' => $path,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * @return array{0:int,1:int,2:int,3:int}
+     */
+    private function coverGeometry(int $srcWidth, int $srcHeight): array
+    {
+        $targetRatio = self::THUMBNAIL_WIDTH / self::THUMBNAIL_HEIGHT;
+        $sourceRatio = $srcWidth / $srcHeight;
+
+        if ($sourceRatio > $targetRatio) {
+            $copyHeight = $srcHeight;
+            $copyWidth = (int) round($srcHeight * $targetRatio);
+            $srcX = (int) (($srcWidth - $copyWidth) / 2);
+
+            return [$srcX, 0, $copyWidth, $copyHeight];
+        }
+
+        $copyWidth = $srcWidth;
+        $copyHeight = (int) round($srcWidth / $targetRatio);
+        $srcY = (int) (($srcHeight - $copyHeight) / 2);
+
+        return [0, $srcY, $copyWidth, $copyHeight];
+    }
+
+    private function createImageResource(string $path, string $mime): mixed
+    {
+        return match ($mime) {
+            'image/jpeg' => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($path) : null,
+            'image/png' => function_exists('imagecreatefrompng') ? @imagecreatefrompng($path) : null,
+            'image/webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($path) : null,
+            'image/gif' => function_exists('imagecreatefromgif') ? @imagecreatefromgif($path) : null,
+            default => null,
+        };
     }
 }

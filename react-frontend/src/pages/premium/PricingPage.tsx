@@ -1,5 +1,10 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Switch } from '@/components/ui';
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import HandHeart from 'lucide-react/icons/hand-heart';
@@ -8,15 +13,13 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useToast } from '@/contexts';
-import { DonationCheckout } from '@/components/donations/DonationCheckout';
 import api from '@/lib/api';
 import { logError } from '@/lib/logger';
+
+const DonationCheckout = lazy(() =>
+  import('@/components/donations/DonationCheckout').then((module) => ({ default: module.DonationCheckout })),
+);
 // Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-
 interface PremiumTier {
   id: number;
   slug: string;
@@ -227,10 +230,14 @@ export function PricingPage() {
         </Chip>
       </div>
 
-      <DonationCheckout
-        isOpen={oneOffOpen}
-        onClose={() => setOneOffOpen(false)}
-      />
+      {oneOffOpen && (
+        <Suspense fallback={null}>
+          <DonationCheckout
+            isOpen={oneOffOpen}
+            onClose={() => setOneOffOpen(false)}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }

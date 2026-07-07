@@ -248,6 +248,11 @@ export interface RequestOptions extends Omit<RequestInit, 'body'> {
   body?: unknown;
   timeout?: number; // Request timeout in ms (default 30000)
   responseType?: 'json' | 'blob' | 'text';
+  /**
+   * Optional in-memory GET cache TTL. When omitted, only known public static
+   * endpoints such as tenant bootstrap and category metadata get a short TTL.
+   */
+  cacheTtlMs?: number;
   /** When provided, the upload is sent via XHR so byte progress (0-100) is reported. */
   onUploadProgress?: (percent: number) => void;
 }
@@ -364,6 +369,7 @@ class ApiClient {
 
   // Request deduplication: track in-flight GET requests
   private inflightRequests: Map<string, Promise<ApiResponse<unknown>>> = new Map();
+  private responseCache: Map<string, { expiresAt: number; response: ApiResponse<unknown> }> = new Map();
 
   // Cross-tab token refresh coordination
   private static readonly REFRESH_LOCK_KEY = 'nexus_token_refresh_lock';
@@ -391,6 +397,7 @@ class ApiClient {
    */
   clearInflightRequests(): void {
     this.inflightRequests.clear();
+    this.responseCache.clear();
   }
 
   /**
@@ -425,6 +432,26 @@ class ApiClient {
     // entry across tenants and leak the wrong tenant's data.
     const tenantId = tokenManager.getTenantId() ?? '-';
     return `${options.method || 'GET'}:${endpoint}#t=${tenantId}`;
+  }
+
+  private getResponseCacheTtl(endpoint: string, options: RequestOptions): number {
+    if (options.cacheTtlMs !== undefined) {
+      return Math.max(0, options.cacheTtlMs);
+    }
+
+    const path = endpoint.split('?')[0] ?? endpoint;
+    if (
+      path === '/v2/tenant/bootstrap' ||
+      path === '/v2/tenants' ||
+      path === '/v2/platform/stats' ||
+      path === '/v2/categories' ||
+      path === '/v2/marketplace/categories' ||
+      /^\/v2\/marketplace\/categories\/\d+\/template$/.test(path)
+    ) {
+      return 5 * 60 * 1000;
+    }
+
+    return 0;
   }
 
   /**
@@ -808,7 +835,19 @@ class ApiClient {
       return this.request<T>(endpoint, { ...options, method: 'GET' });
     }
 
-    const cacheKey = this.getCacheKey(endpoint, { ...options, method: 'GET' });
+    const requestOptions = { ...options, method: 'GET' };
+    const cacheKey = this.getCacheKey(endpoint, requestOptions);
+    const cacheTtl = this.getResponseCacheTtl(endpoint, requestOptions);
+
+    if (cacheTtl > 0) {
+      const cached = this.responseCache.get(cacheKey);
+      if (cached && cached.expiresAt > Date.now()) {
+        return cached.response as ApiResponse<T>;
+      }
+      if (cached) {
+        this.responseCache.delete(cacheKey);
+      }
+    }
 
     // Check for in-flight request
     const inflight = this.inflightRequests.get(cacheKey);
@@ -817,7 +856,15 @@ class ApiClient {
     }
 
     // Create new request
-    const promise = this.request<T>(endpoint, { ...options, method: 'GET' });
+    const promise = this.request<T>(endpoint, requestOptions).then((response) => {
+      if (cacheTtl > 0 && response.success) {
+        this.responseCache.set(cacheKey, {
+          expiresAt: Date.now() + cacheTtl,
+          response: response as ApiResponse<unknown>,
+        });
+      }
+      return response;
+    });
 
     // Store in-flight request
     this.inflightRequests.set(cacheKey, promise as Promise<ApiResponse<unknown>>);

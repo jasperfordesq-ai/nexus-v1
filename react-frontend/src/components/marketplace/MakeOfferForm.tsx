@@ -10,7 +10,8 @@
  * price comparison, and submits via the marketplace offers API endpoint.
  */
 
-import { useState, useCallback } from 'react';import Send from 'lucide-react/icons/send';
+import { useState, useCallback } from 'react';
+import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
@@ -36,12 +37,12 @@ export function MakeOfferForm({
 }: MakeOfferFormProps) {
   const { t } = useTranslation('marketplace');
   const toast = useToast();
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(0);
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const parsedAmount = parseFloat(amount);
-  const isValidAmount = !isNaN(parsedAmount) && parsedAmount > 0;
+  const parsedAmount = amount;
+  const isValidAmount = parsedAmount > 0;
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -88,9 +89,9 @@ export function MakeOfferForm({
         minValue={0}
         step={0.01}
         formatOptions={{ maximumFractionDigits: 2 }}
-        value={amount === '' ? undefined : parseFloat(amount)}
+        value={amount}
         onChange={(val) =>
-          setAmount(val === undefined || isNaN(val) ? '' : String(val))
+          setAmount(val === undefined || isNaN(val) ? 0 : val)
         }
         variant="secondary"
         isRequired

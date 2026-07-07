@@ -48,7 +48,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { formatDateTime, formatDateValue, formatMonthShort, resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
+import { formatDateTime, formatDateValue, formatMonthShort, resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import type { Event, User, RsvpResponse } from '@/types/api';
 
 type RsvpOption = 'going' | 'interested' | 'not_going';
@@ -557,7 +557,9 @@ export function EventDetailPage() {
   const endTimeLabel = endDate
     ? formatDateTime(endDate, { hour: '2-digit', minute: '2-digit' })
     : null;
-  const eventImage = event.cover_image ? resolveAssetUrl(event.cover_image) : undefined;
+  const eventImage = event.cover_image
+    ? resolveThumbnailUrl(event.cover_image, { width: 1200, height: 675 })
+    : undefined;
   const organizerName = event.organizer?.name || `${event.organizer?.first_name ?? ''} ${event.organizer?.last_name ?? ''}`.trim() || t('detail.community_member');
   const seoDescription = event.description?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 160)
     || t('detail.meta_description_fallback', {

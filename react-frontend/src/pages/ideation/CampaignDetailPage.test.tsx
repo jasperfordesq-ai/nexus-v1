@@ -82,6 +82,7 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   resolveAssetUrl: (url: string | null) => url ?? '',
+  resolveThumbnailUrl: (url: string | null) => url ?? '',
 }));
 
 import { CampaignDetailPage } from './CampaignDetailPage';

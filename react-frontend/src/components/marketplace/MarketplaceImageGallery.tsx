@@ -14,6 +14,7 @@
 import { useState, useRef, useCallback } from 'react';import Image from 'lucide-react/icons/image';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 
 interface GalleryImage {
   id: number;
@@ -75,7 +76,7 @@ export function MarketplaceImageGallery({ images }: MarketplaceImageGalleryProps
       {/* Desktop: single primary image */}
       <div className="hidden sm:block relative">
         <img
-          src={activeImage.url}
+          src={resolveThumbnailUrl(activeImage.thumbnail_url || activeImage.url, { width: 1200, height: 675 })}
           alt={activeImage.alt_text || t('gallery.image_alt')}
           className="w-full aspect-video object-cover rounded-lg"
         />
@@ -100,7 +101,7 @@ export function MarketplaceImageGallery({ images }: MarketplaceImageGalleryProps
           >
             <div className="relative">
               <img
-                src={image.url}
+                src={resolveThumbnailUrl(image.thumbnail_url || image.url, { width: 960, height: 540 })}
                 alt={image.alt_text || t('gallery.image_alt')}
                 className="w-full aspect-video object-cover rounded-lg"
               />
@@ -133,7 +134,7 @@ export function MarketplaceImageGallery({ images }: MarketplaceImageGalleryProps
               aria-current={index === activeIndex ? 'true' : undefined}
             >
               <img
-                src={image.thumbnail_url || image.url}
+                src={resolveThumbnailUrl(image.thumbnail_url || image.url, { width: 160, height: 160 })}
                 alt={t('gallery.thumbnail_alt', { number: index + 1 })}
                 className="w-full h-full object-cover"
                 loading="lazy"

@@ -1,9 +1,9 @@
-import { CardBody, Card, ImagePlaceholder, Button, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { CardBody, Card, ImagePlaceholder, Button, Chip } from '@/components/ui';
 /**
  * MarketplaceListingCard - Grid card for marketplace listing display
  *
@@ -18,6 +18,7 @@ import Megaphone from 'lucide-react/icons/megaphone';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import { PriceBadge } from './PriceBadge';
 import { ConditionBadge } from './ConditionBadge';
 import type { MarketplaceListingItem } from '@/types/marketplace';
@@ -45,7 +46,10 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
     [isSaved, listing.id, onSave, onUnsave],
   );
 
-  const imageUrl = listing.image?.thumbnail_url || listing.image?.url;
+  const sourceImageUrl = listing.image?.thumbnail_url || listing.image?.url;
+  const imageUrl = sourceImageUrl
+    ? resolveThumbnailUrl(sourceImageUrl, { width: 640, height: 360 })
+    : null;
 
   return (
     <Card
@@ -63,6 +67,8 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
               alt={listing.image?.alt_text || listing.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
+              decoding="async"
+              fetchPriority="low"
             />
           ) : (
             <ImagePlaceholder className="w-full h-full" />

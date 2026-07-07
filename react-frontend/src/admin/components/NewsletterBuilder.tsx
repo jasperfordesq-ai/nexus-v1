@@ -31,13 +31,15 @@
  *  - grapesjs-mjml@1.0.8 supports grapesjs ^0.21.x ONLY. Keep grapesjs pinned.
  *  - The canvas MUST be seeded with an <mjml><mj-body> document or there is no
  *    valid mj-body to drop blocks into.
- *  - GrapesJS UI CSS is imported once in src/main.tsx (with our theme overrides
- *    right after), not here, so the cascade order is deterministic.
+ *  - GrapesJS UI CSS is imported in this lazy builder chunk so the public app
+ *    shell does not download editor chrome.
  *
  * GrapesJS is imperative; it's mounted once in a useEffect, guarded against
  * React StrictMode's mount→cleanup→remount by gating on the editor INSTANCE ref.
  */
 
+import 'grapesjs/dist/css/grapes.min.css';
+import '@/styles/newsletter-builder.css';
 import { useEffect, useRef, useState } from 'react';
 import grapesjs, { type Editor } from 'grapesjs';
 import mjmlPlugin from 'grapesjs-mjml';

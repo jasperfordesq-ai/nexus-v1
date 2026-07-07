@@ -1,4 +1,3 @@
-import { Select, SelectItem, Accordion, AccordionItem, Button, NumberField, Label, CheckboxGroup, Checkbox, RadioGroup, Radio } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,6 +13,7 @@ import { useState, useCallback } from 'react';
 
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import { useTranslation } from 'react-i18next';
+import { Select, SelectItem, Accordion, AccordionItem, Button, NumberField, Label, CheckboxGroup, Checkbox, RadioGroup, Radio } from '@/components/ui';
 import type { MarketplaceFilters,
   MarketplaceCategory } from '@/types/marketplace';
 
@@ -77,6 +77,7 @@ export function MarketplaceFacetedSearch({
       <div>
         <Select
           label={t('filters.category')}
+          aria-label={t('filters.category')}
           variant="secondary"
           size="sm"
           selectedKeys={localFilters.category_id != null ? [String(localFilters.category_id)] : []}
@@ -105,11 +106,12 @@ export function MarketplaceFacetedSearch({
             minValue={0}
             value={localFilters.price_min ?? undefined}
             onChange={(v) => updateFilter('price_min', v)}
+            aria-label={t('filters.min')}
           >
             <Label>{t('filters.min')}</Label>
             <NumberField.Group>
               <NumberField.DecrementButton />
-              <NumberField.Input className="w-full" />
+              <NumberField.Input className="w-full" aria-label={t('filters.min')} />
               <NumberField.IncrementButton />
             </NumberField.Group>
           </NumberField>
@@ -119,11 +121,12 @@ export function MarketplaceFacetedSearch({
             minValue={0}
             value={localFilters.price_max ?? undefined}
             onChange={(v) => updateFilter('price_max', v)}
+            aria-label={t('filters.max')}
           >
             <Label>{t('filters.max')}</Label>
             <NumberField.Group>
               <NumberField.DecrementButton />
-              <NumberField.Input className="w-full" />
+              <NumberField.Input className="w-full" aria-label={t('filters.max')} />
               <NumberField.IncrementButton />
             </NumberField.Group>
           </NumberField>
@@ -183,6 +186,7 @@ export function MarketplaceFacetedSearch({
       <div>
         <Select
           label={t('filters.sort')}
+          aria-label={t('filters.sort')}
           variant="secondary"
           size="sm"
           selectedKeys={localFilters.sort ? [localFilters.sort] : ['newest']}
@@ -203,6 +207,7 @@ export function MarketplaceFacetedSearch({
       <div>
         <Select
           label={t('filters.posted_within')}
+          aria-label={t('filters.posted_within')}
           variant="secondary"
           size="sm"
           selectedKeys={

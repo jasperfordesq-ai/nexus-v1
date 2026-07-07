@@ -13,6 +13,24 @@ module.exports = {
         'http://localhost/index.html',
       ],
       numberOfRuns: 1,
+      settings: {
+        budgets: [
+          {
+            path: '/*',
+            resourceCounts: [
+              { resourceType: 'script', budget: 35 },
+              { resourceType: 'stylesheet', budget: 8 },
+              { resourceType: 'image', budget: 25 },
+            ],
+            resourceSizes: [
+              { resourceType: 'script', budget: 700 },
+              { resourceType: 'stylesheet', budget: 120 },
+              { resourceType: 'image', budget: 800 },
+              { resourceType: 'total', budget: 1800 },
+            ],
+          },
+        ],
+      },
     },
     assert: {
       // No preset — presets include hidden error-level individual audit
