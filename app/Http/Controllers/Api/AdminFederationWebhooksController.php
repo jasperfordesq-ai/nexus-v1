@@ -48,7 +48,7 @@ class AdminFederationWebhooksController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
 
         try {
@@ -76,7 +76,7 @@ class AdminFederationWebhooksController extends BaseApiController
      */
     public function store(): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
         $input = $this->getAllInput();
 
@@ -137,7 +137,7 @@ class AdminFederationWebhooksController extends BaseApiController
      */
     public function update(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
         $input = $this->getAllInput();
 
@@ -222,7 +222,7 @@ class AdminFederationWebhooksController extends BaseApiController
      */
     public function destroy(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
 
         $webhook = DB::table('federation_webhooks')
@@ -259,7 +259,7 @@ class AdminFederationWebhooksController extends BaseApiController
      */
     public function test(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
 
         $webhook = DB::table('federation_webhooks')
@@ -376,7 +376,7 @@ class AdminFederationWebhooksController extends BaseApiController
      */
     public function logs(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
 
         // Verify webhook exists and belongs to tenant
@@ -419,7 +419,7 @@ class AdminFederationWebhooksController extends BaseApiController
      */
     public function retry(int $logId): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
 
         // Get the log entry

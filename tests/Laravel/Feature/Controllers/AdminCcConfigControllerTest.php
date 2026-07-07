@@ -44,6 +44,15 @@ class AdminCcConfigControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_show_rejects_standard_admin(): void
+    {
+        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create());
+
+        $response = $this->apiGet('/v2/admin/federation/cc-config');
+
+        $response->assertStatus(403);
+    }
+
     public function test_update_requires_auth(): void
     {
         $response = $this->apiPut('/v2/admin/federation/cc-config', ['node_slug' => 'test-node']);
@@ -60,13 +69,22 @@ class AdminCcConfigControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
+    public function test_update_rejects_standard_admin(): void
+    {
+        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create());
+
+        $response = $this->apiPut('/v2/admin/federation/cc-config', ['node_slug' => 'test-node']);
+
+        $response->assertStatus(403);
+    }
+
     // ------------------------------------------------------------------
     //  Validation — node_slug / exchange_rate / validated_window
     // ------------------------------------------------------------------
 
     public function test_update_rejects_invalid_node_slug(): void
     {
-        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create());
+        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create(['is_tenant_super_admin' => true]));
 
         $response = $this->apiPut('/v2/admin/federation/cc-config', [
             'node_slug' => 'INVALID UPPER!',
@@ -77,7 +95,7 @@ class AdminCcConfigControllerTest extends TestCase
 
     public function test_update_rejects_exchange_rate_out_of_range(): void
     {
-        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create());
+        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create(['is_tenant_super_admin' => true]));
 
         $response = $this->apiPut('/v2/admin/federation/cc-config', [
             'exchange_rate' => 0,
@@ -88,7 +106,7 @@ class AdminCcConfigControllerTest extends TestCase
 
     public function test_update_rejects_invalid_validated_window(): void
     {
-        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create());
+        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create(['is_tenant_super_admin' => true]));
 
         $response = $this->apiPut('/v2/admin/federation/cc-config', [
             'validated_window' => 5, // below 30-second minimum

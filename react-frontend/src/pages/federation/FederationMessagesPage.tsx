@@ -442,6 +442,10 @@ export function FederationMessagesPage() {
 
       if (unreadIds.length === 0) return;
 
+      const previousMessages = thread.messages
+        .filter((m) => unreadIds.includes(m.id))
+        .map((m) => ({ id: m.id, status: m.status, read_at: m.read_at }));
+
       // Optimistically mark as read in local state
       setAllMessages((prev) =>
         prev.map((msg) =>
@@ -453,9 +457,15 @@ export function FederationMessagesPage() {
       try {
         const response = await api.post('/v2/federation/messages/mark-read-batch', { ids: unreadIds });
         if (!response.success) {
-          throw new Error(response.error || 'Mark-read failed');
+          throw new Error(response.error || 'mark-read failed');
         }
       } catch (err) {
+        setAllMessages((prev) =>
+          prev.map((msg) => {
+            const previous = previousMessages.find((item) => item.id === msg.id);
+            return previous ? { ...msg, status: previous.status, read_at: previous.read_at } : msg;
+          })
+        );
         logError('Failed to batch mark federated messages as read', err);
       }
     },

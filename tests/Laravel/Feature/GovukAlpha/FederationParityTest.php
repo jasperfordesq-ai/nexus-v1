@@ -65,8 +65,10 @@ class FederationParityTest extends TestCase
      * federation gate resolve truthy, and whitelist the tenant. Self-contained
      * (does not depend on the federation integration harness).
      */
-    private function enableFederationForTenant(): void
+    private function enableFederationForTenant(?int $tenantId = null): void
     {
+        $tenantId ??= $this->testTenantId;
+
         DB::table('federation_system_control')->updateOrInsert(
             ['id' => 1],
             [
@@ -84,23 +86,23 @@ class FederationParityTest extends TestCase
         );
 
         DB::table('federation_tenant_whitelist')->updateOrInsert(
-            ['tenant_id' => $this->testTenantId],
+            ['tenant_id' => $tenantId],
             ['approved_at' => now(), 'approved_by' => 1]
         );
 
         foreach (['tenant_federation_enabled', 'federation'] as $feature) {
             DB::table('federation_tenant_features')->updateOrInsert(
-                ['tenant_id' => $this->testTenantId, 'feature_key' => $feature],
+                ['tenant_id' => $tenantId, 'feature_key' => $feature],
                 ['is_enabled' => 1, 'updated_at' => now()]
             );
         }
 
         try {
-            $tenant = DB::table('tenants')->where('id', $this->testTenantId)->first();
+            $tenant = DB::table('tenants')->where('id', $tenantId)->first();
             if ($tenant) {
                 $features = json_decode($tenant->features ?? '{}', true) ?: [];
                 $features['federation'] = true;
-                DB::table('tenants')->where('id', $this->testTenantId)->update([
+                DB::table('tenants')->where('id', $tenantId)->update([
                     'features'   => json_encode($features),
                     'updated_at' => now(),
                 ]);
@@ -110,12 +112,71 @@ class FederationParityTest extends TestCase
         }
 
         try {
-            app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
+            app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($tenantId);
         } catch (\Throwable $e) {
             // Optional cache clear.
         }
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
+    }
+
+    private function seedPartnerTenant(string $name = 'Accessible Partner'): int
+    {
+        return (int) DB::table('tenants')->insertGetId([
+            'name' => $name,
+            'slug' => strtolower(str_replace(' ', '-', $name)) . '-' . substr(uniqid(), -6),
+            'is_active' => 1,
+            'features' => json_encode(['federation' => true]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function seedPartnership(int $partnerTenantId, array $overrides = []): int
+    {
+        $data = array_merge([
+            'tenant_id' => $this->testTenantId,
+            'partner_tenant_id' => $partnerTenantId,
+            'status' => 'active',
+            'federation_level' => 4,
+            'profiles_enabled' => 1,
+            'messaging_enabled' => 1,
+            'transactions_enabled' => 1,
+            'listings_enabled' => 1,
+            'events_enabled' => 1,
+            'groups_enabled' => 1,
+            'requested_at' => now(),
+            'approved_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ], $overrides);
+
+        if (DB::getSchemaBuilder()->hasColumn('federation_partnerships', 'canonical_pair')) {
+            $data['canonical_pair'] = min($this->testTenantId, $partnerTenantId) . '-' . max($this->testTenantId, $partnerTenantId);
+        }
+
+        return (int) DB::table('federation_partnerships')->insertGetId($data);
+    }
+
+    private function setFederationSettings(int $userId, array $overrides = []): void
+    {
+        DB::table('federation_user_settings')->updateOrInsert(
+            ['user_id' => $userId],
+            array_merge([
+                'federation_optin' => 1,
+                'profile_visible_federated' => 1,
+                'appear_in_federated_search' => 1,
+                'show_skills_federated' => 1,
+                'show_location_federated' => 0,
+                'show_reviews_federated' => 1,
+                'messaging_enabled_federated' => 1,
+                'transactions_enabled_federated' => 1,
+                'email_notifications' => 1,
+                'service_reach' => 'remote_ok',
+                'travel_radius_km' => 25,
+                'updated_at' => now(),
+            ], $overrides)
+        );
     }
 
     public function test_federation_onboarding_redirects_anonymous_to_login(): void
@@ -308,5 +369,132 @@ class FederationParityTest extends TestCase
         $response = $this->get("/{$this->testTenantSlug}/alpha/federation/onboarding");
 
         $response->assertForbidden();
+    }
+
+    public function test_accessible_hub_counts_received_federated_transactions(): void
+    {
+        $this->enableFederationForTenant();
+        $partnerTenantId = $this->seedPartnerTenant('Accessible Transaction Partner');
+        $this->enableFederationForTenant($partnerTenantId);
+        $this->seedPartnership($partnerTenantId);
+
+        $viewer = $this->authenticatedUser(['name' => 'Receiving Member']);
+        $partner = User::factory()->forTenant($partnerTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $this->setFederationSettings($viewer->id);
+        $this->setFederationSettings($partner->id);
+
+        DB::table('transactions')->insert([
+            [
+                'tenant_id' => $this->testTenantId,
+                'sender_id' => $viewer->id,
+                'receiver_id' => $partner->id,
+                'amount' => 1,
+                'description' => 'Sent transfer',
+                'status' => 'completed',
+                'is_federated' => 1,
+                'sender_tenant_id' => $this->testTenantId,
+                'receiver_tenant_id' => $partnerTenantId,
+                'created_at' => now(),
+            ],
+            [
+                'tenant_id' => $partnerTenantId,
+                'sender_id' => $partner->id,
+                'receiver_id' => $viewer->id,
+                'amount' => 2,
+                'description' => 'Received transfer',
+                'status' => 'completed',
+                'is_federated' => 1,
+                'sender_tenant_id' => $partnerTenantId,
+                'receiver_tenant_id' => $this->testTenantId,
+                'created_at' => now(),
+            ],
+        ]);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/federation");
+
+        $response->assertOk();
+        $response->assertSeeInOrder([
+            __('govuk_alpha.federation.hub.stat_transactions'),
+            '2',
+        ]);
+    }
+
+    public function test_accessible_federation_transfer_is_idempotent_and_stores_raw_description(): void
+    {
+        $this->enableFederationForTenant();
+        $partnerTenantId = $this->seedPartnerTenant('Accessible Transfer Partner');
+        $this->enableFederationForTenant($partnerTenantId);
+        $this->seedPartnership($partnerTenantId);
+
+        $sender = $this->authenticatedUser(['name' => 'Transfer Sender']);
+        $receiver = User::factory()->forTenant($partnerTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        DB::table('users')->where('id', $sender->id)->update(['balance' => 10]);
+        DB::table('users')->where('id', $receiver->id)->update(['balance' => 0]);
+        $this->setFederationSettings($sender->id);
+        $this->setFederationSettings($receiver->id);
+
+        $csrfToken = 'transfer-csrf-token';
+        $payload = [
+            '_token' => $csrfToken,
+            'receiver_tenant_id' => $partnerTenantId,
+            'amount' => '3',
+            'description' => 'Thanks & support <3',
+            'idempotency_key' => 'alpha-transfer-dup-1',
+        ];
+
+        $this->withSession(['_token' => $csrfToken])
+            ->post("/{$this->testTenantSlug}/alpha/federation/members/{$receiver->id}/transfer", $payload)
+            ->assertRedirect();
+
+        $this->withSession(['_token' => $csrfToken])
+            ->post("/{$this->testTenantSlug}/alpha/federation/members/{$receiver->id}/transfer", $payload)
+            ->assertRedirect();
+
+        $rows = DB::table('transactions')
+            ->where('sender_id', $sender->id)
+            ->where('sender_tenant_id', $this->testTenantId)
+            ->where('receiver_id', $receiver->id)
+            ->where('receiver_tenant_id', $partnerTenantId)
+            ->where('is_federated', 1)
+            ->get();
+
+        $this->assertCount(1, $rows);
+        $this->assertSame('Thanks & support <3', $rows[0]->description);
+        $this->assertSame('7.00', (string) DB::table('users')->where('id', $sender->id)->value('balance'));
+        $this->assertSame('3.00', (string) DB::table('users')->where('id', $receiver->id)->value('balance'));
+    }
+
+    public function test_accessible_federation_message_stores_raw_subject_and_body(): void
+    {
+        $this->enableFederationForTenant();
+        $partnerTenantId = $this->seedPartnerTenant('Accessible Message Partner');
+        $this->enableFederationForTenant($partnerTenantId);
+        $this->seedPartnership($partnerTenantId);
+
+        $sender = $this->authenticatedUser(['name' => 'Message Sender']);
+        $receiver = User::factory()->forTenant($partnerTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $this->setFederationSettings($sender->id);
+        $this->setFederationSettings($receiver->id);
+
+        $csrfToken = 'message-csrf-token';
+        $this->withSession(['_token' => $csrfToken])
+            ->post("/{$this->testTenantSlug}/alpha/federation/messages", [
+                '_token' => $csrfToken,
+                'receiver_id' => $receiver->id,
+                'receiver_tenant_id' => $partnerTenantId,
+                'subject' => 'Hello & welcome',
+                'body' => 'Use <b>bold</b> & plain text.',
+            ])
+            ->assertRedirect();
+
+        $message = DB::table('federation_messages')
+            ->where('sender_user_id', $sender->id)
+            ->where('receiver_user_id', $receiver->id)
+            ->where('direction', 'outbound')
+            ->first();
+
+        $this->assertNotNull($message);
+        $this->assertSame('Hello & welcome', $message->subject);
+        $this->assertSame('Use <b>bold</b> & plain text.', $message->body);
     }
 }

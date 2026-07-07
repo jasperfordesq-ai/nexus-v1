@@ -8,7 +8,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, cleanup } from '@/test/test-utils';
+import type { ReactNode } from 'react';
 
 // Mock API module
 const mockApiGet = vi.fn();
@@ -39,7 +40,7 @@ vi.mock('@/contexts', () => ({
     error: vi.fn(),
     info: vi.fn(),
   })),
-  ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  ToastProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
 
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
   useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
@@ -58,7 +59,7 @@ vi.mock('@/contexts/ToastContext', () => ({
     error: vi.fn(),
     info: vi.fn(),
   })),
-  ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  ToastProvider: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
@@ -69,7 +70,58 @@ vi.mock('@/lib/helpers', () => ({
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
-vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+type UiStubProps = {
+  children?: ReactNode;
+  className?: string;
+  role?: string;
+  href?: string;
+  to?: string;
+  name?: string;
+  src?: string;
+  startContent?: ReactNode;
+  onPress?: () => void;
+  onClick?: () => void;
+  isDisabled?: boolean;
+  disabled?: boolean;
+  'aria-label'?: string;
+};
+
+vi.mock('@/components/ui', () => ({
+  GlassCard: ({ children, className, role }: UiStubProps) => (
+    <div className={className} role={role}>
+      {children}
+    </div>
+  ),
+  Button: ({
+    children,
+    className,
+    startContent,
+    onPress,
+    onClick,
+    isDisabled,
+    disabled,
+    href,
+    to,
+  }: UiStubProps) => (
+    <button
+      className={className}
+      disabled={isDisabled || disabled}
+      type="button"
+      onClick={onPress ?? onClick}
+      data-href={href ?? to}
+    >
+      {startContent}
+      {children}
+    </button>
+  ),
+  Chip: ({ children, className }: UiStubProps) => <span className={className}>{children}</span>,
+  Spinner: ({ className, 'aria-label': ariaLabel }: UiStubProps) => (
+    <span className={className} role="status" aria-label={ariaLabel ?? 'loading'} />
+  ),
+  Avatar: ({ name, src, className }: UiStubProps) => (
+    <span className={className} data-src={src} aria-label={name} />
+  ),
+}));
 
 vi.mock('@/components/navigation', () => ({
   Breadcrumbs: ({ items }: { items: { label: string }[] }) => (
@@ -83,35 +135,41 @@ vi.mock('@/components/navigation', () => ({
 
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
 
-vi.mock('@/lib/motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport', 'custom']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,  };});
+vi.mock('@/lib/motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport', 'custom']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children as ReactNode}</div>,    },    AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,  };});
 
 import FederationHubPage from './FederationHubPage';
 
 describe('FederationHubPage', () => {
   beforeEach(() => {
+    cleanup();
     vi.clearAllMocks();
   });
 
   it('shows loading state initially', async () => {
-    // Use a controllable promise instead of never-resolving one (prevents Vitest hang on CI)
-    let resolveApi: (value: unknown) => void;
-    mockApiGet.mockReturnValue(new Promise((resolve) => { resolveApi = resolve; }));
+    mockApiGet.mockResolvedValue({
+      success: true,
+      data: { enabled: false, tenant_federation_enabled: false },
+    });
 
     render(<FederationHubPage />);
     expect(screen.getByText('Loading federation data...')).toBeInTheDocument();
-    // Clean up: resolve the promise so Vitest can exit cleanly
-    resolveApi!({ success: true, data: { enabled: false } });
+    await waitFor(() => {
+      expect(screen.queryByText('Loading federation data...')).not.toBeInTheDocument();
+    });
   });
 
   it('shows breadcrumbs', async () => {
-    let resolveApi: (value: unknown) => void;
-    mockApiGet.mockReturnValue(new Promise((resolve) => { resolveApi = resolve; }));
+    mockApiGet.mockResolvedValue({
+      success: true,
+      data: { enabled: false, tenant_federation_enabled: false },
+    });
 
     render(<FederationHubPage />);
     expect(screen.getByTestId('breadcrumbs')).toBeInTheDocument();
     expect(screen.getByText('Federation')).toBeInTheDocument();
-    // Clean up: resolve the promise so Vitest can exit cleanly
-    resolveApi!({ success: true, data: { enabled: false } });
+    await waitFor(() => {
+      expect(screen.queryByText('Loading federation data...')).not.toBeInTheDocument();
+    });
   });
 
   it('shows error state when API fails', async () => {

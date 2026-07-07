@@ -266,7 +266,7 @@ class FederationController extends BaseApiController
                     'description' => $item['description'] ?? ($item['preview'] ?? ''),
                     'created_at' => $item['timestamp'] ?? date('Y-m-d H:i:s'),
                     'actor' => [
-                        'name' => $item['subtitle'] ?? 'Federation Network',
+                        'name' => $item['subtitle'] ?? __('api.federation_network_name'),
                         'avatar' => null,
                         'tenant_name' => $item['subtitle'] ?? null,
                     ],

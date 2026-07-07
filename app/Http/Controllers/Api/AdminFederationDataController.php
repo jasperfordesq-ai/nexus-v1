@@ -72,7 +72,7 @@ class AdminFederationDataController extends BaseApiController
      */
     public function export(Request $request): StreamedResponse|JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = TenantContext::getId();
         $userId = $this->getUserId();
 
@@ -147,7 +147,7 @@ class AdminFederationDataController extends BaseApiController
      */
     public function import(Request $request): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = TenantContext::getId();
         $userId = $this->getUserId();
 
@@ -340,7 +340,7 @@ class AdminFederationDataController extends BaseApiController
      */
     public function purge(Request $request): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = TenantContext::getId();
         $userId = $this->getUserId();
 

@@ -29,9 +29,15 @@ class AdminFederationExternalPartnersControllerTest extends TestCase
         $this->apiGet('/v2/admin/federation/external-partners')->assertStatus(403);
     }
 
-    public function test_index_allows_admin(): void
+    public function test_index_rejects_standard_admin(): void
     {
         Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create());
+        $this->apiGet('/v2/admin/federation/external-partners')->assertStatus(403);
+    }
+
+    public function test_index_allows_super_admin(): void
+    {
+        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create(['is_tenant_super_admin' => true]));
         $response = $this->apiGet('/v2/admin/federation/external-partners');
         $this->assertLessThan(500, $response->status());
     }

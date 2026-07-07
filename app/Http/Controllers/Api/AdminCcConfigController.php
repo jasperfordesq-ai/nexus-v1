@@ -29,7 +29,7 @@ class AdminCcConfigController extends BaseApiController
      */
     public function show(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
 
         $config = CreditCommonsNodeService::getNodeConfig($tenantId);
@@ -78,7 +78,7 @@ class AdminCcConfigController extends BaseApiController
      */
     public function update(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
         $input = $this->getAllInput();
 
@@ -86,7 +86,7 @@ class AdminCcConfigController extends BaseApiController
         if (isset($input['node_slug'])) {
             if (!preg_match('/^[0-9a-z-]{3,15}$/', $input['node_slug'])) {
                 return $this->respondWithError('VALIDATION_ERROR',
-                    'Node slug must be 3-15 characters, lowercase letters, numbers, and hyphens only',
+                    __('api.cc_node_slug_invalid'),
                     'node_slug', 422);
             }
         }
@@ -96,7 +96,7 @@ class AdminCcConfigController extends BaseApiController
             $rate = (float) $input['exchange_rate'];
             if ($rate <= 0 || $rate > 1000) {
                 return $this->respondWithError('VALIDATION_ERROR',
-                    'Exchange rate must be between 0.01 and 1000', 'exchange_rate', 422);
+                    __('api.cc_exchange_rate_range'), 'exchange_rate', 422);
             }
         }
 
@@ -105,13 +105,13 @@ class AdminCcConfigController extends BaseApiController
             $window = (int) $input['validated_window'];
             if ($window < 30 || $window > 86400) {
                 return $this->respondWithError('VALIDATION_ERROR',
-                    'Validation window must be between 30 and 86400 seconds', 'validated_window', 422);
+                    __('api.cc_validated_window_range'), 'validated_window', 422);
             }
         }
 
         if (!empty($input['parent_node_url']) && !OutboundUrlGuard::isSafeHttpUrl((string) $input['parent_node_url'])) {
             return $this->respondWithError('VALIDATION_ERROR',
-                'Parent node URL must resolve to a public HTTP or HTTPS endpoint', 'parent_node_url', 422);
+                __('api.cc_parent_node_url_public'), 'parent_node_url', 422);
         }
 
         // Ensure config exists

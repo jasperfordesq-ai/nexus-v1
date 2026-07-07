@@ -7181,8 +7181,13 @@ class AlphaController extends Controller
                  WHERE u.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
                    AND u.status = 'active') as partner_member_count,
                 (SELECT COUNT(*) FROM listings li
+                 JOIN federation_user_settings fusl ON fusl.user_id = li.user_id
                  WHERE li.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
-                   AND li.status = 'active') as partner_listing_count
+                   AND li.status = 'active'
+                   AND li.federated_visibility IN ('listed', 'bookable')
+                   AND fusl.federation_optin = 1
+                   AND fusl.profile_visible_federated = 1
+                   AND fusl.appear_in_federated_search = 1) as partner_listing_count
             FROM federation_partnerships fp
             LEFT JOIN tenants t1 ON fp.tenant_id = t1.id
             LEFT JOIN tenants t2 ON fp.partner_tenant_id = t2.id
@@ -7312,8 +7317,12 @@ class AlphaController extends Controller
             try {
                 $row = DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM transactions
-                     WHERE is_federated = 1 AND (sender_id = ? OR receiver_id = ?) AND tenant_id = ?",
-                    [$userId, $userId, $tenantId]
+                     WHERE is_federated = 1
+                       AND (
+                        (sender_id = ? AND sender_tenant_id = ?)
+                        OR (receiver_id = ? AND receiver_tenant_id = ?)
+                       )",
+                    [$userId, $tenantId, $userId, $tenantId]
                 );
                 $transactionsCount = (int) ($row->cnt ?? 0);
             } catch (\Throwable $e) {
@@ -7419,8 +7428,13 @@ class AlphaController extends Controller
                              WHERE u.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
                                AND u.status = 'active') as partner_member_count,
                             (SELECT COUNT(*) FROM listings li
+                             JOIN federation_user_settings fusl ON fusl.user_id = li.user_id
                              WHERE li.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
-                               AND li.status = 'active') as partner_listing_count
+                               AND li.status = 'active'
+                               AND li.federated_visibility IN ('listed', 'bookable')
+                               AND fusl.federation_optin = 1
+                               AND fusl.profile_visible_federated = 1
+                               AND fusl.appear_in_federated_search = 1) as partner_listing_count
                         FROM federation_partnerships fp
                         LEFT JOIN tenants t1 ON fp.tenant_id = t1.id
                         LEFT JOIN tenants t2 ON fp.partner_tenant_id = t2.id
@@ -12886,9 +12900,7 @@ class AlphaController extends Controller
             return $backToMember('message-failed');
         }
 
-        // Sanitise (stored-XSS safe; the blade renders these escaped).
-        $subject = htmlspecialchars($subject, ENT_QUOTES, 'UTF-8');
-        $bodyClean = htmlspecialchars($body, ENT_QUOTES, 'UTF-8');
+        $bodyClean = $body;
 
         try {
             // Receiver must exist, be opted in, and accept federated messages.
@@ -13133,8 +13145,6 @@ class AlphaController extends Controller
         if (mb_strlen($description) > 500) {
             return $backToTransfer('transfer-description-too-long');
         }
-        $description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
-
         // Re-resolve the recipient under the SAME gate as the form (do not trust
         // the posted member id — verify it is a real, transferable, cross-tenant
         // partner member right now).
@@ -13157,6 +13167,39 @@ class AlphaController extends Controller
             return $backToTransfer('transfer-recipient-unavailable');
         }
 
+        $explicitKey = trim(self::asStr($request->input('idempotency_key')));
+        $hasExplicitKey = $explicitKey !== '';
+        $fingerprint = $hasExplicitKey
+            ? sha1('key:' . $explicitKey)
+            : sha1('content:' . $receiverId . '|' . $receiverTenantId . '|' . $amount . '|' . $description);
+        $idemCacheKey = "fedtx:idem:{$tenantId}:{$userId}:{$fingerprint}";
+        $idemTtl = $hasExplicitKey ? 86400 : 120;
+
+        try {
+            $claimed = \Illuminate\Support\Facades\Cache::add($idemCacheKey, ['status' => 'pending'], $idemTtl);
+        } catch (\Throwable $cacheEx) {
+            $claimed = true;
+            $idemCacheKey = null;
+        }
+        if (!$claimed) {
+            $prior = null;
+            try {
+                $prior = \Illuminate\Support\Facades\Cache::get($idemCacheKey);
+            } catch (\Throwable $cacheEx) {
+                $prior = null;
+            }
+            if (is_array($prior) && isset($prior['transaction_id'])) {
+                return redirect()->route('govuk-alpha.federation.members.show', [
+                    'tenantSlug' => $tenantSlug,
+                    'id' => $receiverId,
+                    'tenant_id' => $receiverTenantId,
+                    'status' => 'transfer-sent',
+                ]);
+            }
+
+            return $backToTransfer('transfer-failed');
+        }
+
         $txId = null;
         try {
             DB::beginTransaction();
@@ -13170,6 +13213,9 @@ class AlphaController extends Controller
             );
             if ($deducted === 0) {
                 DB::rollBack();
+                if ($idemCacheKey !== null) {
+                    try { \Illuminate\Support\Facades\Cache::forget($idemCacheKey); } catch (\Throwable $cacheEx) {}
+                }
                 return $backToTransfer('transfer-insufficient');
             }
 
@@ -13186,8 +13232,23 @@ class AlphaController extends Controller
             $txId = (int) DB::getPdo()->lastInsertId();
 
             DB::commit();
+
+            if ($idemCacheKey !== null) {
+                try {
+                    \Illuminate\Support\Facades\Cache::put(
+                        $idemCacheKey,
+                        ['transaction_id' => $txId, 'status' => 'completed', 'amount' => $amount],
+                        $idemTtl
+                    );
+                } catch (\Throwable $cacheEx) {
+                    // Best-effort only.
+                }
+            }
         } catch (\Throwable $e) {
             DB::rollBack();
+            if ($idemCacheKey !== null) {
+                try { \Illuminate\Support\Facades\Cache::forget($idemCacheKey); } catch (\Throwable $cacheEx) {}
+            }
             report($e);
             return $backToTransfer('transfer-failed');
         }
@@ -15135,6 +15196,7 @@ class AlphaController extends Controller
                         g.visibility, t.name as tenant_name
                     FROM groups g
                     JOIN tenants t ON t.id = g.tenant_id
+                    JOIN federation_user_settings fus_owner ON fus_owner.user_id = g.owner_id
                     JOIN federation_partnerships fp ON (
                         (fp.tenant_id = :tid1 AND fp.partner_tenant_id = g.tenant_id)
                         OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = g.tenant_id)
@@ -15142,6 +15204,9 @@ class AlphaController extends Controller
                     WHERE fp.status = 'active' AND fp.groups_enabled = 1
                     AND g.tenant_id != :tid3
                     AND g.status = 'active'
+                    AND fus_owner.federation_optin = 1
+                    AND fus_owner.profile_visible_federated = 1
+                    AND fus_owner.appear_in_federated_search = 1
                     AND (g.federated_visibility IN ('listed', 'joinable') OR g.allow_federated_members = 1)
                 ";
                 $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];

@@ -47,9 +47,10 @@ class FederationActivityService
                  LEFT JOIN tenants tt ON tt.id = fal.target_tenant_id
                  WHERE (fal.source_tenant_id = ? OR fal.target_tenant_id = ?)
                    AND fal.level IN ('info', 'warning')
+                   " . self::userActivityFilterSql() . "
                  ORDER BY fal.created_at DESC
                  LIMIT ? OFFSET ?",
-                [$tenantId, $tenantId, $limit, $offset]
+                array_merge([$tenantId, $tenantId], self::userActivityFilterParams($userId), [$limit, $offset])
             );
 
             return array_map(function ($row) use ($tenantId) {
@@ -62,7 +63,7 @@ class FederationActivityService
                 // Use pre-fetched tenant name from JOIN (no per-row query)
                 $partnerTenantId = $isIncoming ? $row->source_tenant_id : $row->target_tenant_id;
                 $partnerTenantName = $isIncoming ? $row->source_tenant_name : $row->target_tenant_name;
-                $subtitle = $partnerTenantName ?? $row->actor_name ?? 'Federation Network';
+                $subtitle = $partnerTenantName ?? $row->actor_name ?? __('api.federation_network_name');
 
                 return [
                     'id' => (int) $row->id,
@@ -97,14 +98,15 @@ class FederationActivityService
         try {
             $lastReadAt = Cache::get("federation_activity_read:{$userId}");
 
-            $sql = "SELECT COUNT(*) as cnt FROM federation_audit_log
-                 WHERE (source_tenant_id = ? OR target_tenant_id = ?)
-                   AND level IN ('info', 'warning')
-                   AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
-            $params = [$tenantId, $tenantId];
+            $sql = "SELECT COUNT(*) as cnt FROM federation_audit_log fal
+                 WHERE (fal.source_tenant_id = ? OR fal.target_tenant_id = ?)
+                   AND fal.level IN ('info', 'warning')
+                   AND fal.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
+                   . self::userActivityFilterSql();
+            $params = array_merge([$tenantId, $tenantId], self::userActivityFilterParams($userId));
 
             if ($lastReadAt) {
-                $sql .= " AND created_at > ?";
+                $sql .= " AND fal.created_at > ?";
                 $params[] = $lastReadAt;
             }
 
@@ -126,6 +128,27 @@ class FederationActivityService
         Cache::put("federation_activity_read:{$userId}", now()->toDateTimeString(), 60 * 60 * 24 * 30);
     }
 
+    private static function userActivityFilterSql(): string
+    {
+        return " AND (
+            fal.actor_user_id = ?
+            OR JSON_UNQUOTE(JSON_EXTRACT(fal.data, '$.user_id')) = ?
+            OR JSON_UNQUOTE(JSON_EXTRACT(fal.data, '$.sender_id')) = ?
+            OR JSON_UNQUOTE(JSON_EXTRACT(fal.data, '$.receiver_id')) = ?
+            OR JSON_UNQUOTE(JSON_EXTRACT(fal.data, '$.sender_user_id')) = ?
+            OR JSON_UNQUOTE(JSON_EXTRACT(fal.data, '$.receiver_user_id')) = ?
+        )";
+    }
+
+    /**
+     * @return list<int|string>
+     */
+    private static function userActivityFilterParams(int $userId): array
+    {
+        $id = (string) $userId;
+        return [$userId, $id, $id, $id, $id, $id];
+    }
+
     /**
      * Get activity statistics summary for a user.
      */
@@ -142,32 +165,37 @@ class FederationActivityService
             ];
 
             $total = DB::selectOne(
-                "SELECT COUNT(*) as cnt FROM federation_audit_log WHERE source_tenant_id = ? OR target_tenant_id = ?",
-                [$tenantId, $tenantId]
+                "SELECT COUNT(*) as cnt FROM federation_audit_log fal
+                 WHERE (fal.source_tenant_id = ? OR fal.target_tenant_id = ?)"
+                 . self::userActivityFilterSql(),
+                array_merge([$tenantId, $tenantId], self::userActivityFilterParams($userId))
             );
             $stats['total_activities'] = (int) ($total->cnt ?? 0);
 
             $thisWeek = DB::selectOne(
-                "SELECT COUNT(*) as cnt FROM federation_audit_log
-                 WHERE (source_tenant_id = ? OR target_tenant_id = ?)
-                   AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)",
-                [$tenantId, $tenantId]
+                "SELECT COUNT(*) as cnt FROM federation_audit_log fal
+                 WHERE (fal.source_tenant_id = ? OR fal.target_tenant_id = ?)
+                   AND fal.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)"
+                   . self::userActivityFilterSql(),
+                array_merge([$tenantId, $tenantId], self::userActivityFilterParams($userId))
             );
             $stats['activities_this_week'] = (int) ($thisWeek->cnt ?? 0);
 
             $thisMonth = DB::selectOne(
-                "SELECT COUNT(*) as cnt FROM federation_audit_log
-                 WHERE (source_tenant_id = ? OR target_tenant_id = ?)
-                   AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)",
-                [$tenantId, $tenantId]
+                "SELECT COUNT(*) as cnt FROM federation_audit_log fal
+                 WHERE (fal.source_tenant_id = ? OR fal.target_tenant_id = ?)
+                   AND fal.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)"
+                   . self::userActivityFilterSql(),
+                array_merge([$tenantId, $tenantId], self::userActivityFilterParams($userId))
             );
             $stats['activities_this_month'] = (int) ($thisMonth->cnt ?? 0);
 
             $categories = DB::select(
-                "SELECT category, COUNT(*) as cnt FROM federation_audit_log
-                 WHERE source_tenant_id = ? OR target_tenant_id = ?
-                 GROUP BY category ORDER BY cnt DESC",
-                [$tenantId, $tenantId]
+                "SELECT fal.category, COUNT(*) as cnt FROM federation_audit_log fal
+                 WHERE (fal.source_tenant_id = ? OR fal.target_tenant_id = ?)"
+                 . self::userActivityFilterSql() . "
+                 GROUP BY fal.category ORDER BY cnt DESC",
+                array_merge([$tenantId, $tenantId], self::userActivityFilterParams($userId))
             );
             foreach ($categories as $cat) {
                 $stats['by_category'][$cat->category] = (int) $cat->cnt;

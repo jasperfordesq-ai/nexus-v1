@@ -209,7 +209,7 @@ class FederationV2Controller extends BaseApiController
             'profile_visible_federated' => true,
             'appear_in_federated_search' => true,
             'show_skills_federated' => true,
-            'show_location_federated' => true,
+            'show_location_federated' => false,
             'show_reviews_federated' => true,
             'messaging_enabled_federated' => true,
             'transactions_enabled_federated' => true,
@@ -312,8 +312,13 @@ class FederationV2Controller extends BaseApiController
                      WHERE u.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
                        AND u.status = 'active') as partner_member_count,
                     (SELECT COUNT(*) FROM listings li
+                     JOIN federation_user_settings fusl ON fusl.user_id = li.user_id
                      WHERE li.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
-                       AND li.status = 'active') as partner_listing_count
+                       AND li.status = 'active'
+                       AND li.federated_visibility IN ('listed', 'bookable')
+                       AND fusl.federation_optin = 1
+                       AND fusl.profile_visible_federated = 1
+                       AND fusl.appear_in_federated_search = 1) as partner_listing_count
                 FROM federation_partnerships fp
                 LEFT JOIN tenants t1 ON fp.tenant_id = t1.id
                 LEFT JOIN tenants t2 ON fp.partner_tenant_id = t2.id
@@ -460,8 +465,13 @@ class FederationV2Controller extends BaseApiController
                      WHERE u.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
                        AND u.status = 'active') as partner_member_count,
                     (SELECT COUNT(*) FROM listings li
+                     JOIN federation_user_settings fusl ON fusl.user_id = li.user_id
                      WHERE li.tenant_id = CASE WHEN fp.tenant_id = ? THEN fp.partner_tenant_id ELSE fp.tenant_id END
-                       AND li.status = 'active') as partner_listing_count
+                       AND li.status = 'active'
+                       AND li.federated_visibility IN ('listed', 'bookable')
+                       AND fusl.federation_optin = 1
+                       AND fusl.profile_visible_federated = 1
+                       AND fusl.appear_in_federated_search = 1) as partner_listing_count
                 FROM federation_partnerships fp
                 LEFT JOIN tenants t1 ON fp.tenant_id = t1.id
                 LEFT JOIN tenants t2 ON fp.partner_tenant_id = t2.id
@@ -514,6 +524,17 @@ class FederationV2Controller extends BaseApiController
     public function activity(): JsonResponse
     {
         $userId = $this->getUserId();
+        $tenantId = $this->getTenantId();
+
+        $tenantEnabled = $this->federationFeatureService->isGloballyEnabled()
+            && $this->federationFeatureService->isTenantFederationEnabled($tenantId);
+        if (!$tenantEnabled) {
+            return $this->respondWithError('FEDERATION_NOT_AVAILABLE', __('api.fed_not_available'), null, 403);
+        }
+
+        if (!\App\Services\FederationUserService::hasOptedIn($userId, $tenantId)) {
+            return $this->respondWithError('FEDERATION_NOT_ENABLED', __('api.fed_sender_not_opted_in'), null, 403);
+        }
 
         try {
             $rawActivity = $this->federationActivityService->getActivityFeed($userId, 20);
@@ -532,7 +553,7 @@ class FederationV2Controller extends BaseApiController
                     'description' => $item['description'] ?? ($item['preview'] ?? ''),
                     'created_at' => $item['timestamp'] ?? date('Y-m-d H:i:s'),
                     'actor' => [
-                        'name' => $item['subtitle'] ?? 'Federation Network',
+                        'name' => $item['subtitle'] ?? __('api.federation_network_name'),
                         'avatar' => null,
                         'tenant_name' => $item['subtitle'] ?? null,
                     ],
@@ -700,6 +721,7 @@ class FederationV2Controller extends BaseApiController
                     g.tenant_id, g.created_at, t.name AS tenant_name
                 FROM `groups` g
                 JOIN tenants t ON t.id = g.tenant_id
+                JOIN federation_user_settings fus_owner ON fus_owner.user_id = g.owner_id
                 JOIN federation_partnerships fp ON (
                     (fp.tenant_id = :tid1 AND fp.partner_tenant_id = g.tenant_id)
                     OR (fp.partner_tenant_id = :tid2 AND fp.tenant_id = g.tenant_id)
@@ -708,6 +730,9 @@ class FederationV2Controller extends BaseApiController
                   AND fp.groups_enabled = 1
                   AND g.tenant_id != :tid3
                   AND g.status = 'active'
+                  AND fus_owner.federation_optin = 1
+                  AND fus_owner.profile_visible_federated = 1
+                  AND fus_owner.appear_in_federated_search = 1
                   AND (g.federated_visibility IN ('listed', 'joinable') OR g.allow_federated_members = 1)
             ";
             $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];

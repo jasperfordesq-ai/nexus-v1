@@ -20,6 +20,14 @@ class AdminFederationControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
+    private function superAdmin(): User
+    {
+        return User::factory()
+            ->forTenant($this->testTenantId)
+            ->admin()
+            ->create(['is_tenant_super_admin' => true]);
+    }
+
     // ================================================================
     // SETTINGS — GET /v2/admin/federation/settings
     // ================================================================
@@ -146,15 +154,25 @@ class AdminFederationControllerTest extends TestCase
     // API KEYS — GET /v2/admin/federation/api-keys
     // ================================================================
 
-    public function test_api_keys_returns_200_for_admin(): void
+    public function test_api_keys_returns_200_for_super_admin(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = $this->superAdmin();
         Sanctum::actingAs($admin);
 
         $response = $this->apiGet('/v2/admin/federation/api-keys');
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
+    }
+
+    public function test_api_keys_returns_403_for_standard_admin(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/federation/api-keys');
+
+        $response->assertStatus(403);
     }
 
     public function test_api_keys_returns_403_for_regular_member(): void
@@ -171,15 +189,26 @@ class AdminFederationControllerTest extends TestCase
     // DATA MANAGEMENT — GET /v2/admin/federation/data
     // ================================================================
 
-    public function test_data_management_returns_200_for_admin(): void
+    public function test_data_management_returns_200_for_super_admin(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = $this->superAdmin();
         Sanctum::actingAs($admin);
 
         $response = $this->apiGet('/v2/admin/federation/data');
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
+    }
+
+    public function test_setup_mutation_endpoints_return_403_for_standard_admin(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $this->apiPut('/v2/admin/federation/settings', ['federation_enabled' => true])->assertStatus(403);
+        $this->apiPost('/v2/admin/federation/api-keys', ['name' => 'Blocked key'])->assertStatus(403);
+        $this->apiGet('/v2/admin/federation/data')->assertStatus(403);
+        $this->apiGet('/v2/admin/federation/export/users')->assertStatus(403);
     }
 
     public function test_data_management_returns_401_for_unauthenticated(): void

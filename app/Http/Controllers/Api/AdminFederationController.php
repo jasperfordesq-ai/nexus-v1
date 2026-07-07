@@ -214,7 +214,7 @@ class AdminFederationController extends BaseApiController
 
     public function updateSettings(): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireSuperAdmin();
         $tenantId = TenantContext::getId();
         $input = $this->getAllInput();
         $featureMap = [
@@ -996,7 +996,7 @@ class AdminFederationController extends BaseApiController
 
     public function apiKeys(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = TenantContext::getId();
         if (!$this->tableExists('federation_api_keys')) { return $this->respondWithData([]); }
 
@@ -1009,7 +1009,7 @@ class AdminFederationController extends BaseApiController
 
     public function createApiKey(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = TenantContext::getId();
         $name = $this->input('name');
         $scopes = $this->input('scopes', []);
@@ -1048,7 +1048,7 @@ class AdminFederationController extends BaseApiController
     /** POST /api/v2/admin/federation/api-keys/{id}/revoke */
     public function revokeApiKey($id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = TenantContext::getId();
         $id = (int) $id;
 
@@ -1075,7 +1075,7 @@ class AdminFederationController extends BaseApiController
 
     public function dataManagement(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         return $this->respondWithData([
             'export_formats' => ['json', 'csv'],
             'available_exports' => ['users' => 'Member directory', 'partnerships' => 'Partnership records', 'transactions' => 'Cross-community transactions', 'audit' => 'Audit log'],
@@ -1086,7 +1086,7 @@ class AdminFederationController extends BaseApiController
     /** GET /api/v2/admin/federation/export/{type} */
     public function exportData($type)
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = TenantContext::getId();
         $type = (string) $type;
 

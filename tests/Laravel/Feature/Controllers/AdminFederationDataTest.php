@@ -25,12 +25,29 @@ class AdminFederationDataTest extends TestCase
 {
     use DatabaseTransactions;
 
+    private function superAdmin(): User
+    {
+        return User::factory()
+            ->forTenant($this->testTenantId)
+            ->admin()
+            ->create(['is_tenant_super_admin' => true]);
+    }
+
     // ─── Export ──────────────────────────────────────────────────────────────
 
     public function test_export_returns_403_for_regular_member(): void
     {
         $member = User::factory()->forTenant($this->testTenantId)->create();
         Sanctum::actingAs($member);
+
+        $response = $this->apiPost('/v2/admin/federation/data/export');
+        $response->assertStatus(403);
+    }
+
+    public function test_export_returns_403_for_standard_admin(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
 
         $response = $this->apiPost('/v2/admin/federation/data/export');
         $response->assertStatus(403);
@@ -44,7 +61,7 @@ class AdminFederationDataTest extends TestCase
 
     public function test_export_redacts_external_partner_secrets(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = $this->superAdmin();
         Sanctum::actingAs($admin);
 
         DB::table('federation_external_partners')->insert([
@@ -71,7 +88,7 @@ class AdminFederationDataTest extends TestCase
 
     public function test_export_produces_valid_parseable_json_with_expected_keys(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = $this->superAdmin();
         Sanctum::actingAs($admin);
 
         $response = $this->apiPost('/v2/admin/federation/data/export');
@@ -96,7 +113,7 @@ class AdminFederationDataTest extends TestCase
 
     public function test_export_streams_large_api_logs_without_memory_spike(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = $this->superAdmin();
         Sanctum::actingAs($admin);
 
         $keyId = DB::table('federation_api_keys')->insertGetId([
@@ -168,7 +185,7 @@ class AdminFederationDataTest extends TestCase
 
     public function test_purge_rejects_days_out_of_range(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = $this->superAdmin();
         Sanctum::actingAs($admin);
 
         $response = $this->apiPost('/v2/admin/federation/data/purge', ['days' => 1]);
@@ -180,7 +197,7 @@ class AdminFederationDataTest extends TestCase
 
     public function test_purge_respects_days_param(): void
     {
-        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $admin = $this->superAdmin();
         Sanctum::actingAs($admin);
 
         $keyId = DB::table('federation_api_keys')->insertGetId([

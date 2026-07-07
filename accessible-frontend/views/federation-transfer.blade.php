@@ -85,6 +85,7 @@
                 <form method="post" action="{{ route('govuk-alpha.federation.transfer.store', ['tenantSlug' => $tenantSlug, 'id' => $memberId]) }}">
                     @csrf
                     <input type="hidden" name="receiver_tenant_id" value="{{ $memberTenantId }}">
+                    <input type="hidden" name="idempotency_key" value="{{ \Illuminate\Support\Str::uuid() }}">
 
                     <div class="govuk-form-group">
                         <label class="govuk-label govuk-label--m" for="amount">{{ __('govuk_alpha.fed2.transfer.amount_label') }}</label>

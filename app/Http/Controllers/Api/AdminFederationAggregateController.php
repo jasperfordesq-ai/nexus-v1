@@ -32,7 +32,7 @@ class AdminFederationAggregateController extends BaseApiController
     /** GET /v2/admin/federation/aggregate-consent */
     public function consent(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = (int) TenantContext::getId();
 
         $consent = $this->service->getConsent($tenantId) ?? [
@@ -47,7 +47,7 @@ class AdminFederationAggregateController extends BaseApiController
     /** PUT /v2/admin/federation/aggregate-consent */
     public function updateConsent(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = (int) TenantContext::getId();
 
         $enabled = (bool) $this->input('enabled', false);
@@ -59,7 +59,7 @@ class AdminFederationAggregateController extends BaseApiController
     /** POST /v2/admin/federation/aggregate-consent/rotate-secret */
     public function rotateSecret(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = (int) TenantContext::getId();
 
         $this->service->rotateSecret($tenantId);
@@ -78,7 +78,7 @@ class AdminFederationAggregateController extends BaseApiController
     /** GET /v2/admin/federation/aggregate-consent/audit-log */
     public function auditLog(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = (int) TenantContext::getId();
 
         $entries = $this->service->recentAuditLog($tenantId, 100);
@@ -88,7 +88,7 @@ class AdminFederationAggregateController extends BaseApiController
     /** GET /v2/admin/federation/aggregate-consent/preview */
     public function preview(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
 
         [$from, $to] = $this->resolvePeriod();
         $payload = $this->service->compute($from, $to);

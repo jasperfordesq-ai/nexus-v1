@@ -138,6 +138,19 @@ class FederationV2ControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_opt_in_defaults_location_sharing_off(): void
+    {
+        $this->enableFederationForTenant($this->testTenantId);
+        $user = $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/federation/opt-in');
+
+        $response->assertOk();
+        $settings = DB::table('federation_user_settings')->where('user_id', $user->id)->first();
+        $this->assertNotNull($settings);
+        $this->assertSame(0, (int) $settings->show_location_federated);
+    }
+
     // ------------------------------------------------------------------
     //  POST /v2/federation/opt-out
     // ------------------------------------------------------------------
@@ -386,6 +399,141 @@ class FederationV2ControllerTest extends TestCase
         $eventTitles = array_column($eventResponse->json('data'), 'title');
         $this->assertContains('Federated event', $eventTitles);
         $this->assertNotContains('Local-only event', $eventTitles);
+    }
+
+    public function test_partner_stats_count_only_federated_visible_listings(): void
+    {
+        $partnerTenantId = $this->seedPartnerTenant('Listing Count Partner');
+        $this->seedPartnership($partnerTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        $visibleOwner = $this->seedFederatedUser($partnerTenantId);
+        $hiddenOwner = $this->seedFederatedUser($partnerTenantId, [], ['appear_in_federated_search' => 0]);
+
+        DB::table('listings')->insert([
+            [
+                'tenant_id' => $partnerTenantId,
+                'user_id' => $visibleOwner->id,
+                'title' => 'Federated visible listing',
+                'description' => 'Visible.',
+                'type' => 'offer',
+                'status' => 'active',
+                'federated_visibility' => 'listed',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tenant_id' => $partnerTenantId,
+                'user_id' => $visibleOwner->id,
+                'title' => 'Local-only listing',
+                'description' => 'Not counted.',
+                'type' => 'offer',
+                'status' => 'active',
+                'federated_visibility' => 'none',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'tenant_id' => $partnerTenantId,
+                'user_id' => $hiddenOwner->id,
+                'title' => 'Hidden owner listing',
+                'description' => 'Not counted.',
+                'type' => 'offer',
+                'status' => 'active',
+                'federated_visibility' => 'listed',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->apiGet('/v2/federation/partners');
+
+        $response->assertOk();
+        $partner = collect($response->json('data'))->firstWhere('id', $partnerTenantId);
+        $this->assertNotNull($partner);
+        $this->assertSame(1, (int) $partner['listing_count']);
+    }
+
+    public function test_activity_feed_requires_opt_in_and_only_returns_user_relevant_activity(): void
+    {
+        $partnerTenantId = $this->seedPartnerTenant('Activity Partner');
+        $this->seedPartnership($partnerTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        $other = $this->seedFederatedUser($this->testTenantId);
+
+        DB::table('federation_audit_log')->insert([
+            [
+                'action_type' => 'member_search',
+                'category' => 'profiles',
+                'level' => 'info',
+                'source_tenant_id' => $this->testTenantId,
+                'target_tenant_id' => $partnerTenantId,
+                'actor_user_id' => $viewer->id,
+                'actor_name' => 'Viewer',
+                'data' => json_encode(['description' => 'Viewer activity']),
+                'created_at' => now(),
+            ],
+            [
+                'action_type' => 'member_search',
+                'category' => 'profiles',
+                'level' => 'info',
+                'source_tenant_id' => $this->testTenantId,
+                'target_tenant_id' => $partnerTenantId,
+                'actor_user_id' => $other->id,
+                'actor_name' => 'Other',
+                'data' => json_encode(['description' => 'Other member activity']),
+                'created_at' => now(),
+            ],
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->apiGet('/v2/federation/activity');
+
+        $response->assertOk();
+        $descriptions = array_column($response->json('data'), 'description');
+        $this->assertContains('Viewer activity', $descriptions);
+        $this->assertNotContains('Other member activity', $descriptions);
+
+        DB::table('federation_user_settings')->where('user_id', $viewer->id)->update(['federation_optin' => 0]);
+        $this->apiGet('/v2/federation/activity')->assertStatus(403);
+    }
+
+    public function test_groups_endpoint_respects_group_owner_federation_privacy(): void
+    {
+        $partnerTenantId = $this->seedPartnerTenant('Group Privacy Partner');
+        $this->seedPartnership($partnerTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        $visibleOwner = $this->seedFederatedUser($partnerTenantId);
+        $hiddenOwner = $this->seedFederatedUser($partnerTenantId, [], ['profile_visible_federated' => 0]);
+
+        DB::table('groups')->insert([
+            [
+                'tenant_id' => $partnerTenantId,
+                'owner_id' => $visibleOwner->id,
+                'name' => 'Visible federated group',
+                'description' => 'Visible.',
+                'status' => 'active',
+                'federated_visibility' => 'listed',
+                'created_at' => now(),
+            ],
+            [
+                'tenant_id' => $partnerTenantId,
+                'owner_id' => $hiddenOwner->id,
+                'name' => 'Hidden owner group',
+                'description' => 'Hidden.',
+                'status' => 'active',
+                'federated_visibility' => 'listed',
+                'created_at' => now(),
+            ],
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->apiGet('/v2/federation/groups');
+
+        $response->assertOk();
+        $names = array_column($response->json('data'), 'name');
+        $this->assertContains('Visible federated group', $names);
+        $this->assertNotContains('Hidden owner group', $names);
     }
 
     public function test_admin_partnership_stats_count_logical_messages_and_internal_transactions(): void

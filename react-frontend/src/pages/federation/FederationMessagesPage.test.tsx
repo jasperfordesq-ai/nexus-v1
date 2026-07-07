@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, userEvent } from '@/test/test-utils';
 import { api } from '@/lib/api';
 import type { ReactNode } from 'react';
 
@@ -178,5 +178,26 @@ describe('FederationMessagesPage', () => {
     });
     // Unread count badge should be visible (count = 1)
     expect(screen.getByText('1')).toBeInTheDocument();
+  });
+
+  it('restores unread state when optimistic mark-read fails', async () => {
+    const user = userEvent.setup();
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: [mockMessage] });
+    vi.mocked(api.post).mockResolvedValue({ success: false, error: 'Nope' });
+
+    render(<FederationMessagesPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Maria Green')).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText('Maria Green'));
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/v2/federation/messages/mark-read-batch', { ids: [1] });
+    });
+    await waitFor(() => {
+      expect(screen.getByText('1')).toBeInTheDocument();
+    });
   });
 });

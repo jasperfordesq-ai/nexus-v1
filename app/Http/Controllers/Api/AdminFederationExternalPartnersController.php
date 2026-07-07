@@ -28,7 +28,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
 
         try {
@@ -46,7 +46,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
      */
     public function store(): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
         $input = $this->getAllInput();
 
@@ -69,7 +69,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
      */
     public function update(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
         $input = $this->getAllInput();
 
@@ -97,7 +97,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
      */
     public function destroy(int $id): JsonResponse
     {
-        $adminId = $this->requireAdmin();
+        $adminId = $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
 
         $result = FederationExternalPartnerService::delete($id, $tenantId, $adminId);
@@ -122,7 +122,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
      */
     public function healthCheck(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
 
         // Verify partner exists and belongs to tenant
@@ -202,7 +202,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
             'healthy' => $result['success'],
             'response_time_ms' => $elapsed,
             'status_code' => $result['status_code'] ?? 0,
-            'error' => $result['success'] ? null : ($result['error'] ?? 'Health check failed'),
+            'error' => $result['success'] ? null : ($result['error'] ?? __('api.health_check_failed')),
         ]);
     }
 
@@ -213,7 +213,7 @@ class AdminFederationExternalPartnersController extends BaseApiController
      */
     public function logs(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requireSuperAdmin();
         $tenantId = $this->getTenantId();
 
         // Verify partner exists and belongs to tenant
