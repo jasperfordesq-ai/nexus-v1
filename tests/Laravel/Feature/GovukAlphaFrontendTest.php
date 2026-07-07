@@ -5420,6 +5420,7 @@ class GovukAlphaFrontendTest extends TestCase
             'description' => 'Happy to fix punctures across the network.',
             'type' => 'offer',
             'status' => 'active',
+            'federated_visibility' => 'listed',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -5487,6 +5488,7 @@ class GovukAlphaFrontendTest extends TestCase
             'description' => 'I can trim hedges and tidy gardens across the network.',
             'type' => 'offer',
             'status' => 'active',
+            'federated_visibility' => 'listed',
             'price' => 2,
             'created_at' => now(),
             'updated_at' => now(),

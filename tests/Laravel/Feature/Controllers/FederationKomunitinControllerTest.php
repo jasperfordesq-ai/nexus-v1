@@ -71,6 +71,17 @@ class FederationKomunitinControllerTest extends TestCase
             'balance' => 0,
         ]);
 
+        foreach ([$payer->id, $payee->id] as $userId) {
+            DB::table('federation_user_settings')->updateOrInsert(
+                ['user_id' => $userId],
+                [
+                    'federation_optin' => 1,
+                    'transactions_enabled_federated' => 1,
+                    'updated_at' => now(),
+                ]
+            );
+        }
+
         $txId = DB::table('transactions')->insertGetId([
             'tenant_id' => $this->testTenantId,
             'sender_id' => $payer->id,
