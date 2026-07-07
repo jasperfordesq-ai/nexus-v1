@@ -869,7 +869,18 @@
     "qr_alt": "Code QR pour l'enregistrement",
     "checked_in_at": "Archivé : {{time}}",
     "checked_out_at": "Extrait : {{time}}",
-    "some_unavailable": "Les codes QR d'enregistrement ne sont pas encore disponibles pour certaines équipes."
+    "some_unavailable": "Les codes QR d'enregistrement ne sont pas encore disponibles pour certaines équipes.",
+    "verify_title": "Enregistrement du bénévole",
+    "verify_intro": "Confirmez l’arrivée de ce bénévole pour son créneau.",
+    "confirm_button": "Confirmer l’enregistrement",
+    "success": "{{name}} est enregistré",
+    "already": "{{name}} est déjà enregistré",
+    "checkout_button": "Enregistrer la sortie",
+    "checkout_success": "{{name}} enregistré à la sortie",
+    "invalid": "Ce code d’enregistrement est invalide ou a expiré.",
+    "forbidden": "Vous n’êtes pas autorisé à valider les enregistrements de ce créneau.",
+    "error": "Une erreur s’est produite. Veuillez réessayer.",
+    "done": "Terminé"
   },
   "page_meta": {
     "create_opportunity": {

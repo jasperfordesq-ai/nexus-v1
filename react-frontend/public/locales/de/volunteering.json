@@ -869,7 +869,18 @@
     "qr_alt": "QR-Code für den Check-in",
     "checked_in_at": "Eingecheckt: {{time}}",
     "checked_out_at": "Ausgecheckt: {{time}}",
-    "some_unavailable": "Für einige Schichten sind Check-in-QR-Codes noch nicht verfügbar."
+    "some_unavailable": "Für einige Schichten sind Check-in-QR-Codes noch nicht verfügbar.",
+    "verify_title": "Freiwilligen-Check-in",
+    "verify_intro": "Bestätige die Ankunft dieser freiwilligen Person zu ihrer Schicht.",
+    "confirm_button": "Check-in bestätigen",
+    "success": "{{name}} ist eingecheckt",
+    "already": "{{name}} ist bereits eingecheckt",
+    "checkout_button": "Auschecken",
+    "checkout_success": "{{name}} ausgecheckt",
+    "invalid": "Dieser Check-in-Code ist ungültig oder abgelaufen.",
+    "forbidden": "Du hast keine Berechtigung, Check-ins für diese Schicht zu bestätigen.",
+    "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "done": "Fertig"
   },
   "page_meta": {
     "create_opportunity": {

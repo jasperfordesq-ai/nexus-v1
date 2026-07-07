@@ -26,6 +26,7 @@ import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 import { useDisclosure } from '@/components/ui/useDisclosure';
+import { QrCodeImage } from '@/components/volunteering/QrCodeImage';
 
 import MapPin from 'lucide-react/icons/map-pin';
 import Calendar from 'lucide-react/icons/calendar';
@@ -264,11 +265,11 @@ function ShiftCheckinPanel({ shifts }: ShiftCheckinPanelProps) {
                   </p>
                 )}
                 <div className="flex flex-col items-center gap-3">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(checkin.qr_url)}`}
+                  <QrCodeImage
+                    value={checkin.qr_url}
                     alt={t('check_in.qr_alt')}
+                    size={192}
                     className="w-48 h-48 rounded-lg bg-white p-1"
-                    loading="lazy"
                   />
                   <Chip color={checkinStatusColor(checkin.status)} variant="soft">
                     {statusLabel}

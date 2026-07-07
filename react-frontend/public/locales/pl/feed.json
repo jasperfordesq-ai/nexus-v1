@@ -346,7 +346,9 @@
     },
     "read_more_about": "Przeczytaj więcej o {{title}}",
     "detail_course": "Zobacz kurs",
-    "type_course": "Kurs"
+    "type_course": "Kurs",
+    "type_volunteer_hours": "Godziny wolontariatu",
+    "volunteer_hours_title": "Przepracowano {{hours}} godzin wolontariatu"
   },
   "poll": {
     "load_failed": "Nie udało się załadować danych ankiety.",

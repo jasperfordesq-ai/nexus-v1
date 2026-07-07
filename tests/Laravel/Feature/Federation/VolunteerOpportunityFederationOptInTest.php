@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Tests\Laravel\Feature\Federation;
 
 use App\Events\VolunteerOpportunityCreated;
+use App\Events\VolunteerOpportunityUpdated;
 use App\Listeners\PushVolunteerOpportunityToFederatedPartners;
 use App\Models\User;
 use App\Models\VolOpportunity;
@@ -117,6 +118,21 @@ final class VolunteerOpportunityFederationOptInTest extends TestCase
         $this->makeListener()->handle(new VolunteerOpportunityCreated($closed, $this->testTenantId));
 
         Http::assertNothingSent();
+    }
+
+    public function test_listener_retracts_shared_opportunity_on_update_to_inactive(): void
+    {
+        $partner = $this->setupPartner('nexus');
+
+        // A previously-shared opportunity transitions to inactive (e.g. deleted):
+        // the listener must send a retraction (action 'deleted'), not skip it.
+        $retracted = $this->makeOpportunity(['federated_visibility' => 'listed', 'is_active' => false]);
+        $this->makeListener()->handle(new VolunteerOpportunityUpdated($retracted, $this->testTenantId));
+
+        Http::assertSent(function ($request) use ($partner) {
+            return str_starts_with($request->url(), $partner->base_url)
+                && str_contains($request->body(), '"action":"deleted"');
+        });
     }
 
     // ------------------------------------------------------------------

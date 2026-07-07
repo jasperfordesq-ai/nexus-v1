@@ -869,7 +869,18 @@
     "qr_alt": "QR-code voor inchecken",
     "checked_in_at": "Ingecheckt: {{time}}",
     "checked_out_at": "Uitgecheckt: {{time}}",
-    "some_unavailable": "Voor sommige diensten zijn er nog geen QR-codes voor het inchecken beschikbaar."
+    "some_unavailable": "Voor sommige diensten zijn er nog geen QR-codes voor het inchecken beschikbaar.",
+    "verify_title": "Vrijwilliger inchecken",
+    "verify_intro": "Bevestig de aankomst van deze vrijwilliger voor zijn dienst.",
+    "confirm_button": "Inchecken bevestigen",
+    "success": "{{name}} is ingecheckt",
+    "already": "{{name}} is al ingecheckt",
+    "checkout_button": "Uitchecken",
+    "checkout_success": "{{name}} uitgecheckt",
+    "invalid": "Deze incheckcode is ongeldig of verlopen.",
+    "forbidden": "Je hebt geen toestemming om check-ins voor deze dienst te bevestigen.",
+    "error": "Er is iets misgegaan. Probeer het opnieuw.",
+    "done": "Klaar"
   },
   "page_meta": {
     "create_opportunity": {

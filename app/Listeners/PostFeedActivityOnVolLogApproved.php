@@ -12,6 +12,7 @@ use App\Core\TenantContext;
 use App\Events\VolLogStatusChanged;
 use App\Models\VolLog;
 use App\Services\FeedActivityService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -56,13 +57,31 @@ class PostFeedActivityOnVolLogApproved
                 return;
             }
 
+            // Resolve the organisation name for display (metadata is denormalised
+            // into the feed row; the frontend renders a localised title from the
+            // hours, so this stored title is only a non-localised fallback).
+            $orgName = null;
+            if ($log->organization_id !== null) {
+                $orgName = DB::table('vol_organizations')
+                    ->where('id', (int) $log->organization_id)
+                    ->where('tenant_id', $event->tenantId)
+                    ->value('name');
+            }
+
+            // Non-localised fallback title. The React feed card renders a localised
+            // title from the numeric `hours` metadata (card.volunteer_hours_title),
+            // so this value is only used by non-localising readers.
             $title = sprintf('Volunteered %.2f hours', $hours);
             $content = (string) ($log->description ?? '');
 
+            // source_type 'volunteer_hours' (mapped to vol_logs), NOT 'volunteer'
+            // (mapped to vol_opportunities) — keying an hour-log row under
+            // 'volunteer' made every reader treat it as an orphaned opportunity and
+            // silently drop it from the feed.
             $this->feedActivityService->recordActivity(
                 $event->tenantId,
                 $userId,
-                'volunteer',
+                'volunteer_hours',
                 $event->volLogId,
                 [
                     'title'    => $title,
@@ -72,6 +91,7 @@ class PostFeedActivityOnVolLogApproved
                         'organization_id' => $log->organization_id !== null
                             ? (int) $log->organization_id
                             : null,
+                        'organization'    => $orgName,
                         'opportunity_id'  => $log->opportunity_id !== null
                             ? (int) $log->opportunity_id
                             : null,

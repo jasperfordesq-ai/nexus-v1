@@ -253,6 +253,13 @@ const typeConfig = {
     softGradient: 'from-green-500/10 to-emerald-500/10',
     accentGradient: 'from-green-500 via-emerald-500 to-green-500',
   },
+  volunteer_hours: {
+    labelKey: 'card.type_volunteer_hours',
+    color: 'success' as const,
+    icon: <Clock className="w-3 h-3" aria-hidden="true" />,
+    softGradient: 'from-green-500/10 to-emerald-500/10',
+    accentGradient: 'from-emerald-500 via-green-500 to-emerald-500',
+  },
   blog: {
     labelKey: 'card.type_blog',
     color: 'primary' as const,
@@ -481,6 +488,11 @@ const FeedCard = React.memo(function FeedCard({
   const typeLabel = config.labelKey ? t(config.labelKey) : null;
   const detailPath = getItemDetailPath(item);
   const detailLabel = getItemDetailLabel(item);
+  // Volunteer-hours activity is system-generated, so its stored title is a
+  // non-localised fallback; render a localised title from the hours instead.
+  const displayTitle = item.type === 'volunteer_hours' && item.hours != null
+    ? t('card.volunteer_hours_title', { hours: item.hours, organization: item.organization ?? '' })
+    : item.title;
   const { ref: trackingRef, recordClick } = useFeedTracking(item.id, item.type, isAuthenticated);
 
   // Load poll data lazily ONLY when the item is a poll, poll_data was NOT
@@ -861,17 +873,17 @@ const FeedCard = React.memo(function FeedCard({
 
         {/* Content */}
         <div className="mb-4">
-          {item.title && item.title !== item.content && (
+          {displayTitle && displayTitle !== item.content && (
             detailPath ? (
               <Link
                 to={tenantPath(detailPath)}
                 className="text-sm font-semibold text-theme-primary hover:text-accent transition-colors mb-1.5 block"
                 onClick={recordClick}
               >
-                {item.title}
+                {displayTitle}
               </Link>
             ) : (
-              <p className="text-sm font-semibold text-theme-primary mb-1.5">{item.title}</p>
+              <p className="text-sm font-semibold text-theme-primary mb-1.5">{displayTitle}</p>
             )
           )}
           <FeedContentRenderer

@@ -346,7 +346,9 @@
     },
     "read_more_about": "Ulteriori informazioni su {{title}}",
     "detail_course": "Visualizza il corso",
-    "type_course": "Corso"
+    "type_course": "Corso",
+    "type_volunteer_hours": "Ore di volontariato",
+    "volunteer_hours_title": "{{hours}} ore di volontariato"
   },
   "poll": {
     "load_failed": "Impossibile caricare i dati del sondaggio.",

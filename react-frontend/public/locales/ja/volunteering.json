@@ -869,7 +869,18 @@
     "qr_alt": "チェックイン用のQRコード",
     "checked_in_at": "チェックイン済み: {{time}}",
     "checked_out_at": "チェックアウトしました: {{time}}",
-    "some_unavailable": "チェックイン QR コードは一部のシフトではまだ利用できません。"
+    "some_unavailable": "チェックイン QR コードは一部のシフトではまだ利用できません。",
+    "verify_title": "ボランティアのチェックイン",
+    "verify_intro": "このボランティアのシフトへの到着を確認します。",
+    "confirm_button": "チェックインを確認",
+    "success": "{{name}} はチェックインしました",
+    "already": "{{name}} はすでにチェックイン済みです",
+    "checkout_button": "チェックアウト",
+    "checkout_success": "{{name}} はチェックアウトしました",
+    "invalid": "このチェックインコードは無効か有効期限が切れています。",
+    "forbidden": "このシフトのチェックインを確認する権限がありません。",
+    "error": "問題が発生しました。もう一度お試しください。",
+    "done": "完了"
   },
   "page_meta": {
     "create_opportunity": {

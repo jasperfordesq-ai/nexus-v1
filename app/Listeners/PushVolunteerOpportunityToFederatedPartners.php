@@ -78,13 +78,18 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
                 return;
             }
 
-            // (c) Never push inactive or closed opportunities. The service
-            // writes status 'active' on create and treats both 'open' and
-            // 'active' as publicly visible (see VolunteerService).
+            // (c) A previously-shared opportunity that is now inactive or closed
+            // must be RETRACTED from partners (action 'deleted'), not silently left
+            // stale forever. deleteOpportunity() dispatches an update event with
+            // is_active=0 for exactly this purpose. A newly-CREATED inactive/closed
+            // opportunity was never shared, so there is nothing to retract — skip.
             $isActive = !empty($opportunity->is_active);
             $isOpen   = in_array((string) ($opportunity->status ?? 'open'), ['open', 'active'], true);
             if (!$isActive || !$isOpen) {
-                return;
+                if ($action === 'created') {
+                    return;
+                }
+                $action = 'deleted';
             }
 
             $partners = FederationExternalPartnerService::getActivePartnersWithFlag($tenantId, 'allow_volunteering');
@@ -95,6 +100,10 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
             $payload = [
                 'action'          => $action,
                 'id'              => $opportunity->id,
+                // The sender's opportunity id is the partner's external reference —
+                // send it explicitly so create/update/delete all key on the same
+                // value on the receiving side.
+                'external_id'     => (string) ($opportunity->id ?? ''),
                 'title'           => $opportunity->title ?? null,
                 'description'     => $opportunity->description ?? null,
                 'location'        => $opportunity->location ?? null,

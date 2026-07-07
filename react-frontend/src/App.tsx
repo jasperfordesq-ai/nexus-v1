@@ -95,10 +95,9 @@ import { LoadingScreen } from '@/components/feedback/LoadingScreen';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { FeatureErrorBoundary } from '@/components/feedback/FeatureErrorBoundary';
 
-// Auth Pages (critical path - eager loaded)
-import { LoginPage } from '@/pages/auth/LoginPage';
-
-// Auth Pages (rarely used - lazy loaded)
+// Auth pages are route-loaded so their HeroUI form primitives do not force the
+// global shell to preload the full UI vendor chunk before route resolution.
+const LoginPage = lazyWithRetry(() => import('@/pages/auth/LoginPage'));
 const RegisterPage = lazyWithRetry(() => import('@/pages/auth/RegisterPage'));
 const ForgotPasswordPage = lazyWithRetry(() => import('./pages/auth/ForgotPasswordPage'));
 const ResetPasswordPage = lazyWithRetry(() => import('./pages/auth/ResetPasswordPage'));
@@ -120,7 +119,7 @@ const SuperAdminApp = lazyWithRetry(() => import('@/super-admin/SuperAdminApp'))
 // Broker Panel (lazy-loaded — simplified admin interface for brokers)
 const BrokerApp = lazyWithRetry(() => import('@/broker/BrokerApp'));
 
-// Partner Timebanks Panel (lazy-loaded — super-admin-only federation/partner hub)
+// Partner Timebanks Panel (lazy-loaded federation/partner hub; sensitive routes gate inside)
 const PartnersApp = lazyWithRetry(() => import('@/partners/PartnersApp'));
 
 // Community Caring Panel (lazy-loaded — dedicated hub for caring_community module)
@@ -222,6 +221,7 @@ const VolOrgDashboardPage = lazyWithRetry(() => import('@/pages/volunteering/Vol
 const MyOrganisationsPage = lazyWithRetry(() => import('@/pages/volunteering/MyOrganisationsPage'));
 const DonationReceiptPage = lazyWithRetry(() => import('@/pages/volunteering/DonationReceiptPage'));
 const GuardianConsentVerifyPage = lazyWithRetry(() => import('@/pages/volunteering/GuardianConsentVerifyPage'));
+const CheckInVerifyPage = lazyWithRetry(() => import('@/pages/volunteering/CheckInVerifyPage'));
 const OrganisationsPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationsPage'));
 const OrganisationDetailPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationDetailPage'));
 const RegisterOrganisationPage = lazyWithRetry(() => import('@/pages/organisations/RegisterOrganisationPage'));
@@ -1636,6 +1636,13 @@ function AppRoutes() {
             </FeatureGate>
           } />
           <Route path="volunteering/my-applications" element={<Navigate to="../volunteering?tab=applications" replace />} />
+          <Route path="volunteering/checkin/:token" element={
+            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={t('coming_soon.features.volunteering')} />}>
+              <FeatureErrorBoundary featureName="Volunteering">
+                <CheckInVerifyPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
           <Route path="donations/:id/receipt" element={
             <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={t('coming_soon.features.volunteering')} />}>
               <FeatureErrorBoundary featureName="Donations">
@@ -1803,7 +1810,7 @@ function AppRoutes() {
       {/* Broker Panel (simplified admin for brokers) — fully lazy-loaded */}
       <Route path="broker/*" element={<BrokerApp />} />
 
-      {/* Partner Timebanks Panel (super admins only) — fully lazy-loaded */}
+      {/* Partner Timebanks Panel — fully lazy-loaded; route-level gates live inside the panel */}
       <Route path="partner-timebanks/*" element={<PartnersApp />} />
 
       {/* Community Caring Panel — fully lazy-loaded, gated by caring_community feature */}

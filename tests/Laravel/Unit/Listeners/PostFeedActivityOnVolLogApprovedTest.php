@@ -92,7 +92,8 @@ class PostFeedActivityOnVolLogApprovedTest extends TestCase
         $listener->handle($event);
 
         $this->assertSame(2, $capturedArgs['tid']);
-        $this->assertSame('volunteer', $capturedArgs['type']);
+        // 'volunteer_hours' (mapped to vol_logs), NOT 'volunteer' (vol_opportunities).
+        $this->assertSame('volunteer_hours', $capturedArgs['type']);
         $this->assertSame($volLogId, $capturedArgs['sid']);
         $this->assertStringContainsString('3.00 hours', $capturedArgs['data']['title']);
         $this->assertSame('Painted the community hall', $capturedArgs['data']['content']);
@@ -264,7 +265,7 @@ class PostFeedActivityOnVolLogApprovedTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // Test 10: source_type passed to recordActivity is 'volunteer'
+    // Test 10: source_type passed to recordActivity is 'volunteer_hours'
     // -------------------------------------------------------------------------
     public function test_handle_uses_volunteer_source_type(): void
     {
@@ -283,6 +284,6 @@ class PostFeedActivityOnVolLogApprovedTest extends TestCase
         $listener = new PostFeedActivityOnVolLogApproved($this->feedService);
         $listener->handle($event);
 
-        $this->assertSame('volunteer', $capturedType);
+        $this->assertSame('volunteer_hours', $capturedType);
     }
 }

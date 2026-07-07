@@ -371,6 +371,7 @@ class FederationExternalWebhookController extends BaseApiController
             'group.member_joined' => $this->handleInboundGroupMembership($data, $partner),
             'connection.requested', 'connection.accepted' => $this->handleInboundConnection($data, $partner, $event),
             'volunteering.created', 'volunteering.updated' => $this->handleInboundVolunteering($data, $partner),
+            'volunteering.deleted' => $this->handleInboundVolunteeringDeletion($data, $partner),
             'member.profile_updated' => $this->handleInboundMemberSync($data, $partner),
             'health_check' => ['status' => 'ok'],
             default => ['status' => 'unhandled', 'event' => $event],
@@ -834,6 +835,42 @@ class FederationExternalWebhookController extends BaseApiController
         event(new FederatedVolunteeringReceived($tenantId, (int) $partner->id, $localId, $row));
 
         return ['status' => 'handled', 'local_id' => $localId];
+    }
+
+    /**
+     * Retract a previously-federated volunteering opportunity: remove the shadow
+     * record and deactivate the mirrored vol_opportunities row so it drops out of
+     * listings/search. Historical applications on the mirror are left intact.
+     * Idempotent — a redelivered retraction affects zero rows the second time.
+     */
+    private function handleInboundVolunteeringDeletion(array $data, object $partner): array
+    {
+        // Accept either external_id or the sender's id — a retraction must key on
+        // the same reference the original create used.
+        $externalId = $this->optionalString($data, 'external_id', 191);
+        if ($externalId === null || $externalId === '') {
+            $externalId = isset($data['id']) ? (string) $data['id'] : '';
+        }
+        if ($externalId === '') {
+            throw new InboundValidationException('external_id is required', 'external_id');
+        }
+        $tenantId = (int) TenantContext::getId();
+
+        DB::table('federation_volunteering')
+            ->where('tenant_id', $tenantId)
+            ->where('external_partner_id', (int) $partner->id)
+            ->where('external_id', $externalId)
+            ->delete();
+
+        if (Schema::hasColumn('vol_opportunities', 'external_id')) {
+            DB::table('vol_opportunities')
+                ->where('tenant_id', $tenantId)
+                ->where('external_partner_id', (int) $partner->id)
+                ->where('external_id', $externalId)
+                ->update(['is_active' => 0, 'status' => 'closed', 'updated_at' => now()]);
+        }
+
+        return ['status' => 'retracted', 'external_id' => $externalId];
     }
 
     private function handleInboundMemberSync(array $data, object $partner): array

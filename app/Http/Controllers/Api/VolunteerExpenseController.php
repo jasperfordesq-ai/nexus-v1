@@ -172,6 +172,47 @@ class VolunteerExpenseController extends BaseApiController
         ]);
     }
 
+    /**
+     * Stream a submitted expense receipt to a reviewing admin.
+     *
+     * Receipts live on the private 'local' disk under
+     * volunteer-expenses/{tenantId}/... with no public URL, so the admin UI
+     * previously linked to a path that always 404'd. This mirrors the credential
+     * download: admin-gated, tenant-scoped, prefix- and traversal-checked.
+     */
+    public function downloadReceipt($id): \Symfony\Component\HttpFoundation\StreamedResponse|JsonResponse
+    {
+        $this->ensureFeature();
+        $this->requireAdmin();
+        $this->rateLimit('vol_expense_receipt_download', 30, 60);
+
+        $tenantId = TenantContext::getId();
+        $expense = \Illuminate\Support\Facades\DB::selectOne(
+            "SELECT id, receipt_path, receipt_filename FROM vol_expenses WHERE id = ? AND tenant_id = ?",
+            [(int) $id, $tenantId]
+        );
+
+        if (!$expense || empty($expense->receipt_path)) {
+            return $this->respondWithError('NOT_FOUND', __('api.expense_not_found'), null, 404);
+        }
+
+        $path = (string) $expense->receipt_path;
+        $expectedPrefix = "volunteer-expenses/{$tenantId}/";
+        if (!str_starts_with($path, $expectedPrefix) || str_contains($path, '..')) {
+            return $this->respondWithError('NOT_FOUND', __('api.expense_not_found'), null, 404);
+        }
+        if (!Storage::disk('local')->exists($path)) {
+            return $this->respondWithError('NOT_FOUND', __('api.expense_not_found'), null, 404);
+        }
+
+        // Storage::download() is driver-agnostic (streams from any disk, incl. the
+        // fake disk used in tests) and sets the Content-Disposition for us.
+        return Storage::disk('local')->download(
+            $path,
+            basename((string) ($expense->receipt_filename ?: basename($path)))
+        );
+    }
+
     public function reviewExpense($id): JsonResponse
     {
         $this->ensureFeature();

@@ -909,7 +909,18 @@
     "qr_alt": "QR code for check-in",
     "checked_in_at": "Checked in: {{time}}",
     "checked_out_at": "Checked out: {{time}}",
-    "some_unavailable": "Check-in QR codes are not yet available for some shifts."
+    "some_unavailable": "Check-in QR codes are not yet available for some shifts.",
+    "verify_title": "Volunteer Check-In",
+    "verify_intro": "Confirm this volunteer’s arrival for their shift.",
+    "confirm_button": "Confirm check-in",
+    "success": "{{name}} is checked in",
+    "already": "{{name}} is already checked in",
+    "checkout_button": "Check out",
+    "checkout_success": "{{name}} checked out",
+    "invalid": "This check-in code is invalid or has expired.",
+    "forbidden": "You do not have permission to verify check-ins for this shift.",
+    "error": "Something went wrong. Please try again.",
+    "done": "Done"
   },
   "page_meta": {
     "create_opportunity": {

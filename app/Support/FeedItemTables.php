@@ -39,6 +39,7 @@ final class FeedItemTables
         'poll'      => 'polls',
         'review'    => 'reviews',
         'volunteer' => 'vol_opportunities',
+        'volunteer_hours' => 'vol_logs',
         'challenge' => 'ideation_challenges',
         'resource'  => 'resources',
         'job'       => 'job_vacancies',

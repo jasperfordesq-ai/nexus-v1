@@ -453,7 +453,8 @@ Route::get('/v2/federation/events', [\App\Http\Controllers\Api\FederationV2Contr
 Route::get('/v2/federation/groups', [\App\Http\Controllers\Api\FederationV2Controller::class, 'groups'])->middleware('throttle:60,1');
 Route::get('/v2/federation/listings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'listings'])->middleware('throttle:60,1');
 Route::get('/v2/federation/members', [\App\Http\Controllers\Api\FederationV2Controller::class, 'members'])->middleware('throttle:60,1');
-Route::get('/v2/federation/members/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'member']);
+Route::get('/v2/federation/members/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'member'])
+    ->where('id', '(?:[0-9]+|ext-[0-9]+-.+)');
 Route::get('/v2/federation/members/{id}/reviews', [\App\Http\Controllers\Api\FederationV2Controller::class, 'memberReviews'])
     ->where('id', '.*');
 Route::get('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'messages']);
@@ -2146,6 +2147,7 @@ Route::get('/v2/admin/volunteering/expenses/policies', [\App\Http\Controllers\Ap
 Route::put('/v2/admin/volunteering/expenses/policies', [\App\Http\Controllers\Api\VolunteerExpenseController::class, 'updateExpensePolicy']);
 // NOTE: the {id} route must stay below the literal /export and /policies routes or it shadows them
 Route::put('/v2/admin/volunteering/expenses/{id}', [\App\Http\Controllers\Api\VolunteerExpenseController::class, 'reviewExpense']);
+Route::get('/v2/admin/volunteering/expenses/{id}/receipt', [\App\Http\Controllers\Api\VolunteerExpenseController::class, 'downloadReceipt'])->whereNumber('id');
 Route::get('/v2/admin/volunteering/guardian-consents', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'adminGuardianConsents']);
 Route::get('/v2/admin/volunteering/training', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'adminTraining']);
 Route::put('/v2/admin/volunteering/training/{id}/verify', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'verifyTraining']);

@@ -468,6 +468,8 @@ class FeedService
                 // Volunteer metadata
                 'credits_offered' => isset($meta['credits_offered']) ? (int) $meta['credits_offered'] : null,
                 'organization' => $meta['organization'] ?? null,
+                // Volunteer-hours metadata (approved hour logs)
+                'hours' => isset($meta['hours']) ? (float) $meta['hours'] : null,
                 // Internal cursor fields
                 '_activity_id' => (int) $row->activity_id,
                 '_activity_created_at' => (string) $row->created_at,
@@ -997,6 +999,7 @@ class FeedService
             'goal'      => 'goals',
             'challenge' => 'ideation_challenges',
             'volunteer' => 'vol_opportunities',
+            'volunteer_hours' => 'vol_logs',
             'review'    => 'reviews',
         ];
 

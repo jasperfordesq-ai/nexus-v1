@@ -50,12 +50,23 @@ class VolunteerService
 
         $viewerId = !empty($filters['viewer_id']) ? (int) $filters['viewer_id'] : null;
 
+        $federationColumnExists = Schema::hasColumn('vol_opportunities', 'is_federated');
+
         $query = VolOpportunity::query()
             ->with(['creator:id,first_name,last_name,avatar_url', 'organization:id,name,logo_url', 'category:id,name,color'])
             ->where('is_active', true)
             ->whereIn('status', self::PUBLIC_OPPORTUNITY_STATUSES)
-            ->whereHas('organization', function (Builder $q) {
-                $q->whereIn('status', self::PUBLIC_ORGANIZATION_STATUSES);
+            ->where(function (Builder $outer) use ($federationColumnExists) {
+                $outer->whereHas('organization', function (Builder $q) {
+                    $q->whereIn('status', self::PUBLIC_ORGANIZATION_STATUSES);
+                });
+                // Federated (imported) opportunities carry no local organisation
+                // row — they were vetted at the partner and are gated by
+                // is_federated — but whereHas(organization) would otherwise hide
+                // them from the very listing they were mirrored in for.
+                if ($federationColumnExists) {
+                    $outer->orWhere('vol_opportunities.is_federated', 1);
+                }
             });
 
         if (! empty($filters['organization_id'])) {
@@ -1009,6 +1020,29 @@ class VolunteerService
         try {
             DB::update("UPDATE vol_opportunities SET is_active = 0 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
             self::refreshPrerenderForOpportunity($tenantId, $id);
+
+            // Federation retraction: a soft-deleted opportunity that was shared to
+            // partners must be withdrawn from them, not left stale forever.
+            // Dispatch the standard update event (now is_active=0) so the push
+            // listener propagates a retraction. Only for LOCAL rows that opted in;
+            // imported rows must never be re-exported.
+            try {
+                if ((string) ($opp->federated_visibility ?? 'none') === 'listed'
+                    && empty($opp->is_federated)
+                    && empty($opp->external_id)) {
+                    $updated = VolOpportunity::query()->find($id);
+                    if ($updated) {
+                        TenantContext::runForTenant($tenantId, function () use ($updated, $tenantId): void {
+                            \App\Events\VolunteerOpportunityUpdated::dispatch($updated, (int) $tenantId);
+                        });
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Failed to dispatch federation retraction on delete', [
+                    'opportunity_id' => $id,
+                    'error'          => $e->getMessage(),
+                ]);
+            }
 
             // Notify volunteers with approved applications that the opportunity is cancelled
             try {

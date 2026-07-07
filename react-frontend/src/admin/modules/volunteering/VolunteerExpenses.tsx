@@ -233,16 +233,31 @@ export function VolunteerExpenses() {
 
   // ── Actions ────────────────────────────────────────────────────────────────
 
-  const openReceipt = (expense: Expense) => {
-    if (!expense.receipt_path) return;
-    const isPdf = expense.receipt_path.toLowerCase().endsWith('.pdf');
-    setReceiptUrl(expense.receipt_path);
-    setReceiptIsPdf(isPdf);
-    if (isPdf) {
-      window.open(expense.receipt_path, '_blank');
-    } else {
-      setReceiptModal(true);
+  const openReceipt = async (expense: Expense) => {
+    if (!expense.has_receipt) return;
+    const isPdf = (expense.receipt_path || '').toLowerCase().endsWith('.pdf');
+    try {
+      // Receipts live on a private disk with no public URL — fetch the bytes
+      // through the authenticated, tenant-scoped download endpoint and preview
+      // via an object URL (the old code linked the raw storage path, which 404'd).
+      const res = await adminVolunteering.getReceiptBlob(expense.id);
+      const blob = res instanceof Blob ? res : new Blob([res as BlobPart]);
+      const objectUrl = URL.createObjectURL(blob);
+      setReceiptUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return objectUrl; });
+      setReceiptIsPdf(isPdf);
+      if (isPdf) {
+        window.open(objectUrl, '_blank');
+      } else {
+        setReceiptModal(true);
+      }
+    } catch {
+      toast.error(t('volunteering.failed_to_load_receipt'));
     }
+  };
+
+  const closeReceiptModal = () => {
+    setReceiptModal(false);
+    setReceiptUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return ''; });
   };
 
   const openReview = (expense: Expense) => {
@@ -745,7 +760,7 @@ export function VolunteerExpenses() {
       </Modal>
 
       {/* Receipt Preview Modal */}
-      <Modal isOpen={receiptModal} onClose={() => setReceiptModal(false)} size="lg">
+      <Modal isOpen={receiptModal} onClose={closeReceiptModal} size="lg">
         <ModalContent>
           <ModalHeader>
             {t('volunteering.receipt_preview')}
@@ -767,7 +782,7 @@ export function VolunteerExpenses() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="tertiary" onPress={() => setReceiptModal(false)}>
+            <Button variant="tertiary" onPress={closeReceiptModal}>
               {t('volunteering.close')}
             </Button>
             <Button

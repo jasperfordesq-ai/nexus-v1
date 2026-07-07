@@ -346,7 +346,9 @@
     },
     "read_more_about": "Lees meer over {{title}}",
     "detail_course": "Bekijk cursus",
-    "type_course": "Cursus"
+    "type_course": "Cursus",
+    "type_volunteer_hours": "Vrijwilligersuren",
+    "volunteer_hours_title": "{{hours}} uur vrijwilligerswerk"
   },
   "poll": {
     "load_failed": "Peilinggegevens laden mislukt.",

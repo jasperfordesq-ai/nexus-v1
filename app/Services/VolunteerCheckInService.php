@@ -287,12 +287,18 @@ class VolunteerCheckInService
             return null;
         }
 
-        $baseUrl = config('app.url', 'https://api.project-nexus.ie');
+        // The QR must open a FRONTEND page a scanning coordinator can act on — the
+        // old value pointed at the POST-only, auth-gated JSON API route, so scanning
+        // it just produced a 405/401. The landing page (CheckInVerifyPage) POSTs the
+        // verify endpoint on the authenticated coordinator's behalf.
+        $qrUrl = TenantContext::getFrontendUrl()
+            . TenantContext::getSlugPrefix()
+            . '/volunteering/checkin/' . $checkin->qr_token;
 
         return [
             'id' => $checkin->id,
             'qr_token' => $checkin->qr_token,
-            'qr_url' => $baseUrl . '/api/v2/volunteering/checkin/verify/' . $checkin->qr_token,
+            'qr_url' => $qrUrl,
             'status' => $checkin->status,
             'checked_in_at' => self::dateTimeString($checkin->checked_in_at),
             'checked_out_at' => self::dateTimeString($checkin->checked_out_at),

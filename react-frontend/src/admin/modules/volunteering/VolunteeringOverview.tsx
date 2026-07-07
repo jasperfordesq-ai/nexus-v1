@@ -12,6 +12,7 @@ import Building2 from 'lucide-react/icons/building-2';
 import DollarSign from 'lucide-react/icons/dollar-sign';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Activity from 'lucide-react/icons/activity';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
@@ -118,7 +119,7 @@ function formatTimestamp(ts: string, t: TFunction): string {
 }
 
 export function VolunteeringOverview() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.volunteering_overview_title'));
   const toast = useToast();
   const navigate = useNavigate();
@@ -216,6 +217,7 @@ export function VolunteeringOverview() {
     { label: t('volunteering.verify_hours'), description: t('volunteering.verify_hours_desc'), icon: Clock, path: '/admin/volunteering/hours', color: 'success' },
     { label: t('volunteering.manage_organizations'), description: t('volunteering.manage_organizations_desc'), icon: Building2, path: '/admin/volunteering/organizations', color: 'secondary' },
     { label: t('volunteering.view_expenses'), description: t('volunteering.view_expenses_desc'), icon: DollarSign, path: '/admin/volunteering/expenses', color: 'primary' },
+    { label: t('volunteering.manage_swaps'), description: t('volunteering.manage_swaps_desc'), icon: ArrowLeftRight, path: '/admin/volunteering/swaps', color: 'secondary' },
   ];
 
   // Build alert banners for urgent items

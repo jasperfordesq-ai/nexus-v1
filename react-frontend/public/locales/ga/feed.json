@@ -346,7 +346,9 @@
     },
     "read_more_about": "Léigh tuilleadh faoi {{title}}",
     "detail_course": "Féach ar an gcúrsa",
-    "type_course": "Cúrsa"
+    "type_course": "Cúrsa",
+    "type_volunteer_hours": "Uaireanta oibre deonaí",
+    "volunteer_hours_title": "{{hours}} uair an chloig oibre deonaí déanta"
   },
   "poll": {
     "load_failed": "Theip ar shonraí an vóta a luchtú.",

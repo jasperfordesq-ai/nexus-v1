@@ -73,7 +73,12 @@ class FederationNativeIngestController extends BaseApiController
 
     public function volunteering(Request $request): JsonResponse
     {
-        return $this->ingest($request, 'volunteering.created');
+        // A retraction (action 'deleted') routes to the deletion handler so the
+        // mirrored/shadow opportunity is withdrawn; everything else upserts.
+        $action = (string) ($request->json('action') ?? 'created');
+        $eventType = $action === 'deleted' ? 'volunteering.deleted' : 'volunteering.created';
+
+        return $this->ingest($request, $eventType);
     }
 
     public function membersSync(Request $request): JsonResponse

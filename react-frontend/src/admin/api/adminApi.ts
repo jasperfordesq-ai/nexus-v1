@@ -1382,6 +1382,23 @@ export const adminVolunteering = {
   verifyHours: (logId: number, action: 'approve' | 'decline') =>
     api.post(`/v2/admin/volunteering/hours/${logId}/verify`, { action }),
 
+  // Admin-approval-gated shift swaps (path lives under /v2/volunteering/admin/swaps).
+  // A swap requiring admin approval sits in 'admin_pending' until resolved here.
+  getPendingSwaps: () =>
+    api.get<Array<{
+      id: number;
+      status: string;
+      message: string | null;
+      requester: { id: number; name: string };
+      recipient: { id: number; name: string };
+      original_shift: { id: number; start_time: string; end_time: string; opportunity_title: string | null };
+      proposed_shift: { id: number; start_time: string; end_time: string; opportunity_title: string | null };
+      created_at: string;
+    }>>('/v2/volunteering/admin/swaps'),
+
+  decideSwap: (id: number, action: 'approve' | 'reject') =>
+    api.put<{ id: number; status: string }>(`/v2/volunteering/admin/swaps/${id}`, { action }),
+
   // Applications with filters
   getApplications: (params?: { status?: string; cursor?: string }) => {
     const search = new URLSearchParams();
@@ -1397,6 +1414,7 @@ export const adminVolunteering = {
   reviewExpense: (id: number, data: { status: string; review_notes?: string; payment_reference?: string }) =>
     api.put(`/v2/admin/volunteering/expenses/${id}`, data),
   exportExpenses: (filename?: string) => api.download('/v2/admin/volunteering/expenses/export', { filename }),
+  getReceiptBlob: (id: number) => api.download(`/v2/admin/volunteering/expenses/${id}/receipt`),
   getExpensePolicies: () => api.get('/v2/admin/volunteering/expenses/policies'),
   updateExpensePolicies: (data: Record<string, unknown>) =>
     api.put('/v2/admin/volunteering/expenses/policies', data),

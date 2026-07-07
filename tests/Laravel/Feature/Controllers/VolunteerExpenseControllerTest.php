@@ -205,4 +205,79 @@ class VolunteerExpenseControllerTest extends TestCase
         $this->assertSame("'\t=hidden", $exported['review_notes']);
         $this->assertSame('\'-10+20', $exported['payment_reference']);
     }
+
+    // ------------------------------------------------------------------
+    //  GET /v2/admin/volunteering/expenses/{id}/receipt — download
+    // ------------------------------------------------------------------
+
+    private function makeExpenseWithReceipt(int $tenantId, string $relPath): int
+    {
+        \Illuminate\Support\Facades\Storage::disk('local')->put($relPath, 'PDFDATA');
+        $admin = User::factory()->forTenant($tenantId)->create();
+        $org = VolOrganization::factory()->forTenant($tenantId)->create();
+
+        return (int) VolExpense::factory()->forTenant($tenantId)->create([
+            'user_id' => $admin->id,
+            'organization_id' => $org->id,
+            'opportunity_id' => null,
+            'status' => 'pending',
+            'amount' => 12,
+            'receipt_path' => $relPath,
+            'receipt_filename' => 'receipt.pdf',
+            'submitted_at' => now(),
+        ])->id;
+    }
+
+    public function test_admin_can_download_expense_receipt(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+        $this->enableVolunteeringFeature($this->testTenantId);
+        $expenseId = $this->makeExpenseWithReceipt($this->testTenantId, "volunteer-expenses/{$this->testTenantId}/r1.pdf");
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet("/v2/admin/volunteering/expenses/{$expenseId}/receipt");
+
+        $response->assertStatus(200);
+    }
+
+    public function test_expense_receipt_download_forbidden_for_regular_member(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+        $this->enableVolunteeringFeature($this->testTenantId);
+        $expenseId = $this->makeExpenseWithReceipt($this->testTenantId, "volunteer-expenses/{$this->testTenantId}/r2.pdf");
+
+        $member = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($member);
+
+        $response = $this->apiGet("/v2/admin/volunteering/expenses/{$expenseId}/receipt");
+
+        $response->assertStatus(403);
+    }
+
+    public function test_expense_receipt_download_404_when_no_receipt(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+        $this->enableVolunteeringFeature($this->testTenantId);
+
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $volunteer = User::factory()->forTenant($this->testTenantId)->create();
+        $org = VolOrganization::factory()->forTenant($this->testTenantId)->create();
+        $expenseId = (int) VolExpense::factory()->forTenant($this->testTenantId)->create([
+            'user_id' => $volunteer->id,
+            'organization_id' => $org->id,
+            'opportunity_id' => null,
+            'status' => 'pending',
+            'amount' => 10,
+            'receipt_path' => null,
+            'submitted_at' => now(),
+        ])->id;
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet("/v2/admin/volunteering/expenses/{$expenseId}/receipt");
+
+        $response->assertStatus(404);
+    }
 }

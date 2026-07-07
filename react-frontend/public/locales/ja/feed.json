@@ -346,7 +346,9 @@
     },
     "read_more_about": "{{title}} について詳しく読む",
     "detail_course": "コースを見る",
-    "type_course": "コース"
+    "type_course": "コース",
+    "type_volunteer_hours": "ボランティア時間",
+    "volunteer_hours_title": "{{hours}} 時間のボランティア"
   },
   "poll": {
     "load_failed": "投票データの読み込みに失敗しました。",

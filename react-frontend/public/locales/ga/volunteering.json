@@ -869,7 +869,18 @@
     "qr_alt": "Cód QR le haghaidh seiceáil isteach",
     "checked_in_at": "Ticeáilte isteach: {{time}}",
     "checked_out_at": "Seiceáilte amach: {{time}}",
-    "some_unavailable": "Níl cóid QR seiceála isteach ar fáil fós le haghaidh roinnt sealanna."
+    "some_unavailable": "Níl cóid QR seiceála isteach ar fáil fós le haghaidh roinnt sealanna.",
+    "verify_title": "Seiceáil Isteach Oibrí Deonach",
+    "verify_intro": "Deimhnigh teacht an oibrí dheonach seo dá seal.",
+    "confirm_button": "Deimhnigh seiceáil isteach",
+    "success": "Tá {{name}} seiceáilte isteach",
+    "already": "Tá {{name}} seiceáilte isteach cheana",
+    "checkout_button": "Seiceáil amach",
+    "checkout_success": "{{name}} seiceáilte amach",
+    "invalid": "Tá an cód seiceála isteach seo neamhbhailí nó imithe as feidhm.",
+    "forbidden": "Níl cead agat seiceálacha isteach a fhíorú don seal seo.",
+    "error": "Chuaigh rud éigin amú. Bain triail eile as.",
+    "done": "Déanta"
   },
   "page_meta": {
     "create_opportunity": {

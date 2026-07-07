@@ -869,7 +869,18 @@
     "qr_alt": "Codice QR per il check-in",
     "checked_in_at": "Check-in: {{time}}",
     "checked_out_at": "Estratto: {{time}}",
-    "some_unavailable": "Per alcuni turni i codici QR del check-in non sono ancora disponibili."
+    "some_unavailable": "Per alcuni turni i codici QR del check-in non sono ancora disponibili.",
+    "verify_title": "Check-in volontario",
+    "verify_intro": "Conferma l’arrivo di questo volontario per il suo turno.",
+    "confirm_button": "Conferma check-in",
+    "success": "{{name}} ha effettuato il check-in",
+    "already": "{{name}} ha già effettuato il check-in",
+    "checkout_button": "Check-out",
+    "checkout_success": "{{name}} ha effettuato il check-out",
+    "invalid": "Questo codice di check-in non è valido o è scaduto.",
+    "forbidden": "Non hai il permesso di verificare i check-in per questo turno.",
+    "error": "Qualcosa è andato storto. Riprova.",
+    "done": "Fatto"
   },
   "page_meta": {
     "create_opportunity": {

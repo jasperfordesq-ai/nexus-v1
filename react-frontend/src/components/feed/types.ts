@@ -36,7 +36,7 @@ export interface FeedItem {
   };
   created_at: string;
   updated_at?: string;
-  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'blog' | 'discussion' | 'resource' | 'badge_earned' | 'level_up' | 'course';
+  type: 'post' | 'listing' | 'event' | 'poll' | 'goal' | 'review' | 'job' | 'challenge' | 'volunteer' | 'volunteer_hours' | 'blog' | 'discussion' | 'resource' | 'badge_earned' | 'level_up' | 'course';
   likes_count: number;
   comments_count: number;
   views_count?: number;
@@ -69,6 +69,8 @@ export interface FeedItem {
   credits_offered?: number;
   /** Volunteer-specific: organization name */
   organization?: string;
+  /** Volunteer-hours-specific: approved hours logged */
+  hours?: number | null;
   /** Badge-earned-specific: badge key */
   badge_key?: string;
   /** Badge-earned-specific: badge name */
@@ -211,6 +213,9 @@ export function getItemDetailPath(item: FeedItem): string | null {
       return `/ideation/${item.id}`;
     case 'volunteer':
       return `/volunteering/opportunities/${item.id}`;
+    case 'volunteer_hours':
+      // An hour-log has no standalone detail page; link to the member's hours.
+      return null;
     case 'blog':
       return item.slug ? `/blog/${item.slug}` : `/feed/item/blog/${item.id}`;
     case 'course':

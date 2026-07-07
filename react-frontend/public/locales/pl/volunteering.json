@@ -869,7 +869,18 @@
     "qr_alt": "Kod QR do odprawy",
     "checked_in_at": "Zameldowałem się: {{time}}",
     "checked_out_at": "Wymeldowano: {{time}}",
-    "some_unavailable": "W przypadku niektórych zmian kody QR do odprawy nie są jeszcze dostępne."
+    "some_unavailable": "W przypadku niektórych zmian kody QR do odprawy nie są jeszcze dostępne.",
+    "verify_title": "Odprawa wolontariusza",
+    "verify_intro": "Potwierdź przybycie tego wolontariusza na zmianę.",
+    "confirm_button": "Potwierdź odprawę",
+    "success": "{{name}} został odprawiony",
+    "already": "{{name}} jest już odprawiony",
+    "checkout_button": "Odpraw wyjście",
+    "checkout_success": "{{name}} odprawiony na wyjściu",
+    "invalid": "Ten kod odprawy jest nieprawidłowy lub wygasł.",
+    "forbidden": "Nie masz uprawnień do weryfikacji odpraw dla tej zmiany.",
+    "error": "Coś poszło nie tak. Spróbuj ponownie.",
+    "done": "Gotowe"
   },
   "page_meta": {
     "create_opportunity": {
