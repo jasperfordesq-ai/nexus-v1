@@ -50,6 +50,7 @@ export function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [turnstileArmed, setTurnstileArmed] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || '',
     email: user?.email || '',
@@ -67,11 +68,14 @@ export function ContactPage() {
     siteKey: turnstileSiteKey,
     containerRef: turnstileRef,
     reset: resetTurnstile,
-  } = useTurnstile();
+  } = useTurnstile({ enabled: turnstileArmed });
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (turnstileSiteKey && !turnstileToken) return;
+    if (turnstileSiteKey && !turnstileToken) {
+      setTurnstileArmed(true);
+      return;
+    }
     setIsSubmitting(true);
     setError(null);
 
@@ -146,7 +150,7 @@ export function ContactPage() {
               </Link>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} onFocusCapture={() => setTurnstileArmed(true)} className="space-y-5">
               {error && (
                 <div role="alert" className="p-3 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 text-sm">
                   {error}
@@ -212,7 +216,7 @@ export function ContactPage() {
                   input: 'text-theme-primary placeholder:text-theme-subtle',
                 }} />
 
-              {turnstileSiteKey && (
+              {turnstileSiteKey && turnstileArmed && (
                 <div>
                   <div ref={turnstileRef} className="my-2 min-h-[1px]" />
                   {turnstileStatus === 'error' && (
@@ -226,7 +230,7 @@ export function ContactPage() {
               <Button
                 type="submit"
                 isLoading={isSubmitting}
-                isDisabled={!formData.name.trim() || !formData.email.trim() || !formData.message.trim() || (!!turnstileSiteKey && !turnstileToken)}
+                isDisabled={!formData.name.trim() || !formData.email.trim() || !formData.message.trim() || (!!turnstileSiteKey && turnstileArmed && !turnstileToken)}
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
                 size="lg"
                 spinner={<Spinner size="sm" aria-hidden="true" />}

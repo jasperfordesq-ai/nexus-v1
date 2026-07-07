@@ -57,7 +57,11 @@ const SCRIPT_SRC = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
 
 export type TurnstileStatus = 'idle' | 'loading' | 'ready' | 'solved' | 'error';
 
-export function useTurnstile() {
+interface UseTurnstileOptions {
+  enabled?: boolean;
+}
+
+export function useTurnstile({ enabled = true }: UseTurnstileOptions = {}) {
   const [token, setToken] = useState<string>('');
   const [status, setStatus] = useState<TurnstileStatus>('idle');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -65,7 +69,7 @@ export function useTurnstile() {
   const siteKey = (import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined) ?? '';
 
   useEffect(() => {
-    if (!siteKey) return;
+    if (!siteKey || !enabled) return;
     setStatus('loading');
 
     // Inject api.js once per page.
@@ -141,7 +145,7 @@ export function useTurnstile() {
       setStatus('idle');
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- status omitted intentionally; we don't want to re-render the widget on every state transition
-  }, [siteKey]);
+  }, [siteKey, enabled]);
 
   const reset = () => {
     if (widgetIdRef.current && window.turnstile) {
