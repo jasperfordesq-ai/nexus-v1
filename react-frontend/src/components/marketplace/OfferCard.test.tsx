@@ -89,7 +89,12 @@ describe('OfferCard', () => {
 
   it('renders accepted status chip for an accepted offer', () => {
     render(<OfferCard offer={{ ...BASE_OFFER, status: 'accepted' }} />);
-    expect(screen.getByText(/accepted/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/^accepted$/i).length).toBeGreaterThan(0);
+  });
+
+  it('shows a payment action for accepted buyer offers', () => {
+    render(<OfferCard offer={{ ...BASE_OFFER, status: 'accepted' }} perspective="buyer" />);
+    expect(screen.getByRole('button', { name: /pay accepted offer/i })).toBeInTheDocument();
   });
 
   it('renders declined status chip', () => {

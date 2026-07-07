@@ -120,7 +120,8 @@
     "decline": "Refuser",
     "counter": "Contre-offre",
     "withdraw": "Retirer",
-    "accept_counter": "Accepter la contre-offre"
+    "accept_counter": "Accepter la contre-offre",
+    "pay_accepted": "Pay accepted offer"
   },
   "create": {
     "page_title": "Vendre quelque chose - Marché",
@@ -444,7 +445,8 @@
     "counter_message_label": "Message (optionnel)",
     "counter_message_placeholder": "Expliquez votre contre-offre...",
     "counter_sent_success": "Contre-offre envoyée",
-    "send_counter": "Envoyer la contre-offre"
+    "send_counter": "Envoyer la contre-offre",
+    "checkout_started_success": "Checkout started for your accepted offer."
   },
   "collections": {
     "page_title": "Mes Collections",
@@ -594,7 +596,8 @@
     "no_slot_selected": "Aucun créneau de retrait",
     "left": "disponibles",
     "slot_fallback": "Créneau #{{id}}",
-    "status_unknown": "Inconnu"
+    "status_unknown": "Inconnu",
+    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
   },
   "inventory": {
     "section_title": "Inventaire",
@@ -643,6 +646,10 @@
   },
   "shipping": {
     "title": "Options d'expédition",
+    "page_title": "Shipping Options",
+    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
+    "back_to_listings": "Back to My Listings",
+    "manage_cta": "Shipping settings",
     "add_option": "Ajouter une option d'expédition",
     "courier_name": "Nom du transporteur",
     "courier_name_placeholder": "par ex. An Post, Royal Mail, DHL",
@@ -673,7 +680,8 @@
     "recommended": "Recommandé",
     "loading": "Chargement des options d'expédition...",
     "no_options": "Aucune option d'expédition disponible pour ce vendeur.",
-    "delete_confirm": "Supprimer cette option d'expédition ? Cela ne peut pas être annulé."
+    "delete_confirm": "Supprimer cette option d'expédition ? Cela ne peut pas être annulé.",
+    "choose_required": "Choose a delivery method before checkout."
   },
   "listing_location": {
     "location_title": "Localisation",
@@ -799,6 +807,7 @@
     "title": "Paiement sécurisé",
     "order_summary": "Récapitulatif de la commande",
     "shipping": "Livraison",
+    "discount": "Discount",
     "total": "Total",
     "secure_notice": "Les paiements sont traités en toute sécurité par Stripe. Vos coordonnées bancaires ne sont jamais stockées sur nos serveurs.",
     "cancel": "Annuler",

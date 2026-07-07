@@ -1,9 +1,9 @@
-import { useDisclosure, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tab, Tabs } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { useDisclosure, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tab, Tabs } from '@/components/ui';
 /**
  * MyOffersPage — View and manage marketplace offers as buyer/seller.
  *
@@ -205,6 +205,10 @@ export function MyOffersPage() {
     }
   }, [toast, updateOfferLocally, t])
 
+  const handleCheckoutSuccess = useCallback((_offerId: number) => {
+    toast.success(t('my_offers.checkout_started_success'));
+  }, [toast, t]);
+
   // Open counter-offer modal (seller)
   const openCounterModal = useCallback((offerId: number) => {
     setCounterTargetId(offerId);
@@ -328,6 +332,7 @@ export function MyOffersPage() {
                 onCounter={openCounterModal}
                 onWithdraw={handleWithdraw}
                 onAcceptCounter={handleAcceptCounter}
+                onCheckoutSuccess={handleCheckoutSuccess}
               />
             ))}
 

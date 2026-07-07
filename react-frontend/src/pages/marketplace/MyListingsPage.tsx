@@ -28,6 +28,7 @@ import Eye from 'lucide-react/icons/eye';
 import DollarSign from 'lucide-react/icons/dollar-sign';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Clock from 'lucide-react/icons/clock';
+import Truck from 'lucide-react/icons/truck';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, useDisclosure, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tab, Tabs } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
@@ -288,14 +289,23 @@ export function MyListingsPage() {
               {t('my_listings.subtitle')}
             </p>
           </div>
-          <Button
-            as={Link}
-            to={tenantPath('/marketplace/sell')}
-
-            startContent={<Plus className="w-4 h-4" />}
-          >
-            {t('hub.sell_something')}
-          </Button>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            <Button
+              as={Link}
+              to={tenantPath('/marketplace/seller/shipping-options')}
+              variant="secondary"
+              startContent={<Truck className="w-4 h-4" />}
+            >
+              {t('shipping.manage_cta')}
+            </Button>
+            <Button
+              as={Link}
+              to={tenantPath('/marketplace/sell')}
+              startContent={<Plus className="w-4 h-4" />}
+            >
+              {t('hub.sell_something')}
+            </Button>
+          </div>
         </div>
 
         {/* AG48 — Onboarding nudge */}

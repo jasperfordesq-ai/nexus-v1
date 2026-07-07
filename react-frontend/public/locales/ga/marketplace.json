@@ -120,7 +120,8 @@
     "decline": "Diúltaigh",
     "counter": "Frith-thairg",
     "withdraw": "Tarraing Siar",
-    "accept_counter": "Glac leis an bhFrith-thairiscint"
+    "accept_counter": "Glac leis an bhFrith-thairiscint",
+    "pay_accepted": "Pay accepted offer"
   },
   "create": {
     "page_title": "Díol Rud Éigin - Margadh",
@@ -444,7 +445,8 @@
     "counter_message_label": "Teachtaireacht (roghnach)",
     "counter_message_placeholder": "Mínigh do fhrith-thairiscint...",
     "counter_sent_success": "Seoladh an fhrith-thairiscint",
-    "send_counter": "Seol Frith-thairiscint"
+    "send_counter": "Seol Frith-thairiscint",
+    "checkout_started_success": "Checkout started for your accepted offer."
   },
   "collections": {
     "page_title": "Mo Bhailiúcháin",
@@ -594,7 +596,8 @@
     "no_slot_selected": "Gan sliotán bailiúcháin",
     "left": "fágtha",
     "slot_fallback": "Sliotán #{{id}}",
-    "status_unknown": "Anaithnid"
+    "status_unknown": "Anaithnid",
+    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
   },
   "inventory": {
     "section_title": "Stoc",
@@ -643,6 +646,10 @@
   },
   "shipping": {
     "title": "Roghanna Loingseoireachta",
+    "page_title": "Shipping Options",
+    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
+    "back_to_listings": "Back to My Listings",
+    "manage_cta": "Shipping settings",
     "add_option": "Cuir Rogha Loingseoireachta Leis",
     "courier_name": "Ainm an Teachtaire",
     "courier_name_placeholder": "m.sh. An Post, Royal Mail, DHL",
@@ -673,7 +680,8 @@
     "recommended": "Molta",
     "loading": "Roghanna loingseoireachta á luchtú...",
     "no_options": "Níl aon roghanna loingseoireachta ar fáil don díoltóir seo.",
-    "delete_confirm": "An bhfuil fonn ort an rogha seolta seo a bhaint? Ní féidir é seo a chealú."
+    "delete_confirm": "An bhfuil fonn ort an rogha seolta seo a bhaint? Ní féidir é seo a chealú.",
+    "choose_required": "Choose a delivery method before checkout."
   },
   "listing_location": {
     "location_title": "Suíomh",
@@ -799,6 +807,7 @@
     "title": "Seiceáil Slán",
     "order_summary": "Achoimre Ordaithe",
     "shipping": "Postáil",
+    "discount": "Discount",
     "total": "Iomlán",
     "secure_notice": "Próiseáltar íocaíochtaí go slán ag Stripe. Ní stóráiltear sonraí do chárta ar ár bhfreastalaithe riamh.",
     "cancel": "Cealaigh",

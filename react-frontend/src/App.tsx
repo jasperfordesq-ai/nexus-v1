@@ -284,6 +284,7 @@ const CouponDetailPage = lazyWithRetry(() => import('./pages/coupons/CouponDetai
 const SellerCouponsPage = lazyWithRetry(() => import('./pages/marketplace/seller/SellerCouponsPage'));
 const SellerCouponEditPage = lazyWithRetry(() => import('./pages/marketplace/seller/SellerCouponEditPage'));
 const SellerPickupSlotsPage = lazyWithRetry(() => import('./pages/marketplace/seller/SellerPickupSlotsPage'));
+const SellerShippingOptionsPage = lazyWithRetry(() => import('./pages/marketplace/seller/SellerShippingOptionsPage'));
 const SellerPickupScanPage = lazyWithRetry(() => import('./pages/marketplace/seller/SellerPickupScanPage'));
 const MyPickupsPage = lazyWithRetry(() => import('./pages/marketplace/MyPickupsPage'));
 
@@ -1523,6 +1524,13 @@ function AppRoutes() {
             <FeatureGate feature="marketplace" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Marketplace">
                 <SellerPickupSlotsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/seller/shipping-options" element={
+            <FeatureGate feature="marketplace" redirect="/dashboard">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <SellerShippingOptionsPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />

@@ -120,7 +120,8 @@
     "decline": "Odrzuć",
     "counter": "Kontroferta",
     "withdraw": "Wycofaj",
-    "accept_counter": "Zaakceptuj kontrofertę"
+    "accept_counter": "Zaakceptuj kontrofertę",
+    "pay_accepted": "Pay accepted offer"
   },
   "create": {
     "page_title": "Sprzedaj coś - Marketplace",
@@ -444,7 +445,8 @@
     "counter_message_label": "Wiadomość (opcjonalnie)",
     "counter_message_placeholder": "Wyjaśnij swoją kontrofertę...",
     "counter_sent_success": "Kontroferta wysłana",
-    "send_counter": "Wyślij kontrofertę"
+    "send_counter": "Wyślij kontrofertę",
+    "checkout_started_success": "Checkout started for your accepted offer."
   },
   "collections": {
     "page_title": "Moje kolekcje",
@@ -594,7 +596,8 @@
     "no_slot_selected": "Brak wybranego terminu odbioru",
     "left": "pozostało",
     "slot_fallback": "Termin #{{id}}",
-    "status_unknown": "Nieznany"
+    "status_unknown": "Nieznany",
+    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
   },
   "inventory": {
     "section_title": "Stan magazynowy",
@@ -643,6 +646,10 @@
   },
   "shipping": {
     "title": "Opcje wysyłki",
+    "page_title": "Shipping Options",
+    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
+    "back_to_listings": "Back to My Listings",
+    "manage_cta": "Shipping settings",
     "add_option": "Dodaj opcję wysyłki",
     "courier_name": "Nazwa kuriera",
     "courier_name_placeholder": "np. Poczta Polska, InPost, DHL",
@@ -673,7 +680,8 @@
     "recommended": "Polecane",
     "loading": "Ładowanie opcji wysyłki...",
     "no_options": "Brak dostępnych opcji wysyłki dla tego sprzedawcy.",
-    "delete_confirm": "Usunąć tę opcję wysyłki? Tego nie można cofnąć."
+    "delete_confirm": "Usunąć tę opcję wysyłki? Tego nie można cofnąć.",
+    "choose_required": "Choose a delivery method before checkout."
   },
   "listing_location": {
     "location_title": "Lokalizacja",
@@ -799,6 +807,7 @@
     "title": "Bezpieczna płatność",
     "order_summary": "Podsumowanie zamówienia",
     "shipping": "Dostawa",
+    "discount": "Discount",
     "total": "Łącznie",
     "secure_notice": "Płatności są bezpiecznie przetwarzane przez Stripe. Dane Twojej karty nigdy nie są przechowywane na naszych serwerach.",
     "cancel": "Anuluj",

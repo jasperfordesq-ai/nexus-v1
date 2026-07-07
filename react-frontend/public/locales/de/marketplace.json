@@ -120,7 +120,8 @@
     "decline": "Ablehnen",
     "counter": "Gegenangebot",
     "withdraw": "Zurückziehen",
-    "accept_counter": "Gegenangebot annehmen"
+    "accept_counter": "Gegenangebot annehmen",
+    "pay_accepted": "Pay accepted offer"
   },
   "create": {
     "page_title": "Etwas verkaufen – Marktplatz",
@@ -444,7 +445,8 @@
     "counter_message_label": "Nachricht (optional)",
     "counter_message_placeholder": "Erklären Sie Ihr Gegenangebot...",
     "counter_sent_success": "Gegenangebot gesendet",
-    "send_counter": "Gegenangebot senden"
+    "send_counter": "Gegenangebot senden",
+    "checkout_started_success": "Checkout started for your accepted offer."
   },
   "collections": {
     "page_title": "Meine Sammlungen",
@@ -594,7 +596,8 @@
     "no_slot_selected": "Kein Abholtermin",
     "left": "übrig",
     "slot_fallback": "Abholfenster #{{id}}",
-    "status_unknown": "Unbekannt"
+    "status_unknown": "Unbekannt",
+    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
   },
   "inventory": {
     "section_title": "Bestand",
@@ -643,6 +646,10 @@
   },
   "shipping": {
     "title": "Versandoptionen",
+    "page_title": "Shipping Options",
+    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
+    "back_to_listings": "Back to My Listings",
+    "manage_cta": "Shipping settings",
     "add_option": "Versandoption hinzufügen",
     "courier_name": "Kuriername",
     "courier_name_placeholder": "z. B. Schweizerische Post, DHL",
@@ -673,7 +680,8 @@
     "recommended": "Empfohlen",
     "loading": "Versandoptionen werden geladen...",
     "no_options": "Keine Versandoptionen für diesen Verkäufer verfügbar.",
-    "delete_confirm": "Diese Versandoption entfernen? Dies kann nicht rückgängig gemacht werden."
+    "delete_confirm": "Diese Versandoption entfernen? Dies kann nicht rückgängig gemacht werden.",
+    "choose_required": "Choose a delivery method before checkout."
   },
   "listing_location": {
     "location_title": "Standort",
@@ -799,6 +807,7 @@
     "title": "Sicherer Checkout",
     "order_summary": "Bestellübersicht",
     "shipping": "Versand",
+    "discount": "Discount",
     "total": "Gesamt",
     "secure_notice": "Zahlungen werden sicher über Stripe verarbeitet. Ihre Kartendaten werden niemals auf unseren Servern gespeichert.",
     "cancel": "Abbrechen",

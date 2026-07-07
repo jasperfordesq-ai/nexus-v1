@@ -104,6 +104,52 @@ class MarketplaceOrderControllerTest extends TestCase
         $this->assertLessThan(500, $response->status());
     }
 
+    public function test_store_accepts_shipping_cost_for_direct_purchase(): void
+    {
+        $buyer = $this->authenticatedUser();
+        $seller = User::factory()->forTenant(2)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $listingId = DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => 2,
+            'user_id' => $seller->id,
+            'title' => 'Shippable item',
+            'description' => 'desc',
+            'price' => 10.00,
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'quantity' => 1,
+            'shipping_available' => 1,
+            'local_pickup' => 0,
+            'delivery_method' => 'shipping',
+            'seller_type' => 'private',
+            'status' => 'active',
+            'moderation_status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiPost('/v2/marketplace/orders', [
+            'listing_id' => $listingId,
+            'shipping_method' => 'Express Courier',
+            'shipping_cost' => 4.50,
+        ]);
+
+        if ($response->status() === 403) {
+            $this->markTestSkipped('Marketplace feature gate is disabled for the test tenant.');
+        }
+
+        $response->assertCreated();
+        $this->assertDatabaseHas('marketplace_orders', [
+            'buyer_id' => $buyer->id,
+            'marketplace_listing_id' => $listingId,
+            'shipping_method' => 'Express Courier',
+            'shipping_cost' => 4.50,
+            'total_price' => 14.50,
+        ]);
+    }
+
     // -------- Deep tests --------
 
     public function test_show_returns_404_for_missing_order(): void

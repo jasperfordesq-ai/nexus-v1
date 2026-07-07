@@ -120,7 +120,8 @@
     "decline": "Recusar",
     "counter": "Contraoferta",
     "withdraw": "Retirar",
-    "accept_counter": "Aceitar Contraoferta"
+    "accept_counter": "Aceitar Contraoferta",
+    "pay_accepted": "Pay accepted offer"
   },
   "create": {
     "page_title": "Vender Algo - Mercado",
@@ -444,7 +445,8 @@
     "counter_message_label": "Mensagem (opcional)",
     "counter_message_placeholder": "Explique sua contra-oferta...",
     "counter_sent_success": "Contra-oferta enviada",
-    "send_counter": "Enviar Contra"
+    "send_counter": "Enviar Contra",
+    "checkout_started_success": "Checkout started for your accepted offer."
   },
   "collections": {
     "page_title": "Minhas Coleções",
@@ -594,7 +596,8 @@
     "no_slot_selected": "Sem horário de levantamento",
     "left": "disponíveis",
     "slot_fallback": "Horário #{{id}}",
-    "status_unknown": "Desconhecido"
+    "status_unknown": "Desconhecido",
+    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
   },
   "inventory": {
     "section_title": "Inventário",
@@ -643,6 +646,10 @@
   },
   "shipping": {
     "title": "Opções de Envio",
+    "page_title": "Shipping Options",
+    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
+    "back_to_listings": "Back to My Listings",
+    "manage_cta": "Shipping settings",
     "add_option": "Adicionar Opção de Envio",
     "courier_name": "Nome do Courier",
     "courier_name_placeholder": "ex. An Post, Royal Mail, DHL",
@@ -673,7 +680,8 @@
     "recommended": "Recomendado",
     "loading": "Carregando opções de envio...",
     "no_options": "Nenhuma opção de envio disponível para este vendedor.",
-    "delete_confirm": "Remover esta opção de envio? Isto não pode ser desfeito."
+    "delete_confirm": "Remover esta opção de envio? Isto não pode ser desfeito.",
+    "choose_required": "Choose a delivery method before checkout."
   },
   "listing_location": {
     "location_title": "Localização",
@@ -799,6 +807,7 @@
     "title": "Pagamento seguro",
     "order_summary": "Resumo do pedido",
     "shipping": "Envio",
+    "discount": "Discount",
     "total": "Total",
     "secure_notice": "Os pagamentos são processados de forma segura pelo Stripe. Os dados do seu cartão nunca são armazenados nos nossos servidores.",
     "cancel": "Cancelar",

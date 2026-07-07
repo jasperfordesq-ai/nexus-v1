@@ -44,6 +44,7 @@ class MarketplaceOrderController extends BaseApiController
             'offer_id' => 'nullable|integer|exists:marketplace_offers,id',
             'quantity' => 'nullable|integer|min:1',
             'shipping_method' => 'nullable|string|max:100',
+            'shipping_cost' => 'nullable|numeric|min:0|max:999999',
             'delivery_address' => 'nullable|array',
             'delivery_notes' => 'nullable|string|max:500',
             'coupon_code' => 'nullable|string|max:64',

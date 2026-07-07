@@ -41,12 +41,15 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard, useDisclosure, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { BuyNowButton, LoyaltyRedemptionCard, MarketplaceListingDetailSkeleton } from '@/components/marketplace';
+import { ShippingSelector } from '@/components/marketplace/ShippingSelector';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveThumbnailUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
+import type { MarketplaceShippingOption } from '@/types/marketplace';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -235,7 +238,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
         <AnimatePresence mode="wait">
           <motion.img
             key={activeIndex}
-            src={images[activeIndex]?.url}
+            src={resolveThumbnailUrl(images[activeIndex]?.url, { width: 1200, height: 675, fit: 'contain' })}
             alt={images[activeIndex]?.alt_text || t('listing.image_alt', { number: activeIndex + 1 })}
             className="w-full h-full object-contain"
             initial={{ opacity: 0 }}
@@ -303,7 +306,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
               }`}
             >
               <img
-                src={img.thumbnail_url || img.url}
+                src={resolveThumbnailUrl(img.thumbnail_url || img.url, { width: 128, height: 128 })}
                 alt={t('listing.thumbnail_alt', { number: idx + 1 })}
                 className="w-full h-full object-cover"
                 loading="lazy"
@@ -344,6 +347,7 @@ export function MarketplaceListingPage() {
   const [isSubmittingOffer, setIsSubmittingOffer] = useState(false);
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportReason, setReportReason] = useState('');
+  const [selectedShippingOption, setSelectedShippingOption] = useState<MarketplaceShippingOption | null | undefined>(undefined);
   const sellerId = listing?.user?.id;
 
   // Load listing
@@ -397,6 +401,10 @@ export function MarketplaceListingPage() {
     load();
     return () => { cancelled = true; };
   }, [sellerId, listing?.id]);
+
+  useEffect(() => {
+    setSelectedShippingOption(undefined);
+  }, [listing?.id]);
 
   // Toggle save
   const handleToggleSave = useCallback(async () => {
@@ -511,6 +519,7 @@ export function MarketplaceListingPage() {
   }
 
   const priceDisplay = formatPrice(listing.price, listing.price_type, listing.price_currency, freeLabel);
+  const shippingRequired = Boolean(listing.shipping_available || listing.local_pickup);
   const metaDescription = (listing.tagline || listing.description || t('listing.meta_description_fallback'))
     .replace(/\s+/g, ' ')
     .trim()
@@ -655,12 +664,21 @@ export function MarketplaceListingPage() {
                       orderTotalChf={listing.price}
                       currency={listing.price_currency || 'CHF'}
                     />
+                    {(listing.shipping_available || listing.local_pickup) && (
+                      <ShippingSelector
+                        sellerId={listing.user?.id ?? 0}
+                        localPickup={listing.local_pickup}
+                        onSelect={setSelectedShippingOption}
+                      />
+                    )}
                     <BuyNowButton
                       listingId={listing.id}
                       listingTitle={listing.title}
                       price={listing.price}
                       currency={listing.price_currency}
                       sellerId={listing.user?.id ?? 0}
+                      selectedShippingOption={selectedShippingOption}
+                      shippingRequired={shippingRequired}
                       onSuccess={() => {
                         toast.success(t('listing.order_created'));
                       }}
@@ -815,7 +833,7 @@ export function MarketplaceListingPage() {
                     <div className="aspect-square bg-surface-secondary overflow-hidden rounded-t-xl">
                       {item.images?.[0] ? (
                         <img
-                          src={item.images[0].thumbnail_url || item.images[0].url}
+                          src={resolveThumbnailUrl(item.images[0].thumbnail_url || item.images[0].url, { width: 360, height: 360 })}
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           loading="lazy"

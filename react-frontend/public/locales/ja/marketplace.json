@@ -120,7 +120,8 @@
     "decline": "辞退",
     "counter": "カウンター",
     "withdraw": "取り下げ",
-    "accept_counter": "カウンターを承諾"
+    "accept_counter": "カウンターを承諾",
+    "pay_accepted": "Pay accepted offer"
   },
   "create": {
     "page_title": "出品する - マーケットプレイス",
@@ -444,7 +445,8 @@
     "counter_message_label": "メッセージ(任意)",
     "counter_message_placeholder": "カウンターオファーの理由を説明…",
     "counter_sent_success": "カウンターオファーを送信しました",
-    "send_counter": "カウンターを送信"
+    "send_counter": "カウンターを送信",
+    "checkout_started_success": "Checkout started for your accepted offer."
   },
   "collections": {
     "page_title": "マイコレクション",
@@ -594,7 +596,8 @@
     "no_slot_selected": "受取スロットなし",
     "left": "残り",
     "slot_fallback": "スロット #{{id}}",
-    "status_unknown": "不明"
+    "status_unknown": "不明",
+    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
   },
   "inventory": {
     "section_title": "在庫",
@@ -643,6 +646,10 @@
   },
   "shipping": {
     "title": "配送オプション",
+    "page_title": "Shipping Options",
+    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
+    "back_to_listings": "Back to My Listings",
+    "manage_cta": "Shipping settings",
     "add_option": "配送オプションを追加",
     "courier_name": "配送業者名",
     "courier_name_placeholder": "例: ヤマト運輸、佐川急便、DHL",
@@ -673,7 +680,8 @@
     "recommended": "おすすめ",
     "loading": "配送オプションを読み込み中…",
     "no_options": "このセラーには利用可能な配送オプションがありません。",
-    "delete_confirm": "この配送オプションを削除しますか?これを元に戻すことはできません。"
+    "delete_confirm": "この配送オプションを削除しますか?これを元に戻すことはできません。",
+    "choose_required": "Choose a delivery method before checkout."
   },
   "listing_location": {
     "location_title": "場所",
@@ -799,6 +807,7 @@
     "title": "安全なチェックアウト",
     "order_summary": "注文概要",
     "shipping": "配送",
+    "discount": "Discount",
     "total": "合計",
     "secure_notice": "決済はStripeによって安全に処理されます。カード情報は当社のサーバーに保存されることはありません。",
     "cancel": "キャンセル",

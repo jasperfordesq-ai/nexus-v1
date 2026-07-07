@@ -120,7 +120,8 @@
     "decline": "رفض",
     "counter": "عرض مضاد",
     "withdraw": "سحب",
-    "accept_counter": "قبول العداد"
+    "accept_counter": "قبول العداد",
+    "pay_accepted": "Pay accepted offer"
   },
   "create": {
     "page_title": "بيع شيء ما - السوق",
@@ -444,7 +445,8 @@
     "counter_message_label": "رسالة (اختياري)",
     "counter_message_placeholder": "اشرح عرضك المضاد...",
     "counter_sent_success": "تم إرسال العرض المضاد",
-    "send_counter": "إرسال عرض مضاد"
+    "send_counter": "إرسال عرض مضاد",
+    "checkout_started_success": "Checkout started for your accepted offer."
   },
   "collections": {
     "page_title": "مجموعاتي",
@@ -594,7 +596,8 @@
     "no_slot_selected": "لم يتم اختيار موعد",
     "left": "متبقي",
     "slot_fallback": "الموعد #{{id}}",
-    "status_unknown": "غير معروف"
+    "status_unknown": "غير معروف",
+    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
   },
   "inventory": {
     "section_title": "المخزون",
@@ -643,6 +646,10 @@
   },
   "shipping": {
     "title": "خيارات الشحن",
+    "page_title": "Shipping Options",
+    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
+    "back_to_listings": "Back to My Listings",
+    "manage_cta": "Shipping settings",
     "add_option": "أضف خيار شحن",
     "courier_name": "اسم الناقل",
     "courier_name_placeholder": "مثل: An Post، Royal Mail، DHL",
@@ -673,7 +680,8 @@
     "recommended": "موصى به",
     "loading": "جارٍ تحميل خيارات الشحن...",
     "no_options": "لا توجد خيارات شحن متاحة لهذا البائع.",
-    "delete_confirm": "هل تريد إزالة خيار الشحن هذا؟ لا يمكن التراجع عن هذا."
+    "delete_confirm": "هل تريد إزالة خيار الشحن هذا؟ لا يمكن التراجع عن هذا.",
+    "choose_required": "Choose a delivery method before checkout."
   },
   "listing_location": {
     "location_title": "الموقع",
@@ -799,6 +807,7 @@
     "title": "الدفع الآمن",
     "order_summary": "ملخص الطلب",
     "shipping": "الشحن",
+    "discount": "Discount",
     "total": "الإجمالي",
     "secure_notice": "تتم معالجة المدفوعات بأمان عبر Stripe. لا يتم تخزين بيانات بطاقتك على خوادمنا.",
     "cancel": "إلغاء",

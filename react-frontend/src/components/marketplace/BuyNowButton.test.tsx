@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { fireEvent, render, screen, waitFor } from '@/test/test-utils';
 import userEvent from '@testing-library/user-event';
 import { createMockContexts } from '@/test/mock-contexts';
 
@@ -49,8 +49,8 @@ vi.mock('@/contexts', () =>
 
 // ── mock StripeCheckoutModal ──────────────────────────────────────────────────
 vi.mock('./StripeCheckoutModal', () => ({
-  StripeCheckoutModal: ({ isOpen }: { isOpen: boolean }) =>
-    isOpen ? <div data-testid="stripe-modal" /> : null,
+  StripeCheckoutModal: ({ isOpen, amount }: { isOpen: boolean; amount: number }) =>
+    isOpen ? <div data-testid="stripe-modal">Amount {amount}</div> : null,
 }));
 
 import { BuyNowButton } from './BuyNowButton';
@@ -67,6 +67,7 @@ const BASE_PROPS = {
 describe('BuyNowButton', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockHasFeature.mockReturnValue(false);
     // Default: no pickup slots
     mockApi.get.mockResolvedValue({ success: true, data: [] });
   });
@@ -156,6 +157,107 @@ describe('BuyNowButton', () => {
     expect(window.location.href).toBe('https://stripe.com/pay/123');
     // @ts-expect-error restore
     window.location = origLocation;
+  });
+
+  it('includes accepted offer id when checking out an accepted offer', async () => {
+    mockApi.get.mockResolvedValue({ success: true, data: [] });
+    mockApi.post
+      .mockResolvedValueOnce({ success: true, data: { id: 14, order_number: 'ORD-014', status: 'pending' } })
+      .mockResolvedValueOnce({ success: true, data: {} });
+
+    const user = userEvent.setup();
+    render(<BuyNowButton {...BASE_PROPS} offerId={77} allowCoupons={false} />);
+    await waitFor(() => screen.getByRole('button', { name: /buy now/i }));
+
+    await user.click(screen.getByRole('button', { name: /buy now/i }));
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith('/v2/marketplace/orders', expect.objectContaining({
+        listing_id: 42,
+        offer_id: 77,
+      }));
+    });
+  });
+
+  it('includes selected shipping cost in the order payload and displayed total', async () => {
+    mockApi.get.mockResolvedValue({ success: true, data: [] });
+    mockApi.post
+      .mockResolvedValueOnce({ success: true, data: { id: 15, order_number: 'ORD-015', status: 'pending' } })
+      .mockResolvedValueOnce({ success: true, data: {} });
+
+    const user = userEvent.setup();
+    render(
+      <BuyNowButton
+        {...BASE_PROPS}
+        selectedShippingOption={{
+          id: 3,
+          courier_name: 'Express Courier',
+          price: 5,
+          currency: 'EUR',
+          is_default: false,
+          is_active: true,
+        }}
+        shippingRequired
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/shipping/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /34/ })).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole('button', { name: /buy now/i }));
+
+    await waitFor(() => {
+      expect(mockApi.post).toHaveBeenCalledWith('/v2/marketplace/orders', expect.objectContaining({
+        shipping_method: 'Express Courier',
+        shipping_cost: 5,
+      }));
+    });
+  });
+
+  it('blocks payment intent creation when pickup reservation fails', async () => {
+    mockApi.get.mockResolvedValueOnce({
+      success: true,
+      data: [{ id: 5, slot_start: '2025-07-01T10:00:00Z', slot_end: null, remaining: 3 }],
+    });
+    mockApi.post
+      .mockResolvedValueOnce({ success: true, data: { id: 16, order_number: 'ORD-016', status: 'pending' } })
+      .mockResolvedValueOnce({ success: false, error: 'Slot full' });
+
+    const user = userEvent.setup();
+    render(<BuyNowButton {...BASE_PROPS} />);
+
+    await waitFor(() => {
+      expect(document.querySelector('select option[value="5"]')).not.toBeNull();
+    });
+    fireEvent.change(document.querySelector('select') as HTMLSelectElement, { target: { value: '5' } });
+    await user.click(screen.getByRole('button', { name: /buy now/i }));
+
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith('Slot full');
+    });
+    expect(mockApi.post).not.toHaveBeenCalledWith(
+      '/v2/marketplace/payments/create-intent',
+      expect.anything(),
+    );
+  });
+
+  it('shows coupon discount in the checkout total', async () => {
+    mockHasFeature.mockReturnValue(true);
+    mockApi.get.mockResolvedValue({ success: true, data: [] });
+    mockApi.post.mockResolvedValueOnce({ success: true, data: { discount_cents: 500 } });
+
+    const user = userEvent.setup();
+    render(<BuyNowButton {...BASE_PROPS} />);
+
+    await user.type(screen.getByPlaceholderText(/coupon/i), 'SAVE5');
+    await user.click(screen.getByRole('button', { name: /apply/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/discount/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /24/ })).toBeInTheDocument();
+    });
   });
 
   it('opens Stripe checkout modal when client_secret is returned', async () => {

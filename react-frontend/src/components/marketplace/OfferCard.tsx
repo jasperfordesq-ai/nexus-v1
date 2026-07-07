@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { GlassCard, Button, Chip, Avatar } from '@/components/ui';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import type { MarketplaceOffer } from '@/types/marketplace';
+import { BuyNowButton } from './BuyNowButton';
 
 interface OfferCardProps {
   offer: MarketplaceOffer;
@@ -29,6 +30,7 @@ interface OfferCardProps {
   onCounter?: (offerId: number) => void;
   onWithdraw?: (offerId: number) => void;
   onAcceptCounter?: (offerId: number) => void;
+  onCheckoutSuccess?: (offerId: number) => void;
 }
 
 const STATUS_CONFIG: Record<string, { color: 'warning' | 'success' | 'danger' | 'secondary' | 'default'; labelKey: string }> = {
@@ -74,6 +76,7 @@ export function OfferCard({
   onCounter,
   onWithdraw,
   onAcceptCounter,
+  onCheckoutSuccess,
 }: OfferCardProps) {
   const { t } = useTranslation('marketplace');
   const statusConfig = STATUS_CONFIG[offer.status] ?? { color: 'default' as const, labelKey: 'offer.status.unknown' };
@@ -229,6 +232,22 @@ export function OfferCard({
               >
                 {t('offer.decline')}
               </Button>
+            </div>
+          )}
+
+          {offer.status === 'accepted' && perspective === 'buyer' && offer.listing && offer.seller && (
+            <div className="mt-3">
+              <BuyNowButton
+                listingId={offer.listing.id}
+                offerId={offer.id}
+                listingTitle={offer.listing.title}
+                price={offer.amount}
+                currency={offer.currency}
+                sellerId={offer.seller.id}
+                allowCoupons={false}
+                buttonLabelKey="offer.pay_accepted"
+                onSuccess={() => onCheckoutSuccess?.(offer.id)}
+              />
             </div>
           )}
         </div>

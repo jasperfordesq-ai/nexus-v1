@@ -29,7 +29,7 @@ import { Chip, Spinner, RadioGroup, Radio } from '@/components/ui';
 
 export interface ShippingSelectorProps {
   sellerId: number;
-  onSelect: (option: MarketplaceShippingOption | null) => void;
+  onSelect: (option: MarketplaceShippingOption | null | undefined) => void;
   /** Whether local pickup is available for this listing. */
   localPickup: boolean;
 }
@@ -93,7 +93,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
   // When selectedValue changes, fire onSelect
   useEffect(() => {
     if (!selectedValue) {
-      onSelect(null);
+      onSelect(undefined);
       return;
     }
     if (selectedValue === LOCAL_PICKUP_ID) {

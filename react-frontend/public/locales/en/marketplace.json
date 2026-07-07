@@ -120,7 +120,8 @@
     "decline": "Decline",
     "counter": "Counter",
     "withdraw": "Withdraw",
-    "accept_counter": "Accept Counter"
+    "accept_counter": "Accept Counter",
+    "pay_accepted": "Pay accepted offer"
   },
   "create": {
     "page_title": "Sell Something - Marketplace",
@@ -444,7 +445,8 @@
     "counter_message_label": "Message (optional)",
     "counter_message_placeholder": "Explain your counter-offer...",
     "counter_sent_success": "Counter-offer sent",
-    "send_counter": "Send Counter"
+    "send_counter": "Send Counter",
+    "checkout_started_success": "Checkout started for your accepted offer."
   },
   "collections": {
     "page_title": "My Collections",
@@ -594,7 +596,8 @@
     "no_slot_selected": "No pickup slot",
     "left": "left",
     "slot_fallback": "Slot #{{id}}",
-    "status_unknown": "Unknown"
+    "status_unknown": "Unknown",
+    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
   },
   "inventory": {
     "section_title": "Inventory",
@@ -643,6 +646,10 @@
   },
   "shipping": {
     "title": "Shipping Options",
+    "page_title": "Shipping Options",
+    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
+    "back_to_listings": "Back to My Listings",
+    "manage_cta": "Shipping settings",
     "add_option": "Add Shipping Option",
     "courier_name": "Courier Name",
     "courier_name_placeholder": "e.g. An Post, Royal Mail, DHL",
@@ -673,7 +680,8 @@
     "recommended": "Recommended",
     "loading": "Loading shipping options...",
     "no_options": "No shipping options available for this seller.",
-    "delete_confirm": "Remove this shipping option? This cannot be undone."
+    "delete_confirm": "Remove this shipping option? This cannot be undone.",
+    "choose_required": "Choose a delivery method before checkout."
   },
   "listing_location": {
     "location_title": "Location",
@@ -799,6 +807,7 @@
     "title": "Secure Checkout",
     "order_summary": "Order Summary",
     "shipping": "Shipping",
+    "discount": "Discount",
     "total": "Total",
     "secure_notice": "Payments are processed securely by Stripe. Your card details are never stored on our servers.",
     "cancel": "Cancel",

@@ -24,6 +24,7 @@ import Grid3X3 from 'lucide-react/icons/grid-3x3';
 import Heart from 'lucide-react/icons/heart';
 import Package from 'lucide-react/icons/package';
 import HandCoins from 'lucide-react/icons/hand-coins';
+import Truck from 'lucide-react/icons/truck';
 import { useTranslation } from 'react-i18next';
 import { GlassCard, Button, SearchField } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
@@ -459,6 +460,13 @@ export function MarketplacePage() {
                     >
                       <ShoppingBag className="w-4 h-4" aria-hidden="true" />
                       {t('hub.my_orders')}
+                    </Link>
+                    <Link
+                      to={tenantPath('/marketplace/seller/shipping-options')}
+                      className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
+                    >
+                      <Truck className="w-4 h-4" aria-hidden="true" />
+                      {t('shipping.manage_cta')}
                     </Link>
                     <Link
                       to={tenantPath('/marketplace/collections')}

@@ -272,22 +272,15 @@ class MarketplaceListingService
         // Sorting
         $sort = $filters['sort'] ?? 'newest';
         match ($sort) {
-            'price_asc' => $query->orderBy('price', 'asc'),
-            'price_desc' => $query->orderBy('price', 'desc'),
-            'popular' => $query->orderBy('views_count', 'desc'),
+            'price_asc' => $query->orderByRaw('COALESCE(price, -1) ASC')->orderBy('id', 'asc'),
+            'price_desc' => $query->orderByRaw('COALESCE(price, -1) DESC')->orderBy('id', 'desc'),
+            'popular' => $query->orderBy('views_count', 'desc')->orderBy('id', 'desc'),
             default => $query->orderBy('id', 'desc'), // newest
         };
 
         // Cursor pagination
         if ($cursor) {
-            $decodedCursor = (int) base64_decode($cursor, true);
-            if ($decodedCursor > 0) {
-                if ($sort === 'price_asc') {
-                    $query->where('id', '>', $decodedCursor);
-                } else {
-                    $query->where('id', '<', $decodedCursor);
-                }
-            }
+            self::applySqlCursor($query, $sort, $cursor);
         }
 
         $listings = $query->limit($limit + 1)->get();
@@ -311,7 +304,7 @@ class MarketplaceListingService
         $items = $listings->map(fn ($l) => self::formatListingItem($l, $savedIds, $currentUserId))->values()->all();
 
         $nextCursor = $hasMore && $listings->isNotEmpty()
-            ? base64_encode((string) $listings->last()->id)
+            ? self::encodeSqlCursor($listings->last(), $sort)
             : null;
 
         return [
@@ -319,6 +312,70 @@ class MarketplaceListingService
             'cursor' => $nextCursor,
             'has_more' => $hasMore,
         ];
+    }
+
+    private static function applySqlCursor(Builder $query, string $sort, string $cursor): void
+    {
+        $decoded = base64_decode($cursor, true);
+        if ($decoded === false || $decoded === '') {
+            return;
+        }
+
+        $payload = json_decode($decoded, true);
+        if (!is_array($payload) || ($payload['sort'] ?? null) !== $sort || !isset($payload['id'])) {
+            $legacyId = (int) $decoded;
+            if ($legacyId > 0) {
+                $query->where('id', $sort === 'price_asc' ? '>' : '<', $legacyId);
+            }
+            return;
+        }
+
+        $id = (int) $payload['id'];
+        if ($id <= 0) {
+            return;
+        }
+
+        if ($sort === 'price_asc' || $sort === 'price_desc') {
+            $price = (float) ($payload['value'] ?? -1);
+            $operator = $sort === 'price_asc' ? '>' : '<';
+            $query->where(function (Builder $q) use ($price, $id, $operator) {
+                $q->whereRaw('COALESCE(price, -1) ' . $operator . ' ?', [$price])
+                    ->orWhere(function (Builder $tie) use ($price, $id, $operator) {
+                        $tie->whereRaw('COALESCE(price, -1) = ?', [$price])
+                            ->where('id', $operator, $id);
+                    });
+            });
+            return;
+        }
+
+        if ($sort === 'popular') {
+            $views = (int) ($payload['value'] ?? 0);
+            $query->where(function (Builder $q) use ($views, $id) {
+                $q->where('views_count', '<', $views)
+                    ->orWhere(function (Builder $tie) use ($views, $id) {
+                        $tie->where('views_count', $views)
+                            ->where('id', '<', $id);
+                    });
+            });
+            return;
+        }
+
+        $query->where('id', '<', $id);
+    }
+
+    private static function encodeSqlCursor(MarketplaceListing $listing, string $sort): string
+    {
+        $value = match ($sort) {
+            'price_asc', 'price_desc' => (float) ($listing->price ?? -1),
+            'popular' => (int) ($listing->views_count ?? 0),
+            default => (int) $listing->id,
+        };
+
+        return base64_encode(json_encode([
+            'sort' => $sort,
+            'value' => $value,
+            'id' => (int) $listing->id,
+        ], JSON_THROW_ON_ERROR));
     }
 
     /**
