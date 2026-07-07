@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use App\Services\PrerenderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -29,7 +30,7 @@ class AdminPrerenderController extends BaseApiController
     /** GET /api/v2/admin/prerender/summary */
     public function summary(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         return $this->respondWithData($this->service->summary());
     }
 
@@ -41,7 +42,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function inventory(Request $r): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $tenantSlug = $r->query('tenant');
         if (is_string($tenantSlug)) {
             $tenantSlug = trim($tenantSlug);
@@ -65,7 +66,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function inspect(Request $r): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $path = (string) $r->query('path', '');
         if ($path === '') {
             return $this->error('Missing path', 400, 'VALIDATION_REQUIRED_FIELD');
@@ -80,7 +81,7 @@ class AdminPrerenderController extends BaseApiController
     /** GET /api/v2/admin/prerender/coverage */
     public function coverage(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         return $this->respondWithData([
             'expected_routes' => PrerenderService::EXPECTED_ROUTES,
             'rows'            => $this->service->coverage(),
@@ -90,7 +91,7 @@ class AdminPrerenderController extends BaseApiController
     /** GET /api/v2/admin/prerender/tenant-safety?tenant=slug */
     public function tenantSafety(Request $r): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $slug = (string) $r->query('tenant', '');
         if ($slug === '' || !preg_match('/^[A-Za-z0-9_-]{1,64}$/', $slug)) {
             return $this->error('Valid tenant slug required', 400, 'VALIDATION_INVALID');
@@ -114,7 +115,7 @@ class AdminPrerenderController extends BaseApiController
     /** GET /api/v2/admin/prerender/events?limit=200 */
     public function events(Request $r): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $limit = (int) $r->query('limit', 200);
         return $this->respondWithData([
             'events' => $this->service->tailEvents($limit),
@@ -124,7 +125,7 @@ class AdminPrerenderController extends BaseApiController
     /** GET /api/v2/admin/prerender/failures */
     public function failures(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         return $this->respondWithData([
             'items' => $this->service->readFailures(),
         ]);
@@ -133,7 +134,7 @@ class AdminPrerenderController extends BaseApiController
     /** GET /api/v2/admin/prerender/jobs?status=&limit= */
     public function jobs(Request $r): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $status = $r->query('status');
         $limit = (int) $r->query('limit', 50);
         return $this->respondWithData([
@@ -144,7 +145,7 @@ class AdminPrerenderController extends BaseApiController
     /** GET /api/v2/admin/prerender/jobs/{id} */
     public function showJob(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $row = $this->service->getJob($id);
         if (!$row) return $this->error('Job not found', 404, 'NOT_FOUND');
         return $this->respondWithData($row);
@@ -373,11 +374,23 @@ class AdminPrerenderController extends BaseApiController
     {
         $token = (string) config('prerender.webhook_token', '');
         $authed = false;
+        $actorUserId = null;
+        $authMode = 'unknown';
 
         if ($token !== '') {
             $bearer = (string) $r->bearerToken();
             if ($bearer !== '' && hash_equals($token, $bearer)) {
-                $authed = true;
+                $replayKey = 'prerender:webhook:bearer:' . hash('sha256', $r->getContent());
+                if (Cache::add($replayKey, 1, 300)) {
+                    $authed = true;
+                    $authMode = 'bearer';
+                } else {
+                    $this->service->audit(
+                        'invalidate', null, null, null, 'denied',
+                        ['reason' => 'webhook_bearer_replay'],
+                        $r->ip(), substr((string) $r->userAgent(), 0, 255)
+                    );
+                }
             } else {
                 $sig = (string) $r->header('X-Nexus-Signature', '');
                 $tsHeader = (string) $r->header('X-Nexus-Timestamp', '');
@@ -395,9 +408,10 @@ class AdminPrerenderController extends BaseApiController
                             // Key TTL = 2× max skew so an attacker can't
                             // simply wait for it to expire.
                             $nonceKey = 'prerender:webhook:nonce:' . hash('sha256', $ts . ':' . $sig);
-                            $fresh = \Illuminate\Support\Facades\Cache::add($nonceKey, 1, 600);
+                            $fresh = Cache::add($nonceKey, 1, 600);
                             if ($fresh) {
                                 $authed = true;
+                                $authMode = 'hmac';
                             } else {
                                 // Replay detected. Don't tell the caller why
                                 // — just bounce — but audit it so we have a
@@ -418,8 +432,9 @@ class AdminPrerenderController extends BaseApiController
             // Fall back to admin-session auth so the admin UI can call this
             // directly without needing the shared secret.
             try {
-                $this->requirePlatformSuperAdmin();
+                $actorUserId = $this->requirePlatformSuperAdmin();
                 $authed = true;
+                $authMode = 'admin_session';
             } catch (\Throwable $e) {
                 return $this->error('Unauthorized', 401, 'UNAUTHENTICATED');
             }
@@ -442,9 +457,13 @@ class AdminPrerenderController extends BaseApiController
         }
         $recache = (bool) ($payload['recache'] ?? true);
 
+        if ($actorUserId === null && !$this->checkExternalInvalidateRate($r, $tenantId, $authMode)) {
+            return $this->error(__('api.rate_limit_exceeded'), 429, 'RATE_LIMITED');
+        }
+
         $count = $this->service->invalidateRoutes($tenantId, $routes, $recache);
         $jobId = null;
-        if ($recache && $count > 0) {
+        if ($recache) {
             // invalidateRoutes already enqueues; surface the job id by reading
             // the most recent matching queued row.
             $row = \DB::table('prerender_jobs')
@@ -456,8 +475,8 @@ class AdminPrerenderController extends BaseApiController
         }
 
         $this->service->audit(
-            'invalidate', null, $tenantId, $jobId, 'ok',
-            ['routes' => $routes, 'invalidated' => $count, 'recache' => $recache],
+            'invalidate', $actorUserId, $tenantId, $jobId, 'ok',
+            ['routes' => $routes, 'invalidated' => $count, 'recache' => $recache, 'auth_mode' => $authMode],
             $r->ip(), substr((string) $r->userAgent(), 0, 255)
         );
 
@@ -478,7 +497,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function analytics(Request $r): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $since = $r->query('since');
         $limit = (int) $r->query('limit', 200);
         $limit = max(10, min(1000, $limit));
@@ -571,7 +590,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function metrics(): \Symfony\Component\HttpFoundation\Response
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $body = $this->service->prometheusMetrics();
         return response($body, 200, [
             'Content-Type' => 'text/plain; version=0.0.4; charset=utf-8',
@@ -587,7 +606,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function realtimeChannel(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         return $this->respondWithData([
             'channel' => \App\Services\PrerenderService::REALTIME_CHANNEL,
             'event'   => \App\Services\PrerenderService::REALTIME_EVENT,
@@ -607,7 +626,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function health(): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $data = $this->service->health();
         // HTTP 200 even on red — uptime monitors decide what to alert on by
         // reading the body's status field. A 5xx would mask the engine being
@@ -622,7 +641,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function auditLog(Request $r): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $action = $r->query('action');
         $limit  = (int) $r->query('limit', 100);
         return $this->respondWithData([
@@ -675,7 +694,6 @@ class AdminPrerenderController extends BaseApiController
             );
         }
 
-        $now = date('Y-m-d H:i:s');
         // Anything older than 30 min in claimed/running is fair game.
         $cutoff = date('Y-m-d H:i:s', time() - 1800);
         $reset = \DB::table('prerender_jobs')
@@ -689,7 +707,6 @@ class AdminPrerenderController extends BaseApiController
                 'claimed_by'    => null,
                 'started_at'    => null,
                 'error_message' => 'reset by admin via /reset-queue',
-                'updated_at'    => $now,
             ]);
 
         $this->service->resetBreaker();
@@ -716,7 +733,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function exportCsv(Request $r, string $kind): \Symfony\Component\HttpFoundation\StreamedResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $kind = strtolower($kind);
         if (!in_array($kind, ['audit', 'inventory', 'jobs'], true)) {
             abort(404, 'Unknown export kind');
@@ -852,7 +869,7 @@ class AdminPrerenderController extends BaseApiController
      */
     public function sitemapExplorer(Request $r): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $slug = (string) $r->query('tenant', '');
         if ($slug === '' || !preg_match('/^[A-Za-z0-9_-]{1,64}$/', $slug)) {
             return $this->error('Valid tenant slug required', 400, 'VALIDATION_INVALID');
@@ -885,7 +902,7 @@ class AdminPrerenderController extends BaseApiController
 
     public function ttlInspector(Request $r): JsonResponse
     {
-        $this->requireAdmin();
+        $this->requirePlatformSuperAdmin();
         $route = (string) $r->query('route', '');
         if ($route === '' || $route[0] !== '/') {
             return $this->error('route must start with "/"', 400, 'VALIDATION_INVALID');
@@ -929,14 +946,35 @@ class AdminPrerenderController extends BaseApiController
     private function checkActionRate(int $userId, string $action, int $limit, int $windowSeconds): bool
     {
         $key = "prerender:rate:{$action}:{$userId}";
-        $count = (int) \Illuminate\Support\Facades\Cache::increment($key);
+        $count = (int) Cache::increment($key);
         if ($count === 1) {
-            \Illuminate\Support\Facades\Cache::put($key, 1, $windowSeconds);
+            Cache::put($key, 1, $windowSeconds);
         }
         if ($count > $limit) {
             $this->service->audit(
                 $action, $userId, null, null, 'denied',
                 ['reason' => 'rate_limit_exceeded', 'count' => $count, 'limit' => $limit]
+            );
+            return false;
+        }
+        return true;
+    }
+
+    private function checkExternalInvalidateRate(Request $r, int $tenantId, string $authMode): bool
+    {
+        $ipHash = hash('sha256', (string) $r->ip());
+        $key = "prerender:rate:invalidate:webhook:{$tenantId}:{$authMode}:{$ipHash}";
+        $limit = 60;
+        $windowSeconds = 60;
+        $count = (int) Cache::increment($key);
+        if ($count === 1) {
+            Cache::put($key, 1, $windowSeconds);
+        }
+        if ($count > $limit) {
+            $this->service->audit(
+                'invalidate', null, $tenantId, null, 'denied',
+                ['reason' => 'rate_limit_exceeded', 'auth_mode' => $authMode, 'count' => $count, 'limit' => $limit],
+                $r->ip(), substr((string) $r->userAgent(), 0, 255)
             );
             return false;
         }

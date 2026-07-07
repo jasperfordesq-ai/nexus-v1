@@ -756,6 +756,8 @@ class AdminVolunteerController extends BaseApiController
             "UPDATE vol_organizations SET " . implode(', ', $updates) . ", updated_at = NOW() WHERE id = ? AND tenant_id = ?",
             $params
         );
+        app(\App\Services\PrerenderContentInvalidator::class)
+            ->refreshVolunteerOrganisation((int) $tenantId, (int) $orgId);
 
         return $this->respondWithData($this->volunteerService->getOrganizationById($orgId, true), null, 201);
     }
@@ -807,6 +809,8 @@ class AdminVolunteerController extends BaseApiController
             "UPDATE vol_organizations SET " . implode(', ', $updates) . ", updated_at = NOW() WHERE id = ? AND tenant_id = ?",
             $params
         );
+        app(\App\Services\PrerenderContentInvalidator::class)
+            ->refreshVolunteerOrganisation((int) $tenantId, (int) $id);
 
         return $this->respondWithData($this->volunteerService->getOrganizationById($id, true));
     }
@@ -1135,6 +1139,8 @@ class AdminVolunteerController extends BaseApiController
                 [$status, $id, $tenantId]
             );
 
+            app(\App\Services\PrerenderContentInvalidator::class)
+                ->refreshVolunteerOrganisation((int) $tenantId, (int) $id);
             return $this->respondWithData([
                 'id' => $id,
                 'status' => $status,

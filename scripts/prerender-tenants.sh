@@ -699,6 +699,15 @@ inject_rendered_pages() {
             mv -f "$file" "$dest"
         done
 
+        # Move checksum sidecars (integrity verification) alongside their
+        # index.html siblings.
+        find "$INCOMING_DIR" -name index.html.sha256 -type f | while IFS= read -r file; do
+            rel="${file#$INCOMING_DIR/}"
+            dest="$PRERENDER_DIR/$rel"
+            mkdir -p "$(dirname "$dest")"
+            mv -f "$file" "$dest"
+        done
+
         # Move _status sidecars (status code propagation, Phase 1.2) alongside
         # their index.html siblings.
         find "$INCOMING_DIR" -name _status -type f | while IFS= read -r file; do

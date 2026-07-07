@@ -59,7 +59,7 @@ class PrerenderService
         '/timebanking-guide', '/regional-analytics', '/platform/terms', '/platform/privacy',
         '/platform/disclaimer', '/resources', '/kb', '/features', '/changelog',
         '/events', '/groups', '/jobs', '/coupons', '/marketplace', '/volunteering',
-        '/pilot-inquiry', '/pilot-apply', '/developers', '/developers/auth',
+        '/organisations', '/pilot-inquiry', '/pilot-apply', '/developers', '/developers/auth',
         '/developers/endpoints', '/developers/webhooks',
         '/partner', '/social-prescribing', '/impact-report',
         '/impact-summary', '/strategic-plan',
@@ -107,10 +107,9 @@ class PrerenderService
         'groups'              => ['/groups'],
         'job_vacancies'       => ['/jobs'],
         'merchant_coupons'    => ['/coupons'],
-        'volunteering'        => ['/volunteering'],
+        'volunteering'        => ['/volunteering', '/organisations'],
         'ideation_challenges' => ['/ideation'],
         'resources'           => ['/resources', '/kb'],
-        'organisations'       => ['/organisations'],
         'marketplace'         => ['/marketplace', '/marketplace/free', '/marketplace/map'],
     ];
 
@@ -854,23 +853,26 @@ class PrerenderService
             fn($r) => is_string($r)
                 && $r !== ''
                 && $r[0] === '/'
-                && $this->tenantRouteCanBePrerendered($tenantId, $r, $target)
+                && preg_match(self::ROUTE_REGEX, $r)
         )));
         if (empty($routes)) return 0;
+
+        $recacheRoutes = array_values(array_filter(
+            $routes,
+            fn (string $route) => $this->tenantRouteCanBePrerendered($tenantId, $route, $target)
+        ));
 
         $deleted = 0;
         foreach ($routes as $route) {
             $outRoute = $prefix . $route;
             $rel = $route === '/' ? $host . '/index.html' : $host . $outRoute . '/index.html';
             $abs = $this->cachePath . '/' . $rel;
-            if (is_file($abs)) {
-                @unlink($abs);
-                @unlink(dirname($abs) . '/_status');
+            if ($this->deleteSnapshotBundle($abs)) {
                 $deleted++;
             }
         }
 
-        if ($enqueueRecache && $deleted > 0) {
+        if ($enqueueRecache && $recacheRoutes !== []) {
             // Backpressure: bulk imports (e.g. seeding 5,000 blog posts) would
             // otherwise enqueue 5,000 distinct queued rows (each with a unique
             // per-post route, so the dedup key differs and they don't coalesce).
@@ -883,7 +885,7 @@ class PrerenderService
             if ($burstCount === 1) {
                 \Illuminate\Support\Facades\Cache::put($burstKey, 1, 60);
             }
-            $routesArg = $burstCount > 50 ? null : implode(',', $routes);
+            $routesArg = $burstCount > 50 ? null : implode(',', $recacheRoutes);
 
             // NORMAL priority: a content save is a user-initiated event with a
             // human waiting for the public page to update. Background sweeps
@@ -955,11 +957,7 @@ class PrerenderService
 
             $abs = $this->cachePath . '/' . $row['cache_path'];
             if (!$dryRun && is_file($abs)) {
-                @unlink($abs);
-                // Best effort: clean up the now-empty directory.
-                @rmdir(dirname($abs));
-                // Drop status sidecar if present (see Phase 1.2).
-                @unlink(dirname($abs) . '/_status');
+                $this->deleteSnapshotBundle($abs);
             }
             $deleted[] = $row['cache_path'];
         }
@@ -970,6 +968,22 @@ class PrerenderService
             'pattern'  => $pattern,
             'tenant_slug' => $tenantSlug,
         ];
+    }
+
+    private function deleteSnapshotBundle(string $indexPath): bool
+    {
+        if (!str_ends_with($indexPath, '/index.html') || !is_file($indexPath)) {
+            return false;
+        }
+
+        $dir = dirname($indexPath);
+        @unlink($indexPath);
+        @unlink($dir . '/index.html.sha256');
+        @unlink($dir . '/_status');
+        @unlink($dir . '/index.md');
+        @rmdir($dir);
+
+        return true;
     }
 
     private function globToRegex(string $glob, bool $allowDoubleStar): string
@@ -1695,11 +1709,7 @@ class PrerenderService
 
                 if (!$dryRun) {
                     $abs = $this->cachePath . '/' . $row['cache_path'];
-                    @unlink($abs);
-                    @unlink($abs . '.sha256');
-                    @unlink(dirname($abs) . '/_status');
-                    @unlink(dirname($abs) . '/index.md');
-                    @rmdir(dirname($abs));
+                    $this->deleteSnapshotBundle($abs);
                 }
                 continue;
             }
@@ -1738,10 +1748,7 @@ class PrerenderService
 
             if (!$dryRun) {
                 $abs = $this->cachePath . '/' . $row['cache_path'];
-                @unlink($abs);
-                @unlink(dirname($abs) . '/_status');
-                @unlink(dirname($abs) . '/index.md');
-                @rmdir(dirname($abs));
+                $this->deleteSnapshotBundle($abs);
             }
         }
 
@@ -1845,11 +1852,17 @@ class PrerenderService
 
         if (preg_match('#^/volunteering/opportunities/([0-9]+)$#', $tenantLocalRoute, $m) === 1) {
             return Schema::hasTable('vol_opportunities')
-                && DB::table('vol_opportunities')
-                    ->where('tenant_id', $tenantId)
-                    ->where('id', (int) $m[1])
-                    ->where('status', 'open')
-                    ->where('is_active', 1)
+                && Schema::hasTable('vol_organizations')
+                && DB::table('vol_opportunities as opp')
+                    ->join('vol_organizations as org', function ($join) {
+                        $join->on('org.id', '=', 'opp.organization_id')
+                            ->whereColumn('org.tenant_id', 'opp.tenant_id');
+                    })
+                    ->where('opp.tenant_id', $tenantId)
+                    ->where('opp.id', (int) $m[1])
+                    ->whereIn('opp.status', VolunteerService::PUBLIC_OPPORTUNITY_STATUSES)
+                    ->where('opp.is_active', 1)
+                    ->whereIn('org.status', VolunteerService::PUBLIC_ORGANIZATION_STATUSES)
                     ->exists();
         }
 
@@ -1872,11 +1885,11 @@ class PrerenderService
         }
 
         if (preg_match('#^/organisations/([0-9]+)$#', $tenantLocalRoute, $m) === 1) {
-            return Schema::hasTable('organizations')
-                && DB::table('organizations')
+            return Schema::hasTable('vol_organizations')
+                && DB::table('vol_organizations')
                     ->where('tenant_id', $tenantId)
                     ->where('id', (int) $m[1])
-                    ->where('status', 'active')
+                    ->whereIn('status', VolunteerService::PUBLIC_ORGANIZATION_STATUSES)
                     ->exists();
         }
 
@@ -2279,17 +2292,22 @@ class PrerenderService
         $out = [];
 
         $queries = [
-            '/blog'     => ['table' => 'posts',    'col' => 'updated_at'],
-            '/events'   => ['table' => 'events',   'col' => 'updated_at'],
-            '/listings' => ['table' => 'listings', 'col' => 'updated_at'],
-            '/groups'   => ['table' => 'groups',   'col' => 'updated_at'],
+            '/blog'         => ['table' => 'posts',             'col' => 'updated_at'],
+            '/events'       => ['table' => 'events',            'col' => 'updated_at'],
+            '/listings'     => ['table' => 'listings',          'col' => 'updated_at'],
+            '/groups'       => ['table' => 'groups',            'col' => 'updated_at'],
+            '/volunteering' => ['table' => 'vol_opportunities', 'col' => 'updated_at'],
+            '/organisations' => ['table' => 'vol_organizations', 'col' => 'updated_at'],
         ];
 
         foreach ($queries as $route => $q) {
             if (!Schema::hasTable($q['table'])) continue;
             if (!Schema::hasColumn($q['table'], $q['col'])) continue;
+            $timestampExpr = Schema::hasColumn($q['table'], 'created_at')
+                ? "MAX(COALESCE({$q['col']}, created_at)) as ts"
+                : "MAX({$q['col']}) as ts";
             $rows = DB::table($q['table'])
-                ->select('tenant_id', DB::raw("MAX({$q['col']}) as ts"))
+                ->select('tenant_id', DB::raw($timestampExpr))
                 ->groupBy('tenant_id')
                 ->get();
             foreach ($rows as $row) {

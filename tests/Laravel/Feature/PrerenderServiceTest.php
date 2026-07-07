@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Feature;
 
 use App\Console\Commands\PrerenderProcessQueue;
+use App\Models\User;
 use App\Services\PrerenderService;
 use App\Services\SitemapService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -793,12 +794,94 @@ HTML;
         $service = new PrerenderService();
         $deleted = $service->invalidateRoutes($otherId, ["/blog/{$slug}"]);
 
-        $this->assertSame(0, $deleted);
-        $this->assertFileExists($wrongPath);
+        $this->assertSame(1, $deleted);
+        $this->assertFileDoesNotExist($wrongPath);
         $this->assertFalse(
             DB::table('prerender_jobs')->where('tenant_id', $otherId)->where('routes', "/blog/{$slug}")->exists(),
-            'Wrong-tenant invalidation must not enqueue a recache job.'
+            'Wrong-tenant invalidation may purge a stale snapshot, but must not enqueue a recache job.'
         );
+    }
+
+    public function test_invalidate_routes_enqueues_prerenderable_missing_snapshot(): void
+    {
+        [$tenantId] = $this->seedCmsTenantPair('missing-snapshot-owner', 'missing-snapshot-other');
+
+        $service = new PrerenderService();
+        $deleted = $service->invalidateRoutes($tenantId, ['/about']);
+
+        $this->assertSame(0, $deleted);
+        $this->assertTrue(
+            DB::table('prerender_jobs')->where('tenant_id', $tenantId)->where('routes', '/about')->exists(),
+            'A valid route without an existing snapshot should still enqueue recache work.'
+        );
+    }
+
+    public function test_invalidate_routes_deletes_snapshot_bundle_for_hidden_dynamic_route(): void
+    {
+        [$tenantId, , $slug] = $this->seedCmsTenantPair('hidden-vol-owner', 'hidden-vol-other');
+        $host = $this->frontendHost();
+        $indexPath = $this->writeSnapshot("{$host}/{$slug}/volunteering/opportunities/987654/index.html", '<html><body>old</body></html>');
+        file_put_contents(dirname($indexPath) . '/index.html.sha256', hash('sha256', 'old'));
+        file_put_contents(dirname($indexPath) . '/_status', '200');
+        file_put_contents(dirname($indexPath) . '/index.md', '# old');
+
+        $service = new PrerenderService();
+        $deleted = $service->invalidateRoutes($tenantId, ['/volunteering/opportunities/987654']);
+
+        $this->assertSame(1, $deleted);
+        $this->assertFileDoesNotExist($indexPath);
+        $this->assertFileDoesNotExist(dirname($indexPath) . '/index.html.sha256');
+        $this->assertFileDoesNotExist(dirname($indexPath) . '/_status');
+        $this->assertFileDoesNotExist(dirname($indexPath) . '/index.md');
+        $this->assertFalse(
+            DB::table('prerender_jobs')->where('tenant_id', $tenantId)->where('routes', '/volunteering/opportunities/987654')->exists(),
+            'Hidden/deleted dynamic routes should be purged without recache.'
+        );
+    }
+
+    public function test_tenant_owned_organisation_route_uses_volunteer_organizations(): void
+    {
+        [$tenantId] = $this->seedCmsTenantPair('vol-org-owner', 'vol-org-other');
+        [$orgId] = $this->seedVolunteerContent($tenantId, organizationStatus: 'active');
+        [$pendingOrgId] = $this->seedVolunteerContent($tenantId, organizationStatus: 'pending');
+
+        $service = new PrerenderService();
+
+        $this->assertTrue($service->tenantOwnedRouteExistsForTenant($tenantId, "/organisations/{$orgId}"));
+        $this->assertFalse($service->tenantOwnedRouteExistsForTenant($tenantId, "/organisations/{$pendingOrgId}"));
+    }
+
+    public function test_tenant_owned_volunteer_opportunity_requires_visible_opportunity_and_org(): void
+    {
+        [$tenantId] = $this->seedCmsTenantPair('vol-opp-owner', 'vol-opp-other');
+        [, $activeOpportunityId] = $this->seedVolunteerContent($tenantId, organizationStatus: 'approved', opportunityStatus: 'active');
+        [, $pendingOrgOpportunityId] = $this->seedVolunteerContent($tenantId, organizationStatus: 'pending', opportunityStatus: 'active');
+        [, $closedOpportunityId] = $this->seedVolunteerContent($tenantId, organizationStatus: 'approved', opportunityStatus: 'closed');
+
+        $service = new PrerenderService();
+
+        $this->assertTrue($service->tenantOwnedRouteExistsForTenant($tenantId, "/volunteering/opportunities/{$activeOpportunityId}"));
+        $this->assertFalse($service->tenantOwnedRouteExistsForTenant($tenantId, "/volunteering/opportunities/{$pendingOrgOpportunityId}"));
+        $this->assertFalse($service->tenantOwnedRouteExistsForTenant($tenantId, "/volunteering/opportunities/{$closedOpportunityId}"));
+    }
+
+    public function test_inventory_marks_volunteering_snapshot_content_stale(): void
+    {
+        [$tenantId, , $slug] = $this->seedCmsTenantPair('vol-stale-owner', 'vol-stale-other');
+        DB::table('tenants')->where('id', $tenantId)->update(['updated_at' => now()->subDays(2)]);
+        $this->seedVolunteerContent($tenantId, organizationStatus: 'active', opportunityStatus: 'active');
+        $host = $this->frontendHost();
+        $indexPath = $this->writeSnapshot("{$host}/{$slug}/volunteering/index.html", '<html><body>old volunteering</body></html>');
+        touch($indexPath, time() - 7200);
+
+        $service = new PrerenderService();
+        $rows = $service->inventory($slug, true);
+
+        $row = $rows[0] ?? null;
+        $this->assertNotNull($row);
+        $this->assertSame('/volunteering', $row['tenant_route']);
+        $this->assertTrue($row['content_stale']);
+        $this->assertStringContainsString('/volunteering content updated', (string) $row['content_stale_reason']);
     }
 
     public function test_route_planner_lists_cms_page_only_for_owning_tenant(): void
@@ -1020,6 +1103,47 @@ HTML;
     {
         return parse_url((string) env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST)
             ?: 'app.project-nexus.ie';
+    }
+
+    /**
+     * @return array{0:int,1:int}
+     */
+    private function seedVolunteerContent(
+        int $tenantId,
+        string $organizationStatus = 'active',
+        string $opportunityStatus = 'active'
+    ): array {
+        $now = date('Y-m-d H:i:s');
+        $user = User::factory()->forTenant($tenantId)->create([
+            'is_approved' => 1,
+            'status' => 'active',
+        ]);
+        $suffix = uniqid();
+        $orgId = (int) DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $user->id,
+            'name' => 'Volunteer Org ' . $suffix,
+            'slug' => 'vol-org-' . $suffix,
+            'description' => 'A volunteer organisation for prerender regression tests.',
+            'contact_email' => 'vol-org-' . $suffix . '@example.test',
+            'status' => $organizationStatus,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        $opportunityId = (int) DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $tenantId,
+            'organization_id' => $orgId,
+            'created_by' => $user->id,
+            'title' => 'Volunteer Opportunity ' . $suffix,
+            'description' => 'A volunteering opportunity for prerender regression tests.',
+            'location' => 'Remote',
+            'status' => $opportunityStatus,
+            'is_active' => 1,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        return [$orgId, $opportunityId];
     }
 
     private function writeSnapshot(string $rel, string $html): string

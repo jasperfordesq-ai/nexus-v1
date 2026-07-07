@@ -29,6 +29,9 @@ use Illuminate\Support\Facades\Schema;
  */
 class VolunteerService
 {
+    public const PUBLIC_OPPORTUNITY_STATUSES = ['open', 'active'];
+    public const PUBLIC_ORGANIZATION_STATUSES = ['approved', 'active'];
+
     public function __construct(
         private readonly VolOpportunity $opportunity,
         private readonly VolApplication $application,
@@ -50,9 +53,9 @@ class VolunteerService
         $query = VolOpportunity::query()
             ->with(['creator:id,first_name,last_name,avatar_url', 'organization:id,name,logo_url', 'category:id,name,color'])
             ->where('is_active', true)
-            ->whereIn('status', ['open', 'active'])
+            ->whereIn('status', self::PUBLIC_OPPORTUNITY_STATUSES)
             ->whereHas('organization', function (Builder $q) {
-                $q->whereIn('status', ['approved', 'active']);
+                $q->whereIn('status', self::PUBLIC_ORGANIZATION_STATUSES);
             });
 
         if (! empty($filters['organization_id'])) {
@@ -968,6 +971,8 @@ class VolunteerService
                 ]);
             }
 
+            self::refreshPrerenderForOpportunity($tenantId, $id);
+
             return true;
         } catch (\Exception $e) {
             Log::warning("VolunteerService::updateOpportunity error: " . $e->getMessage());
@@ -1003,6 +1008,7 @@ class VolunteerService
 
         try {
             DB::update("UPDATE vol_opportunities SET is_active = 0 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            self::refreshPrerenderForOpportunity($tenantId, $id);
 
             // Notify volunteers with approved applications that the opportunity is cancelled
             try {
@@ -2078,7 +2084,7 @@ class VolunteerService
         $maxRetries = 3;
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
             try {
-                return DB::transaction(function () use ($tenantId, $userId, $name, $description, $contactEmail, $website) {
+                $orgId = DB::transaction(function () use ($tenantId, $userId, $name, $description, $contactEmail, $website) {
                     $slug = self::generateOrgSlug($name, $tenantId);
 
                     DB::insert(
@@ -2097,6 +2103,10 @@ class VolunteerService
 
                     return $orgId;
                 });
+
+                self::refreshPrerenderForOrganization($tenantId, $orgId);
+
+                return $orgId;
             } catch (\Illuminate\Database\QueryException $e) {
                 // Retry on duplicate slug (integrity constraint violation)
                 if ($attempt >= $maxRetries || $e->getCode() !== '23000') {
@@ -2409,9 +2419,24 @@ class VolunteerService
         return $orgRole && in_array($orgRole->role, ['owner', 'admin'], true);
     }
 
-    private static function isApprovedOrganizationStatus(?string $status): bool
+    public static function isApprovedOrganizationStatus(?string $status): bool
     {
-        return in_array($status, ['approved', 'active'], true);
+        return in_array($status, self::PUBLIC_ORGANIZATION_STATUSES, true);
+    }
+
+    public static function isPublicOpportunityStatus(?string $status): bool
+    {
+        return in_array($status, self::PUBLIC_OPPORTUNITY_STATUSES, true);
+    }
+
+    private static function refreshPrerenderForOpportunity(int $tenantId, int $opportunityId): void
+    {
+        app(PrerenderContentInvalidator::class)->refreshVolunteerOpportunity($tenantId, $opportunityId);
+    }
+
+    private static function refreshPrerenderForOrganization(int $tenantId, int $organizationId): void
+    {
+        app(PrerenderContentInvalidator::class)->refreshVolunteerOrganisation($tenantId, $organizationId);
     }
 
     private static function userCanVolunteerForOrganization(int $tenantId, int $userId, int $organizationId): bool

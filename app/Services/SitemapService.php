@@ -78,7 +78,8 @@ class SitemapService
      */
     public function generateForTenant(int $tenantId, ?string $overrideBaseUrl = null): string
     {
-        $cacheKey = self::CACHE_PREFIX . "tenant:{$tenantId}" . ($overrideBaseUrl ? ':' . md5($overrideBaseUrl) : '');
+        $version = (int) Cache::get($this->tenantVersionKey($tenantId), 1);
+        $cacheKey = self::CACHE_PREFIX . "tenant:{$tenantId}:v{$version}" . ($overrideBaseUrl ? ':' . md5($overrideBaseUrl) : '');
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($tenantId, $overrideBaseUrl) {
             $tenant = DB::selectOne(
                 "SELECT id, slug, domain, parent_id, features, configuration FROM tenants WHERE id = ? AND is_active = 1",
@@ -148,12 +149,15 @@ class SitemapService
 
         if ($tenantId !== null) {
             Cache::forget(self::CACHE_PREFIX . "tenant:{$tenantId}");
+            Cache::forever($this->tenantVersionKey($tenantId), (int) Cache::get($this->tenantVersionKey($tenantId), 1) + 1);
             $cleared++;
         } else {
             // Clear all tenant caches
             $tenants = DB::select("SELECT id FROM tenants WHERE is_active = 1");
             foreach ($tenants as $tenant) {
                 Cache::forget(self::CACHE_PREFIX . "tenant:{$tenant->id}");
+                $tid = (int) $tenant->id;
+                Cache::forever($this->tenantVersionKey($tid), (int) Cache::get($this->tenantVersionKey($tid), 1) + 1);
                 $cleared++;
             }
         }
@@ -263,15 +267,13 @@ class SitemapService
         }
         if ($this->hasFeature($tenant, 'volunteering')) {
             $methods['volunteering'] = fn (int $tid, string $base) => $this->getVolunteeringUrls($tid, $base);
+            $methods['organisations'] = fn (int $tid, string $base) => $this->getOrganizationUrls($tid, $base);
         }
         if ($this->hasFeature($tenant, 'ideation_challenges')) {
             $methods['ideation'] = fn (int $tid, string $base) => $this->getIdeationUrls($tid, $base);
         }
         if ($this->hasFeature($tenant, 'resources')) {
             $methods['kb_articles'] = fn (int $tid, string $base) => $this->getKbArticleUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'organisations')) {
-            $methods['organisations'] = fn (int $tid, string $base) => $this->getOrganizationUrls($tid, $base);
         }
         if ($this->hasFeature($tenant, 'marketplace')) {
             $methods['marketplace_listings'] = fn (int $tid, string $base) => $this->getMarketplaceListingUrls($tid, $base);
@@ -370,15 +372,13 @@ class SitemapService
         }
         if ($this->hasFeature($tenant, 'volunteering')) {
             $urls[] = $this->url($baseUrl, '/volunteering', $now, 'daily', '0.7');
+            $urls[] = $this->url($baseUrl, '/organisations', $now, 'weekly', '0.6');
         }
         if ($this->hasFeature($tenant, 'ideation_challenges')) {
             $urls[] = $this->url($baseUrl, '/ideation', $now, 'weekly', '0.6');
         }
         if ($this->hasFeature($tenant, 'resources')) {
             $urls[] = $this->url($baseUrl, '/resources', $now, 'weekly', '0.6');
-        }
-        if ($this->hasFeature($tenant, 'organisations')) {
-            $urls[] = $this->url($baseUrl, '/organisations', $now, 'weekly', '0.6');
         }
         if ($this->hasFeature($tenant, 'marketplace')) {
             $urls[] = $this->url($baseUrl, '/marketplace', $now, 'daily', '0.8');
@@ -479,11 +479,21 @@ class SitemapService
     private function getVolunteeringUrls(int $tenantId, string $baseUrl): array
     {
         $rows = DB::select(
-            "SELECT id, created_at AS lastmod
-             FROM vol_opportunities
-             WHERE tenant_id = ? AND status = 'open' AND is_active = 1
-             ORDER BY created_at DESC",
-            [$tenantId]
+            "SELECT opp.id, COALESCE(opp.updated_at, opp.created_at) AS lastmod
+             FROM vol_opportunities opp
+             JOIN vol_organizations org
+               ON org.id = opp.organization_id
+              AND org.tenant_id = opp.tenant_id
+             WHERE opp.tenant_id = ?
+               AND opp.status IN (?, ?)
+               AND opp.is_active = 1
+               AND org.status IN (?, ?)
+             ORDER BY COALESCE(opp.updated_at, opp.created_at) DESC",
+            [
+                $tenantId,
+                ...VolunteerService::PUBLIC_OPPORTUNITY_STATUSES,
+                ...VolunteerService::PUBLIC_ORGANIZATION_STATUSES,
+            ]
         );
 
         return array_map(
@@ -584,10 +594,10 @@ class SitemapService
     {
         $rows = DB::select(
             "SELECT id, COALESCE(updated_at, created_at) AS lastmod
-             FROM organizations
-             WHERE tenant_id = ? AND status = 'active'
-             ORDER BY created_at DESC",
-            [$tenantId]
+             FROM vol_organizations
+             WHERE tenant_id = ? AND status IN (?, ?)
+             ORDER BY COALESCE(updated_at, created_at) DESC",
+            [$tenantId, ...VolunteerService::PUBLIC_ORGANIZATION_STATUSES]
         );
 
         return array_map(
@@ -760,6 +770,11 @@ class SitemapService
         $modules = $config['modules'] ?? [];
 
         return (bool) ($modules[$module] ?? true);
+    }
+
+    private function tenantVersionKey(int $tenantId): string
+    {
+        return self::CACHE_PREFIX . "tenant:{$tenantId}:version";
     }
 
     /**

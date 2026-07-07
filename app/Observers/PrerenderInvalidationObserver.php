@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Services\PrerenderService;
+use App\Services\SitemapService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /*
@@ -66,6 +68,8 @@ abstract class PrerenderInvalidationObserver
             if ($tenantId === null || $tenantId === 0) return;
             $routes = $this->routesFor($model);
             if (empty($routes)) return;
+            app(SitemapService::class)->clearCache($tenantId);
+            Cache::forget('prerender:summary:inventory');
             app(PrerenderService::class)->invalidateRoutes($tenantId, $routes, true);
         } catch (\Throwable $e) {
             // Observer failures must NEVER block model writes. Log and move on.

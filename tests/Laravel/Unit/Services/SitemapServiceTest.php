@@ -7,6 +7,7 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Models\User;
 use App\Services\SitemapService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -279,6 +280,71 @@ class SitemapServiceTest extends TestCase
         $this->assertStringContainsString('/kb', $xml);
     }
 
+    public function test_generateForTenant_includes_volunteer_organisations_when_volunteering_enabled(): void
+    {
+        [$tenantId, $userId] = $this->seedSitemapTenant([
+            'volunteering' => true,
+            'organisations' => false,
+        ]);
+        $orgId = $this->seedVolunteerOrganization($tenantId, $userId, 'active');
+
+        Cache::flush();
+        $xml = $this->service->generateForTenant($tenantId);
+
+        $this->assertStringContainsString('/organisations', $xml);
+        $this->assertStringContainsString("/organisations/{$orgId}", $xml);
+    }
+
+    public function test_generateForTenant_excludes_volunteer_organisations_when_volunteering_disabled(): void
+    {
+        [$tenantId, $userId] = $this->seedSitemapTenant([
+            'volunteering' => false,
+            'organisations' => true,
+        ]);
+        $orgId = $this->seedVolunteerOrganization($tenantId, $userId, 'active');
+
+        Cache::flush();
+        $xml = $this->service->generateForTenant($tenantId);
+
+        $this->assertStringNotContainsString('/organisations', $xml);
+        $this->assertStringNotContainsString("/organisations/{$orgId}", $xml);
+    }
+
+    public function test_generateForTenant_includes_only_public_volunteer_opportunities(): void
+    {
+        [$tenantId, $userId] = $this->seedSitemapTenant(['volunteering' => true]);
+        $activeOrgId = $this->seedVolunteerOrganization($tenantId, $userId, 'approved');
+        $pendingOrgId = $this->seedVolunteerOrganization($tenantId, $userId, 'pending');
+        $activeOpportunityId = $this->seedVolunteerOpportunity($tenantId, $userId, $activeOrgId, 'active');
+        $pendingOrgOpportunityId = $this->seedVolunteerOpportunity($tenantId, $userId, $pendingOrgId, 'active');
+        $closedOpportunityId = $this->seedVolunteerOpportunity($tenantId, $userId, $activeOrgId, 'closed');
+
+        Cache::flush();
+        $xml = $this->service->generateForTenant($tenantId);
+
+        $this->assertStringContainsString("/volunteering/opportunities/{$activeOpportunityId}", $xml);
+        $this->assertStringNotContainsString("/volunteering/opportunities/{$pendingOrgOpportunityId}", $xml);
+        $this->assertStringNotContainsString("/volunteering/opportunities/{$closedOpportunityId}", $xml);
+    }
+
+    public function test_clearCache_invalidates_override_base_url_tenant_sitemap_variants(): void
+    {
+        [$tenantId, $userId] = $this->seedSitemapTenant(['volunteering' => true]);
+        $overrideBaseUrl = 'https://sitemap-variant.example.test';
+
+        Cache::flush();
+        $before = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
+        $orgId = $this->seedVolunteerOrganization($tenantId, $userId, 'active');
+        $stale = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
+
+        $this->assertSame($before, $stale);
+
+        $this->service->clearCache($tenantId);
+        $fresh = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
+
+        $this->assertStringContainsString("/organisations/{$orgId}", $fresh);
+    }
+
     public function test_generateForTenant_excludes_profiles(): void
     {
         Cache::flush();
@@ -449,5 +515,69 @@ class SitemapServiceTest extends TestCase
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
         $this->assertStringNotContainsString('cross-tenant-post-sitemap', $xml);
+    }
+
+    /**
+     * @return array{0:int,1:int}
+     */
+    private function seedSitemapTenant(array $features = []): array
+    {
+        $now = now();
+        $suffix = uniqid();
+        $tenantId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'Sitemap Tenant ' . $suffix,
+            'slug' => 'sitemap-tenant-' . $suffix,
+            'domain' => null,
+            'is_active' => 1,
+            'depth' => 0,
+            'allows_subtenants' => false,
+            'features' => json_encode($features),
+            'configuration' => json_encode(['modules' => []]),
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+        $user = User::factory()->forTenant($tenantId)->create([
+            'is_approved' => 1,
+            'status' => 'active',
+        ]);
+
+        return [$tenantId, (int) $user->id];
+    }
+
+    private function seedVolunteerOrganization(int $tenantId, int $userId, string $status): int
+    {
+        $now = now();
+        $suffix = uniqid();
+
+        return (int) DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $userId,
+            'name' => 'Sitemap Volunteer Org ' . $suffix,
+            'slug' => 'sitemap-vol-org-' . $suffix,
+            'description' => 'Volunteer organisation used by sitemap regression tests.',
+            'contact_email' => 'sitemap-vol-org-' . $suffix . '@example.test',
+            'status' => $status,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+    }
+
+    private function seedVolunteerOpportunity(int $tenantId, int $userId, int $orgId, string $status): int
+    {
+        $now = now();
+        $suffix = uniqid();
+
+        return (int) DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $tenantId,
+            'organization_id' => $orgId,
+            'created_by' => $userId,
+            'title' => 'Sitemap Volunteer Opportunity ' . $suffix,
+            'description' => 'Volunteer opportunity used by sitemap regression tests.',
+            'location' => 'Remote',
+            'status' => $status,
+            'is_active' => 1,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
     }
 }

@@ -43,9 +43,15 @@ class AdminPrerenderControllerTest extends TestCase
         $this->apiGet('/v2/admin/prerender/summary')->assertStatus(403);
     }
 
-    public function test_summary_allows_admin(): void
+    public function test_summary_rejects_tenant_admin(): void
     {
         Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create());
+        $this->apiGet('/v2/admin/prerender/summary')->assertStatus(403);
+    }
+
+    public function test_summary_allows_platform_super_admin(): void
+    {
+        Sanctum::actingAs($this->makeSuperAdmin());
         $r = $this->apiGet('/v2/admin/prerender/summary');
         $r->assertStatus(200);
         $r->assertJsonStructure(['data' => [
@@ -56,14 +62,14 @@ class AdminPrerenderControllerTest extends TestCase
 
     public function test_inventory_validates_tenant_slug(): void
     {
-        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create());
+        Sanctum::actingAs($this->makeSuperAdmin());
         $this->apiGet('/v2/admin/prerender/inventory?tenant=' . urlencode('not!a!slug!'))
             ->assertStatus(400);
     }
 
     public function test_inspect_rejects_path_traversal(): void
     {
-        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create());
+        Sanctum::actingAs($this->makeSuperAdmin());
         $this->apiGet('/v2/admin/prerender/inspect?path=' . urlencode('../../etc/passwd'))
             ->assertStatus(404);
     }
@@ -156,7 +162,7 @@ class AdminPrerenderControllerTest extends TestCase
 
     public function test_metrics_returns_prometheus_text(): void
     {
-        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create());
+        Sanctum::actingAs($this->makeSuperAdmin());
         $r = $this->apiGet('/v2/admin/prerender/metrics');
         $r->assertStatus(200);
         $r->assertHeader('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
@@ -167,11 +173,36 @@ class AdminPrerenderControllerTest extends TestCase
 
     public function test_realtime_channel_returns_expected_shape(): void
     {
-        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->admin()->create());
+        Sanctum::actingAs($this->makeSuperAdmin());
         $r = $this->apiGet('/v2/admin/prerender/realtime-channel');
         $r->assertStatus(200);
         $this->assertSame('private-admin-prerender', $r->json('data.channel'));
         $this->assertSame('job.updated', $r->json('data.event'));
+    }
+
+    public function test_reset_queue_requeues_stale_claimed_jobs_without_updated_at_column(): void
+    {
+        Sanctum::actingAs($this->makeSuperAdmin());
+        $jobId = DB::table('prerender_jobs')->insertGetId([
+            'status' => 'claimed',
+            'priority' => 5,
+            'tenant_id' => $this->testTenantId,
+            'routes' => '/about',
+            'force_render' => 0,
+            'dry_run' => 0,
+            'claimed_at' => now()->subHour(),
+            'claimed_by' => 'stale-worker',
+            'started_at' => now()->subHour(),
+            'queued_at' => now()->subHour(),
+        ]);
+
+        $this->apiPost('/v2/admin/prerender/reset-queue')->assertStatus(200);
+
+        $row = DB::table('prerender_jobs')->where('id', $jobId)->first();
+        $this->assertSame('queued', $row->status);
+        $this->assertNull($row->claimed_at);
+        $this->assertNull($row->claimed_by);
+        $this->assertNull($row->started_at);
     }
 
     private function makeSuperAdmin(): User

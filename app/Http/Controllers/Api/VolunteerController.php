@@ -1043,6 +1043,8 @@ class VolunteerController extends BaseApiController
         $params[] = (int) $id;
         $params[] = $tenantId;
         DB::update("UPDATE vol_organizations SET " . implode(', ', $updates) . " WHERE id = ? AND tenant_id = ?", $params);
+        app(\App\Services\PrerenderContentInvalidator::class)
+            ->refreshVolunteerOrganisation((int) $tenantId, (int) $id);
 
         $updatedOrg = $this->volunteerService->getOrganizationById((int) $id, true);
         return $this->respondWithData($updatedOrg);
