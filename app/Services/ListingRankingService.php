@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 /**
  * ListingRankingService — MatchRank Algorithm for intelligent listing ranking.
@@ -46,6 +47,10 @@ class ListingRankingService
 
     // Featured boost — ensures is_featured listings always appear at top
     private const FEATURED_BOOST = 5.0;
+
+    // Cap on how many of the viewer's most-recent saved listings seed the
+    // collaborative-filtering "similar" amplification (bounds getSimilarListings calls).
+    private const VIEWER_SAVED_LISTINGS_LIMIT = 25;
 
     private ?array $config = null;
     private array $ownerListingsCache = [];
@@ -137,6 +142,11 @@ class ListingRankingService
 
         $this->ownerListingsCache = [];
 
+        // Start a fresh per-request training set for collaborative filtering so all
+        // getSimilarListings() calls below reuse one loaded interaction matrix instead
+        // of rebuilding it per saved listing.
+        \App\Services\CollaborativeFilteringService::flushRequestCache();
+
         $viewerCoords = ['lat' => null, 'lon' => null];
         $viewerInterests = [];
         $viewerListings = [];
@@ -163,6 +173,23 @@ class ListingRankingService
             }
             foreach ($cfService->getSuggestedListingsForUser($viewerId, $tenantId, 20) as $sid) {
                 $cfUserSuggestIds[$sid] = true;
+            }
+        }
+
+        // Batch-load listings for every distinct listing owner on the page in a single
+        // query, so calculateReciprocityScore() reuses the cache instead of issuing one
+        // owner-listings query per ranked listing. Only relevant when reciprocity can
+        // actually score (viewer has their own listings to reciprocate).
+        if ($viewerId && !empty($viewerListings) && !empty($this->getConfig()['reciprocity_enabled'])) {
+            $ownerIds = [];
+            foreach ($listings as $listing) {
+                $ownerId = (int) ($listing['user_id'] ?? 0);
+                if ($ownerId > 0) {
+                    $ownerIds[$ownerId] = true;
+                }
+            }
+            if (!empty($ownerIds)) {
+                $this->ownerListingsCache = $this->getUsersListings(array_keys($ownerIds));
             }
         }
 
@@ -586,6 +613,13 @@ class ListingRankingService
         }
     }
 
+    /**
+     * Most-recently saved listing IDs for the viewer, capped for performance.
+     *
+     * Capped to the {@see self::VIEWER_SAVED_LISTINGS_LIMIT} most-recent saves so the
+     * collaborative-filtering amplification loop in rankListings() does a bounded number
+     * of getSimilarListings() lookups instead of one per favourite.
+     */
     private function getViewerSavedListingIds(int $userId): array
     {
         try {
@@ -593,6 +627,9 @@ class ListingRankingService
                 ->join('listings as l', 'lf.listing_id', '=', 'l.id')
                 ->where('lf.user_id', $userId)
                 ->where('l.tenant_id', TenantContext::getId())
+                ->orderByDesc('lf.created_at')
+                ->orderByDesc('lf.id')
+                ->limit(self::VIEWER_SAVED_LISTINGS_LIMIT)
                 ->pluck('lf.listing_id')
                 ->all();
         } catch (\Exception $e) {
@@ -616,6 +653,49 @@ class ListingRankingService
             Log::debug('[ListingRanking] getUserListings failed: ' . $e->getMessage());
             return [];
         }
+    }
+
+    /**
+     * Batch-load active listings for many owners in a single query.
+     *
+     * Returns a map keyed by owner user id; every requested id is present (empty array
+     * when the owner has no active listings) so callers can rely on isset() and never
+     * fall back to a per-owner query. Each listing keeps the same shape as
+     * {@see self::getUserListings()} (id, type, category_id).
+     *
+     * @param int[] $userIds
+     * @return array<int, array<int, array{id: mixed, type: mixed, category_id: mixed}>>
+     */
+    private function getUsersListings(array $userIds): array
+    {
+        $result = [];
+        foreach ($userIds as $userId) {
+            $result[(int) $userId] = [];
+        }
+
+        if (empty($result)) {
+            return $result;
+        }
+
+        try {
+            $rows = DB::table('listings')
+                ->whereIn('user_id', array_keys($result))
+                ->where('tenant_id', TenantContext::getId())
+                ->where('status', 'active')
+                ->select(['id', 'user_id', 'type', 'category_id'])
+                ->get();
+
+            foreach ($rows as $row) {
+                $listing = (array) $row;
+                $ownerId = (int) $listing['user_id'];
+                unset($listing['user_id']);
+                $result[$ownerId][] = $listing;
+            }
+        } catch (\Exception $e) {
+            Log::debug('[ListingRanking] getUsersListings failed: ' . $e->getMessage());
+        }
+
+        return $result;
     }
 
     private function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): float

@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\Notification;
 
@@ -263,18 +264,28 @@ class AdminGroupsController extends BaseApiController
             );
             ActivityLog::log($adminId, 'admin_approve_group_member', "Approved membership #{$id} for group \"{$membership->group_name}\"");
 
-            // Notify the member they've been approved (unless admin is the member)
+            // Notify the member they've been approved (unless admin is the
+            // member), rendered in the member's preferred language.
             try {
                 if ((int) $membership->user_id !== $adminId) {
-                    Notification::createNotification(
-                        (int) $membership->user_id,
-                        __('api_controllers_3.admin_bells.group_member_approved', ['group' => $membership->group_name]),
-                        "/groups/{$membership->group_id}",
-                        'info',
-                        false,
-                        $tenantId
-                    );
-                    \App\Services\NotificationDispatcher::fanOutPush((int) ($membership->user_id), 'info', __('api_controllers_3.admin_bells.group_member_approved', ['group' => $membership->group_name]), "/groups/{$membership->group_id}");
+                    $recipient = DB::table('users')
+                        ->where('id', (int) $membership->user_id)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['preferred_language'])
+                        ->first();
+
+                    LocaleContext::withLocale($recipient, function () use ($membership, $tenantId) {
+                        $msg = __('api_controllers_3.admin_bells.group_member_approved', ['group' => $membership->group_name]);
+                        Notification::createNotification(
+                            (int) $membership->user_id,
+                            $msg,
+                            "/groups/{$membership->group_id}",
+                            'info',
+                            false,
+                            $tenantId
+                        );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($membership->user_id), 'info', $msg, "/groups/{$membership->group_id}");
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('Failed to send group member approval notification', [
@@ -314,18 +325,28 @@ class AdminGroupsController extends BaseApiController
             );
             ActivityLog::log($adminId, 'admin_reject_group_member', "Rejected membership #{$id} for group \"{$membership->group_name}\"");
 
-            // Notify the member their request was declined (unless admin is the member)
+            // Notify the member their request was declined (unless admin is the
+            // member), rendered in the member's preferred language.
             try {
                 if ((int) $membership->user_id !== $adminId) {
-                    Notification::createNotification(
-                        (int) $membership->user_id,
-                        __('api_controllers_3.admin_bells.group_member_rejected', ['group' => $membership->group_name]),
-                        null,
-                        'info',
-                        false,
-                        $tenantId
-                    );
-                    \App\Services\NotificationDispatcher::fanOutPush((int) ($membership->user_id), 'info', __('api_controllers_3.admin_bells.group_member_rejected', ['group' => $membership->group_name]), null);
+                    $recipient = DB::table('users')
+                        ->where('id', (int) $membership->user_id)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['preferred_language'])
+                        ->first();
+
+                    LocaleContext::withLocale($recipient, function () use ($membership, $tenantId) {
+                        $msg = __('api_controllers_3.admin_bells.group_member_rejected', ['group' => $membership->group_name]);
+                        Notification::createNotification(
+                            (int) $membership->user_id,
+                            $msg,
+                            null,
+                            'info',
+                            false,
+                            $tenantId
+                        );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($membership->user_id), 'info', $msg, null);
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('Failed to send group member rejection notification', [
@@ -358,18 +379,28 @@ class AdminGroupsController extends BaseApiController
 
         DB::update("UPDATE `groups` SET is_active = 1 WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
-        // Notify the group owner (unless the admin is the owner)
+        // Notify the group owner (unless the admin is the owner), rendered in
+        // the owner's preferred language.
         try {
             if ($group->owner_id && (int) $group->owner_id !== $adminId) {
-                Notification::createNotification(
-                    (int) $group->owner_id,
-                    __('api_controllers_3.admin_bells.group_approved'),
-                    "/groups/{$id}",
-                    'info',
-                    false,
-                    $tenantId
-                );
-                \App\Services\NotificationDispatcher::fanOutPush((int) ($group->owner_id), 'info', __('api_controllers_3.admin_bells.group_approved'), "/groups/{$id}");
+                $recipient = DB::table('users')
+                    ->where('id', (int) $group->owner_id)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['preferred_language'])
+                    ->first();
+
+                LocaleContext::withLocale($recipient, function () use ($group, $id, $tenantId) {
+                    $msg = __('api_controllers_3.admin_bells.group_approved');
+                    Notification::createNotification(
+                        (int) $group->owner_id,
+                        $msg,
+                        "/groups/{$id}",
+                        'info',
+                        false,
+                        $tenantId
+                    );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($group->owner_id), 'info', $msg, "/groups/{$id}");
+                });
             }
         } catch (\Throwable $e) {
             Log::warning('Failed to send group approval notification', [
@@ -890,18 +921,28 @@ class AdminGroupsController extends BaseApiController
             );
             ActivityLog::log($adminId, 'admin_kick_group_member', "Kicked user #{$userId} from group #{$groupId}");
 
-            // Notify the kicked member (unless the admin kicked themselves)
+            // Notify the kicked member (unless the admin kicked themselves),
+            // rendered in the member's preferred language.
             try {
                 if ((int) $userId !== $adminId) {
-                    Notification::createNotification(
-                        (int) $userId,
-                        __('api_controllers_3.admin_bells.group_member_removed', ['group' => $member->group_name]),
-                        null,
-                        'info',
-                        false,
-                        $tenantId
-                    );
-                    \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'info', __('api_controllers_3.admin_bells.group_member_removed', ['group' => $member->group_name]), null);
+                    $recipient = DB::table('users')
+                        ->where('id', (int) $userId)
+                        ->where('tenant_id', $tenantId)
+                        ->select(['preferred_language'])
+                        ->first();
+
+                    LocaleContext::withLocale($recipient, function () use ($userId, $member, $tenantId) {
+                        $msg = __('api_controllers_3.admin_bells.group_member_removed', ['group' => $member->group_name]);
+                        Notification::createNotification(
+                            (int) $userId,
+                            $msg,
+                            null,
+                            'info',
+                            false,
+                            $tenantId
+                        );
+                        \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'info', $msg, null);
+                    });
                 }
             } catch (\Throwable $e) {
                 Log::warning('Failed to send group kick notification', [

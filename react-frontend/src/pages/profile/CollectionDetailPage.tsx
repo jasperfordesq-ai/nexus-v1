@@ -1,9 +1,11 @@
-import { CardBody, Card, Button, Pagination } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { CardBody, Card } from '@/components/ui/Card';
+import { Pagination } from '@/components/ui/Pagination';
 /**
  * SOC10 — CollectionDetailPage at /me/collections/:id
  * Paginated saved items hydrated with previews.
@@ -64,6 +66,7 @@ export default function CollectionDetailPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   usePageTitle(data?.collection.name ?? t('collections.detail_title'));
 
   const reqIdRef = useRef(0);
@@ -71,6 +74,7 @@ export default function CollectionDetailPage() {
     if (!id) return;
     const reqId = ++reqIdRef.current;
     setLoading(true);
+    setError(false);
     try {
       const res = await api.get<ApiPayload>(`/v2/me/collections/${id}/items?page=${p}`);
       if (reqId !== reqIdRef.current) return; // a newer load started — drop this stale response
@@ -78,7 +82,14 @@ export default function CollectionDetailPage() {
         setData(res.data);
         const meta = (res as unknown as { meta?: { total_pages?: number } }).meta;
         if (meta?.total_pages) setTotalPages(meta.total_pages);
+      } else {
+        // A rejected response (session expired, deleted collection, server error)
+        // must surface an error state. Without it, `data` stays null and the page
+        // renders blank — `undefined === 0` is false, so the empty state never shows.
+        setError(true);
       }
+    } catch {
+      if (reqId === reqIdRef.current) setError(true);
     } finally {
       if (reqId === reqIdRef.current) setLoading(false);
     }
@@ -124,7 +135,16 @@ export default function CollectionDetailPage() {
         </div>
       )}
 
-      {data?.items.length === 0 ? (
+      {error && !data ? (
+        <Card>
+          <CardBody className="items-center text-center gap-4 py-12">
+            <p className="text-[var(--text-muted)]">{t('common.error')}</p>
+            <Button color="primary" variant="flat" onPress={() => load(page)}>
+              {t('actions.retry')}
+            </Button>
+          </CardBody>
+        </Card>
+      ) : !data || data.items.length === 0 ? (
         <EmptyState
           title={t('collections.no_items')}
           description={t('collections.no_items_desc')}

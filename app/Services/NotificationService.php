@@ -122,6 +122,41 @@ class NotificationService
             $groups[$key][] = $n;
         }
 
+        // First pass: precompute each grouped notification's top-3 actor IDs and
+        // collect their union, so every actor can be hydrated in ONE users query.
+        // This previously ran a separate users lookup per group (N+1) — a busy
+        // bell dropdown fired one query per collapsed group on every poll.
+        $groupActorIds = [];
+        $allActorIds = [];
+        foreach ($groups as $key => $rows) {
+            if (count($rows) === 1) {
+                continue;
+            }
+            $ids = [];
+            foreach ($rows as $r) {
+                $aid = $r->actor_id ?? null;
+                if ($aid && ! in_array((int) $aid, $ids, true)) {
+                    $ids[] = (int) $aid;
+                }
+            }
+            $top = array_slice($ids, 0, 3);
+            $groupActorIds[$key] = $top;
+            foreach ($top as $id) {
+                $allActorIds[$id] = true;
+            }
+        }
+
+        $userMap = [];
+        if (! empty($allActorIds)) {
+            $actorUsers = \Illuminate\Support\Facades\DB::table('users')
+                ->where('tenant_id', \App\Core\TenantContext::getId())
+                ->whereIn('id', array_keys($allActorIds))
+                ->get(['id', 'name', 'first_name', 'last_name', 'avatar_url']);
+            foreach ($actorUsers as $u) {
+                $userMap[(int) $u->id] = $u;
+            }
+        }
+
         $result = [];
         foreach ($groups as $key => $rows) {
             $latest = $rows[0]; // already id DESC
@@ -132,25 +167,20 @@ class NotificationService
                 continue;
             }
 
-            $actorIds = [];
             $allRead = true;
             foreach ($rows as $r) {
                 if (! $r->is_read) {
                     $allRead = false;
-                }
-                $aid = $r->actor_id ?? null;
-                if ($aid && ! in_array((int) $aid, $actorIds, true)) {
-                    $actorIds[] = (int) $aid;
+                    break;
                 }
             }
 
+            // Hydrate actors from the prefetched map, preserving most-recent-first
+            // order (rows are id DESC, so $groupActorIds already reflects that).
             $actors = [];
-            if (! empty($actorIds)) {
-                $actorUsers = \Illuminate\Support\Facades\DB::table('users')
-                    ->where('tenant_id', \App\Core\TenantContext::getId())
-                    ->whereIn('id', array_slice($actorIds, 0, 3))
-                    ->get(['id', 'name', 'first_name', 'last_name', 'avatar_url']);
-                foreach ($actorUsers as $u) {
+            foreach ($groupActorIds[$key] as $aid) {
+                $u = $userMap[$aid] ?? null;
+                if ($u) {
                     $actors[] = [
                         'id' => (int) $u->id,
                         'name' => $u->name ?: trim(($u->first_name ?? '') . ' ' . ($u->last_name ?? '')),

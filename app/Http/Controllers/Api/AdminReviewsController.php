@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\Notification;
 
@@ -304,20 +305,30 @@ class AdminReviewsController extends BaseApiController
             "Hidden review #{$id} (set status to rejected)" . ($superAdmin ? " (tenant {$reviewTenantId})" : '')
         );
 
-        // Notify the reviewer
+        // Notify the reviewer, rendered in the reviewer's preferred language
+        // (scoped to the review's tenant for the super-admin path).
         try {
             $reviewerId = (int) $review->reviewer_id;
 
             if ($reviewerId && $reviewerId !== $adminId) {
-                Notification::createNotification(
-                    $reviewerId,
-                    __('api_controllers_3.admin_bells.review_hidden'),
-                    null,
-                    'moderation',
-                    true,
-                    $reviewTenantId
-                );
-                \App\Services\NotificationDispatcher::fanOutPush((int) $reviewerId, 'moderation', __('api_controllers_3.admin_bells.review_hidden'), null);
+                $recipient = DB::table('users')
+                    ->where('id', $reviewerId)
+                    ->where('tenant_id', $reviewTenantId)
+                    ->select(['preferred_language'])
+                    ->first();
+
+                LocaleContext::withLocale($recipient, function () use ($reviewerId, $reviewTenantId) {
+                    $msg = __('api_controllers_3.admin_bells.review_hidden');
+                    Notification::createNotification(
+                        $reviewerId,
+                        $msg,
+                        null,
+                        'moderation',
+                        true,
+                        $reviewTenantId
+                    );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $reviewerId, 'moderation', $msg, null);
+                });
             }
         } catch (\Throwable $e) {
             Log::warning("AdminReviewsController::hide notification failed: " . $e->getMessage());
@@ -358,18 +369,29 @@ class AdminReviewsController extends BaseApiController
             "Deleted review #{$id}" . ($superAdmin ? " (tenant {$reviewTenantId})" : '')
         );
 
-        // Notify the reviewer (review already deleted, use cached reviewer_id)
+        // Notify the reviewer (review already deleted, use cached reviewer_id),
+        // rendered in the reviewer's preferred language (scoped to the review's
+        // tenant for the super-admin path).
         try {
             if ($reviewerId && $reviewerId !== $adminId) {
-                Notification::createNotification(
-                    $reviewerId,
-                    __('api_controllers_3.admin_bells.review_removed'),
-                    null,
-                    'moderation',
-                    true,
-                    $reviewTenantId
-                );
-                \App\Services\NotificationDispatcher::fanOutPush((int) $reviewerId, 'moderation', __('api_controllers_3.admin_bells.review_removed'), null);
+                $recipient = DB::table('users')
+                    ->where('id', $reviewerId)
+                    ->where('tenant_id', $reviewTenantId)
+                    ->select(['preferred_language'])
+                    ->first();
+
+                LocaleContext::withLocale($recipient, function () use ($reviewerId, $reviewTenantId) {
+                    $msg = __('api_controllers_3.admin_bells.review_removed');
+                    Notification::createNotification(
+                        $reviewerId,
+                        $msg,
+                        null,
+                        'moderation',
+                        true,
+                        $reviewTenantId
+                    );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $reviewerId, 'moderation', $msg, null);
+                });
             }
         } catch (\Throwable $e) {
             Log::warning("AdminReviewsController::destroy notification failed: " . $e->getMessage());

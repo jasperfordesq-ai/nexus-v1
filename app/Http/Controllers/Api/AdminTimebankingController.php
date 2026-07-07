@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Services\AbuseDetectionService;
 
 /**
@@ -184,8 +185,10 @@ class AdminTimebankingController extends BaseApiController
         }
         if (empty($reason)) return $this->respondWithError('VALIDATION_ERROR', __('api.reason_required'), 'reason', 400);
 
-        // Verify user exists (non-locking read for early 404)
-        $user = DB::selectOne("SELECT id, first_name, last_name, balance FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
+        // Verify user exists (non-locking read for early 404). preferred_language
+        // is selected so the balance-adjustment notification below renders in the
+        // RECIPIENT's locale, not the admin's/broker's request locale.
+        $user = DB::selectOne("SELECT id, first_name, last_name, balance, preferred_language FROM users WHERE id = ? AND tenant_id = ?", [$userId, $tenantId]);
         if (!$user) return $this->respondWithError('NOT_FOUND', __('api.user_not_found'), null, 404);
 
         try {
@@ -235,20 +238,23 @@ class AdminTimebankingController extends BaseApiController
             return $this->respondWithError('SERVER_ERROR', __('api.balance_adjust_failed'), null, 500);
         }
 
-        // Notify user of balance adjustment
+        // Notify user of balance adjustment — rendered in the recipient's
+        // preferred language (bell + device push), not the actor's request locale.
         try {
             $absAmount = abs($amount);
-            $unit = $absAmount == 1 ? 'hour' : 'hours';
-            $msg = $amount > 0
-                ? __('api_controllers_3.wallet_admin.balance_adjusted_added', ['amount' => $absAmount, 'unit' => $unit])
-                : __('api_controllers_3.wallet_admin.balance_adjusted_removed', ['amount' => $absAmount, 'unit' => $unit]);
-            \App\Models\Notification::createNotification(
-                $userId,
-                $msg,
-                '/wallet',
-                'transaction'
-            );
-            \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'transaction', $msg, '/wallet');
+            LocaleContext::withLocale($user, function () use ($userId, $amount, $absAmount) {
+                $unit = trans_choice('api_controllers_3.wallet_admin.hours_unit', (float) $absAmount);
+                $msg = $amount > 0
+                    ? __('api_controllers_3.wallet_admin.balance_adjusted_added', ['amount' => $absAmount, 'unit' => $unit])
+                    : __('api_controllers_3.wallet_admin.balance_adjusted_removed', ['amount' => $absAmount, 'unit' => $unit]);
+                \App\Models\Notification::createNotification(
+                    $userId,
+                    $msg,
+                    '/wallet',
+                    'transaction'
+                );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'transaction', $msg, '/wallet');
+            });
         } catch (\Throwable $e) {
             \Log::warning('Balance adjustment notification failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
         }

@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\Notification;
 use App\Services\EventNotificationService;
@@ -127,18 +128,28 @@ class AdminEventsController extends BaseApiController
             ['active', $id, $tenantId]
         );
 
-        // Notify the event organizer (unless the admin is the organizer)
+        // Notify the event organizer (unless the admin is the organizer),
+        // rendered in the organizer's preferred language rather than the admin's.
         try {
             if ((int) $event->created_by !== $adminId) {
-                Notification::createNotification(
-                    (int) $event->created_by,
-                    __('api_controllers_3.admin_bells.event_approved'),
-                    "/events/{$id}",
-                    'info',
-                    false,
-                    $tenantId
-                );
-                \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $event->created_by), 'info', __('api_controllers_3.admin_bells.event_approved'), "/events/{$id}");
+                $recipient = DB::table('users')
+                    ->where('id', (int) $event->created_by)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['preferred_language'])
+                    ->first();
+
+                LocaleContext::withLocale($recipient, function () use ($event, $id, $tenantId) {
+                    $msg = __('api_controllers_3.admin_bells.event_approved');
+                    Notification::createNotification(
+                        (int) $event->created_by,
+                        $msg,
+                        "/events/{$id}",
+                        'info',
+                        false,
+                        $tenantId
+                    );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ((int) $event->created_by), 'info', $msg, "/events/{$id}");
+                });
             }
         } catch (\Throwable $e) {
             Log::warning('Failed to send event approval notification', [

@@ -83,7 +83,8 @@
   "wallet_admin": {
     "grant_received": "You received {{amount}} {{unit}} from your timebank coordinator",
     "balance_adjusted_added": "Your balance was adjusted: +{{amount}} {{unit}} added by coordinator",
-    "balance_adjusted_removed": "Your balance was adjusted: -{{amount}} {{unit}} removed by coordinator"
+    "balance_adjusted_removed": "Your balance was adjusted: -{{amount}} {{unit}} removed by coordinator",
+        "hours_unit": "{1} hour|[2,*] hours"
   },
   "comments": {
     "reaction": "{{name}} reacted to your comment"

@@ -8,6 +8,7 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 
 /**
@@ -130,9 +131,11 @@ class AdminWalletGrantController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.grant_amount_max_10000'), 'amount', 422);
         }
 
-        // Validate user exists and belongs to current tenant
+        // Validate user exists and belongs to current tenant.
+        // preferred_language is selected so the grant notification below renders
+        // in the RECIPIENT's locale, not the admin's request locale.
         $user = DB::selectOne(
-            "SELECT id, first_name, last_name FROM users WHERE id = ? AND tenant_id = ?",
+            "SELECT id, first_name, last_name, preferred_language FROM users WHERE id = ? AND tenant_id = ?",
             [$userId, $tenantId]
         );
 
@@ -161,16 +164,20 @@ class AdminWalletGrantController extends BaseApiController
         $userName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
         ActivityLog::log($adminId, 'admin_grant_credits', "Granted {$amount} credits to user #{$userId} ({$userName}). Reason: " . ($reason ?? 'Admin credit grant'));
 
-        // Notify user of credit grant
+        // Notify user of credit grant — rendered in the recipient's preferred
+        // language (bell + device push), not the admin's request locale.
         try {
-            $unit = $amount == 1 ? 'hour' : 'hours';
-            \App\Models\Notification::createNotification(
-                $userId,
-                __('api_controllers_3.wallet_admin.grant_received', ['amount' => $amount, 'unit' => $unit]),
-                '/wallet',
-                'transaction'
-            );
-            \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'transaction', __('api_controllers_3.wallet_admin.grant_received', ['amount' => $amount, 'unit' => $unit]), '/wallet');
+            LocaleContext::withLocale($user, function () use ($userId, $amount) {
+                $unit = trans_choice('api_controllers_3.wallet_admin.hours_unit', (float) $amount);
+                $msg = __('api_controllers_3.wallet_admin.grant_received', ['amount' => $amount, 'unit' => $unit]);
+                \App\Models\Notification::createNotification(
+                    $userId,
+                    $msg,
+                    '/wallet',
+                    'transaction'
+                );
+                \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'transaction', $msg, '/wallet');
+            });
         } catch (\Throwable $e) {
             \Log::warning('Admin grant notification failed', ['user_id' => $userId, 'error' => $e->getMessage()]);
         }

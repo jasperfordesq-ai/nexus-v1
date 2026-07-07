@@ -31,9 +31,38 @@ class CollaborativeFilteringService
     private const MIN_COMMON_USERS = 2;
     private const MAX_TRAINING_ROWS = 5000;
 
+    /**
+     * In-request memo of the loaded listing-save interaction matrix, keyed by tenant id.
+     * Prevents rebuilding the training set (a MAX_TRAINING_ROWS query + matrix build) on
+     * every getSimilarListings() call within a single ranking pass.
+     *
+     * @var array<int, array<int, array<int, float>>>
+     */
+    private static array $listingInteractionsMemo = [];
+
+    /**
+     * In-request memo of the loaded member interaction graph, keyed by tenant id.
+     *
+     * @var array<int, array<int, array<int, float>>>
+     */
+    private static array $memberInteractionsMemo = [];
+
     // =========================================================================
     // PUBLIC API
     // =========================================================================
+
+    /**
+     * Clear the per-request interaction memos.
+     *
+     * Callers that drive a batch of similarity lookups (e.g. ListingRankingService) call
+     * this at the start of the pass so the training set is loaded at most once per tenant
+     * for that pass, and so long-running workers never reuse a stale in-memory matrix.
+     */
+    public static function flushRequestCache(): void
+    {
+        self::$listingInteractionsMemo = [];
+        self::$memberInteractionsMemo = [];
+    }
 
     /**
      * Find listings similar to the given listing based on shared saves.
@@ -338,6 +367,10 @@ class CollaborativeFilteringService
      */
     private static function loadListingInteractions(int $tenantId): array
     {
+        if (array_key_exists($tenantId, self::$listingInteractionsMemo)) {
+            return self::$listingInteractionsMemo[$tenantId];
+        }
+
         try {
             $rows = DB::select(
                 "SELECT lf.user_id, lf.listing_id
@@ -349,11 +382,11 @@ class CollaborativeFilteringService
             );
         } catch (\Throwable $e) {
             Log::debug('[CollaborativeFiltering] loadListingInteractions failed: ' . $e->getMessage());
-            return [];
+            return self::$listingInteractionsMemo[$tenantId] = [];
         }
 
         if (empty($rows)) {
-            return [];
+            return self::$listingInteractionsMemo[$tenantId] = [];
         }
 
         $matrix = [];
@@ -361,7 +394,7 @@ class CollaborativeFilteringService
             $matrix[(int) $row->user_id][(int) $row->listing_id] = 1.0;
         }
 
-        return $matrix;
+        return self::$listingInteractionsMemo[$tenantId] = $matrix;
     }
 
     /**
@@ -369,6 +402,10 @@ class CollaborativeFilteringService
      */
     private static function loadMemberInteractions(int $tenantId): array
     {
+        if (array_key_exists($tenantId, self::$memberInteractionsMemo)) {
+            return self::$memberInteractionsMemo[$tenantId];
+        }
+
         try {
             $rows = DB::select(
                 "SELECT sender_id, receiver_id, COUNT(*) as interaction_count
@@ -380,11 +417,11 @@ class CollaborativeFilteringService
             );
         } catch (\Throwable $e) {
             Log::debug('[CollaborativeFiltering] loadMemberInteractions failed: ' . $e->getMessage());
-            return [];
+            return self::$memberInteractionsMemo[$tenantId] = [];
         }
 
         if (empty($rows)) {
-            return [];
+            return self::$memberInteractionsMemo[$tenantId] = [];
         }
 
         $matrix = [];
@@ -398,6 +435,6 @@ class CollaborativeFilteringService
             $matrix[$receiverId][$senderId] = $count;
         }
 
-        return $matrix;
+        return self::$memberInteractionsMemo[$tenantId] = $matrix;
     }
 }

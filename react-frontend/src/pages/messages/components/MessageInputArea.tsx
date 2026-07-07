@@ -3,6 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { Button } from '@/components/ui/Button';
+import { Textarea } from '@/components/ui/Textarea';
 import type { RefObject, ChangeEvent, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';import Send from 'lucide-react/icons/send';
 import Mic from 'lucide-react/icons/mic';
@@ -15,7 +17,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTenant } from '@/contexts';
 import { GifPicker } from '@/components/compose/GifPicker';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
-import { Button, Textarea } from '@/components/ui';
 
 export interface AttachmentPreview {
   file: File;
@@ -219,11 +220,11 @@ export function MessageInputArea({
               <Button
                 isIconOnly
                 size="sm"
-                className="absolute -top-1 -right-1 w-4 h-4 min-w-0 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute -top-1.5 -right-1.5 w-6 h-6 min-w-0 bg-red-500 rounded-full shadow-sm flex items-center justify-center"
                 onPress={() => onRemoveAttachment(index)}
                 aria-label={t('aria_remove_attachment', { name: item.file.name })}
               >
-                <X className="w-2.5 h-2.5 text-white" aria-hidden="true" />
+                <X className="w-3.5 h-3.5 text-white" aria-hidden="true" />
               </Button>
             </div>
           ))}

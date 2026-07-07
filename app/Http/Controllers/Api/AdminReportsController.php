@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 use App\Models\Notification;
 use App\Services\ReportTargetResolver;
@@ -258,7 +259,8 @@ class AdminReportsController extends BaseApiController
             "Resolved report ID {$id}" . ($superAdmin ? " (tenant {$reportTenantId})" : '')
         );
 
-        // Notify the report creator
+        // Notify the report creator, rendered in the reporter's preferred
+        // language (scoped to the report's tenant for the super-admin path).
         try {
             $reporterId = (int) $report->reporter_id;
 
@@ -267,14 +269,23 @@ class AdminReportsController extends BaseApiController
                     ? "/{$report->target_type}s/{$report->target_id}"
                     : null;
 
-                Notification::createNotification(
-                    $reporterId,
-                    __('api_controllers_3.admin_bells.report_resolved'),
-                    $link,
-                    'moderation',
-                    false
-                );
-                \App\Services\NotificationDispatcher::fanOutPush((int) ($reporterId), 'moderation', __('api_controllers_3.admin_bells.report_resolved'), $link);
+                $recipient = DB::table('users')
+                    ->where('id', $reporterId)
+                    ->where('tenant_id', $reportTenantId)
+                    ->select(['preferred_language'])
+                    ->first();
+
+                LocaleContext::withLocale($recipient, function () use ($reporterId, $link) {
+                    $msg = __('api_controllers_3.admin_bells.report_resolved');
+                    Notification::createNotification(
+                        $reporterId,
+                        $msg,
+                        $link,
+                        'moderation',
+                        false
+                    );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($reporterId), 'moderation', $msg, $link);
+                });
             }
         } catch (\Throwable $e) {
             Log::warning("AdminReportsController::resolve notification failed: " . $e->getMessage());
@@ -321,19 +332,30 @@ class AdminReportsController extends BaseApiController
             "Dismissed report ID {$id}" . ($superAdmin ? " (tenant {$reportTenantId})" : '')
         );
 
-        // Notify the report creator (neutral wording — "reviewed" not "dismissed")
+        // Notify the report creator (neutral wording — "reviewed" not
+        // "dismissed"), rendered in the reporter's preferred language (scoped to
+        // the report's tenant for the super-admin path).
         try {
             $reporterId = (int) $report->reporter_id;
 
             if ($reporterId) {
-                Notification::createNotification(
-                    $reporterId,
-                    __('api_controllers_3.admin_bells.report_reviewed'),
-                    null,
-                    'moderation',
-                    false
-                );
-                \App\Services\NotificationDispatcher::fanOutPush((int) ($reporterId), 'moderation', __('api_controllers_3.admin_bells.report_reviewed'), null);
+                $recipient = DB::table('users')
+                    ->where('id', $reporterId)
+                    ->where('tenant_id', $reportTenantId)
+                    ->select(['preferred_language'])
+                    ->first();
+
+                LocaleContext::withLocale($recipient, function () use ($reporterId) {
+                    $msg = __('api_controllers_3.admin_bells.report_reviewed');
+                    Notification::createNotification(
+                        $reporterId,
+                        $msg,
+                        null,
+                        'moderation',
+                        false
+                    );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) ($reporterId), 'moderation', $msg, null);
+                });
             }
         } catch (\Throwable $e) {
             Log::warning("AdminReportsController::dismiss notification failed: " . $e->getMessage());

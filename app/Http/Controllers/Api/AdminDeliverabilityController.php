@@ -9,6 +9,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Models\ActivityLog;
 
 /**
@@ -373,17 +374,26 @@ class AdminDeliverabilityController extends BaseApiController
 
         $this->logHistory($tenantId, (int) $newId, 'created', $adminId, null, null, null, "Created deliverable: {$title}");
 
-        // Notify assigned user
+        // Notify assigned user, rendered in the assignee's preferred language.
         try {
             $assignedTo = isset($data['assigned_to']) ? (int) $data['assigned_to'] : null;
             if ($assignedTo && $assignedTo !== $adminId) {
-                \App\Models\Notification::createNotification(
-                    $assignedTo,
-                    __('api_controllers_3.deliverable.assigned', ['title' => $title]),
-                    "/deliverables/{$newId}",
-                    'deliverable_assigned'
-                );
-                \App\Services\NotificationDispatcher::fanOutPush((int) $assignedTo, 'deliverable_assigned', __('api_controllers_3.deliverable.assigned', ['title' => $title]), "/deliverables/{$newId}");
+                $recipient = DB::table('users')
+                    ->where('id', $assignedTo)
+                    ->where('tenant_id', $tenantId)
+                    ->select(['preferred_language'])
+                    ->first();
+
+                LocaleContext::withLocale($recipient, function () use ($assignedTo, $title, $newId) {
+                    $msg = __('api_controllers_3.deliverable.assigned', ['title' => $title]);
+                    \App\Models\Notification::createNotification(
+                        $assignedTo,
+                        $msg,
+                        "/deliverables/{$newId}",
+                        'deliverable_assigned'
+                    );
+                    \App\Services\NotificationDispatcher::fanOutPush((int) $assignedTo, 'deliverable_assigned', $msg, "/deliverables/{$newId}");
+                });
             }
         } catch (\Throwable $e) {
             \Log::warning('Deliverable assignment notification failed', ['deliverable_id' => $newId, 'error' => $e->getMessage()]);
@@ -474,17 +484,26 @@ class AdminDeliverabilityController extends BaseApiController
             if ($oldAssignee !== $newAssigneeStr) {
                 $this->logHistory($tenantId, $id, 'assignment_changed', $adminId, 'assigned_to', $oldAssignee, $newAssigneeStr, "Assignment changed");
 
-                // Notify new assignee
+                // Notify new assignee, rendered in the assignee's preferred language.
                 if ($newAssignee && $newAssignee !== $adminId) {
                     try {
                         $deliverableTitle = $existing['title'] ?? 'a deliverable';
-                        \App\Models\Notification::createNotification(
-                            $newAssignee,
-                            __('api_controllers_3.deliverable.reassigned', ['title' => $deliverableTitle]),
-                            "/deliverables/{$id}",
-                            'deliverable_assigned'
-                        );
-                        \App\Services\NotificationDispatcher::fanOutPush((int) $newAssignee, 'deliverable_assigned', __('api_controllers_3.deliverable.reassigned', ['title' => $deliverableTitle]), "/deliverables/{$id}");
+                        $recipient = DB::table('users')
+                            ->where('id', $newAssignee)
+                            ->where('tenant_id', $tenantId)
+                            ->select(['preferred_language'])
+                            ->first();
+
+                        LocaleContext::withLocale($recipient, function () use ($newAssignee, $deliverableTitle, $id) {
+                            $msg = __('api_controllers_3.deliverable.reassigned', ['title' => $deliverableTitle]);
+                            \App\Models\Notification::createNotification(
+                                $newAssignee,
+                                $msg,
+                                "/deliverables/{$id}",
+                                'deliverable_assigned'
+                            );
+                            \App\Services\NotificationDispatcher::fanOutPush((int) $newAssignee, 'deliverable_assigned', $msg, "/deliverables/{$id}");
+                        });
                     } catch (\Throwable $e) {
                         \Log::warning('Deliverable reassignment notification failed', ['deliverable_id' => $id, 'error' => $e->getMessage()]);
                     }

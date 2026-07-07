@@ -29,7 +29,17 @@ import ArrowUp from 'lucide-react/icons/arrow-up';
 import CircleX from 'lucide-react/icons/circle-x';
 import ListFilter from 'lucide-react/icons/list-filter';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, AlgorithmLabel, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, ToggleButton, ToggleButtonGroup, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, useConfirm } from '@/components/ui';
+import { AlgorithmLabel } from '@/components/ui/AlgorithmLabel';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Textarea } from '@/components/ui/Textarea';
+import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
+import { useDisclosure } from '@/components/ui/useDisclosure';
 import type { Key } from '@heroui/react';
 import { PageMeta } from '@/components/seo';
 import { ComposeHub } from '@/components/compose';
@@ -330,7 +340,15 @@ export function FeedPage() {
         pendingPostsRef.current = [];
       }
     } finally {
-      if (!controller.signal.aborted) {
+      // Reset the loading flag by controller identity, not by abortedness. A
+      // fresh load aborts the in-flight append (see the appendAbortRef.abort()
+      // above); when that aborted append settles it must STILL clear
+      // isLoadingMore here. Guarding on `!controller.signal.aborted` skipped it,
+      // leaving isLoadingMore stuck true forever — which disables infinite
+      // scroll, hides the "load more" button, and pins the skeletons on screen
+      // until remount. `ref.current === controller` is true only for the most
+      // recent call on this ref, so stale calls correctly skip the reset.
+      if (ref.current === controller) {
         if (append) {
           setIsLoadingMore(false);
         } else {
