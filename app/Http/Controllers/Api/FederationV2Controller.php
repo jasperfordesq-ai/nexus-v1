@@ -1147,17 +1147,26 @@ class FederationV2Controller extends BaseApiController
                 return $this->respondWithError('LISTINGS_NOT_ALLOWED', __('api.federation.feature_disabled'), null, 403);
             }
             $external = $this->fetchExternalListingsFromPartner($partnerFilter['id'], $q, $type);
-            return $this->respondWithCollection($external, null, $perPage, false);
+            return $this->respondWithCollection($external, null, $perPage, false, [
+                'pagination_scope' => 'external_partner',
+                'cursor_scope' => 'external_partner',
+                'load_more_scope' => 'none',
+                'external_pagination_scope' => 'single_partner_result_set',
+                'external_results_paginated' => false,
+                'total_items' => count($external),
+                'source_counts' => [
+                    'internal_returned' => 0,
+                    'internal_total_items' => 0,
+                    'external_returned' => count($external),
+                    'returned_total' => count($external),
+                ],
+            ]);
         }
 
         $partnerId = $partnerFilter ? $partnerFilter['id'] : 0;
 
         try {
-            $sql = "
-                SELECT l.id, l.title, l.description, l.type, c.name as category_name,
-                    l.image_url, l.price as estimated_hours, l.location,
-                    l.user_id, l.tenant_id, l.created_at,
-                    u.first_name, u.last_name, u.avatar_url, t.name as tenant_name
+            $fromWhere = "
                 FROM listings l
                 JOIN users u ON u.id = l.user_id AND u.tenant_id = l.tenant_id
                 JOIN tenants t ON t.id = l.tenant_id
@@ -1175,18 +1184,35 @@ class FederationV2Controller extends BaseApiController
             $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':tid3' => $tenantId];
 
             if (!empty($q)) {
-                $sql .= " AND (l.title LIKE :q1 OR l.description LIKE :q2)";
+                $fromWhere .= " AND (l.title LIKE :q1 OR l.description LIKE :q2)";
                 $params[':q1'] = "%{$q}%";
                 $params[':q2'] = "%{$q}%";
             }
             if (!empty($type) && in_array($type, ['offer', 'request'])) {
-                $sql .= " AND l.type = :type";
+                $fromWhere .= " AND l.type = :type";
                 $params[':type'] = $type;
             }
             if ($partnerId) {
-                $sql .= " AND l.tenant_id = :partner_id";
+                $fromWhere .= " AND l.tenant_id = :partner_id";
                 $params[':partner_id'] = $partnerId;
             }
+
+            $totalItems = 0;
+            if ($cursorId === null) {
+                $countStmt = DB::getPdo()->prepare("SELECT COUNT(*) " . $fromWhere);
+                foreach ($params as $key => $value) {
+                    $countStmt->bindValue($key, $value, is_int($value) ? \PDO::PARAM_INT : \PDO::PARAM_STR);
+                }
+                $countStmt->execute();
+                $totalItems = (int) ($countStmt->fetchColumn() ?: 0);
+            }
+
+            $sql = "
+                SELECT l.id, l.title, l.description, l.type, c.name as category_name,
+                    l.image_url, l.price as estimated_hours, l.location,
+                    l.user_id, l.tenant_id, l.created_at,
+                    u.first_name, u.last_name, u.avatar_url, t.name as tenant_name
+                " . $fromWhere;
             if ($cursorId) {
                 $sql .= " AND l.id < :cursor_id";
                 $params[':cursor_id'] = (int) $cursorId;
@@ -1236,15 +1262,33 @@ class FederationV2Controller extends BaseApiController
                 $nextCursor = $this->encodeCursor($lastRow['id']);
             }
 
+            $internalReturned = count($formatted);
+            $externalCount = 0;
+
             // Merge external partner listings (only on first page, and only when NOT filtering by internal partner)
             if (!$cursorId && !$partnerId) {
                 $external = $this->fetchExternalListings($tenantId, $q, $type);
+                $externalCount = count($external);
                 if (!empty($external)) {
                     $formatted = array_merge($formatted, $external);
                 }
             }
 
-            return $this->respondWithCollection($formatted, $nextCursor, $perPage, $hasMore);
+            return $this->respondWithCollection($formatted, $nextCursor, $perPage, $hasMore, [
+                'total_items' => $totalItems,
+                'pagination_scope' => 'internal_partners',
+                'cursor_scope' => 'internal_partners',
+                'load_more_scope' => $hasMore ? 'internal_partners' : 'none',
+                'external_pagination_scope' => $externalCount > 0 ? 'first_page_enrichment' : 'none',
+                'external_results_paginated' => false,
+                'external_results_included' => $externalCount > 0,
+                'source_counts' => [
+                    'internal_returned' => $internalReturned,
+                    'internal_total_items' => $totalItems,
+                    'external_returned' => $externalCount,
+                    'returned_total' => count($formatted),
+                ],
+            ]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("FederationV2Api::listings error: " . $e->getMessage());
             return $this->respondWithCollection([], null, $perPage, false);
@@ -1343,11 +1387,12 @@ class FederationV2Controller extends BaseApiController
                         'avatar' => self::resolveExternalUrl($owner['avatar'] ?? null, $baseUrl),
                     ],
                     'timebank' => [
-                        'id' => (int) ($l['timebank']['id'] ?? $l['tenant_id'] ?? 0),
+                        'id' => 'ext-' . (int) $partnerId,
                         'name' => $l['timebank']['name'] ?? $l['partner_name'] ?? __('api.external_partner_fallback'),
                     ],
                     'created_at' => $l['created_at'] ?? null,
                     'is_external' => true,
+                    'external_partner_id' => (int) $partnerId,
                     'partner_name' => $l['partner_name'] ?? null,
                 ];
             }, $result['listings'] ?? []);
@@ -1393,7 +1438,20 @@ class FederationV2Controller extends BaseApiController
                 return $this->respondWithError('MEMBERS_NOT_ALLOWED', __('api.federation.feature_disabled'), null, 403);
             }
             $external = $this->fetchExternalMembersFromPartner($partnerFilter['id'], $q, $skills);
-            return $this->respondWithCollection($external, null, $perPage, false, ['total_items' => count($external)]);
+            return $this->respondWithCollection($external, null, $perPage, false, [
+                'total_items' => count($external),
+                'pagination_scope' => 'external_partner',
+                'cursor_scope' => 'external_partner',
+                'load_more_scope' => 'none',
+                'external_pagination_scope' => 'single_partner_result_set',
+                'external_results_paginated' => false,
+                'source_counts' => [
+                    'internal_returned' => 0,
+                    'internal_total_items' => 0,
+                    'external_returned' => count($external),
+                    'returned_total' => count($external),
+                ],
+            ]);
         }
 
         $partnerId = $partnerFilter ? $partnerFilter['id'] : 0;
@@ -1515,16 +1573,33 @@ class FederationV2Controller extends BaseApiController
                 $nextCursor = $this->encodeCursor($lastRow['id']);
             }
 
+            $internalReturned = count($formatted);
+            $externalCount = 0;
+
             // Merge external partner members (only on first page, and only when NOT filtering by internal partner)
             if (!$cursorId && !$partnerId) {
                 $external = $this->fetchExternalMembers($tenantId, $q, $skills);
+                $externalCount = count($external);
                 if (!empty($external)) {
-                    $totalItems += count($external);
                     $formatted = array_merge($formatted, $external);
                 }
             }
 
-            return $this->respondWithCollection($formatted, $nextCursor, $perPage, $hasMore, ['total_items' => $totalItems]);
+            return $this->respondWithCollection($formatted, $nextCursor, $perPage, $hasMore, [
+                'total_items' => $totalItems,
+                'pagination_scope' => 'internal_partners',
+                'cursor_scope' => 'internal_partners',
+                'load_more_scope' => $hasMore ? 'internal_partners' : 'none',
+                'external_pagination_scope' => $externalCount > 0 ? 'first_page_enrichment' : 'none',
+                'external_results_paginated' => false,
+                'external_results_included' => $externalCount > 0,
+                'source_counts' => [
+                    'internal_returned' => $internalReturned,
+                    'internal_total_items' => $totalItems,
+                    'external_returned' => $externalCount,
+                    'returned_total' => count($formatted),
+                ],
+            ]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("FederationV2Api::members error: " . $e->getMessage());
             return $this->respondWithCollection([], null, $perPage, false, ['total_items' => 0]);
@@ -1629,7 +1704,7 @@ class FederationV2Controller extends BaseApiController
     }
 
     /** GET /api/v2/federation/members/{id} */
-    public function member(int $id): JsonResponse
+    public function member(string $id): JsonResponse
     {
         if ($blocked = $this->requireFederationOperation('profiles')) {
             return $blocked;
@@ -1638,6 +1713,15 @@ class FederationV2Controller extends BaseApiController
         $this->getUserId();
         $tenantId = $this->getTenantId();
         $memberTenantId = $this->queryInt('tenant_id');
+
+        if (str_starts_with($id, 'ext-')) {
+            return $this->externalMemberDetail($id, $tenantId);
+        }
+
+        $memberId = (int) $id;
+        if ($memberId <= 0) {
+            return $this->respondWithError('MEMBER_NOT_FOUND', __('api.fed_member_not_found'), null, 404);
+        }
 
         try {
             $sql = "
@@ -1658,7 +1742,7 @@ class FederationV2Controller extends BaseApiController
                 AND fus.federation_optin = 1 AND fus.profile_visible_federated = 1
                 AND u.status = 'active'
             ";
-            $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':user_id' => $id];
+            $params = [':tid1' => $tenantId, ':tid2' => $tenantId, ':user_id' => $memberId];
 
             if ($memberTenantId) {
                 $sql .= " AND u.tenant_id = :member_tenant_id";
@@ -1745,6 +1829,70 @@ class FederationV2Controller extends BaseApiController
             return $this->respondWithData($member);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning("FederationV2Api::member error: " . $e->getMessage());
+            return $this->respondWithError('INTERNAL_ERROR', __('api.fed_member_profile_failed'), null, 500);
+        }
+    }
+
+    private function externalMemberDetail(string $id, int $tenantId): JsonResponse
+    {
+        $rest = substr($id, 4);
+        $dashPos = strpos($rest, '-');
+        if ($dashPos === false) {
+            return $this->respondWithError('MEMBER_NOT_FOUND', __('api.fed_member_not_found'), null, 404);
+        }
+
+        $externalPartnerId = (int) substr($rest, 0, $dashPos);
+        $remoteId = $this->parseExternalMemberIdentifier($id, $externalPartnerId);
+        if ($externalPartnerId <= 0 || $remoteId === '') {
+            return $this->respondWithError('MEMBER_NOT_FOUND', __('api.fed_member_not_found'), null, 404);
+        }
+
+        $partner = \App\Services\FederationExternalPartnerService::getById($externalPartnerId, $tenantId);
+        if (!$partner || ($partner['status'] ?? '') !== 'active') {
+            return $this->respondWithError('PARTNER_NOT_FOUND', __('api.external_partner_not_found'), null, 404);
+        }
+        if (!($partner['allow_member_search'] ?? false)) {
+            return $this->respondWithError('MEMBERS_NOT_ALLOWED', __('api.federation.feature_disabled'), null, 403);
+        }
+
+        try {
+            $member = \App\Services\FederationExternalApiClient::fetchMember($externalPartnerId, $remoteId);
+            if (!$member) {
+                return $this->respondWithError('MEMBER_NOT_FOUND', __('api.fed_member_not_found'), null, 404);
+            }
+
+            $partnerName = $partner['name'] ?? __('api.external_partner_fallback');
+            $partnerBaseUrl = rtrim($partner['base_url'] ?? '', '/');
+            $name = $member['name'] ?? trim(($member['first_name'] ?? '') . ' ' . ($member['last_name'] ?? ''));
+
+            return $this->respondWithData([
+                'id' => 'ext-' . $externalPartnerId . '-' . ($member['id'] ?? $remoteId),
+                'external_id' => (string) ($member['id'] ?? $remoteId),
+                'external_partner_id' => $externalPartnerId,
+                'name' => $name,
+                'first_name' => $member['first_name'] ?? '',
+                'last_name' => $member['last_name'] ?? '',
+                'avatar' => self::resolveExternalUrl($member['avatar'] ?? $member['avatar_url'] ?? null, $partnerBaseUrl),
+                'bio' => $member['bio'] ?? '',
+                'skills' => is_array($member['skills'] ?? null)
+                    ? $member['skills']
+                    : (is_string($member['skills'] ?? null) ? array_map('trim', explode(',', $member['skills'])) : []),
+                'location' => $member['location'] ?? null,
+                'service_reach' => $member['service_reach'] ?? 'local_only',
+                'messaging_enabled' => (bool) ($member['accepts_messages'] ?? $member['messaging_enabled'] ?? false),
+                'transactions_enabled' => (bool) ($member['accepts_transactions'] ?? $member['transactions_enabled'] ?? false),
+                'tenant_id' => 'ext-' . $externalPartnerId,
+                'tenant_name' => $member['timebank']['name'] ?? $partnerName,
+                'timebank' => [
+                    'id' => 'ext-' . $externalPartnerId,
+                    'name' => $member['timebank']['name'] ?? $partnerName,
+                ],
+                'is_external' => true,
+                'partner_name' => $partnerName,
+                'listings' => [],
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("FederationV2Api::externalMemberDetail error: " . $e->getMessage());
             return $this->respondWithError('INTERNAL_ERROR', __('api.fed_member_profile_failed'), null, 500);
         }
     }
@@ -2558,12 +2706,33 @@ class FederationV2Controller extends BaseApiController
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $params = array_merge($ids, [$tenantId, $userId]);
 
+            $messages = DB::select(
+                "SELECT id, sender_user_id, sender_tenant_id
+                 FROM federation_messages
+                 WHERE id IN ({$placeholders}) AND receiver_tenant_id = ? AND receiver_user_id = ?
+                 AND direction = 'inbound' AND status != 'read'",
+                $params
+            );
+
             $updated = DB::update(
                 "UPDATE federation_messages SET status = 'read', read_at = NOW()
                  WHERE id IN ({$placeholders}) AND receiver_tenant_id = ? AND receiver_user_id = ?
                  AND direction = 'inbound' AND status != 'read'",
                 $params
             );
+
+            if ($updated > 0) {
+                foreach ($messages as $message) {
+                    if (!empty($message->sender_user_id) && !empty($message->sender_tenant_id)) {
+                        FederationRealtimeService::broadcastMessageRead(
+                            $userId,
+                            $tenantId,
+                            (int) $message->sender_user_id,
+                            (int) $message->sender_tenant_id
+                        );
+                    }
+                }
+            }
 
             return $this->respondWithData(['updated' => $updated]);
         } catch (\Exception $e) {

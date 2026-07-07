@@ -45,6 +45,7 @@ class NexusAdapter implements FederationProtocolAdapter
             'listings'      => '/listings',
             'listing'       => "/listings/{$id}",
             'transactions'  => '/transactions',
+            'transaction'   => "/transactions/{$id}",
             'messages'      => '/messages',
             'reviews'       => '/reviews',
             'events'        => '/events',

@@ -56,6 +56,21 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 type ServiceReachFilter = 'all' | 'local_only' | 'remote_ok' | 'travel_ok';
 
+type FederationSourceMeta = {
+  pagination_scope?: string;
+  cursor_scope?: string;
+  load_more_scope?: string;
+  external_pagination_scope?: string;
+  external_results_paginated?: boolean;
+  external_results_included?: boolean;
+  source_counts?: {
+    internal_returned?: number;
+    internal_total_items?: number;
+    external_returned?: number;
+    returned_total?: number;
+  };
+};
+
 const SERVICE_REACH_OPTIONS: { key: ServiceReachFilter; icon: typeof Home }[] = [
   { key: 'all', icon: Users },
   { key: 'local_only', icon: Home },
@@ -101,6 +116,7 @@ export function FederationMembersPage() {
   const [hasMore, setHasMore] = useState(true);
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
+  const [sourceMeta, setSourceMeta] = useState<FederationSourceMeta | null>(null);
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -212,13 +228,27 @@ export function FederationMembersPage() {
         }
         setHasMore(response.meta?.has_more ?? response.data.length >= ITEMS_PER_PAGE);
         setCursor(response.meta?.cursor ?? undefined);
+        if (!append) {
+          setSourceMeta(response.meta ? {
+            pagination_scope: response.meta.pagination_scope,
+            cursor_scope: response.meta.cursor_scope,
+            load_more_scope: response.meta.load_more_scope,
+            external_pagination_scope: response.meta.external_pagination_scope,
+            external_results_paginated: response.meta.external_results_paginated,
+            external_results_included: response.meta.external_results_included,
+            source_counts: response.meta.source_counts,
+          } : null);
 
-        if (response.meta?.total_items !== undefined) {
-          setTotalCount(response.meta.total_items);
+          if (typeof response.meta?.total_items === 'number') {
+            setTotalCount(response.meta.total_items);
+          } else {
+            setTotalCount(null);
+          }
         }
       } else {
         if (!append) {
           setError(tRef.current('members.load_error'));
+          setSourceMeta(null);
         } else {
           toastRef.current.error(tRef.current('members.load_more_error'));
         }
@@ -228,6 +258,7 @@ export function FederationMembersPage() {
       logError('Failed to load federated members', err);
       if (!append) {
         setError(tRef.current('members.load_error'));
+        setSourceMeta(null);
       } else {
         toastRef.current.error(tRef.current('members.load_more_error'));
       }
@@ -256,6 +287,14 @@ export function FederationMembersPage() {
     if (isLoadingMore || !hasMore) return;
     loadMembers(true, cursor);
   }, [isLoadingMore, hasMore, loadMembers, cursor]);
+
+  const externalResultCount = sourceMeta?.source_counts?.external_returned ?? 0;
+  const visibleResultCount = sourceMeta?.pagination_scope === 'external_partner'
+    ? members.length
+    : Math.max(0, members.length - externalResultCount);
+  const sourceNoteKey = sourceMeta?.pagination_scope === 'external_partner'
+    ? 'members.external_source_note_external_only'
+    : 'members.external_source_note';
 
   // Navigation handlers
   const handleViewProfile = useCallback((member: FederatedMember) => {
@@ -369,7 +408,7 @@ export function FederationMembersPage() {
                     key={option.key}
                     id={option.key}
                     variant="ghost"
-                    className="bg-theme-elevated text-theme-muted hover:bg-theme-hover data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white"
+                    className="bg-theme-elevated text-theme-muted hover:bg-theme-hover data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
                   >
                     <Icon className="w-3.5 h-3.5" aria-hidden="true" />
                     {t(`members.reach_${option.key}`)}
@@ -397,14 +436,23 @@ export function FederationMembersPage() {
 
       {/* Results Count */}
       {!isLoading && !error && totalCount !== null && (
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center gap-2">
           <Chip
             variant="flat"
             size="sm"
             className="bg-theme-elevated text-theme-muted"
           >
-            {t('members.showing_count', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString() })}
+            {t('members.showing_count', { shown: visibleResultCount.toLocaleString(), total: totalCount.toLocaleString() })}
           </Chip>
+          {externalResultCount > 0 && (
+            <Chip
+              variant="flat"
+              size="sm"
+              className="bg-theme-elevated text-theme-muted"
+            >
+              {t(sourceNoteKey, { count: externalResultCount })}
+            </Chip>
+          )}
         </div>
       )}
 
@@ -417,7 +465,7 @@ export function FederationMembersPage() {
           </h3>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            variant="primary"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadMembers()}
           >
@@ -642,7 +690,8 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
         {isAuthenticated && (
           <Button
             size="sm"
-            className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            variant="primary"
+            className="flex-1"
             startContent={<MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />}
             onPress={() => onSendMessage(member)}
           >

@@ -19,7 +19,7 @@ import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGro
  *
  * Features:
  * - Search input with debounce
- * - Type filter (All / Offers / Requests) as Chip group
+ * - Type filter (All / Offers / Requests) as ToggleButtonGroup
  * - Partner community Select dropdown
  * - Responsive grid (1/2/3 cols)
  * - Cursor-based pagination with Load More
@@ -53,6 +53,21 @@ import type { FederatedListing, FederationPartner } from '@/types/api';
 
 type ListingTypeFilter = 'all' | 'offer' | 'request';
 
+type FederationSourceMeta = {
+  pagination_scope?: string;
+  cursor_scope?: string;
+  load_more_scope?: string;
+  external_pagination_scope?: string;
+  external_results_paginated?: boolean;
+  external_results_included?: boolean;
+  source_counts?: {
+    internal_returned?: number;
+    internal_total_items?: number;
+    external_returned?: number;
+    returned_total?: number;
+  };
+};
+
 const SEARCH_DEBOUNCE_MS = 300;
 const PER_PAGE = 20;
 
@@ -75,6 +90,7 @@ export function FederationListingsPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
+  const [sourceMeta, setSourceMeta] = useState<FederationSourceMeta | null>(null);
 
   // Detail modal
   const [selectedListing, setSelectedListing] = useState<FederatedListing | null>(null);
@@ -171,15 +187,28 @@ export function FederationListingsPage() {
           const nextCursor = response.meta?.cursor ?? response.meta?.next_cursor ?? null;
           setCursor(nextCursor);
           setHasMore(response.meta?.has_more ?? response.data.length >= PER_PAGE);
+          if (!append) {
+            setSourceMeta(response.meta ? {
+              pagination_scope: response.meta.pagination_scope,
+              cursor_scope: response.meta.cursor_scope,
+              load_more_scope: response.meta.load_more_scope,
+              external_pagination_scope: response.meta.external_pagination_scope,
+              external_results_paginated: response.meta.external_results_paginated,
+              external_results_included: response.meta.external_results_included,
+              source_counts: response.meta.source_counts,
+            } : null);
+          }
         } else {
           if (!append) setListings([]);
           setHasMore(false);
+          if (!append) setSourceMeta(null);
         }
       } catch (error) {
         if (controller.signal.aborted) return;
         logError('Failed to load federated listings', error);
         if (!append) {
           setLoadError(tRef.current('listings.load_error'));
+          setSourceMeta(null);
         } else {
           toastRef.current.error(tRef.current('listings.load_more_error'));
         }
@@ -219,6 +248,11 @@ export function FederationListingsPage() {
       loadListings(true);
     }
   }
+
+  const externalResultCount = sourceMeta?.source_counts?.external_returned ?? 0;
+  const sourceNoteKey = sourceMeta?.pagination_scope === 'external_partner'
+    ? 'listings.external_source_note_external_only'
+    : 'listings.external_source_note';
 
   return (
     <div className="space-y-6">
@@ -304,13 +338,25 @@ export function FederationListingsPage() {
               key={item.key}
               id={item.key}
               variant="ghost"
-              className="bg-theme-elevated text-theme-muted hover:bg-theme-hover data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white"
+              className="bg-theme-elevated text-theme-muted hover:bg-theme-hover data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground"
             >
               {item.label}
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
       </GlassCard>
+
+      {externalResultCount > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Chip
+            variant="flat"
+            size="sm"
+            className="bg-theme-elevated text-theme-muted"
+          >
+            {t(sourceNoteKey, { count: externalResultCount })}
+          </Chip>
+        </div>
+      )}
 
       {/* Loading State */}
       {isLoading && listings.length === 0 && (
@@ -330,7 +376,7 @@ export function FederationListingsPage() {
           </h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            variant="primary"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => { setCursor(null); loadListings(false); }}
           >
@@ -562,7 +608,7 @@ export function FederationListingsPage() {
                         </Button>
                       )}
                       <Button
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                        variant="primary"
                         startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
                         onPress={() => {
                           setIsDetailOpen(false);

@@ -11,6 +11,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
 import { SearchField } from '@/components/ui/SearchField';
 import { MediaRowsSkeleton } from '@/components/ui/Skeletons';
+import { Switch } from '@/components/ui/Switch';
 
 /**
  * Federation Events Page - Browse events from partner communities
@@ -18,7 +19,7 @@ import { MediaRowsSkeleton } from '@/components/ui/Skeletons';
  * Features:
  * - Search input with debounce
  * - Partner community Select dropdown
- * - Upcoming-only toggle via Chip
+ * - Upcoming-only toggle via Switch
  * - Card list layout (not grid) with date box fallback
  * - Cursor-based pagination with Load More
  * - Loading skeletons and error states
@@ -265,21 +266,17 @@ export function FederationEventsPage() {
           </Autocomplete>
 
           {/* Upcoming toggle */}
-          <Chip
-            variant={upcomingOnly ? 'solid' : 'flat'}
-            className={
-              upcomingOnly
-                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white cursor-pointer self-start'
-                : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover self-start'
-            }
-            onClick={() => setUpcomingOnly(!upcomingOnly)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setUpcomingOnly(!upcomingOnly); } }}
-            aria-pressed={upcomingOnly}
+          <Switch
+            isSelected={upcomingOnly}
+            onChange={setUpcomingOnly}
+            color="primary"
+            className="self-start"
+            classNames={{
+              label: 'text-sm font-medium text-theme-primary',
+            }}
           >
             {t('events.upcoming_only')}
-          </Chip>
+          </Switch>
         </div>
       </GlassCard>
 
@@ -301,7 +298,7 @@ export function FederationEventsPage() {
           </h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            variant="primary"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => { setCursor(null); loadEvents(false); }}
           >

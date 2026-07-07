@@ -332,6 +332,55 @@ class FederationExternalApiClient
     }
 
     /**
+     * Fetch the remote state of an external transaction.
+     *
+     * Prefer a concrete remote transaction id. If the local saga never received
+     * one, fall back to querying the collection by the partner idempotency key;
+     * protocols that do not support that filter simply return no terminal state.
+     *
+     * @return array{success: bool, data?: array, error?: string, status_code?: int}
+     */
+    public static function fetchTransactionStatus(
+        int $partnerId,
+        ?string $externalTransactionId = null,
+        ?string $partnerIdempotencyKey = null
+    ): array {
+        $adapter = self::resolveAdapter($partnerId);
+
+        $externalTransactionId = trim((string) $externalTransactionId);
+        if ($externalTransactionId !== '') {
+            $endpoint = $adapter->mapEndpoint('transaction', ['id' => $externalTransactionId]);
+            $result = self::get($partnerId, $endpoint);
+        } else {
+            $partnerIdempotencyKey = trim((string) $partnerIdempotencyKey);
+            if ($partnerIdempotencyKey === '') {
+                return ['success' => false, 'error' => 'missing_transaction_lookup_identifier', 'status_code' => 0];
+            }
+
+            $endpoint = $adapter->mapEndpoint('transactions');
+            $result = self::get($partnerId, $endpoint, ['idempotency_key' => $partnerIdempotencyKey]);
+        }
+
+        if (!($result['success'] ?? false)) {
+            return $result;
+        }
+
+        $data = $result['data'] ?? [];
+        $transaction = self::selectTransactionStatusPayload(
+            is_array($data) ? $data : [],
+            $externalTransactionId,
+            trim((string) $partnerIdempotencyKey)
+        );
+
+        if ($transaction === []) {
+            return ['success' => false, 'error' => 'transaction_status_not_found', 'status_code' => $result['status_code'] ?? 0];
+        }
+
+        $result['data'] = $adapter->transformInboundTransaction($transaction);
+        return $result;
+    }
+
+    /**
      * Send a Nexus listing to an external partner.
      *
      * @return array{success: bool, data?: array, error?: string, status_code?: int}
@@ -469,6 +518,47 @@ class FederationExternalApiClient
         $adapter = self::resolveAdapter($partnerId);
         $endpoint = $adapter->mapEndpoint('health');
         return self::get($partnerId, $endpoint);
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private static function selectTransactionStatusPayload(array $data, string $externalTransactionId, string $partnerIdempotencyKey): array
+    {
+        if (isset($data['id']) || isset($data['uuid']) || isset($data['status']) || isset($data['state'])) {
+            return $data;
+        }
+
+        $items = array_is_list($data)
+            ? $data
+            : (is_array($data['transactions'] ?? null)
+                ? $data['transactions']
+                : (is_array($data['data'] ?? null) ? $data['data'] : []));
+
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $attrs = is_array($item['attributes'] ?? null) ? $item['attributes'] : [];
+            $candidateId = (string) ($item['id'] ?? $item['uuid'] ?? $attrs['id'] ?? $attrs['uuid'] ?? '');
+            $candidateKey = (string) (
+                $item['idempotency_key']
+                ?? $item['federation_partner_idempotency_key']
+                ?? $attrs['idempotency_key']
+                ?? $attrs['federation_partner_idempotency_key']
+                ?? ''
+            );
+
+            if (
+                ($externalTransactionId !== '' && $candidateId === $externalTransactionId)
+                || ($partnerIdempotencyKey !== '' && $candidateKey === $partnerIdempotencyKey)
+            ) {
+                return $item;
+            }
+        }
+
+        return count($items) === 1 && is_array($items[0] ?? null) ? $items[0] : [];
     }
 
     // ----------------------------------------------------------------
@@ -985,6 +1075,10 @@ class FederationExternalApiClient
             'oauth_client_secret', 'token', 'access_token', 'refresh_token', 'password', 'secret'];
 
         array_walk_recursive($data, function (&$value, $key) use ($sensitiveKeys) {
+            if (!is_string($key)) {
+                return;
+            }
+
             if (in_array(strtolower($key), $sensitiveKeys, true) && is_string($value) && strlen($value) > 0) {
                 $value = '[REDACTED]';
             }

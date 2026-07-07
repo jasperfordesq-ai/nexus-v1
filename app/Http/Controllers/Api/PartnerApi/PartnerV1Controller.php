@@ -152,10 +152,7 @@ class PartnerV1Controller extends BaseApiController
     public function walletBalance(int $userId): JsonResponse
     {
         $tenantId = TenantContext::getId();
-        $user = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('id', $userId)
-            ->first();
+        $user = $this->findFederationWalletUser($tenantId, $userId);
 
         if (! $user) {
             return $this->respondNotFound(__('api.partner_api_user_not_found'), 'USER_NOT_FOUND');
@@ -203,10 +200,7 @@ class PartnerV1Controller extends BaseApiController
             return $this->respondWithError('invalid_partner', __('api.partner_api_invalid_partner'), null, 403);
         }
 
-        $user = DB::table('users')
-            ->where('tenant_id', $tenantId)
-            ->where('id', $userId)
-            ->first();
+        $user = $this->findFederationWalletUser($tenantId, $userId);
         if (! $user) {
             return $this->respondNotFound(__('api.partner_api_user_not_found'), 'USER_NOT_FOUND');
         }
@@ -401,17 +395,17 @@ class PartnerV1Controller extends BaseApiController
 
         if (! is_array($events) || empty($events) || $targetUrl === '') {
             return $this->respondWithError('invalid_request',
-                'event_types (array) and target_url are required.', null, 422);
+                __('api.partner_webhook_event_types_and_target_required'), null, 422);
         }
 
         if (! filter_var($targetUrl, FILTER_VALIDATE_URL) || ! str_starts_with($targetUrl, 'https://')) {
             return $this->respondWithError('invalid_url',
-                'target_url must be a valid https:// URL.', null, 422);
+                __('api.partner_webhook_target_https_required'), null, 422);
         }
 
         if (WebhookDispatchService::isPrivateUrl($targetUrl)) {
             return $this->respondWithError('private_url',
-                'target_url resolves to a private network address.', null, 422);
+                __('api.partner_webhook_target_private_url'), null, 422);
         }
 
         try {
@@ -421,7 +415,7 @@ class PartnerV1Controller extends BaseApiController
                 $targetUrl,
             );
         } catch (\InvalidArgumentException $e) {
-            return $this->respondWithError('invalid_request', $e->getMessage(), null, 422);
+            return $this->respondWithError('invalid_request', __('api.partner_webhook_subscription_invalid'), null, 422);
         }
 
         return $this->respondWithData(['subscription' => $sub], null, 201);
@@ -434,5 +428,19 @@ class PartnerV1Controller extends BaseApiController
     {
         $s = $request->attributes->get('partner_scopes', []);
         return is_array($s) ? $s : [];
+    }
+
+    private function findFederationWalletUser(int $tenantId, int $userId): ?object
+    {
+        return DB::table('users')
+            ->join('federation_user_settings as fus', 'fus.user_id', '=', 'users.id')
+            ->where('users.tenant_id', $tenantId)
+            ->where('users.id', $userId)
+            ->where('users.status', 'active')
+            ->where('fus.federation_optin', 1)
+            ->where('fus.profile_visible_federated', 1)
+            ->where('fus.transactions_enabled_federated', 1)
+            ->select('users.*')
+            ->first();
     }
 }

@@ -22,6 +22,7 @@ import { validateResponse } from '@/lib/api-validation';
 import { apiResponseSchema } from '@/lib/api-schemas';
 import { recordApiDiagnostic } from '@/lib/supportDiagnostics';
 import { safeLocalStorageSet } from '@/lib/safeStorage';
+import { readStoredConsent } from '@/lib/cookieConsentStorage';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -60,6 +61,7 @@ function captureTelemetryApiCall(
   status: number,
   duration: number,
 ): void {
+  if (readStoredConsent()?.analytics !== true) return;
   void import('@/lib/sentry').then(({ captureApiCall }) => {
     captureApiCall(method, endpoint, status, duration);
   });
@@ -71,6 +73,7 @@ function addTelemetryBreadcrumb(
   data: Record<string, unknown>,
   level: 'info' | 'warning' | 'error' = 'info',
 ): void {
+  if (readStoredConsent()?.analytics !== true) return;
   void import('@/lib/sentry').then(({ addSentryBreadcrumb }) => {
     addSentryBreadcrumb(message, category, data, level);
   });
@@ -81,6 +84,7 @@ function captureTelemetryMessage(
   level: 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug',
   context?: Record<string, unknown>,
 ): void {
+  if (readStoredConsent()?.analytics !== true) return;
   void import('@/lib/sentry').then(({ captureSentryMessage }) => {
     captureSentryMessage(message, level, context);
   });
@@ -240,6 +244,18 @@ export interface PaginationMeta {
   has_next_page?: boolean;
   has_previous_page?: boolean;
   path?: string;
+  pagination_scope?: 'internal_partners' | 'external_partner' | string;
+  cursor_scope?: 'internal_partners' | 'external_partner' | string;
+  load_more_scope?: 'internal_partners' | 'external_partner' | 'none' | string;
+  external_pagination_scope?: 'first_page_enrichment' | 'single_partner_result_set' | 'none' | string;
+  external_results_paginated?: boolean;
+  external_results_included?: boolean;
+  source_counts?: {
+    internal_returned?: number;
+    internal_total_items?: number;
+    external_returned?: number;
+    returned_total?: number;
+  };
   // Gamification API returns available badge types in meta
   available_types?: string[];
   // Messages API returns conversation details in meta

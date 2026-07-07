@@ -45,29 +45,32 @@ class MessageService
         $tenantId = app('tenant.id');
         $showArchived = (bool) ($filters['archived'] ?? false);
 
-        $latestIds = DB::table('messages')
-            ->selectRaw('
-                MAX(id) as latest_id,
-                CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END as partner_id
-            ', [$userId])
+        $sentMessages = DB::table('messages')
+            ->selectRaw('id, receiver_id as partner_id')
             ->where('tenant_id', $tenantId)
             ->where('is_federated', 0)
-            ->where(function ($q) use ($userId) {
-                $q->where('sender_id', $userId)->orWhere('receiver_id', $userId);
-            })
-            ->when(!$showArchived, function ($q) use ($userId) {
-                // Inbox: exclude messages archived by the current user
-                $q->whereRaw('NOT (sender_id = ? AND archived_by_sender IS NOT NULL)', [$userId])
-                  ->whereRaw('NOT (receiver_id = ? AND archived_by_receiver IS NOT NULL)', [$userId]);
-            })
-            ->when($showArchived, function ($q) use ($userId) {
-                // Archive tab: only messages archived by the current user
-                $q->where(function ($q2) use ($userId) {
-                    $q2->whereRaw('(sender_id = ? AND archived_by_sender IS NOT NULL)', [$userId])
-                       ->orWhereRaw('(receiver_id = ? AND archived_by_receiver IS NOT NULL)', [$userId]);
-                });
-            })
-            ->groupByRaw('CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END', [$userId])
+            ->where('sender_id', $userId);
+
+        $receivedMessages = DB::table('messages')
+            ->selectRaw('id, sender_id as partner_id')
+            ->where('tenant_id', $tenantId)
+            ->where('is_federated', 0)
+            ->where('receiver_id', $userId);
+
+        if ($showArchived) {
+            $sentMessages->whereNotNull('archived_by_sender');
+            $receivedMessages->whereNotNull('archived_by_receiver');
+        } else {
+            $sentMessages->whereNull('archived_by_sender');
+            $receivedMessages->whereNull('archived_by_receiver');
+        }
+
+        $sentMessages->unionAll($receivedMessages);
+
+        $latestIds = DB::query()
+            ->fromSub($sentMessages, 'conversation_messages')
+            ->selectRaw('MAX(id) as latest_id, partner_id')
+            ->groupBy('partner_id')
             ->orderByDesc('latest_id');
 
         if ($cursor !== null) {

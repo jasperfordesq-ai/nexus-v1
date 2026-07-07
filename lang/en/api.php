@@ -2467,6 +2467,10 @@ return [
     'partner_wallet_credit_reference_conflict' => 'This partner reference has already been used for a different wallet credit.',
     'partner_wallet_credit_default_note' => 'Partner wallet credit',
     'partner_wallet_credit_description' => 'Partner credit from :partner, reference :reference. :note',
+    'partner_webhook_event_types_and_target_required' => 'event_types and target_url are required.',
+    'partner_webhook_target_https_required' => 'target_url must be a valid https:// URL.',
+    'partner_webhook_target_private_url' => 'target_url resolves to a private network address.',
+    'partner_webhook_subscription_invalid' => 'Webhook subscription could not be created with the supplied event types or target URL.',
 
     // ============================================
     // ACTIVITY LOG

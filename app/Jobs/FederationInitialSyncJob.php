@@ -180,9 +180,19 @@ class FederationInitialSyncJob implements ShouldQueue
 
     private function countActiveListings(int $tenantId): int
     {
-        return (int) DB::table('listings')
-            ->where('tenant_id', $tenantId)
-            ->where('status', 'active')
+        return (int) DB::table('listings as l')
+            ->join('users as u', function ($join): void {
+                $join->on('u.id', '=', 'l.user_id')
+                    ->on('u.tenant_id', '=', 'l.tenant_id');
+            })
+            ->join('federation_user_settings as fus', 'fus.user_id', '=', 'l.user_id')
+            ->where('l.tenant_id', $tenantId)
+            ->where('l.status', 'active')
+            ->where('u.status', 'active')
+            ->whereIn('l.federated_visibility', ['listed', 'bookable'])
+            ->where('fus.federation_optin', 1)
+            ->where('fus.profile_visible_federated', 1)
+            ->where('fus.appear_in_federated_search', 1)
             ->count();
     }
 }

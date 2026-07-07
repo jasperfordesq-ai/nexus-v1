@@ -1087,6 +1087,18 @@ export interface PaginationMeta {
   has_previous_page?: boolean;
   next_cursor?: string;
   previous_cursor?: string;
+  pagination_scope?: 'internal_partners' | 'external_partner' | string;
+  cursor_scope?: 'internal_partners' | 'external_partner' | string;
+  load_more_scope?: 'internal_partners' | 'external_partner' | 'none' | string;
+  external_pagination_scope?: 'first_page_enrichment' | 'single_partner_result_set' | 'none' | string;
+  external_results_paginated?: boolean;
+  external_results_included?: boolean;
+  source_counts?: {
+    internal_returned?: number;
+    internal_total_items?: number;
+    external_returned?: number;
+    returned_total?: number;
+  };
   // Messages API returns conversation details in meta
   conversation?: {
     id: number;

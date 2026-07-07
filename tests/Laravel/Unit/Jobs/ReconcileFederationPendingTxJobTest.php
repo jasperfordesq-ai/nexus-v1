@@ -10,8 +10,11 @@ namespace Tests\Laravel\Unit\Jobs;
 
 use App\Core\TenantContext;
 use App\Jobs\ReconcileFederationPendingTxJob;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Tests\Laravel\TestCase;
 
 /**
@@ -31,6 +34,8 @@ class ReconcileFederationPendingTxJobTest extends TestCase
     use DatabaseTransactions;
 
     private const TENANT_ID = 2;
+
+    private static int $externalPartnerSeq = 0;
 
     // ── helpers ────────────────────────────────────────────────────────────────
 
@@ -56,6 +61,62 @@ class ReconcileFederationPendingTxJobTest extends TestCase
             'is_federated' => $isFederated ? 1 : 0,
             'created_at'   => now()->subMinutes($minutesAgo),
             'updated_at'   => now()->subMinutes($minutesAgo),
+            'transaction_type' => 'transfer',
+        ]);
+    }
+
+    private function insertExternalPartner(int $tenantId): object
+    {
+        $octet = 40 + (self::$externalPartnerSeq++ % 100);
+        $id = (int) DB::table('federation_external_partners')->insertGetId([
+            'tenant_id' => $tenantId,
+            'name' => 'Reconcile Remote Partner ' . uniqid(),
+            'description' => 'External partner for reconciliation tests',
+            'base_url' => 'https://93.184.216.' . $octet,
+            'api_path' => '/api/v1',
+            'api_key' => 'test-api-key',
+            'auth_method' => 'hmac',
+            'signing_secret' => Crypt::encryptString('reconcile-test-secret'),
+            'status' => 'active',
+            'protocol_type' => 'nexus',
+            'allow_transactions' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return DB::table('federation_external_partners')->where('id', $id)->first();
+    }
+
+    private function insertSender(int $tenantId, float $balance): int
+    {
+        return (int) User::factory()->forTenant($tenantId)->create([
+            'balance' => $balance,
+            'status' => 'active',
+        ])->id;
+    }
+
+    private function insertExternalPendingTransaction(
+        int $tenantId,
+        int $senderId,
+        int $externalPartnerId,
+        float $amount = 4.0,
+        string $remoteId = 'remote-reconcile-tx',
+        string $idempotencyKey = 'reconcile-idem-key',
+    ): int {
+        return (int) DB::table('transactions')->insertGetId([
+            'tenant_id' => $tenantId,
+            'sender_id' => $senderId,
+            'receiver_id' => 999999,
+            'amount' => $amount,
+            'description' => 'external reconcile pending',
+            'status' => 'pending',
+            'is_federated' => 1,
+            'sender_tenant_id' => $tenantId,
+            'receiver_tenant_id' => $externalPartnerId,
+            'external_transaction_id' => $remoteId,
+            'federation_partner_idempotency_key' => $idempotencyKey,
+            'created_at' => now()->subMinutes(30),
+            'updated_at' => now()->subMinutes(30),
             'transaction_type' => 'transfer',
         ]);
     }
@@ -273,5 +334,91 @@ class ReconcileFederationPendingTxJobTest extends TestCase
         $this->assertNotContains($freshFedId, $auditTxIds, 'Fresh federated pending tx must NOT be flagged');
         $this->assertNotContains($staleNonFedId, $auditTxIds, 'Stale non-federated tx must NOT be flagged');
         $this->assertNotContains($staleCompId, $auditTxIds, 'Completed federated tx must NOT be flagged');
+    }
+
+    public function test_remote_completed_external_transaction_is_finalised_without_stuck_alert(): void
+    {
+        TenantContext::setById(self::TENANT_ID);
+        $partner = $this->insertExternalPartner(self::TENANT_ID);
+        $senderId = $this->insertSender(self::TENANT_ID, 6.0);
+        $txId = $this->insertExternalPendingTransaction(
+            self::TENANT_ID,
+            $senderId,
+            (int) $partner->id,
+            4.0,
+            'remote-complete-1',
+            'idem-complete-1'
+        );
+
+        Http::fake([
+            $partner->base_url . '/api/v1/transactions/remote-complete-1' => Http::response([
+                'success' => true,
+                'data' => [
+                    'id' => 'remote-complete-1',
+                    'status' => 'completed',
+                ],
+            ], 200),
+        ]);
+
+        $before = now()->subSecond();
+        (new ReconcileFederationPendingTxJob())->handle();
+
+        $tx = DB::table('transactions')->where('id', $txId)->first();
+        $this->assertSame('completed', $tx->status);
+        $this->assertSame('remote-complete-1', $tx->external_transaction_id);
+        $this->assertSame(6.0, (float) DB::table('users')->where('id', $senderId)->value('balance'));
+        $this->assertSame(0, DB::table('federation_audit_log')
+            ->where('action_type', 'external_transaction_stuck_pending')
+            ->where('created_at', '>=', $before)
+            ->whereJsonContains('data->transaction_id', $txId)
+            ->count());
+        $this->assertSame(1, DB::table('federation_audit_log')
+            ->where('action_type', 'external_transaction_reconciled_completed')
+            ->where('created_at', '>=', $before)
+            ->whereJsonContains('data->transaction_id', $txId)
+            ->count());
+    }
+
+    public function test_remote_cancelled_external_transaction_is_refunded_without_stuck_alert(): void
+    {
+        TenantContext::setById(self::TENANT_ID);
+        $partner = $this->insertExternalPartner(self::TENANT_ID);
+        $senderId = $this->insertSender(self::TENANT_ID, 2.0);
+        $txId = $this->insertExternalPendingTransaction(
+            self::TENANT_ID,
+            $senderId,
+            (int) $partner->id,
+            4.0,
+            'remote-cancelled-1',
+            'idem-cancelled-1'
+        );
+
+        Http::fake([
+            $partner->base_url . '/api/v1/transactions/remote-cancelled-1' => Http::response([
+                'success' => true,
+                'data' => [
+                    'id' => 'remote-cancelled-1',
+                    'status' => 'cancelled',
+                ],
+            ], 200),
+        ]);
+
+        $before = now()->subSecond();
+        (new ReconcileFederationPendingTxJob())->handle();
+
+        $tx = DB::table('transactions')->where('id', $txId)->first();
+        $this->assertSame('cancelled', $tx->status);
+        $this->assertSame('remote-cancelled-1', $tx->external_transaction_id);
+        $this->assertSame(6.0, (float) DB::table('users')->where('id', $senderId)->value('balance'));
+        $this->assertSame(0, DB::table('federation_audit_log')
+            ->where('action_type', 'external_transaction_stuck_pending')
+            ->where('created_at', '>=', $before)
+            ->whereJsonContains('data->transaction_id', $txId)
+            ->count());
+        $this->assertSame(1, DB::table('federation_audit_log')
+            ->where('action_type', 'external_transaction_reconciled_cancelled')
+            ->where('created_at', '>=', $before)
+            ->whereJsonContains('data->transaction_id', $txId)
+            ->count());
     }
 }

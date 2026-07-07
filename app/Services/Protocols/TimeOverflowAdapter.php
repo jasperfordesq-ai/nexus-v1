@@ -339,6 +339,7 @@ class TimeOverflowAdapter implements FederationProtocolAdapter
             'listings'      => '/posts',           // TO calls them "posts"
             'listing'       => "/posts/{$id}",
             'transactions'  => '/transfers',       // TO calls them "transfers"
+            'transaction'   => "/transfers/{$id}",  // TO calls them "transfers"
             'organizations' => '/organizations',
             'health'        => '/health',
             'messages'      => '/messages',

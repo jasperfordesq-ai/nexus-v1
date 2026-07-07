@@ -123,6 +123,12 @@ class PartnerApiWalletReliabilityTest extends TestCase
         $tenantId = $this->testTenantId;
         $user = User::factory()->forTenant($tenantId)->create([
             'balance' => 7.00,
+            'status' => 'active',
+        ]);
+        $this->upsertFederationSettings((int) $user->id, [
+            'federation_optin' => 1,
+            'profile_visible_federated' => 1,
+            'transactions_enabled_federated' => 1,
         ]);
 
         $response = TenantContext::runForTenant($tenantId, fn () => (new PartnerV1Controller())->walletBalance((int) $user->id));
@@ -132,12 +138,37 @@ class PartnerApiWalletReliabilityTest extends TestCase
         $this->assertSame(7.0, (float) $payload['data']['balance_hours']);
     }
 
+    public function test_partner_wallet_balance_requires_federation_wallet_visibility(): void
+    {
+        $tenantId = $this->testTenantId;
+        $user = User::factory()->forTenant($tenantId)->create([
+            'balance' => 7.00,
+            'status' => 'active',
+        ]);
+        $this->upsertFederationSettings((int) $user->id, [
+            'federation_optin' => 0,
+            'profile_visible_federated' => 0,
+            'transactions_enabled_federated' => 1,
+        ]);
+
+        $response = TenantContext::runForTenant($tenantId, fn () => (new PartnerV1Controller())->walletBalance((int) $user->id));
+
+        $this->assertSame(404, $response->getStatusCode());
+        $this->assertSame('USER_NOT_FOUND', $response->getData(true)['errors'][0]['code'] ?? null);
+    }
+
     public function test_partner_wallet_credit_uses_live_wallet_and_partner_scoped_idempotency(): void
     {
         $tenantId = $this->testTenantId;
         $user = User::factory()->forTenant($tenantId)->create([
             'balance' => 1.00,
             'email' => 'partner-credit-' . uniqid('', true) . '@example.test',
+            'status' => 'active',
+        ]);
+        $this->upsertFederationSettings((int) $user->id, [
+            'federation_optin' => 1,
+            'profile_visible_federated' => 1,
+            'transactions_enabled_federated' => 1,
         ]);
         $partnerId = $this->createPartner($tenantId, 'credit-partner');
         $otherPartnerId = $this->createPartner($tenantId, 'other-partner');
@@ -176,7 +207,15 @@ class PartnerApiWalletReliabilityTest extends TestCase
     public function test_partner_wallet_credit_reference_conflict_does_not_mutate_wallet(): void
     {
         $tenantId = $this->testTenantId;
-        $user = User::factory()->forTenant($tenantId)->create(['balance' => 1.00]);
+        $user = User::factory()->forTenant($tenantId)->create([
+            'balance' => 1.00,
+            'status' => 'active',
+        ]);
+        $this->upsertFederationSettings((int) $user->id, [
+            'federation_optin' => 1,
+            'profile_visible_federated' => 1,
+            'transactions_enabled_federated' => 1,
+        ]);
         $partnerId = $this->createPartner($tenantId, 'conflict-partner');
         app()->instance(EmailDispatchService::class, $this->fakeMailer());
 
@@ -195,6 +234,46 @@ class PartnerApiWalletReliabilityTest extends TestCase
         $this->assertSame(409, $response->getStatusCode());
         $this->assertSame(3.0, (float) DB::table('users')->where('id', $user->id)->value('balance'));
         $this->assertSame(1, DB::table('transactions')->where('tenant_id', $tenantId)->where('receiver_id', $user->id)->count());
+    }
+
+    public function test_partner_wallet_credit_requires_federation_transaction_consent(): void
+    {
+        $tenantId = $this->testTenantId;
+        $user = User::factory()->forTenant($tenantId)->create([
+            'balance' => 1.00,
+            'status' => 'active',
+        ]);
+        $this->upsertFederationSettings((int) $user->id, [
+            'federation_optin' => 1,
+            'profile_visible_federated' => 1,
+            'transactions_enabled_federated' => 0,
+        ]);
+        $partnerId = $this->createPartner($tenantId, 'blocked-wallet-partner');
+        app()->instance(EmailDispatchService::class, $this->fakeMailer());
+
+        $response = TenantContext::runForTenant($tenantId, fn () => (new PartnerV1Controller())->walletCredit($this->walletCreditRequest($partnerId, [
+            'user_id' => $user->id,
+            'hours' => 2,
+            'reference' => 'blocked-ref',
+        ])));
+
+        $this->assertSame(404, $response->getStatusCode());
+        $this->assertSame(1.0, (float) DB::table('users')->where('id', $user->id)->value('balance'));
+        $this->assertSame(0, DB::table('transactions')->where('tenant_id', $tenantId)->where('receiver_id', $user->id)->count());
+        $this->assertSame(0, DB::table('api_partner_wallet_credits')->where('tenant_id', $tenantId)->where('partner_id', $partnerId)->count());
+    }
+
+    public function test_partner_webhook_subscription_errors_use_translated_messages(): void
+    {
+        $tenantId = $this->testTenantId;
+        $partnerId = $this->createPartner($tenantId, 'webhook-validation-partner');
+
+        $response = TenantContext::runForTenant($tenantId, fn () => (new PartnerV1Controller())->createWebhookSubscription(
+            $this->webhookSubscriptionRequest($partnerId, [])
+        ));
+
+        $this->assertSame(422, $response->getStatusCode());
+        $this->assertSame(__('api.partner_webhook_event_types_and_target_required'), $response->getData(true)['errors'][0]['message'] ?? null);
     }
 
     private function createPartner(int $tenantId, string $slug): int
@@ -227,6 +306,19 @@ class PartnerApiWalletReliabilityTest extends TestCase
     private function walletCreditRequest(int $partnerId, array $payload): Request
     {
         $request = Request::create('/api/partner/v1/wallet/credit', 'POST', $payload);
+        $partner = DB::table('api_partners')->where('id', $partnerId)->first();
+        $request->attributes->set('partner', [
+            'id' => $partnerId,
+            'name' => (string) $partner->name,
+            'slug' => (string) $partner->slug,
+        ]);
+
+        return $request;
+    }
+
+    private function webhookSubscriptionRequest(int $partnerId, array $payload): Request
+    {
+        $request = Request::create('/api/partner/v1/webhooks', 'POST', $payload);
         $partner = DB::table('api_partners')->where('id', $partnerId)->first();
         $request->attributes->set('partner', [
             'id' => $partnerId,

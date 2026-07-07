@@ -2315,10 +2315,20 @@ class VolunteerService
             }
             $history = DB::selectOne("
                 SELECT 1 FROM vol_applications a1
-                JOIN vol_applications a2 ON a1.opportunity_id = a2.opportunity_id
-                WHERE a1.user_id = ? AND a2.user_id = ? AND a1.status = 'approved' AND a2.status = 'approved' AND a1.tenant_id = ?
+                JOIN vol_applications a2
+                    ON a1.opportunity_id = a2.opportunity_id
+                    AND a2.tenant_id = a1.tenant_id
+                JOIN vol_opportunities opp
+                    ON opp.id = a1.opportunity_id
+                    AND opp.tenant_id = a1.tenant_id
+                WHERE a1.user_id = ?
+                    AND a2.user_id = ?
+                    AND a1.status = 'approved'
+                    AND a2.status = 'approved'
+                    AND a1.tenant_id = ?
+                    AND a2.tenant_id = ?
                 LIMIT 1
-            ", [$reviewerId, $targetId, $tenantId]);
+            ", [$reviewerId, $targetId, $tenantId, $tenantId]);
 
             if (!$history) {
                 self::$errors[] = ['code' => 'FORBIDDEN', 'message' => __('api.volunteer_review_user_history_required')];

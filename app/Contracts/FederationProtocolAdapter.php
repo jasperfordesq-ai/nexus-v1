@@ -41,7 +41,7 @@ interface FederationProtocolAdapter
      * Map a Nexus action to the protocol's endpoint path.
      *
      * Actions: 'members', 'member', 'listings', 'listing', 'transactions',
-     *          'messages', 'health', 'accounts', 'about'
+     *          'transaction', 'messages', 'health', 'accounts', 'about'
      *
      * @param string $action   The Nexus action name
      * @param array  $params   Optional params (e.g., ['id' => 123] for single-resource endpoints)

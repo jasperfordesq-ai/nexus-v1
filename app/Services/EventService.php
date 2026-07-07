@@ -52,7 +52,10 @@ class EventService
                 'user:id,first_name,last_name,avatar_url,organization_name,profile_type',
                 'category:id,name,color',
                 'group:id,name',
-            ]);
+            ])
+            ->where(function (Builder $q) {
+                $q->whereNull('status')->orWhere('status', 'active');
+            });
 
         if ($when === 'upcoming') {
             $query->where('start_time', '>=', now());

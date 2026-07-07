@@ -8,7 +8,9 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Core\TenantContext;
 use App\Services\FederationAuditService;
+use App\Services\FederationExternalApiClient;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -27,9 +29,10 @@ use Illuminate\Support\Facades\Log;
  * DB failures can leave the row stuck in 'pending' forever.
  *
  * This job runs on a schedule, finds federated 'pending' transactions older
- * than the threshold, and surfaces them via critical-level logs + audit
- * events so ops can manually resolve. A future enhancement should call the
- * partner's transaction-status endpoint and auto-finalise.
+ * than the threshold, and attempts to resolve external rows by querying the
+ * partner's transaction-status endpoint. Rows with a terminal remote state are
+ * auto-finalised or refunded; unresolved rows are surfaced via critical-level
+ * logs + audit events so ops can manually resolve.
  *
  * Scheduled in bootstrap/app.php withSchedule().
  */
@@ -86,13 +89,37 @@ class ReconcileFederationPendingTxJob implements ShouldQueue
             return;
         }
 
-        $sampleIds = $stale->take(10)->pluck('id')->all();
+        $unresolved = collect();
+        $resolvedCount = 0;
+
+        foreach ($stale as $tx) {
+            if (!empty($tx->external_partner_id)) {
+                $resolution = $this->resolveExternalTransaction($tx);
+                if ($resolution !== 'unresolved') {
+                    $resolvedCount++;
+                    continue;
+                }
+            }
+
+            $unresolved->push($tx);
+        }
+
+        if ($unresolved->isEmpty()) {
+            Log::info('ReconcileFederationPendingTxJob: resolved stale federated transactions automatically', [
+                'count' => $resolvedCount,
+                'cutoff' => $cutoff->toIso8601String(),
+            ]);
+            return;
+        }
+
+        $sampleIds = $unresolved->take(10)->pluck('id')->all();
 
         Log::critical('ReconcileFederationPendingTxJob: stale federated transactions detected', [
-            'count' => $stale->count(),
+            'count' => $unresolved->count(),
+            'resolved_count' => $resolvedCount,
             'cutoff' => $cutoff->toIso8601String(),
             'sample_ids' => $sampleIds,
-            'external_partner_ids' => $stale
+            'external_partner_ids' => $unresolved
                 ->pluck('external_partner_id')
                 ->filter()
                 ->unique()
@@ -106,12 +133,12 @@ class ReconcileFederationPendingTxJob implements ShouldQueue
         // money-state-drift signal that MUST be visible, not just logged.
         report(new \RuntimeException(sprintf(
             'Federation reconcile: %d federated transaction(s) stuck pending > %d min (sample ids: %s)',
-            $stale->count(),
+            $unresolved->count(),
             self::STALE_AFTER_MINUTES,
             implode(',', array_map('strval', $sampleIds))
         )));
 
-        foreach ($stale as $tx) {
+        foreach ($unresolved as $tx) {
             try {
                 FederationAuditService::log(
                     'external_transaction_stuck_pending',
@@ -137,6 +164,152 @@ class ReconcileFederationPendingTxJob implements ShouldQueue
                 ]);
             }
         }
+    }
+
+    private function resolveExternalTransaction(object $tx): string
+    {
+        $tenantId = (int) $tx->tenant_id;
+        $partnerId = (int) $tx->external_partner_id;
+
+        try {
+            $remote = TenantContext::runForTenant($tenantId, fn () => FederationExternalApiClient::fetchTransactionStatus(
+                $partnerId,
+                isset($tx->external_transaction_id) ? (string) $tx->external_transaction_id : null,
+                isset($tx->federation_partner_idempotency_key) ? (string) $tx->federation_partner_idempotency_key : null
+            ));
+        } catch (\Throwable $e) {
+            Log::warning('ReconcileFederationPendingTxJob: remote status lookup failed', [
+                'transaction_id' => $tx->id,
+                'tenant_id' => $tenantId,
+                'external_partner_id' => $partnerId,
+                'error' => $e->getMessage(),
+            ]);
+
+            return 'unresolved';
+        }
+
+        if (!($remote['success'] ?? false) || empty($remote['data']) || !is_array($remote['data'])) {
+            return 'unresolved';
+        }
+
+        $remoteData = $remote['data'];
+        $remoteStatus = $this->normaliseRemoteStatus((string) ($remoteData['status'] ?? ''));
+        $remoteTxId = (string) (
+            $remoteData['external_transaction_id']
+            ?? $remoteData['id']
+            ?? $remoteData['uuid']
+            ?? $tx->external_transaction_id
+            ?? ''
+        );
+
+        if ($remoteStatus === 'completed') {
+            return $this->completeLocalTransaction($tx, $remoteTxId, $remoteData);
+        }
+
+        if ($remoteStatus === 'cancelled') {
+            return $this->refundCancelledRemoteTransaction($tx, $remoteTxId, $remoteData);
+        }
+
+        return 'unresolved';
+    }
+
+    private function completeLocalTransaction(object $tx, string $remoteTxId, array $remoteData): string
+    {
+        $updated = DB::table('transactions')
+            ->where('id', $tx->id)
+            ->where('tenant_id', $tx->tenant_id)
+            ->where('status', 'pending')
+            ->update(array_filter([
+                'status' => 'completed',
+                'external_transaction_id' => $remoteTxId !== '' ? $remoteTxId : null,
+                'updated_at' => now(),
+            ], fn ($value) => $value !== null));
+
+        if ($updated === 0) {
+            return 'unresolved';
+        }
+
+        FederationAuditService::log(
+            'external_transaction_reconciled_completed',
+            (int) $tx->tenant_id,
+            isset($tx->receiver_tenant_id) ? (int) $tx->receiver_tenant_id : null,
+            isset($tx->sender_id) ? (int) $tx->sender_id : null,
+            [
+                'transaction_id' => (int) $tx->id,
+                'external_partner_id' => isset($tx->external_partner_id) ? (int) $tx->external_partner_id : null,
+                'external_transaction_id' => $remoteTxId !== '' ? $remoteTxId : null,
+                'remote_status' => $remoteData['status'] ?? null,
+            ]
+        );
+
+        return 'completed';
+    }
+
+    private function refundCancelledRemoteTransaction(object $tx, string $remoteTxId, array $remoteData): string
+    {
+        try {
+            DB::transaction(function () use ($tx, $remoteTxId): void {
+                $updated = DB::table('transactions')
+                    ->where('id', $tx->id)
+                    ->where('tenant_id', $tx->tenant_id)
+                    ->where('status', 'pending')
+                    ->update(array_filter([
+                        'status' => 'cancelled',
+                        'external_transaction_id' => $remoteTxId !== '' ? $remoteTxId : null,
+                        'updated_at' => now(),
+                    ], fn ($value) => $value !== null));
+
+                if ($updated === 0) {
+                    throw new \RuntimeException('pending_transaction_not_updated');
+                }
+
+                if (!empty($tx->sender_id)) {
+                    DB::table('users')
+                        ->where('id', (int) $tx->sender_id)
+                        ->where('tenant_id', (int) $tx->tenant_id)
+                        ->update([
+                            'balance' => DB::raw('balance + ' . (float) $tx->amount),
+                            'updated_at' => now(),
+                        ]);
+                }
+            });
+        } catch (\Throwable $e) {
+            Log::critical('ReconcileFederationPendingTxJob: remote cancellation refund failed', [
+                'transaction_id' => $tx->id,
+                'tenant_id' => $tx->tenant_id,
+                'external_partner_id' => $tx->external_partner_id ?? null,
+                'error' => $e->getMessage(),
+            ]);
+
+            return 'unresolved';
+        }
+
+        FederationAuditService::log(
+            'external_transaction_reconciled_cancelled',
+            (int) $tx->tenant_id,
+            isset($tx->receiver_tenant_id) ? (int) $tx->receiver_tenant_id : null,
+            isset($tx->sender_id) ? (int) $tx->sender_id : null,
+            [
+                'transaction_id' => (int) $tx->id,
+                'external_partner_id' => isset($tx->external_partner_id) ? (int) $tx->external_partner_id : null,
+                'external_transaction_id' => $remoteTxId !== '' ? $remoteTxId : null,
+                'remote_status' => $remoteData['status'] ?? null,
+                'refunded_amount' => $tx->amount,
+            ]
+        );
+
+        return 'cancelled';
+    }
+
+    private function normaliseRemoteStatus(string $status): string
+    {
+        $status = strtolower(trim($status));
+
+        return match ($status) {
+            'completed', 'complete', 'committed', 'settled', 'accepted', 'delivered', 'c' => 'completed',
+            'cancelled', 'canceled', 'failed', 'rejected', 'declined', 'void', 'voided', 'e', 'x' => 'cancelled',
+            default => 'pending',
+        };
     }
 
     public function failed(\Throwable $e): void

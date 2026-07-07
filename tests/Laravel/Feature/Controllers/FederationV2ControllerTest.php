@@ -13,6 +13,7 @@ use Tests\Laravel\Concerns\FederationIntegrationHarness;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Config;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -106,6 +107,30 @@ class FederationV2ControllerTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         return $user;
+    }
+
+    private function enableMessageTranslationForTenant(int $tenantId): void
+    {
+        $tenant = DB::table('tenants')->where('id', $tenantId)->first();
+        $features = json_decode($tenant->features ?? '{}', true) ?: [];
+        $features['federation'] = true;
+        $features['message_translation'] = true;
+
+        DB::table('tenants')->where('id', $tenantId)->update([
+            'features' => json_encode($features),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $tenantId, 'setting_key' => 'translation.context_aware'],
+            ['setting_value' => 'true', 'setting_type' => 'boolean', 'updated_at' => now()]
+        );
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $tenantId, 'setting_key' => 'translation.context_messages'],
+            ['setting_value' => '5', 'setting_type' => 'integer', 'updated_at' => now()]
+        );
+
+        TenantContext::setById($tenantId);
     }
 
     // ------------------------------------------------------------------
@@ -272,6 +297,245 @@ class FederationV2ControllerTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_direct_external_member_search_returns_source_metadata(): void
+    {
+        $this->enableFederationForTenant($this->testTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        $partner = $this->setupPartner('nexus', $this->testTenantId);
+
+        Http::fake(fn () => Http::response([
+                'success' => true,
+                'data' => [
+                    [
+                        'id' => 'remote-member-1',
+                        'name' => 'Remote Member',
+                        'skills' => ['translation'],
+                        'accepts_messages' => true,
+                        'accepts_transactions' => false,
+                        'timebank' => ['name' => 'Remote Timebank'],
+                    ],
+                ],
+            ], 200));
+
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->apiGet('/v2/federation/members?partner_id=ext-' . $partner->id);
+
+        $response->assertOk();
+        $response->assertJsonPath('meta.pagination_scope', 'external_partner');
+        $response->assertJsonPath('meta.cursor_scope', 'external_partner');
+        $response->assertJsonPath('meta.load_more_scope', 'none');
+        $response->assertJsonPath('meta.external_pagination_scope', 'single_partner_result_set');
+        $response->assertJsonPath('meta.external_results_paginated', false);
+        $response->assertJsonPath('meta.total_items', 1);
+        $response->assertJsonPath('meta.source_counts.internal_returned', 0);
+        $response->assertJsonPath('meta.source_counts.internal_total_items', 0);
+        $response->assertJsonPath('meta.source_counts.external_returned', 1);
+        $response->assertJsonPath('meta.source_counts.returned_total', 1);
+        $response->assertJsonPath('data.0.id', 'ext-' . $partner->id . '-remote-member-1');
+        $response->assertJsonPath('data.0.tenant_id', 'ext-' . $partner->id);
+        $response->assertJsonPath('data.0.timebank.id', 'ext-' . $partner->id);
+    }
+
+    public function test_first_page_external_member_merge_keeps_internal_total_separate(): void
+    {
+        $partnerTenantId = $this->seedPartnerTenant('Source Metadata Members');
+        $this->seedPartnership($partnerTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        $this->seedFederatedUser($partnerTenantId, [
+            'first_name' => 'Internal',
+            'last_name' => 'Partner',
+        ]);
+        $externalPartner = $this->setupPartner('nexus', $this->testTenantId);
+
+        Http::fake([
+            rtrim($externalPartner->base_url, '/') . '/api/v1/members*' => Http::response([
+                'success' => true,
+                'data' => [
+                    [
+                        'id' => 'remote-member-2',
+                        'name' => 'External merged member',
+                        'timebank' => ['name' => 'Remote Timebank'],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->apiGet('/v2/federation/members');
+
+        $response->assertOk();
+        $response->assertJsonPath('meta.total_items', 1);
+        $response->assertJsonPath('meta.pagination_scope', 'internal_partners');
+        $response->assertJsonPath('meta.cursor_scope', 'internal_partners');
+        $response->assertJsonPath('meta.load_more_scope', 'none');
+        $response->assertJsonPath('meta.external_pagination_scope', 'first_page_enrichment');
+        $response->assertJsonPath('meta.external_results_paginated', false);
+        $response->assertJsonPath('meta.external_results_included', true);
+        $response->assertJsonPath('meta.source_counts.internal_returned', 1);
+        $response->assertJsonPath('meta.source_counts.internal_total_items', 1);
+        $response->assertJsonPath('meta.source_counts.external_returned', 1);
+        $response->assertJsonPath('meta.source_counts.returned_total', 2);
+
+        $external = collect($response->json('data'))->firstWhere('is_external', true);
+        $this->assertNotNull($external);
+        $this->assertSame('ext-' . $externalPartner->id, $external['timebank']['id']);
+    }
+
+    public function test_external_member_detail_route_returns_normalized_remote_profile(): void
+    {
+        $this->enableFederationForTenant($this->testTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        $partner = $this->setupPartner('nexus', $this->testTenantId);
+
+        Http::fake([
+            rtrim($partner->base_url, '/') . '/api/v1/members/remote-member-1' => Http::response([
+                'success' => true,
+                'data' => [
+                    'id' => 'remote-member-1',
+                    'name' => 'Remote Detail Member',
+                    'skills' => ['translation', 'repairs'],
+                    'accepts_messages' => true,
+                    'accepts_transactions' => true,
+                    'timebank' => ['name' => 'Remote Timebank'],
+                ],
+            ], 200),
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->apiGet('/v2/federation/members/ext-' . $partner->id . '-remote-member-1');
+
+        $response->assertOk();
+        $response->assertJsonPath('data.id', 'ext-' . $partner->id . '-remote-member-1');
+        $response->assertJsonPath('data.external_id', 'remote-member-1');
+        $response->assertJsonPath('data.external_partner_id', $partner->id);
+        $response->assertJsonPath('data.tenant_id', 'ext-' . $partner->id);
+        $response->assertJsonPath('data.timebank.id', 'ext-' . $partner->id);
+        $response->assertJsonPath('data.is_external', true);
+    }
+
+    public function test_external_member_detail_requires_partner_member_search_allow_flag(): void
+    {
+        $this->enableFederationForTenant($this->testTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        $partner = $this->setupPartner('nexus', $this->testTenantId);
+        DB::table('federation_external_partners')
+            ->where('id', $partner->id)
+            ->update(['allow_member_search' => 0]);
+        Http::fake();
+
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->apiGet('/v2/federation/members/ext-' . $partner->id . '-remote-member-1');
+
+        $response->assertStatus(403);
+        Http::assertNothingSent();
+    }
+
+    public function test_direct_external_listing_search_returns_ext_timebank_contract(): void
+    {
+        $this->enableFederationForTenant($this->testTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        $partner = $this->setupPartner('nexus', $this->testTenantId);
+
+        Http::fake([
+            rtrim($partner->base_url, '/') . '/api/v1/listings*' => Http::response([
+                'success' => true,
+                'data' => [
+                    [
+                        'id' => 'remote-listing-1',
+                        'title' => 'Remote Listing',
+                        'description' => 'Visible external listing.',
+                        'type' => 'offer',
+                        'estimated_hours' => 2,
+                        'owner' => [
+                            'id' => 'remote-owner-1',
+                            'name' => 'Remote Owner',
+                        ],
+                        'timebank' => ['name' => 'Remote Timebank'],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->apiGet('/v2/federation/listings?partner_id=ext-' . $partner->id);
+
+        $response->assertOk();
+        $response->assertJsonPath('meta.pagination_scope', 'external_partner');
+        $response->assertJsonPath('meta.cursor_scope', 'external_partner');
+        $response->assertJsonPath('meta.load_more_scope', 'none');
+        $response->assertJsonPath('meta.external_pagination_scope', 'single_partner_result_set');
+        $response->assertJsonPath('meta.external_results_paginated', false);
+        $response->assertJsonPath('meta.total_items', 1);
+        $response->assertJsonPath('meta.source_counts.internal_returned', 0);
+        $response->assertJsonPath('meta.source_counts.internal_total_items', 0);
+        $response->assertJsonPath('meta.source_counts.external_returned', 1);
+        $response->assertJsonPath('meta.source_counts.returned_total', 1);
+        $response->assertJsonPath('data.0.id', 'ext-' . $partner->id . '-remote-listing-1');
+        $response->assertJsonPath('data.0.timebank.id', 'ext-' . $partner->id);
+        $response->assertJsonPath('data.0.external_partner_id', $partner->id);
+    }
+
+    public function test_first_page_external_listing_merge_returns_source_counts_and_ext_timebank_id(): void
+    {
+        $partnerTenantId = $this->seedPartnerTenant('Source Metadata Partner');
+        $this->seedPartnership($partnerTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        $owner = $this->seedFederatedUser($partnerTenantId);
+        $externalPartner = $this->setupPartner('nexus', $this->testTenantId);
+
+        DB::table('listings')->insert([
+            'tenant_id' => $partnerTenantId,
+            'user_id' => $owner->id,
+            'title' => 'Internal federated listing',
+            'description' => 'Visible internal partner listing.',
+            'type' => 'offer',
+            'status' => 'active',
+            'federated_visibility' => 'listed',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        Http::fake([
+            rtrim($externalPartner->base_url, '/') . '/api/v1/listings*' => Http::response([
+                'success' => true,
+                'data' => [
+                    [
+                        'id' => 'remote-listing-2',
+                        'title' => 'External merged listing',
+                        'description' => 'Visible external merged listing.',
+                        'type' => 'request',
+                        'owner' => [
+                            'id' => 'remote-owner-2',
+                            'name' => 'Remote Owner',
+                        ],
+                        'timebank' => ['name' => 'Remote Timebank'],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->apiGet('/v2/federation/listings');
+
+        $response->assertOk();
+        $response->assertJsonPath('meta.pagination_scope', 'internal_partners');
+        $response->assertJsonPath('meta.cursor_scope', 'internal_partners');
+        $response->assertJsonPath('meta.load_more_scope', 'none');
+        $response->assertJsonPath('meta.external_pagination_scope', 'first_page_enrichment');
+        $response->assertJsonPath('meta.external_results_paginated', false);
+        $response->assertJsonPath('meta.total_items', 1);
+        $response->assertJsonPath('meta.external_results_included', true);
+        $response->assertJsonPath('meta.source_counts.internal_returned', 1);
+        $response->assertJsonPath('meta.source_counts.internal_total_items', 1);
+        $response->assertJsonPath('meta.source_counts.external_returned', 1);
+        $response->assertJsonPath('meta.source_counts.returned_total', 2);
+
+        $external = collect($response->json('data'))->firstWhere('is_external', true);
+        $this->assertNotNull($external);
+        $this->assertSame('ext-' . $externalPartner->id, $external['timebank']['id']);
+        $this->assertSame((int) $externalPartner->id, (int) $external['external_partner_id']);
+    }
+
     // ------------------------------------------------------------------
     //  GET /v2/federation/events
     // ------------------------------------------------------------------
@@ -342,6 +606,96 @@ class FederationV2ControllerTest extends TestCase
         $receiverIds = array_column($receiverResponse->json('data'), 'id');
         $this->assertContains($inboundId, $receiverIds);
         $this->assertNotContains($outboundId, $receiverIds);
+    }
+
+    public function test_batch_mark_read_mirrors_single_message_realtime_receipt_path(): void
+    {
+        $source = file_get_contents(app_path('Http/Controllers/Api/FederationV2Controller.php'));
+        $methodStart = strpos($source, 'public function markMessagesReadBatch');
+        $methodEnd = strpos($source, 'public function translateMessage', $methodStart);
+        $methodSource = substr($source, $methodStart, $methodEnd - $methodStart);
+
+        $this->assertStringContainsString('SELECT id, sender_user_id, sender_tenant_id', $methodSource);
+        $this->assertStringContainsString('FederationRealtimeService::broadcastMessageRead', $methodSource);
+    }
+
+    public function test_external_message_translation_context_is_scoped_to_external_partner(): void
+    {
+        $this->enableFederationForTenant($this->testTenantId);
+        $this->enableMessageTranslationForTenant($this->testTenantId);
+        Config::set('services.openai.api_key', 'test-openai-key');
+
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        $partnerA = $this->setupPartner('nexus', $this->testTenantId);
+        $partnerB = $this->setupPartner('timeoverflow', $this->testTenantId);
+        $remoteUserId = 90123;
+
+        DB::table('federation_messages')->insert([
+            [
+                'sender_tenant_id' => $this->testTenantId,
+                'sender_user_id' => $viewer->id,
+                'receiver_tenant_id' => 0,
+                'receiver_user_id' => $remoteUserId,
+                'external_partner_id' => $partnerA->id,
+                'subject' => 'Context',
+                'body' => 'same-partner-context-token',
+                'direction' => 'outbound',
+                'status' => 'delivered',
+                'created_at' => now()->subMinutes(3),
+            ],
+            [
+                'sender_tenant_id' => $this->testTenantId,
+                'sender_user_id' => $viewer->id,
+                'receiver_tenant_id' => 0,
+                'receiver_user_id' => $remoteUserId,
+                'external_partner_id' => $partnerB->id,
+                'subject' => 'Context',
+                'body' => 'other-partner-leak-token',
+                'direction' => 'outbound',
+                'status' => 'delivered',
+                'created_at' => now()->subMinutes(2),
+            ],
+        ]);
+
+        $targetId = (int) DB::table('federation_messages')->insertGetId([
+            'sender_tenant_id' => $this->testTenantId,
+            'sender_user_id' => $viewer->id,
+            'receiver_tenant_id' => 0,
+            'receiver_user_id' => $remoteUserId,
+            'external_partner_id' => $partnerA->id,
+            'subject' => 'Translate',
+            'body' => 'Message to translate',
+            'direction' => 'outbound',
+            'status' => 'delivered',
+            'created_at' => now(),
+        ]);
+
+        Http::fake([
+            'https://api.openai.com/v1/chat/completions' => Http::response([
+                'choices' => [
+                    ['message' => ['content' => 'Mensaje traducido']],
+                ],
+            ], 200),
+        ]);
+
+        Sanctum::actingAs($viewer, ['*']);
+        $response = $this->postJson("/api/v2/federation/messages/{$targetId}/translate", [
+            'target_language' => 'es',
+        ], [
+            'X-Tenant-ID' => (string) $this->testTenantId,
+            'Accept' => 'application/json',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('data.translated_text', 'Mensaje traducido');
+        Http::assertSent(function ($request): bool {
+            $messages = $request->data()['messages'] ?? [];
+            $userPrompt = (string) ($messages[1]['content'] ?? '');
+
+            return str_contains($userPrompt, 'same-partner-context-token')
+                && !str_contains($userPrompt, 'other-partner-leak-token')
+                && str_contains($userPrompt, 'Message to translate');
+        });
     }
 
     public function test_members_endpoint_hides_searchable_profiles_when_profile_visibility_is_disabled(): void
