@@ -446,7 +446,7 @@ class MarketplaceListingController extends BaseApiController
 
                 $uploadedImages[] = [
                     'url'           => $result['url'],
-                    'thumbnail_url' => $result['thumbnail_url'] ?? $result['url'],
+                    'thumbnail_url' => $result['thumbnail_url'] ?? null,
                     'alt_text'      => $file->getClientOriginalName(),
                 ];
             } catch (\InvalidArgumentException $e) {
