@@ -22,6 +22,7 @@ use App\Services\FederatedMessageService;
 use App\Services\FederationEmailService;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
+use App\Services\FederationFeatureService;
 use App\Services\FederationLogRedactor;
 use App\Support\SecurityBounds;
 use Illuminate\Http\JsonResponse;
@@ -184,6 +185,11 @@ class FederationExternalWebhookController extends BaseApiController
                 'event' => $event,
                 'result' => $result,
             ]);
+        } catch (FederationUnavailableException $e) {
+            DB::table('federation_external_partner_logs')
+                ->where('id', $logId)
+                ->update(['response_code' => 503, 'success' => false, 'error_message' => substr(FederationLogRedactor::redactText($e->getMessage()) ?? '', 0, 1000)]);
+            return $this->respondWithError('FEDERATION_UNAVAILABLE', $e->getMessage(), null, 503);
         } catch (InboundValidationException $e) {
             DB::table('federation_external_partner_logs')
                 ->where('id', $logId)
@@ -411,6 +417,21 @@ class FederationExternalWebhookController extends BaseApiController
 
     private function handleEvent(string $event, array $data, object $partner): array
     {
+        // Kill-switch: inbound federation must honour the same global /
+        // emergency-lockdown / whitelist / tenant gates as the outbound push
+        // listeners. TenantContext is already set to the partner's (local)
+        // tenant by both callers (receive() and processTrustedEvent()).
+        // isTenantFederationEnabled() returns false under emergency lockdown, a
+        // global disable, or a non-whitelisted tenant — so a partner cannot keep
+        // pushing (and crediting balances) while an operator believes federation
+        // is halted.
+        $partnerTenantId = (int) $partner->tenant_id;
+        if (! TenantContext::hasFeature('federation')
+            || ! app(FederationFeatureService::class)->isTenantFederationEnabled($partnerTenantId)
+        ) {
+            throw new FederationUnavailableException(__('api.federation.feature_disabled'));
+        }
+
         if (!$this->partnerAllowsEvent($event, $partner)) {
             return [
                 'status' => 'rejected',
@@ -1798,4 +1819,15 @@ final class InboundValidationException extends \RuntimeException
     {
         parent::__construct($message);
     }
+}
+
+/**
+ * Thrown when inbound federation is gated off for the partner's tenant
+ * (global disable, emergency lockdown, or tenant not whitelisted). Callers map
+ * it to HTTP 503 so a well-behaved partner retries once the operator re-enables
+ * federation — instead of the event being silently acknowledged or minting
+ * balances during a lockdown.
+ */
+final class FederationUnavailableException extends \RuntimeException
+{
 }

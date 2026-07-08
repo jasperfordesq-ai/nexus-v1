@@ -99,6 +99,37 @@ class FederationExternalWebhookControllerTest extends TestCase
         $this->assertNull($m->invoke($controller, 'eyJpdiI6' . base64_encode('garbage-not-ciphertext')));
     }
 
+    public function test_inbound_webhook_blocked_under_emergency_lockdown_credits_no_balance(): void
+    {
+        // Regression (audit H1): inbound webhooks must honour the same
+        // emergency-lockdown / global-disable / whitelist kill-switch as the
+        // outbound push listeners. A transaction.completed webhook under
+        // lockdown must be rejected (503) and must NOT credit the recipient.
+        $this->fakeFederationEmail();
+        $this->enableFederationForTenant();
+        $partner = $this->setupPartner('nexus', $this->testTenantId);
+
+        $receiver = \App\Models\User::factory()->forTenant($this->testTenantId)->create([
+            'balance' => 5,
+            'status'  => 'active',
+        ]);
+
+        // Emergency lockdown ON — the whole platform's federation is halted.
+        DB::table('federation_system_control')->where('id', 1)->update(['emergency_lockdown_active' => 1]);
+
+        $response = $this->simulateInboundWebhook($partner, 'transaction.completed', [
+            'recipient_id'            => $receiver->id,
+            'amount'                  => 3,
+            'external_transaction_id' => 'tx-h1-' . uniqid(),
+            'sender_name'             => 'Ext Sender',
+        ]);
+
+        $this->assertSame(503, $response->getStatusCode());
+        // No minting during lockdown, and no federation_transactions row written.
+        $this->assertEquals(5, (float) DB::table('users')->where('id', $receiver->id)->value('balance'));
+        $this->assertDatabaseMissing('federation_transactions', ['receiver_user_id' => $receiver->id]);
+    }
+
     public function test_duplicate_signing_secret_without_signed_discriminator_fails_closed(): void
     {
         $this->setupPartner('nexus', $this->testTenantId);

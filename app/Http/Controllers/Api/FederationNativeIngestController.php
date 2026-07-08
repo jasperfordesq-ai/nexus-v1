@@ -168,6 +168,10 @@ class FederationNativeIngestController extends BaseApiController
         try {
             $result = app(FederationExternalWebhookController::class)
                 ->processTrustedEvent($eventType, $payload, $handlerPartner);
+        } catch (FederationUnavailableException $e) {
+            $this->logNativeIngest($handlerPartner->id, $eventType, $payload, 503, false, $e->getMessage());
+
+            return $this->respondWithError('FEDERATION_UNAVAILABLE', $e->getMessage(), null, 503);
         } catch (InboundValidationException $e) {
             $this->logNativeIngest($handlerPartner->id, $eventType, $payload, 400, false, $e->getMessage());
 
