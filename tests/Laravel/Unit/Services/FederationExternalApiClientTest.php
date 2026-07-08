@@ -399,6 +399,40 @@ class FederationExternalApiClientTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_undecryptable_ciphertext_credential_fails_loud_without_sending(): void
+    {
+        // Regression (audit M2): a value that looks like Laravel ciphertext but
+        // cannot be decrypted (e.g. after an APP_KEY rotation) must NOT be used
+        // as the raw signing secret. The request must fail cleanly with an auth
+        // error instead of signing against the ciphertext blob and going out.
+        $fakeCiphertext = 'eyJpdiI6' . base64_encode('not-real-ciphertext-payload');
+        if (!$this->seedPartner(['auth_method' => 'hmac', 'signing_secret' => $fakeCiphertext, 'api_key' => ''])) {
+            $this->markTestSkipped('DB unavailable');
+        }
+
+        Http::fake(['*' => Http::response([], 200)]);
+        $result = FederationExternalApiClient::get($this->partnerId, '/ping');
+
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('Authentication setup failed', $result['error']);
+        Http::assertNothingSent();
+    }
+
+    public function test_legacy_plaintext_credential_is_used_as_is(): void
+    {
+        // A non-ciphertext (legacy plaintext) secret is still passed through.
+        if (!$this->seedPartner(['api_key' => 'legacy-plaintext-key'])) {
+            $this->markTestSkipped('DB unavailable');
+        }
+
+        Http::fake(['*' => Http::response([], 200)]);
+        FederationExternalApiClient::get($this->partnerId, '/ping');
+
+        Http::assertSent(function ($request) {
+            return ($request->header('Authorization')[0] ?? '') === 'Bearer legacy-plaintext-key';
+        });
+    }
+
     public function test_clearAdapterCache_is_callable(): void
     {
         FederationExternalApiClient::clearAdapterCache();

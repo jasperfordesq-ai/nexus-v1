@@ -245,7 +245,13 @@ class FederationExternalWebhookController extends BaseApiController
         try {
             return \Illuminate\Support\Facades\Crypt::decryptString($encrypted);
         } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
-            return $encrypted;
+            // Ciphertext that won't decrypt is a real config error (usually an
+            // APP_KEY rotation). Treat the secret as unavailable rather than
+            // authenticating the partner against the raw ciphertext blob.
+            Log::error('[FederationExternalWebhook] Partner signing secret decryption failed — check APP_KEY / APP_PREVIOUS_KEYS', [
+                'error' => $e->getMessage(),
+            ]);
+            return null;
         } catch (\RuntimeException $e) {
             Log::warning('[FederationExternalWebhook] Unable to initialize encrypter while reading partner secret', [
                 'error' => $e->getMessage(),

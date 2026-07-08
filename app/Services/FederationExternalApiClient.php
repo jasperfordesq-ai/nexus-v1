@@ -861,14 +861,28 @@ class FederationExternalApiClient
     /**
      * Decrypt an encrypted credential stored in the database.
      *
-     * Falls back to the raw value if decryption fails (for unencrypted legacy values).
+     * Legacy plaintext values (stored before encryption-at-rest) are not Laravel
+     * ciphertext — which is base64-encoded JSON beginning "eyJpdiI6" — and are
+     * returned unchanged. A value that LOOKS like ciphertext but will not decrypt
+     * is a real configuration error (almost always an APP_KEY rotation): returning
+     * the ciphertext there would silently sign/authenticate with garbage and
+     * masquerade as a generic "partner down", so we fail loud and distinct instead.
+     *
+     * @throws \RuntimeException when ciphertext cannot be decrypted.
      */
     private static function decryptCredential(string $encryptedValue): string
     {
+        if (!str_starts_with($encryptedValue, 'eyJpdiI6')) {
+            return $encryptedValue; // legacy plaintext
+        }
+
         try {
             return Crypt::decryptString($encryptedValue);
-        } catch (\Illuminate\Contracts\Encryption\DecryptException) {
-            return $encryptedValue; // plaintext fallback
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            Log::error('[FederationExternalApiClient] Partner credential decryption failed — check APP_KEY / APP_PREVIOUS_KEYS', [
+                'error' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException('Federation partner credential could not be decrypted (APP_KEY/APP_PREVIOUS_KEYS mismatch)');
         }
     }
 

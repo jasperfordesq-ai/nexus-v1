@@ -82,6 +82,23 @@ class FederationExternalWebhookControllerTest extends TestCase
         $this->assertSame(401, $response->status());
     }
 
+    public function test_decryptSecret_returns_null_for_undecryptable_ciphertext(): void
+    {
+        // Regression (audit M2): a ciphertext-looking signing secret that will
+        // not decrypt (usually an APP_KEY rotation) must be treated as
+        // unavailable — NOT returned as the raw ciphertext for HMAC/Bearer
+        // comparison, which would authenticate the partner against garbage.
+        $controller = app(\App\Http\Controllers\Api\FederationExternalWebhookController::class);
+        $m = new \ReflectionMethod($controller, 'decryptSecret');
+        $m->setAccessible(true);
+
+        // Legacy plaintext passes through unchanged.
+        $this->assertSame('plain-secret', $m->invoke($controller, 'plain-secret'));
+
+        // Undecryptable ciphertext -> null (not the raw value).
+        $this->assertNull($m->invoke($controller, 'eyJpdiI6' . base64_encode('garbage-not-ciphertext')));
+    }
+
     public function test_duplicate_signing_secret_without_signed_discriminator_fails_closed(): void
     {
         $this->setupPartner('nexus', $this->testTenantId);
