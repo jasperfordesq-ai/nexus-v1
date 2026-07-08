@@ -133,6 +133,62 @@ class StripeDonationStateMachineTest extends TestCase
         $this->assertEquals(0.0, (float) DB::table('vol_giving_days')->where('id', $gd)->value('raised_amount'));
     }
 
+    public function test_gift_aid_export_stamps_rows_claimed_and_excludes_them_next_time(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $gd = $this->seedGivingDay(0.0);
+        $donationId = $this->seedDonation('completed', $gd, 'pi_giftaid_1');
+        DB::table('vol_donations')->where('id', $donationId)->update([
+            'gift_aid_claim_status' => 'ready',
+            'gift_aid_declaration_name' => 'Test Donor',
+        ]);
+
+        $rows = \App\Services\DonationOperationsService::giftAidExportRows($this->testTenantId);
+        $exportedIds = array_map(static fn (array $r): int => $r['donation_id'], $rows);
+        $this->assertContains($donationId, $exportedIds);
+
+        $stamped = \App\Services\DonationOperationsService::markGiftAidRowsClaimed($this->testTenantId, $exportedIds);
+        $this->assertGreaterThanOrEqual(1, $stamped);
+
+        $row = DB::table('vol_donations')->where('id', $donationId)->first();
+        $this->assertSame('claimed', $row->gift_aid_claim_status);
+        $this->assertNotNull($row->gift_aid_claimed_at);
+
+        // A second export must NOT include the claimed row (no HMRC double-claim).
+        $secondIds = array_map(
+            static fn (array $r): int => $r['donation_id'],
+            \App\Services\DonationOperationsService::giftAidExportRows($this->testTenantId)
+        );
+        $this->assertNotContains($donationId, $secondIds);
+
+        // Stamping again is a no-op (already claimed).
+        $this->assertSame(0, \App\Services\DonationOperationsService::markGiftAidRowsClaimed($this->testTenantId, [$donationId]));
+    }
+
+    public function test_refund_of_claimed_donation_is_flagged_for_hmrc_adjustment(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $gd = $this->seedGivingDay(10.0);
+        $donationId = $this->seedDonation('completed', $gd, 'pi_giftaid_refund_1');
+        DB::table('vol_donations')->where('id', $donationId)->update([
+            'gift_aid_claim_status' => 'claimed',
+            'gift_aid_claimed_at' => now(),
+        ]);
+
+        $charge = (object) [
+            'payment_intent' => 'pi_giftaid_refund_1',
+            'metadata' => (object) ['nexus_tenant_id' => (string) $this->testTenantId],
+            'amount' => 1000,
+            'amount_refunded' => 1000,
+        ];
+        StripeDonationService::handleChargeRefunded($charge);
+
+        $row = DB::table('vol_donations')->where('id', $donationId)->first();
+        $this->assertSame('refunded', $row->status);
+        $this->assertSame('refund_after_claim', $row->gift_aid_claim_status);
+        $this->assertNotNull($row->gift_aid_claimed_at, 'claimed_at kept as evidence');
+    }
+
     public function test_createPaymentIntent_rejects_currency_mismatch(): void
     {
         // Tenant 2 is configured for EUR; a USD donation must be rejected before

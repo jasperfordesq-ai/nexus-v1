@@ -271,14 +271,30 @@ class MemberPremiumAdminController extends BaseApiController
 
     /**
      * GET /api/v2/admin/member-premium/finance/gift-aid-export
+     *
+     * Exports every 'ready' gift-aid declaration and — unless ?preview=1 —
+     * stamps the exported rows as claimed (gift_aid_claimed_at) so the same
+     * declarations cannot be re-submitted to HMRC by a later export. Use
+     * preview=1 to inspect the pending claim without committing it.
      */
     public function giftAidExport(): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        $rows = DonationOperationsService::giftAidExportRows($tenantId);
+
+        $preview = filter_var($this->input('preview', false), FILTER_VALIDATE_BOOLEAN);
+        if (!$preview && $rows !== []) {
+            DonationOperationsService::markGiftAidRowsClaimed(
+                $tenantId,
+                array_map(static fn (array $row): int => (int) $row['donation_id'], $rows),
+            );
+        }
 
         return $this->csvResponse(
-            'gift-aid-donations.csv',
-            DonationOperationsService::giftAidExportRows(TenantContext::getId()),
+            $preview ? 'gift-aid-donations-preview.csv' : 'gift-aid-donations.csv',
+            $rows,
         );
     }
 

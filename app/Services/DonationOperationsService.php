@@ -73,6 +73,11 @@ class DonationOperationsService
             'gift_aid' => [
                 'ready_cents' => self::sumCents($giftAidReady),
                 'ready_count' => (int) $giftAidReady->count(),
+                // Claimed donations refunded afterwards need an HMRC adjustment
+                // on the next claim — surface them so admins can act.
+                'refund_after_claim_count' => $hasGiftAid
+                    ? (int) (clone $base)->where('gift_aid_claim_status', 'refund_after_claim')->count()
+                    : 0,
             ],
             'recurring' => [
                 'active_count' => self::subscriptionCount($tenantId, ['active', 'trialing']),
@@ -136,6 +141,30 @@ class DonationOperationsService
             ])
             ->values()
             ->all();
+    }
+
+    /**
+     * Mark exported gift-aid rows as claimed so a subsequent export cannot
+     * re-submit the same declarations to HMRC. Conditional on the row still
+     * being 'ready' (a concurrent export stamps only once) and returns the
+     * number of rows transitioned.
+     *
+     * @param array<int, int> $donationIds
+     */
+    public static function markGiftAidRowsClaimed(int $tenantId, array $donationIds): int
+    {
+        if ($donationIds === [] || !Schema::hasColumn('vol_donations', 'gift_aid_claim_status')) {
+            return 0;
+        }
+
+        return DB::table('vol_donations')
+            ->where('tenant_id', $tenantId)
+            ->whereIn('id', $donationIds)
+            ->where('gift_aid_claim_status', 'ready')
+            ->update([
+                'gift_aid_claim_status' => 'claimed',
+                'gift_aid_claimed_at' => now(),
+            ]);
     }
 
     /**

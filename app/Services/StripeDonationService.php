@@ -656,10 +656,18 @@ class StripeDonationService
             // event will then find status 'refunded' and skip its increment.
             $wasCompleted = $locked->status === 'completed';
 
+            $update = ['status' => 'refunded'];
+            // A declaration already submitted to HMRC needs an adjustment on
+            // the next claim — flag it (keeping gift_aid_claimed_at as
+            // evidence) so it surfaces in the admin overview.
+            if (($locked->gift_aid_claim_status ?? null) === 'claimed') {
+                $update['gift_aid_claim_status'] = 'refund_after_claim';
+            }
+
             DB::table('vol_donations')
                 ->where('id', $donation->id)
                 ->where('tenant_id', $donation->tenant_id)
-                ->update(['status' => 'refunded']);
+                ->update($update);
 
             if ($wasCompleted && !empty($locked->giving_day_id)) {
                 DB::table('vol_giving_days')
@@ -726,10 +734,17 @@ class StripeDonationService
         }
 
         DB::transaction(function () use ($donation) {
+            $update = ['status' => 'refunded'];
+            // Flag declarations already submitted to HMRC for adjustment
+            // (mirrors handleChargeRefunded).
+            if (($donation->gift_aid_claim_status ?? null) === 'claimed') {
+                $update['gift_aid_claim_status'] = 'refund_after_claim';
+            }
+
             DB::table('vol_donations')
                 ->where('id', $donation->id)
                 ->where('tenant_id', $donation->tenant_id)
-                ->update(['status' => 'refunded']);
+                ->update($update);
 
             if (!empty($donation->giving_day_id)) {
                 DB::table('vol_giving_days')
