@@ -85,7 +85,12 @@ class PushReviewToFederatedPartner implements ShouldQueue
             // Look up ANY federated identity rows for the receiver. A user
             // may be federated to multiple partners â€” push to each so the
             // review lands wherever they have a reputation presence.
+            //
+            // FederatedIdentity is deliberately NOT tenant-auto-scoped, so the
+            // tenant_id filter is mandatory: without it a same-id user under a
+            // different tenant could leak this review to the wrong network.
             $identities = FederatedIdentity::query()
+                ->where('tenant_id', $event->tenantId)
                 ->where('local_user_id', $receiverId)
                 ->get();
 

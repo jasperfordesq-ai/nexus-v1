@@ -72,7 +72,11 @@ class PushConnectionAcceptedToFederatedPartner implements ShouldQueue
                 return;
             }
 
+            // FederatedIdentity is deliberately NOT tenant-auto-scoped — the
+            // tenant_id filter is mandatory to avoid resolving a same-id
+            // identity that belongs to another tenant/network.
             $identities = FederatedIdentity::query()
+                ->where('tenant_id', $tenantId)
                 ->whereIn('local_user_id', $participantIds)
                 ->get();
 

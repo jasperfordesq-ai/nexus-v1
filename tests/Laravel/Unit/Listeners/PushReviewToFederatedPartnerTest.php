@@ -374,6 +374,34 @@ class PushReviewToFederatedPartnerTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_does_not_push_review_to_federated_identity_belonging_to_another_tenant(): void
+    {
+        // Regression (audit L1): FederatedIdentity is NOT tenant-auto-scoped, so
+        // the listener MUST filter tenant_id. A same-local_user_id identity row
+        // scoped to a DIFFERENT tenant must never receive this tenant's review.
+        Http::fake(['*' => Http::response(['success' => true], 200)]);
+
+        $partnerId  = $this->insertPartner();
+        $reviewerId = $this->insertUser();
+        $receiverId = $this->insertUser();
+
+        // Identity row exists for this local_user_id but under a FOREIGN tenant.
+        DB::table('federated_identities')->insert([
+            'tenant_id'        => self::TENANT_ID + 1,
+            'local_user_id'    => $receiverId,
+            'partner_id'       => $partnerId,
+            'external_user_id' => 'ext-foreign-tenant',
+            'created_at'       => now(),
+        ]);
+
+        $review = $this->makeReview($reviewerId, $receiverId);
+        $event  = new ReviewCreated($review, self::TENANT_ID);
+
+        $this->makeListener()->handle($event);
+
+        Http::assertNothingSent();
+    }
+
     public function test_queue_property_is_federation(): void
     {
         $this->assertSame('federation', $this->makeListener()->queue);
