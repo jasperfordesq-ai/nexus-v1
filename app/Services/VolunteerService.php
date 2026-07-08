@@ -37,6 +37,30 @@ class VolunteerService
         private readonly VolApplication $application,
     ) {}
 
+    /** In-process memo for the cached is_federated schema probe. */
+    private static ?bool $isFederatedColumnMemo = null;
+
+    /**
+     * Whether vol_opportunities has the federation `is_federated` column.
+     * Cached (in-process + 1h shared cache) because this sat on the hottest
+     * read paths (getOpportunities / suggestOpportunities) and ran an
+     * information_schema round-trip on every request.
+     */
+    public static function opportunitiesHaveFederatedColumn(): bool
+    {
+        if (self::$isFederatedColumnMemo !== null) {
+            return self::$isFederatedColumnMemo;
+        }
+
+        self::$isFederatedColumnMemo = (bool) Cache::remember(
+            'schema:vol_opportunities:is_federated',
+            3600,
+            static fn (): bool => Schema::hasColumn('vol_opportunities', 'is_federated')
+        );
+
+        return self::$isFederatedColumnMemo;
+    }
+
     /**
      * Get active volunteer opportunities with cursor pagination.
      *
@@ -50,7 +74,7 @@ class VolunteerService
 
         $viewerId = !empty($filters['viewer_id']) ? (int) $filters['viewer_id'] : null;
 
-        $federationColumnExists = Schema::hasColumn('vol_opportunities', 'is_federated');
+        $federationColumnExists = self::opportunitiesHaveFederatedColumn();
 
         $query = VolOpportunity::query()
             ->with(['creator:id,first_name,last_name,avatar_url', 'organization:id,name,logo_url', 'category:id,name,color'])

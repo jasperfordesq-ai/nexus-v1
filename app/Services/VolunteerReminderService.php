@@ -1004,6 +1004,10 @@ class VolunteerReminderService
             ->get()
             ->keyBy('tenant_id');
 
+        // Dedup in SQL (DISTINCT), not in PHP: the predicate matches essentially
+        // every historical application forever, so ->pluck()->unique() pulled one
+        // row per matching application into memory before deduping — an unbounded,
+        // monotonically growing transfer on every nightly run.
         $tenantsWithInactiveVolunteers = DB::table('vol_applications as va')
             ->join('vol_shifts as vs', function ($join): void {
                 $join->on('vs.id', '=', 'va.shift_id')
@@ -1011,8 +1015,8 @@ class VolunteerReminderService
             })
             ->where('va.status', 'approved')
             ->where('vs.end_time', '<=', now()->subDays(30))
+            ->distinct()
             ->pluck('va.tenant_id')
-            ->unique()
             ->all();
 
         $allTenantIds = array_unique(array_merge(

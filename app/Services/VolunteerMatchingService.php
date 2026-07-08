@@ -9,7 +9,6 @@ namespace App\Services;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 /**
  * VolunteerMatchingService — matches volunteers to opportunities and shifts
@@ -178,7 +177,7 @@ class VolunteerMatchingService
         // public-visibility gates as VolunteerService::getOpportunities —
         // is_active alone is not enough: closed/draft opportunities and
         // pending/declined organizations must never surface in suggestions.
-        $federationColumnExists = Schema::hasColumn('vol_opportunities', 'is_federated');
+        $federationColumnExists = VolunteerService::opportunitiesHaveFederatedColumn();
         $query = DB::table('vol_opportunities as opp')
             ->leftJoin('vol_organizations as org', function ($join) {
                 $join->on('opp.organization_id', '=', 'org.id')
