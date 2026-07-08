@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\EmailDispatchService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -391,6 +392,42 @@ class AdminUsersControllerTest extends TestCase
         $response = $this->apiDelete('/v2/admin/users/1');
 
         $response->assertStatus(401);
+    }
+
+    public function test_destroy_routes_through_gdpr_erasure_not_hard_delete(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $target = User::factory()->forTenant($this->testTenantId)->create([
+            'email' => 'erase-target-' . uniqid() . '@example.test',
+            'status' => 'active',
+        ]);
+        TenantContext::setById($this->testTenantId);
+
+        // A volunteering review the target authored — GDPR erasure deletes it.
+        DB::table('vol_reviews')->insert([
+            'tenant_id' => $this->testTenantId,
+            'reviewer_id' => $target->id,
+            'target_type' => 'user',
+            'target_id' => $admin->id,
+            'rating' => 5,
+            'created_at' => now(),
+        ]);
+
+        Sanctum::actingAs($admin);
+        $response = $this->apiDelete("/v2/admin/users/{$target->id}");
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.deleted', true);
+
+        // Anonymised IN PLACE, not hard-deleted: the row survives (so child
+        // tables are not orphaned) but is deactivated with PII wiped.
+        $row = DB::table('users')->where('id', $target->id)->first();
+        $this->assertNotNull($row, 'user row must survive as an anonymised record');
+        $this->assertSame('inactive', $row->status);
+        $this->assertStringContainsString('@anonymized.local', (string) $row->email);
+
+        // Volunteering PII was actually cleaned (proves the erasure ran, not a raw delete).
+        $this->assertSame(0, DB::table('vol_reviews')->where('reviewer_id', $target->id)->where('tenant_id', $this->testTenantId)->count());
     }
 
     // ================================================================

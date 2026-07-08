@@ -838,10 +838,24 @@ class AdminUsersController extends BaseApiController
             Log::warning("[AdminUsers] Failed to send deletion email to user #{$id}: " . $e->getMessage());
         }
 
-        DB::delete("DELETE FROM users WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        // Route through GDPR erasure instead of a raw DELETE. A hard delete
+        // orphaned every child table that lacks an ON DELETE cascade — safeguarding
+        // incidents, wellbeing/mood records, guardian consents, accessibility needs,
+        // reviews, donations (donor PII), org memberships — and left uploaded
+        // credential/expense-receipt files on disk. executeAccountDeletion
+        // anonymises the users row in place (status='inactive', PII wiped) and
+        // performs the full cross-module PII + file cleanup, so an admin "delete"
+        // now leaves no orphaned personal data behind.
+        $adminEmail = $user['email'];
+        try {
+            (new \App\Services\Enterprise\GdprService($tenantId))->executeAccountDeletion($id, $adminId);
+        } catch (\Throwable $e) {
+            Log::error("[AdminUsers] GDPR erasure failed for user #{$id}: " . $e->getMessage());
+            return $this->respondWithError('SERVER_ERROR', __('api.delete_failed', ['resource' => 'User']), null, 500);
+        }
 
-        ActivityLog::log($adminId, 'admin_delete_user', "Deleted user #{$id} ({$user['email']})");
-        $this->auditLogService->logUserDeleted($adminId, $id, $user['email']);
+        ActivityLog::log($adminId, 'admin_delete_user', "Erased user #{$id} ({$adminEmail})");
+        $this->auditLogService->logUserDeleted($adminId, $id, $adminEmail);
 
         return $this->respondWithData(['deleted' => true, 'id' => $id]);
     }
