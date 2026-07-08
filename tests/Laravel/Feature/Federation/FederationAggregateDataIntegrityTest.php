@@ -53,18 +53,25 @@ final class FederationAggregateDataIntegrityTest extends TestCase
             $this->markTestSkipped('vol_logs table not available.');
         }
 
-        $today = date('Y-m-d');
+        $today = '2099-03-10';
+        $periodFrom = '2099-03-01';
+        $periodTo = '2099-03-31';
         $userId = $this->seedUser($this->testTenantId, 'active');
 
-        // Seed: 1 approved (counts), 1 pending (excluded), 1 declined (excluded)
+        // Seed enough approved rows to clear the aggregate privacy suppression
+        // threshold while keeping the expected public total at exactly 5.0.
         $this->insertVolLog($this->testTenantId, $userId, $today, 5.0,  'approved');
+        $this->insertVolLog($this->testTenantId, $userId, $today, 0.0,  'approved');
+        $this->insertVolLog($this->testTenantId, $userId, $today, 0.0,  'approved');
+        $this->insertVolLog($this->testTenantId, $userId, $today, 0.0,  'approved');
+        $this->insertVolLog($this->testTenantId, $userId, $today, 0.0,  'approved');
         $this->insertVolLog($this->testTenantId, $userId, $today, 99.0, 'pending');
         $this->insertVolLog($this->testTenantId, $userId, $today, 77.0, 'declined');
 
         // Cross-tenant log MUST be excluded — non-existent tenant id 999999
         $this->insertVolLog(999999, $userId, $today, 12345.0, 'approved');
 
-        $payload = $this->service->compute($this->periodFrom, $this->periodTo);
+        $payload = $this->service->compute($periodFrom, $periodTo);
         $this->assertSame(5.0, (float) $payload['hours']['total_approved']);
     }
 
@@ -113,6 +120,9 @@ final class FederationAggregateDataIntegrityTest extends TestCase
         $userId = $this->seedUser($this->testTenantId, 'active');
         $this->insertOrg($this->testTenantId, $userId, 'approved');
         $this->insertOrg($this->testTenantId, $userId, 'active');
+        $this->insertOrg($this->testTenantId, $userId, 'approved');
+        $this->insertOrg($this->testTenantId, $userId, 'active');
+        $this->insertOrg($this->testTenantId, $userId, 'approved');
         $this->insertOrg($this->testTenantId, $userId, 'pending');   // excluded
         $this->insertOrg($this->testTenantId, $userId, 'rejected');  // excluded
 
@@ -120,7 +130,7 @@ final class FederationAggregateDataIntegrityTest extends TestCase
         $this->insertOrg(999999, $userId, 'approved');
 
         $payload = $this->service->compute($this->periodFrom, $this->periodTo);
-        $this->assertSame($baseline + 2, (int) $payload['partner_orgs']['count']);
+        $this->assertSame($baseline + 5, (int) $payload['partner_orgs']['count']);
     }
 
     public function test_category_histogram_returns_real_data_capped_at_10(): void
