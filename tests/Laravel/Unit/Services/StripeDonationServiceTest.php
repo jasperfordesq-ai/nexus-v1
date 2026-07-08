@@ -50,12 +50,13 @@ class StripeDonationServiceTest extends TestCase
 
     public function test_createPaymentIntent_throwsWhenUserNotFound(): void
     {
-        DB::shouldReceive('table->where->where->first')->once()->andReturnNull();
-
+        // Real (unmocked) run: currency 'eur' matches tenant 2's configured
+        // currency, so validation passes and the non-existent user lookup
+        // raises 'User not found' before any Stripe call.
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('User not found');
 
-        StripeDonationService::createPaymentIntent(999, $this->testTenantId, [
+        StripeDonationService::createPaymentIntent(2147483647, $this->testTenantId, [
             'amount' => 10.00,
             'currency' => 'eur',
         ]);

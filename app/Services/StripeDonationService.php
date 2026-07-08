@@ -77,12 +77,13 @@ class StripeDonationService
     public static function createPaymentIntent(int $userId, int $tenantId, array $data): array
     {
         $amount = (float) ($data['amount'] ?? 0);
-        $tenantCurrency = strtolower(trim((string) TenantContext::runForTenant($tenantId, fn () => TenantContext::getCurrency())));
-        $currency = strtolower(trim((string) ($data['currency'] ?? $tenantCurrency)));
-
         if ($amount < 0.50) {
             throw new \InvalidArgumentException('Donation amount must be at least 0.50.');
         }
+
+        $tenantCurrency = strtolower(trim((string) TenantContext::runForTenant($tenantId, fn () => TenantContext::getCurrency())));
+        $currency = strtolower(trim((string) ($data['currency'] ?? $tenantCurrency)));
+
         if (strlen($currency) !== 3) {
             throw new \InvalidArgumentException('Currency must be a 3-letter ISO code.');
         }
