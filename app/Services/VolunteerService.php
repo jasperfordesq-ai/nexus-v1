@@ -1669,7 +1669,15 @@ class VolunteerService
 
                 $logId = (int) DB::getPdo()->lastInsertId();
 
-                if ($status === 'approved' && (bool) $org->auto_pay_enabled) {
+                // Approval ALWAYS mints time credits — classic timebanking. Credits
+                // are minted on confirmation of volunteered hours and are never
+                // gated by the org's auto_pay flag or wallet balance, mirroring
+                // verifyHours() and AdminVolunteerController::verifyHours().
+                // Previously this was gated on auto_pay_enabled (schema default 0),
+                // so auto-approved logs were committed 'approved' but never minted —
+                // and verifyHours only reprocesses 'pending' logs, so those credits
+                // were permanently lost.
+                if ($status === 'approved') {
                     self::applyVolunteerAutoPayment(
                         $tenantId,
                         (int) $org->id,

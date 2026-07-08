@@ -317,7 +317,7 @@ class AdminVolunteerController extends BaseApiController
     /** POST /api/v2/admin/volunteering/hours/{id}/verify */
     public function verifyHours(int $id): JsonResponse
     {
-        $this->requireAdmin();
+        $adminId = $this->requireAdmin();
         if (!TenantContext::hasFeature('volunteering')) {
             return $this->respondWithError('FEATURE_DISABLED', __('api.service_unavailable'), null, 403);
         }
@@ -344,6 +344,14 @@ class AdminVolunteerController extends BaseApiController
 
             if ($log->status !== 'pending') {
                 return $this->respondWithError('VALIDATION_ERROR', __('api.only_pending_can_be_verified'), null, 422);
+            }
+
+            // Separation of duties: admins cannot verify their own volunteer hours
+            // (approving would mint themselves time credits). Mirrors the guard in
+            // VolunteerService::verifyHours(), which blocks self-verification for
+            // org owners/admins — the admin path must not be exempt.
+            if ((int) $log->user_id === $adminId) {
+                return $this->respondWithError('FORBIDDEN', __('api.volunteer_verify_own_hours_forbidden'), null, 403);
             }
 
             $newStatus = $action === 'approve' ? 'approved' : 'declined';

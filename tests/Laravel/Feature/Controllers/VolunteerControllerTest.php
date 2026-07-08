@@ -318,6 +318,54 @@ public function test_apply_requires_auth(): void
             ->count());
     }
 
+    public function test_auto_approved_hours_mint_credits_even_when_auto_pay_disabled(): void
+    {
+        // Approval ALWAYS mints — never gated by the org's auto_pay flag. The
+        // schema default is auto_pay_enabled=0, so before this guarantee the
+        // common case (auto-approve tenant + default org config) committed the
+        // log as 'approved' but never paid the volunteer, and verifyHours()
+        // only reprocesses 'pending' logs, so the credits were lost forever.
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+        $volunteer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+        $orgId = $this->createVolunteerOrganisation($owner->id, 0.00, false); // auto-pay OFF (schema default)
+        $this->addVolunteerToOrganisation($volunteer->id, $orgId);
+        $this->setCaringWorkflowApprovalRequired(false);
+
+        // User::factory()->forTenant() drifts TenantContext to tenant 1; re-pin it
+        // so the direct (non-HTTP) service call scopes to the test tenant.
+        TenantContext::setById($this->testTenantId);
+
+        $logId = VolunteerService::logHours($volunteer->id, [
+            'organization_id' => $orgId,
+            'date' => now()->subDay()->toDateString(),
+            'hours' => 2.50,
+            'description' => 'Community garden session.',
+        ]);
+
+        $this->assertNotNull($logId);
+        $this->assertSame('approved', VolunteerService::getLastLogStatus());
+        $this->assertSame('approved', DB::table('vol_logs')->where('id', $logId)->value('status'));
+
+        // floor(2.50) = 2 minted to the volunteer; org wallet 0.00 - 2 = -2.00.
+        $this->assertEquals(2, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
+        $this->assertEquals(-2.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+
+        $orgTransaction = DB::table('vol_org_transactions')->where('vol_log_id', $logId)->first();
+        $this->assertNotNull($orgTransaction);
+        $this->assertSame('volunteer_payment', $orgTransaction->type);
+        $this->assertEquals(-2.00, (float) $orgTransaction->amount);
+        $this->assertEquals(-2.00, (float) $orgTransaction->balance_after);
+
+        $walletTransaction = DB::table('transactions')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('sender_id', $owner->id)
+            ->where('receiver_id', $volunteer->id)
+            ->where('transaction_type', 'volunteer')
+            ->first();
+        $this->assertNotNull($walletTransaction);
+        $this->assertSame(2, (int) $walletTransaction->amount);
+    }
+
     // ------------------------------------------------------------------
     //  GET /v2/volunteering/hours/summary
     // ------------------------------------------------------------------

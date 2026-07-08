@@ -201,6 +201,60 @@ class AdminVolunteerControllerTest extends TestCase
         $this->assertSame(1, DB::table('vol_org_transactions')->where('vol_log_id', $logId)->where('type', 'volunteer_payment')->count());
     }
 
+    public function test_verify_hours_blocks_admin_self_approval(): void
+    {
+        // Separation of duties: an admin must not be able to approve THEIR OWN
+        // volunteer hours and mint themselves time credits. Mirrors the guard in
+        // VolunteerService::verifyHours() for org owners/admins.
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['balance' => 0]);
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+
+        TenantContext::setById($this->testTenantId);
+
+        $orgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'Self Approval Org',
+            'slug' => 'self-approval-org-' . uniqid(),
+            'description' => 'Organisation used for admin self-approval guard coverage.',
+            'contact_email' => 'self-approval@example.test',
+            'status' => 'active',
+            'auto_pay_enabled' => 0,
+            'balance' => 10.00,
+            'created_at' => now(),
+        ]);
+
+        // The pending log belongs to the ADMIN themselves.
+        $logId = DB::table('vol_logs')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $admin->id,
+            'organization_id' => $orgId,
+            'opportunity_id' => null,
+            'date_logged' => now()->subDay()->toDateString(),
+            'hours' => 5.00,
+            'description' => 'Self-logged shift',
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPost("/v2/admin/volunteering/hours/{$logId}/verify", ['action' => 'approve']);
+        $response->assertStatus(403);
+        $response->assertJsonPath('errors.0.code', 'FORBIDDEN');
+
+        // Nothing mutated: log still pending, no credits minted, wallet untouched.
+        $this->assertSame('pending', DB::table('vol_logs')->where('id', $logId)->value('status'));
+        $this->assertEquals(0, (int) DB::table('users')->where('id', $admin->id)->value('balance'));
+        $this->assertEquals(10.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertSame(0, DB::table('vol_org_transactions')->where('vol_log_id', $logId)->count());
+
+        // Declining your own hours is blocked the same way.
+        $decline = $this->apiPost("/v2/admin/volunteering/hours/{$logId}/verify", ['action' => 'decline']);
+        $decline->assertStatus(403);
+        $this->assertSame('pending', DB::table('vol_logs')->where('id', $logId)->value('status'));
+    }
+
     public function test_list_hours_includes_payment_reconciliation(): void
     {
         $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['balance' => 0]);
