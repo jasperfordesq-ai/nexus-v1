@@ -277,31 +277,42 @@ class AdminTimebankingController extends BaseApiController
         $wallets = [];
 
         try {
-            // Single query with LEFT JOINed aggregates — eliminates N+1 per-org queries
+            // Read the LIVE volunteer-org wallet (vol_organizations.balance +
+            // vol_org_transactions ledger + org_type='volunteer' members). The
+            // previous query read the abandoned community-org tables
+            // (org_wallets / org_transactions / org_type='community'), which no
+            // code ever writes to, so this dashboard always showed empty rows.
+            // In vol_org_transactions, deposits/positive admin adjustments are
+            // amount > 0 (money in) and volunteer payments/negative adjustments
+            // are amount < 0 (money out).
             $rowResults = DB::select(
-                "SELECT ow.id, ow.organization_id as org_id, ow.balance,
-                        ow.created_at, vo.name as org_name,
+                "SELECT vo.id, vo.id as org_id, vo.name as org_name,
+                        ROUND(COALESCE(vo.balance, 0), 1) as balance,
+                        vo.created_at,
                         COUNT(DISTINCT om.id) as member_count,
-                        COALESCE(ot_in.total_in, 0) as total_in,
-                        COALESCE(ot_out.total_out, 0) as total_out
-                 FROM org_wallets ow
-                 JOIN vol_organizations vo ON ow.organization_id = vo.id
-                 LEFT JOIN org_members om ON om.organization_id = ow.organization_id AND om.org_type = 'community' AND om.status = 'active'
+                        COALESCE(vt_in.total_in, 0) as total_in,
+                        COALESCE(vt_out.total_out, 0) as total_out
+                 FROM vol_organizations vo
+                 LEFT JOIN org_members om
+                     ON om.organization_id = vo.id
+                    AND om.tenant_id = vo.tenant_id
+                    AND om.org_type = 'volunteer'
+                    AND om.status = 'active'
                  LEFT JOIN (
-                     SELECT organization_id, ROUND(SUM(amount), 1) as total_in
-                     FROM org_transactions
-                     WHERE tenant_id = ? AND receiver_type = 'organization'
-                     GROUP BY organization_id
-                 ) ot_in ON ot_in.organization_id = ow.organization_id
+                     SELECT vol_organization_id, ROUND(SUM(amount), 1) as total_in
+                     FROM vol_org_transactions
+                     WHERE tenant_id = ? AND amount > 0
+                     GROUP BY vol_organization_id
+                 ) vt_in ON vt_in.vol_organization_id = vo.id
                  LEFT JOIN (
-                     SELECT organization_id, ROUND(SUM(amount), 1) as total_out
-                     FROM org_transactions
-                     WHERE tenant_id = ? AND sender_type = 'organization'
-                     GROUP BY organization_id
-                 ) ot_out ON ot_out.organization_id = ow.organization_id
-                 WHERE ow.tenant_id = ?
-                 GROUP BY ow.id, ow.organization_id, ow.balance, ow.created_at, vo.name, ot_in.total_in, ot_out.total_out
-                 ORDER BY ow.balance DESC",
+                     SELECT vol_organization_id, ROUND(SUM(-amount), 1) as total_out
+                     FROM vol_org_transactions
+                     WHERE tenant_id = ? AND amount < 0
+                     GROUP BY vol_organization_id
+                 ) vt_out ON vt_out.vol_organization_id = vo.id
+                 WHERE vo.tenant_id = ?
+                 GROUP BY vo.id, vo.name, vo.balance, vo.created_at, vt_in.total_in, vt_out.total_out
+                 ORDER BY vo.balance DESC",
                 [$tenantId, $tenantId, $tenantId]
             );
 

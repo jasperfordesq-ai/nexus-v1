@@ -272,6 +272,59 @@ class AdminTimebankingControllerTest extends TestCase
         $response->assertJsonStructure(['data']);
     }
 
+    public function test_org_wallets_reports_live_volunteer_org_data(): void
+    {
+        // Regression (audit M3, fix-not-delete): this dashboard previously read
+        // the abandoned community-org tables (org_wallets/org_transactions) and
+        // always returned empty. It now reports the live vol_organizations
+        // wallet balance, the vol_org_transactions ledger, and active
+        // org_type='volunteer' member counts.
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $member = User::factory()->forTenant($this->testTenantId)->create();
+        Sanctum::actingAs($admin);
+
+        $db = \Illuminate\Support\Facades\DB::class;
+        $orgId = (int) $db::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'Live Wallet Org ' . uniqid(),
+            'slug' => 'live-wallet-org-' . uniqid(),
+            'description' => 'Org for wallet dashboard regression coverage.',
+            'status' => 'active',
+            'balance' => 7.50,
+            'created_at' => now(),
+        ]);
+
+        foreach ([[$owner->id, 'owner'], [$member->id, 'member']] as [$uid, $role]) {
+            $db::table('org_members')->insert([
+                'tenant_id' => $this->testTenantId,
+                'organization_id' => $orgId,
+                'org_type' => 'volunteer',
+                'user_id' => $uid,
+                'role' => $role,
+                'status' => 'active',
+                'created_at' => now(),
+            ]);
+        }
+
+        // Ledger: +10 deposit (money in), -2.5 volunteer payment (money out).
+        $db::table('vol_org_transactions')->insert([
+            ['tenant_id' => $this->testTenantId, 'vol_organization_id' => $orgId, 'user_id' => $owner->id, 'type' => 'deposit', 'amount' => 10.0, 'balance_after' => 10.0, 'created_at' => now()],
+            ['tenant_id' => $this->testTenantId, 'vol_organization_id' => $orgId, 'user_id' => $member->id, 'type' => 'volunteer_payment', 'amount' => -2.5, 'balance_after' => 7.5, 'created_at' => now()],
+        ]);
+
+        $response = $this->apiGet('/v2/admin/timebanking/org-wallets');
+        $response->assertStatus(200);
+
+        $row = collect($response->json('data'))->firstWhere('org_id', $orgId);
+        $this->assertNotNull($row, 'The seeded volunteer org must appear in the wallet dashboard');
+        $this->assertEquals(7.5, (float) $row['balance']);
+        $this->assertEquals(10.0, (float) $row['total_in']);
+        $this->assertEquals(2.5, (float) $row['total_out']);
+        $this->assertEquals(2, (int) $row['member_count']);
+    }
+
     // ================================================================
     // USER REPORT — GET /v2/admin/timebanking/user-report
     // ================================================================
