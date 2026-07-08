@@ -11,9 +11,17 @@ use PHPUnit\Framework\TestCase;
 
 class UrlHelperTest extends TestCase
 {
+    private string|false $originalAllowedHosts;
+    private ?string $originalEnvAllowedHosts;
+
     protected function setUp(): void
     {
         parent::setUp();
+        $this->originalAllowedHosts = getenv('ALLOWED_HOSTS');
+        $this->originalEnvAllowedHosts = $_ENV['ALLOWED_HOSTS'] ?? null;
+        putenv('ALLOWED_HOSTS');
+        unset($_ENV['ALLOWED_HOSTS']);
+
         // Reset static allowedHosts cache
         $ref = new \ReflectionClass(UrlHelper::class);
         $prop = $ref->getProperty('allowedHosts');
@@ -27,6 +35,16 @@ class UrlHelperTest extends TestCase
         $prop = $ref->getProperty('allowedHosts');
         $prop->setAccessible(true);
         $prop->setValue(null, null);
+        if ($this->originalAllowedHosts === false) {
+            putenv('ALLOWED_HOSTS');
+        } else {
+            putenv('ALLOWED_HOSTS=' . $this->originalAllowedHosts);
+        }
+        if ($this->originalEnvAllowedHosts === null) {
+            unset($_ENV['ALLOWED_HOSTS']);
+        } else {
+            $_ENV['ALLOWED_HOSTS'] = $this->originalEnvAllowedHosts;
+        }
         parent::tearDown();
     }
 

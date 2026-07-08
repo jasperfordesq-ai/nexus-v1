@@ -1002,11 +1002,11 @@ class AuthController extends BaseApiController
     {
         $input = $this->getAllInput();
         $token = $input['token'] ?? '';
-        $redirect = $input['redirect'] ?? '/admin-legacy';
+        $redirect = $input['redirect'] ?? '/admin';
 
-        // Sanitize redirect — only allow paths starting with /admin-legacy
-        if (strpos($redirect, '/admin-legacy') !== 0) {
-            $redirect = '/admin-legacy';
+        // Sanitize redirect: this bridge may only enter the maintained React admin.
+        if ($redirect !== '/admin' && !str_starts_with($redirect, '/admin/')) {
+            $redirect = '/admin';
         }
 
         if (empty($token)) {
@@ -1076,7 +1076,7 @@ class AuthController extends BaseApiController
         $_SESSION['is_admin'] = in_array($user['role'], $adminRoles) ? 1 : 0;
         $_SESSION['is_logged_in'] = true;
 
-        // Redirect to legacy admin
+        // Redirect to maintained React admin
         return response()->json(null, 302, ['Location' => $redirect]);
     }
 

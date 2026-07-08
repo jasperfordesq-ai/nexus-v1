@@ -65,13 +65,13 @@ describe('navigateToLegacyAdmin', () => {
     expect(tokenInput?.value).toBe('my-jwt-token');
   });
 
-  it('includes redirect to /admin-legacy in form data', () => {
+  it('includes redirect to /admin in form data', () => {
     mockTokenManager.getAccessToken.mockReturnValue('token');
     navigateToLegacyAdmin();
 
     const inputs = createdForm?.querySelectorAll('input');
     const redirectInput = Array.from(inputs ?? []).find((i) => i.name === 'redirect');
-    expect(redirectInput?.value).toBe('/admin-legacy');
+    expect(redirectInput?.value).toBe('/admin');
   });
 
   it('redirects directly when no token exists', () => {

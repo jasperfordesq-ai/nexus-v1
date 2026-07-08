@@ -34,7 +34,10 @@ const { editorMock, initMock } = vi.hoisted(() => {
 
 vi.mock('grapesjs', () => ({ default: { init: initMock } }));
 vi.mock('grapesjs-mjml', () => ({ default: vi.fn() }));
-vi.mock('@/contexts', () => ({ useToast: () => ({ error: vi.fn(), success: vi.fn() }) }));
+vi.mock('@/contexts', () => ({
+  useTheme: () => ({ resolvedTheme: 'light' }),
+  useToast: () => ({ error: vi.fn(), success: vi.fn() }),
+}));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('../api/adminApi', () => ({ adminNewsletters: { uploadImage: vi.fn() } }));
 

@@ -92,14 +92,14 @@ class MaintenanceModeMiddlewareTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function test_check_passes_through_for_admin_legacy_route(): void
+    public function test_check_passes_through_for_maintained_admin_route(): void
     {
         DB::table('tenant_settings')->updateOrInsert(
             ['tenant_id' => $this->testTenantId, 'setting_key' => 'general.maintenance_mode'],
             ['setting_value' => 'true']
         );
 
-        $_SERVER['REQUEST_URI'] = '/admin-legacy/dashboard';
+        $_SERVER['REQUEST_URI'] = '/admin/dashboard';
 
         MaintenanceModeMiddleware::check();
         $this->assertTrue(true);

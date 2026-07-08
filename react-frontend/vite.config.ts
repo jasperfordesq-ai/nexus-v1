@@ -123,7 +123,7 @@ export default defineConfig(({ command, mode }) => {
           // HTML shell — NetworkFirst with a 3s timeout. Online: every nav
           // gets the freshly deployed shell. Slow network or offline: falls
           // back to the most recent cached HTML so the app still loads.
-          // Excludes API, admin-legacy, health, and the emergency recovery
+              // Excludes API, health, and the emergency recovery
           // URLs — they MUST always go to the network so nginx can return
           // the real response (Clear-Site-Data header on /api/sw-reset and
           // /clear-site-data; live data on /api/* etc.).
@@ -132,7 +132,6 @@ export default defineConfig(({ command, mode }) => {
               if (request.mode !== 'navigate') return false;
               const p = url.pathname;
               if (p.startsWith('/api/')) return false;
-              if (p.startsWith('/admin-legacy/')) return false;
               if (p === '/health.php') return false;
               // /api/sw-reset is the emergency recovery URL — must always
               // hit the network so nginx can return Clear-Site-Data + the
@@ -285,11 +284,6 @@ export default defineConfig(({ command, mode }) => {
           'X-Forwarded-Proto': 'http',
         },
       },
-      // Proxy legacy admin panel to PHP backend
-      '/admin-legacy': {
-        target: apiUrl,
-        changeOrigin: true,
-      },
       // Proxy uploaded assets (images, media) to PHP backend
       '/uploads': {
         target: apiUrl,
@@ -322,7 +316,6 @@ export default defineConfig(({ command, mode }) => {
         timeout: 120000,
         proxyTimeout: 120000,
       },
-      '/admin-legacy': { target: apiUrl, changeOrigin: true },
       '/uploads': { target: apiUrl, changeOrigin: true },
       '/storage': { target: apiUrl, changeOrigin: true },
       '/health.php': { target: apiUrl, changeOrigin: true },
@@ -353,6 +346,12 @@ export default defineConfig(({ command, mode }) => {
           }
           if (/\/node_modules\/recharts\//.test(normalizedId)) {
             return 'vendor-charts';
+          }
+          if (/\/node_modules\/(grapesjs|grapesjs-mjml|grapesjs-blocks-basic|grapesjs-custom-code|grapesjs-plugin-forms|grapesjs-preset-webpage|grapesjs-tabs|grapesjs-tooltip)\//.test(normalizedId)) {
+            return 'vendor-grapesjs';
+          }
+          if (/\/node_modules\/(@codemirror|@uiw\/react-codemirror|codemirror|style-mod|w3c-keyname|crelt)\//.test(normalizedId)) {
+            return 'vendor-codemirror';
           }
         },
       },

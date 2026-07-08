@@ -14,7 +14,7 @@
 
 import 'grapesjs/dist/css/grapes.min.css';
 import '@/styles/newsletter-builder.css';
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, lazy, Suspense, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import grapesjs, { type Editor } from 'grapesjs';
 import presetWebpage from 'grapesjs-preset-webpage';
 import blocksBasic from 'grapesjs-blocks-basic';
@@ -34,9 +34,12 @@ import { BuilderToolbar, type BuilderDevice } from './BuilderToolbar';
 import { BuilderBlockPalette } from './BuilderBlockPalette';
 import { BuilderInspector, type InspectorTab } from './BuilderInspector';
 import { BuilderPreviewModal } from './BuilderPreviewModal';
-import { AssetLibraryModal } from './AssetLibraryModal';
 import { resolveUploadedUrl, isEphemeralSrc, type GjsComp } from './builderImage';
 import { stripUnsafePageBuilderHtml } from '@/lib/pageBuilderHtml';
+
+const AssetLibraryModal = lazy(() =>
+  import('./AssetLibraryModal').then((module) => ({ default: module.AssetLibraryModal })),
+);
 
 interface PageDesignBuilderProps {
   html: string;
@@ -547,18 +550,22 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
         tabIndex={-1}
       />
 
-      <AssetLibraryModal
-        isOpen={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={applyServerImage}
-        labels={{
-          title: t('page_builder.library_title'),
-          upload: t('page_builder.library_upload'),
-          empty: t('page_builder.library_empty'),
-          loadFailed: t('page_builder.library_failed'),
-          uploadFailed: t('page_builder.image_upload_failed'),
-        }}
-      />
+      {libraryOpen && (
+        <Suspense fallback={null}>
+          <AssetLibraryModal
+            isOpen={libraryOpen}
+            onClose={() => setLibraryOpen(false)}
+            onSelect={applyServerImage}
+            labels={{
+              title: t('page_builder.library_title'),
+              upload: t('page_builder.library_upload'),
+              empty: t('page_builder.library_empty'),
+              loadFailed: t('page_builder.library_failed'),
+              uploadFailed: t('page_builder.image_upload_failed'),
+            }}
+          />
+        </Suspense>
+      )}
       <BuilderPreviewModal
         isOpen={previewOpen}
         onClose={() => setPreviewOpen(false)}

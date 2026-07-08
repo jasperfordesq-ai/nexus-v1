@@ -40,6 +40,14 @@ class AccessibleCookieSupportTest extends TestCase
         return $u;
     }
 
+    private function alphaPost(string $uri, array $data = []): \Illuminate\Testing\TestResponse
+    {
+        $token = 'accessible-cookie-support-test-token';
+
+        return $this->withSession(['_token' => $token])
+            ->post($uri, array_merge(['_token' => $token], $data));
+    }
+
     // ── Cookie banner + consent ───────────────────────────────────────────────
 
     public function test_cookie_banner_shows_when_no_choice_made(): void
@@ -61,7 +69,7 @@ class AccessibleCookieSupportTest extends TestCase
 
     public function test_accept_records_analytics_consent_and_sets_cookie(): void
     {
-        $response = $this->post("/{$this->testTenantSlug}/alpha/cookie-consent", [
+        $response = $this->alphaPost("/{$this->testTenantSlug}/alpha/cookie-consent", [
             'cookies' => 'accept',
             'return' => "/{$this->testTenantSlug}/alpha/contact",
         ]);
@@ -74,7 +82,7 @@ class AccessibleCookieSupportTest extends TestCase
 
     public function test_reject_records_no_analytics_consent(): void
     {
-        $response = $this->post("/{$this->testTenantSlug}/alpha/cookie-consent", [
+        $response = $this->alphaPost("/{$this->testTenantSlug}/alpha/cookie-consent", [
             'cookies' => 'reject',
             'return' => "/{$this->testTenantSlug}/alpha/contact",
         ]);
@@ -90,7 +98,7 @@ class AccessibleCookieSupportTest extends TestCase
             ->assertOk()
             ->assertSee(__('govuk_alpha.cookie_settings.analytics_legend'));
 
-        $this->post("/{$this->testTenantSlug}/alpha/cookie-consent", ['cookies' => 'save', 'analytics' => 'yes'])
+        $this->alphaPost("/{$this->testTenantSlug}/alpha/cookie-consent", ['cookies' => 'save', 'analytics' => 'yes'])
             ->assertRedirect()
             ->assertCookie('nexus_alpha_cookie_consent', 'all');
 
@@ -121,7 +129,7 @@ class AccessibleCookieSupportTest extends TestCase
         $user = $this->authedUser();
         $pageUrl = "/{$this->testTenantSlug}/alpha/dashboard";
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/report-a-problem", [
+        $response = $this->alphaPost("/{$this->testTenantSlug}/alpha/report-a-problem", [
             'summary' => 'The Accept button does nothing',
             'description' => 'I clicked Accept on the cookie banner and nothing happened.',
             'impact' => 'minor',
@@ -141,7 +149,7 @@ class AccessibleCookieSupportTest extends TestCase
     public function test_report_problem_post_validates_and_does_not_create(): void
     {
         $this->authedUser();
-        $response = $this->post("/{$this->testTenantSlug}/alpha/report-a-problem", [
+        $response = $this->alphaPost("/{$this->testTenantSlug}/alpha/report-a-problem", [
             'summary' => 'x',          // too short
             'description' => 'short',  // too short
             'impact' => 'nonsense',    // invalid
@@ -155,7 +163,7 @@ class AccessibleCookieSupportTest extends TestCase
 
     public function test_report_problem_post_requires_login(): void
     {
-        $this->post("/{$this->testTenantSlug}/alpha/report-a-problem", [
+        $this->alphaPost("/{$this->testTenantSlug}/alpha/report-a-problem", [
             'summary' => 'A valid summary here',
             'description' => 'A valid description that is long enough.',
             'impact' => 'minor',

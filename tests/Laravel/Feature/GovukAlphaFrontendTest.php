@@ -59,6 +59,20 @@ class GovukAlphaFrontendTest extends TestCase
         \Illuminate\Support\Facades\Cache::flush();
     }
 
+    public function post($uri, array $data = [], array $headers = []): \Illuminate\Testing\TestResponse
+    {
+        if (is_string($uri) && str_contains($uri, '/alpha')) {
+            $token = (string) ($data['_token'] ?? 'govuk-alpha-frontend-test-token');
+            $data['_token'] = $token;
+
+            $this->withSession(['_token' => $token]);
+
+            return parent::post($uri, $data, $headers);
+        }
+
+        return parent::post($uri, $data, $headers);
+    }
+
     public function test_root_renders_accessible_tenant_chooser(): void
     {
         \App\Core\TenantContext::reset();

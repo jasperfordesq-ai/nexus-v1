@@ -24,7 +24,6 @@ class MaintenanceModeMiddleware
     private const EXEMPT_ROUTES = [
         '/api/v2/admin/',
         '/admin/',
-        '/admin-legacy/',
         '/super-admin/',
         '/api/auth/',
         '/api/v2/tenant/bootstrap',

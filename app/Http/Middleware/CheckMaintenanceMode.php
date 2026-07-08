@@ -23,7 +23,6 @@ class CheckMaintenanceMode
     private const EXEMPT_PREFIXES = [
         '/api/v2/admin/',
         '/admin/',
-        '/admin-legacy/',
         '/super-admin/',
         '/api/auth/',
         '/api/v2/tenant/bootstrap',

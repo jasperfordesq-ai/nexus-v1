@@ -40,7 +40,7 @@
 
 import 'grapesjs/dist/css/grapes.min.css';
 import '@/styles/newsletter-builder.css';
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import grapesjs, { type Editor } from 'grapesjs';
 import mjmlPlugin from 'grapesjs-mjml';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +57,6 @@ import { BuilderBlockPalette } from './BuilderBlockPalette';
 import { BuilderInspector, type InspectorTab } from './BuilderInspector';
 import { TemplateGalleryModal, type GalleryTemplate } from './TemplateGalleryModal';
 import { BuilderPreviewModal } from './BuilderPreviewModal';
-import { AssetLibraryModal } from './AssetLibraryModal';
 import {
   resolveUploadedUrl,
   insertImageComponent,
@@ -67,6 +66,10 @@ import {
   type EditorLike,
 } from './builderImage';
 import { attachBackgroundTraits } from './builderTraits';
+
+const AssetLibraryModal = lazy(() =>
+  import('./AssetLibraryModal').then((module) => ({ default: module.AssetLibraryModal })),
+);
 
 interface NewsletterBuilderProps {
   /** Current compiled HTML (unused for restore — design_json drives restore). */
@@ -680,18 +683,22 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
         t={t}
       />
 
-      <AssetLibraryModal
-        isOpen={libraryOpen}
-        onClose={() => setLibraryOpen(false)}
-        onSelect={handleLibrarySelect}
-        labels={{
-          title: t('newsletter_builder.library_title'),
-          upload: t('newsletter_builder.library_upload'),
-          empty: t('newsletter_builder.library_empty'),
-          loadFailed: t('newsletter_builder.library_failed'),
-          uploadFailed: t('newsletter_content_editor.image_upload_failed'),
-        }}
-      />
+      {libraryOpen && (
+        <Suspense fallback={null}>
+          <AssetLibraryModal
+            isOpen={libraryOpen}
+            onClose={() => setLibraryOpen(false)}
+            onSelect={handleLibrarySelect}
+            labels={{
+              title: t('newsletter_builder.library_title'),
+              upload: t('newsletter_builder.library_upload'),
+              empty: t('newsletter_builder.library_empty'),
+              loadFailed: t('newsletter_builder.library_failed'),
+              uploadFailed: t('newsletter_content_editor.image_upload_failed'),
+            }}
+          />
+        </Suspense>
+      )}
 
       <Modal isOpen={codeOpen} onOpenChange={setCodeOpen} size="3xl" scrollBehavior="inside">
         <ModalContent>

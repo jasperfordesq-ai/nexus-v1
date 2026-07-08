@@ -153,14 +153,14 @@ class CheckMaintenanceModeTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function test_handle_allows_admin_legacy_routes_during_maintenance(): void
+    public function test_handle_blocks_retired_admin_legacy_routes_during_maintenance(): void
     {
         $this->enableMaintenanceMode();
 
         $request = Request::create('/admin-legacy/dashboard', 'GET');
         $response = $this->middleware->handle($request, $this->makeNext());
 
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals(503, $response->getStatusCode());
     }
 
     public function test_handle_allows_super_admin_routes_during_maintenance(): void

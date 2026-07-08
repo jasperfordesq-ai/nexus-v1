@@ -50,9 +50,11 @@ const TESTS_DIR = join(PROJECT_ROOT, 'tests');
 // 2026-06-24: lowered 288 -> 286 to lock in the current tracked-tree count
 // (later coverage batches stripped two dead guards). Tightening the ratchet
 // converts that headroom into protection so the slack can't silently refill.
+// 2026-07-08: lowered 286 -> 285 after the platform audit confirmed the
+// tracked-tree count had dropped again.
 // Right direction is still DOWN: lower this as dead guards are stripped or the
 // schema dump is refreshed. Do not raise it further without a matching reason.
-const BASELINE = 286;
+const BASELINE = 285;
 const BUDGET = Number.parseInt(process.env.TEST_SKIP_BUDGET ?? '', 10) || BASELINE;
 
 const REPORT_ONLY = process.argv.includes('--report');

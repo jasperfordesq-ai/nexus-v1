@@ -6,8 +6,8 @@
 import { tokenManager, API_BASE } from '@/lib/api';
 
 /**
- * Navigate to the legacy PHP admin panel by creating a hidden form POST.
- * This bridges the JWT token from the React SPA into a PHP session cookie.
+ * Navigate to the maintained React admin panel by creating a hidden form POST.
+ * This bridges the JWT token into a PHP session cookie for compatibility paths.
  */
 export function navigateToLegacyAdmin(): void {
   const token = tokenManager.getAccessToken();
@@ -28,12 +28,12 @@ export function navigateToLegacyAdmin(): void {
 
     const redirectInput = document.createElement('input');
     redirectInput.name = 'redirect';
-    redirectInput.value = '/admin-legacy';
+    redirectInput.value = '/admin';
     form.appendChild(redirectInput);
 
     document.body.appendChild(form);
     form.submit();
   } else {
-    window.location.href = `${phpOrigin}/admin-legacy`;
+    window.location.href = `${phpOrigin}/admin`;
   }
 }
