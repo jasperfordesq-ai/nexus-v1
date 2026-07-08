@@ -15,5 +15,6 @@
   "notification_invitation_title": "Cuireadh nua cluib",
   "notification_invitation_received": "Thug ball de {{source}} cuireadh duit dul isteach i {{target}}.",
   "notification_accepted_title": "Cuireadh glactha",
-  "notification_invitation_accepted": "Ghlac {{name}} le do chuireadh dul isteach i {{target}}."
+  "notification_invitation_accepted": "Ghlac {{name}} le do chuireadh dul isteach i {{target}}.",
+  "inviter_not_member": "Ní ball gníomhach den chlub seo thú."
 }

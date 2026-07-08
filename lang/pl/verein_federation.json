@@ -15,5 +15,6 @@
   "notification_invitation_title": "Nowe zaproszenie do klubu",
   "notification_invitation_received": "Członek {{source}} zaprosił(-a) Cię do dołączenia do {{target}}.",
   "notification_accepted_title": "Zaproszenie zaakceptowane",
-  "notification_invitation_accepted": "{{name}} zaakceptował(-a) Twoje zaproszenie do dołączenia do {{target}}."
+  "notification_invitation_accepted": "{{name}} zaakceptował(-a) Twoje zaproszenie do dołączenia do {{target}}.",
+  "inviter_not_member": "Nie jesteś aktywnym członkiem tego klubu."
 }

@@ -15,5 +15,6 @@
   "notification_invitation_title": "Novo convite de clube",
   "notification_invitation_received": "Um membro de {{source}} convidou-o(a) a aderir a {{target}}.",
   "notification_accepted_title": "Convite aceite",
-  "notification_invitation_accepted": "{{name}} aceitou o seu convite para aderir a {{target}}."
+  "notification_invitation_accepted": "{{name}} aceitou o seu convite para aderir a {{target}}.",
+  "inviter_not_member": "Você não é um membro ativo deste clube."
 }

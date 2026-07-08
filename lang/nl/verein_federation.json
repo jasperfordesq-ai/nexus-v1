@@ -15,5 +15,6 @@
   "notification_invitation_title": "Nieuwe clubuitnodiging",
   "notification_invitation_received": "Een lid van {{source}} heeft u uitgenodigd om lid te worden van {{target}}.",
   "notification_accepted_title": "Uitnodiging geaccepteerd",
-  "notification_invitation_accepted": "{{name}} heeft uw uitnodiging om lid te worden van {{target}} geaccepteerd."
+  "notification_invitation_accepted": "{{name}} heeft uw uitnodiging om lid te worden van {{target}} geaccepteerd.",
+  "inviter_not_member": "Je bent geen actief lid van deze club."
 }

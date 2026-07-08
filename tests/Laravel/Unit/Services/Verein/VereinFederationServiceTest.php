@@ -405,6 +405,8 @@ class VereinFederationServiceTest extends TestCase
         $inviterId = $this->insertUser();
         $inviteeId = $this->insertUser(); // NOT joined to sourceId
 
+        $this->joinOrg($inviterId, $sourceId); // inviter IS a member; invitee is not
+
         $this->expectException(InvalidArgumentException::class);
 
         $this->svc->sendCrossInvitation($sourceId, $targetId, $inviterId, $inviteeId, null);
@@ -422,6 +424,7 @@ class VereinFederationServiceTest extends TestCase
         $inviterId = $this->insertUser();
         $inviteeId = $this->insertUser();
 
+        $this->joinOrg($inviterId, $sourceId);
         $this->joinOrg($inviteeId, $sourceId);
 
         $invitation = $this->svc->sendCrossInvitation($sourceId, $targetId, $inviterId, $inviteeId, 'Please join!');
@@ -430,6 +433,27 @@ class VereinFederationServiceTest extends TestCase
         $this->assertSame($sourceId, $invitation['source_organization_id']);
         $this->assertSame($targetId, $invitation['target_organization_id']);
         $this->assertSame($inviteeId, $invitation['invitee_user_id']);
+    }
+
+    public function test_sendCrossInvitation_throws_when_inviter_not_member_of_source(): void
+    {
+        // Regression (audit M4): the inviter MUST belong to the source Verein.
+        // Without this, any authenticated user could send invitations "from" a
+        // club they have no relationship with.
+        $muni     = 'MU-INVITER-' . mt_rand(1000, 9999);
+        $sourceId = $this->insertVerein('Inviter Source');
+        $targetId = $this->insertVerein('Inviter Target');
+
+        $this->svc->setConsent($sourceId, 'members', $muni);
+        $this->svc->setConsent($targetId, 'members', $muni);
+
+        $inviterId = $this->insertUser(); // NOT joined to sourceId
+        $inviteeId = $this->insertUser();
+        $this->joinOrg($inviteeId, $sourceId); // invitee IS a member
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $this->svc->sendCrossInvitation($sourceId, $targetId, $inviterId, $inviteeId, null);
     }
 
     // ── respondToInvitation ────────────────────────────────────────────────────
@@ -446,6 +470,7 @@ class VereinFederationServiceTest extends TestCase
         $inviterId = $this->insertUser();
         $inviteeId = $this->insertUser();
 
+        $this->joinOrg($inviterId, $sourceId);
         $this->joinOrg($inviteeId, $sourceId);
 
         $invitation = $this->svc->sendCrossInvitation($sourceId, $targetId, $inviterId, $inviteeId, null);
@@ -467,6 +492,7 @@ class VereinFederationServiceTest extends TestCase
         $inviterId = $this->insertUser();
         $inviteeId = $this->insertUser();
 
+        $this->joinOrg($inviterId, $sourceId);
         $this->joinOrg($inviteeId, $sourceId);
 
         $invitation = $this->svc->sendCrossInvitation($sourceId, $targetId, $inviterId, $inviteeId, null);
@@ -488,6 +514,7 @@ class VereinFederationServiceTest extends TestCase
         $inviterId = $this->insertUser();
         $inviteeId = $this->insertUser();
 
+        $this->joinOrg($inviterId, $sourceId);
         $this->joinOrg($inviteeId, $sourceId);
 
         $invitation = $this->svc->sendCrossInvitation($sourceId, $targetId, $inviterId, $inviteeId, null);
@@ -509,6 +536,7 @@ class VereinFederationServiceTest extends TestCase
         $inviterId = $this->insertUser();
         $inviteeId = $this->insertUser();
 
+        $this->joinOrg($inviterId, $sourceId);
         $this->joinOrg($inviteeId, $sourceId);
 
         $invitation = $this->svc->sendCrossInvitation($sourceId, $targetId, $inviterId, $inviteeId, null);
@@ -533,6 +561,7 @@ class VereinFederationServiceTest extends TestCase
         $inviterId = $this->insertUser();
         $inviteeId = $this->insertUser();
 
+        $this->joinOrg($inviterId, $sourceId);
         $this->joinOrg($inviteeId, $sourceId);
 
         $this->svc->sendCrossInvitation($sourceId, $targetId, $inviterId, $inviteeId, null);

@@ -399,6 +399,22 @@ class VereinFederationService
             throw new RuntimeException(__('verein_federation.different_municipality'));
         }
 
+        // The INVITER must belong to the source Verein. Without this check any
+        // authenticated user could send invitations "from" a Verein they have
+        // no relationship with — fanning out notifications/emails to its members
+        // and using the invitee-membership check below as a disclosure oracle.
+        // Checked BEFORE the invitee lookup so a non-member cannot probe it.
+        $inviterIsMember = DB::table('org_members')
+            ->where('tenant_id', $tenantId)
+            ->where('organization_id', $sourceOrgId)
+            ->where('org_type', 'volunteer')
+            ->where('user_id', $inviterUserId)
+            ->where('status', 'active')
+            ->exists();
+        if (!$inviterIsMember) {
+            throw new InvalidArgumentException(__('verein_federation.inviter_not_member'));
+        }
+
         // Invitee must be a member of the source Verein
         $isMember = DB::table('org_members')
             ->where('tenant_id', $tenantId)

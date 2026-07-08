@@ -15,5 +15,6 @@
   "notification_invitation_title": "Nouvelle invitation de club",
   "notification_invitation_received": "Un membre de {{source}} vous a invité à rejoindre {{target}}.",
   "notification_accepted_title": "Invitation acceptée",
-  "notification_invitation_accepted": "{{name}} a accepté votre invitation à rejoindre {{target}}."
+  "notification_invitation_accepted": "{{name}} a accepté votre invitation à rejoindre {{target}}.",
+  "inviter_not_member": "Vous n’êtes pas un membre actif de ce club."
 }

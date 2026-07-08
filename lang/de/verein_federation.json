@@ -15,5 +15,6 @@
   "notification_invitation_title": "Neue Vereinseinladung",
   "notification_invitation_received": "Ein Mitglied von {{source}} hat Sie eingeladen, {{target}} beizutreten.",
   "notification_accepted_title": "Einladung angenommen",
-  "notification_invitation_accepted": "{{name}} hat Ihre Einladung angenommen, {{target}} beizutreten."
+  "notification_invitation_accepted": "{{name}} hat Ihre Einladung angenommen, {{target}} beizutreten.",
+  "inviter_not_member": "Sie sind kein aktives Mitglied dieses Vereins."
 }
