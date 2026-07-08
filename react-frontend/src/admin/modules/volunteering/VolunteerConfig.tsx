@@ -1,8 +1,9 @@
-import { Button, Chip, Input, Textarea, Card, CardBody, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tab, Tabs, Checkbox, RadioGroup, Radio } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+
+import { Button, Chip, Input, Textarea, Card, CardBody, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tab, Tabs, Checkbox, RadioGroup, Radio } from '@/components/ui';
 
 /**
  * Volunteer Configuration
@@ -73,10 +74,8 @@ const emptyFieldForm = {
 
 interface ReminderSetting {
   key: string;
-  label: string;
   enabled: boolean;
   timing_value: number;
-  timing_unit: string;
   email_enabled: boolean;
   push_enabled: boolean;
   sms_enabled: boolean;
@@ -683,11 +682,11 @@ function CustomFieldsTab() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const defaultReminders: ReminderSetting[] = [
-  { key: 'pre_shift', label: 'Pre-shift Reminder', enabled: true, timing_value: 24, timing_unit: 'hours before', email_enabled: true, push_enabled: true, sms_enabled: false },
-  { key: 'post_shift_feedback', label: 'Post-shift Feedback', enabled: true, timing_value: 2, timing_unit: 'hours after', email_enabled: true, push_enabled: true, sms_enabled: false },
-  { key: 'lapsed_volunteer', label: 'Lapsed Volunteer', enabled: true, timing_value: 30, timing_unit: 'days inactive', email_enabled: true, push_enabled: false, sms_enabled: false },
-  { key: 'credential_expiry', label: 'Credential Expiry', enabled: true, timing_value: 14, timing_unit: 'days before', email_enabled: true, push_enabled: true, sms_enabled: false },
-  { key: 'training_expiry', label: 'Training Expiry', enabled: true, timing_value: 14, timing_unit: 'days before', email_enabled: true, push_enabled: true, sms_enabled: false },
+  { key: 'pre_shift', enabled: true, timing_value: 24, email_enabled: true, push_enabled: true, sms_enabled: false },
+  { key: 'post_shift_feedback', enabled: true, timing_value: 2, email_enabled: true, push_enabled: true, sms_enabled: false },
+  { key: 'lapsed_volunteer', enabled: true, timing_value: 30, email_enabled: true, push_enabled: false, sms_enabled: false },
+  { key: 'credential_expiry', enabled: true, timing_value: 14, email_enabled: true, push_enabled: true, sms_enabled: false },
+  { key: 'training_expiry', enabled: true, timing_value: 14, email_enabled: true, push_enabled: true, sms_enabled: false },
 ];
 
 function fromReminderResponse(row: ReminderSettingResponse): ReminderSetting {
@@ -695,10 +694,8 @@ function fromReminderResponse(row: ReminderSettingResponse): ReminderSetting {
   const timingValue = row.hours_before ?? row.hours_after ?? row.days_inactive ?? row.days_before_expiry ?? template?.timing_value ?? 0;
   return {
     key: row.reminder_type,
-    label: template?.label ?? row.reminder_type,
     enabled: row.enabled,
     timing_value: timingValue,
-    timing_unit: template?.timing_unit ?? '',
     email_enabled: row.email_enabled,
     push_enabled: row.push_enabled,
     sms_enabled: row.sms_enabled,

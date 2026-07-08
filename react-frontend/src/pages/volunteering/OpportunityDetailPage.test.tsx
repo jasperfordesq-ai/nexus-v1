@@ -90,6 +90,13 @@ vi.mock('@/lib/helpers', () => ({
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: (url: string | null) => url ?? '',
 }));
+// PageMeta, Breadcrumbs, and SocialInteractionPanel pull contexts straight from
+// their direct module paths (bypassing the '@/contexts' barrel mock), so stub
+// them out — otherwise every full-content render throws "useTenant must be used
+// within a TenantProvider".
+vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
+vi.mock('@/components/navigation', () => ({ Breadcrumbs: () => null }));
+vi.mock('@/components/social/SocialInteractionPanel', () => ({ SocialInteractionPanel: () => null }));
 
 import OpportunityDetailPage from './OpportunityDetailPage';
 

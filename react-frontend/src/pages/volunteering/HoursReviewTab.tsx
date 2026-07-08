@@ -10,6 +10,7 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import Building2 from 'lucide-react/icons/building-2';
 import ChevronDown from 'lucide-react/icons/chevron-down';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
@@ -81,6 +82,7 @@ export function HoursReviewTab() {
   const { t } = useTranslation('volunteering');
   const [entries, setEntries] = useState<HourLogEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const cursorRef = useRef<string | null>(null);
@@ -105,6 +107,7 @@ export function HoursReviewTab() {
         setIsLoadingMore(true);
       } else {
         setIsLoading(true);
+        setError(null);
       }
 
       const params = new URLSearchParams();
@@ -125,12 +128,22 @@ export function HoursReviewTab() {
         }
         cursorRef.current = nextCursor;
         setHasMore(has_more);
+      } else {
+        // A non-thrown success:false must not fall through and render the
+        // "All hours reviewed" empty state — surface a retryable error instead.
+        if (append) {
+          toastRef.current.error(tRef.current('hours_load_failed'));
+        } else {
+          setError(tRef.current('hours_load_failed'));
+        }
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load pending hours', err);
-      if (!append) {
+      if (append) {
         toastRef.current.error(tRef.current('hours_load_failed'));
+      } else {
+        setError(tRef.current('hours_load_failed'));
       }
     } finally {
       if (!controller.signal.aborted) {
@@ -193,6 +206,18 @@ export function HoursReviewTab() {
       <div role="status" aria-busy="true" aria-label={t('loading')} className="flex items-center justify-center py-16">
         <Spinner size="lg" color="accent" />
       </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <GlassCard className="p-8 text-center" role="alert">
+        <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
+        <p className="text-theme-muted mb-4">{error}</p>
+        <Button className="bg-gradient-to-r from-rose-500 to-pink-600 text-white" onPress={() => loadEntries()}>
+          {t('try_again')}
+        </Button>
+      </GlassCard>
     );
   }
 

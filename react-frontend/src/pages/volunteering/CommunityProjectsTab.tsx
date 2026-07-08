@@ -314,6 +314,13 @@ export function CommunityProjectsTab() {
                     startContent={<Heart className={`w-4 h-4 ${project.has_supported ? 'fill-current' : ''}`} aria-hidden="true" />}
                     isLoading={togglingId === project.id}
                     onPress={() => toggleSupport(project)}
+                    aria-pressed={project.has_supported}
+                    aria-label={t(
+                      project.has_supported
+                        ? 'community_projects.unsupport_aria'
+                        : 'community_projects.support_aria',
+                      { count: project.supporter_count }
+                    )}
                   >
                     {project.supporter_count}
                   </Button>

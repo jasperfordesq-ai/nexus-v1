@@ -34,6 +34,16 @@ vi.mock('@/admin/api/adminApi', () => ({
   adminVolunteering: mockAdminVolunteering,
 }));
 
+// The wellbeing panel talks to the shared api client directly (adminApi has no
+// wellbeing helper), so mock @/lib/api's get/put.
+const mockApi = vi.hoisted(() => ({ get: vi.fn(), put: vi.fn() }));
+
+vi.mock('@/lib/api', () => ({
+  api: mockApi,
+  default: mockApi,
+  API_BASE: 'http://localhost/api',
+}));
+
 // Recharts causes issues in jsdom — stub it
 vi.mock('recharts', () => ({
   AreaChart: ({ children }: { children: React.ReactNode }) => <div data-testid="area-chart">{children}</div>,
@@ -99,6 +109,12 @@ const MOCK_ACTIVITY_RESPONSE = {
     ],
   },
 };
+
+// Default wellbeing endpoint responses for every test (individual tests override).
+beforeEach(() => {
+  mockApi.get.mockResolvedValue({ success: true, data: [] });
+  mockApi.put.mockResolvedValue({ success: true });
+});
 
 describe('VolunteeringOverview — loading state', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -332,5 +348,73 @@ describe('VolunteeringOverview — refresh', () => {
       fireEvent.click(alertBtn);
       expect(mockNavigate).toHaveBeenCalledWith('/admin/volunteering/approvals');
     }
+  });
+});
+
+describe('VolunteeringOverview — wellbeing alerts', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  const WELLBEING_ALERT = {
+    id: 55,
+    user_id: 3,
+    user_name: 'Carer Bob',
+    risk_type: 'burnout_risk',
+    status: 'active',
+    created_at: '2026-06-10T00:00:00Z',
+  };
+
+  it('queries the wellbeing alerts endpoint with the active status on mount', async () => {
+    mockAdminVolunteering.getOverview.mockResolvedValue(MOCK_OVERVIEW_RESPONSE);
+    mockAdminVolunteering.getTrends.mockResolvedValue(MOCK_TRENDS_RESPONSE);
+    mockAdminVolunteering.getActivityFeed.mockResolvedValue(MOCK_ACTIVITY_RESPONSE);
+    mockApi.get.mockResolvedValue({ success: true, data: [] });
+
+    render(<VolunteeringOverview />);
+
+    await waitFor(() => {
+      expect(mockApi.get).toHaveBeenCalledWith(expect.stringContaining('status=active'));
+    });
+  });
+
+  it('renders an active alert and fires the PUT when acknowledged', async () => {
+    mockAdminVolunteering.getOverview.mockResolvedValue(MOCK_OVERVIEW_RESPONSE);
+    mockAdminVolunteering.getTrends.mockResolvedValue(MOCK_TRENDS_RESPONSE);
+    mockAdminVolunteering.getActivityFeed.mockResolvedValue(MOCK_ACTIVITY_RESPONSE);
+    mockApi.get.mockResolvedValue({ success: true, data: [WELLBEING_ALERT] });
+    mockApi.put.mockResolvedValue({ success: true });
+
+    render(<VolunteeringOverview />);
+
+    // Defensive rendering of the alert's name and risk type fields
+    await waitFor(() => {
+      expect(screen.getByText('Carer Bob')).toBeInTheDocument();
+    });
+    expect(screen.getByText('burnout_risk')).toBeInTheDocument();
+
+    const ackBtn = screen.getAllByRole('button').find(
+      (b) => b.textContent?.toLowerCase().includes('acknowledge'),
+    );
+    expect(ackBtn).toBeDefined();
+    fireEvent.click(ackBtn!);
+
+    await waitFor(() => {
+      expect(mockApi.put).toHaveBeenCalledWith(
+        expect.stringContaining('/wellbeing/alerts/55'),
+        { status: 'acknowledged' },
+      );
+    });
+  });
+
+  it('renders defensively when the alert list envelope is nested under data.items', async () => {
+    mockAdminVolunteering.getOverview.mockResolvedValue(MOCK_OVERVIEW_RESPONSE);
+    mockAdminVolunteering.getTrends.mockResolvedValue(MOCK_TRENDS_RESPONSE);
+    mockAdminVolunteering.getActivityFeed.mockResolvedValue(MOCK_ACTIVITY_RESPONSE);
+    mockApi.get.mockResolvedValue({ success: true, data: { items: [WELLBEING_ALERT] } });
+
+    render(<VolunteeringOverview />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Carer Bob')).toBeInTheDocument();
+    });
   });
 });

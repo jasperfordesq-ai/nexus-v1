@@ -16,7 +16,6 @@ import { motion } from '@/lib/motion';
 import Building2 from 'lucide-react/icons/building-2';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import MapPin from 'lucide-react/icons/map-pin';
 import Globe from 'lucide-react/icons/globe';
 import Heart from 'lucide-react/icons/heart';
 import Clock from 'lucide-react/icons/clock';
@@ -48,7 +47,6 @@ interface Organisation {
   logo_url: string | null;
   website: string | null;
   contact_email: string | null;
-  location: string | null;
   opportunity_count: number;
   total_hours: number;
   volunteer_count: number;
@@ -81,13 +79,22 @@ export function OrganisationsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
-  const [cursor, setCursor] = useState<string | undefined>();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [manageableOrgs, setManageableOrgs] = useState<{ id: number }[]>([]);
 
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Cursor for "load more" pagination held in a ref, so loadOrganisations does
+  // not have to be recreated (and re-fire) every time the cursor advances.
+  const cursorRef = useRef<string | undefined>(undefined);
+  // AbortController ref to cancel stale requests. A superseded search — or an
+  // out-of-order "load more" — must never overwrite or append to newer results.
+  const abortRef = useRef<AbortController | null>(null);
+  // Stable ref for t — avoids re-creating loadOrganisations when the i18n
+  // namespace finishes loading mid-flight.
+  const tRef = useRef(t);
+  tRef.current = t;
 
   // Does the signed-in user own/admin any (live) organisation? If so we surface a
   // clear "Manage my organisation" entry here, not just on the volunteering page.
@@ -125,6 +132,12 @@ export function OrganisationsPage() {
   }, [searchQuery]);
 
   const loadOrganisations = useCallback(async (append = false) => {
+    // Cancel any in-flight request. A new search (or a reset) must invalidate a
+    // pending "load more" so its page can never append to a newer query.
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       if (!append) {
         setIsLoading(true);
@@ -135,13 +148,18 @@ export function OrganisationsPage() {
 
       const params = new URLSearchParams();
       params.set('per_page', String(ITEMS_PER_PAGE));
-      if (append && cursor) params.set('cursor', cursor);
+      if (append && cursorRef.current) params.set('cursor', cursorRef.current);
       if (debouncedQuery.trim()) params.set('search', debouncedQuery.trim());
 
       // api.get() already unwraps { data: [...], meta: {...} } → response.data = Organisation[]
       const response = await api.get<Organisation[]>(
         `/v2/volunteering/organisations?${params}`
       );
+
+      // Stale-response guard: a newer request (search change / reset) aborted
+      // this controller while it was in flight — drop the result entirely so a
+      // superseded page never overwrites or appends to fresher results.
+      if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
         const items = extractCollectionItems<Organisation>(response.data);
@@ -151,25 +169,34 @@ export function OrganisationsPage() {
         } else {
           setOrganisations(items);
         }
+        cursorRef.current = response.meta?.cursor ?? undefined;
         setHasMore(response.meta?.has_more ?? false);
-        setCursor(response.meta?.cursor ?? undefined);
       } else {
-        if (!append) setError(t('organisations.error_load'));
+        if (!append) setError(tRef.current('organisations.error_load'));
       }
     } catch (err) {
+      if (controller.signal.aborted) return;
       logError('Failed to load organisations', err);
-      if (!append) setError(t('organisations.error_load_retry'));
+      if (!append) setError(tRef.current('organisations.error_load_retry'));
     } finally {
-      setIsLoading(false);
-      setIsLoadingMore(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
     }
-  }, [cursor, debouncedQuery, t]);
+  }, [debouncedQuery]);
 
-  // Reset on search change
+  // (Re)load whenever the debounced query changes. loadOrganisations is
+  // recreated on every debouncedQuery change, so depending on it here runs the
+  // reset load exactly once per query. Reset the cursor first so the fresh query
+  // starts from page one, and abort any in-flight request on cleanup / unmount.
   useEffect(() => {
-    setCursor(undefined);
+    cursorRef.current = undefined;
     loadOrganisations();
-  }, [debouncedQuery]); // eslint-disable-line react-hooks/exhaustive-deps -- reset on search change; loadOrganisations excluded to avoid loop
+    return () => {
+      abortRef.current?.abort();
+    };
+  }, [loadOrganisations]);
 
   return (
     <div className="space-y-6">
@@ -186,7 +213,7 @@ export function OrganisationsPage() {
         description={t('organisations.subtitle')}
         accent="indigo"
         icon={<Building2 className="h-7 w-7" aria-hidden="true" />}
-        stats={organisations.length > 0 && !isLoading ? [{ label: t('organisations.hero_partners_label'), value: organisations.length.toLocaleString() }] : undefined}
+        stats={organisations.length > 0 && !isLoading ? [{ label: t('organisations.hero_showing_label'), value: organisations.length.toLocaleString() }] : undefined}
         action={
           isAuthenticated ? (
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
@@ -326,12 +353,6 @@ function OrganisationCard({ organisation }: OrganisationCardProps) {
           />
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-theme-primary truncate">{organisation.name}</h3>
-            {organisation.location && (
-              <p className="text-xs text-theme-subtle flex items-center gap-1 mt-0.5">
-                <MapPin className="w-3 h-3" aria-hidden="true" />
-                {organisation.location}
-              </p>
-            )}
           </div>
         </div>
 

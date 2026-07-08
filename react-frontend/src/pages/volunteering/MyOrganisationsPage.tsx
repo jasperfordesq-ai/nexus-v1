@@ -37,8 +37,6 @@ interface MyOrg {
   member_role: string;
   contact_email: string | null;
   website: string | null;
-  balance?: number;
-  auto_pay_enabled?: boolean;
   logo_url?: string | null;
 }
 
@@ -101,6 +99,7 @@ export default function MyOrganisationsPage() {
 
   const managedOrgs = orgs.filter(o => ['owner', 'admin'].includes(o.member_role));
   const pendingOrgs = orgs.filter(o => o.status === 'pending');
+  const declinedOrgs = orgs.filter(o => o.status === 'declined');
 
   return (
     <>
@@ -149,7 +148,7 @@ export default function MyOrganisationsPage() {
             {t('try_again')}
           </Button>
         </GlassCard>
-      ) : managedOrgs.length === 0 && pendingOrgs.length === 0 ? (
+      ) : managedOrgs.length === 0 && pendingOrgs.length === 0 && declinedOrgs.length === 0 ? (
         <GlassCard className="p-12 text-center">
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-rose-100 to-pink-100 dark:from-rose-900/30 dark:to-pink-900/30 flex items-center justify-center mx-auto mb-4">
             <Building2 className="w-8 h-8 text-rose-500" aria-hidden="true" />
@@ -190,6 +189,26 @@ export default function MyOrganisationsPage() {
             </GlassCard>
           )}
 
+          {/* Declined orgs — previously rendered blank because they matched
+              neither the pending section nor the active-status filter. */}
+          {declinedOrgs.length > 0 && (
+            <GlassCard className="p-4 border-red-500/30">
+              <p className="text-sm text-red-700 dark:text-red-400 font-medium mb-2">
+                {t('my_organisations_declined')}
+              </p>
+              {declinedOrgs.map((org) => (
+                <div key={org.id} className="flex items-center gap-3 p-3 rounded-xl bg-theme-elevated">
+                  <Building2 className="w-5 h-5 text-red-400 flex-shrink-0" aria-hidden="true" />
+                  <div className="flex-1">
+                    <p className="font-medium text-theme-primary">{org.name}</p>
+                    <p className="text-xs text-theme-muted">{t('my_organisations_declined_desc')}</p>
+                  </div>
+                  <Chip size="sm" color="danger" variant="soft">{t('status_declined')}</Chip>
+                </div>
+              ))}
+            </GlassCard>
+          )}
+
           {/* Active orgs */}
           {managedOrgs.filter(o => o.status === 'approved' || o.status === 'active').map((org, idx) => (
             <motion.div
@@ -218,14 +237,9 @@ export default function MyOrganisationsPage() {
                       )}
                     </div>
 
-                    {/* Stats + CTA */}
+                    {/* CTA — the my-organisations API never returns a balance,
+                        so the old balance stat rendered nothing. Removed. */}
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 sm:flex-shrink-0">
-                      {org.balance !== undefined && (
-                        <div className="text-center">
-                          <p className="text-lg font-bold text-emerald-500">{t('hours_abbrev', { hours: org.balance })}</p>
-                          <p className="text-xs text-theme-subtle">{t('wallet')}</p>
-                        </div>
-                      )}
                       <Button
                         className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                         endContent={<ArrowRight className="w-4 h-4" />}

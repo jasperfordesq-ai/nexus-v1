@@ -122,11 +122,21 @@ const statusColor = (status: string) => {
   }
 };
 
-const memberStatusIcon = (status: string) => {
+const memberStatusLabelKey = (status: string) => {
   switch (status) {
-    case 'confirmed': return <CheckCircle className="w-3 h-3 text-emerald-500" />;
-    case 'declined': return <XCircle className="w-3 h-3 text-[var(--color-error)]" />;
-    default: return <Hourglass className="w-3 h-3 text-[var(--color-warning)]" />;
+    case 'confirmed': return 'group_signup.member_status.confirmed';
+    case 'declined': return 'group_signup.member_status.declined';
+    default: return 'group_signup.member_status.pending';
+  }
+};
+
+// Status is otherwise conveyed by icon colour only — pass a translated label so
+// screen readers announce the state, not just the member's name.
+const memberStatusIcon = (status: string, label: string) => {
+  switch (status) {
+    case 'confirmed': return <CheckCircle className="w-3 h-3 text-emerald-500" role="img" aria-label={label} />;
+    case 'declined': return <XCircle className="w-3 h-3 text-[var(--color-error)]" role="img" aria-label={label} />;
+    default: return <Hourglass className="w-3 h-3 text-[var(--color-warning)]" role="img" aria-label={label} />;
   }
 };
 
@@ -392,12 +402,20 @@ export function GroupSignUpTab() {
       return;
     }
 
+    // Client-side guard (server stays authoritative): reserved slots must be a
+    // whole number of at least 1 — blocks fractional/zero/NaN values.
+    const slots = parseInt(reserveSlots, 10);
+    if (!Number.isInteger(slots) || slots < 1) {
+      setReservationError(tRef.current('group_signup.reserve_invalid_slots'));
+      return;
+    }
+
     try {
       setIsReserving(true);
       setReservationError(null);
       const response = await api.post(`/v2/volunteering/shifts/${reserveShiftId}/group-reserve`, {
         group_id: parseInt(reserveGroupId, 10),
-        reserved_slots: parseInt(reserveSlots, 10),
+        reserved_slots: slots,
         notes: reserveNotes.trim() || undefined,
       });
 
@@ -570,7 +588,7 @@ export function GroupSignUpTab() {
                             key={member.id}
                             className="flex items-center gap-1 text-xs text-theme-subtle"
                           >
-                            {memberStatusIcon(member.status)}
+                            {memberStatusIcon(member.status, t(memberStatusLabelKey(member.status)))}
                             <span>{member.name}</span>
                           </div>
                         ))}

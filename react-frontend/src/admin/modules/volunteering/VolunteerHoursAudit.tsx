@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Button, Chip, Input, Card, CardBody, CardHeader, Select, SelectItem, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
@@ -21,10 +26,6 @@ import { DataTable, type Column } from '../../components/DataTable';
 import { EmptyState } from '../../components/EmptyState';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * Volunteer Hours Audit
@@ -94,6 +95,35 @@ const STATUS_COLORS: Record<string, 'success' | 'danger' | 'warning' | 'default'
   pending: 'warning',
 };
 
+// Safety cap so a runaway cursor can't loop forever during a full export.
+const MAX_EXPORT_PAGES = 200;
+
+/**
+ * Parse one page of the hours endpoint into { items, meta }. Mirrors the
+ * unwrapping in loadData so the CSV export can page through every result set,
+ * not just the pages currently rendered on screen.
+ */
+function extractHoursPage(res: { data?: unknown; meta?: unknown }): {
+  items: HourLog[];
+  meta: { next_cursor?: string; has_more?: boolean } | null;
+} {
+  const payload = res.data as unknown;
+  let items: HourLog[] = [];
+  let meta: { next_cursor?: string; has_more?: boolean } | null = null;
+  if (payload && typeof payload === 'object') {
+    const p = payload as Record<string, unknown>;
+    const inner = ('data' in p && typeof p.data === 'object' && p.data !== null && 'stats' in (p.data as Record<string, unknown>))
+      ? (p.data as Record<string, unknown>)
+      : p;
+    if (Array.isArray(inner.items)) items = inner.items as HourLog[];
+    else if (Array.isArray(inner.data)) items = inner.data as HourLog[];
+    else if (Array.isArray(inner)) items = inner as unknown as HourLog[];
+    if (inner.meta && typeof inner.meta === 'object') meta = inner.meta as { next_cursor?: string; has_more?: boolean };
+  }
+  meta = meta || (res.meta as { next_cursor?: string; has_more?: boolean } | undefined) || null;
+  return { items, meta };
+}
+
 export function VolunteerHoursAudit() {
   const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.hours_audit_title'));
@@ -111,6 +141,7 @@ export function VolunteerHoursAudit() {
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [actionInProgress, setActionInProgress] = useState<number | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   // Decline requires confirmation; approve is direct
   const [declineTarget, setDeclineTarget] = useState<HourLog | null>(null);
@@ -253,18 +284,72 @@ export function VolunteerHoursAudit() {
     return filteredItems.filter((item) => item.paid === 1 || item.paid === true);
   }, [filteredItems]);
 
-  const handleExportCsv = useCallback(() => {
-    const exportData = filteredItems.map((item) => ({
-      volunteer: `${item.first_name} ${item.last_name}`,
-      organization: item.org_name || '',
-      hours: item.hours,
-      status: item.status,
-      date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
-      paid: (item.paid === 1 || item.paid === true) ? t('volunteering.yes') : t('volunteering.no'),
-      paid_amount: item.paid_amount || 0,
-    }));
-    exportToCsv(exportData, `volunteer-hours-${new Date().toISOString().split('T')[0]}.csv`);
-  }, [filteredItems, t]);
+  const handleExportCsv = useCallback(async () => {
+    setExporting(true);
+    try {
+      // Export every matching row, not just the pages already on screen: page
+      // through the cursor until the server reports no more data (with a cap).
+      const allItems: HourLog[] = [];
+      let exportCursor: string | undefined;
+      let pageCount = 0;
+      let truncated = false;
+
+      for (;;) {
+        const params: { status?: string; cursor?: string } = {};
+        if (statusFilter !== 'all') params.status = statusFilter;
+        if (exportCursor) params.cursor = exportCursor;
+
+        const res = await adminVolunteering.listHours(params);
+        if (!res.success) {
+          if (pageCount === 0) throw new Error('hours_export_failed');
+          break;
+        }
+
+        const { items: pageItems, meta } = extractHoursPage(res);
+        allItems.push(...pageItems);
+        pageCount += 1;
+
+        if (!meta?.has_more || !meta?.next_cursor) break;
+        if (pageCount >= MAX_EXPORT_PAGES) { truncated = true; break; }
+        exportCursor = meta.next_cursor;
+      }
+
+      // Apply the same on-screen date-range filter to the full result set.
+      const rows = allItems.filter((item) => {
+        if (!item.created_at) return true;
+        const itemDate = new Date(item.created_at);
+        if (dateFrom) {
+          const from = new Date(dateFrom);
+          from.setHours(0, 0, 0, 0);
+          if (itemDate < from) return false;
+        }
+        if (dateTo) {
+          const to = new Date(dateTo);
+          to.setHours(23, 59, 59, 999);
+          if (itemDate > to) return false;
+        }
+        return true;
+      });
+
+      const exportData = rows.map((item) => ({
+        volunteer: `${item.first_name} ${item.last_name}`,
+        organization: item.org_name || '',
+        hours: item.hours,
+        status: item.status,
+        date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
+        paid: (item.paid === 1 || item.paid === true) ? t('volunteering.yes') : t('volunteering.no'),
+        paid_amount: item.paid_amount || 0,
+      }));
+      exportToCsv(exportData, `volunteer-hours-${new Date().toISOString().split('T')[0]}.csv`);
+
+      if (truncated) {
+        toast.warning(t('volunteering.export_truncated', { count: MAX_EXPORT_PAGES }));
+      }
+    } catch {
+      toast.error(t('volunteering.export_failed'));
+    }
+    setExporting(false);
+  }, [statusFilter, dateFrom, dateTo, t, toast]);
 
   const columns: Column<HourLog>[] = useMemo(() => [
     {
@@ -412,7 +497,8 @@ export function VolunteerHoursAudit() {
           variant="tertiary"
           startContent={<Download size={14} />}
           onPress={handleExportCsv}
-          isDisabled={filteredItems.length === 0}
+          isLoading={exporting}
+          isDisabled={filteredItems.length === 0 && !hasMore}
         >
           {t('volunteering.export_csv')}
         </Button>
@@ -422,8 +508,13 @@ export function VolunteerHoursAudit() {
           </Button>
         )}
       </div>
+      {hasMore && (
+        <p className="text-xs text-muted">
+          {t('volunteering.export_partial_note')}
+        </p>
+      )}
     </div>
-  ), [statusFilter, hasMore, cursor, loading, t, loadData, dateFrom, dateTo, handleExportCsv, filteredItems.length]);
+  ), [statusFilter, hasMore, cursor, loading, exporting, t, loadData, dateFrom, dateTo, handleExportCsv, filteredItems.length]);
 
   return (
     <div className="space-y-6">

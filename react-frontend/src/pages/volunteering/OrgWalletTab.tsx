@@ -200,6 +200,12 @@ export function OrgWalletTab({ orgId, balance, onBalanceChange }: OrgWalletTabPr
       toastRef.current.error(tRef.current('org_wallet.invalid_amount'));
       return;
     }
+    if (!Number.isInteger(amount)) {
+      // The backend accepts whole credits only (VolOrgWalletService rejects
+      // fractional deposits) — give clear field-level guidance up front.
+      toastRef.current.error(tRef.current('org_wallet.deposit_whole_credits_only'));
+      return;
+    }
     if (amount > 1000) {
       // Mirror the backend per-deposit cap (VolOrgWalletService::depositFromUser
       // rejects amounts > 1000) so the user gets clear field-level guidance
@@ -450,14 +456,15 @@ export function OrgWalletTab({ orgId, balance, onBalanceChange }: OrgWalletTabPr
                 <Input
                   label={t('org_wallet.form.amount')}
                   type="number"
-                  min="0.25"
+                  min="1"
                   max="1000"
-                  step="0.25"
+                  step="1"
                   value={depositAmount}
                   onValueChange={setDepositAmount}
                   variant="secondary"
                   classNames={{ inputWrapper: 'bg-theme-elevated' }}
                   startContent={<Wallet className="w-4 h-4 text-theme-subtle" />}
+                  description={t('org_wallet.form.amount_whole_credits_hint')}
                   isRequired
                 />
                 <Textarea

@@ -319,6 +319,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
   const [nameSearch, setNameSearch] = useState('');
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [isBulkRunning, setIsBulkRunning] = useState(false);
+  const [isLoadingAll, setIsLoadingAll] = useState(false);
   const declineModal = useDisclosure();
   const [pendingDeclineIds, setPendingDeclineIds] = useState<number[]>([]);
   const [declineNote, setDeclineNote] = useState('');
@@ -370,6 +371,54 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
 
   const loadApplicationsRef = useRef(loadApplications);
   loadApplicationsRef.current = loadApplications;
+
+  // Name search filters only the loaded pages. When more exist server-side, this
+  // pulls every remaining page (bounded) so a search can't falsely report "no
+  // matching volunteers" when the match is simply on an unloaded page.
+  const loadAllPages = useCallback(async () => {
+    if (isLoadingAll) return;
+    setIsLoadingAll(true);
+    abortApplicationsRef.current?.abort();
+    const controller = new AbortController();
+    abortApplicationsRef.current = controller;
+    try {
+      let nextCursor = cursor;
+      let more = hasMore;
+      let pages = 0;
+      const MAX_PAGES = 50;
+      while (more && pages < MAX_PAGES) {
+        const params = new URLSearchParams({ per_page: '20' });
+        if (statusFilter !== 'all') params.set('status', statusFilter);
+        if (nextCursor) params.set('cursor', nextCursor);
+        const response = await api.get<{ items: OppApplicationItem[]; cursor: string | null; has_more: boolean }>(
+          `/v2/volunteering/opportunities/${opportunityId}/applications?${params}`,
+        );
+        if (controller.signal.aborted) return;
+        if (!response.success || !response.data) {
+          toastRef.current.error(tRef.current('applications.load_failed'));
+          break;
+        }
+        const { items, cursor: newCursor, has_more } = response.data;
+        nextCursor = newCursor;
+        more = has_more;
+        setApplications((prev) => [...prev, ...items]);
+        pages++;
+      }
+      if (!controller.signal.aborted) {
+        setCursor(nextCursor);
+        setHasMore(more);
+        if (more && pages >= MAX_PAGES) {
+          toastRef.current.error(tRef.current('applications.load_all_capped'));
+        }
+      }
+    } catch (err) {
+      if (controller.signal.aborted) return;
+      logError('Failed to load all applications', err);
+      toastRef.current.error(tRef.current('applications.load_failed'));
+    } finally {
+      if (!controller.signal.aborted) setIsLoadingAll(false);
+    }
+  }, [cursor, hasMore, statusFilter, opportunityId, isLoadingAll]);
 
   useEffect(() => {
     setApplications([]);
@@ -447,11 +496,13 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
   }
 
   async function confirmDecline() {
+    if (isBulkRunning) return; // guard double-submit (applies to single decline too)
     if (declineNoteRequired && !declineNote.trim()) return;
     const ids = pendingDeclineIds;
     if (ids.length === 0) return;
 
-    setIsBulkRunning(ids.length > 1);
+    const isBulk = ids.length > 1;
+    setIsBulkRunning(true);
     try {
       for (const id of ids) {
         await handleAction(id, 'decline', declineNote.trim());
@@ -460,7 +511,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
       declineModal.onClose();
       setPendingDeclineIds([]);
       setDeclineNote('');
-      if (ids.length > 1) loadApplications(statusFilter);
+      if (isBulk) loadApplications(statusFilter);
     } finally {
       setIsBulkRunning(false);
     }
@@ -531,6 +582,23 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
           aria-label={t('applications.aria_search_volunteers')}
           classNames={{ base: 'w-full sm:max-w-xs', inputWrapper: 'bg-theme-elevated' }}
         />
+
+        {/* Search only covers loaded applications — offer to pull the rest. */}
+        {nameSearch.trim() && hasMore && (
+          <div className="flex flex-col gap-2 rounded-lg bg-amber-500/10 border border-amber-500/30 p-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-amber-700 dark:text-amber-400">
+              {t('applications.search_partial_hint')}
+            </p>
+            <Button
+              size="sm"
+              variant="tertiary"
+              isLoading={isLoadingAll}
+              onPress={loadAllPages}
+            >
+              {t('applications.load_all')}
+            </Button>
+          </div>
+        )}
 
         {selected.size > 0 && (
           <div className="flex flex-col gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 sm:flex-row sm:items-center">
@@ -709,7 +777,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
             variant="danger-soft"
             onPress={confirmDecline}
             isLoading={isBulkRunning}
-            isDisabled={declineNoteRequired && !declineNote.trim()}
+            isDisabled={isBulkRunning || (declineNoteRequired && !declineNote.trim())}
           >
             {t('applications.decline_confirm')}
           </Button>

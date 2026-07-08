@@ -200,6 +200,51 @@ describe('OrganisationDetailPage', () => {
     });
   });
 
+  it('renders a review author WITH an id as a profile link', async () => {
+    setupSuccessfulMocks();
+    render(<OrganisationDetailPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Bob Reviewer')).toBeInTheDocument();
+    });
+    // author.id = 10 ⇒ name is a profile link.
+    expect(screen.getByText('Bob Reviewer').closest('a')).not.toBeNull();
+  });
+
+  it('renders a review author WITHOUT an id as plain text (contract a: no owner/profile link)', async () => {
+    vi.mocked(api.get).mockImplementation((url: string) => {
+      if (url.includes('/reviews/organization/')) {
+        return Promise.resolve({
+          success: true,
+          data: {
+            reviews: [
+              {
+                id: 2,
+                rating: 4,
+                comment: 'Anonymous but appreciative.',
+                // Public payload omits the author id — must NOT render a link.
+                author: { name: 'Anon Volunteer', avatar: null },
+                created_at: '2026-03-01T10:00:00Z',
+              },
+            ],
+          },
+        });
+      }
+      if (url.includes('/opportunities')) {
+        return Promise.resolve({ success: true, data: mockOpportunities });
+      }
+      if (url.includes('/organisations/')) {
+        return Promise.resolve({ success: true, data: mockOrganisation });
+      }
+      return Promise.resolve({ success: true, data: null });
+    });
+    render(<OrganisationDetailPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Anon Volunteer')).toBeInTheDocument();
+    });
+    // No id ⇒ rendered as plain text, never wrapped in a profile <a>.
+    expect(screen.getByText('Anon Volunteer').closest('a')).toBeNull();
+  });
+
   it('shows error state when API fails', async () => {
     vi.mocked(api.get).mockRejectedValue(new Error('Network error'));
     render(<OrganisationDetailPage />);

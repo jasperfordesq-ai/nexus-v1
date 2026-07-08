@@ -242,7 +242,8 @@
       "receipt_hint": "Attach a PDF, JPG, PNG, or WebP receipt up to 10 MB.",
       "receipt_attach": "Attach receipt",
       "receipt_replace": "Replace",
-      "receipt_remove": "Remove receipt"
+      "receipt_remove": "Remove receipt",
+      "currency_placeholder": "EUR"
     },
     "no_organisation": "費用を負担できる承認されたボランティア団体はまだありません。",
     "cancel": "キャンセル",
@@ -263,7 +264,9 @@
       "approved": "承認された",
       "rejected": "拒否されました",
       "paid": "有料"
-    }
+    },
+    "invalid_amount": "有効な金額を入力してください（小数点以下2桁まで）。",
+    "invalid_currency": "3文字の通貨コードを使用してください（例：EUR）。"
   },
   "community_projects": {
     "heading": "コミュニティプロジェクト",
@@ -301,7 +304,9 @@
       "active": "アクティブ",
       "completed": "完了しました",
       "cancelled": "キャンセル"
-    }
+    },
+    "support_aria": "このプロジェクトを支援（支援者{{count}}人）",
+    "unsupport_aria": "支援を取り消す（支援者{{count}}人）"
   },
   "donations": {
     "heading": "寄付",
@@ -697,7 +702,16 @@
     "decline_note_placeholder": "Share the reason or next steps for the volunteer.",
     "decline_note_required": "A note is required before declining.",
     "decline_confirm": "Decline application",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "search_partial_hint": "検索は読み込み済みの申請のみが対象です。全員を検索するにはすべて読み込んでください。",
+    "load_all": "すべて読み込む",
+    "load_all_capped": "ページ上限に達しました。一部の申請はまだ表示されていない可能性があります。",
+    "bulk_limit": "一度に処理できる申請は最大{{max}}件です。",
+    "select_all_capped": "最初の{{max}}件を選択しました。処理してから追加で選択してください。",
+    "select_limit": "一度に選択できる申請は最大{{max}}件です。",
+    "bulk_success": "{{count}}件の申請を更新しました。",
+    "bulk_failed": "{{count}}件の申請を更新できませんでした。",
+    "bulk_rate_limited": "{{count}}件を更新できませんでした。操作が速すぎます。1分待って再試行してください。"
   },
   "org_wallet_balance": "ウォレット残高:",
   "auto_pay_on": "自動支払いON",
@@ -758,7 +772,13 @@
     "reserve_error": "Unable to create this group reservation.",
     "reserve_load_error": "Unable to load groups and opportunities.",
     "reserve_shifts_error": "Unable to load shifts for this opportunity.",
-    "reserve_required": "Choose a group, shift, and number of slots."
+    "reserve_required": "Choose a group, shift, and number of slots.",
+    "reserve_invalid_slots": "枠数は整数で入力してください（1以上）。",
+    "member_status": {
+      "confirmed": "確認済み",
+      "declined": "却下",
+      "pending": "保留中"
+    }
   },
   "recommendations": {
     "title": "あなたへのおすすめ",
@@ -909,7 +929,8 @@
     "deposit_modal_title": "入金クレジット",
     "form": {
       "amount": "金額（時間）",
-      "note": "注記 (オプション)"
+      "note": "注記 (オプション)",
+      "amount_whole_credits_hint": "整数クレジットのみ"
     },
     "cancel": "キャンセル",
     "deposit_button": "デポジット",
@@ -925,7 +946,8 @@
     },
     "balance_helper": "This is a record of the time credits your organisation has given out and received. You don't need a balance to pay volunteers — approving their hours credits them automatically.",
     "autocredit_title": "Volunteers are paid automatically",
-    "autocredit_description": "When you approve a volunteer's logged hours, the matching time credits (1 credit per hour) are added to their wallet straight away. There's nothing to switch on and no balance to top up first."
+    "autocredit_description": "When you approve a volunteer's logged hours, the matching time credits (1 credit per hour) are added to their wallet straight away. There's nothing to switch on and no balance to top up first.",
+    "deposit_whole_credits_only": "クレジットは整数で入力してください（小数不可）。"
   },
   "my_organisations": "私の組織",
   "my_organisations_title": "私の組織",
@@ -1014,5 +1036,8 @@
   "distance_km": "{{value}} km",
   "date_range_separator": " – ",
   "form_remote_label": "Remote opportunity",
-  "form_remote_description": "Volunteers can take part online or by phone."
+  "form_remote_description": "Volunteers can take part online or by phone.",
+  "my_organisations_declined": "却下",
+  "my_organisations_declined_desc": "この申請は承認されませんでした。詳細はコミュニティ管理者にお問い合わせください。",
+  "hours_invalid_range": "0.25〜24時間で入力してください。"
 }

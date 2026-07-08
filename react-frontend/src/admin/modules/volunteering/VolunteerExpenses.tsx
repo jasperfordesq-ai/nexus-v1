@@ -95,6 +95,49 @@ function toNum(value: unknown): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+// Safety cap so a runaway cursor can't loop forever during a full export.
+const MAX_EXPORT_PAGES = 200;
+
+// Prefix cells that spreadsheet apps would treat as formulas (=, +, -, @) so
+// member-supplied text can't execute when the CSV is opened in Excel.
+function csvCell(value: unknown): string {
+  const str = String(value ?? '');
+  return JSON.stringify(/^[=+\-@\t\r]/.test(str) ? `'${str}` : str);
+}
+
+function buildCsv(data: Array<Record<string, unknown>>, filename: string) {
+  if (data.length === 0) return;
+  const first = data[0];
+  if (!first) return;
+  const headers = Object.keys(first);
+  const csv = [
+    headers.join(','),
+    ...data.map((r) => headers.map((h) => csvCell(r[h])).join(',')),
+  ].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Parse one page of the expenses endpoint into { items, cursor, has_more }.
+ * Mirrors loadData so the CSV export can page through every matching row, not
+ * just the pages currently rendered on screen.
+ */
+function extractExpensesPage(raw: unknown): { items: Expense[]; cursor: string | null; has_more: boolean } {
+  const payload = parsePayload<{ items?: Expense[]; expenses?: Expense[]; cursor?: string | null; has_more?: boolean } | Expense[]>(raw);
+  if (Array.isArray(payload)) return { items: payload, cursor: null, has_more: false };
+  return {
+    items: payload.items || payload.expenses || [],
+    cursor: payload.cursor ?? null,
+    has_more: Boolean(payload.has_more),
+  };
+}
+
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export function VolunteerExpenses() {
@@ -109,6 +152,7 @@ export function VolunteerExpenses() {
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   // Review modal
   const [reviewModal, setReviewModal] = useState(false);
@@ -294,18 +338,66 @@ export function VolunteerExpenses() {
   };
 
   const handleExport = async () => {
+    setExporting(true);
     try {
-      const res = await adminVolunteering.exportExpenses();
-      const blob = res instanceof Blob ? res : new Blob([res as BlobPart], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `volunteer-expenses-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+      // Export every matching row, not just the page currently on screen: page
+      // through the cursor until the server reports no more data (with a cap).
+      const allRows: Expense[] = [];
+      let exportCursor: string | undefined;
+      let pageCount = 0;
+      let truncated = false;
+
+      for (;;) {
+        const res = await adminVolunteering.getExpenses(exportCursor);
+        if (!res.success || !res.data) {
+          if (pageCount === 0) throw new Error('expenses_export_failed');
+          break;
+        }
+        const { items, cursor: nextCursor, has_more } = extractExpensesPage(res.data);
+        allRows.push(...items);
+        pageCount += 1;
+        if (!has_more || !nextCursor) break;
+        if (pageCount >= MAX_EXPORT_PAGES) { truncated = true; break; }
+        exportCursor = nextCursor;
+      }
+
+      // Apply the same on-screen date-range filter to the full result set.
+      const rows = allRows.filter((item) => {
+        if (!item.submitted_at) return true;
+        const itemDate = new Date(item.submitted_at);
+        if (dateFrom) {
+          const from = new Date(dateFrom);
+          from.setHours(0, 0, 0, 0);
+          if (itemDate < from) return false;
+        }
+        if (dateTo) {
+          const to = new Date(dateTo);
+          to.setHours(23, 59, 59, 999);
+          if (itemDate > to) return false;
+        }
+        return true;
+      });
+
+      const exportData = rows.map((item) => ({
+        volunteer: item.volunteer_name || '',
+        organization: item.organization_name || '',
+        amount: toNum(item.amount).toFixed(2),
+        currency: item.currency || '',
+        type: item.type,
+        status: item.status,
+        submitted: item.submitted_at ? new Date(item.submitted_at).toLocaleDateString() : '',
+        has_receipt: item.has_receipt ? t('volunteering.yes') : t('volunteering.no'),
+        payment_reference: item.payment_reference || '',
+      }));
+      buildCsv(exportData, `volunteer-expenses-${new Date().toISOString().split('T')[0]}.csv`);
+
+      if (truncated) {
+        toast.warning(t('volunteering.export_truncated', { count: MAX_EXPORT_PAGES }));
+      }
     } catch {
       toast.error(t('volunteering.export_failed'));
     }
+    setExporting(false);
   };
 
   const openPolicyEdit = (policy: ExpensePolicy) => {
@@ -450,6 +542,7 @@ export function VolunteerExpenses() {
               variant="tertiary"
               startContent={<Download aria-hidden="true" size={16} />}
               onPress={handleExport}
+              isLoading={exporting}
             >
               {t('volunteering.export_csv')}
             </Button>
@@ -525,6 +618,11 @@ export function VolunteerExpenses() {
           >
             {t('volunteering.clear_dates')}
           </Button>
+        )}
+        {hasMore && (
+          <p className="w-full text-xs text-muted">
+            {t('volunteering.export_partial_note')}
+          </p>
         )}
       </div>
 

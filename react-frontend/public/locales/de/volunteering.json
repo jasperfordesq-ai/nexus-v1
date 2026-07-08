@@ -242,7 +242,8 @@
       "receipt_hint": "Attach a PDF, JPG, PNG, or WebP receipt up to 10 MB.",
       "receipt_attach": "Attach receipt",
       "receipt_replace": "Replace",
-      "receipt_remove": "Remove receipt"
+      "receipt_remove": "Remove receipt",
+      "currency_placeholder": "EUR"
     },
     "no_organisation": "Es stehen noch keine zugelassenen Freiwilligenorganisationen für Spesen zur Verfügung.",
     "cancel": "Abbrechen",
@@ -263,7 +264,9 @@
       "approved": "Genehmigt",
       "rejected": "Abgelehnt",
       "paid": "Bezahlt"
-    }
+    },
+    "invalid_amount": "Geben Sie einen gültigen Betrag ein (bis zu 2 Dezimalstellen).",
+    "invalid_currency": "Verwenden Sie einen 3-stelligen Währungscode (z. B. EUR)."
   },
   "community_projects": {
     "heading": "Gemeinschaftsprojekte",
@@ -301,7 +304,9 @@
       "active": "Aktiv",
       "completed": "Abgeschlossen",
       "cancelled": "Abgebrochen"
-    }
+    },
+    "support_aria": "Dieses Projekt unterstützen ({{count}} Unterstützer)",
+    "unsupport_aria": "Unterstützung zurückziehen ({{count}} Unterstützer)"
   },
   "donations": {
     "heading": "Spenden",
@@ -697,7 +702,16 @@
     "decline_note_placeholder": "Share the reason or next steps for the volunteer.",
     "decline_note_required": "A note is required before declining.",
     "decline_confirm": "Decline application",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "search_partial_hint": "Die Suche umfasst nur geladene Bewerbungen. Laden Sie alle, um alle zu durchsuchen.",
+    "load_all": "Alle laden",
+    "load_all_capped": "Seitenlimit erreicht – einige Bewerbungen sind möglicherweise noch ausgeblendet.",
+    "bulk_limit": "Sie können höchstens {{max}} Bewerbungen gleichzeitig bearbeiten.",
+    "select_all_capped": "Die ersten {{max}} ausgewählt. Bearbeiten Sie diese und wählen Sie dann weitere aus.",
+    "select_limit": "Sie können höchstens {{max}} Bewerbungen gleichzeitig auswählen.",
+    "bulk_success": "{{count}} Bewerbungen aktualisiert.",
+    "bulk_failed": "{{count}} Bewerbungen konnten nicht aktualisiert werden.",
+    "bulk_rate_limited": "{{count}} konnten nicht aktualisiert werden – zu schnell. Warten Sie eine Minute und versuchen Sie es erneut."
   },
   "org_wallet_balance": "Wallet-Guthaben:",
   "auto_pay_on": "Automatische Zahlung EIN",
@@ -758,7 +772,13 @@
     "reserve_error": "Unable to create this group reservation.",
     "reserve_load_error": "Unable to load groups and opportunities.",
     "reserve_shifts_error": "Unable to load shifts for this opportunity.",
-    "reserve_required": "Choose a group, shift, and number of slots."
+    "reserve_required": "Choose a group, shift, and number of slots.",
+    "reserve_invalid_slots": "Geben Sie eine ganze Anzahl an Plätzen ein (mindestens 1).",
+    "member_status": {
+      "confirmed": "Bestätigt",
+      "declined": "Abgelehnt",
+      "pending": "Ausstehend"
+    }
   },
   "recommendations": {
     "title": "Für Sie empfohlen",
@@ -909,7 +929,8 @@
     "deposit_modal_title": "Zeitguthaben einzahlen",
     "form": {
       "amount": "Betrag (Stunden)",
-      "note": "Notiz (optional)"
+      "note": "Notiz (optional)",
+      "amount_whole_credits_hint": "Nur ganze Guthaben"
     },
     "cancel": "Abbrechen",
     "deposit_button": "Einzahlen",
@@ -925,7 +946,8 @@
     },
     "balance_helper": "This is a record of the time credits your organisation has given out and received. You don't need a balance to pay volunteers — approving their hours credits them automatically.",
     "autocredit_title": "Volunteers are paid automatically",
-    "autocredit_description": "When you approve a volunteer's logged hours, the matching time credits (1 credit per hour) are added to their wallet straight away. There's nothing to switch on and no balance to top up first."
+    "autocredit_description": "When you approve a volunteer's logged hours, the matching time credits (1 credit per hour) are added to their wallet straight away. There's nothing to switch on and no balance to top up first.",
+    "deposit_whole_credits_only": "Geben Sie eine ganze Anzahl an Guthaben ein (keine Bruchteile)."
   },
   "my_organisations": "Meine Organisationen",
   "my_organisations_title": "Meine Organisationen",
@@ -1014,5 +1036,8 @@
   "distance_km": "{{value}} km",
   "date_range_separator": " – ",
   "form_remote_label": "Remote opportunity",
-  "form_remote_description": "Volunteers can take part online or by phone."
+  "form_remote_description": "Volunteers can take part online or by phone.",
+  "my_organisations_declined": "Abgelehnt",
+  "my_organisations_declined_desc": "Dieser Antrag wurde nicht genehmigt. Wenden Sie sich für Details an Ihre Community-Administration.",
+  "hours_invalid_range": "Geben Sie zwischen 0,25 und 24 Stunden ein."
 }

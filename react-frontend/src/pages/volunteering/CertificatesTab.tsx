@@ -112,6 +112,9 @@ export function CertificatesTab() {
 
   useEffect(() => {
     load();
+    // Abort any in-flight request on unmount so a late response can't set state
+    // on an unmounted component.
+    return () => abortRef.current?.abort();
   }, [load]);
 
   const handleGenerate = async () => {

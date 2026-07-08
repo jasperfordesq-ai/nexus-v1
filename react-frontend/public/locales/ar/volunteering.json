@@ -242,7 +242,8 @@
       "receipt_hint": "Attach a PDF, JPG, PNG, or WebP receipt up to 10 MB.",
       "receipt_attach": "Attach receipt",
       "receipt_replace": "Replace",
-      "receipt_remove": "Remove receipt"
+      "receipt_remove": "Remove receipt",
+      "currency_placeholder": "EUR"
     },
     "no_organisation": "لا توجد منظمات تطوعية معتمدة متاحة لتغطية النفقات حتى الآن.",
     "cancel": "يلغي",
@@ -263,7 +264,9 @@
       "approved": "موافقة",
       "rejected": "مرفوض",
       "paid": "مدفوع"
-    }
+    },
+    "invalid_amount": "أدخل مبلغًا صالحًا (حتى منزلتين عشريتين).",
+    "invalid_currency": "استخدم رمز عملة من 3 أحرف (مثل EUR)."
   },
   "community_projects": {
     "heading": "المشاريع المجتمعية",
@@ -301,7 +304,9 @@
       "active": "نشيط",
       "completed": "مكتمل",
       "cancelled": "تم الإلغاء"
-    }
+    },
+    "support_aria": "ادعم هذا المشروع ({{count}} داعم)",
+    "unsupport_aria": "اسحب دعمك ({{count}} داعم)"
   },
   "donations": {
     "heading": "التبرعات",
@@ -697,7 +702,16 @@
     "decline_note_placeholder": "Share the reason or next steps for the volunteer.",
     "decline_note_required": "A note is required before declining.",
     "decline_confirm": "Decline application",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "search_partial_hint": "يغطي البحث الطلبات المُحمّلة فقط. حمّل الكل للبحث في الجميع.",
+    "load_all": "تحميل الكل",
+    "load_all_capped": "تم الوصول إلى حد الصفحات — قد تظل بعض الطلبات مخفية.",
+    "bulk_limit": "يمكنك معالجة {{max}} طلبات كحد أقصى في المرة الواحدة.",
+    "select_all_capped": "تم تحديد أول {{max}}. عالجها ثم حدّد المزيد.",
+    "select_limit": "يمكنك تحديد {{max}} طلبات كحد أقصى في المرة الواحدة.",
+    "bulk_success": "تم تحديث {{count}} طلبات.",
+    "bulk_failed": "تعذّر تحديث {{count}} طلبات.",
+    "bulk_rate_limited": "تعذّر تحديث {{count}} — أنت سريع جدًا. انتظر دقيقة وأعد المحاولة."
   },
   "org_wallet_balance": "رصيد المحفظة:",
   "auto_pay_on": "تشغيل الدفع التلقائي",
@@ -758,7 +772,13 @@
     "reserve_error": "Unable to create this group reservation.",
     "reserve_load_error": "Unable to load groups and opportunities.",
     "reserve_shifts_error": "Unable to load shifts for this opportunity.",
-    "reserve_required": "Choose a group, shift, and number of slots."
+    "reserve_required": "Choose a group, shift, and number of slots.",
+    "reserve_invalid_slots": "أدخل عددًا صحيحًا من الأماكن (1 على الأقل).",
+    "member_status": {
+      "confirmed": "مؤكد",
+      "declined": "مرفوض",
+      "pending": "قيد الانتظار"
+    }
   },
   "recommendations": {
     "title": "موصى به لك",
@@ -909,7 +929,8 @@
     "deposit_modal_title": "اعتمادات الودائع",
     "form": {
       "amount": "المبلغ (ساعات)",
-      "note": "ملاحظة (اختياري)"
+      "note": "ملاحظة (اختياري)",
+      "amount_whole_credits_hint": "أرصدة كاملة فقط"
     },
     "cancel": "يلغي",
     "deposit_button": "إيداع",
@@ -925,7 +946,8 @@
     },
     "balance_helper": "This is a record of the time credits your organisation has given out and received. You don't need a balance to pay volunteers — approving their hours credits them automatically.",
     "autocredit_title": "Volunteers are paid automatically",
-    "autocredit_description": "When you approve a volunteer's logged hours, the matching time credits (1 credit per hour) are added to their wallet straight away. There's nothing to switch on and no balance to top up first."
+    "autocredit_description": "When you approve a volunteer's logged hours, the matching time credits (1 credit per hour) are added to their wallet straight away. There's nothing to switch on and no balance to top up first.",
+    "deposit_whole_credits_only": "أدخل عددًا صحيحًا من الأرصدة (بدون كسور)."
   },
   "my_organisations": "منظماتي",
   "my_organisations_title": "منظماتي",
@@ -1014,5 +1036,8 @@
   "distance_km": "{{value}} km",
   "date_range_separator": " – ",
   "form_remote_label": "Remote opportunity",
-  "form_remote_description": "Volunteers can take part online or by phone."
+  "form_remote_description": "Volunteers can take part online or by phone.",
+  "my_organisations_declined": "مرفوض",
+  "my_organisations_declined_desc": "لم تتم الموافقة على هذا الطلب. تواصل مع مسؤول مجتمعك للحصول على التفاصيل.",
+  "hours_invalid_range": "أدخل بين 0.25 و24 ساعة."
 }

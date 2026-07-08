@@ -175,20 +175,43 @@ export function ExpensesTab() {
     if (organisations.length !== 1) setFormOrgId('');
   };
 
+  const handleOpenForm = () => {
+    // Default the currency from a previously-submitted expense so returning
+    // claimants don't retype it. Backend applies its own default when omitted.
+    setFormCurrency((cur) => cur || (items.find((e) => e.currency)?.currency?.toUpperCase() ?? ''));
+    onOpen();
+  };
+
   const handleSubmit = async (onClose: () => void) => {
     if (isSubmitting) return;
     if (!formOrgId || !formAmount || !formDescription) {
       toast.error(t('expenses.fill_required'));
       return;
     }
+
+    // Client-side guard (server stays authoritative): amount must be a positive
+    // number with at most 2 decimal places — never send NaN.
+    const amountNum = parseFloat(formAmount);
+    if (!/^\d+(\.\d{1,2})?$/.test(formAmount.trim()) || !Number.isFinite(amountNum) || amountNum <= 0) {
+      toast.error(t('expenses.invalid_amount'));
+      return;
+    }
+
+    // Currency is optional, but when supplied it must be a 3-letter ISO code.
+    const currency = formCurrency.trim().toUpperCase();
+    if (currency && !/^[A-Z]{3}$/.test(currency)) {
+      toast.error(t('expenses.invalid_currency'));
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const payload = new FormData();
       payload.append('organization_id', formOrgId);
       payload.append('expense_type', formType);
-      payload.append('amount', String(parseFloat(formAmount)));
+      payload.append('amount', String(amountNum));
       payload.append('description', formDescription);
-      if (formCurrency.trim()) payload.append('currency', formCurrency.trim());
+      if (currency) payload.append('currency', currency);
       if (formReceipt) payload.append('receipt', formReceipt);
 
       const response = await api.upload('/v2/volunteering/expenses', payload);
@@ -220,7 +243,7 @@ export function ExpensesTab() {
           size="sm"
           className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-          onPress={onOpen}
+          onPress={handleOpenForm}
         >
           {t('expenses.submit')}
         </Button>
@@ -377,9 +400,11 @@ export function ExpensesTab() {
                   <Input
                     label={t('expenses.form.currency')}
                     value={formCurrency}
-                    onValueChange={setFormCurrency}
+                    onValueChange={(v) => setFormCurrency(v.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3))}
                     variant="secondary"
                     className="sm:w-28"
+                    maxLength={3}
+                    placeholder={t('expenses.form.currency_placeholder')}
                   />
                 </div>
                 <Textarea

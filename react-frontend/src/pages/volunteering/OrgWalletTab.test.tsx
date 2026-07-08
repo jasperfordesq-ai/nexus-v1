@@ -50,19 +50,23 @@ vi.mock('@/contexts', () => ({
   useTenant: () => ({ tenant: { id: 2 }, tenantSlug: 'test', tenantPath: (p: string) => '/test' + p, hasFeature: () => true, hasModule: () => true }),
 }));
 
-// Override useDisclosure so the deposit modal renders open (the shared uiMock
-// returns isOpen:false), letting us exercise the deposit-amount validation.
-vi.mock('@/components/ui', async () => {
-  const { uiMock } = await import('@/test/uiMock');
-  return new Proxy(uiMock as Record<string, unknown>, {
-    get(target, prop) {
-      if (prop === 'useDisclosure') {
-        return () => ({ isOpen: true, onOpen: vi.fn(), onClose: vi.fn(), onOpenChange: vi.fn(), onToggle: vi.fn() });
-      }
-      return Reflect.get(target, prop);
-    },
-    has() { return true; },
-  });
+// The component imports useDisclosure from the SUBPATH '@/components/ui/useDisclosure'
+// (not the barrel), so that is the module that must be overridden to render the
+// deposit modal open and exercise the deposit-amount validation.
+vi.mock('@/components/ui/useDisclosure', () => ({
+  useDisclosure: () => ({ isOpen: true, onOpen: vi.fn(), onClose: vi.fn(), onOpenChange: vi.fn(), onToggle: vi.fn() }),
+}));
+// Render Modal children unconditionally so the deposit form is queryable in jsdom.
+vi.mock('@/components/ui/Modal', () => {
+  const Passthrough = ({ children }: { children?: React.ReactNode }) =>
+    <div>{typeof children === 'function' ? (children as (arg: unknown) => React.ReactNode)(vi.fn()) : children}</div>;
+  return {
+    Modal: Passthrough,
+    ModalContent: Passthrough,
+    ModalHeader: Passthrough,
+    ModalBody: Passthrough,
+    ModalFooter: Passthrough,
+  };
 });
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
@@ -98,6 +102,18 @@ describe('OrgWalletTab', () => {
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith('/v2/volunteering/organisations/5/wallet/deposit', { amount: 100, note: null });
     });
+  });
+
+  // Fix 3: deposits are whole credits only server-side — reject fractional
+  // amounts client-side before calling the API.
+  it('rejects a fractional deposit without calling the API', async () => {
+    render(<OrgWalletTab {...baseProps} />);
+    const amount = await screen.findByLabelText('Amount (hours)');
+    fireEvent.change(amount, { target: { value: '10.5' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Deposit' }));
+
+    await waitFor(() => expect(toastMock.error).toHaveBeenCalled());
+    expect(api.post).not.toHaveBeenCalled();
   });
 
   it('explains that volunteers are paid automatically (no auto-pay toggle)', async () => {

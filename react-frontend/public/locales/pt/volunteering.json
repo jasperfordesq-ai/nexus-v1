@@ -242,7 +242,8 @@
       "receipt_hint": "Attach a PDF, JPG, PNG, or WebP receipt up to 10 MB.",
       "receipt_attach": "Attach receipt",
       "receipt_replace": "Replace",
-      "receipt_remove": "Remove receipt"
+      "receipt_remove": "Remove receipt",
+      "currency_placeholder": "EUR"
     },
     "no_organisation": "Nenhuma organização voluntária aprovada está disponível para despesas ainda.",
     "cancel": "Cancelar",
@@ -263,7 +264,9 @@
       "approved": "Aprovado",
       "rejected": "Rejeitado",
       "paid": "Pago"
-    }
+    },
+    "invalid_amount": "Introduza um valor válido (até 2 casas decimais).",
+    "invalid_currency": "Use um código de moeda de 3 letras (p. ex. EUR)."
   },
   "community_projects": {
     "heading": "Projetos Comunitários",
@@ -301,7 +304,9 @@
       "active": "Ativo",
       "completed": "Concluído",
       "cancelled": "Cancelado"
-    }
+    },
+    "support_aria": "Apoiar este projeto ({{count}} apoiantes)",
+    "unsupport_aria": "Retirar o seu apoio ({{count}} apoiantes)"
   },
   "donations": {
     "heading": "Doações",
@@ -697,7 +702,16 @@
     "decline_note_placeholder": "Share the reason or next steps for the volunteer.",
     "decline_note_required": "A note is required before declining.",
     "decline_confirm": "Decline application",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "search_partial_hint": "A pesquisa abrange apenas as candidaturas carregadas. Carregue todas para pesquisar entre todos.",
+    "load_all": "Carregar todas",
+    "load_all_capped": "Limite de páginas atingido — algumas candidaturas podem continuar ocultas.",
+    "bulk_limit": "Pode processar no máximo {{max}} candidaturas de cada vez.",
+    "select_all_capped": "Selecionadas as primeiras {{max}}. Processe-as e depois selecione mais.",
+    "select_limit": "Pode selecionar no máximo {{max}} candidaturas de cada vez.",
+    "bulk_success": "{{count}} candidaturas atualizadas.",
+    "bulk_failed": "Não foi possível atualizar {{count}} candidaturas.",
+    "bulk_rate_limited": "Não foi possível atualizar {{count}} — está a ir demasiado rápido. Aguarde um minuto e tente novamente."
   },
   "org_wallet_balance": "Saldo da carteira:",
   "auto_pay_on": "Pagamento automático ativado",
@@ -758,7 +772,13 @@
     "reserve_error": "Unable to create this group reservation.",
     "reserve_load_error": "Unable to load groups and opportunities.",
     "reserve_shifts_error": "Unable to load shifts for this opportunity.",
-    "reserve_required": "Choose a group, shift, and number of slots."
+    "reserve_required": "Choose a group, shift, and number of slots.",
+    "reserve_invalid_slots": "Introduza um número inteiro de vagas (pelo menos 1).",
+    "member_status": {
+      "confirmed": "Confirmado",
+      "declined": "Recusado",
+      "pending": "Pendente"
+    }
   },
   "recommendations": {
     "title": "Recomendado para si",
@@ -909,7 +929,8 @@
     "deposit_modal_title": "Créditos de Depósito",
     "form": {
       "amount": "Quantidade (horas)",
-      "note": "Nota (opcional)"
+      "note": "Nota (opcional)",
+      "amount_whole_credits_hint": "Apenas créditos inteiros"
     },
     "cancel": "Cancelar",
     "deposit_button": "Depositar",
@@ -925,7 +946,8 @@
     },
     "balance_helper": "This is a record of the time credits your organisation has given out and received. You don't need a balance to pay volunteers — approving their hours credits them automatically.",
     "autocredit_title": "Volunteers are paid automatically",
-    "autocredit_description": "When you approve a volunteer's logged hours, the matching time credits (1 credit per hour) are added to their wallet straight away. There's nothing to switch on and no balance to top up first."
+    "autocredit_description": "When you approve a volunteer's logged hours, the matching time credits (1 credit per hour) are added to their wallet straight away. There's nothing to switch on and no balance to top up first.",
+    "deposit_whole_credits_only": "Introduza um número inteiro de créditos (sem frações)."
   },
   "my_organisations": "Minhas organizações",
   "my_organisations_title": "Minhas organizações",
@@ -1014,5 +1036,8 @@
   "distance_km": "{{value}} km",
   "date_range_separator": " – ",
   "form_remote_label": "Remote opportunity",
-  "form_remote_description": "Volunteers can take part online or by phone."
+  "form_remote_description": "Volunteers can take part online or by phone.",
+  "my_organisations_declined": "Recusada",
+  "my_organisations_declined_desc": "Este pedido não foi aprovado. Contacte a administração da sua comunidade para mais detalhes.",
+  "hours_invalid_range": "Introduza entre 0,25 e 24 horas."
 }

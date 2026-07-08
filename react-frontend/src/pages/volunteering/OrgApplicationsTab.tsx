@@ -72,6 +72,18 @@ function statusColor(status: string): 'warning' | 'success' | 'danger' | 'defaul
 
 function formatDate(d: string) { return formatDateValue(d); }
 
+// Bulk approve/decline runs one PUT per id, and the endpoint is rate-limited to
+// ~30/min. Cap a batch at 25 so a single "select all + approve" never trips the
+// limiter mid-run and leaves the selection half-processed.
+const MAX_BULK = 25;
+
+// A 429 surfaces as code 'HTTP_429' (see lib/api.ts) or a backend throttle code.
+function isRateLimited(code?: string): boolean {
+  if (!code) return false;
+  const c = code.toUpperCase();
+  return c === 'HTTP_429' || c.includes('RATE') || c.includes('THROTTLE') || c.includes('TOO_MANY');
+}
+
 /* ------------------------------------------------------------------ */
 /*  Component                                                         */
 /* ------------------------------------------------------------------ */
@@ -91,6 +103,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
   const [nameSearch, setNameSearch] = useState('');
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [isBulkRunning, setIsBulkRunning] = useState(false);
+  const [isLoadingAll, setIsLoadingAll] = useState(false);
   const declineModal = useDisclosure();
   const [pendingDeclineIds, setPendingDeclineIds] = useState<number[]>([]);
   const [declineNote, setDeclineNote] = useState('');
@@ -154,6 +167,54 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
   const loadRef = useRef(loadApplications);
   loadRef.current = loadApplications;
 
+  // Name search filters only the applications already loaded into memory. When
+  // more pages exist server-side, this pulls every remaining page (bounded) so
+  // the search covers all volunteers, not just the first page.
+  const loadAllPages = useCallback(async () => {
+    if (isLoadingAll) return;
+    setIsLoadingAll(true);
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    try {
+      let nextCursor = cursor;
+      let more = hasMore;
+      let pages = 0;
+      const MAX_PAGES = 50;
+      while (more && pages < MAX_PAGES) {
+        const params = new URLSearchParams({ per_page: '20' });
+        if (statusFilter !== 'all') params.set('status', statusFilter);
+        if (nextCursor) params.set('cursor', nextCursor);
+        const response = await api.get<ApplicationsResponse>(
+          `/v2/volunteering/organisations/${orgId}/applications?${params}`,
+        );
+        if (controller.signal.aborted) return;
+        if (!response.success || !response.data) {
+          toastRef.current.error(tRef.current('applications.load_failed'));
+          break;
+        }
+        const items = Array.isArray(response.data) ? response.data : [];
+        nextCursor = response.meta?.cursor ?? null;
+        more = response.meta?.has_more ?? false;
+        setApplications((prev) => [...prev, ...items]);
+        pages++;
+      }
+      if (!controller.signal.aborted) {
+        setCursor(nextCursor);
+        setHasMore(more);
+        if (more && pages >= MAX_PAGES) {
+          toastRef.current.error(tRef.current('applications.load_all_capped'));
+        }
+      }
+    } catch (err) {
+      if (controller.signal.aborted) return;
+      logError('Failed to load all org applications', err);
+      toastRef.current.error(tRef.current('applications.load_failed'));
+    } finally {
+      if (!controller.signal.aborted) setIsLoadingAll(false);
+    }
+  }, [cursor, hasMore, statusFilter, orgId, isLoadingAll]);
+
   useEffect(() => {
     setApplications([]);
     setCursor(null);
@@ -164,7 +225,15 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
 
   /* ---- Single action ---- */
 
-  async function handleAction(applicationId: number, action: 'approve' | 'decline', orgNote = '') {
+  // Returns the outcome so bulk callers can tally successes / rate-limit hits.
+  // `silent` suppresses per-item toasts during a batch (the batch shows one
+  // consolidated summary instead).
+  async function handleAction(
+    applicationId: number,
+    action: 'approve' | 'decline',
+    orgNote = '',
+    silent = false,
+  ): Promise<{ ok: boolean; rateLimited: boolean }> {
     setActionLoading((prev) => ({ ...prev, [applicationId]: action }));
 
     // Optimistic update
@@ -178,25 +247,29 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
       if (orgNote.trim()) body.org_note = orgNote.trim();
       const response = await api.put(`/v2/volunteering/applications/${applicationId}`, body);
       if (response.success) {
-        toast.success(
-          action === 'approve'
-            ? t('applications.approved')
-            : t('applications.declined'),
-        );
-      } else {
-        // Revert optimistic update
-        setApplications((prev) =>
-          prev.map((a) => (a.id === applicationId ? { ...a, status: 'pending' } : a)),
-        );
-        toast.error(response.error || t('applications.action_failed'));
+        if (!silent) {
+          toast.success(
+            action === 'approve'
+              ? t('applications.approved')
+              : t('applications.declined'),
+          );
+        }
+        return { ok: true, rateLimited: false };
       }
+      // Revert optimistic update
+      setApplications((prev) =>
+        prev.map((a) => (a.id === applicationId ? { ...a, status: 'pending' } : a)),
+      );
+      if (!silent) toast.error(response.error || t('applications.action_failed'));
+      return { ok: false, rateLimited: isRateLimited(response.code) };
     } catch (err) {
       // Revert optimistic update
       setApplications((prev) =>
         prev.map((a) => (a.id === applicationId ? { ...a, status: 'pending' } : a)),
       );
       logError(`Failed to ${action} application`, err);
-      toast.error(t('something_wrong'));
+      if (!silent) toast.error(t('something_wrong'));
+      return { ok: false, rateLimited: false };
     } finally {
       setActionLoading((prev) => ({ ...prev, [applicationId]: undefined }));
     }
@@ -204,15 +277,35 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
 
   /* ---- Bulk action ---- */
 
+  // Consolidated summary after a batch: successes, plus a DISTINCT message when
+  // failures were rate-limit (429) so the owner knows to slow down and retry.
+  function reportBatchOutcome(ok: number, failed: number, rate: number) {
+    if (ok > 0) toastRef.current.success(tRef.current('applications.bulk_success', { count: ok }));
+    if (rate > 0) {
+      toastRef.current.error(tRef.current('applications.bulk_rate_limited', { count: rate }));
+    } else if (failed > 0) {
+      toastRef.current.error(tRef.current('applications.bulk_failed', { count: failed }));
+    }
+  }
+
   async function handleBulkAction(action: 'approve' | 'decline') {
     if (isBulkRunning) return; // prevent a second click re-submitting in-flight ids
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    if (ids.length > MAX_BULK) {
+      toastRef.current.error(tRef.current('applications.bulk_limit', { max: MAX_BULK }));
+      return;
+    }
     setIsBulkRunning(true);
     try {
-      const ids = Array.from(selected);
+      let ok = 0, failed = 0, rate = 0;
       for (const id of ids) {
-        await handleAction(id, action);
+        const r = await handleAction(id, action, '', true);
+        if (r.ok) ok++;
+        else { failed++; if (r.rateLimited) rate++; }
       }
       setSelected(new Set());
+      reportBatchOutcome(ok, failed, rate);
       loadApplications(statusFilter);
     } finally {
       setIsBulkRunning(false);
@@ -226,20 +319,32 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
   }
 
   async function confirmDecline() {
+    if (isBulkRunning) return; // guard double-submit (applies to single decline too)
     if (declineNoteRequired && !declineNote.trim()) return;
     const ids = pendingDeclineIds;
     if (ids.length === 0) return;
+    if (ids.length > MAX_BULK) {
+      toastRef.current.error(tRef.current('applications.bulk_limit', { max: MAX_BULK }));
+      return;
+    }
 
-    setIsBulkRunning(ids.length > 1);
+    const isBulk = ids.length > 1;
+    setIsBulkRunning(true);
     try {
+      let ok = 0, failed = 0, rate = 0;
       for (const id of ids) {
-        await handleAction(id, 'decline', declineNote.trim());
+        const r = await handleAction(id, 'decline', declineNote.trim(), isBulk);
+        if (r.ok) ok++;
+        else { failed++; if (r.rateLimited) rate++; }
       }
       setSelected(new Set());
       declineModal.onClose();
       setPendingDeclineIds([]);
       setDeclineNote('');
-      if (ids.length > 1) loadApplications(statusFilter);
+      if (isBulk) {
+        reportBatchOutcome(ok, failed, rate);
+        loadApplications(statusFilter);
+      }
     } finally {
       setIsBulkRunning(false);
     }
@@ -288,7 +393,11 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
             isSelected={allPendingSelected}
             onValueChange={(checked) => {
               if (checked) {
-                setSelected(new Set(pendingFiltered.map((a) => a.id)));
+                // Cap at MAX_BULK so a batch can't exceed the endpoint's limiter.
+                setSelected(new Set(pendingFiltered.slice(0, MAX_BULK).map((a) => a.id)));
+                if (pendingFiltered.length > MAX_BULK) {
+                  toastRef.current.error(tRef.current('applications.select_all_capped', { max: MAX_BULK }));
+                }
               } else {
                 setSelected(new Set());
               }
@@ -328,6 +437,23 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
         aria-label={t('applications.aria_search_volunteers')}
         classNames={{ base: 'w-full sm:max-w-xs', inputWrapper: 'bg-theme-elevated' }}
       />
+
+      {/* Search only covers loaded applications — offer to pull the rest. */}
+      {nameSearch.trim() && hasMore && (
+        <div className="flex flex-col gap-2 rounded-lg bg-amber-500/10 border border-amber-500/30 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-amber-700 dark:text-amber-400">
+            {t('applications.search_partial_hint')}
+          </p>
+          <Button
+            size="sm"
+            variant="tertiary"
+            isLoading={isLoadingAll}
+            onPress={loadAllPages}
+          >
+            {t('applications.load_all')}
+          </Button>
+        </div>
+      )}
 
       {/* Bulk action bar */}
       {selected.size > 0 && (
@@ -402,8 +528,13 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
                   onValueChange={(checked) => {
                     setSelected((prev) => {
                       const next = new Set(prev);
-                      if (checked) next.add(app.id);
-                      else next.delete(app.id);
+                      if (checked) {
+                        if (next.size >= MAX_BULK) {
+                          toastRef.current.error(tRef.current('applications.select_limit', { max: MAX_BULK }));
+                          return prev;
+                        }
+                        next.add(app.id);
+                      } else next.delete(app.id);
                       return next;
                     });
                   }}
@@ -542,7 +673,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
               variant="danger-soft"
               onPress={confirmDecline}
               isLoading={isBulkRunning}
-              isDisabled={declineNoteRequired && !declineNote.trim()}
+              isDisabled={isBulkRunning || (declineNoteRequired && !declineNote.trim())}
             >
               {t('applications.decline_confirm')}
             </Button>

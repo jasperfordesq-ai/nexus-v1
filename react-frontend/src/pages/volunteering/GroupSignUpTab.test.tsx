@@ -112,6 +112,9 @@ vi.mock("@/components/ui", () => {
     Avatar: Box,
     AvatarGroup: Box,
     CardRowsSkeleton: () => <div role="status" />,
+    // The real '@/components/ui/Skeletons' module (imported by the component)
+    // re-imports Skeleton from this barrel, so the mock must provide it.
+    Skeleton: () => <div role="status" />,
   };
 });
 

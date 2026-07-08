@@ -282,7 +282,8 @@
       "receipt_hint": "Attach a PDF, JPG, PNG, or WebP receipt up to 10 MB.",
       "receipt_attach": "Attach receipt",
       "receipt_replace": "Replace",
-      "receipt_remove": "Remove receipt"
+      "receipt_remove": "Remove receipt",
+      "currency_placeholder": "EUR"
     },
     "no_organisation": "No approved volunteer organisations are available for expenses yet.",
     "cancel": "Cancel",
@@ -303,7 +304,9 @@
       "approved": "Approved",
       "rejected": "Rejected",
       "paid": "Paid"
-    }
+    },
+    "invalid_amount": "Enter a valid amount (up to 2 decimal places).",
+    "invalid_currency": "Use a 3-letter currency code (e.g. EUR)."
   },
   "community_projects": {
     "heading": "Community Projects",
@@ -341,7 +344,9 @@
       "active": "Active",
       "completed": "Completed",
       "cancelled": "Cancelled"
-    }
+    },
+    "support_aria": "Support this project ({{count}} supporters)",
+    "unsupport_aria": "Remove your support ({{count}} supporters)"
   },
   "donations": {
     "heading": "Donations",
@@ -737,7 +742,16 @@
     "decline_note_placeholder": "Share the reason or next steps for the volunteer.",
     "decline_note_required": "A note is required before declining.",
     "decline_confirm": "Decline application",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "search_partial_hint": "Search covers only loaded applications. Load all to search everyone.",
+    "load_all": "Load all",
+    "load_all_capped": "Reached the page limit — some applications may still be hidden.",
+    "bulk_limit": "You can process at most {{max}} applications at once.",
+    "select_all_capped": "Selected the first {{max}}. Process these, then select more.",
+    "select_limit": "You can select at most {{max}} applications at once.",
+    "bulk_success": "{{count}} applications updated.",
+    "bulk_failed": "{{count}} applications couldn't be updated.",
+    "bulk_rate_limited": "{{count}} couldn't be updated — you're going too fast. Wait a minute and retry."
   },
   "org_wallet_balance": "Wallet balance:",
   "auto_pay_on": "Auto-pay ON",
@@ -798,7 +812,13 @@
     "reserve_error": "Unable to create this group reservation.",
     "reserve_load_error": "Unable to load groups and opportunities.",
     "reserve_shifts_error": "Unable to load shifts for this opportunity.",
-    "reserve_required": "Choose a group, shift, and number of slots."
+    "reserve_required": "Choose a group, shift, and number of slots.",
+    "reserve_invalid_slots": "Enter a whole number of slots (at least 1).",
+    "member_status": {
+      "confirmed": "Confirmed",
+      "declined": "Declined",
+      "pending": "Pending"
+    }
   },
   "recommendations": {
     "title": "Recommended for You",
@@ -952,7 +972,8 @@
     "deposit_modal_title": "Deposit Credits",
     "form": {
       "amount": "Amount (hours)",
-      "note": "Note (optional)"
+      "note": "Note (optional)",
+      "amount_whole_credits_hint": "Whole credits only"
     },
     "cancel": "Cancel",
     "deposit_button": "Deposit",
@@ -965,7 +986,8 @@
       "volunteer_payment": "Volunteer Payment",
       "withdrawal": "Withdrawal",
       "admin_adjustment": "Admin Adjustment"
-    }
+    },
+    "deposit_whole_credits_only": "Enter a whole number of credits (no fractions)."
   },
   "my_organisations": "My Organisations",
   "my_organisations_title": "My Organisations",
@@ -1014,5 +1036,8 @@
     "verify_confirm_button": "Confirm my approval"
   },
   "form_remote_label": "Remote opportunity",
-  "form_remote_description": "Volunteers can take part online or by phone."
+  "form_remote_description": "Volunteers can take part online or by phone.",
+  "my_organisations_declined": "Declined",
+  "my_organisations_declined_desc": "This application wasn't approved. Contact your community administrator for details.",
+  "hours_invalid_range": "Enter between 0.25 and 24 hours."
 }

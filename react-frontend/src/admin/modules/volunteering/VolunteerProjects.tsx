@@ -1,8 +1,9 @@
-import { Select, SelectItem, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+
+import { Select, SelectItem, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 /**
  * Volunteer Community Projects
@@ -20,7 +21,7 @@ import Flag from 'lucide-react/icons/flag';
 import Users from 'lucide-react/icons/users';
 import PlusCircle from 'lucide-react/icons/circle-plus';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { useToast, useTenant } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, type Column } from '../../components/DataTable';
 import { PageHeader } from '../../components/PageHeader';
@@ -64,6 +65,7 @@ export default function VolunteerProjects() {
   const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.projects_title'));
   const toast = useToast();
+  const { tenantPath } = useTenant();
   const navigate = useNavigate();
 
   const [projects, setProjects] = useState<CommunityProject[]>([]);
@@ -159,7 +161,7 @@ export default function VolunteerProjects() {
       from_project: String(project.id),
       title: project.title,
     });
-    navigate(`/volunteering/create?${params.toString()}`);
+    navigate(tenantPath(`/volunteering/create?${params.toString()}`));
   };
 
   const columns: Column<CommunityProject>[] = [

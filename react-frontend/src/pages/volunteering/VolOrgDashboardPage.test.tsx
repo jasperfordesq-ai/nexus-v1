@@ -90,13 +90,22 @@ const ORG = {
 
 const STATS = { wallet_balance: 10, auto_pay_enabled: false };
 
+// The dashboard now resolves the org from the MANAGED-orgs endpoint (so pending/
+// declined owners aren't 404'd by the public org endpoint), so tests mock that.
+function mockManagedOrgs(orgs: Array<Record<string, unknown>>) {
+  mockApi.get.mockImplementation((url: string) => {
+    if (url.includes('/stats')) return Promise.resolve({ success: true, data: STATS });
+    if (url.includes('/my-organisations')) {
+      return Promise.resolve({ success: true, data: { items: orgs } });
+    }
+    return Promise.resolve({ success: false, code: 'NOT_FOUND', data: null });
+  });
+}
+
 describe('VolOrgDashboardPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockApi.get.mockImplementation((url: string) => {
-      if (url.includes('/stats')) return Promise.resolve({ success: true, data: STATS });
-      return Promise.resolve({ success: true, data: ORG });
-    });
+    mockManagedOrgs([ORG]);
   });
 
   it('shows loading screen while fetching', () => {
@@ -179,6 +188,33 @@ describe('VolOrgDashboardPage', () => {
     render(<VolOrgDashboardPage />);
     await waitFor(() => {
       expect(screen.getAllByText(/A great org/).length).toBeGreaterThan(0);
+    });
+  });
+
+  // Fix 5: owners of a pending (not-yet-approved) org must still reach their
+  // dashboard. The org is resolved from the managed-orgs list, which returns it
+  // regardless of approval status — the public org endpoint would 404 it.
+  it('renders the dashboard for a pending org resolved from managed orgs', async () => {
+    mockManagedOrgs([{ ...ORG, status: 'pending' }]);
+    render(<VolOrgDashboardPage />);
+    await waitFor(() => {
+      expect(screen.getAllByText('Community Helpers').length).toBeGreaterThan(0);
+    });
+    // Not access-denied — the overview tab renders.
+    expect(screen.getByTestId('overview-tab')).toBeInTheDocument();
+  });
+
+  // Fix 5: if the caller does not manage this org (absent from managed list),
+  // it is access-denied — not a retryable error.
+  it('shows access denied when the org is not in the managed list', async () => {
+    mockManagedOrgs([{ ...ORG, id: 999 }]); // different id — no match for orgId 42
+    render(<VolOrgDashboardPage />);
+    await waitFor(() => {
+      const btns = screen.getAllByRole('button');
+      const backBtn = btns.find((b) => b.textContent?.toLowerCase().includes('back') || b.textContent?.toLowerCase().includes('volunteer'));
+      expect(backBtn).toBeDefined();
+      const retryBtn = btns.find((b) => b.textContent?.toLowerCase().includes('again'));
+      expect(retryBtn).toBeUndefined();
     });
   });
 });

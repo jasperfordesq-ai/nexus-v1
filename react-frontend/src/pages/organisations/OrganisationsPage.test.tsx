@@ -163,7 +163,6 @@ describe('OrganisationsPage', () => {
     });
     expect(screen.getByText('Community Care')).toBeInTheDocument();
     expect(screen.getByText('Environmental conservation organisation')).toBeInTheDocument();
-    expect(screen.getByText('Dublin, Ireland')).toBeInTheDocument();
   });
 
   it('displays stats on organisation cards (opportunities, volunteers, hours)', async () => {
@@ -204,5 +203,50 @@ describe('OrganisationsPage', () => {
       expect(screen.getByText('Unable to Load Organisations')).toBeInTheDocument();
     });
     expect(screen.getByText('Try Again')).toBeInTheDocument();
+  });
+
+  it('shows a "currently showing" hero stat reflecting the loaded count, not a partners grand total', async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      success: true,
+      data: [
+        {
+          id: 1,
+          name: 'Org One',
+          description: null,
+          logo_url: null,
+          website: null,
+          contact_email: null,
+          opportunity_count: 0,
+          total_hours: 0,
+          volunteer_count: 0,
+          average_rating: null,
+          created_at: '2026-01-01',
+        },
+        {
+          id: 2,
+          name: 'Org Two',
+          description: null,
+          logo_url: null,
+          website: null,
+          contact_email: null,
+          opportunity_count: 0,
+          total_hours: 0,
+          volunteer_count: 0,
+          average_rating: null,
+          created_at: '2026-01-02',
+        },
+      ],
+      // The org list endpoint (respondWithCollection) provides NO server total —
+      // only cursor / per_page / has_more — so the stat must not claim a total.
+      meta: { cursor: null, has_more: false },
+    });
+    render(<OrganisationsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Org One')).toBeInTheDocument();
+    });
+    // Relabelled to "showing N" semantics; the misleading "Partners shown"
+    // grand-total label must be gone.
+    expect(screen.getByText('Currently showing')).toBeInTheDocument();
+    expect(screen.queryByText('Partners shown')).not.toBeInTheDocument();
   });
 });

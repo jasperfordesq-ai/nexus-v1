@@ -37,59 +37,67 @@ vi.mock('../../api/adminApi', () => ({
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 // ─── Stub DataTable / PageHeader / EmptyState / ConfirmModal ─────────────────
-vi.mock('../../components', async (importOriginal) => {
-  const orig = await importOriginal<Record<string, unknown>>();
-  return {
-    ...orig,
-    DataTable: ({
-      data,
-      columns,
-      emptyContent,
-      isLoading,
-    }: {
-      data?: unknown[];
-      columns?: Array<{ key: string; label?: string; render?: (row: unknown) => React.ReactNode }>;
-      emptyContent?: React.ReactNode;
-      isLoading?: boolean;
-    }) => {
-      if (isLoading) return <div role="status" aria-busy="true">Loading...</div>;
-      if (!data || data.length === 0) return <>{emptyContent}</>;
-      return (
-        <table>
-          <tbody>
-            {(data as Record<string, unknown>[]).map((row) => (
-              <tr key={String(row['id'])}>
-                {(columns ?? []).map((col) => (
-                  <td key={col.key}>{col.render ? col.render(row) : String(row[col.key] ?? '')}</td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      );
-    },
-    PageHeader: ({ title }: { title?: string }) => <h1>{title}</h1>,
-    EmptyState: ({ title }: { title?: string }) => <div data-testid="empty-state">{title}</div>,
-    ConfirmModal: ({
-      isOpen,
-      onConfirm,
-      onClose,
-      title,
-    }: {
-      isOpen?: boolean;
-      onConfirm?: () => void;
-      onClose?: () => void;
-      title?: string;
-    }) =>
-      isOpen ? (
-        <div role="dialog" aria-label={title}>
-          <span>{title}</span>
-          <button onClick={onConfirm}>Confirm</button>
-          <button onClick={onClose}>Cancel</button>
-        </div>
-      ) : null,
-  };
-});
+// The component imports these from their '../../components/<Name>' subpaths, so
+// each subpath module must be mocked individually — mocking the '../../components'
+// index barrel does NOT intercept subpath imports.
+vi.mock('../../components/DataTable', () => ({
+  DataTable: ({
+    data,
+    columns,
+    emptyContent,
+    isLoading,
+  }: {
+    data?: unknown[];
+    columns?: Array<{ key: string; label?: string; render?: (row: unknown) => React.ReactNode }>;
+    emptyContent?: React.ReactNode;
+    isLoading?: boolean;
+  }) => {
+    if (isLoading) return <div role="status" aria-busy="true">Loading...</div>;
+    if (!data || data.length === 0) return <>{emptyContent}</>;
+    return (
+      <table>
+        <tbody>
+          {(data as Record<string, unknown>[]).map((row) => (
+            <tr key={String(row['id'])}>
+              {(columns ?? []).map((col) => (
+                <td key={col.key}>{col.render ? col.render(row) : String(row[col.key] ?? '')}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  },
+}));
+
+vi.mock('../../components/PageHeader', () => ({
+  PageHeader: ({ title }: { title?: string }) => <h1>{title}</h1>,
+}));
+
+vi.mock('../../components/EmptyState', () => ({
+  EmptyState: ({ title }: { title?: string }) => <div data-testid="empty-state">{title}</div>,
+}));
+
+vi.mock('../../components/ConfirmModal', () => ({
+  ConfirmModal: ({
+    isOpen,
+    onConfirm,
+    onClose,
+    title,
+  }: {
+    isOpen?: boolean;
+    onConfirm?: () => void;
+    onClose?: () => void;
+    title?: string;
+  }) =>
+    isOpen ? (
+      <div role="dialog" aria-label={title}>
+        <span>{title}</span>
+        <button onClick={onConfirm}>Confirm</button>
+        <button onClick={onClose}>Cancel</button>
+      </div>
+    ) : null,
+}));
 
 // Stub HeroUI Select/Switch to avoid infinite-loops
 vi.mock('@/components/ui', async (importOriginal) => {

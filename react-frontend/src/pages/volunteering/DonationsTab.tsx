@@ -158,12 +158,19 @@ export function DonationsTab() {
 
       if (controller.signal.aborted) return;
 
+      // A non-thrown success:false must not fall through and render the empty
+      // state with 0.00 stats — surface a retryable error instead.
+      if (!daysRes.success || !donationsRes.success) {
+        setError(tRef.current('donations.load_error'));
+        return;
+      }
+
       let days: GivingDay[] = [];
-      if (daysRes.success && daysRes.data) {
+      if (daysRes.data) {
         days = Array.isArray(daysRes.data) ? daysRes.data : [];
         setGivingDays(days);
       }
-      if (donationsRes.success && donationsRes.data) {
+      if (donationsRes.data) {
         const dPayload = donationsRes.data as unknown as Record<string, unknown>;
         const items = Array.isArray(dPayload.items)
           ? (dPayload.items as Donation[])

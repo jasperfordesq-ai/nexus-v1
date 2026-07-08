@@ -242,7 +242,8 @@
       "receipt_hint": "Attach a PDF, JPG, PNG, or WebP receipt up to 10 MB.",
       "receipt_attach": "Attach receipt",
       "receipt_replace": "Replace",
-      "receipt_remove": "Remove receipt"
+      "receipt_remove": "Remove receipt",
+      "currency_placeholder": "EUR"
     },
     "no_organisation": "Níl aon eagraíochtaí deonacha ceadaithe ar fáil le haghaidh speansais go fóill.",
     "cancel": "Cealaigh",
@@ -263,7 +264,9 @@
       "approved": "Ceadaithe",
       "rejected": "Diúltaithe",
       "paid": "Íoctha"
-    }
+    },
+    "invalid_amount": "Cuir isteach méid bailí (suas le 2 ionad deachúlach).",
+    "invalid_currency": "Úsáid cód airgeadra 3 litir (m.sh. EUR)."
   },
   "community_projects": {
     "heading": "Tionscadail Phobail",
@@ -301,7 +304,9 @@
       "active": "Gníomhach",
       "completed": "Críochnaithe",
       "cancelled": "Cealaithe"
-    }
+    },
+    "support_aria": "Tacaigh leis an tionscadal seo ({{count}} lucht tacaíochta)",
+    "unsupport_aria": "Bain do thacaíocht ({{count}} lucht tacaíochta)"
   },
   "donations": {
     "heading": "Tabhartais",
@@ -697,7 +702,16 @@
     "decline_note_placeholder": "Share the reason or next steps for the volunteer.",
     "decline_note_required": "A note is required before declining.",
     "decline_confirm": "Decline application",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "search_partial_hint": "Ní chuimsíonn an cuardach ach iarratais atá lódáilte. Lódáil gach ceann chun cuardach a dhéanamh ar chách.",
+    "load_all": "Lódáil gach ceann",
+    "load_all_capped": "Sroicheadh teorainn na leathanach — d'fhéadfadh roinnt iarratas a bheith i bhfolach fós.",
+    "bulk_limit": "Is féidir leat {{max}} iarratas ar a mhéad a phróiseáil ag an am.",
+    "select_all_capped": "Roghnaíodh an chéad {{max}}. Próiseáil iad seo, ansin roghnaigh tuilleadh.",
+    "select_limit": "Is féidir leat {{max}} iarratas ar a mhéad a roghnú ag an am.",
+    "bulk_success": "{{count}} iarratas nuashonraithe.",
+    "bulk_failed": "Níorbh fhéidir {{count}} iarratas a nuashonrú.",
+    "bulk_rate_limited": "Níorbh fhéidir {{count}} a nuashonrú — tá tú ró-thapa. Fan nóiméad agus bain triail eile as."
   },
   "org_wallet_balance": "Iarmhéid sparán:",
   "auto_pay_on": "Uath-íoc AR",
@@ -758,7 +772,13 @@
     "reserve_error": "Unable to create this group reservation.",
     "reserve_load_error": "Unable to load groups and opportunities.",
     "reserve_shifts_error": "Unable to load shifts for this opportunity.",
-    "reserve_required": "Choose a group, shift, and number of slots."
+    "reserve_required": "Choose a group, shift, and number of slots.",
+    "reserve_invalid_slots": "Cuir isteach líon iomlán sliotán (1 ar a laghad).",
+    "member_status": {
+      "confirmed": "Deimhnithe",
+      "declined": "Diúltaithe",
+      "pending": "Ar feitheamh"
+    }
   },
   "recommendations": {
     "title": "Molta Duit",
@@ -909,7 +929,8 @@
     "deposit_modal_title": "Creidmheasanna Taisce",
     "form": {
       "amount": "Méid (uaireanta)",
-      "note": "Nóta (roghnach)"
+      "note": "Nóta (roghnach)",
+      "amount_whole_credits_hint": "Creidmheasanna iomlána amháin"
     },
     "cancel": "Cealaigh",
     "deposit_button": "Taisce",
@@ -925,7 +946,8 @@
     },
     "balance_helper": "This is a record of the time credits your organisation has given out and received. You don't need a balance to pay volunteers — approving their hours credits them automatically.",
     "autocredit_title": "Volunteers are paid automatically",
-    "autocredit_description": "When you approve a volunteer's logged hours, the matching time credits (1 credit per hour) are added to their wallet straight away. There's nothing to switch on and no balance to top up first."
+    "autocredit_description": "When you approve a volunteer's logged hours, the matching time credits (1 credit per hour) are added to their wallet straight away. There's nothing to switch on and no balance to top up first.",
+    "deposit_whole_credits_only": "Cuir isteach líon iomlán creidmheasanna (gan codáin)."
   },
   "my_organisations": "Mo Eagraíochtaí",
   "my_organisations_title": "Mo Eagraíochtaí",
@@ -1014,5 +1036,8 @@
   "distance_km": "{{value}} km",
   "date_range_separator": " – ",
   "form_remote_label": "Remote opportunity",
-  "form_remote_description": "Volunteers can take part online or by phone."
+  "form_remote_description": "Volunteers can take part online or by phone.",
+  "my_organisations_declined": "Diúltaithe",
+  "my_organisations_declined_desc": "Níor ceadaíodh an t-iarratas seo. Déan teagmháil le riarthóir do phobail le haghaidh sonraí.",
+  "hours_invalid_range": "Cuir isteach idir 0.25 agus 24 uair."
 }

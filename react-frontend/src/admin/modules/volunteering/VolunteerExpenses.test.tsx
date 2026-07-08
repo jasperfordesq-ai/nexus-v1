@@ -49,54 +49,62 @@ vi.mock('@/contexts', () =>
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 
-// Stub DataTable, EmptyState, StatCard, PageHeader from admin components
-vi.mock('../../components', async (importOriginal) => {
-  const orig = await importOriginal<Record<string, unknown>>();
-  return {
-    ...orig,
-    DataTable: ({ data, columns, isLoading }: {
-      data: unknown[];
-      columns: Array<{ key: string; label: string; render?: (item: unknown) => React.ReactNode }>;
-      isLoading?: boolean;
-    }) => {
-      if (isLoading) return <div role="status" aria-busy="true" aria-label="loading" />;
-      if (!data || data.length === 0) return <div data-testid="data-table-empty">No data</div>;
-      return (
-        <div data-testid="data-table">
-          {(data as Array<Record<string, unknown>>).map((row) => (
-            <div key={String(row.id)} data-testid={`row-${String(row.id)}`}>
-              {columns.map((col) => (
-                <div key={col.key}>
-                  {col.render
-                    ? col.render(row)
-                    : String(row[col.key] ?? '')}
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      );
-    },
-    EmptyState: ({ title, description }: { title: string; description?: string }) => (
-      <div data-testid="empty-state">
-        <p>{title}</p>
-        {description && <p>{description}</p>}
+// Stub DataTable, EmptyState, StatCard, PageHeader from admin components.
+// The component imports these from their '../../components/<Name>' subpaths, so
+// each subpath module must be mocked individually — mocking the '../../components'
+// index barrel does NOT intercept subpath imports.
+vi.mock('../../components/DataTable', () => ({
+  DataTable: ({ data, columns, isLoading }: {
+    data: unknown[];
+    columns: Array<{ key: string; label: string; render?: (item: unknown) => React.ReactNode }>;
+    isLoading?: boolean;
+  }) => {
+    if (isLoading) return <div role="status" aria-busy="true" aria-label="loading" />;
+    if (!data || data.length === 0) return <div data-testid="data-table-empty">No data</div>;
+    return (
+      <div data-testid="data-table">
+        {(data as Array<Record<string, unknown>>).map((row) => (
+          <div key={String(row.id)} data-testid={`row-${String(row.id)}`}>
+            {columns.map((col) => (
+              <div key={col.key}>
+                {col.render
+                  ? col.render(row)
+                  : String(row[col.key] ?? '')}
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
-    ),
-    StatCard: ({ label, value }: { label: string; value: number | string }) => (
-      <div data-testid="stat-card">
-        <span>{label}</span>
-        <span>{value}</span>
-      </div>
-    ),
-    PageHeader: ({ title, actions }: { title?: React.ReactNode; actions?: React.ReactNode }) => (
-      <div data-testid="page-header">
-        <h1>{title}</h1>
-        {actions}
-      </div>
-    ),
-  };
-});
+    );
+  },
+}));
+
+vi.mock('../../components/EmptyState', () => ({
+  EmptyState: ({ title, description }: { title: string; description?: string }) => (
+    <div data-testid="empty-state">
+      <p>{title}</p>
+      {description && <p>{description}</p>}
+    </div>
+  ),
+}));
+
+vi.mock('../../components/StatCard', () => ({
+  StatCard: ({ label, value }: { label: string; value: number | string }) => (
+    <div data-testid="stat-card">
+      <span>{label}</span>
+      <span>{value}</span>
+    </div>
+  ),
+}));
+
+vi.mock('../../components/PageHeader', () => ({
+  PageHeader: ({ title, actions }: { title?: React.ReactNode; actions?: React.ReactNode }) => (
+    <div data-testid="page-header">
+      <h1>{title}</h1>
+      {actions}
+    </div>
+  ),
+}));
 
 // Stub Select to avoid HeroUI infinite-loop
 vi.mock('@/components/ui', async (importOriginal) => {
@@ -393,8 +401,10 @@ describe('VolunteerExpenses', () => {
     render(<VolunteerExpenses />);
 
     await waitFor(() => {
-      expect(screen.getByText('Green Org')).toBeInTheDocument();
-      expect(screen.getByText('Blue Org')).toBeInTheDocument();
+      // Org names appear both in the mocked DataTable rows and the org-breakdown
+      // table, so assert presence rather than uniqueness.
+      expect(screen.getAllByText('Green Org').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Blue Org').length).toBeGreaterThan(0);
     });
   });
 });

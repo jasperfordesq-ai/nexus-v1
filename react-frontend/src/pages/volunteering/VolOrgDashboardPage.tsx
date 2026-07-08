@@ -59,6 +59,21 @@ interface OrgDetails {
   auto_pay_enabled: boolean;
 }
 
+// Shape of an entry from GET /v2/volunteering/my-organisations. Unlike the
+// PUBLIC org endpoint, this returns orgs the caller manages regardless of
+// approval status, so pending/declined owners can still reach their dashboard.
+interface ManagedOrg {
+  id: number;
+  name: string;
+  description?: string | null;
+  contact_email?: string | null;
+  website?: string | null;
+  status: string;
+  member_role?: string;
+  balance?: number;
+  auto_pay_enabled?: boolean;
+}
+
 const TAB_DEFS: { key: OrgDashTab; icon: typeof LayoutDashboard }[] = [
   { key: 'overview', icon: LayoutDashboard },
   { key: 'applications', icon: ClipboardList },
@@ -137,52 +152,78 @@ export default function VolOrgDashboardPage() {
     }
   }, [tab, setTab]);
 
-  const loadOrg = useCallback(async () => {
+  // `silent` refreshes (triggered by child tabs after a mutation) must NOT flip
+  // the full-page loading/error state, otherwise the whole page — including the
+  // active tab — unmounts and remounts, losing the tab's local state.
+  const loadOrg = useCallback(async (opts?: { silent?: boolean }) => {
+    const silent = opts?.silent ?? false;
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
 
-    setIsLoading(true);
-    setAccessDenied(false);
-    setLoadError(false);
+    if (!silent) {
+      setIsLoading(true);
+      setAccessDenied(false);
+      setLoadError(false);
+    }
     try {
-      // Load org details AND stats in parallel to get balance/autopay
-      const [orgRes, statsRes] = await Promise.all([
-        api.get<OrgDetails>(`/v2/volunteering/organisations/${orgId}`),
+      // Resolve the org from the caller's MANAGED organisations (not the PUBLIC
+      // org endpoint, which 404s pending/declined orgs) so owners of a
+      // not-yet-approved org still reach their dashboard. Stats are best-effort:
+      // a pending org may have no wallet yet, which must not block the page.
+      const [myOrgsRes, statsRes] = await Promise.all([
+        api.get<unknown>('/v2/volunteering/my-organisations'),
         api.get<{ wallet_balance: number; auto_pay_enabled: boolean }>(`/v2/volunteering/organisations/${orgId}/stats`),
       ]);
 
       if (controller.signal.aborted) return;
 
-      // Distinguish a genuine authorization failure (show "Access Denied") from a
-      // transient failure such as a network drop or 5xx (show a retryable error).
-      // Previously ANY failure showed "Access Denied", so a flaky connection looked
-      // like a permanent permissions problem with no way to recover.
-      if (!orgRes.success || !orgRes.data) {
-        if (isAccessError(orgRes.code)) setAccessDenied(true);
-        else setLoadError(true);
+      // A failed managed-orgs request is transient (network/5xx) → retryable,
+      // NOT "Access Denied".
+      if (!myOrgsRes.success || !myOrgsRes.data) {
+        if (!silent) {
+          if (isAccessError(myOrgsRes.code)) setAccessDenied(true);
+          else setLoadError(true);
+        }
         return;
       }
 
-      if (!statsRes.success) {
-        if (isAccessError(statsRes.code)) setAccessDenied(true);
-        else setLoadError(true);
+      // respondWithData wraps in { data: { items: [...] } }
+      const raw = myOrgsRes.data as { data?: { items?: unknown[] }; items?: unknown[] };
+      const items = (raw.data?.items ?? raw.items ?? (Array.isArray(myOrgsRes.data) ? myOrgsRes.data : [])) as ManagedOrg[];
+      const match = items.find((o) => Number(o.id) === orgId);
+
+      if (!match) {
+        // The caller does not manage this org (or it doesn't exist) → denied.
+        // On a silent refresh keep the last-known org rather than yanking the UI.
+        if (!silent) setAccessDenied(true);
         return;
       }
 
+      const stats = statsRes.success ? statsRes.data : null;
       setOrg({
-        ...orgRes.data,
-        balance: statsRes.data?.wallet_balance ?? orgRes.data.balance ?? 0,
-        auto_pay_enabled: statsRes.data?.auto_pay_enabled ?? orgRes.data.auto_pay_enabled ?? false,
+        id: match.id,
+        name: match.name,
+        description: match.description ?? null,
+        contact_email: match.contact_email ?? null,
+        website: match.website ?? null,
+        status: match.status,
+        balance: stats?.wallet_balance ?? match.balance ?? 0,
+        auto_pay_enabled: stats?.auto_pay_enabled ?? match.auto_pay_enabled ?? false,
       });
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load org', err);
-      setLoadError(true);
+      if (!silent) setLoadError(true);
     } finally {
-      if (!controller.signal.aborted) setIsLoading(false);
+      if (!controller.signal.aborted && !silent) setIsLoading(false);
     }
   }, [orgId]);
+
+  // Background refresh that never unmounts the active tab.
+  const refreshOrg = useCallback(() => {
+    loadOrg({ silent: true });
+  }, [loadOrg]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -198,7 +239,9 @@ export default function VolOrgDashboardPage() {
     return () => { abortRef.current?.abort(); };
   }, [isAuthenticated, orgId, loadOrg]);
 
-  if (isLoading) return <LoadingScreen />;
+  // Only block the whole page while the org has never loaded. Silent refreshes
+  // keep isLoading false, so once org is set the tabs never unmount.
+  if (isLoading && !org) return <LoadingScreen />;
 
   if (loadError && !org) {
     return (
@@ -344,7 +387,7 @@ export default function VolOrgDashboardPage() {
             orgId={orgId}
             balance={org.balance}
             autoPay={org.auto_pay_enabled}
-            onBalanceChange={loadOrg}
+            onBalanceChange={refreshOrg}
           />
         )}
         {tab === 'volunteers' && (
@@ -355,7 +398,7 @@ export default function VolOrgDashboardPage() {
             orgId={orgId}
             balance={org.balance}
             autoPay={org.auto_pay_enabled}
-            onBalanceChange={loadOrg}
+            onBalanceChange={refreshOrg}
           />
         )}
         {tab === 'settings' && (
@@ -367,7 +410,7 @@ export default function VolOrgDashboardPage() {
               contact_email: org.contact_email,
               website: org.website,
             }}
-            onOrgUpdate={loadOrg}
+            onOrgUpdate={refreshOrg}
           />
         )}
       </Suspense>

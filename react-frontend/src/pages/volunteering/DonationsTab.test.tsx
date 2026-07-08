@@ -187,6 +187,17 @@ describe('DonationsTab', () => {
     expect(tryAgainBtn).toBeTruthy();
   });
 
+  // Fix 2: a non-thrown success:false must surface the error state, not fall
+  // through to the empty state with 0.00 stats.
+  it('shows the error state (not the empty state) when a load returns success:false', async () => {
+    vi.mocked(api.get).mockResolvedValue({ success: false, error: 'boom', code: 'SERVER_ERROR' });
+    render(<DonationsTab />);
+    await waitFor(() => {
+      expect(screen.getByText('Unable to load donations data.')).toBeInTheDocument();
+    });
+    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument();
+  });
+
   it('retries loading when Try Again is clicked', async () => {
     let callCount = 0;
     vi.mocked(api.get).mockImplementation(() => {

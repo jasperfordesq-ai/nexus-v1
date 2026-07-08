@@ -60,8 +60,6 @@ interface OrganisationDetail {
   logo_url: string | null;
   website: string | null;
   contact_email: string | null;
-  email: string | null;
-  location: string | null;
   opportunity_count: number;
   total_hours: number;
   volunteer_count: number;
@@ -90,7 +88,9 @@ interface Review {
   id: number;
   rating: number;
   comment: string;
-  author: { id: number; name: string; avatar: string | null };
+  // Public payloads may omit the author's internal id (see contract a) — the
+  // profile link is rendered only when an id is present.
+  author: { id?: number | null; name: string; avatar: string | null };
   created_at: string;
 }
 
@@ -333,7 +333,6 @@ export function OrganisationDetailPage() {
             ...(organisation?.description ? { description: organisation.description.substring(0, 300) } : {}),
             ...(organisation?.logo_url ? { logo: organisation.logo_url } : {}),
             ...(organisation?.website ? { url: organisation.website } : {}),
-            ...(organisation?.email ? { email: organisation.email } : {}),
           }).replace(/</g, '\\u003c')}
         </script>
       </Helmet>
@@ -354,13 +353,6 @@ export function OrganisationDetailPage() {
           />
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl font-bold text-theme-primary">{organisation.name}</h1>
-
-            {organisation.location && (
-              <p className="text-theme-muted flex items-center gap-1 mt-1">
-                <MapPin className="w-4 h-4" aria-hidden="true" />
-                {organisation.location}
-              </p>
-            )}
 
             {organisation.description && (
               <p className="text-theme-muted mt-3">{organisation.description}</p>
@@ -568,21 +560,35 @@ export function OrganisationDetailPage() {
             {reviews.map((review) => (
             <GlassCard key={review.id} className="p-4">
               <div className="flex items-start gap-3">
-                <Link to={tenantPath(`/profile/${review.author.id}`)}>
+                {review.author.id != null ? (
+                  <Link to={tenantPath(`/profile/${review.author.id}`)}>
+                    <Avatar
+                      name={review.author.name}
+                      src={resolveAvatarUrl(review.author.avatar) || undefined}
+                      size="sm"
+                    />
+                  </Link>
+                ) : (
                   <Avatar
                     name={review.author.name}
                     src={resolveAvatarUrl(review.author.avatar) || undefined}
                     size="sm"
                   />
-                </Link>
+                )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <Link
-                      to={tenantPath(`/profile/${review.author.id}`)}
-                      className="font-semibold text-sm text-theme-primary hover:underline"
-                    >
-                      {review.author.name}
-                    </Link>
+                    {review.author.id != null ? (
+                      <Link
+                        to={tenantPath(`/profile/${review.author.id}`)}
+                        className="font-semibold text-sm text-theme-primary hover:underline"
+                      >
+                        {review.author.name}
+                      </Link>
+                    ) : (
+                      <span className="font-semibold text-sm text-theme-primary">
+                        {review.author.name}
+                      </span>
+                    )}
                     <div className="flex items-center gap-0.5">
                       <span className="sr-only">{t('organisation_detail.rating_sr', { n: review.rating })}</span>
                       {Array.from({ length: 5 }, (_, i) => (

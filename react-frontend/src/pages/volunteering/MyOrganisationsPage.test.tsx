@@ -47,6 +47,9 @@ vi.mock('@/components/navigation', () => ({
 vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/hooks/usePageTitle', () => ({ usePageTitle: vi.fn() }));
+// PageMeta pulls useTenant straight from '@/contexts/TenantContext' (bypassing
+// the '@/contexts' barrel mock), so stub it out like the other page tests do.
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 
 const translations: Record<string, string> = {
   breadcrumb_volunteering: 'Volunteering',
@@ -66,6 +69,9 @@ const translations: Record<string, string> = {
   my_organisations_none: 'No Organisations Yet',
   my_organisations_load_error: 'Unable to load your organisations. Please try again.',
   try_again: 'Try Again',
+  status_declined: 'Declined',
+  my_organisations_declined: 'Declined',
+  my_organisations_declined_desc: "This application wasn't approved. Contact your community administrator for details.",
 };
 
 vi.mock('react-i18next', () => ({
@@ -112,6 +118,36 @@ describe('MyOrganisationsPage', () => {
 
     expect(screen.getByText('Owner')).toBeInTheDocument();
     expect(screen.queryByText('owner')).not.toBeInTheDocument();
+  });
+
+  // Fix 13: an org whose only status is 'declined' previously rendered blank
+  // (it matched neither the pending section nor the active-status filter).
+  it('renders a declined organisation with a status chip and explanation', async () => {
+    vi.mocked(api.get).mockResolvedValue({
+      success: true,
+      data: [
+        {
+          id: 9,
+          name: 'Rejected Org',
+          description: null,
+          status: 'declined',
+          member_role: 'owner',
+          contact_email: null,
+          website: null,
+        },
+      ],
+      meta: { cursor: null, has_more: false },
+    });
+
+    render(<MyOrganisationsPage />);
+
+    await waitFor(() => expect(screen.getByText('Rejected Org')).toBeInTheDocument());
+
+    // The declined explanation renders, and it is NOT the "no organisations" empty state.
+    expect(
+      screen.getByText("This application wasn't approved. Contact your community administrator for details."),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('No Organisations Yet')).not.toBeInTheDocument();
   });
 
   it('shows a retryable error instead of the empty state when the fetch fails', async () => {

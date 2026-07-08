@@ -162,6 +162,20 @@ describe('HoursReviewTab', () => {
     expect(screen.queryByRole('button', { name: /Load more/i })).not.toBeInTheDocument();
   });
 
+  // Fix 1: a non-thrown success:false response must surface a retryable error,
+  // not silently fall through to the "all hours reviewed" empty state.
+  it('shows a retryable error (not the empty state) when the load returns success:false', async () => {
+    vi.mocked(api.get).mockResolvedValue({ success: false, error: 'boom', code: 'SERVER_ERROR' });
+    render(<HoursReviewTab />);
+    await waitFor(() => {
+      expect(
+        screen.getByText('Failed to load pending hour reviews. Please try again.'),
+      ).toBeInTheDocument();
+    });
+    expect(screen.queryByText('No hours pending review.')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Try Again/i })).toBeInTheDocument();
+  });
+
   it('renders correctly for a single hour (no plural)', async () => {
     const singleHourEntry = { ...makeEntry(1, 'pending'), hours: 1 };
     vi.mocked(api.get).mockResolvedValue({

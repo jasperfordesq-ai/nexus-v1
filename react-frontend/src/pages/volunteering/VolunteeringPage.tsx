@@ -164,6 +164,25 @@ const VOLUNTEER_TAB_FEATURE_GATES: Partial<Record<VolunteerTab, (keyof Volunteer
 const VOL_GRADIENT_BASE = 'bg-linear-to-r from-rose-500 to-pink-600';
 const VOL_GRADIENT = `${VOL_GRADIENT_BASE} text-white`;
 
+// Today's date as YYYY-MM-DD in the user's LOCAL timezone. `toISOString()`
+// returns UTC, so for users west of UTC it can roll back to "yesterday" for
+// several hours after local midnight — a logged-hours date one day too early.
+function localCalendarDate(d: Date = new Date()): string {
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+// Format a 'YYYY-MM' bucket as a localized "Month YYYY" label. Parsing
+// `new Date('YYYY-MM-01')` treats the string as UTC midnight, which renders as
+// the PREVIOUS month for UTC-negative timezones — so build a LOCAL date instead.
+function formatYearMonthLabel(yearMonth: string): string {
+  const [y, m] = yearMonth.split('-').map((n) => parseInt(n, 10));
+  if (!y || !m) return yearMonth;
+  return new Date(y, m - 1, 1).toLocaleDateString(undefined, { year: 'numeric', month: 'long' });
+}
+
 const statusColor = (status: string) => {
   switch (status) {
     case 'approved': return 'success';
@@ -1225,7 +1244,7 @@ function HoursTab() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [logForm, setLogForm] = useState({
     organization_id: '',
-    date: new Date().toISOString().split('T')[0],
+    date: localCalendarDate(),
     hours: '',
     description: '',
   });
@@ -1303,7 +1322,7 @@ function HoursTab() {
     setLogForm((prev) => ({
       ...prev,
       organization_id: prev.organization_id || (organisations.length === 1 ? String(organisations[0]?.id ?? '') : ''),
-      date: prev.date || new Date().toISOString().split('T')[0],
+      date: prev.date || localCalendarDate(),
     }));
     onOpen();
   };
@@ -1311,19 +1330,28 @@ function HoursTab() {
   const handleLogHours = async () => {
     if (!logForm.hours || !logForm.date || !logForm.organization_id) return;
 
+    // Client-side guard (server stays authoritative): a single logged entry must
+    // be a number between 0.25 and 24 hours. Blocks NaN and out-of-range values
+    // before they hit the API and come back as a generic 422.
+    const hoursNum = parseFloat(logForm.hours);
+    if (Number.isNaN(hoursNum) || hoursNum < 0.25 || hoursNum > 24) {
+      toast.error(t('hours_invalid_range'));
+      return;
+    }
+
     try {
       setIsLogging(true);
       const response = await api.post('/v2/volunteering/hours', {
         organization_id: parseInt(logForm.organization_id, 10),
         date: logForm.date,
-        hours: parseFloat(logForm.hours),
+        hours: hoursNum,
         description: logForm.description || undefined,
       });
 
       if (response.success) {
         toast.success(t('hours_logged_success'));
         onClose();
-        setLogForm({ organization_id: '', date: new Date().toISOString().split('T')[0], hours: '', description: '' });
+        setLogForm({ organization_id: '', date: localCalendarDate(), hours: '', description: '' });
         loadSummary();
       } else {
         toast.error(response.error || t('hours_log_failed'));
@@ -1492,7 +1520,7 @@ function HoursTab() {
                     {(summary.by_month ?? []).map((month) => (
                       <div key={month.month} className="flex items-center justify-between">
                         <span className="text-sm text-theme-muted">
-                          {new Date(month.month + '-01').toLocaleDateString(undefined, { year: 'numeric', month: 'long' })}
+                          {formatYearMonthLabel(month.month)}
                         </span>
                         <span className="text-sm font-medium text-theme-primary">{t('hours_abbrev', { hours: month.hours })}</span>
                       </div>

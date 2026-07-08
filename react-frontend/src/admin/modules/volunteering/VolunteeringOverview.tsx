@@ -1,4 +1,9 @@
-import { Card, CardBody, CardHeader, Button, Chip, Avatar, Skeleton } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { Card, CardBody, CardHeader, Button, Chip, Avatar, Skeleton, Select, SelectItem } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { ButtonGroup } from '@/components/ui';
 import Heart from 'lucide-react/icons/heart';
@@ -13,19 +18,20 @@ import DollarSign from 'lucide-react/icons/dollar-sign';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Activity from 'lucide-react/icons/activity';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import HeartPulse from 'lucide-react/icons/heart-pulse';
+import Check from 'lucide-react/icons/check';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import X from 'lucide-react/icons/x';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useNavigate } from 'react-router-dom';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
+import { api } from '@/lib/api';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * Volunteering Overview
@@ -122,6 +128,62 @@ function formatTimestamp(ts: string, t: TFunction): string {
   return date.toLocaleDateString();
 }
 
+// ── Wellbeing alerts ───────────────────────────────────────────────────────────
+
+type WellbeingStatus = 'active' | 'acknowledged' | 'resolved' | 'dismissed';
+
+/**
+ * Admin wellbeing alert. Every field is optional — the backend contract only
+ * guarantees a loose shape, so the UI reads defensively and falls back to
+ * whatever identifying/type fields the item exposes.
+ */
+interface WellbeingAlert {
+  id?: number | string;
+  user_id?: number;
+  user_name?: string;
+  name?: string;
+  display_name?: string;
+  volunteer_name?: string;
+  alert_type?: string;
+  risk_type?: string;
+  type?: string;
+  risk_level?: string;
+  severity?: string;
+  status?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+/** Pull the alert list out of any of the envelope shapes the endpoint may use. */
+function extractWellbeingAlerts(payload: unknown): WellbeingAlert[] {
+  if (Array.isArray(payload)) return payload as WellbeingAlert[];
+  if (payload && typeof payload === 'object') {
+    const p = payload as Record<string, unknown>;
+    if (Array.isArray(p.data)) return p.data as WellbeingAlert[];
+    if (Array.isArray(p.items)) return p.items as WellbeingAlert[];
+    if (p.data && typeof p.data === 'object') {
+      const inner = p.data as Record<string, unknown>;
+      if (Array.isArray(inner.items)) return inner.items as WellbeingAlert[];
+      if (Array.isArray(inner.data)) return inner.data as WellbeingAlert[];
+    }
+  }
+  return [];
+}
+
+function wellbeingAlertName(a: WellbeingAlert, t: TFunction): string {
+  return (
+    a.user_name ||
+    a.name ||
+    a.display_name ||
+    a.volunteer_name ||
+    (a.user_id != null ? t('volunteering.wellbeing_user_number', { id: a.user_id }) : t('volunteering.wellbeing_unknown_user'))
+  );
+}
+
+function wellbeingAlertType(a: WellbeingAlert, t: TFunction): string {
+  return a.risk_type || a.alert_type || a.type || t('volunteering.wellbeing_unknown_type');
+}
+
 export function VolunteeringOverview() {
   const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.volunteering_overview_title'));
@@ -140,6 +202,17 @@ export function VolunteeringOverview() {
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [activitiesLoading, setActivitiesLoading] = useState(true);
 
+  // Data-load error state — surfaced on success:false / thrown failures so the
+  // page never silently shows stale or empty content.
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  // Wellbeing alerts state
+  const [wellbeingAlerts, setWellbeingAlerts] = useState<WellbeingAlert[]>([]);
+  const [wellbeingLoading, setWellbeingLoading] = useState(true);
+  const [wellbeingStatus, setWellbeingStatus] = useState<WellbeingStatus>('active');
+  const [wellbeingActionId, setWellbeingActionId] = useState<number | string | null>(null);
+  const [wellbeingError, setWellbeingError] = useState<string | null>(null);
+
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
@@ -154,11 +227,20 @@ export function VolunteeringOverview() {
         }
         setStats(d.stats || null);
         setOpportunities(d.recent_opportunities || []);
+        setLoadError(null);
+      } else {
+        // success:false comes back without throwing — surface it instead of
+        // leaving stale/empty content on screen silently.
+        setStats(null);
+        setOpportunities([]);
+        setLoadError(t('volunteering.failed_to_load_volunteering_data'));
+        toast.error(t('volunteering.failed_to_load_volunteering_data'));
       }
     } catch {
       toast.error(t('volunteering.failed_to_load_volunteering_data'));
       setStats(null);
       setOpportunities([]);
+      setLoadError(t('volunteering.failed_to_load_volunteering_data'));
     }
     setLoading(false);
   }, [toast, t]);
@@ -177,12 +259,16 @@ export function VolunteeringOverview() {
           d = payload as TrendsData;
         }
         setTrends(d);
+      } else {
+        setTrends(null);
+        toast.error(t('volunteering.failed_to_load_trends'));
       }
     } catch {
       setTrends(null);
+      toast.error(t('volunteering.failed_to_load_trends'));
     }
     setTrendsLoading(false);
-  }, []);
+  }, [toast, t]);
 
   const loadActivityFeed = useCallback(async () => {
     setActivitiesLoading(true);
@@ -197,16 +283,56 @@ export function VolunteeringOverview() {
           d = payload as typeof d;
         }
         setActivities(d.activities || []);
+      } else {
+        setActivities([]);
+        toast.error(t('volunteering.failed_to_load_activity'));
       }
     } catch {
       setActivities([]);
+      toast.error(t('volunteering.failed_to_load_activity'));
     }
     setActivitiesLoading(false);
-  }, []);
+  }, [toast, t]);
+
+  const loadWellbeingAlerts = useCallback(async (status: WellbeingStatus) => {
+    setWellbeingLoading(true);
+    try {
+      const res = await api.get(`/v2/admin/volunteering/wellbeing/alerts?status=${status}`);
+      if (res.success) {
+        setWellbeingAlerts(extractWellbeingAlerts(res.data));
+        setWellbeingError(null);
+      } else {
+        setWellbeingAlerts([]);
+        setWellbeingError(t('volunteering.failed_to_load_wellbeing_alerts'));
+      }
+    } catch {
+      setWellbeingAlerts([]);
+      setWellbeingError(t('volunteering.failed_to_load_wellbeing_alerts'));
+    }
+    setWellbeingLoading(false);
+  }, [t]);
+
+  const handleWellbeingAction = useCallback(async (alert: WellbeingAlert, status: WellbeingStatus) => {
+    if (alert.id == null) return;
+    setWellbeingActionId(alert.id);
+    try {
+      const res = await api.put(`/v2/admin/volunteering/wellbeing/alerts/${alert.id}`, { status });
+      if (res.success) {
+        toast.success(t('volunteering.wellbeing_alert_updated'));
+        loadWellbeingAlerts(wellbeingStatus);
+      } else {
+        toast.error(t('volunteering.wellbeing_alert_update_failed'));
+      }
+    } catch {
+      toast.error(t('volunteering.wellbeing_alert_update_failed'));
+    }
+    setWellbeingActionId(null);
+  }, [toast, t, loadWellbeingAlerts, wellbeingStatus]);
 
   useEffect(() => { loadData(); }, [loadData]);
   useEffect(() => { loadTrends(trendPeriod); }, [loadTrends, trendPeriod]);
   useEffect(() => { loadActivityFeed(); }, [loadActivityFeed]);
+  useEffect(() => { loadWellbeingAlerts(wellbeingStatus); }, [loadWellbeingAlerts, wellbeingStatus]);
 
   // Merge trend data for the chart
   const chartData = trends ? trends.hours_by_period.map((h, i) => ({
@@ -234,6 +360,7 @@ export function VolunteeringOverview() {
     loadData();
     loadTrends(trendPeriod);
     loadActivityFeed();
+    loadWellbeingAlerts(wellbeingStatus);
   };
 
   return (
@@ -264,6 +391,15 @@ export function VolunteeringOverview() {
         </div>
       )}
 
+      {/* Data load error banner */}
+      {!loading && loadError && (
+        <div className="p-3 rounded-xl bg-danger/10 border border-danger/30 flex items-center gap-3">
+          <AlertTriangle size={18} className="text-danger shrink-0" />
+          <span className="text-sm font-medium flex-1">{loadError}</span>
+          <Button size="sm" variant="tertiary" onPress={handleRefresh}>{t('volunteering.retry')}</Button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard label={t('volunteering.label_active_opportunities')} value={stats?.active_opportunities ?? 0} icon={Briefcase} loading={loading} />
         <StatCard label={t('volunteering.label_pending_applications')} value={stats?.pending_applications ?? 0} icon={Users} color="warning" loading={loading} />
@@ -275,6 +411,120 @@ export function VolunteeringOverview() {
         <StatCard label={t('volunteering.label_total_applications')} value={stats?.total_applications ?? 0} icon={Users} loading={loading} />
         <StatCard label={t('volunteering.label_active_volunteers')} value={stats?.active_volunteers ?? 0} icon={Users} color="success" loading={loading} />
       </div>
+
+      {/* Wellbeing Alerts */}
+      <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
+        <CardHeader className="flex flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <HeartPulse size={18} className="text-danger" />
+            <h3 className="text-lg font-semibold">{t('volunteering.wellbeing_alerts_title')}</h3>
+          </div>
+          <Select
+            aria-label={t('volunteering.wellbeing_filter_status_aria')}
+            className="w-44"
+            size="sm"
+            selectedKeys={new Set([wellbeingStatus])}
+            onSelectionChange={(keys) => {
+              const val = Array.from(keys)[0] as WellbeingStatus;
+              if (val) setWellbeingStatus(val);
+            }}
+          >
+            <SelectItem key="active" id="active">{t('volunteering.wellbeing_status_active')}</SelectItem>
+            <SelectItem key="acknowledged" id="acknowledged">{t('volunteering.wellbeing_status_acknowledged')}</SelectItem>
+            <SelectItem key="resolved" id="resolved">{t('volunteering.wellbeing_status_resolved')}</SelectItem>
+            <SelectItem key="dismissed" id="dismissed">{t('volunteering.wellbeing_status_dismissed')}</SelectItem>
+          </Select>
+        </CardHeader>
+        <CardBody>
+          {wellbeingLoading ? (
+            <div className="space-y-3">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full rounded-xl" />
+              ))}
+            </div>
+          ) : wellbeingError ? (
+            <div className="flex flex-col items-center py-8 text-muted">
+              <AlertTriangle size={32} className="mb-2 text-danger" />
+              <p>{wellbeingError}</p>
+              <Button size="sm" variant="tertiary" className="mt-3" onPress={() => loadWellbeingAlerts(wellbeingStatus)}>
+                {t('volunteering.retry')}
+              </Button>
+            </div>
+          ) : wellbeingAlerts.length === 0 ? (
+            <div className="flex flex-col items-center py-8 text-muted">
+              <HeartPulse size={40} className="mb-2" />
+              <p>{t('volunteering.wellbeing_no_alerts')}</p>
+              <p className="text-xs mt-1">{t('volunteering.wellbeing_no_alerts_desc')}</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {wellbeingAlerts.map((alert, idx) => {
+                const busy = wellbeingActionId !== null && wellbeingActionId === alert.id;
+                const otherBusy = wellbeingActionId !== null && wellbeingActionId !== alert.id;
+                const riskLevel = alert.risk_level || alert.severity;
+                return (
+                  <div
+                    key={`${alert.id ?? 'alert'}-${idx}`}
+                    className="flex flex-col gap-2 rounded-xl border border-divider/70 bg-surface-secondary/30 p-3 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium">{wellbeingAlertName(alert, t)}</span>
+                        <Chip size="sm" variant="soft" color="danger" className="capitalize">
+                          {wellbeingAlertType(alert, t)}
+                        </Chip>
+                        {riskLevel && (
+                          <Chip size="sm" variant="soft" color="warning" className="capitalize">
+                            {riskLevel}
+                          </Chip>
+                        )}
+                      </div>
+                      {alert.created_at && (
+                        <p className="text-xs text-muted mt-1">
+                          {t('volunteering.wellbeing_raised_on', { date: new Date(alert.created_at).toLocaleDateString() })}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-1 shrink-0">
+                      <Button
+                        size="sm"
+                        variant="tertiary"
+                        startContent={<Check size={14} />}
+                        isLoading={busy}
+                        isDisabled={otherBusy}
+                        onPress={() => handleWellbeingAction(alert, 'acknowledged')}
+                      >
+                        {t('volunteering.wellbeing_acknowledge')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="tertiary"
+                        color="success"
+                        startContent={<CheckCircle size={14} />}
+                        isLoading={busy}
+                        isDisabled={otherBusy}
+                        onPress={() => handleWellbeingAction(alert, 'resolved')}
+                      >
+                        {t('volunteering.wellbeing_resolve')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="tertiary"
+                        startContent={<X size={14} />}
+                        isLoading={busy}
+                        isDisabled={otherBusy}
+                        onPress={() => handleWellbeingAction(alert, 'dismissed')}
+                      >
+                        {t('volunteering.wellbeing_dismiss')}
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardBody>
+      </Card>
 
       {/* Trends Chart */}
       <Card  className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
