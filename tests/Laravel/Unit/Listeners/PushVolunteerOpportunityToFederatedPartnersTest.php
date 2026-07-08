@@ -306,19 +306,28 @@ class PushVolunteerOpportunityToFederatedPartnersTest extends TestCase
         });
     }
 
-    public function test_payload_contains_tenant_id(): void
+    public function test_payload_does_not_leak_local_tenant_or_creator_ids(): void
     {
         Http::fake(['*' => Http::response(['success' => true], 200)]);
 
         $this->insertVolPartner();
 
-        $opp = $this->makeOpportunity(['id' => 5004]);
+        $opp = $this->makeOpportunity(['id' => 5004, 'created_by' => 4242]);
         $listener = $this->makeListener();
         $listener->handle(new VolunteerOpportunityCreated($opp, self::TENANT_ID));
 
         Http::assertSent(function ($request) {
             $body = $request->data();
-            return ((int) ($body['tenant_id'] ?? 0)) === self::TENANT_ID;
+
+            // The request must still carry real, partner-relevant data...
+            $carriesData = ((string) ($body['external_id'] ?? '')) === '5004';
+
+            // ...but must NOT leak the sender's internal user/tenant ids: no
+            // outbound adapter or inbound consumer reads them (see the listener).
+            $noLeak = !array_key_exists('created_by', $body)
+                && !array_key_exists('tenant_id', $body);
+
+            return $carriesData && $noLeak;
         });
     }
 

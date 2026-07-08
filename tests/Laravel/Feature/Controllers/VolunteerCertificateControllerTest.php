@@ -74,6 +74,40 @@ class VolunteerCertificateControllerTest extends TestCase
             ->assertJsonStructure(['errors' => [['code', 'message']]]);
     }
 
+    /**
+     * fix(volunteering): certificate verification codes are now 16-char uppercase
+     * alphanumeric. The lookup column collates case-insensitively, so uppercasing
+     * a mixed-case random adds no entropy — the length is what matters.
+     */
+    public function test_generated_certificate_code_is_16_char_uppercase_alphanumeric(): void
+    {
+        \App\Core\TenantContext::setById($this->testTenantId);
+
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+
+        DB::table('vol_logs')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'organization_id' => null,
+            'date_logged' => now()->toDateString(),
+            'hours' => 5.0,
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Creating the fixture user above re-resolves TenantContext to the
+        // default tenant; re-assert it so generate() scopes vol_logs to the
+        // tenant the approved hours were seeded under.
+        \App\Core\TenantContext::setById($this->testTenantId);
+
+        $cert = \App\Services\VolunteerCertificateService::generate($user->id);
+
+        $this->assertNotNull($cert, 'certificate should generate for approved hours');
+        $this->assertArrayHasKey('verification_code', $cert);
+        $this->assertMatchesRegularExpression('/^[A-Z0-9]{16}$/', (string) $cert['verification_code']);
+    }
+
     public function test_verify_certificate_is_tenant_scoped(): void
     {
         $user = User::factory()->forTenant($this->testTenantId)->create([

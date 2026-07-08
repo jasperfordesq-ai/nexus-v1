@@ -42,20 +42,6 @@ class VolunteerReminderServiceTest extends TestCase
         $this->assertEquals(0, VolunteerReminderService::sendReminders(2, 1));
     }
 
-    public function test_scheduleReminder_returns_false_for_invalid_datetime(): void
-    {
-        $this->assertFalse(VolunteerReminderService::scheduleReminder(2, 1, 'not-a-date'));
-    }
-
-    public function test_cancelReminder_returns_false_when_not_found(): void
-    {
-        DB::shouldReceive('table')->with('vol_reminders_sent')->andReturnSelf();
-        DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('delete')->andReturn(0);
-
-        $this->assertFalse(VolunteerReminderService::cancelReminder(2, 999));
-    }
-
     public function test_updateSetting_returns_false_for_invalid_type(): void
     {
         $this->assertFalse(VolunteerReminderService::updateSetting('invalid_type', ['enabled' => true]));
@@ -97,5 +83,39 @@ class VolunteerReminderServiceTest extends TestCase
         $this->assertStringContainsString('sendReminders email channel claimed without valid recipient email', $source);
         $this->assertStringContainsString('sendPreShiftReminders email channel claimed without valid recipient email', $source);
         $this->assertStringContainsString('sendPostShiftFeedback email channel claimed without valid recipient email', $source);
+    }
+
+    // ── restrictToTenant() — the runAll N× redundant-sweep fix ──────────────────
+
+    private function invokeRestrictToTenant(array $tenantIds, ?int $onlyTenantId): array
+    {
+        $method = new \ReflectionMethod(VolunteerReminderService::class, 'restrictToTenant');
+        $method->setAccessible(true);
+
+        /** @var array<int,int> $result */
+        $result = $method->invoke(null, $tenantIds, $onlyTenantId);
+
+        return $result;
+    }
+
+    public function test_restrictToTenant_returns_all_tenants_when_none_specified(): void
+    {
+        // Standalone (single, all-tenant) callers pass null → unchanged behaviour,
+        // normalised to ints.
+        $this->assertSame([2, 3, 5], $this->invokeRestrictToTenant([2, 3, '5'], null));
+    }
+
+    public function test_restrictToTenant_narrows_to_single_eligible_tenant(): void
+    {
+        // The runAll scheduler passes the current tenant → only that tenant is
+        // processed, killing the N× re-sweep.
+        $this->assertSame([3], $this->invokeRestrictToTenant([2, 3, 5], 3));
+    }
+
+    public function test_restrictToTenant_returns_empty_when_tenant_has_no_work(): void
+    {
+        // A tenant not in the eligible set has nothing to send — the all-tenant
+        // sweep would have skipped it too, so semantics are preserved.
+        $this->assertSame([], $this->invokeRestrictToTenant([2, 3, 5], 99));
     }
 }

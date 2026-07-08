@@ -23,6 +23,18 @@ class VolunteerWellbeingController extends BaseApiController
 {
     protected bool $isV2Api = true;
 
+    /**
+     * Full admin role set for the volunteering module — includes
+     * tenant_super_admin, matching VolunteerCheckInController and
+     * VolunteerEmergencyAlertService::isAdminOrOrgOwner().
+     *
+     * @var list<string>
+     */
+    private const ADMIN_ROLES = ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin', 'god'];
+
+    /** Wellbeing alert lifecycle statuses (vol_wellbeing_alerts.status enum). */
+    private const ALERT_STATUSES = ['active', 'acknowledged', 'resolved', 'dismissed'];
+
     public function __construct(
         private readonly VolunteerWellbeingService $volunteerWellbeingService,
         private readonly VolunteerEmergencyAlertService $volunteerEmergencyAlertService,
@@ -36,6 +48,31 @@ class VolunteerWellbeingController extends BaseApiController
                 $this->respondWithError('FEATURE_DISABLED', __('api.vol_feature_disabled'), null, 403)
             );
         }
+    }
+
+    private function isModuleAdmin(): bool
+    {
+        $user = Auth::user();
+
+        return in_array($user->role ?? 'member', self::ADMIN_ROLES, true);
+    }
+
+    /**
+     * Require an authenticated user with a volunteering-module admin role.
+     *
+     * @return int The authenticated admin's user ID
+     */
+    private function requireModuleAdmin(): int
+    {
+        $userId = $this->getUserId();
+
+        if (!$this->isModuleAdmin()) {
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                $this->respondWithError('FORBIDDEN', __('api.admin_access_required'), null, 403)
+            );
+        }
+
+        return $userId;
     }
 
     private function getErrorStatus(array $errors): int
@@ -220,6 +257,74 @@ class VolunteerWellbeingController extends BaseApiController
         return $this->respondWithData($assessment);
     }
 
+    /**
+     * GET /v2/admin/volunteering/wellbeing/alerts
+     *
+     * List wellbeing (burnout-risk) alerts for coordinators. Optional
+     * ?status= filter (active|acknowledged|resolved|dismissed), default active.
+     */
+    public function adminWellbeingAlerts(): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->requireModuleAdmin();
+        $this->rateLimit('vol_wellbeing_alerts_admin', 30, 60);
+
+        $status = $this->query('status') ?: 'active';
+        if (!in_array($status, self::ALERT_STATUSES, true)) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.invalid_status_allowed', ['statuses' => implode(', ', self::ALERT_STATUSES)]),
+                'status',
+                422
+            );
+        }
+
+        $alerts = $this->volunteerWellbeingService->getActiveAlerts($status);
+
+        return $this->respondWithCollection($alerts, null, count($alerts), false);
+    }
+
+    /**
+     * PUT /v2/admin/volunteering/wellbeing/alerts/{id}
+     *
+     * Update a wellbeing alert's lifecycle status
+     * (acknowledged|resolved|dismissed) with an optional coordinator note.
+     */
+    public function updateWellbeingAlert($id): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->requireModuleAdmin();
+        $this->rateLimit('vol_wellbeing_alert_update', 30, 60);
+
+        $status = (string) $this->input('status', '');
+        $allowed = ['acknowledged', 'resolved', 'dismissed'];
+        if (!in_array($status, $allowed, true)) {
+            return $this->respondWithError(
+                'VALIDATION_ERROR',
+                __('api.invalid_status_allowed', ['statuses' => implode(', ', $allowed)]),
+                'status',
+                422
+            );
+        }
+
+        $note = $this->input('note');
+        if ($note !== null) {
+            $note = trim((string) $note);
+            if ($note === '') {
+                $note = null;
+            }
+        }
+
+        $success = $this->volunteerWellbeingService->updateAlert((int) $id, $status, $note);
+
+        if (!$success) {
+            $errors = $this->volunteerWellbeingService->getErrors();
+            return $this->respondWithErrors($errors, $this->getErrorStatus($errors));
+        }
+
+        return $this->respondWithData(['id' => (int) $id, 'status' => $status]);
+    }
+
     // ========================================
     // EMERGENCY ALERTS
     // ========================================
@@ -337,9 +442,7 @@ class VolunteerWellbeingController extends BaseApiController
 
         // Non-admin users can only see incidents they reported.
         // Full list is available via adminIncidents() which requires admin role.
-        $user = Auth::user();
-        $role = $user->role ?? 'member';
-        $isAdmin = in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true);
+        $isAdmin = $this->isModuleAdmin();
 
         if ($isAdmin) {
             $status = $this->query('status');
@@ -366,9 +469,7 @@ class VolunteerWellbeingController extends BaseApiController
         }
 
         // Ownership check: only the reporter or an admin can view
-        $user = Auth::user();
-        $role = $user->role ?? 'member';
-        $isAdmin = in_array($role, ['admin', 'tenant_admin', 'super_admin', 'god'], true);
+        $isAdmin = $this->isModuleAdmin();
         if ((int) ($incident['reported_by'] ?? 0) !== $userId && !$isAdmin) {
             return $this->respondWithError('FORBIDDEN', __('api.vol_incident_view_forbidden'), null, 403);
         }

@@ -187,7 +187,7 @@ class StripeDonationService
         $donation = DB::transaction(function () use (
             $tenantId, $userId, $data, $amount, $currency, $paymentIntent, $user, $tenantStripeAccountId, $paymentRoute
         ) {
-            $giftAid = self::normalizeGiftAidDeclaration($data);
+            $giftAid = self::normalizeGiftAidDeclaration($data, $currency);
 
             $attributes = [
                 'tenant_id' => $tenantId,
@@ -267,9 +267,17 @@ class StripeDonationService
     }
 
     /**
+     * Normalise a donor's Gift Aid declaration into vol_donations columns.
+     *
+     * Gift Aid is a UK/HMRC scheme: only donations made in GBP can be
+     * claimed, so a declaration is only marked 'ready' when the donation
+     * currency is GBP in addition to the GB address requirements. Non-GBP
+     * donations are recorded as 'not_eligible' regardless of address.
+     *
+     * @param string $currency 3-letter ISO currency code of the donation (any case)
      * @return array{claim_status:string,declaration_name:?string,address_line1:?string,address_line2:?string,town:?string,postcode:?string,country:?string,consented_at:?string}
      */
-    private static function normalizeGiftAidDeclaration(array $data): array
+    private static function normalizeGiftAidDeclaration(array $data, string $currency): array
     {
         $giftAid = is_array($data['gift_aid'] ?? null) ? $data['gift_aid'] : [];
         $enabled = !empty($data['gift_aid_enabled']) || !empty($giftAid['enabled']);
@@ -279,7 +287,8 @@ class StripeDonationService
         $line2 = trim((string) ($giftAid['address_line2'] ?? $data['gift_aid_address_line2'] ?? ''));
         $town = trim((string) ($giftAid['town'] ?? $data['gift_aid_town'] ?? ''));
         $postcode = strtoupper(trim((string) ($giftAid['postcode'] ?? $data['gift_aid_postcode'] ?? '')));
-        $ready = $enabled && $country === 'GB' && $name !== '' && $line1 !== '' && $postcode !== '';
+        $isGbp = strtolower(trim($currency)) === 'gbp';
+        $ready = $enabled && $isGbp && $country === 'GB' && $name !== '' && $line1 !== '' && $postcode !== '';
 
         return [
             'claim_status' => $ready ? 'ready' : 'not_eligible',

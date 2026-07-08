@@ -171,6 +171,19 @@ class VolunteerCertificateController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'credential_type']), 'credential_type');
         }
 
+        // Validate the optional expiry date before it reaches the DATE column —
+        // an unparseable string would otherwise be silently coerced to 0000-00-00
+        // (or rejected at the DB layer with an opaque 500). Normalise to Y-m-d.
+        if ($expiresAt !== null && trim((string) $expiresAt) !== '') {
+            $expiresTs = strtotime((string) $expiresAt);
+            if ($expiresTs === false) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_expiry_date_format'), 'expires_at', 422);
+            }
+            $expiresAt = date('Y-m-d', $expiresTs);
+        } else {
+            $expiresAt = null;
+        }
+
         // Support both Laravel UploadedFile and raw $_FILES
         $file = request()->file('file') ?? request()->file('document');
         $uploadedFile = null;

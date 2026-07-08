@@ -63,6 +63,55 @@ class StripeDonationServiceTest extends TestCase
     }
 
     // =========================================================================
+    // normalizeGiftAidDeclaration — Gift Aid is a UK/HMRC scheme (GBP only)
+    // =========================================================================
+
+    /**
+     * @return array{claim_status:string,declaration_name:?string,address_line1:?string,address_line2:?string,town:?string,postcode:?string,country:?string,consented_at:?string}
+     */
+    private function normalizeGiftAid(array $data, string $currency): array
+    {
+        $method = new \ReflectionMethod(StripeDonationService::class, 'normalizeGiftAidDeclaration');
+
+        return $method->invoke(null, $data, $currency);
+    }
+
+    private function fullGiftAidDeclaration(): array
+    {
+        return [
+            'gift_aid_enabled' => true,
+            'gift_aid_declaration_name' => 'Ada Lovelace',
+            'gift_aid_address_line1' => '1 Example Street',
+            'gift_aid_postcode' => 'SW1A 1AA',
+            'gift_aid_country' => 'GB',
+        ];
+    }
+
+    public function test_giftAid_declaration_never_ready_for_non_gbp_donation(): void
+    {
+        // A complete GB declaration on a non-GBP donation must NOT become
+        // 'ready' — Gift Aid can only be claimed on GBP donations.
+        $result = $this->normalizeGiftAid($this->fullGiftAidDeclaration(), 'eur');
+
+        $this->assertSame('not_eligible', $result['claim_status']);
+        $this->assertNull($result['declaration_name']);
+        $this->assertNull($result['postcode']);
+        $this->assertNull($result['consented_at']);
+    }
+
+    public function test_giftAid_declaration_ready_for_gbp_donation_any_case(): void
+    {
+        foreach (['gbp', 'GBP'] as $currency) {
+            $result = $this->normalizeGiftAid($this->fullGiftAidDeclaration(), $currency);
+
+            $this->assertSame('ready', $result['claim_status'], "currency: {$currency}");
+            $this->assertSame('Ada Lovelace', $result['declaration_name']);
+            $this->assertSame('GB', $result['country']);
+            $this->assertNotNull($result['consented_at']);
+        }
+    }
+
+    // =========================================================================
     // handlePaymentSucceeded
     // =========================================================================
 

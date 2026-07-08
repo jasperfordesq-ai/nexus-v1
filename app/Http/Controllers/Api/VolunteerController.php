@@ -14,6 +14,7 @@ use App\Http\Requests\Volunteering\CreateReviewRequest;
 use App\Http\Requests\Volunteering\HandleApplicationRequest;
 use App\Http\Requests\Volunteering\LogHoursRequest;
 use App\Http\Requests\Volunteering\UpdateOpportunityRequest;
+use App\Http\Requests\Volunteering\UpdateOrganisationRequest;
 use App\Http\Requests\Volunteering\VerifyHoursRequest;
 use App\Http\Resources\PublicOrganisationResource;
 use App\Services\VolunteerService;
@@ -393,7 +394,14 @@ class VolunteerController extends BaseApiController
     {
         $this->ensureFeature();
         $this->rateLimit('volunteering_shifts', 120, 60);
-        $shifts = $this->volunteerService->getShiftsForOpportunity((int) $id);
+        // Same public-visibility gate as showOpportunity(): shift details of
+        // cancelled/hidden opportunities must 404 unless the caller can manage
+        // the opportunity.
+        $viewerId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+        $shifts = $this->volunteerService->getShiftsForOpportunity((int) $id, $viewerId);
+        if ($shifts === null) {
+            return $this->respondWithError('NOT_FOUND', __('api.opportunity_not_found'), null, 404);
+        }
         return $this->respondWithData($shifts);
     }
 
@@ -592,6 +600,13 @@ class VolunteerController extends BaseApiController
             $org['deputy_dlp_user_id'],
         );
 
+        // The eager-loaded owner relation ({id, first_name, last_name,
+        // avatar_url}) survives toArray() — keep the display fields but never
+        // re-leak the owner's internal user id we just stripped above.
+        if (isset($org['owner']) && is_array($org['owner'])) {
+            unset($org['owner']['id']);
+        }
+
         return $org;
     }
 
@@ -742,10 +757,17 @@ class VolunteerController extends BaseApiController
             return $org;
         }
 
-        // Site admins (super_admin, god) can access any org dashboard
+        // Platform/tenant admins can access any org dashboard. Uses the
+        // volunteering module's full tenant-admin taxonomy (mirrors
+        // VolunteerCheckInController / VolunteerEmergencyAlertService and the
+        // canManageOpportunity() grant) — previously only super_admin/god were
+        // recognised here, so admin/tenant_admin could decide applications but
+        // not open the org dashboard.
         $user = $this->resolveUser();
         $role = $user->role ?? 'member';
-        if (in_array($role, ['super_admin', 'god']) || ($user->is_super_admin ?? false) || ($user->is_tenant_super_admin ?? false)) {
+        if (in_array($role, ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin', 'god'], true)
+            || ($user->is_super_admin ?? false)
+            || ($user->is_tenant_super_admin ?? false)) {
             return $org;
         }
 
@@ -842,24 +864,6 @@ class VolunteerController extends BaseApiController
             'message' => $result['message'],
             'new_balance' => $result['new_balance'],
         ]);
-    }
-
-    public function orgWalletAutoPayToggle($id): JsonResponse
-    {
-        $this->ensureFeature();
-        $this->rateLimit('vol_org_autopay', 20, 60);
-        $org = $this->ensureOrgAccess((int) $id);
-        if (!$org) return $this->respondWithError('FORBIDDEN', __('api_controllers_2.volunteer.access_denied'), null, 403);
-
-        $enabled = $this->inputBool('enabled');
-        $tenantId = TenantContext::getId();
-
-        DB::update(
-            "UPDATE vol_organizations SET auto_pay_enabled = ? WHERE id = ? AND tenant_id = ?",
-            [$enabled ? 1 : 0, (int) $id, $tenantId]
-        );
-
-        return $this->respondWithData(['auto_pay_enabled' => $enabled]);
     }
 
     public function orgVolunteers($id): JsonResponse
@@ -1050,7 +1054,7 @@ class VolunteerController extends BaseApiController
         return $this->respondWithCollection($items, $hasMore ? $nextCursor : null, $limit, $hasMore);
     }
 
-    public function updateOrganisation($id): JsonResponse
+    public function updateOrganisation(UpdateOrganisationRequest $request, $id): JsonResponse
     {
         $this->ensureFeature();
         $this->rateLimit('vol_org_update', 10, 60);

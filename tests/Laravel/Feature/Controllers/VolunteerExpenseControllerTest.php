@@ -65,6 +65,45 @@ class VolunteerExpenseControllerTest extends TestCase
         $response->assertJsonStructure(['data']);
     }
 
+    /**
+     * fix(volunteering): myExpenses previously reduced its summary cards over the
+     * current page only (max 50 rows), under-counting once a volunteer had more
+     * than one page of expenses. The stats block must aggregate over the full
+     * user-scoped set via getExpenseStats.
+     */
+    public function test_my_expenses_stats_aggregate_over_full_set_not_just_page(): void
+    {
+        $this->enableVolunteeringFeature($this->testTenantId);
+
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        $org = VolOrganization::factory()->forTenant($this->testTenantId)->create();
+
+        foreach ([['pending', 30], ['paid', 20], ['approved', 15]] as [$status, $amount]) {
+            VolExpense::factory()->forTenant($this->testTenantId)->create([
+                'user_id' => $user->id,
+                'organization_id' => $org->id,
+                'opportunity_id' => null,
+                'status' => $status,
+                'amount' => $amount,
+                'submitted_at' => now(),
+            ]);
+        }
+
+        Sanctum::actingAs($user);
+
+        // per_page=1 → a page-scoped reduce would only see a single row.
+        $response = $this->apiGet('/v2/volunteering/expenses?per_page=1');
+
+        $response->assertStatus(200);
+        $this->assertCount(1, $response->json('data.items'));
+
+        $stats = $response->json('data.stats');
+        $this->assertEqualsWithDelta(65.0, (float) $stats['total_submitted'], 0.001);
+        $this->assertEqualsWithDelta(30.0, (float) $stats['pending_review'], 0.001);
+        $this->assertEqualsWithDelta(35.0, (float) $stats['approved_total'], 0.001);
+        $this->assertEqualsWithDelta(20.0, (float) $stats['paid_total'], 0.001);
+    }
+
     public function test_my_expenses_returns_403_when_feature_disabled(): void
     {
         DB::table('tenants')->where('id', $this->testTenantId)->update([

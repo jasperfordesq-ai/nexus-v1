@@ -52,7 +52,12 @@ class DonationOperationsService
 
         $giftAidReady = (clone $completed);
         if ($hasGiftAid) {
-            $giftAidReady->where('gift_aid_claim_status', 'ready');
+            // GBP-only, matching giftAidExportRows(): the overview's "ready"
+            // totals must reflect what the HMRC export will actually emit.
+            // Legacy non-GBP rows stamped 'ready' before the currency guard
+            // existed are excluded here too.
+            $giftAidReady->where('gift_aid_claim_status', 'ready')
+                ->whereRaw('UPPER(currency) = ?', ['GBP']);
         } else {
             $giftAidReady->whereRaw('1 = 0');
         }
@@ -108,6 +113,11 @@ class DonationOperationsService
             ->where('tenant_id', $tenantId)
             ->where('status', 'completed')
             ->where('gift_aid_claim_status', 'ready')
+            // Gift Aid is a UK/HMRC scheme — only GBP donations qualify.
+            // Non-GBP rows must never reach an HMRC claim export, even if a
+            // legacy row was stamped 'ready' before the currency guard in
+            // StripeDonationService::normalizeGiftAidDeclaration() existed.
+            ->whereRaw('UPPER(currency) = ?', ['GBP'])
             ->orderBy('created_at')
             ->get([
                 'id',
@@ -161,6 +171,10 @@ class DonationOperationsService
             ->where('tenant_id', $tenantId)
             ->whereIn('id', $donationIds)
             ->where('gift_aid_claim_status', 'ready')
+            // Refuse non-GBP rows (mirrors giftAidExportRows): a donation that
+            // cannot legally be claimed with HMRC must never be stamped
+            // 'claimed', even if its ID is passed in explicitly.
+            ->whereRaw('UPPER(currency) = ?', ['GBP'])
             ->update([
                 'gift_aid_claim_status' => 'claimed',
                 'gift_aid_claimed_at' => now(),

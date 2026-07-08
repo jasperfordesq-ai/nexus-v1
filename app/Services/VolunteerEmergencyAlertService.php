@@ -60,7 +60,10 @@ class VolunteerEmergencyAlertService
         $message = trim($data['message'] ?? '');
         $priority = $data['priority'] ?? 'urgent';
         $requiredSkills = $data['required_skills'] ?? null;
-        $expiresHours = (int) ($data['expires_hours'] ?? 24);
+        // Clamp the expiry window: at least 1 hour, at most 336 (14 days),
+        // defaulting to 24. Prevents a zero/negative value (an immediately-stale
+        // alert) or an unbounded one that would linger for months.
+        $expiresHours = max(1, min(336, (int) ($data['expires_hours'] ?? 24)));
 
         if (!$shiftId) {
             self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.vol_alert_shift_id_required'), 'field' => 'shift_id'];

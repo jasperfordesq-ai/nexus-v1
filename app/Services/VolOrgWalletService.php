@@ -174,6 +174,12 @@ class VolOrgWalletService
         if ($amount <= 0) {
             return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.amount_must_be_greater_than_zero')];
         }
+        // Reject fractional deposits explicitly — the previous silent
+        // (int) floor() made "5.75" quietly deposit 5 while the UI implied
+        // the full amount moved. users.balance stores whole hours only.
+        if (floor($amount) !== $amount) {
+            return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.deposit_whole_number_required')];
+        }
         if ($amount > 1000) {
             return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.deposit_cannot_exceed_1000')];
         }
@@ -201,8 +207,9 @@ class VolOrgWalletService
                 return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.organization_not_found')];
             }
 
-            // Use floor (not ceil) to prevent phantom debit: user loses same INT as org gains
-            $intAmount = (int) floor($amount);
+            // Whole-number amounts only (fractional deposits are rejected
+            // above): user loses the same INT as the org gains.
+            $intAmount = (int) $amount;
             if ($intAmount <= 0) {
                 return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.amount_must_be_at_least_1')];
             }

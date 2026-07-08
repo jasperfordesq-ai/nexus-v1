@@ -125,4 +125,52 @@ class RetentionEnforcementTest extends TestCase
         $this->assertNotNull(DB::table('vol_guardian_consents')->find($justLapsed), 'recently lapsed consent retained as evidence');
         $this->assertNotNull(DB::table('vol_guardian_consents')->find($noExpiry), 'no-expiry consent never matched');
     }
+
+    public function test_guardian_consent_purge_covers_withdrawn_and_abandoned_pending_rows(): void
+    {
+        $t = $this->testTenantId;
+        $mk = fn (array $attrs): int => (int) DB::table('vol_guardian_consents')->insertGetId(array_merge([
+            'tenant_id' => $t,
+            'minor_user_id' => 1,
+            'guardian_name' => 'G',
+            'guardian_email' => 'g@example.test',
+            'guardian_phone' => '+1 555 123 4567',
+            'relationship' => 'parent',
+            'consent_token' => bin2hex(random_bytes(32)),
+            'status' => 'active',
+            'expires_at' => null,
+            'consent_withdrawn_at' => null,
+            'created_at' => now()->subDays(10),
+        ], $attrs));
+
+        // Withdrawn consents (expires_at NULL) age out from withdrawal time.
+        $oldWithdrawn = $mk(['status' => 'withdrawn', 'consent_withdrawn_at' => now()->subDays(500)]);
+        $freshWithdrawn = $mk(['status' => 'withdrawn', 'consent_withdrawn_at' => now()->subDays(10)]);
+
+        // Abandoned pending requests (guardian PII captured, consent never
+        // given) age out from creation time.
+        $oldPending = $mk(['status' => 'pending', 'created_at' => now()->subDays(500)]);
+        $freshPending = $mk(['status' => 'pending', 'created_at' => now()->subDays(10)]);
+
+        // A LIVE consent with no expiry is never matched, however old.
+        $oldActiveNoExpiry = $mk(['status' => 'active', 'created_at' => now()->subDays(4000)]);
+
+        // Same shape as $oldWithdrawn but another tenant — must survive.
+        $otherTenantWithdrawn = $mk([
+            'tenant_id' => $t + 1,
+            'status' => 'withdrawn',
+            'consent_withdrawn_at' => now()->subDays(500),
+        ]);
+
+        $this->assertNull(RetentionPolicyService::upsertPolicy($t, 'vol_guardian_consents', 365, true));
+        $results = RetentionPolicyService::enforceForTenant($t);
+
+        $this->assertSame('completed', $results['vol_guardian_consents']['status']);
+        $this->assertNull(DB::table('vol_guardian_consents')->find($oldWithdrawn), 'long-withdrawn consent must be purged');
+        $this->assertNotNull(DB::table('vol_guardian_consents')->find($freshWithdrawn), 'recently withdrawn consent retained as evidence');
+        $this->assertNull(DB::table('vol_guardian_consents')->find($oldPending), 'abandoned pending request must be purged');
+        $this->assertNotNull(DB::table('vol_guardian_consents')->find($freshPending), 'fresh pending request must survive');
+        $this->assertNotNull(DB::table('vol_guardian_consents')->find($oldActiveNoExpiry), 'live no-expiry consent never matched');
+        $this->assertNotNull(DB::table('vol_guardian_consents')->find($otherTenantWithdrawn), 'other tenant data must never be touched');
+    }
 }

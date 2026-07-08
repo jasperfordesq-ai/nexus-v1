@@ -426,7 +426,7 @@ public function test_apply_requires_auth(): void
                         'website',
                         'contact_email',
                         'location' => ['label'],
-                        'owner' => ['id', 'display_name', 'avatar_url'],
+                        'owner' => ['display_name', 'avatar_url'],
                         'stats' => ['opportunity_count', 'volunteer_count', 'total_hours', 'review_count', 'average_rating'],
                         'org_type',
                         'created_at',
@@ -445,6 +445,8 @@ public function test_apply_requires_auth(): void
         $this->assertSame('https://example.test/care', $contract['website']);
         $this->assertSame('hello@example.test', $contract['contact_email']);
         $this->assertSame('Organisation Owner', $contract['owner']['display_name']);
+        // The owner's internal user id must never be exposed on the PUBLIC contract.
+        $this->assertArrayNotHasKey('id', $contract['owner']);
         $this->assertSame('organisation', $contract['org_type']);
         $this->assertSame('active', $contract['status']);
         $this->assertArrayNotHasKey('balance', $contract);
@@ -827,5 +829,91 @@ public function test_apply_requires_auth(): void
 
         $response->assertStatus(400);
         $this->assertEquals(5.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+    }
+
+    // ------------------------------------------------------------------
+    //  PUT /v2/volunteering/organisations/{id} — UpdateOrganisationRequest
+    // ------------------------------------------------------------------
+
+    public function test_update_organisation_rejects_javascript_website(): void
+    {
+        $owner = $this->authenticatedUser();
+        $this->enableVolunteeringFeature();
+        $orgId = $this->createPublicOrganisation($owner);
+
+        // A javascript: scheme is rendered as an <a href> on the PUBLIC org page
+        // for unauthenticated visitors — url:http,https must reject it (422) and
+        // leave the stored website untouched.
+        $response = $this->apiPut("/v2/volunteering/organisations/{$orgId}", [
+            'website' => 'javascript:alert(document.cookie)',
+        ]);
+
+        $response->assertStatus(422);
+        $this->assertSame(
+            'https://example.test/care',
+            DB::table('vol_organizations')->where('id', $orgId)->value('website')
+        );
+    }
+
+    public function test_update_organisation_rejects_blank_and_overlong_name(): void
+    {
+        $owner = $this->authenticatedUser();
+        $this->enableVolunteeringFeature();
+        $orgId = $this->createPublicOrganisation($owner);
+
+        // Blank name fails required; a 201-char name fails max:200. Neither
+        // partial-update attempt may mutate the stored name.
+        $this->apiPut("/v2/volunteering/organisations/{$orgId}", ['name' => ''])->assertStatus(422);
+        $this->apiPut("/v2/volunteering/organisations/{$orgId}", ['name' => str_repeat('a', 201)])->assertStatus(422);
+
+        $this->assertSame(
+            'Neighbourhood Care Collective',
+            DB::table('vol_organizations')->where('id', $orgId)->value('name')
+        );
+    }
+
+    public function test_second_application_decision_is_noop_and_fires_no_new_notification(): void
+    {
+        $owner = $this->authenticatedUser();
+        $this->enableVolunteeringFeature();
+        $orgId = $this->createVolunteerOrganisation($owner->id, 0.00, false);
+
+        $oppId = (int) DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $orgId,
+            'created_by' => $owner->id,
+            'title' => 'Decision Guard Opportunity',
+            'description' => 'Test',
+            'status' => 'active',
+            'is_active' => 1,
+            'created_at' => now(),
+        ]);
+
+        $applicant = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+        $appId = (int) DB::table('vol_applications')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $oppId,
+            'user_id' => $applicant->id,
+            'status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // First decision is a real pending -> approved transition.
+        $first = $this->apiPut("/v2/volunteering/applications/{$appId}", ['action' => 'approve']);
+        $first->assertStatus(200);
+        $this->assertSame('approved', DB::table('vol_applications')->where('id', $appId)->value('status'));
+
+        $notificationsAfterFirst = DB::table('notifications')->count();
+
+        // Second decision on the already-decided application must be a no-op:
+        // 409 conflict, status unchanged, and NO additional decision notification.
+        $second = $this->apiPut("/v2/volunteering/applications/{$appId}", ['action' => 'decline']);
+        $second->assertStatus(409);
+        $this->assertSame('approved', DB::table('vol_applications')->where('id', $appId)->value('status'));
+        $this->assertSame($notificationsAfterFirst, DB::table('notifications')->count());
     }
 }

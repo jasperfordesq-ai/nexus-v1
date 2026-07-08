@@ -435,72 +435,6 @@ class VolunteerReminderService
     }
 
     /**
-     * Schedule a reminder for a specific opportunity at a given datetime.
-     *
-     * Records a pre_shift reminder entry with the specified send time.
-     * Actual delivery is handled by a scheduled job that polls vol_reminders_sent.
-     *
-     * @return bool  True if scheduled successfully
-     */
-    public static function scheduleReminder(int $tenantId, int $opportunityId, string $datetime): bool
-    {
-        try {
-            $sendAt = new \DateTime($datetime);
-        } catch (\Throwable $e) {
-            Log::warning('[VolunteerReminder] Invalid datetime for scheduleReminder: ' . $e->getMessage());
-            return false;
-        }
-
-        // Verify the opportunity exists in this tenant
-        $opp = DB::table('vol_opportunities as opp')
-            ->join('vol_organizations as org', 'opp.organization_id', '=', 'org.id')
-            ->where('opp.id', $opportunityId)
-            ->where('org.tenant_id', $tenantId)
-            ->first();
-
-        if (!$opp) {
-            return false;
-        }
-
-        try {
-            // Record a scheduled reminder entry (reference_id = opportunity_id)
-            DB::table('vol_reminders_sent')->insert([
-                'tenant_id' => $tenantId,
-                'user_id' => 0, // 0 = broadcast to all volunteers for this opportunity
-                'reminder_type' => 'pre_shift',
-                'reference_id' => $opportunityId,
-                'channel' => 'push',
-                'sent_at' => $sendAt->format('Y-m-d H:i:s'),
-            ]);
-
-            return true;
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("VolunteerReminderService::scheduleReminder error: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Cancel a scheduled reminder by its ID.
-     *
-     * @return bool  True if the reminder was found and deleted
-     */
-    public static function cancelReminder(int $tenantId, int $reminderId): bool
-    {
-        try {
-            $deleted = DB::table('vol_reminders_sent')
-                ->where('id', $reminderId)
-                ->where('tenant_id', $tenantId)
-                ->delete();
-
-            return $deleted > 0;
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("VolunteerReminderService::cancelReminder error: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
      * Get all reminder settings for the current tenant.
      *
      * Returns one row per reminder_type, or synthesises defaults for types
@@ -595,6 +529,30 @@ class VolunteerReminderService
     // ─── Cron-callable reminder jobs ───────────────────────────────────────────
 
     /**
+     * Narrow a collected list of tenant IDs to a single tenant when requested.
+     *
+     * The sweep jobs below iterate every eligible tenant on their own. The
+     * runAll scheduler used to call them once per tenant inside forEachTenant(),
+     * which re-swept all tenants N times. Passing $onlyTenantId lets that caller
+     * process just the current tenant while standalone callers (no argument)
+     * keep the all-tenant behaviour. Preserves the "tenant must actually be
+     * eligible" semantics: a tenant not in the collected set has no work to do.
+     *
+     * @param array<int, int|string> $tenantIds
+     * @return list<int>
+     */
+    private static function restrictToTenant(array $tenantIds, ?int $onlyTenantId): array
+    {
+        $ints = array_map('intval', $tenantIds);
+
+        if ($onlyTenantId === null) {
+            return array_values($ints);
+        }
+
+        return array_values(array_intersect($ints, [$onlyTenantId]));
+    }
+
+    /**
      * Send pre-shift reminders to volunteers with upcoming shifts.
      *
      * Iterates all active tenants, reads their pre_shift reminder setting to
@@ -603,7 +561,7 @@ class VolunteerReminderService
      *
      * @return int Total number of reminders sent across all tenants
      */
-    public static function sendPreShiftReminders(): int
+    public static function sendPreShiftReminders(?int $onlyTenantId = null): int
     {
         self::releaseStaleReminderDeliveryClaims();
 
@@ -627,6 +585,7 @@ class VolunteerReminderService
             ->all();
 
         $allTenantIds = array_unique(array_merge($tenantIds, $tenantsWithShifts));
+        $allTenantIds = self::restrictToTenant($allTenantIds, $onlyTenantId);
 
         foreach ($allTenantIds as $tenantId) {
             try {
@@ -814,7 +773,7 @@ class VolunteerReminderService
      *
      * @return int Total number of feedback requests sent across all tenants
      */
-    public static function sendPostShiftFeedback(): int
+    public static function sendPostShiftFeedback(?int $onlyTenantId = null): int
     {
         self::releaseStaleReminderDeliveryClaims();
 
@@ -840,6 +799,7 @@ class VolunteerReminderService
             $settingsByTenant->keys()->all(),
             $tenantsWithEndedShifts
         ));
+        $allTenantIds = self::restrictToTenant($allTenantIds, $onlyTenantId);
 
         foreach ($allTenantIds as $tenantId) {
             try {
@@ -994,7 +954,7 @@ class VolunteerReminderService
      *
      * @return int Number of nudges sent
      */
-    public static function nudgeLapsedVolunteers(): int
+    public static function nudgeLapsedVolunteers(?int $onlyTenantId = null): int
     {
         self::releaseStaleReminderDeliveryClaims();
 
@@ -1023,6 +983,7 @@ class VolunteerReminderService
             $settingsByTenant->keys()->all(),
             $tenantsWithInactiveVolunteers
         ));
+        $allTenantIds = self::restrictToTenant($allTenantIds, $onlyTenantId);
 
         foreach ($allTenantIds as $tenantId) {
             try {
@@ -1129,14 +1090,15 @@ class VolunteerReminderService
      *
      * @return int Number of warnings sent
      */
-    public static function sendCredentialExpiryWarnings(): int
+    public static function sendCredentialExpiryWarnings(?int $onlyTenantId = null): int
     {
         return self::sendExpiryWarnings(
             'credential_expiry',
             'vol_credentials',
             'credential_type',
             null,
-            '/volunteering?tab=credentials'
+            '/volunteering?tab=credentials',
+            $onlyTenantId
         );
     }
 
@@ -1145,14 +1107,15 @@ class VolunteerReminderService
      *
      * @return int Number of warnings sent
      */
-    public static function sendTrainingExpiryWarnings(): int
+    public static function sendTrainingExpiryWarnings(?int $onlyTenantId = null): int
     {
         return self::sendExpiryWarnings(
             'training_expiry',
             'vol_safeguarding_training',
             'training_type',
             'training_name',
-            '/volunteering?tab=training'
+            '/volunteering?tab=training',
+            $onlyTenantId
         );
     }
 
@@ -1161,7 +1124,8 @@ class VolunteerReminderService
         string $table,
         string $typeColumn,
         ?string $nameColumn,
-        string $frontendPath
+        string $frontendPath,
+        ?int $onlyTenantId = null
     ): int {
         self::releaseStaleReminderDeliveryClaims();
 
@@ -1184,6 +1148,7 @@ class VolunteerReminderService
             $settingsByTenant->keys()->all(),
             $tenantsWithExpiringRecords
         ));
+        $allTenantIds = self::restrictToTenant($allTenantIds, $onlyTenantId);
 
         foreach ($allTenantIds as $tenantId) {
             try {

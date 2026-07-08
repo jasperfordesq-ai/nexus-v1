@@ -119,13 +119,17 @@ class VolunteerCertificateService
             ])
             ->all();
 
-        // Generate unique verification code
-        $verificationCode = strtoupper(Str::random(12));
+        // Generate a unique verification code. The lookup column
+        // (vol_certificates.verification_code) collates utf8mb4_unicode_ci —
+        // i.e. case-insensitive — so uppercasing a mixed-case string adds no
+        // real entropy. Use 16 uppercase alphanumeric chars (~36^16 ≈ 8e24
+        // combinations), which comfortably fits the varchar(32) column.
+        $verificationCode = strtoupper(Str::random(16));
 
         // Prevent duplicate — ensure code is unique
         $attempts = 0;
         while (DB::table('vol_certificates')->where('verification_code', $verificationCode)->exists() && $attempts < 5) {
-            $verificationCode = strtoupper(Str::random(12));
+            $verificationCode = strtoupper(Str::random(16));
             $attempts++;
         }
 

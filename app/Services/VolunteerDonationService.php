@@ -42,9 +42,9 @@ class VolunteerDonationService
      * Get paginated donations for the current tenant.
      *
      * Uses cursor-based pagination (keyset on id DESC). Optionally filters
-     * by opportunity_id and/or giving_day_id.
+     * by opportunity_id, community_project_id and/or giving_day_id.
      *
-     * @param array $filters Keys: opportunity_id, giving_day_id, cursor, limit
+     * @param array $filters Keys: user_id, opportunity_id, community_project_id, giving_day_id, cursor, limit
      * @return array{items: array, next_cursor: int|null}
      */
     public static function getDonations(array $filters = []): array
@@ -52,12 +52,20 @@ class VolunteerDonationService
         $limit = max(1, min((int) ($filters['limit'] ?? self::DEFAULT_LIMIT), self::MAX_LIMIT));
         $cursor = isset($filters['cursor']) ? (int) $filters['cursor'] : null;
 
-        $query = VolDonation::query()
-            ->select(array_merge([
-                'id', 'user_id', 'opportunity_id', 'giving_day_id',
-                'amount', 'currency', 'payment_method', 'payment_reference',
-                'message', 'is_anonymous', 'status', 'created_at',
-            ], self::donationRoutingColumns()));
+        $select = array_merge([
+            'id', 'user_id', 'opportunity_id', 'giving_day_id',
+            'amount', 'currency', 'payment_method', 'payment_reference',
+            'message', 'is_anonymous', 'status', 'created_at',
+        ], self::donationRoutingColumns());
+
+        // community_project_id was added after the base table shipped, so it is
+        // schema-guarded like the Stripe routing columns above.
+        $hasCommunityProject = Schema::hasColumn('vol_donations', 'community_project_id');
+        if ($hasCommunityProject) {
+            $select[] = 'community_project_id';
+        }
+
+        $query = VolDonation::query()->select($select);
 
         if (!empty($filters['user_id'])) {
             $query->where('user_id', (int) $filters['user_id']);
@@ -65,6 +73,10 @@ class VolunteerDonationService
 
         if (!empty($filters['opportunity_id'])) {
             $query->where('opportunity_id', (int) $filters['opportunity_id']);
+        }
+
+        if (!empty($filters['community_project_id']) && $hasCommunityProject) {
+            $query->where('community_project_id', (int) $filters['community_project_id']);
         }
 
         if (!empty($filters['giving_day_id'])) {
@@ -108,7 +120,16 @@ class VolunteerDonationService
         $tenantId = TenantContext::getId();
 
         $amount = (float) ($data['amount'] ?? 0);
-        $currency = strtoupper(trim($data['currency'] ?? 'EUR'));
+        // Offline/manual donations are recorded in the community's configured
+        // currency (same resolution as StripeDonationService::createPaymentIntent).
+        // Giving-day raised_amount sums the raw numeric amount with no FX
+        // conversion, so accepting a client-supplied foreign currency would let
+        // a donor inflate totals with a cheap currency. If the caller explicitly
+        // supplies a DIFFERENT currency we reject rather than silently
+        // relabelling the donation.
+        $tenantCurrency = strtoupper(trim((string) TenantContext::runForTenant($tenantId, fn () => TenantContext::getCurrency())));
+        $suppliedCurrency = strtoupper(trim((string) ($data['currency'] ?? '')));
+        $currency = $suppliedCurrency === '' ? $tenantCurrency : $suppliedCurrency;
         $paymentMethod = trim($data['payment_method'] ?? '');
         $paymentReference = trim($data['payment_reference'] ?? '');
         $message = trim($data['message'] ?? '');
@@ -128,6 +149,9 @@ class VolunteerDonationService
         }
         if (strlen($currency) !== 3) {
             throw new \InvalidArgumentException(__('api.vol_donation_currency_invalid'));
+        }
+        if ($currency !== $tenantCurrency) {
+            throw new \InvalidArgumentException(__('api.vol_donation_currency_mismatch', ['currency' => $tenantCurrency]));
         }
         if ($paymentMethod === '') {
             throw new \InvalidArgumentException(__('api.vol_donation_payment_method_required'));
@@ -338,14 +362,14 @@ class VolunteerDonationService
             return [];
         }
 
-        // Resolve per-day aggregates in ONE grouped query instead of three columns
+        // Resolve per-day aggregates in ONE grouped query instead of a query
         // per row (N+1). Days with no completed donations are absent from the
-        // result and fall back to zeroes — matching the prior COALESCE(SUM)=0.
+        // result and fall back to zeroes.
         $statsByDay = VolDonation::whereIn('giving_day_id', $rows->pluck('id'))
             ->where('tenant_id', TenantContext::getId())
             ->where('status', 'completed')
             ->groupBy('giving_day_id')
-            ->selectRaw('giving_day_id, COUNT(*) as total_donations, COUNT(DISTINCT COALESCE(user_id, id)) as donor_count, COALESCE(SUM(amount), 0) as total_amount')
+            ->selectRaw('giving_day_id, COUNT(*) as total_donations, COUNT(DISTINCT COALESCE(user_id, id)) as donor_count')
             ->get()
             ->keyBy('giving_day_id');
 
@@ -354,7 +378,15 @@ class VolunteerDonationService
             $stats = $statsByDay->get($row->id);
             $day['donor_count'] = (int) ($stats->donor_count ?? 0);
             $day['donation_count'] = (int) ($stats->total_donations ?? 0);
-            $day['raised_amount'] = (float) ($stats->total_amount ?? 0);
+            // raised_amount deliberately serves the STORED vol_giving_days
+            // counter — the same source of truth the public getGivingDays()
+            // and getGivingDayStats() paths use. The counter is maintained
+            // transactionally across the full donation lifecycle: incremented
+            // on completion (markCompleted / Stripe payment_intent.succeeded)
+            // and decremented on refund (StripeDonationService::
+            // handleChargeRefunded and ::createRefund). Recomputing
+            // SUM(amount) here made the admin total silently diverge from the
+            // totals members see.
             return self::formatGivingDay($day);
         })->toArray();
     }

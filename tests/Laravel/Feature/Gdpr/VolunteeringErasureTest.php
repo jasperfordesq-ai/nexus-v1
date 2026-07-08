@@ -128,6 +128,274 @@ class VolunteeringErasureTest extends TestCase
         $this->assertSame(1, DB::table('vol_custom_field_values')->where('entity_type', 'opportunity')->where('entity_id', $appId)->where('tenant_id', $tenantId)->count());
     }
 
+    public function test_erasure_scrubs_gift_aid_except_hmrc_claimed_declarations(): void
+    {
+        $tenantId = $this->testTenantId;
+        TenantContext::setById($tenantId);
+
+        $user = User::factory()->forTenant($tenantId)->create();
+        TenantContext::setById($tenantId);
+
+        $mkDonation = fn (string $claimStatus): int => (int) DB::table('vol_donations')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $user->id,
+            'amount' => 25.00,
+            'currency' => 'GBP',
+            'payment_method' => 'stripe',
+            'donor_name' => 'Donor Name',
+            'donor_email' => 'donor@example.test',
+            'message' => 'In memory of...',
+            'status' => 'completed',
+            'gift_aid_claim_status' => $claimStatus,
+            'gift_aid_declaration_name' => 'Declared Name',
+            'gift_aid_address_line1' => '1 Home Street',
+            'gift_aid_address_line2' => 'Flat 2',
+            'gift_aid_town' => 'Hometown',
+            'gift_aid_postcode' => 'HT1 2AB',
+            'gift_aid_country' => 'GB',
+            'gift_aid_consented_at' => now(),
+            'created_at' => now(),
+        ]);
+
+        $unclaimedId = $mkDonation('ready');
+        $claimedId = $mkDonation('claimed');
+        $refundAfterClaimId = $mkDonation('refund_after_claim');
+
+        (new GdprService($tenantId))->executeAccountDeletion($user->id);
+
+        // Donor identity + free-text message are scrubbed on EVERY row,
+        // claimed or not.
+        foreach ([$unclaimedId, $claimedId, $refundAfterClaimId] as $id) {
+            $row = DB::table('vol_donations')->find($id);
+            $this->assertNotNull($row, 'donation rows are retained for org accounting');
+            $this->assertNull($row->donor_name);
+            $this->assertNull($row->donor_email);
+            $this->assertNull($row->message);
+        }
+
+        // Unclaimed declaration ('ready') — the gift-aid PII goes too.
+        $unclaimed = DB::table('vol_donations')->find($unclaimedId);
+        $this->assertNull($unclaimed->gift_aid_declaration_name);
+        $this->assertNull($unclaimed->gift_aid_address_line1);
+        $this->assertNull($unclaimed->gift_aid_address_line2);
+        $this->assertNull($unclaimed->gift_aid_town);
+        $this->assertNull($unclaimed->gift_aid_postcode);
+
+        // Claimed declarations are RETAINED — HMRC's ~6-year record-keeping
+        // obligation for submitted Gift Aid claims (Art. 17(3)(b) carve-out).
+        foreach ([$claimedId, $refundAfterClaimId] as $id) {
+            $claimed = DB::table('vol_donations')->find($id);
+            $this->assertSame('Declared Name', $claimed->gift_aid_declaration_name);
+            $this->assertSame('1 Home Street', $claimed->gift_aid_address_line1);
+            $this->assertSame('Flat 2', $claimed->gift_aid_address_line2);
+            $this->assertSame('Hometown', $claimed->gift_aid_town);
+            $this->assertSame('HT1 2AB', $claimed->gift_aid_postcode);
+        }
+    }
+
+    public function test_erasure_scrubs_supporter_reservation_and_swap_free_text_but_keeps_rows(): void
+    {
+        $tenantId = $this->testTenantId;
+        TenantContext::setById($tenantId);
+
+        $user = User::factory()->forTenant($tenantId)->create();
+        $other = User::factory()->forTenant($tenantId)->create();
+        TenantContext::setById($tenantId);
+
+        // Community project + supporter pledges (one from the erased user,
+        // one from another member).
+        $projectId = (int) DB::table('vol_community_projects')->insertGetId([
+            'tenant_id' => $tenantId,
+            'proposed_by' => $other->id,
+            'title' => 'Erasure Project',
+            'description' => 'Community garden.',
+            'status' => 'proposed',
+            'supporter_count' => 2,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $mySupportId = (int) DB::table('vol_community_project_supporters')->insertGetId([
+            'tenant_id' => $tenantId,
+            'project_id' => $projectId,
+            'user_id' => $user->id,
+            'message' => 'Count me in, I live next door!',
+            'supported_at' => now(),
+        ]);
+        $otherSupportId = (int) DB::table('vol_community_project_supporters')->insertGetId([
+            'tenant_id' => $tenantId,
+            'project_id' => $projectId,
+            'user_id' => $other->id,
+            'message' => 'Happy to help at weekends',
+            'supported_at' => now(),
+        ]);
+
+        // Shifts (FK targets for reservations and swaps).
+        $opportunityId = (int) DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $tenantId,
+            'title' => 'Erasure Opportunity',
+            'description' => 'Shift work.',
+            'is_active' => 1,
+            'status' => 'open',
+            'created_at' => now(),
+        ]);
+        $mkShift = fn (): int => (int) DB::table('vol_shifts')->insertGetId([
+            'tenant_id' => $tenantId,
+            'opportunity_id' => $opportunityId,
+            'start_time' => now()->addDays(3),
+            'end_time' => now()->addDays(3)->addHours(2),
+            'capacity' => 5,
+            'created_at' => now(),
+        ]);
+        $shiftA = $mkShift();
+        $shiftB = $mkShift();
+
+        // Group reservations: one led by the erased user, one by someone else.
+        $ledReservationId = (int) DB::table('vol_shift_group_reservations')->insertGetId([
+            'tenant_id' => $tenantId,
+            'shift_id' => $shiftA,
+            'group_id' => 1,
+            'reserved_slots' => 3,
+            'reserved_by' => $user->id,
+            'status' => 'active',
+            'notes' => 'Our minibus arrives at 9, ring me on my mobile',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $otherReservationId = (int) DB::table('vol_shift_group_reservations')->insertGetId([
+            'tenant_id' => $tenantId,
+            'shift_id' => $shiftB,
+            'group_id' => 2,
+            'reserved_slots' => 2,
+            'reserved_by' => $other->id,
+            'status' => 'active',
+            'notes' => 'Other leader logistics',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Swap requests: outgoing (user authored the message) and incoming
+        // (counterparty authored it).
+        $outgoingSwapId = (int) DB::table('vol_shift_swap_requests')->insertGetId([
+            'tenant_id' => $tenantId,
+            'from_user_id' => $user->id,
+            'to_user_id' => $other->id,
+            'from_shift_id' => $shiftA,
+            'to_shift_id' => $shiftB,
+            'status' => 'pending',
+            'message' => 'Sorry, my daughter has a hospital appointment',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $incomingSwapId = (int) DB::table('vol_shift_swap_requests')->insertGetId([
+            'tenant_id' => $tenantId,
+            'from_user_id' => $other->id,
+            'to_user_id' => $user->id,
+            'from_shift_id' => $shiftB,
+            'to_shift_id' => $shiftA,
+            'status' => 'accepted',
+            'message' => 'Counterparty reason for swapping',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        (new GdprService($tenantId))->executeAccountDeletion($user->id);
+
+        // Supporter row kept (supporter counts stay honest), message scrubbed;
+        // the other member's pledge is untouched.
+        $mySupport = DB::table('vol_community_project_supporters')->find($mySupportId);
+        $this->assertNotNull($mySupport);
+        $this->assertNull($mySupport->message);
+        $this->assertSame('Happy to help at weekends', DB::table('vol_community_project_supporters')->find($otherSupportId)->message);
+
+        // Led reservation kept (group capacity record), notes scrubbed; the
+        // other leader's notes are untouched.
+        $ledReservation = DB::table('vol_shift_group_reservations')->find($ledReservationId);
+        $this->assertNotNull($ledReservation);
+        $this->assertNull($ledReservation->notes);
+        $this->assertSame('Other leader logistics', DB::table('vol_shift_group_reservations')->find($otherReservationId)->notes);
+
+        // Swap requests kept in BOTH directions (two-party records). The
+        // erased user's own message is scrubbed; the counterparty's survives.
+        $outgoing = DB::table('vol_shift_swap_requests')->find($outgoingSwapId);
+        $this->assertNotNull($outgoing, 'outgoing swap row must be retained for the counterparty');
+        $this->assertNull($outgoing->message);
+        $incoming = DB::table('vol_shift_swap_requests')->find($incomingSwapId);
+        $this->assertNotNull($incoming, 'incoming swap row must be retained for the counterparty');
+        $this->assertSame('Counterparty reason for swapping', $incoming->message);
+    }
+
+    public function test_sar_export_includes_supporter_pledges_and_led_group_reservations(): void
+    {
+        $tenantId = $this->testTenantId;
+        TenantContext::setById($tenantId);
+
+        $user = User::factory()->forTenant($tenantId)->create();
+        TenantContext::setById($tenantId);
+
+        $projectId = (int) DB::table('vol_community_projects')->insertGetId([
+            'tenant_id' => $tenantId,
+            'proposed_by' => $user->id,
+            'title' => 'SAR Export Project',
+            'description' => 'Litter pick.',
+            'status' => 'proposed',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('vol_community_project_supporters')->insert([
+            'tenant_id' => $tenantId,
+            'project_id' => $projectId,
+            'user_id' => $user->id,
+            'message' => 'My supporter pledge message',
+            'supported_at' => now(),
+        ]);
+
+        $opportunityId = (int) DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $tenantId,
+            'title' => 'SAR Export Opportunity',
+            'description' => 'Shift work.',
+            'is_active' => 1,
+            'status' => 'open',
+            'created_at' => now(),
+        ]);
+        $shiftId = (int) DB::table('vol_shifts')->insertGetId([
+            'tenant_id' => $tenantId,
+            'opportunity_id' => $opportunityId,
+            'start_time' => now()->addDays(5),
+            'end_time' => now()->addDays(5)->addHours(2),
+            'capacity' => 4,
+            'created_at' => now(),
+        ]);
+        DB::table('vol_shift_group_reservations')->insert([
+            'tenant_id' => $tenantId,
+            'shift_id' => $shiftId,
+            'group_id' => 1,
+            'reserved_slots' => 3,
+            'reserved_by' => $user->id,
+            'status' => 'active',
+            'notes' => 'Leader logistics notes',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $service = new GdprService($tenantId);
+        $method = new \ReflectionMethod($service, 'exportVolunteerData');
+        $data = $method->invoke($service, (int) $user->id);
+
+        // Supporter pledge disclosed, including the free-text message and
+        // the project it relates to.
+        $this->assertNotEmpty($data['community_project_support']);
+        $pledge = $data['community_project_support'][0];
+        $this->assertSame('My supporter pledge message', $pledge['message']);
+        $this->assertSame('SAR Export Project', $pledge['project_title']);
+
+        // Group reservations the user LEADS are disclosed with their notes
+        // (memberships alone would miss these rows).
+        $this->assertNotEmpty($data['shift_group_reservations_led']);
+        $reservation = $data['shift_group_reservations_led'][0];
+        $this->assertSame($shiftId, (int) $reservation['shift_id']);
+        $this->assertSame('Leader logistics notes', $reservation['notes']);
+    }
+
     public function test_sar_export_includes_payment_ledger_and_subject_side_incidents(): void
     {
         $tenantId = $this->testTenantId;

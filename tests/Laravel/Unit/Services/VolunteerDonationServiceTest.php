@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Unit\Services;
 
 use Tests\Laravel\TestCase;
+use App\Core\TenantContext;
 use App\Services\VolunteerDonationService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
@@ -38,6 +39,39 @@ class VolunteerDonationServiceTest extends TestCase
             'currency' => 'EURO',
             'payment_method' => 'card',
         ]);
+    }
+
+    public function test_createDonation_rejects_currency_different_from_tenant_currency(): void
+    {
+        // Giving-day totals sum raw numeric amounts with no FX conversion, so
+        // a client-supplied foreign currency must be rejected, not recorded.
+        $tenantCurrency = strtoupper(TenantContext::getCurrency());
+        $foreignCurrency = $tenantCurrency === 'USD' ? 'EUR' : 'USD';
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must match the community currency');
+
+        VolunteerDonationService::createDonation(1, [
+            'amount' => 10,
+            'currency' => $foreignCurrency,
+            'payment_method' => 'bank_transfer',
+        ]);
+    }
+
+    public function test_createDonation_records_tenant_currency_when_none_supplied(): void
+    {
+        $tenantCurrency = strtoupper(TenantContext::getCurrency());
+
+        $donation = VolunteerDonationService::createDonation(1, [
+            'amount' => 10,
+            'payment_method' => 'bank_transfer',
+        ]);
+
+        $this->assertSame($tenantCurrency, $donation['currency']);
+        $this->assertSame(
+            $tenantCurrency,
+            strtoupper((string) DB::table('vol_donations')->where('id', $donation['id'])->value('currency'))
+        );
     }
 
     public function test_createDonation_throws_for_missing_payment_method(): void
@@ -172,6 +206,88 @@ class VolunteerDonationServiceTest extends TestCase
         $this->assertSame('tenant_connect', $row['payment_route']);
         $this->assertSame('acct_test_123456', $row['stripe_account_id']);
         $this->assertSame('pi_test_123456', $row['stripe_payment_intent_id']);
+    }
+
+    public function test_getDonations_filters_by_community_project_id(): void
+    {
+        if (!Schema::hasColumn('vol_donations', 'community_project_id')) {
+            $this->markTestSkipped('vol_donations.community_project_id column not present');
+        }
+
+        $userId = random_int(10_000_000, 99_999_999);
+        $projectId = random_int(10_000_000, 99_999_999);
+
+        $projectDonationId = (int) DB::table('vol_donations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'community_project_id' => $projectId,
+            'amount' => 10.00,
+            'currency' => 'EUR',
+            'payment_method' => 'bank_transfer',
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+        DB::table('vol_donations')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'community_project_id' => null,
+            'amount' => 20.00,
+            'currency' => 'EUR',
+            'payment_method' => 'bank_transfer',
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+
+        // Previously the community_project_id filter was accepted but never
+        // applied, silently returning ALL of the user's donations.
+        $result = VolunteerDonationService::getDonations([
+            'user_id' => $userId,
+            'community_project_id' => $projectId,
+        ]);
+
+        $this->assertCount(1, $result['items']);
+        $this->assertSame($projectDonationId, (int) $result['items'][0]['id']);
+        $this->assertSame($projectId, (int) $result['items'][0]['community_project_id']);
+    }
+
+    public function test_adminGetGivingDays_serves_stored_raised_amount_counter(): void
+    {
+        $givingDayId = (int) DB::table('vol_giving_days')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'title' => 'Stored Counter Giving Day',
+            'start_date' => now()->toDateString(),
+            'end_date' => now()->addDay()->toDateString(),
+            'goal_amount' => 1000,
+            // Stored counter deliberately differs from SUM(amount) of completed
+            // donations to pin the source of truth.
+            'raised_amount' => 50.00,
+            'is_active' => 1,
+            'created_by' => 1,
+            'created_at' => now(),
+        ]);
+
+        DB::table('vol_donations')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => random_int(10_000_000, 99_999_999),
+            'giving_day_id' => $givingDayId,
+            'amount' => 10.00,
+            'currency' => 'EUR',
+            'payment_method' => 'bank_transfer',
+            'status' => 'completed',
+            'created_at' => now(),
+        ]);
+
+        $days = VolunteerDonationService::adminGetGivingDays();
+        $day = collect($days)->firstWhere('id', $givingDayId);
+
+        $this->assertNotNull($day);
+        // The admin list must serve the SAME stored vol_giving_days counter as
+        // the public getGivingDays()/getGivingDayStats() paths (the counter is
+        // maintained on completion AND refund), not a recomputed SUM(amount)
+        // that silently diverges from what members see.
+        $this->assertSame(50.0, (float) $day['raised_amount']);
+        $this->assertSame(1, $day['donation_count']);
+        $this->assertSame(1, $day['donor_count']);
     }
 
     public function test_createGivingDay_throws_for_empty_title(): void

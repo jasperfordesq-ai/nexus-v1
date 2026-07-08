@@ -329,11 +329,12 @@ class VolunteerWellbeingService
     }
 
     /**
-     * Get active wellbeing alerts for the current tenant.
+     * Get wellbeing alerts for the current tenant, filtered by status.
      *
-     * @return array  List of active alerts with user info
+     * @param string $status  One of: active, acknowledged, resolved, dismissed (defaults to active)
+     * @return array  List of alerts with user info
      */
-    public static function getActiveAlerts(): array
+    public static function getActiveAlerts(string $status = 'active'): array
     {
         $tenantId = TenantContext::getId();
 
@@ -344,7 +345,7 @@ class VolunteerWellbeingService
                          ->on('wa.tenant_id', '=', 'u.tenant_id');
                 })
                 ->where('wa.tenant_id', $tenantId)
-                ->where('wa.status', 'active')
+                ->where('wa.status', $status)
                 ->select(
                     'wa.id', 'wa.user_id', 'wa.risk_level', 'wa.risk_score',
                     'wa.indicators', 'wa.coordinator_notified', 'wa.coordinator_notes',

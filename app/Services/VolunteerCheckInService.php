@@ -77,45 +77,6 @@ class VolunteerCheckInService
     }
 
     /**
-     * Check in a volunteer for an opportunity (legacy-compatible signature).
-     */
-    public static function checkIn(int $tenantId, int $opportunityId, int $userId): bool
-    {
-        try {
-            $shift = VolShift::where('opportunity_id', $opportunityId)
-                ->where('tenant_id', $tenantId)
-                ->first();
-            if (!$shift) {
-                return false;
-            }
-
-            $checkin = DB::table('vol_shift_checkins')
-                ->where('shift_id', $shift->id)
-                ->where('user_id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->first();
-
-            if (!$checkin) {
-                return false;
-            }
-
-            if ($checkin->status === 'checked_in') {
-                return true; // already checked in
-            }
-
-            DB::table('vol_shift_checkins')
-                ->where('id', $checkin->id)
-                ->where('tenant_id', $tenantId)
-                ->update(['status' => 'checked_in', 'checked_in_at' => now(), 'updated_at' => now()]);
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error('VolunteerCheckInService::checkIn error: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
      * Check out a volunteer using QR token.
      *
      * @param string $token QR token
@@ -150,42 +111,6 @@ class VolunteerCheckInService
         } catch (\Exception $e) {
             Log::error('VolunteerCheckInService::checkOut error: ' . $e->getMessage());
             $this->addError('INTERNAL_ERROR', __('api.unexpected_error'));
-            return false;
-        }
-    }
-
-    /**
-     * Check out a volunteer for an opportunity (legacy-compatible signature).
-     */
-    public static function checkOutLegacy(int $tenantId, int $opportunityId, int $userId, ?float $hours = null): bool
-    {
-        try {
-            $shift = VolShift::where('opportunity_id', $opportunityId)
-                ->where('tenant_id', $tenantId)
-                ->first();
-            if (!$shift) {
-                return false;
-            }
-
-            $checkin = DB::table('vol_shift_checkins')
-                ->where('shift_id', $shift->id)
-                ->where('user_id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->where('status', 'checked_in')
-                ->first();
-
-            if (!$checkin) {
-                return false;
-            }
-
-            DB::table('vol_shift_checkins')
-                ->where('id', $checkin->id)
-                ->where('tenant_id', $tenantId)
-                ->update(['status' => 'checked_out', 'checked_out_at' => now(), 'updated_at' => now()]);
-
-            return true;
-        } catch (\Exception $e) {
-            Log::error('VolunteerCheckInService::checkOut error: ' . $e->getMessage());
             return false;
         }
     }
@@ -434,6 +359,22 @@ class VolunteerCheckInService
                 $this->addError('VALIDATION_ERROR', __('api.vol_checkin_not_yet_available', ['time' => $shiftStart->toDateTimeString()]));
                 return null;
             }
+        }
+
+        // Upper bound: QR tokens previously never expired, so a leaked/stale
+        // token could still check a volunteer in weeks after the shift. Allow a
+        // 4-hour grace window after the shift ends; when the shift has no
+        // end_time, fall back to 24 hours after the start. Shifts with neither
+        // timestamp keep the historical always-open behaviour.
+        $latestCheckin = null;
+        if ($checkin->end_time) {
+            $latestCheckin = Carbon::parse($checkin->end_time)->addHours(4);
+        } elseif ($checkin->start_time) {
+            $latestCheckin = Carbon::parse($checkin->start_time)->addHours(24);
+        }
+        if ($latestCheckin !== null && now()->gt($latestCheckin)) {
+            $this->addError('VALIDATION_ERROR', __('api.vol_checkin_window_closed', ['time' => $latestCheckin->toDateTimeString()]));
+            return null;
         }
 
         if ($checkin->status === 'checked_in') {

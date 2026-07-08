@@ -1065,7 +1065,11 @@ trait VolunteeringParity
 
         $data = [
             'amount' => $amount,
-            'currency' => 'EUR',
+            // Currency is intentionally omitted: the service records the
+            // tenant's configured currency (TenantContext::getCurrency()).
+            // Hardcoding 'EUR' here mislabelled donations for non-euro
+            // communities and would now be rejected by the service's
+            // tenant-currency guard.
             'payment_method' => $paymentMethod,
             'message' => $message,
             'is_anonymous' => $isAnonymous,

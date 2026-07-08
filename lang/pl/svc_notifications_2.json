@@ -14,6 +14,7 @@
   "org_wallet.only_admin_or_owner_can_direct_transfer": "Only admin or owner can perform direct transfers",
   "vol_org_wallet.amount_must_be_greater_than_zero": "Amount must be greater than 0",
   "vol_org_wallet.deposit_cannot_exceed_1000": "Deposit amount cannot exceed 1000 hours",
+  "vol_org_wallet.deposit_whole_number_required": "Kwota wpłaty musi być pełną liczbą godzin",
   "vol_org_wallet.user_not_found": "User not found",
   "vol_org_wallet.organization_not_found": "Organization not found",
   "vol_org_wallet.amount_must_be_at_least_1": "Amount must be at least 1 hour",

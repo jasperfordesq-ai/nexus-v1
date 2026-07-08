@@ -3352,7 +3352,7 @@ class CronJobRunner
     {
         $this->forEachTenant(function ($tenantId, $slug) {
             try {
-                $sent = \App\Services\VolunteerReminderService::sendPreShiftReminders();
+                $sent = \App\Services\VolunteerReminderService::sendPreShiftReminders((int) $tenantId);
                 if ($sent > 0) {
                     echo "   [{$slug}] Pre-shift reminders: {$sent} sent.\n";
                 }
@@ -3380,7 +3380,7 @@ class CronJobRunner
     {
         $this->forEachTenant(function ($tenantId, $slug) {
             try {
-                $sent = \App\Services\VolunteerReminderService::sendPostShiftFeedback();
+                $sent = \App\Services\VolunteerReminderService::sendPostShiftFeedback((int) $tenantId);
                 if ($sent > 0) {
                     echo "   [{$slug}] Post-shift feedback: {$sent} sent.\n";
                 }
@@ -3394,7 +3394,7 @@ class CronJobRunner
     {
         $this->forEachTenant(function ($tenantId, $slug) {
             try {
-                $sent = \App\Services\VolunteerReminderService::nudgeLapsedVolunteers();
+                $sent = \App\Services\VolunteerReminderService::nudgeLapsedVolunteers((int) $tenantId);
                 if ($sent > 0) {
                     echo "   [{$slug}] Lapsed nudges: {$sent} sent.\n";
                 }
@@ -3408,8 +3408,8 @@ class CronJobRunner
     {
         $this->forEachTenant(function ($tenantId, $slug) {
             try {
-                $creds = \App\Services\VolunteerReminderService::sendCredentialExpiryWarnings();
-                $train = \App\Services\VolunteerReminderService::sendTrainingExpiryWarnings();
+                $creds = \App\Services\VolunteerReminderService::sendCredentialExpiryWarnings((int) $tenantId);
+                $train = \App\Services\VolunteerReminderService::sendTrainingExpiryWarnings((int) $tenantId);
                 $total = $creds + $train;
                 if ($total > 0) {
                     echo "   [{$slug}] Expiry warnings: {$total} sent (creds: {$creds}, training: {$train}).\n";

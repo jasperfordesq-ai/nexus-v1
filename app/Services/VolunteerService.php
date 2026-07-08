@@ -106,7 +106,8 @@ class VolunteerService
         }
 
         if (! empty($filters['search'])) {
-            $term = '%' . $filters['search'] . '%';
+            // Escape LIKE wildcards so user input is matched literally.
+            $term = '%' . addcslashes((string) $filters['search'], '%_\\') . '%';
             $query->where(function (Builder $q) use ($term) {
                 $q->where('title', 'LIKE', $term)
                   ->orWhere('description', 'LIKE', $term)
@@ -134,20 +135,28 @@ class VolunteerService
                 cos(radians(?)) * cos(radians(vol_opportunities.latitude)) * cos(radians(vol_opportunities.longitude) - radians(?)) +
                 sin(radians(?)) * sin(radians(vol_opportunities.latitude))
             ))))";
+            // distance_km is rounded to 6 decimal places (sub-metre precision)
+            // in the SELECT itself so the ORDER BY, the HAVING radius filter,
+            // and the keyset-cursor comparison below all share one exact value
+            // — comparing a rounded cursor against the raw float expression
+            // skipped/repeated rows at page boundaries.
             $query->whereNotNull('vol_opportunities.latitude')
                   ->whereNotNull('vol_opportunities.longitude')
-                  ->selectRaw("vol_opportunities.*, {$haversine} AS distance_km", [$nearLat, $nearLng, $nearLat])
+                  ->selectRaw("vol_opportunities.*, ROUND({$haversine}, 6) AS distance_km", [$nearLat, $nearLng, $nearLat])
                   ->having('distance_km', '<=', $radiusKm)
                   ->orderBy('distance_km')
                   ->orderBy('id');
 
             // Distance ordering needs a (distance, id) keyset cursor — an
-            // id-based one would skip/repeat items across pages.
+            // id-based one would skip/repeat items across pages. distance_km
+            // is already ROUND(..., 6) in the SELECT, and the cursor encodes
+            // the same rounded value, so this boundary comparison is exact.
             if ($decodedCursor !== false && str_starts_with($decodedCursor, 'D:') && str_contains($decodedCursor, '|')) {
                 [$lastDistance, $lastId] = explode('|', substr($decodedCursor, 2), 2);
+                $roundedLastDistance = round((float) $lastDistance, 6);
                 $query->havingRaw(
                     '(distance_km > ?) OR (distance_km = ? AND vol_opportunities.id > ?)',
-                    [(float) $lastDistance, (float) $lastDistance, (int) $lastId]
+                    [$roundedLastDistance, $roundedLastDistance, (int) $lastId]
                 );
             }
         } else {
@@ -188,8 +197,10 @@ class VolunteerService
         $nextCursor = null;
         if ($hasMore && $items->isNotEmpty()) {
             $last = $items->last();
+            // Round to the same 6 decimal places the SQL boundary comparison
+            // uses so page-boundary rows are neither skipped nor repeated.
             $nextCursor = $proximity
-                ? base64_encode('D:' . (float) $last->distance_km . '|' . $last->id)
+                ? base64_encode('D:' . round((float) $last->distance_km, 6) . '|' . $last->id)
                 : base64_encode((string) $last->id);
         }
 
@@ -679,7 +690,8 @@ class VolunteerService
             ->whereIn('status', ['approved', 'active']);
 
         if (! empty($filters['search'])) {
-            $term = '%' . $filters['search'] . '%';
+            // Escape LIKE wildcards so user input is matched literally.
+            $term = '%' . addcslashes((string) $filters['search'], '%_\\') . '%';
             $query->where(function (Builder $q) use ($term) {
                 $q->where('name', 'LIKE', $term)
                   ->orWhere('description', 'LIKE', $term);
@@ -914,7 +926,8 @@ class VolunteerService
         }
 
         $formatted = self::formatOpportunity((array) $opp);
-        $formatted['shifts'] = self::getShiftsForOpportunity($id);
+        // Visibility already established above — skip the redundant gate.
+        $formatted['shifts'] = self::getShiftsForOpportunity($id, null, true);
 
         if ($viewerId) {
             // Only pending/approved applications block re-applying — apply()
@@ -1267,21 +1280,31 @@ class VolunteerService
         $status = $action === 'approve' ? 'approved' : 'declined';
 
         try {
-            DB::transaction(function () use ($status, $orgNote, $applicationId, $tenantId, $app) {
+            $alreadyDecided = false;
+
+            DB::transaction(function () use ($status, $orgNote, $applicationId, $tenantId, $app, &$alreadyDecided) {
                 if ($status === 'approved' && !self::shiftHasApprovalCapacity((int) ($app->shift_id ?? 0), $tenantId)) {
                     throw new \DomainException(__('api.volunteer_shift_at_capacity'));
                 }
 
-                DB::update(
-                    "UPDATE vol_applications SET status = ?, org_note = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                // Conditional status guard: only a pending application can be
+                // decided. A concurrent/retried decision finds 0 rows affected
+                // and reports "already decided" instead of silently flipping an
+                // existing decision (and re-firing decision notifications).
+                $affected = DB::update(
+                    "UPDATE vol_applications SET status = ?, org_note = ?, updated_at = NOW() WHERE id = ? AND tenant_id = ? AND status = 'pending'",
                     [$status, $orgNote !== '' ? $orgNote : null, $applicationId, $tenantId]
                 );
+                if ($affected === 0) {
+                    $alreadyDecided = true;
+                }
             });
 
-            // Declining a previously approved application with a shift frees
-            // that slot — offer it to the next person on the waitlist.
-            if ($status === 'declined' && $app->status === 'approved' && !empty($app->shift_id)) {
-                ShiftWaitlistService::notifyNext((int) $app->shift_id, $tenantId);
+            if ($alreadyDecided) {
+                // ALREADY_EXISTS maps to a 409 conflict in the controller;
+                // callers must NOT fire decision notifications for this outcome.
+                self::$errors[] = ['code' => 'ALREADY_EXISTS', 'message' => __('api.volunteer_application_already_decided')];
+                return false;
             }
 
             return true;
@@ -1342,10 +1365,44 @@ class VolunteerService
 
     /**
      * Get shifts for an opportunity.
+     *
+     * Applies the same public-visibility gate as getOpportunityById() (active
+     * + public status + approved organisation) unless the viewer can manage
+     * the opportunity, so shift details of cancelled/hidden opportunities are
+     * not exposed. Returns null when the opportunity is not visible to the
+     * caller (callers translate this to a 404). Internal callers that have
+     * already established visibility may pass $skipVisibilityGate = true.
+     *
+     * @return array<int, array<string, mixed>>|null
      */
-    public static function getShiftsForOpportunity(int $opportunityId): array
+    public static function getShiftsForOpportunity(int $opportunityId, ?int $viewerId = null, bool $skipVisibilityGate = false): ?array
     {
         $tenantId = self::getTenantId();
+
+        if (! $skipVisibilityGate) {
+            $opp = DB::selectOne("
+                SELECT opp.id, opp.is_active, opp.status, opp.organization_id,
+                       org.status as org_status, org.user_id as org_owner_id
+                FROM vol_opportunities opp
+                JOIN vol_organizations org ON opp.organization_id = org.id AND org.tenant_id = opp.tenant_id
+                WHERE opp.id = ? AND opp.tenant_id = ?
+            ", [$opportunityId, $tenantId]);
+
+            if (!$opp) {
+                return null;
+            }
+
+            $viewerCanManage = $viewerId ? self::canManageOpportunity((array) $opp, $viewerId) : false;
+            if (!$viewerCanManage) {
+                $isPublicStatus = ((int) ($opp->is_active ?? 0) === 1)
+                    && in_array((string) ($opp->status ?? ''), self::PUBLIC_OPPORTUNITY_STATUSES, true)
+                    && self::isApprovedOrganizationStatus($opp->org_status ?? null);
+
+                if (!$isPublicStatus) {
+                    return null;
+                }
+            }
+        }
 
         $shifts = DB::select(
             "SELECT * FROM vol_shifts WHERE opportunity_id = ? AND tenant_id = ? ORDER BY start_time ASC",
@@ -1447,9 +1504,14 @@ class VolunteerService
             return false;
         }
 
-        // Atomic capacity check + signup inside a transaction with row lock
+        // Atomic capacity check + signup inside a transaction with row lock.
+        // Notification data is captured inside the transaction and dispatched
+        // AFTER commit (matching the verifyHours() convention) — the bell/push
+        // fanout must not run while the shift FOR UPDATE lock is held.
         try {
-            $ok = DB::transaction(function () use ($shiftId, $tenantId, $app, $userId, $shift) {
+            $confirmedShiftDate = null;
+
+            $ok = DB::transaction(function () use ($shiftId, $tenantId, $app, $shift, &$confirmedShiftDate) {
                 // Lock the shift row to prevent concurrent signups from exceeding capacity
                 $lockedShift = self::getShiftContext($shiftId, $tenantId, true);
 
@@ -1479,11 +1541,19 @@ class VolunteerService
                     [$shiftId, $app->id, $tenantId]
                 );
 
-                // Notify volunteer of confirmed shift signup
+                // Capture the confirmed shift date for the post-commit notification.
+                $confirmedShiftDate = isset($lockedShift->start_time)
+                    ? date('d M Y H:i', strtotime($lockedShift->start_time))
+                    : date('d M Y', strtotime($shift->start_time));
+
+                return true;
+            });
+
+            // Notify volunteer of confirmed shift signup — AFTER the commit so
+            // the fanout never runs under the shift row lock.
+            if ($ok) {
                 try {
-                    $shiftDate = isset($lockedShift->start_time)
-                        ? date('d M Y H:i', strtotime($lockedShift->start_time))
-                        : date('d M Y', strtotime($shift->start_time));
+                    $shiftDate = $confirmedShiftDate ?? date('d M Y', strtotime($shift->start_time));
                     $recipient = DB::table('users')
                         ->where('id', $userId)
                         ->where('tenant_id', $tenantId)
@@ -1501,9 +1571,7 @@ class VolunteerService
                 } catch (\Throwable $notifErr) {
                     Log::warning('VolunteerService::signUpForShift notification failed', ['error' => $notifErr->getMessage()]);
                 }
-
-                return true;
-            });
+            }
 
             // The volunteer moved off $previousShiftId onto $shiftId — that old
             // shift now has a free slot, so offer it to its waitlist (the same
@@ -1953,7 +2021,17 @@ class VolunteerService
                         return;
                     }
 
-                    // Lock org row (serialises concurrent payouts).
+                    // Lock the volunteer's USER row FIRST, then the org row —
+                    // VolOrgWalletService::depositFromUser() locks user -> org,
+                    // so locking org -> user here is a lock-order inversion
+                    // deadlock when a deposit and a payout race (the exact
+                    // inversion documented in payVolunteer()).
+                    DB::selectOne(
+                        "SELECT id FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                        [$volunteerId, $tenantId]
+                    );
+
+                    // Then lock the org row (serialises concurrent payouts).
                     $orgLocked = DB::selectOne(
                         "SELECT id, balance, user_id FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
                         [(int) $org->id, $tenantId]
@@ -2671,6 +2749,16 @@ class VolunteerService
         if ($intHours <= 0) {
             return 'no_payable_hours';
         }
+
+        // Lock the volunteer's USER row FIRST, then the org row —
+        // VolOrgWalletService::depositFromUser() locks user -> org, so locking
+        // org -> user here is a lock-order inversion deadlock when a deposit
+        // and a payout race (the exact inversion documented in payVolunteer()).
+        DB::selectOne(
+            "SELECT id FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
+            [$volunteerId, $tenantId]
+        );
+
         $orgLocked = DB::selectOne(
             "SELECT id, balance FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
             [$organizationId, $tenantId]

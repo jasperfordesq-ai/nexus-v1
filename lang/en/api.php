@@ -1810,6 +1810,7 @@ return [
     'vol_invalid_checkin_token'            => 'Invalid check-in token.',
     'vol_checkin_not_yet_available'        => 'Check-in is not yet available. Shift starts at :time',
     'vol_checkin_already_checked_out'      => 'Volunteer has already checked out.',
+    'vol_checkin_window_closed'            => 'Check-in is no longer available for this shift. The check-in window closed at :time',
     'action_must_be_approve_or_decline'    => 'Action must be approve or decline',
     'type_must_be_org_or_user'             => 'Type must be organization or user',
 
@@ -2440,6 +2441,7 @@ return [
     'vol_donation_amount_positive' => 'Donation amount must be greater than zero.',
     'vol_donation_amount_max' => 'Donation amount exceeds the maximum allowed.',
     'vol_donation_currency_invalid' => 'Currency must be a 3-letter ISO code.',
+    'vol_donation_currency_mismatch' => 'Donation currency must match the community currency (:currency).',
     'vol_donation_payment_method_required' => 'Payment method is required.',
     'vol_donation_stripe_complete_via_webhook' => 'Card donations are completed automatically by the payment provider and cannot be completed manually.',
     'vol_donation_only_pending_completable' => 'Only pending donations can be marked as completed.',
@@ -2536,6 +2538,7 @@ return [
     'volunteer_application_not_yours' => 'This is not your application',
     'volunteer_application_withdraw_approved' => 'You cannot withdraw an approved application. Please contact the organisation directly.',
     'volunteer_application_withdraw_failed' => 'Failed to withdraw application',
+    'volunteer_application_already_decided' => 'This application has already been decided',
     'volunteer_shift_approved_application_required' => 'You must have an approved application to sign up for shifts',
     'volunteer_shift_signup_failed' => 'Failed to sign up for shift',
     'volunteer_shift_cancel_started' => 'Cannot cancel a shift that has already started',

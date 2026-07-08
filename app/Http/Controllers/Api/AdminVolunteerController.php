@@ -92,10 +92,10 @@ class AdminVolunteerController extends BaseApiController
             $sql = "SELECT opp.*, org.name as org_name, org.logo_url as org_logo,
                            org.status as org_status, cat.name as category_name
                     FROM vol_opportunities opp
-                    LEFT JOIN vol_organizations org ON opp.organization_id = org.id
+                    LEFT JOIN vol_organizations org ON opp.organization_id = org.id AND org.tenant_id = ?
                     LEFT JOIN categories cat ON opp.category_id = cat.id
                     WHERE opp.tenant_id = ?";
-            $params = [$tenantId];
+            $params = [$tenantId, $tenantId];
 
             if ($status && in_array($status, ['open', 'active', 'closed', 'draft'], true)) {
                 $sql .= " AND opp.status = ?";
@@ -163,9 +163,9 @@ class AdminVolunteerController extends BaseApiController
                            vo.title as opportunity_title
                     FROM vol_applications a
                     INNER JOIN vol_opportunities vo ON a.opportunity_id = vo.id
-                    LEFT JOIN users u ON a.user_id = u.id
+                    LEFT JOIN users u ON a.user_id = u.id AND u.tenant_id = ?
                     WHERE vo.tenant_id = ? AND a.tenant_id = ?";
-            $params = [$tenantId, $tenantId];
+            $params = [$tenantId, $tenantId, $tenantId];
 
             if ($status && in_array($status, ['pending', 'approved', 'declined', 'withdrawn'], true)) {
                 $sql .= " AND a.status = ?";
@@ -252,10 +252,10 @@ class AdminVolunteerController extends BaseApiController
                            u.first_name, u.last_name,
                            vo.name as org_name
                     FROM vol_logs vl
-                    LEFT JOIN users u ON vl.user_id = u.id
-                    LEFT JOIN vol_organizations vo ON vl.organization_id = vo.id{$paymentJoin}
+                    LEFT JOIN users u ON vl.user_id = u.id AND u.tenant_id = ?
+                    LEFT JOIN vol_organizations vo ON vl.organization_id = vo.id AND vo.tenant_id = ?{$paymentJoin}
                     WHERE vl.tenant_id = ?";
-            $params = [$tenantId];
+            $params = [$tenantId, $tenantId, $tenantId];
 
             if ($status && in_array($status, ['pending', 'approved', 'declined'], true)) {
                 $sql .= " AND vl.status = ?";
@@ -399,11 +399,21 @@ class AdminVolunteerController extends BaseApiController
                     return;
                 }
 
-                // Lock org row (serialises concurrent payouts). Approval ALWAYS mints
-                // credits — classic timebanking. Credits are minted on confirmation
-                // and are never gated by the org wallet balance or the auto_pay flag;
-                // the org wallet is a reconciliation figure (it may go negative), not
-                // a spending limit. This mirrors VolunteerService::verifyHours().
+                // Lock the volunteer's USER row FIRST, then the org row —
+                // VolOrgWalletService::depositFromUser() locks user -> org, so
+                // locking org -> user here is a lock-order inversion deadlock
+                // when a deposit and a payout race (the exact inversion
+                // documented in VolOrgWalletService::payVolunteer()).
+                DB::selectOne(
+                    "SELECT id FROM users WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                    [$volunteerId, $tenantId]
+                );
+
+                // Then lock the org row (serialises concurrent payouts). Approval
+                // ALWAYS mints credits — classic timebanking. Credits are minted on
+                // confirmation and are never gated by the org wallet balance or the
+                // auto_pay flag; the org wallet is a reconciliation figure (it may go
+                // negative), not a spending limit. Mirrors VolunteerService::verifyHours().
                 $org = DB::selectOne(
                     "SELECT id, balance, user_id FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
                     [$orgId, $tenantId]
@@ -652,10 +662,10 @@ class AdminVolunteerController extends BaseApiController
                 "SELECT va.*, u.first_name, u.last_name, u.email, vo.title as opportunity_title
                  FROM vol_applications va
                  INNER JOIN vol_opportunities vo ON va.opportunity_id = vo.id
-                 LEFT JOIN users u ON va.user_id = u.id
+                 LEFT JOIN users u ON va.user_id = u.id AND u.tenant_id = ?
                  WHERE vo.tenant_id = ? AND va.tenant_id = ?
                  ORDER BY (va.status = 'pending') DESC, va.created_at DESC LIMIT 150",
-                [$tenantId, $tenantId]
+                [$tenantId, $tenantId, $tenantId]
             );
             return $this->respondWithData(array_map(fn($r) => (array)$r, $results));
         } catch (\Exception $e) {
@@ -899,7 +909,9 @@ class AdminVolunteerController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', __('api.only_pending_can_be_approved', ['status' => 'pending']), null, 422);
             }
 
-            DB::transaction(function () use ($id, $tenantId, $app) {
+            $alreadyDecided = false;
+
+            DB::transaction(function () use ($id, $tenantId, $app, &$alreadyDecided) {
                 if (!empty($app->shift_id)) {
                     $shift = DB::selectOne(
                         "SELECT id, capacity FROM vol_shifts WHERE id = ? AND tenant_id = ? FOR UPDATE",
@@ -926,11 +938,23 @@ class AdminVolunteerController extends BaseApiController
                     }
                 }
 
-                DB::update(
-                    "UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ? AND tenant_id = ?",
+                // Conditional status guard: the pre-check above runs OUTSIDE this
+                // transaction, so a concurrent decision can slip between it and
+                // this UPDATE. 0 rows affected means the application was already
+                // decided — report the same conflict the pre-check returns and
+                // do NOT send a duplicate decision notification.
+                $affected = DB::update(
+                    "UPDATE vol_applications SET status = 'approved', updated_at = NOW() WHERE id = ? AND tenant_id = ? AND status = 'pending'",
                     [$id, $tenantId]
                 );
+                if ($affected === 0) {
+                    $alreadyDecided = true;
+                }
             });
+
+            if ($alreadyDecided) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.only_pending_can_be_approved', ['status' => 'pending']), null, 422);
+            }
 
             // Load applicant once with preferred_language for both notifications and email
             $applicant = DB::table('users')
@@ -1035,7 +1059,17 @@ class AdminVolunteerController extends BaseApiController
                 return $this->respondWithError('VALIDATION_ERROR', __('api.only_pending_can_be_rejected', ['status' => 'pending']), null, 422);
             }
 
-            DB::update("UPDATE vol_applications SET status = 'declined', updated_at = NOW() WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+            // Conditional status guard: the pre-check above is not transactional,
+            // so a concurrent decision can slip in. 0 rows affected means the
+            // application was already decided — report the same conflict the
+            // pre-check returns, without a duplicate decision notification.
+            $affected = DB::update(
+                "UPDATE vol_applications SET status = 'declined', updated_at = NOW() WHERE id = ? AND tenant_id = ? AND status = 'pending'",
+                [$id, $tenantId]
+            );
+            if ($affected === 0) {
+                return $this->respondWithError('VALIDATION_ERROR', __('api.only_pending_can_be_rejected', ['status' => 'pending']), null, 422);
+            }
 
             // Notify the applicant
             try {

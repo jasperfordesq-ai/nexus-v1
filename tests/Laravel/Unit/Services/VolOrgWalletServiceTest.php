@@ -93,22 +93,22 @@ class VolOrgWalletServiceTest extends TestCase
         $this->assertEquals(2, (int) $tx->tenant_id);
     }
 
-    public function test_fractional_deposit_debits_and_records_only_whole_hours(): void
+    public function test_fractional_deposit_is_rejected_whole_hours_only(): void
     {
         $user = User::factory()->forTenant(2)->create(['balance' => 10]);
         $orgId = $this->makeOrg(2, 0.00);
         $this->pinTenant();
 
-        $result = VolOrgWalletService::depositFromUser($user->id, $orgId, 1.75);
+        // Fractional deposits are rejected outright — users.balance stores whole
+        // hours only. The previous silent (int) floor() quietly moved fewer hours
+        // than the UI implied (e.g. 5.75 deposited 5), so a non-integer amount is
+        // now an explicit validation failure that changes nothing.
+        $result = VolOrgWalletService::depositFromUser($user->id, $orgId, 5.75);
 
-        $this->assertTrue($result['success'], $result['message'] ?? '');
-        $this->assertEquals(1.00, (float) $result['new_balance']);
-        $this->assertEquals(9, (int) DB::table('users')->where('id', $user->id)->value('balance'));
-        $this->assertEquals(1.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
-
-        $tx = DB::table('vol_org_transactions')->where('vol_organization_id', $orgId)->orderByDesc('id')->first();
-        $this->assertEquals(1.00, (float) $tx->amount);
-        $this->assertEquals(1.00, (float) $tx->balance_after);
+        $this->assertFalse($result['success'], 'Fractional deposit must be rejected');
+        $this->assertEquals(10, (int) DB::table('users')->where('id', $user->id)->value('balance'));
+        $this->assertEquals(0.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertEquals(0, DB::table('vol_org_transactions')->where('vol_organization_id', $orgId)->count());
     }
 
     public function test_deposit_rejects_zero_and_negative_amounts(): void

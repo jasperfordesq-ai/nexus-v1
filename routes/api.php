@@ -826,7 +826,6 @@ Route::get('/v2/volunteering/organisations/{id}/stats', [\App\Http\Controllers\A
 Route::get('/v2/volunteering/organisations/{id}/wallet', [\App\Http\Controllers\Api\VolunteerController::class, 'orgWalletBalance']);
 Route::get('/v2/volunteering/organisations/{id}/wallet/transactions', [\App\Http\Controllers\Api\VolunteerController::class, 'orgWalletTransactions']);
 Route::post('/v2/volunteering/organisations/{id}/wallet/deposit', [\App\Http\Controllers\Api\VolunteerController::class, 'orgWalletDeposit']);
-Route::put('/v2/volunteering/organisations/{id}/wallet/auto-pay', [\App\Http\Controllers\Api\VolunteerController::class, 'orgWalletAutoPayToggle']);
 Route::get('/v2/volunteering/organisations/{id}/volunteers', [\App\Http\Controllers\Api\VolunteerController::class, 'orgVolunteers']);
 Route::get('/v2/volunteering/organisations/{id}/applications', [\App\Http\Controllers\Api\VolunteerController::class, 'orgApplications']);
 Route::get('/v2/volunteering/organisations/{id}/hours/pending', [\App\Http\Controllers\Api\VolunteerController::class, 'orgHoursPending']);
@@ -2154,6 +2153,8 @@ Route::put('/v2/admin/volunteering/training/{id}/verify', [\App\Http\Controllers
 Route::put('/v2/admin/volunteering/training/{id}/reject', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'rejectTraining']);
 Route::get('/v2/admin/volunteering/incidents', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'adminIncidents']);
 Route::put('/v2/admin/volunteering/incidents/{id}', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'updateIncident']);
+Route::get('/v2/admin/volunteering/wellbeing/alerts', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'adminWellbeingAlerts']);
+Route::put('/v2/admin/volunteering/wellbeing/alerts/{id}', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'updateWellbeingAlert'])->whereNumber('id');
 Route::put('/v2/admin/volunteering/organizations/{id}/dlp', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'assignDlp']);
 Route::put('/v2/admin/volunteering/organizations/{id}/wallet/adjust', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'adjustOrgWallet']);
 Route::get('/v2/admin/volunteering/organizations/{id}/wallet/transactions', [\App\Http\Controllers\Api\AdminVolunteerController::class, 'orgWalletTransactions']);

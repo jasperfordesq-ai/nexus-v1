@@ -472,6 +472,9 @@ class VolunteeringParityTest extends TestCase
             'payment_method' => 'bank_transfer',
             'status' => 'pending',
             'is_anonymous' => 1,
+            // Recorded in the tenant's configured currency — the parity form
+            // used to hardcode EUR for every community.
+            'currency' => strtoupper(TenantContext::getCurrency()),
         ]);
     }
 

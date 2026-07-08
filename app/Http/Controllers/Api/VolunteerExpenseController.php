@@ -68,12 +68,11 @@ class VolunteerExpenseController extends BaseApiController
         ];
 
         $result = $this->volunteerExpenseService->getExpenses($filters);
-        $stats = [
-            'total_submitted' => array_reduce($result['items'], fn ($sum, $item) => $sum + (float) ($item['amount'] ?? 0), 0.0),
-            'pending_review' => array_reduce($result['items'], fn ($sum, $item) => $sum + (($item['status'] ?? null) === 'pending' ? (float) ($item['amount'] ?? 0) : 0.0), 0.0),
-            'approved_total' => array_reduce($result['items'], fn ($sum, $item) => $sum + (in_array(($item['status'] ?? null), ['approved', 'paid'], true) ? (float) ($item['amount'] ?? 0) : 0.0), 0.0),
-            'paid_total' => array_reduce($result['items'], fn ($sum, $item) => $sum + (($item['status'] ?? null) === 'paid' ? (float) ($item['amount'] ?? 0) : 0.0), 0.0),
-        ];
+        // Aggregate over the FULL user-scoped set, not just the current page — a
+        // page-scoped reduce under-counts once there is more than one page.
+        // getExpenseStats honours the same filters ($filters already carries the
+        // current user_id) and is tenant-scoped via the VolExpense global scope.
+        $stats = $this->volunteerExpenseService->getExpenseStats($filters);
 
         return $this->respondWithData([
             'expenses' => $result['items'],

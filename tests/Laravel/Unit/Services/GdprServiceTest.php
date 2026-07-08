@@ -834,7 +834,6 @@ class GdprServiceTest extends \Tests\Laravel\TestCase
             'DELETE FROM vol_safeguarding_training',
             'DELETE FROM vol_certificates',
             'DELETE FROM vol_shift_waitlist',
-            'DELETE FROM vol_shift_swap_requests',
             'DELETE FROM vol_emergency_alert_recipients',
             'DELETE FROM vol_shift_checkins',
             'DELETE FROM vol_reviews',
@@ -844,6 +843,16 @@ class GdprServiceTest extends \Tests\Laravel\TestCase
             'UPDATE vol_applications SET message = NULL, org_note = NULL',
             'UPDATE vol_logs SET description = NULL, feedback = NULL',
             'UPDATE vol_expenses SET description = NULL',
+            // Anonymization — two-party / shared records retained with the
+            // erased user's free-text scrubbed (2026-07-08 audit): swap
+            // requests keep the counterparty's history, supporter rows keep
+            // project supporter counts honest, group reservations keep the
+            // group's capacity booking. Gift-aid declarations are scrubbed
+            // unless an HMRC claim was submitted (legal-obligation carve-out).
+            'UPDATE vol_shift_swap_requests SET message = NULL',
+            'UPDATE vol_community_project_supporters SET message = NULL',
+            'UPDATE vol_shift_group_reservations SET notes = NULL',
+            "gift_aid_claim_status NOT IN ('claimed', 'refund_after_claim')",
         ];
 
         foreach ($required as $needle) {

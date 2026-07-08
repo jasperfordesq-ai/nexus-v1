@@ -85,8 +85,12 @@ final class PublicOrganisationResource
     }
 
     /**
+     * The owner's internal user id is deliberately NOT included — this
+     * resource feeds PUBLIC (unauthenticated) endpoints and must never
+     * re-leak the id that stripInternalOrgFields() removes.
+     *
      * @param array<string, mixed> $organisation
-     * @return array{id: int|null, display_name: string|null, avatar_url: string|null}
+     * @return array{display_name: string|null, avatar_url: string|null}
      */
     private static function owner(array $organisation): array
     {
@@ -97,7 +101,6 @@ final class PublicOrganisationResource
             ?? trim((string) $firstName . ' ' . (string) $lastName);
 
         return [
-            'id' => self::nullableInt($owner['id'] ?? $organisation['user_id'] ?? null),
             'display_name' => $displayName !== '' ? $displayName : null,
             'avatar_url' => self::nullableString($owner['avatar_url'] ?? null),
         ];

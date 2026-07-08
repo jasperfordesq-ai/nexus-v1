@@ -119,6 +119,55 @@ class DonationOperationsServiceTest extends TestCase
         $this->assertSame('12.34', $annualRows[0]['amount']);
     }
 
+    public function test_gift_aid_export_claim_and_overview_exclude_non_gbp_donations(): void
+    {
+        $tenantId = $this->operationsTenantId;
+
+        $giftAidRow = static fn (string $currency, string $pi): array => [
+            'tenant_id' => $tenantId,
+            'user_id' => 401,
+            'amount' => 20.00,
+            'currency' => $currency,
+            'payment_method' => 'stripe',
+            'payment_reference' => '',
+            'payment_route' => 'platform_default',
+            'stripe_payment_intent_id' => $pi,
+            'status' => 'completed',
+            'donor_name' => 'Currency Guard Donor',
+            'donor_email' => 'currency-guard@example.test',
+            'gift_aid_claim_status' => 'ready',
+            'gift_aid_declaration_name' => 'Currency Guard Donor',
+            'gift_aid_address_line1' => '1 Test Street',
+            'gift_aid_postcode' => 'SW1A 1AA',
+            'gift_aid_country' => 'GB',
+            'gift_aid_consented_at' => '2026-04-01 10:00:00',
+            'created_at' => '2026-04-05 12:00:00',
+        ];
+
+        $gbpId = (int) DB::table('vol_donations')->insertGetId($giftAidRow('GBP', 'pi_ga_gbp_' . uniqid()));
+        // Legacy row stamped 'ready' before the GBP guard existed — must be
+        // excluded from every HMRC-facing layer.
+        $eurId = (int) DB::table('vol_donations')->insertGetId($giftAidRow('EUR', 'pi_ga_eur_' . uniqid()));
+
+        $overview = DonationOperationsService::overview($tenantId);
+        $this->assertSame(2000, $overview['gift_aid']['ready_cents']);
+        $this->assertSame(1, $overview['gift_aid']['ready_count']);
+
+        $rows = DonationOperationsService::giftAidExportRows($tenantId);
+        $exportedIds = array_column($rows, 'donation_id');
+        $this->assertContains($gbpId, $exportedIds);
+        $this->assertNotContains($eurId, $exportedIds);
+
+        $claimed = DonationOperationsService::markGiftAidRowsClaimed($tenantId, [$gbpId, $eurId]);
+
+        $this->assertSame(1, $claimed);
+        $this->assertSame('claimed', DB::table('vol_donations')->where('id', $gbpId)->value('gift_aid_claim_status'));
+        // The EUR row must never be stamped as claimed with HMRC, even when
+        // its ID is passed explicitly.
+        $this->assertSame('ready', DB::table('vol_donations')->where('id', $eurId)->value('gift_aid_claim_status'));
+        $this->assertNull(DB::table('vol_donations')->where('id', $eurId)->value('gift_aid_claimed_at'));
+    }
+
     public function test_record_stripe_dispute_is_tenant_scoped_and_idempotent(): void
     {
         $tenantId = $this->operationsTenantId;

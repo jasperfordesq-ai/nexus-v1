@@ -111,8 +111,13 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
                 'start_date'      => $opportunity->start_date ?? null,
                 'end_date'        => $opportunity->end_date ?? null,
                 'organization_id' => $opportunity->organization_id ?? null,
-                'created_by'      => $opportunity->created_by ?? null,
-                'tenant_id'       => $tenantId,
+                // Deliberately NOT sent: the sender's local created_by (user id)
+                // and tenant_id. No outbound adapter (Nexus/TimeOverflow/Komunitin/
+                // CreditCommons) maps them and no inbound consumer
+                // (FederationExternalWebhookController::handleInboundVolunteering →
+                // IngestFederatedVolunteerOpportunity) reads them — the receiver
+                // keys on (external_partner_id, external_id) and assigns its own
+                // tenant. Sending them only leaked internal ids to partners.
                 'created_at'      => $opportunity->created_at?->toISOString(),
             ];
 

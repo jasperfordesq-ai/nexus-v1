@@ -47,6 +47,11 @@ class RetentionPolicyService
      * where_in     = optional status guard — only rows in these states are
      *                ever purged (open/active records are never disposed of
      *                regardless of age).
+     * or_windows   = optional additional disposal triggers. Each entry is an
+     *                independent OR-branch matched against the same cutoff:
+     *                the row is purgeable when the branch column is older
+     *                than the window, optionally restricted by the branch's
+     *                own where_in status guard. NULL timestamps never match.
      */
     public const DATA_TYPES = [
         'activity_log' => [
@@ -94,10 +99,19 @@ class RetentionPolicyService
         'vol_guardian_consents' => [
             // Minor guardian consents, measured from EXPIRY (expires_at), so
             // a consent record is kept N days beyond its lapse as evidence
-            // and then purged. Rows with no expiry are never matched.
+            // and then purged. Rows with no expiry are matched only via the
+            // or_windows branches below: WITHDRAWN consents (expires_at often
+            // NULL, consent_withdrawn_at set) age out N days after withdrawal,
+            // and abandoned 'pending' requests — guardian name/email/phone
+            // captured but consent never given — age out N days after
+            // creation. Given (active) consents with no expiry never match.
             'table' => 'vol_guardian_consents',
             'column' => 'expires_at',
             'default_days' => 365,
+            'or_windows' => [
+                ['column' => 'consent_withdrawn_at'],
+                ['column' => 'created_at', 'where_in' => ['status' => ['pending']]],
+            ],
         ],
         // NOTE: login_attempts is deliberately NOT here. It is global
         // rate-limiting data with no tenant_id column, so a per-tenant
@@ -219,6 +233,13 @@ class RetentionPolicyService
             ['tenant_id', $config['column']],
             array_keys($config['where_in'] ?? [])
         );
+        foreach (($config['or_windows'] ?? []) as $window) {
+            $requiredColumns = array_merge(
+                $requiredColumns,
+                [$window['column']],
+                array_keys($window['where_in'] ?? [])
+            );
+        }
         $missingColumn = false;
         foreach ($requiredColumns as $requiredColumn) {
             if (!\Schema::hasColumn($config['table'], $requiredColumn)) {
@@ -240,8 +261,23 @@ class RetentionPolicyService
             for ($batch = 0; $batch < self::MAX_BATCHES_PER_RUN; $batch++) {
                 // Every batch is tenant-scoped AND bounded.
                 $query = DB::table($config['table'])
-                    ->where('tenant_id', $tenantId)
-                    ->where($config['column'], '<', $cutoff);
+                    ->where('tenant_id', $tenantId);
+
+                // Window match: the primary timestamp column, OR any of the
+                // type's or_windows branches (each with its own optional
+                // status guard). All branches are grouped so the tenant scope
+                // and the where_in guard below still apply to every row.
+                $query->where(function ($q) use ($config, $cutoff) {
+                    $q->where($config['column'], '<', $cutoff);
+                    foreach (($config['or_windows'] ?? []) as $window) {
+                        $q->orWhere(function ($branch) use ($window, $cutoff) {
+                            $branch->where($window['column'], '<', $cutoff);
+                            foreach (($window['where_in'] ?? []) as $col => $values) {
+                                $branch->whereIn($col, $values);
+                            }
+                        });
+                    }
+                });
 
                 // Status guard: types with a where_in constraint only ever
                 // purge rows in the listed (concluded) states — an open

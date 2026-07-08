@@ -690,6 +690,22 @@ class GdprService
             [$userId, $t]
         )->fetchAll();
 
+        // vol_community_project_supporters — the user's support pledges on
+        // community project proposals (free-text message + timestamp).
+        try {
+            $communityProjectSupport = $this->query(
+                "SELECT s.id, s.project_id, cp.title AS project_title,
+                        s.message, s.supported_at
+                 FROM vol_community_project_supporters s
+                 LEFT JOIN vol_community_projects cp ON s.project_id = cp.id AND cp.tenant_id = s.tenant_id
+                 WHERE s.user_id = ? AND s.tenant_id = ?
+                 ORDER BY s.supported_at DESC",
+                [$userId, $t]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            $communityProjectSupport = [];
+        }
+
         // vol_shift_waitlist (user's waitlist entries)
         try {
             $shiftWaitlist = $this->query(
@@ -736,6 +752,24 @@ class GdprService
             $shiftGroupMemberships = [];
         }
 
+        // vol_shift_group_reservations the user made as group LEADER
+        // (reserved_by) — distinct from the memberships above, and carries
+        // the leader's free-text notes.
+        try {
+            $shiftGroupReservationsLed = $this->query(
+                "SELECT gr.id, gr.shift_id, gr.group_id, gr.reserved_slots,
+                        gr.filled_slots, gr.status, gr.notes, gr.created_at, gr.updated_at,
+                        vs.start_time, vs.end_time
+                 FROM vol_shift_group_reservations gr
+                 LEFT JOIN vol_shifts vs ON gr.shift_id = vs.id
+                 WHERE gr.reserved_by = ? AND gr.tenant_id = ?
+                 ORDER BY gr.created_at DESC",
+                [$userId, $t]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            $shiftGroupReservationsLed = [];
+        }
+
         // vol_emergency_alert_recipients (emergency alerts sent to user)
         try {
             $emergencyAlertRecipients = $this->query(
@@ -773,6 +807,7 @@ class GdprService
             'shift_waitlist' => $shiftWaitlist,
             'shift_swap_requests' => $shiftSwapRequests,
             'shift_group_memberships' => $shiftGroupMemberships,
+            'shift_group_reservations_led' => $shiftGroupReservationsLed,
             'reviews' => $reviews,
             'certificates' => $certificates,
             'mood_checkins' => $moodCheckins,
@@ -787,6 +822,7 @@ class GdprService
             'donations' => $donations,
             'volunteer_payment_ledger' => $orgTransactions,
             'community_projects' => $communityProjects,
+            'community_project_support' => $communityProjectSupport,
             'emergency_alert_recipients' => $emergencyAlertRecipients,
             'wellbeing_alerts' => $wellbeingAlerts,
         ];
@@ -1298,7 +1334,6 @@ class GdprService
                 $this->query("DELETE FROM vol_safeguarding_training WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("DELETE FROM vol_certificates WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("DELETE FROM vol_shift_waitlist WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
-                $this->query("DELETE FROM vol_shift_swap_requests WHERE (from_user_id = ? OR to_user_id = ?) AND tenant_id = ?", [$userId, $userId, $this->tenantId]);
                 $this->query("DELETE FROM vol_emergency_alert_recipients WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 // Shift check-in presence PII (place + checked_in/out timestamps).
                 // The users-row ON DELETE CASCADE never fires because erasure
@@ -1334,9 +1369,51 @@ class GdprService
             // content and copied PII are wiped. Identity linkage is broken by
             // the users-row anonymization above.
             try {
-                $this->query("UPDATE vol_donations SET donor_name = NULL, donor_email = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                // Donor identity + free-text message are always scrubbed.
+                $this->query("UPDATE vol_donations SET donor_name = NULL, donor_email = NULL, message = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+                // Gift-aid declaration fields (declared name + home address) —
+                // LEGAL-BASIS CARVE-OUT (GDPR Art. 17(3)(b), legal obligation):
+                // once a Gift Aid claim has been submitted to HMRC the charity
+                // must retain the declaration for ~6 years as claim evidence,
+                // so declaration fields are RETAINED on claimed rows. That
+                // covers claim_status 'claimed' and 'refund_after_claim'
+                // (claimed then refunded — the HMRC claim still happened; see
+                // StripeDonationService/DonationOperationsService for the
+                // status lifecycle: not_eligible → ready → claimed →
+                // refund_after_claim). Unclaimed declarations ('not_eligible',
+                // 'ready') are scrubbed with the rest of the PII.
+                $this->query(
+                    "UPDATE vol_donations
+                     SET gift_aid_declaration_name = NULL, gift_aid_address_line1 = NULL,
+                         gift_aid_address_line2 = NULL, gift_aid_town = NULL, gift_aid_postcode = NULL
+                     WHERE user_id = ? AND tenant_id = ?
+                       AND gift_aid_claim_status NOT IN ('claimed', 'refund_after_claim')",
+                    [$userId, $this->tenantId]
+                );
                 $this->query("UPDATE vol_applications SET message = NULL, org_note = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("UPDATE vol_logs SET description = NULL, feedback = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+
+                // Community-project supporter rows are KEPT (deleting them
+                // would corrupt vol_community_projects.supporter_count) but the
+                // free-text message is scrubbed — the module's documented
+                // anonymize-in-place strategy; identity linkage is broken by
+                // the users-row anonymization.
+                $this->query("UPDATE vol_community_project_supporters SET message = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+
+                // Group shift reservations the user made as group LEADER are
+                // group-capacity records (reserved/filled slots for the whole
+                // group), not personal records — keep them, scrub the leader's
+                // free-text notes.
+                $this->query("UPDATE vol_shift_group_reservations SET notes = NULL WHERE reserved_by = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+
+                // Shift swap requests are TWO-PARTY records (same rationale as
+                // 3n transactions / 3s marketplace offers): deleting rows where
+                // the erased user is only one party would destroy the
+                // counterparty's swap history, so rows are retained in both
+                // directions and only the requester's free-text message is
+                // scrubbed when the erased user authored it (from_user_id).
+                // Identity linkage is broken by the users-row anonymization.
+                $this->query("UPDATE vol_shift_swap_requests SET message = NULL WHERE from_user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
 
                 // Expense receipt images carry the volunteer's name, home address
                 // and card fragments — delete the files from the 'local' disk
