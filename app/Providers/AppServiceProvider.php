@@ -85,7 +85,6 @@ use App\Services\CronJobService;
 use App\Services\AdminSettingsService;
 use App\Services\AdminListingsService;
 use App\Services\AdminUsersService;
-use App\Services\OrgWalletService;
 use App\Services\DeliverableService;
 use App\Services\FederationService;
 use App\Services\ChallengeService;
@@ -462,10 +461,6 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(AdminUsersService::class, function ($app) {
             return new AdminUsersService(new User());
-        });
-
-        $this->app->singleton(OrgWalletService::class, function ($app) {
-            return new OrgWalletService();
         });
 
         $this->app->singleton(DeliverableService::class, function ($app) {
