@@ -9,10 +9,13 @@
  */
 
 import { Component, Suspense, lazy, type ReactNode, type ErrorInfo } from 'react';
+import { motion } from '@/lib/motion';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Home from 'lucide-react/icons/house';
 
+import { GlassCard } from '@/components/ui/GlassCard';
+import { Button } from '@/components/ui/Button';
 import { logError } from '@/lib/logger';
 import i18n from 'i18next';
 
@@ -114,66 +117,73 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
       return (
         <div role="alert" className="min-h-screen flex items-center justify-center p-4">
-          <div className="w-full max-w-md relative z-10 rounded-lg border border-theme-default bg-theme-surface/90 p-8 text-center shadow-xl">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 mb-6">
-              <AlertTriangle className="w-8 h-8 text-red-400" aria-hidden="true" />
-            </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full max-w-md relative z-10"
+          >
+            <GlassCard className="p-8">
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 mb-6">
+                  <AlertTriangle className="w-8 h-8 text-red-400" aria-hidden="true" />
+                </div>
 
-            <h1 className="text-2xl font-bold text-theme-primary mb-2">
-              {i18n.t('error_boundary.title', { ns: 'common' })}
-            </h1>
+                <h1 className="text-2xl font-bold text-theme-primary mb-2">
+                  {i18n.t('error_boundary.title', { ns: 'common' })}
+                </h1>
 
-            <p className="text-theme-muted mb-6">
-              {i18n.t('error_boundary.description', { ns: 'common' })}
-            </p>
-
-            {/* Error details in development */}
-            {import.meta.env.DEV && this.state.error && (
-              <div className="mb-6 p-4 rounded-xl bg-red-500/5 border border-red-500/20 text-left">
-                <p className="text-red-400 text-sm font-mono break-all">
-                  {this.state.error.message}
+                <p className="text-theme-muted mb-6">
+                  {i18n.t('error_boundary.description', { ns: 'common' })}
                 </p>
-                {this.state.errorInfo?.componentStack && (
-                  <details className="mt-2">
-                    <summary className="text-theme-subtle text-xs cursor-pointer">
-                      {i18n.t('error_boundary.component_stack', { ns: 'common' })}
-                    </summary>
-                    <pre className="text-theme-subtle/70 text-xs mt-2 overflow-auto max-h-40">
-                      {this.state.errorInfo.componentStack}
-                    </pre>
-                  </details>
+
+                {/* Error details in development */}
+                {import.meta.env.DEV && this.state.error && (
+                  <div className="mb-6 p-4 rounded-xl bg-red-500/5 border border-red-500/20 text-left">
+                    <p className="text-red-400 text-sm font-mono break-all">
+                      {this.state.error.message}
+                    </p>
+                    {this.state.errorInfo?.componentStack && (
+                      <details className="mt-2">
+                        <summary className="text-theme-subtle text-xs cursor-pointer">
+                          {i18n.t('error_boundary.component_stack', { ns: 'common' })}
+                        </summary>
+                        <pre className="text-theme-subtle/70 text-xs mt-2 overflow-auto max-h-40">
+                          {this.state.errorInfo.componentStack}
+                        </pre>
+                      </details>
+                    )}
+                  </div>
                 )}
+
+                <div className="flex flex-col gap-3">
+                  <Button
+                    onPress={this.handleTryAgain}
+                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+                  >
+                    {i18n.t('error_boundary.try_again', { ns: 'common' })}
+                  </Button>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {this.props.showReportProblem !== false ? (
+                      <Suspense fallback={null}>
+                        <ReportProblemButton className="w-full" />
+                      </Suspense>
+                    ) : null}
+
+                    <Button
+                      onPress={this.handleGoHome}
+                      variant="tertiary"
+                      className="w-full bg-theme-elevated text-theme-muted"
+                      startContent={<Home className="w-4 h-4" aria-hidden="true" />}
+                    >
+                      {i18n.t('error_boundary.go_home', { ns: 'common' })}
+                    </Button>
+                  </div>
+                </div>
               </div>
-            )}
-
-            <div className="flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={this.handleTryAgain}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-theme-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-theme-focus"
-              >
-                <RefreshCw className="w-4 h-4" aria-hidden="true" />
-                {i18n.t('error_boundary.try_again', { ns: 'common' })}
-              </button>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                {this.props.showReportProblem !== false ? (
-                  <Suspense fallback={null}>
-                    <ReportProblemButton className="w-full" />
-                  </Suspense>
-                ) : null}
-
-                <button
-                  type="button"
-                  onClick={this.handleGoHome}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-theme-elevated px-4 py-2.5 text-sm font-semibold text-theme-muted transition hover:bg-theme-muted/10 focus:outline-none focus:ring-2 focus:ring-theme-focus"
-                >
-                  <Home className="w-4 h-4" aria-hidden="true" />
-                  {i18n.t('error_boundary.go_home', { ns: 'common' })}
-                </button>
-              </div>
-            </div>
-          </div>
+            </GlassCard>
+          </motion.div>
         </div>
       );
     }

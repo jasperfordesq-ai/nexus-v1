@@ -51,6 +51,7 @@ import { PageMeta } from '@/components/seo';
 import { useOnboardingConfig } from '@/hooks/useOnboardingConfig';
 import { useToast, useTenant, useAuth } from '@/contexts';
 import { api } from '@/lib/api';
+import { AVATAR_UPLOAD_ACCEPT, isAvatarFileTooLarge, isSupportedAvatarFile } from '@/lib/avatarUpload';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { SafeguardingStep } from './SafeguardingStep';
@@ -306,12 +307,12 @@ export function OnboardingPage() {
   // ── Avatar upload handler (Step 2) ───────────────────────────────────────
 
   const processAvatarFile = useCallback(async (file: File) => {
-    if (!file.type.startsWith('image/')) {
+    if (!isSupportedAvatarFile(file)) {
       toast.error(t('toast_invalid_file_type'), t('toast_invalid_file_type_desc'));
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (isAvatarFileTooLarge(file)) {
       toast.error(t('toast_file_too_large'), t('toast_file_too_large_desc'));
       return;
     }
@@ -769,7 +770,7 @@ export function OnboardingPage() {
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept="image/*"
+                      accept={AVATAR_UPLOAD_ACCEPT}
                       onChange={handleAvatarUpload}
                       className="hidden"
                       aria-label={t('aria_upload_photo')}

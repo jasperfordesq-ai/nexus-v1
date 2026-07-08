@@ -7,6 +7,7 @@ import { render, screen } from '@/test/test-utils';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { ProfileTab } from './ProfileTab';
 import type { ProfileFormData } from './ProfileTab';
+import { AVATAR_UPLOAD_ACCEPT } from '@/lib/avatarUpload';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -38,6 +39,12 @@ vi.mock('@/lib/helpers', () => ({
 }));
 
 vi.mock('@/components/location', () => ({
+  PlaceAutocompleteInput: ({ label }: { label: string }) => (
+    <div data-testid="place-autocomplete">{label}</div>
+  ),
+}));
+
+vi.mock('@/components/location/PlaceAutocompleteInput', () => ({
   PlaceAutocompleteInput: ({ label }: { label: string }) => (
     <div data-testid="place-autocomplete">{label}</div>
   ),
@@ -149,6 +156,11 @@ describe('ProfileTab', () => {
   it('renders change photo button', () => {
     render(<ProfileTab {...defaultProps} />);
     expect(screen.getByLabelText('profile.change_photo_aria')).toBeDefined();
+  });
+
+  it('limits the avatar picker to supported image formats', () => {
+    render(<ProfileTab {...defaultProps} />);
+    expect(screen.getByLabelText('profile.upload_photo_aria')).toHaveAttribute('accept', AVATAR_UPLOAD_ACCEPT);
   });
 
   it('shows loading state on save button when isSaving', () => {

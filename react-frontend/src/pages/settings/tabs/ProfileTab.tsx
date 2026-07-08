@@ -26,6 +26,7 @@ import { isPhoneValid } from '@/lib/validation';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useTheme } from '@/contexts';
+import { AVATAR_UPLOAD_ACCEPT } from '@/lib/avatarUpload';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -110,7 +111,7 @@ export function ProfileTab({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept={AVATAR_UPLOAD_ACCEPT}
               onChange={onAvatarUpload}
               className="hidden"
               disabled={isUploading}

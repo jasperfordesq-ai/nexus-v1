@@ -17,7 +17,6 @@ import { AdminRoute } from './AdminRoute';
 import { AdminLayout } from './AdminLayout';
 import { AdminRoutes } from './routes';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
-import './admin.css';
 
 export default function AdminApp() {
   return (

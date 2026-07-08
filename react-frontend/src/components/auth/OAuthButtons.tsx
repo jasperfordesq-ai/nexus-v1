@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { GoogleIcon } from '@/components/icons/GoogleIcon';
 import { AppleIcon } from '@/components/icons/AppleIcon';
 import { FacebookIcon } from '@/components/icons/FacebookIcon';
+import { Button } from '@/components/ui/Button';
 
 type Provider = 'google' | 'apple' | 'facebook';
 
@@ -86,15 +87,18 @@ export function OAuthButtons({ intent = 'login', enabledProviders, tenantId }: O
   return (
     <div className="space-y-3">
       {visible.map(({ id, Icon, key }) => (
-        <button
+        <Button
           key={id}
           type="button"
-          onClick={() => startFlow(id)}
-          className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-transparent px-4 py-3 text-sm font-semibold text-theme-primary transition-colors hover:bg-theme-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
+          variant="outline"
+          fullWidth
+          size="lg"
+          startContent={<Icon className="w-5 h-5" aria-hidden="true" />}
+          onPress={() => startFlow(id)}
+          className="border-[var(--border-default)] text-theme-primary hover:bg-theme-hover"
         >
-          <Icon className="w-5 h-5" aria-hidden="true" />
-          <span>{t(key)}</span>
-        </button>
+          {t(key)}
+        </Button>
       ))}
       <div className="relative flex items-center my-2">
         <div className="flex-grow border-t border-[var(--border-default)]" />

@@ -248,7 +248,9 @@ RUN mkdir -p /var/www/html/storage/app/public \
 # =============================================================================
 # Create upload directories
 # =============================================================================
-RUN mkdir -p /var/www/html/httpdocs/uploads /var/www/html/public/uploads/posts \
+RUN mkdir -p /var/www/html/httpdocs/uploads/tenants \
+             /var/www/html/httpdocs/uploads/posts \
+             /var/www/html/public/uploads/posts \
     && chown -R www-data:www-data /var/www/html
 
 # Symlink storage/app/public into the web root so /storage/* URLs work
@@ -281,7 +283,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 # =============================================================================
 CMD ["sh", "-c", "\
     umask 0002; \
-    mkdir -p /var/www/html/storage/logs /var/www/html/storage/framework/cache /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/storage/app/public /var/www/html/bootstrap/cache; \
+    mkdir -p /var/www/html/storage/logs /var/www/html/storage/framework/cache /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/storage/app/public /var/www/html/bootstrap/cache /var/www/html/httpdocs/uploads/tenants /var/www/html/httpdocs/uploads/posts /var/www/html/public/uploads/posts; \
     chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache; \
     chmod -R ug+rwX /var/www/html/storage /var/www/html/bootstrap/cache; \
     find /var/www/html/storage -type d -exec chmod g+s {} + 2>/dev/null || true; \

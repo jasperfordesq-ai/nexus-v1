@@ -122,10 +122,8 @@ describe('resolveAvatarUrl', () => {
 
   it('returns resolved URL for valid avatar path', () => {
     const result = resolveAvatarUrl('/uploads/avatars/user123.jpg');
-    expect(result).toContain('/v2/media/thumbnail?');
-    expect(result).toContain('src=%2Fuploads%2Favatars%2Fuser123.jpg');
-    expect(result).toContain('w=96');
-    expect(result).toContain('h=96');
+    expect(result).toContain('/uploads/avatars/user123.jpg');
+    expect(result).not.toContain('/v2/media/thumbnail?');
   });
 
   it('leaves external avatar URLs untouched', () => {
@@ -136,13 +134,11 @@ describe('resolveAvatarUrl', () => {
 });
 
 describe('resolveThumbnailUrl', () => {
-  it('routes local upload paths through the thumbnail endpoint', () => {
+  it('returns the original uploaded asset by default', () => {
     const result = resolveThumbnailUrl('/uploads/tenants/test/listings/image.jpg', { width: 640, height: 360 });
 
-    expect(result).toContain('/v2/media/thumbnail?');
-    expect(result).toContain('src=%2Fuploads%2Ftenants%2Ftest%2Flistings%2Fimage.jpg');
-    expect(result).toContain('w=640');
-    expect(result).toContain('h=360');
+    expect(result).toContain('/uploads/tenants/test/listings/image.jpg');
+    expect(result).not.toContain('/v2/media/thumbnail?');
   });
 
   it('leaves external media untouched', () => {
@@ -151,20 +147,42 @@ describe('resolveThumbnailUrl', () => {
     expect(resolveThumbnailUrl(url, { width: 640, height: 360 })).toBe(url);
   });
 
-  it('adds an explicit format when requested', () => {
-    const result = resolveThumbnailUrl('/uploads/tenants/test/listings/image.jpg', {
+  it('routes local upload paths through the thumbnail endpoint only when explicitly enabled', async () => {
+    vi.resetModules();
+    vi.stubEnv('VITE_ENABLE_MEDIA_THUMBNAILS', 'true');
+
+    const { resolveThumbnailUrl: resolveWithThumbnails } = await import('./helpers');
+    const result = resolveWithThumbnails('/uploads/tenants/test/listings/image.jpg', {
       width: 640,
       height: 360,
       format: 'avif',
     });
 
+    expect(result).toContain('/v2/media/thumbnail?');
+    expect(result).toContain('src=%2Fuploads%2Ftenants%2Ftest%2Flistings%2Fimage.jpg');
+    expect(result).toContain('w=640');
+    expect(result).toContain('h=360');
     expect(result).toContain('format=avif');
   });
 });
 
 describe('resolveThumbnailSrcSet', () => {
-  it('builds responsive width descriptors for local upload paths', () => {
+  it('omits srcset by default so browsers keep the original uploaded asset', () => {
     const result = resolveThumbnailSrcSet('/uploads/tenants/test/listings/image.jpg', {
+      width: 640,
+      height: 360,
+      widths: [320, 640],
+    });
+
+    expect(result).toBe('');
+  });
+
+  it('builds responsive width descriptors for local upload paths when explicitly enabled', async () => {
+    vi.resetModules();
+    vi.stubEnv('VITE_ENABLE_MEDIA_THUMBNAILS', 'true');
+
+    const { resolveThumbnailSrcSet: resolveSrcSetWithThumbnails } = await import('./helpers');
+    const result = resolveSrcSetWithThumbnails('/uploads/tenants/test/listings/image.jpg', {
       width: 640,
       height: 360,
       widths: [320, 640],
@@ -184,7 +202,7 @@ describe('resolveThumbnailSrcSet', () => {
 });
 
 describe('responsiveThumbnailProps', () => {
-  it('returns src, srcSet, and sizes for local uploaded media', () => {
+  it('returns the original src and no srcSet by default', () => {
     const props = responsiveThumbnailProps('/storage/tenant_2/uploads/listing.jpg', {
       width: 640,
       height: 360,
@@ -192,8 +210,9 @@ describe('responsiveThumbnailProps', () => {
       sizes: '100vw',
     });
 
-    expect(props.src).toContain('/v2/media/thumbnail?');
-    expect(props.srcSet).toContain('320w');
+    expect(props.src).toContain('/storage/tenant_2/uploads/listing.jpg');
+    expect(props.src).not.toContain('/v2/media/thumbnail?');
+    expect(props.srcSet).toBeUndefined();
     expect(props.sizes).toBe('100vw');
   });
 });

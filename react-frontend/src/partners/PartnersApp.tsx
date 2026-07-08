@@ -19,7 +19,6 @@ import { PartnersLayout } from './PartnersLayout';
 import { PartnersRoutes } from './routes';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { LoadingScreen } from '@/components/feedback/LoadingScreen';
-import './partners.css';
 
 function PartnersAppInner() {
   // Keep the partners shell scoped to its own namespace. Embedded admin/caring

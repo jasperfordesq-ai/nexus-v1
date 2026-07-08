@@ -322,6 +322,18 @@ export default defineConfig(({ command, mode }) => {
     },
   },
   build: {
+    modulePreload: {
+      resolveDependencies(_filename, deps, context) {
+        if (context.hostType !== 'html') {
+          return deps
+        }
+
+        // HeroUI v3 is the platform UI contract and depends on React Aria.
+        // Keep those components in the app, but do not eagerly advertise the
+        // React Aria vendor chunk from the raw HTML shell.
+        return deps.filter((dep) => !/vendor-(?:heroui|react-aria)-/.test(dep))
+      },
+    },
     outDir: 'dist',
     rollupOptions: {
       // Capacitor packages are optional native deps — not installed in web builds.

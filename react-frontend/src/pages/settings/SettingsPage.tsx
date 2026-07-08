@@ -44,6 +44,7 @@ import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';
 import { AppearanceSettings } from '@/components/settings/AppearanceSettings';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api, tokenManager } from '@/lib/api';
+import { isAvatarFileTooLarge, isSupportedAvatarFile } from '@/lib/avatarUpload';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
@@ -586,12 +587,12 @@ export function SettingsPage() {
     // Reset input so the same file can be re-selected
     event.target.value = '';
 
-    if (!file.type.startsWith('image/')) {
+    if (!isSupportedAvatarFile(file)) {
       toast.error(t('toasts.invalid_file_type'), t('toasts.invalid_file_type_desc'));
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
+    if (isAvatarFileTooLarge(file)) {
       toast.error(t('toasts.file_too_large'), t('toasts.avatar_file_too_large_desc'));
       return;
     }
@@ -608,6 +609,7 @@ export function SettingsPage() {
         if (refreshUser) await refreshUser();
         toast.success(t('toasts.avatar_updated'), t('toasts.avatar_updated_desc'));
       } else {
+        logError('Failed to upload avatar', response);
         toast.error(t('toasts.upload_failed'), t('toasts.avatar_upload_failed_desc'));
       }
     } catch (error) {

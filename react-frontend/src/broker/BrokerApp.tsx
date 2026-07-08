@@ -19,7 +19,6 @@ import { BrokerLayout } from './BrokerLayout';
 import { BrokerRoutes } from './routes';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { LoadingScreen } from '@/components/feedback/LoadingScreen';
-import './broker.css';
 
 function BrokerAppInner() {
   // Keep broker startup scoped to the broker namespace. Admin-derived pages

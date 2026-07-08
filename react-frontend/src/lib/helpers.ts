@@ -21,6 +21,7 @@ type DateValue = Date | number | string;
 const API_BASE_ENV = import.meta.env.VITE_API_BASE || import.meta.env.VITE_API_URL || '';
 const API_ROUTE_BASE = API_BASE_ENV || (import.meta.env.DEV ? '/api' : 'https://api.project-nexus.ie/api');
 const API_ASSET_BASE = API_BASE_ENV.replace(/\/api$/, '') || (import.meta.env.DEV ? '' : 'https://api.project-nexus.ie');
+const MEDIA_THUMBNAILS_ENABLED = import.meta.env.VITE_ENABLE_MEDIA_THUMBNAILS === 'true';
 
 export interface ThumbnailOptions {
   width: number;
@@ -120,6 +121,10 @@ export function resolveThumbnailUrl(url: string | null | undefined, options: Thu
   const resolved = resolveAssetUrl(url, options.fallback);
   if (!resolved) {
     return options.fallback || '';
+  }
+
+  if (!MEDIA_THUMBNAILS_ENABLED) {
+    return resolved;
   }
 
   try {

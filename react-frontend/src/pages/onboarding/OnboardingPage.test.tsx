@@ -159,9 +159,56 @@ vi.mock('@/components/ui', async () => {
   });
 });
 
+vi.mock('@/components/ui/TagGroup', async () => {
+  const R = await import('react');
+
+  type TagCtxValue = { selected: Set<string>; toggle: (id: string) => void };
+  const TagSelectionContext = R.createContext<TagCtxValue>({ selected: new Set(), toggle: () => {} });
+
+  function TagGroupMock({
+    children,
+    selectedKeys,
+    onSelectionChange,
+    ...rest
+  }: {
+    children?: React.ReactNode;
+    selectedKeys?: Iterable<unknown>;
+    selectionMode?: string;
+    onSelectionChange?: (keys: Set<string>) => void;
+    'aria-label'?: string;
+  }) {
+    const selected = new Set(Array.from(selectedKeys ?? [], String));
+    const toggle = (id: string) => {
+      const next = new Set(selected);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      onSelectionChange?.(next);
+    };
+    return (
+      <div aria-label={rest['aria-label']}>
+        <TagSelectionContext.Provider value={{ selected, toggle }}>{children}</TagSelectionContext.Provider>
+      </div>
+    );
+  }
+  TagGroupMock.List = ({ children }: { children?: React.ReactNode }) => <div>{children}</div>;
+
+  function TagMock({ id, children }: { id?: string | number; children?: React.ReactNode }) {
+    const { selected, toggle } = R.useContext(TagSelectionContext);
+    const key = String(id);
+    return (
+      <span role="button" tabIndex={0} aria-pressed={selected.has(key)} onClick={() => toggle(key)}>
+        {children}
+      </span>
+    );
+  }
+
+  return { TagGroup: TagGroupMock, Tag: TagMock };
+});
+
 vi.mock('@/lib/motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport', 'custom']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,    useReducedMotion: () => false,  };});
 
 import { api } from '@/lib/api';
+import { AVATAR_UPLOAD_ACCEPT } from '@/lib/avatarUpload';
 import { OnboardingPage } from './OnboardingPage';
 
 describe('OnboardingPage', () => {
@@ -324,6 +371,32 @@ describe('OnboardingPage', () => {
       expect(stableToastValue.error).toHaveBeenCalled();
     });
     // Upload API should NOT have been called
+    expect(api.upload).not.toHaveBeenCalled();
+  });
+
+  // ── Avatar upload backend format validation ─────────────────────────────
+
+  it('rejects image MIME types unsupported by the avatar backend', async () => {
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+
+    render(<OnboardingPage />);
+
+    await user.click(screen.getByText("Let's Get Started"));
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /Step 2: Profile \(current\)/ })).toBeInTheDocument();
+    });
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(fileInput).toBeTruthy();
+    expect(fileInput).toHaveAttribute('accept', AVATAR_UPLOAD_ACCEPT);
+
+    const heicFile = new File(['fake-content'], 'photo.heic', { type: 'image/heic' });
+    fireEvent.change(fileInput, { target: { files: [heicFile] } });
+
+    await waitFor(() => {
+      expect(stableToastValue.error).toHaveBeenCalled();
+    });
     expect(api.upload).not.toHaveBeenCalled();
   });
 

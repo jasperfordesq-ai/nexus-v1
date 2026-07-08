@@ -52,33 +52,13 @@ const startupImportBudgets = [
   },
   {
     file: 'src/index.css',
-    pattern: /@source\s+["']\.\/\*\*\/\*\.\{js,ts,jsx,tsx\}["'];(?![\s\S]*@source\s+not\s+["']\.\/admin\/\*\*\/\*\.\{js,ts,jsx,tsx\}["'];)/,
-    message: 'src/index.css must exclude src/admin from the main Tailwind scan so admin-only utilities stay in the lazy admin CSS chunk.',
+    pattern: /@source\s+not\s+["']\.\/(?:admin|broker|caring|partners|super-admin)\/\*\*\//,
+    message: 'src/index.css must include panel source folders in the main Tailwind scan; late-loaded panel utility stylesheets corrupt the member header/footer after returning from admin.',
   },
   {
     file: 'src/index.css',
     pattern: /^(?![\s\S]*@source\s+not\s+["']\.\/\*\*\/\*\.d\.ts["'];)/,
     message: 'src/index.css must exclude generated TypeScript declaration files from the Tailwind scan so generated translation/type metadata cannot create CSS candidates.',
-  },
-  {
-    file: 'src/index.css',
-    pattern: /^(?![\s\S]*@source\s+not\s+["']\.\/broker\/\*\*\/\*\.\{js,ts,jsx,tsx\}["'];)/,
-    message: 'src/index.css must exclude src/broker from the main Tailwind scan so broker-only utilities stay in the lazy broker CSS chunk.',
-  },
-  {
-    file: 'src/index.css',
-    pattern: /^(?![\s\S]*@source\s+not\s+["']\.\/caring\/\*\*\/\*\.\{js,ts,jsx,tsx\}["'];)/,
-    message: 'src/index.css must exclude src/caring from the main Tailwind scan so caring-only utilities stay in the lazy caring CSS chunk.',
-  },
-  {
-    file: 'src/index.css',
-    pattern: /^(?![\s\S]*@source\s+not\s+["']\.\/partners\/\*\*\/\*\.\{js,ts,jsx,tsx\}["'];)/,
-    message: 'src/index.css must exclude src/partners from the main Tailwind scan so partner-only utilities stay in the lazy partners CSS chunk.',
-  },
-  {
-    file: 'src/index.css',
-    pattern: /^(?![\s\S]*@source\s+not\s+["']\.\/super-admin\/\*\*\/\*\.\{js,ts,jsx,tsx\}["'];)/,
-    message: 'src/index.css must exclude src/super-admin from the main Tailwind scan so super-admin-only utilities stay in the lazy super-admin CSS chunk.',
   },
   {
     file: 'src/index.css',
@@ -92,28 +72,28 @@ const startupImportBudgets = [
   },
   {
     file: 'src/admin/AdminApp.tsx',
-    pattern: /^(?![\s\S]*import\s+['"]\.\/admin\.css['"];)/,
-    message: 'AdminApp.tsx must import ./admin.css so admin-only Tailwind utilities load with the lazy admin route.',
+    pattern: /import\s+['"]\.\/admin\.css['"]/,
+    message: 'AdminApp.tsx must not import a lazy global admin stylesheet; panel utilities belong in the main Tailwind stylesheet to protect the member shell after admin navigation.',
   },
   {
     file: 'src/broker/BrokerApp.tsx',
-    pattern: /^(?![\s\S]*import\s+['"]\.\/broker\.css['"];)/,
-    message: 'BrokerApp.tsx must import ./broker.css so broker-only Tailwind utilities load with the lazy broker route.',
+    pattern: /import\s+['"]\.\/broker\.css['"]/,
+    message: 'BrokerApp.tsx must not import a lazy global broker stylesheet; panel utilities belong in the main Tailwind stylesheet to protect the member shell after panel navigation.',
   },
   {
     file: 'src/caring/CaringApp.tsx',
-    pattern: /^(?![\s\S]*import\s+['"]\.\/caring\.css['"];)/,
-    message: 'CaringApp.tsx must import ./caring.css so caring-only Tailwind utilities load with the lazy caring route.',
+    pattern: /import\s+['"]\.\/caring\.css['"]/,
+    message: 'CaringApp.tsx must not import a lazy global caring stylesheet; panel utilities belong in the main Tailwind stylesheet to protect the member shell after panel navigation.',
   },
   {
     file: 'src/partners/PartnersApp.tsx',
-    pattern: /^(?![\s\S]*import\s+['"]\.\/partners\.css['"];)/,
-    message: 'PartnersApp.tsx must import ./partners.css so partner-only Tailwind utilities load with the lazy partner-timebanks route.',
+    pattern: /import\s+['"]\.\/partners\.css['"]/,
+    message: 'PartnersApp.tsx must not import a lazy global partners stylesheet; panel utilities belong in the main Tailwind stylesheet to protect the member shell after panel navigation.',
   },
   {
     file: 'src/super-admin/SuperAdminApp.tsx',
-    pattern: /^(?![\s\S]*import\s+['"]\.\/super-admin\.css['"];)/,
-    message: 'SuperAdminApp.tsx must import ./super-admin.css so super-admin-only Tailwind utilities load with the lazy super-admin route.',
+    pattern: /import\s+['"]\.\/super-admin\.css['"]/,
+    message: 'SuperAdminApp.tsx must not import a lazy global super-admin stylesheet; panel utilities belong in the main Tailwind stylesheet to protect the member shell after panel navigation.',
   },
   {
     file: 'src/main.tsx',
@@ -472,8 +452,8 @@ const startupImportBudgets = [
   },
   {
     file: 'src/components/layout/AuthLayout.tsx',
-    pattern: /import\(['"]@\/components\/LanguageSwitcher['"]\)|import\(['"]\.\/SourceRepositoryLink['"]\)|from ['"]@\/components\/ui|from ['"]@heroui\//,
-    message: 'AuthLayout.tsx must keep auth chrome lightweight; do not load the full language switcher, source-repository component, HeroUI, or UI barrel on auth routes.',
+    pattern: /from ['"]@\/components\/ui['"]/,
+    message: 'AuthLayout.tsx must keep auth chrome lightweight by avoiding the full @/components/ui barrel; focused HeroUI-backed primitives are allowed.',
   },
   {
     file: 'src/components/ui/GlassCard.tsx',

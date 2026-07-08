@@ -227,7 +227,10 @@ RUN chown -R www-data:www-data /var/www/html
 
 # Create upload directories with correct ownership so Docker volumes mount
 # with the right permissions (named volumes initialise from image content)
-RUN mkdir -p /var/www/html/httpdocs/uploads /var/www/html/uploads /var/www/html/public/uploads/posts \
+RUN mkdir -p /var/www/html/httpdocs/uploads/tenants \
+             /var/www/html/httpdocs/uploads/posts \
+             /var/www/html/uploads \
+             /var/www/html/public/uploads/posts \
     && chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads /var/www/html/public/uploads \
     && chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads /var/www/html/public/uploads
 
@@ -248,4 +251,4 @@ EXPOSE 80
 # Ensure upload dirs are writable by www-data at each startup (handles volume
 # re-mounts that reset ownership) then start Apache.
 # =============================================================================
-CMD ["sh", "-c", "mkdir -p /var/www/html/httpdocs /var/www/html/storage/app/public; ln -sfn /var/www/html/storage/app/public /var/www/html/httpdocs/storage; chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads /var/www/html/public/uploads 2>/dev/null; chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads /var/www/html/public/uploads 2>/dev/null; chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null; chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null; apache2-foreground"]
+CMD ["sh", "-c", "mkdir -p /var/www/html/httpdocs/uploads/tenants /var/www/html/httpdocs/uploads/posts /var/www/html/uploads /var/www/html/public/uploads/posts /var/www/html/storage/app/public; ln -sfn /var/www/html/storage/app/public /var/www/html/httpdocs/storage; chown -R www-data:www-data /var/www/html/httpdocs/uploads /var/www/html/uploads /var/www/html/public/uploads 2>/dev/null; chmod -R 775 /var/www/html/httpdocs/uploads /var/www/html/uploads /var/www/html/public/uploads 2>/dev/null; chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null; chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null; apache2-foreground"]
