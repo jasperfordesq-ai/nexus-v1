@@ -42,10 +42,10 @@ return new class extends Migration
 
     public function down(): void
     {
-        $this->dropIndex('vol_donations', 'idx_vol_donations_tenant_created');
-        $this->dropIndex('vol_shifts', 'idx_vol_shifts_end_time');
-        $this->dropIndex('vol_applications', 'idx_vol_apps_tenant_status_created');
-        $this->dropIndex('vol_logs', 'idx_vol_logs_tenant_status_created');
+        // Intentionally non-destructive. These are additive performance indexes
+        // and production blue/green safety gates reject raw DROP INDEX in pending
+        // migrations. Removing them, if ever needed, should be a deliberate
+        // maintenance-window contract step rather than an automatic rollback.
     }
 
     /**
@@ -77,15 +77,6 @@ return new class extends Migration
 
         $columnSql = implode(', ', array_map(static fn (string $column): string => "`{$column}`", $columns));
         DB::statement("ALTER TABLE `{$table}` ADD INDEX `{$index}` ({$columnSql})");
-    }
-
-    private function dropIndex(string $table, string $index): void
-    {
-        if (! Schema::hasTable($table) || ! $this->indexExists($table, $index)) {
-            return;
-        }
-
-        DB::statement("ALTER TABLE `{$table}` DROP INDEX `{$index}`");
     }
 
     private function indexExists(string $table, string $index): bool
