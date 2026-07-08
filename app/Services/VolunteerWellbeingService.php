@@ -45,9 +45,13 @@ class VolunteerWellbeingService
      * Returns a risk assessment with a 0-100 risk_score, risk_level, and
      * detailed indicators that the controller uses to build the wellbeing dashboard.
      *
+     * @param bool $persist When true, an active wellbeing alert is upserted for
+     *                       an at-risk (score >= 30) volunteer. Read endpoints
+     *                       (dashboard / my-status) pass false so a GET never
+     *                       writes; the scheduled tenant assessment passes true.
      * @return array  Assessment with keys: risk_score, risk_level, indicators, recommendations
      */
-    public static function detectBurnoutRisk(int $userId): array
+    public static function detectBurnoutRisk(int $userId, bool $persist = false): array
     {
         $tenantId = TenantContext::getId();
 
@@ -245,8 +249,12 @@ class VolunteerWellbeingService
             $recommendations[] = __('api.vol_wellbeing_recommendation_healthy_balance');
         }
 
-        // Persist alert if risk is moderate or higher
-        if ($riskScore >= 30) {
+        // Persist an alert if risk is moderate or higher — but only in a write
+        // context (the scheduled tenant assessment). Read endpoints pass
+        // $persist = false so viewing the wellbeing dashboard never mutates
+        // vol_wellbeing_alerts. upsertAlert is idempotent (one active row per
+        // user), so the daily job refreshes rather than duplicates.
+        if ($persist && $riskScore >= 30) {
             self::upsertAlert($tenantId, $userId, $riskLevel, $riskScore, $indicators);
         }
 
@@ -294,7 +302,7 @@ class VolunteerWellbeingService
         $atRiskUsers = [];
 
         foreach ($volunteerIds as $userId) {
-            $assessment = self::detectBurnoutRisk((int) $userId);
+            $assessment = self::detectBurnoutRisk((int) $userId, true);
             $level = $assessment['risk_level'] ?? 'low';
             $riskBreakdown[$level] = ($riskBreakdown[$level] ?? 0) + 1;
 

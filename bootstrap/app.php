@@ -110,6 +110,14 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->onOneServer()
             ->name('retention-enforce');
 
+        // Volunteer burnout-risk assessment — refreshes wellbeing alerts off the
+        // read path (the dashboard GET no longer writes vol_wellbeing_alerts).
+        $schedule->command('volunteering:assess-wellbeing')
+            ->dailyAt('04:00')
+            ->withoutOverlapping()
+            ->onOneServer()
+            ->name('volunteering-assess-wellbeing');
+
         $schedule->command('safeguarding:sla-escalate')
             ->everyFifteenMinutes()
             ->withoutOverlapping()
