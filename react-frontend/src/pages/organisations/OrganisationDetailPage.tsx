@@ -48,6 +48,7 @@ import { PageMeta } from '@/components/seo/PageMeta';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { extractCollectionItems } from '@/pages/volunteering/extractCollectionItems';
 import GuardianConsentModal from '@/components/volunteering/GuardianConsentModal';
 
 /* ───────────────────────── Types ───────────────────────── */
@@ -146,7 +147,8 @@ export function OrganisationDetailPage() {
       // Load org details, opportunities, and enabled secondary data in parallel.
       const [orgRes, oppsRes, reviewsRes] = await Promise.all([
         api.get<OrganisationDetail>(`/v2/volunteering/organisations/${id}`),
-        api.get<{ data: Opportunity[] }>(`/v2/volunteering/opportunities?organization_id=${id}&per_page=50`),
+        // api.get() already unwraps { data: [...], meta: {...} } → oppsRes.data = Opportunity[]
+        api.get<Opportunity[]>(`/v2/volunteering/opportunities?organization_id=${id}&per_page=50`),
         reviewsEnabled
           ? api.get<{ reviews: Review[] }>(`/v2/volunteering/reviews/organization/${id}`)
           : Promise.resolve({ success: true, data: { reviews: [] } }),
@@ -162,7 +164,7 @@ export function OrganisationDetailPage() {
       }
 
       if (oppsRes.success && oppsRes.data) {
-        setOpportunities(Array.isArray(oppsRes.data) ? oppsRes.data as Opportunity[] : []);
+        setOpportunities(extractCollectionItems<Opportunity>(oppsRes.data));
       }
 
       if (reviewsEnabled && reviewsRes.success && reviewsRes.data) {
@@ -176,12 +178,15 @@ export function OrganisationDetailPage() {
       logError('Failed to load organisation', err);
       setError(tRef.current('organisation_detail.error_load_retry'));
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [id, reviewsEnabled]);
 
   useEffect(() => {
     loadData();
+    return () => { abortRef.current?.abort(); };
   }, [loadData]);
 
   // Detect whether the signed-in user owns/admins THIS org, to show a "Manage"
@@ -657,11 +662,16 @@ export function OrganisationDetailPage() {
                 {Array.from({ length: 5 }, (_, i) => {
                   const rating = i + 1;
                   return (
+                    // as="button" renders a native element so role/aria-checked reach
+                    // the DOM — React Aria's filterDOMProps strips them on the default path.
                     <Button
                       key={rating}
+                      as="button"
                       isIconOnly
                       size="sm"
                       variant="tertiary"
+                      role="radio"
+                      aria-checked={reviewRating === rating}
                       aria-label={t('organisation_detail.rating_sr', { n: rating })}
                       onPress={() => setReviewRating(rating)}
                     >

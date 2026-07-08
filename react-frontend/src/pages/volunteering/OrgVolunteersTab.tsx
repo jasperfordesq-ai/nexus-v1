@@ -16,6 +16,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { useTranslation } from 'react-i18next';
+import { extractCollectionItems } from './extractCollectionItems';
 
 interface Volunteer {
   id: number;
@@ -25,12 +26,6 @@ interface Volunteer {
   total_hours: number;
   applications_count: number;
   applied_at: string;
-}
-
-interface VolunteersResponse {
-  items: Volunteer[];
-  cursor: string | null;
-  has_more: boolean;
 }
 
 interface OrgVolunteersTabProps {
@@ -63,7 +58,7 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
       const params = new URLSearchParams({ per_page: '20' });
       if (append && cursorRef.current) params.set('cursor', cursorRef.current);
 
-      const response = await api.get<VolunteersResponse>(
+      const response = await api.get<Volunteer[]>(
         `/v2/volunteering/organisations/${orgId}/volunteers?${params}`
       );
 
@@ -71,7 +66,7 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
 
       if (response.success && response.data) {
         // api.get() already unwraps { data: [...], meta: {...} } → response.data = [...], response.meta = {...}
-        const items = Array.isArray(response.data) ? response.data : [];
+        const items = extractCollectionItems<Volunteer>(response.data);
         const cursor = response.meta?.cursor ?? null;
         const has_more = response.meta?.has_more ?? false;
         if (append) {

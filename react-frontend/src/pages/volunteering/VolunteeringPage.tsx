@@ -67,6 +67,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { VolunteeringConfig } from '@/types';
 import { ProximityFilter, type ProximityFilterParams } from '@/components/proximity/ProximityFilter';
+import { extractCollectionItems } from './extractCollectionItems';
 import { RecommendedShiftsTab } from './RecommendedShiftsTab';
 import { EmergencyAlertsTab } from './EmergencyAlertsTab';
 import { CertificatesTab } from './CertificatesTab';
@@ -139,24 +140,6 @@ interface HoursSummary {
   total_declined: number;
   by_organization: { name: string; hours: number }[];
   by_month: { month: string; hours: number }[];
-}
-
-function extractCollectionItems<T>(payload: unknown): T[] {
-  if (Array.isArray(payload)) {
-    return payload as T[];
-  }
-
-  if (payload && typeof payload === 'object') {
-    const wrapped = payload as { items?: T[]; data?: { items?: T[] } };
-    if (Array.isArray(wrapped.items)) {
-      return wrapped.items;
-    }
-    if (Array.isArray(wrapped.data?.items)) {
-      return wrapped.data.items;
-    }
-  }
-
-  return [];
 }
 
 type VolunteerTab = 'opportunities' | 'applications' | 'hours' | 'recommended' | 'certificates' | 'alerts' | 'wellbeing' | 'credentials' | 'waitlist' | 'swaps' | 'group-signups' | 'expenses' | 'safeguarding' | 'community-projects' | 'donations' | 'accessibility';

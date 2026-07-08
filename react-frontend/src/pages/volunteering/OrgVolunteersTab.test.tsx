@@ -73,7 +73,8 @@ function volunteerResponse(
 ) {
   return {
     success: true,
-    // The component checks Array.isArray(response.data) and falls back to response.meta
+    // Mirrors the real backend shape after api.get() unwraps the envelope:
+    // response.data = Volunteer[] (read via extractCollectionItems), response.meta = pagination
     data: items,
     meta: { cursor, has_more },
   };

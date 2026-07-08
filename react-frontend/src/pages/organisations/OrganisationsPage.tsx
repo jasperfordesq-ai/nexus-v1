@@ -37,6 +37,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { extractCollectionItems } from '@/pages/volunteering/extractCollectionItems';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -137,12 +138,13 @@ export function OrganisationsPage() {
       if (append && cursor) params.set('cursor', cursor);
       if (debouncedQuery.trim()) params.set('search', debouncedQuery.trim());
 
-      const response = await api.get<{ data: Organisation[]; meta: { cursor: string | null; has_more: boolean } }>(
+      // api.get() already unwraps { data: [...], meta: {...} } → response.data = Organisation[]
+      const response = await api.get<Organisation[]>(
         `/v2/volunteering/organisations?${params}`
       );
 
       if (response.success && response.data) {
-        const items = Array.isArray(response.data) ? response.data : [];
+        const items = extractCollectionItems<Organisation>(response.data);
 
         if (append) {
           setOrganisations((prev) => [...prev, ...items]);
