@@ -564,12 +564,35 @@ class VolunteerController extends BaseApiController
         if ($this->query('cursor')) $filters['cursor'] = $this->query('cursor');
         $result = $this->volunteerService->getOrganisations($filters);
         // Public endpoint (withoutMiddleware('auth:sanctum')) — never expose
-        // wallet/financial state, mirroring showOrganisation() below.
-        $items = array_map(static function (array $org): array {
-            unset($org['balance'], $org['auto_pay_enabled']);
-            return PublicOrganisationResource::augment($org);
+        // wallet/financial state or internal identifiers, mirroring
+        // showOrganisation() below.
+        $items = array_map(function (array $org): array {
+            return PublicOrganisationResource::augment($this->stripInternalOrgFields($org));
         }, $result['items']);
         return $this->respondWithCollection($items, $result['cursor'], $filters['limit'], $result['has_more']);
+    }
+
+    /**
+     * Remove internal / financial / safeguarding fields before an organisation
+     * row is returned to an UNAUTHENTICATED caller. The public directory needs
+     * the org's public profile only — never its wallet state, the owner's or
+     * safeguarding officers' internal user ids, or the tenant id.
+     *
+     * @param array<string, mixed> $org
+     * @return array<string, mixed>
+     */
+    private function stripInternalOrgFields(array $org): array
+    {
+        unset(
+            $org['balance'],
+            $org['auto_pay_enabled'],
+            $org['tenant_id'],
+            $org['user_id'],
+            $org['dlp_user_id'],
+            $org['deputy_dlp_user_id'],
+        );
+
+        return $org;
     }
 
     public function showOrganisation($id): JsonResponse
@@ -579,11 +602,10 @@ class VolunteerController extends BaseApiController
         $org = $this->volunteerService->getOrganisationById((int) $id);
         if (!$org) return $this->respondWithError('NOT_FOUND', __('api.organization_not_found'), null, 404);
         // This endpoint is public (withoutMiddleware('auth:sanctum')). Never expose
-        // internal wallet/financial state to unauthenticated callers — org owners
-        // read balance/auto-pay from the ownership-scoped /organisations/{id}/stats
-        // endpoint instead.
-        unset($org['balance'], $org['auto_pay_enabled']);
-        return $this->respondWithData(PublicOrganisationResource::augment($org));
+        // internal wallet/financial state or the owner/safeguarding-officer user
+        // ids to unauthenticated callers — org owners read balance/auto-pay from
+        // the ownership-scoped /organisations/{id}/stats endpoint instead.
+        return $this->respondWithData(PublicOrganisationResource::augment($this->stripInternalOrgFields($org)));
     }
 
     public function myOrganisations(): JsonResponse

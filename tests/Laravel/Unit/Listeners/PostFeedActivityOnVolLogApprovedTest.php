@@ -60,6 +60,10 @@ class PostFeedActivityOnVolLogApprovedTest extends TestCase
             $this->markTestSkipped('No users found in tenant 2 — cannot create vol_log fixture.');
         }
 
+        // Ensure the broadcast opt-out is ON (show_on_leaderboard = 1) so the
+        // happy-path tests are deterministic regardless of seed data.
+        DB::table('users')->where('id', $userId)->update(['show_on_leaderboard' => 1]);
+
         return (int) DB::table('vol_logs')->insertGetId([
             'tenant_id'   => 2,
             'user_id'     => $userId,
@@ -96,7 +100,28 @@ class PostFeedActivityOnVolLogApprovedTest extends TestCase
         $this->assertSame('volunteer_hours', $capturedArgs['type']);
         $this->assertSame($volLogId, $capturedArgs['sid']);
         $this->assertStringContainsString('3.00 hours', $capturedArgs['data']['title']);
-        $this->assertSame('Painted the community hall', $capturedArgs['data']['content']);
+        // Privacy: the volunteer's free-text description is NOT broadcast to the
+        // community feed (it may disclose sensitive context written for the org).
+        $this->assertNull($capturedArgs['data']['content']);
+    }
+
+    // -------------------------------------------------------------------------
+    // Test: volunteer who opted out of public sharing (show_on_leaderboard = 0)
+    // does NOT get their hours broadcast to the community feed.
+    // -------------------------------------------------------------------------
+    public function test_handle_respects_show_on_leaderboard_opt_out(): void
+    {
+        $volLogId = $this->insertVolLog(2.0, 'Sensitive context');
+        $userId = (int) DB::table('vol_logs')->where('id', $volLogId)->value('user_id');
+        DB::table('users')->where('id', $userId)->update(['show_on_leaderboard' => 0]);
+
+        $this->feedService->shouldReceive('recordActivity')->never();
+
+        $event = new VolLogStatusChanged(2, $volLogId, 'pending', 'approved');
+        $listener = new PostFeedActivityOnVolLogApproved($this->feedService);
+        $listener->handle($event);
+
+        $this->assertTrue(true);
     }
 
     // -------------------------------------------------------------------------

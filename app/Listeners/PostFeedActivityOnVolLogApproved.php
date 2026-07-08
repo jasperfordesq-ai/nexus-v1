@@ -57,6 +57,19 @@ class PostFeedActivityOnVolLogApproved
                 return;
             }
 
+            // Respect the volunteer's broadcast opt-out. show_on_leaderboard is
+            // the platform's existing "share my volunteering publicly" preference
+            // (the leaderboard honours it for approved hours); a volunteer who
+            // opted out must not have their hours pushed to the community feed
+            // either — e.g. someone volunteering at a sensitive organisation.
+            $showPublicly = DB::table('users')
+                ->where('id', $userId)
+                ->where('tenant_id', $event->tenantId)
+                ->value('show_on_leaderboard');
+            if ($showPublicly !== null && (int) $showPublicly === 0) {
+                return;
+            }
+
             // Resolve the organisation name for display (metadata is denormalised
             // into the feed row; the frontend renders a localised title from the
             // hours, so this stored title is only a non-localised fallback).
@@ -72,7 +85,11 @@ class PostFeedActivityOnVolLogApproved
             // title from the numeric `hours` metadata (card.volunteer_hours_title),
             // so this value is only used by non-localising readers.
             $title = sprintf('Volunteered %.2f hours', $hours);
-            $content = (string) ($log->description ?? '');
+            // The volunteer's free-text description is deliberately NOT broadcast:
+            // it is context the volunteer wrote for the organisation, not for the
+            // whole-community feed, and could disclose sensitive detail. The feed
+            // card renders from the hours metadata and never used this body.
+            $content = null;
 
             // source_type 'volunteer_hours' (mapped to vol_logs), NOT 'volunteer'
             // (mapped to vol_opportunities) — keying an hour-log row under
@@ -85,7 +102,7 @@ class PostFeedActivityOnVolLogApproved
                 $event->volLogId,
                 [
                     'title'    => $title,
-                    'content'  => $content !== '' ? $content : null,
+                    'content'  => $content,
                     'metadata' => [
                         'vol_log_id'      => $event->volLogId,
                         'organization_id' => $log->organization_id !== null
