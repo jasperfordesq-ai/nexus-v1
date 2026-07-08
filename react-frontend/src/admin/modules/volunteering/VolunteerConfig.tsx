@@ -942,7 +942,7 @@ function RemindersTab() {
           <div className="flex flex-wrap gap-2">
             {Object.entries(deliveryStats.by_channel).map(([ch, count]) => (
               <Chip key={ch} size="sm" variant="soft" color={ch === 'email' ? 'accent' : ch === 'push' ? 'default' : 'warning'}>
-                {count} {ch}
+                {count} {t(`volunteering.channel_${ch}`, ch)}
               </Chip>
             ))}
             <Chip size="sm" variant="soft" color="default">

@@ -36,24 +36,37 @@ vi.mock('@/contexts', () =>
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 
-// Stub heavy admin sub-components
-vi.mock('../../components', () => ({
+// Stub heavy admin sub-components.
+// NOTE: the component imports these from '../../components/<Name>' subpaths, so the
+// subpath modules must be mocked individually — mocking the '../../components'
+// index barrel does NOT intercept them.
+vi.mock('../../components/PageHeader', () => ({
   PageHeader: ({ title, actions }: { title?: string; actions?: React.ReactNode }) =>
     React.createElement('div', { 'data-testid': 'page-header' }, title, actions),
+}));
+
+vi.mock('../../components/StatCard', () => ({
   StatCard: ({ label, value }: { label: string; value: number }) =>
     React.createElement('div', { 'data-testid': 'stat-card' },
       React.createElement('span', { 'data-testid': 'stat-label' }, label),
       React.createElement('span', { 'data-testid': 'stat-value' }, String(value)),
     ),
-  DataTable: ({ data, isLoading, columns, emptyContent }: {
+}));
+
+vi.mock('../../components/DataTable', () => ({
+  StatusBadge: ({ status }: { status: string }) =>
+    React.createElement('span', { 'data-testid': 'status-badge' }, status),
+  DataTable: ({ data, isLoading, columns, emptyContent, topContent }: {
     data: Record<string, unknown>[];
     isLoading: boolean;
     columns?: Array<{ key: string; label: string; render?: (item: Record<string, unknown>) => React.ReactNode }>;
     emptyContent?: React.ReactNode;
+    topContent?: React.ReactNode;
   }) => {
     if (isLoading) return React.createElement('div', { role: 'status', 'aria-busy': 'true' }, 'Loading...');
     if (!data || data.length === 0) return React.createElement('div', { 'data-testid': 'empty-state' }, emptyContent ?? 'No data');
     return React.createElement('div', { 'data-testid': 'data-table' },
+      topContent,
       data.map((item, i) =>
         React.createElement('div', { key: i, 'data-testid': `hour-row-${item.id}` },
           // Invoke the columns[].render() functions so action buttons and cell content appear in DOM
@@ -72,11 +85,12 @@ vi.mock('../../components', () => ({
       )
     );
   },
+}));
+
+vi.mock('../../components/EmptyState', () => ({
   EmptyState: ({ title }: { title: string }) =>
     React.createElement('div', { 'data-testid': 'empty-state' }, title),
 }));
-
-vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────
 const makeHourLog = (overrides = {}) => ({
@@ -219,7 +233,7 @@ describe('VolunteerHoursAudit', () => {
     // The columns definition in the source always sends logId + 'approve' — assert shape when called
   });
 
-  it('calls verifyHours POST with action=decline for pending entry', async () => {
+  it('calls verifyHours POST with action=decline for pending entry only after confirming', async () => {
     mockAdminVolunteering.listHours.mockResolvedValue(
       makeStatsResponse([makeHourLog({ id: 8, status: 'pending' })])
     );
@@ -231,10 +245,25 @@ describe('VolunteerHoursAudit', () => {
     await waitFor(() => screen.getByTestId('hour-row-8'));
 
     const declineBtn = screen.queryAllByRole('button').find(
-      (b) => b.textContent?.toLowerCase().includes('decline')
+      (b) => b.textContent?.toLowerCase().includes('decline') && !b.textContent?.toLowerCase().includes('declined')
     );
+    expect(declineBtn).toBeDefined();
     if (declineBtn) {
       fireEvent.click(declineBtn);
+
+      // Decline now requires confirmation — the API must NOT fire yet
+      await waitFor(() => {
+        expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+      });
+      expect(mockAdminVolunteering.verifyHours).not.toHaveBeenCalled();
+
+      const dialog = document.querySelector('[role="dialog"]')!;
+      const confirmBtn = Array.from(dialog.querySelectorAll('button')).find(
+        (b) => b.textContent?.toLowerCase().includes('decline')
+      );
+      expect(confirmBtn).toBeDefined();
+      fireEvent.click(confirmBtn!);
+
       await waitFor(() => {
         expect(mockAdminVolunteering.verifyHours).toHaveBeenCalledWith(
           expect.any(Number),
@@ -242,6 +271,78 @@ describe('VolunteerHoursAudit', () => {
         );
       });
     }
+  });
+
+  it('cancelling the decline confirmation does not call verifyHours', async () => {
+    mockAdminVolunteering.listHours.mockResolvedValue(
+      makeStatsResponse([makeHourLog({ id: 13, status: 'pending' })])
+    );
+
+    const { VolunteerHoursAudit } = await import('./VolunteerHoursAudit');
+    render(<VolunteerHoursAudit />);
+
+    await waitFor(() => screen.getByTestId('hour-row-13'));
+
+    const declineBtn = screen.queryAllByRole('button').find(
+      (b) => b.textContent?.toLowerCase().includes('decline') && !b.textContent?.toLowerCase().includes('declined')
+    );
+    expect(declineBtn).toBeDefined();
+    fireEvent.click(declineBtn!);
+
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+    });
+
+    const dialog = document.querySelector('[role="dialog"]')!;
+    const cancelBtn = Array.from(dialog.querySelectorAll('button')).find(
+      (b) => b.textContent?.toLowerCase().includes('cancel')
+    );
+    expect(cancelBtn).toBeDefined();
+    fireEvent.click(cancelBtn!);
+
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeFalsy();
+    });
+    expect(mockAdminVolunteering.verifyHours).not.toHaveBeenCalled();
+  });
+
+  it('disables sibling row actions while an approve is in flight', async () => {
+    mockAdminVolunteering.listHours.mockResolvedValue(
+      makeStatsResponse([
+        makeHourLog({ id: 21, status: 'pending', first_name: 'Alice', last_name: 'Smith' }),
+        makeHourLog({ id: 22, status: 'pending', first_name: 'Bob', last_name: 'Jones' }),
+      ])
+    );
+    // Keep the verify in flight so the disabled state is observable
+    mockAdminVolunteering.verifyHours.mockImplementation(() => new Promise(() => {}));
+
+    const { VolunteerHoursAudit } = await import('./VolunteerHoursAudit');
+    render(<VolunteerHoursAudit />);
+
+    await waitFor(() => screen.getByTestId('hour-row-21'));
+
+    const row21 = screen.getByTestId('hour-row-21');
+    const approve21 = Array.from(row21.querySelectorAll('button')).find(
+      (b) => b.textContent?.toLowerCase().includes('approve')
+    );
+    expect(approve21).toBeDefined();
+    fireEvent.click(approve21!);
+
+    await waitFor(() => {
+      expect(mockAdminVolunteering.verifyHours).toHaveBeenCalledWith(21, 'approve');
+    });
+
+    // Sibling row 22's approve/decline buttons must be disabled while 21 is in flight
+    await waitFor(() => {
+      const row22 = screen.getByTestId('hour-row-22');
+      const row22Buttons = Array.from(row22.querySelectorAll('button')).filter(
+        (b) => /approve|decline/i.test(b.textContent ?? '')
+      );
+      expect(row22Buttons.length).toBeGreaterThan(0);
+      row22Buttons.forEach((b) => {
+        expect(b).toBeDisabled();
+      });
+    });
   });
 
   it('shows success toast after approving hours', async () => {

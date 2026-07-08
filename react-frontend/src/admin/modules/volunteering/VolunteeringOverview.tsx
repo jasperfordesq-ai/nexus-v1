@@ -100,6 +100,10 @@ const ACTIVITY_TYPE_COLORS: Record<string, 'success' | 'warning' | 'danger' | 'p
   donation: 'primary',
 };
 
+/**
+ * Fallback humanizer for unknown activity types — known types resolve through
+ * `volunteering.activity_type_*` translation keys at the call site.
+ */
 function formatActivityType(type: string): string {
   return type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
@@ -412,7 +416,9 @@ export function VolunteeringOverview() {
                         {t('volunteering.by_name', { name: [opp.first_name, opp.last_name].filter(Boolean).join(' ') || t('volunteering.unknown_org') })}
                       </p>
                   </div>
-                  <Chip size="sm" variant="soft" color={['active', 'open'].includes(opp.status) ? 'success' : 'default'} className="capitalize">{opp.status}</Chip>
+                  <Chip size="sm" variant="soft" color={['active', 'open'].includes(opp.status) ? 'success' : 'default'} className="capitalize">
+                    {t(`volunteering.status_${opp.status || 'unknown'}`, opp.status)}
+                  </Chip>
                 </div>
               ))}
             </div>
@@ -457,7 +463,7 @@ export function VolunteeringOverview() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-medium">{item.user_name}</span>
                         <Chip size="sm" variant="soft" color={typeColor} className="capitalize">
-                          {formatActivityType(item.type)}
+                          {t(`volunteering.activity_type_${item.type}`, formatActivityType(item.type))}
                         </Chip>
                       </div>
                       <p className="text-sm text-muted mt-0.5">{item.description}</p>

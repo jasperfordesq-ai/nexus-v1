@@ -24,6 +24,7 @@ import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
 import { PageHeader } from '../../components/PageHeader';
 import { EmptyState } from '../../components/EmptyState';
+import { ConfirmModal } from '../../components/ConfirmModal';
 
 import { useTranslation } from 'react-i18next';
 
@@ -73,6 +74,7 @@ export function VolunteerApprovals() {
   const [statusTab, setStatusTab] = useState<string>('all');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [bulkConfirmAction, setBulkConfirmAction] = useState<'approve' | 'decline' | null>(null);
   const [opportunityFilter, setOpportunityFilter] = useState<string>('all');
 
   const loadData = useCallback(async () => {
@@ -161,7 +163,7 @@ export function VolunteerApprovals() {
     }
   }, [loadData, toast, t]);
 
-  // Bulk operations
+  // Bulk operations — both are gated behind a ConfirmModal (see bulkConfirmAction)
   const handleBulkApprove = useCallback(async () => {
     if (selectedIds.size === 0) return;
     setBulkLoading(true);
@@ -176,6 +178,7 @@ export function VolunteerApprovals() {
     }
     toast.success(t('volunteering.bulk_approved', { count: successCount }));
     setBulkLoading(false);
+    setBulkConfirmAction(null);
     loadData();
   }, [items, loadData, selectedIds, toast, t]);
 
@@ -193,6 +196,7 @@ export function VolunteerApprovals() {
     }
     toast.success(t('volunteering.bulk_declined', { count: successCount }));
     setBulkLoading(false);
+    setBulkConfirmAction(null);
     loadData();
   }, [items, loadData, selectedIds, toast, t]);
 
@@ -277,7 +281,7 @@ export function VolunteerApprovals() {
                 startContent={<CheckCircle size={14} />}
                 onPress={() => handleApprove(item.id)}
                 isLoading={actionId === item.id}
-                isDisabled={actionId !== null && actionId !== item.id}
+                isDisabled={bulkLoading || (actionId !== null && actionId !== item.id)}
               >
                 {t('volunteering.approve')}
               </Button>
@@ -287,7 +291,7 @@ export function VolunteerApprovals() {
                 startContent={<XCircle size={14} />}
                 onPress={() => handleDecline(item.id)}
                 isLoading={actionId === item.id}
-                isDisabled={actionId !== null && actionId !== item.id}
+                isDisabled={bulkLoading || (actionId !== null && actionId !== item.id)}
               >
                 {t('volunteering.decline')}
               </Button>
@@ -373,7 +377,7 @@ export function VolunteerApprovals() {
             </Checkbox>
           )}
 
-          {/* Bulk actions */}
+          {/* Bulk actions — confirmed via ConfirmModal before firing */}
           {selectedIds.size > 0 && (
             <>
               <Button
@@ -381,7 +385,7 @@ export function VolunteerApprovals() {
                 variant="tertiary"
                 color="success"
                 startContent={<CheckCircle size={14} />}
-                onPress={handleBulkApprove}
+                onPress={() => setBulkConfirmAction('approve')}
                 isLoading={bulkLoading}
               >
                 {t('volunteering.bulk_approve', { count: selectedIds.size })}
@@ -390,7 +394,7 @@ export function VolunteerApprovals() {
                 size="sm"
                 variant="danger"
                 startContent={<XCircle size={14} />}
-                onPress={handleBulkDecline}
+                onPress={() => setBulkConfirmAction('decline')}
                 isLoading={bulkLoading}
               >
                 {t('volunteering.bulk_decline', { count: selectedIds.size })}
@@ -411,7 +415,7 @@ export function VolunteerApprovals() {
         </div>
       </div>
     </div>
-  ), [statusTab, statusCounts, searchQuery, opportunityFilter, opportunityOptions, selectedIds, pendingFilteredItems.length, filteredItems, bulkLoading, t, handleSelectAll, handleBulkApprove, handleBulkDecline, handleExport]);
+  ), [statusTab, statusCounts, searchQuery, opportunityFilter, opportunityOptions, selectedIds, pendingFilteredItems.length, filteredItems, bulkLoading, t, handleSelectAll, handleExport]);
 
   if (!loading && items.length === 0) {
     return (
@@ -436,6 +440,23 @@ export function VolunteerApprovals() {
         onRefresh={loadData}
         searchable={false}
         topContent={topContent}
+      />
+
+      {/* Bulk approve/decline confirmation */}
+      <ConfirmModal
+        isOpen={bulkConfirmAction !== null}
+        onClose={() => { if (!bulkLoading) setBulkConfirmAction(null); }}
+        onConfirm={bulkConfirmAction === 'approve' ? handleBulkApprove : handleBulkDecline}
+        title={bulkConfirmAction === 'approve'
+          ? t('volunteering.bulk_approve_title')
+          : t('volunteering.bulk_decline_title')}
+        message={bulkConfirmAction === 'approve'
+          ? t('volunteering.bulk_approve_confirm', { count: selectedIds.size })
+          : t('volunteering.bulk_decline_confirm', { count: selectedIds.size })}
+        confirmLabel={bulkConfirmAction === 'approve' ? t('volunteering.approve') : t('volunteering.decline')}
+        cancelLabel={t('volunteering.cancel')}
+        confirmColor={bulkConfirmAction === 'approve' ? 'primary' : 'danger'}
+        isLoading={bulkLoading}
       />
     </div>
   );

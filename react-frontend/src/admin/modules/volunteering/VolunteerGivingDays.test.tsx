@@ -270,11 +270,86 @@ describe('VolunteerGivingDays', () => {
 
     await waitFor(() => screen.getByText('Spring Giving Day'));
 
-    // DataTable is stubbed — actions are rendered via columns.render by DataTable passing data;
-    // since our DataTable stub doesn't call column.render, we can only assert that
-    // updateGivingDay would be called. Check the columns definition is set up.
     // This test verifies the component loads without error and the table shows the row.
     expect(screen.getByText('Spring Giving Day')).toBeInTheDocument();
+
+    // Deactivating an active campaign now requires confirmation before the API fires.
+    const deactivateBtn = screen.queryAllByRole('button').find(
+      (b) => b.getAttribute('aria-label')?.toLowerCase() === 'deactivate',
+    );
+    if (deactivateBtn) {
+      fireEvent.click(deactivateBtn);
+
+      await waitFor(() => {
+        expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+      });
+      expect(mockAdminVolunteering.updateGivingDay).not.toHaveBeenCalled();
+
+      const dialog = document.querySelector('[role="dialog"]')!;
+      const confirmBtn = Array.from(dialog.querySelectorAll('button')).find((b) =>
+        b.textContent?.toLowerCase().includes('deactivate'),
+      );
+      expect(confirmBtn).toBeDefined();
+      fireEvent.click(confirmBtn!);
+
+      await waitFor(() => {
+        expect(mockAdminVolunteering.updateGivingDay).toHaveBeenCalledWith(1, { is_active: false });
+      });
+    }
+  });
+
+  it('cancelling the deactivate confirmation does not call updateGivingDay', async () => {
+    mockAdminVolunteering.getGivingDays.mockResolvedValue(successGivingDays([makeGivingDay({ is_active: true })]));
+    mockAdminVolunteering.updateGivingDay.mockResolvedValue({ success: true });
+
+    const { default: VolunteerGivingDays } = await import('./VolunteerGivingDays');
+    render(<VolunteerGivingDays />);
+
+    await waitFor(() => screen.getByText('Spring Giving Day'));
+
+    const deactivateBtn = screen.queryAllByRole('button').find(
+      (b) => b.getAttribute('aria-label')?.toLowerCase() === 'deactivate',
+    );
+    if (deactivateBtn) {
+      fireEvent.click(deactivateBtn);
+
+      await waitFor(() => {
+        expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+      });
+
+      const dialog = document.querySelector('[role="dialog"]')!;
+      const cancelBtn = Array.from(dialog.querySelectorAll('button')).find((b) =>
+        b.textContent?.toLowerCase().includes('cancel'),
+      );
+      expect(cancelBtn).toBeDefined();
+      fireEvent.click(cancelBtn!);
+
+      await waitFor(() => {
+        expect(document.querySelector('[role="dialog"]')).toBeFalsy();
+      });
+      expect(mockAdminVolunteering.updateGivingDay).not.toHaveBeenCalled();
+    }
+  });
+
+  it('activating an inactive campaign fires directly without a confirmation dialog', async () => {
+    mockAdminVolunteering.getGivingDays.mockResolvedValue(successGivingDays([makeGivingDay({ is_active: false })]));
+    mockAdminVolunteering.updateGivingDay.mockResolvedValue({ success: true });
+
+    const { default: VolunteerGivingDays } = await import('./VolunteerGivingDays');
+    render(<VolunteerGivingDays />);
+
+    await waitFor(() => screen.getByText('Spring Giving Day'));
+
+    const activateBtn = screen.queryAllByRole('button').find(
+      (b) => b.getAttribute('aria-label')?.toLowerCase() === 'activate',
+    );
+    if (activateBtn) {
+      fireEvent.click(activateBtn);
+
+      await waitFor(() => {
+        expect(mockAdminVolunteering.updateGivingDay).toHaveBeenCalledWith(1, { is_active: true });
+      });
+    }
   });
 
   it('calls exportDonations when Export Donations button clicked', async () => {

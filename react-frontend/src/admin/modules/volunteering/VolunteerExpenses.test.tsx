@@ -227,6 +227,45 @@ describe('VolunteerExpenses', () => {
     });
   });
 
+  it('renders the bare amount without assuming EUR when currency is absent', async () => {
+    mockAdminVolunteering.getExpenses.mockResolvedValue({
+      success: true,
+      data: {
+        items: [makeExpense({ currency: undefined, amount: 25.5 })],
+        stats: makeStats(),
+      },
+    });
+    const { VolunteerExpenses } = await import('./VolunteerExpenses');
+    render(<VolunteerExpenses />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Alice Volunteer')).toBeInTheDocument();
+    });
+
+    // No hardcoded '€' fallback — the amount renders bare
+    // (25.50 can also appear in the org-breakdown totals, so use getAllByText)
+    expect(screen.getAllByText('25.50').length).toBeGreaterThan(0);
+    expect(screen.queryByText('€25.50')).not.toBeInTheDocument();
+  });
+
+  it('renders the provided currency prefix when currency is present', async () => {
+    mockAdminVolunteering.getExpenses.mockResolvedValue({
+      success: true,
+      data: {
+        items: [makeExpense({ currency: '£', amount: 12 })],
+        stats: makeStats(),
+      },
+    });
+    const { VolunteerExpenses } = await import('./VolunteerExpenses');
+    render(<VolunteerExpenses />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Alice Volunteer')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('£12.00')).toBeInTheDocument();
+  });
+
   it('renders Export CSV and Refresh buttons', async () => {
     const { VolunteerExpenses } = await import('./VolunteerExpenses');
     render(<VolunteerExpenses />);

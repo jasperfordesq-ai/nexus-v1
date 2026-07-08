@@ -222,10 +222,8 @@ describe('VolunteerTraining', () => {
     });
   });
 
-  it('calls rejectTraining when Reject button is clicked with a reason', async () => {
+  it('calls rejectTraining when Reject is confirmed in the modal with a reason', async () => {
     const user = userEvent.setup();
-    // Mock window.prompt to return a reason
-    vi.spyOn(window, 'prompt').mockReturnValue('Invalid certificate');
 
     mockGetTraining.mockResolvedValue(makeSuccessPayload([makeRecord({ status: 'pending', id: 9 })]));
     mockRejectTraining.mockResolvedValue({ success: true });
@@ -238,18 +236,33 @@ describe('VolunteerTraining', () => {
     const rejectBtn = screen.getAllByRole('button').find((b) =>
       b.textContent?.toLowerCase().includes('reject')
     );
+    expect(rejectBtn).toBeDefined();
     if (rejectBtn) await user.click(rejectBtn);
+
+    // Reject now opens a modal with a reason textarea (replaces window.prompt)
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+    });
+    expect(mockRejectTraining).not.toHaveBeenCalled();
+
+    const dialog = document.querySelector('[role="dialog"]')!;
+    const reasonField = dialog.querySelector('textarea');
+    expect(reasonField).toBeTruthy();
+    await user.type(reasonField as HTMLTextAreaElement, 'Invalid certificate');
+
+    const confirmBtn = Array.from(dialog.querySelectorAll('button')).find((b) =>
+      b.textContent?.toLowerCase().includes('reject')
+    );
+    expect(confirmBtn).toBeDefined();
+    await user.click(confirmBtn!);
 
     await waitFor(() => {
       expect(mockRejectTraining).toHaveBeenCalledWith(9, 'Invalid certificate');
     });
-
-    vi.restoreAllMocks();
   });
 
-  it('does NOT call rejectTraining when prompt is cancelled', async () => {
+  it('does NOT call rejectTraining when the reject modal is cancelled', async () => {
     const user = userEvent.setup();
-    vi.spyOn(window, 'prompt').mockReturnValue(null);
 
     mockGetTraining.mockResolvedValue(makeSuccessPayload([makeRecord({ status: 'pending' })]));
 
@@ -264,10 +277,50 @@ describe('VolunteerTraining', () => {
     if (rejectBtn) await user.click(rejectBtn);
 
     await waitFor(() => {
-      expect(mockRejectTraining).not.toHaveBeenCalled();
+      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
     });
 
-    vi.restoreAllMocks();
+    const dialog = document.querySelector('[role="dialog"]')!;
+    const cancelBtn = Array.from(dialog.querySelectorAll('button')).find((b) =>
+      b.textContent?.toLowerCase().includes('cancel')
+    );
+    expect(cancelBtn).toBeDefined();
+    await user.click(cancelBtn!);
+
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeFalsy();
+    });
+    expect(mockRejectTraining).not.toHaveBeenCalled();
+  });
+
+  it('keeps the reject confirm disabled while the reason is empty', async () => {
+    const user = userEvent.setup();
+
+    mockGetTraining.mockResolvedValue(makeSuccessPayload([makeRecord({ status: 'pending', id: 4 })]));
+
+    const { VolunteerTraining } = await import('./VolunteerTraining');
+    render(<VolunteerTraining />);
+
+    await waitFor(() => screen.getByText('Alice Smith'));
+
+    const rejectBtn = screen.getAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase().includes('reject')
+    );
+    if (rejectBtn) await user.click(rejectBtn);
+
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+    });
+
+    const dialog = document.querySelector('[role="dialog"]')!;
+    const confirmBtn = Array.from(dialog.querySelectorAll('button')).find((b) =>
+      b.textContent?.toLowerCase().includes('reject')
+    );
+    expect(confirmBtn).toBeDefined();
+
+    // Empty reason → confirm is disabled and clicking it does nothing
+    await user.click(confirmBtn!);
+    expect(mockRejectTraining).not.toHaveBeenCalled();
   });
 
   it('renders expiry alert when a verified record expires within 30 days', async () => {

@@ -313,4 +313,102 @@ describe('VolunteerApprovals', () => {
       expect(exportBtn).toBeInTheDocument();
     });
   });
+
+  // ── Bulk actions are gated behind a confirmation modal ──────────────────────
+
+  async function selectFirstPendingRow() {
+    mockGetApprovals.mockResolvedValue({ success: true, data: MOCK_APPLICATIONS });
+    render(<VolunteerApprovals />);
+    await waitFor(() => {
+      expect(screen.getByText(/Alice Volunteer/i)).toBeInTheDocument();
+    });
+    // Only pending rows render a selection checkbox (application id 1)
+    const rowCheckbox = screen.getAllByRole('checkbox').find(
+      (c) => c.getAttribute('aria-label')?.toLowerCase().includes('select application'),
+    ) ?? screen.getAllByRole('checkbox')[0];
+    expect(rowCheckbox).toBeDefined();
+    await userEvent.click(rowCheckbox!);
+  }
+
+  it('bulk approve opens a confirmation modal and does NOT call the API until confirmed', async () => {
+    await selectFirstPendingRow();
+
+    const bulkApproveBtn = screen.getAllByRole('button').find(
+      (b) => /approve \(\d+\)/i.test(b.textContent ?? ''),
+    );
+    expect(bulkApproveBtn).toBeDefined();
+    await userEvent.click(bulkApproveBtn!);
+
+    // Confirmation modal appears; the API has NOT fired yet
+    await waitFor(() => {
+      expect(screen.getAllByRole('dialog').length).toBeGreaterThan(0);
+    });
+    expect(mockApproveApp).not.toHaveBeenCalled();
+
+    // Confirm inside the dialog fires the bulk approve
+    const dialog = screen.getAllByRole('dialog')[0]!;
+    const confirmBtn = Array.from(dialog.querySelectorAll('button')).find(
+      (b) => /approve/i.test(b.textContent ?? ''),
+    );
+    expect(confirmBtn).toBeDefined();
+    await userEvent.click(confirmBtn!);
+
+    await waitFor(() => {
+      expect(mockApproveApp).toHaveBeenCalledWith(1);
+      expect(mockToast.success).toHaveBeenCalled();
+    });
+  });
+
+  it('bulk decline opens a confirmation modal and does NOT call the API until confirmed', async () => {
+    await selectFirstPendingRow();
+
+    const bulkDeclineBtn = screen.getAllByRole('button').find(
+      (b) => /decline \(\d+\)/i.test(b.textContent ?? ''),
+    );
+    expect(bulkDeclineBtn).toBeDefined();
+    await userEvent.click(bulkDeclineBtn!);
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('dialog').length).toBeGreaterThan(0);
+    });
+    expect(mockDeclineApp).not.toHaveBeenCalled();
+
+    const dialog = screen.getAllByRole('dialog')[0]!;
+    const confirmBtn = Array.from(dialog.querySelectorAll('button')).find(
+      (b) => /decline/i.test(b.textContent ?? ''),
+    );
+    expect(confirmBtn).toBeDefined();
+    await userEvent.click(confirmBtn!);
+
+    await waitFor(() => {
+      expect(mockDeclineApp).toHaveBeenCalledWith(1);
+      expect(mockToast.success).toHaveBeenCalled();
+    });
+  });
+
+  it('cancelling the bulk decline confirmation does not call the API', async () => {
+    await selectFirstPendingRow();
+
+    const bulkDeclineBtn = screen.getAllByRole('button').find(
+      (b) => /decline \(\d+\)/i.test(b.textContent ?? ''),
+    );
+    await userEvent.click(bulkDeclineBtn!);
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('dialog').length).toBeGreaterThan(0);
+    });
+
+    const dialog = screen.getAllByRole('dialog')[0]!;
+    const cancelBtn = Array.from(dialog.querySelectorAll('button')).find(
+      (b) => /cancel/i.test(b.textContent ?? ''),
+    );
+    expect(cancelBtn).toBeDefined();
+    await userEvent.click(cancelBtn!);
+
+    await waitFor(() => {
+      expect(screen.queryAllByRole('dialog').length).toBe(0);
+    });
+    expect(mockDeclineApp).not.toHaveBeenCalled();
+    expect(mockApproveApp).not.toHaveBeenCalled();
+  });
 });

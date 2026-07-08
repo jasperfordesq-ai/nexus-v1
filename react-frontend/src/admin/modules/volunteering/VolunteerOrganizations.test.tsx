@@ -235,7 +235,7 @@ describe('VolunteerOrganizations', () => {
     }
   });
 
-  it('shows suspend button for active org and calls status toggle', async () => {
+  it('shows suspend button for active org and calls status toggle only after confirming', async () => {
     // Source uses updateOrgStatus (not toggleOrgStatus)
     mockAdminVolunteering.updateOrgStatus.mockResolvedValue({ success: true });
     const { VolunteerOrganizations } = await import('./VolunteerOrganizations');
@@ -247,8 +247,26 @@ describe('VolunteerOrganizations', () => {
     const suspendBtn = btns.find((b) =>
       b.textContent?.toLowerCase().includes('suspend') || b.textContent?.toLowerCase().includes('deactivate')
     );
+    expect(suspendBtn).toBeDefined();
     if (suspendBtn) {
       fireEvent.click(suspendBtn);
+
+      // Suspending now requires confirmation — the API must NOT fire yet
+      await waitFor(() => {
+        const dialog = document.querySelector('[role="dialog"]');
+        expect(dialog).toBeTruthy();
+      });
+      expect(mockAdminVolunteering.updateOrgStatus).not.toHaveBeenCalled();
+      expect(mockAdminVolunteering.toggleOrgStatus).not.toHaveBeenCalled();
+
+      // Confirm inside the dialog
+      const dialog = document.querySelector('[role="dialog"]')!;
+      const confirmBtn = Array.from(dialog.querySelectorAll('button')).find((b) =>
+        b.textContent?.toLowerCase().includes('suspend')
+      );
+      expect(confirmBtn).toBeDefined();
+      fireEvent.click(confirmBtn!);
+
       await waitFor(() => {
         // Source calls updateOrgStatus; check either alias
         expect(
@@ -256,8 +274,56 @@ describe('VolunteerOrganizations', () => {
           mockAdminVolunteering.toggleOrgStatus.mock.calls.length > 0
         ).toBe(true);
       });
+      expect(mockAdminVolunteering.updateOrgStatus).toHaveBeenCalledWith(1, 'suspended');
     }
-    // If suspendBtn not found, the implementation may use different naming — skip with note
+  });
+
+  it('cancelling the suspend confirmation does not toggle status', async () => {
+    const { VolunteerOrganizations } = await import('./VolunteerOrganizations');
+    render(<VolunteerOrganizations />);
+
+    await waitFor(() => screen.getByText('Green Volunteers'));
+
+    const suspendBtn = screen.getAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase().includes('suspend')
+    );
+    expect(suspendBtn).toBeDefined();
+    fireEvent.click(suspendBtn!);
+
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+    });
+
+    const dialog = document.querySelector('[role="dialog"]')!;
+    const cancelBtn = Array.from(dialog.querySelectorAll('button')).find((b) =>
+      b.textContent?.toLowerCase().includes('cancel')
+    );
+    expect(cancelBtn).toBeDefined();
+    fireEvent.click(cancelBtn!);
+
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeFalsy();
+    });
+    expect(mockAdminVolunteering.updateOrgStatus).not.toHaveBeenCalled();
+    expect(mockAdminVolunteering.toggleOrgStatus).not.toHaveBeenCalled();
+  });
+
+  it('activating a suspended org fires directly without a confirmation dialog', async () => {
+    mockAdminVolunteering.getOrganizations.mockResolvedValue(makeOk([makeOrg({ status: 'suspended' })]));
+    const { VolunteerOrganizations } = await import('./VolunteerOrganizations');
+    render(<VolunteerOrganizations />);
+
+    await waitFor(() => screen.getByText('Green Volunteers'));
+
+    const activateBtn = screen.getAllByRole('button').find((b) =>
+      b.textContent?.toLowerCase().includes('activate') && !b.textContent?.toLowerCase().includes('deactivate')
+    );
+    expect(activateBtn).toBeDefined();
+    fireEvent.click(activateBtn!);
+
+    await waitFor(() => {
+      expect(mockAdminVolunteering.updateOrgStatus).toHaveBeenCalledWith(1, 'active');
+    });
   });
 
   it('filters organizations by search query', async () => {

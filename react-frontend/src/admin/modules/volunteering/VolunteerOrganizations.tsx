@@ -27,6 +27,7 @@ import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, type Column } from '../../components/DataTable';
 import { PageHeader } from '../../components/PageHeader';
 import { EmptyState } from '../../components/EmptyState';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 
 interface VolOrg {
@@ -133,6 +134,10 @@ export function VolunteerOrganizations() {
   const createModal = useDisclosure();
   const [createForm, setCreateForm] = useState<OrgFormData>(EMPTY_ORG_FORM);
   const [createSubmitting, setCreateSubmitting] = useState(false);
+
+  // Status toggle (suspend requires confirmation; activate is direct)
+  const [suspendTarget, setSuspendTarget] = useState<VolOrg | null>(null);
+  const [statusToggleId, setStatusToggleId] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -267,19 +272,24 @@ export function VolunteerOrganizations() {
 
   // --- Status Toggle ---
   const handleStatusToggle = useCallback(async (org: VolOrg) => {
+    if (statusToggleId !== null) return;
     const newStatus = org.status === 'active' ? 'suspended' : 'active';
+    setStatusToggleId(org.id);
     try {
       const res = await adminVolunteering.updateOrgStatus(org.id, newStatus);
       if (res.success) {
         toast.success(t('volunteering.status_updated', { status: t(`volunteering.status_${newStatus}`) }));
+        setSuspendTarget(null);
         loadData();
       } else {
         toast.error((res as { message?: string }).message || t('volunteering.status_update_failed'));
       }
     } catch {
       toast.error(t('volunteering.status_update_failed'));
+    } finally {
+      setStatusToggleId(null);
     }
-  }, [toast, t, loadData]);
+  }, [statusToggleId, toast, t, loadData]);
 
   // --- Edit Organization ---
   const openEditModal = useCallback((org: VolOrg) => {
@@ -488,7 +498,15 @@ export function VolunteerOrganizations() {
             size="sm"
             variant={item.status === 'active' ? 'danger' : 'secondary'}
             startContent={item.status === 'active' ? <ShieldOff size={14} /> : <ShieldCheck size={14} />}
-            onPress={() => handleStatusToggle(item)}
+            onPress={() => {
+              if (item.status === 'active') {
+                setSuspendTarget(item);
+              } else {
+                handleStatusToggle(item);
+              }
+            }}
+            isLoading={statusToggleId === item.id}
+            isDisabled={statusToggleId !== null && statusToggleId !== item.id}
           >
             {item.status === 'active'
               ? t('volunteering.suspend')
@@ -864,6 +882,19 @@ export function VolunteerOrganizations() {
           )}
         </ModalContent>
       </Modal>
+
+      {/* Suspend Confirmation */}
+      <ConfirmModal
+        isOpen={suspendTarget !== null}
+        onClose={() => { if (statusToggleId === null) setSuspendTarget(null); }}
+        onConfirm={() => { if (suspendTarget) handleStatusToggle(suspendTarget); }}
+        title={t('volunteering.suspend_org_title')}
+        message={t('volunteering.suspend_org_confirm', { name: suspendTarget?.org_name ?? '' })}
+        confirmLabel={t('volunteering.suspend')}
+        cancelLabel={t('volunteering.cancel')}
+        confirmColor="danger"
+        isLoading={statusToggleId !== null}
+      />
     </div>
   );
 }

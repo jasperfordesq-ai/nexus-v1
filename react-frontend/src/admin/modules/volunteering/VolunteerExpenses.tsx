@@ -363,7 +363,7 @@ export function VolunteerExpenses() {
       sortable: true,
       render: (item) => (
         <span className="font-semibold">
-          {item.currency || '\u20AC'}{toNum(item.amount).toFixed(2)}
+          {item.currency || ''}{toNum(item.amount).toFixed(2)}
         </span>
       ),
     },
@@ -691,7 +691,7 @@ export function VolunteerExpenses() {
                   </div>
                   <div>
                     <span className="text-muted/80">{t('volunteering.col_amount')}:</span>
-                    <p className="font-semibold">{reviewExpense.currency || '\u20AC'}{toNum(reviewExpense.amount).toFixed(2)}</p>
+                    <p className="font-semibold">{reviewExpense.currency || ''}{toNum(reviewExpense.amount).toFixed(2)}</p>
                   </div>
                   <div>
                     <span className="text-muted/80">{t('volunteering.col_type')}:</span>

@@ -1,4 +1,4 @@
-import { Button, Chip, Card, CardBody, Select, SelectItem, Checkbox } from '@/components/ui';
+import { Button, Chip, Card, CardBody, Select, SelectItem, Checkbox, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -108,6 +108,10 @@ export function VolunteerTraining() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [bulkVerifying, setBulkVerifying] = useState(false);
 
+  // Reject modal (replaces window.prompt — matches the review-modal pattern)
+  const [rejectTarget, setRejectTarget] = useState<TrainingRecord | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
+
   // Filters
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [typeFilter, setTypeFilter] = useState<string>('all');
@@ -153,15 +157,29 @@ export function VolunteerTraining() {
     setActionId(null);
   };
 
-  const handleReject = async (id: number) => {
-    const reason = window.prompt(t('volunteering.reject_training_reason_prompt'))?.trim();
+  const openReject = (item: TrainingRecord) => {
+    setRejectTarget(item);
+    setRejectReason('');
+  };
+
+  const closeReject = () => {
+    if (actionId !== null) return;
+    setRejectTarget(null);
+    setRejectReason('');
+  };
+
+  const handleReject = async () => {
+    if (!rejectTarget) return;
+    const reason = rejectReason.trim();
     if (!reason) return;
 
-    setActionId(id);
+    setActionId(rejectTarget.id);
     try {
-      const res = await adminVolunteering.rejectTraining(id, reason);
+      const res = await adminVolunteering.rejectTraining(rejectTarget.id, reason);
       if (res.success) {
         toast.success(t('volunteering.training_rejected'));
+        setRejectTarget(null);
+        setRejectReason('');
         loadData();
       } else {
         toast.error(t('volunteering.failed_to_reject_training'));
@@ -347,7 +365,7 @@ export function VolunteerTraining() {
                 startContent={<CheckCircle size={14} />}
                 onPress={() => handleVerify(item.id)}
                 isLoading={actionId === item.id}
-                isDisabled={actionId !== null && actionId !== item.id}
+                isDisabled={bulkVerifying || (actionId !== null && actionId !== item.id)}
               >
                 {t('volunteering.verify')}
               </Button>
@@ -355,9 +373,9 @@ export function VolunteerTraining() {
                 size="sm"
                 variant="danger"
                 startContent={<XCircle size={14} />}
-                onPress={() => handleReject(item.id)}
+                onPress={() => openReject(item)}
                 isLoading={actionId === item.id}
-                isDisabled={actionId !== null && actionId !== item.id}
+                isDisabled={bulkVerifying || (actionId !== null && actionId !== item.id)}
               >
                 {t('volunteering.reject')}
               </Button>
@@ -530,6 +548,42 @@ export function VolunteerTraining() {
       ) : (
         <DataTable columns={columns} data={filteredRecords} isLoading={loading} onRefresh={loadData} />
       )}
+
+      {/* Reject Modal */}
+      <Modal isOpen={rejectTarget !== null} onClose={closeReject} size="md">
+        <ModalContent>
+          <ModalHeader>
+            {t('volunteering.reject_training_title')}
+            {rejectTarget && (
+              <span className="mt-1 block text-sm font-normal text-muted">{rejectTarget.volunteer_name}</span>
+            )}
+          </ModalHeader>
+          <ModalBody>
+            <Textarea
+              label={t('volunteering.reason_label')}
+              placeholder={t('volunteering.reject_training_reason_prompt')}
+              value={rejectReason}
+              onValueChange={setRejectReason}
+              minRows={2}
+              isRequired
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="tertiary" onPress={closeReject} isDisabled={actionId !== null}>
+              {t('volunteering.cancel')}
+            </Button>
+            <Button
+              variant="danger"
+              startContent={<XCircle size={16} />}
+              onPress={handleReject}
+              isLoading={rejectTarget !== null && actionId === rejectTarget.id}
+              isDisabled={!rejectReason.trim() || actionId !== null}
+            >
+              {t('volunteering.reject')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

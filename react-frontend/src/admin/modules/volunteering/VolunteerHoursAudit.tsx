@@ -19,6 +19,7 @@ import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 import { DataTable, type Column } from '../../components/DataTable';
 import { EmptyState } from '../../components/EmptyState';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -111,6 +112,9 @@ export function VolunteerHoursAudit() {
   const [hasMore, setHasMore] = useState(false);
   const [actionInProgress, setActionInProgress] = useState<number | null>(null);
 
+  // Decline requires confirmation; approve is direct
+  const [declineTarget, setDeclineTarget] = useState<HourLog | null>(null);
+
   // Date range filter
   const [dateFrom, setDateFrom] = useState<string>('');
   const [dateTo, setDateTo] = useState<string>('');
@@ -192,6 +196,7 @@ export function VolunteerHoursAudit() {
             ? t('volunteering.hours_approved')
             : t('volunteering.hours_declined')
         );
+        setDeclineTarget(null);
         // Refresh all data to update stats
         loadData();
       } else {
@@ -327,6 +332,7 @@ export function VolunteerHoursAudit() {
       render: (item) => {
         if (item.status !== 'pending') return null;
         const isThisItem = actionInProgress === item.id;
+        const isOtherItem = actionInProgress !== null && actionInProgress !== item.id;
         return (
           <div className="flex gap-1">
             <Button
@@ -335,6 +341,7 @@ export function VolunteerHoursAudit() {
               color="success"
               startContent={<ThumbsUp size={14} />}
               isLoading={isThisItem}
+              isDisabled={isOtherItem}
               onPress={() => handleVerify(item.id, 'approve')}
             >
               {t('volunteering.approve')}
@@ -344,7 +351,8 @@ export function VolunteerHoursAudit() {
               variant="danger"
               startContent={<ThumbsDown size={14} />}
               isLoading={isThisItem}
-              onPress={() => handleVerify(item.id, 'decline')}
+              isDisabled={isOtherItem}
+              onPress={() => setDeclineTarget(item)}
             >
               {t('volunteering.decline')}
             </Button>
@@ -603,6 +611,22 @@ export function VolunteerHoursAudit() {
           </CardBody>
         </Card>
       )}
+
+      {/* Decline Confirmation */}
+      <ConfirmModal
+        isOpen={declineTarget !== null}
+        onClose={() => { if (actionInProgress === null) setDeclineTarget(null); }}
+        onConfirm={() => { if (declineTarget) handleVerify(declineTarget.id, 'decline'); }}
+        title={t('volunteering.decline_hours_title')}
+        message={t('volunteering.decline_hours_confirm', {
+          hours: declineTarget?.hours ?? 0,
+          name: [declineTarget?.first_name, declineTarget?.last_name].filter(Boolean).join(' '),
+        })}
+        confirmLabel={t('volunteering.decline')}
+        cancelLabel={t('volunteering.cancel')}
+        confirmColor="danger"
+        isLoading={actionInProgress !== null}
+      />
     </div>
   );
 }

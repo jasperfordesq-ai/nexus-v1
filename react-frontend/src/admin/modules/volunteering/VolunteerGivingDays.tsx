@@ -22,6 +22,7 @@ import { DataTable, type Column } from '../../components/DataTable';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 import { EmptyState } from '../../components/EmptyState';
+import { ConfirmModal } from '../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 // Copyright © 2024–2026 Jasper Ford
@@ -116,6 +117,10 @@ export default function VolunteerGivingDays() {
   const [trends, setTrends] = useState<TrendPoint[]>([]);
   const [trendsLoading, setTrendsLoading] = useState(false);
 
+  // Deactivation requires confirmation; activation is direct. Both share the in-flight guard.
+  const [deactivateTarget, setDeactivateTarget] = useState<GivingDay | null>(null);
+  const [togglingId, setTogglingId] = useState<number | null>(null);
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { isOpen: isDonorOpen, onOpen: onDonorOpen, onClose: onDonorClose } = useDisclosure();
 
@@ -196,18 +201,23 @@ export default function VolunteerGivingDays() {
   };
 
   const handleDeactivate = async (day: GivingDay) => {
+    if (togglingId !== null) return;
+    setTogglingId(day.id);
     try {
       const res = await adminVolunteering.updateGivingDay(day.id, { is_active: !day.is_active });
       if (res.success) {
         toast.success(day.is_active
           ? t('volunteering.giving_day_deactivated')
           : t('volunteering.giving_day_activated'));
+        setDeactivateTarget(null);
         loadData();
       } else {
         toast.error(res.error || t('volunteering.failed_to_update_status'));
       }
     } catch {
       toast.error(t('volunteering.failed_to_update_status'));
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -364,7 +374,15 @@ export default function VolunteerGivingDays() {
             size="sm"
             variant={row.is_active ? 'danger-soft' : 'tertiary'}
             isIconOnly
-            onPress={() => handleDeactivate(row)}
+            onPress={() => {
+              if (row.is_active) {
+                setDeactivateTarget(row);
+              } else {
+                handleDeactivate(row);
+              }
+            }}
+            isLoading={togglingId === row.id}
+            isDisabled={togglingId !== null && togglingId !== row.id}
             aria-label={row.is_active ? t('volunteering.deactivate') : t('volunteering.activate')}
           >
             <XCircle size={14} />
@@ -503,7 +521,7 @@ export default function VolunteerGivingDays() {
                 }
               >
                 {donorsLoading && donors.length === 0 ? (
-                  <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-8">
+                  <div role="status" aria-busy="true" aria-label={t('volunteering.loading')} className="flex justify-center py-8">
                     <Spinner size="lg" />
                   </div>
                 ) : donors.length === 0 ? (
@@ -575,7 +593,7 @@ export default function VolunteerGivingDays() {
                 }
               >
                 {trendsLoading ? (
-                  <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-8">
+                  <div role="status" aria-busy="true" aria-label={t('volunteering.loading')} className="flex justify-center py-8">
                     <Spinner size="lg" />
                   </div>
                 ) : trends.length === 0 ? (
@@ -689,6 +707,19 @@ export default function VolunteerGivingDays() {
           </ModalFooter>
         </ModalContent>
       </Modal>
+
+      {/* Deactivate Confirmation */}
+      <ConfirmModal
+        isOpen={deactivateTarget !== null}
+        onClose={() => { if (togglingId === null) setDeactivateTarget(null); }}
+        onConfirm={() => { if (deactivateTarget) handleDeactivate(deactivateTarget); }}
+        title={t('volunteering.deactivate_giving_day_title')}
+        message={t('volunteering.deactivate_giving_day_confirm', { name: deactivateTarget?.name ?? '' })}
+        confirmLabel={t('volunteering.deactivate')}
+        cancelLabel={t('volunteering.cancel')}
+        confirmColor="danger"
+        isLoading={togglingId !== null}
+      />
     </div>
   );
 }
