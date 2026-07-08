@@ -627,16 +627,58 @@ class GdprService
             [$userId, $t, $t]
         )->fetchAll();
 
-        // vol_donations
+        // vol_donations — include the gift-aid declaration columns: the stored
+        // home address and declaration name are the subject's personal data and
+        // an Art. 15 response must disclose them.
         $donations = $this->query(
             "SELECT id, opportunity_id, community_project_id, giving_day_id, amount, currency,
                     payment_method, payment_reference, donor_name, donor_email,
-                    message, is_anonymous, status, created_at
+                    message, is_anonymous, status,
+                    gift_aid_claim_status, gift_aid_declaration_name,
+                    gift_aid_address_line1, gift_aid_address_line2,
+                    gift_aid_town, gift_aid_postcode, gift_aid_country,
+                    gift_aid_consented_at, gift_aid_claimed_at, created_at
              FROM vol_donations
              WHERE user_id = ? AND tenant_id = ?
              ORDER BY created_at DESC",
             [$userId, $t]
         )->fetchAll();
+
+        // vol_org_transactions — the user's volunteer-payment ledger history
+        // (credits minted for approved hours, org-wallet deposits) is their
+        // financial data and belongs in the Art. 15 response.
+        try {
+            $orgTransactions = $this->query(
+                "SELECT vot.id, vot.vol_organization_id, vo.name AS organization_name,
+                        vot.vol_log_id, vot.type, vot.amount, vot.created_at
+                 FROM vol_org_transactions vot
+                 LEFT JOIN vol_organizations vo ON vot.vol_organization_id = vo.id AND vo.tenant_id = vot.tenant_id
+                 WHERE vot.user_id = ? AND vot.tenant_id = ?
+                 ORDER BY vot.created_at DESC",
+                [$userId, $t]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            $orgTransactions = [];
+        }
+
+        // vol_safeguarding_incidents where the user is the SUBJECT or an
+        // involved party — this is their personal data too. Third-party
+        // detail (reporter identity, free-text narrative naming others,
+        // resolution notes) is deliberately withheld per Art. 15(4); only
+        // the facts about the record's existence and state are disclosed.
+        try {
+            $subjectIncidents = $this->query(
+                "SELECT id, incident_type, category, severity, incident_date, status,
+                        authority_notified, resolved_at, created_at,
+                        CASE WHEN subject_user_id = ? THEN 'subject' ELSE 'involved' END AS your_role
+                 FROM vol_safeguarding_incidents
+                 WHERE (subject_user_id = ? OR involved_user_id = ?) AND tenant_id = ?
+                 ORDER BY created_at DESC",
+                [$userId, $userId, $userId, $t]
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            $subjectIncidents = [];
+        }
 
         // vol_community_projects (proposed by user)
         $communityProjects = $this->query(
@@ -740,8 +782,10 @@ class GdprService
             'guardian_consents' => $guardianConsents,
             'accessibility_needs' => $accessibilityNeeds,
             'safeguarding_incidents' => $safeguardingIncidents,
+            'safeguarding_incidents_about_you' => $subjectIncidents,
             'custom_field_values' => $customFieldValues,
             'donations' => $donations,
+            'volunteer_payment_ledger' => $orgTransactions,
             'community_projects' => $communityProjects,
             'emergency_alert_recipients' => $emergencyAlertRecipients,
             'wellbeing_alerts' => $wellbeingAlerts,

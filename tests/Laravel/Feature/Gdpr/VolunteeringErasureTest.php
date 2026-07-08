@@ -127,4 +127,61 @@ class VolunteeringErasureTest extends TestCase
         $this->assertSame(0, DB::table('vol_custom_field_values')->where('entity_type', 'application')->where('entity_id', $appId)->where('tenant_id', $tenantId)->count());
         $this->assertSame(1, DB::table('vol_custom_field_values')->where('entity_type', 'opportunity')->where('entity_id', $appId)->where('tenant_id', $tenantId)->count());
     }
+
+    public function test_sar_export_includes_payment_ledger_and_subject_side_incidents(): void
+    {
+        $tenantId = $this->testTenantId;
+        TenantContext::setById($tenantId);
+
+        $user = User::factory()->forTenant($tenantId)->create();
+        $reporter = User::factory()->forTenant($tenantId)->create();
+        TenantContext::setById($tenantId);
+
+        $orgId = (int) DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $reporter->id,
+            'name' => 'SAR Ledger Org',
+            'status' => 'active',
+            'created_at' => now(),
+        ]);
+        DB::table('vol_org_transactions')->insert([
+            'tenant_id' => $tenantId,
+            'vol_organization_id' => $orgId,
+            'user_id' => $user->id,
+            'vol_log_id' => null,
+            'type' => 'volunteer_payment',
+            'amount' => -2.00,
+            'balance_after' => -2.00,
+            'description' => 'Volunteer payment for approved hours',
+            'created_at' => now(),
+        ]);
+        // Incident ABOUT the user, reported by someone else — narrative must be withheld.
+        DB::table('vol_safeguarding_incidents')->insert([
+            'tenant_id' => $tenantId,
+            'reported_by' => $reporter->id,
+            'subject_user_id' => $user->id,
+            'incident_type' => 'concern',
+            'severity' => 'low',
+            'description' => 'Third-party narrative that must NOT be disclosed',
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $service = new GdprService($tenantId);
+        $method = new \ReflectionMethod($service, 'exportVolunteerData');
+        $data = $method->invoke($service, (int) $user->id);
+
+        // Payment ledger disclosed.
+        $this->assertNotEmpty($data['volunteer_payment_ledger']);
+        $this->assertSame('volunteer_payment', $data['volunteer_payment_ledger'][0]['type']);
+
+        // Subject-side incident disclosed as facts only — role marked, no narrative.
+        $this->assertNotEmpty($data['safeguarding_incidents_about_you']);
+        $incident = $data['safeguarding_incidents_about_you'][0];
+        $this->assertSame('subject', $incident['your_role']);
+        $this->assertArrayNotHasKey('description', $incident);
+        $this->assertArrayNotHasKey('resolution_notes', $incident);
+        $this->assertArrayNotHasKey('reported_by', $incident);
+    }
 }
