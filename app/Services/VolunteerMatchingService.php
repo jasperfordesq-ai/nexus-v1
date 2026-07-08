@@ -9,6 +9,7 @@ namespace App\Services;
 use App\Core\TenantContext;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * VolunteerMatchingService — matches volunteers to opportunities and shifts
@@ -173,7 +174,11 @@ class VolunteerMatchingService
             ->pluck('opportunity_id')
             ->all();
 
-        // Get active opportunities
+        // Get active, publicly visible opportunities. Enforce the same
+        // public-visibility gates as VolunteerService::getOpportunities —
+        // is_active alone is not enough: closed/draft opportunities and
+        // pending/declined organizations must never surface in suggestions.
+        $federationColumnExists = Schema::hasColumn('vol_opportunities', 'is_federated');
         $query = DB::table('vol_opportunities as opp')
             ->leftJoin('vol_organizations as org', function ($join) {
                 $join->on('opp.organization_id', '=', 'org.id')
@@ -181,6 +186,16 @@ class VolunteerMatchingService
             })
             ->where('opp.tenant_id', $tenantId)
             ->where('opp.is_active', true)
+            ->whereIn('opp.status', VolunteerService::PUBLIC_OPPORTUNITY_STATUSES)
+            ->where(function ($outer) use ($federationColumnExists) {
+                $outer->whereIn('org.status', VolunteerService::PUBLIC_ORGANIZATION_STATUSES);
+                // Federated (imported) opportunities carry no local organisation
+                // row — they were vetted at the partner and are gated by
+                // is_federated (mirrors VolunteerService::getOpportunities).
+                if ($federationColumnExists) {
+                    $outer->orWhere('opp.is_federated', 1);
+                }
+            })
             ->select('opp.id', 'opp.title', 'opp.description', 'opp.location', 'opp.skills_needed',
                      'opp.start_date', 'opp.end_date', 'org.name as organization_name');
 
@@ -415,9 +430,16 @@ class VolunteerMatchingService
             $hoursUntil = max(0, (int) now()->diffInHours($shift->start_time, false));
             $urgencyScore = $hoursUntil <= 48 ? 25 : ($hoursUntil <= 168 ? 15 : 5);
 
-            // Availability bonus — shifts with fewer signups relative to capacity (0-15)
-            $fillRate = $capacity > 0 ? $currentSignups / $capacity : 1;
-            $availabilityScore = round((1 - $fillRate) * 15);
+            // Availability bonus — shifts with fewer signups relative to capacity (0-15).
+            // Unlimited-capacity shifts ($capacity === null) are always fully
+            // available; treating them as fill-rate 1 zeroed their availability
+            // score and made them rank below nearly-full limited shifts.
+            if ($capacity === null) {
+                $availabilityScore = 15;
+            } else {
+                $fillRate = $capacity > 0 ? $currentSignups / $capacity : 1;
+                $availabilityScore = round((1 - $fillRate) * 15);
+            }
 
             $totalScore = min(100, $skillScore + $urgencyScore + $availabilityScore);
 
@@ -439,7 +461,8 @@ class VolunteerMatchingService
                 'end_time' => $shift->end_time,
                 'capacity' => $capacity,
                 'current_signups' => $currentSignups,
-                'spots_remaining' => max(0, $capacity - $currentSignups),
+                // null capacity = unlimited: report null, not (0 - signups) → 0.
+                'spots_remaining' => $capacity === null ? null : max(0, $capacity - $currentSignups),
                 'match_score' => $totalScore,
                 'already_applied' => $alreadyApplied,
             ];

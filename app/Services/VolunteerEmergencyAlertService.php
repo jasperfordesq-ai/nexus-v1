@@ -163,6 +163,15 @@ class VolunteerEmergencyAlertService
                     throw new \RuntimeException('ALERT_INACTIVE');
                 }
 
+                // Lapsed alerts are no longer actionable: without this guard a
+                // volunteer could "accept" a days-old alert, flipping it to
+                // 'filled' and pinging the coordinator as though the (long past)
+                // shift were covered. expires_at is set on create but there is
+                // no sweeper flipping status, so it must be enforced on read.
+                if ($alert->expires_at !== null && $alert->expires_at->isPast()) {
+                    throw new \RuntimeException('ALERT_INACTIVE');
+                }
+
                 $recipient = VolEmergencyAlertRecipient::where('tenant_id', $tenantId)
                     ->where('alert_id', $alertId)
                     ->where('user_id', $userId)
@@ -266,6 +275,13 @@ class VolunteerEmergencyAlertService
             ->where('vol_emergency_alerts.tenant_id', $tenantId)
             ->where('r.user_id', $userId)
             ->where('vol_emergency_alerts.status', 'active')
+            // No sweeper flips lapsed alerts to 'expired', so enforce
+            // expires_at on read — a stale urgent alert must not stay
+            // visible/actionable for recipients indefinitely.
+            ->where(function ($q) {
+                $q->whereNull('vol_emergency_alerts.expires_at')
+                    ->orWhere('vol_emergency_alerts.expires_at', '>', now());
+            })
             ->select([
                 'vol_emergency_alerts.*',
                 'r.response as my_response',

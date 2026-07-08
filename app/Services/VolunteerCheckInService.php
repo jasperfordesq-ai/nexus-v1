@@ -10,6 +10,7 @@ use App\Core\TenantContext;
 use App\Models\VolApplication;
 use App\Models\VolShift;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -331,31 +332,45 @@ class VolunteerCheckInService
             return null;
         }
 
-        // Check for existing token (tenant-scoped)
-        $existing = DB::table('vol_shift_checkins')
-            ->where('shift_id', $shiftId)
-            ->where('user_id', $volunteerId)
-            ->where('tenant_id', $tenantId)
-            ->whereNotNull('qr_token')
-            ->value('qr_token');
-
-        if ($existing) {
-            return $existing;
+        // Serialise the check-then-insert under an atomic lock (same pattern as
+        // VolunteerService::logHours). Without it, two concurrent calls both
+        // find no existing token and both insert, leaving duplicate checkin
+        // rows with two valid QR tokens for one signup.
+        $lock = Cache::lock(sprintf('vol_checkin_token:%d:%d:%d', $tenantId, $shiftId, $volunteerId), 10);
+        if (! $lock->get()) {
+            self::$staticErrors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.vol_checkin_save_failed')];
+            return null;
         }
 
-        $token = bin2hex(random_bytes(32));
+        try {
+            // Check for existing token (tenant-scoped)
+            $existing = DB::table('vol_shift_checkins')
+                ->where('shift_id', $shiftId)
+                ->where('user_id', $volunteerId)
+                ->where('tenant_id', $tenantId)
+                ->whereNotNull('qr_token')
+                ->value('qr_token');
 
-        DB::table('vol_shift_checkins')->insert([
-            'tenant_id' => $tenantId,
-            'shift_id' => $shiftId,
-            'user_id' => $volunteerId,
-            'qr_token' => $token,
-            'status' => 'pending',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+            if ($existing) {
+                return $existing;
+            }
 
-        return $token;
+            $token = bin2hex(random_bytes(32));
+
+            DB::table('vol_shift_checkins')->insert([
+                'tenant_id' => $tenantId,
+                'shift_id' => $shiftId,
+                'user_id' => $volunteerId,
+                'qr_token' => $token,
+                'status' => 'pending',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return $token;
+        } finally {
+            $lock->release();
+        }
     }
 
     /**

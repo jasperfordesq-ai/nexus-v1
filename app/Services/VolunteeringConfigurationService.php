@@ -117,11 +117,16 @@ class VolunteeringConfigurationService
         self::CONFIG_SWAP_REQUIRES_ADMIN          => false,
         self::CONFIG_AUTO_APPROVE_APPLICATIONS    => false,
         self::CONFIG_REQUIRE_ORG_NOTE_ON_DECLINE  => false,
-        self::CONFIG_CANCELLATION_DEADLINE_HOURS  => 24,
-        self::CONFIG_MAX_HOURS_PER_SHIFT          => 8,
+        // NOTE: these MUST match the inline defaults at the enforcing call sites
+        // (VolunteerService::cancelShiftSignup / logHours,
+        // VolunteerCertificateService) — get() returns a non-null caller default
+        // BEFORE consulting DEFAULTS, so a mismatch makes the admin UI advertise
+        // a policy that is not what is actually enforced for unconfigured tenants.
+        self::CONFIG_CANCELLATION_DEADLINE_HOURS  => 0,  // 0 = no deadline (legacy behaviour preserved)
+        self::CONFIG_MAX_HOURS_PER_SHIFT          => 24, // legacy 24h sanity cap
         // Hours & Verification
         self::CONFIG_HOURS_REQUIRE_VERIFICATION   => true,
-        self::CONFIG_MIN_HOURS_FOR_CERTIFICATE    => 1,
+        self::CONFIG_MIN_HOURS_FOR_CERTIFICATE    => 0,  // 0 = no minimum (legacy behaviour preserved)
         // Emergency Alerts
         self::CONFIG_ALERT_DEFAULT_EXPIRY_HOURS   => 24,
         self::CONFIG_ALERT_SKILL_MATCHING         => true,
@@ -146,6 +151,14 @@ class VolunteeringConfigurationService
     // Public API
     // =========================================================================
 
+    /**
+     * Resolution order: tenant-stored value → non-null caller $default → DEFAULTS.
+     *
+     * ⚠ A non-null caller $default takes precedence over DEFAULTS, so passing an
+     * inline default that disagrees with DEFAULTS silently forks the enforced
+     * policy from what the admin config UI (getAll) advertises. Either omit the
+     * default or keep it identical to DEFAULTS[$key].
+     */
     public static function get(string $key, mixed $default = null): mixed
     {
         $tenantId = TenantContext::getId();

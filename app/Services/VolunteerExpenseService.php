@@ -147,8 +147,12 @@ class VolunteerExpenseService
             }
 
             if (!empty($policy->max_monthly)) {
-                $monthStart = now()->startOfMonth()->toDateString();
-                $monthEnd = now()->endOfMonth()->toDateString();
+                // Full datetime bounds: toDateString() would truncate the upper
+                // bound to <last-day> 00:00:00, excluding everything submitted
+                // ON the last calendar day and letting the monthly cap be
+                // exceeded by submitting on the 31st.
+                $monthStart = now()->startOfMonth();
+                $monthEnd = now()->endOfMonth();
 
                 $monthlyTotal = (float) VolExpense::where('user_id', $userId)
                     ->where('tenant_id', $tenantId)
@@ -215,7 +219,9 @@ class VolunteerExpenseService
             }
         }
 
-        $query = VolExpense::with(['user:id,first_name,last_name,avatar_url', 'organization']);
+        // email must be in the constrained select — the admin expense screens
+        // read user->email, and an unselected attribute silently resolves to ''.
+        $query = VolExpense::with(['user:id,first_name,last_name,email,avatar_url', 'organization']);
 
         if (!empty($filters['user_id'])) {
             $query->where('user_id', (int) $filters['user_id']);
@@ -316,7 +322,7 @@ class VolunteerExpenseService
      */
     public static function getExpense(int $id): ?array
     {
-        $expense = VolExpense::with(['user:id,first_name,last_name,avatar_url', 'organization'])
+        $expense = VolExpense::with(['user:id,first_name,last_name,email,avatar_url', 'organization'])
             ->where('tenant_id', TenantContext::getId())
             ->find($id);
 
