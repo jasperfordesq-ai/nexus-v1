@@ -133,6 +133,92 @@ vi.mock('@/components/ui', async (importOriginal) => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+vi.mock('@/components/ui/Button', () => ({
+  Button: ({
+    children,
+    onPress,
+    'aria-label': ariaLabel,
+    title,
+    isIconOnly: _isIconOnly,
+    ...rest
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    onPress?: () => void;
+    children?: React.ReactNode;
+    isIconOnly?: boolean;
+    title?: string;
+    variant?: string;
+    size?: string;
+  }) => (
+    <button
+      aria-label={ariaLabel}
+      title={title}
+      onClick={onPress}
+      {...(rest as object)}
+    >
+      {children}
+    </button>
+  ),
+}));
+
+vi.mock('@/components/ui/Input', () => ({
+  Input: ({
+    value,
+    onValueChange,
+    placeholder,
+    'aria-label': ariaLabel,
+    autoFocus,
+  }: {
+    value?: string;
+    onValueChange?: (val: string) => void;
+    placeholder?: string;
+    'aria-label'?: string;
+    autoFocus?: boolean;
+    startContent?: React.ReactNode;
+    size?: string;
+  }) => (
+    <input
+      aria-label={ariaLabel}
+      placeholder={placeholder}
+      value={value ?? ''}
+      autoFocus={autoFocus}
+      onChange={(e) => onValueChange?.(e.target.value)}
+    />
+  ),
+}));
+
+vi.mock('@/components/ui/Modal', () => ({
+  Modal: ({
+    isOpen,
+    children,
+  }: {
+    isOpen?: boolean;
+    onClose?: () => void;
+    children?: React.ReactNode;
+    size?: string;
+    scrollBehavior?: string;
+  }) => isOpen ? <div role="dialog" aria-label="Dialog" data-testid="icon-modal">{children}</div> : null,
+  ModalContent: ({ children }: { children: React.ReactNode | ((onClose: () => void) => React.ReactNode) }) => (
+    <div>{typeof children === 'function' ? children(() => {}) : children}</div>
+  ),
+  ModalHeader: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="modal-header">{children}</div>
+  ),
+  ModalBody: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="modal-body">{children}</div>
+  ),
+}));
+
+vi.mock('@/components/ui/DynamicIcon', async (importOriginal) => {
+  const orig = await importOriginal<typeof import('@/components/ui/DynamicIcon')>();
+
+  return {
+    ...orig,
+    DynamicIcon: ({ name, className }: { name: string; className?: string }) => (
+      <span data-testid="dynamic-icon" className={className}>{name}</span>
+    ),
+  };
+});
+
 describe('IconPicker', () => {
   const mockOnChange = vi.fn();
 

@@ -20,7 +20,7 @@ export function PurgeControls({
   toast: ToastShape;
   onActed: () => void;
 }) {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.purge' });
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.purge' });
   const [pattern, setPattern] = useState('');
   const [tenant, setTenant] = useState('');
   const [dryRun, setDryRun] = useState(true);

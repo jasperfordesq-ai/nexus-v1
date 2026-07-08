@@ -22,10 +22,46 @@ import User from 'lucide-react/icons/user';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { adminSupportReports } from '@/admin/api/adminApi';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Avatar } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
 interface AdminHeaderProps {
   sidebarCollapsed: boolean;
   onSidebarToggle?: () => void;
+}
+
+function scheduleSupportStatsFetch(callback: () => void): () => void {
+  let cancelled = false;
+  let timeoutId: number | undefined;
+  let secondFrameId: number | undefined;
+  let idleId: number | undefined;
+  const idleWindow = window as Window & {
+    requestIdleCallback?: (idleCallback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+    cancelIdleCallback?: (handle: number) => void;
+  };
+
+  const firstFrameId = window.requestAnimationFrame(() => {
+    secondFrameId = window.requestAnimationFrame(() => {
+      if (cancelled) return;
+      if (typeof idleWindow.requestIdleCallback === 'function') {
+        idleId = idleWindow.requestIdleCallback(() => {
+          if (!cancelled) callback();
+        }, { timeout: 3000 });
+        return;
+      }
+      timeoutId = window.setTimeout(() => {
+        if (!cancelled) callback();
+      }, 1500);
+    });
+  });
+
+  return () => {
+    cancelled = true;
+    if (firstFrameId !== undefined) window.cancelAnimationFrame(firstFrameId);
+    if (secondFrameId !== undefined) window.cancelAnimationFrame(secondFrameId);
+    if (idleId !== undefined) idleWindow.cancelIdleCallback?.(idleId);
+    if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+  };
 }
 
 export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderProps) {
@@ -35,24 +71,28 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
   const navigate = useNavigate();
   const adminLabel = t('admin');
 
-  // Open support-request count for the header indicator. Best-effort: if the
+  // Open support-request count for the header indicator. Best-effort and
+  // deferred so it does not compete with the first admin page render. If the
   // stats endpoint is unavailable for this admin, the badge simply stays hidden.
   const [openSupportCount, setOpenSupportCount] = useState(0);
 
   useEffect(() => {
     let active = true;
-    adminSupportReports
-      .stats()
-      .then((response) => {
-        if (active && response?.success && response.data) {
-          setOpenSupportCount(response.data.open ?? 0);
-        }
-      })
-      .catch(() => {
-        /* indicator is non-critical — ignore failures */
-      });
+    const cancelScheduledFetch = scheduleSupportStatsFetch(() => {
+      adminSupportReports
+        .stats()
+        .then((response) => {
+          if (active && response?.success && response.data) {
+            setOpenSupportCount(response.data.open ?? 0);
+          }
+        })
+        .catch(() => {
+          /* indicator is non-critical — ignore failures */
+        });
+    });
     return () => {
       active = false;
+      cancelScheduledFetch();
     };
   }, []);
 

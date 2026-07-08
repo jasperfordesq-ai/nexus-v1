@@ -107,7 +107,7 @@ const renderValueChip = (item: DecisionItem) => {
 };
 
 export default function IsolatedNodeAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('isolated_node.meta.page_title'));
   const { showToast } = useToast();
 

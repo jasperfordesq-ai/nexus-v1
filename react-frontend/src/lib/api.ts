@@ -22,7 +22,7 @@ import { validateResponse } from '@/lib/api-validation';
 import { apiResponseSchema } from '@/lib/api-schemas';
 import { recordApiDiagnostic } from '@/lib/supportDiagnostics';
 import { safeLocalStorageSet } from '@/lib/safeStorage';
-import { readStoredConsent } from '@/lib/cookieConsentStorage';
+import { queueSentryApiCall, queueSentryBreadcrumb, queueSentryMessage } from '@/lib/telemetryQueue';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -61,10 +61,7 @@ function captureTelemetryApiCall(
   status: number,
   duration: number,
 ): void {
-  if (readStoredConsent()?.analytics !== true) return;
-  void import('@/lib/sentry').then(({ captureApiCall }) => {
-    captureApiCall(method, endpoint, status, duration);
-  });
+  queueSentryApiCall(method, endpoint, status, duration);
 }
 
 function addTelemetryBreadcrumb(
@@ -73,10 +70,7 @@ function addTelemetryBreadcrumb(
   data: Record<string, unknown>,
   level: 'info' | 'warning' | 'error' = 'info',
 ): void {
-  if (readStoredConsent()?.analytics !== true) return;
-  void import('@/lib/sentry').then(({ addSentryBreadcrumb }) => {
-    addSentryBreadcrumb(message, category, data, level);
-  });
+  queueSentryBreadcrumb(message, category, data, level);
 }
 
 function captureTelemetryMessage(
@@ -84,10 +78,7 @@ function captureTelemetryMessage(
   level: 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug',
   context?: Record<string, unknown>,
 ): void {
-  if (readStoredConsent()?.analytics !== true) return;
-  void import('@/lib/sentry').then(({ captureSentryMessage }) => {
-    captureSentryMessage(message, level, context);
-  });
+  queueSentryMessage(message, level, context);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

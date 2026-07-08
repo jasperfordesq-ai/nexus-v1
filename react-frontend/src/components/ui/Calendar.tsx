@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Calendar as HeroUICalendar,
-  type CalendarProps as HeroUICalendarProps,
-} from '@heroui/react';
+import { Calendar as HeroUICalendar, type CalendarProps as HeroUICalendarProps } from '@heroui/react/calendar';
 
 export type CalendarProps = HeroUICalendarProps;
 export const Calendar = HeroUICalendar;

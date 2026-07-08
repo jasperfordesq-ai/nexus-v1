@@ -1,4 +1,3 @@
-import { Card } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -7,6 +6,7 @@ import { Card } from '@/components/ui';
 import { type ReactNode, type HTMLAttributes, type MouseEvent, type Ref } from 'react';
 
 import { motion, type Variants } from '@/lib/motion';
+import { Card } from '@/components/ui/Card';
 
 /** Exclude HTML event props that conflict with Framer Motion's signatures */
 type SafeHtmlProps = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart'>;

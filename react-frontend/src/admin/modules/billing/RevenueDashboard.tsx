@@ -141,7 +141,7 @@ function StatCard({ label, value, color = 'default', icon }: StatCardProps) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function RevenueDashboard() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_billing');
   usePageTitle(t('billing.revenue_title'));
   const { user } = useAuth();
   const { tenantPath } = useTenant();

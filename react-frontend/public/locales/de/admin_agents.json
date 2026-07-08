@@ -1,0 +1,222 @@
+{
+  "common": {
+    "an_unexpected_error": "Es ist ein unerwarteter Fehler aufgetreten",
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "critical": "Kritisch",
+    "delete": "Löschen",
+    "feature": "Funktion",
+    "high": "Hoch",
+    "in_progress": "In Bearbeitung",
+    "in_review": "Im Rückblick",
+    "low": "Niedrig",
+    "medium": "Mittel",
+    "planned": "Geplant",
+    "refresh": "Aktualisieren",
+    "unexpected_error": "Unerwarteter Fehler",
+    "unknown": "Unbekannt",
+    "unfeature": "Unfeature",
+    "actions": "Aktionen",
+    "active": "Aktiv",
+    "all": "Alle",
+    "approved": "Genehmigt",
+    "clear": "Klar",
+    "clear_filters": "Filter löschen",
+    "clear_selection": "Auswahl löschen",
+    "close": "Schließen",
+    "collapse": "Zusammenbruch",
+    "confirm": "Bestätigen",
+    "create": "Erstellen",
+    "declined": "Abgelehnt",
+    "download": "Herunterladen",
+    "edit": "Bearbeiten",
+    "error_loading_data": "Fehler beim Laden der Daten",
+    "expand": "Erweitern",
+    "export": "Exportieren",
+    "load_more": "Mehr laden",
+    "loading": "Laden",
+    "next": "Als nächstes",
+    "no": "Nein",
+    "ok": "OK",
+    "pending": "Ausstehend",
+    "previous": "Zurück",
+    "retry": "Versuchen Sie es noch einmal",
+    "save": "Speichern",
+    "select_all": "Wählen Sie „Alle“ aus",
+    "select_item": "Wählen Sie Artikel aus",
+    "yes": "Ja"
+  },
+  "shared": {
+    "broker_actions": "Makleraktionen",
+    "content": "Inhalt",
+    "core_module": "Kernmodul",
+    "document_details": "Dokumentdetails",
+    "history": "Geschichte",
+    "log_file_empty": "Keine Protokolldatei gefunden",
+    "no": "Nein",
+    "no_history_available": "Keine verfügbare Historie gefunden",
+    "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
+    "no_members_found": "Keine Mitglieder gefunden",
+    "loading": "Loading",
+    "no_data": "Keine Daten",
+    "no_data_available": "Keine Daten verfügbar",
+    "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
+    "open_page_help": "Hilfeseite öffnen",
+    "help": "Helfen",
+    "quick_access": "Schnellzugriff",
+    "recent_activity": "Letzte Aktivität",
+    "refresh": "Aktualisieren",
+    "search": "Suchen...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Daten",
+    "total_count": "{{count}}insgesamt"
+  },
+  "agents": {
+    "actions": {
+      "cancel": "Stornieren",
+      "refresh": "Aktualisieren",
+      "save": "Speichern"
+    },
+    "common": {
+      "empty_dash": "-"
+    },
+    "status": {
+      "disabled": "Deaktiviert",
+      "enabled": "Ermöglicht"
+    },
+    "toggle": "Enable or disable {{name}}",
+    "run_status": {
+      "completed": "Vollendet",
+      "failed": "Fehlgeschlagen",
+      "pending": "Ausstehend",
+      "running": "Läuft"
+    },
+    "proposal_status": {
+      "approved": "Genehmigt",
+      "pending": "Ausstehend",
+      "pending_review": "Ausstehende Überprüfung",
+      "rejected": "Abgelehnt"
+    },
+    "definitions": {
+      "title": "AI-Agenten",
+      "subtitle": "Autonome Agenten entwerfen Vorschläge zur Genehmigung durch den Administrator. Aktionen bleiben in der Warteschlange, bis Sie sie genehmigen.",
+      "loading": "Agentendefinitionen werden geladen...",
+      "last_run": "Letzter Lauf: {{date}}",
+      "meta": {
+        "title": "AI-Agenten",
+        "description": "Konfigurieren Sie autonome Agentendefinitionen und führen Sie Vorschlagsgeneratoren für diesen Mandanten aus."
+      },
+      "actions": {
+        "edit_config": "Konfiguration bearbeiten",
+        "run_now": "Lauf jetzt"
+      },
+      "empty": {
+        "title": "Noch keine Agentendefinitionen",
+        "description": "Seeden Sie die Standard-Agentendefinitionen des Mandanten, bevor Sie autonome Angebotsworkflows verwenden."
+      },
+      "edit_modal": {
+        "config_json": "Konfiguration (JSON)",
+        "name": "Name",
+        "title": "Bearbeiten Sie {{name}}"
+      },
+      "toasts": {
+        "disabled": "{{name}} deaktiviert",
+        "enabled": "{{name}} aktiviert",
+        "invalid_json": "Die Konfiguration ist ungültig. JSON",
+        "load_failed": "Agentendefinitionen konnten nicht geladen werden",
+        "run_created": "Führen Sie #{{runId}} aus und erstellen Sie {{count}}-Vorschläge.",
+        "run_failed": "Der Agent konnte nicht ausgeführt werden",
+        "run_failed_with_error": "Ausführung fehlgeschlagen: {{error}}",
+        "toggle_failed": "Agent konnte nicht umgeschaltet werden",
+        "updated": "Agent aktualisiert",
+        "update_failed": "Der Agent konnte nicht aktualisiert werden"
+      }
+    },
+    "runs": {
+      "title": "Agentenläufe",
+      "subtitle": "Verlauf aller Agentenausführungen. Wählen Sie eine Zeile aus, um die Fehlerdetails zu erweitern.",
+      "loading": "Der Agent wird geladen...",
+      "table_aria": "Agent läuft",
+      "proposals_cell": "{{generated}} ({{applied}} angewendet)",
+      "meta": {
+        "title": "AI-Agent wird ausgeführt",
+        "description": "Überprüfen Sie den Ausführungsverlauf, den Status, die Token-Nutzung, die Kosten und die Fehler für autonome Agenten."
+      },
+      "columns": {
+        "agent": "Agent",
+        "cost": "Kosten",
+        "id": "ID",
+        "proposals": "Vorschläge",
+        "started": "Begonnen",
+        "status": "Status",
+        "tokens": "Token (eingehend/ausgehend)",
+        "triggered": "Ausgelöst"
+      },
+      "detail": {
+        "completed": "Abgeschlossen: {{date}}",
+        "error": "Fehler",
+        "summary": "Zusammenfassung"
+      },
+      "empty": {
+        "title": "Noch keine Läufe",
+        "description": "Der Ausführungsverlauf des Agenten wird hier angezeigt, nachdem ein Agent ausgeführt wurde."
+      },
+      "toasts": {
+        "load_failed": "Läufe konnten nicht geladen werden"
+      }
+    },
+    "proposals": {
+      "title": "Agentenvorschläge",
+      "subtitle": "Überprüfen und genehmigen Sie von autonomen Agenten erstellte Vorschläge.",
+      "loading": "Agentenvorschläge werden geladen...",
+      "confidence": "Vertrauen: {{score}}",
+      "run_id": "Führen Sie #{{id}} aus",
+      "subject_user": "Betreff: {{id}}",
+      "target_user": "Zielbenutzer: {{id}}",
+      "meta": {
+        "title": "AI-Agentenvorschläge",
+        "description": "Überprüfen, bearbeiten, genehmigen oder lehnen Sie Vorschläge autonomer Agenten ab, bevor sie sich auf Mieterdaten auswirken."
+      },
+      "actions": {
+        "approve": "Genehmigen",
+        "edit_approve": "Bearbeiten und genehmigen",
+        "reject": "Ablehnen",
+        "save_approve": "Speichern und genehmigen"
+      },
+      "empty": {
+        "title": "Keine Vorschläge",
+        "description": "Hier werden passende Vorschläge angezeigt, wenn Agenten Bewertungselemente für diesen Filter erstellen."
+      },
+      "edit_modal": {
+        "payload_json": "Nutzlast (JSON)",
+        "title": "Bearbeiten und genehmigen Sie den Vorschlag #{{id}}"
+      },
+      "labels": {
+        "payload": "Nutzlast",
+        "reasoning": "Argumentation"
+      },
+      "reject_modal": {
+        "note": "Hinweis (optional)",
+        "title": "Vorschlag #{{id}} ablehnen"
+      },
+      "tabs": {
+        "all": "Alle",
+        "approved": "Genehmigt",
+        "pending": "Ausstehend",
+        "rejected": "Abgelehnt"
+      },
+      "toasts": {
+        "approved": "Vorschlag genehmigt und ausgeführt",
+        "approve_failed": "Genehmigung fehlgeschlagen",
+        "edit_approve_failed": "Bearbeiten und Genehmigen fehlgeschlagen",
+        "edited_approved": "Vorschlag bearbeitet und genehmigt",
+        "invalid_json": "Die bearbeitete Nutzlast ist ungültig. JSON",
+        "load_failed": "Die Vorschläge konnten nicht geladen werden",
+        "reject_failed": "Ablehnung fehlgeschlagen",
+        "rejected": "Vorschlag abgelehnt"
+      }
+    },
+    "tabs_aria": "Agent proposal status filter"
+  }
+}

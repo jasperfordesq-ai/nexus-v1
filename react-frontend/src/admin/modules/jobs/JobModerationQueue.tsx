@@ -79,7 +79,7 @@ function getSpamScoreColor(score: number): 'success' | 'warning' | 'danger' | 'd
 
 export function JobModerationQueue() {
   const { t } = useTranslation('jobs');
-  const { t: tAdmin } = useTranslation('admin');
+  const { t: tAdmin } = useTranslation('admin_jobs');
   usePageTitle(t('moderation.title'));
   const toast = useToast();
 

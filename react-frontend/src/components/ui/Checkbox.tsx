@@ -9,12 +9,10 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
-import {
-  Checkbox as HeroUICheckbox,
-  CheckboxGroup as HeroUICheckboxGroup,
-  Description,
-  Label,
-} from '@heroui/react';
+import { Checkbox as HeroUICheckbox } from '@heroui/react/checkbox';
+import { CheckboxGroup as HeroUICheckboxGroup } from '@heroui/react/checkbox-group';
+import { Description } from '@heroui/react/description';
+import { Label } from '@heroui/react/label';
 
 type HeroUICheckboxProps = ComponentPropsWithoutRef<typeof HeroUICheckbox>;
 type HeroUICheckboxGroupProps = ComponentPropsWithoutRef<typeof HeroUICheckboxGroup>;

@@ -23,7 +23,7 @@ import { Button } from '@/components/ui';
 
 export function OrgWallets() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_timebanking');
   useAdminPageMeta({ title: tNav('timebanking') });
   const { tenantPath } = useTenant();
   const toast = useToast();

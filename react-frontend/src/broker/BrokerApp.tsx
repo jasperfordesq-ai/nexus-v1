@@ -18,16 +18,15 @@ import { BrokerRoute } from './BrokerRoute';
 import { BrokerLayout } from './BrokerLayout';
 import { BrokerRoutes } from './routes';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
-import { LoadingScreen } from '@/components/feedback';
+import { LoadingScreen } from '@/components/feedback/LoadingScreen';
+import './broker.css';
 
 function BrokerAppInner() {
-  // Ensure both 'broker' and 'admin' namespaces are loaded before rendering.
+  // Keep broker startup scoped to the broker namespace. Admin-derived pages
+  // lazy-load admin keys only when those specific child routes render.
   // Without this, useTranslation() in child components may render raw keys on
-  // first paint because HttpBackend loads namespaces asynchronously. The
-  // 'admin' namespace is needed because pages ported from the admin panel
-  // (BrokerDashboard, RiskTags, InsuranceCertificates, etc.) use admin-side
-  // translation keys (broker_dashboard.*, etc.).
-  const { ready } = useTranslation(['broker', 'admin']);
+  // first paint because HttpBackend loads namespaces asynchronously.
+  const { ready } = useTranslation('broker');
 
   if (!ready) {
     return <LoadingScreen />;

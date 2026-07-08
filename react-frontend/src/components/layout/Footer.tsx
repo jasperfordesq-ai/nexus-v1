@@ -5,7 +5,10 @@
 
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';import { useTenant, useFeature, useCookieConsent, useTheme } from '@/contexts';
+import { useTranslation } from 'react-i18next';
+import { useCookieConsent } from '@/contexts/CookieConsentContext';
+import { useFeature, useTenant } from '@/contexts/TenantContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import Mail from 'lucide-react/icons/mail';
 import Phone from 'lucide-react/icons/phone';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -14,7 +17,7 @@ import { TenantLogo } from '@/components/branding';
 import Sparkles from 'lucide-react/icons/sparkles';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 import { resolveThumbnailUrl } from '@/lib/helpers';
 
 

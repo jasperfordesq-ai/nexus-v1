@@ -36,7 +36,7 @@ const dependentCapabilities = [
 ] as const;
 
 export default function CaringCommunityAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('caring_community.meta.title'));
   const { tenantPath, refreshTenant } = useTenant();
   const toast = useToast();

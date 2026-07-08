@@ -32,7 +32,7 @@ interface SubscriptionItem {
 }
 
 export function Subscriptions() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   usePageTitle("Content");
   const toast = useToast();
 

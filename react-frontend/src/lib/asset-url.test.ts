@@ -113,7 +113,16 @@ describe('resolveAvatarUrl', () => {
 
   it('returns resolved URL for valid avatar path', () => {
     const result = resolveAvatarUrl('/uploads/avatars/user123.jpg');
-    expect(result).toContain('/uploads/avatars/user123.jpg');
+    expect(result).toContain('/v2/media/thumbnail?');
+    expect(result).toContain('src=%2Fuploads%2Favatars%2Fuser123.jpg');
+    expect(result).toContain('w=96');
+    expect(result).toContain('h=96');
+  });
+
+  it('leaves external avatar URLs untouched', () => {
+    const url = 'https://gravatar.com/avatar/abc123';
+
+    expect(resolveAvatarUrl(url)).toBe(url);
   });
 });
 

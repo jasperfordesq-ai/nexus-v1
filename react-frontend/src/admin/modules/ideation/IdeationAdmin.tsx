@@ -102,7 +102,7 @@ interface ChallengeActionsProps {
 }
 
 function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: ChallengeActionsProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_ideation');
   type ActionKey = 'view' | ChallengeStatus | 'delete';
 
   const handleAction = (key: React.Key) => {
@@ -189,7 +189,7 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function IdeationAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_ideation');
   usePageTitle(t('ideation.ideation_admin_title'));
   const toast = useToast();
 

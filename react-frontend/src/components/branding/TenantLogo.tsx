@@ -8,7 +8,8 @@ import { Link } from 'react-router-dom';
 
 import { motion } from '@/lib/motion';
 import { useTenant } from '@/contexts';
-import { Avatar, Tooltip } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { resolveThumbnailUrl } from '@/lib/helpers';
 
 /** Extract 1–2 initials from a tenant name. */

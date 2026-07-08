@@ -1,0 +1,232 @@
+{
+  "common": {
+    "an_unexpected_error": "An unexpected error occurred",
+    "back": "Back",
+    "cancel": "Cancel",
+    "critical": "Critical",
+    "delete": "Delete",
+    "feature": "Feature",
+    "high": "High",
+    "in_progress": "In Progress",
+    "in_review": "In Review",
+    "low": "Low",
+    "medium": "Medium",
+    "planned": "Planned",
+    "refresh": "Refresh",
+    "unexpected_error": "Unexpected error",
+    "unknown": "Unknown",
+    "unfeature": "Unfeature",
+    "actions": "Actions",
+    "active": "Active",
+    "all": "All",
+    "approved": "Approved",
+    "clear": "Clear",
+    "clear_filters": "Clear Filters",
+    "clear_selection": "Clear Selection",
+    "close": "Close",
+    "collapse": "Collapse",
+    "confirm": "Confirm",
+    "create": "Create",
+    "declined": "Declined",
+    "download": "Download",
+    "edit": "Edit",
+    "error_loading_data": "Loading Data error",
+    "expand": "Expand",
+    "export": "Export",
+    "load_more": "Load More",
+    "loading": "Loading",
+    "next": "Next",
+    "no": "No",
+    "ok": "OK",
+    "pending": "Pending",
+    "previous": "Previous",
+    "retry": "Retry",
+    "save": "Save",
+    "select_all": "Select All",
+    "select_item": "Select Item",
+    "yes": "Yes"
+  },
+  "shared": {
+    "broker_actions": "Broker Actions",
+    "content": "Content",
+    "core_module": "Core Module",
+    "document_details": "Document Details",
+    "history": "History",
+    "log_file_empty": "No log file found",
+    "no": "No",
+    "no_history_available": "No history available found",
+    "no_legal_documents_found": "No legal documents found found",
+    "no_members_found": "No members found found",
+    "loading": "Loading",
+    "no_data": "No data",
+    "no_data_available": "No data available",
+    "no_recent_broker_activity": "No recent broker activity found",
+    "open_page_help": "Open page help",
+    "help": "Help",
+    "quick_access": "Quick Access",
+    "recent_activity": "Recent Activity",
+    "refresh": "Refresh",
+    "search": "Search...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Data",
+    "total_count": "{{count}} total"
+  },
+  "fadp": {
+    "meta": {
+      "page_title": "FADP Compliance"
+    },
+    "header": {
+      "title": "Swiss FADP Compliance (nDSG)",
+      "description": "Federal Act on Data Protection: processing register, retention configuration, consent audit, and residency controls."
+    },
+    "actions": {
+      "add_activity": "Add activity",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "export_csv": "Export CSV",
+      "export_ledger_csv": "Export full ledger CSV",
+      "refresh": "Refresh",
+      "save_changes": "Save changes",
+      "save_configuration": "Save configuration"
+    },
+    "common": {
+      "empty_dash": "—",
+      "no": "No"
+    },
+    "tabs": {
+      "aria": "FADP sections",
+      "ledger": "Consent ledger",
+      "register": "Processing register",
+      "residency": "Data residency",
+      "retention": "Retention config"
+    },
+    "register": {
+      "description": "Article 12 nDSG requires a record of processing activities. Add each activity where personal data is collected, used, shared, or retained.",
+      "empty": "No processing activities yet. Add an activity to create the register.",
+      "profiling_yes": "Yes: consent required",
+      "table_aria": "Processing activities",
+      "columns": {
+        "actions": "Actions",
+        "activity": "Activity",
+        "automated_profiling": "Automated profiling",
+        "legal_basis": "Legal basis",
+        "retention": "Retention"
+      }
+    },
+    "retention": {
+      "data_residency_label": "Data residency declaration",
+      "dpa_contact_description": "Data Protection Officer or responsible person email.",
+      "dpa_contact_label": "DPA contact email (optional)",
+      "periods_title": "Retention periods",
+      "residency_title": "Data residency and DPA contact",
+      "fields": {
+        "activity_logs_years": "Activity logs (years)",
+        "ai_embeddings_years": "AI embeddings (years)",
+        "member_data_years": "Member data (years)",
+        "messages_years": "Messages (years)",
+        "transaction_data_years": "Transaction data (years)"
+      },
+      "hints": {
+        "activity_logs_years": "Platform activity and audit logs.",
+        "ai_embeddings_years": "Matching embeddings. Consent is required.",
+        "member_data_years": "Registration, profiles, and authentication data.",
+        "messages_years": "Direct and group messages.",
+        "transaction_data_years": "Time-credit exchange records."
+      }
+    },
+    "ledger": {
+      "description": "Immutable audit log of member consent decisions. Required by Art. 6 nDSG to demonstrate lawfulness.",
+      "empty": "No consent records yet.",
+      "table_aria": "Consent records",
+      "truncated": "Showing the most recent 200 records. Export the full ledger CSV to download all {{count}} records.",
+      "columns": {
+        "action": "Action",
+        "consent_type": "Consent type",
+        "date": "Date",
+        "ip_address": "IP address",
+        "member_id": "Member ID"
+      }
+    },
+    "residency": {
+      "article_16": "Cross-border disclosure of personal data is permitted if the destination country ensures adequate data protection recognised by the Federal Council. Switzerland, EU/EEA member states, and a small list of other countries qualify.",
+      "article_16_label": "FADP Art. 16",
+      "article_17": "If the destination does not qualify, appropriate safeguards must be in place, such as standard data protection clauses approved by the FDPIC, binding corporate rules, or member consent.",
+      "article_17_label": "FADP Art. 17",
+      "description": "Where tenant member data is stored and processed.",
+      "dpa_contact": "DPA contact",
+      "title": "Declared data residency",
+      "update_hint_prefix": "To update the declared residency, use the",
+      "update_hint_suffix": "tab.",
+      "copy": {
+        "EU": "Data is stored within the EU/EEA. Switzerland recognises EU data protection as adequate, so no additional FADP safeguards are needed for these transfers.",
+        "International": "Data is stored outside Switzerland and the EU. Art. 16-17 nDSG safeguards are required, such as standard contractual clauses or explicit member consent for each transfer.",
+        "Switzerland": "Data is stored entirely within Switzerland. Cross-border transfer provisions are not required for this declaration."
+      }
+    },
+    "summary": {
+      "automated_profiling": "Automated profiling",
+      "generated": "Generated",
+      "tenant": "Tenant",
+      "title": "Register summary",
+      "total_activities": "Total activities"
+    },
+    "activity_modal": {
+      "add_title": "Add processing activity",
+      "edit_title": "Edit processing activity",
+      "fields": {
+        "activity_name": "Activity name",
+        "automated_profiling": "Automated profiling",
+        "data_categories": "Data categories (comma-separated)",
+        "legal_basis": "Legal basis",
+        "purpose": "Purpose",
+        "recipients": "Recipients (comma-separated, optional)",
+        "retention_period": "Retention period",
+        "sort_order": "Sort order"
+      },
+      "hints": {
+        "automated_profiling": "Art. 21 nDSG: automated individual decision-making requires explicit consent and transparency.",
+        "data_categories": "For example: name, email, phone, address.",
+        "purpose": "Why is this data processed? Be specific about the legitimate purpose.",
+        "recipients": "Who receives or accesses this data, such as internal teams or processors.",
+        "retention_period": "For example: 7 years after membership ends, or until consent is withdrawn."
+      }
+    },
+    "delete_modal": {
+      "message": "Delete this processing activity? This cannot be undone.",
+      "title": "Delete processing activity"
+    },
+    "legal_basis": {
+      "consent": "Consent",
+      "contract": "Contract",
+      "legal_obligation": "Legal obligation",
+      "legitimate_interest": "Legitimate interest",
+      "unknown": "Unknown legal basis: {{basis}}"
+    },
+    "data_residency": {
+      "EU": "EU (EEA)",
+      "International": "International (outside EU/Switzerland)",
+      "Switzerland": "Switzerland"
+    },
+    "consent_actions": {
+      "granted": "Granted",
+      "withdrawn": "Withdrawn",
+      "unknown": "Unknown action: {{action}}"
+    },
+    "toasts": {
+      "activities_load_failed": "Failed to load processing activities.",
+      "activity_delete_failed": "Failed to delete activity.",
+      "activity_deleted": "Activity deleted.",
+      "activity_required": "Activity name and purpose are required.",
+      "activity_save_failed": "Failed to save activity.",
+      "activity_saved": "Processing activity saved.",
+      "consent_export_failed": "Failed to export consent ledger.",
+      "consent_load_failed": "Failed to load consent ledger.",
+      "register_export_failed": "Failed to export register.",
+      "retention_load_failed": "Failed to load retention config.",
+      "retention_save_failed": "Failed to save retention config.",
+      "retention_saved": "Retention configuration saved."
+    }
+  }
+}

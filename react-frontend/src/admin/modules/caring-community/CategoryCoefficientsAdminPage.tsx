@@ -69,7 +69,7 @@ function clampCoefficient(value: number): number {
 // ---------------------------------------------------------------------------
 
 export default function CategoryCoefficientsAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('category_coefficients.meta.page_title'));
   const { showToast } = useToast();
 

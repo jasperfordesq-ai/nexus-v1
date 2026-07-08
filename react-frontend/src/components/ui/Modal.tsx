@@ -13,7 +13,7 @@ import {
   use,
   useMemo,
 } from 'react';
-import { Modal as HeroUIModal, ModalHeading as HeroUIModalHeading } from '@heroui/react';
+import { Modal as HeroUIModal, ModalHeading as HeroUIModalHeading } from '@heroui/react/modal';
 
 import { cn } from '@/lib/helpers';
 

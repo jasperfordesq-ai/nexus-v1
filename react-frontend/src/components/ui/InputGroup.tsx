@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  InputGroup as HeroUIInputGroup,
-  type InputGroupProps as HeroUIInputGroupProps,
-} from '@heroui/react';
+import { InputGroup as HeroUIInputGroup, type InputGroupProps as HeroUIInputGroupProps } from '@heroui/react/input-group';
 
 export type InputGroupProps = HeroUIInputGroupProps;
 

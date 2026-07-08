@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  CloseButton as HeroUICloseButton,
-  type CloseButton as HeroUICloseButtonTypes,
-} from '@heroui/react';
+import { CloseButton as HeroUICloseButton, type CloseButton as HeroUICloseButtonTypes } from '@heroui/react/close-button';
 
 export type CloseButtonProps = HeroUICloseButtonTypes['Props'];
 export const CloseButton = HeroUICloseButton;

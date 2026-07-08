@@ -135,7 +135,7 @@ function formatRelativeTime(dateStr: string, t: (key: string, options?: Record<s
 
 export function ActivityTimeline() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_crm');
   useAdminPageMeta({ title: tNav('crm') });
   const { tenantPath } = useTenant();
   const [searchParams] = useSearchParams();

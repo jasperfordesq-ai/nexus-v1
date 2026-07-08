@@ -47,13 +47,17 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/comp
 import { Textarea } from '@/components/ui/Textarea';
 import { useDisclosure } from '@/components/ui/useDisclosure';
 import { EmptyState } from '@/components/feedback';
-import { BuyNowButton, LoyaltyRedemptionCard, MarketplaceListingDetailSkeleton } from '@/components/marketplace';
+import { BuyNowButton } from '@/components/marketplace/BuyNowButton';
+import { LoyaltyRedemptionCard } from '@/components/marketplace/LoyaltyRedemptionCard';
+import { MarketplaceListingDetailSkeleton } from '@/components/marketplace/MarketplaceListingDetailSkeleton';
 import { ShippingSelector } from '@/components/marketplace/ShippingSelector';
-import { useAuth, useToast, useTenant } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
+import { useTenant } from '@/contexts/TenantContext';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveThumbnailUrl } from '@/lib/helpers';
-import { usePageTitle } from '@/hooks';
+import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import type { MarketplaceShippingOption } from '@/types/marketplace';
@@ -734,7 +738,7 @@ export function MarketplaceListingPage() {
               </h3>
               <div className="flex items-center gap-3">
                 <Avatar
-                  src={listing.user.avatar_url || undefined}
+                  src={resolveAvatarUrl(listing.user.avatar_url) || undefined}
                   name={listing.user.name}
                   size="lg"
                 />

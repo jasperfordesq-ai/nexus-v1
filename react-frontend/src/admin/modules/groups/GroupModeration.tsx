@@ -21,7 +21,7 @@ import type { GroupModerationItem } from '../../api/types';
 import { Chip, Spinner } from '@/components/ui';
 
 export function GroupModeration() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   usePageTitle(t('groups.page_title'));
   const toast = useToast();
 

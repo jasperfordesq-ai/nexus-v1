@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Home from 'lucide-react/icons/house';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
 
 export interface BreadcrumbItem {
   label: string;

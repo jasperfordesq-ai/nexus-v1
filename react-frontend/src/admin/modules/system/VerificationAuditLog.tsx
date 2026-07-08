@@ -53,7 +53,7 @@ const EVENT_TYPES = Object.keys(EVENT_TYPE_LABELS);
 const PAGE_SIZE = 25;
 
 export function VerificationAuditLog() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   const [events, setEvents] = useState<AuditEvent[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);

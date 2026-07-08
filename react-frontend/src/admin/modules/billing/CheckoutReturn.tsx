@@ -24,7 +24,7 @@ const MAX_POLL_ATTEMPTS = 10;
 const POLL_INTERVAL_MS = 2000;
 
 export function CheckoutReturn() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_billing');
   usePageTitle(t('billing.checkout_title'));
   const { tenantPath } = useTenant();
   const [searchParams] = useSearchParams();

@@ -1,0 +1,22 @@
+/* Copyright (c) 2024-2026 Jasper Ford
+   SPDX-License-Identifier: AGPL-3.0-or-later
+   Author: Jasper Ford
+   See NOTICE file for attribution and acknowledgements. */
+
+/*
+   Admin-only Tailwind utility sheet.
+
+   The main app stylesheet deliberately excludes src/admin so login, register,
+   and member-facing routes do not download utilities generated only for the
+   lazy-loaded admin panel. AdminApp imports this file from its route chunk.
+*/
+
+@import "tailwindcss" source(none);
+
+@source "./**/*.{js,ts,jsx,tsx}";
+@source not "./**/*.test.ts";
+@source not "./**/*.test.tsx";
+@source not "./**/*.spec.ts";
+@source not "./**/*.spec.tsx";
+
+@custom-variant dark (&:is(.dark *));

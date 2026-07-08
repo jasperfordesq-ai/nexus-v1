@@ -1,0 +1,180 @@
+{
+  "common": {
+    "an_unexpected_error": "Ocorreu um erro inesperado",
+    "back": "Voltar",
+    "cancel": "Cancelar",
+    "critical": "Crítico",
+    "delete": "Excluir",
+    "feature": "Recurso",
+    "high": "Alto",
+    "in_progress": "Em andamento",
+    "in_review": "Em revisão",
+    "low": "Baixo",
+    "medium": "Médio",
+    "planned": "Planejado",
+    "refresh": "Atualizar",
+    "unexpected_error": "Erro inesperado",
+    "unknown": "Desconhecido",
+    "unfeature": "Desapresentar",
+    "actions": "Ações",
+    "active": "Ativo",
+    "all": "Todos",
+    "approved": "Aprovado",
+    "clear": "Limpar",
+    "clear_filters": "Limpar filtros",
+    "clear_selection": "Limpar seleção",
+    "close": "Fechar",
+    "collapse": "Recolher",
+    "confirm": "Confirmar",
+    "create": "Criar",
+    "declined": "Recusado",
+    "download": "Baixar",
+    "edit": "Editar",
+    "error_loading_data": "Erro ao carregar dados",
+    "expand": "Expandir",
+    "export": "Exportar",
+    "load_more": "Carregar mais",
+    "loading": "Carregando",
+    "next": "Próximo",
+    "no": "Não",
+    "ok": "OK",
+    "pending": "Pendente",
+    "previous": "Anterior",
+    "retry": "Tentar novamente",
+    "save": "Salvar",
+    "select_all": "Selecionar tudo",
+    "select_item": "Selecione o item",
+    "yes": "Sim"
+  },
+  "shared": {
+    "broker_actions": "Ações do corretor",
+    "content": "Conteúdo",
+    "core_module": "Módulo Principal",
+    "document_details": "Detalhes do documento",
+    "history": "História",
+    "log_file_empty": "Nenhum arquivo de log encontrado",
+    "no": "Não",
+    "no_history_available": "Nenhum histórico disponível encontrado",
+    "no_legal_documents_found": "Nenhum documento legal encontrado foi encontrado",
+    "no_members_found": "Nenhum membro encontrado encontrado",
+    "loading": "Loading",
+    "no_data": "Sem dados",
+    "no_data_available": "Não há dados disponíveis",
+    "no_recent_broker_activity": "Nenhuma atividade recente do corretor encontrada",
+    "open_page_help": "Abrir página de ajuda",
+    "help": "Ajuda",
+    "quick_access": "Acesso rápido",
+    "recent_activity": "Atividade recente",
+    "refresh": "Atualizar",
+    "search": "Procurar...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Dados",
+    "total_count": "{{count}}total"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "Parceiros API"
+    },
+    "header": {
+      "title": "Parceiros API",
+      "description": "Forneça a sistemas externos aprovados - como um sistema bancário ou municipal - chaves de acesso seguras aos seus dados NEXUS. Para se conectar a outra plataforma de banco de tempo, use Parceiros de Protocolo Externo."
+    },
+    "actions": {
+      "activate": "Ativar",
+      "cancel": "Cancelar",
+      "close": "Fechar",
+      "new_partner": "Novo parceiro",
+      "regenerate_credentials": "Gerar credenciais novamente",
+      "suspend": "Suspender",
+      "view_call_log": "Ver registro de chamadas"
+    },
+    "call_log": {
+      "table_aria": "Chamadas recentes",
+      "columns": {
+        "duration": "Duração",
+        "method": "Método",
+        "path": "Caminho",
+        "status": "Estado",
+        "when": "Quando"
+      }
+    },
+    "columns": {
+      "actions": "Ações",
+      "name": "Nome",
+      "rate_limit": "Limite de taxa",
+      "sandbox": "Caixa de areia",
+      "scopes": "Escopos",
+      "slug": "Lesma",
+      "status": "Estado"
+    },
+    "common": {
+      "any": "qualquer",
+      "empty_dash": "-",
+      "milliseconds": "{{value}} ms",
+      "no": "Não",
+      "per_minute": "{{value}}/min",
+      "yes": "Sim"
+    },
+    "confirm": {
+      "regenerate_credentials": "Criar novas chaves de acesso para este parceiro? As chaves antigas param de funcionar imediatamente — você precisará compartilhar as novas com o parceiro."
+    },
+    "create_modal": {
+      "allowed_scopes": "Escopos permitidos",
+      "contact_email": "E-mail de contato",
+      "contact_email_placeholder": "integrações@parceiro.exemplo",
+      "description": "Descrição",
+      "name": "Nome",
+      "name_placeholder": "por exemplo PostFinance Switzerland",
+      "rate_limit": "Limite de taxa (solicitações/minuto)",
+      "sandbox_mode": "Modo sandbox (teste) — o parceiro pode visualizar os dados, mas não pode alterar nada",
+      "submit": "Criar e emitir credenciais",
+      "title": "Novo parceiro API"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Copiar client_id",
+      "copy_client_secret": "Copiar client_secret",
+      "saved_button": "Eu salvei estes",
+      "title": "Credenciais do cliente emitidas",
+      "warning_body": "A chave secreta é mostrada apenas uma vez. Share both values with your partner privately and securely — never in a public chat or shared document.",
+      "warning_title": "Salve-os agora."
+    },
+    "detail": {
+      "call_log_tab": "Registro de chamadas",
+      "contact": "Contato:",
+      "info_tab": "Informações",
+      "ip_allowlist": "Lista de permissões IP:",
+      "rate_limit": "Limite de taxa:",
+      "sandbox": "Caixa de areia:",
+      "scopes": "Escopos:",
+      "status": "Estado:",
+      "tabs_aria": "Guias de detalhes do parceiro"
+    },
+    "empty": {
+      "no_calls": "Nenhuma ligação ainda.",
+      "no_partners": "Nenhum sistema parceiro conectado ainda. Add one to create its access keys."
+    },
+    "status": {
+      "active": "Ativo",
+      "pending": "Pendente",
+      "suspended": "Suspenso"
+    },
+    "toasts": {
+      "activate_failed": "Falha na ativação",
+      "activated": "Parceiro ativado",
+      "copied": "{{label}} copiado",
+      "copy_failed": "Falha na cópia — copie manualmente",
+      "create_failed": "Falha na criação",
+      "load_failed": "Falha ao carregar parceiros",
+      "name_required": "O nome é obrigatório",
+      "regenerate_failed": "Falha na regeneração",
+      "suspend_failed": "Falha na suspensão",
+      "suspended": "Parceiro suspenso"
+    },
+    "table": {
+      "aria": "Parceiros API"
+    }
+  }
+}

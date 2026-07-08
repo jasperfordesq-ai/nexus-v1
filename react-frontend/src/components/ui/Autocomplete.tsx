@@ -4,15 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { type ComponentProps, type ReactNode } from 'react';
-import {
-  Autocomplete as HeroAutocomplete,
-  Description,
-  FieldError,
-  Label,
-  ListBox as HeroListBox,
-  SearchField,
-  useFilter,
-} from '@heroui/react';
+import { Autocomplete as HeroAutocomplete } from '@heroui/react/autocomplete';
+import { Description } from '@heroui/react/description';
+import { FieldError } from '@heroui/react/field-error';
+import { Label } from '@heroui/react/label';
+import { ListBox as HeroListBox } from '@heroui/react/list-box';
+import { SearchField } from '@heroui/react/search-field';
+import { useFilter } from '@heroui/react/rac';
 import { cn } from '@/lib/helpers';
 
 type HeroAutocompleteProps = ComponentProps<typeof HeroAutocomplete>;

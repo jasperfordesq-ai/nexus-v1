@@ -20,7 +20,7 @@ import type { ErrorLogEntry } from '../../api/types';
 import { Button, Chip } from '@/components/ui';
 
 export function ErrorLogs() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   usePageTitle(t('enterprise.enterprise_dashboard_title'));
   const toast = useToast();
 

@@ -116,7 +116,7 @@ function relativeTime(iso: string, t: TFunction<'caring_community'>): string {
 
 export default function MunicipalityFeedbackAdminPage() {
   const { t } = useTranslation('caring_community');
-  const { t: tAdmin } = useTranslation('admin');
+  const { t: tAdmin } = useTranslation('admin_caring_community');
   const { user } = useAuth();
   const canManage = canManageCaring(user);
   usePageTitle(t('admin.feedback.title'));

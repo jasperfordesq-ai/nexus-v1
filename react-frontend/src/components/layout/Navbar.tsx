@@ -10,7 +10,7 @@
  * Theme-aware styling for light and dark modes.
  */
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { lazy, Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
@@ -67,11 +67,11 @@ import { useInstallPrompt,
   shouldOfferInstall,
   requestInstall } from '@/lib/installPrompt';
 import { useTranslation } from 'react-i18next';
-import { useAuth,
-  useTenant,
-  useNotifications,
-  useTheme,
-  useMenuContext } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
+import { useNotificationsOptional } from '@/contexts/NotificationsContext';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useMenuContext } from '@/contexts/MenuContext';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { hasAdminPanelAccess, hasBrokerPanelAccess, isPlatformSuperAdminUser } from '@/lib/access';
 import { buildAccessibleFrontendUrl } from '@/lib/accessible-frontend';
@@ -81,18 +81,35 @@ import { SearchOverlay } from '@/components/layout/SearchOverlay';
 import { MegaMenu } from '@/components/layout/MegaMenu';
 import { DesktopNavPanel, type DesktopNavPanelSection } from '@/components/layout/DesktopNavPanel';
 import { ThemePicker } from '@/components/layout/ThemePicker';
-import { NotificationFlyout } from '@/components/layout/NotificationFlyout';
 import { TenantLogo } from '@/components/branding';
-import { PresenceIndicator,
-  StatusSelector } from '@/components/social';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
 import type { TenantFeatures } from '@/types/api';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Avatar, Tooltip, Kbd } from '@/components/ui';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection } from '@/components/ui/Dropdown';
+import { Kbd } from '@/components/ui/Kbd';
+import { Tooltip } from '@/components/ui/Tooltip';
 interface IdentityStatusResponse {
   has_id_verified_badge: boolean;
 }
+
+const NotificationFlyout = lazy(() =>
+  import('@/components/layout/NotificationFlyout').then((module) => ({
+    default: module.NotificationFlyout,
+  })),
+);
+const PresenceIndicator = lazy(() =>
+  import('@/components/social/PresenceIndicator').then((module) => ({
+    default: module.PresenceIndicator,
+  })),
+);
+const StatusSelector = lazy(() =>
+  import('@/components/social/StatusSelector').then((module) => ({
+    default: module.StatusSelector,
+  })),
+);
 
 interface NavbarProps {
   /** Opens mobile drawer — only used for unauthenticated users (authenticated users use MobileTabBar) */
@@ -139,7 +156,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   const { t } = useTranslation(['common', 'broker']);
   const { user, isAuthenticated, logout } = useAuth();
   const { tenant, hasFeature, hasModule, tenantPath } = useTenant();
-  const { counts } = useNotifications();
+  const { counts } = useNotificationsOptional();
   const { resolvedTheme, toggleTheme } = useTheme();
   const { headerMenus, hasCustomMenus } = useMenuContext();
   const installState = useInstallPrompt();
@@ -885,11 +902,15 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   </div>
 
                   {/* Notification Flyout — rich popover instead of simple navigate */}
-                  <NotificationFlyout />
+                  <Suspense fallback={null}>
+                    <NotificationFlyout />
+                  </Suspense>
 
                   {/* Status Selector (small dot button) */}
                   <div className="hidden min-[390px]:block">
-                    <StatusSelector />
+                    <Suspense fallback={null}>
+                      <StatusSelector />
+                    </Suspense>
                   </div>
 
                   {/* User Dropdown */}
@@ -1007,7 +1028,11 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       </DropdownSection>
                       </DropdownMenu>
                     </Dropdown>
-                    {user?.id && <PresenceIndicator userId={user.id} size="lg" showOffline className="pointer-events-none" />}
+                    {user?.id && (
+                      <Suspense fallback={null}>
+                        <PresenceIndicator userId={user.id} size="lg" showOffline className="pointer-events-none" />
+                      </Suspense>
+                    )}
                   </div>
                 </>
               ) : (

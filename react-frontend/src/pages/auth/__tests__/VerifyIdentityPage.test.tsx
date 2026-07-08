@@ -69,6 +69,25 @@ vi.mock('@/contexts', () => ({
   useModule: vi.fn(() => true),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
+    user: { id: 1, first_name: 'Test', last_name: 'User', name: 'Test User', role: 'member', tenant_id: 2 },
+    isAuthenticated: true,
+    logout: vi.fn(),
+  })),
+}));
+
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: vi.fn(() => ({
+    tenant: { id: 2, name: 'Test Community', slug: 'test', configuration: {} },
+    tenantSlug: 'test',
+    branding: { name: 'Test Community' },
+    hasFeature: vi.fn(() => true),
+    hasModule: vi.fn(() => true),
+    tenantPath: (p: string) => `/test${p}`,
+  })),
+}));
+
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
@@ -255,7 +274,7 @@ describe('VerifyIdentityPage', () => {
 
   it('shows login prompt when not authenticated', async () => {
     // Override useAuth to return unauthenticated
-    const { useAuth } = await import('@/contexts');
+    const { useAuth } = await import('@/contexts/AuthContext');
     vi.mocked(useAuth).mockReturnValue({
       user: null,
       isAuthenticated: false,

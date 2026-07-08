@@ -10,16 +10,12 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
-import {
-  CloseButton as HeroUICloseButton,
-  Description,
-  FieldError,
-  Input as HeroUIInput,
-  Label,
-  TextField,
-  type InputProps as HeroUIInputProps,
-  type TextFieldProps,
-} from '@heroui/react';
+import { CloseButton as HeroUICloseButton } from '@heroui/react/close-button';
+import { Description } from '@heroui/react/description';
+import { FieldError } from '@heroui/react/field-error';
+import { Input as HeroUIInput, type InputProps as HeroUIInputProps } from '@heroui/react/input';
+import { Label } from '@heroui/react/label';
+import { TextField, type TextFieldProps } from '@heroui/react/textfield';
 
 type LegacyVariant = 'flat' | 'bordered' | 'underlined' | 'faded';
 type V3Variant = NonNullable<HeroUIInputProps['variant']>;

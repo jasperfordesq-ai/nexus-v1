@@ -47,7 +47,7 @@ interface StripeStatus {
 }
 
 export function PlanForm() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
   usePageTitle(t(isEdit ? 'content.plan_edit_page_title' : 'content.plan_create_page_title'));

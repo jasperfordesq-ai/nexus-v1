@@ -9,6 +9,7 @@ import App from './App';
 import './index.css';
 import i18n from './i18n'; // Initialize i18n before App renders
 import type { ErrorInfo, ReactNode } from 'react';
+import { queueSentryBreadcrumb } from '@/lib/telemetryQueue';
 
 // Log build version to console for deployment verification
 console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
@@ -18,24 +19,26 @@ console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
 import { installSupportDiagnosticsCapture } from '@/lib/supportDiagnostics';
 installSupportDiagnosticsCapture();
 
-function scheduleAfterFirstPaint(callback: () => void): void {
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => {
-      const idleWindow = window as Window & {
-        requestIdleCallback?: (idleCallback: IdleRequestCallback, options?: IdleRequestOptions) => number;
-      };
-      if (typeof idleWindow.requestIdleCallback === 'function') {
-        idleWindow.requestIdleCallback(callback, { timeout: 5000 });
-        return;
-      }
-      window.setTimeout(callback, 3000);
-    });
-  });
-}
+type IdleWindow = Window & {
+  requestIdleCallback?: (
+    callback: IdleRequestCallback,
+    options?: IdleRequestOptions,
+  ) => number;
+};
 
-function initTelemetryAfterIdle(): void {
-  scheduleAfterFirstPaint(() => {
-    void import('@/lib/sentry').then(({ initSentryAfterIdle }) => initSentryAfterIdle());
+function runAfterFirstPaintIdle(callback: () => void): void {
+  const scheduleIdle = () => {
+    const idleWindow = window as IdleWindow;
+    if (typeof idleWindow.requestIdleCallback === 'function') {
+      idleWindow.requestIdleCallback(callback, { timeout: 5000 });
+      return;
+    }
+
+    window.setTimeout(callback, 3000);
+  };
+
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(scheduleIdle);
   });
 }
 
@@ -45,9 +48,7 @@ function addTelemetryBreadcrumb(
   data: Record<string, unknown>,
   level: 'info' | 'warning' | 'error' = 'info',
 ): void {
-  void import('@/lib/sentry').then(({ addSentryBreadcrumb }) => {
-    addSentryBreadcrumb(message, category, data, level);
-  });
+  queueSentryBreadcrumb(message, category, data, level);
 }
 
 // Initialise the prerender readiness signal. Routes that load data and want a
@@ -134,26 +135,30 @@ if (import.meta.env.PROD) {
   navigator.serviceWorker?.addEventListener('controllerchange', safeReload);
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js', {
-      scope: '/',
-      updateViaCache: 'none',
-    }).then((registration) => {
-      const updateSW = async () => {
-        try { await registration.update(); } catch { /* non-blocking */ }
-      };
+    const registerServiceWorker = () => {
+      navigator.serviceWorker.register('/sw.js', {
+        scope: '/',
+        updateViaCache: 'none',
+      }).then((registration) => {
+        const updateSW = async () => {
+          try { await registration.update(); } catch { /* non-blocking */ }
+        };
 
-      // Periodically poll for SW updates so long-lived sessions eventually
-      // pick up new builds. updateViaCache:'none' on the registration
-      // guarantees this hits the network, not HTTP cache. When a new SW
-      // installs, skipWaiting + clientsClaim activate it immediately and the
-      // controllerchange listener above runs safeReload (deferred if editing).
-      setInterval(updateSW, 5 * 60 * 1000);
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') updateSW();
+        // Periodically poll for SW updates so long-lived sessions eventually
+        // pick up new builds. updateViaCache:'none' on the registration
+        // guarantees this hits the network, not HTTP cache. When a new SW
+        // installs, skipWaiting + clientsClaim activate it immediately and the
+        // controllerchange listener above runs safeReload (deferred if editing).
+        setInterval(updateSW, 5 * 60 * 1000);
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') updateSW();
+        });
+      }).catch(() => {
+        // PWA registration is optional - app works without it.
       });
-    }).catch(() => {
-      // PWA registration is optional — app works without it.
-    });
+    };
+
+    runAfterFirstPaintIdle(registerServiceWorker);
   }
 }
 
@@ -213,7 +218,6 @@ createRoot(document.getElementById('root')!).render(
     </RootErrorBoundary>
   </StrictMode>
 );
-initTelemetryAfterIdle();
 
 // Error fallback component
 function ErrorFallback() {

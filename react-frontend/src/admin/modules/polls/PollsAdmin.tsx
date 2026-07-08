@@ -76,7 +76,7 @@ function normalizePoll(item: RawPoll): Poll {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function PollsAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_polls');
   usePageTitle(t('polls.page_title'));
   const toast = useToast();
 

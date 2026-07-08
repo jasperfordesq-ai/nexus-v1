@@ -34,7 +34,7 @@ const formatPrice = (amount: number) => {
 };
 
 export function PlanSelector() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_billing');
   usePageTitle(t('billing.choose_plan'));
   const toast = useToast();
   const { tenantPath } = useTenant();

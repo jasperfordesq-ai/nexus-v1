@@ -139,7 +139,7 @@ const dataResidencyOptions: RetentionConfig['data_residency'][] = ['Switzerland'
 const legalBasisOptions = ['consent', 'contract', 'legal_obligation', 'legitimate_interest'];
 
 export function FadpAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_legal');
   usePageTitle(t('fadp.meta.page_title'));
   const toast = useToast();
 

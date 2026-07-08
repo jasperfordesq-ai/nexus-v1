@@ -64,7 +64,7 @@ const FEATURE_TOGGLE_KEYS: Array<{
 ];
 
 export function FederationTenantFeatures() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   const { tenantId } = useParams<{ tenantId: string }>();
   const numericTenantId = Number(tenantId);
   const toast = useToast();

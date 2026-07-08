@@ -10,13 +10,15 @@
  * inline form. Used by BookmarkButton on long-press (mobile) or secondary click.
  */
 
-import { useState, useCallback } from 'react';import { Separator } from '@/components/ui';
+import { useState, useCallback } from 'react';import { Separator } from '@/components/ui/Separator';
 import Plus from 'lucide-react/icons/plus';
 import FolderOpen from 'lucide-react/icons/folder-open';
 import Check from 'lucide-react/icons/check';
 import { useTranslation } from 'react-i18next';
 import { useBookmarkCollections } from '@/hooks/useBookmarkCollections';
-import { Button, Spinner, Input } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Spinner } from '@/components/ui/Spinner';
 
 interface BookmarkCollectionPickerProps {
   /** Currently selected collection ID (null = no collection) */

@@ -12,15 +12,12 @@ import {
   type ComponentProps,
   type ReactNode,
 } from 'react';
-import {
-  Description,
-  Dropdown as HeroDropdown,
-  Header,
-  Kbd,
-  Label,
-  Separator,
-  type Dropdown as HeroDropdownTypes,
-} from '@heroui/react';
+import { Description } from '@heroui/react/description';
+import { Dropdown as HeroDropdown, type Dropdown as HeroDropdownTypes } from '@heroui/react/dropdown';
+import { Header } from '@heroui/react/header';
+import { Kbd } from '@heroui/react/kbd';
+import { Label } from '@heroui/react/label';
+import { Separator } from '@heroui/react/separator';
 import { cn } from '@/lib/helpers';
 
 type HeroDropdownProps = ComponentProps<typeof HeroDropdown>;

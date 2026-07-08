@@ -6,7 +6,7 @@
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
 import { Button } from '@/components/ui/Button';
 
 interface MarketplaceEmptyStateProps {

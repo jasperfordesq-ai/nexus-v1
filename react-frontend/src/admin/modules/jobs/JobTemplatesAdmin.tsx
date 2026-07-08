@@ -68,7 +68,7 @@ const typeColors: Record<string, 'primary' | 'success' | 'secondary' | 'default'
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function JobTemplatesAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_jobs');
   usePageTitle(t('jobs.templates_page_title'));
   const toast = useToast();
 

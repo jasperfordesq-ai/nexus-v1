@@ -61,7 +61,7 @@ interface VolApplication {
 }
 
 export function VolunteerApprovals() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.volunteer_approvals_title'));
   const toast = useToast();
   const [items, setItems] = useState<VolApplication[]>([]);

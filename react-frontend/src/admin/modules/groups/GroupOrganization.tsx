@@ -66,7 +66,7 @@ const EMPTY_COLLECTION_FORM = { name: '', description: '', image_url: '', sort_o
 const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleDateString() : '—');
 
 export default function GroupOrganization() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   usePageTitle(t('group_organization.page_title'));
   const { success, error } = useToast();
 

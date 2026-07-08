@@ -68,7 +68,7 @@ const STAGE_COLOR: Record<Stage, 'default' | 'primary' | 'warning' | 'success' |
 };
 
 export default function LeadNurtureAdminPage() {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t } = useTranslation(['admin_caring_community', 'common']);
   const confirm = useConfirm();
   usePageTitle(t('lead_nurture.meta.page_title'));
   const { showToast } = useToast();

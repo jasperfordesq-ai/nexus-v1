@@ -49,7 +49,7 @@ interface PlatformInfrastructureProps {
 }
 
 export default function PlatformInfrastructure({ config: _config, onConfigChange: _onConfigChange }: PlatformInfrastructureProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_config');
   const toast = useToast();
   const { refreshTenant, supportedLanguages, defaultLanguage, hasFeature } = useTenant();
 

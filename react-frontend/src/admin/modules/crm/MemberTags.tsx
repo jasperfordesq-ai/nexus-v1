@@ -58,7 +58,7 @@ const formatDate = (dateStr: string) => {
 
 export function MemberTags() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_crm');
   useAdminPageMeta({ title: tNav('crm') });
   const { tenantPath } = useTenant();
   const toast = useToast();

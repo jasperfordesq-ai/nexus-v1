@@ -15,7 +15,7 @@ import { Tooltip } from '@/components/ui/Tooltip';
  * Groups Page - Community groups listing
  */
 
-import { useState, useEffect, useCallback, useRef, memo } from 'react';
+import { lazy, Suspense, useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
@@ -31,12 +31,13 @@ import { useTranslation } from 'react-i18next';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
-import { RecommendedGroups } from './components/RecommendedGroups';
-import { useAuth, useToast, useTenant } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
+import { useTenant } from '@/contexts/TenantContext';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
-import { usePageTitle } from '@/hooks';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import type { Group } from '@/types/api';
 
@@ -45,6 +46,11 @@ type GroupFilter = 'all' | 'joined' | 'public' | 'private';
 const ITEMS_PER_PAGE = 20;
 const SEARCH_DEBOUNCE_MS = 300;
 const MAX_VISIBLE_TAGS = 3;
+const RecommendedGroups = lazy(() =>
+  import('./components/RecommendedGroups').then((module) => ({
+    default: module.RecommendedGroups,
+  })),
+);
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -314,7 +320,11 @@ export function GroupsPage() {
       </GlassCard>
 
       {/* Smart Matching group recommendations */}
-      <RecommendedGroups />
+      {isAuthenticated && (
+        <Suspense fallback={null}>
+          <RecommendedGroups />
+        </Suspense>
+      )}
 
       {/* Error State */}
       {error && !isLoading && (

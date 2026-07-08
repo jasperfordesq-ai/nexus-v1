@@ -183,7 +183,7 @@ export function PartnerPage() {
               <picture>
                 <source srcSet="/images/Timebanking-UK-and-Timebank-Ireland-Partners.webp" type="image/webp" />
                 <img
-                  src="/images/Timebanking-UK-and-Timebank-Ireland-Partners.png"
+                  src="/images/Timebanking-UK-and-Timebank-Ireland-Partners.webp"
                   alt={t('partner.together_banner_alt')}
                   className="w-full h-auto rounded-lg"
                   loading="eager"
@@ -249,7 +249,7 @@ export function PartnerPage() {
               <picture>
                 <source srcSet="/images/project-nexus-logo.webp" type="image/webp" />
                 <img
-                  src="/images/project-nexus-logo.png"
+                  src="/images/project-nexus-logo.webp"
                   alt={t('partner.tech_partner_logo_alt')}
                   className="w-64 sm:w-80 mx-auto mb-6"
                   loading="lazy"
@@ -370,7 +370,7 @@ export function PartnerPage() {
               <picture>
                 <source srcSet="/images/timebank_ireland_west_cork_partnership.webp" type="image/webp" />
                 <img
-                  src="/images/timebank_ireland_west_cork_partnership.jpg"
+                  src="/images/timebank_ireland_west_cork_partnership.webp"
                   alt={t('partner.partners_banner_alt')}
                   className="w-full max-w-3xl mx-auto rounded-lg bg-white p-4"
                   loading="lazy"

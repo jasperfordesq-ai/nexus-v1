@@ -22,7 +22,7 @@ import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminComment } from '@/admin/api/types';
 
 export default function CommentsModeration() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_moderation');
   usePageTitle(t('moderation.page_title'));
 
   const CONTENT_TYPES = [

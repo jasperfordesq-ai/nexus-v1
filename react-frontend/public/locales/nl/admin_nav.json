@@ -512,5 +512,79 @@
   },
   "aria": {
     "breadcrumbs": "Broodkruimels"
+  },
+  "shared": {
+    "loading": "Loading",
+    "help": "Help",
+    "open_page_help": "Paginahulp openen",
+    "search": "Zoekopdracht...",
+    "refresh": "Vernieuwen",
+    "total_count": "{{count}}totaal",
+    "data_table": "Gegevens",
+    "select_all_rows": "Select all rows",
+    "no_data": "Geen gegevens",
+    "no_data_available": "Geen gegevens beschikbaar",
+    "select_row": "Select row {{id}}"
+  },
+  "help_drawer": {
+    "aria_label": "Hulp: {{title}}",
+    "close_panel": "Sluit het helppaneel",
+    "how_to_use": "Hoe deze pagina te gebruiken",
+    "label": "Hulp",
+    "related_pages": "Gerelateerde pagina's",
+    "tips": "Tips en valkuilen"
+  },
+  "bulk": {
+    "selected_count": "{{count}} geselecteerd",
+    "clear_selection": "Duidelijke selectie",
+    "confirm_title": "Bevestig {{action}}",
+    "confirm_message": "Weet u zeker dat u {{action}} {{count}}-items wilt hebben?",
+    "destructive_warning": "Deze actie kan niet ongedaan worden gemaakt.",
+    "reason_label": "Reden",
+    "reason_placeholder": "Geef een reden voor deze actie"
+  },
+  "common": {
+    "cancel": "Annuleer"
+  },
+  "icon_picker": {
+    "choose_icon": "Kies Pictogram",
+    "choose_icon_placeholder": "Zoek naar een pictogram...",
+    "clear_icon": "Duidelijk pictogram",
+    "label": "Icoon",
+    "no_icons_found": "Geen iconen gevonden die overeenkomen met \"{{search}}\"",
+    "search_for_icon": "Zoek naar een pictogram...",
+    "search_icons": "Zoek iconen"
+  },
+  "visibility_rules": {
+    "min_role": "Minimale rol",
+    "requires_auth": "Vereist authenticatie",
+    "requires_feature": "Vereist functie",
+    "title": "Zichtbaarheidsregels",
+    "roles": {
+      "any": "Elke",
+      "user": "Gebruiker",
+      "admin": "Beheerder",
+      "tenant_admin": "Huurder beheerder",
+      "super_admin": "Super beheerder"
+    },
+    "features": {
+      "none": "Geen",
+      "events": "Evenementen",
+      "groups": "Groepen",
+      "gamification": "Gamificatie",
+      "goals": "Doelen",
+      "blog": "Bloggen",
+      "resources": "Hulpbronnen",
+      "volunteering": "Vrijwilligerswerk",
+      "exchange_workflow": "Uitwisselingsworkflow",
+      "organisations": "Organisaties",
+      "federation": "Federatie",
+      "connections": "Verbindingen",
+      "reviews": "Recensies",
+      "polls": "Opiniepeilingen",
+      "direct_messaging": "Directe berichtenuitwisseling",
+      "group_exchanges": "Groepsuitwisselingen",
+      "search": "Zoeken"
+    }
   }
 }

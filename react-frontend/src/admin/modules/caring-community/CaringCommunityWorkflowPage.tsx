@@ -791,7 +791,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
 const formatHours = (value: number) => `${Number(value.toFixed(1))} h`;
 
 export default function CaringCommunityWorkflowPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   const { tenantPath } = useTenant();
   const toast = useToast();
   usePageTitle(t('caring_workflow.meta.page_title'));
@@ -2817,7 +2817,7 @@ function PrintableInviteCard({
   inviteUrl: string;
   expiresAt: string;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
 
   return (
     <div className="mx-auto max-w-[400px] rounded-xl border-[3px] border-foreground p-8 text-center font-serif">

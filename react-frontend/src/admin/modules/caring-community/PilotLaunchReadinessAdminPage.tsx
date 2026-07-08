@@ -114,7 +114,7 @@ function isReadinessReport(value: unknown): value is ReadinessReport {
 }
 
 export default function PilotLaunchReadinessAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('pilot_launch_readiness.meta.page_title'));
   const { showToast } = useToast();
 

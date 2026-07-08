@@ -85,6 +85,65 @@ vi.mock('@/components/ui', async (importOriginal) => {
 });
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
+vi.mock('@/components/ui/Switch', () => ({
+  Switch: ({
+    children,
+    isSelected,
+    onValueChange,
+    size: _size,
+  }: {
+    children?: React.ReactNode;
+    isSelected?: boolean;
+    onValueChange?: (v: boolean) => void;
+    size?: string;
+  }) => (
+    <label>
+      <input
+        type="checkbox"
+        checked={!!isSelected}
+        onChange={(e) => onValueChange?.(e.target.checked)}
+        data-testid="switch-requires-auth"
+      />
+      {children}
+    </label>
+  ),
+}));
+
+vi.mock('@/components/ui/Select', () => ({
+  Select: ({
+    children,
+    label,
+    selectedKeys,
+    onSelectionChange,
+    size: _size,
+    className: _className,
+  }: {
+    children?: React.ReactNode;
+    label?: string;
+    selectedKeys?: Iterable<string>;
+    onSelectionChange?: (keys: Set<string>) => void;
+    size?: string;
+    className?: string;
+  }) => {
+    const current = selectedKeys ? Array.from(selectedKeys)[0] ?? '' : '';
+    return (
+      <div>
+        {label && <label>{label}</label>}
+        <select
+          data-testid={`select-${(label ?? '').toLowerCase().replace(/\s+/g, '-')}`}
+          value={current}
+          onChange={(e) => onSelectionChange?.(new Set([e.target.value]))}
+        >
+          {children}
+        </select>
+      </div>
+    );
+  },
+  SelectItem: ({ children, id }: { children?: React.ReactNode; id?: string }) => (
+    <option value={id ?? ''}>{children}</option>
+  ),
+}));
+
 import type { VisibilityRules } from '@/types/menu';
 
 // ─────────────────────────────────────────────────────────────────────────────

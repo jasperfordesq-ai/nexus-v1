@@ -58,6 +58,63 @@ vi.mock('@/components/ui', async (importOriginal) => {
 });
 
 // ─── Types matching the component ─────────────────────────────────────────────
+vi.mock('@/components/ui/Table', () => ({
+  Table: ({ children, topContent, bottomContent, ...rest }: { children: React.ReactNode; topContent?: React.ReactNode; bottomContent?: React.ReactNode; [key: string]: unknown }) =>
+    <div data-testid="table-wrapper" aria-label={(rest['aria-label'] as string | undefined) ?? 'table'}>
+      {topContent && <div data-testid="top-content">{topContent}</div>}
+      <table role="table">{children}</table>
+      {bottomContent && <div data-testid="bottom-content">{bottomContent}</div>}
+    </div>,
+  TableHeader: ({ children }: { children: React.ReactNode }) => <thead><tr>{children}</tr></thead>,
+  TableColumn: ({ children }: { children: React.ReactNode; [key: string]: unknown }) => <th scope="col" aria-label={typeof children === 'string' ? children : undefined}>{children}</th>,
+  TableBody: ({ children, isLoading, loadingContent, emptyContent }: { children: React.ReactNode; isLoading?: boolean; loadingContent?: React.ReactNode; emptyContent?: React.ReactNode }) => {
+    if (isLoading) return <tbody><tr><td>{loadingContent}</td></tr></tbody>;
+    const childArr = React.Children.toArray(children);
+    if (childArr.length === 0) return <tbody><tr><td>{emptyContent}</td></tr></tbody>;
+    return <tbody>{children}</tbody>;
+  },
+  TableRow: ({ children, ...rest }: { children: React.ReactNode; [key: string]: unknown }) => <tr data-id={rest['id'] as string | undefined}>{children}</tr>,
+  TableCell: ({ children }: { children: React.ReactNode }) => <td>{children}</td>,
+}));
+
+vi.mock('@/components/ui/Input', () => ({
+  Input: ({ value, onValueChange, placeholder, 'aria-label': ariaLabel }: { value?: string; onValueChange?: (v: string) => void; placeholder?: string; 'aria-label'?: string; [key: string]: unknown }) =>
+    <input
+      aria-label={ariaLabel ?? placeholder}
+      placeholder={placeholder}
+      value={value ?? ''}
+      onChange={(e) => onValueChange?.(e.target.value)}
+    />,
+}));
+
+vi.mock('@/components/ui/Button', () => ({
+  Button: ({ children, onPress, 'aria-label': ariaLabel }: { children?: React.ReactNode; onPress?: () => void; 'aria-label'?: string; isIconOnly?: boolean; [key: string]: unknown }) =>
+    <button type="button" aria-label={ariaLabel ?? (typeof children === 'string' ? children : undefined)} onClick={() => onPress?.()}>{children}</button>,
+}));
+
+vi.mock('@/components/ui/Checkbox', () => ({
+  Checkbox: ({ 'aria-label': ariaLabel }: { 'aria-label'?: string; [key: string]: unknown }) =>
+    <input type="checkbox" aria-label={ariaLabel} />,
+}));
+
+vi.mock('@/components/ui/Chip', () => ({
+  Chip: ({ children, color }: { children: React.ReactNode; color?: string }) =>
+    <span data-testid="chip" data-color={color}>{children}</span>,
+}));
+
+vi.mock('@/components/ui/Pagination', () => ({
+  Pagination: ({ page, total, onChange }: { page: number; total: number; onChange?: (p: number) => void }) =>
+    <nav aria-label="pagination">
+      <button type="button" onClick={() => onChange?.(page - 1)} disabled={page <= 1}>Prev</button>
+      <span>{page}/{total}</span>
+      <button type="button" onClick={() => onChange?.(page + 1)} disabled={page >= total}>Next</button>
+    </nav>,
+}));
+
+vi.mock('@/components/ui/Spinner', () => ({
+  Spinner: () => <span role="status" aria-busy="true">Loading...</span>,
+}));
+
 type RowData = { id: number; name: string; status: string; age?: number };
 
 const COLUMNS = [

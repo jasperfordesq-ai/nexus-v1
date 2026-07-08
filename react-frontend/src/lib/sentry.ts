@@ -43,6 +43,15 @@ let sentryModule: SentryModule | null = null;
 let sentryLoading: Promise<SentryModule | null> | null = null;
 let hasInitialized = false;
 let idleInitHandle: number | null = null;
+let pendingUser: User | null | undefined;
+let pendingTenant: TenantInfo | null | undefined;
+const pendingBreadcrumbs: Array<{
+  message: string;
+  category: string;
+  data: Record<string, unknown>;
+  level: SeverityLevel;
+}> = [];
+const MAX_PENDING_BREADCRUMBS = 25;
 
 type IdleWindow = Window & {
   requestIdleCallback?: (
@@ -75,6 +84,42 @@ function sensitiveFields(): string[] {
     'refresh_token',
     'access_token',
   ];
+}
+
+function applySentryUser(Sentry: SentryModule, user: User | null): void {
+  Sentry.setUser(user ? { id: String(user.id) } : null);
+}
+
+function applySentryTenant(Sentry: SentryModule, tenant: TenantInfo | null): void {
+  if (!tenant) {
+    Sentry.setContext('tenant', null);
+    return;
+  }
+
+  Sentry.setTag('tenant_id', String(tenant.id));
+  Sentry.setTag('tenant_name', tenant.name);
+  Sentry.setTag('tenant_slug', tenant.slug);
+  Sentry.setContext('tenant', {
+    id: tenant.id,
+    name: tenant.name,
+    slug: tenant.slug,
+  });
+}
+
+function flushPendingTelemetry(Sentry: SentryModule): void {
+  if (pendingUser !== undefined) {
+    applySentryUser(Sentry, pendingUser);
+    pendingUser = undefined;
+  }
+
+  if (pendingTenant !== undefined) {
+    applySentryTenant(Sentry, pendingTenant);
+    pendingTenant = undefined;
+  }
+
+  for (const breadcrumb of pendingBreadcrumbs.splice(0)) {
+    Sentry.addBreadcrumb(breadcrumb);
+  }
 }
 
 async function loadSentry(): Promise<SentryModule | null> {
@@ -152,6 +197,7 @@ async function loadAndInitializeSentry(): Promise<void> {
   Sentry.setTag('app_component', 'frontend');
   Sentry.setTag('build_commit', __BUILD_COMMIT__);
   Sentry.setTag('build_time', __BUILD_TIME__);
+  flushPendingTelemetry(Sentry);
 }
 
 export function initSentry(): void {
@@ -187,24 +233,27 @@ export function initSentryAfterIdle(): void {
 
 export function setSentryUser(user: User | null): void {
   if (!IS_ENABLED) return;
+  if (!hasInitialized) {
+    pendingUser = user;
+    return;
+  }
+
   void loadSentry().then((Sentry) => {
     if (!Sentry) return;
-    Sentry.setUser(user ? { id: String(user.id) } : null);
+    applySentryUser(Sentry, user);
   });
 }
 
 export function setSentryTenant(tenant: TenantInfo | null): void {
-  if (!IS_ENABLED || !tenant) return;
+  if (!IS_ENABLED) return;
+  if (!hasInitialized) {
+    pendingTenant = tenant;
+    return;
+  }
+
   void loadSentry().then((Sentry) => {
     if (!Sentry) return;
-    Sentry.setTag('tenant_id', String(tenant.id));
-    Sentry.setTag('tenant_name', tenant.name);
-    Sentry.setTag('tenant_slug', tenant.slug);
-    Sentry.setContext('tenant', {
-      id: tenant.id,
-      name: tenant.name,
-      slug: tenant.slug,
-    });
+    applySentryTenant(Sentry, tenant);
   });
 }
 
@@ -215,6 +264,14 @@ export function addSentryBreadcrumb(
   level: SeverityLevel = 'info',
 ): void {
   if (!IS_ENABLED) return;
+  if (!hasInitialized) {
+    pendingBreadcrumbs.push({ message, category, data, level });
+    if (pendingBreadcrumbs.length > MAX_PENDING_BREADCRUMBS) {
+      pendingBreadcrumbs.shift();
+    }
+    return;
+  }
+
   void loadSentry().then((Sentry) => {
     Sentry?.addBreadcrumb({ message, category, data, level });
   });

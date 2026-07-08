@@ -140,7 +140,7 @@ function getEventConfig(type: string, t: (key: string, defaultValue?: string) =>
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function TimelineItem({ item }: { item: ActivityItem }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   const config = getEventConfig(item.type, ((key: string) => t(key)) as (key: string, defaultValue?: string) => string);
   const Icon = config.icon;
 
@@ -228,7 +228,7 @@ function TimelineItem({ item }: { item: ActivityItem }) {
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function ActivityFeed() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   usePageTitle(t('federation.activity_feed_title'));
 
   // Data

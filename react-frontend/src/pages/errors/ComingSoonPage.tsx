@@ -15,8 +15,8 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Construction from 'lucide-react/icons/construction';
 import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';
-import { useTenant } from '@/contexts';
-import { usePageTitle } from '@/hooks';
+import { useTenant } from '@/contexts/TenantContext';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 interface ComingSoonPageProps {
   feature?: string;

@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  SearchField as HeroUISearchField,
-  type SearchFieldProps as HeroUISearchFieldProps,
-} from '@heroui/react';
+import { SearchField as HeroUISearchField, type SearchFieldProps as HeroUISearchFieldProps } from '@heroui/react/search-field';
 import type { ReactNode } from 'react';
 
 type LegacyVariant = 'flat' | 'bordered' | 'underlined' | 'faded';

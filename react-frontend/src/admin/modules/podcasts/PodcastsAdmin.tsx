@@ -132,7 +132,7 @@ function formatDate(value?: string | null): string {
 
 
 export default function PodcastsAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_podcasts');
   usePageTitle(t('podcasts_admin.title'));
   const toast = useToast();
 

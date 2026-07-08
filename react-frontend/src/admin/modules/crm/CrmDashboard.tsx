@@ -54,7 +54,7 @@ const QUICK_ACTIONS = [
 
 export function CrmDashboard() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_crm');
   useAdminPageMeta({ title: tNav('crm') });
   const { tenantPath } = useTenant();
   const toast = useToast();

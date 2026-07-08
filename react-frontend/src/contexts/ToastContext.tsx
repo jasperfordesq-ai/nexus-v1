@@ -5,21 +5,20 @@
 
 /**
  * Toast Notification Context
- * Provides global toast notifications for API errors and user feedback
+ * Provides global toast notifications for API errors and user feedback.
  */
 
-import { createContext, use, useState, useCallback, useMemo, useRef, type ReactNode, type Ref } from 'react';
-import { motion, AnimatePresence } from '@/lib/motion';import X from 'lucide-react/icons/x';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import AlertCircle from 'lucide-react/icons/circle-alert';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import Info from 'lucide-react/icons/info';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────────────────────
+import {
+  createContext,
+  lazy,
+  Suspense,
+  use,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -43,33 +42,22 @@ interface ToastContextType {
   showToast: (title: string, type?: ToastType, message?: string) => void;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Context
-// ─────────────────────────────────────────────────────────────────────────────
-
 const ToastContext = createContext<ToastContextType | null>(null);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Provider
-// ─────────────────────────────────────────────────────────────────────────────
+const ToastViewport = lazy(() => import('@/components/feedback/ToastViewport'));
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
   const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
     const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    // Errors stay longer so screen-reader users finish hearing them before
-    // auto-dismiss, and so a user who looks up partway through an error
-    // can still read the full message.
     const duration = toast.duration ?? (toast.type === 'error' ? 9000 : 4000);
 
     setToasts((prev) => [...prev, { ...toast, id }]);
 
-    // Auto-remove after duration
     if (duration > 0) {
       setTimeout(() => removeToast(id), duration);
     }
@@ -103,14 +91,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <ToastContainer toasts={toasts} onRemove={removeToast} />
+      {toasts.length > 0 && (
+        <Suspense fallback={null}>
+          <ToastViewport toasts={toasts} onRemove={removeToast} />
+        </Suspense>
+      )}
     </ToastContext.Provider>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Hook
-// ─────────────────────────────────────────────────────────────────────────────
 
 export function useToast(): ToastContextType {
   const context = use(ToastContext);
@@ -118,13 +106,8 @@ export function useToast(): ToastContextType {
     throw new Error('useToast must be used within a ToastProvider');
   }
 
-  // Return a STABLE object reference to prevent infinite loops.
-  // Problem: 33+ components use `const toast = useToast()` then `useCallback(fn, [toast])`.
-  // If the returned object changes when toasts are added (which it does, since the context
-  // value includes the `toasts` array), any useCallback depending on it gets recreated,
-  // causing useEffects to re-fire → API calls → toast.error() → new toast → loop.
-  // Fix: useMemo keyed only on the stable useCallback-wrapped methods.
-  // `toasts` is accessed via ref so reads are always current without invalidating the memo.
+  // Keep the returned object stable so callbacks depending on `toast` do not
+  // restart effects whenever the toast list changes.
   const ref = useRef(context);
   ref.current = context;
 
@@ -140,140 +123,16 @@ export function useToast(): ToastContextType {
       show: context.show,
       showToast: context.showToast,
     }),
-    [context.addToast, context.removeToast, context.success, context.error, context.warning, context.info, context.show, context.showToast],
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Toast Container Component
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface ToastContainerProps {
-  toasts: Toast[];
-  onRemove: (id: string) => void;
-}
-
-function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
-  const { t } = useTranslation('common');
-
-  // Split toasts into two groups so each live region can use the correct
-  // politeness setting.  Nesting role="alert" (assertive) inside an
-  // aria-live="polite" parent produces inconsistent AT behaviour — some
-  // screen readers honour the parent's politeness for all descendants.
-  // Keeping the two regions separate gives reliable cross-AT semantics.
-  const urgentToasts = toasts.filter((t) => t.type === 'error' || t.type === 'warning');
-  const politeToasts = toasts.filter((t) => t.type === 'success' || t.type === 'info');
-
-  return (
-    <div
-      className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none"
-    >
-      {/* Assertive region — errors and warnings that must interrupt the user */}
-      <div
-        role="alert"
-        aria-live="assertive"
-        aria-label={t('toast.aria_urgent_notifications')}
-        aria-atomic="false"
-        className="flex flex-col gap-2"
-      >
-        <AnimatePresence mode="popLayout">
-          {urgentToasts.map((toast) => (
-            <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
-          ))}
-        </AnimatePresence>
-      </div>
-
-      {/* Polite region — success and info that announce after current speech finishes */}
-      <div
-        role="status"
-        aria-label={t('toast.aria_notifications')}
-        aria-live="polite"
-        aria-atomic="false"
-        className="flex flex-col gap-2"
-      >
-        <AnimatePresence mode="popLayout">
-          {politeToasts.map((toast) => (
-            <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
-          ))}
-        </AnimatePresence>
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Toast Item Component
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface ToastItemProps {
-  toast: Toast;
-  onRemove: (id: string) => void;
-}
-
-const config = {
-  success: {
-    icon: CheckCircle,
-    bgColor: 'bg-emerald-500/20',
-    borderColor: 'border-emerald-500/40',
-    iconColor: 'text-emerald-400',
-  },
-  error: {
-    icon: AlertCircle,
-    bgColor: 'bg-red-500/20',
-    borderColor: 'border-red-500/40',
-    iconColor: 'text-red-400',
-  },
-  warning: {
-    icon: AlertTriangle,
-    bgColor: 'bg-amber-500/20',
-    borderColor: 'border-amber-500/40',
-    iconColor: 'text-amber-400',
-  },
-  info: {
-    icon: Info,
-    bgColor: 'bg-blue-500/20',
-    borderColor: 'border-blue-500/40',
-    iconColor: 'text-blue-400',
-  },
-};
-
-function ToastItem({ toast, onRemove, ref }: ToastItemProps & { ref?: Ref<HTMLDivElement> }) {
-  const { t } = useTranslation('common');
-
-  const { icon: Icon, borderColor, iconColor } = config[toast.type];
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, x: 100, scale: 0.95 }}
-      className={`
-        pointer-events-auto
-        bg-slate-900 ${borderColor}
-        border rounded-lg
-        p-4 shadow-lg
-      `}
-    >
-      <div className="flex items-start gap-3">
-        <Icon className={`w-5 h-5 ${iconColor} flex-shrink-0 mt-0.5`} aria-hidden="true" />
-        <div className="flex-1 min-w-0">
-          <p className="font-medium text-white text-sm">{toast.title}</p>
-          {toast.message && (
-            <p className="text-white/60 text-sm mt-1">{toast.message}</p>
-          )}
-        </div>
-        <Button
-          variant="light"
-          isIconOnly
-          onPress={() => onRemove(toast.id)}
-          className="text-white/40 hover:text-white transition-colors flex-shrink-0 min-w-0 min-h-9 p-0"
-          aria-label={t('toast.aria_dismiss_notification')}
-        >
-          <X className="w-4 h-4" />
-        </Button>
-      </div>
-    </motion.div>
+    [
+      context.addToast,
+      context.removeToast,
+      context.success,
+      context.error,
+      context.warning,
+      context.info,
+      context.show,
+      context.showToast,
+    ],
   );
 }
 

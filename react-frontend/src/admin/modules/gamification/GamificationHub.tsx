@@ -36,7 +36,7 @@ import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GamificationHub() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_gamification');
   usePageTitle(t('gamification.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

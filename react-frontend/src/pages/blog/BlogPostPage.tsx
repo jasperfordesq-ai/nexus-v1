@@ -30,7 +30,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { Breadcrumbs } from '@/components/navigation';
 import { Helmet } from 'react-helmet-async';
 import { PageMeta } from '@/components/seo';
-import { SocialInteractionPanel } from '@/components/social';
+import { SocialInteractionPanel } from '@/components/social/SocialInteractionPanel';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';

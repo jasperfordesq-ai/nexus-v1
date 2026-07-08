@@ -5,7 +5,7 @@
 
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
 
 /**
  * SeoHead — Global SEO tags rendered on every page via Layout.

@@ -49,7 +49,7 @@ const visibilityIcons: Record<string, typeof Eye> = {
 };
 
 export function GroupList() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   usePageTitle(t('groups.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();

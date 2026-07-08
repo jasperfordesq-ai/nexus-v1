@@ -24,7 +24,7 @@ import XCircle from 'lucide-react/icons/circle-x';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Megaphone from 'lucide-react/icons/megaphone';
 import { SafeHtml } from '@/components/ui/SafeHtml';
-import { LocationMapCard } from '@/components/location';
+import { LocationMapCard } from '@/components/location/LocationMapCard';
 import { resolveAvatarUrl, resolveThumbnailUrl, formatDateValue, formatRelativeTime } from '@/lib/helpers';
 import type { Group } from '@/types/api';
 

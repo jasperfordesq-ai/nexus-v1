@@ -19,9 +19,10 @@ import Target from 'lucide-react/icons/target';
 import Heart from 'lucide-react/icons/heart';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
 import type { TenantFeatures, TenantModules } from '@/types/api';
-import { Button, Modal, ModalContent, ModalBody } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Modal, ModalContent, ModalBody } from '@/components/ui/Modal';
 
 interface QuickCreateMenuProps {
   isOpen: boolean;

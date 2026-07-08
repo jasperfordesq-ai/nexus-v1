@@ -9,15 +9,16 @@
  * Supports optimistic updates.
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { lazy, Suspense, useState, useCallback, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from '@/lib/motion';import Bookmark from 'lucide-react/icons/bookmark';
 import BookmarkCheck from 'lucide-react/icons/bookmark-check';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useLongPress } from '@/hooks/useLongPress';
-import { BookmarkCollectionPicker } from './BookmarkCollectionPicker';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+
+const BookmarkCollectionPicker = lazy(() => import('./BookmarkCollectionPicker').then((module) => ({ default: module.BookmarkCollectionPicker })));
 
 export interface BookmarkButtonProps {
   type: string;
@@ -159,11 +160,13 @@ export function BookmarkButton({
             transition={{ type: 'spring', stiffness: 400, damping: 25 }}
             className="absolute top-full right-0 mt-2 z-50 rounded-xl bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl shadow-black/20 p-1"
           >
-            <BookmarkCollectionPicker
-              selectedId={collectionId}
-              onSelect={handleCollectionSelect}
-              onClose={() => setIsPickerOpen(false)}
-            />
+            <Suspense fallback={null}>
+              <BookmarkCollectionPicker
+                selectedId={collectionId}
+                onSelect={handleCollectionSelect}
+                onClose={() => setIsPickerOpen(false)}
+              />
+            </Suspense>
           </motion.div>
         )}
       </AnimatePresence>

@@ -61,7 +61,7 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default
 const reviewStatuses = ['approved', 'rejected', 'under_review'] as const;
 
 export default function VolunteerProjects() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.projects_title'));
   const toast = useToast();
   const navigate = useNavigate();

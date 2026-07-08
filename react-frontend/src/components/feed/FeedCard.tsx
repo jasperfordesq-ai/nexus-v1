@@ -18,7 +18,7 @@ import { Tooltip } from '@/components/ui/Tooltip';
  * Extracted from FeedPage.tsx for maintainability.
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useRef, useCallback } from 'react';
 import {
   Link } from 'react-router-dom';
 import { motion,
@@ -68,14 +68,16 @@ import { TranslateButton } from '@/components/i18n/TranslateButton';
 import { ImageCarousel } from './ImageCarousel';
 import { MediaGrid } from './MediaGrid';
 import { VideoPlayer } from './VideoPlayer';
-import { ReactionPicker, ReactionSummary, type ReactionType } from '@/components/social';
-import { CommentsSection } from '@/components/social/CommentsSection';
+import { ReactionPicker, type ReactionType } from '@/components/social/ReactionPicker';
+import { ReactionSummary } from '@/components/social/ReactionSummary';
 import { LinkPreviewCard } from '@/components/social/LinkPreviewCard';
-import { UserHoverCard } from '@/components/social/UserHoverCard';
+import { DeferredUserHoverCard } from '@/components/social/DeferredUserHoverCard';
 import { ShareButton, SharedByAttribution } from './ShareButton';
 import { QuotedPostEmbed } from './QuotedPostEmbed';
-import { BookmarkButton } from '@/components/social';
-import { PostAnalyticsModal } from './PostAnalyticsModal';
+import { BookmarkButton } from '@/components/social/BookmarkButton';
+
+const CommentsSection = lazy(() => import('@/components/social/CommentsSection').then((module) => ({ default: module.CommentsSection })));
+const PostAnalyticsModal = lazy(() => import('./PostAnalyticsModal').then((module) => ({ default: module.PostAnalyticsModal })));
 
 /* ───────────────────────── Props ───────────────────────── */
 
@@ -561,7 +563,7 @@ const FeedCard = React.memo(function FeedCard({
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <UserHoverCard userId={author.id}>
+            <DeferredUserHoverCard userId={author.id}>
               <Link to={tenantPath(`/profile/${author.id}`)} className="relative">
                 <Avatar
                   name={author.name}
@@ -571,17 +573,17 @@ const FeedCard = React.memo(function FeedCard({
                   isBordered
                 />
               </Link>
-            </UserHoverCard>
+            </DeferredUserHoverCard>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <UserHoverCard userId={author.id}>
+                <DeferredUserHoverCard userId={author.id}>
                   <Link
                     to={tenantPath(`/profile/${author.id}`)}
                     className="font-semibold text-theme-primary hover:text-accent transition-colors text-sm truncate"
                   >
                     {author.name}
                   </Link>
-                </UserHoverCard>
+                </DeferredUserHoverCard>
                 {typeLabel && (
                   detailPath ? (
                     <Link to={tenantPath(detailPath)} onClick={recordClick}>
@@ -1651,11 +1653,13 @@ const FeedCard = React.memo(function FeedCard({
 
         {/* Post Analytics Modal */}
         {showAnalytics && canViewAnalytics && (
-          <PostAnalyticsModal
-            isOpen={showAnalytics}
-            onClose={() => setShowAnalytics(false)}
-            postId={item.id}
-          />
+          <Suspense fallback={null}>
+            <PostAnalyticsModal
+              isOpen={showAnalytics}
+              onClose={() => setShowAnalytics(false)}
+              postId={item.id}
+            />
+          </Suspense>
         )}
 
         {/* Comments Section */}
@@ -1668,22 +1672,24 @@ const FeedCard = React.memo(function FeedCard({
               transition={{ duration: 0.2, ease: 'easeInOut' }}
               className="mt-3 pt-3 border-t border-theme-default space-y-3"
             >
-              <CommentsSection
-                comments={social.comments}
-                commentsCount={social.commentsCount}
-                commentsLoading={social.commentsLoading}
-                commentsLoaded={social.commentsLoaded}
-                loadComments={social.loadComments}
-                submitComment={social.submitComment}
-                editComment={social.editComment}
-                deleteComment={social.deleteComment}
-                toggleReaction={social.toggleReaction}
-                searchMentions={social.searchMentions}
-                isAuthenticated={isAuthenticated}
-                currentUserId={currentUserId}
-                currentUserAvatar={currentUserAvatar ?? undefined}
-                currentUserName={currentUserName ?? undefined}
-              />
+              <Suspense fallback={null}>
+                <CommentsSection
+                  comments={social.comments}
+                  commentsCount={social.commentsCount}
+                  commentsLoading={social.commentsLoading}
+                  commentsLoaded={social.commentsLoaded}
+                  loadComments={social.loadComments}
+                  submitComment={social.submitComment}
+                  editComment={social.editComment}
+                  deleteComment={social.deleteComment}
+                  toggleReaction={social.toggleReaction}
+                  searchMentions={social.searchMentions}
+                  isAuthenticated={isAuthenticated}
+                  currentUserId={currentUserId}
+                  currentUserAvatar={currentUserAvatar ?? undefined}
+                  currentUserName={currentUserName ?? undefined}
+                />
+              </Suspense>
             </motion.div>
           )}
         </AnimatePresence>

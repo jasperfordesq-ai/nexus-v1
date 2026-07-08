@@ -80,7 +80,7 @@ const tierColor = (t: PlanTier): 'primary' | 'secondary' | 'warning' => {
 // ─── Component ────────────────────────────────────────────────────────────
 
 export default function RegionalAnalyticsAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_regional_analytics');
   usePageTitle(t('regional_analytics_admin.meta.title'));
   const toast = useToast();
 
@@ -335,7 +335,7 @@ function CreateSubscriptionModal({
   onClose: () => void;
   onCreated: () => void;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_regional_analytics');
   const toast = useToast();
   const [tenantId, setTenantId] = useState('');
   const [partnerName, setPartnerName] = useState('');

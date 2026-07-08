@@ -8,13 +8,11 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
-import {
-  Description,
-  FieldError,
-  Label,
-  Radio as HeroUIRadio,
-  RadioGroup as HeroUIRadioGroup,
-} from '@heroui/react';
+import { Description } from '@heroui/react/description';
+import { FieldError } from '@heroui/react/field-error';
+import { Label } from '@heroui/react/label';
+import { Radio as HeroUIRadio } from '@heroui/react/radio';
+import { RadioGroup as HeroUIRadioGroup } from '@heroui/react/radio-group';
 
 type HeroUIRadioProps = ComponentPropsWithoutRef<typeof HeroUIRadio>;
 type HeroUIRadioGroupProps = ComponentPropsWithoutRef<typeof HeroUIRadioGroup>;

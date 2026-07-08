@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Building2 from 'lucide-react/icons/building-2';
 import KeyRound from 'lucide-react/icons/key-round';
-import { Button } from '@/components/ui';
 
 interface SsoProvider {
   key: string;
@@ -78,18 +77,15 @@ export function SsoButtons({ tenantId }: SsoButtonsProps) {
       {providers.map((provider) => {
         const Icon = provider.preset === 'entra' ? Building2 : KeyRound;
         return (
-          <Button
+          <button
             key={provider.key}
             type="button"
-            variant="bordered"
-            fullWidth
-            size="lg"
-            startContent={<Icon className="w-5 h-5" />}
-            onPress={() => startFlow(provider.key)}
-            className="border-[var(--border-default)] text-theme-primary hover:bg-theme-hover"
+            onClick={() => startFlow(provider.key)}
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-[var(--border-default)] bg-transparent px-4 py-3 text-sm font-semibold text-theme-primary transition-colors hover:bg-theme-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-primary)]"
           >
-            {t('oauth.sign_in_with_provider', { name: provider.display_name })}
-          </Button>
+            <Icon className="w-5 h-5" aria-hidden="true" />
+            <span>{t('oauth.sign_in_with_provider', { name: provider.display_name })}</span>
+          </button>
         );
       })}
     </div>

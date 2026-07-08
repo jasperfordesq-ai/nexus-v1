@@ -8,8 +8,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { dispatchFeedSync } from '@/lib/feedSync';
 import type { FeedComment } from '@/components/feed/types';
-import { REACTION_EMOJI_MAP } from '@/components/social/ReactionPicker';
-import type { ReactionType } from '@/components/social/ReactionPicker';
+import { REACTION_EMOJI_MAP, type ReactionType } from '@/components/social/reactions';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 

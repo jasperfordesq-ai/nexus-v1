@@ -32,7 +32,7 @@ import {
   useAdvancedMarkerRef,
   APILoadingStatus,
 } from '@vis.gl/react-google-maps';
-import { Skeleton } from '@/components/ui';
+import { Skeleton } from '@/components/ui/Skeleton';
 import {
   MarkerClusterer,
   type Renderer,
@@ -42,7 +42,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '@/contexts/ThemeContext';
 import { DARK_MAP_STYLES } from '@/lib/map-styles';
 import { GoogleMapsProvider, useGoogleMapsConfig } from './GoogleMapsProvider';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
 import { MAPS_ENABLED } from '@/lib/map-config';
 
 // Code-split: the Leaflet bundle (~150KB gz) only loads when a tenant has

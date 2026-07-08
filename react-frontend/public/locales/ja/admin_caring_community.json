@@ -1,0 +1,2755 @@
+{
+  "common": {
+    "an_unexpected_error": "予期しないエラーが発生しました",
+    "back": "戻る",
+    "cancel": "キャンセル",
+    "critical": "クリティカル",
+    "delete": "削除",
+    "feature": "特徴",
+    "high": "高",
+    "in_progress": "進行中",
+    "in_review": "レビュー中",
+    "low": "低い",
+    "medium": "中",
+    "planned": "計画済み",
+    "refresh": "リフレッシュ",
+    "unexpected_error": "予期しないエラー",
+    "unknown": "未知",
+    "unfeature": "特徴がない",
+    "actions": "アクション",
+    "active": "アクティブ",
+    "all": "すべて",
+    "approved": "承認済み",
+    "clear": "クリア",
+    "clear_filters": "フィルターをクリアする",
+    "clear_selection": "選択をクリア",
+    "close": "閉じる",
+    "collapse": "崩壊する",
+    "confirm": "確認する",
+    "create": "作成",
+    "declined": "拒否されました",
+    "download": "ダウンロード",
+    "edit": "編集",
+    "error_loading_data": "データ読み込みエラー",
+    "expand": "展開する",
+    "export": "エクスポート",
+    "load_more": "もっと読み込む",
+    "loading": "読み込み中",
+    "next": "次へ",
+    "no": "いいえ",
+    "ok": "OK",
+    "pending": "保留中",
+    "previous": "前へ",
+    "retry": "再試行",
+    "save": "保存",
+    "select_all": "すべて選択",
+    "select_item": "項目の選択",
+    "yes": "はい"
+  },
+  "shared": {
+    "broker_actions": "ブローカーのアクション",
+    "content": "内容",
+    "core_module": "コアモジュール",
+    "document_details": "文書の詳細",
+    "history": "歴史",
+    "log_file_empty": "ログファイルが見つかりません",
+    "no": "いいえ",
+    "no_history_available": "利用可能な履歴が見つかりません",
+    "no_legal_documents_found": "法的文書が見つかりませんでした",
+    "no_members_found": "メンバーが見つかりませんでした",
+    "loading": "Loading",
+    "no_data": "データなし",
+    "no_data_available": "利用可能なデータがありません",
+    "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
+    "open_page_help": "ページのヘルプを開く",
+    "help": "ヘルプ",
+    "quick_access": "クイックアクセス",
+    "recent_activity": "最近の活動",
+    "refresh": "リフレッシュ",
+    "search": "検索...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "データ",
+    "total_count": "{{count}}合計"
+  },
+  "admin": {
+    "providers": {
+      "title": "介護提供者",
+      "meta_title": "介護提供者",
+      "subtitle": "地元のケアプロバイダー、そのサービス、検証ステータスを管理します。",
+      "empty": "介護サービス提供者が見つかりませんでした。",
+      "verified": "確認済み",
+      "yes": "はい",
+      "no": "いいえ",
+      "confirm_deactivate": "このプロバイダーを無効にしますか?メンバー向けのリストには表示されなくなります。",
+      "confirm_delete": "このプロバイダーを完全に削除しますか?これを元に戻すことはできません。",
+      "about": {
+        "title": "介護事業者について",
+        "body": "ケア提供者は、地域住民にサービスを提供する地域の組織または個人です。",
+        "types_label": "種類",
+        "types_body": "プロバイダーには、在宅ケア、送迎、食事の配達、同伴者、またはその他のカテゴリが含まれます。",
+        "verification_label": "検証",
+        "verification_body": "検証済みプロバイダーは管理者によってレビューされ、ID と資格情報のチェックに合格しています。"
+      },
+      "actions": {
+        "add_provider": "プロバイダーの追加",
+        "cancel": "キャンセル",
+        "close": "閉じる",
+        "create_provider": "プロバイダーの作成",
+        "deactivate_named": "{{name}}を非アクティブ化する",
+        "delete_provider": "プロバイダーの削除",
+        "edit_provider": "プロバイダーの編集",
+        "find_duplicates": "重複の検索",
+        "save_changes": "変更を保存する",
+        "verify_provider": "プロバイダーの確認"
+      },
+      "duplicates": {
+        "title": "潜在的な重複",
+        "empty": "重複は見つかりませんでした。",
+        "match_percent": "{{percent}}% 一致",
+        "scanning": "重複をスキャン中…",
+        "summary": "重複する可能性のある{{count}}が見つかりました。",
+        "vs": "vs"
+      },
+      "errors": {
+        "deactivate": "プロバイダーの無効化に失敗しました。",
+        "delete": "プロバイダーの削除に失敗しました。",
+        "duplicates": "重複のスキャンに失敗しました。",
+        "load": "プロバイダーのロードに失敗しました。",
+        "name_required": "名前は必須です。",
+        "save": "プロバイダーの保存に失敗しました。",
+        "type_required": "タイプは必須です。",
+        "verify": "プロバイダーの検証に失敗しました。"
+      },
+      "fields": {
+        "address": "住所",
+        "description": "説明",
+        "email": "電子メール",
+        "name": "名前",
+        "phone": "電話",
+        "status": "ステータス",
+        "type": "タイプ",
+        "website": "ウェブサイト"
+      },
+      "messages": {
+        "created": "プロバイダーが作成されました。",
+        "deactivated": "プロバイダーが無効になりました。",
+        "removed": "プロバイダーが削除されました。",
+        "updated": "プロバイダーが更新されました。",
+        "verified": "プロバイダーが確認されました。"
+      },
+      "modal": {
+        "create_title": "介護提供者を追加する",
+        "edit_title": "医療提供者を編集する"
+      },
+      "pagination": {
+        "next": "次へ",
+        "previous": "前へ",
+        "summary": "{{from}}–{{total}}の{{to}}を表示しています"
+      },
+      "placeholders": {
+        "address": "通り、都市、郵便番号…",
+        "description": "プロバイダーとそのサービスの簡単な説明…",
+        "name": "例:アクメ ホーム ケア"
+      },
+      "status": {
+        "active": "アクティブ",
+        "inactive": "非アクティブ"
+      },
+      "table": {
+        "actions": "アクション",
+        "aria": "介護提供者",
+        "name": "名前",
+        "status": "ステータス",
+        "type": "タイプ",
+        "verified": "確認済み"
+      }
+    },
+    "common": {
+      "cancel": "キャンセル",
+      "empty_dash": "—",
+      "refresh": "リフレッシュ"
+    },
+    "hour_transfers": {
+      "title": "時間移動",
+      "subtitle": "メンバー間の受信時間および保留中の時間転送を確認して処理します。",
+      "actions": {
+        "approve": "承認する",
+        "reject": "拒否する"
+      },
+      "errors": {
+        "approve": "転送の承認に失敗しました。",
+        "load_inbound": "インバウンド転送のロードに失敗しました。",
+        "load_pending": "保留中の転送をロードできませんでした。",
+        "reject": "転送の拒否に失敗しました。"
+      },
+      "inbound": {
+        "empty": "インバウンド転送はありません。",
+        "title": "インバウンド"
+      },
+      "messages": {
+        "approved": "譲渡が承認されました。",
+        "rejected": "転送が拒否されました。"
+      },
+      "pending": {
+        "empty": "保留中の転送はありません。",
+        "title": "保留中"
+      },
+      "reject_modal": {
+        "reason_label": "理由",
+        "reason_placeholder": "この転送が拒否される理由を説明してください...",
+        "title": "転送を拒否する"
+      },
+      "tabs": {
+        "aria": "時間転送タブ",
+        "inbound": "インバウンド",
+        "pending": "保留中"
+      }
+    },
+    "loyalty": {
+      "title": "ロイヤルティ プログラム",
+      "description": "メンバーがタイム クレジットを参加加盟店の割引に引き換える方法を構成します。",
+      "refresh": "リフレッシュ",
+      "about": {
+        "title": "ロイヤルティプログラムについて",
+        "body": "会員は、商品やサービスの割引と引き換えに、参加店舗でタイム クレジットを引き換えることができます。",
+        "rate_label": "為替レート",
+        "rate_body": "加盟店の販売時点での 1 回のクレジット時間の通貨価値を定義します。",
+        "discount_label": "最大割引額",
+        "discount_body": "時間クレジットで支払うことができる購入の最大割合。"
+      },
+      "errors": {
+        "discount_range": "割引は 0 ～ 100 の範囲にする必要があります。",
+        "load_redemptions": "償還をロードできませんでした。",
+        "load_settings": "ロイヤルティ設定の読み込みに失敗しました。",
+        "rate_positive": "為替レートは正の数である必要があります。",
+        "reverse": "償還を取り消すことができませんでした。",
+        "save_settings": "ロイヤルティ設定を保存できませんでした。"
+      },
+      "ledger": {
+        "actions": "アクション",
+        "date": "日付",
+        "discount": "割引",
+        "empty": "まだ償還はありません。",
+        "hours": "営業時間",
+        "item": "アイテム",
+        "member": "メンバー",
+        "merchant": "商人",
+        "rate": "料金",
+        "reverse": "リバース",
+        "status": "ステータス",
+        "title": "償還台帳"
+      },
+      "messages": {
+        "reversed": "償還が逆転した。",
+        "settings_saved": "ロイヤルティ設定が保存されました。"
+      },
+      "reverse_modal": {
+        "body": "引き換えを取り消すと、タイム クレジットがメンバーに返金されます。",
+        "cancel": "キャンセル",
+        "confirm": "リバース",
+        "discount": "割引",
+        "member_fallback": "メンバー",
+        "merchant": "商人",
+        "reason": "理由",
+        "reason_placeholder": "なぜこの償還が取り消されるのでしょうか？",
+        "redeemed": "償還されました",
+        "title": "逆償還"
+      },
+      "settings": {
+        "accept_time_credits": "タイムクレジットを受け入れる",
+        "accept_time_credits_hint": "この販売者が各購入の一部の支払いとしてタイム クレジットを受け入れることを許可します。",
+        "clear": "クリア",
+        "description": "ロイヤルティ プログラムの販売者側のレートと最大割引ポリシーを構成します。",
+        "exchange_rate": "為替レート",
+        "exchange_rate_description": "加盟店の販売時点での 1 回のクレジット時間の価値はいくらですか。",
+        "maximum_discount": "最大割引率(%)",
+        "maximum_discount_description": "タイム クレジットを使用して支払うことができる購入の最大割合。",
+        "no_matching_members": "一致するメンバーがいません。",
+        "save": "設定を保存する",
+        "seller_label": "商人",
+        "seller_placeholder": "販売者を検索…",
+        "title": "ロイヤルティ設定",
+        "view_only": "この設定には読み取り専用でアクセスできます。"
+      },
+      "stats": {
+        "hours_redeemed": "引き換えられた時間",
+        "total_chf_discount": "付与された割引総額",
+        "total_redemptions": "償還総額"
+      },
+      "table": {
+        "empty_value": "—"
+      }
+    },
+    "surveys": {
+      "errors": {
+        "export_failed": "調査データのエクスポートに失敗しました。"
+      }
+    },
+    "feedback": {
+      "title": "自治体からのフィードバック",
+      "subtitle": "コミュニティ メンバーから送信されたフィードバックを確認します。",
+      "errors": {
+        "close": "フィードバック項目を閉じることができませんでした。",
+        "export": "フィードバックをエクスポートできませんでした。",
+        "load": "フィードバックを読み込めませんでした。",
+        "resolution_required": "解決メモが必要です。",
+        "resolve": "フィードバックを解決できませんでした。",
+        "save_triage": "トリアージメモを保存できませんでした。"
+      },
+      "messages": {
+        "closed": "フィードバックは終了しました。",
+        "resolved": "フィードバックが解決されました。",
+        "triage_saved": "トリアージメモが保存されました。"
+      }
+    },
+    "trust_tier": {
+      "title": "トラスト層の構成",
+      "subtitle": "信頼レベルごとに基準のしきい値を設定します。変更は次回の再計算実行時に適用されます。",
+      "loading": "信頼層構成をロードしています",
+      "recompute_hint": "しきい値が変更され、既存のメンバーを直ちに再評価する必要がある場合は、再計算を使用します。バックグラウンドで実行され、30-60 秒かかる場合があります。",
+      "meta": {
+        "title": "トラスト層の構成",
+        "description": "信頼層のしきい値を構成し、メンバー層を再計算し、各層のロックが解除される内容を確認します。"
+      },
+      "actions": {
+        "recompute": "すべての層を再計算する",
+        "save": "設定の保存"
+      },
+      "about": {
+        "title": "このページについて",
+        "body": "信頼層は、メンバーがよりアクティブになり、認証されるにつれて特権を解放する評判のはしごです。メンバーは、以下の基準のしきい値を満たした場合に自動的に昇格します。 recompute を使用して、すべてのメンバーに対して即時再計算を強制します。ティアの進行は、Warmth Pass、コーディネーターの資格、およびメンバー ディレクトリでの可視性に影響します。"
+      },
+      "criteria": {
+        "title": "階層基準のしきい値"
+      },
+      "fields": {
+        "hours_logged": "記録された時間数 (最小)",
+        "reviews_received": "受け取ったレビュー (最低)",
+        "identity_verified": "本人確認が必要"
+      },
+      "tiers": {
+        "member": {
+          "label": "メンバー",
+          "description": "少なくとも 1 時間ログインしている基本コミュニティ メンバー。"
+        },
+        "trusted": {
+          "label": "信頼できる",
+          "description": "数時間のレビューとレビューを持つアクティブなメンバー。"
+        },
+        "verified": {
+          "label": "確認済み",
+          "description": "身元が確認された信頼できるメンバー。"
+        },
+        "coordinator": {
+          "label": "コーディネーター",
+          "description": "コーディネートする資格のある非常にアクティブな認証済みメンバー。"
+        }
+      },
+      "reference": {
+        "title": "階層リファレンス",
+        "aria": "信頼層のリファレンス",
+        "columns": {
+          "tier": "階層",
+          "level": "レベル",
+          "color": "色",
+          "description": "説明",
+          "unlocks": "ロックを解除するもの"
+        },
+        "rows": {
+          "0": {
+            "name": "新人",
+            "color": "グレー",
+            "description": "参加しただけなので、アクティビティは必要ありません。",
+            "unlocks": "基本的なメンバーアクセス。"
+          },
+          "1": {
+            "name": "メンバー",
+            "color": "青",
+            "description": "時間が記録されています。",
+            "unlocks": "ヘルプリストを投稿したり、ケア時間を受け取ることができます。"
+          },
+          "2": {
+            "name": "信頼できる",
+            "color": "緑",
+            "description": "口コミで活躍中。",
+            "unlocks": "Warmth Pass の対象となり、ケアの推薦を受けられます。"
+          },
+          "3": {
+            "name": "確認済み",
+            "color": "紫",
+            "description": "身元が確認されました。",
+            "unlocks": "フルケア コーディネーターの可視性と ID バッジ。"
+          },
+          "4": {
+            "name": "コーディネーター",
+            "color": "アンバー",
+            "description": "身元確認済みで非常にアクティブです。",
+            "unlocks": "時間を承認し、試合を調整する資格があります。"
+          }
+        }
+      },
+      "errors": {
+        "load_failed": "信頼層構成のロードに失敗しました。",
+        "recompute_failed": "信頼層の再計算に失敗しました。",
+        "save_failed": "信頼層の設定を保存できませんでした。"
+      },
+      "messages": {
+        "recomputed": "{{count}} 人のメンバーの信頼レベルを再計算しました。",
+        "saved": "Trust tier settings saved."
+      },
+      "recompute_confirm": "すべてのメンバーの信頼層を再計算しますか?これには数分かかる場合があります。"
+    },
+    "operating_policy": {
+      "title": "運営方針",
+      "subtitle": "Caring Community 運用ポリシーワークショップ: ソフトウェアが推測できないルール。",
+      "loading": "操作ポリシーをロードしています",
+      "last_updated": "最終更新日: {{date}}",
+      "meta": {
+        "title": "運営方針",
+        "description": "ケア プログラムの承認、保護、SLA、および社会的価値のポリシー ルールを構成します。"
+      },
+      "actions": {
+        "refresh": "リフレッシュ",
+        "save": "変更を保存する"
+      },
+      "about": {
+        "title": "このページについて",
+        "body": "運営ポリシーでは、誰が時間を承認できるか、コーディネーターがどれだけ早く対応しなければならないか、社会的価値の計算方法、報告サイクルがどのようなものであるかなど、地域ケア プログラムのルールを定義します。パイロットを開始する前にこれを構成します。変更はすぐに有効になり、監査のために記録されます。",
+        "methodology_prefix": "の",
+        "methodology_middle": "時間単価と予防乗数フィールドでは、",
+        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
+        "methodology_tail": "パイロットでは、レートを地域の正規ケアの時給相当額に、乗数を 1.0 に設定してください。"
+      },
+      "sections": {
+        "approvals": "承認と信頼",
+        "sla": "SLA のウィンドウ",
+        "hours": "時間管理",
+        "safeguarding": "保護",
+        "social_value": "社会的価値の方法論",
+        "appendix": "パイロットポリシーの付録"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "承認権限",
+          "help": "承認された時間を最終的に決定できるのは、テナント管理者、コーディネーター、または相互承認による両当事者です。"
+        },
+        "trusted_reviewer_threshold": {
+          "label": "信頼できるレビュー担当者のしきい値 (記録時間)",
+          "help": "メンバーが信頼できるレビュー担当者になるか、信頼できるレベルに到達するまでの最小承認時間。"
+        },
+        "sla_first_response_hours": {
+          "label": "SLA: 初回対応 (時間)",
+          "help": "新しいヘルプ リクエストに対する最初の応答までの目標時間を設定します。"
+        },
+        "sla_help_request_hours": {
+          "label": "SLA: 支援リクエストの解決 (時間)",
+          "help": "ヘルプ リクエストを終了または一致させるまでの目標時間を設定します。"
+        },
+        "legacy_hour_settlement": {
+          "label": "従来の時間決済ポリシー",
+          "help": "死亡したメンバーの残りの時間はどのように精算されるか。"
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "相互バランス介入閾値 (時間)",
+          "help": "メンバーの授受の不均衡により、コーディネーターのチェックインがトリガーされた場合。"
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "セーフガーディングエスカレーションの担当者 (ユーザー ID)",
+          "help": "セーフガーディングエスカレーションを受け取るユーザー ID。空欄の場合は管理者グループが使用されます。"
+        },
+        "chf_hourly_rate": {
+          "label": "CHF 1 時間あたりの社会的価値",
+          "help": "スイスの正規介護アシスタント率を使用した ROI レポートの介護時間あたりの CHF 価値。"
+        },
+        "chf_prevention_multiplier": {
+          "label": "CHF 防止乗数",
+          "help": "Caring Community および Caring Community 方法論のフォーマルケア オフセットに適用される乗数。"
+        },
+        "statement_cadence": {
+          "label": "メンバーの発言の頻度",
+          "help": "メンバーがメンバーごとの時間明細を受け取る頻度。"
+        },
+        "policy_appendix_url": {
+          "label": "署名済みポリシーの付録 URL",
+          "help": "協同組合と自治体の間で署名された政策協定の公開 URL を貼り付けます。これは監査報告書と地方自治体の報告パックに記載されます。"
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "管理者",
+          "coordinator": "コーディネーター",
+          "mutual": "共通の"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "プールに寄付する",
+          "expire": "期限切れ",
+          "transfer_to_nominee": "候補者に転送"
+        },
+        "statement_cadence": {
+          "monthly": "毎月",
+          "quarterly": "四半期ごと",
+          "annual": "年間"
+        }
+      },
+      "placeholders": {
+        "url": "NEXUSTERM0トークン"
+      },
+      "errors": {
+        "load_failed": "運用ポリシーの読み込みに失敗しました。",
+        "save_failed": "運用ポリシーの保存に失敗しました。"
+      },
+      "messages": {
+        "saved": "運用ポリシーが保存されました。変更はすべての新しい取引所に直ちに適用されます。"
+      }
+    },
+    "warmth_pass": {
+      "title": "温もりパス",
+      "subtitle": "メンバーを検索して、Warmth Pass の資格と認められた貢献履歴を確認します。",
+      "eligible": "対象となる",
+      "not_eligible": "対象外",
+      "verified": "確認済み",
+      "not_verified": "未検証",
+      "empty_date": "—",
+      "loading": "読み込み中…",
+      "no_categories": "ヘルプ カテゴリが記録されていません。",
+      "tier_chip": "層{{tier}}",
+      "about": {
+        "title": "ウォームスパスについて",
+        "body": "Warmth Pass は、コミュニティに対して継続的かつ検証された貢献を行ったメンバーを表彰します。"
+      },
+      "errors": {
+        "lookup_failed": "メンバーの検索に失敗しました。",
+        "no_data": "このメンバーに関する利用可能なデータはありません。"
+      },
+      "fields": {
+        "help_categories": "ヘルプのカテゴリ",
+        "hours_logged": "記録された時間数",
+        "identity_verified": "本人確認済み",
+        "member_since": "以来のメンバー",
+        "pass_active_since": "パスは次からアクティブです",
+        "reviews_received": "受け取ったレビュー",
+        "trust_tier": "信頼層"
+      },
+      "lookup": {
+        "button": "見上げてください",
+        "member_id": "会員ID",
+        "placeholder": "会員IDを入力して…",
+        "title": "メンバー検索"
+      },
+      "not_eligible_notice": {
+        "title": "まだ対象ではありません",
+        "body": "このメンバーはまだ Warmth Pass の要件を満たしていません。"
+      }
+    }
+  },
+  "panel": {
+    "sidebar": {
+      "items": {
+        "surveys": "アンケート",
+        "projects": "プロジェクト",
+        "trust_tier": "トラスト層"
+      }
+    }
+  },
+  "caring_community": {
+    "meta": {
+      "title": "思いやりのあるコミュニティ",
+      "description": "統合ケア ハブ、依存する機能、および地方自治体のレポート サーフェスを構成します。"
+    },
+    "actions": {
+      "open_member_hub": "メンバーハブを開く",
+      "open_workflow": "Caring Community ワークフローを開く",
+      "refresh": "リフレッシュ"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "Caring Community モジュールを使用すると、タイムバンクが非公式の近隣ケアを調整し、支援を必要とする住民と支援を提供できる信頼できるメンバーをマッチングできるようになります。既存のタイムバンクに信頼層システム、コーディネーター ワークフロー、パイロット評価ツール、地方自治体のレポートが追加されます。"
+    },
+    "getting_started": {
+      "title": "はじめに",
+      "step_1": "運用ポリシーの構成: 承認ワークフローと CHF 時間レートを設定します。",
+      "step_2": "パイロット スコアボードでパイロット前のベースラインを取得します。",
+      "step_3": "信頼層のしきい値を構成します。",
+      "step_4": "パイロット起動準備チェックを実行します。",
+      "step_5": "起動したら、コーディネーター ワークフローを日常の運用ダッシュボードとして使用します。"
+    },
+    "stats": {
+      "master_switch": "マスタースイッチ",
+      "connected_capabilities": "接続された機能",
+      "reporting_pack": "レポートパック",
+      "reporting_ready": "準備完了"
+    },
+    "switch": {
+      "title": "モジュールキルスイッチ",
+      "description": "このスイッチがオフの場合、Caring Community ルート、ナビゲーション エントリ、ダッシュボード カード、およびクイック作成アクションは非表示になります。",
+      "dependency_note": "Caring Community は、以下にリストされているモジュールと機能が有効になっていることに依存しています。モジュールを無効にすると、コーディネーター機能とレポート機能が制限されます。",
+      "aria": "Toggle Caring Community モジュール"
+    },
+    "capabilities": {
+      "timebank": "タイムバンク交換",
+      "volunteering": "確認済みのボランティア活動",
+      "organisations": "信頼できる組織",
+      "groups": "近隣団体",
+      "resources": "リソースライブラリ",
+      "trust": "信頼と口コミ"
+    },
+    "capability_type": {
+      "feature": "特徴",
+      "module": "モジュール"
+    },
+    "reporting": {
+      "title": "自治体の報告",
+      "description": "州、自治体、協同組合の会話に必要なレポート画面に飛び込みます。",
+      "community_analytics": "コミュニティ分析",
+      "impact_report": "影響レポート",
+      "municipal_pack": "市政レポートパック",
+      "note": "これらのサーフェスは現在、既存の NEXUS レポートを使用しており、次に Caring Community 固有のエクスポートの準備ができています。"
+    },
+    "messages": {
+      "enabled": "思いやりのあるコミュニティが有効になっています",
+      "disabled": "思いやりのあるコミュニティが無効になっています"
+    },
+    "status": {
+      "active": "アクティブ",
+      "enabled": "有効",
+      "disabled": "障害者"
+    },
+    "errors": {
+      "load_failed": "Caring Community 構成のロードに失敗しました",
+      "save_failed": "ケアリングコミュニティを更新できませんでした"
+    },
+    "config_route_note": "専用の管理構成ルート:{{route}}"
+  },
+  "caring_emergency": {
+    "title": "緊急警報（AG70）",
+    "heading": "緊急警報",
+    "empty": "まだ緊急警報は出ていません。",
+    "intro": {
+      "title": "このページについて - 使用には注意してください",
+      "body": "緊急警報は、すべてのメンバー (または対象のサブグループ) に即座に送信される緊急ブロードキャストです。これは、悪天候、地域の安全に関する事故、緊急治療の対象範囲が狭い場合など、真の緊急事態の場合にのみ使用してください。アラートはプッシュ通知およびアプリ内バナーとして送信されます。一度発送すると、送信を取り消すことはできません。",
+      "targeting_label": "ターゲティング",
+      "targeting_body": "重大度「危険」または「警告」を選択すると、すべてのメンバーに送信されます。慎重にドラフトを作成します。一度放送されると取り消しはありません。",
+      "delivery_label": "配達",
+      "delivery_body": "アラートは発信後 60 秒以内に配信されます。"
+    },
+    "actions": {
+      "open_send_modal": "緊急警報を送信する",
+      "confirm_prompt": "確認しますか？",
+      "confirm_deactivate": "はい、無効化します",
+      "cancel": "キャンセル",
+      "deactivate": "非アクティブ化",
+      "broadcast": "ブロードキャストアラート"
+    },
+    "errors": {
+      "load_failed": "アラートのロードに失敗しました",
+      "send_failed": "アラートの送信に失敗しました",
+      "deactivate_failed": "アラートを非アクティブ化できませんでした"
+    },
+    "severity": {
+      "info": "情報",
+      "warning": "警告",
+      "danger": "緊急事態（危険）"
+    },
+    "table": {
+      "aria": "緊急警報",
+      "title": "タイトル",
+      "severity": "重大度",
+      "sent": "送信済み",
+      "expires": "有効期限が切れます",
+      "push": "プッシュ",
+      "dismissed": "解雇されました",
+      "status": "ステータス",
+      "actions": "アクション"
+    },
+    "push": {
+      "sent": "送信済み"
+    },
+    "status": {
+      "active": "アクティブ",
+      "inactive": "非アクティブ"
+    },
+    "modal": {
+      "title": "緊急警報を送信する"
+    },
+    "form": {
+      "title": "タイトル",
+      "title_placeholder": "例:荒天警報",
+      "body": "本体",
+      "body_placeholder": "緊急事態とメンバーが取るべき行動について説明してください...",
+      "severity": "重大度",
+      "expires_at": "有効期限: (オプション)",
+      "expires_at_description": "自動有効期限を設定しない場合は空白のままにします",
+      "confirm_prefix": "これによりすぐにプッシュされます",
+      "confirm_audience": "アクティブなメンバー全員",
+      "confirm_suffix": "すべてのページに永続的なバナーを表示します。これは本当に緊急事態であることを確認します。"
+    }
+  },
+  "caring_workflow": {
+    "meta": {
+      "page_title": "思いやりのあるコミュニティのワークフロー",
+      "title": "Caring Community Workflow Console",
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "retry": "リトライ",
+      "open_hour_review": "営業時間のレビュー",
+      "open_report_pack": "レポートパックを開く",
+      "approve": "承認する",
+      "decline": "衰退",
+      "escalate": "エスカレート",
+      "re_escalate": "再エスカレーション"
+    },
+    "loading": {
+      "workflow": "思いやりのあるコミュニティのワークフローを読み込んでいます..."
+    },
+    "toast": {
+      "load_failed": "Failed to load Caring Community workflow data."
+    },
+    "empty": {
+      "value": "-",
+      "unassigned": "未割り当て"
+    },
+    "stats": {
+      "pending_reviews": "保留中のレビュー",
+      "pending_hours": "保留中の時間",
+      "approved_30d": "Approved in 30 days",
+      "coordinators": "コーディネーター"
+    },
+    "pending": {
+      "title": "保留中のレビュー",
+      "description_prefix": "コーディネーターのレビューと承認を待つ時間。マークのある項目",
+      "description_middle": "件がレビュー SLA を超過しています。マークされた項目",
+      "description_suffix": "エスカレーション SLA を超えています。各提出物を承認または拒否するか、特定のコーディネーターに割り当てます。",
+      "needs_review": "見直しが必要",
+      "escalate_now": "今すぐエスカレーションしてください",
+      "escalated_count": "{{count}} がエスカレーションされました",
+      "overdue_count": "{{count}} 期限切れ",
+      "empty": "保留中のものはありません。レビューのキューは空になっています。",
+      "logged": "記録された {{date}}",
+      "submitted": "{{date}}を提出しました",
+      "age_days": "{{count}} 1 日目",
+      "age_days_plural": "{{count}} 日前",
+      "assigned_to": "{{name}} に割り当てられました",
+      "escalated_at": "エスカレートされた {{date}}",
+      "assign_coordinator": "コーディネーターの割り当て",
+      "assign_success": "コーディネーターが割り当てられました。",
+      "assign_failed": "コーディネーターを割り当てることができませんでした。",
+      "manual_escalation_note": "{{count}} の保留日数が経過した後、手動でエスカレーションされました。",
+      "escalate_success": "レビューがエスカレートしました。",
+      "escalate_failed": "レビューをエスカレーションできませんでした。",
+      "approve_success": "レビューが承認されました。",
+      "decline_success": "レビューは拒否されました。",
+      "decision_failed": "決定を記録できませんでした。"
+    },
+    "paper_onboarding": {
+      "title": "Paper Form Intake",
+      "description": "Upload a signed Caring Community form, review the extracted fields, then create the provisional account only after coordinator confirmation.",
+      "file_label": "Scanned form",
+      "name_label": "Extracted full name",
+      "name_placeholder": "Name on the paper form",
+      "dob_label": "生年月日",
+      "email_label": "Extracted email",
+      "email_placeholder": "member@example.com",
+      "phone_label": "Extracted phone",
+      "phone_placeholder": "+41 79 123 45 67",
+      "address_label": "Extracted address",
+      "address_placeholder": "Street, postcode, municipality",
+      "note_label": "Review note",
+      "note_placeholder": "What did the coordinator verify before creating the account?",
+      "upload_cta": "Upload For Review",
+      "confirm_cta": "Confirm And Create Account",
+      "review_cta": "レビュー",
+      "no_email": "No email captured",
+      "file_required": "Choose a scanned form first.",
+      "load_failed": "オンボーディングインテークに用紙をロードできませんでした。",
+      "upload_success": "紙の摂取量をアップロードしました。",
+      "upload_failed": "Could not upload the paper form.",
+      "confirm_success": "メンバーが確認され、アカウントが作成されました。",
+      "confirm_failed": "Could not confirm this paper onboarding intake."
+    },
+    "tandem": {
+      "title": "Tandem の提案",
+      "description": "場所、言語、スキル、空き状況に基づいて AI が提案するサポーターと受け手のペアです。",
+      "empty": "現在提案はありません。さらにメンバーを追加するか、空き状況を調整します。",
+      "load_failed": "タンデムの提案を読み込めませんでした。",
+      "dismiss_success": "提案は却下されました。",
+      "dismiss_failed": "提案を却下できませんでした。",
+      "relationship_title": "Tandem: {{supporter}} と {{recipient}}",
+      "distance_km": "{{value}}km",
+      "same_language": "同じ言語",
+      "complementary_skills": "補完的なスキル",
+      "availability_overlap": "可用性の重複",
+      "shared_interests": "共通の興味",
+      "score": "スコア {{value}}%",
+      "dismiss": "却下する",
+      "create": "Tandem を作成"
+    },
+    "safeguarding": {
+      "title": "レポートの保護",
+      "description": "メンバーが他のメンバー、コーディネーター、または組織に関して提起した懸念。",
+      "view_all": "すべて見る",
+      "no_data": "利用可能な保護データはまだありません。",
+      "overdue": "期限を過ぎました",
+      "no_reports": "まだ報告はありません。",
+      "table_aria": "最近の安全対策レポート",
+      "open": "開ける",
+      "org_subject": "組織 #{{id}}",
+      "age_hours": "{{count}}h",
+      "age_days": "{{count}}日",
+      "columns": {
+        "severity": "重大度",
+        "category": "カテゴリ",
+        "subject": "主題",
+        "status": "状態",
+        "age": "年",
+        "action": "アクション"
+      },
+      "severity": {
+        "critical": "致命的",
+        "high": "高い",
+        "medium": "中くらい",
+        "low": "低い"
+      },
+      "status": {
+        "submitted": "提出済み",
+        "triaged": "トリアージ",
+        "investigating": "調査中",
+        "resolved": "解決済み",
+        "dismissed": "解雇されました"
+      }
+    },
+    "role_pack": {
+      "title": "役割のプリセット",
+      "description": "ケアリングコミュニティの各役割向けに事前構成された権限セットです。完全なロールパックをインストールすると、コーディネーターに正しいアクセス権をすばやく設定できます。{{countLabel}}。",
+      "installed_count": "{{total}} ロール プリセットの {{installed}} がインストールされました",
+      "available_count": "{{count}} 件のロールプリセットが利用可能",
+      "installing": "インストール中...",
+      "install": "役割パックをインストールする",
+      "install_success": "ロールパックがインストールされました。",
+      "install_failed": "役割パックをインストールできませんでした。",
+      "installed": "インストール済み",
+      "not_installed": "インストールされていません",
+      "permissions_granted": "{{total}} 権限のうち {{installed}} 権限が付与されました",
+      "presets": {
+        "national_admin": {
+          "title": "国家管理者",
+          "description": "すべての州および組織にわたるプラットフォーム全体の監視。"
+        },
+        "canton_admin": {
+          "title": "カントン管理者",
+          "description": "カントン内のすべての思いやりのあるコミュニティ活動を管理します。"
+        },
+        "municipality_admin": {
+          "title": "自治体の管理者",
+          "description": "自治体内で思いやりのあるコミュニティ活動を管理します。"
+        },
+        "cooperative_coordinator": {
+          "title": "協力コーディネーター",
+          "description": "地元の協同組合とそのメンバーを調整します。"
+        },
+        "organisation_coordinator": {
+          "title": "組織コーディネーター",
+          "description": "1 つの組織のボランティアとパートナーを調整します。"
+        },
+        "trusted_reviewer": {
+          "title": "信頼できるレビュアー",
+          "description": "軽いタッチで監視しながら時間をすばやく承認します。"
+        }
+      }
+    },
+    "policy": {
+      "title": "ワークフローポリシー",
+      "description": "Tenant-level defaults for Caring Community hour review, statements, and municipal evidence.",
+      "save": "ポリシーの保存",
+      "review_sla_days": "Review SLA days",
+      "review_sla_days_description": "この日数以内にレビューされなかった時間には、キュー内で期限超過としてフラグが立てられます。",
+      "escalation_sla_days": "Escalation SLA days",
+      "escalation_sla_days_description": "この追加日数以内に対応されなかった期限を過ぎた項目は、自動的にエスカレーションされます。",
+      "monthly_statement_day": "Statement day",
+      "monthly_statement_day_description": "メンバーステートメントが生成される月の日 (例: 1 = 毎月 1 日)。",
+      "default_hour_value_chf": "Hour value CHF",
+      "default_hour_value_chf_description": "ステートメントや自治体の報告書の社会的価値の推定値を計算するために使用されます。",
+      "municipal_report_default_period": "デフォルトのレポート期間",
+      "approval_required": "Require hour approval",
+      "approval_required_description": "Logged support time waits for a trusted review before it is accepted.",
+      "auto_approve_trusted_reviewers": "信頼できるレビュー担当者を自動承認する",
+      "auto_approve_trusted_reviewers_description": "Hours submitted by trusted reviewers can skip the pending queue.",
+      "allow_member_self_log": "Allow member self logging",
+      "allow_member_self_log_description": "Members can record their own support activity before review.",
+      "require_organisation_for_partner_hours": "Require partner organisation",
+      "require_organisation_for_partner_hours_description": "Partner-led hours must be tied to an approved organisation.",
+      "include_social_value_estimate": "社会的価値の推定を含める",
+      "include_social_value_estimate_description": "Municipal reports include a configurable CHF value for verified hours.",
+      "save_success": "ワークフローポリシーが保存されました。",
+      "save_failed": "Failed to save workflow policy.",
+      "periods": {
+        "last_30_days": "過去 30 日間",
+        "last_90_days": "過去90日間",
+        "year_to_date": "年初から現在まで",
+        "previous_quarter": "前四半期"
+      }
+    },
+    "member_statement": {
+      "title": "Member statements",
+      "description": "Preview or export a Caring Community member statement with support hours, wallet movement, and municipal value assumptions.",
+      "member_id": "会員ID",
+      "start_date": "From",
+      "end_date": "To",
+      "preview": "プレビュー",
+      "export_csv": "CSVのエクスポート",
+      "approved_support_hours": "承認されたサポート時間",
+      "pending_support_hours": "保留中のサポート時間",
+      "wallet_hours_earned": "ウォレットで獲得した時間数",
+      "wallet_hours_spent": "ウォレットに費やした時間数",
+      "empty": "Enter a member ID to generate a statement.",
+      "chf_value": "推定社会的価値: CHF{{value}}",
+      "invalid_member": "有効な会員IDを入力してください。",
+      "load_failed": "Failed to load the member statement.",
+      "export_success": "Member statement CSV prepared.",
+      "export_failed": "Failed to export the member statement."
+    },
+    "signals": {
+      "title": "コーディネーター信号",
+      "description": "Quick operating indicators for matching, oversight, and partner activity.",
+      "active_requests": "Active requests",
+      "active_offers": "Active offers",
+      "trusted_organisations": "信頼できる組織",
+      "declined_30d": "Declined in 30 days"
+    },
+    "favours": {
+      "title": "非公式の好意",
+      "loading": "読み込み中...",
+      "total_recorded": "合計 {{count}} 件記録済み",
+      "loading_favours": "好意を読み込んでいます...",
+      "empty": "まだ好意は記録されていません。",
+      "anonymous": "匿名",
+      "unknown": "未知"
+    },
+    "assisted_onboarding": {
+      "title": "Assisted Onboarding",
+      "description": "Create a member account on behalf of a participant who cannot self-register.",
+      "name_label": "フルネーム",
+      "name_placeholder": "e.g. Marie Curie",
+      "email_label": "Email address",
+      "email_placeholder": "member@example.com",
+      "phone_label": "電話（オプション）",
+      "phone_placeholder": "+41 79 123 45 67",
+      "note_label": "コーディネーターのメモ (オプション)",
+      "note_placeholder": "e.g. Met at Tuesday drop-in",
+      "create_cta": "Create Member Account",
+      "required": "名前とメールアドレスは必須です。",
+      "created": "Member account created successfully.",
+      "create_failed": "Could not create member account. Please check the email is not already registered.",
+      "created_for": "Account created for {{name}} ({{email}})",
+      "password_note": "The member should change this password on first login.",
+      "copy": "コピー",
+      "copied": "コピーしました！"
+    },
+    "invite_codes": {
+      "title": "招待コード",
+      "description": "新しいメンバーが電子メールの招待状を必要とせずに参加するために使用できる、印刷可能なコードを生成します。",
+      "label": "ラベル (オプション)",
+      "label_placeholder": "例えばメアリーの隣人のために",
+      "generate": "コードの生成",
+      "new_code": "新しい招待コード",
+      "expires": "有効期限: {{date}}",
+      "copied": "コピーしました！",
+      "copy_url": "URLをコピーする",
+      "print_card": "プリントカード",
+      "open": "開ける",
+      "table_aria": "招待コード",
+      "empty": "招待コードはまだありません。上記のものを生成して、将来のメンバーと共有します。",
+      "load_failed": "招待コードを読み込めませんでした。",
+      "generate_success": "招待コードが生成されました。",
+      "generate_failed": "招待コードを生成できませんでした。",
+      "columns": {
+        "code": "コード",
+        "label": "ラベル",
+        "expires": "有効期限が切れます",
+        "status": "状態",
+        "actions": "アクション"
+      },
+      "status": {
+        "active": "アクティブ",
+        "used": "使用済み",
+        "used_by": "{{name}} によって使用されます",
+        "expired": "期限切れ"
+      }
+    },
+    "stages": {
+      "title": "Caring Community operating model",
+      "description": "The workflow path this module should make explicit for evaluators and coordinators.",
+      "intake": {
+        "title": "摂取量",
+        "description": "A member, family, organisation, or coordinator records a need or offer."
+      },
+      "match": {
+        "title": "一致",
+        "description": "Coordinators connect people, organisations, or trusted volunteers."
+      },
+      "log": {
+        "title": "Log hours",
+        "description": "Support time is recorded against the member, organisation, or activity."
+      },
+      "verify": {
+        "title": "検証する",
+        "description": "A trusted coordinator approves or declines the logged hours."
+      },
+      "statement": {
+        "title": "声明",
+        "description": "Accepted hours feed member statements and municipal evidence packs."
+      }
+    },
+    "predictive": {
+      "title": "予測的洞察",
+      "subtitle": "将来を見据えた予測とプロアクティブなアラート。地域のケア不足を緊急事態になる前に発見します。",
+      "not_enough_activity": "予測するにはまだ十分な活動がありません。数週間後にまた来てください。",
+      "no_forecast": "まだ予測データはありません。",
+      "hours_forecast": "時間予測",
+      "active_members": "アクティブなメンバー",
+      "recipients_reached": "受信者に到達しました",
+      "history": "歴史",
+      "forecast": "予報",
+      "confidence": "自信",
+      "trend_growing": "{{value}}% の成長",
+      "trend_declining": "{{value}}% の下落",
+      "trend_stable": "安定した",
+      "sub_region_coverage": "サブリージョンの適用範囲 (過去 {{days}} 日間)",
+      "under_supplied_count": "{{count}}の供給が不足しています",
+      "sub_region_coverage_aria": "サブリージョンのカバー範囲",
+      "helper_churn": "ヘルパーの離脱 ({{days}} 日以上経過)",
+      "overall_percent": "全体で {{value}}%",
+      "helper_churn_note": "以前アクティブだった {{prior}} の {{lapsed}} は、最近時間を記録していません。",
+      "helper_churn_aria": "カテゴリ別のヘルパー チャーン",
+      "coefficient_drift": "カテゴリ係数ドリフト",
+      "drifting_count": "{{count}} 人が離れつつあります",
+      "coefficient_drift_note": "絶対ドリフト > {{threshold}}% を持つカテゴリにはフラグが立てられます。カテゴリ係数エディタでベースライン係数を確認します。",
+      "coefficient_drift_aria": "カテゴリ係数ドリフト",
+      "proactive_alerts": "プロアクティブなアラート",
+      "columns": {
+        "sub_region": "サブリージョン",
+        "requested_90d": "リクエスト済み (90日)",
+        "fulfilled_90d": "満たされました (90日)",
+        "coverage": "カバレッジ",
+        "status": "状態",
+        "category": "カテゴリ",
+        "prior_active": "以前のアクティブな",
+        "lapsed": "失効しました",
+        "churn_rate": "チャーンレート",
+        "baseline": "ベースライン",
+        "expected_hrs": "予想時間",
+        "observed_hrs": "観測時間",
+        "drift": "ドリフト",
+        "sample": "サンプル"
+      },
+      "status": {
+        "under_supplied": "供給不足",
+        "ok": "わかりました"
+      },
+      "severity": {
+        "critical": "致命的",
+        "warning": "警告",
+        "info": "情報"
+      }
+    },
+    "relationships": {
+      "title": "サポート関係",
+      "description": "継続的な支援者と受信者のペアと定期的なチェックイン。",
+      "active": "アクティブ",
+      "paused": "一時停止中",
+      "check_ins_due": "チェックイン期限",
+      "expected_hours": "予定時間",
+      "supporter": "サポーター",
+      "supporter_placeholder": "サポーターを探す",
+      "recipient": "受信者",
+      "recipient_placeholder": "受信者を検索する",
+      "no_members": "メンバーが見つかりませんでした",
+      "clear": "クリア",
+      "relationship_title": "関係タイトル",
+      "frequency_label": "頻度",
+      "expected_hours_per_visit": "1回の訪問あたりの予想時間",
+      "start_date": "開始日",
+      "create": "関係を築く",
+      "empty": "まだサポート関係はありません。上に作成します。",
+      "pair": "{{recipient}} をサポートする {{supporter}}",
+      "started": "{{date}} に開始",
+      "next_check_in": "次回チェックイン {{date}}",
+      "pause": "一時停止",
+      "resume": "再開する",
+      "log_date": "日付",
+      "log_hours": "営業時間",
+      "log_note": "注記 (オプション)",
+      "log_hours_action": "時間を記録する",
+      "load_failed": "サポート関係を読み込めませんでした。",
+      "pick_different_members": "2 人の異なるメンバーを選択します。",
+      "create_success": "サポート関係が構築されました。",
+      "create_failed": "サポート関係を作成できませんでした。",
+      "update_success": "サポート関係を更新しました。",
+      "update_failed": "サポート関係を更新できませんでした。",
+      "log_validation_failed": "有効な日付と 0.25-24 時間を入力してください。",
+      "log_success": "サポート時間が記録されました。",
+      "log_failed": "サポート時間を記録できませんでした。",
+      "frequency": {
+        "weekly": "毎週",
+        "fortnightly": "隔週",
+        "monthly": "毎月",
+        "ad_hoc": "このために"
+      },
+      "status": {
+        "active": "アクティブ",
+        "paused": "一時停止中",
+        "completed": "完了しました",
+        "cancelled": "キャンセル"
+      }
+    }
+  },
+  "category_coefficients": {
+    "meta": {
+      "page_title": "カテゴリ置換係数",
+      "title": "カテゴリ置換係数",
+      "subtitle": "地域ケアの 1 時間あたりが、正式な Spitex/Pflege 時間にどれだけ代替できるか。自治体影響レポートの計算に使用されます。"
+    },
+    "actions": {
+      "refresh_aria": "カテゴリ係数を更新する",
+      "save": "保存"
+    },
+    "about": {
+      "title": "このページについて",
+      "chf_amount": "35スイスフラン",
+      "body_prefix": "代替係数は、コスト オフセットの計算において各ケア カテゴリにどれだけの社会的価値があるかを制御します。係数 1.0 は、1 時間が 1 時間の正式な Spitex/Pflege ケアに等しいことを意味します (",
+      "body_middle": "）。係数 0.5 は、30 分を置き換えることを意味します。係数 2.0 は、集中的なパーソナルケアや専門家のサポートなど、2 時間の正式なケアに代わることを意味します。 The",
+      "body_suffix": "方法論では、すべてのカテゴリーを 1.0 から開始し、観察されたケア強度に基づいて調整することを推奨しています。",
+      "range_prefix": "値の範囲は 0.00 (ケア置換値なし) ～ 9.99 です。変更は次回から有効になります",
+      "range_suffix": "レポートを更新します。"
+    },
+    "migration": {
+      "title": "移行保留中",
+      "body_prefix": "の",
+      "body_middle": "列はまだ移行されていません。走る",
+      "body_suffix": "カテゴリごとの係数を有効にします。",
+      "warning": "データベースの移行は保留中です。上書きされないように、移行の完了後に変更を保存してください。"
+    },
+    "table": {
+      "aria": "カテゴリ置換係数",
+      "category": "カテゴリ",
+      "source": "ソース",
+      "coefficient": "係数",
+      "action": "アクション"
+    },
+    "fields": {
+      "coefficient_aria": "{{name}} の係数",
+      "coefficient_error": "0.00 ～ 9.99 の範囲にする必要があります"
+    },
+    "empty": {
+      "categories": "カテゴリが見つかりませんでした。"
+    },
+    "toasts": {
+      "load_failed": "カテゴリ係数のロードに失敗しました",
+      "invalid_number": "係数は数値でなければなりません",
+      "saved": "{{name}} の保存された係数",
+      "save_failed": "{{name}} の係数を保存できませんでした"
+    }
+  },
+  "commercial_boundary": {
+    "meta": {
+      "page_title": "商業境界図",
+      "title": "商業境界図",
+      "subtitle": "AG82 - AGPL パブリック、テナント構成可能、展開層、商用とは何ですか"
+    },
+    "actions": {
+      "export_markdown": "Markdown としてエクスポート",
+      "export": "輸出",
+      "refresh_data": "データを更新する",
+      "refresh_aria": "商業境界線マップを更新する",
+      "reset_default": "正規のデフォルトにリセットする",
+      "reset_default_aria": "デフォルトにリセットする"
+    },
+    "overrides_count": "{{count}} オーバーライド",
+    "overrides_count_plural": "{{count}} オーバーライド",
+    "about": {
+      "title": "このページについて",
+      "body_prefix": "商業境界は、地域ケア プログラム内でどの種類の有給労働が許可され、どの種類の労働が無給時間単位のままにしなければならないかを定義します。この境界は、",
+      "body_suffix": "試験運用を開始する前に、自治体のパートナーと合意する必要があります。以下のマトリックスは、アクティビティ カテゴリと許可される交換タイプを示しています。",
+      "override_prefix": "行ごとのオーバーライドを使用して、テナント固有の分類 (商用バンドルを含むプライベート展開など) を記録します。オーバーライドはテナント設定にのみ保存されます。オーバーライドは、テナントに付属する正規のパブリック分類を変更することはありません。",
+      "override_suffix": "レポ。境界マトリックスを確認すると、契約書がタイムスタンプとユーザー ID とともに記録され、パイロット起動準備チェックに表示されるパイロット ガバナンス文書の一部を形成します。"
+    },
+    "sections": {
+      "classifications": "分類"
+    },
+    "classification": {
+      "agpl_public": "AGPL パブリック",
+      "tenant_config": "テナント構成",
+      "private_deployment": "プライベート展開",
+      "commercial": "コマーシャル"
+    },
+    "labels": {
+      "overridden": "オーバーライドされました",
+      "module": "モジュール",
+      "out_of_tree": "樹外",
+      "canonical_default": "正規のデフォルト:",
+      "key": "鍵"
+    },
+    "fields": {
+      "set_classification": "セット分類",
+      "classification_aria": "{{label}} の分類"
+    },
+    "export": {
+      "last_updated": "最終更新日: {{date}}",
+      "capability": "能力",
+      "classification": "分類",
+      "agpl_module": "AGPL モジュール",
+      "default": "デフォルト",
+      "overridden": "オーバーライドされました",
+      "notes": "注意事項",
+      "yes": "はい",
+      "no": "いいえ",
+      "generated": "NEXUS 管理パネルから {{date}} が生成されました。"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "商業境界線マップの読み込みに失敗しました",
+      "reverted": "正規のデフォルトに戻しました",
+      "updated": "分類が更新されました",
+      "update_failed": "分類の更新に失敗しました",
+      "export_empty": "エクスポートが空で返されました",
+      "exported": "境界マップがエクスポートされました",
+      "export_failed": "境界マップのエクスポートに失敗しました"
+    }
+  },
+  "data_quality": {
+    "meta": {
+      "page_title": "パイロットデータの品質",
+      "title": "パイロットデータの品質",
+      "subtitle": "AG84 - 実際の居住者をオンボーディングする前の準備状況チェック"
+    },
+    "actions": {
+      "refresh_checks": "リフレッシュチェック",
+      "refresh_aria": "データ品質チェックを更新する",
+      "view_affected_rows": "影響を受ける行を表示する",
+      "close": "近い"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "データ品質チェックでは、プラットフォーム データをスキャンして、パイロット メトリクスを歪めたり、レポート エラーを引き起こす可能性のある問題 (たとえば、重複したプロファイルを持つメンバー、削除されたリストに対して記録された時間数、必須フィールドが欠落している交換レコードなど) を検出します。レポートを生成する前にこれを毎月実行します。資金提供者や地方自治体のパートナーにレポートを提出する前に、すべての重要項目と警告項目を解決してください。"
+    },
+    "severity": {
+      "ok": "わかりました",
+      "info": "情報",
+      "warning": "警告",
+      "danger": "危険"
+    },
+    "severity_guide": {
+      "title": "重大度ガイド",
+      "danger": "レポート内の数値が正しくなくなる原因となるエラー - エクスポートする前に修正する必要があります。",
+      "warning": "メトリクスの精度に影響を与える可能性のある潜在的な問題 - 確認して修正します。",
+      "info": "情報通知 - アクションは必要ありません。",
+      "ok": "このカテゴリでは問題は検出されませんでした。",
+      "note_prefix": "クリック",
+      "note_suffix": "どのカードでも、特定の記録を確認できます。一部の問題はプラットフォームで修正できます。基になるデータを手動でレビューする必要があるものもあります。"
+    },
+    "summary": {
+      "label": "まとめ：",
+      "count": "{{count}} {{label}}",
+      "generated": "生成 {{date}}",
+      "affected": "影響を受ける"
+    },
+    "drilldown": {
+      "subtitle": "影響を受ける行は最大 50 行 - 起動前に解決または文書化します。",
+      "empty": "影響を受ける行は表示されません。",
+      "table_aria": "影響を受ける行"
+    },
+    "table": {
+      "id": "ID",
+      "identifier": "識別子",
+      "name": "名前",
+      "status": "状態",
+      "created": "作成されました"
+    },
+    "empty": {
+      "value": "-",
+      "rows": "行がありません"
+    },
+    "toasts": {
+      "load_failed": "データ品質レポートのロードに失敗しました",
+      "rows_failed": "影響を受ける行のロードに失敗しました"
+    }
+  },
+  "disclosure_pack": {
+    "meta": {
+      "page_title": "FADP / nDSG 開示パック",
+      "title": "FADP / nDSG 開示パック",
+      "subtitle": "AG80 - スイスのデータ保護法のパイロット開示文書"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "refresh_aria": "開示パックを更新する",
+      "export_markdown": "マークダウンのエクスポート",
+      "save_changes": "変更を保存する"
+    },
+    "about": {
+      "title": "このページについて",
+      "body_prefix": "開示パック (AG80) は、",
+      "body_suffix": "地域ケアプログラムに参加する前に住民に周知しなければならないデータ保護開示文書。データ管理者と処理者の身元、処理されるデータのカテゴリ、法的根拠、データ主体の権利、インシデント対応の連絡先、国境を越えた転送の保護措置が含まれます。",
+      "review_prefix": "このパックは作業中のドラフトです - でレビューしてください",
+      "review_middle": "出版前のカウンセリング。コントローラーの詳細、インシデント対応の所有者、展開の分離ノード構成を編集してから、次を使用します。",
+      "review_suffix": "法的な引き継ぎ文書を作成します。デフォルトはプラットフォーム側のコミットメントを反映しています。エクスポートする前に変更を保存します。"
+    },
+    "tabs": {
+      "aria": "開示セクション",
+      "controller": "コントローラーとプロセッサー",
+      "data_retention": "データと保持",
+      "data_subject_rights": "データ主体の権利",
+      "federation_isolated_node": "フェデレーションと孤立したノード",
+      "incident_response": "インシデント対応",
+      "cross_border_transfers": "国境を越えた送金"
+    },
+    "sections": {
+      "tenant_controller": "テナントコントローラー",
+      "platform_processor": "プラットフォームプロセッサ",
+      "data_categories": "データカテゴリー",
+      "lawful_basis": "法的根拠",
+      "retention_defaults": "保持のデフォルト",
+      "federation_policy": "フェデレーションポリシー",
+      "isolated_node_configuration": "分離ノード構成",
+      "destinations": "目的地",
+      "safeguards": "安全対策"
+    },
+    "fields": {
+      "controller_name": "コントローラ名",
+      "address": "住所",
+      "contact_email": "連絡先メールアドレス",
+      "data_protection_officer": "データ保護責任者",
+      "processor_name": "プロセッサ名",
+      "sub_processors": "サブプロセッサ (1 行に 1 つ)",
+      "hosting_owner": "ホスティングオーナー",
+      "smtp_owner": "SMTP オーナー",
+      "storage_owner": "ストレージ所有者",
+      "backup_owner": "バックアップ所有者",
+      "update_cadence": "更新頻度",
+      "owner_name": "所有者名",
+      "notification_window_hours": "通知ウィンドウ (時間)",
+      "fadp_authority": "FADP 権限"
+    },
+    "labels": {
+      "aggregate_policy": "集約ポリシー"
+    },
+    "status": {
+      "enabled": "有効",
+      "disabled": "無効",
+      "enabled_lower": "有効",
+      "disabled_lower": "無効",
+      "members_can_opt_out": "メンバーはオプトアウトできます",
+      "no_member_opt_out": "メンバーのオプトアウトはありません",
+      "cross_border_occurs": "国境を越えた転送が発生する",
+      "no_cross_border_transfers": "国境を越えた転送は禁止"
+    },
+    "isolated_node": {
+      "description_prefix": "これらのフィールドは、この展開が州が管理するインフラストラクチャで実行される場合にのみ関連します。標準のホスト型展開の場合は、デフォルトのままにしておきます。各所有者フィールドは、そのインフラストラクチャ コンポーネントに責任を負う法人を識別します。",
+      "description_suffix": "第9条。"
+    },
+    "descriptions": {
+      "hosting_owner": "サーバー インフラストラクチャを管理する法人 (例: 州の IT 部門)。",
+      "smtp_owner": "アウトバウンド電子メール配信を担当する法人。",
+      "storage_owner": "ファイル/BLOB ストレージ (アップロード、エクスポート) を管理する法人。",
+      "backup_owner": "データベースのバックアップ ストレージと保持を担当する法人。",
+      "update_cadence": "カントンノードがプラットフォームの更新を受け取る頻度 (例: 「毎月」、「四半期」)。"
+    },
+    "footer": {
+      "last_saved": "最後に保存した {{date}}",
+      "customised": "カスタマイズされた"
+    },
+    "toasts": {
+      "load_failed": "開示パックのロードに失敗しました",
+      "saved": "開示パックが保存されました",
+      "save_failed": "開示パックの保存に失敗しました",
+      "export_empty": "エクスポートが空で返されました",
+      "exported": "開示パックがエクスポートされました",
+      "export_failed": "開示パックのエクスポートに失敗しました"
+    }
+  },
+  "external_integrations": {
+    "meta": {
+      "title": "外部統合バックログ",
+      "subtitle": "AG87 - 外部所有者を待っているパートナー依存の統合 / DSA / サンドボックス"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "add": "統合の追加",
+      "seed": "シードのデフォルトのバックログ",
+      "open": "開ける",
+      "edit": "編集",
+      "delete": "消去",
+      "cancel": "キャンセル",
+      "save_changes": "変更を保存する",
+      "create": "統合の作成",
+      "remove": "取り除く"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "外部統合は、銀行取引、AHV 送信、郵便住所検証、州のデータ フィードなど、パートナーに依存する接続のバックログ トラッカーです。各エントリは、統合所有者、データ共有契約 (DSA) のステータス、およびサンドボックスの準備状況を追跡します。これを使用して外部パートナーと調整し、関係者に進捗状況を報告します。",
+      "dsa_label": "DSA (データ共有契約):",
+      "dsa_body": "ライブデータ交換の前に署名する必要があります。 Research Partnerships テンプレートを使用して契約書の草案を作成します。",
+      "sandbox_label": "サンドボックス URL:",
+      "sandbox_body": "パートナーのテスト環境へのリンク。ライブに昇格する前に、サンドボックスで統合を検証します。",
+      "statuses_label": "ステータス:",
+      "statuses_body": "提案 -> スコーピング -> サンドボックス -> ライブ。ブロックされているということは、外部依存関係が未解決であることを意味します。"
+    },
+    "empty": {
+      "title": "統合はまだ追跡されていません",
+      "body": "厳選されたよく知られたパートナー依存の統合セット (AHV 送信、Spitex ハンドオフ、州のマスターデータ フィード、PostFinance、Twint、住所検証) をシードして、プラットフォーム オペレーターが所有者、DSA ステータス、サンドボックスの準備状況を追跡できるようにします。"
+    },
+    "last_updated": "最終更新日 {{date}}",
+    "table": {
+      "aria": "外部統合",
+      "name": "名前",
+      "category": "カテゴリ",
+      "owner": "所有者",
+      "status": "状態",
+      "dsa": "DSA",
+      "sandbox": "サンドボックス",
+      "updated": "更新されました",
+      "row_actions": "行アクション",
+      "actions": "アクション"
+    },
+    "categories": {
+      "banking": "銀行業",
+      "payment": "支払い",
+      "identity_verification": "本人確認",
+      "professional_care": "プロフェッショナルケア",
+      "municipal_data": "自治体データ",
+      "postal": "郵便",
+      "ahv": "AHV",
+      "healthcare": "健康管理",
+      "other": "他の"
+    },
+    "statuses": {
+      "proposed": "提案された",
+      "scoping": "スコーピング",
+      "blocked": "ブロックされました",
+      "sandbox": "サンドボックス",
+      "live": "ライブ",
+      "deprecated": "廃止されました"
+    },
+    "dsa_statuses": {
+      "not_required": "不要",
+      "drafting": "製図",
+      "in_review": "レビュー中",
+      "signed": "署名済み"
+    },
+    "editor": {
+      "add_title": "統合の追加",
+      "edit_title": "編集: {{name}}",
+      "name": "名前",
+      "name_placeholder": "例えばAHV 送信ゲートウェイ",
+      "category": "カテゴリ",
+      "status": "状態",
+      "owner_name": "所有者名",
+      "owner_name_placeholder": "外部連絡先のフルネーム",
+      "owner_email": "所有者のメールアドレス",
+      "owner_email_placeholder": "contact@partner.example",
+      "interface_spec_url": "インターフェース仕様 URL",
+      "interface_spec_placeholder": "https://docs.partner.example/spec",
+      "dsa_status": "データ共有契約",
+      "sandbox_url": "サンドボックス URL",
+      "sandbox_placeholder": "https://sandbox.partner.example",
+      "notes": "注意事項",
+      "notes_placeholder": "未解決の質問、阻害要因、依存関係、契約上の注意事項..."
+    },
+    "delete_modal": {
+      "title": "統合の削除",
+      "body_prefix": "これにより、バックログ エントリが完全に削除されます。",
+      "body_suffix": "外部パートナー レコードは影響を受けません。追跡エントリのみが削除されます。",
+      "warning": "この操作は元に戻すことができません。"
+    },
+    "toasts": {
+      "load_failed": "統合バックログのロードに失敗しました",
+      "seeded": "シードされたデフォルトのバックログ",
+      "seed_failed": "シードに失敗しました",
+      "updated": "統合が更新されました",
+      "update_failed": "アップデートに失敗しました",
+      "created": "統合が作成されました",
+      "create_failed": "作成に失敗しました",
+      "removed": "統合が削除されました",
+      "delete_failed": "削除に失敗しました"
+    }
+  },
+  "federation_peers_admin": {
+    "meta": {
+      "page_title": "フェデレーションピア - 管理者",
+      "title": "フェデレーションピア",
+      "subtitle": "他の協同組合とつながることで、メンバーはコミュニティ間で何時間も過ごすことができます。"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "refresh_aria": "フェデレーションピアを更新する",
+      "add_peer": "ピアの追加",
+      "rotate_secret": "共有シークレットをローテーションする",
+      "delete_peer": "ピアの削除",
+      "cancel": "キャンセル",
+      "create_reveal_secret": "シークレットの作成と公開",
+      "copy_secret": "シークレットをコピーする",
+      "copy_peer_slug": "ピア スラグのコピー",
+      "copied_secret": "秘密をコピーしました"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "フェデレーション ピアは、コミュニティがメンバーと時間を共有することに同意した他の NEXUS 協同組合です。ピア接続が確立されると、メンバーはコミュニティ間で時間を移動したり、フェデレーションされたリストを表示したりできます。各ピア接続には共有秘密が必要であり、これを双方が構成する必要があります。資格情報を交換するには、ピア協同組合の管理者に連絡してください。",
+      "shared_secret_label": "共有秘密:",
+      "shared_secret_body": "両方の協同組合が互いの身元を証明するために使用する秘密鍵。両側にまったく同じように入力する必要があります。 6 ～ 12 か月ごとに交換し、他の人が見たと思ったらすぐに交換してください。",
+      "pending_body": "認証情報が設定され、最初に成功した API 呼び出しを待機しています。",
+      "active_body": "接続されており、同期中です。",
+      "suspended_body": "最後の同期が失敗したか、手動で一時停止されました - ピアのベース URL が正しく、到達可能であることを確認してください。"
+    },
+    "peers": {
+      "title": "登録済みピア",
+      "table_aria": "フェデレーションピア",
+      "empty": "フェデレーション ピアはまだありません。まずフェデレーション ピアを追加してください。"
+    },
+    "table": {
+      "name": "名前",
+      "slug": "ナメクジ",
+      "base_url": "ベース URL",
+      "status": "状態",
+      "last_handshake": "最後に成功したコンタクト",
+      "actions": "アクション"
+    },
+    "status": {
+      "pending": "保留中",
+      "active": "アクティブ",
+      "suspended": "一時停止中"
+    },
+    "empty": {
+      "never": "一度もない"
+    },
+    "create_modal": {
+      "title": "フェデレーションピアの追加",
+      "peer_slug": "ピアナメクジ",
+      "peer_slug_description": "小文字の英数字 + ハイフン。アウトバウンド転送の宛先協調スラッグとして使用されます。",
+      "peer_slug_placeholder": "キスバーン",
+      "display_name": "表示名",
+      "display_name_placeholder": "Caring Community ベルン協同組合",
+      "base_url": "ベース URL",
+      "base_url_description": "リモート NEXUS API の HTTPS URL。 /v2/federation/hour-transfer/inbound パスが自動的に追加されます。",
+      "base_url_placeholder": "https://api.bern-cooperative.ch",
+      "notes": "注意事項",
+      "notes_placeholder": "社内メモ - パートナーの連絡先、契約書の参照...",
+      "status_hint_prefix": "ステータスは次のように始まります",
+      "status_hint_middle": "リモート側が同じ共有シークレットを登録した後、両方の側を次のように設定します。"
+    },
+    "secret_modal": {
+      "title": "ワンタイム共有秘密",
+      "body_prefix": "この秘密が明かされる",
+      "only_once": "一度だけ",
+      "body_suffix": "今すぐコピーして、この協同組合のリモート NEXUS インストールのフェデレーション ピア エントリに貼り付けます。紛失した場合は、ここでシークレットをローテーションし、リモート側を再度更新する必要があります。",
+      "peer_slug_label": "ピアスラッグ:",
+      "base_url_label": "ベース URL:"
+    },
+    "validation": {
+      "required_fields": "すべての必須フィールドに入力する必要があります。"
+    },
+    "confirm_rotate": "「{{name}}」の共有シークレットをローテーションしますか?古いシークレットはすぐに機能しなくなるため、リモート側を更新する必要があります。",
+    "confirm_delete": "フェデレーション ピア「{{name}}」を削除しますか?これは永続的です。",
+    "toasts": {
+      "load_failed": "フェデレーションピアのロードに失敗しました。",
+      "created": "フェデレーション ピアが作成されました。",
+      "create_failed": "ピアの作成に失敗しました。",
+      "status_updated": "ピアステータスが {{status}} に設定されました。",
+      "status_failed": "ピアステータスの更新に失敗しました。",
+      "secret_rotated": "共有シークレットがローテーションされました。",
+      "rotate_failed": "シークレットのローテーションに失敗しました。",
+      "deleted": "ピアが削除されました。",
+      "delete_failed": "ピアの削除に失敗しました。",
+      "copied": "クリップボードにコピーされました。",
+      "copy_failed": "コピーに失敗しました。"
+    }
+  },
+  "help_request_sla": {
+    "meta": {
+      "page_title": "ヘルプ リクエスト SLA ダッシュボード",
+      "title": "ヘルプ リクエスト SLA ダッシュボード",
+      "subtitle_prefix": "AG96 - 最初の対応と解決策",
+      "subtitle_suffix": "AG81 運用ポリシーに対する追跡"
+    },
+    "actions": {
+      "edit_policy": "ポリシーの編集",
+      "refresh": "リフレッシュ",
+      "refresh_aria": "SLA ダッシュボードを更新"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "サービス レベル アグリーメント (SLAs) は、ヘルプ リクエストに対する予想される最大応答時間と解決時間を設定します。リクエストが SLA に近づくか超過すると、このダッシュボードで期限切れとしてフラグが立てられます。 SLA は、一貫したサービス品質を維持し、正確なパイロット指標を生成するのに役立ちます。",
+      "first_response_label": "最初の対応",
+      "first_response_prefix": "リクエストの送信から最初のコーディネーターとの連絡までの時間（ステータスが",
+      "first_response_suffix": ")",
+      "resolution_label": "解決",
+      "resolution_prefix": "最初の応答からリクエストが照合および確認されるまでの時間 (ステータスが到達するまでの時間)",
+      "resolution_suffix": ")",
+      "note": "SLA ウィンドウは、AG81 運用ポリシーで設定されます。上の「ポリシーの編集」ボタンを使用して編集します。緊急ケアのカテゴリ (医療搬送など) にはより厳密な SLA を設定し、社会活動にはより緩やかな SLA を設定します。"
+    },
+    "policy": {
+      "first_response_description": "- 提出からコーディネーターとの最初の連絡までの時間",
+      "resolution_description": "- 最初の応答からリクエストが照合および確認されるまでの時間",
+      "platform_defaults": "プラットフォームのデフォルト - AG81 ワークショップは実行されません",
+      "tenant_policy": "テナントポリシーが適用されました"
+    },
+    "metrics": {
+      "first_response_breached": "初動対応違反",
+      "first_response_at_risk": "危険にさらされる初動対応",
+      "resolution_breached": "決議違反",
+      "resolution_at_risk": "危機に瀕した解決策",
+      "pending": "保留中",
+      "in_progress": "進行中",
+      "resolved_24h": "24 時間以内に解決されました (最近)"
+    },
+    "open": {
+      "title": "ヘルプリクエストを開く",
+      "subtitle": "{{count}} オープン - 最初にソート違反",
+      "bucket_filter_aria": "バケットフィルター",
+      "all_count": "すべて ({{count}})",
+      "breached_count": "侵害されました ({{count}})",
+      "at_risk_count": "危険にさらされています ({{count}})",
+      "on_track_count": "順調に進んでいます ({{count}})",
+      "empty_bucket": "このバケットにはオープンなヘルプ リクエストがありません。",
+      "table_aria": "ヘルプリクエストを開く",
+      "request_meta": "時期: {{when}} - ユーザー番号{{userId}} - 年齢 {{age}}",
+      "target_hours": "ターゲット {{hours}}h",
+      "over_by": "{{duration}}までに終了",
+      "left": "{{duration}} 左"
+    },
+    "resolved": {
+      "title": "最近解決されました (過去 72 時間)",
+      "table_aria": "最近解決されたヘルプ リクエスト",
+      "user_id": "ユーザー番号{{userId}}"
+    },
+    "table": {
+      "request": "リクエスト",
+      "bucket": "バケツ",
+      "status": "状態",
+      "created": "作成されました",
+      "turnaround": "振り向く",
+      "within": "内で",
+      "resolved": "解決済み"
+    },
+    "buckets": {
+      "breached": "違反した",
+      "at_risk": "危険にさらされています",
+      "on_track": "順調に進んでいます"
+    },
+    "dimensions": {
+      "first_response": "最初の対応",
+      "resolution": "解決"
+    },
+    "answers": {
+      "yes": "はい",
+      "no": "いいえ"
+    },
+    "footer": {
+      "generated": "レポートが生成されました {{date}}。",
+      "proxy_prefix": "プロキシ: 最初の応答 = ステータスが次の状態に移行します",
+      "proxy_middle": "解決 = ステータスが到達する",
+      "proxy_suffix": "調整する",
+      "proxy_end": "AG81 操作ポリシーのウィンドウ。"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "SLA ダッシュボードのロードに失敗しました"
+    }
+  },
+  "integration_showcase": {
+    "meta": {
+      "page_title": "統合ショーケース",
+      "title": "統合ショーケース",
+      "subtitle": "この展開で利用可能なすべてのパブリック API、Webhook、フェデレーション エンドポイント、および OAuth サーフェスの単一ページのリファレンス。技術統合パートナーにすぐに渡すことができます。"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "refresh_aria": "統合ショーケースを更新する"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "サードパーティのサービス、自治体のデータ システム、またはフェデレーテッド NEXUS ネットワークとの統合を設定する場合は、このページを使用します。ここにリストされているすべてのエンドポイントはライブであり、この展開にスコープされています。サンプル ペイロードは例示的なものであり、実際の値はテナントのスラッグとパートナーの資格情報によって異なります。統合パートナーに未加工の API ドキュメントを示すのではなく、この URL を統合パートナーと共有してください。",
+      "last_refreshed": "最後に更新された{{date}}。"
+    },
+    "sections": {
+      "sample_request": "サンプルリクエスト",
+      "read_full_spec": "GitHub で完全な仕様を読む"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "統合ショーケースの読み込みに失敗しました"
+    }
+  },
+  "isolated_node": {
+    "meta": {
+      "page_title": "孤立ノード決定ゲート",
+      "title": "孤立ノード決定ゲート",
+      "subtitle": "AG85 - 州が管理する展開の準備チェックリスト"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "refresh_aria": "分離ノード決定ゲートをリフレッシュする",
+      "edit": "編集",
+      "cancel": "キャンセル",
+      "save_changes": "変更を保存する"
+    },
+    "about": {
+      "title": "このページについて",
+      "body_prefix": "分離されたノードのデプロイメントが実行される",
+      "body_middle": "州または自治体によって完全に管理されているインフラストラクチャでは、データが州の境界を出ることはありません。この構成は次の場合に必要です",
+      "body_suffix": "スイス州の厳格なデータ保護規則に基づいて展開されます。ほとんどのコミュニティは標準のホスト型展開として実行されるため、このセクションを構成する必要はありません。",
+      "workflow": "以下の各決定項目を実行します。値を設定し、所有者を割り当て、合意されたら決定済みとしてマークします。すべての項目が「決定済み」ステータスになると、ゲートが閉じます (パイロット打ち上げ準備状況チェックに合格します)。"
+    },
+    "warning": {
+      "title": "重要 - 必要な場合にのみ構成してください",
+      "body_prefix": "これらの設定は、自治体が分離ノード要件を明示的に指定している場合にのみ変更してください。パイロットの開始後に展開モードを変更するには、担当者との調整が必要です。",
+      "body_suffix": "技術チーム。州のデータ保護担当者の同意なしにこの設定を変更しないでください。"
+    },
+    "status": {
+      "pending": "保留中",
+      "in_progress": "進行中",
+      "decided": "決めた",
+      "blocked": "ブロックされました"
+    },
+    "status_counts": {
+      "pending": "保留中: {{count}}",
+      "in_progress": "進行中: {{count}}",
+      "decided": "決定: {{count}}",
+      "blocked": "ブロックされました: {{count}}"
+    },
+    "gate": {
+      "closed": "ゲートは閉じています - 発射準備完了",
+      "open": "ゲートは開いています - 依然として決定が必要です",
+      "decided_count": "{{total}} 件中 {{decided}} 件が決定しました",
+      "blocked_count": "- {{count}} がブロックされました",
+      "progress_aria": "意思決定ゲートの進捗状況"
+    },
+    "fields": {
+      "value": "価値",
+      "owner": "所有者",
+      "notes": "注意事項",
+      "status": "状態",
+      "url_placeholder": "https://...",
+      "owner_description": "この決定に責任を負う個人または組織",
+      "notes_description": "コンテキスト、リンク、契約参照、またはブロッカー"
+    },
+    "empty": {
+      "unassigned": "未割り当て",
+      "none": "なし"
+    },
+    "timestamps": {
+      "last_updated": "最終更新日 {{date}}"
+    },
+    "modal": {
+      "edit_decision_item": "決定項目を編集する",
+      "subtitle": "このゲート アイテムの値、所有者、ステータス、メモを更新します"
+    },
+    "toasts": {
+      "load_failed": "ディシジョンゲートデータのロードに失敗しました",
+      "item_updated": "決定事項を更新しました",
+      "save_failed": "決定項目の保存に失敗しました"
+    }
+  },
+  "kpi_baselines": {
+    "meta": {
+      "page_title": "コミュニティ KPI のベースライン",
+      "title": "コミュニティ KPI のベースライン",
+      "subtitle_prefix": "コミュニティ指標のスナップショットを取得して前後を追跡します",
+      "subtitle_suffix": "インパクト"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "refresh_aria": "KPI ベースラインを更新します",
+      "capture_now": "今すぐベースラインをキャプチャ",
+      "capture_now_short": "今すぐキャプチャ",
+      "capture_first": "最初のベースラインをキャプチャする",
+      "compare": "比較する",
+      "close": "近い",
+      "cancel": "キャンセル"
+    },
+    "about": {
+      "title": "このページについて",
+      "body_prefix": "ベースラインは、Caring Community プログラムが開始される前のコミュニティの状態を記録します。これらは四半期レビューごとに現在の指標と比較され、影響が実証されます。すべてのベースラインを取得",
+      "body_suffix": "住民をオンボーディングする前 - パイロットが開始されると、ベースラインは凍結され、過去に遡ることはできません。",
+      "compare_prefix": "クリック",
+      "compare_suffix": "任意のベースライン行を使用して、現在のプラットフォーム データと並べて比較できます。主要な影響指標で 25% 以上の変化を示す指標は、達成された影響として強調表示されます。"
+    },
+    "metrics": {
+      "volunteer_hours": "ボランティア時間 (90 日)",
+      "member_count": "アクティブなメンバー",
+      "recipient_count": "受信者に到達しました",
+      "active_relationships": "活発な人間関係",
+      "total_exchanges": "合計交換数",
+      "avg_response_hours": "平均応答時間 (時間)",
+      "engagement_rate_pct": "エンゲージメント率 (%)"
+    },
+    "comparison": {
+      "comparing": "比較:",
+      "captured": "(捕獲 {{date}})",
+      "impact_achieved": "達成された効果",
+      "baseline": "ベースライン",
+      "now": "今"
+    },
+    "empty": {
+      "no_data": "利用可能なデータがありません",
+      "no_baselines": "まだベースラインがキャプチャされていません。"
+    },
+    "fields": {
+      "notes_label_prefix": "注:",
+      "baseline_label": "ベースラインラベル",
+      "baseline_placeholder": "例えばNEXUS の起動前",
+      "baseline_description": "このスナップショットを識別するための短い名前 (例: \"Q1 2025 Pre-launch\")",
+      "period_start": "期間の開始",
+      "period_start_description": "基準期間の開始",
+      "period_end": "期間終了",
+      "period_end_description": "基準期間終了日",
+      "notes_source": "注記/ソース (オプション)",
+      "notes_placeholder": "例えば「GP 紹介データ 2026 年第 1 四半期、会員調査 2026 年 3 月、プラットフォームをすべてのゲマインデンに展開する前に収集」",
+      "notes_description": "これらの数値の出所を文書化します (例: 「GP 紹介データ 2026 年第 1 四半期」、「会員調査 2026 年 3 月」)。引用された情報源により、補助金報告においてベースラインが擁護可能になります。"
+    },
+    "table": {
+      "aria": "KPI ベースライン",
+      "label": "ラベル",
+      "captured": "捕らえられた",
+      "members": "メンバー",
+      "volunteer_hours": "ボランティアの時間",
+      "active_relationships": "活発な人間関係",
+      "total_exchanges": "合計交換数",
+      "actions": "アクション"
+    },
+    "modal": {
+      "title_prefix": "捕獲",
+      "title_suffix": "ベースライン",
+      "body": "これにより、現在のコミュニティ メトリクスのライブ スナップショットが取得され、将来の比較のために名前付きベースラインとして保存されます。",
+      "metrics_captured": "取得された指標: アクティブなメンバー数、承認されたボランティア時間 (過去 90 日間)、アクティブなサポート関係、個別の受信者、総交換数。"
+    },
+    "toasts": {
+      "load_failed": "KPI ベースラインのロードに失敗しました",
+      "comparison_failed": "比較のロードに失敗しました",
+      "saved": "ベースラインが保存されました。これを使用して、将来のメトリクスをこのスナップショットと比較します。",
+      "capture_failed": "ベースラインのキャプチャに失敗しました"
+    }
+  },
+  "lead_nurture": {
+    "meta": {
+      "page_title": "リードの育成",
+      "title": "リードの育成",
+      "subtitle": "最初のコンタクトからオンボーディングまで、地方自治体、投資家、企業、住民、コミュニティ組織などの潜在的なパートナーを追跡し、育成します。"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "refresh_aria": "リード育成の連絡先を更新する",
+      "export_csv": "エクスポート CSV",
+      "edit": "編集",
+      "mark_unsubscribed": "購読解除のマークを付ける",
+      "unsubscribe_aria": "購読解除連絡先",
+      "cancel": "キャンセル",
+      "save": "保存"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "Lead Nurture トラッカーは、NEXUS の導入機会を対象とした軽量の CRM です。自治体、潜在的な資金提供者、またはビジネス パートナーが関心を示したら、ここに追加し、ファネルを通じて進捗状況を追跡します。ステージ フィールドを使用して、各連絡先が会話のどの位置にいたかを記録し、誰も冷めてしまわないようにフォローアップの日付を記録します。レポート用に CSV にエクスポートするか、外部の CRM にインポートします。"
+    },
+    "summary": {
+      "title": "まとめ",
+      "total_contacts": "総連絡先数",
+      "by_segment": "セグメント別:",
+      "by_stage": "段階別:"
+    },
+    "filters": {
+      "title": "フィルター",
+      "segment": "セグメント",
+      "segment_description": "自治体: 地方自治体;投資家: 資金提供者。ビジネス: スポンサーシップ;居住者：個人。パートナー: NGO/慈善団体。",
+      "stage": "ステージ",
+      "all_segments": "全セグメント",
+      "all_stages": "全ステージ"
+    },
+    "contacts": {
+      "title": "連絡先 ({{count}})",
+      "empty": "現在のフィルターに一致する連絡先がありません。",
+      "table_aria": "リードナーチャリングの連絡先"
+    },
+    "table": {
+      "name_email": "名前/メールアドレス",
+      "organisation": "組織",
+      "segment": "セグメント",
+      "stage": "ステージ",
+      "source": "ソース",
+      "captured": "捕らえられた",
+      "follow_up": "フォローアップ",
+      "actions": "アクション"
+    },
+    "segments": {
+      "municipality": "自治体",
+      "investor": "投資家",
+      "business": "仕事",
+      "resident": "居住者",
+      "partner": "パートナー"
+    },
+    "stages": {
+      "captured": "捕らえられた",
+      "contacted": "連絡済み",
+      "engaged": "婚約中",
+      "qualified": "資格のある",
+      "converted": "変換された",
+      "dormant": "睡眠状態",
+      "unsubscribed": "購読解除済み"
+    },
+    "fields": {
+      "follow_up_date": "フォローアップ日 (ISO 8601)",
+      "follow_up_placeholder": "2026-05-15",
+      "notes": "注意事項"
+    },
+    "modal": {
+      "title": "連絡先の編集",
+      "stage_description": "捕らえられた：ファーストコンタクト。連絡した:連絡した;参加中: 活発な会話。適格: 関心と予算が確認済み。変換しました: サインアップしました。休眠中：静かになった。未購読: オプトアウトしました。"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "confirm_unsubscribe": "{{email}} を登録解除としてマークしますか?",
+    "toasts": {
+      "load_failed": "見込み客育成連絡先の読み込みに失敗しました",
+      "updated": "連絡先が更新されました",
+      "update_failed": "連絡先を更新できませんでした",
+      "unsubscribed": "未購読としてマークされました",
+      "unsubscribe_failed": "購読解除に失敗しました",
+      "exported": "リードリストがエクスポートされました",
+      "export_failed": "CSV をエクスポートできませんでした"
+    }
+  },
+  "municipal_copilot": {
+    "meta": {
+      "page_title": "市営通信副操縦士",
+      "title": "市営通信副操縦士",
+      "subtitle": "公式発表の下書きを作成し、AI によって洗練され、トーンと明瞭さをチェックしてから公開します。一貫したアクセス可能な音声で住民や自治体の担当者とコミュニケーションをとる必要があるコーディネーター向けに設計されています。"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "generate_proposal": "提案書の生成",
+      "accept": "受け入れる",
+      "reject": "拒否する",
+      "view": "ビュー",
+      "cancel": "キャンセル",
+      "reject_proposal": "提案を拒否する",
+      "publish": "公開"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "市副操縦士は、明確で、適切に形式的で、専門用語のないアナウンスを作成するのに役立ちます。下書きを貼り付けます。AI は改善を提案し、口調の問題 (形式的すぎる、見下すような、または不明瞭な) にフラグを立て、モデレーションに関する懸念事項をリストします。何かが公開される前に、提案を確認して承認または拒否します。"
+    },
+    "sections": {
+      "new_draft": "新しいドラフト",
+      "latest_proposal": "最新の提案",
+      "clarity_warnings": "明確さに関する警告",
+      "moderation_flags": "モデレーションフラグ",
+      "recent_proposals": "最近の提案"
+    },
+    "fields": {
+      "draft_announcement": "ドラフト発表",
+      "draft_placeholder": "大まかなドラフトを貼り付けます。副操縦士が磨きをかけ、トーンをチェックし、問題にフラグを立てます。",
+      "character_count": "{{count}} / 4000 文字",
+      "audience_hint": "視聴者へのヒント (オプション)",
+      "audience_placeholder": "例えば北部地域の介護者",
+      "audience_description": "AI がトーンと語彙を適切に調整できるように、このアナウンスの対象者 (例: 「すべての住民」、「ボランティア」、「自治体の連絡先」) を指定します。",
+      "polished_text": "洗練されたテキスト",
+      "reason": "理由",
+      "reason_placeholder": "なぜこの提案は拒否されるのでしょうか?"
+    },
+    "status": {
+      "proposed": "提案された",
+      "accepted": "承認されました",
+      "rejected": "拒否されました",
+      "published": "発行済み"
+    },
+    "tone": {
+      "too_formal": "形式的すぎる",
+      "too_informal": "カジュアルすぎる",
+      "condescending": "見下すような",
+      "ok": "トーンOK"
+    },
+    "tone_legend": {
+      "prefix": "トーンレジェンド -",
+      "too_formal": "過度に官僚的",
+      "too_informal": "プロフェッショナルではないと思われるかもしれない",
+      "condescending": "読者をひいきにするかもしれない",
+      "ok": "トーンの問題は検出されませんでした"
+    },
+    "labels": {
+      "audience": "視聴者: {{audience}}",
+      "model": "モデル: {{model}}"
+    },
+    "states": {
+      "accepted": "承認済みですが、まだ公開されていません。「公開」を押してお知らせとして送信してください。",
+      "rejected_reason": "拒否されました - 理由: {{reason}}",
+      "published": "お知らせ #{{id}} として公開されました。"
+    },
+    "empty": {
+      "value": "-",
+      "no_latest": "まだ提案はありません。左側のドラフトから 1 つを生成します。",
+      "no_proposals": "まだ提案はありません。分析した下書きは監査証跡としてここに表示されます。"
+    },
+    "table": {
+      "aria": "最近の副操縦士の提案",
+      "status": "状態",
+      "draft": "下書き",
+      "audience": "観客",
+      "tone": "トーン",
+      "created": "作成されました",
+      "actions": "アクション"
+    },
+    "modal": {
+      "reject_title": "提案を拒否する"
+    },
+    "toasts": {
+      "load_failed": "副操縦士の提案をロードできませんでした",
+      "enter_draft": "最初に下書きを入力してください",
+      "draft_too_long": "下書きが長すぎます (最大 4000 文字)",
+      "generated": "生成された提案",
+      "generate_failed": "プロポーザルの生成に失敗しました",
+      "accepted": "提案が承認され、お知らせとして公開されました",
+      "accept_failed": "提案を受け入れられませんでした",
+      "reason_required": "理由は必須です",
+      "rejected": "提案は拒否されました",
+      "reject_failed": "提案を拒否できませんでした",
+      "publish_failed": "提案は承認されましたが、公開に失敗しました。「公開」を押して再試行してください"
+    }
+  },
+  "municipal_roi_page": {
+    "meta": {
+      "page_title": "自治体の影響レポート",
+      "title": "自治体の影響レポート",
+      "subtitle": "B2G 調達の証拠 - 介護コストの相殺と社会資本の指標"
+    },
+    "actions": {
+      "export_csv": "エクスポート CSV",
+      "refresh_data": "データを更新する",
+      "refresh_aria": "自治体の影響レポートを更新する"
+    },
+    "about": {
+      "title": "このページについて",
+      "body_prefix": "市営",
+      "body_middle": "レポートは、次の方法を使用して、地域ケア プログラムの社会的および経済的価値を計算します。",
+      "body_suffix": "Caring Community 方法論。これには、正式なケア サービス (Spitex/Pflege) に対する推定コスト オフセット、生成された社会的価値、およびレポート期間にわたる傾向データが表示されます。このレポートは、プログラムの効果の証拠として自治体のパートナーや資金提供者と共有されるように設計されています。",
+      "formula_prefix": "コスト相殺 = 承認されたケア時間の合計 x",
+      "formula_suffix": "時給×予防乗数。 Caring Community の調査に基づくと、予防乗数 (デフォルト: 2.0) は、1 時間の非公式ケアにより約 2 時間の正式なケア介入が防止されることを反映しています。"
+    },
+    "filters": {
+      "from": "から",
+      "to": "に",
+      "sub_region": "サブリージョン",
+      "all_sub_regions": "すべてのサブリージョン",
+      "period": "期間: {{from}} -> {{to}}"
+    },
+    "methodology": {
+      "hours_valued_at": "価値のある時間数",
+      "hours_are_valued_at": "時間の価値は",
+      "chf_per_hour": "CHF {{amount}}/時",
+      "default_rate": "CHF 35/時間",
+      "tenant_setting_source": "このテナント用に構成された",
+      "default_source": "スイスの介護助手率、SECO 2024",
+      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
+      "prevention_value_suffix": "評価方法論。",
+      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
+      "default_prevention_suffix": "評価方法論。",
+      "substitution_applied": "時間はカテゴリごとの置換係数によって重み付けされます。",
+      "substitution_not_applied": "すべての時間は 1.0 倍で重み付けされます。"
+    },
+    "stats": {
+      "total_hours": "合計時間",
+      "active_members": "アクティブなメンバー",
+      "active_relationships": "活発な人間関係",
+      "care_recipients": "要介護者",
+      "weighted_hours_tooltip": "時間は、Caring Community 方法論ごとにカテゴリ固有の代替率 (例: 交際 0.4 倍、移動 0.7 倍、用事 1.0 倍) によって重み付けされます。",
+      "weighted_hours_note": "{{hours}} 置換係数後の加重時間数"
+    },
+    "roi": {
+      "title": "推定介護費用の相殺",
+      "yoy": "{{value}} YoY",
+      "prevented_this_period": "この期間は正式な医療費が発生しませんでした",
+      "prevention_value": "予防価値",
+      "multiplier_note": "({{multiplier}}x 乗数)",
+      "default_multiplier_note": "(2倍の乗数)",
+      "social_isolation_supported": "社会的孤立から支援された人々"
+    },
+    "municipalities": {
+      "title": "これが自治体にとって何を意味するか",
+      "point_hour_prefix": "地域社会でのケアの時間を 1 時間ごとに約節約できます",
+      "point_hour_suffix": "正式な介護費用の中で",
+      "point_prevention": "地域社会の予防的支援により、居住介護の必要性を軽減できる - 推定乗数は 2 倍",
+      "point_nexus": "この影響を州および地方自治体の調達に関して測定、監査、および報告できるようにします。",
+      "point_export": "CSV エクスポートが可能 - Caring Community、Pro Senectute、および州の社会部門のレポートにはページ ヘッダーのボタンを使用します。"
+    },
+    "breakdown": {
+      "title": "サブ地域別内訳",
+      "description": "サブ地域の内訳は、どの地域が最も多くのケア活動を行っているかを示します。これを使用して、コーディネーターのサポートやボランティアの募集がさらに必要な分野を特定します。",
+      "aria": "サブリージョンの内訳",
+      "sub_region": "サブリージョン",
+      "hours": "営業時間",
+      "weighted_hours": "加重時間数",
+      "formal_care_offset": "フォーマルケアオフセット"
+    },
+    "toasts": {
+      "load_failed": "地方自治体の影響データをロードできませんでした",
+      "export_failed": "CSV をエクスポートできませんでした"
+    }
+  },
+  "municipal_verification": {
+    "meta": {
+      "page_title": "市区町村の検証",
+      "title": "市区町村の検証",
+      "description": "このコミュニティを認証済み自治体パートナーとしてマークします。公開レポートに「認証済み自治体」バッジを追加します。"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "generate_dns_token": "DNS トークンを生成する",
+      "apply_attestation": "証明書の適用",
+      "revoke": "取り消す",
+      "cancel": "キャンセル"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "Municipal Verification は、このコミュニティ ケア プログラムが要件を満たしているという自治体または州のパートナーからの正式な承認を記録します。パイロット打ち上げ準備状況チェックには検証が必要で、これにより自治体影響レポートのロックが解除されます。公式自治体ドメインには DNS TXT 検証を使用するか、DNS 制御が利用できない場合は管理者証明書を適用します。",
+      "pending_dns": "検証トークンが生成されました - DNS の伝播と確認を待っています。",
+      "verified": "正式に確認されました - 自治体レポート パックのロックが解除されました。",
+      "revoked": "検証が削除されました - アクセスを復元するには再検証してください。"
+    },
+    "status": {
+      "verified": "確認済み",
+      "pending_dns": "保留中 DNS",
+      "revoked": "取り消されました"
+    },
+    "current": {
+      "title": "現在の状況",
+      "verified_on": "{{date}} で確認済み",
+      "not_verified": "このテナントは現在検証されていません。 DNS 検証を開始するか、手動の管理者証明書を適用するには、以下のオプションを使用します。"
+    },
+    "request": {
+      "title": "検証のリクエスト",
+      "method_aria": "検証方法",
+      "dns_tab": "DNS TXT (推奨)",
+      "dns_body": "あなたが管理する自治体の公式ドメインを指定してください。公開できる DNS TXT レコードを生成します。伝播すると、システムはこのテナントを検証済みとしてマークします。",
+      "attestation_tab": "管理者の証明書",
+      "attestation_body": "これは、DNS コントロールが使用できない場合にのみ使用してください。検証は、管理者が手動で証明したものとして記録されます。"
+    },
+    "fields": {
+      "municipality_domain": "自治体ドメイン",
+      "domain_or_organisation": "ドメインまたは組織",
+      "domain_placeholder": "例えばチューリッヒ",
+      "attestation_note": "証明書メモ（オプション）",
+      "attestation_description": "DNS 検証を行わずにこれを証明するのはなぜですか? (監査証跡。)"
+    },
+    "history": {
+      "title": "検証",
+      "empty": "まだ検証記録がありません。",
+      "via_method": "{{method}}経由",
+      "updated": "{{date}} を更新しました"
+    },
+    "dns": {
+      "publish_record": "この TXT レコードを DNS で公開し、伝播を待ちます。",
+      "record_name": "レコード名",
+      "value": "価値",
+      "type_label": "タイプ",
+      "ttl_label": "TTL",
+      "txt_type": "TXT",
+      "ttl_value": "300"
+    },
+    "revoke_modal": {
+      "title": "認証を取り消しますか?",
+      "body_prefix": "の検証を取り消します",
+      "body_suffix": "これにより、検証済みバッジが削除され、検証レコードは取り消されたものとしてマークされます。"
+    },
+    "validation": {
+      "domain_required": "ドメインを入力してください"
+    },
+    "toasts": {
+      "load_failed": "検証ステータスのロードに失敗しました",
+      "dns_generated": "DNS 検証トークンが生成されました",
+      "dns_failed": "DNS 検証を開始できませんでした",
+      "attested": "検証済み",
+      "attest_failed": "検証を証明できませんでした",
+      "revoked": "検証が取り消されました",
+      "revoke_failed": "検証の取り消しに失敗しました"
+    }
+  },
+  "pilot_launch_readiness": {
+    "meta": {
+      "page_title": "パイロット打ち上げの準備状況",
+      "title": "パイロット打ち上げの準備状況",
+      "subtitle": "AG95 - AG80～AG87 の評価面を組み合わせたゴー/ノーゴー レポート"
+    },
+    "actions": {
+      "launch_pilot": "パイロットを開始",
+      "refresh": "リフレッシュ",
+      "refresh_aria": "起動準備レポートを更新する",
+      "retry": "リトライ",
+      "open": "開ける",
+      "acknowledge_default_matrix": "デフォルトのマトリックスを承認する",
+      "cancel": "キャンセル",
+      "confirm_launch": "はい、パイロットを開始します"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "これは、Caring Community の試験運用を開始する前の、ゴー/ノーゴーのゲートです。以下の各セクションは、構成または評価モジュール (AG80 ～ AG87) に対応します。 「起動」ボタンが有効になる前に、すべてのセクションが「準備完了」ステータスになる必要があります。起動すると、これは一方向のアクションです。起動タイムスタンプとオペレーターは永続的に記録されます。",
+      "review_help": "「要検討」と表示されているセクションには構成が欠落しているか不完全です。関連するモジュールをクリックして、リストされた項目を解決します。"
+    },
+    "status": {
+      "ready": "準備ができて",
+      "needs_review": "見直しが必要",
+      "not_started": "開始されていません",
+      "blocked": "ブロックされました"
+    },
+    "missing": {
+      "controller_name": "コントローラ名",
+      "controller_contact_email": "管理者の連絡先メールアドレス",
+      "controller_data_protection_officer": "データ保護責任者",
+      "incident_response_contact_email": "インシデント対応の連絡先メールアドレス",
+      "workshop_not_run": "運営方針ワークショップは実施されない",
+      "policy_appendix_url": "ポリシー付録 URL",
+      "safeguarding_escalation_user_id": "エスカレーション連絡先の保護",
+      "acknowledgement": "コーディネーターの承認",
+      "pre_pilot_baseline": "パイロット前のスコアボードのベースライン",
+      "danger_checks": "データ品質の問題",
+      "backlog_empty": "統合バックログが空です"
+    },
+    "states": {
+      "launched_title": "試験運用開始",
+      "launched_body": "{{date}}{{user}} にリリースされました。これは一方向のマイルストーンです。準備状況チェックは監査のために表示されたままになります。",
+      "launched_by_user": "ユーザー #{{id}} による",
+      "ready_title": "起動準備完了",
+      "ready_body_prefix": "すべての準備セクションの準備が整いました。クリック",
+      "ready_body_suffix": "コーディネーター チームがこれを一方的な決定を下す準​​備ができているとき。",
+      "blocked_title": "まだ起動できません - {{count}} ブロッカーが残っています",
+      "blocked_title_plural": "まだ起動できません - {{count}} ブロッカーが残っています",
+      "blocked_body": "起動ボタンを有効にする前に、以下のすべてのセクションを解決してください。"
+    },
+    "overall": {
+      "ready": "パイロットは打ち上げの準備ができています",
+      "blocked": "起動がブロックされました - まず問題を修正してください",
+      "not_started": "パイロット評価はまだ実行されていません",
+      "needs_review": "パイロットにはコーディネーターによるレビューが必要"
+    },
+    "progress": {
+      "ready_count": "{{ready}} / {{total}} 準備完了",
+      "aria": "打ち上げ準備の進捗状況"
+    },
+    "isolated_node": {
+      "required": "分離ノード ゲートがアクティブです - この展開はカントン分離ノード (AG85) として構成されています。すべてのアイテムは、発売前に決定ステータスに到達する必要があります。",
+      "informational": "分離ノード ゲートは、標準のホスト型展開に関する情報です。 AG85deployment_mode が canton_isoulated_node に設定されている場合にのみ起動をブロックします。自治体が分離ノード要件を指定していない場合は、このセクションの項目を無視できます。"
+    },
+    "timestamps": {
+      "last_updated": "最終更新日 {{date}}",
+      "report_generated": "レポートが生成されました {{date}}。任意のセクションをクリックして、対応する管理画面を開きます。"
+    },
+    "modal": {
+      "title": "パイロットを起動しますか?",
+      "body_prefix": "パイロット版の立ち上げは、",
+      "one_way_action": "一方通行の行動",
+      "body_suffix": "テナントの起動タイムスタンプとオペレーターが記録され、プラットフォーム レポートはコミュニティをライブとして扱い始めます。",
+      "confirm_intro": "続行する前に、コーディネーター チームに次のことを確認してください。",
+      "check_disclosure": "開示パック、運営方針、および商業境界が承認される",
+      "check_baseline": "パイロット前のスコアボードのベースラインが取得されました",
+      "check_data_quality": "データ品質チェックは緑色です",
+      "check_residents": "実際の居住者は招待される準備ができています",
+      "section_summary": "セクションの概要"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "more_count": "+{{count}} もっと見る",
+    "toasts": {
+      "load_failed": "起動準備レポートの読み込みに失敗しました",
+      "boundary_acknowledged": "商業境界が認められている",
+      "boundary_acknowledge_failed": "境界の確認に失敗しました",
+      "launch_success": "パイロットは無事に打ち上げられました。",
+      "cannot_launch": "発射できません - 準備ゲートが閉じられていません。",
+      "already_launched": "このパイロットはすでに開始されています。",
+      "launch_failed": "パイロットの起動に失敗しました。"
+    },
+    "errors": {
+      "load_failed": "打ち上げ準備レポートをロードできませんでした。",
+      "unexpected_response": "打ち上げ準備状況レポートから予期しない応答が返されました。",
+      "unavailable_title": "準備状況レポートは利用できません"
+    }
+  },
+  "pilot_scoreboard": {
+    "meta": {
+      "title": "パイロットの成功スコアボード",
+      "subtitle": "AG83 - パイロット前のベースライン + 四半期ごとのレビュー頻度による 90 日間のローリング指標"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "pre_set": "プレパイロットベースラインセット",
+      "capture_pre": "パイロット前のベースラインをキャプチャする",
+      "capture_quarterly": "四半期レビューを取得する",
+      "capture_baseline": "ベースラインをキャプチャ",
+      "cancel": "キャンセル"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "すべての指標は 90 日のローリング ウィンドウを使用します。実際の居住者をオンボーディングする前にパイロット前のベースラインを取得し、3 か月ごとに四半期レビューのスナップショットを実行します。比較表は、各メトリックがそのベースラインに対してどのように変化したかを示します。",
+      "methodology_prefix": "コスト オフセットは、次の方法を使用して計算されます。",
+      "age_stiftung": "Caring Community",
+      "age_stiftung_title": "Stiftung für das Alter",
+      "methodology_middle": "方法論: 非公式ケアの時間 x",
+      "methodology_suffix": "35/時間（スイスのフォーマル・ケア・アシスタントのレート）× 2（回避されたフォーマル・ケア費用を反映した予防乗数）。この方法論は、試験的な報告に関してスイス州の社会サービスによって認められています。"
+    },
+    "quarterly": {
+      "next_review": "次の四半期レビュー:",
+      "overdue": "期限を過ぎました"
+    },
+    "sections": {
+      "metrics": "パイロットメトリクス",
+      "comparing_baseline": "キャプチャされたパイロット前のベースラインとの比較 {{date}}",
+      "no_baseline": "プレパイロットベースラインはまだありません - 現在の値のみが表示されます",
+      "captured_baselines": "捕捉されたベースライン"
+    },
+    "table": {
+      "metric": "メトリック",
+      "pre_pilot": "プレパイロット",
+      "current": "現在",
+      "delta": "デルタ",
+      "change": "変化"
+    },
+    "metrics": {
+      "active_members": "アクティブなメンバー (90 日)",
+      "first_response_hours": "最初の反応の中央値",
+      "approved_hours": "承認された時間 (90 日)",
+      "recurring_relationships": "繰り返し起こる関係",
+      "coordinator_workload_hrs": "コーディネーターのワークロード",
+      "satisfaction_score": "満足度スコア (1-5)",
+      "social_isolation_pct": "社会的隔離代理人",
+      "comms_reach_pct": "通信範囲",
+      "business_participation": "アクティブなビジネス (90d)",
+      "cost_offset_chf": "推定コストオフセット (CHF)"
+    },
+    "baselines": {
+      "label": "ラベル",
+      "captured": "捕らえられた",
+      "period": "期間",
+      "type": "タイプ",
+      "notes": "注意事項",
+      "pre_pilot": "プレパイロット",
+      "quarterly": "四半期ごと"
+    },
+    "fields": {
+      "notes_optional": "注記 (オプション)",
+      "label_optional": "ラベル (オプション)"
+    },
+    "pre_modal": {
+      "title": "パイロット前のベースラインをキャプチャする",
+      "body": "実際の居住者をオンボーディングする前に、これを一度キャプチャしてください。現在の 90 日間の指標を比較のベースラインとして凍結します。今後のすべての四半期レビューでは、このスナップショットに対してデルタが計算されます。この操作は元に戻すことができません。",
+      "notes_placeholder": "パイロット地域、参加自治体、開始前に行われた決定..."
+    },
+    "quarterly_modal": {
+      "title": "四半期レビューを取得する",
+      "body": "パイロットの開始後、3 か月ごとに実行します。スナップショット ラベルはデフォルトで現在の四半期 (例: Q2_2026) ですが、カスタマイズできます。メモを追加して、到達したマイルストーン、ポリシーの変更、常駐者のフィードバックなど、前回のレビュー以降に変更された内容を記録します。スナップショットは、今日から直近の 90 日間をカバーします。",
+      "label_placeholder": "季刊_2026_07",
+      "label_description": "Q2_2026 や 2026_Q3 などの認識可能なラベルを使用します。デフォルトは四半期_YYYY_MMです。",
+      "notes_placeholder": "この四半期に何が変化したか、マイルストーンが達成されました..."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "currency": {
+      "chf": "CHF"
+    },
+    "methodology": {
+      "prefix": "方法論: 時間 x",
+      "per_hour": "/時間×",
+      "multiplier": "予防乗数。",
+      "window": "期間: {{days}} 日。"
+    },
+    "toasts": {
+      "load_failed": "パイロット スコアボードのロードに失敗しました",
+      "pre_captured": "パイロット前のベースラインを取得",
+      "pre_failed": "パイロット前のベースラインをキャプチャできませんでした",
+      "quarterly_captured": "四半期レビューのキャプチャ",
+      "quarterly_failed": "四半期レビューを取得できませんでした"
+    }
+  },
+  "research_partnerships": {
+    "meta": {
+      "title": "研究パートナーシップ",
+      "subtitle": "プライバシーに配慮した研究パートナー、集計データセットのエクスポート、失効履歴を管理する"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "refresh_aria": "研究パートナーシップを更新する",
+      "generate_export": "エクスポートの生成",
+      "add_partner": "パートナーを追加",
+      "view": "ビュー",
+      "open": "開ける",
+      "revoke": "取り消す",
+      "cancel": "キャンセル",
+      "create": "作成する",
+      "close": "近い",
+      "download_markdown": "ダウンロードMarkdown",
+      "render": "与える",
+      "rerender": "再レンダリング",
+      "generate": "生成する"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "研究パートナーシップにより、承認された学術研究者または政策研究者が評価目的で匿名化されたプラットフォーム データに制御されたアクセスを得ることができます。各パートナーシップは、特定のデータ範囲、期間、およびデータ共有契約を定義します。すべてのアクセスはログに記録されます。パートナーは個々のメンバー データを参照することはなく、集約されたデータセットまたは匿名化されたデータセットのみを参照します。",
+      "data_scope_label": "データ範囲:",
+      "data_scope_body": "研究者がアクセスできるデータを正確に定義します。たとえば、すべての個人識別子を除いたサブ地域ごとの月間ケア時間の集計などです。この範囲には契約上の拘束力があり、四半期ごとに監査されます。",
+      "download_history_label": "ダウンロード履歴:",
+      "download_history_body": "すべてのデータのエクスポートは、タイムスタンプと研究者の詳細とともに記録されます。このログは、リクエストに応じて Data Protection Officer が利用できます。以前に発行されたデータセットを取り消すには、取り消しを使用します。"
+    },
+    "partners": {
+      "title": "研究パートナー",
+      "table_aria": "研究パートナー",
+      "empty": "研究パートナーはまだいません。"
+    },
+    "templates": {
+      "title": "契約書のテンプレート",
+      "subtitle": "FADP/nDSG に準拠した法的審査用の草案",
+      "empty": "利用可能な契約テンプレートはありません。",
+      "placeholder_count_one": "{{count}} プレースホルダー",
+      "placeholder_count_other": "{{count}} プレースホルダー",
+      "fallback_title": "契約書テンプレート",
+      "placeholder_label": "{{placeholder}}",
+      "rendered_markdown": "レンダリングされた Markdown ({{count}} 文字)",
+      "missing_placeholder_count_one": "{{count}} プレースホルダーがありません",
+      "missing_placeholder_count_other": "{{count}} プレースホルダーがありません"
+    },
+    "exports": {
+      "title": "データセットのエクスポート履歴",
+      "table_aria": "研究データセットのエクスポート",
+      "empty": "データセットのエクスポートはまだありません。",
+      "partner_fallback": "パートナー #{{id}}"
+    },
+    "columns": {
+      "partner": "パートナー",
+      "status": "状態",
+      "agreement": "合意",
+      "methodology": "方法論",
+      "created": "作成されました",
+      "period": "期間",
+      "rows": "行",
+      "hash": "ハッシュ",
+      "actions": "アクション"
+    },
+    "fields": {
+      "name": "名前",
+      "institution": "機関",
+      "contact_email": "連絡先メールアドレス",
+      "agreement_reference": "契約書参照",
+      "methodology_url": "方法論 URL",
+      "status": "状態",
+      "dataset_scope": "データセットの範囲",
+      "dataset_scope_description": "カンマ区切りのデータセット キー。",
+      "period_start": "期間開始",
+      "period_end": "期間終了"
+    },
+    "statuses": {
+      "draft": "下書き",
+      "active": "アクティブ",
+      "paused": "一時停止中",
+      "ended": "終了しました",
+      "generated": "生成された",
+      "superseded": "置き換えられました",
+      "revoked": "取り消されました"
+    },
+    "partner_modal": {
+      "title": "研究パートナーを追加"
+    },
+    "export_modal": {
+      "title": "集約データセットの生成",
+      "active_partner": "アクティブな研究パートナー",
+      "privacy_note": "エクスポートは集計のみであり、抑制しきい値を使用します。直接のメンバー識別子は含まれません。"
+    },
+    "toasts": {
+      "load_failed": "研究パートナーシップを読み込めませんでした",
+      "render_template_failed": "テンプレートのレンダリングに失敗しました",
+      "create_partner_failed": "研究パートナーの作成に失敗しました",
+      "partner_created": "研究パートナーが作成されました",
+      "generate_export_failed": "データセットのエクスポートの生成に失敗しました",
+      "export_generated": "生成された集約データセットのエクスポート",
+      "revoke_export_failed": "データセットのエクスポートを取り消すことができませんでした",
+      "export_revoked": "データセットのエクスポートが取り消されました"
+    }
+  },
+  "smart_nudges": {
+    "meta": {
+      "page_title": "賢いメンバーのナッジ",
+      "title": "賢いメンバーのナッジ",
+      "description": "適合性の高いタンデム パートナーに向けてメンバーを誘導する自動提案。保守的なデフォルト - 1 日の上限に基づいて実行されます。"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "dry_run": "予行演習",
+      "dispatch_now": "今すぐ発送",
+      "save_configuration": "設定の保存",
+      "cancel": "キャンセル",
+      "dispatch": "急送"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "スマート ナッジは、適合性の高いタンデム マッチ パートナーが検出されたときにメンバーに送信される自動プロンプトです。ピア接続の恩恵を受けるメンバーはマッチング エンジンによって識別され、接続を提案するアプリ内通知 (およびオプションで電子メール) が送信されます。ナッジではクールダウン期間が考慮されるため、メンバーに頻繁に連絡することはありません。実際に派遣する前に、予行演習を使用して、誰がナッジされるかをプレビューします。",
+      "inactivity_label": "非アクティブ",
+      "inactivity_body": "メンバーが設定された日数ログインしなかった場合にトリガーされます",
+      "unmatched_request_label": "一致しないリクエスト",
+      "unmatched_request_body": "クールダウンウィンドウが経過した後にヘルプリクエストにオファーがない場合にトリガーされます",
+      "follow_up_label": "フォローアップ",
+      "follow_up_body": "承認された交換が完了としてマークされなかった後にコーディネーターに送信される"
+    },
+    "stats": {
+      "sent_30d": "送信済み (30日)",
+      "conversion_30d": "変換 (30 日)",
+      "eligible_candidates": "対象者",
+      "opted_out": "オプトアウトしました"
+    },
+    "chart": {
+      "title": "毎日のナッジ (過去 30 日間)",
+      "sent": "送信済み",
+      "converted": "変換された"
+    },
+    "config": {
+      "title": "構成",
+      "engine_enabled": "エンジンが有効",
+      "engine_description": "オフの場合、ナッジは送出されません。",
+      "min_score": "最小スコア (0.40 - 0.95)",
+      "min_score_description": "ナッジを送信するためのタンデムマッチ スコアのしきい値",
+      "cooldown_days": "クールダウン (日数)",
+      "cooldown_description": "同じペアを再度ナッジする前に、このくらい待ってください",
+      "daily_limit": "1日あたりの制限",
+      "daily_limit_description": "テナント全体の 1 日あたりの最大ナッジ",
+      "save_note": "変更はすぐに有効になります。次にスケジュールされたナッジ実行で新しい設定が適用されます。"
+    },
+    "dry_run": {
+      "title": "ドライランプレビュー",
+      "candidates": "{{count}} 人の候補者",
+      "empty": "現在適格な候補者はいません。",
+      "table_aria": "ナッジ候補のドライラン"
+    },
+    "recent": {
+      "title": "最近のナッジ",
+      "empty": "まだナッジは送信されていません。",
+      "table_aria": "最近のスマートナッジ"
+    },
+    "table": {
+      "target_user": "対象ユーザー",
+      "target": "ターゲット",
+      "suggested_partner": "推奨パートナー",
+      "score": "スコア",
+      "sent": "送信済み",
+      "status": "状態"
+    },
+    "status": {
+      "sent": "送信済み",
+      "converted": "変換された"
+    },
+    "dispatch_modal": {
+      "title": "今すぐナッジを派遣しますか？",
+      "body_prefix": "これにより、最大で送信されます",
+      "body_suffix": "資格のあるメンバーに今すぐ通知を促します。最初に予行演習を必ず行ってください。"
+    },
+    "toasts": {
+      "load_failed": "ナッジ分析の読み込みに失敗しました",
+      "config_saved": "ナッジ構成が保存されました。更新されたルールは、次回のスケジュールされた実行に適用されます。",
+      "save_failed": "設定の保存に失敗しました",
+      "dry_run": "予行演習: {{count}} 人の適格な候補者",
+      "dispatched": "{{count}} ナッジをディスパッチしました",
+      "dispatch_failed": "派遣失敗"
+    }
+  },
+  "sub_regions": {
+    "meta": {
+      "page_title": "サブリージョン - 管理者",
+      "title": "サブリージョン",
+      "subtitle": "医療提供者ディレクトリと地域フィルター用のカルチェ、オルトシュタイン、ゲマインデ、およびカントンの区画"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "サブリージョンは、コミュニティを地理的エリア (近隣、地区、または区) に分割します。これらは、コーディネーターを特定のエリアに割り当て、場所ごとにヘルプ リクエストをフィルタリングし、近隣ごとにパイロット メトリクスを分析するために使用されます。サブリージョンの追加はオプションですが、複数のコーディネーター チームがいる大規模なコミュニティでは強く推奨されます。",
+      "postal_codes_note": "[郵便番号] フィールド: 郵便番号リスト、近隣の名前、または自由形式の説明を入力します。正確な境界は必要ありません。これは、マッピングではなく、コーディネーターの割り当てとレポート フィルター用です。"
+    },
+    "actions": {
+      "add": "サブ領域の追加",
+      "edit_aria": "サブ領域の編集",
+      "mark_inactive": "非アクティブとしてマークする",
+      "cancel": "キャンセル",
+      "save_changes": "変更を保存する",
+      "create": "サブ領域の作成"
+    },
+    "filters": {
+      "search_aria": "サブリージョンを検索する",
+      "search_placeholder": "名前、説明、またはスラッグで検索します...",
+      "type_aria": "タイプでフィルタリングする"
+    },
+    "table": {
+      "aria": "サブ領域テーブル",
+      "name": "名前",
+      "type": "タイプ",
+      "postal_codes": "郵便番号",
+      "coordinates": "座標",
+      "status": "状態",
+      "actions": "アクション",
+      "empty": "サブリージョンはまだありません。サブリージョンを追加して、テナントの地理的なセグメント化を開始します。"
+    },
+    "type_options": {
+      "all": "全種類",
+      "quartier": "カルチェ (地区)",
+      "ortsteil": "オルトシュタイル (地区)",
+      "municipality": "自治体 (ゲマインデ)",
+      "canton": "カントン",
+      "other": "他の"
+    },
+    "status": {
+      "active": "アクティブ",
+      "inactive": "非アクティブ"
+    },
+    "modal": {
+      "add_title": "サブ領域の追加",
+      "edit_title": "編集: {{name}}"
+    },
+    "form": {
+      "name": "名前",
+      "name_placeholder": "例えばロルツェンホフ",
+      "slug": "スラグ (空白の場合は自動生成)",
+      "slug_placeholder": "例えばロルツェンホフ",
+      "slug_description": "URL およびフィルタで使用される小文字のハイフンでつながれた識別子。",
+      "type": "タイプ",
+      "description": "説明",
+      "description_placeholder": "このエリアについて簡単に説明すると...",
+      "postal_codes": "郵便番号",
+      "postal_codes_placeholder": "6330、6331、6332",
+      "postal_codes_description": "カンマまたはスペースで区切られた PLZ リスト。",
+      "centre_latitude": "中心緯度",
+      "latitude_placeholder": "47.1758",
+      "centre_longitude": "中心経度",
+      "longitude_placeholder": "8.4622",
+      "status": "状態"
+    },
+    "validation": {
+      "name_required": "名前は必須です。",
+      "type_required": "タイプは必須です。",
+      "latitude_number": "緯度は数値でなければなりません。",
+      "longitude_number": "経度は数値でなければなりません。"
+    },
+    "toasts": {
+      "created": "サブ領域が正常に作成されました。",
+      "updated": "サブリージョンが正常に更新されました。",
+      "marked_inactive": "サブ領域は非アクティブとしてマークされています。"
+    },
+    "errors": {
+      "load_failed": "サブ領域のロードに失敗しました。",
+      "save_failed": "サブ領域の保存に失敗しました。",
+      "delete_failed": "サブ領域の削除に失敗しました。"
+    },
+    "confirm_mark_inactive": "「{{name}}」を非アクティブとしてマークしますか?リンクされている医療提供者はそこから切り離されることになる。"
+  },
+  "success_stories_admin": {
+    "meta": {
+      "title": "成功事例",
+      "subtitle": "コミュニティの影響を示すプルーフ カードを作成および管理します。調達担当者、資金提供者、自治体のパートナーと共有できるように設計されています。"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "プルーフ カードは、プラットフォームからのライブ メトリクスに関連付けられた構造化された影響ストーリーです。各カードには、引用された証拠ソースおよび方法論のメモとの前後の比較が表示されます。 「デモ」とマークされているカードは説明のみを目的としています。データを検証したら、カードを「本物の証拠」としてマークします。公開されたカードは、地方自治体の影響レポートおよび一般向けの影響ページに表示されます。"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "new_story": "新しい物語",
+      "seed_demo": "シード 3 デモ カード",
+      "refresh_live": "ライブデータから更新する",
+      "edit": "編集",
+      "delete": "消去",
+      "cancel": "キャンセル",
+      "save_changes": "変更を保存する",
+      "create_story": "ストーリーを作成する",
+      "remove": "取り除く"
+    },
+    "empty": {
+      "title": "まだ成功事例はありません",
+      "body": "3 つの例示的なデモ カードをシードして、調達担当者や資金提供者にとってプルーフ カードがどのように見えるかを示します。実際の証拠として手動でマークするまで、それらには明確に「デモ/説明」というラベルが付けられます。"
+    },
+    "table": {
+      "aria": "成功事例",
+      "title": "タイトル",
+      "status": "状態",
+      "demo": "デモ",
+      "audience": "観客",
+      "metric": "メトリック",
+      "row_actions": "行アクション",
+      "actions": "アクション"
+    },
+    "status": {
+      "published": "発行済み",
+      "unpublished": "未公開",
+      "demo": "デモ",
+      "real": "本物"
+    },
+    "metric_sources": {
+      "pilot_scoreboard": "AG83 パイロット スコアボード",
+      "municipal_roi": "AG76 市営 ROI",
+      "manual": "マニュアル・イラスト"
+    },
+    "audience": {
+      "all_residents": "住民の皆様",
+      "municipality": "自治体",
+      "kanton": "カントン",
+      "verein_members": "ヴェラインのメンバー",
+      "volunteers": "ボランティア",
+      "recipients": "要介護者"
+    },
+    "editor": {
+      "new_title": "新たな成功事例",
+      "edit_title": "編集: {{title}}",
+      "title": "タイトル",
+      "title_placeholder": "例えば情報配布の労力を 30% 削減",
+      "narrative": "物語",
+      "narrative_placeholder": "調達担当者または資金提供者にストーリーを説明する 2 ～ 4 文。",
+      "metric_source": "メトリクスソース",
+      "metric_source_description": "pilot_scoreboard: AG83 から自動取得します。自治体_roi: AG76 から自動プルします。手動: 値を手動で入力します。",
+      "metric_key": "メトリックキー",
+      "metric_key_placeholder": "例えば承認済み_時間、フォーマル_ケア_オフセット_chf",
+      "metric_key_description": "手動以外のソースには必須",
+      "before_value": "前の値",
+      "after_value": "後の値",
+      "unit": "ユニット",
+      "unit_placeholder": "例えば時間、CHF、%",
+      "audience": "観客",
+      "sub_region_id": "サブ領域 ID (オプション)",
+      "sub_region_placeholder": "すべて空白のままにしておきます",
+      "method_caveat": "メソッドに関する注意事項",
+      "method_caveat_placeholder": "例えば「パイロット リージョンのみ、n=42 メンバー、90 日の期間」",
+      "method_caveat_description": "必須 - 方法論の制限に関する 1 文のメモ。資金提供者に対して請求を誠実に保ちます。例: '自己申告の時間に基づいています。外部監査は保留中です。」",
+      "evidence_source": "証拠の出典",
+      "evidence_source_placeholder": "例えば「AG83 パイロット スコアボード 2026-04-30 ベースライン」",
+      "evidence_source_description": "必須 - 番号の由来。例: 「NEXUS プラットフォーム データ、2026 年 4 月 1 日までの 90 日間のローリング ウィンドウ」または「Swiss Federal Statistical Office 2023」。",
+      "demo_label": "デモ/説明",
+      "demo_description": "カードはギャラリー上でデモとしてラベル付けされています",
+      "published_label": "発行済み",
+      "published_description": "会員向けギャラリーに表示されます"
+    },
+    "delete_modal": {
+      "title": "成功事例を削除する",
+      "body_prefix": "これにより完全に削除されます",
+      "body_suffix": "ギャラリーから。",
+      "warning": "この操作は元に戻すことができません。"
+    },
+    "toasts": {
+      "load_failed": "成功事例の読み込みに失敗しました",
+      "seeded": "シード済みのデモ カード 3 枚",
+      "seed_failed": "シードに失敗しました",
+      "updated": "ストーリーが更新されました",
+      "update_failed": "アップデートに失敗しました",
+      "created": "ストーリーが作成されました",
+      "create_failed": "作成に失敗しました",
+      "removed": "ストーリーが削除されました",
+      "delete_failed": "削除に失敗しました",
+      "metric_refreshed": "ライブメトリクスが更新されました",
+      "refresh_failed": "更新に失敗しました"
+    }
+  }
+}

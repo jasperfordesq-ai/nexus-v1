@@ -23,7 +23,7 @@ import { PageHeader } from '../../components/PageHeader';
 import type { CreateUserPayload } from '../../api/types';
 
 export function UserCreate() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_users');
   usePageTitle(t('users.create_user_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();

@@ -3,11 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Tag as HeroUITag,
-  TagGroup as HeroUITagGroup,
-  type TagGroupProps as HeroUITagGroupProps,
-} from '@heroui/react';
+import { Tag as HeroUITag } from '@heroui/react/tag';
+import { TagGroup as HeroUITagGroup, type TagGroupProps as HeroUITagGroupProps } from '@heroui/react/tag-group';
 import type { ComponentProps } from 'react';
 
 export type TagGroupProps = HeroUITagGroupProps;

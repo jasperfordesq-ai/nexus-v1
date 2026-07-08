@@ -102,7 +102,7 @@ function parsePayload<T>(raw: unknown): T {
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export function VolunteerSafeguarding() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.safeguarding_page_title'));
   const toast = useToast();
 

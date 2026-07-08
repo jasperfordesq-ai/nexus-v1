@@ -85,7 +85,7 @@ const STATUS_COLORS: Record<string, 'success' | 'danger' | 'warning' | 'default'
 };
 
 export function VolunteerOrganizations() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.volunteer_organizations_title'));
   const toast = useToast();
   const { user } = useAuth();

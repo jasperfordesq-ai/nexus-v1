@@ -60,7 +60,7 @@ const EMPTY_FORM: CategoryFormData = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ResourceCategoriesAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_resources');
   useAdminPageMeta({ title: t('resources.categories_page_title') });
   const toast = useToast();
   const { tenantPath } = useTenant();

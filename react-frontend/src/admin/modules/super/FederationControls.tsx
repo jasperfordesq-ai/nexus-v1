@@ -49,7 +49,7 @@ const colorClasses: Record<string, { bg: string; text: string }> = {
 };
 
 export function FederationControls() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   usePageTitle(t('super.federation_controls_title'));
   const toast = useToast();
   const toastRef = useRef(toast);

@@ -512,5 +512,79 @@
   },
   "aria": {
     "breadcrumbs": "Bułka tarta"
+  },
+  "shared": {
+    "loading": "Loading",
+    "help": "Pomoc",
+    "open_page_help": "Otw?rz pomoc strony",
+    "search": "Szukaj...",
+    "refresh": "Odświeżać",
+    "total_count": "Łącznie{{count}}",
+    "data_table": "Dane",
+    "select_all_rows": "Select all rows",
+    "no_data": "Brak danych",
+    "no_data_available": "Brak dostępnych danych",
+    "select_row": "Select row {{id}}"
+  },
+  "help_drawer": {
+    "aria_label": "Pomoc: {{title}}",
+    "close_panel": "Zamknij panel pomocy",
+    "how_to_use": "Jak korzystać z tej strony",
+    "label": "Pomoc",
+    "related_pages": "Powiązane strony",
+    "tips": "Wskazówki i porady"
+  },
+  "bulk": {
+    "selected_count": "Wybrano {{count}}",
+    "clear_selection": "Wyczyść wybór",
+    "confirm_title": "Potwierdź {{action}}",
+    "confirm_message": "Czy na pewno chcesz {{action}} {{count}}?",
+    "destructive_warning": "Tej akcji nie można cofnąć.",
+    "reason_label": "Powód",
+    "reason_placeholder": "Podaj powód tego działania"
+  },
+  "common": {
+    "cancel": "Anuluj"
+  },
+  "icon_picker": {
+    "choose_icon": "Wybierz ikonę",
+    "choose_icon_placeholder": "Wyszukaj ikonę...",
+    "clear_icon": "Wyczyść ikonę",
+    "label": "Ikona",
+    "no_icons_found": "Nie znaleziono ikon pasujących do „{{search}}”",
+    "search_for_icon": "Wyszukaj ikonę...",
+    "search_icons": "Szukaj ikon"
+  },
+  "visibility_rules": {
+    "min_role": "Minimalna rola",
+    "requires_auth": "Wymaga autoryzacji",
+    "requires_feature": "Wymaga funkcji",
+    "title": "Zasady widoczności",
+    "roles": {
+      "any": "Dowolny",
+      "user": "Użytkownik",
+      "admin": "Administrator",
+      "tenant_admin": "Administrator najemcy",
+      "super_admin": "Superadministrator"
+    },
+    "features": {
+      "none": "Żadne",
+      "events": "Wydarzenia",
+      "groups": "Grupy",
+      "gamification": "Grywalizacja",
+      "goals": "Cele",
+      "blog": "Bloga",
+      "resources": "Zasoby",
+      "volunteering": "Wolontariat",
+      "exchange_workflow": "Przepływ pracy wymiany",
+      "organisations": "Organizacje",
+      "federation": "Federacja",
+      "connections": "Połączenia",
+      "reviews": "Recenzje",
+      "polls": "Ankiety",
+      "direct_messaging": "Wiadomości bezpośrednie",
+      "group_exchanges": "Wymiany grupowe",
+      "search": "Szukaj"
+    }
   }
 }

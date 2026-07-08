@@ -1,0 +1,158 @@
+{
+  "common": {
+    "an_unexpected_error": "Ocurrió un error inesperado",
+    "back": "Atrás",
+    "cancel": "Cancelar",
+    "critical": "Crítico",
+    "delete": "Eliminar",
+    "feature": "Característica",
+    "high": "Alto",
+    "in_progress": "En progreso",
+    "in_review": "En revisión",
+    "low": "Bajo",
+    "medium": "Medio",
+    "planned": "planeado",
+    "refresh": "Actualizar",
+    "unexpected_error": "error inesperado",
+    "unknown": "Desconocido",
+    "unfeature": "no característica",
+    "actions": "Acciones",
+    "active": "Activo",
+    "all": "Todos",
+    "approved": "Aprobado",
+    "clear": "Borrar",
+    "clear_filters": "Borrar filtros",
+    "clear_selection": "Borrar selección",
+    "close": "Cerrar",
+    "collapse": "Colapso",
+    "confirm": "Confirmar",
+    "create": "crear",
+    "declined": "Rechazado",
+    "download": "Descargar",
+    "edit": "Editar",
+    "error_loading_data": "Error al cargar datos",
+    "expand": "Expandir",
+    "export": "Exportar",
+    "load_more": "Cargar más",
+    "loading": "Cargando",
+    "next": "Siguiente",
+    "no": "No",
+    "ok": "OK",
+    "pending": "Pendiente",
+    "previous": "Anterior",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "select_all": "Seleccionar todo",
+    "select_item": "Seleccionar artículo",
+    "yes": "si"
+  },
+  "shared": {
+    "broker_actions": "Acciones del corredor",
+    "content": "Contenido",
+    "core_module": "Módulo principal",
+    "document_details": "Detalles del documento",
+    "history": "Historia",
+    "log_file_empty": "No se encontró ningún archivo de registro",
+    "no": "No",
+    "no_history_available": "No se encontró ningún historial disponible",
+    "no_legal_documents_found": "No se encontraron documentos legales encontrados.",
+    "no_members_found": "No se encontraron miembros encontrados.",
+    "loading": "Loading",
+    "no_data": "Sin datos",
+    "no_data_available": "No hay datos disponibles",
+    "no_recent_broker_activity": "No se encontró actividad reciente del corredor",
+    "open_page_help": "Abrir página de ayuda",
+    "help": "Ayuda",
+    "quick_access": "Acceso rápido",
+    "recent_activity": "Actividad reciente",
+    "refresh": "Refrescar",
+    "search": "Buscar...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Datos",
+    "total_count": "{{count}}total"
+  },
+  "regional_analytics_admin": {
+    "meta": {
+      "title": "Análisis regionales",
+      "description": "Administre suscripciones de análisis pagas para municipios y SME socios: solo agregados agrupados y seguros para la privacidad."
+    },
+    "actions": {
+      "new_subscription": "Nueva suscripción",
+      "generate_report_now": "Generar informe ahora",
+      "view_access_log": "Ver registro de acceso",
+      "suspend": "Suspender",
+      "resume": "Reanudar",
+      "close": "Cerca",
+      "cancel": "Cancelar",
+      "create": "Crear"
+    },
+    "tables": {
+      "subscriptions_aria": "Suscripciones a análisis regionales",
+      "partner": "Pareja",
+      "type": "Tipo",
+      "plan": "Planificar",
+      "status": "Estado",
+      "period_end": "Fin del período",
+      "price_per_month": "Precio / mes",
+      "modules": "Módulos",
+      "actions": "Comportamiento"
+    },
+    "partner_types": {
+      "municipality": "Municipio",
+      "sme_partner": "SME socio"
+    },
+    "plan_tiers": {
+      "basic": "Básico",
+      "pro": "profesional",
+      "enterprise": "Empresa"
+    },
+    "statuses": {
+      "trialing": "Ensayo",
+      "active": "Activo",
+      "past_due": "Vencido",
+      "cancelled": "Cancelado"
+    },
+    "modules": {
+      "trends": "Tendencias",
+      "demand_supply": "Demanda y oferta",
+      "demographics": "Demografía",
+      "footfall": "Pisada"
+    },
+    "empty": {
+      "subscriptions": "Aún no hay suscripciones. Proporcione uno para comenzar a vender análisis regionales.",
+      "access_log": "Aún no se han registrado eventos de acceso.",
+      "value": "-"
+    },
+    "access_log": {
+      "title": "Registro de acceso: {{name}}",
+      "table_aria": "Registro de acceso",
+      "when": "Cuando",
+      "endpoint": "Punto final",
+      "ip_hashed": "IP (en hash)",
+      "user_agent": "agente de usuario"
+    },
+    "create_modal": {
+      "title": "Nueva suscripción de análisis regional",
+      "tenant_id": "Inquilino ID",
+      "partner_name": "Nombre del socio",
+      "partner_type": "Tipo de socio",
+      "contact_email": "Correo electrónico de contacto",
+      "billing_email": "Correo electrónico de facturación",
+      "plan_tier": "Nivel del plan",
+      "monthly_price_cents": "Precio mensual (centavos)",
+      "currency": "Divisa",
+      "enabled_modules": "Módulos habilitados"
+    },
+    "toasts": {
+      "load_failed": "No se pudieron cargar las suscripciones",
+      "status_updated": "Suscripción {{status}}",
+      "update_failed": "La actualización falló",
+      "report_queued": "Generación de informes en cola",
+      "report_failed": "No se pudo poner en cola el informe",
+      "required_fields": "Se requieren inquilino, nombre del socio y correo electrónico de contacto.",
+      "created": "Suscripción creada",
+      "create_failed": "Error al crear"
+    }
+  }
+}

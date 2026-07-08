@@ -27,7 +27,7 @@ import { useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { PageMeta } from '@/components/seo';
 import { ReviewModal } from '@/components/reviews/ReviewModal';
-import { SocialInteractionPanel } from '@/components/social';
+import { SocialInteractionPanel } from '@/components/social/SocialInteractionPanel';
 import { Button, Chip, Avatar, Tabs, Tab, Skeleton, useConfirm } from '@/components/ui';
 
 // ─── Types ────────────────────────────────────────────────────────────────────

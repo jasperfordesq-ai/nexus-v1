@@ -34,9 +34,9 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default
 };
 
 export function SeoAudit() {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced' });
   const { t: tNav } = useTranslation('admin_nav');
-  const { t: tAdmin } = useTranslation('admin');
+  const { t: tAdmin } = useTranslation('admin_advanced');
   useAdminPageMeta({ title: tNav('advanced') });
   const toast = useToast();
 

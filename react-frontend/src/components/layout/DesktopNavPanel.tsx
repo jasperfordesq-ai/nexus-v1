@@ -12,7 +12,9 @@ import { useState, useRef, useEffect, useCallback, useMemo, type KeyboardEvent }
 import { useLocation } from 'react-router-dom';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import type { LucideIcon } from 'lucide-react';
-import { Button, Popover, PopoverContent, PopoverTrigger, ScrollShadow } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
+import { ScrollShadow } from '@/components/ui/ScrollShadow';
 
 export interface DesktopNavPanelItem {
   label: string;

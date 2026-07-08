@@ -22,7 +22,9 @@ import { useTranslation } from 'react-i18next';
 
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import X from 'lucide-react/icons/x';
-import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Textarea } from '@/components/ui/Textarea';
 
 export interface BulkAction {
   key: string;
@@ -52,7 +54,7 @@ export function BulkActionToolbar({
   onClearSelection,
   isLoading = false,
 }: BulkActionToolbarProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_nav');
   const [pending, setPending] = useState<BulkAction | null>(null);
   const [reason, setReason] = useState('');
   const [running, setRunning] = useState(false);

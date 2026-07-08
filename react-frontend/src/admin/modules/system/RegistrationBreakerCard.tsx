@@ -37,7 +37,7 @@ interface BreakerStatus {
 }
 
 export function RegistrationBreakerCard() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   const toast = useToast();
   const [status, setStatus] = useState<BreakerStatus | null>(null);
   const [loading, setLoading] = useState(true);

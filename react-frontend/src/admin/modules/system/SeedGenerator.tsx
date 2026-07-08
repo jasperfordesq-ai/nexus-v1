@@ -31,7 +31,7 @@ const SEED_OPTIONS = [
 ];
 
 export function SeedGenerator() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [selected, setSelected] = useState<string[]>([]);

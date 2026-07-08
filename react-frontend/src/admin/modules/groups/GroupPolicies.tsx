@@ -74,7 +74,7 @@ function buildPolicySections(
 
 export default function GroupPolicies({
   isOpen, onClose, typeId, typeName }: GroupPoliciesProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   const { success, error } = useToast();
   const [loading, setLoading] = useState(true);
   const [policies, setPolicies] = useState<GroupPolicy[]>([]);

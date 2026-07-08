@@ -57,7 +57,7 @@ function formatDate(iso: string | null, fallback: string): string {
 
 export function WarmthPassAdminPage() {
   const { t } = useTranslation('caring_community');
-  const { t: tAdmin } = useTranslation('admin');
+  const { t: tAdmin } = useTranslation('admin_caring_community');
   usePageTitle(t('admin.warmth_pass.title'));
   const { userId: routeUserId } = useParams<{ userId?: string }>();
   const [userId, setUserId] = useState(routeUserId ?? '');

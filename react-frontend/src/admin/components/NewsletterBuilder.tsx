@@ -122,7 +122,7 @@ function exportIsValid(ed: Editor): boolean {
 }
 
 export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, enableTemplates, onChange }: NewsletterBuilderProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   const toast = useToast();
   const confirm = useConfirm();
 

@@ -51,7 +51,7 @@ const tierOrder = ['core', 'template', 'custom'];
 type FilterTab = 'all' | 'core' | 'template' | 'custom' | 'quality';
 
 export function BadgeConfiguration() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_gamification');
   usePageTitle(t('gamification.badge_configuration_title'));
   const toast = useToast();
 

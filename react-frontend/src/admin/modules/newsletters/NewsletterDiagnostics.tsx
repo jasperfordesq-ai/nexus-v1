@@ -56,7 +56,7 @@ const getConfigIcon = (enabled: boolean) => {
 };
 
 export function NewsletterDiagnostics() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   usePageTitle(t('newsletters.newsletter_diagnostics_title'));
   const toast = useToast();
   const navigate = useNavigate();

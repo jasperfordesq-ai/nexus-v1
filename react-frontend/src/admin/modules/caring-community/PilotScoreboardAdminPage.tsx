@@ -129,7 +129,7 @@ const ICONS: Record<string, typeof Users> = {
 };
 
 export default function PilotScoreboardAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('pilot_scoreboard.meta.title'));
   const { showToast } = useToast();
 

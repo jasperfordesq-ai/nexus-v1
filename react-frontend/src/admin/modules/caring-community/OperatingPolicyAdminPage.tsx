@@ -48,7 +48,7 @@ interface PolicyResponse {
 }
 
 export default function OperatingPolicyAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('admin.operating_policy.meta.title'));
   useAdminPageMeta({
     title: t('admin.operating_policy.meta.title'),

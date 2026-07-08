@@ -8,7 +8,7 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { Info } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Spinner } from '@/components/ui';
+import { Spinner } from '@/components/ui/Spinner';
 import type { PasswordCheckState } from '@/hooks/usePasswordCheck';
 import { PASSWORD_MIN_LENGTH } from '@/hooks/usePasswordCheck';
 

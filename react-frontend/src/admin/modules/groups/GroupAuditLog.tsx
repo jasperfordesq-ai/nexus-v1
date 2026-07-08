@@ -55,7 +55,7 @@ function getActionColor(action: string): 'primary' | 'success' | 'warning' | 'da
 
 function ExpandableDetails({ details }: { details: Record<string, unknown> | string | null }) {
   const [expanded, setExpanded] = useState(false);
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
 
   if (!details) return <span className="text-muted">-</span>;
 
@@ -89,7 +89,7 @@ function ExpandableDetails({ details }: { details: Record<string, unknown> | str
 }
 
 export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   const toast = useToast();
 
   const [entries, setEntries] = useState<AuditEntry[]>([]);

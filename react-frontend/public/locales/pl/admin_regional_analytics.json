@@ -1,0 +1,158 @@
+{
+  "common": {
+    "an_unexpected_error": "Wystąpił nieoczekiwany błąd",
+    "back": "Powrót",
+    "cancel": "Anuluj",
+    "critical": "Krytyczny",
+    "delete": "Usuń",
+    "feature": "Funkcja",
+    "high": "Wysoka",
+    "in_progress": "W toku",
+    "in_review": "W przeglądzie",
+    "low": "Niski",
+    "medium": "Średni",
+    "planned": "Planowane",
+    "refresh": "Odśwież",
+    "unexpected_error": "Nieoczekiwany błąd",
+    "unknown": "Nieznany",
+    "unfeature": "Brak funkcji",
+    "actions": "Działania",
+    "active": "Aktywny",
+    "all": "Wszystko",
+    "approved": "Zatwierdzone",
+    "clear": "Jasne",
+    "clear_filters": "Wyczyść filtry",
+    "clear_selection": "Wyczyść wybór",
+    "close": "Zamknij",
+    "collapse": "Zwiń",
+    "confirm": "Potwierdź",
+    "create": "Utwórz",
+    "declined": "Odrzucono",
+    "download": "Pobierz",
+    "edit": "Edytuj",
+    "error_loading_data": "Błąd ładowania danych",
+    "expand": "Rozwiń",
+    "export": "Eksportuj",
+    "load_more": "Załaduj więcej",
+    "loading": "Ładowanie",
+    "next": "Następny",
+    "no": "Nie",
+    "ok": "OK",
+    "pending": "Oczekujące",
+    "previous": "Poprzedni",
+    "retry": "Spróbuj ponownie",
+    "save": "Zapisz",
+    "select_all": "Wybierz wszystko",
+    "select_item": "Wybierz element",
+    "yes": "Tak"
+  },
+  "shared": {
+    "broker_actions": "Działania brokera",
+    "content": "Treść",
+    "core_module": "Moduł podstawowy",
+    "document_details": "Szczegóły dokumentu",
+    "history": "Historia",
+    "log_file_empty": "Nie znaleziono pliku dziennika",
+    "no": "Nie",
+    "no_history_available": "Nie znaleziono dostępnej historii",
+    "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
+    "no_members_found": "Nie znaleziono żadnych członków",
+    "loading": "Loading",
+    "no_data": "Brak danych",
+    "no_data_available": "Brak dostępnych danych",
+    "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
+    "open_page_help": "Otwórz pomoc na stronie",
+    "help": "Pomoc",
+    "quick_access": "Szybki dostęp",
+    "recent_activity": "Ostatnia aktywność",
+    "refresh": "Odświeżać",
+    "search": "Szukaj...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Dane",
+    "total_count": "Łącznie{{count}}"
+  },
+  "regional_analytics_admin": {
+    "meta": {
+      "title": "Analityka regionalna",
+      "description": "Zarządzaj subskrypcjami płatnych usług analitycznych dla gmin i partnerów SME — wyłącznie zbiorcze dane zbiorcze zapewniające ochronę prywatności."
+    },
+    "actions": {
+      "new_subscription": "Nowa subskrypcja",
+      "generate_report_now": "Wygeneruj raport teraz",
+      "view_access_log": "Wyświetl dziennik dostępu",
+      "suspend": "Wstrzymać",
+      "resume": "Wznawiać",
+      "close": "Zamknąć",
+      "cancel": "Anulować",
+      "create": "Tworzyć"
+    },
+    "tables": {
+      "subscriptions_aria": "Subskrypcje analiz regionalnych",
+      "partner": "Partnera",
+      "type": "Typ",
+      "plan": "Planuj",
+      "status": "Stan",
+      "period_end": "Koniec okresu",
+      "price_per_month": "Cena / mc",
+      "modules": "Moduły",
+      "actions": "Działania"
+    },
+    "partner_types": {
+      "municipality": "Miasto",
+      "sme_partner": "SME partnera"
+    },
+    "plan_tiers": {
+      "basic": "Podstawowy",
+      "pro": "Zawodowiec",
+      "enterprise": "Przedsiębiorstwo"
+    },
+    "statuses": {
+      "trialing": "Próba",
+      "active": "Aktywny",
+      "past_due": "Przeterminowany",
+      "cancelled": "Odwołany"
+    },
+    "modules": {
+      "trends": "Trendy",
+      "demand_supply": "Popyt i podaż",
+      "demographics": "Demografia",
+      "footfall": "Odgłos kroków"
+    },
+    "empty": {
+      "subscriptions": "Nie ma jeszcze subskrypcji. Zapewnij jeden, aby rozpocząć sprzedaż analiz regionalnych.",
+      "access_log": "Nie zarejestrowano jeszcze żadnych zdarzeń związanych z dostępem.",
+      "value": "-"
+    },
+    "access_log": {
+      "title": "Dziennik dostępu - {{name}}",
+      "table_aria": "Dziennik dostępu",
+      "when": "Gdy",
+      "endpoint": "Punkt końcowy",
+      "ip_hashed": "Adres IP (haszowany)",
+      "user_agent": "Agent użytkownika"
+    },
+    "create_modal": {
+      "title": "Nowa subskrypcja analiz regionalnych",
+      "tenant_id": "Najemca ID",
+      "partner_name": "Nazwa partnera",
+      "partner_type": "Typ partnera",
+      "contact_email": "Adres e-mail do kontaktu",
+      "billing_email": "E-mail rozliczeniowy",
+      "plan_tier": "Poziom planu",
+      "monthly_price_cents": "Cena miesięczna (centy)",
+      "currency": "Waluta",
+      "enabled_modules": "Włączone moduły"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować subskrypcji",
+      "status_updated": "Subskrypcja {{status}}",
+      "update_failed": "Aktualizacja nie powiodła się",
+      "report_queued": "Generowanie raportu w kolejce",
+      "report_failed": "Nie udało się ustawić w kolejce raportu",
+      "required_fields": "Wymagane są najemca, nazwa partnera i kontaktowy adres e-mail",
+      "created": "Subskrypcja utworzona",
+      "create_failed": "Tworzenie nie powiodło się"
+    }
+  }
+}

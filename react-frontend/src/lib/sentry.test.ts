@@ -162,6 +162,65 @@ describe('sentry analytics consent checks', () => {
     vi.useRealTimers();
   });
 
+  it('queues context and breadcrumbs without touching the SDK before idle initialization', async () => {
+    vi.useFakeTimers();
+    vi.resetModules();
+    vi.stubEnv('VITE_SENTRY_DSN', 'https://public@example.sentry.io/1');
+    mockReadStoredConsent.mockReturnValue({ analytics: true });
+    const Sentry = await import('@sentry/react');
+    vi.clearAllMocks();
+
+    const animationCallbacks: FrameRequestCallback[] = [];
+    const idleCallbacks: IdleRequestCallback[] = [];
+    Object.defineProperty(window, 'requestIdleCallback', {
+      configurable: true,
+      value: (() => 0) as typeof window.requestIdleCallback,
+    });
+    const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback) => {
+      animationCallbacks.push(callback);
+      return animationCallbacks.length;
+    });
+    const idleSpy = vi.spyOn(window, 'requestIdleCallback').mockImplementation((callback) => {
+      idleCallbacks.push(callback);
+      return idleCallbacks.length;
+    });
+
+    const {
+      initSentryAfterIdle,
+      setSentryUser,
+      setSentryTenant,
+      addSentryBreadcrumb,
+    } = await import('./sentry');
+
+    setSentryUser({ id: 42, name: 'Alice', email: 'alice@test.com' } as Parameters<typeof setSentryUser>[0]);
+    setSentryTenant({ id: 7, name: 'Hour Timebank', slug: 'hour-timebank' });
+    addSentryBreadcrumb('bootstrapped tenant', 'tenant', { slug: 'hour-timebank' });
+
+    expect(Sentry.setUser).not.toHaveBeenCalled();
+    expect(Sentry.setTag).not.toHaveBeenCalled();
+    expect(Sentry.addBreadcrumb).not.toHaveBeenCalled();
+
+    initSentryAfterIdle();
+    animationCallbacks.shift()?.(0);
+    animationCallbacks.shift()?.(16);
+    idleCallbacks.shift()?.({
+      didTimeout: false,
+      timeRemaining: () => 10,
+    });
+
+    await vi.waitFor(() => expect(Sentry.init).toHaveBeenCalled());
+    expect(Sentry.setUser).toHaveBeenCalledWith({ id: '42' });
+    expect(Sentry.setTag).toHaveBeenCalledWith('tenant_slug', 'hour-timebank');
+    expect(Sentry.addBreadcrumb).toHaveBeenCalledWith(expect.objectContaining({
+      message: 'bootstrapped tenant',
+      category: 'tenant',
+    }));
+
+    rafSpy.mockRestore();
+    idleSpy.mockRestore();
+    vi.useRealTimers();
+  });
+
   it('is disabled when no consent stored', async () => {
     mockReadStoredConsent.mockReturnValue(null);
     // Since sentry module is cached and IS_ENABLED is computed at module load time,

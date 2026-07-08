@@ -512,5 +512,79 @@
   },
   "aria": {
     "breadcrumbs": "Fil d'Ariane"
+  },
+  "shared": {
+    "loading": "Loading",
+    "help": "Aide",
+    "open_page_help": "Ouvrir l'aide de la page",
+    "search": "Recherche...",
+    "refresh": "Rafraîchir",
+    "total_count": "{{count}}total",
+    "data_table": "Données",
+    "select_all_rows": "Select all rows",
+    "no_data": "Aucune donnée",
+    "no_data_available": "Aucune donnée disponible",
+    "select_row": "Select row {{id}}"
+  },
+  "help_drawer": {
+    "aria_label": "Aide : {{title}}",
+    "close_panel": "Fermer le panneau d'aide",
+    "how_to_use": "Comment utiliser cette page",
+    "label": "Aide",
+    "related_pages": "Pages connexes",
+    "tips": "Conseils et pièges"
+  },
+  "bulk": {
+    "selected_count": "{{count}} sélectionné",
+    "clear_selection": "Effacer la sélection",
+    "confirm_title": "Confirmer {{action}}",
+    "confirm_message": "Etes-vous sûr de vouloir les articles {{action}} {{count}} ?",
+    "destructive_warning": "Cette action ne peut pas être annulée.",
+    "reason_label": "Raison",
+    "reason_placeholder": "Donnez la raison de cette action"
+  },
+  "common": {
+    "cancel": "Annuler"
+  },
+  "icon_picker": {
+    "choose_icon": "Choisir l'icône",
+    "choose_icon_placeholder": "Rechercher une icône...",
+    "clear_icon": "Icône Effacer",
+    "label": "Icône",
+    "no_icons_found": "Aucune icône trouvée correspondant à \"{{search}}\"",
+    "search_for_icon": "Rechercher une icône...",
+    "search_icons": "Icônes de recherche"
+  },
+  "visibility_rules": {
+    "min_role": "Rôle minimum",
+    "requires_auth": "Nécessite une authentification",
+    "requires_feature": "Fonctionnalité requise",
+    "title": "Règles de visibilité",
+    "roles": {
+      "any": "N'importe lequel",
+      "user": "Utilisateur",
+      "admin": "Administrateur",
+      "tenant_admin": "Administrateur des locataires",
+      "super_admin": "Super administrateur"
+    },
+    "features": {
+      "none": "Aucun",
+      "events": "Événements",
+      "groups": "Groupes",
+      "gamification": "Gamification",
+      "goals": "Objectifs",
+      "blog": "Blogue",
+      "resources": "Ressources",
+      "volunteering": "Bénévolat",
+      "exchange_workflow": "Flux de travail d'échange",
+      "organisations": "Organisations",
+      "federation": "Fédération",
+      "connections": "Connexions",
+      "reviews": "Avis",
+      "polls": "Sondages",
+      "direct_messaging": "Messagerie directe",
+      "group_exchanges": "Échanges de groupe",
+      "search": "Rechercher"
+    }
   }
 }

@@ -12,7 +12,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Separator } from '@/components/ui';
+import { Separator } from '@/components/ui/Separator';
 import X from 'lucide-react/icons/x';
 import Home from 'lucide-react/icons/house';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
@@ -64,10 +64,10 @@ import { TenantLogo } from '@/components/branding';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { useTranslation } from 'react-i18next';
-import { useAuth,
-  useTenant,
-  useNotifications,
-  useCookieConsent } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
+import { useNotificationsOptional } from '@/contexts/NotificationsContext';
+import { useCookieConsent } from '@/contexts/CookieConsentContext';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { hasAdminPanelAccess, hasBrokerPanelAccess } from '@/lib/access';
 import { buildAccessibleFrontendUrl } from '@/lib/accessible-frontend';
@@ -75,10 +75,13 @@ import type { TenantFeatures,
   TenantModules } from '@/types/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemePicker } from '@/components/layout/ThemePicker';
-import { useMenuContext } from '@/contexts';
+import { useMenuContext } from '@/contexts/MenuContext';
 import { MobileMenuItems } from '@/components/navigation';
 
-import { Accordion, AccordionItem, Button, Avatar, Drawer, DrawerContent, DrawerHeader, DrawerBody } from '@/components/ui';
+import { Accordion, AccordionItem } from '@/components/ui/Accordion';
+import { Avatar } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Drawer, DrawerContent, DrawerHeader, DrawerBody } from '@/components/ui/Drawer';
 interface IdentityStatusResponse {
   has_id_verified_badge: boolean;
 }
@@ -146,7 +149,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   const { t } = useTranslation('common');
   const { user, isAuthenticated, logout } = useAuth();
   const { tenant, hasFeature, hasModule, tenantPath } = useTenant();
-  const { unreadCount, counts } = useNotifications();
+  const { unreadCount, counts } = useNotificationsOptional();
   const { resetConsent } = useCookieConsent();
   const { mobileMenus, headerMenus, hasCustomMenus } = useMenuContext();
   const year = new Date().getFullYear();

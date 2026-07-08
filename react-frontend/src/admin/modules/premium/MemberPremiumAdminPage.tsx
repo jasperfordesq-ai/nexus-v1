@@ -83,7 +83,7 @@ function isTierStripeSynced(tier: MemberPremiumTier): boolean {
 }
 
 export function MemberPremiumAdminPage() {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t } = useTranslation(['admin_premium', 'common']);
   const confirm = useConfirm();
   usePageTitle(t('member_premium_admin.meta.title'));
   const toast = useToast();

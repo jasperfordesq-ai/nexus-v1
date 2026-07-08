@@ -1,0 +1,20 @@
+/* Copyright (c) 2024-2026 Jasper Ford
+   SPDX-License-Identifier: AGPL-3.0-or-later
+   Author: Jasper Ford
+   See NOTICE file for attribution and acknowledgements. */
+
+/*
+   Super-admin-only Tailwind utility sheet.
+   SuperAdminApp is lazy-loaded, so super-admin route utilities are kept out of
+   the default stylesheet used by public, auth, and member-facing pages.
+*/
+
+@import "tailwindcss" source(none);
+
+@source "./**/*.{js,ts,jsx,tsx}";
+@source not "./**/*.test.ts";
+@source not "./**/*.test.tsx";
+@source not "./**/*.spec.ts";
+@source not "./**/*.spec.tsx";
+
+@custom-variant dark (&:is(.dark *));

@@ -123,7 +123,7 @@ async function exportCsv(days: string) {
 // ---------------------------------------------------------------------------
 
 export function InactiveMembersPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_reports');
   usePageTitle(t('reports.page_title'));
 
   const DAYS_OPTIONS = [

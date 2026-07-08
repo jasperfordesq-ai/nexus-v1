@@ -99,7 +99,7 @@ const csvToList = (value: string): string[] | null => {
 export function NewsletterForm() {
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   usePageTitle(isEdit ? t('newsletter_form.page_title_edit') : t('newsletter_form.page_title_create'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();

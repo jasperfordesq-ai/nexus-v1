@@ -29,7 +29,7 @@ import { PageHeader } from '../../components/PageHeader';
 import type { EnterpriseDashboardStats } from '../../api/types';
 
 export function EnterpriseDashboard() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   usePageTitle(t('enterprise.enterprise_dashboard_title'));
   const { tenantPath } = useTenant();
 

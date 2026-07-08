@@ -187,7 +187,7 @@ async function downloadMunicipalExport(format: 'csv' | 'pdf', filename: string, 
 }
 
 export default function MunicipalImpactReportsPage() {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t } = useTranslation(['admin_reports', 'common']);
   const { tenantPath } = useTenant();
   const toast = useToast();
   const confirm = useConfirm();
@@ -881,7 +881,7 @@ function NarrativeShell({
   description: string;
   children: ReactNode;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_reports');
 
   return (
     <Card className={isActive ? 'border-2 border-accent/40 bg-surface' : 'border border-border bg-surface opacity-70'}>
@@ -915,7 +915,7 @@ function CantonNarrativeSection({
   tenantName: string | null;
   period: Period;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_reports');
   const formatter = useMemo(
     () => new Intl.NumberFormat(undefined, { style: 'currency', currency, maximumFractionDigits: 0 }),
     [currency],
@@ -1007,7 +1007,7 @@ function MunicipalityNarrativeSection({
   variant?: MunicipalityVariant;
   period: Period;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_reports');
 
   if (!variant) {
     return (
@@ -1103,7 +1103,7 @@ function CooperativeNarrativeSection({
   variant?: CooperativeVariant;
   period: Period;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_reports');
 
   if (!variant) {
     return (

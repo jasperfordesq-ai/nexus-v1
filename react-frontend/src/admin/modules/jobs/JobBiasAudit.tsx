@@ -64,7 +64,7 @@ const FUNNEL_COLORS: Record<string, string> = {
 };
 
 function JobBiasAudit() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_jobs');
   usePageTitle(t('jobs.bias_page_title'));
   const toast = useToast();
 

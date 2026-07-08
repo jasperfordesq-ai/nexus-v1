@@ -34,7 +34,7 @@ const roleColorFor = (role?: string): 'primary' | 'secondary' | 'success' | 'war
 };
 
 export function UserPermissions() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_users');
   usePageTitle(t('users.permissions_title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();

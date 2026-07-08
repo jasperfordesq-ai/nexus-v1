@@ -1,0 +1,186 @@
+{
+  "common": {
+    "an_unexpected_error": "Er is een onverwachte fout opgetreden",
+    "back": "Terug",
+    "cancel": "Annuleer",
+    "critical": "Kritisch",
+    "delete": "Verwijderen",
+    "feature": "Functie",
+    "high": "Hoog",
+    "in_progress": "In uitvoering",
+    "in_review": "Ter beoordeling",
+    "low": "Laag",
+    "medium": "Middelmatig",
+    "planned": "Gepland",
+    "refresh": "Vernieuwen",
+    "unexpected_error": "Onverwachte fout",
+    "unknown": "Onbekend",
+    "unfeature": "Uitgelicht",
+    "actions": "Acties",
+    "active": "Actief",
+    "all": "Allemaal",
+    "approved": "Goedgekeurd",
+    "clear": "Duidelijk",
+    "clear_filters": "Filters wissen",
+    "clear_selection": "Selectie wissen",
+    "close": "Sluiten",
+    "collapse": "Samenvouwen",
+    "confirm": "Bevestig",
+    "create": "Creëer",
+    "declined": "Geweigerd",
+    "download": "Downloaden",
+    "edit": "Bewerken",
+    "error_loading_data": "Fout bij het laden van gegevens",
+    "expand": "Uitbreiden",
+    "export": "Exporteren",
+    "load_more": "Laad meer",
+    "loading": "Laden",
+    "next": "Volgende",
+    "no": "Nee",
+    "ok": "OK",
+    "pending": "In behandeling",
+    "previous": "Vorige",
+    "retry": "Opnieuw proberen",
+    "save": "Opslaan",
+    "select_all": "Selecteer Alles",
+    "select_item": "Selecteer Artikel",
+    "yes": "Ja"
+  },
+  "shared": {
+    "broker_actions": "Makelaarsacties",
+    "content": "Inhoud",
+    "core_module": "Kernmodule",
+    "document_details": "Documentdetails",
+    "history": "Geschiedenis",
+    "log_file_empty": "Geen logbestand gevonden",
+    "no": "Nee",
+    "no_history_available": "Geen geschiedenis beschikbaar gevonden",
+    "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
+    "no_members_found": "Geen leden gevonden gevonden",
+    "loading": "Loading",
+    "no_data": "Geen gegevens",
+    "no_data_available": "Geen gegevens beschikbaar",
+    "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
+    "open_page_help": "Helppagina openen",
+    "help": "Hulp",
+    "quick_access": "Snelle toegang",
+    "recent_activity": "Recente activiteit",
+    "refresh": "Vernieuwen",
+    "search": "Zoekopdracht...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Gegevens",
+    "total_count": "{{count}}totaal"
+  },
+  "national": {
+    "trend_chart_aria": "Chart showing community activity trends over time"
+  },
+  "national_kiss_dashboard": {
+    "loading": "Loading",
+    "meta": {
+      "page_title": "Caring Community - Nationaal dashboard",
+      "title": "Caring Community - Nationaal dashboard",
+      "description": "Cross-coöperatieve superbeheerdersweergave van elke Caring Community coöperatie op het platform. Ledenaantallen worden gerapporteerd tussen haakjes ter bescherming van de privacy."
+    },
+    "actions": {
+      "refresh": "Vernieuwen"
+    },
+    "about": {
+      "title": "Over dit dashboard",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "health_prefix": "Gebruik de periodekiezer om kwartalen te vergelijken. De vergelijkende tabel rangschikt coöperaties op uren, leden of gezondheidsstatus. De gezondheidsstatus wordt afgeleid van activiteitstrends:",
+      "thriving_definition": "snel groeiend,",
+      "stable_definition": "vlakke activiteit,",
+      "struggling_definition": "afnemende activiteit of een zeer lage betrokkenheid."
+    },
+    "status": {
+      "thriving": "Gezond",
+      "stable": "Stabiel",
+      "struggling": "Worstelend"
+    },
+    "health_legend": {
+      "title": "Gezondheidsstatussleutel:",
+      "thriving": "uren groeien sterk (>10% versus voorgaande periode)",
+      "stable": "vlakke activiteit (+/-10%)",
+      "struggling": "afnemende activiteit of minder dan 5 geverifieerde uren in de periode",
+      "privacy_note": "Het aantal leden wordt weergegeven als privacybeschermende haakjes (bijvoorbeeld '50-99'). Er worden hier nooit individuele gegevens weergegeven."
+    },
+    "filters": {
+      "period": "Periode",
+      "period_aria": "Rapportageperiode",
+      "from": "Van",
+      "from_aria": "Periode vanaf",
+      "to": "Naar",
+      "to_aria": "Periode tot"
+    },
+    "periods": {
+      "this_month": "Deze maand",
+      "last_quarter": "Laatste kwartaal (90 dagen)",
+      "last_year": "Vorig jaar",
+      "custom": "Aangepast bereik"
+    },
+    "stats": {
+      "total_cooperatives": "Totaal coöperaties",
+      "active_cooperatives": "Actieve coöperaties",
+      "active_description": "{{active}} van {{total}} actief in periode",
+      "total_hours": "Totaal uren (nationaal)",
+      "active_tandems": "Actieve tandems"
+    },
+    "inline": {
+      "active_members": "Actieve leden:",
+      "recipients_reached": "Ontvangers bereikt:",
+      "safeguarding_reports": "Beveiligingsrapporten:"
+    },
+    "metrics": {
+      "yoy": "{{value}} JoJ"
+    },
+    "trend": {
+      "title": "Nationale trend over 12 maanden",
+      "empty": "Geen trendgegevens beschikbaar.",
+      "hours_axis": "Uur",
+      "cooperatives_axis": "Coöperaties",
+      "active_cooperatives": "Actieve coöperaties",
+      "total_hours_all": "Totaal aantal uren (alle coöperaties)"
+    },
+    "comparative": {
+      "title": "Vergelijkende statistieken",
+      "sort_hint": "Klik op een kolom om te sorteren",
+      "empty_prefix": "Nee",
+      "empty_middle": "coöperaties nog niet geconfigureerd. Ga naar",
+      "super_admin_tenants": "Superbeheerder -> Huurders",
+      "empty_suffix": "en stel de tenantcategorie in op",
+      "empty_tail": "op ten minste één tenant om dit dashboard te vullen.",
+      "aria": "Vergelijkende statistieken per coöperatie",
+      "cooperative": "Coöperatief",
+      "hours_title": "Totaal geverifieerde zorguren in de geselecteerde periode",
+      "hours_sort": "Uren <->",
+      "members_title": "Het aantal actieve leden wordt weergegeven als een privacybeschermende beugel",
+      "members": "Leden",
+      "recipients_title": "Zorgontvangers bereikt (privacybeschermende beugel)",
+      "recipients": "Ontvangers",
+      "tandems_title": "Terugkerende helper/ontvanger-paren met meer dan 2 voltooide uitwisselingen",
+      "tandems_sort": "Tandems <->",
+      "retention_title": "% leden actief in zowel deze periode als de voorgaande equivalente periode",
+      "retention_sort": "Retentie <->",
+      "reciprocity_title": "% supporters dat in de periode ook uren kreeg - duidt op onderlinge uitwisselingsgezondheid",
+      "reciprocity_sort": "Wederkerigheid <->",
+      "status": "Status"
+    },
+    "leaderboards": {
+      "top_title": "Top 5 per uur",
+      "bottom_title": "Onderste 5 (alleen actief)"
+    },
+    "empty": {
+      "no_data": "Geen gegevens.",
+      "no_active_cooperatives": "Geen actieve coöperaties in deze periode."
+    },
+    "footer": {
+      "generated_at": "Gegenereerd op {{date}}.",
+      "privacy_note": "Het aantal leden wordt gerapporteerd tussen haakjes ter bescherming van de privacy. Er worden nergens op deze pagina individuele identificatiegegevens van leden weergegeven."
+    },
+    "toasts": {
+      "load_failed": "Kan dashboard niet laden"
+    }
+  }
+}

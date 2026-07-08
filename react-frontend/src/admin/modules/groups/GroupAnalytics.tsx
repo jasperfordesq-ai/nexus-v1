@@ -24,7 +24,7 @@ import type { GroupAnalyticsData } from '../../api/types';
 
 
 export function GroupAnalytics() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   usePageTitle(t('groups.page_title'));
   const toast = useToast();
 

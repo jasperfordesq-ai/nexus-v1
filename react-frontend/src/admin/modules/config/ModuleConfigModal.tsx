@@ -29,7 +29,7 @@ import type { BrokerConfig } from '../../api/types';
 import type { ModuleDefinition, ConfigOption } from './moduleRegistry';
 import { getOptionCategories } from './moduleRegistry';
 
-type AdminTranslator = ReturnType<typeof useTranslation<'admin'>>['t'];
+type AdminTranslator = ReturnType<typeof useTranslation<'admin_config'>>['t'];
 
 function slugConfigText(value: string): string {
   return value
@@ -75,7 +75,7 @@ interface ModuleConfigModalProps {
 }
 
 export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleConfigModalProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_config');
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -632,7 +632,7 @@ interface ConfigOptionRowProps {
 }
 
 function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_config');
   const label = getOptionLabel(t, option);
   const description = getOptionDescription(t, option);
 

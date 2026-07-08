@@ -26,7 +26,7 @@ import { PageHeader } from '../../components/PageHeader';
 import type { CacheStats, BackgroundJob } from '../../api/types';
 
 export default function Operations() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   usePageTitle(t('operations.title'));
   const toast = useToast();
 

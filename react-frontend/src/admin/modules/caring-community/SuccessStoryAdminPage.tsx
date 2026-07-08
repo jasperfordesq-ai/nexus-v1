@@ -150,7 +150,7 @@ const formatDelta = (s: SuccessStory): string => {
 // ---------------------------------------------------------------------------
 
 export default function SuccessStoryAdminPage(): ReactNode {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('success_stories_admin.meta.title'));
   const { showToast } = useToast();
 

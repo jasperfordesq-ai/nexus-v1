@@ -22,7 +22,7 @@ interface TemplatePreviewProps {
 }
 
 export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreviewProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   const [html, setHtml] = useState('');
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('');

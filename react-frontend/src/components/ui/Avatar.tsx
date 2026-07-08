@@ -13,7 +13,7 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
-import { Avatar as HeroUIAvatar } from '@heroui/react';
+import { Avatar as HeroUIAvatar } from '@heroui/react/avatar';
 import { resolveThumbnailUrl } from '@/lib/helpers';
 
 type HeroUIAvatarProps = ComponentPropsWithoutRef<typeof HeroUIAvatar>;

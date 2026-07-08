@@ -45,7 +45,7 @@ const EMPTY_FORM: DocForm = {
 };
 
 export default function AiModuleDocsAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_ai');
   usePageTitle(t('ai.module_docs.meta.title'));
   const toast = useToast();
 

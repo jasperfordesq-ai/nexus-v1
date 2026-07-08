@@ -8,7 +8,7 @@ import {
   type ComponentPropsWithoutRef,
   type ReactNode,
 } from 'react';
-import { Pagination as HeroUIPagination } from '@heroui/react';
+import { Pagination as HeroUIPagination } from '@heroui/react/pagination';
 
 type HeroUIPaginationProps = ComponentPropsWithoutRef<typeof HeroUIPagination>;
 type PaginationItem = number | 'ellipsis';

@@ -18,7 +18,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
 
 export interface LegalDocument {
   id: number;

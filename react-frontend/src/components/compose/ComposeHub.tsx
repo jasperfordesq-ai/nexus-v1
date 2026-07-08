@@ -13,9 +13,9 @@
  * Desktop: HeroUI Modal with underlined tabs and glass background.
  */
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { lazy, Suspense, useState, useMemo, useCallback, useEffect } from 'react';
 
-import { Separator } from '@/components/ui';
+import { Separator } from '@/components/ui/Separator';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Calendar from 'lucide-react/icons/calendar';
@@ -26,15 +26,18 @@ import { useTenant } from '@/contexts';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { ComposeSubmitProvider } from './ComposeSubmitContext';
 import { MobileComposeOverlay } from './MobileComposeOverlay';
-import { PostTab } from './tabs/PostTab';
-import { PollTab } from './tabs/PollTab';
-import { ListingTab } from './tabs/ListingTab';
-import { EventTab } from './tabs/EventTab';
-import { GoalTab } from './tabs/GoalTab';
 import { GroupSelector } from './shared/GroupSelector';
 import { TemplatePicker } from './shared/TemplatePicker';
 import type { ComposeHubProps, ComposeTab, ComposeTabConfig } from './types';
-import { Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab } from '@/components/ui';
+import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui/Modal';
+import { Spinner } from '@/components/ui/Spinner';
+import { Tabs, Tab } from '@/components/ui/Tabs';
+
+const EventTab = lazy(() => import('./tabs/EventTab').then((module) => ({ default: module.EventTab })));
+const GoalTab = lazy(() => import('./tabs/GoalTab').then((module) => ({ default: module.GoalTab })));
+const ListingTab = lazy(() => import('./tabs/ListingTab').then((module) => ({ default: module.ListingTab })));
+const PollTab = lazy(() => import('./tabs/PollTab').then((module) => ({ default: module.PollTab })));
+const PostTab = lazy(() => import('./tabs/PostTab').then((module) => ({ default: module.PostTab })));
 
 const ALL_TABS: ComposeTabConfig[] = [
   { key: 'listing', label: 'Listing', icon: ShoppingBag, gate: { type: 'module', key: 'listings' } },
@@ -118,6 +121,12 @@ export function ComposeHub({
     onContentChange: setHasChildContent,
   };
 
+  const tabFallback = (
+    <div className="flex min-h-48 items-center justify-center">
+      <Spinner size="sm" aria-label={t('loading_label')} />
+    </div>
+  );
+
   /** Body content — group selector + active tab */
   const bodyContent = (
     <>
@@ -130,11 +139,13 @@ export function ComposeHub({
         </div>
       )}
 
-      {activeTab === 'listing' && <ListingTab {...tabProps} />}
-      {activeTab === 'post' && <PostTab {...tabProps} editItem={editItem} onEditSuccess={onEditSuccess} />}
-      {activeTab === 'poll' && <PollTab {...tabProps} />}
-      {activeTab === 'event' && <EventTab {...tabProps} />}
-      {activeTab === 'goal' && <GoalTab {...tabProps} />}
+      <Suspense fallback={tabFallback}>
+        {activeTab === 'listing' && <ListingTab {...tabProps} />}
+        {activeTab === 'post' && <PostTab {...tabProps} editItem={editItem} onEditSuccess={onEditSuccess} />}
+        {activeTab === 'poll' && <PollTab {...tabProps} />}
+        {activeTab === 'event' && <EventTab {...tabProps} />}
+        {activeTab === 'goal' && <GoalTab {...tabProps} />}
+      </Suspense>
     </>
   );
 

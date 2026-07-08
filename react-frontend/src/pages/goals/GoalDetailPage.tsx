@@ -34,7 +34,7 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
-import { SocialInteractionPanel } from '@/components/social';
+import { SocialInteractionPanel } from '@/components/social/SocialInteractionPanel';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';

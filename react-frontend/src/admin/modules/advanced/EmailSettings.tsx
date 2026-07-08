@@ -84,7 +84,7 @@ const PROVIDERS = [
 ];
 
 export function EmailSettings() {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced' });
   const { t: tNav } = useTranslation('admin_nav');
   usePageTitle(tNav('advanced'));
   const toast = useToast();

@@ -1,4 +1,3 @@
-import { Select, SelectItem, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,6 +5,8 @@ import { Select, SelectItem, Switch } from '@/components/ui';
 
 import { useTranslation } from 'react-i18next';
 
+import { Select, SelectItem } from '@/components/ui/Select';
+import { Switch } from '@/components/ui/Switch';
 import type { VisibilityRules } from '@/types/menu';
 
 const ROLE_KEYS = ['', 'user', 'admin', 'tenant_admin', 'super_admin'];
@@ -22,7 +23,7 @@ interface VisibilityRulesEditorProps {
 }
 
 export function VisibilityRulesEditor({ value, onChange }: VisibilityRulesEditorProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_nav');
   const rules = value || {};
 
   const updateRule = <K extends keyof VisibilityRules>(key: K, val: VisibilityRules[K]) => {

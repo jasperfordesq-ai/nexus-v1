@@ -1,0 +1,158 @@
+{
+  "common": {
+    "an_unexpected_error": "Es ist ein unerwarteter Fehler aufgetreten",
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "critical": "Kritisch",
+    "delete": "Löschen",
+    "feature": "Funktion",
+    "high": "Hoch",
+    "in_progress": "In Bearbeitung",
+    "in_review": "Im Rückblick",
+    "low": "Niedrig",
+    "medium": "Mittel",
+    "planned": "Geplant",
+    "refresh": "Aktualisieren",
+    "unexpected_error": "Unerwarteter Fehler",
+    "unknown": "Unbekannt",
+    "unfeature": "Unfeature",
+    "actions": "Aktionen",
+    "active": "Aktiv",
+    "all": "Alle",
+    "approved": "Genehmigt",
+    "clear": "Klar",
+    "clear_filters": "Filter löschen",
+    "clear_selection": "Auswahl löschen",
+    "close": "Schließen",
+    "collapse": "Zusammenbruch",
+    "confirm": "Bestätigen",
+    "create": "Erstellen",
+    "declined": "Abgelehnt",
+    "download": "Herunterladen",
+    "edit": "Bearbeiten",
+    "error_loading_data": "Fehler beim Laden der Daten",
+    "expand": "Erweitern",
+    "export": "Exportieren",
+    "load_more": "Mehr laden",
+    "loading": "Laden",
+    "next": "Als nächstes",
+    "no": "Nein",
+    "ok": "OK",
+    "pending": "Ausstehend",
+    "previous": "Zurück",
+    "retry": "Versuchen Sie es noch einmal",
+    "save": "Speichern",
+    "select_all": "Wählen Sie „Alle“ aus",
+    "select_item": "Wählen Sie Artikel aus",
+    "yes": "Ja"
+  },
+  "shared": {
+    "broker_actions": "Makleraktionen",
+    "content": "Inhalt",
+    "core_module": "Kernmodul",
+    "document_details": "Dokumentdetails",
+    "history": "Geschichte",
+    "log_file_empty": "Keine Protokolldatei gefunden",
+    "no": "Nein",
+    "no_history_available": "Keine verfügbare Historie gefunden",
+    "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
+    "no_members_found": "Keine Mitglieder gefunden",
+    "loading": "Loading",
+    "no_data": "Keine Daten",
+    "no_data_available": "Keine Daten verfügbar",
+    "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
+    "open_page_help": "Hilfeseite öffnen",
+    "help": "Helfen",
+    "quick_access": "Schnellzugriff",
+    "recent_activity": "Letzte Aktivität",
+    "refresh": "Aktualisieren",
+    "search": "Suchen...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Daten",
+    "total_count": "{{count}}insgesamt"
+  },
+  "regional_analytics_admin": {
+    "meta": {
+      "title": "Regionale Analysen",
+      "description": "Verwalten Sie kostenpflichtige Analyseabonnements für Kommunen und SME-Partner – nur in Buckets unterteilte, datenschutzsichere Aggregate."
+    },
+    "actions": {
+      "new_subscription": "Neues Abonnement",
+      "generate_report_now": "Jetzt Bericht erstellen",
+      "view_access_log": "Zugriffsprotokoll anzeigen",
+      "suspend": "Aussetzen",
+      "resume": "Wieder aufnehmen",
+      "close": "Schließen",
+      "cancel": "Stornieren",
+      "create": "Erstellen"
+    },
+    "tables": {
+      "subscriptions_aria": "Abonnements für regionale Analysen",
+      "partner": "Partner",
+      "type": "Typ",
+      "plan": "Planen",
+      "status": "Status",
+      "period_end": "Periodenende",
+      "price_per_month": "Preis / Monat",
+      "modules": "Module",
+      "actions": "Aktionen"
+    },
+    "partner_types": {
+      "municipality": "Gemeinde",
+      "sme_partner": "SME Partner"
+    },
+    "plan_tiers": {
+      "basic": "Einfach",
+      "pro": "Profi",
+      "enterprise": "Unternehmen"
+    },
+    "statuses": {
+      "trialing": "Versuch",
+      "active": "Aktiv",
+      "past_due": "Überfällig",
+      "cancelled": "Abgesagt"
+    },
+    "modules": {
+      "trends": "Trends",
+      "demand_supply": "Nachfrage und Angebot",
+      "demographics": "Demografie",
+      "footfall": "Schritt"
+    },
+    "empty": {
+      "subscriptions": "Noch keine Abonnements. Stellen Sie eines bereit, um mit dem Verkauf regionaler Analysen zu beginnen.",
+      "access_log": "Es wurden noch keine Zugriffsereignisse erfasst.",
+      "value": "-"
+    },
+    "access_log": {
+      "title": "Zugriffsprotokoll – {{name}}",
+      "table_aria": "Zugriffsprotokoll",
+      "when": "Wann",
+      "endpoint": "Endpunkt",
+      "ip_hashed": "IP (gehasht)",
+      "user_agent": "Benutzeragent"
+    },
+    "create_modal": {
+      "title": "Neues Abonnement für regionale Analysen",
+      "tenant_id": "Mieter ID",
+      "partner_name": "Partnername",
+      "partner_type": "Partnertyp",
+      "contact_email": "Kontakt-E-Mail",
+      "billing_email": "Rechnungs-E-Mail",
+      "plan_tier": "Planstufe",
+      "monthly_price_cents": "Monatspreis (Cent)",
+      "currency": "Währung",
+      "enabled_modules": "Aktivierte Module"
+    },
+    "toasts": {
+      "load_failed": "Abonnements konnten nicht geladen werden",
+      "status_updated": "Abonnement {{status}}",
+      "update_failed": "Update fehlgeschlagen",
+      "report_queued": "Die Berichtserstellung steht in der Warteschlange",
+      "report_failed": "Fehler beim Einreihen des Berichts in die Warteschlange",
+      "required_fields": "Mieter, Partnername und Kontakt-E-Mail sind erforderlich",
+      "created": "Abonnement erstellt",
+      "create_failed": "Erstellen ist fehlgeschlagen"
+    }
+  }
+}

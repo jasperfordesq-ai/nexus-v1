@@ -83,7 +83,7 @@ const categoryColorMap: Record<string, 'primary' | 'secondary' | 'success' | 'wa
 };
 
 export function FederationAuditLog() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   usePageTitle(t('super.page_title'));
 
   const [logs, setLogs] = useState<SuperAuditEntry[]>([]);

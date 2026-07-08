@@ -11,7 +11,7 @@ import {
   type ComponentPropsWithoutRef,
   type ReactNode,
 } from 'react';
-import { Table as HeroUITable } from '@heroui/react';
+import { Table as HeroUITable } from '@heroui/react/table';
 
 type HeroUITableProps = ComponentPropsWithoutRef<typeof HeroUITable>;
 type HeroUITableContentProps = ComponentPropsWithoutRef<typeof HeroUITable.Content>;

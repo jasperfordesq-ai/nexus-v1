@@ -27,7 +27,7 @@ interface NewsletterResendProps {
 }
 
 export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: NewsletterResendProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);

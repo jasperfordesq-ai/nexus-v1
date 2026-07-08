@@ -39,7 +39,7 @@ interface Segment {
 }
 
 export function Segments() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   const { tenantPath } = useTenant();
   const { error: showError } = useToast();
   usePageTitle(t('newsletters.page_title'));

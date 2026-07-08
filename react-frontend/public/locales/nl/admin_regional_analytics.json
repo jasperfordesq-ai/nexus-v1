@@ -1,0 +1,158 @@
+{
+  "common": {
+    "an_unexpected_error": "Er is een onverwachte fout opgetreden",
+    "back": "Terug",
+    "cancel": "Annuleer",
+    "critical": "Kritisch",
+    "delete": "Verwijderen",
+    "feature": "Functie",
+    "high": "Hoog",
+    "in_progress": "In uitvoering",
+    "in_review": "Ter beoordeling",
+    "low": "Laag",
+    "medium": "Middelmatig",
+    "planned": "Gepland",
+    "refresh": "Vernieuwen",
+    "unexpected_error": "Onverwachte fout",
+    "unknown": "Onbekend",
+    "unfeature": "Uitgelicht",
+    "actions": "Acties",
+    "active": "Actief",
+    "all": "Allemaal",
+    "approved": "Goedgekeurd",
+    "clear": "Duidelijk",
+    "clear_filters": "Filters wissen",
+    "clear_selection": "Selectie wissen",
+    "close": "Sluiten",
+    "collapse": "Samenvouwen",
+    "confirm": "Bevestig",
+    "create": "Creëer",
+    "declined": "Geweigerd",
+    "download": "Downloaden",
+    "edit": "Bewerken",
+    "error_loading_data": "Fout bij het laden van gegevens",
+    "expand": "Uitbreiden",
+    "export": "Exporteren",
+    "load_more": "Laad meer",
+    "loading": "Laden",
+    "next": "Volgende",
+    "no": "Nee",
+    "ok": "OK",
+    "pending": "In behandeling",
+    "previous": "Vorige",
+    "retry": "Opnieuw proberen",
+    "save": "Opslaan",
+    "select_all": "Selecteer Alles",
+    "select_item": "Selecteer Artikel",
+    "yes": "Ja"
+  },
+  "shared": {
+    "broker_actions": "Makelaarsacties",
+    "content": "Inhoud",
+    "core_module": "Kernmodule",
+    "document_details": "Documentdetails",
+    "history": "Geschiedenis",
+    "log_file_empty": "Geen logbestand gevonden",
+    "no": "Nee",
+    "no_history_available": "Geen geschiedenis beschikbaar gevonden",
+    "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
+    "no_members_found": "Geen leden gevonden gevonden",
+    "loading": "Loading",
+    "no_data": "Geen gegevens",
+    "no_data_available": "Geen gegevens beschikbaar",
+    "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
+    "open_page_help": "Helppagina openen",
+    "help": "Hulp",
+    "quick_access": "Snelle toegang",
+    "recent_activity": "Recente activiteit",
+    "refresh": "Vernieuwen",
+    "search": "Zoekopdracht...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Gegevens",
+    "total_count": "{{count}}totaal"
+  },
+  "regional_analytics_admin": {
+    "meta": {
+      "title": "Regionale analyses",
+      "description": "Beheer betaalde analyseabonnementen voor gemeenten en SME-partners - alleen in buckets verdeelde, privacyveilige aggregaten."
+    },
+    "actions": {
+      "new_subscription": "Nieuw abonnement",
+      "generate_report_now": "Genereer nu een rapport",
+      "view_access_log": "Toegangslogboek bekijken",
+      "suspend": "Opschorten",
+      "resume": "Cv",
+      "close": "Dichtbij",
+      "cancel": "Annuleren",
+      "create": "Creëren"
+    },
+    "tables": {
+      "subscriptions_aria": "Abonnementen op regionale analyses",
+      "partner": "Partner",
+      "type": "Typ",
+      "plan": "Plannen",
+      "status": "Status",
+      "period_end": "Einde periode",
+      "price_per_month": "Prijs / ma",
+      "modules": "Modules",
+      "actions": "Acties"
+    },
+    "partner_types": {
+      "municipality": "Gemeente",
+      "sme_partner": "MKB-partner"
+    },
+    "plan_tiers": {
+      "basic": "Basis",
+      "pro": "Pro",
+      "enterprise": "Onderneming"
+    },
+    "statuses": {
+      "trialing": "Proeven",
+      "active": "Actief",
+      "past_due": "Achterstallig",
+      "cancelled": "Geannuleerd"
+    },
+    "modules": {
+      "trends": "Trends",
+      "demand_supply": "Vraag en aanbod",
+      "demographics": "Demografie",
+      "footfall": "Voetstappen"
+    },
+    "empty": {
+      "subscriptions": "Nog geen abonnementen. Zorg voor één om regionale analyses te gaan verkopen.",
+      "access_log": "Er zijn nog geen toegangsgebeurtenissen geregistreerd.",
+      "value": "-"
+    },
+    "access_log": {
+      "title": "Toegangslogboek - {{name}}",
+      "table_aria": "Toegangslogboek",
+      "when": "Wanneer",
+      "endpoint": "Eindpunt",
+      "ip_hashed": "IP (gehasht)",
+      "user_agent": "Gebruikersagent"
+    },
+    "create_modal": {
+      "title": "Nieuw abonnement op regionale analyses",
+      "tenant_id": "Huurder ID",
+      "partner_name": "Partnernaam",
+      "partner_type": "Partnertype",
+      "contact_email": "E-mailadres voor contact",
+      "billing_email": "E-mail voor facturering",
+      "plan_tier": "Planniveau",
+      "monthly_price_cents": "Maandelijkse prijs (cent)",
+      "currency": "Munteenheid",
+      "enabled_modules": "Ingeschakelde modules"
+    },
+    "toasts": {
+      "load_failed": "Kan abonnementen niet laden",
+      "status_updated": "Abonnement {{status}}",
+      "update_failed": "Update mislukt",
+      "report_queued": "Het genereren van rapporten staat in de wachtrij",
+      "report_failed": "Kan het rapport niet in de wachtrij plaatsen",
+      "required_fields": "Huurder, partnernaam en e-mailadres voor contact zijn vereist",
+      "created": "Abonnement aangemaakt",
+      "create_failed": "Maken mislukt"
+    }
+  }
+}

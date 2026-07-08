@@ -15,7 +15,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { api } from '@/lib/api';
-import { useAuth } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface PendingDocument {
   document_id: number;

@@ -1,0 +1,158 @@
+{
+  "common": {
+    "an_unexpected_error": "Tharla earráid gan choinne",
+    "back": "Ar ais",
+    "cancel": "Cealaigh",
+    "critical": "Criticiúil",
+    "delete": "Scrios",
+    "feature": "Gné",
+    "high": "Ard",
+    "in_progress": "Ar Siúl",
+    "in_review": "In Léirmheas",
+    "low": "Íseal",
+    "medium": "Meánach",
+    "planned": "Pleanáilte",
+    "refresh": "Athnuaigh",
+    "unexpected_error": "Earráid gan choinne",
+    "unknown": "Anaithnid",
+    "unfeature": "Neamhghné",
+    "actions": "Gníomhartha",
+    "active": "Gníomhach",
+    "all": "Gach",
+    "approved": "Ceadaithe",
+    "clear": "Glan",
+    "clear_filters": "Scagairí Glan",
+    "clear_selection": "Glan Roghnú",
+    "close": "Dún",
+    "collapse": "Laghdaigh",
+    "confirm": "Deimhnigh",
+    "create": "Cruthaigh",
+    "declined": "Diúltaithe",
+    "download": "Íosluchtaigh",
+    "edit": "Cuir in eagar",
+    "error_loading_data": "Earráid Sonraí á Luchtú",
+    "expand": "Leathnaigh",
+    "export": "Easpórtáil",
+    "load_more": "Luchtaigh Níos mó",
+    "loading": "Ag lódáil",
+    "next": "Ar aghaidh",
+    "no": "Níl",
+    "ok": "OK",
+    "pending": "Ar feitheamh",
+    "previous": "Roimhe Seo",
+    "retry": "Bain triail eile as",
+    "save": "Sábháil",
+    "select_all": "Roghnaigh Uile",
+    "select_item": "Roghnaigh Mír",
+    "yes": "Tá"
+  },
+  "shared": {
+    "broker_actions": "Gníomhartha Bróicéara",
+    "content": "Ábhar",
+    "core_module": "Croímhodúl",
+    "document_details": "Sonraí an Doiciméid",
+    "history": "Stair",
+    "log_file_empty": "Níor aimsíodh aon logchomhad",
+    "no": "Níl",
+    "no_history_available": "Níor aimsíodh aon stair le fáil",
+    "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
+    "no_members_found": "Níor aimsíodh aon bhall",
+    "loading": "Loading",
+    "no_data": "Gan sonraí",
+    "no_data_available": "Níl aon sonraí ar fáil",
+    "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
+    "open_page_help": "Cabhair leathanach a oscailt",
+    "help": "Cabhrú",
+    "quick_access": "Rochtain Thapa",
+    "recent_activity": "Gníomhaíocht le Déanaí",
+    "refresh": "Athnuaigh",
+    "search": "Cuardach...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Sonraí",
+    "total_count": "{{count}}iomlán"
+  },
+  "regional_analytics_admin": {
+    "meta": {
+      "title": "Anailísí Réigiúnacha",
+      "description": "Bainistigh síntiúis anailísíochta íoctha do pháirtithe bardais agus SME - comhiomláin buicéad, atá sábháilte ó thaobh príobháideachta amháin."
+    },
+    "actions": {
+      "new_subscription": "Síntiús nua",
+      "generate_report_now": "Gin tuairisc anois",
+      "view_access_log": "Féach ar loga rochtana",
+      "suspend": "Fionraí",
+      "resume": "Atosaigh",
+      "close": "Dún",
+      "cancel": "Cealaigh",
+      "create": "Cruthaigh"
+    },
+    "tables": {
+      "subscriptions_aria": "Síntiúis anailíse réigiúnacha",
+      "partner": "Comhpháirtí",
+      "type": "Cineál",
+      "plan": "Plean",
+      "status": "Stádas",
+      "period_end": "Deireadh tréimhse",
+      "price_per_month": "Praghas / mo",
+      "modules": "modúil",
+      "actions": "Gníomhartha"
+    },
+    "partner_types": {
+      "municipality": "Bardas",
+      "sme_partner": "SME comhpháirtí"
+    },
+    "plan_tiers": {
+      "basic": "Bunúsach",
+      "pro": "Pro",
+      "enterprise": "Fiontar"
+    },
+    "statuses": {
+      "trialing": "Triail",
+      "active": "Gníomhach",
+      "past_due": "Past dlite",
+      "cancelled": "Ar ceal"
+    },
+    "modules": {
+      "trends": "Treochtaí",
+      "demand_supply": "Éileamh agus soláthar",
+      "demographics": "Déimeagrafaic",
+      "footfall": "Líon coise"
+    },
+    "empty": {
+      "subscriptions": "Níl aon síntiús fós. Foráil a haon chun tús a chur le hanailísíocht réigiúnach a dhíol.",
+      "access_log": "Níl aon imeachtaí rochtana taifeadta go fóill.",
+      "value": "-"
+    },
+    "access_log": {
+      "title": "Loga rochtana - {{name}}",
+      "table_aria": "Logchomhad rochtana",
+      "when": "Cathain",
+      "endpoint": "Críochphointe",
+      "ip_hashed": "IP (staiste)",
+      "user_agent": "Gníomhaire úsáideora"
+    },
+    "create_modal": {
+      "title": "Síntiús nua anailísíochta réigiúnach",
+      "tenant_id": "Tionónta ID",
+      "partner_name": "Ainm an chomhpháirtí",
+      "partner_type": "Cineál comhpháirtí",
+      "contact_email": "Ríomhphost teagmhála",
+      "billing_email": "Ríomhphost billeála",
+      "plan_tier": "Sraith plean",
+      "monthly_price_cents": "Praghas míosúil (cents)",
+      "currency": "Airgeadra",
+      "enabled_modules": "Modúil chumasaithe"
+    },
+    "toasts": {
+      "load_failed": "Theip ar shíntiúis a lódáil",
+      "status_updated": "Síntiús {{status}}",
+      "update_failed": "Theip ar an nuashonrú",
+      "report_queued": "Giniúint tuairisce ciúáilte",
+      "report_failed": "Theip ar an tuairisc scuaine",
+      "required_fields": "Teastaíonn ainm an tionónta, an chomhpháirtí agus an ríomhphost teagmhála",
+      "created": "Síntiús cruthaithe",
+      "create_failed": "Theip ar chruthú"
+    }
+  }
+}

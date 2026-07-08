@@ -30,9 +30,9 @@ interface Error404Entry {
 }
 
 export function Error404Tracking() {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced' });
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced' });
   const { t: tNav } = useTranslation('admin_nav');
-  const { t: tAdmin } = useTranslation('admin');
+  const { t: tAdmin } = useTranslation('admin_advanced');
   usePageTitle(tNav('advanced'));
   const toast = useToast();
 

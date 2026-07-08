@@ -512,5 +512,79 @@
   },
   "aria": {
     "breadcrumbs": "فتات الخبز"
+  },
+  "shared": {
+    "loading": "Loading",
+    "help": "??????",
+    "open_page_help": "??? ?????? ??????",
+    "search": "يبحث...",
+    "refresh": "ينعش",
+    "total_count": "إجمالي{{count}}",
+    "data_table": "بيانات",
+    "select_all_rows": "Select all rows",
+    "no_data": "لا توجد بيانات",
+    "no_data_available": "لا توجد بيانات متاحة",
+    "select_row": "Select row {{id}}"
+  },
+  "help_drawer": {
+    "aria_label": "مساعدة: {{title}}",
+    "close_panel": "إغلاق لوحة المساعدة",
+    "how_to_use": "كيفية استخدام هذه الصفحة",
+    "label": "يساعد",
+    "related_pages": "الصفحات ذات الصلة",
+    "tips": "نصائح ومسكتك"
+  },
+  "bulk": {
+    "selected_count": "تم تحديد {{count}}",
+    "clear_selection": "مسح التحديد",
+    "confirm_title": "قم بتأكيد {{action}}",
+    "confirm_message": "هل أنت متأكد أنك تريد عناصر {{action}} {{count}}؟",
+    "destructive_warning": "لا يمكن التراجع عن هذا الإجراء.",
+    "reason_label": "سبب",
+    "reason_placeholder": "تقديم سبب لهذا الإجراء"
+  },
+  "common": {
+    "cancel": "يلغي"
+  },
+  "icon_picker": {
+    "choose_icon": "اختر أيقونة",
+    "choose_icon_placeholder": "ابحث عن أيقونة...",
+    "clear_icon": "أيقونة واضحة",
+    "label": "رمز",
+    "no_icons_found": "لم يتم العثور على أيقونات مطابقة لـ \"{{search}}\"",
+    "search_for_icon": "ابحث عن أيقونة...",
+    "search_icons": "أيقونات البحث"
+  },
+  "visibility_rules": {
+    "min_role": "الدور الأدنى",
+    "requires_auth": "يتطلب المصادقة",
+    "requires_feature": "يتطلب الميزة",
+    "title": "قواعد الرؤية",
+    "roles": {
+      "any": "أي",
+      "user": "مستخدم",
+      "admin": "مسؤل",
+      "tenant_admin": "مشرف المستأجر",
+      "super_admin": "المشرف الفائق"
+    },
+    "features": {
+      "none": "لا أحد",
+      "events": "الأحداث",
+      "groups": "المجموعات",
+      "gamification": "التلعيب",
+      "goals": "الأهداف",
+      "blog": "مدونة",
+      "resources": "موارد",
+      "volunteering": "التطوع",
+      "exchange_workflow": "تبادل سير العمل",
+      "organisations": "المنظمات",
+      "federation": "الاتحاد",
+      "connections": "اتصالات",
+      "reviews": "التعليقات",
+      "polls": "استطلاعات الرأي",
+      "direct_messaging": "المراسلة المباشرة",
+      "group_exchanges": "التبادلات الجماعية",
+      "search": "يبحث"
+    }
   }
 }

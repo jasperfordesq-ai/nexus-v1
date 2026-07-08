@@ -262,7 +262,7 @@ function UserActionsMenu({ user, t, isSuperAdmin, currentUser, navigate, tenantP
 }
 
 export function UserList() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_users');
   useAdminPageMeta({ title: t('users.title') });
   const { tenantPath, tenant } = useTenant();
   const toast = useToast();

@@ -1,0 +1,1973 @@
+{
+  "common": {
+    "an_unexpected_error": "Wystąpił nieoczekiwany błąd",
+    "back": "Powrót",
+    "cancel": "Anuluj",
+    "critical": "Krytyczny",
+    "delete": "Usuń",
+    "feature": "Funkcja",
+    "high": "Wysoka",
+    "in_progress": "W toku",
+    "in_review": "W przeglądzie",
+    "low": "Niski",
+    "medium": "Średni",
+    "planned": "Planowane",
+    "refresh": "Odśwież",
+    "unexpected_error": "Nieoczekiwany błąd",
+    "unknown": "Nieznany",
+    "unfeature": "Brak funkcji",
+    "actions": "Działania",
+    "active": "Aktywny",
+    "all": "Wszystko",
+    "approved": "Zatwierdzone",
+    "clear": "Jasne",
+    "clear_filters": "Wyczyść filtry",
+    "clear_selection": "Wyczyść wybór",
+    "close": "Zamknij",
+    "collapse": "Zwiń",
+    "confirm": "Potwierdź",
+    "create": "Utwórz",
+    "declined": "Odrzucono",
+    "download": "Pobierz",
+    "edit": "Edytuj",
+    "error_loading_data": "Błąd ładowania danych",
+    "expand": "Rozwiń",
+    "export": "Eksportuj",
+    "load_more": "Załaduj więcej",
+    "loading": "Ładowanie",
+    "next": "Następny",
+    "no": "Nie",
+    "ok": "OK",
+    "pending": "Oczekujące",
+    "previous": "Poprzedni",
+    "retry": "Spróbuj ponownie",
+    "save": "Zapisz",
+    "select_all": "Wybierz wszystko",
+    "select_item": "Wybierz element",
+    "yes": "Tak"
+  },
+  "shared": {
+    "broker_actions": "Działania brokera",
+    "content": "Treść",
+    "core_module": "Moduł podstawowy",
+    "document_details": "Szczegóły dokumentu",
+    "history": "Historia",
+    "log_file_empty": "Nie znaleziono pliku dziennika",
+    "no": "Nie",
+    "no_history_available": "Nie znaleziono dostępnej historii",
+    "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
+    "no_members_found": "Nie znaleziono żadnych członków",
+    "loading": "Loading",
+    "no_data": "Brak danych",
+    "no_data_available": "Brak dostępnych danych",
+    "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
+    "open_page_help": "Otwórz pomoc na stronie",
+    "help": "Pomoc",
+    "quick_access": "Szybki dostęp",
+    "recent_activity": "Ostatnia aktywność",
+    "refresh": "Odświeżać",
+    "search": "Szukaj...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Dane",
+    "total_count": "Łącznie{{count}}"
+  },
+  "advanced": {
+    "loading": "Loading",
+    "health_loading": "Loading algorithm health...",
+    "404_entry_dismissed": "Wpis 404 został usunięty",
+    "a_i_settings_saved_successfully": "Ustawienia AI zostały pomyślnie zapisane",
+    "active_provider": "Aktywny dostawca",
+    "add_redirect": "Dodaj przekierowanie",
+    "ai_features_heading": "Funkcje sztucznej inteligencji",
+    "ai_integration_heading": "Integracja sztucznej inteligencji",
+    "ai_settings_desc": "Skonfiguruj dostawcę AI, klucz API i funkcje dla swojej platformy",
+    "ai_settings_title": "Ustawienia AI",
+    "algorithm_disabled_msg": "Algorytm jest obecnie wyłączony",
+    "algorithm_health_desc": "Wyświetl stan kondycji rekomendacji i pasujących algorytmów",
+    "algorithm_health_title": "Zdrowie algorytmu",
+    "algorithm_settings_desc": "Skonfiguruj wagi algorytmów i parametry rankingu treści",
+    "algorithm_settings_title": "Ustawienia algorytmu",
+    "area_feed_ranking": "Ranking kanałów (EdgeRank)",
+    "area_feed_ranking_desc": "Sposób rankingu postów w kanale aktywności",
+    "area_listings_ranking": "Ranking ofert (MatchRank)",
+    "area_listings_ranking_desc": "Jak aukcje są oceniane i klasyfikowane dla każdego użytkownika",
+    "area_member_ranking": "Ranking członków (CommunityRank)",
+    "area_member_ranking_desc": "W jaki sposób członkowie są oceniani i klasyfikowani w katalogach i rekomendacjach",
+    "area_smart_matching": "Inteligentne dopasowanie",
+    "area_smart_matching_desc": "W jaki sposób użytkownicy są dopasowywani do ofert w celu uzyskania spersonalizowanych rekomendacji",
+    "area_settings_saved": "Ustawienia obszaru zostały zapisane",
+    "audit_results": "Wyniki audytu",
+    "auto_generate_sitemap": "Automatycznie generuj mapę witryny",
+    "auto_generate_sitemap_desc": "Automatycznie generuj mapę witryny XML dla wyszukiwarek",
+    "both_from_u_r_l_and_to_u_r_l_are_required": "Wymagane są zarówno adres URL, jak i adres URL",
+    "cancel": "Anuluj",
+    "canonical_urls": "Kanoniczne adresy URL",
+    "canonical_urls_desc": "Kontroluj ustawienia kanonicznych adresów URL, aby uniknąć powielania treści",
+    "cf_min_hint": "Minimalny próg podobieństwa przy filtrowaniu wspólnym",
+    "chronological_mode": "Tryb chronologiczny",
+    "chronological_mode_desc": "Wyświetlaj elementy kanału w ścisłym porządku chronologicznym, a nie w kolejności rankingowej",
+    "col_created": "Utworzono",
+    "col_from_url": "Z adresu URL",
+    "col_hits": "Hity",
+    "col_last_seen": "Ostatnio widziany",
+    "col_referrer": "Osoba polecająca",
+    "col_status_code": "Kod stanu",
+    "col_to_url": "Do adresu URL",
+    "col_url": "URL",
+    "collaborative_filtering_title": "Wspólne filtrowanie",
+    "connection_weight": "Waga połączenia",
+    "connection_weight_desc": "Jak mocno akceptowane połączenia członków powinny wpływać na CommunityRank",
+    "copied": "Skopiowano",
+    "copy": "Kopiuj",
+    "create_redirect": "Utwórz przekierowanie",
+    "custom_robots_txt": "Niestandardowy plik Robots.txt",
+    "delete": "Usuń",
+    "delete_redirect_message": "Usuń przekierowanie",
+    "delete_redirect_title": "Usuń przekierowanie",
+    "desc_the_destination_u_r_l_path": "Docelowa ścieżka adresu URL, do której ma nastąpić przekierowanie",
+    "desc_the_u_r_l_path_to_redirect_from": "Ścieżka URL, z której ma nastąpić przekierowanie",
+    "desc_when_visitors_hit_missing_pages_they_wi": "Gdy odwiedzający trafią na brakujące strony, zobaczą tutaj śledzony błąd 404",
+    "desc_your_a_i_provider_a_p_i_key_stored_encrypt": "Klucz API Twojego dostawcy AI, przechowywany w postaci zaszyfrowanej",
+    "disabled": "Niepełnosprawny",
+    "dismiss": "Odrzuć",
+    "dismiss_404_entry": "Odrzuć",
+    "dismiss_404_message": "Odrzuć 404",
+    "dismiss_404_title": "Odrzuć 404",
+    "direct_referrer": "Bezpośredni",
+    "diversity_factor": "Czynnik różnorodności",
+    "email_provider_heading": "Dostawca poczty e-mail",
+    "email_settings_desc": "Skonfiguruj dostawcę poczty e-mail używanego do wysyłania powiadomień i biuletynów",
+    "email_settings_saved_successfully": "Ustawienia poczty e-mail zostały zapisane pomyślnie",
+    "email_settings_title": "Ustawienia poczty e-mail",
+    "enable_ai_features": "Włącz funkcje AI",
+    "enable_ai_features_desc": "Włącz lub wyłącz funkcje oparte na sztucznej inteligencji na całej platformie",
+    "enable_area": "Włącz{{area}}",
+    "enabled": "Włączone",
+    "engagement_weight": "Waga zaangażowania",
+    "error404_tracking_desc": "Śledź strony, które zwracają błędy 404, aby móc tworzyć przekierowania lub naprawiać uszkodzone linki",
+    "error404_tracking_title": "Śledzenie błędów 404",
+    "failed_count": "Nie udało się zliczyć",
+    "failed_to_copy": "Nie udało się skopiować",
+    "failed_to_create_redirect": "Nie udało się utworzyć przekierowania",
+    "failed_to_delete_404_entry": "Nie udało się usunąć wpisu 404",
+    "failed_to_delete_redirect": "Nie udało się usunąć przekierowania",
+    "failed_to_load_404_errors": "Nie udało się załadować błędów 404",
+    "failed_to_load_a_i_settings": "Nie udało się załadować ustawień AI",
+    "failed_to_load_algorithm_settings": "Nie udało się załadować ustawień algorytmu",
+    "failed_to_load_email_settings": "Nie udało się załadować ustawień poczty e-mail",
+    "failed_to_load_feed_algorithm_settings": "Nie udało się wczytać ustawień algorytmu pliku danych",
+    "failed_to_load_matches_for_this_user": "Nie udało się załadować dopasowań dla tego użytkownika",
+    "failed_to_load_redirects": "Nie udało się załadować przekierowań",
+    "failed_to_load_s_e_o_settings": "Nie udało się załadować ustawień SEO",
+    "failed_to_save_a_i_settings": "Nie udało się zapisać ustawień AI",
+    "failed_to_save_area": "Nie udało się zapisać obszaru",
+    "failed_to_save_email_settings": "Nie udało się zapisać ustawień poczty e-mail",
+    "failed_to_save_feed_algorithm_settings": "Nie udało się zapisać ustawień algorytmu pliku danych",
+    "failed_to_save_s_e_o_settings": "Nie udało się zapisać ustawień SEO",
+    "failed_to_send_test_email": "Nie udało się wysłać testowego e-maila",
+    "feature_ai_analytics": "Analityka AI",
+    "feature_ai_analytics_desc": "Informacje generowane przez sztuczną inteligencję na podstawie działań społeczności",
+    "feature_ai_chat": "Asystent czatu AI",
+    "feature_ai_chat_desc": "Czat AI na platformie dla członków",
+    "feature_ai_moderation": "Moderacja sztucznej inteligencji",
+    "feature_ai_moderation_desc": "Zautomatyzowana moderacja treści i wykrywanie toksyczności",
+    "feature_ai_recommendations": "Zalecenia AI",
+    "feature_ai_recommendations_desc": "Spersonalizowane rekomendacje dotyczące list, członków i treści",
+    "feature_content_generation": "Generowanie treści",
+    "feature_content_generation_desc": "Tworzenie postów, list i wiadomości wspomagane sztuczną inteligencją",
+    "feed_algorithm_desc": "Skonfiguruj sposób, w jaki posty są klasyfikowane i wyświetlane w kanale społeczności",
+    "feed_algorithm_settings_saved_successful": "Ustawienia algorytmu podawania zostały pomyślnie zapisane",
+    "feed_algorithm_title": "Algorytm podawania",
+    "feed_options": "Opcje kanału",
+    "feed_ranking_weights": "Wagi rankingu pasz",
+    "fulltext_indexes_title": "Indeksy pełnotekstowe",
+    "gmail_api_configuration": "Konfiguracja API Gmaila",
+    "generate_embeddings_hint_prefix": "Uruchomić",
+    "generate_embeddings_hint_suffix": "do generowania osadzania.",
+    "health_unavailable": "Dane dotyczące zdrowia są niedostępne",
+    "include_events": "Uwzględnij wydarzenia",
+    "include_events_desc": "Uwzględnij posty o wydarzeniach w algorytmie rankingu kanału",
+    "include_polls": "Uwzględnij ankiety",
+    "include_polls_desc": "Uwzględnij ankiety w algorytmie rankingu kanałów",
+    "inspecting": "Kontrola",
+    "label_a_i_provider": "Dostawca sztucznej inteligencji",
+    "label_a_p_i_key": "Klucz API",
+    "label_auto_sitemap": "Automatyczna mapa witryny",
+    "label_bing_webmaster_verification": "Weryfikacja webmastera Bing",
+    "label_boost_content_from_connected_users": "Zwiększaj zawartość od połączonych użytkowników",
+    "label_canonical_u_r_ls": "Kanoniczne adresy URL",
+    "label_chronological_mode": "Tryb chronologiczny",
+    "label_client_i_d": "Identyfikator klienta",
+    "label_client_secret": "Sekret Klienta",
+    "label_default_title_suffix": "Domyślny przyrostek tytułu",
+    "label_delete_redirect": "Usuń przekierowanie",
+    "label_email_provider": "Dostawca poczty e-mail",
+    "label_enable_a_i": "Włącz sztuczną inteligencję",
+    "label_encryption": "Szyfrowanie",
+    "label_from_email": "Z e-maila",
+    "label_from_name": "Od imienia",
+    "label_from_u_r_l": "Z adresu URL",
+    "label_global_meta_description": "Globalny metaopis",
+    "label_google_search_console_verification": "Weryfikacja w Google Search Console",
+    "label_h1_headline": "Nagłówek H1",
+    "label_hero_intro_text": "Tekst wprowadzający bohatera",
+    "label_host": "Gospodarz",
+    "label_how_much_to_prioritize_likedcommented_content": "Jak nadać priorytet treściom, które polubiły/skomentowały",
+    "label_how_much_to_prioritize_newer_content": "Jaki priorytet nadać nowszym treściom",
+    "label_include_events": "Uwzględnij wydarzenia",
+    "label_include_polls": "Uwzględnij ankiety",
+    "label_listings": "Oferty",
+    "label_max_tokens": "Maksymalna liczba tokenów",
+    "label_meta_description": "Metaopis",
+    "label_meta_keywords": "Meta-słowa kluczowe",
+    "label_meta_title": "Tytuł meta",
+    "label_model": "Modelka",
+    "label_open_graph": "Otwórz wykres",
+    "label_password": "Hasło",
+    "label_port": "Portu",
+    "label_refresh_token": "Odśwież token",
+    "label_reload_matches": "Załaduj ponownie mecze",
+    "label_search_users": "Wyszukaj użytkowników",
+    "label_sender_email": "E-mail nadawcy",
+    "label_sender_name": "Nazwa nadawcy",
+    "label_status_code": "Kod stanu",
+    "label_test_email_address": "Testowy adres e-mail",
+    "label_to_u_r_l": "Do adresu URL",
+    "label_twitter_cards": "Karty na Twitterze",
+    "label_username": "Nazwa użytkownika",
+    "label_users": "Użytkownicy",
+    "label_vary_content_types_in_the_feed": "Zmieniaj typy treści w kanale",
+    "last_run": "Ostatni bieg",
+    "listing_saves": "Lista zostaje zapisana",
+    "loading_match_scores": "Ładowanie wyników meczów...",
+    "match_debug_panel_desc": "Sprawdź wyniki meczów i uzasadnienie dowolnych dwóch członków",
+    "match_debug_panel_title": "Dopasuj panel debugowania",
+    "match_reasons": "Powody dopasowania",
+    "match_count_one": "Dopasowanie{{count}}",
+    "match_count_other": "Dopasowania{{count}}",
+    "meilisearch_offline": "Meilisearch offline",
+    "meilisearch_online": "Meilisearch w Internecie",
+    "member_transactions": "Transakcje członkowskie",
+    "meta_tags_heading": "Metatagi",
+    "missing_indexes_hint_prefix": "Uruchomić",
+    "missing_indexes_hint_suffix": "do tworzenia brakujących indeksów.",
+    "no_404_errors": "Nie znaleziono błędów 404",
+    "no_audit_results": "Brak wyników audytu",
+    "no_audit_results_desc": "Przeprowadź audyt, aby zobaczyć wyniki SEO",
+    "no_debug_scores": "Brak dostępnych wyników debugowania",
+    "no_matches_desc": "Nie znaleziono żadnych dopasowań dla wybranego użytkownika",
+    "no_matches_found": "Nie znaleziono żadnych dopasowań",
+    "no_redirects": "Nie skonfigurowano żadnych przekierowań",
+    "no_redirects_desc": "Nie skonfigurowano jeszcze żadnych przekierowań. Dodaj jeden powyżej.",
+    "no_user_selected": "Nie wybrano użytkownika",
+    "no_user_selected_desc": "Wybierz użytkownika powyżej, aby zobaczyć jego wyniki meczów",
+    "not_configured": "Nie skonfigurowano",
+    "open_graph_tags": "Otwórz znaczniki wykresu",
+    "open_graph_tags_desc": "Skonfiguruj metatagi Open Graph do udostępniania w mediach społecznościowych",
+    "overall_match_score": "Ogólny wynik meczu",
+    "overall_match_score_aria": "Ogólny wynik meczu:{{score}}%",
+    "page_title": "Zaawansowane",
+    "passed_count": "Minęło",
+    "passed_count_with_value": "{{count}}zaliczony",
+    "placeholder_a_short_description_of_your_timebank": "Krótki opis Twojego banku czasu...",
+    "placeholder_community_timebanking_platform": "Społeczna platforma banku czasu...",
+    "placeholder_exchange_skills_and_time_with_your_community": "Wymieniaj się umiejętnościami i czasem ze swoją społecznością...",
+    "placeholder_gocspx": "GOCSPPX-xxxxx",
+    "placeholder_my_timebank": "Mój bank czasu...",
+    "placeholder_noreply_example": "noreply@example.com",
+    "placeholder_robots_txt": "Klient użytkownika: *\nNie zezwalaj: /admin/",
+    "placeholder_s_gxxxxx": "S Gxxxxx...",
+    "placeholder_search_users_by_name_or_email": "Wyszukaj użytkowników według nazwy lub adresu e-mail...",
+    "placeholder_smtpexamplecom": "Smtpexamplecom...",
+    "placeholder_smtp_port": "587",
+    "placeholder_test_example": "test@example.com",
+    "placeholder_user_example": "użytkownik@example.com",
+    "placeholder_welcome_to_our_community": "Witamy w naszej społeczności...",
+    "placeholder_xxxxappsgoogleusercontentcom": "Xxxxappsgoogleusercontentcom...",
+    "placeholder_your_timebank_name": "Twoja nazwa w banku czasu...",
+    "platform_default_desc": "Użyj domyślnych ustawień dostawcy platformy",
+    "platform_default_heading": "Domyślne platformy",
+    "platform_default_hint": "Użyj domyślnej platformy",
+    "please_enter_a_test_email_address": "Wprowadź testowy adres e-mail",
+    "recency_weight": "Aktualna waga",
+    "redirect_created": "Utworzono przekierowanie",
+    "redirect_deleted": "Przekierowanie usunięte",
+    "redirects_desc": "Zarządzaj przekierowaniami adresów URL, aby wysyłać odwiedzających ze starych adresów URL na nowe",
+    "redirects_title": "Przekierowuje",
+    "reload": "Załaduj ponownie",
+    "reload_results": "Załaduj ponownie wyniki",
+    "run_audit": "Uruchom audyt",
+    "s_e_o_settings_saved_successfully": "Ustawienia SEO zostały pomyślnie zapisane",
+    "save_algorithm": "Zapisz algorytm",
+    "save_area": "Zapisz obszar",
+    "save_failed": "Zapisywanie nie powiodło się",
+    "save_seo_settings": "Zapisz ustawienia SEO",
+    "save_settings": "Zapisz ustawienia",
+    "score_breakdown": "Podział punktów",
+    "search_engine_title": "Wyszukiwarka",
+    "secret_already_saved": "Sekret już zapisany",
+    "select_a_user": "Wybierz użytkownika",
+    "select_a_user_desc": "Wyszukaj członka, aby sprawdzić jego wyniki meczowe",
+    "semantic_embeddings_title": "Osadzenia semantyczne",
+    "send_test_email": "Wyślij e-mail testowy",
+    "sendgrid_api_key_desc": "Wprowadź klucz API SendGrid, aby umożliwić dostarczanie wiadomości e-mail za pośrednictwem SendGrid",
+    "sendgrid_configuration": "Konfiguracja SendGrid",
+    "seo_audit_complete": "Audyt SEO zakończony",
+    "seo_audit_desc": "Przeprowadź automatyczny audyt SEO, aby zidentyfikować problemy ze swoją witryną",
+    "seo_audit_error": "Błąd audytu SEO",
+    "seo_audit_failed": "Audyt SEO nie powiódł się",
+    "seo_audit_no_results": "Audyt SEO nie przyniósł żadnych wyników",
+    "seo_audit_title": "Audyt SEO",
+    "seo_features_heading": "Funkcje SEO",
+    "seo_overview_desc": "Skonfiguruj globalne ustawienia SEO, w tym metatagi i udostępnianie w mediach społecznościowych",
+    "seo_overview_title": "Przegląd SEO",
+    "smtp_configuration": "Konfiguracja SMTP",
+    "status_301": "Stałe przekierowanie 301",
+    "status_302": "302 Tymczasowe przekierowanie",
+    "tenant_meta_heading": "Meta najemcy",
+    "test_email_heading": "Testowy e-mail",
+    "test_email_hint": "Wpisz adres e-mail, na który chcesz wysłać wiadomość testową",
+    "test_email_sent": "Testowy e-mail wysłany",
+    "test_email_sent_via": "Testowy e-mail wysłany przez",
+    "test_email_sent_via_provider": "Testowy e-mail wysłany za pośrednictwem{{provider}}",
+    "total_count": "Razem: {{count}}",
+    "twitter_cards": "Karty na Twitterze",
+    "twitter_cards_desc": "Skonfiguruj metatagi karty Twitter w celu uzyskania rozbudowanych podglądów linków na Twitterze",
+    "verification_robots_heading": "Roboty weryfikacyjne",
+    "warnings_count": "Ostrzeżenia",
+    "warnings_count_with_value": "Ostrzeżenia{{count}}",
+    "webhook_u_r_l_copied": "Skopiowano adres URL webhooka",
+    "webhook_url_hint": "Adres URL webhooka do otrzymywania powiadomień",
+    "webhook_url_label": "Adres URL webhooka",
+    "score_category": "Dopasowanie kategorii",
+    "score_freshness": "Świeżość",
+    "score_proximity": "Bliskość",
+    "score_quality": "Jakość",
+    "score_reciprocity": "Wzajemność",
+    "score_skill": "Mecz umiejętności",
+    "btn_clear_cache": "Wyczyść pamięć podręczną",
+    "btn_refresh": "Odśwież",
+    "chip_active": "Aktywny",
+    "chip_fail": "Niepowodzenie",
+    "chip_key_configured": "Klucz skonfigurowany",
+    "chip_pass": "Przełęcz",
+    "chip_warning": "Ostrzeżenie",
+    "desc_api_key_new": "Klucz API Nowy.",
+    "desc_api_key_replace": "Klucz API Zamień.",
+    "desc_custom_robots_txt": "Niestandardowe roboty Txt.",
+    "desc_default_daily_limit": "Domyślny limit dzienny.",
+    "desc_default_monthly_limit": "Domyślny limit miesięczny.",
+    "desc_global_meta_description_chars": "Globalny metaopis znaków.",
+    "desc_h1_headline": "Nagłówek H1.",
+    "desc_meta_description_chars": "Meta Opis Znaki.",
+    "desc_meta_keywords": "Meta-słowa kluczowe.",
+    "desc_meta_title": "Tytuł meta.",
+    "desc_og_image_url": "Adres URL obrazu OG.",
+    "desc_ollama_host": "Gospodarz Ollama.",
+    "desc_select_ai_provider": "Wybierz dostawcę AI.",
+    "desc_select_model": "Wybierz Model.",
+    "desc_title_suffix": "Sufiks tytułu.",
+    "encryption_none": "Szyfrowanie Brak",
+    "encryption_ssl": "Szyfrowanie SSL",
+    "encryption_tls": "Szyfrowanie TLS",
+    "failed_to_clear_sitemap_cache": "Nie udało się wyczyścić pamięci podręcznej mapy witryny",
+    "failed_to_load_sitemap_stats": "Nie udało się załadować statystyk mapy witryny",
+    "failed_to_run_seo_audit": "Nie udało się przeprowadzić audytu SEO",
+    "failed_count_with_value": "Niepowodzenie{{count}}",
+    "fail_count": "Niepowodzenie{{count}}",
+    "pass_count": "{{count}} zaliczone",
+    "warning_count": "{{count}} ostrzeżenie",
+    "global_meta_description_count": "{{count}}/160 znaków globalnego metaopisu",
+    "health_auto_sitemap_active_count": "Aktywne — indeksowane są adresy URL{{count}}",
+    "health_auto_sitemap_disabled": "Wyłączone — wyszukiwarki nie mogą znaleźć Twoich stron",
+    "health_canonical_disabled": "Wyłączone — w wynikach wyszukiwania mogą pojawiać się zduplikowane treści",
+    "health_canonical_enabled": "Włączone — zapobieganie duplikowaniu treści",
+    "health_default_og_image": "Domyślny obraz OG",
+    "health_google_verification_configured": "Skonfigurowano tag weryfikacyjny",
+    "health_google_verification_missing": "Nieskonfigurowane — zalecane do statystyk wyszukiwania",
+    "health_homepage_h1": "Strona główna H1",
+    "health_homepage_h1_missing": "Nie ustawiono — na stronie głównej może brakować tagu H1",
+    "health_homepage_h1_set": "Zestaw: „{{headline}}”",
+    "health_meta_description": "Metaopis",
+    "health_meta_description_length": "Znaki{{count}}(idealnie: 150–160)",
+    "health_meta_description_missing": "Brak zestawu domyślnego metaopisu",
+    "health_og_image_configured": "Skonfigurowano domyślny obraz do udostępniania w mediach społecznościowych",
+    "health_og_image_missing": "Brak domyślnego obrazu OG — udostępnienia społecznościowe będą używać obrazu zastępczego",
+    "health_open_graph_disabled": "Wyłączone — podglądy w mediach społecznościowych nie będą działać",
+    "health_tenant_title": "Tytuł najemcy",
+    "health_tenant_title_missing": "Nie ustawiono — przy użyciu domyślnego „NEXUS”",
+    "health_tenant_title_set": "Zestaw: „{{title}}”",
+    "health_title_suffix": "Sufiks tytułu",
+    "health_title_suffix_configured": "Skonfigurowano: „{{suffix}}”",
+    "health_title_suffix_missing": "Nie ustawiono przyrostka tytułu — strony będą domyślnie wyświetlać „Strona | NEXUS”.",
+    "health_twitter_cards_disabled": "Wyłączone — podglądy X/Twitter nie będą działać",
+    "invalid_weight": "Nieprawidłowa waga",
+    "label_api_key": "Klucz API",
+    "label_default_daily_limit": "Domyślny limit dzienny",
+    "label_default_monthly_limit": "Domyślny limit miesięczny",
+    "label_og_image_url": "Adres URL obrazu OG",
+    "label_ollama_host_url": "Adres URL hosta Ollama",
+    "last_run_label": "Ostatni bieg",
+    "meta_description_count": "{{count}}/160 znaków metaopisu",
+    "no_audit_results_prompt": "No audit results prompt found",
+    "og_image_preview": "Podgląd obrazu OG",
+    "param_activity_weight": "Waga aktywności",
+    "param_activity_weight_desc": "Jak bardzo ostatnia aktywność podnosi ranking",
+    "param_affinity_weight": "Waga powinowactwa",
+    "param_affinity_weight_desc": "Jak silnie relacje między użytkownikami a autorami wpływają na ranking",
+    "param_availability_weight": "Dostępność Waga",
+    "param_availability_weight_desc": "Jak mocno nakładająca się dostępność wpływa na wyniki meczów",
+    "param_connectivity_weight": "Waga połączenia",
+    "param_connectivity_weight_desc": "Jak mocno akceptowane połączenia członków powinny wpływać na CommunityRank",
+    "param_content_type_weight": "Typ zawartości Waga",
+    "param_content_type_weight_desc": "Jak mocno ważony jest rodzaj treści",
+    "param_contribution_weight": "Waga wkładu",
+    "param_contribution_weight_desc": "Jak mocno ważona jest historia wkładu członka",
+    "param_engagement_weight": "Waga zaangażowania",
+    "param_engagement_weight_desc": "Jak bardzo polubienia, komentarze i udostępnienia wpływają na ranking",
+    "param_freshness_minimum": "Podłoga Świeżości",
+    "param_freshness_minimum_desc": "Minimalny wynik świeżości niezależnie od wieku",
+    "param_freshness_weight": "Waga świeżości",
+    "param_freshness_weight_desc": "Jak bardzo nowsze oferty są preferowane",
+    "param_half_life_hours": "Okres półtrwania (godziny)",
+    "param_half_life_hours_desc": "Godziny, po których post spada do połowy początkowego wyniku świeżości",
+    "param_listings_ranking": "Ranking ogłoszeń",
+    "param_listing_engagement_weight": "Waga zaangażowania",
+    "param_listing_engagement_weight_desc": "Jak silnie wyświetlenia wpisów, zapisy i zapytania wpływają na ranking",
+    "param_location_weight": "Lokalizacja Waga",
+    "param_location_weight_desc": "Jak bliskość geograficzna wpływa na ranking",
+    "param_match_location_weight": "Lokalizacja Waga",
+    "param_match_location_weight_desc": "Jak bliskość geograficzna wpływa na wyniki meczów",
+    "param_member_reputation_weight": "Waga reputacji",
+    "param_member_reputation_weight_desc": "Jak mocno ważone są oceny i recenzje członków",
+    "param_proximity_weight": "Waga zbliżeniowa",
+    "param_proximity_weight_desc": "Jak bliskość geograficzna wpływa na ranking",
+    "param_quality_weight": "Jakość Waga",
+    "param_quality_weight_desc": "Jak mocno ważone są sygnały dotyczące kompletności i jakości wykazu",
+    "param_rating_weight": "Ocena Waga",
+    "param_rating_weight_desc": "Jak mocno wcześniejsze oceny użytkowników wpływają na wyniki meczów",
+    "param_reputation_weight": "Waga reputacji",
+    "param_reputation_weight_desc": "Jak mocno reputacja wystawiającego wpływa na ranking",
+    "param_skill_match_weight": "Waga dopasowania umiejętności",
+    "param_skill_match_weight_desc": "Jak mocno nakładanie się umiejętności użytkowników na listę wpływa na ranking",
+    "param_skill_weight": "Waga umiejętności",
+    "param_skill_weight_desc": "Jak mocno nakładanie się umiejętności wpływa na wyniki meczów",
+    "param_time_decay_weight": "Waga zaniku czasu",
+    "param_time_decay_weight_desc": "Jak mocno wiek po spadku obniża ranking",
+    "placeholder_current": "Wpisz aktualne...",
+    "placeholder_enter_api_key": "Wprowadź klucz API...",
+    "placeholder_current_key": "Wpisz bieżący:{{masked}}",
+    "provider_configuration_heading": "Konfiguracja dostawcy",
+    "provider_anthropic": "Antropiczny (Claude)",
+    "provider_gemini": "Google Bliźnięta",
+    "provider_gmail_api": "API Gmaila",
+    "provider_ollama": "Ollama (na własnym serwerze)",
+    "provider_openai": "OpenAI",
+    "provider_platform_default": "Domyślne platformy",
+    "provider_sendgrid": "Wyślij siatkę",
+    "provider_smtp": "SMTP",
+    "prerender": {
+      "description": "Migawki renderowane przez serwer tylko przez boty. Monitoruj zasięg, wykrywaj nieaktualności i wymuszaj odświeżenia.",
+      "guide": {
+        "title": "Plain-English guide",
+        "intro": "The prerender engine makes saved HTML copies of public pages for search engines and social previews. Members use the normal app; these snapshots are only for crawlers.",
+        "bot_only": {
+          "title": "What gets rendered",
+          "body": "Public tenant pages, such as about pages, listings, blog posts, and public groups. Private member areas are not supposed to be rendered."
+        },
+        "tenant_scope": {
+          "title": "Tenant safety",
+          "body": "When a page belongs to one tenant, actions should include that tenant slug. The engine now checks host and tenant path before touching snapshots."
+        },
+        "dry_run": {
+          "title": "Preview first",
+          "body": "A dry run shows what would happen without deleting files or queuing work. Use it before purge or repair actions."
+        },
+        "repair": {
+          "title": "Repair stuck queue",
+          "body": "This is not a content reset. It only releases jobs that look abandoned and lets the worker resume after repeated failures."
+        }
+      },
+      "workflows": {
+        "title": "What are you trying to do?",
+        "description": "Start with the plain task, then use the tab it opens. This keeps routine work away from the risky controls.",
+        "open": "Open",
+        "refresh_one_tenant": {
+          "title": "Refresh one tenant",
+          "body": "Use when public content changed for a single community. Enter its tenant slug before queuing work."
+        },
+        "find_stale_pages": {
+          "title": "Find stale or missing pages",
+          "body": "Check coverage first to see which tenants have old snapshots, missing pages, or broken assets."
+        },
+        "inspect_cache": {
+          "title": "Inspect saved pages",
+          "body": "Search the cache, inspect SEO tags, and recache selected snapshots using tenant-safe routes."
+        },
+        "investigate_failures": {
+          "title": "Investigate failed renders",
+          "body": "Review routes in the backoff window before retrying, purging, or repairing the queue."
+        },
+        "check_tenant_safety": {
+          "title": "Check one tenant is safe",
+          "body": "Inspect exactly what this tenant should have, what is saved, and whether any snapshots belong elsewhere."
+        }
+      },
+      "analytics": {
+        "actions": {
+          "reload": "Przeładować"
+        },
+        "columns": {
+          "crawler": "ŻETON NEXUSARM20",
+          "hits": "ŻETON NEXUSARM21",
+          "host": "ŻETON NEXUSARM22",
+          "ip": "ŻETON NEXUSARM14",
+          "status": "ŻETON NEXUSARM23",
+          "time": "TOKEN NEXUSARM24",
+          "uri": "ŻETON NEXUSARM12",
+          "url": "TOKEN NEXUSARM11"
+        },
+        "empty": "Brak dostępnych analiz. Dziennik dostępu bota może być pusty.",
+        "empty_bot_traffic": "Nie ma jeszcze ruchu botów",
+        "empty_no_data": "Brak danych",
+        "empty_recent_hits": "Brak najnowszych hitów",
+        "errors": {
+          "load": "Nie udało się załadować statystyk"
+        },
+        "filters": {
+          "window": "Okno"
+        },
+        "hints": {
+          "spoofed": "zgłosił główny bot, nie udało się uzyskać zasięgu IP",
+          "top_50_cap": "od top-50 czapka",
+          "verified_of_total": "{{verified}} z {{total}}"
+        },
+        "kpi": {
+          "ip_verified": "IP zweryfikowane",
+          "spoofed": "Sfałszowany (podejrzany)",
+          "total_bot_hits": "Całkowita liczba trafień botów",
+          "unique_uris": "Unikalne żetony URI"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} sfałszowany"
+        },
+        "log_summary": "Log: {{size}} - od {{time}}",
+        "sections": {
+          "hits_by_crawler": "Trafienia przez robota",
+          "hits_by_status": "Trafienia według statusu HTTP",
+          "recent_activity": "Ostatnia aktywność (najpierw najnowsze, ostatnie {{count}})",
+          "top_uris": "Najpopularniejsze tokeny NEXUSTERM12 (50 najlepszych według liczby trafień)"
+        },
+        "tables": {
+          "recent_hits_aria": "Ostatnie trafienia botów",
+          "top_uris_aria": "Najlepsze tokeny NEXUSRM12"
+        },
+        "windows": {
+          "1": "Ostatnie 24 godziny",
+          "7": "Ostatnie 7 dni",
+          "30": "Ostatnie 30 dni"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "Otwórz w ekwipunku",
+          "refresh": "Odświeżać",
+          "refresh_all_stale": "Odśwież wszystkie nieaktualne ({{count}})"
+        },
+        "columns": {
+          "actions": "ŻETON NEXUSARM25",
+          "asset": "ASSET",
+          "coverage": "ŻETON NEXUSARM27",
+          "host": "ŻETON NEXUSARM22",
+          "missing": "ŻETON NEXUSARM28",
+          "stale": "ŻETON NEXUSARM29",
+          "tenant": "ŻETON NEXUSARM30"
+        },
+        "confirm": {
+          "queue_recache": "Odzyskiwanie kolejki dla dzierżawców {{count}}?"
+        },
+        "empty": "Żadnych najemców",
+        "errors": {
+          "bulk_enqueue": "Zbiorcze kolejkowanie nie powiodło się (niektórzy dzierżawcy mogli ustawić się w kolejce)",
+          "enqueue": "Nie udało się umieścić w kolejce",
+          "load": "Nie udało się załadować zasięgu"
+        },
+        "messages": {
+          "bulk_queued": "Pamięć podręczna w kolejce dla dzierżawców {{count}}",
+          "no_stale": "Brak nieaktualnych najemców – zasięg jest dobry",
+          "tenant_queued": "Dodano #{{id}} do kolejki dla {{slug}}"
+        },
+        "summary": {
+          "healthy": "Wszyscy najemcy {{count}} zdrowi.",
+          "needs_work": "{{needing}} z dzierżawców {{total}} ma brakujące, nieaktualne lub uszkodzone trasy."
+        },
+        "table_aria": "Zasięg"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "Stosować",
+          "dry_run": "Praca na sucho"
+        },
+        "auto_recache": {
+          "description": "Skanuje każdą migawkę. Kolejkuje operacje ponownego ładowania o niskim priorytecie dla tras, których zawartość źródłowa uległa zmianie lub których TTL wygasł. Działa na cronie co 15-30 minut; użyj tego, aby natychmiast go uruchomić.",
+          "title": "Automatyczne ponowne buforowanie (TTL + dryf zawartości)"
+        },
+        "drift": {
+          "description": "Przechodzi mapę witryny każdej dzierżawy, porównuje lastmod z mtimesami migawek i wychwytuje nieaktualne strony z nieprzetworzonych zapisów, migracji lub zadań w kolejce. Uruchamia się co 2 minuty i kolejkuje pamięci podręczne o wysokim priorytecie.",
+          "title": "Wykryj dryf (mapa witryny a migawki)"
+        },
+        "errors": {
+          "auto_recache": "Nie udało się uruchomić automatycznego ponownego buforowania",
+          "drift_detection": "Nie udało się uruchomić wykrywania dryfu",
+          "purge_unexpected": "Nieoczekiwane czyszczenie nie powiodło się"
+        },
+        "messages": {
+          "auto_recache_applied": "Zastosowano automatyczne ponowne buforowanie",
+          "auto_recache_dry_run": "Próba automatycznego ponownego buforowania została ukończona",
+          "drift_applied": "Zastosowano wykrywanie dryfu",
+          "drift_dry_run": "Zakończono jazdę na sucho",
+          "purge_dry_run": "Praca próbna: migawki {{count}} zostaną usunięte",
+          "purged_ungated": "Usunięto niezamknięte migawki {{count}} wśród dzierżawców {{tenants}}"
+        },
+        "no_output": "(brak wyjścia)",
+        "purge_ungated": {
+          "description": "Przeglądaj migawki, których trasa nie znajduje się w oczekiwanym zestawie dzierżawcy. Często po wyłączeniu funkcji lub w celu oczyszczenia tras statycznych wstępnie renderowanych bez flag funkcji. Trasy zawartości dynamicznej pozostają w spokoju.",
+          "title": "Usuń niezablokowane migawki (czyszczenie 404 dla poszczególnych dzierżawców)"
+        },
+        "result": {
+          "deleted": "Usunięto migawki {{count}} wśród dzierżawców {{tenants}}",
+          "would_delete": "Spowoduje usunięcie migawek {{count}} wśród dzierżawców {{tenants}}"
+        },
+        "title": "Automatyzacja świeżości"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "Anulować",
+          "close_breaker_now": "Zamknij teraz wyłącznik",
+          "details": "Bliższe dane",
+          "emergency_reset": "Reset awaryjny",
+          "hide": "Ukrywać",
+          "hide_details": "Ukryj szczegóły",
+          "reset_queue": "Zresetuj kolejkę"
+        },
+        "engine_healthy": "Silnik zdrowy",
+        "issue_count_one": "Problem z {{count}}",
+        "issue_count_other": "Problemy z {{count}}",
+        "modal": {
+          "body_middle": "Lub",
+          "body_prefix": "Spowoduje to konieczność kolejkowania każdego",
+          "body_suffix": "wiersz, którego pracownik milczał przez >30 min, i wyczyść wyłącznik automatyczny.",
+          "title": "Awaryjne: zresetuj zablokowaną kolejkę",
+          "warning": "Używaj tej opcji tylko wtedy, gdy potwierdziłeś, że kolejka utknęła. Jeśli zdrowy pracownik nadal działa, spowoduje to utworzenie duplikatu pracy."
+        },
+        "toasts": {
+          "breaker_reset": "Reset wyłącznika automatycznego",
+          "queue_reset_one": "Zresetuj zablokowany wiersz {{count}}; wyłącznik wyczyszczony",
+          "queue_reset_other": "Zresetuj zablokowane wiersze {{count}}; wyłącznik wyczyszczony",
+          "queue_reset_failed": "Resetowanie kolejki nie powiodło się",
+          "reset_failed": "Resetowanie nie powiodło się"
+        },
+        "checks": {
+          "cache_readable": "Cache can be read",
+          "cache_writable": "Cache can be written",
+          "cache_filesystem": "Cache storage",
+          "route_planner": "Tenant route planner",
+          "job_table": "Job queue table",
+          "circuit_breaker": "Circuit breaker",
+          "queue_age": "Queue age",
+          "recent_failures": "Recent failures",
+          "stuck_jobs": "Stuck jobs",
+          "last_successful_pass": "Last successful run",
+          "last_failed_pass": "Last failed run",
+          "sched_prerender-detect-drift": "Drift detector heartbeat",
+          "sched_prerender-auto-recache": "Auto-recache heartbeat",
+          "sched_prerender-reap-stale": "Stale-job cleanup heartbeat"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "Zamknąć",
+          "inspect": "Sprawdzać",
+          "inspect_snapshot": "Sprawdź {{path}}",
+          "open_rendered_url": "Otwórz wyrenderowany URL",
+          "recache_selected": "Wybrano pamięć podręczną ({{count}})",
+          "reload": "Przeładować",
+          "select_all_visible": "Wybierz wszystkie widoczne",
+          "select_snapshot": "Wybierz {{path}}"
+        },
+        "columns": {
+          "actions": "Działania",
+          "age": "Wiek",
+          "host": "Gospodarz",
+          "http": "ŻETON NEXUSARM15",
+          "route": "Trasa",
+          "size": "Rozmiar",
+          "status": "Stan"
+        },
+        "empty": "Żadne migawki nie pasują do filtrów",
+        "errors": {
+          "bulk_recache": "Zbiorcze ponowne załadowanie nie powiodło się",
+          "inspect": "Nie udało się sprawdzić migawki",
+          "load": "Nie udało się załadować zapasów"
+        },
+        "filters": {
+          "aging": "Starzenie się",
+          "all": "Wszystko",
+          "asset_broken": "Zasób uszkodzony",
+          "content_drifted": "Treść dryfowała",
+          "filter": "Filtr",
+          "filter_placeholder": "podciąg trasy lub hosta",
+          "fresh": "Świeży",
+          "issue": "Wydanie",
+          "stale": "Nieświeży",
+          "staleness": "Nieaktualność",
+          "status": "Stan",
+          "status_200": "Tylko 200",
+          "status_non_200": "Nie-200",
+          "tenant_placeholder": "fakultatywny",
+          "tenant_slug": "Ślimak najemcy"
+        },
+        "messages": {
+          "bulk_recache": "Nieprawidłowe migawki {{count}} i pamięć podręczna w kolejce"
+        },
+        "inspect": {
+          "age": "Wiek",
+          "all_valid": "wszystko aktualne",
+          "asset_references": "Referencje zasobów ({{count}})",
+          "canonical": "Kanoniczny",
+          "dead_assets": "{{count}} nie żyje",
+          "flags": "Flagi",
+          "h1_count": "H1 (liczba)",
+          "html_parse_warnings": "HTML analizuje ostrzeżenia",
+          "html_preview": "Podgląd HTML (pierwsze 12 KB, usunięte skrypty)",
+          "integrity_mismatch": "bajty zmienione od czasu renderowania - oczekiwano sha256 {{expected}}..., otrzymano {{actual}}...",
+          "integrity_missing": "brak wózka bocznego sha256 — migawka powstała przed weryfikacją integralności lub została ręcznie edytowana",
+          "integrity_ok": "bajty odpowiadają sha256 zapisanemu w czasie renderowania",
+          "integrity_status": "integralność: {{status}}",
+          "integrity_unreadable": "Wózek boczny sha256 istnieje, ale jest zniekształcony",
+          "invalid_present": "INVALID OBECNY",
+          "json_ld": "JSON-LD (bloki {{blocks}}, {{status}})",
+          "meta_description": "Metaopis",
+          "missing": "- zaginiony -",
+          "modal_title": "Kontrola migawki",
+          "modified": "Zmodyfikowany",
+          "must_fix": "Należy naprawić ({{count}})",
+          "no_structured_data": "Brak danych strukturalnych",
+          "no_type": "(brak @typu)",
+          "none": "(nic)",
+          "old": "{{age}} stary",
+          "open_graph": "Otwórz wykres",
+          "path": "Ścieżka",
+          "seo_score": "Wynik SEO",
+          "size": "Rozmiar",
+          "tips": "Wskazówki ({{count}})",
+          "title": "Tytuł"
+        },
+        "selected": "Wybrano {{count}}",
+        "status": {
+          "asset": "zaleta",
+          "content": "treść",
+          "content_drifted": "treść poszła"
+        },
+        "summary": "{{filtered}} z migawek {{total}}",
+        "table_aria": "Inwentarz migawkowy"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "Anuluj zadanie #{{id}}",
+          "close": "Zamknąć",
+          "reload": "Przeładować",
+          "retry_job": "Ponów zadanie #{{id}}",
+          "retry_same_parameters": "Spróbuj ponownie z tymi samymi parametrami",
+          "view_details": "Wyświetl szczegóły zadania #{{id}}"
+        },
+        "columns": {
+          "actions": "Działania",
+          "by": "Przez",
+          "flags": "Flagi",
+          "id": "#",
+          "priority": "Priorytet",
+          "queued": "W kolejce",
+          "result": "Wynik",
+          "scope": "Zakres",
+          "status": "Stan"
+        },
+        "detail": {
+          "all": "Wszystko",
+          "claimed_by": "Zgłoszone przez",
+          "duration": "Czas trwania",
+          "error": "Błąd",
+          "exit_code": "Kod wyjścia",
+          "finished_at": "Skończono o godz",
+          "log_tail": "Kłoda (ogon)",
+          "queued_at": "W kolejce o godz",
+          "requested_by": "Na prośbę",
+          "routes": "Trasy",
+          "started_at": "Rozpoczęło się o godz",
+          "status": "Stan",
+          "tenant": "Najemca",
+          "title": "Zadanie #{{id}}"
+        },
+        "empty": "Brak pracy",
+        "errors": {
+          "cancel": "Nie można anulować — zadanie mogło się rozpocząć",
+          "load": "Nie udało się załadować zadań",
+          "retry": "Ponowna próba nie powiodła się — oryginalne zadanie może nadal być w trakcie wykonywania"
+        },
+        "filters": {
+          "all": "Wszystko",
+          "cancelled": "Odwołany",
+          "failed": "Przegrany",
+          "partial": "Częściowy",
+          "queued": "W kolejce",
+          "running": "Działanie",
+          "status": "Stan",
+          "succeeded": "Udało się"
+        },
+        "flags": {
+          "dry_run": "praca na sucho",
+          "force": "siła"
+        },
+        "messages": {
+          "cancelled": "Anulowano zadanie #{{id}}",
+          "retry_queued": "Dodano ponowną próbę #{{retryId}} do kolejki (z #{{id}})"
+        },
+        "priority": {
+          "high": "Wysoki",
+          "low": "Niski",
+          "normal": "Normalna",
+          "tooltip": "priorytet={{priority}} (niższe wygrane)"
+        },
+        "result": {
+          "invalid": "{{count}} nieprawidłowy"
+        },
+        "scope": {
+          "all_tenants": "wszyscy najemcy"
+        },
+        "table_aria": "Praca"
+      },
+      "events": {
+        "actions": {
+          "reload": "Przeładować"
+        },
+        "columns": {
+          "commit": "Popełniać",
+          "details": "Bliższe dane",
+          "event": "Wydarzenie",
+          "time": "Czas"
+        },
+        "empty": "Brak wydarzeń",
+        "errors": {
+          "load": "Nie udało się załadować wydarzeń"
+        },
+        "filters": {
+          "limit": "Limit"
+        },
+        "summary": "Wydarzenia {{count}}",
+        "table_aria": "Wydarzenia",
+        "types": {
+          "fail": "Ponieść porażkę",
+          "partial": "Częściowy",
+          "success": "Sukces",
+          "supersede": "Zastąpić",
+          "unknown": "Nieznane zdarzenie: {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "Wiek",
+          "cache_path": "Ścieżka pamięci podręcznej",
+          "failed_at": "Nie udało się w"
+        },
+        "description_action": "Wymuś odświeżenie",
+        "description_middle": "Trasy na tej liście są automatycznie pomijane w okresie wygaśnięcia awarii (domyślnie 6 godzin). Używać",
+        "description_prefix": "Zapisz w pamięci podręcznej ścieżki, które nie powiodły się podczas ostatniego renderowania wstępnego.",
+        "description_suffix": "na karcie Przegląd, aby natychmiast ponowić próbę.",
+        "empty": "Żadnych ostatnich awarii",
+        "errors": {
+          "load": "Nie udało się załadować błędów"
+        },
+        "table_aria": "Awarie"
+      },
+      "live_connected": "Połączono aktualizacje na żywo",
+      "audit": {
+        "actions": {
+          "auto_recache": "Auto-recache",
+          "cancel": "Cancel job",
+          "detect_drift": "Detect drift",
+          "enqueue": "Queue refresh",
+          "invalidate": "Invalidate route",
+          "purge": "Delete snapshots",
+          "purge_unexpected": "Clean unexpected snapshots",
+          "reset_breaker": "Reset safety breaker",
+          "reset_queue": "Repair stuck queue"
+        },
+        "buttons": {
+          "export_csv": "Eksportuj CSV",
+          "refresh": "Odświeżać"
+        },
+        "columns": {
+          "action": "Działanie",
+          "actor": "Aktor",
+          "details": "Bliższe dane",
+          "job": "Stanowisko",
+          "outcome": "Wynik",
+          "tenant": "Najemca",
+          "when": "Gdy"
+        },
+        "empty": "Brak wpisów audytu.",
+        "fallbacks": {
+          "all": "Wszystko",
+          "system": "system"
+        },
+        "filters": {
+          "action": "Filtr akcji",
+          "all": "Wszystko"
+        },
+        "table_aria": "Historia audytu",
+        "outcomes": {
+          "ok": "Completed",
+          "denied": "Denied",
+          "failed": "Failed"
+        },
+        "details_empty": "No extra details"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "Praca w kolejce",
+          "refresh": "Odświeżać"
+        },
+        "empty_summary": "Brak podsumowania.",
+        "errors": {
+          "enqueue_job": "Nie udało się umieścić zadania w kolejce",
+          "load_summary": "Nie udało się załadować podsumowania"
+        },
+        "fields": {
+          "routes": "Trasy",
+          "tenant_slug": "Ślimak najemcy"
+        },
+        "force_refresh": {
+          "description": "Kolejkuj ponowne renderowanie. Pozostaw oba pola puste, aby odświeżyć każdego najemcę i trasę. Procesor hosta podejmuje zadanie w ciągu około 60 sekund.",
+          "dry_run": "Próba próbna (tylko plan)",
+          "force": "Wymuś (ignoruj ​​pamięć podręczną)",
+          "title": "Wymuś odświeżenie"
+        },
+        "health": {
+          "cache_unreachable": "Pamięć podręczna nieosiągalna",
+          "healthy": "Zdrowy",
+          "missing": "Brak {{count}}",
+          "stale": "{{count}} jest nieaktualny"
+        },
+        "hints": {
+          "active_jobs": "{{count}} aktywny",
+          "aging": "{{count}} starzenie się (>7 dni)",
+          "asset_broken": "Referencje martwe /aktywa/*",
+          "backoff_window": "W 6-godzinnym oknie wycofania",
+          "cache_age": "Najstarszy {{oldest}} / najnowszy {{newest}}",
+          "content_stale": "Treść źródłowa nowsza niż migawka",
+          "event_at": "Zdarzenie {{time}}",
+          "no_events": "Brak wydarzeń",
+          "prometheus": "Format tekstowy Prometeusza",
+          "tenants_routes": "Najemcy {{tenants}} x trasy {{routes}}"
+        },
+        "kpi": {
+          "age_stale": "Wiek nieaktualny (>14d)",
+          "asset_broken": "Zniszczony majątek",
+          "build_commit": "Zbuduj zatwierdzenie",
+          "cache_size": "Rozmiar pamięci podręcznej",
+          "content_stale": "Treść nieaktualna",
+          "coverage": "Zasięg",
+          "metrics": "Metryka",
+          "missing": "Zaginiony",
+          "queued_jobs": "Zadania w kolejce",
+          "recent_failures": "Ostatnie awarie",
+          "status": "Stan"
+        },
+        "last_run": "Ostatni ukończony bieg",
+        "messages": {
+          "job_queued": "Dodano zadanie #{{id}} do kolejki"
+        },
+        "placeholders": {
+          "routes": "/about,/blog (puste = wszystkie)",
+          "tenant_slug": "np. bank godzin (puste = wszystkie)"
+        },
+        "super_admin_only": "Tylko superadministrator"
+      },
+      "polling_fallback": "Ankieta zastępcza",
+      "purge": {
+        "actions": {
+          "auto_recache": "Automatyczne ponowne buforowanie po czyszczeniu",
+          "dry_run": "Praca na sucho",
+          "preview_purge": "Podgląd czyszczenia",
+          "purge_now": "Oczyść teraz",
+          "continue_to_delete": "Continue to live delete"
+        },
+        "description_middle": "dla jednego segmentu ścieżki,",
+        "description_prefix": "Usuń migawki pasujące do wzorca globu. Używać",
+        "description_suffix": "dla każdego potomka. Przykłady:",
+        "all_tenants_warning": {
+          "body": "Leaving tenant slug blank will delete matching snapshots across every tenant. This is only for platform-wide cleanup after you have previewed the exact files.",
+          "confirm": "I understand this delete applies to every tenant",
+          "title": "All-tenant delete"
+        },
+        "errors": {
+          "confirm_all_tenants": "Confirm the all-tenant delete before continuing",
+          "pattern_required": "Wymagany jest wzór (np. /blog/*)",
+          "purge_failed": "Czyszczenie nie powiodło się",
+          "preview_required": "Run a matching preview before deleting snapshots.",
+          "confirm_text": "Type {{phrase}} to confirm this live delete."
+        },
+        "fields": {
+          "pattern": "Wzór",
+          "tenant_slug": "Ślimak najemcy",
+          "confirm_text": "Type {{phrase}} to confirm"
+        },
+        "messages": {
+          "dry_run": "Praca próbna: migawki {{count}} zostaną usunięte",
+          "purged": "Usunięto migawki {{count}}{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* lub /listy/**",
+          "tenant_slug": "opcjonalne - pozostaw puste dla wszystkich"
+        },
+        "result": {
+          "deleted": "Usunięto migawki {{count}}",
+          "would_delete": "Spowoduje usunięcie migawek {{count}}"
+        },
+        "title": "Czyszczenie pamięci podręcznej symboli wieloznacznych",
+        "preview_gate": {
+          "title": "Preview required before live delete",
+          "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
+          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
+        }
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "Sprawdzać"
+        },
+        "description_prefix": "Zobacz które",
+        "description_suffix": "wzorzec jest właścicielem trasy i tego, co otrzymuje TTL, bez konfiguracji grepowania. Służy do dostrojenia polityki świeżości.",
+        "error": "Wyszukiwanie nie powiodło się — sprawdź format trasy (musi zaczynać się od „/”)",
+        "fields": {
+          "route": "Trasa"
+        },
+        "path_only": "Tylko ścieżka — bez schematu i hosta",
+        "placeholders": {
+          "route": "/blog/mój-post"
+        },
+        "result": {
+          "match": "dopasowanie: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (specyficzność {{specificity}})",
+          "other_patterns": "Inne wzorce pasujące do tej trasy:",
+          "ttl": "TTL:{{ttl}}({{seconds}}s)"
+        },
+        "title": "Inspektor TTL",
+        "units": {
+          "days": "{{count}}d",
+          "hours": "{{count}} godz",
+          "minutes": "{{count}}min"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "Badać"
+        },
+        "counts": {
+          "dynamic": "{{count}} dynamiczny",
+          "static": "{{count}} statyczny",
+          "total": "Łącznie {{count}}"
+        },
+        "description_prefix": "Zobacz dokładnie, które trasy silnik planuje renderować dla najemcy — podłoga statyczna (ograniczona funkcja/moduł) plus dynamiczne znaczniki URL z",
+        "description_suffix": "Pracownik dramaturga odwiedza tę listę.",
+        "error": "Wyszukiwanie nie powiodło się — sprawdź informację o dzierżawie",
+        "fields": {
+          "tenant_slug": "Ślimak najemcy"
+        },
+        "none": "(nic)",
+        "placeholders": {
+          "tenant_slug": "bank czasu"
+        },
+        "sections": {
+          "dynamic_routes": "Trasy dynamiczne (ograniczone do 1000)",
+          "static_routes": "Trasy statyczne"
+        },
+        "title": "Eksplorator mapy witryny"
+      },
+      "readonly": {
+        "prefix": "Widok tylko do odczytu — przyciski akcji są wyłączone, ponieważ silnik renderowania wstępnego działa w każdej dzierżawie. Zaloguj się za pomocą a",
+        "role": "superadministrator platformy",
+        "suffix": "konto, aby kolejkować zadania, usuwać migawki lub wyzwalać wykrywanie dryfu."
+      },
+      "tabs": {
+        "analytics": "Analityka",
+        "coverage": "Zasięg",
+        "events": "Wydarzenia",
+        "failures": "Awarie",
+        "history": "Historia",
+        "inventory": "Spis",
+        "jobs": "Praca",
+        "overview": "Przegląd",
+        "tenant_safety": "Tenant safety"
+      },
+      "tabs_aria": "Karty wstępnego renderowania",
+      "title": "Silnik wstępnego renderowania",
+      "tenant_safety": {
+        "title": "Tenant safety inspector",
+        "description": "Check one community before refreshing or deleting anything. This view compares the tenant route plan with the saved cache and explains why each snapshot exists.",
+        "fields": {
+          "tenant_slug": "Tenant slug"
+        },
+        "placeholders": {
+          "tenant_slug": "hour-timebank"
+        },
+        "actions": {
+          "inspect": "Inspect tenant",
+          "open_inventory": "Open inventory"
+        },
+        "errors": {
+          "tenant_required": "Enter a tenant slug first.",
+          "load": "Failed to load tenant safety report."
+        },
+        "messages": {
+          "loaded": "Loaded safety report for {{slug}}."
+        },
+        "status": {
+          "clean": "No issues found",
+          "needs_attention": "{{count}} item needs attention"
+        },
+        "counts": {
+          "expected": "Expected",
+          "snapshots": "Saved",
+          "missing": "Missing",
+          "unexpected": "Unexpected",
+          "stale": "Stale",
+          "asset_invalid": "Assets",
+          "static": "Static",
+          "sitemap": "Sitemap"
+        },
+        "sections": {
+          "attention": "Items needing attention"
+        },
+        "empty": "Enter a tenant slug to inspect its route plan and saved snapshots.",
+        "empty_attention": "This tenant has no missing, stale, asset-broken, or unexpected snapshots.",
+        "columns": {
+          "route": "Route",
+          "source": "Source",
+          "status": "Status",
+          "why": "Why it is here"
+        },
+        "tables": {
+          "attention_aria": "Tenant snapshot items needing attention"
+        },
+        "sources": {
+          "static": "Static route",
+          "sitemap": "Sitemap route",
+          "unexpected": "Unexpected"
+        },
+        "badges": {
+          "unexpected": "Unexpected",
+          "assets": "Asset issue",
+          "content": "Content stale"
+        },
+        "reasons": {
+          "sitemap": "Published by this tenant sitemap as public content.",
+          "unexpected": "Saved for this tenant, but not present in the current static route set or sitemap plan.",
+          "always_public": "Always-public tenant route.",
+          "feature_enabled": "Enabled by the {{value}} tenant feature.",
+          "feature_disabled": "Would require the {{value}} tenant feature, which is currently off.",
+          "module_enabled": "Enabled by the {{value}} tenant module.",
+          "module_disabled": "Would require the {{value}} tenant module, which is currently off.",
+          "expected": "Expected for this tenant."
+        },
+        "help": {
+          "title": "How to read this",
+          "expected": "Expected routes are pages the engine believes this tenant should expose publicly.",
+          "unexpected": "Unexpected snapshots are saved files that no longer match the tenant plan. They are the highest-risk items to clean up.",
+          "next_step": "Use preview-only cleanup first. Only delete after the preview shows the tenant and routes you expect."
+        },
+        "cleanup": {
+          "title": "Cleanup available",
+          "body": "Unexpected snapshots can usually be removed with the cleanup tool in Overview. Preview first, then apply only when the tenant list is correct."
+        },
+        "staleness": {
+          "fresh": "Fresh",
+          "warn": "Aging",
+          "stale": "Stale"
+        }
+      }
+    },
+    "running_audit": "Audyt bieżący",
+    "security_heading": "Bezpieczeństwo",
+    "security_note": "Bezpieczeństwo",
+    "seo_audit_completed": "Audyt SEO zakończony",
+    "seo_audit_summary": "Podsumowanie audytu SEO",
+    "seo_audit_summary_counts": "{{passCount}}zaliczony, ostrzeżenia{{warnCount}},{{failCount}}nie powiodło się",
+    "seo_health_check_heading": "Kontrola stanu SEO",
+    "server_seo_audit_heading": "Audyt SEO serwera",
+    "sitemap_cache_cleared": "Pamięć podręczna mapy witryny została wyczyszczona",
+    "sitemap_heading": "Mapa witryny",
+    "sitemap_total_urls": "Łączna liczba adresów URL",
+    "sitemap_url_label": "Adres URL mapy witryny",
+    "sitemap_urls_by_type": "Adresy URL według typu",
+    "social_sharing_image_heading": "Obraz udostępniany w mediach społecznościowych",
+    "source_group": "Grupa",
+    "source_job": "Stanowisko",
+    "source_listing": "Wymienianie kolejno",
+    "source_volunteering": "Zgłaszanie się na ochotnika",
+    "status_fail": "Ponieść porażkę",
+    "status_pass": "Przechodzić",
+    "status_warning": "Ostrzeżenie",
+    "sync_search_hint_prefix": "Uruchomić",
+    "sync_search_hint_suffix": "po uruchomieniu Meilisearch.",
+    "unable_to_load_sitemap_stats": "Nie można załadować statystyk mapy witryny",
+    "usage_limits_heading": "Limity użytkowania",
+    "top_matches_for_user_one": "Najlepszy mecz{{count}}dla{{name}}",
+    "top_matches_for_user_other": "Najpopularniejsze mecze{{count}}dla{{name}}",
+    "next_public": {
+      "title": "Next.js public frontend readiness",
+      "description": "Read-only shadow-mode status for the Next.js public frontend. This page does not enable public routing or change prerender behaviour.",
+      "refresh": "Refresh",
+      "loading": "Loading Next.js public frontend readiness",
+      "error": "Next.js readiness could not be loaded.",
+      "cards": {
+        "mode": "Mode",
+        "production_routing": "Production routing",
+        "prerender": "Prerender fallback"
+      },
+      "values": {
+        "shadow_mode": "Shadow mode",
+        "public_traffic_next": "Public traffic is served by Next.js",
+        "public_traffic_not_next": "Public traffic is not served by Next.js",
+        "prerender_retained": "Prerender fallback retained",
+        "prerender_not_retained": "Prerender fallback not retained"
+      },
+      "route_ownership": {
+        "title": "Route ownership manifest",
+        "next_public": "Next-owned public routes",
+        "vite_private": "Vite-owned private routes"
+      },
+      "safety": {
+        "title": "Safety checks"
+      },
+      "route_gates": {
+        "title": "Route cutover gates"
+      },
+      "tenant_resolution": {
+        "title": "Tenant resolution contract",
+        "bootstrap_endpoint": "Bootstrap endpoint",
+        "source_of_truth": "Source of truth",
+        "slug_parameter": "Shared-host slug parameter",
+        "request_host": "Request host",
+        "request_path": "Request path",
+        "bootstrap_request": "Bootstrap request",
+        "origin_forwarding": "Custom-domain Origin forwarding enabled",
+        "no_next_database": "Next.js does not query the database",
+        "next_queries_database": "Next.js database queries detected"
+      },
+      "tenant_resolution_examples": {
+        "shared_host_slug": "Shared app host with tenant slug",
+        "custom_domain": "Custom tenant domain"
+      },
+      "tenant_resolution_route_statuses": {
+        "public": "Public Laravel GET route",
+        "missing": "Laravel route is not registered",
+        "auth": "Laravel route requires authentication"
+      },
+      "edge_canary": {
+        "title": "Edge canary preview",
+        "edge": "Production edge",
+        "routing_flag": "Routing flag",
+        "route_file_status": "Route file status",
+        "config_template": "Config template",
+        "template_exists": "Template exists",
+        "template_missing": "Template missing",
+        "example_only": "Example only",
+        "not_example_only": "Not example only",
+        "included_by_deploy": "Included by deploy",
+        "not_included_by_deploy": "Not included by deploy",
+        "route_audit_title": "Template route audit",
+        "exact_path_count": "{{count}} exact paths",
+        "public_only": "Public routes only",
+        "not_public_only": "Not public routes only",
+        "no_private_collisions": "No private-route collisions",
+        "private_collisions": "Private-route collisions detected",
+        "unmatched_template_path": "Unmatched template path: {{path}}",
+        "unsupported_rule": "Unsupported rewrite rule: {{rule}}",
+        "routing_flag_on": "Routing flag is enabled",
+        "routing_flag_off": "Routing flag is disabled",
+        "activation_available": "Activation controls are available",
+        "no_activation_control": "No activation controls are available",
+        "preview_only": "Preview only",
+        "not_preview_only": "Preview mode is not confirmed",
+        "reviewed_config_required": "Reviewed config required",
+        "explicit_instruction_required": "Separate cutover instruction required"
+      },
+      "edge_canary_edges": {
+        "apache_plesk": "Apache/Plesk"
+      },
+      "edge_canary_route_file_statuses": {
+        "not_configured": "No route file configured by this module"
+      },
+      "edge_canary_review_steps": {
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
+        "next_shadow_checks_required": "Next shadow checks required",
+        "react_private_regression_required": "React private-route regression required",
+        "apache_configtest_required": "Apache configtest required",
+        "prerender_fallback_must_remain": "Prerender fallback must remain"
+      },
+      "edge_canary_guardrails": {
+        "do_not_edit_plesk_vhosts_directly": "Do not edit Plesk vhosts directly",
+        "do_not_enable_routing_flag_without_cutover_instruction": "Do not enable routing without explicit cutover instruction",
+        "public_routes_only": "Public routes only",
+        "do_not_remove_prerender": "Do not remove prerender fallback"
+      },
+      "route_batches": {
+        "title": "Route batch readiness",
+        "route_count": "{{count}} routes"
+      },
+      "remaining_route_work": {
+        "title": "Remaining public route work",
+        "route_count": "{{count}} routes",
+        "public_routes": "{{count}} public route",
+        "public_routes_plural": "{{count}} public routes",
+        "api_backed_routes": "{{count}} API-backed route",
+        "api_backed_routes_plural": "{{count}} API-backed routes",
+        "remaining_routes": "{{count}} route remaining",
+        "remaining_routes_plural": "{{count}} routes remaining",
+        "unclassified_routes": "{{count}} unclassified route",
+        "unclassified_routes_plural": "{{count}} unclassified routes",
+        "activation_available": "Activation controls are available",
+        "activation_unavailable": "No activation controls"
+      },
+      "remaining_route_work_groups": {
+        "static_manual_review": "Static/manual-review routes",
+        "auth_only_backend": "Auth-only backend routes",
+        "backend_contract_missing": "Backend contract gaps",
+        "unclassified_manifest_only": "Unclassified manifest-only routes"
+      },
+      "remaining_route_work_reasons": {
+        "static_or_tenant_bootstrap": "Static or tenant-bootstrap content",
+        "authoritative_static_content_missing": "Authoritative static content source missing",
+        "existing_backend_requires_auth": "Existing backend requires authentication",
+        "public_api_would_expand_auth_scope": "Public API would expand an auth-only content surface",
+        "route_params_do_not_match_public_api": "Route params do not match a public API",
+        "manifest_only_unclassified": "Manifest-only route not classified yet"
+      },
+      "remaining_route_work_actions": {
+        "manual_no_js_shadow_review": "Run manual no-JavaScript shadow review",
+        "publish_authoritative_content_source": "Publish an authoritative content source",
+        "keep_vite_or_prerender_until_public_contract": "Keep Vite or prerender until a public contract exists",
+        "public_visibility_decision_required": "Decide what content is safe to make public",
+        "privacy_review_required_before_public_api": "Complete privacy review before adding a public API",
+        "add_public_laravel_api_with_tests": "Add a public Laravel API with tests",
+        "classify_route_before_cutover": "Classify route ownership and backend contract before cutover"
+      },
+      "remaining_route_work_guardrails": {
+        "route_status_has_no_production_effect": "Route status has no production effect",
+        "do_not_promote_auth_only_routes": "Do not promote auth-only routes"
+      },
+      "dry_runs": {
+        "title": "Pre-cutover dry-run checks",
+        "activation_available": "Activation controls are available",
+        "activation_unavailable": "No activation controls",
+        "explicit_instruction_required": "Separate cutover instruction required"
+      },
+      "dry_run_items": {
+        "shadow_manifest_and_html": "Shadow manifest and no-JS HTML",
+        "remaining_static_manual_review": "Platform legal content review",
+        "auth_only_public_contract_review": "Auth-only public contract review",
+        "private_vite_regression": "Private Vite regression",
+        "inertness_guard": "Production inertness guard"
+      },
+      "dry_run_blockers": {
+        "manual_verification_required": "Manual verification required",
+        "route_parity_required": "Route parity required",
+        "authoritative_content_source_required": "Authoritative content source required",
+        "public_visibility_decision_required": "Public visibility decision required",
+        "privacy_review_required_before_public_api": "Privacy review required before public API",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+      },
+      "dry_run_notes": {
+        "shadow_only": "Shadow only",
+        "no_activation_control": "No activation control",
+        "do_not_promote_auth_only_routes": "Do not promote auth-only routes",
+        "vite_private_routes_remain_primary": "Vite private routes remain primary",
+        "do_not_remove_prerender": "Do not remove prerender fallback"
+      },
+      "artifacts": {
+        "title": "Cutover artifact inventory",
+        "path": "Path",
+        "present": "Present",
+        "missing": "Missing",
+        "required_commands": "Required commands",
+        "required_before_cutover": "Required before cutover",
+        "activation_available": "Activation controls are available",
+        "no_activation_control": "No activation controls"
+      },
+      "artifact_items": {
+        "route_ownership_manifest": "Route ownership manifest",
+        "content_sources_manifest": "Content sources manifest",
+        "apache_canary_template": "Edge canary template",
+        "shadow_compose_profile": "Shadow Compose profile",
+        "routing_flag_config": "Routing flag config",
+        "prerender_fallback": "Prerender fallback"
+      },
+      "artifact_categories": {
+        "manifest": "Manifest",
+        "edge_config": "Edge config",
+        "runtime": "Runtime",
+        "guard": "Guard",
+        "fallback": "Fallback"
+      },
+      "production_effects": {
+        "none": "No production effect"
+      },
+      "cutover_eligibility": {
+        "title": "Cutover eligibility",
+        "eligible": "Eligible for cutover",
+        "blocked": "Not eligible for cutover",
+        "public_routes": "{{count}} public routes",
+        "api_backed_public_routes": "{{count}} API-backed public routes",
+        "remaining_public_routes": "{{count}} remaining public routes",
+        "activation_available": "Activation controls available",
+        "activation_unavailable": "No activation controls",
+        "blockers": "Blockers",
+        "required_actions": "Required actions"
+      },
+      "cutover_eligibility_blockers": {
+        "manifest_validation_blocked": "Manifest validation is blocked",
+        "remaining_public_route_work": "Remaining public route work is incomplete",
+        "edge_canary_template_audit_blocked": "Edge canary template audit is blocked",
+        "edge_routes_not_configured": "Production edge routes are not configured",
+        "route_parity_required": "Route parity is still required",
+        "routing_flag_enabled_before_cutover": "Routing flag is enabled before cutover",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+      },
+      "cutover_eligibility_actions": {
+        "complete_remaining_public_route_work": "Complete remaining public route work",
+        "run_shadow_verification": "Run shadow verification",
+        "prepare_reviewed_edge_config_after_instruction": "Prepare reviewed edge config only after instruction",
+        "keep_prerender_fallback": "Keep prerender fallback"
+      },
+      "route_batch_names": {
+        "foundation_public_pages": "Foundation public pages",
+        "api_backed_public_content": "API-backed public content",
+        "vite_private_retained": "Vite private routes retained"
+      },
+      "route_batch_blockers": {
+        "manual_shadow_review_required": "Manual shadow review required",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
+        "public_api_parity_required": "Public API parity required"
+      },
+      "route_gate_blockers": {
+        "parity_test_required": "Parity test required"
+      },
+      "safety_checks": {
+        "route_cutover_disabled": "Public route cutover remains disabled",
+        "prerender_retained": "Current prerender fallback remains retained",
+        "vite_private_routes_retained": "Private Vite route ownership remains retained",
+        "public_edge_not_configured": "No production edge route is configured for Next.js",
+        "apache_canary_template_not_included": "Apache canary template is not included by deploy",
+        "parity_tests_required_before_cutover": "Parity tests are still required before any cutover"
+      },
+      "statuses": {
+        "pass": "Pass",
+        "blocker": "Blocker",
+        "info": "Info",
+        "fail": "Fail",
+        "blocked": "Blocked"
+      },
+      "runtime": {
+        "title": "Shadow runtime",
+        "compose_profile": "Compose profile",
+        "dev_command": "Dev command",
+        "build_command": "Build command",
+        "port_env": "Port environment variable"
+      },
+      "cutover": {
+        "title": "Remaining live cutover sequence",
+        "verification_commands": "Verification commands"
+      },
+      "cutover_steps": {
+        "verify_next_shadow_build": "Verify the Next.js shadow build and route manifest.",
+        "verify_no_js_public_html": "Run no-JavaScript HTML checks for each public route.",
+        "verify_private_vite_regression": "Build and regression-check the existing Vite private application.",
+        "prepare_apache_canary_routes": "Prepare Apache canary routing for public routes only.",
+        "enable_canary_for_public_routes_only": "Enable a canary route for public pages after explicit approval.",
+        "monitor_and_keep_prerender_fallback": "Monitor responses and keep prerender available as fallback until parity is proven."
+      },
+      "counts": {
+        "public_routes": "{{count}} public routes",
+        "private_prefixes": "{{count}} private prefixes",
+        "private_patterns": "{{count}} private edit/create patterns"
+      },
+      "validation": {
+        "title": "Manifest validation",
+        "passed": "Manifest validation passed",
+        "blocked": "Manifest validation blocked",
+        "lockfile": "Lockfile pinned",
+        "package_scripts": "Package scripts present",
+        "compose_profile": "Shadow Compose profile present"
+      },
+      "validation_issues": {
+        "manifest_missing": "Route ownership manifest is missing.",
+        "manifest_not_shadow": "Route ownership manifest is not in shadow mode.",
+        "public_route_invalid": "A public route entry is malformed.",
+        "public_route_missing_fields": "A public route is missing required fields.",
+        "public_route_duplicate_pattern": "A public route pattern is duplicated.",
+        "public_route_duplicate_key": "A public route key is duplicated.",
+        "public_route_collides_with_private_prefix": "A public route collides with a private Vite route prefix.",
+        "public_route_collides_with_private_pattern": "A public route collides with a private Vite route pattern.",
+        "vite_private_prefix_missing_required": "Required Vite private route prefix is missing.",
+        "vite_private_pattern_missing_required": "Required Vite private route pattern is missing.",
+        "content_sources_not_laravel_api": "Content sources must use Laravel public APIs.",
+        "content_sources_allow_next_database_queries": "Next.js content sources must not query the database.",
+        "api_backed_route_invalid": "An API-backed route entry is malformed.",
+        "api_backed_route_missing_fields": "An API-backed route is missing required fields.",
+        "api_backed_route_duplicate_key": "An API-backed route key is duplicated.",
+        "api_backed_route_not_in_manifest": "An API-backed route is missing from the public route manifest.",
+        "api_backed_route_not_get": "API-backed public routes must use GET.",
+        "api_backed_route_not_laravel_v2_endpoint": "API-backed routes must use relative Laravel v2 endpoints.",
+        "api_backed_route_private_endpoint": "API-backed public routes must not use private Laravel v2 namespaces.",
+        "api_backed_route_endpoint_not_plain_path": "API-backed route endpoints must be plain paths without query strings or fragments.",
+        "api_backed_route_endpoint_has_path_traversal": "API-backed route endpoints must not contain path traversal segments.",
+        "api_backed_route_param_mismatch": "API endpoint parameters must match the public route pattern.",
+        "api_backed_route_not_registered": "API-backed route endpoint is not registered in Laravel.",
+        "api_backed_route_requires_auth": "API-backed route endpoint requires authentication."
+      },
+      "cutover_gate_blockers": {
+        "manual_verification_required": "Manual verification required",
+        "route_parity_required": "Route parity required",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
+        "edge_routes_not_configured": "Production edge routes are not configured",
+        "cutover_not_active": "Cutover is not active",
+        "prerender_fallback_must_remain": "Prerender fallback must remain available"
+      },
+      "playbook": {
+        "title": "Operator playbook",
+        "activation_available": "Activation controls are available",
+        "no_activation_control": "No activation controls are available on this page.",
+        "explicit_instruction_required": "Separate cutover instruction required",
+        "no_production_effect": "No production routing change"
+      },
+      "playbook_stages": {
+        "verify_shadow_module": "Verify the shadow module locally.",
+        "prepare_reviewed_edge_config": "Prepare Apache canary routing as a reviewed config-only change.",
+        "run_private_route_regression": "Re-check the existing Vite private application.",
+        "canary_public_routes_only": "Canary public routes only after approval.",
+        "monitor_with_prerender_fallback": "Monitor live responses while preserving fallback."
+      },
+      "playbook_notes": {
+        "shadow_only": "Shadow only",
+        "no_activation_control": "No activation control",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
+        "vite_private_routes_remain_primary": "Vite private routes remain primary",
+        "public_routes_only": "Public routes only",
+        "do_not_remove_prerender": "Do not remove prerender fallback.",
+        "rollback_path_required": "Rollback path required"
+      }
+    }
+  },
+  "email_deliverability": {
+    "title": "Dostarczalność e-maili",
+    "subtitle": "Śledź dowody wyzwalacza, próby wysyłania, stan dostawcy i pominięci odbiorcy dla tego dzierżawcy.",
+    "trigger_score": "Wynik wyzwalacza",
+    "trigger_coverage": "Problemy z {{issues}} w monitorowanych przepływach {{count}}",
+    "actions": {
+      "refresh": "Odświeżać",
+      "reset": "Nastawić",
+      "search": "Szukaj"
+    },
+    "windows": {
+      "1": "Ostatnie 24 godziny",
+      "7": "Ostatnie 7 dni",
+      "30": "Ostatnie 30 dni",
+      "90": "Ostatnie 90 dni"
+    },
+    "filters": {
+      "all": "Wszystko",
+      "category": "Kategoria",
+      "email": "E-mail",
+      "recipient": "Adres e-mail odbiorcy",
+      "reason": "Powód",
+      "since": "Od",
+      "status": "Stan",
+      "until": "Dopóki",
+      "window": "Okno czasowe"
+    },
+    "metrics": {
+      "accepted": "Przyjęty",
+      "bad_outcomes": "{{count}} nie powiódł się, został odrzucony lub pominięty",
+      "bounced": "Odbił się",
+      "delivered": "Dostarczony",
+      "not_available": "Brak danych kontroli wyzwalacza",
+      "total": "Całkowity",
+      "trigger_score": "Wynik wyzwalacza",
+      "unconfirmed": "{{count}} zaakceptowany, ale niepotwierdzony",
+      "webhook_confirmed": "Potwierdzone przez webhook dostawcy",
+      "window_days": "Okno dzienne {{days}}"
+    },
+    "status": {
+      "bounced": "Odbił się",
+      "delivered": "Dostarczony",
+      "failed": "Przegrany",
+      "pending": "Aż do",
+      "processing": "Przetwarzanie",
+      "queued": "W kolejce",
+      "sent": "Wysłano",
+      "suppressed": "Zduszony",
+      "unknown": "Nieznany status: {{status}}"
+    },
+    "severity": {
+      "critical": "Krytyczny",
+      "info": "Informacje",
+      "warning": "Ostrzeżenie"
+    },
+    "status_breakdown": {
+      "title": "Podział statusu",
+      "subtitle": "Kompaktowy widok wyników wysyłania bieżącego najemcy dla wybranego okna."
+    },
+    "trigger_health": {
+      "critical": "Krytyczne problemy z wyzwalaczem",
+      "monitored": "Monitorowane przepływy",
+      "warning": "Ostrzeżenie o problemach z wyzwalaczem"
+    },
+    "trigger_issues": {
+      "title": "Wywołaj problemy z audytem",
+      "subtitle": "Wiersze źródłowe, w których powinien zostać wysłany e-mail lub powiadomienie, ale audyt nie zawiera wiarygodnych dowodów dostarczenia.",
+      "table_label": "Problemy z inspekcją wyzwalaczy e-mail",
+      "empty": "Brak problemów z inspekcją wyzwalaczy dla wybranego okna.",
+      "all_tenants": "Wszyscy najemcy",
+      "columns": {
+        "event": "Wydarzenie",
+        "issue": "Wydanie",
+        "module": "Moduł",
+        "params": "Dowód",
+        "severity": "Powaga",
+        "tenant": "Najemca"
+      }
+    },
+    "queues": {
+      "title": "Diagnostyka kolejek",
+      "subtitle": "Nieudane, pominięte lub nieaktualne oczekujące wiersze kolejki poczty e-mail dla tej dzierżawy.",
+      "table_label": "Diagnostyka kolejki e-mailowej",
+      "empty": "Brak nieudanych, pominiętych lub nieaktualnych wierszy kolejki poczty e-mail.",
+      "columns": {
+        "attempts": "Próbowanie",
+        "category": "Kategoria",
+        "error": "Błąd",
+        "last_attempt": "Ostatnia próba",
+        "recipient": "Odbiorca",
+        "source": "Źródło",
+        "status": "Stan"
+      },
+      "sources": {
+        "civic_digest_delivery_claims": "Roszczenie dotyczące podsumowania obywatelskiego",
+        "event_reminder_delivery_claims": "Roszczenie dotyczące przypomnienia o wydarzeniu",
+        "event_reminders": "Przypomnienie o wydarzeniu",
+        "federation_inbound_connections": "Połączenie federacyjne",
+        "federation_messages": "Komunikat Federacji",
+        "federation_transactions": "Transakcja federacyjna",
+        "goal_reminders": "Przypomnienie o celu",
+        "job_interviews": "Przypomnienie o rozmowie kwalifikacyjnej",
+        "listing_expiry_reminders_sent": "Przypomnienie o wygaśnięciu aukcji",
+        "marketplace_disputes": "Spór o targowisko",
+        "marketplace_order_notification_deliveries": "Powiadomienie o zamówieniu na rynku",
+        "marketplace_report_notifications": "Raport z rynku",
+        "marketplace_seller_ratings": "Ocena sprzedawcy na rynku",
+        "member_subscription_events": "Rozliczenia subskrypcji członkowskiej",
+        "newsletter_queue": "Biuletyn",
+        "notification_queue": "Powiadomienie",
+        "notifications": "Dowód powiadomienia",
+        "reviews": "Przegląd federacyjny",
+        "transaction_notification_deliveries": "Powiadomienie o transakcji",
+        "user_safeguarding_preferences": "Przegląd zabezpieczający",
+        "vol_donations": "Pokwitowanie darowizny",
+        "vol_reminder_delivery_claims": "Roszczenie przypominające o wolontariacie",
+        "vol_reminders_sent": "Przypomnienie o wolontariacie"
+      }
+    },
+    "logs": {
+      "title": "Dziennik prób e-mail",
+      "subtitle": "Przeszukuj każdą próbę wysłania według odbiorcy, kategorii, statusu i daty.",
+      "table_label": "Dziennik prób wysłania e-maila",
+      "empty": "Żadne e-maile nie pasują do bieżących filtrów.",
+      "columns": {
+        "category": "Kategoria",
+        "delivered": "Dostarczony",
+        "error": "Błąd",
+        "provider": "Dostawca",
+        "recipient": "Odbiorca",
+        "sent": "Wysłano",
+        "status": "Stan",
+        "subject": "Temat"
+      }
+    },
+    "pagination": {
+      "page_size": "Wiersze na stronę",
+      "summary": "{{from}}-{{to}} z {{total}}"
+    },
+    "suppressions": {
+      "title": "Lista tłumień",
+      "subtitle": "Odbiorcy na całej platformie, których dostawcy odrzucili, zablokowali, unieważnili lub anulowali subskrypcję.",
+      "table_label": "Lista wykluczeń e-mailowych",
+      "empty": "Żaden pominięty adresat nie pasuje do bieżących filtrów.",
+      "confirm_remove": "Usunąć {{email}} z listy wykluczeń? Będą mogli ponownie otrzymywać e-maile.",
+      "remove": "Usuń tłumienie",
+      "remove_failed": "Nie udało się usunąć wykluczenia.",
+      "removed": "Usunięto {{email}}.",
+      "columns": {
+        "actions": "Działania",
+        "detail": "Szczegół",
+        "email": "E-mail",
+        "reason": "Powód",
+        "suppressed_at": "Stłumione o godz"
+      },
+      "reasons": {
+        "block": "Blok",
+        "bounce": "Odbić się",
+        "invalid": "Nieważny",
+        "spam_report": "Raport o spamie",
+        "unsubscribe": "Zrezygnuj z subskrypcji",
+        "unknown": "Nieznany powód: {{reason}}"
+      }
+    },
+    "empty": {
+      "no_statuses": "Nie ma jeszcze żadnych statusów"
+    },
+    "warnings": {
+      "default_title": "Ostrzeżenie e-mailem",
+      "default_body": "Dostarczanie wiadomości e-mail wymaga uwagi.",
+      "email_log_missing": {
+        "title": "Brak dziennika poczty e-mail",
+        "body": "Nie można sprawdzić stanu poczty e-mail, ponieważ brakuje tabeli dziennika poczty e-mail."
+      },
+      "recent_email_failures": {
+        "title": "Ostatnie awarie poczty e-mail",
+        "body": "Próby wysłania e-maila {{count}} nie powiodły się, zostały odesłane lub zostały pominięte w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "critical_email_failures": {
+        "title": "Krytyczne awarie poczty e-mail",
+        "body": "{{count}} krytyczne wiadomości e-mail dotyczące konta lub zabezpieczeń nie powiodły się w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "notification_queue_failures": {
+        "title": "Awarie kolejki powiadomień",
+        "body": "{{count}} powiadomienia w kolejce nie powiodły się w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "notification_queue_suppressed": {
+        "title": "E-maile z powiadomieniami zostały pominięte",
+        "body": "{{count}} wiadomości e-mail z powiadomieniami w kolejce zostały pominięte w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "notification_queue_stale_processing": {
+        "title": "Przestarzała kolejka powiadomień",
+        "body": "Powiadomienia {{count}} są przetwarzane dłużej niż {{minutes}} minut."
+      },
+      "newsletter_queue_failures": {
+        "title": "Awarie kolejki biuletynów",
+        "body": "Odbiorcom newslettera {{count}} nie udało się w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "Przestarzała kolejka biuletynów",
+        "body": "Odbiorcy newslettera {{count}} przetwarzali dane przez ponad minuty {{minutes}}."
+      },
+      "no_recent_email_activity": {
+        "title": "Brak ostatniej aktywności e-mailowej",
+        "body": "Ten dzierżawca ma aktywnych członków, ale w ciągu ostatnich {{days}} dni nie prowadził żadnej aktywności e-mailowej."
+      },
+      "new_users_without_activation_email_log": {
+        "title": "Brak dziennika e-maili aktywacyjnych",
+        "body": "Nowi użytkownicy {{count}} nie mieli aktywacji, weryfikacji, zatwierdzenia ani dziennika powitalnego e-maili w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "Adres e-mail konta nie został uruchomiony",
+        "body": "{{count}} nowi użytkownicy nie mieli aktywacji konta, weryfikacji, zatwierdzenia ani próby wysłania wiadomości powitalnej w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "new_users_without_admin_registration_alert": {
+        "title": "Alert rejestracji dla administratorów nie został uruchomiony",
+        "body": "{{count}} nowych użytkowników nie ma alertu e-mail o nowej rejestracji dla administratorów w ciągu ostatnich {{window_hours}} godzin."
+      },
+      "password_resets_without_email_attempt": {
+        "title": "E-mail dotyczący resetowania hasła nie został uruchomiony",
+        "body": "Dla tokenów resetowania hasła {{count}} nie ma pasującej próby e-maila dotyczącego resetowania hasła w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "group_invites_without_email_attempt": {
+        "title": "E-mail z zaproszeniem do grupy nie został uruchomiony",
+        "body": "Zaproszenia e-mailowe do grup {{count}} nie odpowiadają żadnej próbie wysłania zaproszenia do grupy w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "group_members_tenant_mismatch": {
+        "title": "Niezgodność dzierżawy członkostwa w grupie",
+        "body": "Członkostwa w grupach {{count}} należą do innego dzierżawcy niż ich grupa. Wiersze te stwarzają ryzyko niewłaściwej roli dzierżawy i routingu powiadomień."
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "Powiadomienie o dołączeniu do grupy nie pojawiło się w kolejce",
+        "body": "Członkostwa w grupach {{count}} stały się aktywne bez pasującego wiersza kolejki powiadomień właściciela w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "Natychmiastowe wiadomości e-mail są zablokowane",
+        "body": "Wiadomości e-mail z natychmiastowymi powiadomieniami {{count}} oczekują od ponad {{minutes}} minut."
+      },
+      "notification_queue_failed_recently": {
+        "title": "E-maile z powiadomieniami nie powiodły się",
+        "body": "{{count}} e-maile z powiadomieniami w kolejce nie powiodły się w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "E-maile z powiadomieniami zostały pominięte",
+        "body": "{{count}} wiadomości e-mail z powiadomieniami w kolejce zostały pominięte w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "notification_queue_missing_tenant_id": {
+        "title": "Brak dzierżawcy w kolejce powiadomień",
+        "body": "Powiadomienia w kolejce {{count}} oczekują lub są przetwarzane bez własności dzierżawcy. Do czasu naprawy nie można ich bezpiecznie poprowadzić."
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "Niezgodność dzierżawy kolejki powiadomień",
+        "body": "Powiadomienia w kolejce {{count}} należą do innego dzierżawcy niż użytkownik będący ich odbiorcą. Wiersze te stwarzają ryzyko routingu przez niewłaściwą dzierżawę."
+      },
+      "notifications_missing_tenant_id": {
+        "title": "Powiadomienia o braku najemcy",
+        "body": "Powiadomienia w aplikacji {{count}} nie są własnością dzierżawcy, więc użytkownicy mogą nie widzieć ich stale."
+      },
+      "notifications_tenant_mismatch": {
+        "title": "Niezgodność dzierżawy powiadomień",
+        "body": "Powiadomienia w aplikacji {{count}} należą do innego dzierżawcy niż użytkownik będący ich odbiorcą. Wiersze te stwarzają ryzyko błędów widoczności między dzierżawcami."
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "Powiadomienie oznaczone jako wysłane bez potwierdzenia e-mailem",
+        "body": "Powiadomienia w kolejce {{count}} zostały oznaczone jako wysłane bez pasującego wpisu w dzienniku poczty e-mail w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "Brak dzierżawcy w kolejce biuletynów",
+        "body": "Wiersze kolejki biuletynów {{count}} nie mają własności dzierżawcy. Do czasu naprawy nie można ich bezpiecznie poprowadzić."
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "Niezgodność dzierżawcy kolejki biuletynów",
+        "body": "Wiersze kolejki biuletynów {{count}} należą do innego dzierżawcy niż ich biuletyn. Wiersze te stwarzają ryzyko routingu przez niewłaściwą dzierżawę."
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "E-maile z biuletynami są zablokowane",
+        "body": "Odbiorcy newslettera {{count}} oczekują na wiadomość od ponad {{minutes}} minut."
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "Nie udało się wysłać e-maili z biuletynami",
+        "body": "Odbiorcom newslettera {{count}} nie udało się w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "Biuletyn oznaczony jako wysłany bez potwierdzenia e-mailem",
+        "body": "Odbiorcy biuletynu {{count}} zostali oznaczeni jako wysłani bez pasującego wpisu w dzienniku poczty e-mail w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "event_reminders_overdue_pending": {
+        "title": "Przypomnienia o wydarzeniach są spóźnione",
+        "body": "Przypomnienia o wydarzeniach {{count}} nadal oczekują ponad {{minutes}} minut po zaplanowanym czasie wysłania."
+      },
+      "event_reminders_failed_recently": {
+        "title": "Przypomnienia o wydarzeniach nie powiodły się",
+        "body": "Przypomnienia o wydarzeniach {{count}} nie powiodły się w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "Przypomnienia o wydarzeniach oznaczone jako wysłane bez potwierdzenia e-mailem",
+        "body": "Przypomnienia e-mail o wydarzeniach {{count}} zostały oznaczone jako wysłane bez pasującego wpisu w dzienniku poczty e-mail w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "E-mail z potwierdzeniem raportu z Marketplace nie znalazł się w kolejce",
+        "body": "Otrzymano raporty z rynku {{count}} bez pasującego wiersza powiadomienia e-mail z potwierdzeniem w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "E-mail z potwierdzeniem raportu z Marketplace nie znalazł się w kolejce",
+        "body": "Raporty platformy handlowej {{count}} zostały potwierdzone bez pasującego wiersza powiadomienia e-mail z potwierdzeniem w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "Wiadomość e-mail z rozwiązaniem raportu z rynku nie została umieszczona w kolejce",
+        "body": "Raporty rynku {{count}} zostały rozwiązane bez pasującego wiersza powiadomienia e-mail o rozwiązaniu w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "E-mail z odwołaniem dotyczącym raportu z rynku nie trafił do kolejki",
+        "body": "Odwołania dotyczące raportów rynkowych {{count}} zostały złożone bez pasującego wiersza powiadomienia e-mail z potwierdzeniem odwołania w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "Wiadomość e-mail dotycząca odwołania w sprawie raportu z rynku nie została umieszczona w kolejce",
+        "body": "Odwołania dotyczące raportów rynkowych {{count}} zostały rozpatrzone bez pasującego wiersza powiadomienia e-mail o ostatecznej decyzji w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "Brakuje dowodu e-maila dotyczącego połączenia z federacją",
+        "body": "Zdarzenia połączenia federacyjnego {{count}} nie mają dowodu pomyślnego dostarczenia wiadomości e-mail w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "Brak dowodów powiadomienia o połączeniu federacyjnym",
+        "body": "Zdarzenia połączenia federacyjnego {{count}} nie zawierają żadnych dowodów powiadomień w aplikacji w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "federation_review_without_email_evidence": {
+        "title": "Brak dowodów w wiadomości e-mail z oceną federacji",
+        "body": "W recenzjach stowarzyszonych {{count}} w ciągu ostatnich godzin {{window_hours}} nie znaleziono żadnych pomyślnych lub celowo pominiętych dowodów e-mail."
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "Brak dowodów powiadomienia o przeglądzie federacyjnym",
+        "body": "W przypadku recenzji federacyjnych {{count}} w ciągu ostatnich godzin {{window_hours}} nie znaleziono żadnych powiadomień w aplikacji."
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "Brakuje dowodu e-maila dotyczącego subskrypcji członkowskiej",
+        "body": "Zdarzenia rozliczeniowe subskrypcji członkowskiej {{count}} nie mają potwierdzenia dostarczenia wiadomości e-mail w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "Brak potwierdzenia e-maila z potwierdzeniem przekazania darowizny",
+        "body": "{{count}} zakończone darowizny Stripe nie mają potwierdzenia odbioru e-mailem w ciągu ostatnich godzin {{window_hours}}."
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "W krytycznej wiadomości e-mail brakuje kontekstu dzierżawy",
+        "body": "W ciągu ostatnich {{window_hours}} godzin zarejestrowano {{count}} krytycznych prób wysłania wiadomości e-mail bez kontekstu dzierżawy."
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "Brak zdarzeń dostawy SendGrid",
+        "body": "E-maile {{count}} SendGrid pozostają akceptowane, ale niepotwierdzone po upływie więcej niż godzin {{hours}}."
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "Konfiguracja dzierżawy Gmail jest niekompletna",
+        "body": "Ten dzierżawca ma niekompletne zastąpienie dostawcy poczty e-mail Gmail."
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "Konfiguracja dzierżawy SMTP jest niekompletna",
+        "body": "Ten dzierżawca ma niekompletne zastąpienie dostawcy poczty e-mail SMTP."
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "Dzierżawca SendGrid zastępuje brakujący klucz API",
+        "body": "Ten dzierżawca jest skonfigurowany do używania zastąpienia SendGrid, ale nie ma klucza dzierżawy API, więc zostanie użyta rezerwowa platforma."
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "Sprawdzenie dostawcy dzierżawy nie powiodło się",
+        "body": "Nie można ukończyć audytu konfiguracji dostawcy poczty e-mail dla tej dzierżawy."
+      },
+      "direct_email_send_paths_remaining": {
+        "title": "Starsze bezpośrednie ścieżki e-mail pozostają",
+        "body": "{{count}} surowe ścieżki wysyłania wiadomości e-mail nadal omijają ujednolicony moduł rozsyłający powiadomienia. Kontynuuj ulepszanie tych ścieżek, aż każdy moduł przejdzie przez kontrolowany moduł rozsyłający."
+      },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "W e-mailu dyspozytora brakuje wyraźnego dzierżawcy",
+        "body": "Witryny połączeń dyspozytorów poczty e-mail {{count}} nadal opierają się na wywnioskowanym kontekście dzierżawy. Przekazuj identyfikator_dzierżawcy lub identyfikator_dzierżawcy jawnie, aby można było kontrolować każde wysyłanie w kolejce, cron, webhook i między dzierżawcami."
+      },
+      "email_trigger_audit_failed": {
+        "title": "Kontrola wyzwalacza poczty e-mail nie powiodła się",
+        "body": "Nie można ukończyć kontroli wyzwalacza e-mail."
+      },
+      "email_health_unavailable": {
+        "title": "Stan poczty e-mail niedostępny",
+        "body": "Nie udało się wczytać kontroli stanu poczty e-mail."
+      },
+      "email_warning_check_failed": {
+        "title": "Sprawdzenie ostrzeżenia nie powiodło się",
+        "body": "Nie można ukończyć sprawdzania ostrzeżeń e-mailowych."
+      }
+    },
+    "push": {
+      "title": "Powiadomienia push",
+      "subtitle": "Dostarczanie powiadomień push w sieci i na urządzeniach mobilnych w wybranym okresie",
+      "unavailable": "Rejestrowanie dostarczania powiadomień push nie jest jeszcze dostępne.",
+      "total": "Powiadomienia",
+      "delivered": "Dostarczone",
+      "partial": "Częściowe",
+      "failed": "Nieudane",
+      "success_rate": "Wskaźnik sukcesu",
+      "fcm": "Mobilne wysłane/nieudane",
+      "web": "Web dostarczone",
+      "recent_failures": "Ostatnie błędy"
+    }
+  }
+}

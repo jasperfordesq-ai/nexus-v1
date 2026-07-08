@@ -102,7 +102,7 @@ const editorTheme = {
 
 function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolean; showMarkdownImport?: boolean }) {
   const [editor] = useLexicalComposerContext();
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_editor');
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
@@ -490,7 +490,7 @@ export function RichTextEditor({
   label,
   showMarkdownImport = false,
 }: RichTextEditorProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_editor');
   const editorPlaceholder = placeholder ?? t('rte.start_writing');
 
   const initialConfig = {

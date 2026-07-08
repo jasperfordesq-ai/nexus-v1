@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  FieldError as HeroUIFieldError,
-  type FieldErrorProps as HeroUIFieldErrorProps,
-} from '@heroui/react';
+import { FieldError as HeroUIFieldError, type FieldErrorProps as HeroUIFieldErrorProps } from '@heroui/react/field-error';
 
 export type FieldErrorProps = HeroUIFieldErrorProps;
 

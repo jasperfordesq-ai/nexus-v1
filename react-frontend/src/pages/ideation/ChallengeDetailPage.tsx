@@ -62,7 +62,7 @@ import Layers from 'lucide-react/icons/layers';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { EmptyState } from '@/components/feedback';
-import { SocialInteractionPanel } from '@/components/social';
+import { SocialInteractionPanel } from '@/components/social/SocialInteractionPanel';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';

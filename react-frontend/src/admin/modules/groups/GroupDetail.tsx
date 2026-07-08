@@ -24,7 +24,7 @@ import { ConfirmModal } from '../../components/ConfirmModal';
 import { Button, Chip, Input, Textarea, Card, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 
 export default function GroupDetail() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   usePageTitle(t('groups.page_title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();

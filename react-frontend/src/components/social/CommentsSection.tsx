@@ -92,10 +92,10 @@ function CommentItemInner({
   const { t } = useTranslation('social');
   const { tenantPath } = useTenant();
   const toast = useToast();
-  const tr = (key: string, fallback: string) => {
+  const tr = useCallback((key: string, fallback: string) => {
     const value = t(key);
     return value === key ? fallback : value;
-  };
+  }, [t]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
@@ -482,10 +482,10 @@ function MentionInput({
   searchMentions,
 }: MentionInputProps) {
   const { t } = useTranslation('social');
-  const tr = (key: string, fallback: string) => {
+  const tr = useCallback((key: string, fallback: string) => {
     const value = t(key);
     return value === key ? fallback : value;
-  };
+  }, [t]);
   const [mentionResults, setMentionResults] = useState<MentionUser[]>([]);
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
@@ -639,10 +639,10 @@ export function CommentsSection({
 }: CommentsSectionProps) {
   const { t } = useTranslation('social');
   const toast = useToast();
-  const tr = (key: string, fallback: string) => {
+  const tr = useCallback((key: string, fallback: string) => {
     const value = t(key);
     return value === key ? fallback : value;
-  };
+  }, [t]);
 
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

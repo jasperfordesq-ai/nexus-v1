@@ -66,7 +66,7 @@ function formatDate(dateStr: string): string {
 }
 
 export function SearchAnalytics() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_analytics');
   usePageTitle(t('search_analytics.page_title'));
   useAdminPageMeta({ title: t('search_analytics.page_title') });
   const toast = useToast();

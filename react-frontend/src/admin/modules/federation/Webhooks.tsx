@@ -118,7 +118,7 @@ const truncateUrl = (url: string, max = 45) => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function Webhooks() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   usePageTitle(t('federation.webhooks_title'));
   const toast = useToast();
 

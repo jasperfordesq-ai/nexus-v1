@@ -12,9 +12,7 @@ import React from 'react';
 vi.mock('@/contexts', () => createMockContexts());
 
 // ─── Stub HeroUI Link so we get a clean anchor to assert on ─────────────────
-vi.mock('@heroui/react', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@heroui/react')>();
-
+vi.mock('@heroui/react/link', () => {
   const MockHeroUILink = ({
     children,
     href,
@@ -35,7 +33,6 @@ vi.mock('@heroui/react', async (importOriginal) => {
   MockHeroUILink.Icon = MockIcon;
 
   return {
-    ...orig,
     Link: MockHeroUILink,
   };
 });

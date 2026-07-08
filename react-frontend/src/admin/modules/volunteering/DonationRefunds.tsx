@@ -77,7 +77,7 @@ function formatDate(dateStr: string | null): string {
 }
 
 export function DonationRefunds() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('donation_refunds.page_title'));
   useAdminPageMeta({ title: t('donation_refunds.page_title') });
   const toast = useToast();

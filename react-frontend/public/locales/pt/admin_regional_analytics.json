@@ -1,0 +1,158 @@
+{
+  "common": {
+    "an_unexpected_error": "Ocorreu um erro inesperado",
+    "back": "Voltar",
+    "cancel": "Cancelar",
+    "critical": "Crítico",
+    "delete": "Excluir",
+    "feature": "Recurso",
+    "high": "Alto",
+    "in_progress": "Em andamento",
+    "in_review": "Em revisão",
+    "low": "Baixo",
+    "medium": "Médio",
+    "planned": "Planejado",
+    "refresh": "Atualizar",
+    "unexpected_error": "Erro inesperado",
+    "unknown": "Desconhecido",
+    "unfeature": "Desapresentar",
+    "actions": "Ações",
+    "active": "Ativo",
+    "all": "Todos",
+    "approved": "Aprovado",
+    "clear": "Limpar",
+    "clear_filters": "Limpar filtros",
+    "clear_selection": "Limpar seleção",
+    "close": "Fechar",
+    "collapse": "Recolher",
+    "confirm": "Confirmar",
+    "create": "Criar",
+    "declined": "Recusado",
+    "download": "Baixar",
+    "edit": "Editar",
+    "error_loading_data": "Erro ao carregar dados",
+    "expand": "Expandir",
+    "export": "Exportar",
+    "load_more": "Carregar mais",
+    "loading": "Carregando",
+    "next": "Próximo",
+    "no": "Não",
+    "ok": "OK",
+    "pending": "Pendente",
+    "previous": "Anterior",
+    "retry": "Tentar novamente",
+    "save": "Salvar",
+    "select_all": "Selecionar tudo",
+    "select_item": "Selecione o item",
+    "yes": "Sim"
+  },
+  "shared": {
+    "broker_actions": "Ações do corretor",
+    "content": "Conteúdo",
+    "core_module": "Módulo Principal",
+    "document_details": "Detalhes do documento",
+    "history": "História",
+    "log_file_empty": "Nenhum arquivo de log encontrado",
+    "no": "Não",
+    "no_history_available": "Nenhum histórico disponível encontrado",
+    "no_legal_documents_found": "Nenhum documento legal encontrado foi encontrado",
+    "no_members_found": "Nenhum membro encontrado encontrado",
+    "loading": "Loading",
+    "no_data": "Sem dados",
+    "no_data_available": "Não há dados disponíveis",
+    "no_recent_broker_activity": "Nenhuma atividade recente do corretor encontrada",
+    "open_page_help": "Abrir página de ajuda",
+    "help": "Ajuda",
+    "quick_access": "Acesso rápido",
+    "recent_activity": "Atividade recente",
+    "refresh": "Atualizar",
+    "search": "Procurar...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Dados",
+    "total_count": "{{count}}total"
+  },
+  "regional_analytics_admin": {
+    "meta": {
+      "title": "Análise Regional",
+      "description": "Gerencie assinaturas de análises pagas para municípios e parceiros SME - apenas agregados agrupados e com privacidade segura."
+    },
+    "actions": {
+      "new_subscription": "Nova assinatura",
+      "generate_report_now": "Gerar relatório agora",
+      "view_access_log": "Ver registro de acesso",
+      "suspend": "Suspender",
+      "resume": "Retomar",
+      "close": "Fechar",
+      "cancel": "Cancelar",
+      "create": "Criar"
+    },
+    "tables": {
+      "subscriptions_aria": "Assinaturas de análises regionais",
+      "partner": "Parceiro",
+      "type": "Tipo",
+      "plan": "Plano",
+      "status": "Estado",
+      "period_end": "Fim do período",
+      "price_per_month": "Preço / mês",
+      "modules": "Módulos",
+      "actions": "Ações"
+    },
+    "partner_types": {
+      "municipality": "Município",
+      "sme_partner": "SME parceiro"
+    },
+    "plan_tiers": {
+      "basic": "Básico",
+      "pro": "Pró",
+      "enterprise": "Empresa"
+    },
+    "statuses": {
+      "trialing": "Teste",
+      "active": "Ativo",
+      "past_due": "Vencido",
+      "cancelled": "Cancelado"
+    },
+    "modules": {
+      "trends": "Tendências",
+      "demand_supply": "Demanda e oferta",
+      "demographics": "Demografia",
+      "footfall": "Passo"
+    },
+    "empty": {
+      "subscriptions": "Ainda não há assinaturas. Forneça um para começar a vender análises regionais.",
+      "access_log": "Nenhum evento de acesso registrado ainda.",
+      "value": "-"
+    },
+    "access_log": {
+      "title": "Registro de acesso - {{name}}",
+      "table_aria": "Registro de acesso",
+      "when": "Quando",
+      "endpoint": "Ponto final",
+      "ip_hashed": "IP (com hash)",
+      "user_agent": "Agente do usuário"
+    },
+    "create_modal": {
+      "title": "Nova assinatura de análise regional",
+      "tenant_id": "Inquilino ID",
+      "partner_name": "Nome do parceiro",
+      "partner_type": "Tipo de parceiro",
+      "contact_email": "E-mail de contato",
+      "billing_email": "E-mail de cobrança",
+      "plan_tier": "Nível do plano",
+      "monthly_price_cents": "Preço mensal (centavos)",
+      "currency": "Moeda",
+      "enabled_modules": "Módulos habilitados"
+    },
+    "toasts": {
+      "load_failed": "Falha ao carregar assinaturas",
+      "status_updated": "Assinatura {{status}}",
+      "update_failed": "Falha na atualização",
+      "report_queued": "Geração de relatório na fila",
+      "report_failed": "Falha ao colocar o relatório na fila",
+      "required_fields": "Inquilino, nome do parceiro e e-mail de contato são obrigatórios",
+      "created": "Assinatura criada",
+      "create_failed": "Falha na criação"
+    }
+  }
+}

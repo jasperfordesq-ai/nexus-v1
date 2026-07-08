@@ -124,7 +124,7 @@ function InquiryCard({
   inquiry: PilotInquiry;
   onClick: () => void;
 }) {
-  const { t } = useTranslation('admin', { keyPrefix: 'pilot_inquiry_admin' });
+  const { t } = useTranslation('admin_super', { keyPrefix: 'pilot_inquiry_admin' });
   const sc = stageConfig(inquiry.stage);
   return (
     <Card
@@ -168,7 +168,7 @@ function InquiryDetailModal({
   onRefresh: () => void;
 }) {
   const toast = useToast();
-  const { t } = useTranslation('admin', { keyPrefix: 'pilot_inquiry_admin' });
+  const { t } = useTranslation('admin_super', { keyPrefix: 'pilot_inquiry_admin' });
   const [newStage, setNewStage]         = useState('');
   const [rejectionReason, setRejReason] = useState('');
   const [internalNotes, setNotes]       = useState('');
@@ -395,8 +395,8 @@ function handleExport() {
 }
 
 export function PilotInquiryAdminPage() {
-  const { t } = useTranslation('admin', { keyPrefix: 'pilot_inquiry_admin' });
-  const { t: tAdmin } = useTranslation('admin');
+  const { t } = useTranslation('admin_super', { keyPrefix: 'pilot_inquiry_admin' });
+  const { t: tAdmin } = useTranslation('admin_super');
   usePageTitle(t('page_title'));
   const toast = useToast();
 

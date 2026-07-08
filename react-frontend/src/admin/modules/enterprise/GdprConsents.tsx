@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Chip } from '@/components/ui';
 
 export function GdprConsents() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   useAdminPageMeta({ title: t('enterprise.gdpr_consents_title') });
   const toast = useToast();
 

@@ -9,13 +9,17 @@
  * Preserves tenant slug prefix in the redirect URL.
  */
 
+import { lazy, Suspense } from 'react';
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { LoadingScreen } from '@/components/feedback/LoadingScreen';
 import { useLegalGate } from '@/hooks/useLegalGate';
-import { LegalAcceptanceGate } from '@/components/legal/LegalAcceptanceGate';
+
+const LegalAcceptanceGate = lazy(() =>
+  import('@/components/legal/LegalAcceptanceGate').then((module) => ({ default: module.LegalAcceptanceGate }))
+);
 
 interface ProtectedRouteProps {
   children?: React.ReactNode;
@@ -87,11 +91,13 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   return (
     <>
       {showLegalGate && (
-        <LegalAcceptanceGate
-          pendingDocs={pendingDocs}
-          onAcceptAll={acceptAll}
-          isAccepting={isAccepting}
-        />
+        <Suspense fallback={null}>
+          <LegalAcceptanceGate
+            pendingDocs={pendingDocs}
+            onAcceptAll={acceptAll}
+            isAccepting={isAccepting}
+          />
+        </Suspense>
       )}
       {children ? <>{children}</> : <Outlet />}
     </>

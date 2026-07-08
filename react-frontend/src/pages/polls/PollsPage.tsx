@@ -55,7 +55,7 @@ import ListOrdered from 'lucide-react/icons/list-ordered';
 import Filter from 'lucide-react/icons/filter';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/feedback';
-import { SocialInteractionPanel } from '@/components/social';
+import { SocialInteractionPanel } from '@/components/social/SocialInteractionPanel';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';

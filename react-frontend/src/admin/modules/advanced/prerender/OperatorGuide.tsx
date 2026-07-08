@@ -12,7 +12,7 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import { useTranslation } from 'react-i18next';
 
 export function OperatorGuide() {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.guide' });
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.guide' });
   const items = [
     { title: t('bot_only.title'), body: t('bot_only.body') },
     { title: t('tenant_scope.title'), body: t('tenant_scope.body') },
@@ -41,7 +41,7 @@ export function OperatorGuide() {
 }
 
 export function GuidedWorkflows({ onSelect }: { onSelect: (tab: string) => void }) {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.workflows' });
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.workflows' });
   const workflows = [
     {
       key: 'refresh_one_tenant',

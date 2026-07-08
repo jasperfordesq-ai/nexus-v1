@@ -77,7 +77,7 @@ function resolveBlogFeaturedImageValue(res: FeaturedImageUploadResult): string |
 }
 
 export function BlogPostForm() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_blog');
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const { tenantPath } = useTenant();

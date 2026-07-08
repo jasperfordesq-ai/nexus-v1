@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
 import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
 import { resolveThumbnailUrl } from '@/lib/helpers';
 import { PriceBadge } from './PriceBadge';
 import { ConditionBadge } from './ConditionBadge';

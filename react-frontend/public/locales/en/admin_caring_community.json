@@ -1,0 +1,2755 @@
+{
+  "common": {
+    "an_unexpected_error": "An unexpected error occurred",
+    "back": "Back",
+    "cancel": "Cancel",
+    "critical": "Critical",
+    "delete": "Delete",
+    "feature": "Feature",
+    "high": "High",
+    "in_progress": "In Progress",
+    "in_review": "In Review",
+    "low": "Low",
+    "medium": "Medium",
+    "planned": "Planned",
+    "refresh": "Refresh",
+    "unexpected_error": "Unexpected error",
+    "unknown": "Unknown",
+    "unfeature": "Unfeature",
+    "actions": "Actions",
+    "active": "Active",
+    "all": "All",
+    "approved": "Approved",
+    "clear": "Clear",
+    "clear_filters": "Clear Filters",
+    "clear_selection": "Clear Selection",
+    "close": "Close",
+    "collapse": "Collapse",
+    "confirm": "Confirm",
+    "create": "Create",
+    "declined": "Declined",
+    "download": "Download",
+    "edit": "Edit",
+    "error_loading_data": "Loading Data error",
+    "expand": "Expand",
+    "export": "Export",
+    "load_more": "Load More",
+    "loading": "Loading",
+    "next": "Next",
+    "no": "No",
+    "ok": "OK",
+    "pending": "Pending",
+    "previous": "Previous",
+    "retry": "Retry",
+    "save": "Save",
+    "select_all": "Select All",
+    "select_item": "Select Item",
+    "yes": "Yes"
+  },
+  "shared": {
+    "broker_actions": "Broker Actions",
+    "content": "Content",
+    "core_module": "Core Module",
+    "document_details": "Document Details",
+    "history": "History",
+    "log_file_empty": "No log file found",
+    "no": "No",
+    "no_history_available": "No history available found",
+    "no_legal_documents_found": "No legal documents found found",
+    "no_members_found": "No members found found",
+    "loading": "Loading",
+    "no_data": "No data",
+    "no_data_available": "No data available",
+    "no_recent_broker_activity": "No recent broker activity found",
+    "open_page_help": "Open page help",
+    "help": "Help",
+    "quick_access": "Quick Access",
+    "recent_activity": "Recent Activity",
+    "refresh": "Refresh",
+    "search": "Search...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Data",
+    "total_count": "{{count}} total"
+  },
+  "admin": {
+    "providers": {
+      "title": "Care Providers",
+      "meta_title": "Care Providers",
+      "subtitle": "Manage local care providers, their services, and verification status.",
+      "empty": "No care providers found.",
+      "verified": "Verified",
+      "yes": "Yes",
+      "no": "No",
+      "confirm_deactivate": "Deactivate this provider? It will no longer appear in member-facing lists.",
+      "confirm_delete": "Delete this provider permanently? This cannot be undone.",
+      "about": {
+        "title": "About care providers",
+        "body": "Care providers are local organisations or individuals offering services to community members.",
+        "types_label": "Types",
+        "types_body": "Providers can be home care, transport, meal delivery, companionship, or other categories.",
+        "verification_label": "Verification",
+        "verification_body": "Verified providers have been reviewed by an administrator and have passed identity and credential checks."
+      },
+      "actions": {
+        "add_provider": "Add provider",
+        "cancel": "Cancel",
+        "close": "Close",
+        "create_provider": "Create provider",
+        "deactivate_named": "Deactivate {{name}}",
+        "delete_provider": "Delete provider",
+        "edit_provider": "Edit provider",
+        "find_duplicates": "Find duplicates",
+        "save_changes": "Save changes",
+        "verify_provider": "Verify provider"
+      },
+      "duplicates": {
+        "title": "Potential duplicates",
+        "empty": "No duplicates found.",
+        "match_percent": "{{percent}}% match",
+        "scanning": "Scanning for duplicates…",
+        "summary": "Found {{count}} possible duplicate(s).",
+        "vs": "vs"
+      },
+      "errors": {
+        "deactivate": "Failed to deactivate provider.",
+        "delete": "Failed to delete provider.",
+        "duplicates": "Failed to scan for duplicates.",
+        "load": "Failed to load providers.",
+        "name_required": "Name is required.",
+        "save": "Failed to save provider.",
+        "type_required": "Type is required.",
+        "verify": "Failed to verify provider."
+      },
+      "fields": {
+        "address": "Address",
+        "description": "Description",
+        "email": "Email",
+        "name": "Name",
+        "phone": "Phone",
+        "status": "Status",
+        "type": "Type",
+        "website": "Website"
+      },
+      "messages": {
+        "created": "Provider created.",
+        "deactivated": "Provider deactivated.",
+        "removed": "Provider removed.",
+        "updated": "Provider updated.",
+        "verified": "Provider verified."
+      },
+      "modal": {
+        "create_title": "Add care provider",
+        "edit_title": "Edit care provider"
+      },
+      "pagination": {
+        "next": "Next",
+        "previous": "Previous",
+        "summary": "Showing {{from}}–{{to}} of {{total}}"
+      },
+      "placeholders": {
+        "address": "Street, city, postcode…",
+        "description": "A short description of the provider and their services…",
+        "name": "e.g. Acme Home Care"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "table": {
+        "actions": "Actions",
+        "aria": "Care providers",
+        "name": "Name",
+        "status": "Status",
+        "type": "Type",
+        "verified": "Verified"
+      }
+    },
+    "common": {
+      "cancel": "Cancel",
+      "empty_dash": "—",
+      "refresh": "Refresh"
+    },
+    "hour_transfers": {
+      "title": "Hour Transfers",
+      "subtitle": "Review and process incoming and pending hour transfers between members.",
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "errors": {
+        "approve": "Failed to approve transfer.",
+        "load_inbound": "Failed to load inbound transfers.",
+        "load_pending": "Failed to load pending transfers.",
+        "reject": "Failed to reject transfer."
+      },
+      "inbound": {
+        "empty": "No inbound transfers.",
+        "title": "Inbound"
+      },
+      "messages": {
+        "approved": "Transfer approved.",
+        "rejected": "Transfer rejected."
+      },
+      "pending": {
+        "empty": "No pending transfers.",
+        "title": "Pending"
+      },
+      "reject_modal": {
+        "reason_label": "Reason",
+        "reason_placeholder": "Explain why this transfer is being rejected…",
+        "title": "Reject transfer"
+      },
+      "tabs": {
+        "aria": "Hour transfer tabs",
+        "inbound": "Inbound",
+        "pending": "Pending"
+      }
+    },
+    "loyalty": {
+      "title": "Loyalty Program",
+      "description": "Configure how members redeem time credits for discounts at participating merchants.",
+      "refresh": "Refresh",
+      "about": {
+        "title": "About the loyalty program",
+        "body": "Members can redeem time credits at participating merchants in exchange for a discount on goods or services.",
+        "rate_label": "Exchange rate",
+        "rate_body": "Defines how much currency one time credit hour is worth at the merchant point of sale.",
+        "discount_label": "Maximum discount",
+        "discount_body": "The maximum percentage of a purchase that can be paid for with time credits."
+      },
+      "errors": {
+        "discount_range": "Discount must be between 0 and 100.",
+        "load_redemptions": "Failed to load redemptions.",
+        "load_settings": "Failed to load loyalty settings.",
+        "rate_positive": "Exchange rate must be a positive number.",
+        "reverse": "Failed to reverse redemption.",
+        "save_settings": "Failed to save loyalty settings."
+      },
+      "ledger": {
+        "actions": "Actions",
+        "date": "Date",
+        "discount": "Discount",
+        "empty": "No redemptions yet.",
+        "hours": "Hours",
+        "item": "Item",
+        "member": "Member",
+        "merchant": "Merchant",
+        "rate": "Rate",
+        "reverse": "Reverse",
+        "status": "Status",
+        "title": "Redemption ledger"
+      },
+      "messages": {
+        "reversed": "Redemption reversed.",
+        "settings_saved": "Loyalty settings saved."
+      },
+      "reverse_modal": {
+        "body": "Reversing a redemption will refund the time credits to the member.",
+        "cancel": "Cancel",
+        "confirm": "Reverse",
+        "discount": "Discount",
+        "member_fallback": "Member",
+        "merchant": "Merchant",
+        "reason": "Reason",
+        "reason_placeholder": "Why is this redemption being reversed?",
+        "redeemed": "Redeemed",
+        "title": "Reverse redemption"
+      },
+      "settings": {
+        "accept_time_credits": "Accept time credits",
+        "accept_time_credits_hint": "Allow this merchant to accept time credits as payment for a portion of each purchase.",
+        "clear": "Clear",
+        "description": "Configure the merchant-side rate and maximum-discount policy for the loyalty program.",
+        "exchange_rate": "Exchange rate",
+        "exchange_rate_description": "How much currency a single time credit hour is worth at the merchant point of sale.",
+        "maximum_discount": "Maximum discount (%)",
+        "maximum_discount_description": "The maximum percentage of a purchase that can be paid using time credits.",
+        "no_matching_members": "No matching members.",
+        "save": "Save settings",
+        "seller_label": "Merchant",
+        "seller_placeholder": "Search merchants…",
+        "title": "Loyalty settings",
+        "view_only": "You have read-only access to this setting."
+      },
+      "stats": {
+        "hours_redeemed": "Hours redeemed",
+        "total_chf_discount": "Total discount given",
+        "total_redemptions": "Total redemptions"
+      },
+      "table": {
+        "empty_value": "—"
+      }
+    },
+    "surveys": {
+      "errors": {
+        "export_failed": "Failed to export survey data."
+      }
+    },
+    "feedback": {
+      "title": "Municipality Feedback",
+      "subtitle": "Review feedback submitted by community members.",
+      "errors": {
+        "close": "Failed to close feedback item.",
+        "export": "Failed to export feedback.",
+        "load": "Failed to load feedback.",
+        "resolution_required": "A resolution note is required.",
+        "resolve": "Failed to resolve feedback.",
+        "save_triage": "Failed to save triage notes."
+      },
+      "messages": {
+        "closed": "Feedback closed.",
+        "resolved": "Feedback resolved.",
+        "triage_saved": "Triage notes saved."
+      }
+    },
+    "trust_tier": {
+      "title": "Trust Tier Configuration",
+      "subtitle": "Set the criteria thresholds for each trust level. Changes apply on the next recompute run.",
+      "loading": "Loading trust tier configuration",
+      "recompute_hint": "Use recompute when thresholds change and existing members need to be re-evaluated immediately. Runs in the background and may take 30-60 seconds.",
+      "meta": {
+        "title": "Trust Tier Configuration",
+        "description": "Configure trust tier thresholds, recompute member tiers, and review what each tier unlocks."
+      },
+      "actions": {
+        "recompute": "Recompute all tiers",
+        "save": "Save configuration"
+      },
+      "about": {
+        "title": "About this page",
+        "body": "Trust tiers are a reputation ladder that unlocks privileges as members become more active and verified. Members advance automatically when they meet the criteria thresholds below. Use recompute to force an immediate recalculation for all members. Tier progression affects the Warmth Pass, coordinator eligibility, and visibility in the member directory."
+      },
+      "criteria": {
+        "title": "Tier criteria thresholds"
+      },
+      "fields": {
+        "hours_logged": "Hours logged (minimum)",
+        "reviews_received": "Reviews received (minimum)",
+        "identity_verified": "Require identity verified"
+      },
+      "tiers": {
+        "member": {
+          "label": "Member",
+          "description": "Basic community member with at least 1 hour logged."
+        },
+        "trusted": {
+          "label": "Trusted",
+          "description": "Active member with several hours and reviews."
+        },
+        "verified": {
+          "label": "Verified",
+          "description": "Trusted member with confirmed identity."
+        },
+        "coordinator": {
+          "label": "Coordinator",
+          "description": "Highly active verified member eligible to coordinate."
+        }
+      },
+      "reference": {
+        "title": "Tier reference",
+        "aria": "Trust tier reference",
+        "columns": {
+          "tier": "Tier",
+          "level": "Level",
+          "color": "Color",
+          "description": "Description",
+          "unlocks": "What it unlocks"
+        },
+        "rows": {
+          "0": {
+            "name": "Newcomer",
+            "color": "Grey",
+            "description": "Just joined, no activity required.",
+            "unlocks": "Basic member access."
+          },
+          "1": {
+            "name": "Member",
+            "color": "Blue",
+            "description": "Has logged hours.",
+            "unlocks": "Can post help listings and receive care hours."
+          },
+          "2": {
+            "name": "Trusted",
+            "color": "Green",
+            "description": "Active with reviews.",
+            "unlocks": "Eligible for Warmth Pass and can be recommended for care."
+          },
+          "3": {
+            "name": "Verified",
+            "color": "Purple",
+            "description": "Identity verified.",
+            "unlocks": "Full care coordinator visibility and identity badge."
+          },
+          "4": {
+            "name": "Coordinator",
+            "color": "Amber",
+            "description": "Highly active with verified identity.",
+            "unlocks": "Eligible to approve hours and coordinate matches."
+          }
+        }
+      },
+      "errors": {
+        "load_failed": "Failed to load trust tier configuration.",
+        "recompute_failed": "Failed to recompute trust tiers.",
+        "save_failed": "Failed to save trust tier settings."
+      },
+      "messages": {
+        "recomputed": "Trust tiers recomputed for {{count}} members.",
+        "saved": "Trust tier configuration saved. Changes apply on the next recompute run."
+      },
+      "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
+    },
+    "operating_policy": {
+      "title": "Operating Policy",
+      "subtitle": "Caring Community operating-policy workshop: rules software cannot guess.",
+      "loading": "Loading operating policy",
+      "last_updated": "Last updated {{date}}",
+      "meta": {
+        "title": "Operating Policy",
+        "description": "Configure approval, safeguarding, SLA, and social-value policy rules for the care programme."
+      },
+      "actions": {
+        "refresh": "Refresh",
+        "save": "Save changes"
+      },
+      "about": {
+        "title": "About this page",
+        "body": "Operating Policy defines the rules of your community care programme: who can approve hours, how quickly coordinators must respond, how social value is calculated, and what the reporting cycle looks like. Configure this before launching the pilot. Changes take effect immediately and are logged for audit purposes.",
+        "methodology_prefix": "The",
+        "methodology_middle": "hourly rate and prevention multiplier fields use the",
+        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
+        "methodology_tail": "pilot, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0."
+      },
+      "sections": {
+        "approvals": "Approvals and trust",
+        "sla": "SLA windows",
+        "hours": "Hour management",
+        "safeguarding": "Safeguarding",
+        "social_value": "social-value methodology",
+        "appendix": "Pilot policy appendix"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "Approval authority",
+          "help": "Who may finalise approved hours: tenant admin, coordinators, or both parties by mutual approval."
+        },
+        "trusted_reviewer_threshold": {
+          "label": "Trusted-reviewer threshold (hours logged)",
+          "help": "Minimum approved hours before a member becomes a trusted reviewer or reaches Trusted tier."
+        },
+        "sla_first_response_hours": {
+          "label": "SLA: first response (hours)",
+          "help": "Target time to first response on a new help request."
+        },
+        "sla_help_request_hours": {
+          "label": "SLA: help-request resolution (hours)",
+          "help": "Target time to close or match a help request."
+        },
+        "legacy_hour_settlement": {
+          "label": "Legacy-hour settlement policy",
+          "help": "How a deceased member's remaining hours are settled."
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "Reciprocal-balance intervention threshold (hours)",
+          "help": "When a member's give/receive imbalance triggers a coordinator check-in."
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "Safeguarding escalation owner (user ID)",
+          "help": "User ID receiving safeguarding escalations. Leave blank to use admins as a group."
+        },
+        "chf_hourly_rate": {
+          "label": "CHF social value per hour",
+          "help": "CHF value per care hour for ROI reporting using the Swiss formal-care assistant rate."
+        },
+        "chf_prevention_multiplier": {
+          "label": "CHF prevention multiplier",
+          "help": "Multiplier applied to formal-care offset for the Caring Community and Caring Community methodology."
+        },
+        "statement_cadence": {
+          "label": "Member statement cadence",
+          "help": "How often members receive a per-member hour statement."
+        },
+        "policy_appendix_url": {
+          "label": "Signed policy appendix URL",
+          "help": "Paste the public URL of the signed policy agreement between your cooperative and the municipality. This appears in audit reports and the municipal reporting pack."
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "Admin",
+          "coordinator": "Coordinator",
+          "mutual": "Mutual"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "Donate to pool",
+          "expire": "Expire",
+          "transfer_to_nominee": "Transfer to nominee"
+        },
+        "statement_cadence": {
+          "monthly": "Monthly",
+          "quarterly": "Quarterly",
+          "annual": "Annual"
+        }
+      },
+      "placeholders": {
+        "url": "https://..."
+      },
+      "errors": {
+        "load_failed": "Failed to load operating policy.",
+        "save_failed": "Failed to save operating policy."
+      },
+      "messages": {
+        "saved": "Operating policy saved. Changes apply to all new exchanges immediately."
+      }
+    },
+    "warmth_pass": {
+      "title": "Warmth Pass",
+      "subtitle": "Look up a member to check Warmth Pass eligibility and recognised contribution history.",
+      "eligible": "Eligible",
+      "not_eligible": "Not eligible",
+      "verified": "Verified",
+      "not_verified": "Not verified",
+      "empty_date": "—",
+      "loading": "Loading…",
+      "no_categories": "No help categories recorded.",
+      "tier_chip": "Tier {{tier}}",
+      "about": {
+        "title": "About Warmth Pass",
+        "body": "Warmth Pass recognises members who have made sustained, verified contributions to their community."
+      },
+      "errors": {
+        "lookup_failed": "Member lookup failed.",
+        "no_data": "No data available for this member."
+      },
+      "fields": {
+        "help_categories": "Help categories",
+        "hours_logged": "Hours logged",
+        "identity_verified": "Identity verified",
+        "member_since": "Member since",
+        "pass_active_since": "Pass active since",
+        "reviews_received": "Reviews received",
+        "trust_tier": "Trust tier"
+      },
+      "lookup": {
+        "button": "Look up",
+        "member_id": "Member ID",
+        "placeholder": "Enter a member ID…",
+        "title": "Member lookup"
+      },
+      "not_eligible_notice": {
+        "title": "Not eligible yet",
+        "body": "This member does not yet meet the requirements for a Warmth Pass."
+      }
+    }
+  },
+  "panel": {
+    "sidebar": {
+      "items": {
+        "surveys": "Surveys",
+        "projects": "Projects",
+        "trust_tier": "Trust Tier"
+      }
+    }
+  },
+  "caring_community": {
+    "meta": {
+      "title": "Caring Community",
+      "description": "Configure the integrated care hub, dependent capabilities, and municipal reporting surfaces."
+    },
+    "actions": {
+      "open_member_hub": "Open member hub",
+      "open_workflow": "Open Caring Community workflow",
+      "refresh": "Refresh"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "The Caring Community module enables your timebank to coordinate informal neighbourhood care, matching residents who need help with trusted members who can provide it. It adds a trust-tier system, coordinator workflow, pilot evaluation tools, and municipal reporting on top of your existing timebank."
+    },
+    "getting_started": {
+      "title": "Getting started",
+      "step_1": "Configure Operating Policy: set your approval workflow and CHF hourly rate.",
+      "step_2": "Capture a pre-pilot baseline in the Pilot Scoreboard.",
+      "step_3": "Configure Trust Tier thresholds.",
+      "step_4": "Run the Pilot Launch Readiness check.",
+      "step_5": "Once launched, use the Coordinator Workflow as your daily operations dashboard."
+    },
+    "stats": {
+      "master_switch": "Master switch",
+      "connected_capabilities": "Connected capabilities",
+      "reporting_pack": "Reporting pack",
+      "reporting_ready": "Ready"
+    },
+    "switch": {
+      "title": "Module kill switch",
+      "description": "When this switch is off, the Caring Community route, navigation entry, dashboard cards, and quick-create actions are hidden.",
+      "dependency_note": "Caring Community relies on the modules and features listed below being enabled. A disabled module will limit coordinator and reporting features.",
+      "aria": "Toggle Caring Community module"
+    },
+    "capabilities": {
+      "timebank": "Time bank exchange",
+      "volunteering": "Verified volunteering",
+      "organisations": "Trusted organisations",
+      "groups": "Neighbourhood groups",
+      "resources": "Resource library",
+      "trust": "Trust and reviews"
+    },
+    "capability_type": {
+      "feature": "Feature",
+      "module": "Module"
+    },
+    "reporting": {
+      "title": "Municipal reporting",
+      "description": "Jump into the reporting surfaces needed for canton, municipality, and cooperative conversations.",
+      "community_analytics": "Community analytics",
+      "impact_report": "Impact report",
+      "municipal_pack": "Municipal report pack",
+      "note": "These surfaces use existing NEXUS reporting today and are ready for Caring Community exports next."
+    },
+    "messages": {
+      "enabled": "Caring Community enabled",
+      "disabled": "Caring Community disabled"
+    },
+    "status": {
+      "active": "Active",
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "errors": {
+      "load_failed": "Failed to load Caring Community configuration",
+      "save_failed": "Failed to update Caring Community"
+    },
+    "config_route_note": "Dedicated admin configuration route: {{route}}"
+  },
+  "caring_emergency": {
+    "title": "Emergency Alerts (AG70)",
+    "heading": "Emergency Alerts",
+    "empty": "No emergency alerts yet.",
+    "intro": {
+      "title": "About this page - use with caution",
+      "body": "Emergency Alerts are urgent broadcasts sent to all members (or a targeted sub-group) immediately. Use this only for genuine emergencies - severe weather, community safety incidents, or urgent care coverage gaps. Alerts are sent as push notifications and in-app banners. They cannot be unsent once dispatched.",
+      "targeting_label": "Targeting",
+      "targeting_body": "Selecting severity \"Danger\" or \"Warning\" sends to all members. Draft carefully - there is no recall once broadcast.",
+      "delivery_label": "Delivery",
+      "delivery_body": "Alerts are delivered within 60 seconds of dispatch."
+    },
+    "actions": {
+      "open_send_modal": "Send emergency alert",
+      "confirm_prompt": "Confirm?",
+      "confirm_deactivate": "Yes, deactivate",
+      "cancel": "Cancel",
+      "deactivate": "Deactivate",
+      "broadcast": "Broadcast alert"
+    },
+    "errors": {
+      "load_failed": "Failed to load alerts",
+      "send_failed": "Failed to send alert",
+      "deactivate_failed": "Failed to deactivate alert"
+    },
+    "severity": {
+      "info": "Info",
+      "warning": "Warning",
+      "danger": "Emergency (danger)"
+    },
+    "table": {
+      "aria": "Emergency alerts",
+      "title": "Title",
+      "severity": "Severity",
+      "sent": "Sent",
+      "expires": "Expires",
+      "push": "Push",
+      "dismissed": "Dismissed",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "push": {
+      "sent": "Sent"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "modal": {
+      "title": "Send emergency alert"
+    },
+    "form": {
+      "title": "Title",
+      "title_placeholder": "e.g. Severe weather warning",
+      "body": "Body",
+      "body_placeholder": "Describe the emergency and any actions members should take...",
+      "severity": "Severity",
+      "expires_at": "Expires at (optional)",
+      "expires_at_description": "Leave blank for no automatic expiry",
+      "confirm_prefix": "This will immediately push to",
+      "confirm_audience": "all active members",
+      "confirm_suffix": "and display a persistent banner on all pages. I confirm this is a genuine emergency."
+    }
+  },
+  "caring_workflow": {
+    "meta": {
+      "page_title": "Caring Community Workflow",
+      "title": "Caring Community Workflow",
+      "description": "This is your daily operations dashboard. Use it to review pending hour approvals, monitor overdue items, manage coordinator assignments, generate member statements, and configure workflow policy. Pending items that have exceeded their SLA appear highlighted in amber."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "retry": "Retry",
+      "open_hour_review": "Open hour review",
+      "open_report_pack": "Open report pack",
+      "approve": "Approve",
+      "decline": "Decline",
+      "escalate": "Escalate",
+      "re_escalate": "Re-escalate"
+    },
+    "loading": {
+      "workflow": "Loading caring community workflow..."
+    },
+    "toast": {
+      "load_failed": "Could not load caring community workflow."
+    },
+    "empty": {
+      "value": "-",
+      "unassigned": "Unassigned"
+    },
+    "stats": {
+      "pending_reviews": "Pending reviews",
+      "pending_hours": "Pending hours",
+      "approved_30d": "Approved (30d)",
+      "coordinators": "Coordinators"
+    },
+    "pending": {
+      "title": "Pending Reviews",
+      "description_prefix": "Hours awaiting coordinator review and approval. Items marked",
+      "description_middle": "have exceeded the review SLA; items marked",
+      "description_suffix": "have exceeded the escalation SLA. Approve or decline each submission, or assign it to a specific coordinator.",
+      "needs_review": "Needs review",
+      "escalate_now": "Escalate now",
+      "escalated_count": "{{count}} escalated",
+      "overdue_count": "{{count}} overdue",
+      "empty": "Nothing pending. The review queue is clear.",
+      "logged": "Logged {{date}}",
+      "submitted": "Submitted {{date}}",
+      "age_days": "{{count}} day old",
+      "age_days_plural": "{{count}} days old",
+      "assigned_to": "Assigned to {{name}}",
+      "escalated_at": "Escalated {{date}}",
+      "assign_coordinator": "Assign coordinator",
+      "assign_success": "Coordinator assigned.",
+      "assign_failed": "Could not assign coordinator.",
+      "manual_escalation_note": "Manually escalated after {{count}} pending days.",
+      "escalate_success": "Review escalated.",
+      "escalate_failed": "Could not escalate review.",
+      "approve_success": "Review approved.",
+      "decline_success": "Review declined.",
+      "decision_failed": "Could not record decision."
+    },
+    "paper_onboarding": {
+      "title": "Paper onboarding (OCR)",
+      "description": "Upload a scanned form or photo. We'll extract the fields and let you review before creating the account.",
+      "file_label": "Scanned form or photo",
+      "name_label": "Full name",
+      "name_placeholder": "As written on the form",
+      "dob_label": "Date of birth",
+      "email_label": "Email",
+      "email_placeholder": "member@example.com",
+      "phone_label": "Phone",
+      "phone_placeholder": "+1 555 123 4567",
+      "address_label": "Address",
+      "address_placeholder": "Street, city, postcode",
+      "note_label": "Coordinator note",
+      "note_placeholder": "Optional context for this intake",
+      "upload_cta": "Upload & extract",
+      "confirm_cta": "Confirm & create account",
+      "review_cta": "Review",
+      "no_email": "No email",
+      "file_required": "Choose a file to upload first.",
+      "load_failed": "Could not load paper onboarding intakes.",
+      "upload_success": "Paper intake uploaded.",
+      "upload_failed": "Could not upload paper intake.",
+      "confirm_success": "Member confirmed and account created.",
+      "confirm_failed": "Could not confirm paper intake."
+    },
+    "tandem": {
+      "title": "Tandem Suggestions",
+      "description": "AI-suggested supporter-recipient pairs based on location, language, skills and availability.",
+      "empty": "No suggestions right now. Add more members or adjust availability.",
+      "load_failed": "Could not load tandem suggestions.",
+      "dismiss_success": "Suggestion dismissed.",
+      "dismiss_failed": "Could not dismiss suggestion.",
+      "relationship_title": "Tandem: {{supporter}} & {{recipient}}",
+      "distance_km": "{{value}} km",
+      "same_language": "Same language",
+      "complementary_skills": "Complementary skills",
+      "availability_overlap": "Availability overlap",
+      "shared_interests": "Shared interests",
+      "score": "Score {{value}}%",
+      "dismiss": "Dismiss",
+      "create": "Create Tandem"
+    },
+    "safeguarding": {
+      "title": "Safeguarding Reports",
+      "description": "Member-raised concerns about other members, coordinators, or organisations.",
+      "view_all": "View all",
+      "no_data": "No safeguarding data available yet.",
+      "overdue": "Overdue",
+      "no_reports": "No reports yet.",
+      "table_aria": "Recent safeguarding reports",
+      "open": "Open",
+      "org_subject": "Org #{{id}}",
+      "age_hours": "{{count}}h",
+      "age_days": "{{count}}d",
+      "columns": {
+        "severity": "Severity",
+        "category": "Category",
+        "subject": "Subject",
+        "status": "Status",
+        "age": "Age",
+        "action": "Action"
+      },
+      "severity": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "status": {
+        "submitted": "Submitted",
+        "triaged": "Triaged",
+        "investigating": "Investigating",
+        "resolved": "Resolved",
+        "dismissed": "Dismissed"
+      }
+    },
+    "role_pack": {
+      "title": "Role presets",
+      "description": "Pre-configured permission sets for each caring community role. Install the full role pack to quickly set up your coordinators with the correct access. {{countLabel}}.",
+      "installed_count": "{{installed}} of {{total}} role presets installed",
+      "available_count": "{{count}} role presets available",
+      "installing": "Installing...",
+      "install": "Install role pack",
+      "install_success": "Role pack installed.",
+      "install_failed": "Could not install role pack.",
+      "installed": "Installed",
+      "not_installed": "Not installed",
+      "permissions_granted": "{{installed}} of {{total}} permissions granted",
+      "presets": {
+        "national_admin": {
+          "title": "National Admin",
+          "description": "Platform-wide oversight across all cantons and organisations."
+        },
+        "canton_admin": {
+          "title": "Canton Admin",
+          "description": "Manage all caring community activity within a canton."
+        },
+        "municipality_admin": {
+          "title": "Municipality Admin",
+          "description": "Manage caring community activity within a municipality."
+        },
+        "cooperative_coordinator": {
+          "title": "Cooperative Coordinator",
+          "description": "Coordinate a local cooperative and its members."
+        },
+        "organisation_coordinator": {
+          "title": "Organisation Coordinator",
+          "description": "Coordinate volunteers and partners for one organisation."
+        },
+        "trusted_reviewer": {
+          "title": "Trusted Reviewer",
+          "description": "Approve hours quickly with light-touch oversight."
+        }
+      }
+    },
+    "policy": {
+      "title": "Workflow policy",
+      "description": "Configure SLAs, approval rules, and reporting defaults. Changes take effect immediately on save and apply to all new hour submissions from that point forward.",
+      "save": "Save policy",
+      "review_sla_days": "Review SLA (days)",
+      "review_sla_days_description": "Hours not reviewed within this many days will be flagged as overdue in the queue.",
+      "escalation_sla_days": "Escalation SLA (days)",
+      "escalation_sla_days_description": "Overdue items not actioned within this many additional days will be escalated automatically.",
+      "monthly_statement_day": "Monthly statement day",
+      "monthly_statement_day_description": "Day of the month on which member statements are generated (e.g. 1 = 1st of each month).",
+      "default_hour_value_chf": "Default hour value (CHF)",
+      "default_hour_value_chf_description": "Used to calculate estimated social value on statements and municipal reports.",
+      "municipal_report_default_period": "Default report period",
+      "approval_required": "Approval required",
+      "approval_required_description": "Require coordinator approval before hours are added to wallets.",
+      "auto_approve_trusted_reviewers": "Auto-approve trusted reviewers",
+      "auto_approve_trusted_reviewers_description": "Skip the queue for hours logged by trusted reviewers.",
+      "allow_member_self_log": "Allow member self-log",
+      "allow_member_self_log_description": "Let members log their own support hours without coordinator entry.",
+      "require_organisation_for_partner_hours": "Require organisation for partner hours",
+      "require_organisation_for_partner_hours_description": "Hours given on behalf of partners must be linked to an organisation.",
+      "include_social_value_estimate": "Include social value estimate",
+      "include_social_value_estimate_description": "Show estimated social value (CHF) on statements and reports.",
+      "save_success": "Workflow policy saved.",
+      "save_failed": "Could not save workflow policy.",
+      "periods": {
+        "last_30_days": "Last 30 days",
+        "last_90_days": "Last 90 days",
+        "year_to_date": "Year to date",
+        "previous_quarter": "Previous quarter"
+      }
+    },
+    "member_statement": {
+      "title": "Member Statements",
+      "description": "Generate an hours-and-impact statement for a single member. Use this to share a formal record of their support hours, wallet balance, and estimated social value - useful for grant applications, reviews, or member queries. Enter a member ID and an optional date range, then preview or export CSV.",
+      "member_id": "Member ID",
+      "start_date": "Start date",
+      "end_date": "End date",
+      "preview": "Preview",
+      "export_csv": "Export CSV",
+      "approved_support_hours": "Approved support hours",
+      "pending_support_hours": "Pending support hours",
+      "wallet_hours_earned": "Wallet hours earned",
+      "wallet_hours_spent": "Wallet hours spent",
+      "empty": "Enter a member ID and press Preview to view their statement.",
+      "chf_value": "Estimated social value: CHF {{value}}",
+      "invalid_member": "Enter a valid member ID.",
+      "load_failed": "Could not load member statement.",
+      "export_success": "Statement exported.",
+      "export_failed": "Could not export statement."
+    },
+    "signals": {
+      "title": "Coordinator signals",
+      "description": "A real-time snapshot of activity that may need coordinator attention - open requests, available offers, trusted organisations, and recent declines.",
+      "active_requests": "Active support requests",
+      "active_offers": "Active support offers",
+      "trusted_organisations": "Trusted organisations",
+      "declined_30d": "Declined (30d)"
+    },
+    "favours": {
+      "title": "Informal Favours",
+      "loading": "Loading...",
+      "total_recorded": "{{count}} total recorded",
+      "loading_favours": "Loading favours...",
+      "empty": "No favours recorded yet.",
+      "anonymous": "Anonymous",
+      "unknown": "Unknown"
+    },
+    "assisted_onboarding": {
+      "title": "Assisted onboarding",
+      "description": "Create an account on behalf of a member who can't self-register, then share their temporary password.",
+      "name_label": "Full name",
+      "name_placeholder": "Member's full name",
+      "email_label": "Email",
+      "email_placeholder": "member@example.com",
+      "phone_label": "Phone (optional)",
+      "phone_placeholder": "+1 555 123 4567",
+      "note_label": "Coordinator note (optional)",
+      "note_placeholder": "Anything the coordinator should remember",
+      "create_cta": "Create member account",
+      "required": "Name and email are required.",
+      "created": "Member account created.",
+      "create_failed": "Could not create member account.",
+      "created_for": "Account created for {{name}} ({{email}}).",
+      "password_note": "Share this temporary password with the member. They will be asked to change it on first login.",
+      "copy": "Copy",
+      "copied": "Copied!"
+    },
+    "invite_codes": {
+      "title": "Invite Codes",
+      "description": "Generate a printable code that a new member can use to join without needing an email invitation.",
+      "label": "Label (optional)",
+      "label_placeholder": "e.g. For Mary's neighbour",
+      "generate": "Generate Code",
+      "new_code": "New invite code",
+      "expires": "Expires: {{date}}",
+      "copied": "Copied!",
+      "copy_url": "Copy URL",
+      "print_card": "Print Card",
+      "open": "Open",
+      "table_aria": "Invite codes",
+      "empty": "No invite codes yet. Generate one above to share with a prospective member.",
+      "load_failed": "Could not load invite codes.",
+      "generate_success": "Invite code generated.",
+      "generate_failed": "Could not generate invite code.",
+      "columns": {
+        "code": "Code",
+        "label": "Label",
+        "expires": "Expires",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Active",
+        "used": "Used",
+        "used_by": "Used by {{name}}",
+        "expired": "Expired"
+      }
+    },
+    "stages": {
+      "title": "Workflow stages",
+      "description": "The five-step caring community pipeline at a glance.",
+      "intake": {
+        "title": "Intake",
+        "description": "Welcome new members and capture their support needs."
+      },
+      "match": {
+        "title": "Match",
+        "description": "Pair supporters and recipients based on skills and availability."
+      },
+      "log": {
+        "title": "Log Hours",
+        "description": "Capture support hours as they happen."
+      },
+      "verify": {
+        "title": "Verify",
+        "description": "Coordinators review and approve logged hours."
+      },
+      "statement": {
+        "title": "Statement",
+        "description": "Issue monthly statements and impact reports."
+      }
+    },
+    "predictive": {
+      "title": "Predictive Insights",
+      "subtitle": "Forward-looking forecasts and proactive alerts. Spot regional care deficits before they become emergencies.",
+      "not_enough_activity": "Not enough activity yet to forecast. Come back in a few weeks.",
+      "no_forecast": "No forecast data available yet.",
+      "hours_forecast": "Hours forecast",
+      "active_members": "Active members",
+      "recipients_reached": "Recipients reached",
+      "history": "History",
+      "forecast": "Forecast",
+      "confidence": "Confidence",
+      "trend_growing": "Growing {{value}}%",
+      "trend_declining": "Declining {{value}}%",
+      "trend_stable": "Stable",
+      "sub_region_coverage": "Sub-region coverage (last {{days}} days)",
+      "under_supplied_count": "{{count}} under-supplied",
+      "sub_region_coverage_aria": "Sub-region coverage",
+      "helper_churn": "Helper churn (lapsed >= {{days}} days)",
+      "overall_percent": "{{value}}% overall",
+      "helper_churn_note": "{{lapsed}} of {{prior}} previously active helpers haven't logged hours recently.",
+      "helper_churn_aria": "Helper churn by category",
+      "coefficient_drift": "Category coefficient drift",
+      "drifting_count": "{{count}} drifting",
+      "coefficient_drift_note": "Categories with absolute drift > {{threshold}}% are flagged. Review baseline coefficients in the category coefficient editor.",
+      "coefficient_drift_aria": "Category coefficient drift",
+      "proactive_alerts": "Proactive alerts",
+      "columns": {
+        "sub_region": "Sub-region",
+        "requested_90d": "Requested (90d)",
+        "fulfilled_90d": "Fulfilled (90d)",
+        "coverage": "Coverage",
+        "status": "Status",
+        "category": "Category",
+        "prior_active": "Prior active",
+        "lapsed": "Lapsed",
+        "churn_rate": "Churn rate",
+        "baseline": "Baseline",
+        "expected_hrs": "Expected hrs",
+        "observed_hrs": "Observed hrs",
+        "drift": "Drift",
+        "sample": "Sample"
+      },
+      "status": {
+        "under_supplied": "Under-supplied",
+        "ok": "OK"
+      },
+      "severity": {
+        "critical": "Critical",
+        "warning": "Warning",
+        "info": "Info"
+      }
+    },
+    "relationships": {
+      "title": "Support relationships",
+      "description": "Ongoing supporter-recipient pairs and recurring check-ins.",
+      "active": "Active",
+      "paused": "Paused",
+      "check_ins_due": "Check-ins due",
+      "expected_hours": "Expected hours",
+      "supporter": "Supporter",
+      "supporter_placeholder": "Search for the supporter",
+      "recipient": "Recipient",
+      "recipient_placeholder": "Search for the recipient",
+      "no_members": "No members found",
+      "clear": "Clear",
+      "relationship_title": "Relationship title",
+      "frequency_label": "Frequency",
+      "expected_hours_per_visit": "Expected hours per visit",
+      "start_date": "Start date",
+      "create": "Create relationship",
+      "empty": "No support relationships yet. Create one above.",
+      "pair": "{{supporter}} supporting {{recipient}}",
+      "started": "Started {{date}}",
+      "next_check_in": "Next check-in {{date}}",
+      "pause": "Pause",
+      "resume": "Resume",
+      "log_date": "Date",
+      "log_hours": "Hours",
+      "log_note": "Note (optional)",
+      "log_hours_action": "Log hours",
+      "load_failed": "Could not load support relationships.",
+      "pick_different_members": "Pick two different members.",
+      "create_success": "Support relationship created.",
+      "create_failed": "Could not create support relationship.",
+      "update_success": "Support relationship updated.",
+      "update_failed": "Could not update support relationship.",
+      "log_validation_failed": "Enter a valid date and 0.25-24 hours.",
+      "log_success": "Support hours logged.",
+      "log_failed": "Could not log support hours.",
+      "frequency": {
+        "weekly": "Weekly",
+        "fortnightly": "Fortnightly",
+        "monthly": "Monthly",
+        "ad_hoc": "Ad hoc"
+      },
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      }
+    }
+  },
+  "category_coefficients": {
+    "meta": {
+      "page_title": "Category Substitution Coefficients",
+      "title": "Category Substitution Coefficients",
+      "subtitle": "How much each hour of community care substitutes for formal Spitex/Pflege hours. Used in Municipal Impact Report calculations."
+    },
+    "actions": {
+      "refresh_aria": "Refresh category coefficients",
+      "save": "Save"
+    },
+    "about": {
+      "title": "About this page",
+      "chf_amount": "CHF 35",
+      "body_prefix": "Substitution Coefficients control how much social value each care category is worth in the cost-offset calculation. A coefficient of 1.0 means one hour equals one hour of formal Spitex/Pflege care (",
+      "body_middle": "). A coefficient of 0.5 means it substitutes for half an hour. A coefficient of 2.0 means it substitutes for two hours of formal care - for example, intensive personal care or specialist support. The",
+      "body_suffix": "methodology recommends starting all categories at 1.0 and adjusting based on observed care intensity.",
+      "range_prefix": "Values range from 0.00 (no care substitution value) to 9.99. Changes take effect on the next",
+      "range_suffix": "report refresh."
+    },
+    "migration": {
+      "title": "Migration pending",
+      "body_prefix": "The",
+      "body_middle": "column has not been migrated yet. Run",
+      "body_suffix": "to enable per-category coefficients.",
+      "warning": "A database migration is pending - save your changes after the migration completes to avoid them being overwritten."
+    },
+    "table": {
+      "aria": "Category substitution coefficients",
+      "category": "Category",
+      "source": "Source",
+      "coefficient": "Coefficient",
+      "action": "Action"
+    },
+    "fields": {
+      "coefficient_aria": "Coefficient for {{name}}",
+      "coefficient_error": "Must be between 0.00 and 9.99"
+    },
+    "empty": {
+      "categories": "No categories found."
+    },
+    "toasts": {
+      "load_failed": "Failed to load category coefficients",
+      "invalid_number": "Coefficient must be a number",
+      "saved": "Saved coefficient for {{name}}",
+      "save_failed": "Failed to save coefficient for {{name}}"
+    }
+  },
+  "commercial_boundary": {
+    "meta": {
+      "page_title": "Commercial Boundary Map",
+      "title": "Commercial Boundary Map",
+      "subtitle": "AG82 - what is AGPL public, tenant-configurable, deployment-layer, or commercial"
+    },
+    "actions": {
+      "export_markdown": "Export as Markdown",
+      "export": "Export",
+      "refresh_data": "Refresh data",
+      "refresh_aria": "Refresh commercial boundary map",
+      "reset_default": "Reset to canonical default",
+      "reset_default_aria": "Reset to default"
+    },
+    "overrides_count": "{{count}} override",
+    "overrides_count_plural": "{{count}} overrides",
+    "about": {
+      "title": "About this page",
+      "body_prefix": "The Commercial Boundary defines which types of paid work are permitted within the community care programme and which must remain unpaid time credits. This boundary is a requirement of the",
+      "body_suffix": "methodology and must be agreed with your municipal partner before the pilot launches. The matrix below lists activity categories and their permitted exchange type.",
+      "override_prefix": "Use the per-row override to record a tenant-specific classification (for example, a private deployment that has a commercial bundle). Overrides are stored in tenant settings only - they never alter the canonical public classification shipped with the",
+      "override_suffix": "repo. Once you confirm the boundary matrix, the agreement is recorded with a timestamp and your user ID, forming part of the pilot governance documentation that appears in the Pilot Launch Readiness check."
+    },
+    "sections": {
+      "classifications": "Classifications"
+    },
+    "classification": {
+      "agpl_public": "AGPL public",
+      "tenant_config": "Tenant config",
+      "private_deployment": "Private deployment",
+      "commercial": "Commercial"
+    },
+    "labels": {
+      "overridden": "Overridden",
+      "module": "module",
+      "out_of_tree": "Out-of-tree",
+      "canonical_default": "Canonical default:",
+      "key": "Key"
+    },
+    "fields": {
+      "set_classification": "Set classification",
+      "classification_aria": "Classification for {{label}}"
+    },
+    "export": {
+      "last_updated": "Last updated: {{date}}",
+      "capability": "Capability",
+      "classification": "Classification",
+      "agpl_module": "AGPL module",
+      "default": "Default",
+      "overridden": "Overridden",
+      "notes": "Notes",
+      "yes": "yes",
+      "no": "no",
+      "generated": "Generated {{date}} from the NEXUS admin panel."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Failed to load commercial boundary map",
+      "reverted": "Reverted to canonical default",
+      "updated": "Classification updated",
+      "update_failed": "Failed to update classification",
+      "export_empty": "Export returned empty",
+      "exported": "Boundary map exported",
+      "export_failed": "Failed to export boundary map"
+    }
+  },
+  "data_quality": {
+    "meta": {
+      "page_title": "Pilot Data Quality",
+      "title": "Pilot Data Quality",
+      "subtitle": "AG84 - readiness checks before onboarding real residents"
+    },
+    "actions": {
+      "refresh_checks": "Refresh checks",
+      "refresh_aria": "Refresh data-quality checks",
+      "view_affected_rows": "View affected rows",
+      "close": "Close"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Data Quality checks scan your platform data for issues that could distort pilot metrics or cause reporting errors - for example, members with duplicate profiles, hours logged against deleted listings, or exchange records missing required fields. Run this monthly before generating reports. Resolve all Critical and Warning items before submitting reports to funders or municipal partners."
+    },
+    "severity": {
+      "ok": "OK",
+      "info": "Info",
+      "warning": "Warning",
+      "danger": "Danger"
+    },
+    "severity_guide": {
+      "title": "Severity guide",
+      "danger": "Errors that will cause incorrect numbers in reports - must fix before exporting.",
+      "warning": "Potential issues that may affect metric accuracy - review and confirm or fix.",
+      "info": "Informational notices - no action required.",
+      "ok": "No issues detected in this category.",
+      "note_prefix": "Click",
+      "note_suffix": "on any card to see the specific records. Some issues can be corrected in the platform; others require manual review of the underlying data."
+    },
+    "summary": {
+      "label": "Summary:",
+      "count": "{{count}} {{label}}",
+      "generated": "Generated {{date}}",
+      "affected": "affected"
+    },
+    "drilldown": {
+      "subtitle": "Up to 50 affected rows - resolve or document before launch.",
+      "empty": "No affected rows to show.",
+      "table_aria": "Affected rows"
+    },
+    "table": {
+      "id": "ID",
+      "identifier": "Identifier",
+      "name": "Name",
+      "status": "Status",
+      "created": "Created"
+    },
+    "empty": {
+      "value": "-",
+      "rows": "No rows"
+    },
+    "toasts": {
+      "load_failed": "Failed to load data-quality report",
+      "rows_failed": "Failed to load affected rows"
+    }
+  },
+  "disclosure_pack": {
+    "meta": {
+      "page_title": "FADP / nDSG Disclosure Pack",
+      "title": "FADP / nDSG Disclosure Pack",
+      "subtitle": "AG80 - pilot disclosure document for Swiss data-protection law"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh disclosure pack",
+      "export_markdown": "Export Markdown",
+      "save_changes": "Save changes"
+    },
+    "about": {
+      "title": "About this page",
+      "body_prefix": "The Disclosure Pack (AG80) is the",
+      "body_suffix": "data-protection disclosure document that residents must be made aware of before participating in the community care programme. It covers the data controller and processor identities, data categories processed, lawful basis, data-subject rights, incident response contacts, and cross-border transfer safeguards.",
+      "review_prefix": "This pack is a working draft - review it with",
+      "review_middle": "counsel before publishing. Edit the controller details, incident-response owner, and isolated-node configuration for your deployment, then use",
+      "review_suffix": "to produce the legal handover document. Defaults reflect platform-side commitments. Save any changes before exporting."
+    },
+    "tabs": {
+      "aria": "Disclosure sections",
+      "controller": "Controller & Processor",
+      "data_retention": "Data & retention",
+      "data_subject_rights": "Data subject rights",
+      "federation_isolated_node": "Federation & isolated node",
+      "incident_response": "Incident response",
+      "cross_border_transfers": "Cross-border transfers"
+    },
+    "sections": {
+      "tenant_controller": "Tenant controller",
+      "platform_processor": "Platform processor",
+      "data_categories": "Data categories",
+      "lawful_basis": "Lawful basis",
+      "retention_defaults": "Retention defaults",
+      "federation_policy": "Federation policy",
+      "isolated_node_configuration": "Isolated-node configuration",
+      "destinations": "Destinations",
+      "safeguards": "Safeguards"
+    },
+    "fields": {
+      "controller_name": "Controller name",
+      "address": "Address",
+      "contact_email": "Contact email",
+      "data_protection_officer": "Data protection officer",
+      "processor_name": "Processor name",
+      "sub_processors": "Sub-processors (one per line)",
+      "hosting_owner": "Hosting owner",
+      "smtp_owner": "SMTP owner",
+      "storage_owner": "Storage owner",
+      "backup_owner": "Backup owner",
+      "update_cadence": "Update cadence",
+      "owner_name": "Owner name",
+      "notification_window_hours": "Notification window (hours)",
+      "fadp_authority": "FADP authority"
+    },
+    "labels": {
+      "aggregate_policy": "Aggregate policy"
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "enabled_lower": "enabled",
+      "disabled_lower": "disabled",
+      "members_can_opt_out": "Members can opt out",
+      "no_member_opt_out": "No member opt-out",
+      "cross_border_occurs": "Cross-border transfers occur",
+      "no_cross_border_transfers": "No cross-border transfers"
+    },
+    "isolated_node": {
+      "description_prefix": "These fields are only relevant if this deployment runs on canton-controlled infrastructure. For standard hosted deployments, leave as defaults. Each owner field identifies the legal entity responsible for that infrastructure component under",
+      "description_suffix": "Article 9."
+    },
+    "descriptions": {
+      "hosting_owner": "Legal entity that controls the server infrastructure (e.g. the canton IT department).",
+      "smtp_owner": "Legal entity responsible for outbound email delivery.",
+      "storage_owner": "Legal entity controlling file/blob storage (uploads, exports).",
+      "backup_owner": "Legal entity responsible for database backup storage and retention.",
+      "update_cadence": "How frequently the canton node receives platform updates (e.g. 'monthly', 'quarterly')."
+    },
+    "footer": {
+      "last_saved": "Last saved {{date}}",
+      "customised": "Customised"
+    },
+    "toasts": {
+      "load_failed": "Failed to load disclosure pack",
+      "saved": "Disclosure pack saved",
+      "save_failed": "Failed to save disclosure pack",
+      "export_empty": "Export returned empty",
+      "exported": "Disclosure pack exported",
+      "export_failed": "Failed to export disclosure pack"
+    }
+  },
+  "external_integrations": {
+    "meta": {
+      "title": "External Integration Backlog",
+      "subtitle": "AG87 - partner-dependent integrations awaiting external owner / DSA / sandbox"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "add": "Add integration",
+      "seed": "Seed default backlog",
+      "open": "Open",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save_changes": "Save changes",
+      "create": "Create integration",
+      "remove": "Remove"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Partner Integration Tracker is a backlog tracker for partner-dependent connections - banking, AHV submission, postal address verification, and cantonal data feeds. Each entry tracks the integration owner, data sharing agreement (DSA) status, and sandbox readiness. Use this to coordinate with external partners and report progress to stakeholders.",
+      "dsa_label": "DSA (Data Sharing Agreement):",
+      "dsa_body": "Must be signed before any live data exchange. Draft agreements using the Research Partnerships templates.",
+      "sandbox_label": "Sandbox URL:",
+      "sandbox_body": "Link to the partner's test environment. Validate the integration in sandbox before promoting to live.",
+      "statuses_label": "Statuses:",
+      "statuses_body": "Proposed -> Scoping -> Sandbox -> Live. Blocked means an external dependency is unresolved."
+    },
+    "empty": {
+      "title": "No integrations tracked yet",
+      "body": "Seed a curated set of well-known partner-dependent integrations (AHV submission, Spitex handoff, cantonal master-data feed, PostFinance, Twint, postal-address verification) so the platform operator can track owner, DSA status, and sandbox readiness."
+    },
+    "last_updated": "Last updated {{date}}",
+    "table": {
+      "aria": "External integrations",
+      "name": "Name",
+      "category": "Category",
+      "owner": "Owner",
+      "status": "Status",
+      "dsa": "DSA",
+      "sandbox": "Sandbox",
+      "updated": "Updated",
+      "row_actions": "Row actions",
+      "actions": "Actions"
+    },
+    "categories": {
+      "banking": "Banking",
+      "payment": "Payment",
+      "identity_verification": "Identity verification",
+      "professional_care": "Professional care",
+      "municipal_data": "Municipal data",
+      "postal": "Postal",
+      "ahv": "AHV",
+      "healthcare": "Healthcare",
+      "other": "Other"
+    },
+    "statuses": {
+      "proposed": "Proposed",
+      "scoping": "Scoping",
+      "blocked": "Blocked",
+      "sandbox": "Sandbox",
+      "live": "Live",
+      "deprecated": "Deprecated"
+    },
+    "dsa_statuses": {
+      "not_required": "Not required",
+      "drafting": "Drafting",
+      "in_review": "In review",
+      "signed": "Signed"
+    },
+    "editor": {
+      "add_title": "Add integration",
+      "edit_title": "Edit: {{name}}",
+      "name": "Name",
+      "name_placeholder": "e.g. AHV submission gateway",
+      "category": "Category",
+      "status": "Status",
+      "owner_name": "Owner name",
+      "owner_name_placeholder": "External contact full name",
+      "owner_email": "Owner email",
+      "owner_email_placeholder": "contact@partner.example",
+      "interface_spec_url": "Interface specification URL",
+      "interface_spec_placeholder": "https://docs.partner.example/spec",
+      "dsa_status": "Data sharing agreement",
+      "sandbox_url": "Sandbox URL",
+      "sandbox_placeholder": "https://sandbox.partner.example",
+      "notes": "Notes",
+      "notes_placeholder": "Open questions, blockers, dependencies, contractual notes..."
+    },
+    "delete_modal": {
+      "title": "Remove integration",
+      "body_prefix": "This will permanently remove the backlog entry for",
+      "body_suffix": "The external partner record is not affected - only the tracking entry is removed.",
+      "warning": "This action cannot be undone."
+    },
+    "toasts": {
+      "load_failed": "Failed to load integration backlog",
+      "seeded": "Seeded default backlog",
+      "seed_failed": "Seed failed",
+      "updated": "Integration updated",
+      "update_failed": "Update failed",
+      "created": "Integration created",
+      "create_failed": "Create failed",
+      "removed": "Integration removed",
+      "delete_failed": "Delete failed"
+    }
+  },
+  "federation_peers_admin": {
+    "meta": {
+      "page_title": "Partner Cooperatives - Admin",
+      "title": "Partner Cooperatives",
+      "subtitle": "Connect with other cooperatives so members can send hours between communities."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh federation peers",
+      "add_peer": "Add Peer",
+      "rotate_secret": "Rotate shared secret",
+      "delete_peer": "Delete peer",
+      "cancel": "Cancel",
+      "create_reveal_secret": "Create & Reveal Secret",
+      "copy_secret": "Copy Secret",
+      "copy_peer_slug": "Copy Peer Slug",
+      "copied_secret": "I have copied the secret"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Partner Cooperatives are other NEXUS cooperatives that your community has agreed to share members and hours with. Once a peer connection is established, members can transfer hours between communities and view federated listings. Each peer connection requires a shared secret that both sides must configure - contact the peer cooperative's administrator to exchange credentials.",
+      "shared_secret_label": "Shared secret:",
+      "shared_secret_body": "A private key both cooperatives use to prove who they are to each other. It must be entered exactly the same on both sides. Replace it every 6-12 months, and straight away if you think anyone else has seen it.",
+      "pending_body": "Credentials set, awaiting first successful API call.",
+      "active_body": "Connected and syncing.",
+      "suspended_body": "Last sync failed or manually suspended - check that the peer's base URL is correct and reachable."
+    },
+    "peers": {
+      "title": "Registered Peers",
+      "table_aria": "Federation peers",
+      "empty": "No federation peers yet - add one to start."
+    },
+    "table": {
+      "name": "Name",
+      "slug": "Slug",
+      "base_url": "Base URL",
+      "status": "Status",
+      "last_handshake": "Last successful contact",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "empty": {
+      "never": "Never"
+    },
+    "create_modal": {
+      "title": "Add Federation Peer",
+      "peer_slug": "Peer Slug",
+      "peer_slug_description": "Lowercase alphanumeric + hyphens. Used as destination cooperative slug for outbound transfers.",
+      "peer_slug_placeholder": "bern-cooperative",
+      "display_name": "Display Name",
+      "display_name_placeholder": "Bern Cooperative",
+      "base_url": "Base URL",
+      "base_url_description": "HTTPS URL of the remote NEXUS API. The /v2/federation/hour-transfer/inbound path is appended automatically.",
+      "base_url_placeholder": "https://api.bern-cooperative.ch",
+      "notes": "Notes",
+      "notes_placeholder": "Internal notes - partner contact, agreement reference...",
+      "status_hint_prefix": "Status starts as",
+      "status_hint_middle": "After the remote side has registered the same shared secret, set both sides to"
+    },
+    "secret_modal": {
+      "title": "One-Time Shared Secret",
+      "body_prefix": "This secret is shown",
+      "only_once": "only once",
+      "body_suffix": "Copy it now and paste it into the remote NEXUS install's federation peer entry for this cooperative. If you lose it, you must rotate the secret here and update the remote side again.",
+      "peer_slug_label": "Peer slug:",
+      "base_url_label": "Base URL:"
+    },
+    "validation": {
+      "required_fields": "All required fields must be filled."
+    },
+    "confirm_rotate": "Rotate the shared secret for \"{{name}}\"? The old secret stops working immediately and you must update the remote side.",
+    "confirm_delete": "Delete federation peer \"{{name}}\"? This is permanent.",
+    "toasts": {
+      "load_failed": "Failed to load federation peers.",
+      "created": "Federation peer created.",
+      "create_failed": "Failed to create peer.",
+      "status_updated": "Peer status set to {{status}}.",
+      "status_failed": "Failed to update peer status.",
+      "secret_rotated": "Shared secret rotated.",
+      "rotate_failed": "Failed to rotate secret.",
+      "deleted": "Peer deleted.",
+      "delete_failed": "Failed to delete peer.",
+      "copied": "Copied to clipboard.",
+      "copy_failed": "Failed to copy."
+    }
+  },
+  "help_request_sla": {
+    "meta": {
+      "page_title": "Help Request SLA Dashboard",
+      "title": "Help Request SLA Dashboard",
+      "subtitle_prefix": "AG96 - first-response and resolution",
+      "subtitle_suffix": "tracking against AG81 operating policy"
+    },
+    "actions": {
+      "edit_policy": "Edit policy",
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh SLA dashboard"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Service Level Agreements (SLAs) set the maximum expected response and resolution times for help requests. When a request approaches or exceeds its SLA, it is flagged as overdue in this dashboard. SLAs help you maintain consistent service quality and generate accurate pilot metrics.",
+      "first_response_label": "First response",
+      "first_response_prefix": "time from request submission to first coordinator contact (status moves out of",
+      "first_response_suffix": ")",
+      "resolution_label": "Resolution",
+      "resolution_prefix": "time from first response to the request being matched and confirmed (status reaches",
+      "resolution_suffix": ")",
+      "note": "SLA windows are set in the AG81 Operating Policy. Edit them using the \"Edit policy\" button above. Set tighter SLAs for urgent care categories (e.g. medical transport) and looser ones for social activities."
+    },
+    "policy": {
+      "first_response_description": "- time from submission to first coordinator contact",
+      "resolution_description": "- time from first response to request being matched and confirmed",
+      "platform_defaults": "Platform defaults - no AG81 workshop run",
+      "tenant_policy": "Tenant policy applied"
+    },
+    "metrics": {
+      "first_response_breached": "First-response breached",
+      "first_response_at_risk": "First-response at risk",
+      "resolution_breached": "Resolution breached",
+      "resolution_at_risk": "Resolution at risk",
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "resolved_24h": "Resolved <24h (recent)"
+    },
+    "open": {
+      "title": "Open help requests",
+      "subtitle": "{{count}} open - sorted breached first",
+      "bucket_filter_aria": "Bucket filter",
+      "all_count": "All ({{count}})",
+      "breached_count": "Breached ({{count}})",
+      "at_risk_count": "At risk ({{count}})",
+      "on_track_count": "On track ({{count}})",
+      "empty_bucket": "No open help requests in this bucket.",
+      "table_aria": "Open help requests",
+      "request_meta": "When: {{when}} - user #{{userId}} - age {{age}}",
+      "target_hours": "Target {{hours}}h",
+      "over_by": "Over by {{duration}}",
+      "left": "{{duration}} left"
+    },
+    "resolved": {
+      "title": "Recently resolved (last 72h)",
+      "table_aria": "Recently resolved help requests",
+      "user_id": "user #{{userId}}"
+    },
+    "table": {
+      "request": "Request",
+      "bucket": "Bucket",
+      "status": "Status",
+      "created": "Created",
+      "turnaround": "Turnaround",
+      "within": "Within",
+      "resolved": "Resolved"
+    },
+    "buckets": {
+      "breached": "Breached",
+      "at_risk": "At risk",
+      "on_track": "On track"
+    },
+    "dimensions": {
+      "first_response": "First response",
+      "resolution": "Resolution"
+    },
+    "answers": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "footer": {
+      "generated": "Report generated {{date}}.",
+      "proxy_prefix": "proxy: first-response = status moves out of",
+      "proxy_middle": "resolution = status reaches",
+      "proxy_suffix": "Adjust",
+      "proxy_end": "windows in AG81 operating policy."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Failed to load SLA dashboard"
+    }
+  },
+  "integration_showcase": {
+    "meta": {
+      "page_title": "Developer Integration Reference",
+      "title": "Developer Integration Reference",
+      "subtitle": "A single-page reference of every public API, webhook, federation endpoint, and OAuth surface available in this deployment - ready to hand to a technical integration partner."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh integration showcase"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Use this page when setting up an integration with a third-party service, a municipality's data system, or a federated NEXUS network. Every endpoint listed here is live and scoped to this deployment. Sample payloads are illustrative - real values depend on your tenant slug and partner credentials. Share this URL with integration partners rather than pointing them to the raw API docs.",
+      "last_refreshed": "Last refreshed {{date}}."
+    },
+    "sections": {
+      "sample_request": "Sample request",
+      "read_full_spec": "Read the full spec on GitHub"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Failed to load integration showcase"
+    }
+  },
+  "isolated_node": {
+    "meta": {
+      "page_title": "Isolated-Node Decision Gate",
+      "title": "Isolated-Node Decision Gate",
+      "subtitle": "AG85 - readiness checklist for canton-controlled deployment"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh isolated-node decision gate",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "save_changes": "Save changes"
+    },
+    "about": {
+      "title": "About this page",
+      "body_prefix": "An Isolated Node deployment runs",
+      "body_middle": "on infrastructure controlled entirely by the canton or municipality - no data leaves the canton boundary. This configuration is required for",
+      "body_suffix": "deployments under strict Swiss cantonal data protection rules. Most communities run as standard hosted deployments and do not need to configure this section.",
+      "workflow": "Work through each decision item below: set the value, assign an owner, and mark it as Decided when agreed. The gate closes (and the Pilot Launch Readiness check passes) once every item is in Decided status."
+    },
+    "warning": {
+      "title": "Important - only configure if required",
+      "body_prefix": "Only change these settings if your municipality has explicitly specified an isolated-node requirement. Changing the deployment mode after pilot launch requires coordination with the",
+      "body_suffix": "technical team. Do not change this setting without agreement from your cantonal data protection officer."
+    },
+    "status": {
+      "pending": "Pending",
+      "in_progress": "In progress",
+      "decided": "Decided",
+      "blocked": "Blocked"
+    },
+    "status_counts": {
+      "pending": "Pending: {{count}}",
+      "in_progress": "In progress: {{count}}",
+      "decided": "Decided: {{count}}",
+      "blocked": "Blocked: {{count}}"
+    },
+    "gate": {
+      "closed": "Gate closed - ready to launch",
+      "open": "Gate open - decisions still required",
+      "decided_count": "{{decided}} of {{total}} items decided",
+      "blocked_count": " - {{count}} blocked",
+      "progress_aria": "Decision-gate progress"
+    },
+    "fields": {
+      "value": "Value",
+      "owner": "Owner",
+      "notes": "Notes",
+      "status": "Status",
+      "url_placeholder": "https://...",
+      "owner_description": "Person or organisation responsible for this decision",
+      "notes_description": "Context, links, contract references, or blockers"
+    },
+    "empty": {
+      "unassigned": "unassigned",
+      "none": "none"
+    },
+    "timestamps": {
+      "last_updated": "Last updated {{date}}"
+    },
+    "modal": {
+      "edit_decision_item": "Edit decision item",
+      "subtitle": "Update value, owner, status, and notes for this gate item"
+    },
+    "toasts": {
+      "load_failed": "Failed to load decision-gate data",
+      "item_updated": "Decision item updated",
+      "save_failed": "Failed to save decision item"
+    }
+  },
+  "kpi_baselines": {
+    "meta": {
+      "page_title": "Community KPI Baselines",
+      "title": "Community KPI Baselines",
+      "subtitle_prefix": "Capture snapshots of your community metrics to track before/after",
+      "subtitle_suffix": "impact"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh KPI baselines",
+      "capture_now": "Capture Baseline Now",
+      "capture_now_short": "Capture Now",
+      "capture_first": "Capture your first baseline",
+      "compare": "Compare",
+      "close": "Close",
+      "cancel": "Cancel"
+    },
+    "about": {
+      "title": "About this page",
+      "body_prefix": "Baselines record the state of your community before the Caring Community programme begins. They are compared against current metrics at each quarterly review to demonstrate impact. Capture baselines for every",
+      "body_suffix": "before onboarding residents - once the pilot starts, the baseline is frozen and cannot be backdated.",
+      "compare_prefix": "Click",
+      "compare_suffix": "on any baseline row to see a side-by-side comparison against current platform data. Metrics showing 25%+ change on key impact indicators are highlighted as Impact achieved."
+    },
+    "metrics": {
+      "volunteer_hours": "Volunteer Hours (90d)",
+      "member_count": "Active Members",
+      "recipient_count": "Recipients Reached",
+      "active_relationships": "Active Relationships",
+      "total_exchanges": "Total Exchanges",
+      "avg_response_hours": "Avg Response Time (hrs)",
+      "engagement_rate_pct": "Engagement Rate (%)"
+    },
+    "comparison": {
+      "comparing": "Comparing:",
+      "captured": "(captured {{date}})",
+      "impact_achieved": "Impact achieved",
+      "baseline": "Baseline",
+      "now": "Now"
+    },
+    "empty": {
+      "no_data": "No data available",
+      "no_baselines": "No baselines captured yet."
+    },
+    "fields": {
+      "notes_label_prefix": "Notes:",
+      "baseline_label": "Baseline Label",
+      "baseline_placeholder": "e.g. Before NEXUS Launch",
+      "baseline_description": "A short name to identify this snapshot (e.g. \"Q1 2025 Pre-launch\")",
+      "period_start": "Period Start",
+      "period_start_description": "Reference period start",
+      "period_end": "Period End",
+      "period_end_description": "Reference period end",
+      "notes_source": "Notes / source (optional)",
+      "notes_placeholder": "e.g. 'GP referral data Q1 2026, member survey March 2026, captured before platform rollout to all Gemeinden'",
+      "notes_description": "Document where these numbers come from (e.g. 'GP referral data Q1 2026', 'member survey March 2026'). Cited sources make the baseline defensible in grant reporting."
+    },
+    "table": {
+      "aria": "KPI Baselines",
+      "label": "Label",
+      "captured": "Captured",
+      "members": "Members",
+      "volunteer_hours": "Volunteer Hours",
+      "active_relationships": "Active Relationships",
+      "total_exchanges": "Total Exchanges",
+      "actions": "Actions"
+    },
+    "modal": {
+      "title_prefix": "Capture",
+      "title_suffix": "Baseline",
+      "body": "This will take a live snapshot of your community metrics right now and save it as a named baseline for future comparisons.",
+      "metrics_captured": "Metrics captured: active member count, approved volunteer hours (last 90 days), active support relationships, distinct recipients, and total exchanges."
+    },
+    "toasts": {
+      "load_failed": "Failed to load KPI baselines",
+      "comparison_failed": "Failed to load comparison",
+      "saved": "Baseline saved. Use it to compare future metrics against this snapshot.",
+      "capture_failed": "Failed to capture baseline"
+    }
+  },
+  "lead_nurture": {
+    "meta": {
+      "page_title": "Lead Nurture",
+      "title": "Lead Nurture",
+      "subtitle": "Track and nurture prospective partners - municipalities, investors, businesses, residents, and community organisations - from first contact through to onboarding."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh lead nurture contacts",
+      "export_csv": "Export CSV",
+      "edit": "Edit",
+      "mark_unsubscribed": "Mark unsubscribed",
+      "unsubscribe_aria": "Unsubscribe contact",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "The Lead Nurture tracker is a lightweight CRM for NEXUS deployment opportunities. When a municipality, potential funder, or business partner expresses interest, add them here and track their progress through the funnel. Use the stage field to record where each contact is in the conversation, and the follow-up date to ensure no one goes cold. Export to CSV for reporting or import into an external CRM."
+    },
+    "summary": {
+      "title": "Summary",
+      "total_contacts": "total contacts",
+      "by_segment": "By segment:",
+      "by_stage": "By stage:"
+    },
+    "filters": {
+      "title": "Filters",
+      "segment": "Segment",
+      "segment_description": "municipality: local gov; investor: funder; business: sponsorship; resident: individual; partner: NGO/charity.",
+      "stage": "Stage",
+      "all_segments": "All segments",
+      "all_stages": "All stages"
+    },
+    "contacts": {
+      "title": "Contacts ({{count}})",
+      "empty": "No contacts match the current filters.",
+      "table_aria": "Lead nurture contacts"
+    },
+    "table": {
+      "name_email": "Name / Email",
+      "organisation": "Organisation",
+      "segment": "Segment",
+      "stage": "Stage",
+      "source": "Source",
+      "captured": "Captured",
+      "follow_up": "Follow-up",
+      "actions": "Actions"
+    },
+    "segments": {
+      "municipality": "Municipality",
+      "investor": "Investor",
+      "business": "Business",
+      "resident": "Resident",
+      "partner": "Partner"
+    },
+    "stages": {
+      "captured": "Captured",
+      "contacted": "Contacted",
+      "engaged": "Engaged",
+      "qualified": "Qualified",
+      "converted": "Converted",
+      "dormant": "Dormant",
+      "unsubscribed": "Unsubscribed"
+    },
+    "fields": {
+      "follow_up_date": "Follow-up date (ISO 8601)",
+      "follow_up_placeholder": "2026-05-15",
+      "notes": "Notes"
+    },
+    "modal": {
+      "title": "Edit contact",
+      "stage_description": "captured: first contact; contacted: reached out; engaged: active conversation; qualified: interest and budget confirmed; converted: signed up; dormant: gone quiet; unsubscribed: opted out."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "confirm_unsubscribe": "Mark {{email}} as unsubscribed?",
+    "toasts": {
+      "load_failed": "Failed to load lead nurture contacts",
+      "updated": "Contact updated",
+      "update_failed": "Failed to update contact",
+      "unsubscribed": "Marked unsubscribed",
+      "unsubscribe_failed": "Failed to unsubscribe",
+      "exported": "Lead list exported",
+      "export_failed": "Failed to export CSV"
+    }
+  },
+  "municipal_copilot": {
+    "meta": {
+      "page_title": "Municipal Communication Copilot",
+      "title": "Municipal Communication Copilot",
+      "subtitle": "Draft official announcements, have them polished by AI, check tone and clarity, then publish. Designed for coordinators who need to communicate with residents and municipality contacts in a consistent, accessible voice."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "generate_proposal": "Generate proposal",
+      "accept": "Accept",
+      "reject": "Reject",
+      "view": "View",
+      "cancel": "Cancel",
+      "reject_proposal": "Reject proposal",
+      "publish": "Publish"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "The Municipal Copilot helps you write announcements that are clear, appropriately formal, and free of jargon. Paste a rough draft - the AI will suggest improvements, flag tone issues (too formal, condescending, or unclear), and list any moderation concerns. You review and accept or reject the suggestion before anything is published."
+    },
+    "sections": {
+      "new_draft": "New draft",
+      "latest_proposal": "Latest proposal",
+      "clarity_warnings": "Clarity warnings",
+      "moderation_flags": "Moderation flags",
+      "recent_proposals": "Recent proposals"
+    },
+    "fields": {
+      "draft_announcement": "Draft announcement",
+      "draft_placeholder": "Paste a rough draft - the copilot will polish, check tone, and flag issues.",
+      "character_count": "{{count}} / 4000 characters",
+      "audience_hint": "Audience hint (optional)",
+      "audience_placeholder": "e.g. caregivers in north sub-region",
+      "audience_description": "Specify who this announcement is for (e.g. 'all residents', 'volunteers', 'municipality contacts') so the AI can calibrate the tone and vocabulary appropriately.",
+      "polished_text": "Polished text",
+      "reason": "Reason",
+      "reason_placeholder": "Why is this proposal being rejected?"
+    },
+    "status": {
+      "proposed": "Proposed",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "published": "Published"
+    },
+    "tone": {
+      "too_formal": "Too formal",
+      "too_informal": "Too informal",
+      "condescending": "Condescending",
+      "ok": "Tone OK"
+    },
+    "tone_legend": {
+      "prefix": "Tone legend -",
+      "too_formal": "overly bureaucratic",
+      "too_informal": "may seem unprofessional",
+      "condescending": "may patronise the reader",
+      "ok": "no tone issues detected"
+    },
+    "labels": {
+      "audience": "Audience: {{audience}}",
+      "model": "Model: {{model}}"
+    },
+    "states": {
+      "accepted": "Accepted but not published yet. Press Publish to send it as an announcement.",
+      "rejected_reason": "Rejected - reason: {{reason}}",
+      "published": "Published as announcement #{{id}}."
+    },
+    "empty": {
+      "value": "-",
+      "no_latest": "No proposal yet. Generate one from the draft on the left.",
+      "no_proposals": "No proposals yet. Drafts you analyse will appear here as an audit trail."
+    },
+    "table": {
+      "aria": "Recent copilot proposals",
+      "status": "STATUS",
+      "draft": "DRAFT",
+      "audience": "AUDIENCE",
+      "tone": "TONE",
+      "created": "CREATED",
+      "actions": "ACTIONS"
+    },
+    "modal": {
+      "reject_title": "Reject proposal"
+    },
+    "toasts": {
+      "load_failed": "Failed to load copilot proposals",
+      "enter_draft": "Enter a draft first",
+      "draft_too_long": "Draft is too long (max 4000 characters)",
+      "generated": "Proposal generated",
+      "generate_failed": "Failed to generate proposal",
+      "accepted": "Proposal accepted and published as an announcement",
+      "accept_failed": "Failed to accept proposal",
+      "reason_required": "Reason is required",
+      "rejected": "Proposal rejected",
+      "reject_failed": "Failed to reject proposal",
+      "publish_failed": "Proposal accepted, but publishing failed - press Publish to retry"
+    }
+  },
+  "municipal_roi_page": {
+    "meta": {
+      "page_title": "Municipal Impact Report",
+      "title": "Municipal Impact Report",
+      "subtitle": "Evidence for B2G procurement - care cost offsets and social capital metrics"
+    },
+    "actions": {
+      "export_csv": "Export CSV",
+      "refresh_data": "Refresh data",
+      "refresh_aria": "Refresh municipal impact report"
+    },
+    "about": {
+      "title": "About this page",
+      "body_prefix": "The Municipal",
+      "body_middle": "Report calculates the social and economic value of your community care programme using the",
+      "body_suffix": "Caring Community methodology. It shows the estimated cost offset to formal care services (Spitex/Pflege), the social value generated, and trend data across reporting periods. This report is designed to be shared with municipal partners and funders as evidence of the programme's impact.",
+      "formula_prefix": "Cost offset = total approved care hours x",
+      "formula_suffix": "hourly rate x prevention multiplier. The prevention multiplier (default: 2.0) reflects that one hour of informal care prevents approximately two hours of formal care intervention, based on Caring Community research."
+    },
+    "filters": {
+      "from": "From",
+      "to": "To",
+      "sub_region": "Sub-region",
+      "all_sub_regions": "All sub-regions",
+      "period": "Period: {{from}} -> {{to}}"
+    },
+    "methodology": {
+      "hours_valued_at": "Hours valued at",
+      "hours_are_valued_at": "Hours are valued at",
+      "chf_per_hour": "CHF {{amount}}/hr",
+      "default_rate": "CHF 35/hr",
+      "tenant_setting_source": "configured for this tenant",
+      "default_source": "Swiss formal care assistant rate, SECO 2024",
+      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
+      "prevention_value_suffix": "evaluation methodology.",
+      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
+      "default_prevention_suffix": "evaluation methodology.",
+      "substitution_applied": "Hours are weighted by per-category substitution coefficients.",
+      "substitution_not_applied": "All hours weighted at 1.0x."
+    },
+    "stats": {
+      "total_hours": "Total Hours",
+      "active_members": "Active Members",
+      "active_relationships": "Active Relationships",
+      "care_recipients": "Care Recipients",
+      "weighted_hours_tooltip": "Hours are weighted by category-specific substitution rates (e.g. companionship 0.4x, transport 0.7x, errands 1.0x) per Caring Community methodology.",
+      "weighted_hours_note": "{{hours}} weighted hours after substitution coefficients"
+    },
+    "roi": {
+      "title": "Estimated Care Cost Offset",
+      "yoy": "{{value}} YoY",
+      "prevented_this_period": "in formal care costs prevented this period",
+      "prevention_value": "Prevention value",
+      "multiplier_note": " ({{multiplier}}x multiplier)",
+      "default_multiplier_note": " (2x multiplier)",
+      "social_isolation_supported": "People supported out of social isolation"
+    },
+    "municipalities": {
+      "title": "What this means for municipalities",
+      "point_hour_prefix": "Every hour of community caring time saves approximately",
+      "point_hour_suffix": "in formal care costs",
+      "point_prevention": "Preventative community support can reduce residential care needs - estimated 2x multiplier",
+      "point_nexus": "makes this impact measurable, auditable, and reportable for cantonal and municipal procurement",
+      "point_export": "CSV export available - use the button in the page header for Caring Community, Pro Senectute, and cantonal social department reporting."
+    },
+    "breakdown": {
+      "title": "Breakdown by sub-region",
+      "description": "Sub-region breakdown shows which neighbourhoods are generating the most care activity. Use this to identify areas that may need more coordinator support or volunteer recruitment.",
+      "aria": "Sub-region breakdown",
+      "sub_region": "Sub-region",
+      "hours": "Hours",
+      "weighted_hours": "Weighted hours",
+      "formal_care_offset": "Formal care offset"
+    },
+    "toasts": {
+      "load_failed": "Failed to load municipal impact data",
+      "export_failed": "Failed to export CSV"
+    }
+  },
+  "municipal_verification": {
+    "meta": {
+      "page_title": "Municipal verification",
+      "title": "Municipal verification",
+      "description": "Mark this community as a verified municipal partner. Adds a 'Verified municipality' badge to public reports."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "generate_dns_token": "Generate DNS token",
+      "apply_attestation": "Apply attestation",
+      "revoke": "Revoke",
+      "cancel": "Cancel"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Municipal Verification records the formal sign-off from a municipality or canton partner that this community care programme meets their requirements. Verification is required for the Pilot Launch Readiness check and unlocks the Municipal Impact Report. Use DNS TXT verification for official municipal domains, or apply an admin attestation if DNS control is not available.",
+      "pending_dns": "Verification token generated - awaiting DNS propagation and confirmation.",
+      "verified": "Formally verified - the municipal reporting pack is unlocked.",
+      "revoked": "Verification was removed - re-verify to restore access."
+    },
+    "status": {
+      "verified": "Verified",
+      "pending_dns": "Pending DNS",
+      "revoked": "Revoked"
+    },
+    "current": {
+      "title": "Current status",
+      "verified_on": "Verified on {{date}}",
+      "not_verified": "This tenant is not currently verified. Use the options below to start a DNS verification or apply a manual admin attestation."
+    },
+    "request": {
+      "title": "Request verification",
+      "method_aria": "Verification method",
+      "dns_tab": "DNS TXT (preferred)",
+      "dns_body": "Provide the official municipality domain you control. We'll generate a DNS TXT record for you to publish; once it propagates, the system marks this tenant as verified.",
+      "attestation_tab": "Admin attestation",
+      "attestation_body": "Use this only when DNS control is not available. The verification is recorded as manually attested by an admin."
+    },
+    "fields": {
+      "municipality_domain": "Municipality domain",
+      "domain_or_organisation": "Domain or organisation",
+      "domain_placeholder": "e.g. zurich.ch",
+      "attestation_note": "Attestation note (optional)",
+      "attestation_description": "Why are you attesting this without DNS verification? (Audit trail.)"
+    },
+    "history": {
+      "title": "Verifications",
+      "empty": "No verification records yet.",
+      "via_method": "via {{method}}",
+      "updated": "Updated {{date}}"
+    },
+    "dns": {
+      "publish_record": "Publish this TXT record on your DNS, then wait for propagation:",
+      "record_name": "Record name",
+      "value": "Value",
+      "type_label": "Type",
+      "ttl_label": "TTL",
+      "txt_type": "TXT",
+      "ttl_value": "300"
+    },
+    "revoke_modal": {
+      "title": "Revoke verification?",
+      "body_prefix": "Revoke verification for",
+      "body_suffix": "This removes the verified badge and the verification record will be marked as revoked."
+    },
+    "validation": {
+      "domain_required": "Enter a domain"
+    },
+    "toasts": {
+      "load_failed": "Failed to load verification status",
+      "dns_generated": "DNS verification token generated",
+      "dns_failed": "Failed to start DNS verification",
+      "attested": "Verification attested",
+      "attest_failed": "Failed to attest verification",
+      "revoked": "Verification revoked",
+      "revoke_failed": "Failed to revoke verification"
+    }
+  },
+  "pilot_launch_readiness": {
+    "meta": {
+      "page_title": "Pilot Launch Readiness",
+      "title": "Pilot Launch Readiness",
+      "subtitle": "AG95 - go/no-go report combining AG80-AG87 evaluation surfaces"
+    },
+    "actions": {
+      "launch_pilot": "Launch pilot",
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh launch-readiness report",
+      "retry": "Retry",
+      "open": "Open",
+      "acknowledge_default_matrix": "Acknowledge default matrix",
+      "cancel": "Cancel",
+      "confirm_launch": "Yes, launch the pilot"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "This is the go/no-go gate before your Caring Community pilot goes live. Each section below corresponds to a configuration or evaluation module (AG80-AG87). All sections must reach Ready status before the Launch button is enabled. Once launched, this is a one-way action - the launch timestamp and operator are recorded permanently.",
+      "review_help": "Sections showing Needs review have missing or incomplete configuration. Click through to the relevant module to resolve the listed items."
+    },
+    "status": {
+      "ready": "Ready",
+      "needs_review": "Needs review",
+      "not_started": "Not started",
+      "blocked": "Blocked"
+    },
+    "missing": {
+      "controller_name": "Controller name",
+      "controller_contact_email": "Controller contact email",
+      "controller_data_protection_officer": "Data protection officer",
+      "incident_response_contact_email": "Incident response contact email",
+      "workshop_not_run": "Operating policy workshop not run",
+      "policy_appendix_url": "Policy appendix URL",
+      "safeguarding_escalation_user_id": "Safeguarding escalation contact",
+      "acknowledgement": "Coordinator acknowledgement",
+      "pre_pilot_baseline": "Pre-pilot scoreboard baseline",
+      "danger_checks": "Data quality issues",
+      "backlog_empty": "Integration backlog empty"
+    },
+    "states": {
+      "launched_title": "Pilot launched",
+      "launched_body": "Launched on {{date}}{{user}}. This is a one-way milestone - readiness checks remain visible for audit.",
+      "launched_by_user": " by user #{{id}}",
+      "ready_title": "Ready to launch",
+      "ready_body_prefix": "Every readiness section is ready. Click",
+      "ready_body_suffix": "when your coordinator team is ready to make this a one-way decision.",
+      "blocked_title": "Cannot launch yet - {{count}} blocker remains",
+      "blocked_title_plural": "Cannot launch yet - {{count}} blockers remain",
+      "blocked_body": "Resolve every section below before the launch button is enabled."
+    },
+    "overall": {
+      "ready": "Pilot is ready to launch",
+      "blocked": "Launch blocked - fix issues first",
+      "not_started": "Pilot evaluation not yet run",
+      "needs_review": "Pilot needs coordinator review"
+    },
+    "progress": {
+      "ready_count": "{{ready}} / {{total}} ready",
+      "aria": "Launch readiness progress"
+    },
+    "isolated_node": {
+      "required": "Isolated-node gate is active - this deployment is configured as a canton-isolated node (AG85). All items must reach Decided status before launch.",
+      "informational": "Isolated-node gate is informational for standard hosted deployments. It only blocks launch when AG85 deployment_mode is set to canton_isolated_node. If your municipality has not specified an isolated-node requirement, you can disregard items in this section."
+    },
+    "timestamps": {
+      "last_updated": "Last updated {{date}}",
+      "report_generated": "Report generated {{date}}. Click any section to open the corresponding admin surface."
+    },
+    "modal": {
+      "title": "Launch the pilot?",
+      "body_prefix": "Launching the pilot is a",
+      "one_way_action": "one-way action",
+      "body_suffix": "It records the launch timestamp and operator on the tenant, and platform reports begin treating the community as live.",
+      "confirm_intro": "Before continuing, confirm with your coordinator team that:",
+      "check_disclosure": "The disclosure pack, operating policy, and commercial boundary are signed off",
+      "check_baseline": "The pre-pilot scoreboard baseline has been captured",
+      "check_data_quality": "Data quality checks are green",
+      "check_residents": "Real residents are ready to be invited",
+      "section_summary": "Section summary"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "more_count": "+{{count}} more",
+    "toasts": {
+      "load_failed": "Failed to load launch-readiness report",
+      "boundary_acknowledged": "Commercial boundary acknowledged",
+      "boundary_acknowledge_failed": "Failed to acknowledge boundary",
+      "launch_success": "Pilot launched successfully.",
+      "cannot_launch": "Cannot launch - readiness gate is not closed.",
+      "already_launched": "This pilot has already been launched.",
+      "launch_failed": "Failed to launch pilot."
+    },
+    "errors": {
+      "load_failed": "The launch-readiness report could not be loaded.",
+      "unexpected_response": "The launch-readiness report returned an unexpected response.",
+      "unavailable_title": "Readiness report unavailable"
+    }
+  },
+  "pilot_scoreboard": {
+    "meta": {
+      "title": "Pilot Success Scoreboard",
+      "subtitle": "AG83 - pre-pilot baseline + 90-day rolling metrics with quarterly review cadence"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "pre_set": "Pre-pilot baseline set",
+      "capture_pre": "Capture pre-pilot baseline",
+      "capture_quarterly": "Capture quarterly review",
+      "capture_baseline": "Capture baseline",
+      "cancel": "Cancel"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "All metrics use a 90-day rolling window. Capture a pre-pilot baseline before onboarding real residents, then run a quarterly review snapshot every 3 months. The comparison table shows how each metric has moved relative to that baseline.",
+      "methodology_prefix": "Cost offset is calculated using the",
+      "age_stiftung": "Caring Community",
+      "age_stiftung_title": "Stiftung für das Alter",
+      "methodology_middle": "methodology: hours of informal care x",
+      "methodology_suffix": "35/hr (Swiss formal-care assistant rate) x 2 (prevention multiplier reflecting avoided formal care costs). This methodology is recognised by Swiss cantonal social services for pilot reporting."
+    },
+    "quarterly": {
+      "next_review": "Next quarterly review:",
+      "overdue": "Overdue"
+    },
+    "sections": {
+      "metrics": "Pilot metrics",
+      "comparing_baseline": "Comparing against pre-pilot baseline captured {{date}}",
+      "no_baseline": "No pre-pilot baseline yet - current values shown alone",
+      "captured_baselines": "Captured baselines"
+    },
+    "table": {
+      "metric": "Metric",
+      "pre_pilot": "Pre-pilot",
+      "current": "Current",
+      "delta": "Delta",
+      "change": "Change"
+    },
+    "metrics": {
+      "active_members": "Active members (90d)",
+      "first_response_hours": "Median first-response",
+      "approved_hours": "Approved hours (90d)",
+      "recurring_relationships": "Recurring relationships",
+      "coordinator_workload_hrs": "Coordinator workload",
+      "satisfaction_score": "Satisfaction score (1-5)",
+      "social_isolation_pct": "Social isolation proxy",
+      "comms_reach_pct": "Comms reach",
+      "business_participation": "Active businesses (90d)",
+      "cost_offset_chf": "Estimated cost offset (CHF)"
+    },
+    "baselines": {
+      "label": "Label",
+      "captured": "Captured",
+      "period": "Period",
+      "type": "Type",
+      "notes": "Notes",
+      "pre_pilot": "Pre-pilot",
+      "quarterly": "Quarterly"
+    },
+    "fields": {
+      "notes_optional": "Notes (optional)",
+      "label_optional": "Label (optional)"
+    },
+    "pre_modal": {
+      "title": "Capture pre-pilot baseline",
+      "body": "Capture this ONCE before onboarding real residents. It freezes the current 90-day metrics as your comparison baseline. All future quarterly reviews will calculate delta against this snapshot. This action cannot be undone.",
+      "notes_placeholder": "Pilot region, participating municipality, decisions made before launch..."
+    },
+    "quarterly_modal": {
+      "title": "Capture quarterly review",
+      "body": "Run every 3 months after pilot launch. The snapshot label defaults to the current quarter (e.g. Q2_2026) but you can customise it. Add notes to record what changed since the last review - milestones reached, policy changes, resident feedback. Snapshot covers the most recent 90-day window from today.",
+      "label_placeholder": "quarterly_2026_07",
+      "label_description": "Use a recognisable label such as Q2_2026 or 2026_Q3. Defaults to quarterly_YYYY_MM.",
+      "notes_placeholder": "What changed this quarter, milestones reached..."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "currency": {
+      "chf": "CHF"
+    },
+    "methodology": {
+      "prefix": "Methodology: hours x",
+      "per_hour": "/hr x",
+      "multiplier": "prevention multiplier.",
+      "window": "Window: {{days}} days."
+    },
+    "toasts": {
+      "load_failed": "Failed to load pilot scoreboard",
+      "pre_captured": "Pre-pilot baseline captured",
+      "pre_failed": "Failed to capture pre-pilot baseline",
+      "quarterly_captured": "Quarterly review captured",
+      "quarterly_failed": "Failed to capture quarterly review"
+    }
+  },
+  "research_partnerships": {
+    "meta": {
+      "title": "Research Partnerships",
+      "subtitle": "Manage privacy-safe research partners, aggregate dataset exports, and revocation history"
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "refresh_aria": "Refresh research partnerships",
+      "generate_export": "Generate export",
+      "add_partner": "Add partner",
+      "view": "View",
+      "open": "Open",
+      "revoke": "Revoke",
+      "cancel": "Cancel",
+      "create": "Create",
+      "close": "Close",
+      "download_markdown": "Download Markdown",
+      "render": "Render",
+      "rerender": "Re-render",
+      "generate": "Generate"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Research partnerships give approved academic or policy researchers controlled access to anonymised platform data for evaluation purposes. Each partnership defines a specific data scope, a duration, and a data sharing agreement. All access is logged. Partners never see individual member data - only aggregated or anonymised datasets.",
+      "data_scope_label": "Data scope:",
+      "data_scope_body": "Define exactly what data the researcher can access, for example aggregate monthly care hours by sub-region, excluding all personal identifiers. The scope is contractually binding and audited quarterly.",
+      "download_history_label": "Download history:",
+      "download_history_body": "Every data export is logged with a timestamp and the researcher's details. This log is available to your Data Protection Officer on request. Use Revoke to withdraw a previously issued dataset."
+    },
+    "partners": {
+      "title": "Research Partners",
+      "table_aria": "Research partners",
+      "empty": "No research partners yet."
+    },
+    "templates": {
+      "title": "Agreement Templates",
+      "subtitle": "FADP/nDSG-aligned drafts for legal review",
+      "empty": "No agreement templates available.",
+      "placeholder_count_one": "{{count}} placeholder",
+      "placeholder_count_other": "{{count}} placeholders",
+      "fallback_title": "Agreement Template",
+      "placeholder_label": "{{placeholder}}",
+      "rendered_markdown": "Rendered Markdown ({{count}} chars)",
+      "missing_placeholder_count_one": "{{count}} placeholder missing",
+      "missing_placeholder_count_other": "{{count}} placeholders missing"
+    },
+    "exports": {
+      "title": "Dataset Export History",
+      "table_aria": "Research dataset exports",
+      "empty": "No dataset exports yet.",
+      "partner_fallback": "Partner #{{id}}"
+    },
+    "columns": {
+      "partner": "Partner",
+      "status": "Status",
+      "agreement": "Agreement",
+      "methodology": "Methodology",
+      "created": "Created",
+      "period": "Period",
+      "rows": "Rows",
+      "hash": "Hash",
+      "actions": "Actions"
+    },
+    "fields": {
+      "name": "Name",
+      "institution": "Institution",
+      "contact_email": "Contact email",
+      "agreement_reference": "Agreement reference",
+      "methodology_url": "Methodology URL",
+      "status": "Status",
+      "dataset_scope": "Dataset scope",
+      "dataset_scope_description": "Comma-separated dataset keys.",
+      "period_start": "Period start",
+      "period_end": "Period end"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "active": "Active",
+      "paused": "Paused",
+      "ended": "Ended",
+      "generated": "Generated",
+      "superseded": "Superseded",
+      "revoked": "Revoked"
+    },
+    "partner_modal": {
+      "title": "Add Research Partner"
+    },
+    "export_modal": {
+      "title": "Generate Aggregate Dataset",
+      "active_partner": "Active research partner",
+      "privacy_note": "Exports are aggregate only and use suppression thresholds. Direct member identifiers are not included."
+    },
+    "toasts": {
+      "load_failed": "Failed to load research partnerships",
+      "render_template_failed": "Failed to render template",
+      "create_partner_failed": "Failed to create research partner",
+      "partner_created": "Research partner created",
+      "generate_export_failed": "Failed to generate dataset export",
+      "export_generated": "Aggregate dataset export generated",
+      "revoke_export_failed": "Failed to revoke dataset export",
+      "export_revoked": "Dataset export revoked"
+    }
+  },
+  "smart_nudges": {
+    "meta": {
+      "page_title": "Smart member nudges",
+      "title": "Smart member nudges",
+      "description": "Automated suggestions that nudge members toward high-fit tandem partners. Conservative defaults - runs on a daily cap."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "dry_run": "Dry-run",
+      "dispatch_now": "Dispatch now",
+      "save_configuration": "Save configuration",
+      "cancel": "Cancel",
+      "dispatch": "Dispatch"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Smart Nudges are automated prompts sent to members when a high-fit tandem-match partner is detected. Members who would benefit from a peer connection are identified by the matching engine and sent an in-app notification (and optionally email) suggesting they connect. Nudges respect a cooldown window so no member is contacted too frequently. Use the dry-run to preview who would be nudged before dispatching for real.",
+      "inactivity_label": "Inactivity",
+      "inactivity_body": "triggered when a member hasn't logged in for the configured number of days",
+      "unmatched_request_label": "Unmatched request",
+      "unmatched_request_body": "triggered when a help request has no offers after the cooldown window passes",
+      "follow_up_label": "Follow-up",
+      "follow_up_body": "sent to the coordinator after an approved exchange hasn't been marked complete"
+    },
+    "stats": {
+      "sent_30d": "Sent (30d)",
+      "conversion_30d": "Conversion (30d)",
+      "eligible_candidates": "Eligible candidates",
+      "opted_out": "Opted out"
+    },
+    "chart": {
+      "title": "Daily nudges (last 30 days)",
+      "sent": "Sent",
+      "converted": "Converted"
+    },
+    "config": {
+      "title": "Configuration",
+      "engine_enabled": "Engine enabled",
+      "engine_description": "When off, no nudges are dispatched.",
+      "min_score": "Minimum score (0.40 - 0.95)",
+      "min_score_description": "Tandem-match score threshold for sending a nudge",
+      "cooldown_days": "Cooldown (days)",
+      "cooldown_description": "Wait this long before nudging the same pair again",
+      "daily_limit": "Daily limit",
+      "daily_limit_description": "Maximum nudges per day across the whole tenant",
+      "save_note": "Changes take effect immediately - the next scheduled nudge run will apply the new settings."
+    },
+    "dry_run": {
+      "title": "Dry-run preview",
+      "candidates": "{{count}} candidates",
+      "empty": "No eligible candidates right now.",
+      "table_aria": "Dry-run nudge candidates"
+    },
+    "recent": {
+      "title": "Recent nudges",
+      "empty": "No nudges sent yet.",
+      "table_aria": "Recent smart nudges"
+    },
+    "table": {
+      "target_user": "Target user",
+      "target": "Target",
+      "suggested_partner": "Suggested partner",
+      "score": "Score",
+      "sent": "Sent",
+      "status": "Status"
+    },
+    "status": {
+      "sent": "Sent",
+      "converted": "Converted"
+    },
+    "dispatch_modal": {
+      "title": "Dispatch nudges now?",
+      "body_prefix": "This will send up to",
+      "body_suffix": "nudge notifications to eligible members right now. Make sure you've reviewed a dry-run first."
+    },
+    "toasts": {
+      "load_failed": "Failed to load nudge analytics",
+      "config_saved": "Nudge config saved. The updated rules will apply on the next scheduled run.",
+      "save_failed": "Failed to save configuration",
+      "dry_run": "Dry run: {{count}} eligible candidates",
+      "dispatched": "Dispatched {{count}} nudges",
+      "dispatch_failed": "Dispatch failed"
+    }
+  },
+  "sub_regions": {
+    "meta": {
+      "page_title": "Sub-Regions - Admin",
+      "title": "Sub-Regions",
+      "subtitle": "Quartier, Ortsteil, Gemeinde and Kanton subdivisions for the care provider directory and locality filters"
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Sub-Regions divide your community into geographical areas (neighbourhoods, districts, or wards). They are used to assign coordinators to specific areas, filter help requests by location, and break down pilot metrics by neighbourhood. Adding sub-regions is optional but strongly recommended for larger communities with multiple coordinator teams.",
+      "postal_codes_note": "For the Postal codes field: enter a postcode list, neighbourhood name, or freeform description. Precise boundaries are not required - this is for coordinator assignment and reporting filters, not mapping."
+    },
+    "actions": {
+      "add": "Add Sub-Region",
+      "edit_aria": "Edit sub-region",
+      "mark_inactive": "Mark inactive",
+      "cancel": "Cancel",
+      "save_changes": "Save changes",
+      "create": "Create Sub-Region"
+    },
+    "filters": {
+      "search_aria": "Search sub-regions",
+      "search_placeholder": "Search by name, description or slug...",
+      "type_aria": "Filter by type"
+    },
+    "table": {
+      "aria": "Sub-regions table",
+      "name": "Name",
+      "type": "Type",
+      "postal_codes": "Postal codes",
+      "coordinates": "Coordinates",
+      "status": "Status",
+      "actions": "Actions",
+      "empty": "No sub-regions yet - add one to start segmenting your tenant geographically."
+    },
+    "type_options": {
+      "all": "All types",
+      "quartier": "Quartier (neighbourhood)",
+      "ortsteil": "Ortsteil (district)",
+      "municipality": "Municipality (Gemeinde)",
+      "canton": "Canton",
+      "other": "Other"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "modal": {
+      "add_title": "Add Sub-Region",
+      "edit_title": "Edit: {{name}}"
+    },
+    "form": {
+      "name": "Name",
+      "name_placeholder": "e.g. Lorzenhof",
+      "slug": "Slug (auto-generated if blank)",
+      "slug_placeholder": "e.g. lorzenhof",
+      "slug_description": "Lowercase, hyphenated identifier used in URLs and filters.",
+      "type": "Type",
+      "description": "Description",
+      "description_placeholder": "Brief description of this area...",
+      "postal_codes": "Postal codes",
+      "postal_codes_placeholder": "6330, 6331, 6332",
+      "postal_codes_description": "Comma- or space-separated PLZ list.",
+      "centre_latitude": "Centre latitude",
+      "latitude_placeholder": "47.1758",
+      "centre_longitude": "Centre longitude",
+      "longitude_placeholder": "8.4622",
+      "status": "Status"
+    },
+    "validation": {
+      "name_required": "Name is required.",
+      "type_required": "Type is required.",
+      "latitude_number": "Latitude must be a number.",
+      "longitude_number": "Longitude must be a number."
+    },
+    "toasts": {
+      "created": "Sub-region created successfully.",
+      "updated": "Sub-region updated successfully.",
+      "marked_inactive": "Sub-region marked inactive."
+    },
+    "errors": {
+      "load_failed": "Failed to load sub-regions.",
+      "save_failed": "Failed to save sub-region.",
+      "delete_failed": "Failed to delete sub-region."
+    },
+    "confirm_mark_inactive": "Mark \"{{name}}\" as inactive? Linked care providers will be detached from it."
+  },
+  "success_stories_admin": {
+    "meta": {
+      "title": "Success Stories",
+      "subtitle": "Create and manage proof cards that demonstrate the community's impact - designed for sharing with procurement officers, funders, and municipal partners."
+    },
+    "about": {
+      "title": "About this page",
+      "body": "Proof cards are structured impact stories tied to live metrics from the platform. Each card shows a before/after comparison with a cited evidence source and methodology note. Cards marked as \"Demo\" are illustrative only; mark a card as \"Real evidence\" once you have verified the data. Published cards appear in the Municipal Impact Report and the public-facing impact page."
+    },
+    "actions": {
+      "refresh": "Refresh",
+      "new_story": "New story",
+      "seed_demo": "Seed 3 demo cards",
+      "refresh_live": "Refresh from live data",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save_changes": "Save changes",
+      "create_story": "Create story",
+      "remove": "Remove"
+    },
+    "empty": {
+      "title": "No success stories yet",
+      "body": "Seed 3 illustrative demo cards to show what proof cards look like to procurement officers and funders. They are clearly labelled \"Demo / illustrative\" until you mark them as real evidence by hand."
+    },
+    "table": {
+      "aria": "Success stories",
+      "title": "Title",
+      "status": "Status",
+      "demo": "Demo",
+      "audience": "Audience",
+      "metric": "Metric",
+      "row_actions": "Row actions",
+      "actions": "Actions"
+    },
+    "status": {
+      "published": "Published",
+      "unpublished": "Unpublished",
+      "demo": "Demo",
+      "real": "Real"
+    },
+    "metric_sources": {
+      "pilot_scoreboard": "AG83 pilot scoreboard",
+      "municipal_roi": "AG76 municipal ROI",
+      "manual": "Manual / illustrative"
+    },
+    "audience": {
+      "all_residents": "All residents",
+      "municipality": "Municipality",
+      "kanton": "Kanton",
+      "verein_members": "Verein members",
+      "volunteers": "Volunteers",
+      "recipients": "Care recipients"
+    },
+    "editor": {
+      "new_title": "New success story",
+      "edit_title": "Edit: {{title}}",
+      "title": "Title",
+      "title_placeholder": "e.g. 30% lower information distribution effort",
+      "narrative": "Narrative",
+      "narrative_placeholder": "2-4 sentences explaining the story to a procurement officer or funder.",
+      "metric_source": "Metric source",
+      "metric_source_description": "pilot_scoreboard: auto-pulls from AG83; municipal_roi: auto-pulls from AG76; manual: you enter values by hand.",
+      "metric_key": "Metric key",
+      "metric_key_placeholder": "e.g. approved_hours, formal_care_offset_chf",
+      "metric_key_description": "Required for non-manual sources",
+      "before_value": "Before value",
+      "after_value": "After value",
+      "unit": "Unit",
+      "unit_placeholder": "e.g. hours, CHF, %",
+      "audience": "Audience",
+      "sub_region_id": "Sub-region ID (optional)",
+      "sub_region_placeholder": "Leave blank for all",
+      "method_caveat": "Method caveat",
+      "method_caveat_placeholder": "e.g. \"Pilot region only; n=42 members; 90-day window\"",
+      "method_caveat_description": "Required - a one-sentence note on methodology limitations. Keeps claims honest with funders. Example: 'Based on self-reported hours; external audit pending.'",
+      "evidence_source": "Evidence source",
+      "evidence_source_placeholder": "e.g. \"AG83 pilot scoreboard 2026-04-30 baseline\"",
+      "evidence_source_description": "Required - where the number comes from. Example: 'NEXUS platform data, 90-day rolling window ending 2026-04-01' or 'Swiss Federal Statistical Office 2023.'",
+      "demo_label": "Demo / illustrative",
+      "demo_description": "Card is labelled as demo on the gallery",
+      "published_label": "Published",
+      "published_description": "Visible on the member-facing gallery"
+    },
+    "delete_modal": {
+      "title": "Remove success story",
+      "body_prefix": "This will permanently remove",
+      "body_suffix": "from the gallery.",
+      "warning": "This action cannot be undone."
+    },
+    "toasts": {
+      "load_failed": "Failed to load success stories",
+      "seeded": "Seeded 3 demo cards",
+      "seed_failed": "Seed failed",
+      "updated": "Story updated",
+      "update_failed": "Update failed",
+      "created": "Story created",
+      "create_failed": "Create failed",
+      "removed": "Story removed",
+      "delete_failed": "Delete failed",
+      "metric_refreshed": "Live metric refreshed",
+      "refresh_failed": "Refresh failed"
+    }
+  }
+}

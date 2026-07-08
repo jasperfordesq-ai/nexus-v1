@@ -76,7 +76,7 @@ function renderRating(rating: number) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MarketplaceSellerAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_marketplace');
   usePageTitle(t('marketplace.sellers_page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

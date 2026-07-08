@@ -1,0 +1,180 @@
+{
+  "common": {
+    "an_unexpected_error": "予期しないエラーが発生しました",
+    "back": "戻る",
+    "cancel": "キャンセル",
+    "critical": "クリティカル",
+    "delete": "削除",
+    "feature": "特徴",
+    "high": "高",
+    "in_progress": "進行中",
+    "in_review": "レビュー中",
+    "low": "低い",
+    "medium": "中",
+    "planned": "計画済み",
+    "refresh": "リフレッシュ",
+    "unexpected_error": "予期しないエラー",
+    "unknown": "未知",
+    "unfeature": "特徴がない",
+    "actions": "アクション",
+    "active": "アクティブ",
+    "all": "すべて",
+    "approved": "承認済み",
+    "clear": "クリア",
+    "clear_filters": "フィルターをクリアする",
+    "clear_selection": "選択をクリア",
+    "close": "閉じる",
+    "collapse": "崩壊する",
+    "confirm": "確認する",
+    "create": "作成",
+    "declined": "拒否されました",
+    "download": "ダウンロード",
+    "edit": "編集",
+    "error_loading_data": "データ読み込みエラー",
+    "expand": "展開する",
+    "export": "エクスポート",
+    "load_more": "もっと読み込む",
+    "loading": "読み込み中",
+    "next": "次へ",
+    "no": "いいえ",
+    "ok": "OK",
+    "pending": "保留中",
+    "previous": "前へ",
+    "retry": "再試行",
+    "save": "保存",
+    "select_all": "すべて選択",
+    "select_item": "項目の選択",
+    "yes": "はい"
+  },
+  "shared": {
+    "broker_actions": "ブローカーのアクション",
+    "content": "内容",
+    "core_module": "コアモジュール",
+    "document_details": "文書の詳細",
+    "history": "歴史",
+    "log_file_empty": "ログファイルが見つかりません",
+    "no": "いいえ",
+    "no_history_available": "利用可能な履歴が見つかりません",
+    "no_legal_documents_found": "法的文書が見つかりませんでした",
+    "no_members_found": "メンバーが見つかりませんでした",
+    "loading": "Loading",
+    "no_data": "データなし",
+    "no_data_available": "利用可能なデータがありません",
+    "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
+    "open_page_help": "ページのヘルプを開く",
+    "help": "ヘルプ",
+    "quick_access": "クイックアクセス",
+    "recent_activity": "最近の活動",
+    "refresh": "リフレッシュ",
+    "search": "検索...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "データ",
+    "total_count": "{{count}}合計"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "インバウンド API パートナー"
+    },
+    "header": {
+      "title": "インバウンド API パートナー",
+      "description": "銀行や市議会のシステムなど、承認された外部システムに、NEXUS データへの安全なアクセス キーを提供します。別のタイムバンク プラットフォームに接続するには、代わりに外部プロトコル パートナーを使用してください。"
+    },
+    "actions": {
+      "activate": "活性化",
+      "cancel": "キャンセル",
+      "close": "近い",
+      "new_partner": "新しいパートナー",
+      "regenerate_credentials": "資格情報を再生成する",
+      "suspend": "つるす",
+      "view_call_log": "通話記録を表示する"
+    },
+    "call_log": {
+      "table_aria": "最近の通話",
+      "columns": {
+        "duration": "間隔",
+        "method": "方法",
+        "path": "パス",
+        "status": "状態",
+        "when": "いつ"
+      }
+    },
+    "columns": {
+      "actions": "アクション",
+      "name": "名前",
+      "rate_limit": "レート制限",
+      "sandbox": "サンドボックス",
+      "scopes": "スコープ",
+      "slug": "ナメクジ",
+      "status": "状態"
+    },
+    "common": {
+      "any": "どれでも",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ミリ秒",
+      "no": "いいえ",
+      "per_minute": "{{value}}/分",
+      "yes": "はい"
+    },
+    "confirm": {
+      "regenerate_credentials": "このパートナー用に新しいアクセス キーを作成しますか?古いキーはすぐに機能しなくなります。新しいキーをパートナーと共有する必要があります。"
+    },
+    "create_modal": {
+      "allowed_scopes": "許可されるスコープ",
+      "contact_email": "連絡先メールアドレス",
+      "contact_email_placeholder": "integrations@partner.example",
+      "description": "説明",
+      "name": "名前",
+      "name_placeholder": "例: PostFinance Switzerland",
+      "rate_limit": "レート制限 (リクエスト/分)",
+      "sandbox_mode": "サンドボックス (テスト) モード - パートナーはデータを表示できますが、何も変更できません。",
+      "submit": "認証情報の作成と発行",
+      "title": "新しい API パートナー"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "client_idをコピーする",
+      "copy_client_secret": "client_secretをコピーする",
+      "saved_button": "これらを保存しました",
+      "title": "発行されたクライアント認証情報",
+      "warning_body": "秘密鍵は 1 回だけ表示されます。両方の価値観をパートナーと非公開かつ安全に共有してください。公開チャットや共有ドキュメントでは決して共有しないでください。",
+      "warning_title": "今すぐこれらを保存してください。"
+    },
+    "detail": {
+      "call_log_tab": "通話履歴",
+      "contact": "接触：",
+      "info_tab": "情報",
+      "ip_allowlist": "IP 許可リスト:",
+      "rate_limit": "レート制限:",
+      "sandbox": "サンドボックス:",
+      "scopes": "範囲:",
+      "status": "状態：",
+      "tabs_aria": "パートナーの詳細タブ"
+    },
+    "empty": {
+      "no_calls": "まだ電話はありません。",
+      "no_partners": "まだパートナー システムが接続されていません。アクセス キーを作成するには 1 つ追加します。"
+    },
+    "status": {
+      "active": "アクティブ",
+      "pending": "保留中",
+      "suspended": "一時停止中"
+    },
+    "toasts": {
+      "activate_failed": "アクティブ化に失敗しました",
+      "activated": "パートナーがアクティブ化されました",
+      "copied": "{{label}} がコピーされました",
+      "copy_failed": "コピーに失敗しました - 手動でコピーします",
+      "create_failed": "作成に失敗しました",
+      "load_failed": "パートナーをロードできませんでした",
+      "name_required": "名前は必須です",
+      "regenerate_failed": "再生成に失敗しました",
+      "suspend_failed": "サスペンドに失敗しました",
+      "suspended": "パートナーの停止"
+    },
+    "table": {
+      "aria": "API パートナー"
+    }
+  }
+}

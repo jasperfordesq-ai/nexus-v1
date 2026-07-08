@@ -22,7 +22,7 @@ import type { SuperAdminUserDetail, SuperAdminTenant } from '../../api/types';
 export function SuperUserForm() {
   const { id } = useParams();
   const isEditing = !!id;
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   usePageTitle(isEditing ? t('super.title_edit_user') : t('super.title_create_user'));
   const { tenantPath } = useTenant();
   const toast = useToast();

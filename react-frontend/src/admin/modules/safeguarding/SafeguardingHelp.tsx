@@ -32,7 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { Accordion, AccordionItem, Card, CardBody, CardHeader, Chip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 
 export function SafeguardingHelp() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_safeguarding');
   const triggerRows = [
     {
       key: 'requires_broker_approval',

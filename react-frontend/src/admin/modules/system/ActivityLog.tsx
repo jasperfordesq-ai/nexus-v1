@@ -71,7 +71,7 @@ function formatDate(dateStr: string): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ActivityLog() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   usePageTitle(t('system.page_title'));
 
   const [entries, setEntries] = useState<ActivityLogEntry[]>([]);

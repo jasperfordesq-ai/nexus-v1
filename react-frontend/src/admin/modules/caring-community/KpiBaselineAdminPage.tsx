@@ -184,7 +184,7 @@ function ComparisonPanel({ result, onClose, t }: { result: ComparisonResult; onC
 // ---------------------------------------------------------------------------
 
 export default function KpiBaselineAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('kpi_baselines.meta.page_title'));
   const { showToast } = useToast();
 

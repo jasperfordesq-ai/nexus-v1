@@ -1,0 +1,265 @@
+{
+  "common": {
+    "an_unexpected_error": "予期しないエラーが発生しました",
+    "back": "戻る",
+    "cancel": "キャンセル",
+    "critical": "クリティカル",
+    "delete": "削除",
+    "feature": "特徴",
+    "high": "高",
+    "in_progress": "進行中",
+    "in_review": "レビュー中",
+    "low": "低い",
+    "medium": "中",
+    "planned": "計画済み",
+    "refresh": "リフレッシュ",
+    "unexpected_error": "予期しないエラー",
+    "unknown": "未知",
+    "unfeature": "特徴がない",
+    "actions": "アクション",
+    "active": "アクティブ",
+    "all": "すべて",
+    "approved": "承認済み",
+    "clear": "クリア",
+    "clear_filters": "フィルターをクリアする",
+    "clear_selection": "選択をクリア",
+    "close": "閉じる",
+    "collapse": "崩壊する",
+    "confirm": "確認する",
+    "create": "作成",
+    "declined": "拒否されました",
+    "download": "ダウンロード",
+    "edit": "編集",
+    "error_loading_data": "データ読み込みエラー",
+    "expand": "展開する",
+    "export": "エクスポート",
+    "load_more": "もっと読み込む",
+    "loading": "読み込み中",
+    "next": "次へ",
+    "no": "いいえ",
+    "ok": "OK",
+    "pending": "保留中",
+    "previous": "前へ",
+    "retry": "再試行",
+    "save": "保存",
+    "select_all": "すべて選択",
+    "select_item": "項目の選択",
+    "yes": "はい"
+  },
+  "shared": {
+    "broker_actions": "ブローカーのアクション",
+    "content": "内容",
+    "core_module": "コアモジュール",
+    "document_details": "文書の詳細",
+    "history": "歴史",
+    "log_file_empty": "ログファイルが見つかりません",
+    "no": "いいえ",
+    "no_history_available": "利用可能な履歴が見つかりません",
+    "no_legal_documents_found": "法的文書が見つかりませんでした",
+    "no_members_found": "メンバーが見つかりませんでした",
+    "loading": "Loading",
+    "no_data": "データなし",
+    "no_data_available": "利用可能なデータがありません",
+    "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
+    "open_page_help": "ページのヘルプを開く",
+    "help": "ヘルプ",
+    "quick_access": "クイックアクセス",
+    "recent_activity": "最近の活動",
+    "refresh": "リフレッシュ",
+    "search": "検索...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "データ",
+    "total_count": "{{count}}合計"
+  },
+  "advertising": {
+    "status": {
+      "all": "全て",
+      "active": "アクティブ",
+      "cancelled": "キャンセル",
+      "completed": "完了",
+      "draft": "下書き",
+      "drafts": "下書き",
+      "paused": "一時停止中",
+      "pending_review": "審査待ち",
+      "rejected": "拒否されました",
+      "scheduled": "予定されている",
+      "sending": "送信中",
+      "sent": "送信済み"
+    },
+    "advertiser": {
+      "gemeinde": "自治体",
+      "private": "プライベート",
+      "sme": "SME",
+      "sme_local": "SME (ローカルビジネス)",
+      "verein": "協会"
+    },
+    "shared": {
+      "campaign_details": "キャンペーン詳細",
+      "filter_by_status": "ステータスでフィルタリングする",
+      "rejection_reason": "拒否理由",
+      "search_campaigns": "検索キャンペーン...",
+      "unexpected_error": "予期しないエラーが発生しました",
+      "actions": {
+        "approve": "承認する",
+        "cancel": "キャンセル",
+        "close": "近い",
+        "create_campaign": "キャンペーンの作成",
+        "details": "詳細",
+        "new_campaign": "新しいキャンペーン",
+        "pause": "一時停止",
+        "reject": "拒否する",
+        "reject_campaign": "拒否キャンペーン",
+        "submit_for_review": "レビューのために送信する",
+        "view_details": "詳細を見る"
+      },
+      "columns": {
+        "actions": "アクション",
+        "advertiser": "広告主",
+        "campaign": "キャンペーン",
+        "clicks": "クリック数",
+        "ctr": "CTR",
+        "id": "ID",
+        "impressions": "感想",
+        "status": "状態"
+      },
+      "empty": {
+        "no_campaigns": "キャンペーンが見つかりませんでした。"
+      },
+      "fields": {
+        "advertiser_type": "広告主の種類",
+        "campaign_name": "キャンペーン名",
+        "type": "タイプ"
+      }
+    },
+    "ad": {
+      "page_title": "広告キャンペーン",
+      "budget_description": "予算を無制限にするには 0 を入力します",
+      "audience_description": "すべてのコミュニティメンバーを対象とする場合は空白のままにします",
+      "creative_alt": "クリエイティブ",
+      "create_title": "広告キャンペーンの作成",
+      "creatives_count": "クリエイティブ ({{count}})",
+      "no_creatives": "このキャンペーンにはまだクリエイティブが添付されていません。",
+      "performance_30_days": "公演（30日間）",
+      "reject_intro_prefix": "あなたは拒否しています",
+      "reject_intro_suffix": "広告主が送信内容を改善する方法を理解できるように、理由を入力してください。",
+      "rejection_placeholder": "例えばコンテンツはコミュニティ ガイドラインに違反しています。見出しを修正してください。",
+      "columns": {
+        "budget_spent": "予算/支出額"
+      },
+      "fields": {
+        "audience_filters": "オーディエンスフィルター (JSON、オプション)",
+        "end_date": "終了日",
+        "placement": "配置",
+        "start_date": "開始日",
+        "total_budget_cents": "総予算 (セント単位)"
+      },
+      "header": {
+        "title": "ローカル広告",
+        "description": "中小企業、団体、自治体からのローカル広告キャンペーンを管理します"
+      },
+      "placement": {
+        "all": "すべてのプレースメント",
+        "discovery": "発見",
+        "feed": "餌",
+        "market": "市場"
+      },
+      "placeholders": {
+        "budget": "例: 5000 = EUR 50.00",
+        "campaign_name": "サマーセール - Cafe Helvetia"
+      },
+      "stats": {
+        "active_campaigns": "アクティブなキャンペーン",
+        "clicks_today": "今日のクリック数",
+        "impressions_today": "今日の感想",
+        "total_revenue": "総収益"
+      },
+      "toasts": {
+        "approved": "キャンペーン「{{name}}」が承認されました",
+        "approve_failed": "キャンペーンの承認に失敗しました",
+        "audience_json_invalid": "オーディエンスフィルターは有効なJSONである必要があります",
+        "created": "キャンペーンを作成し、レビューのために送信しました",
+        "create_failed": "キャンペーンの作成に失敗しました",
+        "details_failed": "キャンペーンの詳細を読み込めませんでした",
+        "load_failed": "広告キャンペーンを読み込めませんでした",
+        "name_required": "キャンペーン名は必須です",
+        "paused": "キャンペーン「{{name}}」が一時停止されました",
+        "pause_failed": "キャンペーンを一時停止できませんでした",
+        "rejected": "キャンペーン「{{name}}」が拒否されました",
+        "reject_failed": "キャンペーンを拒否できませんでした"
+      }
+    },
+    "push": {
+      "page_title": "プッシュキャンペーン",
+      "chart_opens_title": "{{count}} 件の開封",
+      "chart_sends_title": "{{count}} 件の送信",
+      "create_title": "新しいプッシュキャンペーン",
+      "daily_breakdown": "一日の内訳",
+      "immediate": "すぐに",
+      "no_daily_data": "日次データはまだありません。",
+      "reject_intro_prefix": "拒否する",
+      "reject_intro_suffix": "広告主にわかる理由を入力してください。",
+      "rejection_placeholder": "例えばコンテンツがコミュニティ ガイドラインに準拠していません...",
+      "table_aria": "プッシュキャンペーン",
+      "actions": {
+        "dispatch_now": "今すぐ発送"
+      },
+      "columns": {
+        "cost": "料金",
+        "open_rate": "開封率",
+        "scheduled": "予定されている",
+        "targets": "ターゲット",
+        "title_preview": "タイトルプレビュー"
+      },
+      "dates": {
+        "approved": "承認された",
+        "created": "作成されました",
+        "scheduled": "予定されている",
+        "sent": "送信済み"
+      },
+      "fields": {
+        "cta_url": "CTA URL",
+        "cta_url_optional": "CTA URL (オプション)",
+        "notification_body": "プッシュ通知本文",
+        "notification_title": "プッシュ通知のタイトル",
+        "push_body": "プッシュボディ",
+        "push_title": "タイトルをプッシュ",
+        "scheduled_at": "スケジュール済み (オプション - 承認時に送信するには空白のままにします)"
+      },
+      "header": {
+        "title": "有料プッシュキャンペーン (AG57)"
+      },
+      "metrics": {
+        "opens": "開く",
+        "revenue": "収益",
+        "sends": "送信します",
+        "sent": "送信済み"
+      },
+      "placeholders": {
+        "body": "最大400文字",
+        "campaign_name": "例えば春のプロモーション - Cafe Seeblick",
+        "title": "最大100文字"
+      },
+      "stats": {
+        "needs_attention": "注意が必要です",
+        "pending_review": "審査待ち",
+        "revenue_this_month": "今月の収益",
+        "sends_this_month": "今月発送します",
+        "total_campaigns": "キャンペーンの合計"
+      },
+      "toasts": {
+        "approved": "キャンペーン「{{name}}」が承認されました。",
+        "approve_failed": "キャンペーンの承認に失敗しました。",
+        "created": "キャンペーンが作成されました。",
+        "create_failed": "キャンペーンの作成に失敗しました。",
+        "dispatched": "キャンペーン「{{name}}」が配信されました。",
+        "dispatch_failed": "キャンペーンのディスパッチに失敗しました。",
+        "load_failed": "キャンペーンの読み込みに失敗しました",
+        "rejected": "キャンペーン「{{name}}」が拒否されました。",
+        "reject_failed": "キャンペーンを拒否できませんでした。",
+        "required_fields": "名前、タイトル、本文は必須です。"
+      }
+    },
+    "tabs_aria": "Ad campaign status filter"
+  }
+}

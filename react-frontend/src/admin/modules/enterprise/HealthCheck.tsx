@@ -35,7 +35,7 @@ function statusBorderClass(status: string): string {
 }
 
 export function HealthCheck() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   usePageTitle(t('enterprise.page_title'));
 
   const [result, setResult] = useState<HealthCheckResult | null>(null);

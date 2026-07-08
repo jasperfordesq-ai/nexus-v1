@@ -15,7 +15,7 @@ import { adminGroups } from '@/admin/api/adminApi';
 import type { FeaturedGroup } from '@/admin/api/types';
 
 export default function GroupRanking() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   usePageTitle(t('groups.page_title'));
   const { success, error } = useToast();
   const [groups, setGroups] = useState<FeaturedGroup[]>([]);

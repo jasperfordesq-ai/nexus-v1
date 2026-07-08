@@ -9,6 +9,13 @@
 /* Content sources for Tailwind */
 @source "../index.html";
 @source "./**/*.{js,ts,jsx,tsx}";
+@source not "./admin/**/*.{js,ts,jsx,tsx}";
+@source not "./broker/**/*.{js,ts,jsx,tsx}";
+@source not "./caring/**/*.{js,ts,jsx,tsx}";
+@source not "./partners/**/*.{js,ts,jsx,tsx}";
+@source not "./super-admin/**/*.{js,ts,jsx,tsx}";
+@source not "./test/**/*.{js,ts,jsx,tsx}";
+@source not "./**/__tests__/**/*.{js,ts,jsx,tsx}";
 @source not "./**/*.test.ts";
 @source not "./**/*.test.tsx";
 @source not "./**/*.spec.ts";

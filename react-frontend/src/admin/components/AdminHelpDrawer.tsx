@@ -4,14 +4,15 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useRef } from 'react';
-import { Separator } from '@/components/ui';
 import { Link } from 'react-router-dom';
 import X from 'lucide-react/icons/x';
 import LightbulbIcon from 'lucide-react/icons/lightbulb';
 import TriangleAlertIcon from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import type { HelpArticle } from '../data/helpContent';
-import { Button, Chip } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Separator } from '@/components/ui/Separator';
 
 interface AdminHelpDrawerProps {
   article: HelpArticle;
@@ -20,7 +21,7 @@ interface AdminHelpDrawerProps {
 }
 
 export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_nav');
   const panelRef = useRef<HTMLDivElement>(null);
 
   // Move focus into the close button when the drawer opens; close on Escape

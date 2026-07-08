@@ -77,7 +77,7 @@ interface LedgerResponse {
 export default function RegionalPointsAdminPage() {
   const toast = useToast();
   const { t } = useTranslation('caring_community');
-  const { t: tAdmin } = useTranslation('admin');
+  const { t: tAdmin } = useTranslation('admin_caring_community');
   usePageTitle(t('admin.regional_points.title'));
 
   const [config, setConfig] = useState<RegionalPointsConfig | null>(null);

@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Form as HeroUIForm,
-  type Form as HeroUIFormTypes,
-} from '@heroui/react';
+import { Form as HeroUIForm, type Form as HeroUIFormTypes } from '@heroui/react/form';
 
 export type FormProps = HeroUIFormTypes['Props'];
 export const Form = HeroUIForm;

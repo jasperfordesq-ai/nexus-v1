@@ -28,7 +28,7 @@ import { Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, M
 
 export function UserReport() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_timebanking');
   useAdminPageMeta({ title: tNav('timebanking') });
   const { tenantPath } = useTenant();
   const toast = useToast();

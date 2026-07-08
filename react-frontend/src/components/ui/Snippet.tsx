@@ -50,7 +50,7 @@ export function Snippet({
   symbol = '$',
   variant: _variant,
 }: SnippetProps) {
-  const { t } = useTranslation(['common', 'admin']);
+  const { t } = useTranslation('common');
   const [copied, setCopied] = useState(false);
   const copyText = useMemo(() => codeString ?? textFromChildren(children), [children, codeString]);
 
@@ -83,7 +83,7 @@ export function Snippet({
           type="button"
           className="shrink-0 rounded p-1 text-muted transition-colors hover:bg-surface-tertiary hover:text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
           onClick={handleCopy}
-          aria-label={t('common:copy_code')}
+          aria-label={t('copy_code')}
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
         </button>

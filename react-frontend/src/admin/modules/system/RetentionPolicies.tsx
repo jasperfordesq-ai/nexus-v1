@@ -66,7 +66,7 @@ function statusColor(status: string): 'success' | 'warning' | 'danger' {
 }
 
 export function RetentionPolicies() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   useAdminPageMeta({ title: t('retention.page_title') });
   const toast = useToast();
 

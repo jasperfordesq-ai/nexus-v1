@@ -125,7 +125,7 @@ const emptyWebhookForm = {
 // ─── Main component ────────────────────────────────────────────────────────────
 
 export default function VolunteerConfig() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.config_title'));
 
   const [activeTab, setActiveTab] = useState('custom-fields');
@@ -198,7 +198,7 @@ function FieldPreviewModal({
   onClose: () => void;
   field: CustomField | null;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   if (!field) return null;
 
   const renderPreview = () => {
@@ -330,7 +330,7 @@ function FieldPreviewModal({
 }
 
 function CustomFieldsTab() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   const toast = useToast();
 
   const [fields, setFields] = useState<CustomField[]>([]);
@@ -720,7 +720,7 @@ function toReminderRequest(reminder: ReminderSetting): Record<string, unknown> {
 }
 
 function RemindersTab() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   const toast = useToast();
   const { user } = useAuth();
   const canRunReminderJobs = Boolean(
@@ -1068,7 +1068,7 @@ function RemindersTab() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function WebhooksTab() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   const toast = useToast();
 
   const [webhooks, setWebhooks] = useState<WebhookEntry[]>([]);

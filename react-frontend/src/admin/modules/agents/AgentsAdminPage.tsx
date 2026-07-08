@@ -31,7 +31,7 @@ interface AgentDefinition {
 }
 
 export default function AgentsAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_agents');
   usePageTitle(t('agents.definitions.meta.title'));
   useAdminPageMeta({
     title: t('agents.definitions.meta.title'),

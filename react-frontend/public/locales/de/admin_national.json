@@ -1,0 +1,186 @@
+{
+  "common": {
+    "an_unexpected_error": "Es ist ein unerwarteter Fehler aufgetreten",
+    "back": "Zurück",
+    "cancel": "Abbrechen",
+    "critical": "Kritisch",
+    "delete": "Löschen",
+    "feature": "Funktion",
+    "high": "Hoch",
+    "in_progress": "In Bearbeitung",
+    "in_review": "Im Rückblick",
+    "low": "Niedrig",
+    "medium": "Mittel",
+    "planned": "Geplant",
+    "refresh": "Aktualisieren",
+    "unexpected_error": "Unerwarteter Fehler",
+    "unknown": "Unbekannt",
+    "unfeature": "Unfeature",
+    "actions": "Aktionen",
+    "active": "Aktiv",
+    "all": "Alle",
+    "approved": "Genehmigt",
+    "clear": "Klar",
+    "clear_filters": "Filter löschen",
+    "clear_selection": "Auswahl löschen",
+    "close": "Schließen",
+    "collapse": "Zusammenbruch",
+    "confirm": "Bestätigen",
+    "create": "Erstellen",
+    "declined": "Abgelehnt",
+    "download": "Herunterladen",
+    "edit": "Bearbeiten",
+    "error_loading_data": "Fehler beim Laden der Daten",
+    "expand": "Erweitern",
+    "export": "Exportieren",
+    "load_more": "Mehr laden",
+    "loading": "Laden",
+    "next": "Als nächstes",
+    "no": "Nein",
+    "ok": "OK",
+    "pending": "Ausstehend",
+    "previous": "Zurück",
+    "retry": "Versuchen Sie es noch einmal",
+    "save": "Speichern",
+    "select_all": "Wählen Sie „Alle“ aus",
+    "select_item": "Wählen Sie Artikel aus",
+    "yes": "Ja"
+  },
+  "shared": {
+    "broker_actions": "Makleraktionen",
+    "content": "Inhalt",
+    "core_module": "Kernmodul",
+    "document_details": "Dokumentdetails",
+    "history": "Geschichte",
+    "log_file_empty": "Keine Protokolldatei gefunden",
+    "no": "Nein",
+    "no_history_available": "Keine verfügbare Historie gefunden",
+    "no_legal_documents_found": "Es wurden keine Rechtsdokumente gefunden",
+    "no_members_found": "Keine Mitglieder gefunden",
+    "loading": "Loading",
+    "no_data": "Keine Daten",
+    "no_data_available": "Keine Daten verfügbar",
+    "no_recent_broker_activity": "Keine aktuelle Brokeraktivität gefunden",
+    "open_page_help": "Hilfeseite öffnen",
+    "help": "Helfen",
+    "quick_access": "Schnellzugriff",
+    "recent_activity": "Letzte Aktivität",
+    "refresh": "Aktualisieren",
+    "search": "Suchen...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Daten",
+    "total_count": "{{count}}insgesamt"
+  },
+  "national": {
+    "trend_chart_aria": "Chart showing community activity trends over time"
+  },
+  "national_kiss_dashboard": {
+    "loading": "Loading",
+    "meta": {
+      "page_title": "Caring Community – Nationales Dashboard",
+      "title": "Caring Community – Nationales Dashboard",
+      "description": "Genossenschaftsübergreifende Superadministratoransicht aller cooperativeen auf der Plattform. Die Mitgliederzahlen werden in datenschutzrechtlichen Klammern angegeben."
+    },
+    "actions": {
+      "refresh": "Aktualisieren"
+    },
+    "about": {
+      "title": "Über dieses Dashboard",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "health_prefix": "Verwenden Sie die Periodenauswahl, um Quartale zu vergleichen. Die Vergleichstabelle ordnet Genossenschaften nach Stunden, Mitgliedern oder Gesundheitszustand. Der Gesundheitszustand wird aus Aktivitätstrends abgeleitet:",
+      "thriving_definition": "wächst schnell,",
+      "stable_definition": "flache Aktivität,",
+      "struggling_definition": "sinkende Aktivität oder sehr geringes Engagement."
+    },
+    "status": {
+      "thriving": "Gedeihend",
+      "stable": "Stabil",
+      "struggling": "Kämpfend"
+    },
+    "health_legend": {
+      "title": "Schlüssel zum Gesundheitszustand:",
+      "thriving": "Stunden steigen stark an (>10 % gegenüber dem Vorzeitraum)",
+      "stable": "flache Aktivität (+/-10 %)",
+      "struggling": "rückläufige Aktivität oder weniger als 5 verifizierte Stunden im Zeitraum",
+      "privacy_note": "Mitgliederzahlen werden in datenschutzrechtlichen Klammern angezeigt (z. B. „50-99“) – hier werden niemals individuelle Daten angezeigt."
+    },
+    "filters": {
+      "period": "Zeitraum",
+      "period_aria": "Berichtszeitraum",
+      "from": "Aus",
+      "from_aria": "Zeitraum von",
+      "to": "Zu",
+      "to_aria": "Zeitraum bis"
+    },
+    "periods": {
+      "this_month": "Diesen Monat",
+      "last_quarter": "Letztes Quartal (90 Tage)",
+      "last_year": "Letztes Jahr",
+      "custom": "Benutzerdefiniertes Sortiment"
+    },
+    "stats": {
+      "total_cooperatives": "Gesamtgenossenschaften",
+      "active_cooperatives": "Aktive Genossenschaften",
+      "active_description": "{{active}} von {{total}} aktiv im Zeitraum",
+      "total_hours": "Gesamtstunden (national)",
+      "active_tandems": "Aktive Tandems"
+    },
+    "inline": {
+      "active_members": "Aktive Mitglieder:",
+      "recipients_reached": "Empfänger erreicht:",
+      "safeguarding_reports": "Schutzberichte:"
+    },
+    "metrics": {
+      "yoy": "{{value}} im Jahresvergleich"
+    },
+    "trend": {
+      "title": "Nationaler 12-Monats-Trend",
+      "empty": "Keine Trenddaten verfügbar.",
+      "hours_axis": "Std",
+      "cooperatives_axis": "Genossenschaften",
+      "active_cooperatives": "Aktive Genossenschaften",
+      "total_hours_all": "Gesamtstunden (alle Genossenschaften)"
+    },
+    "comparative": {
+      "title": "Vergleichsmetriken",
+      "sort_hint": "Klicken Sie zum Sortieren auf eine Spalte",
+      "empty_prefix": "NEIN",
+      "empty_middle": "Genossenschaften noch konfiguriert. Gehe zu",
+      "super_admin_tenants": "Super Admin -> Mieter",
+      "empty_suffix": "und legen Sie die Mieterkategorie auf fest",
+      "empty_tail": "auf mindestens einem Mandanten, um dieses Dashboard zu füllen.",
+      "aria": "Vergleichsmetriken nach Genossenschaft",
+      "cooperative": "Kooperative",
+      "hours_title": "Gesamte verifizierte Pflegestunden im ausgewählten Zeitraum",
+      "hours_sort": "Stunden <->",
+      "members_title": "Die Anzahl der aktiven Mitglieder wird als datenschutzrechtliche Klammer angezeigt",
+      "members": "Mitglieder",
+      "recipients_title": "Erreichte Pflegebedürftige (Datenschutzgruppe)",
+      "recipients": "Empfänger",
+      "tandems_title": "Wiederkehrende Helfer/Empfänger-Paare mit mehr als 2 abgeschlossenen Austauschvorgängen",
+      "tandems_sort": "Tandems <->",
+      "retention_title": "% der Mitglieder, die sowohl in diesem Zeitraum als auch im vorherigen entsprechenden Zeitraum aktiv waren",
+      "retention_sort": "Aufbewahrung <->",
+      "reciprocity_title": "% der Unterstützer, die in diesem Zeitraum auch Stunden erhalten haben – zeigt die Gesundheit des gegenseitigen Austauschs an",
+      "reciprocity_sort": "Gegenseitigkeit <->",
+      "status": "Status"
+    },
+    "leaderboards": {
+      "top_title": "Top 5 nach Stunden",
+      "bottom_title": "Unten 5 (nur aktiv)"
+    },
+    "empty": {
+      "no_data": "Keine Daten.",
+      "no_active_cooperatives": "Keine aktiven Genossenschaften in diesem Zeitraum."
+    },
+    "footer": {
+      "generated_at": "Erstellt am {{date}}.",
+      "privacy_note": "Die Anzahl der Mitglieder wird in datenschutzrechtlichen Klammern angegeben. Auf dieser Seite werden keine individuellen Mitgliedskennungen angezeigt."
+    },
+    "toasts": {
+      "load_failed": "Das Dashboard konnte nicht geladen werden"
+    }
+  }
+}

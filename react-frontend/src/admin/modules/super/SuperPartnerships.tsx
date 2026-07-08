@@ -131,7 +131,7 @@ const getFeatureIcon = (feature: string) => {
 };
 
 export default function Partnerships() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   usePageTitle(t('super.page_title'));
   const toast = useToast();
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);

@@ -231,7 +231,7 @@ function HeroEditor({
   content: HeroContent;
   onChange: (c: HeroContent) => void;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   const update = (field: keyof HeroContent, value: string) => {
     onChange({ ...content, [field]: value });
   };
@@ -323,7 +323,7 @@ function AudienceCardsEditor({
   content: AudienceCardsContent;
   onChange: (c: AudienceCardsContent) => void;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   const cards = content.cards || [];
 
   const updateCard = (index: number, field: keyof AudienceCard, value: string) => {
@@ -509,7 +509,7 @@ function FeaturePillsEditor({
   content: FeaturePillsContent;
   onChange: (c: FeaturePillsContent) => void;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   const items = content.items || [];
 
   const updateItem = (index: number, field: keyof FeaturePillItem, value: string) => {
@@ -603,7 +603,7 @@ function StatsEditor({
   content: StatsContent;
   onChange: (c: StatsContent) => void;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   return (
     <div className="flex flex-col gap-4">
       <Switch
@@ -627,7 +627,7 @@ function HowItWorksEditor({
   content: HowItWorksContent;
   onChange: (c: HowItWorksContent) => void;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   const steps = content.steps || [];
 
   const updateStep = (index: number, field: keyof HowItWorksStep, value: string) => {
@@ -736,7 +736,7 @@ function CoreValuesEditor({
   content: CoreValuesContent;
   onChange: (c: CoreValuesContent) => void;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   const values = content.values || [];
 
   const updateValue = (index: number, field: keyof CoreValue, value: string) => {
@@ -832,7 +832,7 @@ function CtaEditor({
   content: CtaContent;
   onChange: (c: CtaContent) => void;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   const update = (field: keyof CtaContent, value: string) => {
     onChange({ ...content, [field]: value });
   };
@@ -903,7 +903,7 @@ function SectionCard({
   onMoveDown: () => void;
   onContentChange: (content: LandingSection['content']) => void;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   const sectionType = section.type as LandingSectionType;
   const labelKey = SECTION_LABEL_KEYS[sectionType];
   const label = labelKey ? t(labelKey) : sectionType;
@@ -1037,7 +1037,7 @@ function SectionCard({
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function LandingPageBuilder() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   usePageTitle(t('content.landing_page_title'));
   const toast = useToast();
 

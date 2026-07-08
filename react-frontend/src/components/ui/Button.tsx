@@ -5,11 +5,8 @@
 
 import { type ElementType, type MouseEvent, type ReactNode, type Ref } from 'react';
 import type { ButtonHTMLAttributes } from 'react';
-import {
-  Button as HeroUIButton,
-  Spinner as HeroUISpinner,
-  type ButtonProps as HeroUIButtonProps,
-} from '@heroui/react';
+import { Button as HeroUIButton, type ButtonProps as HeroUIButtonProps } from '@heroui/react/button';
+import { Spinner as HeroUISpinner } from '@heroui/react/spinner';
 
 function heroButtonClasses(opts: {
   variant?: string;

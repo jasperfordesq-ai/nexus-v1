@@ -1,0 +1,180 @@
+{
+  "common": {
+    "an_unexpected_error": "Ocurrió un error inesperado",
+    "back": "Atrás",
+    "cancel": "Cancelar",
+    "critical": "Crítico",
+    "delete": "Eliminar",
+    "feature": "Característica",
+    "high": "Alto",
+    "in_progress": "En progreso",
+    "in_review": "En revisión",
+    "low": "Bajo",
+    "medium": "Medio",
+    "planned": "planeado",
+    "refresh": "Actualizar",
+    "unexpected_error": "error inesperado",
+    "unknown": "Desconocido",
+    "unfeature": "no característica",
+    "actions": "Acciones",
+    "active": "Activo",
+    "all": "Todos",
+    "approved": "Aprobado",
+    "clear": "Borrar",
+    "clear_filters": "Borrar filtros",
+    "clear_selection": "Borrar selección",
+    "close": "Cerrar",
+    "collapse": "Colapso",
+    "confirm": "Confirmar",
+    "create": "crear",
+    "declined": "Rechazado",
+    "download": "Descargar",
+    "edit": "Editar",
+    "error_loading_data": "Error al cargar datos",
+    "expand": "Expandir",
+    "export": "Exportar",
+    "load_more": "Cargar más",
+    "loading": "Cargando",
+    "next": "Siguiente",
+    "no": "No",
+    "ok": "OK",
+    "pending": "Pendiente",
+    "previous": "Anterior",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "select_all": "Seleccionar todo",
+    "select_item": "Seleccionar artículo",
+    "yes": "si"
+  },
+  "shared": {
+    "broker_actions": "Acciones del corredor",
+    "content": "Contenido",
+    "core_module": "Módulo principal",
+    "document_details": "Detalles del documento",
+    "history": "Historia",
+    "log_file_empty": "No se encontró ningún archivo de registro",
+    "no": "No",
+    "no_history_available": "No se encontró ningún historial disponible",
+    "no_legal_documents_found": "No se encontraron documentos legales encontrados.",
+    "no_members_found": "No se encontraron miembros encontrados.",
+    "loading": "Loading",
+    "no_data": "Sin datos",
+    "no_data_available": "No hay datos disponibles",
+    "no_recent_broker_activity": "No se encontró actividad reciente del corredor",
+    "open_page_help": "Abrir página de ayuda",
+    "help": "Ayuda",
+    "quick_access": "Acceso rápido",
+    "recent_activity": "Actividad reciente",
+    "refresh": "Refrescar",
+    "search": "Buscar...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Datos",
+    "total_count": "{{count}}total"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "Socios de API"
+    },
+    "header": {
+      "title": "Socios de API",
+      "description": "Proporcione a los sistemas externos aprobados, como un sistema bancario o municipal, claves de acceso seguras a sus datos NEXUS. Para conectarse con otra plataforma de banco de tiempo, utilice socios de protocolo externos."
+    },
+    "actions": {
+      "activate": "Activar",
+      "cancel": "Cancelar",
+      "close": "Cerca",
+      "new_partner": "Nuevo socio",
+      "regenerate_credentials": "Regenerar credenciales",
+      "suspend": "Suspender",
+      "view_call_log": "Ver registro de llamadas"
+    },
+    "call_log": {
+      "table_aria": "Llamadas recientes",
+      "columns": {
+        "duration": "Duración",
+        "method": "Método",
+        "path": "Camino",
+        "status": "Estado",
+        "when": "Cuando"
+      }
+    },
+    "columns": {
+      "actions": "Comportamiento",
+      "name": "Nombre",
+      "rate_limit": "Límite de tarifa",
+      "sandbox": "Salvadera",
+      "scopes": "Alcances",
+      "slug": "Babosa",
+      "status": "Estado"
+    },
+    "common": {
+      "any": "cualquier",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ms",
+      "no": "No",
+      "per_minute": "{{value}}/min",
+      "yes": "Sí"
+    },
+    "confirm": {
+      "regenerate_credentials": "¿Crear nuevas claves de acceso para este socio? Las claves antiguas dejan de funcionar inmediatamente; deberá compartir las nuevas con el socio."
+    },
+    "create_modal": {
+      "allowed_scopes": "Alcances permitidos",
+      "contact_email": "Correo electrónico de contacto",
+      "contact_email_placeholder": "integraciones@socio.ejemplo",
+      "description": "Descripción",
+      "name": "Nombre",
+      "name_placeholder": "p.ej. PostFinance Switzerland",
+      "rate_limit": "Límite de tarifa (solicitudes/minuto)",
+      "sandbox_mode": "Modo Sandbox (prueba): el socio puede ver los datos pero no puede cambiar nada",
+      "submit": "Crear y emitir credenciales",
+      "title": "Nuevo socio API"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Copiar client_id",
+      "copy_client_secret": "Copiar client_secret",
+      "saved_button": "He guardado estos",
+      "title": "Credenciales de cliente emitidas",
+      "warning_body": "La clave secreta se muestra sólo una vez. Comparte ambos valores con tu pareja de forma privada y segura, nunca en un chat público o en un documento compartido.",
+      "warning_title": "Guárdalos ahora."
+    },
+    "detail": {
+      "call_log_tab": "Registro de llamadas",
+      "contact": "Contacto:",
+      "info_tab": "Información",
+      "ip_allowlist": "Lista de permitidos de IP:",
+      "rate_limit": "Límite de tarifa:",
+      "sandbox": "Salvadera:",
+      "scopes": "Alcances:",
+      "status": "Estado:",
+      "tabs_aria": "Pestañas de detalles de socios"
+    },
+    "empty": {
+      "no_calls": "Aún no hay llamadas.",
+      "no_partners": "Aún no hay sistemas asociados conectados. Agregue uno para crear sus claves de acceso."
+    },
+    "status": {
+      "active": "Activo",
+      "pending": "Pendiente",
+      "suspended": "Suspendido"
+    },
+    "toasts": {
+      "activate_failed": "Activación fallida",
+      "activated": "Socio activado",
+      "copied": "{{label}} copiado",
+      "copy_failed": "Error al copiar: copiar manualmente",
+      "create_failed": "Error al crear",
+      "load_failed": "No se pudieron cargar los socios",
+      "name_required": "El nombre es obligatorio",
+      "regenerate_failed": "Falló la regeneración",
+      "suspend_failed": "Suspender falló",
+      "suspended": "Socio suspendido"
+    },
+    "table": {
+      "aria": "Socios de API"
+    }
+  }
+}

@@ -40,6 +40,7 @@ import type { MarketplaceListingItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
@@ -269,7 +270,7 @@ export function SellerProfilePage() {
         <GlassCard className="p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
             <Avatar
-              src={seller.avatar_url || undefined}
+              src={resolveAvatarUrl(seller.avatar_url) || undefined}
               name={seller.display_name}
               className="w-20 h-20 text-xl"
               isBordered

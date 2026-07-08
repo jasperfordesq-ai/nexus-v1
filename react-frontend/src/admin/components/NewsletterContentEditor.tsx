@@ -99,7 +99,7 @@ export function NewsletterContentEditor({
   onOpenDesigner,
   hasDesign,
 }: NewsletterContentEditorProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   const confirm = useConfirm();
   const [showPreview, setShowPreview] = useState(true);
 

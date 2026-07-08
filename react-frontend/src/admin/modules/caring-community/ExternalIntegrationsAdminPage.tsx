@@ -148,7 +148,7 @@ function fromIntegration(item: Integration): FormState {
 }
 
 export default function ExternalIntegrationsAdminPage(): ReactNode {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('external_integrations.meta.title'));
   const { showToast } = useToast();
 

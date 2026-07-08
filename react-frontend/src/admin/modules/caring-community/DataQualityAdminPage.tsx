@@ -80,7 +80,7 @@ function formatTimestamp(ts: string | null | undefined): string {
 // ---------------------------------------------------------------------------
 
 export default function DataQualityAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('data_quality.meta.page_title'));
   const { showToast } = useToast();
 

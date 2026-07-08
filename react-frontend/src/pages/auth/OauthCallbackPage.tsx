@@ -18,10 +18,10 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Spinner } from '@/components/ui/Spinner';
-import { PageMeta } from '@/components/seo';
+import { PageMeta } from '@/components/seo/PageMeta';
 import { tokenManager } from '@/lib/api';
-import { useTenant } from '@/contexts';
-import { usePageTitle } from '@/hooks';
+import { useTenant } from '@/contexts/TenantContext';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 export function OauthCallbackPage() {
   const { t } = useTranslation('common');

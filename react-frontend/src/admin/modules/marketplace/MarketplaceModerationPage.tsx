@@ -74,7 +74,7 @@ const MODERATION_TABS = ['all', 'pending', 'approved', 'rejected', 'flagged'] as
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MarketplaceModerationPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_marketplace');
   usePageTitle(t('marketplace.moderation_page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

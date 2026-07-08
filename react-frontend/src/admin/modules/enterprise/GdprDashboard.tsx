@@ -70,7 +70,7 @@ function ComplianceScoreRing({ score, size = 120, scoreLabel }: { score: number;
 }
 
 export function GdprDashboard() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   useAdminPageMeta({ title: t('enterprise.gdpr_dashboard_title') });
   const { tenantPath } = useTenant();
   const navigate = useNavigate();

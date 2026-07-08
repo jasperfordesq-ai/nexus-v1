@@ -24,7 +24,7 @@ import type { SuperAuditEntry } from '../../api/types';
 const PAGE_SIZE = 25;
 
 export default function SuperAuditLog() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   usePageTitle(t('super.page_title'));
   const { tenantPath } = useTenant();
 

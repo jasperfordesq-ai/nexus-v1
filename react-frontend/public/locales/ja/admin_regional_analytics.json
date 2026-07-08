@@ -1,0 +1,158 @@
+{
+  "common": {
+    "an_unexpected_error": "予期しないエラーが発生しました",
+    "back": "戻る",
+    "cancel": "キャンセル",
+    "critical": "クリティカル",
+    "delete": "削除",
+    "feature": "特徴",
+    "high": "高",
+    "in_progress": "進行中",
+    "in_review": "レビュー中",
+    "low": "低い",
+    "medium": "中",
+    "planned": "計画済み",
+    "refresh": "リフレッシュ",
+    "unexpected_error": "予期しないエラー",
+    "unknown": "未知",
+    "unfeature": "特徴がない",
+    "actions": "アクション",
+    "active": "アクティブ",
+    "all": "すべて",
+    "approved": "承認済み",
+    "clear": "クリア",
+    "clear_filters": "フィルターをクリアする",
+    "clear_selection": "選択をクリア",
+    "close": "閉じる",
+    "collapse": "崩壊する",
+    "confirm": "確認する",
+    "create": "作成",
+    "declined": "拒否されました",
+    "download": "ダウンロード",
+    "edit": "編集",
+    "error_loading_data": "データ読み込みエラー",
+    "expand": "展開する",
+    "export": "エクスポート",
+    "load_more": "もっと読み込む",
+    "loading": "読み込み中",
+    "next": "次へ",
+    "no": "いいえ",
+    "ok": "OK",
+    "pending": "保留中",
+    "previous": "前へ",
+    "retry": "再試行",
+    "save": "保存",
+    "select_all": "すべて選択",
+    "select_item": "項目の選択",
+    "yes": "はい"
+  },
+  "shared": {
+    "broker_actions": "ブローカーのアクション",
+    "content": "内容",
+    "core_module": "コアモジュール",
+    "document_details": "文書の詳細",
+    "history": "歴史",
+    "log_file_empty": "ログファイルが見つかりません",
+    "no": "いいえ",
+    "no_history_available": "利用可能な履歴が見つかりません",
+    "no_legal_documents_found": "法的文書が見つかりませんでした",
+    "no_members_found": "メンバーが見つかりませんでした",
+    "loading": "Loading",
+    "no_data": "データなし",
+    "no_data_available": "利用可能なデータがありません",
+    "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
+    "open_page_help": "ページのヘルプを開く",
+    "help": "ヘルプ",
+    "quick_access": "クイックアクセス",
+    "recent_activity": "最近の活動",
+    "refresh": "リフレッシュ",
+    "search": "検索...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "データ",
+    "total_count": "{{count}}合計"
+  },
+  "regional_analytics_admin": {
+    "meta": {
+      "title": "地域分析",
+      "description": "自治体および SME パートナー向けの有料分析サブスクリプションを管理します - バケット化されたプライバシーに安全な集計のみ。"
+    },
+    "actions": {
+      "new_subscription": "新規購読",
+      "generate_report_now": "今すぐレポートを生成",
+      "view_access_log": "アクセスログを見る",
+      "suspend": "つるす",
+      "resume": "再開する",
+      "close": "近い",
+      "cancel": "キャンセル",
+      "create": "作成する"
+    },
+    "tables": {
+      "subscriptions_aria": "地域分析サブスクリプション",
+      "partner": "パートナー",
+      "type": "タイプ",
+      "plan": "プラン",
+      "status": "状態",
+      "period_end": "期間終了",
+      "price_per_month": "価格/月",
+      "modules": "モジュール",
+      "actions": "アクション"
+    },
+    "partner_types": {
+      "municipality": "自治体",
+      "sme_partner": "SME パートナー"
+    },
+    "plan_tiers": {
+      "basic": "基本",
+      "pro": "プロ",
+      "enterprise": "企業"
+    },
+    "statuses": {
+      "trialing": "トライアル中",
+      "active": "アクティブ",
+      "past_due": "期限を過ぎた",
+      "cancelled": "キャンセル"
+    },
+    "modules": {
+      "trends": "トレンド",
+      "demand_supply": "需要と供給",
+      "demographics": "人口統計",
+      "footfall": "足音"
+    },
+    "empty": {
+      "subscriptions": "まだ購読はありません。地域分析の販売を開始するには、1 つをプロビジョニングします。",
+      "access_log": "アクセス イベントはまだ記録されていません。",
+      "value": "-"
+    },
+    "access_log": {
+      "title": "アクセスログ - {{name}}",
+      "table_aria": "アクセスログ",
+      "when": "いつ",
+      "endpoint": "終点",
+      "ip_hashed": "IP (ハッシュ化)",
+      "user_agent": "ユーザーエージェント"
+    },
+    "create_modal": {
+      "title": "新しい地域分析サブスクリプション",
+      "tenant_id": "テナント ID",
+      "partner_name": "パートナー名",
+      "partner_type": "パートナータイプ",
+      "contact_email": "連絡先メールアドレス",
+      "billing_email": "請求メール",
+      "plan_tier": "プラン階層",
+      "monthly_price_cents": "月額料金 (セント)",
+      "currency": "通貨",
+      "enabled_modules": "有効なモジュール"
+    },
+    "toasts": {
+      "load_failed": "サブスクリプションの読み込みに失敗しました",
+      "status_updated": "定期購読 {{status}}",
+      "update_failed": "アップデートに失敗しました",
+      "report_queued": "レポート生成がキューに入れられました",
+      "report_failed": "レポートをキューに入れることができませんでした",
+      "required_fields": "テナント、パートナー名、連絡先メールアドレスは必須です",
+      "created": "サブスクリプションが作成されました",
+      "create_failed": "作成に失敗しました"
+    }
+  }
+}

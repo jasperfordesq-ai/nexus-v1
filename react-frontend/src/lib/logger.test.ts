@@ -9,6 +9,14 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+const queueSentryExceptionMock = vi.fn();
+const queueSentryMessageMock = vi.fn();
+
+vi.mock('@/lib/telemetryQueue', () => ({
+  queueSentryException: queueSentryExceptionMock,
+  queueSentryMessage: queueSentryMessageMock,
+}));
+
 // We need to control import.meta.env.DEV, so we test the functions indirectly
 describe('logger', () => {
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
@@ -17,14 +25,20 @@ describe('logger', () => {
   let consoleLogSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
+    vi.resetModules();
+    vi.stubEnv('DEV', true);
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     consoleInfoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+    queueSentryExceptionMock.mockClear();
+    queueSentryMessageMock.mockClear();
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+    vi.resetModules();
   });
 
   describe('logError', () => {
@@ -39,6 +53,36 @@ describe('logger', () => {
       const { logError } = await import('./logger');
       logError('test message');
       expect(consoleErrorSpy).toHaveBeenCalledWith('[Error] test message', '');
+    });
+
+    it('queues Error instances in production without console logging', async () => {
+      vi.resetModules();
+      vi.stubEnv('DEV', false);
+      const error = new Error('fail');
+      const { logError } = await import('./logger');
+
+      logError('production error', error);
+
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      expect(queueSentryExceptionMock).toHaveBeenCalledWith(error, {
+        source: 'logger',
+        message: 'production error',
+      });
+      expect(queueSentryMessageMock).not.toHaveBeenCalled();
+    });
+
+    it('queues non-Error production failures as messages', async () => {
+      vi.resetModules();
+      vi.stubEnv('DEV', false);
+      const { logError } = await import('./logger');
+
+      logError('production message', { code: 'NOPE' });
+
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      expect(queueSentryExceptionMock).not.toHaveBeenCalled();
+      expect(queueSentryMessageMock).toHaveBeenCalledWith('production message', 'error', {
+        detail: { code: 'NOPE' },
+      });
     });
   });
 

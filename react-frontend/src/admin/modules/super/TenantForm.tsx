@@ -75,7 +75,7 @@ const PLATFORM_LANGUAGES = [
 ];
 
 export function TenantForm() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   const { id } = useParams<{ id: string }>();
   const [searchParams] = useSearchParams();
   const isEdit = !!id;

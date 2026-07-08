@@ -70,7 +70,7 @@ function statusColor(status: string): 'default' | 'primary' | 'success' | 'warni
 }
 
 export function ProvisioningRequestsPage() {
-  const { t } = useTranslation('admin', { keyPrefix: 'provisioning_requests' });
+  const { t } = useTranslation('admin_provisioning', { keyPrefix: 'provisioning_requests' });
   usePageTitle(t('page_title'));
   const toast = useToast();
 

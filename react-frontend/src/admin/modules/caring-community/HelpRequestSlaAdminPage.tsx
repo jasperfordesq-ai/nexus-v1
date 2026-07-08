@@ -86,7 +86,7 @@ function fmtHours(h: number): string {
 }
 
 export default function HelpRequestSlaAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('help_request_sla.meta.page_title'));
   const { showToast } = useToast();
   const { tenantPath } = useTenant();

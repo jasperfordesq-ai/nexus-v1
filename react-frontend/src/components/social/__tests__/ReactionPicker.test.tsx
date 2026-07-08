@@ -63,6 +63,12 @@ function W({ children }: { children: React.ReactNode }) {
   );
 }
 
+async function settleLazyMenu() {
+  await act(async () => {
+    await vi.dynamicImportSettled();
+  });
+}
+
 describe('ReactionPicker', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -141,7 +147,7 @@ describe('ReactionPicker', () => {
     expect(onReact).not.toHaveBeenCalled();
   });
 
-  it('opens picker popup on mouse hover after delay', () => {
+  it('opens picker popup on mouse hover after delay', async () => {
     render(<W><ReactionPicker {...defaultProps} /></W>);
     const container = screen.getByText('Like').closest('.relative')!;
     fireEvent.mouseEnter(container);
@@ -153,9 +159,10 @@ describe('ReactionPicker', () => {
     act(() => {
       vi.advanceTimersByTime(350);
     });
+    await settleLazyMenu();
 
     // Picker should now be open — reaction buttons should be visible
-    expect(screen.getAllByRole('menuitem').length).toBe(8);
+    expect(screen.getAllByRole('menuitem')).toHaveLength(8);
   });
 
   it('does not open picker on hover when not authenticated', () => {
@@ -172,16 +179,17 @@ describe('ReactionPicker', () => {
     expect(allButtons).toHaveLength(1);
   });
 
-  it('triggers close on mouse leave after delay', () => {
+  it('triggers close on mouse leave after delay', async () => {
     render(<W><ReactionPicker {...defaultProps} /></W>);
     const container = screen.getByText('Like').closest('.relative')!;
 
     // Open picker
     fireEvent.mouseEnter(container);
     act(() => { vi.advanceTimersByTime(350); });
+    await settleLazyMenu();
 
     // Verify picker is open (more than 1 button)
-    expect(screen.getAllByRole('menuitem').length).toBe(8);
+    expect(screen.getAllByRole('menuitem')).toHaveLength(8);
 
     // Mouse leave triggers close timeout — the AnimatePresence exit animation
     // may keep DOM nodes briefly. Just verify mouse leave does not throw.
@@ -193,7 +201,7 @@ describe('ReactionPicker', () => {
     expect(container).toBeTruthy();
   });
 
-  it('calls onReact and closes picker when a reaction emoji is selected', () => {
+  it('calls onReact and closes picker when a reaction emoji is selected', async () => {
     const onReact = vi.fn();
     render(<W><ReactionPicker {...defaultProps} onReact={onReact} /></W>);
     const container = screen.getByText('Like').closest('.relative')!;
@@ -201,6 +209,7 @@ describe('ReactionPicker', () => {
     // Open picker
     fireEvent.mouseEnter(container);
     act(() => { vi.advanceTimersByTime(350); });
+    await settleLazyMenu();
 
     // Click the "love" reaction button
     const loveButton = screen.getByRole('menuitem', { name: 'reaction.love' });

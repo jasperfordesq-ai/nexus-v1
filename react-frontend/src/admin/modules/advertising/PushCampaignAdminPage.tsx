@@ -246,7 +246,7 @@ function MiniBarChart({
 // ---------------------------------------------------------------------------
 
 export default function PushCampaignAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_advertising');
   usePageTitle(t('advertising.push.page_title'));
 
   // Modals

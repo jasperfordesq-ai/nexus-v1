@@ -44,7 +44,7 @@ const getBadgeColor = (type: string) => {
 };
 
 export function NewsletterBounces() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   usePageTitle(t('newsletters.page_title'));
   const toast = useToast();
   const [activeTab, setActiveTab] = useState('bounces');

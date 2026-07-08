@@ -25,7 +25,7 @@ import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Switch } fr
 import type { LegalDocument } from '../../api/types';
 
 export function LegalDocForm() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   const { id } = useParams();
   const isEdit = !!id;
 

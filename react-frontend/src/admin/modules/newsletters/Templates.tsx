@@ -54,7 +54,7 @@ const CATEGORY_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'war
 };
 
 export function Templates() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   usePageTitle(t('newsletters.page_title'));
 
   const CATEGORY_LABELS: Record<string, string> = {

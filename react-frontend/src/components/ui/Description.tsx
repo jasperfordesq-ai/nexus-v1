@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Description as HeroUIDescription,
-  type Description as HeroUIDescriptionTypes,
-} from '@heroui/react';
+import { Description as HeroUIDescription, type Description as HeroUIDescriptionTypes } from '@heroui/react/description';
 
 export type DescriptionProps = HeroUIDescriptionTypes['Props'];
 export const Description = HeroUIDescription;

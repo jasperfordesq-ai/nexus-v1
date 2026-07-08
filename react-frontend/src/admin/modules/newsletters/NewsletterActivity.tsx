@@ -143,7 +143,7 @@ function downloadCsv(rows: string[][], filename: string) {
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export function NewsletterActivity() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();

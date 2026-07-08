@@ -125,7 +125,7 @@ const SEVERITY_COLORS: Record<string, 'default' | 'warning' | 'danger'> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function SafeguardingDashboard({ routeBase = '/admin/safeguarding' }: SafeguardingDashboardProps = {}) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_safeguarding');
   usePageTitle(t('safeguarding.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

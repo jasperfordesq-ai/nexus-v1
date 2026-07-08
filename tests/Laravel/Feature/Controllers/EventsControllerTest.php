@@ -110,6 +110,25 @@ class EventsControllerTest extends TestCase
         $this->assertArrayNotHasKey('public_contract', $response->json('data.0'));
     }
 
+    public function test_index_only_returns_publicly_visible_events(): void
+    {
+        $user = $this->authenticatedUser();
+        $this->createEvent($user->id, ['title' => 'Visible active event', 'status' => 'active']);
+        $this->createEvent($user->id, ['title' => 'Cancelled event', 'status' => 'cancelled']);
+        $this->createEvent($user->id, ['title' => 'Draft event', 'status' => 'draft']);
+        $this->createEvent($user->id, ['title' => 'Completed event', 'status' => 'completed']);
+
+        $response = $this->apiGet('/v2/events?per_page=20');
+
+        $response->assertOk();
+        $titles = array_column($response->json('data'), 'title');
+
+        $this->assertContains('Visible active event', $titles);
+        $this->assertNotContains('Cancelled event', $titles);
+        $this->assertNotContains('Draft event', $titles);
+        $this->assertNotContains('Completed event', $titles);
+    }
+
     public function test_public_index_returns_full_next_public_event_contract_when_opted_in(): void
     {
         $user = User::factory()->forTenant($this->testTenantId)->create([

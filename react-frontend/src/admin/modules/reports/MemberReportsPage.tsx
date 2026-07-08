@@ -156,7 +156,7 @@ async function exportCsv(reportType: string) {
 // ---------------------------------------------------------------------------
 
 export function MemberReportsPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_reports');
   usePageTitle(t('reports.page_title'));
   const toast = useToast();
 

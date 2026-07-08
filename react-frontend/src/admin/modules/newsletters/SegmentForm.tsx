@@ -100,7 +100,7 @@ const getFieldConfig = (fieldKey: string): RuleFieldConfig | undefined =>
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function SegmentForm() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   const { tenantPath } = useTenant();
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);

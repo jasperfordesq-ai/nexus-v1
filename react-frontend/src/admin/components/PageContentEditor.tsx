@@ -52,7 +52,7 @@ export const PageContentEditor = forwardRef<PageContentEditorHandle, PageContent
   { value, format, designJson, isDisabled, onChange },
   ref,
 ) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_editor');
   const confirm = useConfirm();
   const designBuilderRef = useRef<PageDesignBuilderHandle | null>(null);
 

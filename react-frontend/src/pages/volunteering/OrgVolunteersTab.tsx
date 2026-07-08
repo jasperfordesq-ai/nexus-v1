@@ -87,7 +87,7 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to load volunteers', err);
-      toastRef.current.error(t('org_volunteers.load_failed'));
+      toastRef.current.error(tRef.current('org_volunteers.load_failed'));
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);

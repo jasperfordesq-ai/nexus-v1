@@ -83,7 +83,7 @@ const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'>
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function MarketplaceAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_marketplace');
   usePageTitle(t('marketplace.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

@@ -43,7 +43,7 @@ const formatAmount = (amount: number, currency: string) => {
 };
 
 export function InvoiceHistory() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_billing');
   usePageTitle(t('billing.view_invoices'));
   const toast = useToast();
 

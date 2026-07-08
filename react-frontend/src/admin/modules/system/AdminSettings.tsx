@@ -119,7 +119,7 @@ function readableHeaderText(hex: string): string {
 
 export function AdminSettings() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   useAdminPageMeta({ title: tNav('system') });
   const toast = useToast();
   const { tenant, tenantPath, refreshTenant, branding } = useTenant();

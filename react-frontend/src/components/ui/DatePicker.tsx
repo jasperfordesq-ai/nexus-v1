@@ -5,14 +5,12 @@
 
 import type { ComponentProps, ReactNode } from 'react';
 import type { DateValue } from '@internationalized/date';
-import {
-  Calendar,
-  DateField,
-  DatePicker as HeroUIDatePicker,
-  Description,
-  FieldError,
-  Label,
-} from '@heroui/react';
+import { Calendar } from '@heroui/react/calendar';
+import { DateField } from '@heroui/react/date-field';
+import { DatePicker as HeroUIDatePicker } from '@heroui/react/date-picker';
+import { Description } from '@heroui/react/description';
+import { FieldError } from '@heroui/react/field-error';
+import { Label } from '@heroui/react/label';
 
 type HeroUIDatePickerProps = ComponentProps<typeof HeroUIDatePicker>;
 type HeroUIDatePickerPopoverProps = ComponentProps<typeof HeroUIDatePicker.Popover>;

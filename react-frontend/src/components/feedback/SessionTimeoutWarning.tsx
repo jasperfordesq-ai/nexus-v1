@@ -24,7 +24,7 @@ import LogOut from 'lucide-react/icons/log-out';
 
 import { SESSION_EXPIRING_EVENT, tokenManager } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 // How long to count down in the warning (seconds shown to user)

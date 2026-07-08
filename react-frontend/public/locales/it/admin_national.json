@@ -1,0 +1,186 @@
+{
+  "common": {
+    "an_unexpected_error": "Si è verificato un errore imprevisto",
+    "back": "Indietro",
+    "cancel": "Annulla",
+    "critical": "Critico",
+    "delete": "Elimina",
+    "feature": "Caratteristica",
+    "high": "Alto",
+    "in_progress": "In corso",
+    "in_review": "In revisione",
+    "low": "Basso",
+    "medium": "Medio",
+    "planned": "Pianificato",
+    "refresh": "Aggiorna",
+    "unexpected_error": "Errore imprevisto",
+    "unknown": "Sconosciuto",
+    "unfeature": "Disattivazione",
+    "actions": "Azioni",
+    "active": "Attivo",
+    "all": "Tutto",
+    "approved": "Approvato",
+    "clear": "Chiaro",
+    "clear_filters": "Cancella filtri",
+    "clear_selection": "Cancella selezione",
+    "close": "Chiudi",
+    "collapse": "Crollo",
+    "confirm": "Conferma",
+    "create": "Crea",
+    "declined": "Rifiutato",
+    "download": "Scarica",
+    "edit": "Modifica",
+    "error_loading_data": "Errore durante il caricamento dei dati",
+    "expand": "Espandi",
+    "export": "Esporta",
+    "load_more": "Carica altro",
+    "loading": "Caricamento",
+    "next": "Avanti",
+    "no": "No",
+    "ok": "OK",
+    "pending": "In sospeso",
+    "previous": "Precedente",
+    "retry": "Riprova",
+    "save": "Salva",
+    "select_all": "Seleziona tutto",
+    "select_item": "Seleziona elemento",
+    "yes": "Sì"
+  },
+  "shared": {
+    "broker_actions": "Azioni del broker",
+    "content": "Contenuto",
+    "core_module": "Modulo principale",
+    "document_details": "Dettagli del documento",
+    "history": "Storia",
+    "log_file_empty": "Nessun file di registro trovato",
+    "no": "No",
+    "no_history_available": "Nessuna cronologia disponibile trovata",
+    "no_legal_documents_found": "Nessun documento legale trovato trovato",
+    "no_members_found": "Nessun membro trovato trovato",
+    "loading": "Loading",
+    "no_data": "Nessun dato",
+    "no_data_available": "Nessun dato disponibile",
+    "no_recent_broker_activity": "Nessuna attività recente del broker trovata",
+    "open_page_help": "Apri la pagina di aiuto",
+    "help": "Aiuto",
+    "quick_access": "Accesso rapido",
+    "recent_activity": "Attività recente",
+    "refresh": "Aggiorna",
+    "search": "Ricerca...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Dati",
+    "total_count": "{{count}}totale"
+  },
+  "national": {
+    "trend_chart_aria": "Chart showing community activity trends over time"
+  },
+  "national_kiss_dashboard": {
+    "loading": "Loading",
+    "meta": {
+      "page_title": "Caring Community - Cruscotto nazionale",
+      "title": "Caring Community - Cruscotto nazionale",
+      "description": "Visualizzazione super amministratore multi-cooperativa per ogni Caring Community cooperativa sulla piattaforma. I conteggi dei membri sono riportati tra parentesi che tutelano la privacy."
+    },
+    "actions": {
+      "refresh": "Aggiorna"
+    },
+    "about": {
+      "title": "Informazioni su questa dashboard",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "health_prefix": "Utilizza il selettore del periodo per confrontare i trimestri. La tabella comparativa classifica le cooperative in base agli orari, ai soci o allo stato di salute. Lo stato di salute deriva dalle tendenze dell'attività:",
+      "thriving_definition": "crescendo velocemente,",
+      "stable_definition": "attività piatta,",
+      "struggling_definition": "attività in calo o coinvolgimento molto basso."
+    },
+    "status": {
+      "thriving": "Fiorente",
+      "stable": "Stabile",
+      "struggling": "Lottando"
+    },
+    "health_legend": {
+      "title": "Chiave dello stato di salute:",
+      "thriving": "ore in forte crescita (>10% vs periodo precedente)",
+      "stable": "attività piatta (+/-10%)",
+      "struggling": "attività in calo o meno di 5 ore verificate nel periodo",
+      "privacy_note": "Il numero dei membri viene mostrato come parentesi di tutela della privacy (ad esempio \"50-99\"): qui non vengono mai visualizzati dati individuali."
+    },
+    "filters": {
+      "period": "Periodo",
+      "period_aria": "Periodo di riferimento",
+      "from": "Da",
+      "from_aria": "Periodo da",
+      "to": "A",
+      "to_aria": "Periodo a"
+    },
+    "periods": {
+      "this_month": "Questo mese",
+      "last_quarter": "Ultimo trimestre (90 giorni)",
+      "last_year": "L'anno scorso",
+      "custom": "Gamma personalizzata"
+    },
+    "stats": {
+      "total_cooperatives": "Cooperative totali",
+      "active_cooperatives": "Cooperative attive",
+      "active_description": "{{active}} di {{total}} attivi nel periodo",
+      "total_hours": "Ore totali (nazionale)",
+      "active_tandems": "Tandem attivi"
+    },
+    "inline": {
+      "active_members": "Membri attivi:",
+      "recipients_reached": "Destinatari raggiunti:",
+      "safeguarding_reports": "Rapporti di salvaguardia:"
+    },
+    "metrics": {
+      "yoy": "{{value}} YoY"
+    },
+    "trend": {
+      "title": "Andamento nazionale sui 12 mesi",
+      "empty": "Nessun dato di tendenza disponibile.",
+      "hours_axis": "Ore",
+      "cooperatives_axis": "Cooperative",
+      "active_cooperatives": "Cooperative attive",
+      "total_hours_all": "Ore totali (tutte le cooperative)"
+    },
+    "comparative": {
+      "title": "Metriche comparative",
+      "sort_hint": "Fare clic su una colonna per ordinare",
+      "empty_prefix": "NO",
+      "empty_middle": "cooperative già configurate. Vai a",
+      "super_admin_tenants": "Super amministratore -> Inquilini",
+      "empty_suffix": "e impostare la categoria dell'inquilino su",
+      "empty_tail": "su almeno un tenant per popolare questo dashboard.",
+      "aria": "Metriche comparative per cooperativa",
+      "cooperative": "Cooperativa",
+      "hours_title": "Ore di assistenza totali verificate nel periodo selezionato",
+      "hours_sort": "Orari <->",
+      "members_title": "Conteggio dei membri attivi mostrato come fascia di tutela della privacy",
+      "members": "Membri",
+      "recipients_title": "Destinatari delle cure raggiunti (fascia di tutela della privacy)",
+      "recipients": "Destinatari",
+      "tandems_title": "Coppie ricorrenti aiutante/destinatario con 2+ scambi completati",
+      "tandems_sort": "Tandem <->",
+      "retention_title": "% di membri attivi sia in questo periodo che nel periodo equivalente precedente",
+      "retention_sort": "Conservazione <->",
+      "reciprocity_title": "% di sostenitori che hanno ricevuto anche ore nel periodo - indica la salute dello scambio reciproco",
+      "reciprocity_sort": "Reciprocità <->",
+      "status": "Stato"
+    },
+    "leaderboards": {
+      "top_title": "I primi 5 per ora",
+      "bottom_title": "Ultimi 5 (solo attivi)"
+    },
+    "empty": {
+      "no_data": "Nessun dato.",
+      "no_active_cooperatives": "Nessuna cooperativa attiva in questo periodo."
+    },
+    "footer": {
+      "generated_at": "Generato alle {{date}}.",
+      "privacy_note": "I conteggi dei membri sono riportati tra parentesi che tutelano la privacy: nessun identificatore dei singoli membri viene mostrato in nessuna parte di questa pagina."
+    },
+    "toasts": {
+      "load_failed": "Impossibile caricare il dashboard"
+    }
+  }
+}

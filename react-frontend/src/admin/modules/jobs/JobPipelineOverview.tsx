@@ -101,7 +101,7 @@ const PAGE_SIZE = 20;
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function JobPipelineOverview() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_jobs');
   usePageTitle(t('jobs.pipeline_title'));
   const toast = useToast();
 

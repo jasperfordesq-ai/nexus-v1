@@ -33,7 +33,7 @@ interface DeliverableFormData {
 
 export function CreateDeliverable() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_deliverability');
   useAdminPageMeta({ title: tNav('deliverability') });
   const navigate = useNavigate();
   const { tenantPath } = useTenant();

@@ -39,7 +39,7 @@ import type { MarketplaceOrderItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
@@ -128,7 +128,7 @@ function OrderCard({
               </Link>
               <div className="flex items-center gap-2 mt-1">
                 <Avatar
-                  src={order.seller.avatar_url || undefined}
+                  src={resolveAvatarUrl(order.seller.avatar_url) || undefined}
                   name={order.seller.name}
                   size="sm"
                   className="w-5 h-5"

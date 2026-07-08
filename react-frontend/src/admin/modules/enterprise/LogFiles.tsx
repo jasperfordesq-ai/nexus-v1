@@ -59,7 +59,7 @@ const formatBytes = (bytes: number) => {
 };
 
 export function LogFiles() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   usePageTitle(t('enterprise.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

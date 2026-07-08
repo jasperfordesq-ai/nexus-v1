@@ -4,15 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { type ComponentProps, type ReactNode } from 'react';
-import {
-  ComboBox as HeroComboBox,
-  Description,
-  FieldError,
-  Input,
-  Label,
-  ListBox as HeroListBox,
-  useFilter,
-} from '@heroui/react';
+import { ComboBox as HeroComboBox } from '@heroui/react/combo-box';
+import { Description } from '@heroui/react/description';
+import { FieldError } from '@heroui/react/field-error';
+import { Input } from '@heroui/react/input';
+import { Label } from '@heroui/react/label';
+import { ListBox as HeroListBox } from '@heroui/react/list-box';
+import { useFilter } from '@heroui/react/rac';
 import { cn } from '@/lib/helpers';
 
 type HeroComboBoxProps = ComponentProps<typeof HeroComboBox>;

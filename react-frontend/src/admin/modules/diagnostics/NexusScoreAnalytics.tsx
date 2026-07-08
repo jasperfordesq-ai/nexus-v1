@@ -33,7 +33,7 @@ interface NexusScoreData {
 }
 
 export function NexusScoreAnalytics() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_diagnostics');
   useAdminPageMeta({ title: t('diagnostics.page_title') });
   const toast = useToast();
 

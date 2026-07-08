@@ -10,13 +10,17 @@
  * has an entry in the HELP_CONTENT registry.
  */
 
-import { useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';import HelpCircle from 'lucide-react/icons/help-circle';
-import { HELP_CONTENT } from '../data/helpContent';
-import { AdminHelpDrawer } from './AdminHelpDrawer';
-import { Button } from '@/components/ui';
+import { useTranslation } from 'react-i18next';
+import HelpCircle from 'lucide-react/icons/help-circle';
+import type { HelpArticle } from '../data/helpContent';
+import { Button } from '@/components/ui/Button';
+
+const AdminHelpDrawer = lazy(() =>
+  import('./AdminHelpDrawer').then((module) => ({ default: module.AdminHelpDrawer }))
+);
 
 interface PageHeaderProps {
   title: string;
@@ -27,16 +31,42 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ title, description, subtitle, icon, actions }: PageHeaderProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_nav');
   const body = description ?? subtitle;
   const location = useLocation();
-
-  // Strip the tenant-slug prefix so /slug/caring/foo -> /caring/foo
-  // and /slug/super-admin/national/kiss -> /super-admin/national/kiss.
-  const normalizedPath = location.pathname.replace(/^\/[^/]+(?=\/(?:admin|caring|super-admin))/, '');
-  const article = HELP_CONTENT[normalizedPath] ?? HELP_CONTENT[location.pathname] ?? null;
-
+  const [article, setArticle] = useState<HelpArticle | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    // Strip the tenant-slug prefix so /slug/caring/foo -> /caring/foo
+    // and /slug/super-admin/national/kiss -> /super-admin/national/kiss.
+    const normalizedPath = location.pathname.replace(/^\/[^/]+(?=\/(?:admin|caring|super-admin))/, '');
+    const loadHelpArticle = () => {
+      void import('../data/helpContent').then(({ HELP_CONTENT }) => {
+        if (!cancelled) {
+          setArticle(HELP_CONTENT[normalizedPath] ?? HELP_CONTENT[location.pathname] ?? null);
+        }
+      });
+    };
+
+    setArticle(null);
+    setHelpOpen(false);
+
+    if ('requestIdleCallback' in window) {
+      const idleId = window.requestIdleCallback(loadHelpArticle, { timeout: 1500 });
+      return () => {
+        cancelled = true;
+        window.cancelIdleCallback(idleId);
+      };
+    }
+
+    const timeoutId = globalThis.setTimeout(loadHelpArticle, 0);
+    return () => {
+      cancelled = true;
+      globalThis.clearTimeout(timeoutId);
+    };
+  }, [location.pathname]);
 
   return (
     <>
@@ -71,12 +101,14 @@ export function PageHeader({ title, description, subtitle, icon, actions }: Page
           {actions && <div className="flex flex-wrap items-center gap-2 sm:justify-end">{actions}</div>}
         </div>
       </div>
-      {article && (
-        <AdminHelpDrawer
-          article={article}
-          isOpen={helpOpen}
-          onClose={() => setHelpOpen(false)}
-        />
+      {article && helpOpen && (
+        <Suspense fallback={null}>
+          <AdminHelpDrawer
+            article={article}
+            isOpen={helpOpen}
+            onClose={() => setHelpOpen(false)}
+          />
+        </Suspense>
       )}
     </>
   );

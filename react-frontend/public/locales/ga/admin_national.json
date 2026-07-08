@@ -1,0 +1,186 @@
+{
+  "common": {
+    "an_unexpected_error": "Tharla earráid gan choinne",
+    "back": "Ar ais",
+    "cancel": "Cealaigh",
+    "critical": "Criticiúil",
+    "delete": "Scrios",
+    "feature": "Gné",
+    "high": "Ard",
+    "in_progress": "Ar Siúl",
+    "in_review": "In Léirmheas",
+    "low": "Íseal",
+    "medium": "Meánach",
+    "planned": "Pleanáilte",
+    "refresh": "Athnuaigh",
+    "unexpected_error": "Earráid gan choinne",
+    "unknown": "Anaithnid",
+    "unfeature": "Neamhghné",
+    "actions": "Gníomhartha",
+    "active": "Gníomhach",
+    "all": "Gach",
+    "approved": "Ceadaithe",
+    "clear": "Glan",
+    "clear_filters": "Scagairí Glan",
+    "clear_selection": "Glan Roghnú",
+    "close": "Dún",
+    "collapse": "Laghdaigh",
+    "confirm": "Deimhnigh",
+    "create": "Cruthaigh",
+    "declined": "Diúltaithe",
+    "download": "Íosluchtaigh",
+    "edit": "Cuir in eagar",
+    "error_loading_data": "Earráid Sonraí á Luchtú",
+    "expand": "Leathnaigh",
+    "export": "Easpórtáil",
+    "load_more": "Luchtaigh Níos mó",
+    "loading": "Ag lódáil",
+    "next": "Ar aghaidh",
+    "no": "Níl",
+    "ok": "OK",
+    "pending": "Ar feitheamh",
+    "previous": "Roimhe Seo",
+    "retry": "Bain triail eile as",
+    "save": "Sábháil",
+    "select_all": "Roghnaigh Uile",
+    "select_item": "Roghnaigh Mír",
+    "yes": "Tá"
+  },
+  "shared": {
+    "broker_actions": "Gníomhartha Bróicéara",
+    "content": "Ábhar",
+    "core_module": "Croímhodúl",
+    "document_details": "Sonraí an Doiciméid",
+    "history": "Stair",
+    "log_file_empty": "Níor aimsíodh aon logchomhad",
+    "no": "Níl",
+    "no_history_available": "Níor aimsíodh aon stair le fáil",
+    "no_legal_documents_found": "Níor aimsíodh aon doiciméad dlíthiúil",
+    "no_members_found": "Níor aimsíodh aon bhall",
+    "loading": "Loading",
+    "no_data": "Gan sonraí",
+    "no_data_available": "Níl aon sonraí ar fáil",
+    "no_recent_broker_activity": "Níor aimsíodh aon ghníomhaíocht bróicéir le déanaí",
+    "open_page_help": "Cabhair leathanach a oscailt",
+    "help": "Cabhrú",
+    "quick_access": "Rochtain Thapa",
+    "recent_activity": "Gníomhaíocht le Déanaí",
+    "refresh": "Athnuaigh",
+    "search": "Cuardach...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Sonraí",
+    "total_count": "{{count}}iomlán"
+  },
+  "national": {
+    "trend_chart_aria": "Chart showing community activity trends over time"
+  },
+  "national_kiss_dashboard": {
+    "loading": "Loading",
+    "meta": {
+      "page_title": "Caring Community - An Painéal Náisiúnta",
+      "title": "Caring Community - An Painéal Náisiúnta",
+      "description": "Radharc sár-riaracháin tras-chomhoibríoch thar gach comharchumann Caring Community ar an ardán. Tuairiscítear comhaireamh na mball idir lúibíní caomhnaithe príobháideachais."
+    },
+    "actions": {
+      "refresh": "Athnuaigh"
+    },
+    "about": {
+      "title": "Maidir leis an painéal seo",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "health_prefix": "Úsáid an roghnóir peiriad chun ceathrúna a chur i gcomparáid. Rangaíonn an tábla comparáideach comharchumainn de réir uaireanta, baill, nó stádas sláinte. Díorthaítear stádas sláinte ó threochtaí gníomhaíochta:",
+      "thriving_definition": "ag fás go tapa,",
+      "stable_definition": "gníomhaíocht chothrom,",
+      "struggling_definition": "laghdú ar ghníomhaíocht nó rannpháirtíocht an-íseal."
+    },
+    "status": {
+      "thriving": "Faoi rath",
+      "stable": "Cobhsaí",
+      "struggling": "Ag streachailt"
+    },
+    "health_legend": {
+      "title": "Eochair stádais sláinte:",
+      "thriving": "uaireanta ag fás go láidir (>10% vs tréimhse roimhe sin)",
+      "stable": "gníomhaíocht leata (+/- 10%)",
+      "struggling": "gníomhaíocht laghdaithe nó níos lú ná 5 huaire fíoraithe sa tréimhse",
+      "privacy_note": "Taispeántar comhaireamh na mball mar lúibíní caomhnaithe príobháideachta (m.sh. \"50-99\") - ní thugtar aon sonraí aonair riamh anseo."
+    },
+    "filters": {
+      "period": "Tréimhse",
+      "period_aria": "Tréimhse tuairiscithe",
+      "from": "Ó",
+      "from_aria": "Tréimhse ó",
+      "to": "Chuig",
+      "to_aria": "Tréimhse go"
+    },
+    "periods": {
+      "this_month": "an mhí seo",
+      "last_quarter": "An ceathrú deiridh (90 lá)",
+      "last_year": "An bhliain seo caite",
+      "custom": "Raon saincheaptha"
+    },
+    "stats": {
+      "total_cooperatives": "Comharchumainn iomlána",
+      "active_cooperatives": "Comharchumainn ghníomhacha",
+      "active_description": "{{active}} de {{total}} gníomhach sa tréimhse",
+      "total_hours": "Uaireanta iomlána (náisiúnta)",
+      "active_tandems": "Tandems gníomhacha"
+    },
+    "inline": {
+      "active_members": "Baill ghníomhacha:",
+      "recipients_reached": "Shroich na faighteoirí:",
+      "safeguarding_reports": "Tuarascálacha cosanta:"
+    },
+    "metrics": {
+      "yoy": "{{value}} YoY"
+    },
+    "trend": {
+      "title": "Treocht náisiúnta 12 mhí",
+      "empty": "Níl aon sonraí treochtaí ar fáil.",
+      "hours_axis": "Uaireanta",
+      "cooperatives_axis": "Comharchumainn",
+      "active_cooperatives": "Comharchumainn ghníomhacha",
+      "total_hours_all": "Uaireanta iomlána (gach comharchumann)"
+    },
+    "comparative": {
+      "title": "Méadracht chomparáideach",
+      "sort_hint": "Cliceáil colún le sórtáil",
+      "empty_prefix": "Níl",
+      "empty_middle": "comharchumainn cumraithe fós. Téigh go dtí",
+      "super_admin_tenants": "Sár-Riarachán -> Tionóntaí",
+      "empty_suffix": "agus an catagóir tionónta a shocrú go",
+      "empty_tail": "ar thionónta amháin ar a laghad chun an painéal seo a líonadh.",
+      "aria": "Méadracht chomparáideach de réir comharchumainn",
+      "cooperative": "Comharchumann",
+      "hours_title": "Iomlán na n-uaireanta cúraim fíoraithe sa tréimhse roghnaithe",
+      "hours_sort": "Uaireanta <->",
+      "members_title": "Taispeántar comhaireamh ball gníomhach mar lúibín caomhnaithe príobháideachta",
+      "members": "Baill",
+      "recipients_title": "Faighteoirí cúraim bainte amach (lúibín caomhnaithe príobháideachta)",
+      "recipients": "Faighteoirí",
+      "tandems_title": "Péirí cúntóra/faighteoirí athfhillteacha le 2+ malartú críochnaithe",
+      "tandems_sort": "Tandems <->",
+      "retention_title": "% de na comhaltaí a bhí gníomhach sa tréimhse seo agus sa tréimhse choibhéiseach roimhe sin",
+      "retention_sort": "Coinneáil <->",
+      "reciprocity_title": "% de lucht tacaíochta a fuair freisin uair an chloig sa tréimhse - léiríonn sláinte a mhalartú frithpháirteach",
+      "reciprocity_sort": "Cómhalartacht <->",
+      "status": "Stádas"
+    },
+    "leaderboards": {
+      "top_title": "Barr 5 in aghaidh na huaire",
+      "bottom_title": "Bun 5 (gníomhach amháin)"
+    },
+    "empty": {
+      "no_data": "Gan sonraí.",
+      "no_active_cooperatives": "Uimh comharchumainn gníomhach sa tréimhse seo."
+    },
+    "footer": {
+      "generated_at": "Gintear ag {{date}}.",
+      "privacy_note": "Tuairiscítear comhaireamh na mball idir lúibíní caomhnaithe príobháideachais - ní thaispeántar aitheantóirí baill aonair ar bith ar an leathanach seo."
+    },
+    "toasts": {
+      "load_failed": "Theip ar lódáil an deais"
+    }
+  }
+}

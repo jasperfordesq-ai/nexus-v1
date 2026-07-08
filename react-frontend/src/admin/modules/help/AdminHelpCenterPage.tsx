@@ -56,7 +56,7 @@ function categoryKey(category: Category): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function AdminHelpCenterPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_help_module');
   usePageTitle(t('admin_help.page_title'));
   const { tenantPath } = useTenant();
   const navigate = useNavigate();

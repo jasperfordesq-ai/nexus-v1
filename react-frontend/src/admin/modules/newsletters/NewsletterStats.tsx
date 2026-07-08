@@ -163,7 +163,7 @@ export function NewsletterStats() {
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   usePageTitle(t('newsletters.page_title'));
 
   const [data, setData] = useState<StatsData | null>(null);
@@ -921,7 +921,7 @@ function AbVariantCard({
   isLeading: boolean;
   chipColor: 'accent' | 'warning';
 }) {
-  const { t: tLocal } = useTranslation('admin');
+  const { t: tLocal } = useTranslation('admin_newsletters');
   return (
     <Card
       className={`border-2 ${isWinner ? 'border-success bg-success-50/50 dark:bg-success-50/5' : 'border-border'}`}

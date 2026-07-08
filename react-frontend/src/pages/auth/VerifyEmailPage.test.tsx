@@ -44,6 +44,27 @@ vi.mock('@/contexts', () => ({
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
+    isAuthenticated: false,
+    user: null,
+  })),
+}));
+
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: vi.fn(() => ({
+    tenant: { id: 2, name: 'Test Tenant', slug: 'test', settings: {} },
+    branding: { name: 'Test Community', logo_url: null },
+    tenantPath: (p: string) => `/test${p}`,
+    hasFeature: vi.fn(() => true),
+  })),
+}));
+
+vi.mock('@/contexts/ToastContext', () => ({
+  useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
+  ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 vi.mock('@/lib/motion', () => ({
@@ -72,7 +93,8 @@ vi.mock('react-router-dom', async () => {
 
 import { VerifyEmailPage } from './VerifyEmailPage';
 import { api } from '@/lib/api';
-import { useAuth, useTenant } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
 
 const mockApi = api as { post: ReturnType<typeof vi.fn> };
 const mockUseAuth = useAuth as ReturnType<typeof vi.fn>;

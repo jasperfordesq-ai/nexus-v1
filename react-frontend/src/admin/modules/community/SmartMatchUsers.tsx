@@ -23,7 +23,7 @@ import { Chip, Spinner } from '@/components/ui';
 export function SmartMatchUsers() {
   usePageTitle("Community");
   const toast = useToast();
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_community');
 
   const [data, setData] = useState<MatchApproval[]>([]);
   const [loading, setLoading] = useState(true);

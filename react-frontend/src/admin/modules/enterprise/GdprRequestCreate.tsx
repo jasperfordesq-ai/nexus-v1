@@ -50,7 +50,7 @@ const REQUEST_TYPES: RequestTypeOption[] = [
 const PRIORITY_KEYS = ['low', 'normal', 'high', 'urgent'] as const;
 
 export function GdprRequestCreate() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   useAdminPageMeta({ title: t('enterprise.gdpr_create_request_title') });
   const { tenantPath } = useTenant();
   const toast = useToast();

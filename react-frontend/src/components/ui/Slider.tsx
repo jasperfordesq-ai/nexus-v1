@@ -4,7 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { ComponentProps, ReactNode } from 'react';
-import { Label, Slider as HeroUISlider } from '@heroui/react';
+import { Label } from '@heroui/react/label';
+import { Slider as HeroUISlider } from '@heroui/react/slider';
 
 type HeroUISliderProps = ComponentProps<typeof HeroUISlider>;
 type SliderValue = number | number[];

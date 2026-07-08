@@ -4,20 +4,18 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Fragment, isValidElement, type ComponentProps, type ReactNode } from 'react';
-import {
-  Description,
-  Header,
-  Label,
-  ListBox as HeroListBox,
-  Separator,
-} from '@heroui/react';
+import { Description } from '@heroui/react/description';
+import { Header } from '@heroui/react/header';
+import { Label } from '@heroui/react/label';
+import { ListBox as HeroListBox } from '@heroui/react/list-box';
+import { Separator } from '@heroui/react/separator';
 import { cn } from '@/lib/helpers';
 
 type HeroListBoxProps = ComponentProps<typeof HeroListBox>;
 type HeroListBoxItemProps = ComponentProps<typeof HeroListBox.Item>;
 type HeroListBoxSectionProps = ComponentProps<typeof HeroListBox.Section>;
 
-export type { Selection } from '@heroui/react';
+export type { Selection } from '@heroui/react/rac';
 
 export interface ListBoxProps<T extends object = object>
   extends Omit<HeroListBoxProps, 'className' | 'children'> {

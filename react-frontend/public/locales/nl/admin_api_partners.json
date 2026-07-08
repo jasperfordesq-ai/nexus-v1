@@ -1,0 +1,180 @@
+{
+  "common": {
+    "an_unexpected_error": "Er is een onverwachte fout opgetreden",
+    "back": "Terug",
+    "cancel": "Annuleer",
+    "critical": "Kritisch",
+    "delete": "Verwijderen",
+    "feature": "Functie",
+    "high": "Hoog",
+    "in_progress": "In uitvoering",
+    "in_review": "Ter beoordeling",
+    "low": "Laag",
+    "medium": "Middelmatig",
+    "planned": "Gepland",
+    "refresh": "Vernieuwen",
+    "unexpected_error": "Onverwachte fout",
+    "unknown": "Onbekend",
+    "unfeature": "Uitgelicht",
+    "actions": "Acties",
+    "active": "Actief",
+    "all": "Allemaal",
+    "approved": "Goedgekeurd",
+    "clear": "Duidelijk",
+    "clear_filters": "Filters wissen",
+    "clear_selection": "Selectie wissen",
+    "close": "Sluiten",
+    "collapse": "Samenvouwen",
+    "confirm": "Bevestig",
+    "create": "Creëer",
+    "declined": "Geweigerd",
+    "download": "Downloaden",
+    "edit": "Bewerken",
+    "error_loading_data": "Fout bij het laden van gegevens",
+    "expand": "Uitbreiden",
+    "export": "Exporteren",
+    "load_more": "Laad meer",
+    "loading": "Laden",
+    "next": "Volgende",
+    "no": "Nee",
+    "ok": "OK",
+    "pending": "In behandeling",
+    "previous": "Vorige",
+    "retry": "Opnieuw proberen",
+    "save": "Opslaan",
+    "select_all": "Selecteer Alles",
+    "select_item": "Selecteer Artikel",
+    "yes": "Ja"
+  },
+  "shared": {
+    "broker_actions": "Makelaarsacties",
+    "content": "Inhoud",
+    "core_module": "Kernmodule",
+    "document_details": "Documentdetails",
+    "history": "Geschiedenis",
+    "log_file_empty": "Geen logbestand gevonden",
+    "no": "Nee",
+    "no_history_available": "Geen geschiedenis beschikbaar gevonden",
+    "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
+    "no_members_found": "Geen leden gevonden gevonden",
+    "loading": "Loading",
+    "no_data": "Geen gegevens",
+    "no_data_available": "Geen gegevens beschikbaar",
+    "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
+    "open_page_help": "Helppagina openen",
+    "help": "Hulp",
+    "quick_access": "Snelle toegang",
+    "recent_activity": "Recente activiteit",
+    "refresh": "Vernieuwen",
+    "search": "Zoekopdracht...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Gegevens",
+    "total_count": "{{count}}totaal"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "API-partners"
+    },
+    "header": {
+      "title": "API-partners",
+      "description": "Geef goedgekeurde externe systemen (zoals een bank- of gemeentesysteem) veilige toegangssleutels tot uw NEXUS-gegevens. Gebruik in plaats daarvan externe protocolpartners om verbinding te maken met een ander tijdbankplatform."
+    },
+    "actions": {
+      "activate": "Activeren",
+      "cancel": "Annuleren",
+      "close": "Dichtbij",
+      "new_partner": "Nieuwe partner",
+      "regenerate_credentials": "Referenties opnieuw genereren",
+      "suspend": "Opschorten",
+      "view_call_log": "Bekijk oproeplog"
+    },
+    "call_log": {
+      "table_aria": "Recente oproepen",
+      "columns": {
+        "duration": "Duur",
+        "method": "Methode",
+        "path": "Pad",
+        "status": "Status",
+        "when": "Wanneer"
+      }
+    },
+    "columns": {
+      "actions": "Acties",
+      "name": "Naam",
+      "rate_limit": "Tarieflimiet",
+      "sandbox": "Zandbak",
+      "scopes": "Bereik",
+      "slug": "Naaktslak",
+      "status": "Status"
+    },
+    "common": {
+      "any": "elk",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ms",
+      "no": "Nee",
+      "per_minute": "{{value}}/min",
+      "yes": "Ja"
+    },
+    "confirm": {
+      "regenerate_credentials": "Nieuwe toegangssleutels aanmaken voor deze partner? De oude sleutels werken onmiddellijk niet meer; u moet de nieuwe delen met de partner."
+    },
+    "create_modal": {
+      "allowed_scopes": "Toegestane bereiken",
+      "contact_email": "E-mailadres voor contact",
+      "contact_email_placeholder": "integraties@partner.voorbeeld",
+      "description": "Beschrijving",
+      "name": "Naam",
+      "name_placeholder": "bijv. PostFinance Switzerland",
+      "rate_limit": "Tarieflimiet (aanvragen / minuut)",
+      "sandbox_mode": "Sandbox-modus (testmodus): de partner kan gegevens bekijken maar niets wijzigen",
+      "submit": "Creëren en uitgeven van inloggegevens",
+      "title": "Nieuwe API-partner"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Kopieer client_id",
+      "copy_client_secret": "Kopieer client_secret",
+      "saved_button": "Deze heb ik bewaard",
+      "title": "Klantreferenties uitgegeven",
+      "warning_body": "De geheime sleutel wordt slechts één keer getoond. Deel beide waarden privé en veilig met uw partner – nooit in een openbare chat of gedeeld document.",
+      "warning_title": "Bewaar deze nu."
+    },
+    "detail": {
+      "call_log_tab": "Oproeplog",
+      "contact": "Contactpersoon:",
+      "info_tab": "Info",
+      "ip_allowlist": "IP toelatingslijst:",
+      "rate_limit": "Tarieflimiet:",
+      "sandbox": "Zandbak:",
+      "scopes": "Bereik:",
+      "status": "Status:",
+      "tabs_aria": "Tabbladen met partnerdetails"
+    },
+    "empty": {
+      "no_calls": "Nog geen oproepen.",
+      "no_partners": "Er zijn nog geen partnersystemen aangesloten. Voeg er een toe om de toegangssleutels te maken."
+    },
+    "status": {
+      "active": "Actief",
+      "pending": "In behandeling",
+      "suspended": "Opgeschort"
+    },
+    "toasts": {
+      "activate_failed": "Activeren mislukt",
+      "activated": "Partner geactiveerd",
+      "copied": "{{label}} gekopieerd",
+      "copy_failed": "Kopiëren mislukt — handmatig kopiëren",
+      "create_failed": "Maken mislukt",
+      "load_failed": "Kan partners niet laden",
+      "name_required": "Naam is vereist",
+      "regenerate_failed": "Opnieuw genereren is mislukt",
+      "suspend_failed": "Opschorten is mislukt",
+      "suspended": "Partner geschorst"
+    },
+    "table": {
+      "aria": "API-partners"
+    }
+  }
+}

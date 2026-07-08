@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  DateRangePicker as HeroUIDateRangePicker,
-  type DateRangePicker as HeroUIDateRangePickerTypes,
-} from '@heroui/react';
+import { DateRangePicker as HeroUIDateRangePicker, type DateRangePicker as HeroUIDateRangePickerTypes } from '@heroui/react/date-range-picker';
 
 export type DateRangePickerProps = HeroUIDateRangePickerTypes['Props'];
 export const DateRangePicker = HeroUIDateRangePicker;

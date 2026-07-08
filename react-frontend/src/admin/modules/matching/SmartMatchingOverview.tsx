@@ -51,7 +51,7 @@ const WEIGHT_META: Array<{
 ];
 
 export function SmartMatchingOverview() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_matching');
   usePageTitle(t('matching.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();

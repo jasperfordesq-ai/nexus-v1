@@ -28,7 +28,7 @@ import type { AdminGroup, GroupType } from '../../api/types';
 
 
 export function GroupEdit() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   const { id } = useParams<{ id: string }>();
   const { tenantPath, hasFeature } = useTenant();
   const toast = useToast();

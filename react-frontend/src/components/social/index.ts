@@ -26,8 +26,9 @@ export { ShareButton } from './ShareButton';
 export type { ShareButtonProps } from './ShareButton';
 
 export { ReactionPicker } from './ReactionPicker';
-export type { ReactionPickerProps, ReactionType } from './ReactionPicker';
-export { REACTION_CONFIGS, REACTION_EMOJI_MAP, REACTION_LABEL_MAP } from './ReactionPicker';
+export type { ReactionPickerProps } from './ReactionPicker';
+export type { ReactionType } from './reactions';
+export { REACTION_CONFIGS, REACTION_EMOJI_MAP, REACTION_LABEL_MAP } from './reactions';
 
 export { ReactionSummary } from './ReactionSummary';
 export type { ReactionSummaryProps } from './ReactionSummary';

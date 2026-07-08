@@ -8,7 +8,10 @@ import { useState, useMemo } from 'react';
 import Search from 'lucide-react/icons/search';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { ICON_MAP, ICON_NAMES, DynamicIcon, Button, Input, Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { DynamicIcon, ICON_MAP, ICON_NAMES } from '@/components/ui/DynamicIcon';
+import { Input } from '@/components/ui/Input';
+import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui/Modal';
 
 interface IconPickerProps {
   value: string | null;
@@ -17,7 +20,7 @@ interface IconPickerProps {
 }
 
 export function IconPicker({ value, onChange, label }: IconPickerProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_nav');
   const resolvedLabel = label ?? t('icon_picker.label');
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');

@@ -25,7 +25,7 @@ interface WebpStats {
 }
 
 export function WebpConverter() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   usePageTitle(t('system.page_title'));
   const toast = useToast();
 

@@ -13,7 +13,7 @@
  * Uses V2 API: POST /api/v2/feed/polls, POST /api/v2/feed/polls/{id}/vote
  */
 
-import React, { useState, useEffect, useCallback, useMemo, useRef, Component, type ReactNode, type ErrorInfo } from 'react';
+import React, { lazy, Suspense, useState, useEffect, useCallback, useMemo, useRef, Component, type ReactNode, type ErrorInfo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from '@/lib/motion';
 
@@ -40,17 +40,15 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/comp
 import { Textarea } from '@/components/ui/Textarea';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 import { useDisclosure } from '@/components/ui/useDisclosure';
-import type { Key } from '@heroui/react';
+import type { Key } from '@heroui/react/rac';
 import { PageMeta } from '@/components/seo';
-import { ComposeHub } from '@/components/compose';
-import type { ComposeTab } from '@/components/compose';
-import { FeedSidebar } from '@/components/feed/sidebar';
+import type { ComposeTab } from '@/components/compose/types';
 import { StoriesBar } from '@/components/feed/StoriesBar';
 import { FeedModeToggle } from '@/components/feed/FeedModeToggle';
 import { SubFilterChips } from '@/components/feed/SubFilterChips';
 import { ConnectionSuggestionsWidget } from '@/components/feed/ConnectionSuggestionsWidget';
-import { useAuth, useToast, usePusherOptional, useTenant } from '@/contexts';
-import type { FeedPostEvent } from '@/contexts';
+import { useAuth, useToast, useTenant } from '@/contexts';
+import { usePusherOptional, type FeedPostEvent } from '@/contexts/PusherContext';
 import { api } from '@/lib/api';
 import { applyFeedSyncToItem, dispatchFeedSync, FEED_SYNC_EVENT, type FeedSyncPayload } from '@/lib/feedSync';
 import { logError } from '@/lib/logger';
@@ -71,6 +69,9 @@ import { FeedEmptyIllustration } from '@/components/illustrations';
 import type { FeedItem, FeedFilter, PollData } from '@/components/feed/types';
 import { getAuthor } from '@/components/feed/types';
 import type { ReactionType } from '@/components/social';
+
+const ComposeHub = lazy(() => import('@/components/compose').then((mod) => ({ default: mod.ComposeHub })));
+const FeedSidebar = lazy(() => import('@/components/feed/sidebar/FeedSidebar'));
 
 /* ───────────────────────── Constants ───────────────────────── */
 
@@ -1332,21 +1333,25 @@ export function FeedPage() {
       )}
 
       {/* Compose Hub */}
-      <ComposeHub
-        isOpen={isCreateOpen}
-        onClose={handleComposeClose}
-        defaultTab={composeDefaultTab}
-        editItem={editingItem}
-        onEditSuccess={handleEditSuccess}
-        onSuccess={(type) => {
-          if (type === 'poll') {
-            navigate(tenantPath('/polls'));
-          } else {
-            cursorRef.current = undefined;
-            loadFeed();
-          }
-        }}
-      />
+      {(isCreateOpen || editingItem) && (
+        <Suspense fallback={null}>
+          <ComposeHub
+            isOpen={isCreateOpen}
+            onClose={handleComposeClose}
+            defaultTab={composeDefaultTab}
+            editItem={editingItem}
+            onEditSuccess={handleEditSuccess}
+            onSuccess={(type) => {
+              if (type === 'poll') {
+                navigate(tenantPath('/polls'));
+              } else {
+                cursorRef.current = undefined;
+                loadFeed();
+              }
+            }}
+          />
+        </Suspense>
+      )}
 
       {/* Report Post Modal */}
       <Modal
@@ -1414,7 +1419,9 @@ export function FeedPage() {
       {showDesktopSidebar && (
         <aside data-testid="feed-sidebar-panel" aria-label={t('aria.feed_sidebar')} className="static hidden w-72 shrink-0 self-start lg:block">
           <SidebarErrorBoundary>
-            <FeedSidebar />
+            <Suspense fallback={null}>
+              <FeedSidebar />
+            </Suspense>
           </SidebarErrorBoundary>
         </aside>
       )}

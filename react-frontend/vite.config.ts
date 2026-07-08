@@ -87,7 +87,34 @@ export default defineConfig(({ command, mode }) => {
         // is what forced this codebase into the "click Update to get fresh
         // code" workflow that PWAs are notorious for. Removing it makes
         // deploys propagate to users on their next navigation, with no UI.
-        globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
+        globPatterns: [
+          'sw-push-handler.js',
+          'manifest.json',
+          'favicon.svg',
+          'og-default.svg',
+          'icons/*.png',
+        ],
+        // Do not make first-visit SW install compete with login/register by
+        // precaching heavyweight route-only bundles. These remain immutable
+        // hashed assets and are fetched/cached by the browser when their route
+        // or editor is actually opened.
+        globIgnores: [
+          '**/NewsletterBuilder-*.js',
+          '**/AssetLibraryModal-*.js',
+          '**/AssetLibraryModal-*.css',
+          '**/HtmlSourceEditor-*.js',
+          '**/OpenStreetMapView-*.js',
+          '**/OpenStreetMapView-*.css',
+          '**/jspdf*.js',
+          '**/html2canvas*.js',
+          '**/LexicalOnChangePlugin*.js',
+          '**/vendor-charts-*.js',
+          '**/MarkdownRenderer-*.js',
+          '**/PageDesignBuilder-*.js',
+          '**/CaringCommunityWorkflowPage-*.js',
+          '**/helpContent-*.js',
+          '**/images/*.png',
+        ],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         skipWaiting: true,
         clientsClaim: true,
@@ -136,7 +163,7 @@ export default defineConfig(({ command, mode }) => {
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'nexus-locales',
-              expiration: { maxEntries: 50, maxAgeSeconds: 86400 },
+              expiration: { maxEntries: 250, maxAgeSeconds: 30 * 86400 },
             },
           },
           {
@@ -308,11 +335,25 @@ export default defineConfig(({ command, mode }) => {
       // Guard all usages with window.Capacitor?.isNativePlatform?.() checks.
       external: ['@capacitor/app', '@capacitor/push-notifications'],
       output: {
-        manualChunks: {
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-heroui': ['@heroui/react'],
-          'vendor-i18n': ['i18next', 'react-i18next'],
-          'vendor-charts': ['recharts'],
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+
+          const normalizedId = id.replace(/\\/g, '/');
+          if (
+            /\/node_modules\/(react|react-dom|react-router-dom|scheduler)\//.test(normalizedId) ||
+            normalizedId.includes('/node_modules/react/jsx-runtime')
+          ) {
+            return 'vendor-react';
+          }
+          if (/\/node_modules\/(@react-aria|@react-stately|@react-types|@internationalized)\//.test(normalizedId)) {
+            return 'vendor-react-aria';
+          }
+          if (/\/node_modules\/(i18next|react-i18next)\//.test(normalizedId)) {
+            return 'vendor-i18n';
+          }
+          if (/\/node_modules\/recharts\//.test(normalizedId)) {
+            return 'vendor-charts';
+          }
         },
       },
     },

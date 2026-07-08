@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  InputOTP as HeroUIInputOTP,
-  type InputOTPProps as HeroUIInputOTPProps,
-} from '@heroui/react';
+import { InputOTP as HeroUIInputOTP, type InputOTPProps as HeroUIInputOTPProps } from '@heroui/react/input-otp';
 
 export type InputOTPProps = HeroUIInputOTPProps;
 export const InputOTP = HeroUIInputOTP;

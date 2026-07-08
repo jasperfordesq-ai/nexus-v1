@@ -57,7 +57,7 @@ interface TemplateGalleryModalProps {
 type CategoryTab = 'starter' | 'saved' | 'custom';
 
 export function TemplateGalleryModal({ isOpen, onClose, templates, onSelect }: TemplateGalleryModalProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   const [tab, setTab] = useState<CategoryTab>('starter');
 
   const byCategory = useMemo(() => {

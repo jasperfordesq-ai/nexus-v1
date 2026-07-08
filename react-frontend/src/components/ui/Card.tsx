@@ -10,7 +10,7 @@ import React, {
   type ReactNode,
   type Ref,
 } from 'react';
-import { Card as HeroUICard, type CardProps as HeroUICardProps } from '@heroui/react';
+import { Card as HeroUICard, type CardProps as HeroUICardProps } from '@heroui/react/card';
 
 function heroCardBaseClass(variant?: string): string {
   return `card card--${variant ?? 'default'}`;

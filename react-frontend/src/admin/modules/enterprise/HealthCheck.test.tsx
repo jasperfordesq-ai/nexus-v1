@@ -24,7 +24,7 @@ vi.mock('@/contexts', () => createMockContexts());
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 // ─── Sample data ─────────────────────────────────────────────────────────────
-// Real i18n values (en/admin.json):
+// Real i18n values (en/admin_enterprise.json):
 //   enterprise.status_healthy → "Healthy"
 //   enterprise.status_degraded → "Degraded"
 //   enterprise.status_unhealthy → "Unhealthy"

@@ -130,7 +130,7 @@ describe('EntityMapView', () => {
   it('renders LocationMap when maps enabled and items have coordinates', async () => {
     const { EntityMapView } = await import('./EntityMapView');
     render(<EntityMapView {...defaultProps} />);
-    expect(screen.getByTestId('location-map')).toBeInTheDocument();
+    expect(await screen.findByTestId('location-map')).toBeInTheDocument();
   });
 
   it('passes correct marker data to LocationMap', async () => {
@@ -195,8 +195,8 @@ describe('EntityMapView', () => {
   it('shows loading skeleton (not map) when isLoading is true', async () => {
     const { EntityMapView } = await import('./EntityMapView');
     render(<EntityMapView {...defaultProps} isLoading />);
-    expect(screen.getByTestId('skeleton')).toBeInTheDocument();
-    expect(screen.getByTestId('skeleton').getAttribute('aria-busy')).toBe('true');
+    const skeleton = screen.getAllByRole('status').find((el) => el.getAttribute('aria-busy') === 'true');
+    expect(skeleton).toBeInTheDocument();
     expect(screen.queryByTestId('location-map')).not.toBeInTheDocument();
   });
 

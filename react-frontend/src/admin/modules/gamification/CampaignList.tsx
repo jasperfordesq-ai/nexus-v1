@@ -109,7 +109,7 @@ function CampaignActions({ campaign, t, navigate, tenantPath, handleStatusChange
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CampaignList() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_gamification');
   usePageTitle(t('gamification.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

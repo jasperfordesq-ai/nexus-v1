@@ -78,7 +78,68 @@ vi.mock('@/contexts', () =>
   })
 );
 
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: () => ({
+    tenant: { id: 2, name: 'Test', slug: 'test' },
+    tenantPath: (p: string) => `/test${p}`,
+    hasFeature: vi.fn(() => true),
+    hasModule: vi.fn(() => true),
+  }),
+}));
+
+vi.mock('@/contexts/NotificationsContext', () => ({
+  useNotificationsOptional: () => ({
+    unreadCount: 0,
+    counts: {
+      total: 0, messages: 0, listings: 0, transactions: 0,
+      connections: 0, events: 0, groups: 0, achievements: 0, system: 0,
+    },
+    isConnected: false,
+    connectionError: null,
+    refreshCounts: vi.fn(),
+    markAsRead: mockMarkAsRead,
+    markAllAsRead: mockMarkAllAsRead,
+  }),
+}));
+
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
+
+vi.mock('@/components/ui/Popover', () => ({
+  Popover: ({ children, isOpen, onOpenChange }: {
+    children: React.ReactNode; isOpen?: boolean; onOpenChange?: (open: boolean) => void;
+  }) => (
+    <div data-testid="popover" data-open={String(isOpen)} onClick={() => onOpenChange?.(!isOpen)}>
+      {children}
+    </div>
+  ),
+  PopoverTrigger: ({ children }: { children: React.ReactNode }) => <div data-testid="popover-trigger">{children}</div>,
+  PopoverContent: ({ children }: { children: React.ReactNode }) => <div data-testid="popover-content">{children}</div>,
+}));
+
+vi.mock('@/components/ui/Button', () => ({
+  Button: ({ children, onPress, 'aria-label': ariaLabel, className }: {
+    children?: React.ReactNode; onPress?: () => void; 'aria-label'?: string; className?: string;
+  }) => (
+    <button onClick={onPress} aria-label={ariaLabel} className={className}>{children}</button>
+  ),
+}));
+
+vi.mock('@/components/ui/Avatar', () => ({
+  Avatar: ({ name, src }: { name?: string; src?: string | null }) => <img alt={name || ''} src={src || ''} />,
+  AvatarGroup: ({ children }: { children: React.ReactNode }) => <div data-testid="avatar-group">{children}</div>,
+}));
+
+vi.mock('@/components/ui/Drawer', () => ({
+  Drawer: ({ isOpen, children }: { isOpen: boolean; children?: React.ReactNode }) =>
+    isOpen ? <div role="dialog" aria-label="Dialog" data-testid="drawer">{children}</div> : null,
+  DrawerContent: ({ children, 'aria-label': ariaLabel }: { children: React.ReactNode; 'aria-label'?: string }) => <div aria-label={ariaLabel}>{children}</div>,
+  DrawerHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  DrawerBody: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
+vi.mock('@/components/ui/Skeleton', () => ({
+  Skeleton: ({ className }: { className?: string }) => <div data-testid="skeleton" className={className} />,
+}));
 
 // ─── Stub heavy HeroUI components ────────────────────────────────────────────
 vi.mock('@/components/ui', async (importOriginal) => {

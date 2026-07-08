@@ -46,7 +46,7 @@ import ArrowUp from 'lucide-react/icons/arrow-up';
 import ArrowDown from 'lucide-react/icons/arrow-down';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
-import { SocialInteractionPanel } from '@/components/social';
+import { SocialInteractionPanel } from '@/components/social/SocialInteractionPanel';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { useAuth, useToast, useTenant } from '@/contexts';

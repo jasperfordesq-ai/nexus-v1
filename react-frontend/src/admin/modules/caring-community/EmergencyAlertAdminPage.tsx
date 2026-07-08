@@ -88,7 +88,7 @@ function severityChip(severity: string, label: string) {
 // ---------------------------------------------------------------------------
 
 export default function EmergencyAlertAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('caring_emergency.title'));
   const { isOpen, onOpen, onClose } = useDisclosure();
 

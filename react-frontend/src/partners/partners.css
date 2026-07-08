@@ -1,0 +1,20 @@
+/* Copyright (c) 2024-2026 Jasper Ford
+   SPDX-License-Identifier: AGPL-3.0-or-later
+   Author: Jasper Ford
+   See NOTICE file for attribution and acknowledgements. */
+
+/*
+   Partner-timebanks-only Tailwind utility sheet.
+   PartnersApp is lazy-loaded, so partner-panel utilities should not inflate
+   the main stylesheet for login, register, and ordinary member routes.
+*/
+
+@import "tailwindcss" source(none);
+
+@source "./**/*.{js,ts,jsx,tsx}";
+@source not "./**/*.test.ts";
+@source not "./**/*.test.tsx";
+@source not "./**/*.spec.ts";
+@source not "./**/*.spec.tsx";
+
+@custom-variant dark (&:is(.dark *));

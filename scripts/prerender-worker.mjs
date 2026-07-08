@@ -126,9 +126,21 @@ async function renderPage(page, url) {
 
   const status = await extractStatusCode(page);
   const redirect = await extractRedirectTarget(page, status);
-  const html = await page.content();
+  const html = stripNonCoreModulePreloads(await page.content());
   const markdown = status === 200 ? await extractMarkdown(page) : null;
   return { html, status, redirect, readiness, markdown };
+}
+
+function stripNonCoreModulePreloads(html) {
+  return html.replace(/<link\b[^>]*>/gi, (tag) => {
+    const rel = tag.match(/\brel=["']([^"']+)["']/i)?.[1] || '';
+    if (!rel.split(/\s+/).includes('modulepreload')) return tag;
+
+    const href = tag.match(/\bhref=["']([^"']+)["']/i)?.[1] || '';
+    if (/^\/assets\/vendor-(?:react|i18n)-[^/]+\.js$/i.test(href)) return tag;
+
+    return '';
+  });
 }
 
 /**

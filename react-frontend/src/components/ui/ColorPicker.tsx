@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  ColorPicker as HeroUIColorPicker,
-  type ColorPickerProps as HeroUIColorPickerProps,
-} from '@heroui/react';
+import { ColorPicker as HeroUIColorPicker, type ColorPickerProps as HeroUIColorPickerProps } from '@heroui/react/color-picker';
 
 export type ColorPickerProps = HeroUIColorPickerProps;
 export const ColorPicker = HeroUIColorPicker;

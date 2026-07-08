@@ -122,7 +122,7 @@ function formatAdminDate(value: string): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function SmartNudgesAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   const toast = useToast();
   usePageTitle(t('smart_nudges.meta.page_title'));
 

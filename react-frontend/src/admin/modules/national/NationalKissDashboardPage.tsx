@@ -144,7 +144,7 @@ const statusChip: Record<CoopStatus, { color: 'success' | 'warning' | 'danger' }
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function NationalKissDashboardPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_national');
   usePageTitle(t('national_kiss_dashboard.meta.page_title'));
   const { showToast } = useToast();
 

@@ -10,6 +10,7 @@ import { CaringLayout } from './CaringLayout';
 import { CaringRoutes } from './routes';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { LoadingScreen } from '@/components/feedback';
+import './caring.css';
 
 function CaringAppInner() {
   return (

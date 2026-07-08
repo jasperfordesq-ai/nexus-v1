@@ -53,7 +53,7 @@ const STATUS_META: Record<DerivedStatus, { key: string; color: 'success' | 'warn
 };
 
 export function LegalDocList() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   useAdminPageMeta({ title: t('enterprise.legal_doc_list_title') });
   const { tenantPath } = useTenant();
   const toast = useToast();

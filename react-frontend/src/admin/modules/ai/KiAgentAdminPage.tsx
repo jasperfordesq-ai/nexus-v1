@@ -144,7 +144,7 @@ const proposalFilters = ['pending_review', 'approved', 'auto_applied', 'rejected
 // ---------------------------------------------------------------------------
 
 export default function KiAgentAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_ai');
   usePageTitle(t('ai.ki_agents.meta.title'));
   const toast = useToast();
 

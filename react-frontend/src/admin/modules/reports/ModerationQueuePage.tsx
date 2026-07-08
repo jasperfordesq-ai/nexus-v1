@@ -135,7 +135,7 @@ const TYPE_COLORS: Record<string, 'accent' | 'default' | 'success' | 'warning'> 
 // ---------------------------------------------------------------------------
 
 export function ModerationQueuePage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_reports');
   usePageTitle(t('reports.page_title'));
 
   const toast = useToast();

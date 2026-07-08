@@ -45,7 +45,7 @@ interface CcNodeConfig {
 }
 
 export function CreditCommonsConfig() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   usePageTitle(t('federation.cc_config_title'));
   const toast = useToast();
 

@@ -47,7 +47,7 @@ export function NewsletterPreviewPane({
   previewText,
   onRequestPreview,
 }: NewsletterPreviewPaneProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
   const [html, setHtml] = useState('');
   const [loading, setLoading] = useState(false);

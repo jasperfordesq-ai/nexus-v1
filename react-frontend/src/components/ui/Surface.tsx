@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Surface as HeroUISurface,
-  type SurfaceProps as HeroUISurfaceProps,
-} from '@heroui/react';
+import { Surface as HeroUISurface, type SurfaceProps as HeroUISurfaceProps } from '@heroui/react/surface';
 
 type ProjectSurfaceVariant = 'elevated' | 'outlined' | 'filled' | 'ghost';
 type V3SurfaceVariant = NonNullable<HeroUISurfaceProps['variant']>;

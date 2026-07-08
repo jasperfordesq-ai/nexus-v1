@@ -124,7 +124,7 @@ function typeColor(type: ProviderType): ChipColor {
 
 export default function CareProviderAdminPage() {
   const { t } = useTranslation(['caring_community', 'common']);
-  const { t: tAdmin } = useTranslation('admin');
+  const { t: tAdmin } = useTranslation('admin_caring_community');
   const confirm = useConfirm();
   usePageTitle(t('admin.providers.meta_title'));
   const { showToast } = useToast();

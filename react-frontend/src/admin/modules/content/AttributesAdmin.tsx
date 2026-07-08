@@ -90,7 +90,7 @@ function AttributeActionsMenu({ item, t, openEditModal, setDeleteTarget }: Attri
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function AttributesAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   usePageTitle(t('content.page_title'));
   const toast = useToast();
 

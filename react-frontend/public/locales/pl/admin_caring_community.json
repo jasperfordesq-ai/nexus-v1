@@ -1,0 +1,2755 @@
+{
+  "common": {
+    "an_unexpected_error": "Wystąpił nieoczekiwany błąd",
+    "back": "Powrót",
+    "cancel": "Anuluj",
+    "critical": "Krytyczny",
+    "delete": "Usuń",
+    "feature": "Funkcja",
+    "high": "Wysoka",
+    "in_progress": "W toku",
+    "in_review": "W przeglądzie",
+    "low": "Niski",
+    "medium": "Średni",
+    "planned": "Planowane",
+    "refresh": "Odśwież",
+    "unexpected_error": "Nieoczekiwany błąd",
+    "unknown": "Nieznany",
+    "unfeature": "Brak funkcji",
+    "actions": "Działania",
+    "active": "Aktywny",
+    "all": "Wszystko",
+    "approved": "Zatwierdzone",
+    "clear": "Jasne",
+    "clear_filters": "Wyczyść filtry",
+    "clear_selection": "Wyczyść wybór",
+    "close": "Zamknij",
+    "collapse": "Zwiń",
+    "confirm": "Potwierdź",
+    "create": "Utwórz",
+    "declined": "Odrzucono",
+    "download": "Pobierz",
+    "edit": "Edytuj",
+    "error_loading_data": "Błąd ładowania danych",
+    "expand": "Rozwiń",
+    "export": "Eksportuj",
+    "load_more": "Załaduj więcej",
+    "loading": "Ładowanie",
+    "next": "Następny",
+    "no": "Nie",
+    "ok": "OK",
+    "pending": "Oczekujące",
+    "previous": "Poprzedni",
+    "retry": "Spróbuj ponownie",
+    "save": "Zapisz",
+    "select_all": "Wybierz wszystko",
+    "select_item": "Wybierz element",
+    "yes": "Tak"
+  },
+  "shared": {
+    "broker_actions": "Działania brokera",
+    "content": "Treść",
+    "core_module": "Moduł podstawowy",
+    "document_details": "Szczegóły dokumentu",
+    "history": "Historia",
+    "log_file_empty": "Nie znaleziono pliku dziennika",
+    "no": "Nie",
+    "no_history_available": "Nie znaleziono dostępnej historii",
+    "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
+    "no_members_found": "Nie znaleziono żadnych członków",
+    "loading": "Loading",
+    "no_data": "Brak danych",
+    "no_data_available": "Brak dostępnych danych",
+    "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
+    "open_page_help": "Otwórz pomoc na stronie",
+    "help": "Pomoc",
+    "quick_access": "Szybki dostęp",
+    "recent_activity": "Ostatnia aktywność",
+    "refresh": "Odświeżać",
+    "search": "Szukaj...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Dane",
+    "total_count": "Łącznie{{count}}"
+  },
+  "admin": {
+    "providers": {
+      "title": "Dostawcy opieki",
+      "meta_title": "Dostawcy opieki",
+      "subtitle": "Zarządzaj lokalnymi dostawcami usług opieki zdrowotnej, ich usługami i statusem weryfikacji.",
+      "empty": "Nie znaleziono dostawców opieki.",
+      "verified": "Zweryfikowano",
+      "yes": "Tak",
+      "no": "Nie",
+      "confirm_deactivate": "Dezaktywować tego dostawcę? Nie będzie już wyświetlany na listach dostępnych dla członków.",
+      "confirm_delete": "Trwale usunąć tego dostawcę? Tego nie można cofnąć.",
+      "about": {
+        "title": "O świadczeniodawcach",
+        "body": "Dostawcy opieki to lokalne organizacje lub osoby oferujące usługi członkom społeczności.",
+        "types_label": "Typy",
+        "types_body": "Dostawcami mogą być opieka domowa, transport, dostawa posiłków, towarzystwo lub inne kategorie.",
+        "verification_label": "Weryfikacja",
+        "verification_body": "Zweryfikowani dostawcy zostali sprawdzeni przez administratora i przeszli weryfikację tożsamości i poświadczeń."
+      },
+      "actions": {
+        "add_provider": "Dodaj dostawcę",
+        "cancel": "Anuluj",
+        "close": "Zamknij",
+        "create_provider": "Utwórz dostawcę",
+        "deactivate_named": "Dezaktywuj{{name}}",
+        "delete_provider": "Usuń dostawcę",
+        "edit_provider": "Edytuj dostawcę",
+        "find_duplicates": "Znajdź duplikaty",
+        "save_changes": "Zapisz zmiany",
+        "verify_provider": "Zweryfikuj dostawcę"
+      },
+      "duplicates": {
+        "title": "Potencjalne duplikaty",
+        "empty": "Nie znaleziono duplikatów.",
+        "match_percent": "{{percent}}% dopasowania",
+        "scanning": "Skanowanie w poszukiwaniu duplikatów…",
+        "summary": "Znaleziono możliwe duplikaty{{count}}.",
+        "vs": "vs"
+      },
+      "errors": {
+        "deactivate": "Nie udało się dezaktywować dostawcy.",
+        "delete": "Nie udało się usunąć dostawcy.",
+        "duplicates": "Nie udało się przeskanować w poszukiwaniu duplikatów.",
+        "load": "Nie udało się załadować dostawców.",
+        "name_required": "Imię i nazwisko jest wymagane.",
+        "save": "Nie udało się zapisać dostawcy.",
+        "type_required": "Typ jest wymagany.",
+        "verify": "Nie udało się zweryfikować dostawcy."
+      },
+      "fields": {
+        "address": "Adres",
+        "description": "Opis",
+        "email": "E-mail",
+        "name": "Imię",
+        "phone": "Telefon",
+        "status": "Stan",
+        "type": "Wpisz",
+        "website": "Strona internetowa"
+      },
+      "messages": {
+        "created": "Dostawca został utworzony.",
+        "deactivated": "Dostawca dezaktywowany.",
+        "removed": "Dostawca usunięty.",
+        "updated": "Dostawca zaktualizowany.",
+        "verified": "Dostawca zweryfikowany."
+      },
+      "modal": {
+        "create_title": "Dodaj dostawcę opieki",
+        "edit_title": "Edytuj dostawcę opieki"
+      },
+      "pagination": {
+        "next": "Następny",
+        "previous": "Poprzedni",
+        "summary": "Wyświetlanie{{from}}–{{to}}z{{total}}"
+      },
+      "placeholders": {
+        "address": "Ulica, miasto, kod pocztowy…",
+        "description": "Krótki opis dostawcy i jego usług…",
+        "name": "np. Opieka domowa Acme"
+      },
+      "status": {
+        "active": "Aktywny",
+        "inactive": "Nieaktywny"
+      },
+      "table": {
+        "actions": "Działania",
+        "aria": "Dostawcy opieki",
+        "name": "Imię",
+        "status": "Stan",
+        "type": "Wpisz",
+        "verified": "Zweryfikowano"
+      }
+    },
+    "common": {
+      "cancel": "Anuluj",
+      "empty_dash": "—",
+      "refresh": "Odśwież"
+    },
+    "hour_transfers": {
+      "title": "Transfery godzinowe",
+      "subtitle": "Przeglądaj i przetwarzaj przychodzące i oczekujące transfery godzinowe między członkami.",
+      "actions": {
+        "approve": "Zatwierdź",
+        "reject": "Odrzuć"
+      },
+      "errors": {
+        "approve": "Nie udało się zatwierdzić przeniesienia.",
+        "load_inbound": "Nie udało się wczytać przelewów przychodzących.",
+        "load_pending": "Nie udało się wczytać oczekujących przelewów.",
+        "reject": "Nie udało się odrzucić przeniesienia."
+      },
+      "inbound": {
+        "empty": "Brak przelewów przychodzących.",
+        "title": "Przychodzące"
+      },
+      "messages": {
+        "approved": "Przeniesienie zatwierdzone.",
+        "rejected": "Transfer odrzucony."
+      },
+      "pending": {
+        "empty": "Brak oczekujących transferów.",
+        "title": "Oczekujące"
+      },
+      "reject_modal": {
+        "reason_label": "Powód",
+        "reason_placeholder": "Wyjaśnij, dlaczego ten transfer został odrzucony…",
+        "title": "Odrzuć przelew"
+      },
+      "tabs": {
+        "aria": "Zakładki transferu godzinowego",
+        "inbound": "Przychodzące",
+        "pending": "Oczekujące"
+      }
+    },
+    "loyalty": {
+      "title": "Program lojalnościowy",
+      "description": "Skonfiguruj sposób, w jaki członkowie wymieniają kredyty czasowe na zniżki u uczestniczących sprzedawców.",
+      "refresh": "Odśwież",
+      "about": {
+        "title": "O programie lojalnościowym",
+        "body": "Członkowie mogą wymieniać kredyty czasowe u uczestniczących sprzedawców w zamian za zniżkę na towary lub usługi.",
+        "rate_label": "Kurs wymiany",
+        "rate_body": "Określa, ile w walucie warta jest jednorazowa godzina kredytowa w punkcie sprzedaży.",
+        "discount_label": "Maksymalny rabat",
+        "discount_body": "Maksymalny procent zakupu, który można opłacić kredytami czasowymi."
+      },
+      "errors": {
+        "discount_range": "Rabat musi mieścić się w przedziale od 0 do 100.",
+        "load_redemptions": "Nie udało się wczytać realizacji.",
+        "load_settings": "Nie udało się załadować ustawień programu lojalnościowego.",
+        "rate_positive": "Kurs wymiany musi być liczbą dodatnią.",
+        "reverse": "Nie udało się cofnąć wykupu.",
+        "save_settings": "Nie udało się zapisać ustawień programu lojalnościowego."
+      },
+      "ledger": {
+        "actions": "Działania",
+        "date": "Data",
+        "discount": "Rabat",
+        "empty": "Nie ma jeszcze żadnych wykupów.",
+        "hours": "Godziny",
+        "item": "Przedmiot",
+        "member": "Członek",
+        "merchant": "Kupiec",
+        "rate": "Oceń",
+        "reverse": "Odwróć",
+        "status": "Stan",
+        "title": "Księga wykupów"
+      },
+      "messages": {
+        "reversed": "Odkupienie odwrócone.",
+        "settings_saved": "Ustawienia lojalnościowe zostały zapisane."
+      },
+      "reverse_modal": {
+        "body": "Cofnięcie wykupu spowoduje zwrot środków czasowych członkowi.",
+        "cancel": "Anuluj",
+        "confirm": "Odwróć",
+        "discount": "Rabat",
+        "member_fallback": "Członek",
+        "merchant": "Kupiec",
+        "reason": "Powód",
+        "reason_placeholder": "Dlaczego to odkupienie zostało odwrócone?",
+        "redeemed": "Odkupiony",
+        "title": "Odwrotne odkupienie"
+      },
+      "settings": {
+        "accept_time_credits": "Zaakceptuj kredyty czasowe",
+        "accept_time_credits_hint": "Zezwól temu sprzedawcy na akceptowanie kredytów czasowych jako płatności za część każdego zakupu.",
+        "clear": "Jasne",
+        "description": "Skonfiguruj politykę stawek i maksymalnych rabatów po stronie sprzedawcy dla programu lojalnościowego.",
+        "exchange_rate": "Kurs wymiany",
+        "exchange_rate_description": "Ile w walucie warta jest jednorazowa godzina kredytowa w punkcie sprzedaży.",
+        "maximum_discount": "Maksymalny rabat (%)",
+        "maximum_discount_description": "Maksymalny procent zakupu, który można opłacić kredytami czasowymi.",
+        "no_matching_members": "Brak pasujących członków.",
+        "save": "Zapisz ustawienia",
+        "seller_label": "Kupiec",
+        "seller_placeholder": "Wyszukaj sprzedawców…",
+        "title": "Ustawienia lojalnościowe",
+        "view_only": "Do tego ustawienia masz dostęp tylko do odczytu."
+      },
+      "stats": {
+        "hours_redeemed": "Godziny wykorzystane",
+        "total_chf_discount": "Całkowita udzielona zniżka",
+        "total_redemptions": "Całkowite wykupy"
+      },
+      "table": {
+        "empty_value": "—"
+      }
+    },
+    "surveys": {
+      "errors": {
+        "export_failed": "Nie udało się wyeksportować danych ankiety."
+      }
+    },
+    "feedback": {
+      "title": "Odpowiedź gminy",
+      "subtitle": "Przejrzyj opinie przesłane przez członków społeczności.",
+      "errors": {
+        "close": "Nie udało się zamknąć elementu opinii.",
+        "export": "Nie udało się wyeksportować opinii.",
+        "load": "Nie udało się załadować opinii.",
+        "resolution_required": "Wymagana jest notatka o rozwiązaniu.",
+        "resolve": "Nie udało się rozwiązać opinii.",
+        "save_triage": "Nie udało się zapisać notatek dotyczących segregacji."
+      },
+      "messages": {
+        "closed": "Opinia została zamknięta.",
+        "resolved": "Opinia rozwiązana.",
+        "triage_saved": "Zapisano notatki dotyczące segregacji."
+      }
+    },
+    "trust_tier": {
+      "title": "Konfiguracja warstwy zaufania",
+      "subtitle": "Ustaw progi kryteriów dla każdego poziomu zaufania. Zmiany zostaną zastosowane przy następnym przeliczeniu.",
+      "loading": "Ładowanie konfiguracji warstwy zaufania",
+      "recompute_hint": "Użyj funkcji ponownego obliczenia, gdy zmienią się progi i trzeba natychmiast dokonać ponownej oceny istniejących członków. Działa w tle i może zająć 30-60 sekund.",
+      "meta": {
+        "title": "Konfiguracja warstwy zaufania",
+        "description": "Skonfiguruj progi poziomów zaufania, ponownie oblicz poziomy członków i sprawdź, co odblokowuje każdy poziom."
+      },
+      "actions": {
+        "recompute": "Oblicz ponownie wszystkie poziomy",
+        "save": "Zapisz konfigurację"
+      },
+      "about": {
+        "title": "O tej stronie",
+        "body": "Poziomy zaufania to drabina reputacji, która odblokowuje przywileje, gdy członkowie stają się bardziej aktywni i zweryfikowani. Członkowie awansują automatycznie, gdy spełniają poniższe kryteria. Użyj opcji ponownego obliczenia, aby wymusić natychmiastowe ponowne obliczenie dla wszystkich elementów. Postęp poziomu wpływa na Warmth Pass, uprawnienia koordynatora i widoczność w katalogu członków."
+      },
+      "criteria": {
+        "title": "Progi kryteriów poziomu"
+      },
+      "fields": {
+        "hours_logged": "Zarejestrowane godziny (minimum)",
+        "reviews_received": "Otrzymane recenzje (minimum)",
+        "identity_verified": "Wymagaj weryfikacji tożsamości"
+      },
+      "tiers": {
+        "member": {
+          "label": "Członek",
+          "description": "Podstawowy członek społeczności z co najmniej 1 godziną zalogowania."
+        },
+        "trusted": {
+          "label": "Zaufany",
+          "description": "Aktywny członek z kilkoma godzinami i recenzjami."
+        },
+        "verified": {
+          "label": "Zweryfikowano",
+          "description": "Zaufany członek z potwierdzoną tożsamością."
+        },
+        "coordinator": {
+          "label": "Koordynator",
+          "description": "Bardzo aktywny zweryfikowany członek uprawniony do koordynowania."
+        }
+      },
+      "reference": {
+        "title": "Odniesienie do poziomu",
+        "aria": "Odniesienie do poziomu zaufania",
+        "columns": {
+          "tier": "Szczebel",
+          "level": "Poziom",
+          "color": "Kolor",
+          "description": "Opis",
+          "unlocks": "Co odblokowuje"
+        },
+        "rows": {
+          "0": {
+            "name": "Przybysz",
+            "color": "Szary",
+            "description": "Właśnie dołączyłem, nie jest wymagana żadna aktywność.",
+            "unlocks": "Podstawowy dostęp dla członków."
+          },
+          "1": {
+            "name": "Członek",
+            "color": "Niebieski",
+            "description": "Ma zapisane godziny.",
+            "unlocks": "Może publikować listy pomocy i otrzymywać godziny opieki."
+          },
+          "2": {
+            "name": "Zaufany",
+            "color": "Zielony",
+            "description": "Aktywny dzięki recenzjom.",
+            "unlocks": "Kwalifikuje się do Warmth Pass i może być zalecany do opieki."
+          },
+          "3": {
+            "name": "Zweryfikowano",
+            "color": "Fioletowy",
+            "description": "Tożsamość zweryfikowana.",
+            "unlocks": "Widoczność koordynatora pełnej opieki i plakietka identyfikacyjna."
+          },
+          "4": {
+            "name": "Koordynator",
+            "color": "Bursztyn",
+            "description": "Bardzo aktywny ze zweryfikowaną tożsamością.",
+            "unlocks": "Uprawniony do zatwierdzania godzin i koordynowania meczów."
+          }
+        }
+      },
+      "errors": {
+        "load_failed": "Nie udało się załadować konfiguracji warstwy zaufania.",
+        "recompute_failed": "Nie udało się ponownie obliczyć poziomów zaufania.",
+        "save_failed": "Nie udało się zapisać ustawień poziomu zaufania."
+      },
+      "messages": {
+        "recomputed": "Ponownie obliczono poziomy zaufania dla {{count}} członków.",
+        "saved": "Trust tier settings saved."
+      },
+      "recompute_confirm": "Czy ponownie obliczyć poziomy zaufania dla wszystkich członków? Może to potrwać kilka minut."
+    },
+    "operating_policy": {
+      "title": "Polityka operacyjna",
+      "subtitle": "Warsztaty dotyczące polityki operacyjnej Caring Community: oprogramowanie nie potrafi odgadnąć reguł.",
+      "loading": "Ładowanie polityki operacyjnej",
+      "last_updated": "Ostatnia aktualizacja {{date}}",
+      "meta": {
+        "title": "Polityka operacyjna",
+        "description": "Skonfiguruj zasady zatwierdzania, zabezpieczania, SLA i polityki wartości społecznych dla programu opieki."
+      },
+      "actions": {
+        "refresh": "Odświeżać",
+        "save": "Zapisz zmiany"
+      },
+      "about": {
+        "title": "O tej stronie",
+        "body": "Polityka operacyjna określa zasady programu opieki środowiskowej: kto może zatwierdzać godziny pracy, jak szybko koordynatorzy muszą zareagować, w jaki sposób obliczana jest wartość społeczna i jak wygląda cykl raportowania. Skonfiguruj to przed uruchomieniem pilota. Zmiany wchodzą w życie natychmiast i są rejestrowane w celach audytowych.",
+        "methodology_prefix": "The",
+        "methodology_middle": "Pola stawki godzinowej i mnożnika zapobiegania korzystają z",
+        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
+        "methodology_tail": "pilotażowego, ustaw stawkę na lokalny odpowiednik godzinowy opieki formalnej i mnożnik na 1.0."
+      },
+      "sections": {
+        "approvals": "Aprobaty i zaufanie",
+        "sla": "Okna SLA",
+        "hours": "Zarządzanie godzinami",
+        "safeguarding": "Ochrona",
+        "social_value": "metodologia wartości społecznych",
+        "appendix": "Załącznik do polityki pilotażowej"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "Organ zatwierdzający",
+          "help": "Kto może sfinalizować zatwierdzone godziny: administrator najemcy, koordynatorzy lub obie strony za obopólną zgodą."
+        },
+        "trusted_reviewer_threshold": {
+          "label": "Próg zaufanego recenzenta (liczba zarejestrowanych godzin)",
+          "help": "Minimalna liczba zatwierdzonych godzin, zanim członek stanie się zaufanym recenzentem lub osiągnie poziom Zaufany."
+        },
+        "sla_first_response_hours": {
+          "label": "SLA: pierwsza odpowiedź (godziny)",
+          "help": "Docelowy czas pierwszej odpowiedzi na nową prośbę o pomoc."
+        },
+        "sla_help_request_hours": {
+          "label": "SLA: rozwiązanie prośby o pomoc (godziny)",
+          "help": "Docelowy czas zamknięcia lub dopasowania prośby o pomoc."
+        },
+        "legacy_hour_settlement": {
+          "label": "Zasady rozliczeń według starszych godzin",
+          "help": "Sposób rozliczania pozostałych godzin zmarłego członka."
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "Próg interwencji w ramach wzajemnej równowagi (w godzinach)",
+          "help": "Kiedy brak równowagi między dawaniem a otrzymywaniem przez członka powoduje zgłoszenie się koordynatora."
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "Ochrona właściciela eskalacji (użytkownik ID)",
+          "help": "Użytkownik ID otrzymuje eskalacje dotyczące zabezpieczeń. Pozostaw puste, aby używać administratorów jako grupy."
+        },
+        "chf_hourly_rate": {
+          "label": "CHF wartość społeczna na godzinę",
+          "help": "Wartość CHF za godzinę opieki w przypadku raportowania ROI przy zastosowaniu szwajcarskiej stawki asystenta opieki formalnej."
+        },
+        "chf_prevention_multiplier": {
+          "label": "Mnożnik zapobiegania CHF",
+          "help": "Mnożnik zastosowany do offsetu formalno-opiekuńczego dla metodologii Caring Community i Caring Community."
+        },
+        "statement_cadence": {
+          "label": "Częstotliwość oświadczeń członkowskich",
+          "help": "Jak często członkowie otrzymują zestawienie godzin przypadających na członka."
+        },
+        "policy_appendix_url": {
+          "label": "Podpisany załącznik do polityki URL",
+          "help": "Wklej publiczny URL podpisanej umowy politycznej pomiędzy spółdzielnią a gminą. Pojawia się to w raportach z audytów i miejskim pakiecie sprawozdawczym."
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "Administrator",
+          "coordinator": "Koordynator",
+          "mutual": "Wzajemne"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "Przekaż darowiznę na basen",
+          "expire": "Wygasać",
+          "transfer_to_nominee": "Przeniesienie do nominowanego"
+        },
+        "statement_cadence": {
+          "monthly": "Miesięczny",
+          "quarterly": "Kwartalny",
+          "annual": "Coroczny"
+        }
+      },
+      "placeholders": {
+        "url": "TOKEN NEXUSARM0"
+      },
+      "errors": {
+        "load_failed": "Nie udało się wczytać zasad operacyjnych.",
+        "save_failed": "Nie udało się zapisać zasad operacyjnych."
+      },
+      "messages": {
+        "saved": "Polityka operacyjna została zapisana. Zmiany obowiązują natychmiast dla wszystkich nowych giełd."
+      }
+    },
+    "warmth_pass": {
+      "title": "Przepustka Ciepła",
+      "subtitle": "Wyszukaj członka, aby sprawdzić uprawnienia Warmth Pass i uznaną historię wpłat.",
+      "eligible": "Kwalifikujące się",
+      "not_eligible": "Nie kwalifikuje się",
+      "verified": "Zweryfikowano",
+      "not_verified": "Nie zweryfikowano",
+      "empty_date": "—",
+      "loading": "Ładowanie…",
+      "no_categories": "Nie zarejestrowano żadnych kategorii pomocy.",
+      "tier_chip": "Poziom{{tier}}",
+      "about": {
+        "title": "O Przełęczy Ciepła",
+        "body": "Warmth Pass wyróżnia członków, którzy wnieśli trwały i zweryfikowany wkład w swoją społeczność."
+      },
+      "errors": {
+        "lookup_failed": "Wyszukiwanie członków nie powiodło się.",
+        "no_data": "Brak dostępnych danych dla tego członka."
+      },
+      "fields": {
+        "help_categories": "Kategorie pomocy",
+        "hours_logged": "Zarejestrowane godziny",
+        "identity_verified": "Tożsamość zweryfikowana",
+        "member_since": "Członek od",
+        "pass_active_since": "Pass aktywny od",
+        "reviews_received": "Otrzymane recenzje",
+        "trust_tier": "Poziom zaufania"
+      },
+      "lookup": {
+        "button": "Spójrz w górę",
+        "member_id": "Identyfikator członka",
+        "placeholder": "Wprowadź identyfikator członka…",
+        "title": "Wyszukiwanie członków"
+      },
+      "not_eligible_notice": {
+        "title": "Jeszcze się nie kwalifikuję",
+        "body": "Ten członek nie spełnia jeszcze wymagań Warmth Pass."
+      }
+    }
+  },
+  "panel": {
+    "sidebar": {
+      "items": {
+        "surveys": "Ankiety",
+        "projects": "Projekty",
+        "trust_tier": "Poziom zaufania"
+      }
+    }
+  },
+  "caring_community": {
+    "meta": {
+      "title": "Troskliwa społeczność",
+      "description": "Skonfiguruj zintegrowane centrum opieki, zależne możliwości i miejskie powierzchnie raportowania."
+    },
+    "actions": {
+      "open_member_hub": "Otwórz centrum członków",
+      "open_workflow": "Otwórz przepływ pracy Caring Community",
+      "refresh": "Odśwież"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Moduł Caring Community umożliwia koordynację nieformalnej opieki sąsiedzkiej w Twoim banku czasu, łącząc mieszkańców potrzebujących pomocy z zaufanymi członkami, którzy mogą jej zapewnić. Dodaje system poziomu zaufania, przepływ pracy koordynatora, narzędzia oceny pilotażowej i raportowanie gminne do istniejącego banku czasu."
+    },
+    "getting_started": {
+      "title": "Rozpoczęcie",
+      "step_1": "Skonfiguruj politykę operacyjną: ustaw przepływ pracy zatwierdzania i stawkę godzinową w CHF.",
+      "step_2": "Zapisz punkt odniesienia przed pilotażem na tablicy wyników pilotażu.",
+      "step_3": "Skonfiguruj progi warstwy zaufania.",
+      "step_4": "Uruchom test gotowości do startu pilotażowego.",
+      "step_5": "Po uruchomieniu użyj przepływu pracy koordynatora jako pulpitu codziennych operacji."
+    },
+    "stats": {
+      "master_switch": "Przełącznik główny",
+      "connected_capabilities": "Połączone możliwości",
+      "reporting_pack": "Pakiet raportowania",
+      "reporting_ready": "Gotowy"
+    },
+    "switch": {
+      "title": "Wyłącznik awaryjny modułu",
+      "description": "Gdy ten przełącznik jest wyłączony, trasa Caring Community, wpisy nawigacji, karty pulpitu nawigacyjnego i akcje szybkiego tworzenia są ukryte.",
+      "dependency_note": "Caring Community polega na włączeniu modułów i funkcji wymienionych poniżej. Wyłączony moduł ograniczy funkcje koordynatora i raportowania.",
+      "aria": "Przełącz moduł Społeczności Troskliwej"
+    },
+    "capabilities": {
+      "timebank": "Wymiana banku czasu",
+      "volunteering": "Sprawdzony wolontariat",
+      "organisations": "Zaufane organizacje",
+      "groups": "Grupy sąsiedzkie",
+      "resources": "Biblioteka zasobów",
+      "trust": "Zaufanie i recenzje"
+    },
+    "capability_type": {
+      "feature": "Funkcja",
+      "module": "Moduł"
+    },
+    "reporting": {
+      "title": "Sprawozdania miejskie",
+      "description": "Przejdź do platform raportowania potrzebnych do rozmów w kantonie, gminie i współpracy.",
+      "community_analytics": "Analityka społeczności",
+      "impact_report": "Raport wpływu",
+      "municipal_pack": "Pakiet raportów miejskich",
+      "note": "Powierzchnie te korzystają obecnie z istniejących raportów NEXUS i są gotowe do eksportu specyficznego dla Caring Community w przyszłości."
+    },
+    "messages": {
+      "enabled": "Włączono troskliwą społeczność",
+      "disabled": "Społeczność troskliwa niepełnosprawna"
+    },
+    "status": {
+      "active": "Aktywny",
+      "enabled": "Włączone",
+      "disabled": "Niepełnosprawny"
+    },
+    "errors": {
+      "load_failed": "Nie udało się załadować konfiguracji Caring Community",
+      "save_failed": "Nie udało się zaktualizować społeczności Caring"
+    },
+    "config_route_note": "Dedykowana trasa konfiguracji administratora:{{route}}"
+  },
+  "caring_emergency": {
+    "title": "Alerty awaryjne (AG70)",
+    "heading": "Alerty awaryjne",
+    "empty": "Nie ma jeszcze żadnych alertów alarmowych.",
+    "intro": {
+      "title": "O tej stronie - używaj ostrożnie",
+      "body": "Alerty awaryjne to pilne transmisje wysyłane natychmiast do wszystkich członków (lub docelowej podgrupy). Używaj tego tylko w przypadku autentycznych sytuacji awaryjnych – trudnych warunków pogodowych, incydentów związanych z bezpieczeństwem społeczności lub luk w zasięgu pilnej opieki. Alerty są wysyłane jako powiadomienia push i banery w aplikacji. Po wysłaniu nie można ich cofnąć.",
+      "targeting_label": "Kierowanie",
+      "targeting_body": "Wybranie wagi „Niebezpieczeństwo” lub „Ostrzeżenie” wysyła do wszystkich członków. Szkicuj ostrożnie – po transmisji nie ma możliwości odwołania.",
+      "delivery_label": "Dostawa",
+      "delivery_body": "Alerty są dostarczane w ciągu 60 sekund od wysłania."
+    },
+    "actions": {
+      "open_send_modal": "Wyślij alert awaryjny",
+      "confirm_prompt": "Potwierdzić?",
+      "confirm_deactivate": "Tak, dezaktywuj",
+      "cancel": "Anuluj",
+      "deactivate": "Dezaktywuj",
+      "broadcast": "Alarm transmisji"
+    },
+    "errors": {
+      "load_failed": "Nie udało się załadować alertów",
+      "send_failed": "Nie udało się wysłać alertu",
+      "deactivate_failed": "Nie udało się dezaktywować alertu"
+    },
+    "severity": {
+      "info": "Informacje",
+      "warning": "Ostrzeżenie",
+      "danger": "Awaryjne (niebezpieczeństwo)"
+    },
+    "table": {
+      "aria": "Alerty awaryjne",
+      "title": "Tytuł",
+      "severity": "Dotkliwość",
+      "sent": "Wysłane",
+      "expires": "Wygasa",
+      "push": "Pchnij",
+      "dismissed": "Zwolniony",
+      "status": "Stan",
+      "actions": "Działania"
+    },
+    "push": {
+      "sent": "Wysłane"
+    },
+    "status": {
+      "active": "Aktywny",
+      "inactive": "Nieaktywny"
+    },
+    "modal": {
+      "title": "Wyślij alert awaryjny"
+    },
+    "form": {
+      "title": "Tytuł",
+      "title_placeholder": "np. Ostrzeżenie o trudnych warunkach pogodowych",
+      "body": "Ciało",
+      "body_placeholder": "Opisz sytuację awaryjną i wszelkie działania, które członkowie powinni podjąć...",
+      "severity": "Dotkliwość",
+      "expires_at": "Wygasa o (opcjonalnie)",
+      "expires_at_description": "Pozostaw puste, aby nie wygasało automatycznie",
+      "confirm_prefix": "To natychmiast popchnie do",
+      "confirm_audience": "wszystkich aktywnych członków",
+      "confirm_suffix": "i wyświetlaj trwały baner na wszystkich stronach. Potwierdzam, że to naprawdę nagły przypadek."
+    }
+  },
+  "caring_workflow": {
+    "meta": {
+      "page_title": "Troskliwy przepływ pracy w społeczności",
+      "title": "Caring Community Workflow Console",
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+    },
+    "actions": {
+      "refresh": "Odśwież",
+      "retry": "Spróbować ponownie",
+      "open_hour_review": "Przegląd w godzinach otwartych",
+      "open_report_pack": "Otwórz pakiet raportów",
+      "approve": "Zatwierdzić",
+      "decline": "Spadek",
+      "escalate": "Wzmagać",
+      "re_escalate": "Ponowna eskalacja"
+    },
+    "loading": {
+      "workflow": "Ładowanie przepływu pracy społeczności opiekuńczej..."
+    },
+    "toast": {
+      "load_failed": "Failed to load Caring Community workflow data."
+    },
+    "empty": {
+      "value": "-",
+      "unassigned": "Nieprzypisany"
+    },
+    "stats": {
+      "pending_reviews": "Oczekujące recenzje",
+      "pending_hours": "Oczekujące godziny",
+      "approved_30d": "Approved in 30 days",
+      "coordinators": "Koordynatorzy"
+    },
+    "pending": {
+      "title": "Oczekujące recenzje",
+      "description_prefix": "Godziny oczekiwania na weryfikację i zatwierdzenie przez koordynatora. Elementy zaznaczone",
+      "description_middle": "przekroczyły recenzję SLA; zaznaczone elementy",
+      "description_suffix": "przekroczyły eskalację SLA. Zatwierdź lub odrzuć każde zgłoszenie lub przypisz je konkretnemu koordynatorowi.",
+      "needs_review": "Wymaga przeglądu",
+      "escalate_now": "Eskaluj teraz",
+      "escalated_count": "Eskalacja {{count}}",
+      "overdue_count": "{{count}} spóźniony",
+      "empty": "Nic w toku. Kolejka do recenzji jest jasna.",
+      "logged": "Zalogowano {{date}}",
+      "submitted": "Przesłano {{date}}",
+      "age_days": "{{count}} ma już kilka dni",
+      "age_days_plural": "{{count}} dni",
+      "assigned_to": "Przypisany do {{name}}",
+      "escalated_at": "Eskalowano {{date}}",
+      "assign_coordinator": "Przypisz koordynatora",
+      "assign_success": "Koordynator przydzielony.",
+      "assign_failed": "Nie można przypisać koordynatora.",
+      "manual_escalation_note": "Eskalacja ręczna po dniach oczekiwania {{count}}.",
+      "escalate_success": "Recenzja nasiliła się.",
+      "escalate_failed": "Nie udało się przekazać opinii.",
+      "approve_success": "Recenzja zatwierdzona.",
+      "decline_success": "Recenzja odrzucona.",
+      "decision_failed": "Nie udało się zapisać decyzji."
+    },
+    "paper_onboarding": {
+      "title": "Paper Form Intake",
+      "description": "Upload a signed Caring Community form, review the extracted fields, then create the provisional account only after coordinator confirmation.",
+      "file_label": "Scanned form",
+      "name_label": "Extracted full name",
+      "name_placeholder": "Name on the paper form",
+      "dob_label": "Data urodzenia",
+      "email_label": "Extracted email",
+      "email_placeholder": "członek@przykład.com",
+      "phone_label": "Extracted phone",
+      "phone_placeholder": "+41 79 123 45 67",
+      "address_label": "Extracted address",
+      "address_placeholder": "Street, postcode, municipality",
+      "note_label": "Review note",
+      "note_placeholder": "What did the coordinator verify before creating the account?",
+      "upload_cta": "Upload For Review",
+      "confirm_cta": "Confirm And Create Account",
+      "review_cta": "Recenzja",
+      "no_email": "No email captured",
+      "file_required": "Choose a scanned form first.",
+      "load_failed": "Nie udało się wczytać papieru dotyczącego przyjęć pokładowych.",
+      "upload_success": "Przesłano pobranie papieru.",
+      "upload_failed": "Could not upload the paper form.",
+      "confirm_success": "Członek potwierdzony i konto utworzone.",
+      "confirm_failed": "Could not confirm this paper onboarding intake."
+    },
+    "tandem": {
+      "title": "Sugestie Tandem",
+      "description": "AI sugerowane pary wspierający-odbiorca na podstawie lokalizacji, języka, umiejętności i dostępności.",
+      "empty": "W tej chwili nie ma żadnych sugestii. Dodaj więcej członków lub dostosuj dostępność.",
+      "load_failed": "Nie udało się wczytać sugestii dotyczących tandemu.",
+      "dismiss_success": "Sugestia odrzucona.",
+      "dismiss_failed": "Nie można odrzucić sugestii.",
+      "relationship_title": "Tandem: {{supporter}} i {{recipient}}",
+      "distance_km": "{{value}}km",
+      "same_language": "Ten sam język",
+      "complementary_skills": "Umiejętności uzupełniające",
+      "availability_overlap": "Nakładanie się dostępności",
+      "shared_interests": "Wspólne zainteresowania",
+      "score": "Wynik {{value}}%",
+      "dismiss": "Odrzucać",
+      "create": "Utwórz Tandem"
+    },
+    "safeguarding": {
+      "title": "Raporty zabezpieczające",
+      "description": "Członkowie wyrazili obawy dotyczące innych członków, koordynatorów lub organizacji.",
+      "view_all": "Zobacz wszystkie",
+      "no_data": "Nie są jeszcze dostępne żadne dane zabezpieczające.",
+      "overdue": "Zaległy",
+      "no_reports": "Nie ma jeszcze żadnych raportów.",
+      "table_aria": "Najnowsze raporty dotyczące zabezpieczeń",
+      "open": "Otwarte",
+      "org_subject": "Organizacja #{{id}}",
+      "age_hours": "{{count}}godz",
+      "age_days": "{{count}}D",
+      "columns": {
+        "severity": "Powaga",
+        "category": "Kategoria",
+        "subject": "Temat",
+        "status": "Stan",
+        "age": "Wiek",
+        "action": "Działanie"
+      },
+      "severity": {
+        "critical": "Krytyczny",
+        "high": "Wysoki",
+        "medium": "Średni",
+        "low": "Niski"
+      },
+      "status": {
+        "submitted": "Złożony",
+        "triaged": "Tried",
+        "investigating": "Badanie",
+        "resolved": "Rozwiązany",
+        "dismissed": "Zwolniony"
+      }
+    },
+    "role_pack": {
+      "title": "Wstępne ustawienia ról",
+      "description": "Wstępnie skonfigurowane zestawy uprawnień dla każdej roli społeczności opiekuńczej. Zainstaluj pełny pakiet ról, aby szybko nadać koordynatorom właściwy dostęp. {{countLabel}}.",
+      "installed_count": "Zainstalowano wstępne ustawienia ról {{installed}} z {{total}}",
+      "available_count": "Dostępne wstępne ustawienia ról {{count}}",
+      "installing": "Instaluję...",
+      "install": "Zainstaluj pakiet ról",
+      "install_success": "Zainstalowano pakiet ról.",
+      "install_failed": "Nie można zainstalować pakietu ról.",
+      "installed": "Zainstalowany",
+      "not_installed": "Nie zainstalowano",
+      "permissions_granted": "Przyznano uprawnienia {{installed}} z {{total}}",
+      "presets": {
+        "national_admin": {
+          "title": "Admin Krajowy",
+          "description": "Nadzór obejmujący całą platformę, we wszystkich kantonach i organizacjach."
+        },
+        "canton_admin": {
+          "title": "Administrator Kantonu",
+          "description": "Zarządzaj całą działalnością społeczności opiekuńczej w kantonie."
+        },
+        "municipality_admin": {
+          "title": "Administrator gminy",
+          "description": "Zarządzaj działalnością społeczności opiekuńczej na terenie gminy."
+        },
+        "cooperative_coordinator": {
+          "title": "Koordynator Współpracy",
+          "description": "Koordynuje lokalną spółdzielnię i jej członków."
+        },
+        "organisation_coordinator": {
+          "title": "Koordynator Organizacji",
+          "description": "Koordynuj wolontariuszy i partnerów w jednej organizacji."
+        },
+        "trusted_reviewer": {
+          "title": "Zaufany recenzent",
+          "description": "Szybko zatwierdzaj godziny pracy dzięki łatwemu nadzorowi."
+        }
+      }
+    },
+    "policy": {
+      "title": "Polityka przepływu pracy",
+      "description": "Tenant-level defaults for Caring Community hour review, statements, and municipal evidence.",
+      "save": "Zapisz politykę",
+      "review_sla_days": "Review SLA days",
+      "review_sla_days_description": "Godziny niesprawdzone w ciągu tej liczby dni zostaną oznaczone w kolejce jako przeterminowane.",
+      "escalation_sla_days": "Escalation SLA days",
+      "escalation_sla_days_description": "Zaległe pozycje, które nie zostaną podjęte w ciągu tylu dodatkowych dni, zostaną automatycznie eskalowane.",
+      "monthly_statement_day": "Statement day",
+      "monthly_statement_day_description": "Dzień miesiąca, w którym generowane są wyciągi członkowskie (np. 1 = 1 dzień każdego miesiąca).",
+      "default_hour_value_chf": "Hour value CHF",
+      "default_hour_value_chf_description": "Służy do obliczania szacunkowej wartości społecznej na zestawieniach i raportach gminnych.",
+      "municipal_report_default_period": "Domyślny okres raportu",
+      "approval_required": "Require hour approval",
+      "approval_required_description": "Logged support time waits for a trusted review before it is accepted.",
+      "auto_approve_trusted_reviewers": "Automatycznie zatwierdzaj zaufanych recenzentów",
+      "auto_approve_trusted_reviewers_description": "Hours submitted by trusted reviewers can skip the pending queue.",
+      "allow_member_self_log": "Allow member self logging",
+      "allow_member_self_log_description": "Members can record their own support activity before review.",
+      "require_organisation_for_partner_hours": "Require partner organisation",
+      "require_organisation_for_partner_hours_description": "Partner-led hours must be tied to an approved organisation.",
+      "include_social_value_estimate": "Uwzględnij oszacowanie wartości społecznej",
+      "include_social_value_estimate_description": "Municipal reports include a configurable CHF value for verified hours.",
+      "save_success": "Zasady przepływu pracy zostały zapisane.",
+      "save_failed": "Failed to save workflow policy.",
+      "periods": {
+        "last_30_days": "Ostatnie 30 dni",
+        "last_90_days": "Ostatnie 90 dni",
+        "year_to_date": "Rok do chwili obecnej",
+        "previous_quarter": "Poprzedni kwartał"
+      }
+    },
+    "member_statement": {
+      "title": "Member statements",
+      "description": "Preview or export a Caring Community member statement with support hours, wallet movement, and municipal value assumptions.",
+      "member_id": "Identyfikator członka",
+      "start_date": "From",
+      "end_date": "To",
+      "preview": "Podgląd",
+      "export_csv": "Eksportuj plik CSV",
+      "approved_support_hours": "Zatwierdzone godziny wsparcia",
+      "pending_support_hours": "Oczekujące godziny wsparcia",
+      "wallet_hours_earned": "Zarobione godziny w Portfelu",
+      "wallet_hours_spent": "Spędzone godziny w portfelu",
+      "empty": "Enter a member ID to generate a statement.",
+      "chf_value": "Szacunkowa wartość społeczna: CHF{{value}}",
+      "invalid_member": "Wprowadź prawidłowy identyfikator członka.",
+      "load_failed": "Failed to load the member statement.",
+      "export_success": "Member statement CSV prepared.",
+      "export_failed": "Failed to export the member statement."
+    },
+    "signals": {
+      "title": "Sygnały koordynatora",
+      "description": "Quick operating indicators for matching, oversight, and partner activity.",
+      "active_requests": "Active requests",
+      "active_offers": "Active offers",
+      "trusted_organisations": "Zaufane organizacje",
+      "declined_30d": "Declined in 30 days"
+    },
+    "favours": {
+      "title": "Nieformalne przysługi",
+      "loading": "Załadunek...",
+      "total_recorded": "Łącznie zarejestrowano {{count}}",
+      "loading_favours": "Ładowanie przysług...",
+      "empty": "Nie zarejestrowano jeszcze żadnych przysług.",
+      "anonymous": "Anonimowy",
+      "unknown": "Nieznany"
+    },
+    "assisted_onboarding": {
+      "title": "Assisted Onboarding",
+      "description": "Create a member account on behalf of a participant who cannot self-register.",
+      "name_label": "Pełne imię i nazwisko",
+      "name_placeholder": "e.g. Marie Curie",
+      "email_label": "Email address",
+      "email_placeholder": "członek@przykład.com",
+      "phone_label": "Telefon (opcjonalnie)",
+      "phone_placeholder": "+41 79 123 45 67",
+      "note_label": "Notatka koordynatora (opcjonalnie)",
+      "note_placeholder": "e.g. Met at Tuesday drop-in",
+      "create_cta": "Create Member Account",
+      "required": "Imię i nazwisko oraz adres e-mail są wymagane.",
+      "created": "Member account created successfully.",
+      "create_failed": "Could not create member account. Please check the email is not already registered.",
+      "created_for": "Account created for {{name}} ({{email}})",
+      "password_note": "The member should change this password on first login.",
+      "copy": "Kopiuj",
+      "copied": "Skopiowano!"
+    },
+    "invite_codes": {
+      "title": "Kody zaproszeń",
+      "description": "Wygeneruj kod do wydrukowania, za pomocą którego nowy członek może dołączyć bez konieczności otrzymywania zaproszenia e-mailem.",
+      "label": "Etykieta (opcjonalnie)",
+      "label_placeholder": "np. Dla sąsiadki Marii",
+      "generate": "Wygeneruj kod",
+      "new_code": "Nowy kod zaproszenia",
+      "expires": "Wygasa: {{date}}",
+      "copied": "Skopiowano!",
+      "copy_url": "Kopiuj URL",
+      "print_card": "Wydrukuj kartę",
+      "open": "Otwarte",
+      "table_aria": "Kody zaproszeń",
+      "empty": "Nie ma jeszcze kodów zaproszeń. Wygeneruj powyższy plik, aby udostępnić go potencjalnemu członkowi.",
+      "load_failed": "Nie udało się wczytać kodów zaproszeń.",
+      "generate_success": "Wygenerowano kod zaproszenia.",
+      "generate_failed": "Nie można wygenerować kodu zaproszenia.",
+      "columns": {
+        "code": "Kod",
+        "label": "Etykieta",
+        "expires": "Wygasa",
+        "status": "Stan",
+        "actions": "Działania"
+      },
+      "status": {
+        "active": "Aktywny",
+        "used": "Używany",
+        "used_by": "Używany przez {{name}}",
+        "expired": "Wygasły"
+      }
+    },
+    "stages": {
+      "title": "Caring Community operating model",
+      "description": "The workflow path this module should make explicit for evaluators and coordinators.",
+      "intake": {
+        "title": "Spożycie",
+        "description": "A member, family, organisation, or coordinator records a need or offer."
+      },
+      "match": {
+        "title": "Mecz",
+        "description": "Coordinators connect people, organisations, or trusted volunteers."
+      },
+      "log": {
+        "title": "Log hours",
+        "description": "Support time is recorded against the member, organisation, or activity."
+      },
+      "verify": {
+        "title": "Zweryfikuj",
+        "description": "A trusted coordinator approves or declines the logged hours."
+      },
+      "statement": {
+        "title": "Oświadczenie",
+        "description": "Accepted hours feed member statements and municipal evidence packs."
+      }
+    },
+    "predictive": {
+      "title": "Przewidywalne spostrzeżenia",
+      "subtitle": "Prognozy przyszłościowe i proaktywne alerty. Dostrzegaj regionalne deficyty w zakresie opieki, zanim staną się sytuacjami kryzysowymi.",
+      "not_enough_activity": "Za mało aktywności, aby można było prognozować. Wróć za kilka tygodni.",
+      "no_forecast": "Nie są jeszcze dostępne żadne dane prognostyczne.",
+      "hours_forecast": "Prognoza godzin",
+      "active_members": "Aktyw",
+      "recipients_reached": "Dotarto do odbiorców",
+      "history": "Historia",
+      "forecast": "Prognoza",
+      "confidence": "Zaufanie",
+      "trend_growing": "Rosnące {{value}}%",
+      "trend_declining": "Malejący {{value}}%",
+      "trend_stable": "Stabilny",
+      "sub_region_coverage": "Zasięg podregionu (ostatnie dni {{days}})",
+      "under_supplied_count": "Niedostateczna podaż {{count}}",
+      "sub_region_coverage_aria": "Zasięg subregionu",
+      "helper_churn": "Odejście pomocnika (upłynęło >= {{days}} dni)",
+      "overall_percent": "{{value}}% ogółem",
+      "helper_churn_note": "{{lapsed}} z {{prior}} wcześniej aktywnych pomocników nie rejestrował ostatnio godzin.",
+      "helper_churn_aria": "Odpływ pomocników według kategorii",
+      "coefficient_drift": "Dryf współczynnika kategorii",
+      "drifting_count": "{{count}} dryfuje",
+      "coefficient_drift_note": "Kategorie z dryfem absolutnym > {{threshold}}% są oznaczone. Przejrzyj współczynniki bazowe w edytorze współczynników kategorii.",
+      "coefficient_drift_aria": "Dryf współczynnika kategorii",
+      "proactive_alerts": "Proaktywne alerty",
+      "columns": {
+        "sub_region": "Podregion",
+        "requested_90d": "Prośba (90d)",
+        "fulfilled_90d": "Spełnione (90d)",
+        "coverage": "Zasięg",
+        "status": "Stan",
+        "category": "Kategoria",
+        "prior_active": "Wcześniej aktywny",
+        "lapsed": "Wygasło",
+        "churn_rate": "Wskaźnik rezygnacji",
+        "baseline": "Linia bazowa",
+        "expected_hrs": "Oczekiwane godz",
+        "observed_hrs": "Obserwowane godz",
+        "drift": "Dryf",
+        "sample": "Próbka"
+      },
+      "status": {
+        "under_supplied": "Niedostateczna podaż",
+        "ok": "OK"
+      },
+      "severity": {
+        "critical": "Krytyczny",
+        "warning": "Ostrzeżenie",
+        "info": "Informacje"
+      }
+    },
+    "relationships": {
+      "title": "Wspieraj relacje",
+      "description": "Stałe pary kibic-odbiorca i cykliczne meldowanie się.",
+      "active": "Aktywny",
+      "paused": "Wstrzymano",
+      "check_ins_due": "Termin zameldowania",
+      "expected_hours": "Oczekiwane godziny",
+      "supporter": "Kibic",
+      "supporter_placeholder": "Szukaj zwolennika",
+      "recipient": "Odbiorca",
+      "recipient_placeholder": "Wyszukaj odbiorcę",
+      "no_members": "Nie znaleziono żadnych członków",
+      "clear": "Jasne",
+      "relationship_title": "Tytuł związku",
+      "frequency_label": "Częstotliwość",
+      "expected_hours_per_visit": "Oczekiwana liczba godzin na wizytę",
+      "start_date": "Data rozpoczęcia",
+      "create": "Stwórz relację",
+      "empty": "Nie ma jeszcze relacji wsparcia. Utwórz jeden powyżej.",
+      "pair": "{{supporter}} obsługujący {{recipient}}",
+      "started": "Uruchomiono {{date}}",
+      "next_check_in": "Następne zameldowanie {{date}}",
+      "pause": "Pauza",
+      "resume": "Wznawiać",
+      "log_date": "Data",
+      "log_hours": "Godziny",
+      "log_note": "Uwaga (opcjonalnie)",
+      "log_hours_action": "Rejestruj godziny",
+      "load_failed": "Nie można wczytać relacji pomocy technicznej.",
+      "pick_different_members": "Wybierz dwóch różnych członków.",
+      "create_success": "Utworzono relację wsparcia.",
+      "create_failed": "Nie można utworzyć relacji wsparcia.",
+      "update_success": "Zaktualizowano relację wsparcia.",
+      "update_failed": "Nie można zaktualizować relacji pomocy technicznej.",
+      "log_validation_failed": "Wprowadź prawidłową datę i 0.25-24 godzin.",
+      "log_success": "Zarejestrowane godziny wsparcia.",
+      "log_failed": "Nie udało się zarejestrować godzin pomocy technicznej.",
+      "frequency": {
+        "weekly": "Tygodnik",
+        "fortnightly": "Dwutygodniowy",
+        "monthly": "Miesięczny",
+        "ad_hoc": "Doraźnie"
+      },
+      "status": {
+        "active": "Aktywny",
+        "paused": "Wstrzymano",
+        "completed": "Zakończony",
+        "cancelled": "Odwołany"
+      }
+    }
+  },
+  "category_coefficients": {
+    "meta": {
+      "page_title": "Współczynniki substytucji kategorii",
+      "title": "Współczynniki substytucji kategorii",
+      "subtitle": "Ile każda godzina opieki środowiskowej zastępuje formalne Spitex/Pflege godziny. Używany w obliczeniach Miejskiego Raportu Oddziaływania."
+    },
+    "actions": {
+      "refresh_aria": "Odśwież współczynniki kategorii",
+      "save": "Ratować"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "chf_amount": "35 CHF",
+      "body_prefix": "Współczynniki substytucji kontrolują wartość społeczną każdej kategorii opieki w kalkulacji kompensacji kosztów. Współczynnik 1,0 oznacza, że ​​jedna godzina równa się jednej godzinie opieki formalnej Spitex/Pflege (",
+      "body_middle": "). Współczynnik 0,5 oznacza, że ​​zastępuje pół godziny. Współczynnik 2,0 oznacza, że ​​zastępuje dwie godziny formalnej opieki – na przykład intensywnej opieki osobistej lub wsparcia specjalistycznego.",
+      "body_suffix": "Metodologia zaleca rozpoczęcie wszystkich kategorii od 1,0 i dostosowanie ich w oparciu o zaobserwowaną intensywność opieki.",
+      "range_prefix": "Wartości wahają się od 0,00 (wartość zastępcza bez opieki) do 9,99. Zmiany zaczną obowiązywać od następnego",
+      "range_suffix": "odświeżenie raportu."
+    },
+    "migration": {
+      "title": "Migracja w toku",
+      "body_prefix": "The",
+      "body_middle": "kolumna nie została jeszcze przeniesiona. Uruchomić",
+      "body_suffix": "aby włączyć współczynniki według kategorii.",
+      "warning": "Oczekuje migracja bazy danych — zapisz zmiany po zakończeniu migracji, aby uniknąć ich nadpisania."
+    },
+    "table": {
+      "aria": "Współczynniki substytucji kategorii",
+      "category": "Kategoria",
+      "source": "Źródło",
+      "coefficient": "Współczynnik",
+      "action": "Działanie"
+    },
+    "fields": {
+      "coefficient_aria": "Współczynnik dla {{name}}",
+      "coefficient_error": "Musi mieścić się w przedziale od 0,00 do 9,99"
+    },
+    "empty": {
+      "categories": "Nie znaleziono żadnych kategorii."
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować współczynników kategorii",
+      "invalid_number": "Współczynnik musi być liczbą",
+      "saved": "Zapisany współczynnik dla {{name}}",
+      "save_failed": "Nie udało się zapisać współczynnika dla {{name}}"
+    }
+  },
+  "commercial_boundary": {
+    "meta": {
+      "page_title": "Mapa granic handlowych",
+      "title": "Mapa granic handlowych",
+      "subtitle": "AG82 — co jest AGPL publiczne, konfigurowalne przez dzierżawcę, warstwy wdrożeniowej lub komercyjne"
+    },
+    "actions": {
+      "export_markdown": "Eksportuj jako Markdown",
+      "export": "Eksport",
+      "refresh_data": "Odśwież dane",
+      "refresh_aria": "Odśwież mapę granic handlowych",
+      "reset_default": "Przywróć domyślne ustawienia kanoniczne",
+      "reset_default_aria": "Przywróć ustawienia domyślne"
+    },
+    "overrides_count": "Zastąpienie {{count}}",
+    "overrides_count_plural": "{{count}} zastępuje",
+    "about": {
+      "title": "O tej stronie",
+      "body_prefix": "Granica komercyjna określa, jakie rodzaje pracy zarobkowej są dozwolone w ramach programu opieki społecznej, a które muszą pozostać nieodpłatnymi kredytami czasowymi. Ta granica jest wymogiem art",
+      "body_suffix": "metodologii i musi zostać uzgodniony z partnerem miejskim przed rozpoczęciem pilotażu. Poniższa matryca przedstawia kategorie działań i ich dozwolony typ wymiany.",
+      "override_prefix": "Użyj zastąpienia wiersza, aby zarejestrować klasyfikację specyficzną dla dzierżawy (na przykład wdrożenie prywatne z pakietem komercyjnym). Zastąpienia są przechowywane tylko w ustawieniach dzierżawy — nigdy nie zmieniają kanonicznej klasyfikacji publicznej dostarczanej z plikiem",
+      "override_suffix": "repozytorium. Po potwierdzeniu macierzy granic umowa jest rejestrowana wraz ze znacznikiem czasu i identyfikatorem użytkownika, co stanowi część dokumentacji zarządzania pilotażem, która pojawia się podczas sprawdzania gotowości do startu pilotażowego."
+    },
+    "sections": {
+      "classifications": "Klasyfikacje"
+    },
+    "classification": {
+      "agpl_public": "AGPL publiczny",
+      "tenant_config": "Konfiguracja najemcy",
+      "private_deployment": "Wdrożenie prywatne",
+      "commercial": "Handlowy"
+    },
+    "labels": {
+      "overridden": "Zastąpione",
+      "module": "moduł",
+      "out_of_tree": "Poza drzewem",
+      "canonical_default": "Wartość domyślna kanoniczna:",
+      "key": "Klawisz"
+    },
+    "fields": {
+      "set_classification": "Ustaw klasyfikację",
+      "classification_aria": "Klasyfikacja dla {{label}}"
+    },
+    "export": {
+      "last_updated": "Ostatnia aktualizacja: {{date}}",
+      "capability": "Zdolność",
+      "classification": "Klasyfikacja",
+      "agpl_module": "Moduł AGPL",
+      "default": "Domyślny",
+      "overridden": "Zastąpione",
+      "notes": "Notatki",
+      "yes": "Tak",
+      "no": "NIE",
+      "generated": "Wygenerowano {{date}} z panelu administracyjnego NEXUS."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować mapy granic handlowych",
+      "reverted": "Przywrócono do wartości domyślnych kanonicznych",
+      "updated": "Klasyfikacja zaktualizowana",
+      "update_failed": "Nie udało się zaktualizować klasyfikacji",
+      "export_empty": "Eksport zwrócił pusty",
+      "exported": "Wyeksportowana mapa granic",
+      "export_failed": "Nie udało się wyeksportować mapy granic"
+    }
+  },
+  "data_quality": {
+    "meta": {
+      "page_title": "Jakość danych pilotażowych",
+      "title": "Jakość danych pilotażowych",
+      "subtitle": "AG84 - kontrola gotowości przed przyjęciem prawdziwych mieszkańców"
+    },
+    "actions": {
+      "refresh_checks": "Odśwież kontrole",
+      "refresh_aria": "Odśwież kontrole jakości danych",
+      "view_affected_rows": "Wyświetl wiersze, których to dotyczy",
+      "close": "Zamknąć"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Kontrole jakości danych skanują dane platformy pod kątem problemów, które mogą zniekształcić wskaźniki pilotażowe lub spowodować błędy w raportach – na przykład członkowie ze zduplikowanymi profilami, godziny zarejestrowane w odniesieniu do usuniętych wpisów lub rekordy wymiany, w których brakuje wymaganych pól. Uruchamiaj to co miesiąc przed wygenerowaniem raportów. Rozwiąż wszystkie kwestie krytyczne i ostrzegawcze przed przesłaniem raportów do fundatorów lub partnerów miejskich."
+    },
+    "severity": {
+      "ok": "OK",
+      "info": "Informacje",
+      "warning": "Ostrzeżenie",
+      "danger": "Niebezpieczeństwo"
+    },
+    "severity_guide": {
+      "title": "Przewodnik po ważności",
+      "danger": "Błędy powodujące nieprawidłowe liczby w raportach - należy naprawić przed eksportem.",
+      "warning": "Potencjalne problemy, które mogą mieć wpływ na dokładność metryki — przejrzyj i potwierdź lub napraw.",
+      "info": "Powiadomienia informacyjne – nie są wymagane żadne działania.",
+      "ok": "Nie wykryto żadnych problemów w tej kategorii.",
+      "note_prefix": "Trzask",
+      "note_suffix": "na dowolnej karcie, aby zobaczyć konkretne zapisy. Niektóre problemy można rozwiązać na platformie; inne wymagają ręcznego przeglądu danych źródłowych."
+    },
+    "summary": {
+      "label": "Streszczenie:",
+      "count": "{{count}} {{label}}",
+      "generated": "Wygenerowano {{date}}",
+      "affected": "dotknięty"
+    },
+    "drilldown": {
+      "subtitle": "Do 50 wierszy, których dotyczy problem — rozwiąż lub udokumentuj przed uruchomieniem.",
+      "empty": "Brak wierszy, których dotyczy problem, do pokazania.",
+      "table_aria": "Dotknięte wiersze"
+    },
+    "table": {
+      "id": "ID",
+      "identifier": "Identyfikator",
+      "name": "Nazwa",
+      "status": "Stan",
+      "created": "Stworzony"
+    },
+    "empty": {
+      "value": "-",
+      "rows": "Żadnych rzędów"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować raportu o jakości danych",
+      "rows_failed": "Nie udało się wczytać wierszy, których to dotyczy"
+    }
+  },
+  "disclosure_pack": {
+    "meta": {
+      "page_title": "FADP / nDSG Pakiet informacyjny",
+      "title": "FADP / nDSG Pakiet informacyjny",
+      "subtitle": "AG80 – pilotażowy dokument ujawniający szwajcarskie prawo o ochronie danych"
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież pakiet informacyjny",
+      "export_markdown": "Eksportuj przecenę",
+      "save_changes": "Zapisz zmiany"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body_prefix": "Pakiet ujawnień (AG80) to",
+      "body_suffix": "dokument ujawniający zasady ochrony danych, z którym mieszkańcy muszą się zapoznać przed wzięciem udziału w programie opieki środowiskowej. Obejmuje tożsamość administratora i podmiotu przetwarzającego dane, kategorie przetwarzanych danych, podstawę prawną, prawa osób, których dane dotyczą, kontakty w odpowiedzi na incydenty oraz gwarancje transferu transgranicznego.",
+      "review_prefix": "Ten pakiet jest wersją roboczą — przejrzyj go za pomocą",
+      "review_middle": "porady przed publikacją. Edytuj szczegóły kontrolera, właściciela reakcji na incydent i konfigurację izolowanego węzła dla swojego wdrożenia, a następnie użyj",
+      "review_suffix": "w celu przedstawienia prawnego dokumentu przekazania. Wartości domyślne odzwierciedlają zobowiązania po stronie platformy. Zapisz wszelkie zmiany przed eksportem."
+    },
+    "tabs": {
+      "aria": "Sekcje ujawnień",
+      "controller": "Kontroler i procesor",
+      "data_retention": "Dane i przechowywanie",
+      "data_subject_rights": "Prawa osób, których dane dotyczą",
+      "federation_isolated_node": "Federacja i izolowany węzeł",
+      "incident_response": "Reakcja na incydent",
+      "cross_border_transfers": "Przelewy transgraniczne"
+    },
+    "sections": {
+      "tenant_controller": "Kontroler najemcy",
+      "platform_processor": "Procesor platformowy",
+      "data_categories": "Kategorie danych",
+      "lawful_basis": "Podstawa prawna",
+      "retention_defaults": "Wartości domyślne przechowywania",
+      "federation_policy": "Polityka Federacji",
+      "isolated_node_configuration": "Konfiguracja izolowanego węzła",
+      "destinations": "Miejsca docelowe",
+      "safeguards": "Zabezpieczenia"
+    },
+    "fields": {
+      "controller_name": "Nazwa kontrolera",
+      "address": "Adres",
+      "contact_email": "Adres e-mail do kontaktu",
+      "data_protection_officer": "Inspektor ochrony danych",
+      "processor_name": "Nazwa procesora",
+      "sub_processors": "Podwykonawcy przetwarzania (jeden na linię)",
+      "hosting_owner": "Właściciel hostingu",
+      "smtp_owner": "SMTP właściciel",
+      "storage_owner": "Właściciel magazynu",
+      "backup_owner": "Właściciel kopii zapasowej",
+      "update_cadence": "Aktualizuj rytm",
+      "owner_name": "Imię właściciela",
+      "notification_window_hours": "Okno powiadomień (godziny)",
+      "fadp_authority": "FADP autorytet"
+    },
+    "labels": {
+      "aggregate_policy": "Polityka zbiorcza"
+    },
+    "status": {
+      "enabled": "Włączony",
+      "disabled": "Wyłączony",
+      "enabled_lower": "włączony",
+      "disabled_lower": "wyłączony",
+      "members_can_opt_out": "Członkowie mogą zrezygnować",
+      "no_member_opt_out": "Brak możliwości rezygnacji przez członka",
+      "cross_border_occurs": "Zdarzają się przelewy transgraniczne",
+      "no_cross_border_transfers": "Brak przelewów transgranicznych"
+    },
+    "isolated_node": {
+      "description_prefix": "Pola te są istotne tylko wtedy, gdy to wdrożenie działa w infrastrukturze kontrolowanej przez kanton. W przypadku standardowych wdrożeń hostowanych pozostaw ustawienia domyślne. Każde pole właściciela określa podmiot prawny odpowiedzialny za dany element infrastruktury",
+      "description_suffix": "Artykuł 9."
+    },
+    "descriptions": {
+      "hosting_owner": "Podmiot prawny kontrolujący infrastrukturę serwerową (np. dział IT kantonu).",
+      "smtp_owner": "Podmiot prawny odpowiedzialny za dostarczanie wychodzącej poczty elektronicznej.",
+      "storage_owner": "Podmiot prawny kontrolujący przechowywanie plików/blobów (przesyłanie, eksportowanie).",
+      "backup_owner": "Podmiot prawny odpowiedzialny za przechowywanie i przechowywanie kopii zapasowych baz danych.",
+      "update_cadence": "Jak często węzeł kantonu otrzymuje aktualizacje platformy (np. „co miesiąc”, „kwartalnie”)."
+    },
+    "footer": {
+      "last_saved": "Ostatnio zapisany {{date}}",
+      "customised": "Dostosowane"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować pakietu ujawnień",
+      "saved": "Pakiet ujawnień został zapisany",
+      "save_failed": "Nie udało się zapisać pakietu ujawnień",
+      "export_empty": "Eksport zwrócił pusty",
+      "exported": "Wyeksportowano pakiet ujawnień",
+      "export_failed": "Nie udało się wyeksportować pakietu ujawnień"
+    }
+  },
+  "external_integrations": {
+    "meta": {
+      "title": "Zaległości w zakresie integracji zewnętrznej",
+      "subtitle": "AG87 - integracje zależne od partnera oczekujące na zewnętrznego właściciela / DSA / sandbox"
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "add": "Dodaj integrację",
+      "seed": "Domyślny zaległości w początkowej fazie",
+      "open": "Otwarte",
+      "edit": "Redagować",
+      "delete": "Usuwać",
+      "cancel": "Anulować",
+      "save_changes": "Zapisz zmiany",
+      "create": "Stwórz integrację",
+      "remove": "Usunąć"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Integracje zewnętrzne to narzędzie do śledzenia zaległości dla połączeń zależnych od partnerów — bankowość, składanie AHV, weryfikacja adresu pocztowego i źródła danych kantonalnych. Każdy wpis śledzi właściciela integracji, status umowy udostępniania danych (DSA) i gotowość piaskownicy. Użyj tego, aby koordynować działania z partnerami zewnętrznymi i raportować postępy zainteresowanym stronom.",
+      "dsa_label": "DSA (Umowa o udostępnianiu danych):",
+      "dsa_body": "Należy podpisać przed jakąkolwiek wymianą danych w czasie rzeczywistym. Projektuj umowy, korzystając z szablonów Partnerstw Badawczych.",
+      "sandbox_label": "Piaskownica URL:",
+      "sandbox_body": "Link do środowiska testowego partnera. Przed promowaniem na żywo zweryfikuj integrację w piaskownicy.",
+      "statuses_label": "Statusy:",
+      "statuses_body": "Proponowane -> Zakres -> Piaskownica -> Na żywo. Zablokowany oznacza, że ​​zależność zewnętrzna jest nierozwiązana."
+    },
+    "empty": {
+      "title": "Nie śledzono jeszcze żadnych integracji",
+      "body": "Stwórz wyselekcjonowany zestaw dobrze znanych, zależnych od partnerów integracji (złożenie AHV, przekazanie Spitex, kantonalne źródło danych podstawowych, PostFinance, Twint, weryfikacja adresu pocztowego), aby operator platformy mógł śledzić właściciela, status DSA i gotowość piaskownicy."
+    },
+    "last_updated": "Ostatnia aktualizacja {{date}}",
+    "table": {
+      "aria": "Integracje zewnętrzne",
+      "name": "Nazwa",
+      "category": "Kategoria",
+      "owner": "Właściciel",
+      "status": "Stan",
+      "dsa": "DSA",
+      "sandbox": "Piaskownica",
+      "updated": "Zaktualizowano",
+      "row_actions": "Działania wierszowe",
+      "actions": "Działania"
+    },
+    "categories": {
+      "banking": "Bankowy",
+      "payment": "Zapłata",
+      "identity_verification": "Weryfikacja tożsamości",
+      "professional_care": "Profesjonalna opieka",
+      "municipal_data": "Dane miejskie",
+      "postal": "Pocztowy",
+      "ahv": "AHV",
+      "healthcare": "Opieka zdrowotna",
+      "other": "Inny"
+    },
+    "statuses": {
+      "proposed": "Zaproponowano",
+      "scoping": "Zakres",
+      "blocked": "Zablokowany",
+      "sandbox": "Piaskownica",
+      "live": "Na żywo",
+      "deprecated": "Przestarzałe"
+    },
+    "dsa_statuses": {
+      "not_required": "Nie jest wymagane",
+      "drafting": "Redakcja",
+      "in_review": "W recenzji",
+      "signed": "Podpisano"
+    },
+    "editor": {
+      "add_title": "Dodaj integrację",
+      "edit_title": "Edycja: {{name}}",
+      "name": "Nazwa",
+      "name_placeholder": "np. AHV bramka do przesyłania",
+      "category": "Kategoria",
+      "status": "Stan",
+      "owner_name": "Imię właściciela",
+      "owner_name_placeholder": "Imię i nazwisko kontaktu zewnętrznego",
+      "owner_email": "Adres e-mail właściciela",
+      "owner_email_placeholder": "kontakt@partner.przykład",
+      "interface_spec_url": "Specyfikacja interfejsu URL",
+      "interface_spec_placeholder": "https://docs.partner.example/spec",
+      "dsa_status": "Umowa udostępniania danych",
+      "sandbox_url": "Piaskownica URL",
+      "sandbox_placeholder": "https://sandbox.partner.example",
+      "notes": "Notatki",
+      "notes_placeholder": "Pytania otwarte, blokady, zależności, uwagi umowne..."
+    },
+    "delete_modal": {
+      "title": "Usuń integrację",
+      "body_prefix": "Spowoduje to trwałe usunięcie wpisu zaległości dla",
+      "body_suffix": "Nie ma to wpływu na rekord partnera zewnętrznego – usuwany jest jedynie wpis śledzenia.",
+      "warning": "Tej akcji nie można cofnąć."
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować zaległości integracji",
+      "seeded": "Rozstawiony domyślny zaległości",
+      "seed_failed": "Nasienie nie powiodło się",
+      "updated": "Integracja zaktualizowana",
+      "update_failed": "Aktualizacja nie powiodła się",
+      "created": "Integracja utworzona",
+      "create_failed": "Tworzenie nie powiodło się",
+      "removed": "Integracja usunięta",
+      "delete_failed": "Usunięcie nie powiodło się"
+    }
+  },
+  "federation_peers_admin": {
+    "meta": {
+      "page_title": "Członkowie Federacji — Administrator",
+      "title": "Koledzy Federacji",
+      "subtitle": "Połącz się z innymi spółdzielniami, aby członkowie mogli wysyłać godziny między społecznościami."
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież kolegów z federacji",
+      "add_peer": "Dodaj partnera",
+      "rotate_secret": "Obróć udostępniony sekret",
+      "delete_peer": "Usuń partnera",
+      "cancel": "Anulować",
+      "create_reveal_secret": "Utwórz i odkryj sekret",
+      "copy_secret": "Skopiuj sekret",
+      "copy_peer_slug": "Skopiuj Peer Slug",
+      "copied_secret": "Skopiowałem sekret"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Federacja Peers to inne NEXUS spółdzielnie, z którymi Twoja społeczność zgodziła się dzielić członków i godziny pracy. Po nawiązaniu połączenia równorzędnego członkowie mogą przenosić godziny między społecznościami i przeglądać listy stowarzyszone. Każde połączenie równorzędne wymaga wspólnego sekretu, który obie strony muszą skonfigurować — skontaktuj się z administratorem spółdzielni równorzędnej w celu wymiany poświadczeń.",
+      "shared_secret_label": "Wspólny sekret:",
+      "shared_secret_body": "Klucz prywatny, którego obie spółdzielnie używają, aby udowodnić sobie nawzajem, kim są. Należy go wpisać dokładnie tak samo po obu stronach. Wymień go co 6–12 miesięcy i natychmiast, jeśli uważasz, że ktoś inny go widział.",
+      "pending_body": "Poświadczenia ustawione, oczekujące na pierwsze pomyślne wywołanie API.",
+      "active_body": "Połączono i synchronizowano.",
+      "suspended_body": "Ostatnia synchronizacja nie powiodła się lub została ręcznie zawieszona — sprawdź, czy baza URL partnera jest poprawna i osiągalna."
+    },
+    "peers": {
+      "title": "Zarejestrowani rówieśnicy",
+      "table_aria": "Koledzy z Federacji",
+      "empty": "Nie ma jeszcze żadnych partnerów w federacji — dodaj jednego, aby rozpocząć."
+    },
+    "table": {
+      "name": "Nazwa",
+      "slug": "Ślimak",
+      "base_url": "Baza URL",
+      "status": "Stan",
+      "last_handshake": "Ostatni udany kontakt",
+      "actions": "Działania"
+    },
+    "status": {
+      "pending": "Aż do",
+      "active": "Aktywny",
+      "suspended": "Zawieszony"
+    },
+    "empty": {
+      "never": "Nigdy"
+    },
+    "create_modal": {
+      "title": "Dodaj partnera federacyjnego",
+      "peer_slug": "Ślimak rówieśniczy",
+      "peer_slug_description": "Małe litery alfanumeryczne + łączniki. Używany jako docelowy ślimak kooperacyjny dla transferów wychodzących.",
+      "peer_slug_placeholder": "pocałunek-bern",
+      "display_name": "Nazwa wyświetlana",
+      "display_name_placeholder": "Spółdzielnia Caring Community Berno",
+      "base_url": "Baza URL",
+      "base_url_description": "HTTPS URL pilota NEXUS API. Ścieżka /v2/federation/hour-transfer/inbound jest dodawana automatycznie.",
+      "base_url_placeholder": "https://api.bern-cooperative.ch",
+      "notes": "Notatki",
+      "notes_placeholder": "Notatki wewnętrzne - kontakt z partnerem, referencje do umowy...",
+      "status_hint_prefix": "Stan zaczyna się jako",
+      "status_hint_middle": "Gdy strona zdalna zarejestruje ten sam wspólny sekret, ustaw obie strony na"
+    },
+    "secret_modal": {
+      "title": "Jednorazowy wspólny sekret",
+      "body_prefix": "Ten sekret został pokazany",
+      "only_once": "tylko raz",
+      "body_suffix": "Skopiuj go teraz i wklej do wpisu równorzędnego federacji zdalnej instalacji NEXUS dla tej spółdzielni. Jeśli go zgubisz, musisz obrócić sekret tutaj i ponownie zaktualizować zdalną stronę.",
+      "peer_slug_label": "Ślimak równorzędny:",
+      "base_url_label": "Baza URL:"
+    },
+    "validation": {
+      "required_fields": "Wszystkie wymagane pola muszą być wypełnione."
+    },
+    "confirm_rotate": "Obrócić wspólny sekret dla „{{name}}”? Stary sekret natychmiast przestaje działać i musisz zaktualizować stronę zdalną.",
+    "confirm_delete": "Usunąć element równorzędny federacji „{{name}}”? To jest trwałe.",
+    "toasts": {
+      "load_failed": "Nie udało się załadować elementów równorzędnych federacji.",
+      "created": "Utworzono element równorzędny Federacji.",
+      "create_failed": "Nie udało się utworzyć elementu równorzędnego.",
+      "status_updated": "Stan równorzędny ustawiony na {{status}}.",
+      "status_failed": "Nie udało się zaktualizować statusu elementu równorzędnego.",
+      "secret_rotated": "Obrócono wspólny sekret.",
+      "rotate_failed": "Nie udało się obrócić sekretu.",
+      "deleted": "Współpracownik usunięty.",
+      "delete_failed": "Nie udało się usunąć partnera.",
+      "copied": "Skopiowano do schowka.",
+      "copy_failed": "Nie udało się skopiować."
+    }
+  },
+  "help_request_sla": {
+    "meta": {
+      "page_title": "Panel prośby o pomoc SLA",
+      "title": "Panel prośby o pomoc SLA",
+      "subtitle_prefix": "AG96 - pierwsza odpowiedź i rozwiązanie",
+      "subtitle_suffix": "śledzenie zgodnie z AG81 zasadami operacyjnymi"
+    },
+    "actions": {
+      "edit_policy": "Edytuj zasady",
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież panel SLA"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Umowy dotyczące poziomu usług (SLAs) określają maksymalny oczekiwany czas odpowiedzi i rozwiązywania próśb o pomoc. Gdy żądanie zbliża się do SLA lub przekracza je, jest oznaczane w tym panelu jako przeterminowane. SLA pomagają utrzymać stałą jakość usług i generować dokładne wskaźniki pilotażowe.",
+      "first_response_label": "Pierwsza odpowiedź",
+      "first_response_prefix": "czas od złożenia wniosku do pierwszego kontaktu z koordynatorem (status przesuwa się z",
+      "first_response_suffix": ")",
+      "resolution_label": "Rezolucja",
+      "resolution_prefix": "czas od pierwszej odpowiedzi do dopasowania i potwierdzenia żądania (stan osiąga",
+      "resolution_suffix": ")",
+      "note": "Okna SLA są ustawione w Zasadach operacyjnych AG81. Edytuj je, korzystając z przycisku „Edytuj zasady” powyżej. Ustaw bardziej rygorystyczne SLA dla kategorii pilnej opieki (np. transport medyczny), a luźniejsze dla działań społecznych."
+    },
+    "policy": {
+      "first_response_description": "- czas od złożenia wniosku do pierwszego kontaktu z koordynatorem",
+      "resolution_description": "- czas od pierwszej odpowiedzi do dopasowania i potwierdzenia żądania",
+      "platform_defaults": "Domyślne ustawienia platformy — brak uruchomienia warsztatu AG81",
+      "tenant_policy": "Zastosowano zasady najemcy"
+    },
+    "metrics": {
+      "first_response_breached": "Pierwsza odpowiedź została naruszona",
+      "first_response_at_risk": "Pierwsza reakcja zagrożona",
+      "resolution_breached": "Naruszona uchwała",
+      "resolution_at_risk": "Rozwiązanie zagrożone",
+      "pending": "Aż do",
+      "in_progress": "W toku",
+      "resolved_24h": "Rozwiązano <24h (ostatnie)"
+    },
+    "open": {
+      "title": "Otwórz prośby o pomoc",
+      "subtitle": "{{count}} otwarte — najpierw posortowano naruszenie",
+      "bucket_filter_aria": "Filtr kubełkowy",
+      "all_count": "Wszystko ({{count}})",
+      "breached_count": "Naruszony ({{count}})",
+      "at_risk_count": "Zagrożone ({{count}})",
+      "on_track_count": "Na dobrej drodze ({{count}})",
+      "empty_bucket": "Brak otwartych próśb o pomoc w tym zasobniku.",
+      "table_aria": "Otwórz prośby o pomoc",
+      "request_meta": "Kiedy: {{when}} - użytkownik #{{userId}} - wiek {{age}}",
+      "target_hours": "Cel {{hours}}godz",
+      "over_by": "Koniec o {{duration}}",
+      "left": "Pozostało {{duration}}"
+    },
+    "resolved": {
+      "title": "Niedawno rozwiązane (ostatnie 72h)",
+      "table_aria": "Ostatnio rozwiązane prośby o pomoc",
+      "user_id": "użytkownik #{{userId}}"
+    },
+    "table": {
+      "request": "Wniosek",
+      "bucket": "Wiaderko",
+      "status": "Stan",
+      "created": "Stworzony",
+      "turnaround": "Zwrot",
+      "within": "W",
+      "resolved": "Rozwiązany"
+    },
+    "buckets": {
+      "breached": "Naruszony",
+      "at_risk": "Ryzykowne",
+      "on_track": "Na dobrej drodze"
+    },
+    "dimensions": {
+      "first_response": "Pierwsza odpowiedź",
+      "resolution": "Rezolucja"
+    },
+    "answers": {
+      "yes": "Tak",
+      "no": "NIE"
+    },
+    "footer": {
+      "generated": "Raport wygenerowano {{date}}.",
+      "proxy_prefix": "proxy: pierwsza odpowiedź = status zostaje przeniesiony z",
+      "proxy_middle": "rozdzielczość = stan osiągnięty",
+      "proxy_suffix": "Regulować",
+      "proxy_end": "Windows w AG81 zasadach operacyjnych."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować panelu SLA"
+    }
+  },
+  "integration_showcase": {
+    "meta": {
+      "page_title": "Pokaz integracji",
+      "title": "Pokaz integracji",
+      "subtitle": "Jednostronicowe odniesienie do każdego publicznego interfejsu API, webhooka, federacyjnego punktu końcowego i powierzchni OAuth dostępnych w tym wdrożeniu — gotowe do przekazania partnerowi zajmującemu się integracją techniczną."
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież prezentację integracyjną"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Skorzystaj z tej strony, konfigurując integrację z usługą strony trzeciej, gminnym systemem danych lub stowarzyszoną siecią NEXUS. Każdy wymieniony tutaj punkt końcowy jest aktywny i ma zakres tego wdrożenia. Przykładowe ładunki mają charakter ilustracyjny — rzeczywiste wartości zależą od informacji o dzierżawie i poświadczeń partnera. Udostępnij ten adres URL partnerom zajmującym się integracją, zamiast wskazywać im nieprzetworzone dokumenty API.",
+      "last_refreshed": "Ostatnio odświeżony{{date}}."
+    },
+    "sections": {
+      "sample_request": "Przykładowe żądanie",
+      "read_full_spec": "Przeczytaj pełną specyfikację na GitHubie"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się wczytać prezentacji integracji"
+    }
+  },
+  "isolated_node": {
+    "meta": {
+      "page_title": "Brama decyzyjna z izolowanym węzłem",
+      "title": "Brama decyzyjna z izolowanym węzłem",
+      "subtitle": "AG85 — lista kontrolna gotowości do wdrożenia kontrolowanego przez kanton"
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież bramkę decyzyjną izolowanego węzła",
+      "edit": "Redagować",
+      "cancel": "Anulować",
+      "save_changes": "Zapisz zmiany"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body_prefix": "Trwa wdrażanie izolowanego węzła",
+      "body_middle": "dotyczące infrastruktury kontrolowanej całkowicie przez kanton lub gminę – żadne dane nie opuszczają granic kantonu. Ta konfiguracja jest wymagana dla",
+      "body_suffix": "wdrożenia zgodnie ze ścisłymi szwajcarskimi przepisami dotyczącymi ochrony danych kantonalnych. Większość społeczności działa w ramach standardowych wdrożeń hostowanych i nie ma potrzeby konfigurowania tej sekcji.",
+      "workflow": "Przeanalizuj każdy element decyzji poniżej: ustaw wartość, przypisz właściciela i oznacz go jako Zdecydowany, gdy zostanie uzgodniony. Brama zamyka się (i test gotowości pilota do startu przechodzi pomyślnie), gdy każdy element ma status Zdecydowano."
+    },
+    "warning": {
+      "title": "Ważne — konfiguruj tylko w razie potrzeby",
+      "body_prefix": "Zmień te ustawienia tylko wtedy, gdy Twoja gmina wyraźnie określiła wymagania dotyczące izolowanego węzła. Zmiana trybu wdrażania po uruchomieniu pilotażu wymaga koordynacji z",
+      "body_suffix": "zespół techniczny. Nie zmieniaj tego ustawienia bez zgody swojego kantonalnego inspektora ochrony danych."
+    },
+    "status": {
+      "pending": "Aż do",
+      "in_progress": "W toku",
+      "decided": "Zdecydowany",
+      "blocked": "Zablokowany"
+    },
+    "status_counts": {
+      "pending": "Oczekujące: {{count}}",
+      "in_progress": "W toku: {{count}}",
+      "decided": "Zdecydowano: {{count}}",
+      "blocked": "Zablokowano: {{count}}"
+    },
+    "gate": {
+      "closed": "Brama zamknięta - gotowa do uruchomienia",
+      "open": "Brama otwarta – potrzebne są jeszcze decyzje",
+      "decided_count": "Zdecydowano {{decided}} z {{total}} elementów",
+      "blocked_count": "- {{count}} zablokowane",
+      "progress_aria": "Postęp dzięki bramce decyzyjnej"
+    },
+    "fields": {
+      "value": "Wartość",
+      "owner": "Właściciel",
+      "notes": "Notatki",
+      "status": "Stan",
+      "url_placeholder": "https://...",
+      "owner_description": "Osoba lub organizacja odpowiedzialna za tę decyzję",
+      "notes_description": "Kontekst, linki, odniesienia do umów lub elementy blokujące"
+    },
+    "empty": {
+      "unassigned": "nieprzypisany",
+      "none": "nic"
+    },
+    "timestamps": {
+      "last_updated": "Ostatnia aktualizacja {{date}}"
+    },
+    "modal": {
+      "edit_decision_item": "Edytuj element decyzji",
+      "subtitle": "Zaktualizuj wartość, właściciela, status i notatki dla tego elementu bramy"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować danych bramki decyzyjnej",
+      "item_updated": "Zaktualizowano element decyzji",
+      "save_failed": "Nie udało się zapisać elementu decyzji"
+    }
+  },
+  "kpi_baselines": {
+    "meta": {
+      "page_title": "Wartości bazowe społeczności KPI",
+      "title": "Wartości bazowe społeczności KPI",
+      "subtitle_prefix": "Przechwytuj migawki wskaźników swojej społeczności, aby śledzić je przed i po",
+      "subtitle_suffix": "uderzenie"
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież KPI linie bazowe",
+      "capture_now": "Przechwyć teraz linię bazową",
+      "capture_now_short": "Przechwytuj teraz",
+      "capture_first": "Uchwyć swoją pierwszą linię bazową",
+      "compare": "Porównywać",
+      "close": "Zamknąć",
+      "cancel": "Anulować"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body_prefix": "Linie bazowe rejestrują stan Twojej społeczności przed rozpoczęciem programu Caring Community. Są one porównywane z bieżącymi wskaźnikami podczas każdego kwartalnego przeglądu, aby wykazać wpływ. Przechwytuj linie bazowe dla każdego",
+      "body_suffix": "przed przyjęciem mieszkańców na pokład – po rozpoczęciu pilotażu wartości bazowe zostają zamrożone i nie można zastosować ich wstecznej daty.",
+      "compare_prefix": "Trzask",
+      "compare_suffix": "w dowolnym wierszu linii bazowej, aby zobaczyć bezpośrednie porównanie z bieżącymi danymi platformy. Metryki wykazujące zmianę kluczowych wskaźników wpływu o ponad 25% są wyróżnione jako Wpływ osiągnięty."
+    },
+    "metrics": {
+      "volunteer_hours": "Godziny wolontariatu (90d)",
+      "member_count": "Aktyw",
+      "recipient_count": "Odbiorcy dotarli",
+      "active_relationships": "Aktywne relacje",
+      "total_exchanges": "Całkowita wymiana",
+      "avg_response_hours": "Średni czas reakcji (godz.)",
+      "engagement_rate_pct": "Wskaźnik zaangażowania (%)"
+    },
+    "comparison": {
+      "comparing": "Porównywanie:",
+      "captured": "(przechwycone {{date}})",
+      "impact_achieved": "Osiągnięty wpływ",
+      "baseline": "Linia bazowa",
+      "now": "Teraz"
+    },
+    "empty": {
+      "no_data": "Brak dostępnych danych",
+      "no_baselines": "Nie przechwycono jeszcze żadnych wartości bazowych."
+    },
+    "fields": {
+      "notes_label_prefix": "Uwagi:",
+      "baseline_label": "Etykieta bazowa",
+      "baseline_placeholder": "np. Przed NEXUS uruchomieniem",
+      "baseline_description": "Krótka nazwa identyfikująca tę migawkę (np. „Pierwszy kwartał 2025 r. przed premierą”)",
+      "period_start": "Początek okresu",
+      "period_start_description": "Początek okresu referencyjnego",
+      "period_end": "Koniec okresu",
+      "period_end_description": "Koniec okresu referencyjnego",
+      "notes_source": "Uwagi / źródło (opcjonalnie)",
+      "notes_placeholder": "np. „Dane dotyczące skierowań do lekarzy pierwszego kontaktu za pierwszy kwartał 2026 r., ankieta wśród członków z marca 2026 r., zebrane przed wprowadzeniem platformy we wszystkich Gemeinden”",
+      "notes_description": "Dokument, z którego pochodzą te liczby (np. „dane dotyczące skierowań do lekarzy pierwszego kontaktu za I kwartał 2026 r.”, „ankieta wśród członków z marca 2026 r.”). Cytowane źródła sprawiają, że poziom bazowy można obronić w raportach o dotacjach."
+    },
+    "table": {
+      "aria": "KPI Linie bazowe",
+      "label": "Etykieta",
+      "captured": "Złapany",
+      "members": "Członkowie",
+      "volunteer_hours": "Godziny wolontariatu",
+      "active_relationships": "Aktywne relacje",
+      "total_exchanges": "Całkowita wymiana",
+      "actions": "Działania"
+    },
+    "modal": {
+      "title_prefix": "Schwytać",
+      "title_suffix": "Linia bazowa",
+      "body": "Spowoduje to wykonanie aktualnej migawki wskaźników Twojej społeczności i zapisanie jej jako nazwanej linii bazowej na potrzeby przyszłych porównań.",
+      "metrics_captured": "Przechwycone wskaźniki: liczba aktywnych członków, godziny zatwierdzonych wolontariatów (ostatnie 90 dni), relacje aktywnego wsparcia, różni odbiorcy i łączna liczba wymian."
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować KPI linii bazowych",
+      "comparison_failed": "Nie udało się załadować porównania",
+      "saved": "Wartość bazowa została zapisana. Użyj go, aby porównać przyszłe metryki z tą migawką.",
+      "capture_failed": "Nie udało się przechwycić linii bazowej"
+    }
+  },
+  "lead_nurture": {
+    "meta": {
+      "page_title": "Pielęgnowanie leadów",
+      "title": "Pielęgnowanie leadów",
+      "subtitle": "Śledź i wspieraj potencjalnych partnerów — gminy, inwestorów, firmy, mieszkańców i organizacje społeczne — od pierwszego kontaktu po wdrożenie."
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież kontakty w zakresie pielęgnacji leadów",
+      "export_csv": "Eksportuj CSV",
+      "edit": "Redagować",
+      "mark_unsubscribed": "Oznacz jako anulowane",
+      "unsubscribe_aria": "Wypisz kontakt",
+      "cancel": "Anulować",
+      "save": "Ratować"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Narzędzie do śledzenia Lead Nurture to lekkie narzędzie CRM dla NEXUS możliwości wdrożenia. Gdy gmina, potencjalny fundator lub partner biznesowy wyrazi zainteresowanie, dodaj ich tutaj i śledź ich postępy na ścieżce. Użyj pola etapu, aby zapisać miejsce, w którym znajduje się każdy kontakt w rozmowie, oraz datę kolejnej wizyty, aby mieć pewność, że nikt nie zmarznie. Eksportuj do CSV w celu raportowania lub importuj do zewnętrznego CRM."
+    },
+    "summary": {
+      "title": "Streszczenie",
+      "total_contacts": "ogół kontaktów",
+      "by_segment": "Według segmentu:",
+      "by_stage": "Według etapu:"
+    },
+    "filters": {
+      "title": "Filtry",
+      "segment": "Segment",
+      "segment_description": "gmina: samorząd lokalny; inwestor: fundator; biznes: sponsoring; mieszkaniec: indywidualny; partner: organizacja pozarządowa/organizacja charytatywna.",
+      "stage": "Scena",
+      "all_segments": "Wszystkie segmenty",
+      "all_stages": "Wszystkie etapy"
+    },
+    "contacts": {
+      "title": "Kontakty ({{count}})",
+      "empty": "Żadne kontakty nie pasują do bieżących filtrów.",
+      "table_aria": "Kontakty pielęgnujące leady"
+    },
+    "table": {
+      "name_email": "Imię/e-mail",
+      "organisation": "Organizacja",
+      "segment": "Segment",
+      "stage": "Scena",
+      "source": "Źródło",
+      "captured": "Złapany",
+      "follow_up": "Podejmować właściwe kroki",
+      "actions": "Działania"
+    },
+    "segments": {
+      "municipality": "Miasto",
+      "investor": "Inwestor",
+      "business": "Biznes",
+      "resident": "Rezydent",
+      "partner": "Partnera"
+    },
+    "stages": {
+      "captured": "Złapany",
+      "contacted": "Skontaktowano się",
+      "engaged": "Zaangażowany",
+      "qualified": "Wykwalifikowany",
+      "converted": "Przekształcony",
+      "dormant": "Uśpiony",
+      "unsubscribed": "Niesubskrybowany"
+    },
+    "fields": {
+      "follow_up_date": "Data kontroli (ISO 8601)",
+      "follow_up_placeholder": "2026-05-15",
+      "notes": "Notatki"
+    },
+    "modal": {
+      "title": "Edytuj kontakt",
+      "stage_description": "schwytany: pierwszy kontakt; skontaktowano się: wyciągnięto rękę; zaangażowany: aktywna rozmowa; zakwalifikowany: potwierdzone odsetki i budżet; przekonwertowany: zarejestrowany; uśpiony: uspokoił się; bez subskrypcji: rezygnacja."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "confirm_unsubscribe": "Oznaczyć {{email}} jako osobę niesubskrybowaną?",
+    "toasts": {
+      "load_failed": "Nie udało się wczytać kontaktów zajmujących się opieką nad potencjalnymi klientami",
+      "updated": "Kontakt zaktualizowany",
+      "update_failed": "Nie udało się zaktualizować kontaktu",
+      "unsubscribed": "Oznaczono jako niesubskrybowane",
+      "unsubscribe_failed": "Nie udało się anulować subskrypcji",
+      "exported": "Wyeksportowano listę potencjalnych klientów",
+      "export_failed": "Nie udało się wyeksportować CSV"
+    }
+  },
+  "municipal_copilot": {
+    "meta": {
+      "page_title": "Drugi pilot komunikacji miejskiej",
+      "title": "Drugi pilot komunikacji miejskiej",
+      "subtitle": "Przygotuj projekty oficjalnych ogłoszeń, poproś o ich dopracowanie do AI, sprawdź ton i przejrzystość, a następnie opublikuj. Przeznaczony dla koordynatorów, którzy potrzebują komunikować się z mieszkańcami i kontaktami gminnymi spójnym, przystępnym głosem."
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "generate_proposal": "Wygeneruj propozycję",
+      "accept": "Przyjąć",
+      "reject": "Odrzucić",
+      "view": "Pogląd",
+      "cancel": "Anulować",
+      "reject_proposal": "Odrzuć propozycję",
+      "publish": "Opublikuj"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Municipal Copilot pomoże Ci napisać ogłoszenia jasne, odpowiednio formalne i wolne od żargonu. Wklej wstępną wersję roboczą — element AI zasugeruje ulepszenia, oznaczy problemy z tonem (zbyt formalne, protekcjonalne lub niejasne) i wyświetli listę wszelkich problemów związanych z moderacją. Sprawdzasz i akceptujesz lub odrzucasz sugestię, zanim cokolwiek zostanie opublikowane."
+    },
+    "sections": {
+      "new_draft": "Nowy projekt",
+      "latest_proposal": "Najnowsza propozycja",
+      "clarity_warnings": "Ostrzeżenia dotyczące przejrzystości",
+      "moderation_flags": "Flagi moderacji",
+      "recent_proposals": "Najnowsze propozycje"
+    },
+    "fields": {
+      "draft_announcement": "Projekt ogłoszenia",
+      "draft_placeholder": "Wklej wstępny szkic — drugi pilot wypoleruje, sprawdzi dźwięk i zasygnalizuje problemy.",
+      "character_count": "{{count}} / 4000 znaków",
+      "audience_hint": "Wskazówka dla odbiorców (opcjonalnie)",
+      "audience_placeholder": "np. opiekunów w podregionie północnym",
+      "audience_description": "Określ, dla kogo jest przeznaczone to ogłoszenie (np. „wszyscy mieszkańcy”, „wolontariusze”, „osoby kontaktowe w gminie”), aby AI mógł odpowiednio skalibrować ton i słownictwo.",
+      "polished_text": "Wypolerowany tekst",
+      "reason": "Powód",
+      "reason_placeholder": "Dlaczego ta propozycja zostaje odrzucona?"
+    },
+    "status": {
+      "proposed": "Zaproponowano",
+      "accepted": "Przyjęty",
+      "rejected": "Odrzucony",
+      "published": "Opublikowany"
+    },
+    "tone": {
+      "too_formal": "Zbyt formalne",
+      "too_informal": "Zbyt nieformalne",
+      "condescending": "Protekcjonalny",
+      "ok": "Ton OK"
+    },
+    "tone_legend": {
+      "prefix": "Legenda tonów -",
+      "too_formal": "nadmiernie biurokratyczny",
+      "too_informal": "może wydawać się nieprofesjonalne",
+      "condescending": "może patronować czytelnikowi",
+      "ok": "nie wykryto żadnych problemów z dźwiękiem"
+    },
+    "labels": {
+      "audience": "Publiczność: {{audience}}",
+      "model": "Użyty model: {{model}}"
+    },
+    "states": {
+      "accepted": "Zaakceptowano, ale jeszcze nie opublikowano. Naciśnij Opublikuj, aby wysłać tekst jako ogłoszenie.",
+      "rejected_reason": "Odrzucono - powód: {{reason}}",
+      "published": "Opublikowano jako ogłoszenie nr {{id}}."
+    },
+    "empty": {
+      "value": "-",
+      "no_latest": "Nie ma jeszcze propozycji. Wygeneruj jeden z wersji roboczej po lewej stronie.",
+      "no_proposals": "Nie ma jeszcze żadnych propozycji. Wersje robocze, które analizujesz, pojawią się tutaj jako ścieżka audytu."
+    },
+    "table": {
+      "aria": "Najnowsze propozycje drugiego pilota",
+      "status": "Status",
+      "draft": "PROJEKT",
+      "audience": "PUBLICZNOŚĆ",
+      "tone": "TON",
+      "created": "STWORZONY",
+      "actions": "DZIAŁANIA"
+    },
+    "modal": {
+      "reject_title": "Odrzuć propozycję"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować propozycji drugiego pilota",
+      "enter_draft": "Najpierw wprowadź wersję roboczą",
+      "draft_too_long": "Wersja robocza jest za długa (maks. 4000 znaków)",
+      "generated": "Wygenerowano propozycję",
+      "generate_failed": "Nie udało się wygenerować propozycji",
+      "accepted": "Propozycja zaakceptowana i opublikowana jako ogłoszenie",
+      "accept_failed": "Nie udało się zaakceptować propozycji",
+      "reason_required": "Powód jest wymagany",
+      "rejected": "Propozycja odrzucona",
+      "reject_failed": "Nie udało się odrzucić propozycji",
+      "publish_failed": "Propozycja zaakceptowana, ale publikacja się nie powiodła - naciśnij Opublikuj, aby spróbować ponownie"
+    }
+  },
+  "municipal_roi_page": {
+    "meta": {
+      "page_title": "Raport oddziaływania na gminę",
+      "title": "Raport oddziaływania na gminę",
+      "subtitle": "Dowody na zamówienia B2G – kompensacja kosztów opieki i wskaźniki kapitału społecznego"
+    },
+    "actions": {
+      "export_csv": "Eksportuj CSV",
+      "refresh_data": "Odśwież dane",
+      "refresh_aria": "Odśwież raport oddziaływania na gminę"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body_prefix": "Miejski",
+      "body_middle": "Raport oblicza wartość społeczną i ekonomiczną Twojego programu opieki społecznej za pomocą",
+      "body_suffix": "Metodologia Caring Community. Pokazuje szacowany koszt usług opieki formalnej (Spitex/Pflege), wygenerowaną wartość społeczną i dane dotyczące trendów w okresach raportowania. Niniejszy raport ma zostać udostępniony partnerom miejskim i fundatorom jako dowód wpływu programu.",
+      "formula_prefix": "Rekompensata kosztów = całkowita liczba zatwierdzonych godzin opieki x",
+      "formula_suffix": "stawka godzinowa x mnożnik zapobiegania. Mnożnik zapobiegania (domyślnie: 2,0) odzwierciedla, że ​​jedna godzina opieki nieformalnej zapobiega w przybliżeniu dwóm godzinom interwencji w ramach opieki formalnej, jak wynika z badań Caring Community."
+    },
+    "filters": {
+      "from": "Z",
+      "to": "Do",
+      "sub_region": "Podregion",
+      "all_sub_regions": "Wszystkie podregiony",
+      "period": "Okres: {{from}} -> {{to}}"
+    },
+    "methodology": {
+      "hours_valued_at": "Godziny wyceniane na",
+      "hours_are_valued_at": "Godziny są wyceniane na",
+      "chf_per_hour": "CHF {{amount}}/godz",
+      "default_rate": "CHF 35/godz",
+      "tenant_setting_source": "skonfigurowany dla tego dzierżawcy",
+      "default_source": "Stawka asystenta opieki formalnej w Szwajcarii, SECO 2024",
+      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
+      "prevention_value_suffix": "metodologia oceny.",
+      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
+      "default_prevention_suffix": "metodologia oceny.",
+      "substitution_applied": "Godziny są ważone współczynnikami substytucji według kategorii.",
+      "substitution_not_applied": "Wszystkie godziny ważone przy 1,0x."
+    },
+    "stats": {
+      "total_hours": "Łączna liczba godzin",
+      "active_members": "Aktyw",
+      "active_relationships": "Aktywne relacje",
+      "care_recipients": "Odbiorcy opieki",
+      "weighted_hours_tooltip": "Godziny są ważone współczynnikami substytucji specyficznymi dla kategorii (np. towarzystwo 0,4x, transport 0,7x, załatwianie spraw 1,0x) zgodnie z metodologią Caring Community.",
+      "weighted_hours_note": "{{hours}} godziny ważone po współczynnikach podstawienia"
+    },
+    "roi": {
+      "title": "Szacowane przesunięcie kosztów opieki",
+      "yoy": "{{value}} r/r",
+      "prevented_this_period": "koszty opieki formalnej uniemożliwiły ten okres",
+      "prevention_value": "Wartość zapobiegawcza",
+      "multiplier_note": "({{multiplier}}x mnożnik)",
+      "default_multiplier_note": "(mnożnik 2x)",
+      "social_isolation_supported": "Osoby wspierane z powodu izolacji społecznej"
+    },
+    "municipalities": {
+      "title": "Co to oznacza dla gmin",
+      "point_hour_prefix": "Każda godzina opieki społecznej pozwala zaoszczędzić około",
+      "point_hour_suffix": "w kosztach opieki formalnej",
+      "point_prevention": "Profilaktyczne wsparcie społeczne może zmniejszyć potrzeby w zakresie opieki stacjonarnej – szacunkowy mnożnik dwukrotnie",
+      "point_nexus": "sprawia, że ​​wpływ ten jest mierzalny, możliwy do kontrolowania i raportowania w przypadku zamówień kantonalnych i gminnych",
+      "point_export": "Dostępny eksport CSV — użyj przycisku w nagłówku strony, aby uzyskać raporty Caring Community, Pro Senectute i kantonalnego departamentu społecznego."
+    },
+    "breakdown": {
+      "title": "Podział na podregiony",
+      "description": "Podział na podregiony pokazuje, które dzielnice generują najwięcej działań związanych z opieką. Użyj tego, aby zidentyfikować obszary, które mogą wymagać większego wsparcia koordynatorów lub rekrutacji wolontariuszy.",
+      "aria": "Podział podregionów",
+      "sub_region": "Podregion",
+      "hours": "Godziny",
+      "weighted_hours": "Ważone godziny",
+      "formal_care_offset": "Oficjalne przesunięcie opieki"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować danych o wpływie na gminy",
+      "export_failed": "Nie udało się wyeksportować CSV"
+    }
+  },
+  "municipal_verification": {
+    "meta": {
+      "page_title": "Weryfikacja miejska",
+      "title": "Weryfikacja miejska",
+      "description": "Oznacz tę gminę jako zweryfikowanego partnera miejskiego. Dodaje do raportów publicznych plakietkę „Zweryfikowana gmina”."
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "generate_dns_token": "Wygeneruj token DNS",
+      "apply_attestation": "Zastosuj zaświadczenie",
+      "revoke": "Unieważnić",
+      "cancel": "Anulować"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Weryfikacja miejska rejestruje formalne potwierdzenie od partnera gminy lub kantonu, że ten program opieki środowiskowej spełnia jego wymagania. Weryfikacja jest wymagana do sprawdzenia gotowości do startu pilotażowego i odblokowuje raport oddziaływania na miasto. Użyj weryfikacji DNS TXT dla oficjalnych domen miejskich lub zastosuj zaświadczenie administratora, jeśli kontrola DNS nie jest dostępna.",
+      "pending_dns": "Wygenerowano token weryfikacyjny — oczekuje na propagację DNS i potwierdzenie.",
+      "verified": "Formalnie zweryfikowane – pakiet raportowania miejskiego odblokowany.",
+      "revoked": "Weryfikacja została usunięta - zweryfikuj ponownie, aby przywrócić dostęp."
+    },
+    "status": {
+      "verified": "Zweryfikowano",
+      "pending_dns": "Oczekuje DNS",
+      "revoked": "Odwołany"
+    },
+    "current": {
+      "title": "Aktualny stan",
+      "verified_on": "Zweryfikowano {{date}}",
+      "not_verified": "Ten najemca nie jest obecnie zweryfikowany. Skorzystaj z poniższych opcji, aby rozpocząć weryfikację DNS lub zastosować ręczne zaświadczenie administratora."
+    },
+    "request": {
+      "title": "Poproś o weryfikację",
+      "method_aria": "Metoda weryfikacji",
+      "dns_tab": "DNS TXT (preferowane)",
+      "dns_body": "Podaj oficjalną domenę gminy, którą kontrolujesz. Wygenerujemy rekord DNS TXT do opublikowania; po rozprzestrzenieniu się system oznacza tego najemcę jako zweryfikowanego.",
+      "attestation_tab": "Zaświadczenie administratora",
+      "attestation_body": "Używaj tej opcji tylko wtedy, gdy sterowanie DNS nie jest dostępne. Weryfikacja jest rejestrowana jako ręcznie potwierdzona przez administratora."
+    },
+    "fields": {
+      "municipality_domain": "Domena gminy",
+      "domain_or_organisation": "Domena lub organizacja",
+      "domain_placeholder": "np. zurich.ch",
+      "attestation_note": "Nota atestacyjna (opcjonalnie)",
+      "attestation_description": "Dlaczego potwierdzasz to bez weryfikacji DNS? (Ścieżka audytu.)"
+    },
+    "history": {
+      "title": "Weryfikacje",
+      "empty": "Nie ma jeszcze żadnych zapisów weryfikacyjnych.",
+      "via_method": "przez {{method}}",
+      "updated": "Zaktualizowano {{date}}"
+    },
+    "dns": {
+      "publish_record": "Opublikuj ten rekord TXT na swoim DNS, a następnie poczekaj na propagację:",
+      "record_name": "Nazwa rekordu",
+      "value": "Wartość",
+      "type_label": "Typ",
+      "ttl_label": "TTL",
+      "txt_type": "TXT",
+      "ttl_value": "300"
+    },
+    "revoke_modal": {
+      "title": "Cofnąć weryfikację?",
+      "body_prefix": "Cofnij weryfikację dla",
+      "body_suffix": "Spowoduje to usunięcie zweryfikowanej plakietki, a zapis weryfikacji zostanie oznaczony jako unieważniony."
+    },
+    "validation": {
+      "domain_required": "Wpisz domenę"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się wczytać stanu weryfikacji",
+      "dns_generated": "Wygenerowano token weryfikacyjny DNS",
+      "dns_failed": "Nie udało się rozpocząć weryfikacji DNS",
+      "attested": "Weryfikacja potwierdzona",
+      "attest_failed": "Nie udało się potwierdzić weryfikacji",
+      "revoked": "Weryfikacja odwołana",
+      "revoke_failed": "Nie udało się cofnąć weryfikacji"
+    }
+  },
+  "pilot_launch_readiness": {
+    "meta": {
+      "page_title": "Gotowość do startu pilotażowego",
+      "title": "Gotowość do startu pilotażowego",
+      "subtitle": "AG95 - raport go/no-go łączący powierzchnie oceny AG80-AG87"
+    },
+    "actions": {
+      "launch_pilot": "Uruchom pilota",
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież raport gotowości do startu",
+      "retry": "Spróbować ponownie",
+      "open": "Otwarte",
+      "acknowledge_default_matrix": "Potwierdź domyślną macierz",
+      "cancel": "Anulować",
+      "confirm_launch": "Tak, uruchom pilota"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "To jest bramka typu „go/no-go”, zanim Twój program pilotażowy Caring Community zostanie uruchomiony. Każda sekcja poniżej odpowiada modułowi konfiguracyjnemu lub ewaluacyjnemu (AG80-AG87). Wszystkie sekcje muszą osiągnąć stan Gotowe, zanim zostanie włączony przycisk Uruchom. Po uruchomieniu jest to działanie jednokierunkowe – znacznik czasu uruchomienia i operator są rejestrowane na stałe.",
+      "review_help": "W sekcjach pokazujących Przegląd potrzeb brakuje konfiguracji lub jest ona niekompletna. Kliknij odpowiedni moduł, aby rozwiązać wymienione problemy."
+    },
+    "status": {
+      "ready": "Gotowy",
+      "needs_review": "Wymaga przeglądu",
+      "not_started": "Nie rozpoczęte",
+      "blocked": "Zablokowany"
+    },
+    "missing": {
+      "controller_name": "Nazwa kontrolera",
+      "controller_contact_email": "Adres e-mail kontaktowy kontrolera",
+      "controller_data_protection_officer": "Inspektor ochrony danych",
+      "incident_response_contact_email": "Kontaktowy adres e-mail dotyczący reakcji na incydenty",
+      "workshop_not_run": "Warsztaty dotyczące polityki operacyjnej nie są prowadzone",
+      "policy_appendix_url": "Załącznik do zasad URL",
+      "safeguarding_escalation_user_id": "Ochrona kontaktu eskalacyjnego",
+      "acknowledgement": "Potwierdzenie koordynatora",
+      "pre_pilot_baseline": "Linia bazowa tablicy wyników przed pilotażem",
+      "danger_checks": "Problemy z jakością danych",
+      "backlog_empty": "Zaległości w integracji puste"
+    },
+    "states": {
+      "launched_title": "Uruchomiono pilotaż",
+      "launched_body": "Uruchomiono {{date}}{{user}}. Jest to kamień milowy w jedną stronę – kontrole gotowości pozostają widoczne na potrzeby audytu.",
+      "launched_by_user": "przez użytkownika #{{id}}",
+      "ready_title": "Gotowy do uruchomienia",
+      "ready_body_prefix": "Każda sekcja gotowości jest gotowa. Trzask",
+      "ready_body_suffix": "kiedy zespół koordynatorów będzie gotowy do podjęcia jednostronnej decyzji.",
+      "blocked_title": "Nie można jeszcze uruchomić — pozostała blokada {{count}}",
+      "blocked_title_plural": "Nie można jeszcze uruchomić – pozostały {{count}} blokery",
+      "blocked_body": "Rozwiąż każdą sekcję poniżej, zanim przycisk uruchamiania zostanie włączony."
+    },
+    "overall": {
+      "ready": "Pilot jest gotowy do startu",
+      "blocked": "Uruchomienie zablokowane — najpierw napraw problemy",
+      "not_started": "Ocena pilotażowa nie została jeszcze przeprowadzona",
+      "needs_review": "Pilot wymaga przeglądu przez koordynatora"
+    },
+    "progress": {
+      "ready_count": "{{ready}} / {{total}} gotowy",
+      "aria": "Postęp w gotowości do uruchomienia"
+    },
+    "isolated_node": {
+      "required": "Brama izolowanego węzła jest aktywna — to wdrożenie jest skonfigurowane jako węzeł izolowany w kantonie (AG85). Wszystkie elementy muszą osiągnąć status Zdecydowano przed uruchomieniem.",
+      "informational": "Brama izolowanego węzła ma charakter informacyjny w przypadku standardowych wdrożeń hostowanych. Blokuje uruchamianie tylko wtedy, gdy AG85 tryb_wdrożenia jest ustawiony na canton_isolated_node. Jeśli Twoja gmina nie określiła wymogu izolowanego węzła, możesz pominąć pozycje w tej sekcji."
+    },
+    "timestamps": {
+      "last_updated": "Ostatnia aktualizacja {{date}}",
+      "report_generated": "Raport wygenerowano {{date}}. Kliknij dowolną sekcję, aby otworzyć odpowiednią powierzchnię administracyjną."
+    },
+    "modal": {
+      "title": "Uruchomić pilota?",
+      "body_prefix": "Uruchomienie pilotażu to a",
+      "one_way_action": "działanie jednokierunkowe",
+      "body_suffix": "Rejestruje sygnaturę czasową i operatora w dzierżawie, a raporty platformy zaczynają traktować społeczność jako aktywną.",
+      "confirm_intro": "Zanim przejdziesz dalej, potwierdź u swojego zespołu koordynatorów, że:",
+      "check_disclosure": "Pakiet informacyjny, zasady operacyjne i granice handlowe zostały podpisane",
+      "check_baseline": "Przechwycono linię bazową tablicy wyników przed pilotażem",
+      "check_data_quality": "Kontrole jakości danych są zielone",
+      "check_residents": "Prawdziwi mieszkańcy są gotowi na zaproszenie",
+      "section_summary": "Podsumowanie sekcji"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "more_count": "+{{count}} więcej",
+    "toasts": {
+      "load_failed": "Nie udało się załadować raportu gotowości do uruchomienia",
+      "boundary_acknowledged": "Uznano granicę handlową",
+      "boundary_acknowledge_failed": "Nie udało się potwierdzić granicy",
+      "launch_success": "Pilotaż został pomyślnie uruchomiony.",
+      "cannot_launch": "Nie można uruchomić – bramka gotowości nie jest zamknięta.",
+      "already_launched": "Ten pilotaż został już uruchomiony.",
+      "launch_failed": "Nie udało się uruchomić pilota."
+    },
+    "errors": {
+      "load_failed": "Nie można załadować raportu gotowości do uruchomienia.",
+      "unexpected_response": "Raport gotowości do uruchomienia zwrócił nieoczekiwaną odpowiedź.",
+      "unavailable_title": "Raport gotowości niedostępny"
+    }
+  },
+  "pilot_scoreboard": {
+    "meta": {
+      "title": "Tablica wyników pilotażu",
+      "subtitle": "AG83 – wartość bazowa przed pilotażem + 90-dniowe wskaźniki kroczące z częstotliwością kwartalnych przeglądów"
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "pre_set": "Zestaw bazowy przed pilotażem",
+      "capture_pre": "Przechwyć linię bazową przed pilotażem",
+      "capture_quarterly": "Przechwytuj kwartalny przegląd",
+      "capture_baseline": "Przechwytywanie linii bazowej",
+      "cancel": "Anulować"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Wszystkie wskaźniki korzystają z 90-dniowego okna kroczącego. Przed wdrożeniem prawdziwych mieszkańców przeprowadź ocenę bazową przed pilotażem, a następnie co 3 miesiące wykonuj kwartalną analizę stanu. Tabela porównawcza pokazuje, jak zmieniły się poszczególne dane w stosunku do wartości bazowej.",
+      "methodology_prefix": "Odliczenie kosztów oblicza się za pomocą",
+      "age_stiftung": "Caring Community",
+      "age_stiftung_title": "Stiftung für das Alter",
+      "methodology_middle": "metodologia: godziny nieformalnej opieki x",
+      "methodology_suffix": "35/godz. (stawka asystenta opieki formalnej w Szwajcarii) x 2 (mnożnik zapobiegania odzwierciedlający uniknięte koszty opieki formalnej). Metodologia ta jest uznawana przez szwajcarskie służby socjalne kantonów w zakresie sprawozdawczości pilotażowej."
+    },
+    "quarterly": {
+      "next_review": "Kolejny przegląd kwartalny:",
+      "overdue": "Zaległy"
+    },
+    "sections": {
+      "metrics": "Metryki pilotażowe",
+      "comparing_baseline": "Porównanie z wartością bazową zarejestrowaną przed pilotażem {{date}}",
+      "no_baseline": "Nie ma jeszcze wartości bazowych przed pilotażem – pokazane są same bieżące wartości",
+      "captured_baselines": "Przechwycone linie bazowe"
+    },
+    "table": {
+      "metric": "Metryczny",
+      "pre_pilot": "Wstępny pilot",
+      "current": "Aktualny",
+      "delta": "Delta",
+      "change": "Zmiana"
+    },
+    "metrics": {
+      "active_members": "Aktywni członkowie (90d)",
+      "first_response_hours": "Mediana pierwszej odpowiedzi",
+      "approved_hours": "Zatwierdzone godziny (90d)",
+      "recurring_relationships": "Powtarzające się relacje",
+      "coordinator_workload_hrs": "Obciążenie koordynatora",
+      "satisfaction_score": "Wynik satysfakcji (1-5)",
+      "social_isolation_pct": "Serwer proxy izolacji społecznej",
+      "comms_reach_pct": "Zasięg komunikacji",
+      "business_participation": "Aktywne firmy (90d)",
+      "cost_offset_chf": "Szacowane przesunięcie kosztów (CHF)"
+    },
+    "baselines": {
+      "label": "Etykieta",
+      "captured": "Złapany",
+      "period": "Okres",
+      "type": "Typ",
+      "notes": "Notatki",
+      "pre_pilot": "Wstępny pilot",
+      "quarterly": "Kwartalny"
+    },
+    "fields": {
+      "notes_optional": "Notatki (opcjonalnie)",
+      "label_optional": "Etykieta (opcjonalnie)"
+    },
+    "pre_modal": {
+      "title": "Przechwyć linię bazową przed pilotażem",
+      "body": "Zrób to RAZ przed wejściem na pokład prawdziwych mieszkańców. Zamraża bieżące dane z 90 dni jako punkt odniesienia dla porównania. Wszystkie przyszłe przeglądy kwartalne będą obliczać deltę na podstawie tej migawki. Tej akcji nie można cofnąć.",
+      "notes_placeholder": "Region pilotażowy, uczestnicząca gmina, decyzje podjęte przed uruchomieniem..."
+    },
+    "quarterly_modal": {
+      "title": "Przechwytuj kwartalny przegląd",
+      "body": "Uruchamiaj co 3 miesiące po uruchomieniu pilotażu. Etykieta migawki domyślnie wskazuje bieżący kwartał (np. Q2_2026), ale możesz ją dostosować. Dodawaj notatki, aby rejestrować, co się zmieniło od czasu ostatniej recenzji – osiągnięte kamienie milowe, zmiany zasad, opinie mieszkańców. Migawka obejmuje ostatnie 90-dniowe okno z dzisiaj.",
+      "label_placeholder": "kwartalnie_2026_07",
+      "label_description": "Użyj rozpoznawalnej etykiety, takiej jak Q2_2026 lub 2026_Q3. Domyślnie jest to kwartalny_RRRR_MM.",
+      "notes_placeholder": "Co zmieniło się w tym kwartale, kamienie milowe osiągnięte…"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "currency": {
+      "chf": "CHF"
+    },
+    "methodology": {
+      "prefix": "Metodologia: godziny x",
+      "per_hour": "/godz. x",
+      "multiplier": "mnożnik zapobiegania.",
+      "window": "Okno: {{days}} dni."
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować tablicy wyników pilota",
+      "pre_captured": "Przechwycono linię bazową przed pilotażem",
+      "pre_failed": "Nie udało się przechwycić wartości bazowej przed pilotażem",
+      "quarterly_captured": "Przechwycono przegląd kwartalny",
+      "quarterly_failed": "Nie udało się przechwycić przeglądu kwartalnego"
+    }
+  },
+  "research_partnerships": {
+    "meta": {
+      "title": "Partnerstwa badawcze",
+      "subtitle": "Zarządzaj partnerami badawczymi zapewniającymi ochronę prywatności, eksportem zbiorczych zbiorów danych i historią odwołań"
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież partnerstwa badawcze",
+      "generate_export": "Generuj eksport",
+      "add_partner": "Dodaj partnera",
+      "view": "Pogląd",
+      "open": "Otwarte",
+      "revoke": "Unieważnić",
+      "cancel": "Anulować",
+      "create": "Tworzyć",
+      "close": "Zamknąć",
+      "download_markdown": "Pobierz Markdown",
+      "render": "Oddać",
+      "rerender": "Renderuj ponownie",
+      "generate": "Spowodować"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Partnerstwa badawcze zapewniają zatwierdzonym badaczom akademickim lub badaczom polityki kontrolowany dostęp do zanonimizowanych danych platformy na potrzeby oceny. Każde partnerstwo określa konkretny zakres danych, czas trwania i umowę dotyczącą udostępniania danych. Każdy dostęp jest rejestrowany. Partnerzy nigdy nie widzą danych poszczególnych członków – jedynie zagregowane lub anonimowe zbiory danych.",
+      "data_scope_label": "Zakres danych:",
+      "data_scope_body": "Zdefiniuj dokładnie, do jakich danych badacz może uzyskać dostęp, na przykład zagregowane miesięczne godziny opieki według podregionów, z wyłączeniem wszystkich identyfikatorów osobistych. Zakres jest wiążący umownie i podlega audytowi kwartalnemu.",
+      "download_history_label": "Historia pobierania:",
+      "download_history_body": "Każdy eksport danych jest rejestrowany ze znacznikiem czasu i danymi badacza. Ten dziennik jest dostępny dla Twojego Data Protection Officer na żądanie. Użyj opcji Revoke, aby wycofać wcześniej wydany zestaw danych."
+    },
+    "partners": {
+      "title": "Partnerzy naukowi",
+      "table_aria": "Partnerzy naukowi",
+      "empty": "Nie ma jeszcze partnerów badawczych."
+    },
+    "templates": {
+      "title": "Wzory umów",
+      "subtitle": "FADP/nDSG-wyrównane wersje robocze do oceny prawnej",
+      "empty": "Brak dostępnych wzorów umów.",
+      "placeholder_count_one": "{{count}} symbol zastępczy",
+      "placeholder_count_other": "{{count}} symbole zastępcze",
+      "fallback_title": "Wzór umowy",
+      "placeholder_label": "{{placeholder}}",
+      "rendered_markdown": "Renderowane Markdown ({{count}} znaków)",
+      "missing_placeholder_count_one": "Brak {{count}} symbolu zastępczego",
+      "missing_placeholder_count_other": "Brak {{count}} symboli zastępczych"
+    },
+    "exports": {
+      "title": "Historia eksportu zbioru danych",
+      "table_aria": "Eksport zbioru danych badawczych",
+      "empty": "Nie ma jeszcze eksportu zbioru danych.",
+      "partner_fallback": "Partner #{{id}}"
+    },
+    "columns": {
+      "partner": "Partnera",
+      "status": "Stan",
+      "agreement": "Porozumienie",
+      "methodology": "Metodologia",
+      "created": "Stworzony",
+      "period": "Okres",
+      "rows": "Wydziwianie",
+      "hash": "Haszysz",
+      "actions": "Działania"
+    },
+    "fields": {
+      "name": "Nazwa",
+      "institution": "Instytucja",
+      "contact_email": "Adres e-mail do kontaktu",
+      "agreement_reference": "Odniesienie do umowy",
+      "methodology_url": "Metodologia URL",
+      "status": "Stan",
+      "dataset_scope": "Zakres zbioru danych",
+      "dataset_scope_description": "Klucze zestawu danych rozdzielane przecinkami.",
+      "period_start": "Początek okresu",
+      "period_end": "Koniec okresu"
+    },
+    "statuses": {
+      "draft": "Projekt",
+      "active": "Aktywny",
+      "paused": "Wstrzymano",
+      "ended": "Zakończone",
+      "generated": "Wygenerowano",
+      "superseded": "Zastąpione",
+      "revoked": "Odwołany"
+    },
+    "partner_modal": {
+      "title": "Dodaj partnera badawczego"
+    },
+    "export_modal": {
+      "title": "Wygeneruj zbiorczy zbiór danych",
+      "active_partner": "Aktywny partner badawczy",
+      "privacy_note": "Eksporty mają charakter wyłącznie zbiorczy i korzystają z progów pomijania. Bezpośrednie identyfikatory członków nie są uwzględniane."
+    },
+    "toasts": {
+      "load_failed": "Nie udało się wczytać partnerstw badawczych",
+      "render_template_failed": "Nie udało się wyrenderować szablonu",
+      "create_partner_failed": "Nie udało się utworzyć partnera badawczego",
+      "partner_created": "Utworzono partnera badawczego",
+      "generate_export_failed": "Nie udało się wygenerować eksportu zbioru danych",
+      "export_generated": "Wygenerowano zbiorczy eksport zbioru danych",
+      "revoke_export_failed": "Nie udało się odwołać eksportu zbioru danych",
+      "export_revoked": "Eksport zbioru danych został odwołany"
+    }
+  },
+  "smart_nudges": {
+    "meta": {
+      "page_title": "Inteligentne szturchnięcia członków",
+      "title": "Inteligentne szturchnięcia członków",
+      "description": "Zautomatyzowane sugestie, które skłaniają członków do wybierania partnerów w tandemie o dobrej kondycji. Konserwatywne ustawienia domyślne – działają z dziennym limitem."
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "dry_run": "Praca na sucho",
+      "dispatch_now": "Wyślij teraz",
+      "save_configuration": "Zapisz konfigurację",
+      "cancel": "Anulować",
+      "dispatch": "Załatwić"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Inteligentne podpowiedzi to automatyczne monity wysyłane do członków w przypadku wykrycia dobrze dopasowanego partnera do meczu tandemowego. Członkowie, którzy skorzystaliby na połączeniu równorzędnym, są identyfikowani przez silnik dopasowujący i wysyłani do aplikacji powiadomienie (i opcjonalnie e-mail) sugerujące połączenie. Szturchnięcia uwzględniają czas odnowienia, więc żaden członek nie kontaktuje się zbyt często. Skorzystaj z próby próbnej, aby zobaczyć, kto zostanie szturchnięty przed realną wysyłką.",
+      "inactivity_label": "Bezczynność",
+      "inactivity_body": "wyzwalane, gdy członek nie zalogował się przez skonfigurowaną liczbę dni",
+      "unmatched_request_label": "Niedopasowane żądanie",
+      "unmatched_request_body": "wyzwalane, gdy prośba o pomoc nie zawiera żadnych ofert po upływie okna odnowienia",
+      "follow_up_label": "Podejmować właściwe kroki",
+      "follow_up_body": "wysyłane do koordynatora, gdy zatwierdzona wymiana nie została oznaczona jako ukończona"
+    },
+    "stats": {
+      "sent_30d": "Wysłano (30 dni)",
+      "conversion_30d": "Konwersja (30 dni)",
+      "eligible_candidates": "Kwalifikujący się kandydaci",
+      "opted_out": "Zrezygnowano"
+    },
+    "chart": {
+      "title": "Codzienne podpowiedzi (ostatnie 30 dni)",
+      "sent": "Wysłano",
+      "converted": "Przekształcony"
+    },
+    "config": {
+      "title": "Konfiguracja",
+      "engine_enabled": "Silnik włączony",
+      "engine_description": "Gdy opcja jest wyłączona, żadne podpowiedzi nie są wysyłane.",
+      "min_score": "Minimalny wynik (0,40 - 0,95)",
+      "min_score_description": "Próg wyniku w przypadku dopasowania tandemowego przy wysyłaniu szturchnięcia",
+      "cooldown_days": "Czas odnowienia (dni)",
+      "cooldown_description": "Poczekaj tak długo, zanim ponownie szturchniesz tę samą parę",
+      "daily_limit": "Limit dzienny",
+      "daily_limit_description": "Maksymalna liczba szturchnięć dziennie w całym najemcy",
+      "save_note": "Zmiany zaczynają obowiązywać natychmiast — przy następnym zaplanowanym uruchomieniu podpowiedzi zostaną zastosowane nowe ustawienia."
+    },
+    "dry_run": {
+      "title": "Podgląd próbny",
+      "candidates": "{{count}} kandydatów",
+      "empty": "W tej chwili brak odpowiednich kandydatów.",
+      "table_aria": "Wyselekcjonowani kandydaci szturchają"
+    },
+    "recent": {
+      "title": "Ostatnie szturchnięcia",
+      "empty": "Nie wysłano jeszcze żadnych podpowiedzi.",
+      "table_aria": "Ostatnie inteligentne szturchnięcia"
+    },
+    "table": {
+      "target_user": "Użytkownik docelowy",
+      "target": "Cel",
+      "suggested_partner": "Sugerowany partner",
+      "score": "Wynik",
+      "sent": "Wysłano",
+      "status": "Stan"
+    },
+    "status": {
+      "sent": "Wysłano",
+      "converted": "Przekształcony"
+    },
+    "dispatch_modal": {
+      "title": "Wysłać podpowiedzi teraz?",
+      "body_prefix": "To wyśle ​​do",
+      "body_suffix": "wysyłaj powiadomienia do kwalifikujących się członków już teraz. Upewnij się, że najpierw sprawdziłeś próbę próbną."
+    },
+    "toasts": {
+      "load_failed": "Nie udało się wczytać statystyk podpowiedzi",
+      "config_saved": "Konfiguracja przesuwania została zapisana. Zaktualizowane zasady będą obowiązywać w następnym zaplanowanym biegu.",
+      "save_failed": "Nie udało się zapisać konfiguracji",
+      "dry_run": "Próba próbna: {{count}} kwalifikujący się kandydaci",
+      "dispatched": "Wysłano {{count}} podpowiedzi",
+      "dispatch_failed": "Wysyłka nie powiodła się"
+    }
+  },
+  "sub_regions": {
+    "meta": {
+      "page_title": "Podregiony - Admin",
+      "title": "Podregiony",
+      "subtitle": "Podziały Quartier, Ortsteil, Gemeinde i Kanton dla katalogu dostawców opieki i filtrów lokalizacji"
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Podregiony dzielą Twoją społeczność na obszary geograficzne (dzielnice, dystrykty lub okręgi). Służą do przypisywania koordynatorów do konkretnych obszarów, filtrowania próśb o pomoc według lokalizacji i dzielenia wskaźników pilotażowych według sąsiedztwa. Dodawanie podregionów jest opcjonalne, ale zdecydowanie zalecane w przypadku większych społeczności z wieloma zespołami koordynatorów.",
+      "postal_codes_note": "W polu Kody pocztowe: wprowadź listę kodów pocztowych, nazwę okolicy lub dowolny opis. Dokładne granice nie są wymagane – dotyczy to przydzielania koordynatorów i filtrów raportowania, a nie mapowania."
+    },
+    "actions": {
+      "add": "Dodaj podregion",
+      "edit_aria": "Edytuj podregion",
+      "mark_inactive": "Oznacz jako nieaktywne",
+      "cancel": "Anulować",
+      "save_changes": "Zapisz zmiany",
+      "create": "Utwórz podregion"
+    },
+    "filters": {
+      "search_aria": "Wyszukaj podregiony",
+      "search_placeholder": "Szukaj według nazwy, opisu lub ślimaka...",
+      "type_aria": "Filtruj według typu"
+    },
+    "table": {
+      "aria": "Tabela podregionów",
+      "name": "Nazwa",
+      "type": "Typ",
+      "postal_codes": "Kody pocztowe",
+      "coordinates": "Współrzędne",
+      "status": "Stan",
+      "actions": "Działania",
+      "empty": "Nie ma jeszcze podregionów — dodaj jeden, aby rozpocząć geograficzną segmentację najemcy."
+    },
+    "type_options": {
+      "all": "Wszystkie typy",
+      "quartier": "Dzielnica (dzielnica)",
+      "ortsteil": "Ortsteil (dzielnica)",
+      "municipality": "Gmina (Gemeinde)",
+      "canton": "Kanton",
+      "other": "Inny"
+    },
+    "status": {
+      "active": "Aktywny",
+      "inactive": "Nieaktywny"
+    },
+    "modal": {
+      "add_title": "Dodaj podregion",
+      "edit_title": "Edycja: {{name}}"
+    },
+    "form": {
+      "name": "Nazwa",
+      "name_placeholder": "np. Lorzenhof",
+      "slug": "Informacja o błędzie (generowana automatycznie, jeśli jest pusta)",
+      "slug_placeholder": "np. Lozenhof",
+      "slug_description": "Identyfikator z małymi literami i łącznikami używany w URLs i filtrach.",
+      "type": "Typ",
+      "description": "Opis",
+      "description_placeholder": "Krótki opis tego obszaru...",
+      "postal_codes": "Kody pocztowe",
+      "postal_codes_placeholder": "6330, 6331, 6332",
+      "postal_codes_description": "Lista PLZ rozdzielana przecinkami lub spacjami.",
+      "centre_latitude": "Środkowa szerokość geograficzna",
+      "latitude_placeholder": "47.1758",
+      "centre_longitude": "Długość geograficzna środkowa",
+      "longitude_placeholder": "8.4622",
+      "status": "Stan"
+    },
+    "validation": {
+      "name_required": "Imię i nazwisko jest wymagane.",
+      "type_required": "Typ jest wymagany.",
+      "latitude_number": "Szerokość geograficzna musi być liczbą.",
+      "longitude_number": "Długość geograficzna musi być liczbą."
+    },
+    "toasts": {
+      "created": "Podregion został utworzony pomyślnie.",
+      "updated": "Podregion został pomyślnie zaktualizowany.",
+      "marked_inactive": "Podregion oznaczony jako nieaktywny."
+    },
+    "errors": {
+      "load_failed": "Nie udało się wczytać podregionów.",
+      "save_failed": "Nie udało się zapisać podregionu.",
+      "delete_failed": "Nie udało się usunąć podregionu."
+    },
+    "confirm_mark_inactive": "Oznaczyć „{{name}}” jako nieaktywne? Powiązani świadczeniodawcy zostaną z niego odłączeni."
+  },
+  "success_stories_admin": {
+    "meta": {
+      "title": "Historie sukcesu",
+      "subtitle": "Twórz karty potwierdzające, które pokazują wpływ społeczności, i zarządzaj nimi – przeznaczone do udostępniania urzędnikom odpowiedzialnym za zamówienia, fundatorom i partnerom miejskim."
+    },
+    "about": {
+      "title": "O tej stronie",
+      "body": "Karty dowodów to ustrukturyzowane historie wpływu powiązane z bieżącymi wskaźnikami z platformy. Każda karta przedstawia porównanie przed/po z cytowanym źródłem dowodów i uwagą metodologiczną. Karty oznaczone jako „Demo” mają charakter wyłącznie poglądowy; po zweryfikowaniu danych oznacz kartę jako „Prawdziwy dowód”. Opublikowane karty pojawiają się w Raporcie oddziaływania na gminę i na stronie wpływu dostępnej publicznie."
+    },
+    "actions": {
+      "refresh": "Odświeżać",
+      "new_story": "Nowa historia",
+      "seed_demo": "Załóż 3 karty demonstracyjne",
+      "refresh_live": "Odśwież na podstawie danych bieżących",
+      "edit": "Redagować",
+      "delete": "Usuwać",
+      "cancel": "Anulować",
+      "save_changes": "Zapisz zmiany",
+      "create_story": "Stwórz historię",
+      "remove": "Usunąć"
+    },
+    "empty": {
+      "title": "Nie ma jeszcze żadnych historii sukcesu",
+      "body": "Załóż 3 ilustracyjne karty demonstracyjne, aby pokazać urzędnikom ds. zamówień publicznych i podmiotom finansującym, jak wyglądają karty próbne. Są one wyraźnie oznaczone jako „Demo / ilustracyjne”, dopóki nie oznaczysz ich ręcznie jako prawdziwy dowód."
+    },
+    "table": {
+      "aria": "Historie sukcesu",
+      "title": "Tytuł",
+      "status": "Stan",
+      "demo": "Demonstracja",
+      "audience": "Publiczność",
+      "metric": "Metryczny",
+      "row_actions": "Działania wierszowe",
+      "actions": "Działania"
+    },
+    "status": {
+      "published": "Opublikowany",
+      "unpublished": "Niepublikowane",
+      "demo": "Demonstracja",
+      "real": "Prawdziwy"
+    },
+    "metric_sources": {
+      "pilot_scoreboard": "AG83 tablica wyników pilotażu",
+      "municipal_roi": "AG76miejskie ROI",
+      "manual": "Instrukcja/ilustracja"
+    },
+    "audience": {
+      "all_residents": "Wszyscy mieszkańcy",
+      "municipality": "Miasto",
+      "kanton": "Kanton",
+      "verein_members": "Członkowie Verein",
+      "volunteers": "Wolontariusze",
+      "recipients": "Odbiorcy opieki"
+    },
+    "editor": {
+      "new_title": "Nowa historia sukcesu",
+      "edit_title": "Edycja: {{title}}",
+      "title": "Tytuł",
+      "title_placeholder": "np. O 30% mniejszy wysiłek związany z dystrybucją informacji",
+      "narrative": "Narracja",
+      "narrative_placeholder": "2–4 zdania wyjaśniające historię urzędnikowi ds. zamówień publicznych lub fundatorowi.",
+      "metric_source": "Źródło metryczne",
+      "metric_source_description": "pilot_scoreboard: automatyczne pobieranie z AG83; Municipal_roi: automatycznie pobiera z AG76; ręcznie: wartości wprowadzasz ręcznie.",
+      "metric_key": "Klucz metryczny",
+      "metric_key_placeholder": "np. zatwierdzone_godziny, formal_care_offset_chf",
+      "metric_key_description": "Wymagane w przypadku źródeł innych niż ręczne",
+      "before_value": "Przed wartością",
+      "after_value": "Po wartości",
+      "unit": "Jednostka",
+      "unit_placeholder": "np. godziny, CHF,%",
+      "audience": "Publiczność",
+      "sub_region_id": "Podregion ID (opcjonalnie)",
+      "sub_region_placeholder": "Pozostaw puste dla wszystkich",
+      "method_caveat": "Zastrzeżenie dotyczące metody",
+      "method_caveat_placeholder": "np. „Tylko region pilotażowy; n=42 członków; okno 90-dniowe”",
+      "method_caveat_description": "Wymagane – jednozdaniowa uwaga dotycząca ograniczeń metodologicznych. Zapewnia uczciwość roszczeń wobec fundatorów. Przykład: „Na podstawie godzin samodzielnie zgłoszonych; audyt zewnętrzny w toku.”",
+      "evidence_source": "Źródło dowodów",
+      "evidence_source_placeholder": "np. „AG83 pilotażowa tablica wyników na dzień bazowy 30.04.2026 r.”",
+      "evidence_source_description": "Wymagane - skąd pochodzi numer. Przykład: „Dane platformy NEXUS, 90-dniowe okno kroczące kończące się 2026-04-01” lub „Swiss Federal Statistical Office 2023”.",
+      "demo_label": "Demo / ilustracyjne",
+      "demo_description": "Karta oznaczona jest w galerii jako demo",
+      "published_label": "Opublikowany",
+      "published_description": "Widoczne w galerii skierowanej do członków"
+    },
+    "delete_modal": {
+      "title": "Usuń historię sukcesu",
+      "body_prefix": "Spowoduje to trwałe usunięcie",
+      "body_suffix": "z galerii.",
+      "warning": "Tej akcji nie można cofnąć."
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować historii sukcesu",
+      "seeded": "Rozstawione 3 karty demo",
+      "seed_failed": "Nasienie nie powiodło się",
+      "updated": "Historia zaktualizowana",
+      "update_failed": "Aktualizacja nie powiodła się",
+      "created": "Historia stworzona",
+      "create_failed": "Tworzenie nie powiodło się",
+      "removed": "Historia usunięta",
+      "delete_failed": "Usunięcie nie powiodło się",
+      "metric_refreshed": "Odświeżono dane na żywo",
+      "refresh_failed": "Odświeżanie nie powiodło się"
+    }
+  }
+}

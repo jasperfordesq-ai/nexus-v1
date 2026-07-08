@@ -29,7 +29,7 @@ import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 
 function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_timebanking');
   const toast = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -242,7 +242,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function GrantHistory({ refreshKey }: { refreshKey: number }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_timebanking');
   const toast = useToast();
 
   const [grants, setGrants] = useState<WalletGrant[]>([]);
@@ -364,7 +364,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
 
 export function StartingBalances() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_timebanking');
   useAdminPageMeta({ title: tNav('timebanking') });
 
   // Key to trigger grant history refresh after new grant

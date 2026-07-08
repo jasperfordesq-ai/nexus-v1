@@ -65,7 +65,7 @@ interface FormData {
 }
 
 export function CreateBadge() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_gamification');
   usePageTitle(t('gamification.create_badge_page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

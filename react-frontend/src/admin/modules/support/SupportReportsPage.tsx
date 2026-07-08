@@ -99,7 +99,7 @@ export function buildSupportReportHandoff(report: AdminSupportReport): string {
 }
 
 export default function SupportReportsPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_support');
   const toast = useToast();
   const { search: locationSearch } = useLocation();
 

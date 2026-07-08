@@ -20,10 +20,10 @@ import Bot from 'lucide-react/icons/bot';
 import Gauge from 'lucide-react/icons/gauge';
 import Zap from 'lucide-react/icons/zap';
 import ShieldCheck from 'lucide-react/icons/shield-check';
-import RouteIcon from 'lucide-react/icons/route';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
-import { useToast, useAuth, usePusherOptional } from '@/contexts';
+import { useToast, useAuth } from '@/contexts';
+import { usePusherOptional } from '@/contexts/PusherContext';
 import { PageHeader } from '../../../components/PageHeader';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import {
@@ -109,7 +109,7 @@ function useJobUpdates(): { lastUpdate: number; live: boolean } {
 }
 
 export function PrerenderAdmin() {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender' });
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender' });
   usePageTitle(t('title'));
   const toast = useToast();
   const { user } = useAuth();
@@ -250,8 +250,8 @@ export default PrerenderAdmin;
 // ─── Overview ──────────────────────────────────────────────────────────────
 
 function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number; live: boolean }) {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.overview' });
-  const { t: tAdmin } = useTranslation('admin');
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.overview' });
+  const { t: tAdmin } = useTranslation('admin_advanced');
   const [summary, setSummary] = useState<PrerenderSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [enqueuing, setEnqueuing] = useState(false);
@@ -422,7 +422,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
 function FreshnessControls({
   isSuperAdmin, toast, onActed,
 }: { isSuperAdmin: boolean; toast: ToastShape; onActed: () => void }) {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.freshness' });
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.freshness' });
   const [autoRecLoading, setAutoRecLoading] = useState(false);
   const [autoRecOutput, setAutoRecOutput] = useState<string>('');
   const [driftLoading, setDriftLoading] = useState(false);
@@ -641,8 +641,8 @@ function KpiCard({
 // ─── Inventory ─────────────────────────────────────────────────────────────
 
 function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string | null; onPresetConsumed: () => void }) {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.inventory' });
-  const { t: tAdmin } = useTranslation('admin');
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.inventory' });
+  const { t: tAdmin } = useTranslation('admin_advanced');
   const toast = useToast();
   const { user } = useAuth();
   const isSuperAdmin = Boolean(user?.is_super_admin || user?.is_god || user?.role === 'super_admin');
@@ -1148,8 +1148,8 @@ function Info({ label, value, mono = false }: { label: string; value: string; mo
 // ─── Coverage ──────────────────────────────────────────────────────────────
 
 function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boolean; toast: ToastShape; onDrillDown: (slug: string) => void }) {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.coverage' });
-  const { t: tAdmin } = useTranslation('admin');
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.coverage' });
+  const { t: tAdmin } = useTranslation('admin_advanced');
   const [rows, setRows] = useState<PrerenderCoverageRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [enqueuingFor, setEnqueuingFor] = useState<string | null>(null);
@@ -1342,8 +1342,8 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
  * IP-range verification — the spoofing signal.
  */
 function AnalyticsTab() {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.analytics' });
-  const { t: tAdmin } = useTranslation('admin');
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.analytics' });
+  const { t: tAdmin } = useTranslation('admin_advanced');
   const toast = useToast();
   const [data, setData] = useState<PrerenderAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
@@ -1513,8 +1513,8 @@ function AnalyticsTab() {
 // ─── Jobs ──────────────────────────────────────────────────────────────────
 
 function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number; live: boolean }) {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.jobs' });
-  const { t: tAdmin } = useTranslation('admin');
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.jobs' });
+  const { t: tAdmin } = useTranslation('admin_advanced');
   const [jobs, setJobs] = useState<PrerenderJob[]>([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState<string>('all');
@@ -1738,8 +1738,8 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
 // ─── Events ────────────────────────────────────────────────────────────────
 
 function EventsTab() {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.events' });
-  const { t: tAdmin } = useTranslation('admin');
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.events' });
+  const { t: tAdmin } = useTranslation('admin_advanced');
   const toast = useToast();
   const [events, setEvents] = useState<PrerenderEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1833,8 +1833,8 @@ function EventsTab() {
 // ─── Failures ──────────────────────────────────────────────────────────────
 
 function FailuresTab() {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.failures' });
-  const { t: tAdmin } = useTranslation('admin');
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.failures' });
+  const { t: tAdmin } = useTranslation('admin_advanced');
   const toast = useToast();
   const [items, setItems] = useState<PrerenderFailure[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1952,7 +1952,7 @@ function HealthCheckList({
 }
 
 function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number }) {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.health_banner' });
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.health_banner' });
   const [health, setHealth] = useState<PrerenderHealth | null>(null);
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -2075,8 +2075,8 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
 // ─── Audit history tab ─────────────────────────────────────────────────────
 
 function AuditTab() {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.audit' });
-  const { t: tAdmin } = useTranslation('admin');
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.audit' });
+  const { t: tAdmin } = useTranslation('admin_advanced');
   const [items, setItems] = useState<PrerenderAuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
@@ -2182,7 +2182,7 @@ function AuditTab() {
 // ─── TTL inspector (Overview tab card) ─────────────────────────────────────
 
 function TtlInspector() {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.ttl_inspector' });
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.ttl_inspector' });
   const [route, setRoute] = useState('/');
   const [result, setResult] = useState<PrerenderTtlInspect | null>(null);
   const [loading, setLoading] = useState(false);
@@ -2268,7 +2268,7 @@ function TtlInspector() {
 // ─── Sitemap explorer (Overview tab card) ──────────────────────────────────
 
 function SitemapExplorer() {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.sitemap_explorer' });
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.sitemap_explorer' });
   const [slug, setSlug] = useState('');
   const [data, setData] = useState<{
     tenant_slug: string;

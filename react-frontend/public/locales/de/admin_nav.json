@@ -512,5 +512,79 @@
   },
   "aria": {
     "breadcrumbs": "Semmelbrösel"
+  },
+  "shared": {
+    "loading": "Loading",
+    "help": "Hilfe",
+    "open_page_help": "Seitenhilfe ?ffnen",
+    "search": "Suchen...",
+    "refresh": "Aktualisieren",
+    "total_count": "{{count}}insgesamt",
+    "data_table": "Daten",
+    "select_all_rows": "Select all rows",
+    "no_data": "Keine Daten",
+    "no_data_available": "Keine Daten verfügbar",
+    "select_row": "Select row {{id}}"
+  },
+  "help_drawer": {
+    "aria_label": "Hilfe: {{title}}",
+    "close_panel": "Hilfebereich schließen",
+    "how_to_use": "So nutzen Sie diese Seite",
+    "label": "Hilfe",
+    "related_pages": "Verwandte Seiten",
+    "tips": "Tipps und Fallstricke"
+  },
+  "bulk": {
+    "selected_count": "{{count}} ausgewählt",
+    "clear_selection": "Klare Auswahl",
+    "confirm_title": "Bestätigen Sie {{action}}",
+    "confirm_message": "Sind Sie sicher, dass Sie Elemente {{action}} {{count}} möchten?",
+    "destructive_warning": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "reason_label": "Grund",
+    "reason_placeholder": "Geben Sie einen Grund für diese Aktion an"
+  },
+  "common": {
+    "cancel": "Abbrechen"
+  },
+  "icon_picker": {
+    "choose_icon": "Wählen Sie Symbol",
+    "choose_icon_placeholder": "Nach einem Symbol suchen...",
+    "clear_icon": "Klares Symbol",
+    "label": "Symbol",
+    "no_icons_found": "Es wurden keine Symbole gefunden, die zu „{{search}}“ passen.",
+    "search_for_icon": "Nach einem Symbol suchen...",
+    "search_icons": "Suchsymbole"
+  },
+  "visibility_rules": {
+    "min_role": "Min. Rolle",
+    "requires_auth": "Erfordert Authentifizierung",
+    "requires_feature": "Erfordert Funktion",
+    "title": "Sichtbarkeitsregeln",
+    "roles": {
+      "any": "Irgendein",
+      "user": "Benutzer",
+      "admin": "Admin",
+      "tenant_admin": "Mieteradministrator",
+      "super_admin": "Super Admin"
+    },
+    "features": {
+      "none": "Keine",
+      "events": "Veranstaltungen",
+      "groups": "Gruppen",
+      "gamification": "Gamifizierung",
+      "goals": "Ziele",
+      "blog": "Blog",
+      "resources": "Ressourcen",
+      "volunteering": "Freiwilligenarbeit",
+      "exchange_workflow": "Exchange-Workflow",
+      "organisations": "Organisationen",
+      "federation": "Föderation",
+      "connections": "Verbindungen",
+      "reviews": "Rezensionen",
+      "polls": "Umfragen",
+      "direct_messaging": "Direktnachrichten",
+      "group_exchanges": "Gruppenaustausch",
+      "search": "Suchen"
+    }
   }
 }

@@ -14,7 +14,7 @@
  * @googlemaps/markerclusterer for dense datasets.
  */
 
-import { useMemo } from 'react';
+import { Suspense, lazy, useMemo } from 'react';
 import { Link } from 'react-router-dom';import MapPin from 'lucide-react/icons/map-pin';
 import MapPinOff from 'lucide-react/icons/map-pin-off';
 import Navigation from 'lucide-react/icons/navigation';
@@ -24,13 +24,19 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { LocationMap, type MapMarker } from '@/components/location';
+import type { MapMarker } from '@/components/location/LocationMap';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { PriceBadge } from './PriceBadge';
 import { ConditionBadge } from './ConditionBadge';
 import { useTenant } from '@/contexts';
 import { resolveThumbnailUrl } from '@/lib/helpers';
 import type { MarketplaceListingItem } from '@/types/marketplace';
+
+const LazyLocationMap = lazy(() =>
+  import('@/components/location/LocationMap').then((module) => ({
+    default: module.LocationMap,
+  }))
+);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -212,14 +218,26 @@ export function MapSearchView({
   // ─── Map with markers ─────────────────────────────────────────────────────
   return (
     <div className={`relative ${className}`}>
-      <LocationMap
-        markers={markers}
-        center={center}
-        zoom={zoom}
-        height={height}
-        fitBounds={markers.length > 1}
-        cluster={markers.length > 10}
-      />
+      <Suspense
+        fallback={
+          <Skeleton
+            className="rounded-xl"
+            style={{ height }}
+            role="status"
+            aria-busy="true"
+            aria-label={t('common:loading')}
+          />
+        }
+      >
+        <LazyLocationMap
+          markers={markers}
+          center={center}
+          zoom={zoom}
+          height={height}
+          fitBounds={markers.length > 1}
+          cluster={markers.length > 10}
+        />
+      </Suspense>
 
       {/* Use my location button — overlaid on map */}
       {onRequestLocation && (

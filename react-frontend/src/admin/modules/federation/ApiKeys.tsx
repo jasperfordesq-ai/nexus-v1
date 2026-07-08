@@ -48,7 +48,7 @@ interface ApiKeysProps {
 }
 
 export function ApiKeys({ onCreateClick, refreshToken }: ApiKeysProps = {}) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   usePageTitle(t('federation.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();

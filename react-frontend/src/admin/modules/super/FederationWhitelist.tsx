@@ -46,7 +46,7 @@ function mapWhitelistEntry(e: FederationWhitelistEntry): WhitelistEntry {
 }
 
 export default function FederationWhitelist() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   usePageTitle(t('super.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

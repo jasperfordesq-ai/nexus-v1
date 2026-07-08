@@ -52,7 +52,7 @@ function unwrapArray<T>(payload: unknown): T[] {
 }
 
 function CommunityFundDepositForm({ onComplete }: { onComplete: () => void }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_timebanking');
   const toast = useToast();
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -135,7 +135,7 @@ function CommunityFundDepositForm({ onComplete }: { onComplete: () => void }) {
 }
 
 function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: number; onComplete: () => void }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_timebanking');
   const toast = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<AdminUser[]>([]);
@@ -332,7 +332,7 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
 
 export function CommunityFund() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_timebanking');
   useAdminPageMeta({ title: tNav('community_fund') });
   const { tenantPath } = useTenant();
   const toast = useToast();

@@ -50,7 +50,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle, useDraftPersistence } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
-import { PlaceAutocompleteInput } from '@/components/location';
+import { PlaceAutocompleteInput } from '@/components/location/PlaceAutocompleteInput';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

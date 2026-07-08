@@ -56,7 +56,7 @@ function unwrapData<T>(res: { data?: unknown }): T | null {
 }
 
 export default function FederationAggregatesPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   usePageTitle(t('federation_aggregates.meta.title'));
   const toast = useToast();
 

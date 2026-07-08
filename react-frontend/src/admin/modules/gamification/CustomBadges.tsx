@@ -30,7 +30,7 @@ import type { BadgeDefinition } from '../../api/types';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CustomBadges() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_gamification');
   usePageTitle(t('gamification.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

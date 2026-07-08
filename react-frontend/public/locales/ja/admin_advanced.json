@@ -1,0 +1,1973 @@
+{
+  "common": {
+    "an_unexpected_error": "予期しないエラーが発生しました",
+    "back": "戻る",
+    "cancel": "キャンセル",
+    "critical": "クリティカル",
+    "delete": "削除",
+    "feature": "特徴",
+    "high": "高",
+    "in_progress": "進行中",
+    "in_review": "レビュー中",
+    "low": "低い",
+    "medium": "中",
+    "planned": "計画済み",
+    "refresh": "リフレッシュ",
+    "unexpected_error": "予期しないエラー",
+    "unknown": "未知",
+    "unfeature": "特徴がない",
+    "actions": "アクション",
+    "active": "アクティブ",
+    "all": "すべて",
+    "approved": "承認済み",
+    "clear": "クリア",
+    "clear_filters": "フィルターをクリアする",
+    "clear_selection": "選択をクリア",
+    "close": "閉じる",
+    "collapse": "崩壊する",
+    "confirm": "確認する",
+    "create": "作成",
+    "declined": "拒否されました",
+    "download": "ダウンロード",
+    "edit": "編集",
+    "error_loading_data": "データ読み込みエラー",
+    "expand": "展開する",
+    "export": "エクスポート",
+    "load_more": "もっと読み込む",
+    "loading": "読み込み中",
+    "next": "次へ",
+    "no": "いいえ",
+    "ok": "OK",
+    "pending": "保留中",
+    "previous": "前へ",
+    "retry": "再試行",
+    "save": "保存",
+    "select_all": "すべて選択",
+    "select_item": "項目の選択",
+    "yes": "はい"
+  },
+  "shared": {
+    "broker_actions": "ブローカーのアクション",
+    "content": "内容",
+    "core_module": "コアモジュール",
+    "document_details": "文書の詳細",
+    "history": "歴史",
+    "log_file_empty": "ログファイルが見つかりません",
+    "no": "いいえ",
+    "no_history_available": "利用可能な履歴が見つかりません",
+    "no_legal_documents_found": "法的文書が見つかりませんでした",
+    "no_members_found": "メンバーが見つかりませんでした",
+    "loading": "Loading",
+    "no_data": "データなし",
+    "no_data_available": "利用可能なデータがありません",
+    "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
+    "open_page_help": "ページのヘルプを開く",
+    "help": "ヘルプ",
+    "quick_access": "クイックアクセス",
+    "recent_activity": "最近の活動",
+    "refresh": "リフレッシュ",
+    "search": "検索...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "データ",
+    "total_count": "{{count}}合計"
+  },
+  "advanced": {
+    "loading": "Loading",
+    "health_loading": "Loading algorithm health...",
+    "404_entry_dismissed": "404 エントリが却下されました",
+    "a_i_settings_saved_successfully": "AI設定が正常に保存されました",
+    "active_provider": "アクティブなプロバイダー",
+    "add_redirect": "リダイレクトの追加",
+    "ai_features_heading": "AIの機能",
+    "ai_integration_heading": "AIの統合",
+    "ai_settings_desc": "プラットフォームの AI プロバイダー、API キー、機能を構成する",
+    "ai_settings_title": "AI設定",
+    "algorithm_disabled_msg": "アルゴリズムは現在無効になっています",
+    "algorithm_health_desc": "推奨およびマッチングアルゴリズムの健全性ステータスを表示する",
+    "algorithm_health_title": "アルゴリズムの健全性",
+    "algorithm_settings_desc": "コンテンツランキングのアルゴリズムの重みとパラメータを構成する",
+    "algorithm_settings_title": "アルゴリズム設定",
+    "area_feed_ranking": "フィードランキング (EdgeRank)",
+    "area_feed_ranking_desc": "アクティビティ フィード内での投稿のランク付け方法",
+    "area_listings_ranking": "出品ランキング (MatchRank)",
+    "area_listings_ranking_desc": "各ユーザーごとにリスティングがどのようにスコアリングされ、ランク付けされるか",
+    "area_member_ranking": "メンバーランキング（CommunityRank）",
+    "area_member_ranking_desc": "ディレクトリおよび推奨事項でメンバーがどのように採点され、ランク付けされるか",
+    "area_smart_matching": "スマートマッチング",
+    "area_smart_matching_desc": "パーソナライズされた推奨事項のためにユーザーをリスティングと照合する方法",
+    "area_settings_saved": "エリア設定が保存されました",
+    "audit_results": "監査結果",
+    "auto_generate_sitemap": "サイトマップを自動生成",
+    "auto_generate_sitemap_desc": "検索エンジン用の XML サイトマップを自動的に生成する",
+    "both_from_u_r_l_and_to_u_r_l_are_required": "from URL と to URL の両方が必須です",
+    "cancel": "キャンセル",
+    "canonical_urls": "正規の URL",
+    "canonical_urls_desc": "正規 URL 設定を制御してコンテンツの重複を回避します",
+    "cf_min_hint": "協調フィルタリング類似性の最小しきい値",
+    "chronological_mode": "時系列モード",
+    "chronological_mode_desc": "フィード項目をランク順ではなく厳密な時系列順に表示する",
+    "col_created": "作成されました",
+    "col_from_url": "URLから",
+    "col_hits": "ヒット曲",
+    "col_last_seen": "最後に見たもの",
+    "col_referrer": "参照元",
+    "col_status_code": "ステータスコード",
+    "col_to_url": "URLへ",
+    "col_url": "URL",
+    "collaborative_filtering_title": "協調フィルタリング",
+    "connection_weight": "接続重量",
+    "connection_weight_desc": "強く受け入れられたメンバー接続が CommunityRank にどの程度影響を与えるか",
+    "copied": "コピーされました",
+    "copy": "コピー",
+    "create_redirect": "リダイレクトの作成",
+    "custom_robots_txt": "カスタムロボット.txt",
+    "delete": "削除",
+    "delete_redirect_message": "リダイレクトの削除",
+    "delete_redirect_title": "リダイレクトの削除",
+    "desc_the_destination_u_r_l_path": "リダイレクト先の宛先 URL パス",
+    "desc_the_u_r_l_path_to_redirect_from": "リダイレクト元の URL パス",
+    "desc_when_visitors_hit_missing_pages_they_wi": "訪問者が欠落しているページにアクセスすると、ここで追跡された 404 エラーが表示されます",
+    "desc_your_a_i_provider_a_p_i_key_stored_encrypt": "AI プロバイダーの API キー、暗号化して保存",
+    "disabled": "障害者",
+    "dismiss": "解雇する",
+    "dismiss_404_entry": "解雇する",
+    "dismiss_404_message": "404を却下",
+    "dismiss_404_title": "404を却下",
+    "direct_referrer": "直接",
+    "diversity_factor": "多様性の要因",
+    "email_provider_heading": "電子メールプロバイダー",
+    "email_settings_desc": "通知とニュースレターの送信に使用する電子メールプロバイダーを構成する",
+    "email_settings_saved_successfully": "電子メール設定が正常に保存されました",
+    "email_settings_title": "メール設定",
+    "enable_ai_features": "AI 機能を有効にする",
+    "enable_ai_features_desc": "プラットフォーム全体で AI を活用した機能を有効または無効にする",
+    "enable_area": "{{area}}を有効にする",
+    "enabled": "有効",
+    "engagement_weight": "エンゲージメントウェイト",
+    "error404_tracking_desc": "404 エラーを返すページを追跡して、リダイレクトを作成したり壊れたリンクを修正したりできるようにする",
+    "error404_tracking_title": "404エラー追跡",
+    "failed_count": "カウントに失敗しました",
+    "failed_to_copy": "コピーに失敗しました",
+    "failed_to_create_redirect": "リダイレクトの作成に失敗しました",
+    "failed_to_delete_404_entry": "404 エントリの削除に失敗しました",
+    "failed_to_delete_redirect": "リダイレクトの削除に失敗しました",
+    "failed_to_load_404_errors": "404エラーでロードに失敗しました",
+    "failed_to_load_a_i_settings": "AI設定のロードに失敗しました",
+    "failed_to_load_algorithm_settings": "アルゴリズム設定のロードに失敗しました",
+    "failed_to_load_email_settings": "メール設定の読み込みに失敗しました",
+    "failed_to_load_feed_algorithm_settings": "フィードアルゴリズム設定のロードに失敗しました",
+    "failed_to_load_matches_for_this_user": "このユーザーの一致をロードできませんでした",
+    "failed_to_load_redirects": "リダイレクトの読み込みに失敗しました",
+    "failed_to_load_s_e_o_settings": "SEO設定の読み込みに失敗しました",
+    "failed_to_save_a_i_settings": "AI設定の保存に失敗しました",
+    "failed_to_save_area": "領域の保存に失敗しました",
+    "failed_to_save_email_settings": "メール設定の保存に失敗しました",
+    "failed_to_save_feed_algorithm_settings": "フィードアルゴリズム設定の保存に失敗しました",
+    "failed_to_save_s_e_o_settings": "SEO設定を保存できませんでした",
+    "failed_to_send_test_email": "テストメールの送信に失敗しました",
+    "feature_ai_analytics": "AI分析",
+    "feature_ai_analytics_desc": "AI がコミュニティ活動から生成した洞察",
+    "feature_ai_chat": "AIチャットアシスタント",
+    "feature_ai_chat_desc": "会員向けプラットフォーム内AIチャット",
+    "feature_ai_moderation": "AI モデレーション",
+    "feature_ai_moderation_desc": "自動化されたコンテンツのモデレーションと有害性の検出",
+    "feature_ai_recommendations": "AI によるレコメンデーション",
+    "feature_ai_recommendations_desc": "パーソナライズされたリスト、メンバー、およびコンテンツの推奨事項",
+    "feature_content_generation": "コンテンツの生成",
+    "feature_content_generation_desc": "AI を利用した投稿、リスト、メッセージのドラフト作成",
+    "feed_algorithm_desc": "投稿をランク付けしてコミュニティ フィードに表示する方法を構成する",
+    "feed_algorithm_settings_saved_successful": "フィードアルゴリズム設定が正常に保存されました",
+    "feed_algorithm_title": "フィードアルゴリズム",
+    "feed_options": "フィードオプション",
+    "feed_ranking_weights": "フィードのランキングの重み付け",
+    "fulltext_indexes_title": "全文インデックス",
+    "gmail_api_configuration": "Gmail API 構成",
+    "generate_embeddings_hint_prefix": "走る",
+    "generate_embeddings_hint_suffix": "埋め込みを生成します。",
+    "health_unavailable": "健康データが利用できない",
+    "include_events": "イベントを含める",
+    "include_events_desc": "フィードランキングアルゴリズムにイベント投稿を含める",
+    "include_polls": "投票を含める",
+    "include_polls_desc": "フィードランキングアルゴリズムに投票を含める",
+    "inspecting": "検査中",
+    "label_a_i_provider": "AIプロバイダー",
+    "label_a_p_i_key": "APIキー",
+    "label_auto_sitemap": "自動サイトマップ",
+    "label_bing_webmaster_verification": "Bing ウェブマスターの認証",
+    "label_boost_content_from_connected_users": "接続しているユーザーからのコンテンツを強化する",
+    "label_canonical_u_r_ls": "正規の URL",
+    "label_chronological_mode": "時系列モード",
+    "label_client_i_d": "クライアントID",
+    "label_client_secret": "クライアントシークレット",
+    "label_default_title_suffix": "デフォルトのタイトルサフィックス",
+    "label_delete_redirect": "リダイレクトの削除",
+    "label_email_provider": "電子メールプロバイダー",
+    "label_enable_a_i": "AI を有効にする",
+    "label_encryption": "暗号化",
+    "label_from_email": "メールから",
+    "label_from_name": "差出人名",
+    "label_from_u_r_l": "URLから",
+    "label_global_meta_description": "グローバルメタディスクリプション",
+    "label_google_search_console_verification": "Googleサーチコンソールの検証",
+    "label_h1_headline": "上半期の見出し",
+    "label_hero_intro_text": "ヒーローの紹介文",
+    "label_host": "ホスト",
+    "label_how_much_to_prioritize_likedcommented_content": "「いいね！」/コメントされたコンテンツをどの程度優先するか",
+    "label_how_much_to_prioritize_newer_content": "新しいコンテンツをどの程度優先するか",
+    "label_include_events": "イベントを含める",
+    "label_include_polls": "投票を含める",
+    "label_listings": "リスト",
+    "label_max_tokens": "最大トークン数",
+    "label_meta_description": "メタディスクリプション",
+    "label_meta_keywords": "メタキーワード",
+    "label_meta_title": "メタタイトル",
+    "label_model": "モデル",
+    "label_open_graph": "グラフを開く",
+    "label_password": "パスワード",
+    "label_port": "港",
+    "label_refresh_token": "リフレッシュトークン",
+    "label_reload_matches": "マッチをリロードする",
+    "label_search_users": "ユーザーの検索",
+    "label_sender_email": "送信者の電子メール",
+    "label_sender_name": "送信者名",
+    "label_status_code": "ステータスコード",
+    "label_test_email_address": "テストメールアドレス",
+    "label_to_u_r_l": "URLへ",
+    "label_twitter_cards": "ツイッターカード",
+    "label_username": "ユーザー名",
+    "label_users": "ユーザー",
+    "label_vary_content_types_in_the_feed": "フィード内のコンテンツ タイプを変更する",
+    "last_run": "ラストラン",
+    "listing_saves": "保存のリスト表示",
+    "loading_match_scores": "試合スコアを読み込んでいます...",
+    "match_debug_panel_desc": "任意の 2 人のメンバーの試合スコアと推論を検査する",
+    "match_debug_panel_title": "マッチデバッグパネル",
+    "match_reasons": "一致理由",
+    "match_count_one": "{{count}}の一致",
+    "match_count_other": "{{count}}の一致",
+    "meilisearch_offline": "メイリサーチオフライン",
+    "meilisearch_online": "メイリサーチオンライン",
+    "member_transactions": "会員の取引",
+    "meta_tags_heading": "メタタグ",
+    "missing_indexes_hint_prefix": "走る",
+    "missing_indexes_hint_suffix": "欠落しているインデックスを作成します。",
+    "no_404_errors": "404エラーは見つかりませんでした",
+    "no_audit_results": "監査結果なし",
+    "no_audit_results_desc": "監査を実行して SEO の結果を確認する",
+    "no_debug_scores": "利用可能なデバッグ スコアはありません",
+    "no_matches_desc": "選択したユーザーに一致するものが見つかりませんでした",
+    "no_matches_found": "一致するものが見つかりませんでした",
+    "no_redirects": "リダイレクトが設定されていません",
+    "no_redirects_desc": "リダイレクトはまだ設定されていません。上に 1 つ追加します。",
+    "no_user_selected": "ユーザーが選択されていません",
+    "no_user_selected_desc": "上のユーザーを選択すると、そのマッチスコアが表示されます",
+    "not_configured": "未構成",
+    "open_graph_tags": "オープングラフタグ",
+    "open_graph_tags_desc": "ソーシャル共有用に Open Graph メタ タグを構成する",
+    "overall_match_score": "全体的な試合スコア",
+    "overall_match_score_aria": "全体的な試合スコア:{{score}}%",
+    "page_title": "上級者向け",
+    "passed_count": "合格",
+    "passed_count_with_value": "{{count}}が渡されました",
+    "placeholder_a_short_description_of_your_timebank": "タイムバンクの簡単な説明...",
+    "placeholder_community_timebanking_platform": "コミュニティ タイムバンキング プラットフォーム...",
+    "placeholder_exchange_skills_and_time_with_your_community": "コミュニティとスキルや時間を交換しましょう...",
+    "placeholder_gocspx": "GOCSPX-xxxxx",
+    "placeholder_my_timebank": "私のタイムバンク...",
+    "placeholder_noreply_example": "Noreply@example.com",
+    "placeholder_robots_txt": "ユーザーエージェント: *\n許可しない: /admin/",
+    "placeholder_s_gxxxxx": "S Gxxxxx...",
+    "placeholder_search_users_by_name_or_email": "名前またはメールアドレスでユーザーを検索...",
+    "placeholder_smtpexamplecom": "smtpexamplecom...",
+    "placeholder_smtp_port": "587",
+    "placeholder_test_example": "test@example.com",
+    "placeholder_user_example": "user@example.com",
+    "placeholder_welcome_to_our_community": "私たちのコミュニティへようこそ...",
+    "placeholder_xxxxappsgoogleusercontentcom": "Xxxxappsgoogleusercontentcom...",
+    "placeholder_your_timebank_name": "タイムバンク名...",
+    "platform_default_desc": "プラットフォームのデフォルトのプロバイダー設定を使用する",
+    "platform_default_heading": "プラットフォームのデフォルト",
+    "platform_default_hint": "プラットフォームのデフォルトを使用する",
+    "please_enter_a_test_email_address": "テスト用のメールアドレスを入力してください",
+    "recency_weight": "リーセンシーの重み",
+    "redirect_created": "リダイレクトが作成されました",
+    "redirect_deleted": "リダイレクトが削除されました",
+    "redirects_desc": "URL リダイレクトを管理して、訪問者を古い URL から新しい URL に送信します",
+    "redirects_title": "リダイレクト",
+    "reload": "リロード",
+    "reload_results": "結果をリロードする",
+    "run_audit": "監査の実行",
+    "s_e_o_settings_saved_successfully": "SEO設定が正常に保存されました",
+    "save_algorithm": "保存アルゴリズム",
+    "save_area": "セーブエリア",
+    "save_failed": "保存に失敗しました",
+    "save_seo_settings": "SEO設定を保存する",
+    "save_settings": "設定の保存",
+    "score_breakdown": "スコアの内訳",
+    "search_engine_title": "検索エンジン",
+    "secret_already_saved": "シークレットはすでに保存されています",
+    "select_a_user": "ユーザーを選択してください",
+    "select_a_user_desc": "メンバーを検索して試合スコアを確認する",
+    "semantic_embeddings_title": "セマンティック埋め込み",
+    "send_test_email": "テストメールを送信する",
+    "sendgrid_api_key_desc": "SendGrid API キーを入力して、SendGrid 経由の電子メール配信を有効にします",
+    "sendgrid_configuration": "SendGrid 構成",
+    "seo_audit_complete": "SEO監査が完了しました",
+    "seo_audit_desc": "自動 SEO 監査を実行してサイトの問題を特定します",
+    "seo_audit_error": "SEO監査エラー",
+    "seo_audit_failed": "SEO監査に失敗しました",
+    "seo_audit_no_results": "SEO監査で結果が返されませんでした",
+    "seo_audit_title": "SEO監査",
+    "seo_features_heading": "SEOの機能",
+    "seo_overview_desc": "メタタグやソーシャル共有などのグローバル SEO 設定を構成する",
+    "seo_overview_title": "SEOの概要",
+    "smtp_configuration": "SMTP設定",
+    "status_301": "301 永久リダイレクト",
+    "status_302": "302 一時リダイレクト",
+    "tenant_meta_heading": "テナントメタ",
+    "test_email_heading": "テストメール",
+    "test_email_hint": "テストメッセージを送信する電子メールアドレスを入力してください",
+    "test_email_sent": "テストメールを送信しました",
+    "test_email_sent_via": "テストメールの送信方法",
+    "test_email_sent_via_provider": "{{provider}}経由で送信されたテストメール",
+    "total_count": "合計: {{count}}",
+    "twitter_cards": "ツイッターカード",
+    "twitter_cards_desc": "Twitter のリッチ リンク プレビュー用に Twitter Card メタ タグを構成する",
+    "verification_robots_heading": "検証ロボット",
+    "warnings_count": "警告",
+    "warnings_count_with_value": "{{count}}の警告",
+    "webhook_u_r_l_copied": "Webhook URL がコピーされました",
+    "webhook_url_hint": "通知を受信するための Webhook URL",
+    "webhook_url_label": "Webhook URL",
+    "score_category": "カテゴリーマッチ",
+    "score_freshness": "鮮度",
+    "score_proximity": "近接性",
+    "score_quality": "品質",
+    "score_reciprocity": "互恵性",
+    "score_skill": "スキルマッチ",
+    "btn_clear_cache": "キャッシュのクリア",
+    "btn_refresh": "リフレッシュ",
+    "chip_active": "アクティブ",
+    "chip_fail": "失敗",
+    "chip_key_configured": "キーが設定されました",
+    "chip_pass": "パス",
+    "chip_warning": "警告",
+    "desc_api_key_new": "API キー 新しい。",
+    "desc_api_key_replace": "API キーの置き換え。",
+    "desc_custom_robots_txt": "カスタムロボットのテキスト。",
+    "desc_default_daily_limit": "デフォルトの 1 日あたりの制限。",
+    "desc_default_monthly_limit": "デフォルトの月間制限。",
+    "desc_global_meta_description_chars": "グローバルメタ説明文字。",
+    "desc_h1_headline": "上半期の見出し。",
+    "desc_meta_description_chars": "メタディスクリプション文字。",
+    "desc_meta_keywords": "メタキーワード。",
+    "desc_meta_title": "メタタイトル。",
+    "desc_og_image_url": "OG 画像の URL。",
+    "desc_ollama_host": "オラマのホスト。",
+    "desc_select_ai_provider": "AI プロバイダーを選択します。",
+    "desc_select_model": "モデルを選択します。",
+    "desc_title_suffix": "タイトルの接尾辞。",
+    "encryption_none": "暗号化なし",
+    "encryption_ssl": "暗号化SSL",
+    "encryption_tls": "暗号化TLS",
+    "failed_to_clear_sitemap_cache": "サイトマップのキャッシュをクリアできませんでした",
+    "failed_to_load_sitemap_stats": "サイトマップ統計の読み込みに失敗しました",
+    "failed_to_run_seo_audit": "SEO監査の実行に失敗しました",
+    "failed_count_with_value": "{{count}}が失敗しました",
+    "fail_count": "{{count}}が失敗しました",
+    "pass_count": "合格 {{count}} 件",
+    "warning_count": "警告 {{count}} 件",
+    "global_meta_description_count": "{{count}}/160 グローバル メタ記述文字",
+    "health_auto_sitemap_active_count": "アクティブ —{{count}}URL がインデックス付けされました",
+    "health_auto_sitemap_disabled": "無効 — 検索エンジンはページを検出できません",
+    "health_canonical_disabled": "無効 — 検索結果に重複したコンテンツが表示される場合があります",
+    "health_canonical_enabled": "有効 — 重複したコンテンツが防止されます",
+    "health_default_og_image": "デフォルトのOGイメージ",
+    "health_google_verification_configured": "検証タグが設定されました",
+    "health_google_verification_missing": "未構成 - 検索インサイトに推奨",
+    "health_homepage_h1": "ホームページ H1",
+    "health_homepage_h1_missing": "未設定 — ホームページに H1 タグが欠落している可能性があります",
+    "health_homepage_h1_set": "設定:「{{headline}}」",
+    "health_meta_description": "メタディスクリプション",
+    "health_meta_description_length": "{{count}}文字 (理想: 150 ～ 160)",
+    "health_meta_description_missing": "デフォルトのメタディスクリプションが設定されていません",
+    "health_og_image_configured": "デフォルトのソーシャル共有イメージが構成されています",
+    "health_og_image_missing": "デフォルトの OG イメージはありません - ソーシャル共有はフォールバック イメージを使用します",
+    "health_open_graph_disabled": "無効 — ソーシャルメディアのプレビューは機能しません",
+    "health_tenant_title": "テナントのタイトル",
+    "health_tenant_title_missing": "未設定 - デフォルトの「NEXUS」を使用",
+    "health_tenant_title_set": "設定:「{{title}}」",
+    "health_title_suffix": "タイトルの接尾語",
+    "health_title_suffix_configured": "構成: 「{{suffix}}」",
+    "health_title_suffix_missing": "タイトルのサフィックスが設定されていません - ページにはデフォルトとして「ページ | NEXUS」が表示されます",
+    "health_twitter_cards_disabled": "無効 — X/Twitter プレビューは機能しません",
+    "invalid_weight": "無効な重量",
+    "label_api_key": "APIキー",
+    "label_default_daily_limit": "デフォルトの 1 日あたりの制限",
+    "label_default_monthly_limit": "デフォルトの月間制限",
+    "label_og_image_url": "OG 画像の URL",
+    "label_ollama_host_url": "オラマホストURL",
+    "last_run_label": "ラストラン",
+    "meta_description_count": "{{count}}/160 メタ記述文字",
+    "no_audit_results_prompt": "No audit results prompt found",
+    "og_image_preview": "OG 画像プレビュー",
+    "param_activity_weight": "アクティビティの重み",
+    "param_activity_weight_desc": "最近のアクティビティがランキングをどれほど強く押し上げるか",
+    "param_affinity_weight": "アフィニティの重み",
+    "param_affinity_weight_desc": "ユーザーと著者の関係がランキングにどの程度強く影響するか",
+    "param_availability_weight": "可用性の重み",
+    "param_availability_weight_desc": "重複する可用性が一致スコアにどの程度影響するか",
+    "param_connectivity_weight": "接続重量",
+    "param_connectivity_weight_desc": "強く受け入れられたメンバー接続が CommunityRank にどの程度影響を与えるか",
+    "param_content_type_weight": "コンテンツタイプの重み",
+    "param_content_type_weight_desc": "コンテンツの種類をどの程度強く重み付けするか",
+    "param_contribution_weight": "貢献の重み",
+    "param_contribution_weight_desc": "メンバーの貢献履歴がどの程度重視されるか",
+    "param_engagement_weight": "エンゲージメントウェイト",
+    "param_engagement_weight_desc": "「いいね！」、コメント、シェアがどれだけランキングを押し上げるか",
+    "param_freshness_minimum": "鮮度フロア",
+    "param_freshness_minimum_desc": "年齢に関係なく最低鮮度スコア",
+    "param_freshness_weight": "鮮度重量",
+    "param_freshness_weight_desc": "新しいリスティングがどれだけ強く支持されるか",
+    "param_half_life_hours": "半減期 (時間)",
+    "param_half_life_hours_desc": "投稿の鮮度スコアが最初の半分に低下するまでの時間",
+    "param_listings_ranking": "出品ランキング",
+    "param_listing_engagement_weight": "エンゲージメントウェイト",
+    "param_listing_engagement_weight_desc": "閲覧数、保存数、問い合わせ数を強力にリストアップすることでランキングがどのように向上するか",
+    "param_location_weight": "位置の重み",
+    "param_location_weight_desc": "地理的な近さがランキングに与える影響",
+    "param_match_location_weight": "位置の重み",
+    "param_match_location_weight_desc": "地理的な近さが試合スコアにどの程度強く影響するか",
+    "param_member_reputation_weight": "評判の重み",
+    "param_member_reputation_weight_desc": "会員の評価とレビューの重み付けの程度",
+    "param_proximity_weight": "近接ウェイト",
+    "param_proximity_weight_desc": "地理的な近さがランキングに与える影響",
+    "param_quality_weight": "品質の重さ",
+    "param_quality_weight_desc": "リストの完全性と品質シグナルの重み付けをどの程度強く行うか",
+    "param_rating_weight": "評価の重み付け",
+    "param_rating_weight_desc": "ユーザー間の過去の評価が試合スコアにどの程度強く影響するか",
+    "param_reputation_weight": "評判の重み",
+    "param_reputation_weight_desc": "リスターの評判がランキングにどれだけ強く影響するか",
+    "param_skill_match_weight": "スキルマッチウェイト",
+    "param_skill_match_weight_desc": "リスティングとユーザーのスキルの重複がランキングにどの程度強く影響するか",
+    "param_skill_weight": "スキルウェイト",
+    "param_skill_weight_desc": "スキルの重複が試合スコアにどの程度強く影響するか",
+    "param_time_decay_weight": "時間減衰の重み",
+    "param_time_decay_weight_desc": "年齢後のランキングの低下がどれほど強いか",
+    "placeholder_current": "現在を入力してください...",
+    "placeholder_enter_api_key": "API キーを入力してください...",
+    "placeholder_current_key": "現在の値を入力してください:{{masked}}",
+    "provider_configuration_heading": "プロバイダーの構成",
+    "provider_anthropic": "人間性（クロード）",
+    "provider_gemini": "Google ジェミニ",
+    "provider_gmail_api": "Gmail API",
+    "provider_ollama": "オラマ (自己ホスト型)",
+    "provider_openai": "OpenAI",
+    "provider_platform_default": "プラットフォームのデフォルト",
+    "provider_sendgrid": "送信グリッド",
+    "provider_smtp": "SMTP",
+    "prerender": {
+      "description": "ボットのみのサーバーでレンダリングされたスナップショット。カバレッジを監視し、古くなったものを検出し、強制的に更新します。",
+      "guide": {
+        "title": "Plain-English guide",
+        "intro": "The prerender engine makes saved HTML copies of public pages for search engines and social previews. Members use the normal app; these snapshots are only for crawlers.",
+        "bot_only": {
+          "title": "What gets rendered",
+          "body": "Public tenant pages, such as about pages, listings, blog posts, and public groups. Private member areas are not supposed to be rendered."
+        },
+        "tenant_scope": {
+          "title": "Tenant safety",
+          "body": "When a page belongs to one tenant, actions should include that tenant slug. The engine now checks host and tenant path before touching snapshots."
+        },
+        "dry_run": {
+          "title": "Preview first",
+          "body": "A dry run shows what would happen without deleting files or queuing work. Use it before purge or repair actions."
+        },
+        "repair": {
+          "title": "Repair stuck queue",
+          "body": "This is not a content reset. It only releases jobs that look abandoned and lets the worker resume after repeated failures."
+        }
+      },
+      "workflows": {
+        "title": "What are you trying to do?",
+        "description": "Start with the plain task, then use the tab it opens. This keeps routine work away from the risky controls.",
+        "open": "Open",
+        "refresh_one_tenant": {
+          "title": "Refresh one tenant",
+          "body": "Use when public content changed for a single community. Enter its tenant slug before queuing work."
+        },
+        "find_stale_pages": {
+          "title": "Find stale or missing pages",
+          "body": "Check coverage first to see which tenants have old snapshots, missing pages, or broken assets."
+        },
+        "inspect_cache": {
+          "title": "Inspect saved pages",
+          "body": "Search the cache, inspect SEO tags, and recache selected snapshots using tenant-safe routes."
+        },
+        "investigate_failures": {
+          "title": "Investigate failed renders",
+          "body": "Review routes in the backoff window before retrying, purging, or repairing the queue."
+        },
+        "check_tenant_safety": {
+          "title": "Check one tenant is safe",
+          "body": "Inspect exactly what this tenant should have, what is saved, and whether any snapshots belong elsewhere."
+        }
+      },
+      "analytics": {
+        "actions": {
+          "reload": "リロード"
+        },
+        "columns": {
+          "crawler": "NEXUSTERM20トークン",
+          "hits": "NEXUSTERM21トークン",
+          "host": "NEXUSTERM22トークン",
+          "ip": "NEXUSTERM14トークン",
+          "status": "NEXUSTERM23トークン",
+          "time": "NEXUSTERM24トークン",
+          "uri": "NEXUSTERM12トークン",
+          "url": "NEXUSTERM11トークン"
+        },
+        "empty": "利用可能な分析はありません。ボットのアクセス ログが空である可能性があります。",
+        "empty_bot_traffic": "ボットトラフィックはまだありません",
+        "empty_no_data": "データなし",
+        "empty_recent_hits": "最近のヒット曲はありません",
+        "errors": {
+          "load": "分析のロードに失敗しました"
+        },
+        "filters": {
+          "window": "ウィンドウ"
+        },
+        "hints": {
+          "spoofed": "主要なボットを主張し、IP 範囲に失敗しました",
+          "top_50_cap": "上位 50 件の上限から",
+          "verified_of_total": "{{total}} の {{verified}}"
+        },
+        "kpi": {
+          "ip_verified": "IP-検証済み",
+          "spoofed": "なりすまし（疑わしい）",
+          "total_bot_hits": "ボットの総ヒット数",
+          "unique_uris": "ユニークな URI"
+        },
+        "labels": {
+          "spoofed_count": "{{count}} がなりすましされました"
+        },
+        "log_summary": "ログ: {{size}} - {{time}} 以降",
+        "sections": {
+          "hits_by_crawler": "クローラーによるヒット",
+          "hits_by_status": "HTTP ステータスによるヒット数",
+          "recent_activity": "最近のアクティビティ (新しい順、最後の {{count}})",
+          "top_uris": "上位 URI (ヒット数上位 50 件)"
+        },
+        "tables": {
+          "recent_hits_aria": "最近のボットのヒット数",
+          "top_uris_aria": "トップの URI"
+        },
+        "windows": {
+          "1": "過去 24 時間",
+          "7": "過去 7 日間",
+          "30": "過去 30 日間"
+        }
+      },
+      "coverage": {
+        "actions": {
+          "open_in_inventory": "インベントリで開く",
+          "refresh": "リフレッシュ",
+          "refresh_all_stale": "古いものをすべて更新 ({{count}})"
+        },
+        "columns": {
+          "actions": "NEXUSTERM25トークン",
+          "asset": "ANEXUSTERM19トークン",
+          "coverage": "NEXUSTERM27トークン",
+          "host": "NEXUSTERM22トークン",
+          "missing": "NEXUSTERM28トークン",
+          "stale": "NEXUSTERM29トークン",
+          "tenant": "NEXUSTERM30トークン"
+        },
+        "confirm": {
+          "queue_recache": "{{count}} 件のテナントの再キャッシュをキューに入れますか?"
+        },
+        "empty": "テナントなし",
+        "errors": {
+          "bulk_enqueue": "一括エンキューに失敗しました (一部のテナントがキューに入っている可能性があります)",
+          "enqueue": "エンキューに失敗しました",
+          "load": "カバレッジのロードに失敗しました"
+        },
+        "messages": {
+          "bulk_queued": "{{count}} テナントのキューに入れられた再キャッシュ",
+          "no_stale": "古いテナントはありません - カバレッジは健全です",
+          "tenant_queued": "{{slug}} の #{{id}} をキューに入れました"
+        },
+        "summary": {
+          "healthy": "{{count}} 件のテナントすべてが正常です。",
+          "needs_work": "{{total}} テナントの {{needing}} には、ルートが見つからないか、古くなっているか、資産が壊れています。"
+        },
+        "table_aria": "カバレッジ"
+      },
+      "freshness": {
+        "actions": {
+          "apply": "適用する",
+          "dry_run": "ドライラン"
+        },
+        "auto_recache": {
+          "description": "すべてのスナップショットをスキャンします。ソース コンテンツが変更されたルート、または TTL の有効期限が切れたルートの、優先度の低い再キャッシュをキューに入れます。 cron で 15 ～ 30 分ごとに実行されます。これを使用してすぐにトリガーします。",
+          "title": "自動再キャッシュ (TTL + コンテンツ ドリフト)"
+        },
+        "drift": {
+          "description": "各テナント サイトマップを調べ、lastmod をスナップショット mtimes と比較し、生の書き込み、移行、またはキューに入れられたジョブから古いページを捕捉します。 2 分ごとに実行され、優先度の高い再キャッシュがキューに入れられます。",
+          "title": "ドリフトの検出 (サイトマップとスナップショット)"
+        },
+        "errors": {
+          "auto_recache": "自動再キャッシュのトリガーに失敗しました",
+          "drift_detection": "ドリフト検出のトリガーに失敗しました",
+          "purge_unexpected": "パージが予期せず失敗しました"
+        },
+        "messages": {
+          "auto_recache_applied": "自動再キャッシュが適用されました",
+          "auto_recache_dry_run": "自動再キャッシュのドライランが完了しました",
+          "drift_applied": "ドリフト検出が適用されました",
+          "drift_dry_run": "ドリフト予行演習完了",
+          "purge_dry_run": "ドライラン: {{count}} 件のスナップショットが削除される見込みです",
+          "purged_ungated": "{{tenants}} テナント全体で {{count}} のゲートされていないスナップショットをパージしました"
+        },
+        "no_output": "(出力なし)",
+        "purge_ungated": {
+          "description": "ルートがテナントの予期されるセットに含まれていないスナップショットをスイープします。機能をオフに切り替えた後、または機能フラグなしで事前レンダリングされた静的ルートのクリーンアップによく使用されます。動的コンテンツのルートはそのまま残されます。",
+          "title": "ゲートされていないスナップショットのパージ (テナントごとの 404 クリーンアップ)"
+        },
+        "result": {
+          "deleted": "{{tenants}} テナント全体で削除された {{count}} スナップショット",
+          "would_delete": "{{tenants}} テナント全体で {{count}} スナップショットを削除します"
+        },
+        "title": "鮮度自動化"
+      },
+      "health_banner": {
+        "actions": {
+          "cancel": "キャンセル",
+          "close_breaker_now": "今すぐブレーカーを閉じてください",
+          "details": "詳細",
+          "emergency_reset": "緊急リセット",
+          "hide": "隠れる",
+          "hide_details": "詳細を隠す",
+          "reset_queue": "キューをリセット"
+        },
+        "engine_healthy": "エンジンは健全です",
+        "issue_count_one": "{{count}} 件の問題",
+        "issue_count_other": "{{count}}の問題",
+        "modal": {
+          "body_middle": "または",
+          "body_prefix": "これにより、毎回キューに再配置されます",
+          "body_suffix": "従業員が >30 min に対して沈黙している行を削除し、サーキット ブレーカーをクリアします。",
+          "title": "緊急: スタックしたキューをリセット",
+          "warning": "これは、キューがスタックしていることを確認した場合にのみ使用してください。正常なワーカーがまだ実行中の場合、重複した作業が作成されます。"
+        },
+        "toasts": {
+          "breaker_reset": "サーキットブレーカーのリセット",
+          "queue_reset_one": "{{count}} 件のスタックした行をリセットしました。ブレーカーをクリアしました",
+          "queue_reset_other": "{{count}} 件のスタックした行をリセットしました。ブレーカーをクリアしました",
+          "queue_reset_failed": "キューのリセットに失敗しました",
+          "reset_failed": "リセットに失敗しました"
+        },
+        "checks": {
+          "cache_readable": "Cache can be read",
+          "cache_writable": "Cache can be written",
+          "cache_filesystem": "Cache storage",
+          "route_planner": "Tenant route planner",
+          "job_table": "Job queue table",
+          "circuit_breaker": "Circuit breaker",
+          "queue_age": "Queue age",
+          "recent_failures": "Recent failures",
+          "stuck_jobs": "Stuck jobs",
+          "last_successful_pass": "Last successful run",
+          "last_failed_pass": "Last failed run",
+          "sched_prerender-detect-drift": "Drift detector heartbeat",
+          "sched_prerender-auto-recache": "Auto-recache heartbeat",
+          "sched_prerender-reap-stale": "Stale-job cleanup heartbeat"
+        }
+      },
+      "inventory": {
+        "actions": {
+          "close": "近い",
+          "inspect": "検査する",
+          "inspect_snapshot": "{{path}} を検査する",
+          "open_rendered_url": "レンダリングされた URL を開く",
+          "recache_selected": "再キャッシュが選択されました ({{count}})",
+          "reload": "リロード",
+          "select_all_visible": "表示されているものをすべて選択します",
+          "select_snapshot": "{{path}}を選択します"
+        },
+        "columns": {
+          "actions": "アクション",
+          "age": "年",
+          "host": "ホスト",
+          "http": "NEXUSTERM15トークン",
+          "route": "ルート",
+          "size": "サイズ",
+          "status": "状態"
+        },
+        "empty": "フィルターに一致するスナップショットはありません",
+        "errors": {
+          "bulk_recache": "一括再キャッシュに失敗しました",
+          "inspect": "スナップショットの検査に失敗しました",
+          "load": "在庫のロードに失敗しました"
+        },
+        "filters": {
+          "aging": "エージング",
+          "all": "全て",
+          "asset_broken": "壊れた資産",
+          "content_drifted": "コンテンツのドリフト",
+          "filter": "フィルター",
+          "filter_placeholder": "ルートまたはホストの部分文字列",
+          "fresh": "新鮮な",
+          "issue": "問題",
+          "stale": "古い",
+          "staleness": "古さ",
+          "status": "状態",
+          "status_200": "200のみ",
+          "status_non_200": "200以外",
+          "tenant_placeholder": "オプション",
+          "tenant_slug": "テナントナメクジ"
+        },
+        "messages": {
+          "bulk_recache": "無効化された {{count}} スナップショットとキューに入れられた再キャッシュ"
+        },
+        "inspect": {
+          "age": "年",
+          "all_valid": "すべて有効です",
+          "asset_references": "アセット参照 ({{count}})",
+          "canonical": "正規",
+          "dead_assets": "{{count}} が死亡しました",
+          "flags": "フラグ",
+          "h1_count": "H1 (カウント)",
+          "html_parse_warnings": "HTML 解析の警告",
+          "html_preview": "HTML プレビュー (最初の 12KB、スクリプト除去済み)",
+          "integrity_mismatch": "レンダリング後にバイトが変更されました - sha256 {{expected}}... が期待されていましたが、{{actual}} を取得しました...",
+          "integrity_missing": "sha256 サイドカーがありません - スナップショットは整合性検証より前のものであるか、手動で編集されました",
+          "integrity_ok": "バイトはレンダリング時に書き込まれた sha256 と一致します",
+          "integrity_status": "整合性: {{status}}",
+          "integrity_unreadable": "sha256 サイドカーは存在しますが、形式が正しくありません",
+          "invalid_present": "INVALNEXUSTERM13トークンプレゼント",
+          "json_ld": "JSON-LD ({{blocks}} ブロック、{{status}})",
+          "meta_description": "メタディスクリプション",
+          "missing": "- ない -",
+          "modal_title": "スナップショット検査",
+          "modified": "修正済み",
+          "must_fix": "修正する必要があります ({{count}})",
+          "no_structured_data": "構造化データなし",
+          "no_type": "(@type なし)",
+          "none": "（なし）",
+          "old": "{{age}} 古い",
+          "open_graph": "グラフを開く",
+          "path": "パス",
+          "seo_score": "SEO スコア",
+          "size": "サイズ",
+          "tips": "ヒント ({{count}})",
+          "title": "タイトル"
+        },
+        "selected": "{{count}} が選択されました",
+        "status": {
+          "asset": "資産",
+          "content": "コンテンツ",
+          "content_drifted": "内容がずれた"
+        },
+        "summary": "{{total}} スナップショットのうちの {{filtered}}",
+        "table_aria": "スナップショットインベントリ"
+      },
+      "jobs": {
+        "actions": {
+          "cancel_job": "ジョブ #{{id}} をキャンセル",
+          "close": "近い",
+          "reload": "リロード",
+          "retry_job": "ジョブ #{{id}} を再試行",
+          "retry_same_parameters": "同じパラメータで再試行します",
+          "view_details": "ジョブ #{{id}} の詳細を表示"
+        },
+        "columns": {
+          "actions": "アクション",
+          "by": "による",
+          "flags": "フラグ",
+          "id": "#",
+          "priority": "優先度",
+          "queued": "キューに入れられました",
+          "result": "結果",
+          "scope": "範囲",
+          "status": "状態"
+        },
+        "detail": {
+          "all": "全て",
+          "claimed_by": "請求者",
+          "duration": "間隔",
+          "error": "エラー",
+          "exit_code": "終了コード",
+          "finished_at": "終了時刻",
+          "log_tail": "ログ（尾部）",
+          "queued_at": "でキューに入れられました",
+          "requested_by": "リクエスト者",
+          "routes": "ルート",
+          "started_at": "に開始",
+          "status": "状態",
+          "tenant": "テナント",
+          "title": "ジョブ #{{id}}"
+        },
+        "empty": "仕事がありません",
+        "errors": {
+          "cancel": "キャンセルできませんでした - ジョブが開始された可能性があります",
+          "load": "ジョブのロードに失敗しました",
+          "retry": "再試行が失敗しました - 元のジョブがまだ実行中の可能性があります"
+        },
+        "filters": {
+          "all": "全て",
+          "cancelled": "キャンセル",
+          "failed": "失敗した",
+          "partial": "部分的",
+          "queued": "キューに入れられました",
+          "running": "ランニング",
+          "status": "状態",
+          "succeeded": "成功しました"
+        },
+        "flags": {
+          "dry_run": "予行演習",
+          "force": "力"
+        },
+        "messages": {
+          "cancelled": "ジョブ #{{id}} をキャンセルしました",
+          "retry_queued": "再試行 #{{retryId}} をキューに入れました (#{{id}} から)"
+        },
+        "priority": {
+          "high": "高い",
+          "low": "低い",
+          "normal": "普通",
+          "tooltip": "priority={{priority}} (小さいほど優先)"
+        },
+        "result": {
+          "invalid": "{{count}} 件が無効"
+        },
+        "scope": {
+          "all_tenants": "すべてのテナント"
+        },
+        "table_aria": "求人"
+      },
+      "events": {
+        "actions": {
+          "reload": "リロード"
+        },
+        "columns": {
+          "commit": "専念",
+          "details": "詳細",
+          "event": "イベント",
+          "time": "時間"
+        },
+        "empty": "イベントはありません",
+        "errors": {
+          "load": "イベントの読み込みに失敗しました"
+        },
+        "filters": {
+          "limit": "限界"
+        },
+        "summary": "{{count}} イベント",
+        "table_aria": "イベント",
+        "types": {
+          "fail": "失敗",
+          "partial": "部分的",
+          "success": "成功",
+          "supersede": "置き換える",
+          "unknown": "不明なイベント: {{event}}"
+        }
+      },
+      "failures": {
+        "columns": {
+          "age": "年",
+          "cache_path": "キャッシュパス",
+          "failed_at": "失敗しました"
+        },
+        "description_action": "強制リフレッシュ",
+        "description_middle": "このリスト内のルートは、障害バックオフ ウィンドウ中（デフォルトは 6 時間）、自動的にスキップされます。使用",
+        "description_prefix": "最近のプリレンダリング実行中に失敗したキャッシュ パス。",
+        "description_suffix": "すぐに再試行するには、「概要」タブをクリックしてください。",
+        "empty": "最近失敗はありません",
+        "errors": {
+          "load": "失敗のロードに失敗しました"
+        },
+        "table_aria": "失敗"
+      },
+      "live_connected": "ライブアップデートが接続されています",
+      "audit": {
+        "actions": {
+          "auto_recache": "Auto-recache",
+          "cancel": "Cancel job",
+          "detect_drift": "Detect drift",
+          "enqueue": "Queue refresh",
+          "invalidate": "Invalidate route",
+          "purge": "Delete snapshots",
+          "purge_unexpected": "Clean unexpected snapshots",
+          "reset_breaker": "Reset safety breaker",
+          "reset_queue": "Repair stuck queue"
+        },
+        "buttons": {
+          "export_csv": "CSVをエクスポートする",
+          "refresh": "リフレッシュ"
+        },
+        "columns": {
+          "action": "アクション",
+          "actor": "俳優",
+          "details": "詳細",
+          "job": "仕事",
+          "outcome": "結果",
+          "tenant": "テナント",
+          "when": "いつ"
+        },
+        "empty": "監査エントリはありません。",
+        "fallbacks": {
+          "all": "全て",
+          "system": "システム"
+        },
+        "filters": {
+          "action": "アクションフィルター",
+          "all": "全て"
+        },
+        "table_aria": "監査履歴",
+        "outcomes": {
+          "ok": "Completed",
+          "denied": "Denied",
+          "failed": "Failed"
+        },
+        "details_empty": "No extra details"
+      },
+      "overview": {
+        "actions": {
+          "queue_job": "ジョブをキューに入れる",
+          "refresh": "リフレッシュ"
+        },
+        "empty_summary": "要約はありません。",
+        "errors": {
+          "enqueue_job": "ジョブをキューに入れることができませんでした",
+          "load_summary": "概要の読み込みに失敗しました"
+        },
+        "fields": {
+          "routes": "ルート",
+          "tenant_slug": "テナントナメクジ"
+        },
+        "force_refresh": {
+          "description": "再レンダリングをキューに入れます。すべてのテナントとルートを更新するには、両方のフィールドを空のままにします。ホスト プロセッサは約 60 秒以内にジョブを取得します。",
+          "dry_run": "ドライラン (計画のみ)",
+          "force": "強制（キャッシュを無視）",
+          "title": "強制リフレッシュ"
+        },
+        "health": {
+          "cache_unreachable": "キャッシュに到達できません",
+          "healthy": "健康",
+          "missing": "{{count}} がありません",
+          "stale": "{{count}} が古い"
+        },
+        "hints": {
+          "active_jobs": "{{count}} アクティブ",
+          "aging": "{{count}} のエージング (7 日以上)",
+          "asset_broken": "参照が無効になっています /assets/*",
+          "backoff_window": "6 時間のバックオフ ウィンドウ内",
+          "cache_age": "最古の {{oldest}} / 最新の {{newest}}",
+          "content_stale": "スナップショットより新しいソース コンテンツ",
+          "event_at": "イベント {{time}}",
+          "no_events": "イベントはありません",
+          "prometheus": "プロメテウスのテキスト形式",
+          "tenants_routes": "{{tenants}} テナント x {{routes}} ルート"
+        },
+        "kpi": {
+          "age_stale": "古い (>14 日)",
+          "asset_broken": "資産が壊れた",
+          "build_commit": "ビルドコミット",
+          "cache_size": "キャッシュサイズ",
+          "content_stale": "コンテンツが古い",
+          "coverage": "カバレッジ",
+          "metrics": "メトリクス",
+          "missing": "ない",
+          "queued_jobs": "キューに入れられたジョブ",
+          "recent_failures": "最近の失敗",
+          "status": "状態"
+        },
+        "last_run": "最後に完了した実行",
+        "messages": {
+          "job_queued": "ジョブ #{{id}} をキューに入れました"
+        },
+        "placeholders": {
+          "routes": "/about、/blog (空白 = すべて)",
+          "tenant_slug": "例えば時間-タイムバンク (空白 = すべて)"
+        },
+        "super_admin_only": "スーパー管理者のみ"
+      },
+      "polling_fallback": "ポーリングフォールバック",
+      "purge": {
+        "actions": {
+          "auto_recache": "パージ後の自動再キャッシュ",
+          "dry_run": "ドライラン",
+          "preview_purge": "プレビューパージ",
+          "purge_now": "今すぐパージ",
+          "continue_to_delete": "Continue to live delete"
+        },
+        "description_middle": "1 つのパス セグメントに対して、",
+        "description_prefix": "グロブパターンに一致するスナップショットを削除します。使用",
+        "description_suffix": "あらゆる子孫のために。例:",
+        "all_tenants_warning": {
+          "body": "Leaving tenant slug blank will delete matching snapshots across every tenant. This is only for platform-wide cleanup after you have previewed the exact files.",
+          "confirm": "I understand this delete applies to every tenant",
+          "title": "All-tenant delete"
+        },
+        "errors": {
+          "confirm_all_tenants": "Confirm the all-tenant delete before continuing",
+          "pattern_required": "パターンは必須です (例: /blog/*)",
+          "purge_failed": "パージに失敗しました",
+          "preview_required": "Run a matching preview before deleting snapshots.",
+          "confirm_text": "Type {{phrase}} to confirm this live delete."
+        },
+        "fields": {
+          "pattern": "パターン",
+          "tenant_slug": "テナントナメクジ",
+          "confirm_text": "Type {{phrase}} to confirm"
+        },
+        "messages": {
+          "dry_run": "ドライラン: {{count}} 件のスナップショットが削除される見込みです",
+          "purged": "パージされた {{count}} スナップショット{{job}}"
+        },
+        "placeholders": {
+          "pattern": "/blog/* または /listings/**",
+          "tenant_slug": "オプション - すべて空白のままにします"
+        },
+        "result": {
+          "deleted": "{{count}} 件のスナップショットを削除しました",
+          "would_delete": "{{count}} 件のスナップショットが削除される見込みです"
+        },
+        "title": "ワイルドカードキャッシュのパージ",
+        "preview_gate": {
+          "title": "Preview required before live delete",
+          "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
+          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
+        }
+      },
+      "ttl_inspector": {
+        "actions": {
+          "inspect": "検査する"
+        },
+        "description_prefix": "どちらを参照してください",
+        "description_suffix": "pattern は、設定を grep せずに、ルートとそれが取得する TTL を所有します。鮮度ポリシーを調整するために使用されます。",
+        "error": "ルックアップに失敗しました - ルート形式を確認してください (「/」で始まる必要があります)",
+        "fields": {
+          "route": "ルート"
+        },
+        "path_only": "パスのみ - スキームやホストなし",
+        "placeholders": {
+          "route": "/ブログ/私の投稿"
+        },
+        "result": {
+          "match": "一致: {{pattern}}",
+          "other_pattern_item": "{{pattern}} -> {{ttl}} (特異性 {{specificity}})",
+          "other_patterns": "このルートに一致する他のパターン:",
+          "ttl": "TTL: {{ttl}} ({{seconds}})"
+        },
+        "title": "TTL検査官",
+        "units": {
+          "days": "{{count}} 日",
+          "hours": "{{count}}h",
+          "minutes": "{{count}} 分"
+        }
+      },
+      "sitemap_explorer": {
+        "actions": {
+          "explore": "探検する"
+        },
+        "counts": {
+          "dynamic": "{{count}} ダイナミック",
+          "static": "{{count}} 静的",
+          "total": "{{count}} 合計"
+        },
+        "description_prefix": "エンジンがテナントに対してどのルートをレンダリングする予定であるかを正確に確認します - 静的フロア (機能/モジュール ゲート) と、からの動的 URL",
+        "description_suffix": "Playwright ワーカーはこのリストにアクセスします。",
+        "error": "ルックアップに失敗しました - テナントのスラッグを確認してください",
+        "fields": {
+          "tenant_slug": "テナントナメクジ"
+        },
+        "none": "（なし）",
+        "placeholders": {
+          "tenant_slug": "時間銀行"
+        },
+        "sections": {
+          "dynamic_routes": "動的ルート (上限は 1,000)",
+          "static_routes": "静的ルート"
+        },
+        "title": "サイトマップエクスプローラー"
+      },
+      "readonly": {
+        "prefix": "読み取り専用ビュー - プリレンダリング エンジンはすべてのテナントにわたって動作するため、アクション ボタンは無効になります。でサインインします",
+        "role": "プラットフォームのスーパー管理者",
+        "suffix": "アカウントを使用して、ジョブをキューに入れたり、スナップショットをパージしたり、ドリフト検出をトリガーしたりできます。"
+      },
+      "tabs": {
+        "analytics": "分析",
+        "coverage": "カバレッジ",
+        "events": "イベント",
+        "failures": "失敗",
+        "history": "歴史",
+        "inventory": "在庫",
+        "jobs": "求人",
+        "overview": "概要",
+        "tenant_safety": "Tenant safety"
+      },
+      "tabs_aria": "タブの事前レンダリング",
+      "title": "プリレンダー エンジン",
+      "tenant_safety": {
+        "title": "Tenant safety inspector",
+        "description": "Check one community before refreshing or deleting anything. This view compares the tenant route plan with the saved cache and explains why each snapshot exists.",
+        "fields": {
+          "tenant_slug": "Tenant slug"
+        },
+        "placeholders": {
+          "tenant_slug": "hour-timebank"
+        },
+        "actions": {
+          "inspect": "Inspect tenant",
+          "open_inventory": "Open inventory"
+        },
+        "errors": {
+          "tenant_required": "Enter a tenant slug first.",
+          "load": "Failed to load tenant safety report."
+        },
+        "messages": {
+          "loaded": "Loaded safety report for {{slug}}."
+        },
+        "status": {
+          "clean": "No issues found",
+          "needs_attention": "{{count}} item needs attention"
+        },
+        "counts": {
+          "expected": "Expected",
+          "snapshots": "Saved",
+          "missing": "Missing",
+          "unexpected": "Unexpected",
+          "stale": "Stale",
+          "asset_invalid": "Assets",
+          "static": "Static",
+          "sitemap": "Sitemap"
+        },
+        "sections": {
+          "attention": "Items needing attention"
+        },
+        "empty": "Enter a tenant slug to inspect its route plan and saved snapshots.",
+        "empty_attention": "This tenant has no missing, stale, asset-broken, or unexpected snapshots.",
+        "columns": {
+          "route": "Route",
+          "source": "Source",
+          "status": "Status",
+          "why": "Why it is here"
+        },
+        "tables": {
+          "attention_aria": "Tenant snapshot items needing attention"
+        },
+        "sources": {
+          "static": "Static route",
+          "sitemap": "Sitemap route",
+          "unexpected": "Unexpected"
+        },
+        "badges": {
+          "unexpected": "Unexpected",
+          "assets": "Asset issue",
+          "content": "Content stale"
+        },
+        "reasons": {
+          "sitemap": "Published by this tenant sitemap as public content.",
+          "unexpected": "Saved for this tenant, but not present in the current static route set or sitemap plan.",
+          "always_public": "Always-public tenant route.",
+          "feature_enabled": "Enabled by the {{value}} tenant feature.",
+          "feature_disabled": "Would require the {{value}} tenant feature, which is currently off.",
+          "module_enabled": "Enabled by the {{value}} tenant module.",
+          "module_disabled": "Would require the {{value}} tenant module, which is currently off.",
+          "expected": "Expected for this tenant."
+        },
+        "help": {
+          "title": "How to read this",
+          "expected": "Expected routes are pages the engine believes this tenant should expose publicly.",
+          "unexpected": "Unexpected snapshots are saved files that no longer match the tenant plan. They are the highest-risk items to clean up.",
+          "next_step": "Use preview-only cleanup first. Only delete after the preview shows the tenant and routes you expect."
+        },
+        "cleanup": {
+          "title": "Cleanup available",
+          "body": "Unexpected snapshots can usually be removed with the cleanup tool in Overview. Preview first, then apply only when the tenant list is correct."
+        },
+        "staleness": {
+          "fresh": "Fresh",
+          "warn": "Aging",
+          "stale": "Stale"
+        }
+      }
+    },
+    "running_audit": "監査の実行",
+    "security_heading": "セキュリティ",
+    "security_note": "セキュリティ",
+    "seo_audit_completed": "SEO監査が完了しました",
+    "seo_audit_summary": "SEO監査の概要",
+    "seo_audit_summary_counts": "{{passCount}}は成功しました、{{warnCount}}警告、{{failCount}}は失敗しました",
+    "seo_health_check_heading": "SEO ヘルスチェック",
+    "server_seo_audit_heading": "サーバーSEO監査",
+    "sitemap_cache_cleared": "サイトマップのキャッシュがクリアされました",
+    "sitemap_heading": "サイトマップ",
+    "sitemap_total_urls": "合計 URL",
+    "sitemap_url_label": "サイトマップURL",
+    "sitemap_urls_by_type": "タイプ別の URL",
+    "social_sharing_image_heading": "ソーシャル共有画像",
+    "source_group": "グループ",
+    "source_job": "仕事",
+    "source_listing": "リスト",
+    "source_volunteering": "ボランティア活動",
+    "status_fail": "失敗",
+    "status_pass": "合格",
+    "status_warning": "警告",
+    "sync_search_hint_prefix": "走る",
+    "sync_search_hint_suffix": "メイリサーチ開始後。",
+    "unable_to_load_sitemap_stats": "サイトマップ統計を読み込めません",
+    "usage_limits_heading": "使用制限",
+    "top_matches_for_user_one": "{{name}}の上位{{count}}一致",
+    "top_matches_for_user_other": "{{name}}の上位{{count}}一致",
+    "next_public": {
+      "title": "Next.js public frontend readiness",
+      "description": "Read-only shadow-mode status for the Next.js public frontend. This page does not enable public routing or change prerender behaviour.",
+      "refresh": "Refresh",
+      "loading": "Loading Next.js public frontend readiness",
+      "error": "Next.js readiness could not be loaded.",
+      "cards": {
+        "mode": "Mode",
+        "production_routing": "Production routing",
+        "prerender": "Prerender fallback"
+      },
+      "values": {
+        "shadow_mode": "Shadow mode",
+        "public_traffic_next": "Public traffic is served by Next.js",
+        "public_traffic_not_next": "Public traffic is not served by Next.js",
+        "prerender_retained": "Prerender fallback retained",
+        "prerender_not_retained": "Prerender fallback not retained"
+      },
+      "route_ownership": {
+        "title": "Route ownership manifest",
+        "next_public": "Next-owned public routes",
+        "vite_private": "Vite-owned private routes"
+      },
+      "safety": {
+        "title": "Safety checks"
+      },
+      "route_gates": {
+        "title": "Route cutover gates"
+      },
+      "tenant_resolution": {
+        "title": "Tenant resolution contract",
+        "bootstrap_endpoint": "Bootstrap endpoint",
+        "source_of_truth": "Source of truth",
+        "slug_parameter": "Shared-host slug parameter",
+        "request_host": "Request host",
+        "request_path": "Request path",
+        "bootstrap_request": "Bootstrap request",
+        "origin_forwarding": "Custom-domain Origin forwarding enabled",
+        "no_next_database": "Next.js does not query the database",
+        "next_queries_database": "Next.js database queries detected"
+      },
+      "tenant_resolution_examples": {
+        "shared_host_slug": "Shared app host with tenant slug",
+        "custom_domain": "Custom tenant domain"
+      },
+      "tenant_resolution_route_statuses": {
+        "public": "Public Laravel GET route",
+        "missing": "Laravel route is not registered",
+        "auth": "Laravel route requires authentication"
+      },
+      "edge_canary": {
+        "title": "Edge canary preview",
+        "edge": "Production edge",
+        "routing_flag": "Routing flag",
+        "route_file_status": "Route file status",
+        "config_template": "Config template",
+        "template_exists": "Template exists",
+        "template_missing": "Template missing",
+        "example_only": "Example only",
+        "not_example_only": "Not example only",
+        "included_by_deploy": "Included by deploy",
+        "not_included_by_deploy": "Not included by deploy",
+        "route_audit_title": "Template route audit",
+        "exact_path_count": "{{count}} exact paths",
+        "public_only": "Public routes only",
+        "not_public_only": "Not public routes only",
+        "no_private_collisions": "No private-route collisions",
+        "private_collisions": "Private-route collisions detected",
+        "unmatched_template_path": "Unmatched template path: {{path}}",
+        "unsupported_rule": "Unsupported rewrite rule: {{rule}}",
+        "routing_flag_on": "Routing flag is enabled",
+        "routing_flag_off": "Routing flag is disabled",
+        "activation_available": "Activation controls are available",
+        "no_activation_control": "No activation controls are available",
+        "preview_only": "Preview only",
+        "not_preview_only": "Preview mode is not confirmed",
+        "reviewed_config_required": "Reviewed config required",
+        "explicit_instruction_required": "Separate cutover instruction required"
+      },
+      "edge_canary_edges": {
+        "apache_plesk": "Apache/Plesk"
+      },
+      "edge_canary_route_file_statuses": {
+        "not_configured": "No route file configured by this module"
+      },
+      "edge_canary_review_steps": {
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
+        "next_shadow_checks_required": "Next shadow checks required",
+        "react_private_regression_required": "React private-route regression required",
+        "apache_configtest_required": "Apache configtest required",
+        "prerender_fallback_must_remain": "Prerender fallback must remain"
+      },
+      "edge_canary_guardrails": {
+        "do_not_edit_plesk_vhosts_directly": "Do not edit Plesk vhosts directly",
+        "do_not_enable_routing_flag_without_cutover_instruction": "Do not enable routing without explicit cutover instruction",
+        "public_routes_only": "Public routes only",
+        "do_not_remove_prerender": "Do not remove prerender fallback"
+      },
+      "route_batches": {
+        "title": "Route batch readiness",
+        "route_count": "{{count}} routes"
+      },
+      "remaining_route_work": {
+        "title": "Remaining public route work",
+        "route_count": "{{count}} routes",
+        "public_routes": "{{count}} public route",
+        "public_routes_plural": "{{count}} public routes",
+        "api_backed_routes": "{{count}} API-backed route",
+        "api_backed_routes_plural": "{{count}} API-backed routes",
+        "remaining_routes": "{{count}} route remaining",
+        "remaining_routes_plural": "{{count}} routes remaining",
+        "unclassified_routes": "{{count}} unclassified route",
+        "unclassified_routes_plural": "{{count}} unclassified routes",
+        "activation_available": "Activation controls are available",
+        "activation_unavailable": "No activation controls"
+      },
+      "remaining_route_work_groups": {
+        "static_manual_review": "Static/manual-review routes",
+        "auth_only_backend": "Auth-only backend routes",
+        "backend_contract_missing": "Backend contract gaps",
+        "unclassified_manifest_only": "Unclassified manifest-only routes"
+      },
+      "remaining_route_work_reasons": {
+        "static_or_tenant_bootstrap": "Static or tenant-bootstrap content",
+        "authoritative_static_content_missing": "Authoritative static content source missing",
+        "existing_backend_requires_auth": "Existing backend requires authentication",
+        "public_api_would_expand_auth_scope": "Public API would expand an auth-only content surface",
+        "route_params_do_not_match_public_api": "Route params do not match a public API",
+        "manifest_only_unclassified": "Manifest-only route not classified yet"
+      },
+      "remaining_route_work_actions": {
+        "manual_no_js_shadow_review": "Run manual no-JavaScript shadow review",
+        "publish_authoritative_content_source": "Publish an authoritative content source",
+        "keep_vite_or_prerender_until_public_contract": "Keep Vite or prerender until a public contract exists",
+        "public_visibility_decision_required": "Decide what content is safe to make public",
+        "privacy_review_required_before_public_api": "Complete privacy review before adding a public API",
+        "add_public_laravel_api_with_tests": "Add a public Laravel API with tests",
+        "classify_route_before_cutover": "Classify route ownership and backend contract before cutover"
+      },
+      "remaining_route_work_guardrails": {
+        "route_status_has_no_production_effect": "Route status has no production effect",
+        "do_not_promote_auth_only_routes": "Do not promote auth-only routes"
+      },
+      "dry_runs": {
+        "title": "Pre-cutover dry-run checks",
+        "activation_available": "Activation controls are available",
+        "activation_unavailable": "No activation controls",
+        "explicit_instruction_required": "Separate cutover instruction required"
+      },
+      "dry_run_items": {
+        "shadow_manifest_and_html": "Shadow manifest and no-JS HTML",
+        "remaining_static_manual_review": "Platform legal content review",
+        "auth_only_public_contract_review": "Auth-only public contract review",
+        "private_vite_regression": "Private Vite regression",
+        "inertness_guard": "Production inertness guard"
+      },
+      "dry_run_blockers": {
+        "manual_verification_required": "Manual verification required",
+        "route_parity_required": "Route parity required",
+        "authoritative_content_source_required": "Authoritative content source required",
+        "public_visibility_decision_required": "Public visibility decision required",
+        "privacy_review_required_before_public_api": "Privacy review required before public API",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+      },
+      "dry_run_notes": {
+        "shadow_only": "Shadow only",
+        "no_activation_control": "No activation control",
+        "do_not_promote_auth_only_routes": "Do not promote auth-only routes",
+        "vite_private_routes_remain_primary": "Vite private routes remain primary",
+        "do_not_remove_prerender": "Do not remove prerender fallback"
+      },
+      "artifacts": {
+        "title": "Cutover artifact inventory",
+        "path": "Path",
+        "present": "Present",
+        "missing": "Missing",
+        "required_commands": "Required commands",
+        "required_before_cutover": "Required before cutover",
+        "activation_available": "Activation controls are available",
+        "no_activation_control": "No activation controls"
+      },
+      "artifact_items": {
+        "route_ownership_manifest": "Route ownership manifest",
+        "content_sources_manifest": "Content sources manifest",
+        "apache_canary_template": "Edge canary template",
+        "shadow_compose_profile": "Shadow Compose profile",
+        "routing_flag_config": "Routing flag config",
+        "prerender_fallback": "Prerender fallback"
+      },
+      "artifact_categories": {
+        "manifest": "Manifest",
+        "edge_config": "Edge config",
+        "runtime": "Runtime",
+        "guard": "Guard",
+        "fallback": "Fallback"
+      },
+      "production_effects": {
+        "none": "No production effect"
+      },
+      "cutover_eligibility": {
+        "title": "Cutover eligibility",
+        "eligible": "Eligible for cutover",
+        "blocked": "Not eligible for cutover",
+        "public_routes": "{{count}} public routes",
+        "api_backed_public_routes": "{{count}} API-backed public routes",
+        "remaining_public_routes": "{{count}} remaining public routes",
+        "activation_available": "Activation controls available",
+        "activation_unavailable": "No activation controls",
+        "blockers": "Blockers",
+        "required_actions": "Required actions"
+      },
+      "cutover_eligibility_blockers": {
+        "manifest_validation_blocked": "Manifest validation is blocked",
+        "remaining_public_route_work": "Remaining public route work is incomplete",
+        "edge_canary_template_audit_blocked": "Edge canary template audit is blocked",
+        "edge_routes_not_configured": "Production edge routes are not configured",
+        "route_parity_required": "Route parity is still required",
+        "routing_flag_enabled_before_cutover": "Routing flag is enabled before cutover",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+      },
+      "cutover_eligibility_actions": {
+        "complete_remaining_public_route_work": "Complete remaining public route work",
+        "run_shadow_verification": "Run shadow verification",
+        "prepare_reviewed_edge_config_after_instruction": "Prepare reviewed edge config only after instruction",
+        "keep_prerender_fallback": "Keep prerender fallback"
+      },
+      "route_batch_names": {
+        "foundation_public_pages": "Foundation public pages",
+        "api_backed_public_content": "API-backed public content",
+        "vite_private_retained": "Vite private routes retained"
+      },
+      "route_batch_blockers": {
+        "manual_shadow_review_required": "Manual shadow review required",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
+        "public_api_parity_required": "Public API parity required"
+      },
+      "route_gate_blockers": {
+        "parity_test_required": "Parity test required"
+      },
+      "safety_checks": {
+        "route_cutover_disabled": "Public route cutover remains disabled",
+        "prerender_retained": "Current prerender fallback remains retained",
+        "vite_private_routes_retained": "Private Vite route ownership remains retained",
+        "public_edge_not_configured": "No production edge route is configured for Next.js",
+        "apache_canary_template_not_included": "Apache canary template is not included by deploy",
+        "parity_tests_required_before_cutover": "Parity tests are still required before any cutover"
+      },
+      "statuses": {
+        "pass": "Pass",
+        "blocker": "Blocker",
+        "info": "Info",
+        "fail": "Fail",
+        "blocked": "Blocked"
+      },
+      "runtime": {
+        "title": "Shadow runtime",
+        "compose_profile": "Compose profile",
+        "dev_command": "Dev command",
+        "build_command": "Build command",
+        "port_env": "Port environment variable"
+      },
+      "cutover": {
+        "title": "Remaining live cutover sequence",
+        "verification_commands": "Verification commands"
+      },
+      "cutover_steps": {
+        "verify_next_shadow_build": "Verify the Next.js shadow build and route manifest.",
+        "verify_no_js_public_html": "Run no-JavaScript HTML checks for each public route.",
+        "verify_private_vite_regression": "Build and regression-check the existing Vite private application.",
+        "prepare_apache_canary_routes": "Prepare Apache canary routing for public routes only.",
+        "enable_canary_for_public_routes_only": "Enable a canary route for public pages after explicit approval.",
+        "monitor_and_keep_prerender_fallback": "Monitor responses and keep prerender available as fallback until parity is proven."
+      },
+      "counts": {
+        "public_routes": "{{count}} public routes",
+        "private_prefixes": "{{count}} private prefixes",
+        "private_patterns": "{{count}} private edit/create patterns"
+      },
+      "validation": {
+        "title": "Manifest validation",
+        "passed": "Manifest validation passed",
+        "blocked": "Manifest validation blocked",
+        "lockfile": "Lockfile pinned",
+        "package_scripts": "Package scripts present",
+        "compose_profile": "Shadow Compose profile present"
+      },
+      "validation_issues": {
+        "manifest_missing": "Route ownership manifest is missing.",
+        "manifest_not_shadow": "Route ownership manifest is not in shadow mode.",
+        "public_route_invalid": "A public route entry is malformed.",
+        "public_route_missing_fields": "A public route is missing required fields.",
+        "public_route_duplicate_pattern": "A public route pattern is duplicated.",
+        "public_route_duplicate_key": "A public route key is duplicated.",
+        "public_route_collides_with_private_prefix": "A public route collides with a private Vite route prefix.",
+        "public_route_collides_with_private_pattern": "A public route collides with a private Vite route pattern.",
+        "vite_private_prefix_missing_required": "Required Vite private route prefix is missing.",
+        "vite_private_pattern_missing_required": "Required Vite private route pattern is missing.",
+        "content_sources_not_laravel_api": "Content sources must use Laravel public APIs.",
+        "content_sources_allow_next_database_queries": "Next.js content sources must not query the database.",
+        "api_backed_route_invalid": "An API-backed route entry is malformed.",
+        "api_backed_route_missing_fields": "An API-backed route is missing required fields.",
+        "api_backed_route_duplicate_key": "An API-backed route key is duplicated.",
+        "api_backed_route_not_in_manifest": "An API-backed route is missing from the public route manifest.",
+        "api_backed_route_not_get": "API-backed public routes must use GET.",
+        "api_backed_route_not_laravel_v2_endpoint": "API-backed routes must use relative Laravel v2 endpoints.",
+        "api_backed_route_private_endpoint": "API-backed public routes must not use private Laravel v2 namespaces.",
+        "api_backed_route_endpoint_not_plain_path": "API-backed route endpoints must be plain paths without query strings or fragments.",
+        "api_backed_route_endpoint_has_path_traversal": "API-backed route endpoints must not contain path traversal segments.",
+        "api_backed_route_param_mismatch": "API endpoint parameters must match the public route pattern.",
+        "api_backed_route_not_registered": "API-backed route endpoint is not registered in Laravel.",
+        "api_backed_route_requires_auth": "API-backed route endpoint requires authentication."
+      },
+      "cutover_gate_blockers": {
+        "manual_verification_required": "Manual verification required",
+        "route_parity_required": "Route parity required",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
+        "edge_routes_not_configured": "Production edge routes are not configured",
+        "cutover_not_active": "Cutover is not active",
+        "prerender_fallback_must_remain": "Prerender fallback must remain available"
+      },
+      "playbook": {
+        "title": "Operator playbook",
+        "activation_available": "Activation controls are available",
+        "no_activation_control": "No activation controls are available on this page.",
+        "explicit_instruction_required": "Separate cutover instruction required",
+        "no_production_effect": "No production routing change"
+      },
+      "playbook_stages": {
+        "verify_shadow_module": "Verify the shadow module locally.",
+        "prepare_reviewed_edge_config": "Prepare Apache canary routing as a reviewed config-only change.",
+        "run_private_route_regression": "Re-check the existing Vite private application.",
+        "canary_public_routes_only": "Canary public routes only after approval.",
+        "monitor_with_prerender_fallback": "Monitor live responses while preserving fallback."
+      },
+      "playbook_notes": {
+        "shadow_only": "Shadow only",
+        "no_activation_control": "No activation control",
+        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
+        "vite_private_routes_remain_primary": "Vite private routes remain primary",
+        "public_routes_only": "Public routes only",
+        "do_not_remove_prerender": "Do not remove prerender fallback.",
+        "rollback_path_required": "Rollback path required"
+      }
+    }
+  },
+  "email_deliverability": {
+    "title": "電子メールの到達性",
+    "subtitle": "このテナントのトリガーの証拠、送信試行、プロバイダーのステータス、および抑制された受信者を追跡します。",
+    "trigger_score": "トリガースコア",
+    "trigger_coverage": "{{count}} が監視するフロー全体にわたる {{issues}} の問題",
+    "actions": {
+      "refresh": "リフレッシュ",
+      "reset": "リセット",
+      "search": "検索"
+    },
+    "windows": {
+      "1": "過去 24 時間",
+      "7": "過去 7 日間",
+      "30": "過去 30 日間",
+      "90": "過去90日間"
+    },
+    "filters": {
+      "all": "全て",
+      "category": "カテゴリ",
+      "email": "電子メール",
+      "recipient": "受信者の電子メール",
+      "reason": "理由",
+      "since": "以来",
+      "status": "状態",
+      "until": "それまで",
+      "window": "タイムウィンドウ"
+    },
+    "metrics": {
+      "accepted": "承認されました",
+      "bad_outcomes": "{{count}} が失敗、バウンス、または抑制されました",
+      "bounced": "跳ね返った",
+      "delivered": "納品済み",
+      "not_available": "トリガー監査データなし",
+      "total": "合計",
+      "trigger_score": "トリガースコア",
+      "unconfirmed": "{{count}} 件は受理済みですが未確認です",
+      "webhook_confirmed": "プロバイダー Webhook で確認済み",
+      "window_days": "{{days}} の日枠"
+    },
+    "status": {
+      "bounced": "跳ね返った",
+      "delivered": "納品済み",
+      "failed": "失敗した",
+      "pending": "保留中",
+      "processing": "処理",
+      "queued": "キューに入れられました",
+      "sent": "送信済み",
+      "suppressed": "抑制された",
+      "unknown": "不明なステータス: {{status}}"
+    },
+    "severity": {
+      "critical": "致命的",
+      "info": "情報",
+      "warning": "警告"
+    },
+    "status_breakdown": {
+      "title": "ステータスの内訳",
+      "subtitle": "選択したウィンドウに対する現在のテナントの送信結果のコンパクトなビュー。"
+    },
+    "trigger_health": {
+      "critical": "トリガーに関する重大な問題",
+      "monitored": "監視対象のフロー",
+      "warning": "警告トリガーの問題"
+    },
+    "trigger_issues": {
+      "title": "監査の問題のトリガー",
+      "subtitle": "電子メールまたは通知が発行されるべきソース行ですが、監査には信頼できる配信証拠がありません。",
+      "table_label": "電子メールトリガー監査の問題",
+      "empty": "選択したウィンドウにはトリガー監査の問題はありません。",
+      "all_tenants": "すべてのテナント",
+      "columns": {
+        "event": "イベント",
+        "issue": "問題",
+        "module": "モジュール",
+        "params": "証拠",
+        "severity": "重大度",
+        "tenant": "テナント"
+      }
+    },
+    "queues": {
+      "title": "キュー診断",
+      "subtitle": "このテナントの失敗した、抑制された、または古い保留中の電子メール キュー行。",
+      "table_label": "電子メールキュー診断",
+      "empty": "失敗した電子メール キュー行、抑制された電子メール キュー行、または古い電子メール キュー行はありません。",
+      "columns": {
+        "attempts": "試み",
+        "category": "カテゴリ",
+        "error": "エラー",
+        "last_attempt": "最後の試み",
+        "recipient": "受信者",
+        "source": "ソース",
+        "status": "状態"
+      },
+      "sources": {
+        "civic_digest_delivery_claims": "シビックダイジェスト請求",
+        "event_reminder_delivery_claims": "イベントリマインダーの請求",
+        "event_reminders": "イベントリマインダー",
+        "federation_inbound_connections": "フェデレーション接続",
+        "federation_messages": "フェデレーションメッセージ",
+        "federation_transactions": "フェデレーショントランザクション",
+        "goal_reminders": "目標リマインダー",
+        "job_interviews": "就職面接のリマインダー",
+        "listing_expiry_reminders_sent": "出品期限リマインダー",
+        "marketplace_disputes": "市場紛争",
+        "marketplace_order_notification_deliveries": "マーケットプレイスの注文通知",
+        "marketplace_report_notifications": "マーケットプレイスレポート",
+        "marketplace_seller_ratings": "マーケットプレイスの販売者の評価",
+        "member_subscription_events": "メンバーのサブスクリプションの請求",
+        "newsletter_queue": "ニュースレター",
+        "notification_queue": "通知",
+        "notifications": "通知証拠",
+        "reviews": "連合審査",
+        "transaction_notification_deliveries": "取引通知",
+        "user_safeguarding_preferences": "安全保護の見直し",
+        "vol_donations": "寄付金受領書",
+        "vol_reminder_delivery_claims": "ボランティアのリマインダー請求",
+        "vol_reminders_sent": "ボランティアのリマインダー"
+      }
+    },
+    "logs": {
+      "title": "電子メール試行ログ",
+      "subtitle": "すべての送信試行を受信者、カテゴリ、ステータス、日付で検索します。",
+      "table_label": "電子メール試行ログ",
+      "empty": "現在のフィルターに一致する電子メールはありません。",
+      "columns": {
+        "category": "カテゴリ",
+        "delivered": "納品済み",
+        "error": "エラー",
+        "provider": "プロバイダー",
+        "recipient": "受信者",
+        "sent": "送信済み",
+        "status": "状態",
+        "subject": "主題"
+      }
+    },
+    "pagination": {
+      "page_size": "ページあたりの行数",
+      "summary": "{{from}}-{{total}} の {{to}}"
+    },
+    "suppressions": {
+      "title": "抑制リスト",
+      "subtitle": "プロバイダーがバウンス、ブロック、無効化、または購読解除したプラットフォーム全体の受信者。",
+      "table_label": "電子メール抑制リスト",
+      "empty": "現在のフィルタに一致する抑制された受信者はありません。",
+      "confirm_remove": "{{email}} を抑制リストから削除しますか?再度メールを受信できるようになります。",
+      "remove": "抑制を解除する",
+      "remove_failed": "抑制を解除できませんでした。",
+      "removed": "{{email}} を削除しました。",
+      "columns": {
+        "actions": "アクション",
+        "detail": "詳細",
+        "email": "電子メール",
+        "reason": "理由",
+        "suppressed_at": "で抑制されました"
+      },
+      "reasons": {
+        "block": "ブロック",
+        "bounce": "バウンス",
+        "invalid": "無効",
+        "spam_report": "スパムレポート",
+        "unsubscribe": "購読を解除する",
+        "unknown": "不明な理由: {{reason}}"
+      }
+    },
+    "empty": {
+      "no_statuses": "まだステータスがありません"
+    },
+    "warnings": {
+      "default_title": "電子メールによる警告",
+      "default_body": "電子メールの配信には注意が必要です。",
+      "email_log_missing": {
+        "title": "メールログが見つからない",
+        "body": "電子メール ログ テーブルが欠落しているため、電子メールの健全性を監査できません。"
+      },
+      "recent_email_failures": {
+        "title": "最近のメール障害",
+        "body": "過去 {{window_hours}} 時間内に、{{count}} 電子メールの試行が失敗、バウンス、または抑制されました。"
+      },
+      "critical_email_failures": {
+        "title": "重大な電子メールの失敗",
+        "body": "過去 {{window_hours}} 時間内に、{{count}} の重要なアカウントまたはセキュリティ メールが失敗しました。"
+      },
+      "notification_queue_failures": {
+        "title": "通知キューの失敗",
+        "body": "{{count}} キューに登録された通知は、過去 {{window_hours}} 時間内に失敗しました。"
+      },
+      "notification_queue_suppressed": {
+        "title": "通知メールが抑制される",
+        "body": "{{count}} キューに登録された通知メールは、過去 {{window_hours}} 時間内に抑制されました。"
+      },
+      "notification_queue_stale_processing": {
+        "title": "古い通知キュー",
+        "body": "{{count}} 通知は、{{minutes}} 分以上処理されています。"
+      },
+      "newsletter_queue_failures": {
+        "title": "ニュースレターキューの失敗",
+        "body": "{{count}} ニュースレターの受信者は、過去 {{window_hours}} 時間内に失敗しました。"
+      },
+      "newsletter_queue_stale_processing": {
+        "title": "古いニュースレターのキュー",
+        "body": "{{count}} ニュースレターの受信者は、{{minutes}} 分を超えて処理を続けています。"
+      },
+      "no_recent_email_activity": {
+        "title": "最近の電子メール活動はありません",
+        "body": "このテナントにはアクティブなメンバーがいますが、過去 {{days}} 日間に電子メール アクティビティはありませんでした。"
+      },
+      "new_users_without_activation_email_log": {
+        "title": "アクティベーションメールログがありません",
+        "body": "{{count}} の新規ユーザーには、過去 {{window_hours}} 時間のアクティブ化、検証、承認、またはウェルカム電子メールのログがありません。"
+      },
+      "new_users_without_account_email_attempt": {
+        "title": "アカウントのメールアドレスがトリガーされませんでした",
+        "body": "{{count}} の新規ユーザーは、過去 {{window_hours}} 時間内にアカウントのアクティベーション、検証、承認、またはウェルカム メールの試行を行っていません。"
+      },
+      "new_users_without_admin_registration_alert": {
+        "title": "管理者向け登録アラートがトリガーされませんでした",
+        "body": "過去 {{window_hours}} 時間以内に、{{count}} 人の新規ユーザーについて管理者向けの新規登録メールアラートが記録されていません。"
+      },
+      "password_resets_without_email_attempt": {
+        "title": "パスワードリセットメールがトリガーされませんでした",
+        "body": "{{count}} パスワード リセット トークンには、過去 {{window_hours}} 時間内に試行されたパスワード リセット電子メールに一致するものはありません。"
+      },
+      "group_invites_without_email_attempt": {
+        "title": "グループ招待メールがトリガーされませんでした",
+        "body": "{{count}} のメール グループ招待には、過去 {{window_hours}} 時間内に一致するグループ招待メールの試行がありませんでした。"
+      },
+      "group_members_tenant_mismatch": {
+        "title": "グループメンバーシップテナントの不一致",
+        "body": "{{count}} 件のグループメンバーシップが、所属グループとは異なるテナントに属しています。これらの行は、誤ったテナントへの役割および通知ルーティングのリスクがあります。"
+      },
+      "group_member_joined_without_owner_notification_queue": {
+        "title": "グループ参加通知がキューに登録されませんでした",
+        "body": "過去 {{window_hours}} 時間内に、一致する所有者通知キュー行がない状態で、{{count}} グループ メンバーシップがアクティブになりました。"
+      },
+      "instant_notifications_stuck_pending": {
+        "title": "インスタントメールが止まってしまう",
+        "body": "{{count}} 件のインスタント通知メールが {{minutes}} 分以上保留中です。"
+      },
+      "notification_queue_failed_recently": {
+        "title": "通知メールが失敗しました",
+        "body": "{{count}} キューに登録された通知メールは、過去 {{window_hours}} 時間内に失敗しました。"
+      },
+      "notification_queue_suppressed_recently": {
+        "title": "通知メールが抑制される",
+        "body": "{{count}} キューに登録された通知メールは、過去 {{window_hours}} 時間内に抑制されました。"
+      },
+      "notification_queue_missing_tenant_id": {
+        "title": "通知キューにテナントがありません",
+        "body": "{{count}} 件のキュー済み通知が、テナント所有権のないまま保留中または処理中です。修復されるまで確実にルーティングできません。"
+      },
+      "notification_queue_tenant_mismatch": {
+        "title": "通知キューのテナントの不一致",
+        "body": "{{count}} 件のキュー済み通知が、受信者ユーザーとは異なるテナントに属しています。これらの行は誤ったテナントへのルーティングのリスクがあります。"
+      },
+      "notifications_missing_tenant_id": {
+        "title": "テナントが見つからない通知",
+        "body": "{{count}} 件のアプリ内通知にテナント所有権がないため、ユーザーに一貫して表示されない可能性があります。"
+      },
+      "notifications_tenant_mismatch": {
+        "title": "通知テナントの不一致",
+        "body": "{{count}} 件のアプリ内通知が、受信者ユーザーとは異なるテナントに属しています。これらの行はテナント間の表示障害のリスクがあります。"
+      },
+      "notification_queue_marked_sent_without_email_log": {
+        "title": "電子メールによる証拠なしで送信済みとマークされた通知",
+        "body": "{{count}} のキューに登録された通知は、過去 {{window_hours}} 時間内に一致する電子メール ログ エントリなしで送信されたとマークされました。"
+      },
+      "newsletter_queue_missing_tenant_id": {
+        "title": "ニュースレターのキューにテナントがありません",
+        "body": "{{count}} 件のニュースレターキュー行にテナント所有権がありません。修復されるまで確実にルーティングできません。"
+      },
+      "newsletter_queue_tenant_mismatch": {
+        "title": "ニュースレターキューのテナントの不一致",
+        "body": "{{count}} ニュースレター キュー行は、ニュースレターとは異なるテナントに属します。これらの行は、間違ったテナント ルーティングの危険性があります。"
+      },
+      "newsletter_queue_stuck_pending": {
+        "title": "ニュースレターのメールが止まってしまう",
+        "body": "{{count}} ニュースレターの受信者は、{{minutes}} 分以上保留されています。"
+      },
+      "newsletter_queue_failed_recently": {
+        "title": "ニュースレターメールが失敗しました",
+        "body": "{{count}} ニュースレターの受信者は、過去 {{window_hours}} 時間内に失敗しました。"
+      },
+      "newsletter_queue_marked_sent_without_email_log": {
+        "title": "電子メールによる証拠なしで送信済みとマークされたニュースレター",
+        "body": "{{count}} ニュースレターの受信者は、過去 {{window_hours}} 時間に、一致する成功した電子メール ログ エントリなしで送信済みとしてマークされました。"
+      },
+      "event_reminders_overdue_pending": {
+        "title": "イベントリマインダーの期限が切れています",
+        "body": "{{count}} イベント リマインダーは、予定された送信時刻から {{minutes}} 分以上経過しても保留中です。"
+      },
+      "event_reminders_failed_recently": {
+        "title": "イベントリマインダーが失敗しました",
+        "body": "過去 {{window_hours}} 時間で、{{count}} イベント リマインダーが失敗しました。"
+      },
+      "event_reminders_marked_sent_without_email_log": {
+        "title": "電子メールによる証拠なしで送信済みとマークされたイベントリマインダー",
+        "body": "{{count}} 電子メール イベント リマインダーは、過去 {{window_hours}} 時間内に一致する成功した電子メール ログ エントリなしで送信済みとしてマークされました。"
+      },
+      "marketplace_report_received_without_notification_outbox": {
+        "title": "マーケットプレイスのレポート受信メールがキューに登録されませんでした",
+        "body": "過去 {{window_hours}} 時間に、{{count}} 件のマーケットプレイス報告が、対応する受領メール通知行なしで受信されました。"
+      },
+      "marketplace_report_acknowledged_without_notification_outbox": {
+        "title": "マーケットプレイスのレポート確認メールがキューに登録されませんでした",
+        "body": "{{count}} マーケットプレイス レポートは、過去 {{window_hours}} 時間内に、一致する確認メール通知行なしで確認されました。"
+      },
+      "marketplace_report_resolved_without_notification_outbox": {
+        "title": "マーケットプレイスのレポート解決メールがキューに登録されませんでした",
+        "body": "{{count}} マーケットプレイス レポートは、過去 {{window_hours}} 時間内に、一致する解決策の電子メール通知行なしで解決されました。"
+      },
+      "marketplace_report_appealed_without_notification_outbox": {
+        "title": "マーケットプレイス レポートの異議メールがキューに登録されませんでした",
+        "body": "過去 {{window_hours}} 時間に、{{count}} 件のマーケットプレイス報告の異議申し立てが、対応する受領メール通知行なしで提出されました。"
+      },
+      "marketplace_report_appeal_resolved_without_notification_outbox": {
+        "title": "マーケットプレイス レポートの異議申し立て解決メールがキューに登録されませんでした",
+        "body": "{{count}} マーケットプレイス レポートの異議申し立ては、過去 {{window_hours}} 時間内に一致する最終決定メール通知行なしで解決されました。"
+      },
+      "federation_connection_without_email_evidence": {
+        "title": "フェデレーション接続電子メールの証拠がありません",
+        "body": "{{count}} フェデレーション接続イベントには、過去 {{window_hours}} 時間内に電子メール配信が成功したという証拠はありません。"
+      },
+      "federation_connection_without_bell_evidence": {
+        "title": "フェデレーション接続通知の証拠がありません",
+        "body": "{{count}} フェデレーション接続イベントには、過去 {{window_hours}} 時間におけるアプリ内通知の証拠はありません。"
+      },
+      "federation_review_without_email_evidence": {
+        "title": "フェデレーションレビュー電子メールの証拠が欠落している",
+        "body": "{{count}} フェデレーション レビューでは、過去 {{window_hours}} 時間内に成功した、または意図的にスキップされた電子メールの証拠はありません。"
+      },
+      "federation_review_without_bell_evidence": {
+        "title": "連盟審査通知の証拠が欠落している",
+        "body": "{{count}} フェデレーション レビューには、過去 {{window_hours}} 時間におけるアプリ内通知の証拠はありません。"
+      },
+      "member_subscription_event_without_email_evidence": {
+        "title": "メンバーのサブスクリプション電子メールの証拠がありません",
+        "body": "{{count}} メンバーのサブスクリプション請求イベントでは、過去 {{window_hours}} 時間内に電子メール配信が成功した証拠はありません。"
+      },
+      "stripe_donation_without_receipt_email_evidence": {
+        "title": "寄付金受領書メールの証拠が見つからない",
+        "body": "{{count}} が完了した Stripe 寄付は、過去 {{window_hours}} 時間以内に電子メールで正常に受信されたという証拠がありません。"
+      },
+      "critical_email_attempts_missing_tenant_context": {
+        "title": "重要な電子メールにテナント コンテキストがありません",
+        "body": "{{count}} の重要な電子メール試行は、過去 {{window_hours}} 時間にテナント コンテキストなしでログに記録されました。"
+      },
+      "sendgrid_events_not_confirming_delivery": {
+        "title": "SendGrid 配信イベントがありません",
+        "body": "{{count}} SendGrid の電子メールは引き続き受け付けられますが、{{hours}} 時間以上経過しても確認されません。"
+      },
+      "tenant_gmail_override_incomplete": {
+        "title": "テナント Gmail 構成が不完全",
+        "body": "このテナントには、Gmail 電子メール プロバイダーのオーバーライドが不完全です。"
+      },
+      "tenant_smtp_override_incomplete": {
+        "title": "テナント SMTP 構成が不完全",
+        "body": "このテナントには、SMTP 電子メール プロバイダーのオーバーライドが不完全です。"
+      },
+      "tenant_sendgrid_override_missing_api_key": {
+        "title": "テナントの SendGrid が欠落している API キーをオーバーライドします",
+        "body": "このテナントは SendGrid オーバーライドを使用するように設定されていますが、テナント API キーがないため、プラットフォーム フォールバックが使用されます。"
+      },
+      "tenant_provider_config_check_failed": {
+        "title": "テナントプロバイダーのチェックに失敗しました",
+        "body": "このテナントの電子メール プロバイダー構成監査を完了できませんでした。"
+      },
+      "direct_email_send_paths_remaining": {
+        "title": "従来のダイレクトメールパスはそのまま残ります",
+        "body": "{{count}} 件の生のメール送信パスが、依然として統合通知ディスパッチャーを迂回しています。すべてのモジュールが監査可能なディスパッチャーを経由するまで、これらのパスの強化を続けてください。"
+      },
+      "email_dispatch_missing_explicit_tenant": {
+        "title": "ディスパッチャーのメールに明示的なテナントがありません",
+        "body": "{{count}} 件のメールディスパッチャー呼び出し箇所が、依然として推測されたテナントコンテキストに依存しています。キュー、cron、Webhook、テナント間のすべての送信を監査可能にするため、tenant_id または tenantId を明示的に渡してください。"
+      },
+      "email_trigger_audit_failed": {
+        "title": "電子メールトリガー監査に失敗しました",
+        "body": "電子メール トリガーの監査を完了できませんでした。"
+      },
+      "email_health_unavailable": {
+        "title": "電子メールの状態を利用できません",
+        "body": "電子メールのヘルスチェックをロードできませんでした。"
+      },
+      "email_warning_check_failed": {
+        "title": "警告チェックに失敗しました",
+        "body": "電子メール警告チェックを完了できませんでした。"
+      }
+    },
+    "push": {
+      "title": "プッシュ通知",
+      "subtitle": "選択した期間のウェブおよびモバイルのプッシュ配信",
+      "unavailable": "プッシュ配信のログはまだ利用できません。",
+      "total": "プッシュ数",
+      "delivered": "配信済み",
+      "partial": "一部",
+      "failed": "失敗",
+      "success_rate": "成功率",
+      "fcm": "モバイル送信/失敗",
+      "web": "ウェブ配信",
+      "recent_failures": "最近の失敗"
+    }
+  }
+}

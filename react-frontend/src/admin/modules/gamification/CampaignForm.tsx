@@ -76,7 +76,7 @@ const INITIAL_FORM: FormData = {
 };
 
 export function CampaignForm() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_gamification');
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   usePageTitle(t(isEdit ? 'gamification.edit_campaign' : 'gamification.create_campaign'));

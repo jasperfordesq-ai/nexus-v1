@@ -17,9 +17,11 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { useTheme } from '@/contexts';
+import { useTheme } from '@/contexts/ThemeContext';
 import type { Density, ThemeMode } from '@/contexts/ThemeContext';
-import { Button, ButtonGroup, Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { ButtonGroup } from '@/components/ui/ButtonGroup';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
 import Sun from 'lucide-react/icons/sun';
 import Moon from 'lucide-react/icons/moon';
 import Monitor from 'lucide-react/icons/monitor';

@@ -40,7 +40,7 @@ const DIGEST_SOURCES = [
 
 export default function CivicDigestAdminPage() {
   const { t } = useTranslation('caring_community');
-  const { t: tAdmin } = useTranslation('admin');
+  const { t: tAdmin } = useTranslation('admin_caring_community');
   usePageTitle(t('admin.civic_digest.meta_title'));
   const { showToast } = useToast();
   const { tenantPath } = useTenant();

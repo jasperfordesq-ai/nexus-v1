@@ -38,7 +38,7 @@ interface FedSettings {
 }
 
 export function FederationSettings() {
-  const { t } = useTranslation('admin', { keyPrefix: 'federation' });
+  const { t } = useTranslation('admin_federation', { keyPrefix: 'federation' });
   usePageTitle(t('federation_settings_title'));
   const toast = useToast();
 

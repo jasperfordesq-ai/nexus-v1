@@ -1,5 +1,5 @@
 import { Card, CardBody, CardHeader, Spinner, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, lazy, useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -31,7 +31,6 @@ import MapPin from 'lucide-react/icons/map-pin';
 import Globe from 'lucide-react/icons/globe';
 import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
-import { LocationMap } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { useTenant } from '@/contexts';
 import { StatCard } from '../../components/StatCard';
@@ -106,12 +105,18 @@ interface GeographyData {
 
 const PIE_COLORS = CHART_COLORS;
 
+const LazyLocationMap = lazy(() =>
+  import('@/components/location/LocationMap').then((module) => ({
+    default: module.LocationMap,
+  }))
+);
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CommunityAnalytics() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_analytics');
   usePageTitle(t('analytics.page_title'));
   useAdminPageMeta({
     title: t('analytics.community_analytics_title'),
@@ -578,26 +583,39 @@ export function CommunityAnalytics() {
 
                 {/* Map */}
                 {geoData.member_locations.length > 0 && (
-                  <LocationMap
-                    markers={geoData.member_locations.map((loc, i) => ({
-                      id: `cluster-${i}`,
-                      lat: Number(loc.lat),
-                      lng: Number(loc.lng),
-                      title: t('analytics.location_marker_title', { area: loc.area, count: loc.count }),
-                      pinGlyph: String(loc.count),
-                      infoContent: (
-                        <div className="p-2">
-                          <h4 className="font-semibold text-sm text-gray-900">{loc.area}</h4>
-                          <p className="text-xs text-gray-600">
-                            {t('analytics.member_count', { count: loc.count })}
-                          </p>
-                        </div>
-                      ),
-                    }))}
-                    height="400px"
-                    fitBounds
-                    className="mb-6 rounded-xl"
-                  />
+                  <Suspense
+                    fallback={
+                      <div
+                        role="status"
+                        aria-busy="true"
+                        aria-label={t('analytics.loading')}
+                        className="mb-6 flex h-[400px] items-center justify-center rounded-xl bg-surface-secondary"
+                      >
+                        <Spinner label={t('analytics.loading')} />
+                      </div>
+                    }
+                  >
+                    <LazyLocationMap
+                      markers={geoData.member_locations.map((loc, i) => ({
+                        id: `cluster-${i}`,
+                        lat: Number(loc.lat),
+                        lng: Number(loc.lng),
+                        title: t('analytics.location_marker_title', { area: loc.area, count: loc.count }),
+                        pinGlyph: String(loc.count),
+                        infoContent: (
+                          <div className="p-2">
+                            <h4 className="font-semibold text-sm text-gray-900">{loc.area}</h4>
+                            <p className="text-xs text-gray-600">
+                              {t('analytics.member_count', { count: loc.count })}
+                            </p>
+                          </div>
+                        ),
+                      }))}
+                      height="400px"
+                      fitBounds
+                      className="mb-6 rounded-xl"
+                    />
+                  </Suspense>
                 )}
 
                 {/* Top Areas list */}

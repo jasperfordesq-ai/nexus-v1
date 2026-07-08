@@ -20,7 +20,7 @@ import Building2 from 'lucide-react/icons/building-2';
 import Monitor from 'lucide-react/icons/monitor';
 import Lock from 'lucide-react/icons/lock';
 import ShieldCheck from 'lucide-react/icons/shield-check';
-import { PlaceAutocompleteInput } from '@/components/location';
+import { PlaceAutocompleteInput } from '@/components/location/PlaceAutocompleteInput';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { isPhoneValid } from '@/lib/validation';
 import { useTranslation } from 'react-i18next';

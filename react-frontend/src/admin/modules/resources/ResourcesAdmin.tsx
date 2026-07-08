@@ -63,7 +63,7 @@ const PAGE_SIZE = 50;
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ResourcesAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_resources');
   useAdminPageMeta({ title: t('resources.resources_admin_title') });
   const toast = useToast();
   const { tenantPath } = useTenant();

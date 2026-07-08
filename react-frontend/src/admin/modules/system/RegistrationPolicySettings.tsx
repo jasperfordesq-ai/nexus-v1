@@ -96,7 +96,7 @@ const REGISTRATION_MODE_COLORS: Record<string, 'success' | 'primary' | 'secondar
 };
 
 export function RegistrationPolicySettings() {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t } = useTranslation(['admin_system', 'common']);
   const confirm = useConfirm();
   usePageTitle(t('system.page_title'));
   const toast = useToast();

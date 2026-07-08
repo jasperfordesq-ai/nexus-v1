@@ -28,7 +28,7 @@ import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminReport, ModerationStats } from '@/admin/api/types';
 
 export default function ReportsManagement() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_moderation');
   usePageTitle(t('moderation.page_title'));
   useAdminPageMeta({
     title: t('moderation.reports_management_title'),

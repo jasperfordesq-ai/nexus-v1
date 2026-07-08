@@ -23,7 +23,7 @@ import type { GroupApproval } from '../../api/types';
 import { Button, Chip, Spinner } from '@/components/ui';
 
 export function GroupApprovals() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   usePageTitle(t('groups.page_title'));
   const toast = useToast();
 

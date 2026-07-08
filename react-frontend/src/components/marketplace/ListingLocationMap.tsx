@@ -13,15 +13,22 @@
  * Falls back to a text-only display when Google Maps is not configured.
  */
 
-import { useMemo } from 'react';import MapPin from 'lucide-react/icons/map-pin';
+import { Suspense, lazy, useMemo } from 'react';import MapPin from 'lucide-react/icons/map-pin';
 import Navigation from 'lucide-react/icons/navigation';
 import MapPinOff from 'lucide-react/icons/map-pin-off';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { LocationMap, type MapMarker } from '@/components/location';
+import { Skeleton } from '@/components/ui/Skeleton';
+import type { MapMarker } from '@/components/location/LocationMap';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { useTenant } from '@/contexts';
+
+const LazyLocationMap = lazy(() =>
+  import('@/components/location/LocationMap').then((module) => ({
+    default: module.LocationMap,
+  }))
+);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -96,14 +103,26 @@ export function ListingLocationMap({
       {/* Map or fallback */}
       {mapDisplayEnabled ? (
         <div className="px-4">
-          <LocationMap
-            markers={markers}
-            center={offsetPosition}
-            zoom={14}
-            height={mapHeight}
-            fitBounds={false}
-            className="rounded-lg"
-          />
+          <Suspense
+            fallback={
+              <Skeleton
+                className="rounded-lg"
+                style={{ height: mapHeight }}
+                role="status"
+                aria-busy="true"
+                aria-label={t('common:loading')}
+              />
+            }
+          >
+            <LazyLocationMap
+              markers={markers}
+              center={offsetPosition}
+              zoom={14}
+              height={mapHeight}
+              fitBounds={false}
+              className="rounded-lg"
+            />
+          </Suspense>
         </div>
       ) : (
         <div className="px-4 py-6 flex flex-col items-center gap-2">

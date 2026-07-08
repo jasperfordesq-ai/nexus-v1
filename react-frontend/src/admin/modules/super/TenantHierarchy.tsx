@@ -114,7 +114,7 @@ function TreeNode({ node, depth, onNavigate, expandedIds, onToggle, t }: TreeNod
 }
 
 export function TenantHierarchy() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   usePageTitle(t('super.super_dashboard_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();

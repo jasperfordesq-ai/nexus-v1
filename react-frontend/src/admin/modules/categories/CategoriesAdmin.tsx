@@ -95,7 +95,7 @@ function CategoryActionsMenu({ category, t, openEditModal, setDeleteTarget }: Ca
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CategoriesAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_categories');
   useAdminPageMeta({ title: t('categories.page_title') });
   const toast = useToast();
 

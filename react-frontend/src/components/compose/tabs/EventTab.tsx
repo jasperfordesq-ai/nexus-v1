@@ -19,7 +19,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { TimeInput, type TimeInputValue, Button, Input, Textarea } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { PlaceAutocompleteInput } from '@/components/location';
+import { PlaceAutocompleteInput } from '@/components/location/PlaceAutocompleteInput';
 import { AiAssistButton } from '../shared/AiAssistButton';
 import { SdgGoalsPicker } from '../shared/SdgGoalsPicker';
 import { CharacterCount } from '../shared/CharacterCount';

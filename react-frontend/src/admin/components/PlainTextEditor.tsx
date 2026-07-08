@@ -27,7 +27,7 @@ const TOKENS = [
 ];
 
 export function PlainTextEditor({ value, onChange, isDisabled }: PlainTextEditorProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   const ref = useRef<HTMLTextAreaElement>(null);
 
   const insertToken = (token: string) => {

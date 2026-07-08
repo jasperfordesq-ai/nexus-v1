@@ -97,7 +97,7 @@ const getProgressColor = (pct: number): 'success' | 'warning' | 'danger' | 'defa
 };
 
 export default function VolunteerGivingDays() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_volunteering');
   usePageTitle(t('volunteering.giving_days_title'));
   const toast = useToast();
 

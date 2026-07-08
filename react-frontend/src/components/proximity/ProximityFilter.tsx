@@ -8,7 +8,8 @@ import { Select, SelectItem, Button } from '@/components/ui';
 // Coordinates come from the user's profile — no browser geolocation popup.
 
 import { useTranslation } from 'react-i18next';import MapPin from 'lucide-react/icons/map-pin';
-import { useAuth, useToast } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 
 export interface ProximityFilterParams {
   near_lat: number;

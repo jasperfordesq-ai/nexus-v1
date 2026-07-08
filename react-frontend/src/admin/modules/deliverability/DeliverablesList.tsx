@@ -40,7 +40,7 @@ interface DeliverableItem {
 
 export function DeliverablesList() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_deliverability');
   useAdminPageMeta({ title: tNav('deliverability') });
   const { tenantPath } = useTenant();
   const toast = useToast();

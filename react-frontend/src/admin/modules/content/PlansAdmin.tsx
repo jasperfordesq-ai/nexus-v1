@@ -40,7 +40,7 @@ const TIER_COLORS: Record<number, 'default' | 'primary' | 'secondary' | 'success
 const planPriceFormatter = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'EUR' });
 
 export function PlansAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   usePageTitle(t('content.plans_admin_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();

@@ -102,7 +102,7 @@ const editorTheme = {
 
 function LegalDocToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
   const [editor] = useLexicalComposerContext();
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_legal_editor');
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
@@ -478,7 +478,7 @@ function LegalDocToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
  */
 function LegalNoticePlugin() {
   const [editor] = useLexicalComposerContext();
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_legal_editor');
 
   useEffect(() => {
     return editor.registerCommand(
@@ -572,7 +572,7 @@ interface LegalDocEditorProps {
 }
 
 export function LegalDocEditor({ value, onChange, disabled = false, errorMessage }: LegalDocEditorProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_legal_editor');
   const [showPreview, setShowPreview] = useState(false);
 
   // Internal mirror of the current HTML — updated on every editor change so the

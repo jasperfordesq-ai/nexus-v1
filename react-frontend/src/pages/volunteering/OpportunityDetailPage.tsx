@@ -51,7 +51,7 @@ import { Helmet } from 'react-helmet-async';
 import { PageMeta } from '@/components/seo';
 import { LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
-import { SocialInteractionPanel } from '@/components/social';
+import { SocialInteractionPanel } from '@/components/social/SocialInteractionPanel';
 import { useAuth, useTenant } from '@/contexts';
 import { useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';

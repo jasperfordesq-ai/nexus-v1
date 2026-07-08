@@ -14,13 +14,13 @@ import { useCallback, useEffect, useState } from 'react';import { AnimatePresenc
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
 import { useSocialInteractions } from '@/hooks/useSocialInteractions';
 import { cn } from '@/lib/helpers';
 import { CommentsSection } from './CommentsSection';
 import { LikersModal } from './LikersModal';
 import { ShareButton } from './ShareButton';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 
 export interface SocialInteractionPanelProps {
   targetType: string;

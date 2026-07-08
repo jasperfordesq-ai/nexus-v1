@@ -119,7 +119,7 @@ const formatDate = (iso: string): string =>
 // ---------------------------------------------------------------------------
 
 export function GoalsAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_goals');
   usePageTitle(t('goals.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

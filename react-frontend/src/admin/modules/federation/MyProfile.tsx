@@ -48,7 +48,7 @@ interface FedTopic {
 }
 
 export function MyProfile() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
 
   const CATEGORY_LABELS: Record<string, string> = {
     care: t('federation.category_care'),

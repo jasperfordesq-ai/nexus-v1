@@ -512,5 +512,79 @@
   },
   "aria": {
     "breadcrumbs": "Pan rallado"
+  },
+  "shared": {
+    "loading": "Loading",
+    "help": "Ayuda",
+    "open_page_help": "Abrir ayuda de la p?gina",
+    "search": "Buscar...",
+    "refresh": "Refrescar",
+    "total_count": "{{count}}total",
+    "data_table": "Datos",
+    "select_all_rows": "Select all rows",
+    "no_data": "Sin datos",
+    "no_data_available": "No hay datos disponibles",
+    "select_row": "Select row {{id}}"
+  },
+  "help_drawer": {
+    "aria_label": "Ayuda: {{title}}",
+    "close_panel": "Cerrar panel de ayuda",
+    "how_to_use": "Cómo utilizar esta página",
+    "label": "Ayuda",
+    "related_pages": "Páginas relacionadas",
+    "tips": "Consejos y trampas"
+  },
+  "bulk": {
+    "selected_count": "{{count}} seleccionado",
+    "clear_selection": "Borrar selección",
+    "confirm_title": "Confirmar {{action}}",
+    "confirm_message": "¿Está seguro de que desea obtener artículos {{action}} {{count}}?",
+    "destructive_warning": "Esta acción no se puede deshacer.",
+    "reason_label": "Razón",
+    "reason_placeholder": "Proporcione una razón para esta acción."
+  },
+  "common": {
+    "cancel": "Cancelar"
+  },
+  "icon_picker": {
+    "choose_icon": "Elija el icono",
+    "choose_icon_placeholder": "Busque un icono...",
+    "clear_icon": "Icono Borrar",
+    "label": "Icono",
+    "no_icons_found": "No se encontraron iconos que coincidan con \"{{search}}\"",
+    "search_for_icon": "Busque un icono...",
+    "search_icons": "Iconos de búsqueda"
+  },
+  "visibility_rules": {
+    "min_role": "Rol mínimo",
+    "requires_auth": "Requiere autenticación",
+    "requires_feature": "Requiere característica",
+    "title": "Reglas de visibilidad",
+    "roles": {
+      "any": "Cualquiera",
+      "user": "Usuario",
+      "admin": "administrador",
+      "tenant_admin": "Administrador de inquilinos",
+      "super_admin": "Súper administrador"
+    },
+    "features": {
+      "none": "Ninguno",
+      "events": "Eventos",
+      "groups": "Grupos",
+      "gamification": "Gamificación",
+      "goals": "Metas",
+      "blog": "Blog",
+      "resources": "Recursos",
+      "volunteering": "voluntariado",
+      "exchange_workflow": "Flujo de trabajo de intercambio",
+      "organisations": "Organizaciones",
+      "federation": "Federación",
+      "connections": "Conexiones",
+      "reviews": "Reseñas",
+      "polls": "Encuestas",
+      "direct_messaging": "Mensajería directa",
+      "group_exchanges": "Intercambios grupales",
+      "search": "Buscar"
+    }
   }
 }

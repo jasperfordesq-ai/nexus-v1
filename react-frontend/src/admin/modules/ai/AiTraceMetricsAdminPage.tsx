@@ -47,7 +47,7 @@ interface Metrics {
 const WINDOWS = ['7', '30', '90'] as const;
 
 export default function AiTraceMetricsAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_ai');
   usePageTitle(t('ai.trace_metrics.meta.title'));
   const toast = useToast();
   const [days, setDays] = useState('30');

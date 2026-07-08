@@ -103,7 +103,7 @@ function todayISO(): string {
 // ---------------------------------------------------------------------------
 
 export default function MunicipalRoiAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('municipal_roi_page.meta.page_title'));
   const { showToast } = useToast();
 

@@ -82,7 +82,7 @@ function formatDate(value: string | null): string {
 }
 
 export default function ResearchPartnershipsAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('research_partnerships.meta.title'));
   const { showToast } = useToast();
 

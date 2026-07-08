@@ -38,14 +38,14 @@ import FileText from 'lucide-react/icons/file-text';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Languages from 'lucide-react/icons/languages';
 import MessageCircle from 'lucide-react/icons/message-circle';
-import { useToast,
-  useNotifications } from '@/contexts';
+import { useNotifications, useToast } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
-import { useAuth, usePresenceOptional, usePusherOptional, useTenant } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
+import { usePresenceOptional } from '@/contexts/PresenceContext';
+import { usePusherOptional, type NewMessageEvent, type TypingEvent } from '@/contexts/PusherContext';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
-import type { NewMessageEvent, TypingEvent } from '@/contexts';
 import { api, type ApiErrorDetail, type ApiResponse } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';

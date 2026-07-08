@@ -23,7 +23,7 @@ import { canModerateContent } from '@/lib/roles';
 import type { AdminFeedPost } from '@/admin/api/types';
 
 export default function FeedModeration() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_moderation');
   usePageTitle(t('moderation.page_title'));
 
   const POST_TYPES = [

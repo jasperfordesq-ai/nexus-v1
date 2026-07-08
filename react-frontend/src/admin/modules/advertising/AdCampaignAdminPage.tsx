@@ -159,7 +159,7 @@ const EMPTY_FORM: CreateCampaignForm = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function AdCampaignAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_advertising');
   usePageTitle(t('advertising.ad.page_title'));
   const toast = useToast();
 

@@ -18,6 +18,7 @@ import { LoadingScreen } from '@/components/feedback';
 import { SuperAdminRoute } from '@/admin/SuperAdminRoute';
 import { SuperAdminLayout } from './SuperAdminLayout';
 import { SuperAdminRoutes } from './SuperAdminRoutes';
+import './super-admin.css';
 
 function SuperAdminAppInner() {
   const { ready, t } = useTranslation(['super_admin', 'admin_nav']);

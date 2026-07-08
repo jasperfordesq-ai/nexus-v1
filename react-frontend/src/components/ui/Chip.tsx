@@ -4,11 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { type ElementType, type HTMLAttributes, type ReactNode } from 'react';
-import {
-  Chip as HeroUIChip,
-  CloseButton,
-  type ChipProps as HeroUIChipProps,
-} from '@heroui/react';
+import { Chip as HeroUIChip, type ChipProps as HeroUIChipProps } from '@heroui/react/chip';
+import { CloseButton } from '@heroui/react/close-button';
 import { useTranslation } from 'react-i18next';
 
 type V2ChipColor =

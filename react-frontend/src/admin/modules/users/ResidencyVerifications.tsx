@@ -61,7 +61,7 @@ const formatDate = (value?: string | null) =>
     : '—';
 
 export default function ResidencyVerifications() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_users');
   usePageTitle(t('residency_admin.page_title'));
   const { success, error } = useToast();
 

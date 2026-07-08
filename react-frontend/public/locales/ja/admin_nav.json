@@ -512,5 +512,79 @@
   },
   "aria": {
     "breadcrumbs": "ブレッドクラム"
+  },
+  "shared": {
+    "loading": "Loading",
+    "help": "???",
+    "open_page_help": "??????????",
+    "search": "検索...",
+    "refresh": "リフレッシュ",
+    "total_count": "{{count}}合計",
+    "data_table": "データ",
+    "select_all_rows": "Select all rows",
+    "no_data": "データなし",
+    "no_data_available": "利用可能なデータがありません",
+    "select_row": "Select row {{id}}"
+  },
+  "help_drawer": {
+    "aria_label": "ヘルプ: {{title}}",
+    "close_panel": "ヘルプパネルを閉じる",
+    "how_to_use": "このページの使い方",
+    "label": "ヘルプ",
+    "related_pages": "関連ページ",
+    "tips": "ヒントと注意点"
+  },
+  "bulk": {
+    "selected_count": "{{count}} が選択されました",
+    "clear_selection": "選択をクリア",
+    "confirm_title": "{{action}}を確認する",
+    "confirm_message": "{{action}} {{count}} アイテムを取得してもよろしいですか?",
+    "destructive_warning": "この操作は元に戻すことができません。",
+    "reason_label": "理由",
+    "reason_placeholder": "このアクションの理由を入力してください"
+  },
+  "common": {
+    "cancel": "キャンセル"
+  },
+  "icon_picker": {
+    "choose_icon": "アイコンを選択",
+    "choose_icon_placeholder": "アイコンを検索...",
+    "clear_icon": "クリアアイコン",
+    "label": "アイコン",
+    "no_icons_found": "「{{search}}」に一致するアイコンは見つかりませんでした",
+    "search_for_icon": "アイコンを検索...",
+    "search_icons": "検索アイコン"
+  },
+  "visibility_rules": {
+    "min_role": "最小の役割",
+    "requires_auth": "認証が必要です",
+    "requires_feature": "機能が必要です",
+    "title": "可視性ルール",
+    "roles": {
+      "any": "どれでも",
+      "user": "ユーザー",
+      "admin": "管理者",
+      "tenant_admin": "テナント管理者",
+      "super_admin": "スーパー管理者"
+    },
+    "features": {
+      "none": "なし",
+      "events": "イベント",
+      "groups": "グループ",
+      "gamification": "ゲーミフィケーション",
+      "goals": "目標",
+      "blog": "ブログ",
+      "resources": "リソース",
+      "volunteering": "ボランティア活動",
+      "exchange_workflow": "交換ワークフロー",
+      "organisations": "組織",
+      "federation": "連邦",
+      "connections": "接続",
+      "reviews": "レビュー",
+      "polls": "投票",
+      "direct_messaging": "ダイレクトメッセージング",
+      "group_exchanges": "グループ交流",
+      "search": "検索"
+    }
   }
 }

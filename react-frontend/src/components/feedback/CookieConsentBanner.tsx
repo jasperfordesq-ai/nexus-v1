@@ -14,8 +14,6 @@
  * - Preferences (theme, locale)
  */
 
-import { Card } from '@/components/ui';
-import { Button, Chip, Switch } from '@/components/ui';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -26,9 +24,13 @@ import Shield from 'lucide-react/icons/shield';
 import ExternalLink from 'lucide-react/icons/external-link';
 import { motion, AnimatePresence } from '@/lib/motion';
 import { useCookieConsent } from '@/contexts/CookieConsentContext';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
 import { useTranslation } from 'react-i18next';
-import { readStoredConsent } from '@/contexts/CookieConsentContext';
+import { readStoredConsent } from '@/lib/cookieConsentStorage';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Switch } from '@/components/ui/Switch';
 
 export function CookieConsentBanner() {
   const { showBanner, acceptAll, acceptEssentialOnly, savePreferences } = useCookieConsent();

@@ -16,9 +16,9 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
-import { PageMeta } from '@/components/seo';
-import { useTenant } from '@/contexts';
-import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
+import { useTenant } from '@/contexts/TenantContext';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';
 
 export function ForgotPasswordPage() {

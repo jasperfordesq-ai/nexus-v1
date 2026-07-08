@@ -166,7 +166,7 @@ const SUPPRESSION_REASONS = ['', 'bounce', 'block', 'invalid', 'spam_report', 'u
 const KNOWN_SUPPRESSION_REASONS = new Set(SUPPRESSION_REASONS.filter(Boolean));
 
 export default function EmailDeliverability() {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t } = useTranslation(['admin_advanced', 'common']);
   const confirm = useConfirm();
   usePageTitle(t('email_deliverability.title'));
   const toast = useToast();

@@ -104,7 +104,7 @@ function formatDate(dateStr: string | null): string {
 }
 
 export function SsoProviders() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   useAdminPageMeta({ title: t('sso.page_title') });
   const toast = useToast();
   const confirm = useConfirm();

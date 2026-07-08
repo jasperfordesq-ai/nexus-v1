@@ -13,7 +13,22 @@ import { useState, useMemo, useCallback, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
-import { Button, Checkbox, Chip, Spinner, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, type Selection, type SortDescriptor } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Checkbox } from '@/components/ui/Checkbox';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Pagination } from '@/components/ui/Pagination';
+import { Spinner } from '@/components/ui/Spinner';
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  type Selection,
+  type SortDescriptor,
+} from '@/components/ui/Table';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -80,7 +95,7 @@ export function DataTable<T extends Record<string, any>>({
   topContent,
   emptyContent,
 }: DataTableProps<T>) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_nav');
   const [searchValue, setSearchValue] = useState('');
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor | undefined>(undefined);
 

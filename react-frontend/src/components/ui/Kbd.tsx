@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Kbd as HeroUIKbd,
-  type KbdProps as HeroUIKbdProps,
-} from '@heroui/react';
+import { Kbd as HeroUIKbd, type KbdProps as HeroUIKbdProps } from '@heroui/react/kbd';
 
 export type KbdProps = HeroUIKbdProps;
 

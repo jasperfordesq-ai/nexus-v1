@@ -16,10 +16,11 @@
  *
  * Server sync:
  * - On save → fire-and-forget POST /api/cookie-consent
- * - On mount (if auth token exists) → fetch server consent, prefer most recent
+ * - After first paint/idle (if auth token exists) → fetch server consent, prefer most recent
  */
 
 import { createContext, use, useState, useCallback, useMemo, useEffect, useRef, type ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 import { api, tokenManager } from '@/lib/api';
 import {
   clearStoredConsent,
@@ -57,17 +58,53 @@ interface CookieConsentContextValue {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const AHREFS_ANALYTICS_KEY = 'dQCLnhFgNF6rOd6nvIEc9Q';
+const AHREFS_ANALYTICS_DELAY_MS = 30000;
+const SENTRY_ANALYTICS_DELAY_MS = 45000;
 
 let ahrefsAnalyticsLoading = false;
+let ahrefsAnalyticsScheduled = false;
+
+type IdleWindow = Window & {
+  requestIdleCallback?: (
+    callback: IdleRequestCallback,
+    options?: IdleRequestOptions,
+  ) => number;
+  cancelIdleCallback?: (handle: number) => void;
+};
+
+function isAuthEntryPath(pathname: string): boolean {
+  const normalizedPath = pathname.toLowerCase().replace(/\/+$/, '') || '/';
+  const segments = normalizedPath.split('/').filter(Boolean);
+  const candidatePaths = segments.map((_, index) => `/${segments.slice(index).join('/')}`);
+  const authPaths = new Set([
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/reset-password',
+    '/password/forgot',
+    '/password/reset',
+    '/verify-email',
+    '/verify-identity',
+    '/auth/oauth/callback',
+    '/oauth/callback',
+  ]);
+
+  return candidatePaths.some((candidate) => authPaths.has(candidate));
+}
 
 function loadAhrefsAnalytics(): void {
-  if (typeof document === 'undefined' || ahrefsAnalyticsLoading) return;
+  if (typeof document === 'undefined' || ahrefsAnalyticsLoading || ahrefsAnalyticsScheduled) return;
   if (document.querySelector('script[data-nexus-ahrefs="true"]')) {
     ahrefsAnalyticsLoading = true;
     return;
   }
 
   const appendScript = () => {
+    ahrefsAnalyticsScheduled = false;
+    if (document.querySelector('script[data-nexus-ahrefs="true"]')) {
+      ahrefsAnalyticsLoading = true;
+      return;
+    }
     const script = document.createElement('script');
     script.src = 'https://analytics.ahrefs.com/analytics.js';
     script.async = true;
@@ -77,11 +114,75 @@ function loadAhrefsAnalytics(): void {
     ahrefsAnalyticsLoading = true;
   };
 
+  ahrefsAnalyticsScheduled = true;
   if (typeof window.requestIdleCallback === 'function') {
     window.requestIdleCallback(appendScript, { timeout: 5000 });
   } else {
     globalThis.setTimeout(appendScript, 1500);
   }
+}
+
+function runAfterFirstPaintIdle(callback: () => void): () => void {
+  if (typeof window === 'undefined') {
+    callback();
+    return () => {};
+  }
+
+  let cancelled = false;
+  let firstFrame = 0;
+  let secondFrame = 0;
+  let timeoutHandle: number | null = null;
+  let idleHandle: number | null = null;
+
+  const run = () => {
+    if (!cancelled) {
+      callback();
+    }
+  };
+
+  const scheduleIdle = () => {
+    const idleWindow = window as IdleWindow;
+    if (typeof idleWindow.requestIdleCallback === 'function') {
+      idleHandle = idleWindow.requestIdleCallback(run, { timeout: 5000 });
+      return;
+    }
+
+    timeoutHandle = window.setTimeout(run, 1500);
+  };
+
+  firstFrame = window.requestAnimationFrame(() => {
+    secondFrame = window.requestAnimationFrame(scheduleIdle);
+  });
+
+  return () => {
+    cancelled = true;
+    window.cancelAnimationFrame(firstFrame);
+    window.cancelAnimationFrame(secondFrame);
+    if (timeoutHandle !== null) {
+      window.clearTimeout(timeoutHandle);
+    }
+    if (idleHandle !== null) {
+      const idleWindow = window as IdleWindow;
+      idleWindow.cancelIdleCallback?.(idleHandle);
+    }
+  };
+}
+
+function runAfterDelayedIdle(callback: () => void, delayMs: number): () => void {
+  if (typeof window === 'undefined') {
+    callback();
+    return () => {};
+  }
+
+  let cancelIdle: (() => void) | null = null;
+  const timeoutHandle = window.setTimeout(() => {
+    cancelIdle = runAfterFirstPaintIdle(callback);
+  }, delayMs);
+
+  return () => {
+    window.clearTimeout(timeoutHandle);
+    cancelIdle?.();
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -145,9 +246,9 @@ async function fetchServerConsent(): Promise<CookieConsent | null> {
 const CookieConsentContext = createContext<CookieConsentContextValue | null>(null);
 
 export function CookieConsentProvider({ children }: { children: ReactNode }) {
+  const location = useLocation();
   const [consent, setConsent] = useState<CookieConsent | null>(() => readStoredConsent());
 
-  const prevAnalytics = useRef(consent?.analytics ?? false);
   const serverSyncDone = useRef(false);
 
   const persist = useCallback((newConsent: CookieConsent) => {
@@ -156,7 +257,9 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
     syncConsentToServer(newConsent);
   }, []);
 
-  // On mount: if authenticated and no local consent, try to restore from server
+  // On mount: if authenticated, restore server consent after first paint/idle.
+  // Consent is useful across devices, but the read is non-critical and should
+  // not compete with login/register or first app-route rendering.
   useEffect(() => {
     if (serverSyncDone.current) return;
     serverSyncDone.current = true;
@@ -164,35 +267,41 @@ export function CookieConsentProvider({ children }: { children: ReactNode }) {
     if (!tokenManager.getAccessToken()) return;
 
     const localConsent = readStoredConsent();
-    fetchServerConsent().then((serverConsent) => {
-      if (!serverConsent) return;
+    return runAfterFirstPaintIdle(() => {
+      fetchServerConsent().then((serverConsent) => {
+        if (!serverConsent) return;
 
-      // If no local consent, use server consent (e.g. new device)
-      if (!localConsent) {
-        setConsent(serverConsent);
-        writeStoredConsent(serverConsent);
-        return;
-      }
+        // If no local consent, use server consent (e.g. new device)
+        if (!localConsent) {
+          setConsent(serverConsent);
+          writeStoredConsent(serverConsent);
+          return;
+        }
 
-      // If server consent is newer, prefer it
-      const localTime = new Date(localConsent.timestamp).getTime();
-      const serverTime = new Date(serverConsent.timestamp).getTime();
-      if (serverTime > localTime) {
-        setConsent(serverConsent);
-        writeStoredConsent(serverConsent);
-      }
+        // If server consent is newer, prefer it
+        const localTime = new Date(localConsent.timestamp).getTime();
+        const serverTime = new Date(serverConsent.timestamp).getTime();
+        if (serverTime > localTime) {
+          setConsent(serverConsent);
+          writeStoredConsent(serverConsent);
+        }
+      });
     });
   }, []);
 
   useEffect(() => {
-    if (consent?.analytics) {
-      loadAhrefsAnalytics();
-      if (!prevAnalytics.current) {
+    if (consent?.analytics && !isAuthEntryPath(location.pathname)) {
+      const cancelAhrefs = runAfterDelayedIdle(loadAhrefsAnalytics, AHREFS_ANALYTICS_DELAY_MS);
+      const cancelSentry = runAfterDelayedIdle(() => {
         void import('@/lib/sentry').then(({ initSentryAfterIdle }) => initSentryAfterIdle());
-      }
+      }, SENTRY_ANALYTICS_DELAY_MS);
+
+      return () => {
+        cancelAhrefs();
+        cancelSentry();
+      };
     }
-    prevAnalytics.current = consent?.analytics ?? false;
-  }, [consent?.analytics]);
+  }, [consent?.analytics, location.pathname]);
 
   const acceptAll = useCallback(() => {
     persist({

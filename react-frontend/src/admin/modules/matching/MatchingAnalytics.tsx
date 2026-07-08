@@ -85,7 +85,7 @@ const PILLAR_LABEL_KEYS: Record<string, string> = {
 };
 
 export function MatchingAnalytics() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_matching');
   usePageTitle(t('matching.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();

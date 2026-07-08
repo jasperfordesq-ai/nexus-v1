@@ -7,7 +7,7 @@ import {
   type ComponentPropsWithoutRef,
   type ReactNode,
 } from 'react';
-import { Tooltip as HeroUITooltip } from '@heroui/react';
+import { Tooltip as HeroUITooltip } from '@heroui/react/tooltip';
 
 type HeroUITooltipProps = ComponentPropsWithoutRef<typeof HeroUITooltip>;
 type HeroUITooltipContentProps = ComponentPropsWithoutRef<typeof HeroUITooltip.Content>;

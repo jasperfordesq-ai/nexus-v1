@@ -1,0 +1,180 @@
+{
+  "common": {
+    "an_unexpected_error": "Une erreur inattendue s'est produite",
+    "back": "Retour",
+    "cancel": "Annuler",
+    "critical": "Critique",
+    "delete": "Supprimer",
+    "feature": "Caractéristique",
+    "high": "Élevé",
+    "in_progress": "En cours",
+    "in_review": "En revue",
+    "low": "Faible",
+    "medium": "Moyen",
+    "planned": "Prévu",
+    "refresh": "Actualiser",
+    "unexpected_error": "Erreur inattendue",
+    "unknown": "Inconnu",
+    "unfeature": "Inutilité",
+    "actions": "Actions",
+    "active": "Actif",
+    "all": "Tout",
+    "approved": "Approuvé",
+    "clear": "Effacer",
+    "clear_filters": "Effacer les filtres",
+    "clear_selection": "Effacer la sélection",
+    "close": "Fermer",
+    "collapse": "Réduire",
+    "confirm": "Confirmer",
+    "create": "Créer",
+    "declined": "Refusé",
+    "download": "Télécharger",
+    "edit": "Modifier",
+    "error_loading_data": "Erreur de chargement des données",
+    "expand": "Développer",
+    "export": "Exporter",
+    "load_more": "Charger plus",
+    "loading": "Chargement",
+    "next": "Suivant",
+    "no": "Non",
+    "ok": "OK",
+    "pending": "En attente",
+    "previous": "Précédent",
+    "retry": "Réessayer",
+    "save": "Enregistrer",
+    "select_all": "Sélectionner tout",
+    "select_item": "Sélectionner un article",
+    "yes": "Oui"
+  },
+  "shared": {
+    "broker_actions": "Actions des courtiers",
+    "content": "Contenu",
+    "core_module": "Module de base",
+    "document_details": "Détails du document",
+    "history": "Histoire",
+    "log_file_empty": "Aucun fichier journal trouvé",
+    "no": "Non",
+    "no_history_available": "Aucun historique disponible trouvé",
+    "no_legal_documents_found": "Aucun document juridique trouvé",
+    "no_members_found": "Aucun membre trouvé trouvé",
+    "loading": "Loading",
+    "no_data": "Aucune donnée",
+    "no_data_available": "Aucune donnée disponible",
+    "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
+    "open_page_help": "Ouvrir la page d'aide",
+    "help": "Aide",
+    "quick_access": "Accès rapide",
+    "recent_activity": "Activité récente",
+    "refresh": "Rafraîchir",
+    "search": "Recherche...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Données",
+    "total_count": "{{count}}total"
+  },
+  "api_partners": {
+    "meta": {
+      "title": "Partenaires API"
+    },
+    "header": {
+      "title": "Partenaires API",
+      "description": "Donnez à des systèmes externes approuvés, comme un système bancaire ou municipal, des clés d'accès sécurisées à vos données NEXUS. Pour vous connecter à une autre plateforme de banque de temps, utilisez plutôt des partenaires de protocole externes."
+    },
+    "actions": {
+      "activate": "Activer",
+      "cancel": "Annuler",
+      "close": "Fermer",
+      "new_partner": "Nouveau partenaire",
+      "regenerate_credentials": "Régénérer les identifiants",
+      "suspend": "Suspendre",
+      "view_call_log": "Afficher le journal des appels"
+    },
+    "call_log": {
+      "table_aria": "Appels récents",
+      "columns": {
+        "duration": "Durée",
+        "method": "Méthode",
+        "path": "Chemin",
+        "status": "Statut",
+        "when": "Quand"
+      }
+    },
+    "columns": {
+      "actions": "Actes",
+      "name": "Nom",
+      "rate_limit": "Limite de taux",
+      "sandbox": "Bac à sable",
+      "scopes": "Portées",
+      "slug": "Limace",
+      "status": "Statut"
+    },
+    "common": {
+      "any": "n'importe lequel",
+      "empty_dash": "—",
+      "milliseconds": "{{value}} ms",
+      "no": "Non",
+      "per_minute": "{{value}}/min",
+      "yes": "Oui"
+    },
+    "confirm": {
+      "regenerate_credentials": "Créer de nouvelles clés d'accès pour ce partenaire ? Les anciennes clés cessent de fonctionner immédiatement — vous devrez partager les nouvelles avec le partenaire."
+    },
+    "create_modal": {
+      "allowed_scopes": "Portées autorisées",
+      "contact_email": "E-mail de contact",
+      "contact_email_placeholder": "Integrations@partner.example",
+      "description": "Descriptif",
+      "name": "Nom",
+      "name_placeholder": "par ex. PostFinance Switzerland",
+      "rate_limit": "Limite de débit (requêtes / minute)",
+      "sandbox_mode": "Mode Sandbox (test) : le partenaire peut afficher les données mais ne peut rien modifier",
+      "submit": "Créer et émettre des informations d'identification",
+      "title": "Nouveau partenaire API"
+    },
+    "credentials_modal": {
+      "client_id": "client_id",
+      "client_secret": "client_secret",
+      "copy_client_id": "Copier client_id",
+      "copy_client_secret": "Copier client_secret",
+      "saved_button": "Je les ai sauvegardés",
+      "title": "Identifiants client émis",
+      "warning_body": "La clé secrète n'est affichée qu'une seule fois. Partagez ces deux valeurs avec votre partenaire en privé et en toute sécurité, jamais dans une discussion publique ou dans un document partagé.",
+      "warning_title": "Enregistrez-les maintenant."
+    },
+    "detail": {
+      "call_log_tab": "Journal des appels",
+      "contact": "Contacter :",
+      "info_tab": "Informations",
+      "ip_allowlist": "Liste verte IP :",
+      "rate_limit": "Limite de taux :",
+      "sandbox": "Bac à sable :",
+      "scopes": "Portées :",
+      "status": "Statut:",
+      "tabs_aria": "Onglets de détails du partenaire"
+    },
+    "empty": {
+      "no_calls": "Aucun appel pour l'instant.",
+      "no_partners": "Aucun système partenaire connecté pour l'instant. Ajoutez-en un pour créer ses clés d'accès."
+    },
+    "status": {
+      "active": "Actif",
+      "pending": "En attente",
+      "suspended": "Suspendu"
+    },
+    "toasts": {
+      "activate_failed": "Échec de l'activation",
+      "activated": "Partenaire activé",
+      "copied": "{{label}} copié",
+      "copy_failed": "Échec de la copie – copier manuellement",
+      "create_failed": "Échec de la création",
+      "load_failed": "Échec du chargement des partenaires",
+      "name_required": "Le nom est requis",
+      "regenerate_failed": "Échec de la régénération",
+      "suspend_failed": "Échec de la suspension",
+      "suspended": "Partenaire suspendu"
+    },
+    "table": {
+      "aria": "Partenaires API"
+    }
+  }
+}

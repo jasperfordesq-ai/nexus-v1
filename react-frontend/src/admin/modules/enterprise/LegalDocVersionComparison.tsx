@@ -28,7 +28,7 @@ export default function LegalDocVersionComparison({
   version2Id,
   onClose,
 }: LegalDocVersionComparisonProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   const { error } = useToast();
 
   const [comparison, setComparison] = useState<VersionComparison | null>(null);

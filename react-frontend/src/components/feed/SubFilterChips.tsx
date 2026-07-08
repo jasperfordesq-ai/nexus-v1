@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useTranslation } from 'react-i18next';
-import type { Key } from '@heroui/react';
+import type { Key } from '@heroui/react/rac';
 import { TagGroup, Tag } from '@/components/ui/TagGroup';
 
 interface SubFilterChipsProps {

@@ -65,7 +65,7 @@ const formatLevel = (level: string): string => {
 };
 
 export function VerificationReviewQueue() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   const toast = useToast();
   const [sessions, setSessions] = useState<PendingSession[]>([]);
   const [loading, setLoading] = useState(true);

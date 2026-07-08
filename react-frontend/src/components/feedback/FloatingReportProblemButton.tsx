@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { ReportProblemButton } from '@/components/feedback/ReportProblemButton';
-import { useAuth } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function FloatingReportProblemButton() {
   const { isAuthenticated } = useAuth();

@@ -41,7 +41,7 @@ interface TierRowProps {
 }
 
 function TierRow({ tierName, criteria, onChange }: TierRowProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
 
   return (
     <div className="space-y-3">
@@ -83,7 +83,7 @@ function TierRow({ tierName, criteria, onChange }: TierRowProps) {
 }
 
 export function TrustTierAdminPage() {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t } = useTranslation(['admin_caring_community', 'common']);
   const confirm = useConfirm();
   usePageTitle(t('panel.sidebar.items.trust_tier'));
   useAdminPageMeta({

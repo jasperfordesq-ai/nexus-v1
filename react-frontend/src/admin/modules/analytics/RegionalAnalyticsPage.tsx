@@ -512,7 +512,7 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function RegionalAnalyticsPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_analytics');
   usePageTitle(t('analytics.regional.meta.title'));
   useAdminPageMeta({
     title: t('analytics.regional.meta.title'),

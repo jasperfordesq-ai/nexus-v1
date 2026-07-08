@@ -32,7 +32,7 @@ import type { CronLog } from '../../api/types';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CronJobLogs() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   usePageTitle(t('system.cron_job_logs_title'));
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();

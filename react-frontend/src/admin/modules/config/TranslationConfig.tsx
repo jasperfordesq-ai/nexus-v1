@@ -95,7 +95,7 @@ const CONFIG_KEYS: Record<string, { labelKey: string; descKey: string }> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function TranslationConfig() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_config');
   usePageTitle(t('config.translation_settings_title'));
   const toast = useToast();
 

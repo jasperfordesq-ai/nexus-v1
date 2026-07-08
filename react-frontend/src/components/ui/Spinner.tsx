@@ -4,10 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { type HTMLAttributes, type ReactNode } from 'react';
-import {
-  Spinner as HeroUISpinner,
-  type SpinnerProps as HeroUISpinnerProps,
-} from '@heroui/react';
+import { Spinner as HeroUISpinner, type SpinnerProps as HeroUISpinnerProps } from '@heroui/react/spinner';
 import { useTranslation } from 'react-i18next';
 
 type V2SpinnerColor =

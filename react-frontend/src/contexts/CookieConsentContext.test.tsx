@@ -9,7 +9,11 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { CookieConsentProvider, useCookieConsent, readStoredConsent } from './CookieConsentContext';
+import { api, tokenManager } from '@/lib/api';
+
+const initSentryAfterIdleMock = vi.fn();
 
 // Mock api module
 vi.mock('@/lib/api', () => ({
@@ -20,6 +24,10 @@ vi.mock('@/lib/api', () => ({
   tokenManager: {
     getAccessToken: vi.fn().mockReturnValue(null),
   },
+}));
+
+vi.mock('@/lib/sentry', () => ({
+  initSentryAfterIdle: initSentryAfterIdleMock,
 }));
 
 const STORAGE_KEY = 'nexus_cookie_consent';
@@ -43,9 +51,22 @@ function TestConsumer() {
   );
 }
 
+function renderWithProvider(initialEntry = '/dashboard') {
+  return render(
+    <MemoryRouter initialEntries={[initialEntry]}>
+      <CookieConsentProvider>
+        <TestConsumer />
+      </CookieConsentProvider>
+    </MemoryRouter>
+  );
+}
+
 describe('CookieConsentContext', () => {
   beforeEach(() => {
     localStorage.clear();
+    initSentryAfterIdleMock.mockClear();
+    vi.mocked(api.get).mockClear();
+    vi.mocked(tokenManager.getAccessToken).mockReturnValue(null);
     vi.useFakeTimers({ shouldAdvanceTime: true });
   });
 
@@ -54,22 +75,14 @@ describe('CookieConsentContext', () => {
   });
 
   it('shows banner when no consent stored', () => {
-    render(
-      <CookieConsentProvider>
-        <TestConsumer />
-      </CookieConsentProvider>
-    );
+    renderWithProvider();
 
     expect(screen.getByTestId('show-banner')).toHaveTextContent('true');
     expect(screen.getByTestId('consent')).toHaveTextContent('null');
   });
 
   it('hides banner after accepting all', () => {
-    render(
-      <CookieConsentProvider>
-        <TestConsumer />
-      </CookieConsentProvider>
-    );
+    renderWithProvider();
 
     act(() => {
       screen.getByRole('button', { name: 'Accept All' }).click();
@@ -81,11 +94,7 @@ describe('CookieConsentContext', () => {
   });
 
   it('sets analytics=false and preferences=false on essential only', () => {
-    render(
-      <CookieConsentProvider>
-        <TestConsumer />
-      </CookieConsentProvider>
-    );
+    renderWithProvider();
 
     act(() => {
       screen.getByRole('button', { name: 'Essential Only' }).click();
@@ -97,11 +106,7 @@ describe('CookieConsentContext', () => {
   });
 
   it('saves custom preferences', () => {
-    render(
-      <CookieConsentProvider>
-        <TestConsumer />
-      </CookieConsentProvider>
-    );
+    renderWithProvider();
 
     act(() => {
       screen.getByRole('button', { name: 'Custom Save' }).click();
@@ -112,11 +117,7 @@ describe('CookieConsentContext', () => {
   });
 
   it('persists consent to localStorage', () => {
-    render(
-      <CookieConsentProvider>
-        <TestConsumer />
-      </CookieConsentProvider>
-    );
+    renderWithProvider();
 
     act(() => {
       screen.getByRole('button', { name: 'Accept All' }).click();
@@ -139,11 +140,7 @@ describe('CookieConsentContext', () => {
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
 
-    render(
-      <CookieConsentProvider>
-        <TestConsumer />
-      </CookieConsentProvider>
-    );
+    renderWithProvider();
 
     expect(screen.getByTestId('show-banner')).toHaveTextContent('false');
     expect(screen.getByTestId('has-analytics')).toHaveTextContent('true');
@@ -159,11 +156,7 @@ describe('CookieConsentContext', () => {
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
 
-    render(
-      <CookieConsentProvider>
-        <TestConsumer />
-      </CookieConsentProvider>
-    );
+    renderWithProvider();
 
     expect(screen.getByTestId('show-banner')).toHaveTextContent('false');
 
@@ -183,6 +176,76 @@ describe('CookieConsentContext', () => {
     }).toThrow('useCookieConsent must be used within CookieConsentProvider');
 
     spy.mockRestore();
+  });
+
+  it.each([
+    '/login',
+    '/hour-timebank/login',
+    '/hour-timebank/register',
+    '/hour-timebank/password/forgot',
+    '/hour-timebank/password/reset',
+    '/hour-timebank/verify-email',
+    '/hour-timebank/verify-identity',
+    '/hour-timebank/auth/oauth/callback',
+  ])('does not initialize optional analytics on auth entry route %s', async (authPath) => {
+    const consent = {
+      essential: true,
+      analytics: true,
+      preferences: true,
+      timestamp: new Date().toISOString(),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
+
+    renderWithProvider(authPath);
+
+    await vi.dynamicImportSettled();
+    expect(initSentryAfterIdleMock).not.toHaveBeenCalled();
+  });
+
+  it('initializes optional analytics on non-auth routes when consent is stored', async () => {
+    const consent = {
+      essential: true,
+      analytics: true,
+      preferences: true,
+      timestamp: new Date().toISOString(),
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
+
+    renderWithProvider('/hour-timebank/listings');
+
+    await vi.dynamicImportSettled();
+    expect(initSentryAfterIdleMock).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(52000);
+    });
+
+    await vi.dynamicImportSettled();
+    expect(initSentryAfterIdleMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('defers authenticated server consent restore until after idle', async () => {
+    vi.mocked(tokenManager.getAccessToken).mockReturnValue('token');
+    vi.mocked(api.get).mockResolvedValueOnce({
+      success: true,
+      data: {
+        consent: {
+          analytics: true,
+          functional: false,
+          created_at: new Date().toISOString(),
+        },
+      },
+    });
+
+    renderWithProvider('/hour-timebank/dashboard');
+
+    expect(api.get).not.toHaveBeenCalledWith('/cookie-consent');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(6000);
+    });
+
+    expect(api.get).toHaveBeenCalledWith('/cookie-consent');
   });
 });
 

@@ -112,7 +112,7 @@ const TRIGGER_KEYS = [
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function SafeguardingOptionsAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_safeguarding');
   usePageTitle(t('safeguarding.options_page_title'));
   const toast = useToast();
 
@@ -503,7 +503,7 @@ function OptionCard({
   onEdit: () => void;
   onDelete: () => void;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_safeguarding');
   const triggers = option.triggers || {};
   const activeTriggers = Object.entries(triggers).filter(
     ([k, v]) => v === true && k in TRIGGER_I18N_KEY

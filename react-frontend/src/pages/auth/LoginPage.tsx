@@ -36,18 +36,15 @@ import Fingerprint from 'lucide-react/icons/fingerprint';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import ShieldX from 'lucide-react/icons/shield-x';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useTenant, useToast } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
+import { useToast } from '@/contexts/ToastContext';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
 import { SsoButtons } from '@/components/auth/SsoButtons';
-import { PageMeta } from '@/components/seo';
-import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { api, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import {
-  isBiometricAvailable,
-  isConditionalMediationAvailable,
-  startConditionalAuthentication,
-} from '@/lib/webauthn';
 
 interface Tenant {
   id: number;
@@ -56,6 +53,10 @@ interface Tenant {
   domain?: string;
   tagline?: string;
   logo_url?: string;
+}
+
+function browserHasPasskeyApi(): boolean {
+  return typeof window !== 'undefined' && 'PublicKeyCredential' in window;
 }
 
 export function LoginPage() {
@@ -104,9 +105,10 @@ export function LoginPage() {
   const [resendVerificationSent, setResendVerificationSent] = useState(false);
 
   // Passkey login state
-  const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [biometricAvailable, setBiometricAvailable] = useState(browserHasPasskeyApi);
   const [biometricLoading, setBiometricLoading] = useState(false);
   const conditionalAbortRef = useRef<AbortController | null>(null);
+  const conditionalStartedRef = useRef(false);
 
   // Redirect after successful login (preserve tenant slug prefix)
   const from = (location.state as { from?: string })?.from || tenantPath('/feed');
@@ -116,16 +118,26 @@ export function LoginPage() {
     tokenManager.clearTokens();
   }, []);
 
-  // Check if passkey login is available on this device
-  useEffect(() => {
-    isBiometricAvailable().then(setBiometricAvailable).catch(() => setBiometricAvailable(false));
-  }, []);
-
-  // Start conditional mediation (passkey autofill) when a tenant is selected
+  // Start conditional mediation (passkey autofill) after the user focuses the
+  // email field. Loading SimpleWebAuthn on mount was competing with login paint.
   const startConditionalAuth = useCallback(async () => {
+    if (conditionalStartedRef.current) return;
     if (!selectedTenantId) return;
+    if (!browserHasPasskeyApi()) {
+      setBiometricAvailable(false);
+      return;
+    }
+
+    conditionalStartedRef.current = true;
+    const {
+      isConditionalMediationAvailable,
+      startConditionalAuthentication,
+    } = await import('@/lib/webauthn');
     const supported = await isConditionalMediationAvailable();
-    if (!supported) return;
+    if (!supported) {
+      setBiometricAvailable(false);
+      return;
+    }
 
     // Abort any previous conditional auth
     conditionalAbortRef.current?.abort();
@@ -145,17 +157,10 @@ export function LoginPage() {
   }, [selectedTenantId, from]);
 
   useEffect(() => {
-    // Deferred one tick: StrictMode's synchronous mount→unmount→mount must
-    // net out to ONE challenge POST and ONE pending credential request, not
-    // two stacked ones.
-    const timer = window.setTimeout(() => {
-      startConditionalAuth();
-    }, 0);
     return () => {
-      window.clearTimeout(timer);
       conditionalAbortRef.current?.abort();
     };
-  }, [startConditionalAuth]);
+  }, []);
 
   // Tenant is "resolved from URL" only when there's an explicit URL slug or
   // the hostname is a custom tenant domain (not the generic app.* domain).
@@ -531,6 +536,7 @@ export function LoginPage() {
                       placeholder={t('login.email_placeholder')}
                       value={email}
                       onChange={(e) => { setEmail(e.target.value); setLoginErrorCode(undefined); setLoginRetryAfter(null); }}
+                      onFocus={() => { void startConditionalAuth(); }}
                       startContent={<Mail className="w-4 h-4 text-theme-subtle" />}
                       isRequired
                       autoComplete="email webauthn"

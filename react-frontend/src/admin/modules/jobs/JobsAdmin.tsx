@@ -53,7 +53,7 @@ const APPLICATION_STAGE_KEYS = ['applied', 'pending', 'screening', 'reviewed', '
 interface ApplicationCardProps { application: Application; onStatusUpdate: (appId: number, status: string, notes: string) => Promise<void>; }
 
 function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_jobs');
   const [expanded, setExpanded] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(application.status);
@@ -210,7 +210,7 @@ function ApplicationsPanel({
 }
 
 export function JobsAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_jobs');
   usePageTitle(t('jobs.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

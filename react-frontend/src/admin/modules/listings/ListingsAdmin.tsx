@@ -43,7 +43,7 @@ const typeColors: Record<string, 'primary' | 'secondary' | 'success' | 'warning'
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FeaturedListingsPanel() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_listings');
   const toast = useToast();
 
   const [featured, setFeatured] = useState<FeaturedListing[]>([]);
@@ -302,7 +302,7 @@ function FeaturedListingsPanel() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ListingsAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_listings');
   useAdminPageMeta({
     title: t('listings.listings_admin_title'),
     description: t('listings.listings_admin_desc'),

@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  TextField as HeroUITextField,
-  type TextField as HeroUITextFieldTypes,
-} from '@heroui/react';
+import { TextField as HeroUITextField, type TextField as HeroUITextFieldTypes } from '@heroui/react/textfield';
 
 export type TextFieldProps = HeroUITextFieldTypes['Props'];
 export const TextField = HeroUITextField;

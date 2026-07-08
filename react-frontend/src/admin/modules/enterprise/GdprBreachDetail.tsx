@@ -58,7 +58,7 @@ const formatCountdown = (ms: number): string => {
 };
 
 export function GdprBreachDetail() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   const { id } = useParams();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();

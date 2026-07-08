@@ -53,7 +53,7 @@ interface PackResponse {
 }
 
 export default function DisclosurePackAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('disclosure_pack.meta.page_title'));
   const { showToast } = useToast();
 

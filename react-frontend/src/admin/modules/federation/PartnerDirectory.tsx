@@ -103,7 +103,7 @@ const enabledFeatures = (community: Community): string[] => {
 };
 
 export function PartnerDirectory() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   usePageTitle(t('federation.page_title'));
   const toast = useToast();
 

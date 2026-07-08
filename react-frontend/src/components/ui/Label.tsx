@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Label as HeroUILabel,
-  type Label as HeroUILabelTypes,
-} from '@heroui/react';
+import { Label as HeroUILabel, type Label as HeroUILabelTypes } from '@heroui/react/label';
 
 export type LabelProps = HeroUILabelTypes['Props'];
 export const Label = HeroUILabel;

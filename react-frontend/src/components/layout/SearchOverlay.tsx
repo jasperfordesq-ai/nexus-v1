@@ -14,7 +14,8 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { FocusScope } from '@react-aria/focus';
-import { useNavigate } from 'react-router-dom';import Search from 'lucide-react/icons/search';
+import { useNavigate } from 'react-router-dom';
+import Search from 'lucide-react/icons/search';
 import X from 'lucide-react/icons/x';
 import ListTodo from 'lucide-react/icons/list-todo';
 import Calendar from 'lucide-react/icons/calendar';
@@ -26,10 +27,13 @@ import HelpCircle from 'lucide-react/icons/circle-help';
 import Clock from 'lucide-react/icons/clock';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useTenant, useTheme } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { api } from '@/lib/api';
 import { safeLocalStorageGetJSON, safeLocalStorageSetJSON, safeLocalStorageRemove } from '@/lib/safeStorage';
-import { Button, Kbd } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Kbd } from '@/components/ui/Kbd';
 
 const RECENT_SEARCHES_KEY = 'nexus_recent_searches';
 

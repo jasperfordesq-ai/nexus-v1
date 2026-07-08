@@ -40,7 +40,7 @@ import Video from 'lucide-react/icons/video';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
-import { PlaceAutocompleteInput } from '@/components/location';
+import { PlaceAutocompleteInput } from '@/components/location/PlaceAutocompleteInput';
 import { useToast, useTenant } from '@/contexts';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';

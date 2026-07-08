@@ -17,10 +17,9 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ScrollShadow } from '@/components/ui';
+import { ScrollShadow } from '@/components/ui/ScrollShadow';
 import { useAuth,
   useTenant } from '@/contexts';
-import { api } from '@/lib/api';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import Users from 'lucide-react/icons/users';
 import ListChecks from 'lucide-react/icons/list-checks';
@@ -85,9 +84,11 @@ import BellRing from 'lucide-react/icons/bell-ring';
 import Bug from 'lucide-react/icons/bug';
 import HelpCircle from 'lucide-react/icons/help-circle';
 import HandCoins from 'lucide-react/icons/hand-coins';
+import { Accordion, AccordionItem } from '@/components/ui/Accordion';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Tooltip } from '@/components/ui/Tooltip';
 import type { LucideIcon } from 'lucide-react';
-
-import { Accordion, AccordionItem, Button, Input, Tooltip } from '@/components/ui';
 interface NavItem {
   label: string;
   href: string;

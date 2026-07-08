@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { ComponentProps, ElementType } from 'react';
-import { ScrollShadow as HeroUIScrollShadow } from '@heroui/react';
+import { ScrollShadow as HeroUIScrollShadow } from '@heroui/react/scroll-shadow';
 
 type HeroUIScrollShadowProps = ComponentProps<typeof HeroUIScrollShadow>;
 

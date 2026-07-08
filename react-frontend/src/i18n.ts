@@ -9,6 +9,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import ChainedBackend from 'i18next-chained-backend';
 import HttpBackend from 'i18next-http-backend';
 import LocalStorageBackend from 'i18next-localstorage-backend';
+import { queueSentryMessage } from '@/lib/telemetryQueue';
 
 export const SUPPORTED_LOCALE_CODES = [
   'ar',
@@ -32,6 +33,7 @@ const STRICT_MISSING_KEY_STORAGE_KEY = 'nexus_i18n_strict_missing_keys';
 const isVitest = import.meta.env.MODE === 'test' || Boolean(import.meta.env.VITEST);
 const isInteractiveDev = import.meta.env.DEV && !isVitest;
 const localeBackends = import.meta.env.DEV ? [HttpBackend] : [LocalStorageBackend, HttpBackend];
+const PRODUCTION_LOCALE_CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 const localeBackendOptions = import.meta.env.DEV
   ? [
       {
@@ -42,7 +44,7 @@ const localeBackendOptions = import.meta.env.DEV
     ]
   : [
       {
-        expirationTime: 60 * 60 * 1000,
+        expirationTime: PRODUCTION_LOCALE_CACHE_TTL_MS,
         prefix: `i18n_${__BUILD_COMMIT__}_`,
       },
       {
@@ -61,11 +63,7 @@ const I18N_CACHE_PREFIX = `i18n_${__BUILD_COMMIT__}_`;
 const STARTUP_NAMESPACES = [
   'common',
   'auth',
-  'broker',
   'errors',
-  'legal',
-  'public',
-  'settings',
   'utility',
 ] as const;
 
@@ -99,9 +97,7 @@ const isStrictMissingKeyMode = () => {
 };
 
 const captureMissingKeyWarning = (identifier: string) => {
-  void import('@/lib/sentry').then(({ captureSentryMessage }) => {
-    captureSentryMessage(`[i18n] Missing translation key: ${identifier}`, 'warning');
-  });
+  queueSentryMessage(`[i18n] Missing translation key: ${identifier}`, 'warning');
 };
 
 const reportMissingKey = (identifier: string) => {

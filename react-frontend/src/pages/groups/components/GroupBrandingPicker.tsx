@@ -17,14 +17,12 @@ import { GlassCard } from '@/components/ui/GlassCard';
 
 import { useState, useCallback, type ReactNode } from 'react';
 import Paintbrush from 'lucide-react/icons/paintbrush';
-import {
-  ColorArea,
-  ColorField,
-  ColorSlider,
-  ColorSwatch,
-  Label,
-  parseColor,
-} from '@heroui/react';
+import { ColorArea } from '@heroui/react/color-area';
+import { ColorField } from '@heroui/react/color-field';
+import { ColorSlider } from '@heroui/react/color-slider';
+import { ColorSwatch } from '@heroui/react/color-swatch';
+import { Label } from '@heroui/react/label';
+import { parseColor } from '@heroui/react/rac';
 import { useTranslation } from 'react-i18next';
 
 interface GroupBrandingPickerProps {

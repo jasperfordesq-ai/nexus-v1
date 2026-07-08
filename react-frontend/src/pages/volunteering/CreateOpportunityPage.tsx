@@ -31,7 +31,7 @@ import Briefcase from 'lucide-react/icons/briefcase';
 import Wrench from 'lucide-react/icons/wrench';
 import Globe from 'lucide-react/icons/globe';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import { PlaceAutocompleteInput } from '@/components/location';
+import { PlaceAutocompleteInput } from '@/components/location/PlaceAutocompleteInput';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
 import { useToast, useTenant } from '@/contexts';

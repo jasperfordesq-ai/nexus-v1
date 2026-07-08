@@ -14,15 +14,17 @@ import React, { useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';
-import { Badge } from '@/components/ui';
+import { Badge } from '@/components/ui/Badge';
 import House from 'lucide-react/icons/house';
 import ListTodo from 'lucide-react/icons/list-todo';
 import Plus from 'lucide-react/icons/plus';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Menu from 'lucide-react/icons/menu';
-import { useAuth, useTenant, useNotifications } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
+import { useNotificationsOptional } from '@/contexts/NotificationsContext';
 import { QuickCreateMenu } from './QuickCreateMenu';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 
 interface MobileTabBarProps {
   onMenuOpen?: () => void;
@@ -52,7 +54,7 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
   const navigate = useNavigate();
   const visible = useMobileTabBarVisible();
   const { hasModule, tenantPath } = useTenant();
-  const { counts } = useNotifications();
+  const { counts } = useNotificationsOptional();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const handleCreateOpen = useCallback(() => setIsCreateOpen(true), []);

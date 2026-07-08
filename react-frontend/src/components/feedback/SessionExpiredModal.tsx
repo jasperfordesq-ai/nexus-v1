@@ -15,7 +15,8 @@ import { useNavigate } from 'react-router-dom';
 import LogIn from 'lucide-react/icons/log-in';
 import Clock from 'lucide-react/icons/clock';
 import { SESSION_EXPIRED_EVENT } from '@/lib/api';
-import { useTenant, useAuth } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 export function SessionExpiredModal() {

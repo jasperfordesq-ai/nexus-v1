@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Meter as HeroUIMeter,
-  type Meter as HeroUIMeterTypes,
-} from '@heroui/react';
+import { Meter as HeroUIMeter, type Meter as HeroUIMeterTypes } from '@heroui/react/meter';
 
 export type MeterProps = HeroUIMeterTypes['Props'];
 export type MeterOutputProps = HeroUIMeterTypes['OutputProps'];

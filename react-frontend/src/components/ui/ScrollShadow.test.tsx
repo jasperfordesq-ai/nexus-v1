@@ -10,10 +10,8 @@ import React from 'react';
 // Stub HeroUI ScrollShadow so we can inspect the `role` it receives.
 // The real component is a complex DOM element; we just need a div that
 // renders its children and forwards the `role` attribute.
-vi.mock('@heroui/react', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@heroui/react')>();
+vi.mock('@heroui/react/scroll-shadow', () => {
   return {
-    ...orig,
     ScrollShadow: ({
       role,
       children,

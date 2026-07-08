@@ -12,10 +12,8 @@ import React from 'react';
 vi.mock('@/contexts', () => createMockContexts());
 
 // ─── Stub HeroUI Surface so we can inspect the mapped variant prop ────────────
-vi.mock('@heroui/react', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@heroui/react')>();
+vi.mock('@heroui/react/surface', () => {
   return {
-    ...orig,
     Surface: ({ variant, children, ...rest }: { variant?: string; children?: React.ReactNode; [key: string]: unknown }) => (
       <div data-testid="heroui-surface" data-variant={variant} {...rest}>
         {children}

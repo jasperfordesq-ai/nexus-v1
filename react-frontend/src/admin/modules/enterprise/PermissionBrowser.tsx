@@ -20,7 +20,7 @@ import { PageHeader } from '../../components/PageHeader';
 
 export function PermissionBrowser() {
   usePageTitle("Enterprise");
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
 
   const [permissions, setPermissions] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);

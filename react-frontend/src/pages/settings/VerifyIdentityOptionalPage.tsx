@@ -27,8 +27,9 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
 import { Spinner } from '@/components/ui/Spinner';
 import { PageMeta } from '@/components/seo';
-import { useTenant, useAuth } from '@/contexts';
-import { usePageTitle } from '@/hooks';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';
 
 const StripePaymentForm = lazy(() =>

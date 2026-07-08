@@ -8,25 +8,21 @@
  * Wraps all pages with navigation, footer, and background
  */
 
-import { useState, useCallback, useEffect, type CSSProperties } from 'react';
+import { lazy, Suspense, useState, useCallback, useEffect, type CSSProperties } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Navbar } from './Navbar';
 import { MobileDrawer } from './MobileDrawer';
 import { MobileTabBar } from './MobileTabBar';
-import { PodcastMiniPlayer } from '@/components/podcasts/PodcastMiniPlayer';
 import { Footer } from './Footer';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { OfflineIndicator } from '@/components/feedback/OfflineIndicator';
 import { InstallBanner } from '@/components/pwa/InstallBanner';
 import { InstallModalHost } from '@/components/pwa/InstallModalHost';
-import EmergencyAlertBanner from '@/components/caring-community/EmergencyAlertBanner';
-import { FadpConsentBanner } from '@/components/legal/FadpConsentBanner';
 import { SessionExpiredModal } from '@/components/feedback/SessionExpiredModal';
 import { SessionTimeoutWarning } from '@/components/feedback/SessionTimeoutWarning';
 import { AppUpdateModal } from '@/components/feedback/AppUpdateModal';
-import { FloatingReportProblemButton } from '@/components/feedback/FloatingReportProblemButton';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { SeoHead } from '@/components/seo/SeoHead';
 import { useApiErrorHandler } from '@/hooks/useApiErrorHandler';
@@ -35,6 +31,15 @@ import { useAppUpdate } from '@/hooks/useAppUpdate';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/contexts/TenantContext';
+
+const EmergencyAlertBanner = lazy(() => import('@/components/caring-community/EmergencyAlertBanner'));
+const FadpConsentBanner = lazy(() => import('@/components/legal/FadpConsentBanner').then((mod) => ({
+  default: mod.FadpConsentBanner,
+})));
+const FloatingReportProblemButton = lazy(() => import('@/components/feedback/FloatingReportProblemButton'));
+const PodcastMiniPlayer = lazy(() => import('@/components/podcasts/PodcastMiniPlayer').then((mod) => ({
+  default: mod.PodcastMiniPlayer,
+})));
 
 interface LayoutProps {
   /**
@@ -79,8 +84,8 @@ export function Layout({
 
   // Register FCM device token for push notifications once user is authenticated.
   // No-ops on web browsers — only runs inside the Capacitor native app.
-  const { user } = useAuth();
-  const { tenantPath, branding } = useTenant();
+  const { user, isAuthenticated } = useAuth();
+  const { tenantPath, branding, hasFeature } = useTenant();
   const navigate = useNavigate();
   usePushNotifications(user?.id ?? null);
 
@@ -196,10 +201,18 @@ export function Layout({
         }`}
       >
         {/* AG70 — Emergency/safety alert banner (caring community tenants only) */}
-        <EmergencyAlertBanner />
+        {hasFeature('caring_community') && (
+          <Suspense fallback={null}>
+            <EmergencyAlertBanner />
+          </Suspense>
+        )}
 
         {/* AG42 — Swiss FADP consent banner (fadp_compliance feature tenants only) */}
-        <FadpConsentBanner />
+        {hasFeature('fadp_compliance') && (
+          <Suspense fallback={null}>
+            <FadpConsentBanner />
+          </Suspense>
+        )}
 
         {/* PWA install banner — one-time, dismissible, hidden when installed */}
         <InstallBanner />
@@ -213,13 +226,21 @@ export function Layout({
       {showFooter && <Footer />}
 
       {/* Persistent podcast mini-player (renders only while a track is loaded) */}
-      <PodcastMiniPlayer tabBarMayShow={showNavbar} />
+      {isAuthenticated && hasFeature('podcasts') && (
+        <Suspense fallback={null}>
+          <PodcastMiniPlayer tabBarMayShow={showNavbar} />
+        </Suspense>
+      )}
 
       {/* Mobile bottom tab bar */}
       {showNavbar && <MobileTabBar onMenuOpen={handleMobileMenuOpen} isMenuOpen={isMobileMenuOpen} />}
 
       {/* Same-page support capture */}
-      {showNavbar && <FloatingReportProblemButton />}
+      {showNavbar && isAuthenticated && (
+        <Suspense fallback={null}>
+          <FloatingReportProblemButton />
+        </Suspense>
+      )}
 
       {/* Back to top button */}
       <BackToTop />

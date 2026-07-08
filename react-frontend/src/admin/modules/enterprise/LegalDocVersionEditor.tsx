@@ -29,7 +29,7 @@ import { LegalDocEditor } from '@/admin/components';
 import { Card, CardBody, Button, Input, Textarea, Switch, Spinner } from '@/components/ui';
 
 export function LegalDocVersionEditor() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   const { id, versionId } = useParams<{ id: string; versionId?: string }>();
   const isEdit = !!versionId;
   const documentId = parseInt(id || '0', 10);

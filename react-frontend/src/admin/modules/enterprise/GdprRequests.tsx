@@ -55,7 +55,7 @@ function SlaChip({ createdAt, t }: { createdAt: string; t: (key: string, opts?: 
 }
 
 export function GdprRequests() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   useAdminPageMeta({ title: t('enterprise.gdpr_requests_title') });
   const { tenantPath } = useTenant();
   const toast = useToast();

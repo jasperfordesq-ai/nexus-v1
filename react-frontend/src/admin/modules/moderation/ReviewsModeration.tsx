@@ -24,7 +24,7 @@ import { adminSuper } from '@/admin/api/adminApi';
 import type { AdminReview } from '@/admin/api/types';
 
 export default function ReviewsModeration() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_moderation');
   usePageTitle(t('moderation.page_title'));
 
   const RATING_FILTERS = [

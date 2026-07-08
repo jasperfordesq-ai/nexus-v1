@@ -3,8 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
+import { render, screen, waitFor } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import userEvent from '@testing-library/user-event';
 
@@ -29,6 +29,10 @@ vi.mock('../data/helpContent', () => ({
 import { PageHeader } from './PageHeader';
 
 describe('PageHeader', () => {
+  beforeEach(() => {
+    window.history.pushState({}, '', '/');
+  });
+
   it('renders the page title', () => {
     render(<PageHeader title="My Page" />);
     expect(screen.getByRole('heading', { name: 'My Page' })).toBeInTheDocument();
@@ -61,8 +65,23 @@ describe('PageHeader', () => {
   });
 
   it('does NOT render a help button when the route has no help article', () => {
-    // Default MemoryRouter path is '/' which has no entry in HELP_CONTENT
     render(<PageHeader title="No Help Page" />);
     expect(screen.queryByRole('button', { name: /help/i })).not.toBeInTheDocument();
+  });
+
+  it('loads the contextual help article after render and opens the drawer on demand', async () => {
+    window.history.pushState({}, '', '/admin/dashboard');
+    const user = userEvent.setup();
+
+    render(<PageHeader title="Dashboard" />);
+
+    expect(screen.queryByRole('button', { name: /open page help/i })).not.toBeInTheDocument();
+
+    const helpButton = await screen.findByRole('button', { name: /open page help/i });
+    await user.click(helpButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('help-drawer')).toHaveTextContent('Dashboard Help');
+    });
   });
 });

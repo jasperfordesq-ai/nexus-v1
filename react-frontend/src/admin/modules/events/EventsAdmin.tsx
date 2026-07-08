@@ -107,7 +107,7 @@ const formatDateTime = (iso: string) => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function EventsAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_events');
   useAdminPageMeta({ title: t('events.events_admin_title') });
   const { tenantPath } = useTenant();
   const toast = useToast();

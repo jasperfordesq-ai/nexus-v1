@@ -23,7 +23,7 @@ interface ModuleCardProps {
 }
 
 export default function ModuleCard({ module, enabled, onToggle, onConfigure, toggling }: ModuleCardProps) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_config');
   const Icon = module.icon;
   const optionCount = module.configOptions.length;
   const liveCount = module.configOptions.filter(o => !o.comingSoon).length;

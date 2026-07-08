@@ -23,7 +23,7 @@ import { PartnersPageShell } from '../components';
 import { EMBED_RESTYLE } from '../components/adminEmbed';
 
 export default function ApiKeysPage() {
-  const { t } = useTranslation(['partners', 'admin']);
+  const { t } = useTranslation(['partners', 'admin_federation']);
   const [createOpen, setCreateOpen] = useState(false);
   const [refreshToken, setRefreshToken] = useState(0);
 
@@ -47,7 +47,7 @@ export default function ApiKeysPage() {
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
             <KeyRound size={20} className="text-warning" aria-hidden="true" />
-            {t('admin:federation.create_api_key_title')}
+            {t('admin_federation:federation.create_api_key_title')}
           </ModalHeader>
           <ModalBody className="pb-6">
             <CreateApiKey onDone={closeCreate} />

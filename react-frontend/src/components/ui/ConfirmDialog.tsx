@@ -33,16 +33,22 @@
 
 import {
   createContext,
+  lazy,
+  Suspense,
   useCallback,
   use,
   useState,
   type ReactNode,
 } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertDialog } from './AlertDialog';
-import { Button } from './Button';
 
-type ConfirmStatus = 'accent' | 'success' | 'warning' | 'danger';
+const ConfirmDialogSurface = lazy(() =>
+  import('./ConfirmDialogSurface').then((module) => ({
+    default: module.ConfirmDialogSurface,
+  })),
+);
+
+export type ConfirmStatus = 'accent' | 'success' | 'warning' | 'danger';
 
 export interface ConfirmOptions {
   title: ReactNode;
@@ -57,7 +63,7 @@ type ConfirmFn = (options: ConfirmOptions) => Promise<boolean>;
 
 const ConfirmContext = createContext<ConfirmFn | null>(null);
 
-interface PendingConfirm extends ConfirmOptions {
+export interface PendingConfirm extends ConfirmOptions {
   resolve: (value: boolean) => void;
 }
 
@@ -84,36 +90,20 @@ export function ConfirmDialogProvider({ children }: { children: ReactNode }) {
     }
   }, [resolveAndClose]);
 
-  const status: ConfirmStatus = pending?.status ?? 'danger';
-  const confirmVariant = status === 'danger' ? 'danger' : 'primary';
-
   return (
     <ConfirmContext.Provider value={confirm}>
       {children}
-      <AlertDialog.Backdrop isOpen={pending !== null} onOpenChange={handleOpenChange}>
-        <AlertDialog.Container>
-          <AlertDialog.Dialog className="sm:max-w-[420px]">
-            <AlertDialog.CloseTrigger />
-            <AlertDialog.Header>
-              <AlertDialog.Icon status={status} />
-              <AlertDialog.Heading>{pending?.title}</AlertDialog.Heading>
-            </AlertDialog.Header>
-            {pending?.body && (
-              <AlertDialog.Body>
-                {typeof pending.body === 'string' ? <p>{pending.body}</p> : pending.body}
-              </AlertDialog.Body>
-            )}
-            <AlertDialog.Footer>
-              <Button variant="tertiary" onPress={() => resolveAndClose(false)}>
-                {pending?.cancelLabel ?? t('cancel')}
-              </Button>
-              <Button variant={confirmVariant} onPress={() => resolveAndClose(true)}>
-                {pending?.confirmLabel ?? t('confirm')}
-              </Button>
-            </AlertDialog.Footer>
-          </AlertDialog.Dialog>
-        </AlertDialog.Container>
-      </AlertDialog.Backdrop>
+      {pending !== null ? (
+        <Suspense fallback={null}>
+          <ConfirmDialogSurface
+            pending={pending}
+            onOpenChange={handleOpenChange}
+            onResolve={resolveAndClose}
+            cancelLabel={t('cancel')}
+            confirmLabel={t('confirm')}
+          />
+        </Suspense>
+      ) : null}
     </ConfirmContext.Provider>
   );
 }

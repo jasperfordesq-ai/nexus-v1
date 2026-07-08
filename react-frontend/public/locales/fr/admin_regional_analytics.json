@@ -1,0 +1,158 @@
+{
+  "common": {
+    "an_unexpected_error": "Une erreur inattendue s'est produite",
+    "back": "Retour",
+    "cancel": "Annuler",
+    "critical": "Critique",
+    "delete": "Supprimer",
+    "feature": "Caractéristique",
+    "high": "Élevé",
+    "in_progress": "En cours",
+    "in_review": "En revue",
+    "low": "Faible",
+    "medium": "Moyen",
+    "planned": "Prévu",
+    "refresh": "Actualiser",
+    "unexpected_error": "Erreur inattendue",
+    "unknown": "Inconnu",
+    "unfeature": "Inutilité",
+    "actions": "Actions",
+    "active": "Actif",
+    "all": "Tout",
+    "approved": "Approuvé",
+    "clear": "Effacer",
+    "clear_filters": "Effacer les filtres",
+    "clear_selection": "Effacer la sélection",
+    "close": "Fermer",
+    "collapse": "Réduire",
+    "confirm": "Confirmer",
+    "create": "Créer",
+    "declined": "Refusé",
+    "download": "Télécharger",
+    "edit": "Modifier",
+    "error_loading_data": "Erreur de chargement des données",
+    "expand": "Développer",
+    "export": "Exporter",
+    "load_more": "Charger plus",
+    "loading": "Chargement",
+    "next": "Suivant",
+    "no": "Non",
+    "ok": "OK",
+    "pending": "En attente",
+    "previous": "Précédent",
+    "retry": "Réessayer",
+    "save": "Enregistrer",
+    "select_all": "Sélectionner tout",
+    "select_item": "Sélectionner un article",
+    "yes": "Oui"
+  },
+  "shared": {
+    "broker_actions": "Actions des courtiers",
+    "content": "Contenu",
+    "core_module": "Module de base",
+    "document_details": "Détails du document",
+    "history": "Histoire",
+    "log_file_empty": "Aucun fichier journal trouvé",
+    "no": "Non",
+    "no_history_available": "Aucun historique disponible trouvé",
+    "no_legal_documents_found": "Aucun document juridique trouvé",
+    "no_members_found": "Aucun membre trouvé trouvé",
+    "loading": "Loading",
+    "no_data": "Aucune donnée",
+    "no_data_available": "Aucune donnée disponible",
+    "no_recent_broker_activity": "Aucune activité récente de courtier trouvée",
+    "open_page_help": "Ouvrir la page d'aide",
+    "help": "Aide",
+    "quick_access": "Accès rapide",
+    "recent_activity": "Activité récente",
+    "refresh": "Rafraîchir",
+    "search": "Recherche...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Données",
+    "total_count": "{{count}}total"
+  },
+  "regional_analytics_admin": {
+    "meta": {
+      "title": "Analyse régionale",
+      "description": "Gérez les abonnements analytiques payants pour la municipalité et les partenaires SME - agrégats regroupés et respectueux de la confidentialité uniquement."
+    },
+    "actions": {
+      "new_subscription": "Nouvel abonnement",
+      "generate_report_now": "Générer un rapport maintenant",
+      "view_access_log": "Afficher le journal d'accès",
+      "suspend": "Suspendre",
+      "resume": "CV",
+      "close": "Fermer",
+      "cancel": "Annuler",
+      "create": "Créer"
+    },
+    "tables": {
+      "subscriptions_aria": "Abonnements aux analyses régionales",
+      "partner": "Partenaire",
+      "type": "Taper",
+      "plan": "Planifier",
+      "status": "Statut",
+      "period_end": "Fin de période",
+      "price_per_month": "Prix ​​/ mois",
+      "modules": "Modules",
+      "actions": "Actes"
+    },
+    "partner_types": {
+      "municipality": "Municipalité",
+      "sme_partner": "SME partenaire"
+    },
+    "plan_tiers": {
+      "basic": "Basique",
+      "pro": "Pro",
+      "enterprise": "Entreprise"
+    },
+    "statuses": {
+      "trialing": "Essai",
+      "active": "Actif",
+      "past_due": "En souffrance",
+      "cancelled": "Annulé"
+    },
+    "modules": {
+      "trends": "Tendances",
+      "demand_supply": "Demande et offre",
+      "demographics": "Données démographiques",
+      "footfall": "Bruit de pas"
+    },
+    "empty": {
+      "subscriptions": "Aucun abonnement pour l'instant. Fournissez-en un pour commencer à vendre des analyses régionales.",
+      "access_log": "Aucun événement d'accès enregistré pour le moment.",
+      "value": "-"
+    },
+    "access_log": {
+      "title": "Journal d'accès - {{name}}",
+      "table_aria": "Journal d'accès",
+      "when": "Quand",
+      "endpoint": "Point de terminaison",
+      "ip_hashed": "IP (hachée)",
+      "user_agent": "Agent utilisateur"
+    },
+    "create_modal": {
+      "title": "Nouvel abonnement aux analyses régionales",
+      "tenant_id": "Locataire ID",
+      "partner_name": "Nom du partenaire",
+      "partner_type": "Type de partenaire",
+      "contact_email": "E-mail de contact",
+      "billing_email": "E-mail de facturation",
+      "plan_tier": "Niveau du forfait",
+      "monthly_price_cents": "Prix ​​mensuel (centimes)",
+      "currency": "Devise",
+      "enabled_modules": "Modules activés"
+    },
+    "toasts": {
+      "load_failed": "Échec du chargement des abonnements",
+      "status_updated": "Abonnement {{status}}",
+      "update_failed": "La mise à jour a échoué",
+      "report_queued": "Génération de rapport en file d'attente",
+      "report_failed": "Échec de la mise en file d'attente du rapport",
+      "required_fields": "Le nom du locataire, le nom du partenaire et l'e-mail de contact sont requis",
+      "created": "Abonnement créé",
+      "create_failed": "Échec de la création"
+    }
+  }
+}

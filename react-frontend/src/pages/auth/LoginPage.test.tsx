@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, cleanup } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type ReactNode } from 'react';
 
@@ -73,6 +73,26 @@ vi.mock('@/contexts', () => ({
   useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
   useFeature: vi.fn(() => true),
   useModule: vi.fn(() => true),
+}));
+
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ ...authDefaults, ...authOverrides }),
+}));
+
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: () => ({
+    tenant: { id: 2, name: 'Test Tenant', slug: 'test', tagline: null },
+    branding: { name: 'Test Community', logo_url: null },
+    tenantSlug: 'test',
+    tenantPath: mockTenantPath,
+    isLoading: false,
+    hasFeature: vi.fn(() => true),
+    hasModule: vi.fn(() => true),
+  }),
+}));
+
+vi.mock('@/contexts/ToastContext', () => ({
+  useToast: () => mockToast,
 }));
 
 // ── Mock react-router-dom ───────────────────────────────────────────────────
@@ -145,6 +165,10 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     authOverrides = {};
+    Object.defineProperty(window, 'PublicKeyCredential', {
+      value: { isConditionalMediationAvailable: vi.fn() },
+      configurable: true,
+    });
     // Defaults: biometric available, conditional mediation not supported
     mockIsBiometricAvailable.mockResolvedValue(true);
     mockIsConditionalMediationAvailable.mockResolvedValue(false);
@@ -154,6 +178,7 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
 
   afterEach(() => {
     cleanup();
+    Reflect.deleteProperty(window, 'PublicKeyCredential');
   });
 
   // ─── 1. Passkey button renders when biometric available + tenant selected ──
@@ -167,14 +192,9 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
 
   // ─── 2. Passkey button NOT rendered when biometric unavailable ─────────────
   it('does NOT render passkey button when biometric is unavailable', async () => {
-    mockIsBiometricAvailable.mockResolvedValue(false);
+    Reflect.deleteProperty(window, 'PublicKeyCredential');
 
     render(<LoginPage />);
-
-    // Wait for the async biometric check to settle
-    await waitFor(() => {
-      expect(mockIsBiometricAvailable).toHaveBeenCalled();
-    });
 
     expect(screen.queryByText('Sign in with a passkey')).toBeNull();
   });
@@ -225,6 +245,7 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
     mockStartConditionalAuthentication.mockResolvedValue(null);
 
     render(<LoginPage />);
+    fireEvent.focus(document.querySelector('input[type="email"]') as HTMLInputElement);
 
     await waitFor(() => {
       expect(mockIsConditionalMediationAvailable).toHaveBeenCalled();
@@ -246,6 +267,7 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
     const abortSpy = vi.spyOn(AbortController.prototype, 'abort');
 
     const { unmount } = render(<LoginPage />);
+    fireEvent.focus(document.querySelector('input[type="email"]') as HTMLInputElement);
 
     await waitFor(() => {
       expect(mockStartConditionalAuthentication).toHaveBeenCalled();
@@ -270,6 +292,7 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
         <LoginPage />
       </StrictMode>,
     );
+    fireEvent.focus(document.querySelector('input[type="email"]') as HTMLInputElement);
 
     await waitFor(() => {
       expect(mockStartConditionalAuthentication).toHaveBeenCalled();
@@ -288,10 +311,7 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
 
     render(<LoginPage />);
 
-    await waitFor(() => {
-      expect(mockStartConditionalAuthentication).toHaveBeenCalled();
-    });
-
+    expect(mockStartConditionalAuthentication).not.toHaveBeenCalled();
     expect(mockLoginWithBiometric).not.toHaveBeenCalled();
   });
 
@@ -302,6 +322,7 @@ describe('LoginPage — Passkey/WebAuthn functionality', () => {
     mockIsConditionalMediationAvailable.mockResolvedValue(false);
 
     render(<LoginPage />);
+    fireEvent.focus(document.querySelector('input[type="email"]') as HTMLInputElement);
 
     await waitFor(() => {
       expect(mockIsConditionalMediationAvailable).toHaveBeenCalled();

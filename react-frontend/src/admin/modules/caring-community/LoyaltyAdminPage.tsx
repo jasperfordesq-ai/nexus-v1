@@ -79,7 +79,7 @@ export default function LoyaltyAdminPage() {
   const toast = useToast();
   const { user } = useAuth();
   const { t } = useTranslation('caring_community');
-  const { t: tAdmin } = useTranslation('admin');
+  const { t: tAdmin } = useTranslation('admin_caring_community');
   const canManage = canManageCaring(user);
   usePageTitle(t('admin.loyalty.title'));
 

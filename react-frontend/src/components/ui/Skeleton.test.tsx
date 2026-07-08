@@ -8,10 +8,8 @@ import { render, screen } from '@/test/test-utils';
 import React from 'react';
 
 // ─── Stub HeroUI Skeleton to avoid jsdom rendering issues ───────────────────
-vi.mock('@heroui/react', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@heroui/react')>();
+vi.mock('@heroui/react/skeleton', () => {
   return {
-    ...orig,
     Skeleton: ({ className, animationType, ...rest }: { className?: string; animationType?: string; [key: string]: unknown }) => (
       <div
         data-testid="heroui-skeleton"

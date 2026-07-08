@@ -9,10 +9,18 @@
  */
 
 import MapPin from 'lucide-react/icons/map-pin';
+import { lazy, Suspense } from 'react';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { LocationMap, type MapMarker } from './LocationMap';
+import { Skeleton } from '@/components/ui/Skeleton';
+import type { MapMarker } from './LocationMap';
 import { MAPS_ENABLED } from '@/lib/map-config';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
+
+const LazyLocationMap = lazy(() =>
+  import('./LocationMap').then((module) => ({
+    default: module.LocationMap,
+  })),
+);
 
 export interface LocationMapCardProps {
   title: string;
@@ -51,13 +59,15 @@ export function LocationMapCard({
       {/* Map */}
       {showMap && (
         <div className="px-4">
-          <LocationMap
-            markers={markers}
-            center={center}
-            zoom={zoom}
-            height={mapHeight}
-            fitBounds={markers.length > 1}
-          />
+          <Suspense fallback={<Skeleton className="w-full rounded-lg" style={{ height: mapHeight }} />}>
+            <LazyLocationMap
+              markers={markers}
+              center={center}
+              zoom={zoom}
+              height={mapHeight}
+              fitBounds={markers.length > 1}
+            />
+          </Suspense>
         </div>
       )}
 

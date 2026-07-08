@@ -1,0 +1,186 @@
+{
+  "common": {
+    "an_unexpected_error": "Wystąpił nieoczekiwany błąd",
+    "back": "Powrót",
+    "cancel": "Anuluj",
+    "critical": "Krytyczny",
+    "delete": "Usuń",
+    "feature": "Funkcja",
+    "high": "Wysoka",
+    "in_progress": "W toku",
+    "in_review": "W przeglądzie",
+    "low": "Niski",
+    "medium": "Średni",
+    "planned": "Planowane",
+    "refresh": "Odśwież",
+    "unexpected_error": "Nieoczekiwany błąd",
+    "unknown": "Nieznany",
+    "unfeature": "Brak funkcji",
+    "actions": "Działania",
+    "active": "Aktywny",
+    "all": "Wszystko",
+    "approved": "Zatwierdzone",
+    "clear": "Jasne",
+    "clear_filters": "Wyczyść filtry",
+    "clear_selection": "Wyczyść wybór",
+    "close": "Zamknij",
+    "collapse": "Zwiń",
+    "confirm": "Potwierdź",
+    "create": "Utwórz",
+    "declined": "Odrzucono",
+    "download": "Pobierz",
+    "edit": "Edytuj",
+    "error_loading_data": "Błąd ładowania danych",
+    "expand": "Rozwiń",
+    "export": "Eksportuj",
+    "load_more": "Załaduj więcej",
+    "loading": "Ładowanie",
+    "next": "Następny",
+    "no": "Nie",
+    "ok": "OK",
+    "pending": "Oczekujące",
+    "previous": "Poprzedni",
+    "retry": "Spróbuj ponownie",
+    "save": "Zapisz",
+    "select_all": "Wybierz wszystko",
+    "select_item": "Wybierz element",
+    "yes": "Tak"
+  },
+  "shared": {
+    "broker_actions": "Działania brokera",
+    "content": "Treść",
+    "core_module": "Moduł podstawowy",
+    "document_details": "Szczegóły dokumentu",
+    "history": "Historia",
+    "log_file_empty": "Nie znaleziono pliku dziennika",
+    "no": "Nie",
+    "no_history_available": "Nie znaleziono dostępnej historii",
+    "no_legal_documents_found": "Nie znaleziono żadnych dokumentów prawnych",
+    "no_members_found": "Nie znaleziono żadnych członków",
+    "loading": "Loading",
+    "no_data": "Brak danych",
+    "no_data_available": "Brak dostępnych danych",
+    "no_recent_broker_activity": "Nie znaleziono ostatniej aktywności brokera",
+    "open_page_help": "Otwórz pomoc na stronie",
+    "help": "Pomoc",
+    "quick_access": "Szybki dostęp",
+    "recent_activity": "Ostatnia aktywność",
+    "refresh": "Odświeżać",
+    "search": "Szukaj...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Dane",
+    "total_count": "Łącznie{{count}}"
+  },
+  "national": {
+    "trend_chart_aria": "Chart showing community activity trends over time"
+  },
+  "national_kiss_dashboard": {
+    "loading": "Loading",
+    "meta": {
+      "page_title": "Caring Community - Panel krajowy",
+      "title": "Caring Community - Panel krajowy",
+      "description": "Międzykooperacyjny widok superadministratora dla każdej Caring Community spółdzielni na platformie. Liczbę członków podaje się w nawiasach chroniących prywatność."
+    },
+    "actions": {
+      "refresh": "Odświeżać"
+    },
+    "about": {
+      "title": "Informacje o tym panelu",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "health_prefix": "Użyj selektora okresu, aby porównać kwartały. Tabela porównawcza klasyfikuje spółdzielnie według godzin pracy, członków lub stanu zdrowia. Stan zdrowia wynika z trendów aktywności:",
+      "thriving_definition": "szybko rośnie,",
+      "stable_definition": "płaska aktywność,",
+      "struggling_definition": "spadek aktywności lub bardzo niskie zaangażowanie."
+    },
+    "status": {
+      "thriving": "Kwitnie",
+      "stable": "Stabilny",
+      "struggling": "Zmagający się"
+    },
+    "health_legend": {
+      "title": "Klucz stanu zdrowia:",
+      "thriving": "godzin silnie rośnie (>10% w porównaniu z poprzednim okresem)",
+      "stable": "aktywność płaska (+/-10%)",
+      "struggling": "malejąca aktywność lub mniej niż 5 zweryfikowanych godzin w okresie",
+      "privacy_note": "Liczba członków pokazana jest w nawiasach chroniących prywatność (np. „50–99”) – nie pojawiają się tutaj żadne indywidualne dane."
+    },
+    "filters": {
+      "period": "Okres",
+      "period_aria": "Okres raportowania",
+      "from": "Z",
+      "from_aria": "Okres od",
+      "to": "Do",
+      "to_aria": "Okres do"
+    },
+    "periods": {
+      "this_month": "W tym miesiącu",
+      "last_quarter": "Ostatni kwartał (90 dni)",
+      "last_year": "W ubiegłym roku",
+      "custom": "Zakres niestandardowy"
+    },
+    "stats": {
+      "total_cooperatives": "Razem spółdzielnie",
+      "active_cooperatives": "Aktywne spółdzielnie",
+      "active_description": "{{active}} z {{total}} aktywne w okresie",
+      "total_hours": "Całkowita liczba godzin (krajowa)",
+      "active_tandems": "Aktywne tandemy"
+    },
+    "inline": {
+      "active_members": "Aktyw:",
+      "recipients_reached": "Odbiorcy dotarli:",
+      "safeguarding_reports": "Raporty zabezpieczające:"
+    },
+    "metrics": {
+      "yoy": "{{value}} r/r"
+    },
+    "trend": {
+      "title": "Krajowy trend 12-miesięczny",
+      "empty": "Brak dostępnych danych dotyczących trendów.",
+      "hours_axis": "Godziny",
+      "cooperatives_axis": "Spółdzielnie",
+      "active_cooperatives": "Aktywne spółdzielnie",
+      "total_hours_all": "Łączna liczba godzin (wszystkie spółdzielnie)"
+    },
+    "comparative": {
+      "title": "Metryki porównawcze",
+      "sort_hint": "Kliknij kolumnę, aby posortować",
+      "empty_prefix": "NIE",
+      "empty_middle": "spółdzielnie są jeszcze skonfigurowane. Idź do",
+      "super_admin_tenants": "Superadministrator -> Najemcy",
+      "empty_suffix": "i ustaw kategorię najemcy na",
+      "empty_tail": "na co najmniej jednej dzierżawie, aby wypełnić ten pulpit nawigacyjny.",
+      "aria": "Wskaźniki porównawcze według spółdzielni",
+      "cooperative": "Spółdzielnia",
+      "hours_title": "Łączna liczba zweryfikowanych godzin opieki w wybranym okresie",
+      "hours_sort": "Godziny <->",
+      "members_title": "Liczba aktywnych członków pokazana w nawiasie chroniącym prywatność",
+      "members": "Członkowie",
+      "recipients_title": "Dotarcie do odbiorców opieki (przedział chroniący prywatność)",
+      "recipients": "Odbiorcy",
+      "tandems_title": "Powtarzające się pary pomocnika/odbiorcy z ponad 2 ukończonymi wymianami",
+      "tandems_sort": "Tandemy <->",
+      "retention_title": "% członków aktywnych zarówno w tym okresie, jak i w poprzednim równoważnym okresie",
+      "retention_sort": "Zatrzymanie <->",
+      "reciprocity_title": "% kibiców, którzy w tym okresie otrzymali także godziny – wskazuje na zdrowie wzajemnej wymiany",
+      "reciprocity_sort": "Wzajemność <->",
+      "status": "Stan"
+    },
+    "leaderboards": {
+      "top_title": "Top 5 według godzin",
+      "bottom_title": "Dolne 5 (tylko aktywne)"
+    },
+    "empty": {
+      "no_data": "Brak danych.",
+      "no_active_cooperatives": "Brak aktywnych spółdzielni w tym okresie."
+    },
+    "footer": {
+      "generated_at": "Wygenerowano o {{date}}.",
+      "privacy_note": "Liczbę członków podaje się w nawiasach chroniących prywatność — na tej stronie nie są wyświetlane żadne indywidualne identyfikatory członków."
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować panelu"
+    }
+  }
+}

@@ -31,7 +31,7 @@ interface AnalyticsData {
 
 export function DeliverabilityAnalytics() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_deliverability');
   useAdminPageMeta({ title: tNav('deliverability') });
   const toast = useToast();
 

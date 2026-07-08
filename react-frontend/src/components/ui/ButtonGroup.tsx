@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { ComponentProps } from 'react';
-import { ButtonGroup as HeroUIButtonGroup } from '@heroui/react';
+import { ButtonGroup as HeroUIButtonGroup } from '@heroui/react/button-group';
 
 type HeroUIButtonGroupProps = ComponentProps<typeof HeroUIButtonGroup>;
 

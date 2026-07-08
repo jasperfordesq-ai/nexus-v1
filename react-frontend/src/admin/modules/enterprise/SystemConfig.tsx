@@ -379,7 +379,7 @@ interface SystemConfigProps {
  * route was retired and its sidebar entries removed).
  */
 export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps = {}) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   const { tenantPath } = useTenant();
   const toast = useToast();
 

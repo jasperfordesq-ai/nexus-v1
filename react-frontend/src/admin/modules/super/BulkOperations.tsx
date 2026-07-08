@@ -22,7 +22,7 @@ import type { SuperAdminTenant, SuperAdminUser, BulkOperationResult } from '../.
 
 
 export function BulkOperations() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   usePageTitle(t('super.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

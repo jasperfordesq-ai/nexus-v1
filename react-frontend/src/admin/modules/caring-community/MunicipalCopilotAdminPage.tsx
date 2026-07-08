@@ -97,7 +97,7 @@ function truncate(text: string, n: number): string {
 // ---------------------------------------------------------------------------
 
 export default function MunicipalCopilotAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('municipal_copilot.meta.page_title'));
   const { showToast } = useToast();
 

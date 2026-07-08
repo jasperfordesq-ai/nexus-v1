@@ -9,10 +9,9 @@
  */
 
 import { Component, type ReactNode, type ErrorInfo } from 'react';
-import { motion } from '@/lib/motion';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import RefreshCw from 'lucide-react/icons/refresh-cw';import i18n from 'i18next';
-import { GlassCard, Button } from '@/components/ui';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import i18n from 'i18next';
 import { logError } from '@/lib/logger';
 
 interface FeatureErrorBoundaryProps {
@@ -78,12 +77,8 @@ export class FeatureErrorBoundary extends Component<
       }
 
       return (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-4"
-        >
-          <GlassCard role="alert" className="p-6 text-center">
+        <div className="p-4">
+          <div role="alert" className="rounded-lg border border-theme-default bg-theme-surface/90 p-6 text-center shadow-sm">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 mb-4">
               <AlertTriangle className="w-6 h-6 text-amber-400" aria-hidden="true" />
             </div>
@@ -93,16 +88,16 @@ export class FeatureErrorBoundary extends Component<
             <p className="text-theme-muted text-sm mb-4">
               {i18n.t('feature_error.load_failed', { ns: 'common', feature: this.props.featureName })}
             </p>
-            <Button
-              variant="flat"
-              className="bg-theme-elevated text-theme-primary"
-              startContent={<RefreshCw className="w-4 h-4" />}
-              onPress={this.handleRetry}
+            <button
+              type="button"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-theme-elevated px-4 py-2.5 text-sm font-semibold text-theme-primary transition hover:bg-theme-muted/10 focus:outline-none focus:ring-2 focus:ring-theme-focus"
+              onClick={this.handleRetry}
             >
+              <RefreshCw className="w-4 h-4" aria-hidden="true" />
               {i18n.t('error_boundary.try_again', { ns: 'common' })}
-            </Button>
-          </GlassCard>
-        </motion.div>
+            </button>
+          </div>
+        </div>
       );
     }
 

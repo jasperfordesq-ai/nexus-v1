@@ -27,7 +27,7 @@ function permissionLabel(value: string): string {
 }
 
 export function RoleForm() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   const { id } = useParams();
   const isEdit = !!id;
   usePageTitle(isEdit ? t('enterprise.page_title_edit_role') : t('enterprise.page_title_create_role'));

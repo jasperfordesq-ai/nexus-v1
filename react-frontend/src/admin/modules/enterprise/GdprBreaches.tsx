@@ -34,7 +34,7 @@ const severityColorMap: Record<string, 'default' | 'primary' | 'warning' | 'dang
 const SEVERITY_KEYS = ['low', 'medium', 'high', 'critical'] as const;
 
 export function GdprBreaches() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   useAdminPageMeta({ title: t('enterprise.gdpr_breaches_title') });
   const toast = useToast();
 

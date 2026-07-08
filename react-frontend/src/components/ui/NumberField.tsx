@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  NumberField as HeroUINumberField,
-  type NumberFieldProps as HeroUINumberFieldProps,
-} from '@heroui/react';
+import { NumberField as HeroUINumberField, type NumberFieldProps as HeroUINumberFieldProps } from '@heroui/react/number-field';
 
 export type NumberFieldProps = HeroUINumberFieldProps;
 

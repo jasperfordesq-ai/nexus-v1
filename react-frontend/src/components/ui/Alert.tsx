@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { ComponentProps, ReactNode } from 'react';
-import { Alert as HeroUIAlert } from '@heroui/react';
+import { Alert as HeroUIAlert } from '@heroui/react/alert';
 
 type HeroUIAlertProps = ComponentProps<typeof HeroUIAlert>;
 

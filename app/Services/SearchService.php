@@ -939,6 +939,9 @@ class SearchService
                       ->orWhere('description', 'LIKE', $like)
                       ->orWhere('location', 'LIKE', $like);
                 })
+                ->where(function (Builder $q) {
+                    $q->whereNull('status')->orWhere('status', 'active');
+                })
                 ->where('start_time', '>=', now())
                 ->orderBy('start_time')
                 ->limit($limit)
@@ -1188,6 +1191,9 @@ class SearchService
                       ->orWhere('description', 'LIKE', $like)
                       ->orWhere('location', 'LIKE', $like);
                 })
+                ->where(function (Builder $q) {
+                    $q->whereNull('status')->orWhere('status', 'active');
+                })
                 ->where('start_time', '>=', now());
 
             $this->applySortOrder($eq, $sort, 'start_time');
@@ -1330,6 +1336,9 @@ class SearchService
 
         $events = $this->event->newQuery()
             ->where('title', 'LIKE', $like)
+            ->where(function (Builder $q) {
+                $q->whereNull('status')->orWhere('status', 'active');
+            })
             ->where('start_time', '>=', now())
             ->select('id', 'title', 'start_time')
             ->orderBy('start_time')

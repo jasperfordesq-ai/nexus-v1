@@ -75,7 +75,7 @@ const METHOD_COLOUR: Record<string, 'success' | 'primary' | 'warning' | 'danger'
 };
 
 export default function IntegrationShowcaseAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('integration_showcase.meta.page_title'));
   const { showToast } = useToast();
 

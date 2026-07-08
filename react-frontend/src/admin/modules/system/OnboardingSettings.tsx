@@ -122,7 +122,7 @@ const STEPS_CONFIG = [
 // ── Component ────────────────────────────────────────────────────────────────
 
 export function OnboardingSettings() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   usePageTitle(t('system.onboarding.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

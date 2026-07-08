@@ -48,7 +48,7 @@ interface CreateApiKeyProps {
 }
 
 export function CreateApiKey({ onDone }: CreateApiKeyProps = {}) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   usePageTitle(t('federation.page_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();

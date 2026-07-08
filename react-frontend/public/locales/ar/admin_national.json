@@ -1,0 +1,186 @@
+{
+  "common": {
+    "an_unexpected_error": "حدث خطأ غير متوقع",
+    "back": "خلف",
+    "cancel": "يلغي",
+    "critical": "شديد الأهمية",
+    "delete": "يمسح",
+    "feature": "ميزة",
+    "high": "عالي",
+    "in_progress": "في تَقَدم",
+    "in_review": "قيد المراجعة",
+    "low": "قليل",
+    "medium": "واسطة",
+    "planned": "المخطط لها",
+    "refresh": "ينعش",
+    "unexpected_error": "خطأ غير متوقع",
+    "unknown": "مجهول",
+    "unfeature": "غير مميز",
+    "actions": "الإجراءات",
+    "active": "نشيط",
+    "all": "الجميع",
+    "approved": "موافقة",
+    "clear": "واضح",
+    "clear_filters": "مسح المرشحات",
+    "clear_selection": "مسح التحديد",
+    "close": "يغلق",
+    "collapse": "ينهار",
+    "confirm": "يتأكد",
+    "create": "يخلق",
+    "declined": "انخفض",
+    "download": "تحميل",
+    "edit": "يحرر",
+    "error_loading_data": "خطأ في تحميل البيانات",
+    "expand": "يوسع",
+    "export": "يصدّر",
+    "load_more": "تحميل المزيد",
+    "loading": "تحميل",
+    "next": "التالي",
+    "no": "لا",
+    "ok": "OK",
+    "pending": "قيد الانتظار",
+    "previous": "سابق",
+    "retry": "أعد المحاولة",
+    "save": "يحفظ",
+    "select_all": "حدد الكل",
+    "select_item": "حدد العنصر",
+    "yes": "نعم"
+  },
+  "shared": {
+    "broker_actions": "إجراءات الوسيط",
+    "content": "محتوى",
+    "core_module": "الوحدة الأساسية",
+    "document_details": "تفاصيل الوثيقة",
+    "history": "تاريخ",
+    "log_file_empty": "لم يتم العثور على ملف السجل",
+    "no": "لا",
+    "no_history_available": "لم يتم العثور على أي سجل متاح",
+    "no_legal_documents_found": "لم يتم العثور على وثائق قانونية",
+    "no_members_found": "لم يتم العثور على أعضاء وجدت",
+    "loading": "Loading",
+    "no_data": "لا توجد بيانات",
+    "no_data_available": "لا توجد بيانات متاحة",
+    "no_recent_broker_activity": "لم يتم العثور على أي نشاط وسيط حديث",
+    "open_page_help": "افتح صفحة المساعدة",
+    "help": "يساعد",
+    "quick_access": "الوصول السريع",
+    "recent_activity": "النشاط الأخير",
+    "refresh": "ينعش",
+    "search": "يبحث...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "بيانات",
+    "total_count": "إجمالي{{count}}"
+  },
+  "national": {
+    "trend_chart_aria": "Chart showing community activity trends over time"
+  },
+  "national_kiss_dashboard": {
+    "loading": "Loading",
+    "meta": {
+      "page_title": "Caring Community - لوحة المعلومات الوطنية",
+      "title": "Caring Community - لوحة المعلومات الوطنية",
+      "description": "عرض المشرف المتميز التعاوني عبر كل تعاونية Caring Community على النظام الأساسي. يتم الإبلاغ عن أعداد الأعضاء بين قوسين للحفاظ على الخصوصية."
+    },
+    "actions": {
+      "refresh": "ينعش"
+    },
+    "about": {
+      "title": "حول لوحة القيادة هذه",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "health_prefix": "استخدم محدد الفترة لمقارنة الأرباع. يصنف الجدول المقارن التعاونيات حسب ساعات العمل أو الأعضاء أو الحالة الصحية. الحالة الصحية مستمدة من اتجاهات النشاط:",
+      "thriving_definition": "ينمو بسرعة،",
+      "stable_definition": "نشاط مسطح,",
+      "struggling_definition": "انخفاض النشاط أو المشاركة المنخفضة جدًا."
+    },
+    "status": {
+      "thriving": "مزدهرة",
+      "stable": "مستقر",
+      "struggling": "يكافح"
+    },
+    "health_legend": {
+      "title": "مفتاح الحالة الصحية:",
+      "thriving": "ساعات النمو بقوة (> 10% مقارنة بالفترة السابقة)",
+      "stable": "نشاط ثابت (+/-10%)",
+      "struggling": "انخفاض النشاط أو أقل من 5 ساعات تم التحقق منها في الفترة",
+      "privacy_note": "يتم عرض أعداد الأعضاء بين قوسين للحفاظ على الخصوصية (على سبيل المثال، \"50-99\") - ولا تظهر هنا أي بيانات فردية على الإطلاق."
+    },
+    "filters": {
+      "period": "فترة",
+      "period_aria": "فترة التقرير",
+      "from": "من",
+      "from_aria": "الفترة من",
+      "to": "ل",
+      "to_aria": "فترة ل"
+    },
+    "periods": {
+      "this_month": "هذا الشهر",
+      "last_quarter": "الربع الأخير (90 يومًا)",
+      "last_year": "العام الماضي",
+      "custom": "نطاق مخصص"
+    },
+    "stats": {
+      "total_cooperatives": "إجمالي التعاونيات",
+      "active_cooperatives": "التعاونيات النشطة",
+      "active_description": "{{active}} من {{total}} نشط في الفترة",
+      "total_hours": "إجمالي الساعات (وطني)",
+      "active_tandems": "ترادفات نشطة"
+    },
+    "inline": {
+      "active_members": "الأعضاء النشطين:",
+      "recipients_reached": "تم الوصول إلى المستلمين:",
+      "safeguarding_reports": "تقارير الحماية:"
+    },
+    "metrics": {
+      "yoy": "{{value}} سنويًا"
+    },
+    "trend": {
+      "title": "الاتجاه الوطني لمدة 12 شهرا",
+      "empty": "لا توجد بيانات الاتجاه المتاحة.",
+      "hours_axis": "ساعات",
+      "cooperatives_axis": "التعاونيات",
+      "active_cooperatives": "التعاونيات النشطة",
+      "total_hours_all": "إجمالي الساعات (جميع التعاونيات)"
+    },
+    "comparative": {
+      "title": "مقاييس المقارنة",
+      "sort_hint": "انقر فوق عمود للفرز",
+      "empty_prefix": "لا",
+      "empty_middle": "التعاونيات تكوينها حتى الآن. اذهب الى",
+      "super_admin_tenants": "المشرف المتميز -> المستأجرين",
+      "empty_suffix": "وقم بتعيين فئة المستأجر على",
+      "empty_tail": "على مستأجر واحد على الأقل لملء لوحة المعلومات هذه.",
+      "aria": "المقاييس المقارنة من قبل التعاونية",
+      "cooperative": "تعاونية",
+      "hours_title": "إجمالي ساعات الرعاية التي تم التحقق منها في الفترة المحددة",
+      "hours_sort": "ساعات <->",
+      "members_title": "يظهر عدد الأعضاء النشطين على شكل شريحة للحفاظ على الخصوصية",
+      "members": "أعضاء",
+      "recipients_title": "تم الوصول إلى متلقي الرعاية (شريحة الحفاظ على الخصوصية)",
+      "recipients": "المستلمون",
+      "tandems_title": "أزواج المساعد/المستلم المتكررة مع أكثر من 2 عمليات تبادل مكتملة",
+      "tandems_sort": "جنبا إلى جنب <->",
+      "retention_title": "النسبة المئوية للأعضاء النشطين في كل من هذه الفترة والفترة المماثلة السابقة",
+      "retention_sort": "الاحتفاظ <->",
+      "reciprocity_title": "نسبة المؤيدين الذين حصلوا أيضًا على ساعات في الفترة - تشير إلى صحة التبادل المتبادل",
+      "reciprocity_sort": "المعاملة بالمثل <->",
+      "status": "حالة"
+    },
+    "leaderboards": {
+      "top_title": "أعلى 5 ساعات",
+      "bottom_title": "أسفل 5 (نشط فقط)"
+    },
+    "empty": {
+      "no_data": "لا توجد بيانات.",
+      "no_active_cooperatives": "لا توجد تعاونيات نشطة في هذه الفترة."
+    },
+    "footer": {
+      "generated_at": "تم إنشاؤها في {{date}}.",
+      "privacy_note": "يتم الإبلاغ عن أعداد الأعضاء بين قوسين للحفاظ على الخصوصية - ولا تظهر معرفات الأعضاء الفردية في أي مكان في هذه الصفحة."
+    },
+    "toasts": {
+      "load_failed": "فشل تحميل لوحة القيادة"
+    }
+  }
+}

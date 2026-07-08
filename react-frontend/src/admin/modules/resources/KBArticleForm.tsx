@@ -88,7 +88,7 @@ function resolveAttachmentUrl(fileUrl: string): string {
 }
 
 export function KBArticleForm() {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t } = useTranslation(['admin_resources', 'common']);
   const confirm = useConfirm();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;

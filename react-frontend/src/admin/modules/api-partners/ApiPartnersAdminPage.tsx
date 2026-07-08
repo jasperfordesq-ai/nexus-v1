@@ -84,7 +84,7 @@ const statusColor = (s: ApiPartner['status']): 'success' | 'warning' | 'danger' 
 // ─── Component ────────────────────────────────────────────────────────────
 
 export default function ApiPartnersAdminPage() {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t } = useTranslation(['admin_api_partners', 'common']);
   usePageTitle(t('api_partners.meta.title'));
   const toast = useToast();
   const confirm = useConfirm();
@@ -355,7 +355,7 @@ function CreatePartnerModal({
   onClose: () => void;
   onCreated: (creds: IssuedCredentials) => void;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_api_partners');
   const toast = useToast();
   const [name, setName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
@@ -488,7 +488,7 @@ function CredentialsModal({
   credentials: IssuedCredentials | null;
   onClose: () => void;
 }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_api_partners');
   const toast = useToast();
 
   const copy = async (text: string, label: string) => {

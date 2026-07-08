@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  DateField as HeroUIDateField,
-  type DateField as HeroUIDateFieldTypes,
-} from '@heroui/react';
+import { DateField as HeroUIDateField, type DateField as HeroUIDateFieldTypes } from '@heroui/react/date-field';
 
 export type DateFieldProps = HeroUIDateFieldTypes['Props'];
 export const DateField = HeroUIDateField;

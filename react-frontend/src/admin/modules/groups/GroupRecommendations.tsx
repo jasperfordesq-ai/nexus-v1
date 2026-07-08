@@ -16,7 +16,7 @@ import { adminGroups } from '@/admin/api/adminApi';
 import type { GroupRecommendation } from '@/admin/api/types';
 
 export default function GroupRecommendations() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   usePageTitle(t('groups.page_title'));
   const { error } = useToast();
   const [recommendations, setRecommendations] = useState<GroupRecommendation[]>([]);

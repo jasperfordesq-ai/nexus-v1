@@ -1,0 +1,222 @@
+{
+  "common": {
+    "an_unexpected_error": "An unexpected error occurred",
+    "back": "Back",
+    "cancel": "Cancel",
+    "critical": "Critical",
+    "delete": "Delete",
+    "feature": "Feature",
+    "high": "High",
+    "in_progress": "In Progress",
+    "in_review": "In Review",
+    "low": "Low",
+    "medium": "Medium",
+    "planned": "Planned",
+    "refresh": "Refresh",
+    "unexpected_error": "Unexpected error",
+    "unknown": "Unknown",
+    "unfeature": "Unfeature",
+    "actions": "Actions",
+    "active": "Active",
+    "all": "All",
+    "approved": "Approved",
+    "clear": "Clear",
+    "clear_filters": "Clear Filters",
+    "clear_selection": "Clear Selection",
+    "close": "Close",
+    "collapse": "Collapse",
+    "confirm": "Confirm",
+    "create": "Create",
+    "declined": "Declined",
+    "download": "Download",
+    "edit": "Edit",
+    "error_loading_data": "Loading Data error",
+    "expand": "Expand",
+    "export": "Export",
+    "load_more": "Load More",
+    "loading": "Loading",
+    "next": "Next",
+    "no": "No",
+    "ok": "OK",
+    "pending": "Pending",
+    "previous": "Previous",
+    "retry": "Retry",
+    "save": "Save",
+    "select_all": "Select All",
+    "select_item": "Select Item",
+    "yes": "Yes"
+  },
+  "shared": {
+    "broker_actions": "Broker Actions",
+    "content": "Content",
+    "core_module": "Core Module",
+    "document_details": "Document Details",
+    "history": "History",
+    "log_file_empty": "No log file found",
+    "no": "No",
+    "no_history_available": "No history available found",
+    "no_legal_documents_found": "No legal documents found found",
+    "no_members_found": "No members found found",
+    "loading": "Loading",
+    "no_data": "No data",
+    "no_data_available": "No data available",
+    "no_recent_broker_activity": "No recent broker activity found",
+    "open_page_help": "Open page help",
+    "help": "Help",
+    "quick_access": "Quick Access",
+    "recent_activity": "Recent Activity",
+    "refresh": "Refresh",
+    "search": "Search...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Data",
+    "total_count": "{{count}} total"
+  },
+  "agents": {
+    "actions": {
+      "cancel": "Cancel",
+      "refresh": "Refresh",
+      "save": "Save"
+    },
+    "common": {
+      "empty_dash": "-"
+    },
+    "status": {
+      "disabled": "Disabled",
+      "enabled": "Enabled"
+    },
+    "toggle": "Enable or disable {{name}}",
+    "run_status": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "pending": "Pending",
+      "running": "Running"
+    },
+    "proposal_status": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "pending_review": "Pending review",
+      "rejected": "Rejected"
+    },
+    "definitions": {
+      "title": "AI Agents",
+      "subtitle": "Autonomous agents draft proposals for admin approval. Actions stay queued until you approve them.",
+      "loading": "Loading agent definitions...",
+      "last_run": "Last run: {{date}}",
+      "meta": {
+        "title": "AI Agents",
+        "description": "Configure autonomous agent definitions and run proposal generators for this tenant."
+      },
+      "actions": {
+        "edit_config": "Edit config",
+        "run_now": "Run now"
+      },
+      "empty": {
+        "title": "No agent definitions yet",
+        "description": "Seed the tenant's default agent definitions before using autonomous proposal workflows."
+      },
+      "edit_modal": {
+        "config_json": "Config (JSON)",
+        "name": "Name",
+        "title": "Edit {{name}}"
+      },
+      "toasts": {
+        "disabled": "{{name}} disabled",
+        "enabled": "{{name}} enabled",
+        "invalid_json": "Config is not valid JSON",
+        "load_failed": "Failed to load agent definitions",
+        "run_created": "Run #{{runId}} created {{count}} proposal(s)",
+        "run_failed": "Failed to run agent",
+        "run_failed_with_error": "Run failed: {{error}}",
+        "toggle_failed": "Failed to toggle agent",
+        "updated": "Agent updated",
+        "update_failed": "Failed to update agent"
+      }
+    },
+    "runs": {
+      "title": "Agent Runs",
+      "subtitle": "History of every agent execution. Select a row to expand error details.",
+      "loading": "Loading agent runs...",
+      "table_aria": "Agent runs",
+      "proposals_cell": "{{generated}} ({{applied}} applied)",
+      "meta": {
+        "title": "AI Agent Runs",
+        "description": "Review execution history, status, token usage, costs, and errors for autonomous agents."
+      },
+      "columns": {
+        "agent": "Agent",
+        "cost": "Cost",
+        "id": "ID",
+        "proposals": "Proposals",
+        "started": "Started",
+        "status": "Status",
+        "tokens": "Tokens (in/out)",
+        "triggered": "Triggered"
+      },
+      "detail": {
+        "completed": "Completed: {{date}}",
+        "error": "Error",
+        "summary": "Summary"
+      },
+      "empty": {
+        "title": "No runs yet",
+        "description": "Agent execution history will appear here after an agent runs."
+      },
+      "toasts": {
+        "load_failed": "Failed to load runs"
+      }
+    },
+    "proposals": {
+      "title": "Agent Proposals",
+      "subtitle": "Review and approve proposals generated by autonomous agents.",
+      "loading": "Loading agent proposals...",
+      "confidence": "Confidence: {{score}}",
+      "run_id": "Run #{{id}}",
+      "subject_user": "Subject user: {{id}}",
+      "target_user": "Target user: {{id}}",
+      "meta": {
+        "title": "AI Agent Proposals",
+        "description": "Review, edit, approve, or reject autonomous agent proposals before they affect tenant data."
+      },
+      "actions": {
+        "approve": "Approve",
+        "edit_approve": "Edit & approve",
+        "reject": "Reject",
+        "save_approve": "Save & approve"
+      },
+      "empty": {
+        "title": "No proposals",
+        "description": "Matching proposals will appear here when agents create review items for this filter."
+      },
+      "edit_modal": {
+        "payload_json": "Payload (JSON)",
+        "title": "Edit & approve proposal #{{id}}"
+      },
+      "labels": {
+        "payload": "Payload",
+        "reasoning": "Reasoning"
+      },
+      "reject_modal": {
+        "note": "Note (optional)",
+        "title": "Reject proposal #{{id}}"
+      },
+      "tabs": {
+        "all": "All",
+        "approved": "Approved",
+        "pending": "Pending",
+        "rejected": "Rejected"
+      },
+      "toasts": {
+        "approved": "Proposal approved and executed",
+        "approve_failed": "Failed to approve",
+        "edit_approve_failed": "Failed to edit and approve",
+        "edited_approved": "Proposal edited and approved",
+        "invalid_json": "Edited payload is not valid JSON",
+        "load_failed": "Failed to load proposals",
+        "reject_failed": "Failed to reject",
+        "rejected": "Proposal rejected"
+      }
+    },
+    "tabs_aria": "Agent proposal status filter"
+  }
+}

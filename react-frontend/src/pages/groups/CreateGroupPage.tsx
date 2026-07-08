@@ -32,7 +32,7 @@ import ImagePlus from 'lucide-react/icons/image-plus';
 import X from 'lucide-react/icons/x';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
-import { PlaceAutocompleteInput } from '@/components/location';
+import { PlaceAutocompleteInput } from '@/components/location/PlaceAutocompleteInput';
 import { useTranslation } from 'react-i18next';
 import { useToast, useTenant } from '@/contexts';
 import { PageMeta } from '@/components/seo';

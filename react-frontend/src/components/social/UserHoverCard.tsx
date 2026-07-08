@@ -31,6 +31,7 @@ import { Button, Chip, Avatar, Skeleton } from '@/components/ui';
 interface UserHoverCardProps {
   userId: number;
   children: React.ReactNode;
+  openOnMount?: boolean;
 }
 
 interface HoverCardData {
@@ -68,19 +69,19 @@ function isTouchDevice(): boolean {
 export const UserHoverCard = memo(function UserHoverCard({
   userId,
   children,
+  openOnMount = false,
 }: UserHoverCardProps) {
   const { t } = useTranslation('social');
   const { tenantPath } = useTenant();
+  // Don't render hover card on touch devices
+  const isTouch = useRef(isTouchDevice());
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(() => openOnMount && !isTouch.current);
   const [userData, setUserData] = useState<HoverCardData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const leaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-
-  // Don't render hover card on touch devices
-  const isTouch = useRef(isTouchDevice());
 
   const fetchUserData = useCallback(async () => {
     // Return cached data
@@ -102,6 +103,12 @@ export const UserHoverCard = memo(function UserHoverCard({
       setIsLoading(false);
     }
   }, [userId]);
+
+  useEffect(() => {
+    if (!openOnMount || isTouch.current) return;
+    setIsOpen(true);
+    fetchUserData();
+  }, [fetchUserData, openOnMount]);
 
   const clearTimers = useCallback(() => {
     if (hoverTimeoutRef.current) {

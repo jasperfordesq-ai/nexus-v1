@@ -100,7 +100,7 @@ function formatLevel(level: string): string {
 }
 
 export function ProviderHealthDashboard() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   const toast = useToast();
   const [providers, setProviders] = useState<ProviderHealth[]>([]);
   const [loading, setLoading] = useState(true);
@@ -177,7 +177,7 @@ export function ProviderHealthDashboard() {
 }
 
 function ProviderCard({ provider }: { provider: ProviderHealth }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   const { stats, recent_24h, last_webhook } = provider;
   const successColor = stats.success_rate === null
     ? 'default'

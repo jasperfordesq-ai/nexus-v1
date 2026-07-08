@@ -56,7 +56,7 @@ function formatDate(dateStr: string | null | undefined, neverLabel = 'Never'): s
 }
 
 export function UserShow() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   usePageTitle(t('super.users'));
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();

@@ -101,7 +101,7 @@ function FaqActionsMenu({ faq, t, openEditModal, setDeleteTarget }: FaqActionsMe
 }
 
 export function HelpFaqsAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_help_module');
   usePageTitle(t('help_faqs.page_title'));
   useAdminPageMeta({ title: t('help_faqs.page_title') });
   const toast = useToast();

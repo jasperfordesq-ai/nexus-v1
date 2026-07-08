@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { useToast } from '@/contexts';
+import { useToast } from '@/contexts/ToastContext';
 import { API_ERROR_EVENT, type ApiErrorEventDetail } from '@/lib/api';
 
 /**

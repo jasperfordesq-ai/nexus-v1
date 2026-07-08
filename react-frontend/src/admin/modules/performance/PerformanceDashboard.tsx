@@ -65,7 +65,7 @@ const formatTimestamp = (timestamp: string) => {
 };
 
 export default function PerformanceDashboard() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_performance');
   usePageTitle(t('performance.page_title'));
 
   const [summary, setSummary] = useState<PerformanceSummary | null>(null);

@@ -29,7 +29,7 @@ import type { SystemRequirements as SystemRequirementsType } from '../../api/typ
 
 
 export function SystemRequirements() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   usePageTitle(t('enterprise.page_title'));
   const toast = useToast();
 

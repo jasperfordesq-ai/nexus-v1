@@ -224,6 +224,18 @@ function stripRuntimeMapsAssets(html) {
     .replace(/<link[^>]+(?:maps\.googleapis\.com|maps-api-v3|maps\.gstatic\.com)[^>]*>/gi, '');
 }
 
+function stripNonCoreModulePreloads(html) {
+  return html.replace(/<link\b[^>]*>/gi, (tag) => {
+    const rel = tag.match(/\brel=["']([^"']+)["']/i)?.[1] || '';
+    if (!rel.split(/\s+/).includes('modulepreload')) return tag;
+
+    const href = tag.match(/\bhref=["']([^"']+)["']/i)?.[1] || '';
+    if (/^\/assets\/vendor-(?:react|i18n)-[^/]+\.js$/i.test(href)) return tag;
+
+    return '';
+  });
+}
+
 // ─── Pre-render a single route ───────────────────────────────────────────────
 async function capturePageContent(page) {
   let lastError;
@@ -265,6 +277,7 @@ async function prerenderRoute(page, route) {
     // Clean up: remove Vite HMR scripts that shouldn't be in static output
     html = html.replace(/<script[^>]*type="module"[^>]*src="\/src\/[^"]*"[^>]*><\/script>/g, '');
     html = stripRuntimeMapsAssets(html);
+    html = stripNonCoreModulePreloads(html);
 
     // Write the static HTML file
     const outputPath = route === '/'

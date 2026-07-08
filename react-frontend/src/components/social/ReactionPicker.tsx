@@ -3,81 +3,39 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-/**
- * ReactionPicker — Animated emoji reaction picker for posts and comments.
- *
- * Appears on hover (desktop, 300ms delay) or long-press (mobile).
- * Shows 8 reaction types in a glassmorphism popup bar above the trigger button.
- * Selecting a reaction replaces the button text/icon with the chosen emoji.
- * Tapping the same reaction again removes it.
- */
+import { lazy, Suspense, useCallback, useEffect, useId, useRef, useState } from 'react';
 
-import { useState, useRef, useCallback, useEffect, useId } from 'react';
-import { motion, AnimatePresence } from '@/lib/motion';
-
-import Heart from 'lucide-react/icons/heart';
 import Clock from 'lucide-react/icons/clock';
+import Heart from 'lucide-react/icons/heart';
 import { useTranslation } from 'react-i18next';
-import { Button, Tooltip } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import {
+  REACTION_CONFIGS,
+  type ReactionType,
+} from './reactions';
 
-/* ───────────────────────── Reaction Config ───────────────────────── */
+const ReactionPickerMenu = lazy(() => import('./ReactionPickerMenu').then((module) => ({ default: module.ReactionPickerMenu })));
 
-export type ReactionType = 'love' | 'like' | 'laugh' | 'wow' | 'sad' | 'celebrate' | 'clap' | 'time_credit';
-
-export interface ReactionConfig {
-  type: ReactionType;
-  emoji: string;
-  label: string;
-}
-
-export const REACTION_CONFIGS: ReactionConfig[] = [
-  { type: 'like', emoji: '\uD83D\uDC4D', label: 'reaction.like' },
-  { type: 'love', emoji: '\u2764\uFE0F', label: 'reaction.love' },
-  { type: 'laugh', emoji: '\uD83D\uDE02', label: 'reaction.laugh' },
-  { type: 'wow', emoji: '\uD83D\uDE2E', label: 'reaction.wow' },
-  { type: 'sad', emoji: '\uD83D\uDE22', label: 'reaction.sad' },
-  { type: 'celebrate', emoji: '\uD83C\uDF89', label: 'reaction.celebrate' },
-  { type: 'clap', emoji: '\uD83D\uDC4F', label: 'reaction.clap' },
-  { type: 'time_credit', emoji: '\u23F0', label: 'reaction.time_credit' },
-];
-
-/** Map from reaction type to its emoji */
-export const REACTION_EMOJI_MAP: Record<ReactionType, string> = Object.fromEntries(
-  REACTION_CONFIGS.map((r) => [r.type, r.emoji])
-) as Record<ReactionType, string>;
-
-/** Map from reaction type to its label */
-export const REACTION_LABEL_MAP: Record<ReactionType, string> = Object.fromEntries(
-  REACTION_CONFIGS.map((r) => [r.type, r.label])
-) as Record<ReactionType, string>;
-
-/* ───────────────────────── Props ───────────────────────── */
+export type { ReactionType } from './reactions';
+export { REACTION_CONFIGS, REACTION_EMOJI_MAP, REACTION_LABEL_MAP } from './reactions';
 
 export interface ReactionPickerProps {
-  /** Currently selected reaction type (null if none) */
   userReaction: ReactionType | null;
-  /** Called when a reaction is selected or deselected */
   onReact: (type: ReactionType) => void;
-  /** Whether the user is authenticated */
   isAuthenticated: boolean;
-  /** Whether the picker is disabled (e.g. during API call) */
   isDisabled?: boolean;
-  /** Size variant */
   size?: 'sm' | 'md';
 }
 
-/* ───────────────────────── Component ───────────────────────── */
-
-// Color based on reaction type
 const getReactionColor = (type: ReactionType | null): string => {
   if (!type) return 'text-[var(--text-muted)] hover:text-rose-500';
+
   switch (type) {
     case 'love':
       return 'text-rose-500 font-medium';
     case 'like':
       return 'text-[var(--color-info)] font-medium';
     case 'laugh':
-      return 'text-[var(--color-warning)] font-medium';
     case 'wow':
       return 'text-[var(--color-warning)] font-medium';
     case 'sad':
@@ -109,10 +67,8 @@ export function ReactionPicker({
   const longPressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const isLongPressRef = useRef(false);
 
-  // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
       if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
@@ -121,15 +77,14 @@ export function ReactionPicker({
     };
   }, []);
 
-  /* ───── Desktop: hover with 300ms delay ───── */
-
   const handleMouseEnter = useCallback(() => {
-    // Cancel any pending close so the picker stays open
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
     }
+
     if (!isAuthenticated || isDisabled) return;
+
     hoverTimeoutRef.current = setTimeout(() => {
       setIsPickerOpen(true);
     }, 300);
@@ -140,17 +95,16 @@ export function ReactionPicker({
       clearTimeout(hoverTimeoutRef.current);
       hoverTimeoutRef.current = null;
     }
-    // Small delay before closing to allow moving to the picker
+
     closeTimeoutRef.current = setTimeout(() => {
       setIsPickerOpen(false);
       closeTimeoutRef.current = null;
     }, 300);
   }, []);
 
-  /* ───── Mobile: long-press ───── */
-
   const handleTouchStart = useCallback(() => {
     if (!isAuthenticated || isDisabled) return;
+
     isLongPressRef.current = false;
     longPressTimeoutRef.current = setTimeout(() => {
       isLongPressRef.current = true;
@@ -165,8 +119,6 @@ export function ReactionPicker({
     }
   }, []);
 
-  /* ───── Select reaction ───── */
-
   const handleSelectReaction = useCallback(
     (type: ReactionType) => {
       onReact(type);
@@ -175,32 +127,30 @@ export function ReactionPicker({
     [onReact]
   );
 
-  /* ───── Quick tap on button (no picker) ───── */
+  const handleKeepPickerOpen = useCallback(() => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  }, []);
 
   const handleQuickTap = useCallback(() => {
     if (!isAuthenticated || isDisabled) return;
-    // If long press just fired, ignore
+
     if (isLongPressRef.current) {
       isLongPressRef.current = false;
       return;
     }
-    // Quick tap: toggle like (default reaction)
-    if (userReaction) {
-      // Remove current reaction
-      onReact(userReaction);
-    } else {
-      // Add default "like" reaction
-      onReact('like');
-    }
-  }, [isAuthenticated, isDisabled, userReaction, onReact]);
 
-  /* ───── Close picker when clicking outside ───── */
+    onReact(userReaction ?? 'like');
+  }, [isAuthenticated, isDisabled, userReaction, onReact]);
 
   useEffect(() => {
     if (!isPickerOpen) return;
 
-    const handleClickOutside = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsPickerOpen(false);
       }
     };
@@ -209,31 +159,26 @@ export function ReactionPicker({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isPickerOpen]);
 
-  /* ───── Keyboard navigation: arrows, Enter, Escape ───── */
-
-  // Focus the first or current reaction when picker opens via keyboard
   useEffect(() => {
     if (!isPickerOpen) {
       setFocusedIndex(null);
-      return;
     }
-    if (focusedIndex !== null) {
-      itemRefs.current[focusedIndex]?.focus();
-    }
-  }, [isPickerOpen, focusedIndex]);
+  }, [isPickerOpen]);
 
   const handleTriggerKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    (event: React.KeyboardEvent<HTMLButtonElement>) => {
       if (!isAuthenticated || isDisabled) return;
-      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-        e.preventDefault();
-        const startIdx = userReaction
-          ? Math.max(0, REACTION_CONFIGS.findIndex((r) => r.type === userReaction))
+
+      if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        const startIndex = userReaction
+          ? Math.max(0, REACTION_CONFIGS.findIndex((reaction) => reaction.type === userReaction))
           : 0;
+
         setIsPickerOpen(true);
-        setFocusedIndex(startIdx);
-      } else if (e.key === 'Escape' && isPickerOpen) {
-        e.preventDefault();
+        setFocusedIndex(startIndex);
+      } else if (event.key === 'Escape' && isPickerOpen) {
+        event.preventDefault();
         setIsPickerOpen(false);
         triggerRef.current?.focus();
       }
@@ -241,36 +186,7 @@ export function ReactionPicker({
     [isAuthenticated, isDisabled, isPickerOpen, userReaction]
   );
 
-  const handlePickerKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        setIsPickerOpen(false);
-        triggerRef.current?.focus();
-        return;
-      }
-      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-        e.preventDefault();
-        setFocusedIndex((idx) => {
-          const cur = idx ?? 0;
-          const len = REACTION_CONFIGS.length;
-          return e.key === 'ArrowRight' ? (cur + 1) % len : (cur - 1 + len) % len;
-        });
-      } else if (e.key === 'Home') {
-        e.preventDefault();
-        setFocusedIndex(0);
-      } else if (e.key === 'End') {
-        e.preventDefault();
-        setFocusedIndex(REACTION_CONFIGS.length - 1);
-      }
-    },
-    []
-  );
-
-  /* ───── Button content based on current reaction ───── */
-
-  const currentConfig = userReaction ? REACTION_CONFIGS.find((r) => r.type === userReaction) : null;
-
+  const currentConfig = userReaction ? REACTION_CONFIGS.find((reaction) => reaction.type === userReaction) : null;
   const buttonLabel = currentConfig ? t(currentConfig.label) : t('card.like_action');
   const buttonEmoji = currentConfig ? currentConfig.emoji : null;
 
@@ -281,77 +197,21 @@ export function ReactionPicker({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Picker popup */}
-      <AnimatePresence>
-        {isPickerOpen && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.6, y: 8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.6, y: 8 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-            /*
-              Anchor the popup to the BUTTON'S left edge rather than centering it.
-              The feed card is `overflow-hidden`, and after the footer redesign the
-              Like button sits near the card's left edge — a centered popup was
-              getting clipped on the left. Extending rightward keeps it inside the
-              card body which always has room.
-            */
-            className="absolute bottom-full left-0 pb-2 z-50"
-            onMouseEnter={() => {
-              if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-              if (closeTimeoutRef.current) {
-                clearTimeout(closeTimeoutRef.current);
-                closeTimeoutRef.current = null;
-              }
-            }}
-            onKeyDown={handlePickerKeyDown}
-          >
-            <div
-              id={pickerId}
-              role="menu"
-              aria-label={t('reaction.react_to_post')}
-              className="flex items-center gap-0.5 px-2 py-1.5 rounded-full bg-[var(--surface-dropdown)]/95 backdrop-blur-xl border border-[var(--border-default)] shadow-xl shadow-black/20"
-            >
-              {REACTION_CONFIGS.map((config, idx) => (
-                <Tooltip
-                  key={config.type}
-                  content={t(config.label)}
-                  delay={200}
-                  closeDelay={0}
-                  size="sm"
-                  placement="top"
-                >
-                  <motion.button
-                    ref={(el: HTMLButtonElement | null) => { itemRefs.current[idx] = el; }}
-                    whileHover={{ scale: 1.35, y: -4 }}
-                    whileTap={{ scale: 0.9 }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 20 }}
-                    className={`w-9 h-9 flex items-center justify-center rounded-full cursor-pointer text-xl transition-colors
-                      ${userReaction === config.type
-                        ? 'bg-[var(--surface-active)] ring-2 ring-[var(--color-primary)]/40'
-                        : 'hover:bg-[var(--surface-hover)]'
-                      }`}
-                    onClick={() => handleSelectReaction(config.type)}
-                    aria-label={t(config.label)}
-                    aria-pressed={userReaction === config.type}
-                    role="menuitem"
-                    tabIndex={focusedIndex === idx ? 0 : -1}
-                    type="button"
-                  >
-                    {config.type === 'time_credit' ? (
-                      <Clock className="w-5 h-5 text-purple-400" aria-hidden="true" />
-                    ) : (
-                      <span role="img" aria-label={t(config.label)}>{config.emoji}</span>
-                    )}
-                  </motion.button>
-                </Tooltip>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {isPickerOpen && (
+        <Suspense fallback={null}>
+          <ReactionPickerMenu
+            pickerId={pickerId}
+            userReaction={userReaction}
+            focusedIndex={focusedIndex}
+            onFocusedIndexChange={setFocusedIndex}
+            onKeepOpen={handleKeepPickerOpen}
+            onClose={() => setIsPickerOpen(false)}
+            onSelectReaction={handleSelectReaction}
+            focusTrigger={() => triggerRef.current?.focus()}
+          />
+        </Suspense>
+      )}
 
-      {/* Main reaction button */}
       <Button
         ref={triggerRef}
         size={size}

@@ -19,7 +19,7 @@ import { ConfirmModal } from '../../components/ConfirmModal';
 import GroupPolicies from './GroupPolicies';
 
 export default function GroupTypes() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   usePageTitle(t('groups.page_title'));
   const { success, error } = useToast();
   const [types, setTypes] = useState<GroupType[]>([]);

@@ -49,8 +49,8 @@ describe('ToastContext', () => {
       screen.getByRole('button', { name: 'Show Success' }).click();
     });
 
-    expect(screen.getByText('Success!')).toBeInTheDocument();
-    expect(screen.getByText('It worked')).toBeInTheDocument();
+    expect(await screen.findByText('Success!')).toBeInTheDocument();
+    expect(await screen.findByText('It worked')).toBeInTheDocument();
   });
 
   it('adds toast when error is called', async () => {
@@ -64,8 +64,8 @@ describe('ToastContext', () => {
       screen.getByRole('button', { name: 'Show Error' }).click();
     });
 
-    expect(screen.getByText('Error!')).toBeInTheDocument();
-    expect(screen.getByText('Something failed')).toBeInTheDocument();
+    expect(await screen.findByText('Error!')).toBeInTheDocument();
+    expect(await screen.findByText('Something failed')).toBeInTheDocument();
   });
 
   it('throws error when useToast is used outside provider', () => {

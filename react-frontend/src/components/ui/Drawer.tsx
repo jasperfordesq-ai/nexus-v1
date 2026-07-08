@@ -15,7 +15,7 @@ import {
   use,
   useMemo,
 } from 'react';
-import { Drawer as HeroUIDrawer } from '@heroui/react';
+import { Drawer as HeroUIDrawer } from '@heroui/react/drawer';
 
 import { cn } from '@/lib/helpers';
 

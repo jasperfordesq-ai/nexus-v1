@@ -403,7 +403,7 @@ function DragItemCard({ item, t }: { item: MenuItemData; t: TFunction }) {
 export function MenuBuilder() {
   const { id } = useParams<{ id: string }>();
   const isEdit = id !== undefined && id !== 'new';
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   usePageTitle(t('menu_builder.menu_builder_title'));
   const navigate = useNavigate();
   const { tenantPath } = useTenant();

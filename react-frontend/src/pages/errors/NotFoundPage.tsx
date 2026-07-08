@@ -16,8 +16,8 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Search from 'lucide-react/icons/search';
 import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';
-import { useTenant } from '@/contexts';
-import { usePageTitle } from '@/hooks';
+import { useTenant } from '@/contexts/TenantContext';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 export function NotFoundPage() {
   const { t } = useTranslation('utility');

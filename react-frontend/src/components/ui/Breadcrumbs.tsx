@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Breadcrumbs as HeroUIBreadcrumbs,
-  type BreadcrumbsProps as HeroUIBreadcrumbsProps,
-} from '@heroui/react';
+import { Breadcrumbs as HeroUIBreadcrumbs, type BreadcrumbsProps as HeroUIBreadcrumbsProps } from '@heroui/react/breadcrumbs';
 
 export type BreadcrumbsProps = HeroUIBreadcrumbsProps;
 export const Breadcrumbs = HeroUIBreadcrumbs;

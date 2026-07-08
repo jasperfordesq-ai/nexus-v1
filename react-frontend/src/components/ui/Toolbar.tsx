@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Toolbar as HeroUIToolbar,
-  type Toolbar as HeroUIToolbarTypes,
-} from '@heroui/react';
+import { Toolbar as HeroUIToolbar, type Toolbar as HeroUIToolbarTypes } from '@heroui/react/toolbar';
 
 export type ToolbarProps = HeroUIToolbarTypes['Props'];
 export const Toolbar = HeroUIToolbar;

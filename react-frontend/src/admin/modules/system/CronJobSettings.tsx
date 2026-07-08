@@ -30,7 +30,7 @@ import type { CronJob, CronJobSettings, GlobalCronSettings } from '../../api/typ
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CronJobSettingsPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   usePageTitle(t('system.cron_job_settings_title'));
   const toast = useToast();
   const { user } = useAuth();

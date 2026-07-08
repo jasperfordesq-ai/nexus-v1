@@ -10,15 +10,11 @@ import {
   type Ref,
   type TextareaHTMLAttributes,
 } from 'react';
-import {
-  Description,
-  FieldError,
-  Label,
-  TextArea as HeroUITextArea,
-  TextField,
-  type TextAreaProps as HeroUITextAreaProps,
-  type TextFieldProps,
-} from '@heroui/react';
+import { Description } from '@heroui/react/description';
+import { FieldError } from '@heroui/react/field-error';
+import { Label } from '@heroui/react/label';
+import { TextArea as HeroUITextArea, type TextAreaProps as HeroUITextAreaProps } from '@heroui/react/textarea';
+import { TextField, type TextFieldProps } from '@heroui/react/textfield';
 
 type LegacyVariant = 'flat' | 'bordered' | 'underlined' | 'faded';
 type V3Variant = NonNullable<HeroUITextAreaProps['variant']>;

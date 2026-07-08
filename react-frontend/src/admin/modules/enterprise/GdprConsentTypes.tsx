@@ -50,7 +50,7 @@ const handleExportUsers = (slug: string) => {
 };
 
 export function GdprConsentTypes() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   useAdminPageMeta({ title: t('enterprise.gdpr_consent_types_title') });
   const toast = useToast();
 

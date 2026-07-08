@@ -10,7 +10,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
 import Bell from 'lucide-react/icons/bell';
 import MessageSquare from 'lucide-react/icons/message-square';
 import ListTodo from 'lucide-react/icons/list-todo';
@@ -25,13 +25,17 @@ import Info from 'lucide-react/icons/info';
 import X from 'lucide-react/icons/x';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useTranslation } from 'react-i18next';
-import { useNotifications, useTenant } from '@/contexts';
+import { useNotificationsOptional } from '@/contexts/NotificationsContext';
+import { useTenant } from '@/contexts/TenantContext';
 import { api } from '@/lib/api';
 import { formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { getNotificationDisplayText } from '@/lib/notificationText';
 import type { Notification } from '@/types/api';
-import { Button, Avatar, AvatarGroup, Skeleton, Drawer, DrawerContent, DrawerHeader, DrawerBody } from '@/components/ui';
+import { Avatar, AvatarGroup } from '@/components/ui/Avatar';
+import { Button } from '@/components/ui/Button';
+import { Drawer, DrawerContent, DrawerHeader, DrawerBody } from '@/components/ui/Drawer';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 const TYPE_ICONS: Record<string, typeof Bell> = {
   message: MessageSquare,
@@ -52,7 +56,7 @@ const getIcon = (type: string) => {
 export function NotificationFlyout() {
   const { t } = useTranslation('notifications');
   const navigate = useNavigate();
-  const { unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { unreadCount, markAsRead, markAllAsRead } = useNotificationsOptional();
   const { tenantPath } = useTenant();
   const isMobile = useMediaQuery('(max-width: 767px)');
 

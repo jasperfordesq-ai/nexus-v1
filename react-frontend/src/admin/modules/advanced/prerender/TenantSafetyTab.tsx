@@ -34,7 +34,7 @@ export function TenantSafetyTab({
   toast: ToastShape;
   onOpenInventory: (slug: string) => void;
 }) {
-  const { t } = useTranslation('admin', { keyPrefix: 'advanced.prerender.tenant_safety' });
+  const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.tenant_safety' });
   const [tenant, setTenant] = useState('');
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<PrerenderTenantSafety | null>(null);

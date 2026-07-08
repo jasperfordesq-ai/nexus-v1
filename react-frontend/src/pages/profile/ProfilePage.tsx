@@ -43,7 +43,7 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import ExternalLink from 'lucide-react/icons/external-link';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
-import { LocationMapCard } from '@/components/location';
+import { LocationMapCard } from '@/components/location/LocationMapCard';
 import { ReviewModal } from '@/components/reviews';
 import { TranslateButton } from '@/components/i18n/TranslateButton';
 import { TransferModal } from '@/components/wallet';

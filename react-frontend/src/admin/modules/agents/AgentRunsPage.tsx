@@ -41,7 +41,7 @@ const statusColor = (s: string): 'success' | 'warning' | 'danger' | 'default' =>
 };
 
 export default function AgentRunsPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_agents');
   usePageTitle(t('agents.runs.meta.title'));
   useAdminPageMeta({
     title: t('agents.runs.meta.title'),

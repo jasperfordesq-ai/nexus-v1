@@ -82,7 +82,7 @@ function StatusChip({ status, t }: StatusChipProps) {
 }
 
 export default function MunicipalVerificationAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   const toast = useToast();
   usePageTitle(t('municipal_verification.meta.page_title'));
 

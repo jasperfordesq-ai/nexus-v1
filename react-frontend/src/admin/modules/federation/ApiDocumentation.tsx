@@ -56,7 +56,7 @@ function MethodChip({ method }: { method: 'GET' | 'POST' }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function OverviewTab() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   return (
     <div className="space-y-6">
       <Card>
@@ -237,7 +237,7 @@ function OverviewTab() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function AuthenticationTab() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   return (
     <div className="space-y-6">
       {/* API Key Auth */}
@@ -763,7 +763,7 @@ const ENDPOINTS: EndpointDef[] = [
 ];
 
 function EndpointsTab() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   return (
     <Accordion variant="surface" selectionMode="multiple">
       {ENDPOINTS.map((ep) => (
@@ -999,7 +999,7 @@ const langLabels: Record<ExampleLang, string> = {
 };
 
 function ExamplesTab() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   const [lang, setLang] = useState<ExampleLang>('curl');
 
   return (
@@ -1062,7 +1062,7 @@ const ERROR_CODES = [
 ];
 
 function ErrorCodesTab() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted">
@@ -1125,7 +1125,7 @@ const WEBHOOK_EVENTS = [
 ];
 
 function WebhooksTab() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   const { tenantPath } = useTenant();
   return (
     <div className="space-y-6">
@@ -1275,7 +1275,7 @@ def handle_webhook():
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function ApiDocumentation() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   usePageTitle(t('federation.api_docs_title'));
 
   return (

@@ -37,7 +37,7 @@ interface PageItem {
 }
 
 export function PagesAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   usePageTitle(t('content.page_title'));
   const { tenantPath, refreshTenant } = useTenant();
   const toast = useToast();

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { ComponentProps, ReactNode } from 'react';
-import { Badge as HeroUIBadge } from '@heroui/react';
+import { Badge as HeroUIBadge } from '@heroui/react/badge';
 
 type HeroUIBadgeProps = ComponentProps<typeof HeroUIBadge>;
 type HeroUIBadgeAnchorProps = ComponentProps<typeof HeroUIBadge.Anchor>;

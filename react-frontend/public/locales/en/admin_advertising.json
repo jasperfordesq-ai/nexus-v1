@@ -1,0 +1,265 @@
+{
+  "common": {
+    "an_unexpected_error": "An unexpected error occurred",
+    "back": "Back",
+    "cancel": "Cancel",
+    "critical": "Critical",
+    "delete": "Delete",
+    "feature": "Feature",
+    "high": "High",
+    "in_progress": "In Progress",
+    "in_review": "In Review",
+    "low": "Low",
+    "medium": "Medium",
+    "planned": "Planned",
+    "refresh": "Refresh",
+    "unexpected_error": "Unexpected error",
+    "unknown": "Unknown",
+    "unfeature": "Unfeature",
+    "actions": "Actions",
+    "active": "Active",
+    "all": "All",
+    "approved": "Approved",
+    "clear": "Clear",
+    "clear_filters": "Clear Filters",
+    "clear_selection": "Clear Selection",
+    "close": "Close",
+    "collapse": "Collapse",
+    "confirm": "Confirm",
+    "create": "Create",
+    "declined": "Declined",
+    "download": "Download",
+    "edit": "Edit",
+    "error_loading_data": "Loading Data error",
+    "expand": "Expand",
+    "export": "Export",
+    "load_more": "Load More",
+    "loading": "Loading",
+    "next": "Next",
+    "no": "No",
+    "ok": "OK",
+    "pending": "Pending",
+    "previous": "Previous",
+    "retry": "Retry",
+    "save": "Save",
+    "select_all": "Select All",
+    "select_item": "Select Item",
+    "yes": "Yes"
+  },
+  "shared": {
+    "broker_actions": "Broker Actions",
+    "content": "Content",
+    "core_module": "Core Module",
+    "document_details": "Document Details",
+    "history": "History",
+    "log_file_empty": "No log file found",
+    "no": "No",
+    "no_history_available": "No history available found",
+    "no_legal_documents_found": "No legal documents found found",
+    "no_members_found": "No members found found",
+    "loading": "Loading",
+    "no_data": "No data",
+    "no_data_available": "No data available",
+    "no_recent_broker_activity": "No recent broker activity found",
+    "open_page_help": "Open page help",
+    "help": "Help",
+    "quick_access": "Quick Access",
+    "recent_activity": "Recent Activity",
+    "refresh": "Refresh",
+    "search": "Search...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Data",
+    "total_count": "{{count}} total"
+  },
+  "advertising": {
+    "status": {
+      "all": "All",
+      "active": "Active",
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "draft": "Draft",
+      "drafts": "Drafts",
+      "paused": "Paused",
+      "pending_review": "Pending Review",
+      "rejected": "Rejected",
+      "scheduled": "Scheduled",
+      "sending": "Sending",
+      "sent": "Sent"
+    },
+    "advertiser": {
+      "gemeinde": "Municipality",
+      "private": "Private",
+      "sme": "SME",
+      "sme_local": "SME (local business)",
+      "verein": "Association"
+    },
+    "shared": {
+      "campaign_details": "Campaign details",
+      "filter_by_status": "Filter by status",
+      "rejection_reason": "Rejection reason",
+      "search_campaigns": "Search campaigns...",
+      "unexpected_error": "An unexpected error occurred",
+      "actions": {
+        "approve": "Approve",
+        "cancel": "Cancel",
+        "close": "Close",
+        "create_campaign": "Create campaign",
+        "details": "Details",
+        "new_campaign": "New campaign",
+        "pause": "Pause",
+        "reject": "Reject",
+        "reject_campaign": "Reject campaign",
+        "submit_for_review": "Submit for review",
+        "view_details": "View details"
+      },
+      "columns": {
+        "actions": "Actions",
+        "advertiser": "Advertiser",
+        "campaign": "Campaign",
+        "clicks": "Clicks",
+        "ctr": "CTR",
+        "id": "ID",
+        "impressions": "Impressions",
+        "status": "Status"
+      },
+      "empty": {
+        "no_campaigns": "No campaigns found."
+      },
+      "fields": {
+        "advertiser_type": "Advertiser type",
+        "campaign_name": "Campaign name",
+        "type": "Type"
+      }
+    },
+    "ad": {
+      "page_title": "Ad Campaigns",
+      "budget_description": "Enter 0 for unlimited budget",
+      "audience_description": "Leave blank to target all community members",
+      "creative_alt": "Creative",
+      "create_title": "Create ad campaign",
+      "creatives_count": "Creatives ({{count}})",
+      "no_creatives": "No creatives attached to this campaign yet.",
+      "performance_30_days": "Performance (30 days)",
+      "reject_intro_prefix": "You are rejecting",
+      "reject_intro_suffix": "Please provide a reason so the advertiser knows how to improve their submission.",
+      "rejection_placeholder": "e.g. Content violates community guidelines - please revise the headline.",
+      "columns": {
+        "budget_spent": "Budget / Spent"
+      },
+      "fields": {
+        "audience_filters": "Audience filters (JSON, optional)",
+        "end_date": "End date",
+        "placement": "Placement",
+        "start_date": "Start date",
+        "total_budget_cents": "Total budget (in cents)"
+      },
+      "header": {
+        "title": "Local Advertising",
+        "description": "Manage local ad campaigns from SMEs, associations, and municipalities"
+      },
+      "placement": {
+        "all": "All placements",
+        "discovery": "Discovery",
+        "feed": "Feed",
+        "market": "Market"
+      },
+      "placeholders": {
+        "budget": "e.g. 5000 = EUR 50.00",
+        "campaign_name": "Summer Sale - Cafe Helvetia"
+      },
+      "stats": {
+        "active_campaigns": "Active campaigns",
+        "clicks_today": "Clicks today",
+        "impressions_today": "Impressions today",
+        "total_revenue": "Total revenue"
+      },
+      "toasts": {
+        "approved": "Campaign \"{{name}}\" approved",
+        "approve_failed": "Failed to approve campaign",
+        "audience_json_invalid": "Audience filters must be valid JSON",
+        "created": "Campaign created and submitted for review",
+        "create_failed": "Failed to create campaign",
+        "details_failed": "Failed to load campaign details",
+        "load_failed": "Failed to load ad campaigns",
+        "name_required": "Campaign name is required",
+        "paused": "Campaign \"{{name}}\" paused",
+        "pause_failed": "Failed to pause campaign",
+        "rejected": "Campaign \"{{name}}\" rejected",
+        "reject_failed": "Failed to reject campaign"
+      }
+    },
+    "push": {
+      "page_title": "Push Campaigns",
+      "chart_opens_title": "{{count}} opens",
+      "chart_sends_title": "{{count}} sends",
+      "create_title": "New push campaign",
+      "daily_breakdown": "Daily breakdown",
+      "immediate": "Immediate",
+      "no_daily_data": "No daily data yet.",
+      "reject_intro_prefix": "Rejecting",
+      "reject_intro_suffix": "Please provide a reason that will be visible to the advertiser.",
+      "rejection_placeholder": "e.g. Content does not comply with community guidelines...",
+      "table_aria": "Push campaigns",
+      "actions": {
+        "dispatch_now": "Dispatch now"
+      },
+      "columns": {
+        "cost": "Cost",
+        "open_rate": "Open rate",
+        "scheduled": "Scheduled",
+        "targets": "Targets",
+        "title_preview": "Title preview"
+      },
+      "dates": {
+        "approved": "Approved",
+        "created": "Created",
+        "scheduled": "Scheduled",
+        "sent": "Sent"
+      },
+      "fields": {
+        "cta_url": "CTA URL",
+        "cta_url_optional": "CTA URL (optional)",
+        "notification_body": "Push notification body",
+        "notification_title": "Push notification title",
+        "push_body": "Push body",
+        "push_title": "Push title",
+        "scheduled_at": "Scheduled at (optional - leave blank to send on approval)"
+      },
+      "header": {
+        "title": "Paid push campaigns (AG57)"
+      },
+      "metrics": {
+        "opens": "Opens",
+        "revenue": "Revenue",
+        "sends": "Sends",
+        "sent": "Sent"
+      },
+      "placeholders": {
+        "body": "Max 400 characters",
+        "campaign_name": "e.g. Spring Promotion - Cafe Seeblick",
+        "title": "Max 100 characters"
+      },
+      "stats": {
+        "needs_attention": "Needs attention",
+        "pending_review": "Pending review",
+        "revenue_this_month": "Revenue this month",
+        "sends_this_month": "Sends this month",
+        "total_campaigns": "Total campaigns"
+      },
+      "toasts": {
+        "approved": "Campaign \"{{name}}\" approved.",
+        "approve_failed": "Failed to approve campaign.",
+        "created": "Campaign created.",
+        "create_failed": "Failed to create campaign.",
+        "dispatched": "Campaign \"{{name}}\" dispatched.",
+        "dispatch_failed": "Failed to dispatch campaign.",
+        "load_failed": "Failed to load campaigns",
+        "rejected": "Campaign \"{{name}}\" rejected.",
+        "reject_failed": "Failed to reject campaign.",
+        "required_fields": "Name, title, and body are required."
+      }
+    },
+    "tabs_aria": "Ad campaign status filter"
+  }
+}

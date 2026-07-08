@@ -12,7 +12,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react';
-import { Tabs as HeroUITabs } from '@heroui/react';
+import { Tabs as HeroUITabs } from '@heroui/react/tabs';
 
 type HeroUITabsProps = ComponentPropsWithoutRef<typeof HeroUITabs>;
 type TabsVariant = 'solid' | 'bordered' | 'light' | 'underlined' | 'primary' | 'secondary';

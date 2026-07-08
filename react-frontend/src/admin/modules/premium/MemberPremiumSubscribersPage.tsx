@@ -38,7 +38,7 @@ function statusColor(s: string): 'success' | 'warning' | 'danger' | 'default' {
 }
 
 export function MemberPremiumSubscribersPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_premium');
   usePageTitle(t('member_premium_admin.subscribers_page.title'));
   const toast = useToast();
 

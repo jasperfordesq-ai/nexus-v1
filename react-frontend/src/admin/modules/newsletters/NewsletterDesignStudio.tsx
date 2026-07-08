@@ -17,10 +17,13 @@
  * design_json are sent, so targeting/scheduling set on the form is untouched.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Spinner, Input, Chip } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
+import { Chip } from '@/components/ui/Chip';
+import { Input } from '@/components/ui/Input';
+import { Spinner } from '@/components/ui/Spinner';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Check from 'lucide-react/icons/check';
@@ -29,10 +32,15 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
 import { adminNewsletters } from '../../api/adminApi';
-import { NewsletterBuilder } from '../../components/NewsletterBuilder';
 
 const AUTOSAVE_DEBOUNCE_MS = 900;
 type SaveState = 'idle' | 'dirty' | 'saving' | 'saved' | 'error';
+
+const NewsletterBuilder = lazy(() =>
+  import('../../components/NewsletterBuilder').then((module) => ({
+    default: module.NewsletterBuilder,
+  })),
+);
 
 /** Status chip appearance per save state (null = show nothing). */
 const SAVE_CHIP: Record<SaveState, { color: 'default' | 'success' | 'warning' | 'danger'; key: string } | null> = {
@@ -45,7 +53,7 @@ const SAVE_CHIP: Record<SaveState, { color: 'default' | 'success' | 'warning' | 
 
 export function NewsletterDesignStudio() {
   const { id } = useParams<{ id: string }>();
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
   const toast = useToast();
@@ -267,15 +275,23 @@ export function NewsletterDesignStudio() {
           <Spinner size="sm" />
         </div>
       ) : (
-        <NewsletterBuilder
-          fill
-          enableTemplates
-          html=""
-          designJson={designJson}
-          initialMjml={initialMjml}
-          readOnly={readOnly}
-          onChange={handleBuilderChange}
-        />
+        <Suspense
+          fallback={
+            <div className="flex flex-1 items-center justify-center" role="status" aria-busy="true">
+              <Spinner size="sm" />
+            </div>
+          }
+        >
+          <NewsletterBuilder
+            fill
+            enableTemplates
+            html=""
+            designJson={designJson}
+            initialMjml={initialMjml}
+            readOnly={readOnly}
+            onChange={handleBuilderChange}
+          />
+        </Suspense>
       )}
     </div>
   );

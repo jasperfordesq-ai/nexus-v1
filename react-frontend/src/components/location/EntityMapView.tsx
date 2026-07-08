@@ -8,14 +8,20 @@
  * Generic component that renders any entity type as map markers.
  */
 
-import { type ReactNode, useMemo } from 'react';
+import { Suspense, lazy, type ReactNode, useMemo } from 'react';
 import MapPin from 'lucide-react/icons/map-pin';
 import MapPinOff from 'lucide-react/icons/map-pin-off';
 import { useTranslation } from 'react-i18next';
-import { LocationMap, type MapMarker } from './LocationMap';
-import { Skeleton } from '@/components/ui';
+import type { MapMarker } from './LocationMap';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { MAPS_ENABLED } from '@/lib/map-config';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
+
+const LazyLocationMap = lazy(() =>
+  import('./LocationMap').then((module) => ({
+    default: module.LocationMap,
+  }))
+);
 
 export interface EntityMapViewProps<T> {
   items: T[];
@@ -96,13 +102,25 @@ export function EntityMapView<T>({
   }
 
   return (
-    <LocationMap
-      markers={markers}
-      center={center}
-      height={height}
-      className={className}
-      fitBounds
-      onMapsFailed={onMapsFailed}
-    />
+    <Suspense
+      fallback={
+        <Skeleton
+          role="status"
+          aria-busy="true"
+          aria-label={t('common:loading')}
+          className={`rounded-xl ${className}`}
+          style={{ height }}
+        />
+      }
+    >
+      <LazyLocationMap
+        markers={markers}
+        center={center}
+        height={height}
+        className={className}
+        fitBounds
+        onMapsFailed={onMapsFailed}
+      />
+    </Suspense>
   );
 }

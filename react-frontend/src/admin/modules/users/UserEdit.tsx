@@ -37,8 +37,8 @@ import type { AdminUserDetail, AdminBadge, UpdateUserPayload, UserConsent, Vetti
 
 
 export function UserEdit() {
-  const { t } = useTranslation('admin', { keyPrefix: 'user_edit' });
-  const { t: tAdmin } = useTranslation('admin');
+  const { t } = useTranslation('admin_users', { keyPrefix: 'user_edit' });
+  const { t: tAdmin } = useTranslation('admin_users');
   const { id } = useParams<{ id: string }>();
   const { tenantPath } = useTenant();
   const toast = useToast();

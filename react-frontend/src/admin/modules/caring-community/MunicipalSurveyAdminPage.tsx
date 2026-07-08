@@ -188,7 +188,7 @@ function AnalyticsView({ analytics, t }: { analytics: Analytics; t: TFunction<'c
 
 export default function MunicipalSurveyAdminPage() {
   const { t } = useTranslation('caring_community');
-  const { t: tAdmin } = useTranslation('admin');
+  const { t: tAdmin } = useTranslation('admin_caring_community');
   const { showToast } = useToast();
   usePageTitle(t('admin.surveys.meta_title'));
   const createModal    = useDisclosure();

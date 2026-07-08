@@ -75,7 +75,7 @@ function fmtDate(iso: string | null, emptyValue: string): string {
 
 export default function CareRecipientCirclePage() {
   const { t } = useTranslation('caring_community');
-  const { t: tAdmin } = useTranslation('admin');
+  const { t: tAdmin } = useTranslation('admin_caring_community');
   usePageTitle(t('admin.recipient_circle.meta_title'));
 
   const [userIdInput, setUserIdInput] = useState('');

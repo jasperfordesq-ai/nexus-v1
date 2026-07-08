@@ -1,0 +1,2755 @@
+{
+  "common": {
+    "an_unexpected_error": "Er is een onverwachte fout opgetreden",
+    "back": "Terug",
+    "cancel": "Annuleer",
+    "critical": "Kritisch",
+    "delete": "Verwijderen",
+    "feature": "Functie",
+    "high": "Hoog",
+    "in_progress": "In uitvoering",
+    "in_review": "Ter beoordeling",
+    "low": "Laag",
+    "medium": "Middelmatig",
+    "planned": "Gepland",
+    "refresh": "Vernieuwen",
+    "unexpected_error": "Onverwachte fout",
+    "unknown": "Onbekend",
+    "unfeature": "Uitgelicht",
+    "actions": "Acties",
+    "active": "Actief",
+    "all": "Allemaal",
+    "approved": "Goedgekeurd",
+    "clear": "Duidelijk",
+    "clear_filters": "Filters wissen",
+    "clear_selection": "Selectie wissen",
+    "close": "Sluiten",
+    "collapse": "Samenvouwen",
+    "confirm": "Bevestig",
+    "create": "Creëer",
+    "declined": "Geweigerd",
+    "download": "Downloaden",
+    "edit": "Bewerken",
+    "error_loading_data": "Fout bij het laden van gegevens",
+    "expand": "Uitbreiden",
+    "export": "Exporteren",
+    "load_more": "Laad meer",
+    "loading": "Laden",
+    "next": "Volgende",
+    "no": "Nee",
+    "ok": "OK",
+    "pending": "In behandeling",
+    "previous": "Vorige",
+    "retry": "Opnieuw proberen",
+    "save": "Opslaan",
+    "select_all": "Selecteer Alles",
+    "select_item": "Selecteer Artikel",
+    "yes": "Ja"
+  },
+  "shared": {
+    "broker_actions": "Makelaarsacties",
+    "content": "Inhoud",
+    "core_module": "Kernmodule",
+    "document_details": "Documentdetails",
+    "history": "Geschiedenis",
+    "log_file_empty": "Geen logbestand gevonden",
+    "no": "Nee",
+    "no_history_available": "Geen geschiedenis beschikbaar gevonden",
+    "no_legal_documents_found": "Geen juridische documenten gevonden gevonden",
+    "no_members_found": "Geen leden gevonden gevonden",
+    "loading": "Loading",
+    "no_data": "Geen gegevens",
+    "no_data_available": "Geen gegevens beschikbaar",
+    "no_recent_broker_activity": "Geen recente makelaarsactiviteit gevonden",
+    "open_page_help": "Helppagina openen",
+    "help": "Hulp",
+    "quick_access": "Snelle toegang",
+    "recent_activity": "Recente activiteit",
+    "refresh": "Vernieuwen",
+    "search": "Zoekopdracht...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Gegevens",
+    "total_count": "{{count}}totaal"
+  },
+  "admin": {
+    "providers": {
+      "title": "Zorgaanbieders",
+      "meta_title": "Zorgaanbieders",
+      "subtitle": "Beheer lokale zorgverleners, hun diensten en de verificatiestatus.",
+      "empty": "Er zijn geen zorgverleners gevonden.",
+      "verified": "Geverifieerd",
+      "yes": "Ja",
+      "no": "Nee",
+      "confirm_deactivate": "Deze aanbieder deactiveren? Het zal niet langer verschijnen in ledengerichte lijsten.",
+      "confirm_delete": "Deze aanbieder definitief verwijderen? Dit kan niet ongedaan worden gemaakt.",
+      "about": {
+        "title": "Over zorgverleners",
+        "body": "Zorgaanbieders zijn lokale organisaties of individuen die diensten aanbieden aan leden van de gemeenschap.",
+        "types_label": "Soorten",
+        "types_body": "Aanbieders kunnen thuiszorg, transport, maaltijdbezorging, gezelschap of andere categorieën zijn.",
+        "verification_label": "Verificatie",
+        "verification_body": "Geverifieerde providers zijn beoordeeld door een beheerder en hebben identiteits- en referentiecontroles doorstaan."
+      },
+      "actions": {
+        "add_provider": "Aanbieder toevoegen",
+        "cancel": "Annuleer",
+        "close": "Sluiten",
+        "create_provider": "Aanbieder maken",
+        "deactivate_named": "Deactiveer{{name}}",
+        "delete_provider": "Aanbieder verwijderen",
+        "edit_provider": "Aanbieder bewerken",
+        "find_duplicates": "Vind duplicaten",
+        "save_changes": "Wijzigingen opslaan",
+        "verify_provider": "Verifieer aanbieder"
+      },
+      "duplicates": {
+        "title": "Mogelijke duplicaten",
+        "empty": "Geen duplicaten gevonden.",
+        "match_percent": "{{percent}}% overeenkomst",
+        "scanning": "Scannen op duplicaten...",
+        "summary": "{{count}}mogelijke duplicaat(en) gevonden.",
+        "vs": "vs"
+      },
+      "errors": {
+        "deactivate": "Kan de provider niet deactiveren.",
+        "delete": "Kan provider niet verwijderen.",
+        "duplicates": "Kan niet scannen op duplicaten.",
+        "load": "Kan providers niet laden.",
+        "name_required": "Naam is vereist.",
+        "save": "Kan provider niet opslaan.",
+        "type_required": "Type is vereist.",
+        "verify": "Kan de provider niet verifiëren."
+      },
+      "fields": {
+        "address": "Adres",
+        "description": "Beschrijving",
+        "email": "E-mail",
+        "name": "Naam",
+        "phone": "Telefoon",
+        "status": "Status",
+        "type": "Typ",
+        "website": "Website"
+      },
+      "messages": {
+        "created": "Aanbieder gemaakt.",
+        "deactivated": "Aanbieder gedeactiveerd.",
+        "removed": "Aanbieder verwijderd.",
+        "updated": "Aanbieder bijgewerkt.",
+        "verified": "Aanbieder geverifieerd."
+      },
+      "modal": {
+        "create_title": "Zorgverlener toevoegen",
+        "edit_title": "Zorgverlener bewerken"
+      },
+      "pagination": {
+        "next": "Volgende",
+        "previous": "Vorige",
+        "summary": "Toont{{from}}–{{to}}van{{total}}"
+      },
+      "placeholders": {
+        "address": "Straat, stad, postcode…",
+        "description": "Een korte beschrijving van de aanbieder en hun diensten…",
+        "name": "bijv. Acme Thuiszorg"
+      },
+      "status": {
+        "active": "Actief",
+        "inactive": "Inactief"
+      },
+      "table": {
+        "actions": "Acties",
+        "aria": "Zorgverleners",
+        "name": "Naam",
+        "status": "Status",
+        "type": "Typ",
+        "verified": "Geverifieerd"
+      }
+    },
+    "common": {
+      "cancel": "Annuleer",
+      "empty_dash": "—",
+      "refresh": "Vernieuwen"
+    },
+    "hour_transfers": {
+      "title": "Uuroverdrachten",
+      "subtitle": "Beoordelen en verwerken van inkomende en openstaande urenoverdrachten tussen leden.",
+      "actions": {
+        "approve": "Goedkeuren",
+        "reject": "Afwijzen"
+      },
+      "errors": {
+        "approve": "Kan de overdracht niet goedkeuren.",
+        "load_inbound": "Kan inkomende overdrachten niet laden.",
+        "load_pending": "Kan openstaande overdrachten niet laden.",
+        "reject": "Kan de overdracht niet weigeren."
+      },
+      "inbound": {
+        "empty": "Geen inkomende overdrachten.",
+        "title": "Inkomend"
+      },
+      "messages": {
+        "approved": "Overdracht goedgekeurd.",
+        "rejected": "Overboeking afgewezen."
+      },
+      "pending": {
+        "empty": "Geen lopende overdrachten.",
+        "title": "In behandeling"
+      },
+      "reject_modal": {
+        "reason_label": "Reden",
+        "reason_placeholder": "Leg uit waarom deze overdracht wordt afgewezen...",
+        "title": "Overdracht weigeren"
+      },
+      "tabs": {
+        "aria": "Tabbladen voor urenoverdracht",
+        "inbound": "Inkomend",
+        "pending": "In behandeling"
+      }
+    },
+    "loyalty": {
+      "title": "Loyaliteitsprogramma",
+      "description": "Configureer hoe leden tijdskredieten inwisselen voor kortingen bij deelnemende verkopers.",
+      "refresh": "Vernieuwen",
+      "about": {
+        "title": "Over het loyaliteitsprogramma",
+        "body": "Leden kunnen tijdskredieten inwisselen bij deelnemende handelaars in ruil voor korting op goederen of diensten.",
+        "rate_label": "Wisselkoers",
+        "rate_body": "Definieert hoeveel valuta eenmalig kredietuur waard is op het verkooppunt van de verkoper.",
+        "discount_label": "Maximale korting",
+        "discount_body": "Het maximale percentage van een aankoop dat met tijdskrediet kan worden betaald."
+      },
+      "errors": {
+        "discount_range": "De korting moet tussen 0 en 100 liggen.",
+        "load_redemptions": "Kan inwisselingen niet laden.",
+        "load_settings": "Kan loyaliteitsinstellingen niet laden.",
+        "rate_positive": "De wisselkoers moet een positief getal zijn.",
+        "reverse": "Het is niet gelukt de inwisseling ongedaan te maken.",
+        "save_settings": "Kan loyaliteitsinstellingen niet opslaan."
+      },
+      "ledger": {
+        "actions": "Acties",
+        "date": "Datum",
+        "discount": "Korting",
+        "empty": "Nog geen aflossingen.",
+        "hours": "Uur",
+        "item": "Artikel",
+        "member": "Lid",
+        "merchant": "Koopman",
+        "rate": "Beoordeel",
+        "reverse": "Omgekeerd",
+        "status": "Status",
+        "title": "Grootboek van aflossingen"
+      },
+      "messages": {
+        "reversed": "De verlossing is teruggedraaid.",
+        "settings_saved": "Loyaliteitsinstellingen opgeslagen."
+      },
+      "reverse_modal": {
+        "body": "Als u een inwisseling ongedaan maakt, worden de tijdskredieten aan het lid terugbetaald.",
+        "cancel": "Annuleer",
+        "confirm": "Omgekeerd",
+        "discount": "Korting",
+        "member_fallback": "Lid",
+        "merchant": "Koopman",
+        "reason": "Reden",
+        "reason_placeholder": "Waarom wordt deze verlossing teruggedraaid?",
+        "redeemed": "Ingewisseld",
+        "title": "Omgekeerde verlossing"
+      },
+      "settings": {
+        "accept_time_credits": "Accepteer tijdskredieten",
+        "accept_time_credits_hint": "Sta deze verkoper toe tijdskredieten te accepteren als betaling voor een deel van elke aankoop.",
+        "clear": "Duidelijk",
+        "description": "Configureer het beleid aan de verkoperszijde en het maximale kortingsbeleid voor het loyaliteitsprogramma.",
+        "exchange_rate": "Wisselkoers",
+        "exchange_rate_description": "Hoeveel valuta een enkel tijdskredietuur waard is op het verkooppunt van de verkoper.",
+        "maximum_discount": "Maximale korting (%)",
+        "maximum_discount_description": "Het maximale percentage van een aankoop dat met tijdskrediet kan worden betaald.",
+        "no_matching_members": "Geen overeenkomende leden.",
+        "save": "Instellingen opslaan",
+        "seller_label": "Koopman",
+        "seller_placeholder": "Zoek verkopers…",
+        "title": "Loyaliteitsinstellingen",
+        "view_only": "U heeft alleen-lezen toegang tot deze instelling."
+      },
+      "stats": {
+        "hours_redeemed": "Uren verzilverd",
+        "total_chf_discount": "Totale korting gegeven",
+        "total_redemptions": "Totaal aantal aflossingen"
+      },
+      "table": {
+        "empty_value": "—"
+      }
+    },
+    "surveys": {
+      "errors": {
+        "export_failed": "Kan enquêtegegevens niet exporteren."
+      }
+    },
+    "feedback": {
+      "title": "Feedback gemeente",
+      "subtitle": "Beoordeel de feedback die door communityleden is ingediend.",
+      "errors": {
+        "close": "Kan feedbackitem niet sluiten.",
+        "export": "Kan feedback niet exporteren.",
+        "load": "Kan feedback niet laden.",
+        "resolution_required": "Er is een resolutienota vereist.",
+        "resolve": "Kan de feedback niet oplossen.",
+        "save_triage": "Kan triagenotities niet opslaan."
+      },
+      "messages": {
+        "closed": "Feedback gesloten.",
+        "resolved": "Feedback opgelost.",
+        "triage_saved": "Triagenotities opgeslagen."
+      }
+    },
+    "trust_tier": {
+      "title": "Configuratie van vertrouwensniveau",
+      "subtitle": "Stel de criteriadrempels in voor elk vertrouwensniveau. Wijzigingen zijn van toepassing bij de volgende herberekeningsrun.",
+      "loading": "Configuratie van vertrouwenslaag laden",
+      "recompute_hint": "Gebruik herberekening wanneer drempels veranderen en bestaande leden onmiddellijk opnieuw moeten worden geëvalueerd. Draait op de achtergrond en kan 30-60 seconden duren.",
+      "meta": {
+        "title": "Configuratie van vertrouwensniveau",
+        "description": "Configureer drempelwaarden voor vertrouwensniveaus, bereken de niveaus van leden opnieuw en bekijk wat elke laag ontgrendelt."
+      },
+      "actions": {
+        "recompute": "Bereken alle niveaus opnieuw",
+        "save": "Configuratie opslaan"
+      },
+      "about": {
+        "title": "Over deze pagina",
+        "body": "Vertrouwensniveaus zijn een reputatieladder die privileges ontgrendelt naarmate leden actiever en geverifieerd worden. Leden gaan automatisch vooruit als ze aan de onderstaande criteria voldoen. Gebruik herberekenen om een ​​onmiddellijke herberekening voor alle leden af ​​te dwingen. Niveauvoortgang heeft invloed op de Warmth Pass, de geschiktheid van de coördinator en de zichtbaarheid in de ledenlijst."
+      },
+      "criteria": {
+        "title": "Drempels voor niveaucriteria"
+      },
+      "fields": {
+        "hours_logged": "Gelogde uren (minimaal)",
+        "reviews_received": "Ontvangen beoordelingen (minimaal)",
+        "identity_verified": "Vereisen dat identiteit wordt geverifieerd"
+      },
+      "tiers": {
+        "member": {
+          "label": "Lid",
+          "description": "Basiscommunitylid met minimaal 1 uur ingelogd."
+        },
+        "trusted": {
+          "label": "Vertrouwd",
+          "description": "Actief lid met meerdere uren en recensies."
+        },
+        "verified": {
+          "label": "Geverifieerd",
+          "description": "Vertrouwd lid met bevestigde identiteit."
+        },
+        "coordinator": {
+          "label": "Coördinator",
+          "description": "Zeer actief, geverifieerd lid dat in aanmerking komt om te coördineren."
+        }
+      },
+      "reference": {
+        "title": "Niveaureferentie",
+        "aria": "Referentie van vertrouwensniveau",
+        "columns": {
+          "tier": "Laag",
+          "level": "Niveau",
+          "color": "Kleur",
+          "description": "Beschrijving",
+          "unlocks": "Wat het ontgrendelt"
+        },
+        "rows": {
+          "0": {
+            "name": "Nieuwkomer",
+            "color": "Grijs",
+            "description": "Net lid geworden, geen activiteit vereist.",
+            "unlocks": "Basistoegang voor leden."
+          },
+          "1": {
+            "name": "Lid",
+            "color": "Blauw",
+            "description": "Heeft uren geregistreerd.",
+            "unlocks": "Kan hulplijsten plaatsen en zorguren ontvangen."
+          },
+          "2": {
+            "name": "Vertrouwd",
+            "color": "Groente",
+            "description": "Actief met recensies.",
+            "unlocks": "Komt in aanmerking voor Warmth Pass en kan worden aanbevolen voor onderhoud."
+          },
+          "3": {
+            "name": "Geverifieerd",
+            "color": "Paars",
+            "description": "Identiteit geverifieerd.",
+            "unlocks": "Volledige zichtbaarheid en identiteitsbadge van de zorgcoördinator."
+          },
+          "4": {
+            "name": "Coördinator",
+            "color": "Amber",
+            "description": "Zeer actief met geverifieerde identiteit.",
+            "unlocks": "Komt in aanmerking om uren goed te keuren en wedstrijden te coördineren."
+          }
+        }
+      },
+      "errors": {
+        "load_failed": "Kan de configuratie van de vertrouwenslaag niet laden.",
+        "recompute_failed": "Kan vertrouwensniveaus niet opnieuw berekenen.",
+        "save_failed": "Kan de instellingen voor de vertrouwenslaag niet opslaan."
+      },
+      "messages": {
+        "recomputed": "Vertrouwensniveaus opnieuw berekend voor {{count}} leden.",
+        "saved": "Trust tier settings saved."
+      },
+      "recompute_confirm": "Vertrouwensniveaus voor alle leden opnieuw berekenen? Dit kan enkele minuten duren."
+    },
+    "operating_policy": {
+      "title": "Operationeel beleid",
+      "subtitle": "Caring Community workshop over operationeel beleid: regels die software niet kan raden.",
+      "loading": "Operationeel beleid laden",
+      "last_updated": "Laatst bijgewerkt {{date}}",
+      "meta": {
+        "title": "Operationeel beleid",
+        "description": "Configureer goedkeurings-, waarborgings-, SLA- en sociale waardebeleidsregels voor het zorgprogramma."
+      },
+      "actions": {
+        "refresh": "Vernieuwen",
+        "save": "Wijzigingen opslaan"
+      },
+      "about": {
+        "title": "Over deze pagina",
+        "body": "Operating Policy definieert de regels van uw wijkzorgprogramma: wie uren kan goedkeuren, hoe snel coördinatoren moeten reageren, hoe maatschappelijke waarde wordt berekend en hoe de rapportagecyclus eruit ziet. Configureer dit voordat u de pilot start. Wijzigingen worden onmiddellijk van kracht en worden geregistreerd voor auditdoeleinden.",
+        "methodology_prefix": "De",
+        "methodology_middle": "uurtarief en preventie-multipliervelden gebruiken de",
+        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
+        "methodology_tail": "pilot, stel het tarief in op uw lokale uuruurequivalent voor formele zorg en de vermenigvuldiger op 1.0."
+      },
+      "sections": {
+        "approvals": "Goedkeuringen en vertrouwen",
+        "sla": "SLA-ramen",
+        "hours": "Uurbeheer",
+        "safeguarding": "Beveiliging",
+        "social_value": "methodologie op het gebied van sociale waarden",
+        "appendix": "Bijlage pilotbeleid"
+      },
+      "fields": {
+        "approval_authority": {
+          "label": "Goedkeuringsautoriteit",
+          "help": "Wie goedgekeurde uren mag finaliseren: huurderbeheerder, coördinatoren of beide partijen met wederzijdse goedkeuring."
+        },
+        "trusted_reviewer_threshold": {
+          "label": "Drempel voor vertrouwde reviewer (gelogde uren)",
+          "help": "Minimaal goedgekeurde uren voordat een lid een vertrouwde beoordelaar wordt of het Vertrouwde niveau bereikt."
+        },
+        "sla_first_response_hours": {
+          "label": "SLA: eerste reactie (uren)",
+          "help": "Richt de tijd tot de eerste reactie op een nieuw hulpverzoek."
+        },
+        "sla_help_request_hours": {
+          "label": "SLA: oplossing van hulpverzoeken (uren)",
+          "help": "Streeftijd voor het sluiten of matchen van een hulpverzoek."
+        },
+        "legacy_hour_settlement": {
+          "label": "Legacy-uur-afrekeningsbeleid",
+          "help": "Hoe de resterende uren van een overleden lid worden verrekend."
+        },
+        "reciprocal_balance_threshold_hours": {
+          "label": "Interventiedrempel voor wederkerig evenwicht (uren)",
+          "help": "Wanneer de onevenwichtigheid van geven/ontvangen bij een lid een check-in door de coördinator activeert."
+        },
+        "safeguarding_escalation_user_id": {
+          "label": "Beveiliging van escalatie-eigenaar (gebruiker ID)",
+          "help": "Gebruiker ID ontvangt veiligheidsescalaties. Laat dit leeg als u beheerders als groep wilt gebruiken."
+        },
+        "chf_hourly_rate": {
+          "label": "CHF sociale waarde per uur",
+          "help": "CHF-waarde per zorguur voor ROI-rapportage op basis van het Zwitserse tarief voor formele zorgassistenten."
+        },
+        "chf_prevention_multiplier": {
+          "label": "CHF preventiemultiplier",
+          "help": "Multiplier toegepast op compensatie voor formele zorg voor de Caring Community- en Caring Community-methodologie."
+        },
+        "statement_cadence": {
+          "label": "Cadans van ledenverklaring",
+          "help": "Hoe vaak leden een urenoverzicht per lid ontvangen."
+        },
+        "policy_appendix_url": {
+          "label": "Ondertekende beleidsbijlage URL",
+          "help": "Plak de openbare URL van de ondertekende beleidsovereenkomst tussen uw coöperatie en de gemeente. Dit blijkt uit accountantsrapporten en het gemeentelijke rapportagepakket."
+        }
+      },
+      "choices": {
+        "approval_authority": {
+          "admin": "Beheerder",
+          "coordinator": "Coördinator",
+          "mutual": "Wederzijds"
+        },
+        "legacy_hour_settlement": {
+          "donate_to_pool": "Doneer aan het zwembad",
+          "expire": "Verlopen",
+          "transfer_to_nominee": "Overdracht naar genomineerde"
+        },
+        "statement_cadence": {
+          "monthly": "Maandelijks",
+          "quarterly": "Driemaandelijks",
+          "annual": "Jaarlijks"
+        }
+      },
+      "placeholders": {
+        "url": "https://..."
+      },
+      "errors": {
+        "load_failed": "Kan operationeel beleid niet laden.",
+        "save_failed": "Kan het operationele beleid niet opslaan."
+      },
+      "messages": {
+        "saved": "Bedrijfsbeleid opgeslagen. Wijzigingen zijn onmiddellijk van toepassing op alle nieuwe uitwisselingen."
+      }
+    },
+    "warmth_pass": {
+      "title": "Warmte pas",
+      "subtitle": "Zoek een lid op om te controleren of u in aanmerking komt voor de Warmtepas en de erkende bijdragegeschiedenis.",
+      "eligible": "Geschikt",
+      "not_eligible": "Niet geschikt",
+      "verified": "Geverifieerd",
+      "not_verified": "Niet geverifieerd",
+      "empty_date": "—",
+      "loading": "Laden…",
+      "no_categories": "Geen hulpcategorieën geregistreerd.",
+      "tier_chip": "Niveau{{tier}}",
+      "about": {
+        "title": "Over Warmtepas",
+        "body": "Warmte Pass erkent leden die duurzame, geverifieerde bijdragen aan hun gemeenschap hebben geleverd."
+      },
+      "errors": {
+        "lookup_failed": "Het opzoeken van leden is mislukt.",
+        "no_data": "Er zijn geen gegevens beschikbaar voor dit lid."
+      },
+      "fields": {
+        "help_categories": "Hulpcategorieën",
+        "hours_logged": "Uren geregistreerd",
+        "identity_verified": "Identiteit geverifieerd",
+        "member_since": "Lid sinds",
+        "pass_active_since": "Pass actief sinds",
+        "reviews_received": "Recensies ontvangen",
+        "trust_tier": "Vertrouwenslaag"
+      },
+      "lookup": {
+        "button": "Kijk omhoog",
+        "member_id": "Lid-ID",
+        "placeholder": "Voer een lid-ID in...",
+        "title": "Leden opzoeken"
+      },
+      "not_eligible_notice": {
+        "title": "Nog niet in aanmerking",
+        "body": "Dit lid voldoet nog niet aan de eisen voor een Warmtepas."
+      }
+    }
+  },
+  "panel": {
+    "sidebar": {
+      "items": {
+        "surveys": "Enquêtes",
+        "projects": "Projecten",
+        "trust_tier": "Vertrouwensniveau"
+      }
+    }
+  },
+  "caring_community": {
+    "meta": {
+      "title": "Zorgzame gemeenschap",
+      "description": "Configureer de geïntegreerde zorghub, afhankelijke mogelijkheden en gemeentelijke rapportageoppervlakken."
+    },
+    "actions": {
+      "open_member_hub": "Open ledenhub",
+      "open_workflow": "Open de Caring Community-workflow",
+      "refresh": "Vernieuwen"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "The Caring Community module enables your timebank to coordinate informal neighbourhood care, matching residents who need help with trusted members who can provide it. Het voegt een trust-tier-systeem, coördinatorworkflow, pilot-evaluatietools en gemeentelijke rapportage toe bovenop uw bestaande tijdbank."
+    },
+    "getting_started": {
+      "title": "Aan de slag",
+      "step_1": "Configureer het bedrijfsbeleid: stel uw goedkeuringsworkflow en CHF-uurtarief in.",
+      "step_2": "Leg een pre-pilot-basislijn vast in het Pilot Scoreboard.",
+      "step_3": "Configureer drempelwaarden voor de vertrouwenslaag.",
+      "step_4": "Voer de Pilot Launch Readiness-controle uit.",
+      "step_5": "Eenmaal gelanceerd, gebruikt u de Coördinator Workflow als uw dagelijkse operationele dashboard."
+    },
+    "stats": {
+      "master_switch": "Hoofdschakelaar",
+      "connected_capabilities": "Verbonden mogelijkheden",
+      "reporting_pack": "Rapportagepakket",
+      "reporting_ready": "Klaar"
+    },
+    "switch": {
+      "title": "Module-kill-schakelaar",
+      "description": "Als deze schakelaar is uitgeschakeld, zijn de Caring Community-route, navigatie-items, dashboardkaarten en snelle creatie-acties verborgen.",
+      "dependency_note": "Caring Community vertrouwt erop dat de onderstaande modules en functies zijn ingeschakeld. Een uitgeschakelde module beperkt de coördinator- en rapportagefuncties.",
+      "aria": "Schakel de Caring Community-module in"
+    },
+    "capabilities": {
+      "timebank": "Tijdbankuitwisseling",
+      "volunteering": "Geverifieerd vrijwilligerswerk",
+      "organisations": "Vertrouwde organisaties",
+      "groups": "Buurtgroepen",
+      "resources": "Bronnenbibliotheek",
+      "trust": "Vertrouwen en beoordelingen"
+    },
+    "capability_type": {
+      "feature": "Functie",
+      "module": "Module"
+    },
+    "reporting": {
+      "title": "Gemeentelijke rapportage",
+      "description": "Duik in de rapportageoppervlakken die nodig zijn voor kanton-, gemeente- en coöperatieve gesprekken.",
+      "community_analytics": "Community-analyses",
+      "impact_report": "Impactrapport",
+      "municipal_pack": "Gemeentelijk rapportpakket",
+      "note": "Deze oppervlakken maken momenteel gebruik van bestaande NEXUS-rapportage en zijn daarna klaar voor Caring Community-specifieke export."
+    },
+    "messages": {
+      "enabled": "Zorgzame gemeenschap ingeschakeld",
+      "disabled": "Zorgzame gemeenschap uitgeschakeld"
+    },
+    "status": {
+      "active": "Actief",
+      "enabled": "Ingeschakeld",
+      "disabled": "Uitgeschakeld"
+    },
+    "errors": {
+      "load_failed": "Kan de Caring Community-configuratie niet laden",
+      "save_failed": "Kan Caring Community niet updaten"
+    },
+    "config_route_note": "Speciale beheerdersconfiguratieroute:{{route}}"
+  },
+  "caring_emergency": {
+    "title": "Noodwaarschuwingen (AG70)",
+    "heading": "Noodwaarschuwingen",
+    "empty": "Er zijn nog geen noodwaarschuwingen.",
+    "intro": {
+      "title": "Over deze pagina - wees voorzichtig",
+      "body": "Noodwaarschuwingen zijn urgente uitzendingen die onmiddellijk naar alle leden (of een gerichte subgroep) worden verzonden. Gebruik dit alleen voor echte noodsituaties - zwaar weer, veiligheidsincidenten in de gemeenschap of lacunes in de dekking van urgente zorg. Waarschuwingen worden verzonden als pushmeldingen en in-app-banners. Zodra ze zijn verzonden, kunnen ze niet meer ongedaan worden gemaakt.",
+      "targeting_label": "Targeting",
+      "targeting_body": "Als u de ernst selecteert, wordt \"Gevaar\" of \"Waarschuwing\" naar alle leden verzonden. Zorgvuldig opstellen: eenmaal uitgezonden is er geen terugroepactie meer.",
+      "delivery_label": "Levering",
+      "delivery_body": "Waarschuwingen worden binnen 60 seconden na verzending afgeleverd."
+    },
+    "actions": {
+      "open_send_modal": "Noodwaarschuwing verzenden",
+      "confirm_prompt": "Bevestigen?",
+      "confirm_deactivate": "Ja, deactiveren",
+      "cancel": "Annuleer",
+      "deactivate": "Deactiveren",
+      "broadcast": "Uitgezonden waarschuwing"
+    },
+    "errors": {
+      "load_failed": "Kan waarschuwingen niet laden",
+      "send_failed": "Kan waarschuwing niet verzenden",
+      "deactivate_failed": "Het deactiveren van de waarschuwing is mislukt"
+    },
+    "severity": {
+      "info": "Info",
+      "warning": "Waarschuwing",
+      "danger": "Noodsituatie (gevaar)"
+    },
+    "table": {
+      "aria": "Noodwaarschuwingen",
+      "title": "Titel",
+      "severity": "Ernst",
+      "sent": "Verzonden",
+      "expires": "Verloopt",
+      "push": "Duwen",
+      "dismissed": "Ontslagen",
+      "status": "Status",
+      "actions": "Acties"
+    },
+    "push": {
+      "sent": "Verzonden"
+    },
+    "status": {
+      "active": "Actief",
+      "inactive": "Inactief"
+    },
+    "modal": {
+      "title": "Noodwaarschuwing verzenden"
+    },
+    "form": {
+      "title": "Titel",
+      "title_placeholder": "bijv. Waarschuwing voor zwaar weer",
+      "body": "Lichaam",
+      "body_placeholder": "Beschrijf de noodsituatie en eventuele acties die leden moeten ondernemen...",
+      "severity": "Ernst",
+      "expires_at": "Verloopt op (optioneel)",
+      "expires_at_description": "Laat dit veld leeg als er geen automatische vervaldatum is",
+      "confirm_prefix": "Dit zal onmiddellijk pushen",
+      "confirm_audience": "alle actieve leden",
+      "confirm_suffix": "en een permanente banner op alle pagina's weergeven. Ik bevestig dat dit een echte noodsituatie is."
+    }
+  },
+  "caring_workflow": {
+    "meta": {
+      "page_title": "Zorgzame gemeenschapsworkflow",
+      "title": "Caring Community Workflow Console",
+      "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements."
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "retry": "Opnieuw proberen",
+      "open_hour_review": "Overzicht open uren",
+      "open_report_pack": "Rapportpakket openen",
+      "approve": "Goedkeuren",
+      "decline": "Afwijzen",
+      "escalate": "Escaleren",
+      "re_escalate": "Opnieuw escaleren"
+    },
+    "loading": {
+      "workflow": "Zorgzame community-workflow laden..."
+    },
+    "toast": {
+      "load_failed": "Failed to load Caring Community workflow data."
+    },
+    "empty": {
+      "value": "-",
+      "unassigned": "Niet toegewezen"
+    },
+    "stats": {
+      "pending_reviews": "Beoordelingen in behandeling",
+      "pending_hours": "Uren in behandeling",
+      "approved_30d": "Approved in 30 days",
+      "coordinators": "Coördinatoren"
+    },
+    "pending": {
+      "title": "In afwachting van beoordelingen",
+      "description_prefix": "Uren in afwachting van beoordeling en goedkeuring van de coördinator. Artikelen gemarkeerd",
+      "description_middle": "hebben de beoordeling SLA overtroffen; artikelen gemarkeerd",
+      "description_suffix": "hebben de escalatie SLA overschreden. Keur elke inzending goed of af, of wijs deze toe aan een specifieke coördinator.",
+      "needs_review": "Moet worden beoordeeld",
+      "escalate_now": "Escaleer nu",
+      "escalated_count": "{{count}} geëscaleerd",
+      "overdue_count": "{{count}} te laat",
+      "empty": "Niets in behandeling. De beoordelingswachtrij is duidelijk.",
+      "logged": "{{date}} geregistreerd",
+      "submitted": "{{date}} ingediend",
+      "age_days": "{{count}} dag oud",
+      "age_days_plural": "{{count}} dagen oud",
+      "assigned_to": "Toegewezen aan {{name}}",
+      "escalated_at": "{{date}} geëscaleerd",
+      "assign_coordinator": "Coördinator aanstellen",
+      "assign_success": "Coördinator toegewezen.",
+      "assign_failed": "Kan coördinator niet toewijzen.",
+      "manual_escalation_note": "Handmatig geëscaleerd na dagen in behandeling met {{count}}.",
+      "escalate_success": "Beoordeling geëscaleerd.",
+      "escalate_failed": "Kan de beoordeling niet escaleren.",
+      "approve_success": "Beoordeling goedgekeurd.",
+      "decline_success": "Beoordeling afgewezen.",
+      "decision_failed": "Kan beslissing niet opnemen."
+    },
+    "paper_onboarding": {
+      "title": "Paper Form Intake",
+      "description": "Upload a signed Caring Community form, review the extracted fields, then create the provisional account only after coordinator confirmation.",
+      "file_label": "Scanned form",
+      "name_label": "Extracted full name",
+      "name_placeholder": "Name on the paper form",
+      "dob_label": "Geboortedatum",
+      "email_label": "Extracted email",
+      "email_placeholder": "lid@voorbeeld.com",
+      "phone_label": "Extracted phone",
+      "phone_placeholder": "+41 79 123 45 67",
+      "address_label": "Extracted address",
+      "address_placeholder": "Street, postcode, municipality",
+      "note_label": "Review note",
+      "note_placeholder": "What did the coordinator verify before creating the account?",
+      "upload_cta": "Upload For Review",
+      "confirm_cta": "Confirm And Create Account",
+      "review_cta": "Beoordeling",
+      "no_email": "No email captured",
+      "file_required": "Choose a scanned form first.",
+      "load_failed": "Kan papierinvoer niet laden.",
+      "upload_success": "Papierinvoer geüpload.",
+      "upload_failed": "Could not upload the paper form.",
+      "confirm_success": "Lid bevestigd en account aangemaakt.",
+      "confirm_failed": "Could not confirm this paper onboarding intake."
+    },
+    "tandem": {
+      "title": "Tandem-suggesties",
+      "description": "AI-voorgestelde supporter-ontvangerparen op basis van locatie, taal, vaardigheden en beschikbaarheid.",
+      "empty": "Er zijn momenteel geen suggesties. Voeg meer leden toe of pas de beschikbaarheid aan.",
+      "load_failed": "Kan tandemsuggesties niet laden.",
+      "dismiss_success": "Suggestie afgewezen.",
+      "dismiss_failed": "Kan suggestie niet afwijzen.",
+      "relationship_title": "Tandem:{{supporter}}&{{recipient}}",
+      "distance_km": "{{value}}km",
+      "same_language": "Dezelfde taal",
+      "complementary_skills": "Complementaire vaardigheden",
+      "availability_overlap": "Beschikbaarheid overlapt",
+      "shared_interests": "Gedeelde interesses",
+      "score": "Score{{value}}%",
+      "dismiss": "Afwijzen",
+      "create": "Maak Tandem aan"
+    },
+    "safeguarding": {
+      "title": "Beveiligingsrapporten",
+      "description": "Door leden geuite zorgen over andere leden, coördinatoren of organisaties.",
+      "view_all": "Bekijk alles",
+      "no_data": "Er zijn nog geen beveiligingsgegevens beschikbaar.",
+      "overdue": "Verlopen",
+      "no_reports": "Nog geen rapporten.",
+      "table_aria": "Recente beveiligingsrapporten",
+      "open": "Openen",
+      "org_subject": "Organisatie #{{id}}",
+      "age_hours": "{{count}}h",
+      "age_days": "{{count}}d",
+      "columns": {
+        "severity": "Ernst",
+        "category": "Categorie",
+        "subject": "Onderwerp",
+        "status": "Status",
+        "age": "Leeftijd",
+        "action": "Actie"
+      },
+      "severity": {
+        "critical": "Kritisch",
+        "high": "Hoog",
+        "medium": "Middelmatig",
+        "low": "Laag"
+      },
+      "status": {
+        "submitted": "Ingediend",
+        "triaged": "Triaged",
+        "investigating": "Onderzoeken",
+        "resolved": "Opgelost",
+        "dismissed": "Afgewezen"
+      }
+    },
+    "role_pack": {
+      "title": "Voorinstellingen voor rollen",
+      "description": "Vooraf geconfigureerde machtigingensets voor elke zorgzame gemeenschapsrol. Installeer het volledige rollenpakket om uw coördinatoren snel de juiste toegang te geven. {{countLabel}}.",
+      "installed_count": "{{installed}} van {{total}} rolvoorinstellingen geïnstalleerd",
+      "available_count": "{{count}} rolvoorinstellingen beschikbaar",
+      "installing": "Installeren...",
+      "install": "Rolpakket installeren",
+      "install_success": "Rolpakket geïnstalleerd.",
+      "install_failed": "Kan rolpakket niet installeren.",
+      "installed": "Geïnstalleerd",
+      "not_installed": "Niet geïnstalleerd",
+      "permissions_granted": "{{installed}} van {{total}}-machtigingen verleend",
+      "presets": {
+        "national_admin": {
+          "title": "Nationale admin",
+          "description": "Platformbreed toezicht over alle kantons en organisaties."
+        },
+        "canton_admin": {
+          "title": "Kanton beheerder",
+          "description": "Beheer alle zorgzame gemeenschapsactiviteiten binnen een kanton."
+        },
+        "municipality_admin": {
+          "title": "Gemeente administr",
+          "description": "Beheer zorgzame gemeenschapsactiviteiten binnen een gemeente."
+        },
+        "cooperative_coordinator": {
+          "title": "Coöperatie Coördinator",
+          "description": "Coördineren van een lokale coöperatie en haar leden."
+        },
+        "organisation_coordinator": {
+          "title": "Organisatie Coördinator",
+          "description": "Coördineer vrijwilligers en partners voor één organisatie."
+        },
+        "trusted_reviewer": {
+          "title": "Vertrouwde recensent",
+          "description": "Keur uren snel goed met eenvoudig overzicht."
+        }
+      }
+    },
+    "policy": {
+      "title": "Workflow-beleid",
+      "description": "Tenant-level defaults for Caring Community hour review, statements, and municipal evidence.",
+      "save": "Beleid opslaan",
+      "review_sla_days": "Review SLA days",
+      "review_sla_days_description": "Uren die binnen dit aantal dagen niet zijn beoordeeld, worden als te laat in de wachtrij gemarkeerd.",
+      "escalation_sla_days": "Escalation SLA days",
+      "escalation_sla_days_description": "Achterstallige items die niet binnen dit aantal extra dagen worden afgehandeld, worden automatisch geëscaleerd.",
+      "monthly_statement_day": "Statement day",
+      "monthly_statement_day_description": "Dag van de maand waarop ledenoverzichten worden gegenereerd (bijvoorbeeld 1 = 1e van elke maand).",
+      "default_hour_value_chf": "Hour value CHF",
+      "default_hour_value_chf_description": "Wordt gebruikt voor het berekenen van de geschatte maatschappelijke waarde op opgaven en gemeentelijke rapporten.",
+      "municipal_report_default_period": "Standaard rapportperiode",
+      "approval_required": "Require hour approval",
+      "approval_required_description": "Logged support time waits for a trusted review before it is accepted.",
+      "auto_approve_trusted_reviewers": "Vertrouwde reviewers automatisch goedkeuren",
+      "auto_approve_trusted_reviewers_description": "Hours submitted by trusted reviewers can skip the pending queue.",
+      "allow_member_self_log": "Allow member self logging",
+      "allow_member_self_log_description": "Members can record their own support activity before review.",
+      "require_organisation_for_partner_hours": "Require partner organisation",
+      "require_organisation_for_partner_hours_description": "Partner-led hours must be tied to an approved organisation.",
+      "include_social_value_estimate": "Inclusief schatting van de sociale waarde",
+      "include_social_value_estimate_description": "Municipal reports include a configurable CHF value for verified hours.",
+      "save_success": "Workflowbeleid opgeslagen.",
+      "save_failed": "Failed to save workflow policy.",
+      "periods": {
+        "last_30_days": "Laatste 30 dagen",
+        "last_90_days": "Laatste 90 dagen",
+        "year_to_date": "Jaar tot nu toe",
+        "previous_quarter": "Vorig kwartaal"
+      }
+    },
+    "member_statement": {
+      "title": "Member statements",
+      "description": "Preview or export a Caring Community member statement with support hours, wallet movement, and municipal value assumptions.",
+      "member_id": "Lid-ID",
+      "start_date": "From",
+      "end_date": "To",
+      "preview": "Voorbeeld",
+      "export_csv": "CSV exporteren",
+      "approved_support_hours": "Goedgekeurde ondersteuningsuren",
+      "pending_support_hours": "Ondersteuningsuren in behandeling",
+      "wallet_hours_earned": "Verdiende portemonnee-uren",
+      "wallet_hours_spent": "Bestede portemonnee-uren",
+      "empty": "Enter a member ID to generate a statement.",
+      "chf_value": "Estimated social value: CHF{{value}}",
+      "invalid_member": "Voer een geldig lid-ID in.",
+      "load_failed": "Failed to load the member statement.",
+      "export_success": "Member statement CSV prepared.",
+      "export_failed": "Failed to export the member statement."
+    },
+    "signals": {
+      "title": "Coördinator signalen",
+      "description": "Quick operating indicators for matching, oversight, and partner activity.",
+      "active_requests": "Active requests",
+      "active_offers": "Active offers",
+      "trusted_organisations": "Vertrouwde organisaties",
+      "declined_30d": "Declined in 30 days"
+    },
+    "favours": {
+      "title": "Informele gunsten",
+      "loading": "Laden...",
+      "total_recorded": "{{count}} totaal geregistreerd",
+      "loading_favours": "Gunsten laden...",
+      "empty": "Er zijn nog geen gunsten geregistreerd.",
+      "anonymous": "Anoniem",
+      "unknown": "Onbekend"
+    },
+    "assisted_onboarding": {
+      "title": "Assisted Onboarding",
+      "description": "Create a member account on behalf of a participant who cannot self-register.",
+      "name_label": "Volledige naam",
+      "name_placeholder": "e.g. Marie Curie",
+      "email_label": "Email address",
+      "email_placeholder": "lid@voorbeeld.com",
+      "phone_label": "Telefoon (optioneel)",
+      "phone_placeholder": "+41 79 123 45 67",
+      "note_label": "Coördinatornotitie (optioneel)",
+      "note_placeholder": "e.g. Met at Tuesday drop-in",
+      "create_cta": "Create Member Account",
+      "required": "Naam en e-mailadres zijn vereist.",
+      "created": "Member account created successfully.",
+      "create_failed": "Could not create member account. Please check the email is not already registered.",
+      "created_for": "Account created for {{name}} ({{email}})",
+      "password_note": "The member should change this password on first login.",
+      "copy": "Kopieer",
+      "copied": "Gekopieerd!"
+    },
+    "invite_codes": {
+      "title": "Uitnodigingscodes",
+      "description": "Genereer een afdrukbare code die een nieuw lid kan gebruiken om lid te worden zonder dat hij een e-mailuitnodiging nodig heeft.",
+      "label": "Etiket (optioneel)",
+      "label_placeholder": "bijv. Voor de buurvrouw van Maria",
+      "generate": "Code genereren",
+      "new_code": "Nieuwe uitnodigingscode",
+      "expires": "Verloopt: {{date}}",
+      "copied": "Gekopieerd!",
+      "copy_url": "Kopieer URL",
+      "print_card": "Kaart afdrukken",
+      "open": "Openen",
+      "table_aria": "Uitnodigingscodes",
+      "empty": "Nog geen uitnodigingscodes. Genereer er hierboven één om te delen met een toekomstig lid.",
+      "load_failed": "Kan uitnodigingscodes niet laden.",
+      "generate_success": "Uitnodigingscode gegenereerd.",
+      "generate_failed": "Kan uitnodigingscode niet genereren.",
+      "columns": {
+        "code": "Codeer",
+        "label": "Etiket",
+        "expires": "Verloopt",
+        "status": "Status",
+        "actions": "Acties"
+      },
+      "status": {
+        "active": "Actief",
+        "used": "Gebruikt",
+        "used_by": "Gebruikt door {{name}}",
+        "expired": "Verlopen"
+      }
+    },
+    "stages": {
+      "title": "Caring Community operating model",
+      "description": "The workflow path this module should make explicit for evaluators and coordinators.",
+      "intake": {
+        "title": "Inname",
+        "description": "A member, family, organisation, or coordinator records a need or offer."
+      },
+      "match": {
+        "title": "Overeenkomen",
+        "description": "Coordinators connect people, organisations, or trusted volunteers."
+      },
+      "log": {
+        "title": "Log hours",
+        "description": "Support time is recorded against the member, organisation, or activity."
+      },
+      "verify": {
+        "title": "Verifieer",
+        "description": "A trusted coordinator approves or declines the logged hours."
+      },
+      "statement": {
+        "title": "Verklaring",
+        "description": "Accepted hours feed member statements and municipal evidence packs."
+      }
+    },
+    "predictive": {
+      "title": "Voorspellende inzichten",
+      "subtitle": "Toekomstgerichte voorspellingen en proactieve waarschuwingen. Spoor regionale zorgtekorten op voordat ze een noodsituatie worden.",
+      "not_enough_activity": "Nog niet genoeg activiteit om te voorspellen. Kom over een paar weken terug.",
+      "no_forecast": "Er zijn nog geen prognosegegevens beschikbaar.",
+      "hours_forecast": "Uur voorspelling",
+      "active_members": "Actieve leden",
+      "recipients_reached": "Ontvangers bereikt",
+      "history": "Geschiedenis",
+      "forecast": "Voorspelling",
+      "confidence": "Vertrouwen",
+      "trend_growing": "Groeiende {{value}}%",
+      "trend_declining": "Dalende {{value}}%",
+      "trend_stable": "Stabiel",
+      "sub_region_coverage": "Subregiodekking (laatste {{days}}-dagen)",
+      "under_supplied_count": "{{count}} onvoldoende geleverd",
+      "sub_region_coverage_aria": "Subregiodekking",
+      "helper_churn": "Helperchurn (verstreken >= {{days}} dagen)",
+      "overall_percent": "{{value}}% in totaal",
+      "helper_churn_note": "{{lapsed}} van {{prior}} eerder actieve helpers hebben de laatste tijd geen uren geregistreerd.",
+      "helper_churn_aria": "Helperverloop per categorie",
+      "coefficient_drift": "Categoriecoëfficiëntafwijking",
+      "drifting_count": "{{count}} drijft af",
+      "coefficient_drift_note": "Categorieën met absolute afwijking > {{threshold}}% zijn gemarkeerd. Bekijk de basislijncoëfficiënten in de categoriecoëfficiënteditor.",
+      "coefficient_drift_aria": "Categoriecoëfficiëntafwijking",
+      "proactive_alerts": "Proactieve waarschuwingen",
+      "columns": {
+        "sub_region": "Subregio",
+        "requested_90d": "Aangevraagd (90d)",
+        "fulfilled_90d": "Vervuld (90d)",
+        "coverage": "Dekking",
+        "status": "Status",
+        "category": "Categorie",
+        "prior_active": "Eerder actief",
+        "lapsed": "Vervallen",
+        "churn_rate": "Verlooppercentage",
+        "baseline": "Basislijn",
+        "expected_hrs": "Verwachte uren",
+        "observed_hrs": "Waargenomen uur",
+        "drift": "Afdrijven",
+        "sample": "Steekproef"
+      },
+      "status": {
+        "under_supplied": "Te weinig geleverd",
+        "ok": "OK"
+      },
+      "severity": {
+        "critical": "Kritisch",
+        "warning": "Waarschuwing",
+        "info": "Info"
+      }
+    },
+    "relationships": {
+      "title": "Ondersteun relaties",
+      "description": "Doorlopende supporter-ontvangerparen en terugkerende check-ins.",
+      "active": "Actief",
+      "paused": "Gepauzeerd",
+      "check_ins_due": "Inchecken is vereist",
+      "expected_hours": "Verwachte uren",
+      "supporter": "Ondersteuner",
+      "supporter_placeholder": "Zoek de ondersteuner",
+      "recipient": "Ontvanger",
+      "recipient_placeholder": "Zoek de ontvanger",
+      "no_members": "Geen leden gevonden",
+      "clear": "Duidelijk",
+      "relationship_title": "Titel van de relatie",
+      "frequency_label": "Frequentie",
+      "expected_hours_per_visit": "Verwachte uren per bezoek",
+      "start_date": "Startdatum",
+      "create": "Creëer een relatie",
+      "empty": "Nog geen ondersteuningsrelaties. Maak er hierboven één aan.",
+      "pair": "{{supporter}} ondersteunt {{recipient}}",
+      "started": "{{date}} gestart",
+      "next_check_in": "Volgende check-in {{date}}",
+      "pause": "Pauze",
+      "resume": "Cv",
+      "log_date": "Datum",
+      "log_hours": "Uur",
+      "log_note": "Opmerking (optioneel)",
+      "log_hours_action": "Uren registreren",
+      "load_failed": "Kan ondersteuningsrelaties niet laden.",
+      "pick_different_members": "Kies twee verschillende leden.",
+      "create_success": "Ondersteuningsrelatie gecreëerd.",
+      "create_failed": "Kan geen ondersteuningsrelatie maken.",
+      "update_success": "Ondersteuningsrelatie bijgewerkt.",
+      "update_failed": "Kan ondersteuningsrelatie niet updaten.",
+      "log_validation_failed": "Voer een geldige datum en 0.25-24 uren in.",
+      "log_success": "Ondersteuningsuren geregistreerd.",
+      "log_failed": "Kan ondersteuningsuren niet registreren.",
+      "frequency": {
+        "weekly": "Wekelijks",
+        "fortnightly": "Tweewekelijks",
+        "monthly": "Maandelijks",
+        "ad_hoc": "Ad-hoc"
+      },
+      "status": {
+        "active": "Actief",
+        "paused": "Gepauzeerd",
+        "completed": "Voltooid",
+        "cancelled": "Geannuleerd"
+      }
+    }
+  },
+  "category_coefficients": {
+    "meta": {
+      "page_title": "Categorievervangingscoëfficiënten",
+      "title": "Categorievervangingscoëfficiënten",
+      "subtitle": "Hoeveel elk uur gemeenschapszorg vervangt voor formele Spitex/Pflege uur. Gebruikt bij berekeningen van het Gemeentelijk Effectrapport."
+    },
+    "actions": {
+      "refresh_aria": "Categoriecoëfficiënten vernieuwen",
+      "save": "Redden"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "chf_amount": "CHF 35",
+      "body_prefix": "Substitutiecoëfficiënten bepalen hoeveel maatschappelijke waarde elke zorgcategorie waard is in de kostencompensatieberekening. Een coëfficiënt van 1,0 betekent dat één uur gelijk is aan één uur formele Spitex/Pflege zorg (",
+      "body_middle": "). Een coëfficiënt van 0,5 betekent dat het een half uur vervangt. Een coëfficiënt van 2,0 betekent dat het twee uur formele zorg vervangt, bijvoorbeeld intensieve persoonlijke zorg of specialistische ondersteuning. De",
+      "body_suffix": "De methodologie beveelt aan om alle categorieën op 1,0 te starten en deze aan te passen op basis van de waargenomen zorgintensiteit.",
+      "range_prefix": "Waarden variëren van 0,00 (geen zorgvervangende waarde) tot 9,99. Wijzigingen worden van kracht op de volgende",
+      "range_suffix": "rapport vernieuwen."
+    },
+    "migration": {
+      "title": "Migratie in behandeling",
+      "body_prefix": "De",
+      "body_middle": "kolom is nog niet gemigreerd. Loop",
+      "body_suffix": "om coëfficiënten per categorie mogelijk te maken.",
+      "warning": "Er is een databasemigratie in behandeling. Sla uw wijzigingen op nadat de migratie is voltooid om te voorkomen dat ze worden overschreven."
+    },
+    "table": {
+      "aria": "Categorievervangingscoëfficiënten",
+      "category": "Categorie",
+      "source": "Bron",
+      "coefficient": "Coëfficiënt",
+      "action": "Actie"
+    },
+    "fields": {
+      "coefficient_aria": "Coëfficiënt voor {{name}}",
+      "coefficient_error": "Moet tussen 0,00 en 9,99 liggen"
+    },
+    "empty": {
+      "categories": "Geen categorieën gevonden."
+    },
+    "toasts": {
+      "load_failed": "Kan categoriecoëfficiënten niet laden",
+      "invalid_number": "Coëfficiënt moet een getal zijn",
+      "saved": "Coëfficiënt opgeslagen voor {{name}}",
+      "save_failed": "Kan de coëfficiënt voor {{name}} niet opslaan"
+    }
+  },
+  "commercial_boundary": {
+    "meta": {
+      "page_title": "Commerciële grenskaart",
+      "title": "Commerciële grenskaart",
+      "subtitle": "AG82 - wat is AGPL openbaar, tenant-configureerbaar, implementatielaag of commercieel"
+    },
+    "actions": {
+      "export_markdown": "Exporteer als Markdown",
+      "export": "Exporteren",
+      "refresh_data": "Gegevens vernieuwen",
+      "refresh_aria": "Vernieuw de commerciële grenskaart",
+      "reset_default": "Reset naar canonieke standaard",
+      "reset_default_aria": "Resetten naar standaard"
+    },
+    "overrides_count": "{{count}} overschrijven",
+    "overrides_count_plural": "{{count}} overschrijft",
+    "about": {
+      "title": "Over deze pagina",
+      "body_prefix": "De Commerciële Grens bepaalt welke soorten betaald werk zijn toegestaan ​​binnen het gemeenschapszorgprogramma en welke onbetaalde tijdskredieten moeten blijven. Deze grens is een vereiste van de",
+      "body_suffix": "methodiek en moet vóór aanvang van de pilot met uw gemeentelijke partner worden afgestemd. De onderstaande matrix geeft een overzicht van de activiteitscategorieën en hun toegestane uitwisselingstype.",
+      "override_prefix": "Gebruik de overschrijving per rij om een ​​tenantspecifieke classificatie vast te leggen (bijvoorbeeld een privé-implementatie met een commerciële bundel). Overschrijvingen worden alleen opgeslagen in tenantinstellingen: ze wijzigen nooit de canonieke openbare classificatie die bij de",
+      "override_suffix": "repository. Zodra u de grensmatrix heeft bevestigd, wordt de overeenkomst vastgelegd met een tijdstempel en uw gebruikers-ID, die deel uitmaakt van de pilot-governancedocumentatie die verschijnt in de Pilot Launch Readiness-controle."
+    },
+    "sections": {
+      "classifications": "Classificaties"
+    },
+    "classification": {
+      "agpl_public": "AGPL openbaar",
+      "tenant_config": "Tenantconfiguratie",
+      "private_deployment": "Privé-implementatie",
+      "commercial": "Commercieel"
+    },
+    "labels": {
+      "overridden": "Overschreven",
+      "module": "module",
+      "out_of_tree": "Uit de boom",
+      "canonical_default": "Canonieke standaard:",
+      "key": "Sleutel"
+    },
+    "fields": {
+      "set_classification": "Classificatie instellen",
+      "classification_aria": "Classificatie voor {{label}}"
+    },
+    "export": {
+      "last_updated": "Laatst bijgewerkt: {{date}}",
+      "capability": "Vermogen",
+      "classification": "Classificatie",
+      "agpl_module": "AGPL-module",
+      "default": "Standaard",
+      "overridden": "Overschreven",
+      "notes": "Opmerkingen",
+      "yes": "Ja",
+      "no": "Nee",
+      "generated": "Gegenereerd {{date}} vanuit het NEXUS beheerdersdashboard."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Kan commerciële grenskaart niet laden",
+      "reverted": "Teruggekeerd naar de canonieke standaard",
+      "updated": "Classificatie bijgewerkt",
+      "update_failed": "Kan de classificatie niet updaten",
+      "export_empty": "Export is leeg geretourneerd",
+      "exported": "Grenskaart geëxporteerd",
+      "export_failed": "Kan grenskaart niet exporteren"
+    }
+  },
+  "data_quality": {
+    "meta": {
+      "page_title": "Pilotgegevenskwaliteit",
+      "title": "Pilotgegevenskwaliteit",
+      "subtitle": "AG84 - gereedheidscontroles voordat echte bewoners aan boord gaan"
+    },
+    "actions": {
+      "refresh_checks": "Controles vernieuwen",
+      "refresh_aria": "Vernieuw de controles op de gegevenskwaliteit",
+      "view_affected_rows": "Bekijk de getroffen rijen",
+      "close": "Dichtbij"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "Gegevenskwaliteitscontroles scannen uw platformgegevens op problemen die de pilotstatistieken kunnen verstoren of rapportagefouten kunnen veroorzaken, bijvoorbeeld leden met dubbele profielen, urenregistratie voor verwijderde vermeldingen of uitwisselingsrecords waarin verplichte velden ontbreken. Voer dit maandelijks uit voordat u rapporten genereert. Los alle kritieke en waarschuwingspunten op voordat u rapporten indient bij financiers of gemeentelijke partners."
+    },
+    "severity": {
+      "ok": "OK",
+      "info": "Info",
+      "warning": "Waarschuwing",
+      "danger": "Gevaar"
+    },
+    "severity_guide": {
+      "title": "Gids voor ernst",
+      "danger": "Fouten die onjuiste cijfers in rapporten veroorzaken, moeten worden opgelost voordat ze worden geëxporteerd.",
+      "warning": "Potentiële problemen die de metrische nauwkeurigheid kunnen beïnvloeden: controleer en bevestig of repareer.",
+      "info": "Informatieve mededelingen - geen actie vereist.",
+      "ok": "Er zijn geen problemen gedetecteerd in deze categorie.",
+      "note_prefix": "Klik",
+      "note_suffix": "op elke kaart om de specifieke gegevens te bekijken. Sommige problemen kunnen op het platform worden gecorrigeerd; andere vereisen een handmatige beoordeling van de onderliggende gegevens."
+    },
+    "summary": {
+      "label": "Samenvatting:",
+      "count": "{{count}} {{label}}",
+      "generated": "Gegenereerd {{date}}",
+      "affected": "aangetast"
+    },
+    "drilldown": {
+      "subtitle": "Maximaal 50 betrokken rijen - oplossen of documenteren vóór lancering.",
+      "empty": "Er zijn geen getroffen rijen om te tonen.",
+      "table_aria": "Betrokken rijen"
+    },
+    "table": {
+      "id": "ID",
+      "identifier": "Identificatie",
+      "name": "Naam",
+      "status": "Status",
+      "created": "Gemaakt"
+    },
+    "empty": {
+      "value": "-",
+      "rows": "Geen rijen"
+    },
+    "toasts": {
+      "load_failed": "Kan het rapport over de gegevenskwaliteit niet laden",
+      "rows_failed": "Kan de getroffen rijen niet laden"
+    }
+  },
+  "disclosure_pack": {
+    "meta": {
+      "page_title": "FADP / nDSG Disclosure-pakket",
+      "title": "FADP / nDSG Disclosure-pakket",
+      "subtitle": "AG80 - pilot-openbaarmakingsdocument voor de Zwitserse wetgeving inzake gegevensbescherming"
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Vernieuw het openbaarmakingspakket",
+      "export_markdown": "Markdown exporteren",
+      "save_changes": "Wijzigingen opslaan"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body_prefix": "Het Disclosure Pack (AG80) is het",
+      "body_suffix": "openbaarmakingsdocument inzake gegevensbescherming waarvan bewoners op de hoogte moeten worden gesteld voordat zij deelnemen aan het gemeenschapszorgprogramma. Het heeft betrekking op de identiteit van de verwerkingsverantwoordelijke en de verwerker, de verwerkte gegevenscategorieën, de rechtsgrondslag, de rechten van de betrokkene, contacten met respons op incidenten en waarborgen voor grensoverschrijdende overdracht.",
+      "review_prefix": "Dit pakket is een werkconcept - bespreek het met",
+      "review_middle": "advies alvorens te publiceren. Bewerk de controllergegevens, de eigenaar van de incidentrespons en de geïsoleerde knooppuntconfiguratie voor uw implementatie en gebruik deze vervolgens",
+      "review_suffix": "om het document voor de juridische overdracht te produceren. Wanbetalingen weerspiegelen verplichtingen aan de kant van het platform. Sla eventuele wijzigingen op voordat u exporteert."
+    },
+    "tabs": {
+      "aria": "Openbaarmakingssecties",
+      "controller": "Verwerkingsverantwoordelijke & Verwerker",
+      "data_retention": "Gegevens en retentie",
+      "data_subject_rights": "Rechten van betrokkenen",
+      "federation_isolated_node": "Federatie en geïsoleerd knooppunt",
+      "incident_response": "Reactie op incidenten",
+      "cross_border_transfers": "Grensoverschrijdende overdrachten"
+    },
+    "sections": {
+      "tenant_controller": "Huurder controleur",
+      "platform_processor": "Platformprocessor",
+      "data_categories": "Gegevenscategorieën",
+      "lawful_basis": "Wettelijke basis",
+      "retention_defaults": "Standaardwaarden voor bewaring",
+      "federation_policy": "Federatie beleid",
+      "isolated_node_configuration": "Configuratie met geïsoleerde knooppunten",
+      "destinations": "Bestemmingen",
+      "safeguards": "Waarborgen"
+    },
+    "fields": {
+      "controller_name": "Naam van controller",
+      "address": "Adres",
+      "contact_email": "E-mailadres voor contact",
+      "data_protection_officer": "Functionaris voor gegevensbescherming",
+      "processor_name": "Processornaam",
+      "sub_processors": "Subverwerkers (één per lijn)",
+      "hosting_owner": "Hosting-eigenaar",
+      "smtp_owner": "SMTP eigenaar",
+      "storage_owner": "Eigenaar van opslag",
+      "backup_owner": "Back-up eigenaar",
+      "update_cadence": "Cadans bijwerken",
+      "owner_name": "Naam eigenaar",
+      "notification_window_hours": "Meldingsvenster (uren)",
+      "fadp_authority": "FADP autoriteit"
+    },
+    "labels": {
+      "aggregate_policy": "Geaggregeerd beleid"
+    },
+    "status": {
+      "enabled": "Ingeschakeld",
+      "disabled": "Gehandicapt",
+      "enabled_lower": "ingeschakeld",
+      "disabled_lower": "gehandicapt",
+      "members_can_opt_out": "Leden kunnen zich afmelden",
+      "no_member_opt_out": "Er is geen opt-out voor leden",
+      "cross_border_occurs": "Er vinden grensoverschrijdende overdrachten plaats",
+      "no_cross_border_transfers": "Geen grensoverschrijdende overdrachten"
+    },
+    "isolated_node": {
+      "description_prefix": "Deze velden zijn alleen relevant als deze inzet draait op door het kanton gecontroleerde infrastructuur. Voor standaard gehoste implementaties laat u de standaardwaarden staan. In elk eigenaarveld wordt de rechtspersoon geïdentificeerd die verantwoordelijk is voor de desbetreffende infrastructuurcomponent",
+      "description_suffix": "Artikel 9."
+    },
+    "descriptions": {
+      "hosting_owner": "Juridische entiteit die de serverinfrastructuur beheert (bijvoorbeeld de IT-afdeling van het kanton).",
+      "smtp_owner": "Juridische entiteit die verantwoordelijk is voor de bezorging van uitgaande e-mail.",
+      "storage_owner": "Rechtspersoon die de opslag van bestanden/blobs beheert (uploads, exports).",
+      "backup_owner": "Juridische entiteit die verantwoordelijk is voor de opslag en retentie van databaseback-ups.",
+      "update_cadence": "Hoe vaak het kantonknooppunt platformupdates ontvangt (bijvoorbeeld 'maandelijks', 'driemaandelijks')."
+    },
+    "footer": {
+      "last_saved": "Laatst opgeslagen {{date}}",
+      "customised": "Aangepast"
+    },
+    "toasts": {
+      "load_failed": "Kan het openbaarmakingspakket niet laden",
+      "saved": "Disclosure-pakket opgeslagen",
+      "save_failed": "Kan het openbaarmakingspakket niet opslaan",
+      "export_empty": "Export is leeg geretourneerd",
+      "exported": "Disclosure-pakket geëxporteerd",
+      "export_failed": "Kan het openbaarmakingspakket niet exporteren"
+    }
+  },
+  "external_integrations": {
+    "meta": {
+      "title": "Externe integratieachterstand",
+      "subtitle": "AG87 - partnerafhankelijke integraties in afwachting van externe eigenaar / DSA / sandbox"
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "add": "Voeg integratie toe",
+      "seed": "Standaard achterstand inzaaien",
+      "open": "Openen",
+      "edit": "Bewerking",
+      "delete": "Verwijderen",
+      "cancel": "Annuleren",
+      "save_changes": "Wijzigingen opslaan",
+      "create": "Creëer integratie",
+      "remove": "Verwijderen"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "External Integrations is een backlog-tracker voor partnerafhankelijke verbindingen: bankieren, AHV indiening, postadresverificatie en kantonale datafeeds. Bij elk item worden de eigenaar van de integratie, de status van de overeenkomst voor het delen van gegevens (DSA) en de gereedheid voor de sandbox bijgehouden. Gebruik dit om te coördineren met externe partners en om de voortgang aan belanghebbenden te rapporteren.",
+      "dsa_label": "DSA (overeenkomst voor het delen van gegevens):",
+      "dsa_body": "Moet worden ondertekend vóór elke live gegevensuitwisseling. Maak overeenkomsten op met behulp van de Research Partnerships-sjablonen.",
+      "sandbox_label": "Sandbox-URL:",
+      "sandbox_body": "Link naar de testomgeving van de partner. Valideer de integratie in de sandbox voordat u deze promoveert naar live.",
+      "statuses_label": "Statussen:",
+      "statuses_body": "Voorgesteld -> Scoping -> Sandbox -> Live. Geblokkeerd betekent dat een externe afhankelijkheid onopgelost is."
+    },
+    "empty": {
+      "title": "Er zijn nog geen integraties bijgehouden",
+      "body": "Zorg voor een samengestelde set bekende partnerafhankelijke integraties (AHV indiening, Spitex overdracht, kantonale masterdatafeed, PostFinance, Twint, postadresverificatie), zodat de platformbeheerder de eigenaar, DSA status en de gereedheid voor de sandbox kan volgen."
+    },
+    "last_updated": "Laatst bijgewerkt {{date}}",
+    "table": {
+      "aria": "Externe integraties",
+      "name": "Naam",
+      "category": "Categorie",
+      "owner": "Eigenaar",
+      "status": "Status",
+      "dsa": "DSA",
+      "sandbox": "Zandbak",
+      "updated": "Bijgewerkt",
+      "row_actions": "Rij-acties",
+      "actions": "Acties"
+    },
+    "categories": {
+      "banking": "Bankieren",
+      "payment": "Betaling",
+      "identity_verification": "Identiteitsverificatie",
+      "professional_care": "Professionele zorg",
+      "municipal_data": "Gemeentelijke gegevens",
+      "postal": "Post",
+      "ahv": "AHV",
+      "healthcare": "Gezondheidszorg",
+      "other": "Ander"
+    },
+    "statuses": {
+      "proposed": "Voorgesteld",
+      "scoping": "Scoring",
+      "blocked": "Geblokkeerd",
+      "sandbox": "Zandbak",
+      "live": "Leef",
+      "deprecated": "Afgekeurd"
+    },
+    "dsa_statuses": {
+      "not_required": "Niet vereist",
+      "drafting": "Opstellen",
+      "in_review": "Wordt beoordeeld",
+      "signed": "Ondertekend"
+    },
+    "editor": {
+      "add_title": "Voeg integratie toe",
+      "edit_title": "Bewerken: {{name}}",
+      "name": "Naam",
+      "name_placeholder": "bijv. AHV indieningsgateway",
+      "category": "Categorie",
+      "status": "Status",
+      "owner_name": "Naam eigenaar",
+      "owner_name_placeholder": "Volledige naam van externe contactpersoon",
+      "owner_email": "E-mailadres van de eigenaar",
+      "owner_email_placeholder": "contact@partner.voorbeeld",
+      "interface_spec_url": "Interfacespecificatie URL",
+      "interface_spec_placeholder": "https://docs.partner.example/spec",
+      "dsa_status": "Overeenkomst voor het delen van gegevens",
+      "sandbox_url": "Sandbox-URL",
+      "sandbox_placeholder": "https://sandbox.partner.voorbeeld",
+      "notes": "Opmerkingen",
+      "notes_placeholder": "Open vragen, blokkers, afhankelijkheden, contractuele opmerkingen..."
+    },
+    "delete_modal": {
+      "title": "Integratie verwijderen",
+      "body_prefix": "Hiermee wordt de achterstandsinvoer voor permanent verwijderd",
+      "body_suffix": "Het externe partnerrecord wordt niet beïnvloed; alleen de trackinginvoer wordt verwijderd.",
+      "warning": "Deze actie kan niet ongedaan worden gemaakt."
+    },
+    "toasts": {
+      "load_failed": "Kan de integratieachterstand niet laden",
+      "seeded": "Gezaaide standaardachterstand",
+      "seed_failed": "Zaad is mislukt",
+      "updated": "Integratie bijgewerkt",
+      "update_failed": "Update mislukt",
+      "created": "Integratie gecreëerd",
+      "create_failed": "Maken mislukt",
+      "removed": "Integratie verwijderd",
+      "delete_failed": "Verwijderen is mislukt"
+    }
+  },
+  "federation_peers_admin": {
+    "meta": {
+      "page_title": "Federatie-peers - Beheerder",
+      "title": "Federatiegenoten",
+      "subtitle": "Maak contact met andere coöperaties, zodat leden uren tussen gemeenschappen kunnen sturen."
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Federatie-peers vernieuwen",
+      "add_peer": "Peer toevoegen",
+      "rotate_secret": "Gedeeld geheim roteren",
+      "delete_peer": "Peer verwijderen",
+      "cancel": "Annuleren",
+      "create_reveal_secret": "Creëer en onthul geheim",
+      "copy_secret": "Kopieer geheim",
+      "copy_peer_slug": "Kopieer peer-slak",
+      "copied_secret": "Ik heb het geheim gekopieerd"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "Federatiepeers zijn andere NEXUS coöperaties waarmee uw community leden en uren wil delen. Zodra er een peer-verbinding tot stand is gebracht, kunnen leden uren overbrengen tussen communities en federatieve vermeldingen bekijken. Elke peer-verbinding vereist een gedeeld geheim dat beide partijen moeten configureren. Neem contact op met de beheerder van de peer-coöperatie om inloggegevens uit te wisselen.",
+      "shared_secret_label": "Gedeeld geheim:",
+      "shared_secret_body": "Een privésleutel die beide coöperaties gebruiken om aan elkaar te bewijzen wie ze zijn. Het moet aan beide zijden exact hetzelfde worden ingevoerd. Vervang hem elke 6 tot 12 maanden, en meteen als u denkt dat iemand anders hem heeft gezien.",
+      "pending_body": "Inloggegevens ingesteld, in afwachting van eerste succesvolle API oproep.",
+      "active_body": "Verbonden en gesynchroniseerd.",
+      "suspended_body": "Laatste synchronisatie mislukt of handmatig opgeschort. Controleer of de basis URL van de peer correct en bereikbaar is."
+    },
+    "peers": {
+      "title": "Geregistreerde collega's",
+      "table_aria": "Federatiegenoten",
+      "empty": "Er zijn nog geen federatie-peers. Voeg er één toe om te beginnen."
+    },
+    "table": {
+      "name": "Naam",
+      "slug": "Naaktslak",
+      "base_url": "Basis URL",
+      "status": "Status",
+      "last_handshake": "Laatste succesvolle contact",
+      "actions": "Acties"
+    },
+    "status": {
+      "pending": "In behandeling",
+      "active": "Actief",
+      "suspended": "Opgeschort"
+    },
+    "empty": {
+      "never": "Nooit"
+    },
+    "create_modal": {
+      "title": "Federatie-peer toevoegen",
+      "peer_slug": "Peer-slak",
+      "peer_slug_description": "Alfanumerieke kleine letters + koppeltekens. Gebruikt als coöperatieve bestemmingsslak voor uitgaande overdrachten.",
+      "peer_slug_placeholder": "kus-bern",
+      "display_name": "Weergavenaam",
+      "display_name_placeholder": "Caring Community Bern-coöperatie",
+      "base_url": "Basis URL",
+      "base_url_description": "HTTPS URL van de afstandsbediening NEXUS API. Het pad /v2/federation/hour-transfer/inbound wordt automatisch toegevoegd.",
+      "base_url_placeholder": "https://api.bern-cooperative.ch",
+      "notes": "Opmerkingen",
+      "notes_placeholder": "Interne opmerkingen - partnercontact, overeenkomstreferentie...",
+      "status_hint_prefix": "Status begint als",
+      "status_hint_middle": "Nadat de externe kant hetzelfde gedeelde geheim heeft geregistreerd, stelt u beide kanten in op"
+    },
+    "secret_modal": {
+      "title": "Eenmalig gedeeld geheim",
+      "body_prefix": "Dit geheim wordt getoond",
+      "only_once": "slechts één keer",
+      "body_suffix": "Kopieer het nu en plak het in de externe federatie-peer-invoer van NEXUS voor deze coöperatie. Als je het kwijtraakt, moet je het geheim hier draaien en de externe kant opnieuw bijwerken.",
+      "peer_slug_label": "Peer-slak:",
+      "base_url_label": "Basis URL:"
+    },
+    "validation": {
+      "required_fields": "Alle verplichte velden moeten worden ingevuld."
+    },
+    "confirm_rotate": "Het gedeelde geheim voor \"{{name}}\" roteren? Het oude geheim werkt onmiddellijk niet meer en u moet de externe kant bijwerken.",
+    "confirm_delete": "Federatie-peer \"{{name}}\" verwijderen? Dit is permanent.",
+    "toasts": {
+      "load_failed": "Kan federatieve peers niet laden.",
+      "created": "Federatie-peer gemaakt.",
+      "create_failed": "Kan peer niet maken.",
+      "status_updated": "Peer-status ingesteld op {{status}}.",
+      "status_failed": "Kan de peerstatus niet bijwerken.",
+      "secret_rotated": "Gedeeld geheim geroteerd.",
+      "rotate_failed": "Kan geheim niet roteren.",
+      "deleted": "Peer verwijderd.",
+      "delete_failed": "Kan peer niet verwijderen.",
+      "copied": "Gekopieerd naar klembord.",
+      "copy_failed": "Kopiëren is niet gelukt."
+    }
+  },
+  "help_request_sla": {
+    "meta": {
+      "page_title": "Hulpverzoek SLA Dashboard",
+      "title": "Hulpverzoek SLA Dashboard",
+      "subtitle_prefix": "AG96 - eerste reactie en oplossing",
+      "subtitle_suffix": "tracking op basis van AG81 operationeel beleid"
+    },
+    "actions": {
+      "edit_policy": "Beleid bewerken",
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Vernieuw SLA dashboard"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "Service Level Agreements (SLAs) stellen de maximale verwachte reactie- en oplossingstijden voor hulpverzoeken in. Wanneer een verzoek zijn SLA benadert of overschrijdt, wordt het in dit dashboard gemarkeerd als te laat. Met SLAs kunt u een consistente servicekwaliteit handhaven en nauwkeurige pilotstatistieken genereren.",
+      "first_response_label": "Eerste reactie",
+      "first_response_prefix": "tijd vanaf indiening van het verzoek tot het eerste contact met de coördinator (status gaat van",
+      "first_response_suffix": ")",
+      "resolution_label": "Oplossing",
+      "resolution_prefix": "tijd vanaf de eerste reactie tot het moment waarop het verzoek wordt gematcht en bevestigd (status bereikt",
+      "resolution_suffix": ")",
+      "note": "SLA vensters worden ingesteld in het AG81 Besturingssysteem. Bewerk ze met de knop 'Beleid bewerken' hierboven. Stel strakkere SLAs in voor urgente zorgcategorieën (bijvoorbeeld medisch vervoer) en lossere voor sociale activiteiten."
+    },
+    "policy": {
+      "first_response_description": "- tijd vanaf indiening tot eerste contact met de coördinator",
+      "resolution_description": "- tijd vanaf de eerste reactie tot het moment waarop het verzoek wordt gematcht en bevestigd",
+      "platform_defaults": "Standaardwaarden platform - geen AG81 workshoprun",
+      "tenant_policy": "Huurdersbeleid toegepast"
+    },
+    "metrics": {
+      "first_response_breached": "Eerste reactie geschonden",
+      "first_response_at_risk": "Eerste reactie in gevaar",
+      "resolution_breached": "Resolutie geschonden",
+      "resolution_at_risk": "Resolutie in gevaar",
+      "pending": "In behandeling",
+      "in_progress": "In uitvoering",
+      "resolved_24h": "Opgelost <24 uur (recent)"
+    },
+    "open": {
+      "title": "Hulpaanvragen openen",
+      "subtitle": "{{count}} open - eerst de inbreuk gesorteerd",
+      "bucket_filter_aria": "Emmerfilter",
+      "all_count": "Alles ({{count}})",
+      "breached_count": "Schending ({{count}})",
+      "at_risk_count": "In gevaar ({{count}})",
+      "on_track_count": "Op schema ({{count}})",
+      "empty_bucket": "Geen openstaande hulpverzoeken in deze bucket.",
+      "table_aria": "Hulpaanvragen openen",
+      "request_meta": "Wanneer: {{when}} - gebruiker #{{userId}} - leeftijd {{age}}",
+      "target_hours": "Doel {{hours}}u",
+      "over_by": "Over {{duration}}",
+      "left": "{{duration}} over"
+    },
+    "resolved": {
+      "title": "Recent opgelost (laatste 72 uur)",
+      "table_aria": "Recent opgeloste hulpverzoeken",
+      "user_id": "gebruiker #{{userId}}"
+    },
+    "table": {
+      "request": "Verzoek",
+      "bucket": "Emmer",
+      "status": "Status",
+      "created": "Gemaakt",
+      "turnaround": "Ommekeer",
+      "within": "Binnenin",
+      "resolved": "Opgelost"
+    },
+    "buckets": {
+      "breached": "geschonden",
+      "at_risk": "In gevaar",
+      "on_track": "Op koers"
+    },
+    "dimensions": {
+      "first_response": "Eerste reactie",
+      "resolution": "Oplossing"
+    },
+    "answers": {
+      "yes": "Ja",
+      "no": "Nee"
+    },
+    "footer": {
+      "generated": "Rapport gegenereerd {{date}}.",
+      "proxy_prefix": "proxy: eerste reactie = status verdwijnt",
+      "proxy_middle": "resolutie = status bereikt",
+      "proxy_suffix": "Aanpassen",
+      "proxy_end": "windows in AG81 operationeel beleid."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Kan dashboard SLA niet laden"
+    }
+  },
+  "integration_showcase": {
+    "meta": {
+      "page_title": "Integratieshow",
+      "title": "Integratieshow",
+      "subtitle": "Een verwijzing op één pagina van elk openbaar API-, webhook-, federatie-eindpunt en OAuth-oppervlak dat beschikbaar is in deze implementatie - klaar om te overhandigen aan een technische integratiepartner."
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Vernieuw de integratieshowcase"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "Gebruik deze pagina bij het opzetten van een integratie met een dienst van derden, het datasysteem van een gemeente of een federatief NEXUS-netwerk. Elk hier vermeld eindpunt is live en gericht op deze implementatie. Voorbeeldpayloads zijn ter illustratie: de echte waarden zijn afhankelijk van uw tenant-slug en partnerreferenties. Deel deze URL met integratiepartners in plaats van hen naar de onbewerkte API-documenten te verwijzen.",
+      "last_refreshed": "Laatst vernieuwd{{date}}."
+    },
+    "sections": {
+      "sample_request": "Monsteraanvraag",
+      "read_full_spec": "Lees de volledige specificaties op GitHub"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Kan integratieshowcase niet laden"
+    }
+  },
+  "isolated_node": {
+    "meta": {
+      "page_title": "Besluitpoort met geïsoleerde knooppunten",
+      "title": "Besluitpoort met geïsoleerde knooppunten",
+      "subtitle": "AG85 - checklist voor gereedheid voor kantongestuurde implementatie"
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Vernieuw de beslissingspoort met geïsoleerde knooppunten",
+      "edit": "Bewerking",
+      "cancel": "Annuleren",
+      "save_changes": "Wijzigingen opslaan"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body_prefix": "Er wordt een geïsoleerde knooppuntimplementatie uitgevoerd",
+      "body_middle": "op infrastructuur die volledig door het kanton of de gemeente wordt beheerd - geen gegevens verlaten de grens van het kanton. Deze configuratie is vereist voor",
+      "body_suffix": "implementaties onder strikte Zwitserse kantonnale regels voor gegevensbescherming. De meeste community's draaien als standaard gehoste implementaties en hoeven deze sectie niet te configureren.",
+      "workflow": "Doorloop elk beslissingsitem hieronder: stel de waarde in, wijs een eigenaar toe en markeer het als Besloten wanneer er overeenstemming is bereikt. De poort sluit (en de Pilot Launch Readiness-controle is geslaagd) zodra elk item de status Beslist heeft."
+    },
+    "warning": {
+      "title": "Belangrijk - configureer alleen indien nodig",
+      "body_prefix": "Wijzig deze instellingen alleen als uw gemeente expliciet een eis voor geïsoleerde knooppunten heeft opgegeven. Het wijzigen van de inzetmodus na de lancering van de pilot vereist coördinatie met de",
+      "body_suffix": "technisch team. Wijzig deze instelling niet zonder toestemming van uw kantonale functionaris voor gegevensbescherming."
+    },
+    "status": {
+      "pending": "In behandeling",
+      "in_progress": "In uitvoering",
+      "decided": "Besloten",
+      "blocked": "Geblokkeerd"
+    },
+    "status_counts": {
+      "pending": "In behandeling: {{count}}",
+      "in_progress": "In uitvoering: {{count}}",
+      "decided": "Besloten: {{count}}",
+      "blocked": "Geblokkeerd: {{count}}"
+    },
+    "gate": {
+      "closed": "Poort gesloten - klaar om te lanceren",
+      "open": "Poort open - beslissingen zijn nog steeds vereist",
+      "decided_count": "{{decided}} van {{total}} punten besloten",
+      "blocked_count": "- {{count}} geblokkeerd",
+      "progress_aria": "Vooruitgang op het gebied van besluitvorming"
+    },
+    "fields": {
+      "value": "Waarde",
+      "owner": "Eigenaar",
+      "notes": "Opmerkingen",
+      "status": "Status",
+      "url_placeholder": "https://...",
+      "owner_description": "Persoon of organisatie die verantwoordelijk is voor deze beslissing",
+      "notes_description": "Context, links, contractreferenties of blockers"
+    },
+    "empty": {
+      "unassigned": "niet toegewezen",
+      "none": "geen"
+    },
+    "timestamps": {
+      "last_updated": "Laatst bijgewerkt {{date}}"
+    },
+    "modal": {
+      "edit_decision_item": "Beslissingsitem bewerken",
+      "subtitle": "Update de waarde, eigenaar, status en opmerkingen voor dit poortitem"
+    },
+    "toasts": {
+      "load_failed": "Kan beslissingspoortgegevens niet laden",
+      "item_updated": "Beslissingsitem bijgewerkt",
+      "save_failed": "Kan beslissingsitem niet opslaan"
+    }
+  },
+  "kpi_baselines": {
+    "meta": {
+      "page_title": "Gemeenschap KPI Basislijnen",
+      "title": "Gemeenschap KPI Basislijnen",
+      "subtitle_prefix": "Maak momentopnamen van uw communitystatistieken om deze voor/na bij te houden",
+      "subtitle_suffix": "invloed"
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Vernieuw KPI basislijnen",
+      "capture_now": "Leg nu de basislijn vast",
+      "capture_now_short": "Leg nu vast",
+      "capture_first": "Leg uw eerste basislijn vast",
+      "compare": "Vergelijken",
+      "close": "Dichtbij",
+      "cancel": "Annuleren"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body_prefix": "Basislijnen leggen de toestand van uw gemeenschap vast voordat het Caring Community-programma begint. Bij elke kwartaalbeoordeling worden ze vergeleken met de huidige statistieken om de impact aan te tonen. Leg basislijnen vast voor iedereen",
+      "body_suffix": "voordat bewoners aan boord gaan: zodra de pilot start, is de basislijn bevroren en kan deze niet meer met terugwerkende kracht worden gedateerd.",
+      "compare_prefix": "Klik",
+      "compare_suffix": "op elke basislijnrij om een ​​vergelijking naast elkaar te zien met de huidige platformgegevens. Statistieken die een verandering van meer dan 25% op de belangrijkste impactindicatoren laten zien, worden gemarkeerd als Impact bereikt."
+    },
+    "metrics": {
+      "volunteer_hours": "Vrijwilligersuren (90d)",
+      "member_count": "Actieve leden",
+      "recipient_count": "Ontvangers bereikt",
+      "active_relationships": "Actieve relaties",
+      "total_exchanges": "Totaal aantal uitwisselingen",
+      "avg_response_hours": "Gem. responstijd (uur)",
+      "engagement_rate_pct": "Betrokkenheidspercentage (%)"
+    },
+    "comparison": {
+      "comparing": "Vergelijken:",
+      "captured": "(vastgelegd {{date}})",
+      "impact_achieved": "Impact bereikt",
+      "baseline": "Basislijn",
+      "now": "Nu"
+    },
+    "empty": {
+      "no_data": "Geen gegevens beschikbaar",
+      "no_baselines": "Er zijn nog geen basislijnen vastgelegd."
+    },
+    "fields": {
+      "notes_label_prefix": "Opmerkingen:",
+      "baseline_label": "Basislijnlabel",
+      "baseline_placeholder": "bijv. Vóór de lancering van NEXUS",
+      "baseline_description": "Een korte naam om deze momentopname te identificeren (bijvoorbeeld 'Pre-lancering Q1 2025')",
+      "period_start": "Periode begin",
+      "period_start_description": "Begin referentieperiode",
+      "period_end": "Einde periode",
+      "period_end_description": "Einde referentieperiode",
+      "notes_source": "Opmerkingen / bron (optioneel)",
+      "notes_placeholder": "bijv. 'Verwijzingsgegevens huisartsen Q1 2026, ledenenquête maart 2026, vastgelegd vóór platformuitrol naar alle Gemeinden'",
+      "notes_description": "Documenteer waar deze cijfers vandaan komen (bijvoorbeeld 'Verwijsgegevens huisarts Q1 2026', 'ledenonderzoek maart 2026'). Geciteerde bronnen maken de uitgangssituatie verdedigbaar in de subsidierapportage."
+    },
+    "table": {
+      "aria": "KPI Basislijnen",
+      "label": "Etiket",
+      "captured": "Gevangen",
+      "members": "Leden",
+      "volunteer_hours": "Vrijwilligersuren",
+      "active_relationships": "Actieve relaties",
+      "total_exchanges": "Totaal aantal uitwisselingen",
+      "actions": "Acties"
+    },
+    "modal": {
+      "title_prefix": "Vastlegging",
+      "title_suffix": "Basislijn",
+      "body": "Er wordt nu een live momentopname gemaakt van uw communitystatistieken en deze wordt opgeslagen als een benoemde basislijn voor toekomstige vergelijkingen.",
+      "metrics_captured": "Vastgelegde statistieken: aantal actieve leden, goedgekeurde vrijwilligersuren (laatste 90 dagen), actieve ondersteuningsrelaties, verschillende ontvangers en totale uitwisselingen."
+    },
+    "toasts": {
+      "load_failed": "Kan KPI basislijnen niet laden",
+      "comparison_failed": "Kan de vergelijking niet laden",
+      "saved": "Basislijn opgeslagen. Gebruik het om toekomstige statistieken te vergelijken met deze momentopname.",
+      "capture_failed": "Kan basislijn niet vastleggen"
+    }
+  },
+  "lead_nurture": {
+    "meta": {
+      "page_title": "Leid nurture",
+      "title": "Leid nurture",
+      "subtitle": "Volg en begeleid potentiële partners - gemeenten, investeerders, bedrijven, bewoners en maatschappelijke organisaties - vanaf het eerste contact tot en met de onboarding."
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Ververs leadnurture-contacten",
+      "export_csv": "Exporteer CSV",
+      "edit": "Bewerking",
+      "mark_unsubscribed": "Markeer als afgemeld",
+      "unsubscribe_aria": "Afmelden contactpersoon",
+      "cancel": "Annuleren",
+      "save": "Redden"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "De Lead Nurture-tracker is een lichtgewicht CRM voor NEXUS implementatiemogelijkheden. Wanneer een gemeente, potentiële financier of zakenpartner interesse toont, kunt u deze hier toevoegen en de voortgang via de trechter volgen. Gebruik het faseveld om vast te leggen waar elk contact zich in het gesprek bevindt, en de vervolgdatum om ervoor te zorgen dat niemand het koud krijgt. Exporteer naar CSV voor rapportage of importeer in een externe CRM."
+    },
+    "summary": {
+      "title": "Samenvatting",
+      "total_contacts": "totale contacten",
+      "by_segment": "Per segment:",
+      "by_stage": "Per fase:"
+    },
+    "filters": {
+      "title": "Filters",
+      "segment": "Segmenteren",
+      "segment_description": "gemeente: lokaal bestuur; investeerder: financier; zakelijk: sponsoring; ingezetene: individu; partner: NGO/goed doel.",
+      "stage": "Fase",
+      "all_segments": "Alle segmenten",
+      "all_stages": "Alle fasen"
+    },
+    "contacts": {
+      "title": "Contacten ({{count}})",
+      "empty": "Er zijn geen contacten die overeenkomen met de huidige filters.",
+      "table_aria": "Leid nurture-contacten"
+    },
+    "table": {
+      "name_email": "Naam / E-mail",
+      "organisation": "Organisatie",
+      "segment": "Segmenteren",
+      "stage": "Fase",
+      "source": "Bron",
+      "captured": "Gevangen",
+      "follow_up": "Vervolg",
+      "actions": "Acties"
+    },
+    "segments": {
+      "municipality": "Gemeente",
+      "investor": "Investeerder",
+      "business": "Bedrijf",
+      "resident": "Inwoner",
+      "partner": "Partner"
+    },
+    "stages": {
+      "captured": "Gevangen",
+      "contacted": "Gecontacteerd",
+      "engaged": "Betrokken",
+      "qualified": "Gekwalificeerd",
+      "converted": "Geconverteerd",
+      "dormant": "Slaperig",
+      "unsubscribed": "Uitgeschreven"
+    },
+    "fields": {
+      "follow_up_date": "Vervolgdatum (ISO 8601)",
+      "follow_up_placeholder": "2026-05-15",
+      "notes": "Opmerkingen"
+    },
+    "modal": {
+      "title": "Contact bewerken",
+      "stage_description": "vastgelegd: eerste contact; gecontacteerd: contact opgenomen; betrokken: actief gesprek; gekwalificeerd: rente en budget bevestigd; omgezet: aangemeld; slapend: stil geworden; uitgeschreven: opt-out."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "confirm_unsubscribe": "{{email}} markeren als afgemeld?",
+    "toasts": {
+      "load_failed": "Kan leadnurture-contacten niet laden",
+      "updated": "Contact bijgewerkt",
+      "update_failed": "Kan contactpersoon niet updaten",
+      "unsubscribed": "Gemarkeerd als afgemeld",
+      "unsubscribe_failed": "Afmelden is mislukt",
+      "exported": "Leadlijst geëxporteerd",
+      "export_failed": "Kan CSV niet exporteren"
+    }
+  },
+  "municipal_copilot": {
+    "meta": {
+      "page_title": "Copiloot gemeentelijke communicatie",
+      "title": "Copiloot gemeentelijke communicatie",
+      "subtitle": "Stel officiële aankondigingen op, laat ze op AI bijwerken, controleer de toon en duidelijkheid en publiceer ze vervolgens. Ontworpen voor coördinatoren die op een consistente, toegankelijke toon moeten communiceren met bewoners en gemeentecontacten."
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "generate_proposal": "Voorstel genereren",
+      "accept": "Accepteren",
+      "reject": "Afwijzen",
+      "view": "Weergave",
+      "cancel": "Annuleren",
+      "reject_proposal": "Voorstel afwijzen",
+      "publish": "Publiceren"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "De Gemeentelijke Copiloot helpt u mededelingen te schrijven die duidelijk, passend formeel en vrij van jargon zijn. Plak een ruwe schets. De AI zal verbeteringen voorstellen, toonproblemen markeren (te formeel, neerbuigend of onduidelijk) en eventuele moderatieproblemen opnoemen. U beoordeelt en accepteert of wijst de suggestie af voordat er iets wordt gepubliceerd."
+    },
+    "sections": {
+      "new_draft": "Nieuw ontwerp",
+      "latest_proposal": "Laatste voorstel",
+      "clarity_warnings": "Duidelijkheidswaarschuwingen",
+      "moderation_flags": "Moderatievlaggen",
+      "recent_proposals": "Recente voorstellen"
+    },
+    "fields": {
+      "draft_announcement": "Concept-aankondiging",
+      "draft_placeholder": "Plak een ruwe schets. De copiloot zal de toon oppoetsen, de toon controleren en problemen signaleren.",
+      "character_count": "{{count}} / 4000 tekens",
+      "audience_hint": "Doelgroephint (optioneel)",
+      "audience_placeholder": "bijv. zorgverleners in de noordelijke subregio",
+      "audience_description": "Geef aan voor wie deze mededeling bedoeld is (bijvoorbeeld 'alle bewoners', 'vrijwilligers', 'gemeentecontacten'), zodat de AI de toon en de woordenschat op de juiste manier kan kalibreren.",
+      "polished_text": "Gepolijste tekst",
+      "reason": "Reden",
+      "reason_placeholder": "Waarom wordt dit voorstel afgewezen?"
+    },
+    "status": {
+      "proposed": "Voorgesteld",
+      "accepted": "Geaccepteerd",
+      "rejected": "Afgewezen",
+      "published": "Gepubliceerd"
+    },
+    "tone": {
+      "too_formal": "Te formeel",
+      "too_informal": "Te informeel",
+      "condescending": "Zelfingenomen",
+      "ok": "Toon oké"
+    },
+    "tone_legend": {
+      "prefix": "Toon legende -",
+      "too_formal": "overdreven bureaucratisch",
+      "too_informal": "lijkt misschien onprofessioneel",
+      "condescending": "kan de lezer betuttelen",
+      "ok": "geen toonproblemen gedetecteerd"
+    },
+    "labels": {
+      "audience": "Publiek: {{audience}}",
+      "model": "Gebruikt model: {{model}}"
+    },
+    "states": {
+      "accepted": "Geaccepteerd maar nog niet gepubliceerd. Druk op Publiceren om de tekst als aankondiging te versturen.",
+      "rejected_reason": "Afgewezen - reden: {{reason}}",
+      "published": "Gepubliceerd als aankondiging #{{id}}."
+    },
+    "empty": {
+      "value": "-",
+      "no_latest": "Nog geen voorstel. Genereer er een uit het concept aan de linkerkant.",
+      "no_proposals": "Nog geen voorstellen. Concepten die u analyseert, verschijnen hier als een audittrail."
+    },
+    "table": {
+      "aria": "Recente copilootvoorstellen",
+      "status": "Status",
+      "draft": "VOORLOPIGE VERSIE",
+      "audience": "PUBLIEK",
+      "tone": "TOON",
+      "created": "GEMAAKT",
+      "actions": "ACTIES"
+    },
+    "modal": {
+      "reject_title": "Voorstel afwijzen"
+    },
+    "toasts": {
+      "load_failed": "Kan copilootvoorstellen niet laden",
+      "enter_draft": "Voer eerst een concept in",
+      "draft_too_long": "Het concept is te lang (max. 4000 tekens)",
+      "generated": "Voorstel gegenereerd",
+      "generate_failed": "Kan voorstel niet genereren",
+      "accepted": "Voorstel geaccepteerd en gepubliceerd als aankondiging",
+      "accept_failed": "Kan het voorstel niet accepteren",
+      "reason_required": "Reden is vereist",
+      "rejected": "Voorstel afgewezen",
+      "reject_failed": "Het voorstel kan niet worden afgewezen",
+      "publish_failed": "Voorstel geaccepteerd, maar publiceren is mislukt - druk op Publiceren om het opnieuw te proberen"
+    }
+  },
+  "municipal_roi_page": {
+    "meta": {
+      "page_title": "Gemeentelijk Impactrapport",
+      "title": "Gemeentelijk Impactrapport",
+      "subtitle": "Bewijs voor B2G-inkoop: compensaties voor zorgkosten en maatstaven voor sociaal kapitaal"
+    },
+    "actions": {
+      "export_csv": "Exporteer CSV",
+      "refresh_data": "Gegevens vernieuwen",
+      "refresh_aria": "Vernieuwen gemeentelijke impactrapportage"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body_prefix": "De gemeentelijke",
+      "body_middle": "Report berekent de sociale en economische waarde van uw gemeenschapszorgprogramma met behulp van de",
+      "body_suffix": "Caring Community methodologie. Het toont de geschatte kosten die worden gecompenseerd voor formele zorgdiensten (Spitex/Pflege), de gegenereerde sociale waarde en trendgegevens over de rapportageperioden. Dit rapport is bedoeld om te worden gedeeld met gemeentelijke partners en financiers als bewijs van de impact van het programma.",
+      "formula_prefix": "Kostencompensatie = totaal goedgekeurde zorguren x",
+      "formula_suffix": "uurtarief x preventiemultiplier. De preventiemultiplier (standaard: 2,0) weerspiegelt dat één uur informele zorg ongeveer twee uur formele zorginterventie voorkomt, gebaseerd op Caring Community onderzoek."
+    },
+    "filters": {
+      "from": "Van",
+      "to": "Naar",
+      "sub_region": "Subregio",
+      "all_sub_regions": "Alle subregio's",
+      "period": "Periode: {{from}} -> {{to}}"
+    },
+    "methodology": {
+      "hours_valued_at": "Uren gewaardeerd op",
+      "hours_are_valued_at": "Uren worden gewaardeerd op",
+      "chf_per_hour": "CHF {{amount}}/uur",
+      "default_rate": "CHF 35/uur",
+      "tenant_setting_source": "geconfigureerd voor deze tenant",
+      "default_source": "Tarief Zwitserse formele zorgassistenten, SECO 2024",
+      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
+      "prevention_value_suffix": "evaluatiemethodologie.",
+      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
+      "default_prevention_suffix": "evaluatiemethodologie.",
+      "substitution_applied": "Uren worden gewogen op basis van substitutiecoëfficiënten per categorie.",
+      "substitution_not_applied": "Alle uren gewogen op 1,0x."
+    },
+    "stats": {
+      "total_hours": "Totaal aantal uren",
+      "active_members": "Actieve leden",
+      "active_relationships": "Actieve relaties",
+      "care_recipients": "Zorgontvangers",
+      "weighted_hours_tooltip": "Uren worden gewogen op basis van categoriespecifieke vervangingspercentages (bijvoorbeeld gezelschap 0,4x, vervoer 0,7x, boodschappen 1,0x) per Caring Community methodologie.",
+      "weighted_hours_note": "{{hours}} gewogen uren na vervangingscoëfficiënten"
+    },
+    "roi": {
+      "title": "Geschatte zorgkostencompensatie",
+      "yoy": "{{value}} JoJ",
+      "prevented_this_period": "aan formele zorgkosten voorkomen deze periode",
+      "prevention_value": "Preventiewaarde",
+      "multiplier_note": "({{multiplier}}x vermenigvuldiger)",
+      "default_multiplier_note": "(2x vermenigvuldiger)",
+      "social_isolation_supported": "Mensen ondersteund uit sociaal isolement"
+    },
+    "municipalities": {
+      "title": "Wat dit betekent voor gemeenten",
+      "point_hour_prefix": "Elk uur zorgtijd voor de gemeenschap bespaart ongeveer",
+      "point_hour_suffix": "in de formele zorgkosten",
+      "point_prevention": "Preventieve gemeenschapssteun kan de behoeften aan residentiële zorg verminderen - een geschatte vermenigvuldiger van 2x",
+      "point_nexus": "maakt deze impact meetbaar, controleerbaar en rapporteerbaar voor kantonnale en gemeentelijke aanbestedingen",
+      "point_export": "CSV export beschikbaar - gebruik de knop in de paginakop voor Caring Community, Pro Senectute en rapportage van de kantonnale sociale afdelingen."
+    },
+    "breakdown": {
+      "title": "Uitsplitsing per subregio",
+      "description": "Uitsplitsing naar subregio laat zien welke buurten de meeste zorgactiviteit genereren. Gebruik dit om gebieden te identificeren die mogelijk meer coördinatorondersteuning of vrijwilligerswerving nodig hebben.",
+      "aria": "Uitsplitsing naar subregio",
+      "sub_region": "Subregio",
+      "hours": "Uur",
+      "weighted_hours": "Gewogen uren",
+      "formal_care_offset": "Formele zorgcompensatie"
+    },
+    "toasts": {
+      "load_failed": "Kan gemeentelijke impactgegevens niet laden",
+      "export_failed": "Kan CSV niet exporteren"
+    }
+  },
+  "municipal_verification": {
+    "meta": {
+      "page_title": "Gemeentelijke verificatie",
+      "title": "Gemeentelijke verificatie",
+      "description": "Markeer deze gemeenschap als een geverifieerde gemeentelijke partner. Voegt een badge 'Geverifieerde gemeente' toe aan openbare rapporten."
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "generate_dns_token": "Genereer een DNS-token",
+      "apply_attestation": "Pas attest toe",
+      "revoke": "Herroepen",
+      "cancel": "Annuleren"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "Gemeentelijke Verificatie registreert de formele ondertekening door een gemeente of kantonpartner dat dit gemeenschapszorgprogramma aan hun eisen voldoet. Verificatie is vereist voor de controle van de pilotlanceringsgereedheid en ontgrendelt het gemeentelijke impactrapport. Gebruik DNS TXT verificatie voor officiële gemeentelijke domeinen, of pas een beheerdersattest toe als DNS controle niet beschikbaar is.",
+      "pending_dns": "Verificatietoken gegenereerd - in afwachting van DNS-propagatie en bevestiging.",
+      "verified": "Formeel geverifieerd - het gemeentelijke rapportagepakket is ontgrendeld.",
+      "revoked": "Verificatie is verwijderd. Verifieer opnieuw om de toegang te herstellen."
+    },
+    "status": {
+      "verified": "Geverifieerd",
+      "pending_dns": "In behandeling DNS",
+      "revoked": "Ingetrokken"
+    },
+    "current": {
+      "title": "Huidige status",
+      "verified_on": "Geverifieerd op {{date}}",
+      "not_verified": "Deze tenant is momenteel niet geverifieerd. Gebruik de onderstaande opties om een ​​DNS-verificatie te starten of een handmatige beheerdersattest toe te passen."
+    },
+    "request": {
+      "title": "Verificatie aanvragen",
+      "method_aria": "Verificatiemethode",
+      "dns_tab": "DNS TXT (bij voorkeur)",
+      "dns_body": "Geef het officiële gemeentedomein op dat u beheert. We genereren een DNS TXT record die u kunt publiceren; Zodra het zich verspreidt, markeert het systeem deze tenant als geverifieerd.",
+      "attestation_tab": "Beheerdersattest",
+      "attestation_body": "Gebruik dit alleen als DNS-besturing niet beschikbaar is. De verificatie wordt geregistreerd als handmatig bevestigd door een beheerder."
+    },
+    "fields": {
+      "municipality_domain": "Gemeente domein",
+      "domain_or_organisation": "Domein of organisatie",
+      "domain_placeholder": "bijv. zürich.ch",
+      "attestation_note": "Attestnota (optioneel)",
+      "attestation_description": "Waarom bevestigt u dit zonder DNS verificatie? (Audittraject.)"
+    },
+    "history": {
+      "title": "Verificaties",
+      "empty": "Nog geen verificatiegegevens.",
+      "via_method": "via {{method}}",
+      "updated": "{{date}} bijgewerkt"
+    },
+    "dns": {
+      "publish_record": "Publiceer deze TXT record op uw DNS en wacht vervolgens op verspreiding:",
+      "record_name": "Naam opnemen",
+      "value": "Waarde",
+      "type_label": "Soort",
+      "ttl_label": "TTL",
+      "txt_type": "TXT",
+      "ttl_value": "300"
+    },
+    "revoke_modal": {
+      "title": "Verificatie intrekken?",
+      "body_prefix": "Verificatie intrekken voor",
+      "body_suffix": "Hierdoor wordt de geverifieerde badge verwijderd en wordt het verificatierecord gemarkeerd als ingetrokken."
+    },
+    "validation": {
+      "domain_required": "Voer een domein in"
+    },
+    "toasts": {
+      "load_failed": "Kan de verificatiestatus niet laden",
+      "dns_generated": "DNS verificatietoken gegenereerd",
+      "dns_failed": "Kan de DNS-verificatie niet starten",
+      "attested": "Verificatie bevestigd",
+      "attest_failed": "Kan de verificatie niet bevestigen",
+      "revoked": "Verificatie ingetrokken",
+      "revoke_failed": "Kan de verificatie niet intrekken"
+    }
+  },
+  "pilot_launch_readiness": {
+    "meta": {
+      "page_title": "Gereedheid voor pilootlancering",
+      "title": "Gereedheid voor pilootlancering",
+      "subtitle": "AG95 - go/no-go-rapport waarin AG80-AG87 evaluatieoppervlakken worden gecombineerd"
+    },
+    "actions": {
+      "launch_pilot": "Lancering piloot",
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Vernieuw het lanceringsgereedheidsrapport",
+      "retry": "Opnieuw proberen",
+      "open": "Openen",
+      "acknowledge_default_matrix": "Bevestig de standaardmatrix",
+      "cancel": "Annuleren",
+      "confirm_launch": "Ja, start de pilot"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "Dit is de go/no-go-poort voordat uw Caring Community-pilot live gaat. Elke sectie hieronder komt overeen met een configuratie- of evaluatiemodule (AG80-AG87). Alle secties moeten de status Gereed hebben voordat de knop Starten wordt ingeschakeld. Eenmaal gelanceerd, is dit een eenrichtingsactie: het lanceringstijdstempel en de operator worden permanent vastgelegd.",
+      "review_help": "Secties met Behoeftenbeoordeling hebben een ontbrekende of onvolledige configuratie. Klik door naar de betreffende module om de genoemde items op te lossen."
+    },
+    "status": {
+      "ready": "Klaar",
+      "needs_review": "Moet worden beoordeeld",
+      "not_started": "Niet gestart",
+      "blocked": "Geblokkeerd"
+    },
+    "missing": {
+      "controller_name": "Naam van controller",
+      "controller_contact_email": "E-mailadres voor contactpersoon van de controller",
+      "controller_data_protection_officer": "Functionaris voor gegevensbescherming",
+      "incident_response_contact_email": "Contact-e-mailadres voor reactie op incidenten",
+      "workshop_not_run": "Workshop over operationeel beleid wordt niet uitgevoerd",
+      "policy_appendix_url": "Beleidsbijlage URL",
+      "safeguarding_escalation_user_id": "Borgen van escalatiecontact",
+      "acknowledgement": "Erkenning coördinator",
+      "pre_pilot_baseline": "Basislijn scorebord vóór de pilot",
+      "danger_checks": "Problemen met de gegevenskwaliteit",
+      "backlog_empty": "Integratieachterstand leeg"
+    },
+    "states": {
+      "launched_title": "Piloot gelanceerd",
+      "launched_body": "Gelanceerd op {{date}}{{user}}. Dit is een mijlpaal in één richting: gereedheidscontroles blijven zichtbaar voor audits.",
+      "launched_by_user": "door gebruiker #{{id}}",
+      "ready_title": "Klaar om te lanceren",
+      "ready_body_prefix": "Elke gereedheidssectie is gereed. Klik",
+      "ready_body_suffix": "wanneer uw coördinatorenteam er klaar voor is om dit een eenrichtingsbeslissing te laten nemen.",
+      "blocked_title": "Kan nog niet starten - {{count}} blocker blijft bestaan",
+      "blocked_title_plural": "Kan nog niet starten - {{count}} blokkers blijven bestaan",
+      "blocked_body": "Los elk gedeelte hieronder op voordat de startknop wordt ingeschakeld."
+    },
+    "overall": {
+      "ready": "Piloot is klaar om te lanceren",
+      "blocked": "Start geblokkeerd - los eerst de problemen op",
+      "not_started": "Pilotevaluatie nog niet uitgevoerd",
+      "needs_review": "Piloot heeft coördinatorbeoordeling nodig"
+    },
+    "progress": {
+      "ready_count": "{{ready}} / {{total}} gereed",
+      "aria": "Vooruitgang in voorbereidingsbereidheid"
+    },
+    "isolated_node": {
+      "required": "Poort met geïsoleerd knooppunt is actief: deze implementatie is geconfigureerd als een kanton-geïsoleerd knooppunt (AG85). Alle items moeten vóór de lancering de status Besloten hebben.",
+      "informational": "Gate met geïsoleerde knooppunten is informatief voor standaard gehoste implementaties. Het blokkeert alleen het starten wanneer AG85 deployment_mode is ingesteld op canton_isolated_node. Als uw gemeente geen vereiste voor geïsoleerde knooppunten heeft gespecificeerd, kunt u de items in deze sectie negeren."
+    },
+    "timestamps": {
+      "last_updated": "Laatst bijgewerkt {{date}}",
+      "report_generated": "Rapport gegenereerd {{date}}. Klik op een sectie om het bijbehorende beheerdersoppervlak te openen."
+    },
+    "modal": {
+      "title": "De pilot lanceren?",
+      "body_prefix": "Het lanceren van de pilot is een",
+      "one_way_action": "eenrichtingsactie",
+      "body_suffix": "Het registreert het starttijdstempel en de operator van de tenant, en platformrapporten beginnen de community als live te beschouwen.",
+      "confirm_intro": "Voordat u doorgaat, moet u bij uw coördinatorenteam bevestigen dat:",
+      "check_disclosure": "Het openbaarmakingspakket, het operationele beleid en de commerciële grens zijn ondertekend",
+      "check_baseline": "De basislijn van het scorebord van vóór de pilot is vastgelegd",
+      "check_data_quality": "Gegevenskwaliteitscontroles zijn groen",
+      "check_residents": "Echte bewoners staan ​​klaar om uitgenodigd te worden",
+      "section_summary": "Sectie samenvatting"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "more_count": "+{{count}} meer",
+    "toasts": {
+      "load_failed": "Kan het gereedheidsrapport voor opstarten niet laden",
+      "boundary_acknowledged": "Commerciële grens erkend",
+      "boundary_acknowledge_failed": "Kan de grens niet erkennen",
+      "launch_success": "Pilot succesvol gelanceerd.",
+      "cannot_launch": "Kan niet starten - de paraatheidshek is niet gesloten.",
+      "already_launched": "Deze pilot is inmiddels gestart.",
+      "launch_failed": "Kan de pilot niet starten."
+    },
+    "errors": {
+      "load_failed": "Het rapport over de gereedheid voor lancering kan niet worden geladen.",
+      "unexpected_response": "Het rapport over de gereedheid voor lancering gaf een onverwacht antwoord.",
+      "unavailable_title": "Gereedheidsrapport niet beschikbaar"
+    }
+  },
+  "pilot_scoreboard": {
+    "meta": {
+      "title": "Scorebord voor succes van piloten",
+      "subtitle": "AG83 - basislijn vóór de pilot + voortschrijdende statistieken over 90 dagen met driemaandelijkse beoordelingsfrequentie"
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "pre_set": "Basislijnset vóór de pilot",
+      "capture_pre": "Leg de pre-pilot basislijn vast",
+      "capture_quarterly": "Kwartaaloverzicht vastleggen",
+      "capture_baseline": "Basislijn vastleggen",
+      "cancel": "Annuleren"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "Alle statistieken gebruiken een voortschrijdende periode van 90 dagen. Leg een pre-pilot-basislijn vast voordat u echte bewoners aan boord neemt, en voer vervolgens elke drie maanden een driemaandelijkse beoordelingsmomentopname uit. De vergelijkingstabel laat zien hoe elke metriek is verschoven ten opzichte van die basislijn.",
+      "methodology_prefix": "De kostencompensatie wordt berekend met behulp van de",
+      "age_stiftung": "Caring Community",
+      "age_stiftung_title": "Stiftung für das Alter",
+      "methodology_middle": "methodiek: uren mantelzorg x",
+      "methodology_suffix": "35/uur (Zwitsers tarief voor formele zorgassistenten) x 2 (preventiemultiplier die de vermeden formele zorgkosten weerspiegelt). Deze methodologie wordt erkend door de Zwitserse kantonnale sociale diensten voor pilotrapportage."
+    },
+    "quarterly": {
+      "next_review": "Volgende kwartaaloverzicht:",
+      "overdue": "Verlopen"
+    },
+    "sections": {
+      "metrics": "Pilotstatistieken",
+      "comparing_baseline": "Vergelijking met de basislijn vóór de pilot vastgelegd {{date}}",
+      "no_baseline": "Er is nog geen pre-pilot basislijn; alleen de huidige waarden worden weergegeven",
+      "captured_baselines": "Vastgelegde basislijnen"
+    },
+    "table": {
+      "metric": "Metrisch",
+      "pre_pilot": "Pre-piloot",
+      "current": "Huidig",
+      "delta": "Delta",
+      "change": "Wijziging"
+    },
+    "metrics": {
+      "active_members": "Actieve leden (90d)",
+      "first_response_hours": "Mediane eerste reactie",
+      "approved_hours": "Goedgekeurde uren (90d)",
+      "recurring_relationships": "Terugkerende relaties",
+      "coordinator_workload_hrs": "Werklast coördinator",
+      "satisfaction_score": "Tevredenheidsscore (1-5)",
+      "social_isolation_pct": "Proxy voor sociaal isolement",
+      "comms_reach_pct": "Communicatiebereik",
+      "business_participation": "Actieve bedrijven (90d)",
+      "cost_offset_chf": "Geschatte kostencompensatie (CHF)"
+    },
+    "baselines": {
+      "label": "Etiket",
+      "captured": "Gevangen",
+      "period": "Periode",
+      "type": "Typ",
+      "notes": "Opmerkingen",
+      "pre_pilot": "Pre-piloot",
+      "quarterly": "Driemaandelijks"
+    },
+    "fields": {
+      "notes_optional": "Opmerkingen (optioneel)",
+      "label_optional": "Etiket (optioneel)"
+    },
+    "pre_modal": {
+      "title": "Leg de pre-pilot basislijn vast",
+      "body": "Leg dit EENMAAL vast voordat u echte bewoners aan boord haalt. Het bevriest de huidige statistieken van 90 dagen als uw vergelijkingsbasislijn. Bij alle toekomstige kwartaalbeoordelingen wordt de delta berekend op basis van deze momentopname. Deze actie kan niet ongedaan worden gemaakt.",
+      "notes_placeholder": "Pilotregio, deelnemende gemeente, beslissingen vóór lancering..."
+    },
+    "quarterly_modal": {
+      "title": "Kwartaaloverzicht vastleggen",
+      "body": "Wordt elke drie maanden uitgevoerd na de lancering van de pilot. Het momentopnamelabel is standaard ingesteld op het huidige kwartaal (bijvoorbeeld Q2_2026), maar u kunt dit aanpassen. Voeg notities toe om vast te leggen wat er is veranderd sinds de laatste beoordeling: bereikte mijlpalen, beleidswijzigingen, feedback van bewoners. De momentopname bestrijkt de meest recente periode van 90 dagen vanaf vandaag.",
+      "label_placeholder": "driemaandelijks_2026_07",
+      "label_description": "Gebruik een herkenbaar label zoals Q2_2026 of 2026_Q3. Standaard ingesteld op driemaandelijks_JJJJ_MM.",
+      "notes_placeholder": "Wat is er dit kwartaal veranderd, mijlpalen bereikt..."
+    },
+    "empty": {
+      "value": "-"
+    },
+    "currency": {
+      "chf": "CHF"
+    },
+    "methodology": {
+      "prefix": "Methodiek: uur x",
+      "per_hour": "/uur x",
+      "multiplier": "preventievermenigvuldiger.",
+      "window": "Periode: {{days}} dagen."
+    },
+    "toasts": {
+      "load_failed": "Kan het scorebord van de piloot niet laden",
+      "pre_captured": "Basislijn vóór de piloot vastgelegd",
+      "pre_failed": "Het is niet gelukt om de pre-pilot basislijn vast te leggen",
+      "quarterly_captured": "Kwartaaloverzicht vastgelegd",
+      "quarterly_failed": "Kan kwartaaloverzicht niet vastleggen"
+    }
+  },
+  "research_partnerships": {
+    "meta": {
+      "title": "Onderzoekspartnerschappen",
+      "subtitle": "Beheer privacyveilige onderzoekspartners, verzamel datasetexports en intrekkingsgeschiedenis"
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Onderzoekspartnerschappen vernieuwen",
+      "generate_export": "Exporteren genereren",
+      "add_partner": "Partner toevoegen",
+      "view": "Weergave",
+      "open": "Openen",
+      "revoke": "Herroepen",
+      "cancel": "Annuleren",
+      "create": "Creëren",
+      "close": "Dichtbij",
+      "download_markdown": "Markdown downloaden",
+      "render": "Veroorzaken",
+      "rerender": "Opnieuw renderen",
+      "generate": "Genereer"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "Onderzoekspartnerschappen geven goedgekeurde academische of beleidsonderzoekers gecontroleerde toegang tot geanonimiseerde platformgegevens voor evaluatiedoeleinden. Elk partnerschap definieert een specifieke datascope, een duur en een overeenkomst voor het delen van gegevens. Alle toegang wordt geregistreerd. Partners zien nooit gegevens van individuele leden, maar alleen geaggregeerde of geanonimiseerde datasets.",
+      "data_scope_label": "Gegevensbereik:",
+      "data_scope_body": "Definieer precies tot welke gegevens de onderzoeker toegang heeft, bijvoorbeeld de totale maandelijkse zorguren per subregio, met uitzondering van alle persoonlijke identificatiegegevens. De reikwijdte is contractueel bindend en wordt elk kwartaal gecontroleerd.",
+      "download_history_label": "Geschiedenis downloaden:",
+      "download_history_body": "Elke data-export wordt gelogd met een tijdstempel en de gegevens van de onderzoeker. Dit logboek is op verzoek beschikbaar voor uw Data Protection Officer. Gebruik Intrekken om een ​​eerder uitgegeven dataset in te trekken."
+    },
+    "partners": {
+      "title": "Onderzoekspartners",
+      "table_aria": "Onderzoekspartners",
+      "empty": "Nog geen onderzoekspartners."
+    },
+    "templates": {
+      "title": "Overeenkomstsjablonen",
+      "subtitle": "FADP/nDSG-uitgelijnde concepten voor juridische beoordeling",
+      "empty": "Er zijn geen overeenkomstsjablonen beschikbaar.",
+      "placeholder_count_one": "{{count}} tijdelijke aanduiding",
+      "placeholder_count_other": "{{count}} tijdelijke aanduidingen",
+      "fallback_title": "Overeenkomstsjabloon",
+      "placeholder_label": "{{placeholder}}",
+      "rendered_markdown": "Weergegeven Markdown ({{count}} tekens)",
+      "missing_placeholder_count_one": "{{count}} tijdelijke aanduiding ontbreekt",
+      "missing_placeholder_count_other": "{{count}} tijdelijke aanduidingen ontbreken"
+    },
+    "exports": {
+      "title": "Gegevensset-exportgeschiedenis",
+      "table_aria": "Export van onderzoeksdatasets",
+      "empty": "Nog geen dataset-exports.",
+      "partner_fallback": "Partner #{{id}}"
+    },
+    "columns": {
+      "partner": "Partner",
+      "status": "Status",
+      "agreement": "Overeenkomst",
+      "methodology": "Methodologie",
+      "created": "Gemaakt",
+      "period": "Periode",
+      "rows": "Rijen",
+      "hash": "Hasj",
+      "actions": "Acties"
+    },
+    "fields": {
+      "name": "Naam",
+      "institution": "Instelling",
+      "contact_email": "E-mailadres voor contact",
+      "agreement_reference": "Overeenkomstreferentie",
+      "methodology_url": "Methodologie URL",
+      "status": "Status",
+      "dataset_scope": "Bereik van gegevensset",
+      "dataset_scope_description": "Door komma's gescheiden gegevenssetsleutels.",
+      "period_start": "Periode begin",
+      "period_end": "Einde periode"
+    },
+    "statuses": {
+      "draft": "Voorlopige versie",
+      "active": "Actief",
+      "paused": "Gepauzeerd",
+      "ended": "Beëindigd",
+      "generated": "Gegenereerd",
+      "superseded": "Vervangen",
+      "revoked": "Ingetrokken"
+    },
+    "partner_modal": {
+      "title": "Onderzoekspartner toevoegen"
+    },
+    "export_modal": {
+      "title": "Genereer een geaggregeerde gegevensset",
+      "active_partner": "Actieve onderzoekspartner",
+      "privacy_note": "Exporten zijn alleen geaggregeerd en gebruiken onderdrukkingsdrempels. Directe leden-ID's zijn niet inbegrepen."
+    },
+    "toasts": {
+      "load_failed": "Kan onderzoekspartnerschappen niet laden",
+      "render_template_failed": "Kan de sjabloon niet weergeven",
+      "create_partner_failed": "Kan onderzoekspartner niet aanmaken",
+      "partner_created": "Onderzoekspartner gecreëerd",
+      "generate_export_failed": "Kan gegevenssetexport niet genereren",
+      "export_generated": "Geaggregeerde dataset-export gegenereerd",
+      "revoke_export_failed": "Kan de export van de gegevensset niet intrekken",
+      "export_revoked": "Export van gegevensset ingetrokken"
+    }
+  },
+  "smart_nudges": {
+    "meta": {
+      "page_title": "Slimme duwtjes voor leden",
+      "title": "Slimme duwtjes voor leden",
+      "description": "Geautomatiseerde suggesties die leden naar goed passende tandempartners sturen. Conservatieve wanbetalingen - geldt voor een dagelijkse limiet."
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "dry_run": "Drooglopen",
+      "dispatch_now": "Nu verzenden",
+      "save_configuration": "Configuratie opslaan",
+      "cancel": "Annuleren",
+      "dispatch": "Verzenden"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "Smart Nudges zijn geautomatiseerde aanwijzingen die naar leden worden verzonden wanneer een goed passende tandemmatchpartner wordt gedetecteerd. Leden die baat zouden hebben bij een peer-verbinding worden geïdentificeerd door de matching-engine en sturen een in-app-melding (en optioneel een e-mail) waarin wordt voorgesteld dat ze verbinding maken. Nudges respecteren een cooldown-periode, zodat er niet te vaak contact wordt opgenomen met een lid. Gebruik de proefsessie om te zien wie er een duwtje in de rug krijgt voordat het echt wordt verzonden.",
+      "inactivity_label": "Inactiviteit",
+      "inactivity_body": "geactiveerd wanneer een lid het geconfigureerde aantal dagen niet heeft ingelogd",
+      "unmatched_request_label": "Ongeëvenaard verzoek",
+      "unmatched_request_body": "wordt geactiveerd wanneer een hulpverzoek geen aanbiedingen bevat nadat de afkoelperiode is verstreken",
+      "follow_up_label": "Vervolg",
+      "follow_up_body": "verzonden naar de coördinator nadat een goedgekeurde uitwisseling niet als voltooid is gemarkeerd"
+    },
+    "stats": {
+      "sent_30d": "Verzonden (30d)",
+      "conversion_30d": "Conversie (30d)",
+      "eligible_candidates": "Geschikte kandidaten",
+      "opted_out": "Afgemeld"
+    },
+    "chart": {
+      "title": "Dagelijkse nudges (laatste 30 dagen)",
+      "sent": "Verstuurd",
+      "converted": "Geconverteerd"
+    },
+    "config": {
+      "title": "Configuratie",
+      "engine_enabled": "Motor ingeschakeld",
+      "engine_description": "Wanneer uitgeschakeld, worden er geen nudges verzonden.",
+      "min_score": "Minimale score (0,40 - 0,95)",
+      "min_score_description": "Scoredrempel voor tandemmatches voor het verzenden van een duwtje",
+      "cooldown_days": "Afkoeling (dagen)",
+      "cooldown_description": "Wacht zo lang voordat je hetzelfde paar opnieuw een duwtje geeft",
+      "daily_limit": "Dagelijkse limiet",
+      "daily_limit_description": "Maximale nudges per dag voor de hele huurder",
+      "save_note": "Wijzigingen worden onmiddellijk van kracht: bij de volgende geplande nudge-run worden de nieuwe instellingen toegepast."
+    },
+    "dry_run": {
+      "title": "Voorbeeld van droogdraaien",
+      "candidates": "{{count}} kandidaten",
+      "empty": "Er zijn momenteel geen geschikte kandidaten.",
+      "table_aria": "Kandidaten voor een dry-run-nudge"
+    },
+    "recent": {
+      "title": "Recente duwtjes",
+      "empty": "Er zijn nog geen nudges verzonden.",
+      "table_aria": "Recente slimme duwtjes"
+    },
+    "table": {
+      "target_user": "Doelgebruiker",
+      "target": "Doel",
+      "suggested_partner": "Voorgestelde partner",
+      "score": "Scoren",
+      "sent": "Verstuurd",
+      "status": "Status"
+    },
+    "status": {
+      "sent": "Verstuurd",
+      "converted": "Geconverteerd"
+    },
+    "dispatch_modal": {
+      "title": "Nudges versturen?",
+      "body_prefix": "Dit wordt verzonden naar",
+      "body_suffix": "geef nu meldingen door aan in aanmerking komende leden. Zorg ervoor dat u eerst een proefrun heeft beoordeeld."
+    },
+    "toasts": {
+      "load_failed": "Kan nudge-analyses niet laden",
+      "config_saved": "Nudge-configuratie opgeslagen. De bijgewerkte regels zijn van toepassing op de volgende geplande run.",
+      "save_failed": "Kan configuratie niet opslaan",
+      "dry_run": "Testrun: {{count}} geschikte kandidaten",
+      "dispatched": "{{count}} duwtjes verzonden",
+      "dispatch_failed": "Verzending mislukt"
+    }
+  },
+  "sub_regions": {
+    "meta": {
+      "page_title": "Subregio's - Beheerder",
+      "title": "Subregio's",
+      "subtitle": "Onderverdelingen Quartier, Ortsteil, Gemeinde en Kanton voor de zorgverlenergids en locatiefilters"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "Subregio's verdelen uw gemeenschap in geografische gebieden (buurten, districten of wijken). Ze worden gebruikt om coördinatoren aan specifieke gebieden toe te wijzen, hulpverzoeken op locatie te filteren en pilotstatistieken op te splitsen per buurt. Het toevoegen van subregio's is optioneel, maar wordt sterk aanbevolen voor grotere gemeenschappen met meerdere coördinatorteams.",
+      "postal_codes_note": "Voor het veld Postcodes: voer een postcodelijst, buurtnaam of vrije beschrijving in. Nauwkeurige grenzen zijn niet vereist. Dit is bedoeld voor toewijzing van coördinatoren en rapportagefilters, niet voor mapping."
+    },
+    "actions": {
+      "add": "Subregio toevoegen",
+      "edit_aria": "Subregio bewerken",
+      "mark_inactive": "Markeer inactief",
+      "cancel": "Annuleren",
+      "save_changes": "Wijzigingen opslaan",
+      "create": "Maak een subregio"
+    },
+    "filters": {
+      "search_aria": "Zoek subregio's",
+      "search_placeholder": "Zoek op naam, beschrijving of naaktslak...",
+      "type_aria": "Filter op type"
+    },
+    "table": {
+      "aria": "Tabel met subregio's",
+      "name": "Naam",
+      "type": "Typ",
+      "postal_codes": "Postcodes",
+      "coordinates": "Coördinaten",
+      "status": "Status",
+      "actions": "Acties",
+      "empty": "Nog geen subregio's. Voeg er een toe om uw tenant geografisch te segmenteren."
+    },
+    "type_options": {
+      "all": "Alle soorten",
+      "quartier": "Kwartier (buurt)",
+      "ortsteil": "Ortsteil (district)",
+      "municipality": "Gemeente (Gemeinde)",
+      "canton": "Kanton",
+      "other": "Ander"
+    },
+    "status": {
+      "active": "Actief",
+      "inactive": "Inactief"
+    },
+    "modal": {
+      "add_title": "Subregio toevoegen",
+      "edit_title": "Bewerken: {{name}}"
+    },
+    "form": {
+      "name": "Naam",
+      "name_placeholder": "bijv. Lorzenhof",
+      "slug": "Slug (automatisch gegenereerd indien leeg)",
+      "slug_placeholder": "bijv. lorzenhof",
+      "slug_description": "Identificatie met koppelteken in kleine letters, gebruikt in URLs en filters.",
+      "type": "Typ",
+      "description": "Beschrijving",
+      "description_placeholder": "Korte beschrijving van dit gebied...",
+      "postal_codes": "Postcodes",
+      "postal_codes_placeholder": "6330, 6331, 6332",
+      "postal_codes_description": "Door komma's of spaties gescheiden PLZ lijst.",
+      "centre_latitude": "Centrum breedtegraad",
+      "latitude_placeholder": "47.1758",
+      "centre_longitude": "Centrum lengtegraad",
+      "longitude_placeholder": "8.4622",
+      "status": "Status"
+    },
+    "validation": {
+      "name_required": "Naam is vereist.",
+      "type_required": "Type is vereist.",
+      "latitude_number": "De breedtegraad moet een getal zijn.",
+      "longitude_number": "Lengtegraad moet een getal zijn."
+    },
+    "toasts": {
+      "created": "Subregio is succesvol aangemaakt.",
+      "updated": "Subregio is succesvol bijgewerkt.",
+      "marked_inactive": "Subregio gemarkeerd als inactief."
+    },
+    "errors": {
+      "load_failed": "Kan subregio's niet laden.",
+      "save_failed": "Kan subregio niet opslaan.",
+      "delete_failed": "Kan subregio niet verwijderen."
+    },
+    "confirm_mark_inactive": "Markeer '{{name}}' als inactief? Gekoppelde zorgaanbieders worden daarvan losgemaakt."
+  },
+  "success_stories_admin": {
+    "meta": {
+      "title": "Succesverhalen",
+      "subtitle": "Maak en beheer proefkaarten die de impact van de gemeenschap aantonen - ontworpen om te delen met inkopers, financiers en gemeentelijke partners."
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "Bewijskaarten zijn gestructureerde impactverhalen gekoppeld aan live statistieken van het platform. Elke kaart toont een voor/na-vergelijking met een geciteerde bewijsbron en methodologienota. Kaarten gemarkeerd als \"Demo\" zijn alleen ter illustratie; markeer een kaart als 'echt bewijs' zodra u de gegevens heeft geverifieerd. Gepubliceerde kaarten verschijnen in het Gemeentelijk Impactrapport en de publieksgerichte impactpagina."
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "new_story": "Nieuw verhaal",
+      "seed_demo": "Plaats 3 demokaarten",
+      "refresh_live": "Vernieuwen vanuit live gegevens",
+      "edit": "Bewerking",
+      "delete": "Verwijderen",
+      "cancel": "Annuleren",
+      "save_changes": "Wijzigingen opslaan",
+      "create_story": "Creëer een verhaal",
+      "remove": "Verwijderen"
+    },
+    "empty": {
+      "title": "Nog geen succesverhalen",
+      "body": "Plaats 3 illustratieve demokaarten om te laten zien hoe proefkaarten eruit zien voor inkopers en financiers. Ze zijn duidelijk voorzien van het label \"Demo/illustratief\" totdat u ze met de hand als echt bewijs markeert."
+    },
+    "table": {
+      "aria": "Succesverhalen",
+      "title": "Titel",
+      "status": "Status",
+      "demo": "Demo",
+      "audience": "Publiek",
+      "metric": "Metrisch",
+      "row_actions": "Rij-acties",
+      "actions": "Acties"
+    },
+    "status": {
+      "published": "Gepubliceerd",
+      "unpublished": "Niet gepubliceerd",
+      "demo": "Demo",
+      "real": "Echt"
+    },
+    "metric_sources": {
+      "pilot_scoreboard": "AG83 pilotscorebord",
+      "municipal_roi": "AG76 gemeentelijk ROI",
+      "manual": "Handleiding / illustratief"
+    },
+    "audience": {
+      "all_residents": "Alle bewoners",
+      "municipality": "Gemeente",
+      "kanton": "Kanton",
+      "verein_members": "Verein-leden",
+      "volunteers": "Vrijwilligers",
+      "recipients": "Ontvangers van zorg"
+    },
+    "editor": {
+      "new_title": "Nieuw succesverhaal",
+      "edit_title": "Bewerken: {{title}}",
+      "title": "Titel",
+      "title_placeholder": "bijv. 30% minder inspanning voor informatiedistributie",
+      "narrative": "Verhaal",
+      "narrative_placeholder": "2-4 zinnen waarin het verhaal wordt uitgelegd aan een inkoper of financier.",
+      "metric_source": "Metrische bron",
+      "metric_source_description": "pilot_scoreboard: haalt automatisch op van AG83; gemeentelijke_roi: haalt automatisch op van AG76; handmatig: u voert waarden handmatig in.",
+      "metric_key": "Metrische sleutel",
+      "metric_key_placeholder": "bijv. goedgekeurde_uren, formele_zorg_offset_chf",
+      "metric_key_description": "Vereist voor niet-handmatige bronnen",
+      "before_value": "Vóór waarde",
+      "after_value": "Na waarde",
+      "unit": "Eenheid",
+      "unit_placeholder": "bijv. uur, CHF, %",
+      "audience": "Publiek",
+      "sub_region_id": "Subregio ID (optioneel)",
+      "sub_region_placeholder": "Laat voor iedereen leeg",
+      "method_caveat": "Methodevoorbehoud",
+      "method_caveat_placeholder": "bijv. \"Alleen pilotregio; n=42 leden; venster van 90 dagen\"",
+      "method_caveat_description": "Vereist: een opmerking van één zin over de beperkingen van de methodologie. Houdt claims eerlijk tegenover financiers. Voorbeeld: 'Op basis van zelfgerapporteerde uren; externe audit in behandeling.'",
+      "evidence_source": "Bewijsbron",
+      "evidence_source_placeholder": "bijv. \"AG83 pilotscorebord 30-04-2026 basislijn\"",
+      "evidence_source_description": "Vereist - waar het nummer vandaan komt. Voorbeeld: 'NEXUS platformgegevens, voortschrijdende periode van 90 dagen eindigend op 01-04-2026' of 'Swiss Federal Statistical Office 2023.'",
+      "demo_label": "Demo / illustratief",
+      "demo_description": "Kaart is gelabeld als demo op de galerij",
+      "published_label": "Gepubliceerd",
+      "published_description": "Zichtbaar op de ledengerichte galerij"
+    },
+    "delete_modal": {
+      "title": "Succesverhaal verwijderen",
+      "body_prefix": "Dit wordt permanent verwijderd",
+      "body_suffix": "van de galerij.",
+      "warning": "Deze actie kan niet ongedaan worden gemaakt."
+    },
+    "toasts": {
+      "load_failed": "Kan succesverhalen niet laden",
+      "seeded": "3 demokaarten geplaatst",
+      "seed_failed": "Zaad is mislukt",
+      "updated": "Verhaal bijgewerkt",
+      "update_failed": "Update mislukt",
+      "created": "Verhaal gemaakt",
+      "create_failed": "Maken mislukt",
+      "removed": "Verhaal verwijderd",
+      "delete_failed": "Verwijderen is mislukt",
+      "metric_refreshed": "Live-statistiek vernieuwd",
+      "refresh_failed": "Vernieuwen mislukt"
+    }
+  }
+}

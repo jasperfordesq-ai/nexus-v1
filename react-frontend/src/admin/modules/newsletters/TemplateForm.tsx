@@ -54,7 +54,7 @@ interface TemplateData {
 }
 
 export function TemplateForm() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
   const { tenantPath } = useTenant();

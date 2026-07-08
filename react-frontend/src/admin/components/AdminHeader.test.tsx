@@ -24,7 +24,10 @@ const { mockApi } = vi.hoisted(() => ({
 
 vi.mock('@/lib/api', () => ({ api: mockApi, default: mockApi }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
-vi.mock('@/lib/helpers', () => ({ resolveAvatarUrl: vi.fn((url: string | null) => url ?? null) }));
+vi.mock('@/lib/helpers', () => ({
+  cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
+  resolveAvatarUrl: vi.fn((url: string | null) => url ?? null),
+}));
 
 // ─── Navigation ──────────────────────────────────────────────────────────────
 const mockNavigate = vi.fn();
@@ -135,9 +138,89 @@ vi.mock('@/components/ui', async (importOriginal) => {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+vi.mock('@/components/ui/Button', () => ({
+  Button: ({
+    children,
+    onPress,
+    'aria-label': ariaLabel,
+    startContent,
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & {
+    onPress?: () => void;
+    children?: React.ReactNode;
+    isIconOnly?: boolean;
+    startContent?: React.ReactNode;
+    variant?: string;
+    size?: string;
+    className?: string;
+  }) => (
+    <button aria-label={ariaLabel} onClick={onPress}>
+      {startContent}
+      {children}
+    </button>
+  ),
+}));
+
+vi.mock('@/components/ui/Avatar', () => ({
+  Avatar: ({ name, src }: { name?: string; src?: string }) => (
+    <img data-testid="avatar" alt={name ?? ''} src={src || undefined} />
+  ),
+}));
+
+vi.mock('@/components/ui/Dropdown', () => ({
+  Dropdown: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="dropdown">{children}</div>
+  ),
+  DropdownTrigger: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="dropdown-trigger">{children}</div>
+  ),
+  DropdownMenu: ({
+    children,
+    onAction,
+  }: {
+    children: React.ReactNode;
+    onAction?: (key: string) => void;
+  }) => (
+    <div data-testid="dropdown-menu" onClick={(e) => {
+      const key = (e.target as HTMLElement).getAttribute('data-key');
+      if (key && onAction) onAction(key);
+    }}>
+      {children}
+    </div>
+  ),
+  DropdownItem: ({
+    children,
+    id,
+  }: {
+    children: React.ReactNode;
+    id?: string;
+  }) => (
+    <div data-testid={`dropdown-item-${id}`} data-key={id} role="menuitem">
+      {children}
+    </div>
+  ),
+}));
+
 describe('AdminHeader', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((callback: FrameRequestCallback) =>
+      window.setTimeout(() => callback(performance.now()), 0)
+    );
+    vi.spyOn(window, 'cancelAnimationFrame').mockImplementation((handle: number) => {
+      window.clearTimeout(handle);
+    });
+    Object.defineProperty(window, 'requestIdleCallback', {
+      configurable: true,
+      value: (callback: IdleRequestCallback) =>
+        window.setTimeout(() => callback({
+          didTimeout: false,
+          timeRemaining: () => 50,
+        } as IdleDeadline), 0),
+    });
+    Object.defineProperty(window, 'cancelIdleCallback', {
+      configurable: true,
+      value: (handle: number) => window.clearTimeout(handle),
+    });
     // The header fetches open support-request stats on mount; default to a
     // resolved empty payload so the indicator effect never throws.
     mockApi.get.mockResolvedValue({ success: true, data: { open: 0 } });

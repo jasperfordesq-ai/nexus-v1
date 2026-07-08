@@ -76,7 +76,11 @@ export function resolveAssetUrl(url: string | null | undefined, fallback?: strin
  * Resolve an avatar URL with a default fallback
  */
 export function resolveAvatarUrl(url: string | null | undefined): string {
-  return resolveAssetUrl(url, `${API_ASSET_BASE}/assets/img/defaults/default_avatar.png`);
+  return resolveThumbnailUrl(url, {
+    width: 96,
+    height: 96,
+    fallback: `${API_ASSET_BASE}/assets/img/defaults/default_avatar.png`,
+  });
 }
 
 /**

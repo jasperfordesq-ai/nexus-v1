@@ -54,7 +54,7 @@ function levelColorClass(level: string | null): string {
 }
 
 export function LogFileViewer() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   usePageTitle(t('enterprise.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

@@ -28,9 +28,10 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Spinner } from '@/components/ui/Spinner';
-import { PageMeta } from '@/components/seo';
-import { useTenant, useAuth } from '@/contexts';
-import { usePageTitle } from '@/hooks';
+import { PageMeta } from '@/components/seo/PageMeta';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';
 
 interface VerificationStatus {

@@ -89,7 +89,7 @@ export default function HourTransferAdminPage() {
   const toast = useToast();
   const { user } = useAuth();
   const { t } = useTranslation('caring_community');
-  const { t: tAdmin } = useTranslation('admin');
+  const { t: tAdmin } = useTranslation('admin_caring_community');
   const canManage = canManageCaring(user);
   usePageTitle(t('admin.hour_transfers.title'));
 

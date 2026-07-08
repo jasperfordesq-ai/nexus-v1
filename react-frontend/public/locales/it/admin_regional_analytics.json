@@ -1,0 +1,158 @@
+{
+  "common": {
+    "an_unexpected_error": "Si è verificato un errore imprevisto",
+    "back": "Indietro",
+    "cancel": "Annulla",
+    "critical": "Critico",
+    "delete": "Elimina",
+    "feature": "Caratteristica",
+    "high": "Alto",
+    "in_progress": "In corso",
+    "in_review": "In revisione",
+    "low": "Basso",
+    "medium": "Medio",
+    "planned": "Pianificato",
+    "refresh": "Aggiorna",
+    "unexpected_error": "Errore imprevisto",
+    "unknown": "Sconosciuto",
+    "unfeature": "Disattivazione",
+    "actions": "Azioni",
+    "active": "Attivo",
+    "all": "Tutto",
+    "approved": "Approvato",
+    "clear": "Chiaro",
+    "clear_filters": "Cancella filtri",
+    "clear_selection": "Cancella selezione",
+    "close": "Chiudi",
+    "collapse": "Crollo",
+    "confirm": "Conferma",
+    "create": "Crea",
+    "declined": "Rifiutato",
+    "download": "Scarica",
+    "edit": "Modifica",
+    "error_loading_data": "Errore durante il caricamento dei dati",
+    "expand": "Espandi",
+    "export": "Esporta",
+    "load_more": "Carica altro",
+    "loading": "Caricamento",
+    "next": "Avanti",
+    "no": "No",
+    "ok": "OK",
+    "pending": "In sospeso",
+    "previous": "Precedente",
+    "retry": "Riprova",
+    "save": "Salva",
+    "select_all": "Seleziona tutto",
+    "select_item": "Seleziona elemento",
+    "yes": "Sì"
+  },
+  "shared": {
+    "broker_actions": "Azioni del broker",
+    "content": "Contenuto",
+    "core_module": "Modulo principale",
+    "document_details": "Dettagli del documento",
+    "history": "Storia",
+    "log_file_empty": "Nessun file di registro trovato",
+    "no": "No",
+    "no_history_available": "Nessuna cronologia disponibile trovata",
+    "no_legal_documents_found": "Nessun documento legale trovato trovato",
+    "no_members_found": "Nessun membro trovato trovato",
+    "loading": "Loading",
+    "no_data": "Nessun dato",
+    "no_data_available": "Nessun dato disponibile",
+    "no_recent_broker_activity": "Nessuna attività recente del broker trovata",
+    "open_page_help": "Apri la pagina di aiuto",
+    "help": "Aiuto",
+    "quick_access": "Accesso rapido",
+    "recent_activity": "Attività recente",
+    "refresh": "Aggiorna",
+    "search": "Ricerca...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "Dati",
+    "total_count": "{{count}}totale"
+  },
+  "regional_analytics_admin": {
+    "meta": {
+      "title": "Analisi regionale",
+      "description": "Gestisci gli abbonamenti alle analisi a pagamento per il comune e i partner SME: solo aggregati raggruppati e rispettosi della privacy."
+    },
+    "actions": {
+      "new_subscription": "Nuovo abbonamento",
+      "generate_report_now": "Genera rapporto ora",
+      "view_access_log": "Visualizza il registro degli accessi",
+      "suspend": "Sospendere",
+      "resume": "Riprendere",
+      "close": "Vicino",
+      "cancel": "Cancellare",
+      "create": "Creare"
+    },
+    "tables": {
+      "subscriptions_aria": "Abbonamenti all'analisi regionale",
+      "partner": "Socio",
+      "type": "Tipo",
+      "plan": "Piano",
+      "status": "Stato",
+      "period_end": "Fine periodo",
+      "price_per_month": "Prezzo/mese",
+      "modules": "Moduli",
+      "actions": "Azioni"
+    },
+    "partner_types": {
+      "municipality": "Comune",
+      "sme_partner": "SME socio"
+    },
+    "plan_tiers": {
+      "basic": "Di base",
+      "pro": "Pro",
+      "enterprise": "Impresa"
+    },
+    "statuses": {
+      "trialing": "Prova",
+      "active": "Attivo",
+      "past_due": "Scaduto",
+      "cancelled": "Annullato"
+    },
+    "modules": {
+      "trends": "Tendenze",
+      "demand_supply": "Domanda e offerta",
+      "demographics": "Dati demografici",
+      "footfall": "Calpestio"
+    },
+    "empty": {
+      "subscriptions": "Nessun abbonamento ancora. Fornirne uno per iniziare a vendere analisi regionali.",
+      "access_log": "Nessun evento di accesso ancora registrato.",
+      "value": "-"
+    },
+    "access_log": {
+      "title": "Registro di accesso - {{name}}",
+      "table_aria": "Registro degli accessi",
+      "when": "Quando",
+      "endpoint": "Punto finale",
+      "ip_hashed": "IP (con hash)",
+      "user_agent": "Agente utente"
+    },
+    "create_modal": {
+      "title": "Nuovo abbonamento all'analisi regionale",
+      "tenant_id": "Locatario ID",
+      "partner_name": "Nome del partner",
+      "partner_type": "Tipo di partner",
+      "contact_email": "Contatto e-mail",
+      "billing_email": "E-mail di fatturazione",
+      "plan_tier": "Livello del piano",
+      "monthly_price_cents": "Prezzo mensile (centesimi)",
+      "currency": "Valuta",
+      "enabled_modules": "Moduli abilitati"
+    },
+    "toasts": {
+      "load_failed": "Impossibile caricare gli abbonamenti",
+      "status_updated": "Abbonamento {{status}}",
+      "update_failed": "Aggiornamento non riuscito",
+      "report_queued": "Generazione del report in coda",
+      "report_failed": "Impossibile mettere in coda il rapporto",
+      "required_fields": "Sono obbligatori il locatario, il nome del partner e l'e-mail di contatto",
+      "created": "Abbonamento creato",
+      "create_failed": "Creazione fallita"
+    }
+  }
+}

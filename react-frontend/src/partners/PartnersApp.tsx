@@ -18,16 +18,15 @@ import { PartnersRoute } from './PartnersRoute';
 import { PartnersLayout } from './PartnersLayout';
 import { PartnersRoutes } from './routes';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
-import { LoadingScreen } from '@/components/feedback';
+import { LoadingScreen } from '@/components/feedback/LoadingScreen';
+import './partners.css';
 
 function PartnersAppInner() {
-  // Ensure all namespaces used inside the panel are loaded before rendering.
+  // Keep the partners shell scoped to its own namespace. Embedded admin/caring
+  // pages lazy-load their own larger namespaces when their routes render.
   // Without this, useTranslation() in child components may render raw keys on
-  // first paint because HttpBackend loads namespaces asynchronously. The
-  // 'admin' namespace is needed because the embedded federation admin pages
-  // use admin-side keys; 'caring_community' backs the embedded
-  // FederationPeersAdminPage.
-  const { ready } = useTranslation(['partners', 'admin', 'caring_community']);
+  // first paint because HttpBackend loads namespaces asynchronously.
+  const { ready } = useTranslation('partners');
 
   if (!ready) {
     return <LoadingScreen />;

@@ -216,7 +216,7 @@ function SnapshotCard({ eyebrow, value, body, accentClassName }: SnapshotCardPro
 }
 
 export default function OnboardingFunnel() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_crm');
   const { t: tNav } = useTranslation('admin_nav');
   useAdminPageMeta({ title: tNav('crm') });
 

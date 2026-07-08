@@ -43,7 +43,7 @@ const LOCATIONS: string[] = [
 ];
 
 export function MenusAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   usePageTitle(t('content.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();

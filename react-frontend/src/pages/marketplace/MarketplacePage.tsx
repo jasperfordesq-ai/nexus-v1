@@ -29,18 +29,18 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { SearchField } from '@/components/ui/SearchField';
-import { EmptyState } from '@/components/feedback';
+import { EmptyState } from '@/components/feedback/EmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
-import {
-  MarketplaceListingGrid,
-  MarketplaceListingGridSkeleton,
-  CategoryChips,
-} from '@/components/marketplace';
+import { CategoryChips } from '@/components/marketplace/CategoryChips';
+import { MarketplaceListingGrid } from '@/components/marketplace/MarketplaceListingGrid';
+import { MarketplaceListingGridSkeleton } from '@/components/marketplace/MarketplaceListingGridSkeleton';
 import type { MarketplaceListingItem, MarketplaceCategory } from '@/types/marketplace';
-import { useAuth, useToast, useTenant } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
+import { useTenant } from '@/contexts/TenantContext';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { usePageTitle } from '@/hooks';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 
 // ─────────────────────────────────────────────────────────────────────────────

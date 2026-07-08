@@ -66,7 +66,7 @@ const categoryColorMap: Record<string, 'success' | 'warning' | 'danger' | 'defau
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CronJobs() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [jobs, setJobs] = useState<CronJobExtended[]>([]);

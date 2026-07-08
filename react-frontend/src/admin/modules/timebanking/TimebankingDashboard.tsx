@@ -31,7 +31,7 @@ import { useTranslation } from 'react-i18next';
 
 export function TimebankingDashboard() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_timebanking');
   useAdminPageMeta({ title: tNav('timebanking') });
   const { tenantPath } = useTenant();
 

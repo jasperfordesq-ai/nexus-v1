@@ -59,7 +59,7 @@ function memoryProgressColor(pct: number): 'success' | 'warning' | 'danger' {
 }
 
 export function SystemMonitoring() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   usePageTitle(t('enterprise.page_title'));
   const { tenantPath } = useTenant();
 

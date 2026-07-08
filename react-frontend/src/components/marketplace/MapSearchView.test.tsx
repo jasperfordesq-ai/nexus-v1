@@ -49,6 +49,12 @@ vi.mock('@/components/location', () => ({
 }));
 
 // ─── Stub the local sub-components to keep tests lean ─────────────────────
+vi.mock('@/components/location/LocationMap', () => ({
+  LocationMap: ({ markers }: { markers: Array<{ id: number }> }) => (
+    <div data-testid="location-map" data-marker-count={markers.length} />
+  ),
+}));
+
 vi.mock('./PriceBadge', () => ({
   PriceBadge: () => <span data-testid="price-badge" />,
 }));
@@ -128,15 +134,16 @@ describe('MapSearchView — maps enabled', () => {
     expect(onRequestLocation).toHaveBeenCalledTimes(1);
   });
 
-  it('renders LocationMap stub when listings have coordinates', () => {
+  it('renders LocationMap stub when listings have coordinates', async () => {
     render(<MapSearchView listings={[LISTING_WITH_COORDS]} />);
-    expect(screen.getByTestId('location-map')).toBeInTheDocument();
-    expect(screen.getByTestId('location-map')).toHaveAttribute('data-marker-count', '1');
+    const map = await screen.findByTestId('location-map');
+    expect(map).toBeInTheDocument();
+    expect(map).toHaveAttribute('data-marker-count', '1');
   });
 
-  it('passes only coordinate-bearing listings as markers', () => {
+  it('passes only coordinate-bearing listings as markers', async () => {
     render(<MapSearchView listings={[LISTING_WITH_COORDS, LISTING_NO_COORDS]} />);
-    expect(screen.getByTestId('location-map')).toHaveAttribute('data-marker-count', '1');
+    expect(await screen.findByTestId('location-map')).toHaveAttribute('data-marker-count', '1');
   });
 
   it('renders "Use my location" overlay button on map when callback provided', () => {

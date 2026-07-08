@@ -32,7 +32,7 @@ interface AdminCoupon {
 }
 
 export default function AdminCouponsPage() {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t } = useTranslation(['admin_marketplace', 'common']);
   const confirm = useConfirm();
   usePageTitle(t('marketplace.coupons.page_title'));
   const toast = useToast();

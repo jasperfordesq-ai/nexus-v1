@@ -34,7 +34,7 @@ const statusColors: Record<string, 'success' | 'default'> = {
 };
 
 export function BlogAdmin() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_blog');
   usePageTitle(t('blog.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();

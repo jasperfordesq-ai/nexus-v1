@@ -20,7 +20,7 @@ import { adminSettings } from '../../api/adminApi';
 
 
 export function ImageSettings() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   usePageTitle(t('system.page_title'));
   const toast = useToast();
   const [loading, setLoading] = useState(true);

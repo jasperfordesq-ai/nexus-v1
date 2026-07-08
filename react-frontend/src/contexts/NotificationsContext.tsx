@@ -78,6 +78,28 @@ interface NotificationsContextValue extends NotificationsState {
 
 const NotificationsContext = createContext<NotificationsContextValue | null>(null);
 
+const emptyCounts: NotificationCounts = {
+  total: 0,
+  messages: 0,
+  listings: 0,
+  transactions: 0,
+  connections: 0,
+  events: 0,
+  groups: 0,
+  achievements: 0,
+  system: 0,
+};
+
+const emptyNotificationsContext: NotificationsContextValue = {
+  unreadCount: 0,
+  counts: emptyCounts,
+  isConnected: false,
+  connectionError: null,
+  refreshCounts: async () => {},
+  markAsRead: async () => false,
+  markAllAsRead: async () => false,
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Provider
 // ─────────────────────────────────────────────────────────────────────────────
@@ -471,6 +493,10 @@ export function useNotifications(): NotificationsContextValue {
   }
 
   return context;
+}
+
+export function useNotificationsOptional(): NotificationsContextValue {
+  return use(NotificationsContext) ?? emptyNotificationsContext;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

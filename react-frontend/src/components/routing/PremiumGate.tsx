@@ -1,5 +1,3 @@
-import { Card } from '@/components/ui';
-import { Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -21,7 +19,8 @@ import { Link } from 'react-router-dom';
 
 import Crown from 'lucide-react/icons/crown';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useTenant } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTenant } from '@/contexts/TenantContext';
 import api from '@/lib/api';
 
 interface MeResponse {
@@ -101,20 +100,23 @@ export function PremiumGate({ featureKey, children, fallback, silent = false }: 
   if (fallback !== undefined) return <>{fallback}</>;
 
   return (
-    <Card className="shadow-sm">
-      <Card.Content className="text-center py-8 flex flex-col items-center gap-3">
-        <Crown size={36} className="text-yellow-500" />
+    <div className="rounded-lg border border-theme-default bg-theme-surface p-6 text-center shadow-sm">
+      <div className="flex flex-col items-center gap-3">
+        <Crown size={36} className="text-yellow-500" aria-hidden="true" />
         <h3 className="text-lg font-semibold">
           {t('premium.gate_title')}
         </h3>
         <p className="text-sm text-[var(--color-text-secondary)] max-w-md">
           {t('premium.gate_body')}
         </p>
-        <Button as={Link} to={tenantPath('/premium')} color="primary">
+        <Link
+          to={tenantPath('/premium')}
+          className="inline-flex items-center justify-center rounded-lg bg-theme-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-theme-focus"
+        >
           {t('premium.gate_cta')}
-        </Button>
-      </Card.Content>
-    </Card>
+        </Link>
+      </div>
+    </div>
   );
 }
 

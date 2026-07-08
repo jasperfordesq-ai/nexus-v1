@@ -29,6 +29,7 @@ import { logError, logWarn } from '@/lib/logger';
 import i18n from '@/i18n';
 import { validateResponseIfPresent } from '@/lib/api-validation';
 import { loginResponseSchema, userSchema } from '@/lib/api-schemas';
+import { queueSentryAuthEvent, queueSentryUser } from '@/lib/telemetryQueue';
 import type {
   User,
   LoginRequest,
@@ -37,7 +38,6 @@ import type {
   TwoFactorVerifyRequest,
   RegisterRequest,
 } from '@/types';
-import { authenticateWithBiometric } from '@/lib/webauthn';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -102,7 +102,7 @@ interface LoginResult {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 function setTelemetryUser(user: User | null): void {
-  void import('@/lib/sentry').then(({ setSentryUser }) => setSentryUser(user));
+  queueSentryUser(user);
 }
 
 function captureTelemetryAuthEvent(
@@ -110,9 +110,7 @@ function captureTelemetryAuthEvent(
   userId?: number,
   context?: Record<string, unknown>,
 ): void {
-  void import('@/lib/sentry').then(({ captureAuthEvent }) => {
-    captureAuthEvent(event, userId, context);
-  });
+  queueSentryAuthEvent(event, userId, context);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -329,6 +327,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const loginWithBiometric = useCallback(async (email?: string): Promise<LoginResult> => {
     setState((prev) => ({ ...prev, status: 'loading', error: null }));
 
+    const { authenticateWithBiometric } = await import('@/lib/webauthn');
     const result = await authenticateWithBiometric(email);
 
     if (!result.success || !result.data) {

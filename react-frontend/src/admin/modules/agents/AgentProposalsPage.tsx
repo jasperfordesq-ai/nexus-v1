@@ -44,7 +44,7 @@ const confidenceColor = (score: number | string | null): 'success' | 'warning' |
 };
 
 export default function AgentProposalsPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_agents');
   usePageTitle(t('agents.proposals.meta.title'));
   useAdminPageMeta({
     title: t('agents.proposals.meta.title'),

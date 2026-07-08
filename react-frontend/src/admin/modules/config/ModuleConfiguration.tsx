@@ -33,7 +33,7 @@ import { Button, Chip, Spinner, Input } from '@/components/ui';
 type FilterType = 'all' | 'core' | 'feature';
 
 export default function ModuleConfiguration() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_config');
   usePageTitle(t('config.module_configuration_title'));
   const toast = useToast();
   const { refreshTenant } = useTenant();

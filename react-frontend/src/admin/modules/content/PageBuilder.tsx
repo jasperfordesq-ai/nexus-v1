@@ -57,7 +57,7 @@ const toSlugInput = (text: string): string =>
     .replace(/-+/g, '-');
 
 export function PageBuilder() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_content');
   const { id } = useParams<{ id: string }>();
   const isEdit = id !== undefined && id !== 'new';
   usePageTitle(t(isEdit ? 'content.edit_pages' : 'content.create_pages'));

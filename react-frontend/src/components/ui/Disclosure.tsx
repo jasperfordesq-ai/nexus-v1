@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Disclosure as HeroUIDisclosure,
-  type Disclosure as HeroUIDisclosureTypes,
-} from '@heroui/react';
+import { Disclosure as HeroUIDisclosure, type Disclosure as HeroUIDisclosureTypes } from '@heroui/react/disclosure';
 
 export type DisclosureProps = HeroUIDisclosureTypes['Props'];
 export type DisclosureHeadingProps = HeroUIDisclosureTypes['HeadingProps'];

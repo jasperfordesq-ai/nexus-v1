@@ -20,7 +20,7 @@ import { useTenant } from '@/contexts';
 import { PageHeader } from '../components/PageHeader';
 
 export function AdminNotFound() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_not_found_module');
   usePageTitle(t('admin_not_found.title'));
   const { tenantPath } = useTenant();
 

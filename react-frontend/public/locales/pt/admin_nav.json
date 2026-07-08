@@ -512,5 +512,79 @@
   },
   "aria": {
     "breadcrumbs": "Pão ralado"
+  },
+  "shared": {
+    "loading": "Loading",
+    "help": "Ajuda",
+    "open_page_help": "Abrir ajuda da p?gina",
+    "search": "Procurar...",
+    "refresh": "Atualizar",
+    "total_count": "{{count}}total",
+    "data_table": "Dados",
+    "select_all_rows": "Select all rows",
+    "no_data": "Sem dados",
+    "no_data_available": "Não há dados disponíveis",
+    "select_row": "Select row {{id}}"
+  },
+  "help_drawer": {
+    "aria_label": "Ajuda: {{title}}",
+    "close_panel": "Fechar painel de ajuda",
+    "how_to_use": "Como usar esta página",
+    "label": "Ajuda",
+    "related_pages": "Páginas relacionadas",
+    "tips": "Dicas e pegadinhas"
+  },
+  "bulk": {
+    "selected_count": "{{count}} selecionado",
+    "clear_selection": "Limpar seleção",
+    "confirm_title": "Confirme {{action}}",
+    "confirm_message": "Tem certeza de que deseja itens {{action}} {{count}}?",
+    "destructive_warning": "Esta ação não pode ser desfeita.",
+    "reason_label": "Razão",
+    "reason_placeholder": "Forneça um motivo para esta ação"
+  },
+  "common": {
+    "cancel": "Cancelar"
+  },
+  "icon_picker": {
+    "choose_icon": "Escolha o ícone",
+    "choose_icon_placeholder": "Procure um ícone...",
+    "clear_icon": "Limpar ícone",
+    "label": "Ícone",
+    "no_icons_found": "Nenhum ícone encontrado correspondente a \"{{search}}\"",
+    "search_for_icon": "Procure um ícone...",
+    "search_icons": "Ícones de pesquisa"
+  },
+  "visibility_rules": {
+    "min_role": "Função mínima",
+    "requires_auth": "Requer autenticação",
+    "requires_feature": "Requer recurso",
+    "title": "Regras de visibilidade",
+    "roles": {
+      "any": "Qualquer",
+      "user": "Usuário",
+      "admin": "Administrador",
+      "tenant_admin": "Administrador de locatário",
+      "super_admin": "Superadministrador"
+    },
+    "features": {
+      "none": "Nenhum",
+      "events": "Eventos",
+      "groups": "Grupos",
+      "gamification": "Gamificação",
+      "goals": "Metas",
+      "blog": "Blogue",
+      "resources": "Recursos",
+      "volunteering": "Voluntariado",
+      "exchange_workflow": "Fluxo de trabalho do Exchange",
+      "organisations": "Organizações",
+      "federation": "Federação",
+      "connections": "Conexões",
+      "reviews": "Avaliações",
+      "polls": "Enquetes",
+      "direct_messaging": "Mensagens diretas",
+      "group_exchanges": "Trocas de grupo",
+      "search": "Pesquisar"
+    }
   }
 }

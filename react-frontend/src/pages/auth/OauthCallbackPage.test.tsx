@@ -12,7 +12,7 @@
  *
  * Mocking strategy:
  *  - react-router-dom: preserve everything, override useSearchParams via vi.hoisted().
- *  - @/contexts: inline stubs for every hook the component tree pulls in.
+ *  - context modules: inline stubs for every hook the component tree pulls in.
  *  - @/lib/api: tokenManager stubs via vi.hoisted().
  *  - @/hooks: stub usePageTitle (side-effect only).
  *  - @/components/seo: null stub for PageMeta.
@@ -107,6 +107,15 @@ vi.mock('@/contexts', () => ({
     isOnline: vi.fn(() => false),
   })),
   usePresenceOptional: vi.fn(() => null),
+}));
+
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: vi.fn(() => ({
+    tenant: { id: 2, name: 'Test', slug: 'test' },
+    tenantPath: (p: string) => `/test${p}`,
+    hasFeature: vi.fn(() => true),
+    hasModule: vi.fn(() => true),
+  })),
 }));
 
 // ─── @/lib/api — tokenManager ─────────────────────────────────────────────────

@@ -23,7 +23,7 @@ import { useMemo } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
 
 // Map our short language codes to OG locale codes (BCP 47 with region).
 // Google and Facebook expect e.g. en_GB / fr_FR, not the bare lang code.

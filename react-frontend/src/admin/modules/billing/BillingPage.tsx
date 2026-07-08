@@ -72,7 +72,7 @@ interface SubscriptionWithUsage extends SubscriptionDetails {
 }
 
 export function BillingPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_billing');
   usePageTitle(t('billing.title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

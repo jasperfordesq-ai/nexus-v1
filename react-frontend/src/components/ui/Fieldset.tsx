@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Fieldset as HeroUIFieldset,
-  type Fieldset as HeroUIFieldsetTypes,
-} from '@heroui/react';
+import { Fieldset as HeroUIFieldset, type Fieldset as HeroUIFieldsetTypes } from '@heroui/react/fieldset';
 
 export type FieldsetProps = HeroUIFieldsetTypes['Props'];
 export type FieldsetLegendProps = HeroUIFieldsetTypes['LegendProps'];

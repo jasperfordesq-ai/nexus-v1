@@ -110,7 +110,7 @@ function postalCodesPreview(codes: string[] | null): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function SubRegionsAdminPage() {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t } = useTranslation(['admin_caring_community', 'common']);
   const confirm = useConfirm();
   usePageTitle(t('sub_regions.meta.page_title'));
   const { showToast } = useToast();

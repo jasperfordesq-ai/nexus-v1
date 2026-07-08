@@ -20,7 +20,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 import { api } from '@/lib/api';
-import { useToast } from '@/contexts';
+import { useToast } from '@/contexts/ToastContext';
 
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
@@ -52,8 +52,27 @@ vi.mock('@/contexts/ToastContext', () => ({
   ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-vi.mock('@/hooks', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(() => ({
+    user: { id: 99, first_name: 'Alice', name: 'Alice Test' },
+    isAuthenticated: true,
+  })),
+}));
+
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: vi.fn(() => ({
+    tenant: { id: 2, slug: 'test' },
+    tenantPath: (p: string) => `/test${p}`,
+    hasFeature: vi.fn(() => true),
+    hasModule: vi.fn(() => true),
+  })),
+}));
+
+vi.mock('@/hooks/usePageTitle', () => ({
   usePageTitle: vi.fn(),
+}));
+
+vi.mock('@/hooks/useSocialInteractions', () => ({
   useSocialInteractions: vi.fn(),
 }));
 
@@ -103,9 +122,19 @@ vi.mock('@/components/location', () => ({
   LocationMapCard: () => <div data-testid="location-map" />,
 }));
 
-vi.mock('@/components/social', () => ({
+vi.mock('@/components/location/LocationMapCard', () => ({
+  LocationMapCard: () => <div data-testid="location-map" />,
+}));
+
+vi.mock('@/components/social/CommentsSection', () => ({
   CommentsSection: () => <div data-testid="comments-section" />,
+}));
+
+vi.mock('@/components/social/LikersModal', () => ({
   LikersModal: () => <div data-testid="likers-modal" />,
+}));
+
+vi.mock('@/components/social/ShareButton', () => ({
   ShareButton: () => <button>Share</button>,
 }));
 
@@ -117,8 +146,16 @@ vi.mock('@/components/listings/FeaturedBadge', () => ({
   FeaturedBadge: () => <span data-testid="featured-badge">Featured</span>,
 }));
 
+vi.mock('@/components/verification/VerificationBadge', () => ({
+  VerificationBadgeRow: () => <span data-testid="verification-badge" />,
+}));
+
+vi.mock('@/components/i18n/TranslateButton', () => ({
+  TranslateButton: () => <button type="button">Translate</button>,
+}));
+
 import { ListingDetailPage } from './ListingDetailPage';
-import { useSocialInteractions } from '@/hooks';
+import { useSocialInteractions } from '@/hooks/useSocialInteractions';
 
 const mockUseSocialInteractions = vi.mocked(useSocialInteractions);
 

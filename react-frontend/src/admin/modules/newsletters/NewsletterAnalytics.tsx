@@ -120,7 +120,7 @@ function rateColor(rate: number, benchmark: number): 'success' | 'warning' | 'da
 /* ────────────────────────────────────────────────────────────────────────── */
 
 export function NewsletterAnalytics() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   usePageTitle(t('newsletters.newsletter_analytics_title'));
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -570,7 +570,7 @@ function BenchmarkCard({
   yours: number;
   benchmark: number;
 }) {
-  const { t: tLocal } = useTranslation('admin');
+  const { t: tLocal } = useTranslation('admin_newsletters');
   const diff = yours - benchmark;
   const diffPct = benchmark > 0 ? Math.round((diff / benchmark) * 100) : 0;
   const isAbove = diff >= 0;

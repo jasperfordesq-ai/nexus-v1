@@ -85,7 +85,7 @@ const LANGUAGE_LABELS: Record<string, string> = {
 
 export function TenantShow() {
   const { id } = useParams<{ id: string }>();
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   usePageTitle(t('super.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();

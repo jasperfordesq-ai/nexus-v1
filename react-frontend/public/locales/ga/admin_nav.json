@@ -512,5 +512,79 @@
   },
   "aria": {
     "breadcrumbs": "Brioscáin aráin"
+  },
+  "shared": {
+    "loading": "Loading",
+    "help": "Cabhair",
+    "open_page_help": "Oscail cabhair an leathanaigh",
+    "search": "Cuardach...",
+    "refresh": "Athnuaigh",
+    "total_count": "{{count}}iomlán",
+    "data_table": "Sonraí",
+    "select_all_rows": "Select all rows",
+    "no_data": "Gan sonraí",
+    "no_data_available": "Níl aon sonraí ar fáil",
+    "select_row": "Select row {{id}}"
+  },
+  "help_drawer": {
+    "aria_label": "Cabhair: {{title}}",
+    "close_panel": "Dún an painéal cabhrach",
+    "how_to_use": "Conas an leathanach seo a úsáid",
+    "label": "Cabhrú",
+    "related_pages": "Leathanaigh ghaolmhara",
+    "tips": "Leideanna & gotchas"
+  },
+  "bulk": {
+    "selected_count": "{{count}} roghnaithe",
+    "clear_selection": "Roghnú soiléir",
+    "confirm_title": "Deimhnigh {{action}}",
+    "confirm_message": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?",
+    "destructive_warning": "Ní féidir an gníomh seo a chealú.",
+    "reason_label": "Cúis",
+    "reason_placeholder": "Tabhair cúis leis an ngníomh seo"
+  },
+  "common": {
+    "cancel": "Cealaigh"
+  },
+  "icon_picker": {
+    "choose_icon": "Roghnaigh Deilbhín",
+    "choose_icon_placeholder": "Cuardaigh deilbhín...",
+    "clear_icon": "Glan Deilbhín",
+    "label": "Deilbhín",
+    "no_icons_found": "Níor aimsíodh aon deilbhíní a fhreagraíonn do \"{{search}}\"",
+    "search_for_icon": "Cuardaigh deilbhín...",
+    "search_icons": "Deilbhíní Cuardaigh"
+  },
+  "visibility_rules": {
+    "min_role": "Ról Íosta",
+    "requires_auth": "Teastaíonn Auth",
+    "requires_feature": "Éilíonn Gné",
+    "title": "Rialacha Infheictheachta",
+    "roles": {
+      "any": "ar bith",
+      "user": "Úsáideoir",
+      "admin": "Riarachán",
+      "tenant_admin": "Riarachán Tionónta",
+      "super_admin": "Sár-Riarachán"
+    },
+    "features": {
+      "none": "Dada",
+      "events": "Imeachtaí",
+      "groups": "Grúpaí",
+      "gamification": "Cearrbhachas",
+      "goals": "Spriocanna",
+      "blog": "Blag",
+      "resources": "Acmhainní",
+      "volunteering": "Obair dheonach",
+      "exchange_workflow": "Sreabhadh Oibre Malartú",
+      "organisations": "Eagraíochtaí",
+      "federation": "Cónaidhm",
+      "connections": "Naisc",
+      "reviews": "Léirmheasanna",
+      "polls": "Pobalbhreith",
+      "direct_messaging": "Teachtaireachtaí Díreacha",
+      "group_exchanges": "Malartuithe Grúpa",
+      "search": "Cuardach"
+    }
   }
 }

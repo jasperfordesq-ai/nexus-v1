@@ -27,7 +27,9 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null) => url ?? '',
+  resolveThumbnailUrl: (url: string | null) => url ?? '',
   formatRelativeTime: () => '2 hours ago',
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 // ─── Contexts ────────────────────────────────────────────────────────────────
@@ -179,7 +181,7 @@ describe('ReactionSummary', () => {
     render(<ReactionSummary {...makeProps()} />);
     const btn = screen.getByRole('button', { name: /View reactions/i });
     await userEvent.click(btn);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 
   it('calls api.get to load reactors when modal opens', async () => {
@@ -225,7 +227,7 @@ describe('ReactionSummary', () => {
     render(<ReactionSummary {...makeProps()} />);
     await userEvent.click(screen.getByRole('button', { name: /View reactions/i }));
 
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
     const spinner = screen.queryAllByRole('status').find(
       (el) => el.getAttribute('aria-busy') === 'true'
     );
@@ -263,6 +265,6 @@ describe('ReactionSummary', () => {
     );
     await userEvent.click(screen.getByRole('button', { name: /View reactions/i }));
 
-    expect(screen.getByTestId('tabs')).toBeInTheDocument();
+    expect(await screen.findByRole('tablist', { name: /reaction/i })).toBeInTheDocument();
   });
 });

@@ -30,7 +30,7 @@ import type { GamificationStats, BadgeDefinition } from '../../api/types';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function GamificationAnalytics() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_gamification');
   usePageTitle(t('gamification.page_title'));
   const toast = useToast();
   const { tenantPath } = useTenant();

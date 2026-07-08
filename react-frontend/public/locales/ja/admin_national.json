@@ -1,0 +1,186 @@
+{
+  "common": {
+    "an_unexpected_error": "予期しないエラーが発生しました",
+    "back": "戻る",
+    "cancel": "キャンセル",
+    "critical": "クリティカル",
+    "delete": "削除",
+    "feature": "特徴",
+    "high": "高",
+    "in_progress": "進行中",
+    "in_review": "レビュー中",
+    "low": "低い",
+    "medium": "中",
+    "planned": "計画済み",
+    "refresh": "リフレッシュ",
+    "unexpected_error": "予期しないエラー",
+    "unknown": "未知",
+    "unfeature": "特徴がない",
+    "actions": "アクション",
+    "active": "アクティブ",
+    "all": "すべて",
+    "approved": "承認済み",
+    "clear": "クリア",
+    "clear_filters": "フィルターをクリアする",
+    "clear_selection": "選択をクリア",
+    "close": "閉じる",
+    "collapse": "崩壊する",
+    "confirm": "確認する",
+    "create": "作成",
+    "declined": "拒否されました",
+    "download": "ダウンロード",
+    "edit": "編集",
+    "error_loading_data": "データ読み込みエラー",
+    "expand": "展開する",
+    "export": "エクスポート",
+    "load_more": "もっと読み込む",
+    "loading": "読み込み中",
+    "next": "次へ",
+    "no": "いいえ",
+    "ok": "OK",
+    "pending": "保留中",
+    "previous": "前へ",
+    "retry": "再試行",
+    "save": "保存",
+    "select_all": "すべて選択",
+    "select_item": "項目の選択",
+    "yes": "はい"
+  },
+  "shared": {
+    "broker_actions": "ブローカーのアクション",
+    "content": "内容",
+    "core_module": "コアモジュール",
+    "document_details": "文書の詳細",
+    "history": "歴史",
+    "log_file_empty": "ログファイルが見つかりません",
+    "no": "いいえ",
+    "no_history_available": "利用可能な履歴が見つかりません",
+    "no_legal_documents_found": "法的文書が見つかりませんでした",
+    "no_members_found": "メンバーが見つかりませんでした",
+    "loading": "Loading",
+    "no_data": "データなし",
+    "no_data_available": "利用可能なデータがありません",
+    "no_recent_broker_activity": "最近のブローカー活動は見つかりませんでした",
+    "open_page_help": "ページのヘルプを開く",
+    "help": "ヘルプ",
+    "quick_access": "クイックアクセス",
+    "recent_activity": "最近の活動",
+    "refresh": "リフレッシュ",
+    "search": "検索...",
+    "select_all_rows": "Select all rows",
+    "select_row": "Select row {{id}}",
+    "data_table": "データ",
+    "total_count": "{{count}}合計"
+  },
+  "national": {
+    "trend_chart_aria": "Chart showing community activity trends over time"
+  },
+  "national_kiss_dashboard": {
+    "loading": "Loading",
+    "meta": {
+      "page_title": "Caring Community - 全国ダッシュボード",
+      "title": "Caring Community - 全国ダッシュボード",
+      "description": "プラットフォーム上のすべての Caring Community 協同組合にわたる協同組合間のスーパー管理者ビュー。メンバー数はプライバシー保護のため括弧書きで報告されます。"
+    },
+    "actions": {
+      "refresh": "リフレッシュ"
+    },
+    "about": {
+      "title": "このダッシュボードについて",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "health_prefix": "期間セレクターを使用して四半期を比較します。比較表では、協同組合を営業時間、組合員、または健康状態によってランク付けしています。健康状態は活動の傾向から導き出されます。",
+      "thriving_definition": "急速に成長し、",
+      "stable_definition": "フラットなアクティビティ、",
+      "struggling_definition": "アクティビティが低下しているか、エンゲージメントが非常に低い。"
+    },
+    "status": {
+      "thriving": "繁栄する",
+      "stable": "安定した",
+      "struggling": "もがく"
+    },
+    "health_legend": {
+      "title": "健康状態キー:",
+      "thriving": "時間数は大幅に増加 (前期比 >10%)",
+      "stable": "平坦なアクティビティ (+/-10%)",
+      "struggling": "活動性が低下しているか、確認された期間が 5 時間未満である",
+      "privacy_note": "会員数はプライバシー保護のため括弧書きで表示されます (例: 「50-99」)。ここでは個人データは一切公開されません。"
+    },
+    "filters": {
+      "period": "期間",
+      "period_aria": "報告期間",
+      "from": "から",
+      "from_aria": "からの期間",
+      "to": "に",
+      "to_aria": "までの期間"
+    },
+    "periods": {
+      "this_month": "今月",
+      "last_quarter": "最後の四半期 (90 日)",
+      "last_year": "去年",
+      "custom": "カスタム範囲"
+    },
+    "stats": {
+      "total_cooperatives": "協同組合合計",
+      "active_cooperatives": "活発な協同組合",
+      "active_description": "{{active}}/{{total}} が期間内にアクティブです",
+      "total_hours": "合計時間（国内）",
+      "active_tandems": "アクティブタンデム"
+    },
+    "inline": {
+      "active_members": "アクティブなメンバー:",
+      "recipients_reached": "受信者に到達しました:",
+      "safeguarding_reports": "レポートの保護:"
+    },
+    "metrics": {
+      "yoy": "{{value}} YoY"
+    },
+    "trend": {
+      "title": "全国の 12 か月の傾向",
+      "empty": "利用可能な傾向データはありません。",
+      "hours_axis": "営業時間",
+      "cooperatives_axis": "協同組合",
+      "active_cooperatives": "活発な協同組合",
+      "total_hours_all": "合計時間（すべての協同組合）"
+    },
+    "comparative": {
+      "title": "比較指標",
+      "sort_hint": "列をクリックして並べ替えます",
+      "empty_prefix": "いいえ",
+      "empty_middle": "協同組合はまだ設定されていません。に行く",
+      "super_admin_tenants": "スーパー管理者 -> テナント",
+      "empty_suffix": "テナント カテゴリを次のように設定します。",
+      "empty_tail": "少なくとも 1 つのテナントでこのダッシュボードに入力します。",
+      "aria": "協同組合ごとの比較指標",
+      "cooperative": "協同組合",
+      "hours_title": "選択した期間の検証済みケア時間の合計",
+      "hours_sort": "営業時間 <->",
+      "members_title": "アクティブなメンバー数はプライバシー保護括弧として表示されます",
+      "members": "メンバー",
+      "recipients_title": "要介護者に到達（プライバシー保護枠）",
+      "recipients": "受信者",
+      "tandems_title": "2 回以上の交換が完了した繰り返しのヘルパー/受信者のペア",
+      "tandems_sort": "タンデム <->",
+      "retention_title": "この期間と以前の同等の期間の両方でアクティブだったメンバーの割合",
+      "retention_sort": "保持 <->",
+      "reciprocity_title": "期間中に時間も受け取ったサポーターの割合 - 相互交流の健全性を示す",
+      "reciprocity_sort": "互恵性 <->",
+      "status": "状態"
+    },
+    "leaderboards": {
+      "top_title": "時間別トップ 5",
+      "bottom_title": "下位 5 (アクティブのみ)"
+    },
+    "empty": {
+      "no_data": "データがありません。",
+      "no_active_cooperatives": "この期間に活動している協同組合はありません。"
+    },
+    "footer": {
+      "generated_at": "{{date}} で生成されます。",
+      "privacy_note": "メンバー数はプライバシー保護のため括弧内に報告されます。このページには個々のメンバー ID は表示されません。"
+    },
+    "toasts": {
+      "load_failed": "ダッシュボードの読み込みに失敗しました"
+    }
+  }
+}

@@ -3,14 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
-const appRoutesUrl = new URL('./routes/AppRoutes.tsx', import.meta.url);
-const routeSourceUrl = existsSync(appRoutesUrl)
-  ? appRoutesUrl
-  : new URL('./App.tsx', import.meta.url);
-const appSource = readFileSync(routeSourceUrl, 'utf8');
+const appSource = readFileSync(path.resolve(__dirname, 'routes/AppRoutes.tsx'), 'utf8');
+const authRoutesSource = readFileSync(path.resolve(__dirname, 'routes/AuthRoutes.tsx'), 'utf8');
+const tenantShellSource = readFileSync(path.resolve(__dirname, 'components/routing/TenantShell.tsx'), 'utf8');
 
 describe('App route feature gates', () => {
   it('gates matches routes behind the listings module', () => {
@@ -21,5 +20,23 @@ describe('App route feature gates', () => {
   it('gates reviews routes behind the reviews feature', () => {
     expect(appSource).toMatch(/<Route path="reviews" element=\{\s*<FeatureGate feature="reviews" redirect="\/dashboard">[\s\S]*?<ReviewsPage \/>[\s\S]*?<\/FeatureGate>/);
     expect(appSource).toMatch(/<Route path="reviews\/create" element=\{\s*<FeatureGate feature="reviews" redirect="\/dashboard">[\s\S]*?<ReviewsPage \/>[\s\S]*?<\/FeatureGate>/);
+  });
+
+  it('keeps auth-entry routes out of the full app route registry', () => {
+    expect(appSource).not.toContain('@/components/layout/AuthLayout');
+    expect(appSource).not.toMatch(/@\/pages\/auth\/(?:LoginPage|RegisterPage|ForgotPasswordPage|ResetPasswordPage|VerifyEmailPage|VerifyIdentityPage|OauthCallbackPage)/);
+
+    expect(authRoutesSource).toContain('@/components/layout/AuthLayout');
+    expect(authRoutesSource).toContain("@/pages/auth/LoginPage");
+    expect(authRoutesSource).toContain("@/pages/auth/RegisterPage");
+  });
+
+  it('keeps app-only runtime providers out of the auth startup shell', () => {
+    expect(tenantShellSource).not.toMatch(/from ['"]@\/contexts\/(?:NotificationsContext|PusherContext|MenuContext|PresenceContext|PodcastPlayerContext)['"]/);
+    expect(tenantShellSource).not.toContain('@/components/security/IdleLogoutGuard');
+    expect(tenantShellSource).not.toContain('appRoutesModulePromise');
+    expect(tenantShellSource).toContain("import('@/routes/AuthRoutes')");
+    expect(tenantShellSource).toContain("import('@/routes/AppRoutes')");
+    expect(tenantShellSource).toContain("lazy(() => import('./TenantAppProviders'))");
   });
 });

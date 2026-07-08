@@ -37,7 +37,7 @@ vi.mock('@/contexts', () =>
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
 // ─── Sample data ─────────────────────────────────────────────────────────────
-// Use real data_type values that match the actual i18n keys in public/locales/en/admin.json
+// Use real data_type values that match the actual i18n keys in public/locales/en/admin_system.json
 // Keys: type_activity_log, type_notifications, etc.
 const POLICIES = [
   {

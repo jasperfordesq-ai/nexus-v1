@@ -31,7 +31,7 @@ interface ImportSummary {
 }
 
 export function DataManagement() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   usePageTitle(t('federation.data_management_title'));
   const toast = useToast();
 

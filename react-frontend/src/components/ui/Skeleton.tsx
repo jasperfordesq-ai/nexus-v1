@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { type ComponentPropsWithoutRef, type ReactNode } from 'react';
-import { Skeleton as HeroUISkeleton } from '@heroui/react';
+import { Skeleton as HeroUISkeleton } from '@heroui/react/skeleton';
 
 type HeroUISkeletonProps = ComponentPropsWithoutRef<typeof HeroUISkeleton>;
 

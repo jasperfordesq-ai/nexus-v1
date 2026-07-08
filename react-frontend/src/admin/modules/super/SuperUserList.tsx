@@ -25,7 +25,7 @@ import { ConfirmModal } from '../../components/ConfirmModal';
 import type { SuperAdminUser } from '../../api/types';
 
 export function SuperUserList() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_super');
   usePageTitle(t('super.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();

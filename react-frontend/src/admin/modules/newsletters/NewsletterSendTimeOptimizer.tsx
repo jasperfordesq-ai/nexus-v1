@@ -27,7 +27,7 @@ const formatHour = (hour: number) => {
 };
 
 export function NewsletterSendTimeOptimizer() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_newsletters');
   usePageTitle(t('newsletters.page_title'));
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<SendTimeData | null>(null);

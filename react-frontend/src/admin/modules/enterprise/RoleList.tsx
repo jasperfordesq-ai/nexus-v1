@@ -25,7 +25,7 @@ import type { Role } from '../../api/types';
 import { Button, Chip } from '@/components/ui';
 
 export function RoleList() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   usePageTitle(t('enterprise.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();

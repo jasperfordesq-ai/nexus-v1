@@ -32,7 +32,7 @@ import { adminSystem } from '../../api/adminApi';
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function CronJobSetup() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_system');
   usePageTitle(t('system.cron_job_setup_title'));
   const toast = useToast();
   const [testing, setTesting] = useState(false);

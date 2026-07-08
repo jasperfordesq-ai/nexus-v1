@@ -20,7 +20,7 @@ import { usePageTitle } from '@/hooks';
 import { PageHeader } from '../../components/PageHeader';
 
 export function GroupGeocode() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_groups');
   usePageTitle(t('groups.geocode_title'));
 
   return (

@@ -4,17 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Fragment, isValidElement, type ComponentProps, type ReactNode } from 'react';
-import {
-  Description,
-  FieldError,
-  Header,
-  Label,
-  ListBox,
-  Select as HeroSelect,
-  Separator,
-  type ListBox as HeroListBoxTypes,
-  type Select as HeroSelectTypes,
-} from '@heroui/react';
+import { Description } from '@heroui/react/description';
+import { FieldError } from '@heroui/react/field-error';
+import { Header } from '@heroui/react/header';
+import { Label } from '@heroui/react/label';
+import { ListBox, type ListBox as HeroListBoxTypes } from '@heroui/react/list-box';
+import { Select as HeroSelect, type Select as HeroSelectTypes } from '@heroui/react/select';
+import { Separator } from '@heroui/react/separator';
 import { cn } from '@/lib/helpers';
 
 type HeroSelectProps = HeroSelectTypes['Props'];

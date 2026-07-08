@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { getFeatureModules } from './moduleRegistry';
 
 const adminLocale = JSON.parse(
-  readFileSync('public/locales/en/admin.json', 'utf8')
+  readFileSync('public/locales/en/admin_config.json', 'utf8')
 ) as { config: Record<string, string> };
 
 function slugConfigText(value: string): string {

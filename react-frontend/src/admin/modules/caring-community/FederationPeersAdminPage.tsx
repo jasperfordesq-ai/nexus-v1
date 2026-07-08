@@ -55,7 +55,7 @@ const STATUS_COLOR: Record<PeerStatus, 'default' | 'success' | 'warning' | 'dang
 };
 
 export default function FederationPeersAdminPage() {
-  const { t } = useTranslation(['admin', 'common']);
+  const { t } = useTranslation(['admin_caring_community', 'common']);
   const confirm = useConfirm();
   usePageTitle(t('federation_peers_admin.meta.page_title'));
   const { showToast } = useToast();

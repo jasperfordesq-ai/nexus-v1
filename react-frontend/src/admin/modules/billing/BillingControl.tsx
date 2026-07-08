@@ -92,7 +92,7 @@ const formatUserCount = (row: TenantSnapshot): string => {
 // ---------------------------------------------------------------------------
 
 export function BillingControl() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_billing');
   usePageTitle(t('billing.control_title'));
   const { user } = useAuth();
   const toast = useToast();

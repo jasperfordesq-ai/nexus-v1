@@ -8,11 +8,9 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
-import {
-  Description,
-  Label,
-  Switch as HeroUISwitch,
-} from '@heroui/react';
+import { Description } from '@heroui/react/description';
+import { Label } from '@heroui/react/label';
+import { Switch as HeroUISwitch } from '@heroui/react/switch';
 
 type HeroUISwitchProps = ComponentPropsWithoutRef<typeof HeroUISwitch>;
 type SwitchColor = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';

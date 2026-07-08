@@ -28,7 +28,7 @@ const getComplianceColor = (rate: number): 'success' | 'warning' | 'danger' => {
 };
 
 export default function LegalDocComplianceDashboard() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   useAdminPageMeta({ title: t('enterprise.legal_compliance_dashboard') });
 
   const { success, error } = useToast();

@@ -261,7 +261,7 @@ async function exportCsv(dateFrom?: string, dateTo?: string) {
 // ---------------------------------------------------------------------------
 
 export function ImpactReport() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_impact');
   usePageTitle(t('impact.page_title'));
   const toast = useToast();
 

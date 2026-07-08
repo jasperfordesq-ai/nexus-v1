@@ -32,6 +32,7 @@ import { api, tokenManager, fetchCsrfToken } from '@/lib/api';
 import { detectTenantFromUrl, tenantPath as buildTenantPath } from '@/lib/tenant-routing';
 import { validateResponseIfPresent } from '@/lib/api-validation';
 import { tenantBootstrapSchema } from '@/lib/api-schemas';
+import { queueSentryTenant } from '@/lib/telemetryQueue';
 import { DEFAULT_LANDING_PAGE_CONFIG } from '@/types';
 import type { TenantConfig, TenantFeatures, TenantModules, TenantBranding, GroupTabConfig, ListingConfig, VolunteeringConfig, JobConfig, LandingPageConfig } from '@/types';
 
@@ -81,7 +82,7 @@ const ALLOWED_MAP_PROVIDERS: readonly MapProvider[] = ['google', 'openstreetmap'
 const ALLOWED_GEOCODING_PROVIDERS: readonly GeocodingProvider[] = ['google', 'nominatim', 'os_places'];
 
 function setTelemetryTenant(tenant: { id: number; name: string; slug: string } | null): void {
-  void import('@/lib/sentry').then(({ setSentryTenant }) => setSentryTenant(tenant));
+  queueSentryTenant(tenant);
 }
 
 // Default features — synced with PHP TenantFeatureConfig::FEATURE_DEFAULTS

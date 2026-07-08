@@ -56,7 +56,7 @@ const actionColorMap: Record<string, 'default' | 'success' | 'warning' | 'danger
 };
 
 export function GdprRequestDetail() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_enterprise');
   const { id } = useParams();
   const navigate = useNavigate();
   const { tenantPath } = useTenant();

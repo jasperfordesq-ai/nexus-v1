@@ -22,7 +22,7 @@ import type { MatchingStatsResponse } from '../../api/types';
 
 
 export function SmartMatchMonitoring() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_community');
   usePageTitle(t('community.page_title'));
   const toast = useToast();
 

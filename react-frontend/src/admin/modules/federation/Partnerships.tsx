@@ -136,7 +136,7 @@ const PERMISSION_ICONS: Record<string, typeof Users> = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function Partnerships() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   usePageTitle(t('federation.page_title'));
   const toast = useToast();
 

@@ -57,6 +57,19 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: (...args: unknown[]) => mockUseAuth(...args),
 }));
 
+vi.mock('@/contexts/CookieConsentContext', () => ({
+  useCookieConsent: () => ({
+    consent: null,
+    showBanner: false,
+    openPreferences: vi.fn(),
+    resetConsent: vi.fn(),
+    saveConsent: vi.fn(),
+    hasConsent: vi.fn(() => true),
+    updateConsent: vi.fn(),
+  }),
+  readStoredConsent: () => null,
+}));
+
 vi.mock('@/contexts/NotificationsContext', () => ({
   NotificationsProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
@@ -245,7 +258,7 @@ describe('TenantShell', () => {
   });
 
   describe('Community Not Found', () => {
-    it('shows CommunityNotFound when notFoundSlug is set', () => {
+    it('shows CommunityNotFound when notFoundSlug is set', async () => {
       mockDetectTenantFromUrl.mockReturnValue({ slug: 'nonexistent-community', source: 'path' });
       setupDefaultMocks({
         tenant: {
@@ -255,11 +268,11 @@ describe('TenantShell', () => {
         },
       });
       renderWithRouter('/nonexistent-community/dashboard');
-      expect(screen.getByText('Community not found')).toBeInTheDocument();
+      expect(await screen.findByText('Community not found')).toBeInTheDocument();
       expect(screen.getByText(/nonexistent-community/)).toBeInTheDocument();
     });
 
-    it('shows Go Home button in CommunityNotFound', () => {
+    it('shows Go Home button in CommunityNotFound', async () => {
       mockDetectTenantFromUrl.mockReturnValue({ slug: 'bad-slug', source: 'path' });
       setupDefaultMocks({
         tenant: {
@@ -269,10 +282,10 @@ describe('TenantShell', () => {
         },
       });
       renderWithRouter('/bad-slug/dashboard');
-      expect(screen.getByText('Go home')).toBeInTheDocument();
+      expect(await screen.findByText('Go home')).toBeInTheDocument();
     });
 
-    it('shows Find Community button in CommunityNotFound', () => {
+    it('shows Find Community button in CommunityNotFound', async () => {
       mockDetectTenantFromUrl.mockReturnValue({ slug: 'bad-slug', source: 'path' });
       setupDefaultMocks({
         tenant: {
@@ -282,7 +295,7 @@ describe('TenantShell', () => {
         },
       });
       renderWithRouter('/bad-slug/dashboard');
-      expect(screen.getByText('Find a community')).toBeInTheDocument();
+      expect(await screen.findByText('Find a community')).toBeInTheDocument();
     });
   });
 

@@ -27,22 +27,25 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Outlet, Routes, useLocation } from 'react-router-dom';
+import { Routes, useLocation } from 'react-router-dom';
 import { TenantProvider, useTenant } from '@/contexts/TenantContext';
 import { useAuth, AuthProvider } from '@/contexts/AuthContext';
-import { NotificationsProvider } from '@/contexts/NotificationsContext';
-import { PusherProvider } from '@/contexts/PusherContext';
-import { MenuProvider } from '@/contexts/MenuContext';
-import { PresenceProvider } from '@/contexts/PresenceContext';
-import { PodcastPlayerProvider } from '@/contexts/PodcastPlayerContext';
+import { useCookieConsent } from '@/contexts/CookieConsentContext';
 import { detectTenantFromUrl } from '@/lib/tenant-routing';
-import { CookieConsentBanner } from '@/components/feedback/CookieConsentBanner';
-import { IdleLogoutGuard } from '@/components/security/IdleLogoutGuard';
 import { LoadingScreen } from '@/components/feedback/LoadingScreen';
-import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { listenForImpersonationToken } from '@/lib/impersonate';
 
 const MaintenancePage = lazy(() => import('@/pages/public/MaintenancePage'));
+const TenantPublicProviders = lazy(() => import('./TenantPublicProviders'));
+const TenantAppProviders = lazy(() => import('./TenantAppProviders'));
+const CookieConsentBanner = lazy(() =>
+  import('@/components/feedback/CookieConsentBanner').then((module) => ({
+    default: module.CookieConsentBanner,
+  })),
+);
+
+type AppRoutesFactory = () => React.ReactNode;
 
 /**
  * Props for TenantShell — receives appRoutes from App.tsx so it can
@@ -53,6 +56,9 @@ interface TenantShellProps {
 }
 
 export function TenantShell({ appRoutes }: TenantShellProps) {
+  const shellLocation = useLocation();
+  const [loadedAppRoutes, setLoadedAppRoutes] = useState<AppRoutesFactory | null>(appRoutes ?? null);
+
   // Listen for impersonation token handoff from admin tab via BroadcastChannel.
   // Token is set in tokenManager (memory → localStorage, same as normal login)
   // and page reloads to pick up the new auth state.
@@ -86,6 +92,35 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
     stickySlugRef.current = detectedSlug;
   }
   const effectiveSlug = detectedSlug ?? stickySlugRef.current ?? undefined;
+  const isAuthRoute = isAuthEntryPath(shellLocation.pathname, effectiveSlug);
+
+  useEffect(() => {
+    if (appRoutes) {
+      setLoadedAppRoutes(() => appRoutes);
+      return;
+    }
+
+    let mounted = true;
+    setLoadedAppRoutes(null);
+
+    if (isAuthRoute) {
+      import('@/routes/AuthRoutes').then(({ AuthRoutes }) => {
+        if (mounted) {
+          setLoadedAppRoutes(() => AuthRoutes);
+        }
+      });
+    } else {
+      import('@/routes/AppRoutes').then(({ AppRoutes }) => {
+        if (mounted) {
+          setLoadedAppRoutes(() => AppRoutes);
+        }
+      });
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [appRoutes, isAuthRoute]);
 
   // Cross-tenant slug-recovery redirect REMOVED (2026-05-08). The previous
   // logic re-prepended a stored slug from localStorage when a user hit a
@@ -99,27 +134,227 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
   return (
     <TenantProvider tenantSlug={effectiveSlug}>
       <AuthProvider>
-        <NotificationsProvider>
-          <PusherProvider>
-            <PresenceProvider>
-              <MenuProvider>
-                <PodcastPlayerProvider>
-                  <TenantGuard slugPrefix={effectiveSlug} appRoutes={appRoutes}>
-                    <Outlet />
-                  </TenantGuard>
-                </PodcastPlayerProvider>
-                <IdleLogoutGuard />
-                <CookieConsentBanner />
-              </MenuProvider>
-            </PresenceProvider>
-          </PusherProvider>
-        </NotificationsProvider>
+        <TenantShellRuntime
+          appRoutes={loadedAppRoutes}
+          isAuthRoute={isAuthRoute}
+          slugPrefix={effectiveSlug}
+        />
+        <DeferredCookieConsentBanner />
       </AuthProvider>
     </TenantProvider>
   );
 }
 
-const authPaths = ['login', 'register', 'password/forgot', 'password/reset', 'verify-email'];
+function TenantShellRuntime({
+  appRoutes,
+  isAuthRoute,
+  slugPrefix,
+}: {
+  appRoutes: AppRoutesFactory | null;
+  isAuthRoute: boolean;
+  slugPrefix?: string;
+}) {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+
+  if (isAuthRoute) {
+    return <TenantRouteSurface slugPrefix={slugPrefix} appRoutes={appRoutes} />;
+  }
+
+  const needsFullRuntime = isAuthenticated && routeNeedsTenantAppRuntime(location.pathname, slugPrefix);
+  const Providers = needsFullRuntime ? TenantAppProviders : TenantPublicProviders;
+
+  return (
+    <Suspense fallback={<LoadingScreen />}>
+      <Providers>
+        <TenantRouteSurface slugPrefix={slugPrefix} appRoutes={appRoutes} />
+      </Providers>
+    </Suspense>
+  );
+}
+
+function TenantRouteSurface({
+  slugPrefix,
+  appRoutes,
+}: {
+  slugPrefix?: string;
+  appRoutes: AppRoutesFactory | null;
+}) {
+  return <TenantGuard slugPrefix={slugPrefix} appRoutes={appRoutes} />;
+}
+
+function DeferredCookieConsentBanner() {
+  const { showBanner } = useCookieConsent();
+  const [canRenderBanner, setCanRenderBanner] = useState(false);
+
+  useEffect(() => {
+    if (!showBanner) {
+      setCanRenderBanner(false);
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(() => setCanRenderBanner(true), { timeout: 1500 });
+      } else {
+        setCanRenderBanner(true);
+      }
+    }, 1200);
+
+    return () => window.clearTimeout(timer);
+  }, [showBanner]);
+
+  if (!showBanner || !canRenderBanner) return null;
+
+  return (
+    <Suspense fallback={null}>
+      <CookieConsentBanner />
+    </Suspense>
+  );
+}
+
+const authPaths = [
+  'login',
+  'register',
+  'password/forgot',
+  'password/reset',
+  'verify-email',
+  'verify-identity',
+  'auth/oauth/callback',
+];
+
+function isAuthEntryPath(pathname: string, slugPrefix?: string): boolean {
+  const lowerPath = pathname.toLowerCase().replace(/\/+$/, '') || '/';
+  const lowerPrefix = slugPrefix?.toLowerCase();
+  return authPaths.some((path) => {
+    const authPath = `/${path}`;
+    return lowerPath === authPath || (lowerPrefix ? lowerPath === `/${lowerPrefix}${authPath}` : false);
+  });
+}
+
+const protectedRuntimePrefixes = [
+  'admin',
+  'super-admin',
+  'broker',
+  'dashboard',
+  'feed',
+  'profile',
+  'messages',
+  'wallet',
+  'settings',
+  'search',
+  'notifications',
+  'onboarding',
+  'activity',
+  'saved',
+  'connections',
+  'members',
+  'matches',
+  'reviews',
+  'goals',
+  'achievements',
+  'leaderboard',
+  'nexus-score',
+  'skills',
+  'chat',
+  'exchanges',
+  'group-exchanges',
+  'federation',
+  'clubs',
+  'vereine',
+  'advertise',
+  'partners',
+  'caring',
+  'listings/create',
+  'listings/edit',
+  'events/create',
+  'events/edit',
+  'groups/create',
+  'groups/edit',
+  'marketplace/create',
+  'marketplace/edit',
+  'marketplace/my',
+  'marketplace/buyer',
+  'marketplace/seller',
+  'courses/create',
+  'courses/instructor',
+  'courses/my-learning',
+  'volunteering/create',
+  'organisations/register',
+  'ideation/create',
+];
+
+const publicRuntimePrefixes = [
+  '',
+  'features',
+  'changelog',
+  'development-status',
+  'about',
+  'faq',
+  'contact',
+  'pilot-inquiry',
+  'pilot-apply',
+  'help',
+  'terms',
+  'privacy',
+  'accessibility',
+  'cookies',
+  'community-guidelines',
+  'trust-and-safety',
+  'acceptable-use',
+  'legal',
+  'platform',
+  'timebanking-guide',
+  'developers',
+  'regional-analytics',
+  'partner-analytics',
+  'newsletter',
+  'volunteering/guardian-consent',
+  'explore',
+  'partner',
+  'social-prescribing',
+  'impact-summary',
+  'impact-report',
+  'strategic-plan',
+  'page',
+  'blog',
+  'listings',
+  'events',
+  'groups',
+  'jobs',
+  'courses',
+  'marketplace',
+  'sellers',
+  'coupons',
+  'pricing',
+  'volunteering',
+  'resources',
+  'kb',
+  'organisations',
+  'ideation',
+  'join',
+  'podcasts',
+  'public',
+];
+
+function routeNeedsTenantAppRuntime(pathname: string, slugPrefix?: string): boolean {
+  let routePath = pathname.toLowerCase().replace(/\/+$/, '');
+  const lowerPrefix = slugPrefix?.toLowerCase();
+  if (lowerPrefix && (routePath === `/${lowerPrefix}` || routePath.startsWith(`/${lowerPrefix}/`))) {
+    routePath = routePath.slice(lowerPrefix.length + 1) || '/';
+  }
+  const normalized = routePath.replace(/^\/+/, '');
+
+  if (protectedRuntimePrefixes.some((prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`))) {
+    return true;
+  }
+
+  if (publicRuntimePrefixes.some((prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`))) {
+    return false;
+  }
+
+  return true;
+}
 
 /**
  * Inner guard that checks if tenant resolution failed with a notFoundSlug.
@@ -130,23 +365,16 @@ const authPaths = ['login', 'register', 'password/forgot', 'password/reset', 've
  * e.g. "/hour-timebank/dashboard" → nested Routes sees "/dashboard"
  */
 function TenantGuard({
-  children,
   slugPrefix,
   appRoutes,
 }: {
-  children: React.ReactNode;
   slugPrefix?: string;
-  appRoutes?: () => React.ReactNode;
+  appRoutes: AppRoutesFactory | null;
 }) {
   const { t } = useTranslation('common');
   const { isLoading, notFoundSlug, tenant, error } = useTenant();
   const { user } = useAuth();
   const location = useLocation();
-
-  // Invoke appRoutes() unconditionally so any hooks inside (e.g. useTranslation
-  // in AppRoutes) are called on every render. Conditional invocation later would
-  // violate React's rules of hooks (different hook count per render).
-  const nestedRouteContent = appRoutes ? appRoutes() : undefined;
 
   // While tenant is loading, block page rendering to prevent API calls before
   // X-Tenant-ID is set in localStorage. Bootstrap is fast (50-200ms, Redis-cached).
@@ -194,9 +422,26 @@ function TenantGuard({
     );
   }
 
+  if (!appRoutes) {
+    return <LoadingScreen />;
+  }
+
+  return <TenantRoutes slugPrefix={slugPrefix} appRoutes={appRoutes} />;
+}
+
+function TenantRoutes({
+  slugPrefix,
+  appRoutes,
+}: {
+  slugPrefix?: string;
+  appRoutes: AppRoutesFactory;
+}) {
+  const location = useLocation();
+  const nestedRouteContent = appRoutes();
+
   // If there's a slug prefix, render a nested Routes with the slug stripped
   // so child routes like "dashboard" match "/hour-timebank/dashboard" correctly
-  if (slugPrefix && nestedRouteContent) {
+  if (slugPrefix) {
     const strippedPath = location.pathname.replace(new RegExp(`^/${slugPrefix}`, 'i'), '') || '/';
     return (
       <>
@@ -208,7 +453,11 @@ function TenantGuard({
     );
   }
 
-  return <>{children}</>;
+  return (
+    <Routes>
+      {nestedRouteContent}
+    </Routes>
+  );
 }
 
 /**
@@ -294,14 +543,12 @@ function BootstrapError({ onRetry }: { onRetry: () => void }) {
  * Inline component to avoid circular dependency with lazy-loaded NotFoundPage.
  */
 import { Link } from 'react-router-dom';
-import { motion } from '@/lib/motion';import { Helmet } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import Home from 'lucide-react/icons/house';
 import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
-import { GlassCard } from '@/components/ui/GlassCard';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { Button } from '@/components/ui/Button';
 
 function CommunityNotFound({ slug }: { slug: string }) {
   const { t } = useTranslation('errors');
@@ -312,12 +559,8 @@ function CommunityNotFound({ slug }: { slug: string }) {
       <Helmet>
         <meta name="prerender-status-code" content="404" />
       </Helmet>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md"
-      >
-        <GlassCard className="p-8 text-center">
+      <div className="w-full max-w-md">
+        <div className="rounded-lg border border-theme-default bg-theme-surface/90 p-8 text-center shadow-xl">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 mb-6">
             <Globe className="w-10 h-10 text-[var(--color-warning)]" aria-hidden="true" />
           </div>
@@ -331,26 +574,23 @@ function CommunityNotFound({ slug }: { slug: string }) {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link to="/" className="flex-1">
-              <Button
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={<Home className="w-4 h-4" aria-hidden="true" />}
-              >
+            <Link
+              to="/"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-theme-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-theme-focus"
+            >
+              <Home className="w-4 h-4" aria-hidden="true" />
                 {t('go_home')}
-              </Button>
             </Link>
-            <Link to="/login" className="flex-1">
-              <Button
-                variant="flat"
-                className="w-full bg-theme-elevated text-theme-muted"
-                startContent={<Search className="w-4 h-4" aria-hidden="true" />}
-              >
+            <Link
+              to="/login"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-theme-elevated px-4 py-2.5 text-sm font-semibold text-theme-muted transition hover:bg-theme-muted/10 focus:outline-none focus:ring-2 focus:ring-theme-focus"
+            >
+              <Search className="w-4 h-4" aria-hidden="true" />
                 {t('find_community')}
-              </Button>
             </Link>
           </div>
-        </GlassCard>
-      </motion.div>
+        </div>
+      </div>
     </div>
   );
 }

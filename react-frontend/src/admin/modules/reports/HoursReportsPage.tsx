@@ -147,7 +147,7 @@ async function exportCsv(exportType: string, dateFrom?: string, dateTo?: string)
 // ---------------------------------------------------------------------------
 
 export function HoursReportsPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_reports');
   usePageTitle(t('reports.page_title'));
   const toast = useToast();
 

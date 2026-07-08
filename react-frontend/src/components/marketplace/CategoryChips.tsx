@@ -5,7 +5,7 @@
 
 import LayoutGrid from 'lucide-react/icons/layout-grid';
 import { useTranslation } from 'react-i18next';
-import type { Key } from '@heroui/react';
+import type { Key } from '@heroui/react/rac';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 import type { MarketplaceCategory } from '@/types/marketplace';
 

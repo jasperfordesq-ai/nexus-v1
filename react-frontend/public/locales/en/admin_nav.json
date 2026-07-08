@@ -512,5 +512,79 @@
   },
   "aria": {
     "breadcrumbs": "Breadcrumbs"
+  },
+  "shared": {
+    "loading": "Loading",
+    "help": "Help",
+    "open_page_help": "Open page help",
+    "search": "Search...",
+    "refresh": "Refresh",
+    "total_count": "{{count}} total",
+    "data_table": "Data",
+    "select_all_rows": "Select all rows",
+    "no_data": "No data",
+    "no_data_available": "No data available",
+    "select_row": "Select row {{id}}"
+  },
+  "help_drawer": {
+    "aria_label": "Help: {{title}}",
+    "close_panel": "Close help panel",
+    "how_to_use": "How to use this page",
+    "label": "Help",
+    "related_pages": "Related pages",
+    "tips": "Tips & gotchas"
+  },
+  "bulk": {
+    "selected_count": "{{count}} selected",
+    "clear_selection": "Clear selection",
+    "confirm_title": "Confirm {{action}}",
+    "confirm_message": "Are you sure you want to {{action}} {{count}} items?",
+    "destructive_warning": "This action cannot be undone.",
+    "reason_label": "Reason",
+    "reason_placeholder": "Provide a reason for this action"
+  },
+  "common": {
+    "cancel": "Cancel"
+  },
+  "icon_picker": {
+    "choose_icon": "Choose Icon",
+    "choose_icon_placeholder": "Search for an icon...",
+    "clear_icon": "Clear Icon",
+    "label": "Icon",
+    "no_icons_found": "No icons found matching \"{{search}}\"",
+    "search_for_icon": "Search for an icon...",
+    "search_icons": "Search Icons"
+  },
+  "visibility_rules": {
+    "min_role": "Min Role",
+    "requires_auth": "Requires Auth",
+    "requires_feature": "Requires Feature",
+    "title": "Visibility Rules",
+    "roles": {
+      "any": "Any",
+      "user": "User",
+      "admin": "Admin",
+      "tenant_admin": "Tenant Admin",
+      "super_admin": "Super Admin"
+    },
+    "features": {
+      "none": "None",
+      "events": "Events",
+      "groups": "Groups",
+      "gamification": "Gamification",
+      "goals": "Goals",
+      "blog": "Blog",
+      "resources": "Resources",
+      "volunteering": "Volunteering",
+      "exchange_workflow": "Exchange Workflow",
+      "organisations": "Organisations",
+      "federation": "Federation",
+      "connections": "Connections",
+      "reviews": "Reviews",
+      "polls": "Polls",
+      "direct_messaging": "Direct Messaging",
+      "group_exchanges": "Group Exchanges",
+      "search": "Search"
+    }
   }
 }

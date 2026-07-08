@@ -112,7 +112,7 @@ function formatDateTime(dateStr: string): string {
 }
 
 export default function CoordinatorTasks() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_crm');
   const { t: tNav } = useTranslation('admin_nav');
   useAdminPageMeta({ title: tNav('crm') });
   const { tenantPath } = useTenant();

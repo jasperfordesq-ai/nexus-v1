@@ -130,7 +130,7 @@ function buildMarkdown(matrix: BoundaryMatrix, t: AdminT): string {
 // ---------------------------------------------------------------------------
 
 export default function CommercialBoundaryAdminPage() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_caring_community');
   usePageTitle(t('commercial_boundary.meta.page_title'));
   const { showToast } = useToast();
 

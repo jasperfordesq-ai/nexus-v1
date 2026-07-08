@@ -16,8 +16,7 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // Stub HeroUI ButtonGroup to a simple div so jsdom doesn't choke on complex
 // React Aria internals, while still propagating children and data attributes.
-vi.mock('@heroui/react', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@heroui/react')>();
+vi.mock('@heroui/react/button-group', () => {
   const FakeButtonGroup = ({
     children,
     variant,
@@ -44,7 +43,6 @@ vi.mock('@heroui/react', async (importOriginal) => {
   FakeButtonGroup.Separator = () => <hr data-testid="button-group-separator" />;
 
   return {
-    ...orig,
     ButtonGroup: FakeButtonGroup,
   };
 });

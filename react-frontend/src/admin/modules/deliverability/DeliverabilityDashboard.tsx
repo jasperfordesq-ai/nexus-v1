@@ -38,7 +38,7 @@ interface DashboardData {
 
 export function DeliverabilityDashboard() {
   const { t: tNav } = useTranslation('admin_nav');
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_deliverability');
   useAdminPageMeta({ title: tNav('deliverability') });
   const toast = useToast();
 

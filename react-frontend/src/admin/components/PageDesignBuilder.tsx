@@ -150,7 +150,7 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
   { html, designJson, readOnly, onChange },
   ref,
 ) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_editor');
   const toast = useToast();
   const confirm = useConfirm();
 

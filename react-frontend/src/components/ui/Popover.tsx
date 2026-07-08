@@ -11,7 +11,7 @@ import {
   type ComponentPropsWithoutRef,
   type ReactNode,
 } from 'react';
-import { Popover as HeroUIPopover } from '@heroui/react';
+import { Popover as HeroUIPopover } from '@heroui/react/popover';
 
 type HeroUIPopoverProps = ComponentPropsWithoutRef<typeof HeroUIPopover>;
 type HeroUIPopoverContentProps = ComponentPropsWithoutRef<typeof HeroUIPopover.Content>;

@@ -110,7 +110,7 @@ const guidanceAccordionItemClasses = {
 };
 
 export function PartnerTimebankGuidance({ page }: { page: PartnerTimebankGuidePage }) {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_federation');
   const { tenantPath } = useTenant();
   const prefix = `federation_admin_guidance.pages.${page}`;
   const related = RELATED_LINKS[page];

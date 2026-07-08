@@ -51,7 +51,7 @@ const DEFAULT_CONFIG: SmartMatchingConfig = {
 };
 
 export function MatchingConfig() {
-  const { t } = useTranslation('admin');
+  const { t } = useTranslation('admin_matching');
   usePageTitle(t('matching.page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
