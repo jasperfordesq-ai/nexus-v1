@@ -941,28 +941,11 @@ const heavyStaticAssetBudgets = [
   },
 ];
 
-const disallowedPublicAssets = [
-  {
-    file: 'public/images/Timebanking-UK-and-Timebank-Ireland-Partners.png',
-    message: 'Use Timebanking-UK-and-Timebank-Ireland-Partners.webp; the PNG original must not ship in the public build.',
-  },
-  {
-    file: 'public/images/project-nexus-logo.png',
-    message: 'Use project-nexus-logo.webp; the PNG original must not ship in the public build.',
-  },
-  {
-    file: 'public/images/timebank_ireland_west_cork_partnership.jpg',
-    message: 'Use timebank_ireland_west_cork_partnership.webp; the JPG original must not ship in the public build.',
-  },
-  {
-    file: 'public/images/powered-by-nexus-dark.png',
-    message: 'Use powered-by-nexus-dark.webp; the PNG original must not ship in the public build.',
-  },
-  {
-    file: 'public/images/powered-by-nexus-light.png',
-    message: 'Use powered-by-nexus-light.webp; the PNG original must not ship in the public build.',
-  },
-];
+// Header/footer brand marks are an explicit exception to the usual "prefer WebP"
+// image rule: they must be allowed to use transparent raster logo files so
+// light/dark logo contrast is faithful. Keep page-level guards above so ordinary
+// content pages do not point at the heavy originals.
+const disallowedPublicAssets = [];
 
 const migratedAdminMonolithGroups = [
   'advanced',

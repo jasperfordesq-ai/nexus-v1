@@ -289,6 +289,7 @@ This project is **publicly released** under AGPL-3.0-or-later at <https://github
 - Use Tailwind CSS utilities for layout/spacing — **no separate CSS component files**
 - Use CSS tokens in `src/styles/tokens.css` for theme-aware colors
 - **Do NOT** create PHP views
+- **Header/footer logo exception:** Tenant logos rendered in the React header/footer must use uploaded raster image assets (prefer transparent PNG; JPEG only when transparency is not required). Do **not** replace these brand logos with inline SVGs or generated SVG wrappers. SVG may still be appropriate elsewhere in the app for icons/illustration, but header/footer brand marks are the exception because light/dark logo contrast depends on real transparent raster assets.
 
 - **Laravel is the production/default backend contract.** ASP.NET compatibility work is development-only and must make ASP.NET conform to the Laravel React API rather than changing production frontend behaviour; see [docs/REACT-DUAL-BACKEND.md](docs/REACT-DUAL-BACKEND.md).
 

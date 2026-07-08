@@ -72,6 +72,7 @@ manifest generator. Generated smoke manifests live under
 6. **Every page uses `usePageTitle()`** — sets `document.title` to "Page - Tenant"
 7. **All internal links use `tenantPath()`** — for tenant slug routing
 8. **SPDX header on every file** — see root CLAUDE.md
+9. **Header/footer logo exception** — tenant brand logos in `Navbar`, `Footer`, `MobileDrawer`, and shared branding components must render uploaded raster assets, preferably transparent PNGs. Do not convert these header/footer logos to inline SVGs or generated SVG wrappers. SVGs are still fine for icons/illustrations elsewhere; this exception exists so light/dark header and footer logo contrast uses the real transparent logo files.
 
 ## Styling Examples
 
