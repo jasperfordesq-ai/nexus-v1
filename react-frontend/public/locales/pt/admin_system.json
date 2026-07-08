@@ -152,7 +152,15 @@
     "type_email_log": "Registo de e-mails",
     "type_email_log_desc": "Registos de entrega de e-mails enviados (corpos encriptados).",
     "type_login_attempts": "Tentativas de início de sessão",
-    "type_login_attempts_desc": "Registos de tentativas de início de sessão bem-sucedidas e falhadas."
+    "type_login_attempts_desc": "Registos de tentativas de início de sessão bem-sucedidas e falhadas.",
+    "type_vol_mood_checkins": "Check-ins de humor dos voluntários",
+    "type_vol_mood_checkins_desc": "Autoavaliações de bem-estar (pontuação de humor e nota) registadas pelos voluntários.",
+    "type_vol_wellbeing_alerts": "Alertas de bem-estar",
+    "type_vol_wellbeing_alerts_desc": "Alertas de risco de esgotamento sobre voluntários. Apenas alertas resolvidos ou dispensados são eliminados.",
+    "type_vol_safeguarding_incidents": "Incidentes de proteção",
+    "type_vol_safeguarding_incidents_desc": "Processos de proteção. Apenas casos resolvidos ou encerrados são eliminados; verifique os deveres legais de conservação antes de ativar.",
+    "type_vol_guardian_consents": "Consentimentos de tutores",
+    "type_vol_guardian_consents_desc": "Consentimentos de tutores para menores, eliminados este número de dias após a expiração."
   },
   "seed_generator": {
     "count_aria_label": "Contagem de {{label}}",

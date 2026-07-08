@@ -152,7 +152,15 @@
     "type_email_log": "E-maillog",
     "type_email_log_desc": "Bezorgingsrecords van uitgaande e-mails (versleutelde inhoud).",
     "type_login_attempts": "Aanmeldpogingen",
-    "type_login_attempts_desc": "Records van geslaagde en mislukte aanmeldpogingen."
+    "type_login_attempts_desc": "Records van geslaagde en mislukte aanmeldpogingen.",
+    "type_vol_mood_checkins": "Stemmingscheck-ins van vrijwilligers",
+    "type_vol_mood_checkins_desc": "Welzijnszelfrapportages (stemmingsscore en notitie) vastgelegd door vrijwilligers.",
+    "type_vol_wellbeing_alerts": "Welzijnswaarschuwingen",
+    "type_vol_wellbeing_alerts_desc": "Burn-outrisicowaarschuwingen over vrijwilligers. Alleen opgeloste of afgewezen waarschuwingen worden verwijderd.",
+    "type_vol_safeguarding_incidents": "Veiligheidsincidenten",
+    "type_vol_safeguarding_incidents_desc": "Dossiers van veiligheidszaken. Alleen opgeloste of gesloten zaken worden verwijderd; controleer wettelijke bewaarplichten vóór inschakeling.",
+    "type_vol_guardian_consents": "Toestemmingen van voogden",
+    "type_vol_guardian_consents_desc": "Toestemmingsrecords van voogden voor minderjarigen, verwijderd dit aantal dagen na het verlopen van de toestemming."
   },
   "seed_generator": {
     "count_aria_label": "Aantal {{label}}",

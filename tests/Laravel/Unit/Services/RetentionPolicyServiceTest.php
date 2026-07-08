@@ -74,9 +74,12 @@ class RetentionPolicyServiceTest extends TestCase
         $policies = RetentionPolicyService::getPolicies(1);
 
         $this->assertSame(array_keys(RetentionPolicyService::DATA_TYPES), array_keys($policies));
-        foreach ($policies as $policy) {
+        foreach ($policies as $type => $policy) {
             $this->assertFalse($policy['is_enabled'], 'policies must default to disabled (retain indefinitely)');
-            $this->assertSame(365, $policy['retention_days']);
+            // Each type advertises its registry default window (365 unless the
+            // registry sets a type-specific default_days, e.g. safeguarding).
+            $expected = (int) (RetentionPolicyService::DATA_TYPES[$type]['default_days'] ?? 365);
+            $this->assertSame($expected, $policy['retention_days']);
         }
     }
 }

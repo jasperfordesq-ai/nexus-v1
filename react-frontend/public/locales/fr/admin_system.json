@@ -152,7 +152,15 @@
     "type_email_log": "Journal des e-mails",
     "type_email_log_desc": "Enregistrements d'envoi des e-mails sortants (corps chiffrés).",
     "type_login_attempts": "Tentatives de connexion",
-    "type_login_attempts_desc": "Enregistrements des tentatives de connexion réussies et échouées."
+    "type_login_attempts_desc": "Enregistrements des tentatives de connexion réussies et échouées.",
+    "type_vol_mood_checkins": "Bilans d’humeur des bénévoles",
+    "type_vol_mood_checkins_desc": "Auto-évaluations de bien-être (score d’humeur et note) saisies par les bénévoles.",
+    "type_vol_wellbeing_alerts": "Alertes de bien-être",
+    "type_vol_wellbeing_alerts_desc": "Alertes de risque d’épuisement concernant des bénévoles. Seules les alertes résolues ou écartées sont purgées.",
+    "type_vol_safeguarding_incidents": "Incidents de protection",
+    "type_vol_safeguarding_incidents_desc": "Dossiers de protection. Seuls les cas résolus ou clos sont purgés ; vérifiez les obligations légales de conservation avant activation.",
+    "type_vol_guardian_consents": "Consentements des tuteurs",
+    "type_vol_guardian_consents_desc": "Consentements de tuteurs pour mineurs, purgés ce nombre de jours après leur expiration."
   },
   "seed_generator": {
     "count_aria_label": "Nombre de {{label}}",

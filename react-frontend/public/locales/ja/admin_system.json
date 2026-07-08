@@ -152,7 +152,15 @@
     "type_email_log": "メールログ",
     "type_email_log_desc": "送信メールの配信記録(本文は暗号化)。",
     "type_login_attempts": "ログイン試行",
-    "type_login_attempts_desc": "成功および失敗したサインイン試行の記録。"
+    "type_login_attempts_desc": "成功および失敗したサインイン試行の記録。",
+    "type_vol_mood_checkins": "ボランティアの気分チェックイン",
+    "type_vol_mood_checkins_desc": "ボランティアが記録したウェルビーイングの自己申告（気分スコアとメモ）。",
+    "type_vol_wellbeing_alerts": "ウェルビーイングアラート",
+    "type_vol_wellbeing_alerts_desc": "ボランティアの燃え尽きリスクに関するアラート。解決済みまたは却下済みのアラートのみ削除されます。",
+    "type_vol_safeguarding_incidents": "セーフガーディング事案",
+    "type_vol_safeguarding_incidents_desc": "セーフガーディング事案の記録。解決済みまたは終結した事案のみ削除されます。有効化する前に法定保存義務を確認してください。",
+    "type_vol_guardian_consents": "保護者の同意",
+    "type_vol_guardian_consents_desc": "未成年者の保護者同意記録。同意の有効期限からこの日数が経過した後に削除されます。"
   },
   "seed_generator": {
     "count_aria_label": "{{label}} の件数",

@@ -152,7 +152,15 @@
     "type_email_log": "E-Mail-Protokoll",
     "type_email_log_desc": "Zustellprotokolle ausgehender E-Mails (verschlüsselte Inhalte).",
     "type_login_attempts": "Anmeldeversuche",
-    "type_login_attempts_desc": "Aufzeichnungen erfolgreicher und fehlgeschlagener Anmeldeversuche."
+    "type_login_attempts_desc": "Aufzeichnungen erfolgreicher und fehlgeschlagener Anmeldeversuche.",
+    "type_vol_mood_checkins": "Stimmungs-Check-ins von Freiwilligen",
+    "type_vol_mood_checkins_desc": "Selbstauskünfte zum Wohlbefinden (Stimmungswert und Notiz) von Freiwilligen.",
+    "type_vol_wellbeing_alerts": "Wohlbefindens-Warnungen",
+    "type_vol_wellbeing_alerts_desc": "Burnout-Risiko-Warnungen zu Freiwilligen. Nur gelöste oder verworfene Warnungen werden gelöscht.",
+    "type_vol_safeguarding_incidents": "Schutzvorfälle",
+    "type_vol_safeguarding_incidents_desc": "Schutzfall-Akten. Nur gelöste oder geschlossene Fälle werden gelöscht; prüfen Sie gesetzliche Aufbewahrungspflichten vor der Aktivierung.",
+    "type_vol_guardian_consents": "Einwilligungen von Erziehungsberechtigten",
+    "type_vol_guardian_consents_desc": "Einwilligungen für Minderjährige, gelöscht so viele Tage nach Ablauf der Einwilligung."
   },
   "seed_generator": {
     "count_aria_label": "Anzahl {{label}}",

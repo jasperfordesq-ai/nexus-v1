@@ -152,7 +152,15 @@
     "type_email_log": "Email log",
     "type_email_log_desc": "Outbound email delivery records (encrypted bodies).",
     "type_login_attempts": "Login attempts",
-    "type_login_attempts_desc": "Successful and failed sign-in attempt records."
+    "type_login_attempts_desc": "Successful and failed sign-in attempt records.",
+    "type_vol_mood_checkins": "Volunteer mood check-ins",
+    "type_vol_mood_checkins_desc": "Wellbeing self-reports (mood score and note) recorded by volunteers.",
+    "type_vol_wellbeing_alerts": "Volunteer wellbeing alerts",
+    "type_vol_wellbeing_alerts_desc": "Burnout-risk alerts about volunteers. Only resolved or dismissed alerts are purged.",
+    "type_vol_safeguarding_incidents": "Safeguarding incidents",
+    "type_vol_safeguarding_incidents_desc": "Safeguarding case records. Only resolved or closed cases are purged; check statutory retention duties before enabling.",
+    "type_vol_guardian_consents": "Guardian consents",
+    "type_vol_guardian_consents_desc": "Guardian consent records for minors, purged this many days after the consent expires."
   },
   "seed_generator": {
     "count_aria_label": "{{label}} count",

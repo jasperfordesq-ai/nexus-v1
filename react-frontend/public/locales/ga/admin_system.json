@@ -152,7 +152,15 @@
     "type_email_log": "Loga ríomhphoist",
     "type_email_log_desc": "Taifid seachadta ríomhphost amach (coirp chriptithe).",
     "type_login_attempts": "Iarrachtaí logála isteach",
-    "type_login_attempts_desc": "Taifid ar iarrachtaí sínithe isteach rathúla agus teipthe."
+    "type_login_attempts_desc": "Taifid ar iarrachtaí sínithe isteach rathúla agus teipthe.",
+    "type_vol_mood_checkins": "Seiceálacha meanma na n-oibrithe deonacha",
+    "type_vol_mood_checkins_desc": "Féin-tuairiscí folláine (scór meanma agus nóta) a thaifeadann oibrithe deonacha.",
+    "type_vol_wellbeing_alerts": "Foláirimh folláine",
+    "type_vol_wellbeing_alerts_desc": "Foláirimh riosca dó amach faoi oibrithe deonacha. Ní ghlantar ach foláirimh réitithe nó díbhe.",
+    "type_vol_safeguarding_incidents": "Teagmhais chosanta",
+    "type_vol_safeguarding_incidents_desc": "Taifid chásanna cosanta. Ní ghlantar ach cásanna réitithe nó dúnta; seiceáil dualgais choinneála reachtúla sula gcumasaítear é.",
+    "type_vol_guardian_consents": "Toilithe caomhnóirí",
+    "type_vol_guardian_consents_desc": "Taifid toilithe caomhnóirí do mhionaoisigh, glanta an líon seo laethanta tar éis don toiliú dul in éag."
   },
   "seed_generator": {
     "count_aria_label": "Líon {{label}}",

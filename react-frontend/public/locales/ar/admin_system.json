@@ -152,7 +152,15 @@
     "type_email_log": "سجل البريد الإلكتروني",
     "type_email_log_desc": "سجلات تسليم البريد الإلكتروني الصادر (نصوص مشفّرة).",
     "type_login_attempts": "محاولات تسجيل الدخول",
-    "type_login_attempts_desc": "سجلات محاولات تسجيل الدخول الناجحة والفاشلة."
+    "type_login_attempts_desc": "سجلات محاولات تسجيل الدخول الناجحة والفاشلة.",
+    "type_vol_mood_checkins": "تسجيلات مزاج المتطوعين",
+    "type_vol_mood_checkins_desc": "تقارير ذاتية عن الرفاه (درجة المزاج وملاحظة) يسجلها المتطوعون.",
+    "type_vol_wellbeing_alerts": "تنبيهات الرفاه",
+    "type_vol_wellbeing_alerts_desc": "تنبيهات خطر الإرهاق بشأن المتطوعين. تُحذف فقط التنبيهات المحلولة أو المرفوضة.",
+    "type_vol_safeguarding_incidents": "حوادث الحماية",
+    "type_vol_safeguarding_incidents_desc": "سجلات قضايا الحماية. تُحذف فقط القضايا المحلولة أو المغلقة؛ تحقق من واجبات الاحتفاظ القانونية قبل التفعيل.",
+    "type_vol_guardian_consents": "موافقات أولياء الأمور",
+    "type_vol_guardian_consents_desc": "سجلات موافقة أولياء الأمور للقاصرين، تُحذف بعد هذا العدد من الأيام من انتهاء صلاحية الموافقة."
   },
   "seed_generator": {
     "count_aria_label": "عدد {{label}}",

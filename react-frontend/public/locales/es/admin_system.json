@@ -152,7 +152,15 @@
     "type_email_log": "Registro de correos",
     "type_email_log_desc": "Registros de entrega de correos salientes (cuerpos cifrados).",
     "type_login_attempts": "Intentos de inicio de sesión",
-    "type_login_attempts_desc": "Registros de intentos de inicio de sesión correctos y fallidos."
+    "type_login_attempts_desc": "Registros de intentos de inicio de sesión correctos y fallidos.",
+    "type_vol_mood_checkins": "Registros de ánimo de voluntariado",
+    "type_vol_mood_checkins_desc": "Autoinformes de bienestar (puntuación de ánimo y nota) registrados por voluntarios.",
+    "type_vol_wellbeing_alerts": "Alertas de bienestar",
+    "type_vol_wellbeing_alerts_desc": "Alertas de riesgo de agotamiento sobre voluntarios. Solo se purgan las alertas resueltas o descartadas.",
+    "type_vol_safeguarding_incidents": "Incidentes de protección",
+    "type_vol_safeguarding_incidents_desc": "Expedientes de protección. Solo se purgan los casos resueltos o cerrados; compruebe las obligaciones legales de conservación antes de activarlo.",
+    "type_vol_guardian_consents": "Consentimientos de tutores",
+    "type_vol_guardian_consents_desc": "Consentimientos de tutores para menores, purgados este número de días tras su caducidad."
   },
   "seed_generator": {
     "count_aria_label": "Recuento de {{label}}",

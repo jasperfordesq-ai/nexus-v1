@@ -152,7 +152,15 @@
     "type_email_log": "Dziennik e-maili",
     "type_email_log_desc": "Rejestry dostarczania wychodzących e-maili (zaszyfrowana treść).",
     "type_login_attempts": "Próby logowania",
-    "type_login_attempts_desc": "Rejestry udanych i nieudanych prób logowania."
+    "type_login_attempts_desc": "Rejestry udanych i nieudanych prób logowania.",
+    "type_vol_mood_checkins": "Odprawy nastroju wolontariuszy",
+    "type_vol_mood_checkins_desc": "Samooceny dobrostanu (ocena nastroju i notatka) rejestrowane przez wolontariuszy.",
+    "type_vol_wellbeing_alerts": "Alerty dobrostanu",
+    "type_vol_wellbeing_alerts_desc": "Alerty o ryzyku wypalenia dotyczące wolontariuszy. Usuwane są tylko alerty rozwiązane lub odrzucone.",
+    "type_vol_safeguarding_incidents": "Incydenty ochrony",
+    "type_vol_safeguarding_incidents_desc": "Akta spraw ochrony. Usuwane są tylko sprawy rozwiązane lub zamknięte; przed włączeniem sprawdź ustawowe obowiązki przechowywania.",
+    "type_vol_guardian_consents": "Zgody opiekunów",
+    "type_vol_guardian_consents_desc": "Zgody opiekunów dla nieletnich, usuwane po upływie tylu dni od wygaśnięcia zgody."
   },
   "seed_generator": {
     "count_aria_label": "Liczba {{label}}",

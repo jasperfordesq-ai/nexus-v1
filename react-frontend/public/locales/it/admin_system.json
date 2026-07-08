@@ -152,7 +152,15 @@
     "type_email_log": "Registro e-mail",
     "type_email_log_desc": "Record di consegna delle e-mail in uscita (corpi cifrati).",
     "type_login_attempts": "Tentativi di accesso",
-    "type_login_attempts_desc": "Record dei tentativi di accesso riusciti e non riusciti."
+    "type_login_attempts_desc": "Record dei tentativi di accesso riusciti e non riusciti.",
+    "type_vol_mood_checkins": "Check-in dell’umore dei volontari",
+    "type_vol_mood_checkins_desc": "Autovalutazioni di benessere (punteggio dell’umore e nota) registrate dai volontari.",
+    "type_vol_wellbeing_alerts": "Avvisi di benessere",
+    "type_vol_wellbeing_alerts_desc": "Avvisi di rischio burnout sui volontari. Vengono eliminati solo gli avvisi risolti o archiviati.",
+    "type_vol_safeguarding_incidents": "Incidenti di tutela",
+    "type_vol_safeguarding_incidents_desc": "Fascicoli di tutela. Vengono eliminati solo i casi risolti o chiusi; verificare gli obblighi legali di conservazione prima di attivarlo.",
+    "type_vol_guardian_consents": "Consensi dei tutori",
+    "type_vol_guardian_consents_desc": "Consensi dei tutori per minori, eliminati questo numero di giorni dopo la scadenza."
   },
   "seed_generator": {
     "count_aria_label": "Conteggio {{label}}",

@@ -41,7 +41,12 @@ class RetentionPolicyService
 
     /**
      * Registry of purgeable data types.
-     * column = timestamp the retention window is measured against.
+     * column       = timestamp the retention window is measured against.
+     * default_days = window shown in the admin UI before a policy row exists
+     *                (policies remain opt-in/disabled by default).
+     * where_in     = optional status guard — only rows in these states are
+     *                ever purged (open/active records are never disposed of
+     *                regardless of age).
      */
     public const DATA_TYPES = [
         'activity_log' => [
@@ -59,6 +64,40 @@ class RetentionPolicyService
         'email_log' => [
             'table' => 'email_log',
             'column' => 'created_at',
+        ],
+        // Volunteering special-category data (GDPR Art. 9 adjacent). All
+        // opt-in: enabling is a per-tenant DPO decision; the defaults below
+        // are the recommended storage-limitation windows.
+        'vol_mood_checkins' => [
+            // Wellbeing self-reports (mood score + free-text note).
+            'table' => 'vol_mood_checkins',
+            'column' => 'created_at',
+            'default_days' => 365,
+        ],
+        'vol_wellbeing_alerts' => [
+            // Burnout-risk alerts about a volunteer. Only concluded alerts
+            // are purgeable; active/acknowledged ones stay regardless of age.
+            'table' => 'vol_wellbeing_alerts',
+            'column' => 'created_at',
+            'default_days' => 730,
+            'where_in' => ['status' => ['resolved', 'dismissed']],
+        ],
+        'vol_safeguarding_incidents' => [
+            // Safeguarding case records. Statutory retention is long — the
+            // default is ~7 years — and ONLY closed cases are ever purged;
+            // open/investigating/escalated incidents are live case files.
+            'table' => 'vol_safeguarding_incidents',
+            'column' => 'created_at',
+            'default_days' => 2555,
+            'where_in' => ['status' => ['resolved', 'closed']],
+        ],
+        'vol_guardian_consents' => [
+            // Minor guardian consents, measured from EXPIRY (expires_at), so
+            // a consent record is kept N days beyond its lapse as evidence
+            // and then purged. Rows with no expiry are never matched.
+            'table' => 'vol_guardian_consents',
+            'column' => 'expires_at',
+            'default_days' => 365,
         ],
         // NOTE: login_attempts is deliberately NOT here. It is global
         // rate-limiting data with no tenant_id column, so a per-tenant
@@ -81,11 +120,11 @@ class RetentionPolicyService
             ->keyBy('data_type');
 
         $policies = [];
-        foreach (array_keys(self::DATA_TYPES) as $type) {
+        foreach (self::DATA_TYPES as $type => $config) {
             $row = $rows->get($type);
             $policies[$type] = [
                 'data_type' => $type,
-                'retention_days' => $row ? (int) $row->retention_days : 365,
+                'retention_days' => $row ? (int) $row->retention_days : (int) ($config['default_days'] ?? 365),
                 'action' => $row ? (string) $row->action : 'delete',
                 'is_enabled' => $row ? (bool) $row->is_enabled : false,
                 'updated_at' => $row->updated_at ?? null,
@@ -173,13 +212,21 @@ class RetentionPolicyService
         $error = null;
 
         // Fail safe rather than fail nightly: a registered type whose table
-        // lacks tenant_id or the timestamp column could never be scoped
-        // correctly. Skip it (status 'skipped', no DELETE) instead of
-        // throwing an unscoped query every run.
-        if (
-            !\Schema::hasColumn($config['table'], 'tenant_id')
-            || !\Schema::hasColumn($config['table'], $config['column'])
-        ) {
+        // lacks tenant_id, the timestamp column, or a where_in guard column
+        // could never be scoped correctly. Skip it (status 'skipped', no
+        // DELETE) instead of throwing an unscoped query every run.
+        $requiredColumns = array_merge(
+            ['tenant_id', $config['column']],
+            array_keys($config['where_in'] ?? [])
+        );
+        $missingColumn = false;
+        foreach ($requiredColumns as $requiredColumn) {
+            if (!\Schema::hasColumn($config['table'], $requiredColumn)) {
+                $missingColumn = true;
+                break;
+            }
+        }
+        if ($missingColumn) {
             Log::warning('[Retention] skipped — table missing tenant_id/timestamp column', [
                 'tenant_id' => $tenantId,
                 'data_type' => $dataType,
@@ -192,9 +239,19 @@ class RetentionPolicyService
         try {
             for ($batch = 0; $batch < self::MAX_BATCHES_PER_RUN; $batch++) {
                 // Every batch is tenant-scoped AND bounded.
-                $deleted = DB::table($config['table'])
+                $query = DB::table($config['table'])
                     ->where('tenant_id', $tenantId)
-                    ->where($config['column'], '<', $cutoff)
+                    ->where($config['column'], '<', $cutoff);
+
+                // Status guard: types with a where_in constraint only ever
+                // purge rows in the listed (concluded) states — an open
+                // safeguarding case or active wellbeing alert is never
+                // disposed of, however old it is.
+                foreach (($config['where_in'] ?? []) as $col => $values) {
+                    $query->whereIn($col, $values);
+                }
+
+                $deleted = $query
                     ->limit(self::BATCH_SIZE)
                     ->delete();
 
