@@ -88,7 +88,7 @@
                     <h2 class="govuk-heading-l">{{ __('govuk_alpha.federation.hub.hero_title') }}</h2>
                     <p class="govuk-body">{{ __('govuk_alpha.federation.hub.hero_description') }}</p>
                     <div class="govuk-button-group">
-                        <a class="govuk-button" data-module="govuk-button" href="{{ route('govuk-alpha.federation.opt-in', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.optin_banner_cta') }}</a>
+                        <a class="govuk-button" data-module="govuk-button" href="{{ route('govuk-alpha.federation.onboarding', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.federation.hub.optin_banner_cta') }}</a>
                     </div>
                 </div>
             </div>

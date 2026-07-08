@@ -371,6 +371,22 @@ class FederationParityTest extends TestCase
         $response->assertForbidden();
     }
 
+    public function test_accessible_hub_links_opted_out_member_to_onboarding_wizard(): void
+    {
+        // Regression (audit M6): the opted-out hub CTA must point at the guided
+        // onboarding wizard (parity with the React opt-in UX), not only the flat
+        // opt-in form. Previously the wizard was reachable by URL alone.
+        $this->enableFederationForTenant();
+        $this->authenticatedUser(['name' => 'Opted Out Member']);
+        // No federation_user_settings row → the member is opted out.
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/federation");
+
+        $response->assertOk();
+        $onboardingUrl = route('govuk-alpha.federation.onboarding', ['tenantSlug' => $this->testTenantSlug]);
+        $response->assertSee($onboardingUrl, false);
+    }
+
     public function test_accessible_hub_counts_received_federated_transactions(): void
     {
         $this->enableFederationForTenant();
