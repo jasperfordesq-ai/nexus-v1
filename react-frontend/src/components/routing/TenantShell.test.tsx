@@ -82,6 +82,18 @@ vi.mock('@/contexts/MenuContext', () => ({
   MenuProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
+vi.mock('./TenantAppProviders', () => ({
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="tenant-app-providers">{children}</div>
+  ),
+}));
+
+vi.mock('./TenantPublicProviders', () => ({
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="tenant-public-providers">{children}</div>
+  ),
+}));
+
 const mockDetectTenantFromUrl = vi.fn(() => ({ slug: null, source: null }));
 
 vi.mock('@/lib/tenant-routing', () => ({
@@ -321,6 +333,22 @@ describe('TenantShell', () => {
 
       expect(screen.queryByTestId('app-routes')).not.toBeInTheDocument();
       expect(await screen.findByTestId('auth-routes')).toBeInTheDocument();
+    });
+
+    it('uses full app providers for protected routes even before auth is settled', async () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
+      setupDefaultMocks({
+        auth: {
+          isAuthenticated: false,
+          isLoading: true,
+          user: null,
+        },
+      });
+
+      renderWithRouter('/dashboard');
+
+      expect(await screen.findByTestId('tenant-app-providers')).toBeInTheDocument();
+      expect(screen.queryByTestId('tenant-public-providers')).not.toBeInTheDocument();
     });
   });
 
