@@ -84,6 +84,25 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({ resolveAvatarUrl: (url: string | null) => url ?? '', cn: (...classes: unknown[]) => classes.filter(Boolean).join(' ') }));
 
+// PageMeta is imported via the deep path `@/components/seo/PageMeta`, which the
+// global `@/components/seo` mock in src/test/setup.ts does NOT intercept. Left
+// real, it calls useTenant() from @/contexts/TenantContext (bypassing this file's
+// `@/contexts` mock) and throws "useTenant must be used within a TenantProvider".
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
+
+// Breadcrumbs also pulls useTenant() from @/contexts/TenantContext (deep path,
+// not this file's `@/contexts` barrel mock), so stub it out like the sibling
+// OrganisationsPage test does.
+vi.mock('@/components/navigation', () => ({
+  Breadcrumbs: ({ items }: { items: { label: string; href?: string }[] }) => (
+    <nav data-testid="breadcrumbs">
+      {items.map((item) => (
+        <span key={item.label}>{item.label}</span>
+      ))}
+    </nav>
+  ),
+}));
+
 import { OrganisationDetailPage } from './OrganisationDetailPage';
 
 const mockOrganisation = {

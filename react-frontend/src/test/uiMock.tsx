@@ -183,6 +183,14 @@ const handler: ProxyHandler<Record<string, unknown>> = {
     }
     if (prop === '__esModule') return true;
     if (prop === 'default') return undefined;
+    // CRITICAL: the mock stands in for an ES module namespace, which must NOT
+    // look like a thenable. If `then` resolves to a truthy stub (any capitalised
+    // or lowercase name otherwise becomes one below), Vitest's module-linking
+    // interop treats the namespace as a promise and awaits `namespace.then(...)`,
+    // which never settles — the worker spins at 100% CPU forever. Every barrel
+    // (`import { X } from '@/components/ui'`) consumer would hang. Keep `then`
+    // (and the `has` trap below) reporting "no such export".
+    if (prop === 'then') return undefined;
     if (prop === 'ICON_MAP') return {};
     if (prop === 'ICON_NAMES') return [];
     if (cache.has(prop)) return cache.get(prop);
@@ -201,7 +209,10 @@ const handler: ProxyHandler<Record<string, unknown>> = {
     cache.set(prop, value);
     return value;
   },
-  has() {
+  has(_target, prop) {
+    // Mirror `get`: never claim to own `then`, so `'then' in namespace` is false
+    // and the namespace is not mistaken for a thenable during module linking.
+    if (prop === 'then') return false;
     return true;
   },
 };

@@ -55,6 +55,12 @@ vi.mock('@/lib/logger', () => ({
   logError: vi.fn(),
 }));
 
+// PageMeta is imported via the deep path `@/components/seo/PageMeta`, which the
+// global `@/components/seo` mock in src/test/setup.ts does NOT intercept. Left
+// real, it calls useTenant() from @/contexts/TenantContext (bypassing this file's
+// `@/contexts` mock) and throws "useTenant must be used within a TenantProvider".
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
+
 vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('@/components/feedback', () => ({
