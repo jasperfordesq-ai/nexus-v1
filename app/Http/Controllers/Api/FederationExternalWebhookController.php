@@ -1216,6 +1216,8 @@ class FederationExternalWebhookController extends BaseApiController
         // Record the completed transaction in our federation_transactions table
         $recipientId = $data['recipient_id'] ?? $data['local_member_id'] ?? null;
         $senderId = $data['sender_id'] ?? 0;
+        // Already normalized to HOURS by the protocol adapter (TimeOverflow
+        // seconds are converted upstream in normalizeWebhookPayload).
         $amount = (float) ($data['amount'] ?? 0);
         $description = $data['description'] ?? '';
 
@@ -1420,11 +1422,13 @@ class FederationExternalWebhookController extends BaseApiController
         }
 
         $externalTxId = $data['external_transaction_id'] ?? null;
-        $rawAmount = (float) ($data['amount'] ?? 0);
 
-        // TimeOverflow sends amount in SECONDS — convert to hours for Nexus
-        // Detect: if amount > 100, it's almost certainly seconds (nobody sends 100+ hours)
-        $amountInHours = $rawAmount > 100 ? round($rawAmount / 3600, 2) : $rawAmount;
+        // Amount arrives already normalized to HOURS: the protocol adapter
+        // (e.g. TimeOverflowAdapter::normalizeWebhookPayload) converts partner
+        // units — TimeOverflow sends seconds — before this handler runs, and
+        // native Nexus partners send hours directly. The old >100 magnitude
+        // heuristic mis-converted small seconds and large hours alike.
+        $amountInHours = (float) ($data['amount'] ?? 0);
 
         // Accept multiple field names for recipient — different platforms use different keys
         $recipientId = $data['recipient_id']
@@ -1435,7 +1439,6 @@ class FederationExternalWebhookController extends BaseApiController
         Log::info('[FederationExternalWebhook] Transaction requested', [
             'partner' => $partner->name,
             'external_transaction_id' => $externalTxId,
-            'raw_amount' => $rawAmount,
             'amount_hours' => $amountInHours,
             'recipient_id' => $recipientId,
         ]);

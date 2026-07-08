@@ -225,6 +225,47 @@ class TimeOverflowAdapterTest extends TestCase
         $this->assertFalse($payload['allow_transactions']);
     }
 
+    // ── Webhook payload normalization (unit conversion) ──────────────
+
+    public function test_normalizeWebhookPayload_converts_transaction_amount_seconds_to_hours(): void
+    {
+        // Regression (audit M1): a 60-second transfer must credit 0.02h, not 60h.
+        // Conversion is deterministic per-protocol here so the shared inbound
+        // handlers no longer guess units with a magnitude heuristic.
+        $adapter = new TimeOverflowAdapter();
+
+        foreach (['transaction.completed', 'transaction.requested'] as $event) {
+            $out = $adapter->normalizeWebhookPayload([
+                'event' => $event,
+                'data'  => ['amount' => 60, 'external_transaction_id' => 'tx-1'],
+            ]);
+            $this->assertSame($event, $out['event']);
+            $this->assertSame(0.02, $out['data']['amount'], "amount for {$event}");
+            $this->assertSame('tx-1', $out['data']['external_transaction_id']);
+        }
+    }
+
+    public function test_normalizeWebhookPayload_converts_one_hour_in_seconds_to_one(): void
+    {
+        $adapter = new TimeOverflowAdapter();
+        $out = $adapter->normalizeWebhookPayload([
+            'event' => 'transaction.completed',
+            'data'  => ['amount' => 3600],
+        ]);
+        $this->assertSame(1.0, $out['data']['amount']);
+    }
+
+    public function test_normalizeWebhookPayload_leaves_non_transaction_amounts_untouched(): void
+    {
+        $adapter = new TimeOverflowAdapter();
+        $out = $adapter->normalizeWebhookPayload([
+            'event' => 'listing.created',
+            'data'  => ['amount' => 60, 'title' => 'Gardening'],
+        ]);
+        $this->assertSame(60, $out['data']['amount']);
+        $this->assertSame('Gardening', $out['data']['title']);
+    }
+
     // ── Interface accessors ──────────────────────────────────────────
 
     public function test_getProtocolName_returns_platform_constant(): void

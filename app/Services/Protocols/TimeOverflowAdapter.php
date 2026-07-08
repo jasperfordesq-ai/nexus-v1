@@ -526,9 +526,25 @@ class TimeOverflowAdapter implements FederationProtocolAdapter
 
     public function normalizeWebhookPayload(array $rawPayload): array
     {
+        $event = $rawPayload['event'] ?? 'unknown';
+        $data  = $rawPayload['data'] ?? [];
+
+        // TimeOverflow sends time amounts in SECONDS; Nexus works in hours.
+        // Normalize transaction amounts deterministically here so the shared
+        // inbound handlers can treat every protocol's `amount` uniformly as
+        // hours — instead of guessing units with a magnitude heuristic (which
+        // over-credited seconds < 100 and under-credited hours > 100).
+        if (is_array($data)
+            && in_array($event, ['transaction.completed', 'transaction.requested', 'transaction.cancelled'], true)
+            && isset($data['amount'])
+            && is_numeric($data['amount'])
+        ) {
+            $data['amount'] = self::secondsToHours((int) round((float) $data['amount']));
+        }
+
         return [
-            'event' => $rawPayload['event'] ?? 'unknown',
-            'data'  => $rawPayload['data'] ?? [],
+            'event' => $event,
+            'data'  => $data,
         ];
     }
 
