@@ -37,6 +37,9 @@ class VolCustomField extends Model
         'is_required' => 'boolean',
         'is_active' => 'boolean',
         'display_order' => 'integer',
+        // JSON column (json_valid CHECK at the DB level). Writers must set an
+        // array — a JSON string set through this cast would be double-encoded.
+        'field_options' => 'array',
     ];
 
     public function organization(): BelongsTo

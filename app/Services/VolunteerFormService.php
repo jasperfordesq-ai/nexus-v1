@@ -151,11 +151,19 @@ class VolunteerFormService
         }
 
         if (!isset($data['field_options']) && array_key_exists('options', $data)) {
-            $data['field_options'] = is_array($data['options']) ? json_encode($data['options']) : $data['options'];
+            $data['field_options'] = $data['options'];
         }
 
         if (!isset($data['field_options']) && array_key_exists('options_json', $data)) {
             $data['field_options'] = $data['options_json'];
+        }
+
+        // VolCustomField casts field_options to 'array', so the value must be
+        // set as an array — setting a JSON string through the cast would
+        // double-encode it. Accept legacy JSON-string input by decoding.
+        if (isset($data['field_options']) && is_string($data['field_options'])) {
+            $decoded = json_decode($data['field_options'], true);
+            $data['field_options'] = is_array($decoded) ? $decoded : null;
         }
 
         return $data;
