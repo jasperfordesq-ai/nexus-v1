@@ -2259,9 +2259,17 @@ class VolunteerService
             return null;
         }
 
-        if (!empty($website) && !filter_var($website, FILTER_VALIDATE_URL)) {
-            self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_org_website_invalid'), 'field' => 'website'];
-            return null;
+        if (!empty($website)) {
+            // Restrict to http/https. This service is the shared create sink for
+            // the React member form, both GOV.UK register paths, and the admin
+            // create endpoint. The website is rendered as an <a href> on the
+            // PUBLIC org page, so javascript:/data: schemes are a link-injection
+            // hole — and FILTER_VALIDATE_URL alone accepts them.
+            $scheme = strtolower((string) parse_url((string) $website, PHP_URL_SCHEME));
+            if (!filter_var($website, FILTER_VALIDATE_URL) || !in_array($scheme, ['http', 'https'], true)) {
+                self::$errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.volunteer_org_website_invalid'), 'field' => 'website'];
+                return null;
+            }
         }
 
         // Check for duplicate name

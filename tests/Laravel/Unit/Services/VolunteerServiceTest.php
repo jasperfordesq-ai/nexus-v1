@@ -285,4 +285,36 @@ class VolunteerServiceTest extends TestCase
             'target_id' => $target->id,
         ]);
     }
+
+    public function test_createOrganization_rejects_non_http_website_scheme(): void
+    {
+        // Regression (audit M5): the website renders as a public <a href>, so a
+        // javascript:/data: URL is a link-injection hole. FILTER_VALIDATE_URL
+        // alone accepted these — the scheme allow-list must reject them.
+        $owner = User::factory()->forTenant(2)->create();
+
+        $orgId = VolunteerService::createOrganization($owner->id, [
+            'name' => 'Scheme Test Org',
+            'description' => 'A description long enough to pass validation checks.',
+            'contact_email' => 'scheme-org@test.test',
+            'website' => 'javascript://%0aalert(1)',
+        ]);
+
+        $this->assertNull($orgId);
+        $this->assertSame('website', VolunteerService::getErrors()[0]['field'] ?? null);
+    }
+
+    public function test_createOrganization_accepts_https_website(): void
+    {
+        $owner = User::factory()->forTenant(2)->create();
+
+        $orgId = VolunteerService::createOrganization($owner->id, [
+            'name' => 'Valid Website Org ' . uniqid(),
+            'description' => 'A description long enough to pass validation checks.',
+            'contact_email' => 'valid-org@test.test',
+            'website' => 'https://example.org',
+        ]);
+
+        $this->assertNotNull($orgId);
+    }
 }

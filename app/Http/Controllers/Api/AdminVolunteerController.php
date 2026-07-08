@@ -813,8 +813,12 @@ class AdminVolunteerController extends BaseApiController
                 if ($field === 'contact_email' && $value !== '' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
                     return $this->respondWithError('VALIDATION_ERROR', __('api.valid_email_address_required'), $field, 422);
                 }
-                if ($field === 'website' && $value !== '' && !filter_var($value, FILTER_VALIDATE_URL)) {
-                    return $this->respondWithError('VALIDATION_ERROR', __('api.valid_url_required'), $field, 422);
+                if ($field === 'website' && $value !== '') {
+                    // http/https only — the value renders as a public <a href>.
+                    $scheme = strtolower((string) parse_url($value, PHP_URL_SCHEME));
+                    if (!filter_var($value, FILTER_VALIDATE_URL) || !in_array($scheme, ['http', 'https'], true)) {
+                        return $this->respondWithError('VALIDATION_ERROR', __('api.valid_url_required'), $field, 422);
+                    }
                 }
                 $updates[] = "{$field} = ?";
                 $params[] = $value === '' ? null : $value;

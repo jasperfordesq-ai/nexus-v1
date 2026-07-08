@@ -24,7 +24,10 @@ class CreateOrganisationRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'min:20', 'max:5000'],
             'contact_email' => ['required', 'email', 'max:255'],
-            'website' => ['nullable', 'url', 'max:500'],
+            // http/https only — the website renders as an <a href> on the PUBLIC
+            // org page, so other schemes (javascript:, data:) are a link-injection
+            // hole. Mirrors UpdateOrganisationRequest and the service-level check.
+            'website' => ['nullable', 'url:http,https', 'max:500'],
         ];
     }
 }
