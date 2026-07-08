@@ -217,4 +217,72 @@ class VolunteerServiceTest extends TestCase
         $this->assertEquals(3.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
         $this->assertSame(1, DB::table('vol_org_transactions')->where('vol_log_id', $logId)->where('type', 'volunteer_payment')->count());
     }
+
+    public function test_create_review_rejects_cross_tenant_application_history(): void
+    {
+        DB::table('tenants')->insertOrIgnore([
+            'id' => 999,
+            'name' => 'Foreign Review Tenant',
+            'slug' => 'foreign-review-tenant',
+            'is_active' => true,
+            'depth' => 0,
+            'allows_subtenants' => false,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $owner = User::factory()->forTenant(2)->create();
+        $reviewer = User::factory()->forTenant(2)->create();
+        $target = User::factory()->forTenant(2)->create();
+
+        $orgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => 2,
+            'user_id' => $owner->id,
+            'name' => 'Review Isolation Org',
+            'slug' => 'review-isolation-org-' . uniqid(),
+            'description' => 'Organisation used for volunteer review tenant isolation coverage.',
+            'contact_email' => 'review-isolation@example.test',
+            'status' => 'active',
+            'balance' => 0.00,
+            'created_at' => now(),
+        ]);
+
+        $opportunityId = DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => 2,
+            'organization_id' => $orgId,
+            'title' => 'Tenant-scoped Review Shift',
+            'description' => 'A shared volunteering opportunity.',
+            'is_active' => 1,
+            'status' => 'open',
+            'created_by' => $owner->id,
+            'created_at' => now(),
+        ]);
+
+        DB::table('vol_applications')->insert([
+            'tenant_id' => 2,
+            'opportunity_id' => $opportunityId,
+            'user_id' => $reviewer->id,
+            'status' => 'approved',
+            'created_at' => now(),
+        ]);
+        DB::table('vol_applications')->insert([
+            'tenant_id' => 999,
+            'opportunity_id' => $opportunityId,
+            'user_id' => $target->id,
+            'status' => 'approved',
+            'created_at' => now(),
+        ]);
+
+        TenantContext::setById(2);
+        $reviewId = VolunteerService::createReview($reviewer->id, 'user', $target->id, 5, 'Great teamwork.');
+
+        $this->assertNull($reviewId);
+        $this->assertSame('FORBIDDEN', VolunteerService::getErrors()[0]['code'] ?? null);
+        $this->assertDatabaseMissing('vol_reviews', [
+            'tenant_id' => 2,
+            'reviewer_id' => $reviewer->id,
+            'target_type' => 'user',
+            'target_id' => $target->id,
+        ]);
+    }
 }

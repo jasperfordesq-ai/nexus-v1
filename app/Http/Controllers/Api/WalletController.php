@@ -160,16 +160,16 @@ class WalletController extends BaseApiController
             $status = 422;
             $msg = $e->getMessage();
 
-            if (str_contains($msg, 'not found')) {
+            if ($msg === __('api.wallet_transfer_recipient_not_found')) {
                 $code = 'NOT_FOUND';
                 $status = 404;
-            } elseif (str_contains($msg, 'Insufficient')) {
+            } elseif ($msg === __('api.wallet_transfer_insufficient_balance')) {
                 $code = 'INSUFFICIENT_FUNDS';
                 $status = 400;
-            } elseif (str_contains($msg, 'yourself')) {
+            } elseif ($msg === __('api.wallet_transfer_self_forbidden')) {
                 $code = 'VALIDATION_ERROR';
                 $status = 400;
-            } elseif (str_contains($msg, 'Duplicate')) {
+            } elseif ($msg === __('api.wallet_transfer_duplicate')) {
                 // A concurrent in-flight duplicate of this transfer (the original
                 // hasn't committed yet). 409 so the client can stop retrying.
                 $code = 'DUPLICATE_TRANSACTION';

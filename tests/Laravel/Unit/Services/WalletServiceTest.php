@@ -64,7 +64,7 @@ class WalletServiceTest extends TestCase
     public function test_transfer_throws_when_no_recipient(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Recipient is required');
+        $this->expectExceptionMessage(__('api.wallet_transfer_recipient_required'));
 
         $this->service->transfer(1, ['amount' => 1]);
     }
@@ -72,7 +72,7 @@ class WalletServiceTest extends TestCase
     public function test_transfer_throws_when_amount_zero(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Amount must be greater than 0');
+        $this->expectExceptionMessage(__('api.wallet_transfer_amount_positive'));
 
         $this->service->transfer(1, ['recipient' => 2, 'amount' => 0]);
     }
@@ -87,7 +87,7 @@ class WalletServiceTest extends TestCase
         $this->mockUser->shouldReceive('newQuery')->andReturn($mockBuilder);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Recipient not found');
+        $this->expectExceptionMessage(__('api.wallet_transfer_recipient_not_found'));
 
         $this->service->transfer(1, ['recipient' => 999, 'amount' => 1]);
     }
@@ -99,12 +99,13 @@ class WalletServiceTest extends TestCase
         // setAttribute() expectation error; only ->id is read before the throw.
         $receiver = new User();
         $receiver->id = 1;
+        $mockBuilder->shouldReceive('where')->andReturnSelf();
         $mockBuilder->shouldReceive('find')->andReturn($receiver);
 
         $this->mockUser->shouldReceive('newQuery')->andReturn($mockBuilder);
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Cannot transfer to yourself');
+        $this->expectExceptionMessage(__('api.wallet_transfer_self_forbidden'));
 
         $this->service->transfer(1, ['recipient' => 1, 'amount' => 1]);
     }

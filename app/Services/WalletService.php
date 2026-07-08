@@ -313,44 +313,55 @@ class WalletService
         $description = trim($data['description'] ?? '');
 
         if (empty($recipient)) {
-            throw new \InvalidArgumentException('Recipient is required');
+            throw new \InvalidArgumentException(__('api.wallet_transfer_recipient_required'));
         }
 
         if ($amount <= 0) {
-            throw new \InvalidArgumentException('Amount must be greater than 0');
+            throw new \InvalidArgumentException(__('api.wallet_transfer_amount_positive'));
         }
 
         // Cap maximum transfer amount to prevent accidental or malicious large transfers
-        if ($amount > 1000) {
-            throw new \InvalidArgumentException('Transfer amount cannot exceed 1000 hours');
+        $maxTransferAmount = 1000;
+        if ($amount > $maxTransferAmount) {
+            throw new \InvalidArgumentException(__('api.wallet_transfer_amount_max', ['max' => $maxTransferAmount]));
         }
 
         // Enforce reasonable decimal precision (max 2 decimal places)
         if (round($amount, 2) != $amount) {
-            throw new \InvalidArgumentException('Amount must have at most 2 decimal places');
+            throw new \InvalidArgumentException(__('api.wallet_transfer_amount_precision'));
         }
+
+        $tenantId = TenantContext::getId();
 
         // Resolve recipient: ID, email, or username
         $receiver = null;
         if (is_numeric($recipient)) {
-            $receiver = $this->user->newQuery()->find((int) $recipient);
+            $receiver = $this->user->newQuery()
+                ->where('tenant_id', $tenantId)
+                ->find((int) $recipient);
         } elseif (filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
-            $receiver = $this->user->newQuery()->where('email', $recipient)->first();
+            $receiver = $this->user->newQuery()
+                ->where('tenant_id', $tenantId)
+                ->where('email', $recipient)
+                ->first();
         } else {
-            $receiver = $this->user->newQuery()->where('username', $recipient)->first();
+            $receiver = $this->user->newQuery()
+                ->where('tenant_id', $tenantId)
+                ->where('username', $recipient)
+                ->first();
         }
 
         if (! $receiver) {
-            throw new \RuntimeException('Recipient not found');
+            throw new \RuntimeException(__('api.wallet_transfer_recipient_not_found'));
         }
 
         if ($senderId === $receiver->id) {
-            throw new \RuntimeException('Cannot transfer to yourself');
+            throw new \RuntimeException(__('api.wallet_transfer_self_forbidden'));
         }
 
         // Reject transfers to banned, suspended, or inactive accounts
         if (in_array($receiver->status, ['banned', 'suspended', 'inactive', 'deactivated'], true)) {
-            throw new \RuntimeException('Recipient account is not active');
+            throw new \RuntimeException(__('api.wallet_transfer_recipient_inactive'));
         }
 
         // ── Idempotency / anti-double-submit guard ──
@@ -364,7 +375,6 @@ class WalletService
         // back to a 120s content fingerprint so an accidental double-click is
         // caught even without a client key. Fail OPEN on any cache hiccup — never
         // block a legitimate transfer on cache flakiness.
-        $tenantId = TenantContext::getId();
         $explicitKey = trim((string) ($data['idempotency_key'] ?? ''));
         $hasExplicitKey = $explicitKey !== '';
         $fingerprint = $hasExplicitKey
@@ -398,23 +408,23 @@ class WalletService
                     return $this->formatTransaction($original, $senderId);
                 }
             }
-            throw new \RuntimeException('Duplicate transfer ignored');
+            throw new \RuntimeException(__('api.wallet_transfer_duplicate'));
         }
 
         try {
-            $txn = DB::transaction(function () use ($senderId, $receiver, $amount, $description) {
+            $txn = DB::transaction(function () use ($senderId, $receiver, $amount, $description, $tenantId) {
                 // Lock both user rows in consistent ID order to prevent deadlocks
                 // when two users transfer to each other simultaneously
                 $minId = min($senderId, $receiver->id);
                 $maxId = max($senderId, $receiver->id);
-                $this->user->newQuery()->lockForUpdate()->findOrFail($minId);
-                $this->user->newQuery()->lockForUpdate()->findOrFail($maxId);
+                $this->user->newQuery()->where('tenant_id', $tenantId)->lockForUpdate()->findOrFail($minId);
+                $this->user->newQuery()->where('tenant_id', $tenantId)->lockForUpdate()->findOrFail($maxId);
 
                 /** @var User $sender */
-                $sender = $this->user->newQuery()->find($senderId);
+                $sender = $this->user->newQuery()->where('tenant_id', $tenantId)->findOrFail($senderId);
 
                 if ((float) $sender->balance < $amount) {
-                    throw new \RuntimeException('Insufficient balance');
+                    throw new \RuntimeException(__('api.wallet_transfer_insufficient_balance'));
                 }
 
                 $txn = $this->transaction->newInstance([
@@ -610,11 +620,11 @@ class WalletService
             if (! $u) {
                 // Use a meaningful label for system transactions
                 $label = match ($txnType) {
-                    'donation'         => 'Community Fund',
-                    'community_fund'   => 'Community Fund',
-                    'starting_balance' => 'System',
-                    'admin_grant'      => 'Admin',
-                    default            => 'Unknown',
+                    'donation'         => __('api.wallet_counterparty_community_fund'),
+                    'community_fund'   => __('api.wallet_counterparty_community_fund'),
+                    'starting_balance' => __('api.wallet_counterparty_system'),
+                    'admin_grant'      => __('api.wallet_counterparty_admin'),
+                    default            => __('api.wallet_counterparty_unknown'),
                 };
                 return ['id' => 0, 'name' => $label, 'avatar' => null];
             }

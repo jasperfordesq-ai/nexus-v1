@@ -113,6 +113,9 @@ class VolunteeringParityTest extends TestCase
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.org_dashboard.title'));
         $response->assertSee('Dashboard Org');
+        $response->assertSee(__('govuk_alpha_volunteering.org_dashboard.auto_credit_note'));
+        $response->assertDontSee(__('govuk_alpha_volunteering.org_dashboard.auto_pay_on'));
+        $response->assertDontSee(__('govuk_alpha_volunteering.org_dashboard.auto_pay_off'));
     }
 
     public function test_volunteering_org_dashboard_404_for_missing_org(): void
@@ -191,7 +194,7 @@ class VolunteeringParityTest extends TestCase
     }
 
     // =====================================================================
-    // Org wallet — render + auto-pay toggle persists
+    // Org wallet — render + auto-credit status
     // =====================================================================
 
     public function test_volunteering_org_wallet_renders_for_owner(): void
@@ -203,22 +206,32 @@ class VolunteeringParityTest extends TestCase
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.org_wallet.title'));
+        $response->assertSee(__('govuk_alpha_volunteering.org_wallet.auto_credit_title'));
+        $response->assertDontSee(__('govuk_alpha_volunteering.org_wallet.auto_pay_title'));
+        $response->assertDontSee(route('govuk-alpha.volunteering.org.wallet.auto-pay', ['tenantSlug' => $this->testTenantSlug, 'id' => $orgId]), false);
     }
 
-    public function test_volunteering_org_wallet_autopay_toggle_persists(): void
+    public function test_volunteering_org_wallet_autopay_route_no_longer_mutates_flag(): void
     {
         $user = $this->authenticatedUser();
         $orgId = $this->createVolOrg((int) $user->id, 'Autopay Org', 'approved');
+        DB::table('vol_organizations')
+            ->where('id', $orgId)
+            ->where('tenant_id', $this->testTenantId)
+            ->update(['auto_pay_enabled' => 0]);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$orgId}/wallet/auto-pay", [
-            'enabled' => '1',
-        ]);
+        $response = $this->withSession(['_token' => 'test-csrf-token'])
+            ->post("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$orgId}/wallet/auto-pay", [
+                '_token' => 'test-csrf-token',
+                'enabled' => '1',
+            ]);
 
         $response->assertRedirect();
+        $this->assertStringContainsString('status=auto-credit-always-on', $response->headers->get('Location') ?? '');
         $this->assertDatabaseHas('vol_organizations', [
             'id' => $orgId,
             'tenant_id' => $this->testTenantId,
-            'auto_pay_enabled' => 1,
+            'auto_pay_enabled' => 0,
         ]);
     }
 

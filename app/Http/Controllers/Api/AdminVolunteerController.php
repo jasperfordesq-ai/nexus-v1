@@ -35,7 +35,7 @@ class AdminVolunteerController extends BaseApiController
     private const ALLOWED_TABLES = [
         'vol_opportunities', 'vol_applications', 'vol_shifts', 'vol_shift_signups',
         'vol_organizations', 'vol_logs', 'vol_shift_checkins', 'vol_mood_checkins',
-        'vol_emergency_alerts',
+        'vol_emergency_alerts', 'vol_org_transactions',
     ];
 
     private function tableExists(string $table): bool

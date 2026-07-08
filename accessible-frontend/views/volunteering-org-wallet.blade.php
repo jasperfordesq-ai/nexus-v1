@@ -10,18 +10,15 @@
         $orgName = (string) ($orgName ?? '');
         $summary = $summary ?? [];
         $transactions = $transactions ?? [];
-        $autoPayEnabled = (bool) ($autoPayEnabled ?? false);
         $status = $status ?? null;
         $formatDateTime = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y, g:ia') : null;
         $successStates = [
             'deposit-made' => 'govuk_alpha_volunteering.org_wallet.deposit_made',
-            'autopay-enabled' => 'govuk_alpha_volunteering.org_wallet.autopay_enabled',
-            'autopay-disabled' => 'govuk_alpha_volunteering.org_wallet.autopay_disabled',
+            'auto-credit-always-on' => 'govuk_alpha_volunteering.org_wallet.auto_credit_always_on',
         ];
         $errorStates = [
             'deposit-failed' => 'govuk_alpha_volunteering.org_wallet.deposit_failed',
             'deposit-amount-invalid' => 'govuk_alpha_volunteering.org_wallet.deposit_amount_invalid',
-            'autopay-failed' => 'govuk_alpha_volunteering.org_wallet.autopay_failed',
         ];
     @endphp
 
@@ -65,21 +62,8 @@
         </div>
     </dl>
 
-    {{-- Auto-pay toggle --}}
-    <h2 class="govuk-heading-l">{{ __('govuk_alpha_volunteering.org_wallet.auto_pay_title') }}</h2>
-    <p class="govuk-body">{{ __('govuk_alpha_volunteering.org_wallet.auto_pay_hint') }}</p>
-    <p class="govuk-body">
-        <strong class="govuk-tag {{ $autoPayEnabled ? 'govuk-tag--green' : 'govuk-tag--grey' }}">
-            {{ $autoPayEnabled ? __('govuk_alpha_volunteering.org_wallet.auto_pay_on') : __('govuk_alpha_volunteering.org_wallet.auto_pay_off') }}
-        </strong>
-    </p>
-    <form method="post" action="{{ route('govuk-alpha.volunteering.org.wallet.auto-pay', ['tenantSlug' => $tenantSlug, 'id' => $orgId]) }}" class="govuk-!-margin-bottom-8">
-        @csrf
-        <input type="hidden" name="enabled" value="{{ $autoPayEnabled ? '0' : '1' }}">
-        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">
-            {{ $autoPayEnabled ? __('govuk_alpha_volunteering.org_wallet.auto_pay_disable') : __('govuk_alpha_volunteering.org_wallet.auto_pay_enable') }}
-        </button>
-    </form>
+    <h2 class="govuk-heading-l">{{ __('govuk_alpha_volunteering.org_wallet.auto_credit_title') }}</h2>
+    <p class="govuk-body">{{ __('govuk_alpha_volunteering.org_wallet.auto_credit_hint') }}</p>
 
     {{-- Deposit form --}}
     <h2 class="govuk-heading-l">{{ __('govuk_alpha_volunteering.org_wallet.deposit_title') }}</h2>

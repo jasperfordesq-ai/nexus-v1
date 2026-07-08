@@ -1791,13 +1791,29 @@ function AppRoutes() {
           } />
 
           {/* Matches — cross-module matches page (MA1, requires auth) */}
-          <Route path="matches" element={<ErrorBoundary><MatchesPage /></ErrorBoundary>} />
-          <Route path="matches/preferences" element={<ErrorBoundary><MatchPreferencesPage /></ErrorBoundary>} />
+          <Route path="matches" element={
+            <FeatureGate module="listings" redirect="/dashboard">
+              <ErrorBoundary><MatchesPage /></ErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="matches/preferences" element={
+            <FeatureGate module="listings" redirect="/dashboard">
+              <ErrorBoundary><MatchPreferencesPage /></ErrorBoundary>
+            </FeatureGate>
+          } />
 
           {/* Reviews — user reviews for completed exchanges */}
-          <Route path="reviews" element={<ErrorBoundary><ReviewsPage /></ErrorBoundary>} />
+          <Route path="reviews" element={
+            <FeatureGate feature="reviews" redirect="/dashboard">
+              <ErrorBoundary><ReviewsPage /></ErrorBoundary>
+            </FeatureGate>
+          } />
           {/* Deep link target for the review-request email (?transaction_id=…) */}
-          <Route path="reviews/create" element={<ErrorBoundary><ReviewsPage /></ErrorBoundary>} />
+          <Route path="reviews/create" element={
+            <FeatureGate feature="reviews" redirect="/dashboard">
+              <ErrorBoundary><ReviewsPage /></ErrorBoundary>
+            </FeatureGate>
+          } />
         </Route>
       </Route>
 

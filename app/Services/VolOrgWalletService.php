@@ -308,10 +308,6 @@ class VolOrgWalletService
                 return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.organization_not_found')];
             }
 
-            if ((float) $org->balance < $amount) {
-                return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.insufficient_organization_balance')];
-            }
-
             // users.balance is an INT (whole hours). If the org is paying out
             // a fractional amount, we pay only the integer floor to the
             // volunteer and retain the fractional remainder in the org balance
@@ -320,8 +316,9 @@ class VolOrgWalletService
             $fractional = round($amount - $intAmount, 4);
             $netOrgDebit = $amount - $fractional; // == $intAmount as float
 
-            // Deduct from org (only the integer portion actually leaves the org;
-            // the fractional remainder stays so it can accumulate with future payouts)
+            // The volunteer org wallet is a reconciliation ledger. Approval
+            // mints whole-hour credits to the volunteer and may drive the org
+            // balance negative; top-ups reconcile that balance later.
             DB::update(
                 "UPDATE vol_organizations SET balance = balance - ? WHERE id = ? AND tenant_id = ?",
                 [$netOrgDebit, $volOrgId, $tenantId]

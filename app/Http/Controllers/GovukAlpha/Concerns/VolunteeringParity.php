@@ -67,7 +67,7 @@ trait VolunteeringParity
 
         $tenantId = TenantContext::getId();
         $org = DB::selectOne(
-            'SELECT id, name, user_id, status, description, contact_email, website, balance, auto_pay_enabled
+            'SELECT id, name, user_id, status, description, contact_email, website, balance
              FROM vol_organizations WHERE id = ? AND tenant_id = ?',
             [$orgId, $tenantId]
         );
@@ -198,7 +198,6 @@ trait VolunteeringParity
             'orgStatus' => (string) ($org->status ?? 'pending'),
             'stats' => $stats,
             'walletBalance' => (float) ($org->balance ?? 0),
-            'autoPayEnabled' => (bool) ($org->auto_pay_enabled ?? false),
         ]);
     }
 
@@ -355,7 +354,7 @@ trait VolunteeringParity
     }
 
     // =========================================================================
-    // ORG WALLET — balance, transactions, deposit, auto-pay (React OrgWalletTab)
+    // ORG WALLET — balance, transactions, deposit, auto-credit (React OrgWalletTab)
     // =========================================================================
 
     public function volunteeringOrgWallet(Request $request, string $tenantSlug, int $id): Response|RedirectResponse
@@ -387,7 +386,6 @@ trait VolunteeringParity
             'orgName' => (string) ($org->name ?? ''),
             'summary' => $summary,
             'transactions' => $transactions,
-            'autoPayEnabled' => (bool) ($org->auto_pay_enabled ?? false),
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }
@@ -431,24 +429,10 @@ trait VolunteeringParity
             return $gate;
         }
 
-        $tenantId = TenantContext::getId();
-        $enabled = $request->input('enabled') === '1' || $request->boolean('enabled');
-
-        $ok = false;
-        try {
-            DB::update(
-                'UPDATE vol_organizations SET auto_pay_enabled = ? WHERE id = ? AND tenant_id = ?',
-                [$enabled ? 1 : 0, $id, $tenantId]
-            );
-            $ok = true;
-        } catch (\Throwable $e) {
-            report($e);
-        }
-
         return redirect()->route('govuk-alpha.volunteering.org.wallet', [
             'tenantSlug' => $tenantSlug,
             'id' => $id,
-            'status' => $ok ? ($enabled ? 'autopay-enabled' : 'autopay-disabled') : 'autopay-failed',
+            'status' => 'auto-credit-always-on',
         ]);
     }
 

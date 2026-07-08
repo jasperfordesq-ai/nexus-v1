@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Services\WalletService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
 /**
@@ -167,7 +168,7 @@ class WalletServiceDoubleSubmitTest extends TestCase
             ]);
             $this->fail('Expected an insufficient-balance failure.');
         } catch (\RuntimeException $e) {
-            $this->assertStringContainsString('Insufficient', $e->getMessage());
+            $this->assertSame(__('api.wallet_transfer_insufficient_balance'), $e->getMessage());
         }
 
         // Fund the sender and retry with the SAME key — must go through.
@@ -192,6 +193,37 @@ class WalletServiceDoubleSubmitTest extends TestCase
             ->where('sender_id', $sender->id)
             ->where('receiver_id', $receiver->id)
             ->count());
+    }
+
+    public function test_transfer_rejects_cross_tenant_recipient(): void
+    {
+        $sender = User::factory()->forTenant($this->testTenantId)->create(['balance' => 25]);
+        $foreignTenantId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'Wallet Foreign Tenant',
+            'slug' => 'wallet-foreign-' . strtolower(\Illuminate\Support\Str::random(8)),
+            'is_active' => true,
+            'depth' => 0,
+            'allows_subtenants' => false,
+            'tagline' => 'A neighbouring community.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $foreign = User::factory()->forTenant($foreignTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'balance' => 0,
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(__('api.wallet_transfer_recipient_not_found'));
+
+        $this->service->transfer($sender->id, [
+            'recipient' => $foreign->id,
+            'amount' => 5,
+            'description' => 'Cross-tenant transfer attempt',
+        ]);
     }
 
     /**

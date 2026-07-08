@@ -192,7 +192,7 @@ class VolOrgWalletServiceTest extends TestCase
         $this->assertEquals(2, (int) $mainTx->amount);
     }
 
-    public function test_pay_volunteer_rejects_when_org_balance_insufficient(): void
+    public function test_pay_volunteer_allows_negative_reconciliation_balance(): void
     {
         $admin = User::factory()->forTenant(2)->create();
         $volunteer = User::factory()->forTenant(2)->create(['balance' => 0]);
@@ -201,10 +201,16 @@ class VolOrgWalletServiceTest extends TestCase
 
         $result = VolOrgWalletService::payVolunteer($orgId, $volunteer->id, 50.0, $admin->id);
 
-        $this->assertFalse($result['success']);
-        $this->assertEquals(5.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
-        $this->assertEquals(0, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
-        $this->assertEquals(0, DB::table('vol_org_transactions')->where('vol_organization_id', $orgId)->count());
+        $this->assertTrue($result['success'], $result['message'] ?? '');
+        $this->assertEquals(-45.00, (float) $result['new_balance']);
+        $this->assertEquals(-45.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertEquals(50, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
+
+        $tx = DB::table('vol_org_transactions')->where('vol_organization_id', $orgId)->orderByDesc('id')->first();
+        $this->assertNotNull($tx);
+        $this->assertEquals('volunteer_payment', $tx->type);
+        $this->assertEquals(-50.00, (float) $tx->amount);
+        $this->assertEquals(-45.00, (float) $tx->balance_after);
     }
 
     public function test_admin_adjustment_positive_and_negative_track_balance_after(): void

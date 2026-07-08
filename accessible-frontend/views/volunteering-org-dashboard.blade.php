@@ -11,7 +11,6 @@
         $orgStatus = (string) ($orgStatus ?? 'pending');
         $stats = $stats ?? [];
         $walletBalance = (float) ($walletBalance ?? 0);
-        $autoPayEnabled = (bool) ($autoPayEnabled ?? false);
         $isApproved = in_array($orgStatus, ['approved', 'active'], true);
     @endphp
 
@@ -59,11 +58,7 @@
             <dd>{{ number_format($walletBalance, 1) }}</dd>
         </div>
     </dl>
-    <p class="govuk-body">
-        <strong class="govuk-tag {{ $autoPayEnabled ? 'govuk-tag--green' : 'govuk-tag--grey' }}">
-            {{ $autoPayEnabled ? __('govuk_alpha_volunteering.org_dashboard.auto_pay_on') : __('govuk_alpha_volunteering.org_dashboard.auto_pay_off') }}
-        </strong>
-    </p>
+    <p class="govuk-body">{{ __('govuk_alpha_volunteering.org_dashboard.auto_credit_note') }}</p>
 
     {{-- Quick actions --}}
     <h2 class="govuk-heading-l">{{ __('govuk_alpha_volunteering.org_dashboard.quick_actions_title') }}</h2>

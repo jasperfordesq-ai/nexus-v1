@@ -201,6 +201,62 @@ class AdminVolunteerControllerTest extends TestCase
         $this->assertSame(1, DB::table('vol_org_transactions')->where('vol_log_id', $logId)->where('type', 'volunteer_payment')->count());
     }
 
+    public function test_list_hours_includes_payment_reconciliation(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['balance' => 0]);
+        $volunteer = User::factory()->forTenant($this->testTenantId)->create(['balance' => 3]);
+
+        TenantContext::setById($this->testTenantId);
+
+        $orgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $admin->id,
+            'name' => 'Paid Hours Audit Org',
+            'slug' => 'paid-hours-audit-org-' . uniqid(),
+            'description' => 'Organisation used for admin hours payment audit coverage.',
+            'contact_email' => 'paid-hours@example.test',
+            'status' => 'active',
+            'auto_pay_enabled' => 0,
+            'balance' => -3.00,
+            'created_at' => now(),
+        ]);
+
+        $logId = DB::table('vol_logs')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $volunteer->id,
+            'organization_id' => $orgId,
+            'opportunity_id' => null,
+            'date_logged' => now()->subDay()->toDateString(),
+            'hours' => 3.00,
+            'description' => 'Approved paid shift',
+            'status' => 'approved',
+            'created_at' => now(),
+        ]);
+
+        DB::table('vol_org_transactions')->insert([
+            'tenant_id' => $this->testTenantId,
+            'vol_organization_id' => $orgId,
+            'user_id' => $volunteer->id,
+            'vol_log_id' => $logId,
+            'type' => 'volunteer_payment',
+            'amount' => -3.00,
+            'balance_after' => -3.00,
+            'description' => 'Volunteer payment for approved hours',
+            'created_at' => now(),
+        ]);
+
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiGet('/v2/admin/volunteering/hours?status=approved');
+
+        $response->assertStatus(200);
+        $item = $response->json('data.items.0');
+        $this->assertSame($logId, (int) ($item['id'] ?? 0));
+        $this->assertSame(1, (int) ($item['paid'] ?? 0));
+        $this->assertEquals(3.00, (float) $response->json('data.items.0.paid_amount'));
+        $this->assertEquals(3.00, (float) $response->json('data.stats.total_paid'));
+    }
+
     // ================================================================
     // ADJUST ORG WALLET — PUT /v2/admin/volunteering/organizations/{id}/wallet/adjust
     // Money-moving admin endpoint: authorization + conservation + guards.
