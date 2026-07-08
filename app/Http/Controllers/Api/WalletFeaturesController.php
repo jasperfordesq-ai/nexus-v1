@@ -140,6 +140,9 @@ class WalletFeaturesController extends BaseApiController
     public function communityFundDonate(): JsonResponse
     {
         $userId = $this->requireAuth();
+        // Same guards as donate(): rate limit, cap, and double-submit lock —
+        // this is the same irreversible credit transfer under a second route.
+        $this->rateLimit('wallet_donate', 10, 60);
 
         if (!TenantContext::hasFeature('wallet')) {
             return $this->respondWithData(['balance' => 0, 'enabled' => false]);
@@ -150,12 +153,27 @@ class WalletFeaturesController extends BaseApiController
         if (empty($data['amount']) || (float) $data['amount'] <= 0) {
             return $this->error(__('api.amount_gt_zero'), 400);
         }
+        if ((float) $data['amount'] > 1000) {
+            return $this->error(__('api.amount_out_of_range'), 400);
+        }
 
-        $result = $this->creditDonationService->donateToCommunityFund(
-            $userId,
-            (float) $data['amount'],
-            $data['message'] ?? ''
+        $lock = \Illuminate\Support\Facades\Cache::lock(
+            sprintf('wallet_donate:%d:%d', TenantContext::getId(), $userId),
+            10
         );
+        if (! $lock->get()) {
+            return $this->respondWithError('DUPLICATE_REQUEST', __('api.wallet_transfer_duplicate'), null, 429);
+        }
+
+        try {
+            $result = $this->creditDonationService->donateToCommunityFund(
+                $userId,
+                (float) $data['amount'],
+                $data['message'] ?? ''
+            );
+        } finally {
+            $lock->release();
+        }
 
         if (!$result['success']) {
             return $this->error($result['error'], 400);
@@ -302,32 +320,52 @@ class WalletFeaturesController extends BaseApiController
     public function donate(): JsonResponse
     {
         $userId = $this->requireAuth();
+        // Irreversible credit transfer: rate-limited (parity with the Stripe
+        // donation path), amount-capped (parity with the accessible-frontend
+        // donation cap and the org-wallet deposit cap), and double-submit
+        // guarded — a double-clicked donate button must not transfer twice.
+        $this->rateLimit('wallet_donate', 10, 60);
 
         $data = $this->getAllInput();
 
         if (empty($data['amount']) || (float) $data['amount'] <= 0) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.amount_gt_zero'), 'amount', 400);
         }
+        if ((float) $data['amount'] > 1000) {
+            return $this->respondWithError('VALIDATION_ERROR', __('api.amount_out_of_range'), 'amount', 400);
+        }
 
-        $recipientType = $data['recipient_type'] ?? 'community_fund';
+        $lock = \Illuminate\Support\Facades\Cache::lock(
+            sprintf('wallet_donate:%d:%d', TenantContext::getId(), $userId),
+            10
+        );
+        if (! $lock->get()) {
+            return $this->respondWithError('DUPLICATE_REQUEST', __('api.wallet_transfer_duplicate'), null, 429);
+        }
 
-        if ($recipientType === 'user') {
-            if (empty($data['recipient_id'])) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.recipient_id_required_for_user'), 'recipient_id', 400);
+        try {
+            $recipientType = $data['recipient_type'] ?? 'community_fund';
+
+            if ($recipientType === 'user') {
+                if (empty($data['recipient_id'])) {
+                    return $this->respondWithError('VALIDATION_ERROR', __('api.recipient_id_required_for_user'), 'recipient_id', 400);
+                }
+
+                $result = $this->creditDonationService->donateToMember(
+                    $userId,
+                    (int) $data['recipient_id'],
+                    (float) $data['amount'],
+                    $data['message'] ?? ''
+                );
+            } else {
+                $result = $this->creditDonationService->donateToCommunityFund(
+                    $userId,
+                    (float) $data['amount'],
+                    $data['message'] ?? ''
+                );
             }
-
-            $result = $this->creditDonationService->donateToMember(
-                $userId,
-                (int) $data['recipient_id'],
-                (float) $data['amount'],
-                $data['message'] ?? ''
-            );
-        } else {
-            $result = $this->creditDonationService->donateToCommunityFund(
-                $userId,
-                (float) $data['amount'],
-                $data['message'] ?? ''
-            );
+        } finally {
+            $lock->release();
         }
 
         if (!$result['success']) {
