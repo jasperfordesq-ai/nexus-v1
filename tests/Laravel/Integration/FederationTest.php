@@ -81,11 +81,9 @@ class FederationTest extends TestCase
 
         $response = $this->apiGet('/v2/federation/partners');
 
-        // partners() lists active federation_partnerships (none are seeded), so it returns
-        // 200 with an empty list — no partner communities exist for this tenant.
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertIsArray($response->json('data'));
-        $this->assertEmpty($response->json('data'), 'No active partnerships -> empty partner list');
+        // partners() is gated by requireFederationOperation('profiles'), so the
+        // system-level federation switch blocks discovery before partner rows are listed.
+        $this->assertSame(403, $response->getStatusCode());
     }
 
     // =========================================================================
@@ -105,6 +103,7 @@ class FederationTest extends TestCase
             ],
             ['is_enabled' => 1, 'updated_at' => now()]
         );
+        $this->app->make(FederationFeatureService::class)->clearCache();
 
         // Add both tenants to the global federation whitelist (schema is a
         // single-column approval list, not pair-based).
@@ -420,13 +419,24 @@ class FederationTest extends TestCase
     private function setSystemFederationEnabled(bool $enabled): void
     {
         $exists = DB::table('federation_system_control')->where('id', 1)->exists();
+        $enabledDefaults = $enabled ? [
+            'emergency_lockdown_active' => 0,
+            'max_federation_level' => 4,
+            'cross_tenant_profiles_enabled' => 1,
+            'cross_tenant_messaging_enabled' => 1,
+            'cross_tenant_transactions_enabled' => 1,
+            'cross_tenant_listings_enabled' => 1,
+            'cross_tenant_events_enabled' => 1,
+            'cross_tenant_groups_enabled' => 1,
+        ] : [];
+
         if ($exists) {
-            DB::table('federation_system_control')->where('id', 1)->update([
+            DB::table('federation_system_control')->where('id', 1)->update(array_merge([
                 'federation_enabled' => $enabled ? 1 : 0,
                 'updated_at' => now(),
-            ]);
+            ], $enabledDefaults));
         } else {
-            DB::table('federation_system_control')->insert([
+            DB::table('federation_system_control')->insert(array_merge([
                 'id' => 1,
                 'federation_enabled' => $enabled ? 1 : 0,
                 'whitelist_mode_enabled' => 1,
@@ -434,8 +444,10 @@ class FederationTest extends TestCase
                 'emergency_lockdown_active' => 0,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]);
+            ], $enabledDefaults));
         }
+
+        $this->app->make(FederationFeatureService::class)->clearCache();
     }
 
     private function setEmergencyLockdown(bool $active): void

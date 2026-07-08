@@ -9,7 +9,9 @@
    default app stylesheet used by auth and ordinary member routes.
 */
 
-@import "tailwindcss" source(none);
+@layer theme, base, components, route-utilities, utilities;
+
+@import "tailwindcss" layer(route-utilities) source(none);
 
 @source "./**/*.{js,ts,jsx,tsx}";
 @source not "./**/*.test.ts";

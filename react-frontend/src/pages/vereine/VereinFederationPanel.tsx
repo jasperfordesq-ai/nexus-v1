@@ -11,6 +11,7 @@ import { Separator } from '@/components/ui';
 import Network from 'lucide-react/icons/network';
 import Share2 from 'lucide-react/icons/share-2';
 import Calendar from 'lucide-react/icons/calendar';
+import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -365,8 +366,9 @@ export default function VereinFederationPanel({ organizationId }: Props) {
                     <li key={s.id} className="py-3 flex items-start gap-3">
                       <div className="flex-1">
                         <p className="font-medium">{s.title}</p>
-                        <p className="text-xs text-muted">
-                          â†’ {s.target_name ?? 'â€”'}
+                        <p className="text-xs text-muted flex items-center gap-1">
+                          <ArrowRight className="h-3 w-3" aria-hidden="true" />
+                          <span>{s.target_name ?? t('not_available')}</span>
                           {s.start_time ? ` Â· ${new Date(s.start_time).toLocaleString()}` : ''}
                         </p>
                       </div>

@@ -59,7 +59,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useSocialInteractions } from '@/hooks/useSocialInteractions';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl, resolveThumbnailUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import type { Listing, ListingDetail, ExchangeConfig } from '@/types/api';
 
 interface ListingStructuredDataOptions {

@@ -3,6 +3,8 @@
    ============================================= */
 
 /* Tailwind v4 */
+@layer theme, base, components, route-utilities, utilities;
+
 @import "tailwindcss" source(none);
 @import "@heroui/styles";
 

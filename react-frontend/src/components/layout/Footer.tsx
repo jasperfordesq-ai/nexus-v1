@@ -118,7 +118,7 @@ export function Footer({ children, copyright }: FooterProps) {
             {/* Footer Links Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
               {/* Brand + Contact */}
-              <div className="col-span-2 sm:col-span-1 space-y-3">
+              <div className="space-y-3">
                 <TenantLogo size="sm" showName />
                 <p className="text-sm text-theme-subtle">
                   {branding.tagline || 'Building stronger communities through the exchange of time.'}

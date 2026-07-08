@@ -7106,7 +7106,19 @@ class GovukAlphaFrontendTest extends TestCase
         ]);
 
         $mine = $this->v2SeedShift($user->id);
-        $theirs = $this->v2SeedShift($partner->id);
+        $theirShiftId = DB::table('vol_shifts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $mine['opportunity_id'],
+            'start_time' => now()->addDays(11),
+            'end_time' => now()->addDays(11)->addHours(3),
+            'capacity' => 5,
+            'created_at' => now(),
+        ]);
+        $theirs = [
+            'organization_id' => $mine['organization_id'],
+            'opportunity_id' => $mine['opportunity_id'],
+            'shift_id' => $theirShiftId,
+        ];
 
         // Both volunteers are signed up (approved) for their respective shifts.
         DB::table('vol_applications')->insert([
@@ -7128,7 +7140,8 @@ class GovukAlphaFrontendTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $request = $this->post("/{$this->testTenantSlug}/alpha/volunteering/swaps", [
+        $request = $this->withSession(['_token' => 'test-token'])->post("/{$this->testTenantSlug}/alpha/volunteering/swaps", [
+            '_token' => 'test-token',
             'from_shift_id' => $mine['shift_id'],
             'to_shift_id' => $theirs['shift_id'],
             'to_user_id' => $partner->id,
