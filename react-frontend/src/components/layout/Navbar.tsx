@@ -767,9 +767,10 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   </DropdownTrigger>
                   <DropdownMenu
                     aria-label={t('aria.timebanking_navigation')}
-                    className="min-w-[220px]"
+                    className="min-w-[240px] p-1.5"
                     classNames={{
                       base: 'bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-xl max-h-[70vh] overflow-y-auto',
+                      list: 'gap-1',
                     }}
                     onAction={(key) => {
                       dropdownNavigate(String(key));
@@ -778,11 +779,22 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     {timebankingItems.map((item) => (
                       <DropdownItem
                         key={item.href} id={item.href}
-                        description={item.desc}
-                        startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
-                        className={pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
+                        textValue={`${item.label} ${item.desc}`}
+                        className={`rounded-xl px-3 py-2.5 text-theme-primary data-[hovered=true]:bg-theme-hover data-[focus-visible=true]:bg-theme-hover ${
+                          pathname.startsWith(item.href) ? 'bg-theme-active' : ''
+                        }`}
                       >
-                        {item.label}
+                        <span className="flex items-start gap-3">
+                          <item.icon className="mt-0.5 h-4 w-4 shrink-0 text-theme-muted" aria-hidden="true" />
+                          <span className="flex min-w-0 flex-col gap-0.5">
+                            <span className="text-sm font-semibold leading-tight text-theme-primary">
+                              {item.label}
+                            </span>
+                            <span className="text-xs leading-snug text-theme-subtle">
+                              {item.desc}
+                            </span>
+                          </span>
+                        </span>
                       </DropdownItem>
                     ))}
                   </DropdownMenu>
