@@ -1813,6 +1813,15 @@ return [
     'action_must_be_approve_or_decline'    => 'Action must be approve or decline',
     'type_must_be_org_or_user'             => 'Type must be organization or user',
 
+    // Admin volunteering activity feed
+    'vol_activity_hours_logged'            => ':name logged :hours hours',
+    'vol_activity_application_pending'     => ':name applied for ":title"',
+    'vol_activity_application_approved'    => ':name was approved for ":title"',
+    'vol_activity_application_declined'    => ':name was declined for ":title"',
+    'vol_activity_application_updated'     => ':name updated their application for ":title"',
+    'vol_activity_donation'                => ':name donated :amount',
+    'vol_activity_donor_anonymous'         => 'Anonymous',
+
     // OpenAPI
     'openapi_spec_not_found'               => 'OpenAPI specification not found',
     'openapi_parse_failed'                 => 'Failed to parse OpenAPI specification',

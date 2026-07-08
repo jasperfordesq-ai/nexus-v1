@@ -1455,18 +1455,22 @@ class AdminVolunteerController extends BaseApiController
         $days = $this->queryInt('days', 30, 1, 365);
 
         try {
-            // UNION of recent volunteering activities from multiple tables
+            // UNION of recent volunteering activities from multiple tables.
+            // Descriptions are rendered in PHP with __() (the requesting
+            // admin's locale) — never concatenate English fragments in SQL.
             $activities = DB::select("
                 (SELECT 'hours_logged' as type, vl.created_at as timestamp,
                         u.name as user_name, u.avatar_url,
-                        CONCAT(u.name, ' logged ', vl.hours, 'h') as description,
+                        vl.hours as detail_hours, NULL as detail_status, NULL as detail_title,
+                        NULL as detail_amount, NULL as detail_donor_name,
                         'vol_logs' as entity_type, vl.id as entity_id
                  FROM vol_logs vl JOIN users u ON vl.user_id = u.id
                  WHERE vl.tenant_id = ? AND vl.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY))
                 UNION ALL
                 (SELECT CONCAT('application_', va.status) as type, va.created_at as timestamp,
                         u.name as user_name, u.avatar_url,
-                        CONCAT(u.name, ' ', IF(va.status='pending','applied for',''), IF(va.status='approved','was approved for',''), IF(va.status='declined','was declined for',''), ' \"', vo.title, '\"') as description,
+                        NULL as detail_hours, va.status as detail_status, vo.title as detail_title,
+                        NULL as detail_amount, NULL as detail_donor_name,
                         'vol_applications' as entity_type, va.id as entity_id
                  FROM vol_applications va
                  JOIN users u ON va.user_id = u.id
@@ -1474,8 +1478,9 @@ class AdminVolunteerController extends BaseApiController
                  WHERE va.tenant_id = ? AND va.created_at >= DATE_SUB(NOW(), INTERVAL ? DAY))
                 UNION ALL
                 (SELECT 'donation' as type, vd.created_at as timestamp,
-                        COALESCE(u.name, vd.donor_name, 'Anonymous') as user_name, u.avatar_url,
-                        CONCAT(COALESCE(u.name, vd.donor_name, 'Anonymous'), ' donated ', vd.amount) as description,
+                        u.name as user_name, u.avatar_url,
+                        NULL as detail_hours, NULL as detail_status, NULL as detail_title,
+                        vd.amount as detail_amount, vd.donor_name as detail_donor_name,
                         'vol_donations' as entity_type, vd.id as entity_id
                  FROM vol_donations vd
                  LEFT JOIN users u ON vd.user_id = u.id
@@ -1483,15 +1488,37 @@ class AdminVolunteerController extends BaseApiController
                 ORDER BY timestamp DESC LIMIT ?
             ", [$tenantId, $days, $tenantId, $days, $tenantId, $days, $limit]);
 
-            $items = array_map(fn($r) => [
-                'type' => $r->type,
-                'timestamp' => $r->timestamp,
-                'user_name' => $r->user_name,
-                'avatar_url' => $r->avatar_url,
-                'description' => $r->description,
-                'entity_type' => $r->entity_type,
-                'entity_id' => (int) $r->entity_id,
-            ], $activities);
+            $items = array_map(function ($r) {
+                $donorName = $r->user_name ?? $r->detail_donor_name ?? __('api.vol_activity_donor_anonymous');
+
+                $description = match (true) {
+                    $r->type === 'hours_logged' => __('api.vol_activity_hours_logged', [
+                        'name' => $r->user_name,
+                        'hours' => $r->detail_hours,
+                    ]),
+                    $r->type === 'donation' => __('api.vol_activity_donation', [
+                        'name' => $donorName,
+                        'amount' => $r->detail_amount,
+                    ]),
+                    $r->entity_type === 'vol_applications' => __(
+                        in_array($r->detail_status, ['pending', 'approved', 'declined'], true)
+                            ? 'api.vol_activity_application_' . $r->detail_status
+                            : 'api.vol_activity_application_updated',
+                        ['name' => $r->user_name, 'title' => $r->detail_title]
+                    ),
+                    default => (string) $r->user_name,
+                };
+
+                return [
+                    'type' => $r->type,
+                    'timestamp' => $r->timestamp,
+                    'user_name' => $r->type === 'donation' ? $donorName : $r->user_name,
+                    'avatar_url' => $r->avatar_url,
+                    'description' => $description,
+                    'entity_type' => $r->entity_type,
+                    'entity_id' => (int) $r->entity_id,
+                ];
+            }, $activities);
 
             return $this->respondWithData(['activities' => $items]);
         } catch (\Exception $e) {

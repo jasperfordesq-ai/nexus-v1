@@ -2170,4 +2170,12 @@ return [
     'job_ai_ranking_system_prompt'         => "You are a hiring assistant for a community timebanking platform. Rank candidates for a job vacancy based on skills match, experience, and community trust signals. Community trust signals (XP, completed exchanges, review ratings, badges) are IMPORTANT - they indicate how active and trusted a member is in the community. A candidate with high community engagement and good reviews is more reliable.\n\nReturn a JSON array (and NOTHING else) with objects containing:\n- application_id (int)\n- rank (int, 1 = best)\n- score (int, 0-100)\n- reason (string, 1-2 sentences explaining the ranking)\n\nSort by rank ascending (best first).",
     'job_ai_ranking_user_prompt'           => "JOB:\n:job\n\nCANDIDATES::candidates",
 
+    // Admin volunteering activity feed
+    'vol_activity_hours_logged' => ':name zarejestrował(a) :hours godzin',
+    'vol_activity_application_pending' => ':name zgłosił(a) się do ":title"',
+    'vol_activity_application_approved' => ':name został(a) zaakceptowany(-a) do ":title"',
+    'vol_activity_application_declined' => ':name został(a) odrzucony(-a) do ":title"',
+    'vol_activity_application_updated' => ':name zaktualizował(a) zgłoszenie do ":title"',
+    'vol_activity_donation' => ':name przekazał(a) :amount',
+    'vol_activity_donor_anonymous' => 'Anonim',
 ];
