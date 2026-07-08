@@ -198,7 +198,7 @@ export function FederationOnboardingPage() {
       // Single atomic request: opt in + save settings together
       const response = await api.post('/v2/federation/setup', settings);
       if (!response.success) {
-        toastRef.current.error(tRef.current('onboarding.toast_setup_failed'), response.error || tRef.current('onboarding.toast_enable_error'));
+        toastRef.current.error(tRef.current('onboarding.toast_setup_failed'), tRef.current('onboarding.toast_enable_error'));
         return;
       }
 

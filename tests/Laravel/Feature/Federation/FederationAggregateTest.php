@@ -86,6 +86,25 @@ final class FederationAggregateTest extends TestCase
         $this->assertNotEmpty($resp->json('data.signature'));
     }
 
+    public function test_public_aggregate_contract_requires_consent_not_member_auth(): void
+    {
+        $this->service->setEnabled($this->testTenantId, true);
+
+        $resp = $this->getJson(
+            "/api/v2/federation/aggregates?tenant_slug={$this->testTenantSlug}",
+            ['Accept' => 'application/json']
+        );
+
+        $resp->assertStatus(200);
+        $this->assertSame($this->testTenantSlug, $resp->json('data.payload.tenant.slug'));
+
+        $this->service->setEnabled($this->testTenantId, false);
+        $this->getJson(
+            "/api/v2/federation/aggregates?tenant_slug={$this->testTenantSlug}",
+            ['Accept' => 'application/json']
+        )->assertStatus(404);
+    }
+
     public function test_signature_verifies_with_tenant_secret(): void
     {
         $this->service->setEnabled($this->testTenantId, true);

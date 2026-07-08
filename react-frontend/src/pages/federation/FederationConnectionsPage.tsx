@@ -119,7 +119,7 @@ export function FederationConnectionsPage() {
         toastRef.current.success(msgs[action] ?? '');
         loadConnections(activeTab);
       } else {
-        toastRef.current.error(response.error || tRef.current('connections.action_failed'));
+        toastRef.current.error(tRef.current('connections.action_failed'));
       }
     } catch (err) {
       logError(`Failed to ${action} connection`, err);

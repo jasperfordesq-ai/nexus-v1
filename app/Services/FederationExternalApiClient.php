@@ -1044,12 +1044,12 @@ class FederationExternalApiClient
                 'partner_id' => $partnerId,
                 'endpoint' => substr($endpoint, 0, 500),
                 'method' => strtoupper($method),
-                'request_body' => $requestBody ? substr(self::redactSensitiveFields($requestBody), 0, 10000) : null,
+                'request_body' => $requestBody ? substr(FederationLogRedactor::redactJsonString($requestBody) ?? '', 0, 10000) : null,
                 'response_code' => $statusCode ?: null,
-                'response_body' => $responseBody ? substr(self::redactSensitiveFields($responseBody), 0, 10000) : null,
+                'response_body' => $responseBody ? substr(FederationLogRedactor::redactJsonString($responseBody) ?? '', 0, 10000) : null,
                 'response_time_ms' => (int) round($responseTime),
                 'success' => $success ? 1 : 0,
-                'error_message' => $errorMessage ? substr($errorMessage, 0, 65535) : null,
+                'error_message' => $errorMessage ? substr(FederationLogRedactor::redactText($errorMessage) ?? '', 0, 65535) : null,
                 'created_at' => now(),
             ]);
         } catch (\Exception $e) {
@@ -1061,29 +1061,4 @@ class FederationExternalApiClient
         }
     }
 
-    /**
-     * Redact sensitive fields from JSON strings before logging.
-     */
-    private static function redactSensitiveFields(string $json): string
-    {
-        $data = json_decode($json, true);
-        if (!is_array($data)) {
-            return $json;
-        }
-
-        $sensitiveKeys = ['body', 'message_body', 'content', 'api_key', 'signing_secret',
-            'oauth_client_secret', 'token', 'access_token', 'refresh_token', 'password', 'secret'];
-
-        array_walk_recursive($data, function (&$value, $key) use ($sensitiveKeys) {
-            if (!is_string($key)) {
-                return;
-            }
-
-            if (in_array(strtolower($key), $sensitiveKeys, true) && is_string($value) && strlen($value) > 0) {
-                $value = '[REDACTED]';
-            }
-        });
-
-        return json_encode($data, JSON_UNESCAPED_SLASHES) ?: $json;
-    }
 }

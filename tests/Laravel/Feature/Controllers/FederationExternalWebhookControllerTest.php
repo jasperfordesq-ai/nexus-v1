@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Tests\Laravel\Concerns\FederationIntegrationHarness;
 use Tests\Laravel\TestCase;
 
 /**
@@ -19,6 +20,7 @@ use Tests\Laravel\TestCase;
 class FederationExternalWebhookControllerTest extends TestCase
 {
     use DatabaseTransactions;
+    use FederationIntegrationHarness;
 
     public function test_controller_exists(): void
     {
@@ -80,6 +82,88 @@ class FederationExternalWebhookControllerTest extends TestCase
         $this->assertSame(401, $response->status());
     }
 
+    public function test_duplicate_signing_secret_without_signed_discriminator_fails_closed(): void
+    {
+        $this->setupPartner('nexus', $this->testTenantId);
+        $this->setupPartner('nexus', $this->testTenantId);
+
+        $response = $this->postSignedWebhook([
+            'event' => 'health_check',
+            'timestamp' => (string) time(),
+            'data' => [],
+        ]);
+
+        $this->assertSame(401, $response->getStatusCode());
+    }
+
+    public function test_signed_partner_discriminator_resolves_duplicate_signing_secret(): void
+    {
+        $partner = $this->setupPartner('nexus', $this->testTenantId);
+        $this->setupPartner('nexus', $this->testTenantId);
+
+        $response = $this->postSignedWebhook([
+            'event' => 'health_check',
+            'partner_id' => $partner->id,
+            'timestamp' => (string) time(),
+            'data' => [],
+        ]);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function test_disabled_listing_permission_rejects_inbound_push_without_shadow_write(): void
+    {
+        $partner = $this->setupPartner('nexus', $this->testTenantId);
+        DB::table('federation_external_partners')
+            ->where('id', $partner->id)
+            ->update(['allow_listing_search' => 0]);
+
+        $externalId = 'denied-listing-' . uniqid();
+        $response = $this->simulateInboundWebhook($partner, 'listing.created', [
+            'external_id' => $externalId,
+            'title' => 'Denied listing',
+            'description' => 'This should not be mirrored.',
+        ]);
+
+        $response->assertOk();
+        $this->assertSame('rejected', $response->json('data.result.status'));
+        $this->assertDatabaseMissing('federation_listings', [
+            'tenant_id' => $this->testTenantId,
+            'external_partner_id' => $partner->id,
+            'external_id' => $externalId,
+        ]);
+    }
+
+    public function test_inbound_webhook_log_redacts_sensitive_request_fields(): void
+    {
+        $partner = $this->setupPartner('nexus', $this->testTenantId);
+        $externalId = 'redacted-member-' . uniqid();
+
+        $response = $this->simulateInboundWebhook($partner, 'member.profile_updated', [
+            'external_id' => $externalId,
+            'display_name' => 'Visible Name',
+            'bio' => 'private biography text',
+            'avatar_url' => 'https://example.test/private-avatar.png',
+            'password' => 'super-secret-password',
+            'metadata' => ['token' => 'nested-token-value'],
+        ]);
+
+        $response->assertOk();
+
+        $log = DB::table('federation_external_partner_logs')
+            ->where('partner_id', $partner->id)
+            ->orderByDesc('id')
+            ->first();
+
+        $this->assertNotNull($log);
+        $body = (string) $log->request_body;
+        $this->assertStringContainsString('[REDACTED]', $body);
+        $this->assertStringNotContainsString('private biography text', $body);
+        $this->assertStringNotContainsString('private-avatar.png', $body);
+        $this->assertStringNotContainsString('super-secret-password', $body);
+        $this->assertStringNotContainsString('nested-token-value', $body);
+    }
+
     /**
      * Wrong HMAC signature (random hex) -> 401.
      */
@@ -99,6 +183,34 @@ class FederationExternalWebhookControllerTest extends TestCase
             json_encode(['event' => 'health_check', 'data' => []])
         );
         $this->assertSame(401, $response->getStatusCode());
+    }
+
+    private function postSignedWebhook(array $payload, ?string $secret = null): \Illuminate\Testing\TestResponse
+    {
+        $uri = '/api/v2/federation/external/webhooks/receive';
+        $timestamp = (string) ($payload['timestamp'] ?? time());
+        $nonce = bin2hex(random_bytes(16));
+        $body = json_encode($payload);
+        $signature = hash_hmac(
+            'sha256',
+            implode("\n", ['POST', $uri, $timestamp, $nonce, $body]),
+            $secret ?? $this->testSigningSecret
+        );
+
+        return $this->call(
+            'POST',
+            $uri,
+            [],
+            [],
+            [],
+            $this->transformHeadersToServerVars($this->withTenantHeader([
+                'Content-Type' => 'application/json',
+                'X-Webhook-Signature' => $signature,
+                'X-Webhook-Timestamp' => $timestamp,
+                'X-Federation-Nonce' => $nonce,
+            ])),
+            $body
+        );
     }
 
     /**

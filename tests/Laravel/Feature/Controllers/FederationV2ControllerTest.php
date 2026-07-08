@@ -177,6 +177,35 @@ class FederationV2ControllerTest extends TestCase
         $this->assertSame(0, (int) $settings->show_location_federated);
     }
 
+    public function test_update_settings_normalizes_string_false_values(): void
+    {
+        $this->enableFederationForTenant($this->testTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        Sanctum::actingAs($viewer, ['*']);
+
+        $response = $this->apiPut('/v2/federation/settings', [
+            'profile_visible_federated' => 'false',
+            'appear_in_federated_search' => 'false',
+            'show_skills_federated' => 'false',
+            'show_location_federated' => 'false',
+            'show_reviews_federated' => 'false',
+            'messaging_enabled_federated' => 'false',
+            'transactions_enabled_federated' => 'false',
+            'email_notifications' => 'false',
+        ]);
+
+        $response->assertOk();
+        $settings = DB::table('federation_user_settings')->where('user_id', $viewer->id)->first();
+        $this->assertSame(0, (int) $settings->profile_visible_federated);
+        $this->assertSame(0, (int) $settings->appear_in_federated_search);
+        $this->assertSame(0, (int) $settings->show_skills_federated);
+        $this->assertSame(0, (int) $settings->show_location_federated);
+        $this->assertSame(0, (int) $settings->show_reviews_federated);
+        $this->assertSame(0, (int) $settings->messaging_enabled_federated);
+        $this->assertSame(0, (int) $settings->transactions_enabled_federated);
+        $this->assertSame(0, (int) $settings->email_notifications);
+    }
+
     // ------------------------------------------------------------------
     //  POST /v2/federation/opt-out
     // ------------------------------------------------------------------
@@ -885,6 +914,30 @@ class FederationV2ControllerTest extends TestCase
 
         DB::table('federation_user_settings')->where('user_id', $viewer->id)->update(['federation_optin' => 0]);
         $this->apiGet('/v2/federation/activity')->assertStatus(403);
+    }
+
+    public function test_federation_browse_and_read_endpoints_require_caller_opt_in(): void
+    {
+        $this->enableFederationForTenant($this->testTenantId);
+        $viewer = $this->seedFederatedUser($this->testTenantId);
+        DB::table('federation_user_settings')
+            ->where('user_id', $viewer->id)
+            ->update(['federation_optin' => 0]);
+
+        Sanctum::actingAs($viewer, ['*']);
+
+        foreach ([
+            '/v2/federation/members',
+            '/v2/federation/listings',
+            '/v2/federation/events',
+            '/v2/federation/groups',
+            '/v2/federation/messages',
+            '/v2/federation/connections',
+            '/v2/federation/members/1',
+            '/v2/federation/members/1/reviews',
+        ] as $endpoint) {
+            $this->apiGet($endpoint)->assertStatus(403);
+        }
     }
 
     public function test_groups_endpoint_respects_group_owner_federation_privacy(): void

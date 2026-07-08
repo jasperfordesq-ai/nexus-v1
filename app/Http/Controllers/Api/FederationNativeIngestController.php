@@ -11,6 +11,7 @@ namespace App\Http\Controllers\Api;
 use App\Core\FederationApiMiddleware;
 use App\Core\TenantContext;
 use App\Services\FederationFeatureService;
+use App\Services\FederationLogRedactor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -129,28 +130,40 @@ class FederationNativeIngestController extends BaseApiController
         // Resolve the external partner record (if any) — federation_api_keys
         // may or may not link to federation_external_partners depending on how
         // the key was provisioned. We best-effort log against partner.platform_id.
-        $externalPartnerId = null;
+        $externalPartner = null;
         try {
             $platformId = $partner['platform_id'] ?? null;
-            if ($platformId) {
-                $externalPartnerId = DB::table('federation_external_partners')
-                    ->where('tenant_id', $tenantId)
-                    ->where('platform_id', $platformId)
-                    ->value('id');
+            $query = DB::table('federation_external_partners')->where('tenant_id', $tenantId);
+            $requestedPartnerId = $request->header('X-Federation-Partner-ID')
+                ?? $request->header('X-Webhook-Partner-ID');
+            if (is_scalar($requestedPartnerId) && (int) $requestedPartnerId > 0) {
+                $externalPartner = $query->where('id', (int) $requestedPartnerId)->first();
+            } elseif ($platformId && \Illuminate\Support\Facades\Schema::hasColumn('federation_external_partners', 'platform_id')) {
+                $externalPartner = $query->where('platform_id', $platformId)->first();
             }
         } catch (\Throwable $e) {
             // Table missing in minimal test schemas — ignore
         }
 
         $handlerPartner = (object) [
-            'id' => (int) ($externalPartnerId ?: ($partner['id'] ?? 0)),
+            'id' => (int) ($externalPartner->id ?? ($partner['id'] ?? 0)),
             'tenant_id' => (int) $tenantId,
-            'name' => (string) ($partner['name'] ?? $partner['platform_id'] ?? __('api.external_partner_fallback')),
-            'status' => 'active',
-            'allow_messaging' => true,
-            'allow_transactions' => true,
-            'allow_listing_search' => true,
+            'name' => (string) ($externalPartner->name ?? $partner['name'] ?? $partner['platform_id'] ?? __('api.external_partner_fallback')),
+            'status' => (string) ($externalPartner->status ?? 'active'),
+            'allow_member_search' => (bool) ($externalPartner->allow_member_search ?? false),
+            'allow_listing_search' => (bool) ($externalPartner->allow_listing_search ?? false),
+            'allow_messaging' => (bool) ($externalPartner->allow_messaging ?? false),
+            'allow_transactions' => (bool) ($externalPartner->allow_transactions ?? false),
+            'allow_events' => (bool) ($externalPartner->allow_events ?? false),
+            'allow_groups' => (bool) ($externalPartner->allow_groups ?? false),
+            'allow_connections' => (bool) ($externalPartner->allow_connections ?? false),
+            'allow_volunteering' => (bool) ($externalPartner->allow_volunteering ?? false),
+            'allow_member_sync' => (bool) ($externalPartner->allow_member_sync ?? false),
         ];
+
+        if ($handlerPartner->status !== 'active') {
+            return $this->respondWithError('PARTNER_INACTIVE', __('api.federation.webhook_partner_inactive'), null, 403);
+        }
 
         try {
             $result = app(FederationExternalWebhookController::class)
@@ -158,9 +171,7 @@ class FederationNativeIngestController extends BaseApiController
         } catch (InboundValidationException $e) {
             $this->logNativeIngest($handlerPartner->id, $eventType, $payload, 400, false, $e->getMessage());
 
-            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), [
-                'field' => $e->field,
-            ], 400);
+            return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), $e->field, 400);
         } catch (\Throwable $e) {
             Log::error('[FederationNativeIngest] Processing failed', [
                 'event' => $eventType,
@@ -205,9 +216,9 @@ class FederationNativeIngestController extends BaseApiController
                 'method'            => 'POST',
                 'response_code'     => $responseCode,
                 'success'           => $success,
-                'request_body'      => substr(json_encode($payload) ?: '{}', 0, 10000),
-                'response_body'     => $responseBody ? substr(json_encode($responseBody) ?: '{}', 0, 10000) : null,
-                'error_message'     => $errorMessage,
+                'request_body'      => substr(FederationLogRedactor::redactJsonString(json_encode($payload) ?: '{}') ?? '', 0, 10000),
+                'response_body'     => $responseBody ? substr(FederationLogRedactor::redactJsonString(json_encode($responseBody) ?: '{}') ?? '', 0, 10000) : null,
+                'error_message'     => FederationLogRedactor::redactText($errorMessage),
                 'created_at'        => now(),
             ]);
         } catch (\Throwable $e) {

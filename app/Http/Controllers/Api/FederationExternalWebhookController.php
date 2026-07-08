@@ -22,6 +22,7 @@ use App\Services\FederatedMessageService;
 use App\Services\FederationEmailService;
 use App\Services\FederationExternalApiClient;
 use App\Services\FederationExternalPartnerService;
+use App\Services\FederationLogRedactor;
 use App\Support\SecurityBounds;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Database\QueryException;
@@ -186,7 +187,7 @@ class FederationExternalWebhookController extends BaseApiController
         } catch (InboundValidationException $e) {
             DB::table('federation_external_partner_logs')
                 ->where('id', $logId)
-                ->update(['response_code' => 400, 'success' => false, 'error_message' => substr($e->getMessage(), 0, 1000)]);
+                ->update(['response_code' => 400, 'success' => false, 'error_message' => substr(FederationLogRedactor::redactText($e->getMessage()) ?? '', 0, 1000)]);
             return $this->respondWithError('INVALID_PAYLOAD', $e->getMessage(), $e->field, 400);
         } catch (\Throwable $e) {
             Log::error("[FederationExternalWebhook] Event processing failed: {$e->getMessage()}", [
@@ -197,7 +198,7 @@ class FederationExternalWebhookController extends BaseApiController
 
             DB::table('federation_external_partner_logs')
                 ->where('id', $logId)
-                ->update(['response_code' => 500, 'success' => false, 'error_message' => substr($e->getMessage(), 0, 1000)]);
+                ->update(['response_code' => 500, 'success' => false, 'error_message' => substr(FederationLogRedactor::redactText($e->getMessage()) ?? '', 0, 1000)]);
 
             return $this->respondWithError('PROCESSING_FAILED', __('api.federation.webhook_processing_failed'), null, 500);
         }
@@ -269,20 +270,20 @@ class FederationExternalWebhookController extends BaseApiController
             return null;
         }
 
-        // Must iterate and decrypt each secret to compare (can't query encrypted values)
-        $partners = DB::table('federation_external_partners')
-            ->whereNotNull('signing_secret')
-            ->where('signing_secret', '!=', '')
-            ->get();
+        $partners = $this->candidatePartnersForRequest($request);
+        if ($partners->isEmpty()) {
+            return null;
+        }
 
+        $matches = [];
         foreach ($partners as $partner) {
             $decrypted = $this->decryptSecret($partner->signing_secret);
             if ($decrypted && hash_equals($decrypted, $token)) {
-                return $partner;
+                $matches[] = $partner;
             }
         }
 
-        return null;
+        return $this->singleMatchedPartner($matches, 'bearer');
     }
 
     /**
@@ -319,12 +320,12 @@ class FederationExternalWebhookController extends BaseApiController
             return null;
         }
 
-        // Try all partners with signing_secret configured
-        $partners = DB::table('federation_external_partners')
-            ->whereNotNull('signing_secret')
-            ->where('signing_secret', '!=', '')
-            ->get();
+        $partners = $this->candidatePartnersForRequest($request);
+        if ($partners->isEmpty()) {
+            return null;
+        }
 
+        $matches = [];
         foreach ($partners as $partner) {
             // Decrypt the secret (handles both encrypted and plaintext values)
             $secret = $this->decryptSecret($partner->signing_secret);
@@ -340,8 +341,59 @@ class FederationExternalWebhookController extends BaseApiController
             $expectedNexus = hash_hmac('sha256', $stringToSign, $secret);
             if (hash_equals($expectedNexus, $signature)) {
                 $this->authenticatedWithHmac = true;
-                return $partner;
+                $matches[] = $partner;
             }
+        }
+
+        return $this->singleMatchedPartner($matches, 'hmac');
+    }
+
+    private function candidatePartnersForRequest(Request $request): \Illuminate\Support\Collection
+    {
+        $query = DB::table('federation_external_partners')
+            ->whereNotNull('signing_secret')
+            ->where('signing_secret', '!=', '');
+
+        $partnerId = $request->json('partner_id')
+            ?? $request->header('X-Federation-Partner-ID')
+            ?? $request->header('X-Webhook-Partner-ID');
+        if (is_scalar($partnerId) && (int) $partnerId > 0) {
+            $query->where('id', (int) $partnerId);
+        }
+
+        $tenantId = $request->json('tenant_id')
+            ?? $request->header('X-Federation-Tenant-ID')
+            ?? $request->header('X-Webhook-Tenant-ID');
+        if (is_scalar($tenantId) && (int) $tenantId > 0) {
+            $query->where('tenant_id', (int) $tenantId);
+        }
+
+        $platformId = $request->json('platform_id')
+            ?? $request->json('partner.platform_id')
+            ?? $request->header('X-Federation-Platform-ID')
+            ?? $request->header('X-Webhook-Platform-ID');
+        if (is_scalar($platformId) && trim((string) $platformId) !== ''
+            && Schema::hasColumn('federation_external_partners', 'platform_id')) {
+            $query->where('platform_id', trim((string) $platformId));
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * @param array<int,object> $matches
+     */
+    private function singleMatchedPartner(array $matches, string $authMethod): ?object
+    {
+        if (count($matches) === 1) {
+            return $matches[0];
+        }
+
+        if (count($matches) > 1) {
+            Log::warning('[FederationExternalWebhook] Ambiguous partner secret match rejected', [
+                'auth_method' => $authMethod,
+                'partner_ids' => array_map(static fn (object $partner): int => (int) $partner->id, $matches),
+            ]);
         }
 
         return null;
@@ -353,6 +405,14 @@ class FederationExternalWebhookController extends BaseApiController
 
     private function handleEvent(string $event, array $data, object $partner): array
     {
+        if (!$this->partnerAllowsEvent($event, $partner)) {
+            return [
+                'status' => 'rejected',
+                'reason' => __('api.federation.permission_denied'),
+                'event' => $event,
+            ];
+        }
+
         return match ($event) {
             'message.sent', 'message.received' => $this->handleInboundMessage($data, $partner),
             'transaction.completed' => $this->handleTransactionCompleted($data, $partner),
@@ -385,6 +445,28 @@ class FederationExternalWebhookController extends BaseApiController
         }
 
         return $this->handleEvent($event, $data, $partner);
+    }
+
+    private function partnerAllowsEvent(string $event, object $partner): bool
+    {
+        $flag = match ($event) {
+            'message.sent', 'message.received' => 'allow_messaging',
+            'transaction.completed', 'transaction.cancelled', 'transaction.requested' => 'allow_transactions',
+            'members.list' => 'allow_member_search',
+            'listings.list', 'listing.created', 'listing.updated' => 'allow_listing_search',
+            'review.created', 'member.profile_updated' => 'allow_member_sync',
+            'event.created', 'event.updated' => 'allow_events',
+            'group.created', 'group.updated', 'group.member_joined' => 'allow_groups',
+            'connection.requested', 'connection.accepted' => 'allow_connections',
+            'volunteering.created', 'volunteering.updated', 'volunteering.deleted' => 'allow_volunteering',
+            default => null,
+        };
+
+        if ($flag === null) {
+            return true;
+        }
+
+        return !empty($partner->{$flag});
     }
 
     // ----------------------------------------------------------------
@@ -580,6 +662,7 @@ class FederationExternalWebhookController extends BaseApiController
         ];
 
         $existing = DB::table('federation_listings')
+            ->where('tenant_id', $tenantId)
             ->where('external_partner_id', $partner->id)
             ->where('external_id', $externalId)
             ->first(['id']);
@@ -620,6 +703,7 @@ class FederationExternalWebhookController extends BaseApiController
         ];
 
         $existing = DB::table('federation_events')
+            ->where('tenant_id', $tenantId)
             ->where('external_partner_id', $partner->id)
             ->where('external_id', $externalId)
             ->first(['id']);
@@ -659,6 +743,7 @@ class FederationExternalWebhookController extends BaseApiController
         ];
 
         $existing = DB::table('federation_groups')
+            ->where('tenant_id', $tenantId)
             ->where('external_partner_id', $partner->id)
             ->where('external_id', $externalId)
             ->first(['id']);
@@ -684,6 +769,7 @@ class FederationExternalWebhookController extends BaseApiController
 
         // Increment the shadow group's member_count if we have it
         $existing = DB::table('federation_groups')
+            ->where('tenant_id', $tenantId)
             ->where('external_partner_id', $partner->id)
             ->where('external_id', $externalId)
             ->first(['id', 'member_count']);
@@ -819,6 +905,7 @@ class FederationExternalWebhookController extends BaseApiController
         ];
 
         $existing = DB::table('federation_volunteering')
+            ->where('tenant_id', $tenantId)
             ->where('external_partner_id', $partner->id)
             ->where('external_id', $externalId)
             ->first(['id']);
@@ -896,6 +983,7 @@ class FederationExternalWebhookController extends BaseApiController
         ];
 
         $existing = DB::table('federation_members')
+            ->where('tenant_id', $tenantId)
             ->where('external_partner_id', $partner->id)
             ->where('external_id', $externalId)
             ->first(['id']);
@@ -1682,7 +1770,7 @@ class FederationExternalWebhookController extends BaseApiController
             'method' => 'POST',
             'response_code' => 0,
             'success' => false,
-            'request_body' => substr(json_encode($payload) ?: '{"_encode_error": true}', 0, 10000),
+            'request_body' => substr(FederationLogRedactor::redactJsonString(json_encode($payload) ?: '{"_encode_error": true}') ?? '', 0, 10000),
             'response_body' => null,
             'response_time_ms' => 0,
             'created_at' => now(),

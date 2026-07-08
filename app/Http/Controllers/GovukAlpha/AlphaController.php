@@ -7405,6 +7405,15 @@ class AlphaController extends Controller
         }
     }
 
+    private function federationOptInRedirectIfRequired(int $userId, string $tenantSlug): ?RedirectResponse
+    {
+        if (\App\Services\FederationUserService::hasOptedIn($userId, TenantContext::getId())) {
+            return null;
+        }
+
+        return redirect()->route('govuk-alpha.federation.opt-in', ['tenantSlug' => $tenantSlug]);
+    }
+
     /**
      * Partner DETAIL — `/federation/partners/{id}` where {id} is an integer for
      * an internal partner tenant, or "ext-{N}" for an external partner. Mirrors
@@ -7414,7 +7423,8 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('federation'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
@@ -7524,7 +7534,8 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('federation'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
@@ -7792,6 +7803,9 @@ class AlphaController extends Controller
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
+        }
 
         $tenantId = TenantContext::getId();
         $allowed = $this->federationOperationAllowed('profiles', $tenantId);
@@ -7972,6 +7986,9 @@ class AlphaController extends Controller
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
         }
 
         $tenantId = TenantContext::getId();
@@ -8212,8 +8229,12 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('federation'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
         }
 
         $tenantId = TenantContext::getId();
@@ -8337,8 +8358,12 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('federation'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
         }
 
         $viewerTenantId = TenantContext::getId();
@@ -8413,8 +8438,12 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('federation'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
         }
 
         $tenantId = TenantContext::getId();
@@ -12434,6 +12463,9 @@ class AlphaController extends Controller
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
+        }
 
         $tenantId = TenantContext::getId();
         $allowed = $this->federationOperationAllowed('profiles', $tenantId);
@@ -12488,6 +12520,9 @@ class AlphaController extends Controller
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
         }
 
         $tenantId = TenantContext::getId();
@@ -12601,6 +12636,9 @@ class AlphaController extends Controller
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
         }
 
         $tenantId = TenantContext::getId();
@@ -12720,6 +12758,9 @@ class AlphaController extends Controller
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
         }
 
         $tenantId = TenantContext::getId();
@@ -12889,6 +12930,9 @@ class AlphaController extends Controller
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
+        }
 
         $tenantId = TenantContext::getId();
         $receiverId = (int) $request->input('receiver_id');
@@ -13039,6 +13083,9 @@ class AlphaController extends Controller
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
+        }
 
         $tenantId = TenantContext::getId();
         abort_unless($this->federationOperationAllowed('transactions', $tenantId), 404);
@@ -13146,6 +13193,9 @@ class AlphaController extends Controller
         $userId = $this->currentUserId();
         if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
         }
 
         $tenantId = TenantContext::getId();
@@ -15211,8 +15261,12 @@ class AlphaController extends Controller
     {
         $this->assertTenantSlug($tenantSlug);
         abort_unless(TenantContext::hasFeature('federation'), 403);
-        if ($this->currentUserId() === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+        if ($redirect = $this->federationOptInRedirectIfRequired($userId, $tenantSlug)) {
+            return $redirect;
         }
 
         $tenantId = TenantContext::getId();

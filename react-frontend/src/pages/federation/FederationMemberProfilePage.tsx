@@ -183,7 +183,7 @@ export function FederationMemberProfilePage() {
         toastRef.current.success(tRef.current('member_profile.connect_sent'));
         loadConnectionStatus();
       } else {
-        toastRef.current.error(response.error || tRef.current('member_profile.connect_failed'));
+        toastRef.current.error(tRef.current('member_profile.connect_failed'));
       }
     } catch (err) {
       logError('Failed to send connection request', err);
@@ -600,7 +600,7 @@ export function FederationMemberProfilePage() {
                         } else {
                           toast.error(
                             t('member_profile.tx_failed'),
-                            (res as { error?: string }).error || t('member_profile.tx_unknown_error')
+                            t('member_profile.tx_unknown_error')
                           );
                         }
                       } catch (err) {

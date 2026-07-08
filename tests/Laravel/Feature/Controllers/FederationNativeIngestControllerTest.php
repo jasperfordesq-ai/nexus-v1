@@ -6,7 +6,11 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Core\FederationApiMiddleware;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Tests\Laravel\Concerns\FederationIntegrationHarness;
 use Tests\Laravel\TestCase;
 
 /**
@@ -19,6 +23,64 @@ use Tests\Laravel\TestCase;
 class FederationNativeIngestControllerTest extends TestCase
 {
     use DatabaseTransactions;
+    use FederationIntegrationHarness;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        FederationApiMiddleware::reset();
+        Cache::flush();
+    }
+
+    protected function tearDown(): void
+    {
+        FederationApiMiddleware::reset();
+        parent::tearDown();
+    }
+
+    private function createFederationApiKey(array $permissions = ['*']): string
+    {
+        $this->enableFederationForTenant($this->testTenantId);
+
+        $apiKey = 'native-ingest-' . bin2hex(random_bytes(8));
+
+        try {
+            DB::table('federation_api_keys')->insert([
+                'tenant_id' => $this->testTenantId,
+                'name' => 'Native Ingest Test Key',
+                'key_hash' => hash('sha256', $apiKey),
+                'key_prefix' => substr($apiKey, 0, 8),
+                'platform_id' => 'native-ingest-' . bin2hex(random_bytes(4)),
+                'permissions' => json_encode($permissions),
+                'rate_limit' => 1000,
+                'status' => 'active',
+                'signing_enabled' => 0,
+                'created_by' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                'hourly_request_count' => 0,
+            ]);
+        } catch (\Throwable $e) {
+            $this->markTestSkipped('federation_api_keys not available: ' . $e->getMessage());
+        }
+
+        return $apiKey;
+    }
+
+    private function nativeAuthHeaders(string $apiKey, object $externalPartner): array
+    {
+        $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . $apiKey;
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['REQUEST_URI'] = '/api/v2/federation/ingest';
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+
+        return [
+            'Authorization' => 'Bearer ' . $apiKey,
+            'X-Federation-Partner-ID' => (string) $externalPartner->id,
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ];
+    }
 
     public function test_controller_exists(): void
     {
@@ -116,6 +178,71 @@ class FederationNativeIngestControllerTest extends TestCase
             ['Authorization' => 'Bearer totally-fake-' . uniqid()]
         );
         $this->assertContains($response->status(), [401, 403]);
+    }
+
+    public function test_disabled_external_partner_permission_rejects_native_listing_push_without_shadow_write(): void
+    {
+        $apiKey = $this->createFederationApiKey();
+        $externalPartner = $this->setupPartner('nexus', $this->testTenantId);
+        DB::table('federation_external_partners')
+            ->where('id', $externalPartner->id)
+            ->update(['allow_listing_search' => 0]);
+
+        $externalId = 'native-denied-listing-' . uniqid();
+        $response = $this->apiPost(
+            '/v2/federation/ingest/listings',
+            [
+                'external_id' => $externalId,
+                'title' => 'Native denied listing',
+                'description' => 'This should not be mirrored.',
+            ],
+            $this->nativeAuthHeaders($apiKey, $externalPartner)
+        );
+
+        $response->assertOk();
+        $this->assertSame('rejected', $response->json('data.result.status'));
+        $this->assertDatabaseMissing('federation_listings', [
+            'tenant_id' => $this->testTenantId,
+            'external_partner_id' => $externalPartner->id,
+            'external_id' => $externalId,
+        ]);
+    }
+
+    public function test_native_ingest_log_redacts_sensitive_request_fields(): void
+    {
+        $apiKey = $this->createFederationApiKey();
+        $externalPartner = $this->setupPartner('nexus', $this->testTenantId);
+        $externalId = 'native-redacted-member-' . uniqid();
+
+        $response = $this->apiPost(
+            '/v2/federation/ingest/members/sync',
+            [
+                'external_id' => $externalId,
+                'display_name' => 'Visible Name',
+                'bio' => 'native private biography',
+                'avatar_url' => 'https://example.test/native-private-avatar.png',
+                'password' => 'native-secret-password',
+                'metadata' => ['token' => 'native-nested-token'],
+            ],
+            $this->nativeAuthHeaders($apiKey, $externalPartner)
+        );
+
+        $response->assertOk();
+
+        $log = DB::table('federation_external_partner_logs')
+            ->where('partner_id', $externalPartner->id)
+            ->orderByDesc('id')
+            ->first();
+
+        $this->assertNotNull($log);
+        $body = (string) $log->request_body;
+        $this->assertStringContainsString('[REDACTED]', $body);
+        $this->assertStringNotContainsString('native private biography', $body);
+        $this->assertStringNotContainsString('native-private-avatar.png', $body);
+        $this->assertStringNotContainsString('native-secret-password', $body);
+        $this->assertStringNotContainsString('native-nested-token', $body);
+        $this->assertStringNotContainsString('native private biography', (string) $log->response_body);
+        $this->assertStringNotContainsString('native private biography', (string) $log->error_message);
     }
 
     /**

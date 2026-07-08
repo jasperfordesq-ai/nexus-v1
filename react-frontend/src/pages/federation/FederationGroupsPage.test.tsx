@@ -29,6 +29,18 @@ vi.mock('@/lib/api', () => {
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: vi.fn(() => ({
+    tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
+    tenantSlug: 'test',
+    tenantPath: (p: string) => `/test${p}`,
+    hasFeature: vi.fn(() => true),
+    hasModule: vi.fn(() => true),
+  })),
+  useFeature: vi.fn(() => true),
+  useModule: vi.fn(() => true),
+}));
+
 vi.mock('@/contexts', () =>
   createMockContexts({
     useToast: () => mockToast,

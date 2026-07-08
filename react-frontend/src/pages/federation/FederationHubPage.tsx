@@ -636,7 +636,7 @@ export default function FederationHubPage() {
       if (controller.signal.aborted) return;
 
       if (!statusRes.success || !statusRes.data) {
-        setError(statusRes.error || tRef.current('hub.error_load_status'));
+        setError(tRef.current('hub.error_load_status'));
         setIsLoading(false);
         return;
       }
@@ -701,7 +701,7 @@ export default function FederationHubPage() {
         toastRef.current.success(tRef.current('hub.toast_enabled_title'), tRef.current('hub.toast_enabled_description'));
         await loadData();
       } else {
-        toastRef.current.error(tRef.current('hub.toast_enable_error_title'), res.error || tRef.current('hub.toast_enable_error_description'));
+        toastRef.current.error(tRef.current('hub.toast_enable_error_title'), tRef.current('hub.toast_enable_error_description'));
       }
     } catch (err) {
       logError('FederationHubPage: Opt-in failed', err);
@@ -722,7 +722,7 @@ export default function FederationHubPage() {
         setShowOptOutConfirm(false);
         await loadData();
       } else {
-        toastRef.current.error(tRef.current('hub.toast_disable_error_title'), res.error || tRef.current('hub.toast_disable_error_description'));
+        toastRef.current.error(tRef.current('hub.toast_disable_error_title'), tRef.current('hub.toast_disable_error_description'));
       }
     } catch (err) {
       logError('FederationHubPage: Opt-out failed', err);

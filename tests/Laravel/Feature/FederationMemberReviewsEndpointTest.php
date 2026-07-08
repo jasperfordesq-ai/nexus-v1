@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Services\FederationFeatureService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Tests\Laravel\Concerns\FederationIntegrationHarness;
 use Tests\Laravel\TestCase;
 
@@ -155,6 +156,7 @@ class FederationMemberReviewsEndpointTest extends TestCase
         $this->makeReceiverReviewsVisible((int) $receiver->id, $this->testTenantId);
 
         $actingUser = User::factory()->forTenant($this->testTenantId)->create();
+        $this->optInUserToFederation((int) $actingUser->id);
         $this->actingAs($actingUser);
 
         $response = $this->makeController()->memberReviews((string) $receiver->id);
@@ -179,6 +181,7 @@ class FederationMemberReviewsEndpointTest extends TestCase
     {
         $this->setFederationFeature($this->testTenantId, true);
         $actingUser = User::factory()->forTenant($this->testTenantId)->create();
+        $this->optInUserToFederation((int) $actingUser->id);
         $this->actingAs($actingUser);
 
         $response = $this->makeController()->memberReviews('99999999');
@@ -209,6 +212,7 @@ class FederationMemberReviewsEndpointTest extends TestCase
         ]);
 
         $actingUser = User::factory()->forTenant($this->testTenantId)->create();
+        $this->optInUserToFederation((int) $actingUser->id);
         $this->actingAs($actingUser);
 
         $response = $this->makeController()->memberReviews((string) $foreignReceiver->id);
@@ -232,5 +236,57 @@ class FederationMemberReviewsEndpointTest extends TestCase
             'Federation feature disabled',
             (string) $response->getContent()
         );
+    }
+
+    /**
+     * @dataProvider inactiveExternalPartnerStatusProvider
+     */
+    public function test_external_member_reviews_rejects_inactive_partner_before_fetch(string $status): void
+    {
+        $this->setFederationFeature($this->testTenantId, true);
+        Http::fake();
+
+        $partner = $this->setupPartner('nexus', $this->testTenantId);
+        DB::table('federation_external_partners')
+            ->where('id', $partner->id)
+            ->update(['status' => $status]);
+
+        $actingUser = User::factory()->forTenant($this->testTenantId)->create();
+        $this->optInUserToFederation((int) $actingUser->id);
+        $this->actingAs($actingUser);
+
+        $response = $this->makeController()->memberReviews('ext-' . $partner->id . '-remote-member-1');
+
+        $this->assertSame(404, $response->getStatusCode());
+        Http::assertNothingSent();
+    }
+
+    public static function inactiveExternalPartnerStatusProvider(): array
+    {
+        return [
+            'inactive' => ['inactive'],
+            'suspended' => ['suspended'],
+            'disabled' => ['disabled'],
+        ];
+    }
+
+    public function test_external_member_reviews_rejects_disabled_member_permission_before_fetch(): void
+    {
+        $this->setFederationFeature($this->testTenantId, true);
+        Http::fake();
+
+        $partner = $this->setupPartner('nexus', $this->testTenantId);
+        DB::table('federation_external_partners')
+            ->where('id', $partner->id)
+            ->update(['allow_member_search' => 0]);
+
+        $actingUser = User::factory()->forTenant($this->testTenantId)->create();
+        $this->optInUserToFederation((int) $actingUser->id);
+        $this->actingAs($actingUser);
+
+        $response = $this->makeController()->memberReviews('ext-' . $partner->id . '-remote-member-1');
+
+        $this->assertSame(403, $response->getStatusCode());
+        Http::assertNothingSent();
     }
 }

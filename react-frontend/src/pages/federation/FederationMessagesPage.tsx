@@ -466,7 +466,7 @@ export function FederationMessagesPage() {
       try {
         const response = await api.post('/v2/federation/messages/mark-read-batch', { ids: unreadIds });
         if (!response.success) {
-          throw new Error(response.error || 'mark-read failed');
+          throw new Error('mark-read failed');
         }
       } catch (err) {
         setAllMessages((prev) =>
@@ -648,7 +648,7 @@ export function FederationMessagesPage() {
           messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         }, 100);
       } else {
-        toastRef.current.error(tRef.current('messages.toast_error'), response.error || tRef.current('messages.send_error'));
+        toastRef.current.error(tRef.current('messages.toast_error'), tRef.current('messages.send_error'));
       }
     } catch (err) {
       logError('Failed to send federated reply', err);
@@ -722,7 +722,7 @@ export function FederationMessagesPage() {
         setActiveThreadKey(key);
         setMobileShowThread(true);
       } else {
-        toastRef.current.error(tRef.current('messages.toast_error'), response.error || tRef.current('messages.send_error'));
+        toastRef.current.error(tRef.current('messages.toast_error'), tRef.current('messages.send_error'));
       }
     } catch (err) {
       logError('Failed to send federated message', err);

@@ -63,20 +63,30 @@ class FederationInboundHandlersTest extends TestCase
 
         $this->partnerToken = 'test-token-' . bin2hex(random_bytes(8));
 
-        $this->partnerId = (int) DB::table('federation_external_partners')->insertGetId([
+        $partnerRow = [
             'tenant_id'          => $this->testTenantId,
             'name'               => 'Test Inbound Partner',
             'base_url'           => 'https://inbound-test.example',
             'api_path'           => '/api/v1/federation',
             'signing_secret'     => $this->partnerToken, // plaintext — decryptSecret falls back
             'status'             => 'active',
+            'allow_member_search' => 1,
+            'allow_listing_search' => 1,
             'allow_messaging'    => 1,
             'allow_transactions' => 1,
             'allow_events'       => 1,
             'allow_groups'       => 1,
             'created_at'         => now(),
             'updated_at'         => now(),
-        ]);
+        ];
+
+        foreach (['allow_connections', 'allow_volunteering', 'allow_member_sync'] as $flag) {
+            if (Schema::hasColumn('federation_external_partners', $flag)) {
+                $partnerRow[$flag] = 1;
+            }
+        }
+
+        $this->partnerId = (int) DB::table('federation_external_partners')->insertGetId($partnerRow);
 
         TenantContext::setById($this->testTenantId);
     }

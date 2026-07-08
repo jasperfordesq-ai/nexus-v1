@@ -419,6 +419,32 @@ class FederationParityTest extends TestCase
         ]);
     }
 
+    public function test_accessible_federation_read_screens_require_member_opt_in(): void
+    {
+        $this->enableFederationForTenant();
+        $this->authenticatedUser(['name' => 'Not Opted In Member']);
+
+        $expectedRedirect = route('govuk-alpha.federation.opt-in', ['tenantSlug' => $this->testTenantSlug]);
+
+        foreach ([
+            "/{$this->testTenantSlug}/alpha/federation/members",
+            "/{$this->testTenantSlug}/alpha/federation/members/123",
+            "/{$this->testTenantSlug}/alpha/federation/members/123/transfer",
+            "/{$this->testTenantSlug}/alpha/federation/listings",
+            "/{$this->testTenantSlug}/alpha/federation/listings/99/123",
+            "/{$this->testTenantSlug}/alpha/federation/events",
+            "/{$this->testTenantSlug}/alpha/federation/groups",
+            "/{$this->testTenantSlug}/alpha/federation/connections",
+            "/{$this->testTenantSlug}/alpha/federation/messages",
+            "/{$this->testTenantSlug}/alpha/federation/messages/conversation/123",
+        ] as $path) {
+            $this->get($path)->assertRedirect($expectedRedirect);
+        }
+
+        $this->get("/{$this->testTenantSlug}/alpha/federation")->assertOk();
+        $this->get("/{$this->testTenantSlug}/alpha/federation/partners")->assertOk();
+    }
+
     public function test_accessible_federation_transfer_is_idempotent_and_stores_raw_description(): void
     {
         $this->enableFederationForTenant();

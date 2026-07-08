@@ -105,6 +105,18 @@ class FederationV2Controller extends BaseApiController
         return $this->respondWithError('FORBIDDEN', __('api.federation.feature_disabled'), null, 403);
     }
 
+    private function requireFederationOptIn(): ?JsonResponse
+    {
+        $userId = $this->getUserId();
+        $tenantId = $this->getTenantId();
+
+        if (FederationUserService::hasOptedIn($userId, $tenantId)) {
+            return null;
+        }
+
+        return $this->respondWithError('FEDERATION_NOT_ENABLED', __('api.fed_must_opt_in_first'), null, 403);
+    }
+
     private function getActiveExternalPartnerForOperation(int $externalPartnerId, int $tenantId, string $allowFlag): ?array
     {
         $partner = \App\Services\FederationExternalPartnerService::getById($externalPartnerId, $tenantId);
@@ -117,6 +129,27 @@ class FederationV2Controller extends BaseApiController
         }
 
         return $partner;
+    }
+
+    private function payloadBool(array $data, string $key, bool $default): bool
+    {
+        if (!array_key_exists($key, $data)) {
+            return $default;
+        }
+
+        $value = $data[$key];
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_int($value)) {
+            return $value === 1;
+        }
+        if (is_string($value)) {
+            $normalized = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            return $normalized ?? $default;
+        }
+
+        return $default;
     }
 
     private function parseExternalMemberIdentifier(string $memberId, int $expectedPartnerId): string
@@ -489,14 +522,14 @@ class FederationV2Controller extends BaseApiController
 
         $settings = [
             'federation_optin' => true,
-            'profile_visible_federated' => $data['profile_visible_federated'] ?? true,
-            'appear_in_federated_search' => $data['appear_in_federated_search'] ?? true,
-            'show_skills_federated' => $data['show_skills_federated'] ?? true,
-            'show_location_federated' => $data['show_location_federated'] ?? false,
-            'show_reviews_federated' => $data['show_reviews_federated'] ?? true,
-            'messaging_enabled_federated' => $data['messaging_enabled_federated'] ?? true,
-            'transactions_enabled_federated' => $data['transactions_enabled_federated'] ?? true,
-            'email_notifications' => $data['email_notifications'] ?? true,
+            'profile_visible_federated' => $this->payloadBool($data, 'profile_visible_federated', true),
+            'appear_in_federated_search' => $this->payloadBool($data, 'appear_in_federated_search', true),
+            'show_skills_federated' => $this->payloadBool($data, 'show_skills_federated', true),
+            'show_location_federated' => $this->payloadBool($data, 'show_location_federated', false),
+            'show_reviews_federated' => $this->payloadBool($data, 'show_reviews_federated', true),
+            'messaging_enabled_federated' => $this->payloadBool($data, 'messaging_enabled_federated', true),
+            'transactions_enabled_federated' => $this->payloadBool($data, 'transactions_enabled_federated', true),
+            'email_notifications' => $this->payloadBool($data, 'email_notifications', true),
             'service_reach' => $data['service_reach'] ?? 'local_only',
             'travel_radius_km' => array_key_exists('travel_radius_km', $data) ? (int) $data['travel_radius_km'] : 25,
         ];
@@ -834,8 +867,10 @@ class FederationV2Controller extends BaseApiController
         if ($blocked = $this->requireFederationOperation('events')) {
             return $blocked;
         }
+        if ($blocked = $this->requireFederationOptIn()) {
+            return $blocked;
+        }
 
-        $this->getUserId();
         $tenantId = $this->getTenantId();
 
         $q = $this->query('q', '');
@@ -952,8 +987,10 @@ class FederationV2Controller extends BaseApiController
         if ($blocked = $this->requireFederationOperation('groups')) {
             return $blocked;
         }
+        if ($blocked = $this->requireFederationOptIn()) {
+            return $blocked;
+        }
 
-        $this->getUserId();
         $tenantId = $this->getTenantId();
 
         $q = $this->query('q', '');
@@ -1126,8 +1163,10 @@ class FederationV2Controller extends BaseApiController
         if ($blocked = $this->requireFederationOperation('listings')) {
             return $blocked;
         }
+        if ($blocked = $this->requireFederationOptIn()) {
+            return $blocked;
+        }
 
-        $this->getUserId();
         $tenantId = $this->getTenantId();
 
         $q = $this->query('q', '');
@@ -1412,8 +1451,10 @@ class FederationV2Controller extends BaseApiController
         if ($blocked = $this->requireFederationOperation('profiles')) {
             return $blocked;
         }
+        if ($blocked = $this->requireFederationOptIn()) {
+            return $blocked;
+        }
 
-        $this->getUserId();
         $tenantId = $this->getTenantId();
 
         $q = $this->query('q', '');
@@ -1709,8 +1750,10 @@ class FederationV2Controller extends BaseApiController
         if ($blocked = $this->requireFederationOperation('profiles')) {
             return $blocked;
         }
+        if ($blocked = $this->requireFederationOptIn()) {
+            return $blocked;
+        }
 
-        $this->getUserId();
         $tenantId = $this->getTenantId();
         $memberTenantId = $this->queryInt('tenant_id');
 
@@ -1915,8 +1958,10 @@ class FederationV2Controller extends BaseApiController
         if ($blocked = $this->requireFederationOperation('profiles')) {
             return $blocked;
         }
+        if ($blocked = $this->requireFederationOptIn()) {
+            return $blocked;
+        }
 
-        $this->getUserId();
         $tenantId = $this->getTenantId();
 
         // External member path: ext-{partnerId}-{externalId}
@@ -1934,8 +1979,11 @@ class FederationV2Controller extends BaseApiController
 
             try {
                 $partner = \App\Services\FederationExternalPartnerService::getById($partnerId, $tenantId);
-                if (!$partner) {
-                    return $this->respondWithData([]);
+                if (!$partner || ($partner['status'] ?? '') !== 'active') {
+                    return $this->respondWithError('PARTNER_NOT_FOUND', __('api.external_partner_not_found'), null, 404);
+                }
+                if (!($partner['allow_member_search'] ?? false)) {
+                    return $this->respondWithError('MEMBERS_NOT_ALLOWED', __('api.federation.feature_disabled'), null, 403);
                 }
 
                 $result = \App\Services\FederationExternalApiClient::fetchMemberReviews(
@@ -2091,6 +2139,9 @@ class FederationV2Controller extends BaseApiController
     public function messages(): JsonResponse
     {
         if ($blocked = $this->requireFederationOperation('messaging')) {
+            return $blocked;
+        }
+        if ($blocked = $this->requireFederationOptIn()) {
             return $blocked;
         }
 
@@ -2909,14 +2960,14 @@ class FederationV2Controller extends BaseApiController
         $current = $this->federationUserService->getUserSettings($userId);
         $settings = [
             'federation_optin' => $current['federation_optin'],
-            'profile_visible_federated' => $data['profile_visible_federated'] ?? $current['profile_visible_federated'],
-            'appear_in_federated_search' => $data['appear_in_federated_search'] ?? $current['appear_in_federated_search'],
-            'show_skills_federated' => $data['show_skills_federated'] ?? $current['show_skills_federated'],
-            'show_location_federated' => $data['show_location_federated'] ?? $current['show_location_federated'],
-            'show_reviews_federated' => $data['show_reviews_federated'] ?? $current['show_reviews_federated'],
-            'messaging_enabled_federated' => $data['messaging_enabled_federated'] ?? $current['messaging_enabled_federated'],
-            'transactions_enabled_federated' => $data['transactions_enabled_federated'] ?? $current['transactions_enabled_federated'],
-            'email_notifications' => $data['email_notifications'] ?? ($current['email_notifications'] ?? true),
+            'profile_visible_federated' => $this->payloadBool($data, 'profile_visible_federated', (bool) $current['profile_visible_federated']),
+            'appear_in_federated_search' => $this->payloadBool($data, 'appear_in_federated_search', (bool) $current['appear_in_federated_search']),
+            'show_skills_federated' => $this->payloadBool($data, 'show_skills_federated', (bool) $current['show_skills_federated']),
+            'show_location_federated' => $this->payloadBool($data, 'show_location_federated', (bool) $current['show_location_federated']),
+            'show_reviews_federated' => $this->payloadBool($data, 'show_reviews_federated', (bool) $current['show_reviews_federated']),
+            'messaging_enabled_federated' => $this->payloadBool($data, 'messaging_enabled_federated', (bool) $current['messaging_enabled_federated']),
+            'transactions_enabled_federated' => $this->payloadBool($data, 'transactions_enabled_federated', (bool) $current['transactions_enabled_federated']),
+            'email_notifications' => $this->payloadBool($data, 'email_notifications', (bool) ($current['email_notifications'] ?? true)),
             'service_reach' => $data['service_reach'] ?? $current['service_reach'],
             'travel_radius_km' => array_key_exists('travel_radius_km', $data) ? $data['travel_radius_km'] : $current['travel_radius_km'],
         ];
@@ -2938,6 +2989,9 @@ class FederationV2Controller extends BaseApiController
     public function connections(): JsonResponse
     {
         if ($blocked = $this->requireFederationOperation('profiles')) {
+            return $blocked;
+        }
+        if ($blocked = $this->requireFederationOptIn()) {
             return $blocked;
         }
 

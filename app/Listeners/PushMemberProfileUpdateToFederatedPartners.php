@@ -84,6 +84,7 @@ class PushMemberProfileUpdateToFederatedPartners implements ShouldQueue
 
             $identities = FederatedIdentity::query()
                 ->where('local_user_id', (int) $freshUser->id)
+                ->where('tenant_id', $tenantId)
                 ->get();
             if ($identities->isEmpty()) {
                 return;

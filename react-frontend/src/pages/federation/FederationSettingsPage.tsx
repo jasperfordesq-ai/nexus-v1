@@ -204,7 +204,7 @@ export function FederationSettingsPage() {
           tRef.current('settings.federation_toggled_description', { action })
         );
       } else {
-        toastRef.current.error(tRef.current('settings.action_failed'), response.error || tRef.current('settings.toggle_error', { action: federationOptedIn ? tRef.current('settings.disable') : tRef.current('settings.enable') }));
+        toastRef.current.error(tRef.current('settings.action_failed'), tRef.current('settings.toggle_error', { action: federationOptedIn ? tRef.current('settings.disable') : tRef.current('settings.enable') }));
       }
     } catch (error) {
       logError(`Failed to toggle federation`, error);
@@ -222,7 +222,7 @@ export function FederationSettingsPage() {
         setOriginalSettings({ ...settings });
         toastRef.current.success(tRef.current('settings.save_success_title'), tRef.current('settings.save_success_description'));
       } else {
-        toastRef.current.error(tRef.current('settings.save_failed_title'), response.error || tRef.current('settings.save_failed_description'));
+        toastRef.current.error(tRef.current('settings.save_failed_title'), tRef.current('settings.save_failed_description'));
       }
     } catch (error) {
       logError('Failed to save federation settings', error);

@@ -267,6 +267,26 @@ class PushMemberProfileUpdateToFederatedPartnersTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_ignores_federated_identity_rows_from_other_tenants(): void
+    {
+        $this->insertPartnerWithMemberSync();
+        $user = $this->createUser(['first_name' => 'CrossTenant']);
+
+        DB::table('federated_identities')->insert([
+            'tenant_id' => self::TENANT_ID + 1,
+            'local_user_id' => $user->id,
+            'partner_id' => self::PARTNER_ID,
+            'external_user_id' => 'cross-tenant-identity',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $listener = $this->makeListener();
+        $listener->handle(new MemberProfileUpdated($user, ['first_name'], self::TENANT_ID));
+
+        Http::assertNothingSent();
+    }
+
     public function test_skips_when_partner_does_not_have_allow_member_sync(): void
     {
         // Insert partner with allow_member_sync = 0.
