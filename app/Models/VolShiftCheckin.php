@@ -18,7 +18,6 @@ class VolShiftCheckin extends Model
     protected $table = 'vol_shift_checkins';
 
     protected $fillable = [
-        'tenant_id',
         'shift_id',
         'user_id',
         'qr_token',

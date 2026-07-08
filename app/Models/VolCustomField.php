@@ -19,7 +19,6 @@ class VolCustomField extends Model
     protected $table = 'vol_custom_fields';
 
     protected $fillable = [
-        'tenant_id',
         'organization_id',
         'field_key',
         'field_label',

@@ -29,7 +29,7 @@ class VolAccessibilityNeedTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'user_id', 'need_type', 'description',
+            'user_id', 'need_type', 'description',
             'accommodations_required', 'emergency_contact_name',
             'emergency_contact_phone',
         ];

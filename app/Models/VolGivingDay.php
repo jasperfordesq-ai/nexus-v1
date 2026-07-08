@@ -20,7 +20,6 @@ class VolGivingDay extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'tenant_id',
         'title',
         'description',
         'start_date',

@@ -34,7 +34,7 @@ class VolGivingDayTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'title', 'description', 'start_date', 'end_date',
+            'title', 'description', 'start_date', 'end_date',
             'goal_amount', 'raised_amount', 'target_hours', 'is_active', 'created_by', 'created_at',
         ];
         $this->assertEquals($expected, $this->model->getFillable());

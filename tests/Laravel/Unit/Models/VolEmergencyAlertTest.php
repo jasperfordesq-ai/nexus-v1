@@ -35,7 +35,7 @@ class VolEmergencyAlertTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'shift_id', 'created_by', 'priority', 'message',
+            'shift_id', 'created_by', 'priority', 'message',
             'required_skills', 'status', 'expires_at', 'filled_at', 'created_at',
         ];
         $this->assertEquals($expected, $this->model->getFillable());

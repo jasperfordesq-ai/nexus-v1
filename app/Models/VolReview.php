@@ -18,7 +18,6 @@ class VolReview extends Model
     protected $table = 'vol_reviews';
 
     protected $fillable = [
-        'tenant_id',
         'reviewer_id',
         'target_type',
         'target_id',

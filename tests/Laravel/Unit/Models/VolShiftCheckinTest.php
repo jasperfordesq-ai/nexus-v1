@@ -29,7 +29,7 @@ class VolShiftCheckinTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'shift_id', 'user_id', 'qr_token',
+            'shift_id', 'user_id', 'qr_token',
             'status', 'checked_in_at', 'checked_out_at',
         ];
         $this->assertEquals($expected, $this->model->getFillable());

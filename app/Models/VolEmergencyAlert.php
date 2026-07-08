@@ -21,7 +21,6 @@ class VolEmergencyAlert extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'tenant_id',
         'shift_id',
         'created_by',
         'priority',

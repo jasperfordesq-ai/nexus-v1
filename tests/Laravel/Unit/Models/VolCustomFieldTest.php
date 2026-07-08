@@ -30,7 +30,7 @@ class VolCustomFieldTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'organization_id', 'field_key', 'field_label',
+            'organization_id', 'field_key', 'field_label',
             'field_type', 'applies_to', 'is_required', 'field_options',
             'display_order', 'placeholder', 'help_text', 'is_active',
         ];

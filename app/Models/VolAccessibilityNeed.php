@@ -18,7 +18,6 @@ class VolAccessibilityNeed extends Model
     protected $table = 'vol_accessibility_needs';
 
     protected $fillable = [
-        'tenant_id',
         'user_id',
         'need_type',
         'description',

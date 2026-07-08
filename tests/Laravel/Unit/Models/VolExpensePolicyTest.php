@@ -29,7 +29,7 @@ class VolExpensePolicyTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'organization_id', 'expense_type', 'max_amount',
+            'organization_id', 'expense_type', 'max_amount',
             'max_monthly', 'requires_receipt_above', 'requires_approval',
         ];
         $this->assertEquals($expected, $this->model->getFillable());

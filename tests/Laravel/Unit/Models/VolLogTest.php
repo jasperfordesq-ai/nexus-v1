@@ -29,7 +29,7 @@ class VolLogTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'user_id', 'organization_id', 'opportunity_id',
+            'user_id', 'organization_id', 'opportunity_id',
             'caring_support_relationship_id', 'support_recipient_id',
             'date_logged', 'hours', 'description', 'status',
             'assigned_to', 'assigned_at', 'escalated_at', 'escalation_note',

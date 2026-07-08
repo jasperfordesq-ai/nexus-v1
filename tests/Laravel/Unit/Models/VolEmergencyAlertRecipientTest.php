@@ -33,7 +33,7 @@ class VolEmergencyAlertRecipientTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'alert_id', 'tenant_id', 'user_id', 'notified_at',
+            'alert_id', 'user_id', 'notified_at',
             'response', 'responded_at',
         ];
         $this->assertEquals($expected, $this->model->getFillable());

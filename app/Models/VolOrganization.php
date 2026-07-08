@@ -19,7 +19,6 @@ class VolOrganization extends Model
     protected $table = 'vol_organizations';
 
     protected $fillable = [
-        'tenant_id',
         'user_id',
         'name',
         'description',

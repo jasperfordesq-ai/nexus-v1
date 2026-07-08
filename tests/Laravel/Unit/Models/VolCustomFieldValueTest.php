@@ -29,7 +29,7 @@ class VolCustomFieldValueTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'custom_field_id', 'entity_type', 'entity_id', 'field_value',
+            'custom_field_id', 'entity_type', 'entity_id', 'field_value',
         ];
         $this->assertEquals($expected, $this->model->getFillable());
     }

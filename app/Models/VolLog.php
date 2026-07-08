@@ -18,7 +18,6 @@ class VolLog extends Model
     protected $table = 'vol_logs';
 
     protected $fillable = [
-        'tenant_id',
         'user_id',
         'organization_id',
         'opportunity_id',

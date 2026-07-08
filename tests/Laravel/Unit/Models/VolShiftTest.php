@@ -29,7 +29,7 @@ class VolShiftTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'opportunity_id', 'start_time', 'end_time', 'capacity',
+            'opportunity_id', 'start_time', 'end_time', 'capacity',
         ];
         $this->assertEquals($expected, $this->model->getFillable());
     }

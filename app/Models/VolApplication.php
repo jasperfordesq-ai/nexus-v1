@@ -18,7 +18,6 @@ class VolApplication extends Model
     protected $table = 'vol_applications';
 
     protected $fillable = [
-        'tenant_id',
         'opportunity_id',
         'user_id',
         'message',

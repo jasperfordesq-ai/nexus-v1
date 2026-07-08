@@ -18,7 +18,6 @@ class VolExpensePolicy extends Model
     protected $table = 'vol_expense_policies';
 
     protected $fillable = [
-        'tenant_id',
         'organization_id',
         'expense_type',
         'max_amount',

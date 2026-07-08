@@ -30,7 +30,7 @@ class VolOpportunityTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'created_by', 'organization_id', 'title', 'description',
+            'created_by', 'organization_id', 'title', 'description',
             'location', 'is_remote', 'latitude', 'longitude', 'skills_needed', 'start_date', 'end_date', 'category_id',
             'status', 'is_active', 'federated_visibility',
         ];

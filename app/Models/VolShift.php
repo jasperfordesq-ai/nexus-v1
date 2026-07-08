@@ -18,7 +18,6 @@ class VolShift extends Model
     protected $table = 'vol_shifts';
 
     protected $fillable = [
-        'tenant_id',
         'opportunity_id',
         'start_time',
         'end_time',

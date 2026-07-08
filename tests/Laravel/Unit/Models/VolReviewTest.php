@@ -29,7 +29,7 @@ class VolReviewTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'reviewer_id', 'target_type', 'target_id',
+            'reviewer_id', 'target_type', 'target_id',
             'rating', 'comment',
         ];
         $this->assertEquals($expected, $this->model->getFillable());

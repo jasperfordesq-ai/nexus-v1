@@ -29,7 +29,7 @@ class VolApplicationTest extends TestCase
     public function test_fillable_contains_expected_fields(): void
     {
         $expected = [
-            'tenant_id', 'opportunity_id', 'user_id', 'message', 'shift_id',
+            'opportunity_id', 'user_id', 'message', 'shift_id',
         ];
         $this->assertEquals($expected, $this->model->getFillable());
     }

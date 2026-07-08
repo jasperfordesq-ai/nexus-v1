@@ -21,7 +21,6 @@ class VolEmergencyAlertRecipient extends Model
 
     protected $fillable = [
         'alert_id',
-        'tenant_id',
         'user_id',
         'notified_at',
         'response',
