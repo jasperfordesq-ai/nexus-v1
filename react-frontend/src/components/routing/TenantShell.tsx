@@ -179,14 +179,13 @@ function TenantShellRuntime({
   isAuthRoute: boolean;
   slugPrefix?: string;
 }) {
-  const { isAuthenticated } = useAuth();
   const location = useLocation();
 
   if (isAuthRoute) {
     return <TenantRouteSurface slugPrefix={slugPrefix} appRoutes={appRoutes} />;
   }
 
-  const needsFullRuntime = isAuthenticated && routeNeedsTenantAppRuntime(location.pathname, slugPrefix);
+  const needsFullRuntime = routeNeedsTenantAppRuntime(location.pathname, slugPrefix);
   const Providers = needsFullRuntime ? TenantAppProviders : TenantPublicProviders;
 
   return (

@@ -29,6 +29,39 @@ use Illuminate\Support\Facades\Log;
 class StripeDonationService
 {
     /**
+     * Stripe currencies with NO minor unit — the amount is charged as whole
+     * units (e.g. ¥500 is amount=500, not 50000). Charging these ×100 overbills
+     * the donor 100×. https://stripe.com/docs/currencies#zero-decimal
+     */
+    private const ZERO_DECIMAL_CURRENCIES = [
+        'bif', 'clp', 'djf', 'gnf', 'jpy', 'kmf', 'krw', 'mga',
+        'pyg', 'rwf', 'ugx', 'vnd', 'vuv', 'xaf', 'xof', 'xpf',
+    ];
+
+    /** Stripe currencies charged in thousandths (three decimal places). */
+    private const THREE_DECIMAL_CURRENCIES = ['bhd', 'jod', 'kwd', 'omr', 'tnd'];
+
+    /**
+     * Convert a decimal amount to Stripe's smallest-unit integer for the given
+     * currency, honouring zero- and three-decimal currencies.
+     */
+    private static function toStripeMinorUnits(float $amount, string $currency): int
+    {
+        $currency = strtolower($currency);
+
+        if (in_array($currency, self::ZERO_DECIMAL_CURRENCIES, true)) {
+            return (int) round($amount);
+        }
+
+        if (in_array($currency, self::THREE_DECIMAL_CURRENCIES, true)) {
+            // Stripe requires three-decimal amounts to be a multiple of 10.
+            return (int) (round($amount * 100) * 10);
+        }
+
+        return (int) round($amount * 100);
+    }
+
+    /**
      * Create a Stripe PaymentIntent and a pending donation record.
      *
      * @param int   $userId   Authenticated user ID
@@ -44,13 +77,22 @@ class StripeDonationService
     public static function createPaymentIntent(int $userId, int $tenantId, array $data): array
     {
         $amount = (float) ($data['amount'] ?? 0);
-        $currency = strtolower(trim($data['currency'] ?? TenantContext::runForTenant($tenantId, fn() => TenantContext::getCurrency())));
+        $tenantCurrency = strtolower(trim((string) TenantContext::runForTenant($tenantId, fn () => TenantContext::getCurrency())));
+        $currency = strtolower(trim((string) ($data['currency'] ?? $tenantCurrency)));
 
         if ($amount < 0.50) {
             throw new \InvalidArgumentException('Donation amount must be at least 0.50.');
         }
         if (strlen($currency) !== 3) {
             throw new \InvalidArgumentException('Currency must be a 3-letter ISO code.');
+        }
+        // Donations must be in the community's configured currency. Accepting an
+        // arbitrary client-supplied currency (a) enabled the zero-decimal 100×
+        // mischarge and (b) let a donor inflate a giving day's single-currency
+        // running total with a cheap foreign currency (raised_amount sums the
+        // raw numeric amount regardless of currency).
+        if ($tenantCurrency !== '' && strlen($tenantCurrency) === 3 && $currency !== $tenantCurrency) {
+            throw new \InvalidArgumentException('Donation currency must match the community currency.');
         }
 
         $user = DB::table('users')
@@ -106,7 +148,7 @@ class StripeDonationService
         // Create PaymentIntent
         try {
             $paymentIntentParams = [
-                'amount' => (int) round($amount * 100),
+                'amount' => self::toStripeMinorUnits($amount, $currency),
                 'currency' => $currency,
                 'description' => "Donation to {$tenantName}",
                 'metadata' => [
@@ -306,20 +348,48 @@ class StripeDonationService
             return;
         }
 
-        DB::transaction(function () use ($donation, $piId) {
+        $transitioned = DB::transaction(function () use ($donation) {
+            // Re-read under lock. The status pre-check above runs OUTSIDE this
+            // transaction, so a concurrent/late charge.refunded or a reclaimed-
+            // and-replayed event could have moved the row. Only pending →
+            // completed is valid; a completed/refunded/failed row must not be
+            // re-completed or re-increment the giving day.
+            $locked = DB::table('vol_donations')
+                ->where('id', $donation->id)
+                ->where('tenant_id', $donation->tenant_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$locked || $locked->status !== 'pending') {
+                return false;
+            }
+
             DB::table('vol_donations')
                 ->where('id', $donation->id)
                 ->where('tenant_id', $donation->tenant_id)
+                ->where('status', 'pending')
                 ->update(['status' => 'completed']);
 
             // Increment giving day raised_amount if applicable
-            if (!empty($donation->giving_day_id)) {
+            if (!empty($locked->giving_day_id)) {
                 DB::table('vol_giving_days')
-                    ->where('id', $donation->giving_day_id)
+                    ->where('id', $locked->giving_day_id)
                     ->where('tenant_id', $donation->tenant_id)
-                    ->increment('raised_amount', (float) $donation->amount);
+                    ->increment('raised_amount', (float) $locked->amount);
             }
+
+            return true;
         });
+
+        if (!$transitioned) {
+            // Another path (late refund, replayed event) already resolved this
+            // donation — do not send a fresh receipt or admin notification.
+            Log::info('Stripe donation: succeeded event skipped (not pending)', [
+                'donation_id' => $donation->id,
+                'payment_intent_id' => $piId,
+            ]);
+            return;
+        }
 
         Log::info('Stripe donation: payment succeeded', [
             'donation_id' => $donation->id,
@@ -493,14 +563,19 @@ class StripeDonationService
             return;
         }
 
-        DB::table('vol_donations')
+        // Only pending → failed. Stripe does not guarantee event ordering, so a
+        // late payment_failed from a first attempt must never clobber a donation
+        // already completed (or refunded) by a later attempt's succeeded event.
+        $affected = DB::table('vol_donations')
             ->where('id', $donation->id)
             ->where('tenant_id', $donation->tenant_id)
+            ->where('status', 'pending')
             ->update(['status' => 'failed']);
 
         Log::warning('Stripe donation: payment failed', [
             'donation_id' => $donation->id,
             'payment_intent_id' => $piId,
+            'applied' => $affected > 0,
         ]);
     }
 
@@ -546,17 +621,50 @@ class StripeDonationService
             return;
         }
 
+        // charge.refunded also fires for PARTIAL refunds. Only treat the
+        // donation as refunded when Stripe reports the full charge refunded —
+        // a partial refund must not drop it out of completed/gift-aid reporting
+        // or decrement the giving day by the full amount.
+        $amountRefunded = (int) ($charge->amount_refunded ?? 0);
+        $chargeAmount = (int) ($charge->amount ?? 0);
+        if ($chargeAmount <= 0 || $amountRefunded < $chargeAmount) {
+            Log::info('Stripe donation: partial refund ignored (not fully refunded)', [
+                'donation_id' => $donation->id,
+                'amount_refunded' => $amountRefunded,
+                'charge_amount' => $chargeAmount,
+            ]);
+            return;
+        }
+
         DB::transaction(function () use ($donation) {
+            // Re-read under lock — a refund can race a not-yet-completed
+            // succeeded event.
+            $locked = DB::table('vol_donations')
+                ->where('id', $donation->id)
+                ->where('tenant_id', $donation->tenant_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$locked || $locked->status === 'refunded') {
+                return;
+            }
+
+            // Only decrement the giving day if this donation had actually been
+            // counted (status 'completed'). A refund racing a still-pending
+            // donation must not drive the total negative; the later succeeded
+            // event will then find status 'refunded' and skip its increment.
+            $wasCompleted = $locked->status === 'completed';
+
             DB::table('vol_donations')
                 ->where('id', $donation->id)
                 ->where('tenant_id', $donation->tenant_id)
                 ->update(['status' => 'refunded']);
 
-            if (!empty($donation->giving_day_id)) {
+            if ($wasCompleted && !empty($locked->giving_day_id)) {
                 DB::table('vol_giving_days')
-                    ->where('id', $donation->giving_day_id)
+                    ->where('id', $locked->giving_day_id)
                     ->where('tenant_id', $donation->tenant_id)
-                    ->decrement('raised_amount', (float) $donation->amount);
+                    ->decrement('raised_amount', (float) $locked->amount);
             }
         });
 

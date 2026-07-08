@@ -233,6 +233,16 @@ describe('AdminHeader', () => {
     expect(screen.getByRole('banner')).toBeInTheDocument();
   });
 
+  it('uses an opaque token-backed header surface so page content cannot show through while scrolling', async () => {
+    const { AdminHeader } = await import('./AdminHeader');
+    render(<AdminHeader sidebarCollapsed={false} />);
+
+    const header = screen.getByRole('banner');
+    expect(header).toHaveClass('bg-[var(--surface-solid)]');
+    expect(header.className).not.toContain('bg-surface/90');
+    expect(header.className).not.toContain('backdrop-blur');
+  });
+
   it('shows the tenant name', async () => {
     const { AdminHeader } = await import('./AdminHeader');
     render(<AdminHeader sidebarCollapsed={false} />);
