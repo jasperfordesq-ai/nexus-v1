@@ -56,7 +56,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
@@ -249,7 +249,13 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
         <AnimatePresence mode="wait">
           <motion.img
             key={activeIndex}
-            src={resolveThumbnailUrl(images[activeIndex]?.url, { width: 1200, height: 675, fit: 'contain' })}
+            {...responsiveThumbnailProps(images[activeIndex]?.url, {
+              width: 1200,
+              height: 675,
+              fit: 'contain',
+              widths: [640, 960, 1200],
+              sizes: '(max-width: 768px) 100vw, 58vw',
+            })}
             alt={images[activeIndex]?.alt_text || t('listing.image_alt', { number: activeIndex + 1 })}
             className="w-full h-full object-contain"
             initial={{ opacity: 0 }}
@@ -844,7 +850,12 @@ export function MarketplaceListingPage() {
                     <div className="aspect-square bg-surface-secondary overflow-hidden rounded-t-xl">
                       {item.images?.[0] ? (
                         <img
-                          src={resolveThumbnailUrl(item.images[0].thumbnail_url || item.images[0].url, { width: 360, height: 360 })}
+                          {...responsiveThumbnailProps(item.images[0].thumbnail_url || item.images[0].url, {
+                            width: 360,
+                            height: 360,
+                            widths: [180, 240, 360],
+                            sizes: '(max-width: 640px) 50vw, 25vw',
+                          })}
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           loading="lazy"

@@ -59,7 +59,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useSocialInteractions } from '@/hooks/useSocialInteractions';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl, resolveThumbnailUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import type { Listing, ListingDetail, ExchangeConfig } from '@/types/api';
 
 interface ListingStructuredDataOptions {
@@ -504,7 +504,13 @@ export function ListingDetailPage() {
         <div className="relative overflow-hidden bg-theme-hover">
           {listing.image_url && !imageError ? (
             <img
-              src={resolveThumbnailUrl(listing.image_url, { width: 1200, height: 675, fit: 'contain' })}
+              {...responsiveThumbnailProps(listing.image_url, {
+                width: 1200,
+                height: 675,
+                fit: 'contain',
+                widths: [640, 960, 1200],
+                sizes: '(max-width: 768px) 100vw, 72vw',
+              })}
               alt={t('detail_image_alt', { title: listing.title })}
               className="h-64 w-full object-cover sm:h-80 lg:h-[24rem]"
               loading="lazy"

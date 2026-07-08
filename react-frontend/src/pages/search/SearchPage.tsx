@@ -36,7 +36,7 @@ import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import type { Listing, User as UserType, Event, Group } from '@/types/api';
@@ -408,7 +408,12 @@ export function SearchPage() {
                           <GlassCard className="hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden">
                             {listing.image_url && (
                               <img
-                                src={resolveThumbnailUrl(listing.image_url, { width: 640, height: 360 })}
+                                {...responsiveThumbnailProps(listing.image_url, {
+                                  width: 640,
+                                  height: 360,
+                                  widths: [320, 480, 640],
+                                  sizes: '(max-width: 640px) 100vw, 50vw',
+                                })}
                                 alt={listing.title || t('listing_image_alt')}
                                 className="w-full h-32 object-cover"
                                 loading="lazy"

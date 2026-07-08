@@ -27,8 +27,16 @@ final class MediaThumbnailService
         return max(self::MIN_SIZE, min(self::MAX_SIZE, (int) $dimension));
     }
 
-    public function format(): string
+    public function format(?string $requested = null): string
     {
+        $requested = strtolower((string) $requested);
+        if ($requested === 'avif' && function_exists('imageavif')) {
+            return 'avif';
+        }
+        if ($requested === 'webp' && function_exists('imagewebp')) {
+            return 'webp';
+        }
+
         return function_exists('imagewebp') ? 'webp' : 'jpg';
     }
 
@@ -111,7 +119,9 @@ final class MediaThumbnailService
         imagecopyresampled($thumb, $source, $destX, $destY, $srcX, $srcY, $destWidth, $destHeight, $copyWidth, $copyHeight);
 
         File::ensureDirectoryExists(dirname($thumbPath), 0755, true);
-        if ($format === 'webp') {
+        if ($format === 'avif' && function_exists('imageavif')) {
+            imageavif($thumb, $thumbPath, self::WEBP_QUALITY);
+        } elseif ($format === 'webp') {
             imagewebp($thumb, $thumbPath, self::WEBP_QUALITY);
         } else {
             imagejpeg($thumb, $thumbPath, self::JPEG_QUALITY);

@@ -17,7 +17,7 @@
 
 import { useState } from 'react';import Play from 'lucide-react/icons/play';
 import { useTranslation } from 'react-i18next';
-import { resolveAssetUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAssetUrl, resolveThumbnailUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import type { PostMedia } from './types';
 import { ImageLightbox } from './ImageLightbox';
 import { Button } from '@/components/ui/Button';
@@ -66,7 +66,12 @@ export function MediaGrid({ media, className = '' }: MediaGridProps) {
         </>
       ) : (
         <img
-          src={resolveThumbnailUrl(item.thumbnail_url || item.file_url, { width: 640, height: 640 })}
+          {...responsiveThumbnailProps(item.thumbnail_url || item.file_url, {
+            width: 640,
+            height: 640,
+            widths: [320, 480, 640],
+            sizes: total === 1 ? '100vw' : '(max-width: 768px) 50vw, 320px',
+          })}
           alt={item.alt_text || t('carousel.image_of', { current: index + 1, total })}
           className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           loading={index === 0 ? 'eager' : 'lazy'}

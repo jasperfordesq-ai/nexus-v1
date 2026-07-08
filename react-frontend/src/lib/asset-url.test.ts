@@ -14,7 +14,16 @@
  */
 
 import { afterEach, describe, it, expect, vi } from 'vitest';
-import { resolveAssetUrl, resolveAvatarUrl, resolveBrandingImageUrl, resolveThumbnailUrl, getUserDisplayName, getUserInitials } from './helpers';
+import {
+  getUserDisplayName,
+  getUserInitials,
+  resolveAssetUrl,
+  resolveAvatarUrl,
+  resolveBrandingImageUrl,
+  resolveThumbnailSrcSet,
+  resolveThumbnailUrl,
+  responsiveThumbnailProps,
+} from './helpers';
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -140,6 +149,52 @@ describe('resolveThumbnailUrl', () => {
     const url = 'https://example.com/image.jpg';
 
     expect(resolveThumbnailUrl(url, { width: 640, height: 360 })).toBe(url);
+  });
+
+  it('adds an explicit format when requested', () => {
+    const result = resolveThumbnailUrl('/uploads/tenants/test/listings/image.jpg', {
+      width: 640,
+      height: 360,
+      format: 'avif',
+    });
+
+    expect(result).toContain('format=avif');
+  });
+});
+
+describe('resolveThumbnailSrcSet', () => {
+  it('builds responsive width descriptors for local upload paths', () => {
+    const result = resolveThumbnailSrcSet('/uploads/tenants/test/listings/image.jpg', {
+      width: 640,
+      height: 360,
+      widths: [320, 640],
+    });
+
+    expect(result).toContain('w=320');
+    expect(result).toContain('h=180');
+    expect(result).toContain('320w');
+    expect(result).toContain('w=640');
+    expect(result).toContain('h=360');
+    expect(result).toContain('640w');
+  });
+
+  it('omits srcset for external media', () => {
+    expect(resolveThumbnailSrcSet('https://example.com/image.jpg', { width: 640, height: 360 })).toBe('');
+  });
+});
+
+describe('responsiveThumbnailProps', () => {
+  it('returns src, srcSet, and sizes for local uploaded media', () => {
+    const props = responsiveThumbnailProps('/storage/tenant_2/uploads/listing.jpg', {
+      width: 640,
+      height: 360,
+      widths: [320, 640],
+      sizes: '100vw',
+    });
+
+    expect(props.src).toContain('/v2/media/thumbnail?');
+    expect(props.srcSet).toContain('320w');
+    expect(props.sizes).toBe('100vw');
   });
 });
 

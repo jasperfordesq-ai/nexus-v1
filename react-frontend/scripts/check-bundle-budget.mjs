@@ -941,6 +941,44 @@ const heavyStaticAssetBudgets = [
   },
 ];
 
+const responsiveUploadedMediaBudgets = [
+  {
+    file: 'src/pages/listings/ListingsPage.tsx',
+    pattern: /^(?![\s\S]*responsiveThumbnailProps)/,
+    message: 'ListingsPage listing images must use responsiveThumbnailProps so browsers do not download one oversized image for every card.',
+  },
+  {
+    file: 'src/pages/listings/ListingDetailPage.tsx',
+    pattern: /^(?![\s\S]*responsiveThumbnailProps)/,
+    message: 'ListingDetailPage hero media must use responsiveThumbnailProps for uploaded listing images.',
+  },
+  {
+    file: 'src/components/marketplace/MarketplaceListingCard.tsx',
+    pattern: /^(?![\s\S]*responsiveThumbnailProps)/,
+    message: 'MarketplaceListingCard images must use responsiveThumbnailProps for card-sized uploaded media.',
+  },
+  {
+    file: 'src/components/marketplace/MarketplaceImageGallery.tsx',
+    pattern: /^(?![\s\S]*responsiveThumbnailProps)/,
+    message: 'MarketplaceImageGallery must use responsiveThumbnailProps for gallery images.',
+  },
+  {
+    file: 'src/components/feed/MediaGrid.tsx',
+    pattern: /^(?![\s\S]*responsiveThumbnailProps)/,
+    message: 'Feed MediaGrid image cells must use responsiveThumbnailProps for uploaded feed media.',
+  },
+  {
+    file: 'src/components/feed/ImageCarousel.tsx',
+    pattern: /^(?![\s\S]*responsiveThumbnailProps)/,
+    message: 'Feed ImageCarousel display images must use responsiveThumbnailProps for uploaded feed media.',
+  },
+  {
+    file: 'src/pages/search/SearchPage.tsx',
+    pattern: /^(?![\s\S]*responsiveThumbnailProps)/,
+    message: 'Search listing result images must use responsiveThumbnailProps.',
+  },
+];
+
 // Header/footer brand marks are an explicit exception to the usual "prefer WebP"
 // image rule: they must be allowed to use transparent raster logo files so
 // light/dark logo contrast is faithful. Keep page-level guards above so ordinary
@@ -1281,6 +1319,13 @@ async function main() {
   }
 
   for (const budget of heavyStaticAssetBudgets) {
+    const source = await readFile(path.resolve(import.meta.dirname, '..', budget.file), 'utf8');
+    if (budget.pattern.test(source)) {
+      failures.push(`${budget.file}: ${budget.message}`);
+    }
+  }
+
+  for (const budget of responsiveUploadedMediaBudgets) {
     const source = await readFile(path.resolve(import.meta.dirname, '..', budget.file), 'utf8');
     if (budget.pattern.test(source)) {
       failures.push(`${budget.file}: ${budget.message}`);

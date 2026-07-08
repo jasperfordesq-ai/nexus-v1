@@ -53,6 +53,8 @@ vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: (url: string | null) => url ?? '',
   resolveAvatarUrl: (url: string | null) => url ?? '',
+  resolveThumbnailUrl: (url: string | null) => url ?? '',
+  responsiveThumbnailProps: (url: string | null) => ({ src: url ?? '' }),
 }));
 
 // ─── Fixtures ────────────────────────────────────────────────────────────────

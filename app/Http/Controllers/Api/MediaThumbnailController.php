@@ -27,11 +27,15 @@ final class MediaThumbnailController extends Controller
         $width = $this->thumbnails->dimension($request->query('w'), MediaThumbnailService::DEFAULT_WIDTH);
         $height = $this->thumbnails->dimension($request->query('h'), MediaThumbnailService::DEFAULT_HEIGHT);
         $fit = $request->query('fit') === 'contain' ? 'contain' : 'cover';
-        $format = $this->thumbnails->format();
+        $format = $this->thumbnails->format($request->query('format'));
         $thumbPath = $this->thumbnails->ensureThumbnail($sourcePath, $width, $height, $fit, $format);
 
         $response = response()->file($thumbPath, [
-            'Content-Type' => $format === 'webp' ? 'image/webp' : 'image/jpeg',
+            'Content-Type' => match ($format) {
+                'avif' => 'image/avif',
+                'webp' => 'image/webp',
+                default => 'image/jpeg',
+            },
             'Content-Disposition' => 'inline',
         ]);
 

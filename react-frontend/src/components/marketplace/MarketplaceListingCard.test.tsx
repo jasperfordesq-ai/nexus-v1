@@ -22,6 +22,14 @@ vi.mock('@/contexts', () =>
     }),
   }),
 );
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: () => ({
+    tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
+    tenantPath: (p: string) => `/test${p}`,
+    hasFeature: vi.fn(() => true),
+    hasModule: vi.fn(() => true),
+  }),
+}));
 
 // PriceBadge and ConditionBadge are internal — no need to mock, let them render
 // but we stub the logger to keep console clean

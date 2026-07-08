@@ -61,7 +61,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { MAPS_ENABLED } from '@/lib/map-config';
-import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import type { EntityMapViewProps } from '@/components/location/EntityMapView';
 import type { ProximityFilterParams } from '@/components/proximity/ProximityFilter';
 import type { Listing, Category } from '@/types/api';
@@ -969,8 +969,13 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
     }
   }
 
-  const imageUrl = listing.image_url
-    ? resolveThumbnailUrl(listing.image_url, { width: isGrid ? 640 : 160, height: isGrid ? 360 : 160 })
+  const imageProps = listing.image_url
+    ? responsiveThumbnailProps(listing.image_url, {
+        width: isGrid ? 640 : 160,
+        height: isGrid ? 360 : 160,
+        widths: isGrid ? [320, 480, 640] : [96, 160],
+        sizes: isGrid ? '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw' : '160px',
+      })
     : null;
 
   if (!isGrid) {
@@ -978,9 +983,9 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
     return (
       <GlassCard className={`relative cursor-pointer p-4 transition-all duration-200 hover:-translate-y-0.5 hover:bg-theme-hover hover:shadow-md border-l-4 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent ${listing.type === 'offer' ? 'border-l-emerald-500/70' : 'border-l-amber-500/70'}`}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
-            {imageUrl && !imgError ? (
+            {imageProps && !imgError ? (
               <img
-                src={imageUrl}
+                {...imageProps}
                 alt={imageAlt}
                 className="h-36 w-full shrink-0 rounded-lg object-cover sm:h-20 sm:w-20"
                 width={160}
@@ -1086,9 +1091,9 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
       <GlassCard className="group relative flex h-full cursor-pointer flex-col overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-accent">
         {/* Listing Image with hover overlay and floating save button */}
         <div className="relative aspect-video overflow-hidden bg-theme-elevated">
-          {imageUrl && !imgError ? (
+          {imageProps && !imgError ? (
             <img
-              src={imageUrl}
+              {...imageProps}
               alt={imageAlt}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               width={800}

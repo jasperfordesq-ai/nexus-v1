@@ -81,21 +81,22 @@ class ImageUploadServiceTest extends TestCase
 
     public function test_upload_valid_image_stores_and_returns_result(): void
     {
-        $file = Mockery::mock(UploadedFile::class);
-        $file->shouldReceive('getPathname')->andReturn($this->makeTempFile(1024));
-        $file->shouldReceive('getMimeType')->andReturn('image/jpeg');
-        $file->shouldReceive('getClientOriginalExtension')->andReturn('jpg');
-        $file->shouldReceive('storeAs')->once()->andReturn('tenant_2/uploads/test.jpg');
-
-        Storage::shouldReceive('disk')->with('public')->andReturnSelf();
-        Storage::shouldReceive('url')->with('tenant_2/uploads/test.jpg')->andReturn('/storage/tenant_2/uploads/test.jpg');
+        Storage::fake('public');
+        $file = UploadedFile::fake()->image('test.jpg', 1280, 720)->size(512);
 
         $result = $this->service->upload($file);
 
         $this->assertArrayHasKey('path', $result);
         $this->assertArrayHasKey('url', $result);
         $this->assertArrayHasKey('filename', $result);
-        $this->assertSame('tenant_2/uploads/test.jpg', $result['path']);
+        $this->assertArrayHasKey('width', $result);
+        $this->assertArrayHasKey('height', $result);
+        $this->assertArrayHasKey('thumbnail_url', $result);
+        $this->assertArrayHasKey('variants', $result);
+        $this->assertArrayHasKey('srcsets', $result);
+        $this->assertSame(1280, $result['width']);
+        $this->assertSame(720, $result['height']);
+        $this->assertTrue(Storage::disk('public')->exists($result['path']));
     }
 
     // ─── delete ──────────────────────────────────────────────────

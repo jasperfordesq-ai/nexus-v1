@@ -21,7 +21,7 @@ import { Card, CardBody } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
 import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
 import { useTenant } from '@/contexts/TenantContext';
-import { resolveThumbnailUrl } from '@/lib/helpers';
+import { responsiveThumbnailProps } from '@/lib/helpers';
 import { PriceBadge } from './PriceBadge';
 import { ConditionBadge } from './ConditionBadge';
 import type { MarketplaceListingItem } from '@/types/marketplace';
@@ -50,8 +50,13 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
   );
 
   const sourceImageUrl = listing.image?.thumbnail_url || listing.image?.url;
-  const imageUrl = sourceImageUrl
-    ? resolveThumbnailUrl(sourceImageUrl, { width: 640, height: 360 })
+  const imageProps = sourceImageUrl
+    ? responsiveThumbnailProps(sourceImageUrl, {
+        width: 640,
+        height: 360,
+        widths: [320, 480, 640],
+        sizes: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw',
+      })
     : null;
 
   return (
@@ -64,9 +69,9 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
       >
         {/* Image container */}
         <div className="relative aspect-video overflow-hidden">
-          {imageUrl ? (
+          {imageProps ? (
             <img
-              src={imageUrl}
+              {...imageProps}
               alt={listing.image?.alt_text || listing.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"

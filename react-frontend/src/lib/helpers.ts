@@ -22,11 +22,17 @@ const API_BASE_ENV = import.meta.env.VITE_API_BASE || import.meta.env.VITE_API_U
 const API_ROUTE_BASE = API_BASE_ENV || (import.meta.env.DEV ? '/api' : 'https://api.project-nexus.ie/api');
 const API_ASSET_BASE = API_BASE_ENV.replace(/\/api$/, '') || (import.meta.env.DEV ? '' : 'https://api.project-nexus.ie');
 
-interface ThumbnailOptions {
+export interface ThumbnailOptions {
   width: number;
   height: number;
   fit?: 'cover' | 'contain';
   fallback?: string;
+  format?: 'avif' | 'webp' | 'jpg';
+}
+
+export interface ResponsiveThumbnailOptions extends ThumbnailOptions {
+  widths?: number[];
+  sizes?: string;
 }
 
 /**
@@ -133,11 +139,60 @@ export function resolveThumbnailUrl(url: string | null | undefined, options: Thu
       h: String(options.height),
       fit: options.fit ?? 'cover',
     });
+    if (options.format) {
+      params.set('format', options.format);
+    }
 
     return `${routeBase.origin}${routeBase.pathname.replace(/\/$/, '')}/v2/media/thumbnail?${params.toString()}`;
   } catch {
     return resolved;
   }
+}
+
+/**
+ * Build a responsive srcset for local uploaded media using the thumbnail cache.
+ * External/federated media returns an empty string so callers keep the original
+ * URL instead of proxying partner assets through our server.
+ */
+export function resolveThumbnailSrcSet(url: string | null | undefined, options: ResponsiveThumbnailOptions): string {
+  const widths = Array.from(new Set(options.widths ?? [320, 640, options.width]))
+    .filter((width) => width > 0 && width <= options.width)
+    .sort((a, b) => a - b);
+
+  const parts = widths
+    .map((width) => {
+      const height = Math.max(1, Math.round(width * (options.height / options.width)));
+      const resolved = resolveThumbnailUrl(url, { ...options, width, height });
+      return resolved ? `${resolved} ${width}w` : '';
+    })
+    .filter(Boolean);
+
+  if (parts.length <= 1) {
+    return '';
+  }
+
+  const firstUrl = parts[0]?.replace(/\s+\d+w$/, '');
+  const allSame = parts.every((part) => part.replace(/\s+\d+w$/, '') === firstUrl);
+
+  return allSame ? '' : parts.join(', ');
+}
+
+/**
+ * Convenience props for <img> elements that should use uploaded-media
+ * derivatives without losing their normal fallback behaviour.
+ */
+export function responsiveThumbnailProps(
+  url: string | null | undefined,
+  options: ResponsiveThumbnailOptions,
+): { src: string; srcSet?: string; sizes?: string } {
+  const src = resolveThumbnailUrl(url, options);
+  const srcSet = resolveThumbnailSrcSet(url, options);
+
+  return {
+    src,
+    ...(srcSet ? { srcSet } : {}),
+    ...(options.sizes ? { sizes: options.sizes } : {}),
+  };
 }
 
 /**

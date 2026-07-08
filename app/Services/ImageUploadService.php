@@ -20,15 +20,34 @@ use Throwable;
 class ImageUploadService
 {
     private const MAX_FILE_SIZE = 10485760; // 10 MB
+    private const MAX_IMAGE_PIXELS = 24000000; // 24 MP cap prevents memory-heavy uploads.
+    private const MAX_IMAGE_EDGE = 6000;
     private const ALLOWED_MIMES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     private const THUMBNAIL_WIDTH = 640;
     private const THUMBNAIL_HEIGHT = 480;
     private const THUMBNAIL_QUALITY = 78;
+    private const DERIVATIVE_SPECS = [
+        ['name' => 'avatar', 'width' => 96, 'height' => 96, 'fit' => 'cover'],
+        ['name' => 'card_small', 'width' => 320, 'height' => 180, 'fit' => 'cover'],
+        ['name' => 'card', 'width' => 640, 'height' => 360, 'fit' => 'cover'],
+        ['name' => 'square', 'width' => 640, 'height' => 640, 'fit' => 'cover'],
+        ['name' => 'detail', 'width' => 1200, 'height' => 675, 'fit' => 'contain'],
+    ];
 
     /**
      * Upload an image file.
      *
-     * @return array{path: string, url: string, filename: string, thumbnail_path?: string, thumbnail_url?: string}
+     * @return array{
+     *   path: string,
+     *   url: string,
+     *   filename: string,
+     *   width: int,
+     *   height: int,
+     *   thumbnail_path?: string,
+     *   thumbnail_url?: string,
+     *   variants?: array<string, array<string, array{path:string,url:string,width:int,height:int,format:string}>>,
+     *   srcsets?: array<string, array<string, string>>
+     * }
      * @throws \InvalidArgumentException
      */
     public function upload(UploadedFile $file, string $directory = 'uploads'): array
@@ -49,6 +68,15 @@ class ImageUploadService
             throw new \InvalidArgumentException('Invalid file type. Allowed: JPEG, PNG, GIF, WebP.');
         }
 
+        $imageInfo = @getimagesize($tmpPath);
+        if ($imageInfo === false || ($imageInfo[0] ?? 0) <= 0 || ($imageInfo[1] ?? 0) <= 0) {
+            throw new \InvalidArgumentException('Upload failed: image dimensions could not be read.');
+        }
+        $pixels = (int) $imageInfo[0] * (int) $imageInfo[1];
+        if ($pixels > self::MAX_IMAGE_PIXELS || max((int) $imageInfo[0], (int) $imageInfo[1]) > self::MAX_IMAGE_EDGE) {
+            throw new \InvalidArgumentException('Image dimensions are too large. Please upload an image no larger than 24 megapixels.');
+        }
+
         // Scope uploads by tenant to prevent cross-tenant file access
         $tenantId = \App\Core\TenantContext::getId();
         $tenantDir = $tenantId ? "tenant_{$tenantId}/{$directory}" : $directory;
@@ -56,16 +84,23 @@ class ImageUploadService
         $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
         $path = $file->storeAs($tenantDir, $filename, 'public');
         $thumbnail = $this->createThumbnail($path, $filename);
+        $variants = $this->createVariants($path, $filename);
 
         $result = [
             'path'     => $path,
             'url'      => $this->getUrl($path),
             'filename' => $filename,
+            'width'    => (int) $imageInfo[0],
+            'height'   => (int) $imageInfo[1],
         ];
 
         if ($thumbnail !== null) {
             $result['thumbnail_path'] = $thumbnail['path'];
             $result['thumbnail_url'] = $thumbnail['url'];
+        }
+        if ($variants !== []) {
+            $result['variants'] = $variants;
+            $result['srcsets'] = $this->srcsets($variants);
         }
 
         return $result;
@@ -205,6 +240,147 @@ class ImageUploadService
     }
 
     /**
+     * Generate upload-time responsive variants. The runtime thumbnail endpoint
+     * still handles cache-on-demand sizes, but publishing these variants lets
+     * clients and builders prefer compact assets immediately after upload.
+     *
+     * @return array<string, array<string, array{path:string,url:string,width:int,height:int,format:string}>>
+     */
+    private function createVariants(string $path, string $filename): array
+    {
+        $variants = [];
+        foreach (self::DERIVATIVE_SPECS as $spec) {
+            foreach ($this->derivativeFormats() as $format) {
+                $variant = $this->createDerivative(
+                    $path,
+                    $filename,
+                    (string) $spec['name'],
+                    (int) $spec['width'],
+                    (int) $spec['height'],
+                    (string) $spec['fit'],
+                    $format
+                );
+                if ($variant !== null) {
+                    $variants[(string) $spec['name']][$format] = $variant;
+                }
+            }
+        }
+
+        return $variants;
+    }
+
+    /**
+     * @param array<string, array<string, array{path:string,url:string,width:int,height:int,format:string}>> $variants
+     * @return array<string, array<string, string>>
+     */
+    private function srcsets(array $variants): array
+    {
+        $groups = [
+            'card' => ['card_small', 'card'],
+            'detail' => ['card', 'detail'],
+            'square' => ['avatar', 'square'],
+        ];
+        $srcsets = [];
+
+        foreach ($groups as $group => $names) {
+            foreach ($this->derivativeFormats() as $format) {
+                $parts = [];
+                foreach ($names as $name) {
+                    $variant = $variants[$name][$format] ?? null;
+                    if ($variant === null) {
+                        continue;
+                    }
+                    $parts[] = $variant['url'] . ' ' . $variant['width'] . 'w';
+                }
+                if ($parts !== []) {
+                    $srcsets[$group][$format] = implode(', ', $parts);
+                }
+            }
+        }
+
+        return $srcsets;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function derivativeFormats(): array
+    {
+        $formats = [];
+        if (function_exists('imagewebp')) {
+            $formats[] = 'webp';
+        }
+        if (function_exists('imageavif')) {
+            $formats[] = 'avif';
+        }
+
+        return $formats !== [] ? $formats : ['jpg'];
+    }
+
+    /**
+     * @return array{path:string,url:string,width:int,height:int,format:string}|null
+     */
+    private function createDerivative(string $path, string $filename, string $name, int $width, int $height, string $fit, string $format): ?array
+    {
+        try {
+            $disk = Storage::disk('public');
+            $sourcePath = $disk->path($path);
+            $info = @getimagesize($sourcePath);
+            if ($info === false) {
+                return null;
+            }
+
+            [$srcWidth, $srcHeight] = $info;
+            $source = $this->createImageResource($sourcePath, (string) ($info['mime'] ?? ''));
+            if ($source === null || $srcWidth <= 0 || $srcHeight <= 0) {
+                return null;
+            }
+
+            [$srcX, $srcY, $copyWidth, $copyHeight, $destWidth, $destHeight, $destX, $destY] =
+                $this->geometry($srcWidth, $srcHeight, $width, $height, $fit);
+
+            $canvas = imagecreatetruecolor($width, $height);
+            imagefill($canvas, 0, 0, imagecolorallocate($canvas, 255, 255, 255));
+            imagecopyresampled($canvas, $source, $destX, $destY, $srcX, $srcY, $destWidth, $destHeight, $copyWidth, $copyHeight);
+
+            $baseName = pathinfo($filename, PATHINFO_FILENAME);
+            $variantPath = trim(dirname($path), '.') . '/variants/' . $baseName . "-{$name}-{$width}x{$height}.{$format}";
+            $fullVariantPath = $disk->path($variantPath);
+            if (! is_dir(dirname($fullVariantPath))) {
+                mkdir(dirname($fullVariantPath), 0755, true);
+            }
+
+            if ($format === 'avif' && function_exists('imageavif')) {
+                imageavif($canvas, $fullVariantPath, self::THUMBNAIL_QUALITY);
+            } elseif ($format === 'webp' && function_exists('imagewebp')) {
+                imagewebp($canvas, $fullVariantPath, self::THUMBNAIL_QUALITY);
+            } else {
+                imagejpeg($canvas, $fullVariantPath, 82);
+            }
+
+            imagedestroy($source);
+            imagedestroy($canvas);
+
+            return [
+                'path' => $variantPath,
+                'url' => (string) $this->getUrl($variantPath),
+                'width' => $width,
+                'height' => $height,
+                'format' => $format,
+            ];
+        } catch (Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Image variant generation failed', [
+                'path' => $path,
+                'variant' => $name,
+                'format' => $format,
+                'error' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
      * @return array{0:int,1:int,2:int,3:int}
      */
     private function coverGeometry(int $srcWidth, int $srcHeight): array
@@ -225,6 +401,36 @@ class ImageUploadService
         $srcY = (int) (($srcHeight - $copyHeight) / 2);
 
         return [0, $srcY, $copyWidth, $copyHeight];
+    }
+
+    /**
+     * @return array{0:int,1:int,2:int,3:int,4:int,5:int,6:int,7:int}
+     */
+    private function geometry(int $srcWidth, int $srcHeight, int $width, int $height, string $fit): array
+    {
+        if ($fit === 'contain') {
+            $scale = min($width / $srcWidth, $height / $srcHeight);
+            $destWidth = max(1, (int) round($srcWidth * $scale));
+            $destHeight = max(1, (int) round($srcHeight * $scale));
+
+            return [0, 0, $srcWidth, $srcHeight, $destWidth, $destHeight, (int) (($width - $destWidth) / 2), (int) (($height - $destHeight) / 2)];
+        }
+
+        $targetRatio = $width / $height;
+        $sourceRatio = $srcWidth / $srcHeight;
+        if ($sourceRatio > $targetRatio) {
+            $copyHeight = $srcHeight;
+            $copyWidth = (int) round($srcHeight * $targetRatio);
+            $srcX = (int) (($srcWidth - $copyWidth) / 2);
+
+            return [$srcX, 0, $copyWidth, $copyHeight, $width, $height, 0, 0];
+        }
+
+        $copyWidth = $srcWidth;
+        $copyHeight = (int) round($srcWidth / $targetRatio);
+        $srcY = (int) (($srcHeight - $copyHeight) / 2);
+
+        return [0, $srcY, $copyWidth, $copyHeight, $width, $height, 0, 0];
     }
 
     private function createImageResource(string $path, string $mime): mixed
