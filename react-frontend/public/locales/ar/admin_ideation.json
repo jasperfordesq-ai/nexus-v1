@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -132,6 +132,6 @@
     "no_challenges_found": "لم يتم العثور على التحديات",
     "no_matching_challenges": "لم يتم العثور على تحديات مطابقة",
     "no_status_challenges": "لم يتم العثور على تحديات الحالة",
-    "tabs_aria": "Challenge status filter"
+    "tabs_aria": "مرشح حالة التحدي"
   }
 }

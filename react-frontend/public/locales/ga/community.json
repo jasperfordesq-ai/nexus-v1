@@ -152,6 +152,7 @@
     "hours_logged": "{{hours}}u cláraithe",
     "website": "Suíomh Gréasáin",
     "register_button": "Cláraigh Eagras",
+    "manage_my_button": "Bainistigh m'eagraíocht",
     "register_page_title": "Cláraigh Eagras",
     "register_heading": "Cláraigh D'Eagras",
     "register_subtitle": "Cláraigh d'eagras deonach chun deiseanna a fhoilsiú agus oibrithe deonacha a bhainistiú",
@@ -186,8 +187,7 @@
     "terms_required": "Ní mór duit aontú leis na téarmaí chun d'eagras a chlárú.",
     "opportunity_count_one": "{{count}} deis",
     "opportunity_count_other": "{{count}} deiseanna",
-    "loading": "Eagraíochtaí á lódáil",
-    "manage_my_button": "Manage my organisation"
+    "loading": "Eagraíochtaí á lódáil"
   },
   "organisation_detail": {
     "page_title": "Eagras",
@@ -201,6 +201,7 @@
     "meta_description_fallback": "Faigh amach faoi {{name}} agus {{count}} deis dheonach gníomhach ar an mbanc ama pobail seo.",
     "try_again": "Bain Triail Eile As",
     "browse_organisations": "Brabhsáil Eagrais",
+    "manage_button": "Bainistigh an eagraíocht seo",
     "website": "Suíomh Gréasáin",
     "contact": "Teagmháil",
     "opportunities": "Deiseanna",
@@ -222,16 +223,15 @@
     "submit_application": "Cuir Iarratas Isteach",
     "job_openings": "Oscailtí Poist",
     "rating_sr": "{{n}} as 5 réalta",
-    "manage_button": "Manage this organisation",
-    "write_review": "Write review",
-    "review_modal_title": "Review this organisation",
+    "write_review": "Scríobh léirmheas",
+    "review_modal_title": "Déan athbhreithniú ar an eagraíocht seo",
     "rating_label": "Rating",
     "comment_label": "Comment",
-    "comment_placeholder": "Share what worked well or what others should know.",
-    "submit_review": "Submit review",
-    "review_success": "Review submitted.",
-    "review_error": "Unable to submit your review.",
-    "rating_required": "Choose a rating before submitting."
+    "comment_placeholder": "Roinn cad a d'oibrigh go maith nó cad ba cheart go mbeadh a fhios ag daoine eile.",
+    "submit_review": "Cuir isteach athbhreithniú",
+    "review_success": "Athbhreithniú curtha isteach.",
+    "review_error": "Ní féidir do léirmheas a chur isteach.",
+    "rating_required": "Roghnaigh rátáil roimh chur isteach."
   },
   "emergency_alerts": {
     "heading": "Foláirimh Éigeandála",

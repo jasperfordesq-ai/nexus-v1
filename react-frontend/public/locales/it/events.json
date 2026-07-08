@@ -138,18 +138,18 @@
     "tabs_aria": "Sezioni dei dettagli dell'evento",
     "delete_series_note": "Questo è un evento ricorrente. Eliminandolo verranno eliminate anche tutte le occorrenze future.",
     "cancel_series_note": "Questo è un evento ricorrente. Annullandolo verranno annullate anche tutte le occorrenze future e i partecipanti saranno avvisati.",
-    "series_dates_title": "Upcoming dates in this series",
-    "series_this_date": "This date"
+    "series_dates_title": "Prossime date di questa serie",
+    "series_this_date": "Questa data"
   },
   "card": {
     "cancelled": "Annullato",
     "spots_left": "{{count}} posti rimasti",
     "full": "Completo",
     "open_aria": "{{title}} on {{date}}",
-    "repeats_daily": "Repeats daily",
-    "repeats_weekly": "Repeats weekly",
-    "repeats_monthly": "Repeats monthly",
-    "repeats_yearly": "Repeats yearly",
+    "repeats_daily": "Si ripete ogni giorno",
+    "repeats_weekly": "Si ripete settimanalmente",
+    "repeats_monthly": "Si ripete mensilmente",
+    "repeats_yearly": "Si ripete ogni anno",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
     "series_dates_other": "{{count}} dates"
@@ -215,6 +215,7 @@
     "end_on_date": "In una data specifica",
     "recurrence_count": "Numero di occorrenze",
     "recurrence_count_placeholder": "10",
+    "recurrence_count_hint": "Tra 2 e 52 occorrenze",
     "recurrence_end_date": "Data fine serie",
     "recurrence_preview_empty": "REGOLA:...",
     "weekday_mon": "Lun",
@@ -245,7 +246,7 @@
       "updated": "Evento aggiornato",
       "image_failed": "Evento creato ma il caricamento dell'immagine non è riuscito",
       "error": "Qualcosa è andato storto",
-      "fix_errors": "Please fix the highlighted fields before saving"
+      "fix_errors": "Correggi i campi evidenziati prima di salvare"
     },
     "attach_polls_label": "Allega sondaggi (opzionale)",
     "attach_polls_placeholder": "Seleziona sondaggi da allegare...",
@@ -263,8 +264,7 @@
     "edit_scope_message": "Questo evento fa parte di una serie ricorrente. Cosa desidera aggiornare?",
     "edit_scope_single": "Solo questo evento",
     "edit_scope_all": "Questo e tutti gli eventi futuri",
-    "edit_scope_all_note": "Le modifiche a data e ora si applicano solo a questo evento.",
-    "recurrence_count_hint": "Between 2 and 52 occurrences"
+    "edit_scope_all_note": "Le modifiche a data e ora si applicano solo a questo evento."
   },
   "toast": {
     "rsvp_removed": "RSVP rimosso",

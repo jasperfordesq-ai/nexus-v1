@@ -67,7 +67,7 @@
     "recent_activity": "Ostatnia aktywność",
     "refresh": "Odświeżać",
     "search": "Szukaj...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wybierz wszystkie wiersze",
     "select_row": "Select row {{id}}",
     "data_table": "Dane",
     "total_count": "Łącznie{{count}}"
@@ -106,6 +106,6 @@
     "type_listing": "Lista",
     "type_resource": "Zasób",
     "type_vol_opportunity": "Tom Szansa",
-    "tabs_aria": "Category type filter"
+    "tabs_aria": "Filtr typu kategorii"
   }
 }

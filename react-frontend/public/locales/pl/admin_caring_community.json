@@ -67,7 +67,7 @@
     "recent_activity": "Ostatnia aktywność",
     "refresh": "Odświeżać",
     "search": "Szukaj...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wybierz wszystkie wiersze",
     "select_row": "Select row {{id}}",
     "data_table": "Dane",
     "total_count": "Łącznie{{count}}"
@@ -418,7 +418,7 @@
         "body": "Polityka operacyjna określa zasady programu opieki środowiskowej: kto może zatwierdzać godziny pracy, jak szybko koordynatorzy muszą zareagować, w jaki sposób obliczana jest wartość społeczna i jak wygląda cykl raportowania. Skonfiguruj to przed uruchomieniem pilota. Zmiany wchodzą w życie natychmiast i są rejestrowane w celach audytowych.",
         "methodology_prefix": "The",
         "methodology_middle": "Pola stawki godzinowej i mnożnika zapobiegania korzystają z",
-        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
+        "methodology_suffix": "Pola stawki godzinowej i mnożnika zapobiegania korzystają z metodologii Caring Community. Jeśli w Twojej społeczności obowiązuje inna waluta lub obowiązują lokalne zasady ekonomii opieki, ustaw stawkę na lokalny ekwiwalent godzinowy za opiekę formalną i mnożnik na 1,0.",
         "methodology_tail": "pilotażowego, ustaw stawkę na lokalny odpowiednik godzinowy opieki formalnej i mnożnik na 1.0."
       },
       "sections": {
@@ -2055,9 +2055,9 @@
       "default_rate": "CHF 35/godz",
       "tenant_setting_source": "skonfigurowany dla tego dzierżawcy",
       "default_source": "Stawka asystenta opieki formalnej w Szwajcarii, SECO 2024",
-      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
+      "prevention_value_prefix": "Wartość zapobiegania stosuje mnożnik {{multiplier}}x na",
       "prevention_value_suffix": "metodologia oceny.",
-      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
+      "default_prevention_prefix": "Wartość zapobiegania stosuje mnożnik 2x na",
       "default_prevention_suffix": "metodologia oceny.",
       "substitution_applied": "Godziny są ważone współczynnikami substytucji według kategorii.",
       "substitution_not_applied": "Wszystkie godziny ważone przy 1,0x."

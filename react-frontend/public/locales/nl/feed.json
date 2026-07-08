@@ -232,7 +232,7 @@
     "listing_preview_alt": "Voorbeeld van vermelding",
     "image_preview_alt": "Uploadvoorbeeld",
     "type_tabs_aria": "Inhoudstype samenstellen",
-    "compose_post": "Compose post"
+    "compose_post": "Bericht opstellen"
   },
   "moderation": {
     "unauthorized": "Je hebt geen toestemming om deze actie uit te voeren."
@@ -538,7 +538,7 @@
     "scroll_right": "Scroll verhalen naar rechts",
     "create_your_story": "Maak jouw verhaal",
     "view_story_from": "Bekijk verhaal van {{name}}",
-    "load_failed": "Couldn't load stories",
+    "load_failed": "Kan verhalen niet laden",
     "retry": "Retry"
   },
   "fab": {
@@ -626,6 +626,6 @@
     "delete_post": "Dit bericht verwijderen? Dit kan niet ongedaan worden gemaakt."
   },
   "aria": {
-    "feed_sidebar": "Community suggestions and highlights"
+    "feed_sidebar": "Community-suggesties en hoogtepunten"
   }
 }

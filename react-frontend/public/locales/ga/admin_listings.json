@@ -67,7 +67,7 @@
     "recent_activity": "Gníomhaíocht le Déanaí",
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
@@ -125,7 +125,7 @@
     "unfeature": "Neamhghné",
     "unfeature_listing": "Liostú Neamhghné",
     "unfeatured_success": "D'éirigh le neamh-feiceáil",
-    "section_tabs_aria": "Listings management sections",
-    "filter_tabs_aria": "Listing status filter"
+    "section_tabs_aria": "Rannóga bainistíochta liostaí",
+    "filter_tabs_aria": "Scagaire stádais liostála"
   }
 }

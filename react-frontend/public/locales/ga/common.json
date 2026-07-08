@@ -869,15 +869,15 @@
     "current_language": "Teanga: {{language}}",
     "select_language": "Roghnaigh teanga",
     "clear_location": "Glan suíomh",
+    "location_results": "{{count}} moltaí seoltaí ar fáil",
+    "search_results": "{{count}} results available",
     "select_category": "Roghnaigh catagóir",
     "verification_badges": "Suaitheantais fhírúcháin",
     "search_skills": "Cuardaigh scileanna",
     "user_menu_trigger": "Roghchlár úsáideora le haghaidh {{name}}",
     "feed_sidebar": "Taobh-bharra pobail",
     "filter_panel": "Painéal scagaire",
-    "remove": "Remove",
-    "location_results": "{{count}} address suggestions available",
-    "search_results": "{{count}} results available"
+    "remove": "Remove"
   },
   "skills": {
     "browse_title": "Eolaire Scileanna Pobail",
@@ -920,14 +920,14 @@
     "add_skill": "Cuir scil leis",
     "add_a_skill": "Cuir scil leis",
     "search_result_category": "i {{category}}",
+    "aria_results": "{{count}} moltaí scile ar fáil",
     "no_matching_custom": "Níor aimsíodh scil mheaitseála. Is féidir leat \"{{query}}\" a chur leis mar scil shaincheaptha.",
     "use_custom": "Úsáid \"{{query}}\"",
     "skill_to_add": "Scil le cur leis:",
     "aria_clear_search": "Glan cuardach",
     "aria_close_members_list": "Dún liosta ball",
     "category_optional": "Catagóir (roghnach)",
-    "proficiency_level": "Leibhéal Inniúlachta",
-    "aria_results": "{{count}} skill suggestions available"
+    "proficiency_level": "Leibhéal Inniúlachta"
   },
   "hours_display_one": "{{count}} uair",
   "hours_display_other": "{{count}} uair",
@@ -1663,7 +1663,7 @@
       "ad_free": "Eispéireas saor ó fhógraí"
     },
     "return_meta_description": "Leathanach fillte slán tar éis na híocaíochta chun do shíntiús préimhe a chur i ngníomh, a dheimhniú nó a bhainistiú.",
-    "one_off_cta": "Make a one-off donation"
+    "one_off_cta": "Déan síntiús aonuaire"
   },
   "developers": {
     "page_title": "Forbróirí",
@@ -2077,7 +2077,7 @@
     "connect_modal": {
       "confirm": "Is é seo an t-aon mhodh síniú isteach atá fágtha agat. Má dhícheanglaíonn tú é, cuirfidh sé glas ort mura socraíonn tú pasfhocal nó mura gcuireann tú eochair phasála leis ar dtús. Lean ar aghaidh?"
     },
-    "sign_in_with_provider": "Sign in with {{name}}"
+    "sign_in_with_provider": "Sínigh isteach le {{name}}"
   },
   "verein_dues": {
     "my_page_title": "Mo tháillí ballraíochta Verein",

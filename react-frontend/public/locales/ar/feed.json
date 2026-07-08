@@ -232,7 +232,7 @@
     "listing_preview_alt": "معاينة الإعلان",
     "image_preview_alt": "معاينة الرفع",
     "type_tabs_aria": "يؤلف نوع المحتوى",
-    "compose_post": "Compose post"
+    "compose_post": "إنشاء مشاركة"
   },
   "moderation": {
     "unauthorized": "ليس لديك صلاحية لتنفيذ هذا الإجراء."
@@ -538,7 +538,7 @@
     "scroll_right": "مرر القصص لليمين",
     "create_your_story": "أنشئ قصتك",
     "view_story_from": "عرض القصة من {{name}}",
-    "load_failed": "Couldn't load stories",
+    "load_failed": "تعذر تحميل القصص",
     "retry": "Retry"
   },
   "fab": {
@@ -626,6 +626,6 @@
     "delete_post": "هل تريد حذف هذه المشاركة؟ لا يمكن التراجع عن هذا."
   },
   "aria": {
-    "feed_sidebar": "Community suggestions and highlights"
+    "feed_sidebar": "اقتراحات المجتمع وأبرزها"
   }
 }

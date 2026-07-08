@@ -67,7 +67,7 @@
     "recent_activity": "Attività recente",
     "refresh": "Aggiorna",
     "search": "Ricerca...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleziona tutte le righe",
     "select_row": "Select row {{id}}",
     "data_table": "Dati",
     "total_count": "{{count}}totale"
@@ -75,9 +75,9 @@
   "support_reports": {
     "meta_title": "Support Reports",
     "title": "Support Reports",
-    "subtitle": "Review member-submitted bug reports with page diagnostics, Sentry event IDs, and triage notes.",
-    "loading": "Loading support reports...",
-    "empty": "No support reports match these filters.",
+    "subtitle": "Esamina le segnalazioni di bug inviate dai membri con diagnostica della pagina, ID evento Sentry e note di valutazione.",
+    "loading": "Caricamento dei rapporti di supporto...",
+    "empty": "Nessun rapporto di supporto corrisponde a questi filtri.",
     "empty_value": "-",
     "unassigned": "Unassigned",
     "actions": {
@@ -85,12 +85,12 @@
       "search": "Search",
       "clear": "Clear",
       "review": "Review",
-      "open_page": "Open page",
+      "open_page": "Apri pagina",
       "open_sentry": "Open Sentry",
-      "copy_diagnostics": "Copy diagnostics",
-      "copy_handoff": "Copy engineering handoff",
+      "copy_diagnostics": "Copia la diagnostica",
+      "copy_handoff": "Copia di trasferimento tecnico",
       "close": "Close",
-      "save": "Save triage"
+      "save": "Salva il triage"
     },
     "stats": {
       "open": "Open",
@@ -99,26 +99,26 @@
       "unassigned": "Unassigned"
     },
     "filters": {
-      "search": "Search reference, route, reporter, or summary",
+      "search": "Cerca riferimento, percorso, giornalista o riepilogo",
       "status": "Status",
       "impact": "Impact"
     },
     "status": {
-      "all": "All statuses",
+      "all": "Tutti gli stati",
       "open": "Open",
       "triaged": "Triaged",
       "resolved": "Resolved",
       "closed": "Closed"
     },
     "impact": {
-      "all": "All impacts",
+      "all": "Tutti gli impatti",
       "blocked": "Blocked",
       "major": "Major",
       "minor": "Minor",
       "cosmetic": "Cosmetic"
     },
     "table": {
-      "aria": "Support reports",
+      "aria": "Rapporti di supporto",
       "reference": "Reference",
       "summary": "Summary",
       "impact": "Impact",
@@ -130,33 +130,33 @@
     },
     "detail": {
       "title": "Report {{reference}}",
-      "loading": "Loading report...",
+      "loading": "Caricamento rapporto...",
       "summary": "Summary",
       "description": "Description",
       "reporter": "Reporter",
       "page": "Page",
       "created": "Created",
-      "user_agent": "User agent",
-      "sentry_event": "Sentry event",
+      "user_agent": "Agente utente",
+      "sentry_event": "Evento sentinella",
       "diagnostics": "Diagnostics"
     },
     "fields": {
       "status": "Status",
       "assignee": "Assignee",
-      "sentry_issue_url": "Sentry issue URL",
-      "triage_notes": "Triage notes"
+      "sentry_issue_url": "URL del problema della sentinella",
+      "triage_notes": "Note sul triage"
     },
     "messages": {
-      "saved": "Support report updated.",
-      "copied": "Diagnostics copied.",
-      "handoff_copied": "Engineering handoff copied."
+      "saved": "Rapporto di supporto aggiornato.",
+      "copied": "Diagnostica copiata.",
+      "handoff_copied": "Trasferimento di ingegneria copiato."
     },
     "errors": {
-      "load": "Failed to load support reports.",
-      "load_detail": "Failed to load the support report.",
-      "save": "Failed to save the support report.",
-      "copy": "Could not copy diagnostics.",
-      "copy_handoff": "Could not copy the engineering handoff."
+      "load": "Impossibile caricare i report di supporto.",
+      "load_detail": "Impossibile caricare il rapporto di supporto.",
+      "save": "Impossibile salvare il rapporto di supporto.",
+      "copy": "Impossibile copiare la diagnostica.",
+      "copy_handoff": "Impossibile copiare il trasferimento tecnico."
     }
   }
 }

@@ -67,7 +67,7 @@
     "recent_activity": "Gníomhaíocht le Déanaí",
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
@@ -469,7 +469,7 @@
     "load_error": "Theip ar an scuaine modhnóireachta a lódáil.",
     "pagination_label": "uimhriú scuaine measarthachta",
     "user_fallback": "Úsáideoir anaithnid",
-    "rating_aria": "{{n}} out of 5 stars"
+    "rating_aria": "{{n}} as 5 réalta"
   },
   "something_wrong": "Chuaigh rud éigin mícheart. Bain triail eile as.",
   "spam": {

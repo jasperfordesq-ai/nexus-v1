@@ -246,8 +246,8 @@
     "label": "Clibeanna Scileanna",
     "placeholder": "Clóscríobh scil agus brúigh Iontráil...",
     "aria_add": "Cuir clib scile leis",
-    "aria_add_count": "Add skill tag ({{current}} of {{max}})",
-    "aria_results": "{{count}} skill suggestions available"
+    "aria_add_count": "Cuir clib scile leis ({{current}} de {{max}})",
+    "aria_results": "{{count}} moltaí scile ar fáil"
   },
   "more_filters": "Tuilleadh scagairí",
   "filters_label": "Scagairí",

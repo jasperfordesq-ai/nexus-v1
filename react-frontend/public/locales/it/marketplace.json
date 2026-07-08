@@ -121,7 +121,7 @@
     "counter": "Controfferta",
     "withdraw": "Ritira",
     "accept_counter": "Accetta contatore",
-    "pay_accepted": "Pay accepted offer"
+    "pay_accepted": "Paga l'offerta accettata"
   },
   "create": {
     "page_title": "Vendi qualcosa - Mercato",
@@ -446,7 +446,7 @@
     "counter_message_placeholder": "Spiega la tua contro-offerta...",
     "counter_sent_success": "Contro-offerta inviata",
     "send_counter": "Invia Contro-offerta",
-    "checkout_started_success": "Checkout started for your accepted offer."
+    "checkout_started_success": "Il pagamento è iniziato per l'offerta accettata."
   },
   "collections": {
     "page_title": "Le Mie Collezioni",
@@ -597,7 +597,7 @@
     "left": "disponibili",
     "slot_fallback": "Fascia #{{id}}",
     "status_unknown": "Sconosciuto",
-    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
+    "reservation_failed": "Impossibile prenotare quello spazio di ritiro. Scegli un altro slot."
   },
   "inventory": {
     "section_title": "Inventario",
@@ -647,9 +647,9 @@
   "shipping": {
     "title": "Opzioni di Spedizione",
     "page_title": "Shipping Options",
-    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
-    "back_to_listings": "Back to My Listings",
-    "manage_cta": "Shipping settings",
+    "page_subtitle": "Imposta i servizi di consegna che gli acquirenti possono scegliere al momento del pagamento.",
+    "back_to_listings": "Torna alle mie inserzioni",
+    "manage_cta": "Impostazioni di spedizione",
     "add_option": "Aggiungi Opzione di Spedizione",
     "courier_name": "Nome del Corriere",
     "courier_name_placeholder": "es. An Post, Royal Mail, DHL",
@@ -681,7 +681,7 @@
     "loading": "Caricamento opzioni di spedizione...",
     "no_options": "Nessuna opzione di spedizione disponibile per questo venditore.",
     "delete_confirm": "Rimuovere questa opzione di spedizione? Questa operazione non può essere annullata.",
-    "choose_required": "Choose a delivery method before checkout."
+    "choose_required": "Scegli un metodo di consegna prima del pagamento."
   },
   "listing_location": {
     "location_title": "Posizione",

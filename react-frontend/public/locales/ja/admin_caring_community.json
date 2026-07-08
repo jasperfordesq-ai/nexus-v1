@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -418,7 +418,7 @@
         "body": "運営ポリシーでは、誰が時間を承認できるか、コーディネーターがどれだけ早く対応しなければならないか、社会的価値の計算方法、報告サイクルがどのようなものであるかなど、地域ケア プログラムのルールを定義します。パイロットを開始する前にこれを構成します。変更はすぐに有効になり、監査のために記録されます。",
         "methodology_prefix": "の",
         "methodology_middle": "時間単価と予防乗数フィールドでは、",
-        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
+        "methodology_suffix": "時間給と予防乗数のフィールドでは、Caring Community の方法論が使用されます。コミュニティで別の通貨または地域のケア経済学が使用されている場合は、レートを地域のフォーマルケア時間相当に設定し、乗数を 1.0 に設定します。",
         "methodology_tail": "パイロットでは、レートを地域の正規ケアの時給相当額に、乗数を 1.0 に設定してください。"
       },
       "sections": {
@@ -2055,9 +2055,9 @@
       "default_rate": "CHF 35/時間",
       "tenant_setting_source": "このテナント用に構成された",
       "default_source": "スイスの介護助手率、SECO 2024",
-      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
+      "prevention_value_prefix": "防止値には、{{multiplier}}x 乗数が適用されます。",
       "prevention_value_suffix": "評価方法論。",
-      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
+      "default_prevention_prefix": "防止値には 2 倍の乗数が適用されます。",
       "default_prevention_suffix": "評価方法論。",
       "substitution_applied": "時間はカテゴリごとの置換係数によって重み付けされます。",
       "substitution_not_applied": "すべての時間は 1.0 倍で重み付けされます。"

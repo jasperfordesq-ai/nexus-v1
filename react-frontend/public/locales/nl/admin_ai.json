@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -251,9 +251,9 @@
         "seed_defaults": "Standaardinstellingen voor Seed"
       },
       "about": {
-        "body": "When a member's chat message contains any of a doc's keywords, that doc's body is appended to the AI's system prompt as canonical grounding. Up to 4 docs are injected per turn, ranked by keyword match strength. Write in plain language: what the feature does, how to use it, and what is not possible. Add your community's specific terminology, policies, and FAQs.",
+        "body": "Wanneer het chatbericht van een lid een van de trefwoorden van een document bevat, wordt de hoofdtekst van dat document als canonieke basis toegevoegd aan de systeemprompt van de AI. Er worden per beurt maximaal vier documenten geïnjecteerd, gerangschikt op basis van de overeenkomststerkte van de zoekwoorden. Schrijf in duidelijke taal: wat de functie doet, hoe u deze kunt gebruiken en wat niet mogelijk is. Voeg de specifieke terminologie, het beleid en de veelgestelde vragen van uw community toe.",
         "tip_label": "Tip:",
-        "tip_body": "New tenants are auto-seeded with a comprehensive 38-doc starter pack covering the platform overview, timebanking philosophy, every module/feature, account security, privacy, accessibility, mobile, and troubleshooting. Click \"Seed defaults\" to top up missing docs — your custom edits are never overwritten."
+        "tip_body": "Nieuwe huurders worden automatisch voorzien van een uitgebreid startpakket van 38 documenten dat het platformoverzicht, de tijdbankfilosofie, elke module/functie, accountbeveiliging, privacy, toegankelijkheid, mobiel en probleemoplossing omvat. Klik op 'Seed-standaardinstellingen' om ontbrekende documenten aan te vullen. Uw aangepaste bewerkingen worden nooit overschreven."
       },
       "columns": {
         "actions": "Acties",

@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -791,8 +791,8 @@
     "select_hub_tenant": "حدد مستأجر المحور",
     "no_hub_tenants_found": "لم يتم العثور على مستأجرين للمركز",
     "impersonate_user_warning": "يقوم انتحال الشخصية بتسجيل كل إجراء تحت هوية هذا المستخدم. استخدم فقط عند الضرورة للحصول على الدعم.",
-    "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "partnerships_tabs_aria": "مرشح حالة شراكة الاتحاد",
+    "tenant_list_tabs_aria": "مرشح حالة المستأجر"
   },
   "tenant_form": {
     "active": "نشيط",
@@ -965,11 +965,11 @@
     "feature_feed_desc": "تمكين خلاصة المجتمع.",
     "feature_marketplace": "السوق",
     "feature_marketplace_desc": "تمكين ميزات السوق.",
-    "tabs_aria": "Tenant form sections",
-    "domain_desc": "Used for the React web frontend (e.g. community.example.org).",
-    "accessible_domain_label": "Accessible frontend domain",
+    "tabs_aria": "أقسام نموذج المستأجر",
+    "domain_desc": "يُستخدم لواجهة ويب React الأمامية (على سبيل المثال، Community.example.org).",
+    "accessible_domain_label": "مجال الواجهة الأمامية الذي يمكن الوصول إليه",
     "accessible_domain_placeholder": "e.g. accessible.example.org",
-    "accessible_domain_desc": "Optional. Custom domain for the accessible (GOV.UK) frontend."
+    "accessible_domain_desc": "خياري. النطاق المخصص للواجهة الأمامية (GOV.UK) التي يمكن الوصول إليها."
   },
   "federation_whitelist": {
     "add_tenant_to_whitelist": "أضف المستأجر إلى القائمة البيضاء",

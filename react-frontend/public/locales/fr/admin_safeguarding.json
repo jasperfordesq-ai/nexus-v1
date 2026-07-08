@@ -67,7 +67,7 @@
     "recent_activity": "Activité récente",
     "refresh": "Rafraîchir",
     "search": "Recherche...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Sélectionner toutes les lignes",
     "select_row": "Select row {{id}}",
     "data_table": "Données",
     "total_count": "{{count}}total"
@@ -370,6 +370,6 @@
     "vetting_international": "Vérification internationale",
     "vetting_other": "Vérification des autres",
     "vetting_pvg_scotland": "Vérification du Pvg Ecosse",
-    "tabs_aria": "Safeguarding sections"
+    "tabs_aria": "Sections de sauvegarde"
   }
 }

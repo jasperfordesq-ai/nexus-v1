@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -272,11 +272,11 @@
     "tab_by_category": "حسب الفئة",
     "tab_by_member": "بواسطة العضو",
     "tab_monthly_trend": "الاتجاه الشهري",
-    "hours_tabs_aria": "Hours report view",
-    "members_tabs_aria": "Member report type",
-    "hours_by_category_aria": "Bar chart showing hours exchanged by category",
-    "hours_distribution_aria": "Pie chart showing distribution of time exchange hours",
-    "hours_trend_aria": "Area chart showing hours exchanged over time"
+    "hours_tabs_aria": "عرض تقرير ساعات العمل",
+    "members_tabs_aria": "نوع تقرير العضو",
+    "hours_by_category_aria": "مخطط شريطي يوضح الساعات المتبادلة حسب الفئة",
+    "hours_distribution_aria": "رسم بياني دائري يوضح توزيع ساعات تبادل الوقت",
+    "hours_trend_aria": "مخطط مساحي يوضح الساعات المتبادلة مع مرور الوقت"
   },
   "municipal_reports": {
     "meta": {
@@ -434,7 +434,7 @@
         "cooperative": "تعاونية",
         "foundation": "مؤسسة"
       },
-      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
+      "delete_confirm": "هل تريد حذف القالب \"{{name}}\"؟ لا يمكن التراجع عن هذا."
     },
     "narrative": {
       "in_export": "في التصدير",

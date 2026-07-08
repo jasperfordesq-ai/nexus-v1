@@ -67,7 +67,7 @@
     "recent_activity": "Atividade recente",
     "refresh": "Atualizar",
     "search": "Procurar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecione todas as linhas",
     "select_row": "Select row {{id}}",
     "data_table": "Dados",
     "total_count": "{{count}}total"
@@ -251,9 +251,9 @@
         "seed_defaults": "Padrões de sementes"
       },
       "about": {
-        "body": "When a member's chat message contains any of a doc's keywords, that doc's body is appended to the AI's system prompt as canonical grounding. Up to 4 docs are injected per turn, ranked by keyword match strength. Write in plain language: what the feature does, how to use it, and what is not possible. Add your community's specific terminology, policies, and FAQs.",
-        "tip_label": "Tip:",
-        "tip_body": "New tenants are auto-seeded with a comprehensive 38-doc starter pack covering the platform overview, timebanking philosophy, every module/feature, account security, privacy, accessibility, mobile, and troubleshooting. Click \"Seed defaults\" to top up missing docs — your custom edits are never overwritten."
+        "body": "Quando a mensagem de bate-papo de um membro contém qualquer uma das palavras-chave de um documento, o corpo desse documento é anexado ao prompt do sistema da IA ​​como base canônica. Até 4 documentos são injetados por turno, classificados pela força de correspondência de palavras-chave. Escreva em linguagem simples: o que o recurso faz, como usá-lo e o que não é possível. Adicione terminologia, políticas e perguntas frequentes específicas da sua comunidade.",
+        "tip_label": "Dica:",
+        "tip_body": "Os novos locatários são propagados automaticamente com um pacote inicial abrangente de 38 documentos que cobre a visão geral da plataforma, filosofia de banco de tempo, cada módulo/recurso, segurança da conta, privacidade, acessibilidade, mobilidade e solução de problemas. Clique em \"Padrões de propagação\" para recarregar documentos ausentes — suas edições personalizadas nunca serão substituídas."
       },
       "columns": {
         "actions": "Ações",

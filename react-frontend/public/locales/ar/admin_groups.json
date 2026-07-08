@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -359,8 +359,8 @@
     "unarchive": "إلغاء الأرشفة",
     "geocode_description": "قم بترميز مواقع المجموعة جغرافيًا لتمكين عرض الخريطة والاكتشاف المستند إلى المسافة.",
     "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet.",
-    "detail_tabs_aria": "Group detail sections",
-    "status_tabs_aria": "Group status filter"
+    "detail_tabs_aria": "أقسام تفاصيل المجموعة",
+    "status_tabs_aria": "مرشح حالة المجموعة"
   },
   "group_organization": {
     "page_title": "تنظيم المجموعات",

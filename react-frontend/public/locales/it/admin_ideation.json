@@ -67,7 +67,7 @@
     "recent_activity": "Attività recente",
     "refresh": "Aggiorna",
     "search": "Ricerca...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleziona tutte le righe",
     "select_row": "Select row {{id}}",
     "data_table": "Dati",
     "total_count": "{{count}}totale"
@@ -132,6 +132,6 @@
     "no_challenges_found": "Nessuna sfida trovata trovata",
     "no_matching_challenges": "Nessuna sfida corrispondente trovata",
     "no_status_challenges": "Nessun problema di stato trovato",
-    "tabs_aria": "Challenge status filter"
+    "tabs_aria": "Filtro sullo stato della sfida"
   }
 }

@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -455,12 +455,12 @@
     "winning_metric": "مقياس الفوز",
     "resend_queued_count": "إعادة إرسال{{count}}في قائمة الانتظار",
     "resend_queued_count_plural": "يتم إعادة إرسال{{count}}في قائمة الانتظار",
-    "template_tabs_aria": "Newsletter template category filter"
+    "template_tabs_aria": "مرشح فئة قالب النشرة الإخبارية"
   },
   "newsletter_form": {
     "ab_test_label": "اختبار أب",
     "ab_test_enabled": "ممكّن ({{a}}/{{b}})",
-    "ab_test_short": "A/B",
+    "ab_test_short": "أ/ب",
     "ab_test_subject_lines": "خطوط موضوع اختبار أب",
     "ab_test_subject_lines_desc": "Ab Test Subject Lines.",
     "audience_all_members": "Audience All Members",
@@ -642,14 +642,14 @@
       "hero_desc": "صورة بانر مع عنوان",
       "html_label": "HTML",
       "html_desc": "الصق HTML المخصص الخاص بك",
+      "wrapper_label": "غلاف",
       "wrapper_desc": "تجميع الأقسام ذات الخلفية المشتركة",
       "navbar_label": "شريط التنقل",
       "navbar_desc": "صف من روابط القائمة",
       "social_icon_label": "أيقونة الاجتماعية",
       "social_icon_desc": "أيقونة شبكة اجتماعية واحدة",
       "nav_link_label": "رابط التنقل",
-      "nav_link_desc": "رابط قائمة واحدة",
-      "wrapper_label": "غلاف"
+      "nav_link_desc": "رابط قائمة واحدة"
     }
   },
   "newsletter_content_editor": {

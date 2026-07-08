@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -272,11 +272,11 @@
     "tab_by_category": "Per categorie",
     "tab_by_member": "Per lid",
     "tab_monthly_trend": "Maandelijkse trend",
-    "hours_tabs_aria": "Hours report view",
-    "members_tabs_aria": "Member report type",
-    "hours_by_category_aria": "Bar chart showing hours exchanged by category",
-    "hours_distribution_aria": "Pie chart showing distribution of time exchange hours",
-    "hours_trend_aria": "Area chart showing hours exchanged over time"
+    "hours_tabs_aria": "Urenrapport bekijken",
+    "members_tabs_aria": "Type ledenrapport",
+    "hours_by_category_aria": "Staafdiagram met uitgewisselde uren per categorie",
+    "hours_distribution_aria": "Cirkeldiagram dat de verdeling van de tijduitwisselingsuren weergeeft",
+    "hours_trend_aria": "Vlakdiagram met uitgewisselde uren in de loop van de tijd"
   },
   "municipal_reports": {
     "meta": {
@@ -434,7 +434,7 @@
         "cooperative": "Coöperatief",
         "foundation": "Fundering"
       },
-      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
+      "delete_confirm": "Sjabloon \"{{name}}\" verwijderen? Dit kan niet ongedaan worden gemaakt."
     },
     "narrative": {
       "in_export": "Bij het exporteren",

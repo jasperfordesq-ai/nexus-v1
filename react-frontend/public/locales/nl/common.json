@@ -869,15 +869,15 @@
     "current_language": "Taal: {{language}}",
     "select_language": "Taal selecteren",
     "clear_location": "Locatie wissen",
+    "location_results": "{{count}} adressuggesties beschikbaar",
+    "search_results": "{{count}} results available",
     "select_category": "Selecteer een categorie",
     "verification_badges": "Verificatiebadges",
     "search_skills": "Vaardigheden zoeken",
     "user_menu_trigger": "Gebruikersmenu voor {{name}}",
     "feed_sidebar": "Zijbalk van de community",
     "filter_panel": "Filterpaneel",
-    "remove": "Remove",
-    "location_results": "{{count}} address suggestions available",
-    "search_results": "{{count}} results available"
+    "remove": "Remove"
   },
   "skills": {
     "browse_title": "Gemeenschaps vaardigheidsgids",
@@ -920,14 +920,14 @@
     "add_skill": "Vaardigheid toevoegen",
     "add_a_skill": "Een vaardigheid toevoegen",
     "search_result_category": "in {{category}}",
+    "aria_results": "{{count}} vaardigheidssuggesties beschikbaar",
     "no_matching_custom": "Geen overeenkomende vaardigheid gevonden. Je kunt \"{{query}}\" als aangepaste vaardigheid toevoegen.",
     "use_custom": "\"{{query}}\" gebruiken",
     "skill_to_add": "Toe te voegen vaardigheid:",
     "aria_clear_search": "Zoekopdracht wissen",
     "aria_close_members_list": "Ledenlijst sluiten",
     "category_optional": "Categorie (optioneel)",
-    "proficiency_level": "Vaardigheidsniveau",
-    "aria_results": "{{count}} skill suggestions available"
+    "proficiency_level": "Vaardigheidsniveau"
   },
   "hours_display_one": "{{count}} uur",
   "hours_display_other": "{{count}} uren",
@@ -1663,7 +1663,7 @@
       "ad_free": "Reclamevrije ervaring"
     },
     "return_meta_description": "Veilige terugkeerpagina na afrekenen om uw premium-abonnement te activeren, te bevestigen of te beheren.",
-    "one_off_cta": "Make a one-off donation"
+    "one_off_cta": "Doe een eenmalige donatie"
   },
   "developers": {
     "page_title": "Ontwikkelaars",
@@ -2077,7 +2077,7 @@
     "connect_modal": {
       "confirm": "Dit is uw enige resterende aanmeldmethode. Als u deze ontkoppelt, kunt u niet meer inloggen tenzij u eerst een wachtwoord instelt of een passkey toevoegt. Doorgaan?"
     },
-    "sign_in_with_provider": "Sign in with {{name}}"
+    "sign_in_with_provider": "Log in met {{name}}"
   },
   "verein_dues": {
     "my_page_title": "Mijn Verein-ledencontributie",

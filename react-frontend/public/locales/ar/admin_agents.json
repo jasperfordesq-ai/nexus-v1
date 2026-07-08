@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -85,7 +85,7 @@
       "disabled": "عاجز",
       "enabled": "ممكّن"
     },
-    "toggle": "Enable or disable {{name}}",
+    "toggle": "تمكين أو تعطيل {{name}}",
     "run_status": {
       "completed": "مكتمل",
       "failed": "فشل",
@@ -217,6 +217,6 @@
         "rejected": "تم رفض الاقتراح"
       }
     },
-    "tabs_aria": "Agent proposal status filter"
+    "tabs_aria": "عامل تصفية حالة اقتراح الوكيل"
   }
 }

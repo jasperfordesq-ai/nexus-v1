@@ -67,7 +67,7 @@
     "recent_activity": "Letzte Aktivität",
     "refresh": "Aktualisieren",
     "search": "Suchen...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wählen Sie alle Zeilen aus",
     "select_row": "Select row {{id}}",
     "data_table": "Daten",
     "total_count": "{{count}}insgesamt"
@@ -455,7 +455,7 @@
     "winning_metric": "Erfolgsmetrik",
     "resend_queued_count": "{{count}}erneut gesendet in der Warteschlange",
     "resend_queued_count_plural": "{{count}}in der Warteschlange wird erneut gesendet",
-    "template_tabs_aria": "Newsletter template category filter"
+    "template_tabs_aria": "Kategorienfilter für Newsletter-Vorlagen"
   },
   "newsletter_form": {
     "ab_test_label": "Ab-Test",
@@ -642,14 +642,14 @@
       "hero_desc": "Ein Bannerbild mit einer Überschrift",
       "html_label": "HTML",
       "html_desc": "Fügen Sie Ihren eigenen benutzerdefinierten HTML-Code ein",
+      "wrapper_label": "Container",
       "wrapper_desc": "Gruppieren Sie Abschnitte mit einem gemeinsamen Hintergrund",
       "navbar_label": "Navigationsleiste",
       "navbar_desc": "Eine Reihe von Menülinks",
       "social_icon_label": "Soziale Ikone",
       "social_icon_desc": "Ein einzelnes Symbol für ein soziales Netzwerk",
       "nav_link_label": "Navigationslink",
-      "nav_link_desc": "Ein einzelner Menülink",
-      "wrapper_label": "Container"
+      "nav_link_desc": "Ein einzelner Menülink"
     }
   },
   "newsletter_content_editor": {

@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -210,7 +210,7 @@
     "validation_last_name_required": "姓は必須です",
     "validation_password_min": "パスワードは8文字以上である必要があります",
     "validation_role_required": "役割は必須です",
-    "tabs_aria": "User status filter",
+    "tabs_aria": "ユーザーステータスフィルター",
     "smart_search_label": "スマートユーザー検索",
     "smart_search_placeholder": "名前、メール、電話番号、役割、ステータス、ID で検索...",
     "smart_search_description": "名前、メール、電話番号、role:admin、pending、never logged in、id:42 などを試してください。",
@@ -238,7 +238,7 @@
       "set_password": "パスワードを設定する"
     },
     "aria": {
-      "edit_user_form": "Edit user",
+      "edit_user_form": "ユーザーの編集",
       "remove_badge": "バッジを削除: {{name}}",
       "toggle_global_super_admin": "グローバルスーパー管理者の切り替え",
       "toggle_municipal_announcer": "市アナウンサーの役割を切り替えます",

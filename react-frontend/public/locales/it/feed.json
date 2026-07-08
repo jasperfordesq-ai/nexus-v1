@@ -232,7 +232,7 @@
     "listing_preview_alt": "Anteprima dell'annuncio",
     "image_preview_alt": "Anteprima del caricamento",
     "type_tabs_aria": "Componi il tipo di contenuto",
-    "compose_post": "Compose post"
+    "compose_post": "Componi il post"
   },
   "moderation": {
     "unauthorized": "Non hai il permesso di eseguire questa azione."
@@ -538,7 +538,7 @@
     "scroll_right": "Scorri storie a destra",
     "create_your_story": "Crea la tua storia",
     "view_story_from": "Vedi storia di {{name}}",
-    "load_failed": "Couldn't load stories",
+    "load_failed": "Impossibile caricare le storie",
     "retry": "Retry"
   },
   "fab": {
@@ -626,6 +626,6 @@
     "delete_post": "Eliminare questo post? Questa operazione non può essere annullata."
   },
   "aria": {
-    "feed_sidebar": "Community suggestions and highlights"
+    "feed_sidebar": "Suggerimenti e punti salienti della community"
   }
 }

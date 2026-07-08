@@ -121,7 +121,7 @@
     "counter": "Frith-thairg",
     "withdraw": "Tarraing Siar",
     "accept_counter": "Glac leis an bhFrith-thairiscint",
-    "pay_accepted": "Pay accepted offer"
+    "pay_accepted": "Tairiscint íoctha a nglactar leis"
   },
   "create": {
     "page_title": "Díol Rud Éigin - Margadh",
@@ -446,7 +446,7 @@
     "counter_message_placeholder": "Mínigh do fhrith-thairiscint...",
     "counter_sent_success": "Seoladh an fhrith-thairiscint",
     "send_counter": "Seol Frith-thairiscint",
-    "checkout_started_success": "Checkout started for your accepted offer."
+    "checkout_started_success": "Cuireadh tús le seiceáil amach le haghaidh do thairiscint glactha."
   },
   "collections": {
     "page_title": "Mo Bhailiúcháin",
@@ -597,7 +597,7 @@
     "left": "fágtha",
     "slot_fallback": "Sliotán #{{id}}",
     "status_unknown": "Anaithnid",
-    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
+    "reservation_failed": "Níorbh fhéidir an sliotán bailithe sin a chur in áirithe. Roghnaigh sliotán eile le do thoil."
   },
   "inventory": {
     "section_title": "Stoc",
@@ -647,9 +647,9 @@
   "shipping": {
     "title": "Roghanna Loingseoireachta",
     "page_title": "Shipping Options",
-    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
-    "back_to_listings": "Back to My Listings",
-    "manage_cta": "Shipping settings",
+    "page_subtitle": "Socraigh na seirbhísí seachadta is féidir le ceannaitheoirí a roghnú ag an tseiceáil amach.",
+    "back_to_listings": "Ar ais go Mo Liostaí",
+    "manage_cta": "Socruithe loingseoireachta",
     "add_option": "Cuir Rogha Loingseoireachta Leis",
     "courier_name": "Ainm an Teachtaire",
     "courier_name_placeholder": "m.sh. An Post, Royal Mail, DHL",
@@ -681,7 +681,7 @@
     "loading": "Roghanna loingseoireachta á luchtú...",
     "no_options": "Níl aon roghanna loingseoireachta ar fáil don díoltóir seo.",
     "delete_confirm": "An bhfuil fonn ort an rogha seolta seo a bhaint? Ní féidir é seo a chealú.",
-    "choose_required": "Choose a delivery method before checkout."
+    "choose_required": "Roghnaigh modh seachadta roimh an tseiceáil amach."
   },
   "listing_location": {
     "location_title": "Suíomh",

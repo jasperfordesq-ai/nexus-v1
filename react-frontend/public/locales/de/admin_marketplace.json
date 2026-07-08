@@ -67,7 +67,7 @@
     "recent_activity": "Letzte Aktivität",
     "refresh": "Aktualisieren",
     "search": "Suchen...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wählen Sie alle Zeilen aus",
     "select_row": "Select row {{id}}",
     "data_table": "Daten",
     "total_count": "{{count}}insgesamt"
@@ -207,8 +207,8 @@
     "verify_seller_message": "Dadurch wird der Verkäufer als verifiziert markiert. Weitermachen?",
     "verify_seller_title": "Verkäufer bestätigen",
     "view_all": "Alle anzeigen",
-    "moderation_tabs_aria": "Marketplace moderation status filter",
-    "seller_tabs_aria": "Seller status filter"
+    "moderation_tabs_aria": "Filter für den Moderationsstatus des Marktplatzes",
+    "seller_tabs_aria": "Verkäuferstatusfilter"
   },
   "bulk": {
     "selected_count": "{{count}} ausgewählt",

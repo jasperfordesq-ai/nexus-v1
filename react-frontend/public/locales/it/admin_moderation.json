@@ -67,7 +67,7 @@
     "recent_activity": "Attività recente",
     "refresh": "Aggiorna",
     "search": "Ricerca...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleziona tutte le righe",
     "select_row": "Select row {{id}}",
     "data_table": "Dati",
     "total_count": "{{count}}totale"
@@ -289,7 +289,7 @@
     "load_error": "Impossibile caricare la coda di moderazione.",
     "pagination_label": "Impaginazione della coda di moderazione",
     "user_fallback": "Utente sconosciuto",
-    "rating_aria": "{{n}} out of 5 stars"
+    "rating_aria": "{{n}} su 5 stelle"
   },
   "something_wrong": "Qualcosa è andato storto. Per favore riprova."
 }

@@ -67,7 +67,7 @@
     "recent_activity": "Atividade recente",
     "refresh": "Atualizar",
     "search": "Procurar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecione todas as linhas",
     "select_row": "Select row {{id}}",
     "data_table": "Dados",
     "total_count": "{{count}}total"
@@ -125,7 +125,7 @@
     "unfeature": "Desapresentar",
     "unfeature_listing": "Listagem sem recursos",
     "unfeatured_success": "Descaracterizado com sucesso",
-    "section_tabs_aria": "Listings management sections",
-    "filter_tabs_aria": "Listing status filter"
+    "section_tabs_aria": "Seções de gerenciamento de listagens",
+    "filter_tabs_aria": "Filtro de status de listagem"
   }
 }

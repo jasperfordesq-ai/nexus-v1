@@ -138,18 +138,18 @@
     "tabs_aria": "Secties met evenementdetails",
     "delete_series_note": "Dit is een terugkerend evenement. Als u het verwijdert, worden ook alle toekomstige herhalingen verwijderd.",
     "cancel_series_note": "Dit is een terugkerend evenement. Bij annulering worden ook alle toekomstige herhalingen geannuleerd en worden de deelnemers op de hoogte gebracht.",
-    "series_dates_title": "Upcoming dates in this series",
-    "series_this_date": "This date"
+    "series_dates_title": "Komende data in deze serie",
+    "series_this_date": "Deze datum"
   },
   "card": {
     "cancelled": "Geannuleerd",
     "spots_left": "{{count}} plekjes vrij",
     "full": "Vol",
     "open_aria": "{{title}} on {{date}}",
-    "repeats_daily": "Repeats daily",
-    "repeats_weekly": "Repeats weekly",
-    "repeats_monthly": "Repeats monthly",
-    "repeats_yearly": "Repeats yearly",
+    "repeats_daily": "Wordt dagelijks herhaald",
+    "repeats_weekly": "Wordt wekelijks herhaald",
+    "repeats_monthly": "Wordt maandelijks herhaald",
+    "repeats_yearly": "Wordt jaarlijks herhaald",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
     "series_dates_other": "{{count}} dates"
@@ -215,6 +215,7 @@
     "end_on_date": "Op een specifieke datum",
     "recurrence_count": "Aantal voorvallen",
     "recurrence_count_placeholder": "10",
+    "recurrence_count_hint": "Tussen 2 en 52 voorvallen",
     "recurrence_end_date": "Einddatum serie",
     "recurrence_preview_empty": "RREGEL:...",
     "weekday_mon": "ma",
@@ -245,7 +246,7 @@
       "updated": "Evenement bijgewerkt",
       "image_failed": "Evenement gemaakt, maar uploaden van afbeelding mislukt",
       "error": "Er is iets misgegaan",
-      "fix_errors": "Please fix the highlighted fields before saving"
+      "fix_errors": "Corrigeer de gemarkeerde velden voordat u opslaat"
     },
     "attach_polls_label": "Polls bijvoegen (optioneel)",
     "attach_polls_placeholder": "Polls selecteren om bij te voegen...",
@@ -263,8 +264,7 @@
     "edit_scope_message": "Dit evenement maakt deel uit van een terugkerende reeks. Wat wilt u bijwerken?",
     "edit_scope_single": "Alleen dit evenement",
     "edit_scope_all": "Dit en alle toekomstige evenementen",
-    "edit_scope_all_note": "Wijzigingen in datum en tijd gelden alleen voor dit evenement.",
-    "recurrence_count_hint": "Between 2 and 52 occurrences"
+    "edit_scope_all_note": "Wijzigingen in datum en tijd gelden alleen voor dit evenement."
   },
   "toast": {
     "rsvp_removed": "RSVP verwijderd",

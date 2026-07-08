@@ -67,7 +67,7 @@
     "recent_activity": "Attività recente",
     "refresh": "Aggiorna",
     "search": "Ricerca...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleziona tutte le righe",
     "select_row": "Select row {{id}}",
     "data_table": "Dati",
     "total_count": "{{count}}totale"
@@ -272,11 +272,11 @@
     "tab_by_category": "Per categoria",
     "tab_by_member": "Per membro",
     "tab_monthly_trend": "Tendenza mensile",
-    "hours_tabs_aria": "Hours report view",
-    "members_tabs_aria": "Member report type",
-    "hours_by_category_aria": "Bar chart showing hours exchanged by category",
-    "hours_distribution_aria": "Pie chart showing distribution of time exchange hours",
-    "hours_trend_aria": "Area chart showing hours exchanged over time"
+    "hours_tabs_aria": "Visualizzazione del rapporto sulle ore",
+    "members_tabs_aria": "Tipo di rapporto membro",
+    "hours_by_category_aria": "Grafico a barre che mostra le ore scambiate per categoria",
+    "hours_distribution_aria": "Grafico a torta che mostra la distribuzione delle ore di scambio orario",
+    "hours_trend_aria": "Grafico ad area che mostra le ore scambiate nel tempo"
   },
   "municipal_reports": {
     "meta": {
@@ -434,7 +434,7 @@
         "cooperative": "Cooperativa",
         "foundation": "Fondazione"
       },
-      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
+      "delete_confirm": "Eliminare il modello \"{{name}}\"? Questa operazione non può essere annullata."
     },
     "narrative": {
       "in_export": "Nell'esportazione",

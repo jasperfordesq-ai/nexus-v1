@@ -5,13 +5,18 @@
   "heading": "Twoje dopasowania",
   "subtitle": "Odkryj połączenia w ogłoszeniach, ofertach pracy, wolontariacie i grupach",
   "refresh": "Odśwież",
+  "preferences_link": "Dopasuj preferencje",
   "stats_total_matches": "Łączna liczba dopasowań",
   "stats_avg_score": "Średni wynik",
   "stats_hot_matches": "Gorące dopasowania",
+  "stats_mutual_matches": "Mutual Matches",
   "filter_all": "Wszystkie",
+  "filter_mutual_only": "Tylko wzajemne mecze",
+  "filter_people_listings": "Listings",
   "source_listing": "Ogłoszenie",
   "source_volunteering": "Wolontariat",
   "source_group": "Grupa",
+  "source_event": "Event",
   "empty_title_all": "Brak dopasowań",
   "empty_title_filtered": "Brak {{source}} dopasowań",
   "empty_description": "Dopasowania pojawią się tutaj, gdy system znajdzie połączenia dla Ciebie w całej platformie.",
@@ -28,111 +33,106 @@
   },
   "filter_tabs_aria": "Dopasuj filtr źródła",
   "loading": "Ładowanie meczów...",
-  "preferences_link": "Match preferences",
-  "stats_mutual_matches": "Mutual Matches",
-  "filter_mutual_only": "Mutual matches only",
-  "filter_people_listings": "Listings",
-  "source_event": "Event",
   "banner": {
-    "no_coords_title": "Add your location to see nearby matches",
-    "no_coords_desc": "We can't calculate distance-based matches until your profile has a location. You can still see matches below based on other signals.",
-    "paused_title": "Matching is paused",
-    "paused_desc": "You won't receive new match suggestions or notifications until you resume matching in your preferences.",
-    "mutual_title": "Showing mutual matches",
-    "mutual_desc": "These matches go both ways — you're a great fit for them, and they're a great fit for you.",
-    "show_all": "Show all matches"
+    "no_coords_title": "Dodaj swoją lokalizację, aby zobaczyć mecze w pobliżu",
+    "no_coords_desc": "Nie możemy obliczyć dopasowań na podstawie odległości, dopóki Twój profil nie będzie miał lokalizacji. Nadal możesz zobaczyć dopasowania poniżej na podstawie innych sygnałów.",
+    "paused_title": "Dopasowywanie zostało wstrzymane",
+    "paused_desc": "Nie będziesz otrzymywać nowych sugestii ani powiadomień dotyczących dopasowań, dopóki nie wznowisz dopasowywania w swoich preferencjach.",
+    "mutual_title": "Wyświetlanie wspólnych dopasowań",
+    "mutual_desc": "Te dopasowania działają w obie strony — świetnie do nich pasujesz, a one świetnie dopasowują się do Ciebie.",
+    "show_all": "Pokaż wszystkie dopasowania"
   },
   "card": {
     "distance_km": "{{value}} km",
     "remote": "Remote",
-    "mutual": "Mutual match",
+    "mutual": "Wzajemny mecz",
     "message": "Message",
-    "save": "Save match",
-    "dismiss": "Not interested",
-    "view_group": "View group",
+    "save": "Zapisz mecz",
+    "dismiss": "Nie jestem zainteresowany",
+    "view_group": "Zobacz grupę",
     "join": "Join",
     "joined": "Joined"
   },
   "explanation": {
-    "ai_caption": "AI-generated explanation based on your profile and activity"
+    "ai_caption": "Wyjaśnienia generowane przez sztuczną inteligencję na podstawie Twojego profilu i aktywności"
   },
   "breakdown": {
-    "title": "Why this score?",
+    "title": "Dlaczego taki wynik?",
     "pillars": {
       "relevance": "Relevance",
       "feasibility": "Feasibility",
       "trust": "Trust"
     },
     "signals": {
-      "category": "Category match",
-      "skill": "Skill match",
-      "semantic": "Description similarity",
+      "category": "Dopasowanie kategorii",
+      "skill": "Mecz umiejętności",
+      "semantic": "Podobieństwo opisu",
       "proximity": "Proximity",
       "availability": "Availability",
-      "activity": "Activity level",
+      "activity": "Poziom aktywności",
       "reviews": "Reviews",
-      "trust_tier": "Trust tier",
-      "completion": "Completion rate"
+      "trust_tier": "Poziom zaufania",
+      "completion": "Stopień ukończenia"
     }
   },
   "dismiss_reasons": {
-    "not_relevant": "Not relevant",
-    "too_far": "Too far away",
-    "already_done": "Already done",
-    "not_my_skills": "Not my skills",
-    "not_interested": "Not interested",
+    "not_relevant": "Nie dotyczy",
+    "too_far": "Za daleko",
+    "already_done": "Już zrobione",
+    "not_my_skills": "Nie moje umiejętności",
+    "not_interested": "Nie jestem zainteresowany",
     "other": "Other"
   },
   "empty": {
-    "no_coordinates_title": "We need your location to find matches",
-    "no_coordinates_description": "Add a location to your profile so we can find listings, groups, and opportunities near you.",
-    "set_location_cta": "Set your location",
-    "no_listings_title": "Matching works from your listings",
-    "no_listings_description": "Create a listing to start finding people, groups, and opportunities that match what you offer or need.",
-    "create_listing_cta": "Create a listing",
-    "adjust_preferences_cta": "Adjust match preferences"
+    "no_coordinates_title": "Potrzebujemy Twojej lokalizacji, aby znaleźć dopasowania",
+    "no_coordinates_description": "Dodaj lokalizację do swojego profilu, abyśmy mogli znaleźć oferty, grupy i możliwości w Twojej okolicy.",
+    "set_location_cta": "Ustaw swoją lokalizację",
+    "no_listings_title": "Pasujące prace z Twoich ofert",
+    "no_listings_description": "Utwórz listę, aby rozpocząć wyszukiwanie osób, grup i możliwości pasujących do Twojej oferty lub potrzeb.",
+    "create_listing_cta": "Utwórz listę",
+    "adjust_preferences_cta": "Dostosuj preferencje dopasowania"
   },
   "preferences": {
     "page_title": "Match Preferences",
     "page_meta_title": "Match Preferences",
     "breadcrumb": "Preferences",
     "heading": "Match Preferences",
-    "subtitle": "Control how Smart Matching finds and notifies you about connections.",
-    "load_failed": "Failed to load your match preferences",
-    "save": "Save preferences",
-    "save_success": "Match preferences saved",
-    "save_failed": "Failed to save match preferences",
-    "unsaved_changes": "You have unsaved changes",
+    "subtitle": "Kontroluj sposób, w jaki Smart Matching znajduje i powiadamia Cię o połączeniach.",
+    "load_failed": "Nie udało się załadować preferencji dopasowania",
+    "save": "Zapisz preferencje",
+    "save_success": "Ustawienia meczu zostały zapisane",
+    "save_failed": "Nie udało się zapisać preferencji dopasowania",
+    "unsaved_changes": "Masz niezapisane zmiany",
     "pause": {
-      "title": "Pause matching",
-      "description": "When paused, you won't get new match suggestions or notifications.",
-      "active_description": "Matching is paused — you won't get new suggestions or notifications until you resume."
+      "title": "Wstrzymaj dopasowanie",
+      "description": "Po wstrzymaniu nie będziesz otrzymywać sugestii ani powiadomień o nowych dopasowaniach.",
+      "active_description": "Dopasowywanie zostało wstrzymane — nie będziesz otrzymywać nowych sugestii ani powiadomień, dopóki nie wznowisz."
     },
     "thresholds": {
-      "title": "Distance & quality",
-      "no_location_title": "Add a location to use distance-based matching",
-      "no_location_desc": "Set your location in your profile to get matches ranked by how close they are to you.",
-      "distance_label": "Maximum distance",
+      "title": "Odległość i jakość",
+      "no_location_title": "Dodaj lokalizację, aby skorzystać z dopasowywania na podstawie odległości",
+      "no_location_desc": "Ustaw swoją lokalizację w swoim profilu, aby uzyskać ranking dopasowań według odległości od Ciebie.",
+      "distance_label": "Maksymalna odległość",
       "distance_value": "{{value}} km",
-      "quality_label": "Minimum match quality",
+      "quality_label": "Minimalna jakość dopasowania",
       "quality_value": "{{value}}%"
     },
     "categories": {
-      "title": "Category interests",
-      "description": "Choose the categories you'd like to be matched on. Leave everything unchecked to match on all categories.",
-      "empty": "No categories are available yet."
+      "title": "Zainteresowania kategoriami",
+      "description": "Wybierz kategorie, do których chcesz być dopasowany. Pozostaw wszystko niezaznaczone, aby dopasować je do wszystkich kategorii.",
+      "empty": "Żadne kategorie nie są jeszcze dostępne."
     },
     "notifications": {
       "title": "Notifications",
-      "frequency_label": "Match digest frequency",
+      "frequency_label": "Dopasuj częstotliwość podsumowania",
       "daily": "Daily",
       "fortnightly": "Fortnightly",
       "monthly": "Monthly",
       "never": "Never",
-      "hot_matches": "Hot match alerts",
-      "hot_matches_desc": "Get notified right away about exceptionally strong matches.",
-      "mutual_matches": "Mutual match alerts",
-      "mutual_matches_desc": "Get notified when a match goes both ways."
+      "hot_matches": "Alerty dotyczące gorących meczów",
+      "hot_matches_desc": "Otrzymuj powiadomienia od razu o wyjątkowo mocnych meczach.",
+      "mutual_matches": "Alerty o wzajemnych dopasowaniach",
+      "mutual_matches_desc": "Otrzymuj powiadomienia, gdy dopasowanie przebiega w obie strony."
     }
   }
 }

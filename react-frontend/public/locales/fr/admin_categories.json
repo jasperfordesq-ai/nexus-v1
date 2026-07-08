@@ -67,7 +67,7 @@
     "recent_activity": "Activité récente",
     "refresh": "Rafraîchir",
     "search": "Recherche...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Sélectionner toutes les lignes",
     "select_row": "Select row {{id}}",
     "data_table": "Données",
     "total_count": "{{count}}total"
@@ -106,6 +106,6 @@
     "type_listing": "Annonce",
     "type_resource": "Ressource",
     "type_vol_opportunity": "Opportunité de vol",
-    "tabs_aria": "Category type filter"
+    "tabs_aria": "Filtre de type de catégorie"
   }
 }

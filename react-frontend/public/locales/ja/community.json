@@ -152,6 +152,7 @@
     "hours_logged": "{{hours}}h がログに記録されました",
     "website": "Webサイト",
     "register_button": "組織を登録する",
+    "manage_my_button": "私の組織を管理する",
     "register_page_title": "組織を登録する",
     "register_heading": "組織を登録する",
     "register_subtitle": "ボランティア組織を登録して、機会を投稿し、ボランティアを管理します",
@@ -186,8 +187,7 @@
     "terms_required": "組織を登録するには、規約に同意する必要があります。",
     "opportunity_count_one": "{{count}} の機会",
     "opportunity_count_other": "{{count}} の機会",
-    "loading": "組織を読み込んでいます",
-    "manage_my_button": "Manage my organisation"
+    "loading": "組織を読み込んでいます"
   },
   "organisation_detail": {
     "page_title": "組織",
@@ -201,6 +201,7 @@
     "meta_description_fallback": "このコミュニティタイムバンクで {{name}} と {{count}} 件の有効なボランティア機会を見つけましょう。",
     "try_again": "もう一度やり直してください",
     "browse_organisations": "組織を参照する",
+    "manage_button": "この組織を管理する",
     "website": "ウェブサイト",
     "contact": "連絡する",
     "opportunities": "機会",
@@ -222,16 +223,15 @@
     "submit_application": "申請書の提出",
     "job_openings": "求人情報",
     "rating_sr": "{{n}} 5つ星のうち",
-    "manage_button": "Manage this organisation",
-    "write_review": "Write review",
-    "review_modal_title": "Review this organisation",
+    "write_review": "レビューを書く",
+    "review_modal_title": "この組織をレビューする",
     "rating_label": "Rating",
     "comment_label": "Comment",
-    "comment_placeholder": "Share what worked well or what others should know.",
-    "submit_review": "Submit review",
-    "review_success": "Review submitted.",
-    "review_error": "Unable to submit your review.",
-    "rating_required": "Choose a rating before submitting."
+    "comment_placeholder": "うまくいったことや他の人が知っておくべきことを共有します。",
+    "submit_review": "レビューを送信する",
+    "review_success": "レビューが送信されました。",
+    "review_error": "レビューを送信できません。",
+    "rating_required": "送信する前に評価を選択してください。"
   },
   "emergency_alerts": {
     "heading": "緊急アラート",

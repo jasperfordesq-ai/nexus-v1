@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -125,7 +125,7 @@
     "unfeature": "特徴がない",
     "unfeature_listing": "未機能リスト",
     "unfeatured_success": "正常に非表示になりました",
-    "section_tabs_aria": "Listings management sections",
-    "filter_tabs_aria": "Listing status filter"
+    "section_tabs_aria": "出品管理セクション",
+    "filter_tabs_aria": "リストステータスフィルター"
   }
 }

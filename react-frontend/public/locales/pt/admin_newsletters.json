@@ -67,7 +67,7 @@
     "recent_activity": "Atividade recente",
     "refresh": "Atualizar",
     "search": "Procurar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecione todas as linhas",
     "select_row": "Select row {{id}}",
     "data_table": "Dados",
     "total_count": "{{count}}total"
@@ -455,7 +455,7 @@
     "winning_metric": "Métrica vencedora",
     "resend_queued_count": "Reenvio de{{count}}na fila",
     "resend_queued_count_plural": "{{count}}na fila reenvia",
-    "template_tabs_aria": "Newsletter template category filter"
+    "template_tabs_aria": "Filtro de categoria de modelo de boletim informativo"
   },
   "newsletter_form": {
     "ab_test_label": "Teste Ab",
@@ -642,14 +642,14 @@
       "hero_desc": "Uma imagem de banner com um título",
       "html_label": "HTML",
       "html_desc": "Cole seu próprio HTML personalizado",
+      "wrapper_label": "Contentor",
       "wrapper_desc": "Agrupar seções com um plano de fundo compartilhado",
       "navbar_label": "Barra de navegação",
       "navbar_desc": "Uma linha de links de menu",
       "social_icon_label": "Ícone social",
       "social_icon_desc": "Um único ícone de rede social",
       "nav_link_label": "Link de navegação",
-      "nav_link_desc": "Um único link de menu",
-      "wrapper_label": "Contentor"
+      "nav_link_desc": "Um único link de menu"
     }
   },
   "newsletter_content_editor": {

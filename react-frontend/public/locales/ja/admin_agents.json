@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -85,7 +85,7 @@
       "disabled": "無効",
       "enabled": "有効"
     },
-    "toggle": "Enable or disable {{name}}",
+    "toggle": "{{name}} を有効または無効にする",
     "run_status": {
       "completed": "完了",
       "failed": "失敗した",
@@ -217,6 +217,6 @@
         "rejected": "提案は拒否されました"
       }
     },
-    "tabs_aria": "Agent proposal status filter"
+    "tabs_aria": "エージェントの提案ステータス フィルター"
   }
 }

@@ -67,7 +67,7 @@
     "recent_activity": "Activité récente",
     "refresh": "Rafraîchir",
     "search": "Recherche...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Sélectionner toutes les lignes",
     "select_row": "Select row {{id}}",
     "data_table": "Données",
     "total_count": "{{count}}total"
@@ -251,9 +251,9 @@
         "seed_defaults": "Valeurs par défaut des semences"
       },
       "about": {
-        "body": "When a member's chat message contains any of a doc's keywords, that doc's body is appended to the AI's system prompt as canonical grounding. Up to 4 docs are injected per turn, ranked by keyword match strength. Write in plain language: what the feature does, how to use it, and what is not possible. Add your community's specific terminology, policies, and FAQs.",
-        "tip_label": "Tip:",
-        "tip_body": "New tenants are auto-seeded with a comprehensive 38-doc starter pack covering the platform overview, timebanking philosophy, every module/feature, account security, privacy, accessibility, mobile, and troubleshooting. Click \"Seed defaults\" to top up missing docs — your custom edits are never overwritten."
+        "body": "Lorsque le message de discussion d'un membre contient l'un des mots-clés d'un document, le corps de ce document est ajouté à l'invite système de l'IA en tant que fondement canonique. Jusqu'à 4 documents sont injectés par tour, classés par force de correspondance des mots clés. Écrivez en langage simple : ce que fait la fonctionnalité, comment l'utiliser et ce qui n'est pas possible. Ajoutez la terminologie, les politiques et les FAQ spécifiques à votre communauté.",
+        "tip_label": "Conseil:",
+        "tip_body": "Les nouveaux locataires sont automatiquement générés avec un pack de démarrage complet de 38 documents couvrant la présentation de la plate-forme, la philosophie de la banque de temps, chaque module/fonctionnalité, la sécurité du compte, la confidentialité, l'accessibilité, le mobile et le dépannage. Cliquez sur « Valeurs par défaut » pour compléter les documents manquants : vos modifications personnalisées ne sont jamais écrasées."
       },
       "columns": {
         "actions": "Actes",

@@ -232,7 +232,7 @@
     "listing_preview_alt": "Podgląd ogłoszenia",
     "image_preview_alt": "Podgląd przesyłania",
     "type_tabs_aria": "Utwórz typ zawartości",
-    "compose_post": "Compose post"
+    "compose_post": "Utwórz wpis"
   },
   "moderation": {
     "unauthorized": "Nie masz uprawnień do wykonania tej czynności."
@@ -538,7 +538,7 @@
     "scroll_right": "Przewiń historie w prawo",
     "create_your_story": "Utwórz swoją historię",
     "view_story_from": "Zobacz historię od {{name}}",
-    "load_failed": "Couldn't load stories",
+    "load_failed": "Nie udało się wczytać historii",
     "retry": "Retry"
   },
   "fab": {
@@ -626,6 +626,6 @@
     "delete_post": "Usunąć ten post? Tego nie można cofnąć."
   },
   "aria": {
-    "feed_sidebar": "Community suggestions and highlights"
+    "feed_sidebar": "Sugestie i najważniejsze informacje społeczności"
   }
 }

@@ -67,7 +67,7 @@
     "recent_activity": "Actividad reciente",
     "refresh": "Refrescar",
     "search": "Buscar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleccionar todas las filas",
     "select_row": "Select row {{id}}",
     "data_table": "Datos",
     "total_count": "{{count}}total"
@@ -289,7 +289,7 @@
     "load_error": "No se pudo cargar la cola de moderación.",
     "pagination_label": "Paginación de la cola de moderación",
     "user_fallback": "Usuario desconocido",
-    "rating_aria": "{{n}} out of 5 stars"
+    "rating_aria": "{{n}} de 5 estrellas"
   },
   "something_wrong": "Algo salió mal. Por favor inténtalo de nuevo."
 }

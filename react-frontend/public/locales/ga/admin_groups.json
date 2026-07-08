@@ -67,7 +67,7 @@
     "recent_activity": "Gníomhaíocht le Déanaí",
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
@@ -359,8 +359,8 @@
     "unarchive": "Unarchive",
     "geocode_description": "Suíomhanna grúpa geochóid chun taispeáint léarscáileanna agus fionnachtain chianbhunaithe a chumasú.",
     "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet.",
-    "detail_tabs_aria": "Group detail sections",
-    "status_tabs_aria": "Group status filter"
+    "detail_tabs_aria": "Rannóga mionsonraí an ghrúpa",
+    "status_tabs_aria": "Scagaire stádais grúpa"
   },
   "group_organization": {
     "page_title": "Eagrú Grúpaí",

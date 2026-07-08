@@ -67,7 +67,7 @@
     "recent_activity": "Attività recente",
     "refresh": "Aggiorna",
     "search": "Ricerca...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleziona tutte le righe",
     "select_row": "Select row {{id}}",
     "data_table": "Dati",
     "total_count": "{{count}}totale"
@@ -455,7 +455,7 @@
     "winning_metric": "Metrica vincente",
     "resend_queued_count": "{{count}}in coda rinviato",
     "resend_queued_count_plural": "{{count}}in coda invia nuovamente",
-    "template_tabs_aria": "Newsletter template category filter"
+    "template_tabs_aria": "Filtro categoria modello newsletter"
   },
   "newsletter_form": {
     "ab_test_label": "Prova addominali",
@@ -642,14 +642,14 @@
       "hero_desc": "Un'immagine banner con un titolo",
       "html_label": "HTML",
       "html_desc": "Incolla il tuo codice HTML personalizzato",
+      "wrapper_label": "Contenitore",
       "wrapper_desc": "Sezioni di gruppo con uno sfondo condiviso",
       "navbar_label": "Barra di navigazione",
       "navbar_desc": "Una fila di collegamenti al menu",
       "social_icon_label": "Icona sociale",
       "social_icon_desc": "Un'unica icona del social network",
       "nav_link_label": "Collegamento di navigazione",
-      "nav_link_desc": "Un unico collegamento al menu",
-      "wrapper_label": "Contenitore"
+      "nav_link_desc": "Un unico collegamento al menu"
     }
   },
   "newsletter_content_editor": {

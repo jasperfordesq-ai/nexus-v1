@@ -88,6 +88,11 @@
     "meta_description": "hOURタイムバンクと提携して、投資した€1ごとに€16の社会的価値を創造しましょう。企業のパートナーシップ、スポンサーシップ、研究機会。",
     "breadcrumb_about": "について",
     "hero_subtitle": "実績のある社会的影響組織と力を合わせましょう。あなたが投資する€1は、アイルランド全体のコミュニティに対して€16の測定可能な社会的価値を生み出します。",
+    "together_banner_heading": "一緒にタイムバンキングをする",
+    "together_banner_alt": "タイムバンキングのために一緒に – より強力なコミュニティ、共通の価値観、より明るい未来。 Timebanking UK および Timebank Ireland と提携して、Project NEXUS を利用しています。",
+    "tbuk_heading": "Timebanking UK",
+    "tbuk_para1": "タイムバンク アイルランドとプロジェクト NEXUS は、タイムバンキング UK との新たな戦略的および技術的パートナーシップを発表できることを嬉しく思います。これにより、共有のオープンソース デジタル インフラストラクチャを中心とした 2 つのタイムバンキングの動きが統合されます。このパートナーシップを通じて、Timebanking UK は Project NEXUS エコシステムの貢献者および戦略的パートナーとして認められ、地域交流、アクセシビリティ、コミュニティ間のコラボレーション、および長期的なコミュニティ所有のために構築された連合プラットフォームの形成を支援します。",
+    "tbuk_para2": "このパートナーシップにより、プロジェクト NEXUS は閉鎖的な市民テクノロジーに代わる実践的で運動主導の代替手段として強化されます。 Timebanking UK と協力することで、私たちはアイルランド、英国、その他の地域でタイムバンクのより強力な基盤を構築しています。つまり、共通の標準、共有された学習、商用ソフトウェア ベンダーの優先事項ではなくコミュニティの実際のニーズに基づいて設計されたプラットフォームです。",
     "funding_gap_heading": "資金ギャップへの対処",
     "funding_gap_para1": "hOURタイムバンクのようなコミュニティ組織は、驚異的な社会的価値を提供しますが、限られた予算で運営されています。私たちの独立した2023年の調査は、16:1の社会的リターンを示していますが、基本的な運営をカバーするのはコア資金のみです。",
     "funding_gap_para2": "戦略的パートナーシップはこのギャップを埋めることができます。企業のCSRプログラム、研究協力、または直接のスポンサーシップを通じて、あなたの支援はコミュニティの幸福を直接増幅し、すべての人に利益をもたらす社会的インフラを構築します。",
@@ -128,12 +133,7 @@
     "cta_heading": "一緒により強いコミュニティを築きましょう",
     "cta_subtitle": "あなたが企業、資金提供者、研究者、またはコミュニティリーダーであっても、あなたに合ったパートナーシップモデルがあります。",
     "cta_contact": "会話を始める",
-    "cta_view_plan": "戦略計画を見る",
-    "together_banner_heading": "Together for Timebanking",
-    "together_banner_alt": "Together for Timebanking — stronger communities, shared values, brighter future. Powered by Project NEXUS, in partnership with Timebanking UK and Timebank Ireland.",
-    "tbuk_heading": "Timebanking UK",
-    "tbuk_para1": "Timebank Ireland and Project NEXUS are delighted to announce a new strategic and technology partnership with Timebanking UK, bringing together two timebanking movements around shared, open-source digital infrastructure. Through this partnership, Timebanking UK will become a recognised contributor and strategic partner in the Project NEXUS ecosystem, helping shape a federated platform built for local exchange, accessibility, cross-community collaboration and long-term community ownership.",
-    "tbuk_para2": "The partnership strengthens Project NEXUS as a practical, movement-led alternative to closed civic technology. By working with Timebanking UK, we are creating a stronger foundation for time banks across Ireland, the UK and beyond: shared standards, shared learning, and a platform designed around the real needs of communities rather than the priorities of commercial software vendors."
+    "cta_view_plan": "戦略計画を見る"
   },
   "social_prescribing": {
     "page_title": "社会的処方",

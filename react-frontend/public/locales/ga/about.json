@@ -88,6 +88,11 @@
     "meta_description": "Comhpháirtigh le hOUR Timebank chun €16 de luach sóisialta a chruthú do gach €1 infheistithe. Comhpháirtíochtaí corparáideacha, urraíochtaí, agus deiseanna taighde.",
     "breadcrumb_about": "Faoi",
     "hero_subtitle": "Bí i gcomhar le heagraíocht tionchar sóisialta cruthaithe. Gineann gach €1 a infheistíonn tú €16 de luach sóisialta in-tomhaiste do phobail ar fud na hÉireann.",
+    "together_banner_heading": "Le Chéile le haghaidh Bainc Ama",
+    "together_banner_alt": "Le Chéile ar son Bainc Ama — pobail níos láidre, comhluachanna, todhchaí níos gile. Cumhachtaithe ag Tionscadal NEXUS, i gcomhpháirtíocht le Timebanking UK agus Timebank Ireland.",
+    "tbuk_heading": "Timebanking UK",
+    "tbuk_para1": "Tá lúcháir ar Timebank Ireland agus Project NEXUS comhpháirtíocht nua straitéiseach agus teicneolaíochta a fhógairt le Timebanking UK, ag tabhairt le chéile dhá ghluaiseacht bainc ama timpeall ar bhonneagar digiteach foinse oscailte roinnte. Tríd an gcomhpháirtíocht seo, beidh Timebanking UK ina ranníocóir aitheanta agus ina chomhpháirtí straitéiseach in éiceachóras Project NEXUS, ag cuidiú le hardán cónasctha a mhúnlú a thógfar le haghaidh malartú áitiúil, inrochtaineacht, comhoibriú trasphobail agus úinéireacht phobail fhadtéarmach.",
+    "tbuk_para2": "Neartaíonn an chomhpháirtíocht Tionscadal NEXUS mar mhalairt phraiticiúil, treoraithe ag gluaiseacht, in ionad na teicneolaíochta cathartha dúnta. Trí oibriú le Timebanking UK, táimid ag cruthú dúshraith níos láidre do bhainc ama ar fud na hÉireann, na Ríochta Aontaithe agus níos faide i gcéin: caighdeáin chomhroinnte, comhfhoghlaim, agus ardán atá deartha timpeall ar fhíor-riachtanais na bpobal seachas ar thosaíochtaí díoltóirí bogearraí tráchtála.",
     "funding_gap_heading": "Dul i Ngleic leis an mBearna Maoiniúcháin",
     "funding_gap_para1": "Soláthraíonn eagraíochtaí pobail cosúil le hOUR Timebank luach sóisialta eisceachtúil — ach oibríonn siad ar bhuiséid an-bheag. Léiríonn ár staidéar neamhspleách 2023 toradh sóisialta 16:1, ach ní chlúdaíonn croímhaoiniú ach bun-oibríochtaí.",
     "funding_gap_para2": "Is féidir le comhpháirtíochtaí straitéiseacha an bhearna seo a dhúnadh. Cibé trí chláir CSR corparáideacha, comhoibriú taighde, nó urraíocht dhíreach, méadaíonn do thacaíocht folláine pobail go díreach agus tógann bonneagar sóisialta a théann chun sochair do chách.",
@@ -128,12 +133,7 @@
     "cta_heading": "Tógaimis Pobail Níos Láidre Le Chéile",
     "cta_subtitle": "Cibé corparáid, maoinitheoir, taighdeoir, nó ceannaire pobail thú — tá múnla comhpháirtíochta ann a oibríonn duit.",
     "cta_contact": "Tosaigh Comhrá",
-    "cta_view_plan": "Féach ar an bPlean Straitéiseach",
-    "together_banner_heading": "Together for Timebanking",
-    "together_banner_alt": "Together for Timebanking — stronger communities, shared values, brighter future. Powered by Project NEXUS, in partnership with Timebanking UK and Timebank Ireland.",
-    "tbuk_heading": "Timebanking UK",
-    "tbuk_para1": "Timebank Ireland and Project NEXUS are delighted to announce a new strategic and technology partnership with Timebanking UK, bringing together two timebanking movements around shared, open-source digital infrastructure. Through this partnership, Timebanking UK will become a recognised contributor and strategic partner in the Project NEXUS ecosystem, helping shape a federated platform built for local exchange, accessibility, cross-community collaboration and long-term community ownership.",
-    "tbuk_para2": "The partnership strengthens Project NEXUS as a practical, movement-led alternative to closed civic technology. By working with Timebanking UK, we are creating a stronger foundation for time banks across Ireland, the UK and beyond: shared standards, shared learning, and a platform designed around the real needs of communities rather than the priorities of commercial software vendors."
+    "cta_view_plan": "Féach ar an bPlean Straitéiseach"
   },
   "social_prescribing": {
     "page_title": "Oideasacht Shóisialta",

@@ -869,15 +869,15 @@
     "current_language": "Idioma: {{language}}",
     "select_language": "Seleccionar idioma",
     "clear_location": "Limpiar ubicación",
+    "location_results": "{{count}} sugerencias de direcciones disponibles",
+    "search_results": "{{count}} results available",
     "select_category": "Seleccionar una categoría",
     "verification_badges": "Insignias de verificación",
     "search_skills": "Buscar habilidades",
     "user_menu_trigger": "Menú de usuario para {{name}}",
     "feed_sidebar": "Barra lateral de la comunidad",
     "filter_panel": "Panel de filtro",
-    "remove": "Remove",
-    "location_results": "{{count}} address suggestions available",
-    "search_results": "{{count}} results available"
+    "remove": "Remove"
   },
   "skills": {
     "browse_title": "Directorio de Habilidades de la Comunidad",
@@ -920,14 +920,14 @@
     "add_skill": "Añadir habilidad",
     "add_a_skill": "Añadir una habilidad",
     "search_result_category": "en {{category}}",
+    "aria_results": "{{count}} sugerencias de habilidades disponibles",
     "no_matching_custom": "No se encontró ninguna habilidad coincidente. Puedes añadir \"{{query}}\" como habilidad personalizada.",
     "use_custom": "Usar \"{{query}}\"",
     "skill_to_add": "Habilidad para añadir:",
     "aria_clear_search": "Limpiar búsqueda",
     "aria_close_members_list": "Cerrar lista de miembros",
     "category_optional": "Categoría (opcional)",
-    "proficiency_level": "Nivel de competencia",
-    "aria_results": "{{count}} skill suggestions available"
+    "proficiency_level": "Nivel de competencia"
   },
   "hours_display_one": "{{count}} hora",
   "hours_display_other": "{{count}} horas",
@@ -1663,7 +1663,7 @@
       "ad_free": "Experiencia sin anuncios"
     },
     "return_meta_description": "Página de retorno seguro tras el pago para activar, confirmar o gestionar tu suscripción premium.",
-    "one_off_cta": "Make a one-off donation"
+    "one_off_cta": "Haz una donación única"
   },
   "developers": {
     "page_title": "Desarrolladores",
@@ -2077,7 +2077,7 @@
     "connect_modal": {
       "confirm": "Este es tu único método de inicio de sesión restante. Si lo desconectas, perderás el acceso a menos que primero establezcas una contraseña o añadas una clave de acceso. ¿Continuar?"
     },
-    "sign_in_with_provider": "Sign in with {{name}}"
+    "sign_in_with_provider": "Inicia sesión con {{name}}"
   },
   "verein_dues": {
     "my_page_title": "Mis cuotas de miembro de Verein",

@@ -67,13 +67,13 @@
     "recent_activity": "Actividad reciente",
     "refresh": "Refrescar",
     "search": "Buscar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleccionar todas las filas",
     "select_row": "Select row {{id}}",
     "data_table": "Datos",
     "total_count": "{{count}}total"
   },
   "national": {
-    "trend_chart_aria": "Chart showing community activity trends over time"
+    "trend_chart_aria": "Gráfico que muestra las tendencias de actividad de la comunidad a lo largo del tiempo"
   },
   "national_kiss_dashboard": {
     "loading": "Loading",
@@ -87,8 +87,8 @@
     },
     "about": {
       "title": "Acerca de este panel",
-      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
-      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "body_prefix": "Caring Community es una metodología para la coordinación de la atención basada en la comunidad. Este panel de superadministrador agrega métricas de todas las cooperativas NEXUS que ejecutan el programa Caring Community a nivel nacional, lo que brinda al país",
+      "body_suffix": "fundación una visión intercooperativa de las horas intercambiadas, la participación de los miembros y la salud cooperativa. El recuento de miembros se muestra entre paréntesis para preservar la privacidad (por ejemplo, \"50-99\") en lugar de números exactos.",
       "health_prefix": "Utilice el selector de períodos para comparar trimestres. El cuadro comparativo clasifica a las cooperativas por horas, miembros o estado de salud. El estado de salud se deriva de las tendencias de actividad:",
       "thriving_definition": "creciendo rápidamente,",
       "stable_definition": "actividad plana,",

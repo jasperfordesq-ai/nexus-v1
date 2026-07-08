@@ -67,7 +67,7 @@
     "recent_activity": "Ostatnia aktywność",
     "refresh": "Odświeżać",
     "search": "Szukaj...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wybierz wszystkie wiersze",
     "select_row": "Select row {{id}}",
     "data_table": "Dane",
     "total_count": "Łącznie{{count}}"
@@ -251,9 +251,9 @@
         "seed_defaults": "Domyślne ustawienia nasion"
       },
       "about": {
-        "body": "When a member's chat message contains any of a doc's keywords, that doc's body is appended to the AI's system prompt as canonical grounding. Up to 4 docs are injected per turn, ranked by keyword match strength. Write in plain language: what the feature does, how to use it, and what is not possible. Add your community's specific terminology, policies, and FAQs.",
-        "tip_label": "Tip:",
-        "tip_body": "New tenants are auto-seeded with a comprehensive 38-doc starter pack covering the platform overview, timebanking philosophy, every module/feature, account security, privacy, accessibility, mobile, and troubleshooting. Click \"Seed defaults\" to top up missing docs — your custom edits are never overwritten."
+        "body": "Jeśli wiadomość na czacie członka zawiera którekolwiek ze słów kluczowych dokumentu, treść tego dokumentu jest dodawana do zachęty systemowej sztucznej inteligencji jako podstawa kanoniczna. Na turę wstrzykiwane są maksymalnie 4 dokumenty, uszeregowane według siły dopasowania słowa kluczowego. Napisz prostym językiem: co robi dana funkcja, jak z niej korzystać i co nie jest możliwe. Dodaj terminologię, zasady i często zadawane pytania dotyczące Twojej społeczności.",
+        "tip_label": "Wskazówka:",
+        "tip_body": "Nowi najemcy otrzymują automatycznie kompleksowy pakiet startowy składający się z 38 dokumentów obejmujący przegląd platformy, filozofię bankowości czasu, każdy moduł/funkcję, bezpieczeństwo konta, prywatność, dostępność, urządzenia mobilne i rozwiązywanie problemów. Kliknij „Domyślne ustawienia początkowe”, aby uzupełnić brakujące dokumenty — Twoje niestandardowe zmiany nigdy nie zostaną nadpisane."
       },
       "columns": {
         "actions": "Działania",

@@ -67,7 +67,7 @@
     "recent_activity": "Actividad reciente",
     "refresh": "Refrescar",
     "search": "Buscar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleccionar todas las filas",
     "select_row": "Select row {{id}}",
     "data_table": "Datos",
     "total_count": "{{count}}total"
@@ -210,7 +210,7 @@
     "validation_last_name_required": "Se requiere apellido",
     "validation_password_min": "La contraseña debe tener al menos 8 caracteres.",
     "validation_role_required": "Se requiere rol",
-    "tabs_aria": "User status filter",
+    "tabs_aria": "Filtro de estado de usuario",
     "smart_search_label": "Búsqueda inteligente de usuarios",
     "smart_search_placeholder": "Busca por nombre, correo, teléfono, rol, estado o ID...",
     "smart_search_description": "Prueba nombres, correos, teléfonos, role:admin, pending, never logged in o id:42.",
@@ -238,7 +238,7 @@
       "set_password": "Establecer contraseña"
     },
     "aria": {
-      "edit_user_form": "Edit user",
+      "edit_user_form": "Editar usuario",
       "remove_badge": "Quitar insignia: {{name}}",
       "toggle_global_super_admin": "Alternar superadministrador global",
       "toggle_municipal_announcer": "Alternar función de locutor municipal",

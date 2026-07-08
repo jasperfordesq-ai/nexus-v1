@@ -67,7 +67,7 @@
     "recent_activity": "Gníomhaíocht le Déanaí",
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
@@ -106,6 +106,6 @@
     "type_listing": "Liostú",
     "type_resource": "Acmhainn",
     "type_vol_opportunity": "Vol Opportunity",
-    "tabs_aria": "Category type filter"
+    "tabs_aria": "Scagaire cineáil chatagóir"
   }
 }

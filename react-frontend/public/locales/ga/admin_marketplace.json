@@ -67,7 +67,7 @@
     "recent_activity": "Gníomhaíocht le Déanaí",
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
@@ -207,8 +207,8 @@
     "verify_seller_message": "Marcálfaidh sé seo an díoltóir mar a fíoraíodh. Lean ort?",
     "verify_seller_title": "Fíoraigh Díoltóir",
     "view_all": "Féach ar Uile",
-    "moderation_tabs_aria": "Marketplace moderation status filter",
-    "seller_tabs_aria": "Seller status filter"
+    "moderation_tabs_aria": "Scagaire stádais modhnóireachta Marketplace",
+    "seller_tabs_aria": "Scagaire stádais díoltóra"
   },
   "bulk": {
     "selected_count": "{{count}} roghnaithe",

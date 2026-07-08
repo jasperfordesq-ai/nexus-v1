@@ -67,7 +67,7 @@
     "recent_activity": "Atividade recente",
     "refresh": "Atualizar",
     "search": "Procurar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecione todas as linhas",
     "select_row": "Select row {{id}}",
     "data_table": "Dados",
     "total_count": "{{count}}total"
@@ -359,8 +359,8 @@
     "unarchive": "Desarquivar",
     "geocode_description": "Geocodifique locais de grupos para permitir a exibição de mapas e descoberta baseada em distância.",
     "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet.",
-    "detail_tabs_aria": "Group detail sections",
-    "status_tabs_aria": "Group status filter"
+    "detail_tabs_aria": "Seções de detalhes do grupo",
+    "status_tabs_aria": "Filtro de status do grupo"
   },
   "group_organization": {
     "page_title": "Organização de grupos",

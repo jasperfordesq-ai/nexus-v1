@@ -67,13 +67,13 @@
     "recent_activity": "Ostatnia aktywność",
     "refresh": "Odświeżać",
     "search": "Szukaj...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wybierz wszystkie wiersze",
     "select_row": "Select row {{id}}",
     "data_table": "Dane",
     "total_count": "Łącznie{{count}}"
   },
   "national": {
-    "trend_chart_aria": "Chart showing community activity trends over time"
+    "trend_chart_aria": "Wykres przedstawiający trendy aktywności społeczności na przestrzeni czasu"
   },
   "national_kiss_dashboard": {
     "loading": "Loading",
@@ -87,8 +87,8 @@
     },
     "about": {
       "title": "Informacje o tym panelu",
-      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
-      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "body_prefix": "Caring Community to metodologia koordynacji opieki środowiskowej. Ten panel superadministratora gromadzi dane dotyczące każdej spółdzielni NEXUS realizującej program Caring Community na poziomie krajowym – dając krajowemu",
+      "body_suffix": "fundacji międzyspółdzielczy pogląd na wymianę godzin, uczestnictwo członków i zdrowie spółdzielni. Liczba członków jest pokazywana w nawiasach chroniących prywatność (np. „50–99”), a nie w dokładnych liczbach.",
       "health_prefix": "Użyj selektora okresu, aby porównać kwartały. Tabela porównawcza klasyfikuje spółdzielnie według godzin pracy, członków lub stanu zdrowia. Stan zdrowia wynika z trendów aktywności:",
       "thriving_definition": "szybko rośnie,",
       "stable_definition": "płaska aktywność,",

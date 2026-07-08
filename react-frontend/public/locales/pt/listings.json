@@ -246,8 +246,8 @@
     "label": "Etiquetas de Competências",
     "placeholder": "Escreva uma competência e prima Enter...",
     "aria_add": "Adicionar etiqueta de competência",
-    "aria_add_count": "Add skill tag ({{current}} of {{max}})",
-    "aria_results": "{{count}} skill suggestions available"
+    "aria_add_count": "Adicionar tag de habilidade ({{current}} de {{max}})",
+    "aria_results": "{{count}} sugestões de habilidades disponíveis"
   },
   "more_filters": "Mais filtros",
   "filters_label": "Filtros",

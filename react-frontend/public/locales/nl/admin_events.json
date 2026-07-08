@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -105,6 +105,6 @@
     "tab_draft": "Diepgang",
     "tab_published": "Gepubliceerd",
     "unknown": "Onbekend",
-    "tabs_aria": "Event status filter"
+    "tabs_aria": "Gebeurtenisstatusfilter"
   }
 }

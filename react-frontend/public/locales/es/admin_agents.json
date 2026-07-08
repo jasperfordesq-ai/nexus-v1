@@ -67,7 +67,7 @@
     "recent_activity": "Actividad reciente",
     "refresh": "Refrescar",
     "search": "Buscar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleccionar todas las filas",
     "select_row": "Select row {{id}}",
     "data_table": "Datos",
     "total_count": "{{count}}total"
@@ -85,7 +85,7 @@
       "disabled": "Desactivado",
       "enabled": "Activado"
     },
-    "toggle": "Enable or disable {{name}}",
+    "toggle": "Activar o desactivar {{name}}",
     "run_status": {
       "completed": "Terminado",
       "failed": "Fallido",
@@ -217,6 +217,6 @@
         "rejected": "Propuesta rechazada"
       }
     },
-    "tabs_aria": "Agent proposal status filter"
+    "tabs_aria": "Filtro de estado de propuesta de agente"
   }
 }

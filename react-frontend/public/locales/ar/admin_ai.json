@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -251,9 +251,9 @@
         "seed_defaults": "افتراضيات البذور"
       },
       "about": {
-        "body": "When a member's chat message contains any of a doc's keywords, that doc's body is appended to the AI's system prompt as canonical grounding. Up to 4 docs are injected per turn, ranked by keyword match strength. Write in plain language: what the feature does, how to use it, and what is not possible. Add your community's specific terminology, policies, and FAQs.",
-        "tip_label": "Tip:",
-        "tip_body": "New tenants are auto-seeded with a comprehensive 38-doc starter pack covering the platform overview, timebanking philosophy, every module/feature, account security, privacy, accessibility, mobile, and troubleshooting. Click \"Seed defaults\" to top up missing docs — your custom edits are never overwritten."
+        "body": "عندما تحتوي رسالة الدردشة الخاصة بأحد الأعضاء على أي من الكلمات الرئيسية للمستند، يتم إلحاق نص هذا المستند بموجه نظام الذكاء الاصطناعي باعتباره أساسًا أساسيًا. يتم إدخال ما يصل إلى 4 مستندات في كل دور، مرتبة حسب قوة مطابقة الكلمات الرئيسية. اكتب بلغة واضحة: ما الذي تفعله الميزة، وكيفية استخدامها، وما هو غير ممكن. أضف المصطلحات والسياسات والأسئلة الشائعة الخاصة بمجتمعك.",
+        "tip_label": "نصيحة:",
+        "tip_body": "يتم تصنيف المستأجرين الجدد تلقائيًا بحزمة بداية شاملة مكونة من 38 مستندًا تغطي نظرة عامة على النظام الأساسي، وفلسفة توفير الوقت، وكل وحدة/ميزة، وأمن الحساب، والخصوصية، وإمكانية الوصول، والهاتف المحمول، واستكشاف الأخطاء وإصلاحها. انقر فوق \"الإعدادات الافتراضية للبذور\" لتعبئة المستندات المفقودة - لن يتم استبدال تعديلاتك المخصصة أبدًا."
       },
       "columns": {
         "actions": "الإجراءات",

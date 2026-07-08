@@ -67,13 +67,13 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
   },
   "national": {
-    "trend_chart_aria": "Chart showing community activity trends over time"
+    "trend_chart_aria": "Grafiek die trends in gemeenschapsactiviteit in de loop van de tijd laat zien"
   },
   "national_kiss_dashboard": {
     "loading": "Loading",
@@ -87,8 +87,8 @@
     },
     "about": {
       "title": "Over dit dashboard",
-      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
-      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "body_prefix": "Caring Community is een methodologie voor zorgcoördinatie binnen de gemeenschap. Dit dashboard voor superbeheerders verzamelt gegevens van alle NEXUS-coöperaties die het Caring Community-programma op nationaal niveau uitvoeren, waardoor de nationale",
+      "body_suffix": "stichting een coöperatieve visie op uitgewisselde uren, ledenparticipatie en coöperatieve gezondheid. Het aantal leden wordt weergegeven als privacybeschermende haakjes (bijvoorbeeld '50-99') in plaats van exacte cijfers.",
       "health_prefix": "Gebruik de periodekiezer om kwartalen te vergelijken. De vergelijkende tabel rangschikt coöperaties op uren, leden of gezondheidsstatus. De gezondheidsstatus wordt afgeleid van activiteitstrends:",
       "thriving_definition": "snel groeiend,",
       "stable_definition": "vlakke activiteit,",

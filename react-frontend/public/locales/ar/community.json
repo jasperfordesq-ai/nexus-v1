@@ -152,6 +152,7 @@
     "hours_logged": "تم تسجيل {{hours}}h",
     "website": "موقع إلكتروني",
     "register_button": "تسجيل المنظمة",
+    "manage_my_button": "إدارة مؤسستي",
     "register_page_title": "تسجيل المنظمة",
     "register_heading": "سجل مؤسستك",
     "register_subtitle": "قم بتسجيل مؤسستك التطوعية لنشر الفرص وإدارة المتطوعين",
@@ -186,8 +187,7 @@
     "terms_required": "يجب عليك الموافقة على الشروط لتسجيل مؤسستك.",
     "opportunity_count_one": "فرصة {{count}}",
     "opportunity_count_other": "{{count}} الفرص",
-    "loading": "تحميل المنظمات",
-    "manage_my_button": "Manage my organisation"
+    "loading": "تحميل المنظمات"
   },
   "organisation_detail": {
     "page_title": "منظمة",
@@ -201,6 +201,7 @@
     "meta_description_fallback": "استكشف {{name}} و{{count}} فرصة تطوعية نشطة في بنك الوقت المجتمعي هذا.",
     "try_again": "حاول ثانية",
     "browse_organisations": "تصفح المنظمات",
+    "manage_button": "إدارة هذه المنظمة",
     "website": "الموقع الإلكتروني",
     "contact": "تواصل",
     "opportunities": "فرص",
@@ -222,16 +223,15 @@
     "submit_application": "تقديم الطلب",
     "job_openings": "الوظائف الشاغرة",
     "rating_sr": "{{n}} من أصل 5 نجوم",
-    "manage_button": "Manage this organisation",
-    "write_review": "Write review",
-    "review_modal_title": "Review this organisation",
+    "write_review": "اكتب مراجعة",
+    "review_modal_title": "مراجعة هذه المنظمة",
     "rating_label": "Rating",
     "comment_label": "Comment",
-    "comment_placeholder": "Share what worked well or what others should know.",
-    "submit_review": "Submit review",
-    "review_success": "Review submitted.",
-    "review_error": "Unable to submit your review.",
-    "rating_required": "Choose a rating before submitting."
+    "comment_placeholder": "شارك ما نجح بشكل جيد أو ما يجب أن يعرفه الآخرون.",
+    "submit_review": "إرسال المراجعة",
+    "review_success": "تم إرسال المراجعة.",
+    "review_error": "غير قادر على تقديم رأيك.",
+    "rating_required": "اختر التقييم قبل الإرسال."
   },
   "emergency_alerts": {
     "heading": "التنبيهات الطارئة",

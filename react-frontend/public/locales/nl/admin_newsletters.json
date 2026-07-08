@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -455,7 +455,7 @@
     "winning_metric": "Winnende maatstaf",
     "resend_queued_count": "{{count}}opnieuw verzonden in wachtrij",
     "resend_queued_count_plural": "In de wachtrij geplaatste{{count}}wordt opnieuw verzonden",
-    "template_tabs_aria": "Newsletter template category filter"
+    "template_tabs_aria": "Categoriefilter voor nieuwsbriefsjabloon"
   },
   "newsletter_form": {
     "ab_test_label": "Ab-test",
@@ -642,14 +642,14 @@
       "hero_desc": "Een bannerafbeelding met een kop",
       "html_label": "HTML",
       "html_desc": "Plak uw eigen aangepaste HTML",
+      "wrapper_label": "Container",
       "wrapper_desc": "Groepeer secties met een gedeelde achtergrond",
       "navbar_label": "Navigatiebalk",
       "navbar_desc": "Een rij menulinks",
       "social_icon_label": "Sociaal icoon",
       "social_icon_desc": "Eén sociaal netwerkpictogram",
       "nav_link_label": "Navigatielink",
-      "nav_link_desc": "Eén enkele menulink",
-      "wrapper_label": "Container"
+      "nav_link_desc": "Eén enkele menulink"
     }
   },
   "newsletter_content_editor": {

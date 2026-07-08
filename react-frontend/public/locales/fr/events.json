@@ -138,18 +138,18 @@
     "tabs_aria": "Sections de détails de l'événement",
     "delete_series_note": "Il s'agit d'un événement récurrent. Sa suppression supprimera également toutes ses occurrences futures.",
     "cancel_series_note": "Il s'agit d'un événement récurrent. Son annulation annulera également toutes les occurrences futures et leurs participants seront informés.",
-    "series_dates_title": "Upcoming dates in this series",
-    "series_this_date": "This date"
+    "series_dates_title": "Dates à venir dans cette série",
+    "series_this_date": "Cette date"
   },
   "card": {
     "cancelled": "Annulé",
     "spots_left": "{{count}} places restantes",
     "full": "Complet",
     "open_aria": "{{title}} on {{date}}",
-    "repeats_daily": "Repeats daily",
-    "repeats_weekly": "Repeats weekly",
-    "repeats_monthly": "Repeats monthly",
-    "repeats_yearly": "Repeats yearly",
+    "repeats_daily": "Se répète quotidiennement",
+    "repeats_weekly": "Se répète chaque semaine",
+    "repeats_monthly": "Se répète mensuellement",
+    "repeats_yearly": "Se répète chaque année",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
     "series_dates_other": "{{count}} dates"
@@ -215,6 +215,7 @@
     "end_on_date": "À une date précise",
     "recurrence_count": "Nombre d’occurrences",
     "recurrence_count_placeholder": "10",
+    "recurrence_count_hint": "Entre 2 et 52 occurrences",
     "recurrence_end_date": "Date de fin de la série",
     "recurrence_preview_empty": "RÈGLE :...",
     "weekday_mon": "Lun",
@@ -245,7 +246,7 @@
       "updated": "Événement mis à jour",
       "image_failed": "Événement créé mais le téléchargement de l'image a échoué",
       "error": "Une erreur s'est produite",
-      "fix_errors": "Please fix the highlighted fields before saving"
+      "fix_errors": "Veuillez corriger les champs en surbrillance avant de sauvegarder"
     },
     "attach_polls_label": "Joindre des sondages (optionnel)",
     "attach_polls_placeholder": "Sélectionner des sondages à joindre...",
@@ -263,8 +264,7 @@
     "edit_scope_message": "Cet événement fait partie d'une série récurrente. Que souhaitez-vous mettre à jour ?",
     "edit_scope_single": "Seulement cet événement",
     "edit_scope_all": "Cet événement et tous les suivants",
-    "edit_scope_all_note": "Les modifications de date et d'heure ne s'appliquent qu'à cet événement.",
-    "recurrence_count_hint": "Between 2 and 52 occurrences"
+    "edit_scope_all_note": "Les modifications de date et d'heure ne s'appliquent qu'à cet événement."
   },
   "toast": {
     "rsvp_removed": "RSVP annulé",

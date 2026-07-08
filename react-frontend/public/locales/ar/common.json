@@ -869,15 +869,15 @@
     "current_language": "اللغة: {{language}}",
     "select_language": "اختر اللغة",
     "clear_location": "مسح الموقع",
+    "location_results": "{{count}} اقتراحات العناوين متاحة",
+    "search_results": "{{count}} results available",
     "select_category": "اختر فئة",
     "verification_badges": "شارات التحقق",
     "search_skills": "البحث عن مهارات",
     "user_menu_trigger": "قائمة المستخدم لـ {{name}}",
     "feed_sidebar": "الشريط الجانبي للمجتمع",
     "filter_panel": "لوحة التصفية",
-    "remove": "Remove",
-    "location_results": "{{count}} address suggestions available",
-    "search_results": "{{count}} results available"
+    "remove": "Remove"
   },
   "skills": {
     "browse_title": "دليل مهارات المجتمع",
@@ -920,14 +920,14 @@
     "add_skill": "إضافة مهارة",
     "add_a_skill": "إضافة مهارة",
     "search_result_category": "في {{category}}",
+    "aria_results": "{{count}} اقتراحات المهارات متاحة",
     "no_matching_custom": "لم يتم العثور على مهارة مطابقة. يمكنك إضافة \"{{query}}\" كمهارة مخصصة.",
     "use_custom": "استخدام \"{{query}}\"",
     "skill_to_add": "المهارة المراد إضافتها:",
     "aria_clear_search": "مسح البحث",
     "aria_close_members_list": "إغلاق قائمة الأعضاء",
     "category_optional": "الفئة (اختياري)",
-    "proficiency_level": "مستوى الإتقان",
-    "aria_results": "{{count}} skill suggestions available"
+    "proficiency_level": "مستوى الإتقان"
   },
   "hours_display_one": "{{count}} ساعة",
   "hours_display_other": "{{count}} ساعات",
@@ -1663,7 +1663,7 @@
       "ad_free": "تجربة خالية من الإعلانات"
     },
     "return_meta_description": "صفحة العودة الآمنة بعد الدفع لتفعيل أو تأكيد أو إدارة اشتراكك المميز.",
-    "one_off_cta": "Make a one-off donation"
+    "one_off_cta": "قم بالتبرع لمرة واحدة"
   },
   "developers": {
     "page_title": "المطورون",
@@ -2077,7 +2077,7 @@
     "connect_modal": {
       "confirm": "هذه هي وسيلة تسجيل الدخول الوحيدة المتبقية لديك. فصلها سيمنعك من الدخول ما لم تضع كلمة مرور أو تُضِف مفتاح مرور أولًا. هل تريد المتابعة؟"
     },
-    "sign_in_with_provider": "Sign in with {{name}}"
+    "sign_in_with_provider": "قم بتسجيل الدخول باستخدام {{name}}"
   },
   "verein_dues": {
     "my_page_title": "رسوم عضوية Verein الخاصة بي",

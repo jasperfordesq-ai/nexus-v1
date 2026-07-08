@@ -232,7 +232,7 @@
     "listing_preview_alt": "Vorschau des Eintrags",
     "image_preview_alt": "Upload-Vorschau",
     "type_tabs_aria": "Inhaltstyp erstellen",
-    "compose_post": "Compose post"
+    "compose_post": "Beitrag verfassen"
   },
   "moderation": {
     "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."
@@ -538,7 +538,7 @@
     "scroll_right": "Stories nach rechts scrollen",
     "create_your_story": "Erstelle deine Story",
     "view_story_from": "Story von {{name}} ansehen",
-    "load_failed": "Couldn't load stories",
+    "load_failed": "Die Storys konnten nicht geladen werden",
     "retry": "Retry"
   },
   "fab": {
@@ -626,6 +626,6 @@
     "delete_post": "Diesen Beitrag löschen? Dies kann nicht rückgängig gemacht werden."
   },
   "aria": {
-    "feed_sidebar": "Community suggestions and highlights"
+    "feed_sidebar": "Community-Vorschläge und Highlights"
   }
 }

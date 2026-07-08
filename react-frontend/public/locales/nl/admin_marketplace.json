@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -207,8 +207,8 @@
     "verify_seller_message": "This will mark the seller as verified. Doorgaan?",
     "verify_seller_title": "Verkoper verifiëren",
     "view_all": "Bekijk alles",
-    "moderation_tabs_aria": "Marketplace moderation status filter",
-    "seller_tabs_aria": "Seller status filter"
+    "moderation_tabs_aria": "Statusfilter voor marktplaatsmoderatie",
+    "seller_tabs_aria": "Verkoperstatusfilter"
   },
   "bulk": {
     "selected_count": "{{count}} geselecteerd",

@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -418,7 +418,7 @@
         "body": "تحدد سياسة التشغيل قواعد برنامج رعاية المجتمع الخاص بك: من يمكنه الموافقة على ساعات العمل، ومدى سرعة استجابة المنسقين، وكيفية حساب القيمة الاجتماعية، وكيف تبدو دورة إعداد التقارير. قم بتكوين هذا قبل إطلاق البرنامج التجريبي. تسري التغييرات على الفور ويتم تسجيلها لأغراض التدقيق.",
         "methodology_prefix": "ال",
         "methodology_middle": "تستخدم حقول معدل الأجر بالساعة ومضاعف المنع",
-        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
+        "methodology_suffix": "تستخدم حقول معدل الساعة ومضاعف الوقاية منهجية مجتمع الرعاية. إذا كان مجتمعك يستخدم عملة مختلفة أو اقتصاديات الرعاية المحلية، فاضبط السعر على ما يعادل الرعاية الرسمية المحلية الخاصة بك بالساعة والمضاعف على 1.0.",
         "methodology_tail": "تجريبي، قم بتعيين السعر على ما يعادل الرعاية الرسمية المحلية الخاصة بك بالساعة والمضاعف على 1.0."
       },
       "sections": {
@@ -2055,9 +2055,9 @@
       "default_rate": "CHF 35/ساعة",
       "tenant_setting_source": "تم تكوينه لهذا المستأجر",
       "default_source": "معدل مساعد الرعاية الرسمية السويسري، SECO 2024",
-      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
+      "prevention_value_prefix": "تنطبق قيمة المنع على مضاعف {{multiplier}}x لكل",
       "prevention_value_suffix": "منهجية التقييم.",
-      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
+      "default_prevention_prefix": "تنطبق قيمة الوقاية على مضاعف 2x لكل",
       "default_prevention_suffix": "منهجية التقييم.",
       "substitution_applied": "يتم ترجيح الساعات حسب معاملات الاستبدال لكل فئة.",
       "substitution_not_applied": "جميع الساعات مرجحة بـ 1.0x."

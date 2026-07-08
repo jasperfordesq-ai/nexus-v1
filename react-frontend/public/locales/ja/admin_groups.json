@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -359,8 +359,8 @@
     "unarchive": "アーカイブを解除する",
     "geocode_description": "グループの位置を地理コード化して、地図表示と距離ベースの検出を可能にします。",
     "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet.",
-    "detail_tabs_aria": "Group detail sections",
-    "status_tabs_aria": "Group status filter"
+    "detail_tabs_aria": "グループ詳細セクション",
+    "status_tabs_aria": "グループステータスフィルター"
   },
   "group_organization": {
     "page_title": "グループの整理",

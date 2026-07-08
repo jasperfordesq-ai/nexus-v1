@@ -152,6 +152,7 @@
     "hours_logged": "{{hours}}h registadas",
     "website": "Site",
     "register_button": "Registar Organização",
+    "manage_my_button": "Gerenciar minha organização",
     "register_page_title": "Registar Organização",
     "register_heading": "Registar a Sua Organização",
     "register_subtitle": "Registe a sua organização de voluntariado para publicar oportunidades e gerir voluntários",
@@ -186,8 +187,7 @@
     "terms_required": "Deve concordar com os termos para registar a sua organização.",
     "opportunity_count_one": "{{count}} oportunidade",
     "opportunity_count_other": "{{count}} oportunidades",
-    "loading": "Carregando organizações",
-    "manage_my_button": "Manage my organisation"
+    "loading": "Carregando organizações"
   },
   "organisation_detail": {
     "page_title": "Organização",
@@ -201,6 +201,7 @@
     "meta_description_fallback": "Explora {{name}} e {{count}} oportunidades de voluntariado ativas neste banco de tempo comunitário.",
     "try_again": "Tentar Novamente",
     "browse_organisations": "Explorar Organizações",
+    "manage_button": "Gerenciar esta organização",
     "website": "Site",
     "contact": "Contacto",
     "opportunities": "Oportunidades",
@@ -222,16 +223,15 @@
     "submit_application": "Submeter Candidatura",
     "job_openings": "Vagas de emprego",
     "rating_sr": "{{n}} de 5 estrelas",
-    "manage_button": "Manage this organisation",
-    "write_review": "Write review",
-    "review_modal_title": "Review this organisation",
+    "write_review": "Escrever comentário",
+    "review_modal_title": "Avalie esta organização",
     "rating_label": "Rating",
     "comment_label": "Comment",
-    "comment_placeholder": "Share what worked well or what others should know.",
-    "submit_review": "Submit review",
-    "review_success": "Review submitted.",
-    "review_error": "Unable to submit your review.",
-    "rating_required": "Choose a rating before submitting."
+    "comment_placeholder": "Compartilhe o que funcionou bem ou o que outras pessoas deveriam saber.",
+    "submit_review": "Enviar avaliação",
+    "review_success": "Revisão enviada.",
+    "review_error": "Não foi possível enviar sua avaliação.",
+    "rating_required": "Escolha uma classificação antes de enviar."
   },
   "emergency_alerts": {
     "heading": "Alertas de Emergência",

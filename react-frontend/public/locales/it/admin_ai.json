@@ -67,7 +67,7 @@
     "recent_activity": "Attività recente",
     "refresh": "Aggiorna",
     "search": "Ricerca...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleziona tutte le righe",
     "select_row": "Select row {{id}}",
     "data_table": "Dati",
     "total_count": "{{count}}totale"
@@ -251,9 +251,9 @@
         "seed_defaults": "Impostazioni predefinite del seme"
       },
       "about": {
-        "body": "When a member's chat message contains any of a doc's keywords, that doc's body is appended to the AI's system prompt as canonical grounding. Up to 4 docs are injected per turn, ranked by keyword match strength. Write in plain language: what the feature does, how to use it, and what is not possible. Add your community's specific terminology, policies, and FAQs.",
-        "tip_label": "Tip:",
-        "tip_body": "New tenants are auto-seeded with a comprehensive 38-doc starter pack covering the platform overview, timebanking philosophy, every module/feature, account security, privacy, accessibility, mobile, and troubleshooting. Click \"Seed defaults\" to top up missing docs — your custom edits are never overwritten."
+        "body": "Quando il messaggio di chat di un membro contiene una qualsiasi delle parole chiave di un documento, il corpo di quel documento viene aggiunto al prompt del sistema dell'IA come base canonica. Vengono inseriti fino a 4 documenti per turno, classificati in base alla forza di corrispondenza delle parole chiave. Scrivi in ​​un linguaggio semplice: cosa fa la funzionalità, come usarla e cosa non è possibile. Aggiungi la terminologia, le politiche e le domande frequenti specifiche della tua comunità.",
+        "tip_label": "Mancia:",
+        "tip_body": "I nuovi tenant vengono sottoposti a seeding automatico con uno starter pack completo di 38 documenti che copre la panoramica della piattaforma, la filosofia del timebanking, ogni modulo/funzionalità, la sicurezza dell'account, la privacy, l'accessibilità, i dispositivi mobili e la risoluzione dei problemi. Fai clic su \"Impostazioni predefinite seed\" per ricaricare i documenti mancanti: le modifiche personalizzate non verranno mai sovrascritte."
       },
       "columns": {
         "actions": "Azioni",

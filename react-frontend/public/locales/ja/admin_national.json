@@ -67,13 +67,13 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
   },
   "national": {
-    "trend_chart_aria": "Chart showing community activity trends over time"
+    "trend_chart_aria": "コミュニティ活動の長期的な傾向を示すグラフ"
   },
   "national_kiss_dashboard": {
     "loading": "Loading",
@@ -87,8 +87,8 @@
     },
     "about": {
       "title": "このダッシュボードについて",
-      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
-      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "body_prefix": "ケアリング コミュニティは、地域ベースのケア調整のための方法論です。このスーパー管理者ダッシュボードは、全国的にケアリング コミュニティ プログラムを実行しているすべての NEXUS 協同組合の指標を集約し、全国的な",
+      "body_suffix": "交流時間、メンバーの参加、協同組合の健全性を協同組合全体で把握できる基盤。メンバー数は、正確な数字ではなく、プライバシー保護のため括弧書き (例: 「50-99」) で表示されます。",
       "health_prefix": "期間セレクターを使用して四半期を比較します。比較表では、協同組合を営業時間、組合員、または健康状態によってランク付けしています。健康状態は活動の傾向から導き出されます。",
       "thriving_definition": "急速に成長し、",
       "stable_definition": "フラットなアクティビティ、",

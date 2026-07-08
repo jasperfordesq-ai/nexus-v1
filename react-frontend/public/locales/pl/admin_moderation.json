@@ -67,7 +67,7 @@
     "recent_activity": "Ostatnia aktywność",
     "refresh": "Odświeżać",
     "search": "Szukaj...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wybierz wszystkie wiersze",
     "select_row": "Select row {{id}}",
     "data_table": "Dane",
     "total_count": "Łącznie{{count}}"
@@ -289,7 +289,7 @@
     "load_error": "Nie udało się załadować kolejki moderacji.",
     "pagination_label": "Paginacja kolejki moderacji",
     "user_fallback": "Nieznany użytkownik",
-    "rating_aria": "{{n}} out of 5 stars"
+    "rating_aria": "{{n}} z 5 gwiazdek"
   },
   "something_wrong": "Coś poszło nie tak. Spróbuj ponownie."
 }

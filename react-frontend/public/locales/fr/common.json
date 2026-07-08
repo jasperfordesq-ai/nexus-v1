@@ -869,15 +869,15 @@
     "current_language": "Langue : {{language}}",
     "select_language": "Choisir la langue",
     "clear_location": "Effacer la localisation",
+    "location_results": "{{count}} suggestions d'adresses disponibles",
+    "search_results": "{{count}} results available",
     "select_category": "Choisir une catégorie",
     "verification_badges": "Badges de vérification",
     "search_skills": "Rechercher des compétences",
     "user_menu_trigger": "Menu utilisateur pour {{name}}",
     "feed_sidebar": "Barre latérale de la communauté",
     "filter_panel": "Panneau de filtre",
-    "remove": "Remove",
-    "location_results": "{{count}} address suggestions available",
-    "search_results": "{{count}} results available"
+    "remove": "Remove"
   },
   "skills": {
     "browse_title": "Répertoire des compétences communautaires",
@@ -920,14 +920,14 @@
     "add_skill": "Ajouter une compétence",
     "add_a_skill": "Ajouter une compétence",
     "search_result_category": "dans {{category}}",
+    "aria_results": "{{count}} suggestions de compétences disponibles",
     "no_matching_custom": "Aucune compétence correspondante trouvée. Vous pouvez ajouter \"{{query}}\" comme compétence personnalisée.",
     "use_custom": "Utiliser \"{{query}}\"",
     "skill_to_add": "Compétence à ajouter :",
     "aria_clear_search": "Effacer la recherche",
     "aria_close_members_list": "Fermer la liste des membres",
     "category_optional": "Catégorie (facultatif)",
-    "proficiency_level": "Niveau de compétence",
-    "aria_results": "{{count}} skill suggestions available"
+    "proficiency_level": "Niveau de compétence"
   },
   "hours_display_one": "{{count}} heure",
   "hours_display_other": "{{count}} heures",
@@ -1663,7 +1663,7 @@
       "ad_free": "Expérience sans publicité"
     },
     "return_meta_description": "Page de retour sécurisée après paiement pour activer, confirmer ou gérer votre abonnement premium.",
-    "one_off_cta": "Make a one-off donation"
+    "one_off_cta": "Faites un don unique"
   },
   "developers": {
     "page_title": "Développeurs",
@@ -2077,7 +2077,7 @@
     "connect_modal": {
       "confirm": "C’est votre seule méthode de connexion restante. La déconnecter vous empêchera de vous reconnecter, sauf si vous définissez d’abord un mot de passe ou ajoutez une passkey. Continuer ?"
     },
-    "sign_in_with_provider": "Sign in with {{name}}"
+    "sign_in_with_provider": "Connectez-vous avec {{name}}"
   },
   "verein_dues": {
     "my_page_title": "Mes cotisations de membre Verein",

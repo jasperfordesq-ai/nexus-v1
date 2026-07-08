@@ -67,7 +67,7 @@
     "recent_activity": "Letzte Aktivität",
     "refresh": "Aktualisieren",
     "search": "Suchen...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wählen Sie alle Zeilen aus",
     "select_row": "Select row {{id}}",
     "data_table": "Daten",
     "total_count": "{{count}}insgesamt"
@@ -132,6 +132,6 @@
     "no_challenges_found": "Keine Herausforderungen gefunden",
     "no_matching_challenges": "Keine passenden Herausforderungen gefunden",
     "no_status_challenges": "Keine Statusherausforderungen gefunden",
-    "tabs_aria": "Challenge status filter"
+    "tabs_aria": "Herausforderungsstatusfilter"
   }
 }

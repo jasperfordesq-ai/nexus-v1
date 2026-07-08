@@ -67,7 +67,7 @@
     "recent_activity": "Letzte Aktivität",
     "refresh": "Aktualisieren",
     "search": "Suchen...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wählen Sie alle Zeilen aus",
     "select_row": "Select row {{id}}",
     "data_table": "Daten",
     "total_count": "{{count}}insgesamt"
@@ -418,7 +418,7 @@
         "body": "Die Betriebsrichtlinie definiert die Regeln Ihres Community Care-Programms: Wer kann Stunden genehmigen, wie schnell Koordinatoren reagieren müssen, wie der soziale Wert berechnet wird und wie der Berichtszyklus aussieht. Konfigurieren Sie dies, bevor Sie den Piloten starten. Änderungen werden sofort wirksam und zu Prüfzwecken protokolliert.",
         "methodology_prefix": "Der",
         "methodology_middle": "Die Felder Stundensatz und Präventionsmultiplikator verwenden die",
-        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
+        "methodology_suffix": "Die Felder Stundensatz und Präventionsmultiplikator nutzen die Caring-Community-Methodik. Wenn in Ihrer Gemeinde eine andere Währung oder eine andere örtliche Pflegeökonomie verwendet wird, legen Sie den Satz auf den Stundenäquivalent Ihrer örtlichen formellen Pflege und den Multiplikator auf 1,0 fest.",
         "methodology_tail": "Legen Sie für den Piloten den Satz auf Ihren örtlichen Stundenäquivalent für formelle Pflege und den Multiplikator auf 1.0 fest."
       },
       "sections": {
@@ -2055,9 +2055,9 @@
       "default_rate": "CHF 35/Std",
       "tenant_setting_source": "für diesen Mandanten konfiguriert",
       "default_source": "Quote der formellen Pflegeassistenten in der Schweiz, SECO 2024",
-      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
+      "prevention_value_prefix": "Der Präventionswert wendet einen {{multiplier}}x-Multiplikator pro an",
       "prevention_value_suffix": "Bewertungsmethodik.",
-      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
+      "default_prevention_prefix": "Der Präventionswert wendet einen 2-fachen Multiplikator pro an",
       "default_prevention_suffix": "Bewertungsmethodik.",
       "substitution_applied": "Die Stunden werden anhand der Substitutionskoeffizienten pro Kategorie gewichtet.",
       "substitution_not_applied": "Alle Stunden gewichtet mit 1,0x."

@@ -67,7 +67,7 @@
     "recent_activity": "Ostatnia aktywność",
     "refresh": "Odświeżać",
     "search": "Szukaj...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wybierz wszystkie wiersze",
     "select_row": "Select row {{id}}",
     "data_table": "Dane",
     "total_count": "Łącznie{{count}}"
@@ -272,11 +272,11 @@
     "tab_by_category": "Według kategorii",
     "tab_by_member": "Przez członka",
     "tab_monthly_trend": "Trend miesięczny",
-    "hours_tabs_aria": "Hours report view",
-    "members_tabs_aria": "Member report type",
-    "hours_by_category_aria": "Bar chart showing hours exchanged by category",
-    "hours_distribution_aria": "Pie chart showing distribution of time exchange hours",
-    "hours_trend_aria": "Area chart showing hours exchanged over time"
+    "hours_tabs_aria": "Widok raportu godzinowego",
+    "members_tabs_aria": "Typ raportu członkowskiego",
+    "hours_by_category_aria": "Wykres słupkowy pokazujący godziny zamienione według kategorii",
+    "hours_distribution_aria": "Wykres kołowy przedstawiający rozkład godzin wymiany czasu",
+    "hours_trend_aria": "Wykres warstwowy przedstawiający godziny zamienione w czasie"
   },
   "municipal_reports": {
     "meta": {
@@ -434,7 +434,7 @@
         "cooperative": "Spółdzielnia",
         "foundation": "Fundacja"
       },
-      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
+      "delete_confirm": "Usunąć szablon „{{name}}”? Tego nie można cofnąć."
     },
     "narrative": {
       "in_export": "W eksporcie",

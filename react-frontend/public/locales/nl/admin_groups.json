@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -359,8 +359,8 @@
     "unarchive": "Uit het archief halen",
     "geocode_description": "Geocodeer locaties om kaarten weer te geven en op afstand gebaseerde ontdekkingen mogelijk te maken.",
     "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet.",
-    "detail_tabs_aria": "Group detail sections",
-    "status_tabs_aria": "Group status filter"
+    "detail_tabs_aria": "Groepsdetailsecties",
+    "status_tabs_aria": "Groepsstatusfilter"
   },
   "group_organization": {
     "page_title": "Groepsorganisatie",

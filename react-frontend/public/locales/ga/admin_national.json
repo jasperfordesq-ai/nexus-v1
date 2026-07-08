@@ -67,13 +67,13 @@
     "recent_activity": "Gníomhaíocht le Déanaí",
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
   },
   "national": {
-    "trend_chart_aria": "Chart showing community activity trends over time"
+    "trend_chart_aria": "Cairt a thaispeánann treochtaí gníomhaíochta pobail le himeacht ama"
   },
   "national_kiss_dashboard": {
     "loading": "Loading",
@@ -87,8 +87,8 @@
     },
     "about": {
       "title": "Maidir leis an painéal seo",
-      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
-      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "body_prefix": "Is modheolaíocht é Caring Community chun cúram pobalbhunaithe a chomhordú. Comhiomlánaíonn an painéal sár-riaracháin seo méadracht ar fud gach comharchumann NEXUS a reáchtálann an clár Pobal Cúraim go náisiúnta - ag tabhairt an chláir náisiúnta",
+      "body_suffix": "bunús dearcadh tras-chomhoibríoch ar uaireanta a mhalartaítear, rannpháirtíocht na mball, agus sláinte chomhoibríoch. Taispeántar comhaireamh na mball mar lúibíní caomhnaithe príobháideachais (m.sh. \"50-99\") seachas mar uimhreacha beachta.",
       "health_prefix": "Úsáid an roghnóir peiriad chun ceathrúna a chur i gcomparáid. Rangaíonn an tábla comparáideach comharchumainn de réir uaireanta, baill, nó stádas sláinte. Díorthaítear stádas sláinte ó threochtaí gníomhaíochta:",
       "thriving_definition": "ag fás go tapa,",
       "stable_definition": "gníomhaíocht chothrom,",

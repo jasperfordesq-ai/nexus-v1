@@ -67,7 +67,7 @@
     "recent_activity": "Letzte Aktivität",
     "refresh": "Aktualisieren",
     "search": "Suchen...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wählen Sie alle Zeilen aus",
     "select_row": "Select row {{id}}",
     "data_table": "Daten",
     "total_count": "{{count}}insgesamt"
@@ -251,9 +251,9 @@
         "seed_defaults": "Seed-Standardwerte"
       },
       "about": {
-        "body": "When a member's chat message contains any of a doc's keywords, that doc's body is appended to the AI's system prompt as canonical grounding. Up to 4 docs are injected per turn, ranked by keyword match strength. Write in plain language: what the feature does, how to use it, and what is not possible. Add your community's specific terminology, policies, and FAQs.",
-        "tip_label": "Tip:",
-        "tip_body": "New tenants are auto-seeded with a comprehensive 38-doc starter pack covering the platform overview, timebanking philosophy, every module/feature, account security, privacy, accessibility, mobile, and troubleshooting. Click \"Seed defaults\" to top up missing docs — your custom edits are never overwritten."
+        "body": "Wenn die Chat-Nachricht eines Mitglieds Schlüsselwörter eines Dokuments enthält, wird der Text dieses Dokuments als kanonische Begründung an die Systemaufforderung der KI angehängt. Pro Runde werden bis zu 4 Dokumente eingefügt, sortiert nach der Übereinstimmungsstärke des Schlüsselworts. Schreiben Sie im Klartext: Was die Funktion bewirkt, wie man sie nutzt und was nicht möglich ist. Fügen Sie die spezifische Terminologie, Richtlinien und FAQs Ihrer Community hinzu.",
+        "tip_label": "Tipp:",
+        "tip_body": "Neue Mieter erhalten automatisch ein umfassendes Starterpaket mit 38 Dokumenten, das die Plattformübersicht, die Timebanking-Philosophie, jedes Modul/jede Funktion, Kontosicherheit, Datenschutz, Zugänglichkeit, Mobilgeräte und Fehlerbehebung abdeckt. Klicken Sie auf „Standardwerte setzen“, um fehlende Dokumente zu ergänzen – Ihre benutzerdefinierten Änderungen werden nie überschrieben."
       },
       "columns": {
         "actions": "Aktionen",

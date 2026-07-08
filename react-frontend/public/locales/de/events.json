@@ -138,18 +138,18 @@
     "tabs_aria": "Abschnitte mit Veranstaltungsdetails",
     "delete_series_note": "Dies ist ein wiederkehrender Termin. Beim Löschen werden auch alle zukünftigen Termine der Serie gelöscht.",
     "cancel_series_note": "Dies ist ein wiederkehrender Termin. Bei der Absage werden auch alle zukünftigen Termine abgesagt und deren Teilnehmende benachrichtigt.",
-    "series_dates_title": "Upcoming dates in this series",
-    "series_this_date": "This date"
+    "series_dates_title": "Kommende Termine in dieser Reihe",
+    "series_this_date": "Dieses Datum"
   },
   "card": {
     "cancelled": "Abgesagt",
     "spots_left": "{{count}} Plätze frei",
     "full": "Ausgebucht",
     "open_aria": "{{title}} on {{date}}",
-    "repeats_daily": "Repeats daily",
-    "repeats_weekly": "Repeats weekly",
-    "repeats_monthly": "Repeats monthly",
-    "repeats_yearly": "Repeats yearly",
+    "repeats_daily": "Wird täglich wiederholt",
+    "repeats_weekly": "Wird wöchentlich wiederholt",
+    "repeats_monthly": "Wird monatlich wiederholt",
+    "repeats_yearly": "Wird jährlich wiederholt",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
     "series_dates_other": "{{count}} dates"
@@ -215,6 +215,7 @@
     "end_on_date": "An einem bestimmten Datum",
     "recurrence_count": "Anzahl der Termine",
     "recurrence_count_placeholder": "10",
+    "recurrence_count_hint": "Zwischen 2 und 52 Vorkommen",
     "recurrence_end_date": "Serien-Enddatum",
     "recurrence_preview_empty": "REGEL:...",
     "weekday_mon": "Mo",
@@ -245,7 +246,7 @@
       "updated": "Veranstaltung aktualisiert",
       "image_failed": "Veranstaltung erstellt, aber Bild-Upload fehlgeschlagen",
       "error": "Etwas ist schiefgelaufen",
-      "fix_errors": "Please fix the highlighted fields before saving"
+      "fix_errors": "Bitte korrigieren Sie die hervorgehobenen Felder vor dem Speichern"
     },
     "attach_polls_label": "Umfragen anhängen (optional)",
     "attach_polls_placeholder": "Umfragen zum Anhängen auswählen...",
@@ -263,8 +264,7 @@
     "edit_scope_message": "Dieser Termin ist Teil einer wiederkehrenden Serie. Was möchten Sie aktualisieren?",
     "edit_scope_single": "Nur diesen Termin",
     "edit_scope_all": "Diesen und alle zukünftigen Termine",
-    "edit_scope_all_note": "Datums- und Zeitänderungen gelten nur für diesen Termin.",
-    "recurrence_count_hint": "Between 2 and 52 occurrences"
+    "edit_scope_all_note": "Datums- und Zeitänderungen gelten nur für diesen Termin."
   },
   "toast": {
     "rsvp_removed": "RSVP entfernt",

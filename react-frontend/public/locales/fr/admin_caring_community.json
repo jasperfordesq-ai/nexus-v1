@@ -67,7 +67,7 @@
     "recent_activity": "Activité récente",
     "refresh": "Rafraîchir",
     "search": "Recherche...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Sélectionner toutes les lignes",
     "select_row": "Select row {{id}}",
     "data_table": "Données",
     "total_count": "{{count}}total"
@@ -418,7 +418,7 @@
         "body": "La politique opérationnelle définit les règles de votre programme de soins communautaires : qui peut approuver les heures, à quelle vitesse les coordinateurs doivent répondre, comment la valeur sociale est calculée et à quoi ressemble le cycle de reporting. Configurez-le avant de lancer le pilote. Les modifications prennent effet immédiatement et sont enregistrées à des fins d'audit.",
         "methodology_prefix": "Le",
         "methodology_middle": "Les champs taux horaire et multiplicateur de prévention utilisent le",
-        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
+        "methodology_suffix": "Les champs du taux horaire et du multiplicateur de prévention utilisent la méthodologie Caring Community. Si votre communauté utilise une monnaie ou une économie de soins locale différente, fixez le taux sur votre équivalent horaire local de soins formels et le multiplicateur sur 1,0.",
         "methodology_tail": "pilote, définissez le tarif sur votre équivalent horaire local de soins formels et le multiplicateur sur 1.0."
       },
       "sections": {
@@ -2055,9 +2055,9 @@
       "default_rate": "CHF 35/h",
       "tenant_setting_source": "configuré pour ce locataire",
       "default_source": "Tarif suisse des aides-soignants, SECO 2024",
-      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
+      "prevention_value_prefix": "La valeur de prévention applique un multiplicateur {{multiplier}}x par",
       "prevention_value_suffix": "méthodologie d’évaluation.",
-      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
+      "default_prevention_prefix": "La valeur de prévention applique un multiplicateur 2x par",
       "default_prevention_suffix": "méthodologie d’évaluation.",
       "substitution_applied": "Les heures sont pondérées par des coefficients de substitution par catégorie.",
       "substitution_not_applied": "Toutes les heures pondérées à 1,0x."

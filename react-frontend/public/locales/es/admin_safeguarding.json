@@ -67,7 +67,7 @@
     "recent_activity": "Actividad reciente",
     "refresh": "Refrescar",
     "search": "Buscar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleccionar todas las filas",
     "select_row": "Select row {{id}}",
     "data_table": "Datos",
     "total_count": "{{count}}total"
@@ -370,6 +370,6 @@
     "vetting_international": "Investigación internacional",
     "vetting_other": "Investigación de otros",
     "vetting_pvg_scotland": "Investigación de investigación de Pvg Escocia",
-    "tabs_aria": "Safeguarding sections"
+    "tabs_aria": "Secciones de salvaguardia"
   }
 }

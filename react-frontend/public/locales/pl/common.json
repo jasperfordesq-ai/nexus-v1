@@ -869,15 +869,15 @@
     "current_language": "Język: {{language}}",
     "select_language": "Wybierz język",
     "clear_location": "Wyczyść lokalizację",
+    "location_results": "Dostępne są sugestie adresów {{count}}",
+    "search_results": "{{count}} results available",
     "select_category": "Wybierz kategorię",
     "verification_badges": "Odznaki weryfikacyjne",
     "search_skills": "Szukaj umiejętności",
     "user_menu_trigger": "Menu użytkownika dla {{name}}",
     "feed_sidebar": "Pasek boczny społeczności",
     "filter_panel": "Panel filtrów",
-    "remove": "Remove",
-    "location_results": "{{count}} address suggestions available",
-    "search_results": "{{count}} results available"
+    "remove": "Remove"
   },
   "skills": {
     "browse_title": "Katalog umiejętności społeczności",
@@ -920,14 +920,14 @@
     "add_skill": "Dodaj umiejętność",
     "add_a_skill": "Dodaj umiejętność",
     "search_result_category": "w {{category}}",
+    "aria_results": "Dostępne sugestie umiejętności {{count}}",
     "no_matching_custom": "Nie znaleziono pasującej umiejętności. Możesz dodać \"{{query}}\" jako umiejętność niestandardową.",
     "use_custom": "Użyj \"{{query}}\"",
     "skill_to_add": "Umiejętność do dodania:",
     "aria_clear_search": "Wyczyść wyszukiwanie",
     "aria_close_members_list": "Zamknij listę członków",
     "category_optional": "Kategoria (opcjonalna)",
-    "proficiency_level": "Poziom umiejętności",
-    "aria_results": "{{count}} skill suggestions available"
+    "proficiency_level": "Poziom umiejętności"
   },
   "hours_display_one": "{{count}} godzina",
   "hours_display_other": "{{count}} godzin",
@@ -1663,7 +1663,7 @@
       "ad_free": "Bez reklam"
     },
     "return_meta_description": "Bezpieczna strona powrotu po płatności do aktywacji, potwierdzenia lub zarządzania subskrypcją premium.",
-    "one_off_cta": "Make a one-off donation"
+    "one_off_cta": "Przekaż jednorazową darowiznę"
   },
   "developers": {
     "page_title": "Programiści",
@@ -2077,7 +2077,7 @@
     "connect_modal": {
       "confirm": "To jedyna pozostała metoda logowania. Odłączenie jej spowoduje zablokowanie dostępu, chyba że najpierw ustawisz hasło lub dodasz passkey. Kontynuować?"
     },
-    "sign_in_with_provider": "Sign in with {{name}}"
+    "sign_in_with_provider": "Zaloguj się za pomocą {{name}}"
   },
   "verein_dues": {
     "my_page_title": "Moje składki członkowskie Verein",

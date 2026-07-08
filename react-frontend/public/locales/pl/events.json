@@ -138,18 +138,18 @@
     "tabs_aria": "Sekcje szczegółów wydarzenia",
     "delete_series_note": "To wydarzenie cykliczne. Jego usunięcie spowoduje również usunięcie wszystkich przyszłych wystąpień.",
     "cancel_series_note": "To wydarzenie cykliczne. Jego odwołanie spowoduje również odwołanie wszystkich przyszłych wystąpień i powiadomienie ich uczestników.",
-    "series_dates_title": "Upcoming dates in this series",
-    "series_this_date": "This date"
+    "series_dates_title": "Najbliższe daty w tej serii",
+    "series_this_date": "Ta data"
   },
   "card": {
     "cancelled": "Odwołany",
     "spots_left": "Pozostało {{count}} miejsc",
     "full": "Pełny",
     "open_aria": "{{title}} on {{date}}",
-    "repeats_daily": "Repeats daily",
-    "repeats_weekly": "Repeats weekly",
-    "repeats_monthly": "Repeats monthly",
-    "repeats_yearly": "Repeats yearly",
+    "repeats_daily": "Powtarza się codziennie",
+    "repeats_weekly": "Powtarza się co tydzień",
+    "repeats_monthly": "Powtarza się co miesiąc",
+    "repeats_yearly": "Powtarza się co roku",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
     "series_dates_other": "{{count}} dates"
@@ -215,6 +215,7 @@
     "end_on_date": "W konkretnym dniu",
     "recurrence_count": "Liczba wystąpień",
     "recurrence_count_placeholder": "10",
+    "recurrence_count_hint": "Od 2 do 52 wystąpień",
     "recurrence_end_date": "Data zakończenia serii",
     "recurrence_preview_empty": "ZASADA:...",
     "weekday_mon": "pon",
@@ -245,7 +246,7 @@
       "updated": "Wydarzenie zaktualizowane",
       "image_failed": "Wydarzenie zostało utworzone, ale przesyłanie obrazu nie powiodło się",
       "error": "Coś poszło nie tak",
-      "fix_errors": "Please fix the highlighted fields before saving"
+      "fix_errors": "Przed zapisaniem popraw zaznaczone pola"
     },
     "attach_polls_label": "Dołącz ankiety (opcjonalnie)",
     "attach_polls_placeholder": "Wybierz ankiety do załączenia...",
@@ -263,8 +264,7 @@
     "edit_scope_message": "To wydarzenie jest częścią cyklicznej serii. Co chcesz zaktualizować?",
     "edit_scope_single": "Tylko to wydarzenie",
     "edit_scope_all": "To i wszystkie przyszłe wydarzenia",
-    "edit_scope_all_note": "Zmiany daty i godziny dotyczą tylko tego wydarzenia.",
-    "recurrence_count_hint": "Between 2 and 52 occurrences"
+    "edit_scope_all_note": "Zmiany daty i godziny dotyczą tylko tego wydarzenia."
   },
   "toast": {
     "rsvp_removed": "Odpowiedź została usunięta",

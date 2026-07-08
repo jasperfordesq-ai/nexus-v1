@@ -67,7 +67,7 @@
     "recent_activity": "Actividad reciente",
     "refresh": "Refrescar",
     "search": "Buscar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleccionar todas las filas",
     "select_row": "Select row {{id}}",
     "data_table": "Datos",
     "total_count": "{{count}}total"
@@ -105,6 +105,6 @@
     "tab_draft": "Borrador",
     "tab_published": "Publicado",
     "unknown": "Desconocido",
-    "tabs_aria": "Event status filter"
+    "tabs_aria": "Filtro de estado de evento"
   }
 }

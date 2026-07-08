@@ -67,7 +67,7 @@
     "recent_activity": "Letzte Aktivität",
     "refresh": "Aktualisieren",
     "search": "Suchen...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wählen Sie alle Zeilen aus",
     "select_row": "Select row {{id}}",
     "data_table": "Daten",
     "total_count": "{{count}}insgesamt"
@@ -359,8 +359,8 @@
     "unarchive": "Dearchivieren",
     "geocode_description": "Geokodieren Sie Gruppenstandorte, um die Kartenanzeige und die entfernungsbasierte Erkennung zu ermöglichen.",
     "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet.",
-    "detail_tabs_aria": "Group detail sections",
-    "status_tabs_aria": "Group status filter"
+    "detail_tabs_aria": "Gruppendetailabschnitte",
+    "status_tabs_aria": "Gruppenstatusfilter"
   },
   "group_organization": {
     "page_title": "Gruppenorganisation",

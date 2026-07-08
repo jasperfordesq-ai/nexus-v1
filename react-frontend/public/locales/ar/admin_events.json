@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -105,6 +105,6 @@
     "tab_draft": "مسودة",
     "tab_published": "تم النشر",
     "unknown": "مجهول",
-    "tabs_aria": "Event status filter"
+    "tabs_aria": "مرشح حالة الحدث"
   }
 }

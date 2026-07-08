@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -207,8 +207,8 @@
     "verify_seller_message": "سيؤدي هذا إلى وضع علامة على البائع على أنه تم التحقق منه. يكمل؟",
     "verify_seller_title": "التحقق من البائع",
     "view_all": "عرض الكل",
-    "moderation_tabs_aria": "Marketplace moderation status filter",
-    "seller_tabs_aria": "Seller status filter"
+    "moderation_tabs_aria": "مرشح حالة الإشراف على السوق",
+    "seller_tabs_aria": "مرشح حالة البائع"
   },
   "bulk": {
     "selected_count": "تم تحديد {{count}}",

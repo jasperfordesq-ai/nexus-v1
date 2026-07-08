@@ -67,7 +67,7 @@
     "recent_activity": "Ostatnia aktywność",
     "refresh": "Odświeżać",
     "search": "Szukaj...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wybierz wszystkie wiersze",
     "select_row": "Select row {{id}}",
     "data_table": "Dane",
     "total_count": "Łącznie{{count}}"
@@ -75,9 +75,9 @@
   "support_reports": {
     "meta_title": "Support Reports",
     "title": "Support Reports",
-    "subtitle": "Review member-submitted bug reports with page diagnostics, Sentry event IDs, and triage notes.",
-    "loading": "Loading support reports...",
-    "empty": "No support reports match these filters.",
+    "subtitle": "Przejrzyj raporty o błędach przesłane przez członków, zawierające diagnostykę strony, identyfikatory zdarzeń Sentry i notatki dotyczące segregacji.",
+    "loading": "Ładowanie raportów wsparcia...",
+    "empty": "Żadne raporty pomocy technicznej nie pasują do tych filtrów.",
     "empty_value": "-",
     "unassigned": "Unassigned",
     "actions": {
@@ -85,12 +85,12 @@
       "search": "Search",
       "clear": "Clear",
       "review": "Review",
-      "open_page": "Open page",
+      "open_page": "Otwórz stronę",
       "open_sentry": "Open Sentry",
-      "copy_diagnostics": "Copy diagnostics",
-      "copy_handoff": "Copy engineering handoff",
+      "copy_diagnostics": "Kopiuj diagnostykę",
+      "copy_handoff": "Kopiowanie przekazania inżynierii",
       "close": "Close",
-      "save": "Save triage"
+      "save": "Zapisz segregację"
     },
     "stats": {
       "open": "Open",
@@ -99,26 +99,26 @@
       "unassigned": "Unassigned"
     },
     "filters": {
-      "search": "Search reference, route, reporter, or summary",
+      "search": "Wyszukaj odniesienie, trasę, reportera lub podsumowanie",
       "status": "Status",
       "impact": "Impact"
     },
     "status": {
-      "all": "All statuses",
+      "all": "Wszystkie statusy",
       "open": "Open",
       "triaged": "Triaged",
       "resolved": "Resolved",
       "closed": "Closed"
     },
     "impact": {
-      "all": "All impacts",
+      "all": "Wszystkie uderzenia",
       "blocked": "Blocked",
       "major": "Major",
       "minor": "Minor",
       "cosmetic": "Cosmetic"
     },
     "table": {
-      "aria": "Support reports",
+      "aria": "Raporty wsparcia",
       "reference": "Reference",
       "summary": "Summary",
       "impact": "Impact",
@@ -130,33 +130,33 @@
     },
     "detail": {
       "title": "Report {{reference}}",
-      "loading": "Loading report...",
+      "loading": "Ładowanie raportu...",
       "summary": "Summary",
       "description": "Description",
       "reporter": "Reporter",
       "page": "Page",
       "created": "Created",
-      "user_agent": "User agent",
-      "sentry_event": "Sentry event",
+      "user_agent": "Agent użytkownika",
+      "sentry_event": "Wydarzenie wartownicze",
       "diagnostics": "Diagnostics"
     },
     "fields": {
       "status": "Status",
       "assignee": "Assignee",
-      "sentry_issue_url": "Sentry issue URL",
-      "triage_notes": "Triage notes"
+      "sentry_issue_url": "Adres URL problemu z funkcją Sentry",
+      "triage_notes": "Notatki segregacyjne"
     },
     "messages": {
-      "saved": "Support report updated.",
-      "copied": "Diagnostics copied.",
-      "handoff_copied": "Engineering handoff copied."
+      "saved": "Zaktualizowano raport wsparcia.",
+      "copied": "Diagnostyka skopiowana.",
+      "handoff_copied": "Przekaz inżynieryjny skopiowany."
     },
     "errors": {
-      "load": "Failed to load support reports.",
-      "load_detail": "Failed to load the support report.",
-      "save": "Failed to save the support report.",
-      "copy": "Could not copy diagnostics.",
-      "copy_handoff": "Could not copy the engineering handoff."
+      "load": "Nie udało się załadować raportów pomocy technicznej.",
+      "load_detail": "Nie udało się załadować raportu wsparcia.",
+      "save": "Nie udało się zapisać raportu pomocy technicznej.",
+      "copy": "Nie udało się skopiować diagnostyki.",
+      "copy_handoff": "Nie można skopiować przekazania technicznego."
     }
   }
 }

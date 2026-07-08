@@ -67,7 +67,7 @@
     "recent_activity": "Atividade recente",
     "refresh": "Atualizar",
     "search": "Procurar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecione todas as linhas",
     "select_row": "Select row {{id}}",
     "data_table": "Dados",
     "total_count": "{{count}}total"
@@ -791,8 +791,8 @@
     "select_hub_tenant": "Selecione um locatário do hub",
     "no_hub_tenants_found": "Nenhum locatário do hub encontrado",
     "impersonate_user_warning": "A representação registra todas as ações sob a identidade desse usuário. Use somente quando necessário para suporte.",
-    "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "partnerships_tabs_aria": "Filtro de status de parceria da federação",
+    "tenant_list_tabs_aria": "Filtro de status de locatário"
   },
   "tenant_form": {
     "active": "Ativo",
@@ -965,11 +965,11 @@
     "feature_feed_desc": "Ative o feed da comunidade.",
     "feature_marketplace": "Mercado",
     "feature_marketplace_desc": "Habilite recursos do mercado.",
-    "tabs_aria": "Tenant form sections",
-    "domain_desc": "Used for the React web frontend (e.g. community.example.org).",
-    "accessible_domain_label": "Accessible frontend domain",
+    "tabs_aria": "Seções do formulário de locatário",
+    "domain_desc": "Usado para o front-end da web React (por exemplo, community.example.org).",
+    "accessible_domain_label": "Domínio front-end acessível",
     "accessible_domain_placeholder": "e.g. accessible.example.org",
-    "accessible_domain_desc": "Optional. Custom domain for the accessible (GOV.UK) frontend."
+    "accessible_domain_desc": "Opcional. Domínio personalizado para o frontend acessível (GOV.UK)."
   },
   "federation_whitelist": {
     "add_tenant_to_whitelist": "Adicionar locatário à lista de permissões",

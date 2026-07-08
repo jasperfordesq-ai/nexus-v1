@@ -67,7 +67,7 @@
     "recent_activity": "Ostatnia aktywność",
     "refresh": "Odświeżać",
     "search": "Szukaj...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wybierz wszystkie wiersze",
     "select_row": "Select row {{id}}",
     "data_table": "Dane",
     "total_count": "Łącznie{{count}}"
@@ -547,7 +547,7 @@
     "jwt_rotation_procedure": "Procedura rotacji:",
     "jwt_setup_and_reference": "i odwołaj się do niego poprzez",
     "jwt_setup_append_to": "dołączyć do",
-    "jwt_setup_aws": "AWS ECS / Fargate:",
+    "jwt_setup_aws": "ECS AWS / Fargate:",
     "jwt_setup_aws_body": "dodaj go do definicji zadania",
     "jwt_setup_aws_middle": "zablokować za pomocą Menedżera sekretów AWS lub pliku",
     "jwt_setup_aws_suffix": "blok.",
@@ -791,8 +791,8 @@
     "select_hub_tenant": "Wybierz dzierżawcę centrum",
     "no_hub_tenants_found": "Nie znaleziono najemców centrum",
     "impersonate_user_warning": "Podszywanie się rejestruje każde działanie w ramach tożsamości tego użytkownika. Używaj tylko wtedy, gdy jest to konieczne do wsparcia.",
-    "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "partnerships_tabs_aria": "Filtr statusu partnerstwa federacyjnego",
+    "tenant_list_tabs_aria": "Filtr stanu najemcy"
   },
   "tenant_form": {
     "active": "Aktywny",
@@ -965,11 +965,11 @@
     "feature_feed_desc": "Włącz kanał społecznościowy.",
     "feature_marketplace": "Rynek",
     "feature_marketplace_desc": "Włącz funkcje rynku.",
-    "tabs_aria": "Tenant form sections",
-    "domain_desc": "Used for the React web frontend (e.g. community.example.org).",
-    "accessible_domain_label": "Accessible frontend domain",
+    "tabs_aria": "Sekcje formularza najemcy",
+    "domain_desc": "Używany w interfejsie internetowym React (np. Community.example.org).",
+    "accessible_domain_label": "Dostępna domena frontendowa",
     "accessible_domain_placeholder": "e.g. accessible.example.org",
-    "accessible_domain_desc": "Optional. Custom domain for the accessible (GOV.UK) frontend."
+    "accessible_domain_desc": "Fakultatywny. Niestandardowa domena dla dostępnego frontendu (GOV.UK)."
   },
   "federation_whitelist": {
     "add_tenant_to_whitelist": "Dodaj najemcę do białej listy",

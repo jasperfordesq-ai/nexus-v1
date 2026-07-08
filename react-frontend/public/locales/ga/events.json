@@ -138,18 +138,18 @@
     "tabs_aria": "Rannóga sonraí imeachta",
     "delete_series_note": "Imeacht athfhillteach é seo. Má scriostar é, scriosfar gach teagmhas amach anseo freisin.",
     "cancel_series_note": "Imeacht athfhillteach é seo. Má chuirtear ar ceal é, cuirfear gach teagmhas amach anseo ar ceal freisin agus cuirfear a rannpháirtithe ar an eolas.",
-    "series_dates_title": "Upcoming dates in this series",
-    "series_this_date": "This date"
+    "series_dates_title": "Dátaí atá le teacht sa tsraith seo",
+    "series_this_date": "An dáta seo"
   },
   "card": {
     "cancelled": "Cealaithe",
     "spots_left": "{{count}} áit fágtha",
     "full": "Lán",
     "open_aria": "{{title}} on {{date}}",
-    "repeats_daily": "Repeats daily",
-    "repeats_weekly": "Repeats weekly",
-    "repeats_monthly": "Repeats monthly",
-    "repeats_yearly": "Repeats yearly",
+    "repeats_daily": "Athdhéantar seo go laethúil",
+    "repeats_weekly": "Athdhéantar seo go seachtainiúil",
+    "repeats_monthly": "Athdhéantar seo go míosúil",
+    "repeats_yearly": "Athdhéantar seo go bliantúil",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
     "series_dates_other": "{{count}} dates"
@@ -215,6 +215,7 @@
     "end_on_date": "Ar dháta sonrach",
     "recurrence_count": "Líon na dtarluithe",
     "recurrence_count_placeholder": "10",
+    "recurrence_count_hint": "Idir 2 agus 52 teagmhas",
     "recurrence_end_date": "Dáta deiridh sraithe",
     "recurrence_preview_empty": "RIAL:...",
     "weekday_mon": "Lua",
@@ -245,7 +246,7 @@
       "updated": "Imeacht nuashonraithe",
       "image_failed": "Imeacht cruthaithe ach theip ar uaslódáil íomhá",
       "error": "Chuaigh rud éigin mícheart",
-      "fix_errors": "Please fix the highlighted fields before saving"
+      "fix_errors": "Ceartaigh na réimsí aibhsithe roimh shábháil"
     },
     "attach_polls_label": "Ceangail pobalbhreitheanna (roghnach)",
     "attach_polls_placeholder": "Roghnaigh pobalbhreitheanna le ceangal...",
@@ -263,8 +264,7 @@
     "edit_scope_message": "Tá an imeacht seo mar chuid de shraith athfhillteach. Cad ba mhaith leat a nuashonrú?",
     "edit_scope_single": "An imeacht seo amháin",
     "edit_scope_all": "É seo agus gach imeacht amach anseo",
-    "edit_scope_all_note": "Ní bhaineann athruithe dáta agus ama ach leis an imeacht seo.",
-    "recurrence_count_hint": "Between 2 and 52 occurrences"
+    "edit_scope_all_note": "Ní bhaineann athruithe dáta agus ama ach leis an imeacht seo."
   },
   "toast": {
     "rsvp_removed": "RSVP bainte",

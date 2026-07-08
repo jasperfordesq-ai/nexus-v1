@@ -152,6 +152,7 @@
     "hours_logged": "{{hours}} Std. erfasst",
     "website": "Webseite",
     "register_button": "Organisation registrieren",
+    "manage_my_button": "Meine Organisation verwalten",
     "register_page_title": "Organisation registrieren",
     "register_heading": "Ihre Organisation registrieren",
     "register_subtitle": "Registrieren Sie Ihre Freiwilligenorganisation, um Einsätze zu veröffentlichen und Freiwillige zu verwalten",
@@ -186,8 +187,7 @@
     "terms_required": "Sie müssen den Bedingungen zustimmen, um Ihre Organisation zu registrieren.",
     "opportunity_count_one": "{{count}} Einsatz",
     "opportunity_count_other": "{{count}} Einsätze",
-    "loading": "Laden von Organisationen",
-    "manage_my_button": "Manage my organisation"
+    "loading": "Laden von Organisationen"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -201,6 +201,7 @@
     "meta_description_fallback": "Entdecken Sie {{name}} und {{count}} aktive Freiwilligenmöglichkeiten in dieser Gemeinschafts-Zeitbank.",
     "try_again": "Erneut versuchen",
     "browse_organisations": "Organisationen durchsuchen",
+    "manage_button": "Verwalten Sie diese Organisation",
     "website": "Webseite",
     "contact": "Kontakt",
     "opportunities": "Einsätze",
@@ -222,16 +223,15 @@
     "submit_application": "Bewerbung absenden",
     "job_openings": "Stellenangebote",
     "rating_sr": "{{n}} von 5 Sternen",
-    "manage_button": "Manage this organisation",
-    "write_review": "Write review",
-    "review_modal_title": "Review this organisation",
+    "write_review": "Rezension schreiben",
+    "review_modal_title": "Bewerten Sie diese Organisation",
     "rating_label": "Rating",
     "comment_label": "Comment",
-    "comment_placeholder": "Share what worked well or what others should know.",
-    "submit_review": "Submit review",
-    "review_success": "Review submitted.",
-    "review_error": "Unable to submit your review.",
-    "rating_required": "Choose a rating before submitting."
+    "comment_placeholder": "Teilen Sie mit, was gut funktioniert hat oder was andere wissen sollten.",
+    "submit_review": "Bewertung abgeben",
+    "review_success": "Bewertung eingereicht.",
+    "review_error": "Ihre Bewertung kann nicht übermittelt werden.",
+    "rating_required": "Wählen Sie vor dem Absenden eine Bewertung."
   },
   "emergency_alerts": {
     "heading": "Notfallwarnungen",

@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -370,6 +370,6 @@
     "vetting_international": "الفحص الدولي",
     "vetting_other": "فحص أخرى",
     "vetting_pvg_scotland": "فحص Pvg اسكتلندا",
-    "tabs_aria": "Safeguarding sections"
+    "tabs_aria": "أقسام الحماية"
   }
 }

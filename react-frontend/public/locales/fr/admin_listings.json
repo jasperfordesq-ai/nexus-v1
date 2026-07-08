@@ -67,7 +67,7 @@
     "recent_activity": "Activité récente",
     "refresh": "Rafraîchir",
     "search": "Recherche...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Sélectionner toutes les lignes",
     "select_row": "Select row {{id}}",
     "data_table": "Données",
     "total_count": "{{count}}total"
@@ -125,7 +125,7 @@
     "unfeature": "Inutilité",
     "unfeature_listing": "Liste des non-fonctionnalités",
     "unfeatured_success": "Non présenté avec succès",
-    "section_tabs_aria": "Listings management sections",
-    "filter_tabs_aria": "Listing status filter"
+    "section_tabs_aria": "Sections de gestion des annonces",
+    "filter_tabs_aria": "Filtre de statut d'annonce"
   }
 }

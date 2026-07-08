@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -418,7 +418,7 @@
         "body": "Operating Policy definieert de regels van uw wijkzorgprogramma: wie uren kan goedkeuren, hoe snel coördinatoren moeten reageren, hoe maatschappelijke waarde wordt berekend en hoe de rapportagecyclus eruit ziet. Configureer dit voordat u de pilot start. Wijzigingen worden onmiddellijk van kracht en worden geregistreerd voor auditdoeleinden.",
         "methodology_prefix": "De",
         "methodology_middle": "uurtarief en preventie-multipliervelden gebruiken de",
-        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
+        "methodology_suffix": "de velden voor uurtarieven en preventievermenigvuldigers gebruiken de Caring Community-methodologie. Als uw gemeenschap een andere munteenheid of een andere lokale zorgeconomie hanteert, stelt u het tarief in op uw lokale uurequivalent voor formele zorg en de vermenigvuldiger op 1,0.",
         "methodology_tail": "pilot, stel het tarief in op uw lokale uuruurequivalent voor formele zorg en de vermenigvuldiger op 1.0."
       },
       "sections": {
@@ -2055,9 +2055,9 @@
       "default_rate": "CHF 35/uur",
       "tenant_setting_source": "geconfigureerd voor deze tenant",
       "default_source": "Tarief Zwitserse formele zorgassistenten, SECO 2024",
-      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
+      "prevention_value_prefix": "De preventiewaarde past een {{multiplier}}x vermenigvuldiger per toe",
       "prevention_value_suffix": "evaluatiemethodologie.",
-      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
+      "default_prevention_prefix": "Voor de preventiewaarde geldt een vermenigvuldiger van 2x per",
       "default_prevention_suffix": "evaluatiemethodologie.",
       "substitution_applied": "Uren worden gewogen op basis van substitutiecoëfficiënten per categorie.",
       "substitution_not_applied": "Alle uren gewogen op 1,0x."

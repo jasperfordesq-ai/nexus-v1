@@ -869,15 +869,15 @@
     "current_language": "Lingua: {{language}}",
     "select_language": "Seleziona lingua",
     "clear_location": "Cancella posizione",
+    "location_results": "{{count}} suggerimenti di indirizzi disponibili",
+    "search_results": "{{count}} results available",
     "select_category": "Seleziona una categoria",
     "verification_badges": "Badge di verifica",
     "search_skills": "Cerca competenze",
     "user_menu_trigger": "Menu utente per {{name}}",
     "feed_sidebar": "Barra laterale della comunità",
     "filter_panel": "Pannello filtro",
-    "remove": "Remove",
-    "location_results": "{{count}} address suggestions available",
-    "search_results": "{{count}} results available"
+    "remove": "Remove"
   },
   "skills": {
     "browse_title": "Elenco Competenze della Comunità",
@@ -920,14 +920,14 @@
     "add_skill": "Aggiungi competenza",
     "add_a_skill": "Aggiungi una competenza",
     "search_result_category": "in {{category}}",
+    "aria_results": "{{count}} suggerimenti di abilità disponibili",
     "no_matching_custom": "Nessuna competenza corrispondente trovata. Puoi aggiungere \"{{query}}\" come competenza personalizzata.",
     "use_custom": "Usa \"{{query}}\"",
     "skill_to_add": "Competenza da aggiungere:",
     "aria_clear_search": "Cancella ricerca",
     "aria_close_members_list": "Chiudi elenco membri",
     "category_optional": "Categoria (opzionale)",
-    "proficiency_level": "Livello di competenza",
-    "aria_results": "{{count}} skill suggestions available"
+    "proficiency_level": "Livello di competenza"
   },
   "hours_display_one": "{{count}} ora",
   "hours_display_other": "{{count}} ore",
@@ -1663,7 +1663,7 @@
       "ad_free": "Esperienza senza pubblicità"
     },
     "return_meta_description": "Pagina di ritorno sicura dal checkout per attivare, confermare o gestire il tuo abbonamento premium.",
-    "one_off_cta": "Make a one-off donation"
+    "one_off_cta": "Fai una donazione una tantum"
   },
   "developers": {
     "page_title": "Sviluppatori",
@@ -2077,7 +2077,7 @@
     "connect_modal": {
       "confirm": "Questo è il tuo unico metodo di accesso rimasto. Se lo disconnetti, non potrai più entrare a meno che tu non imposti prima una password o aggiunga una passkey. Continuare?"
     },
-    "sign_in_with_provider": "Sign in with {{name}}"
+    "sign_in_with_provider": "Accedi con {{name}}"
   },
   "verein_dues": {
     "my_page_title": "Le mie quote associative Verein",

@@ -152,6 +152,7 @@
     "hours_logged": "{{hours}}h registrate",
     "website": "Sito web",
     "register_button": "Registra organizzazione",
+    "manage_my_button": "Gestisci la mia organizzazione",
     "register_page_title": "Registra organizzazione",
     "register_heading": "Registri la Sua organizzazione",
     "register_subtitle": "Registri la Sua organizzazione di volontariato per pubblicare opportunità e gestire i volontari",
@@ -186,8 +187,7 @@
     "terms_required": "Deve accettare i termini per registrare la Sua organizzazione.",
     "opportunity_count_one": "{{count}} opportunità",
     "opportunity_count_other": "{{count}} opportunità",
-    "loading": "Caricamento organizzazioni",
-    "manage_my_button": "Manage my organisation"
+    "loading": "Caricamento organizzazioni"
   },
   "organisation_detail": {
     "page_title": "Organizzazione",
@@ -201,6 +201,7 @@
     "meta_description_fallback": "Esplora {{name}} e {{count}} opportunità di volontariato attive su questa banca del tempo comunitaria.",
     "try_again": "Riprova",
     "browse_organisations": "Sfoglia le organizzazioni",
+    "manage_button": "Gestisci questa organizzazione",
     "website": "Sito web",
     "contact": "Contatto",
     "opportunities": "Opportunità",
@@ -222,16 +223,15 @@
     "submit_application": "Invia candidatura",
     "job_openings": "Posizioni aperte",
     "rating_sr": "{{n}} su 5 stelle",
-    "manage_button": "Manage this organisation",
-    "write_review": "Write review",
-    "review_modal_title": "Review this organisation",
+    "write_review": "Scrivi recensione",
+    "review_modal_title": "Esamina questa organizzazione",
     "rating_label": "Rating",
     "comment_label": "Comment",
-    "comment_placeholder": "Share what worked well or what others should know.",
-    "submit_review": "Submit review",
-    "review_success": "Review submitted.",
-    "review_error": "Unable to submit your review.",
-    "rating_required": "Choose a rating before submitting."
+    "comment_placeholder": "Condividi ciò che ha funzionato bene o ciò che gli altri dovrebbero sapere.",
+    "submit_review": "Invia recensione",
+    "review_success": "Recensione inviata.",
+    "review_error": "Impossibile inviare la tua recensione.",
+    "rating_required": "Scegli una valutazione prima di inviare."
   },
   "emergency_alerts": {
     "heading": "Avvisi di Emergenza",

@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -791,8 +791,8 @@
     "select_hub_tenant": "ハブテナントを選択してください",
     "no_hub_tenants_found": "ハブテナントが見つかりませんでした",
     "impersonate_user_warning": "偽装は、このユーザーの ID でのすべてのアクションをログに記録します。サポートに必要な場合にのみ使用してください。",
-    "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "partnerships_tabs_aria": "フェデレーション パートナーシップ ステータス フィルター",
+    "tenant_list_tabs_aria": "テナントステータスフィルター"
   },
   "tenant_form": {
     "active": "アクティブ",
@@ -965,11 +965,11 @@
     "feature_feed_desc": "コミュニティ フィードを有効にします。",
     "feature_marketplace": "市場",
     "feature_marketplace_desc": "マーケットプレイス機能を有効にします。",
-    "tabs_aria": "Tenant form sections",
-    "domain_desc": "Used for the React web frontend (e.g. community.example.org).",
-    "accessible_domain_label": "Accessible frontend domain",
+    "tabs_aria": "テナントフォームセクション",
+    "domain_desc": "React Web フロントエンドに使用されます (community.example.org など)。",
+    "accessible_domain_label": "アクセス可能なフロントエンド ドメイン",
     "accessible_domain_placeholder": "e.g. accessible.example.org",
-    "accessible_domain_desc": "Optional. Custom domain for the accessible (GOV.UK) frontend."
+    "accessible_domain_desc": "オプション。アクセス可能な (GOV.UK) フロントエンドのカスタム ドメイン。"
   },
   "federation_whitelist": {
     "add_tenant_to_whitelist": "テナントをホワイトリストに追加",

@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -251,9 +251,9 @@
         "seed_defaults": "シードのデフォルト"
       },
       "about": {
-        "body": "When a member's chat message contains any of a doc's keywords, that doc's body is appended to the AI's system prompt as canonical grounding. Up to 4 docs are injected per turn, ranked by keyword match strength. Write in plain language: what the feature does, how to use it, and what is not possible. Add your community's specific terminology, policies, and FAQs.",
-        "tip_label": "Tip:",
-        "tip_body": "New tenants are auto-seeded with a comprehensive 38-doc starter pack covering the platform overview, timebanking philosophy, every module/feature, account security, privacy, accessibility, mobile, and troubleshooting. Click \"Seed defaults\" to top up missing docs — your custom edits are never overwritten."
+        "body": "メンバーのチャット メッセージにドキュメントのキーワードのいずれかが含まれている場合、そのドキュメントの本文が正規の根拠として AI のシステム プロンプトに追加されます。ターンごとに最大 4 つのドキュメントが挿入され、キーワードの一致強度によってランク付けされます。機能が何をするのか、その使用方法、何が不可能なのかをわかりやすい言葉で書きます。コミュニティ固有の用語、ポリシー、FAQ を追加します。",
+        "tip_label": "ヒント：",
+        "tip_body": "新しいテナントには、プラットフォームの概要、タイムバンキングの哲学、すべてのモジュール/機能、アカウントのセキュリティ、プライバシー、アクセシビリティ、モバイル、トラブルシューティングをカバーする包括的な 38 ドキュメントのスターター パックが自動シードされます。 [シード デフォルト] をクリックして不足しているドキュメントを追加します。カスタム編集は上書きされません。"
       },
       "columns": {
         "actions": "アクション",

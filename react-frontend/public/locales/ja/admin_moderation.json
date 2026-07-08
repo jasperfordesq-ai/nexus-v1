@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -289,7 +289,7 @@
     "load_error": "モデレーションキューのロードに失敗しました。",
     "pagination_label": "モデレーションキューのページネーション",
     "user_fallback": "不明なユーザー",
-    "rating_aria": "{{n}} out of 5 stars"
+    "rating_aria": "{{n}} 5つ星のうち"
   },
   "something_wrong": "何か問題が発生しました。もう一度試してください。"
 }

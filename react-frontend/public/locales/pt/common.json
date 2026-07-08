@@ -869,15 +869,15 @@
     "current_language": "Idioma: {{language}}",
     "select_language": "Selecionar idioma",
     "clear_location": "Limpar localização",
+    "location_results": "{{count}} sugestões de endereços disponíveis",
+    "search_results": "{{count}} results available",
     "select_category": "Selecionar uma categoria",
     "verification_badges": "Emblemas de verificação",
     "search_skills": "Pesquisar competências",
     "user_menu_trigger": "Menu do usuário para {{name}}",
     "feed_sidebar": "Barra lateral da comunidade",
     "filter_panel": "Painel de filtro",
-    "remove": "Remove",
-    "location_results": "{{count}} address suggestions available",
-    "search_results": "{{count}} results available"
+    "remove": "Remove"
   },
   "skills": {
     "browse_title": "Diretório de Competências da Comunidade",
@@ -920,14 +920,14 @@
     "add_skill": "Adicionar competência",
     "add_a_skill": "Adicionar uma competência",
     "search_result_category": "em {{category}}",
+    "aria_results": "{{count}} sugestões de habilidades disponíveis",
     "no_matching_custom": "Nenhuma competência correspondente encontrada. Pode adicionar \"{{query}}\" como competência personalizada.",
     "use_custom": "Usar \"{{query}}\"",
     "skill_to_add": "Competência a adicionar:",
     "aria_clear_search": "Limpar pesquisa",
     "aria_close_members_list": "Fechar lista de membros",
     "category_optional": "Categoria (opcional)",
-    "proficiency_level": "Nível de proficiência",
-    "aria_results": "{{count}} skill suggestions available"
+    "proficiency_level": "Nível de proficiência"
   },
   "hours_display_one": "{{count}} hora",
   "hours_display_other": "{{count}} horas",
@@ -1663,7 +1663,7 @@
       "ad_free": "Experiência sem anúncios"
     },
     "return_meta_description": "Página de retorno segura do checkout para ativar, confirmar ou gerir a sua subscrição premium.",
-    "one_off_cta": "Make a one-off donation"
+    "one_off_cta": "Faça uma doação única"
   },
   "developers": {
     "page_title": "Programadores",
@@ -2077,7 +2077,7 @@
     "connect_modal": {
       "confirm": "Este é o seu único método de início de sessão restante. Se o desligar, ficará bloqueado a menos que defina primeiro uma palavra-passe ou adicione uma passkey. Continuar?"
     },
-    "sign_in_with_provider": "Sign in with {{name}}"
+    "sign_in_with_provider": "Faça login com {{name}}"
   },
   "verein_dues": {
     "my_page_title": "As minhas quotas de membro Verein",

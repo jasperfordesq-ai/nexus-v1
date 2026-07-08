@@ -67,7 +67,7 @@
     "recent_activity": "Atividade recente",
     "refresh": "Atualizar",
     "search": "Procurar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecione todas as linhas",
     "select_row": "Select row {{id}}",
     "data_table": "Dados",
     "total_count": "{{count}}total"
@@ -260,6 +260,6 @@
         "required_fields": "Nome, cargo e corpo são obrigatórios."
       }
     },
-    "tabs_aria": "Ad campaign status filter"
+    "tabs_aria": "Filtro de status da campanha publicitária"
   }
 }

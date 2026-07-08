@@ -67,7 +67,7 @@
     "recent_activity": "Gníomhaíocht le Déanaí",
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
@@ -272,11 +272,11 @@
     "tab_by_category": "De réir Catagóire",
     "tab_by_member": "De réir Comhalta",
     "tab_monthly_trend": "Treocht Míosúil",
-    "hours_tabs_aria": "Hours report view",
-    "members_tabs_aria": "Member report type",
-    "hours_by_category_aria": "Bar chart showing hours exchanged by category",
-    "hours_distribution_aria": "Pie chart showing distribution of time exchange hours",
-    "hours_trend_aria": "Area chart showing hours exchanged over time"
+    "hours_tabs_aria": "Amharc tuairisce uaireanta",
+    "members_tabs_aria": "Cineál tuairisce ball",
+    "hours_by_category_aria": "Barrachairt a thaispeánann uaireanta a mhalartaítear de réir catagóire",
+    "hours_distribution_aria": "Píchairt a thaispeánann dáileadh uaireanta malartaithe ama",
+    "hours_trend_aria": "Cairt achair a thaispeánann uaireanta a mhalartaítear le himeacht ama"
   },
   "municipal_reports": {
     "meta": {
@@ -434,7 +434,7 @@
         "cooperative": "Comharchumann",
         "foundation": "Fondúireacht"
       },
-      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
+      "delete_confirm": "Scrios teimpléad \"{{name}}\"? Ní féidir é seo a chealú."
     },
     "narrative": {
       "in_export": "In onnmhairiú",

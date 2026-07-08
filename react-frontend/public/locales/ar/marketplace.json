@@ -121,7 +121,7 @@
     "counter": "عرض مضاد",
     "withdraw": "سحب",
     "accept_counter": "قبول العداد",
-    "pay_accepted": "Pay accepted offer"
+    "pay_accepted": "دفع العرض المقبول"
   },
   "create": {
     "page_title": "بيع شيء ما - السوق",
@@ -446,7 +446,7 @@
     "counter_message_placeholder": "اشرح عرضك المضاد...",
     "counter_sent_success": "تم إرسال العرض المضاد",
     "send_counter": "إرسال عرض مضاد",
-    "checkout_started_success": "Checkout started for your accepted offer."
+    "checkout_started_success": "بدأت عملية الدفع لعرضك المقبول."
   },
   "collections": {
     "page_title": "مجموعاتي",
@@ -597,7 +597,7 @@
     "left": "متبقي",
     "slot_fallback": "الموعد #{{id}}",
     "status_unknown": "غير معروف",
-    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
+    "reservation_failed": "تعذر حجز فتحة الالتقاط هذه. الرجاء اختيار فتحة أخرى."
   },
   "inventory": {
     "section_title": "المخزون",
@@ -647,9 +647,9 @@
   "shipping": {
     "title": "خيارات الشحن",
     "page_title": "Shipping Options",
-    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
-    "back_to_listings": "Back to My Listings",
-    "manage_cta": "Shipping settings",
+    "page_subtitle": "قم بتعيين خدمات التوصيل التي يمكن للمشترين اختيارها عند الخروج.",
+    "back_to_listings": "العودة إلى قوائمي",
+    "manage_cta": "إعدادات الشحن",
     "add_option": "أضف خيار شحن",
     "courier_name": "اسم الناقل",
     "courier_name_placeholder": "مثل: An Post، Royal Mail، DHL",
@@ -681,7 +681,7 @@
     "loading": "جارٍ تحميل خيارات الشحن...",
     "no_options": "لا توجد خيارات شحن متاحة لهذا البائع.",
     "delete_confirm": "هل تريد إزالة خيار الشحن هذا؟ لا يمكن التراجع عن هذا.",
-    "choose_required": "Choose a delivery method before checkout."
+    "choose_required": "اختر طريقة التسليم قبل الخروج."
   },
   "listing_location": {
     "location_title": "الموقع",

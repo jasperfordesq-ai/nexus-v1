@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -260,6 +260,6 @@
         "required_fields": "الاسم والعنوان والجسم مطلوبة."
       }
     },
-    "tabs_aria": "Ad campaign status filter"
+    "tabs_aria": "مرشح حالة الحملة الإعلانية"
   }
 }

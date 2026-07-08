@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -469,7 +469,7 @@
     "load_error": "فشل تحميل قائمة انتظار الإشراف.",
     "pagination_label": "ترقيم الصفحات في قائمة انتظار الإشراف",
     "user_fallback": "مستخدم غير معروف",
-    "rating_aria": "{{n}} out of 5 stars"
+    "rating_aria": "{{n}} من أصل 5 نجوم"
   },
   "something_wrong": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
   "spam": {

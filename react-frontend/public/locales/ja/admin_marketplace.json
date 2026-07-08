@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -207,8 +207,8 @@
     "verify_seller_message": "これにより、販売者が認証済みとしてマークされます。続く？",
     "verify_seller_title": "販売者の確認",
     "view_all": "すべて見る",
-    "moderation_tabs_aria": "Marketplace moderation status filter",
-    "seller_tabs_aria": "Seller status filter"
+    "moderation_tabs_aria": "マーケットプレイスのモデレーションステータスフィルター",
+    "seller_tabs_aria": "販売者ステータスフィルター"
   },
   "bulk": {
     "selected_count": "{{count}} が選択されました",

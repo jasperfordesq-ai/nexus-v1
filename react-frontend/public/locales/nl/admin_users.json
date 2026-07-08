@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -210,7 +210,7 @@
     "validation_last_name_required": "Achternaam is vereist",
     "validation_password_min": "Wachtwoord moet minimaal 8 tekens lang zijn",
     "validation_role_required": "Rol is vereist",
-    "tabs_aria": "User status filter",
+    "tabs_aria": "Gebruikersstatusfilter",
     "smart_search_label": "Slimme gebruikerszoekopdracht",
     "smart_search_placeholder": "Zoek op naam, e-mail, telefoon, rol, status of ID...",
     "smart_search_description": "Probeer namen, e-mails, telefoonnummers, role:admin, pending, never logged in of id:42.",
@@ -238,7 +238,7 @@
       "set_password": "Wachtwoord instellen"
     },
     "aria": {
-      "edit_user_form": "Edit user",
+      "edit_user_form": "Gebruiker bewerken",
       "remove_badge": "Badge verwijderen: {{name}}",
       "toggle_global_super_admin": "Schakel globale superbeheerder in",
       "toggle_municipal_announcer": "Schakel de rol van gemeentelijke omroeper in",

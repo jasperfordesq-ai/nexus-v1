@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -125,7 +125,7 @@
     "unfeature": "Uitgelicht",
     "unfeature_listing": "Lijst met functies ongedaan maken",
     "unfeatured_success": "Met succes uitgelicht",
-    "section_tabs_aria": "Listings management sections",
-    "filter_tabs_aria": "Listing status filter"
+    "section_tabs_aria": "Beheer secties van vermeldingen",
+    "filter_tabs_aria": "Lijststatusfilter"
   }
 }

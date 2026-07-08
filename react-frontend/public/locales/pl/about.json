@@ -88,6 +88,11 @@
     "meta_description": "Nawiąż współpracę z hOUR Timebank, aby stworzyć wartość społeczną o wartości 16 EUR za każde zainwestowane 1 EUR. Partnerstwa korporacyjne, sponsoring i możliwości badawcze.",
     "breadcrumb_about": "O",
     "hero_subtitle": "Połącz siły ze sprawdzoną organizacją wywierającą wpływ na społeczeństwo. Każde 1 euro, które zainwestujesz, generuje 16 euro wymiernej wartości społecznej dla społeczności w całej Irlandii.",
+    "together_banner_heading": "Razem dla Banku Czasu",
+    "together_banner_alt": "Razem na rzecz banku czasu — silniejsze społeczności, wspólne wartości, jaśniejsza przyszłość. Obsługiwane przez Project NEXUS we współpracy z Timebanking UK i Timebank Ireland.",
+    "tbuk_heading": "Timebanking UK",
+    "tbuk_para1": "Timebank Ireland i Project NEXUS z przyjemnością ogłaszają nowe strategiczne i technologiczne partnerstwo z Timebanking UK, łączące dwa ruchy banków czasu wokół wspólnej infrastruktury cyfrowej typu open source. Dzięki temu partnerstwu Timebanking UK stanie się uznanym współautorem i partnerem strategicznym w ekosystemie Projektu NEXUS, pomagając w kształtowaniu stowarzyszonej platformy zbudowanej z myślą o lokalnej wymianie, dostępności, współpracy między społecznościami i długoterminowej własności społeczności.",
+    "tbuk_para2": "Partnerstwo wzmacnia Projekt NEXUS jako praktyczną, kierowaną przez ruch alternatywę dla zamkniętej technologii obywatelskiej. Współpracując z Timebanking UK, tworzymy silniejsze podstawy dla banków czasu w Irlandii, Wielkiej Brytanii i poza nią: wspólne standardy, wspólne uczenie się i platforma zaprojektowana wokół rzeczywistych potrzeb społeczności, a nie priorytetów komercyjnych dostawców oprogramowania.",
     "funding_gap_heading": "Rozwiązanie problemu luki w finansowaniu",
     "funding_gap_para1": "Organizacje społeczne, takie jak hOUR Timebank, zapewniają niezwykłą wartość społeczną, ale działają przy ograniczonych budżetach. Nasze niezależne badanie z 2023 r. pokazuje zwrot społeczny w stosunku 16:1, jednak finansowanie podstawowe pokrywa jedynie podstawowe operacje.",
     "funding_gap_para2": "Strategiczne partnerstwa mogą wypełnić tę lukę. Niezależnie od tego, czy chodzi o korporacyjne programy CSR, współpracę badawczą czy bezpośrednie sponsorowanie, Twoje wsparcie bezpośrednio poprawia dobrobyt społeczności i buduje infrastrukturę społeczną, z której korzystają wszyscy.",
@@ -128,12 +133,7 @@
     "cta_heading": "Budujmy razem silniejsze społeczności",
     "cta_subtitle": "Niezależnie od tego, czy jesteś korporacją, fundatorem, badaczem czy liderem społeczności – istnieje model partnerstwa, który będzie dla Ciebie odpowiedni.",
     "cta_contact": "Rozpocznij rozmowę",
-    "cta_view_plan": "Zobacz plan strategiczny",
-    "together_banner_heading": "Together for Timebanking",
-    "together_banner_alt": "Together for Timebanking — stronger communities, shared values, brighter future. Powered by Project NEXUS, in partnership with Timebanking UK and Timebank Ireland.",
-    "tbuk_heading": "Timebanking UK",
-    "tbuk_para1": "Timebank Ireland and Project NEXUS are delighted to announce a new strategic and technology partnership with Timebanking UK, bringing together two timebanking movements around shared, open-source digital infrastructure. Through this partnership, Timebanking UK will become a recognised contributor and strategic partner in the Project NEXUS ecosystem, helping shape a federated platform built for local exchange, accessibility, cross-community collaboration and long-term community ownership.",
-    "tbuk_para2": "The partnership strengthens Project NEXUS as a practical, movement-led alternative to closed civic technology. By working with Timebanking UK, we are creating a stronger foundation for time banks across Ireland, the UK and beyond: shared standards, shared learning, and a platform designed around the real needs of communities rather than the priorities of commercial software vendors."
+    "cta_view_plan": "Zobacz plan strategiczny"
   },
   "social_prescribing": {
     "page_title": "Przepisywanie społeczne",

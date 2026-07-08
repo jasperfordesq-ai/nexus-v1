@@ -88,6 +88,11 @@
     "meta_description": "Diventi partner di hOUR Timebank per creare €16 di valore sociale per ogni €1 investito. Partnership aziendali, sponsorizzazioni e opportunità di ricerca.",
     "breadcrumb_about": "Chi siamo",
     "hero_subtitle": "Unisca le Sue forze con un'organizzazione d'impatto sociale comprovata. Ogni €1 che investe genera €16 di valore sociale misurabile per le comunità in tutta l'Irlanda.",
+    "together_banner_heading": "Insieme per la banca del tempo",
+    "together_banner_alt": "Insieme per Timebanking: comunità più forti, valori condivisi, futuro migliore. Realizzato da Project NEXUS, in collaborazione con Timebanking UK e Timebank Ireland.",
+    "tbuk_heading": "Timebanking UK",
+    "tbuk_para1": "Timebank Ireland e Project NEXUS sono lieti di annunciare una nuova partnership strategica e tecnologica con Timebanking UK, che riunisce due movimenti di timebanking attorno a un'infrastruttura digitale condivisa e open source. Attraverso questa partnership, Timebanking UK diventerà un contributore riconosciuto e un partner strategico nell'ecosistema del Progetto NEXUS, contribuendo a creare una piattaforma federata costruita per lo scambio locale, l'accessibilità, la collaborazione intercomunitaria e la proprietà della comunità a lungo termine.",
+    "tbuk_para2": "La partnership rafforza il progetto NEXUS come alternativa pratica e guidata dal movimento alla tecnologia civica chiusa. Collaborando con Timebanking UK, stiamo creando una base più solida per le banche del tempo in Irlanda, Regno Unito e oltre: standard condivisi, apprendimento condiviso e una piattaforma progettata attorno ai bisogni reali delle comunità piuttosto che alle priorità dei fornitori di software commerciali.",
     "funding_gap_heading": "Colmare il divario di finanziamento",
     "funding_gap_para1": "Organizzazioni comunitarie come hOUR Timebank offrono un valore sociale straordinario — ma operano con budget ridottissimi. Il nostro studio indipendente 2023 mostra un ritorno sociale di 16:1, eppure il finanziamento base copre solo le operazioni essenziali.",
     "funding_gap_para2": "Le partnership strategiche possono colmare questo divario. Che sia attraverso programmi RSI aziendali, collaborazioni di ricerca o sponsorizzazione diretta, il Suo sostegno amplifica direttamente il benessere comunitario e costruisce infrastrutture sociali che beneficiano tutti.",
@@ -128,12 +133,7 @@
     "cta_heading": "Costruiamo comunità più forti insieme",
     "cta_subtitle": "Che Lei sia un'azienda, un finanziatore, un ricercatore o un leader comunitario — esiste un modello di partnership adatto alle Sue esigenze.",
     "cta_contact": "Avvia una conversazione",
-    "cta_view_plan": "Visualizza il piano strategico",
-    "together_banner_heading": "Together for Timebanking",
-    "together_banner_alt": "Together for Timebanking — stronger communities, shared values, brighter future. Powered by Project NEXUS, in partnership with Timebanking UK and Timebank Ireland.",
-    "tbuk_heading": "Timebanking UK",
-    "tbuk_para1": "Timebank Ireland and Project NEXUS are delighted to announce a new strategic and technology partnership with Timebanking UK, bringing together two timebanking movements around shared, open-source digital infrastructure. Through this partnership, Timebanking UK will become a recognised contributor and strategic partner in the Project NEXUS ecosystem, helping shape a federated platform built for local exchange, accessibility, cross-community collaboration and long-term community ownership.",
-    "tbuk_para2": "The partnership strengthens Project NEXUS as a practical, movement-led alternative to closed civic technology. By working with Timebanking UK, we are creating a stronger foundation for time banks across Ireland, the UK and beyond: shared standards, shared learning, and a platform designed around the real needs of communities rather than the priorities of commercial software vendors."
+    "cta_view_plan": "Visualizza il piano strategico"
   },
   "social_prescribing": {
     "page_title": "Prescrizione sociale",

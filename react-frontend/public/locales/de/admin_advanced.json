@@ -67,14 +67,14 @@
     "recent_activity": "Letzte Aktivität",
     "refresh": "Aktualisieren",
     "search": "Suchen...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wählen Sie alle Zeilen aus",
     "select_row": "Select row {{id}}",
     "data_table": "Daten",
     "total_count": "{{count}}insgesamt"
   },
   "advanced": {
     "loading": "Loading",
-    "health_loading": "Loading algorithm health...",
+    "health_loading": "Zustand des Algorithmus wird geladen...",
     "404_entry_dismissed": "404-Eintrag abgewiesen",
     "a_i_settings_saved_successfully": "AI-Einstellungen erfolgreich gespeichert",
     "active_provider": "Aktiver Anbieter",
@@ -470,48 +470,48 @@
     "prerender": {
       "description": "Nur vom Bot gerenderte Snapshots. Überwachen Sie die Abdeckung, erkennen Sie veraltete Daten und erzwingen Sie Aktualisierungen.",
       "guide": {
-        "title": "Plain-English guide",
-        "intro": "The prerender engine makes saved HTML copies of public pages for search engines and social previews. Members use the normal app; these snapshots are only for crawlers.",
+        "title": "Leitfaden in einfacher englischer Sprache",
+        "intro": "Die Prerender-Engine erstellt gespeicherte HTML-Kopien öffentlicher Seiten für Suchmaschinen und soziale Vorschauen. Mitglieder nutzen die normale App; Diese Snapshots sind nur für Crawler.",
         "bot_only": {
-          "title": "What gets rendered",
-          "body": "Public tenant pages, such as about pages, listings, blog posts, and public groups. Private member areas are not supposed to be rendered."
+          "title": "Was gerendert wird",
+          "body": "Öffentliche Mandantenseiten, z. B. Info-Seiten, Einträge, Blogbeiträge und öffentliche Gruppen. Private Mitgliederbereiche sollen nicht gerendert werden."
         },
         "tenant_scope": {
-          "title": "Tenant safety",
-          "body": "When a page belongs to one tenant, actions should include that tenant slug. The engine now checks host and tenant path before touching snapshots."
+          "title": "Mietersicherheit",
+          "body": "Wenn eine Seite zu einem Mandanten gehört, sollten die Aktionen diesen Mandanten-Slug enthalten. Die Engine überprüft jetzt den Host- und Mandantenpfad, bevor sie Snapshots berührt."
         },
         "dry_run": {
-          "title": "Preview first",
-          "body": "A dry run shows what would happen without deleting files or queuing work. Use it before purge or repair actions."
+          "title": "Zuerst Vorschau",
+          "body": "Ein Probelauf zeigt, was passieren würde, ohne Dateien zu löschen oder Arbeit in die Warteschlange zu stellen. Verwenden Sie es vor Reinigungs- oder Reparaturarbeiten."
         },
         "repair": {
-          "title": "Repair stuck queue",
-          "body": "This is not a content reset. It only releases jobs that look abandoned and lets the worker resume after repeated failures."
+          "title": "Reparieren Sie feststeckende Warteschlangen",
+          "body": "Dies ist kein Zurücksetzen des Inhalts. Es gibt nur Jobs frei, die aufgegeben zu sein scheinen, und ermöglicht dem Arbeiter die Wiederaufnahme nach wiederholten Fehlern."
         }
       },
       "workflows": {
-        "title": "What are you trying to do?",
-        "description": "Start with the plain task, then use the tab it opens. This keeps routine work away from the risky controls.",
+        "title": "Was versuchst du zu tun?",
+        "description": "Beginnen Sie mit der einfachen Aufgabe und verwenden Sie dann die Registerkarte, die geöffnet wird. Dies hält Routinearbeiten von den riskanten Kontrollen fern.",
         "open": "Open",
         "refresh_one_tenant": {
-          "title": "Refresh one tenant",
-          "body": "Use when public content changed for a single community. Enter its tenant slug before queuing work."
+          "title": "Aktualisieren Sie einen Mandanten",
+          "body": "Wird verwendet, wenn öffentliche Inhalte für eine einzelne Community geändert wurden. Geben Sie den Mandanten-Slug ein, bevor Sie die Arbeit in die Warteschlange stellen."
         },
         "find_stale_pages": {
-          "title": "Find stale or missing pages",
-          "body": "Check coverage first to see which tenants have old snapshots, missing pages, or broken assets."
+          "title": "Finden Sie veraltete oder fehlende Seiten",
+          "body": "Überprüfen Sie zunächst die Abdeckung, um zu sehen, welche Mieter über alte Snapshots, fehlende Seiten oder defekte Assets verfügen."
         },
         "inspect_cache": {
-          "title": "Inspect saved pages",
-          "body": "Search the cache, inspect SEO tags, and recache selected snapshots using tenant-safe routes."
+          "title": "Überprüfen Sie gespeicherte Seiten",
+          "body": "Durchsuchen Sie den Cache, prüfen Sie SEO-Tags und laden Sie ausgewählte Snapshots über mandantensichere Routen erneut in den Cache."
         },
         "investigate_failures": {
-          "title": "Investigate failed renders",
-          "body": "Review routes in the backoff window before retrying, purging, or repairing the queue."
+          "title": "Untersuchen Sie fehlgeschlagene Renderings",
+          "body": "Überprüfen Sie die Routen im Backoff-Fenster, bevor Sie es erneut versuchen, löschen oder die Warteschlange reparieren."
         },
         "check_tenant_safety": {
-          "title": "Check one tenant is safe",
-          "body": "Inspect exactly what this tenant should have, what is saved, and whether any snapshots belong elsewhere."
+          "title": "Überprüfen Sie, ob ein Mieter sicher ist",
+          "body": "Überprüfen Sie genau, was dieser Mandant haben sollte, was gespeichert wird und ob Snapshots woanders hingehören."
         }
       },
       "analytics": {
@@ -669,20 +669,20 @@
           "reset_failed": "Zurücksetzen fehlgeschlagen"
         },
         "checks": {
-          "cache_readable": "Cache can be read",
-          "cache_writable": "Cache can be written",
-          "cache_filesystem": "Cache storage",
-          "route_planner": "Tenant route planner",
-          "job_table": "Job queue table",
-          "circuit_breaker": "Circuit breaker",
-          "queue_age": "Queue age",
-          "recent_failures": "Recent failures",
-          "stuck_jobs": "Stuck jobs",
-          "last_successful_pass": "Last successful run",
-          "last_failed_pass": "Last failed run",
-          "sched_prerender-detect-drift": "Drift detector heartbeat",
-          "sched_prerender-auto-recache": "Auto-recache heartbeat",
-          "sched_prerender-reap-stale": "Stale-job cleanup heartbeat"
+          "cache_readable": "Cache kann gelesen werden",
+          "cache_writable": "Cache kann geschrieben werden",
+          "cache_filesystem": "Cache-Speicher",
+          "route_planner": "Routenplaner für Mieter",
+          "job_table": "Auftragswarteschlangentabelle",
+          "circuit_breaker": "Leistungsschalter",
+          "queue_age": "Alter der Warteschlange",
+          "recent_failures": "Aktuelle Misserfolge",
+          "stuck_jobs": "Festgefahrene Jobs",
+          "last_successful_pass": "Letzter erfolgreicher Lauf",
+          "last_failed_pass": "Letzter fehlgeschlagener Lauf",
+          "sched_prerender-detect-drift": "Herzschlag des Driftdetektors",
+          "sched_prerender-auto-recache": "Automatischer Recache-Herzschlag",
+          "sched_prerender-reap-stale": "Herzschlag bei der Bereinigung veralteter Jobs"
         }
       },
       "inventory": {
@@ -894,14 +894,14 @@
       "audit": {
         "actions": {
           "auto_recache": "Auto-recache",
-          "cancel": "Cancel job",
-          "detect_drift": "Detect drift",
-          "enqueue": "Queue refresh",
-          "invalidate": "Invalidate route",
-          "purge": "Delete snapshots",
-          "purge_unexpected": "Clean unexpected snapshots",
-          "reset_breaker": "Reset safety breaker",
-          "reset_queue": "Repair stuck queue"
+          "cancel": "Auftrag abbrechen",
+          "detect_drift": "Drift erkennen",
+          "enqueue": "Warteschlangenaktualisierung",
+          "invalidate": "Route ungültig machen",
+          "purge": "Snapshots löschen",
+          "purge_unexpected": "Bereinigen Sie unerwartete Schnappschüsse",
+          "reset_breaker": "Sicherheitsschalter zurücksetzen",
+          "reset_queue": "Reparieren Sie feststeckende Warteschlangen"
         },
         "buttons": {
           "export_csv": "CSV exportieren",
@@ -931,7 +931,7 @@
           "denied": "Denied",
           "failed": "Failed"
         },
-        "details_empty": "No extra details"
+        "details_empty": "Keine zusätzlichen Details"
       },
       "overview": {
         "actions": {
@@ -1001,27 +1001,27 @@
           "dry_run": "Trockenlauf",
           "preview_purge": "Vorschau der Bereinigung",
           "purge_now": "Jetzt reinigen",
-          "continue_to_delete": "Continue to live delete"
+          "continue_to_delete": "Fahren Sie mit dem Live-Löschen fort"
         },
         "description_middle": "für ein Wegsegment,",
         "description_prefix": "Snapshots löschen, die einem Glob-Muster entsprechen. Verwenden",
         "description_suffix": "für jeden Nachkommen. Beispiele:",
         "all_tenants_warning": {
-          "body": "Leaving tenant slug blank will delete matching snapshots across every tenant. This is only for platform-wide cleanup after you have previewed the exact files.",
-          "confirm": "I understand this delete applies to every tenant",
-          "title": "All-tenant delete"
+          "body": "Wenn Sie den Mieter-Slug leer lassen, werden übereinstimmende Snapshots für jeden Mieter gelöscht. Dies dient nur der plattformweiten Bereinigung, nachdem Sie eine Vorschau der genauen Dateien angezeigt haben.",
+          "confirm": "Ich verstehe, dass diese Löschung für jeden Mieter gilt",
+          "title": "Alle Mandanten löschen"
         },
         "errors": {
-          "confirm_all_tenants": "Confirm the all-tenant delete before continuing",
+          "confirm_all_tenants": "Bestätigen Sie die Löschung aller Mandanten, bevor Sie fortfahren",
           "pattern_required": "Muster ist erforderlich (z. B. /blog/*)",
           "purge_failed": "Die Bereinigung ist fehlgeschlagen",
-          "preview_required": "Run a matching preview before deleting snapshots.",
-          "confirm_text": "Type {{phrase}} to confirm this live delete."
+          "preview_required": "Führen Sie eine entsprechende Vorschau aus, bevor Sie Snapshots löschen.",
+          "confirm_text": "Geben Sie {{phrase}} ein, um diesen Live-Löschvorgang zu bestätigen."
         },
         "fields": {
           "pattern": "Muster",
           "tenant_slug": "Mieterschnecke",
-          "confirm_text": "Type {{phrase}} to confirm"
+          "confirm_text": "Geben Sie zur Bestätigung {{phrase}} ein"
         },
         "messages": {
           "dry_run": "Probelauf: {{count}}-Snapshots würden gelöscht",
@@ -1037,9 +1037,9 @@
         },
         "title": "Platzhalter-Cache löschen",
         "preview_gate": {
-          "title": "Preview required before live delete",
-          "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
-          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
+          "title": "Vor dem Live-Löschen ist eine Vorschau erforderlich",
+          "required": "Ein Live-Löschvorgang ist gesperrt, bis Sie das gleiche Routenmuster und den gleichen Mandantenbereich in der Vorschau anzeigen.",
+          "ready": "Passende Vorschau gefunden. Das Live-Löschen ist auf die in der Vorschau angezeigten {{count}} passenden Snapshots beschränkt."
         }
       },
       "ttl_inspector": {
@@ -1108,33 +1108,33 @@
         "inventory": "Inventar",
         "jobs": "Jobs",
         "overview": "Überblick",
-        "tenant_safety": "Tenant safety"
+        "tenant_safety": "Mietersicherheit"
       },
       "tabs_aria": "Registerkarten für das Vorrendern",
       "title": "Prerender-Engine",
       "tenant_safety": {
-        "title": "Tenant safety inspector",
-        "description": "Check one community before refreshing or deleting anything. This view compares the tenant route plan with the saved cache and explains why each snapshot exists.",
+        "title": "Mietersicherheitsinspektor",
+        "description": "Überprüfen Sie eine Community, bevor Sie etwas aktualisieren oder löschen. Diese Ansicht vergleicht den Mandantenroutenplan mit dem gespeicherten Cache und erklärt, warum jeder Snapshot vorhanden ist.",
         "fields": {
-          "tenant_slug": "Tenant slug"
+          "tenant_slug": "Mieterschnecke"
         },
         "placeholders": {
           "tenant_slug": "hour-timebank"
         },
         "actions": {
-          "inspect": "Inspect tenant",
-          "open_inventory": "Open inventory"
+          "inspect": "Mieter besichtigen",
+          "open_inventory": "Inventar öffnen"
         },
         "errors": {
-          "tenant_required": "Enter a tenant slug first.",
-          "load": "Failed to load tenant safety report."
+          "tenant_required": "Geben Sie zuerst einen Mieter-Slug ein.",
+          "load": "Der Mietersicherheitsbericht konnte nicht geladen werden."
         },
         "messages": {
-          "loaded": "Loaded safety report for {{slug}}."
+          "loaded": "Sicherheitsbericht für {{slug}} geladen."
         },
         "status": {
-          "clean": "No issues found",
-          "needs_attention": "{{count}} item needs attention"
+          "clean": "Keine Probleme gefunden",
+          "needs_attention": "{{count}}-Element erfordert Aufmerksamkeit"
         },
         "counts": {
           "expected": "Expected",
@@ -1147,48 +1147,48 @@
           "sitemap": "Sitemap"
         },
         "sections": {
-          "attention": "Items needing attention"
+          "attention": "Gegenstände, die Aufmerksamkeit erfordern"
         },
-        "empty": "Enter a tenant slug to inspect its route plan and saved snapshots.",
-        "empty_attention": "This tenant has no missing, stale, asset-broken, or unexpected snapshots.",
+        "empty": "Betreten Sie einen Mieter-Slug, um dessen Routenplan und gespeicherte Snapshots zu überprüfen.",
+        "empty_attention": "Dieser Mandant verfügt über keine fehlenden, veralteten, beschädigten oder unerwarteten Snapshots.",
         "columns": {
           "route": "Route",
           "source": "Source",
           "status": "Status",
-          "why": "Why it is here"
+          "why": "Warum es hier ist"
         },
         "tables": {
-          "attention_aria": "Tenant snapshot items needing attention"
+          "attention_aria": "Mieter-Snapshot-Elemente, die Aufmerksamkeit erfordern"
         },
         "sources": {
-          "static": "Static route",
-          "sitemap": "Sitemap route",
+          "static": "Statische Route",
+          "sitemap": "Sitemap-Route",
           "unexpected": "Unexpected"
         },
         "badges": {
           "unexpected": "Unexpected",
-          "assets": "Asset issue",
-          "content": "Content stale"
+          "assets": "Vermögensproblem",
+          "content": "Inhalt veraltet"
         },
         "reasons": {
-          "sitemap": "Published by this tenant sitemap as public content.",
-          "unexpected": "Saved for this tenant, but not present in the current static route set or sitemap plan.",
-          "always_public": "Always-public tenant route.",
-          "feature_enabled": "Enabled by the {{value}} tenant feature.",
-          "feature_disabled": "Would require the {{value}} tenant feature, which is currently off.",
-          "module_enabled": "Enabled by the {{value}} tenant module.",
-          "module_disabled": "Would require the {{value}} tenant module, which is currently off.",
-          "expected": "Expected for this tenant."
+          "sitemap": "Von dieser Mieter-Sitemap als öffentlicher Inhalt veröffentlicht.",
+          "unexpected": "Für diesen Mandanten gespeichert, aber nicht im aktuellen statischen Routensatz oder Sitemap-Plan vorhanden.",
+          "always_public": "Immer öffentliche Mandantenroute.",
+          "feature_enabled": "Wird durch die Mandantenfunktion {{value}} aktiviert.",
+          "feature_disabled": "Würde die Mieterfunktion {{value}} erfordern, die derzeit deaktiviert ist.",
+          "module_enabled": "Aktiviert durch das {{value}}-Mandantenmodul.",
+          "module_disabled": "Würde das Mandantenmodul {{value}} erfordern, das derzeit deaktiviert ist.",
+          "expected": "Wird für diesen Mieter erwartet."
         },
         "help": {
-          "title": "How to read this",
-          "expected": "Expected routes are pages the engine believes this tenant should expose publicly.",
-          "unexpected": "Unexpected snapshots are saved files that no longer match the tenant plan. They are the highest-risk items to clean up.",
-          "next_step": "Use preview-only cleanup first. Only delete after the preview shows the tenant and routes you expect."
+          "title": "So lesen Sie das",
+          "expected": "Erwartete Routen sind Seiten, von denen die Engine glaubt, dass sie dieser Mandant öffentlich zugänglich machen sollte.",
+          "unexpected": "Unerwartete Snapshots sind gespeicherte Dateien, die nicht mehr zum Mieterplan passen. Sie sind die Gegenstände mit dem höchsten Reinigungsrisiko.",
+          "next_step": "Verwenden Sie zunächst die Nur-Vorschau-Bereinigung. Löschen Sie erst, wenn in der Vorschau der erwartete Mandant und die erwarteten Routen angezeigt werden."
         },
         "cleanup": {
-          "title": "Cleanup available",
-          "body": "Unexpected snapshots can usually be removed with the cleanup tool in Overview. Preview first, then apply only when the tenant list is correct."
+          "title": "Reinigung verfügbar",
+          "body": "Unerwartete Schnappschüsse können normalerweise mit dem Bereinigungstool in der Übersicht entfernt werden. Zuerst Vorschau anzeigen, dann nur anwenden, wenn die Mieterliste korrekt ist."
         },
         "staleness": {
           "fresh": "Fresh",
@@ -1225,251 +1225,251 @@
     "top_matches_for_user_one": "Beste{{count}}-Übereinstimmung für{{name}}",
     "top_matches_for_user_other": "Die besten{{count}}-Übereinstimmungen für{{name}}",
     "next_public": {
-      "title": "Next.js public frontend readiness",
-      "description": "Read-only shadow-mode status for the Next.js public frontend. This page does not enable public routing or change prerender behaviour.",
+      "title": "Bereitschaft des öffentlichen Frontends von Next.js",
+      "description": "Schreibgeschützter Schattenmodusstatus für das öffentliche Next.js-Frontend. Auf dieser Seite ist weder das öffentliche Routing noch die Änderung des Prerender-Verhaltens möglich.",
       "refresh": "Refresh",
-      "loading": "Loading Next.js public frontend readiness",
-      "error": "Next.js readiness could not be loaded.",
+      "loading": "Die Bereitschaft des öffentlichen Frontends von Next.j wird geladen",
+      "error": "Next.js-Bereitschaft konnte nicht geladen werden.",
       "cards": {
         "mode": "Mode",
-        "production_routing": "Production routing",
-        "prerender": "Prerender fallback"
+        "production_routing": "Produktionsrouting",
+        "prerender": "Fallback vor dem Rendern"
       },
       "values": {
-        "shadow_mode": "Shadow mode",
-        "public_traffic_next": "Public traffic is served by Next.js",
-        "public_traffic_not_next": "Public traffic is not served by Next.js",
-        "prerender_retained": "Prerender fallback retained",
-        "prerender_not_retained": "Prerender fallback not retained"
+        "shadow_mode": "Schattenmodus",
+        "public_traffic_next": "Der öffentliche Datenverkehr wird von Next.js bereitgestellt",
+        "public_traffic_not_next": "Öffentlicher Datenverkehr wird von Next.js nicht bedient",
+        "prerender_retained": "Prerender-Fallback beibehalten",
+        "prerender_not_retained": "Prerender-Fallback wird nicht beibehalten"
       },
       "route_ownership": {
-        "title": "Route ownership manifest",
-        "next_public": "Next-owned public routes",
-        "vite_private": "Vite-owned private routes"
+        "title": "Routeneigentumsmanifest",
+        "next_public": "Nächste öffentliche Strecken im Besitz",
+        "vite_private": "Vite-eigene Privatstrecken"
       },
       "safety": {
-        "title": "Safety checks"
+        "title": "Sicherheitskontrollen"
       },
       "route_gates": {
-        "title": "Route cutover gates"
+        "title": "Routen-Cutover-Tore"
       },
       "tenant_resolution": {
-        "title": "Tenant resolution contract",
-        "bootstrap_endpoint": "Bootstrap endpoint",
-        "source_of_truth": "Source of truth",
-        "slug_parameter": "Shared-host slug parameter",
-        "request_host": "Request host",
-        "request_path": "Request path",
-        "bootstrap_request": "Bootstrap request",
-        "origin_forwarding": "Custom-domain Origin forwarding enabled",
-        "no_next_database": "Next.js does not query the database",
-        "next_queries_database": "Next.js database queries detected"
+        "title": "Mieterauflösungsvertrag",
+        "bootstrap_endpoint": "Bootstrap-Endpunkt",
+        "source_of_truth": "Quelle der Wahrheit",
+        "slug_parameter": "Shared-Host-Slug-Parameter",
+        "request_host": "Gastgeber anfragen",
+        "request_path": "Anforderungspfad",
+        "bootstrap_request": "Bootstrap-Anfrage",
+        "origin_forwarding": "Ursprungsweiterleitung für benutzerdefinierte Domänen aktiviert",
+        "no_next_database": "Next.js fragt die Datenbank nicht ab",
+        "next_queries_database": "Next.js-Datenbankabfragen erkannt"
       },
       "tenant_resolution_examples": {
-        "shared_host_slug": "Shared app host with tenant slug",
-        "custom_domain": "Custom tenant domain"
+        "shared_host_slug": "Gemeinsamer App-Host mit Mieter-Slug",
+        "custom_domain": "Benutzerdefinierte Mandantendomäne"
       },
       "tenant_resolution_route_statuses": {
-        "public": "Public Laravel GET route",
+        "public": "Öffentliche Laravel-GET-Route",
         "missing": "Laravel route is not registered",
         "auth": "Laravel route requires authentication"
       },
       "edge_canary": {
-        "title": "Edge canary preview",
-        "edge": "Production edge",
-        "routing_flag": "Routing flag",
-        "route_file_status": "Route file status",
-        "config_template": "Config template",
-        "template_exists": "Template exists",
-        "template_missing": "Template missing",
-        "example_only": "Example only",
-        "not_example_only": "Not example only",
-        "included_by_deploy": "Included by deploy",
-        "not_included_by_deploy": "Not included by deploy",
-        "route_audit_title": "Template route audit",
+        "title": "Edge Canary-Vorschau",
+        "edge": "Produktionsvorsprung",
+        "routing_flag": "Routing-Flag",
+        "route_file_status": "Status der Routendatei",
+        "config_template": "Konfigurationsvorlage",
+        "template_exists": "Vorlage existiert",
+        "template_missing": "Vorlage fehlt",
+        "example_only": "Nur Beispiel",
+        "not_example_only": "Nicht nur ein Beispiel",
+        "included_by_deploy": "In der Bereitstellung enthalten",
+        "not_included_by_deploy": "Nicht im Deploy enthalten",
+        "route_audit_title": "Vorlagenroutenprüfung",
         "exact_path_count": "{{count}} exact paths",
-        "public_only": "Public routes only",
-        "not_public_only": "Not public routes only",
-        "no_private_collisions": "No private-route collisions",
-        "private_collisions": "Private-route collisions detected",
-        "unmatched_template_path": "Unmatched template path: {{path}}",
-        "unsupported_rule": "Unsupported rewrite rule: {{rule}}",
-        "routing_flag_on": "Routing flag is enabled",
-        "routing_flag_off": "Routing flag is disabled",
-        "activation_available": "Activation controls are available",
-        "no_activation_control": "No activation controls are available",
-        "preview_only": "Preview only",
-        "not_preview_only": "Preview mode is not confirmed",
-        "reviewed_config_required": "Reviewed config required",
-        "explicit_instruction_required": "Separate cutover instruction required"
+        "public_only": "Nur öffentliche Strecken",
+        "not_public_only": "Nicht nur öffentliche Strecken",
+        "no_private_collisions": "Keine Kollisionen auf Privatrouten",
+        "private_collisions": "Kollisionen auf privaten Routen festgestellt",
+        "unmatched_template_path": "Nicht übereinstimmender Vorlagenpfad: {{path}}",
+        "unsupported_rule": "Nicht unterstützte Umschreiberegel: {{rule}}",
+        "routing_flag_on": "Routing-Flag ist aktiviert",
+        "routing_flag_off": "Das Routing-Flag ist deaktiviert",
+        "activation_available": "Aktivierungskontrollen sind verfügbar",
+        "no_activation_control": "Es sind keine Aktivierungskontrollen verfügbar",
+        "preview_only": "Nur Vorschau",
+        "not_preview_only": "Der Vorschaumodus wird nicht bestätigt",
+        "reviewed_config_required": "Überprüfte Konfiguration erforderlich",
+        "explicit_instruction_required": "Separate Umstellungsanweisung erforderlich"
       },
       "edge_canary_edges": {
         "apache_plesk": "Apache/Plesk"
       },
       "edge_canary_route_file_statuses": {
-        "not_configured": "No route file configured by this module"
+        "not_configured": "Von diesem Modul wurde keine Routendatei konfiguriert"
       },
       "edge_canary_review_steps": {
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "next_shadow_checks_required": "Next shadow checks required",
+        "explicit_cutover_instruction_required": "Ausdrückliche Umstellungsanweisung erforderlich",
+        "next_shadow_checks_required": "Nächste Schattenprüfungen erforderlich",
         "react_private_regression_required": "React private-route regression required",
         "apache_configtest_required": "Apache configtest required",
-        "prerender_fallback_must_remain": "Prerender fallback must remain"
+        "prerender_fallback_must_remain": "Der Prerender-Fallback muss bestehen bleiben"
       },
       "edge_canary_guardrails": {
-        "do_not_edit_plesk_vhosts_directly": "Do not edit Plesk vhosts directly",
-        "do_not_enable_routing_flag_without_cutover_instruction": "Do not enable routing without explicit cutover instruction",
-        "public_routes_only": "Public routes only",
-        "do_not_remove_prerender": "Do not remove prerender fallback"
+        "do_not_edit_plesk_vhosts_directly": "Bearbeiten Sie Plesk-Vhosts nicht direkt",
+        "do_not_enable_routing_flag_without_cutover_instruction": "Aktivieren Sie das Routing nicht ohne explizite Cutover-Anweisung",
+        "public_routes_only": "Nur öffentliche Strecken",
+        "do_not_remove_prerender": "Prerender-Fallback nicht entfernen"
       },
       "route_batches": {
-        "title": "Route batch readiness",
+        "title": "Batch-Bereitschaft weiterleiten",
         "route_count": "{{count}} routes"
       },
       "remaining_route_work": {
-        "title": "Remaining public route work",
+        "title": "Verbleibende Arbeiten an der öffentlichen Strecke",
         "route_count": "{{count}} routes",
         "public_routes": "{{count}} public route",
         "public_routes_plural": "{{count}} public routes",
-        "api_backed_routes": "{{count}} API-backed route",
-        "api_backed_routes_plural": "{{count}} API-backed routes",
+        "api_backed_routes": "{{count}} API-gestützte Route",
+        "api_backed_routes_plural": "{{count}} API-gestützte Routen",
         "remaining_routes": "{{count}} route remaining",
         "remaining_routes_plural": "{{count}} routes remaining",
         "unclassified_routes": "{{count}} unclassified route",
         "unclassified_routes_plural": "{{count}} unclassified routes",
-        "activation_available": "Activation controls are available",
-        "activation_unavailable": "No activation controls"
+        "activation_available": "Aktivierungskontrollen sind verfügbar",
+        "activation_unavailable": "Keine Aktivierungskontrollen"
       },
       "remaining_route_work_groups": {
-        "static_manual_review": "Static/manual-review routes",
-        "auth_only_backend": "Auth-only backend routes",
-        "backend_contract_missing": "Backend contract gaps",
-        "unclassified_manifest_only": "Unclassified manifest-only routes"
+        "static_manual_review": "Statische/manuelle Überprüfungsrouten",
+        "auth_only_backend": "Nur Authentifizierungs-Backend-Routen",
+        "backend_contract_missing": "Lücken im Backend-Vertrag",
+        "unclassified_manifest_only": "Nicht klassifizierte Nur-Manifest-Routen"
       },
       "remaining_route_work_reasons": {
-        "static_or_tenant_bootstrap": "Static or tenant-bootstrap content",
-        "authoritative_static_content_missing": "Authoritative static content source missing",
-        "existing_backend_requires_auth": "Existing backend requires authentication",
-        "public_api_would_expand_auth_scope": "Public API would expand an auth-only content surface",
-        "route_params_do_not_match_public_api": "Route params do not match a public API",
-        "manifest_only_unclassified": "Manifest-only route not classified yet"
+        "static_or_tenant_bootstrap": "Statischer oder mandantenbasierter Bootstrap-Inhalt",
+        "authoritative_static_content_missing": "Die maßgebliche statische Inhaltsquelle fehlt",
+        "existing_backend_requires_auth": "Das vorhandene Backend erfordert eine Authentifizierung",
+        "public_api_would_expand_auth_scope": "Die öffentliche API würde eine reine Authentifizierungs-Inhaltsoberfläche erweitern",
+        "route_params_do_not_match_public_api": "Routenparameter stimmen nicht mit einer öffentlichen API überein",
+        "manifest_only_unclassified": "Nur-Manifest-Route noch nicht klassifiziert"
       },
       "remaining_route_work_actions": {
-        "manual_no_js_shadow_review": "Run manual no-JavaScript shadow review",
-        "publish_authoritative_content_source": "Publish an authoritative content source",
-        "keep_vite_or_prerender_until_public_contract": "Keep Vite or prerender until a public contract exists",
-        "public_visibility_decision_required": "Decide what content is safe to make public",
-        "privacy_review_required_before_public_api": "Complete privacy review before adding a public API",
-        "add_public_laravel_api_with_tests": "Add a public Laravel API with tests",
-        "classify_route_before_cutover": "Classify route ownership and backend contract before cutover"
+        "manual_no_js_shadow_review": "Führen Sie eine manuelle Shadow-Überprüfung ohne JavaScript durch",
+        "publish_authoritative_content_source": "Veröffentlichen Sie eine maßgebliche Inhaltsquelle",
+        "keep_vite_or_prerender_until_public_contract": "Behalten Sie Vite oder Prerender bei, bis ein öffentlicher Auftrag vorliegt",
+        "public_visibility_decision_required": "Entscheiden Sie, welche Inhalte sicher veröffentlicht werden dürfen",
+        "privacy_review_required_before_public_api": "Führen Sie eine Datenschutzprüfung durch, bevor Sie eine öffentliche API hinzufügen",
+        "add_public_laravel_api_with_tests": "Fügen Sie eine öffentliche Laravel-API mit Tests hinzu",
+        "classify_route_before_cutover": "Klassifizieren Sie Routeneigentum und Backend-Vertrag vor der Umstellung"
       },
       "remaining_route_work_guardrails": {
-        "route_status_has_no_production_effect": "Route status has no production effect",
-        "do_not_promote_auth_only_routes": "Do not promote auth-only routes"
+        "route_status_has_no_production_effect": "Der Routenstatus hat keinen Einfluss auf die Produktion",
+        "do_not_promote_auth_only_routes": "Fördern Sie keine reinen Authentifizierungsrouten"
       },
       "dry_runs": {
-        "title": "Pre-cutover dry-run checks",
-        "activation_available": "Activation controls are available",
-        "activation_unavailable": "No activation controls",
-        "explicit_instruction_required": "Separate cutover instruction required"
+        "title": "Trockenlaufprüfungen vor der Umstellung",
+        "activation_available": "Aktivierungskontrollen sind verfügbar",
+        "activation_unavailable": "Keine Aktivierungskontrollen",
+        "explicit_instruction_required": "Separate Umstellungsanweisung erforderlich"
       },
       "dry_run_items": {
-        "shadow_manifest_and_html": "Shadow manifest and no-JS HTML",
-        "remaining_static_manual_review": "Platform legal content review",
-        "auth_only_public_contract_review": "Auth-only public contract review",
-        "private_vite_regression": "Private Vite regression",
-        "inertness_guard": "Production inertness guard"
+        "shadow_manifest_and_html": "Schattenmanifest und No-JS-HTML",
+        "remaining_static_manual_review": "Überprüfung der rechtlichen Inhalte der Plattform",
+        "auth_only_public_contract_review": "Nur-authentifizierte Prüfung öffentlicher Verträge",
+        "private_vite_regression": "Private Vite-Regression",
+        "inertness_guard": "Produktionsträgheitsschutz"
       },
       "dry_run_blockers": {
-        "manual_verification_required": "Manual verification required",
-        "route_parity_required": "Route parity required",
-        "authoritative_content_source_required": "Authoritative content source required",
-        "public_visibility_decision_required": "Public visibility decision required",
-        "privacy_review_required_before_public_api": "Privacy review required before public API",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+        "manual_verification_required": "Manuelle Überprüfung erforderlich",
+        "route_parity_required": "Routenparität erforderlich",
+        "authoritative_content_source_required": "Maßgebliche Inhaltsquelle erforderlich",
+        "public_visibility_decision_required": "Entscheidung zur öffentlichen Sichtbarkeit erforderlich",
+        "privacy_review_required_before_public_api": "Datenschutzprüfung vor der öffentlichen API erforderlich",
+        "explicit_cutover_instruction_required": "Ausdrückliche Umstellungsanweisung erforderlich"
       },
       "dry_run_notes": {
-        "shadow_only": "Shadow only",
-        "no_activation_control": "No activation control",
-        "do_not_promote_auth_only_routes": "Do not promote auth-only routes",
-        "vite_private_routes_remain_primary": "Vite private routes remain primary",
-        "do_not_remove_prerender": "Do not remove prerender fallback"
+        "shadow_only": "Nur Schatten",
+        "no_activation_control": "Keine Aktivierungskontrolle",
+        "do_not_promote_auth_only_routes": "Fördern Sie keine reinen Authentifizierungsrouten",
+        "vite_private_routes_remain_primary": "Private Vite-Routen bleiben primär",
+        "do_not_remove_prerender": "Prerender-Fallback nicht entfernen"
       },
       "artifacts": {
-        "title": "Cutover artifact inventory",
+        "title": "Umstellung des Artefaktinventars",
         "path": "Path",
         "present": "Present",
         "missing": "Missing",
-        "required_commands": "Required commands",
-        "required_before_cutover": "Required before cutover",
-        "activation_available": "Activation controls are available",
-        "no_activation_control": "No activation controls"
+        "required_commands": "Erforderliche Befehle",
+        "required_before_cutover": "Vor der Umstellung erforderlich",
+        "activation_available": "Aktivierungskontrollen sind verfügbar",
+        "no_activation_control": "Keine Aktivierungskontrollen"
       },
       "artifact_items": {
-        "route_ownership_manifest": "Route ownership manifest",
-        "content_sources_manifest": "Content sources manifest",
-        "apache_canary_template": "Edge canary template",
-        "shadow_compose_profile": "Shadow Compose profile",
-        "routing_flag_config": "Routing flag config",
-        "prerender_fallback": "Prerender fallback"
+        "route_ownership_manifest": "Routeneigentumsmanifest",
+        "content_sources_manifest": "Inhaltsquellen manifestieren sich",
+        "apache_canary_template": "Edge Canary-Vorlage",
+        "shadow_compose_profile": "Shadow Compose-Profil",
+        "routing_flag_config": "Routing-Flag-Konfiguration",
+        "prerender_fallback": "Fallback vor dem Rendern"
       },
       "artifact_categories": {
         "manifest": "Manifest",
-        "edge_config": "Edge config",
+        "edge_config": "Edge-Konfiguration",
         "runtime": "Runtime",
         "guard": "Guard",
         "fallback": "Fallback"
       },
       "production_effects": {
-        "none": "No production effect"
+        "none": "Kein Produktionseffekt"
       },
       "cutover_eligibility": {
-        "title": "Cutover eligibility",
-        "eligible": "Eligible for cutover",
-        "blocked": "Not eligible for cutover",
+        "title": "Cutover-Berechtigung",
+        "eligible": "Für eine Umstellung geeignet",
+        "blocked": "Nicht für eine Umstellung geeignet",
         "public_routes": "{{count}} public routes",
-        "api_backed_public_routes": "{{count}} API-backed public routes",
-        "remaining_public_routes": "{{count}} remaining public routes",
-        "activation_available": "Activation controls available",
-        "activation_unavailable": "No activation controls",
+        "api_backed_public_routes": "{{count}} API-gestützte öffentliche Routen",
+        "remaining_public_routes": "{{count}} verbleibende öffentliche Routen",
+        "activation_available": "Aktivierungskontrollen verfügbar",
+        "activation_unavailable": "Keine Aktivierungskontrollen",
         "blockers": "Blockers",
-        "required_actions": "Required actions"
+        "required_actions": "Erforderliche Aktionen"
       },
       "cutover_eligibility_blockers": {
-        "manifest_validation_blocked": "Manifest validation is blocked",
-        "remaining_public_route_work": "Remaining public route work is incomplete",
-        "edge_canary_template_audit_blocked": "Edge canary template audit is blocked",
-        "edge_routes_not_configured": "Production edge routes are not configured",
-        "route_parity_required": "Route parity is still required",
-        "routing_flag_enabled_before_cutover": "Routing flag is enabled before cutover",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+        "manifest_validation_blocked": "Die Manifestvalidierung ist blockiert",
+        "remaining_public_route_work": "Die verbleibenden Arbeiten an der öffentlichen Strecke sind unvollständig",
+        "edge_canary_template_audit_blocked": "Die Prüfung der Edge Canary-Vorlage ist blockiert",
+        "edge_routes_not_configured": "Produktions-Edge-Routen sind nicht konfiguriert",
+        "route_parity_required": "Routenparität ist weiterhin erforderlich",
+        "routing_flag_enabled_before_cutover": "Das Routing-Flag wird vor der Umstellung aktiviert",
+        "explicit_cutover_instruction_required": "Ausdrückliche Umstellungsanweisung erforderlich"
       },
       "cutover_eligibility_actions": {
-        "complete_remaining_public_route_work": "Complete remaining public route work",
-        "run_shadow_verification": "Run shadow verification",
-        "prepare_reviewed_edge_config_after_instruction": "Prepare reviewed edge config only after instruction",
-        "keep_prerender_fallback": "Keep prerender fallback"
+        "complete_remaining_public_route_work": "Vervollständigen Sie die verbleibenden Arbeiten an der öffentlichen Strecke",
+        "run_shadow_verification": "Führen Sie eine Schattenüberprüfung durch",
+        "prepare_reviewed_edge_config_after_instruction": "Bereiten Sie die überprüfte Edge-Konfiguration erst nach Anweisung vor",
+        "keep_prerender_fallback": "Behalten Sie den Fallback vor dem Rendern bei"
       },
       "route_batch_names": {
-        "foundation_public_pages": "Foundation public pages",
-        "api_backed_public_content": "API-backed public content",
-        "vite_private_retained": "Vite private routes retained"
+        "foundation_public_pages": "Öffentliche Seiten der Stiftung",
+        "api_backed_public_content": "API-gestützter öffentlicher Inhalt",
+        "vite_private_retained": "Vite-Privatrouten bleiben erhalten"
       },
       "route_batch_blockers": {
-        "manual_shadow_review_required": "Manual shadow review required",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "public_api_parity_required": "Public API parity required"
+        "manual_shadow_review_required": "Manuelle Schattenüberprüfung erforderlich",
+        "explicit_cutover_instruction_required": "Ausdrückliche Umstellungsanweisung erforderlich",
+        "public_api_parity_required": "Öffentliche API-Parität erforderlich"
       },
       "route_gate_blockers": {
-        "parity_test_required": "Parity test required"
+        "parity_test_required": "Paritätstest erforderlich"
       },
       "safety_checks": {
-        "route_cutover_disabled": "Public route cutover remains disabled",
-        "prerender_retained": "Current prerender fallback remains retained",
-        "vite_private_routes_retained": "Private Vite route ownership remains retained",
-        "public_edge_not_configured": "No production edge route is configured for Next.js",
+        "route_cutover_disabled": "Die Umschaltung öffentlicher Routen bleibt deaktiviert",
+        "prerender_retained": "Der aktuelle Fallback vor dem Rendern bleibt erhalten",
+        "vite_private_routes_retained": "Das Eigentum an der privaten Vite-Strecke bleibt erhalten",
+        "public_edge_not_configured": "Für Next.js ist keine Produktions-Edge-Route konfiguriert",
         "apache_canary_template_not_included": "Apache canary template is not included by deploy",
-        "parity_tests_required_before_cutover": "Parity tests are still required before any cutover"
+        "parity_tests_required_before_cutover": "Vor jeder Umstellung sind weiterhin Paritätstests erforderlich"
       },
       "statuses": {
         "pass": "Pass",
@@ -1479,93 +1479,93 @@
         "blocked": "Blocked"
       },
       "runtime": {
-        "title": "Shadow runtime",
-        "compose_profile": "Compose profile",
-        "dev_command": "Dev command",
-        "build_command": "Build command",
-        "port_env": "Port environment variable"
+        "title": "Schattenlaufzeit",
+        "compose_profile": "Profil erstellen",
+        "dev_command": "Dev-Befehl",
+        "build_command": "Build-Befehl",
+        "port_env": "Port-Umgebungsvariable"
       },
       "cutover": {
-        "title": "Remaining live cutover sequence",
-        "verification_commands": "Verification commands"
+        "title": "Verbleibende Live-Cutover-Sequenz",
+        "verification_commands": "Verifizierungsbefehle"
       },
       "cutover_steps": {
-        "verify_next_shadow_build": "Verify the Next.js shadow build and route manifest.",
-        "verify_no_js_public_html": "Run no-JavaScript HTML checks for each public route.",
-        "verify_private_vite_regression": "Build and regression-check the existing Vite private application.",
-        "prepare_apache_canary_routes": "Prepare Apache canary routing for public routes only.",
-        "enable_canary_for_public_routes_only": "Enable a canary route for public pages after explicit approval.",
-        "monitor_and_keep_prerender_fallback": "Monitor responses and keep prerender available as fallback until parity is proven."
+        "verify_next_shadow_build": "Überprüfen Sie das Schatten-Build- und Routenmanifest von Next.js.",
+        "verify_no_js_public_html": "Führen Sie für jede öffentliche Route HTML-Prüfungen ohne JavaScript durch.",
+        "verify_private_vite_regression": "Erstellen Sie die vorhandene private Vite-Anwendung und führen Sie eine Regressionsprüfung durch.",
+        "prepare_apache_canary_routes": "Bereiten Sie das Apache Canary-Routing nur für öffentliche Routen vor.",
+        "enable_canary_for_public_routes_only": "Aktivieren Sie nach ausdrücklicher Genehmigung eine Canary-Route für öffentliche Seiten.",
+        "monitor_and_keep_prerender_fallback": "Überwachen Sie die Antworten und halten Sie den Prerender als Ersatz bereit, bis die Parität nachgewiesen ist."
       },
       "counts": {
         "public_routes": "{{count}} public routes",
         "private_prefixes": "{{count}} private prefixes",
-        "private_patterns": "{{count}} private edit/create patterns"
+        "private_patterns": "{{count}} private Muster bearbeiten/erstellen"
       },
       "validation": {
-        "title": "Manifest validation",
-        "passed": "Manifest validation passed",
-        "blocked": "Manifest validation blocked",
-        "lockfile": "Lockfile pinned",
-        "package_scripts": "Package scripts present",
-        "compose_profile": "Shadow Compose profile present"
+        "title": "Manifest-Validierung",
+        "passed": "Manifestvalidierung bestanden",
+        "blocked": "Manifestvalidierung blockiert",
+        "lockfile": "Sperrdatei angepinnt",
+        "package_scripts": "Paketskripte vorhanden",
+        "compose_profile": "Shadow Compose-Profil vorhanden"
       },
       "validation_issues": {
-        "manifest_missing": "Route ownership manifest is missing.",
-        "manifest_not_shadow": "Route ownership manifest is not in shadow mode.",
-        "public_route_invalid": "A public route entry is malformed.",
-        "public_route_missing_fields": "A public route is missing required fields.",
-        "public_route_duplicate_pattern": "A public route pattern is duplicated.",
-        "public_route_duplicate_key": "A public route key is duplicated.",
-        "public_route_collides_with_private_prefix": "A public route collides with a private Vite route prefix.",
-        "public_route_collides_with_private_pattern": "A public route collides with a private Vite route pattern.",
-        "vite_private_prefix_missing_required": "Required Vite private route prefix is missing.",
-        "vite_private_pattern_missing_required": "Required Vite private route pattern is missing.",
-        "content_sources_not_laravel_api": "Content sources must use Laravel public APIs.",
-        "content_sources_allow_next_database_queries": "Next.js content sources must not query the database.",
-        "api_backed_route_invalid": "An API-backed route entry is malformed.",
-        "api_backed_route_missing_fields": "An API-backed route is missing required fields.",
-        "api_backed_route_duplicate_key": "An API-backed route key is duplicated.",
-        "api_backed_route_not_in_manifest": "An API-backed route is missing from the public route manifest.",
-        "api_backed_route_not_get": "API-backed public routes must use GET.",
-        "api_backed_route_not_laravel_v2_endpoint": "API-backed routes must use relative Laravel v2 endpoints.",
-        "api_backed_route_private_endpoint": "API-backed public routes must not use private Laravel v2 namespaces.",
-        "api_backed_route_endpoint_not_plain_path": "API-backed route endpoints must be plain paths without query strings or fragments.",
-        "api_backed_route_endpoint_has_path_traversal": "API-backed route endpoints must not contain path traversal segments.",
-        "api_backed_route_param_mismatch": "API endpoint parameters must match the public route pattern.",
-        "api_backed_route_not_registered": "API-backed route endpoint is not registered in Laravel.",
-        "api_backed_route_requires_auth": "API-backed route endpoint requires authentication."
+        "manifest_missing": "Das Routenbesitzmanifest fehlt.",
+        "manifest_not_shadow": "Das Routenbesitzmanifest befindet sich nicht im Schattenmodus.",
+        "public_route_invalid": "Ein öffentlicher Routeneintrag ist fehlerhaft.",
+        "public_route_missing_fields": "Bei einer öffentlichen Route fehlen erforderliche Felder.",
+        "public_route_duplicate_pattern": "Ein öffentliches Routenmuster wird dupliziert.",
+        "public_route_duplicate_key": "Ein öffentlicher Routenschlüssel wird dupliziert.",
+        "public_route_collides_with_private_prefix": "Eine öffentliche Route kollidiert mit einem privaten Vite-Routenpräfix.",
+        "public_route_collides_with_private_pattern": "Eine öffentliche Route kollidiert mit einem privaten Vite-Routenmuster.",
+        "vite_private_prefix_missing_required": "Das erforderliche Vite-Präfix für die private Route fehlt.",
+        "vite_private_pattern_missing_required": "Das erforderliche private Vite-Routenmuster fehlt.",
+        "content_sources_not_laravel_api": "Inhaltsquellen müssen öffentliche Laravel-APIs verwenden.",
+        "content_sources_allow_next_database_queries": "Next.js-Inhaltsquellen dürfen die Datenbank nicht abfragen.",
+        "api_backed_route_invalid": "Ein API-gestützter Routeneintrag ist fehlerhaft.",
+        "api_backed_route_missing_fields": "Bei einer API-gestützten Route fehlen erforderliche Felder.",
+        "api_backed_route_duplicate_key": "Ein API-gestützter Routenschlüssel wird dupliziert.",
+        "api_backed_route_not_in_manifest": "Im Manifest der öffentlichen Route fehlt eine API-gestützte Route.",
+        "api_backed_route_not_get": "API-gestützte öffentliche Routen müssen GET verwenden.",
+        "api_backed_route_not_laravel_v2_endpoint": "API-gestützte Routen müssen relative Laravel v2-Endpunkte verwenden.",
+        "api_backed_route_private_endpoint": "API-gestützte öffentliche Routen dürfen keine privaten Laravel v2-Namespaces verwenden.",
+        "api_backed_route_endpoint_not_plain_path": "API-gestützte Routenendpunkte müssen einfache Pfade ohne Abfragezeichenfolgen oder Fragmente sein.",
+        "api_backed_route_endpoint_has_path_traversal": "API-gestützte Routenendpunkte dürfen keine Pfaddurchquerungssegmente enthalten.",
+        "api_backed_route_param_mismatch": "API-Endpunktparameter müssen mit dem öffentlichen Routenmuster übereinstimmen.",
+        "api_backed_route_not_registered": "Der API-gestützte Routenendpunkt ist nicht in Laravel registriert.",
+        "api_backed_route_requires_auth": "Der API-gestützte Routenendpunkt erfordert eine Authentifizierung."
       },
       "cutover_gate_blockers": {
-        "manual_verification_required": "Manual verification required",
-        "route_parity_required": "Route parity required",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "edge_routes_not_configured": "Production edge routes are not configured",
-        "cutover_not_active": "Cutover is not active",
-        "prerender_fallback_must_remain": "Prerender fallback must remain available"
+        "manual_verification_required": "Manuelle Überprüfung erforderlich",
+        "route_parity_required": "Routenparität erforderlich",
+        "explicit_cutover_instruction_required": "Ausdrückliche Umstellungsanweisung erforderlich",
+        "edge_routes_not_configured": "Produktions-Edge-Routen sind nicht konfiguriert",
+        "cutover_not_active": "Cutover ist nicht aktiv",
+        "prerender_fallback_must_remain": "Prerender-Fallback muss verfügbar bleiben"
       },
       "playbook": {
-        "title": "Operator playbook",
-        "activation_available": "Activation controls are available",
-        "no_activation_control": "No activation controls are available on this page.",
-        "explicit_instruction_required": "Separate cutover instruction required",
-        "no_production_effect": "No production routing change"
+        "title": "Operator-Playbook",
+        "activation_available": "Aktivierungskontrollen sind verfügbar",
+        "no_activation_control": "Auf dieser Seite sind keine Aktivierungskontrollen verfügbar.",
+        "explicit_instruction_required": "Separate Umstellungsanweisung erforderlich",
+        "no_production_effect": "Keine Änderung der Produktionsroute"
       },
       "playbook_stages": {
-        "verify_shadow_module": "Verify the shadow module locally.",
-        "prepare_reviewed_edge_config": "Prepare Apache canary routing as a reviewed config-only change.",
-        "run_private_route_regression": "Re-check the existing Vite private application.",
-        "canary_public_routes_only": "Canary public routes only after approval.",
-        "monitor_with_prerender_fallback": "Monitor live responses while preserving fallback."
+        "verify_shadow_module": "Überprüfen Sie das Schattenmodul lokal.",
+        "prepare_reviewed_edge_config": "Bereiten Sie das Apache-Canary-Routing als überprüfte, nur auf die Konfiguration beschränkte Änderung vor.",
+        "run_private_route_regression": "Überprüfen Sie die vorhandene private Vite-Anwendung erneut.",
+        "canary_public_routes_only": "Kanarische öffentliche Strecken nur nach Genehmigung.",
+        "monitor_with_prerender_fallback": "Überwachen Sie Live-Antworten und bewahren Sie gleichzeitig den Fallback."
       },
       "playbook_notes": {
-        "shadow_only": "Shadow only",
-        "no_activation_control": "No activation control",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "vite_private_routes_remain_primary": "Vite private routes remain primary",
-        "public_routes_only": "Public routes only",
-        "do_not_remove_prerender": "Do not remove prerender fallback.",
-        "rollback_path_required": "Rollback path required"
+        "shadow_only": "Nur Schatten",
+        "no_activation_control": "Keine Aktivierungskontrolle",
+        "explicit_cutover_instruction_required": "Ausdrückliche Umstellungsanweisung erforderlich",
+        "vite_private_routes_remain_primary": "Private Vite-Routen bleiben primär",
+        "public_routes_only": "Nur öffentliche Strecken",
+        "do_not_remove_prerender": "Prerender-Fallback nicht entfernen.",
+        "rollback_path_required": "Rollback-Pfad erforderlich"
       }
     }
   },

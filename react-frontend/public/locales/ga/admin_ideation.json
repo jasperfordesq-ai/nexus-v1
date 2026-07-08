@@ -67,7 +67,7 @@
     "recent_activity": "Gníomhaíocht le Déanaí",
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
@@ -132,6 +132,6 @@
     "no_challenges_found": "Níor aimsíodh aon dúshláin",
     "no_matching_challenges": "Níor aimsíodh aon dúshláin mheaitseála",
     "no_status_challenges": "Níor aimsíodh aon dúshláin stádais",
-    "tabs_aria": "Challenge status filter"
+    "tabs_aria": "Scagaire stádais dúshlán"
   }
 }

@@ -232,7 +232,7 @@
     "listing_preview_alt": "Pré-visualização do anúncio",
     "image_preview_alt": "Pré-visualização do envio",
     "type_tabs_aria": "Compor tipo de conteúdo",
-    "compose_post": "Compose post"
+    "compose_post": "Compor postagem"
   },
   "moderation": {
     "unauthorized": "Não tem permissão para realizar esta ação."
@@ -538,7 +538,7 @@
     "scroll_right": "Deslizar histórias para a direita",
     "create_your_story": "Crie a sua história",
     "view_story_from": "Ver história de {{name}}",
-    "load_failed": "Couldn't load stories",
+    "load_failed": "Não foi possível carregar histórias",
     "retry": "Retry"
   },
   "fab": {
@@ -626,6 +626,6 @@
     "delete_post": "Excluir esta postagem? Isto não pode ser desfeito."
   },
   "aria": {
-    "feed_sidebar": "Community suggestions and highlights"
+    "feed_sidebar": "Sugestões e destaques da comunidade"
   }
 }

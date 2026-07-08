@@ -232,7 +232,7 @@
     "listing_preview_alt": "リスティングのプレビュー",
     "image_preview_alt": "アップロードのプレビュー",
     "type_tabs_aria": "コンテンツタイプを作成する",
-    "compose_post": "Compose post"
+    "compose_post": "投稿を作成する"
   },
   "moderation": {
     "unauthorized": "この操作を実行する権限がありません。"
@@ -538,7 +538,7 @@
     "scroll_right": "右にストーリーをスクロール",
     "create_your_story": "あなたのストーリーを作成",
     "view_story_from": "{{name}} からのストーリーを見る",
-    "load_failed": "Couldn't load stories",
+    "load_failed": "ストーリーを読み込めませんでした",
     "retry": "Retry"
   },
   "fab": {
@@ -626,6 +626,6 @@
     "delete_post": "この投稿を削除しますか?これを元に戻すことはできません。"
   },
   "aria": {
-    "feed_sidebar": "Community suggestions and highlights"
+    "feed_sidebar": "コミュニティの提案とハイライト"
   }
 }

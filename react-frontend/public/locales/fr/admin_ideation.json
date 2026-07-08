@@ -67,7 +67,7 @@
     "recent_activity": "Activité récente",
     "refresh": "Rafraîchir",
     "search": "Recherche...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Sélectionner toutes les lignes",
     "select_row": "Select row {{id}}",
     "data_table": "Données",
     "total_count": "{{count}}total"
@@ -132,6 +132,6 @@
     "no_challenges_found": "Aucun défi trouvé trouvé",
     "no_matching_challenges": "Aucun défi correspondant trouvé",
     "no_status_challenges": "Aucun problème de statut trouvé",
-    "tabs_aria": "Challenge status filter"
+    "tabs_aria": "Filtre de statut de défi"
   }
 }

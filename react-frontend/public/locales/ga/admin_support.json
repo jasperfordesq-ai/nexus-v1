@@ -67,7 +67,7 @@
     "recent_activity": "Gníomhaíocht le Déanaí",
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
@@ -75,9 +75,9 @@
   "support_reports": {
     "meta_title": "Support Reports",
     "title": "Support Reports",
-    "subtitle": "Review member-submitted bug reports with page diagnostics, Sentry event IDs, and triage notes.",
-    "loading": "Loading support reports...",
-    "empty": "No support reports match these filters.",
+    "subtitle": "Athbhreithnigh tuairiscí fabhtanna arna gcur isteach ag baill le diagnóisic leathanaigh, IDs teagmhais Sentry, agus nótaí triáise.",
+    "loading": "Tuairiscí tacaíochta á lódáil...",
+    "empty": "Ní mheaitseálann aon tuairiscí tacaíochta na scagairí seo.",
     "empty_value": "-",
     "unassigned": "Unassigned",
     "actions": {
@@ -85,12 +85,12 @@
       "search": "Search",
       "clear": "Clear",
       "review": "Review",
-      "open_page": "Open page",
+      "open_page": "Oscail leathanach",
       "open_sentry": "Open Sentry",
-      "copy_diagnostics": "Copy diagnostics",
-      "copy_handoff": "Copy engineering handoff",
+      "copy_diagnostics": "Cóipeáil diagnóisic",
+      "copy_handoff": "Cóipeáil handoff innealtóireachta",
       "close": "Close",
-      "save": "Save triage"
+      "save": "Sábháil triage"
     },
     "stats": {
       "open": "Open",
@@ -99,26 +99,26 @@
       "unassigned": "Unassigned"
     },
     "filters": {
-      "search": "Search reference, route, reporter, or summary",
+      "search": "Cuardaigh tagairt, bealach, tuairisceoir, nó achoimre",
       "status": "Status",
       "impact": "Impact"
     },
     "status": {
-      "all": "All statuses",
+      "all": "Gach stádas",
       "open": "Open",
       "triaged": "Triaged",
       "resolved": "Resolved",
       "closed": "Closed"
     },
     "impact": {
-      "all": "All impacts",
+      "all": "Gach tionchar",
       "blocked": "Blocked",
       "major": "Major",
       "minor": "Minor",
       "cosmetic": "Cosmetic"
     },
     "table": {
-      "aria": "Support reports",
+      "aria": "Tuarascálacha tacaíochta",
       "reference": "Reference",
       "summary": "Summary",
       "impact": "Impact",
@@ -130,33 +130,33 @@
     },
     "detail": {
       "title": "Report {{reference}}",
-      "loading": "Loading report...",
+      "loading": "Tuairisc á lódáil...",
       "summary": "Summary",
       "description": "Description",
       "reporter": "Reporter",
       "page": "Page",
       "created": "Created",
-      "user_agent": "User agent",
-      "sentry_event": "Sentry event",
+      "user_agent": "Gníomhaire úsáideora",
+      "sentry_event": "Imeacht sentry",
       "diagnostics": "Diagnostics"
     },
     "fields": {
       "status": "Status",
       "assignee": "Assignee",
-      "sentry_issue_url": "Sentry issue URL",
-      "triage_notes": "Triage notes"
+      "sentry_issue_url": "URL na heisiúna seolta",
+      "triage_notes": "Nótaí triáise"
     },
     "messages": {
-      "saved": "Support report updated.",
-      "copied": "Diagnostics copied.",
-      "handoff_copied": "Engineering handoff copied."
+      "saved": "Tuarascáil tacaíochta nuashonraithe.",
+      "copied": "Diagnóisic a chóipeáil.",
+      "handoff_copied": "Cóipeáil an aistrithe innealtóireachta."
     },
     "errors": {
-      "load": "Failed to load support reports.",
-      "load_detail": "Failed to load the support report.",
-      "save": "Failed to save the support report.",
-      "copy": "Could not copy diagnostics.",
-      "copy_handoff": "Could not copy the engineering handoff."
+      "load": "Theip ar lódáil tuarascálacha tacaíochta.",
+      "load_detail": "Theip ar lódáil an tuairisc tacaíochta.",
+      "save": "Theip ar shábháil an tuairisc tacaíochta.",
+      "copy": "Níorbh fhéidir diagnóisic a chóipeáil.",
+      "copy_handoff": "Níorbh fhéidir an láimhsiú innealtóireachta a chóipeáil."
     }
   }
 }

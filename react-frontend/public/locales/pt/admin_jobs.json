@@ -67,7 +67,7 @@
     "recent_activity": "Atividade recente",
     "refresh": "Atualizar",
     "search": "Procurar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecione todas as linhas",
     "select_row": "Select row {{id}}",
     "data_table": "Dados",
     "total_count": "{{count}}total"
@@ -469,7 +469,7 @@
     "load_error": "Falha ao carregar a fila de moderação.",
     "pagination_label": "Paginação da fila de moderação",
     "user_fallback": "Usuário desconhecido",
-    "rating_aria": "{{n}} out of 5 stars"
+    "rating_aria": "{{n}} de 5 estrelas"
   },
   "something_wrong": "Algo deu errado. Por favor, tente novamente.",
   "spam": {

@@ -138,18 +138,18 @@
     "tabs_aria": "أقسام تفاصيل الحدث",
     "delete_series_note": "هذه فعالية متكررة. سيؤدي حذفها أيضًا إلى حذف جميع مواعيدها القادمة.",
     "cancel_series_note": "هذه فعالية متكررة. سيؤدي إلغاؤها أيضًا إلى إلغاء جميع المواعيد القادمة وإخطار الحضور.",
-    "series_dates_title": "Upcoming dates in this series",
-    "series_this_date": "This date"
+    "series_dates_title": "التواريخ القادمة في هذه السلسلة",
+    "series_this_date": "هذا التاريخ"
   },
   "card": {
     "cancelled": "تم الإلغاء",
     "spots_left": "{{count}} البقع المتبقية",
     "full": "ممتلىء",
     "open_aria": "{{title}} on {{date}}",
-    "repeats_daily": "Repeats daily",
-    "repeats_weekly": "Repeats weekly",
-    "repeats_monthly": "Repeats monthly",
-    "repeats_yearly": "Repeats yearly",
+    "repeats_daily": "يكرر يوميا",
+    "repeats_weekly": "يتكرر اسبوعيا",
+    "repeats_monthly": "يتكرر شهريا",
+    "repeats_yearly": "يتكرر سنويا",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
     "series_dates_other": "{{count}} dates"
@@ -215,6 +215,7 @@
     "end_on_date": "في تاريخ محدد",
     "recurrence_count": "عدد مرات الظهور",
     "recurrence_count_placeholder": "10",
+    "recurrence_count_hint": "بين 2 و52 حادثة",
     "recurrence_end_date": "تاريخ انتهاء المسلسل",
     "recurrence_preview_empty": "القاعدة:...",
     "weekday_mon": "الاثنين",
@@ -245,7 +246,7 @@
       "updated": "تم تحديث الحدث",
       "image_failed": "تم إنشاء الحدث ولكن فشل تحميل الصورة",
       "error": "حدث خطأ ما",
-      "fix_errors": "Please fix the highlighted fields before saving"
+      "fix_errors": "يرجى إصلاح الحقول المميزة قبل الحفظ"
     },
     "attach_polls_label": "إرفاق استطلاعات الرأي (اختياري)",
     "attach_polls_placeholder": "تحديد استطلاعات الرأي لإرفاقها...",
@@ -263,8 +264,7 @@
     "edit_scope_message": "هذه الفعالية جزء من سلسلة متكررة. ماذا تريد أن تُحدِّث؟",
     "edit_scope_single": "هذه الفعالية فقط",
     "edit_scope_all": "هذه الفعالية وجميع الفعاليات القادمة",
-    "edit_scope_all_note": "تنطبق تغييرات التاريخ والوقت على هذه الفعالية فقط.",
-    "recurrence_count_hint": "Between 2 and 52 occurrences"
+    "edit_scope_all_note": "تنطبق تغييرات التاريخ والوقت على هذه الفعالية فقط."
   },
   "toast": {
     "rsvp_removed": "تمت إزالة الرد على الدعوة",

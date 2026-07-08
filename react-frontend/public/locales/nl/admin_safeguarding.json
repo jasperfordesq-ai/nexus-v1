@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -370,6 +370,6 @@
     "vetting_international": "Vetting Internationaal",
     "vetting_other": "Controle anders",
     "vetting_pvg_scotland": "Controle Pvg Schotland",
-    "tabs_aria": "Safeguarding sections"
+    "tabs_aria": "Beveiliging van secties"
   }
 }

@@ -67,7 +67,7 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
@@ -106,6 +106,6 @@
     "type_listing": "قائمة",
     "type_resource": "الموارد",
     "type_vol_opportunity": "فرصة المجلد",
-    "tabs_aria": "Category type filter"
+    "tabs_aria": "مرشح نوع الفئة"
   }
 }

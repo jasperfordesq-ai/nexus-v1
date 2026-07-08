@@ -67,7 +67,7 @@
     "recent_activity": "Activité récente",
     "refresh": "Rafraîchir",
     "search": "Recherche...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Sélectionner toutes les lignes",
     "select_row": "Select row {{id}}",
     "data_table": "Données",
     "total_count": "{{count}}total"
@@ -210,7 +210,7 @@
     "validation_last_name_required": "Le nom de famille est obligatoire",
     "validation_password_min": "Le mot de passe doit contenir au moins 8 caractères",
     "validation_role_required": "Le rôle est requis",
-    "tabs_aria": "User status filter",
+    "tabs_aria": "Filtre de statut utilisateur",
     "smart_search_label": "Recherche intelligente des utilisateurs",
     "smart_search_placeholder": "Rechercher par nom, e-mail, téléphone, rôle, statut ou ID...",
     "smart_search_description": "Essayez des noms, e-mails, téléphones, role:admin, pending, never logged in ou id:42.",
@@ -238,7 +238,7 @@
       "set_password": "Définir le mot de passe"
     },
     "aria": {
-      "edit_user_form": "Edit user",
+      "edit_user_form": "Modifier l'utilisateur",
       "remove_badge": "Supprimer le badge: {{name}}",
       "toggle_global_super_admin": "Activer/désactiver le super-administrateur global",
       "toggle_municipal_announcer": "Basculer le rôle d'annonceur municipal",

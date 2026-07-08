@@ -67,7 +67,7 @@
     "recent_activity": "Activité récente",
     "refresh": "Rafraîchir",
     "search": "Recherche...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Sélectionner toutes les lignes",
     "select_row": "Select row {{id}}",
     "data_table": "Données",
     "total_count": "{{count}}total"
@@ -469,7 +469,7 @@
     "load_error": "Échec du chargement de la file d'attente de modération.",
     "pagination_label": "Pagination de la file de modération",
     "user_fallback": "Utilisateur inconnu",
-    "rating_aria": "{{n}} out of 5 stars"
+    "rating_aria": "{{n}} étoiles sur 5"
   },
   "something_wrong": "Quelque chose s'est mal passé. Veuillez réessayer.",
   "spam": {

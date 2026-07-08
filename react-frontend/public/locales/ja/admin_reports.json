@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -272,11 +272,11 @@
     "tab_by_category": "カテゴリ別",
     "tab_by_member": "メンバー別",
     "tab_monthly_trend": "月次傾向",
-    "hours_tabs_aria": "Hours report view",
-    "members_tabs_aria": "Member report type",
-    "hours_by_category_aria": "Bar chart showing hours exchanged by category",
-    "hours_distribution_aria": "Pie chart showing distribution of time exchange hours",
-    "hours_trend_aria": "Area chart showing hours exchanged over time"
+    "hours_tabs_aria": "時間レポートビュー",
+    "members_tabs_aria": "メンバーレポートの種類",
+    "hours_by_category_aria": "カテゴリごとの交換時間を示す棒グラフ",
+    "hours_distribution_aria": "交換時間の分布を示す円グラフ",
+    "hours_trend_aria": "時間の経過に伴う交換時間を示す面グラフ"
   },
   "municipal_reports": {
     "meta": {
@@ -434,7 +434,7 @@
         "cooperative": "協同組合",
         "foundation": "財団"
       },
-      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
+      "delete_confirm": "テンプレート「{{name}}」を削除しますか?これを元に戻すことはできません。"
     },
     "narrative": {
       "in_export": "輸出中",

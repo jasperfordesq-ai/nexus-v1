@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -132,6 +132,6 @@
     "no_challenges_found": "チャレンジが見つかりませんでした",
     "no_matching_challenges": "一致するチャレンジが見つかりませんでした",
     "no_status_challenges": "ステータスチャレンジが見つかりませんでした",
-    "tabs_aria": "Challenge status filter"
+    "tabs_aria": "チャレンジステータスフィルター"
   }
 }

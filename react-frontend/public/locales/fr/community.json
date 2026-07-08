@@ -152,6 +152,7 @@
     "hours_logged": "{{hours}}h enregistrées",
     "website": "Site web",
     "register_button": "Enregistrer une organisation",
+    "manage_my_button": "Gérer mon organisation",
     "register_page_title": "Enregistrer une organisation",
     "register_heading": "Enregistrer votre organisation",
     "register_subtitle": "Enregistrez votre organisation bénévole pour publier des opportunités et gérer des bénévoles",
@@ -186,8 +187,7 @@
     "terms_required": "Vous devez accepter les conditions pour enregistrer votre organisation.",
     "opportunity_count_one": "{{count}} opportunité",
     "opportunity_count_other": "{{count}} opportunités",
-    "loading": "Chargement des organisations",
-    "manage_my_button": "Manage my organisation"
+    "loading": "Chargement des organisations"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -201,6 +201,7 @@
     "meta_description_fallback": "Explorez {{name}} et {{count}} opportunités de bénévolat actives sur cette banque de temps communautaire.",
     "try_again": "Réessayer",
     "browse_organisations": "Parcourir les organisations",
+    "manage_button": "Gérer cette organisation",
     "website": "Site web",
     "contact": "Contact",
     "opportunities": "Opportunités",
@@ -222,16 +223,15 @@
     "submit_application": "Envoyer la candidature",
     "job_openings": "Offres d'emploi",
     "rating_sr": "{{n}} étoiles sur 5",
-    "manage_button": "Manage this organisation",
-    "write_review": "Write review",
-    "review_modal_title": "Review this organisation",
+    "write_review": "Écrire un avis",
+    "review_modal_title": "Donnez votre avis sur cette organisation",
     "rating_label": "Rating",
     "comment_label": "Comment",
-    "comment_placeholder": "Share what worked well or what others should know.",
-    "submit_review": "Submit review",
-    "review_success": "Review submitted.",
-    "review_error": "Unable to submit your review.",
-    "rating_required": "Choose a rating before submitting."
+    "comment_placeholder": "Partagez ce qui a bien fonctionné ou ce que les autres devraient savoir.",
+    "submit_review": "Envoyer l'avis",
+    "review_success": "Avis soumis.",
+    "review_error": "Impossible de soumettre votre avis.",
+    "rating_required": "Choisissez une note avant de soumettre."
   },
   "emergency_alerts": {
     "heading": "Alertes d'urgence",

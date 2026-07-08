@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -260,6 +260,6 @@
         "required_fields": "名前、タイトル、本文は必須です。"
       }
     },
-    "tabs_aria": "Ad campaign status filter"
+    "tabs_aria": "広告キャンペーンステータスフィルター"
   }
 }

@@ -121,7 +121,7 @@
     "counter": "Contraoferta",
     "withdraw": "Retirar",
     "accept_counter": "Aceptar contraoferta",
-    "pay_accepted": "Pay accepted offer"
+    "pay_accepted": "Pagar oferta aceptada"
   },
   "create": {
     "page_title": "Vender algo - Mercado",
@@ -446,7 +446,7 @@
     "counter_message_placeholder": "Explica tu contraoferta...",
     "counter_sent_success": "Contraoferta enviada",
     "send_counter": "Enviar Contraoferta",
-    "checkout_started_success": "Checkout started for your accepted offer."
+    "checkout_started_success": "Se inició el pago de su oferta aceptada."
   },
   "collections": {
     "page_title": "Mis Colecciones",
@@ -597,7 +597,7 @@
     "left": "disponibles",
     "slot_fallback": "Franja #{{id}}",
     "status_unknown": "Desconocido",
-    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
+    "reservation_failed": "No se pudo reservar ese espacio de recogida. Elija otra ranura."
   },
   "inventory": {
     "section_title": "Inventario",
@@ -647,9 +647,9 @@
   "shipping": {
     "title": "Opciones de Envío",
     "page_title": "Shipping Options",
-    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
-    "back_to_listings": "Back to My Listings",
-    "manage_cta": "Shipping settings",
+    "page_subtitle": "Establezca los servicios de entrega que los compradores pueden elegir al finalizar la compra.",
+    "back_to_listings": "Volver a Mis listados",
+    "manage_cta": "Configuración de envío",
     "add_option": "Agregar Opción de Envío",
     "courier_name": "Nombre del Mensajero",
     "courier_name_placeholder": "p. ej. An Post, Royal Mail, DHL",
@@ -681,7 +681,7 @@
     "loading": "Cargando opciones de envío...",
     "no_options": "No hay opciones de envío disponibles para este vendedor.",
     "delete_confirm": "¿Eliminar esta opción de envío? Esto no se puede deshacer.",
-    "choose_required": "Choose a delivery method before checkout."
+    "choose_required": "Elija un método de entrega antes de realizar el pago."
   },
   "listing_location": {
     "location_title": "Ubicación",

@@ -67,13 +67,13 @@
     "recent_activity": "النشاط الأخير",
     "refresh": "ينعش",
     "search": "يبحث...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "حدد كافة الصفوف",
     "select_row": "Select row {{id}}",
     "data_table": "بيانات",
     "total_count": "إجمالي{{count}}"
   },
   "national": {
-    "trend_chart_aria": "Chart showing community activity trends over time"
+    "trend_chart_aria": "مخطط يوضح اتجاهات نشاط المجتمع مع مرور الوقت"
   },
   "national_kiss_dashboard": {
     "loading": "Loading",
@@ -87,8 +87,8 @@
     },
     "about": {
       "title": "حول لوحة القيادة هذه",
-      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
-      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "body_prefix": "رعاية المجتمع هي منهجية لتنسيق الرعاية المجتمعية. تقوم لوحة المعلومات ذات الإدارة الفائقة هذه بتجميع المقاييس عبر كل تعاونية NEXUS تدير برنامج مجتمع الرعاية على المستوى الوطني - مما يمنح الجمهور الوطني",
+      "body_suffix": "الأساس هو رؤية تعاونية مشتركة لساعات التبادل ومشاركة الأعضاء والصحة التعاونية. يتم عرض أعداد الأعضاء كأقواس للحفاظ على الخصوصية (على سبيل المثال، \"50-99\") بدلاً من الأرقام الدقيقة.",
       "health_prefix": "استخدم محدد الفترة لمقارنة الأرباع. يصنف الجدول المقارن التعاونيات حسب ساعات العمل أو الأعضاء أو الحالة الصحية. الحالة الصحية مستمدة من اتجاهات النشاط:",
       "thriving_definition": "ينمو بسرعة،",
       "stable_definition": "نشاط مسطح,",

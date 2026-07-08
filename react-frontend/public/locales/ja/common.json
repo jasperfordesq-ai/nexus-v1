@@ -869,15 +869,15 @@
     "current_language": "言語: {{language}}",
     "select_language": "言語を選択",
     "clear_location": "位置情報をクリア",
+    "location_results": "{{count}} アドレスの提案が利用可能",
+    "search_results": "{{count}} results available",
     "select_category": "カテゴリを選択",
     "verification_badges": "認証バッジ",
     "search_skills": "スキルを検索",
     "user_menu_trigger": "{{name}} のユーザー メニュー",
     "feed_sidebar": "コミュニティサイドバー",
     "filter_panel": "フィルターパネル",
-    "remove": "Remove",
-    "location_results": "{{count}} address suggestions available",
-    "search_results": "{{count}} results available"
+    "remove": "Remove"
   },
   "skills": {
     "browse_title": "コミュニティスキルディレクトリ",
@@ -920,14 +920,14 @@
     "add_skill": "スキルを追加",
     "add_a_skill": "スキルを追加",
     "search_result_category": "{{category}}内",
+    "aria_results": "{{count}} のスキル提案が利用可能",
     "no_matching_custom": "一致するスキルが見つかりません。\"{{query}}\"をカスタムスキルとして追加できます。",
     "use_custom": "\"{{query}}\"を使う",
     "skill_to_add": "追加するスキル:",
     "aria_clear_search": "検索をクリア",
     "aria_close_members_list": "メンバーリストを閉じる",
     "category_optional": "カテゴリ（任意）",
-    "proficiency_level": "習熟度",
-    "aria_results": "{{count}} skill suggestions available"
+    "proficiency_level": "習熟度"
   },
   "hours_display_one": "{{count}}時間",
   "hours_display_other": "{{count}}時間",
@@ -1663,7 +1663,7 @@
       "ad_free": "広告なし"
     },
     "return_meta_description": "プレミアムサブスクリプションの有効化、確認、管理のための安全な決済後ページです。",
-    "one_off_cta": "Make a one-off donation"
+    "one_off_cta": "1 回限りの寄付をする"
   },
   "developers": {
     "page_title": "開発者",
@@ -2077,7 +2077,7 @@
     "connect_modal": {
       "confirm": "これは残された唯一のサインイン方法です。切断するとロックアウトされます。先にパスワードを設定するかパスキーを追加してください。続行しますか？"
     },
-    "sign_in_with_provider": "Sign in with {{name}}"
+    "sign_in_with_provider": "{{name}} でサインインします"
   },
   "verein_dues": {
     "my_page_title": "私の Verein 会員会費",

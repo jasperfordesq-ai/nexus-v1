@@ -67,7 +67,7 @@
     "recent_activity": "Gníomhaíocht le Déanaí",
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
@@ -455,7 +455,7 @@
     "winning_metric": "Winning Méadrach",
     "resend_queued_count": "Ciúáilte{{count}}athsheoladh",
     "resend_queued_count_plural": "Athsheolann scuaine{{count}}",
-    "template_tabs_aria": "Newsletter template category filter"
+    "template_tabs_aria": "Scagaire catagóir nuachtlitir teimpléad"
   },
   "newsletter_form": {
     "ab_test_label": "Tástáil Ab",
@@ -642,14 +642,14 @@
       "hero_desc": "Íomhá bratach le ceannlíne",
       "html_label": "HTML",
       "html_desc": "Greamaigh do HTML saincheaptha féin",
+      "wrapper_label": "Coimeádán",
       "wrapper_desc": "Grúpáil rannóga a bhfuil cúlra comhroinnte acu",
       "navbar_label": "Barra loingseoireachta",
       "navbar_desc": "Sraith de naisc roghchláir",
       "social_icon_label": "Deilbhín sóisialta",
       "social_icon_desc": "Deilbhín líonra sóisialta amháin",
       "nav_link_label": "Nasc nascleanúna",
-      "nav_link_desc": "Nasc roghchlár amháin",
-      "wrapper_label": "Coimeádán"
+      "nav_link_desc": "Nasc roghchlár amháin"
     }
   },
   "newsletter_content_editor": {

@@ -152,6 +152,7 @@
     "hours_logged": "{{hours}}h ingelogd",
     "website": "Website",
     "register_button": "Organisatie registreren",
+    "manage_my_button": "Beheer mijn organisatie",
     "register_page_title": "Organisatie registreren",
     "register_heading": "Registreer uw organisatie",
     "register_subtitle": "Registreer uw vrijwilligersorganisatie om vacatures te plaatsen en vrijwilligers te beheren",
@@ -186,8 +187,7 @@
     "terms_required": "Om uw organisatie te kunnen registreren, moet u akkoord gaan met de voorwaarden.",
     "opportunity_count_one": "{{count}} mogelijkheid",
     "opportunity_count_other": "{{count}} mogelijkheden",
-    "loading": "Organisaties laden",
-    "manage_my_button": "Manage my organisation"
+    "loading": "Organisaties laden"
   },
   "organisation_detail": {
     "page_title": "Organisatie",
@@ -201,6 +201,7 @@
     "meta_description_fallback": "Ontdek {{name}} en {{count}} actieve vrijwilligersmogelijkheden op deze gemeenschapstijdbank.",
     "try_again": "Probeer het opnieuw",
     "browse_organisations": "Blader door organisaties",
+    "manage_button": "Beheer deze organisatie",
     "website": "Website",
     "contact": "Contact opnemen",
     "opportunities": "Mogelijkheden",
@@ -222,16 +223,15 @@
     "submit_application": "Aanvraag indienen",
     "job_openings": "Vacatures",
     "rating_sr": "{{n}} van 5 sterren",
-    "manage_button": "Manage this organisation",
-    "write_review": "Write review",
-    "review_modal_title": "Review this organisation",
+    "write_review": "Schrijf recensie",
+    "review_modal_title": "Beoordeel deze organisatie",
     "rating_label": "Rating",
     "comment_label": "Comment",
-    "comment_placeholder": "Share what worked well or what others should know.",
-    "submit_review": "Submit review",
-    "review_success": "Review submitted.",
-    "review_error": "Unable to submit your review.",
-    "rating_required": "Choose a rating before submitting."
+    "comment_placeholder": "Deel wat goed werkte of wat anderen zouden moeten weten.",
+    "submit_review": "Beoordeling indienen",
+    "review_success": "Beoordeling ingediend.",
+    "review_error": "Kan uw beoordeling niet verzenden.",
+    "rating_required": "Kies een beoordeling voordat u deze verzendt."
   },
   "emergency_alerts": {
     "heading": "Noodmeldingen",

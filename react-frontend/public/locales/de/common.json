@@ -869,15 +869,15 @@
     "current_language": "Sprache: {{language}}",
     "select_language": "Sprache auswählen",
     "clear_location": "Standort löschen",
+    "location_results": "{{count}}-Adressvorschläge verfügbar",
+    "search_results": "{{count}} results available",
     "select_category": "Kategorie auswählen",
     "verification_badges": "Verifizierungsabzeichen",
     "search_skills": "Fähigkeiten suchen",
     "user_menu_trigger": "Benutzermenü für {{name}}",
     "feed_sidebar": "Community-Seitenleiste",
     "filter_panel": "Filterplatte",
-    "remove": "Remove",
-    "location_results": "{{count}} address suggestions available",
-    "search_results": "{{count}} results available"
+    "remove": "Remove"
   },
   "skills": {
     "browse_title": "Gemeinschafts-Fähigkeitenverzeichnis",
@@ -920,14 +920,14 @@
     "add_skill": "Fähigkeit hinzufügen",
     "add_a_skill": "Eine Fähigkeit hinzufügen",
     "search_result_category": "in {{category}}",
+    "aria_results": "{{count}}-Skill-Vorschläge verfügbar",
     "no_matching_custom": "Keine passende Fähigkeit gefunden. Sie können \"{{query}}\" als eigene Fähigkeit hinzufügen.",
     "use_custom": "\"{{query}}\" verwenden",
     "skill_to_add": "Hinzuzufügende Fähigkeit:",
     "aria_clear_search": "Suche löschen",
     "aria_close_members_list": "Mitgliederliste schliessen",
     "category_optional": "Kategorie (optional)",
-    "proficiency_level": "Kompetenzstufe",
-    "aria_results": "{{count}} skill suggestions available"
+    "proficiency_level": "Kompetenzstufe"
   },
   "hours_display_one": "{{count}} Stunde",
   "hours_display_other": "{{count}} Stunden",
@@ -1663,7 +1663,7 @@
       "ad_free": "Werbefrei"
     },
     "return_meta_description": "Sichere Rückkehrseite nach dem Checkout zum Aktivieren, Bestätigen oder Verwalten Ihres Premium-Abonnements.",
-    "one_off_cta": "Make a one-off donation"
+    "one_off_cta": "Machen Sie eine einmalige Spende"
   },
   "developers": {
     "page_title": "Entwickler",
@@ -2077,7 +2077,7 @@
     "connect_modal": {
       "confirm": "Dies ist Ihre einzig verbleibende Anmeldemethode. Wenn Sie sie trennen, werden Sie ausgesperrt, sofern Sie nicht zuerst ein Passwort festlegen oder einen Passkey hinzufügen. Fortfahren?"
     },
-    "sign_in_with_provider": "Sign in with {{name}}"
+    "sign_in_with_provider": "Melden Sie sich mit {{name}} an"
   },
   "verein_dues": {
     "my_page_title": "Meine Vereinsmitgliedsbeiträge",

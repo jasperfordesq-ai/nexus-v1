@@ -121,7 +121,7 @@
     "counter": "Contraoferta",
     "withdraw": "Retirar",
     "accept_counter": "Aceitar Contraoferta",
-    "pay_accepted": "Pay accepted offer"
+    "pay_accepted": "Oferta aceita de pagamento"
   },
   "create": {
     "page_title": "Vender Algo - Mercado",
@@ -446,7 +446,7 @@
     "counter_message_placeholder": "Explique sua contra-oferta...",
     "counter_sent_success": "Contra-oferta enviada",
     "send_counter": "Enviar Contra",
-    "checkout_started_success": "Checkout started for your accepted offer."
+    "checkout_started_success": "A finalização da compra foi iniciada para sua oferta aceita."
   },
   "collections": {
     "page_title": "Minhas Coleções",
@@ -597,7 +597,7 @@
     "left": "disponíveis",
     "slot_fallback": "Horário #{{id}}",
     "status_unknown": "Desconhecido",
-    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
+    "reservation_failed": "Não foi possível reservar esse horário de retirada. Escolha outro slot."
   },
   "inventory": {
     "section_title": "Inventário",
@@ -647,9 +647,9 @@
   "shipping": {
     "title": "Opções de Envio",
     "page_title": "Shipping Options",
-    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
-    "back_to_listings": "Back to My Listings",
-    "manage_cta": "Shipping settings",
+    "page_subtitle": "Defina os serviços de entrega que os compradores podem escolher na finalização da compra.",
+    "back_to_listings": "Voltar para Minhas Listagens",
+    "manage_cta": "Configurações de envio",
     "add_option": "Adicionar Opção de Envio",
     "courier_name": "Nome do Courier",
     "courier_name_placeholder": "ex. An Post, Royal Mail, DHL",
@@ -681,7 +681,7 @@
     "loading": "Carregando opções de envio...",
     "no_options": "Nenhuma opção de envio disponível para este vendedor.",
     "delete_confirm": "Remover esta opção de envio? Isto não pode ser desfeito.",
-    "choose_required": "Choose a delivery method before checkout."
+    "choose_required": "Escolha um método de entrega antes de finalizar a compra."
   },
   "listing_location": {
     "location_title": "Localização",

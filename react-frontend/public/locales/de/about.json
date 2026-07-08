@@ -88,6 +88,11 @@
     "meta_description": "Werden Sie Partner von hOUR Timebank und schaffen Sie €16 sozialen Wert für jeden investierten €1. Unternehmenspartnerschaften, Sponsoring und Forschungsmöglichkeiten.",
     "breadcrumb_about": "Über uns",
     "hero_subtitle": "Schliessen Sie sich einer bewährten Organisation für soziale Wirkung an. Jeder von Ihnen investierte €1 generiert €16 messbaren sozialen Wert für Gemeinschaften in ganz Irland.",
+    "together_banner_heading": "Gemeinsam für Timebanking",
+    "together_banner_alt": "Gemeinsam für Timebanking – stärkere Gemeinschaften, gemeinsame Werte, eine bessere Zukunft. Unterstützt durch Project NEXUS, in Zusammenarbeit mit Timebanking UK und Timebank Ireland.",
+    "tbuk_heading": "Timebanking UK",
+    "tbuk_para1": "Timebank Ireland und Project NEXUS freuen sich, eine neue strategische und technologische Partnerschaft mit Timebanking UK bekannt zu geben, die zwei Timebanking-Bewegungen rund um eine gemeinsame digitale Open-Source-Infrastruktur zusammenführt. Durch diese Partnerschaft wird Timebanking UK zu einem anerkannten Mitwirkenden und strategischen Partner im Project NEXUS-Ökosystem und trägt zur Gestaltung einer Verbundplattform bei, die für lokalen Austausch, Zugänglichkeit, gemeinschaftsübergreifende Zusammenarbeit und langfristige Gemeinschaftsverantwortung konzipiert ist.",
+    "tbuk_para2": "Die Partnerschaft stärkt das Projekt NEXUS als praktische, bewegungsgesteuerte Alternative zur geschlossenen Bürgertechnologie. Durch die Zusammenarbeit mit Timebanking UK schaffen wir eine stärkere Grundlage für Zeitbanken in ganz Irland, Großbritannien und darüber hinaus: gemeinsame Standards, gemeinsames Lernen und eine Plattform, die auf die tatsächlichen Bedürfnisse von Communities ausgerichtet ist und nicht auf die Prioritäten kommerzieller Softwareanbieter.",
     "funding_gap_heading": "Die Finanzierungslücke schliessen",
     "funding_gap_para1": "Gemeinschaftsorganisationen wie hOUR Timebank liefern ausserordentlichen sozialen Wert — arbeiten aber mit minimalsten Budgets. Unsere unabhängige Studie 2023 zeigt eine soziale Rendite von 16:1, doch die Kernfinanzierung deckt nur den Grundbetrieb.",
     "funding_gap_para2": "Strategische Partnerschaften können diese Lücke überbrücken. Ob durch CSR-Programme, Forschungskooperationen oder direkte Sponsoring — Ihre Unterstützung verstärkt direkt das Gemeinschaftswohlbefinden und baut soziale Infrastruktur auf, die allen zugutekommt.",
@@ -128,12 +133,7 @@
     "cta_heading": "Gemeinsam stärkere Gemeinschaften aufbauen",
     "cta_subtitle": "Ob Unternehmen, Geldgeber, Forscher oder Gemeinschaftsleiter — es gibt ein Partnerschaftsmodell, das für Sie funktioniert.",
     "cta_contact": "Gespräch beginnen",
-    "cta_view_plan": "Strategieplan ansehen",
-    "together_banner_heading": "Together for Timebanking",
-    "together_banner_alt": "Together for Timebanking — stronger communities, shared values, brighter future. Powered by Project NEXUS, in partnership with Timebanking UK and Timebank Ireland.",
-    "tbuk_heading": "Timebanking UK",
-    "tbuk_para1": "Timebank Ireland and Project NEXUS are delighted to announce a new strategic and technology partnership with Timebanking UK, bringing together two timebanking movements around shared, open-source digital infrastructure. Through this partnership, Timebanking UK will become a recognised contributor and strategic partner in the Project NEXUS ecosystem, helping shape a federated platform built for local exchange, accessibility, cross-community collaboration and long-term community ownership.",
-    "tbuk_para2": "The partnership strengthens Project NEXUS as a practical, movement-led alternative to closed civic technology. By working with Timebanking UK, we are creating a stronger foundation for time banks across Ireland, the UK and beyond: shared standards, shared learning, and a platform designed around the real needs of communities rather than the priorities of commercial software vendors."
+    "cta_view_plan": "Strategieplan ansehen"
   },
   "social_prescribing": {
     "page_title": "Soziale Verschreibung",

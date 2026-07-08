@@ -67,7 +67,7 @@
     "recent_activity": "Letzte Aktivität",
     "refresh": "Aktualisieren",
     "search": "Suchen...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wählen Sie alle Zeilen aus",
     "select_row": "Select row {{id}}",
     "data_table": "Daten",
     "total_count": "{{count}}insgesamt"
@@ -272,11 +272,11 @@
     "tab_by_category": "Nach Kategorie",
     "tab_by_member": "Von Mitglied",
     "tab_monthly_trend": "Monatlicher Trend",
-    "hours_tabs_aria": "Hours report view",
-    "members_tabs_aria": "Member report type",
-    "hours_by_category_aria": "Bar chart showing hours exchanged by category",
-    "hours_distribution_aria": "Pie chart showing distribution of time exchange hours",
-    "hours_trend_aria": "Area chart showing hours exchanged over time"
+    "hours_tabs_aria": "Stundenberichtsansicht",
+    "members_tabs_aria": "Typ des Mitgliedsberichts",
+    "hours_by_category_aria": "Balkendiagramm mit den nach Kategorie ausgetauschten Stunden",
+    "hours_distribution_aria": "Kreisdiagramm, das die Verteilung der Zeitwechselstunden zeigt",
+    "hours_trend_aria": "Flächendiagramm, das die im Laufe der Zeit ausgetauschten Stunden zeigt"
   },
   "municipal_reports": {
     "meta": {
@@ -434,7 +434,7 @@
         "cooperative": "Kooperative",
         "foundation": "Stiftung"
       },
-      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
+      "delete_confirm": "Vorlage „{{name}}“ löschen? Dies kann nicht rückgängig gemacht werden."
     },
     "narrative": {
       "in_export": "Im Export",

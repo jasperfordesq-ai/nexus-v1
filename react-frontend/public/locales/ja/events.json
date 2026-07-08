@@ -138,18 +138,18 @@
     "tabs_aria": "イベント詳細セクション",
     "delete_series_note": "これは定期イベントです。削除すると、今後のすべての開催回も削除されます。",
     "cancel_series_note": "これは定期イベントです。中止すると、今後のすべての開催回も中止され、参加者に通知されます。",
-    "series_dates_title": "Upcoming dates in this series",
-    "series_this_date": "This date"
+    "series_dates_title": "このシリーズの今後の日程",
+    "series_this_date": "この日付"
   },
   "card": {
     "cancelled": "キャンセル",
     "spots_left": "{{count}} 枠が残っています",
     "full": "満杯",
     "open_aria": "{{title}} on {{date}}",
-    "repeats_daily": "Repeats daily",
-    "repeats_weekly": "Repeats weekly",
-    "repeats_monthly": "Repeats monthly",
-    "repeats_yearly": "Repeats yearly",
+    "repeats_daily": "毎日繰り返す",
+    "repeats_weekly": "毎週繰り返します",
+    "repeats_monthly": "毎月繰り返す",
+    "repeats_yearly": "毎年繰り返す",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
     "series_dates_other": "{{count}} dates"
@@ -215,6 +215,7 @@
     "end_on_date": "特定の日付に",
     "recurrence_count": "出現回数",
     "recurrence_count_placeholder": "10",
+    "recurrence_count_hint": "2 ～ 52 回発生",
     "recurrence_end_date": "シリーズ終了日",
     "recurrence_preview_empty": "ルール:...",
     "weekday_mon": "月",
@@ -245,7 +246,7 @@
       "updated": "イベントを更新しました",
       "image_failed": "イベントが作成されましたが、画像のアップロードに失敗しました",
       "error": "何か問題が発生しました",
-      "fix_errors": "Please fix the highlighted fields before saving"
+      "fix_errors": "保存する前に、強調表示されたフィールドを修正してください"
     },
     "attach_polls_label": "投票の添付 (オプション)",
     "attach_polls_placeholder": "添付する投票を選択してください...",
@@ -263,8 +264,7 @@
     "edit_scope_message": "このイベントは定期シリーズの一部です。どちらを更新しますか？",
     "edit_scope_single": "このイベントのみ",
     "edit_scope_all": "このイベントと今後すべて",
-    "edit_scope_all_note": "日時の変更はこのイベントにのみ適用されます。",
-    "recurrence_count_hint": "Between 2 and 52 occurrences"
+    "edit_scope_all_note": "日時の変更はこのイベントにのみ適用されます。"
   },
   "toast": {
     "rsvp_removed": "出欠確認を削除しました",

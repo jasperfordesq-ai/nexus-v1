@@ -67,7 +67,7 @@
     "recent_activity": "Ostatnia aktywność",
     "refresh": "Odświeżać",
     "search": "Szukaj...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Wybierz wszystkie wiersze",
     "select_row": "Select row {{id}}",
     "data_table": "Dane",
     "total_count": "Łącznie{{count}}"
@@ -210,7 +210,7 @@
     "validation_last_name_required": "Nazwisko jest wymagane",
     "validation_password_min": "Hasło musi mieć co najmniej 8 znaków",
     "validation_role_required": "Rola jest wymagana",
-    "tabs_aria": "User status filter",
+    "tabs_aria": "Filtr stanu użytkownika",
     "smart_search_label": "Inteligentne wyszukiwanie użytkowników",
     "smart_search_placeholder": "Szukaj po nazwie, e-mailu, telefonie, roli, statusie lub ID...",
     "smart_search_description": "Spróbuj nazw, e-maili, telefonów, role:admin, pending, never logged in lub id:42.",
@@ -238,7 +238,7 @@
       "set_password": "Ustaw hasło"
     },
     "aria": {
-      "edit_user_form": "Edit user",
+      "edit_user_form": "Edytuj użytkownika",
       "remove_badge": "Usuń odznakę: {{name}}",
       "toggle_global_super_admin": "Przełącz globalnego superadministratora",
       "toggle_municipal_announcer": "Przełącz rolę spikera miejskiego",

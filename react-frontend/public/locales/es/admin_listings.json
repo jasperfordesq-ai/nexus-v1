@@ -67,7 +67,7 @@
     "recent_activity": "Actividad reciente",
     "refresh": "Refrescar",
     "search": "Buscar...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleccionar todas las filas",
     "select_row": "Select row {{id}}",
     "data_table": "Datos",
     "total_count": "{{count}}total"
@@ -125,7 +125,7 @@
     "unfeature": "no característica",
     "unfeature_listing": "Listado de características no destacadas",
     "unfeatured_success": "No destacado con éxito",
-    "section_tabs_aria": "Listings management sections",
-    "filter_tabs_aria": "Listing status filter"
+    "section_tabs_aria": "Secciones de gestión de listados",
+    "filter_tabs_aria": "Filtro de estado de listado"
   }
 }

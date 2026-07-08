@@ -67,7 +67,7 @@
     "recent_activity": "Activité récente",
     "refresh": "Rafraîchir",
     "search": "Recherche...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Sélectionner toutes les lignes",
     "select_row": "Select row {{id}}",
     "data_table": "Données",
     "total_count": "{{count}}total"
@@ -455,7 +455,7 @@
     "winning_metric": "Métrique gagnante",
     "resend_queued_count": "Renvoi{{count}}en file d'attente",
     "resend_queued_count_plural": "Renvois{{count}}en file d'attente",
-    "template_tabs_aria": "Newsletter template category filter"
+    "template_tabs_aria": "Filtre de catégorie de modèle de newsletter"
   },
   "newsletter_form": {
     "ab_test_label": "Test abdominaux",
@@ -642,14 +642,14 @@
       "hero_desc": "Une image de bannière avec un titre",
       "html_label": "HTML",
       "html_desc": "Collez votre propre code HTML personnalisé",
+      "wrapper_label": "Conteneur",
       "wrapper_desc": "Sections de groupe avec un arrière-plan partagé",
       "navbar_label": "Barre de navigation",
       "navbar_desc": "Une rangée de liens de menu",
       "social_icon_label": "Icône sociale",
       "social_icon_desc": "Une seule icône de réseau social",
       "nav_link_label": "Lien de navigation",
-      "nav_link_desc": "Un seul lien de menu",
-      "wrapper_label": "Conteneur"
+      "nav_link_desc": "Un seul lien de menu"
     }
   },
   "newsletter_content_editor": {

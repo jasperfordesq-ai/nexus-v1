@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -105,6 +105,6 @@
     "tab_draft": "草案",
     "tab_published": "発行済み",
     "unknown": "不明",
-    "tabs_aria": "Event status filter"
+    "tabs_aria": "イベントステータスフィルター"
   }
 }

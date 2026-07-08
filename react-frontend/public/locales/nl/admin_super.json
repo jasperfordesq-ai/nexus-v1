@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -791,8 +791,8 @@
     "select_hub_tenant": "Selecteer een hubtenant",
     "no_hub_tenants_found": "Geen hubtenants gevonden",
     "impersonate_user_warning": "Bij imitatie wordt elke actie onder de identiteit van deze gebruiker geregistreerd. Alleen gebruiken wanneer dit nodig is voor ondersteuning.",
-    "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "partnerships_tabs_aria": "Filter voor status van federatiepartnerschap",
+    "tenant_list_tabs_aria": "Filter voor huurderstatus"
   },
   "tenant_form": {
     "active": "Actief",
@@ -965,11 +965,11 @@
     "feature_feed_desc": "Schakel de communityfeed in.",
     "feature_marketplace": "Marktplaats",
     "feature_marketplace_desc": "Schakel marktplaatsfuncties in.",
-    "tabs_aria": "Tenant form sections",
-    "domain_desc": "Used for the React web frontend (e.g. community.example.org).",
-    "accessible_domain_label": "Accessible frontend domain",
+    "tabs_aria": "Secties voor huurdersformulieren",
+    "domain_desc": "Gebruikt voor de React-webfrontend (bijvoorbeeld community.example.org).",
+    "accessible_domain_label": "Toegankelijk frontenddomein",
     "accessible_domain_placeholder": "e.g. accessible.example.org",
-    "accessible_domain_desc": "Optional. Custom domain for the accessible (GOV.UK) frontend."
+    "accessible_domain_desc": "Optioneel. Aangepast domein voor de toegankelijke frontend (GOV.UK)."
   },
   "federation_whitelist": {
     "add_tenant_to_whitelist": "Huurder toevoegen aan witte lijst",

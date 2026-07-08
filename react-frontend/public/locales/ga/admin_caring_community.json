@@ -67,7 +67,7 @@
     "recent_activity": "Gníomhaíocht le Déanaí",
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
@@ -418,7 +418,7 @@
         "body": "Sainmhíníonn Beartas Oibriúcháin rialacha do chlár cúraim phobail: cé atá in ann uaireanta a cheadú, cé chomh tapa agus a chaithfidh comhordaitheoirí freagairt, conas a ríomhtar luach sóisialta, agus cén chuma atá ar an timthriall tuairiscithe. Cumraigh é seo roimh an treoir phíolótach a sheoladh. Tagann athruithe i bhfeidhm láithreach agus déantar iad a logáil chun críocha iniúchta.",
         "methodology_prefix": "Tá an",
         "methodology_middle": "ráta in aghaidh na huaire agus réimsí iolraitheora chosc úsáid an",
-        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
+        "methodology_suffix": "Úsáideann réimsí iolraitheoir ráta in aghaidh na huaire agus coisc modheolaíocht an Chomhphobail Chúraim. Má úsáideann do phobal airgeadra eile nó eacnamaíocht cúraim áitiúil, socraigh an ráta chuig do choibhéis uaire áitiúil um chúram foirmiúil agus an t-iolraitheoir go 1.0.",
         "methodology_tail": "píolótach, socraigh an ráta chuig do choibhéis uaire áitiúil um chúram foirmiúil agus an t-iolraitheoir go 1.0."
       },
       "sections": {
@@ -2055,9 +2055,9 @@
       "default_rate": "CHF 35/uair",
       "tenant_setting_source": "cumraithe don tionónta seo",
       "default_source": "Ráta cúntóir foirmeálta na hEilvéise, SECO 2024",
-      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
+      "prevention_value_prefix": "Baineann luach coiscthe iolraitheoir {{multiplier}}x in aghaidh",
       "prevention_value_suffix": "modheolaíocht meastóireachta.",
-      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
+      "default_prevention_prefix": "Baineann luach coiscthe iolraitheoir 2x in aghaidh an",
       "default_prevention_suffix": "modheolaíocht meastóireachta.",
       "substitution_applied": "Déantar uaireanta a ualú de réir comhéifeachtaí ionadaíochta in aghaidh na catagóire.",
       "substitution_not_applied": "Gach uair an chloig ualaithe ag 1.0x."

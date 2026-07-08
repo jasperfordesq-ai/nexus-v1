@@ -138,18 +138,18 @@
     "tabs_aria": "Secciones de detalles del evento",
     "delete_series_note": "Este es un evento periódico. Al eliminarlo, también se eliminarán todas sus repeticiones futuras.",
     "cancel_series_note": "Este es un evento periódico. Al cancelarlo, también se cancelarán todas las repeticiones futuras y se notificará a sus asistentes.",
-    "series_dates_title": "Upcoming dates in this series",
-    "series_this_date": "This date"
+    "series_dates_title": "Próximas fechas de esta serie",
+    "series_this_date": "esta fecha"
   },
   "card": {
     "cancelled": "Cancelado",
     "spots_left": "{{count}} plazas disponibles",
     "full": "Completo",
     "open_aria": "{{title}} on {{date}}",
-    "repeats_daily": "Repeats daily",
-    "repeats_weekly": "Repeats weekly",
-    "repeats_monthly": "Repeats monthly",
-    "repeats_yearly": "Repeats yearly",
+    "repeats_daily": "Se repite diariamente",
+    "repeats_weekly": "Se repite semanalmente",
+    "repeats_monthly": "Se repite mensualmente",
+    "repeats_yearly": "Se repite anualmente",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
     "series_dates_other": "{{count}} dates"
@@ -215,6 +215,7 @@
     "end_on_date": "En una fecha específica",
     "recurrence_count": "Número de repeticiones",
     "recurrence_count_placeholder": "10",
+    "recurrence_count_hint": "Entre 2 y 52 ocurrencias",
     "recurrence_end_date": "Fecha de fin de la serie",
     "recurrence_preview_empty": "REGLA:...",
     "weekday_mon": "Lun",
@@ -245,7 +246,7 @@
       "updated": "Evento actualizado",
       "image_failed": "Evento creado pero la subida de imagen falló",
       "error": "Algo salió mal",
-      "fix_errors": "Please fix the highlighted fields before saving"
+      "fix_errors": "Por favor corrija los campos resaltados antes de guardar"
     },
     "attach_polls_label": "Adjuntar encuestas (opcional)",
     "attach_polls_placeholder": "Seleccionar encuestas para adjuntar...",
@@ -263,8 +264,7 @@
     "edit_scope_message": "Este evento forma parte de una serie periódica. ¿Qué desea actualizar?",
     "edit_scope_single": "Solo este evento",
     "edit_scope_all": "Este y todos los eventos futuros",
-    "edit_scope_all_note": "Los cambios de fecha y hora solo se aplican a este evento.",
-    "recurrence_count_hint": "Between 2 and 52 occurrences"
+    "edit_scope_all_note": "Los cambios de fecha y hora solo se aplican a este evento."
   },
   "toast": {
     "rsvp_removed": "Confirmación eliminada",

@@ -67,14 +67,14 @@
     "recent_activity": "Gníomhaíocht le Déanaí",
     "refresh": "Athnuaigh",
     "search": "Cuardach...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Roghnaigh gach sraith",
     "select_row": "Select row {{id}}",
     "data_table": "Sonraí",
     "total_count": "{{count}}iomlán"
   },
   "advanced": {
     "loading": "Loading",
-    "health_loading": "Loading algorithm health...",
+    "health_loading": "Algartam sláinte á lódáil...",
     "404_entry_dismissed": "Briseadh 404 iontráil",
     "a_i_settings_saved_successfully": "D'éirigh le Socruithe AI a shábháil",
     "active_provider": "Soláthraí Gníomhach",
@@ -470,48 +470,48 @@
     "prerender": {
       "description": "Grianghraif a rinne an freastalaí le bot amháin. Monatóireacht a dhéanamh ar chlúdach, staleness a bhrath, agus athnuachan bhfeidhm.",
       "guide": {
-        "title": "Plain-English guide",
-        "intro": "The prerender engine makes saved HTML copies of public pages for search engines and social previews. Members use the normal app; these snapshots are only for crawlers.",
+        "title": "Treoir Béarla saor in aisce,",
+        "intro": "Déanann an t-inneall réamhréiteora cóipeanna HTML sábháilte de leathanaigh phoiblí le haghaidh innill chuardaigh agus réamhamhairc shóisialta. Úsáideann baill an gnáth-aip; níl na pictiúir seo ach le haghaidh crawlers.",
         "bot_only": {
-          "title": "What gets rendered",
-          "body": "Public tenant pages, such as about pages, listings, blog posts, and public groups. Private member areas are not supposed to be rendered."
+          "title": "Cad a fhaigheann rindreáil",
+          "body": "Leathanaigh thionóntaí poiblí, mar shampla faoi leathanaigh, liostaí, postálacha blaganna, agus grúpaí poiblí. Níl limistéir bhall phríobháideacha ceaptha a bheith rindreáilte."
         },
         "tenant_scope": {
-          "title": "Tenant safety",
-          "body": "When a page belongs to one tenant, actions should include that tenant slug. The engine now checks host and tenant path before touching snapshots."
+          "title": "Sábháilteacht tionóntaí",
+          "body": "Nuair a bhaineann leathanach le tionónta amháin, ba cheart go n-áireofaí ar ghníomhartha seilide an tionónta. Seiceálann an t-inneall cosán an óstaigh agus na dtionóntaí sula dteagmháil léi le pictiúir."
         },
         "dry_run": {
-          "title": "Preview first",
-          "body": "A dry run shows what would happen without deleting files or queuing work. Use it before purge or repair actions."
+          "title": "Réamhamharc ar dtús",
+          "body": "Léiríonn rith tirim cad a tharlódh gan comhaid a scriosadh nó obair a scuainiú. Úsáid é roimh ghníomhartha glantacháin nó deisiúcháin."
         },
         "repair": {
-          "title": "Repair stuck queue",
-          "body": "This is not a content reset. It only releases jobs that look abandoned and lets the worker resume after repeated failures."
+          "title": "Deisiúchán scuaine bhfostú",
+          "body": "Ní athshocrú inneachair é seo. Ní scaoileann sé ach poist a bhfuil cuma tréigthe orthu agus ligeann sé don oibrí atosú tar éis teipeanna arís agus arís eile."
         }
       },
       "workflows": {
-        "title": "What are you trying to do?",
-        "description": "Start with the plain task, then use the tab it opens. This keeps routine work away from the risky controls.",
+        "title": "Cad atá tú ag iarraidh a dhéanamh?",
+        "description": "Tosaigh leis an tasc simplí, ansin bain úsáid as an táb a osclaíonn sé. Coinníonn sé seo gnáthobair ar shiúl ó na rialuithe contúirteacha.",
         "open": "Open",
         "refresh_one_tenant": {
-          "title": "Refresh one tenant",
-          "body": "Use when public content changed for a single community. Enter its tenant slug before queuing work."
+          "title": "Tionónta amháin a athnuachan",
+          "body": "Úsáid nuair a d’athraigh ábhar poiblí do phobal amháin. Cuir isteach a seilide tionónta roimh obair scuaine."
         },
         "find_stale_pages": {
-          "title": "Find stale or missing pages",
-          "body": "Check coverage first to see which tenants have old snapshots, missing pages, or broken assets."
+          "title": "Faigh leathanaigh atá sean nó in easnamh",
+          "body": "Seiceáil an clúdach ar dtús le fáil amach cé na tionóntaí a bhfuil seanghrianghraif, leathanaigh ar iarraidh nó sócmhainní briste acu."
         },
         "inspect_cache": {
-          "title": "Inspect saved pages",
-          "body": "Search the cache, inspect SEO tags, and recache selected snapshots using tenant-safe routes."
+          "title": "Déan iniúchadh ar leathanaigh shábháilte",
+          "body": "Cuardaigh an taisce, scrúdaigh clibeanna Sinsearach, agus faigh grianghraif roghnaithe ag úsáid bealaí sábháilte do thionóntaí."
         },
         "investigate_failures": {
-          "title": "Investigate failed renders",
-          "body": "Review routes in the backoff window before retrying, purging, or repairing the queue."
+          "title": "Déan iniúchadh ar rindreálacha teipthe",
+          "body": "Déan athbhreithniú ar na bealaí sa bhfuinneog chúltaca sula ndéanfaidh tú iarracht an scuaine arís, sula nglanann tú nó sula deisigh tú an scuaine."
         },
         "check_tenant_safety": {
-          "title": "Check one tenant is safe",
-          "body": "Inspect exactly what this tenant should have, what is saved, and whether any snapshots belong elsewhere."
+          "title": "Seiceáil go bhfuil tionónta amháin sábháilte",
+          "body": "Scrúdaigh go díreach cad ba cheart a bheith ag an tionónta seo, cad a shábháiltear, agus an mbaineann aon phictiúir in áit eile."
         }
       },
       "analytics": {
@@ -669,20 +669,20 @@
           "reset_failed": "Theip ar an athshocrú"
         },
         "checks": {
-          "cache_readable": "Cache can be read",
-          "cache_writable": "Cache can be written",
-          "cache_filesystem": "Cache storage",
-          "route_planner": "Tenant route planner",
-          "job_table": "Job queue table",
-          "circuit_breaker": "Circuit breaker",
-          "queue_age": "Queue age",
-          "recent_failures": "Recent failures",
-          "stuck_jobs": "Stuck jobs",
-          "last_successful_pass": "Last successful run",
-          "last_failed_pass": "Last failed run",
-          "sched_prerender-detect-drift": "Drift detector heartbeat",
-          "sched_prerender-auto-recache": "Auto-recache heartbeat",
-          "sched_prerender-reap-stale": "Stale-job cleanup heartbeat"
+          "cache_readable": "Is féidir taisce a léamh",
+          "cache_writable": "Is féidir taisce a scríobh",
+          "cache_filesystem": "Stóráil taisce",
+          "route_planner": "Pleanálaí bealaigh do thionóntaí",
+          "job_table": "Tábla scuaine poist",
+          "circuit_breaker": "Scoradán ciorcaid",
+          "queue_age": "Aois scuaine",
+          "recent_failures": "Teipeanna le déanaí",
+          "stuck_jobs": "Poist bhfostú",
+          "last_successful_pass": "Rith rathúil deireanach",
+          "last_failed_pass": "An rith dheireanach ar theip air",
+          "sched_prerender-detect-drift": "Buille croí braite sruth",
+          "sched_prerender-auto-recache": "Buille croí uathoibríoch-recache",
+          "sched_prerender-reap-stale": "Buille croí glanta seanphoist"
         }
       },
       "inventory": {
@@ -894,14 +894,14 @@
       "audit": {
         "actions": {
           "auto_recache": "Auto-recache",
-          "cancel": "Cancel job",
-          "detect_drift": "Detect drift",
-          "enqueue": "Queue refresh",
-          "invalidate": "Invalidate route",
-          "purge": "Delete snapshots",
-          "purge_unexpected": "Clean unexpected snapshots",
-          "reset_breaker": "Reset safety breaker",
-          "reset_queue": "Repair stuck queue"
+          "cancel": "Cealaigh post",
+          "detect_drift": "Braith sruth",
+          "enqueue": "Athnuachan scuaine",
+          "invalidate": "Bealach neamhbhailí",
+          "purge": "Scrios grianghraif",
+          "purge_unexpected": "Glan pictiúir gan choinne",
+          "reset_breaker": "Athshocraigh breaker sábháilteachta",
+          "reset_queue": "Deisiúchán scuaine bhfostú"
         },
         "buttons": {
           "export_csv": "Easpórtáil CSV",
@@ -931,7 +931,7 @@
           "denied": "Denied",
           "failed": "Failed"
         },
-        "details_empty": "No extra details"
+        "details_empty": "Gan sonraí breise"
       },
       "overview": {
         "actions": {
@@ -1001,27 +1001,27 @@
           "dry_run": "Rith tirim",
           "preview_purge": "purge Réamhamhairc",
           "purge_now": "Glan anois",
-          "continue_to_delete": "Continue to live delete"
+          "continue_to_delete": "Lean ar aghaidh ag craoladh beo"
         },
         "description_middle": "do mhír cosáin amháin,",
         "description_prefix": "Scrios pictiúir a thagann le patrún glob. Úsáid",
         "description_suffix": "do shliocht ar bith. Samplaí:",
         "all_tenants_warning": {
-          "body": "Leaving tenant slug blank will delete matching snapshots across every tenant. This is only for platform-wide cleanup after you have previewed the exact files.",
-          "confirm": "I understand this delete applies to every tenant",
-          "title": "All-tenant delete"
+          "body": "Má fhágtar seilide tionóntaí bán, scriosfar na pictiúir chomhoiriúnaithe thar gach tionónta. Níl sé seo ach le haghaidh glanta ar fud an ardáin tar éis duit réamhamharc a dhéanamh ar na comhaid chruinne.",
+          "confirm": "Tuigim go mbaineann an scriosadh seo le gach tionónta",
+          "title": "Scriosadh gach tionónta"
         },
         "errors": {
-          "confirm_all_tenants": "Confirm the all-tenant delete before continuing",
+          "confirm_all_tenants": "Deimhnigh an scriosadh uile-thionónta roimh leanúint ar aghaidh",
           "pattern_required": "Tá patrún ag teastáil (m.sh. /blog/*)",
           "purge_failed": "Theip ar an bpurgáiste",
-          "preview_required": "Run a matching preview before deleting snapshots.",
-          "confirm_text": "Type {{phrase}} to confirm this live delete."
+          "preview_required": "Rith réamhamharc meaitseála roimh na pictiúir a scriosadh.",
+          "confirm_text": "Clóscríobh {{phrase}} chun an scrios beo seo a dhearbhú."
         },
         "fields": {
           "pattern": "Patrún",
           "tenant_slug": "Drúchtín tionónta",
-          "confirm_text": "Type {{phrase}} to confirm"
+          "confirm_text": "Clóscríobh {{phrase}} le deimhniú"
         },
         "messages": {
           "dry_run": "Rith tirim: ghlanfaí pictiúir {{count}}",
@@ -1037,9 +1037,9 @@
         },
         "title": "Glantóir taisce saoróg",
         "preview_gate": {
-          "title": "Preview required before live delete",
-          "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
-          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
+          "title": "Réamhamharc riachtanach roimh scriosadh beo",
+          "required": "Tá scriosadh beo faoi ghlas go dtí go ndéanann tú réamhamharc ar an bpatrún bealaigh céanna agus ar an raon feidhme tionónta.",
+          "ready": "Aimsíodh réamhamharc meaitseála. Tá an scriosadh beo teoranta do na pictiúir {{count}} meaitseála a thaispeánann an réamhamharc."
         }
       },
       "ttl_inspector": {
@@ -1108,33 +1108,33 @@
         "inventory": "Fardal",
         "jobs": "Poist",
         "overview": "Forbhreathnú",
-        "tenant_safety": "Tenant safety"
+        "tenant_safety": "Sábháilteacht tionóntaí"
       },
       "tabs_aria": "Cluaisíní réamhshocraithe",
       "title": "Inneall Réamhshocraithe",
       "tenant_safety": {
-        "title": "Tenant safety inspector",
-        "description": "Check one community before refreshing or deleting anything. This view compares the tenant route plan with the saved cache and explains why each snapshot exists.",
+        "title": "Cigire sábháilteachta tionóntaí",
+        "description": "Seiceáil pobal amháin roimh athnuachan nó scriosadh aon rud. Déanann an dearcadh seo comparáid idir plean bealaigh an tionónta agus an taisce sábháilte agus míníonn sé cén fáth a bhfuil gach pictiúr ann.",
         "fields": {
-          "tenant_slug": "Tenant slug"
+          "tenant_slug": "Drúchtín tionónta"
         },
         "placeholders": {
           "tenant_slug": "hour-timebank"
         },
         "actions": {
-          "inspect": "Inspect tenant",
-          "open_inventory": "Open inventory"
+          "inspect": "Tionónta a iniúchadh",
+          "open_inventory": "Fardal oscailte"
         },
         "errors": {
-          "tenant_required": "Enter a tenant slug first.",
-          "load": "Failed to load tenant safety report."
+          "tenant_required": "Cuir isteach slug tionónta ar dtús.",
+          "load": "Theip ar an tuairisc sábháilteachta tionónta a lódáil."
         },
         "messages": {
-          "loaded": "Loaded safety report for {{slug}}."
+          "loaded": "Tuairisc sábháilteachta luchtaithe le haghaidh {{slug}}."
         },
         "status": {
-          "clean": "No issues found",
-          "needs_attention": "{{count}} item needs attention"
+          "clean": "Níor aimsíodh aon fhadhb",
+          "needs_attention": "Ní mór aird a thabhairt ar mhír {{count}}"
         },
         "counts": {
           "expected": "Expected",
@@ -1147,48 +1147,48 @@
           "sitemap": "Sitemap"
         },
         "sections": {
-          "attention": "Items needing attention"
+          "attention": "Míreanna ar gá aird a thabhairt orthu"
         },
-        "empty": "Enter a tenant slug to inspect its route plan and saved snapshots.",
-        "empty_attention": "This tenant has no missing, stale, asset-broken, or unexpected snapshots.",
+        "empty": "Cuir isteach slug tionónta chun a phlean bealaigh a iniúchadh agus pictiúir shábháilte.",
+        "empty_attention": "Níl aon phictiúir in easnamh, sean, sócmhainní-briste nó gan choinne ag an tionónta seo.",
         "columns": {
           "route": "Route",
           "source": "Source",
           "status": "Status",
-          "why": "Why it is here"
+          "why": "Cén fáth go bhfuil sé anseo"
         },
         "tables": {
-          "attention_aria": "Tenant snapshot items needing attention"
+          "attention_aria": "Míreanna seat de thionóntaí ar gá aird a thabhairt orthu"
         },
         "sources": {
-          "static": "Static route",
-          "sitemap": "Sitemap route",
+          "static": "Bealach statach",
+          "sitemap": "Bealach léarscáil an tsuímh",
           "unexpected": "Unexpected"
         },
         "badges": {
           "unexpected": "Unexpected",
-          "assets": "Asset issue",
-          "content": "Content stale"
+          "assets": "Eisiúint sócmhainní",
+          "content": "Ábhar seanchaite"
         },
         "reasons": {
-          "sitemap": "Published by this tenant sitemap as public content.",
-          "unexpected": "Saved for this tenant, but not present in the current static route set or sitemap plan.",
-          "always_public": "Always-public tenant route.",
-          "feature_enabled": "Enabled by the {{value}} tenant feature.",
-          "feature_disabled": "Would require the {{value}} tenant feature, which is currently off.",
-          "module_enabled": "Enabled by the {{value}} tenant module.",
-          "module_disabled": "Would require the {{value}} tenant module, which is currently off.",
-          "expected": "Expected for this tenant."
+          "sitemap": "Arna fhoilsiú ag an mapa suímh tionónta seo mar ábhar poiblí.",
+          "unexpected": "Sábháilte don tionónta seo, ach níl sé i láthair sa tacar bealaigh statach reatha nó sa phlean léarscáile láithreáin.",
+          "always_public": "Bealach tionónta poiblí i gcónaí.",
+          "feature_enabled": "Cumasaithe ag an ngné {{value}} tionónta.",
+          "feature_disabled": "Theastódh an ghné tionónta {{value}}, atá múchta faoi láthair.",
+          "module_enabled": "Cumasaithe ag an modúl tionónta {{value}}.",
+          "module_disabled": "Theastódh an modúl tionónta {{value}}, atá múchta faoi láthair.",
+          "expected": "Bhíothas ag súil leis don tionónta seo."
         },
         "help": {
-          "title": "How to read this",
-          "expected": "Expected routes are pages the engine believes this tenant should expose publicly.",
-          "unexpected": "Unexpected snapshots are saved files that no longer match the tenant plan. They are the highest-risk items to clean up.",
-          "next_step": "Use preview-only cleanup first. Only delete after the preview shows the tenant and routes you expect."
+          "title": "Conas é seo a léamh",
+          "expected": "Is leathanaigh iad na bealaí a bhfuiltear ag súil leo a chreideann an t-inneall gur cheart don tionónta seo a nochtadh go poiblí.",
+          "unexpected": "Is comhaid shábháilte iad grianghraif gan choinne nach dtagann le plean an tionónta a thuilleadh. Is iad na nithe is mó riosca a ghlanadh suas.",
+          "next_step": "Bain úsáid as glantachán réamhamhairc amháin ar dtús. Scrios ach amháin tar éis don réamhamharc an tionónta agus na bealaí a bhfuil tú ag súil leo a thaispeáint."
         },
         "cleanup": {
-          "title": "Cleanup available",
-          "body": "Unexpected snapshots can usually be removed with the cleanup tool in Overview. Preview first, then apply only when the tenant list is correct."
+          "title": "Glanta ar fáil",
+          "body": "Is féidir pictiúir gan choinne a bhaint de ghnáth leis an uirlis glanta in Forbhreathnú. Réamhamharc ar dtús, mar sin ná cuir i bhfeidhm ach amháin nuair atá an liosta tionóntaí i gceart."
         },
         "staleness": {
           "fresh": "Fresh",
@@ -1225,251 +1225,251 @@
     "top_matches_for_user_one": "Cluiche barr{{count}}do{{name}}",
     "top_matches_for_user_other": "Na cluichí is fearr do{{count}}do{{name}}",
     "next_public": {
-      "title": "Next.js public frontend readiness",
-      "description": "Read-only shadow-mode status for the Next.js public frontend. This page does not enable public routing or change prerender behaviour.",
+      "title": "Next.js ullmhacht aghaidh phoiblí",
+      "description": "Stádas scáthmhóid inléite amháin don aghaidh phoiblí Next.js. Ní chumasaíonn an leathanach seo ródú poiblí ná ní athraíonn sé iompar réamhthairisceana.",
       "refresh": "Refresh",
-      "loading": "Loading Next.js public frontend readiness",
-      "error": "Next.js readiness could not be loaded.",
+      "loading": "Réiteach aghaidh phoiblí Next.js á lódáil",
+      "error": "Níorbh fhéidir ullmhacht Next.js a luchtú.",
       "cards": {
         "mode": "Mode",
-        "production_routing": "Production routing",
-        "prerender": "Prerender fallback"
+        "production_routing": "Ródú táirgeachta",
+        "prerender": "Cúltaca réamhshocraithe"
       },
       "values": {
-        "shadow_mode": "Shadow mode",
-        "public_traffic_next": "Public traffic is served by Next.js",
-        "public_traffic_not_next": "Public traffic is not served by Next.js",
-        "prerender_retained": "Prerender fallback retained",
-        "prerender_not_retained": "Prerender fallback not retained"
+        "shadow_mode": "Mod scáth",
+        "public_traffic_next": "Freastalaíonn Next.js ar thrácht phoiblí",
+        "public_traffic_not_next": "Ní fhreastalaíonn Next.js ar thrácht phoiblí",
+        "prerender_retained": "Cúltaca réamhroghnóra coinnithe",
+        "prerender_not_retained": "Níor coinníodh cúl-ais an réamhthairisceoir"
       },
       "route_ownership": {
-        "title": "Route ownership manifest",
-        "next_public": "Next-owned public routes",
-        "vite_private": "Vite-owned private routes"
+        "title": "Léiriú ar úinéireacht bealaigh",
+        "next_public": "Bealaí poiblí faoi úinéireacht eile",
+        "vite_private": "Bealaí príobháideacha faoi úinéireacht Vite"
       },
       "safety": {
-        "title": "Safety checks"
+        "title": "Seiceálacha sábháilteachta"
       },
       "route_gates": {
-        "title": "Route cutover gates"
+        "title": "Geataí réitithe bealaigh"
       },
       "tenant_resolution": {
-        "title": "Tenant resolution contract",
-        "bootstrap_endpoint": "Bootstrap endpoint",
-        "source_of_truth": "Source of truth",
-        "slug_parameter": "Shared-host slug parameter",
-        "request_host": "Request host",
-        "request_path": "Request path",
-        "bootstrap_request": "Bootstrap request",
-        "origin_forwarding": "Custom-domain Origin forwarding enabled",
-        "no_next_database": "Next.js does not query the database",
-        "next_queries_database": "Next.js database queries detected"
+        "title": "Conradh réitigh tionóntaí",
+        "bootstrap_endpoint": "críochphointe Bootstrap",
+        "source_of_truth": "Foinse na fírinne",
+        "slug_parameter": "Paraiméadar seilide comh-óstach",
+        "request_host": "Iarr óstach",
+        "request_path": "Cosán iarratais",
+        "bootstrap_request": "Iarratas Bootstrap",
+        "origin_forwarding": "Cumasaíodh cur ar aghaidh Origin Custom-domain",
+        "no_next_database": "Ní cheistíonn Next.js an bunachar sonraí",
+        "next_queries_database": "Braitheadh ​​ceisteanna bunachar sonraí Next.js"
       },
       "tenant_resolution_examples": {
-        "shared_host_slug": "Shared app host with tenant slug",
-        "custom_domain": "Custom tenant domain"
+        "shared_host_slug": "Óstach aip roinnte le seilide tionónta",
+        "custom_domain": "Fearann ​​​​tionónta saincheaptha"
       },
       "tenant_resolution_route_statuses": {
-        "public": "Public Laravel GET route",
+        "public": "Bealach poiblí Laravel GET",
         "missing": "Laravel route is not registered",
         "auth": "Laravel route requires authentication"
       },
       "edge_canary": {
-        "title": "Edge canary preview",
-        "edge": "Production edge",
-        "routing_flag": "Routing flag",
-        "route_file_status": "Route file status",
-        "config_template": "Config template",
-        "template_exists": "Template exists",
-        "template_missing": "Template missing",
-        "example_only": "Example only",
-        "not_example_only": "Not example only",
-        "included_by_deploy": "Included by deploy",
-        "not_included_by_deploy": "Not included by deploy",
-        "route_audit_title": "Template route audit",
+        "title": "Réamhamharc imeall chanáracha",
+        "edge": "Imeall táirgeachta",
+        "routing_flag": "Bratach ródú",
+        "route_file_status": "Stádas comhaid bealaigh",
+        "config_template": "Teimpléad cumraíochta",
+        "template_exists": "Teimpléad ann",
+        "template_missing": "Teimpléad in easnamh",
+        "example_only": "Sampla amháin",
+        "not_example_only": "Ní sampla amháin",
+        "included_by_deploy": "Áirithe ag imscaradh",
+        "not_included_by_deploy": "Nach n-áirítear trí imscaradh",
+        "route_audit_title": "Iniúchadh bealaigh teimpléad",
         "exact_path_count": "{{count}} exact paths",
-        "public_only": "Public routes only",
-        "not_public_only": "Not public routes only",
-        "no_private_collisions": "No private-route collisions",
-        "private_collisions": "Private-route collisions detected",
-        "unmatched_template_path": "Unmatched template path: {{path}}",
-        "unsupported_rule": "Unsupported rewrite rule: {{rule}}",
-        "routing_flag_on": "Routing flag is enabled",
-        "routing_flag_off": "Routing flag is disabled",
-        "activation_available": "Activation controls are available",
-        "no_activation_control": "No activation controls are available",
-        "preview_only": "Preview only",
-        "not_preview_only": "Preview mode is not confirmed",
-        "reviewed_config_required": "Reviewed config required",
-        "explicit_instruction_required": "Separate cutover instruction required"
+        "public_only": "Bealaí poiblí amháin",
+        "not_public_only": "Ní bealaí poiblí amháin iad",
+        "no_private_collisions": "Gan imbhuailtí ar bhealach príobháideach",
+        "private_collisions": "Braitheadh ​​imbhuailtí ar an mbealach príobháideach",
+        "unmatched_template_path": "Conair an teimpléid gan mheaitseáil: {{path}}",
+        "unsupported_rule": "Riail athscríobh nach dtacaítear léi: {{rule}}",
+        "routing_flag_on": "Tá bratach ródaithe cumasaithe",
+        "routing_flag_off": "Tá bratach an ródaithe díchumasaithe",
+        "activation_available": "Tá rialuithe gníomhachtaithe ar fáil",
+        "no_activation_control": "Níl aon rialuithe gníomhachtaithe ar fáil",
+        "preview_only": "Réamhamharc amháin",
+        "not_preview_only": "Níl an modh réamhamhairc deimhnithe",
+        "reviewed_config_required": "Cumraíocht athbhreithnithe ag teastáil",
+        "explicit_instruction_required": "Teagasc gearrtha ar leith ag teastáil"
       },
       "edge_canary_edges": {
         "apache_plesk": "Apache/Plesk"
       },
       "edge_canary_route_file_statuses": {
-        "not_configured": "No route file configured by this module"
+        "not_configured": "Níl aon chomhad bealaigh cumraithe ag an modúl seo"
       },
       "edge_canary_review_steps": {
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "next_shadow_checks_required": "Next shadow checks required",
+        "explicit_cutover_instruction_required": "Teagasc gearrtha soiléir ag teastáil",
+        "next_shadow_checks_required": "Seiceálacha scáth seo chugainn ag teastáil",
         "react_private_regression_required": "React private-route regression required",
         "apache_configtest_required": "Apache configtest required",
-        "prerender_fallback_must_remain": "Prerender fallback must remain"
+        "prerender_fallback_must_remain": "Ní mór go bhfanfadh cúltaca réamhthairisceora"
       },
       "edge_canary_guardrails": {
-        "do_not_edit_plesk_vhosts_directly": "Do not edit Plesk vhosts directly",
-        "do_not_enable_routing_flag_without_cutover_instruction": "Do not enable routing without explicit cutover instruction",
-        "public_routes_only": "Public routes only",
-        "do_not_remove_prerender": "Do not remove prerender fallback"
+        "do_not_edit_plesk_vhosts_directly": "Ná cuir vhosts Plesk in eagar go díreach",
+        "do_not_enable_routing_flag_without_cutover_instruction": "Ná cumasaigh ródú gan teagasc soiléir maidir le gearradh siar",
+        "public_routes_only": "Bealaí poiblí amháin",
+        "do_not_remove_prerender": "Ná bain an réamhbhabhta ar ais"
       },
       "route_batches": {
-        "title": "Route batch readiness",
+        "title": "Ullmhacht bhaisc bealaigh",
         "route_count": "{{count}} routes"
       },
       "remaining_route_work": {
-        "title": "Remaining public route work",
+        "title": "Obair bealaí poiblí atá fágtha",
         "route_count": "{{count}} routes",
         "public_routes": "{{count}} public route",
         "public_routes_plural": "{{count}} public routes",
-        "api_backed_routes": "{{count}} API-backed route",
-        "api_backed_routes_plural": "{{count}} API-backed routes",
+        "api_backed_routes": "{{count}} Bealach le tacaíocht API",
+        "api_backed_routes_plural": "{{count}} Bealaí a bhfuil tacaíocht API acu",
         "remaining_routes": "{{count}} route remaining",
         "remaining_routes_plural": "{{count}} routes remaining",
         "unclassified_routes": "{{count}} unclassified route",
         "unclassified_routes_plural": "{{count}} unclassified routes",
-        "activation_available": "Activation controls are available",
-        "activation_unavailable": "No activation controls"
+        "activation_available": "Tá rialuithe gníomhachtaithe ar fáil",
+        "activation_unavailable": "Gan rialuithe gníomhachtaithe"
       },
       "remaining_route_work_groups": {
-        "static_manual_review": "Static/manual-review routes",
-        "auth_only_backend": "Auth-only backend routes",
-        "backend_contract_missing": "Backend contract gaps",
-        "unclassified_manifest_only": "Unclassified manifest-only routes"
+        "static_manual_review": "Bealaí statacha/athbhreithnithe láimhe",
+        "auth_only_backend": "Bealaí cúl-údar amháin",
+        "backend_contract_missing": "Bearnaí conartha backend",
+        "unclassified_manifest_only": "Bealaí follasacha amháin neamhrangaithe"
       },
       "remaining_route_work_reasons": {
-        "static_or_tenant_bootstrap": "Static or tenant-bootstrap content",
-        "authoritative_static_content_missing": "Authoritative static content source missing",
-        "existing_backend_requires_auth": "Existing backend requires authentication",
-        "public_api_would_expand_auth_scope": "Public API would expand an auth-only content surface",
-        "route_params_do_not_match_public_api": "Route params do not match a public API",
-        "manifest_only_unclassified": "Manifest-only route not classified yet"
+        "static_or_tenant_bootstrap": "Ábhar statach nó tionónta-bootstrap",
+        "authoritative_static_content_missing": "Foinse ábhair statach údarásach in easnamh",
+        "existing_backend_requires_auth": "Teastaíonn fíordheimhniú ón inneall reatha",
+        "public_api_would_expand_auth_scope": "Leathnódh API Poiblí dromchla ábhair údarás-amháin",
+        "route_params_do_not_match_public_api": "Ní mheaitseálann paraiméir bhealaigh le API poiblí",
+        "manifest_only_unclassified": "Bealach follasach amháin gan rangú fós"
       },
       "remaining_route_work_actions": {
-        "manual_no_js_shadow_review": "Run manual no-JavaScript shadow review",
-        "publish_authoritative_content_source": "Publish an authoritative content source",
-        "keep_vite_or_prerender_until_public_contract": "Keep Vite or prerender until a public contract exists",
-        "public_visibility_decision_required": "Decide what content is safe to make public",
-        "privacy_review_required_before_public_api": "Complete privacy review before adding a public API",
-        "add_public_laravel_api_with_tests": "Add a public Laravel API with tests",
-        "classify_route_before_cutover": "Classify route ownership and backend contract before cutover"
+        "manual_no_js_shadow_review": "Rith léirmheas scáth láimhe gan JavaScript",
+        "publish_authoritative_content_source": "Foilsigh foinse ábhair údarásach",
+        "keep_vite_or_prerender_until_public_contract": "Coinnigh Vite nó prerender go dtí go mbeidh conradh poiblí ann",
+        "public_visibility_decision_required": "Déan cinneadh cén t-ábhar atá sábháilte a phoibliú",
+        "privacy_review_required_before_public_api": "Críochnaigh athbhreithniú príobháideachta sula gcuirfear API poiblí leis",
+        "add_public_laravel_api_with_tests": "Cuir API poiblí Laravel leis le tástálacha",
+        "classify_route_before_cutover": "Aicmigh úinéireacht bealaigh agus conradh inneall roimh ré"
       },
       "remaining_route_work_guardrails": {
-        "route_status_has_no_production_effect": "Route status has no production effect",
-        "do_not_promote_auth_only_routes": "Do not promote auth-only routes"
+        "route_status_has_no_production_effect": "Níl aon éifeacht táirgeachta ag stádas bealaigh",
+        "do_not_promote_auth_only_routes": "Ná cuir bealaí údaráis amháin chun cinn"
       },
       "dry_runs": {
-        "title": "Pre-cutover dry-run checks",
-        "activation_available": "Activation controls are available",
-        "activation_unavailable": "No activation controls",
-        "explicit_instruction_required": "Separate cutover instruction required"
+        "title": "Seiceálacha tirim-rith réamh-ghearrtha",
+        "activation_available": "Tá rialuithe gníomhachtaithe ar fáil",
+        "activation_unavailable": "Gan rialuithe gníomhachtaithe",
+        "explicit_instruction_required": "Teagasc gearrtha ar leith ag teastáil"
       },
       "dry_run_items": {
-        "shadow_manifest_and_html": "Shadow manifest and no-JS HTML",
-        "remaining_static_manual_review": "Platform legal content review",
-        "auth_only_public_contract_review": "Auth-only public contract review",
-        "private_vite_regression": "Private Vite regression",
-        "inertness_guard": "Production inertness guard"
+        "shadow_manifest_and_html": "Scáth follasach agus gan JS HTML",
+        "remaining_static_manual_review": "Athbhreithniú ar ábhar dlíthiúil an ardáin",
+        "auth_only_public_contract_review": "Athbhreithniú conartha poiblí údarás amháin",
+        "private_vite_regression": "Cúlchéimniú Príobháideach Vite",
+        "inertness_guard": "Garda inertness táirgthe"
       },
       "dry_run_blockers": {
-        "manual_verification_required": "Manual verification required",
-        "route_parity_required": "Route parity required",
-        "authoritative_content_source_required": "Authoritative content source required",
-        "public_visibility_decision_required": "Public visibility decision required",
-        "privacy_review_required_before_public_api": "Privacy review required before public API",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+        "manual_verification_required": "Fíorú láimhe ag teastáil",
+        "route_parity_required": "Paireacht bealaigh ag teastáil",
+        "authoritative_content_source_required": "Foinse ábhair údarásach ag teastáil",
+        "public_visibility_decision_required": "Cinneadh infheictheachta poiblí ag teastáil",
+        "privacy_review_required_before_public_api": "Athbhreithniú príobháideachta ag teastáil roimh API poiblí",
+        "explicit_cutover_instruction_required": "Teagasc gearrtha soiléir ag teastáil"
       },
       "dry_run_notes": {
-        "shadow_only": "Shadow only",
-        "no_activation_control": "No activation control",
-        "do_not_promote_auth_only_routes": "Do not promote auth-only routes",
-        "vite_private_routes_remain_primary": "Vite private routes remain primary",
-        "do_not_remove_prerender": "Do not remove prerender fallback"
+        "shadow_only": "Scáth amháin",
+        "no_activation_control": "Gan rialú gníomhachtaithe",
+        "do_not_promote_auth_only_routes": "Ná cuir bealaí údaráis amháin chun cinn",
+        "vite_private_routes_remain_primary": "Is príomhbhealaí fós iad Vite príobháideach",
+        "do_not_remove_prerender": "Ná bain an réamhbhabhta ar ais"
       },
       "artifacts": {
-        "title": "Cutover artifact inventory",
+        "title": "Fardal déantán réitithe",
         "path": "Path",
         "present": "Present",
         "missing": "Missing",
-        "required_commands": "Required commands",
-        "required_before_cutover": "Required before cutover",
-        "activation_available": "Activation controls are available",
-        "no_activation_control": "No activation controls"
+        "required_commands": "Orduithe riachtanacha",
+        "required_before_cutover": "Ag teastáil roimh réitithe",
+        "activation_available": "Tá rialuithe gníomhachtaithe ar fáil",
+        "no_activation_control": "Gan rialuithe gníomhachtaithe"
       },
       "artifact_items": {
-        "route_ownership_manifest": "Route ownership manifest",
-        "content_sources_manifest": "Content sources manifest",
-        "apache_canary_template": "Edge canary template",
-        "shadow_compose_profile": "Shadow Compose profile",
-        "routing_flag_config": "Routing flag config",
-        "prerender_fallback": "Prerender fallback"
+        "route_ownership_manifest": "Léiriú ar úinéireacht bealaigh",
+        "content_sources_manifest": "Léirítear foinsí ábhair",
+        "apache_canary_template": "Teimpléad imeall canáraí",
+        "shadow_compose_profile": "Scáth Cum próifíl",
+        "routing_flag_config": "Cumraíocht bratach ródú",
+        "prerender_fallback": "Cúltaca réamhshocraithe"
       },
       "artifact_categories": {
         "manifest": "Manifest",
-        "edge_config": "Edge config",
+        "edge_config": "Cumraíocht Imeall",
         "runtime": "Runtime",
         "guard": "Guard",
         "fallback": "Fallback"
       },
       "production_effects": {
-        "none": "No production effect"
+        "none": "Gan éifeacht táirgeachta"
       },
       "cutover_eligibility": {
-        "title": "Cutover eligibility",
-        "eligible": "Eligible for cutover",
-        "blocked": "Not eligible for cutover",
+        "title": "Incháilitheacht aisíocaíocht",
+        "eligible": "Incháilithe le haghaidh réitithe",
+        "blocked": "Níl sé incháilithe le haghaidh gearrtha siar",
         "public_routes": "{{count}} public routes",
-        "api_backed_public_routes": "{{count}} API-backed public routes",
-        "remaining_public_routes": "{{count}} remaining public routes",
-        "activation_available": "Activation controls available",
-        "activation_unavailable": "No activation controls",
+        "api_backed_public_routes": "{{count}} Bealaí poiblí a bhfuil tacaíocht API acu",
+        "remaining_public_routes": "{{count}} na bealaí poiblí atá fágtha",
+        "activation_available": "Rialuithe gníomhachtaithe ar fáil",
+        "activation_unavailable": "Gan rialuithe gníomhachtaithe",
         "blockers": "Blockers",
-        "required_actions": "Required actions"
+        "required_actions": "Gníomhartha riachtanacha"
       },
       "cutover_eligibility_blockers": {
-        "manifest_validation_blocked": "Manifest validation is blocked",
-        "remaining_public_route_work": "Remaining public route work is incomplete",
-        "edge_canary_template_audit_blocked": "Edge canary template audit is blocked",
-        "edge_routes_not_configured": "Production edge routes are not configured",
-        "route_parity_required": "Route parity is still required",
-        "routing_flag_enabled_before_cutover": "Routing flag is enabled before cutover",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required"
+        "manifest_validation_blocked": "Tá bac ar bhailíochtú follasach",
+        "remaining_public_route_work": "Níl an obair ar bhealaí poiblí atá fágtha críochnaithe",
+        "edge_canary_template_audit_blocked": "Tá bac ar iniúchadh teimpléad canáraí Edge",
+        "edge_routes_not_configured": "Níl bealaí imeall táirgeachta cumraithe",
+        "route_parity_required": "Tá paireacht bealaigh fós ag teastáil",
+        "routing_flag_enabled_before_cutover": "Tá bratach ródaithe cumasaithe roimh ré",
+        "explicit_cutover_instruction_required": "Teagasc gearrtha soiléir ag teastáil"
       },
       "cutover_eligibility_actions": {
-        "complete_remaining_public_route_work": "Complete remaining public route work",
-        "run_shadow_verification": "Run shadow verification",
-        "prepare_reviewed_edge_config_after_instruction": "Prepare reviewed edge config only after instruction",
-        "keep_prerender_fallback": "Keep prerender fallback"
+        "complete_remaining_public_route_work": "An obair ar bhealaí poiblí atá fágtha a chríochnú",
+        "run_shadow_verification": "Rith fíorú scátha",
+        "prepare_reviewed_edge_config_after_instruction": "Ullmhaigh cumraíocht chiumhais athbhreithnithe ach amháin tar éis an teagaisc",
+        "keep_prerender_fallback": "Coinnigh réamhshocrú ar ais"
       },
       "route_batch_names": {
-        "foundation_public_pages": "Foundation public pages",
-        "api_backed_public_content": "API-backed public content",
-        "vite_private_retained": "Vite private routes retained"
+        "foundation_public_pages": "Fondúireacht leathanaigh phoiblí",
+        "api_backed_public_content": "Ábhar poiblí le tacaíocht API",
+        "vite_private_retained": "Bealaí príobháideacha Vite coinnithe"
       },
       "route_batch_blockers": {
-        "manual_shadow_review_required": "Manual shadow review required",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "public_api_parity_required": "Public API parity required"
+        "manual_shadow_review_required": "Léirmheas scáth láimhe ag teastáil",
+        "explicit_cutover_instruction_required": "Teagasc gearrtha soiléir ag teastáil",
+        "public_api_parity_required": "Tá paireacht API poiblí ag teastáil"
       },
       "route_gate_blockers": {
-        "parity_test_required": "Parity test required"
+        "parity_test_required": "Tástáil paireacht riachtanach"
       },
       "safety_checks": {
-        "route_cutover_disabled": "Public route cutover remains disabled",
-        "prerender_retained": "Current prerender fallback remains retained",
-        "vite_private_routes_retained": "Private Vite route ownership remains retained",
-        "public_edge_not_configured": "No production edge route is configured for Next.js",
+        "route_cutover_disabled": "Tá gearradh bealaigh poiblí díchumasaithe fós",
+        "prerender_retained": "Coinnítear an t-aischur réamhthairisceana reatha",
+        "vite_private_routes_retained": "Tá úinéireacht bhealaigh phríobháideach Vite fós i gcónaí",
+        "public_edge_not_configured": "Níl aon bhealach imeall táirgeachta cumraithe le haghaidh Next.js",
         "apache_canary_template_not_included": "Apache canary template is not included by deploy",
-        "parity_tests_required_before_cutover": "Parity tests are still required before any cutover"
+        "parity_tests_required_before_cutover": "Tá tástálacha paireacht fós ag teastáil roimh aon athrúchán"
       },
       "statuses": {
         "pass": "Pass",
@@ -1479,93 +1479,93 @@
         "blocked": "Blocked"
       },
       "runtime": {
-        "title": "Shadow runtime",
-        "compose_profile": "Compose profile",
-        "dev_command": "Dev command",
-        "build_command": "Build command",
-        "port_env": "Port environment variable"
+        "title": "Am rite scáth",
+        "compose_profile": "Cum próifíl",
+        "dev_command": "Ordú dev",
+        "build_command": "Tóg ordú",
+        "port_env": "Athróg timpeallacht an chalafoirt"
       },
       "cutover": {
-        "title": "Remaining live cutover sequence",
-        "verification_commands": "Verification commands"
+        "title": "Seicheamh gearrtha aistrithe beo atá fágtha",
+        "verification_commands": "Orduithe fíoraithe"
       },
       "cutover_steps": {
-        "verify_next_shadow_build": "Verify the Next.js shadow build and route manifest.",
-        "verify_no_js_public_html": "Run no-JavaScript HTML checks for each public route.",
-        "verify_private_vite_regression": "Build and regression-check the existing Vite private application.",
-        "prepare_apache_canary_routes": "Prepare Apache canary routing for public routes only.",
-        "enable_canary_for_public_routes_only": "Enable a canary route for public pages after explicit approval.",
-        "monitor_and_keep_prerender_fallback": "Monitor responses and keep prerender available as fallback until parity is proven."
+        "verify_next_shadow_build": "Fíoraigh scáthchruth Next.js agus léiriú bealaigh.",
+        "verify_no_js_public_html": "Rith seiceálacha HTML gan JavaScript do gach bealach poiblí.",
+        "verify_private_vite_regression": "Tógáil agus aischéimniú-seiceáil an feidhmchlár príobháideach Vite atá ann cheana féin.",
+        "prepare_apache_canary_routes": "Ullmhaigh ródú canáraí Apache do bhealaí poiblí amháin.",
+        "enable_canary_for_public_routes_only": "Cumasaigh bealach canáraí do leathanaigh phoiblí tar éis ceadú sainráite a fháil.",
+        "monitor_and_keep_prerender_fallback": "Monatóireacht a dhéanamh ar fhreagraí agus coinnigh réamhléiritheoir ar fáil mar chúltaca go dtí go gcruthófar paireacht."
       },
       "counts": {
         "public_routes": "{{count}} public routes",
         "private_prefixes": "{{count}} private prefixes",
-        "private_patterns": "{{count}} private edit/create patterns"
+        "private_patterns": "{{count}} cuir in eagar/cruthaigh patrúin go príobháideach"
       },
       "validation": {
-        "title": "Manifest validation",
-        "passed": "Manifest validation passed",
-        "blocked": "Manifest validation blocked",
-        "lockfile": "Lockfile pinned",
-        "package_scripts": "Package scripts present",
-        "compose_profile": "Shadow Compose profile present"
+        "title": "Bailíochtú follasach",
+        "passed": "Bailíochtú follasach a rith",
+        "blocked": "Bailíochtú Manifest bactha",
+        "lockfile": "Lockfile pinn",
+        "package_scripts": "Scripteanna pacáiste i láthair",
+        "compose_profile": "Scáth Compose próifíl i láthair"
       },
       "validation_issues": {
-        "manifest_missing": "Route ownership manifest is missing.",
-        "manifest_not_shadow": "Route ownership manifest is not in shadow mode.",
-        "public_route_invalid": "A public route entry is malformed.",
-        "public_route_missing_fields": "A public route is missing required fields.",
-        "public_route_duplicate_pattern": "A public route pattern is duplicated.",
-        "public_route_duplicate_key": "A public route key is duplicated.",
-        "public_route_collides_with_private_prefix": "A public route collides with a private Vite route prefix.",
-        "public_route_collides_with_private_pattern": "A public route collides with a private Vite route pattern.",
-        "vite_private_prefix_missing_required": "Required Vite private route prefix is missing.",
-        "vite_private_pattern_missing_required": "Required Vite private route pattern is missing.",
-        "content_sources_not_laravel_api": "Content sources must use Laravel public APIs.",
-        "content_sources_allow_next_database_queries": "Next.js content sources must not query the database.",
-        "api_backed_route_invalid": "An API-backed route entry is malformed.",
-        "api_backed_route_missing_fields": "An API-backed route is missing required fields.",
-        "api_backed_route_duplicate_key": "An API-backed route key is duplicated.",
-        "api_backed_route_not_in_manifest": "An API-backed route is missing from the public route manifest.",
-        "api_backed_route_not_get": "API-backed public routes must use GET.",
-        "api_backed_route_not_laravel_v2_endpoint": "API-backed routes must use relative Laravel v2 endpoints.",
-        "api_backed_route_private_endpoint": "API-backed public routes must not use private Laravel v2 namespaces.",
-        "api_backed_route_endpoint_not_plain_path": "API-backed route endpoints must be plain paths without query strings or fragments.",
-        "api_backed_route_endpoint_has_path_traversal": "API-backed route endpoints must not contain path traversal segments.",
-        "api_backed_route_param_mismatch": "API endpoint parameters must match the public route pattern.",
-        "api_backed_route_not_registered": "API-backed route endpoint is not registered in Laravel.",
-        "api_backed_route_requires_auth": "API-backed route endpoint requires authentication."
+        "manifest_missing": "Tá léiriú úinéireachta bealaigh in easnamh.",
+        "manifest_not_shadow": "Níl léiriú úinéireachta bealaigh i mód scátha.",
+        "public_route_invalid": "Tá bealach isteach poiblí míchumtha.",
+        "public_route_missing_fields": "Tá réimsí riachtanacha in easnamh ar bhealach poiblí.",
+        "public_route_duplicate_pattern": "Déantar patrún bealaí poiblí a mhacasamhlú.",
+        "public_route_duplicate_key": "Déantar eochair bhealaigh phoiblí a mhacasamhlú.",
+        "public_route_collides_with_private_prefix": "Imbhuaileann bealach poiblí le réimír bhealaigh Vite príobháideach.",
+        "public_route_collides_with_private_pattern": "Imbhuaileann bealach poiblí patrún bealaigh Vite príobháideach.",
+        "vite_private_prefix_missing_required": "Tá réimír bealaigh phríobháideach Vite riachtanach in easnamh.",
+        "vite_private_pattern_missing_required": "Tá patrún bealaigh phríobháideach riachtanach Vite in easnamh.",
+        "content_sources_not_laravel_api": "Ní mór d’fhoinsí ábhair API poiblí Laravel a úsáid.",
+        "content_sources_allow_next_database_queries": "Ní ceadmhach d’fhoinsí ábhair Next.js an bunachar sonraí a cheistiú.",
+        "api_backed_route_invalid": "Tá bealach isteach le tacaíocht API míchumtha.",
+        "api_backed_route_missing_fields": "Tá réimsí riachtanacha in easnamh ar bhealach a bhfuil tacaíocht API aige.",
+        "api_backed_route_duplicate_key": "Déantar eochair bealaigh le tacaíocht API a dhúbailt.",
+        "api_backed_route_not_in_manifest": "Tá bealach a bhfuil tacaíocht API aige in easnamh ó léiriú an bhealaigh phoiblí.",
+        "api_backed_route_not_get": "Caithfidh bealaí poiblí le tacaíocht API GET a úsáid.",
+        "api_backed_route_not_laravel_v2_endpoint": "Ní mór do bhealaí le tacaíocht API críochphointí coibhneasta Laravel v2 a úsáid.",
+        "api_backed_route_private_endpoint": "Ní ceadmhach do bhealaí poiblí a fhaigheann tacaíocht API spásanna ainmneacha príobháideacha Laravel v2 a úsáid.",
+        "api_backed_route_endpoint_not_plain_path": "Caithfidh críochphointí bealaigh a bhfuil tacaíocht API acu a bheith ina ngnáthchonairí gan teaghráin nó blúirí fiosrúcháin.",
+        "api_backed_route_endpoint_has_path_traversal": "Níor cheart go mbeadh deighleoga trasnaithe cosáin i gcríochphointí le tacaíocht API.",
+        "api_backed_route_param_mismatch": "Ní mór do pharaiméadair chríochphointe API an patrún bealaigh phoiblí a mheaitseáil.",
+        "api_backed_route_not_registered": "Níl críochphointe bealaigh le tacaíocht API cláraithe in Laravel.",
+        "api_backed_route_requires_auth": "Tá fíordheimhniú ag teastáil ó chríochphointe bealaigh le tacaíocht API."
       },
       "cutover_gate_blockers": {
-        "manual_verification_required": "Manual verification required",
-        "route_parity_required": "Route parity required",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "edge_routes_not_configured": "Production edge routes are not configured",
-        "cutover_not_active": "Cutover is not active",
-        "prerender_fallback_must_remain": "Prerender fallback must remain available"
+        "manual_verification_required": "Fíorú láimhe ag teastáil",
+        "route_parity_required": "Paireacht bealaigh ag teastáil",
+        "explicit_cutover_instruction_required": "Teagasc gearrtha soiléir ag teastáil",
+        "edge_routes_not_configured": "Níl bealaí imeall táirgeachta cumraithe",
+        "cutover_not_active": "Níl an réiteoireacht gníomhach",
+        "prerender_fallback_must_remain": "Ní mór go bhfanfadh cúltaca réamhreora ar fáil"
       },
       "playbook": {
-        "title": "Operator playbook",
-        "activation_available": "Activation controls are available",
-        "no_activation_control": "No activation controls are available on this page.",
-        "explicit_instruction_required": "Separate cutover instruction required",
-        "no_production_effect": "No production routing change"
+        "title": "Leabhar cluiche oibreoir",
+        "activation_available": "Tá rialuithe gníomhachtaithe ar fáil",
+        "no_activation_control": "Níl aon rialuithe gníomhachtaithe ar fáil ar an leathanach seo.",
+        "explicit_instruction_required": "Teagasc gearrtha ar leith ag teastáil",
+        "no_production_effect": "Gan aon athrú ar ródú táirgeachta"
       },
       "playbook_stages": {
-        "verify_shadow_module": "Verify the shadow module locally.",
-        "prepare_reviewed_edge_config": "Prepare Apache canary routing as a reviewed config-only change.",
-        "run_private_route_regression": "Re-check the existing Vite private application.",
-        "canary_public_routes_only": "Canary public routes only after approval.",
-        "monitor_with_prerender_fallback": "Monitor live responses while preserving fallback."
+        "verify_shadow_module": "Fíoraigh an modúl scáth go háitiúil.",
+        "prepare_reviewed_edge_config": "Ullmhaigh ródú canáraí Apache mar athrú athbhreithnithe cumraíochta amháin.",
+        "run_private_route_regression": "Seiceáil an feidhmchlár príobháideach Vite atá ann cheana féin.",
+        "canary_public_routes_only": "Bealaí poiblí Chanáracha ach amháin tar éis formheasa.",
+        "monitor_with_prerender_fallback": "Monatóireacht a dhéanamh ar fhreagraí beo agus cúltaca a chaomhnú."
       },
       "playbook_notes": {
-        "shadow_only": "Shadow only",
-        "no_activation_control": "No activation control",
-        "explicit_cutover_instruction_required": "Explicit cutover instruction required",
-        "vite_private_routes_remain_primary": "Vite private routes remain primary",
-        "public_routes_only": "Public routes only",
-        "do_not_remove_prerender": "Do not remove prerender fallback.",
-        "rollback_path_required": "Rollback path required"
+        "shadow_only": "Scáth amháin",
+        "no_activation_control": "Gan rialú gníomhachtaithe",
+        "explicit_cutover_instruction_required": "Teagasc gearrtha soiléir ag teastáil",
+        "vite_private_routes_remain_primary": "Is príomhbhealaí fós iad Vite príobháideach",
+        "public_routes_only": "Bealaí poiblí amháin",
+        "do_not_remove_prerender": "Ná bain an réamhbhabhta ar ais.",
+        "rollback_path_required": "Tá gá le cosán aisfhillte"
       }
     }
   },

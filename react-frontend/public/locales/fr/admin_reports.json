@@ -67,7 +67,7 @@
     "recent_activity": "Activité récente",
     "refresh": "Rafraîchir",
     "search": "Recherche...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Sélectionner toutes les lignes",
     "select_row": "Select row {{id}}",
     "data_table": "Données",
     "total_count": "{{count}}total"
@@ -272,11 +272,11 @@
     "tab_by_category": "Par catégorie",
     "tab_by_member": "Par membre",
     "tab_monthly_trend": "Tendance mensuelle",
-    "hours_tabs_aria": "Hours report view",
-    "members_tabs_aria": "Member report type",
-    "hours_by_category_aria": "Bar chart showing hours exchanged by category",
-    "hours_distribution_aria": "Pie chart showing distribution of time exchange hours",
-    "hours_trend_aria": "Area chart showing hours exchanged over time"
+    "hours_tabs_aria": "Vue du rapport sur les heures",
+    "members_tabs_aria": "Type de rapport de membre",
+    "hours_by_category_aria": "Graphique à barres montrant les heures échangées par catégorie",
+    "hours_distribution_aria": "Diagramme circulaire montrant la répartition des heures d'échange de temps",
+    "hours_trend_aria": "Graphique en aires montrant les heures échangées au fil du temps"
   },
   "municipal_reports": {
     "meta": {
@@ -434,7 +434,7 @@
         "cooperative": "Coopérative",
         "foundation": "Fondation"
       },
-      "delete_confirm": "Delete template \"{{name}}\"? This cannot be undone."
+      "delete_confirm": "Supprimer le modèle « {{name}} » ? Cela ne peut pas être annulé."
     },
     "narrative": {
       "in_export": "À l'export",

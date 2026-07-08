@@ -121,7 +121,7 @@
     "counter": "Contre-offre",
     "withdraw": "Retirer",
     "accept_counter": "Accepter la contre-offre",
-    "pay_accepted": "Pay accepted offer"
+    "pay_accepted": "Payer l'offre acceptée"
   },
   "create": {
     "page_title": "Vendre quelque chose - Marché",
@@ -446,7 +446,7 @@
     "counter_message_placeholder": "Expliquez votre contre-offre...",
     "counter_sent_success": "Contre-offre envoyée",
     "send_counter": "Envoyer la contre-offre",
-    "checkout_started_success": "Checkout started for your accepted offer."
+    "checkout_started_success": "Le paiement a commencé pour votre offre acceptée."
   },
   "collections": {
     "page_title": "Mes Collections",
@@ -597,7 +597,7 @@
     "left": "disponibles",
     "slot_fallback": "Créneau #{{id}}",
     "status_unknown": "Inconnu",
-    "reservation_failed": "Could not reserve that pickup slot. Please choose another slot."
+    "reservation_failed": "Impossible de réserver ce créneau de prise en charge. Veuillez choisir un autre emplacement."
   },
   "inventory": {
     "section_title": "Inventaire",
@@ -647,9 +647,9 @@
   "shipping": {
     "title": "Options d'expédition",
     "page_title": "Shipping Options",
-    "page_subtitle": "Set the delivery services buyers can choose at checkout.",
-    "back_to_listings": "Back to My Listings",
-    "manage_cta": "Shipping settings",
+    "page_subtitle": "Définissez les services de livraison que les acheteurs peuvent choisir lors du paiement.",
+    "back_to_listings": "Retour à Mes Annonces",
+    "manage_cta": "Paramètres d'expédition",
     "add_option": "Ajouter une option d'expédition",
     "courier_name": "Nom du transporteur",
     "courier_name_placeholder": "par ex. An Post, Royal Mail, DHL",
@@ -681,7 +681,7 @@
     "loading": "Chargement des options d'expédition...",
     "no_options": "Aucune option d'expédition disponible pour ce vendeur.",
     "delete_confirm": "Supprimer cette option d'expédition ? Cela ne peut pas être annulé.",
-    "choose_required": "Choose a delivery method before checkout."
+    "choose_required": "Choisissez un mode de livraison avant de finaliser votre commande."
   },
   "listing_location": {
     "location_title": "Localisation",

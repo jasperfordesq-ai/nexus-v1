@@ -67,7 +67,7 @@
     "recent_activity": "最近の活動",
     "refresh": "リフレッシュ",
     "search": "検索...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "すべての行を選択",
     "select_row": "Select row {{id}}",
     "data_table": "データ",
     "total_count": "{{count}}合計"
@@ -455,7 +455,7 @@
     "winning_metric": "勝利の指標",
     "resend_queued_count": "キューに登録された{{count}}の再送信",
     "resend_queued_count_plural": "キューに登録された{{count}}が再送信されます",
-    "template_tabs_aria": "Newsletter template category filter"
+    "template_tabs_aria": "ニュースレター テンプレート カテゴリ フィルター"
   },
   "newsletter_form": {
     "ab_test_label": "腹筋テスト",
@@ -642,14 +642,14 @@
       "hero_desc": "見出し付きのバナー画像",
       "html_label": "HTML",
       "html_desc": "独自のカスタム HTML を貼り付けます",
+      "wrapper_label": "ラッパー",
       "wrapper_desc": "背景を共有してセクションをグループ化する",
       "navbar_label": "ナビゲーションバー",
       "navbar_desc": "メニューリンクの行",
       "social_icon_label": "ソーシャルアイコン",
       "social_icon_desc": "単一のソーシャル ネットワーク アイコン",
       "nav_link_label": "ナビゲーションリンク",
-      "nav_link_desc": "単一のメニューリンク",
-      "wrapper_label": "ラッパー"
+      "nav_link_desc": "単一のメニューリンク"
     }
   },
   "newsletter_content_editor": {

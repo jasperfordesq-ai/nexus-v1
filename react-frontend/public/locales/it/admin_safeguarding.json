@@ -67,7 +67,7 @@
     "recent_activity": "Attività recente",
     "refresh": "Aggiorna",
     "search": "Ricerca...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Seleziona tutte le righe",
     "select_row": "Select row {{id}}",
     "data_table": "Dati",
     "total_count": "{{count}}totale"
@@ -370,6 +370,6 @@
     "vetting_international": "Controllo internazionale",
     "vetting_other": "Controllo Altro",
     "vetting_pvg_scotland": "Controllo Pvg Scozia",
-    "tabs_aria": "Safeguarding sections"
+    "tabs_aria": "Sezioni di salvaguardia"
   }
 }

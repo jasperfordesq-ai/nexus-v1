@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -106,6 +106,6 @@
     "type_listing": "Lijst",
     "type_resource": "Bron",
     "type_vol_opportunity": "Vol kansen",
-    "tabs_aria": "Category type filter"
+    "tabs_aria": "Filter voor categorietype"
   }
 }

@@ -67,7 +67,7 @@
     "recent_activity": "Recente activiteit",
     "refresh": "Vernieuwen",
     "search": "Zoekopdracht...",
-    "select_all_rows": "Select all rows",
+    "select_all_rows": "Selecteer alle rijen",
     "select_row": "Select row {{id}}",
     "data_table": "Gegevens",
     "total_count": "{{count}}totaal"
@@ -289,7 +289,7 @@
     "load_error": "Kan de moderatiewachtrij niet laden.",
     "pagination_label": "Paginering van wachtrijen voor moderatie",
     "user_fallback": "Onbekende gebruiker",
-    "rating_aria": "{{n}} out of 5 stars"
+    "rating_aria": "{{n}} van 5 sterren"
   },
   "something_wrong": "Er is iets misgegaan. Probeer het opnieuw."
 }

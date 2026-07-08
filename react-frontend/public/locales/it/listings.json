@@ -246,8 +246,8 @@
     "label": "Tag Competenze",
     "placeholder": "Digita una competenza e premi Invio...",
     "aria_add": "Aggiungi tag competenza",
-    "aria_add_count": "Add skill tag ({{current}} of {{max}})",
-    "aria_results": "{{count}} skill suggestions available"
+    "aria_add_count": "Aggiungi tag abilità ({{current}} di {{max}})",
+    "aria_results": "{{count}} suggerimenti di abilità disponibili"
   },
   "more_filters": "Altri filtri",
   "filters_label": "Filtri",
