@@ -1970,6 +1970,14 @@ class VolunteerService
             return false;
         }
 
+        // Hard-freeze: a suspended (non-approved) org cannot mint new time
+        // credits. Declining pending hours stays allowed (no value movement) so
+        // admins can still clear the queue during suspension.
+        if ($action === 'approve' && !self::isApprovedOrganizationStatus($org->status ?? null)) {
+            self::$errors[] = ['code' => 'ORG_NOT_ACTIVE', 'message' => __('api.volunteer_org_not_active')];
+            return false;
+        }
+
         $status = $action === 'approve' ? 'approved' : self::getDeclineStatusValue();
 
         try {

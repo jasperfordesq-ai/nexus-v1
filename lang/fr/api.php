@@ -1485,6 +1485,7 @@ return [
     'vol_dlp_assign_failed' => 'Unable to assign the DLP for this organisation',
     'volunteer_organization_required' => 'Organisation is required',
     'volunteer_org_manage_forbidden' => 'You do not have permission to manage this organisation',
+    'volunteer_org_not_active' => 'Cette organisation n\'est pas active et ne peut pas accepter de nouvelles heures ou de nouveaux dépôts.',
     'volunteer_opportunity_not_active' => 'Opportunity not found or is not active',
     'volunteer_cannot_apply_own' => 'You cannot apply to your own opportunity',
     'volunteer_shift_not_found' => 'Shift not found',

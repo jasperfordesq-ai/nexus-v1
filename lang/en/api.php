@@ -1649,6 +1649,7 @@ return [
     'organization_not_found'               => 'Organization not found',
     'volunteer_organization_required'      => 'Organisation is required',
     'volunteer_org_manage_forbidden'       => 'You do not have permission to manage this organisation',
+    'volunteer_org_not_active' => 'This organisation is not active and cannot accept new hours or deposits.',
     'volunteer_opportunity_not_active'     => 'Opportunity not found or is not active',
     'volunteer_cannot_apply_own'           => 'You cannot apply to your own opportunity',
     'volunteer_shift_not_found'            => 'Shift not found',

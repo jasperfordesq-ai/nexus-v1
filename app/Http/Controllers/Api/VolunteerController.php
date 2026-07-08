@@ -848,6 +848,12 @@ class VolunteerController extends BaseApiController
         $org = $this->ensureOrgAccess((int) $id);
         if (!$org) return $this->respondWithError('FORBIDDEN', __('api_controllers_2.volunteer.access_denied'), null, 403);
 
+        // Hard-freeze: a suspended (non-approved) org cannot take on new value
+        // movements — block deposits until it is active again.
+        if (!VolunteerService::isApprovedOrganizationStatus($org->status ?? null)) {
+            return $this->respondWithError('ORG_NOT_ACTIVE', __('api.volunteer_org_not_active'), null, 403);
+        }
+
         $amount = (float) $this->input('amount', 0);
         $note = trim((string) $this->input('note', ''));
 

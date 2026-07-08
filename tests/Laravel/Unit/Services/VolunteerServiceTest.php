@@ -286,6 +286,53 @@ class VolunteerServiceTest extends TestCase
         ]);
     }
 
+    public function test_verifyHours_approve_blocked_for_suspended_org_and_mints_nothing(): void
+    {
+        // Regression (audit L10, hard-freeze): a suspended org must not mint new
+        // time credits. Approving hours is rejected; declining is still allowed.
+        $admin = User::factory()->forTenant(2)->create(['balance' => 0]);
+        $volunteer = User::factory()->forTenant(2)->create(['balance' => 0]);
+
+        $orgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => 2,
+            'user_id' => $admin->id,
+            'name' => 'Suspended Org ' . uniqid(),
+            'slug' => 'suspended-org-' . uniqid(),
+            'description' => 'A suspended volunteer organisation for freeze coverage.',
+            'contact_email' => 'suspended@example.test',
+            'status' => 'suspended',
+            'created_at' => now(),
+        ]);
+
+        $makeLog = function () use ($volunteer, $orgId) {
+            return (int) DB::table('vol_logs')->insertGetId([
+                'tenant_id' => 2,
+                'user_id' => $volunteer->id,
+                'organization_id' => $orgId,
+                'date_logged' => now()->subDay()->toDateString(),
+                'hours' => 2.0,
+                'description' => 'Shift',
+                'status' => 'pending',
+                'created_at' => now(),
+            ]);
+        };
+
+        $approveLogId = $makeLog();
+        $declineLogId = $makeLog();
+
+        TenantContext::setById(2);
+
+        // Approve is blocked, nothing minted.
+        $this->assertFalse(VolunteerService::verifyHours($approveLogId, $admin->id, 'approve'));
+        $this->assertSame('ORG_NOT_ACTIVE', VolunteerService::getErrors()[0]['code'] ?? null);
+        $this->assertEquals(0, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
+        $this->assertSame('pending', DB::table('vol_logs')->where('id', $approveLogId)->value('status'));
+
+        // Decline is still allowed (no value movement).
+        $this->assertTrue(VolunteerService::verifyHours($declineLogId, $admin->id, 'decline'));
+        $this->assertNotSame('pending', DB::table('vol_logs')->where('id', $declineLogId)->value('status'));
+    }
+
     public function test_createOrganization_rejects_non_http_website_scheme(): void
     {
         // Regression (audit M5): the website renders as a public <a href>, so a
