@@ -60,7 +60,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import type { User as UserType, Listing, Review } from '@/types/api';
 
 type ConnectionStatus = 'none' | 'pending_sent' | 'pending_received' | 'connected';
@@ -1084,7 +1084,11 @@ export function ProfilePage() {
                         <GlassCard className="hover:scale-[1.02] transition-transform h-full flex flex-col overflow-hidden cursor-pointer">
                           {listing.image_url && (
                             <img
-                              src={resolveThumbnailUrl(listing.image_url, { width: 640, height: 360 })}
+                              {...responsiveThumbnailProps(listing.image_url, {
+                                width: 640,
+                                height: 360,
+                                sizes: '(min-width: 1024px) 360px, (min-width: 640px) 45vw, 92vw',
+                              })}
                               alt={listing.title || t('listing_image_alt')}
                               className="w-full h-32 object-cover"
                               loading="lazy"

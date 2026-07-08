@@ -34,6 +34,7 @@ import Plus from 'lucide-react/icons/plus';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { responsiveThumbnailProps } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable, type Column } from '../../components/DataTable';
 import { StatCard } from '../../components/StatCard';
@@ -675,9 +676,16 @@ export function AdCampaignAdminPage() {
                               )}
                               {creative.image_url && (
                                 <img
-                                  src={creative.image_url}
+                                  {...responsiveThumbnailProps(creative.image_url, {
+                                    width: 360,
+                                    height: 180,
+                                    fit: 'contain',
+                                    sizes: '(min-width: 1024px) 360px, 92vw',
+                                  })}
                                   alt={t('advertising.ad.creative_alt')}
                                   className="mt-2 max-h-32 rounded object-contain"
+                                  loading="lazy"
+                                  decoding="async"
                                 />
                               )}
                             </div>

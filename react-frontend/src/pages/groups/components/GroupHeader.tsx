@@ -25,7 +25,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import Megaphone from 'lucide-react/icons/megaphone';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { LocationMapCard } from '@/components/location/LocationMapCard';
-import { resolveAvatarUrl, resolveThumbnailUrl, formatDateValue, formatRelativeTime } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps, formatDateValue, formatRelativeTime } from '@/lib/helpers';
 import type { Group } from '@/types/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -104,8 +104,12 @@ export function GroupHeader({
   const { t } = useTranslation('groups');
   const createdDateLabel = formatDateValue(group.created_at);
   const coverImage = group.cover_image_url || group.cover_image || null;
-  const coverImageUrl = coverImage
-    ? resolveThumbnailUrl(coverImage, { width: 1200, height: 360 })
+  const coverImageProps = coverImage
+    ? responsiveThumbnailProps(coverImage, {
+        width: 1200,
+        height: 360,
+        sizes: '(min-width: 1024px) 960px, 100vw',
+      })
     : null;
   const avatarImage = resolveAvatarUrl(group.image_url);
   const visibilityLabel = group.visibility === 'private' || group.visibility === 'secret'
@@ -118,9 +122,9 @@ export function GroupHeader({
   return (
     <GlassCard className="overflow-hidden">
       <div className="relative min-h-32 bg-gradient-to-br from-[var(--color-primary)]/18 via-[var(--surface-elevated)] to-[var(--color-secondary)]/16">
-        {coverImageUrl && (
+        {coverImageProps && (
           <img
-            src={coverImageUrl}
+            {...coverImageProps}
             alt={t('detail.cover_image_alt', { name: group.name })}
             className="absolute inset-0 h-full w-full object-cover"
             loading="lazy"

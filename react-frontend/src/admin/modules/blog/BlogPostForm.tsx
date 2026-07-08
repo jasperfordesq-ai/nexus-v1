@@ -31,7 +31,7 @@ import { PageHeader } from '../../components/PageHeader';
 import type { AdminBlogPost, AdminCategory } from '../../api/types';
 import { useTranslation } from 'react-i18next';
 import { resolveUploadedUrl } from '../../components/builderImage';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveAssetUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
@@ -119,6 +119,13 @@ export function BlogPostForm() {
   const featuredImagePreview = featuredImage.trim() && !imagePreviewError
     ? resolveAssetUrl(featuredImage.trim())
     : '';
+  const featuredImagePreviewProps = featuredImagePreview
+    ? responsiveThumbnailProps(featuredImage.trim(), {
+        width: 960,
+        height: 520,
+        sizes: '(min-width: 1024px) 640px, 92vw',
+      })
+    : null;
 
   // Dynamic page title
   usePageTitle(isEdit && post
@@ -510,12 +517,14 @@ export function BlogPostForm() {
                 }}
                 onDrop={handleFeaturedImageDrop}
               >
-                {featuredImagePreview ? (
+                {featuredImagePreviewProps ? (
                   <div className="relative">
                     <img
-                      src={featuredImagePreview}
+                      {...featuredImagePreviewProps}
                       alt={t('blog.featured_image_preview_alt')}
                       className="h-52 w-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                       onError={() => setImagePreviewError(true)}
                     />
                     {uploadingImage && (

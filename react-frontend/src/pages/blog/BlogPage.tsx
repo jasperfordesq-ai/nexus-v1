@@ -33,7 +33,7 @@ import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 
@@ -350,8 +350,12 @@ interface PostCardProps {
 function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
   const { t } = useTranslation('blog');
   const { tenantPath } = useTenant();
-  const imageUrl = post.featured_image
-    ? resolveThumbnailUrl(post.featured_image, { width: 720, height: 420 })
+  const imageProps = post.featured_image
+    ? responsiveThumbnailProps(post.featured_image, {
+        width: 720,
+        height: 420,
+        sizes: '(min-width: 768px) 44vw, 92vw',
+      })
     : null;
 
   return (
@@ -360,9 +364,9 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
         <div className="flex flex-col md:flex-row">
           {/* Image */}
           <div className="md:w-1/2 h-48 md:h-72 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 flex items-center justify-center overflow-hidden">
-            {imageUrl ? (
+            {imageProps ? (
               <img
-                src={imageUrl}
+                {...imageProps}
                 alt={post.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
@@ -417,8 +421,12 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
 function BlogPostCard({ post, categoryColors }: PostCardProps) {
   const { t } = useTranslation('blog');
   const { tenantPath } = useTenant();
-  const imageUrl = post.featured_image
-    ? resolveThumbnailUrl(post.featured_image, { width: 420, height: 260 })
+  const imageProps = post.featured_image
+    ? responsiveThumbnailProps(post.featured_image, {
+        width: 420,
+        height: 260,
+        sizes: '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw',
+      })
     : null;
 
   return (
@@ -426,9 +434,9 @@ function BlogPostCard({ post, categoryColors }: PostCardProps) {
       <GlassCard className="overflow-hidden h-full flex flex-col">
         {/* Image */}
         <div className="h-48 bg-gradient-to-br from-blue-500/10 to-indigo-600/10 flex items-center justify-center overflow-hidden">
-          {imageUrl ? (
+          {imageProps ? (
             <img
-              src={imageUrl}
+              {...imageProps}
               alt={post.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"

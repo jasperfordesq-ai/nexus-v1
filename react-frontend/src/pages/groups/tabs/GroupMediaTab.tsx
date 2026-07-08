@@ -29,7 +29,7 @@ import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { formatRelativeTime, resolveThumbnailUrl } from '@/lib/helpers';
+import { formatRelativeTime, resolveThumbnailUrl, responsiveThumbnailProps } from '@/lib/helpers';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -331,7 +331,11 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                   <div className="w-full h-full bg-surface-secondary flex items-center justify-center">
                     {item.thumbnail_url ? (
                       <img
-                        src={resolveThumbnailUrl(item.thumbnail_url, { width: 640, height: 640 })}
+                        {...responsiveThumbnailProps(item.thumbnail_url, {
+                          width: 640,
+                          height: 640,
+                          sizes: '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw',
+                        })}
                         alt={item.caption || t('media.video_thumbnail')}
                         className="w-full h-full object-cover"
                       />
@@ -346,7 +350,11 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                   </div>
                 ) : (
                   <img
-                    src={resolveThumbnailUrl(item.thumbnail_url || item.url, { width: 640, height: 640 })}
+                    {...responsiveThumbnailProps(item.thumbnail_url || item.url, {
+                      width: 640,
+                      height: 640,
+                      sizes: '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw',
+                    })}
                     alt={item.caption || t('media.photo_alt')}
                     className="w-full h-full object-cover"
                   />

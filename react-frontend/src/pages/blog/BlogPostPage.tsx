@@ -35,7 +35,7 @@ import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl, resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAssetUrl, resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -234,8 +234,12 @@ export function BlogPostPage() {
     );
   }
 
-  const imageUrl = post.featured_image
-    ? resolveThumbnailUrl(post.featured_image, { width: 1200, height: 675 })
+  const imageProps = post.featured_image
+    ? responsiveThumbnailProps(post.featured_image, {
+        width: 1200,
+        height: 675,
+        sizes: '(min-width: 768px) 768px, 100vw',
+      })
     : null;
   const canonicalUrl = post.canonical_url
     ? new URL(post.canonical_url, window.location.origin).href
@@ -279,14 +283,14 @@ export function BlogPostPage() {
         ]} />
 
         {/* Featured Image */}
-        {imageUrl && (
+        {imageProps && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-2xl overflow-hidden"
           >
             <img
-              src={imageUrl}
+              {...imageProps}
               alt={post.title}
               className="w-full max-h-48 sm:max-h-96 object-cover"
               loading="lazy"

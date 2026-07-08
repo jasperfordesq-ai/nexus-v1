@@ -45,7 +45,7 @@ import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import type { FederatedEvent, FederationPartner } from '@/types/api';
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -368,8 +368,12 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
   const startDate = new Date(event.start_date);
   const isPast = startDate < new Date();
   const avatarSrc = resolveAvatarUrl(event.organizer?.avatar);
-  const coverSrc = event.cover_image
-    ? resolveThumbnailUrl(event.cover_image, { width: 240, height: 240 })
+  const coverProps = event.cover_image
+    ? responsiveThumbnailProps(event.cover_image, {
+        width: 240,
+        height: 240,
+        sizes: '(min-width: 640px) 96px, 80px',
+      })
     : null;
 
   const formattedDate = startDate.toLocaleDateString(undefined, {
@@ -387,10 +391,10 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
       <GlassCard className={`p-5 hover:scale-[1.01] transition-transform ${isPast ? 'opacity-60' : ''}`}>
         <div className="flex gap-3 sm:gap-4">
           {/* Cover Image or Date Box */}
-          {coverSrc ? (
+          {coverProps ? (
             <div className="flex-shrink-0 w-20 sm:w-24 h-20 sm:h-24 rounded-lg overflow-hidden bg-theme-hover">
               <img
-                src={coverSrc}
+                {...coverProps}
                 alt={event.title}
                 className="w-full h-full object-cover"
                 loading="lazy"

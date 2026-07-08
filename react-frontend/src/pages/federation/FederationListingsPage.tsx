@@ -48,7 +48,7 @@ import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import type { FederatedListing, FederationPartner } from '@/types/api';
 
 type ListingTypeFilter = 'all' | 'offer' | 'request';
@@ -454,8 +454,12 @@ export function FederationListingsPage() {
             const isOffer = selectedListing.type === 'offer';
             const isExternal = !!selectedListing.is_external;
             const authorAvatar = resolveAvatarUrl(selectedListing.author?.avatar);
-            const listingImage = selectedListing.image_url
-              ? resolveThumbnailUrl(selectedListing.image_url, { width: 960, height: 540 })
+            const listingImageProps = selectedListing.image_url
+              ? responsiveThumbnailProps(selectedListing.image_url, {
+                  width: 960,
+                  height: 540,
+                  sizes: '(min-width: 768px) 672px, 92vw',
+                })
               : null;
             const authorName = selectedListing.author?.name || t('listings.anonymous_user');
             const canNavigateToProfile = !isExternal && selectedListing.author?.id;
@@ -511,10 +515,10 @@ export function FederationListingsPage() {
                 <ModalBody>
                   <div className="space-y-4">
                     {/* Listing image */}
-                    {listingImage && (
+                    {listingImageProps && (
                       <div className="w-full h-48 rounded-lg overflow-hidden bg-theme-hover">
                         <img
-                          src={listingImage}
+                          {...listingImageProps}
                           alt={selectedListing.title}
                           className="w-full h-full object-cover"
                           loading="lazy"
@@ -656,8 +660,12 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
   const { t } = useTranslation('federation');
   const isOffer = listing.type === 'offer';
   const avatarSrc = resolveAvatarUrl(listing.author?.avatar);
-  const imageSrc = listing.image_url
-    ? resolveThumbnailUrl(listing.image_url, { width: 640, height: 360 })
+  const imageProps = listing.image_url
+    ? responsiveThumbnailProps(listing.image_url, {
+        width: 640,
+        height: 360,
+        sizes: '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw',
+      })
     : null;
 
   return (
@@ -666,10 +674,10 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
       onClick={onViewDetails}
     >
       {/* Image or Type Icon */}
-      {imageSrc ? (
+      {imageProps ? (
         <div className="w-full h-36 rounded-lg overflow-hidden mb-3 bg-theme-hover">
           <img
-            src={imageSrc}
+            {...imageProps}
             alt={listing.title}
             className="w-full h-full object-cover"
             loading="lazy"

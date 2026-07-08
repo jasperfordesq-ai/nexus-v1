@@ -43,7 +43,7 @@ import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { formatDateTime, formatDateValue, formatMonthShort, resolveThumbnailUrl } from '@/lib/helpers';
+import { formatDateTime, formatDateValue, formatMonthShort, responsiveThumbnailProps } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import type { ProximityFilterParams } from '@/components/proximity/ProximityFilter';
@@ -526,8 +526,12 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
   const monthLabel = formatMonthShort(startDate, true);
   const weekdayLabel = formatDateValue(startDate, { weekday: 'short' });
   const timeLabel = formatDateTime(startDate, { hour: '2-digit', minute: '2-digit' });
-  const coverImage = event.cover_image
-    ? resolveThumbnailUrl(event.cover_image, { width: 360, height: 220 })
+  const coverImageProps = event.cover_image
+    ? responsiveThumbnailProps(event.cover_image, {
+        width: 360,
+        height: 220,
+        sizes: '(min-width: 640px) 112px, 92vw',
+      })
     : null;
   const freq = event.recurrence_frequency;
   const repeatsLabel = freq && ['daily', 'weekly', 'monthly', 'yearly'].includes(freq)
@@ -539,9 +543,9 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
     <Link to={tenantPath(`/events/${event.id}`)} aria-label={t('card.open_aria', { title: event.title, date: eventDateLabel })}>
       <article>
         <GlassCard className={`overflow-hidden hover:border-accent/40 hover:shadow-lg transition ${isPast || isCancelled ? 'opacity-65' : ''}`}>
-          {coverImage && (
+          {coverImageProps && (
             <img
-              src={coverImage}
+              {...coverImageProps}
               alt={t('detail.cover_alt', { title: event.title })}
               className="h-36 w-full object-cover sm:hidden"
               loading="lazy"
@@ -578,9 +582,9 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                   </div>
                   <SafeHtml content={event.description} className="text-theme-muted text-sm line-clamp-2 mt-1" as="p" />
                 </div>
-                {coverImage && (
+                {coverImageProps && (
                   <img
-                    src={coverImage}
+                    {...coverImageProps}
                     alt={t('detail.cover_alt', { title: event.title })}
                     className="hidden h-20 w-28 flex-shrink-0 rounded-lg object-cover sm:block"
                     loading="lazy"

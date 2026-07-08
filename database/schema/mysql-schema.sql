@@ -1824,6 +1824,7 @@ CREATE TABLE `categories` (
   UNIQUE KEY `unique_name_tenant` (`name`,`tenant_id`),
   KEY `tenant_id` (`tenant_id`),
   KEY `idx_cat_parent` (`parent_id`),
+  KEY `idx_categories_tenant_type_slug` (`tenant_id`,`type`,`slug`),
   CONSTRAINT `categories_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=613 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -3476,6 +3477,7 @@ CREATE TABLE `event_rsvps` (
   KEY `idx_rsvp_user` (`user_id`),
   KEY `idx_tenant_id` (`tenant_id`),
   KEY `idx_federated_events` (`is_federated`,`source_tenant_id`),
+  KEY `idx_rsvps_tenant_event_status` (`tenant_id`,`event_id`,`status`),
   CONSTRAINT `event_rsvps_event_id_foreign` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`) ON DELETE CASCADE,
   CONSTRAINT `event_rsvps_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=925 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -7696,6 +7698,7 @@ CREATE TABLE `marketplace_images` (
   PRIMARY KEY (`id`),
   KEY `marketplace_images_marketplace_listing_id_foreign` (`marketplace_listing_id`),
   KEY `marketplace_images_tenant_id_index` (`tenant_id`),
+  KEY `idx_mpi_tenant_listing_primary_sort` (`tenant_id`,`marketplace_listing_id`,`is_primary`,`sort_order`),
   CONSTRAINT `marketplace_images_marketplace_listing_id_foreign` FOREIGN KEY (`marketplace_listing_id`) REFERENCES `marketplace_listings` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=99 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -11251,6 +11254,7 @@ CREATE TABLE `search_logs` (
   KEY `idx_tenant_user` (`tenant_id`,`user_id`),
   KEY `idx_tenant_created` (`tenant_id`,`created_at`),
   KEY `idx_query_trending` (`tenant_id`,`query`(255),`created_at`),
+  KEY `idx_search_logs_tenant_created_query` (`tenant_id`,`created_at`,`query`),
   KEY `fk_search_logs_user` (`user_id`),
   CONSTRAINT `fk_search_logs_tenant` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_search_logs_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL

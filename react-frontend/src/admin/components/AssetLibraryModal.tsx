@@ -17,6 +17,7 @@ import { Button, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@/
 import Upload from 'lucide-react/icons/upload';
 import { useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
+import { responsiveThumbnailProps } from '@/lib/helpers';
 import { adminBuilderAssets } from '../api/adminApi';
 import { resolveUploadedUrl } from './builderImage';
 
@@ -118,9 +119,14 @@ export function AssetLibraryModal({ isOpen, onClose, onSelect, labels }: AssetLi
                   className="group aspect-square overflow-hidden rounded-lg border border-border bg-surface-secondary transition hover:border-accent focus:border-accent focus:outline-none"
                 >
                   <img
-                    src={img.url}
+                    {...responsiveThumbnailProps(img.url, {
+                      width: 240,
+                      height: 240,
+                      sizes: '(min-width: 768px) 20vw, 30vw',
+                    })}
                     alt={img.name}
                     loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover transition group-hover:scale-105"
                   />
                 </button>

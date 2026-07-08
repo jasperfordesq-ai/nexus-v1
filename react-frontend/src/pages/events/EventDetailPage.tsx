@@ -61,7 +61,7 @@ import { useTenant } from '@/contexts/TenantContext';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { formatDateTime, formatDateValue, formatMonthShort, resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { formatDateTime, formatDateValue, formatMonthShort, resolveAvatarUrl, resolveThumbnailUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import type { Event, User, RsvpResponse } from '@/types/api';
 
 type RsvpOption = 'going' | 'interested' | 'not_going';
@@ -573,6 +573,13 @@ export function EventDetailPage() {
   const eventImage = event.cover_image
     ? resolveThumbnailUrl(event.cover_image, { width: 1200, height: 675 })
     : undefined;
+  const eventImageProps = event.cover_image
+    ? responsiveThumbnailProps(event.cover_image, {
+        width: 1200,
+        height: 675,
+        sizes: '(min-width: 1024px) 896px, 100vw',
+      })
+    : null;
   const organizerName = event.organizer?.name || `${event.organizer?.first_name ?? ''} ${event.organizer?.last_name ?? ''}`.trim() || t('detail.community_member');
   const seoDescription = event.description?.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 160)
     || t('detail.meta_description_fallback', {
@@ -629,9 +636,9 @@ export function EventDetailPage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden rounded-2xl border border-theme-default bg-theme-surface shadow-xl">
-        {eventImage ? (
+        {eventImageProps ? (
           <img
-            src={eventImage}
+            {...eventImageProps}
             alt={t('detail.cover_alt', { title: event.title })}
             className="absolute inset-0 h-full w-full object-cover"
             loading="eager"

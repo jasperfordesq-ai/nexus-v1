@@ -22,6 +22,7 @@ interface AdminGroupDetail extends AdminGroup {  stats?: { total_exchanges: numb
 import type { GroupMember } from '@/admin/api/types';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { Button, Chip, Input, Textarea, Card, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
+import { resolveAvatarUrl } from '@/lib/helpers';
 
 export default function GroupDetail() {
   const { t } = useTranslation('admin_groups');
@@ -259,7 +260,7 @@ export default function GroupDetail() {
                   <TableRow key={member.user_id}>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {member.user_avatar && <img src={member.user_avatar} className="w-8 h-8 rounded-full" alt={member.user_name || t('groups.member_avatar')} loading="lazy" />}
+                        {member.user_avatar && <img src={resolveAvatarUrl(member.user_avatar)} className="w-8 h-8 rounded-full" alt={member.user_name || t('groups.member_avatar')} loading="lazy" />}
                         <div>{member.user_name}</div>
                       </div>
                     </TableCell>

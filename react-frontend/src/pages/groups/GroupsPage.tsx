@@ -36,7 +36,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import type { Group } from '@/types/api';
@@ -471,18 +471,22 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
   const { tenantPath } = useTenant();
   const memberCount = group.member_count ?? group.members_count ?? 0;
   const groupImageSource = group.cover_image_url || group.cover_image || group.image_url;
-  const imageUrl = groupImageSource
-    ? resolveThumbnailUrl(groupImageSource, { width: 360, height: 160 })
-    : '';
+  const imageProps = groupImageSource
+    ? responsiveThumbnailProps(groupImageSource, {
+        width: 360,
+        height: 160,
+        sizes: '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw',
+      })
+    : null;
 
   return (
     <Link to={tenantPath(`/groups/${group.id}`)} aria-label={`${group.name} - ${t('members', { count: memberCount })}`} className="block h-full">
       <article className="h-full">
         <GlassCard className={`overflow-hidden hover:scale-[1.01] transition-transform h-full flex flex-col${featured ? ' ring-1 ring-amber-500/30' : ''}`}>
           <div className="relative h-24 bg-theme-elevated">
-            {imageUrl ? (
+            {imageProps ? (
               <img
-                src={imageUrl}
+                {...imageProps}
                 alt=""
                 className="h-full w-full object-cover"
                 loading="lazy"

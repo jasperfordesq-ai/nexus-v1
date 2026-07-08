@@ -46,7 +46,7 @@ import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { resolveAssetUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import type { Event } from '@/types/api';
 
 /** Event category IDs matching EventsPage — names resolved via t() inside the component */
@@ -627,6 +627,13 @@ export function CreateEventPage() {
   }
 
   const hasImage = imagePreview || existingImage;
+  const existingImagePreviewProps = !imagePreview && existingImage
+    ? responsiveThumbnailProps(existingImage, {
+        width: 960,
+        height: 540,
+        sizes: '(min-width: 1024px) 896px, 92vw',
+      })
+    : null;
   const selectedCategoryLabel = formData.category ? t(`category.${formData.category}`) : t('form.summary_not_set');
 
   return (
@@ -695,9 +702,11 @@ export function CreateEventPage() {
             {hasImage ? (
               <div className="relative rounded-xl overflow-hidden border border-theme-default">
                 <img
-                  src={imagePreview || existingImage || ''}
+                  {...(existingImagePreviewProps ?? { src: imagePreview || existingImage || '' })}
                   alt={t('form.cover_preview_alt')}
                   className="w-full h-48 object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute top-2 right-2 flex gap-2">
                   <Button

@@ -45,6 +45,7 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
+import { resolveAvatarUrl } from '@/lib/helpers';
 import { MemberSearchPicker, type MemberSearchMember } from '../../components/MemberSearchPicker';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
@@ -2018,7 +2019,7 @@ export default function CaringCommunityWorkflowPage() {
                           <div className="flex items-center gap-2">
                             <div className="h-9 w-9 overflow-hidden rounded-full bg-surface-secondary flex items-center justify-center text-xs font-semibold">
                               {suggestion.supporter.avatar_url ? (
-                                <img src={suggestion.supporter.avatar_url} alt="" className="h-full w-full object-cover" />
+                                <img src={resolveAvatarUrl(suggestion.supporter.avatar_url)} alt="" className="h-full w-full object-cover" />
                               ) : (
                                 suggestion.supporter.name.charAt(0).toUpperCase()
                               )}
@@ -2032,7 +2033,7 @@ export default function CaringCommunityWorkflowPage() {
                           <div className="flex items-center gap-2">
                             <div className="h-9 w-9 overflow-hidden rounded-full bg-surface-secondary flex items-center justify-center text-xs font-semibold">
                               {suggestion.recipient.avatar_url ? (
-                                <img src={suggestion.recipient.avatar_url} alt="" className="h-full w-full object-cover" />
+                                <img src={resolveAvatarUrl(suggestion.recipient.avatar_url)} alt="" className="h-full w-full object-cover" />
                               ) : (
                                 suggestion.recipient.name.charAt(0).toUpperCase()
                               )}

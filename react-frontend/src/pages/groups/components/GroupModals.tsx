@@ -38,7 +38,7 @@ import MapPin from 'lucide-react/icons/map-pin';
 import Flag from 'lucide-react/icons/flag';
 import { ErrorBoundary } from '@/components/feedback';
 import type { Group } from '@/types/api';
-import { resolveThumbnailUrl } from '@/lib/helpers';
+import { responsiveThumbnailProps } from '@/lib/helpers';
 
 const RichTextEditor = lazy(() => import('@/admin/components/RichTextEditor'));
 
@@ -310,7 +310,11 @@ export function GroupSettingsModal({
                   </p>
                   {group?.cover_image_url && (
                     <img
-                      src={resolveThumbnailUrl(group.cover_image_url, { width: 400, height: 80 })}
+                      {...responsiveThumbnailProps(group.cover_image_url, {
+                        width: 400,
+                        height: 80,
+                        sizes: '(min-width: 640px) 400px, 92vw',
+                      })}
                       alt={t('detail.image_alt_cover')}
                       className="w-full h-10 rounded object-cover mb-2"
                       width={400}
