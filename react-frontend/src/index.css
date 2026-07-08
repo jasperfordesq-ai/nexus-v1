@@ -24,6 +24,12 @@
 @source not "./**/*.spec.ts";
 @source not "./**/*.spec.tsx";
 
+/* Shared responsive utilities used by lazy-loaded panel shells.
+   Panel CSS is intentionally layered below the main app so it cannot break the
+   member site after SPA navigation; these classes must also exist here so
+   panel headers can still reveal their responsive back links and desktop nav. */
+@source inline("hidden block flex inline inline-flex sm:block sm:flex sm:inline sm:inline-flex sm:px-3 sm:px-4 sm:px-6 md:block md:flex md:hidden md:inline md:inline-flex md:left-16 md:left-64 md:ml-16 md:ml-64 lg:block lg:flex lg:hidden lg:inline lg:inline-flex lg:px-8");
+
 /* HeroUI dark mode variant */
 @custom-variant dark (&:is(.dark *));
 

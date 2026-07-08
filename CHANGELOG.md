@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Admin and panel headers now keep their left-side navigation controls visible.** The main Tailwind bundle now safelists the shared responsive display and offset utilities used by lazy-loaded admin, broker, caring-community, partner-timebank, and super-admin shells, so `Back to site`, `Back to admin`, tenant names, mobile toggles, and desktop header links are no longer hidden by the lower-priority route utility layer.
 - **Returning from admin to the member site no longer hides or distorts the header and footer.** Lazy-loaded admin, broker, caring, partner-timebank, and super-admin Tailwind utility sheets now sit in a lower-priority cascade layer, so their late-loaded `.hidden`, spacing, and responsive utilities cannot override the main app navbar after client-side navigation back to `/dashboard`; the desktop footer also no longer carries a conflicting base column span that pushed Legal onto a second row after admin CSS loaded.
 - **CI now recognises the responsive uploaded-image pipeline release note.** The performance/media hotfix is recorded in the pushed changelog delta and the in-app changelog copy is refreshed so the release-note guard passes on `main`.
 - **Volunteering performance indexes now pass the blue/green migration safety gate.** The additive index migration no longer carries raw rollback `DROP INDEX` SQL in the pending migration file, so emergency deploys can proceed without maintenance-mode override.
