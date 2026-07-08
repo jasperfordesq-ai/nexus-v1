@@ -123,4 +123,41 @@ class CaringOrgPaymentConservationTest extends TestCase
             $this->assertEqualsWithDelta(0.0, $workerBalance, 0.001, "$class: sub-one-hour log credits nothing");
         }
     }
+
+    /**
+     * Regression: approval ALWAYS mints time credits — never gated by the org
+     * wallet balance. The org wallet is a reconciliation figure that is debited
+     * unconditionally and allowed to go NEGATIVE (classic timebanking, mirroring
+     * VolunteerService::applyVolunteerAutoPayment). Both caring helpers previously
+     * returned 'insufficient_balance' and paid nothing, silently leaving the
+     * carer's approved hours permanently unminted.
+     */
+    public function test_payment_mints_even_when_org_balance_insufficient_in_both_services(): void
+    {
+        foreach ($this->services() as $class) {
+            $owner  = $this->makeUser(0.0);
+            $worker = $this->makeUser(0.0);
+            $orgId  = $this->makeOrg($owner, 1.0); // only 1 credit — far less than the 3 owed
+            $logId  = $this->makeVolLog($worker, 3.0);
+
+            $result = $this->pay($class, $orgId, $owner, $worker, $logId, 3.0);
+            $this->assertSame('paid', $result, "$class: approval mints even when the org balance is insufficient");
+
+            $orgBalance    = (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance');
+            $workerBalance = (float) DB::table('users')->where('id', $worker)->value('balance');
+
+            $this->assertEqualsWithDelta(3.0, $workerBalance, 0.001, "$class: worker is credited the full 3 whole hours");
+            $this->assertEqualsWithDelta(-2.0, $orgBalance, 0.001, "$class: org wallet is debited into a NEGATIVE balance");
+            $this->assertEqualsWithDelta(1.0 - $orgBalance, $workerBalance, 0.001, "$class: org debit == worker credit (conserved)");
+
+            // A ledger row is written recording the (negative) balance_after.
+            $this->assertDatabaseHas('vol_org_transactions', [
+                'tenant_id'           => $this->testTenantId,
+                'vol_organization_id' => $orgId,
+                'user_id'             => $worker,
+                'vol_log_id'          => $logId,
+                'type'                => 'volunteer_payment',
+            ]);
+        }
+    }
 }

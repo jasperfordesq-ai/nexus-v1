@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Caring-community hour approvals now always mint time credits, matching the core volunteering invariant.** Two caring-community services (`CaringCommunityWorkflowService` review decisions and `CaringSupportRelationshipService` auto-approved hour logging) still gated organisation payment on the org's `auto_pay_enabled` flag and on the org wallet having sufficient balance — so a carer's hours could be committed as **approved** while never being credited (the org wallet is a reconciliation figure, not a spending switch, and the verify paths only ever reprocess *pending* logs, so those credits were lost permanently). Both services now debit the org wallet unconditionally, allow it to go negative, and keep the fractional remainder in the org wallet — mirroring `VolunteerService::applyVolunteerAutoPayment`. Regional points remain an additive, opt-in reward and are unaffected. New regression tests cover both services at the helper level (mint into a negative balance) and through the full approval paths (`auto_pay_enabled = 0` still mints).
+- **Public route startup now defers tenant menu fetching until after first paint.** The navigation components now depend on a lightweight menu-context core, while public tenant routes lazy-load the full menu provider after a short idle delay. This keeps custom public menus available without putting the menu API/provider code on the initial public page path.
+- **Common public tenant pages now avoid the full protected/admin route registry.** TenantShell loads a dedicated public route registry for public listings, events, groups, jobs, marketplace, volunteering, resources, organisations, ideation, blog, legal/static, and similar browse pages. Protected member, admin, panel, seller-tool, and editor routes still fall back to the full registry only when those routes are actually needed.
+
 ## [1.5.5] - 2026-07-08
 
 ### Added

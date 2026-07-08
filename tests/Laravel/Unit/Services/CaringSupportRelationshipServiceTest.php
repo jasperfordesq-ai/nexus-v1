@@ -274,4 +274,53 @@ class CaringSupportRelationshipServiceTest extends TestCase
         $this->assertFalse($duplicate['success']);
         $this->assertSame('ALREADY_EXISTS', $duplicate['code']);
     }
+
+    public function test_log_hours_mints_even_when_org_auto_pay_disabled_and_balance_low(): void
+    {
+        if (!Schema::hasColumn('vol_logs', 'caring_support_relationship_id')) {
+            $this->markTestSkipped('vol_logs.caring_support_relationship_id not present.');
+        }
+
+        // Regression: an auto-approved caring log ALWAYS mints time credits — never
+        // gated by the org's auto_pay_enabled flag or wallet balance. The org wallet
+        // is debited unconditionally and allowed to go negative, mirroring
+        // VolunteerService. Previously auto_pay_enabled=0 skipped payment and a low
+        // balance returned 'insufficient_balance', so the supporter's approved hours
+        // were never credited.
+        $supporter = User::factory()->forTenant($this->testTenantId)->create(['balance' => 0]);
+        $recipient = User::factory()->forTenant($this->testTenantId)->create();
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $coord = User::factory()->forTenant($this->testTenantId)->admin()->create();
+
+        $orgId = (int) DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $owner->id,
+            'name' => 'KISS Zug',
+            'balance' => 1, // far less than the 3 owed
+            'auto_pay_enabled' => 0, // auto-pay OFF — approval must still mint
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $created = $this->service()->create($this->testTenantId, [
+            'supporter_id' => $supporter->id,
+            'recipient_id' => $recipient->id,
+            'organization_id' => $orgId,
+        ], $coord->id);
+        $id = $created['relationship']['id'];
+
+        $result = $this->service()->logHours($this->testTenantId, $id, [
+            'date' => date('Y-m-d'),
+            'hours' => 3.5,
+            'description' => 'Support visit.',
+        ], $coord->id);
+
+        $this->assertTrue($result['success']);
+        $this->assertSame('approved', $result['log']['status']);
+        $this->assertSame('paid', $result['log']['payment_result']);
+
+        // floor(3.5) = 3 minted to the supporter; org debited the same 3 → 1 - 3 = -2.
+        $this->assertSame(3, (int) DB::table('users')->where('id', $supporter->id)->value('balance'));
+        $this->assertEqualsWithDelta(-2.0, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'), 0.001);
+    }
 }

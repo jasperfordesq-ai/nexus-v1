@@ -335,7 +335,10 @@ class CaringSupportRelationshipService
                     ->where('tenant_id', $tenantId)
                     ->where('id', (int) $relationship->organization_id)
                     ->first();
-                if ($org && (bool) ($org->auto_pay_enabled ?? false)) {
+                // Approval ALWAYS mints — never gated by auto_pay_enabled or the
+                // org wallet balance, mirroring VolunteerService. Regional points
+                // (if enabled) are an additive reward, not a replacement.
+                if ($org) {
                     $paymentResult = $this->applyOrganizationPayment(
                         $tenantId,
                         (int) $org->id,
@@ -502,26 +505,35 @@ class CaringSupportRelationshipService
         // sub-one-hour log debits nothing). Mirrors VolunteerService::verifyHours
         // ("keep fractional remainders in the org wallet").
         $wholeHours = (int) floor($hours);
+        if ($wholeHours <= 0) {
+            // Sub-one-hour log: users.balance stores whole hours, so nothing is
+            // minted and nothing is debited (mirrors applyVolunteerAutoPayment).
+            return 'no_payable_hours';
+        }
 
         $orgLocked = DB::selectOne(
             "SELECT id, balance FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
             [$organizationId, $tenantId]
         );
-        if (!$orgLocked || (float) $orgLocked->balance < $wholeHours) {
-            return 'insufficient_balance';
+        if (!$orgLocked) {
+            return 'no_org';
         }
 
-        if ($wholeHours > 0) {
-            DB::table('vol_organizations')
-                ->where('tenant_id', $tenantId)
-                ->where('id', $organizationId)
-                ->update(['balance' => DB::raw('balance - ' . $wholeHours)]);
+        // Debit the org wallet UNCONDITIONALLY — allow it to go NEGATIVE. The org
+        // wallet is a reconciliation figure, not a spending limit; approved hours
+        // are always minted (classic timebanking), mirroring
+        // VolunteerService::applyVolunteerAutoPayment. Previously this returned
+        // 'insufficient_balance' and paid nothing, silently leaving the supporter's
+        // approved hours permanently unminted.
+        DB::table('vol_organizations')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $organizationId)
+            ->update(['balance' => DB::raw('balance - ' . $wholeHours)]);
 
-            DB::table('users')
-                ->where('tenant_id', $tenantId)
-                ->where('id', $supporterId)
-                ->increment('balance', $wholeHours);
-        }
+        DB::table('users')
+            ->where('tenant_id', $tenantId)
+            ->where('id', $supporterId)
+            ->increment('balance', $wholeHours);
 
         $description = __('api.caring_support_relationship_payment_description', ['hours' => $hours]);
         DB::table('vol_org_transactions')->insert([
