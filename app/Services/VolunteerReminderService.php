@@ -646,11 +646,21 @@ class VolunteerReminderService
                 $hoursBefore  = (int) ($setting->hours_before ?? 24);
                 $emailEnabled = (bool) ($setting->email_enabled ?? true);
 
-                // Find shifts within the reminder window for this tenant
-                $shifts = DB::table('vol_shifts')
-                    ->where('tenant_id', $tenantId)
-                    ->where('start_time', '>', now())
-                    ->where('start_time', '<=', now()->addHours($hoursBefore))
+                // Find shifts within the reminder window for this tenant. Join
+                // the opportunity and require it to still be active — a cancelled
+                // (soft-deleted) opportunity keeps its shifts, and without this
+                // volunteers got "shift starting soon" emails for opportunities
+                // that were cancelled.
+                $shifts = DB::table('vol_shifts as s')
+                    ->join('vol_opportunities as o', function ($join) {
+                        $join->on('s.opportunity_id', '=', 'o.id')
+                            ->on('s.tenant_id', '=', 'o.tenant_id');
+                    })
+                    ->where('s.tenant_id', $tenantId)
+                    ->where('s.start_time', '>', now())
+                    ->where('s.start_time', '<=', now()->addHours($hoursBefore))
+                    ->where('o.is_active', 1)
+                    ->select('s.*')
                     ->get();
 
                 foreach ($shifts as $shift) {

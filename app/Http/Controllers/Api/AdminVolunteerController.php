@@ -911,12 +911,16 @@ class AdminVolunteerController extends BaseApiController
                     }
 
                     if (!empty($shift->capacity)) {
-                        $approvedCount = (int) DB::selectOne(
-                            "SELECT COUNT(*) as cnt FROM vol_applications WHERE shift_id = ? AND status = 'approved' AND tenant_id = ?",
-                            [(int) $app->shift_id, $tenantId]
-                        )->cnt;
+                        // Count approved signups AND active group-reservation slots
+                        // (via the shared capacity service) — counting approved
+                        // applications alone let an admin approve past capacity when
+                        // group reservations held the remaining slots.
+                        $used = \App\Services\VolunteerShiftCapacityService::usedSlots(
+                            (int) $app->shift_id,
+                            $tenantId
+                        );
 
-                        if ($approvedCount >= (int) $shift->capacity) {
+                        if ($used >= (int) $shift->capacity) {
                             throw new \DomainException(__('api.volunteer_shift_at_capacity'));
                         }
                     }

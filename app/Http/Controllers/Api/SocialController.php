@@ -1380,10 +1380,17 @@ class SocialController extends BaseApiController
                     $q->select('id')->from('polls')->where('tenant_id', $tenantId);
                 })->delete();
                 DB::table($config['table'])->where('id', $targetId)->where('tenant_id', $tenantId)->delete();
-            } elseif ($targetType === 'volunteering') {
-                DB::table('vol_applications')->where('opportunity_id', $targetId)->where('tenant_id', $tenantId)->delete();
-                DB::table('vol_shifts')->where('opportunity_id', $targetId)->where('tenant_id', $tenantId)->delete();
-                DB::table($config['table'])->where('id', $targetId)->where('tenant_id', $tenantId)->delete();
+            } elseif ($targetType === 'volunteer') {
+                // Volunteer opportunities are SOFT-deleted (is_active = 0), never
+                // hard-deleted. The previous branch tested 'volunteering' — a value
+                // that can never occur (the table map key is 'volunteer'), so this
+                // fell through to the generic hard DELETE below, which orphaned
+                // vol_applications (no FK on opportunity_id) plus donations, alerts
+                // and guardian consents, and destroyed the hour-log audit trail.
+                // The owner/admin check above already authorised the caller; the
+                // canonical VolunteerService::deleteOpportunity endpoint additionally
+                // notifies volunteers and issues a federation retraction.
+                DB::table($config['table'])->where('id', $targetId)->where('tenant_id', $tenantId)->update(['is_active' => 0]);
             } else {
                 DB::table($config['table'])->where('id', $targetId)->where('tenant_id', $tenantId)->delete();
             }

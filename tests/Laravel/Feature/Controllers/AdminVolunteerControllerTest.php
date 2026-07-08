@@ -311,6 +311,76 @@ class AdminVolunteerControllerTest extends TestCase
         $this->assertEquals(3.00, (float) $response->json('data.stats.total_paid'));
     }
 
+    public function test_approve_application_counts_group_reservations_against_capacity(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        $volunteer = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+
+        $orgId = DB::table('vol_organizations')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $admin->id,
+            'name' => 'Overbook Guard Org',
+            'slug' => 'overbook-guard-org-' . uniqid(),
+            'description' => 'Organisation used for admin overbooking coverage.',
+            'status' => 'active',
+            'created_at' => now(),
+        ]);
+        $oppId = DB::table('vol_opportunities')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $orgId,
+            'created_by' => $admin->id,
+            'title' => 'Overbook Guard Opportunity',
+            'description' => 'x',
+            'status' => 'active',
+            'is_active' => 1,
+            'created_at' => now(),
+        ]);
+        // Capacity 2, already fully consumed: 1 approved application + a group
+        // reservation holding the other slot.
+        $shiftId = DB::table('vol_shifts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $oppId,
+            'start_time' => now()->addDays(2)->format('Y-m-d H:i:s'),
+            'end_time' => now()->addDays(2)->addHours(2)->format('Y-m-d H:i:s'),
+            'capacity' => 2,
+        ]);
+        DB::table('vol_applications')->insert([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $oppId,
+            'user_id' => $admin->id,
+            'shift_id' => $shiftId,
+            'status' => 'approved',
+            'created_at' => now(),
+        ]);
+        DB::table('vol_shift_group_reservations')->insert([
+            'tenant_id' => $this->testTenantId,
+            'shift_id' => $shiftId,
+            'group_id' => 1,
+            'reserved_by' => $admin->id,
+            'reserved_slots' => 1,
+            'filled_slots' => 0,
+            'status' => 'active',
+            'created_at' => now(),
+        ]);
+        // The pending application the admin will try to approve.
+        $pendingAppId = DB::table('vol_applications')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $oppId,
+            'user_id' => $volunteer->id,
+            'shift_id' => $shiftId,
+            'status' => 'pending',
+            'created_at' => now(),
+        ]);
+
+        Sanctum::actingAs($admin);
+        $response = $this->apiPost("/v2/admin/volunteering/approvals/{$pendingAppId}/approve");
+
+        // 1 approved + 1 reserved == capacity 2 → must be rejected, not approved.
+        $response->assertStatus(422);
+        $this->assertSame('pending', DB::table('vol_applications')->where('id', $pendingAppId)->value('status'));
+    }
+
     // ================================================================
     // ADJUST ORG WALLET — PUT /v2/admin/volunteering/organizations/{id}/wallet/adjust
     // Money-moving admin endpoint: authorization + conservation + guards.

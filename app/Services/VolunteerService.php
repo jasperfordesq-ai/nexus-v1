@@ -513,6 +513,9 @@ class VolunteerService
             ->where('a.status', 'approved')
             ->where('a.tenant_id', $tenantId)
             ->whereNotNull('a.shift_id')
+            // Exclude shifts of cancelled (soft-deleted) opportunities — a
+            // cancelled opportunity keeps is_active=0 but its shifts survive.
+            ->where('o.is_active', 1)
             ->select('s.*', 'o.title as opportunity_title', 'o.location', 'a.id as application_id');
 
         if (is_string($cursor) && ($cid = base64_decode($cursor, true)) !== false) {

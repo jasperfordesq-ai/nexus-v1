@@ -528,19 +528,41 @@ class RecurringShiftService
         }
 
         try {
-            $deleted = DB::delete(
-                "DELETE FROM vol_shifts
-                 WHERE recurring_pattern_id = ? AND tenant_id = ? AND start_time > NOW()",
-                [$patternId, $tenantId]
-            );
+            return DB::transaction(function () use ($patternId, $tenantId, $userId) {
+                // Capture the shift ids first so we can neutralise emergency
+                // alerts that point at them. vol_emergency_alerts.shift_id has no
+                // FK, so a hard shift delete would orphan any 'active' alert
+                // (every alert query INNER JOINs vol_shifts, making orphans
+                // invisible and impossible to cancel afterwards).
+                $shiftIds = DB::table('vol_shifts')
+                    ->where('recurring_pattern_id', $patternId)
+                    ->where('tenant_id', $tenantId)
+                    ->where('start_time', '>', now())
+                    ->pluck('id')
+                    ->all();
 
-            Log::info('[RecurringShift] Future shifts deleted', [
-                'pattern' => $patternId,
-                'deleted' => $deleted,
-                'by' => $userId,
-            ]);
+                $deleted = DB::delete(
+                    "DELETE FROM vol_shifts
+                     WHERE recurring_pattern_id = ? AND tenant_id = ? AND start_time > NOW()",
+                    [$patternId, $tenantId]
+                );
 
-            return $deleted;
+                if (!empty($shiftIds)) {
+                    DB::table('vol_emergency_alerts')
+                        ->whereIn('shift_id', $shiftIds)
+                        ->where('tenant_id', $tenantId)
+                        ->where('status', 'active')
+                        ->update(['status' => 'cancelled']);
+                }
+
+                Log::info('[RecurringShift] Future shifts deleted', [
+                    'pattern' => $patternId,
+                    'deleted' => $deleted,
+                    'by' => $userId,
+                ]);
+
+                return $deleted;
+            });
         } catch (\Exception $e) {
             Log::error('[RecurringShift] deleteFutureShifts failed', ['error' => $e->getMessage()]);
             $this->errors[] = ['code' => 'SERVER_ERROR', 'message' => __('api.server_error')];
