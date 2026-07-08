@@ -2840,8 +2840,6 @@ Route::get('/gamification/seasons', [\App\Http\Controllers\Api\GamificationContr
 Route::get('/gamification/seasons/current', [\App\Http\Controllers\Api\GamificationController::class, 'getCurrentSeason']);
 Route::post('/shop/purchase', [\App\Http\Controllers\Api\GamificationController::class, 'purchaseItem']);
 Route::get('/insights', [\App\Http\Controllers\Api\AdminDashboardController::class, 'apiInsights'])->middleware(['auth:sanctum', 'admin']);
-Route::get('/organizations/{id}/members', [\App\Http\Controllers\Api\OrgWalletController::class, 'apiMembers']);
-Route::get('/organizations/{id}/wallet/balance', [\App\Http\Controllers\Api\OrgWalletController::class, 'apiBalance']);
 Route::post('/feed/hide', [\App\Http\Controllers\Api\FeedController::class, 'hidePost']);
 Route::post('/feed/mute', [\App\Http\Controllers\Api\FeedController::class, 'muteUser']);
 Route::post('/feed/report', [\App\Http\Controllers\Api\FeedController::class, 'reportPost']);
