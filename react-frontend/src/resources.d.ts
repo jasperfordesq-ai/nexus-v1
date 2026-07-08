@@ -24593,7 +24593,7 @@ export default interface Resources {
         "title": "Regional points are not enabled here"
       }
     },
-    "release_stage": "Generally Available (v1.5.4)",
+    "release_stage": "Generally Available (v1.5.5)",
     "release_status": {
       "changelog_link": "Changelog",
       "features_link": "Features",
@@ -36799,7 +36799,7 @@ export default interface Resources {
         "title": "Maintenance"
       }
     },
-    "release_stage": "Generally Available (v1.5.4)",
+    "release_stage": "Generally Available (v1.5.5)",
     "unknown_error": "Unknown error"
   },
   "reviews": {

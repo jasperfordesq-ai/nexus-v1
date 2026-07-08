@@ -411,7 +411,7 @@ composer prod: 117 · npm prod: 371
 | mjml-browser@4.18.0 | — | MIT | npm | https://github.com/mjmlio/mjml |
 | ms@2.1.3 | — | MIT | npm | https://github.com/vercel/ms |
 | nanoid@3.3.11 | — | MIT | npm | https://github.com/ai/nanoid |
-| nexus-react-frontend@1.5.4 | — | UNLICENSED | npm |  |
+| nexus-react-frontend@1.5.5 | — | UNLICENSED | npm |  |
 | node-fetch@2.7.0 | — | MIT | npm | https://github.com/bitinn/node-fetch |
 | object-assign@4.1.1 | — | MIT | npm | https://github.com/sindresorhus/object-assign |
 | pako@2.1.0 | — | (MIT AND Zlib) | npm | https://github.com/nodeca/pako |

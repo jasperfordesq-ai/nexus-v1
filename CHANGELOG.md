@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.5] - 2026-07-08
+
 ### Added
 
 - **Volunteering module: completed the deferred cross-surface features from the module audit.** (1) Admins can now open submitted **expense receipts** through a tenant-scoped, admin-gated download endpoint (previously the link pointed at a private storage path that 404'd). (2) A new **Shift Swaps** admin screen (Volunteering → Shift Swaps) resolves swap requests that require admin approval — such requests previously sat in `admin_pending` forever with no UI to approve or reject them. (3) Scanning a shift **check-in QR** now opens a proper check-in page that verifies the volunteer and offers checkout; the QR is generated on-device (via the `qrcode` package) instead of being sent to a third-party image service. (4) **Approved volunteer hours now appear in the community feed** as their own card type (a dedicated `volunteer_hours` feed source keyed to `vol_logs` — they were previously written to the feed but silently dropped as orphans). (5) **Federation is now two-way for opportunities:** inbound opportunities mirrored from partners appear in the opportunities listing, and deleting/closing a shared opportunity retracts it from partners (with matching receiver-side handling that deactivates the mirror). New user-facing and admin strings were added across all supported locales, with backend regression tests for the receipt download, org-wallet money paths, feed listener, and federation retraction.
@@ -1565,7 +1567,8 @@ For the people behind the project, see [CONTRIBUTORS.md](CONTRIBUTORS.md) — th
 
 ---
 
-[Unreleased]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.4...HEAD
+[Unreleased]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.5...HEAD
+[1.5.5]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.4...v1.5.5
 [1.5.4]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.3...v1.5.4
 [1.5.3]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.2...v1.5.3
 [1.5.2]: https://github.com/jasperfordesq-ai/nexus-v1/compare/v1.5.1...v1.5.2
