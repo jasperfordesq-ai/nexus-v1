@@ -521,7 +521,7 @@ class TenantContext
             'consent-required', 'consent',
             // Core app routes
             'dashboard', 'feed', 'listings', 'messages', 'compose', 'notifications',
-            'wallet', 'profile', 'settings', 'members', 'connections',
+            'wallet', 'profile', 'settings', 'members', 'connections', 'saved',
             // Feature modules
             'events', 'groups', 'community-groups', 'volunteering', 'organisations',
             'federation', 'blog', 'resources', 'polls', 'goals', 'reviews',

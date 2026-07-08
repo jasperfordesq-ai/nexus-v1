@@ -54,6 +54,7 @@ describe('tenant-routing', () => {
       expect(RESERVED_PATHS.has('login')).toBe(true);
       expect(RESERVED_PATHS.has('register')).toBe(true);
       expect(RESERVED_PATHS.has('dashboard')).toBe(true);
+      expect(RESERVED_PATHS.has('saved')).toBe(true);
       expect(RESERVED_PATHS.has('admin')).toBe(true);
       expect(RESERVED_PATHS.has('admin-legacy')).toBe(true);
       expect(RESERVED_PATHS.has('api')).toBe(true);
@@ -79,6 +80,13 @@ describe('tenant-routing', () => {
 
     it('returns null for reserved path on localhost', () => {
       mockLocation('localhost', '/dashboard');
+      const result = detectTenantFromUrl();
+      expect(result.slug).toBeNull();
+      expect(result.source).toBeNull();
+    });
+
+    it('returns null for the saved-items route on localhost', () => {
+      mockLocation('localhost', '/saved');
       const result = detectTenantFromUrl();
       expect(result.slug).toBeNull();
       expect(result.source).toBeNull();

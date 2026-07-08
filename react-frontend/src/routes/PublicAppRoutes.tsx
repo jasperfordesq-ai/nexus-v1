@@ -112,8 +112,9 @@ function TenantSlugGate({ slug, children }: { slug: string; children: ReactNode 
 }
 
 export function PublicAppRoutes() {
-  const { t } = useTranslation('utility');
+  const { t } = useTranslation(['utility', 'common']);
   const label = (key: string) => String(t(`coming_soon.features.${key}`));
+  const navLabel = (key: string) => String(t(`common:nav.${key}`));
 
   return (
     <>
@@ -163,21 +164,21 @@ export function PublicAppRoutes() {
         <Route path="strategic-plan" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><StrategicPlanPage /></TenantSlugGate></ErrorBoundary>} />
         <Route path="page/:slug" element={<ErrorBoundary><CustomPage /></ErrorBoundary>} />
 
-        <Route path="blog" element={<FeatureGate feature="blog" redirect="/"><FeatureErrorBoundary featureName={String(t('blog:page_title'))}><BlogPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="blog/:slug" element={<FeatureGate feature="blog" redirect="/"><FeatureErrorBoundary featureName={String(t('blog:page_title'))}><BlogPostPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="listings" element={<FeatureGate module="listings" redirect="/"><FeatureErrorBoundary featureName={String(t('listings:page_title'))}><ListingsPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="listings/:id" element={<FeatureGate module="listings" redirect="/"><FeatureErrorBoundary featureName={String(t('listings:page_title'))}><ListingDetailPage /></FeatureErrorBoundary></FeatureGate>} />
+        <Route path="blog" element={<FeatureGate feature="blog" redirect="/"><FeatureErrorBoundary featureName={navLabel('blog')}><BlogPage /></FeatureErrorBoundary></FeatureGate>} />
+        <Route path="blog/:slug" element={<FeatureGate feature="blog" redirect="/"><FeatureErrorBoundary featureName={navLabel('blog')}><BlogPostPage /></FeatureErrorBoundary></FeatureGate>} />
+        <Route path="listings" element={<FeatureGate module="listings" redirect="/"><FeatureErrorBoundary featureName={navLabel('listings')}><ListingsPage /></FeatureErrorBoundary></FeatureGate>} />
+        <Route path="listings/:id" element={<FeatureGate module="listings" redirect="/"><FeatureErrorBoundary featureName={navLabel('listings')}><ListingDetailPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="events" element={<FeatureGate feature="events" fallback={<ComingSoonPage feature={label('events')} />}><FeatureErrorBoundary featureName={label('events')}><EventsPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="events/:id" element={<FeatureGate feature="events" redirect="/"><FeatureErrorBoundary featureName={label('events')}><EventDetailPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="groups" element={<FeatureGate feature="groups" fallback={<ComingSoonPage feature={label('groups')} />}><FeatureErrorBoundary featureName={label('groups')}><GroupsPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="groups/:id" element={<FeatureGate feature="groups" redirect="/"><FeatureErrorBoundary featureName={label('groups')}><GroupDetailPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="jobs" element={<FeatureGate feature="job_vacancies" fallback={<ComingSoonPage feature={label('job_vacancies')} />}><FeatureErrorBoundary featureName={label('job_vacancies')}><JobsPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="jobs/:id" element={<FeatureGate feature="job_vacancies" redirect="/"><FeatureErrorBoundary featureName={label('job_vacancies')}><JobDetailPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="courses" element={<FeatureGate feature="courses" redirect="/"><FeatureErrorBoundary featureName={String(t('courses:catalog.title'))}><CoursesPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="courses/:idOrSlug" element={<FeatureGate feature="courses" redirect="/"><FeatureErrorBoundary featureName={String(t('courses:catalog.title'))}><CourseDetailPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="podcasts" element={<FeatureGate feature="podcasts" redirect="/"><FeatureErrorBoundary featureName={String(t('common:podcasts.title'))}><PodcastsPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="podcasts/:showSlug" element={<FeatureGate feature="podcasts" redirect="/"><FeatureErrorBoundary featureName={String(t('common:podcasts.title'))}><PodcastShowPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="podcasts/:showSlug/:episodeSlug" element={<FeatureGate feature="podcasts" redirect="/"><FeatureErrorBoundary featureName={String(t('common:podcasts.title'))}><PodcastEpisodePage /></FeatureErrorBoundary></FeatureGate>} />
+        <Route path="courses" element={<FeatureGate feature="courses" redirect="/"><FeatureErrorBoundary featureName={navLabel('courses')}><CoursesPage /></FeatureErrorBoundary></FeatureGate>} />
+        <Route path="courses/:idOrSlug" element={<FeatureGate feature="courses" redirect="/"><FeatureErrorBoundary featureName={navLabel('courses')}><CourseDetailPage /></FeatureErrorBoundary></FeatureGate>} />
+        <Route path="podcasts" element={<FeatureGate feature="podcasts" redirect="/"><FeatureErrorBoundary featureName={navLabel('podcasts')}><PodcastsPage /></FeatureErrorBoundary></FeatureGate>} />
+        <Route path="podcasts/:showSlug" element={<FeatureGate feature="podcasts" redirect="/"><FeatureErrorBoundary featureName={navLabel('podcasts')}><PodcastShowPage /></FeatureErrorBoundary></FeatureGate>} />
+        <Route path="podcasts/:showSlug/:episodeSlug" element={<FeatureGate feature="podcasts" redirect="/"><FeatureErrorBoundary featureName={navLabel('podcasts')}><PodcastEpisodePage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="marketplace" element={<FeatureGate feature="marketplace" fallback={<ComingSoonPage feature={label('marketplace')} />}><FeatureErrorBoundary featureName={label('marketplace')}><MarketplacePage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="marketplace/search" element={<FeatureGate feature="marketplace" redirect="/"><FeatureErrorBoundary featureName={label('marketplace')}><MarketplaceSearchPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="marketplace/map" element={<FeatureGate feature="marketplace" redirect="/"><FeatureErrorBoundary featureName={label('marketplace')}><MarketplaceMapSearchPage /></FeatureErrorBoundary></FeatureGate>} />
