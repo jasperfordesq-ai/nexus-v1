@@ -9,6 +9,7 @@ namespace Tests\Laravel\Feature\Volunteering;
 use App\Core\TenantContext;
 use App\Models\User;
 use App\Services\VolunteeringConfigurationService;
+use App\Services\VolunteerService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
@@ -145,6 +146,58 @@ class GuardianConsentGateTest extends TestCase
         $response = $this->apiPost("/v2/volunteering/opportunities/{$oppId}/apply", ['message' => 'hi']);
 
         $response->assertStatus(201);
+    }
+
+    /**
+     * Service-level enforcement (2026-07): the guardian-consent gate lived only
+     * in VolunteerController, so callers that invoke the service directly — the
+     * accessible (GOV.UK) frontend and group reservations — bypassed it. These
+     * tests exercise the service methods directly (no HTTP controller in front).
+     */
+    public function test_service_apply_blocks_minor_without_consent(): void
+    {
+        [$oppId] = $this->makeOpportunityWithShift();
+        $minor = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+        DB::table('users')->where('id', $minor->id)->update(['date_of_birth' => now()->subYears(15)->toDateString()]);
+
+        $this->assertTrue(VolunteerService::guardianConsentBlocks($minor->id, $oppId));
+
+        $threw = false;
+        try {
+            VolunteerService::apply($oppId, $minor->id, ['message' => 'hi']);
+        } catch (\RuntimeException $e) {
+            $threw = true;
+            $this->assertSame(403, $e->getCode());
+        }
+        $this->assertTrue($threw, 'apply() must throw for a consent-less minor');
+        $this->assertDatabaseMissing('vol_applications', [
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $oppId,
+            'user_id' => $minor->id,
+        ]);
+    }
+
+    public function test_service_signup_rechecks_consent_after_approval(): void
+    {
+        [$oppId, $shiftId] = $this->makeOpportunityWithShift();
+        $minor = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+        DB::table('users')->where('id', $minor->id)->update(['date_of_birth' => now()->subYears(16)->toDateString()]);
+
+        // The minor already has an APPROVED application (consent has since lapsed).
+        DB::table('vol_applications')->insert([
+            'tenant_id' => $this->testTenantId,
+            'opportunity_id' => $oppId,
+            'user_id' => $minor->id,
+            'status' => 'approved',
+            'created_at' => now(),
+        ]);
+
+        $ok = VolunteerService::signUpForShift($shiftId, $minor->id);
+
+        $this->assertFalse($ok);
+        $this->assertSame('GUARDIAN_CONSENT_REQUIRED', VolunteerService::getErrors()[0]['code'] ?? null);
     }
 
     public function test_verify_endpoint_grants_pending_consent_without_auth(): void
