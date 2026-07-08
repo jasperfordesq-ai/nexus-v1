@@ -30,6 +30,29 @@ interface ThumbnailOptions {
 }
 
 /**
+ * Resolve a branding/logo image without forcing it through the media thumbnail
+ * pipeline. Header and footer logos need their original transparency and exact
+ * light/dark variants; thumbnails are only for uploaded content media.
+ */
+export function resolveBrandingImageUrl(url: string | null | undefined, fallback?: string): string {
+  const candidate = url || fallback;
+  if (!candidate) {
+    return '';
+  }
+
+  if (candidate.startsWith('http://') || candidate.startsWith('https://') || candidate.startsWith('//')) {
+    return resolveAssetUrl(candidate);
+  }
+
+  const cleanUrl = candidate.startsWith('/') ? candidate : '/' + candidate;
+  if (cleanUrl.startsWith('/uploads/') || cleanUrl.startsWith('/storage/')) {
+    return resolveAssetUrl(cleanUrl);
+  }
+
+  return cleanUrl;
+}
+
+/**
  * Resolve a relative URL to an absolute URL pointing to the API server.
  * Used for images, avatars, and other assets served from the PHP backend.
  *

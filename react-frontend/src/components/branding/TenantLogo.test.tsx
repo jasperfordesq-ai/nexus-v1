@@ -56,7 +56,7 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null | undefined) => url ?? '',
-  resolveThumbnailUrl: (url: string | null | undefined) => url ?? '',
+  resolveBrandingImageUrl: (url: string | null | undefined) => url ?? '',
 }));
 
 vi.mock('@/lib/motion', () => ({
@@ -80,6 +80,18 @@ vi.mock('@/components/ui', async (importOriginal) => {
     ),
   };
 });
+
+vi.mock('@/components/ui/Avatar', () => ({
+  Avatar: ({ name, getInitials }: { name?: string; getInitials?: () => string; style?: object; classNames?: object }) => (
+    <div data-testid="avatar-initials" aria-label={name}>{getInitials ? getInitials() : name}</div>
+  ),
+}));
+
+vi.mock('@/components/ui/Tooltip', () => ({
+  Tooltip: ({ children, content }: { children: React.ReactNode; content: string }) => (
+    <div data-testid="tooltip" title={content}>{children}</div>
+  ),
+}));
 
 // ─────────────────────────────────────────────────────────────────────────────
 describe('TenantLogo', () => {

@@ -9,6 +9,7 @@
 /* Content sources for Tailwind */
 @source "../index.html";
 @source "./**/*.{js,ts,jsx,tsx}";
+@source not "./**/*.d.ts";
 @source not "./admin/**/*.{js,ts,jsx,tsx}";
 @source not "./broker/**/*.{js,ts,jsx,tsx}";
 @source not "./caring/**/*.{js,ts,jsx,tsx}";

@@ -32,6 +32,7 @@ import { TenantProvider, useTenant } from '@/contexts/TenantContext';
 import { useAuth, AuthProvider } from '@/contexts/AuthContext';
 import { useCookieConsent } from '@/contexts/CookieConsentContext';
 import { detectTenantFromUrl } from '@/lib/tenant-routing';
+import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
 import { LoadingScreen } from '@/components/feedback/LoadingScreen';
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { listenForImpersonationToken } from '@/lib/impersonate';
@@ -46,6 +47,12 @@ const CookieConsentBanner = lazy(() =>
 );
 
 type AppRoutesFactory = () => React.ReactNode;
+type RouteRegistryKind = 'auth' | 'public' | 'app' | 'provided';
+
+interface LoadedRouteRegistry {
+  kind: RouteRegistryKind;
+  routes: AppRoutesFactory;
+}
 
 /**
  * Props for TenantShell — receives appRoutes from App.tsx so it can
@@ -57,7 +64,9 @@ interface TenantShellProps {
 
 export function TenantShell({ appRoutes }: TenantShellProps) {
   const shellLocation = useLocation();
-  const [loadedAppRoutes, setLoadedAppRoutes] = useState<AppRoutesFactory | null>(appRoutes ?? null);
+  const [loadedRouteRegistry, setLoadedRouteRegistry] = useState<LoadedRouteRegistry | null>(
+    appRoutes ? { kind: 'provided', routes: appRoutes } : null,
+  );
 
   // Listen for impersonation token handoff from admin tab via BroadcastChannel.
   // Token is set in tokenManager (memory → localStorage, same as normal login)
@@ -93,26 +102,42 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
   }
   const effectiveSlug = detectedSlug ?? stickySlugRef.current ?? undefined;
   const isAuthRoute = isAuthEntryPath(shellLocation.pathname, effectiveSlug);
+  const usePublicRouteRegistry = !isAuthRoute && routeCanUsePublicRouteRegistry(shellLocation.pathname, effectiveSlug);
+  const desiredRouteRegistryKind: RouteRegistryKind = appRoutes
+    ? 'provided'
+    : isAuthRoute
+      ? 'auth'
+      : usePublicRouteRegistry
+        ? 'public'
+        : 'app';
 
   useEffect(() => {
     if (appRoutes) {
-      setLoadedAppRoutes(() => appRoutes);
+      setLoadedRouteRegistry({ kind: 'provided', routes: appRoutes });
       return;
     }
 
     let mounted = true;
-    setLoadedAppRoutes(null);
+    setLoadedRouteRegistry((current) => (
+      current?.kind === desiredRouteRegistryKind ? current : null
+    ));
 
-    if (isAuthRoute) {
+    if (desiredRouteRegistryKind === 'auth') {
       import('@/routes/AuthRoutes').then(({ AuthRoutes }) => {
         if (mounted) {
-          setLoadedAppRoutes(() => AuthRoutes);
+          setLoadedRouteRegistry({ kind: 'auth', routes: AuthRoutes });
+        }
+      });
+    } else if (desiredRouteRegistryKind === 'public') {
+      import('@/routes/PublicAppRoutes').then(({ PublicAppRoutes }) => {
+        if (mounted) {
+          setLoadedRouteRegistry({ kind: 'public', routes: PublicAppRoutes });
         }
       });
     } else {
       import('@/routes/AppRoutes').then(({ AppRoutes }) => {
         if (mounted) {
-          setLoadedAppRoutes(() => AppRoutes);
+          setLoadedRouteRegistry({ kind: 'app', routes: AppRoutes });
         }
       });
     }
@@ -120,7 +145,7 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
     return () => {
       mounted = false;
     };
-  }, [appRoutes, isAuthRoute]);
+  }, [appRoutes, desiredRouteRegistryKind]);
 
   // Cross-tenant slug-recovery redirect REMOVED (2026-05-08). The previous
   // logic re-prepended a stored slug from localStorage when a user hit a
@@ -135,7 +160,7 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
     <TenantProvider tenantSlug={effectiveSlug}>
       <AuthProvider>
         <TenantShellRuntime
-          appRoutes={loadedAppRoutes}
+          appRoutes={loadedRouteRegistry?.kind === desiredRouteRegistryKind ? loadedRouteRegistry.routes : null}
           isAuthRoute={isAuthRoute}
           slugPrefix={effectiveSlug}
         />
@@ -271,17 +296,44 @@ const protectedRuntimePrefixes = [
   'events/edit',
   'groups/create',
   'groups/edit',
+  'jobs/create',
+  'jobs/manage',
+  'jobs/analytics',
+  'jobs/alerts',
+  'jobs/my-applications',
+  'jobs/kanban',
+  'jobs/employer-brand',
+  'jobs/talent-search',
+  'jobs/bias-audit',
+  'jobs/employer-onboarding',
   'marketplace/create',
   'marketplace/edit',
   'marketplace/my',
+  'marketplace/sell',
+  'marketplace/orders',
   'marketplace/buyer',
-  'marketplace/seller',
+  'marketplace/seller/coupons',
+  'marketplace/seller/onboard',
+  'marketplace/seller/onboarding',
+  'marketplace/seller/pickup-slots',
+  'marketplace/seller/shipping-options',
+  'marketplace/seller/pickup-scan',
+  'marketplace/become-partner',
+  'marketplace/me',
+  'premium',
   'courses/create',
   'courses/instructor',
   'courses/my-learning',
+  'podcasts/studio',
   'volunteering/create',
   'organisations/register',
   'ideation/create',
+];
+
+const protectedRuntimePatterns = [
+  /^jobs\/[^/]+\/kanban$/,
+  /^courses\/[^/]+\/learn$/,
+  /^marketplace\/[^/]+\/edit$/,
 ];
 
 const publicRuntimePrefixes = [
@@ -338,14 +390,9 @@ const publicRuntimePrefixes = [
 ];
 
 function routeNeedsTenantAppRuntime(pathname: string, slugPrefix?: string): boolean {
-  let routePath = pathname.toLowerCase().replace(/\/+$/, '');
-  const lowerPrefix = slugPrefix?.toLowerCase();
-  if (lowerPrefix && (routePath === `/${lowerPrefix}` || routePath.startsWith(`/${lowerPrefix}/`))) {
-    routePath = routePath.slice(lowerPrefix.length + 1) || '/';
-  }
-  const normalized = routePath.replace(/^\/+/, '');
+  const normalized = normalizeTenantRoutePath(pathname, slugPrefix);
 
-  if (protectedRuntimePrefixes.some((prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`))) {
+  if (isProtectedRuntimePath(normalized)) {
     return true;
   }
 
@@ -354,6 +401,66 @@ function routeNeedsTenantAppRuntime(pathname: string, slugPrefix?: string): bool
   }
 
   return true;
+}
+
+const publicRegistryPatterns = [
+  /^$/,
+  /^(features|changelog|development-status|about|faq|contact|pilot-inquiry|pilot-apply|help|terms|privacy|accessibility|cookies|community-guidelines|trust-and-safety|acceptable-use|legal|timebanking-guide|explore|partner|social-prescribing|impact-summary|impact-report|strategic-plan|pricing)$/,
+  /^pilot-apply\/status\/[^/]+$/,
+  /^(terms|privacy|accessibility|cookies|community-guidelines|acceptable-use)\/versions$/,
+  /^platform\/(terms|privacy|disclaimer)$/,
+  /^developers(\/(auth|endpoints|webhooks))?$/,
+  /^regional-analytics$/,
+  /^partner-analytics\/dashboard$/,
+  /^newsletter\/unsubscribe$/,
+  /^volunteering\/guardian-consent\/verify\/[^/]+$/,
+  /^page\/[^/]+$/,
+  /^blog(\/[^/]+)?$/,
+  /^listings(\/[^/]+)?$/,
+  /^events(\/[^/]+)?$/,
+  /^groups(\/[^/]+)?$/,
+  /^jobs(\/[^/]+)?$/,
+  /^courses(\/[^/]+)?$/,
+  /^podcasts(\/[^/]+(\/[^/]+)?)?$/,
+  /^marketplace$/,
+  /^marketplace\/(search|map|collections|free)$/,
+  /^marketplace\/seller\/[^/]+$/,
+  /^marketplace\/category\/[^/]+$/,
+  /^marketplace\/(my-listings|my-offers)$/,
+  /^marketplace\/[^/]+$/,
+  /^coupons(\/[^/]+)?$/,
+  /^volunteering$/,
+  /^volunteering\/opportunities\/[^/]+$/,
+  /^resources$/,
+  /^kb(\/[^/]+)?$/,
+  /^organisations(\/[^/]+)?$/,
+  /^ideation(\/[^/]+(\/ideas\/[^/]+)?)?$/,
+  /^join\/[^/]+$/,
+  new RegExp(`^${CARING_COMMUNITY_ROUTE.path}$`),
+];
+
+function routeCanUsePublicRouteRegistry(pathname: string, slugPrefix?: string): boolean {
+  const normalized = normalizeTenantRoutePath(pathname, slugPrefix);
+
+  if (isProtectedRuntimePath(normalized)) {
+    return false;
+  }
+
+  return publicRegistryPatterns.some((pattern) => pattern.test(normalized));
+}
+
+function isProtectedRuntimePath(normalized: string): boolean {
+  return protectedRuntimePrefixes.some((prefix) => normalized === prefix || normalized.startsWith(`${prefix}/`)) ||
+    protectedRuntimePatterns.some((pattern) => pattern.test(normalized));
+}
+
+function normalizeTenantRoutePath(pathname: string, slugPrefix?: string): string {
+  let routePath = pathname.toLowerCase().replace(/\/+$/, '');
+  const lowerPrefix = slugPrefix?.toLowerCase();
+  if (lowerPrefix && (routePath === `/${lowerPrefix}` || routePath.startsWith(`/${lowerPrefix}/`))) {
+    routePath = routePath.slice(lowerPrefix.length + 1) || '/';
+  }
+  return routePath.replace(/^\/+/, '');
 }
 
 /**

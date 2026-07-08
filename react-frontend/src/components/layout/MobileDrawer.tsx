@@ -75,7 +75,7 @@ import type { TenantFeatures,
   TenantModules } from '@/types/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemePicker } from '@/components/layout/ThemePicker';
-import { useMenuContext } from '@/contexts/MenuContext';
+import { useMenuContext } from '@/contexts/MenuContextCore';
 import { MobileMenuItems } from '@/components/navigation';
 
 import { Accordion, AccordionItem } from '@/components/ui/Accordion';

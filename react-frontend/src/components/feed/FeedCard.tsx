@@ -1,13 +1,3 @@
-import { Avatar } from '@/components/ui/Avatar';
-import { BottomSheet } from '@/components/ui/BottomSheet';
-import { Button } from '@/components/ui/Button';
-import { Card, CardBody } from '@/components/ui/Card';
-import { Chip } from '@/components/ui/Chip';
-import { ConfettiCelebration } from '@/components/ui/ConfettiCelebration';
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
-import { GlassCard } from '@/components/ui/GlassCard';
-import { Skeleton } from '@/components/ui/Skeleton';
-import { Tooltip } from '@/components/ui/Tooltip';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -24,7 +14,17 @@ import {
 import { motion,
   AnimatePresence } from '@/lib/motion';
 
+import { Avatar } from '@/components/ui/Avatar';
+import { BottomSheet } from '@/components/ui/BottomSheet';
+import { Button } from '@/components/ui/Button';
+import { Card, CardBody } from '@/components/ui/Card';
+import { Chip } from '@/components/ui/Chip';
+import { ConfettiCelebration } from '@/components/ui/ConfettiCelebration';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
+import { GlassCard } from '@/components/ui/GlassCard';
 import { Separator } from '@/components/ui/Separator';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { Tooltip } from '@/components/ui/Tooltip';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import MoreHorizontal from 'lucide-react/icons/ellipsis';
@@ -65,19 +65,27 @@ import { getAuthor, getItemDetailPath, getItemDetailLabel } from './types';
 import { WhyShown } from './WhyShown';
 import { FeedContentRenderer } from './FeedContentRenderer';
 import { TranslateButton } from '@/components/i18n/TranslateButton';
-import { ImageCarousel } from './ImageCarousel';
-import { MediaGrid } from './MediaGrid';
-import { VideoPlayer } from './VideoPlayer';
 import { ReactionPicker, type ReactionType } from '@/components/social/ReactionPicker';
 import { ReactionSummary } from '@/components/social/ReactionSummary';
-import { LinkPreviewCard } from '@/components/social/LinkPreviewCard';
 import { DeferredUserHoverCard } from '@/components/social/DeferredUserHoverCard';
 import { ShareButton, SharedByAttribution } from './ShareButton';
-import { QuotedPostEmbed } from './QuotedPostEmbed';
 import { BookmarkButton } from '@/components/social/BookmarkButton';
 
 const CommentsSection = lazy(() => import('@/components/social/CommentsSection').then((module) => ({ default: module.CommentsSection })));
 const PostAnalyticsModal = lazy(() => import('./PostAnalyticsModal').then((module) => ({ default: module.PostAnalyticsModal })));
+const ImageCarousel = lazy(() => import('./ImageCarousel').then((module) => ({ default: module.ImageCarousel })));
+const MediaGrid = lazy(() => import('./MediaGrid').then((module) => ({ default: module.MediaGrid })));
+const VideoPlayer = lazy(() => import('./VideoPlayer').then((module) => ({ default: module.VideoPlayer })));
+const LinkPreviewCard = lazy(() => import('@/components/social/LinkPreviewCard').then((module) => ({ default: module.LinkPreviewCard })));
+const QuotedPostEmbed = lazy(() => import('./QuotedPostEmbed').then((module) => ({ default: module.QuotedPostEmbed })));
+
+function FeedMediaFallback() {
+  return <div className="mx-5 aspect-video rounded-xl bg-theme-elevated" aria-hidden="true" />;
+}
+
+function FeedPreviewFallback() {
+  return <div className="h-24 rounded-xl border border-theme-default bg-theme-elevated" aria-hidden="true" />;
+}
 
 /* ───────────────────────── Props ───────────────────────── */
 
@@ -912,19 +920,23 @@ const FeedCard = React.memo(function FeedCard({
         {/* Link Previews */}
         {item.link_previews && item.link_previews.length > 0 && (
           <div className={`mb-4 ${item.link_previews.length > 1 ? 'space-y-2' : ''}`}>
-            {item.link_previews.map((lp) => (
-              <LinkPreviewCard
-                key={lp.url}
-                preview={lp}
-                compact={item.link_previews!.length > 1}
-              />
-            ))}
+            <Suspense fallback={<FeedPreviewFallback />}>
+              {item.link_previews.map((lp) => (
+                <LinkPreviewCard
+                  key={lp.url}
+                  preview={lp}
+                  compact={item.link_previews!.length > 1}
+                />
+              ))}
+            </Suspense>
           </div>
         )}
         {/* Quoted Post Embed (quote repost) */}
         {item.quoted_post && (
           <div className="mb-4">
-            <QuotedPostEmbed post={item.quoted_post} />
+            <Suspense fallback={<FeedPreviewFallback />}>
+              <QuotedPostEmbed post={item.quoted_post} />
+            </Suspense>
           </div>
         )}
 
@@ -1104,11 +1116,13 @@ const FeedCard = React.memo(function FeedCard({
             aria-label={t('card.like_action')}
           >
             <HeartOverlay show={showHeartOverlay} />
-            {item.media.length <= 4 ? (
-              <MediaGrid media={item.media} className="mx-5" />
-            ) : (
-              <ImageCarousel media={item.media} className="mx-5" />
-            )}
+            <Suspense fallback={<FeedMediaFallback />}>
+              {item.media.length <= 4 ? (
+                <MediaGrid media={item.media} className="mx-5" />
+              ) : (
+                <ImageCarousel media={item.media} className="mx-5" />
+              )}
+            </Suspense>
           </div>
         ) : item.media && item.media.length === 1 && item.media[0] ? (
           /* Single media item — use VideoPlayer for video, ImageCarousel for image */
@@ -1121,11 +1135,13 @@ const FeedCard = React.memo(function FeedCard({
             aria-label={t('card.like_action')}
           >
             <HeartOverlay show={showHeartOverlay} />
-            {item.media[0].media_type === 'video' ? (
-              <VideoPlayer media={item.media[0]} className="mx-5" />
-            ) : (
-              <ImageCarousel media={item.media} className="mx-5" />
-            )}
+            <Suspense fallback={<FeedMediaFallback />}>
+              {item.media[0].media_type === 'video' ? (
+                <VideoPlayer media={item.media[0]} className="mx-5" />
+              ) : (
+                <ImageCarousel media={item.media} className="mx-5" />
+              )}
+            </Suspense>
           </div>
         ) : item.image_url ? (
           <div

@@ -10,7 +10,7 @@ import { motion } from '@/lib/motion';
 import { useTenant } from '@/contexts';
 import { Avatar } from '@/components/ui/Avatar';
 import { Tooltip } from '@/components/ui/Tooltip';
-import { resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveBrandingImageUrl } from '@/lib/helpers';
 
 /** Extract 1–2 initials from a tenant name. */
 function getInitials(name: string): string {
@@ -152,13 +152,8 @@ export function TenantLogo({
   // rendered directly on the bar with no backdrop — a logo that only suits a dark
   // background should be supplied via the dark slot (or the tenant sets a header
   // colour); we don't paint a contrast chip behind it.
-  const logoThumbOptions = {
-    width: imgDimMap[effectiveSize].width * 2,
-    height: imgDimMap[effectiveSize].height * 2,
-    fit: 'contain' as const,
-  };
-  const lightSrc = resolveThumbnailUrl(branding.logo || branding.logoDark, logoThumbOptions);
-  const darkSrc = resolveThumbnailUrl(branding.logoDark || branding.logo, logoThumbOptions);
+  const lightSrc = resolveBrandingImageUrl(branding.logo || branding.logoDark);
+  const darkSrc = resolveBrandingImageUrl(branding.logoDark || branding.logo);
 
   // Theme-swapped custom logo: one visible at a time via the dark: variants.
   const logoImages = (

@@ -8,8 +8,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { act, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import React from 'react';
 
 // --- Mocks ---
@@ -126,6 +126,39 @@ vi.mock('@/pages/public/MaintenancePage', () => ({
   default: () => <div>Maintenance mode</div>,
 }));
 
+vi.mock('@/routes/AuthRoutes', async () => {
+  const React = await import('react');
+  const { Route } = await import('react-router-dom');
+  return {
+    AuthRoutes: () => React.createElement(Route, {
+      path: '*',
+      element: React.createElement('div', { 'data-testid': 'auth-routes' }, 'Auth routes'),
+    }),
+  };
+});
+
+vi.mock('@/routes/PublicAppRoutes', async () => {
+  const React = await import('react');
+  const { Route } = await import('react-router-dom');
+  return {
+    PublicAppRoutes: () => React.createElement(Route, {
+      path: '*',
+      element: React.createElement('div', { 'data-testid': 'public-routes' }, 'Public routes'),
+    }),
+  };
+});
+
+vi.mock('@/routes/AppRoutes', async () => {
+  const React = await import('react');
+  const { Route } = await import('react-router-dom');
+  return {
+    AppRoutes: () => React.createElement(Route, {
+      path: '*',
+      element: React.createElement('div', { 'data-testid': 'app-routes' }, 'App routes'),
+    }),
+  };
+});
+
 vi.mock('@/lib/motion', () => {
   const proxy = new Proxy({}, {
     get: (_t: object, prop: string | symbol) => {
@@ -167,6 +200,16 @@ function renderWithRouter(initialPath: string, appRoutes?: () => React.ReactNode
       </Routes>
     </MemoryRouter>,
   );
+}
+
+function NavigationProbe({ onReady }: { onReady: (navigate: ReturnType<typeof useNavigate>) => void }) {
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    onReady(navigate);
+  }, [navigate, onReady]);
+
+  return null;
 }
 
 describe('TenantShell', () => {
@@ -254,6 +297,30 @@ describe('TenantShell', () => {
       mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
       renderWithRouter('/dashboard');
       expect(screen.getByTestId('auth-provider')).toBeInTheDocument();
+    });
+
+    it('does not render stale app routes after navigating to an auth route', async () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
+      let navigateTo: ReturnType<typeof useNavigate> | null = null;
+
+      render(
+        <MemoryRouter initialEntries={['/dashboard']}>
+          <NavigationProbe onReady={(navigate) => { navigateTo = navigate; }} />
+          <Routes>
+            <Route path="/*" element={<TenantShell />} />
+          </Routes>
+        </MemoryRouter>,
+      );
+
+      expect(await screen.findByTestId('app-routes')).toBeInTheDocument();
+      await waitFor(() => expect(navigateTo).not.toBeNull());
+
+      await act(async () => {
+        navigateTo?.('/login');
+      });
+
+      expect(screen.queryByTestId('app-routes')).not.toBeInTheDocument();
+      expect(await screen.findByTestId('auth-routes')).toBeInTheDocument();
     });
   });
 

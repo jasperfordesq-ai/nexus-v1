@@ -270,6 +270,7 @@ react-frontend/fix_tests.py
 httpdocs/assets/css/admin-legacy-compat.css
 *.jpg
 !httpdocs/uploads/**/*.jpg
+!react-frontend/public/images/timebank_ireland_west_cork_partnership.jpg
 
 # ─── Stray CLI Artifacts ────────────────────────────────────────────────────
 --help

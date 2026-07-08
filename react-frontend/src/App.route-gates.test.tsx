@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest';
 
 const appSource = readFileSync(path.resolve(__dirname, 'routes/AppRoutes.tsx'), 'utf8');
 const authRoutesSource = readFileSync(path.resolve(__dirname, 'routes/AuthRoutes.tsx'), 'utf8');
+const publicRoutesSource = readFileSync(path.resolve(__dirname, 'routes/PublicAppRoutes.tsx'), 'utf8');
 const tenantShellSource = readFileSync(path.resolve(__dirname, 'components/routing/TenantShell.tsx'), 'utf8');
 
 describe('App route feature gates', () => {
@@ -36,7 +37,32 @@ describe('App route feature gates', () => {
     expect(tenantShellSource).not.toContain('@/components/security/IdleLogoutGuard');
     expect(tenantShellSource).not.toContain('appRoutesModulePromise');
     expect(tenantShellSource).toContain("import('@/routes/AuthRoutes')");
+    expect(tenantShellSource).toContain("import('@/routes/PublicAppRoutes')");
     expect(tenantShellSource).toContain("import('@/routes/AppRoutes')");
     expect(tenantShellSource).toContain("lazy(() => import('./TenantAppProviders'))");
+  });
+
+  it('keeps protected/admin route declarations out of the public route registry', () => {
+    expect(publicRoutesSource).not.toContain('@/admin/AdminApp');
+    expect(publicRoutesSource).not.toContain('@/super-admin/SuperAdminApp');
+    expect(publicRoutesSource).not.toContain('@/components/routing/ProtectedRoute');
+    expect(publicRoutesSource).not.toContain('@/pages/marketplace/CreateMarketplaceListingPage');
+    expect(publicRoutesSource).not.toContain('@/pages/courses/CoursePlayerPage');
+  });
+
+  it('excludes protected subroutes that sit under public-looking prefixes', () => {
+    expect(tenantShellSource).toContain("'podcasts/studio'");
+    expect(tenantShellSource).toContain("'marketplace/orders'");
+    expect(tenantShellSource).toContain("'marketplace/sell'");
+    expect(tenantShellSource).toContain("'marketplace/seller/coupons'");
+    expect(tenantShellSource).toContain('^courses\\/[^/]+\\/learn$');
+    expect(tenantShellSource).toContain('^jobs\\/[^/]+\\/kanban$');
+    expect(tenantShellSource).toContain('^marketplace\\/[^/]+\\/edit$');
+  });
+
+  it('keeps public marketplace profile/list routes in the public route registry', () => {
+    expect(publicRoutesSource).toContain('path="marketplace/seller/:id"');
+    expect(publicRoutesSource).toContain('path="marketplace/my-listings"');
+    expect(publicRoutesSource).toContain('path="marketplace/my-offers"');
   });
 });

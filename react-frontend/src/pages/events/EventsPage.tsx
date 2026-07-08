@@ -15,7 +15,7 @@ import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGro
  * Events Page - Community events listing with category filtering
  */
 
-import { useState, useEffect, useCallback, useRef, memo, useMemo } from 'react';
+import { lazy, Suspense, useState, useEffect, useCallback, useRef, memo, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
@@ -46,8 +46,14 @@ import { logError } from '@/lib/logger';
 import { formatDateTime, formatDateValue, formatMonthShort, resolveThumbnailUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
-import { ProximityFilter, type ProximityFilterParams } from '@/components/proximity/ProximityFilter';
+import type { ProximityFilterParams } from '@/components/proximity/ProximityFilter';
 import type { Event } from '@/types/api';
+
+const LazyProximityFilter = lazy(() =>
+  import('@/components/proximity/ProximityFilter').then((module) => ({
+    default: module.ProximityFilter,
+  })),
+);
 
 type EventFilter = 'upcoming' | 'past' | 'all';
 
@@ -324,7 +330,9 @@ export function EventsPage() {
             <SelectItem key="all" id="all">{t('filter_all')}</SelectItem>
           </Select>
 
-          <ProximityFilter value={proximityParams} onFilter={setProximityParams} />
+          <Suspense fallback={null}>
+            <LazyProximityFilter value={proximityParams} onFilter={setProximityParams} />
+          </Suspense>
 
         </div>
 

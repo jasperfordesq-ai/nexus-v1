@@ -14,7 +14,7 @@
  */
 
 import { afterEach, describe, it, expect, vi } from 'vitest';
-import { resolveAssetUrl, resolveAvatarUrl, resolveThumbnailUrl, getUserDisplayName, getUserInitials } from './helpers';
+import { resolveAssetUrl, resolveAvatarUrl, resolveBrandingImageUrl, resolveThumbnailUrl, getUserDisplayName, getUserInitials } from './helpers';
 
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -140,5 +140,18 @@ describe('resolveThumbnailUrl', () => {
     const url = 'https://example.com/image.jpg';
 
     expect(resolveThumbnailUrl(url, { width: 640, height: 360 })).toBe(url);
+  });
+});
+
+describe('resolveBrandingImageUrl', () => {
+  it('leaves frontend static image paths on the app origin', () => {
+    expect(resolveBrandingImageUrl('/images/powered-by-nexus-light.png')).toBe('/images/powered-by-nexus-light.png');
+  });
+
+  it('routes uploaded branding paths through the API asset base', () => {
+    const result = resolveBrandingImageUrl('/uploads/tenants/test/header-logo.png');
+
+    expect(result).toContain('/uploads/tenants/test/header-logo.png');
+    expect(result).not.toContain('/v2/media/thumbnail');
   });
 });

@@ -18,7 +18,7 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { Button } from '@/components/ui/Button';
-import { resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveBrandingImageUrl } from '@/lib/helpers';
 
 
 export interface FooterProps {
@@ -45,17 +45,17 @@ export function Footer({ children, copyright }: FooterProps) {
 
   // Powered-by branding: hardcoded NEXUS defaults, overridable per-tenant by God only.
   // God-uploaded images take priority; otherwise the built-in assets ship with every fork/clone.
-  const DEFAULT_PB_IMAGE_LIGHT = '/images/powered-by-nexus-light.webp';
-  const DEFAULT_PB_IMAGE_DARK  = '/images/powered-by-nexus-dark.webp';
+  const DEFAULT_PB_IMAGE_LIGHT = '/images/powered-by-nexus-light.png';
+  const DEFAULT_PB_IMAGE_DARK  = '/images/powered-by-nexus-dark.png';
   const DEFAULT_PB_URL         = 'https://project-nexus.ie';
 
   const pbImageLight = (tenant?.config?.powered_by_image_light as string | undefined) || DEFAULT_PB_IMAGE_LIGHT;
   const pbImageDark  = (tenant?.config?.powered_by_image_dark  as string | undefined) || DEFAULT_PB_IMAGE_DARK;
-  const pbImage = resolvedTheme === 'dark' ? pbImageDark : pbImageLight;
+  const pbImage = resolveBrandingImageUrl(resolvedTheme === 'dark' ? pbImageDark : pbImageLight);
   const pbUrl   = (tenant?.config?.powered_by_url   as string | undefined) || DEFAULT_PB_URL;
   const pbLabel = tenant?.config?.powered_by_label as string | undefined;
 
-  const partnerLogoUrl  = tenant?.config?.partner_logo_url      as string | undefined;
+  const partnerLogoUrl  = resolveBrandingImageUrl(tenant?.config?.partner_logo_url as string | undefined);
   const partnerLogoLabel = tenant?.config?.partner_logo_label   as string | undefined;
   const partnerLinkUrl  = tenant?.config?.partner_logo_link_url as string | undefined;
   const partnerLabel = partnerLogoLabel || t('footer.community_partner');
@@ -79,17 +79,17 @@ export function Footer({ children, copyright }: FooterProps) {
             title={pbLabel || t('footer.powered_by')}
             className="max-w-full transition-opacity hover:opacity-80"
           >
-            <img src={resolveThumbnailUrl(pbImage, { width: 384, height: 160, fit: 'contain' })} alt={pbLabel || t('footer.powered_by')} className="h-auto max-h-24 w-auto max-w-full object-contain" />
+            <img src={pbImage} alt={pbLabel || t('footer.powered_by')} className="h-auto max-h-24 w-auto max-w-full object-contain" />
           </a>
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
           {/* Tenant partner logo — real or placeholder */}
           {partnerLogoUrl ? (
             partnerLinkUrl ? (
               <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" title={partnerLabel} aria-label={partnerLabel} className="max-w-full transition-opacity hover:opacity-80">
-                <img src={resolveThumbnailUrl(partnerLogoUrl, { width: 320, height: 128, fit: 'contain' })} alt={partnerLabel} className="max-h-16 w-auto max-w-full object-contain" />
+                <img src={partnerLogoUrl} alt={partnerLabel} className="max-h-16 w-auto max-w-full object-contain" />
               </a>
             ) : (
-              <img src={resolveThumbnailUrl(partnerLogoUrl, { width: 320, height: 128, fit: 'contain' })} alt={partnerLabel} className="max-h-16 w-auto max-w-full object-contain" />
+              <img src={partnerLogoUrl} alt={partnerLabel} className="max-h-16 w-auto max-w-full object-contain" />
             )
           ) : (
             <div className="w-full max-w-[22rem] border-2 border-dashed border-theme-default/40 rounded-xl h-16 flex items-center justify-center">
@@ -262,10 +262,10 @@ export function Footer({ children, copyright }: FooterProps) {
                   {partnerLogoUrl ? (
                     partnerLinkUrl ? (
                       <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" title={partnerLabel} aria-label={partnerLabel} className="max-w-full transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-accent rounded-lg">
-                        <img src={resolveThumbnailUrl(partnerLogoUrl, { width: 384, height: 160, fit: 'contain' })} alt={partnerLabel} className="max-h-20 w-auto max-w-full object-contain" />
+                        <img src={partnerLogoUrl} alt={partnerLabel} className="max-h-20 w-auto max-w-full object-contain" />
                       </a>
                     ) : (
-                      <img src={resolveThumbnailUrl(partnerLogoUrl, { width: 384, height: 160, fit: 'contain' })} alt={partnerLabel} className="max-h-20 w-auto max-w-full object-contain" />
+                      <img src={partnerLogoUrl} alt={partnerLabel} className="max-h-20 w-auto max-w-full object-contain" />
                     )
                   ) : (
                     <div className="h-20 w-48 border-2 border-dashed border-theme-default/40 rounded-xl flex items-center justify-center">
@@ -298,7 +298,7 @@ export function Footer({ children, copyright }: FooterProps) {
                     className="max-w-full transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-accent rounded-lg"
                   >
                     <img
-                      src={resolveThumbnailUrl(pbImage, { width: 512, height: 192, fit: 'contain' })}
+                      src={pbImage}
                       alt={pbLabel || t('footer.powered_by')}
                       className="h-auto max-h-32 w-auto max-w-full object-contain"
                     />

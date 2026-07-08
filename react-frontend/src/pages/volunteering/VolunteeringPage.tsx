@@ -66,23 +66,28 @@ import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { VolunteeringConfig } from '@/types';
-import { ProximityFilter, type ProximityFilterParams } from '@/components/proximity/ProximityFilter';
+import type { ProximityFilterParams } from '@/components/proximity/ProximityFilter';
 import { extractCollectionItems } from './extractCollectionItems';
-import { RecommendedShiftsTab } from './RecommendedShiftsTab';
-import { EmergencyAlertsTab } from './EmergencyAlertsTab';
-import { CertificatesTab } from './CertificatesTab';
-import { WellbeingTab } from './WellbeingTab';
-import { CredentialVerificationTab } from './CredentialVerificationTab';
-import { WaitlistTab } from './WaitlistTab';
-import { ShiftSwapsTab } from './ShiftSwapsTab';
-import { GroupSignUpTab } from './GroupSignUpTab';
-import { VolunteeringWelcome } from './VolunteeringWelcome';
-import GuardianConsentModal from '@/components/volunteering/GuardianConsentModal';
+const VolunteeringWelcome = React.lazy(() => import('./VolunteeringWelcome'));
+const RecommendedShiftsTab = React.lazy(() => import('./RecommendedShiftsTab'));
+const EmergencyAlertsTab = React.lazy(() => import('./EmergencyAlertsTab'));
+const CertificatesTab = React.lazy(() => import('./CertificatesTab'));
+const WellbeingTab = React.lazy(() => import('./WellbeingTab'));
+const CredentialVerificationTab = React.lazy(() => import('./CredentialVerificationTab'));
+const WaitlistTab = React.lazy(() => import('./WaitlistTab'));
+const ShiftSwapsTab = React.lazy(() => import('./ShiftSwapsTab'));
+const GroupSignUpTab = React.lazy(() => import('./GroupSignUpTab'));
+const GuardianConsentModal = React.lazy(() => import('@/components/volunteering/GuardianConsentModal'));
 const ExpensesTab = React.lazy(() => import('./ExpensesTab'));
 const SafeguardingTab = React.lazy(() => import('./SafeguardingTab'));
 const CommunityProjectsTab = React.lazy(() => import('./CommunityProjectsTab'));
 const DonationsTab = React.lazy(() => import('./DonationsTab'));
 const AccessibilityTab = React.lazy(() => import('./AccessibilityTab'));
+const LazyProximityFilter = React.lazy(() =>
+  import('@/components/proximity/ProximityFilter').then((module) => ({
+    default: module.ProximityFilter,
+  })),
+);
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -291,7 +296,11 @@ export function VolunteeringPage() {
       />
 
       {/* One-time welcome for signed-in members (dismissible, localStorage). */}
-      {isAuthenticated && <VolunteeringWelcome />}
+      {isAuthenticated && (
+        <Suspense fallback={null}>
+          <VolunteeringWelcome />
+        </Suspense>
+      )}
 
       {/* Hero — the VOLUNTEER view. Uses the shared PublicPageHero so it matches
           the Organisations landing for a consistent, professional look. */}
@@ -535,15 +544,15 @@ export function VolunteeringPage() {
               {activeTab === 'opportunities' && isTabEnabled('opportunities') && <OpportunitiesTab />}
               {activeTab === 'applications' && isTabEnabled('applications') && <ApplicationsTab />}
               {activeTab === 'hours' && isTabEnabled('hours') && <HoursTab />}
-              {activeTab === 'recommended' && isTabEnabled('recommended') && <RecommendedShiftsTab />}
-              {activeTab === 'certificates' && isTabEnabled('certificates') && <CertificatesTab />}
-              {activeTab === 'alerts' && isTabEnabled('alerts') && <EmergencyAlertsTab />}
-              {activeTab === 'wellbeing' && isTabEnabled('wellbeing') && <WellbeingTab />}
-              {activeTab === 'credentials' && isTabEnabled('credentials') && <CredentialVerificationTab />}
-              {activeTab === 'waitlist' && isTabEnabled('waitlist') && <WaitlistTab />}
-              {activeTab === 'swaps' && isTabEnabled('swaps') && <ShiftSwapsTab />}
-              {activeTab === 'group-signups' && isTabEnabled('group-signups') && <GroupSignUpTab />}
               <Suspense fallback={<div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>}>
+                {activeTab === 'recommended' && isTabEnabled('recommended') && <RecommendedShiftsTab />}
+                {activeTab === 'certificates' && isTabEnabled('certificates') && <CertificatesTab />}
+                {activeTab === 'alerts' && isTabEnabled('alerts') && <EmergencyAlertsTab />}
+                {activeTab === 'wellbeing' && isTabEnabled('wellbeing') && <WellbeingTab />}
+                {activeTab === 'credentials' && isTabEnabled('credentials') && <CredentialVerificationTab />}
+                {activeTab === 'waitlist' && isTabEnabled('waitlist') && <WaitlistTab />}
+                {activeTab === 'swaps' && isTabEnabled('swaps') && <ShiftSwapsTab />}
+                {activeTab === 'group-signups' && isTabEnabled('group-signups') && <GroupSignUpTab />}
                 {activeTab === 'expenses' && isTabEnabled('expenses') && <ExpensesTab />}
                 {activeTab === 'safeguarding' && isTabEnabled('safeguarding') && <SafeguardingTab />}
                 {activeTab === 'community-projects' && isTabEnabled('community-projects') && <CommunityProjectsTab />}
@@ -711,7 +720,9 @@ function OpportunitiesTab() {
             }}
           />
         </div>
-        <ProximityFilter value={proximityParams} onFilter={setProximityParams} />
+        <Suspense fallback={null}>
+          <LazyProximityFilter value={proximityParams} onFilter={setProximityParams} />
+        </Suspense>
       </div>
 
       {/* Error */}
@@ -811,12 +822,16 @@ function OpportunitiesTab() {
         </ModalContent>
       </Modal>
 
-      <GuardianConsentModal
-        isOpen={guardianModal.isOpen}
-        onOpenChange={guardianModal.onOpenChange}
-        onClose={guardianModal.onClose}
-        opportunityId={selectedOpportunity?.id}
-      />
+      {guardianModal.isOpen && (
+        <Suspense fallback={null}>
+          <GuardianConsentModal
+            isOpen={guardianModal.isOpen}
+            onOpenChange={guardianModal.onOpenChange}
+            onClose={guardianModal.onClose}
+            opportunityId={selectedOpportunity?.id}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

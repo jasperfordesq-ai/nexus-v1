@@ -17,7 +17,7 @@ import { Tooltip } from '@/components/ui/Tooltip';
  * Members Page - Community member directory
  */
 
-import { useState, useEffect, useCallback, useRef, memo } from 'react';
+import { lazy, Suspense, useState, useEffect, useCallback, useRef, memo, type ComponentType } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
@@ -38,7 +38,6 @@ import BadgeCheck from 'lucide-react/icons/badge-check';
 import UserCircle from 'lucide-react/icons/circle-user';
 import { useTranslation } from 'react-i18next';
 import { PresenceIndicator } from '@/components/social/PresenceIndicator';
-import { EntityMapView } from '@/components/location/EntityMapView';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { PageMeta } from '@/components/seo';
@@ -50,7 +49,14 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { usePageTitle } from '@/hooks';
+import type { EntityMapViewProps } from '@/components/location/EntityMapView';
 import type { User } from '@/types/api';
+
+const LazyEntityMapView = lazy(() =>
+  import('@/components/location/EntityMapView').then((module) => ({
+    default: module.EntityMapView,
+  })),
+) as ComponentType<EntityMapViewProps<User>>;
 
 type SortOption = 'communityrank' | 'name' | 'joined' | 'rating' | 'hours_given';
 type ViewMode = 'grid' | 'list' | 'map';
@@ -608,18 +614,28 @@ export function MembersPage() {
               )}
 
               {viewMode === 'map' ? (
-                <EntityMapView
+                <Suspense
+                  fallback={
+                    <div
+                      role="status"
+                      aria-busy="true"
+                      aria-label={t('aria.loading_members')}
+                      className="h-[600px] rounded-xl bg-theme-elevated"
+                    />
+                  }
+                >
+                <LazyEntityMapView
                   items={members}
-                  getCoordinates={(m) =>
+                  getCoordinates={(m: User) =>
                     m.latitude != null && m.longitude != null
                       ? { lat: Number(m.latitude), lng: Number(m.longitude) }
                       : null
                   }
-                  getMarkerConfig={(m) => ({
+                  getMarkerConfig={(m: User) => ({
                     id: m.id,
                     title: m.name?.trim() || `${m.first_name || ''} ${m.last_name || ''}`.trim() || t('members.fallback_name'),
                   })}
-                  renderInfoContent={(m) => (
+                  renderInfoContent={(m: User) => (
                     <div className="p-2 max-w-[200px]">
                       <div className="flex items-center gap-2">
                         {(m.avatar || m.avatar_url) && (
@@ -645,6 +661,7 @@ export function MembersPage() {
                   emptyMessage={t('members.no_location')}
                   onMapsFailed={() => setViewMode('grid')}
                 />
+                </Suspense>
               ) : (
                 <motion.div
                   key={`${debouncedQuery}-${activeSortBy}-${quickFilter}`}

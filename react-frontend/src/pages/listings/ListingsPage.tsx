@@ -7,7 +7,7 @@
  * Listings Page - Browse all listings
  */
 
-import { useState, useEffect, useCallback, memo, useRef, useMemo, type ReactNode } from 'react';
+import { lazy, Suspense, useState, useEffect, useCallback, memo, useRef, useMemo, type ComponentType, type ReactNode } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AlgorithmLabel } from '@/components/ui/AlgorithmLabel';
@@ -51,7 +51,6 @@ import X from 'lucide-react/icons/x';
 import Zap from 'lucide-react/icons/zap';
 import ArrowUpDown from 'lucide-react/icons/arrow-up-down';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
-import { EntityMapView } from '@/components/location/EntityMapView';
 import { PageMeta } from '@/components/seo';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
@@ -63,8 +62,21 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
-import { ProximityFilter, type ProximityFilterParams } from '@/components/proximity/ProximityFilter';
+import type { EntityMapViewProps } from '@/components/location/EntityMapView';
+import type { ProximityFilterParams } from '@/components/proximity/ProximityFilter';
 import type { Listing, Category } from '@/types/api';
+
+const LazyEntityMapView = lazy(() =>
+  import('@/components/location/EntityMapView').then((module) => ({
+    default: module.EntityMapView,
+  })),
+) as ComponentType<EntityMapViewProps<Listing>>;
+
+const LazyProximityFilter = lazy(() =>
+  import('@/components/proximity/ProximityFilter').then((module) => ({
+    default: module.ProximityFilter,
+  })),
+);
 
 type ListingType = 'all' | 'offer' | 'request';
 type ViewMode = 'grid' | 'list' | 'map';
@@ -683,7 +695,9 @@ export function ListingsPage() {
               <SelectItem key="30" id="30">{t('filter_this_month')}</SelectItem>
             </Select>
 
-            <ProximityFilter key={proximityKey} value={proximityParams} onFilter={setProximityParams} />
+            <Suspense fallback={null}>
+              <LazyProximityFilter key={proximityKey} value={proximityParams} onFilter={setProximityParams} />
+            </Suspense>
 
             {activeFilterCount > 0 && (
               <Button
@@ -762,9 +776,19 @@ export function ListingsPage() {
       ) : (
         <>
           {viewMode === 'map' ? (
-            <EntityMapView
+            <Suspense
+              fallback={
+                <div
+                  role="status"
+                  aria-busy="true"
+                  aria-label={t('aria.loading_listings')}
+                  className="h-[600px] rounded-xl bg-theme-elevated"
+                />
+              }
+            >
+            <LazyEntityMapView
               items={listings}
-              getCoordinates={(l) => {
+              getCoordinates={(l: Listing) => {
                 if (l.latitude === null || l.latitude === undefined || l.longitude === null || l.longitude === undefined) {
                   return null;
                 }
@@ -772,12 +796,12 @@ export function ListingsPage() {
                 const lng = Number(l.longitude);
                 return Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lng } : null;
               }}
-              getMarkerConfig={(l) => ({
+              getMarkerConfig={(l: Listing) => ({
                 id: l.id,
                 title: l.title,
                 pinColor: l.type === 'offer' ? '#10b981' : '#f59e0b',
               })}
-              renderInfoContent={(l) => (
+              renderInfoContent={(l: Listing) => (
                 <div className="p-2 max-w-[250px]">
                   <div className="flex items-center gap-1 mb-1">
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
@@ -804,6 +828,7 @@ export function ListingsPage() {
               isLoading={isLoading}
               emptyMessage={t('map_empty')}
             />
+            </Suspense>
           ) : (
             <>
               <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">

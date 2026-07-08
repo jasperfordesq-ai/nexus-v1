@@ -57,6 +57,11 @@ const startupImportBudgets = [
   },
   {
     file: 'src/index.css',
+    pattern: /^(?![\s\S]*@source\s+not\s+["']\.\/\*\*\/\*\.d\.ts["'];)/,
+    message: 'src/index.css must exclude generated TypeScript declaration files from the Tailwind scan so generated translation/type metadata cannot create CSS candidates.',
+  },
+  {
+    file: 'src/index.css',
     pattern: /^(?![\s\S]*@source\s+not\s+["']\.\/broker\/\*\*\/\*\.\{js,ts,jsx,tsx\}["'];)/,
     message: 'src/index.css must exclude src/broker from the main Tailwind scan so broker-only utilities stay in the lazy broker CSS chunk.',
   },
@@ -189,6 +194,41 @@ const startupImportBudgets = [
     file: 'src/components/location/LocationMapCard.tsx',
     pattern: /import\s+\{\s*LocationMap\b/,
     message: 'LocationMapCard.tsx must lazy-load LocationMap so profile/event/group detail pages do not fetch map code unless a map is actually shown.',
+  },
+  {
+    file: 'src/pages/listings/ListingsPage.tsx',
+    pattern: /^import\s+(?!type\b).*from ['"]@\/components\/location\/EntityMapView['"]/m,
+    message: 'ListingsPage.tsx must lazy-load EntityMapView so default grid/list browsing does not download map-wrapper code.',
+  },
+  {
+    file: 'src/pages/listings/ListingsPage.tsx',
+    pattern: /^import\s+(?!type\b).*from ['"]@\/components\/proximity\/ProximityFilter['"]/m,
+    message: 'ListingsPage.tsx must lazy-load ProximityFilter so the default browse page does not download advanced-filter-only UI.',
+  },
+  {
+    file: 'src/pages/members/MembersPage.tsx',
+    pattern: /^import\s+(?!type\b).*from ['"]@\/components\/location\/EntityMapView['"]/m,
+    message: 'MembersPage.tsx must lazy-load EntityMapView so default grid/list browsing does not download map-wrapper code.',
+  },
+  {
+    file: 'src/pages/events/EventsPage.tsx',
+    pattern: /^import\s+(?!type\b).*from ['"]@\/components\/proximity\/ProximityFilter['"]/m,
+    message: 'EventsPage.tsx must lazy-load ProximityFilter so the public events route chunk stays focused on event browsing.',
+  },
+  {
+    file: 'src/pages/volunteering/VolunteeringPage.tsx',
+    pattern: /^import\s+(?!type\b).*from ['"]@\/components\/proximity\/ProximityFilter['"]/m,
+    message: 'VolunteeringPage.tsx must lazy-load ProximityFilter so the public volunteering route chunk stays focused on opportunity browsing.',
+  },
+  {
+    file: 'src/pages/volunteering/VolunteeringPage.tsx',
+    pattern: /^import\s+(?!type\b).*from ['"]\.\/(?:RecommendedShiftsTab|EmergencyAlertsTab|CertificatesTab|WellbeingTab|CredentialVerificationTab|WaitlistTab|ShiftSwapsTab|GroupSignUpTab|VolunteeringWelcome)['"]/m,
+    message: 'VolunteeringPage.tsx must lazy-load signed-in/tab-specific volunteering modules so the public opportunities route stays light.',
+  },
+  {
+    file: 'src/pages/volunteering/VolunteeringPage.tsx',
+    pattern: /^import\s+(?!type\b).*from ['"]@\/components\/volunteering\/GuardianConsentModal['"]/m,
+    message: 'VolunteeringPage.tsx must lazy-load GuardianConsentModal only after guardian consent is actually requested.',
   },
   {
     file: 'src/pages/auth/ForgotPasswordPage.tsx',
@@ -324,6 +364,16 @@ const startupImportBudgets = [
     file: 'src/components/feed/FeedCard.tsx',
     pattern: /from ['"]@\/components\/social['"]/,
     message: 'FeedCard.tsx must not import the @/components/social barrel because it re-exports optional feed surfaces such as comments and analytics.',
+  },
+  {
+    file: 'src/components/feed/FeedCard.tsx',
+    pattern: /^import\s+(?!type\b).*from ['"](?:\.\/(?:ImageCarousel|MediaGrid|VideoPlayer|QuotedPostEmbed)|@\/components\/social\/LinkPreviewCard)['"]/m,
+    message: 'FeedCard.tsx must lazy-load optional media, link-preview, and quote-embed renderers so plain text feed items stay light.',
+  },
+  {
+    file: 'src/components/feed/ShareButton.tsx',
+    pattern: /^import\s+(?!type\b).*from ['"]\.\/(?:QuotePostModal|ExternalShareModal|ShareViaDMModal)['"]/m,
+    message: 'ShareButton.tsx must lazy-load share modals so ordinary feed cards do not download modal workflows before interaction.',
   },
   {
     file: 'src/components/feed/FeedCard.tsx',

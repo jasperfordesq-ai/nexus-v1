@@ -16,8 +16,9 @@
  * API: POST/DELETE /api/v2/feed/posts/{id}/share
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { Link } from 'react-router-dom';import Repeat2 from 'lucide-react/icons/repeat-2';
+import { lazy, Suspense, useState, useCallback, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import Repeat2 from 'lucide-react/icons/repeat-2';
 import Quote from 'lucide-react/icons/quote';
 import Copy from 'lucide-react/icons/copy';
 import Share2 from 'lucide-react/icons/share-2';
@@ -29,12 +30,14 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { FeedItem } from './types';
 import { getItemDetailPath } from './types';
-import { QuotePostModal } from './QuotePostModal';
-import { ExternalShareModal } from './ExternalShareModal';
-import { ShareViaDMModal } from './ShareViaDMModal';
 
 import { Button } from '@/components/ui/Button';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
+
+const QuotePostModal = lazy(() => import('./QuotePostModal').then((module) => ({ default: module.QuotePostModal })));
+const ExternalShareModal = lazy(() => import('./ExternalShareModal').then((module) => ({ default: module.ExternalShareModal })));
+const ShareViaDMModal = lazy(() => import('./ShareViaDMModal').then((module) => ({ default: module.ShareViaDMModal })));
+
 export interface ShareButtonProps {
   /**
    * Legacy: pass when `type` is omitted — resolves to type='post'. Prefer `type` + `id`.
@@ -329,30 +332,40 @@ export function ShareButton({
       </Dropdown>
 
       {/* Quote Post Modal */}
-      {post && (
-        <QuotePostModal
-          isOpen={showQuoteModal}
-          onClose={() => setShowQuoteModal(false)}
-          post={post}
-        />
+      {post && showQuoteModal && (
+        <Suspense fallback={null}>
+          <QuotePostModal
+            isOpen={showQuoteModal}
+            onClose={() => setShowQuoteModal(false)}
+            post={post}
+          />
+        </Suspense>
       )}
 
       {/* External Share Modal (fallback for Web Share API) */}
-      <ExternalShareModal
-        isOpen={showExternalShareModal}
-        onClose={() => setShowExternalShareModal(false)}
-        url={postUrl}
-        title={postTitle}
-        text={postText}
-      />
+      {showExternalShareModal && (
+        <Suspense fallback={null}>
+          <ExternalShareModal
+            isOpen={showExternalShareModal}
+            onClose={() => setShowExternalShareModal(false)}
+            url={postUrl}
+            title={postTitle}
+            text={postText}
+          />
+        </Suspense>
+      )}
 
       {/* Share via DM Modal */}
-      <ShareViaDMModal
-        isOpen={showDMModal}
-        onClose={() => setShowDMModal(false)}
-        postUrl={postUrl}
-        postContent={postText}
-      />
+      {showDMModal && (
+        <Suspense fallback={null}>
+          <ShareViaDMModal
+            isOpen={showDMModal}
+            onClose={() => setShowDMModal(false)}
+            postUrl={postUrl}
+            postContent={postText}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

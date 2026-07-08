@@ -71,7 +71,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { useNotificationsOptional } from '@/contexts/NotificationsContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { useMenuContext } from '@/contexts/MenuContext';
+import { useMenuContext } from '@/contexts/MenuContextCore';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { hasAdminPanelAccess, hasBrokerPanelAccess, isPlatformSuperAdminUser } from '@/lib/access';
 import { buildAccessibleFrontendUrl } from '@/lib/accessible-frontend';

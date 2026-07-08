@@ -31,6 +31,19 @@ vi.mock('@/contexts', () => ({
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
+  useFeature: (...args: unknown[]) => mockUseFeature(...args),
+}));
+
+vi.mock('@/contexts/ThemeContext', () => ({
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
+}));
+
+vi.mock('@/contexts/CookieConsentContext', () => ({
+  useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
+}));
+
 import { Footer, FooterLink } from './Footer';
 import { PROJECT_NEXUS_REPO_URL } from './SourceRepositoryLink';
 
@@ -182,7 +195,7 @@ describe('Footer', () => {
             slug: 'test',
             contact: null,
             config: {
-              partner_logo_url: '/partner.svg',
+              partner_logo_url: '/partner.png',
               partner_logo_label: 'Local partner',
             },
           },
@@ -194,7 +207,17 @@ describe('Footer', () => {
       expect(screen.getByText('Local partner')).toBeInTheDocument();
       const images = screen.getAllByRole('img', { name: 'Local partner' });
       expect(images.length).toBeGreaterThan(0);
-      images.forEach((img) => expect(img.getAttribute('src')).toMatch(/\/partner\.svg$/));
+      images.forEach((img) => expect(img.getAttribute('src')).toMatch(/\/partner\.png$/));
+    });
+
+    it('uses direct PNG assets for the default powered-by image', () => {
+      render(<Footer />);
+
+      const images = screen.getAllByRole('img', { name: 'Powered by' });
+      expect(images.length).toBeGreaterThan(0);
+      images.forEach((img) => {
+        expect(img.getAttribute('src')).toBe('/images/powered-by-nexus-light.png');
+      });
     });
   });
 
