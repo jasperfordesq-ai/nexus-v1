@@ -1262,13 +1262,26 @@ class GdprService
                 // these rows must be removed explicitly.
                 $this->query("DELETE FROM vol_shift_checkins WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("DELETE FROM vol_reviews WHERE reviewer_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
-                // Custom form answers attached to the user's applications
+                // Custom form answers attached to the user's applications. The
+                // entity_type filter is ESSENTIAL: without it the delete matched
+                // ANY custom-field-value row whose entity_id merely collided with
+                // one of the user's application ids (opportunity/shift/profile
+                // rows share the entity_id space), destroying unrelated data.
                 $this->query(
                     "DELETE FROM vol_custom_field_values
                      WHERE tenant_id = ?
+                       AND entity_type = 'application'
                        AND entity_id IN (SELECT va.id FROM vol_applications va WHERE va.user_id = ? AND va.tenant_id = ?)",
                     [$this->tenantId, $userId, $this->tenantId]
                 );
+                // Profile-scoped custom answers key entity_id directly to the user.
+                $this->query(
+                    "DELETE FROM vol_custom_field_values WHERE tenant_id = ? AND entity_type = 'profile' AND entity_id = ?",
+                    [$this->tenantId, $userId]
+                );
+                // The user's own volunteer-org memberships — the anonymise-in-place
+                // users row means the FK cascade never fires.
+                $this->query("DELETE FROM org_members WHERE user_id = ? AND tenant_id = ? AND org_type = 'volunteer'", [$userId, $this->tenantId]);
             } catch (\Throwable $e) { $this->logger->warning('GDPR volunteering deletion step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
             // 3p. Volunteering — anonymize records kept for org accounting/audit.
@@ -1280,7 +1293,33 @@ class GdprService
                 $this->query("UPDATE vol_donations SET donor_name = NULL, donor_email = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("UPDATE vol_applications SET message = NULL, org_note = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
                 $this->query("UPDATE vol_logs SET description = NULL, feedback = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
-                $this->query("UPDATE vol_expenses SET description = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+
+                // Expense receipt images carry the volunteer's name, home address
+                // and card fragments — delete the files from the 'local' disk
+                // before nulling the path columns (mirrors the credential cleanup
+                // in 3o). Previously only `description` was wiped, so the files
+                // and their paths survived erasure.
+                $receiptPaths = $this->query(
+                    "SELECT receipt_path FROM vol_expenses WHERE user_id = ? AND tenant_id = ? AND receipt_path IS NOT NULL",
+                    [$userId, $this->tenantId]
+                )->fetchAll(\PDO::FETCH_COLUMN);
+                foreach ($receiptPaths as $storedPath) {
+                    $path = preg_replace('/^private:/', '', (string) $storedPath);
+                    if ($path === '') { continue; }
+                    try {
+                        \Illuminate\Support\Facades\Storage::disk('local')->delete($path);
+                    } catch (\Throwable $e) {
+                        // best-effort file cleanup
+                    }
+                }
+                $this->query("UPDATE vol_expenses SET description = NULL, receipt_path = NULL, receipt_filename = NULL WHERE user_id = ? AND tenant_id = ?", [$userId, $this->tenantId]);
+
+                // An organisation whose PUBLIC contact email is the erased user's
+                // personal email must have it scrubbed — org admins can set a new
+                // contact. Only exact-match the pre-anonymisation email.
+                if (!empty($originalEmail) && strpos($originalEmail, '@anonymized.local') === false) {
+                    $this->query("UPDATE vol_organizations SET contact_email = NULL WHERE tenant_id = ? AND contact_email = ?", [$this->tenantId, $originalEmail]);
+                }
             } catch (\Throwable $e) { $this->logger->warning('GDPR volunteering anonymization step skipped', ['user_id' => $userId, 'error' => $e->getMessage()]); }
 
             // 3q. Job applications — CVs and cover letters are pure applicant
