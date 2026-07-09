@@ -646,9 +646,29 @@ class StripeDonationService
             return;
         }
 
+        // Shared, idempotent refund-ledger step (see applyDonationRefund): the
+        // admin createRefund() path and this charge.refunded webhook may race, so
+        // both converge on a single decrement under a row lock.
+        self::applyDonationRefund($donation);
+
+        Log::info('Stripe donation: charge refunded', [
+            'donation_id' => $donation->id,
+            'payment_intent_id' => $piId,
+            'amount' => $donation->amount,
+        ]);
+    }
+
+    /**
+     * Idempotently mark a donation refunded and decrement its giving-day total
+     * exactly once, under a row lock. Shared by the admin createRefund() path and
+     * the charge.refunded webhook — the admin refund itself fires that webhook, so
+     * either may run first and both must converge on a single decrement. A refund
+     * racing a still-pending donation does not drive the total negative (only a
+     * locked 'completed' row is decremented).
+     */
+    private static function applyDonationRefund(object $donation): void
+    {
         DB::transaction(function () use ($donation) {
-            // Re-read under lock — a refund can race a not-yet-completed
-            // succeeded event.
             $locked = DB::table('vol_donations')
                 ->where('id', $donation->id)
                 ->where('tenant_id', $donation->tenant_id)
@@ -659,16 +679,11 @@ class StripeDonationService
                 return;
             }
 
-            // Only decrement the giving day if this donation had actually been
-            // counted (status 'completed'). A refund racing a still-pending
-            // donation must not drive the total negative; the later succeeded
-            // event will then find status 'refunded' and skip its increment.
             $wasCompleted = $locked->status === 'completed';
 
             $update = ['status' => 'refunded'];
-            // A declaration already submitted to HMRC needs an adjustment on
-            // the next claim — flag it (keeping gift_aid_claimed_at as
-            // evidence) so it surfaces in the admin overview.
+            // A declaration already submitted to HMRC needs an adjustment on the
+            // next claim — flag it (keeping gift_aid_claimed_at as evidence).
             if (($locked->gift_aid_claim_status ?? null) === 'claimed') {
                 $update['gift_aid_claim_status'] = 'refund_after_claim';
             }
@@ -685,12 +700,6 @@ class StripeDonationService
                     ->decrement('raised_amount', (float) $locked->amount);
             }
         });
-
-        Log::info('Stripe donation: charge refunded', [
-            'donation_id' => $donation->id,
-            'payment_intent_id' => $piId,
-            'amount' => $donation->amount,
-        ]);
     }
 
     /**
@@ -742,26 +751,12 @@ class StripeDonationService
             throw new \RuntimeException('Failed to process refund: ' . $e->getMessage());
         }
 
-        DB::transaction(function () use ($donation) {
-            $update = ['status' => 'refunded'];
-            // Flag declarations already submitted to HMRC for adjustment
-            // (mirrors handleChargeRefunded).
-            if (($donation->gift_aid_claim_status ?? null) === 'claimed') {
-                $update['gift_aid_claim_status'] = 'refund_after_claim';
-            }
-
-            DB::table('vol_donations')
-                ->where('id', $donation->id)
-                ->where('tenant_id', $donation->tenant_id)
-                ->update($update);
-
-            if (!empty($donation->giving_day_id)) {
-                DB::table('vol_giving_days')
-                    ->where('id', $donation->giving_day_id)
-                    ->where('tenant_id', $donation->tenant_id)
-                    ->decrement('raised_amount', (float) $donation->amount);
-            }
-        });
+        // Idempotent under a row lock: creating the Stripe refund above fires a
+        // charge.refunded webhook that handleChargeRefunded() also processes.
+        // Re-reading the locked row here (instead of trusting the stale pre-Stripe
+        // read) ensures the giving day is decremented exactly once whichever path
+        // commits first (VOL-BE-003).
+        self::applyDonationRefund($donation);
 
         Log::info('Stripe donation: admin refund processed', [
             'donation_id' => $donationId,

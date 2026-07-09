@@ -204,4 +204,31 @@ class StripeDonationStateMachineTest extends TestCase
             'currency' => 'usd',
         ]);
     }
+
+    public function test_admin_refund_and_webhook_do_not_double_decrement_giving_day(): void
+    {
+        // VOL-BE-003: createRefund() fires a charge.refunded webhook, so the admin
+        // transaction and the webhook can both decrement the same donation's giving
+        // day. The shared, locked refund-ledger step must decrement exactly once.
+        TenantContext::setById($this->testTenantId);
+        $gd = $this->seedGivingDay(10.0);
+        $donationId = $this->seedDonation('completed', $gd, 'pi_refund_race_1', 10.0);
+
+        // Both paths read the row as 'completed' before either commits (the race
+        // window). Drive the shared ledger step twice with that pre-read row.
+        $donation = DB::table('vol_donations')->where('id', $donationId)->first();
+
+        $apply = new \ReflectionMethod(StripeDonationService::class, 'applyDonationRefund');
+        $apply->setAccessible(true);
+        $apply->invoke(null, $donation); // e.g. admin createRefund() transaction
+        $apply->invoke(null, $donation); // e.g. racing charge.refunded webhook
+
+        $this->assertSame('refunded', DB::table('vol_donations')->where('id', $donationId)->value('status'));
+        $this->assertEqualsWithDelta(
+            0.0,
+            (float) DB::table('vol_giving_days')->where('id', $gd)->value('raised_amount'),
+            0.001,
+            'giving day decremented exactly once, not twice'
+        );
+    }
 }
