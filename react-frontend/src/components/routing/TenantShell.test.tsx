@@ -377,7 +377,11 @@ describe('TenantShell', () => {
         },
       });
       renderWithRouter('/bad-slug/dashboard');
-      expect(await screen.findByText('Go home')).toBeInTheDocument();
+      const goHome = await screen.findByText('Go home');
+      // Must be a real full-document navigation (<a href="/">), not an SPA
+      // <Link>: a client-side nav keeps the sticky bad slug and re-renders this
+      // page, which is why the button used to appear to do nothing.
+      expect(goHome.closest('a')).toHaveAttribute('href', '/');
     });
 
     it('shows Find Community button in CommunityNotFound', async () => {
@@ -390,7 +394,9 @@ describe('TenantShell', () => {
         },
       });
       renderWithRouter('/bad-slug/dashboard');
-      expect(await screen.findByText('Find a community')).toBeInTheDocument();
+      const findCommunity = await screen.findByText('Find a community');
+      // Full-document navigation (<a href="/login">), not an SPA <Link> — see above.
+      expect(findCommunity.closest('a')).toHaveAttribute('href', '/login');
     });
   });
 

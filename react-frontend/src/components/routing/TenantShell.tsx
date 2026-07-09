@@ -648,7 +648,6 @@ function BootstrapError({ onRetry }: { onRetry: () => void }) {
  * Community Not Found page — shown when a URL slug doesn't match any tenant.
  * Inline component to avoid circular dependency with lazy-loaded NotFoundPage.
  */
-import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import Home from 'lucide-react/icons/house';
 import Search from 'lucide-react/icons/search';
@@ -679,21 +678,30 @@ function CommunityNotFound({ slug }: { slug: string }) {
             {t('community_not_found_detail')}
           </p>
 
+          {/*
+            These MUST be full-document navigations (<a href>), NOT SPA <Link>s.
+            TenantShell keeps a "sticky" tenant slug for the lifetime of the
+            document (see stickySlugRef). A client-side navigation away from an
+            unknown-tenant URL keeps that bad slug sticky, so notFoundSlug never
+            clears and this page just re-renders — which is why these buttons
+            appeared to do nothing. A fresh document load resets the sticky slug
+            and re-resolves the tenant from the URL / Host header.
+          */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link
-              to="/"
+            <a
+              href="/"
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-theme-accent px-4 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-theme-focus"
             >
               <Home className="w-4 h-4" aria-hidden="true" />
                 {t('go_home')}
-            </Link>
-            <Link
-              to="/login"
+            </a>
+            <a
+              href="/login"
               className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-theme-elevated px-4 py-2.5 text-sm font-semibold text-theme-muted transition hover:bg-theme-muted/10 focus:outline-none focus:ring-2 focus:ring-theme-focus"
             >
               <Search className="w-4 h-4" aria-hidden="true" />
                 {t('find_community')}
-            </Link>
+            </a>
           </div>
         </div>
       </div>
