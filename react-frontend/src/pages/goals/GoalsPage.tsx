@@ -152,11 +152,16 @@ export function GoalsPage() {
 
   const [goals, setGoals] = useState<Goal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<GoalTab>('my');
   const [hasMore, setHasMore] = useState(false);
   const [, setCursor] = useState<string | undefined>();
   const cursorRef = useRef<string | undefined>(undefined);
+  // Re-entry guard for "Load more" — state updates are async, so a ref is the
+  // only reliable way to stop a double-click appending the same page twice
+  // (duplicate cards with colliding React keys).
+  const loadingMoreRef = useRef(false);
 
   // Create modal
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -203,7 +208,11 @@ export function GoalsPage() {
   const [checkinGoal, setCheckinGoal] = useState<Goal | null>(null);
 
   const loadGoals = useCallback(async (append = false) => {
-    if (!append) {
+    if (append) {
+      if (loadingMoreRef.current) return;
+      loadingMoreRef.current = true;
+      setIsLoadingMore(true);
+    } else {
       abortRef.current?.abort();
       const controller = new AbortController();
       abortRef.current = controller;
@@ -244,11 +253,15 @@ export function GoalsPage() {
         if (!append) setError(tRef.current('goals.load_error'));
       }
     } catch (err) {
-      if (controller?.signal.aborted) return;
+      if (controller?.signal.aborted) return; // finally still resets the guards
       logError('Failed to load goals', err);
       if (!append) setError(tRef.current('goals.load_error'));
     } finally {
       setIsLoading(false);
+      if (append) {
+        loadingMoreRef.current = false;
+        setIsLoadingMore(false);
+      }
     }
   }, [tab]);
 
@@ -661,6 +674,8 @@ export function GoalsPage() {
                     variant="flat"
                     className="bg-theme-elevated text-theme-muted"
                     onPress={() => loadGoals(true)}
+                    isLoading={isLoadingMore}
+                    isDisabled={isLoadingMore}
                   >
                     {t('goals.load_more')}
                   </Button>

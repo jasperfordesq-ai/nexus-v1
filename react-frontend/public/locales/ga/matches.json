@@ -24,6 +24,8 @@
   "view_details": "Féach ar shonraí meaitseála",
   "not_interested": "Níl suim agam",
   "load_failed": "Theip ar na meaitseálacha a lódáil",
+  "load_error_title": "Ní féidir na meaitseálacha a lódáil",
+  "retry": "Bain triail eile as",
   "match_hidden": "Meaitseáil i bhfolach — taispeánfaimid níos lú mar seo duit",
   "page_meta": {
     "title": "Meaitseálacha"
@@ -92,6 +94,8 @@
   "preferences": {
     "subtitle": "Rialú ar an gcaoi a aimsíonn Meaitseáil Chliste agus a thugann sé fógra duit faoi naisc.",
     "load_failed": "Theip ar do shainroghanna meaitseála a lódáil",
+    "load_error_desc": "Níorbh fhéidir do shainroghanna sábháilte a lódáil. Tá an eagarthóireacht díchumasaithe ionas nach ndéanfar iad a fhorscríobh le réamhshocruithe.",
+    "retry": "Bain triail eile as",
     "save": "Sábháil sainroghanna",
     "save_success": "Sábháladh na sainroghanna meaitseála",
     "save_failed": "Theip ar shábháil roghanna meaitseála",

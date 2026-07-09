@@ -43,6 +43,7 @@ const defaultProps = {
   sessions: [],
   sessionsLoading: false,
   sessionsError: null,
+  onReloadSessions: vi.fn(),
   // Password
   passwordData: { current_password: '', new_password: '', confirm_password: '' },
   showCurrentPassword: false,
@@ -152,6 +153,23 @@ describe('SecurityTab', () => {
   it('shows sessions error when sessionsError is set', () => {
     render(<SecurityTab {...defaultProps} sessionsError="Failed to load sessions" />);
     expect(screen.getByText('Failed to load sessions')).toBeDefined();
+  });
+
+  it('shows a retry button alongside the sessions error and wires it to onReloadSessions', async () => {
+    const { userEvent } = await import('@/test/test-utils');
+    const user = userEvent.setup();
+    render(<SecurityTab {...defaultProps} sessionsError="Failed to load sessions" />);
+    const retryBtn = screen.getByText('sessions_retry');
+    await user.click(retryBtn);
+    expect(defaultProps.onReloadSessions).toHaveBeenCalled();
+  });
+
+  it('shows a genuine empty state (not "coming soon") when sessions load succeeds with no rows', () => {
+    // Regression: the sessions endpoint is live; the empty branch used to render
+    // t('sessions_coming_soon'), mislabelling a working feature as unbuilt.
+    render(<SecurityTab {...defaultProps} sessions={[]} sessionsError={null} />);
+    expect(screen.getByText('sessions_empty')).toBeDefined();
+    expect(screen.queryByText('sessions_coming_soon')).toBeNull();
   });
 
   it('renders session list when sessions provided', () => {

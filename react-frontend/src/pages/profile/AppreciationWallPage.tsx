@@ -19,6 +19,8 @@ import Heart from 'lucide-react/icons/heart';
 import Sparkles from 'lucide-react/icons/sparkles';
 import Star from 'lucide-react/icons/star';
 import MessageCircleHeart from 'lucide-react/icons/message-circle-heart';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks';
@@ -53,18 +55,27 @@ export default function AppreciationWallPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   usePageTitle(t('appreciations.wall_title'));
 
   const load = useCallback(async (p: number) => {
     if (!userId) return;
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await api.get<Appreciation[]>(`/v2/users/${userId}/appreciations?page=${p}`);
+      // api.get resolves { success:false } on a 4xx WITHOUT throwing — without
+      // this branch a failed load rendered the "No appreciations yet" empty
+      // state as if the wall were genuinely empty.
       if (res.success && Array.isArray(res.data)) {
         setItems(res.data);
         const meta = (res as unknown as { meta?: { total_pages?: number } }).meta;
         if (meta?.total_pages) setTotalPages(meta.total_pages);
+      } else {
+        setLoadError(true);
       }
+    } catch {
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -113,7 +124,22 @@ export default function AppreciationWallPage() {
         {t('appreciations.wall_title')}
       </h1>
 
-      {items.length === 0 ? (
+      {loadError ? (
+        <Card role="alert">
+          <CardBody className="p-8 text-center">
+            <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
+            <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">{t('appreciations.load_error_title')}</h2>
+            <p className="text-[var(--text-muted)] mb-4">{t('appreciations.load_error_desc')}</p>
+            <Button
+              color="primary"
+              startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+              onPress={() => load(page)}
+            >
+              {t('appreciations.retry')}
+            </Button>
+          </CardBody>
+        </Card>
+      ) : items.length === 0 ? (
         <EmptyState
           title={t('appreciations.empty_title')}
           description={t('appreciations.empty_desc')}
@@ -162,7 +188,7 @@ export default function AppreciationWallPage() {
         </div>
       )}
 
-      {totalPages > 1 && (
+      {!loadError && totalPages > 1 && (
         <div className="flex justify-center mt-6">
           <Pagination total={totalPages} page={page} onChange={setPage} />
         </div>

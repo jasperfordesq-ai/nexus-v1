@@ -27,6 +27,8 @@
   "view_details": "Bekijk matchdetails",
   "not_interested": "Niet geïnteresseerd",
   "load_failed": "Kon matches niet laden",
+  "load_error_title": "Kan matches niet laden",
+  "retry": "Opnieuw proberen",
   "match_hidden": "Match verborgen — we tonen je er minder zoals deze",
   "page_meta": {
     "title": "Overeenkomsten"
@@ -99,6 +101,8 @@
     "heading": "Match Preferences",
     "subtitle": "Bepaal hoe Smart Matching verbindingen vindt en u hiervan op de hoogte stelt.",
     "load_failed": "Kan uw wedstrijdvoorkeuren niet laden",
+    "load_error_desc": "Je opgeslagen voorkeuren konden niet worden geladen. Bewerken is uitgeschakeld zodat ze niet worden overschreven met standaardwaarden.",
+    "retry": "Opnieuw proberen",
     "save": "Bewaar voorkeuren",
     "save_success": "Matchvoorkeuren opgeslagen",
     "save_failed": "Kan wedstrijdvoorkeuren niet opslaan",

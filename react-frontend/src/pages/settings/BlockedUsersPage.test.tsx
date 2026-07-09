@@ -240,6 +240,40 @@ describe('BlockedUsersPage', () => {
     expect(mockToast.success).not.toHaveBeenCalled();
   });
 
+  it('shows an error state with retry — never the empty state — when the load returns success:false', async () => {
+    // Regression: api.get resolves { success:false } on a 4xx WITHOUT throwing,
+    // and the old code only handled the success branch — a failed load rendered
+    // "No blocked users" on a privacy-critical screen.
+    vi.mocked(api.get).mockResolvedValue({ success: false, error: 'Server error' });
+    render(<BlockedUsersPage />);
+
+    expect(await screen.findByText("We couldn't load your blocked users")).toBeInTheDocument();
+    expect(screen.getByText('Try again')).toBeInTheDocument();
+    expect(screen.queryByText('No blocked users')).not.toBeInTheDocument();
+  });
+
+  it('shows the error state — never the empty state — when the load throws', async () => {
+    vi.mocked(api.get).mockRejectedValue(new Error('network down'));
+    render(<BlockedUsersPage />);
+
+    expect(await screen.findByText("We couldn't load your blocked users")).toBeInTheDocument();
+    expect(screen.queryByText('No blocked users')).not.toBeInTheDocument();
+  });
+
+  it('reloads and renders the list when retry is clicked after a failed load', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce({ success: false, error: 'Server error' })
+      .mockResolvedValueOnce({ success: true, data: [MOCK_BLOCKED_USER] });
+    render(<BlockedUsersPage />);
+
+    const retryBtn = await screen.findByText('Try again');
+    fireEvent.click(retryBtn);
+
+    await waitFor(() => expect(screen.getByText('Bob Blocker')).toBeInTheDocument());
+    expect(api.get).toHaveBeenCalledTimes(2);
+    expect(screen.queryByText("We couldn't load your blocked users")).not.toBeInTheDocument();
+  });
+
   it('closes the modal when cancel is clicked', async () => {
     vi.mocked(api.get).mockResolvedValue({ success: true, data: [MOCK_BLOCKED_USER] });
     render(<BlockedUsersPage />);

@@ -27,6 +27,8 @@
   "view_details": "Zobacz szczegóły dopasowania",
   "not_interested": "Nie jestem zainteresowany",
   "load_failed": "Nie udało się załadować dopasowań",
+  "load_error_title": "Nie można załadować dopasowań",
+  "retry": "Spróbuj ponownie",
   "match_hidden": "Dopasowanie ukryte — pokażemy Ci mniej takich",
   "page_meta": {
     "title": "Dopasowania"
@@ -99,6 +101,8 @@
     "heading": "Match Preferences",
     "subtitle": "Kontroluj sposób, w jaki Smart Matching znajduje i powiadamia Cię o połączeniach.",
     "load_failed": "Nie udało się załadować preferencji dopasowania",
+    "load_error_desc": "Nie udało się wczytać zapisanych preferencji. Edycja jest wyłączona, aby nie zostały nadpisane wartościami domyślnymi.",
+    "retry": "Spróbuj ponownie",
     "save": "Zapisz preferencje",
     "save_success": "Ustawienia meczu zostały zapisane",
     "save_failed": "Nie udało się zapisać preferencji dopasowania",

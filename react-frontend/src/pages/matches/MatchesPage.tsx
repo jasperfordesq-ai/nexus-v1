@@ -89,6 +89,7 @@ export function MatchesPage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [meta, setMeta] = useState<MatchesMeta>(DEFAULT_META);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [mutualOnly, setMutualOnly] = useState(searchParams.get('type') === 'mutual');
   const [showMutualBanner, setShowMutualBanner] = useState(searchParams.get('type') === 'mutual');
@@ -108,15 +109,25 @@ export function MatchesPage() {
 
     try {
       const res = await api.get<{ matches?: Match[]; meta?: Partial<MatchesMeta> }>('/v2/matches/all');
+      // api.get resolves { success:false } on a 4xx WITHOUT throwing — without
+      // the else branch a failure envelope rendered the "no matches yet" empty
+      // state as if the user genuinely had no matches.
       if (res.success) {
         const payload = res.data;
         const items = Array.isArray(payload) ? payload : payload?.matches ?? [];
         setMatches(items);
         setMeta({ ...DEFAULT_META, ...(Array.isArray(payload) ? {} : payload?.meta ?? {}) });
+        setLoadError(false);
+      } else if (showRefresh) {
+        // Keep the already-loaded list on a failed refresh; just tell the user.
+        toast.error(t('load_failed'));
+      } else {
+        setLoadError(true);
       }
     } catch (err) {
       logError('MatchesPage.load', err);
       toast.error(t('load_failed'));
+      if (!showRefresh) setLoadError(true);
     }
 
     setLoading(false);
@@ -345,11 +356,24 @@ export function MatchesPage() {
         })}
       </Tabs>
 
-      {/* Matches list */}
+      {/* Matches list — never show the empty state when the load failed */}
       {loading ? (
         <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
+      ) : loadError ? (
+        <GlassCard role="alert" className="p-8 text-center">
+          <Sparkles className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h2>
+          <p className="text-theme-muted mb-4">{t('load_failed')}</p>
+          <Button
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+            onPress={() => loadMatches()}
+          >
+            {t('retry')}
+          </Button>
+        </GlassCard>
       ) : filteredMatches.length === 0 ? (
         <MatchesEmptyState variant={emptyVariant} />
       ) : (

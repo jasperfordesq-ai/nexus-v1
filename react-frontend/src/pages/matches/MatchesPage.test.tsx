@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import React from 'react';
 
 const mockApiGet = vi.fn();
@@ -27,6 +27,7 @@ vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: (url: string | null) => url || '/default-avatar.png',
+  resolveThumbnailUrl: (url: string | null) => url || null,
   formatRelativeTime: (d: string) => d,
 }));
 
@@ -102,14 +103,18 @@ describe('MatchesPage', () => {
     });
   });
 
-  it('renders stats glass cards', async () => {
+  it('renders the four stats cards', async () => {
+    // The page imports GlassCard from '@/components/ui/GlassCard' (not the
+    // mocked barrel), so assert on the rendered stat labels rather than the
+    // uiMock's data-testid.
     mockApiGet.mockResolvedValue(emptyResponse);
     render(<MatchesPage />);
     await waitFor(() => {
-      const glassCards = screen.getAllByTestId('glass-card');
-      // At least 4 stats cards are rendered
-      expect(glassCards.length).toBeGreaterThanOrEqual(4);
+      expect(screen.getByText('Total Matches')).toBeInTheDocument();
     });
+    expect(screen.getByText('Avg Score')).toBeInTheDocument();
+    expect(screen.getByText('Hot Matches')).toBeInTheDocument();
+    expect(screen.getByText('Mutual Matches')).toBeInTheDocument();
   });
 
   it('renders match items when API returns data', async () => {
@@ -155,6 +160,29 @@ describe('MatchesPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Add your location to see nearby matches')).toBeInTheDocument();
     });
+  });
+
+  it('shows an error state with retry — not the empty state — when the load returns success:false', async () => {
+    // Regression: api.get resolves { success:false } on a 4xx WITHOUT throwing;
+    // the page used to render the "no matches yet" empty state on failure.
+    mockApiGet.mockResolvedValue({ success: false, error: 'Server error' });
+    render(<MatchesPage />);
+
+    expect(await screen.findByText('Unable to load matches')).toBeInTheDocument();
+    expect(screen.getByText('Try again')).toBeInTheDocument();
+    expect(screen.queryByTestId('empty-state')).not.toBeInTheDocument();
+  });
+
+  it('recovers via retry after a failed load', async () => {
+    mockApiGet
+      .mockResolvedValueOnce({ success: false, error: 'Server error' })
+      .mockResolvedValue(emptyResponse);
+    render(<MatchesPage />);
+
+    fireEvent.click(await screen.findByText('Try again'));
+
+    await waitFor(() => expect(screen.getByTestId('empty-state')).toBeInTheDocument());
+    expect(screen.queryByText('Unable to load matches')).not.toBeInTheDocument();
   });
 
   it('shows the paused banner when matching is paused', async () => {

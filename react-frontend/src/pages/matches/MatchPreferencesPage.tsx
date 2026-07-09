@@ -14,6 +14,8 @@ import { useTranslation } from 'react-i18next';
 
 import Save from 'lucide-react/icons/save';
 import MapPin from 'lucide-react/icons/map-pin';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import PauseCircle from 'lucide-react/icons/pause-circle';
 import Target from 'lucide-react/icons/target';
 import Tags from 'lucide-react/icons/tags';
@@ -81,10 +83,15 @@ export function MatchPreferencesPage() {
         api.get<Category[]>('/v2/categories').catch(() => null),
       ]);
 
+      // api.get resolves { success:false } on a 4xx WITHOUT throwing. If the
+      // saved preferences fail to load, the form must NOT stay editable with
+      // defaults — saving would silently overwrite the user's real preferences.
       if (prefsRes.success && prefsRes.data) {
         const merged: MatchPreferences = { ...DEFAULT_PREFERENCES, ...prefsRes.data };
         setPreferences(merged);
         setInitialPreferences(merged);
+      } else {
+        setError(t('preferences.load_failed'));
       }
 
       if (categoriesRes?.success && Array.isArray(categoriesRes.data)) {
@@ -100,6 +107,9 @@ export function MatchPreferencesPage() {
   useEffect(() => { load(); }, [load]);
 
   const handleSave = useCallback(async () => {
+    // Defence in depth: never save while the last load failed — the form would
+    // contain defaults, not the user's stored preferences.
+    if (error) return;
     setIsSaving(true);
     try {
       const res = await api.put('/v2/users/me/match-preferences', preferences);
@@ -114,7 +124,7 @@ export function MatchPreferencesPage() {
       toast.error(t('preferences.save_failed'));
     }
     setIsSaving(false);
-  }, [preferences, toast, t]);
+  }, [preferences, toast, t, error]);
 
   if (loading) {
     return (
@@ -122,6 +132,43 @@ export function MatchPreferencesPage() {
         <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
+      </div>
+    );
+  }
+
+  // DATA-INTEGRITY: if the saved preferences failed to load, do NOT render the
+  // editable form — it would hold defaults, and saving would overwrite the
+  // user's real preferences. Show an error with retry instead; the save path
+  // stays unreachable until a successful load has populated the form.
+  if (error) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+        <PageMeta title={t('preferences.page_meta_title')} noIndex />
+        <Breadcrumbs
+          items={[
+            { label: t('breadcrumb_dashboard'), href: '/dashboard' },
+            { label: t('breadcrumb_matches'), href: '/matches' },
+            { label: t('preferences.breadcrumb') },
+          ]}
+        />
+
+        <div>
+          <h1 className="text-2xl font-bold text-theme-primary">{t('preferences.heading')}</h1>
+          <p className="text-theme-subtle mt-1">{t('preferences.subtitle')}</p>
+        </div>
+
+        <GlassCard role="alert" className="p-8 text-center">
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{error}</h2>
+          <p className="text-theme-muted mb-4">{t('preferences.load_error_desc')}</p>
+          <Button
+            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+            onPress={() => load()}
+          >
+            {t('preferences.retry')}
+          </Button>
+        </GlassCard>
       </div>
     );
   }
@@ -141,10 +188,6 @@ export function MatchPreferencesPage() {
         <h1 className="text-2xl font-bold text-theme-primary">{t('preferences.heading')}</h1>
         <p className="text-theme-subtle mt-1">{t('preferences.subtitle')}</p>
       </div>
-
-      {error && (
-        <Alert color="danger" title={error} />
-      )}
 
       {/* Pause matching */}
       <GlassCard className="p-6">

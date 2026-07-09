@@ -24,6 +24,8 @@
   "view_details": "Treffer-Details ansehen",
   "not_interested": "Kein Interesse",
   "load_failed": "Matches konnten nicht geladen werden",
+  "load_error_title": "Matches können nicht geladen werden",
+  "retry": "Erneut versuchen",
   "match_hidden": "Match ausgeblendet — wir zeigen dir weniger davon",
   "page_meta": {
     "title": "Treffer"
@@ -92,6 +94,8 @@
   "preferences": {
     "subtitle": "Steuern Sie, wie Smart Matching Verbindungen findet und Sie darüber benachrichtigt.",
     "load_failed": "Ihre Match-Einstellungen konnten nicht geladen werden",
+    "load_error_desc": "Ihre gespeicherten Einstellungen konnten nicht geladen werden. Die Bearbeitung ist deaktiviert, damit sie nicht mit Standardwerten überschrieben werden.",
+    "retry": "Erneut versuchen",
     "save": "Einstellungen speichern",
     "save_success": "Match-Einstellungen gespeichert",
     "save_failed": "Spieleinstellungen konnten nicht gespeichert werden",

@@ -398,11 +398,13 @@ export function SettingsPage() {
       if (response.success && response.data) {
         setSessions(Array.isArray(response.data) ? response.data : []);
       } else {
-        setSessionsError(t('sessions_coming_soon'));
+        // The sessions endpoint is live — a failure here is a real API error,
+        // not a missing feature. Never mask it as "coming soon".
+        setSessionsError(t('sessions_load_error'));
       }
     } catch (error) {
       logError('Failed to load sessions', error);
-      setSessionsError(t('sessions_coming_soon'));
+      setSessionsError(t('sessions_load_error'));
     } finally {
       setSessionsLoading(false);
     }
@@ -1147,6 +1149,7 @@ export function SettingsPage() {
             sessions={sessions}
             sessionsLoading={sessionsLoading}
             sessionsError={sessionsError}
+            onReloadSessions={loadSessions}
             passwordData={passwordData}
             showCurrentPassword={showCurrentPassword}
             showNewPassword={showNewPassword}

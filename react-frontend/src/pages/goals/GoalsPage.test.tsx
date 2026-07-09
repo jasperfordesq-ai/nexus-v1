@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 
 // Mock API module
 vi.mock('@/lib/api', () => ({
@@ -64,6 +64,7 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
+  resolveThumbnailUrl: vi.fn((url) => url || null),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
@@ -201,5 +202,93 @@ describe('GoalsPage', () => {
       expect(screen.getByText('Unable to Load Goals')).toBeInTheDocument();
     });
     expect(screen.getByText('Try Again')).toBeInTheDocument();
+  });
+
+  describe('Load more re-entry guard', () => {
+    // Use a non-owner goal so GoalCard renders no GoalReminderToggle (which
+    // would fire its own api.get calls and pollute the call-count assertions).
+    const baseGoal = {
+      user_id: 999,
+      description: '',
+      target_value: 10,
+      current_value: 4,
+      deadline: null,
+      is_public: true,
+      status: 'active' as const,
+      created_at: '2026-01-15T10:00:00Z',
+      updated_at: '2026-01-20T10:00:00Z',
+      user_name: 'Someone Else',
+      user_avatar: null,
+      progress_percentage: 40,
+      is_owner: false,
+      buddy_id: null,
+      buddy_name: null,
+      buddy_avatar: null,
+    };
+
+    it('does not append the same page twice when Load More is double-clicked', async () => {
+      const { api } = await import('@/lib/api');
+      const goalA = { ...baseGoal, id: 1, title: 'First page goal' };
+      const goalB = { ...baseGoal, id: 2, title: 'Second page goal' };
+
+      let resolveSecond!: (v: unknown) => void;
+      const secondPage = new Promise((res) => { resolveSecond = res; });
+
+      vi.mocked(api.get)
+        .mockResolvedValueOnce({ success: true, data: [goalA], meta: { has_more: true, cursor: 'c1' } })
+        .mockImplementation(() => secondPage as Promise<never>);
+
+      render(<GoalsPage />);
+      await screen.findByText('First page goal');
+
+      const loadMore = screen.getByRole('button', { name: /load more/i });
+      // Double-click before the request settles — the second press must be a no-op.
+      fireEvent.click(loadMore);
+      fireEvent.click(loadMore);
+
+      resolveSecond({ success: true, data: [goalB], meta: { has_more: false } });
+
+      await screen.findByText('Second page goal');
+      // Regression: the un-guarded handler appended the same page twice,
+      // producing duplicate cards with colliding React keys.
+      expect(screen.getAllByText('Second page goal')).toHaveLength(1);
+
+      const goalCalls = vi.mocked(api.get).mock.calls
+        .filter(([url]) => typeof url === 'string' && url.startsWith('/v2/goals?'));
+      expect(goalCalls).toHaveLength(2); // initial load + ONE load-more
+      expect(String(goalCalls[1]?.[0])).toContain('cursor=c1');
+    });
+
+    it('disables the Load More button while the next page is in flight', async () => {
+      const { api } = await import('@/lib/api');
+      const goalA = { ...baseGoal, id: 1, title: 'First page goal' };
+
+      let resolveSecond!: (v: unknown) => void;
+      const secondPage = new Promise((res) => { resolveSecond = res; });
+
+      vi.mocked(api.get)
+        .mockResolvedValueOnce({ success: true, data: [goalA], meta: { has_more: true, cursor: 'c1' } })
+        .mockImplementation(() => secondPage as Promise<never>);
+
+      render(<GoalsPage />);
+      await screen.findByText('First page goal');
+
+      const loadMore = screen.getByRole('button', { name: /load more/i });
+      fireEvent.click(loadMore);
+
+      await waitFor(() => {
+        const inert =
+          loadMore.hasAttribute('disabled') ||
+          loadMore.getAttribute('aria-disabled') === 'true' ||
+          loadMore.getAttribute('data-pending') === 'true';
+        expect(inert).toBe(true);
+      });
+
+      resolveSecond({ success: true, data: [], meta: { has_more: false } });
+      // Button disappears once has_more is false.
+      await waitFor(() => {
+        expect(screen.queryByRole('button', { name: /load more/i })).not.toBeInTheDocument();
+      });
+    });
   });
 });

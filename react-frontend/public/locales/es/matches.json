@@ -24,6 +24,8 @@
   "view_details": "Ver detalles de coincidencia",
   "not_interested": "No me interesa",
   "load_failed": "Error al cargar las coincidencias",
+  "load_error_title": "No se pueden cargar las coincidencias",
+  "retry": "Intentar de nuevo",
   "match_hidden": "Coincidencia oculta — te mostraremos menos como esta",
   "page_meta": {
     "title": "Coincidencias"
@@ -92,6 +94,8 @@
   "preferences": {
     "subtitle": "Controle cómo Smart Matching encuentra conexiones y le notifica sobre ellas.",
     "load_failed": "No se pudieron cargar tus preferencias de coincidencia",
+    "load_error_desc": "No se pudieron cargar tus preferencias guardadas. La edición está deshabilitada para que no se sobrescriban con valores predeterminados.",
+    "retry": "Intentar de nuevo",
     "save": "Guardar preferencias",
     "save_success": "Preferencias de partido guardadas",
     "save_failed": "No se pudieron guardar las preferencias de coincidencia",

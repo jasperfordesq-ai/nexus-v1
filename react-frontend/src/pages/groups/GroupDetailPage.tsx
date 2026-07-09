@@ -249,7 +249,14 @@ export function GroupDetailPage() {
     if (!id) return;
     try {
       const resp = await api.post<{ invite_url: string }>(`/v2/groups/${id}/invites/link`);
-      setInviteLink(resp.data?.invite_url || null);
+      // api.post resolves { success:false } on a 4xx (e.g. 403 for non-admins)
+      // WITHOUT throwing, so the catch never fires — without this branch a
+      // rejected request silently did nothing.
+      if (resp.success && resp.data?.invite_url) {
+        setInviteLink(resp.data.invite_url);
+      } else {
+        toastRef.current.error(t('detail.invite_link_error'));
+      }
     } catch (err) {
       logError('GroupDetailPage.generateInviteLink', err);
       toastRef.current.error(t('detail.invite_link_error'));

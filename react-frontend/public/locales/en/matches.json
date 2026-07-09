@@ -27,6 +27,8 @@
   "view_details": "View match details",
   "not_interested": "Not interested",
   "load_failed": "Failed to load matches",
+  "load_error_title": "Unable to load matches",
+  "retry": "Try again",
   "match_hidden": "Match hidden — we'll show you fewer like this",
   "page_meta": {
     "title": "Matches"
@@ -99,6 +101,8 @@
     "heading": "Match Preferences",
     "subtitle": "Control how Smart Matching finds and notifies you about connections.",
     "load_failed": "Failed to load your match preferences",
+    "load_error_desc": "Your saved preferences couldn't be loaded. Editing is disabled so they aren't overwritten with defaults.",
+    "retry": "Try again",
     "save": "Save preferences",
     "save_success": "Match preferences saved",
     "save_failed": "Failed to save match preferences",

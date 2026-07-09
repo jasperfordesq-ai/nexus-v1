@@ -111,15 +111,30 @@ describe('AppreciationWallPage', () => {
     expect(screen.queryByText('Thank you so much!')).not.toBeInTheDocument();
   });
 
-  it('shows empty state on API failure (success:false)', async () => {
+  it('shows an error state with retry — not the empty state — on API failure (success:false)', async () => {
+    // Regression: api.get resolves { success:false } on a 4xx WITHOUT throwing;
+    // the page used to render "No appreciations yet" as if the wall were empty.
     vi.mocked(api.get).mockResolvedValueOnce({ success: false, error: 'Not found' });
 
     render(<AppreciationWallPage />);
 
-    await waitFor(() => {
-      // After loading finishes, items is still empty → EmptyState shown
-      expect(screen.queryByText('Thank you so much!')).not.toBeInTheDocument();
-    });
+    expect(await screen.findByText("Couldn't load appreciations")).toBeInTheDocument();
+    expect(screen.getByText('Try again')).toBeInTheDocument();
+    expect(screen.queryByText('No appreciations yet')).not.toBeInTheDocument();
+    expect(screen.queryByText('Thank you so much!')).not.toBeInTheDocument();
+  });
+
+  it('reloads the wall when retry is clicked after a failed load', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce({ success: false, error: 'Not found' })
+      .mockResolvedValueOnce({ success: true, data: [makeAppreciation()] });
+
+    render(<AppreciationWallPage />);
+
+    fireEvent.click(await screen.findByText('Try again'));
+
+    await waitFor(() => expect(screen.getByText('Thank you so much!')).toBeInTheDocument());
+    expect(screen.queryByText("Couldn't load appreciations")).not.toBeInTheDocument();
   });
 
   it('calls POST /v2/appreciations/:id/react when a reaction button is clicked', async () => {

@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
 import ArrowLeft from 'lucide-react/icons/arrow-left';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ShieldOff from 'lucide-react/icons/shield-off';
 import UserX from 'lucide-react/icons/user-x';
 import { Avatar } from '@/components/ui/Avatar';
@@ -42,18 +44,27 @@ export function BlockedUsersPage() {
   const { tenantPath } = useTenant();
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [unblockTarget, setUnblockTarget] = useState<BlockedUser | null>(null);
   const [isUnblocking, setIsUnblocking] = useState(false);
 
   const loadBlockedUsers = useCallback(async () => {
     try {
       setIsLoading(true);
+      setLoadError(false);
       const response = await api.get<BlockedUser[]>('/v2/users/blocked');
+      // api.get resolves { success:false } on a 4xx WITHOUT throwing — without
+      // this branch a failed load rendered "No blocked users" on a
+      // privacy-critical screen, telling the user nobody is blocked when the
+      // list simply failed to load.
       if (response.success && response.data) {
         setBlockedUsers(response.data);
+      } else {
+        setLoadError(true);
       }
     } catch (err) {
       logError('Failed to load blocked users', err);
+      setLoadError(true);
     } finally {
       setIsLoading(false);
     }
@@ -115,15 +126,29 @@ export function BlockedUsersPage() {
               <p className="mt-2 text-sm leading-6 text-theme-muted sm:text-base">{t('blocked_users.subtitle')}</p>
             </div>
           </div>
-          <div className="rounded-xl border border-theme-default bg-theme-elevated px-4 py-3 lg:min-w-64">
-            <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('blocked_users.summary_label')}</span>
-            <span className="mt-1 block font-semibold text-theme-primary">{t('blocked_users.count', { count: blockedUsers.length })}</span>
-          </div>
+          {!loadError && (
+            <div className="rounded-xl border border-theme-default bg-theme-elevated px-4 py-3 lg:min-w-64">
+              <span className="block text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('blocked_users.summary_label')}</span>
+              <span className="mt-1 block font-semibold text-theme-primary">{t('blocked_users.count', { count: blockedUsers.length })}</span>
+            </div>
+          )}
         </div>
       </header>
 
-      {/* List */}
-      {blockedUsers.length === 0 ? (
+      {/* List — never show the "No blocked users" empty state on a failed load */}
+      {loadError ? (
+        <GlassCard role="alert" className="p-8 text-center">
+          <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
+          <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('blocked_users.load_error')}</h2>
+          <p className="text-theme-muted mb-4">{t('blocked_users.load_error_desc')}</p>
+          <Button
+            startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+            onPress={loadBlockedUsers}
+          >
+            {t('blocked_users.retry')}
+          </Button>
+        </GlassCard>
+      ) : blockedUsers.length === 0 ? (
         <EmptyState
           icon={<UserX className="w-12 h-12" />}
           title={t('blocked_users.empty')}

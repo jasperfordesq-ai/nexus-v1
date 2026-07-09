@@ -12,6 +12,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Eye from 'lucide-react/icons/eye';
 import EyeOff from 'lucide-react/icons/eye-off';
 import Monitor from 'lucide-react/icons/monitor';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import QrCode from 'lucide-react/icons/qr-code';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldOff from 'lucide-react/icons/shield-off';
@@ -63,6 +64,7 @@ interface SecurityTabProps {
   sessions: SessionInfo[];
   sessionsLoading: boolean;
   sessionsError: string | null;
+  onReloadSessions: () => void;
   // Password
   passwordData: { current_password: string; new_password: string; confirm_password: string };
   showCurrentPassword: boolean;
@@ -133,6 +135,7 @@ export function SecurityTab({
   sessions,
   sessionsLoading,
   sessionsError,
+  onReloadSessions,
   passwordData,
   showCurrentPassword,
   showNewPassword,
@@ -262,9 +265,17 @@ export function SecurityTab({
               <Spinner size="lg" />
             </div>
           ) : sessionsError ? (
-            <div className="text-center py-6">
-              <Monitor className="w-10 h-10 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
-              <p className="text-theme-muted">{sessionsError}</p>
+            <div role="alert" className="text-center py-6">
+              <AlertTriangle className="w-10 h-10 text-[var(--color-warning)] mx-auto mb-3" aria-hidden="true" />
+              <p className="text-theme-muted mb-4">{sessionsError}</p>
+              <Button
+                size="sm"
+                variant="secondary"
+                startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+                onPress={onReloadSessions}
+              >
+                {t('sessions_retry')}
+              </Button>
             </div>
           ) : sessions.length > 0 ? (
             <div className="space-y-3">
@@ -295,7 +306,7 @@ export function SecurityTab({
           ) : (
             <div className="text-center py-6">
               <Monitor className="w-10 h-10 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
-              <p className="text-theme-muted">{t('sessions_coming_soon')}</p>
+              <p className="text-theme-muted">{t('sessions_empty')}</p>
             </div>
           )}
         </GlassCard>

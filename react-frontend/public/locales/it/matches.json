@@ -24,6 +24,8 @@
   "view_details": "Vedi dettagli abbinamento",
   "not_interested": "Non interessato",
   "load_failed": "Impossibile caricare le corrispondenze",
+  "load_error_title": "Impossibile caricare le corrispondenze",
+  "retry": "Riprova",
   "match_hidden": "Corrispondenza nascosta — te ne mostreremo meno di questo tipo",
   "page_meta": {
     "title": "Corrispondenze"
@@ -92,6 +94,8 @@
   "preferences": {
     "subtitle": "Controlla il modo in cui Smart Matching trova e ti avvisa sulle connessioni.",
     "load_failed": "Impossibile caricare le tue preferenze di corrispondenza",
+    "load_error_desc": "Non è stato possibile caricare le tue preferenze salvate. La modifica è disabilitata per evitare che vengano sovrascritte con i valori predefiniti.",
+    "retry": "Riprova",
     "save": "Salva le preferenze",
     "save_success": "Preferenze di corrispondenza salvate",
     "save_failed": "Impossibile salvare le preferenze di corrispondenza",
