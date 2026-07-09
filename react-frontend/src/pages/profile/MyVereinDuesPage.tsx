@@ -79,6 +79,9 @@ export function MyVereinDuesPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [activePayDuesId, setActivePayDuesId] = useState<number | null>(null);
+  // Guards against double-clicking "Pay now": a second POST while the first is
+  // in flight can surface a spurious error toast mid-payment.
+  const [payingDuesId, setPayingDuesId] = useState<number | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [payAmount, setPayAmount] = useState<number>(0);
   const [payCurrency, setPayCurrency] = useState<string>('CHF');
@@ -105,6 +108,8 @@ export function MyVereinDuesPage() {
   useEffect(() => { void load(); }, [load]);
 
   const onPayClick = useCallback(async (row: DuesRow) => {
+    if (payingDuesId !== null) return;
+    setPayingDuesId(row.id);
     try {
       const res = await api.post<PayResponse>(`/v2/me/verein-dues/${row.id}/pay`, {});
       if (res.success && res.data?.client_secret) {
@@ -119,8 +124,10 @@ export function MyVereinDuesPage() {
     } catch (err) {
       logError('MyVereinDuesPage pay failed', err);
       toast.error(t('verein_dues.errors.start_payment_failed'));
+    } finally {
+      setPayingDuesId(null);
     }
-  }, [toast, t]);
+  }, [payingDuesId, toast, t]);
 
   const onPaymentSuccess = useCallback(() => {
     toast.success(t('verein_dues.payment_success'));
@@ -203,7 +210,12 @@ export function MyVereinDuesPage() {
                   )}
                 </div>
                 {isPayable && (
-                  <Button startContent={<CreditCard className="w-4 h-4" />} onPress={() => onPayClick(row)}>
+                  <Button
+                    startContent={<CreditCard className="w-4 h-4" />}
+                    isLoading={payingDuesId === row.id}
+                    isDisabled={payingDuesId !== null}
+                    onPress={() => onPayClick(row)}
+                  >
                     {t('verein_dues.cta_pay_now')}
                   </Button>
                 )}

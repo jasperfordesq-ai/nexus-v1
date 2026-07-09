@@ -191,8 +191,6 @@
     "no_explicit_permissions": "明示的な権限が見つかりません",
     "page_title": "ページ",
     "permissions_description": "権限。",
-    "permissions_editor_coming_soon_desc": "権限エディターは近日公開予定です。",
-    "permissions_editor_coming_soon_title": "権限エディターは近日公開予定",
     "permissions_granted": "付与された権限",
     "permissions_title": "権限",
     "role_label": "役割",
@@ -218,7 +216,9 @@
     "smart_search_status_chip": "ステータス: {{status}}",
     "smart_search_role_chip": "役割: {{role}}",
     "smart_search_text_chip": "クエリ: {{query}}",
-    "role_super_admin": "スーパー管理者"
+    "role_super_admin": "スーパー管理者",
+    "permissions_editor_unavailable_title": "この画面では権限は読み取り専用です",
+    "permissions_editor_unavailable_desc": "このページではユーザーのロールと付与された権限を表示しますが、変更はできません。アクセス権はユーザー編集ページでロールを変更して管理してください。"
   },
   "user_edit": {
     "actions": {

@@ -251,13 +251,13 @@
     "tab_reviews": "Bewertungen",
     "no_listings_title": "Keine Inserate",
     "no_listings_description": "{{name}} hat derzeit keine aktiven Inserate.",
-    "reviews_coming_soon_title": "Bewertungen kommen bald",
-    "reviews_coming_soon_description": "Käuferbewertungen werden in Phase 2 verfügbar sein. Schauen Sie später wieder vorbei, um zu sehen, was die Gemeinschaft über diesen Verkäufer denkt.",
     "view_listings": "Marktplatzinserate von {{name}} anzeigen.",
     "business": "Gewerblich",
     "private": "Privat",
     "view_profile": "Profil ansehen",
-    "verified_business": "Verifiziertes Unternehmen"
+    "verified_business": "Verifiziertes Unternehmen",
+    "reviews_unavailable_title": "Bewertungen nicht verfügbar",
+    "reviews_unavailable_description": "Einzelne Bewertungen für diesen Verkäufer können hier nicht angezeigt werden. Die Gesamtbewertung ist oben in der Profilübersicht zu sehen."
   },
   "category": {
     "not_found_title": "Kategorie nicht gefunden",

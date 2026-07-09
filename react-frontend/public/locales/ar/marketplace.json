@@ -251,13 +251,13 @@
     "tab_reviews": "التقييمات",
     "no_listings_title": "لا توجد قوائم",
     "no_listings_description": "{{name}} ليس لديه أي قوائم نشطة في الوقت الحالي.",
-    "reviews_coming_soon_title": "المراجعات قادمة قريبًا",
-    "reviews_coming_soon_description": "ستكون مراجعات المشترين متاحة في المرحلة 2. تحقق لاحقًا لترى ما يفكر فيه المجتمع حول هذا البائع.",
     "view_listings": "عرض قوائم السوق الخاصة بـ {{name}}.",
     "business": "تجاري",
     "private": "خاص",
     "view_profile": "عرض الملف الشخصي",
-    "verified_business": "نشاط تجاري موثق"
+    "verified_business": "نشاط تجاري موثق",
+    "reviews_unavailable_title": "المراجعات غير متاحة",
+    "reviews_unavailable_description": "لا يمكن عرض المراجعات الفردية لهذا البائع هنا. يظهر التقييم العام في ملخص الملف الشخصي أعلاه."
   },
   "category": {
     "not_found_title": "الفئة غير موجودة",

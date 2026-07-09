@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { logError } from '@/lib/logger';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
@@ -312,9 +313,9 @@ export default function SmartNudgesAdminPage() {
           <div className="w-full h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} interval={3} />
-                <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={CHART_TOKEN_COLORS.border} />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: CHART_TOKEN_COLORS.muted }} interval={3} />
+                <YAxis tick={{ fontSize: 11, fill: CHART_TOKEN_COLORS.muted }} allowDecimals={false} />
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="sent" fill="#3b82f6" name={chartSeries.sent} />

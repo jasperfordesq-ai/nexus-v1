@@ -16,9 +16,10 @@ import type { AdminUserDetail } from '../../api/types';
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * User Permissions (stub)
+ * User Permissions
  * Read-only view of a user's role and active permission slugs.
- * Full per-permission editor is coming soon.
+ * Per-permission editing is not available here; access is managed by
+ * changing the user's role on the user edit page.
  */
 
 
@@ -128,8 +129,8 @@ export function UserPermissions() {
             <CardBody className="flex flex-row items-start gap-3">
               <Info aria-hidden="true" size={20} className="text-warning shrink-0 mt-0.5" />
               <div>
-                <div className="font-medium">{t('users.permissions_editor_coming_soon_title')}</div>
-                <p className="text-sm text-muted mt-1">{t('users.permissions_editor_coming_soon_desc')}</p>
+                <div className="font-medium">{t('users.permissions_editor_unavailable_title')}</div>
+                <p className="text-sm text-muted mt-1">{t('users.permissions_editor_unavailable_desc')}</p>
               </div>
             </CardBody>
           </Card>

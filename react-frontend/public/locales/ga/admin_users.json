@@ -191,8 +191,6 @@
     "no_explicit_permissions": "Níor aimsíodh aon chead follasach",
     "page_title": "Leathanach",
     "permissions_description": "Ceadanna.",
-    "permissions_editor_coming_soon_desc": "Eagarthóir Ceadanna Ag teacht go luath.",
-    "permissions_editor_coming_soon_title": "Eagarthóir Ceadanna Ag teacht go luath",
     "permissions_granted": "Ceadanna Deonaithe",
     "permissions_title": "Ceadanna",
     "role_label": "Ról",
@@ -218,7 +216,9 @@
     "smart_search_status_chip": "Stádas: {{status}}",
     "smart_search_role_chip": "Ról: {{role}}",
     "smart_search_text_chip": "Iarratas: {{query}}",
-    "role_super_admin": "Sárriarthóir"
+    "role_super_admin": "Sárriarthóir",
+    "permissions_editor_unavailable_title": "Tá na ceadanna inléite amháin anseo",
+    "permissions_editor_unavailable_desc": "Taispeánann an leathanach seo ról an úsáideora agus na ceadanna a deonaíodh, ach ní féidir iad a athrú anseo. Bainistigh rochtain trí ról an úsáideora a athrú ar an leathanach eagarthóireachta."
   },
   "user_edit": {
     "actions": {

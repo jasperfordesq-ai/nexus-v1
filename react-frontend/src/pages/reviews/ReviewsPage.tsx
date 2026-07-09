@@ -18,7 +18,6 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 
 import Star from 'lucide-react/icons/star';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -311,9 +310,6 @@ export default function ReviewsPage(): ReactNode {
   // Review modal
   const [reviewTarget, setReviewTarget] = useState<PendingReview | null>(null);
 
-  // Overall error
-  const [error, setError] = useState<string | null>(null);
-
   const fetchReceived = useCallback(async (cursor?: string | null) => {
     if (!user?.id) return;
     const isLoadMore = !!cursor;
@@ -413,15 +409,9 @@ export default function ReviewsPage(): ReactNode {
     setGiven(prev => prev.filter(r => r.id !== id));
   }, []);
 
-  if (error) {
-    return (
-      <div role="alert" className="max-w-2xl mx-auto p-6 text-center">
-        <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-danger" aria-hidden="true" />
-        <p className="text-[var(--color-text-muted)]">{t('load_error')}</p>
-        <Button className="mt-4" onPress={() => { setError(null); fetchReceived(); fetchGiven(); fetchPending(); }}>{t('load_more')}</Button>
-      </div>
-    );
-  }
+  // Load failures are handled per-tab (receivedError / givenError /
+  // pendingError), each rendering its own inline error + retry block, so a
+  // failed fetch never falls through to the tab's empty state.
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-6">

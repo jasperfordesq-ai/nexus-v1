@@ -169,5 +169,11 @@
   "content_type_tabs_aria": "مرشح نوع محتوى الإشارة المرجعية",
   "comment_delete_failed": "تعذّر حذف التعليق. يُرجى المحاولة مرة أخرى.",
   "comment_edit_failed": "تعذّر حفظ تغييراتك. يُرجى المحاولة مرة أخرى.",
-  "comment_post_failed": "تعذّر نشر تعليقك. يُرجى المحاولة مرة أخرى."
+  "comment_post_failed": "تعذّر نشر تعليقك. يُرجى المحاولة مرة أخرى.",
+  "link_preview": {
+    "image_alt_title": "معاينة {{title}}",
+    "image_alt_domain": "معاينة من {{domain}}",
+    "favicon_alt": "أيقونة {{site}}",
+    "video_fallback": "فيديو"
+  }
 }

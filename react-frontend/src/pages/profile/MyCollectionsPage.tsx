@@ -19,6 +19,7 @@ import { Link } from 'react-router-dom';
 import Bookmark from 'lucide-react/icons/bookmark';
 import Plus from 'lucide-react/icons/plus';
 import FolderOpen from 'lucide-react/icons/folder-open';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks';
@@ -44,6 +45,7 @@ export default function MyCollectionsPage() {
 
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
   const [newDescription, setNewDescription] = useState('');
@@ -52,11 +54,18 @@ export default function MyCollectionsPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await api.get<Collection[]>('/v2/me/collections');
       if (res.success && Array.isArray(res.data)) {
         setCollections(res.data);
+      } else {
+        // api.get resolves { success:false } on 4xx/5xx without throwing —
+        // without this branch a failed load fell through to the empty state.
+        setLoadError(true);
       }
+    } catch {
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -111,7 +120,15 @@ export default function MyCollectionsPage() {
         </Button>
       </div>
 
-      {collections.length === 0 ? (
+      {loadError ? (
+        <div role="alert" className="text-center py-12">
+          <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-danger" aria-hidden="true" />
+          <p className="text-[var(--text-muted)]">{t('collections.load_error')}</p>
+          <Button className="mt-4" color="primary" onPress={() => void load()}>
+            {t('collections.retry')}
+          </Button>
+        </div>
+      ) : collections.length === 0 ? (
         <EmptyState
           icon={<FolderOpen className="w-12 h-12 text-[var(--text-muted)]" />}
           title={t('collections.empty_title')}
@@ -172,7 +189,7 @@ export default function MyCollectionsPage() {
             <Button variant="light" onPress={() => setShowCreate(false)}>
               {t('common.cancel')}
             </Button>
-            <Button color="primary" onPress={handleCreate} isLoading={creating}>
+            <Button color="primary" onPress={handleCreate} isLoading={creating} isDisabled={!newName.trim()}>
               {t('collections.create')}
             </Button>
           </ModalFooter>

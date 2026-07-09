@@ -35,7 +35,8 @@
   "card_wallet_title": "Tu cartera",
   "card_wallet_transactions": "{{count}} transacciones en los últimos 30 días",
   "tool_results": {
-    "view": "Ver"
+    "view": "Ver",
+    "result_fallback": "Resultado"
   },
   "page_meta": {
     "title": "Chat de IA"

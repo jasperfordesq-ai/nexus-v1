@@ -169,5 +169,11 @@
   "content_type_tabs_aria": "Scagaire cineál ábhair leabharmharc",
   "comment_delete_failed": "Níorbh fhéidir an trácht a scriosadh. Bain triail eile as.",
   "comment_edit_failed": "Níorbh fhéidir do chuid athruithe a shábháil. Bain triail eile as.",
-  "comment_post_failed": "Níorbh fhéidir do thrácht a phostáil. Bain triail eile as."
+  "comment_post_failed": "Níorbh fhéidir do thrácht a phostáil. Bain triail eile as.",
+  "link_preview": {
+    "image_alt_title": "Réamhamharc ar {{title}}",
+    "image_alt_domain": "Réamhamharc ó {{domain}}",
+    "favicon_alt": "Deilbhín {{site}}",
+    "video_fallback": "Físeán"
+  }
 }

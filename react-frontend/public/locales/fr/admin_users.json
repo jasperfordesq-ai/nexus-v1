@@ -191,8 +191,6 @@
     "no_explicit_permissions": "Aucune autorisation explicite trouvée",
     "page_title": "Pages",
     "permissions_description": "Autorisations.",
-    "permissions_editor_coming_soon_desc": "L'éditeur d'autorisations sera bientôt disponible.",
-    "permissions_editor_coming_soon_title": "L'éditeur d'autorisations sera bientôt disponible",
     "permissions_granted": "Autorisations accordées",
     "permissions_title": "Autorisations",
     "role_label": "Rôle",
@@ -218,7 +216,9 @@
     "smart_search_status_chip": "Statut : {{status}}",
     "smart_search_role_chip": "Rôle : {{role}}",
     "smart_search_text_chip": "Recherche : {{query}}",
-    "role_super_admin": "Super administrateur"
+    "role_super_admin": "Super administrateur",
+    "permissions_editor_unavailable_title": "Les autorisations sont en lecture seule ici",
+    "permissions_editor_unavailable_desc": "Cette page affiche le rôle de l'utilisateur et les autorisations accordées, mais ne permet pas de les modifier. Gérez l'accès en modifiant le rôle de l'utilisateur sur la page de modification."
   },
   "user_edit": {
     "actions": {

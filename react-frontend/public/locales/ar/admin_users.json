@@ -191,8 +191,6 @@
     "no_explicit_permissions": "لم يتم العثور على أذونات صريحة",
     "page_title": "صفحة",
     "permissions_description": "الأذونات.",
-    "permissions_editor_coming_soon_desc": "محرر الأذونات قريبا.",
-    "permissions_editor_coming_soon_title": "محرر الأذونات قريبا",
     "permissions_granted": "الأذونات الممنوحة",
     "permissions_title": "الأذونات",
     "role_label": "دور",
@@ -218,7 +216,9 @@
     "smart_search_status_chip": "الحالة: {{status}}",
     "smart_search_role_chip": "الدور: {{role}}",
     "smart_search_text_chip": "الاستعلام: {{query}}",
-    "role_super_admin": "مشرف عام"
+    "role_super_admin": "مشرف عام",
+    "permissions_editor_unavailable_title": "الأذونات هنا للقراءة فقط",
+    "permissions_editor_unavailable_desc": "تعرض هذه الصفحة دور المستخدم والأذونات الممنوحة له، لكن لا يمكن تغييرها هنا. يمكن إدارة الوصول عبر تغيير دور المستخدم في صفحة تعديل المستخدم."
   },
   "user_edit": {
     "actions": {

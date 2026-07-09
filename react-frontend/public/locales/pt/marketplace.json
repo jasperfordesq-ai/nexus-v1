@@ -251,13 +251,13 @@
     "tab_reviews": "Avaliações",
     "no_listings_title": "Sem Anúncios",
     "no_listings_description": "{{name}} não tem nenhum anúncio ativo no momento.",
-    "reviews_coming_soon_title": "Avaliações em Breve",
-    "reviews_coming_soon_description": "As avaliações dos compradores estarão disponíveis na Fase 2. Volte mais tarde para ver o que a comunidade pensa sobre este vendedor.",
     "view_listings": "Ver anúncios do mercado de {{name}}.",
     "business": "Empresa",
     "private": "Particular",
     "view_profile": "Ver perfil",
-    "verified_business": "Empresa verificada"
+    "verified_business": "Empresa verificada",
+    "reviews_unavailable_title": "Avaliações indisponíveis",
+    "reviews_unavailable_description": "As avaliações individuais deste vendedor não podem ser apresentadas aqui. A classificação geral aparece acima, no resumo do perfil."
   },
   "category": {
     "not_found_title": "Categoria Não Encontrada",

@@ -251,13 +251,13 @@
     "tab_reviews": "Opinie",
     "no_listings_title": "Brak ogłoszeń",
     "no_listings_description": "{{name}} nie ma obecnie żadnych aktywnych ogłoszeń.",
-    "reviews_coming_soon_title": "Opinie już wkrótce",
-    "reviews_coming_soon_description": "Opinie kupujących będą dostępne w fazie 2. Zajrzyj później, aby zobaczyć, co społeczność sądzi o tym sprzedawcy.",
     "view_listings": "Zobacz ogłoszenia {{name}} na marketplace.",
     "business": "Firma",
     "private": "Prywatny",
     "view_profile": "Zobacz profil",
-    "verified_business": "Zweryfikowana firma"
+    "verified_business": "Zweryfikowana firma",
+    "reviews_unavailable_title": "Opinie są niedostępne",
+    "reviews_unavailable_description": "Poszczególnych opinii o tym sprzedawcy nie można tutaj wyświetlić. Ogólna ocena znajduje się powyżej w podsumowaniu profilu."
   },
   "category": {
     "not_found_title": "Nie znaleziono kategorii",

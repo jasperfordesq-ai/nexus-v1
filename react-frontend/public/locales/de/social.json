@@ -169,5 +169,11 @@
   "content_type_tabs_aria": "Lesezeichen-Inhaltstypfilter",
   "comment_delete_failed": "Der Kommentar konnte nicht gelöscht werden. Bitte versuche es erneut.",
   "comment_edit_failed": "Deine Änderungen konnten nicht gespeichert werden. Bitte versuche es erneut.",
-  "comment_post_failed": "Dein Kommentar konnte nicht gepostet werden. Bitte versuche es erneut."
+  "comment_post_failed": "Dein Kommentar konnte nicht gepostet werden. Bitte versuche es erneut.",
+  "link_preview": {
+    "image_alt_title": "Vorschau für {{title}}",
+    "image_alt_domain": "Vorschau von {{domain}}",
+    "favicon_alt": "Symbol von {{site}}",
+    "video_fallback": "Video"
+  }
 }

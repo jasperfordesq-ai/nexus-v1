@@ -35,7 +35,8 @@
   "card_wallet_title": "Il tuo portafoglio",
   "card_wallet_transactions": "{{count}} transazioni negli ultimi 30 giorni",
   "tool_results": {
-    "view": "Visualizza"
+    "view": "Visualizza",
+    "result_fallback": "Risultato"
   },
   "page_meta": {
     "title": "Chat AI"

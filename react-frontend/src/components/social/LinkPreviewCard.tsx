@@ -19,6 +19,7 @@ import { useState } from 'react';
 
 import ExternalLink from 'lucide-react/icons/external-link';
 import Globe from 'lucide-react/icons/globe';
+import { useTranslation } from 'react-i18next';
 import { YouTubeEmbed } from './YouTubeEmbed';
 
 /* ───────────────────────── Types ───────────────────────── */
@@ -95,6 +96,7 @@ export function LinkPreviewSkeleton({ compact }: { compact?: boolean }) {
 /* ───────────────────────── Component ───────────────────────── */
 
 export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardProps) {
+  const { t } = useTranslation('social');
   const [imageError, setImageError] = useState(false);
 
   const title = preview.title;
@@ -112,7 +114,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
       <YouTubeEmbed
         embedUrl={embedHtml}
         thumbnailUrl={imageUrl || undefined}
-        title={title || 'Video'}
+        title={title || t('link_preview.video_fallback')}
       />
     );
   }
@@ -134,7 +136,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
             <div className="w-20 h-20 flex-shrink-0 overflow-hidden">
               <img
                 src={safeUrl(imageUrl!)}
-                alt={title ? `Preview for ${title}` : `Preview from ${domain}`}
+                alt={title ? t('link_preview.image_alt_title', { title }) : t('link_preview.image_alt_domain', { domain })}
                 className="w-full h-full object-cover"
                 loading="lazy"
                 onError={() => setImageError(true)}
@@ -149,7 +151,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
               {faviconUrl ? (
                 <img
                   src={safeUrl(faviconUrl!)}
-                  alt={`${siteName || domain} icon`}
+                  alt={t('link_preview.favicon_alt', { site: siteName || domain })}
                   className="w-3.5 h-3.5 rounded-sm flex-shrink-0"
                   loading="lazy"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -199,7 +201,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
           <div className="w-full overflow-hidden aspect-[2/1]">
             <img
               src={safeUrl(imageUrl!)}
-              alt={title ? `Preview for ${title}` : `Preview from ${domain}`}
+              alt={title ? t('link_preview.image_alt_title', { title }) : t('link_preview.image_alt_domain', { domain })}
               className="w-full h-full object-cover group-hover/link:scale-[1.03] transition-transform duration-500"
               loading="lazy"
               onError={() => setImageError(true)}
@@ -214,7 +216,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
             {faviconUrl ? (
               <img
                 src={safeUrl(faviconUrl)}
-                alt={`${siteName || domain} icon`}
+                alt={t('link_preview.favicon_alt', { site: siteName || domain })}
                 className="w-4 h-4 rounded-sm flex-shrink-0"
                 loading="lazy"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}

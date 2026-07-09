@@ -191,8 +191,6 @@
     "no_explicit_permissions": "No se encontraron permisos explícitos",
     "page_title": "Página",
     "permissions_description": "Permisos.",
-    "permissions_editor_coming_soon_desc": "Editor de permisos próximamente.",
-    "permissions_editor_coming_soon_title": "Editor de permisos próximamente",
     "permissions_granted": "Permisos concedidos",
     "permissions_title": "Permisos",
     "role_label": "Rol",
@@ -218,7 +216,9 @@
     "smart_search_status_chip": "Estado: {{status}}",
     "smart_search_role_chip": "Rol: {{role}}",
     "smart_search_text_chip": "Consulta: {{query}}",
-    "role_super_admin": "Superadministrador"
+    "role_super_admin": "Superadministrador",
+    "permissions_editor_unavailable_title": "Los permisos son de solo lectura aquí",
+    "permissions_editor_unavailable_desc": "Esta página muestra el rol del usuario y los permisos concedidos, pero no permite modificarlos. Gestiona el acceso cambiando el rol del usuario en la página de edición."
   },
   "user_edit": {
     "actions": {

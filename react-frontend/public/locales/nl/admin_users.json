@@ -191,8 +191,6 @@
     "no_explicit_permissions": "Geen expliciete rechten gevonden",
     "page_title": "Pagina",
     "permissions_description": "Machtigingen.",
-    "permissions_editor_coming_soon_desc": "Machtigingseditor binnenkort beschikbaar.",
-    "permissions_editor_coming_soon_title": "Machtigingseditor binnenkort beschikbaar",
     "permissions_granted": "Machtigingen verleend",
     "permissions_title": "Machtigingen",
     "role_label": "Rol",
@@ -218,7 +216,9 @@
     "smart_search_status_chip": "Status: {{status}}",
     "smart_search_role_chip": "Rol: {{role}}",
     "smart_search_text_chip": "Zoekterm: {{query}}",
-    "role_super_admin": "Superbeheerder"
+    "role_super_admin": "Superbeheerder",
+    "permissions_editor_unavailable_title": "Rechten zijn hier alleen-lezen",
+    "permissions_editor_unavailable_desc": "Deze pagina toont de rol en toegekende rechten van de gebruiker, maar wijzigingen zijn hier niet mogelijk. Beheer toegang door de rol van de gebruiker te wijzigen op de bewerkingspagina."
   },
   "user_edit": {
     "actions": {

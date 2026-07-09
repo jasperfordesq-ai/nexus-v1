@@ -30,7 +30,8 @@ import { useAuth, useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
-import { ToolResultCards, type ToolInvocation } from './ToolResultCards';
+import { Link } from 'react-router-dom';
+import { ToolResultCards, isInternalUrl, type ToolInvocation } from './ToolResultCards';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -248,16 +249,29 @@ function MessageBubble({ message, userName, userAvatar, onFeedback }: MessageBub
                 </Chip>
               );
 
-              return source.url ? (
+              if (!source.url) return chip;
+
+              return isInternalUrl(source.url) ? (
+                <Link
+                  key={`${source.type}-${source.id}`}
+                  to={source.url}
+                  className="inline-flex max-w-full"
+                  title={source.title}
+                >
+                  {chip}
+                </Link>
+              ) : (
                 <a
                   key={`${source.type}-${source.id}`}
                   href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex max-w-full"
                   title={source.title}
                 >
                   {chip}
                 </a>
-              ) : chip;
+              );
             })}
           </div>
         )}

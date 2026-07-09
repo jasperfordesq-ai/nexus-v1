@@ -127,6 +127,28 @@ describe('ToolResultCards — listing card', () => {
     const link = screen.getByRole('link');
     expect(link).toHaveAttribute('href', '/test/listings/1');
   });
+
+  it('renders internal urls as SPA links (no new-tab attributes)', () => {
+    const inv = makeInvocation('listing', [
+      { id: 1, title: 'Internal Listing', url: '/test/listings/1' },
+    ]);
+    render(<ToolResultCards invocations={[inv]} />);
+    const link = screen.getByRole('link');
+    // react-router Link — navigates client-side, so no target/rel
+    expect(link).not.toHaveAttribute('target');
+    expect(link).not.toHaveAttribute('rel');
+  });
+
+  it('renders absolute http(s) urls as external links with new-tab attributes', () => {
+    const inv = makeInvocation('listing', [
+      { id: 1, title: 'External Listing', url: 'https://example.com/thing' },
+    ]);
+    render(<ToolResultCards invocations={[inv]} />);
+    const link = screen.getByRole('link');
+    expect(link).toHaveAttribute('href', 'https://example.com/thing');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', 'noopener noreferrer');
+  });
 });
 
 // ---------------------------------------------------------------------------

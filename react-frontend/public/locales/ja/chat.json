@@ -35,7 +35,8 @@
   "card_wallet_title": "あなたのウォレット",
   "card_wallet_transactions": "過去30日間の{{count}}件の取引",
   "tool_results": {
-    "view": "表示"
+    "view": "表示",
+    "result_fallback": "結果"
   },
   "page_meta": {
     "title": "AIチャット"

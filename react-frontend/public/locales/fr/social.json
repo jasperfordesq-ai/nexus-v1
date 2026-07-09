@@ -169,5 +169,11 @@
   "content_type_tabs_aria": "Filtre de type de contenu de signet",
   "comment_delete_failed": "Impossible de supprimer le commentaire. Veuillez réessayer.",
   "comment_edit_failed": "Impossible d’enregistrer vos modifications. Veuillez réessayer.",
-  "comment_post_failed": "Impossible de publier votre commentaire. Veuillez réessayer."
+  "comment_post_failed": "Impossible de publier votre commentaire. Veuillez réessayer.",
+  "link_preview": {
+    "image_alt_title": "Aperçu de {{title}}",
+    "image_alt_domain": "Aperçu de {{domain}}",
+    "favicon_alt": "Icône de {{site}}",
+    "video_fallback": "Vidéo"
+  }
 }

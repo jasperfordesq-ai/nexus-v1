@@ -432,9 +432,9 @@ export function SellerProfilePage() {
         {activeTab === 'reviews' && (
           <GlassCard className="p-8 text-center">
             <Star className="w-12 h-12 text-muted mx-auto mb-3" />
-            <h3 className="text-lg font-semibold text-foreground mb-2">{t('seller.reviews_coming_soon_title')}</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">{t('seller.reviews_unavailable_title')}</h3>
             <p className="text-sm text-muted max-w-md mx-auto">
-              {t('seller.reviews_coming_soon_description')}
+              {t('seller.reviews_unavailable_description')}
             </p>
           </GlassCard>
         )}

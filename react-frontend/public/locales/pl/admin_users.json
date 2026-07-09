@@ -191,8 +191,6 @@
     "no_explicit_permissions": "Nie znaleziono wyraźnych uprawnień",
     "page_title": "Strona",
     "permissions_description": "Uprawnienia.",
-    "permissions_editor_coming_soon_desc": "Edytor uprawnień już wkrótce.",
-    "permissions_editor_coming_soon_title": "Edytor uprawnień już wkrótce",
     "permissions_granted": "Uprawnienia przyznane",
     "permissions_title": "Uprawnienia",
     "role_label": "Rola",
@@ -218,7 +216,9 @@
     "smart_search_status_chip": "Status: {{status}}",
     "smart_search_role_chip": "Rola: {{role}}",
     "smart_search_text_chip": "Zapytanie: {{query}}",
-    "role_super_admin": "Superadministrator"
+    "role_super_admin": "Superadministrator",
+    "permissions_editor_unavailable_title": "Uprawnienia są tutaj tylko do odczytu",
+    "permissions_editor_unavailable_desc": "Ta strona pokazuje rolę użytkownika i przyznane uprawnienia, ale nie pozwala ich zmieniać. Zarządzaj dostępem, zmieniając rolę użytkownika na stronie edycji."
   },
   "user_edit": {
     "actions": {

@@ -191,8 +191,6 @@
     "no_explicit_permissions": "Keine expliziten Berechtigungen gefunden",
     "page_title": "Seite",
     "permissions_description": "Berechtigungen.",
-    "permissions_editor_coming_soon_desc": "Der Berechtigungseditor ist bald verfügbar.",
-    "permissions_editor_coming_soon_title": "Der Berechtigungseditor ist bald verfügbar",
     "permissions_granted": "Berechtigungen erteilt",
     "permissions_title": "Berechtigungen",
     "role_label": "Rolle",
@@ -218,7 +216,9 @@
     "smart_search_status_chip": "Status: {{status}}",
     "smart_search_role_chip": "Rolle: {{role}}",
     "smart_search_text_chip": "Suche: {{query}}",
-    "role_super_admin": "Superadmin"
+    "role_super_admin": "Superadmin",
+    "permissions_editor_unavailable_title": "Berechtigungen sind hier schreibgeschützt",
+    "permissions_editor_unavailable_desc": "Diese Seite zeigt die Rolle und die erteilten Berechtigungen des Benutzers, kann sie aber nicht ändern. Verwalten Sie den Zugriff, indem Sie die Rolle des Benutzers auf der Bearbeitungsseite ändern."
   },
   "user_edit": {
     "actions": {

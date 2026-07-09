@@ -251,13 +251,13 @@
     "tab_reviews": "レビュー",
     "no_listings_title": "リスティングなし",
     "no_listings_description": "{{name}} は現在有効なリスティングがありません。",
-    "reviews_coming_soon_title": "レビューは近日公開",
-    "reviews_coming_soon_description": "バイヤーのレビューはフェーズ2で利用可能になります。後ほどご確認ください。",
     "view_listings": "{{name}} のマーケットプレイスリスティングを表示。",
     "business": "ビジネス",
     "private": "個人",
     "view_profile": "プロフィールを見る",
-    "verified_business": "認証済みビジネス"
+    "verified_business": "認証済みビジネス",
+    "reviews_unavailable_title": "レビューは表示できません",
+    "reviews_unavailable_description": "この出品者の個別のレビューはここでは表示できません。総合評価は上のプロフィール概要に表示されています。"
   },
   "category": {
     "not_found_title": "カテゴリが見つかりません",

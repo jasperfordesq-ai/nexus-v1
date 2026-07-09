@@ -35,7 +35,8 @@
   "card_wallet_title": "Uw portemonnee",
   "card_wallet_transactions": "{{count}} transacties in de afgelopen 30 dagen",
   "tool_results": {
-    "view": "Bekijken"
+    "view": "Bekijken",
+    "result_fallback": "Resultaat"
   },
   "page_meta": {
     "title": "AI Gesprek"

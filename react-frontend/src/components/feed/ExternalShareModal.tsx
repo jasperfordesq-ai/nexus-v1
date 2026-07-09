@@ -29,7 +29,10 @@ interface ExternalShareModalProps {
 
 interface ShareTarget {
   key: string;
+  /** Brand names (WhatsApp, X, …) stay literal; translatable labels use labelKey. */
   label: string;
+  /** i18n key in the `feed` namespace; takes precedence over `label` when set. */
+  labelKey?: string;
   icon: React.ReactNode;
   color: string;
   getUrl: (url: string, title: string, text: string) => string;
@@ -39,6 +42,7 @@ const SHARE_TARGETS: ShareTarget[] = [
   {
     key: 'email',
     label: 'Email',
+    labelKey: 'share.email',
     icon: <Mail className="w-5 h-5" />,
     color: 'bg-gray-500',
     getUrl: (url, title, text) =>
@@ -162,19 +166,22 @@ export function ExternalShareModal({ isOpen, onClose, url, title, text }: Extern
 
           {/* Share target grid */}
           <div className="grid grid-cols-3 gap-3 mt-3 sm:grid-cols-5">
-            {SHARE_TARGETS.map((target) => (
-              <Tooltip key={target.key} content={target.label} delay={300} closeDelay={0} size="sm">
-                <Button
-                  isIconOnly
-                  size="sm"
-                  className={`flex min-h-11 w-full flex-col items-center gap-1.5 rounded-xl p-3 ${target.color} text-white transition-opacity hover:opacity-80`}
-                  onPress={() => handleShareTarget(target)}
-                  aria-label={t('share.share_via', { platform: target.label })}
-                >
-                  {target.icon}
-                </Button>
-              </Tooltip>
-            ))}
+            {SHARE_TARGETS.map((target) => {
+              const label = target.labelKey ? t(target.labelKey) : target.label;
+              return (
+                <Tooltip key={target.key} content={label} delay={300} closeDelay={0} size="sm">
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    className={`flex min-h-11 w-full flex-col items-center gap-1.5 rounded-xl p-3 ${target.color} text-white transition-opacity hover:opacity-80`}
+                    onPress={() => handleShareTarget(target)}
+                    aria-label={t('share.share_via', { platform: label })}
+                  >
+                    {target.icon}
+                  </Button>
+                </Tooltip>
+              );
+            })}
           </div>
         </ModalBody>
       </ModalContent>

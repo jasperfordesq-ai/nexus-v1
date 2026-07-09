@@ -191,8 +191,6 @@
     "no_explicit_permissions": "Nenhuma permissão explícita encontrada",
     "page_title": "Página",
     "permissions_description": "Permissões.",
-    "permissions_editor_coming_soon_desc": "Editor de permissões em breve.",
-    "permissions_editor_coming_soon_title": "Editor de permissões em breve",
     "permissions_granted": "Permissões concedidas",
     "permissions_title": "Permissões",
     "role_label": "Função",
@@ -218,7 +216,9 @@
     "smart_search_status_chip": "Estado: {{status}}",
     "smart_search_role_chip": "Função: {{role}}",
     "smart_search_text_chip": "Pesquisa: {{query}}",
-    "role_super_admin": "Superadministrador"
+    "role_super_admin": "Superadministrador",
+    "permissions_editor_unavailable_title": "As permissões são apenas de leitura aqui",
+    "permissions_editor_unavailable_desc": "Esta página mostra a função do utilizador e as permissões concedidas, mas não permite alterá-las. Faça a gestão do acesso alterando a função do utilizador na página de edição."
   },
   "user_edit": {
     "actions": {

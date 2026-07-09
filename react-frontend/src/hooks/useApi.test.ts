@@ -62,6 +62,34 @@ describe('useApi', () => {
     expect(mockApi.get).not.toHaveBeenCalled();
   });
 
+  it('does not get stuck loading when endpoint is null', () => {
+    const { result } = renderHook(() => useApi(null));
+
+    expect(result.current.isLoading).toBe(false);
+    expect(result.current.data).toBeNull();
+    expect(result.current.error).toBeNull();
+    expect(mockApi.get).not.toHaveBeenCalled();
+  });
+
+  it('clears loading when endpoint switches back to null (gated fetch)', async () => {
+    mockApi.get.mockResolvedValue({ success: true, data: 'hit' });
+
+    const { result, rerender } = renderHook(
+      ({ endpoint }: { endpoint: string | null }) => useApi<string>(endpoint),
+      { initialProps: { endpoint: null as string | null } }
+    );
+
+    expect(result.current.isLoading).toBe(false);
+
+    rerender({ endpoint: '/v2/search?q=ab' });
+    await waitFor(() => {
+      expect(result.current.data).toBe('hit');
+    });
+
+    rerender({ endpoint: null });
+    expect(result.current.isLoading).toBe(false);
+  });
+
   it('handles API errors', async () => {
     mockApi.get.mockResolvedValue({ success: false, error: 'Not found' });
 
@@ -307,6 +335,40 @@ describe('usePaginatedApi', () => {
 
     expect(result.current.data.items).toHaveLength(2);
     expect(result.current.data.hasMore).toBe(false);
+  });
+
+  it('keeps paginating when meta omits current_page (falls back to requested page)', async () => {
+    mockApi.get
+      .mockResolvedValueOnce({
+        success: true,
+        data: [{ id: 1 }],
+        meta: { total_pages: 3, total: 3 },
+      })
+      .mockResolvedValueOnce({
+        success: true,
+        data: [{ id: 2 }],
+        meta: { total_pages: 3, total: 3 },
+      });
+
+    const { result } = renderHook(() => usePaginatedApi('/v2/items'));
+
+    await waitFor(() => {
+      expect(result.current.data.items).toHaveLength(1);
+    });
+
+    // Regression: current_page missing must NOT fall back to total_pages,
+    // which killed pagination by reporting hasMore=false after page 1.
+    expect(result.current.data.currentPage).toBe(1);
+    expect(result.current.data.hasMore).toBe(true);
+
+    await act(async () => {
+      await result.current.loadMore();
+    });
+
+    expect(result.current.data.items).toHaveLength(2);
+    expect(result.current.data.currentPage).toBe(2);
+    expect(result.current.data.hasMore).toBe(true);
+    expect(mockApi.get).toHaveBeenLastCalledWith(expect.stringContaining('page=2'));
   });
 
   it('handles API error', async () => {

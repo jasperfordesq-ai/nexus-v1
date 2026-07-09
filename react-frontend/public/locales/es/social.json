@@ -169,5 +169,11 @@
   "content_type_tabs_aria": "Filtro de tipo de contenido de marcador",
   "comment_delete_failed": "No se pudo eliminar el comentario. Inténtalo de nuevo.",
   "comment_edit_failed": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
-  "comment_post_failed": "No se pudo publicar tu comentario. Inténtalo de nuevo."
+  "comment_post_failed": "No se pudo publicar tu comentario. Inténtalo de nuevo.",
+  "link_preview": {
+    "image_alt_title": "Vista previa de {{title}}",
+    "image_alt_domain": "Vista previa de {{domain}}",
+    "favicon_alt": "Icono de {{site}}",
+    "video_fallback": "Vídeo"
+  }
 }

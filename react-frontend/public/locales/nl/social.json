@@ -169,5 +169,11 @@
   "content_type_tabs_aria": "Voeg een bladwijzer voor het inhoudstypefilter toe",
   "comment_delete_failed": "Kan de reactie niet verwijderen. Probeer het opnieuw.",
   "comment_edit_failed": "Kan je wijzigingen niet opslaan. Probeer het opnieuw.",
-  "comment_post_failed": "Kan je reactie niet plaatsen. Probeer het opnieuw."
+  "comment_post_failed": "Kan je reactie niet plaatsen. Probeer het opnieuw.",
+  "link_preview": {
+    "image_alt_title": "Voorbeeld van {{title}}",
+    "image_alt_domain": "Voorbeeld van {{domain}}",
+    "favicon_alt": "Pictogram van {{site}}",
+    "video_fallback": "Video"
+  }
 }

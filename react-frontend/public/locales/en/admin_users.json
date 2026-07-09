@@ -191,8 +191,6 @@
     "no_explicit_permissions": "No explicit permissions found",
     "page_title": "Page",
     "permissions_description": "Permissions.",
-    "permissions_editor_coming_soon_desc": "Permissions Editor Coming Soon.",
-    "permissions_editor_coming_soon_title": "Permissions Editor Coming Soon",
     "permissions_granted": "Permissions Granted",
     "permissions_title": "Permissions",
     "role_label": "Role",
@@ -218,7 +216,9 @@
     "smart_search_status_chip": "Status: {{status}}",
     "smart_search_role_chip": "Role: {{role}}",
     "smart_search_text_chip": "Query: {{query}}",
-    "role_super_admin": "Super Admin"
+    "role_super_admin": "Super Admin",
+    "permissions_editor_unavailable_title": "Permissions are read-only here",
+    "permissions_editor_unavailable_desc": "This page shows the user's role and granted permissions but can't change them. Manage access by changing the user's role on the user edit page."
   },
   "user_edit": {
     "actions": {

@@ -14,6 +14,7 @@ import { CardBody, Card, Chip } from '@/components/ui';
  */
 
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 import MapPin from 'lucide-react/icons/map-pin';
 import Tag from 'lucide-react/icons/tag';
@@ -35,6 +36,16 @@ export interface ToolInvocation {
 
 interface ToolResultCardsProps {
   invocations: ToolInvocation[];
+}
+
+/**
+ * Backend tool/source URLs are tenant-slug-prefixed SPA paths (e.g.
+ * "/hour-timebank/listings/5"). Those must go through react-router so a click
+ * doesn't trigger a full page reload; anything absolute (http/https) is
+ * treated as external and opened in a new tab.
+ */
+export function isInternalUrl(url: string): boolean {
+  return url.startsWith('/') && !url.startsWith('//');
 }
 
 export function ToolResultCards({ invocations }: ToolResultCardsProps) {
@@ -84,12 +95,24 @@ function ResultCard({ cardType, item }: ResultCardProps) {
     </Card>
   );
 
-  return url ? (
-    <a href={url} className="inline-block no-underline" aria-label={String(item.title ?? item.name ?? t('tool_results.view'))}>
+  if (!url) return card;
+
+  const ariaLabel = String(item.title ?? item.name ?? t('tool_results.view'));
+
+  return isInternalUrl(url) ? (
+    <Link to={url} className="inline-block no-underline" aria-label={ariaLabel}>
+      {card}
+    </Link>
+  ) : (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-block no-underline"
+      aria-label={ariaLabel}
+    >
       {card}
     </a>
-  ) : (
-    card
   );
 }
 
@@ -235,6 +258,7 @@ function WalletCard({ item }: { item: Record<string, unknown> }) {
 }
 
 function GenericCard({ item }: { item: Record<string, unknown> }) {
-  const title = item.title ?? item.name ?? 'Result';
+  const { t } = useTranslation('chat');
+  const title = item.title ?? item.name ?? t('tool_results.result_fallback');
   return <p className="text-sm text-[var(--color-text)] line-clamp-2">{String(title)}</p>;
 }

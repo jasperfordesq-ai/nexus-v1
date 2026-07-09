@@ -169,5 +169,11 @@
     "listings": "{{count}} listings"
   },
   "reactions_tabs_aria": "Reaction type filter",
-  "content_type_tabs_aria": "Bookmark content type filter"
+  "content_type_tabs_aria": "Bookmark content type filter",
+  "link_preview": {
+    "image_alt_title": "Preview for {{title}}",
+    "image_alt_domain": "Preview from {{domain}}",
+    "favicon_alt": "{{site}} icon",
+    "video_fallback": "Video"
+  }
 }

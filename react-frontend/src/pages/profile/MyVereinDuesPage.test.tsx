@@ -30,6 +30,11 @@ vi.mock('@/contexts', () =>
   createMockContexts({ useToast: () => mockToast }),
 );
 
+// PageMeta reaches for the real TenantContext (imported directly from
+// '@/contexts/TenantContext'), which has no provider in the test harness —
+// stub it out like SellerProfilePage.test.tsx does.
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
+
 // Stripe modal is a heavy dependency — stub it so it doesn't require Stripe.js
 vi.mock('@/components/marketplace/StripeCheckoutModal', () => ({
   StripeCheckoutModal: ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
@@ -197,6 +202,42 @@ describe('MyVereinDuesPage', () => {
     await waitFor(() => {
       expect(screen.getByTestId('stripe-modal')).toBeInTheDocument();
     });
+  });
+
+  it('ignores a second Pay click while the first request is in flight', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce(makeListResponse([pendingRow]));
+
+    // Keep the pay POST pending so the second click happens mid-flight
+    let resolvePay: (value: unknown) => void = () => {};
+    vi.mocked(api.post).mockReturnValueOnce(
+      new Promise((resolve) => { resolvePay = resolve; }) as never,
+    );
+
+    render(<MyVereinDuesPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('FC Zurich')).toBeInTheDocument();
+    });
+
+    const payButtons = screen.getAllByRole('button');
+    fireEvent.click(payButtons[0]);
+    // Double-click: must not fire a second Stripe request
+    fireEvent.click(payButtons[0]);
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledTimes(1);
+    });
+
+    resolvePay({
+      success: true,
+      data: { client_secret: 'cs_test_123', payment_intent_id: 'pi_abc', public_key: 'pk_test' },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('stripe-modal')).toBeInTheDocument();
+    });
+    expect(api.post).toHaveBeenCalledTimes(1);
+    expect(mockToast.error).not.toHaveBeenCalled();
   });
 
   it('shows error toast when pay POST fails', async () => {

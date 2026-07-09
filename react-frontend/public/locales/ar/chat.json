@@ -35,7 +35,8 @@
   "card_wallet_title": "محفظتك",
   "card_wallet_transactions": "{{count}} معاملة خلال آخر 30 يوماً",
   "tool_results": {
-    "view": "عرض"
+    "view": "عرض",
+    "result_fallback": "نتيجة"
   },
   "page_meta": {
     "title": "دردشة الذكاء الاصطناعي"

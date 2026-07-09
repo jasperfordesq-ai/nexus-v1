@@ -93,14 +93,63 @@ describe('MyCollectionsPage', () => {
     expect(newBtn).toBeInTheDocument();
   });
 
-  it('renders empty state on API failure (success:false)', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: false, error: 'Server error' });
+  it('renders an error state with retry on API failure instead of the empty state', async () => {
+    vi.mocked(api.get)
+      .mockResolvedValueOnce({ success: false, error: 'Server error' })
+      .mockResolvedValueOnce({ success: true, data: [makeCollection({ id: 1, name: 'Reading List' })] });
+
+    render(<MyCollectionsPage />);
+
+    // Error state, not the generic empty state
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+    expect(screen.getByText("We couldn't load your collections.")).toBeInTheDocument();
+    expect(screen.queryByText('No collections yet')).not.toBeInTheDocument();
+
+    // Retry re-fetches and renders the collections
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Reading List')).toBeInTheDocument();
+    });
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(api.get).toHaveBeenCalledTimes(2);
+  });
+
+  it('renders the error state when the load request throws', async () => {
+    vi.mocked(api.get).mockRejectedValueOnce(new Error('Network error'));
 
     render(<MyCollectionsPage />);
 
     await waitFor(() => {
-      expect(screen.queryByText('Reading List')).not.toBeInTheDocument();
+      expect(screen.getByRole('alert')).toBeInTheDocument();
     });
+  });
+
+  it('disables the create button while the name is blank', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: [] });
+
+    render(<MyCollectionsPage />);
+    await waitFor(() => expect(screen.getByRole('button')).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button'));
+    await waitFor(() => expect(document.querySelector('[role="dialog"]')).toBeTruthy());
+
+    const allButtons = screen.getAllByRole('button');
+    const createBtn = allButtons[allButtons.length - 1];
+    expect(createBtn).toBeDisabled();
+
+    // Whitespace-only names stay disabled
+    const inputs = document.querySelectorAll('input');
+    fireEvent.change(inputs[0], { target: { value: '   ' } });
+    expect(createBtn).toBeDisabled();
+
+    fireEvent.click(createBtn);
+    expect(api.post).not.toHaveBeenCalled();
+
+    // A real name enables it
+    fireEvent.change(inputs[0], { target: { value: 'My List' } });
+    expect(createBtn).not.toBeDisabled();
   });
 
   it('shows "Public" label for public collections', async () => {

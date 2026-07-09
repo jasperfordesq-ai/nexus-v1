@@ -44,7 +44,10 @@ export function useApi<T>(
 
   const [state, setState] = useState<UseApiState<T>>({
     data: null,
-    isLoading: immediate,
+    // A null endpoint means "not ready to fetch yet" — starting in a loading
+    // state would leave isLoading stuck true because the mount effect only
+    // calls execute() when an endpoint exists.
+    isLoading: immediate && endpoint !== null,
     error: null,
     meta: null,
   });
@@ -100,6 +103,11 @@ export function useApi<T>(
 
     if (immediate && endpoint) {
       execute();
+    } else if (!endpoint) {
+      // Endpoint became null (e.g. a gated fetch was reset) — make sure we
+      // don't present a permanent loading state for a request that will
+      // never be issued.
+      setState((prev) => (prev.isLoading ? { ...prev, isLoading: false } : prev));
     }
 
     return () => {
@@ -267,7 +275,10 @@ export function usePaginatedApi<T>(
           // Pagination meta is in response.meta (preserved by api.ts)
           const items = Array.isArray(response.data) ? response.data : [];
           const meta = response.meta;
-          const newCurrentPage = meta?.current_page ?? meta?.total_pages ?? page;
+          // Fall back to the requested page — never to total_pages, which
+          // would mark pagination as exhausted after the first fetch when the
+          // API omits current_page.
+          const newCurrentPage = meta?.current_page ?? page;
           const newTotalPages = meta?.total_pages ?? 1;
           currentPageRef.current = newCurrentPage;
           totalPagesRef.current = newTotalPages;

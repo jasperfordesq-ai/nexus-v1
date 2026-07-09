@@ -251,13 +251,13 @@
     "tab_reviews": "Léirmheasanna",
     "no_listings_title": "Gan Liostaí",
     "no_listings_description": "Níl aon liostaí gníomhacha ag {{name}} faoi láthair.",
-    "reviews_coming_soon_title": "Léirmheasanna ag Teacht Go Luath",
-    "reviews_coming_soon_description": "Beidh léirmheasanna ceannaitheoirí ar fáil i gCéim 2. Seiceáil ar ais níos déanaí chun a fheiceáil cad a cheapann an pobal faoin díoltóir seo.",
     "view_listings": "Féach ar liostaí margaidh {{name}}.",
     "business": "Gnó",
     "private": "Príobháideach",
     "view_profile": "Féach ar Phróifíl",
-    "verified_business": "Gnó Fíoraithe"
+    "verified_business": "Gnó Fíoraithe",
+    "reviews_unavailable_title": "Níl léirmheasanna ar fáil",
+    "reviews_unavailable_description": "Ní féidir léirmheasanna aonair an díoltóra seo a thaispeáint anseo. Tá an rátáil fhoriomlán le feiceáil thuas in achoimre na próifíle."
   },
   "category": {
     "not_found_title": "Níor Aimsíodh an Chatagóir",

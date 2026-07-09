@@ -251,13 +251,13 @@
     "tab_reviews": "Beoordelingen",
     "no_listings_title": "Geen Lijsten",
     "no_listings_description": "{{name}} heeft momenteel geen actieve lijsten.",
-    "reviews_coming_soon_title": "Beoordelingen Binnenkort",
-    "reviews_coming_soon_description": "Kopersbeoordelingen zullen beschikbaar zijn in Fase 2. Kom later terug om te zien wat de gemeenschap van deze verkoper vindt.",
     "view_listings": "Bekijk de marktplaatslijsten van {{name}}.",
     "business": "Zakelijk",
     "private": "Particulier",
     "view_profile": "Profiel bekijken",
-    "verified_business": "Geverifieerd bedrijf"
+    "verified_business": "Geverifieerd bedrijf",
+    "reviews_unavailable_title": "Beoordelingen niet beschikbaar",
+    "reviews_unavailable_description": "Individuele beoordelingen van deze verkoper kunnen hier niet worden weergegeven. De totale beoordeling staat hierboven in de profielsamenvatting."
   },
   "category": {
     "not_found_title": "Categorie Niet Gevonden",
