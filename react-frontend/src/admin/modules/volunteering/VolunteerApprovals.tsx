@@ -76,6 +76,7 @@ export function VolunteerApprovals() {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
   const [bulkConfirmAction, setBulkConfirmAction] = useState<'approve' | 'decline' | null>(null);
+  const [declineConfirmId, setDeclineConfirmId] = useState<number | null>(null);
   const [opportunityFilter, setOpportunityFilter] = useState<string>('all');
 
   const loadData = useCallback(async () => {
@@ -290,7 +291,7 @@ export function VolunteerApprovals() {
                 size="sm"
                 variant="danger"
                 startContent={<XCircle size={14} />}
-                onPress={() => handleDecline(item.id)}
+                onPress={() => setDeclineConfirmId(item.id)}
                 isLoading={actionId === item.id}
                 isDisabled={bulkLoading || (actionId !== null && actionId !== item.id)}
               >
@@ -458,6 +459,24 @@ export function VolunteerApprovals() {
         cancelLabel={t('volunteering.cancel')}
         confirmColor={bulkConfirmAction === 'approve' ? 'primary' : 'danger'}
         isLoading={bulkLoading}
+      />
+
+      {/* Single-row decline confirmation — a misclick must not decline instantly */}
+      <ConfirmModal
+        isOpen={declineConfirmId !== null}
+        onClose={() => { if (actionId === null) setDeclineConfirmId(null); }}
+        onConfirm={async () => {
+          if (declineConfirmId !== null) {
+            await handleDecline(declineConfirmId);
+          }
+          setDeclineConfirmId(null);
+        }}
+        title={t('volunteering.decline')}
+        message={t('volunteering.decline_confirm')}
+        confirmLabel={t('volunteering.decline')}
+        cancelLabel={t('volunteering.cancel')}
+        confirmColor="danger"
+        isLoading={actionId !== null && actionId === declineConfirmId}
       />
     </div>
   );

@@ -5,6 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/test/test-utils';
+import { within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMockContexts } from '@/test/mock-contexts';
 
@@ -220,7 +221,7 @@ describe('VolunteerApprovals', () => {
     });
   });
 
-  it('calls POST decline endpoint on Decline click and shows success toast', async () => {
+  it('confirms before declining, then calls POST decline and shows success toast (VOL-RX-010)', async () => {
     mockGetApprovals
       .mockResolvedValueOnce({ success: true, data: MOCK_APPLICATIONS })
       .mockResolvedValueOnce({ success: true, data: MOCK_APPLICATIONS });
@@ -228,10 +229,21 @@ describe('VolunteerApprovals', () => {
     await waitFor(() => {
       expect(screen.getAllByRole('button').some((b) => /decline/i.test(b.textContent ?? ''))).toBe(true);
     });
-    const declineBtns = screen.getAllByRole('button').filter(
+
+    // The row Decline button opens a confirmation and must NOT decline immediately.
+    const rowDecline = screen.getAllByRole('button').filter(
       (b) => /decline/i.test(b.textContent ?? ''),
-    );
-    await userEvent.click(declineBtns[0]);
+    )[0];
+    await userEvent.click(rowDecline);
+    expect(mockDeclineApp).not.toHaveBeenCalled();
+
+    // Confirm inside the dialog to actually decline.
+    const dialog = await screen.findByRole('dialog');
+    const confirmBtn = within(dialog).getAllByRole('button').filter(
+      (b) => /decline/i.test(b.textContent ?? ''),
+    )[0];
+    await userEvent.click(confirmBtn);
+
     await waitFor(() => {
       expect(mockDeclineApp).toHaveBeenCalledWith(1);
       expect(mockToast.success).toHaveBeenCalled();
