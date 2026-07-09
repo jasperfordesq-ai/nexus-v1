@@ -86,6 +86,20 @@ class VolunteeringParityTest extends TestCase
         $response->assertSee(__('govuk_alpha_volunteering.my_orgs.title'));
     }
 
+    public function test_volunteering_donations_page_has_no_hardcoded_euro(): void
+    {
+        // VOL-AF-001: the amount prefix must reflect the tenant currency (exposed
+        // to assistive tech), and the hints must not hardcode euro.
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/donations");
+
+        $response->assertOk();
+        $response->assertDontSee('&euro;', false);
+        $response->assertDontSee('in euro');
+        $response->assertSee('govuk-input__prefix', false);
+    }
+
     public function test_volunteering_my_organisations_lists_an_owned_org(): void
     {
         $user = $this->authenticatedUser();

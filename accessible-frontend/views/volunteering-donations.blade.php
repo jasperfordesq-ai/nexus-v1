@@ -15,6 +15,7 @@
         $formatDate = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y') : null;
         $formatDateTime = fn ($value): ?string => $value ? \Illuminate\Support\Carbon::parse($value)->translatedFormat('j F Y, g:ia') : null;
         $money = fn ($value): string => number_format((float) $value, 2);
+        $tenantCurrency = strtoupper(\App\Core\TenantContext::getCurrency());
         $statusLabelKey = [
             'pending' => 'govuk_alpha_volunteering.donations.status_pending',
             'completed' => 'govuk_alpha_volunteering.donations.status_completed',
@@ -194,7 +195,7 @@
                 </p>
             @endif
             <div class="govuk-input__wrapper">
-                <div class="govuk-input__prefix" aria-hidden="true">&euro;</div>
+                <div class="govuk-input__prefix">{{ $tenantCurrency }}</div>
                 <input class="govuk-input govuk-input--width-10 {{ $status === 'donate-failed' ? 'govuk-input--error' : '' }}" id="donate-amount" name="amount" type="text" inputmode="decimal" spellcheck="false" aria-describedby="donate-amount-hint{{ ($status === 'donate-failed' && in_array($donateError, ['amount', 'amount-max'], true)) ? ' donate-amount-error' : '' }}">
             </div>
         </div>
