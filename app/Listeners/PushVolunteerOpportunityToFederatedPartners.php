@@ -72,24 +72,35 @@ class PushVolunteerOpportunityToFederatedPartners implements ShouldQueue
                 return;
             }
 
-            // (b) Per-opportunity opt-in: only push when the owner explicitly
-            // chose to share (mirrors listings.federated_visibility).
-            if (($opportunity->federated_visibility ?? 'none') !== 'listed') {
-                return;
-            }
-
-            // (c) A previously-shared opportunity that is now inactive or closed
-            // must be RETRACTED from partners (action 'deleted'), not silently left
-            // stale forever. deleteOpportunity() dispatches an update event with
-            // is_active=0 for exactly this purpose. A newly-CREATED inactive/closed
-            // opportunity was never shared, so there is nothing to retract — skip.
-            $isActive = !empty($opportunity->is_active);
-            $isOpen   = in_array((string) ($opportunity->status ?? 'open'), ['open', 'active'], true);
-            if (!$isActive || !$isOpen) {
-                if ($action === 'created') {
+            // (b) Per-opportunity opt-in + un-share retraction. Push only when the
+            // owner opted in (federated_visibility='listed'). When a previously
+            // shared opportunity is un-shared (listed -> none), the update event
+            // carries the now-unshared row and its prior visibility, so we RETRACT
+            // it from partners (action 'deleted') rather than returning and leaving
+            // it displayed on partner sites forever. A never-shared row (created
+            // unshared, or an update that was never listed) has nothing to retract.
+            $isListed = ($opportunity->federated_visibility ?? 'none') === 'listed';
+            if (!$isListed) {
+                $wasListed = $event instanceof VolunteerOpportunityUpdated
+                    && ($event->previousFederatedVisibility ?? null) === 'listed';
+                if ($action !== 'updated' || !$wasListed) {
                     return;
                 }
                 $action = 'deleted';
+            } else {
+                // (c) A still-listed opportunity that is now inactive or closed must
+                // also be RETRACTED (action 'deleted'), not silently left stale.
+                // deleteOpportunity() dispatches an update event with is_active=0 for
+                // exactly this purpose; a newly-CREATED inactive/closed opportunity
+                // was never shared, so there is nothing to retract — skip.
+                $isActive = !empty($opportunity->is_active);
+                $isOpen   = in_array((string) ($opportunity->status ?? 'open'), ['open', 'active'], true);
+                if (!$isActive || !$isOpen) {
+                    if ($action === 'created') {
+                        return;
+                    }
+                    $action = 'deleted';
+                }
             }
 
             $partners = FederationExternalPartnerService::getActivePartnersWithFlag($tenantId, 'allow_volunteering');

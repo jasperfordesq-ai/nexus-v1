@@ -1037,10 +1037,14 @@ class VolunteerService
             DB::update("UPDATE vol_opportunities SET " . implode(', ', $fields) . " WHERE id = ? AND tenant_id = ?", $params);
 
             try {
+                // Capture the pre-update share state so the federation push
+                // listener can retract the opportunity when it is un-shared
+                // (federated_visibility listed -> none).
+                $previousVisibility = (string) ($opp->federated_visibility ?? 'none');
                 $updated = VolOpportunity::query()->find($id);
                 if ($updated) {
-                    TenantContext::runForTenant($tenantId, function () use ($updated, $tenantId): void {
-                        VolunteerOpportunityUpdated::dispatch($updated, (int) $tenantId);
+                    TenantContext::runForTenant($tenantId, function () use ($updated, $tenantId, $previousVisibility): void {
+                        VolunteerOpportunityUpdated::dispatch($updated, (int) $tenantId, $previousVisibility);
                     });
                 }
             } catch (\Throwable $e) {

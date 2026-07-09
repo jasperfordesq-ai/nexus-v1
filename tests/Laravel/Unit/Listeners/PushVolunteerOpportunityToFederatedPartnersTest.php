@@ -306,6 +306,38 @@ class PushVolunteerOpportunityToFederatedPartnersTest extends TestCase
         });
     }
 
+    public function test_un_sharing_a_listed_opportunity_retracts_from_partners(): void
+    {
+        // VOL-BE-004: federated_visibility listed -> none must push action='deleted'
+        // so partners drop the withdrawn opportunity instead of displaying it forever.
+        Http::fake(['*' => Http::response(['success' => true], 200)]);
+
+        $this->insertVolPartner();
+
+        $opp = $this->makeOpportunity(['id' => 5005, 'federated_visibility' => 'none']);
+        $listener = $this->makeListener();
+        $listener->handle(new VolunteerOpportunityUpdated($opp, self::TENANT_ID, 'listed'));
+
+        Http::assertSent(function ($request) {
+            $body = $request->data();
+            return ($body['action'] ?? null) === 'deleted'
+                && ((string) ($body['external_id'] ?? '')) === '5005';
+        });
+    }
+
+    public function test_update_of_never_shared_opportunity_does_not_retract(): void
+    {
+        // A row whose prior visibility was not 'listed' must not generate a
+        // spurious retraction on update.
+        $this->insertVolPartner();
+
+        $opp = $this->makeOpportunity(['id' => 5006, 'federated_visibility' => 'none']);
+        $listener = $this->makeListener();
+        $listener->handle(new VolunteerOpportunityUpdated($opp, self::TENANT_ID, 'none'));
+
+        Http::assertNothingSent();
+    }
+
     public function test_payload_does_not_leak_local_tenant_or_creator_ids(): void
     {
         Http::fake(['*' => Http::response(['success' => true], 200)]);
