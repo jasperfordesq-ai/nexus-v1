@@ -1092,6 +1092,12 @@ class CronJobRunner
      */
     public function cleanup()
     {
+        // DELIBERATELY CROSS-TENANT (2026-07-09 audit): this is platform-wide
+        // maintenance run from cron. The DELETE/UPDATE statements below
+        // intentionally omit tenant_id — they expire rows by their own
+        // row-level expiry/staleness across ALL tenants. Do NOT add tenant
+        // filters here (it would break the cleanup), and do NOT copy these
+        // query shapes into request-path code.
         $this->checkAccess();
         $this->startJob('cleanup');
 
@@ -1830,6 +1836,11 @@ class CronJobRunner
 
     /**
      * Internal cleanup method
+     *
+     * DELIBERATELY CROSS-TENANT (2026-07-09 audit): platform-wide cron
+     * maintenance. The unscoped DELETE/UPDATEs expire rows by row-level
+     * expiry across ALL tenants — do NOT add tenant filters, and do NOT
+     * copy these query shapes into request-path code.
      */
     private function cleanupInternal()
     {
@@ -2397,6 +2408,10 @@ class CronJobRunner
 
     /**
      * Clean old sessions and expired tokens (hourly)
+     *
+     * DELIBERATELY CROSS-TENANT (2026-07-09 audit): platform-wide cron
+     * maintenance — sessions/tokens expire by their own timestamps across
+     * ALL tenants. Do NOT add tenant filters here.
      */
     private function cleanSessionsAndTokensInternal(): void
     {

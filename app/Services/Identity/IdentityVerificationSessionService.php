@@ -298,6 +298,11 @@ class IdentityVerificationSessionService
     /**
      * Expire sessions older than the given hours that are still in created/started status.
      *
+     * DELIBERATELY CROSS-TENANT (2026-07-09 audit): called from cron as
+     * platform-wide maintenance — abandonment is a row-level property, so the
+     * UPDATE intentionally omits tenant_id. Do NOT add a tenant filter, and
+     * do NOT copy this query shape into request-path code.
+     *
      * @param int $hoursOld  Sessions older than this many hours
      * @return int Number of sessions expired
      */
@@ -315,6 +320,10 @@ class IdentityVerificationSessionService
     /**
      * Delete completed/expired sessions older than the retention period.
      * Keeps audit trail in identity_verification_events but cleans session table.
+     *
+     * DELIBERATELY CROSS-TENANT (2026-07-09 audit): cron retention sweep for
+     * ALL tenants — the DELETE intentionally omits tenant_id. Do NOT add a
+     * tenant filter, and do NOT copy this query shape into request-path code.
      *
      * @param int $retentionDays  Delete sessions older than this (default 180 days)
      * @return int Number of sessions deleted

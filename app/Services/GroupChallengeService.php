@@ -108,6 +108,8 @@ class GroupChallengeService
         foreach ($challenges as $challenge) {
             $newValue = min($challenge->current_value + $amount, $challenge->target_value);
 
+            // No tenant filter needed: $challenge->id came from the
+            // tenant-scoped query above (id-from-scoped-context).
             DB::table('group_challenges')
                 ->where('id', $challenge->id)
                 ->update(['current_value' => $newValue, 'updated_at' => now()]);
@@ -121,6 +123,9 @@ class GroupChallengeService
 
     /**
      * Mark a challenge as completed and award rewards.
+     *
+     * Private, and only reachable with ids that came from tenant-scoped
+     * queries (id-from-scoped-context) — hence no tenant filter here.
      */
     private static function complete(int $challengeId): void
     {
@@ -155,6 +160,11 @@ class GroupChallengeService
 
     /**
      * Expire overdue challenges.
+     *
+     * DELIBERATELY CROSS-TENANT (2026-07-09 audit): cron maintenance — a
+     * challenge is overdue by its own ends_at regardless of tenant, so the
+     * UPDATE intentionally omits tenant_id. Do NOT add a tenant filter, and
+     * do NOT copy this query shape into request-path code.
      */
     public static function expireOverdue(): int
     {
