@@ -66,8 +66,11 @@ class NotifyAdminOfNewGroup implements ShouldQueue
 
             $groupName = $group->name ?? 'Untitled group';
 
-            // Load the group owner's name
-            $creatorName = 'A member';
+            // Load the group owner's name. Null means "unknown" — the
+            // translated fallback is resolved per-admin INSIDE the
+            // LocaleContext closure below so it renders in each admin's
+            // language, not the dispatching context's (2026-07-09 audit P4).
+            $creatorName = null;
             if (!empty($group->owner_id)) {
                 $creator = DB::table('users')
                     ->where('id', $group->owner_id)
@@ -76,7 +79,7 @@ class NotifyAdminOfNewGroup implements ShouldQueue
                     ->first();
                 if ($creator) {
                     $creatorName = trim(($creator->first_name ?? '') . ' ' . ($creator->last_name ?? ''))
-                        ?: ($creator->name ?? __('emails.common.fallback_member_name'));
+                        ?: ($creator->name ?? null);
                 }
             }
 
@@ -114,7 +117,7 @@ class NotifyAdminOfNewGroup implements ShouldQueue
                         ->paragraph(__('emails_misc.admin_notify.new_group_body', ['community' => htmlspecialchars($tenantName, ENT_QUOTES, 'UTF-8')]))
                         ->highlight(htmlspecialchars($groupName, ENT_QUOTES, 'UTF-8'))
                         ->bulletList([
-                            __('emails_misc.admin_notify.new_group_by_label') . ': ' . htmlspecialchars($creatorName, ENT_QUOTES, 'UTF-8'),
+                            __('emails_misc.admin_notify.new_group_by_label') . ': ' . htmlspecialchars($creatorName ?? __('emails.common.fallback_member_name'), ENT_QUOTES, 'UTF-8'),
                         ])
                         ->button(__('emails_misc.admin_notify.new_group_cta'), $groupUrl)
                         ->render();
