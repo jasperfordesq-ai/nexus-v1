@@ -41,9 +41,12 @@ function isItemVisible(
   if (rules.requires_auth && !isAuthenticated) return false;
 
   if (rules.min_role && userRole) {
-    const roleOrder = ['user', 'admin', 'tenant_admin', 'super_admin'];
-    const minIdx = roleOrder.indexOf(rules.min_role);
-    const userIdx = roleOrder.indexOf(userRole);
+    // tenant_admin was merged into admin (same tier), so treat them as equal
+    // rank — otherwise a min_role of 'tenant_admin' would hide the item from a
+    // migrated tenant super-admin (now role 'admin').
+    const rankOf = (r: string) => ['user', 'admin', 'super_admin'].indexOf(r === 'tenant_admin' ? 'admin' : r);
+    const minIdx = rankOf(rules.min_role);
+    const userIdx = rankOf(userRole);
     if (minIdx >= 0 && userIdx < minIdx) return false;
   }
 

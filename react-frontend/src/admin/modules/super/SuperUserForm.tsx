@@ -180,7 +180,6 @@ export function SuperUserForm() {
                 onSelectionChange={(keys) => update('role', Array.from(keys)[0])}>
                 <SelectItem key="member" id="member">{t('super.role_member')}</SelectItem>
                 <SelectItem key="admin" id="admin">{t('super.role_admin')}</SelectItem>
-                <SelectItem key="tenant_admin" id="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
               </Select>
               <div className="grid grid-cols-2 gap-4">
                 <Input label={t('super.label_location')} value={form.location} onValueChange={(v) => update('location', v)} />
@@ -233,7 +232,6 @@ export function SuperUserForm() {
                     onSelectionChange={(keys) => update('role', Array.from(keys)[0])}>
                     <SelectItem key="member" id="member">{t('super.role_member')}</SelectItem>
                     <SelectItem key="admin" id="admin">{t('super.role_admin')}</SelectItem>
-                    <SelectItem key="tenant_admin" id="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
                   </Select>
                   <div className="grid grid-cols-2 gap-4">
                     <Input label={t('super.label_location')} value={form.location} onValueChange={(v) => update('location', v)} />
