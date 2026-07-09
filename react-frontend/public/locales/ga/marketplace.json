@@ -1,4 +1,7 @@
 {
+  "aria": {
+    "filter_panel": "Painéal scagairí"
+  },
   "breadcrumb": "Breadcrumb",
   "page_title": "Margadh",
   "meta_description": "Ceannaigh, díol nó roinn earraí go háitiúil le comharsana — liostaí margaidh pobail, earraí saor in aisce, ceannacháin ghrúpa, agus seachadtaí laistigh de do bhanc ama.",
@@ -184,6 +187,7 @@
     "draft_saved": "Dréacht sábháilte"
   },
   "search": {
+    "category_search": "Cuardaigh catagóirí...",
     "page_title": "Cuardaigh an Margadh",
     "page_heading": "Search Marketplace",
     "meta_description": "Cuardaigh agus scag earraí i margadh an phobail.",
@@ -284,6 +288,7 @@
     "browse_description": "Brabhsáil liostaí {{name}} sa mhargadh."
   },
   "common": {
+    "loading": "Á Lódáil...",
     "free": "Saor in Aisce",
     "negotiable": "Inchaibidle",
     "save": "Sábháil",

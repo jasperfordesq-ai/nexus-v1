@@ -1,4 +1,5 @@
 {
+  "copy_code": "Copy code",
   "back": "Back",
   "empty_dash": "-",
   "refresh": "Refresh",
@@ -152,6 +153,7 @@
     "log_out": "Log Out"
   },
   "auth": {
+    "log_out": "Log Out",
     "log_in": "Log In",
     "sign_up": "Sign Up"
   },
@@ -1970,6 +1972,7 @@
     }
   },
   "common": {
+    "loading": "Loading...",
     "dismiss": "Dismiss",
     "create": "Create",
     "delete": "Delete",

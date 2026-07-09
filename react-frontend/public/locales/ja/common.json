@@ -1,4 +1,5 @@
 {
+  "copy_code": "コードをコピー",
   "back": "戻る",
   "empty_dash": "-",
   "refresh": "更新",
@@ -152,6 +153,7 @@
     "log_out": "ログアウト"
   },
   "auth": {
+    "log_out": "ログアウト",
     "log_in": "ログイン",
     "sign_up": "新規登録"
   },
@@ -1970,6 +1972,7 @@
     }
   },
   "common": {
+    "loading": "読み込み中...",
     "dismiss": "閉じる",
     "create": "作成",
     "delete": "削除",

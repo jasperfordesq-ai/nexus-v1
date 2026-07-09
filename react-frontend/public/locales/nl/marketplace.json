@@ -1,4 +1,7 @@
 {
+  "aria": {
+    "filter_panel": "Filterpaneel"
+  },
   "breadcrumb": "Breadcrumb",
   "page_title": "Marktplaats",
   "meta_description": "Koop, verkoop of deel spullen lokaal met buren — communitymarktplaats, gratis items, groepsaankopen en leveringen binnen je tijdbank.",
@@ -184,6 +187,7 @@
     "draft_saved": "Concept opgeslagen"
   },
   "search": {
+    "category_search": "Categorieën zoeken...",
     "page_title": "Zoek Marktplaats",
     "page_heading": "Search Marketplace",
     "meta_description": "Zoek en filter items in de gemeenschapsmarkt.",
@@ -284,6 +288,7 @@
     "browse_description": "Blader door {{name}} lijsten op de marktplaats."
   },
   "common": {
+    "loading": "Laden...",
     "free": "Gratis",
     "negotiable": "Onderhandelbaar",
     "save": "Opslaan",

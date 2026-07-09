@@ -1,4 +1,7 @@
 {
+  "aria": {
+    "filter_panel": "フィルターパネル"
+  },
   "breadcrumb": "Breadcrumb",
   "page_title": "マーケットプレイス",
   "meta_description": "ご近所さんと地域でアイテムを売買・シェアしましょう — コミュニティマーケットプレイスの出品、無料アイテム、グループ購入、タイムバンク内の配送。",
@@ -184,6 +187,7 @@
     "draft_saved": "下書きを保存しました"
   },
   "search": {
+    "category_search": "カテゴリを検索...",
     "page_title": "マーケットプレイスを検索",
     "page_heading": "Search Marketplace",
     "meta_description": "コミュニティマーケットプレイスでアイテムを検索・絞り込みできます。",
@@ -284,6 +288,7 @@
     "browse_description": "マーケットプレイスで {{name}} のリスティングを閲覧。"
   },
   "common": {
+    "loading": "読み込み中...",
     "free": "無料",
     "negotiable": "応相談",
     "save": "保存",

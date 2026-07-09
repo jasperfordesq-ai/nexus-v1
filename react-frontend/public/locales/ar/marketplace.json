@@ -1,4 +1,7 @@
 {
+  "aria": {
+    "filter_panel": "لوحة التصفية"
+  },
   "breadcrumb": "Breadcrumb",
   "page_title": "السوق",
   "meta_description": "اشترِ أو بِع أو شارك المنتجات محلياً مع جيرانك — قوائم السوق المجتمعي، المنتجات المجانية، المشتريات الجماعية، والتوصيل داخل بنك وقتك.",
@@ -184,6 +187,7 @@
     "draft_saved": "تم حفظ المسودة"
   },
   "search": {
+    "category_search": "البحث في الفئات...",
     "page_title": "ابحث في السوق",
     "page_heading": "Search Marketplace",
     "meta_description": "ابحث وقم بتصفية العناصر في سوق المجتمع.",
@@ -284,6 +288,7 @@
     "browse_description": "تصفح قوائم {{name}} في السوق."
   },
   "common": {
+    "loading": "جارٍ التحميل...",
     "free": "مجاناً",
     "negotiable": "قابل للتفاوض",
     "save": "حفظ",

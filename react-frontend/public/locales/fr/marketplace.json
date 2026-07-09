@@ -1,4 +1,7 @@
 {
+  "aria": {
+    "filter_panel": "Panneau de filtres"
+  },
   "breadcrumb": "Breadcrumb",
   "page_title": "Marché",
   "meta_description": "Achetez, vendez ou partagez des articles localement avec vos voisins — annonces du marché communautaire, articles gratuits, achats groupés et livraisons au sein de votre banque de temps.",
@@ -184,6 +187,7 @@
     "draft_saved": "Brouillon enregistré"
   },
   "search": {
+    "category_search": "Rechercher des catégories...",
     "page_title": "Rechercher sur le marché",
     "page_heading": "Search Marketplace",
     "meta_description": "Recherchez et filtrez les articles dans le marché communautaire.",
@@ -284,6 +288,7 @@
     "browse_description": "Parcourir les annonces de {{name}} sur le marché."
   },
   "common": {
+    "loading": "Chargement...",
     "free": "Gratuit",
     "negotiable": "Négociable",
     "save": "Sauvegarder",

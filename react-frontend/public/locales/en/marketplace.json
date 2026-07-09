@@ -1,4 +1,7 @@
 {
+  "aria": {
+    "filter_panel": "Filter panel"
+  },
   "breadcrumb": "Breadcrumb",
   "page_title": "Marketplace",
   "meta_description": "Buy, sell, or share items locally with neighbours — community marketplace listings, free items, group buys, and deliveries within your timebank.",
@@ -184,6 +187,7 @@
     "draft_saved": "Draft saved"
   },
   "search": {
+    "category_search": "Search categories...",
     "page_title": "Search Marketplace",
     "page_heading": "Search Marketplace",
     "meta_description": "Search and filter items in the community marketplace.",
@@ -284,6 +288,7 @@
     "browse_description": "Browse {{name}} listings in the marketplace."
   },
   "common": {
+    "loading": "Loading...",
     "free": "Free",
     "negotiable": "Negotiable",
     "save": "Save",

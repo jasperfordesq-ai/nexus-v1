@@ -428,7 +428,7 @@ export function IdeationPage() {
         {availableTags.length > 0 && (
           <div className="flex flex-wrap items-center gap-1.5">
             <TagGroup
-              aria-label={t('tags')}
+              aria-label={t('tags.label')}
               selectionMode="multiple"
               selectedKeys={new Set(selectedTags)}
               onSelectionChange={(keys) => setSelectedTags(keys === 'all' ? availableTags.map((a) => a.tag) : Array.from(keys).map(String))}

@@ -165,8 +165,7 @@ export function ThemePicker({
                   <button
                     key={color.name}
                     type="button"
-                    aria-label={t('appearance_prefs.select_color', {
-                      ns: 'settings',
+                    aria-label={t('settings:appearance_prefs.select_color', {
                       color: color.name,
                     })}
                     aria-pressed={isSelected}

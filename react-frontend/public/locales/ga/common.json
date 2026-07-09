@@ -1,4 +1,5 @@
 {
+  "copy_code": "Cóipeáil cód",
   "back": "Ar ais",
   "empty_dash": "-",
   "refresh": "Athnuaigh",
@@ -152,6 +153,7 @@
     "log_out": "Logáil Amach"
   },
   "auth": {
+    "log_out": "Logáil Amach",
     "log_in": "Logáil Isteach",
     "sign_up": "Cláraigh"
   },
@@ -1970,6 +1972,7 @@
     }
   },
   "common": {
+    "loading": "Á Lódáil...",
     "dismiss": "Dífhostaigh",
     "create": "Cruthaigh",
     "delete": "Scrios",

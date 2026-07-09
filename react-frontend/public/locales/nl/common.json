@@ -1,4 +1,5 @@
 {
+  "copy_code": "Code kopiëren",
   "back": "Rug",
   "empty_dash": "-",
   "refresh": "Vernieuwen",
@@ -152,6 +153,7 @@
     "log_out": "Uitloggen"
   },
   "auth": {
+    "log_out": "Uitloggen",
     "log_in": "Inloggen",
     "sign_up": "Registreren"
   },
@@ -1970,6 +1972,7 @@
     }
   },
   "common": {
+    "loading": "Laden...",
     "dismiss": "Negeren",
     "create": "Aanmaken",
     "delete": "Verwijderen",

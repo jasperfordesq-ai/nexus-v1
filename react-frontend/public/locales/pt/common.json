@@ -1,4 +1,5 @@
 {
+  "copy_code": "Copiar código",
   "back": "Voltar",
   "empty_dash": "-",
   "refresh": "Atualizar",
@@ -152,6 +153,7 @@
     "log_out": "Terminar Sessão"
   },
   "auth": {
+    "log_out": "Terminar Sessão",
     "log_in": "Iniciar Sessão",
     "sign_up": "Registar"
   },
@@ -1970,6 +1972,7 @@
     }
   },
   "common": {
+    "loading": "A carregar...",
     "dismiss": "Ignorar",
     "create": "Criar",
     "delete": "Eliminar",

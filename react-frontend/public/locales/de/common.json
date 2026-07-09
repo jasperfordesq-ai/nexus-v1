@@ -1,4 +1,5 @@
 {
+  "copy_code": "Code kopieren",
   "back": "Zurück",
   "empty_dash": "-",
   "refresh": "Aktualisieren",
@@ -152,6 +153,7 @@
     "log_out": "Abmelden"
   },
   "auth": {
+    "log_out": "Abmelden",
     "log_in": "Anmelden",
     "sign_up": "Registrieren"
   },
@@ -1970,6 +1972,7 @@
     }
   },
   "common": {
+    "loading": "Wird geladen...",
     "dismiss": "Verwerfen",
     "create": "Erstellen",
     "delete": "Löschen",

@@ -1,4 +1,7 @@
 {
+  "aria": {
+    "filter_panel": "Panel filtrów"
+  },
   "breadcrumb": "Breadcrumb",
   "page_title": "Rynek",
   "meta_description": "Kupuj, sprzedawaj lub dziel się przedmiotami lokalnie z sąsiadami — ogłoszenia rynku społecznościowego, darmowe przedmioty, zakupy grupowe i dostawy w ramach twojego banku czasu.",
@@ -184,6 +187,7 @@
     "draft_saved": "Wersja robocza zapisana"
   },
   "search": {
+    "category_search": "Szukaj kategorii...",
     "page_title": "Przeszukaj marketplace",
     "page_heading": "Search Marketplace",
     "meta_description": "Przeszukuj i filtruj przedmioty na marketplace społeczności.",
@@ -284,6 +288,7 @@
     "browse_description": "Przeglądaj ogłoszenia w kategorii {{name}} na marketplace."
   },
   "common": {
+    "loading": "Ładowanie...",
     "free": "Za darmo",
     "negotiable": "Do negocjacji",
     "save": "Zapisz",

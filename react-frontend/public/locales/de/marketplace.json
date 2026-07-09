@@ -1,4 +1,7 @@
 {
+  "aria": {
+    "filter_panel": "Filterbereich"
+  },
   "breadcrumb": "Breadcrumb",
   "page_title": "Marktplatz",
   "meta_description": "Kaufe, verkaufe oder teile Gegenstände lokal mit Nachbarn — Community-Marktplatz, kostenlose Artikel, Gruppenbestellungen und Lieferungen in deiner Zeitbank.",
@@ -184,6 +187,7 @@
     "draft_saved": "Entwurf gespeichert"
   },
   "search": {
+    "category_search": "Kategorien suchen...",
     "page_title": "Marktplatz durchsuchen",
     "page_heading": "Search Marketplace",
     "meta_description": "Durchsuchen und filtern Sie Artikel im Gemeinschaftsmarktplatz.",
@@ -284,6 +288,7 @@
     "browse_description": "Inserate in {{name}} auf dem Marktplatz durchsuchen."
   },
   "common": {
+    "loading": "Wird geladen...",
     "free": "Kostenlos",
     "negotiable": "Verhandelbar",
     "save": "Speichern",
