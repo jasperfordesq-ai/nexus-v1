@@ -336,7 +336,7 @@ export function AppRoutes() {
         <Route path="newsletter/unsubscribe" element={<ErrorBoundary><NewsletterUnsubscribePage /></ErrorBoundary>} />
 
         {/* Guardian consent approval â€” public, no auth, token-based (linked from the consent email) */}
-        <Route path="volunteering/guardian-consent/verify/:token" element={<ErrorBoundary><GuardianConsentVerifyPage /></ErrorBoundary>} />
+        <Route path="volunteering/guardian-consent/verify/:token" element={<ErrorBoundary><FeatureGate feature="volunteering" redirect="/"><GuardianConsentVerifyPage /></FeatureGate></ErrorBoundary>} />
 
         {/* Explore / Discover â€” curated discovery page */}
         <Route path="explore" element={<ErrorBoundary><ExplorePage /></ErrorBoundary>} />

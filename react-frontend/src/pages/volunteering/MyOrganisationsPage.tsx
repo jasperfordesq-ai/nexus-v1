@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { extractCollectionItems } from './extractCollectionItems';
 import { motion } from '@/lib/motion';
 import Building2 from 'lucide-react/icons/building-2';
 import ArrowRight from 'lucide-react/icons/arrow-right';
@@ -72,9 +73,7 @@ export default function MyOrganisationsPage() {
       .then((res) => {
         if (controller.signal.aborted) return;
         if (res.success && res.data) {
-          // respondWithData wraps in { data: { items: [...] } }
-          const raw = res.data as { data?: { items?: unknown[] }; items?: unknown[] };
-          const items = (raw.data?.items ?? raw.items ?? (Array.isArray(res.data) ? res.data : [])) as MyOrg[];
+          const items = extractCollectionItems<MyOrg>(res.data);
           setOrgs(items);
         } else {
           // A failed request must not masquerade as "no organisations" — surface

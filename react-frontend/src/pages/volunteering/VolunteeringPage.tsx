@@ -279,9 +279,7 @@ export function VolunteeringPage() {
       api.get<unknown>('/v2/volunteering/my-organisations')
         .then((res) => {
           if (!cancelled && res.success && res.data) {
-            // respondWithData wraps in { data: { items: [...] } } or may return array directly
-            const raw = res.data as { data?: { items?: unknown[] }; items?: unknown[] };
-            const items = (raw.data?.items ?? raw.items ?? (Array.isArray(res.data) ? res.data : [])) as Array<{ id: number; name: string; status: string; member_role: string; balance?: number }>;
+            const items = extractCollectionItems<{ id: number; name: string; status: string; member_role: string; balance?: number }>(res.data);
             setMyOrgs(items.map((o) => ({ id: o.id, name: o.name, status: o.status, role: o.member_role })));
           }
         })
@@ -1016,7 +1014,7 @@ function ApplicationsTab() {
       if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
-        const items = Array.isArray(response.data) ? response.data : [];
+        const items = extractCollectionItems<Application>(response.data);
 
         if (append) {
           setApplications((prev) => [...prev, ...items]);

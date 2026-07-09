@@ -104,8 +104,7 @@ export function OrganisationsPage() {
     api.get<unknown>('/v2/volunteering/my-organisations')
       .then((res) => {
         if (cancelled || !res.success || !res.data) return;
-        const raw = res.data as { data?: { items?: unknown[] }; items?: unknown[] };
-        const items = (raw.data?.items ?? raw.items ?? (Array.isArray(res.data) ? res.data : [])) as Array<{ id: number; status: string; member_role: string }>;
+        const items = extractCollectionItems<{ id: number; status: string; member_role: string }>(res.data);
         setManageableOrgs(
           items
             .filter((o) => ['approved', 'active'].includes(o.status) && ['owner', 'admin'].includes(o.member_role))

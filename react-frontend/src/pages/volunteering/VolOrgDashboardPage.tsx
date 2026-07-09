@@ -14,6 +14,7 @@
 
 import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { extractCollectionItems } from './extractCollectionItems';
 import { motion } from '@/lib/motion';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
@@ -188,9 +189,7 @@ export default function VolOrgDashboardPage() {
         return;
       }
 
-      // respondWithData wraps in { data: { items: [...] } }
-      const raw = myOrgsRes.data as { data?: { items?: unknown[] }; items?: unknown[] };
-      const items = (raw.data?.items ?? raw.items ?? (Array.isArray(myOrgsRes.data) ? myOrgsRes.data : [])) as ManagedOrg[];
+      const items = extractCollectionItems<ManagedOrg>(myOrgsRes.data);
       const match = items.find((o) => Number(o.id) === orgId);
 
       if (!match) {

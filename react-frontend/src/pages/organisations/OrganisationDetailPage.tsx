@@ -197,8 +197,7 @@ export function OrganisationDetailPage() {
     api.get<unknown>('/v2/volunteering/my-organisations')
       .then((res) => {
         if (cancelled || !res.success || !res.data) return;
-        const raw = res.data as { data?: { items?: unknown[] }; items?: unknown[] };
-        const items = (raw.data?.items ?? raw.items ?? (Array.isArray(res.data) ? res.data : [])) as Array<{ id: number; status: string; member_role: string }>;
+        const items = extractCollectionItems<{ id: number; status: string; member_role: string }>(res.data);
         setCanManage(items.some((o) => o.id === Number(id) && ['approved', 'active'].includes(o.status) && ['owner', 'admin'].includes(o.member_role)));
       })
       .catch(() => { /* silent — manage shortcut just won't show */ });
