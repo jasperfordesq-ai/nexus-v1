@@ -127,6 +127,9 @@ const defaultFeatures: TenantFeatures = {
   // Courses (alpha) — opt-in per tenant. Synced with PHP TenantFeatureConfig.
   courses: false,
   podcasts: false,
+  // Explore / Discover curated discovery page. Default ON — synced with PHP
+  // TenantFeatureConfig::FEATURE_DEFAULTS. Admins can disable it per tenant.
+  explore: true,
 };
 
 // Default modules (all enabled)

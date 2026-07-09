@@ -44,6 +44,7 @@ import Languages from 'lucide-react/icons/languages';
 import GraduationCap from 'lucide-react/icons/graduation-cap';
 import Podcast from 'lucide-react/icons/podcast';
 import HandHeart from 'lucide-react/icons/hand-heart';
+import Compass from 'lucide-react/icons/compass';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -239,6 +240,15 @@ const CORE_MODULES: ModuleDefinition[] = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 const FEATURE_MODULES: ModuleDefinition[] = [
+  {
+    id: 'explore',
+    name: 'Explore',
+    description: 'Curated discovery page surfacing members, listings, events and more',
+    icon: Compass,
+    type: 'feature',
+    configSource: 'tenant_features',
+    configOptions: [],
+  },
   {
     id: 'events',
     name: 'Events',

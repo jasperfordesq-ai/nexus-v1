@@ -62,6 +62,10 @@ class TenantFeatureConfig
         // Podcasts (alpha) — opt-in per tenant. Member-created shows are controlled
         // separately by podcasts.allow_member_show_creation and default ON there.
         'podcasts' => false,
+        // Explore / Discover curated discovery page. Default ON so the navbar link
+        // keeps showing where it already does; admins can turn it off per tenant in
+        // Module Configuration, which hides the navbar link and blocks the route.
+        'explore' => true,
     ];
 
     /**

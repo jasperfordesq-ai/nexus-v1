@@ -1175,6 +1175,8 @@ export interface TenantFeatures {
   courses: boolean;
   /** Podcasts / community audio module — opt-in per tenant. */
   podcasts: boolean;
+  /** Explore / Discover curated discovery page — default ON, gateable per tenant. */
+  explore: boolean;
 }
 
 export interface TenantModules {

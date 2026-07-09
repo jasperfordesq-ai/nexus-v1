@@ -237,6 +237,8 @@
     "module_desc_marketplace": "物理的な商品と有料サービスの商用売買マーケットプレイス",
     "module_name_courses": "コース",
     "module_desc_courses": "コミュニティ学習 — コース、レッスン、クイズ、登録、証明書",
+    "module_name_explore": "探索",
+    "module_desc_explore": "メンバー、リスティング、イベントなどを紹介する厳選されたディスカバリーページ",
     "module_name_podcasts": "Podcasts",
     "module_desc_podcasts": "コミュニティオーディオ - メンバーが作成した番組、エピソード、トランスクリプト、チャプター、RSS、モデレーション",
     "module_name_identity_verification": "本人確認",

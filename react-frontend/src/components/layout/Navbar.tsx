@@ -413,12 +413,12 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     const items: { label: string; desc: string; href: string; icon: typeof LayoutDashboard; module?: string }[] = [];
     if (hasModule('feed') && maxVisibleNav < 1)
       items.push({ label: t('nav.feed'), desc: t('nav_desc.feed'), href: tenantPath('/feed'), icon: Newspaper, module: 'feed' });
-    if (maxVisibleNav < 2)
+    if (hasFeature('explore') && maxVisibleNav < 2)
       items.push({ label: t('nav.explore'), desc: t('nav_desc.explore'), href: tenantPath('/explore'), icon: Compass });
     if (hasModule('messages') && maxVisibleNav < 4)
       items.push({ label: t('nav.messages'), desc: t('nav_desc.messages'), href: tenantPath('/messages'), icon: MessageSquare, module: 'messages' });
     return items;
-  }, [maxVisibleNav, hasModule, t, tenantPath]);
+  }, [maxVisibleNav, hasModule, hasFeature, t, tenantPath]);
 
   // ─── Left column sections ────────────────────────────────────────────────
   const leftSections = useMemo(() => [
@@ -731,7 +731,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               )}
 
               {/* Explore / Discover */}
-              {maxVisibleNav >= 2 && (
+              {maxVisibleNav >= 2 && hasFeature('explore') && (
                 <NavLink
                   to={tenantPath('/explore')}
                   className={({ isActive }) =>

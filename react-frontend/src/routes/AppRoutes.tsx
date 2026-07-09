@@ -339,7 +339,7 @@ export function AppRoutes() {
         <Route path="volunteering/guardian-consent/verify/:token" element={<ErrorBoundary><FeatureGate feature="volunteering" redirect="/"><GuardianConsentVerifyPage /></FeatureGate></ErrorBoundary>} />
 
         {/* Explore / Discover â€” curated discovery page */}
-        <Route path="explore" element={<ErrorBoundary><ExplorePage /></ErrorBoundary>} />
+        <Route path="explore" element={<ErrorBoundary><FeatureGate feature="explore" redirect="/"><ExplorePage /></FeatureGate></ErrorBoundary>} />
 
         {/* Tenant 2 (hOUR Timebank) specific pages â€” redirect other tenants to /about */}
         <Route path="partner" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><PartnerPage /></TenantSlugGate></ErrorBoundary>} />

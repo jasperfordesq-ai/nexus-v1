@@ -237,6 +237,8 @@
     "module_desc_marketplace": "Mercato commerciale di acquisto/vendita di beni fisici e servizi a pagamento",
     "module_name_courses": "Corsi",
     "module_desc_courses": "Apprendimento comunitario: corsi, lezioni, quiz, iscrizioni e certificati",
+    "module_name_explore": "Esplora",
+    "module_desc_explore": "Pagina di scoperta curata che mostra membri, annunci, eventi e altro",
     "module_name_podcasts": "Podcasts",
     "module_desc_podcasts": "Audio della community: programmi, episodi, trascrizioni, capitoli, RSS e moderazione creati dai membri",
     "module_name_identity_verification": "Verifica dell'identità",

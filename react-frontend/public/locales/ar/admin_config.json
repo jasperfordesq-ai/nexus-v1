@@ -237,6 +237,8 @@
     "module_desc_marketplace": "سوق بيع وشراء تجاري للسلع المادية والخدمات المدفوعة",
     "module_name_courses": "الدورات",
     "module_desc_courses": "التعلم المجتمعي - الدورات والدروس والاختبارات والتسجيل والشهادات",
+    "module_name_explore": "استكشاف",
+    "module_desc_explore": "صفحة اكتشاف منسقة تعرض الأعضاء والقوائم والفعاليات والمزيد",
     "module_name_podcasts": "Podcasts",
     "module_desc_podcasts": "صوت المجتمع - العروض والحلقات والنصوص والفصول وRSS والإشراف التي أنشأها الأعضاء",
     "module_name_identity_verification": "التحقق من الهوية",
