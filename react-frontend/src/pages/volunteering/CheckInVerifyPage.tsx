@@ -14,7 +14,7 @@
  * scanners prefetch URLs and a check-in is a state change that needs a human tap.
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -45,6 +45,17 @@ export default function CheckInVerifyPage() {
   const [state, setState] = useState<State>(token ? 'confirm' : 'error');
   const [volunteerName, setVolunteerName] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>(t('check_in.error'));
+  const resultRef = useRef<HTMLDivElement>(null);
+
+  // Announce state transitions to assistive tech (WCAG 4.1.3): the result region
+  // is a live region and receives focus when an action resolves, so screen-reader
+  // users hear the check-in / check-out / error outcome even though the button
+  // that triggered it unmounts.
+  useEffect(() => {
+    if (state === 'checked_in' || state === 'checked_out' || state === 'error') {
+      resultRef.current?.focus();
+    }
+  }, [state]);
 
   const errorForCode = (code?: string): string => {
     if (code === 'FORBIDDEN') return t('check_in.forbidden');
@@ -96,47 +107,55 @@ export default function CheckInVerifyPage() {
     <div className="min-h-screen flex items-center justify-center bg-surface-secondary px-4">
       <PageMeta title={t('check_in.verify_title')} noIndex />
       <Card className="max-w-md w-full p-8 text-center space-y-4">
-        {state === 'confirm' && (
-          <>
-            <QrCode className="w-12 h-12 text-[var(--color-primary)] mx-auto" aria-hidden="true" />
-            <h1 className="text-xl font-semibold">{t('check_in.verify_title')}</h1>
-            <p className="text-theme-muted">{t('check_in.verify_intro')}</p>
-            <Button color="primary" className="w-full" onPress={handleConfirm}>
-              {t('check_in.confirm_button')}
-            </Button>
-          </>
-        )}
+        <div
+          ref={resultRef}
+          tabIndex={-1}
+          role={state === 'error' ? 'alert' : 'status'}
+          aria-live={state === 'error' ? 'assertive' : 'polite'}
+          className="space-y-4 outline-none"
+        >
+          {state === 'confirm' && (
+            <>
+              <QrCode className="w-12 h-12 text-[var(--color-primary)] mx-auto" aria-hidden="true" />
+              <h1 className="text-xl font-semibold">{t('check_in.verify_title')}</h1>
+              <p className="text-theme-muted">{t('check_in.verify_intro')}</p>
+              <Button color="primary" className="w-full" onPress={handleConfirm}>
+                {t('check_in.confirm_button')}
+              </Button>
+            </>
+          )}
 
-        {(state === 'submitting' || state === 'checking_out') && (
-          <>
-            <Spinner className="mx-auto" aria-label={t('loading')} />
-            <p className="text-theme-muted">{t('loading')}</p>
-          </>
-        )}
+          {(state === 'submitting' || state === 'checking_out') && (
+            <>
+              <Spinner className="mx-auto" aria-label={t('loading')} />
+              <p className="text-theme-muted">{t('loading')}</p>
+            </>
+          )}
 
-        {state === 'checked_in' && (
-          <>
-            <CheckCircle className="w-12 h-12 text-[var(--color-success)] mx-auto" aria-hidden="true" />
-            <h1 className="text-xl font-semibold">{t('check_in.success', { name: volunteerName })}</h1>
-            <Button color="primary" variant="secondary" className="w-full" onPress={handleCheckout}>
-              {t('check_in.checkout_button')}
-            </Button>
-          </>
-        )}
+          {state === 'checked_in' && (
+            <>
+              <CheckCircle className="w-12 h-12 text-[var(--color-success)] mx-auto" aria-hidden="true" />
+              <h1 className="text-xl font-semibold">{t('check_in.success', { name: volunteerName })}</h1>
+              <Button color="primary" variant="secondary" className="w-full" onPress={handleCheckout}>
+                {t('check_in.checkout_button')}
+              </Button>
+            </>
+          )}
 
-        {state === 'checked_out' && (
-          <>
-            <CheckCircle className="w-12 h-12 text-[var(--color-success)] mx-auto" aria-hidden="true" />
-            <h1 className="text-xl font-semibold">{t('check_in.checkout_success', { name: volunteerName })}</h1>
-          </>
-        )}
+          {state === 'checked_out' && (
+            <>
+              <CheckCircle className="w-12 h-12 text-[var(--color-success)] mx-auto" aria-hidden="true" />
+              <h1 className="text-xl font-semibold">{t('check_in.checkout_success', { name: volunteerName })}</h1>
+            </>
+          )}
 
-        {state === 'error' && (
-          <>
-            <XCircle className="w-12 h-12 text-[var(--color-danger)] mx-auto" aria-hidden="true" />
-            <p className="text-theme-muted">{errorMessage}</p>
-          </>
-        )}
+          {state === 'error' && (
+            <>
+              <XCircle className="w-12 h-12 text-[var(--color-danger)] mx-auto" aria-hidden="true" />
+              <p className="text-theme-muted">{errorMessage}</p>
+            </>
+          )}
+        </div>
 
         <Link to={tenantPath('/volunteering')} className="text-sm text-[var(--color-primary)] underline block">
           {t('check_in.done')}

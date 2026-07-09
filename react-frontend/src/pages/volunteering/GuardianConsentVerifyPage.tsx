@@ -14,7 +14,7 @@
  * the token is the credential).
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -37,6 +37,17 @@ export default function GuardianConsentVerifyPage() {
   const { token } = useParams<{ token: string }>();
   const { tenantPath } = useTenant();
   const [state, setState] = useState<State>(token ? 'confirm' : 'error');
+  const resultRef = useRef<HTMLDivElement>(null);
+
+  // Announce state transitions to assistive tech (WCAG 4.1.3): the result region
+  // is a live region and receives focus when the async action resolves, so
+  // screen-reader users hear success/failure even though the button that
+  // triggered it unmounts.
+  useEffect(() => {
+    if (state === 'success' || state === 'error') {
+      resultRef.current?.focus();
+    }
+  }, [state]);
 
   async function handleConfirm() {
     if (!token) return;
@@ -53,39 +64,47 @@ export default function GuardianConsentVerifyPage() {
     <div className="min-h-screen flex items-center justify-center bg-surface-secondary px-4">
       <PageMeta title={t('guardian.verify_title')} noIndex />
       <Card className="max-w-md w-full p-8 text-center space-y-4">
-        {state === 'confirm' && (
-          <>
-            <ShieldCheck className="w-12 h-12 text-[var(--color-primary)] mx-auto" aria-hidden="true" />
-            <h1 className="text-xl font-semibold">{t('guardian.verify_title')}</h1>
-            <p className="text-theme-muted">{t('guardian.verify_confirm_intro')}</p>
-            <Button color="primary" className="w-full" onPress={handleConfirm}>
-              {t('guardian.verify_confirm_button')}
-            </Button>
-          </>
-        )}
+        <div
+          ref={resultRef}
+          tabIndex={-1}
+          role={state === 'error' ? 'alert' : 'status'}
+          aria-live={state === 'error' ? 'assertive' : 'polite'}
+          className="space-y-4 outline-none"
+        >
+          {state === 'confirm' && (
+            <>
+              <ShieldCheck className="w-12 h-12 text-[var(--color-primary)] mx-auto" aria-hidden="true" />
+              <h1 className="text-xl font-semibold">{t('guardian.verify_title')}</h1>
+              <p className="text-theme-muted">{t('guardian.verify_confirm_intro')}</p>
+              <Button color="primary" className="w-full" onPress={handleConfirm}>
+                {t('guardian.verify_confirm_button')}
+              </Button>
+            </>
+          )}
 
-        {state === 'submitting' && (
-          <>
-            <Spinner className="mx-auto" aria-label={t('guardian.verify_loading')} />
-            <p className="text-theme-muted">{t('guardian.verify_loading')}</p>
-          </>
-        )}
+          {state === 'submitting' && (
+            <>
+              <Spinner className="mx-auto" aria-label={t('guardian.verify_loading')} />
+              <p className="text-theme-muted">{t('guardian.verify_loading')}</p>
+            </>
+          )}
 
-        {state === 'success' && (
-          <>
-            <CheckCircle className="w-12 h-12 text-[var(--color-success)] mx-auto" aria-hidden="true" />
-            <h1 className="text-xl font-semibold">{t('guardian.verify_success_title')}</h1>
-            <p className="text-theme-muted">{t('guardian.verify_success_body')}</p>
-          </>
-        )}
+          {state === 'success' && (
+            <>
+              <CheckCircle className="w-12 h-12 text-[var(--color-success)] mx-auto" aria-hidden="true" />
+              <h1 className="text-xl font-semibold">{t('guardian.verify_success_title')}</h1>
+              <p className="text-theme-muted">{t('guardian.verify_success_body')}</p>
+            </>
+          )}
 
-        {state === 'error' && (
-          <>
-            <XCircle className="w-12 h-12 text-[var(--color-danger)] mx-auto" aria-hidden="true" />
-            <h1 className="text-xl font-semibold">{t('guardian.verify_error_title')}</h1>
-            <p className="text-theme-muted">{t('guardian.verify_error_body')}</p>
-          </>
-        )}
+          {state === 'error' && (
+            <>
+              <XCircle className="w-12 h-12 text-[var(--color-danger)] mx-auto" aria-hidden="true" />
+              <h1 className="text-xl font-semibold">{t('guardian.verify_error_title')}</h1>
+              <p className="text-theme-muted">{t('guardian.verify_error_body')}</p>
+            </>
+          )}
+        </div>
 
         <Link to={tenantPath('/')} className="text-sm text-[var(--color-primary)] underline block">
           {t('guardian.close')}

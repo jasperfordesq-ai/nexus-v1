@@ -143,4 +143,27 @@ describe('GuardianConsentVerifyPage', () => {
       );
     });
   });
+
+  it('announces the error result via an assertive alert region (WCAG 4.1.3)', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ success: false, error: 'Token expired' });
+
+    render(<GuardianConsentVerifyPage />);
+    fireEvent.click(screen.getByRole('button'));
+
+    const alert = await screen.findByRole('alert');
+    expect(alert).toBeInTheDocument();
+    // The error heading is inside the live region so it is announced.
+    expect(alert.querySelector('h1')).toBeTruthy();
+  });
+
+  it('moves focus to the live result region when the action resolves', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ success: true });
+
+    render(<GuardianConsentVerifyPage />);
+    fireEvent.click(screen.getByRole('button'));
+
+    await waitFor(() => {
+      expect(document.activeElement?.getAttribute('aria-live')).toBeTruthy();
+    });
+  });
 });
