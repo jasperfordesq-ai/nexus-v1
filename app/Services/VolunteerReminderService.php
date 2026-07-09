@@ -572,6 +572,7 @@ class VolunteerReminderService
         $tenantIds = DB::table('vol_reminder_settings')
             ->where('reminder_type', 'pre_shift')
             ->where('enabled', true)
+            ->when($onlyTenantId !== null, fn ($q) => $q->where('tenant_id', $onlyTenantId))
             ->pluck('tenant_id')
             ->unique()
             ->all();
@@ -580,6 +581,7 @@ class VolunteerReminderService
         $tenantsWithShifts = DB::table('vol_shifts')
             ->where('start_time', '>', now())
             ->where('start_time', '<=', now()->addHours(24))
+            ->when($onlyTenantId !== null, fn ($q) => $q->where('tenant_id', $onlyTenantId))
             ->pluck('tenant_id')
             ->unique()
             ->all();
@@ -784,6 +786,7 @@ class VolunteerReminderService
         // of disabled tenants falling into the "no setting → defaults" path.
         $settingsByTenant = DB::table('vol_reminder_settings')
             ->where('reminder_type', 'post_shift_feedback')
+            ->when($onlyTenantId !== null, fn ($q) => $q->where('tenant_id', $onlyTenantId))
             ->get()
             ->keyBy('tenant_id');
 
@@ -791,6 +794,7 @@ class VolunteerReminderService
         $tenantsWithEndedShifts = DB::table('vol_shifts')
             ->where('end_time', '<', now())
             ->where('end_time', '>=', now()->subHours(2))
+            ->when($onlyTenantId !== null, fn ($q) => $q->where('tenant_id', $onlyTenantId))
             ->pluck('tenant_id')
             ->unique()
             ->all();
@@ -961,6 +965,7 @@ class VolunteerReminderService
         $totalSent = 0;
         $settingsByTenant = DB::table('vol_reminder_settings')
             ->where('reminder_type', 'lapsed_volunteer')
+            ->when($onlyTenantId !== null, fn ($q) => $q->where('tenant_id', $onlyTenantId))
             ->get()
             ->keyBy('tenant_id');
 
@@ -975,6 +980,7 @@ class VolunteerReminderService
             })
             ->where('va.status', 'approved')
             ->where('vs.end_time', '<=', now()->subDays(30))
+            ->when($onlyTenantId !== null, fn ($q) => $q->where('va.tenant_id', $onlyTenantId))
             ->distinct()
             ->pluck('va.tenant_id')
             ->all();
@@ -1132,6 +1138,7 @@ class VolunteerReminderService
         $totalSent = 0;
         $settingsByTenant = DB::table('vol_reminder_settings')
             ->where('reminder_type', $reminderType)
+            ->when($onlyTenantId !== null, fn ($q) => $q->where('tenant_id', $onlyTenantId))
             ->get()
             ->keyBy('tenant_id');
 
@@ -1140,6 +1147,7 @@ class VolunteerReminderService
             ->whereNotNull('expires_at')
             ->whereDate('expires_at', '>=', now()->toDateString())
             ->whereDate('expires_at', '<=', now()->addDays(14)->toDateString())
+            ->when($onlyTenantId !== null, fn ($q) => $q->where('tenant_id', $onlyTenantId))
             ->pluck('tenant_id')
             ->unique()
             ->all();
