@@ -85,67 +85,82 @@ vi.mock('@/admin/AdminMetaContext', () => ({
   useAdminPageMeta: vi.fn(),
 }));
 
-// Stub heavy admin components — DataTable renders a simple table stub
-vi.mock('@/admin/components', async (importOriginal) => {
-  const orig = await importOriginal<typeof import('@/admin/components')>();
-  return {
-    ...orig,
-    DataTable: ({
-      data,
-      columns,
-      isLoading,
-    }: {
-      data: Array<Record<string, unknown>>;
-      columns: Array<{ key: string; label: string; render?: (item: Record<string, unknown>) => React.ReactNode }>;
-      isLoading: boolean;
-    }) => (
-      <div data-testid="data-table">
-        {isLoading && <div role="status" aria-busy="true" aria-label="Loading">Loading…</div>}
-        {data.map((row) => (
-          <div key={String(row.id)} data-testid="table-row">
-            {columns.map((col) => (
-              <div key={col.key} data-testid={`cell-${col.key}`}>
-                {col.render ? col.render(row) : String(row[col.key] ?? '')}
-              </div>
-            ))}
-          </div>
+// Stub heavy admin components — DataTable renders a simple table stub.
+// UserList imports each of these from its deep module path (../../components/X),
+// so the mocks must target those modules directly. A barrel mock of
+// '@/admin/components' would NOT intercept the deep-path imports the component
+// actually uses, so the real DataTable/StatusBadge would render and the
+// data-testid hooks below would never appear.
+vi.mock('@/admin/components/DataTable', () => ({
+  DataTable: ({
+    data,
+    columns,
+    isLoading,
+  }: {
+    data: Array<Record<string, unknown>>;
+    columns: Array<{ key: string; label: string; render?: (item: Record<string, unknown>) => React.ReactNode }>;
+    isLoading: boolean;
+  }) => (
+    <div data-testid="data-table">
+      <div data-testid="table-head">
+        {columns.map((col) => (
+          <div key={col.key} data-testid={`head-${col.key}`}>{col.label}</div>
         ))}
       </div>
-    ),
-    PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
-      <div>
-        <h1>{title}</h1>
-        {actions}
-      </div>
-    ),
-    StatusBadge: ({ status }: { status: string }) => (
-      <span data-testid="status-badge">{status}</span>
-    ),
-    ConfirmModal: ({
-      isOpen,
-      onClose,
-      onConfirm,
-      title,
-      confirmLabel,
-    }: {
-      isOpen: boolean;
-      onClose: () => void;
-      onConfirm: () => void;
-      title: string;
-      confirmLabel?: string;
-    }) =>
-      isOpen ? (
-        <div role="dialog" aria-label={title}>
-          <span>{title}</span>
-          <button onClick={onConfirm}>{confirmLabel ?? 'Confirm'}</button>
-          <button onClick={onClose}>Cancel</button>
+      {isLoading && <div role="status" aria-busy="true" aria-label="Loading">Loading…</div>}
+      {data.map((row) => (
+        <div key={String(row.id)} data-testid="table-row">
+          {columns.map((col) => (
+            <div key={col.key} data-testid={`cell-${col.key}`}>
+              {col.render ? col.render(row) : String(row[col.key] ?? '')}
+            </div>
+          ))}
         </div>
-      ) : null,
-    BulkActionToolbar: ({ selectedCount }: { selectedCount: number }) => (
-      <div data-testid="bulk-toolbar">{selectedCount} selected</div>
-    ),
-  };
-});
+      ))}
+    </div>
+  ),
+  StatusBadge: ({ status }: { status: string }) => (
+    <span data-testid="status-badge">{status}</span>
+  ),
+}));
+
+vi.mock('@/admin/components/PageHeader', () => ({
+  PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
+    <div>
+      <h1>{title}</h1>
+      {actions}
+    </div>
+  ),
+}));
+
+vi.mock('@/admin/components/ConfirmModal', () => ({
+  ConfirmModal: ({
+    isOpen,
+    onClose,
+    onConfirm,
+    title,
+    confirmLabel,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title: string;
+    confirmLabel?: string;
+  }) =>
+    isOpen ? (
+      <div role="dialog" aria-label={title}>
+        <span>{title}</span>
+        <button onClick={onConfirm}>{confirmLabel ?? 'Confirm'}</button>
+        <button onClick={onClose}>Cancel</button>
+      </div>
+    ) : null,
+}));
+
+vi.mock('@/admin/components/BulkActionToolbar', () => ({
+  BulkActionToolbar: ({ selectedCount }: { selectedCount: number }) => (
+    <div data-testid="bulk-toolbar">{selectedCount} selected</div>
+  ),
+}));
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 function makeUser(overrides: Record<string, unknown> = {}) {
