@@ -58,6 +58,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { getOpportunityCategoryName, type OpportunityCategory } from '@/lib/volunteering';
 
 import { useTranslation } from 'react-i18next';
 import GuardianConsentModal from '@/components/volunteering/GuardianConsentModal';
@@ -90,7 +91,8 @@ interface OpportunityDetail {
   end_date: string | null;
   is_active: boolean;
   is_remote: boolean;
-  category: string | null;
+  /** String on some endpoints, { id, name, color } object on others — always unwrap via getOpportunityCategoryName(). */
+  category: OpportunityCategory;
   organization: { id: number; name: string; logo_url: string | null };
   created_at: string;
   shifts: Shift[];
@@ -1040,9 +1042,9 @@ export function OpportunityDetailPage() {
                 {t('opportunity.remote')}
               </Chip>
             )}
-            {opp.category && (
+            {getOpportunityCategoryName(opp.category) && (
               <Chip size="sm" variant="soft" color="accent" startContent={<Tag className="w-3 h-3" aria-hidden="true" />}>
-                {opp.category}
+                {getOpportunityCategoryName(opp.category)}
               </Chip>
             )}
             {opp.has_applied && (

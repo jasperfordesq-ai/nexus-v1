@@ -48,6 +48,7 @@ import { PageMeta } from '@/components/seo/PageMeta';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { getOpportunityCategoryName, type OpportunityCategory } from '@/lib/volunteering';
 import { extractCollectionItems } from '@/pages/volunteering/extractCollectionItems';
 import GuardianConsentModal from '@/components/volunteering/GuardianConsentModal';
 
@@ -78,7 +79,8 @@ interface Opportunity {
   end_date: string | null;
   is_active: boolean;
   is_remote: boolean;
-  category: string | null;
+  /** String on some endpoints, { id, name, color } object on others — always unwrap via getOpportunityCategoryName(). */
+  category: OpportunityCategory;
   organization: { id: number; name: string; logo_url: string | null };
   created_at: string;
   has_applied?: boolean;
@@ -496,8 +498,8 @@ export function OrganisationDetailPage() {
                           {opp.end_date ? `${t('date_range_separator', { ns: 'volunteering' })}${new Date(opp.end_date).toLocaleDateString()}` : ''}
                         </span>
                       )}
-                      {opp.category && (
-                        <Chip size="sm" variant="soft" className="text-theme-subtle">{opp.category}</Chip>
+                      {getOpportunityCategoryName(opp.category) && (
+                        <Chip size="sm" variant="soft" className="text-theme-subtle">{getOpportunityCategoryName(opp.category)}</Chip>
                       )}
                     </div>
 

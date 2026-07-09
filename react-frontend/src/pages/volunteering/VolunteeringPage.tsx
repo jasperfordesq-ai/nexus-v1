@@ -65,6 +65,7 @@ import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { getOpportunityCategoryName, type OpportunityCategory } from '@/lib/volunteering';
 import type { VolunteeringConfig } from '@/types';
 import type { ProximityFilterParams } from '@/components/proximity/ProximityFilter';
 import { extractCollectionItems } from './extractCollectionItems';
@@ -110,7 +111,8 @@ interface Opportunity {
   end_date: string | null;
   is_active: boolean;
   is_remote: boolean;
-  category: string | null;
+  /** String on some endpoints, { id, name, color } object on others — always unwrap via getOpportunityCategoryName(). */
+  category: OpportunityCategory;
   organization: Organization;
   created_at: string;
   has_applied?: boolean;
@@ -592,6 +594,7 @@ function OpportunitiesTab() {
   const toast = useToast();
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
@@ -632,6 +635,8 @@ function OpportunitiesTab() {
       if (!append) {
         setIsLoading(true);
         setError(null);
+      } else {
+        setIsLoadingMore(true);
       }
 
       const params = new URLSearchParams();
@@ -672,6 +677,7 @@ function OpportunitiesTab() {
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
+        setIsLoadingMore(false);
       }
     }
   }, [debouncedQuery, proximityParams]);
@@ -789,6 +795,7 @@ function OpportunitiesTab() {
                   <Button
                     variant="secondary"
                     className="bg-theme-elevated text-theme-muted"
+                    isLoading={isLoadingMore}
                     onPress={() => loadOpportunities(true)}
                   >
                     {t('load_more')}
@@ -866,6 +873,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
   const navigate = useNavigate();
   const startDate = opportunity.start_date ? new Date(opportunity.start_date) : null;
   const endDate = opportunity.end_date ? new Date(opportunity.end_date) : null;
+  const categoryName = getOpportunityCategoryName(opportunity.category);
 
   return (
     <GlassCard className="p-5">
@@ -927,9 +935,9 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
                 {endDate ? `${t('date_range_separator')}${endDate.toLocaleDateString()}` : ''}
               </span>
             )}
-            {opportunity.category && (
+            {categoryName && (
               <Chip size="sm" variant="soft" className="text-theme-subtle">
-                {typeof opportunity.category === 'object' ? (opportunity.category as { name?: string }).name : opportunity.category}
+                {categoryName}
               </Chip>
             )}
             {opportunity.skills_needed && (
@@ -982,6 +990,7 @@ function ApplicationsTab() {
   const { tenantPath } = useTenant();
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [hasMore, setHasMore] = useState(false);
@@ -1000,6 +1009,8 @@ function ApplicationsTab() {
       if (!append) {
         setIsLoading(true);
         setError(null);
+      } else {
+        setIsLoadingMore(true);
       }
 
       const params = new URLSearchParams();
@@ -1035,6 +1046,7 @@ function ApplicationsTab() {
     } finally {
       if (!controller.signal.aborted) {
         setIsLoading(false);
+        setIsLoadingMore(false);
       }
     }
   }, [statusFilter]);
@@ -1214,6 +1226,7 @@ function ApplicationsTab() {
                   <Button
                     variant="secondary"
                     className="bg-theme-elevated text-theme-muted"
+                    isLoading={isLoadingMore}
                     onPress={() => loadApplications(true)}
                   >
                     {t('load_more')}
