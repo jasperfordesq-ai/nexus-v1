@@ -442,6 +442,49 @@ class GroupExchangeService
     }
 
     /**
+     * Conservation guard: the credits complete() would give providers must equal
+     * the debits it would take from receivers, or completing the exchange changes
+     * the total credits in circulation. Equal/weighted splits are derived from
+     * total_hours per role so they conserve by construction, but a CUSTOM split
+     * returns whatever hours each participant was added with — unvalidated, an
+     * organizer could set provider=100h / receiver=1h and mint 99 credits on
+     * completion. Totals are computed exactly as complete() applies them (rounded
+     * to 2dp, entries <= 0 skipped) so a negative-hours row can't disguise an
+     * imbalance that a plain SUM() would miss.
+     *
+     * @param array<int, array{user_id: int, role: string, hours: float}> $split
+     * @return string|null translated rejection message, or null when balanced
+     */
+    private function splitImbalanceError(array $split): ?string
+    {
+        $credits = 0.0;
+        $debits = 0.0;
+
+        foreach ($split as $entry) {
+            $hours = round((float) $entry['hours'], 2);
+            if ($hours <= 0) {
+                continue;
+            }
+            if ($entry['role'] === 'provider') {
+                $credits += $hours;
+            } else {
+                $debits += $hours;
+            }
+        }
+
+        // Both sums are multiples of 0.01, so any true imbalance is >= 0.01;
+        // 0.005 only tolerates float accumulation noise.
+        if (abs($credits - $debits) > 0.005) {
+            return __('api.group_exchange_split_unbalanced', [
+                'credits' => number_format($credits, 2, '.', ''),
+                'debits'  => number_format($debits, 2, '.', ''),
+            ]);
+        }
+
+        return null;
+    }
+
+    /**
      * Update an exchange's fields.
      */
     public function update(int $id, array $data): bool
@@ -526,6 +569,14 @@ class GroupExchangeService
 
         if ($providers < 1 || $receivers < 1) {
             return ['success' => false, 'error' => __('api.group_exchange_start_needs_participants')];
+        }
+
+        // Reject an unbalanced split up front so the organizer hears about it
+        // before participants are asked to confirm. complete() re-checks — the
+        // split can still change after start (update() allows split_type edits).
+        $imbalance = $this->splitImbalanceError($this->calculateSplit($exchangeId));
+        if ($imbalance !== null) {
+            return ['success' => false, 'error' => $imbalance];
         }
 
         $this->updateStatus($exchangeId, 'pending_confirmation');
@@ -670,10 +721,18 @@ class GroupExchangeService
             return ['success' => false, 'error' => __('api.group_exchange_no_participants')];
         }
 
+        // Authoritative conservation gate — money only moves from here, so this
+        // check must live here (start() checks too, but the split can change
+        // between start and complete).
+        $imbalance = $this->splitImbalanceError($split);
+        if ($imbalance !== null) {
+            return ['success' => false, 'error' => $imbalance];
+        }
+
         $transactionIds = [];
         // Participants whose balance actually changed in the committed transaction.
         // Captured here so we can bell them ONLY after the DB::transaction commits.
-        // Each entry: ['user_id' => int, 'role' => 'provider'|string, 'hours' => int]
+        // Each entry: ['user_id' => int, 'role' => 'provider'|string, 'hours' => float]
         $balanceChanges = [];
 
         $completed = DB::transaction(function () use ($exchangeId, $exchange, $split, $tenantId, &$transactionIds, &$balanceChanges): bool {
@@ -775,7 +834,7 @@ class GroupExchangeService
      * logged but never propagated, so the already-committed financial transaction
      * is never affected.
      *
-     * @param array<int, array{user_id: int, role: string, hours: int}> $balanceChanges
+     * @param array<int, array{user_id: int, role: string, hours: float}> $balanceChanges
      */
     private function notifyBalanceChanges(int $exchangeId, string $title, array $balanceChanges, int $tenantId): void
     {
@@ -788,10 +847,15 @@ class GroupExchangeService
         foreach ($balanceChanges as $change) {
             try {
                 $userId = (int) ($change['user_id'] ?? 0);
-                $hours = (int) ($change['hours'] ?? 0);
+                $hours = round((float) ($change['hours'] ?? 0), 2);
                 if ($userId <= 0 || $hours <= 0) {
                     continue;
                 }
+
+                // 2dp then trimmed ("0.5", "1.5", "6") — the int cast this
+                // replaces dropped sub-hour shares entirely (0.5 → 0 → no bell
+                // for a real balance change) and showed 1.5h as "1".
+                $hoursLabel = rtrim(rtrim(number_format($hours, 2, '.', ''), '0'), '.');
 
                 $isProvider = ($change['role'] ?? '') === 'provider';
 
@@ -809,10 +873,10 @@ class GroupExchangeService
 
                 // Wrap INSIDE the per-recipient loop — bell, push AND email render in
                 // the recipient's own locale.
-                LocaleContext::withLocale($recipient, function () use ($userId, $recipient, $isProvider, $hours, $exchangeTitle, $tenantId) {
+                LocaleContext::withLocale($recipient, function () use ($userId, $recipient, $isProvider, $hoursLabel, $exchangeTitle, $tenantId) {
                     $message = $isProvider
-                        ? __('svc_notifications.group_exchange.completed_credit', ['hours' => $hours, 'title' => $exchangeTitle])
-                        : __('svc_notifications.group_exchange.completed_debit', ['hours' => $hours, 'title' => $exchangeTitle]);
+                        ? __('svc_notifications.group_exchange.completed_credit', ['hours' => $hoursLabel, 'title' => $exchangeTitle])
+                        : __('svc_notifications.group_exchange.completed_debit', ['hours' => $hoursLabel, 'title' => $exchangeTitle]);
 
                     // Canonical tenant-safe writer — forces tenant_id to the
                     // recipient's users.tenant_id. Never raw Notification::create().

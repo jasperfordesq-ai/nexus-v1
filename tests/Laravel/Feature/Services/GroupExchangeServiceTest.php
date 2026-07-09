@@ -168,4 +168,126 @@ class GroupExchangeServiceTest extends TestCase
         $status = DB::table('group_exchanges')->where('id', $exchangeId)->value('status');
         $this->assertNotSame('completed', $status, 'the status-claim must roll back with the failed money movement');
     }
+
+    // ------------------------------------------------------------------
+    //  Custom-split conservation (P1 — audit 2026-07-09): an unbalanced
+    //  custom split minted SUM(provider) − SUM(receiver) credits from
+    //  nothing on completion. Both gates (start + complete) must reject it.
+    // ------------------------------------------------------------------
+
+    public function test_complete_rejects_unbalanced_custom_split(): void
+    {
+        // The audit exploit verbatim: provider 100h vs receiver 1h would have
+        // minted +99 credits on completion.
+        $provider = $this->makeUser(0);
+        $receiver = $this->makeUser(1);
+        $exchangeId = $this->seedExchange([
+            ['user_id' => $provider, 'role' => 'provider', 'hours' => 100],
+            ['user_id' => $receiver, 'role' => 'receiver', 'hours' => 1],
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+        $result = $this->service->complete($exchangeId);
+
+        $this->assertFalse($result['success'] ?? true, 'unbalanced custom split must be rejected');
+        $this->assertNotEmpty($result['error'] ?? '');
+
+        $this->assertEqualsWithDelta(0, $this->balanceOf($provider), 0.001, 'no credit may be minted');
+        $this->assertEqualsWithDelta(1, $this->balanceOf($receiver), 0.001, 'no debit may be taken');
+        $this->assertSame(0, $this->exchangeCreditCount($provider), 'no ledger row on rejection');
+
+        $status = DB::table('group_exchanges')->where('id', $exchangeId)->value('status');
+        $this->assertNotSame('completed', $status, 'a rejected exchange must not be marked completed');
+    }
+
+    public function test_start_rejects_unbalanced_custom_split(): void
+    {
+        $provider = $this->makeUser(0);
+        $receiver = $this->makeUser(1);
+        $exchangeId = $this->seedExchange([
+            ['user_id' => $provider, 'role' => 'provider', 'hours' => 100],
+            ['user_id' => $receiver, 'role' => 'receiver', 'hours' => 1],
+        ], 'draft');
+
+        TenantContext::setById($this->testTenantId);
+        $result = $this->service->start($exchangeId);
+
+        $this->assertFalse($result['success'] ?? true, 'start must reject an unbalanced custom split');
+        $this->assertNotEmpty($result['error'] ?? '');
+
+        $status = DB::table('group_exchanges')->where('id', $exchangeId)->value('status');
+        $this->assertSame('draft', $status, 'a rejected start must leave the exchange in draft');
+    }
+
+    public function test_start_allows_balanced_custom_split(): void
+    {
+        $provider = $this->makeUser(0);
+        $receiver = $this->makeUser(10);
+        $exchangeId = $this->seedExchange([
+            ['user_id' => $provider, 'role' => 'provider', 'hours' => 6],
+            ['user_id' => $receiver, 'role' => 'receiver', 'hours' => 6],
+        ], 'draft');
+
+        TenantContext::setById($this->testTenantId);
+        $result = $this->service->start($exchangeId);
+
+        $this->assertTrue($result['success'] ?? false, 'a balanced custom split must still start: ' . json_encode($result));
+        $status = DB::table('group_exchanges')->where('id', $exchangeId)->value('status');
+        $this->assertSame('pending_confirmation', $status);
+    }
+
+    public function test_complete_rejects_negative_hours_disguising_imbalance(): void
+    {
+        // A plain SUM() would call this balanced (10 + (-5) = 5 == 5), but
+        // complete() skips <= 0 entries, so the real movement is +10 / −5.
+        // The guard must mirror complete()'s semantics, not raw sums.
+        $providerA = $this->makeUser(0);
+        $providerB = $this->makeUser(0);
+        $receiver  = $this->makeUser(10);
+        $exchangeId = $this->seedExchange([
+            ['user_id' => $providerA, 'role' => 'provider', 'hours' => 10],
+            ['user_id' => $providerB, 'role' => 'provider', 'hours' => -5],
+            ['user_id' => $receiver,  'role' => 'receiver', 'hours' => 5],
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+        $result = $this->service->complete($exchangeId);
+
+        $this->assertFalse($result['success'] ?? true, 'negative-hours rows must not disguise an imbalance');
+        $this->assertEqualsWithDelta(0, $this->balanceOf($providerA), 0.001);
+        $this->assertEqualsWithDelta(10, $this->balanceOf($receiver), 0.001);
+    }
+
+    // ------------------------------------------------------------------
+    //  Fractional-hours notifications (P3 — audit 2026-07-09): hours were
+    //  (int)-cast, so a 0.5h share moved money with NO notification and
+    //  1.5h read as "1 hour".
+    // ------------------------------------------------------------------
+
+    public function test_complete_notifies_fractional_hour_shares(): void
+    {
+        $provider = $this->makeUser(0);
+        $receiver = $this->makeUser(2);
+        $exchangeId = $this->seedExchange([
+            ['user_id' => $provider, 'role' => 'provider', 'hours' => 0.5],
+            ['user_id' => $receiver, 'role' => 'receiver', 'hours' => 0.5],
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+        $result = $this->service->complete($exchangeId);
+        $this->assertTrue($result['success'] ?? false, 'fractional balanced split must complete: ' . json_encode($result));
+
+        $this->assertEqualsWithDelta(0.5, $this->balanceOf($provider), 0.001);
+        $this->assertEqualsWithDelta(1.5, $this->balanceOf($receiver), 0.001);
+
+        foreach ([$provider, $receiver] as $userId) {
+            $message = DB::table('notifications')
+                ->where('user_id', $userId)
+                ->where('type', 'transaction')
+                ->value('message');
+
+            $this->assertNotNull($message, "user {$userId} must be notified of a 0.5h balance change");
+            $this->assertStringContainsString('0.5', (string) $message, 'the fractional amount must survive into the message');
+        }
+    }
 }
