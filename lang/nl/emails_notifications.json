@@ -111,6 +111,7 @@
     "heading_hours_approved": "Uren Goedgekeurd!",
     "hours_approved_body": "Uw vrijwilligersuren bij {{org}} zijn geverifieerd en goedgekeurd.",
     "hours_approved_thanks": "Dank u voor uw waardevolle bijdrage aan de gemeenschap!",
+    "hours_approved_no_credit_note": "Omdat dit minder dan een heel uur was, is er geen tijdkrediet aan je portemonnee toegevoegd.",
     "btn_view_hours": "Mijn Uren Bekijken",
     "heading_hours_declined": "Uren Update",
     "hours_declined_body": "Uw registratie van {{hours}} vrijwilligersuren bij {{org}} is niet goedgekeurd.",

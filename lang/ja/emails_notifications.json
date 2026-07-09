@@ -111,6 +111,7 @@
     "heading_hours_approved": "時間が承認されました！",
     "hours_approved_body": "{{org}} でのあなたのボランティア時間が確認され、承認されました。",
     "hours_approved_thanks": "コミュニティへの貴重な貢献に感謝します！",
+    "hours_approved_no_credit_note": "1時間未満のため、ウォレットにタイムクレジットは追加されませんでした。",
     "btn_view_hours": "自分の時間を表示する",
     "heading_hours_declined": "時間の状況",
     "hours_declined_body": "{{org}} での{{hours}}時間のボランティア記録が承認されませんでした。",

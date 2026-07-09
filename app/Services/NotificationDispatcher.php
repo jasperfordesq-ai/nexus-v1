@@ -2814,8 +2814,14 @@ HTML;
 
     /**
      * Build HTML email for volunteer hours approved (no payment).
+     *
+     * @param bool $creditAdded false for sub-whole-hour approvals: balances
+     *                          store whole hours, so approvals under 1h mint
+     *                          nothing — the email must say so honestly instead
+     *                          of the celebratory generic copy (VOL-BE-008 /
+     *                          2026-07-09 audit P4).
      */
-    public static function buildVolHoursApprovedEmail(float $hours, string $orgName): string
+    public static function buildVolHoursApprovedEmail(float $hours, string $orgName, bool $creditAdded = true): string
     {
         $tenant = TenantContext::get();
         $tenantName = htmlspecialchars($tenant['name'] ?? 'Community', ENT_QUOTES, 'UTF-8');
@@ -2827,7 +2833,9 @@ HTML;
         $volTenantLabel = __('emails_notifications.volunteering.tenant_volunteering', ['community' => $tenantName]);
         $volHoursApprovedBody = __('emails_notifications.volunteering.hours_approved_body', ['org' => "<strong>{$orgNameHtml}</strong>"]);
         $volLabelHoursApproved = __('emails_notifications.volunteering.label_hours_approved');
-        $volHoursApprovedThanks = __('emails_notifications.volunteering.hours_approved_thanks');
+        $volHoursApprovedThanks = $creditAdded
+            ? __('emails_notifications.volunteering.hours_approved_thanks')
+            : __('emails_notifications.volunteering.hours_approved_no_credit_note');
         $volBtnViewHours = __('emails_notifications.volunteering.btn_view_hours');
 
         return <<<HTML

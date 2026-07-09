@@ -111,6 +111,7 @@
     "heading_hours_approved": "تمت الموافقة على الساعات!",
     "hours_approved_body": "تم التحقق من ساعات تطوعك مع {{org}} والموافقة عليها.",
     "hours_approved_thanks": "شكرًا على مساهمتك القيّمة في المجتمع!",
+    "hours_approved_no_credit_note": "نظرًا لأن المدة كانت أقل من ساعة كاملة، لم تتم إضافة أي رصيد وقت إلى محفظتك.",
     "btn_view_hours": "عرض ساعاتي",
     "heading_hours_declined": "تحديث الساعات",
     "hours_declined_body": "لم تتم الموافقة على سجل {{hours}} ساعة من التطوع مع {{org}}.",

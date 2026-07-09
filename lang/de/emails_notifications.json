@@ -111,6 +111,7 @@
     "heading_hours_approved": "Stunden genehmigt!",
     "hours_approved_body": "Ihre ehrenamtlichen Stunden bei {{org}} wurden überprüft und genehmigt.",
     "hours_approved_thanks": "Vielen Dank für Ihren wertvollen Beitrag zur Gemeinschaft!",
+    "hours_approved_no_credit_note": "Da dies unter einer vollen Stunde lag, wurde deinem Guthaben kein Zeitguthaben hinzugefügt.",
     "btn_view_hours": "Meine Stunden ansehen",
     "heading_hours_declined": "Aktualisierung zu den Stunden",
     "hours_declined_body": "Ihr Ehrenamtsprotokoll über {{hours}} Stunden bei {{org}} wurde nicht genehmigt.",

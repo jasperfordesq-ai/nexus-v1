@@ -111,6 +111,7 @@
     "heading_hours_approved": "Uaireanta Ceadaithe!",
     "hours_approved_body": "Tá do chuid uaireanta deonachais le {{org}} fíoraithe agus ceadaithe.",
     "hours_approved_thanks": "Go raibh maith agat as do rannchuidiú luachmhar leis an bpobal!",
+    "hours_approved_no_credit_note": "Toisc go raibh sé seo faoi bhun uair an chloig iomlán, níor cuireadh aon chreidmheas ama le do sparán.",
     "btn_view_hours": "Féach ar Mo Chuid Uaireanta",
     "heading_hours_declined": "Nuashonrú Uaireanta",
     "hours_declined_body": "Níor ceadaíodh do loga deonachais {{hours}} uair le {{org}}.",

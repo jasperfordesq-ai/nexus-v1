@@ -2136,13 +2136,14 @@ class VolunteerService
                 } elseif ($action === 'approve' && $paymentResult === 'no_whole_hours') {
                     // Sub-whole-hour logs floor to 0 credits (users.balance stores
                     // whole hours), so tell the volunteer plainly that no credit was
-                    // added rather than implying a successful credit.
+                    // added rather than implying a successful credit — in the email
+                    // channel too, not just bell/push (2026-07-09 audit P4).
                     LocaleContext::withLocale($volunteerRow, function () use ($volunteerId, $hours, $orgName) {
                         NotificationDispatcher::dispatch(
                             $volunteerId, 'global', 0, 'vol_hours_approved',
                             __('notifications.vol_hours_approved_no_credit_body', ['hours' => $hours]),
                             '/volunteering?tab=hours',
-                            NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
+                            NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName, creditAdded: false)
                         );
                     });
                 } elseif ($action === 'approve') {

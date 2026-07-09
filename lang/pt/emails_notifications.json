@@ -111,6 +111,7 @@
     "heading_hours_approved": "Horas Aprovadas!",
     "hours_approved_body": "As suas horas de voluntariado com {{org}} foram verificadas e aprovadas.",
     "hours_approved_thanks": "Obrigado/a pela sua valiosa contribuição para a comunidade!",
+    "hours_approved_no_credit_note": "Como foi inferior a uma hora completa, nenhum crédito de tempo foi adicionado à sua carteira.",
     "btn_view_hours": "Ver as Minhas Horas",
     "heading_hours_declined": "Atualização de Horas",
     "hours_declined_body": "O seu registo de {{hours}} horas de voluntariado com {{org}} não foi aprovado.",

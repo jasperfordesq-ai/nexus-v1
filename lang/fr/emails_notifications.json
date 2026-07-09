@@ -111,6 +111,7 @@
     "heading_hours_approved": "Heures approuvées !",
     "hours_approved_body": "Vos heures de bénévolat avec {{org}} ont été vérifiées et approuvées.",
     "hours_approved_thanks": "Merci pour votre précieuse contribution à la communauté !",
+    "hours_approved_no_credit_note": "Comme cela représentait moins d'une heure complète, aucun crédit de temps n'a été ajouté à votre portefeuille.",
     "btn_view_hours": "Voir mes heures",
     "heading_hours_declined": "Mise à jour des heures",
     "hours_declined_body": "Votre journal de bénévolat de {{hours}} heure(s) avec {{org}} n'a pas été approuvé.",

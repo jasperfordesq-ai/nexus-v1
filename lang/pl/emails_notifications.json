@@ -111,6 +111,7 @@
     "heading_hours_approved": "Godziny Zatwierdzone!",
     "hours_approved_body": "Twoje godziny wolontariatu w {{org}} zostały zweryfikowane i zatwierdzone.",
     "hours_approved_thanks": "Dziękujemy za Twój cenny wkład w społeczność!",
+    "hours_approved_no_credit_note": "Ponieważ było to mniej niż pełna godzina, do Twojego portfela nie dodano kredytu czasowego.",
     "btn_view_hours": "Wyświetl Moje Godziny",
     "heading_hours_declined": "Aktualizacja Godzin",
     "hours_declined_body": "Twój dziennik {{hours}} godzin wolontariatu w {{org}} nie został zatwierdzony.",

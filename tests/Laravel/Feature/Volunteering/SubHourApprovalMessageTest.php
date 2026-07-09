@@ -74,4 +74,33 @@ class SubHourApprovalMessageTest extends TestCase
         $this->assertNotNull($message, 'the volunteer should receive an approval notification');
         $this->assertStringContainsString('no time credit was added', $message);
     }
+
+    /**
+     * 2026-07-09 audit P4: the VOL-BE-008 fix originally reached only the
+     * bell/push channel — the EMAIL stayed celebratory-generic. The email body
+     * must carry the same honest no-credit note.
+     */
+    public function test_sub_whole_hour_approval_email_carries_the_no_credit_note(): void
+    {
+        TenantContext::setById($this->testTenantId);
+
+        $honest = \App\Services\NotificationDispatcher::buildVolHoursApprovedEmail(0.75, 'Sub-hour Org', creditAdded: false);
+        $this->assertStringContainsString(
+            __('emails_notifications.volunteering.hours_approved_no_credit_note'),
+            $honest,
+            'sub-hour approval email must say no credit was added'
+        );
+        $this->assertStringNotContainsString(
+            __('emails_notifications.volunteering.hours_approved_thanks'),
+            $honest,
+            'sub-hour approval email must not use the celebratory generic copy'
+        );
+
+        // Whole-hour approvals keep the celebratory copy.
+        $generic = \App\Services\NotificationDispatcher::buildVolHoursApprovedEmail(2.0, 'Sub-hour Org');
+        $this->assertStringContainsString(
+            __('emails_notifications.volunteering.hours_approved_thanks'),
+            $generic
+        );
+    }
 }

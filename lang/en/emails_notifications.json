@@ -111,6 +111,7 @@
     "heading_hours_approved": "Hours Approved!",
     "hours_approved_body": "Your volunteer hours with {{org}} have been verified and approved.",
     "hours_approved_thanks": "Thank you for your valuable contribution to the community!",
+    "hours_approved_no_credit_note": "As this was under a whole hour, no time credit was added to your wallet.",
     "btn_view_hours": "View My Hours",
     "heading_hours_declined": "Hours Update",
     "hours_declined_body": "Your {{hours}} volunteering log with {{org}} was not approved.",
