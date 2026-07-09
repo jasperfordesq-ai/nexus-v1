@@ -664,22 +664,31 @@ class GroupService
         }
 
         $groupName = $group->name;
+        // Defense-in-depth (2026-07-09 audit): the parent load above is
+        // tenant-scoped + owner-checked, but every cascade DELETE/UPDATE below
+        // also carries the tenant filter so a copy-paste into an unscoped
+        // context can never cross tenants. Child-of-child tables without a
+        // tenant_id column (subscribers, chatroom messages, wiki revisions)
+        // inherit scoping from these tenant-filtered parent-id lists.
+        $tenantId = (int) TenantContext::getId();
 
-        return DB::transaction(function () use ($group, $id, $userId, $groupName) {
+        return DB::transaction(function () use ($group, $id, $userId, $groupName, $tenantId) {
             // Fetch active members before deleting (to notify them)
             $memberIds = DB::table('group_members')
                 ->where('group_id', $id)
+                ->where('tenant_id', $tenantId)
                 ->where('status', 'active')
                 ->where('user_id', '!=', $userId)
                 ->pluck('user_id')
                 ->all();
 
             // Delete group members
-            DB::table('group_members')->where('group_id', $id)->delete();
+            DB::table('group_members')->where('group_id', $id)->where('tenant_id', $tenantId)->delete();
 
             // Delete discussion posts, then discussions
             $discussionIds = GroupDiscussion::withoutGlobalScopes()
                 ->where('group_id', $id)
+                ->where('tenant_id', $tenantId)
                 ->pluck('id')
                 ->all();
 
@@ -694,17 +703,20 @@ class GroupService
 
                 GroupDiscussion::withoutGlobalScopes()
                     ->where('group_id', $id)
+                    ->where('tenant_id', $tenantId)
                     ->delete();
             }
 
             // Disassociate events from this group (preserve events, clear group_id)
             DB::table('events')
                 ->where('group_id', $id)
+                ->where('tenant_id', $tenantId)
                 ->update(['group_id' => null]);
 
             // Delete chatroom messages and chatrooms
             $chatroomIds = DB::table('group_chatrooms')
                 ->where('group_id', $id)
+                ->where('tenant_id', $tenantId)
                 ->pluck('id')
                 ->all();
 
@@ -712,10 +724,10 @@ class GroupService
                 $placeholders = implode(',', array_fill(0, count($chatroomIds), '?'));
                 DB::delete("DELETE FROM group_chatroom_messages WHERE chatroom_id IN ({$placeholders})", $chatroomIds);
                 DB::delete("DELETE FROM group_chatroom_pinned_messages WHERE chatroom_id IN ({$placeholders})", $chatroomIds);
-                DB::table('group_chatrooms')->where('group_id', $id)->delete();
+                DB::table('group_chatrooms')->where('group_id', $id)->where('tenant_id', $tenantId)->delete();
             }
 
-            self::deleteRelatedGroupRecords($id);
+            self::deleteRelatedGroupRecords($id, $tenantId);
 
             // Delete the group itself
             $group->delete();
@@ -733,18 +745,20 @@ class GroupService
         });
     }
 
-    private static function deleteRelatedGroupRecords(int $groupId): void
+    private static function deleteRelatedGroupRecords(int $groupId, int $tenantId): void
     {
         if (Schema::hasTable('group_wiki_pages')) {
-            $pageIds = DB::table('group_wiki_pages')->where('group_id', $groupId)->pluck('id')->all();
+            $pageIds = DB::table('group_wiki_pages')->where('group_id', $groupId)->where('tenant_id', $tenantId)->pluck('id')->all();
             if (! empty($pageIds) && Schema::hasTable('group_wiki_revisions')) {
+                // group_wiki_revisions has no tenant_id column — scoped via the
+                // tenant-filtered page-id list above.
                 DB::table('group_wiki_revisions')->whereIn('page_id', $pageIds)->delete();
             }
-            DB::table('group_wiki_pages')->where('group_id', $groupId)->delete();
+            DB::table('group_wiki_pages')->where('group_id', $groupId)->where('tenant_id', $tenantId)->delete();
         }
 
         if (Schema::hasTable('group_questions')) {
-            $questionIds = DB::table('group_questions')->where('group_id', $groupId)->pluck('id')->all();
+            $questionIds = DB::table('group_questions')->where('group_id', $groupId)->where('tenant_id', $tenantId)->pluck('id')->all();
             if (! empty($questionIds)) {
                 if (Schema::hasTable('group_answers')) {
                     $answerIds = DB::table('group_answers')->whereIn('question_id', $questionIds)->pluck('id')->all();
@@ -757,7 +771,15 @@ class GroupService
                     DB::table('group_qa_votes')->where('votable_type', 'question')->whereIn('votable_id', $questionIds)->delete();
                 }
             }
-            DB::table('group_questions')->where('group_id', $groupId)->delete();
+            DB::table('group_questions')->where('group_id', $groupId)->where('tenant_id', $tenantId)->delete();
+        }
+
+        // Tables without a tenant_id column — group_id alone is the only key
+        // available; the parent group was tenant-checked before the cascade.
+        foreach (['group_custom_field_values', 'group_tag_assignments'] as $table) {
+            if (Schema::hasTable($table)) {
+                DB::table($table)->where('group_id', $groupId)->delete();
+            }
         }
 
         foreach ([
@@ -766,18 +788,16 @@ class GroupService
             'group_approval_requests',
             'group_challenges',
             'group_chatrooms',
-            'group_custom_field_values',
             'group_files',
             'group_invites',
             'group_media',
             'group_notification_preferences',
             'group_scheduled_posts',
-            'group_tag_assignments',
             'group_views',
             'group_webhooks',
         ] as $table) {
             if (Schema::hasTable($table)) {
-                DB::table($table)->where('group_id', $groupId)->delete();
+                DB::table($table)->where('group_id', $groupId)->where('tenant_id', $tenantId)->delete();
             }
         }
 
@@ -785,12 +805,14 @@ class GroupService
             DB::table('group_content_flags')
                 ->where('content_type', 'group')
                 ->where('content_id', $groupId)
+                ->where('tenant_id', $tenantId)
                 ->delete();
         }
 
         if (Schema::hasTable('group_policies')) {
             DB::table('group_policies')
                 ->where('policy_key', 'LIKE', '%_' . $groupId)
+                ->where('tenant_id', $tenantId)
                 ->delete();
         }
     }
