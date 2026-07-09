@@ -20,6 +20,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { useTranslation } from 'react-i18next';
+import { extractCollectionItems } from './extractCollectionItems';
 
 interface OrgHoursReviewTabProps {
   orgId: number;
@@ -37,12 +38,6 @@ interface PendingHourEntry {
   created_at: string;
   user: { id: number; name: string; avatar_url: string | null };
   opportunity: { id: number; title: string } | null;
-}
-
-interface PendingHoursResponse {
-  items: PendingHourEntry[];
-  cursor: string | null;
-  has_more: boolean;
 }
 
 const formatDate = (dateStr: string) => {
@@ -92,14 +87,16 @@ function OrgHoursReviewTab({ orgId, balance, onBalanceChange }: OrgHoursReviewTa
       params.set('per_page', '20');
       if (append && cursorRef.current) params.set('cursor', cursorRef.current);
 
-      const response = await api.get<PendingHoursResponse>(
+      // The endpoint returns { data: [...], meta: {...} } and api.get() unwraps one
+      // level, so response.data IS the PendingHourEntry[] and cursor/has_more live
+      // on response.meta — type the generic as the array, not an { items } envelope.
+      const response = await api.get<PendingHourEntry[]>(
         `/v2/volunteering/organisations/${orgId}/hours/pending?${params}`,
       );
 
       if (controller.signal.aborted) return;
       if (response.success && response.data) {
-        // api.get() already unwraps { data: [...], meta: {...} } → response.data = [...], response.meta = {...}
-        const items = Array.isArray(response.data) ? response.data : [];
+        const items = extractCollectionItems<PendingHourEntry>(response.data);
         const nextCursor = response.meta?.cursor ?? null;
         const has_more = response.meta?.has_more ?? false;
         if (append) {
