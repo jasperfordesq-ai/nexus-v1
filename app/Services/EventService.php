@@ -467,8 +467,9 @@ class EventService
             }
         }
 
-        // Resolve category_name slug to category_id if provided
-        if (!empty($data['category_name']) && empty($data['category_id'])) {
+        // Resolve category_name to category_id, and tenant-validate any raw
+        // caller-supplied category_id before it reaches fill() below.
+        if (!empty($data['category_name']) || !empty($data['category_id'])) {
             $data['category_id'] = self::resolveCategoryId($data);
         }
 
@@ -522,15 +523,26 @@ class EventService
 
     /**
      * Resolve category_id from data — supports both numeric ID and string slug.
+     *
+     * Both branches are tenant-scoped: a caller-supplied id from another tenant
+     * (or a name that only exists in another tenant) resolves to null instead of
+     * attaching foreign category name/color to this tenant's events.
      */
     private static function resolveCategoryId(array $data): ?int
     {
+        $tenantId = (int) TenantContext::getId();
+
         if (!empty($data['category_id'])) {
-            return (int) $data['category_id'];
+            $ownedId = DB::table('categories')
+                ->where('id', (int) $data['category_id'])
+                ->where('tenant_id', $tenantId)
+                ->value('id');
+            return $ownedId ? (int) $ownedId : null;
         }
 
         if (!empty($data['category_name'])) {
             $category = DB::table('categories')
+                ->where('tenant_id', $tenantId)
                 ->where('name', $data['category_name'])
                 ->where('type', 'events')
                 ->value('id');
