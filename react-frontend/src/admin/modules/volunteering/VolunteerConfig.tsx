@@ -805,15 +805,29 @@ function RemindersTab() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const results = await Promise.all(reminders.map((reminder) => adminVolunteering.updateReminderSettings(toReminderRequest(reminder))));
-      if (results.some((res) => !res.success)) {
-        throw new Error('reminder_settings_update_failed');
+      // Each reminder is an independent PUT, so a partial failure persists some
+      // and not others. Use allSettled so one failure doesn't mask the rest,
+      // name which reminders failed, and reload below so the form reflects the
+      // true saved state instead of the optimistic values.
+      const results = await Promise.allSettled(
+        reminders.map((reminder) => adminVolunteering.updateReminderSettings(toReminderRequest(reminder))),
+      );
+      const failedKeys = reminders
+        .filter((_, i) => {
+          const r = results[i];
+          return !r || r.status !== 'fulfilled' || !r.value.success;
+        })
+        .map((reminder) => reminder.key);
+
+      if (failedKeys.length === 0) {
+        toast.success(t('volunteering.reminders_saved'));
+      } else {
+        toast.error(`${t('volunteering.failed_to_save_reminders')} (${failedKeys.join(', ')})`);
       }
-      toast.success(t('volunteering.reminders_saved'));
-    } catch {
-      toast.error(t('volunteering.failed_to_save_reminders'));
+    } finally {
+      await loadData();
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   const handleTestSend = async () => {
