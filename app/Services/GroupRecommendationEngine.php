@@ -182,14 +182,18 @@ class GroupRecommendationEngine
         }
 
         $userPlaceholders = implode(',', array_fill(0, count($similarUserIds), '?'));
+        // tenant_id filter is defense-in-depth (2026-07-09 audit): the
+        // similar-user ids above already came from tenant-scoped queries,
+        // but every raw read should carry the filter by convention.
         $candidateGroups = DB::select("
             SELECT gm.group_id, gm.user_id, COUNT(*) as recommendation_count
             FROM group_members gm
             WHERE gm.user_id IN ($userPlaceholders)
             AND gm.group_id NOT IN ($placeholders)
             AND gm.status = 'active'
+            AND gm.tenant_id = ?
             GROUP BY gm.group_id, gm.user_id
-        ", array_merge($similarUserIds, $userGroupIds));
+        ", array_merge($similarUserIds, $userGroupIds, [$tenantId]));
 
         $scores = [];
         foreach ($candidateGroups as $candidate) {
@@ -383,11 +387,13 @@ class GroupRecommendationEngine
             return array_slice($scores, 0, $limit, true);
         }
 
-        // Load group types for MMR
+        // Load group types for MMR. tenant_id filter is defense-in-depth
+        // (2026-07-09 audit): $candidateIds were already intersected with the
+        // tenant-scoped visibility list above.
         $candidateIds = array_keys($scores);
         $placeholders = implode(',', array_fill(0, count($candidateIds), '?'));
         try {
-            $typeRows = DB::select("SELECT id, type_id FROM `groups` WHERE id IN ($placeholders)", $candidateIds);
+            $typeRows = DB::select("SELECT id, type_id FROM `groups` WHERE id IN ($placeholders) AND tenant_id = ?", array_merge($candidateIds, [$tenantId]));
         } catch (\Throwable $e) {
             return array_slice($scores, 0, $limit, true);
         }
