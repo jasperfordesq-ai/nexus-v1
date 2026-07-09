@@ -831,14 +831,14 @@ class EventNotificationService
     private function buildReminderMessage(object $event, string $reminderType): string
     {
         $title = htmlspecialchars($event->title, ENT_QUOTES, 'UTF-8');
-        $when = date('l, M j \a\t g:i A', strtotime($event->start_time));
+        $when = $this->formatEventDateTime($event->start_time);
 
         $locationText = '';
         if (!empty($event->is_online) && !empty($event->online_link)) {
-            $locationText = ' (Online)';
+            $locationText = ' ' . __('notifications.event_reminder_location_online');
         } elseif (!empty($event->location)) {
             $loc = htmlspecialchars($event->location, ENT_QUOTES, 'UTF-8');
-            $locationText = " at {$loc}";
+            $locationText = ' ' . __('notifications.event_reminder_location_at', ['location' => $loc]);
         }
 
         if ($reminderType === '24h') {
@@ -848,6 +848,21 @@ class EventNotificationService
         }
 
         return $message;
+    }
+
+    /**
+     * Format an event date/time for user-facing text in the active locale.
+     *
+     * PHP's date() always renders English weekday/month names; Carbon's
+     * isoFormat honours the locale switched in by LocaleContext, so reminder,
+     * cancellation, update, and created emails render dates in the
+     * recipient's preferred_language.
+     */
+    private function formatEventDateTime(string $dateTime, string $isoFormat = 'dddd, MMM D, h:mm A'): string
+    {
+        return \Carbon\Carbon::parse($dateTime)
+            ->locale((string) app()->getLocale())
+            ->isoFormat($isoFormat);
     }
 
     /**
@@ -975,7 +990,7 @@ HTML;
 
         $dateHtml = '';
         if (!empty($event->start_time)) {
-            $when = date('l, M j \a\t g:i A', strtotime($event->start_time));
+            $when = $this->formatEventDateTime($event->start_time);
             $scheduledFor = htmlspecialchars(__('emails.events.cancelled_scheduled_for', ['when' => $when]), ENT_QUOTES, 'UTF-8');
             $dateHtml = "<p style=\"color: #64748b; margin: 4px 0 0; font-size: 14px;\">{$scheduledFor}</p>";
         }
@@ -1025,7 +1040,7 @@ HTML;
 
         $changesHtml = '';
         if (isset($changes['start_time'])) {
-            $newTime = date('l, M j \a\t g:i A', strtotime($changes['start_time']));
+            $newTime = $this->formatEventDateTime($changes['start_time']);
             $changesHtml .= "<li style=\"color: #1e293b; margin-bottom: 8px;\"><strong>{$dateTimeLabel}</strong> {$newTime}</li>";
         }
         if (isset($changes['location'])) {
@@ -1086,7 +1101,7 @@ HTML;
         // Date/time row
         $dateHtml = '';
         if (!empty($event->start_time)) {
-            $when = date('l, F j, Y \a\t g:i A', strtotime($event->start_time));
+            $when = $this->formatEventDateTime($event->start_time, 'dddd, MMMM D, YYYY, h:mm A');
             $safeWhen = htmlspecialchars($when, ENT_QUOTES, 'UTF-8');
             $dateHtml = "<p style=\"color: #64748b; margin: 0 0 6px; font-size: 14px;\">&#128197; {$safeWhen}</p>";
         }
@@ -1136,7 +1151,7 @@ HTML;
         $basePath = TenantContext::getSlugPrefix();
         $eventUrl = $baseUrl . $basePath . '/events/' . $event->id;
 
-        $when = date('l, M j \a\t g:i A', strtotime($event->start_time));
+        $when = $this->formatEventDateTime($event->start_time);
         $heading = $reminderType === '24h'
             ? htmlspecialchars(__('emails.events.reminder_heading_24h'), ENT_QUOTES, 'UTF-8')
             : htmlspecialchars(__('emails.events.reminder_heading_1h'), ENT_QUOTES, 'UTF-8');

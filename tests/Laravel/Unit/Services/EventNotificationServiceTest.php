@@ -183,4 +183,72 @@ class EventNotificationServiceTest extends TestCase
 
         $this->service->notifyEventUpdated(1, ['start_time' => '2026-04-01 14:00']);
     }
+
+    // =========================================================================
+    // buildReminderMessage() — locale-aware date + location rendering
+    // =========================================================================
+
+    /**
+     * Invoke the private buildReminderMessage() under a given locale.
+     */
+    private function buildReminderMessageIn(string $locale, object $event, string $type = '24h'): string
+    {
+        $method = new \ReflectionMethod(EventNotificationService::class, 'buildReminderMessage');
+
+        return \App\I18n\LocaleContext::withLocale(
+            $locale,
+            fn () => $method->invoke($this->service, $event, $type)
+        );
+    }
+
+    public function test_reminder_message_renders_date_in_recipient_locale(): void
+    {
+        // 2026-07-15 is a Wednesday ("Mittwoch" in German, "Juli" for the month).
+        $event = (object) [
+            'id' => 1,
+            'title' => 'Test Event',
+            'start_time' => '2026-07-15 15:00:00',
+            'is_online' => 0,
+            'online_link' => null,
+            'location' => null,
+        ];
+
+        $german = $this->buildReminderMessageIn('de', $event);
+        $this->assertStringContainsString('Mittwoch', $german, 'German recipients must get a German weekday name');
+        $this->assertStringNotContainsString('Wednesday', $german, 'English weekday name must not leak into German reminders');
+
+        $english = $this->buildReminderMessageIn('en', $event);
+        $this->assertStringContainsString('Wednesday', $english);
+    }
+
+    public function test_reminder_message_location_connectors_come_from_translations(): void
+    {
+        $withLocation = (object) [
+            'id' => 1,
+            'title' => 'Test Event',
+            'start_time' => '2026-07-15 15:00:00',
+            'is_online' => 0,
+            'online_link' => null,
+            'location' => 'Cork',
+        ];
+        $message = $this->buildReminderMessageIn('en', $withLocation);
+        $this->assertStringContainsString(
+            ' ' . __('notifications.event_reminder_location_at', ['location' => 'Cork']),
+            $message
+        );
+
+        $online = (object) [
+            'id' => 1,
+            'title' => 'Test Event',
+            'start_time' => '2026-07-15 15:00:00',
+            'is_online' => 1,
+            'online_link' => 'https://example.org/meet',
+            'location' => null,
+        ];
+        $message = $this->buildReminderMessageIn('en', $online);
+        $this->assertStringContainsString(
+            ' ' . __('notifications.event_reminder_location_online'),
+            $message
+        );
+    }
 }
