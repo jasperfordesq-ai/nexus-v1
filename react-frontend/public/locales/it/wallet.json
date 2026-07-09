@@ -1,4 +1,8 @@
 {
+  "category_select": {
+    "label": "Categoria",
+    "placeholder": "Seleziona una categoria"
+  },
   "title": "Portafoglio",
   "balance": "Saldo",
   "time_credits": "Crediti Tempo",

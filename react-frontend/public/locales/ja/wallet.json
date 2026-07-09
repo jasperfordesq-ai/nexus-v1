@@ -1,4 +1,8 @@
 {
+  "category_select": {
+    "label": "カテゴリー",
+    "placeholder": "カテゴリーを選択"
+  },
   "title": "ウォレット",
   "balance": "残高",
   "time_credits": "タイムクレジット",

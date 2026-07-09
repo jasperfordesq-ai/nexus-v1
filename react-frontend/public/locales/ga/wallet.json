@@ -1,4 +1,8 @@
 {
+  "category_select": {
+    "label": "Catagóir",
+    "placeholder": "Roghnaigh catagóir"
+  },
   "title": "Sparán",
   "balance": "Iarmhéid",
   "time_credits": "Creidmheasanna Ama",

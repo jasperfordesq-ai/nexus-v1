@@ -1536,6 +1536,15 @@
       }
     },
     "history": {
+      "types": {
+        "earned_for_hours": "Für Stunden verdient",
+        "transfer_in": "Überweisung erhalten",
+        "transfer_out": "Überweisung gesendet",
+        "admin_issue": "Von Admin ausgestellt",
+        "admin_adjustment": "Admin-Anpassung",
+        "redemption": "Einlösung",
+        "reversal": "Stornierung"
+      },
       "title": "Letzte Aktivität",
       "empty": "Noch keine Transaktionen.",
       "date": "Datum",
@@ -2186,7 +2195,9 @@
     "description_label": "Beschreibung (optional)",
     "make_public": "Öffentlich machen",
     "create": "Erstellen",
-    "confirm_create": "Sammlung erstellen"
+    "confirm_create": "Sammlung erstellen",
+    "load_error": "Ihre Sammlungen konnten nicht geladen werden.",
+    "retry": "Erneut versuchen"
   },
   "appreciations": {
     "title": "Ein Dankeschön senden",
@@ -2204,6 +2215,9 @@
     "wall_title": "Wertschätzungen",
     "empty_title": "Noch keine Wertschätzungen",
     "empty_desc": "Dankesbotschaften werden hier angezeigt.",
+    "load_error_title": "Wertschätzungen konnten nicht geladen werden",
+    "load_error_desc": "Beim Laden der Wertschätzungen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "retry": "Erneut versuchen",
     "most_title": "Am meisten geschätzt",
     "most_empty": "Noch keine Wertschätzungen",
     "react_heart": "Herz",

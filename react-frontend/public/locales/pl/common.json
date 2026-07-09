@@ -1536,6 +1536,15 @@
       }
     },
     "history": {
+      "types": {
+        "earned_for_hours": "Zarobione za godziny",
+        "transfer_in": "Otrzymany przelew",
+        "transfer_out": "Wysłany przelew",
+        "admin_issue": "Wydane przez administratora",
+        "admin_adjustment": "Korekta administratora",
+        "redemption": "Wymiana",
+        "reversal": "Cofnięcie"
+      },
       "title": "Ostatnia aktywność",
       "empty": "Brak transakcji.",
       "date": "Data",
@@ -2186,7 +2195,9 @@
     "description_label": "Opis (opcjonalnie)",
     "make_public": "Uczyń publiczną",
     "create": "Utwórz",
-    "confirm_create": "Utwórz kolekcję"
+    "confirm_create": "Utwórz kolekcję",
+    "load_error": "Nie udało się wczytać Twoich kolekcji.",
+    "retry": "Spróbuj ponownie"
   },
   "appreciations": {
     "title": "Wyślij podziękowanie",
@@ -2204,6 +2215,9 @@
     "wall_title": "Podziękowania",
     "empty_title": "Brak podziękowań",
     "empty_desc": "Podziękowania pojawią się tutaj.",
+    "load_error_title": "Nie udało się wczytać podziękowań",
+    "load_error_desc": "Coś poszło nie tak podczas wczytywania podziękowań. Spróbuj ponownie.",
+    "retry": "Spróbuj ponownie",
     "most_title": "Najbardziej docenieni",
     "most_empty": "Brak podziękowań",
     "react_heart": "Serce",

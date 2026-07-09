@@ -1536,6 +1536,15 @@
       }
     },
     "history": {
+      "types": {
+        "earned_for_hours": "時間に対する獲得",
+        "transfer_in": "受け取った送付",
+        "transfer_out": "送った送付",
+        "admin_issue": "管理者による発行",
+        "admin_adjustment": "管理者による調整",
+        "redemption": "引き換え",
+        "reversal": "取り消し"
+      },
       "title": "最近のアクティビティ",
       "empty": "取引はまだありません。",
       "date": "日付",
@@ -2186,7 +2195,9 @@
     "description_label": "説明（任意）",
     "make_public": "公開する",
     "create": "作成",
-    "confirm_create": "コレクションの作成"
+    "confirm_create": "コレクションの作成",
+    "load_error": "コレクションを読み込めませんでした。",
+    "retry": "再試行"
   },
   "appreciations": {
     "title": "感謝を送る",
@@ -2204,6 +2215,9 @@
     "wall_title": "感謝",
     "empty_title": "まだ感謝はありません",
     "empty_desc": "感謝のメッセージはここに表示されます。",
+    "load_error_title": "感謝を読み込めませんでした",
+    "load_error_desc": "感謝の読み込み中に問題が発生しました。もう一度お試しください。",
+    "retry": "再試行",
     "most_title": "最も感謝されている",
     "most_empty": "まだ感謝はありません",
     "react_heart": "ハート",

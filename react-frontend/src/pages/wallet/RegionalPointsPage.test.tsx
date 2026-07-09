@@ -253,14 +253,15 @@ describe('RegionalPointsPage', () => {
     expect(screen.getByText('Type')).toBeInTheDocument();
     expect(screen.getByText('Description')).toBeInTheDocument();
 
-    // Transaction rows
-    expect(screen.getByText('earn')).toBeInTheDocument();
-    expect(screen.getByText('transfer_out')).toBeInTheDocument();
+    // Transaction rows — unknown type codes ('earn') fall back to a humanized
+    // label; known codes ('transfer_out') render their translated label.
+    expect(screen.getByText('Earn')).toBeInTheDocument();
+    expect(screen.getByText('Transfer sent')).toBeInTheDocument();
     expect(screen.getByText('Volunteering hours')).toBeInTheDocument();
 
     // Null description → falls back to t('empty_dash') which is "–" or "-"
     // We just verify the description column renders without crashing
-    expect(screen.getByText('transfer_out')).toBeInTheDocument();
+    expect(screen.getByText('Transfer sent')).toBeInTheDocument();
 
     // Inbound amount rendered with +, outbound with -
     expect(screen.getByText(/\+50\.00/)).toBeInTheDocument();

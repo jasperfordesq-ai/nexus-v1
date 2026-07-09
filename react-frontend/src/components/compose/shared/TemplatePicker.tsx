@@ -16,8 +16,10 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@
 interface Template {
   key: string;
   labelKey: string;
-  title?: string;
-  content: string;
+  /** Translation key for the pre-filled title (optional). */
+  titleKey?: string;
+  /** Translation key for the pre-filled body content. */
+  contentKey: string;
 }
 
 interface TemplatePickerProps {
@@ -34,83 +36,77 @@ const TEMPLATES: Record<string, Template[]> = {
     {
       key: 'achievement',
       labelKey: 'compose.template_post_achievement',
-      content: '\uD83C\uDF89 I just completed...',
+      contentKey: 'compose.template_post_achievement_content',
     },
     {
       key: 'help',
       labelKey: 'compose.template_post_help',
-      content: '\uD83D\uDC4B Hi everyone! I\'m looking for help with...',
+      contentKey: 'compose.template_post_help_content',
     },
     {
       key: 'recommend',
       labelKey: 'compose.template_post_recommend',
-      content: '\u2B50 I want to recommend @... for their amazing...',
+      contentKey: 'compose.template_post_recommend_content',
     },
   ],
   listing: [
     {
       key: 'offer',
       labelKey: 'compose.template_listing_offer',
-      title: 'I can help with...',
-      content:
-        'I have experience in... and would love to help someone who needs...',
+      titleKey: 'compose.template_listing_offer_title',
+      contentKey: 'compose.template_listing_offer_content',
     },
     {
       key: 'request',
       labelKey: 'compose.template_listing_request',
-      title: 'Looking for help with...',
-      content:
-        'I need someone who can help me with... Estimated time: about X hours.',
+      titleKey: 'compose.template_listing_request_title',
+      contentKey: 'compose.template_listing_request_content',
     },
   ],
   event: [
     {
       key: 'gathering',
       labelKey: 'compose.template_event_gathering',
-      title: 'Community Gathering',
-      content: 'Join us for a friendly community get-together! All welcome.',
+      titleKey: 'compose.template_event_gathering_title',
+      contentKey: 'compose.template_event_gathering_content',
     },
     {
       key: 'workshop',
       labelKey: 'compose.template_event_workshop',
-      title: 'Workshop: ',
-      content:
-        'Learn about... in this hands-on workshop.\n\nWhat to bring:\n- \n\nSuitable for: beginners/all levels',
+      titleKey: 'compose.template_event_workshop_title',
+      contentKey: 'compose.template_event_workshop_content',
     },
     {
       key: 'social',
       labelKey: 'compose.template_event_social',
-      title: 'Social Event: ',
-      content:
-        'Come along for a relaxed social event. A great chance to meet new people and have fun!',
+      titleKey: 'compose.template_event_social_title',
+      contentKey: 'compose.template_event_social_content',
     },
   ],
   goal: [
     {
       key: 'hours',
       labelKey: 'compose.template_goal_hours',
-      title: 'Give X hours this month',
-      content:
-        'My goal is to contribute X hours of my time to the community this month.',
+      titleKey: 'compose.template_goal_hours_title',
+      contentKey: 'compose.template_goal_hours_content',
     },
     {
       key: 'skills',
       labelKey: 'compose.template_goal_skills',
-      title: 'Learn a new skill',
-      content:
-        'I want to learn... by connecting with community members who have this expertise.',
+      titleKey: 'compose.template_goal_skills_title',
+      contentKey: 'compose.template_goal_skills_content',
     },
   ],
   poll: [
     {
       key: 'opinion',
       labelKey: 'compose.template_poll_opinion',
-      content: 'What do you think about...?',
+      contentKey: 'compose.template_poll_opinion_content',
     },
     {
       key: 'preference',
       labelKey: 'compose.template_poll_preference',
-      content: 'Which do you prefer?',
+      contentKey: 'compose.template_poll_preference_content',
     },
   ],
 };
@@ -133,8 +129,8 @@ export function TemplatePicker({ tab, onSelect }: TemplatePickerProps) {
     const template = templates.find((tpl) => tpl.key === String(key));
     if (template) {
       onSelect({
-        title: template.title,
-        content: template.content,
+        title: template.titleKey ? t(template.titleKey) : undefined,
+        content: t(template.contentKey),
       });
     }
   };

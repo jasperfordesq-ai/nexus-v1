@@ -1,4 +1,8 @@
 {
+  "category_select": {
+    "label": "Category",
+    "placeholder": "Select a category"
+  },
   "title": "Wallet",
   "balance": "Balance",
   "time_credits": "Time Credits",

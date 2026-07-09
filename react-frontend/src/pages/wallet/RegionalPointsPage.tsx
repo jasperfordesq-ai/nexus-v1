@@ -88,6 +88,26 @@ function formatActivityDate(value: string): string {
   return activityDateFormatter.format(new Date(value));
 }
 
+/**
+ * Transaction type codes emitted by CaringRegionalPointService.
+ * Each has a matching `regional_points.history.types.*` translation key.
+ */
+const KNOWN_TRANSACTION_TYPES = new Set([
+  'earned_for_hours',
+  'transfer_in',
+  'transfer_out',
+  'admin_issue',
+  'admin_adjustment',
+  'redemption',
+  'reversal',
+]);
+
+/** Graceful fallback for unknown type codes: "some_new_type" → "Some new type". */
+function humanizeTypeCode(code: string): string {
+  const text = code.replace(/_/g, ' ').trim();
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -363,7 +383,9 @@ export default function RegionalPointsPage() {
                             ) : (
                               <ArrowUpCircle className="w-4 h-4 text-danger" />
                             )}
-                            {row.type}
+                            {KNOWN_TRANSACTION_TYPES.has(row.type)
+                              ? t(`regional_points.history.types.${row.type}`)
+                              : humanizeTypeCode(row.type)}
                           </span>
                         </TableCell>
                         <TableCell className="text-muted">{row.description || t('empty_dash')}</TableCell>

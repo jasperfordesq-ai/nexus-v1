@@ -1536,6 +1536,15 @@
       }
     },
     "history": {
+      "types": {
+        "earned_for_hours": "Earned for hours",
+        "transfer_in": "Transfer received",
+        "transfer_out": "Transfer sent",
+        "admin_issue": "Issued by admin",
+        "admin_adjustment": "Admin adjustment",
+        "redemption": "Redemption",
+        "reversal": "Reversal"
+      },
       "title": "Recent activity",
       "empty": "No transactions yet.",
       "date": "Date",
@@ -2186,7 +2195,9 @@
     "description_label": "Description (optional)",
     "make_public": "Make public",
     "create": "Create",
-    "confirm_create": "Create collection"
+    "confirm_create": "Create collection",
+    "load_error": "We couldn't load your collections.",
+    "retry": "Try again"
   },
   "appreciations": {
     "title": "Send a thank-you",
@@ -2204,6 +2215,9 @@
     "wall_title": "Appreciations",
     "empty_title": "No appreciations yet",
     "empty_desc": "Thank-you notes will appear here.",
+    "load_error_title": "Couldn't load appreciations",
+    "load_error_desc": "Something went wrong while loading appreciations. Please try again.",
+    "retry": "Try again",
     "most_title": "Most appreciated",
     "most_empty": "No appreciations yet",
     "react_heart": "Heart",

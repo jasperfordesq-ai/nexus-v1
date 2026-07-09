@@ -1,4 +1,8 @@
 {
+  "category_select": {
+    "label": "Categorie",
+    "placeholder": "Selecteer een categorie"
+  },
   "title": "Portemonnee",
   "balance": "Saldo",
   "time_credits": "Tijdcredits",

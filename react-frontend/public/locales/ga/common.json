@@ -1536,6 +1536,15 @@
       }
     },
     "history": {
+      "types": {
+        "earned_for_hours": "Tuillte as uaireanta",
+        "transfer_in": "Aistriú faighte",
+        "transfer_out": "Aistriú seolta",
+        "admin_issue": "Eisithe ag riarthóir",
+        "admin_adjustment": "Coigeartú riarthóra",
+        "redemption": "Fuascailt",
+        "reversal": "Aisiompú"
+      },
       "title": "Gníomhaíocht le déanaí",
       "empty": "Aon idirbheart fós.",
       "date": "Dáta",
@@ -2186,7 +2195,9 @@
     "description_label": "Cur síos (roghnach)",
     "make_public": "Déan poiblí",
     "create": "Cruthaigh",
-    "confirm_create": "Cruthaigh bailiúchán"
+    "confirm_create": "Cruthaigh bailiúchán",
+    "load_error": "Níorbh fhéidir do bhailiúcháin a lódáil.",
+    "retry": "Bain triail eile as"
   },
   "appreciations": {
     "title": "Seol nóta buíochais",
@@ -2204,6 +2215,9 @@
     "wall_title": "Buíochais",
     "empty_title": "Gan aon bhuíochas fós",
     "empty_desc": "Taispeánfar nótaí buíochais anseo.",
+    "load_error_title": "Níorbh fhéidir na buíochais a lódáil",
+    "load_error_desc": "Chuaigh rud éigin amú agus na buíochais á lódáil. Bain triail eile as.",
+    "retry": "Bain triail eile as",
     "most_title": "Is mó buíochas",
     "most_empty": "Gan aon bhuíochas fós",
     "react_heart": "Croí",

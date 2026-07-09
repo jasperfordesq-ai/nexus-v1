@@ -1536,6 +1536,15 @@
       }
     },
     "history": {
+      "types": {
+        "earned_for_hours": "Ganho por horas",
+        "transfer_in": "Transferência recebida",
+        "transfer_out": "Transferência enviada",
+        "admin_issue": "Emitido pelo administrador",
+        "admin_adjustment": "Ajuste administrativo",
+        "redemption": "Resgate",
+        "reversal": "Reversão"
+      },
       "title": "Atividade recente",
       "empty": "Ainda sem transações.",
       "date": "Data",
@@ -2186,7 +2195,9 @@
     "description_label": "Descrição (opcional)",
     "make_public": "Tornar pública",
     "create": "Criar",
-    "confirm_create": "Criar coleção"
+    "confirm_create": "Criar coleção",
+    "load_error": "Não foi possível carregar as tuas coleções.",
+    "retry": "Tentar novamente"
   },
   "appreciations": {
     "title": "Enviar um agradecimento",
@@ -2204,6 +2215,9 @@
     "wall_title": "Agradecimentos",
     "empty_title": "Ainda sem agradecimentos",
     "empty_desc": "As mensagens de agradecimento vão aparecer aqui.",
+    "load_error_title": "Não foi possível carregar os agradecimentos",
+    "load_error_desc": "Algo deu errado ao carregar os agradecimentos. Tente novamente.",
+    "retry": "Tentar novamente",
     "most_title": "Mais apreciados",
     "most_empty": "Ainda sem agradecimentos",
     "react_heart": "Coração",

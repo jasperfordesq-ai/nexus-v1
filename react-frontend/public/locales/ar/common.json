@@ -1536,6 +1536,15 @@
       }
     },
     "history": {
+      "types": {
+        "earned_for_hours": "مكتسب مقابل الساعات",
+        "transfer_in": "تحويل مستلم",
+        "transfer_out": "تحويل مرسل",
+        "admin_issue": "صادر من المشرف",
+        "admin_adjustment": "تعديل إداري",
+        "redemption": "استرداد",
+        "reversal": "عكس العملية"
+      },
       "title": "النشاط الأخير",
       "empty": "لا توجد معاملات بعد.",
       "date": "التاريخ",
@@ -2186,7 +2195,9 @@
     "description_label": "الوصف (اختياري)",
     "make_public": "اجعلها عامة",
     "create": "إنشاء",
-    "confirm_create": "إنشاء مجموعة"
+    "confirm_create": "إنشاء مجموعة",
+    "load_error": "تعذر تحميل مجموعاتك.",
+    "retry": "أعد المحاولة"
   },
   "appreciations": {
     "title": "أرسل رسالة شكر",
@@ -2204,6 +2215,9 @@
     "wall_title": "التقديرات",
     "empty_title": "لا توجد تقديرات بعد",
     "empty_desc": "ستظهر رسائل الشكر هنا.",
+    "load_error_title": "تعذر تحميل التقديرات",
+    "load_error_desc": "حدث خطأ ما أثناء تحميل التقديرات. يرجى المحاولة مرة أخرى.",
+    "retry": "حاول مرة أخرى",
     "most_title": "الأكثر تقديرًا",
     "most_empty": "لا توجد تقديرات بعد",
     "react_heart": "قلب",

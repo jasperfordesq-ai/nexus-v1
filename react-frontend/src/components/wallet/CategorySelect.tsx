@@ -9,6 +9,7 @@ import { Select, SelectItem } from '@/components/ui/Select';
  */
 
 import { useState, useEffect, type CSSProperties } from 'react';
+import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { TransactionCategory } from '@/types/api';
@@ -24,10 +25,11 @@ interface CategorySelectProps {
 export function CategorySelect({
   value,
   onChange,
-  label = 'Category',
-  placeholder = 'Select a category',
+  label,
+  placeholder,
   className,
 }: CategorySelectProps) {
+  const { t } = useTranslation('wallet');
   const [categories, setCategories] = useState<TransactionCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -54,8 +56,8 @@ export function CategorySelect({
 
   return (
     <Select
-      label={label}
-      placeholder={placeholder}
+      label={label ?? t('category_select.label')}
+      placeholder={placeholder ?? t('category_select.placeholder')}
       selectedKeys={value ? [String(value)] : []}
       onSelectionChange={(keys) => {
         const selected = Array.from(keys)[0] as string | undefined;

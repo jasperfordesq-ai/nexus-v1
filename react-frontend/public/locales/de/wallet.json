@@ -1,4 +1,8 @@
 {
+  "category_select": {
+    "label": "Kategorie",
+    "placeholder": "Kategorie auswählen"
+  },
   "title": "Zeitkonto",
   "balance": "Guthaben",
   "time_credits": "Zeitguthaben",

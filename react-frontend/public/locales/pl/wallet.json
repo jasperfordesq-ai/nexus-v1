@@ -1,4 +1,8 @@
 {
+  "category_select": {
+    "label": "Kategoria",
+    "placeholder": "Wybierz kategorię"
+  },
   "title": "Portfel",
   "balance": "Saldo",
   "time_credits": "Kredyty Czasowe",

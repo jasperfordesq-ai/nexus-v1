@@ -1,4 +1,8 @@
 {
+  "category_select": {
+    "label": "الفئة",
+    "placeholder": "اختر فئة"
+  },
   "title": "المحفظة",
   "balance": "الرصيد",
   "time_credits": "رصيد الوقت",
