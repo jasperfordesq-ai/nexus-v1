@@ -530,8 +530,8 @@ class GroupExchangeService
 
         $this->updateStatus($exchangeId, 'pending_confirmation');
 
-        // Bell + push each participant that the exchange is live and awaiting their
-        // confirmation. Fail-safe: a notification failure never unwinds the start.
+        // Bell + push + email each participant that the exchange is live and awaiting
+        // their confirmation. Fail-safe: a notification failure never unwinds the start.
         $this->notifyParticipantsToConfirm($exchangeId, (string) $exchange->title, $tenantId);
 
         return ['success' => true];
@@ -539,25 +539,35 @@ class GroupExchangeService
 
     /**
      * Notify every participant that an exchange has started and needs their
-     * confirmation. Mirrors notifyBalanceChanges(): each recipient is belled +
-     * pushed in their OWN preferred_language, deduped so a user added as both
-     * provider and receiver only gets one prompt, and every failure is swallowed
-     * so it can never unwind the already-committed status transition.
+     * confirmation. Mirrors notifyBalanceChanges(): each recipient is belled,
+     * pushed and emailed in their OWN preferred_language, deduped so a user added
+     * as both provider and receiver only gets one prompt, and every failure is
+     * swallowed so it can never unwind the already-committed status transition.
      */
     private function notifyParticipantsToConfirm(int $exchangeId, string $title, int $tenantId): void
     {
         $exchangeTitle = trim($title) !== '' ? $title : __('svc_notifications.group_exchange.fallback_title');
         $link = '/group-exchanges/' . $exchangeId;
 
-        $recipients = DB::table('group_exchange_participants as p')
-            ->join('users as u', function ($join) use ($tenantId) {
-                $join->on('p.user_id', '=', 'u.id')
-                    ->where('u.tenant_id', '=', $tenantId);
-            })
-            ->where('p.group_exchange_id', $exchangeId)
-            ->select(['p.user_id', 'u.email', 'u.first_name', 'u.name', 'u.preferred_language'])
-            ->get()
-            ->unique('user_id');
+        try {
+            $recipients = DB::table('group_exchange_participants as p')
+                ->join('users as u', function ($join) use ($tenantId) {
+                    $join->on('p.user_id', '=', 'u.id')
+                        ->where('u.tenant_id', '=', $tenantId);
+                })
+                ->where('p.group_exchange_id', $exchangeId)
+                ->select(['p.user_id', 'u.email', 'u.first_name', 'u.name', 'u.preferred_language'])
+                ->get()
+                ->unique('user_id');
+        } catch (\Throwable $e) {
+            // Loading recipients must never fail the already-committed start() —
+            // the status transition has persisted, notifications are best-effort.
+            Log::warning('[GroupExchange] start notification recipient load failed (continuing)', [
+                'exchange_id' => $exchangeId,
+                'error'       => $e->getMessage(),
+            ]);
+            return;
+        }
 
         foreach ($recipients as $recipient) {
             try {
