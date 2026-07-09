@@ -528,6 +528,8 @@ class TenantContext
             'exchanges', 'group-exchanges', 'matches', 'search', 'explore',
             'achievements', 'leaderboard', 'nexus-score', 'activity', 'skills',
             'ideation', 'jobs', 'kb', 'marketplace', 'chat',
+            'courses', 'podcasts', 'coupons', 'clubs', 'me', 'municipality-calendar',
+            'advertise', 'join',
             'caring', 'caring-community', 'proposals', 'newsletter', 'onboarding',
             // Public info pages
             'home', 'about', 'contact', 'faq', 'help', 'legal', 'terms', 'privacy',
@@ -537,6 +539,8 @@ class TenantContext
             'how-it-works', 'guide', 'news', 'post',
             'features', 'changelog', 'development-status', 'platform',
             'communities', 'local-groups', 'services',
+            'trust-and-safety', 'pilot-inquiry', 'pilot-apply', 'developers',
+            'regional-analytics', 'partner-analytics', 'pricing',
             // System / admin
             'admin', 'admin-legacy', 'super-admin', 'broker', 'partner-timebanks', 'dev',
             'api', 'v2', 'assets', 'downloads', 'uploads',

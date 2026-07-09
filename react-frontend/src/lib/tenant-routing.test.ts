@@ -64,6 +64,20 @@ describe('tenant-routing', () => {
       expect(RESERVED_PATHS.has('partner-timebanks')).toBe(true);
     });
 
+    // Regression: these are real top-level app routes. If any is missing here,
+    // detectTenantFromUrl() misreads it as a tenant slug on custom domains and
+    // the SPA shows "Community not found" instead of the page (e.g. the Courses
+    // module was unreachable on hour-timebank.ie/courses — bootstrap?slug=courses 404).
+    it('reserves top-level app route names so they are never treated as tenant slugs', () => {
+      for (const route of [
+        'courses', 'podcasts', 'coupons', 'clubs', 'me', 'municipality-calendar',
+        'advertise', 'join', 'trust-and-safety', 'pilot-inquiry', 'pilot-apply',
+        'developers', 'regional-analytics', 'partner-analytics', 'pricing',
+      ]) {
+        expect(RESERVED_PATHS.has(route)).toBe(true);
+      }
+    });
+
     it('does not contain tenant slugs', () => {
       expect(RESERVED_PATHS.has('hour-timebank')).toBe(false);
       expect(RESERVED_PATHS.has('my-community')).toBe(false);
@@ -139,6 +153,24 @@ describe('tenant-routing', () => {
       const result = detectTenantFromUrl();
       expect(result.slug).toBeNull();
       expect(result.source).toBeNull();
+    });
+
+    it('does not treat a reserved app route as a sub-tenant slug on a custom domain', () => {
+      // Regression for hour-timebank.ie/courses → bootstrap?slug=courses 404 →
+      // "Community not found". /courses is a real route, not a tenant.
+      mockLocation('hour-timebank.ie', '/courses');
+      const result = detectTenantFromUrl();
+      expect(result.slug).toBeNull();
+      expect(result.source).toBeNull();
+    });
+
+    it('still resolves a genuine sub-tenant slug on a parent custom domain', () => {
+      // Non-reserved first segment on a custom domain is still attempted as a
+      // child slug (e.g. timebanking.uk/cardiff); the bootstrap API validates it.
+      mockLocation('timebanking.uk', '/cardiff');
+      const result = detectTenantFromUrl();
+      expect(result.slug).toBe('cardiff');
+      expect(result.source).toBe('path');
     });
 
     it('lowercases subdomain slugs', () => {
