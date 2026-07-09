@@ -22,6 +22,18 @@ class SavedCollectionService
         'article', 'marketplace_listing', 'job', 'resource',
     ];
 
+    /** Source table and preview columns for each item type. All tables are tenant-scoped. */
+    private const TYPE_TABLE_MAP = [
+        'post' => ['table' => 'posts', 'cols' => ['id', 'content as title']],
+        'listing' => ['table' => 'listings', 'cols' => ['id', 'title']],
+        'event' => ['table' => 'events', 'cols' => ['id', 'title']],
+        'group' => ['table' => 'groups', 'cols' => ['id', 'name as title']],
+        'article' => ['table' => 'pages', 'cols' => ['id', 'title']],
+        'marketplace_listing' => ['table' => 'marketplace_listings', 'cols' => ['id', 'title']],
+        'job' => ['table' => 'job_vacancies', 'cols' => ['id', 'title']],
+        'resource' => ['table' => 'resources', 'cols' => ['id', 'title']],
+    ];
+
     /**
      * Create a new collection for the user.
      */
@@ -92,9 +104,13 @@ class SavedCollectionService
     public function saveItem(int $userId, ?int $collectionId, string $itemType, int $itemId, ?string $note = null): SavedItem
     {
         if (!in_array($itemType, self::ALLOWED_ITEM_TYPES, true)) {
-            throw new \InvalidArgumentException('Invalid item_type');
+            throw new \InvalidArgumentException(__('api.invalid_item_type'));
         }
         $tenantId = TenantContext::getId();
+
+        if (!$this->itemExistsInTenant($itemType, $itemId)) {
+            throw new \InvalidArgumentException(__('api.saved_item_not_found'));
+        }
 
         $collection = $collectionId
             ? SavedCollection::where('id', $collectionId)
@@ -263,24 +279,15 @@ class SavedCollectionService
         foreach ($items as $i) {
             $grouped[$i->item_type][] = $i->item_id;
         }
-        $tableMap = [
-            'post' => ['table' => 'posts', 'cols' => ['id', 'content as title']],
-            'listing' => ['table' => 'listings', 'cols' => ['id', 'title']],
-            'event' => ['table' => 'events', 'cols' => ['id', 'title']],
-            'group' => ['table' => 'groups', 'cols' => ['id', 'name as title']],
-            'article' => ['table' => 'pages', 'cols' => ['id', 'title']],
-            'marketplace_listing' => ['table' => 'marketplace_listings', 'cols' => ['id', 'title']],
-            'job' => ['table' => 'job_vacancies', 'cols' => ['id', 'title']],
-            'resource' => ['table' => 'resources', 'cols' => ['id', 'title']],
-        ];
 
         $previews = [];
         foreach ($grouped as $type => $ids) {
-            $map = $tableMap[$type] ?? null;
+            $map = self::TYPE_TABLE_MAP[$type] ?? null;
             if (!$map) continue;
             try {
                 $rows = DB::table($map['table'])
                     ->whereIn('id', array_unique($ids))
+                    ->where('tenant_id', TenantContext::getId())
                     ->select($map['cols'])
                     ->get();
                 foreach ($rows as $r) {
@@ -292,6 +299,27 @@ class SavedCollectionService
         }
         foreach ($items as $i) {
             $i->preview = $previews[$i->item_type][$i->item_id] ?? null;
+        }
+    }
+
+    /**
+     * An item may only be saved if its row exists in the caller's tenant —
+     * saving a foreign tenant's id would leak its content via previews.
+     */
+    private function itemExistsInTenant(string $itemType, int $itemId): bool
+    {
+        $map = self::TYPE_TABLE_MAP[$itemType] ?? null;
+        if (!$map) {
+            return false;
+        }
+        try {
+            return DB::table($map['table'])
+                ->where('id', $itemId)
+                ->where('tenant_id', TenantContext::getId())
+                ->exists();
+        } catch (\Throwable $e) {
+            // Table may not exist in some installations; fail closed.
+            return false;
         }
     }
 

@@ -40,6 +40,10 @@ class BookmarkService
             return ['bookmarked' => false, 'count' => $count];
         }
 
+        if (!$this->itemExistsInTenant($type, $id)) {
+            throw new \InvalidArgumentException(__('api.saved_item_not_found'));
+        }
+
         // Validate collection belongs to user if provided
         if ($collectionId !== null) {
             $collection = BookmarkCollection::where('id', $collectionId)
@@ -121,6 +125,7 @@ class BookmarkService
             }
             $rows = DB::table($map['table'])
                 ->whereIn('id', array_unique($ids))
+                ->where('tenant_id', TenantContext::getId())
                 ->pluck($map['col'], 'id');
 
             foreach ($rows as $id => $title) {
@@ -239,5 +244,21 @@ class BookmarkService
         if (!in_array($type, self::VALID_TYPES, true)) {
             throw new \InvalidArgumentException(__('api.invalid_bookmarkable_type'));
         }
+    }
+
+    /**
+     * An item may only be bookmarked if its row exists in the caller's tenant —
+     * bookmarking a foreign tenant's id would leak its title via attachTitles().
+     */
+    private function itemExistsInTenant(string $type, int $id): bool
+    {
+        $map = self::TYPE_TABLE_MAP[$type] ?? null;
+        if ($map === null) {
+            return false;
+        }
+        return DB::table($map['table'])
+            ->where('id', $id)
+            ->where('tenant_id', TenantContext::getId())
+            ->exists();
     }
 }

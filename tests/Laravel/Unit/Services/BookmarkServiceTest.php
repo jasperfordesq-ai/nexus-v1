@@ -6,17 +6,47 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Core\TenantContext;
+use App\Models\User;
 use App\Services\BookmarkService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
 class BookmarkServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private BookmarkService $service;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->service = new BookmarkService();
+    }
+
+    /** Secondary tenant seeded by TestCase::setUpTenantContext() — satisfies FK checks. */
+    private const OTHER_TENANT_ID = 999;
+
+    /**
+     * User-created listeners reset TenantContext in console mode
+     * (restoreAfterScopedListener), so re-pin the test tenant after creating.
+     */
+    private function createUser(): User
+    {
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+        TenantContext::setById($this->testTenantId);
+        return $user;
+    }
+
+    private function insertListing(int $userId, int $tenantId): int
+    {
+        return DB::table('listings')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id'   => $userId,
+            'title'     => 'Bookmark seed listing',
+            'type'      => 'offer',
+        ]);
     }
 
     // ── validateType (indirect via toggle) ───────────────────────────
@@ -73,5 +103,75 @@ class BookmarkServiceTest extends TestCase
             // Any other error (e.g. DB/schema) is outside the scope of this guard test.
             $this->assertTrue(true);
         }
+    }
+
+    // ── tenant scoping (regression: 2026-07-09 audit P1 cross-tenant leak) ────
+
+    public function test_toggle_rejects_item_from_another_tenant(): void
+    {
+        $user = $this->createUser();
+        $foreignListingId = $this->insertListing($user->id, self::OTHER_TENANT_ID);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Item not found');
+        $this->service->toggle($user->id, 'listing', $foreignListingId);
+    }
+
+    public function test_toggle_rejects_nonexistent_item(): void
+    {
+        $user = $this->createUser();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Item not found');
+        $this->service->toggle($user->id, 'listing', 999999999);
+    }
+
+    public function test_toggle_bookmarks_and_unbookmarks_same_tenant_item(): void
+    {
+        $user = $this->createUser();
+        $listingId = $this->insertListing($user->id, $this->testTenantId);
+
+        $result = $this->service->toggle($user->id, 'listing', $listingId);
+        $this->assertTrue($result['bookmarked']);
+
+        // Untoggle must keep working even without re-validation (delete path).
+        $result = $this->service->toggle($user->id, 'listing', $listingId);
+        $this->assertFalse($result['bookmarked']);
+    }
+
+    public function test_getUserBookmarks_hydrates_title_for_same_tenant_item(): void
+    {
+        $user = $this->createUser();
+        $listingId = $this->insertListing($user->id, $this->testTenantId);
+        $this->service->toggle($user->id, 'listing', $listingId);
+
+        $items = $this->service->getUserBookmarks($user->id)->items();
+
+        $this->assertCount(1, $items);
+        $this->assertSame('Bookmark seed listing', $items[0]->title);
+    }
+
+    public function test_getUserBookmarks_does_not_leak_foreign_tenant_title(): void
+    {
+        $user = $this->createUser();
+        $foreignListingId = $this->insertListing($user->id, self::OTHER_TENANT_ID);
+
+        // Simulate a poisoned row created before the tenant guard existed.
+        DB::table('bookmarks')->insert([
+            'tenant_id'         => $this->testTenantId,
+            'user_id'           => $user->id,
+            'bookmarkable_type' => 'listing',
+            'bookmarkable_id'   => $foreignListingId,
+            'collection_id'     => null,
+            'created_at'        => now(),
+        ]);
+
+        $items = $this->service->getUserBookmarks($user->id)->items();
+
+        $this->assertCount(1, $items);
+        $this->assertNull(
+            $items[0]->title,
+            'Foreign-tenant listing title must not be hydrated'
+        );
     }
 }

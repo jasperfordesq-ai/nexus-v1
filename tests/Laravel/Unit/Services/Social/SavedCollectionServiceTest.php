@@ -28,15 +28,19 @@ use Tests\Laravel\TestCase;
  *  - isSaved / isSavedBulk: cache is populated and correct; forgetSavedCache
  *    clears it.
  *  - getUserCollections: publicOnly filter.
+ *  - Tenant scoping (2026-07-09 audit P1): saveItem rejects items outside the
+ *    caller's tenant; attachPreviews never hydrates foreign-tenant content.
  *
- * Skipped: getSavedItems (calls abort(403) which requires a full HTTP context and
- *   is tested in feature/controller layer).
+ * Skipped: getSavedItems 403 path (abort(403) is tested in feature/controller layer).
  */
 class SavedCollectionServiceTest extends TestCase
 {
     use DatabaseTransactions;
 
     private const TENANT_ID = 2;
+
+    /** Secondary tenant seeded by TestCase::setUpTenantContext() — satisfies FK checks. */
+    private const OTHER_TENANT_ID = 999;
 
     private SavedCollectionService $svc;
 
@@ -66,6 +70,55 @@ class SavedCollectionServiceTest extends TestCase
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+    }
+
+    /**
+     * saveItem() now requires the target row to exist in the caller's tenant,
+     * so tests seed a real row per item type instead of using made-up ids.
+     */
+    private function insertItem(string $type, int $userId, int $tenantId = self::TENANT_ID): int
+    {
+        return match ($type) {
+            'post' => DB::table('posts')->insertGetId([
+                'tenant_id' => $tenantId,
+                'author_id' => $userId,
+                'title' => 'Seeded post',
+                'slug' => uniqid('saved-post-', true),
+                'content' => 'Seeded post content',
+            ]),
+            'listing' => DB::table('listings')->insertGetId([
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'title' => 'Seeded listing',
+                'type' => 'offer',
+            ]),
+            'event' => DB::table('events')->insertGetId([
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'title' => 'Seeded event',
+                'description' => 'Seeded event description',
+                'start_time' => now()->addDay(),
+            ]),
+            'group' => DB::table('groups')->insertGetId([
+                'tenant_id' => $tenantId,
+                'owner_id' => $userId,
+                'name' => 'Seeded group',
+                'slug' => uniqid('saved-group-', true),
+            ]),
+            'job' => DB::table('job_vacancies')->insertGetId([
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'title' => 'Seeded job',
+                'description' => 'Seeded job description',
+            ]),
+            'resource' => DB::table('resources')->insertGetId([
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'title' => 'Seeded resource',
+                'file_path' => '/uploads/seeded-resource.pdf',
+            ]),
+            default => throw new \InvalidArgumentException("No seeder for item type {$type}"),
+        };
     }
 
     // ── createCollection ──────────────────────────────────────────────────────
@@ -187,12 +240,13 @@ class SavedCollectionServiceTest extends TestCase
     {
         $userId = $this->insertUser();
         $col = $this->svc->ensureDefaultCollection($userId);
+        $listingId = $this->insertItem('listing', $userId);
 
-        $item = $this->svc->saveItem($userId, $col->id, 'listing', 9001);
+        $item = $this->svc->saveItem($userId, $col->id, 'listing', $listingId);
 
         $this->assertInstanceOf(SavedItem::class, $item);
         $this->assertSame('listing', $item->item_type);
-        $this->assertEquals(9001, (int) $item->item_id);
+        $this->assertEquals($listingId, (int) $item->item_id);
 
         $freshCol = SavedCollection::find($col->id);
         $this->assertSame(1, (int) $freshCol->items_count);
@@ -202,16 +256,17 @@ class SavedCollectionServiceTest extends TestCase
     {
         $userId = $this->insertUser();
         $col = $this->svc->ensureDefaultCollection($userId);
+        $eventId = $this->insertItem('event', $userId);
 
-        $this->svc->saveItem($userId, $col->id, 'event', 5555);
-        $second = $this->svc->saveItem($userId, $col->id, 'event', 5555);
+        $this->svc->saveItem($userId, $col->id, 'event', $eventId);
+        $second = $this->svc->saveItem($userId, $col->id, 'event', $eventId);
 
         $this->assertSame('event', $second->item_type);
 
         // Only one row in the table
         $count = SavedItem::where('collection_id', $col->id)
             ->where('item_type', 'event')
-            ->where('item_id', 5555)
+            ->where('item_id', $eventId)
             ->count();
         $this->assertSame(1, $count);
 
@@ -224,9 +279,10 @@ class SavedCollectionServiceTest extends TestCase
     {
         $userId = $this->insertUser();
         $col = $this->svc->ensureDefaultCollection($userId);
+        $postId = $this->insertItem('post', $userId);
 
-        $this->svc->saveItem($userId, $col->id, 'post', 7777, 'first note');
-        $updated = $this->svc->saveItem($userId, $col->id, 'post', 7777, 'new note');
+        $this->svc->saveItem($userId, $col->id, 'post', $postId, 'first note');
+        $updated = $this->svc->saveItem($userId, $col->id, 'post', $postId, 'new note');
 
         $this->assertSame('new note', $updated->note);
     }
@@ -237,7 +293,8 @@ class SavedCollectionServiceTest extends TestCase
     {
         $userId = $this->insertUser();
         $col    = $this->svc->ensureDefaultCollection($userId);
-        $item   = $this->svc->saveItem($userId, $col->id, 'job', 4321);
+        $jobId  = $this->insertItem('job', $userId);
+        $item   = $this->svc->saveItem($userId, $col->id, 'job', $jobId);
 
         $result = $this->svc->unsaveItem($item->id, $userId);
 
@@ -260,7 +317,7 @@ class SavedCollectionServiceTest extends TestCase
         $owner = $this->insertUser();
         $other = $this->insertUser();
         $col   = $this->svc->ensureDefaultCollection($owner);
-        $item  = $this->svc->saveItem($owner, $col->id, 'listing', 8888);
+        $item  = $this->svc->saveItem($owner, $col->id, 'listing', $this->insertItem('listing', $owner));
 
         $result = $this->svc->unsaveItem($item->id, $other);
         $this->assertFalse($result);
@@ -271,11 +328,12 @@ class SavedCollectionServiceTest extends TestCase
 
     public function test_unsaveByItem_removes_matching_item_and_decrements_count(): void
     {
-        $userId = $this->insertUser();
-        $col    = $this->svc->ensureDefaultCollection($userId);
-        $this->svc->saveItem($userId, $col->id, 'group', 111);
+        $userId  = $this->insertUser();
+        $col     = $this->svc->ensureDefaultCollection($userId);
+        $groupId = $this->insertItem('group', $userId);
+        $this->svc->saveItem($userId, $col->id, 'group', $groupId);
 
-        $result = $this->svc->unsaveByItem($userId, 'group', 111);
+        $result = $this->svc->unsaveByItem($userId, 'group', $groupId);
 
         $this->assertTrue($result);
         $freshCol = SavedCollection::find($col->id);
@@ -301,43 +359,47 @@ class SavedCollectionServiceTest extends TestCase
     {
         $userId = $this->insertUser();
         $col = $this->svc->ensureDefaultCollection($userId);
-        $this->svc->saveItem($userId, $col->id, 'listing', 2222);
+        $listingId = $this->insertItem('listing', $userId);
+        $this->svc->saveItem($userId, $col->id, 'listing', $listingId);
 
-        $this->assertTrue($this->svc->isSaved($userId, 'listing', 2222));
+        $this->assertTrue($this->svc->isSaved($userId, 'listing', $listingId));
     }
 
     public function test_isSaved_cache_is_invalidated_after_unsave(): void
     {
-        $userId = $this->insertUser();
-        $col    = $this->svc->ensureDefaultCollection($userId);
-        $item   = $this->svc->saveItem($userId, $col->id, 'resource', 3333);
+        $userId     = $this->insertUser();
+        $col        = $this->svc->ensureDefaultCollection($userId);
+        $resourceId = $this->insertItem('resource', $userId);
+        $item       = $this->svc->saveItem($userId, $col->id, 'resource', $resourceId);
 
         // Prime the cache
-        $this->assertTrue($this->svc->isSaved($userId, 'resource', 3333));
+        $this->assertTrue($this->svc->isSaved($userId, 'resource', $resourceId));
 
         // Unsave (should flush cache)
         $this->svc->unsaveItem($item->id, $userId);
 
         // After cache is cleared, isSaved should return false
-        $this->assertFalse($this->svc->isSaved($userId, 'resource', 3333));
+        $this->assertFalse($this->svc->isSaved($userId, 'resource', $resourceId));
     }
 
     public function test_isSavedBulk_returns_correct_map(): void
     {
-        $userId = $this->insertUser();
-        $col    = $this->svc->ensureDefaultCollection($userId);
-        $this->svc->saveItem($userId, $col->id, 'event', 1);
-        $this->svc->saveItem($userId, $col->id, 'listing', 2);
+        $userId    = $this->insertUser();
+        $col       = $this->svc->ensureDefaultCollection($userId);
+        $eventId   = $this->insertItem('event', $userId);
+        $listingId = $this->insertItem('listing', $userId);
+        $this->svc->saveItem($userId, $col->id, 'event', $eventId);
+        $this->svc->saveItem($userId, $col->id, 'listing', $listingId);
 
         $result = $this->svc->isSavedBulk($userId, [
-            ['item_type' => 'event',   'item_id' => 1],
-            ['item_type' => 'listing', 'item_id' => 2],
-            ['item_type' => 'event',   'item_id' => 99],
+            ['item_type' => 'event',   'item_id' => $eventId],
+            ['item_type' => 'listing', 'item_id' => $listingId],
+            ['item_type' => 'event',   'item_id' => 999999999],
         ]);
 
-        $this->assertTrue($result['event:1']);
-        $this->assertTrue($result['listing:2']);
-        $this->assertFalse($result['event:99']);
+        $this->assertTrue($result["event:{$eventId}"]);
+        $this->assertTrue($result["listing:{$listingId}"]);
+        $this->assertFalse($result['event:999999999']);
     }
 
     // ── getUserCollections ────────────────────────────────────────────────────
@@ -366,5 +428,65 @@ class SavedCollectionServiceTest extends TestCase
 
         $this->assertContains('Public C', $names);
         $this->assertNotContains('Private C', $names);
+    }
+
+    // ── tenant scoping (regression: 2026-07-09 audit P1 cross-tenant leak) ────
+
+    public function test_saveItem_rejects_item_from_another_tenant(): void
+    {
+        $userId = $this->insertUser();
+        $foreignListingId = $this->insertItem('listing', $userId, self::OTHER_TENANT_ID);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Item not found');
+        $this->svc->saveItem($userId, null, 'listing', $foreignListingId);
+    }
+
+    public function test_saveItem_rejects_nonexistent_item(): void
+    {
+        $userId = $this->insertUser();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Item not found');
+        $this->svc->saveItem($userId, null, 'listing', 999999999);
+    }
+
+    public function test_getSavedItems_hydrates_preview_for_same_tenant_item(): void
+    {
+        $userId    = $this->insertUser();
+        $col       = $this->svc->ensureDefaultCollection($userId);
+        $listingId = $this->insertItem('listing', $userId);
+        $this->svc->saveItem($userId, $col->id, 'listing', $listingId);
+
+        $result = $this->svc->getSavedItems($col->id, $userId);
+
+        $this->assertCount(1, $result['data']);
+        $this->assertSame('Seeded listing', $result['data'][0]->preview['title']);
+    }
+
+    public function test_getSavedItems_does_not_leak_foreign_tenant_content_in_preview(): void
+    {
+        $userId        = $this->insertUser();
+        $col           = $this->svc->ensureDefaultCollection($userId);
+        $foreignPostId = $this->insertItem('post', $userId, self::OTHER_TENANT_ID);
+
+        // Simulate a poisoned row saved before the tenant guard existed.
+        DB::table('saved_items')->insert([
+            'collection_id' => $col->id,
+            'user_id'       => $userId,
+            'tenant_id'     => self::TENANT_ID,
+            'item_type'     => 'post',
+            'item_id'       => $foreignPostId,
+            'note'          => null,
+            'saved_at'      => now(),
+        ]);
+
+        $result = $this->svc->getSavedItems($col->id, $userId);
+
+        $this->assertCount(1, $result['data']);
+        $this->assertNull(
+            $result['data'][0]->preview,
+            'Foreign-tenant post content must not be hydrated into preview'
+        );
     }
 }

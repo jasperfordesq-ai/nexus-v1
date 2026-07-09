@@ -12,6 +12,7 @@ use App\Models\Social\SavedItem;
 use App\Models\User;
 use App\Services\Social\SavedCollectionService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
 
@@ -30,15 +31,23 @@ class SaveItemIdempotentTest extends TestCase
         }
 
         $user = User::factory()->forTenant($this->testTenantId)->create();
+        // User-created listeners reset TenantContext in console mode — re-pin.
+        \App\Core\TenantContext::setById($this->testTenantId);
         $svc = new SavedCollectionService();
         $col = $svc->createCollection($user->id, 'Faves');
+        $listingId = DB::table('listings')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id'   => $user->id,
+            'title'     => 'Idempotent listing',
+            'type'      => 'offer',
+        ]);
 
-        $svc->saveItem($user->id, $col->id, 'listing', 1234);
-        $svc->saveItem($user->id, $col->id, 'listing', 1234);
+        $svc->saveItem($user->id, $col->id, 'listing', $listingId);
+        $svc->saveItem($user->id, $col->id, 'listing', $listingId);
 
         $count = SavedItem::where('collection_id', $col->id)
             ->where('item_type', 'listing')
-            ->where('item_id', 1234)
+            ->where('item_id', $listingId)
             ->count();
         $this->assertSame(1, $count);
 
