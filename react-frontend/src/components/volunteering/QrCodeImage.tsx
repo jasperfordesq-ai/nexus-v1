@@ -21,17 +21,34 @@ interface QrCodeImageProps {
 
 export function QrCodeImage({ value, alt, size = 200, className }: QrCodeImageProps) {
   const [dataUrl, setDataUrl] = useState<string>('');
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     setDataUrl('');
+    setFailed(false);
     if (!value) return;
     import('qrcode')
       .then((mod) => mod.toDataURL(value, { width: size, margin: 1, errorCorrectionLevel: 'M' }))
       .then((url) => { if (!cancelled) setDataUrl(url); })
-      .catch(() => { /* leave the placeholder in place on failure */ });
+      .catch(() => { if (!cancelled) setFailed(true); });
     return () => { cancelled = true; };
   }, [value, size]);
+
+  if (failed) {
+    // The qrcode chunk failed to load (stale deploy / offline). Fall back to a
+    // usable link so check-in can still proceed, instead of an aria-busy
+    // placeholder that appears to load forever.
+    return (
+      <a
+        href={value}
+        className={`inline-block max-w-full break-all ${className ?? ''}`}
+        style={{ width: size }}
+      >
+        {alt}
+      </a>
+    );
+  }
 
   if (!dataUrl) {
     // Same footprint as the rendered code so layout doesn't shift on load.

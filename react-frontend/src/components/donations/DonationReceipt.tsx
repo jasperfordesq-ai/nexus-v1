@@ -1,8 +1,9 @@
 import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@/components/ui';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Printer from 'lucide-react/icons/printer';
 import Receipt from 'lucide-react/icons/receipt';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { formatCurrency, formatDateValue } from '@/lib/helpers';
@@ -51,29 +52,29 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchReceipt = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+  const fetchReceipt = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
 
-        const response = await api.get<ReceiptData>(`/v2/donations/${donationId}/receipt`);
+      const response = await api.get<ReceiptData>(`/v2/donations/${donationId}/receipt`);
 
-        if (response.success && response.data) {
-          setReceipt(response.data);
-        } else {
-          setError(response.error || t('donations.receipt_error'));
-        }
-      } catch (err) {
-        logError('Failed to fetch donation receipt', err);
-        setError(t('donations.receipt_error'));
-      } finally {
-        setIsLoading(false);
+      if (response.success && response.data) {
+        setReceipt(response.data);
+      } else {
+        setError(response.error || t('donations.receipt_error'));
       }
-    };
-
-    fetchReceipt();
+    } catch (err) {
+      logError('Failed to fetch donation receipt', err);
+      setError(t('donations.receipt_error'));
+    } finally {
+      setIsLoading(false);
+    }
   }, [donationId, t]);
+
+  useEffect(() => {
+    void fetchReceipt();
+  }, [fetchReceipt]);
 
   if (isLoading) {
     return (
@@ -85,9 +86,16 @@ export function DonationReceipt({ donationId }: DonationReceiptProps) {
 
   if (error || !receipt) {
     return (
-      <div className="text-center py-12">
+      <div className="text-center py-12" role="alert">
         <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
-        <p className="text-theme-muted">{error || t('donations.receipt_not_found')}</p>
+        <p className="text-theme-muted mb-4">{error || t('donations.receipt_not_found')}</p>
+        <Button
+          variant="flat"
+          startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
+          onPress={() => { void fetchReceipt(); }}
+        >
+          {t('try_again')}
+        </Button>
       </div>
     );
   }

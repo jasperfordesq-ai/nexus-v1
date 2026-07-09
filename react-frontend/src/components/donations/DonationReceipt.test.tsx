@@ -122,6 +122,22 @@ describe('DonationReceipt', () => {
     expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument();
   });
 
+  it('announces the error in an alert region and retries on button press (VOL-RX-006)', async () => {
+    vi.mocked(api.get).mockResolvedValueOnce({ success: false, error: 'boom' });
+
+    render(<DonationReceipt donationId={99} />);
+
+    const alert = await screen.findByRole('alert');
+    expect(alert).toBeInTheDocument();
+    expect(api.get).toHaveBeenCalledTimes(1);
+
+    // A second failure lets us assert the retry button re-issues the request.
+    vi.mocked(api.get).mockResolvedValueOnce({ success: false, error: 'still boom' });
+    screen.getByRole('button').click();
+
+    await waitFor(() => expect(api.get).toHaveBeenCalledTimes(2));
+  });
+
   it('calls the correct API endpoint with the given donationId', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: MOCK_RECEIPT });
 
