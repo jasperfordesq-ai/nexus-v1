@@ -12,6 +12,7 @@ use App\Core\TenantContext;
 use App\I18n\LocaleContext;
 use App\Models\VolExpense;
 use App\Models\VolExpensePolicy;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -136,67 +137,88 @@ class VolunteerExpenseService
             }
         }
 
-        // Validate against expense policy
-        $policy = self::getApplicablePolicy($tenantId, $organizationId, $data['expense_type']);
+        // Serialise the monthly-cap read + insert under an atomic lock keyed on
+        // (tenant, user, org, month). Without this, two concurrent submissions
+        // can each read the same pre-insert monthly total, both pass the
+        // max_monthly check, and jointly exceed the cap (check-then-insert
+        // TOCTOU). Mirrors the Cache::lock dedupe guard in VolunteerService::logHours.
+        $capLock = Cache::lock(
+            sprintf('vol_expense_cap:%d:%d:%d:%s', $tenantId, $userId, $organizationId, now()->format('Y-m')),
+            10
+        );
+        if (! $capLock->get()) {
+            // A concurrent submission for the same volunteer/org/month holds the lock.
+            throw new \RuntimeException(__('api.too_many_attempts'), 429);
+        }
 
-        if ($policy) {
-            if (!empty($policy->max_amount) && $amount > (float) $policy->max_amount) {
-                throw new \InvalidArgumentException(
-                    __('api.vol_expense_amount_exceeds_policy', ['amount' => $policy->max_amount])
-                );
-            }
+        try {
+            // Validate against expense policy
+            $policy = self::getApplicablePolicy($tenantId, $organizationId, $data['expense_type']);
 
-            if (!empty($policy->max_monthly)) {
-                // Full datetime bounds: toDateString() would truncate the upper
-                // bound to <last-day> 00:00:00, excluding everything submitted
-                // ON the last calendar day and letting the monthly cap be
-                // exceeded by submitting on the 31st.
-                $monthStart = now()->startOfMonth();
-                $monthEnd = now()->endOfMonth();
-
-                $monthlyTotal = (float) VolExpense::where('user_id', $userId)
-                    ->where('tenant_id', $tenantId)
-                    ->where('organization_id', $organizationId)
-                    ->whereBetween('submitted_at', [$monthStart, $monthEnd])
-                    ->where('status', '!=', 'rejected')
-                    ->sum('amount');
-
-                if (($monthlyTotal + $amount) > (float) $policy->max_monthly) {
+            if ($policy) {
+                if (!empty($policy->max_amount) && $amount > (float) $policy->max_amount) {
                     throw new \InvalidArgumentException(
-                        __('api.vol_expense_monthly_limit_exceeded', [
-                            'limit' => $policy->max_monthly,
-                            'total' => $monthlyTotal,
-                        ])
+                        __('api.vol_expense_amount_exceeds_policy', ['amount' => $policy->max_amount])
+                    );
+                }
+
+                if (!empty($policy->max_monthly)) {
+                    // Full datetime bounds: toDateString() would truncate the upper
+                    // bound to <last-day> 00:00:00, excluding everything submitted
+                    // ON the last calendar day and letting the monthly cap be
+                    // exceeded by submitting on the 31st.
+                    $monthStart = now()->startOfMonth();
+                    $monthEnd = now()->endOfMonth();
+
+                    $monthlyTotal = (float) VolExpense::where('user_id', $userId)
+                        ->where('tenant_id', $tenantId)
+                        ->where('organization_id', $organizationId)
+                        ->whereBetween('submitted_at', [$monthStart, $monthEnd])
+                        ->where('status', '!=', 'rejected')
+                        ->sum('amount');
+
+                    if (($monthlyTotal + $amount) > (float) $policy->max_monthly) {
+                        throw new \InvalidArgumentException(
+                            __('api.vol_expense_monthly_limit_exceeded', [
+                                'limit' => $policy->max_monthly,
+                                'total' => $monthlyTotal,
+                            ])
+                        );
+                    }
+                }
+
+                if (!empty($policy->requires_receipt_above)
+                    && $amount > (float) $policy->requires_receipt_above
+                    && empty($data['receipt_path'])
+                ) {
+                    throw new \InvalidArgumentException(
+                        __('api.vol_expense_receipt_required_above', ['amount' => $policy->requires_receipt_above])
                     );
                 }
             }
 
-            if (!empty($policy->requires_receipt_above)
-                && $amount > (float) $policy->requires_receipt_above
-                && empty($data['receipt_path'])
-            ) {
-                throw new \InvalidArgumentException(
-                    __('api.vol_expense_receipt_required_above', ['amount' => $policy->requires_receipt_above])
-                );
-            }
+            // Insert expense. Currency is the tenant's configured currency,
+            // never a hardcoded euro literal (global platform): expenses are
+            // reimbursed in the tenant currency and there is no multi-currency
+            // expense flow.
+            $expense = VolExpense::create([
+                'tenant_id' => $tenantId,
+                'user_id' => $userId,
+                'organization_id' => $organizationId,
+                'opportunity_id' => $opportunityId,
+                'shift_id' => $data['shift_id'] ?? null,
+                'expense_type' => $data['expense_type'],
+                'amount' => $amount,
+                'currency' => strtoupper(TenantContext::getCurrency()),
+                'description' => $data['description'],
+                'receipt_path' => $data['receipt_path'] ?? null,
+                'receipt_filename' => $data['receipt_filename'] ?? null,
+                'status' => 'pending',
+                'submitted_at' => now(),
+            ]);
+        } finally {
+            $capLock->release();
         }
-
-        // Insert expense
-        $expense = VolExpense::create([
-            'tenant_id' => $tenantId,
-            'user_id' => $userId,
-            'organization_id' => $organizationId,
-            'opportunity_id' => $opportunityId,
-            'shift_id' => $data['shift_id'] ?? null,
-            'expense_type' => $data['expense_type'],
-            'amount' => $amount,
-            'currency' => $data['currency'] ?? 'EUR',
-            'description' => $data['description'],
-            'receipt_path' => $data['receipt_path'] ?? null,
-            'receipt_filename' => $data['receipt_filename'] ?? null,
-            'status' => 'pending',
-            'submitted_at' => now(),
-        ]);
 
         return self::getExpense($expense->id) ?? [];
     }
@@ -380,7 +402,7 @@ class VolunteerExpenseService
                     $bodyKey    = $isApproved ? 'emails_misc.expense.approved_body' : 'emails_misc.expense.rejected_body';
                     $params     = [
                         'amount'   => number_format((float) $expense->amount, 2),
-                        'currency' => $expense->currency ?? 'EUR',
+                        'currency' => $expense->currency ?: strtoupper(TenantContext::getCurrency()),
                         'type'     => $expense->expense_type,
                     ];
 
@@ -443,7 +465,7 @@ class VolunteerExpenseService
                             $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                             $params    = [
                                 'amount'   => number_format((float) $expense->amount, 2),
-                                'currency' => $expense->currency ?? 'EUR',
+                                'currency' => $expense->currency ?: strtoupper(TenantContext::getCurrency()),
                                 'type'     => $expense->expense_type,
                             ];
                             $link    = '/volunteering?tab=expenses'; // no per-expense route exists — deep-link to the Expenses tab
