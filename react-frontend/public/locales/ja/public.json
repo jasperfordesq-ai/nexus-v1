@@ -832,5 +832,15 @@
     }
   },
   "unknown_error": "不明なエラー",
-  "release_stage": "一般提供 (v1.5.5)"
+  "release_stage": "一般提供 (v1.5.5)",
+  "community_chooser": {
+    "title": "コミュニティを選択してください",
+    "subtitle": "Project NEXUS のメインページに移動しました。続行するには、以下からコミュニティを選択してください。",
+    "search_placeholder": "コミュニティを検索",
+    "search_label": "コミュニティを検索",
+    "loading": "コミュニティを読み込んでいます…",
+    "empty": "アクティブなコミュニティはありません。",
+    "no_results": "「{{query}}」に一致するコミュニティはありません。",
+    "go_to": "{{name}} に移動"
+  }
 }

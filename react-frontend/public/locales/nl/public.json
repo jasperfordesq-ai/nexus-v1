@@ -832,5 +832,15 @@
     }
   },
   "unknown_error": "Onbekende fout",
-  "release_stage": "Algemeen beschikbaar (v1.5.5)"
+  "release_stage": "Algemeen beschikbaar (v1.5.5)",
+  "community_chooser": {
+    "title": "Kies je gemeenschap",
+    "subtitle": "Je bent op de hoofdpagina van Project NEXUS beland. Kies hieronder je gemeenschap om verder te gaan.",
+    "search_placeholder": "Gemeenschappen zoeken",
+    "search_label": "Gemeenschappen zoeken",
+    "loading": "Gemeenschappen laden…",
+    "empty": "Er zijn geen actieve gemeenschappen beschikbaar.",
+    "no_results": "Geen gemeenschappen komen overeen met \"{{query}}\".",
+    "go_to": "Ga naar {{name}}"
+  }
 }

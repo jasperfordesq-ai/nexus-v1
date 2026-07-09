@@ -14,9 +14,20 @@
 import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';
 import { LandingPageRenderer } from '@/components/landing';
+import { useTenant } from '@/contexts/TenantContext';
+import { MasterTenantChooser } from './MasterTenantChooser';
 
 export function HomePage() {
   const { t } = useTranslation('public');
+  const { tenant } = useTenant();
+
+  // The master tenant (id 1) is the platform root, not a working community.
+  // Its home is a "Choose your community" directory so visitors who land here
+  // by accident (e.g. an error redirect to the platform root) can get back to
+  // their own community. Every other tenant renders the normal landing page.
+  if (tenant?.id === 1) {
+    return <MasterTenantChooser />;
+  }
 
   return (
     <>

@@ -832,5 +832,15 @@
     }
   },
   "unknown_error": "Erreur inconnue",
-  "release_stage": "Généralement disponible (v1.5.5)"
+  "release_stage": "Généralement disponible (v1.5.5)",
+  "community_chooser": {
+    "title": "Choisissez votre communauté",
+    "subtitle": "Vous êtes arrivé sur la page principale de Project NEXUS. Choisissez votre communauté ci-dessous pour continuer.",
+    "search_placeholder": "Rechercher des communautés",
+    "search_label": "Rechercher des communautés",
+    "loading": "Chargement des communautés…",
+    "empty": "Aucune communauté active n'est disponible.",
+    "no_results": "Aucune communauté ne correspond à « {{query}} ».",
+    "go_to": "Aller à {{name}}"
+  }
 }
