@@ -290,68 +290,11 @@ class NewsletterCronTest extends \Tests\Laravel\TestCase
         $this->assertTrue($ref->isPublic());
     }
 
-    /**
-     * Test getABTestResults method exists
-     */
-    public function testGetABTestResultsMethodExists(): void
-    {
-        $this->assertTrue(
-            method_exists(NewsletterService::class, 'getABTestResults'),
-            'getABTestResults should exist for A/B result analysis'
-        );
-    }
-
-    /**
-     * Test selectABWinner method exists
-     */
-    public function testSelectABWinnerMethodExists(): void
-    {
-        $this->assertTrue(
-            method_exists(NewsletterService::class, 'selectABWinner'),
-            'selectABWinner should exist for declaring A/B test winner'
-        );
-    }
-
-    // =========================================================================
-    // RESEND TO NON-OPENERS — FOLLOW-UP CRON
-    // =========================================================================
-
-    /**
-     * Test resendToNonOpeners method exists
-     */
-    public function testResendToNonOpenersMethodExists(): void
-    {
-        $this->assertTrue(
-            method_exists(NewsletterService::class, 'resendToNonOpeners'),
-            'resendToNonOpeners should exist for follow-up campaigns'
-        );
-
-        $ref = new \ReflectionMethod(NewsletterService::class, 'resendToNonOpeners');
-        $this->assertTrue($ref->isStatic());
-        $this->assertTrue($ref->isPublic());
-    }
-
-    /**
-     * Test resendToNonOpeners method signature
-     */
-    public function testResendToNonOpenersMethodSignature(): void
-    {
-        $ref = new \ReflectionMethod(NewsletterService::class, 'resendToNonOpeners');
-        $params = $ref->getParameters();
-
-        $this->assertGreaterThanOrEqual(1, count($params), 'Should accept at least newsletterId');
-
-        // Optional new subject
-        if (count($params) > 1) {
-            $this->assertTrue($params[1]->isOptional(), 'newSubject should be optional');
-        }
-
-        // Optional wait days
-        if (count($params) > 2) {
-            $this->assertTrue($params[2]->isOptional(), 'waitDays should be optional');
-            $this->assertEquals(3, $params[2]->getDefaultValue(), 'Default wait days should be 3');
-        }
-    }
+    // NOTE (2026-07-09 audit): existence/signature tests for getABTestResults,
+    // selectABWinner and resendToNonOpeners were removed together with those
+    // dead service methods (no callers; they mutated newsletters by bare id).
+    // The live resend/AB workflow is controller-level and tenant-scoped —
+    // see AdminNewsletterController::resend()/getResendInfo().
 
     /**
      * Test getResendInfo method exists for eligibility check
