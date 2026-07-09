@@ -1513,9 +1513,9 @@ class VolunteerService
         // AFTER commit (matching the verifyHours() convention) — the bell/push
         // fanout must not run while the shift FOR UPDATE lock is held.
         try {
-            $confirmedShiftDate = null;
+            $confirmedShiftStart = null;
 
-            $ok = DB::transaction(function () use ($shiftId, $tenantId, $app, $shift, &$confirmedShiftDate) {
+            $ok = DB::transaction(function () use ($shiftId, $tenantId, $app, $shift, &$confirmedShiftStart) {
                 // Lock the shift row to prevent concurrent signups from exceeding capacity
                 $lockedShift = self::getShiftContext($shiftId, $tenantId, true);
 
@@ -1545,10 +1545,9 @@ class VolunteerService
                     [$shiftId, $app->id, $tenantId]
                 );
 
-                // Capture the confirmed shift date for the post-commit notification.
-                $confirmedShiftDate = isset($lockedShift->start_time)
-                    ? date('d M Y H:i', strtotime($lockedShift->start_time))
-                    : date('d M Y', strtotime($shift->start_time));
+                // Capture the raw confirmed shift start; it is formatted inside the
+                // recipient's LocaleContext below so it renders in their language.
+                $confirmedShiftStart = $lockedShift->start_time ?? ($shift->start_time ?? null);
 
                 return true;
             });
@@ -1557,13 +1556,16 @@ class VolunteerService
             // the fanout never runs under the shift row lock.
             if ($ok) {
                 try {
-                    $shiftDate = $confirmedShiftDate ?? date('d M Y', strtotime($shift->start_time));
+                    $shiftStart = $confirmedShiftStart ?? ($shift->start_time ?? null);
                     $recipient = DB::table('users')
                         ->where('id', $userId)
                         ->where('tenant_id', $tenantId)
                         ->select(['id', 'preferred_language'])
                         ->first();
-                    LocaleContext::withLocale($recipient, function () use ($userId, $shiftDate) {
+                    LocaleContext::withLocale($recipient, function () use ($userId, $shiftStart) {
+                        $shiftDate = $shiftStart
+                            ? \Carbon\Carbon::parse($shiftStart)->locale((string) app()->getLocale())->isoFormat('lll')
+                            : '';
                         \App\Models\Notification::createNotification(
                             $userId,
                             __('api_controllers_3.volunteer.shift_signup_confirmed', ['date' => $shiftDate]),

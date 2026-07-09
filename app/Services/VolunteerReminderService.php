@@ -350,7 +350,7 @@ class VolunteerReminderService
                                     return LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $userId, $tenantId): bool {
                                     $firstName = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                                     $shiftTime = $shift->start_time
-                                        ? date('D, d M Y H:i', strtotime($shift->start_time))
+                                        ? \Carbon\Carbon::parse($shift->start_time)->locale((string) app()->getLocale())->isoFormat('ddd, D MMM YYYY HH:mm')
                                         : '';
                                     $shiftUrl = TenantContext::getFrontendUrl()
                                         . TenantContext::getSlugPrefix()
@@ -685,7 +685,7 @@ class VolunteerReminderService
                                         return LocaleContext::withLocale($user, function () use ($user, $shift, $opportunityTitle, $opportunityLocation, $tenantId, $userId): bool {
                                         $firstName    = $user->first_name ?? $user->name ?? __('emails.common.fallback_name');
                                         $shiftTime    = $shift->start_time
-                                            ? date('D, d M Y H:i', strtotime($shift->start_time))
+                                            ? \Carbon\Carbon::parse($shift->start_time)->locale((string) app()->getLocale())->isoFormat('ddd, D MMM YYYY HH:mm')
                                             : '';
                                         $shiftUrl     = TenantContext::getFrontendUrl()
                                             . TenantContext::getSlugPrefix()

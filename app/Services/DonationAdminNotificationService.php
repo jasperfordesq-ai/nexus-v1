@@ -103,7 +103,7 @@ class DonationAdminNotificationService
                 $infoCard = [
                     __('emails.donation_admin.amount_label') => $amountDisplay,
                     __('emails.donation_admin.donor_label') => $donorDisplay,
-                    __('emails.donation_admin.date_label') => date('d M Y'),
+                    __('emails.donation_admin.date_label') => \Carbon\Carbon::now()->locale((string) app()->getLocale())->isoFormat('LL'),
                 ];
 
                 $fund = self::fundLabel($donation);

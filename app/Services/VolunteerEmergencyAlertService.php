@@ -505,7 +505,9 @@ class VolunteerEmergencyAlertService
 
         $notifiedCount = 0;
         $shift = VolShift::where('tenant_id', $tenantId)->where('id', $shiftId)->first();
-        $shiftDate = $shift ? $shift->start_time->format('M j, Y g:ia') : __('api.vol_alert_shift_date_upcoming');
+        // Keep the raw shift start; the human-readable date is formatted inside
+        // each recipient's LocaleContext below so it renders in their language.
+        $shiftStart = $shift?->start_time;
 
         foreach ($candidates as $candidate) {
             // If skills are required, check for match
@@ -534,8 +536,11 @@ class VolunteerEmergencyAlertService
 
             try {
                 $priorityLabel = strtoupper($priority);
-                $bellCreated = TenantContext::runForTenant($tenantId, function () use ($candidate, $priorityLabel, $message, $shiftDate, $tenantId): bool {
-                    return (bool) LocaleContext::withLocale($candidate, function () use ($candidate, $priorityLabel, $message, $shiftDate, $tenantId) {
+                $bellCreated = TenantContext::runForTenant($tenantId, function () use ($candidate, $priorityLabel, $message, $shiftStart, $tenantId): bool {
+                    return (bool) LocaleContext::withLocale($candidate, function () use ($candidate, $priorityLabel, $message, $shiftStart, $tenantId) {
+                        $shiftDate = $shiftStart
+                            ? \Carbon\Carbon::parse($shiftStart)->locale((string) app()->getLocale())->isoFormat('lll')
+                            : __('api.vol_alert_shift_date_upcoming');
                         $pushBody = __('api.vol_alert_request_bell', [
                             'priority' => $priorityLabel,
                             'message' => $message,
