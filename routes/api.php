@@ -1626,6 +1626,10 @@ Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->
     Route::post('/v2/caring-community/safeguarding/report', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingReport']);
     Route::get('/v2/caring-community/safeguarding/my-reports', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'safeguardingMyReports']);
 });
+// Deliberately auth-only (no `admin` middleware): AdminCaringCommunityController's
+// guardSafeguarding() grants access to non-admin safeguarding officers (users with
+// safeguarding.view/manage permissions) plus coordinators/brokers for view-level
+// actions. Adding `admin` here would lock those legitimate roles out.
 Route::withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])->group(function () {
     Route::get('/v2/admin/caring-community/safeguarding/dashboard', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingDashboard']);
     Route::get('/v2/admin/caring-community/safeguarding/reports', [\App\Http\Controllers\Api\AdminCaringCommunityController::class, 'safeguardingList']);
@@ -2785,7 +2789,7 @@ Route::post('/ai/conversations', [\App\Http\Controllers\Api\AiChatController::cl
 Route::delete('/ai/conversations/{id}', [\App\Http\Controllers\Api\AiChatController::class, 'deleteConversation']);
 Route::get('/ai/providers', [\App\Http\Controllers\Api\AiChatController::class, 'getProviders']);
 Route::get('/ai/limits', [\App\Http\Controllers\Api\AiChatController::class, 'getLimits']);
-Route::post('/ai/test-provider', [\App\Http\Controllers\Api\AiChatController::class, 'testProvider']);
+Route::post('/ai/test-provider', [\App\Http\Controllers\Api\AiChatController::class, 'testProvider'])->middleware(['admin', 'throttle:10,1']);
 Route::post('/ai/generate/listing', [\App\Http\Controllers\Api\AiChatController::class, 'generateListing']);
 Route::post('/ai/generate/event', [\App\Http\Controllers\Api\AiChatController::class, 'generateEvent']);
 Route::post('/ai/generate/message', [\App\Http\Controllers\Api\AiChatController::class, 'generateMessage']);
@@ -3234,58 +3238,82 @@ Route::post('/v2/webhooks/stripe', [\App\Http\Controllers\Api\StripeWebhookContr
 Route::post('/v2/marketplace/webhooks/stripe', [\App\Http\Controllers\Api\StripeWebhookController::class, 'handleWebhook'])->middleware('throttle:120,1');
 
 // AG42 — Swiss FADP Compliance Pack
-Route::get('/v2/me/fadp/consent-history', [\App\Http\Controllers\Api\FadpComplianceController::class, 'myConsentHistory']);
-Route::post('/v2/me/fadp/consent', [\App\Http\Controllers\Api\FadpComplianceController::class, 'recordConsent']);
-Route::get('/v2/admin/fadp/retention-config', [\App\Http\Controllers\Api\FadpComplianceController::class, 'getRetentionConfig']);
-Route::put('/v2/admin/fadp/retention-config', [\App\Http\Controllers\Api\FadpComplianceController::class, 'updateRetentionConfig']);
-Route::get('/v2/admin/fadp/processing-activities', [\App\Http\Controllers\Api\FadpComplianceController::class, 'getProcessingActivities']);
-Route::post('/v2/admin/fadp/processing-activities', [\App\Http\Controllers\Api\FadpComplianceController::class, 'upsertProcessingActivity']);
-Route::delete('/v2/admin/fadp/processing-activities/{id}', [\App\Http\Controllers\Api\FadpComplianceController::class, 'deleteProcessingActivity']);
-Route::get('/v2/admin/fadp/consent-ledger', [\App\Http\Controllers\Api\FadpComplianceController::class, 'exportConsentLedger']);
-Route::get('/v2/admin/fadp/processing-register', [\App\Http\Controllers\Api\FadpComplianceController::class, 'processingRegister']);
-Route::get('/v2/admin/fadp/processing-register.csv', [\App\Http\Controllers\Api\FadpComplianceController::class, 'processingRegisterCsv']);
-Route::get('/v2/admin/fadp/disclosure-pack', [\App\Http\Controllers\Api\FadpComplianceController::class, 'disclosurePack']);
+// Audit 2026-07-09 P2 #4: route-level auth added (controllers self-check too,
+// but requireAuth/requireAdmin verify identity/role only — the middleware layer
+// also enforces token↔tenant binding and account status).
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/v2/me/fadp/consent-history', [\App\Http\Controllers\Api\FadpComplianceController::class, 'myConsentHistory']);
+    Route::post('/v2/me/fadp/consent', [\App\Http\Controllers\Api\FadpComplianceController::class, 'recordConsent']);
+});
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/v2/admin/fadp/retention-config', [\App\Http\Controllers\Api\FadpComplianceController::class, 'getRetentionConfig']);
+    Route::put('/v2/admin/fadp/retention-config', [\App\Http\Controllers\Api\FadpComplianceController::class, 'updateRetentionConfig']);
+    Route::get('/v2/admin/fadp/processing-activities', [\App\Http\Controllers\Api\FadpComplianceController::class, 'getProcessingActivities']);
+    Route::post('/v2/admin/fadp/processing-activities', [\App\Http\Controllers\Api\FadpComplianceController::class, 'upsertProcessingActivity']);
+    Route::delete('/v2/admin/fadp/processing-activities/{id}', [\App\Http\Controllers\Api\FadpComplianceController::class, 'deleteProcessingActivity']);
+    Route::get('/v2/admin/fadp/consent-ledger', [\App\Http\Controllers\Api\FadpComplianceController::class, 'exportConsentLedger']);
+    Route::get('/v2/admin/fadp/processing-register', [\App\Http\Controllers\Api\FadpComplianceController::class, 'processingRegister']);
+    Route::get('/v2/admin/fadp/processing-register.csv', [\App\Http\Controllers\Api\FadpComplianceController::class, 'processingRegisterCsv']);
+    Route::get('/v2/admin/fadp/disclosure-pack', [\App\Http\Controllers\Api\FadpComplianceController::class, 'disclosurePack']);
+});
 
 // AG43 — Citizen Residency Verification
-Route::get('/v2/me/residency-verification', [\App\Http\Controllers\Api\ResidencyVerificationController::class, 'myStatus']);
-Route::post('/v2/me/residency-verification', [\App\Http\Controllers\Api\ResidencyVerificationController::class, 'submitDeclaration']);
-Route::get('/v2/admin/residency-verifications', [\App\Http\Controllers\Api\ResidencyVerificationController::class, 'adminList']);
-Route::post('/v2/admin/residency-verifications/{id}/attest', [\App\Http\Controllers\Api\ResidencyVerificationController::class, 'adminAttest']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/v2/me/residency-verification', [\App\Http\Controllers\Api\ResidencyVerificationController::class, 'myStatus']);
+    Route::post('/v2/me/residency-verification', [\App\Http\Controllers\Api\ResidencyVerificationController::class, 'submitDeclaration']);
+});
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/v2/admin/residency-verifications', [\App\Http\Controllers\Api\ResidencyVerificationController::class, 'adminList']);
+    Route::post('/v2/admin/residency-verifications/{id}/attest', [\App\Http\Controllers\Api\ResidencyVerificationController::class, 'adminAttest']);
+});
 
 // AG56 — Local Advertising Platform
+// Deliberately public: ad serving + impression/click beacons work for
+// logged-out visitors (controller uses getOptionalUserId()). Do NOT wrap.
 Route::get('/v2/ads/active', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'getActiveAds']);
 Route::post('/v2/ads/impression', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'recordImpression']);
 Route::post('/v2/ads/impression/{impressionId}/click', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'recordClick']);
-Route::get('/v2/me/ad-campaigns', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'myAdCampaigns']);
-Route::post('/v2/me/ad-campaigns', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'createCampaign']);
-Route::get('/v2/me/ad-campaigns/{id}/stats', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'getMyCampaignStats']);
-Route::post('/v2/me/ad-campaigns/{campaignId}/creatives', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'addCreative']);
-Route::get('/v2/admin/ad-campaigns', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminListCampaigns']);
-Route::get('/v2/admin/ad-campaigns/stats', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminOverviewStats']);
-Route::get('/v2/admin/ad-campaigns/{id}', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminGetCampaign']);
-Route::post('/v2/admin/ad-campaigns/{id}/approve', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminApproveCampaign']);
-Route::post('/v2/admin/ad-campaigns/{id}/reject', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminRejectCampaign']);
-Route::post('/v2/admin/ad-campaigns/{id}/pause', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminPauseCampaign']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/v2/me/ad-campaigns', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'myAdCampaigns']);
+    Route::post('/v2/me/ad-campaigns', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'createCampaign']);
+    Route::get('/v2/me/ad-campaigns/{id}/stats', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'getMyCampaignStats']);
+    Route::post('/v2/me/ad-campaigns/{campaignId}/creatives', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'addCreative']);
+});
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/v2/admin/ad-campaigns', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminListCampaigns']);
+    Route::get('/v2/admin/ad-campaigns/stats', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminOverviewStats']);
+    Route::get('/v2/admin/ad-campaigns/{id}', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminGetCampaign']);
+    Route::post('/v2/admin/ad-campaigns/{id}/approve', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminApproveCampaign']);
+    Route::post('/v2/admin/ad-campaigns/{id}/reject', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminRejectCampaign']);
+    Route::post('/v2/admin/ad-campaigns/{id}/pause', [\App\Http\Controllers\Api\LocalAdvertisingController::class, 'adminPauseCampaign']);
+});
 
 // AG57 — Paid Push Campaign Management
-Route::get('/v2/me/push-campaigns', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'myCampaigns']);
-Route::post('/v2/me/push-campaigns', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'createCampaign']);
-Route::post('/v2/me/push-campaigns/estimate-audience', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'estimateAudience']);
-Route::put('/v2/me/push-campaigns/{id}', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'updateCampaign']);
-Route::post('/v2/me/push-campaigns/{id}/submit', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'submitForReview']);
-Route::delete('/v2/me/push-campaigns/{id}', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'cancelCampaign']);
-Route::get('/v2/admin/push-campaigns', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminListCampaigns']);
-Route::get('/v2/admin/push-campaigns/stats', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminOverviewStats']);
-Route::get('/v2/admin/push-campaigns/{id}', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminGetCampaign']);
-Route::post('/v2/admin/push-campaigns/{id}/approve', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminApproveCampaign']);
-Route::post('/v2/admin/push-campaigns/{id}/reject', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminRejectCampaign']);
-Route::post('/v2/admin/push-campaigns/{id}/dispatch', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminDispatchCampaign']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/v2/me/push-campaigns', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'myCampaigns']);
+    Route::post('/v2/me/push-campaigns', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'createCampaign']);
+    Route::post('/v2/me/push-campaigns/estimate-audience', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'estimateAudience']);
+    Route::put('/v2/me/push-campaigns/{id}', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'updateCampaign']);
+    Route::post('/v2/me/push-campaigns/{id}/submit', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'submitForReview']);
+    Route::delete('/v2/me/push-campaigns/{id}', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'cancelCampaign']);
+});
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/v2/admin/push-campaigns', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminListCampaigns']);
+    Route::get('/v2/admin/push-campaigns/stats', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminOverviewStats']);
+    Route::get('/v2/admin/push-campaigns/{id}', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminGetCampaign']);
+    Route::post('/v2/admin/push-campaigns/{id}/approve', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminApproveCampaign']);
+    Route::post('/v2/admin/push-campaigns/{id}/reject', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminRejectCampaign']);
+    Route::post('/v2/admin/push-campaigns/{id}/dispatch', [\App\Http\Controllers\Api\PaidPushCampaignController::class, 'adminDispatchCampaign']);
+});
 
 // AG62 — Municipality Survey & Feedback Tool
 Route::get('/v2/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'activeSurveys']);
 Route::get('/v2/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'getSurvey']);
 Route::post('/v2/caring-community/surveys/{id}/respond', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'submitSurvey'])
     ->middleware('auth:sanctum');
+// Deliberately auth-only (no `admin` middleware): these methods self-check via
+// hasAnnouncerAccess(), which also grants the non-admin `municipality_announcer`
+// role. Adding `admin` here would lock announcers out of survey management.
 Route::middleware('auth:sanctum')
     ->withoutMiddleware(['admin', \App\Http\Middleware\EnsureIsAdmin::class])
     ->group(function () {
@@ -3301,47 +3329,52 @@ Route::middleware('auth:sanctum')
 // ============================================
 // AG61 — KI-Agenten Autonomous Agent Framework
 // ============================================
-Route::get('/v2/admin/ki-agents/config', [\App\Http\Controllers\Api\KiAgentController::class, 'getConfig']);
-Route::put('/v2/admin/ki-agents/config', [\App\Http\Controllers\Api\KiAgentController::class, 'updateConfig']);
-Route::get('/v2/admin/ki-agents/runs', [\App\Http\Controllers\Api\KiAgentController::class, 'listRuns']);
-Route::get('/v2/admin/ki-agents/runs/{id}', [\App\Http\Controllers\Api\KiAgentController::class, 'getRun']);
-Route::post('/v2/admin/ki-agents/trigger', [\App\Http\Controllers\Api\KiAgentController::class, 'triggerRun']);
-Route::get('/v2/admin/ki-agents/proposals', [\App\Http\Controllers\Api\KiAgentController::class, 'listProposals']);
-Route::post('/v2/admin/ki-agents/proposals/{id}/approve', [\App\Http\Controllers\Api\KiAgentController::class, 'approveProposal']);
-Route::post('/v2/admin/ki-agents/proposals/{id}/reject', [\App\Http\Controllers\Api\KiAgentController::class, 'rejectProposal']);
-Route::post('/v2/admin/ki-agents/proposals/approve-eligible', [\App\Http\Controllers\Api\KiAgentController::class, 'approveAllEligible']);
-Route::get('/v2/admin/ki-agents/stats', [\App\Http\Controllers\Api\KiAgentController::class, 'getStats']);
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/v2/admin/ki-agents/config', [\App\Http\Controllers\Api\KiAgentController::class, 'getConfig']);
+    Route::put('/v2/admin/ki-agents/config', [\App\Http\Controllers\Api\KiAgentController::class, 'updateConfig']);
+    Route::get('/v2/admin/ki-agents/runs', [\App\Http\Controllers\Api\KiAgentController::class, 'listRuns']);
+    Route::get('/v2/admin/ki-agents/runs/{id}', [\App\Http\Controllers\Api\KiAgentController::class, 'getRun']);
+    Route::post('/v2/admin/ki-agents/trigger', [\App\Http\Controllers\Api\KiAgentController::class, 'triggerRun']);
+    Route::get('/v2/admin/ki-agents/proposals', [\App\Http\Controllers\Api\KiAgentController::class, 'listProposals']);
+    Route::post('/v2/admin/ki-agents/proposals/{id}/approve', [\App\Http\Controllers\Api\KiAgentController::class, 'approveProposal']);
+    Route::post('/v2/admin/ki-agents/proposals/{id}/reject', [\App\Http\Controllers\Api\KiAgentController::class, 'rejectProposal']);
+    Route::post('/v2/admin/ki-agents/proposals/approve-eligible', [\App\Http\Controllers\Api\KiAgentController::class, 'approveAllEligible']);
+    Route::get('/v2/admin/ki-agents/stats', [\App\Http\Controllers\Api\KiAgentController::class, 'getStats']);
 
-// AI Module Docs — per-tenant, admin-editable "how each module works" prompts
-Route::get('/v2/admin/ai-module-docs', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'index']);
-Route::post('/v2/admin/ai-module-docs', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'store']);
-Route::put('/v2/admin/ai-module-docs/{id}', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'update']);
-Route::delete('/v2/admin/ai-module-docs/{id}', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'destroy']);
-Route::post('/v2/admin/ai-module-docs/seed-defaults', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'seedDefaults']);
+    // AI Module Docs — per-tenant, admin-editable "how each module works" prompts
+    Route::get('/v2/admin/ai-module-docs', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'index']);
+    Route::post('/v2/admin/ai-module-docs', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'store']);
+    Route::put('/v2/admin/ai-module-docs/{id}', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'update']);
+    Route::delete('/v2/admin/ai-module-docs/{id}', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'destroy']);
+    Route::post('/v2/admin/ai-module-docs/seed-defaults', [\App\Http\Controllers\Api\Admin\AiModuleDocsController::class, 'seedDefaults']);
 
-// AI chat trace metrics (cost, latency, tool usage, downvoted "unanswered" turns)
-Route::get('/v2/admin/ai-traces/metrics', [\App\Http\Controllers\Api\Admin\AiTraceMetricsController::class, 'metrics']);
+    // AI chat trace metrics (cost, latency, tool usage, downvoted "unanswered" turns)
+    Route::get('/v2/admin/ai-traces/metrics', [\App\Http\Controllers\Api\Admin\AiTraceMetricsController::class, 'metrics']);
 
-// AG59 — Regional Analytics Product
-Route::get('/v2/admin/regional-analytics/overview', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'overview']);
-Route::get('/v2/admin/regional-analytics/heatmap', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'heatmap']);
-Route::get('/v2/admin/regional-analytics/demand-supply', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'demandSupply']);
-Route::get('/v2/admin/regional-analytics/demographics', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'demographics']);
-Route::get('/v2/admin/regional-analytics/engagement-trends', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'engagementTrends']);
-Route::get('/v2/admin/regional-analytics/volunteer-breakdown', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'volunteerBreakdown']);
-Route::get('/v2/admin/regional-analytics/help-requests', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'helpRequests']);
-Route::get('/v2/admin/regional-analytics/export', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'exportReport']);
-Route::post('/v2/admin/regional-analytics/invalidate-cache', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'invalidateCache']);
+    // AG59 — Regional Analytics Product
+    Route::get('/v2/admin/regional-analytics/overview', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'overview']);
+    Route::get('/v2/admin/regional-analytics/heatmap', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'heatmap']);
+    Route::get('/v2/admin/regional-analytics/demand-supply', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'demandSupply']);
+    Route::get('/v2/admin/regional-analytics/demographics', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'demographics']);
+    Route::get('/v2/admin/regional-analytics/engagement-trends', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'engagementTrends']);
+    Route::get('/v2/admin/regional-analytics/volunteer-breakdown', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'volunteerBreakdown']);
+    Route::get('/v2/admin/regional-analytics/help-requests', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'helpRequests']);
+    Route::get('/v2/admin/regional-analytics/export', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'exportReport']);
+    Route::post('/v2/admin/regional-analytics/invalidate-cache', [\App\Http\Controllers\Api\RegionalAnalyticsController::class, 'invalidateCache']);
+});
 
 // AG71 — Pilot Region Inquiry & Qualification Funnel
+// Deliberately public: logged-out lead-capture form (throttled). Do NOT wrap.
 Route::post('/v2/pilot-inquiry', [\App\Http\Controllers\Api\PilotInquiryController::class, 'submitInquiry'])->middleware('throttle:5,1');
-Route::get('/v2/admin/pilot-inquiries', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminList']);
-Route::get('/v2/admin/pilot-inquiries/stats', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminPipelineStats']);
-Route::get('/v2/admin/pilot-inquiries/export', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminExportCsv']);
-Route::get('/v2/admin/pilot-inquiries/{id}', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminGet']);
-Route::post('/v2/admin/pilot-inquiries/{id}/stage', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminUpdateStage']);
-Route::post('/v2/admin/pilot-inquiries/{id}/assign', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminAssign']);
-Route::post('/v2/admin/pilot-inquiries/{id}/notes', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminUpdateNotes']);
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/v2/admin/pilot-inquiries', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminList']);
+    Route::get('/v2/admin/pilot-inquiries/stats', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminPipelineStats']);
+    Route::get('/v2/admin/pilot-inquiries/export', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminExportCsv']);
+    Route::get('/v2/admin/pilot-inquiries/{id}', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminGet']);
+    Route::post('/v2/admin/pilot-inquiries/{id}/stage', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminUpdateStage']);
+    Route::post('/v2/admin/pilot-inquiries/{id}/assign', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminAssign']);
+    Route::post('/v2/admin/pilot-inquiries/{id}/notes', [\App\Http\Controllers\Api\PilotInquiryController::class, 'adminUpdateNotes']);
+});
 
 // Public billing — available plans (pricing page, no auth required)
 Route::get('/v2/billing/plans', [\App\Http\Controllers\Api\AdminBillingController::class, 'getPlansPublic']);
@@ -3435,7 +3468,7 @@ Route::middleware(['auth:sanctum', 'super-admin'])->prefix('super-admin/regional
 });
 
 // Admin: Partner CRUD + credential rotation + call log
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/v2/admin/api-partners', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'index']);
     Route::post('/v2/admin/api-partners', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'store']);
     Route::get('/v2/admin/api-partners/{id}', [\App\Http\Controllers\Api\Admin\ApiPartnerAdminController::class, 'show'])->whereNumber('id');
