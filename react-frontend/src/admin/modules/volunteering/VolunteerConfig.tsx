@@ -1191,15 +1191,19 @@ function WebhooksTab() {
     setTestingId(null);
   };
 
+  // The failed-webhook button sends a TEST event (the same call as the Test
+  // button) — it is NOT a redelivery of the failed events. Real failed events are
+  // retried automatically by the */5 cron (WebhookDispatchService::retryFailed),
+  // so this is labelled honestly as a test ping rather than "Retry".
   const handleRetry = async (id: number) => {
     setRetryingId(id);
     try {
       const res = await adminVolunteering.testWebhook(id);
-      if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_retry_failed');
-      toast.success(t('volunteering.webhook_retry_sent'));
+      if (!res.success) throw new Error(apiErrorMessage(res) || 'webhook_test_failed');
+      toast.success(t('volunteering.webhook_test_sent'));
       loadData();
     } catch {
-      toast.error(t('volunteering.webhook_retry_failed'));
+      toast.error(t('volunteering.webhook_test_failed'));
     }
     setRetryingId(null);
   };
@@ -1295,7 +1299,7 @@ function WebhooksTab() {
               isIconOnly
               isLoading={retryingId === row.id}
               onPress={() => handleRetry(row.id)}
-              aria-label={t('volunteering.retry_webhook')}
+              aria-label={t('volunteering.test_webhook')}
             >
               <RotateCcw size={14} />
             </Button>
