@@ -290,6 +290,16 @@ class VolOrgWalletService
             return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.amount_must_be_greater_than_zero')];
         }
 
+        // users.balance is whole hours, so a sub-1.0 amount floors to a 0-hour
+        // payment: it would move nothing yet still record a zero-amount
+        // transaction and email "0 hours paid" while returning success. Reject it
+        // instead of a phantom success. (No production path calls payVolunteer
+        // with a fractional amount today — verifyHours() handles real payouts and
+        // returns no_whole_hours without inserting — but guard it before wiring.)
+        if ((int) floor($amount) < 1) {
+            return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.amount_must_be_greater_than_zero')];
+        }
+
         $tenantId = TenantContext::getId();
 
         $result = DB::transaction(function () use ($volOrgId, $volunteerId, $amount, $adminId, $note, $logId, $tenantId) {

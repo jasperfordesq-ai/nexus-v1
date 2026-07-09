@@ -170,6 +170,25 @@ class VolOrgWalletServiceTest extends TestCase
         );
     }
 
+    public function test_payVolunteer_rejects_sub_whole_hour_amount(): void
+    {
+        // VOL-BE-009: 0.5 floors to 0 whole hours — must not phantom-succeed with
+        // a zero-amount transaction and a "0 hours paid" email.
+        $admin = User::factory()->forTenant(2)->create();
+        $volunteer = User::factory()->forTenant(2)->create(['balance' => 0]);
+        $orgId = $this->makeOrg(2, 10.0, $admin->id);
+        $this->pinTenant();
+
+        $result = VolOrgWalletService::payVolunteer($orgId, $volunteer->id, 0.5, $admin->id);
+
+        $this->assertFalse($result['success']);
+        $this->assertEquals(10.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertEquals(0, (int) DB::table('users')->where('id', $volunteer->id)->value('balance'));
+        $this->assertFalse(
+            DB::table('vol_org_transactions')->where('vol_organization_id', $orgId)->exists()
+        );
+    }
+
     public function test_fractional_pay_volunteer_does_not_lose_or_overpay_hours(): void
     {
         $admin = User::factory()->forTenant(2)->create();
