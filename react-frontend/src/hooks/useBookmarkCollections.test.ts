@@ -3,81 +3,87 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+/**
+ * Tests for useBookmarkCollections.
+ *
+ * The hook keeps a module-level cache keyed by the authenticated user (and
+ * tenant). Because that cache lives at module scope, each test loads a fresh
+ * copy of the module via vi.resetModules() + dynamic import (see loadHook).
+ *
+ * Includes the P2 privacy regression tests: after a user switch or logout the
+ * hook must refetch instead of serving the previous user's cached private
+ * collections.
+ */
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useBookmarkCollections, BookmarkCollection } from './useBookmarkCollections';
+import type { BookmarkCollection } from './useBookmarkCollections';
 
-// Mock the API module
-vi.mock('@/lib/api', () => ({
-  api: {
-    get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
-    delete: vi.fn(),
-  },
-}));
+type MockUser = { id: number } | null;
 
-// Mock the logger so logError calls don't emit console noise in tests
-vi.mock('@/lib/logger', () => ({
-  logError: vi.fn(),
-}));
+interface Harness {
+  hook: typeof import('./useBookmarkCollections')['useBookmarkCollections'];
+  get: ReturnType<typeof vi.fn>;
+  post: ReturnType<typeof vi.fn>;
+  logError: ReturnType<typeof vi.fn>;
+  /** Change the mocked auth user; call rerender() afterwards to apply. */
+  setUser: (user: MockUser) => void;
+}
 
-import { api } from '@/lib/api';
-import { logError } from '@/lib/logger';
+/**
+ * Loads a fresh copy of the hook module with fresh api/logger/auth mocks so
+ * the module-level cache starts empty for every test.
+ */
+async function loadHook(initialUser: MockUser = { id: 1 }): Promise<Harness> {
+  vi.resetModules();
 
-const mockGet = api.get as ReturnType<typeof vi.fn>;
-const mockPost = api.post as ReturnType<typeof vi.fn>;
+  let currentUser: MockUser = initialUser;
+  const get = vi.fn();
+  const post = vi.fn();
+  const logError = vi.fn();
 
-// The module uses a module-level cache variable `cachedCollections`.
-// We need to reset it between tests so each test starts from a clean state.
-// We do this by resetting the module between tests via vi.resetModules() OR
-// by leveraging the fact that fetchCollections + re-render will override it.
-// However since the cache is module-level, we use vi.isolateModules per test
-// or simply clear it by calling the module reset. The simplest approach here
-// is to use vi.resetModules() in beforeEach and re-import inside tests.
-// But that would make the import() async — instead we'll use vi.resetModules
-// combined with dynamic import in a helper. For simplicity in this test suite,
-// we directly reach into the module internals by re-importing after reset.
+  vi.doMock('@/lib/api', () => ({
+    api: { get, post, put: vi.fn(), delete: vi.fn() },
+  }));
+  vi.doMock('@/lib/logger', () => ({ logError }));
+  vi.doMock('@/contexts', () => ({
+    useAuth: () => ({ user: currentUser, isAuthenticated: currentUser !== null }),
+  }));
 
-// NOTE: The module-level `cachedCollections` is set to `null` at module load.
-// Between tests we can't easily null it without module reloads. The approach
-// here is to always mock `api.get` to return a fresh response, and accept that
-// later tests that run after the cache is populated will exercise the "cache hit"
-// path. We have explicit tests for both paths.
+  const mod = await import('./useBookmarkCollections');
+
+  return {
+    hook: mod.useBookmarkCollections,
+    get,
+    post,
+    logError,
+    setUser: (user) => {
+      currentUser = user;
+    },
+  };
+}
 
 const MOCK_COLLECTIONS: BookmarkCollection[] = [
   { id: 1, name: 'Favourites', description: null, is_default: true, bookmarks_count: 5 },
   { id: 2, name: 'Later', description: 'Read later', is_default: false, bookmarks_count: 2 },
 ];
 
+const USER_B_COLLECTIONS: BookmarkCollection[] = [
+  { id: 7, name: 'B own list', description: null, is_default: true, bookmarks_count: 1 },
+];
+
 describe('useBookmarkCollections', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset the module-level cache by resetting modules so each describe block
-    // starts fresh. We use vi.resetModules here combined with dynamic import below.
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
+    window.localStorage.clear();
   });
 
   describe('initial fetch', () => {
     it('starts with isLoading true and empty collections when no cache exists', async () => {
-      // Reset module so cachedCollections starts as null
-      vi.resetModules();
-      // Re-mock after reset
-      vi.doMock('@/lib/api', () => ({
-        api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
-      }));
-      vi.doMock('@/lib/logger', () => ({ logError: vi.fn() }));
+      const h = await loadHook();
+      h.get.mockResolvedValueOnce({ success: true, data: MOCK_COLLECTIONS });
 
-      const { useBookmarkCollections: hook } = await import('./useBookmarkCollections');
-      const { api: freshApi } = await import('@/lib/api');
-      const freshGet = freshApi.get as ReturnType<typeof vi.fn>;
-
-      freshGet.mockResolvedValueOnce({ success: true, data: MOCK_COLLECTIONS });
-
-      const { result } = renderHook(() => hook());
+      const { result } = renderHook(() => h.hook());
 
       // Before the async fetch completes: loading + empty
       expect(result.current.isLoading).toBe(true);
@@ -88,51 +94,31 @@ describe('useBookmarkCollections', () => {
       });
 
       expect(result.current.collections).toEqual(MOCK_COLLECTIONS);
-      expect(freshGet).toHaveBeenCalledWith('/v2/bookmark-collections');
+      expect(h.get).toHaveBeenCalledWith('/v2/bookmark-collections');
     });
 
     it('sets isLoading to false and collections remain empty on API failure', async () => {
-      vi.resetModules();
-      vi.doMock('@/lib/api', () => ({
-        api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
-      }));
-      vi.doMock('@/lib/logger', () => ({ logError: vi.fn() }));
+      const h = await loadHook();
+      h.get.mockRejectedValueOnce(new Error('Network error'));
 
-      const { useBookmarkCollections: hook } = await import('./useBookmarkCollections');
-      const { api: freshApi } = await import('@/lib/api');
-      const freshGet = freshApi.get as ReturnType<typeof vi.fn>;
-      const { logError: freshLogError } = await import('@/lib/logger');
-      const mockLogError = freshLogError as ReturnType<typeof vi.fn>;
-
-      freshGet.mockRejectedValueOnce(new Error('Network error'));
-
-      const { result } = renderHook(() => hook());
+      const { result } = renderHook(() => h.hook());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
       });
 
       expect(result.current.collections).toEqual([]);
-      expect(mockLogError).toHaveBeenCalledWith(
+      expect(h.logError).toHaveBeenCalledWith(
         'Failed to fetch bookmark collections',
         expect.any(Error)
       );
     });
 
-    it('does not fetch again when success is false', async () => {
-      vi.resetModules();
-      vi.doMock('@/lib/api', () => ({
-        api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
-      }));
-      vi.doMock('@/lib/logger', () => ({ logError: vi.fn() }));
+    it('leaves collections empty when success is false', async () => {
+      const h = await loadHook();
+      h.get.mockResolvedValueOnce({ success: false, data: null });
 
-      const { useBookmarkCollections: hook } = await import('./useBookmarkCollections');
-      const { api: freshApi } = await import('@/lib/api');
-      const freshGet = freshApi.get as ReturnType<typeof vi.fn>;
-
-      freshGet.mockResolvedValueOnce({ success: false, data: null });
-
-      const { result } = renderHook(() => hook());
+      const { result } = renderHook(() => h.hook());
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -141,19 +127,111 @@ describe('useBookmarkCollections', () => {
       // When success=false, collections should remain empty (cache not populated)
       expect(result.current.collections).toEqual([]);
     });
+
+    it('does not fetch at all when there is no authenticated user', async () => {
+      const h = await loadHook(null);
+
+      const { result } = renderHook(() => h.hook());
+
+      expect(result.current.isLoading).toBe(false);
+      expect(result.current.collections).toEqual([]);
+      expect(h.get).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('cache scoping by user (privacy regression, P2)', () => {
+    it('serves the cache to the same user across hook instances without refetching', async () => {
+      const h = await loadHook({ id: 1 });
+      h.get.mockResolvedValue({ success: true, data: MOCK_COLLECTIONS });
+
+      const first = renderHook(() => h.hook());
+      await waitFor(() => expect(first.result.current.isLoading).toBe(false));
+      expect(h.get).toHaveBeenCalledTimes(1);
+      first.unmount();
+
+      const second = renderHook(() => h.hook());
+      // Cache hit: data available immediately, no second GET
+      expect(second.result.current.collections).toEqual(MOCK_COLLECTIONS);
+      expect(second.result.current.isLoading).toBe(false);
+      expect(h.get).toHaveBeenCalledTimes(1);
+    });
+
+    it("refetches instead of serving the previous user's cache when the auth user changes", async () => {
+      const h = await loadHook({ id: 1 });
+      h.get.mockResolvedValueOnce({ success: true, data: MOCK_COLLECTIONS });
+
+      const { result, rerender } = renderHook(() => h.hook());
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+      expect(result.current.collections).toEqual(MOCK_COLLECTIONS);
+      expect(h.get).toHaveBeenCalledTimes(1);
+
+      // Simulate a user switch in the same JS session (shared browser)
+      h.get.mockResolvedValueOnce({ success: true, data: USER_B_COLLECTIONS });
+      h.setUser({ id: 2 });
+      rerender();
+
+      // User A's private collections must not be shown, even transiently
+      expect(result.current.collections).toEqual([]);
+
+      await waitFor(() => {
+        expect(result.current.collections).toEqual(USER_B_COLLECTIONS);
+      });
+      expect(h.get).toHaveBeenCalledTimes(2);
+    });
+
+    it("clears the cache on logout so a later user never sees the previous user's collections", async () => {
+      const h = await loadHook({ id: 1 });
+      h.get.mockResolvedValueOnce({ success: true, data: MOCK_COLLECTIONS });
+
+      const first = renderHook(() => h.hook());
+      await waitFor(() => expect(first.result.current.isLoading).toBe(false));
+      expect(first.result.current.collections).toEqual(MOCK_COLLECTIONS);
+
+      // Logout: user becomes null
+      h.setUser(null);
+      first.rerender();
+      expect(first.result.current.collections).toEqual([]);
+      expect(first.result.current.isLoading).toBe(false);
+      first.unmount();
+
+      // User B logs in and a fresh component mounts
+      h.get.mockResolvedValueOnce({ success: true, data: USER_B_COLLECTIONS });
+      h.setUser({ id: 2 });
+      const second = renderHook(() => h.hook());
+
+      // Never user A's data — starts empty, then B's own collections
+      expect(second.result.current.collections).toEqual([]);
+      await waitFor(() => {
+        expect(second.result.current.collections).toEqual(USER_B_COLLECTIONS);
+      });
+      expect(h.get).toHaveBeenCalledTimes(2);
+    });
+
+    it('scopes the cache by tenant id as well as user id', async () => {
+      window.localStorage.setItem('nexus_tenant_id', '2');
+      const h = await loadHook({ id: 1 });
+      h.get.mockResolvedValueOnce({ success: true, data: MOCK_COLLECTIONS });
+
+      const { result, rerender } = renderHook(() => h.hook());
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+      expect(h.get).toHaveBeenCalledTimes(1);
+
+      // Same user id, different tenant — must not reuse the cached entry
+      window.localStorage.setItem('nexus_tenant_id', '3');
+      h.get.mockResolvedValueOnce({ success: true, data: USER_B_COLLECTIONS });
+      rerender();
+
+      expect(result.current.collections).toEqual([]);
+      await waitFor(() => {
+        expect(result.current.collections).toEqual(USER_B_COLLECTIONS);
+      });
+      expect(h.get).toHaveBeenCalledTimes(2);
+    });
   });
 
   describe('fetchCollections (manual refetch)', () => {
     it('re-fetches and updates collections', async () => {
-      vi.resetModules();
-      vi.doMock('@/lib/api', () => ({
-        api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
-      }));
-      vi.doMock('@/lib/logger', () => ({ logError: vi.fn() }));
-
-      const { useBookmarkCollections: hook } = await import('./useBookmarkCollections');
-      const { api: freshApi } = await import('@/lib/api');
-      const freshGet = freshApi.get as ReturnType<typeof vi.fn>;
+      const h = await loadHook();
 
       const firstBatch: BookmarkCollection[] = [
         { id: 1, name: 'A', description: null, is_default: true, bookmarks_count: 0 },
@@ -163,38 +241,28 @@ describe('useBookmarkCollections', () => {
         { id: 3, name: 'B', description: null, is_default: false, bookmarks_count: 1 },
       ];
 
-      freshGet.mockResolvedValueOnce({ success: true, data: firstBatch });
+      h.get.mockResolvedValueOnce({ success: true, data: firstBatch });
 
-      const { result } = renderHook(() => hook());
+      const { result } = renderHook(() => h.hook());
 
       await waitFor(() => expect(result.current.isLoading).toBe(false));
       expect(result.current.collections).toEqual(firstBatch);
 
-      freshGet.mockResolvedValueOnce({ success: true, data: secondBatch });
+      h.get.mockResolvedValueOnce({ success: true, data: secondBatch });
 
       await act(async () => {
         await result.current.fetchCollections();
       });
 
       expect(result.current.collections).toEqual(secondBatch);
-      expect(freshGet).toHaveBeenCalledTimes(2);
+      expect(h.get).toHaveBeenCalledTimes(2);
     });
   });
 
   describe('createCollection', () => {
     it('posts to the API and appends the new collection to state', async () => {
-      vi.resetModules();
-      vi.doMock('@/lib/api', () => ({
-        api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
-      }));
-      vi.doMock('@/lib/logger', () => ({ logError: vi.fn() }));
-
-      const { useBookmarkCollections: hook } = await import('./useBookmarkCollections');
-      const { api: freshApi } = await import('@/lib/api');
-      const freshGet = freshApi.get as ReturnType<typeof vi.fn>;
-      const freshPost = freshApi.post as ReturnType<typeof vi.fn>;
-
-      freshGet.mockResolvedValueOnce({ success: true, data: MOCK_COLLECTIONS });
+      const h = await loadHook();
+      h.get.mockResolvedValueOnce({ success: true, data: MOCK_COLLECTIONS });
 
       const newCollection: BookmarkCollection = {
         id: 99,
@@ -203,9 +271,9 @@ describe('useBookmarkCollections', () => {
         is_default: false,
         bookmarks_count: 0,
       };
-      freshPost.mockResolvedValueOnce({ success: true, data: newCollection });
+      h.post.mockResolvedValueOnce({ success: true, data: newCollection });
 
-      const { result } = renderHook(() => hook());
+      const { result } = renderHook(() => h.hook());
       await waitFor(() => expect(result.current.isLoading).toBe(false));
 
       let created: BookmarkCollection | null = null;
@@ -214,29 +282,17 @@ describe('useBookmarkCollections', () => {
       });
 
       expect(created).toEqual(newCollection);
-      expect(freshPost).toHaveBeenCalledWith('/v2/bookmark-collections', { name: 'New' });
+      expect(h.post).toHaveBeenCalledWith('/v2/bookmark-collections', { name: 'New' });
       expect(result.current.collections).toContainEqual(newCollection);
       expect(result.current.collections).toHaveLength(MOCK_COLLECTIONS.length + 1);
     });
 
     it('returns null and logs when createCollection API call fails', async () => {
-      vi.resetModules();
-      vi.doMock('@/lib/api', () => ({
-        api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
-      }));
-      vi.doMock('@/lib/logger', () => ({ logError: vi.fn() }));
+      const h = await loadHook();
+      h.get.mockResolvedValueOnce({ success: true, data: MOCK_COLLECTIONS });
+      h.post.mockRejectedValueOnce(new Error('Server error'));
 
-      const { useBookmarkCollections: hook } = await import('./useBookmarkCollections');
-      const { api: freshApi } = await import('@/lib/api');
-      const freshGet = freshApi.get as ReturnType<typeof vi.fn>;
-      const freshPost = freshApi.post as ReturnType<typeof vi.fn>;
-      const { logError: freshLogError } = await import('@/lib/logger');
-      const mockLogError = freshLogError as ReturnType<typeof vi.fn>;
-
-      freshGet.mockResolvedValueOnce({ success: true, data: MOCK_COLLECTIONS });
-      freshPost.mockRejectedValueOnce(new Error('Server error'));
-
-      const { result } = renderHook(() => hook());
+      const { result } = renderHook(() => h.hook());
       await waitFor(() => expect(result.current.isLoading).toBe(false));
 
       let created: BookmarkCollection | null | undefined;
@@ -245,28 +301,18 @@ describe('useBookmarkCollections', () => {
       });
 
       expect(created).toBeNull();
-      expect(mockLogError).toHaveBeenCalledWith(
+      expect(h.logError).toHaveBeenCalledWith(
         'Failed to create bookmark collection',
         expect.any(Error)
       );
     });
 
     it('returns null when API responds success:false', async () => {
-      vi.resetModules();
-      vi.doMock('@/lib/api', () => ({
-        api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
-      }));
-      vi.doMock('@/lib/logger', () => ({ logError: vi.fn() }));
+      const h = await loadHook();
+      h.get.mockResolvedValueOnce({ success: true, data: MOCK_COLLECTIONS });
+      h.post.mockResolvedValueOnce({ success: false, data: null });
 
-      const { useBookmarkCollections: hook } = await import('./useBookmarkCollections');
-      const { api: freshApi } = await import('@/lib/api');
-      const freshGet = freshApi.get as ReturnType<typeof vi.fn>;
-      const freshPost = freshApi.post as ReturnType<typeof vi.fn>;
-
-      freshGet.mockResolvedValueOnce({ success: true, data: MOCK_COLLECTIONS });
-      freshPost.mockResolvedValueOnce({ success: false, data: null });
-
-      const { result } = renderHook(() => hook());
+      const { result } = renderHook(() => h.hook());
       await waitFor(() => expect(result.current.isLoading).toBe(false));
 
       let created: BookmarkCollection | null | undefined;
@@ -280,23 +326,17 @@ describe('useBookmarkCollections', () => {
 
   describe('return shape', () => {
     it('exposes collections, isLoading, fetchCollections, createCollection', async () => {
-      vi.resetModules();
-      vi.doMock('@/lib/api', () => ({
-        api: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
-      }));
-      vi.doMock('@/lib/logger', () => ({ logError: vi.fn() }));
+      const h = await loadHook();
+      h.get.mockResolvedValueOnce({ success: true, data: [] });
 
-      const { useBookmarkCollections: hook } = await import('./useBookmarkCollections');
-      const { api: freshApi } = await import('@/lib/api');
-      const freshGet = freshApi.get as ReturnType<typeof vi.fn>;
-      freshGet.mockResolvedValueOnce({ success: true, data: [] });
-
-      const { result } = renderHook(() => hook());
+      const { result } = renderHook(() => h.hook());
 
       expect(typeof result.current.collections).toBe('object');
       expect(typeof result.current.isLoading).toBe('boolean');
       expect(typeof result.current.fetchCollections).toBe('function');
       expect(typeof result.current.createCollection).toBe('function');
+
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
     });
   });
 });
