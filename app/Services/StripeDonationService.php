@@ -93,7 +93,9 @@ class StripeDonationService
         // running total with a cheap foreign currency (raised_amount sums the
         // raw numeric amount regardless of currency).
         if ($tenantCurrency !== '' && strlen($tenantCurrency) === 3 && $currency !== $tenantCurrency) {
-            throw new \InvalidArgumentException('Donation currency must match the community currency.');
+            throw new \InvalidArgumentException(
+                __('api.vol_donation_currency_mismatch', ['currency' => strtoupper($tenantCurrency)])
+            );
         }
 
         $user = DB::table('users')
@@ -820,7 +822,7 @@ class StripeDonationService
         // Build donor display name
         $donorName = $donation->donor_name ?? '';
         if ($donation->is_anonymous) {
-            $donorName = 'Anonymous';
+            $donorName = __('api.vol_activity_donor_anonymous');
         }
 
         return [
