@@ -186,6 +186,13 @@ class VolunteerService
 
         $results = $items->map(function ($opp) use ($appliedOpportunityIds) {
             $data = $opp->toArray();
+            // Do not expose the creator's internal user id on the public/browse
+            // list (mirrors the org directory's owner-id stripping); name + avatar
+            // remain for display. The eager-load keeps `id` so Eloquent can hydrate
+            // the belongsTo relation — it is stripped here, after serialization.
+            if (isset($data['creator']) && is_array($data['creator'])) {
+                unset($data['creator']['id']);
+            }
             $data['is_remote'] = (bool) ($opp->is_remote ?? false);
             $data['has_applied'] = in_array((int) $opp->id, $appliedOpportunityIds, true);
             if (isset($opp->distance_km)) {

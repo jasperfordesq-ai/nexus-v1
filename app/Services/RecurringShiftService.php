@@ -186,7 +186,13 @@ class RecurringShiftService
                         $shouldGenerate = ($weekDiff % 2 === 0) && (empty($daysOfWeek) || in_array($dayOfWeek, $daysOfWeek, true));
                         break;
                     case 'monthly':
-                        $shouldGenerate = ($current->format('d') === $anchorDate->format('d'));
+                        // Clamp the anchor day to the last valid day of the current
+                        // month so a day-29/30/31 anchor still fires in shorter months
+                        // (e.g. a Jan-31 pattern fires on Feb 28/29), matching
+                        // EventService's monthly clamp instead of silently skipping.
+                        $anchorDay = (int) $anchorDate->format('d');
+                        $targetDay = min($anchorDay, (int) $current->format('t'));
+                        $shouldGenerate = ((int) $current->format('d') === $targetDay);
                         break;
                 }
 

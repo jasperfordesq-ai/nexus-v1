@@ -122,6 +122,41 @@ class VolunteerControllerTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_opportunities_do_not_expose_creator_internal_id(): void
+    {
+        // VOL-BE-011: the public/browse list must not leak the creator's internal
+        // users.id (name + avatar remain for display).
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $orgId = $this->createPublicOrganisation($owner);
+        DB::table('vol_opportunities')->insert([
+            'tenant_id' => $this->testTenantId,
+            'organization_id' => $orgId,
+            'title' => 'Creator Id Opportunity',
+            'description' => 'Testing creator id stripping.',
+            'is_active' => 1,
+            'status' => 'open',
+            'created_by' => $owner->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        TenantContext::setById($this->testTenantId);
+
+        $response = $this->apiGet('/v2/volunteering/opportunities');
+        $response->assertStatus(200);
+
+        $items = $response->json('data') ?? [];
+        $creators = array_values(array_filter(array_map(
+            static fn ($item) => $item['creator'] ?? null,
+            $items
+        )));
+
+        $this->assertNotEmpty($creators, 'at least one opportunity should carry a creator');
+        foreach ($creators as $creator) {
+            $this->assertArrayNotHasKey('id', $creator);
+            $this->assertArrayHasKey('first_name', $creator);
+        }
+    }
+
     public function test_legacy_opportunities_endpoint_returns_collection_without_type_error(): void
     {
         $this->authenticatedUser();

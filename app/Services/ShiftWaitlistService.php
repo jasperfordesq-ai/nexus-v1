@@ -542,6 +542,7 @@ class ShiftWaitlistService
             try {
                 $affected = DB::table('vol_shift_waitlist')
                     ->where('id', $entry->id)
+                    ->where('tenant_id', $entry->tenant_id)
                     ->where('status', 'notified')
                     ->update(['status' => 'expired']);
 
