@@ -1012,8 +1012,11 @@ class GamificationService
     private static function checkLikesBadges(int $userId): void
     {
         try {
+            // Tenant-scoped (2026-07-09 audit): raw join bypasses HasTenantScope,
+            // and users belonging to two tenants would otherwise blend counts.
             $count = (int) DB::table('post_likes')
                 ->join('feed_posts', 'post_likes.post_id', '=', 'feed_posts.id')
+                ->where('feed_posts.tenant_id', \App\Core\TenantContext::getId())
                 ->where('feed_posts.user_id', $userId)
                 ->count();
 
@@ -1131,8 +1134,10 @@ class GamificationService
     {
         try {
             // Count distinct listing categories the user has transacted in
+            // (tenant-scoped — raw join bypasses HasTenantScope)
             $categoryCount = (int) DB::table('transactions')
                 ->join('listings', 'transactions.listing_id', '=', 'listings.id')
+                ->where('transactions.tenant_id', \App\Core\TenantContext::getId())
                 ->where(function ($q) use ($userId) {
                     $q->where('transactions.sender_id', $userId)
                       ->orWhere('transactions.receiver_id', $userId);
@@ -1381,6 +1386,7 @@ class GamificationService
         // Batch: transactions table (4 → 2 queries)
         try {
             $txRow = DB::table('transactions')
+                ->where('tenant_id', \App\Core\TenantContext::getId())
                 ->where(fn ($q) => $q->where('sender_id', $userId)->orWhere('receiver_id', $userId))
                 ->selectRaw('COUNT(*) as total, SUM(CASE WHEN receiver_id = ? AND status = ? THEN amount ELSE 0 END) as earned, SUM(CASE WHEN sender_id = ? AND deleted_for_sender = 0 THEN amount ELSE 0 END) as spent', [$userId, 'completed', $userId])
                 ->first();
@@ -1407,7 +1413,7 @@ class GamificationService
         try { $stats['event_host'] = (int) Event::where('user_id', $userId)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[event_host] failed', ['error' => $e->getMessage()]); }
         try { $stats['group_join'] = (int) GroupMember::where('user_id', $userId)->where('status', 'active')->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[group_join] failed', ['error' => $e->getMessage()]); }
         try { $stats['post'] = (int) FeedPost::where('user_id', $userId)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[post] failed', ['error' => $e->getMessage()]); }
-        try { $stats['likes_received'] = (int) DB::table('post_likes')->join('feed_posts', 'post_likes.post_id', '=', 'feed_posts.id')->where('feed_posts.user_id', $userId)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[likes_received] failed', ['error' => $e->getMessage()]); }
+        try { $stats['likes_received'] = (int) DB::table('post_likes')->join('feed_posts', 'post_likes.post_id', '=', 'feed_posts.id')->where('feed_posts.tenant_id', \App\Core\TenantContext::getId())->where('feed_posts.user_id', $userId)->count(); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[likes_received] failed', ['error' => $e->getMessage()]); }
         try { $stats['profile'] = self::getProfileCompletion($userId); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[profile] failed', ['error' => $e->getMessage()]); }
         try { $stats['membership'] = self::getDaysSinceJoined($userId); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[membership] failed', ['error' => $e->getMessage()]); }
         try { $stats['streak'] = (int) (UserStreak::where('user_id', $userId)->where('streak_type', 'login')->value('current_streak') ?? 0); } catch (\Throwable $e) { \Log::warning('GamificationService: stats[streak] failed', ['error' => $e->getMessage()]); }
@@ -1425,6 +1431,7 @@ class GamificationService
         try {
             $stats['bridge_builder'] = (int) DB::table('transactions')
                 ->join('listings', 'transactions.listing_id', '=', 'listings.id')
+                ->where('transactions.tenant_id', \App\Core\TenantContext::getId())
                 ->where(function ($q) use ($userId) {
                     $q->where('transactions.sender_id', $userId)->orWhere('transactions.receiver_id', $userId);
                 })->where('transactions.status', 'completed')
