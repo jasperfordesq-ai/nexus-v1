@@ -200,6 +200,19 @@ class VolunteeringSafeguardingParityTest extends TestCase
         $this->assertStringContainsString('status=training-date-required', $location);
     }
 
+    public function test_volunteering_safeguarding_error_summary_links_to_field(): void
+    {
+        // VOL-AF-002: the GOV.UK error summary must offer a jump link to the
+        // offending field, not just a bare paragraph.
+        $this->authenticatedUser();
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/training?status=training-type-required");
+
+        $response->assertStatus(200);
+        $response->assertSee('govuk-error-summary__list', false);
+        $response->assertSee('href="#training_type"', false);
+    }
+
     // =====================================================================
     // Incident report persistence
     // =====================================================================

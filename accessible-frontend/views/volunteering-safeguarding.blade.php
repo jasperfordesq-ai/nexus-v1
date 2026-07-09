@@ -104,11 +104,33 @@
 
     {{-- Error summary --}}
     @if (in_array($status, $errorStatuses, true))
+        @php
+            // Map each field-level error status to its in-page field anchor so the
+            // GOV.UK error summary offers a jump link (Design System convention).
+            // Statuses with no field (generic/server errors) render as plain text.
+            $errorAnchors = [
+                'training-type-required'         => 'training_type',
+                'training-name-required'         => 'training_name',
+                'training-date-required'         => 'completed_at',
+                'incident-title-required'        => 'title',
+                'incident-description-too-short' => 'description',
+            ];
+            $errorSummaryMessage = $errorMessages[$status] ?? __('govuk_alpha_volunteering.safeguarding.error_generic');
+            $errorSummaryAnchor  = $errorAnchors[$status] ?? null;
+        @endphp
         <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
             <div role="alert">
                 <h2 class="govuk-error-summary__title">{{ __('govuk_alpha_volunteering.shared.error_title') }}</h2>
                 <div class="govuk-error-summary__body">
-                    <p>{{ $errorMessages[$status] ?? __('govuk_alpha_volunteering.safeguarding.error_generic') }}</p>
+                    <ul class="govuk-list govuk-error-summary__list">
+                        <li>
+                            @if ($errorSummaryAnchor)
+                                <a href="#{{ $errorSummaryAnchor }}">{{ $errorSummaryMessage }}</a>
+                            @else
+                                {{ $errorSummaryMessage }}
+                            @endif
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
