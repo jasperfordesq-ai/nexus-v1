@@ -78,4 +78,86 @@ class VolunteerWellbeingAlertPersistenceTest extends TestCase
             'status' => 'active',
         ]);
     }
+
+    /**
+     * Seed a recovered volunteer: one approved log dated today gives a stable
+     * hours trend and no engagement gap, so the recomputed risk score is 0 —
+     * below the 30-point alert threshold.
+     */
+    private function seedRecoveredVolunteer(): int
+    {
+        TenantContext::setById($this->testTenantId);
+        $user = User::factory()->forTenant($this->testTenantId)->create();
+
+        DB::table('vol_logs')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'organization_id' => null,
+            'date_logged' => now()->toDateString(),
+            'hours' => 2.0,
+            'status' => 'approved',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return (int) $user->id;
+    }
+
+    public function test_assessment_resolves_active_alert_when_user_recovers(): void
+    {
+        // VOL-BE-005: a recovered volunteer's stale active alert must be closed.
+        $userId = $this->seedRecoveredVolunteer();
+
+        DB::table('vol_wellbeing_alerts')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'risk_level' => 'critical',
+            'risk_score' => 75,
+            'indicators' => json_encode(['stale' => true]),
+            'coordinator_notified' => false,
+            'status' => 'active',
+            'created_at' => now()->subDays(60),
+            'updated_at' => now()->subDays(60),
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+        VolunteerWellbeingService::runTenantAssessment();
+
+        $this->assertDatabaseMissing('vol_wellbeing_alerts', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'status' => 'active',
+        ]);
+        $this->assertDatabaseHas('vol_wellbeing_alerts', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'status' => 'resolved',
+        ]);
+    }
+
+    public function test_assessment_keeps_active_alert_for_still_at_risk_user(): void
+    {
+        $userId = $this->seedAtRiskVolunteer(); // recomputes to score 35
+
+        DB::table('vol_wellbeing_alerts')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'risk_level' => 'moderate',
+            'risk_score' => 35,
+            'indicators' => json_encode([]),
+            'coordinator_notified' => false,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        TenantContext::setById($this->testTenantId);
+        VolunteerWellbeingService::runTenantAssessment();
+
+        $this->assertDatabaseHas('vol_wellbeing_alerts', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $userId,
+            'status' => 'active',
+        ]);
+    }
 }

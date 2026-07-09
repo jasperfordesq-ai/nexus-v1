@@ -306,6 +306,14 @@ class VolunteerWellbeingService
             $level = $assessment['risk_level'] ?? 'low';
             $riskBreakdown[$level] = ($riskBreakdown[$level] ?? 0) + 1;
 
+            // Recovered below the alert threshold: close any stale system-raised
+            // active alert. detectBurnoutRisk only ever WRITES alerts (score >= 30);
+            // without this reconciliation a recovered volunteer keeps an 'active'
+            // alert carrying old score/indicators forever.
+            if ((int) ($assessment['risk_score'] ?? 0) < 30) {
+                self::resolveRecoveredAlert($tenantId, (int) $userId);
+            }
+
             if (in_array($level, ['moderate', 'high', 'critical'], true)) {
                 // Fetch user name
                 $user = DB::table('users')
@@ -477,6 +485,31 @@ class VolunteerWellbeingService
         } catch (\Throwable $e) {
             // Non-critical — log but don't fail the assessment
             \Illuminate\Support\Facades\Log::warning("VolunteerWellbeingService::upsertAlert error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Auto-resolve a user's active wellbeing alert once their recomputed risk has
+     * dropped below the alert threshold. The daily assessment otherwise only ever
+     * writes alerts (score >= 30) and never clears them, so recovered volunteers
+     * keep a stale 'active' alert with old score/indicators indefinitely. Only
+     * system-raised 'active' alerts are auto-closed; coordinator-managed states
+     * (acknowledged/dismissed/resolved) are left untouched.
+     */
+    private static function resolveRecoveredAlert(int $tenantId, int $userId): void
+    {
+        try {
+            DB::table('vol_wellbeing_alerts')
+                ->where('tenant_id', $tenantId)
+                ->where('user_id', $userId)
+                ->where('status', 'active')
+                ->update([
+                    'status' => 'resolved',
+                    'resolved_at' => now(),
+                    'updated_at' => now(),
+                ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("VolunteerWellbeingService::resolveRecoveredAlert error: " . $e->getMessage());
         }
     }
 }
