@@ -307,7 +307,15 @@ export function ListingDetailPage() {
 
     try {
       setIsDeleting(true);
-      await api.delete(`/v2/listings/${listing.id}`);
+      const response = await api.delete(`/v2/listings/${listing.id}`);
+      // api.delete resolves { success: false } on 4xx (403/404/429/…) WITHOUT
+      // throwing, so the catch below never runs for a rejected delete. Without
+      // this check the user got a success toast and was navigated away while
+      // the listing still existed.
+      if (!response.success) {
+        toastRef.current.error(tRef.current('delete_error_title'), response.error || tRef.current('error_retry'));
+        return;
+      }
       toastRef.current.success(tRef.current('delete_success_title'));
       navigate(tenantPath('/listings'), { replace: true });
     } catch (err) {
@@ -360,6 +368,10 @@ export function ListingDetailPage() {
       if (response.success) {
         toastRef.current.success(tRef.current('renew_success'));
         loadListing(); // Reload to get updated data
+      } else {
+        // 4xx failures resolve with { success: false } instead of throwing —
+        // without this branch the spinner stopped silently with no feedback.
+        toastRef.current.error(tRef.current('renew_error'), response.error || tRef.current('error_retry'));
       }
     } catch (err) {
       logError('Failed to renew listing', err);

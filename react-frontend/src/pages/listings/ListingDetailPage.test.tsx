@@ -11,6 +11,11 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 
+// vi.hoisted so the react-router-dom factory (which runs as soon as
+// @/test/test-utils imports react-router-dom) can reference it without a
+// temporal-dead-zone crash.
+const { mockNavigate } = vi.hoisted(() => ({ mockNavigate: vi.fn() }));
+
 vi.mock('@/lib/api', () => ({
   api: {
     get: vi.fn(),
@@ -21,6 +26,7 @@ vi.mock('@/lib/api', () => ({
 }));
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts/ToastContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
@@ -89,7 +95,7 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useParams: () => ({ id: '1' }),
-    useNavigate: () => vi.fn(),
+    useNavigate: () => mockNavigate,
   };
 });
 
@@ -99,6 +105,20 @@ vi.mock('@/lib/motion', async () => {
 });
 
 vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
+
+// The delete confirmation flow needs the modal to actually mount its children
+// when opened. Stub the Modal wrapper (HeroUI portal/overlay plumbing is
+// irrelevant here) so isOpen deterministically controls rendering in jsdom.
+vi.mock('@/components/ui/Modal', () => ({
+  Modal: ({ isOpen, children }: { isOpen?: boolean; children?: React.ReactNode }) =>
+    isOpen ? <div role="dialog">{children}</div> : null,
+  ModalContent: ({ children }: { children?: React.ReactNode | ((onClose: () => void) => React.ReactNode) }) => (
+    <div>{typeof children === 'function' ? children(() => {}) : children}</div>
+  ),
+  ModalHeader: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
+  ModalBody: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
+  ModalFooter: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
+}));
 
 vi.mock('@/components/navigation', () => ({
   Breadcrumbs: ({ items }: { items: { label: string }[] }) => (
@@ -349,5 +369,112 @@ describe('ListingDetailPage', () => {
 
     await screen.findByTestId('empty-state');
     expect(screen.queryByRole('button', { name: /try again/i })).not.toBeInTheDocument();
+  });
+
+  describe('owner delete/renew failure handling (regression)', () => {
+    // Regression: api.delete/api.post resolve { success: false } on a 4xx
+    // (403/404/429/…) WITHOUT throwing, and the global error toast only fires
+    // on 5xx, so the catch blocks never ran for a rejected request. Before the
+    // fix, handleDelete discarded the api.delete result — showing the success
+    // toast and navigating away while the listing still existed — and
+    // handleRenew simply did nothing on failure (spinner stopped, no feedback).
+    let successToast: ReturnType<typeof vi.fn>;
+    let errorToast: ReturnType<typeof vi.fn>;
+
+    // Owner view (user 5 owns mockListing) with an expiring listing so the
+    // owner action bar renders the Delete and Extend buttons.
+    const ownedListing = { ...mockListing, expires_at: '2027-01-01T00:00:00Z' };
+
+    beforeEach(() => {
+      vi.mocked(useAuth).mockReturnValue({
+        user: { id: 5, first_name: 'Bob', name: 'Bob Smith' },
+        isAuthenticated: true,
+      });
+      successToast = vi.fn();
+      errorToast = vi.fn();
+      vi.mocked(useToast).mockReturnValue({ success: successToast, error: errorToast, info: vi.fn() });
+      api.get.mockImplementation((url: string) => {
+        if (url.includes('/config')) return Promise.resolve({ success: true, data: { exchange_workflow_enabled: true } });
+        if (url.includes('/check')) return Promise.resolve({ success: true, data: null });
+        return Promise.resolve({ success: true, data: ownedListing });
+      });
+    });
+
+    async function openDeleteConfirm() {
+      render(<ListingDetailPage />);
+      const deleteButton = await screen.findByRole('button', { name: 'Delete' });
+      fireEvent.click(deleteButton);
+      return await screen.findByRole('button', { name: 'Delete listing' });
+    }
+
+    it('shows the delete error toast and does NOT navigate when the delete fails', async () => {
+      api.delete.mockResolvedValue({ success: false, error: 'You do not have permission to delete this listing', code: 'HTTP_403' });
+
+      const confirmButton = await openDeleteConfirm();
+      fireEvent.click(confirmButton);
+
+      await waitFor(() => {
+        expect(api.delete).toHaveBeenCalledWith('/v2/listings/1');
+      });
+      await waitFor(() => {
+        expect(errorToast).toHaveBeenCalledWith('Failed to delete', 'You do not have permission to delete this listing');
+      });
+      expect(successToast).not.toHaveBeenCalled();
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it('falls back to the retry subtitle when the failed delete has no error detail', async () => {
+      api.delete.mockResolvedValue({ success: false });
+
+      const confirmButton = await openDeleteConfirm();
+      fireEvent.click(confirmButton);
+
+      await waitFor(() => {
+        expect(errorToast).toHaveBeenCalledWith('Failed to delete', 'Please try again later');
+      });
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it('still shows the success toast and navigates when the delete succeeds', async () => {
+      api.delete.mockResolvedValue({ success: true });
+
+      const confirmButton = await openDeleteConfirm();
+      fireEvent.click(confirmButton);
+
+      await waitFor(() => {
+        expect(successToast).toHaveBeenCalledWith('Listing deleted');
+      });
+      expect(mockNavigate).toHaveBeenCalledWith('/test/listings', { replace: true });
+      expect(errorToast).not.toHaveBeenCalled();
+    });
+
+    it('shows the renew error toast (with the API detail) when the renew fails', async () => {
+      api.post.mockResolvedValue({ success: false, error: 'Renewal limit reached', code: 'HTTP_429' });
+
+      render(<ListingDetailPage />);
+      const renewButton = await screen.findByRole('button', { name: 'Extend' });
+      fireEvent.click(renewButton);
+
+      await waitFor(() => {
+        expect(api.post).toHaveBeenCalledWith('/v2/listings/1/renew', {});
+      });
+      await waitFor(() => {
+        expect(errorToast).toHaveBeenCalledWith('Failed to renew listing', 'Renewal limit reached');
+      });
+      expect(successToast).not.toHaveBeenCalled();
+    });
+
+    it('falls back to the retry subtitle when the failed renew has no error detail', async () => {
+      api.post.mockResolvedValue({ success: false });
+
+      render(<ListingDetailPage />);
+      const renewButton = await screen.findByRole('button', { name: 'Extend' });
+      fireEvent.click(renewButton);
+
+      await waitFor(() => {
+        expect(errorToast).toHaveBeenCalledWith('Failed to renew listing', 'Please try again later');
+      });
+      expect(successToast).not.toHaveBeenCalled();
+    });
   });
 });

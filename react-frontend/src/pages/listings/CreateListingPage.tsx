@@ -278,12 +278,25 @@ export function CreateListingPage() {
         service_type: formData.service_type,
       };
 
+      // api.put/api.post resolve { success: false } on 4xx WITHOUT throwing (the
+      // global error toast only covers 5xx), so the catch below never runs for a
+      // rejected save. Check success explicitly and bail out — otherwise the user
+      // gets a false success toast and is navigated away while their listing was
+      // never created/updated. Returning here keeps the form state intact.
       let listingId = id;
       if (isEditing) {
-        await api.put(`/v2/listings/${id}`, payload);
+        const response = await api.put(`/v2/listings/${id}`, payload);
+        if (!response.success) {
+          toast.error(t('form.save_error_title'), response.error || t('form.save_error_subtitle'));
+          return;
+        }
       } else {
         const response = await api.post<{ id: number }>('/v2/listings', payload);
-        if (response.success && response.data) {
+        if (!response.success) {
+          toast.error(t('form.save_error_title'), response.error || t('form.save_error_subtitle'));
+          return;
+        }
+        if (response.data) {
           listingId = String(response.data.id);
         }
       }

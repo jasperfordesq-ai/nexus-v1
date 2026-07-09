@@ -11,6 +11,14 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 
+// vi.hoisted so the react-router-dom factory (which runs as soon as
+// @/test/test-utils imports react-router-dom) can reference these without a
+// temporal-dead-zone crash.
+const { mockNavigate, mockUseParams } = vi.hoisted(() => ({
+  mockNavigate: vi.fn(),
+  mockUseParams: vi.fn(() => ({ id: undefined as string | undefined })),
+}));
+
 vi.mock('@/lib/api', () => ({
   api: {
     get: vi.fn(),
@@ -21,6 +29,7 @@ vi.mock('@/lib/api', () => ({
   },
 }));
 import { api } from '@/lib/api';
+import { useToast, useTenant } from '@/contexts';
 
 vi.mock('@/contexts', () => ({
   useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() })),
@@ -67,8 +76,8 @@ vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useParams: () => ({ id: undefined }),
-    useNavigate: () => vi.fn(),
+    useParams: () => mockUseParams(),
+    useNavigate: () => mockNavigate,
   };
 });
 
@@ -105,6 +114,7 @@ const mockCategories = [
 describe('CreateListingPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseParams.mockReturnValue({ id: undefined });
     api.get.mockResolvedValue({ success: true, data: mockCategories });
     api.post.mockResolvedValue({ success: true, data: { id: 42 } });
     api.put.mockResolvedValue({ success: true });
@@ -190,6 +200,24 @@ describe('CreateListingPage', () => {
     // A synchronous useRef re-entry guard now blocks the second submit. The sibling
     // group form was live-verified (two POSTs → one); this guards the identical fix
     // on the listing form.
+    //
+    // The file-default useTenant mock sets 'listing.require_category': true, but
+    // this test never selects a category (the real Autocomplete can't be driven
+    // from jsdom), so validation blocked the submit and api.post was never
+    // called. Relax the category requirement so the submit reaches the API and
+    // the double-submit guard is actually exercised.
+    vi.mocked(useTenant).mockReturnValue({
+      tenant: { id: 2, slug: 'test' },
+      tenantPath: (p: string) => `/test${p}`,
+      hasFeature: vi.fn(() => true),
+      hasModule: vi.fn(() => true),
+      listingConfig: {
+        'listing.min_title_length': 5,
+        'listing.min_description_length': 20,
+        'listing.require_category': false,
+        'listing.require_hours_estimate': false,
+      },
+    });
     let resolvePost: (v: { success: boolean; data: { id: number } }) => void = () => {};
     api.post.mockReturnValue(new Promise((resolve) => { resolvePost = resolve; }));
 
@@ -213,5 +241,169 @@ describe('CreateListingPage', () => {
 
     resolvePost({ success: true, data: { id: 42 } });
     await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1));
+  });
+
+  describe('submit failure handling (regression)', () => {
+    // Regression: api.post/api.put resolve { success: false } on a 4xx WITHOUT
+    // throwing (the global error toast only fires on 5xx), so handleSubmit must
+    // check response.success itself. Before the fix, the edit path discarded the
+    // api.put result entirely and the create path only read response.data —
+    // both then showed the success toast and navigated away even though nothing
+    // was saved, silently losing the failure (and, on create, the user's input).
+    let successToast: ReturnType<typeof vi.fn>;
+    let errorToast: ReturnType<typeof vi.fn>;
+
+    beforeEach(() => {
+      successToast = vi.fn();
+      errorToast = vi.fn();
+      vi.mocked(useToast).mockReturnValue({
+        success: successToast,
+        error: errorToast,
+        info: vi.fn(),
+        warning: vi.fn(),
+      });
+      // Category optional here so a filled title + description passes
+      // validation and the submit reaches the API call under test.
+      vi.mocked(useTenant).mockReturnValue({
+        tenant: { id: 2, slug: 'test' },
+        tenantPath: (p: string) => `/test${p}`,
+        hasFeature: vi.fn(() => true),
+        hasModule: vi.fn(() => true),
+        listingConfig: {
+          'listing.min_title_length': 5,
+          'listing.min_description_length': 20,
+          'listing.require_category': false,
+          'listing.require_hours_estimate': false,
+        },
+      });
+    });
+
+    function fillAndSubmitCreateForm(container: HTMLElement) {
+      fireEvent.change(
+        screen.getByPlaceholderText(/grocery shopping/i),
+        { target: { value: 'Garden help offered locally' } },
+      );
+      fireEvent.change(
+        container.querySelector('textarea') as HTMLTextAreaElement,
+        { target: { value: 'I can help with weeding, planting and general garden maintenance.' } },
+      );
+      fireEvent.submit(container.querySelector('form') as HTMLFormElement);
+    }
+
+    it('shows an error toast and does not navigate when creation fails', async () => {
+      api.post.mockResolvedValue({ success: false, error: 'Listing limit reached', code: 'HTTP_422' });
+
+      const { container } = render(<CreateListingPage />);
+      await waitFor(() => screen.getByText(/Create New Listing/i));
+      fillAndSubmitCreateForm(container);
+
+      await waitFor(() => {
+        expect(api.post).toHaveBeenCalledWith('/v2/listings', expect.objectContaining({
+          title: 'Garden help offered locally',
+        }));
+      });
+      await waitFor(() => {
+        expect(errorToast).toHaveBeenCalledWith('Failed to save listing', 'Listing limit reached');
+      });
+      expect(successToast).not.toHaveBeenCalled();
+      expect(mockNavigate).not.toHaveBeenCalled();
+      // Early return: the tags/image sub-steps must not run after a failed create
+      expect(api.put).not.toHaveBeenCalled();
+      // Form state is preserved so the user's input isn't lost
+      expect(screen.getByDisplayValue('Garden help offered locally')).toBeInTheDocument();
+    });
+
+    it('falls back to the translated error subtitle when the API returns no error detail', async () => {
+      api.post.mockResolvedValue({ success: false });
+
+      const { container } = render(<CreateListingPage />);
+      await waitFor(() => screen.getByText(/Create New Listing/i));
+      fillAndSubmitCreateForm(container);
+
+      await waitFor(() => {
+        expect(errorToast).toHaveBeenCalledWith(
+          'Failed to save listing',
+          'Please check your information and try again.',
+        );
+      });
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it('still shows the success toast and navigates when creation succeeds', async () => {
+      const { container } = render(<CreateListingPage />);
+      await waitFor(() => screen.getByText(/Create New Listing/i));
+      fillAndSubmitCreateForm(container);
+
+      await waitFor(() => {
+        expect(successToast).toHaveBeenCalledWith('Listing created successfully');
+      });
+      expect(mockNavigate).toHaveBeenCalledWith('/test/listings/42');
+      expect(errorToast).not.toHaveBeenCalled();
+    });
+
+    describe('edit mode', () => {
+      const existingListing = {
+        id: 42,
+        title: 'Existing listing title',
+        description: 'A perfectly valid existing description for the listing.',
+        type: 'offer',
+        service_type: 'hybrid',
+        category_id: null,
+        hours_estimate: 2,
+        skill_tags: [],
+        image_url: null,
+      };
+
+      beforeEach(() => {
+        mockUseParams.mockReturnValue({ id: '42' });
+        api.get.mockImplementation((url: string) => {
+          if (url.includes('/v2/listings/42')) {
+            return Promise.resolve({ success: true, data: existingListing });
+          }
+          return Promise.resolve({ success: true, data: mockCategories });
+        });
+      });
+
+      it('shows an error toast and does not navigate when the update fails', async () => {
+        api.put.mockResolvedValue({ success: false, error: 'You cannot edit this listing', code: 'HTTP_403' });
+
+        const { container } = render(<CreateListingPage />);
+        await waitFor(() => {
+          expect(screen.getByDisplayValue('Existing listing title')).toBeInTheDocument();
+        });
+
+        fireEvent.submit(container.querySelector('form') as HTMLFormElement);
+
+        await waitFor(() => {
+          expect(api.put).toHaveBeenCalledWith('/v2/listings/42', expect.objectContaining({
+            title: 'Existing listing title',
+          }));
+        });
+        await waitFor(() => {
+          expect(errorToast).toHaveBeenCalledWith('Failed to save listing', 'You cannot edit this listing');
+        });
+        expect(successToast).not.toHaveBeenCalled();
+        expect(mockNavigate).not.toHaveBeenCalled();
+        // Early return: the tags PUT never fires after a failed update
+        expect(api.put).toHaveBeenCalledTimes(1);
+        // Form state (the user's edits) is preserved
+        expect(screen.getByDisplayValue('Existing listing title')).toBeInTheDocument();
+      });
+
+      it('still shows the success toast and navigates when the update succeeds', async () => {
+        const { container } = render(<CreateListingPage />);
+        await waitFor(() => {
+          expect(screen.getByDisplayValue('Existing listing title')).toBeInTheDocument();
+        });
+
+        fireEvent.submit(container.querySelector('form') as HTMLFormElement);
+
+        await waitFor(() => {
+          expect(successToast).toHaveBeenCalledWith('Listing updated successfully');
+        });
+        expect(mockNavigate).toHaveBeenCalledWith('/test/listings/42');
+        expect(errorToast).not.toHaveBeenCalled();
+      });
+    });
   });
 });
