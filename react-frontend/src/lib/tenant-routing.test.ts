@@ -8,6 +8,8 @@
  */
 
 import { describe, it, expect, afterEach } from 'vitest';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   RESERVED_SUBDOMAINS,
   RESERVED_PATHS,
@@ -73,9 +75,41 @@ describe('tenant-routing', () => {
         'courses', 'podcasts', 'coupons', 'clubs', 'me', 'municipality-calendar',
         'advertise', 'join', 'trust-and-safety', 'pilot-inquiry', 'pilot-apply',
         'developers', 'regional-analytics', 'partner-analytics', 'pricing',
+        'auth', 'users', 'premium', 'donations', 'verify-identity-optional',
       ]) {
         expect(RESERVED_PATHS.has(route)).toBe(true);
       }
+    });
+
+    // Completeness guard: derive the invariant from the router itself so a new
+    // top-level route can never ship unreserved again (this bug class has
+    // recurred: /saved, /courses, /premium). Every top-level literal route
+    // segment MUST be in RESERVED_PATHS.
+    it('reserves EVERY top-level literal route segment (router-derived)', () => {
+      const readRouteFile = (file: string): string => {
+        // Robust to vitest running from react-frontend/ or the repo root.
+        for (const base of ['src/routes', 'react-frontend/src/routes']) {
+          const p = resolve(process.cwd(), base, file);
+          if (existsSync(p)) return readFileSync(p, 'utf8');
+        }
+        throw new Error(`route file not found: ${file} (cwd=${process.cwd()})`);
+      };
+      const segs = new Set<string>();
+      for (const file of ['AppRoutes.tsx', 'PublicAppRoutes.tsx', 'AuthRoutes.tsx']) {
+        const src = readRouteFile(file);
+        for (const m of src.matchAll(/path="([^"]+)"/g)) {
+          const first = m[1].split('/').filter(Boolean)[0];
+          if (!first || first.startsWith(':') || first.startsWith('*')) continue;
+          segs.add(first.toLowerCase());
+        }
+      }
+      const missing = [...segs].filter((s) => !RESERVED_PATHS.has(s)).sort();
+      expect(
+        missing,
+        'Unreserved top-level route segments — add each to RESERVED_PATHS ' +
+          '(tenant-routing.ts) AND TenantContext::getReservedPaths() (PHP): ' +
+          missing.join(', '),
+      ).toEqual([]);
     });
 
     it('does not contain tenant slugs', () => {
@@ -94,6 +128,15 @@ describe('tenant-routing', () => {
 
     it('returns null for reserved path on localhost', () => {
       mockLocation('localhost', '/dashboard');
+      const result = detectTenantFromUrl();
+      expect(result.slug).toBeNull();
+      expect(result.source).toBeNull();
+    });
+
+    it('does not treat a reserved app route as a tenant slug on localhost', () => {
+      // Regression for localhost:5173/premium → bootstrap?slug=premium 404 →
+      // "Community not found". /premium is a real route, not a tenant.
+      mockLocation('localhost', '/premium');
       const result = detectTenantFromUrl();
       expect(result.slug).toBeNull();
       expect(result.source).toBeNull();

@@ -518,10 +518,11 @@ class TenantContext
         return [
             // Auth & session
             'login', 'register', 'logout', 'password', 'verify-email', 'verify-identity',
-            'consent-required', 'consent',
+            'verify-identity-optional', 'auth', 'consent-required', 'consent',
             // Core app routes
             'dashboard', 'feed', 'listings', 'messages', 'compose', 'notifications',
             'wallet', 'profile', 'settings', 'members', 'connections', 'saved',
+            'users', 'premium', 'donations',
             // Feature modules
             'events', 'groups', 'community-groups', 'volunteering', 'organisations',
             'federation', 'blog', 'resources', 'polls', 'goals', 'reviews',
