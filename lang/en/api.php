@@ -1500,6 +1500,8 @@ return [
     'group_exchange_user_role_required'    => 'user_id and role are required',
     'group_exchange_participant_failed'    => 'Failed to add participant (may already exist)',
     'group_exchange_organizer_complete_only' => 'Only the organizer can complete',
+    'group_exchange_cannot_start'           => 'This exchange cannot be started from its current status.',
+    'group_exchange_start_needs_participants' => 'An exchange needs at least one provider and one receiver before it can start.',
     'group_collection_not_found'        => 'Collection not found',
     'group_exchange_forbidden'          => 'You do not have permission to view this exchange',
     'group_exchange_participant_required' => 'You must be a participant in this exchange',

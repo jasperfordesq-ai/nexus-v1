@@ -61,6 +61,8 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
+  resolveThumbnailUrl: vi.fn((url) => url || null),
+  cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -124,14 +126,11 @@ describe('GroupExchangeDetailPage', () => {
   });
 
   it('shows an error toast (not a fake success) when an action request fails', async () => {
-    // Regression: handleUpdateStatus/handleConfirm/handleCancel did `await api.X(...)`
-    // WITHOUT capturing the response, then unconditionally showed a success toast and
-    // reloaded/navigated. Since api.X resolves { success: false } on a 4xx without
-    // throwing, a failed action reported a fake success — and a failed cancel even
-    // navigated away as if the exchange was gone. Here we exercise the "Start Exchange"
-    // (handleUpdateStatus) path; the cancel path was additionally live-verified on a
-    // real exchange (failed cancel now shows the error and stays on the page).
-    api.put.mockResolvedValue({ success: false, error: 'Not allowed' } as never);
+    // Regression: handlers did `await api.X(...)` WITHOUT capturing the response,
+    // then unconditionally showed a success toast and reloaded/navigated. Since
+    // api.X resolves { success: false } on a 4xx without throwing, a failed action
+    // reported a fake success. Here we exercise the "Start Exchange" path.
+    api.post.mockResolvedValue({ success: false, error: 'Not allowed' } as never);
 
     render(<GroupExchangeDetailPage />);
     const startBtn = await screen.findByRole('button', { name: /start/i });
@@ -139,6 +138,41 @@ describe('GroupExchangeDetailPage', () => {
 
     await waitFor(() => expect(toastErrorSpy).toHaveBeenCalled());
     expect(toastSuccessSpy).not.toHaveBeenCalled();
+  });
+
+  it('Start Exchange hits the dedicated /start action endpoint', async () => {
+    // Regression F2: "Start" used to PUT {status}, which the update allow-list
+    // silently drops — the exchange was stuck in draft forever. It must POST to the
+    // dedicated /start action instead.
+    render(<GroupExchangeDetailPage />);
+    const startBtn = await screen.findByRole('button', { name: /start/i });
+    fireEvent.click(startBtn);
+
+    await waitFor(() => expect(api.post).toHaveBeenCalled());
+    expect(vi.mocked(api.post).mock.calls[0][0]).toMatch(/\/group-exchanges\/1\/start$/);
+    // status transitions never go through PUT.
+    expect(api.put).not.toHaveBeenCalled();
+  });
+
+  it('renders the hour-split breakdown from a flat calculated_split list', async () => {
+    // Regression F5: the page expected a nested provider→receiver map, but the
+    // backend returns a flat per-participant list — the old code rendered garbage.
+    api.get.mockResolvedValue({
+      success: true,
+      data: {
+        ...mockGroupExchange,
+        calculated_split: [
+          { user_id: 1, role: 'provider', hours: 3 },
+          { user_id: 2, role: 'receiver', hours: 3 },
+        ],
+      },
+    });
+
+    render(<GroupExchangeDetailPage />);
+    // The "Hour Split" section only renders when buildSplitRows() returns rows.
+    await waitFor(() => {
+      expect(screen.getByText('Hour Split')).toBeInTheDocument();
+    });
   });
 
   it('shows loading screen initially', () => {

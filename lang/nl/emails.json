@@ -1,4 +1,11 @@
 {
+  "group_exchange": {
+    "start_subject": "Bevestig je uren: {{title}}",
+    "start_title": "Tijd om te bevestigen",
+    "view_exchange": "Uitwisseling bekijken",
+    "completed_subject": "Groepsuitwisseling voltooid: {{title}}",
+    "completed_title": "Uitwisseling voltooid"
+  },
   "gdpr_request": {
     "subject": "We hebben je gegevensverzoek ontvangen",
     "title": "Verzoek ontvangen",

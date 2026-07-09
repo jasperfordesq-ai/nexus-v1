@@ -73,8 +73,10 @@ class GroupExchangeService
                     ->where('u.tenant_id', '=', $tenantId);
             })
             ->where('p.group_exchange_id', $id)
+            ->orderBy('p.id')
             ->select([
                 'p.id as participant_id',
+                'p.group_exchange_id',
                 'p.user_id',
                 'p.role',
                 'p.hours',
@@ -86,38 +88,63 @@ class GroupExchangeService
                 'u.first_name',
                 'u.last_name',
                 'u.avatar_url',
+                'u.email',
             ])
             ->get();
 
-        $participantList = $participants->map(fn ($p) => [
-            'id'           => (int) $p->participant_id,
-            'user_id'      => (int) $p->user_id,
-            'name'         => trim(($p->first_name ?? '') . ' ' . ($p->last_name ?? '')),
-            'avatar_url'   => $p->avatar_url,
-            'role'         => $p->role,
-            'hours'        => (float) $p->hours,
-            'weight'       => (float) $p->weight,
-            'confirmed'    => (bool) $p->confirmed,
-            'confirmed_at' => $p->confirmed_at,
-            'notes'        => $p->notes,
-        ])->all();
+        // The React detail page reads user_name / user_avatar / user_email. Keep the
+        // legacy name / avatar_url keys too so any other consumer is unaffected.
+        $participantList = $participants->map(function ($p) {
+            $fullName = trim(($p->first_name ?? '') . ' ' . ($p->last_name ?? ''));
+
+            return [
+                'id'                => (int) $p->participant_id,
+                'group_exchange_id' => (int) $p->group_exchange_id,
+                'user_id'           => (int) $p->user_id,
+                'name'              => $fullName,
+                'user_name'         => $fullName,
+                'avatar_url'        => $p->avatar_url,
+                'user_avatar'       => $p->avatar_url,
+                'user_email'        => $p->email,
+                'role'              => $p->role,
+                'hours'             => (float) $p->hours,
+                'weight'            => (float) $p->weight,
+                'confirmed'         => (bool) $p->confirmed,
+                'confirmed_at'      => $p->confirmed_at,
+                'notes'             => $p->notes,
+                'created_at'        => $p->created_at,
+            ];
+        })->all();
+
+        $organizer = DB::table('users')
+            ->where('id', $exchange->organizer_id)
+            ->where('tenant_id', $tenantId)
+            ->select(['first_name', 'last_name', 'avatar_url'])
+            ->first();
+
+        $organizerName = $organizer
+            ? trim(($organizer->first_name ?? '') . ' ' . ($organizer->last_name ?? ''))
+            : '';
 
         return [
-            'id'            => (int) $exchange->id,
-            'tenant_id'     => (int) $exchange->tenant_id,
-            'title'         => $exchange->title,
-            'description'   => $exchange->description,
-            'organizer_id'  => (int) $exchange->organizer_id,
-            'listing_id'    => $exchange->listing_id ? (int) $exchange->listing_id : null,
-            'status'        => $exchange->status,
-            'split_type'    => $exchange->split_type,
-            'total_hours'   => (float) $exchange->total_hours,
-            'broker_id'     => $exchange->broker_id ? (int) $exchange->broker_id : null,
-            'broker_notes'  => $exchange->broker_notes,
-            'completed_at'  => $exchange->completed_at,
-            'created_at'    => $exchange->created_at,
-            'updated_at'    => $exchange->updated_at,
-            'participants'  => $participantList,
+            'id'                => (int) $exchange->id,
+            'tenant_id'         => (int) $exchange->tenant_id,
+            'title'             => $exchange->title,
+            'description'       => $exchange->description,
+            'organizer_id'      => (int) $exchange->organizer_id,
+            'organizer_name'    => $organizerName,
+            'organizer_avatar'  => $organizer->avatar_url ?? null,
+            'listing_id'        => $exchange->listing_id ? (int) $exchange->listing_id : null,
+            'status'            => $exchange->status,
+            'split_type'        => $exchange->split_type,
+            'total_hours'       => (float) $exchange->total_hours,
+            'broker_id'         => $exchange->broker_id ? (int) $exchange->broker_id : null,
+            'broker_notes'      => $exchange->broker_notes,
+            'completed_at'      => $exchange->completed_at,
+            'created_at'        => $exchange->created_at,
+            'updated_at'        => $exchange->updated_at,
+            'participant_count' => count($participantList),
+            'participants'      => $participantList,
         ];
     }
 
@@ -133,6 +160,10 @@ class GroupExchangeService
         $offset = (int) ($filters['offset'] ?? 0);
 
         $query = DB::table('group_exchanges as e')
+            ->leftJoin('users as org', function ($join) use ($tenantId) {
+                $join->on('org.id', '=', 'e.organizer_id')
+                    ->where('org.tenant_id', '=', $tenantId);
+            })
             ->where('e.tenant_id', $tenantId)
             ->where(function ($q) use ($userId) {
                 $q->where('e.organizer_id', $userId)
@@ -142,7 +173,23 @@ class GroupExchangeService
                           ->whereColumn('group_exchange_participants.group_exchange_id', 'e.id')
                           ->where('group_exchange_participants.user_id', $userId);
                   });
-            });
+            })
+            ->select([
+                'e.id',
+                'e.title',
+                'e.description',
+                'e.organizer_id',
+                'e.status',
+                'e.split_type',
+                'e.total_hours',
+                'e.created_at',
+                'e.updated_at',
+                'e.completed_at',
+                'org.first_name as organizer_first_name',
+                'org.last_name as organizer_last_name',
+                'org.avatar_url as organizer_avatar',
+                DB::raw('(SELECT COUNT(*) FROM group_exchange_participants gp WHERE gp.group_exchange_id = e.id) as participant_count'),
+            ]);
 
         if (! empty($filters['status'])) {
             $query->where('e.status', $filters['status']);
@@ -158,15 +205,19 @@ class GroupExchangeService
         }
 
         $items = $exchanges->map(fn ($e) => [
-            'id'           => (int) $e->id,
-            'title'        => $e->title,
-            'description'  => $e->description,
-            'organizer_id' => (int) $e->organizer_id,
-            'status'       => $e->status,
-            'split_type'   => $e->split_type,
-            'total_hours'  => (float) $e->total_hours,
-            'created_at'   => $e->created_at,
-            'updated_at'   => $e->updated_at,
+            'id'                => (int) $e->id,
+            'title'             => $e->title,
+            'description'       => $e->description,
+            'organizer_id'      => (int) $e->organizer_id,
+            'organizer_name'    => trim(($e->organizer_first_name ?? '') . ' ' . ($e->organizer_last_name ?? '')),
+            'organizer_avatar'  => $e->organizer_avatar,
+            'status'            => $e->status,
+            'split_type'        => $e->split_type,
+            'total_hours'       => (float) $e->total_hours,
+            'participant_count' => (int) $e->participant_count,
+            'created_at'        => $e->created_at,
+            'updated_at'        => $e->updated_at,
+            'completed_at'      => $e->completed_at,
         ])->all();
 
         return [
@@ -439,6 +490,119 @@ class GroupExchangeService
     }
 
     /**
+     * Start an exchange: move it out of draft into pending_confirmation so
+     * participants can confirm. Requires at least one provider and one receiver.
+     *
+     * Status changes never go through update() (its allow-list excludes status on
+     * purpose); they flow through controlled transitions like this one, confirm(),
+     * complete() and cancel so the state machine stays well-defined.
+     *
+     * @return array{success: bool, error?: string}
+     */
+    public function start(int $exchangeId): array
+    {
+        $tenantId = TenantContext::getId();
+
+        $exchange = DB::table('group_exchanges')
+            ->where('id', $exchangeId)
+            ->where('tenant_id', $tenantId)
+            ->first();
+
+        if (! $exchange) {
+            return ['success' => false, 'error' => __('api.group_exchange_not_found')];
+        }
+
+        if (! in_array($exchange->status, ['draft', 'pending_participants'], true)) {
+            return ['success' => false, 'error' => __('api.group_exchange_cannot_start')];
+        }
+
+        $roleCounts = DB::table('group_exchange_participants')
+            ->where('group_exchange_id', $exchangeId)
+            ->selectRaw("SUM(role = 'provider') as providers, SUM(role = 'receiver') as receivers")
+            ->first();
+
+        $providers = (int) ($roleCounts->providers ?? 0);
+        $receivers = (int) ($roleCounts->receivers ?? 0);
+
+        if ($providers < 1 || $receivers < 1) {
+            return ['success' => false, 'error' => __('api.group_exchange_start_needs_participants')];
+        }
+
+        $this->updateStatus($exchangeId, 'pending_confirmation');
+
+        // Bell + push each participant that the exchange is live and awaiting their
+        // confirmation. Fail-safe: a notification failure never unwinds the start.
+        $this->notifyParticipantsToConfirm($exchangeId, (string) $exchange->title, $tenantId);
+
+        return ['success' => true];
+    }
+
+    /**
+     * Notify every participant that an exchange has started and needs their
+     * confirmation. Mirrors notifyBalanceChanges(): each recipient is belled +
+     * pushed in their OWN preferred_language, deduped so a user added as both
+     * provider and receiver only gets one prompt, and every failure is swallowed
+     * so it can never unwind the already-committed status transition.
+     */
+    private function notifyParticipantsToConfirm(int $exchangeId, string $title, int $tenantId): void
+    {
+        $exchangeTitle = trim($title) !== '' ? $title : __('svc_notifications.group_exchange.fallback_title');
+        $link = '/group-exchanges/' . $exchangeId;
+
+        $recipients = DB::table('group_exchange_participants as p')
+            ->join('users as u', function ($join) use ($tenantId) {
+                $join->on('p.user_id', '=', 'u.id')
+                    ->where('u.tenant_id', '=', $tenantId);
+            })
+            ->where('p.group_exchange_id', $exchangeId)
+            ->select(['p.user_id', 'u.email', 'u.first_name', 'u.name', 'u.preferred_language'])
+            ->get()
+            ->unique('user_id');
+
+        foreach ($recipients as $recipient) {
+            try {
+                $userId = (int) $recipient->user_id;
+                if ($userId <= 0) {
+                    continue;
+                }
+
+                // Wrap INSIDE the per-recipient loop — bell, push AND email all render
+                // in the recipient's own locale, not the organizer's / worker's.
+                LocaleContext::withLocale($recipient, function () use ($userId, $recipient, $exchangeId, $exchangeTitle, $link, $tenantId) {
+                    $message = __('svc_notifications.group_exchange.needs_confirmation', ['title' => $exchangeTitle]);
+
+                    Notification::createNotification($userId, $message, $link, 'group_exchange');
+                    \App\Services\NotificationDispatcher::fanOutPush($userId, 'group_exchange', $message, $link);
+
+                    // Force-instant transactional email (sent directly, bypassing the
+                    // digest queue; respects an explicit email_transactions opt-out).
+                    // Body reuses the bell string so the channels stay identical.
+                    $recipientName = $recipient->first_name ?: ($recipient->name ?: __('emails.common.fallback_name'));
+                    $this->sendExchangeEmail(
+                        $recipient,
+                        __('emails.group_exchange.start_subject', ['title' => $exchangeTitle]),
+                        $this->buildExchangeEmail(
+                            (string) $recipientName,
+                            __('emails.group_exchange.start_title'),
+                            $message,
+                            __('emails.group_exchange.view_exchange'),
+                            $this->frontendUrl($link),
+                            'indigo'
+                        ),
+                        $tenantId
+                    );
+                });
+            } catch (\Throwable $e) {
+                Log::warning('[GroupExchange] start notification failed (continuing)', [
+                    'exchange_id' => $exchangeId,
+                    'user_id'     => $recipient->user_id ?? null,
+                    'error'       => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    /**
      * Confirm a user's participation in an exchange.
      */
     public function confirmParticipation(int $exchangeId, int $userId): bool
@@ -626,16 +790,16 @@ class GroupExchangeService
                 $recipient = DB::table('users')
                     ->where('id', $userId)
                     ->where('tenant_id', $tenantId)
-                    ->select(['id', 'preferred_language'])
+                    ->select(['id', 'email', 'first_name', 'name', 'preferred_language'])
                     ->first();
 
                 if (! $recipient) {
                     continue;
                 }
 
-                // Wrap INSIDE the per-recipient loop — each message renders in the
-                // recipient's own locale.
-                LocaleContext::withLocale($recipient, function () use ($userId, $isProvider, $hours, $exchangeTitle) {
+                // Wrap INSIDE the per-recipient loop — bell, push AND email render in
+                // the recipient's own locale.
+                LocaleContext::withLocale($recipient, function () use ($userId, $recipient, $isProvider, $hours, $exchangeTitle, $tenantId) {
                     $message = $isProvider
                         ? __('svc_notifications.group_exchange.completed_credit', ['hours' => $hours, 'title' => $exchangeTitle])
                         : __('svc_notifications.group_exchange.completed_debit', ['hours' => $hours, 'title' => $exchangeTitle]);
@@ -649,6 +813,23 @@ class GroupExchangeService
                         'transaction'
                     );
                     \App\Services\NotificationDispatcher::fanOutPush((int) ($userId), 'transaction', $message, '/wallet');
+
+                    // Force-instant transactional email — same wording as the bell,
+                    // credit (emerald) vs debit (amber) accent, links to the wallet.
+                    $recipientName = $recipient->first_name ?: ($recipient->name ?: __('emails.common.fallback_name'));
+                    $this->sendExchangeEmail(
+                        $recipient,
+                        __('emails.group_exchange.completed_subject', ['title' => $exchangeTitle]),
+                        $this->buildExchangeEmail(
+                            (string) $recipientName,
+                            __('emails.group_exchange.completed_title'),
+                            $message,
+                            __('emails.notification.view_wallet'),
+                            $this->frontendUrl('/wallet'),
+                            $isProvider ? 'emerald' : 'amber'
+                        ),
+                        $tenantId
+                    );
                 });
             } catch (\Throwable $e) {
                 // A bell failure must never unwind or mask the committed transfer.
@@ -659,5 +840,121 @@ class GroupExchangeService
                 ]);
             }
         }
+    }
+
+    /**
+     * Build an absolute frontend URL for a relative app path, in the current
+     * tenant's context (custom domain + slug prefix).
+     */
+    private function frontendUrl(string $path): string
+    {
+        return TenantContext::getFrontendUrl() . TenantContext::getSlugPrefix() . $path;
+    }
+
+    /**
+     * Send a group-exchange email to a recipient unless they have opted out of
+     * transaction emails. Sent directly (not via the digest queue) so it is
+     * effectively "instant", and fail-safe so a mail error never unwinds the
+     * already-committed status/balance change. MUST be called inside the
+     * recipient's LocaleContext so any fallback strings render in their language.
+     *
+     * @param object $recipient row carrying at least ->email and ->user_id|->id
+     */
+    private function sendExchangeEmail(object $recipient, string $subject, string $htmlBody, int $tenantId): void
+    {
+        try {
+            $email = $recipient->email ?? null;
+            if (empty($email)) {
+                return;
+            }
+
+            $userId = (int) ($recipient->user_id ?? $recipient->id ?? 0);
+
+            // Respect an explicit transaction-email opt-out (default on). A lookup
+            // failure is non-fatal — we fall through and send the transactional mail.
+            try {
+                $prefs = \App\Models\User::getNotificationPreferences($userId);
+                if (! (bool) ($prefs['email_transactions'] ?? true)) {
+                    return;
+                }
+            } catch (\Throwable $prefError) {
+                Log::debug('[GroupExchange] email_transactions pref lookup failed', [
+                    'user_id' => $userId,
+                    'error'   => $prefError->getMessage(),
+                ]);
+            }
+
+            \App\Services\EmailDispatchService::sendRaw(
+                (string) $email,
+                $subject,
+                $htmlBody,
+                null,
+                null,
+                null,
+                'transaction',
+                ['tenant_id' => $tenantId, 'source' => 'GroupExchangeService']
+            );
+        } catch (\Throwable $e) {
+            Log::warning('[GroupExchange] email send failed (continuing)', [
+                'user_id' => $recipient->user_id ?? $recipient->id ?? null,
+                'error'   => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Build a self-contained HTML email in the platform's notification style.
+     * $accent picks the header gradient / button colour: indigo (start), emerald
+     * (credit) or amber (debit). Body text is a pre-translated string that may
+     * contain user data (the exchange title) so it is HTML-escaped here.
+     */
+    private function buildExchangeEmail(string $recipientName, string $title, string $bodyText, string $ctaText, string $ctaUrl, string $accent): string
+    {
+        $gradients = [
+            'indigo'  => 'linear-gradient(135deg,#6366f1,#8b5cf6)',
+            'emerald' => 'linear-gradient(135deg,#10b981,#059669)',
+            'amber'   => 'linear-gradient(135deg,#f59e0b,#d97706)',
+        ];
+        $buttons = [
+            'indigo'  => '#6366f1',
+            'emerald' => '#10b981',
+            'amber'   => '#d97706',
+        ];
+        $gradient = $gradients[$accent] ?? $gradients['indigo'];
+        $button = $buttons[$accent] ?? $buttons['indigo'];
+
+        $tenantName = htmlspecialchars((string) TenantContext::getSetting('site_name', __('emails.common.platform_name')));
+        $greeting = __('emails.common.greeting', ['name' => htmlspecialchars($recipientName)]);
+        $footer = __('emails.footer.sent_by', ['community' => $tenantName]);
+
+        $safeTitle = htmlspecialchars($title);
+        $safeBody = htmlspecialchars($bodyText);
+        $safeCta = htmlspecialchars($ctaText);
+        $safeUrl = htmlspecialchars($ctaUrl, ENT_QUOTES);
+
+        return <<<HTML
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f4f4f5;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:24px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+  <tr><td style="background:{$gradient};padding:32px;text-align:center;">
+    <h1 style="margin:0;color:#fff;font-size:24px;">{$safeTitle}</h1>
+  </td></tr>
+  <tr><td style="padding:32px;">
+    <p style="margin:0 0 16px;font-size:16px;color:#374151;">{$greeting}</p>
+    <p style="margin:0 0 24px;font-size:16px;color:#374151;line-height:1.6;">{$safeBody}</p>
+    <div style="text-align:center;margin:28px 0;">
+      <a href="{$safeUrl}" style="display:inline-block;padding:14px 32px;background:{$button};color:#fff;text-decoration:none;border-radius:8px;font-weight:600;font-size:16px;">{$safeCta}</a>
+    </div>
+  </td></tr>
+  <tr><td style="padding:16px 32px;background:#f9fafb;border-top:1px solid #e5e7eb;text-align:center;">
+    <p style="margin:0;font-size:12px;color:#9ca3af;">{$footer}</p>
+  </td></tr>
+</table>
+</td></tr></table>
+</body></html>
+HTML;
     }
 }

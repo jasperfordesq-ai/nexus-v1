@@ -153,6 +153,8 @@
     "weight_suffix": "x"
   },
   "toast": {
+    "exchange_started": "Exchange started",
+    "start_failed": "Failed to start exchange",
     "load_more_failed": "Failed to load more exchanges",
     "exchange_updated": "Exchange updated",
     "update_failed": "Failed to update exchange",

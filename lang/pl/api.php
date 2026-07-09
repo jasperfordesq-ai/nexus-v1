@@ -914,6 +914,8 @@ return [
     'group_exchange_user_role_required' => 'user_id and role are required',
     'group_exchange_participant_failed' => 'Failed to add participant (may already exist)',
     'group_exchange_organizer_complete_only' => 'Only the organizer can complete',
+    'group_exchange_cannot_start'           => 'Tej wymiany nie można rozpocząć z jej bieżącego statusu.',
+    'group_exchange_start_needs_participants' => 'Wymiana wymaga co najmniej jednego dostawcy i jednego odbiorcy, zanim będzie można ją rozpocząć.',
     'goal_private' => 'This goal is private',
     'goal_not_found_or_not_owned' => 'Goal not found or not owned',
     'goal_increment_required' => 'Increment value is required',

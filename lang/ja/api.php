@@ -914,6 +914,8 @@ return [
     'group_exchange_user_role_required' => 'user_id and role are required',
     'group_exchange_participant_failed' => 'Failed to add participant (may already exist)',
     'group_exchange_organizer_complete_only' => 'Only the organizer can complete',
+    'group_exchange_cannot_start'           => 'この交換は現在のステータスからは開始できません。',
+    'group_exchange_start_needs_participants' => '交換を開始するには、少なくとも1名の提供者と1名の受領者が必要です。',
     'goal_private' => 'This goal is private',
     'goal_not_found_or_not_owned' => 'Goal not found or not owned',
     'goal_increment_required' => 'Increment value is required',

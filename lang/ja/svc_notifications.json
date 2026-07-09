@@ -139,6 +139,7 @@
     "reminder_push_message": "目標を忘れずに：「{{title}}」"
   },
   "group_exchange": {
+    "needs_confirmation": "グループ交換「{{title}}」が開始され、あなたの時間の確認を待っています。",
     "completed_credit": "完了した交換「{{title}}」から{{hours}}時間クレジットを獲得しました。",
     "completed_debit": "完了した交換「{{title}}」のため、残高から{{hours}}時間クレジットが引き落とされました。",
     "fallback_title": "グループ交換"

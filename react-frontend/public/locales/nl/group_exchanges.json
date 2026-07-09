@@ -151,6 +151,8 @@
     "weight_suffix": "X"
   },
   "toast": {
+    "exchange_started": "Uitwisseling gestart",
+    "start_failed": "Kan uitwisseling niet starten",
     "load_more_failed": "Kon meer uitwisselingen niet laden",
     "exchange_updated": "Uitwisseling bijgewerkt",
     "update_failed": "Kon uitwisseling niet bijwerken",

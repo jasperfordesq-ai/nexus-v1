@@ -179,7 +179,9 @@ export function CreateGroupExchangePage() {
     const timeout = setTimeout(async () => {
       try {
         setIsSearching(true);
-        const response = await api.get<{ data: SearchResult[] }>(`/v2/users?search=${encodeURIComponent(value.trim())}&limit=10`);
+        // The member directory filters on the `q` param (not `search`); sending the
+        // wrong name returned an unfiltered member list regardless of what was typed.
+        const response = await api.get<{ data: SearchResult[] }>(`/v2/users?q=${encodeURIComponent(value.trim())}&limit=10`);
 
         if (response.success && response.data) {
           const results = Array.isArray(response.data) ? response.data : [];
@@ -594,71 +596,79 @@ export function CreateGroupExchangePage() {
                   {t('create.add_participants_desc')}
                 </p>
 
-                <div className="relative">
-                  <SearchField
-                    placeholder={t('detail.search_members_placeholder')}
-                    value={searchQuery}
-                    onValueChange={handleSearchChange}
-                    startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
-                    endContent={isSearching ? <span role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })}><Spinner size="sm" /></span> : null}
-                    classNames={inputClassNames}
-                    aria-label={t('detail.search_members_aria')}
-                  />
+                <SearchField
+                  placeholder={t('detail.search_members_placeholder')}
+                  value={searchQuery}
+                  onValueChange={handleSearchChange}
+                  startContent={<Search className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
+                  endContent={isSearching ? <span role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })}><Spinner size="sm" /></span> : null}
+                  classNames={inputClassNames}
+                  aria-label={t('detail.search_members_aria')}
+                />
 
-                  {/* Search Results Dropdown */}
-                  {searchResults.length > 0 && (
-                    <div className="absolute z-50 mt-2 w-full rounded-xl border border-glass-border bg-theme-surface/95 backdrop-blur-xl shadow-lg shadow-black/10 dark:shadow-black/30 overflow-hidden max-h-72 overflow-y-auto">
-                      {searchResults.map((result, index) => {
-                        const displayName = result.name || [result.first_name, result.last_name].filter(Boolean).join(' ') || 'Unknown';
-                        return (
-                          <div
-                            key={result.id}
-                            className={`flex items-center justify-between p-3 hover:bg-theme-hover transition-colors ${
-                              index < searchResults.length - 1 ? 'border-b border-glass-border/50' : ''
-                            }`}
-                          >
-                            <div className="flex items-center gap-3 min-w-0 flex-1">
-                              <Avatar
-                                src={resolveAvatarUrl(result.avatar_url || result.avatar)}
-                                name={displayName}
-                                size="sm"
-                                className="shrink-0"
-                              />
-                              <div className="min-w-0">
-                                <p className="font-medium text-theme-primary text-sm truncate">{displayName}</p>
-                                {result.email && (
-                                  <p className="text-xs text-theme-subtle truncate">{result.email}</p>
-                                )}
+                {/*
+                  Results render INLINE in normal document flow — not an absolutely
+                  positioned overlay. The old dropdown floated out of flow, so when the
+                  search box sat low in the viewport the list fell below the fold with
+                  no way to scroll to it (only the tops of the role buttons peeked out).
+                  In-flow results grow the card and let the page scroll naturally.
+                */}
+                {searchQuery.trim().length >= 2 && (
+                  <div className="mt-4" role="region" aria-label={t('detail.search_members_aria')}>
+                    {searchResults.length > 0 ? (
+                      <div className="max-h-96 overflow-y-auto rounded-xl border border-theme-default divide-y divide-theme-default/60">
+                        {searchResults.map((result) => {
+                          const displayName = result.name || [result.first_name, result.last_name].filter(Boolean).join(' ') || 'Unknown';
+                          return (
+                            <div
+                              key={result.id}
+                              className="flex flex-wrap items-center justify-between gap-3 p-3 hover:bg-theme-hover transition-colors"
+                            >
+                              <div className="flex items-center gap-3 min-w-0 flex-1">
+                                <Avatar
+                                  src={resolveAvatarUrl(result.avatar_url || result.avatar)}
+                                  name={displayName}
+                                  size="sm"
+                                  className="shrink-0"
+                                />
+                                <div className="min-w-0">
+                                  <p className="font-medium text-theme-primary text-sm truncate">{displayName}</p>
+                                  {result.email && (
+                                    <p className="text-xs text-theme-subtle truncate">{result.email}</p>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex gap-2 shrink-0">
+                                <Button
+                                  size="sm"
+                                  variant="flat"
+                                  className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-400"
+                                  onPress={() => addParticipant(result, 'provider')}
+                                  startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
+                                >
+                                  {t('detail.role_provider')}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="flat"
+                                  className="bg-amber-500/20 text-amber-700 dark:text-amber-400"
+                                  onPress={() => addParticipant(result, 'receiver')}
+                                  startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
+                                >
+                                  {t('detail.role_receiver')}
+                                </Button>
                               </div>
                             </div>
-                            <div className="flex gap-2 shrink-0 ml-2">
-                              <Button
-                                size="sm"
-                                variant="flat"
-                                className="bg-emerald-500/20 text-emerald-400 min-w-0"
-                                onPress={() => addParticipant(result, 'provider')}
-                                startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
-                              >
-                                <span className="hidden sm:inline">{t('detail.role_provider')}</span>
-                                <span className="sm:hidden">P</span>
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="flat"
-                                className="bg-amber-500/20 text-amber-400 min-w-0"
-                                onPress={() => addParticipant(result, 'receiver')}
-                                startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
-                              >
-                                <span className="hidden sm:inline">{t('detail.role_receiver')}</span>
-                                <span className="sm:hidden">R</span>
-                              </Button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
+                          );
+                        })}
+                      </div>
+                    ) : !isSearching ? (
+                      <p className="rounded-xl border border-theme-default bg-theme-elevated/50 p-4 text-center text-sm text-theme-muted">
+                        {t('detail.no_members_found')}
+                      </p>
+                    ) : null}
+                  </div>
+                )}
               </GlassCard>
 
               {/* Current Participants */}

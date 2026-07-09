@@ -1,4 +1,11 @@
 {
+  "group_exchange": {
+    "start_subject": "時間を確認してください: {{title}}",
+    "start_title": "確認をお願いします",
+    "view_exchange": "交換を確認する",
+    "completed_subject": "グループ交換が完了しました: {{title}}",
+    "completed_title": "交換が完了しました"
+  },
   "gdpr_request": {
     "subject": "データに関するリクエストを受け付けました",
     "title": "リクエストを受け付けました",

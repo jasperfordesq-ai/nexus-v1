@@ -151,6 +151,8 @@
     "weight_suffix": "×"
   },
   "toast": {
+    "exchange_started": "بدأ التبادل",
+    "start_failed": "فشل بدء التبادل",
     "load_more_failed": "فشل في تحميل المزيد من التبادلات",
     "exchange_updated": "تم تحديث التبادل",
     "update_failed": "فشل في تحديث التبادل",

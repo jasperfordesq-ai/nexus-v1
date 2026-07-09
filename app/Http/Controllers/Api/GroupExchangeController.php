@@ -35,8 +35,10 @@ class GroupExchangeController extends BaseApiController
 
         $result = $this->groupExchangeService->listForUser($userId, $filters);
 
-        return $this->respondWithData([
-            'data' => $result['items'],
+        // The collection MUST be the top-level `data` array (not nested under a
+        // second `data` key) — the React client unwraps one level, so a nested
+        // envelope makes every list read as empty. has_more travels in meta.
+        return $this->respondWithData($result['items'], [
             'has_more' => $result['has_more'],
         ]);
     }
@@ -204,6 +206,32 @@ class GroupExchangeController extends BaseApiController
         $this->groupExchangeService->removeParticipant((int) $id, (int) $userId);
 
         $updated = $this->groupExchangeService->get((int) $id);
+
+        return $this->respondWithData($updated);
+    }
+
+    /** POST /api/v2/group-exchanges/{id}/start */
+    public function start(int $id): JsonResponse
+    {
+        $userId = $this->requireAuth();
+
+        $exchange = $this->groupExchangeService->get($id);
+
+        if (!$exchange) {
+            return $this->respondWithError('NOT_FOUND', __('api.not_found', ['model' => 'Exchange']), null, 404);
+        }
+
+        if ((int) $exchange['organizer_id'] !== $userId) {
+            return $this->respondWithError('FORBIDDEN', __('api.organizer_only_update'), null, 403);
+        }
+
+        $result = $this->groupExchangeService->start($id);
+
+        if (!$result['success']) {
+            return $this->respondWithError('VALIDATION_ERROR', $result['error'], null, 400);
+        }
+
+        $updated = $this->groupExchangeService->get($id);
 
         return $this->respondWithData($updated);
     }

@@ -151,6 +151,8 @@
     "weight_suffix": "x"
   },
   "toast": {
+    "exchange_started": "Malartú tosaithe",
+    "start_failed": "Theip ar an malartú a thosú",
     "load_more_failed": "Theip ar thuilleadh malartuithe a lódáil",
     "exchange_updated": "Malartú nuashonraithe",
     "update_failed": "Theip ar an malartú a nuashonrú",

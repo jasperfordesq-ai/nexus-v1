@@ -6,113 +6,289 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
-use Tests\Laravel\TestCase;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Laravel\Sanctum\Sanctum;
 use App\Models\User;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\Sanctum;
+use Tests\Laravel\TestCase;
 
 /**
  * Feature tests for GroupExchangeController — group time exchanges.
+ *
+ * Covers the full end-to-end lifecycle over HTTP (create → list → show → start →
+ * confirm → complete → wallet), plus the response-contract regressions that made
+ * the whole module non-functional in production even though the old unit tests
+ * (which mocked an imagined contract) stayed green:
+ *   - index() double-nested the envelope, so the React list was ALWAYS empty.
+ *   - "Start" went through PUT {status}, which the update allow-list drops, so the
+ *     exchange was stuck in draft forever and could never be confirmed/completed.
+ *   - show()/list() omitted organizer_name + participant user_name, so names and
+ *     avatars rendered blank.
  */
 class GroupExchangeControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
+    private function makeUser(float $balance = 0.0): User
+    {
+        return User::factory()->forTenant($this->testTenantId)->create([
+            'status'      => 'active',
+            'is_approved' => true,
+            'balance'     => $balance,
+        ]);
+    }
+
     private function authenticatedUser(): User
     {
-        $user = User::factory()->forTenant($this->testTenantId)->create([
-            'status' => 'active',
-            'is_approved' => true,
-        ]);
-
+        $user = $this->makeUser();
         Sanctum::actingAs($user, ['*']);
 
         return $user;
     }
 
     // ------------------------------------------------------------------
-    //  GET /v2/group-exchanges
+    //  Auth guards
     // ------------------------------------------------------------------
 
     public function test_index_requires_auth(): void
     {
-        $response = $this->apiGet('/v2/group-exchanges');
-
-        $response->assertStatus(401);
+        $this->apiGet('/v2/group-exchanges')->assertStatus(401);
     }
-
-    public function test_index_returns_data(): void
-    {
-        $this->authenticatedUser();
-
-        $response = $this->apiGet('/v2/group-exchanges');
-
-        $response->assertStatus(200);
-    }
-
-    // ------------------------------------------------------------------
-    //  POST /v2/group-exchanges
-    // ------------------------------------------------------------------
 
     public function test_store_requires_auth(): void
     {
-        $response = $this->apiPost('/v2/group-exchanges', ['title' => 'Group session']);
-
-        $response->assertStatus(401);
+        $this->apiPost('/v2/group-exchanges', ['title' => 'Group session'])->assertStatus(401);
     }
-
-    // ------------------------------------------------------------------
-    //  GET /v2/group-exchanges/{id}
-    // ------------------------------------------------------------------
 
     public function test_show_requires_auth(): void
     {
-        $response = $this->apiGet('/v2/group-exchanges/1');
-
-        $response->assertStatus(401);
+        $this->apiGet('/v2/group-exchanges/1')->assertStatus(401);
     }
-
-    // ------------------------------------------------------------------
-    //  PUT /v2/group-exchanges/{id}
-    // ------------------------------------------------------------------
 
     public function test_update_requires_auth(): void
     {
-        $response = $this->apiPut('/v2/group-exchanges/1', ['title' => 'Updated']);
-
-        $response->assertStatus(401);
+        $this->apiPut('/v2/group-exchanges/1', ['title' => 'Updated'])->assertStatus(401);
     }
-
-    // ------------------------------------------------------------------
-    //  DELETE /v2/group-exchanges/{id}
-    // ------------------------------------------------------------------
 
     public function test_destroy_requires_auth(): void
     {
-        $response = $this->apiDelete('/v2/group-exchanges/1');
-
-        $response->assertStatus(401);
+        $this->apiDelete('/v2/group-exchanges/1')->assertStatus(401);
     }
 
-    // ------------------------------------------------------------------
-    //  POST /v2/group-exchanges/{id}/confirm
-    // ------------------------------------------------------------------
+    public function test_start_requires_auth(): void
+    {
+        $this->apiPost('/v2/group-exchanges/1/start')->assertStatus(401);
+    }
 
     public function test_confirm_requires_auth(): void
     {
-        $response = $this->apiPost('/v2/group-exchanges/1/confirm');
-
-        $response->assertStatus(401);
+        $this->apiPost('/v2/group-exchanges/1/confirm')->assertStatus(401);
     }
-
-    // ------------------------------------------------------------------
-    //  POST /v2/group-exchanges/{id}/complete
-    // ------------------------------------------------------------------
 
     public function test_complete_requires_auth(): void
     {
-        $response = $this->apiPost('/v2/group-exchanges/1/complete');
+        $this->apiPost('/v2/group-exchanges/1/complete')->assertStatus(401);
+    }
 
-        $response->assertStatus(401);
+    // ------------------------------------------------------------------
+    //  Store validation
+    // ------------------------------------------------------------------
+
+    public function test_store_requires_title_and_positive_hours(): void
+    {
+        $this->authenticatedUser();
+
+        $this->apiPost('/v2/group-exchanges', ['total_hours' => 5])->assertStatus(400);
+        $this->apiPost('/v2/group-exchanges', ['title' => 'No hours', 'total_hours' => 0])->assertStatus(400);
+    }
+
+    // ------------------------------------------------------------------
+    //  Response contract
+    // ------------------------------------------------------------------
+
+    public function test_index_returns_a_top_level_array_with_organizer_and_count(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $provider  = $this->makeUser();
+        $receiver  = $this->makeUser();
+
+        $id = $this->createExchange($organizer, $provider, $receiver);
+
+        $index = $this->apiGet('/v2/group-exchanges');
+        $index->assertStatus(200);
+
+        // Regression: data MUST be a flat array (was nested under data.data → the
+        // client unwrapped once and Array.isArray failed → list always empty).
+        $data = $index->json('data');
+        $this->assertIsArray($data);
+        $this->assertArrayNotHasKey('data', $data, 'list payload must not be double-nested');
+
+        $item = collect($data)->firstWhere('id', $id);
+        $this->assertNotNull($item, 'created exchange must appear in the list');
+        $this->assertArrayHasKey('organizer_name', $item);
+        $this->assertSame(2, $item['participant_count']);
+        $this->assertTrue($index->json('meta.has_more') === false || $index->json('meta.has_more') === null);
+    }
+
+    public function test_show_returns_frontend_field_names_and_flat_split(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $provider  = $this->makeUser();
+        $receiver  = $this->makeUser();
+
+        $id = $this->createExchange($organizer, $provider, $receiver);
+
+        $show = $this->apiGet("/v2/group-exchanges/{$id}");
+        $show->assertStatus(200);
+
+        $show->assertJsonPath('data.organizer_id', $organizer->id);
+        $this->assertNotEmpty($show->json('data.organizer_name'));
+
+        // Participants must expose user_name (the React detail page reads user_name,
+        // not name) and the split must be a flat per-participant list.
+        $this->assertArrayHasKey('user_name', $show->json('data.participants.0'));
+        $this->assertIsArray($show->json('data.calculated_split'));
+        $this->assertArrayHasKey('role', $show->json('data.calculated_split.0'));
+    }
+
+    // ------------------------------------------------------------------
+    //  Start transition (regression F2)
+    // ------------------------------------------------------------------
+
+    public function test_start_moves_draft_to_pending_confirmation(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $provider  = $this->makeUser();
+        $receiver  = $this->makeUser();
+
+        $id = $this->createExchange($organizer, $provider, $receiver);
+        $this->assertSame('draft', (string) DB::table('group_exchanges')->where('id', $id)->value('status'));
+
+        $start = $this->apiPost("/v2/group-exchanges/{$id}/start");
+        $start->assertStatus(200);
+        $start->assertJsonPath('data.status', 'pending_confirmation');
+
+        // Starting must notify each participant that they need to confirm.
+        foreach ([$provider->id, $receiver->id] as $participantId) {
+            $this->assertSame(
+                1,
+                (int) DB::table('notifications')
+                    ->where('user_id', $participantId)
+                    ->where('link', "/group-exchanges/{$id}")
+                    ->where('type', 'group_exchange')
+                    ->count(),
+                "participant {$participantId} should get a start/confirm notification"
+            );
+        }
+        // The organizer (not a participant) is not spammed.
+        $this->assertSame(0, (int) DB::table('notifications')
+            ->where('user_id', $organizer->id)
+            ->where('link', "/group-exchanges/{$id}")
+            ->count());
+    }
+
+    public function test_start_rejects_non_organizer(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $provider  = $this->makeUser();
+        $receiver  = $this->makeUser();
+        $id = $this->createExchange($organizer, $provider, $receiver);
+
+        Sanctum::actingAs($provider, ['*']);
+        $this->apiPost("/v2/group-exchanges/{$id}/start")->assertStatus(403);
+    }
+
+    public function test_start_requires_a_provider_and_a_receiver(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $provider  = $this->makeUser();
+
+        // Provider only — no receiver.
+        $create = $this->apiPost('/v2/group-exchanges', [
+            'title'        => 'Lopsided',
+            'total_hours'  => 4,
+            'split_type'   => 'equal',
+            'participants' => [
+                ['user_id' => $provider->id, 'role' => 'provider'],
+            ],
+        ]);
+        $create->assertStatus(201);
+        $id = $create->json('data.id');
+
+        $this->apiPost("/v2/group-exchanges/{$id}/start")->assertStatus(400);
+    }
+
+    // ------------------------------------------------------------------
+    //  Full lifecycle → wallet settlement
+    // ------------------------------------------------------------------
+
+    public function test_full_lifecycle_settles_wallets(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $provider  = $this->makeUser(0);
+        $receiver  = $this->makeUser(10);
+
+        $id = $this->createExchange($organizer, $provider, $receiver, totalHours: 6);
+
+        $this->apiPost("/v2/group-exchanges/{$id}/start")->assertStatus(200);
+
+        // Each participant confirms.
+        Sanctum::actingAs($provider, ['*']);
+        $this->apiPost("/v2/group-exchanges/{$id}/confirm")->assertStatus(200);
+        Sanctum::actingAs($receiver, ['*']);
+        $this->apiPost("/v2/group-exchanges/{$id}/confirm")->assertStatus(200);
+
+        // Organizer completes.
+        Sanctum::actingAs($organizer, ['*']);
+        $this->apiPost("/v2/group-exchanges/{$id}/complete")->assertStatus(200);
+
+        // Provider +6, receiver −6 (10 → 4); conserved.
+        $this->assertEqualsWithDelta(6, (float) DB::table('users')->where('id', $provider->id)->value('balance'), 0.001);
+        $this->assertEqualsWithDelta(4, (float) DB::table('users')->where('id', $receiver->id)->value('balance'), 0.001);
+        $this->assertSame('completed', (string) DB::table('group_exchanges')->where('id', $id)->value('status'));
+    }
+
+    public function test_complete_blocked_until_all_confirmed(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $provider  = $this->makeUser(0);
+        $receiver  = $this->makeUser(10);
+
+        $id = $this->createExchange($organizer, $provider, $receiver, totalHours: 6);
+        $this->apiPost("/v2/group-exchanges/{$id}/start")->assertStatus(200);
+
+        // Only the provider confirms.
+        Sanctum::actingAs($provider, ['*']);
+        $this->apiPost("/v2/group-exchanges/{$id}/confirm")->assertStatus(200);
+
+        Sanctum::actingAs($organizer, ['*']);
+        $this->apiPost("/v2/group-exchanges/{$id}/complete")->assertStatus(400);
+
+        // No money moved.
+        $this->assertEqualsWithDelta(0, (float) DB::table('users')->where('id', $provider->id)->value('balance'), 0.001);
+        $this->assertEqualsWithDelta(10, (float) DB::table('users')->where('id', $receiver->id)->value('balance'), 0.001);
+    }
+
+    /**
+     * Create an equal-split exchange as the organizer with one provider + one
+     * receiver, returning its id.
+     */
+    private function createExchange(User $organizer, User $provider, User $receiver, float $totalHours = 5.0): int
+    {
+        Sanctum::actingAs($organizer, ['*']);
+
+        $create = $this->apiPost('/v2/group-exchanges', [
+            'title'        => 'Barn raising',
+            'total_hours'  => $totalHours,
+            'split_type'   => 'equal',
+            'participants' => [
+                ['user_id' => $provider->id, 'role' => 'provider'],
+                ['user_id' => $receiver->id, 'role' => 'receiver'],
+            ],
+        ]);
+
+        $create->assertStatus(201);
+
+        return (int) $create->json('data.id');
     }
 }

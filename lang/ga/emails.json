@@ -1,4 +1,11 @@
 {
+  "group_exchange": {
+    "start_subject": "Deimhnigh do chuid uaireanta: {{title}}",
+    "start_title": "Am le deimhniú",
+    "view_exchange": "Féach ar an malartú",
+    "completed_subject": "Malartú grúpa críochnaithe: {{title}}",
+    "completed_title": "Malartú críochnaithe"
+  },
   "gdpr_request": {
     "subject": "Fuaireamar d'iarratas sonraí",
     "title": "Iarratas faighte",

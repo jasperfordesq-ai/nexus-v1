@@ -139,6 +139,7 @@
     "reminder_push_message": "Vergeet uw doel niet: \"{{title}}\""
   },
   "group_exchange": {
+    "needs_confirmation": "De groepsuitwisseling \"{{title}}\" is gestart en wacht op de bevestiging van je uren.",
     "completed_credit": "Je hebt {{hours}} tijdcredits verdiend met de afgeronde uitwisseling \"{{title}}\".",
     "completed_debit": "Er zijn {{hours}} tijdcredits van je saldo afgeschreven voor de afgeronde uitwisseling \"{{title}}\".",
     "fallback_title": "een groepsuitwisseling"

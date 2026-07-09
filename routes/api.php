@@ -2878,6 +2878,7 @@ Route::put('/v2/group-exchanges/{id}', [\App\Http\Controllers\Api\GroupExchangeC
 Route::delete('/v2/group-exchanges/{id}', [\App\Http\Controllers\Api\GroupExchangeController::class, 'destroy']);
 Route::post('/v2/group-exchanges/{id}/participants', [\App\Http\Controllers\Api\GroupExchangeController::class, 'addParticipant']);
 Route::delete('/v2/group-exchanges/{id}/participants/{userId}', [\App\Http\Controllers\Api\GroupExchangeController::class, 'removeParticipant']);
+Route::post('/v2/group-exchanges/{id}/start', [\App\Http\Controllers\Api\GroupExchangeController::class, 'start']);
 Route::post('/v2/group-exchanges/{id}/confirm', [\App\Http\Controllers\Api\GroupExchangeController::class, 'confirm']);
 Route::post('/v2/group-exchanges/{id}/complete', [\App\Http\Controllers\Api\GroupExchangeController::class, 'complete']);
 Route::get('/v2/wallet/statement', [\App\Http\Controllers\Api\WalletFeaturesController::class, 'statement']);

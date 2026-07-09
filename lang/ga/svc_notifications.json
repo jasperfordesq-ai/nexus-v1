@@ -139,6 +139,7 @@
     "reminder_push_message": "Ná déan dearmad de do sprioc: \"{{title}}\""
   },
   "group_exchange": {
+    "needs_confirmation": "Tá tosaithe ar an malartú grúpa \"{{title}}\" agus tá sé ag fanacht leat do chuid uaireanta a dheimhniú.",
     "completed_credit": "Thuill tú {{hours}} creidmheas ama ón malartú críochnaithe \"{{title}}\".",
     "completed_debit": "Baineadh {{hours}} creidmheas ama de do iarmhéid don mhalartú críochnaithe \"{{title}}\".",
     "fallback_title": "malartú grúpa"

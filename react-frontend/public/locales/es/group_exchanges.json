@@ -151,6 +151,8 @@
     "weight_suffix": "incógnita"
   },
   "toast": {
+    "exchange_started": "Intercambio iniciado",
+    "start_failed": "No se pudo iniciar el intercambio",
     "load_more_failed": "Error al cargar más intercambios",
     "exchange_updated": "Intercambio actualizado",
     "update_failed": "Error al actualizar el intercambio",

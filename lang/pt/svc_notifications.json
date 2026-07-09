@@ -139,6 +139,7 @@
     "reminder_push_message": "Não se esqueça do seu objetivo: \"{{title}}\""
   },
   "group_exchange": {
+    "needs_confirmation": "A troca em grupo \"{{title}}\" começou e está a aguardar a confirmação das suas horas.",
     "completed_credit": "Ganhaste {{hours}} créditos de tempo da troca concluída \"{{title}}\".",
     "completed_debit": "Foram debitados {{hours}} créditos de tempo do teu saldo pela troca concluída \"{{title}}\".",
     "fallback_title": "uma troca de grupo"

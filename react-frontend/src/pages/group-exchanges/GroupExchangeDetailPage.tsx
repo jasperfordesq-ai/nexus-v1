@@ -33,7 +33,6 @@ import Play from 'lucide-react/icons/play';
 import UserPlus from 'lucide-react/icons/user-plus';
 import X from 'lucide-react/icons/x';
 import XCircle from 'lucide-react/icons/circle-x';
-import ArrowRight from 'lucide-react/icons/arrow-right';
 import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
 import { useTranslation } from 'react-i18next';
@@ -75,7 +74,7 @@ interface GroupExchangeParticipant {
   role: 'provider' | 'receiver';
   hours: number;
   weight: number;
-  confirmed: number;
+  confirmed: boolean;
   confirmed_at: string | null;
   notes: string | null;
   user_name: string;
@@ -102,7 +101,10 @@ interface GroupExchangeDetail {
   created_at: string;
   updated_at: string;
   participants: GroupExchangeParticipant[];
-  calculated_split: Record<string, Record<string, number>>;
+  // Flat per-participant split: how much each provider is credited / each receiver
+  // is debited when the exchange completes. This is exactly what the wallet ledger
+  // does, so it is the honest thing to preview.
+  calculated_split: { user_id: number; role: 'provider' | 'receiver'; hours: number }[];
 }
 
 interface SearchResult {
@@ -226,32 +228,24 @@ export function GroupExchangeDetailPage() {
   // Actions
   // ─────────────────────────────────────────────────────────────────────────
 
-  async function handleUpdateStatus(newStatus: string) {
+  async function handleStart() {
     if (!exchange) return;
 
     try {
       setIsSubmitting(true);
-      const response = await api.put(`/v2/group-exchanges/${exchange.id}`, { status: newStatus });
-      if (!response.success) {
-        // A failed status change resolves to { success: false } without throwing —
-        // don't report a fake success.
-        toastRef.current.error(response.error || tRef.current('toast.update_failed'));
-        return;
+      // Dedicated action endpoint. Status changes never went through PUT (the
+      // update allow-list excludes `status` by design), so the old "Start" was a
+      // silent no-op that left the exchange stuck in draft forever.
+      const response = await api.post(`/v2/group-exchanges/${exchange.id}/start`);
+      if (response.success) {
+        toastRef.current.success(tRef.current('toast.exchange_started'));
+        loadExchange();
+      } else {
+        toastRef.current.error(response.error || tRef.current('toast.start_failed'));
       }
-
-      // If just updating status, use the status endpoint approach
-      // Since the update endpoint only handles field changes,
-      // for status changes we rely on specific action endpoints
-      if (newStatus === 'pending_confirmation') {
-        // Transition to pending_confirmation via update
-        await api.put(`/v2/group-exchanges/${exchange.id}`, {});
-      }
-
-      toastRef.current.success(tRef.current('toast.exchange_updated'));
-      loadExchange();
     } catch (err) {
-      toastRef.current.error(tRef.current('toast.update_failed'));
-      logError('Failed to update exchange status', err);
+      toastRef.current.error(tRef.current('toast.start_failed'));
+      logError('Failed to start group exchange', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -340,7 +334,8 @@ export function GroupExchangeDetailPage() {
 
     try {
       setIsSearching(true);
-      const response = await api.get<{ data: SearchResult[] }>(`/v2/users?search=${encodeURIComponent(query.trim())}&limit=10`);
+      // Member directory filters on `q`, not `search` — see CreateGroupExchangePage.
+      const response = await api.get<{ data: SearchResult[] }>(`/v2/users?q=${encodeURIComponent(query.trim())}&limit=10`);
 
       if (response.success && response.data) {
         const results = Array.isArray(response.data) ? response.data : [];
@@ -405,24 +400,19 @@ export function GroupExchangeDetailPage() {
   // Build split rows
   // ─────────────────────────────────────────────────────────────────────────
 
-  function buildSplitRows(): { key: string; providerName: string; receiverName: string; amount: number }[] {
-    if (!exchange?.calculated_split) return [];
+  function buildSplitRows(): { key: string; name: string; role: 'provider' | 'receiver'; hours: number }[] {
+    if (!Array.isArray(exchange?.calculated_split)) return [];
 
-    const rows: { key: string; providerName: string; receiverName: string; amount: number }[] = [];
-    const participantMap = new Map(exchange.participants.map((p) => [String(p.user_id), p.user_name]));
+    const participantMap = new Map(exchange.participants.map((p) => [p.user_id, p.user_name]));
 
-    for (const [providerId, receivers] of Object.entries(exchange.calculated_split)) {
-      for (const [receiverId, amount] of Object.entries(receivers)) {
-        rows.push({
-          key: `${providerId}-${receiverId}`,
-          providerName: participantMap.get(providerId) || `User #${providerId}`,
-          receiverName: participantMap.get(receiverId) || `User #${receiverId}`,
-          amount: amount as number,
-        });
-      }
-    }
-
-    return rows;
+    return exchange.calculated_split
+      .filter((entry) => entry.hours > 0)
+      .map((entry) => ({
+        key: `${entry.user_id}-${entry.role}`,
+        name: participantMap.get(entry.user_id) || `User #${entry.user_id}`,
+        role: entry.role,
+        hours: entry.hours,
+      }));
   }
 
   const splitRows = exchange ? buildSplitRows() : [];
@@ -595,7 +585,7 @@ export function GroupExchangeDetailPage() {
               <Button
                 color="primary"
                 startContent={<Play className="w-4 h-4" aria-hidden="true" />}
-                onPress={() => handleUpdateStatus('pending_confirmation')}
+                onPress={handleStart}
                 isLoading={isSubmitting}
               >
                 {t('detail.start_exchange')}
@@ -738,20 +728,24 @@ export function GroupExchangeDetailPage() {
 
           <Table aria-label={t('detail.aria_hour_split')} shadow="sm" isStriped>
             <TableHeader>
-              <TableColumn>{t('detail.col_provider')}</TableColumn>
-              <TableColumn className="text-center" aria-hidden="true">{' '}</TableColumn>
-              <TableColumn>{t('detail.col_receiver')}</TableColumn>
+              <TableColumn>{t('detail.col_name')}</TableColumn>
+              <TableColumn>{t('detail.col_role')}</TableColumn>
               <TableColumn className="text-right">{t('detail.col_hours')}</TableColumn>
             </TableHeader>
             <TableBody>
               {splitRows.map((row) => (
                 <TableRow key={row.key}>
-                  <TableCell className="text-emerald-700 dark:text-emerald-400">{row.providerName}</TableCell>
-                  <TableCell className="text-center text-theme-subtle">
-                    <ArrowRight className="w-4 h-4 inline" aria-label={t('detail.gives_to')} />
+                  <TableCell className="text-theme-primary">{row.name}</TableCell>
+                  <TableCell>
+                    <Chip size="sm" variant="flat" color={row.role === 'provider' ? 'success' : 'warning'}>
+                      {row.role === 'provider' ? t('role_provider') : t('role_receiver')}
+                    </Chip>
                   </TableCell>
-                  <TableCell className="text-amber-700 dark:text-amber-400">{row.receiverName}</TableCell>
-                  <TableCell className="text-right font-medium text-theme-primary">{t('detail.hours_amount', { count: row.amount })}</TableCell>
+                  <TableCell
+                    className={`text-right font-medium ${row.role === 'provider' ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'}`}
+                  >
+                    {row.role === 'provider' ? '+' : '−'}{t('detail.hours_amount', { count: row.hours })}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

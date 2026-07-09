@@ -151,6 +151,8 @@
     "weight_suffix": "X"
   },
   "toast": {
+    "exchange_started": "Austausch gestartet",
+    "start_failed": "Austausch konnte nicht gestartet werden",
     "load_more_failed": "Weitere Tauschvorgänge konnten nicht geladen werden",
     "exchange_updated": "Tausch aktualisiert",
     "update_failed": "Tausch konnte nicht aktualisiert werden",

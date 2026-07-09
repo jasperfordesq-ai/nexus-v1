@@ -139,6 +139,7 @@
     "reminder_push_message": "Don't forget your goal: \"{{title}}\""
   },
   "group_exchange": {
+    "needs_confirmation": "The group exchange \"{{title}}\" has started and is waiting for you to confirm your hours.",
     "completed_credit": "You earned {{hours}} time credits from the completed exchange \"{{title}}\".",
     "completed_debit": "{{hours}} time credits were debited from your balance for the completed exchange \"{{title}}\".",
     "fallback_title": "a group exchange"

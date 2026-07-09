@@ -139,6 +139,7 @@
     "reminder_push_message": "Vergessen Sie Ihr Ziel nicht: \"{{title}}\""
   },
   "group_exchange": {
+    "needs_confirmation": "Der Gruppenaustausch \"{{title}}\" hat begonnen und wartet auf die Bestätigung deiner Stunden.",
     "completed_credit": "Du hast {{hours}} Zeitgutschriften aus dem abgeschlossenen Austausch „{{title}}\" erhalten.",
     "completed_debit": "{{hours}} Zeitgutschriften wurden für den abgeschlossenen Austausch „{{title}}\" von deinem Guthaben abgezogen.",
     "fallback_title": "einem Gruppenaustausch"

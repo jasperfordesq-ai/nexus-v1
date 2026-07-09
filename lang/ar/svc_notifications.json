@@ -139,6 +139,7 @@
     "reminder_push_message": "لا تنسَ هدفك: \"{{title}}\""
   },
   "group_exchange": {
+    "needs_confirmation": "بدأ التبادل الجماعي \"{{title}}\" وهو في انتظار تأكيدك لساعاتك.",
     "completed_credit": "لقد كسبت {{hours}} ساعة رصيد من التبادل المكتمل \"{{title}}\".",
     "completed_debit": "تم خصم {{hours}} ساعة رصيد من رصيدك مقابل التبادل المكتمل \"{{title}}\".",
     "fallback_title": "تبادل جماعي"

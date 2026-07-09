@@ -1,4 +1,11 @@
 {
+  "group_exchange": {
+    "start_subject": "Confirm your hours: {{title}}",
+    "start_title": "Time to confirm",
+    "view_exchange": "Review exchange",
+    "completed_subject": "Group exchange completed: {{title}}",
+    "completed_title": "Exchange completed"
+  },
   "gdpr_request": {
     "subject": "We've received your data request",
     "title": "Request received",

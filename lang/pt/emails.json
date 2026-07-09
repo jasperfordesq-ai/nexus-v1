@@ -1,4 +1,11 @@
 {
+  "group_exchange": {
+    "start_subject": "Confirme as suas horas: {{title}}",
+    "start_title": "Hora de confirmar",
+    "view_exchange": "Ver a troca",
+    "completed_subject": "Troca em grupo concluída: {{title}}",
+    "completed_title": "Troca concluída"
+  },
   "gdpr_request": {
     "subject": "Recebemos o seu pedido de dados",
     "title": "Pedido recebido",

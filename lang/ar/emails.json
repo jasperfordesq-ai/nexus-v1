@@ -1,4 +1,11 @@
 {
+  "group_exchange": {
+    "start_subject": "أكِّد ساعاتك: {{title}}",
+    "start_title": "حان وقت التأكيد",
+    "view_exchange": "مراجعة التبادل",
+    "completed_subject": "اكتمل التبادل الجماعي: {{title}}",
+    "completed_title": "اكتمل التبادل"
+  },
   "gdpr_request": {
     "subject": "لقد استلمنا طلبك بشأن البيانات",
     "title": "تم استلام الطلب",

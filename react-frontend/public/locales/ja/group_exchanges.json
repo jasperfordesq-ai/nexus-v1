@@ -151,6 +151,8 @@
     "weight_suffix": "×"
   },
   "toast": {
+    "exchange_started": "交換を開始しました",
+    "start_failed": "交換の開始に失敗しました",
     "load_more_failed": "さらに交換を読み込めませんでした",
     "exchange_updated": "交換が更新されました",
     "update_failed": "交換の更新に失敗しました",

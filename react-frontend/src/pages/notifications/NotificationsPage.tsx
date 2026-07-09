@@ -21,6 +21,7 @@ import Bell from 'lucide-react/icons/bell';
 import MessageSquare from 'lucide-react/icons/message-square';
 import ListTodo from 'lucide-react/icons/list-todo';
 import Wallet from 'lucide-react/icons/wallet';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import User from 'lucide-react/icons/user';
 import Calendar from 'lucide-react/icons/calendar';
 import Users from 'lucide-react/icons/users';
@@ -493,6 +494,7 @@ const iconMap: Record<string, { icon: React.ReactNode; color: string }> = {
   safeguarding_flag: { icon: <ShieldAlert className="w-5 h-5" aria-hidden="true" />, color: 'red' },
   safeguarding_assignment: { icon: <Shield className="w-5 h-5" aria-hidden="true" />, color: 'blue' },
   broker_review: { icon: <Eye className="w-5 h-5" aria-hidden="true" />, color: 'amber' },
+  group_exchange: { icon: <ArrowLeftRight className="w-5 h-5" aria-hidden="true" />, color: 'indigo' },
 };
 
 const colorClasses: Record<string, string> = {
