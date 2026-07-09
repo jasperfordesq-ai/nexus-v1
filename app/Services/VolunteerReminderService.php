@@ -621,32 +621,30 @@ class VolunteerReminderService
                     ->where('s.start_time', '>', now())
                     ->where('s.start_time', '<=', now()->addHours($hoursBefore))
                     ->where('o.is_active', 1)
-                    ->select('s.*')
+                    // Select the opportunity title/location from the join so we do
+                    // not re-fetch the opportunity once per shift below.
+                    ->select('s.*', 'o.title as opportunity_title', 'o.location as opportunity_location')
                     ->get();
 
                 foreach ($shifts as $shift) {
-                    // Fetch opportunity once per shift
-                    $opportunity = DB::table('vol_opportunities')
-                        ->where('id', $shift->opportunity_id)
-                        ->where('tenant_id', $tenantId)
-                        ->first(['title', 'location']);
+                    $opportunityTitle    = htmlspecialchars($shift->opportunity_title ?? '', ENT_QUOTES, 'UTF-8');
+                    $opportunityLocation = htmlspecialchars($shift->opportunity_location ?? '', ENT_QUOTES, 'UTF-8');
 
-                    $opportunityTitle    = htmlspecialchars($opportunity->title ?? '', ENT_QUOTES, 'UTF-8');
-                    $opportunityLocation = htmlspecialchars($opportunity->location ?? '', ENT_QUOTES, 'UTF-8');
-
-                    // Get confirmed volunteers for this shift
+                    // Get confirmed volunteers for this shift, plus the set of users
+                    // already reminded — loaded once per shift instead of once per
+                    // recipient.
                     $signups = self::confirmedShiftUserIds($tenantId, (int) $shift->id);
+                    $alreadySentUserIds = DB::table('vol_reminders_sent')
+                        ->where('tenant_id', $tenantId)
+                        ->where('reminder_type', 'pre_shift')
+                        ->where('reference_id', $shift->id)
+                        ->pluck('user_id')
+                        ->map(fn ($id) => (int) $id)
+                        ->all();
 
                     foreach ($signups as $userId) {
-                        // Skip if already reminded
-                        $alreadySent = DB::table('vol_reminders_sent')
-                            ->where('tenant_id', $tenantId)
-                            ->where('user_id', $userId)
-                            ->where('reminder_type', 'pre_shift')
-                            ->where('reference_id', $shift->id)
-                            ->exists();
-
-                        if ($alreadySent) {
+                        // Skip if already reminded (checked against the per-shift set).
+                        if (in_array((int) $userId, $alreadySentUserIds, true)) {
                             continue;
                         }
 
