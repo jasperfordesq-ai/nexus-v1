@@ -141,6 +141,9 @@ class StripeDonationStateMachineTest extends TestCase
         DB::table('vol_donations')->where('id', $donationId)->update([
             'gift_aid_claim_status' => 'ready',
             'gift_aid_declaration_name' => 'Test Donor',
+            // Gift Aid is a UK/HMRC scheme — only GBP donations qualify for export
+            // (giftAidExportRows() now enforces this), so a claimable row must be GBP.
+            'currency' => 'GBP',
         ]);
 
         $rows = \App\Services\DonationOperationsService::giftAidExportRows($this->testTenantId);

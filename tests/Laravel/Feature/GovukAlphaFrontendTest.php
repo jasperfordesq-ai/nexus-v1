@@ -5297,10 +5297,11 @@ class GovukAlphaFrontendTest extends TestCase
         $res = $this->get("/{$this->testTenantSlug}/alpha/federation");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.federation.title'));
-        // Not opted in → the opted-out marketing hero + opt-in CTA button are shown.
+        // Not opted in → the opted-out marketing hero + guided-onboarding CTA are shown.
         $res->assertSee(__('govuk_alpha.federation.hub.hero_title'));
         $res->assertSee(__('govuk_alpha.federation.hub.how_it_works_heading'));
-        $res->assertSee(route('govuk-alpha.federation.opt-in', ['tenantSlug' => $this->testTenantSlug]), false);
+        // The opted-out hub CTA now links to the guided onboarding wizard (017024c0c).
+        $res->assertSee(route('govuk-alpha.federation.onboarding', ['tenantSlug' => $this->testTenantSlug]), false);
         $res->assertSee(__('govuk_alpha.federation.hub.optin_off'));
     }
 
@@ -5392,8 +5393,10 @@ class GovukAlphaFrontendTest extends TestCase
 
     public function test_federation_members_browse_lists_a_federated_member(): void
     {
-        $this->authenticatedUser(['name' => 'Member Browser']);
+        $user = $this->authenticatedUser(['name' => 'Member Browser']);
         $this->enableFederationSystem();
+        // Federation browse screens gate non-opted-in members → opt the viewer in.
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
         $partnerTenantId = $this->seedFederationPartner('Eastside Timebank');
         $partnerUserId = $this->seedFederatedMember($partnerTenantId, 'Federated', 'Friend', 'Gardening, Cooking');
 
@@ -5410,8 +5413,10 @@ class GovukAlphaFrontendTest extends TestCase
 
     public function test_federation_member_profile_renders_with_tenant_id(): void
     {
-        $this->authenticatedUser(['name' => 'Profile Viewer']);
+        $user = $this->authenticatedUser(['name' => 'Profile Viewer']);
         $this->enableFederationSystem();
+        // Federation browse screens gate non-opted-in members → opt the viewer in.
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
         $partnerTenantId = $this->seedFederationPartner('Westside Timebank');
         $partnerUserId = $this->seedFederatedMember($partnerTenantId, 'Visible', 'Profile', 'Carpentry');
 
@@ -5423,8 +5428,10 @@ class GovukAlphaFrontendTest extends TestCase
 
     public function test_federation_listings_browse_renders(): void
     {
-        $this->authenticatedUser(['name' => 'Listing Browser']);
+        $user = $this->authenticatedUser(['name' => 'Listing Browser']);
         $this->enableFederationSystem();
+        // Federation browse screens gate non-opted-in members → opt the viewer in.
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
         $partnerTenantId = $this->seedFederationPartner('Harbour Timebank');
         $partnerUserId = $this->seedFederatedMember($partnerTenantId, 'Listing', 'Owner', 'Plumbing');
         DB::table('listings')->insert([
@@ -5447,8 +5454,10 @@ class GovukAlphaFrontendTest extends TestCase
 
     public function test_federation_events_browse_renders(): void
     {
-        $this->authenticatedUser(['name' => 'Event Browser']);
+        $user = $this->authenticatedUser(['name' => 'Event Browser']);
         $this->enableFederationSystem();
+        // Federation browse screens gate non-opted-in members → opt the viewer in.
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
         $partnerTenantId = $this->seedFederationPartner('Quayside Timebank');
 
         $res = $this->get("/{$this->testTenantSlug}/alpha/federation/events");
@@ -5491,8 +5500,10 @@ class GovukAlphaFrontendTest extends TestCase
 
     public function test_federation_listing_detail_renders_full_description(): void
     {
-        $this->authenticatedUser(['name' => 'Listing Detailer']);
+        $user = $this->authenticatedUser(['name' => 'Listing Detailer']);
         $this->enableFederationSystem();
+        // Federation browse screens gate non-opted-in members → opt the viewer in.
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
         $partnerTenantId = $this->seedFederationPartner('Detail Timebank');
         $partnerUserId = $this->seedFederatedMember($partnerTenantId, 'Detail', 'Owner', 'Joinery');
         $listingId = DB::table('listings')->insertGetId([
@@ -5517,8 +5528,10 @@ class GovukAlphaFrontendTest extends TestCase
 
     public function test_federation_members_partner_filter_scopes_results(): void
     {
-        $this->authenticatedUser(['name' => 'Filter User']);
+        $user = $this->authenticatedUser(['name' => 'Filter User']);
         $this->enableFederationSystem();
+        // Federation browse screens gate non-opted-in members → opt the viewer in.
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
         $partnerA = $this->seedFederationPartner('Filter Alpha');
         $partnerB = $this->seedFederationPartner('Filter Bravo');
         $this->seedFederatedMember($partnerA, 'Alpha', 'Person', 'Cooking');
@@ -5534,6 +5547,8 @@ class GovukAlphaFrontendTest extends TestCase
     {
         $viewer = $this->authenticatedUser(['name' => 'Reputation Viewer']);
         $this->enableFederationSystem();
+        // Federation browse screens gate non-opted-in members → opt the viewer in.
+        $this->setFederationUserSettings($viewer->id, ['federation_optin' => 1]);
         $partnerTenantId = $this->seedFederationPartner('Reputation Timebank');
         $partnerUserId = $this->seedFederatedMember($partnerTenantId, 'Trusted', 'Member', 'Tutoring');
         $this->setFederationUserSettings($partnerUserId, [
@@ -9787,6 +9802,8 @@ class GovukAlphaFrontendTest extends TestCase
     {
         $user = $this->authenticatedUser(['name' => 'Groups Browser']);
         $this->enableFederationSystem();
+        // Federation browse screens gate non-opted-in members → opt the viewer in.
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
         // Enable cross_tenant_groups_enabled which enableFederationSystem does not include.
         DB::table('federation_system_control')->where('id', 1)->update(['cross_tenant_groups_enabled' => 1]);
         DB::table('federation_tenant_features')->updateOrInsert(
@@ -9805,6 +9822,8 @@ class GovukAlphaFrontendTest extends TestCase
     {
         $user = $this->authenticatedUser(['name' => 'Groups Blocked User']);
         $this->enableFederationSystem();
+        // Federation browse screens gate non-opted-in members → opt the viewer in.
+        $this->setFederationUserSettings($user->id, ['federation_optin' => 1]);
         // cross_tenant_groups_enabled defaults to 0 in enableFederationSystem.
         DB::table('federation_system_control')->where('id', 1)->update(['cross_tenant_groups_enabled' => 0]);
         app()->forgetInstance(\App\Services\FederationFeatureService::class);

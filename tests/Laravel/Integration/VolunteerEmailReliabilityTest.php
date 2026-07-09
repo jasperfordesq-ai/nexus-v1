@@ -381,12 +381,17 @@ class VolunteerEmailReliabilityTest extends TestCase
         $start = strpos($source, 'public function verifyHours');
         $end = strpos($source, '/** GET /api/v2/admin/volunteering */', $start);
         $method = substr($source, $start, $end - $start);
+        // Strip line comments before the call-guards below: the approval path
+        // documents *why* it does not use the wallet payout by cross-referencing
+        // VolOrgWalletService::payVolunteer() in a comment, and that reference
+        // must not be mistaken for an actual call.
+        $executable = preg_replace('~//[^\n]*~', '', $method);
 
         // Approval mints inline (no VolOrgWalletService::payVolunteer call), so all
         // volunteer notifications go through NotificationDispatcher — never a raw
         // EmailDispatchService::sendRaw and never the balance-gated wallet payout.
-        $this->assertStringNotContainsString('EmailDispatchService::sendRaw', $method);
-        $this->assertStringNotContainsString('VolOrgWalletService::payVolunteer', $method);
+        $this->assertStringNotContainsString('EmailDispatchService::sendRaw', $executable);
+        $this->assertStringNotContainsString('VolOrgWalletService::payVolunteer', $executable);
         $this->assertStringContainsString("\$paymentOutcome === 'paid'", $method);
         $this->assertStringContainsString('NotificationDispatcher::dispatch', $method);
         $this->assertStringContainsString('buildVolHoursApprovedPaidEmail', $method);
