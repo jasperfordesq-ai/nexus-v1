@@ -1385,7 +1385,8 @@ class GdprService
                 $this->query(
                     "UPDATE vol_donations
                      SET gift_aid_declaration_name = NULL, gift_aid_address_line1 = NULL,
-                         gift_aid_address_line2 = NULL, gift_aid_town = NULL, gift_aid_postcode = NULL
+                         gift_aid_address_line2 = NULL, gift_aid_town = NULL, gift_aid_postcode = NULL,
+                         gift_aid_country = NULL
                      WHERE user_id = ? AND tenant_id = ?
                        AND gift_aid_claim_status NOT IN ('claimed', 'refund_after_claim')",
                     [$userId, $this->tenantId]

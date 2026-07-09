@@ -180,6 +180,7 @@ class VolunteeringErasureTest extends TestCase
         $this->assertNull($unclaimed->gift_aid_address_line2);
         $this->assertNull($unclaimed->gift_aid_town);
         $this->assertNull($unclaimed->gift_aid_postcode);
+        $this->assertNull($unclaimed->gift_aid_country);
 
         // Claimed declarations are RETAINED — HMRC's ~6-year record-keeping
         // obligation for submitted Gift Aid claims (Art. 17(3)(b) carve-out).
@@ -190,6 +191,7 @@ class VolunteeringErasureTest extends TestCase
             $this->assertSame('Flat 2', $claimed->gift_aid_address_line2);
             $this->assertSame('Hometown', $claimed->gift_aid_town);
             $this->assertSame('HT1 2AB', $claimed->gift_aid_postcode);
+            $this->assertSame('GB', $claimed->gift_aid_country);
         }
     }
 
