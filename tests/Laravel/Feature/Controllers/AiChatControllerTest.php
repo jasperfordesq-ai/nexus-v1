@@ -142,4 +142,38 @@ class AiChatControllerTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+    // ------------------------------------------------------------------
+    //  POST /ai/test-provider
+    // ------------------------------------------------------------------
+    // Audit 2026-07-09 P2: this endpoint was member-reachable and unthrottled,
+    // letting any member enumerate configured providers and burn the tenant's
+    // AI API budget. It must be admin-only.
+
+    public function test_test_provider_requires_auth(): void
+    {
+        $response = $this->apiPost('/ai/test-provider', ['provider' => 'gemini']);
+
+        $response->assertStatus(401);
+    }
+
+    public function test_test_provider_rejects_regular_members(): void
+    {
+        $this->authenticatedUser(['role' => 'member']);
+
+        $response = $this->apiPost('/ai/test-provider', ['provider' => 'gemini']);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_test_provider_allows_admins(): void
+    {
+        $this->authenticatedUser(['role' => 'admin']);
+
+        $response = $this->apiPost('/ai/test-provider', ['provider' => 'gemini']);
+
+        // Provider connectivity may legitimately fail in the test environment;
+        // the point is the admin is not rejected by auth/role middleware.
+        $response->assertStatus(200);
+    }
 }

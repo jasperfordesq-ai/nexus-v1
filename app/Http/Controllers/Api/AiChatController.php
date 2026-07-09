@@ -438,7 +438,9 @@ TXT;
     /** POST /api/v2/ai/test-provider */
     public function testProvider(): JsonResponse
     {
-        $this->getUserId();
+        // Admin-only: exposes which AI providers are configured and each call
+        // spends real provider API credit, so members must not reach it.
+        $this->requireAdmin();
 
         $providerId = $this->input('provider', 'gemini');
 
