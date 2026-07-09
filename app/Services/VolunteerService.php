@@ -2133,6 +2133,18 @@ class VolunteerService
                             NotificationDispatcher::buildVolHoursApprovedPaidEmail($hours, $orgName)
                         );
                     });
+                } elseif ($action === 'approve' && $paymentResult === 'no_whole_hours') {
+                    // Sub-whole-hour logs floor to 0 credits (users.balance stores
+                    // whole hours), so tell the volunteer plainly that no credit was
+                    // added rather than implying a successful credit.
+                    LocaleContext::withLocale($volunteerRow, function () use ($volunteerId, $hours, $orgName) {
+                        NotificationDispatcher::dispatch(
+                            $volunteerId, 'global', 0, 'vol_hours_approved',
+                            __('notifications.vol_hours_approved_no_credit_body', ['hours' => $hours]),
+                            '/volunteering?tab=hours',
+                            NotificationDispatcher::buildVolHoursApprovedEmail($hours, $orgName)
+                        );
+                    });
                 } elseif ($action === 'approve') {
                     LocaleContext::withLocale($volunteerRow, function () use ($volunteerId, $hours, $orgName) {
                         NotificationDispatcher::dispatch(

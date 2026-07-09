@@ -320,6 +320,7 @@ return [
     'vol_hours_approved_unpaid_body' => 'تمت الموافقة على :hours ساعة! ستُدفع أرصدة الوقت عندما تموّل المنظمة محفظتها.',
     'vol_hours_org_wallet_insufficient_body' => 'تمت الموافقة على :hours ساعة لمتطوع، لكن رصيد محفظة منظمتك غير كافٍ. يرجى تمويل محفظتك.',
     'vol_hours_approved_body' => 'تمت الموافقة على :hours ساعة من التطوع!',
+    'vol_hours_approved_no_credit_body' => 'Your :hours h were approved, but that is under an hour so no time credit was added.',
     'vol_hours_declined_body' => 'تم رفض سجل التطوع الخاص بك البالغ :hours ساعة.',
     'event_created_confirmation' => 'تم إنشاء :title',
     'event_attendee_confirmation' => 'تم تأكيد حضورك في :title',

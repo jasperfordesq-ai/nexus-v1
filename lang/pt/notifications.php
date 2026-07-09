@@ -320,6 +320,7 @@ return [
     'vol_hours_approved_unpaid_body' => 'As suas :hours h foram aprovadas! Os créditos de tempo serão pagos quando a organização carregar a sua carteira.',
     'vol_hours_org_wallet_insufficient_body' => 'Foram aprovadas :hours h para um voluntário, mas a carteira da sua organização não tem saldo suficiente. Carregue a sua carteira.',
     'vol_hours_approved_body' => 'As suas :hours h de voluntariado foram aprovadas!',
+    'vol_hours_approved_no_credit_body' => 'Your :hours h were approved, but that is under an hour so no time credit was added.',
     'vol_hours_declined_body' => 'O seu registo de :hours h de voluntariado foi recusado.',
     'event_created_confirmation' => ':title foi criado',
     'event_attendee_confirmation' => 'A sua presença em :title está confirmada',

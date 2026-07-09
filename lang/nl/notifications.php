@@ -320,6 +320,7 @@ return [
     'vol_hours_approved_unpaid_body' => 'Uw :hours uur is goedgekeurd! De tijdcredits worden uitbetaald zodra de organisatie haar wallet aanvult.',
     'vol_hours_org_wallet_insufficient_body' => 'Er is :hours uur goedgekeurd voor een vrijwilliger, maar de wallet van uw organisatie heeft onvoldoende saldo. Vul uw wallet aan.',
     'vol_hours_approved_body' => 'Uw :hours uur vrijwilligerswerk is goedgekeurd!',
+    'vol_hours_approved_no_credit_body' => 'Your :hours h were approved, but that is under an hour so no time credit was added.',
     'vol_hours_declined_body' => 'Uw urenregistratie van :hours uur vrijwilligerswerk is afgewezen.',
     'event_created_confirmation' => ':title is aangemaakt',
     'event_attendee_confirmation' => 'U bent bevestigd voor :title',

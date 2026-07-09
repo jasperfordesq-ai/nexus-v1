@@ -320,6 +320,7 @@ return [
     'vol_hours_approved_unpaid_body' => ':hours 時間が承認されました!タイムクレジットは、組織がウォレットに入金した時点で支払われます。',
     'vol_hours_org_wallet_insufficient_body' => 'ボランティアの :hours 時間を承認しましたが、組織のウォレット残高が不足しています。ウォレットに入金してください。',
     'vol_hours_approved_body' => 'ボランティア活動 :hours 時間が承認されました!',
+    'vol_hours_approved_no_credit_body' => 'Your :hours h were approved, but that is under an hour so no time credit was added.',
     'vol_hours_declined_body' => 'ボランティア活動 :hours 時間の記録は却下されました。',
     'event_created_confirmation' => ':title が作成されました',
     'event_attendee_confirmation' => ':title への参加が確定しました',

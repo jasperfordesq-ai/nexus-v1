@@ -320,6 +320,7 @@ return [
     'vol_hours_approved_unpaid_body' => 'Twoje :hours godz. zostały zatwierdzone! Kredyty czasowe zostaną wypłacone, gdy organizacja zasili swój portfel.',
     'vol_hours_org_wallet_insufficient_body' => 'Zatwierdzono :hours godz. dla wolontariusza, ale portfel Twojej organizacji ma niewystarczające saldo. Zasil portfel.',
     'vol_hours_approved_body' => 'Twoje :hours godz. wolontariatu zostały zatwierdzone!',
+    'vol_hours_approved_no_credit_body' => 'Your :hours h were approved, but that is under an hour so no time credit was added.',
     'vol_hours_declined_body' => 'Twój dziennik :hours godz. wolontariatu został odrzucony.',
     'event_created_confirmation' => ':title zostało utworzone',
     'event_attendee_confirmation' => 'Twój udział w :title został potwierdzony',

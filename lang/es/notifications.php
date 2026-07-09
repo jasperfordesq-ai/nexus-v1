@@ -320,6 +320,7 @@ return [
     'vol_hours_approved_unpaid_body' => '¡Sus :hours h fueron aprobadas! Los créditos de tiempo se abonarán cuando la organización recargue su monedero.',
     'vol_hours_org_wallet_insufficient_body' => 'Se aprobaron :hours h para un voluntario, pero el monedero de su organización no tiene saldo suficiente. Recargue su monedero.',
     'vol_hours_approved_body' => '¡Sus :hours h de voluntariado fueron aprobadas!',
+    'vol_hours_approved_no_credit_body' => 'Your :hours h were approved, but that is under an hour so no time credit was added.',
     'vol_hours_declined_body' => 'Su registro de :hours h de voluntariado fue rechazado.',
     'event_created_confirmation' => ':title ha sido creado',
     'event_attendee_confirmation' => 'Su asistencia a :title está confirmada',

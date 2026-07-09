@@ -320,6 +320,7 @@ return [
     'vol_hours_approved_unpaid_body' => 'Ceadaíodh do chuid :hours uair an chloig! Íocfar na creidmheasanna ama nuair a chuirfidh an eagraíocht airgead lena sparán.',
     'vol_hours_org_wallet_insufficient_body' => 'Ceadaíodh :hours uair an chloig d\'oibrí deonach ach níl go leor iarmhéid i sparán d\'eagraíochta. Cuir airgead le do sparán.',
     'vol_hours_approved_body' => 'Ceadaíodh do chuid :hours uair an chloig oibre deonaí!',
+    'vol_hours_approved_no_credit_body' => 'Your :hours h were approved, but that is under an hour so no time credit was added.',
     'vol_hours_declined_body' => 'Diúltaíodh do loga :hours uair an chloig oibre deonaí.',
     'event_created_confirmation' => 'Cruthaíodh :title',
     'event_attendee_confirmation' => 'Tá do láithreacht ag :title deimhnithe',

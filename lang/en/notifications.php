@@ -170,6 +170,7 @@ return [
     'vol_hours_approved_unpaid_body' => 'Your :hours h were approved! Time credits will be paid when the organization funds their wallet.',
     'vol_hours_org_wallet_insufficient_body' => 'Approved :hours h for a volunteer but your org wallet has insufficient balance. Please fund your wallet.',
     'vol_hours_approved_body'        => 'Your :hours h of volunteering were approved!',
+    'vol_hours_approved_no_credit_body' => 'Your :hours h were approved, but that is under an hour so no time credit was added.',
     'vol_hours_declined_body'        => 'Your :hours h volunteering log was declined.',
     'push_new_topic'                 => 'New Post',
     'push_new_reply'                 => 'New Reply',

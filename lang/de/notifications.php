@@ -320,6 +320,7 @@ return [
     'vol_hours_approved_unpaid_body' => 'Ihre :hours Std. wurden genehmigt! Das Zeitguthaben wird ausgezahlt, sobald die Organisation ihr Wallet auflädt.',
     'vol_hours_org_wallet_insufficient_body' => ':hours Std. für eine freiwillige Person wurden genehmigt, aber das Guthaben Ihres Organisations-Wallets reicht nicht aus. Bitte laden Sie Ihr Wallet auf.',
     'vol_hours_approved_body' => 'Ihre :hours Std. Freiwilligenarbeit wurden genehmigt!',
+    'vol_hours_approved_no_credit_body' => 'Your :hours h were approved, but that is under an hour so no time credit was added.',
     'vol_hours_declined_body' => 'Ihr Stundennachweis über :hours Std. Freiwilligenarbeit wurde abgelehnt.',
     'event_created_confirmation' => ':title wurde erstellt',
     'event_attendee_confirmation' => 'Ihre Teilnahme an :title ist bestätigt',
