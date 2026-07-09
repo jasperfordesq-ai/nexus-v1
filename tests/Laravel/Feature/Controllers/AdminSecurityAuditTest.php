@@ -248,11 +248,14 @@ class AdminSecurityAuditTest extends TestCase
             'role' => 'super_admin',
         ]);
 
-        // AdminUsersController::update() requires super-admin to set 'super_admin'/'god';
-        // a regular admin is rejected with 403 and the target role is unchanged — assert
-        // both the status AND the security property rather than accepting any non-200.
-        $this->assertSame(403, $response->getStatusCode(),
-            'SEC-007: a non-super-admin setting super_admin role must receive 403.');
+        // After the role refactor, AdminUsersController::update() rejects
+        // 'tenant_admin'/'super_admin'/'god' as role-field assignment targets for
+        // EVERY caller (super-admin is granted via the dedicated toggle endpoints),
+        // so the attempt is refused with a 422 VALIDATION_ERROR before any update is
+        // applied — assert both the status AND the security property rather than
+        // accepting any non-200.
+        $this->assertSame(422, $response->getStatusCode(),
+            'SEC-007: setting super_admin via the role field must be refused with 422.');
         $targetUser->refresh();
         $this->assertNotEquals('super_admin', $targetUser->role,
             'SEC-007: target role must not have been escalated to super_admin.');
