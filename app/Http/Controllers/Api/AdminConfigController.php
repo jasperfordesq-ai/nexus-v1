@@ -2589,7 +2589,7 @@ class AdminConfigController extends BaseApiController
 
         $settings = $this->input('settings');
         if (!is_array($settings) || empty($settings)) {
-            return $this->respondWithError('VALIDATION_ERROR', 'Settings array is required', 'settings', 422);
+            return $this->respondWithError('VALIDATION_ERROR', __('api.missing_required_field', ['field' => 'settings']), 'settings', 422);
         }
 
         $updated = [];

@@ -53,6 +53,20 @@ class AdminConfigControllerTest extends TestCase
         $response->assertStatus(401);
     }
 
+    public function test_bulk_volunteering_config_rejects_missing_settings_with_translated_error(): void
+    {
+        // VOL-BE-010: the missing-settings validation message must be translated,
+        // not a hardcoded English literal.
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $response = $this->apiPut('/v2/admin/config/volunteering/bulk', []);
+
+        $response->assertStatus(422);
+        $response->assertJsonPath('errors.0.message', __('api.missing_required_field', ['field' => 'settings']));
+        $this->assertStringNotContainsString('Settings array is required', $response->getContent());
+    }
+
     // ================================================================
     // CACHE STATS — GET /v2/admin/cache/stats
     // ================================================================
