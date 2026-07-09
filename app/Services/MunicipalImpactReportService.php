@@ -331,7 +331,7 @@ class MunicipalImpactReportService
         $coordinatorCount = (int) DB::selectOne(
             "SELECT COUNT(*) AS count FROM users
              WHERE tenant_id = ? AND is_approved = 1
-               AND role IN ('admin', 'super_admin', 'moderator', 'coordinator')",
+               AND role IN ('admin', 'super_admin', 'coordinator')",
             [$tenantId]
         )->count;
         $coordinatorLoadAvg = $coordinatorCount > 0

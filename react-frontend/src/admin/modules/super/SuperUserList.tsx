@@ -259,7 +259,6 @@ export function SuperUserList() {
         >
           <SelectItem key="member" id="member">{t('super.role_member')}</SelectItem>
           <SelectItem key="admin" id="admin">{t('super.role_admin')}</SelectItem>
-          <SelectItem key="tenant_admin" id="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
         </Select>
         <Switch
           size="sm"

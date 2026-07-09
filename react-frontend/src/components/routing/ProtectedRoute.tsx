@@ -56,8 +56,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       user?.role === 'admin' ||
       user?.role === 'super_admin' ||
       user?.is_super_admin ||
-      user?.is_tenant_super_admin ||
-      user?.role === 'moderator';
+      user?.is_tenant_super_admin;
 
     if (!isAdmin) {
       return <Navigate to={tenantPath('/dashboard')} replace />;

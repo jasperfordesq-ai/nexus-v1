@@ -181,7 +181,7 @@ class AdminCrmController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         $admins = DB::select(
-            "SELECT id, name, email, avatar_url, role FROM users WHERE tenant_id = ? AND (role IN ('admin','moderator','tenant_admin','super_admin') OR is_admin = 1) ORDER BY name ASC",
+            "SELECT id, name, email, avatar_url, role FROM users WHERE tenant_id = ? AND (role IN ('admin','tenant_admin','super_admin') OR is_admin = 1) ORDER BY name ASC",
             [$tenantId]
         );
         $admins = array_map(fn($r) => (array)$r, $admins);

@@ -216,7 +216,7 @@ class BrokerUserActionsAuthorizationTest extends TestCase
         $target = $this->member();
         Sanctum::actingAs($this->admin());
 
-        $response = $this->apiPut("/v2/admin/users/{$target->id}", ['role' => 'moderator']);
+        $response = $this->apiPut("/v2/admin/users/{$target->id}", ['role' => 'broker']);
 
         $response->assertStatus(200);
     }

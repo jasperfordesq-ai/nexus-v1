@@ -49,9 +49,8 @@ export function isAdminTier(user?: Partial<AdminTierUser> | null): boolean {
  * MUST stay in sync with the backend
  * `app/Http/Controllers/Api/BaseApiController.php::requireBrokerOrAdmin()` that
  * guards the underlying `/v2/admin/feed|comments|reviews` endpoints:
- * admin-tier OR role broker/coordinator. `moderator` is retained for backward
- * compatibility with the previous inline check; the server remains the
- * authoritative gate, so being *permissive* here is safe.
+ * admin-tier OR role broker/coordinator. The server remains the authoritative
+ * gate, so being *permissive* here is safe.
  *
  * The bug this exists to prevent is the inverse — being STRICTER than the
  * server. A gate that blocks a legitimate `tenant_admin`/`broker` client-side
@@ -65,5 +64,5 @@ export function canModerateContent(user?: Partial<AdminTierUser> | null): boolea
 
   const role = (user?.role as string | undefined) ?? '';
 
-  return role === 'broker' || role === 'coordinator' || role === 'moderator';
+  return role === 'broker' || role === 'coordinator';
 }

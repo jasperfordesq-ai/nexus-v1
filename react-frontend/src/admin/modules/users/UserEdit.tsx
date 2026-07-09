@@ -570,10 +570,7 @@ export function UserEdit() {
                   isRequired isInvalid={!!errors.role} errorMessage={errors.role} isDisabled={submitting}>
                   <SelectItem key="member" id="member">{t('roles.member')}</SelectItem>
                   <SelectItem key="broker" id="broker">{t('roles.broker')}</SelectItem>
-                  <SelectItem key="moderator" id="moderator">{t('roles.moderator')}</SelectItem>
-                  <SelectItem key="newsletter_admin" id="newsletter_admin">{t('roles.newsletter_admin')}</SelectItem>
                   <SelectItem key="admin" id="admin">{t('roles.admin')}</SelectItem>
-                  <SelectItem key="tenant_admin" id="tenant_admin">{t('roles.tenant_admin')}</SelectItem>
                 </Select>
                 <Select label={t('fields.status')} placeholder={t('placeholders.status')} selectedKeys={status ? [status] : []}
                   onSelectionChange={(keys) => setStatus(Array.from(keys)[0] as string)}

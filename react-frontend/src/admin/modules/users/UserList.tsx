@@ -82,7 +82,6 @@ const ROLE_HINTS: Record<string, string> = {
   admin: 'admin',
   broker: 'broker',
   member: 'member',
-  moderator: 'moderator',
   super_admin: 'super_admin',
   superadmin: 'super_admin',
   tenant_admin: 'tenant_admin',

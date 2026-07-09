@@ -187,9 +187,6 @@ export function UserCreate() {
               >
                 <SelectItem key="member" id="member">{t('users.role_member')}</SelectItem>
                 <SelectItem key="broker" id="broker">{t('users.role_broker')}</SelectItem>
-                <SelectItem key="moderator" id="moderator">{t('users.role_moderator')}</SelectItem>
-                <SelectItem key="newsletter_admin" id="newsletter_admin">{t('users.role_newsletter_admin')}</SelectItem>
-                <SelectItem key="tenant_admin" id="tenant_admin">{t('users.role_tenant_admin')}</SelectItem>
                 <SelectItem key="admin" id="admin">{t('users.role_admin')}</SelectItem>
               </Select>
 

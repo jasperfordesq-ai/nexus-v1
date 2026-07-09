@@ -319,18 +319,13 @@ class AdminUsersController extends BaseApiController
         $statusForNotification = null;
 
         // SECURITY: Restrict role values to prevent privilege escalation (SEC-007)
-        $allowedRoles = ['member', 'admin', 'broker', 'moderator', 'newsletter_admin'];
-        // Only super admins can assign elevated roles
+        $allowedRoles = ['member', 'admin', 'broker'];
+        // tenant_admin has been merged into admin and is no longer an assignable
+        // role. Tenant super-admin is granted via the dedicated toggle
+        // (PUT /v2/admin/users/{id}/super-admin); super_admin/god via their own
+        // endpoints. Reject all three as role-field assignment targets.
         if (isset($input['role']) && in_array($input['role'], ['tenant_admin', 'super_admin', 'god'], true)) {
-            if (!$this->isCallerSuperAdmin($adminId)) {
-                return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.only_super_admins_assign_roles'), null, 403);
-            }
-            // Super admins can also assign tenant_admin
-            $allowedRoles = array_merge($allowedRoles, ['tenant_admin']);
-            // super_admin and god roles should only be managed via dedicated endpoints
-            if (in_array($input['role'], ['super_admin', 'god'], true)) {
-                return $this->respondWithError('VALIDATION_ERROR', __('api.use_super_admin_endpoints'), null, 422);
-            }
+            return $this->respondWithError('VALIDATION_ERROR', __('api.use_super_admin_endpoints'), 'role', 422);
         }
 
         $fieldMap = ['first_name', 'last_name', 'email', 'role', 'location', 'phone', 'bio', 'tagline', 'organization_name'];
@@ -472,14 +467,9 @@ class AdminUsersController extends BaseApiController
         $location = trim($input['location'] ?? '');
 
         // SECURITY: Restrict role to prevent privilege escalation via user creation (SEC-009)
-        $allowedRoles = ['member', 'admin', 'broker', 'moderator', 'newsletter_admin'];
-        // Only super admins can assign elevated roles like tenant_admin
-        if ($role === 'tenant_admin') {
-            if (!$this->isCallerSuperAdmin($adminId)) {
-                return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', __('api.only_super_admins_assign_roles'), null, 403);
-            }
-            $allowedRoles[] = 'tenant_admin';
-        }
+        $allowedRoles = ['member', 'admin', 'broker'];
+        // tenant_admin is no longer assignable (merged into admin); tenant
+        // super-admin is granted post-creation via the dedicated super-admin toggle.
         if (!in_array($role, $allowedRoles, true)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_role_allowed', ['roles' => implode(', ', $allowedRoles)]), 'role', 422);
         }
@@ -1270,7 +1260,7 @@ class AdminUsersController extends BaseApiController
             // SECURITY: Scope UPDATE by tenant_id to prevent cross-tenant modification
             if ($grant) {
                 DB::update(
-                    "UPDATE users SET is_tenant_super_admin = 1, role = 'tenant_admin' WHERE id = ? AND tenant_id = ?",
+                    "UPDATE users SET is_tenant_super_admin = 1, role = 'admin' WHERE id = ? AND tenant_id = ?",
                     [$id, $tenantId]
                 );
             } else {

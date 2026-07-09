@@ -633,7 +633,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.super_user_create_required_fields'), null, 422);
         }
 
-        $allowedRoles = ['member', 'admin', 'tenant_admin', 'broker', 'super_admin'];
+        $allowedRoles = ['member', 'admin', 'broker', 'super_admin'];
         if (!in_array($role, $allowedRoles, true)) {
             return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.invalid_role_allowed', ['roles' => implode(', ', $allowedRoles)]), 'role', 422);
         }
@@ -709,7 +709,7 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.super_user_edit_required_fields'), null, 422);
         }
 
-        $allowedRoles = ['member', 'admin', 'tenant_admin', 'broker', 'super_admin'];
+        $allowedRoles = ['member', 'admin', 'broker', 'super_admin'];
         if (!in_array($role, $allowedRoles, true)) {
             return $this->respondWithError(ApiErrorCodes::VALIDATION_ERROR, __('api.invalid_role_allowed', ['roles' => implode(', ', $allowedRoles)]), 'role', 422);
         }
@@ -975,9 +975,9 @@ class AdminSuperController extends BaseApiController
             return $this->respondWithError(ApiErrorCodes::SERVER_INTERNAL_ERROR, __('api.super_move_user_failed'), null, 500);
         }
 
-        // Step 2: Grant super admin
+        // Step 2: Grant super admin (role merged into admin; the flag carries the power)
         DB::update(
-            "UPDATE users SET is_tenant_super_admin = 1, role = 'tenant_admin' WHERE id = ?",
+            "UPDATE users SET is_tenant_super_admin = 1, role = 'admin' WHERE id = ?",
             [$id]
         );
 
@@ -1088,7 +1088,7 @@ class AdminSuperController extends BaseApiController
 
                 if ($grantSuperAdmin) {
                     DB::update(
-                        "UPDATE users SET is_tenant_super_admin = 1, role = 'tenant_admin' WHERE id = ?",
+                        "UPDATE users SET is_tenant_super_admin = 1, role = 'admin' WHERE id = ?",
                         [$uid]
                     );
                 } elseif (!$targetTenant['allows_subtenants']) {

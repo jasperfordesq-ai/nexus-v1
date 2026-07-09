@@ -27,7 +27,6 @@ const roleColorFor = (role?: string): 'primary' | 'secondary' | 'success' | 'war
     case 'super_admin': return 'secondary';
     case 'tenant_admin':
     case 'admin': return 'primary';
-    case 'moderator': return 'warning';
     case 'member': return 'success';
     default: return 'default';
   }

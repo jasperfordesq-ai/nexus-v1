@@ -27,6 +27,10 @@ export interface User {
   latitude?: number | null;
   longitude?: number | null;
   skills?: string[];
+  // Note: `moderator` is retained here as a *group-member* role (see GroupMember,
+  // which extends User) and for pre-migration legacy data. It is no longer an
+  // assignable platform role — the admin role selector and AdminUsersController
+  // allow-lists reject it.
   role?: 'member' | 'admin' | 'moderator' | 'broker' | 'tenant_admin' | 'super_admin';
   is_super_admin?: boolean;
   is_god?: boolean;
