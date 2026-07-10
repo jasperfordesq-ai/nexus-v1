@@ -890,14 +890,20 @@ export function ListingsPage() {
   );
 }
 
+// Light-mode text uses the -800 shade (not -600): on the soft -500/20 tint the
+// -600 shade fell below WCAG AA 4.5:1 for this 10px text (axe color-contrast,
+// "serious", on the listings + dashboard cards). -800 clears 4.5:1 for every
+// hue here; dark mode keeps -400, which already passed on the dark tint. The
+// category badge's muted text on the hover surface likewise failed, so it now
+// uses the primary text token.
 const BADGE_TONES = {
-  offer: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
-  request: 'bg-amber-500/20 text-amber-600 dark:text-amber-400',
-  mutual: 'bg-violet-500/20 text-violet-600 dark:text-violet-400',
-  one_way: 'bg-sky-500/20 text-sky-600 dark:text-sky-400',
-  remote: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
-  hybrid: 'bg-teal-500/20 text-teal-600 dark:text-teal-400',
-  category: 'bg-theme-hover text-theme-muted',
+  offer: 'bg-emerald-500/20 text-emerald-800 dark:text-emerald-400',
+  request: 'bg-amber-500/20 text-amber-800 dark:text-amber-400',
+  mutual: 'bg-violet-500/20 text-violet-800 dark:text-violet-400',
+  one_way: 'bg-sky-500/20 text-sky-800 dark:text-sky-400',
+  remote: 'bg-blue-500/20 text-blue-800 dark:text-blue-400',
+  hybrid: 'bg-teal-500/20 text-teal-800 dark:text-teal-400',
+  category: 'bg-theme-hover text-theme-primary',
 } as const;
 
 type BadgeTone = keyof typeof BADGE_TONES;
