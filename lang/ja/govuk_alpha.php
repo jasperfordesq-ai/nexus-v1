@@ -2835,6 +2835,8 @@ return [
             'empty_accepted' => 'まだフェデレーション接続がありません。',
             'empty_received' => '受信した接続リクエストはありません。',
             'empty_sent' => '送信した接続リクエストはありません。',
+            'pagination_previous' => '前へ',
+            'pagination_next' => '次へ',
             'community_label' => 'コミュニティ',
             'view_profile' => 'プロフィールを見る',
             'message' => 'Send a message',

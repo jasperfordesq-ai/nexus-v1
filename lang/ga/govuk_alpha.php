@@ -2835,6 +2835,8 @@ return [
             'empty_accepted' => 'Níl ceangail chónasctha agat fós.',
             'empty_received' => 'Níl iarratais cheangail isteach agat.',
             'empty_sent' => 'Níl iarratais cheangail amach agat.',
+            'pagination_previous' => 'Ar ais',
+            'pagination_next' => 'Ar aghaidh',
             'community_label' => 'Pobal',
             'view_profile' => 'Féach ar an bpróifíl',
             'message' => 'Send a message',

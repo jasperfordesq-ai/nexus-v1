@@ -7342,10 +7342,15 @@ class AlphaController extends Controller
         $transactionsCount = 0;
         if ($tenantEnabled && $optedIn) {
             try {
+                // The send path dual-inserts an inbound AND an outbound copy with
+                // identical sender/receiver columns, so counting without a
+                // direction filter doubles the figure. Match the React API's
+                // semantics (FederationV2Controller::status): outbound copies
+                // count for the sender, inbound copies for the receiver.
                 $row = DB::selectOne(
                     "SELECT COUNT(*) as cnt FROM federation_messages
-                     WHERE (sender_user_id = ? AND sender_tenant_id = ?)
-                        OR (receiver_user_id = ? AND receiver_tenant_id = ?)",
+                     WHERE (direction = 'outbound' AND sender_user_id = ? AND sender_tenant_id = ?)
+                        OR (direction = 'inbound' AND receiver_user_id = ? AND receiver_tenant_id = ?)",
                     [$userId, $tenantId, $userId, $tenantId]
                 );
                 $messagesCount = (int) ($row->cnt ?? 0);
@@ -12524,12 +12529,21 @@ class AlphaController extends Controller
             $tab = 'accepted';
         }
 
+        // Page-based pagination (mirrors the wallet history pattern): fetch one
+        // extra row to detect a next page. A member with >$perPage connections
+        // previously lost every row beyond the flat 100-cap.
+        $page = max(1, (int) $request->query('page', 1));
+        $perPage = 50;
+
         $connections = [];
+        $hasMore = false;
         $loadError = false;
         if ($allowed) {
             try {
-                $connections = app(\App\Services\FederatedConnectionService::class)
-                    ->getConnections($userId, $statusFilter, 100, 0);
+                $rows = app(\App\Services\FederatedConnectionService::class)
+                    ->getConnections($userId, $statusFilter, $perPage + 1, ($page - 1) * $perPage);
+                $hasMore = count($rows) > $perPage;
+                $connections = array_slice($rows, 0, $perPage);
             } catch (\Throwable $e) {
                 report($e);
                 $loadError = true;
@@ -12544,6 +12558,8 @@ class AlphaController extends Controller
             'allowed' => $allowed,
             'connections' => $connections,
             'tab' => $tab,
+            'page' => $page,
+            'hasMore' => $hasMore,
             'loadError' => $loadError,
             'status' => self::asStr($request->query('status')) ?: null,
         ]);

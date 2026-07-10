@@ -2835,6 +2835,8 @@ return [
             'empty_accepted' => 'U heeft nog geen gefedereerde verbindingen.',
             'empty_received' => 'U heeft geen inkomende verbindingsverzoeken.',
             'empty_sent' => 'U heeft geen uitgaande verbindingsverzoeken.',
+            'pagination_previous' => 'Vorige',
+            'pagination_next' => 'Volgende',
             'community_label' => 'Gemeenschap',
             'view_profile' => 'Profiel bekijken',
             'message' => 'Send a message',

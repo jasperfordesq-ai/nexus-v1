@@ -2835,6 +2835,8 @@ return [
             'empty_accepted' => 'Todavía no tiene conexiones federadas.',
             'empty_received' => 'No tiene solicitudes de conexión entrantes.',
             'empty_sent' => 'No tiene solicitudes de conexión salientes.',
+            'pagination_previous' => 'Anterior',
+            'pagination_next' => 'Siguiente',
             'community_label' => 'Comunidad',
             'view_profile' => 'Ver perfil',
             'message' => 'Send a message',

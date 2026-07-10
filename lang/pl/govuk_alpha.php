@@ -2835,6 +2835,8 @@ return [
             'empty_accepted' => 'Nie masz jeszcze żadnych połączeń federacyjnych.',
             'empty_received' => 'Nie masz żadnych przychodzących próśb o połączenie.',
             'empty_sent' => 'Nie masz żadnych wychodzących próśb o połączenie.',
+            'pagination_previous' => 'Poprzednia',
+            'pagination_next' => 'Następna',
             'community_label' => 'Społeczność',
             'view_profile' => 'Zobacz profil',
             'message' => 'Send a message',

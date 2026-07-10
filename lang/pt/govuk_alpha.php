@@ -2835,6 +2835,8 @@ return [
             'empty_accepted' => 'Ainda não tem ligações federadas.',
             'empty_received' => 'Não tem pedidos de ligação recebidos.',
             'empty_sent' => 'Não tem pedidos de ligação enviados.',
+            'pagination_previous' => 'Anterior',
+            'pagination_next' => 'Seguinte',
             'community_label' => 'Comunidade',
             'view_profile' => 'Ver perfil',
             'message' => 'Send a message',

@@ -2835,6 +2835,8 @@ return [
             'empty_accepted' => 'Non hai ancora connessioni federate.',
             'empty_received' => 'Non hai richieste di connessione in entrata.',
             'empty_sent' => 'Non hai richieste di connessione in uscita.',
+            'pagination_previous' => 'Precedente',
+            'pagination_next' => 'Successivo',
             'community_label' => 'Comunità',
             'view_profile' => 'Visualizza profilo',
             'message' => 'Send a message',

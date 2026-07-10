@@ -16,7 +16,15 @@
         $translation = $translation ?? null;
         $translationId = is_array($translation) ? (int) ($translation['id'] ?? 0) : 0;
 
+        // Whitelist the ?status= values (same pattern as federation-member):
+        // an arbitrary query value must never echo a raw translation key.
+        $allowedStatuses = [
+            'message-sent', 'message-empty', 'message-too-long', 'message-failed',
+            'message-not-enabled', 'message-recipient-unavailable', 'message-unavailable',
+            'translate-unavailable', 'translate-failed',
+        ];
         $statusKey = (string) ($status ?? '');
+        $statusKey = in_array($statusKey, $allowedStatuses, true) ? $statusKey : '';
         $statusText = $statusKey !== '' ? __('govuk_alpha.fed2.messages.status.' . $statusKey) : '';
         // translate-* failures and every message-* outcome except message-sent are errors.
         $statusIsError = ($statusKey !== '') && ($statusKey !== 'message-sent');

@@ -2835,6 +2835,8 @@ return [
             'empty_accepted' => 'ليس لديك أي اتصالات موحدة حتى الآن.',
             'empty_received' => 'ليس لديك أي طلبات اتصال واردة.',
             'empty_sent' => 'ليس لديك أي طلبات اتصال صادرة.',
+            'pagination_previous' => 'السابق',
+            'pagination_next' => 'التالي',
             'community_label' => 'المجتمع',
             'view_profile' => 'عرض الملف الشخصي',
             'message' => 'Send a message',

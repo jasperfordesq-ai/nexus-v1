@@ -2835,6 +2835,8 @@ return [
             'empty_accepted' => 'Sie haben noch keine verbundenen Kontakte.',
             'empty_received' => 'Sie haben keine eingehenden Kontaktanfragen.',
             'empty_sent' => 'Sie haben keine ausgehenden Kontaktanfragen.',
+            'pagination_previous' => 'Zurück',
+            'pagination_next' => 'Weiter',
             'community_label' => 'Gemeinschaft',
             'view_profile' => 'Profil anzeigen',
             'message' => 'Send a message',

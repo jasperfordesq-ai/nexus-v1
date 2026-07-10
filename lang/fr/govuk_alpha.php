@@ -2835,6 +2835,8 @@ return [
             'empty_accepted' => 'Vous n\'avez pas encore de connexions fédérées.',
             'empty_received' => 'Vous n\'avez aucune demande de connexion entrante.',
             'empty_sent' => 'Vous n\'avez aucune demande de connexion sortante.',
+            'pagination_previous' => 'Précédent',
+            'pagination_next' => 'Suivant',
             'community_label' => 'Communauté',
             'view_profile' => 'Voir le profil',
             'message' => 'Send a message',

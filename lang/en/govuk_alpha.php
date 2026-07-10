@@ -2856,6 +2856,8 @@ return [
             'empty_accepted' => 'You have no federated connections yet.',
             'empty_received' => 'You have no incoming connection requests.',
             'empty_sent' => 'You have no outgoing connection requests.',
+            'pagination_previous' => 'Previous',
+            'pagination_next' => 'Next',
             'community_label' => 'Community',
             'view_profile' => 'View profile',
             'message' => 'Send a message',

@@ -435,6 +435,68 @@ class FederationParityTest extends TestCase
         ]);
     }
 
+    public function test_accessible_hub_message_stat_does_not_double_count_dual_insert_copies(): void
+    {
+        // Regression (audit B8): the send path dual-inserts an outbound (sender
+        // copy) and an inbound (receiver copy) row with IDENTICAL sender/receiver
+        // columns. The hub stat previously counted both copies (no direction
+        // filter), showing ~2x the React figure. A member with 5 sent + 3
+        // received must see 8, not 16.
+        $this->enableFederationForTenant();
+        $partnerTenantId = $this->seedPartnerTenant('Accessible Message Partner');
+        $this->enableFederationForTenant($partnerTenantId);
+        $this->seedPartnership($partnerTenantId);
+
+        $viewer = $this->authenticatedUser(['name' => 'Messaging Member']);
+        $partner = User::factory()->forTenant($partnerTenantId)->create(['status' => 'active', 'is_approved' => true]);
+        $this->setFederationSettings($viewer->id);
+        $this->setFederationSettings($partner->id);
+
+        $rows = [];
+        // 5 sent by the viewer — each send writes an outbound AND an inbound copy.
+        for ($i = 0; $i < 5; $i++) {
+            foreach (['outbound', 'inbound'] as $direction) {
+                $rows[] = [
+                    'sender_tenant_id'   => $this->testTenantId,
+                    'sender_user_id'     => $viewer->id,
+                    'receiver_tenant_id' => $partnerTenantId,
+                    'receiver_user_id'   => $partner->id,
+                    'subject'            => 'Sent ' . $i,
+                    'body'               => 'Body',
+                    'direction'          => $direction,
+                    'status'             => $direction === 'inbound' ? 'unread' : 'delivered',
+                    'created_at'         => now(),
+                ];
+            }
+        }
+        // 3 received by the viewer — dual copies again, viewer on the receiver side.
+        for ($i = 0; $i < 3; $i++) {
+            foreach (['outbound', 'inbound'] as $direction) {
+                $rows[] = [
+                    'sender_tenant_id'   => $partnerTenantId,
+                    'sender_user_id'     => $partner->id,
+                    'receiver_tenant_id' => $this->testTenantId,
+                    'receiver_user_id'   => $viewer->id,
+                    'subject'            => 'Received ' . $i,
+                    'body'               => 'Body',
+                    'direction'          => $direction,
+                    'status'             => $direction === 'inbound' ? 'unread' : 'delivered',
+                    'created_at'         => now(),
+                ];
+            }
+        }
+        DB::table('federation_messages')->insert($rows);
+
+        $response = $this->get("/{$this->testTenantSlug}/alpha/federation");
+
+        $response->assertOk();
+        $response->assertSeeInOrder([
+            __('govuk_alpha.federation.hub.stat_messages'),
+            '8',
+        ]);
+        $response->assertDontSee('16');
+    }
+
     public function test_accessible_federation_read_screens_require_member_opt_in(): void
     {
         $this->enableFederationForTenant();

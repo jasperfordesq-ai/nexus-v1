@@ -8,11 +8,15 @@
     @php
         $listing = $listing ?? [];
 
+        // Partner-supplied URL: only allow http(s) or site-relative schemes
+        // (same guard as the avatar on federation-member).
+        $asUrl = fn (string $p): string => $p === '' ? '' : (\Illuminate\Support\Str::startsWith($p, ['http://', 'https://', '/']) ? $p : '/' . ltrim($p, '/'));
+
         $title = trim((string) ($listing['title'] ?? ''));
         $type = (string) ($listing['type'] ?? '');
         $categoryName = trim((string) ($listing['category_name'] ?? ''));
         $location = trim((string) ($listing['location'] ?? ''));
-        $imageUrl = trim((string) ($listing['image_url'] ?? ''));
+        $imageUrl = $asUrl(trim((string) ($listing['image_url'] ?? '')));
         $description = (string) ($listing['description'] ?? '');
         $authorName = trim((string) ($listing['author_name'] ?? ''));
         $tenantName = trim((string) ($listing['tenant_name'] ?? ''));

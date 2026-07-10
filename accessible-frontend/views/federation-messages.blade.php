@@ -12,7 +12,14 @@
         $viewerOptedIn = (bool) ($viewerOptedIn ?? false);
         $viewerCanMessage = (bool) ($viewerCanMessage ?? false);
         $loadError = (bool) ($loadError ?? false);
+        // Whitelist the ?status= values (same pattern as federation-member):
+        // an arbitrary query value must never echo a raw translation key.
+        $allowedStatuses = [
+            'message-sent', 'message-empty', 'message-too-long', 'message-failed',
+            'message-not-enabled', 'message-recipient-unavailable', 'message-unavailable',
+        ];
         $statusKey = (string) ($status ?? '');
+        $statusKey = in_array($statusKey, $allowedStatuses, true) ? $statusKey : '';
         $statusText = $statusKey !== '' ? __('govuk_alpha.fed2.messages.status.' . $statusKey) : '';
         $statusIsError = $statusKey !== '' && $statusKey !== 'message-sent';
     @endphp

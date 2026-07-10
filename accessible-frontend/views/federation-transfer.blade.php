@@ -12,7 +12,16 @@
         $mName = trim((string) ($member['name'] ?? '')) ?: __('govuk_alpha.federation.member.caption');
         $memberId = (int) ($member['id'] ?? 0);
         $memberTenantId = (int) ($member['tenant_id'] ?? 0);
+        // Whitelist the ?status= values (same pattern as federation-member):
+        // an arbitrary query value must never echo a raw translation key.
+        $allowedStatuses = [
+            'transfer-sent', 'transfer-insufficient', 'transfer-amount-invalid',
+            'transfer-description-required', 'transfer-description-too-long',
+            'transfer-not-enabled', 'transfer-recipient-unavailable', 'transfer-self',
+            'transfer-failed',
+        ];
         $statusKey = (string) ($status ?? '');
+        $statusKey = in_array($statusKey, $allowedStatuses, true) ? $statusKey : '';
         $statusText = $statusKey !== '' ? __('govuk_alpha.fed2.transfer.status.' . $statusKey) : '';
         // transfer-sent is the only success state; every other status.* key is an error
         // (this includes the new transfer-description-too-long key, which is resolved
