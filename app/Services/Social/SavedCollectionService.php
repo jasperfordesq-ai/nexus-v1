@@ -24,7 +24,11 @@ class SavedCollectionService
 
     /** Source table and preview columns for each item type. All tables are tenant-scoped. */
     private const TYPE_TABLE_MAP = [
-        'post' => ['table' => 'posts', 'cols' => ['id', 'content as title']],
+        // 'post' is a FEED post (feed_posts) — the /saved UI deep-links it to
+        // /feed?post={id}. It is NOT the legacy blog `posts` table (blog
+        // articles save as 'article' -> pages). Mapping 'post' to `posts`
+        // made the existence check reject every real feed save.
+        'post' => ['table' => 'feed_posts', 'cols' => ['id', 'content as title']],
         'listing' => ['table' => 'listings', 'cols' => ['id', 'title']],
         'event' => ['table' => 'events', 'cols' => ['id', 'title']],
         'group' => ['table' => 'groups', 'cols' => ['id', 'name as title']],

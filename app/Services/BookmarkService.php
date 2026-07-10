@@ -69,7 +69,12 @@ class BookmarkService
 
     /** Table and title column for each bookmarkable type. */
     private const TYPE_TABLE_MAP = [
-        'post'       => ['table' => 'posts',            'col' => 'title'],
+        // 'post' is a FEED post (feed_posts, title = post content) — both the
+        // React FeedCard BookmarkButton and the accessible frontend's
+        // storeFeedPostSave() bookmark ('post', feed_posts.id). Blog articles
+        // bookmark as 'blog' -> pages. Mapping 'post' to the legacy blog
+        // `posts` table made the existence check reject every real feed save.
+        'post'       => ['table' => 'feed_posts',       'col' => 'content'],
         'listing'    => ['table' => 'listings',         'col' => 'title'],
         'event'      => ['table' => 'events',           'col' => 'title'],
         'job'        => ['table' => 'job_vacancies',    'col' => 'title'],

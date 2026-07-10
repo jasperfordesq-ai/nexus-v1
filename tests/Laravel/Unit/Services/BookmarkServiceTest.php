@@ -174,4 +174,27 @@ class BookmarkServiceTest extends TestCase
             'Foreign-tenant listing title must not be hydrated'
         );
     }
+
+    // ── 'post' bookmarks are FEED posts (CI regression 2026-07-09) ────────
+    // TYPE_TABLE_MAP briefly pointed 'post' at the legacy blog `posts` table,
+    // so the tenant existence check rejected every real feed save (React
+    // FeedCard bookmark + alpha storeFeedPostSave both send feed_posts ids).
+
+    public function test_toggle_bookmarks_a_feed_post(): void
+    {
+        $user = $this->createUser();
+        $feedPostId = (int) DB::table('feed_posts')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id'   => $user->id,
+            'content'   => 'Feed post to bookmark',
+        ]);
+
+        $result = $this->service->toggle($user->id, 'post', $feedPostId);
+
+        $this->assertTrue($result['bookmarked'], 'a same-tenant feed post must be bookmarkable');
+
+        $items = $this->service->getUserBookmarks($user->id, 'post')->items();
+        $this->assertCount(1, $items);
+        $this->assertSame('Feed post to bookmark', $items[0]->title);
+    }
 }

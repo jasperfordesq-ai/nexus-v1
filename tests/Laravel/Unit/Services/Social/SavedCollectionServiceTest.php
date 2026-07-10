@@ -79,11 +79,11 @@ class SavedCollectionServiceTest extends TestCase
     private function insertItem(string $type, int $userId, int $tenantId = self::TENANT_ID): int
     {
         return match ($type) {
-            'post' => DB::table('posts')->insertGetId([
+            // 'post' saved items are FEED posts (feed_posts), not blog `posts`
+            // — see SavedCollectionService::TYPE_TABLE_MAP.
+            'post' => DB::table('feed_posts')->insertGetId([
                 'tenant_id' => $tenantId,
-                'author_id' => $userId,
-                'title' => 'Seeded post',
-                'slug' => uniqid('saved-post-', true),
+                'user_id' => $userId,
                 'content' => 'Seeded post content',
             ]),
             'listing' => DB::table('listings')->insertGetId([
