@@ -44,7 +44,22 @@ async function primeBrowserState(page: Page): Promise<void> {
   }, cookieConsent);
 }
 
-async function primeApiAuth(page: Page, kind: 'user' | 'admin'): Promise<void> {
+type CachedAuth = {
+  accessToken: string;
+  refreshToken?: string;
+  tenantId?: string | number;
+};
+
+// Log in at most once per role per worker and reuse the tokens across every
+// test. `/api/auth/login` is IP-rate-limited (route `throttle:30,1` plus the
+// App\Core\RateLimiter brute-force limiter) and returns 429 `rate_limited`;
+// logging in per test flooded it (~40 logins/min from the CI runner's single
+// IP → ~11 succeed, the rest 429 and fail the whole smoke suite). Caching keeps
+// it to two logins per worker, and the retry below absorbs any residual throttle
+// when parallel workers share the runner IP.
+const authTokenCache = new Map<'user' | 'admin', CachedAuth>();
+
+async function loginForRole(page: Page, kind: 'user' | 'admin'): Promise<CachedAuth> {
   const email = kind === 'admin' ? process.env.E2E_ADMIN_EMAIL : process.env.E2E_USER_EMAIL;
   const password = kind === 'admin' ? process.env.E2E_ADMIN_PASSWORD : process.env.E2E_USER_PASSWORD;
 
@@ -52,30 +67,69 @@ async function primeApiAuth(page: Page, kind: 'user' | 'admin'): Promise<void> {
     throw new Error(`Missing E2E ${kind} credentials`);
   }
 
-  const response = await page.request.post(`${apiBaseUrl}/api/auth/login`, {
-    data: {
-      email,
-      password,
-      tenant_slug: DEFAULT_TENANT,
-    },
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Tenant-Slug': DEFAULT_TENANT,
-    },
-  });
+  const maxAttempts = 5;
+  let lastStatus = 0;
+  let lastBody = '';
 
-  if (!response.ok()) {
-    throw new Error(`E2E ${kind} API login failed (${response.status()}): ${await response.text()}`);
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const response = await page.request.post(`${apiBaseUrl}/api/auth/login`, {
+      data: {
+        email,
+        password,
+        tenant_slug: DEFAULT_TENANT,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Tenant-Slug': DEFAULT_TENANT,
+      },
+    });
+
+    if (response.ok()) {
+      const loginData = await response.json();
+      const accessToken = loginData?.data?.access_token || loginData?.access_token;
+      const refreshToken = loginData?.data?.refresh_token || loginData?.refresh_token;
+      const tenantId = loginData?.data?.tenant_id || loginData?.tenant_id;
+
+      if (!accessToken) {
+        throw new Error(`E2E ${kind} API login did not return an access token`);
+      }
+
+      return { accessToken, refreshToken, tenantId };
+    }
+
+    lastStatus = response.status();
+    lastBody = await response.text();
+
+    // On a throttle response, honour retry_after (seconds) and try again rather
+    // than failing the suite on a transient rate-limit.
+    if (lastStatus === 429 && attempt < maxAttempts) {
+      let retryAfter = 2;
+      try {
+        const parsed = Number(JSON.parse(lastBody)?.retry_after);
+        if (Number.isFinite(parsed) && parsed > 0) {
+          retryAfter = parsed;
+        }
+      } catch {
+        // non-JSON body — fall back to the default backoff
+      }
+      await page.waitForTimeout(Math.min(retryAfter, 20) * 1000);
+      continue;
+    }
+
+    break;
   }
 
-  const loginData = await response.json();
-  const accessToken = loginData?.data?.access_token || loginData?.access_token;
-  const refreshToken = loginData?.data?.refresh_token || loginData?.refresh_token;
-  const tenantId = loginData?.data?.tenant_id || loginData?.tenant_id;
+  throw new Error(`E2E ${kind} API login failed (${lastStatus}): ${lastBody}`);
+}
 
-  if (!accessToken) {
-    throw new Error(`E2E ${kind} API login did not return an access token`);
+async function primeApiAuth(page: Page, kind: 'user' | 'admin'): Promise<void> {
+  let tokens = authTokenCache.get(kind);
+  if (!tokens) {
+    tokens = await loginForRole(page, kind);
+    authTokenCache.set(kind, tokens);
   }
+
+  const { accessToken, refreshToken, tenantId } = tokens;
 
   await page.addInitScript(
     ({ accessToken, refreshToken, tenantId }) => {
