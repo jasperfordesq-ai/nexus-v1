@@ -492,6 +492,20 @@ $app = Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        // Accessible (GOV.UK) frontend: HTML error pages with layout + AGPL
+        // attribution instead of the bare Laravel defaults. Registered FIRST so
+        // accessible requests are skinned before the API JSON renderables below
+        // (TooManyRequests/ModelNotFound would otherwise answer them with JSON).
+        // Returns null for non-accessible requests, falling through unchanged.
+        $exceptions->renderable(function (\Throwable $e, \Illuminate\Http\Request $request) {
+            if (!\App\Support\AccessibleErrorPage::handles($request)) {
+                return null;
+            }
+            $status = \App\Support\AccessibleErrorPage::statusFor($e);
+
+            return $status === null ? null : \App\Support\AccessibleErrorPage::render($request, $status);
+        });
+
         // JSON error responses for API — see App\Exceptions\Handler
         $exceptions->renderable(function (\Illuminate\Validation\ValidationException $e) {
             return response()->json([

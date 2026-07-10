@@ -144,6 +144,8 @@ return [
         'source' => 'View the source code on GitHub',
     ],
     'actions' => [
+        'back' => 'Back',
+        'cancel' => 'Cancel',
         'download_data' => 'Request your data',
         'delete_account' => 'Delete your account',
         'apply_filters' => 'Apply filters',
@@ -4342,5 +4344,34 @@ return [
 
         // legal-hub — card list a11y
         'legal_hub_list_label' => 'Legal documents',
+    ],
+    'error_pages' => [
+        'home_link' => 'Go to the homepage',
+        '403_title' => 'You do not have permission to view this page',
+        '403_body' => 'This page is not available to your account. If you think this is wrong, contact your community organisers.',
+        '404_title' => 'Page not found',
+        '404_body' => 'If you typed the web address, check it is correct. If you pasted the web address, check you copied the entire address.',
+        '419_title' => 'This page has expired',
+        '419_body' => 'Your form session expired. Go back, reload the page and try again.',
+        '429_title' => 'Too many requests',
+        '429_body' => 'You have made too many requests in a short time. Wait a minute and try again.',
+        '503_title' => 'Sorry, the service is unavailable',
+        '503_body' => 'Try again later.',
+        'generic_title' => 'Sorry, there is a problem',
+        'generic_body' => 'Try again later.',
+    ],
+    'ux' => [
+        'confirm_irreversible' => 'This action is permanent and cannot be undone.',
+        'confirm_delete_button' => 'Yes, delete',
+        'transfer_confirm_label' => 'I understand the credits move immediately and this cannot be undone.',
+        'device_web' => 'Web browser',
+        'device_mobile' => 'Mobile app',
+        'device_pwa' => 'Installed app',
+        'device_unknown' => 'Unknown device',
+        'project_status_approved' => 'Approved',
+        'project_status_active' => 'Active',
+        'project_status_completed' => 'Completed',
+        'rating_choose' => 'Choose a rating',
+        'rating_out_of' => ':rating out of 5',
     ],
 ];
