@@ -122,4 +122,46 @@ class GuardianConsentLifecycleTest extends TestCase
         $this->assertArrayHasKey('opportunity_title', $first);
         $this->assertArrayNotHasKey('consent_token', $first);
     }
+
+    /**
+     * 2026-07-10 audit C1: the minor listing did a bare ->get() and returned
+     * consent_token, letting the minor self-grant via the public verify URL.
+     */
+    public function test_minor_listing_hides_consent_token_and_ip(): void
+    {
+        $this->insertConsent(['minor_user_id' => 77]);
+
+        $rows = GuardianConsentService::getConsentsForMinor(77);
+
+        $this->assertNotEmpty($rows);
+        $this->assertArrayNotHasKey('consent_token', $rows[0]);
+        $this->assertArrayNotHasKey('consent_ip', $rows[0]);
+        $this->assertArrayHasKey('status', $rows[0]);
+        $this->assertArrayHasKey('guardian_email', $rows[0]);
+    }
+
+    public function test_get_consent_status_by_token_is_read_only(): void
+    {
+        $token = bin2hex(random_bytes(32));
+        $id = $this->insertConsent(['consent_token' => $token]);
+
+        $status = GuardianConsentService::getConsentStatusByToken($token);
+
+        $this->assertNotNull($status);
+        $this->assertSame('pending', $status['status']);
+        $this->assertTrue($status['valid']);
+        // The lookup must never mutate the row — granting is POST-only.
+        $this->assertSame('pending', DB::table('vol_guardian_consents')->where('id', $id)->value('status'));
+
+        $this->assertNull(GuardianConsentService::getConsentStatusByToken('unknown-token'));
+
+        $expiredToken = bin2hex(random_bytes(32));
+        $this->insertConsent([
+            'consent_token' => $expiredToken,
+            'expires_at' => now()->subDay()->format('Y-m-d H:i:s'),
+        ]);
+        $expired = GuardianConsentService::getConsentStatusByToken($expiredToken);
+        $this->assertSame('expired', $expired['status']);
+        $this->assertFalse($expired['valid']);
+    }
 }

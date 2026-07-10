@@ -10,8 +10,9 @@
  * Deliberately does NOT grant on page load — email link scanners prefetch
  * URLs, and consent must come from a human action — so the guardian is shown
  * an explicit "Confirm my approval" button which calls
- * GET /api/v2/volunteering/guardian-consents/verify/{token} (public route,
- * the token is the credential).
+ * POST /api/v2/volunteering/guardian-consents/verify/{token} (public route,
+ * the token is the credential). The GET on the same URL is a read-only
+ * lookup and never grants, so scanner prefetches can't flip state either.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -53,7 +54,7 @@ export default function GuardianConsentVerifyPage() {
     if (!token) return;
     setState('submitting');
     try {
-      const res = await api.get(`/v2/volunteering/guardian-consents/verify/${encodeURIComponent(token)}`, { skipAuth: true });
+      const res = await api.post(`/v2/volunteering/guardian-consents/verify/${encodeURIComponent(token)}`, undefined, { skipAuth: true });
       setState(res.success ? 'success' : 'error');
     } catch {
       setState('error');

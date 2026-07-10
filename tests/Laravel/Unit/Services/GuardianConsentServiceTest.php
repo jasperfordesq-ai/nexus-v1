@@ -222,7 +222,7 @@ class GuardianConsentServiceTest extends TestCase
 
     public function test_getConsentsForMinor_returns_array(): void
     {
-        DB::shouldReceive('table->where->where->orderByDesc->get->map->toArray')
+        DB::shouldReceive('table->where->where->select->orderByDesc->get->map->toArray')
             ->andReturn([['id' => 1, 'status' => 'active']]);
 
         $result = GuardianConsentService::getConsentsForMinor(1);
@@ -231,11 +231,50 @@ class GuardianConsentServiceTest extends TestCase
 
     public function test_getConsentsForMinor_returns_empty_on_error(): void
     {
-        DB::shouldReceive('table->where->where->orderByDesc->get->map->toArray')
+        DB::shouldReceive('table->where->where->select->orderByDesc->get->map->toArray')
             ->andThrow(new \Exception('error'));
         Log::shouldReceive('error')->once();
 
         $this->assertEquals([], GuardianConsentService::getConsentsForMinor(1));
+    }
+
+    // =========================================================================
+    // getConsentStatusByToken()
+    // =========================================================================
+
+    public function test_getConsentStatusByToken_returns_null_when_not_found(): void
+    {
+        DB::shouldReceive('table->where->where->select->first')->andReturn(null);
+
+        $this->assertNull(GuardianConsentService::getConsentStatusByToken('unknown'));
+    }
+
+    public function test_getConsentStatusByToken_reports_pending_token_as_valid(): void
+    {
+        DB::shouldReceive('table->where->where->select->first')->andReturn((object) [
+            'id' => 1,
+            'status' => 'pending',
+            'expires_at' => (new \DateTime())->modify('+30 days')->format('Y-m-d H:i:s'),
+        ]);
+
+        $result = GuardianConsentService::getConsentStatusByToken('token');
+
+        $this->assertSame('pending', $result['status']);
+        $this->assertTrue($result['valid']);
+    }
+
+    public function test_getConsentStatusByToken_reports_expired_pending_token_as_invalid(): void
+    {
+        DB::shouldReceive('table->where->where->select->first')->andReturn((object) [
+            'id' => 1,
+            'status' => 'pending',
+            'expires_at' => (new \DateTime())->modify('-1 day')->format('Y-m-d H:i:s'),
+        ]);
+
+        $result = GuardianConsentService::getConsentStatusByToken('token');
+
+        $this->assertSame('expired', $result['status']);
+        $this->assertFalse($result['valid']);
     }
 
     // =========================================================================

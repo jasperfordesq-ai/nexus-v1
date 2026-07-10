@@ -2960,7 +2960,10 @@ Route::post('/v2/volunteering/expenses', [\App\Http\Controllers\Api\VolunteerExp
 Route::get('/v2/volunteering/expenses/{id}', [\App\Http\Controllers\Api\VolunteerExpenseController::class, 'getExpense']);
 Route::get('/v2/volunteering/guardian-consents', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'myGuardianConsents']);
 Route::post('/v2/volunteering/guardian-consents', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'requestGuardianConsent']);
-Route::get('/v2/volunteering/guardian-consents/verify/{token}', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'verifyGuardianConsent'])->withoutMiddleware('auth:sanctum');
+// Guardian-consent verify: GET is a read-only token lookup; the actual grant is
+// POST-only so unauthenticated prefetches (mail scanners) can never flip state.
+Route::get('/v2/volunteering/guardian-consents/verify/{token}', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'showGuardianConsentVerification'])->withoutMiddleware('auth:sanctum');
+Route::post('/v2/volunteering/guardian-consents/verify/{token}', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'verifyGuardianConsent'])->withoutMiddleware('auth:sanctum');
 Route::delete('/v2/volunteering/guardian-consents/{id}', [\App\Http\Controllers\Api\VolunteerCommunityController::class, 'withdrawGuardianConsent']);
 Route::get('/v2/volunteering/training', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'myTraining']);
 Route::post('/v2/volunteering/training', [\App\Http\Controllers\Api\VolunteerWellbeingController::class, 'recordTraining']);

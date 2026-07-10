@@ -55,8 +55,8 @@ describe('GuardianConsentVerifyPage', () => {
 
   it('shows loading/submitting state while API call is in-flight', async () => {
     let resolvePromise!: (v: unknown) => void;
-    vi.mocked(api.get).mockReturnValue(
-      new Promise((res) => { resolvePromise = res; }) as ReturnType<typeof api.get>
+    vi.mocked(api.post).mockReturnValue(
+      new Promise((res) => { resolvePromise = res; }) as ReturnType<typeof api.post>
     );
 
     render(<GuardianConsentVerifyPage />);
@@ -74,14 +74,16 @@ describe('GuardianConsentVerifyPage', () => {
   });
 
   it('shows success state after API returns success', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: true });
+    vi.mocked(api.post).mockResolvedValueOnce({ success: true });
 
     render(<GuardianConsentVerifyPage />);
     fireEvent.click(screen.getByRole('button'));
 
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalledWith(
+      // The grant must be a POST — a GET on the verify URL is read-only.
+      expect(api.post).toHaveBeenCalledWith(
         expect.stringContaining('guardian-consents/verify/test-token-abc123'),
+        undefined,
         expect.objectContaining({ skipAuth: true }),
       );
     });
@@ -94,13 +96,13 @@ describe('GuardianConsentVerifyPage', () => {
   });
 
   it('shows error state after API returns success:false', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: false, error: 'Token expired' });
+    vi.mocked(api.post).mockResolvedValueOnce({ success: false, error: 'Token expired' });
 
     render(<GuardianConsentVerifyPage />);
     fireEvent.click(screen.getByRole('button'));
 
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalled();
+      expect(api.post).toHaveBeenCalled();
     });
 
     // In error state the confirm button disappears
@@ -110,13 +112,13 @@ describe('GuardianConsentVerifyPage', () => {
   });
 
   it('shows error state after API throws', async () => {
-    vi.mocked(api.get).mockRejectedValueOnce(new Error('Network error'));
+    vi.mocked(api.post).mockRejectedValueOnce(new Error('Network error'));
 
     render(<GuardianConsentVerifyPage />);
     fireEvent.click(screen.getByRole('button'));
 
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalled();
+      expect(api.post).toHaveBeenCalled();
     });
 
     await waitFor(() => {
@@ -131,21 +133,22 @@ describe('GuardianConsentVerifyPage', () => {
 
   it('calls the correct API endpoint with the token from useParams', async () => {
     vi.mocked(useParams).mockReturnValue({ token: 'my-special-token' });
-    vi.mocked(api.get).mockResolvedValueOnce({ success: true });
+    vi.mocked(api.post).mockResolvedValueOnce({ success: true });
 
     render(<GuardianConsentVerifyPage />);
     fireEvent.click(screen.getByRole('button'));
 
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalledWith(
+      expect(api.post).toHaveBeenCalledWith(
         expect.stringContaining('my-special-token'),
+        undefined,
         expect.any(Object),
       );
     });
   });
 
   it('announces the error result via an assertive alert region (WCAG 4.1.3)', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: false, error: 'Token expired' });
+    vi.mocked(api.post).mockResolvedValueOnce({ success: false, error: 'Token expired' });
 
     render(<GuardianConsentVerifyPage />);
     fireEvent.click(screen.getByRole('button'));
@@ -157,7 +160,7 @@ describe('GuardianConsentVerifyPage', () => {
   });
 
   it('moves focus to the live result region when the action resolves', async () => {
-    vi.mocked(api.get).mockResolvedValueOnce({ success: true });
+    vi.mocked(api.post).mockResolvedValueOnce({ success: true });
 
     render(<GuardianConsentVerifyPage />);
     fireEvent.click(screen.getByRole('button'));

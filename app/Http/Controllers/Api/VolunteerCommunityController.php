@@ -1019,7 +1019,29 @@ class VolunteerCommunityController extends BaseApiController
         }
     }
 
-    /** Public endpoint -- no auth required */
+    /**
+     * Public endpoint -- no auth required.
+     *
+     * Read-only token lookup for the GET verify route. Deliberately does NOT
+     * grant: the pending → active state change happens only via the POST route
+     * (verifyGuardianConsent), so mail scanners prefetching the emailed link
+     * can never record legal consent.
+     */
+    public function showGuardianConsentVerification($token): JsonResponse
+    {
+        $this->ensureFeature();
+        $this->rateLimit('guardian_consent_verify_lookup', 20, 300);
+
+        $status = $this->guardianConsentService->getConsentStatusByToken($token);
+
+        if ($status === null) {
+            return $this->respondWithError('INVALID_TOKEN', __('api.vol_consent_invalid_token'), null, 400);
+        }
+
+        return $this->respondWithData($status);
+    }
+
+    /** Public endpoint -- no auth required. POST only: grants the consent. */
     public function verifyGuardianConsent($token): JsonResponse
     {
         $this->ensureFeature();

@@ -200,11 +200,76 @@ class GuardianConsentGateTest extends TestCase
         $this->assertSame('GUARDIAN_CONSENT_REQUIRED', VolunteerService::getErrors()[0]['code'] ?? null);
     }
 
-    public function test_verify_endpoint_grants_pending_consent_without_auth(): void
+    public function test_verify_post_grants_pending_consent_without_auth(): void
     {
         TenantContext::setById($this->testTenantId);
         $token = bin2hex(random_bytes(32));
-        $id = (int) DB::table('vol_guardian_consents')->insertGetId([
+        $id = $this->insertPendingConsent($token);
+
+        $response = $this->apiPost("/v2/volunteering/guardian-consents/verify/{$token}");
+
+        $response->assertStatus(200);
+        $this->assertSame('active', DB::table('vol_guardian_consents')->where('id', $id)->value('status'));
+    }
+
+    /**
+     * 2026-07-10 audit H1: the verify GET used to perform the pending → active
+     * grant, so any unauthenticated prefetch (mail scanner, token holder)
+     * could record legal consent. GET must now be a read-only lookup.
+     */
+    public function test_verify_get_is_read_only_and_does_not_grant(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $token = bin2hex(random_bytes(32));
+        $id = $this->insertPendingConsent($token);
+
+        $response = $this->apiGet("/v2/volunteering/guardian-consents/verify/{$token}");
+
+        $response->assertStatus(200);
+        $this->assertSame('pending', $response->json('data.status'));
+        $this->assertArrayNotHasKey('consent_token', (array) $response->json('data'));
+        $this->assertSame('pending', DB::table('vol_guardian_consents')->where('id', $id)->value('status'));
+
+        $this->apiGet('/v2/volunteering/guardian-consents/verify/not-a-real-token')->assertStatus(400);
+    }
+
+    /**
+     * 2026-07-10 audit C1: the minor's own consent-list endpoint returned every
+     * column including consent_token, letting the minor grant their own
+     * consent via the public verify URL. The token must never reach the minor.
+     */
+    public function test_minor_cannot_obtain_consent_token_or_self_grant(): void
+    {
+        $this->actingAsUserWithDob(now()->subYears(15)->toDateString());
+
+        $create = $this->apiPost('/v2/volunteering/guardian-consents', [
+            'guardian_name' => 'Real Guardian',
+            'guardian_email' => 'real-guardian@example.com',
+            'relationship' => 'parent',
+        ]);
+        $create->assertStatus(201);
+        $this->assertArrayNotHasKey('consent_token', (array) $create->json('data'));
+
+        $list = $this->apiGet('/v2/volunteering/guardian-consents');
+        $list->assertStatus(200);
+        $rows = $list->json('data');
+        $this->assertNotEmpty($rows);
+        foreach ($rows as $row) {
+            $this->assertArrayNotHasKey('consent_token', $row);
+            $this->assertArrayNotHasKey('consent_ip', $row);
+        }
+
+        // Even with the real token (worst case: obtained out-of-band), the GET
+        // redemption vehicle no longer mutates — consent stays pending.
+        $consentId = $rows[0]['id'];
+        $token = DB::table('vol_guardian_consents')->where('id', $consentId)->value('consent_token');
+        $this->apiGet("/v2/volunteering/guardian-consents/verify/{$token}")->assertStatus(200);
+        $this->assertSame('pending', DB::table('vol_guardian_consents')->where('id', $consentId)->value('status'));
+    }
+
+    private function insertPendingConsent(string $token): int
+    {
+        return (int) DB::table('vol_guardian_consents')->insertGetId([
             'tenant_id' => $this->testTenantId,
             'minor_user_id' => 1,
             'guardian_name' => 'Test Guardian',
@@ -215,10 +280,5 @@ class GuardianConsentGateTest extends TestCase
             'expires_at' => now()->addDays(30)->format('Y-m-d H:i:s'),
             'created_at' => now(),
         ]);
-
-        $response = $this->apiGet("/v2/volunteering/guardian-consents/verify/{$token}");
-
-        $response->assertStatus(200);
-        $this->assertSame('active', DB::table('vol_guardian_consents')->where('id', $id)->value('status'));
     }
 }

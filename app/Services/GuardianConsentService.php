@@ -184,6 +184,43 @@ class GuardianConsentService
     }
 
     /**
+     * Look up a consent request by token WITHOUT mutating it.
+     *
+     * Backs the public GET verify endpoint, which must stay side-effect-free:
+     * the pending → active grant happens only via POST (grantConsent), so a
+     * mail scanner prefetching the emailed link can never record legal consent.
+     *
+     * @param string $token Consent token
+     * @return array|null ['status' => string, 'valid' => bool], or null when the token is unknown
+     */
+    public static function getConsentStatusByToken(string $token): ?array
+    {
+        $tenantId = TenantContext::getId();
+
+        try {
+            $consent = DB::table('vol_guardian_consents')
+                ->where('consent_token', $token)
+                ->where('tenant_id', $tenantId)
+                ->select(['id', 'status', 'expires_at'])
+                ->first();
+
+            if (!$consent) {
+                return null;
+            }
+
+            $expired = $consent->expires_at && strtotime($consent->expires_at) < time();
+
+            return [
+                'status' => ($expired && $consent->status === 'pending') ? 'expired' : $consent->status,
+                'valid' => $consent->status === 'pending' && !$expired,
+            ];
+        } catch (\Exception $e) {
+            Log::error('GuardianConsentService::getConsentStatusByToken error: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
      * Grant consent using a consent token.
      *
      * @param string $token Consent token
@@ -388,9 +425,27 @@ class GuardianConsentService
         $tenantId = TenantContext::getId();
 
         try {
+            // SECURITY: never select consent_token here. The caller is the MINOR;
+            // handing them the token would let them open the public verify
+            // endpoint and grant their own guardian consent, defeating the
+            // safeguarding gate (same deny-list as getConsentsForAdmin below).
             return DB::table('vol_guardian_consents')
                 ->where('minor_user_id', $minorUserId)
                 ->where('tenant_id', $tenantId)
+                ->select([
+                    'id',
+                    'minor_user_id',
+                    'guardian_name',
+                    'guardian_email',
+                    'guardian_phone',
+                    'relationship',
+                    'opportunity_id',
+                    'status',
+                    'consent_given_at',
+                    'consent_withdrawn_at',
+                    'expires_at',
+                    'created_at',
+                ])
                 ->orderByDesc('created_at')
                 ->get()
                 ->map(fn ($row) => (array) $row)
