@@ -345,7 +345,7 @@ export function AvailabilityGrid({
                         onPress={() => toggleSlot(dayIdx, time)}
                         isDisabled={!editable}
                         className={`
-                          h-6 rounded-sm transition-all min-w-0 p-0
+                          h-6 w-full rounded-sm transition-all min-w-0 p-0
                           ${isAvail
                             ? 'bg-emerald-500/60 hover:bg-emerald-500/80 border border-emerald-500/30'
                             : 'bg-theme-elevated hover:bg-theme-hover border border-theme-default'
