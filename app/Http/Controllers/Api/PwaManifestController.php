@@ -50,13 +50,45 @@ final class PwaManifestController
         ]);
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * Base manifest shared by every tenant, before the per-tenant overlay in
+     * show(). Embedded here rather than read from react-frontend/public/
+     * manifest.json: the backend image does not ship the React source tree, so
+     * that file is absent in production and CI — reading it threw and returned a
+     * 500 on every install-manifest request. Keep in sync with
+     * react-frontend/public/manifest.json if the static manifest changes.
+     *
+     * @return array<string, mixed>
+     */
     private function baseManifest(): array
     {
-        $path = base_path('react-frontend/public/manifest.json');
-        $manifest = json_decode((string) file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
+        $icon192 = ['src' => '/icons/icon-192.png', 'sizes' => '192x192'];
 
-        return is_array($manifest) ? $manifest : [];
+        return [
+            'name' => 'NEXUS Timebanking',
+            'short_name' => 'NEXUS',
+            'description' => 'Community timebanking platform — exchange skills and services using time credits.',
+            'id' => '.',
+            'start_url' => '.',
+            'scope' => '.',
+            'display' => 'standalone',
+            'background_color' => '#0f0f13',
+            'theme_color' => '#6366f1',
+            'orientation' => 'portrait-primary',
+            'categories' => ['social', 'lifestyle', 'productivity'],
+            'icons' => [
+                ['src' => '/icons/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+                ['src' => '/icons/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'maskable'],
+                ['src' => '/icons/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+                ['src' => '/icons/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
+            ],
+            'screenshots' => [],
+            'shortcuts' => [
+                ['name' => 'Listings', 'short_name' => 'Listings', 'description' => 'Browse service listings', 'url' => 'listings', 'icons' => [$icon192]],
+                ['name' => 'Messages', 'short_name' => 'Messages', 'description' => 'Open messages', 'url' => 'messages', 'icons' => [$icon192]],
+                ['name' => 'Wallet', 'short_name' => 'Wallet', 'description' => 'View time credit balance', 'url' => 'wallet', 'icons' => [$icon192]],
+            ],
+        ];
     }
 
     /** @return array{0: array<string, mixed>, 1: string} */
