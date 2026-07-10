@@ -88,7 +88,7 @@ export function TrustSafetyPage() {
 
       {/* Hero */}
       <motion.div variants={itemVariants} className="text-center">
-        <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-indigo-500/20 mb-4">
+        <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-accent-gradient-end/20 mb-4">
           <ShieldCheck className="w-10 h-10 text-emerald-500" aria-hidden="true" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">
@@ -128,7 +128,7 @@ export function TrustSafetyPage() {
           <motion.div key={section.titleKey} variants={itemVariants}>
             <GlassCard className="p-6 sm:p-8">
               <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                <Icon className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+                <Icon className="w-5 h-5 text-accent" aria-hidden="true" />
                 {t(section.titleKey, { name: brandName })}
               </h2>
               {section.introKey && (
@@ -142,7 +142,7 @@ export function TrustSafetyPage() {
                       className="text-theme-muted flex gap-3"
                     >
                       <span
-                        className="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-500/10 text-indigo-500 text-xs font-semibold inline-flex items-center justify-center mt-0.5"
+                        className="flex-shrink-0 w-6 h-6 rounded-full bg-accent/10 text-accent text-xs font-semibold inline-flex items-center justify-center mt-0.5"
                         aria-hidden="true"
                       >
                         {i + 1}
@@ -160,8 +160,8 @@ export function TrustSafetyPage() {
       {/* Contact CTA */}
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8 text-center">
-          <div className="inline-flex p-3 rounded-xl bg-indigo-500/15 mb-3">
-            <Mail className="w-6 h-6 text-indigo-500" aria-hidden="true" />
+          <div className="inline-flex p-3 rounded-xl bg-accent/15 mb-3">
+            <Mail className="w-6 h-6 text-accent" aria-hidden="true" />
           </div>
           <h2 className="text-xl font-semibold text-theme-primary mb-2">
             {t('trust_safety.contact_cta_title')}
@@ -170,16 +170,12 @@ export function TrustSafetyPage() {
             {t('trust_safety.contact_cta_body')}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link to={tenantPath('/contact')}>
-              <Button variant="primary" size="lg">
-                {t('trust_safety.contact_cta_button')}
-              </Button>
-            </Link>
-            <Link to={tenantPath('/community-guidelines')}>
-              <Button variant="tertiary" size="lg">
-                {t('trust_safety.community_guidelines_link')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/contact')} variant="primary" size="lg">
+              {t('trust_safety.contact_cta_button')}
+            </Button>
+            <Button as={Link} to={tenantPath('/community-guidelines')} variant="tertiary" size="lg">
+              {t('trust_safety.community_guidelines_link')}
+            </Button>
           </div>
         </GlassCard>
       </motion.div>

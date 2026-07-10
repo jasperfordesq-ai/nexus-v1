@@ -7,6 +7,7 @@
  * Admin Podcasts — tenant-scoped show and episode moderation for the Podcasts module.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -127,7 +128,7 @@ const wideTableClassNames = { table: 'min-w-[64rem]' };
 
 function formatDate(value?: string | null): string {
   if (!value) return '';
-  return new Date(value).toLocaleDateString();
+  return new Date(value).toLocaleDateString(getFormattingLocale());
 }
 
 

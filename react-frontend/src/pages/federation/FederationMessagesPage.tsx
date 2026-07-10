@@ -48,7 +48,7 @@ import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePusherOptional } from '@/contexts/PusherContext';
 import { api } from '@/lib/api';
 import { fetchUserFederationOptIn } from '@/lib/federationStatus';
-import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
+import { resolveAvatarUrl, formatRelativeTime, getFormattingLocale } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { safeLocalStorageGetJSON, safeLocalStorageSetJSON } from '@/lib/safeStorage';
 import type { FederatedMessage } from '@/types/api';
@@ -800,9 +800,9 @@ export function FederationMessagesPage() {
 
       {/* Opt-in required notice — shown when feature is enabled but user hasn't opted in */}
       {isFederationEnabled && userOptedIn === false && (
-        <GlassCard className="p-4 border-l-4 border-indigo-500 bg-indigo-500/10">
+        <GlassCard className="p-4 border-l-4 border-accent bg-accent/10">
           <div className="flex items-start gap-3">
-            <Globe className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <Globe className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div className="flex-1">
               <h3 className="font-semibold text-theme-primary">{t('messages.optin_required')}</h3>
               <p className="text-sm text-theme-muted mt-1">
@@ -813,7 +813,7 @@ export function FederationMessagesPage() {
               as={Link}
               to={tenantPath('/federation/onboarding')}
               size="sm"
-              className="bg-indigo-500 text-white flex-shrink-0"
+              className="bg-accent text-white flex-shrink-0"
             >
               {t('messages.optin_cta')}
             </Button>
@@ -825,13 +825,13 @@ export function FederationMessagesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Globe className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+            <Globe className="w-7 h-7 text-accent dark:text-accent" aria-hidden="true" />
             {t('messages.title')}
           </h1>
           <p className="text-theme-muted mt-1">{t('messages.subtitle')}</p>
         </div>
         <Button
-          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+          className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={() => setIsComposeOpen(true)}
           isDisabled={!canUseFederationMessaging}
@@ -852,7 +852,7 @@ export function FederationMessagesPage() {
           <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('messages.unable_to_load')}</h3>
           <p className="text-theme-muted mb-4">{t('messages.unable_to_load_description')}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             onPress={loadMessages}
           >
             {t('messages.try_again')}
@@ -861,15 +861,15 @@ export function FederationMessagesPage() {
       ) : threads.length === 0 && !searchQuery ? (
         <GlassCard className="p-12 text-center">
           <div className="flex flex-col items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center">
-              <MessageSquare className="w-8 h-8 text-indigo-500" aria-hidden="true" />
+            <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center">
+              <MessageSquare className="w-8 h-8 text-accent" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-semibold text-theme-primary">{t('messages.no_messages_yet')}</h3>
             <p className="text-theme-muted max-w-md">
               {t('messages.no_messages_description')}
             </p>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white mt-2"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white mt-2"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               onPress={() => setIsComposeOpen(true)}
               isDisabled={!canUseFederationMessaging}
@@ -924,7 +924,7 @@ export function FederationMessagesPage() {
                           variant="light"
                           className={`w-full min-h-9 p-3 rounded-none justify-start text-left border-b border-theme-default transition-colors ${
                             isActive
-                              ? 'bg-indigo-500/10 dark:bg-indigo-500/15'
+                              ? 'bg-accent/10 dark:bg-accent/15'
                               : 'hover:bg-theme-hover'
                           }`}
                           onPress={() => selectThread(thread)}
@@ -944,7 +944,7 @@ export function FederationMessagesPage() {
                                 className="ring-2 ring-theme-default"
                               />
                               {thread.unreadCount > 0 && (
-                                <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-indigo-500 rounded-full border-2 border-theme-default" />
+                                <div className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-accent rounded-full border-2 border-theme-default" />
                               )}
                             </div>
 
@@ -969,8 +969,8 @@ export function FederationMessagesPage() {
                                 variant="flat"
                                 startContent={<Globe className="w-2.5 h-2.5" aria-hidden="true" />}
                                 classNames={{
-                                  base: 'h-5 mt-0.5 bg-indigo-500/10 dark:bg-indigo-500/20',
-                                  content: 'text-indigo-600 dark:text-indigo-400 text-[10px] px-1',
+                                  base: 'h-5 mt-0.5 bg-accent/10 dark:bg-accent/20',
+                                  content: 'text-accent dark:text-accent text-[10px] px-1',
                                 }}
                               >
                                 {thread.partner.tenant_name}
@@ -1051,8 +1051,8 @@ export function FederationMessagesPage() {
                       variant="flat"
                       startContent={<Globe className="w-2.5 h-2.5" aria-hidden="true" />}
                       classNames={{
-                        base: 'h-5 bg-indigo-500/10 dark:bg-indigo-500/20',
-                        content: 'text-indigo-600 dark:text-indigo-400 text-[10px] px-1',
+                        base: 'h-5 bg-accent/10 dark:bg-accent/20',
+                        content: 'text-accent dark:text-accent text-[10px] px-1',
                       }}
                     >
                       {activeThread.partner.tenant_name}
@@ -1074,7 +1074,7 @@ export function FederationMessagesPage() {
                         size="sm"
                         className={
                           autoTranslateOn
-                            ? 'bg-indigo-500/20 text-indigo-500 ring-1 ring-indigo-500/30 ml-auto'
+                            ? 'bg-accent/20 text-accent ring-1 ring-accent/30 ml-auto'
                             : 'bg-theme-elevated text-theme-muted ml-auto'
                         }
                         aria-label={
@@ -1093,20 +1093,20 @@ export function FederationMessagesPage() {
                 {/* Auto-translate active banner */}
                 {translationEnabled && autoTranslateOn && (
                   <div
-                    className="flex items-center gap-2 px-3 py-2 mx-4 mt-2 bg-indigo-500/10 rounded-lg"
+                    className="flex items-center gap-2 px-3 py-2 mx-4 mt-2 bg-accent/10 rounded-lg"
                     role="status"
                   >
                     <Languages
-                      className="w-4 h-4 text-indigo-500 flex-shrink-0"
+                      className="w-4 h-4 text-accent flex-shrink-0"
                       aria-hidden="true"
                     />
-                    <p className="text-xs text-indigo-600 dark:text-indigo-300 flex-1">
+                    <p className="text-xs text-accent dark:text-accent flex-1">
                       {t('messages.auto_translate_active_banner')}
                     </p>
                     <Button
                       size="sm"
                       variant="light"
-                      className="h-6 min-w-0 px-2 text-xs text-indigo-500"
+                      className="h-6 min-w-0 px-2 text-xs text-accent"
                       onPress={handleAutoTranslateToggle}
                     >
                       {t('messages.auto_translate_turn_off')}
@@ -1145,7 +1145,7 @@ export function FederationMessagesPage() {
                                 <p
                                   className={`text-[10px] font-medium mb-1 ${
                                     isOwn
-                                      ? 'text-right text-indigo-300 dark:text-indigo-300'
+                                      ? 'text-right text-accent dark:text-accent'
                                       : 'text-theme-subtle'
                                   }`}
                                 >
@@ -1157,7 +1157,7 @@ export function FederationMessagesPage() {
                               <div
                                 className={`px-4 py-2.5 rounded-2xl ${
                                   isOwn
-                                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-md'
+                                    ? 'bg-gradient-to-r from-accent to-accent-gradient-end text-white rounded-br-md'
                                     : 'bg-theme-elevated text-theme-primary rounded-bl-md'
                                 }`}
                               >
@@ -1238,14 +1238,14 @@ export function FederationMessagesPage() {
                                 }`}
                               >
                                 <span className="text-[10px] text-theme-subtle">
-                                  {new Date(msg.created_at).toLocaleTimeString([], {
+                                  {new Date(msg.created_at).toLocaleTimeString(getFormattingLocale(), {
                                     hour: '2-digit',
                                     minute: '2-digit',
                                   })}
                                 </span>
                                 {isOwn && (
                                   isRead ? (
-                                    <MailOpen className="w-3 h-3 text-indigo-400" aria-label={t('messages.aria_read')} />
+                                    <MailOpen className="w-3 h-3 text-accent" aria-label={t('messages.aria_read')} />
                                   ) : (
                                     <Mail className="w-3 h-3 text-theme-subtle" aria-label={t('messages.aria_delivered')} />
                                   )
@@ -1284,7 +1284,7 @@ export function FederationMessagesPage() {
                     />
                     <Button
                       isIconOnly
-                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white self-end"
+                      className="bg-gradient-to-r from-accent to-accent-gradient-end text-white self-end"
                       onPress={sendReply}
                       isLoading={isSending}
                       isDisabled={!canUseFederationMessaging || !replyText.trim()}
@@ -1298,8 +1298,8 @@ export function FederationMessagesPage() {
             ) : (
               /* No thread selected placeholder (desktop) */
               <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
-                <div className="w-20 h-20 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                  <MessageSquare className="w-10 h-10 text-indigo-500/50" aria-hidden="true" />
+                <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center">
+                  <MessageSquare className="w-10 h-10 text-accent/50" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold text-theme-muted">{t('messages.select_conversation')}</h3>
                 <p className="text-theme-subtle text-sm text-center max-w-xs">
@@ -1325,7 +1325,7 @@ export function FederationMessagesPage() {
       >
         <ModalContent>
           <ModalHeader className="text-theme-primary flex items-center gap-2">
-            <Globe className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+            <Globe className="w-5 h-5 text-accent" aria-hidden="true" />
             {t('messages.new_federated_message')}
           </ModalHeader>
           <ModalBody>
@@ -1350,8 +1350,8 @@ export function FederationMessagesPage() {
                           variant="flat"
                           startContent={<Globe className="w-2.5 h-2.5" aria-hidden="true" />}
                           classNames={{
-                            base: 'h-5 bg-indigo-500/10 dark:bg-indigo-500/20',
-                            content: 'text-indigo-600 dark:text-indigo-400 text-[10px] px-1',
+                            base: 'h-5 bg-accent/10 dark:bg-accent/20',
+                            content: 'text-accent dark:text-accent text-[10px] px-1',
                           }}
                         >
                           {selectedRecipient.tenant_name}
@@ -1371,7 +1371,7 @@ export function FederationMessagesPage() {
                     </Button>
                   </div>
                   {selectedRecipient.is_external && (
-                    <div className="flex items-center gap-2 p-2.5 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-sm">
+                    <div className="flex items-center gap-2 p-2.5 rounded-lg bg-accent/10 text-accent dark:text-accent text-sm">
                       <Globe className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                       <span>{t('messages.external_recipient_info')}</span>
                     </div>
@@ -1423,7 +1423,7 @@ export function FederationMessagesPage() {
                                   <Chip
                                     size="sm"
                                     variant="flat"
-                                    className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 h-4 text-[10px]"
+                                    className="bg-accent/10 text-accent dark:text-accent h-4 text-[10px]"
                                     startContent={<Globe className="w-2.5 h-2.5" aria-hidden="true" />}
                                   >
                                     {t('external')}
@@ -1484,7 +1484,7 @@ export function FederationMessagesPage() {
               {t('messages.cancel')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={<Send className="w-4 h-4" aria-hidden="true" />}
               onPress={sendComposeMessage}
               isLoading={isComposeSending}

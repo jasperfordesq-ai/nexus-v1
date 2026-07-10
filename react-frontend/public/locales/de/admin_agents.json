@@ -130,7 +130,9 @@
         "run_failed_with_error": "Ausführung fehlgeschlagen: {{error}}",
         "toggle_failed": "Agent konnte nicht umgeschaltet werden",
         "updated": "Agent aktualisiert",
-        "update_failed": "Der Agent konnte nicht aktualisiert werden"
+        "update_failed": "Der Agent konnte nicht aktualisiert werden",
+        "run_created_one": "Führen Sie #{{runId}} aus und erstellen Sie {{count}}-Vorschläge.",
+        "run_created_other": "Führen Sie #{{runId}} aus und erstellen Sie {{count}}-Vorschläge."
       }
     },
     "runs": {

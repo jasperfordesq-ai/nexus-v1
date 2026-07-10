@@ -3,11 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { CardRowsSkeleton } from '@/components/ui/Skeletons';
 import { Switch } from '@/components/ui/Switch';
@@ -217,7 +218,7 @@ export function JobAlertsPage() {
           <p className="text-theme-muted mt-1">{t('alerts.subtitle')}</p>
         </div>
         <Button
-          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+          className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={createModal.onOpen}
         >
@@ -232,7 +233,7 @@ export function JobAlertsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('alerts.load_error')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadAlerts}
           >
@@ -255,7 +256,7 @@ export function JobAlertsPage() {
           description={t('alerts.empty_description')}
           action={
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               onPress={createModal.onOpen}
             >
@@ -322,9 +323,9 @@ export function JobAlertsPage() {
                     </div>
 
                     <p className="text-xs text-theme-subtle mt-2">
-                      {t('alerts.created_date', { date: new Date(alert.created_at).toLocaleDateString() })}
+                      {t('alerts.created_date', { date: new Date(alert.created_at).toLocaleDateString(getFormattingLocale()) })}
                       {' '}&middot;{' '}
-                      {t('alerts.last_notified', { date: alert.last_notified_at ? new Date(alert.last_notified_at).toLocaleDateString() : t('alerts.never') })}
+                      {t('alerts.last_notified', { date: alert.last_notified_at ? new Date(alert.last_notified_at).toLocaleDateString(getFormattingLocale()) : t('alerts.never') })}
                     </p>
                   </div>
 
@@ -367,10 +368,10 @@ export function JobAlertsPage() {
           {(onClose) => (
             <>
               <ModalHeader>
-                <div className="flex items-center gap-2">
+                <ModalHeading className="flex items-center gap-2">
                   <Bell className="w-5 h-5 text-accent" aria-hidden="true" />
                   {t('alerts.create')}
-                </div>
+                </ModalHeading>
               </ModalHeader>
               <ModalBody>
                 <div className="space-y-4">
@@ -456,7 +457,7 @@ export function JobAlertsPage() {
                   {t('apply.cancel')}
                 </Button>
                 <Button
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                   onPress={handleCreate}
                   isLoading={isCreating}
                 >

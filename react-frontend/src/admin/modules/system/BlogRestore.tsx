@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Spinner } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
@@ -144,7 +145,7 @@ export function BlogRestore() {
                     <div>
                       <p className="font-medium text-foreground">{backup.filename}</p>
                       <p className="text-xs text-muted">
-                        {new Date(backup.created_at).toLocaleString()} &middot; {backup.size}
+                        {new Date(backup.created_at).toLocaleString(getFormattingLocale())} &middot; {backup.size}
                       </p>
                     </div>
                   </div>

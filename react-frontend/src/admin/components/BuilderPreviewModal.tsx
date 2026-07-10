@@ -11,7 +11,7 @@
  */
 
 import { useState } from 'react';
-import { Button, Modal, ModalBody, ModalContent, ModalHeader } from '@/components/ui';
+import { Button, Modal, ModalBody, ModalContent, ModalHeader, ModalHeading } from '@/components/ui';
 import { useTheme, type ResolvedTheme } from '@/contexts';
 import Monitor from 'lucide-react/icons/monitor';
 import Smartphone from 'lucide-react/icons/smartphone';
@@ -66,7 +66,7 @@ export function BuilderPreviewModal({ isOpen, onClose, html, t, labels }: Builde
     <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()} size="5xl" scrollBehavior="inside">
       <ModalContent>
         <ModalHeader className="flex items-center justify-between gap-4">
-          <span>{labels?.title ?? t('newsletter_builder.preview_title')}</span>
+          <ModalHeading>{labels?.title ?? t('newsletter_builder.preview_title')}</ModalHeading>
           <div className="flex items-center gap-1" role="group" aria-label={labels?.deviceLabel ?? t('newsletter_builder.preview_device_label')}>
             <Button
               size="sm"

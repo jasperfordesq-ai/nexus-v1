@@ -63,6 +63,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
       <div>{typeof children === 'function' ? children(() => {}) : children}</div>
     ),
     ModalHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    ModalHeading: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
     ModalBody: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     ModalFooter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     Avatar: ({ name }: { name: string }) => <div data-testid="avatar">{name}</div>,
@@ -138,14 +139,10 @@ describe('ReviewModal', () => {
     expect(screen.getAllByText('Bob Reviewer').length).toBeGreaterThan(0);
   });
 
-  it('renders 5 star rating buttons', async () => {
+  it('renders 5 star rating radios', async () => {
     const { ReviewModal } = await import('./ReviewModal');
     render(<ReviewModal {...defaultProps} />);
-    // star buttons have aria-label "rate_star ..."
-    const starBtns = screen.getAllByRole('button').filter(
-      (b) => b.getAttribute('aria-label')?.includes('star') || b.getAttribute('aria-label')?.includes('Star') || b.getAttribute('aria-label')?.match(/\d/)
-    );
-    expect(starBtns.length).toBeGreaterThanOrEqual(5);
+    expect(screen.getAllByRole('radio')).toHaveLength(5);
   });
 
   it('submit button is disabled when no star selected', async () => {
@@ -163,9 +160,7 @@ describe('ReviewModal', () => {
     const { ReviewModal } = await import('./ReviewModal');
     render(<ReviewModal {...defaultProps} />);
 
-    // Click the first star button that has an aria-label with digit
-    const allBtns = screen.getAllByRole('button');
-    const starBtns = allBtns.filter((b) => b.getAttribute('aria-label') !== null);
+    const starBtns = screen.getAllByRole('radio');
     if (starBtns[0]) await user.click(starBtns[0]);
 
     const submitBtn = screen.getAllByRole('button').find(
@@ -187,8 +182,7 @@ describe('ReviewModal', () => {
     );
     // Simulate calling handleSubmit with rating=0 via a direct click on a non-disabled copy
     // Instead: select a star, then verify POST is called with rating
-    const allBtns = screen.getAllByRole('button');
-    const starBtn = allBtns.find((b) => b.getAttribute('aria-label') !== null);
+    const starBtn = screen.getAllByRole('radio')[0];
     if (starBtn) await user.click(starBtn);
 
     const submitBtn = screen.getAllByRole('button').find(
@@ -207,9 +201,7 @@ describe('ReviewModal', () => {
     const { ReviewModal } = await import('./ReviewModal');
     render(<ReviewModal {...defaultProps} />);
 
-    const allBtns = screen.getAllByRole('button');
-    // Find the 3rd star button (rating=3)
-    const starBtns = allBtns.filter((b) => b.getAttribute('aria-label') !== null);
+    const starBtns = screen.getAllByRole('radio');
     if (starBtns[2]) await user.click(starBtns[2]);
 
     const submitBtn = screen.getAllByRole('button').find(
@@ -232,8 +224,7 @@ describe('ReviewModal', () => {
     const { ReviewModal } = await import('./ReviewModal');
     render(<ReviewModal {...defaultProps} />);
 
-    const allBtns = screen.getAllByRole('button');
-    const starBtns = allBtns.filter((b) => b.getAttribute('aria-label') !== null);
+    const starBtns = screen.getAllByRole('radio');
     if (starBtns[0]) await user.click(starBtns[0]);
 
     const submitBtn = screen.getAllByRole('button').find(
@@ -253,8 +244,7 @@ describe('ReviewModal', () => {
     const { ReviewModal } = await import('./ReviewModal');
     render(<ReviewModal {...defaultProps} />);
 
-    const allBtns = screen.getAllByRole('button');
-    const starBtns = allBtns.filter((b) => b.getAttribute('aria-label') !== null);
+    const starBtns = screen.getAllByRole('radio');
     if (starBtns[0]) await user.click(starBtns[0]);
 
     const submitBtn = screen.getAllByRole('button').find(
@@ -297,8 +287,7 @@ describe('ReviewModal', () => {
     const { ReviewModal } = await import('./ReviewModal');
     render(<ReviewModal {...defaultProps} onSuccess={onSuccess} />);
 
-    const allBtns = screen.getAllByRole('button');
-    const starBtns = allBtns.filter((b) => b.getAttribute('aria-label') !== null);
+    const starBtns = screen.getAllByRole('radio');
     if (starBtns[4]) await user.click(starBtns[4]);
 
     const submitBtn = screen.getAllByRole('button').find(
@@ -318,8 +307,7 @@ describe('ReviewModal', () => {
     const { ReviewModal } = await import('./ReviewModal');
     render(<ReviewModal {...defaultProps} />);
 
-    const allBtns = screen.getAllByRole('button');
-    const starBtns = allBtns.filter((b) => b.getAttribute('aria-label') !== null);
+    const starBtns = screen.getAllByRole('radio');
     if (starBtns[0]) await user.click(starBtns[0]);
 
     const submitBtn = screen.getAllByRole('button').find(

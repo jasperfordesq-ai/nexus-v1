@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Spinner, Chip, Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -231,7 +232,7 @@ export function HealthCheck() {
                           </TableCell>
                           <TableCell>
                             <span className="text-muted">
-                              {new Date(entry.created_at).toLocaleString()}
+                              {new Date(entry.created_at).toLocaleString(getFormattingLocale())}
                             </span>
                           </TableCell>
                         </TableRow>

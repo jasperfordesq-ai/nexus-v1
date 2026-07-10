@@ -1,4 +1,5 @@
-import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { getFormattingLocale } from '@/lib/helpers';
+import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalHeading, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -87,7 +88,7 @@ const CATEGORY_COLOR: Record<FeedbackCategory, 'default' | 'primary' | 'secondar
 
 function fmtDate(iso: string, fallback: string): string {
   if (!iso) return fallback;
-  return new Date(iso).toLocaleString(undefined, {
+  return new Date(iso).toLocaleString(getFormattingLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -534,15 +535,15 @@ export default function MunicipalityFeedbackAdminPage() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
+                <ModalHeading className="flex items-center gap-2 text-base">
                   <Inbox size={18} className="text-accent" />
-                  <span className="text-base">{t('admin.feedback.modal.title', { id: selected?.id ?? '' })}</span>
+                  <span>{t('admin.feedback.modal.title', { id: selected?.id ?? '' })}</span>
                   {selected && (
                     <Chip size="sm" variant="soft" color={STATUS_COLOR[selected.status]} className="ml-2">
                       {statusLabel(selected.status)}
                     </Chip>
                   )}
-                </div>
+                </ModalHeading>
                 <p className="text-sm font-normal text-muted">{selected?.subject}</p>
               </ModalHeader>
               <ModalBody className="gap-4">

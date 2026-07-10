@@ -107,6 +107,12 @@
     "status_completed": "مكتمل",
     "status_unknown": "مجهول",
     "try_adjusting_search": "حاول تعديل بحثك",
-    "yes": "نعم"
+    "yes": "نعم",
+    "showing_of_total_few": "عرض {{count}} من {{total}}",
+    "showing_of_total_many": "عرض {{count}} من {{total}}",
+    "showing_of_total_one": "عرض {{count}} من {{total}}",
+    "showing_of_total_other": "عرض {{count}} من {{total}}",
+    "showing_of_total_two": "عرض {{count}} من {{total}}",
+    "showing_of_total_zero": "عرض {{count}} من {{total}}"
   }
 }

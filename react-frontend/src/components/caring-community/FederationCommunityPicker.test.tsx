@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
+import { render, screen, waitFor, fireEvent, userEvent } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 
 vi.mock('@/lib/api', () => ({
@@ -160,7 +160,7 @@ describe('FederationCommunityPicker', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('selects a peer on card click and enables the Select button', async () => {
+  it('selects a labelled HeroUI radio card and enables the Select button', async () => {
     mockGet.mockResolvedValueOnce({ success: true, data: { peers: PEERS } });
 
     render(
@@ -179,12 +179,34 @@ describe('FederationCommunityPicker', () => {
     const selectBtn = screen.getByRole('button', { name: /select/i });
     expect(selectBtn).toBeDisabled();
 
-    // Click the peer card (the Card is pressable)
-    fireEvent.click(screen.getByText('Berlin Caring Network'));
+    fireEvent.click(screen.getByRole('radio', { name: 'Berlin Caring Network' }));
 
     await waitFor(() => {
       expect(selectBtn).not.toBeDisabled();
     });
+  });
+
+  it('participates in radio-group arrow-key selection', async () => {
+    mockGet.mockResolvedValueOnce({ success: true, data: { peers: PEERS } });
+    const user = userEvent.setup();
+
+    render(
+      <FederationCommunityPicker
+        isOpen={true}
+        onClose={vi.fn()}
+        onSelect={vi.fn()}
+      />,
+    );
+
+    const berlin = await screen.findByRole('radio', { name: 'Berlin Caring Network' });
+    const munich = screen.getByRole('radio', { name: 'Munich Helpers' });
+
+    await user.click(berlin);
+    expect(berlin).toBeChecked();
+
+    await user.keyboard('{ArrowDown}');
+    expect(munich).toBeChecked();
+    expect(berlin).not.toBeChecked();
   });
 
   it('calls onSelect with the chosen peer and onClose when Select is confirmed', async () => {

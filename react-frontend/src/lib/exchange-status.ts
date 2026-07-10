@@ -89,9 +89,9 @@ export function getStatusIconBgClass(color: ExchangeStatusConfig['color']): stri
     case 'danger':
       return 'bg-red-500/20 text-red-400';
     case 'primary':
-      return 'bg-indigo-500/20 text-indigo-400';
+      return 'bg-accent/20 text-accent';
     case 'secondary':
-      return 'bg-purple-500/20 text-purple-400';
+      return 'bg-accent/20 text-accent';
     default:
       return 'bg-theme-elevated text-theme-muted';
   }

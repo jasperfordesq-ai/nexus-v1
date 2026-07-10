@@ -238,7 +238,7 @@ export default function CreateOpportunityPage() {
             {t('no_approved_orgs_description')}
           </p>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
-            <Button as={Link} to={tenantPath('/organisations/register')} className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+            <Button as={Link} to={tenantPath('/organisations/register')} className="bg-gradient-to-r from-accent to-accent-gradient-end text-white">
               {t('register_org_link')}
             </Button>
             <Button as={Link} to={tenantPath('/volunteering')} variant="tertiary">
@@ -451,8 +451,8 @@ export default function CreateOpportunityPage() {
           {hasFeature('federation') && (
             <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-theme-elevated border border-theme-default">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-indigo-500/20">
-                  <Globe className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                <div className="p-2 rounded-lg bg-accent/20">
+                  <Globe className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="font-medium text-theme-primary">
@@ -468,7 +468,7 @@ export default function CreateOpportunityPage() {
                 isSelected={shareFederated}
                 onValueChange={setShareFederated}
                 classNames={{
-                  wrapper: 'group-data-[selected=true]:bg-indigo-500',
+                  wrapper: 'group-data-[selected=true]:bg-accent',
                 }}
               />
             </div>

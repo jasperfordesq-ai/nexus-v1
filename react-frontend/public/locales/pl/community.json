@@ -187,7 +187,13 @@
     "opportunity_count_one": "Możliwość {{count}}",
     "opportunity_count_other": "{{count}} możliwości",
     "loading": "Ładowanie organizacji",
-    "manage_my_button": "Manage my organisation"
+    "manage_my_button": "Manage my organisation",
+    "opportunity_count_few": "{{count}} możliwości",
+    "opportunity_count_many": "{{count}} możliwości",
+    "volunteer_count_few": "{{count}} wolontariuszy",
+    "volunteer_count_many": "{{count}} wolontariuszy",
+    "volunteer_count_one": "{{count}} wolontariuszy",
+    "volunteer_count_other": "{{count}} wolontariuszy"
   },
   "organisation_detail": {
     "page_title": "Organizacja",
@@ -231,7 +237,15 @@
     "submit_review": "Submit review",
     "review_success": "Review submitted.",
     "review_error": "Unable to submit your review.",
-    "rating_required": "Choose a rating before submitting."
+    "rating_required": "Choose a rating before submitting.",
+    "meta_description_fallback_few": "Poznaj {{name}} i {{count}} aktywnych możliwości wolontariatu w tym społecznościowym banku czasu.",
+    "meta_description_fallback_many": "Poznaj {{name}} i {{count}} aktywnych możliwości wolontariatu w tym społecznościowym banku czasu.",
+    "meta_description_fallback_one": "Poznaj {{name}} i {{count}} aktywnych możliwości wolontariatu w tym społecznościowym banku czasu.",
+    "meta_description_fallback_other": "Poznaj {{name}} i {{count}} aktywnych możliwości wolontariatu w tym społecznościowym banku czasu.",
+    "review_count_few": "Recenzje {{count}}",
+    "review_count_many": "Recenzje {{count}}",
+    "review_count_one": "Recenzje {{count}}",
+    "review_count_other": "Recenzje {{count}}"
   },
   "emergency_alerts": {
     "heading": "Alerty awaryjne",

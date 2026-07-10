@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';
@@ -51,7 +52,7 @@ function formatBytes(bytes: number | null): string {
 function formatDate(value: string | null): string {
   if (!value) return '—';
   try {
-    return new Date(value).toLocaleString();
+    return new Date(value).toLocaleString(getFormattingLocale());
   } catch {
     return value;
   }
@@ -159,8 +160,8 @@ export function DataExportPage(): ReactNode {
       <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
         <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex max-w-2xl items-start gap-4">
-            <div className="rounded-2xl bg-indigo-500/15 p-3">
-              <ShieldCheck className="h-7 w-7 text-indigo-500" aria-hidden="true" />
+            <div className="rounded-2xl bg-accent/15 p-3">
+              <ShieldCheck className="h-7 w-7 text-accent" aria-hidden="true" />
             </div>
             <div className="space-y-2">
               <Chip size="sm" variant="soft" color="accent" className="font-medium">
@@ -205,7 +206,7 @@ export function DataExportPage(): ReactNode {
             onPress={handleDownload}
             isLoading={isDownloading}
             startContent={!isDownloading ? <Download className="w-4 h-4" aria-hidden="true" /> : null}
-            className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white sm:w-auto"
+            className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white sm:w-auto"
           >
             {isDownloading ? t('data_export.downloading') : t('data_export.download_button')}
           </Button>
@@ -215,7 +216,7 @@ export function DataExportPage(): ReactNode {
       {/* History */}
       <GlassCard className="p-5 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
-          <History className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+          <History className="w-5 h-5 text-accent" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary">{t('data_export.history.title')}</h2>
         </div>
 

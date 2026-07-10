@@ -37,5 +37,8 @@
   "page_meta": {
     "title": "Connexions"
   },
-  "loading": "Chargement des connexions..."
+  "loading": "Chargement des connexions...",
+  "pending_count_many": "{{count}} en attente",
+  "pending_count_one": "{{count}} en attente",
+  "pending_count_other": "{{count}} en attente"
 }

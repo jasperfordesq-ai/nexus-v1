@@ -306,6 +306,14 @@
     "audience_badge_holders": "Gebruikers met een specifieke badge",
     "type_one_time": "Eén keer",
     "type_recurring": "Terugkerend",
-    "type_triggered": "Geactiveerd"
+    "type_triggered": "Geactiveerd",
+    "bulk_award_succeeded_count_one": "Bekroond met de{{count}}-badge",
+    "bulk_award_succeeded_count_other": "Bekroond met de{{count}}-badge",
+    "badge_count_one": "{{count}}-badges",
+    "badge_count_other": "{{count}}-badges",
+    "threshold_count_one": "Drempel:{{count}}",
+    "threshold_count_other": "Drempel:{{count}}",
+    "xp_count_one": "{{count}}XP",
+    "xp_count_other": "{{count}}XP"
   }
 }

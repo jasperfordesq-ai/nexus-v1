@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Input, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch } from '@/components/ui';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -646,9 +647,9 @@ export function TenantShow() {
               )}
               <Separator />
               <div className="text-xs text-muted">
-                <p>{t('super.created')}: {new Date(tenant.created_at).toLocaleDateString()}</p>
+                <p>{t('super.created')}: {new Date(tenant.created_at).toLocaleDateString(getFormattingLocale())}</p>
                 {tenant.updated_at && (
-                  <p>{t('super.updated')}: {new Date(tenant.updated_at).toLocaleDateString()}</p>
+                  <p>{t('super.updated')}: {new Date(tenant.updated_at).toLocaleDateString(getFormattingLocale())}</p>
                 )}
               </div>
             </CardBody>

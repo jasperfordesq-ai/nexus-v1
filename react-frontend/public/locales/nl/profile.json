@@ -134,7 +134,9 @@
     "characters_count": "{{count}}/{{max}} tekens",
     "cancel": "Annuleren",
     "submit": "Beoordeling Indienen",
-    "submit_failed_fallback": "Indienen van beoordeling mislukt"
+    "submit_failed_fallback": "Indienen van beoordeling mislukt",
+    "characters_count_one": "{{count}}/{{max}} tekens",
+    "characters_count_other": "{{count}}/{{max}} tekens"
   },
   "page_meta": {
     "title": "Profiel",
@@ -185,5 +187,7 @@
   "read_more": "Meer lezen",
   "read_less": "Minder lezen",
   "hours_abbrev": "{{hours}}u",
-  "not_available_abbrev": "n.v.t."
+  "not_available_abbrev": "n.v.t.",
+  "show_more_skills_one": "Toon {{count}} meer",
+  "show_more_skills_other": "Toon {{count}} meer"
 }

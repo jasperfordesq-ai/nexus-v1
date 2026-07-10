@@ -88,6 +88,7 @@ import { Accordion, AccordionItem } from '@/components/ui/Accordion';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Tooltip } from '@/components/ui/Tooltip';
+import { isPlatformSuperAdminUser, isSuperAdminUser } from '@/lib/access';
 import type { LucideIcon } from 'lucide-react';
 interface NavItem {
   label: string;
@@ -168,15 +169,8 @@ function useAdminNav(): NavSection[] {
 
   const userRecord = user as Record<string, unknown> | null;
   const isGod = (user?.role as string) === 'god' || userRecord?.is_god === true;
-  const isSuperAdmin =
-    (user?.role as string) === 'super_admin' ||
-    userRecord?.is_super_admin === true ||
-    userRecord?.is_tenant_super_admin === true ||
-    isGod;
-  const isPlatformSuperAdmin =
-    (user?.role as string) === 'super_admin' ||
-    userRecord?.is_super_admin === true ||
-    isGod;
+  const isSuperAdmin = isSuperAdminUser(user);
+  const isPlatformSuperAdmin = isPlatformSuperAdminUser(user);
 
   return useMemo(() => {
     const communityItems: NavItem[] = [
@@ -210,7 +204,7 @@ function useAdminNav(): NavSection[] {
         href: '/broker',
         zone: 'overview',
       },
-      ...(isSuperAdmin ? [{
+      ...(isPlatformSuperAdmin ? [{
         key: 'super-admin',
         label: t('super_admin_panel'),
         icon: Crown,

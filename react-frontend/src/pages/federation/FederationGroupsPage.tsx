@@ -281,7 +281,7 @@ export function FederationGroupsPage() {
           </h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => { setCursor(null); loadGroups(false); }}
           >
@@ -354,7 +354,7 @@ function FederatedGroupCard({ group }: FederatedGroupCardProps) {
       <GlassCard className="p-5 hover:scale-[1.01] transition-transform">
         <div className="flex gap-4 items-start">
           {/* Icon box */}
-          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500/20 to-purple-500/20 flex items-center justify-center">
+          <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500/20 to-accent-gradient-end/20 flex items-center justify-center">
             <UsersRound className="w-7 h-7 text-violet-400" aria-hidden="true" />
           </div>
 
@@ -395,7 +395,7 @@ function FederatedGroupCard({ group }: FederatedGroupCardProps) {
               <Chip
                 size="sm"
                 variant="flat"
-                className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                className="bg-accent/10 text-accent dark:text-accent"
                 startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
               >
                 {group.timebank.name}

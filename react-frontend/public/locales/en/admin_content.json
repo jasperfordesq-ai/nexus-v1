@@ -1343,7 +1343,11 @@
     "resync_stripe": "Re-sync to Stripe",
     "sync_to_stripe": "Sync to Stripe",
     "sync_stripe": "Sync to Stripe",
-    "stripe_sync_description": "Creates or updates the Stripe product and prices for this plan. Requires STRIPE_SECRET_KEY."
+    "stripe_sync_description": "Creates or updates the Stripe product and prices for this plan. Requires STRIPE_SECRET_KEY.",
+    "active_tenants_cannot_delete_one": "{{count}} active tenant(s) - cannot delete",
+    "active_tenants_cannot_delete_other": "{{count}} active tenant(s) - cannot delete",
+    "filter_all_one": "All ({{count}})",
+    "filter_all_other": "All ({{count}})"
   },
   "data_table": {
     "admin_data_table": "Data",

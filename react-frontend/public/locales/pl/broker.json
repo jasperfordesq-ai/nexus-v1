@@ -186,7 +186,21 @@
     "time_just_now": "Przed chwilą",
     "time_minutes_ago": "{{count}} min temu",
     "time_hours_ago": "{{count}} godz temu",
-    "time_days_ago": "{{count}} dn temu"
+    "time_days_ago": "{{count}} dn temu",
+    "open_items_few": "pozycje oczekują na Twój przegląd",
+    "open_items_many": "pozycje oczekują na Twój przegląd",
+    "time_minutes_ago_few": "{{count}} min temu",
+    "time_minutes_ago_many": "{{count}} min temu",
+    "time_minutes_ago_one": "{{count}} min temu",
+    "time_minutes_ago_other": "{{count}} min temu",
+    "time_hours_ago_few": "{{count}} godz temu",
+    "time_hours_ago_many": "{{count}} godz temu",
+    "time_hours_ago_one": "{{count}} godz temu",
+    "time_hours_ago_other": "{{count}} godz temu",
+    "time_days_ago_few": "{{count}} dn temu",
+    "time_days_ago_many": "{{count}} dn temu",
+    "time_days_ago_one": "{{count}} dn temu",
+    "time_days_ago_other": "{{count}} dn temu"
   },
   "members": {
     "title": "Członkowie",
@@ -288,7 +302,24 @@
     "empty_never_logged_in_title": "Wszyscy się zalogowali",
     "empty_never_logged_in_hint": "Żaden zatwierdzony członek nie czeka już na pierwsze logowanie.",
     "empty_onboarding_incomplete_title": "Wszyscy ukończyli wdrożenie",
-    "empty_onboarding_incomplete_hint": "Żaden członek nie ma niedokończonych kroków wdrożenia."
+    "empty_onboarding_incomplete_hint": "Żaden członek nie ma niedokończonych kroków wdrożenia.",
+    "time_minutes_ago_few": "{{count}} min temu",
+    "time_minutes_ago_many": "{{count}} min temu",
+    "time_minutes_ago_one": "{{count}} min temu",
+    "time_minutes_ago_other": "{{count}} min temu",
+    "time_hours_ago_few": "{{count}} godz temu",
+    "time_hours_ago_many": "{{count}} godz temu",
+    "time_hours_ago_one": "{{count}} godz temu",
+    "time_hours_ago_other": "{{count}} godz temu",
+    "time_days_ago_few": "{{count}} dni temu",
+    "time_days_ago_many": "{{count}} dni temu",
+    "time_days_ago_one": "{{count}} dni temu",
+    "time_days_ago_other": "{{count}} dni temu",
+    "bulk_selected_few": "Zaznaczono: {{count}}",
+    "bulk_selected_many": "Zaznaczono: {{count}}",
+    "bulk_selected_one": "Zaznaczono: {{count}}",
+    "bulk_selected_other": "Zaznaczono: {{count}}",
+    "role_all": "Wszystkie role"
   },
   "onboarding": {
     "title": "Wdrożenie",
@@ -503,7 +534,43 @@
     "empty_queue_title": "Brak rekordów oczekujących na przegląd",
     "empty_queue_hint": "Wszystko na bieżąco — nowe zgłoszenia pojawią się tutaj do przeglądu.",
     "list_error_title": "Nie udało się załadować rekordów weryfikacji",
-    "list_error_body": "Sprawdź połączenie i spróbuj ponownie."
+    "list_error_body": "Sprawdź połączenie i spróbuj ponownie.",
+    "expiry_days_left_few": "pozostało {{count}} dn.",
+    "expiry_days_left_many": "pozostało {{count}} dn.",
+    "expiry_days_left_one": "pozostało {{count}} dn.",
+    "expiry_days_left_other": "pozostało {{count}} dn.",
+    "toast_bulk_success_few": "{{count}} rekordów {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_many": "{{count}} rekordów {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_one": "{{count}} rekordów {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_other": "{{count}} rekordów {{action}}.{{failedSuffix}}",
+    "toast_bulk_failed_suffix_few": " ({{count}} nieudanych)",
+    "toast_bulk_failed_suffix_many": " ({{count}} nieudanych)",
+    "toast_bulk_failed_suffix_one": " ({{count}} nieudanych)",
+    "toast_bulk_failed_suffix_other": " ({{count}} nieudanych)",
+    "stat_of_total_few": "z {{count}} rekordów łącznie",
+    "stat_of_total_many": "z {{count}} rekordów łącznie",
+    "stat_of_total_one": "z {{count}} rekordów łącznie",
+    "stat_of_total_other": "z {{count}} rekordów łącznie",
+    "stat_expired_hint_few": "{{count}} już wygasło",
+    "stat_expired_hint_many": "{{count}} już wygasło",
+    "stat_expired_hint_one": "{{count}} już wygasło",
+    "stat_expired_hint_other": "{{count}} już wygasło",
+    "records_selected_few": "Zaznaczono {{count}} rekordów",
+    "records_selected_many": "Zaznaczono {{count}} rekordów",
+    "records_selected_one": "Zaznaczono {{count}} rekordów",
+    "records_selected_other": "Zaznaczono {{count}} rekordów",
+    "bulk_verify_confirm_few": "Zweryfikować wszystkie zaznaczone rekordy?",
+    "bulk_verify_confirm_many": "Zweryfikować wszystkie zaznaczone rekordy?",
+    "bulk_verify_confirm_one": "Zweryfikować wszystkie zaznaczone rekordy?",
+    "bulk_verify_confirm_other": "Zweryfikować wszystkie zaznaczone rekordy?",
+    "bulk_delete_confirm_few": "Czy na pewno chcesz usunąć wszystkie zaznaczone rekordy? Tej akcji nie można cofnąć.",
+    "bulk_delete_confirm_many": "Czy na pewno chcesz usunąć wszystkie zaznaczone rekordy? Tej akcji nie można cofnąć.",
+    "bulk_delete_confirm_one": "Czy na pewno chcesz usunąć wszystkie zaznaczone rekordy? Tej akcji nie można cofnąć.",
+    "bulk_delete_confirm_other": "Czy na pewno chcesz usunąć wszystkie zaznaczone rekordy? Tej akcji nie można cofnąć.",
+    "bulk_reject_confirm_few": "Podaj powód odrzucenia wszystkich zaznaczonych rekordów.",
+    "bulk_reject_confirm_many": "Podaj powód odrzucenia wszystkich zaznaczonych rekordów.",
+    "bulk_reject_confirm_one": "Podaj powód odrzucenia wszystkich zaznaczonych rekordów.",
+    "bulk_reject_confirm_other": "Podaj powód odrzucenia wszystkich zaznaczonych rekordów."
   },
   "member_detail": {
     "load_failed": "Nie udało się załadować danych członka.",
@@ -795,7 +862,11 @@
     "retry": "Spróbuj ponownie",
     "detail_not_found_hint": "Kopia wiadomości mogła zostać zarchiwizowana lub usunięta, albo link jest nieprawidłowy.",
     "detail_flag_banner_title": "Oznaczono do przeglądu",
-    "detail_decision_prompt": "Zapisz decyzję z przeglądu dla tej kopii wiadomości."
+    "detail_decision_prompt": "Zapisz decyzję z przeglądu dla tej kopii wiadomości.",
+    "detail_message_count_few": "{{count}} wiadomości",
+    "detail_message_count_many": "{{count}} wiadomości",
+    "detail_message_count_one": "{{count}} wiadomości",
+    "detail_message_count_other": "{{count}} wiadomości"
   },
   "monitoring": {
     "title": "Monitorowanie użytkowników",
@@ -855,7 +926,9 @@
     "empty_all_clear_hint": "Wszyscy członkowie komunikują się swobodnie. Dodaj członka, jeśli coś wymaga bliższego przyjrzenia się.",
     "load_error_title": "Nie udało się załadować monitorowanych członków",
     "load_error_hint": "Coś poszło nie tak podczas pobierania listy monitorowania. Odśwież, aby spróbować ponownie.",
-    "retry_button": "Spróbuj ponownie"
+    "retry_button": "Spróbuj ponownie",
+    "expiry_days_left_few": "pozostało {{count}} dni",
+    "expiry_days_left_many": "pozostało {{count}} dni"
   },
   "risk_tags": {
     "title": "Tagi ryzyka",
@@ -939,7 +1012,8 @@
     "empty_level_title": "Brak tagów na tym poziomie",
     "empty_level_hint": "Żadne ogłoszenie nie ma obecnie tego poziomu ryzyka.",
     "empty_search_title": "Brak pasujących tagów ryzyka",
-    "empty_search_hint": "Spróbuj innego terminu wyszukiwania lub wyczyść wyszukiwanie."
+    "empty_search_hint": "Spróbuj innego terminu wyszukiwania lub wyczyść wyszukiwanie.",
+    "level_all": "Wszystkie poziomy ryzyka"
   },
   "insurance": {
     "title": "Certyfikaty ubezpieczeniowe",
@@ -1124,7 +1198,11 @@
     "detail_description": "Zamrożony, tylko do odczytu zrzut przejrzanej kopii wiadomości.",
     "frozen_note": "Ten rekord jest zachowany dokładnie tak, jak został przejrzany, i nie może być modyfikowany.",
     "record_id": "Rekord #{{id}}",
-    "record_unavailable": "Rekord niedostępny"
+    "record_unavailable": "Rekord niedostępny",
+    "messages_count_few": "{{count}} wiadomości",
+    "messages_count_many": "{{count}} wiadomości",
+    "messages_count_one": "{{count}} wiadomości",
+    "messages_count_other": "{{count}} wiadomości"
   },
   "configuration": {
     "title": "Konfiguracja brokera",

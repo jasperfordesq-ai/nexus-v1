@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Button, Chip } from '@/components/ui';
 
 /**
@@ -140,7 +141,7 @@ export default function VolunteerConsents() {
       label: t('volunteering.col_consent_date'),
       sortable: true,
       render: (row) => (
-        <span>{row.consent_date ? new Date(row.consent_date).toLocaleDateString() : '-'}</span>
+        <span>{row.consent_date ? new Date(row.consent_date).toLocaleDateString(getFormattingLocale()) : '-'}</span>
       ),
     },
     {
@@ -153,7 +154,7 @@ export default function VolunteerConsents() {
         const isExpiringSoon = expiresAt > now && expiresAt <= thirtyDaysFromNow;
         return (
           <span className={isExpiringSoon ? 'text-warning font-medium' : ''}>
-            {expiresAt.toLocaleDateString()}
+            {expiresAt.toLocaleDateString(getFormattingLocale())}
           </span>
         );
       },
@@ -220,7 +221,7 @@ export default function VolunteerConsents() {
                       {' '}&mdash;{' '}
                       {c.opportunity_title}
                       {' '}&mdash;{' '}
-                      {t('volunteering.expires_on', { date: new Date(c.expires_date!).toLocaleDateString() })}
+                      {t('volunteering.expires_on', { date: new Date(c.expires_date!).toLocaleDateString(getFormattingLocale()) })}
                       {' '}
                       <a
                         href={`mailto:${c.guardian_email}?subject=${encodeURIComponent(t('volunteering.consent_renewal_subject'))}`}

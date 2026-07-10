@@ -66,7 +66,10 @@ describe('FadpConsentBanner — gate / visibility', () => {
   it('renders the banner when fadp_compliance feature is enabled', () => {
     mockHasFeature.mockReturnValue(true);
     renderBanner();
-    expect(screen.getByRole('region')).toBeInTheDocument();
+    const banner = screen.getByRole('region');
+    expect(banner).toBeInTheDocument();
+    expect(banner).toHaveClass('z-[310]');
+    expect(banner.className).toContain('var(--safe-area-bottom)');
   });
 
   it('renders nothing when already dismissed (localStorage fadp_consented=true)', () => {
@@ -140,12 +143,23 @@ describe('FadpConsentBanner — accept action', () => {
     expect(mockStorageMap['fadp_consented']).toBe('true');
   });
 
-  it('still dismisses the banner even if the API call throws', async () => {
+  it('retains the banner with a retryable error if the API call throws', async () => {
     vi.mocked(api.post).mockRejectedValue(new Error('Network error'));
     renderBanner();
     fireEvent.click(screen.getByText('Accept AI features'));
-    // Non-blocking: banner should still close
-    await waitFor(() => expect(screen.queryByRole('region')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+    expect(screen.getByRole('region')).toBeInTheDocument();
+    expect(mockStorageMap['fadp_consented']).toBeUndefined();
+  });
+
+  it('retains the banner when the API resolves a failure envelope', async () => {
+    vi.mocked(api.post).mockResolvedValue({ success: false, code: 'NETWORK_ERROR' });
+    renderBanner();
+    fireEvent.click(screen.getByText('Accept AI features'));
+
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+    expect(screen.getByRole('region')).toBeInTheDocument();
+    expect(mockStorageMap['fadp_consented']).toBeUndefined();
   });
 });
 
@@ -178,10 +192,12 @@ describe('FadpConsentBanner — decline action', () => {
     expect(mockStorageMap['fadp_consented']).toBe('true');
   });
 
-  it('still dismisses the banner even if the decline API call throws', async () => {
+  it('retains the banner if the decline API call throws', async () => {
     vi.mocked(api.post).mockRejectedValue(new Error('Server error'));
     renderBanner();
     fireEvent.click(screen.getByText('Use basic features only'));
-    await waitFor(() => expect(screen.queryByRole('region')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+    expect(screen.getByRole('region')).toBeInTheDocument();
+    expect(mockStorageMap['fadp_consented']).toBeUndefined();
   });
 });

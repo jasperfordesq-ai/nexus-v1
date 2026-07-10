@@ -31,7 +31,13 @@
     "empty": "لا توجد إشعارات بعد",
     "view_all": "عرض جميع الإشعارات",
     "close": "إغلاق الإخطارات",
-    "unread_dot_aria": "Unread"
+    "unread_dot_aria": "Unread",
+    "bell_unread_aria_few": "الإشعارات، {{count}} غير مقروءة",
+    "bell_unread_aria_many": "الإشعارات، {{count}} غير مقروءة",
+    "bell_unread_aria_one": "الإشعارات، {{count}} غير مقروءة",
+    "bell_unread_aria_other": "الإشعارات، {{count}} غير مقروءة",
+    "bell_unread_aria_two": "الإشعارات، {{count}} غير مقروءة",
+    "bell_unread_aria_zero": "الإشعارات، {{count}} غير مقروءة"
   },
   "type": {
     "message": "Message",
@@ -96,5 +102,23 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "unread_badge_few": "{{count}} جديد",
+  "unread_badge_many": "{{count}} جديد",
+  "unread_badge_one": "{{count}} جديد",
+  "unread_badge_other": "{{count}} جديد",
+  "unread_badge_two": "{{count}} جديد",
+  "unread_badge_zero": "{{count}} جديد",
+  "filter_unread_few": "غير مقروء ({{count}})",
+  "filter_unread_many": "غير مقروء ({{count}})",
+  "filter_unread_one": "غير مقروء ({{count}})",
+  "filter_unread_other": "غير مقروء ({{count}})",
+  "filter_unread_two": "غير مقروء ({{count}})",
+  "filter_unread_zero": "غير مقروء ({{count}})",
+  "and_others_few": "و{{count}} آخرين",
+  "and_others_many": "و{{count}} آخرين",
+  "and_others_one": "و{{count}} آخرين",
+  "and_others_other": "و{{count}} آخرين",
+  "and_others_two": "و{{count}} آخرين",
+  "and_others_zero": "و{{count}} آخرين"
 }

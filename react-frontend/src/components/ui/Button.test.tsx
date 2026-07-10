@@ -4,8 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render as renderBare } from '@testing-library/react';
+import { Link as RouterLink, MemoryRouter } from 'react-router-dom';
 import { render, screen, fireEvent } from '@/test/test-utils';
-import { Button } from './Button';
+import { Button, type ButtonProps } from './Button';
 
 // Button wraps HeroUIButton which uses React Aria — no contexts needed.
 
@@ -42,6 +44,21 @@ describe('Button — rendering', () => {
     expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute('href', 'https://example.com');
   });
+
+  it('renders a router destination as one styled link without a nested button', () => {
+    renderBare(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Button as={RouterLink} to="/settings" className="flex-1 w-full">
+          Settings
+        </Button>
+      </MemoryRouter>,
+    );
+
+    const link = screen.getByRole('link', { name: /settings/i });
+    expect(link).toHaveAttribute('href', '/settings');
+    expect(link).toHaveClass('button', 'button--primary', 'flex-1', 'w-full');
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
 });
 
 describe('Button — variant / color mapping', () => {
@@ -50,14 +67,19 @@ describe('Button — variant / color mapping', () => {
     expect(screen.getByRole('button', { name: /solid/i })).toBeInTheDocument();
   });
 
-  it('renders with variant="bordered" (maps to secondary)', () => {
+  it('maps the legacy bordered variant to the documented v3 outline style', () => {
     render(<Button variant="bordered">Bordered</Button>);
-    expect(screen.getByRole('button', { name: /bordered/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /bordered/i })).toHaveClass('button--outline');
   });
 
-  it('renders with variant="light" (maps to tertiary)', () => {
+  it('maps the legacy light variant to the documented v3 ghost style', () => {
     render(<Button variant="light">Light</Button>);
-    expect(screen.getByRole('button', { name: /light/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /light/i })).toHaveClass('button--ghost');
+  });
+
+  it('maps the legacy flat variant to the documented v3 tertiary style', () => {
+    render(<Button variant="flat">Flat</Button>);
+    expect(screen.getByRole('button', { name: /flat/i })).toHaveClass('button--tertiary');
   });
 
   it('renders with color="danger" variant="solid" (maps to danger)', () => {
@@ -73,6 +95,40 @@ describe('Button — variant / color mapping', () => {
   it('renders with variant="ghost"', () => {
     render(<Button variant="ghost">Ghost</Button>);
     expect(screen.getByRole('button', { name: /ghost/i })).toBeInTheDocument();
+  });
+
+  it('preserves a solid success intent with semantic HeroUI tokens', () => {
+    render(<Button color="success">Approve</Button>);
+    const button = screen.getByRole('button', { name: /approve/i });
+
+    expect(button).toHaveAttribute('data-color-intent', 'success');
+    expect(button.className).toContain('[--button-bg:var(--success)]');
+    expect(button.className).toContain('[--button-fg:var(--success-foreground)]');
+  });
+
+  it('preserves a soft warning intent for legacy flat buttons', () => {
+    render(<Button color="warning" variant="flat">Review</Button>);
+    const button = screen.getByRole('button', { name: /review/i });
+
+    expect(button).toHaveAttribute('data-color-intent', 'warning');
+    expect(button.className).toContain('[--button-bg:var(--warning-soft)]');
+    expect(button.className).toContain('[--button-fg:var(--warning-soft-foreground)]');
+  });
+
+  it('preserves outlined success intent for legacy bordered buttons', () => {
+    render(<Button color="success" variant="bordered">Confirm</Button>);
+    const button = screen.getByRole('button', { name: /confirm/i });
+
+    expect(button).toHaveClass('border', 'border-success');
+    expect(button.className).toContain('[--button-bg:transparent]');
+  });
+
+  it('preserves status intent when rendered as a link', () => {
+    render(<Button as="a" href="/review" color="warning">Open review</Button>);
+    const link = screen.getByRole('link', { name: /open review/i });
+
+    expect(link).toHaveAttribute('data-color-intent', 'warning');
+    expect(link.className).toContain('[--button-bg:var(--warning)]');
   });
 });
 
@@ -113,22 +169,44 @@ describe('Button — onPress callback', () => {
     fireEvent.click(screen.getByRole('button', { name: /press me/i }));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
+
+  it('uses React Aria press propagation so parent click actions do not also fire', () => {
+    const onParentClick = vi.fn();
+    const onPress = vi.fn();
+    render(
+      <div onClick={onParentClick}>
+        <Button onPress={onPress}>Nested action</Button>
+      </div>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /nested action/i }));
+
+    expect(onPress).toHaveBeenCalledTimes(1);
+    expect(onParentClick).not.toHaveBeenCalled();
+  });
+
+  it('does not expose native onClick in the project compatibility contract', () => {
+    type HasOnClick = 'onClick' extends keyof ButtonProps ? true : false;
+    const hasOnClick: HasOnClick = false;
+
+    expect(hasOnClick).toBe(false);
+  });
 });
 
 describe('Button — as native element', () => {
-  it('renders as native <button> when as="button"', () => {
-    const onClick = vi.fn();
-    render(<Button as="button" onClick={onClick}>Native</Button>);
+  it('renders as native <button> and preserves onPress', () => {
+    const onPress = vi.fn();
+    render(<Button as="button" onPress={onPress}>Native</Button>);
     const btn = screen.getByRole('button', { name: /native/i });
     fireEvent.click(btn);
-    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 
-  it('does not fire onClick when as="button" and isDisabled', () => {
-    const onClick = vi.fn();
-    render(<Button as="button" isDisabled onClick={onClick}>N/A</Button>);
+  it('does not fire onPress when as="button" and isDisabled', () => {
+    const onPress = vi.fn();
+    render(<Button as="button" isDisabled onPress={onPress}>N/A</Button>);
     const btn = screen.getByRole('button', { name: /n\/a/i });
     fireEvent.click(btn);
-    expect(onClick).not.toHaveBeenCalled();
+    expect(onPress).not.toHaveBeenCalled();
   });
 });

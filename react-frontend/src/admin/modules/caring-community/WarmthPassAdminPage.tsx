@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -44,7 +45,7 @@ interface WarmthPass {
 
 function formatDate(iso: string | null, fallback: string): string {
   if (!iso) return fallback;
-  return new Date(iso).toLocaleDateString(undefined, {
+  return new Date(iso).toLocaleDateString(getFormattingLocale(), {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

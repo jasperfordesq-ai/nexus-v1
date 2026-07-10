@@ -124,7 +124,12 @@
         "year": "Bliain",
         "yearly": "Bliantúil",
         "annual": "Bliantúil"
-      }
+      },
+      "total_few": "{{count}} iomlán",
+      "total_many": "{{count}} iomlán",
+      "total_one": "{{count}} iomlán",
+      "total_other": "{{count}} iomlán",
+      "total_two": "{{count}} iomlán"
     },
     "table": {
       "aria": "Sraitheanna préimhe",
@@ -203,7 +208,12 @@
         "restricted": "Gníomh de dhíth",
         "unknown": "Stádas anaithnid"
       },
-      "connect_fallback_active": "Tá cuntas Stripe Connect cumraithe, ach níl sé réidh le haghaidh deonacháin bheo go fóill. Bainfidh íocaíochtaí úsáid as an ardán cúltaca go dtí go mbeidh an bordáil críochnaithe."
+      "connect_fallback_active": "Tá cuntas Stripe Connect cumraithe, ach níl sé réidh le haghaidh deonacháin bheo go fóill. Bainfidh íocaíochtaí úsáid as an ardán cúltaca go dtí go mbeidh an bordáil críochnaithe.",
+      "requirements_due_few": "Riachtanais chuntais stripe ar gá aird a thabhairt orthu: {{count}}.",
+      "requirements_due_many": "Riachtanais chuntais stripe ar gá aird a thabhairt orthu: {{count}}.",
+      "requirements_due_one": "Riachtanais chuntais stripe ar gá aird a thabhairt orthu: {{count}}.",
+      "requirements_due_other": "Riachtanais chuntais stripe ar gá aird a thabhairt orthu: {{count}}.",
+      "requirements_due_two": "Riachtanais chuntais stripe ar gá aird a thabhairt orthu: {{count}}."
     },
     "finance": {
       "title": "Oibríochtaí airgeadais",
@@ -222,7 +232,20 @@
       "past_due_count": "{{count}} past due",
       "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Fáltais bhliantúla a onnmhairiú",
-      "empty": "Níl aon ghníomhaíocht airgeadais taifeadta go fóill."
+      "empty": "Níl aon ghníomhaíocht airgeadais taifeadta go fóill.",
+      "donation_count_few": "{{count}} donation",
+      "donation_count_many": "{{count}} donation",
+      "donation_count_one": "{{count}} síntiús",
+      "donation_count_two": "{{count}} donation",
+      "declaration_count_few": "{{count}} declaration",
+      "declaration_count_many": "{{count}} declaration",
+      "declaration_count_one": "{{count}} dearbhú",
+      "declaration_count_two": "{{count}} declaration",
+      "past_due_count_few": "{{count}} past due",
+      "past_due_count_many": "{{count}} past due",
+      "past_due_count_one": "{{count}} dlite roimhe seo",
+      "past_due_count_other": "{{count}} dlite roimhe seo",
+      "past_due_count_two": "{{count}} past due"
     }
   }
 }

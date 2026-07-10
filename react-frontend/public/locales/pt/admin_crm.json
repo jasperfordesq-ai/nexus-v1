@@ -345,6 +345,26 @@
     "days_ago": "há {{count}} dias",
     "hours_ago": "há {{count}} horas",
     "just_now": "Just Now",
-    "minutes_ago": "há {{count}} minutos"
+    "minutes_ago": "há {{count}} minutos",
+    "loss_between_stages_many": "{{count}}perdido entre etapas",
+    "loss_between_stages_one": "{{count}}perdido entre etapas",
+    "loss_between_stages_other": "{{count}}perdido entre etapas",
+    "lost_since_previous_stage_many": "{{count}}perdeu desde a fase anterior",
+    "lost_since_previous_stage_one": "{{count}}perdeu desde a fase anterior",
+    "lost_since_previous_stage_other": "{{count}}perdeu desde a fase anterior",
+    "members_lost_at_step_many": "Os membros{{count}}estão perdidos nesta etapa.",
+    "members_lost_at_step_one": "Os membros{{count}}estão perdidos nesta etapa.",
+    "members_lost_at_step_other": "Os membros{{count}}estão perdidos nesta etapa.",
+    "tasks_total_count_many": "Total de tarefas{{count}}",
+    "tasks_total_count_one": "Total de tarefas{{count}}",
+    "tasks_total_count_other": "Total de tarefas{{count}}",
+    "activity_type_login": "Conecte-se",
+    "activity_type_signup": "Inscrever-se",
+    "activity_type_listing_created": "Listagem criada",
+    "activity_type_exchange_completed": "Troca concluída",
+    "activity_type_note_added": "Nota adicionada",
+    "activity_type_task_created": "Tarefa criada",
+    "activity_type_profile_updated": "Perfil atualizado",
+    "activity_type_group_joined": "Grupo entrou"
   }
 }

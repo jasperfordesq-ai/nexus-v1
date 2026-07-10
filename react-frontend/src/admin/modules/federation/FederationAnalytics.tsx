@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useCallback, useEffect, useRef } from 'react';
 
@@ -303,7 +304,7 @@ export function FederationAnalytics() {
                 <TableRow key={row.id}>
                   <TableCell>
                     <span className="text-xs text-muted">
-                      {new Date(row.created_at).toLocaleString()}
+                      {new Date(row.created_at).toLocaleString(getFormattingLocale())}
                     </span>
                   </TableCell>
                   <TableCell>

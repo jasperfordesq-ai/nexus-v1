@@ -104,6 +104,9 @@
     "unknown": "Desconocido",
     "votes": "Votos",
     "no_matching_polls": "No se encontraron encuestas coincidentes",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found found",
+    "total_count_many": "totales: {{count}}",
+    "total_count_one": "totales: {{count}}",
+    "total_count_other": "totales: {{count}}"
   }
 }

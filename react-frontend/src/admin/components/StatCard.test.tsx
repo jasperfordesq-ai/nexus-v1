@@ -3,16 +3,21 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { describe, it, expect, vi } from 'vitest';
+import { afterEach, describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import Users from 'lucide-react/icons/users';
+import i18n from '@/i18n';
 
 vi.mock('@/contexts', () => createMockContexts());
 
 import { StatCard } from './StatCard';
 
 describe('StatCard', () => {
+  afterEach(async () => {
+    await i18n.changeLanguage('en');
+  });
+
   it('renders the label', () => {
     render(<StatCard label="Total Members" value={42} icon={Users} />);
     expect(screen.getByText('Total Members')).toBeInTheDocument();
@@ -30,8 +35,16 @@ describe('StatCard', () => {
 
   it('renders a numeric value with locale formatting', () => {
     render(<StatCard label="Credits" value={1000} icon={Users} />);
-    // toLocaleString() may produce "1,000" or "1 000" depending on locale
-    expect(screen.getByText(/1[,\s]?000/)).toBeInTheDocument();
+    expect(screen.getByText(new Intl.NumberFormat('en').format(1000))).toBeInTheDocument();
+  });
+
+  it('uses the selected application language instead of the browser locale', async () => {
+    await i18n.changeLanguage('de');
+    render(<StatCard label="Credits" value={1234567.89} icon={Users} />);
+
+    expect(
+      screen.getByText(new Intl.NumberFormat('de').format(1234567.89)),
+    ).toBeInTheDocument();
   });
 
   it('shows loading skeleton when loading=true', () => {

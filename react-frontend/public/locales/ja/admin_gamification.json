@@ -306,6 +306,10 @@
     "audience_badge_holders": "特定のバッジを持つユーザー",
     "type_one_time": "ワンタイム",
     "type_recurring": "繰り返し発生する",
-    "type_triggered": "トリガーされた"
+    "type_triggered": "トリガーされた",
+    "bulk_award_succeeded_count_other": "{{count}}バッジを獲得しました",
+    "badge_count_other": "{{count}}バッジ",
+    "threshold_count_other": "しきい値:{{count}}",
+    "xp_count_other": "{{count}} XP"
   }
 }

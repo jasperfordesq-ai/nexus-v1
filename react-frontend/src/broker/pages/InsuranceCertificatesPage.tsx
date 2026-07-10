@@ -53,7 +53,7 @@ import Pencil from 'lucide-react/icons/pencil';
 import ExternalLink from 'lucide-react/icons/external-link';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { resolveAssetUrl, resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAssetUrl, resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { parseServerTimestamp, formatServerDate, formatServerDateTime } from '@/lib/serverTime';
 import { adminInsurance, adminUsers, adminBroker } from '@/admin/api/adminApi';
 import { DataTable, ConfirmModal, type Column } from '@/admin/components';
@@ -525,7 +525,7 @@ export function InsuranceCertificates() {
             isExpired ? 'font-medium text-danger' : isExpiringSoon ? 'font-medium text-warning' : 'text-muted'
           }`}
         >
-          {expiry.toLocaleDateString()}
+          {expiry.toLocaleDateString(getFormattingLocale())}
         </span>
         {isExpired && (
           <Chip size="sm" variant="soft" color="danger" className="shrink-0 tabular-nums">
@@ -1216,7 +1216,7 @@ export function InsuranceCertificates() {
                 <div>
                   <p className="text-muted">{t('insurance.label_coverage_amount')}</p>
                   {/* #11: EUR instead of GBP */}
-                  <p className="font-medium tabular-nums">{viewItem.coverage_amount ? `€${Number(viewItem.coverage_amount).toLocaleString()}` : '—'}</p>
+                  <p className="font-medium tabular-nums">{viewItem.coverage_amount ? `€${Number(viewItem.coverage_amount).toLocaleString(getFormattingLocale())}` : '—'}</p>
                 </div>
                 <div>
                   <p className="text-muted">{t('insurance.label_start_date')}</p>

@@ -1,4 +1,5 @@
-import { Button, Chip, Spinner, Textarea, Card, CardBody, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { getFormattingLocale } from '@/lib/helpers';
+import { Button, Chip, Spinner, Textarea, Card, CardBody, useDisclosure, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -245,7 +246,7 @@ export function ProvisioningRequestsPage() {
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{req.applicant_name} — {req.applicant_email}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {new Date(req.created_at).toLocaleString()}
+                  {new Date(req.created_at).toLocaleString(getFormattingLocale())}
                 </p>
               </CardBody>
             </Card>
@@ -259,8 +260,8 @@ export function ProvisioningRequestsPage() {
           {selected && (
             <>
               <ModalHeader className="flex items-center gap-2">
-                <Building className="w-5 h-5 text-indigo-500" aria-hidden="true" />
-                {selected.org_name}
+                <Building className="w-5 h-5 text-accent" aria-hidden="true" />
+                <ModalHeading>{selected.org_name}</ModalHeading>
                 <Chip size="sm" color={statusColor(selected.status)} variant="soft">
                   {selected.status}
                 </Chip>
@@ -270,7 +271,7 @@ export function ProvisioningRequestsPage() {
                   <div>
                     <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.applicant')}</p>
                     <p>{selected.applicant_name}</p>
-                    <p className="text-indigo-700 dark:text-indigo-400">{selected.applicant_email}</p>
+                    <p className="text-accent dark:text-accent">{selected.applicant_email}</p>
                     {selected.applicant_phone && <p>{selected.applicant_phone}</p>}
                   </div>
                   <div>
@@ -343,9 +344,9 @@ export function ProvisioningRequestsPage() {
                 )}
 
                 <div className="border-t border-white/10 pt-3 grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400">
-                  <div><span className="font-medium text-gray-300">{t('submitted')}:</span> {new Date(selected.created_at).toLocaleString()}</div>
+                  <div><span className="font-medium text-gray-300">{t('submitted')}:</span> {new Date(selected.created_at).toLocaleString(getFormattingLocale())}</div>
                   {selected.reviewed_at && (
-                    <div><span className="font-medium text-gray-300">{t('reviewed')}:</span> {new Date(selected.reviewed_at).toLocaleString()}</div>
+                    <div><span className="font-medium text-gray-300">{t('reviewed')}:</span> {new Date(selected.reviewed_at).toLocaleString(getFormattingLocale())}</div>
                   )}
                 </div>
               </ModalBody>

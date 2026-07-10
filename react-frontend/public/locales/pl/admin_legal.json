@@ -147,7 +147,11 @@
         "date": "Data",
         "ip_address": "Adres IP",
         "member_id": "Członek ID"
-      }
+      },
+      "truncated_few": "Wyświetlanie ostatnich 200 rekordów. Wyeksportuj pełną księgę CSV, aby pobrać wszystkie rekordy {{count}}.",
+      "truncated_many": "Wyświetlanie ostatnich 200 rekordów. Wyeksportuj pełną księgę CSV, aby pobrać wszystkie rekordy {{count}}.",
+      "truncated_one": "Wyświetlanie ostatnich 200 rekordów. Wyeksportuj pełną księgę CSV, aby pobrać wszystkie rekordy {{count}}.",
+      "truncated_other": "Wyświetlanie ostatnich 200 rekordów. Wyeksportuj pełną księgę CSV, aby pobrać wszystkie rekordy {{count}}."
     },
     "residency": {
       "article_16": "Transgraniczne ujawnianie danych osobowych jest dozwolone, jeżeli kraj docelowy zapewnia odpowiednią ochronę danych uznaną przez Radę Federalną. Kwalifikują się państwa członkowskie Switzerland, EU/EEA i niewielka lista innych krajów.",

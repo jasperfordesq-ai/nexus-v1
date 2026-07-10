@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import type { PrerenderJob } from '../../../api/adminApi';
 
 export function formatBytes(n: number): string {
@@ -23,7 +24,7 @@ export function formatTs(ts: number | string | null | undefined): string {
   if (!ts) return '—';
   const d = typeof ts === 'number' ? new Date(ts * 1000) : new Date(ts);
   if (Number.isNaN(d.getTime())) return String(ts);
-  return d.toLocaleString();
+  return d.toLocaleString(getFormattingLocale());
 }
 
 export function stalenessColor(staleness: 'fresh' | 'warn' | 'stale'): 'success' | 'warning' | 'danger' {

@@ -278,7 +278,9 @@
     "linked": "Verknüpft",
     "connected_accounts": "Verbunden",
     "safeguarding": "Schutzmassnahmen",
-    "translation": "Übersetzung"
+    "translation": "Übersetzung",
+    "linked-accounts": "Verknüpfte Konten",
+    "connected-accounts": "Verbundene Konten"
   },
   "safeguarding": {
     "page_title": "Schutzpräferenzen",
@@ -588,7 +590,9 @@
     "unblocked_desc": "{{name}} wurde entsperrt.",
     "unblock_error": "Fehler beim Entsperren des Benutzers",
     "blocked_on": "Blockiert am {{date}}",
-    "link": "Blockierte Benutzer"
+    "link": "Blockierte Benutzer",
+    "count_one": "{{count}} blockiert",
+    "count_other": "{{count}} blockiert"
   },
   "block_user": {
     "title": "{{name}} blockieren?",
@@ -615,5 +619,11 @@
   "push_campaign_opt_in": "Geförderte Push-Benachrichtigungen erhalten",
   "push_campaign_opt_in_description": "Erlauben Sie lokalen Unternehmen und Organisationen, Ihnen gezielte Push-Benachrichtigungen zu senden. Sie können sich jederzeit abmelden.",
   "tabs_aria": "Abschnitte „Einstellungen“.",
-  "twofa_loading_setup": "Zwei-Faktor-Setup wird geladen..."
+  "twofa_loading_setup": "Zwei-Faktor-Setup wird geladen...",
+  "biometric_all_removed_one": "{{count}}-Passschlüssel entfernt.",
+  "biometric_all_removed_other": "{{count}}-Passschlüssel entfernt.",
+  "biometric_enabled_one": "{{count}}-Passschlüssel registriert",
+  "biometric_enabled_other": "{{count}}-Passschlüssel registriert",
+  "twofa_backup_remaining_one": "{{count}} Backup-Codes übrig",
+  "twofa_backup_remaining_other": "{{count}} Backup-Codes übrig"
 }

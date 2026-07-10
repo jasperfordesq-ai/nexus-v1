@@ -90,7 +90,10 @@
     "members_count": "{{count}} miembros",
     "empty": "Aún no te has unido a ningún grupo",
     "empty_description": "Los grupos te ayudan a seguir intereses compartidos, proyectos y círculos locales.",
-    "discover": "Descubrir grupos"
+    "discover": "Descubrir grupos",
+    "members_count_many": "{{count}} miembros",
+    "members_count_one": "{{count}} miembros",
+    "members_count_other": "{{count}} miembros"
   },
   "events": {
     "online_event": "Evento en línea",
@@ -106,7 +109,10 @@
     "xp_progress": "Progreso de XP",
     "start_earning": "¡Empieza a ganar XP participando en la comunidad!",
     "streak_days_one": "{{count}} dia",
-    "streak_days_other": "{{count}} dias"
+    "streak_days_other": "{{count}} dias",
+    "xp_value_many": "{{count}} XP",
+    "xp_value_one": "{{count}} XP",
+    "xp_value_other": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "Cargando anuncios",
@@ -150,5 +156,11 @@
       "active": "Activo"
     },
     "view_all": "Ver todos los intercambios"
-  }
+  },
+  "likes_count_many": "{{count}} likes",
+  "likes_count_one": "{{count}} me gusta",
+  "likes_count_other": "{{count}} me gusta",
+  "comments_count_many": "{{count}} comments",
+  "comments_count_one": "{{count}} comentarios",
+  "comments_count_other": "{{count}} comentarios"
 }

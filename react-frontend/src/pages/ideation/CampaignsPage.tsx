@@ -34,7 +34,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveThumbnailUrl, getFormattingLocale } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -52,7 +52,7 @@ interface Campaign {
 
 const formatDate = (dateStr: string) => {
   try {
-    return new Date(dateStr).toLocaleDateString(undefined, {
+    return new Date(dateStr).toLocaleDateString(getFormattingLocale(), {
       month: 'short',
       day: 'numeric',
       year: 'numeric',

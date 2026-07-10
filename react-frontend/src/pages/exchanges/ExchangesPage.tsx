@@ -30,7 +30,7 @@ import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { EXCHANGE_STATUS_CONFIG } from '@/lib/exchange-status';
 import type { Exchange, ExchangeConfig } from '@/types/api';
 
@@ -188,11 +188,9 @@ export function ExchangesPage() {
         title={t('workflow_not_enabled_title')}
         description={t('workflow_not_enabled_description')}
         action={
-          <Link to={tenantPath("/listings")}>
-            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              {t('browse_listings')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath("/listings")} className="bg-gradient-to-r from-accent to-accent-gradient-end text-white">
+            {t('browse_listings')}
+          </Button>
         }
       />
     );
@@ -206,11 +204,9 @@ export function ExchangesPage() {
         title={t('workflow_not_enabled_title')}
         description={t('workflow_not_enabled_description')}
         action={
-          <Link to={tenantPath("/listings")}>
-            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-              {t('browse_listings')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath("/listings")} className="bg-gradient-to-r from-accent to-accent-gradient-end text-white">
+            {t('browse_listings')}
+          </Button>
         }
       />
     );
@@ -231,14 +227,12 @@ export function ExchangesPage() {
             {t('subtitle')}
           </p>
         </div>
-        <Link to={tenantPath("/listings")}>
-          <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-            startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-          >
-            {t('browse_listings')}
-          </Button>
-        </Link>
+        <Button as={Link} to={tenantPath("/listings")}
+          className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
+          startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+        >
+          {t('browse_listings')}
+        </Button>
       </div>
 
       {/* Tabs */}
@@ -267,7 +261,7 @@ export function ExchangesPage() {
           <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('error.unable_to_load')}</h3>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => {
               if (!configLoadedRef.current) {
@@ -305,11 +299,9 @@ export function ExchangesPage() {
                   : t('empty.filter_description')
               }
               action={
-                <Link to={tenantPath("/listings")}>
-                  <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                    {t('browse_listings')}
-                  </Button>
-                </Link>
+                <Button as={Link} to={tenantPath("/listings")} className="bg-gradient-to-r from-accent to-accent-gradient-end text-white">
+                  {t('browse_listings')}
+                </Button>
               }
             />
           ) : (
@@ -325,7 +317,7 @@ export function ExchangesPage() {
                       className="block"
                       aria-label={t('card.aria_label', { title: exchange.listing?.title || t('service_exchange'), status: statusConfig.label })}
                     >
-                      <GlassCard className="p-4 sm:p-6 hover:border-indigo-500/30 transition-colors cursor-pointer">
+                      <GlassCard className="p-4 sm:p-6 hover:border-accent/30 transition-colors cursor-pointer">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                           {/* Other party avatar */}
                           <Avatar
@@ -363,7 +355,7 @@ export function ExchangesPage() {
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-4 h-4" aria-hidden="true" />
                                 <time dateTime={exchange.created_at}>
-                                  {new Date(exchange.created_at).toLocaleDateString()}
+                                  {new Date(exchange.created_at).toLocaleDateString(getFormattingLocale())}
                                 </time>
                               </span>
                             </div>

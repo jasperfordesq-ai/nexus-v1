@@ -206,7 +206,17 @@
     "feed_empty_desc": "Be the first to share something with this group!",
     "feed_create_post": "Create Post",
     "feed_load_more": "Load More",
-    "member_actions_aria": "Member actions"
+    "member_actions_aria": "Member actions",
+    "meta_description_fallback_one": "Join {{name}} and connect with {{count}} community members through shared posts, events, and discussions.",
+    "meta_description_fallback_other": "Join {{name}} and connect with {{count}} community members through shared posts, events, and discussions.",
+    "tab_subgroups_count_one": "Subgroups ({{count}})",
+    "tab_subgroups_count_other": "Subgroups ({{count}})",
+    "members_count_one": "{{count}} members",
+    "members_count_other": "{{count}} members",
+    "posts_count_one": "{{count}} posts",
+    "posts_count_other": "{{count}} posts",
+    "reply_count_one": "{{count}} replies",
+    "reply_count_other": "{{count}} replies"
   },
   "form": {
     "create_title": "Create New Group",
@@ -389,7 +399,9 @@
     "size_b": "B",
     "size_kb": "KB",
     "size_mb": "MB",
-    "size_gb": "GB"
+    "size_gb": "GB",
+    "folder_chip_one": "{{name}} ({{count}})",
+    "folder_chip_other": "{{name}} ({{count}})"
   },
   "media": {
     "filter_all": "All",
@@ -450,7 +462,9 @@
     "secret_placeholder": "Signing secret for payload verification",
     "cancel": "Cancel",
     "create_btn": "Create Webhook",
-    "delete_confirm": "Delete this webhook? This cannot be undone."
+    "delete_confirm": "Delete this webhook? This cannot be undone.",
+    "failures_one": "{{count}} failures",
+    "failures_other": "{{count}} failures"
   },
   "toast": {
     "left": "Left the group",
@@ -562,7 +576,11 @@
     "answer_posted_success": "Answer posted!",
     "answer_posted_error": "Failed to post answer",
     "vote_error": "Failed to vote",
-    "accept_error": "Failed to accept answer"
+    "accept_error": "Failed to accept answer",
+    "answer_count_aria_one": "{{count}} answers",
+    "answer_count_aria_other": "{{count}} answers",
+    "answers_heading_one": "{{count}} Answer(s)",
+    "answers_heading_other": "{{count}} Answer(s)"
   },
   "wiki": {
     "load_failed": "Failed to load wiki pages",
@@ -719,5 +737,11 @@
     "accent_color": "Accent Color",
     "hue": "Hue",
     "preview": "Preview"
-  }
+  },
+  "members_one": "{{count}} members",
+  "members_other": "{{count}} members",
+  "members_count_label_one": "{{count}} members",
+  "members_count_label_other": "{{count}} members",
+  "posts_count_label_one": "{{count}} posts",
+  "posts_count_label_other": "{{count}} posts"
 }

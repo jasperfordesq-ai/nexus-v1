@@ -259,7 +259,7 @@ export default function CommercialBoundaryAdminPage() {
               <p className="font-semibold text-accent dark:text-accent">{t('commercial_boundary.about.title')}</p>
               <p className="text-muted">
                 {t('commercial_boundary.about.body_prefix')}{' '}
-                Caring Community {t('commercial_boundary.about.body_suffix')}
+                {t('common:nav.caring_community')} {t('commercial_boundary.about.body_suffix')}
               </p>
               <p className="text-muted">
                 {t('commercial_boundary.about.override_prefix')}{' '}

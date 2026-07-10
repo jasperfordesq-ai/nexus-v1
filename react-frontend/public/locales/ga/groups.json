@@ -206,7 +206,32 @@
     "feed_empty_desc": "Bí ar an gcéad duine le rud a roinnt leis an ngrúpa seo!",
     "feed_create_post": "Cruthaigh Postáil",
     "feed_load_more": "Lódáil Tuilleadh",
-    "member_actions_aria": "Gníomhartha baill"
+    "member_actions_aria": "Gníomhartha baill",
+    "meta_description_fallback_few": "Téigh isteach i {{name}} agus ceangail le {{count}} ball pobail trí phostálacha, imeachtaí agus pléití comhroinnte.",
+    "meta_description_fallback_many": "Téigh isteach i {{name}} agus ceangail le {{count}} ball pobail trí phostálacha, imeachtaí agus pléití comhroinnte.",
+    "meta_description_fallback_one": "Téigh isteach i {{name}} agus ceangail le {{count}} ball pobail trí phostálacha, imeachtaí agus pléití comhroinnte.",
+    "meta_description_fallback_other": "Téigh isteach i {{name}} agus ceangail le {{count}} ball pobail trí phostálacha, imeachtaí agus pléití comhroinnte.",
+    "meta_description_fallback_two": "Téigh isteach i {{name}} agus ceangail le {{count}} ball pobail trí phostálacha, imeachtaí agus pléití comhroinnte.",
+    "members_count_few": "{{count}} comhalta",
+    "members_count_many": "{{count}} comhalta",
+    "members_count_one": "{{count}} comhalta",
+    "members_count_other": "{{count}} comhalta",
+    "members_count_two": "{{count}} comhalta",
+    "reply_count_few": "{{count}} freagra",
+    "reply_count_many": "{{count}} freagra",
+    "reply_count_one": "{{count}} freagra",
+    "reply_count_other": "{{count}} freagra",
+    "reply_count_two": "{{count}} freagra",
+    "tab_subgroups_count_few": "Fo-ghrúpaí ({{count}})",
+    "tab_subgroups_count_many": "Fo-ghrúpaí ({{count}})",
+    "tab_subgroups_count_one": "Fo-ghrúpaí ({{count}})",
+    "tab_subgroups_count_other": "Fo-ghrúpaí ({{count}})",
+    "tab_subgroups_count_two": "Fo-ghrúpaí ({{count}})",
+    "posts_count_few": "{{count}} postáil",
+    "posts_count_many": "{{count}} postáil",
+    "posts_count_one": "{{count}} postáil",
+    "posts_count_other": "{{count}} postáil",
+    "posts_count_two": "{{count}} postáil"
   },
   "form": {
     "create_title": "Cruthaigh Grúpa Nua",
@@ -389,7 +414,12 @@
     "size_b": "B",
     "size_kb": "KB",
     "size_mb": "MB",
-    "size_gb": "GB"
+    "size_gb": "GB",
+    "folder_chip_few": "{{name}} ({{count}})",
+    "folder_chip_many": "{{name}} ({{count}})",
+    "folder_chip_one": "{{name}} ({{count}})",
+    "folder_chip_other": "{{name}} ({{count}})",
+    "folder_chip_two": "{{name}} ({{count}})"
   },
   "media": {
     "filter_all": "Gach rud",
@@ -450,7 +480,12 @@
     "secret_placeholder": "Rún sínithe le haghaidh fíorúcháin pálasta",
     "cancel": "Cealaigh",
     "create_btn": "Cruthaigh gréasánghríoga",
-    "delete_confirm": "An bhfuil fonn ort an cuaille seo a scriosadh? Ní féidir é seo a chealú."
+    "delete_confirm": "An bhfuil fonn ort an cuaille seo a scriosadh? Ní féidir é seo a chealú.",
+    "failures_few": "{{count}} teipeanna",
+    "failures_many": "{{count}} teipeanna",
+    "failures_one": "{{count}} teipeanna",
+    "failures_other": "{{count}} teipeanna",
+    "failures_two": "{{count}} teipeanna"
   },
   "toast": {
     "left": "D'fhág tú an grúpa",
@@ -562,7 +597,17 @@
     "answer_posted_success": "Freagra postáilte!",
     "answer_posted_error": "Theip ar an bhfreagra a phostáil",
     "vote_error": "Theip ar vótáil",
-    "accept_error": "Theip ar glacadh leis an bhfreagra"
+    "accept_error": "Theip ar glacadh leis an bhfreagra",
+    "answer_count_aria_few": "{{count}} freagra",
+    "answer_count_aria_many": "{{count}} freagra",
+    "answer_count_aria_one": "{{count}} freagra",
+    "answer_count_aria_other": "{{count}} freagra",
+    "answer_count_aria_two": "{{count}} freagra",
+    "answers_heading_few": "{{count}} Freagra/í",
+    "answers_heading_many": "{{count}} Freagra/í",
+    "answers_heading_one": "{{count}} Freagra/í",
+    "answers_heading_other": "{{count}} Freagra/í",
+    "answers_heading_two": "{{count}} Freagra/í"
   },
   "wiki": {
     "load_failed": "Theip ar lódáil leathanaigh wiki",
@@ -719,5 +764,20 @@
     "accent_color": "Dath Béime",
     "hue": "Lí",
     "preview": "Réamhamharc"
-  }
+  },
+  "members_few": "{{count}} comhalta",
+  "members_many": "{{count}} comhalta",
+  "members_one": "{{count}} comhalta",
+  "members_other": "{{count}} comhalta",
+  "members_two": "{{count}} comhalta",
+  "members_count_label_few": "{{count}} ball",
+  "members_count_label_many": "{{count}} ball",
+  "members_count_label_one": "{{count}} ball",
+  "members_count_label_other": "{{count}} ball",
+  "members_count_label_two": "{{count}} ball",
+  "posts_count_label_few": "{{count}} post",
+  "posts_count_label_many": "{{count}} post",
+  "posts_count_label_one": "{{count}} post",
+  "posts_count_label_other": "{{count}} post",
+  "posts_count_label_two": "{{count}} post"
 }

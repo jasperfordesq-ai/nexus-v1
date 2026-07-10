@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -235,7 +236,7 @@ export default function AiModuleDocsAdminPage() {
                 </Chip>
               </TableCell>
               <TableCell>
-                <span className="text-xs">{new Date(doc.updated_at).toLocaleDateString()}</span>
+                <span className="text-xs">{new Date(doc.updated_at).toLocaleDateString(getFormattingLocale())}</span>
               </TableCell>
               <TableCell>
                 <div className="flex gap-1">

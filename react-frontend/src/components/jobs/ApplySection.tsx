@@ -72,11 +72,9 @@ export function ApplySection({
       {!isAuthenticated ? (
         <div className="text-center">
           <p className="text-theme-muted mb-3">{t('apply.login_required')}</p>
-          <Link to={tenantPath('/login')}>
-            <Button color="primary" className="w-full">
-              {t('apply.button')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath('/login')} color="primary" className="w-full">
+            {t('apply.button')}
+          </Button>
         </div>
       ) : isOwner ? (
         <div className="text-center">

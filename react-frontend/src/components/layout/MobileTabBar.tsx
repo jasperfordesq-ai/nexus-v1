@@ -99,13 +99,12 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
     <>
       {/* Spacer so page content isn't hidden behind the fixed bar */}
       {/* Spacer matches tab bar height + safe-area bottom so content isn't hidden behind it */}
-      <div className="md:hidden" aria-hidden="true" style={{ height: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }} />
+      <div className="h-[calc(4rem+env(safe-area-inset-bottom,0px))] md:hidden" aria-hidden="true" />
 
       <nav
         data-mobile-tabbar
-        className={`fixed bottom-0 left-0 right-0 z-300 md:hidden transition-all duration-200 ${isMenuOpen ? 'translate-y-[calc(100%+12px)] pointer-events-none' : ''}`}
+        className={`fixed bottom-0 left-0 right-0 z-300 pb-[env(safe-area-inset-bottom,0px)] md:hidden transition-all duration-200 ${isMenuOpen ? 'translate-y-[calc(100%+12px)] pointer-events-none' : ''}`}
         aria-label={t('aria.mobile_navigation')}
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
       >
         {/* Glass surface */}
         <div className="bg-[var(--glass-bg)] backdrop-blur-xl border-t border-[var(--border-default)] shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
@@ -125,7 +124,7 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
                       isIconOnly
                       radius="full"
                       onPress={tab.action}
-                      className="w-[52px] h-[52px] min-w-0 bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/40 hover:shadow-indigo-500/60 hover:scale-105 active:scale-95 transition-all duration-200"
+                      className="w-[52px] h-[52px] min-w-0 bg-gradient-to-br from-accent to-accent-gradient-end text-white shadow-lg shadow-accent/40 hover:shadow-accent/60 hover:scale-105 active:scale-95 transition-all duration-200"
                       aria-label={t('mobile_tab.create_new_content')}
                     >
                       <motion.div
@@ -158,7 +157,7 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
                     min-w-0 px-1 py-1.5 rounded-none
                     transition-colors duration-150
                     ${active
-                      ? 'text-indigo-600 dark:text-indigo-400'
+                      ? 'text-accent dark:text-accent'
                       : 'text-theme-muted hover:text-theme-primary'
                     }
                   `}
@@ -169,7 +168,7 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
                   <div
                     className={`absolute inset-x-2 top-1.5 h-8 rounded-xl transition-opacity duration-200 ${
                       active
-                        ? 'opacity-100 bg-indigo-500/10 dark:bg-indigo-400/10'
+                        ? 'opacity-100 bg-accent/10 dark:bg-accent/10'
                         : 'opacity-0'
                     }`}
                   />
@@ -187,7 +186,7 @@ export function MobileTabBar({ onMenuOpen, isMenuOpen }: MobileTabBarProps) {
                   <div
                     className={`absolute bottom-1.5 w-1 h-1 rounded-full transition-opacity duration-200 ${
                       active
-                        ? 'opacity-100 bg-indigo-600 dark:bg-indigo-400'
+                        ? 'opacity-100 bg-accent dark:bg-accent'
                         : 'opacity-0'
                     }`}
                   />

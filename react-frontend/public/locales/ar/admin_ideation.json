@@ -132,6 +132,12 @@
     "no_challenges_found": "لم يتم العثور على التحديات",
     "no_matching_challenges": "لم يتم العثور على تحديات مطابقة",
     "no_status_challenges": "لم يتم العثور على تحديات الحالة",
-    "tabs_aria": "مرشح حالة التحدي"
+    "tabs_aria": "مرشح حالة التحدي",
+    "total_count_few": "المجموع: {{count}}",
+    "total_count_many": "المجموع: {{count}}",
+    "total_count_one": "المجموع: {{count}}",
+    "total_count_other": "المجموع: {{count}}",
+    "total_count_two": "المجموع: {{count}}",
+    "total_count_zero": "المجموع: {{count}}"
   }
 }

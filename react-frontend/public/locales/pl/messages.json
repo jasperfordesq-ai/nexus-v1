@@ -234,5 +234,13 @@
     "sent": "Koordynator został powiadomiony — skontaktuje się z Tobą, aby pomóc w nawiązaniu kontaktu.",
     "error": "Nie udało się wysłać Twojej prośby. Spróbuj ponownie za chwilę."
   },
-  "composer_blocked_safeguarding": "Bezpośrednia wiadomość do tego członka nie jest dostępna. Skorzystaj z opcji powyżej, aby poprosić koordynatora o pomoc w nawiązaniu kontaktu."
+  "composer_blocked_safeguarding": "Bezpośrednia wiadomość do tego członka nie jest dostępna. Skorzystaj z opcji powyżej, aby poprosić koordynatora o pomoc w nawiązaniu kontaktu.",
+  "aria_conversation_unread_few": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
+  "aria_conversation_unread_many": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
+  "aria_conversation_unread_one": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
+  "aria_conversation_unread_other": "Rozmowa z {{name}}, {{count}} nieprzeczytana",
+  "selected_members_few": "Wybrani ({{count}})",
+  "selected_members_many": "Wybrani ({{count}})",
+  "selected_members_one": "Wybrani ({{count}})",
+  "selected_members_other": "Wybrani ({{count}})"
 }

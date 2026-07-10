@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Spinner, Button, Input, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Skeleton } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +37,6 @@ import { api, tokenManager } from '@/lib/api';
 import { CHART_COLOR_MAP, CHART_TOKEN_COLORS } from '@/lib/chartColors';
 import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
-import i18n from '@/i18n';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -220,7 +220,7 @@ const tooltipStyle = {
 function formatCurrency(value: number | null | undefined, currency: string): string {
   if (value == null) return '—';
   const symbol = CURRENCY_SYMBOLS[currency] || currency;
-  return `${symbol}${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `${symbol}${value.toLocaleString(getFormattingLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function formatPercent(rate: number): string {
@@ -230,7 +230,7 @@ function formatPercent(rate: number): string {
 function formatMonth(monthStr: string): string {
   const [year, month] = monthStr.split('-');
   const date = new Date(Number(year), Number(month) - 1);
-  return date.toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
+  return date.toLocaleDateString(getFormattingLocale(), { month: 'short', year: '2-digit' });
 }
 
 async function exportCsv(dateFrom?: string, dateTo?: string) {
@@ -440,7 +440,7 @@ export function ImpactReport() {
     doc.text(
       t('impact.pdf_period_generated', {
         months: data.sroi.period_months,
-        date: new Date().toLocaleDateString(i18n.language),
+        date: new Date().toLocaleDateString(getFormattingLocale()),
       }),
       20,
       33,
@@ -757,7 +757,7 @@ export function ImpactReport() {
                 <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-6 w-16 rounded bg-surface-tertiary" />
               ) : (
                 <p className="text-xl font-bold text-foreground">
-                  {data?.sroi.total_transactions.toLocaleString() ?? '\u2014'}
+                  {data?.sroi.total_transactions.toLocaleString(getFormattingLocale()) ?? '\u2014'}
                 </p>
               )}
             </div>
@@ -774,7 +774,7 @@ export function ImpactReport() {
                 <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-6 w-16 rounded bg-surface-tertiary" />
               ) : (
                 <p className="text-xl font-bold text-foreground">
-                  {data?.sroi.unique_givers.toLocaleString() ?? '\u2014'}
+                  {data?.sroi.unique_givers.toLocaleString(getFormattingLocale()) ?? '\u2014'}
                 </p>
               )}
             </div>
@@ -791,7 +791,7 @@ export function ImpactReport() {
                 <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-6 w-16 rounded bg-surface-tertiary" />
               ) : (
                 <p className="text-xl font-bold text-foreground">
-                  {data?.sroi.unique_receivers.toLocaleString() ?? '\u2014'}
+                  {data?.sroi.unique_receivers.toLocaleString(getFormattingLocale()) ?? '\u2014'}
                 </p>
               )}
             </div>
@@ -933,7 +933,7 @@ export function ImpactReport() {
               <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-7 w-20 rounded bg-surface-tertiary" />
             ) : (
               <p className="text-2xl font-bold text-foreground">
-                {data?.health.total_users.toLocaleString() ?? '\u2014'}
+                {data?.health.total_users.toLocaleString(getFormattingLocale()) ?? '\u2014'}
               </p>
             )}
           </CardBody>
@@ -945,7 +945,7 @@ export function ImpactReport() {
               <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-7 w-20 rounded bg-surface-tertiary" />
             ) : (
               <p className="text-2xl font-bold text-foreground">
-                {data?.health.active_users_90d.toLocaleString() ?? '\u2014'}
+                {data?.health.active_users_90d.toLocaleString(getFormattingLocale()) ?? '\u2014'}
               </p>
             )}
           </CardBody>
@@ -957,7 +957,7 @@ export function ImpactReport() {
               <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-7 w-20 rounded bg-surface-tertiary" />
             ) : (
               <p className="text-2xl font-bold text-foreground">
-                {data?.health.new_users_30d.toLocaleString() ?? '\u2014'}
+                {data?.health.new_users_30d.toLocaleString(getFormattingLocale()) ?? '\u2014'}
               </p>
             )}
           </CardBody>
@@ -973,7 +973,7 @@ export function ImpactReport() {
               </p>
             )}
             <p className="text-xs text-muted mt-1">
-              {data?.health.total_connections.toLocaleString() ?? 0} {t('impact.unit_connections')}
+              {data?.health.total_connections.toLocaleString(getFormattingLocale()) ?? 0} {t('impact.unit_connections')}
             </p>
           </CardBody>
         </Card>
@@ -1074,7 +1074,8 @@ export function ImpactReport() {
                 <strong>{t('impact.label_hour_value')}:</strong> {formatCurrency(extras.config.hour_value, currency)}/{t('impact.unit_hour_short')}
               </p>
               <p>
-                <strong>{t('impact.label_social_multiplier')}:</strong> {extras.config.social_multiplier}x
+                <strong>{t('impact.label_social_multiplier')}:</strong>{' '}
+                {t('impact.multiplier_value', { value: extras.config.social_multiplier })}
               </p>
               <p>
                 <strong>{t('impact.label_formula')}:</strong> {t('impact.formula_simple')}

@@ -260,21 +260,21 @@ describe('DataTable', () => {
 describe('StatusBadge', () => {
   it('renders active status with success color', () => {
     render(<W><StatusBadge status="active" /></W>);
-    expect(screen.getByText('active')).toBeTruthy();
+    expect(screen.getByText('Active')).toBeTruthy();
   });
 
   it('renders pending status', () => {
     render(<W><StatusBadge status="pending" /></W>);
-    expect(screen.getByText('pending')).toBeTruthy();
+    expect(screen.getByText('Pending')).toBeTruthy();
   });
 
   it('renders unknown status with default color', () => {
     render(<W><StatusBadge status="custom_status" /></W>);
-    expect(screen.getByText('custom_status')).toBeTruthy();
+    expect(screen.getByText('Unknown')).toBeTruthy();
   });
 
   it('handles empty status string', () => {
     render(<W><StatusBadge status="" /></W>);
-    expect(screen.getByText('unknown')).toBeTruthy();
+    expect(screen.getByText('Unknown')).toBeTruthy();
   });
 });

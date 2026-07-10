@@ -34,7 +34,11 @@
     "tab_hours_review": "Urenoverzicht",
     "tab_volunteers": "Vrijwilligers",
     "tab_wallet": "Portemonnee",
-    "tab_settings": "Instellingen"
+    "tab_settings": "Instellingen",
+    "review_applications_one": "Bekijk {{count}}-applicaties",
+    "review_applications_other": "Bekijk {{count}}-applicaties",
+    "review_hours_one": "Bekijk {{count}} uren",
+    "review_hours_other": "Bekijk {{count}} uren"
   },
   "page_title": "Vrijwilligerswerk",
   "heading": "Vrijwilligerswerk",
@@ -346,7 +350,13 @@
       "cancelled": "Geannuleerd"
     },
     "support_aria": "Steun dit project ({{count}} steunbetuigingen)",
-    "unsupport_aria": "Steun intrekken ({{count}} steunbetuigingen)"
+    "unsupport_aria": "Steun intrekken ({{count}} steunbetuigingen)",
+    "volunteers_needed_one": "{{count}} nodig",
+    "volunteers_needed_other": "{{count}} nodig",
+    "unsupport_aria_one": "Steun intrekken ({{count}} steunbetuigingen)",
+    "unsupport_aria_other": "Steun intrekken ({{count}} steunbetuigingen)",
+    "support_aria_one": "Steun dit project ({{count}} steunbetuigingen)",
+    "support_aria_other": "Steun dit project ({{count}} steunbetuigingen)"
   },
   "donations": {
     "heading": "Donaties",
@@ -453,7 +463,9 @@
     "receipt_method": "Betaalmethode",
     "receipt_message": "Bericht",
     "receipt_error": "Kan de bon niet laden.",
-    "receipt_not_found": "Ontvangstbewijs niet gevonden."
+    "receipt_not_found": "Ontvangstbewijs niet gevonden.",
+    "donors_count_one": "{{count}} donoren",
+    "donors_count_other": "{{count}} donoren"
   },
   "safeguarding": {
     "heading": "Beveiliging",
@@ -592,7 +604,9 @@
     "cancel": "Annuleren",
     "upload_credential": "Referentie uploaden",
     "aria_remove_file": "Geselecteerd bestand verwijderen",
-    "aria_upload_document": "Upload identificatiedocument"
+    "aria_upload_document": "Upload identificatiedocument",
+    "expiring_soon_desc_one": "{{count}}-inloggegevens verlopen binnen 30 dagen.",
+    "expiring_soon_desc_other": "{{count}}-inloggegevens verlopen binnen 30 dagen."
   },
   "waitlist": {
     "heading": "Mijn wachtlijsten",
@@ -612,7 +626,9 @@
     "claim": "Claim plek",
     "claim_success": "Je doet mee - aangemeld voor de dienst!",
     "claim_failed": "Kon de plek niet claimen",
-    "claim_hint": "Er is een plekje voor je vrijgekomen. Claim het snel: niet-geclaimde plekken gaan na 48 uur naar de volgende persoon."
+    "claim_hint": "Er is een plekje voor je vrijgekomen. Claim het snel: niet-geclaimde plekken gaan na 48 uur naar de volgende persoon.",
+    "spots_one": "{{count}} plekken",
+    "spots_other": "{{count}} plekken"
   },
   "swaps": {
     "heading": "Wissels van ploegendiensten",
@@ -751,7 +767,13 @@
     "select_limit": "Je kunt maximaal {{max}} aanmeldingen tegelijk selecteren.",
     "bulk_success": "{{count}} aanmeldingen bijgewerkt.",
     "bulk_failed": "{{count}} aanmeldingen konden niet worden bijgewerkt.",
-    "bulk_rate_limited": "{{count}} konden niet worden bijgewerkt — je gaat te snel. Wacht een minuut en probeer opnieuw."
+    "bulk_rate_limited": "{{count}} konden niet worden bijgewerkt — je gaat te snel. Wacht een minuut en probeer opnieuw.",
+    "pending_count_one": "{{count}} in behandeling",
+    "pending_count_other": "{{count}} in behandeling",
+    "selected_count_one": "{{count}} geselecteerd",
+    "selected_count_other": "{{count}} geselecteerd",
+    "decline_modal_description_one": "Voeg een opmerking toe voor de {{count}}-aanvraag voordat u deze afwijst.",
+    "decline_modal_description_other": "Voeg een opmerking toe voor de {{count}}-aanvraag voordat u deze afwijst."
   },
   "org_wallet_balance": "Wallet-saldo:",
   "auto_pay_on": "Automatisch betalen AAN",
@@ -845,7 +867,9 @@
     "organization_hours": "{{name}} ({{hours}}h)",
     "generated_on": "Gegenereerd",
     "download": "Downloaden",
-    "verify": "Verifiëren"
+    "verify": "Verifiëren",
+    "verified_hours_one": "{{count}} Geverifieerde uren",
+    "verified_hours_other": "{{count}} Geverifieerde uren"
   },
   "emergency": {
     "title": "Noodwaarschuwingen",
@@ -866,7 +890,9 @@
     "respond_error": "Kan niet reageren op waarschuwing.",
     "respond_error_generic": "Kan niet reageren op waarschuwing. Probeer het opnieuw.",
     "from": "Van",
-    "expires": "Verloopt"
+    "expires": "Verloopt",
+    "pending_count_one": "{{count}} in behandeling",
+    "pending_count_other": "{{count}} in behandeling"
   },
   "wellbeing": {
     "heading": "Vrijwilligerswelzijn",
@@ -1039,5 +1065,9 @@
   "form_remote_description": "Vrijwilligers kunnen online of telefonisch deelnemen.",
   "my_organisations_declined": "Afgewezen",
   "my_organisations_declined_desc": "Deze aanvraag is niet goedgekeurd. Neem contact op met je community-beheerder voor details.",
-  "hours_invalid_range": "Voer tussen 0,25 en 24 uur in."
+  "hours_invalid_range": "Voer tussen 0,25 en 24 uur in.",
+  "org_callout_you_manage_many_one": "Je beheert {{count}} organisaties",
+  "org_callout_you_manage_many_other": "Je beheert {{count}} organisaties",
+  "more_sections_one": "Meer ({{count}})",
+  "more_sections_other": "Meer ({{count}})"
 }

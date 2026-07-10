@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody } from '@/components/ui/Card';
@@ -155,7 +156,7 @@ export default function AppreciationWallPage() {
                     {a.sender?.name ?? t('common.someone')}
                   </Link>
                   <span className="text-xs text-[var(--text-muted)] ml-auto">
-                    {new Date(a.created_at).toLocaleDateString()}
+                    {new Date(a.created_at).toLocaleDateString(getFormattingLocale())}
                   </span>
                 </div>
                 <p className="text-[var(--text-primary)]">{a.message}</p>

@@ -40,5 +40,11 @@
   },
   "page_meta": {
     "title": "Chat AI"
-  }
+  },
+  "card_wallet_transactions_many": "{{count}} transazioni negli ultimi 30 giorni",
+  "card_wallet_transactions_one": "{{count}} transazioni negli ultimi 30 giorni",
+  "card_wallet_transactions_other": "{{count}} transazioni negli ultimi 30 giorni",
+  "limits_left_today_many": "{{count}} rimasti oggi",
+  "limits_left_today_one": "{{count}} rimasti oggi",
+  "limits_left_today_other": "{{count}} rimasti oggi"
 }

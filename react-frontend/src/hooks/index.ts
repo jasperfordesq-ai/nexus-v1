@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-export { useApi, useMutation, usePaginatedApi } from './useApi';
+export { useApi } from './useApi';
 export { useTurnstile } from './useTurnstile';
 export { usePasswordCheck, PASSWORD_MIN_LENGTH } from './usePasswordCheck';
 export type { PasswordCheckState } from './usePasswordCheck';

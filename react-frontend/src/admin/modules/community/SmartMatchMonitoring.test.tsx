@@ -41,6 +41,9 @@ const FULL_DATA = {
     total_matches_today: 4,
     total_matches_week: 33,
     hot_matches_count: 7,
+    mutual_matches_count: 11,
+    avg_distance_km: 8.5,
+    cache_entries: 24,
     active_users_matching: 55,
   },
   approval_rate: 65,
@@ -49,6 +52,7 @@ const FULL_DATA = {
   approved_count: 48,
   rejected_count: 9,
   score_distribution: { '0-20': 5, '21-40': 12, '41-60': 30, '61-80': 45, '81-100': 28 },
+  distance_distribution: { walking: 5, local: 12, city: 30, regional: 45, distant: 28 },
 };
 
 describe('SmartMatchMonitoring', () => {
@@ -102,7 +106,7 @@ describe('SmartMatchMonitoring', () => {
     expect(screen.getByText('81-100')).toBeInTheDocument();
   });
 
-  it('shows empty state card text when data is null (success=false)', async () => {
+  it('shows a retryable error when success is false', async () => {
     mockGetMatchingStats.mockResolvedValue({ success: false });
     render(<SmartMatchMonitoring />);
 
@@ -113,18 +117,18 @@ describe('SmartMatchMonitoring', () => {
       );
       expect(busyEl).toBeUndefined();
     });
-    // engine status empty state paragraphs (two separate <p> elements)
-    const empties = screen.getAllByText(/no monitoring data|configure matching/i);
-    expect(empties.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole('alert')).toHaveTextContent(/failed to load matching stats/i);
+    expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
   });
 
-  it('calls toast.error on API rejection', async () => {
+  it('shows a retryable error without a toast on API rejection', async () => {
     mockGetMatchingStats.mockRejectedValue(new Error('network'));
     render(<SmartMatchMonitoring />);
 
     await waitFor(() => {
-      expect(mockToast.error).toHaveBeenCalled();
+      expect(screen.getByRole('alert')).toHaveTextContent(/failed to load matching stats/i);
     });
+    expect(mockToast.error).not.toHaveBeenCalled();
   });
 
   it('shows empty score distribution state when no score data', async () => {

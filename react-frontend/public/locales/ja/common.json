@@ -73,7 +73,8 @@
     "features": "機能",
     "courses": "コース",
     "podcasts": "ポッドキャスト",
-    "switch_community": "コミュニティを切り替え"
+    "switch_community": "コミュニティを切り替え",
+    "unread_notifications_other": "未読通知 {{count}}件"
   },
   "landing_links": {
     "title": "このコミュニティを探索",
@@ -239,6 +240,7 @@
     "accessibility_alpha_new_tab": "アクセシビリティ（アルファ）を新しいタブで開く",
     "menu_opened": "ナビゲーションメニューが開きました",
     "close": "閉じる",
+    "clear_input": "入力をクリア",
     "scroll_to_top": "トップへスクロール",
     "breadcrumb": "パンくずリスト"
   },
@@ -367,7 +369,10 @@
     "load_failed": "メンバーの読み込みに失敗しました",
     "load_more_failed": "追加のメンバーの読み込みに失敗しました",
     "my_profile": "マイプロフィール",
-    "load_more_count": "さらに読み込む (残り {{remaining}} 件)"
+    "load_more_count": "さらに読み込む (残り {{remaining}} 件)",
+    "results_count_other": "{{count}}人のメンバーを表示",
+    "hours_exchanged_aria_other": "{{count}}時間交換",
+    "hours_short_other": "{{count}}時間"
   },
   "error_boundary": {
     "title": "問題が発生しました",
@@ -879,7 +884,9 @@
     "user_menu_trigger": "{{name}} のユーザー メニュー",
     "feed_sidebar": "コミュニティサイドバー",
     "filter_panel": "フィルターパネル",
-    "remove": "Remove"
+    "remove": "Remove",
+    "location_results_other": "{{count}} アドレスの提案が利用可能",
+    "search_results_other": "{{count}} の結果が利用可能"
   },
   "skills": {
     "browse_title": "コミュニティスキルディレクトリ",
@@ -929,7 +936,8 @@
     "aria_clear_search": "検索をクリア",
     "aria_close_members_list": "メンバーリストを閉じる",
     "category_optional": "カテゴリ（任意）",
-    "proficiency_level": "習熟度"
+    "proficiency_level": "習熟度",
+    "aria_results_other": "{{count}} のスキル提案が利用可能"
   },
   "hours_display_one": "{{count}}時間",
   "hours_display_other": "{{count}}時間",
@@ -1108,7 +1116,8 @@
     },
     "errors": {
       "load_failed": "クラブを読み込めませんでした。もう一度お試しください。"
-    }
+    },
+    "member_count_other": "{{count}}人のメンバー"
   },
   "feed": {
     "personalisation": {
@@ -1191,7 +1200,8 @@
       "format": "形式",
       "size": "サイズ",
       "count": "{{count}}件のエクスポート",
-      "empty": "データをまだエクスポートしていません。"
+      "empty": "データをまだエクスポートしていません。",
+      "count_other": "{{count}}件のエクスポート"
     },
     "errors": {
       "rate_limit": "エクスポートは1日5回まで可能です。明日もう一度お試しください。",
@@ -1436,7 +1446,8 @@
     "created_success": "プッシュキャンペーンを正常に作成しました。",
     "create_error": "プッシュキャンペーンを作成できませんでした。もう一度お試しください。",
     "submit_create": "キャンペーンを作成",
-    "feature_disabled": "このアカウントではプッシュキャンペーンは利用できません。"
+    "feature_disabled": "このアカウントではプッシュキャンペーンは利用できません。",
+    "estimate_result_other": "推定リーチ: {{count}} 人"
   },
   "push_campaign_opt_in": "プロモーションプッシュ通知を受け取る",
   "push_campaign_opt_in_description": "地元の企業や団体から、ターゲットを絞ったプッシュ通知を受け取ることを許可します。いつでもオプトアウトできます。",
@@ -1505,7 +1516,8 @@
       "view_redemptions": "利用履歴を表示",
       "usage_count": "{{count}}回使用",
       "saved": "クーポンを保存しました",
-      "deleted": "クーポンを削除しました"
+      "deleted": "クーポンを削除しました",
+      "usage_count_other": "{{count}}回使用"
     },
     "qr_code_alt": "QR コード"
   },
@@ -1989,7 +2001,10 @@
     "error": "問題が発生しました",
     "someone": "誰か",
     "unknown_user": "ユーザー",
-    "not_available": "利用できません"
+    "not_available": "利用できません",
+    "edit": "編集",
+    "collapse": "崩壊する",
+    "expand": "展開する"
   },
   "verein_federation": {
     "panel_title": "他のクラブとの連携",
@@ -2063,7 +2078,8 @@
       "today": "今日",
       "from_label": "差出人",
       "load_failed": "カレンダーを読み込めませんでした。"
-    }
+    },
+    "char_count_other": "{{count}}/500"
   },
   "oauth": {
     "continue_with_google": "Googleで続ける",
@@ -2167,7 +2183,10 @@
       "generate_failed": "生成に失敗しました。",
       "reminder_failed": "リマインダーを送信できませんでした。",
       "waive_failed": "会費を免除できませんでした。"
-    }
+    },
+    "admin_bulk_reminder_sent_other": "{{count}} 件のリマインダーを送信しました。",
+    "admin_overdue_count_other": "{{count}} 名のメンバーが会費を延滞しています。",
+    "badge_none": "会費なし"
   },
   "collections": {
     "save": "保存",
@@ -2311,7 +2330,8 @@
   },
   "max_characters": "最大{{count}}文字",
   "map": {
-    "listings_here": "ここに{{count}}件の投稿"
+    "listings_here": "ここに{{count}}件の投稿",
+    "listings_here_other": "ここに{{count}}件の投稿"
   },
   "time_credits_short": "{{count}}h クレジット",
   "level_plain": "レベル{{level}}",
@@ -2329,5 +2349,680 @@
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "alpha_badge": "アルファ"
+  "alpha_badge": "アルファ",
+  "wellbeing": {
+    "mood_struggling": "もがく",
+    "mood_low": "低い",
+    "mood_okay": "わかった",
+    "mood_good": "良い",
+    "mood_great": "素晴らしい",
+    "mood_unknown": "未知",
+    "score_excellent": "素晴らしい",
+    "score_good": "良い",
+    "score_fair": "公平",
+    "score_needs_attention": "注意が必要です",
+    "score_critical": "致命的"
+  },
+  "credentials": {
+    "status_pending": "審査待ち",
+    "status_verified": "確認済み",
+    "status_expired": "期限切れ",
+    "status_rejected": "拒否されました"
+  },
+  "nexus_score": {
+    "tier_threshold": "{{tier}} ({{min}}+)"
+  },
+  "application_status": {
+    "applied": "適用済み",
+    "pending": "審査待ち",
+    "screening": "スクリーニング",
+    "reviewed": "レビュー済み",
+    "interview": "面接",
+    "offer": "オファー",
+    "accepted": "承諾済み",
+    "rejected": "不採用",
+    "withdrawn": "取り下げ済み"
+  },
+  "salary": {
+    "currency_eur": "EUR",
+    "min_only": "{{min}}から",
+    "max_only": "{{max}}まで"
+  },
+  "salary_display": "{{min}} – {{max}}",
+  "activity": {
+    "action_listing": "リストを共有しました",
+    "action_event": "イベントについて投稿しました",
+    "action_poll": "投票を作成しました",
+    "action_goal": "新しい目標を設定しました",
+    "action_post": "投稿を共有しました"
+  },
+  "hours_short_other": "{{count}}時間",
+  "time_credits_short_other": "{{count}}h クレジット",
+  "question_required": "必須",
+  "yes": "はい",
+  "no": "No",
+  "likert_options": {
+    "1": "非常に不満",
+    "2": "不満",
+    "3": "普通",
+    "4": "満足",
+    "5": "非常に満足"
+  },
+  "required_error": "必須の質問すべてに回答してください。",
+  "already_responded": "このアンケートにはすでに回答済みです。",
+  "submitting": "送信中…",
+  "time_ago_just_now": "たった今",
+  "time_ago_hours_other": "{{count}}時間前",
+  "time_ago_days_other": "{{count}}日前",
+  "providers": {
+    "filter_spitex": "スパイテックス",
+    "filter_tagesstte": "デイセンター",
+    "filter_private": "プライベート",
+    "filter_verein": "協会",
+    "filter_volunteer": "ボランティア",
+    "verified_badge": "確認済み",
+    "call_aria": "{{phone}}でプロバイダーに電話します",
+    "email_aria": "電子メールプロバイダー（{{email}}）",
+    "website_aria": "プロバイダーの Web サイトにアクセスする{{url}}",
+    "website": "Webサイト"
+  },
+  "caregiver": {
+    "burnout_high": "介護者の負荷が高い: 今週の{{hours}}時間",
+    "burnout_moderate": "中程度の負荷: 今週の{{hours}}時間",
+    "burnout_warning": "今週は多くの時間を記録しました。必ず休んでください",
+    "upcoming_care": "今後のケア",
+    "no_upcoming_care": "まだサポート予定はありません",
+    "recent_care": "最近のケア",
+    "no_recent_care": "最近のケアログはまだありません",
+    "view_schedule": "ケアスケジュールを表示する",
+    "request_on_behalf": "彼らに代わって支援を要請する",
+    "hours_short": "{{hours}}h"
+  },
+  "cover": {
+    "title": "カバーケア"
+  },
+  "viewer": {
+    "time_just_now": "たった今",
+    "time_minutes_ago_other": "{{count}}分前",
+    "time_hours_ago_other": "{{count}}時間前",
+    "time_days_ago_other": "{{count}}日前"
+  },
+  "biometric": {
+    "label_builtin": "内蔵認証",
+    "label_external": "外部認証",
+    "label_passkey": "パスキー",
+    "platform_windows_title": "Windowsでの設定",
+    "platform_windows_step1": "「このPC」をクリックして、このコンピューターに保存されるパスキーを作成します。Windows HelloのPIN、指紋、または顔認証で確認します。",
+    "platform_windows_step2": "要件：まずWindows Helloを設定する必要があります。Windowsの設定 > アカウント > サインインオプション > PINで設定してください。",
+    "platform_windows_step3": "または「電話、タブレット、またはセキュリティキー」をクリックして、スマートフォンでQRコードをスキャンします。",
+    "platform_windows_step4": "スマートフォンにもパスキーを登録するには、スマートフォンでこのページを開いて「このデバイス」をタップします。",
+    "platform_mac_title": "Macでの設定",
+    "platform_mac_step1": "「このMac」をクリックすると、ブラウザがTouch IDまたはMacのパスワードを要求します。",
+    "platform_mac_step2": "パスキーはiCloud Keychainを介してiPhone、iPad、その他のMacに自動的に同期されます。",
+    "platform_mac_step3": "または「電話、タブレット、またはセキュリティキー」をクリックして別のデバイスを登録します。",
+    "platform_iphone_title": "iPhoneでの設定",
+    "platform_iphone_step1": "「このデバイス」をタップして、Face IDまたはTouch IDを使用してパスキーを作成します。",
+    "platform_iphone_step2": "パスキーはiCloud Keychainに保存され、すべてのAppleデバイスで使用できます。",
+    "platform_iphone_step3": "「電話、タブレット、またはセキュリティキー」をタップしてセキュリティキーを登録することもできます。",
+    "platform_ipad_title": "iPadでの設定",
+    "platform_ipad_step1": "「このデバイス」をタップして、Face IDまたはTouch IDを使用してパスキーを作成します。",
+    "platform_ipad_step2": "パスキーはiCloud Keychainに保存され、すべてのAppleデバイスで使用できます。",
+    "platform_ipad_step3": "「電話、タブレット、またはセキュリティキー」をタップしてセキュリティキーを登録することもできます。",
+    "platform_android_title": "Androidでの設定",
+    "platform_android_step1": "「このデバイス」をタップして、指紋、顔認証、または画面ロックを使用してパスキーを作成します。",
+    "platform_android_step2": "パスキーはGoogleパスワードマネージャーに保存され、すべてのAndroidデバイスとChromeブラウザで使用できます。",
+    "platform_android_step3": "「電話、タブレット、またはセキュリティキー」をタップしてセキュリティキーを登録することもできます。",
+    "platform_linux_title": "Linuxでの設定",
+    "platform_linux_step1": "「このデバイス」をクリックすると、ブラウザの組み込みパスキーマネージャーが使用されます。",
+    "platform_linux_step2": "または「電話、タブレット、またはセキュリティキー」をクリックして、USBセキュリティキーを使用するか、スマートフォンでQRコードをスキャンします。",
+    "platform_unknown_title": "パスキーの設定",
+    "platform_unknown_step1": "「このデバイス」をクリックして、現在使用しているデバイスにパスキーを作成します。",
+    "platform_unknown_step2": "または「電話、タブレット、またはセキュリティキー」をクリックして別のデバイスを登録します。"
+  },
+  "discussion": {
+    "delete": "消去",
+    "reply": "返事"
+  },
+  "page_builder": {
+    "starter": {
+      "kicker": "コミュニティページ",
+      "hero_title": "美しいカスタム ページを作成する",
+      "hero_body": "セクション、カード、画像、行動喚起を使用して、テナントのストーリーを伝えます。",
+      "cta": "コミュニティを探索する",
+      "card_one_title": "重要なことを共有する",
+      "card_one_body": "プロジェクト、サービス、パートナー、レポート、ポリシー、または地域の機会を紹介します。",
+      "card_two_title": "応答性を維持する",
+      "card_two_body": "デザイン中にデスクトップ、タブレット、モバイルをプレビューできます。"
+    },
+    "blocks": {
+      "category_nexus": "NEXUSセクション",
+      "hero_label": "ヒーローセクション",
+      "hero_kicker": "コミュニティストーリー",
+      "hero_title": "存在感のあるページ見出し",
+      "hero_body": "タイムバンクに特有の明確な紹介文を追加します。",
+      "hero_cta": "行動喚起",
+      "feature_grid_label": "フィーチャグリッド",
+      "feature_one_title": "特徴 1",
+      "feature_one_body": "結果、サービス、または約束について説明します。",
+      "feature_two_title": "特徴2",
+      "feature_two_body": "コピーは具体的でスキャンしやすいものにしてください。",
+      "story_band_label": "ストーリーバンド",
+      "story_kicker": "ローカルな影響",
+      "story_title": "豊富なコンテンツバンドでストーリーを伝える",
+      "story_body": "これをレポート、プログラムの説明、パートナー ページ、またはガイダンスに使用します。"
+    }
+  },
+  "newsletter_content_editor": {
+    "tip_device_desktop": "デスクトップ表示",
+    "tip_device_tablet": "タブレット表示",
+    "tip_device_mobile": "モバイル表示",
+    "toolbar_label": "メールビルダーのツールバー",
+    "tip_undo": "元に戻す",
+    "tip_redo": "やり直し",
+    "tip_borders": "枠線の表示切替",
+    "tip_code": "コードを表示",
+    "tip_clear": "キャンバスをクリア"
+  },
+  "newsletter_builder": {
+    "insert_image": "画像の挿入",
+    "library_title": "画像ライブラリ",
+    "preview": "プレビュー",
+    "templates": "テンプレート",
+    "preview_title": "電子メールのプレビュー",
+    "preview_device_label": "プレビューデバイス",
+    "preview_desktop": "デスクトップ",
+    "preview_mobile": "モバイル"
+  },
+  "dismiss_reasons": {
+    "too_far": "遠すぎる",
+    "not_my_skills": "私のスキルではありません",
+    "not_interested": "興味がない"
+  },
+  "qa": {
+    "upvote_aria": "賛成投票",
+    "vote_count_aria_other": "{{count}} 票",
+    "downvote_aria": "反対投票"
+  },
+  "challenges": {
+    "time_ended": "終了",
+    "time_remaining_days_hours": "残り {{days}}日 {{hours}}時間",
+    "time_remaining_hours_minutes": "残り {{hours}}時間 {{minutes}}分"
+  },
+  "max_characters_other": "最大{{count}}文字",
+  "volunteering": {
+    "time_just_now": "たった今",
+    "time_minutes_ago_other": "{{count}}分前",
+    "time_hours_ago_other": "{{count}}1時間前",
+    "time_days_ago_other": "{{count}}1 日前",
+    "wellbeing_user_number": "ボランティア #{{id}}",
+    "wellbeing_unknown_user": "不明なボランティア",
+    "wellbeing_unknown_type": "ウェルビーイングに関する懸念"
+  },
+  "users": {
+    "action_edit": "編集",
+    "action_approve": "承認する",
+    "action_suspend": "一時停止",
+    "action_ban": "禁止",
+    "action_reactivate": "再アクティブ化",
+    "action_reset_2fa": "2FA をリセット",
+    "action_permissions": "権限",
+    "action_impersonate": "なりすます",
+    "action_delete": "削除",
+    "actions_menu": "アクションメニュー"
+  },
+  "super": {
+    "tenant_actions": "テナントのアクション",
+    "action_view": "見る",
+    "disable_hub": "ハブを無効にする",
+    "enable_hub": "ハブを有効にする",
+    "deactivate": "非アクティブ化",
+    "reactivate": "再アクティブ化",
+    "status_active_label": "Active Label",
+    "status_inactive_label": "Inactive Label",
+    "hub": "ハブ"
+  },
+  "system": {
+    "never": "決してしない",
+    "just_now": "たった今",
+    "minutes_ago_other": "{{count}}1 分前",
+    "hours_ago_other": "{{count}}1時間前",
+    "days_ago_other": "{{count}}日前"
+  },
+  "help_faqs": {
+    "actions_aria": "FAQの操作"
+  },
+  "gamification": {
+    "label_campaign_actions": "キャンペーンアクション",
+    "edit": "編集",
+    "activate": "アクティブ化する",
+    "pause": "一時停止",
+    "resume": "再開",
+    "delete": "削除"
+  },
+  "federation": {
+    "event_type_message_sent": "メッセージを送信しました",
+    "event_type_transaction": "取引",
+    "event_type_connection": "接続要求",
+    "event_type_listing_shared": "共有されたリスト",
+    "event_type_listing_unshared": "非共有リスト",
+    "event_type_listing_viewed": "閲覧されたリスト",
+    "event_type_partnership_requested": "パートナーシップが要求されました",
+    "event_type_partnership_approved": "パートナーシップが承認されました",
+    "event_type_partnership_rejected": "パートナーシップが拒否されました",
+    "event_type_partnership_changed": "パートナーシップを更新しました",
+    "event_type_partnership_terminated": "パートナーシップが終了しました",
+    "event_type_profile_viewed": "プロフィールを閲覧しました",
+    "event_type_federated_search": "パートナー検索"
+  },
+  "groups": {
+    "policy_features": "ポリシーの機能",
+    "policy_moderation": "ポリシーモデレーション",
+    "policy_membership": "ポリシーメンバーシップ",
+    "policy_creation": "ポリシーの作成",
+    "policy_content": "ポリシーの内容",
+    "policy_notifications": "ポリシー通知"
+  },
+  "enterprise": {
+    "config_group_general": "一般的な",
+    "config_group_general_desc": "サイトのアイデンティティ、ローカリゼーション、フッター テキスト。",
+    "config_site_name": "サイト名",
+    "config_site_name_desc": "ヘッダー、ブラウザーのタブ、および電子メールに表示されるパブリック名。",
+    "config_site_description": "サイトの説明",
+    "config_site_description_desc": "メタデータと共有リンクで使用される短いキャッチフレーズ。",
+    "config_contact_email": "連絡先メールアドレス",
+    "config_contact_email_desc": "メンバーがサポートに連絡するために使用するアドレス。",
+    "config_contact_phone": "連絡先電話番号",
+    "config_contact_phone_desc": "サポート問い合わせ用の公衆電話番号。",
+    "config_timezone": "タイムゾーン",
+    "config_timezone_desc": "スケジュールとタイムスタンプに使用される IANA タイムゾーン識別子。",
+    "config_footer_text": "フッターの法的テキスト",
+    "config_footer_text_desc": "フッターに表示される慈善団体番号、会社登録、またはその他の法的テキスト。",
+    "config_locale": "デフォルトのロケール",
+    "config_locale_desc": "新しいメンバーが独自の言語を選択するまで、そのメンバーに使用される言語。",
+    "config_group_registration": "登録とオンボーディング",
+    "config_group_registration_desc": "誰がサインアップできるのか、何を確認するのか、そしてどのように歓迎されるのか。",
+    "config_registration_enabled": "登録が有効になりました",
+    "config_registration_enabled_desc": "サインアップを完全に閉じるにはオフにします。",
+    "config_require_approval": "管理者の承認が必要です",
+    "config_require_approval_desc": "新しいアカウントはサインインする前に管理者によって承認される必要があります。",
+    "config_require_email_verification": "メール認証が必要",
+    "config_require_email_verification_desc": "メンバーはプラットフォームにアクセスする前に電子メール アドレスを確認する必要があります。",
+    "config_maintenance_mode": "メンテナンスモード",
+    "config_maintenance_mode_desc": "読み取り専用。サーバー上の scripts/maintenance.sh を介して切り替えます。",
+    "config_onboarding_enabled": "オンボーディング フローを表示する",
+    "config_onboarding_enabled_desc": "新しいメンバーにサインアップ後のプロフィールとスキルの設定を説明します。",
+    "config_configure_steps": "ステップの構成",
+    "config_welcome_message": "ウェルカムメッセージ",
+    "config_welcome_message_desc": "新しいメンバーの最初のサインイン時に表示されます。",
+    "config_group_wallet": "ウォレットとクレジット",
+    "config_group_wallet_desc": "タイムクレジット残高、転送上限、通貨の命名方法。",
+    "config_starting_balance": "開始残高",
+    "config_starting_balance_desc": "サインアップ時に新規メンバーに付与されるタイム クレジット。無効にするには 0 に設定します。",
+    "config_max_transaction": "最大転送量",
+    "config_max_transaction_desc": "メンバー間の単一転送としては最大規模。制限なしの場合は 0 に設定します。",
+    "config_currency_name": "通貨名",
+    "config_currency_name_desc": "タイムバンク通貨の表示名。",
+    "config_currency_symbol": "通貨記号",
+    "config_currency_symbol_desc": "天びんの横に短い記号が表示されます。",
+    "config_group_content": "コンテンツとモデレーション",
+    "config_group_content_desc": "リストと投稿の承認ルールとコンテンツ フィルター。",
+    "config_auto_approve_listings": "リスティングの自動承認",
+    "config_auto_approve_listings_desc": "新しいリストをモデレーターによるレビューのために保留するのではなく、すぐに公開します。",
+    "config_auto_approve_blog": "ブログ投稿の自動承認",
+    "config_auto_approve_blog_desc": "新しいブログ投稿をモデレーターによるレビューのために保留するのではなく、すぐに公開します。",
+    "config_max_listing_images": "リストあたりの最大画像数",
+    "config_max_listing_images_desc": "1つの出品に添付できる写真の上限。",
+    "config_profanity_filter": "冒涜フィルター",
+    "config_profanity_filter_desc": "プラットフォームの冒涜リストにある単語を含む投稿をブロックします。",
+    "config_group_notifications": "通知",
+    "config_group_notifications_desc": "新しいアカウントとダイジェスト リズムのデフォルトの配信チャネル。",
+    "config_email_notifications_enabled": "電子メール通知が有効になっています",
+    "config_email_notifications_enabled_desc": "新しいアカウントのデフォルト。メンバーは独自の設定で上書きできます。",
+    "config_push_notifications_enabled": "プッシュ通知が有効になっている",
+    "config_push_notifications_enabled_desc": "新しいアカウントのデフォルト。メンバーは独自の設定で上書きできます。",
+    "config_digest_frequency": "ダイジェストの頻度",
+    "config_digest_frequency_desc": "アクティビティ ダイジェスト電子メールが送信される頻度。",
+    "config_digest_daily": "毎日",
+    "config_digest_weekly": "毎週",
+    "config_digest_monthly": "毎月",
+    "config_digest_never": "一度もない",
+    "config_group_limits": "限界",
+    "config_group_limits_desc": "メンバーごとの上限とアップロード サイズ。",
+    "config_max_listings_per_user": "メンバーごとの最大リスト数",
+    "config_max_listings_per_user_desc": "1 人のメンバーが一度にほとんどのリストをアクティブにすることができます。制限なしの場合は 0 に設定します。",
+    "config_max_groups_per_user": "メンバーあたりの最大グループ数",
+    "config_max_groups_per_user_desc": "ほとんどのグループは 1 人のメンバーが参加できます。制限なしの場合は 0 に設定します。",
+    "config_max_file_upload_mb": "最大アップロード サイズ (MB)",
+    "config_max_file_upload_mb_desc": "ファイルごとのアップロード サイズ制限。それより大きなファイルはサーバーで拒否されます。",
+    "validation_required": "必須",
+    "validation_email": "有効なメールアドレスを入力してください (e.g., name@example.com)",
+    "validation_url": "http:// または https:// で始まる有効な URL を入力してください",
+    "validation_number": "数字でなければなりません",
+    "validation_min": "{{value}} 以上である必要があります",
+    "validation_max": "{{value}} 以下である必要があります",
+    "validation_format": "無効な形式",
+    "gdpr_sla_overdue_other": "{{count}} 日遅れています",
+    "gdpr_sla_days_left_other": "残り {{count}} 日"
+  },
+  "crm": {
+    "just_now": "Just Now",
+    "minutes_ago_other": "{{count}} 分前",
+    "hours_ago_other": "{{count}} 時間前",
+    "days_ago_other": "{{count}} 日前"
+  },
+  "config": {
+    "module_name_dashboard": "ダッシュボード",
+    "module_name_feed": "飼料",
+    "module_name_listings": "リスト",
+    "module_name_messages": "メッセージ",
+    "module_name_wallet": "ウォレット",
+    "module_name_members": "メンバー",
+    "module_name_groups": "グループ",
+    "module_name_events": "イベント",
+    "module_name_connections": "接続",
+    "module_name_volunteering": "ボランティア活動",
+    "module_name_organisations": "組織",
+    "module_name_goals": "目標",
+    "module_name_blog": "ブログ",
+    "module_name_resources": "リソース",
+    "module_name_courses": "コース",
+    "module_name_podcasts": "ポッドキャスト",
+    "module_name_job_vacancies": "求人情報",
+    "module_name_marketplace": "マーケットプレイス",
+    "module_name_leaderboard": "リーダーボード",
+    "module_name_achievements": "業績"
+  },
+  "menu_builder": {
+    "group_core": "コア",
+    "group_community": "コミュニティ",
+    "group_features": "特長",
+    "group_gamification": "ゲーミフィケーション",
+    "route_about": "について",
+    "group_info": "情報",
+    "route_faq": "FAQ",
+    "route_explore": "探検する",
+    "location_header_main": "メインヘッダー",
+    "location_header_secondary": "二次ヘッダー",
+    "location_footer": "フッター",
+    "location_sidebar": "サイドバー",
+    "location_mobile": "モバイル",
+    "type_link_label": "内部リンク",
+    "type_link_desc": "このプラットフォーム内のページへのリンク",
+    "type_external_label": "外部リンク",
+    "type_external_desc": "外部ウェブサイトへのリンク",
+    "type_dropdown_label": "ドロップダウン",
+    "type_dropdown_desc": "子項目を含むドロップダウン メニュー",
+    "type_page_label": "カスタムページ",
+    "type_page_desc": "このプラットフォームのカスタム ページへのリンク",
+    "type_route_label": "名前付きルート",
+    "type_route_desc": "名前付きアプリケーションルートを使用したリンク",
+    "type_divider_label": "ディバイダー",
+    "type_divider_desc": "メニュー項目間の視覚的な区切り記号",
+    "live_preview": "ライブプレビュー",
+    "preview": "プレビュー",
+    "no_data": "利用可能なデータがありません",
+    "drag_hint": "項目をドラッグして並べ替えます",
+    "drag_to_reorder": "ドラッグして並べ替えます",
+    "sub_items_other": "{{count}} サブアイテム",
+    "edit_item": "項目を編集する",
+    "delete_item": "項目の削除"
+  },
+  "content": {
+    "label_attribute_actions": "属性アクション",
+    "label_edit_item": "項目の編集",
+    "label_delete_item": "項目の削除"
+  },
+  "categories": {
+    "label_category_actions": "カテゴリのアクション"
+  },
+  "pilot_launch_readiness": {
+    "missing": {
+      "controller_name": "コントローラ名",
+      "controller_contact_email": "管理者の連絡先メールアドレス",
+      "controller_data_protection_officer": "データ保護責任者",
+      "incident_response_contact_email": "インシデント対応の連絡先メールアドレス",
+      "workshop_not_run": "運営方針ワークショップは実施されない",
+      "policy_appendix_url": "ポリシー付録 URL",
+      "safeguarding_escalation_user_id": "エスカレーション連絡先の保護",
+      "acknowledgement": "コーディネーターの承認",
+      "pre_pilot_baseline": "パイロット前のスコアボードのベースライン",
+      "danger_checks": "データ品質の問題",
+      "backlog_empty": "統合バックログが空です"
+    }
+  },
+  "municipal_verification": {
+    "status": {
+      "verified": "確認済み",
+      "pending_dns": "保留中 DNS"
+    }
+  },
+  "admin": {
+    "surveys": {
+      "analytics": {
+        "total_responses": "総回答数",
+        "answer_count_other": "{{count}}の回答",
+        "no_open_text": "公開文による回答はまだありません。"
+      }
+    }
+  },
+  "municipal_copilot": {
+    "empty": {
+      "value": "-"
+    }
+  },
+  "kpi_baselines": {
+    "comparison": {
+      "comparing": "比較:",
+      "captured": "(捕獲 {{date}})",
+      "impact_achieved": "達成された効果",
+      "baseline": "ベースライン",
+      "now": "今"
+    },
+    "actions": {
+      "close": "近い"
+    },
+    "empty": {
+      "no_data": "利用可能なデータがありません"
+    },
+    "fields": {
+      "notes_label_prefix": "注:"
+    }
+  },
+  "commercial_boundary": {
+    "meta": {
+      "title": "商業境界図",
+      "subtitle": "AG82 - AGPL パブリック、テナント構成可能、展開層、商用とは何ですか"
+    },
+    "export": {
+      "last_updated": "最終更新日: {{date}}",
+      "capability": "能力",
+      "classification": "分類",
+      "agpl_module": "AGPL モジュール",
+      "default": "デフォルト",
+      "overridden": "オーバーライドされました",
+      "notes": "注意事項",
+      "yes": "はい",
+      "no": "いいえ",
+      "generated": "NEXUS 管理パネルから {{date}} が生成されました。"
+    },
+    "sections": {
+      "classifications": "分類"
+    },
+    "empty": {
+      "value": "-"
+    }
+  },
+  "caring_workflow": {
+    "predictive": {
+      "trend_growing": "{{value}}% の成長",
+      "trend_declining": "{{value}}% の下落",
+      "trend_stable": "安定した",
+      "not_enough_activity": "予測するにはまだ十分な活動がありません。数週間後にまた来てください。",
+      "history": "歴史",
+      "forecast": "予報",
+      "confidence": "自信",
+      "severity": {
+        "critical": "致命的",
+        "warning": "警告",
+        "info": "情報"
+      },
+      "title": "予測的洞察",
+      "subtitle": "将来を見据えた予測とプロアクティブなアラート。地域のケア不足を緊急事態になる前に発見します。",
+      "no_forecast": "まだ予測データはありません。",
+      "hours_forecast": "時間予測",
+      "active_members": "アクティブなメンバー",
+      "recipients_reached": "受信者に到達しました",
+      "sub_region_coverage": "サブリージョンの適用範囲 (過去 {{days}} 日間)",
+      "under_supplied_count_other": "{{count}}の供給が不足しています",
+      "sub_region_coverage_aria": "サブリージョンのカバー範囲",
+      "columns": {
+        "sub_region": "サブリージョン",
+        "requested_90d": "リクエスト済み (90日)",
+        "fulfilled_90d": "満たされました (90日)",
+        "coverage": "カバレッジ",
+        "status": "状態",
+        "category": "カテゴリ",
+        "prior_active": "以前のアクティブな",
+        "lapsed": "失効しました",
+        "churn_rate": "チャーンレート",
+        "baseline": "ベースライン",
+        "expected_hrs": "予想時間",
+        "observed_hrs": "観測時間",
+        "drift": "ドリフト",
+        "sample": "サンプル"
+      },
+      "status": {
+        "under_supplied": "供給不足",
+        "ok": "わかりました"
+      },
+      "helper_churn": "ヘルパーの離脱 ({{days}} 日以上経過)",
+      "overall_percent": "全体で {{value}}%",
+      "helper_churn_note": "以前アクティブだった {{prior}} の {{lapsed}} は、最近時間を記録していません。",
+      "helper_churn_aria": "カテゴリ別のヘルパー チャーン",
+      "coefficient_drift": "カテゴリ係数ドリフト",
+      "drifting_count_other": "{{count}} 人が離れつつあります",
+      "coefficient_drift_note": "絶対ドリフト > {{threshold}}% を持つカテゴリにはフラグが立てられます。カテゴリ係数エディタでベースライン係数を確認します。",
+      "coefficient_drift_aria": "カテゴリ係数ドリフト",
+      "proactive_alerts": "プロアクティブなアラート"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "retry": "リトライ"
+    }
+  },
+  "billing": {
+    "status_active": "アクティブ",
+    "status_trialing": "トライアル中",
+    "status_past_due": "期限を過ぎた場合",
+    "status_cancelled": "キャンセルされました",
+    "status_expired": "期限切れ",
+    "status_incomplete": "不完全"
+  },
+  "analytics": {
+    "regional": {
+      "loading": {
+        "section": "分析を読み込み中"
+      },
+      "errors": {
+        "data_unavailable": "この期間はデータが利用できません。",
+        "load_data": "この分析セクションを読み込めませんでした: {{error}}"
+      },
+      "heatmap": {
+        "description": "メンバーのアクティビティと密度による上位の場所。"
+      },
+      "sections": {
+        "geographic_activity_density": "地理的な活動密度",
+        "demand_supply_by_category": "カテゴリ別の需要と供給",
+        "monthly_engagement_metrics": "毎月のエンゲージメント指標"
+      },
+      "columns": {
+        "rank": "ランク",
+        "latitude": "緯度",
+        "longitude": "経度",
+        "members": "メンバー",
+        "density": "密度",
+        "month": "月",
+        "new_members": "新しいメンバー",
+        "cumulative_total": "累計",
+        "category": "カテゴリ",
+        "requests": "リクエスト",
+        "offers": "オファー",
+        "ratio": "比率",
+        "trend": "傾向",
+        "active_members": "アクティブなメンバー",
+        "vol_hours": "ボランティアの時間",
+        "new_listings": "新規出品",
+        "new_events": "新しいイベント",
+        "help_requests": "ヘルプリクエスト",
+        "organisation": "組織",
+        "volunteers": "ボランティア",
+        "total": "合計",
+        "resolved": "解決済み",
+        "resolution_rate": "解像度率",
+        "avg_days_to_resolve": "平均解決までの日数"
+      },
+      "empty": {
+        "no_geographic_data": "この期間の地理データはありません。",
+        "infinity": "∞",
+        "no_listing_data": "この期間の上場需要データはありません。",
+        "no_engagement_data": "この期間のエンゲージメント データはありません。",
+        "no_organisation_data": "この期間中は組織活動はありません。",
+        "no_help_request_data": "この期間に利用可能な支援要請データはありません。"
+      },
+      "demographics": {
+        "age_distribution": "年齢分布",
+        "total_with_data": "人口統計データのあるメンバー {{total}} 人",
+        "language_distribution": "言語の分布",
+        "total_active_members": "アクティブメンバー {{total}} 人",
+        "member_growth_12m": "過去 12 か月間のメンバーの増加"
+      },
+      "age_groups": {
+        "under_25": "25歳未満",
+        "25_34": "NEXUSTERM0トークン",
+        "35_44": "NEXUSTERM0トークン",
+        "45_54": "NEXUSTERM0トークン",
+        "55_64": "NEXUSTERM0トークン",
+        "65_plus": "65歳以上",
+        "unknown": "未知"
+      },
+      "volunteer": {
+        "total_hours": "合計時間",
+        "avg_hours_per_volunteer": "平均ボランティア1人当たりの時間",
+        "reciprocity_ratio": "相反比",
+        "reciprocity_description": "地域全体で与えられた時間と受け取られた時間のバランスをとる。",
+        "top_orgs_title": "トップのボランティア団体"
+      },
+      "help": {
+        "by_category": "カテゴリ別のヘルプ リクエスト",
+        "resolution_trend_6m": "過去 6 か月間の解決傾向"
+      },
+      "units": {
+        "days_count_other": "{{count}} 日"
+      },
+      "empty_value": "-"
+    }
+  },
+  "advertising": {
+    "push": {
+      "no_daily_data": "日次データはまだありません。",
+      "metrics": {
+        "sends": "送信します",
+        "opens": "開く"
+      },
+      "chart_sends_title_other": "{{count}} 件の送信",
+      "chart_opens_title_other": "{{count}} 件の開封"
+    }
+  },
+  "submit_error": "提出できませんでした。もう一度試してください。",
+  "submit": "提出する",
+  "under_25": "25歳未満",
+  "25_34": "25–34",
+  "35_44": "35–44",
+  "45_54": "45–54",
+  "55_64": "55–64",
+  "65_plus": "65+",
+  "unknown": "未知"
 }

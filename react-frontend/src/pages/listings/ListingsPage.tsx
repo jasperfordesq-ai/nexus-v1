@@ -61,7 +61,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { MAPS_ENABLED } from '@/lib/map-config';
-import { resolveAvatarUrl, resolveThumbnailUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import type { EntityMapViewProps } from '@/components/location/EntityMapView';
 import type { ProximityFilterParams } from '@/components/proximity/ProximityFilter';
 import type { Listing, Category } from '@/types/api';
@@ -442,20 +442,18 @@ export function ListingsPage() {
         description={t('page_subtitle')}
         accent="emerald"
         icon={<ListTodo className="h-7 w-7" aria-hidden="true" />}
-        stats={totalItems != null ? [{ label: t('hero_results_label'), value: totalItems.toLocaleString() }] : undefined}
+        stats={totalItems != null ? [{ label: t('hero_results_label'), value: totalItems.toLocaleString(getFormattingLocale()) }] : undefined}
         action={
           <div className="flex flex-wrap items-center gap-3">
             <AlgorithmLabel area="listings" />
             {isAuthenticated && (
-              <Link to={tenantPath('/listings/create')}>
-                <Button
-                  variant="primary"
-                  className="shrink-0 font-semibold"
-                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('create')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath('/listings/create')}
+                variant="primary"
+                className="shrink-0 font-semibold"
+                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('create')}
+              </Button>
             )}
           </div>
         }
@@ -764,11 +762,9 @@ export function ListingsPage() {
                     {t('clear_filters')}
                   </Button>
                 ) : isAuthenticated ? (
-                  <Link to={tenantPath('/listings/create')}>
-                    <Button variant="primary" startContent={<Plus className="h-4 w-4" aria-hidden="true" />}>
-                      {t('create')}
-                    </Button>
-                  </Link>
+                  <Button as={Link} to={tenantPath('/listings/create')} variant="primary" startContent={<Plus className="h-4 w-4" aria-hidden="true" />}>
+                    {t('create')}
+                  </Button>
                 ) : undefined
               }
             />
@@ -813,16 +809,14 @@ export function ListingsPage() {
                   <h4 className="font-semibold text-sm text-theme-primary">{l.title}</h4>
                   <p className="text-xs text-theme-secondary line-clamp-2 mt-0.5">{l.description}</p>
                   {l.location && <p className="text-xs text-theme-muted mt-1">{l.location}</p>}
-                  <Link to={tenantPath(`/listings/${l.id}`)} className="mt-2 inline-flex">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="h-8 min-w-0 bg-theme-elevated px-3 text-xs font-medium text-theme-primary hover:bg-theme-hover"
-                      endContent={<ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />}
-                    >
-                      {t('map_view_listing')}
-                    </Button>
-                  </Link>
+                  <Button as={Link} to={tenantPath(`/listings/${l.id}`)}
+                    size="sm"
+                    variant="secondary"
+                    className="mt-2 inline-flex h-8 min-w-0 bg-theme-elevated px-3 text-xs font-medium text-theme-primary hover:bg-theme-hover"
+                    endContent={<ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />}
+                  >
+                    {t('map_view_listing')}
+                  </Button>
                 </div>
               )}
               isLoading={isLoading}
@@ -861,7 +855,7 @@ export function ListingsPage() {
               {totalItems != null && totalItems > 0 && (
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs text-theme-muted px-1">
-                    <span>{listings.length.toLocaleString()} / {totalItems.toLocaleString()}</span>
+                    <span>{listings.length.toLocaleString(getFormattingLocale())} / {totalItems.toLocaleString(getFormattingLocale())}</span>
                     <span className="font-medium text-theme-secondary">{Math.round((listings.length / totalItems) * 100)}%</span>
                   </div>
                   <Progress
@@ -1049,7 +1043,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               {hours && (
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" aria-hidden="true" />
-                  {t('hours_short', { hours })}
+                  {t('listings:hours_short', { hours })}
                 </span>
               )}
               {listing.location && (
@@ -1189,7 +1183,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
             {hours && (
               <span className="flex items-center gap-1 shrink-0" aria-label={t('aria_hours_estimated', { hours })}>
                 <Clock className="w-3 h-3" aria-hidden="true" />
-                {t('hours_short', { hours })}
+                {t('listings:hours_short', { hours })}
               </span>
             )}
             {listing.location && (

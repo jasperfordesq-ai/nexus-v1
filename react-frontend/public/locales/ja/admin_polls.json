@@ -104,6 +104,7 @@
     "unknown": "不明",
     "votes": "投票",
     "no_matching_polls": "一致する投票が見つかりませんでした",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found found",
+    "total_count_other": "合計: {{count}}"
   }
 }

@@ -102,8 +102,7 @@ export function NewsletterPreviewPane({
       title={t('newsletter_content_editor.preview_title')}
       srcDoc={html}
       sandbox="allow-same-origin"
-      className="block w-full bg-white"
-      style={{ height: device === 'mobile' ? 620 : 560, border: 'none' }}
+      className={`block w-full border-0 bg-white ${device === 'mobile' ? 'h-[620px]' : 'h-[560px]'}`}
     />
   );
 
@@ -152,15 +151,12 @@ export function NewsletterPreviewPane({
       {/* Neutral canvas + device frame */}
       <div className="flex justify-center overflow-auto rounded-xl bg-surface-secondary p-4 sm:p-6">
         {device === 'desktop' ? (
-          <div
-            className="overflow-hidden rounded-lg bg-white shadow-lg"
-            style={{ width: '100%', maxWidth: 620 }}
-          >
+          <div className="w-full max-w-[620px] overflow-hidden rounded-lg bg-white shadow-lg">
             {/* Browser chrome */}
             <div className="flex h-9 items-center gap-2 border-b border-neutral-200 bg-neutral-100 px-3">
-              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: '#f87171' }} />
-              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: '#fbbf24' }} />
-              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: '#34d399' }} />
+              <span className="h-3 w-3 rounded-full bg-red-400" />
+              <span className="h-3 w-3 rounded-full bg-amber-400" />
+              <span className="h-3 w-3 rounded-full bg-emerald-400" />
               <span className="ml-2 truncate rounded-md bg-white px-3 py-1 text-[11px] text-neutral-400">
                 {t('newsletter_content_editor.preview_inbox')}
               </span>
@@ -168,14 +164,11 @@ export function NewsletterPreviewPane({
             {iframe}
           </div>
         ) : (
-          <div
-            className="rounded-[2.25rem] p-2.5 shadow-xl"
-            style={{ width: 340, backgroundColor: '#111827' }}
-          >
+          <div className="w-[340px] rounded-[2.25rem] bg-neutral-900 p-2.5 shadow-xl">
             <div className="overflow-hidden rounded-[1.75rem] bg-white">
               {/* Phone status notch */}
-              <div className="flex h-6 items-center justify-center" style={{ backgroundColor: '#111827' }}>
-                <span className="h-1.5 w-16 rounded-full" style={{ backgroundColor: '#374151' }} />
+              <div className="flex h-6 items-center justify-center bg-neutral-900">
+                <span className="h-1.5 w-16 rounded-full bg-neutral-700" />
               </div>
               {iframe}
             </div>

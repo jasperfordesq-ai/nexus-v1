@@ -393,7 +393,9 @@
     "changes_between": "Wijzigingen: v{{old}} tot v{{new}}",
     "changes_count": "{{count}} wijzigingen",
     "legend_removed": "Verwijderd",
-    "legend_added": "Toegevoegd"
+    "legend_added": "Toegevoegd",
+    "changes_count_one": "{{count}} wijzigingen",
+    "changes_count_other": "{{count}} wijzigingen"
   },
   "platform": {
     "effective_date": "Ingangsdatum {{date}}",
@@ -480,7 +482,9 @@
     "consent_text": "Door op Accepteren te klikken, bevestig je dat je de bovenstaande documenten hebt gelezen en ermee akkoord gaat.",
     "accept_aria": "Accepteer alle bijgewerkte juridische documenten en ga verder",
     "accepting": "Accepteren…",
-    "accept_continue": "Accepteer & Ga Verder"
+    "accept_continue": "Accepteer & Ga Verder",
+    "subtitle_other_one": "{{count}} documenten zijn bijgewerkt. Bekijk ze en accepteer ze om door te gaan.",
+    "subtitle_other_other": "{{count}} documenten zijn bijgewerkt. Bekijk ze en accepteer ze om door te gaan."
   },
   "custom": {
     "effective_label": "Ingangsdatum: {{date}}",

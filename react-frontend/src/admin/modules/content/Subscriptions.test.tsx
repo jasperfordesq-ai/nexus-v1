@@ -111,22 +111,24 @@ describe('Subscriptions', () => {
     });
   });
 
-  it('shows empty state when success=false', async () => {
+  it('shows a retryable error when success=false', async () => {
     mockGetSubscriptions.mockResolvedValue({ success: false });
     render(<Subscriptions />);
 
     await waitFor(() => {
-      expect(screen.getByText(/no data available/i)).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent(/failed to load subscriptions/i);
     });
+    expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
   });
 
-  it('calls toast.error on fetch exception', async () => {
+  it('shows a retryable error without a toast on fetch exception', async () => {
     mockGetSubscriptions.mockRejectedValue(new Error('network'));
     render(<Subscriptions />);
 
     await waitFor(() => {
-      expect(mockToast.error).toHaveBeenCalled();
+      expect(screen.getByRole('alert')).toHaveTextContent(/failed to load subscriptions/i);
     });
+    expect(mockToast.error).not.toHaveBeenCalled();
   });
 
   it('handles paginated response shape { data: [...] }', async () => {

@@ -109,7 +109,8 @@
     "ratings": "評価",
     "rate_exchange": "この交換を評価",
     "prep_time_value": "{{count}}h",
-    "rating_value": "評価: {{rating}} (5 点満点中)"
+    "rating_value": "評価: {{rating}} (5 点満点中)",
+    "prep_time_value_other": "{{count}}h"
   },
   "modal": {
     "decline_title": "交換リクエストを拒否",

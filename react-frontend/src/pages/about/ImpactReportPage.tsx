@@ -42,7 +42,7 @@ import { PageMeta } from '@/components/seo';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
-import { resolveAssetUrl } from '@/lib/helpers';
+import { formatNumber, resolveAssetUrl } from '@/lib/helpers';
 import { RelatedPages } from './RelatedPages';
 
 /* ───────────────────────── Constants ───────────────────────── */
@@ -285,8 +285,8 @@ export function ImpactReportPage() {
                   {[
                     {
                       key: 'wellbeing',
-                      color: 'text-indigo-500 dark:text-indigo-400',
-                      bg: 'bg-indigo-500/10',
+                      color: 'text-accent dark:text-accent',
+                      bg: 'bg-accent/10',
                     },
                     {
                       key: 'isolation',
@@ -372,7 +372,7 @@ export function ImpactReportPage() {
       </section>
 
       {/* ─── Section 4: Impact & Demographics ─── */}
-      <section id="impact" className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
+      <section id="impact" className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-accent/5 to-transparent">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -391,7 +391,7 @@ export function ImpactReportPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
                     { band: '18\u201334', pct: '12%', color: 'from-cyan-500/20 to-blue-500/20' },
-                    { band: '35\u201344', pct: '18%', color: 'from-indigo-500/20 to-purple-500/20' },
+                    { band: '35\u201344', pct: '18%', color: 'from-accent/20 to-accent-gradient-end/20' },
                     { band: '45\u201364', pct: '42%', color: 'from-emerald-500/20 to-teal-500/20' },
                     { band: '65+', pct: '28%', color: 'from-amber-500/20 to-orange-500/20' },
                   ].map((age) => (
@@ -414,7 +414,9 @@ export function ImpactReportPage() {
                       </div>
                       <h3 className="font-semibold text-theme-primary">{t('impact_report.outcome_connection_heading')}</h3>
                     </div>
-                    <p className="text-4xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">95%</p>
+                    <p className="text-4xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">
+                      {formatNumber(0.95, { style: 'percent', maximumFractionDigits: 0 })}
+                    </p>
                     <p className="text-sm text-theme-muted">
                       {t('impact_report.outcome_connection_text')}
                     </p>
@@ -430,7 +432,9 @@ export function ImpactReportPage() {
                       </div>
                       <h3 className="font-semibold text-theme-primary">{t('impact_report.outcome_wellbeing_heading')}</h3>
                     </div>
-                    <p className="text-4xl font-bold text-rose-600 dark:text-rose-400 mb-1">100%</p>
+                    <p className="text-4xl font-bold text-rose-600 dark:text-rose-400 mb-1">
+                      {formatNumber(1, { style: 'percent', maximumFractionDigits: 0 })}
+                    </p>
                     <p className="text-sm text-theme-muted">
                       {t('impact_report.outcome_wellbeing_text')}
                     </p>
@@ -596,7 +600,7 @@ export function ImpactReportPage() {
                               ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400'
                               : row.priority === 'High'
                               ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
-                              : 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400'
+                              : 'bg-accent/15 text-accent dark:text-accent'
                           }`}>
                             {row.priority}
                           </span>
@@ -625,7 +629,7 @@ export function ImpactReportPage() {
             <GlassCard className="p-10 sm:p-14 text-center relative overflow-hidden">
               <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-accent to-accent-gradient-end rounded-full blur-3xl" />
               </div>
 
               <div className="relative z-10">
@@ -664,15 +668,13 @@ export function ImpactReportPage() {
 
                 <div className="pt-4 border-t border-theme-default">
                   <p className="text-sm text-theme-subtle mb-3">{t('impact_report.cta_questions')}</p>
-                  <Link to={tenantPath('/contact')}>
-                    <Button
-                      variant="light"
-                      className="text-emerald-600 dark:text-emerald-400"
-                      startContent={<Mail className="w-4 h-4" aria-hidden="true" />}
-                    >
-                      {t('impact_report.cta_contact')}
-                    </Button>
-                  </Link>
+                  <Button as={Link} to={tenantPath('/contact')}
+                    variant="light"
+                    className="text-emerald-600 dark:text-emerald-400"
+                    startContent={<Mail className="w-4 h-4" aria-hidden="true" />}
+                  >
+                    {t('impact_report.cta_contact')}
+                  </Button>
                 </div>
               </div>
             </GlassCard>
@@ -721,10 +723,10 @@ const colorMap = {
     badge: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
   },
   indigo: {
-    bg: 'bg-indigo-500/5',
-    border: 'border-indigo-500/20',
-    icon: 'text-indigo-500/60',
-    badge: 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
+    bg: 'bg-accent/5',
+    border: 'border-accent/20',
+    icon: 'text-accent/60',
+    badge: 'bg-accent/15 text-accent dark:text-accent',
   },
   amber: {
     bg: 'bg-amber-500/5',

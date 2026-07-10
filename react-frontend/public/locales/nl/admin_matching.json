@@ -306,6 +306,16 @@
     "pillar_trust": "Trust",
     "pillar_aria": "{{label}}: {{percent}}%",
     "of_active_users": "van {{total}} actieve gebruikers",
-    "of_active_listings": "van {{total}} actieve vermeldingen"
+    "of_active_listings": "van {{total}} actieve vermeldingen",
+    "cache_cleared_count_one": "Cache-item{{count}}gewist",
+    "cache_cleared_count_other": "Cache-item{{count}}gewist",
+    "clear_cache_confirm_with_count_one": "Weet je zeker dat je de{{count}}-gecachte wedstrijden wilt wissen?",
+    "clear_cache_confirm_with_count_other": "Weet je zeker dat je de{{count}}-gecachte wedstrijden wilt wissen?",
+    "distribution_aria_one": "{{label}}:{{count}}-wedstrijden ({{percent}}%)",
+    "distribution_aria_other": "{{label}}:{{count}}-wedstrijden ({{percent}}%)",
+    "feedback_reason_aria_one": "{{label}}: {{count}} ({{percent}}%)",
+    "feedback_reason_aria_other": "{{label}}: {{count}} ({{percent}}%)",
+    "pillar_averages_sample_size_one": "Gebaseerd op {{count}}-overeenkomsten",
+    "pillar_averages_sample_size_other": "Gebaseerd op {{count}}-overeenkomsten"
   }
 }

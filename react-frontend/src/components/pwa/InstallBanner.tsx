@@ -8,10 +8,11 @@ import { useTranslation } from 'react-i18next';
 import X from 'lucide-react/icons/x';
 import Download from 'lucide-react/icons/download';
 import { useTenant } from '@/contexts/TenantContext';
+import { useCookieConsent } from '@/contexts/CookieConsentContext';
 import { useInstallPrompt, shouldOfferInstall } from '@/lib/installPrompt';
 import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';
 import { IosInstallModal } from './IosInstallModal';
-import { Button } from '@/components/ui';
+import { Button } from '@/components/ui/Button';
 
 const DISMISS_KEY = 'nexus_install_banner_dismissed';
 const FIRST_SEEN_KEY = 'nexus_install_banner_first_seen';
@@ -34,6 +35,7 @@ const GRACE_MS = 60 * 1000;
 export function InstallBanner() {
   const { t } = useTranslation('common');
   const { branding } = useTenant();
+  const { showBanner: isCookieBannerVisible } = useCookieConsent();
   const state = useInstallPrompt();
   const [visible, setVisible] = useState(false);
   const [iosOpen, setIosOpen] = useState(false);
@@ -41,6 +43,10 @@ export function InstallBanner() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    if (isCookieBannerVisible) {
+      setVisible(false);
+      return;
+    }
     if (!shouldOfferInstall(state)) return;
     if (safeLocalStorageGet(DISMISS_KEY) === '1') return;
 
@@ -57,9 +63,9 @@ export function InstallBanner() {
     }
     const timer = window.setTimeout(() => setVisible(true), GRACE_MS - elapsed);
     return () => window.clearTimeout(timer);
-  }, [state]);
+  }, [isCookieBannerVisible, state]);
 
-  if (!visible) return null;
+  if (!visible || isCookieBannerVisible) return null;
 
   const dismiss = () => {
     setVisible(false);
@@ -83,11 +89,11 @@ export function InstallBanner() {
       <div
         role="region"
         aria-label={t('install.banner_aria')}
-        className="relative z-20 mx-3 mt-3 sm:mx-6 sm:mt-4 rounded-xl border border-indigo-500/30 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 px-4 py-3 flex items-center gap-3"
+        className="relative z-20 mx-3 mt-3 sm:mx-6 sm:mt-4 rounded-xl border border-accent/30 bg-gradient-to-r from-accent/10 to-accent-gradient-end/10 px-4 py-3 flex items-center gap-3"
         data-nosnippet
       >
-        <div className="shrink-0 w-9 h-9 rounded-lg bg-indigo-500/20 inline-flex items-center justify-center">
-          <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-300" aria-hidden="true" />
+        <div className="shrink-0 w-9 h-9 rounded-lg bg-accent/20 inline-flex items-center justify-center">
+          <Download className="w-4 h-4 text-accent dark:text-accent" aria-hidden="true" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-theme-primary truncate">
@@ -101,7 +107,7 @@ export function InstallBanner() {
         </div>
         <Button
           size="sm"
-          className="shrink-0 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+          className="shrink-0 bg-gradient-to-r from-accent to-accent-gradient-end text-white"
           onPress={onInstall}
         >
           {t('install.cta')}

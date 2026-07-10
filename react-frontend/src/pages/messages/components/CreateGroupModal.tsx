@@ -128,7 +128,7 @@ export function CreateGroupModal({ isOpen, onClose, onCreated }: CreateGroupModa
     >
       <ModalContent>
         <ModalHeader className="text-theme-primary flex items-center gap-2">
-          <Users className="w-5 h-5 text-indigo-500" />
+          <Users className="w-5 h-5 text-accent" />
           {t('create_group_title')}
         </ModalHeader>
         <ModalBody>
@@ -222,7 +222,7 @@ export function CreateGroupModal({ isOpen, onClose, onCreated }: CreateGroupModa
             {t('cancel')}
           </Button>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             onPress={handleCreate}
             isLoading={isCreating}
             isDisabled={!groupName.trim() || selectedMembers.length < 2}

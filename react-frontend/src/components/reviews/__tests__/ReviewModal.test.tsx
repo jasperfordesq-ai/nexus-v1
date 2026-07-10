@@ -73,6 +73,7 @@ vi.mock('@/lib/api', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null | undefined) => url || '/default-avatar.png',
+  resolveThumbnailUrl: (url: string | null | undefined) => url || '/default-avatar.png',
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
@@ -125,10 +126,11 @@ describe('ReviewModal', () => {
     expect(screen.getByText(/Share your experience with Jane Doe/)).toBeInTheDocument();
   });
 
-  it('renders 5 star rating buttons', () => {
+  it('renders 5 star rating radios', () => {
     render(<W><ReviewModal {...defaultProps} /></W>);
-    const starButtons = screen.getAllByRole('button', { name: /Rate \d out of 5 stars/ });
-    expect(starButtons).toHaveLength(5);
+    expect(screen.getByRole('radiogroup', { name: 'Rating' })).toHaveAttribute('aria-required', 'true');
+    const starRadios = screen.getAllByRole('radio', { name: /Rate \d out of 5 stars/ });
+    expect(starRadios).toHaveLength(5);
   });
 
   it('renders Cancel and Submit buttons', () => {
@@ -168,7 +170,7 @@ describe('ReviewModal', () => {
     );
 
     // Click 4th star
-    fireEvent.click(screen.getByRole('button', { name: 'Rate 4 out of 5 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Rate 4 out of 5 stars' }));
     // Click submit
     fireEvent.click(screen.getByText('Submit Review'));
 

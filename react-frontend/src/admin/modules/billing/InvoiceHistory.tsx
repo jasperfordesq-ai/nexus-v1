@@ -8,6 +8,7 @@
  * Displays invoice list with view/download actions.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect, useState, useCallback } from 'react';import Receipt from 'lucide-react/icons/receipt';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Download from 'lucide-react/icons/download';
@@ -89,7 +90,7 @@ export function InvoiceHistory() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.date ? new Date(item.date).toLocaleDateString() : '--'}
+          {item.date ? new Date(item.date).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },

@@ -120,7 +120,16 @@
       "offer_help": "Offerta di aiuto",
       "celebration": "Celebrazione",
       "note": "Nota"
-    }
+    },
+    "streak_value_many": "{{count}} check-in",
+    "streak_value_one": "{{count}} check-in",
+    "streak_value_other": "{{count}} check-in",
+    "best_streak_many": "Serie migliore: {{count}}",
+    "best_streak_one": "Serie migliore: {{count}}",
+    "best_streak_other": "Serie migliore: {{count}}",
+    "checkins_value_many": "{{count}} registrati",
+    "checkins_value_one": "{{count}} registrati",
+    "checkins_value_other": "{{count}} registrati"
   },
   "template_picker": {
     "load_error": "Impossibile caricare i modelli. Per favore riprova.",

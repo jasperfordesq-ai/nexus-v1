@@ -130,7 +130,11 @@
         "run_failed_with_error": "Uruchomienie nie powiodło się: {{error}}",
         "toggle_failed": "Nie udało się przełączyć agenta",
         "updated": "Zaktualizowano agenta",
-        "update_failed": "Nie udało się zaktualizować agenta"
+        "update_failed": "Nie udało się zaktualizować agenta",
+        "run_created_few": "Uruchom #{{runId}} utworzono propozycje {{count}}",
+        "run_created_many": "Uruchom #{{runId}} utworzono propozycje {{count}}",
+        "run_created_one": "Uruchom #{{runId}} utworzono propozycje {{count}}",
+        "run_created_other": "Uruchom #{{runId}} utworzono propozycje {{count}}"
       }
     },
     "runs": {

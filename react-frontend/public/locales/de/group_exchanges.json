@@ -89,7 +89,11 @@
     "no_members_found": "Keine Mitglieder gefunden, die Ihrer Suche entsprechen.",
     "done": "Fertig",
     "aria_exchange_participants": "Austauschteilnehmer",
-    "aria_hour_split": "Stundenaufteilung"
+    "aria_hour_split": "Stundenaufteilung",
+    "participants_heading_one": "Teilnehmende ({{count}})",
+    "participants_heading_other": "Teilnehmende ({{count}})",
+    "hours_amount_one": "{{count}} Std.",
+    "hours_amount_other": "{{count}} Std."
   },
   "create": {
     "page_title": "Gruppentausch erstellen",
@@ -148,7 +152,11 @@
     "step_of_named": "Schritt {{current}} von {{total}}: {{name}}",
     "hours_value": "{{hours}} Std.",
     "hours_suffix": "Std.",
-    "weight_suffix": "X"
+    "weight_suffix": "X",
+    "providers_count_one": "Anbietende ({{count}})",
+    "providers_count_other": "Anbietende ({{count}})",
+    "receivers_count_one": "Empfangende ({{count}})",
+    "receivers_count_other": "Empfangende ({{count}})"
   },
   "toast": {
     "exchange_started": "Austausch gestartet",

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { isValidElement, type ComponentProps, type ReactNode } from 'react';
+import { createContext, isValidElement, useContext, type ComponentProps, type ReactNode } from 'react';
 import { Accordion as HeroAccordion, type Accordion as HeroAccordionTypes } from '@heroui/react/accordion';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import { cn } from '@/lib/helpers';
@@ -23,6 +23,8 @@ interface LegacyAccordionItemClasses {
   title?: string;
   trigger?: string;
 }
+
+const AccordionItemClassesContext = createContext<LegacyAccordionItemClasses | undefined>(undefined);
 
 export interface AccordionProps
   extends Omit<
@@ -63,7 +65,7 @@ export function Accordion({
   disallowEmptySelection: _disallowEmptySelection,
   dividerProps: _dividerProps,
   expandedKeys,
-  itemClasses: _itemClasses,
+  itemClasses,
   isCompact: _isCompact,
   keepContentMounted: _keepContentMounted,
   motionProps: _motionProps,
@@ -76,19 +78,29 @@ export function Accordion({
   variant,
   ...props
 }: AccordionProps) {
+  const resolvedItemClasses = variant === 'splitted'
+    ? mergeItemClasses(SPLITTED_ITEM_CLASSES, itemClasses)
+    : itemClasses;
+
   return (
-    <HeroAccordion
-      {...props}
-      allowsMultipleExpanded={selectionMode === 'multiple' || props.allowsMultipleExpanded}
-      className={cn(variant === 'splitted' && 'space-y-2', className as string | undefined)}
-      defaultExpandedKeys={defaultExpandedKeys ?? defaultSelectedKeys}
-      expandedKeys={expandedKeys ?? selectedKeys}
-      hideSeparator={showDivider === false ? true : props.hideSeparator}
-      onExpandedChange={onExpandedChange ?? onSelectionChange}
-      variant={mapVariant(variant)}
-    />
+    <AccordionItemClassesContext.Provider value={resolvedItemClasses}>
+      <HeroAccordion
+        {...props}
+        allowsMultipleExpanded={selectionMode === 'multiple' || props.allowsMultipleExpanded}
+        className={cn(variant === 'splitted' && 'space-y-2', className as string | undefined)}
+        defaultExpandedKeys={defaultExpandedKeys ?? defaultSelectedKeys}
+        expandedKeys={expandedKeys ?? selectedKeys}
+        hideSeparator={variant === 'splitted' || showDivider === false ? true : props.hideSeparator}
+        onExpandedChange={onExpandedChange ?? onSelectionChange}
+        variant={mapVariant(variant)}
+      />
+    </AccordionItemClassesContext.Provider>
   );
 }
+
+const SPLITTED_ITEM_CLASSES: LegacyAccordionItemClasses = {
+  base: 'overflow-hidden rounded-2xl bg-surface shadow-surface',
+};
 
 export interface AccordionItemProps
   extends Omit<HeroAccordionItemProps, 'children' | 'id'> {
@@ -114,29 +126,47 @@ export function AccordionItem({
   title,
   ...props
 }: AccordionItemProps) {
+  const inheritedClassNames = useContext(AccordionItemClassesContext);
+  const resolvedClassNames = mergeItemClasses(inheritedClassNames, classNames);
+
   return (
-    <HeroAccordion.Item {...props} id={id} className={cn(classNames?.base, className as string | undefined)}>
-      <HeroAccordion.Heading className={classNames?.heading}>
-        <HeroAccordion.Trigger className={cn('gap-3', classNames?.trigger)}>
+    <HeroAccordion.Item {...props} id={id} className={cn(resolvedClassNames.base, className as string | undefined)}>
+      <HeroAccordion.Heading className={resolvedClassNames.heading}>
+        <HeroAccordion.Trigger className={cn('gap-3', resolvedClassNames.trigger)}>
           {startContent}
-          <span className={cn('flex min-w-0 flex-1 flex-col text-left', classNames?.title)}>
-            {renderTitle(title)}
-            {subtitle && <span className={cn('text-sm text-theme-subtle', classNames?.subtitle)}>{subtitle}</span>}
+          <span className="flex min-w-0 flex-1 flex-col text-left">
+            <span className={resolvedClassNames.title}>{renderTitle(title)}</span>
+            {subtitle && <span className={cn('text-sm text-theme-subtle', resolvedClassNames.subtitle)}>{subtitle}</span>}
           </span>
           {!hideIndicator && (
-            <HeroAccordion.Indicator className={classNames?.indicator}>
+            <HeroAccordion.Indicator className={resolvedClassNames.indicator}>
               {renderIndicator(indicator)}
             </HeroAccordion.Indicator>
           )}
         </HeroAccordion.Trigger>
       </HeroAccordion.Heading>
       <HeroAccordion.Panel>
-        <HeroAccordion.Body className={classNames?.content as HeroAccordionBodyProps['className']}>
+        <HeroAccordion.Body className={resolvedClassNames.content as HeroAccordionBodyProps['className']}>
           {children}
         </HeroAccordion.Body>
       </HeroAccordion.Panel>
     </HeroAccordion.Item>
   );
+}
+
+function mergeItemClasses(
+  inherited: LegacyAccordionItemClasses | undefined,
+  local: LegacyAccordionItemClasses | undefined,
+): LegacyAccordionItemClasses {
+  return {
+    base: cn(inherited?.base, local?.base),
+    content: cn(inherited?.content, local?.content),
+    heading: cn(inherited?.heading, local?.heading),
+    indicator: cn(inherited?.indicator, local?.indicator),
+    subtitle: cn(inherited?.subtitle, local?.subtitle),
+    title: cn(inherited?.title, local?.title),
+    trigger: cn(inherited?.trigger, local?.trigger),
+  };
 }
 
 function mapVariant(variant: LegacyAccordionVariant | undefined): HeroAccordionProps['variant'] {

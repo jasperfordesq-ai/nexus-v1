@@ -81,21 +81,15 @@ export function JobOwnerBanner({ vacancy, tenantPath, onVacancyUpdated }: JobOwn
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <Link to={tenantPath(`/jobs/${vacancy.id}/edit`)}>
-            <Button size="sm" variant="flat" className="bg-theme-elevated text-theme-muted" startContent={<Edit3 className="w-4 h-4" aria-hidden="true" />}>
-              {t('detail.edit')}
-            </Button>
-          </Link>
-          <Link to={tenantPath(`/jobs/${vacancy.id}/analytics`)}>
-            <Button size="sm" variant="flat" className="bg-theme-elevated text-theme-muted" startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}>
-              {t('detail.analytics')}
-            </Button>
-          </Link>
-          <Link to={tenantPath(`/jobs/${vacancy.id}/kanban`)}>
-            <Button size="sm" variant="flat" color="primary" startContent={<Users className="w-4 h-4" aria-hidden="true" />}>
-              {t('detail.kanban_board')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath(`/jobs/${vacancy.id}/edit`)} size="sm" variant="flat" className="bg-theme-elevated text-theme-muted" startContent={<Edit3 className="w-4 h-4" aria-hidden="true" />}>
+            {t('detail.edit')}
+          </Button>
+          <Button as={Link} to={tenantPath(`/jobs/${vacancy.id}/analytics`)} size="sm" variant="flat" className="bg-theme-elevated text-theme-muted" startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}>
+            {t('detail.analytics')}
+          </Button>
+          <Button as={Link} to={tenantPath(`/jobs/${vacancy.id}/kanban`)} size="sm" variant="flat" color="primary" startContent={<Users className="w-4 h-4" aria-hidden="true" />}>
+            {t('detail.kanban_board')}
+          </Button>
           <Button
             size="sm"
             variant="flat"

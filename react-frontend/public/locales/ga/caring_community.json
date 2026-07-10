@@ -108,7 +108,12 @@
       "create": "Níorbh fhéidir iarratas clúdaigh a chruthú",
       "candidates": "Níorbh fhéidir iarrthóirí ionaid a lódáil",
       "assign": "Níorbh fhéidir ionadaí a mheaitseáil"
-    }
+    },
+    "skill_matches_few": "Scileanna meaitseála{{count}}",
+    "skill_matches_many": "Scileanna meaitseála{{count}}",
+    "skill_matches_one": "Scileanna meaitseála{{count}}",
+    "skill_matches_other": "Scileanna meaitseála{{count}}",
+    "skill_matches_two": "Scileanna meaitseála{{count}}"
   },
   "providers": {
     "title": "Eolaire Soláthraí Cúraim",
@@ -488,7 +493,8 @@
         "maximum_discount": "Lascaine uasta in aghaidh an ordaithe (%)",
         "maximum_discount_description": "Teorainn ar an méid d'iomlán an ordaithe is féidir a íoc i gcreidmheasanna ama.",
         "save": "Sábháil socruithe",
-        "view_only": "Ní féidir le húsáideoirí amharc-amháin socruithe dílseachta a athrú."
+        "view_only": "Ní féidir le húsáideoirí amharc-amháin socruithe dílseachta a athrú.",
+        "per_hour_short": "/ u"
       },
       "ledger": {
         "title": "Fuascailtí le Déanaí",
@@ -534,6 +540,9 @@
         "pending": "Ar feitheamh",
         "applied": "Fheidhmeach",
         "reversed": "droim ar ais"
+      },
+      "table": {
+        "empty_value": "—"
       }
     },
     "hour_transfers": {
@@ -808,7 +817,19 @@
         "days_ago_one": "{{count}}d ó shin",
         "days_ago_other": "{{count}}d ó shin",
         "months_ago_one": "{{count}}mo shin",
-        "months_ago_other": "{{count}}mo shin"
+        "months_ago_other": "{{count}}mo shin",
+        "minutes_ago_few": "{{count}}m ó shin",
+        "minutes_ago_many": "{{count}}m ó shin",
+        "minutes_ago_two": "{{count}}m ó shin",
+        "hours_ago_few": "{{count}}h ó shin",
+        "hours_ago_many": "{{count}}h ó shin",
+        "hours_ago_two": "{{count}}h ó shin",
+        "days_ago_few": "{{count}}d ó shin",
+        "days_ago_many": "{{count}}d ó shin",
+        "days_ago_two": "{{count}}d ó shin",
+        "months_ago_few": "{{count}}mo shin",
+        "months_ago_many": "{{count}}mo shin",
+        "months_ago_two": "{{count}}mo shin"
       },
       "messages": {
         "triage_saved": "Triáis shábháil",
@@ -944,7 +965,10 @@
       },
       "errors": {
         "load": "Theip ar luchtú an chiorcail faighteora. Seiceáil ID an bhaill agus bain triail eile as."
-      }
+      },
+      "safeguarding_flags_few": "Bratacha cosanta {{count}}",
+      "safeguarding_flags_many": "Bratacha cosanta {{count}}",
+      "safeguarding_flags_two": "Bratacha cosanta {{count}}"
     },
     "safeguarding_reports": {
       "meta_title": "Tuarascálacha Cosanta - Riarachán",

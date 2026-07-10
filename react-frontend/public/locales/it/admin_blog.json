@@ -158,7 +158,16 @@
       "delete_confirm_title": "Eliminare i post selezionati?",
       "publish": "Pubblica",
       "publish_confirm_message": "Pubblicare i post selezionati di {{count}}?",
-      "publish_confirm_title": "Pubblicare i post selezionati?"
+      "publish_confirm_title": "Pubblicare i post selezionati?",
+      "publish_confirm_message_many": "Pubblicare i post selezionati di {{count}}?",
+      "publish_confirm_message_one": "Pubblicare i post selezionati di {{count}}?",
+      "publish_confirm_message_other": "Pubblicare i post selezionati di {{count}}?",
+      "archive_confirm_message_many": "Ciò annullerà la pubblicazione dei post di {{count}}. Possono essere ripubblicati in seguito.",
+      "archive_confirm_message_one": "Ciò annullerà la pubblicazione dei post di {{count}}. Possono essere ripubblicati in seguito.",
+      "archive_confirm_message_other": "Ciò annullerà la pubblicazione dei post di {{count}}. Possono essere ripubblicati in seguito.",
+      "delete_confirm_message_many": "Eliminare i post selezionati di {{count}}? Questa operazione non può essere annullata.",
+      "delete_confirm_message_one": "Eliminare i post selezionati di {{count}}? Questa operazione non può essere annullata.",
+      "delete_confirm_message_other": "Eliminare i post selezionati di {{count}}? Questa operazione non può essere annullata."
     },
     "marketplace": {
       "reason_label": "Motivo",

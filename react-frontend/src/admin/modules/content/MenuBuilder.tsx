@@ -318,7 +318,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
       style={style}
       className={`flex items-center gap-2 rounded-lg border p-2.5 transition-colors cursor-pointer ${
         isSelected
-          ? 'border-indigo-500 bg-indigo-500/5'
+          ? 'border-accent bg-accent/5'
           : 'border-border hover:border-border-secondary'
       } ${!item.is_active ? 'opacity-50' : ''}`}
       onClick={onSelect}
@@ -331,7 +331,6 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
         {...attributes}
         {...listeners}
         aria-label={t('menu_builder.drag_to_reorder')}
-        onClick={(e) => e.stopPropagation()}
       >
         <GripVertical size={16} aria-hidden="true" />
       </Button>
@@ -363,7 +362,6 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
         variant="tertiary"
         onPress={onSelect}
         aria-label={t('menu_builder.edit_item')}
-        onClick={(e) => e.stopPropagation()}
       >
         <Pencil size={13} aria-hidden="true" />
       </Button>
@@ -374,7 +372,6 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
         variant="danger-soft"
         onPress={() => onDelete()}
         aria-label={t('menu_builder.delete_item')}
-        onClick={(e) => e.stopPropagation()}
       >
         <Trash2 size={13} aria-hidden="true" />
       </Button>
@@ -1048,6 +1045,7 @@ export function MenuBuilder() {
                         <SelectItem key={String(page.id)} id={String(page.id)} textValue={page.title}>
                           <div>
                             <p className="text-sm font-medium">{page.title}</p>
+                            {/* eslint-disable-next-line i18next/no-literal-string -- Route preview must preserve its path syntax. */}
                             <p className="text-xs text-muted">/page/{page.slug}</p>
                           </div>
                         </SelectItem>

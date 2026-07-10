@@ -120,7 +120,16 @@
       "offer_help": "Oferta de ayuda",
       "celebration": "Celebración",
       "note": "Nota"
-    }
+    },
+    "streak_value_many": "{{count}} registros",
+    "streak_value_one": "{{count}} registros",
+    "streak_value_other": "{{count}} registros",
+    "best_streak_many": "Mejor racha: {{count}}",
+    "best_streak_one": "Mejor racha: {{count}}",
+    "best_streak_other": "Mejor racha: {{count}}",
+    "checkins_value_many": "{{count}} registrados",
+    "checkins_value_one": "{{count}} registrados",
+    "checkins_value_other": "{{count}} registrados"
   },
   "template_picker": {
     "load_error": "Error al cargar las plantillas. Por favor, inténtalo de nuevo.",

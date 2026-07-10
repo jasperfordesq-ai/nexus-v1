@@ -91,7 +91,11 @@
     "no_members_found": "No members found matching your search.",
     "done": "Done",
     "aria_exchange_participants": "Exchange participants",
-    "aria_hour_split": "Hour split"
+    "aria_hour_split": "Hour split",
+    "participants_heading_one": "Participants ({{count}})",
+    "participants_heading_other": "Participants ({{count}})",
+    "hours_amount_one": "{{count}}h",
+    "hours_amount_other": "{{count}}h"
   },
   "create": {
     "page_title": "Create Group Exchange",
@@ -150,7 +154,11 @@
     "step_of_named": "Step {{current}} of {{total}}: {{name}}",
     "hours_value": "{{hours}}h",
     "hours_suffix": "h",
-    "weight_suffix": "x"
+    "weight_suffix": "x",
+    "providers_count_one": "Providers ({{count}})",
+    "providers_count_other": "Providers ({{count}})",
+    "receivers_count_one": "Receivers ({{count}})",
+    "receivers_count_other": "Receivers ({{count}})"
   },
   "toast": {
     "exchange_started": "Exchange started",

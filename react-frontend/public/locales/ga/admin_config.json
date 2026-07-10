@@ -781,7 +781,17 @@
     "option_marketplace_listing_duration_days_label": "Fad an Liostú (Laethanta)",
     "option_marketplace_listing_duration_days_desc": "Líon na laethanta sula rachaidh liostuithe margaidh in éag go huathoibríoch",
     "option_identity_verification_fee_cents_label": "Táille Fíoraithe (cent)",
-    "option_identity_verification_fee_cents_desc": "Táille aonuaire gearrtha ar fhíorú aitheantais. Socraigh go 0 le haghaidh fíorú saor in aisce. Luach i gcentin (m.sh. 500 = €5.00)"
+    "option_identity_verification_fee_cents_desc": "Táille aonuaire gearrtha ar fhíorú aitheantais. Socraigh go 0 le haghaidh fíorú saor in aisce. Luach i gcentin (m.sh. 500 = €5.00)",
+    "option_count_few": "Roghanna{{count}}",
+    "option_count_many": "Roghanna{{count}}",
+    "option_count_one": "Roghanna{{count}}",
+    "option_count_other": "Roghanna{{count}}",
+    "option_count_two": "Roghanna{{count}}",
+    "planned_count_few": "{{count}}pleanáilte",
+    "planned_count_many": "{{count}}pleanáilte",
+    "planned_count_one": "{{count}}pleanáilte",
+    "planned_count_other": "{{count}}pleanáilte",
+    "planned_count_two": "{{count}}pleanáilte"
   },
   "tenant_features": {
     "refresh": "Athnuaigh",

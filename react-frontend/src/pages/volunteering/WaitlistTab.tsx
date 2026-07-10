@@ -7,6 +7,7 @@
  * WaitlistTab - View and manage shift waitlist positions (V1)
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from '@/lib/motion';
 
@@ -274,13 +275,13 @@ export function WaitlistTab() {
                       )}
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" aria-hidden="true" />
-                        {new Date(entry.shift.start_time).toLocaleDateString()}
+                        {new Date(entry.shift.start_time).toLocaleDateString(getFormattingLocale())}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" aria-hidden="true" />
-                        {new Date(entry.shift.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(entry.shift.start_time).toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' })}
                         {' - '}
-                        {new Date(entry.shift.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(entry.shift.end_time).toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' })}
                       </span>
                       {entry.shift.capacity != null && (
                         <span className="flex items-center gap-1">
@@ -291,7 +292,7 @@ export function WaitlistTab() {
                     </div>
 
                     <p className="text-xs text-theme-subtle">
-                      {t('waitlist.joined')} {new Date(entry.joined_at).toLocaleDateString()}
+                      {t('waitlist.joined')} {new Date(entry.joined_at).toLocaleDateString(getFormattingLocale())}
                     </p>
                   </div>
 

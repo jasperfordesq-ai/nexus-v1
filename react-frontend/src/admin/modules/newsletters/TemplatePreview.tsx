@@ -81,8 +81,7 @@ export function TemplatePreview({ templateId, isOpen, onClose }: TemplatePreview
         title={t('newsletters.template_preview_title')}
         sandbox="allow-same-origin"
         srcDoc={html}
-        className="w-full border-0"
-        style={{ minHeight: '500px', height: '70vh' }}
+        className="h-[70vh] min-h-[500px] w-full border-0"
       />
     );
   };

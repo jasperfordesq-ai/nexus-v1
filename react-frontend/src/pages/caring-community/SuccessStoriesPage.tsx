@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -56,7 +57,7 @@ interface ListResponse {
 
 function formatValue(v: number | null, unit: string): string {
   if (v === null) return '—';
-  const formatted = v.toLocaleString();
+  const formatted = v.toLocaleString(getFormattingLocale());
   return unit ? `${formatted} ${unit}` : formatted;
 }
 

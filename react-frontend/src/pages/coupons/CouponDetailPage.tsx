@@ -1,4 +1,3 @@
-import { CardBody, Card, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,8 +7,10 @@ import { CardBody, Card, Button, Chip, Spinner, Modal, ModalContent, ModalHeader
  * CouponDetailPage — AG63 detail view: copy online code or generate QR for in-store use.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { CardBody, Card, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
 
 import Tag from 'lucide-react/icons/tag';
 import Copy from 'lucide-react/icons/copy';
@@ -17,7 +18,7 @@ import QrCode from 'lucide-react/icons/qr-code';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { logError } from '@/lib/logger';
@@ -43,6 +44,7 @@ interface QrPayload {
 export default function CouponDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation('common');
+  const { tenantPath } = useTenant();
   const toast = useToast();
   usePageTitle(t('coupon.details'));
 
@@ -107,7 +109,7 @@ export default function CouponDetailPage() {
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <PageMeta title={t('coupon.details')} noIndex />
-        <Button as={Link} to="/coupons" variant="light" startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}>
+        <Button as={Link} to={tenantPath('/coupons')} variant="light" startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}>
           {t('coupon.back_to_coupons')}
         </Button>
       </div>
@@ -138,7 +140,7 @@ export default function CouponDetailPage() {
       />
       <Button
         as={Link}
-        to="/coupons"
+        to={tenantPath('/coupons')}
         variant="light"
         startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
         className="mb-4"
@@ -168,7 +170,7 @@ export default function CouponDetailPage() {
 
           {coupon.valid_until && (
             <p className="text-sm text-[var(--color-text-secondary)] mb-4">
-              {t('coupon.valid_until')}: {new Date(coupon.valid_until).toLocaleDateString()}
+              {t('coupon.valid_until')}: {new Date(coupon.valid_until).toLocaleDateString(getFormattingLocale())}
             </p>
           )}
 
@@ -206,7 +208,7 @@ export default function CouponDetailPage() {
             </p>
             {qr && (
               <p className="text-xs text-[var(--color-text-secondary)]">
-                {t('coupon.qr_expires_in')}: {new Date(qr.expires_at).toLocaleTimeString()}
+                {t('coupon.qr_expires_in')}: {new Date(qr.expires_at).toLocaleTimeString(getFormattingLocale())}
               </p>
             )}
             <div className="text-xs font-mono mt-3 break-all">{qr?.token}</div>

@@ -111,7 +111,10 @@
     "service_type_physical": "Solo di persona",
     "service_type_physical_hint": "Richiede un luogo fisico condiviso",
     "service_type_remote": "Solo da remoto",
-    "service_type_remote_hint": "Può avvenire per telefono, chat o video"
+    "service_type_remote_hint": "Può avvenire per telefono, chat o video",
+    "character_count_many": "{{count}}/{{max}}",
+    "character_count_one": "{{count}}/{{max}}",
+    "character_count_other": "{{count}}/{{max}}"
   },
   "page_subtitle": "Sfoglia i servizi e le richieste della comunità",
   "hero_eyebrow": "Bacheca di scambio della comunità",
@@ -247,7 +250,10 @@
     "placeholder": "Digita una competenza e premi Invio...",
     "aria_add": "Aggiungi tag competenza",
     "aria_add_count": "Aggiungi tag abilità ({{current}} di {{max}})",
-    "aria_results": "{{count}} suggerimenti di abilità disponibili"
+    "aria_results": "{{count}} suggerimenti di abilità disponibili",
+    "aria_results_many": "{{count}} suggerimenti di abilità disponibili",
+    "aria_results_one": "{{count}} suggerimenti di abilità disponibili",
+    "aria_results_other": "{{count}} suggerimenti di abilità disponibili"
   },
   "more_filters": "Altri filtri",
   "filters_label": "Filtri",
@@ -269,7 +275,13 @@
     "load_error": "Impossibile caricare le analisi",
     "retry": "Riprova",
     "no_data": "Ancora nessuna visualizzazione — ricontrolla dopo che il tuo annuncio avrà ricevuto un po' di traffico",
-    "bar_label": "{{date}}: {{count}} visualizzazioni"
+    "bar_label": "{{date}}: {{count}} visualizzazioni",
+    "unique_viewers_many": "{{count}} unici",
+    "unique_viewers_one": "{{count}} unici",
+    "unique_viewers_other": "{{count}} unici",
+    "bar_label_many": "{{date}}: {{count}} visualizzazioni",
+    "bar_label_one": "{{date}}: {{count}} visualizzazioni",
+    "bar_label_other": "{{date}}: {{count}} visualizzazioni"
   },
   "filter_hours": "Durata",
   "filter_any_duration": "Qualsiasi durata",
@@ -349,5 +361,9 @@
   "listing_image_alt": "Immagine dell'elenco",
   "open_listing_aria": "Apri annuncio: {{title}}",
   "distance_meters": "{{distance}} m",
-  "distance_kilometers": "{{distance}} km"
+  "distance_kilometers": "{{distance}} km",
+  "results_count_many": "{{count}} annunci trovati",
+  "listings_loaded_count_many": "{{count}} annunci caricati",
+  "detail_hours_many": "{{count}} ore",
+  "detail_renewed_count_many": "Rinnovato {{count}} volta"
 }

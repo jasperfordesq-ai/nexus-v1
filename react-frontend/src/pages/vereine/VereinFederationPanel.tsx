@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useConfirm } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -347,7 +348,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
                         <p className="font-medium">{s.title}</p>
                         <p className="text-xs text-muted">
                           {t('verein_federation.calendar.from_label')}: {s.source_name ?? '—'}
-                          {s.start_time ? ` Â· ${new Date(s.start_time).toLocaleString()}` : ''}
+                          {s.start_time ? ` Â· ${new Date(s.start_time).toLocaleString(getFormattingLocale())}` : ''}
                         </p>
                       </div>
                     </li>
@@ -369,7 +370,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
                         <p className="text-xs text-muted flex items-center gap-1">
                           <ArrowRight className="h-3 w-3" aria-hidden="true" />
                           <span>{s.target_name ?? t('not_available')}</span>
-                          {s.start_time ? ` Â· ${new Date(s.start_time).toLocaleString()}` : ''}
+                          {s.start_time ? ` Â· ${new Date(s.start_time).toLocaleString(getFormattingLocale())}` : ''}
                         </p>
                       </div>
                       <Button size="sm" variant="flat" color="danger" onPress={() => void handleWithdraw(s.id)}>

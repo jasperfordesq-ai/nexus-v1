@@ -111,9 +111,10 @@ describe('PublicPageHero', () => {
   });
 
   it('accepts an explicit accent prop without error (emerald)', () => {
-    // Just ensure it renders without throwing when a non-default accent is used
     render(<PublicPageHero {...defaultProps} accent="emerald" />);
-    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
+    const chip = screen.getByText('Featured Section').closest('[data-slot="chip"]');
+
+    expect(chip).toHaveClass('chip--success', 'chip--soft');
   });
 
   it('accepts rose accent without error', () => {

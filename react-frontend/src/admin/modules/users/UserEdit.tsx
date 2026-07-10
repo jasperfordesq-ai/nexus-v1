@@ -18,7 +18,7 @@ import FileCheck from 'lucide-react/icons/file-check';
 import Landmark from 'lucide-react/icons/landmark';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { formatNumber, resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { api } from '@/lib/api';
 import { adminUsers, adminTimebanking, adminVetting, adminInsurance } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
@@ -501,7 +501,7 @@ export function UserEdit() {
   const canImpersonate = isSuperAdmin && !user.is_super_admin && !user.is_god && user.id !== currentUser?.id;
   const emailActivated = Boolean(user.email_verified_at);
   const emailActivatedDate = user.email_verified_at
-    ? new Date(user.email_verified_at).toLocaleString()
+    ? new Date(user.email_verified_at).toLocaleString(getFormattingLocale())
     : null;
 
   return (
@@ -742,10 +742,10 @@ export function UserEdit() {
 
         {/* Municipal Announcer (AG14) */}
         {isSuperAdmin && (
-          <Card className="border border-indigo-400/30">
+          <Card className="border border-accent/30">
             <CardHeader className="px-6 pt-5 pb-0">
               <div className="flex items-center gap-2">
-                <Landmark aria-hidden="true" size={18} className="text-indigo-500" />
+                <Landmark aria-hidden="true" size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold text-foreground">{t('sections.municipal_announcer')}</h3>
               </div>
             </CardHeader>
@@ -823,7 +823,9 @@ export function UserEdit() {
           </CardHeader>
           <CardBody className="p-6">
             <div className="flex items-center gap-4">
-              <div className="text-3xl font-bold text-foreground">{user.balance ?? 0}h</div>
+              <div className="text-3xl font-bold text-foreground">
+                {formatNumber(user.balance ?? 0, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
+              </div>
               <p className="text-sm text-muted">{t('fields.current_balance')}</p>
             </div>
           </CardBody>

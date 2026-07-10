@@ -120,7 +120,10 @@
       "offer_help": "助けの申し出",
       "celebration": "お祝い",
       "note": "メモ"
-    }
+    },
+    "streak_value_other": "{{count}}回のチェックイン",
+    "best_streak_other": "最高連続記録: {{count}}",
+    "checkins_value_other": "{{count}}件記録済み"
   },
   "template_picker": {
     "load_error": "テンプレートの読み込みに失敗しました。もう一度お試しください。",

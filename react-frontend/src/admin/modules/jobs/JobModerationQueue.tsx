@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 import { EmptyState } from '../../components/EmptyState';
@@ -336,7 +336,7 @@ export function JobModerationQueue() {
                             ? t('moderation.posted_by', { name: job.poster_name })
                             : t('moderation.user_fallback', { id: job.user_id })}
                           {' '}&middot;{' '}
-                          {new Date(job.created_at).toLocaleDateString(undefined, {
+                          {new Date(job.created_at).toLocaleDateString(getFormattingLocale(), {
                             year: 'numeric',
                             month: 'short',
                             day: 'numeric',

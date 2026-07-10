@@ -63,7 +63,10 @@
     "still_need_help_description": "¿No encuentras lo que buscas? Nuestro equipo está aquí para ayudarte.",
     "contact_support": "Contactar Soporte",
     "load_error_title": "No se pudieron cargar las FAQ",
-    "load_error_description": "Actualiza la pagina o contacta con soporte."
+    "load_error_description": "Actualiza la pagina o contacta con soporte.",
+    "articles_count_many": "{{count}} artículos",
+    "articles_count_one": "{{count}} artículos",
+    "articles_count_other": "{{count}} artículos"
   },
   "resources": {
     "page_title": "Recursos",

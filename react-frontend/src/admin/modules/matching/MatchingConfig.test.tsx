@@ -138,13 +138,15 @@ describe('MatchingConfig', () => {
     });
   });
 
-  it('shows error toast when config load fails', async () => {
+  it('shows a retryable error state when config load fails', async () => {
     mockAdminMatching.getConfig.mockRejectedValueOnce(new Error('network'));
     const { MatchingConfig } = await import('./MatchingConfig');
     render(<MatchingConfig />);
 
     await waitFor(() => {
-      expect(mockToast.error).toHaveBeenCalled();
+      expect(screen.getByRole('alert')).toHaveTextContent(/failed to load matching configuration/i);
+      expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
+      expect(mockToast.error).not.toHaveBeenCalled();
     });
   });
 

@@ -120,7 +120,25 @@
       "offer_help": "عرض مساعدة",
       "celebration": "احتفال",
       "note": "ملاحظة"
-    }
+    },
+    "streak_value_few": "{{count}} تسجيل دخول",
+    "streak_value_many": "{{count}} تسجيل دخول",
+    "streak_value_one": "{{count}} تسجيل دخول",
+    "streak_value_other": "{{count}} تسجيل دخول",
+    "streak_value_two": "{{count}} تسجيل دخول",
+    "streak_value_zero": "{{count}} تسجيل دخول",
+    "best_streak_few": "أفضل سلسلة: {{count}}",
+    "best_streak_many": "أفضل سلسلة: {{count}}",
+    "best_streak_one": "أفضل سلسلة: {{count}}",
+    "best_streak_other": "أفضل سلسلة: {{count}}",
+    "best_streak_two": "أفضل سلسلة: {{count}}",
+    "best_streak_zero": "أفضل سلسلة: {{count}}",
+    "checkins_value_few": "{{count}} مُسجَّل",
+    "checkins_value_many": "{{count}} مُسجَّل",
+    "checkins_value_one": "{{count}} مُسجَّل",
+    "checkins_value_other": "{{count}} مُسجَّل",
+    "checkins_value_two": "{{count}} مُسجَّل",
+    "checkins_value_zero": "{{count}} مُسجَّل"
   },
   "template_picker": {
     "load_error": "فشل في تحميل القوالب. يرجى المحاولة مرة أخرى.",

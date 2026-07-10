@@ -36,8 +36,8 @@ export function GroupSubgroupsTab({ subGroups }: GroupSubgroupsTabProps) {
           <Link key={subGroup.id} to={tenantPath(`/groups/${subGroup.id}`)}>
             <div className="flex items-center justify-between p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-indigo-500/20">
-                  <Users className="w-5 h-5 text-purple-400" aria-hidden="true" />
+                <div className="p-3 rounded-xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20">
+                  <Users className="w-5 h-5 text-accent" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="font-medium text-theme-primary">{subGroup.name}</p>

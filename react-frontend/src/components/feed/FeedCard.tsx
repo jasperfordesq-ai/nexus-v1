@@ -55,7 +55,7 @@ import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { dispatchFeedSync } from '@/lib/feedSync';
-import { resolveAvatarUrl, resolveThumbnailUrl, formatRelativeTime, formatDate, formatTime } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl, formatRelativeTime, formatDate, formatTime, getFormattingLocale } from '@/lib/helpers';
 import { useFeedTracking } from '@/hooks/useFeedTracking';
 import { useSharedFeedObserver } from '@/hooks/useSharedFeedObserver';
 import { useLongPress } from '@/hooks/useLongPress';
@@ -211,8 +211,8 @@ const typeConfig = {
     labelKey: 'card.type_listing',
     color: 'primary' as const,
     icon: <ShoppingBag className="w-3 h-3" aria-hidden="true" />,
-    softGradient: 'from-indigo-500/10 to-blue-500/10',
-    accentGradient: 'from-indigo-500 via-blue-500 to-indigo-500',
+    softGradient: 'from-accent/10 to-blue-500/10',
+    accentGradient: 'from-accent via-blue-500 to-accent-gradient-end',
   },
   event: {
     labelKey: 'card.type_event',
@@ -232,8 +232,8 @@ const typeConfig = {
     labelKey: 'card.type_goal',
     color: 'secondary' as const,
     icon: <Target className="w-3 h-3" aria-hidden="true" />,
-    softGradient: 'from-purple-500/10 to-pink-500/10',
-    accentGradient: 'from-purple-500 via-pink-500 to-purple-500',
+    softGradient: 'from-accent/10 to-pink-500/10',
+    accentGradient: 'from-accent via-pink-500 to-accent-gradient-end',
   },
   review: {
     labelKey: 'card.type_review',
@@ -253,8 +253,8 @@ const typeConfig = {
     labelKey: 'card.type_challenge',
     color: 'secondary' as const,
     icon: <Target className="w-3 h-3" aria-hidden="true" />,
-    softGradient: 'from-violet-500/10 to-purple-500/10',
-    accentGradient: 'from-violet-500 via-purple-500 to-violet-500',
+    softGradient: 'from-violet-500/10 to-accent-gradient-end/10',
+    accentGradient: 'from-violet-500 via-accent-gradient-end to-violet-500',
   },
   volunteer: {
     labelKey: 'card.type_volunteer',
@@ -281,8 +281,8 @@ const typeConfig = {
     labelKey: 'card.type_discussion',
     color: 'secondary' as const,
     icon: <Users className="w-3 h-3" aria-hidden="true" />,
-    softGradient: 'from-fuchsia-500/10 to-purple-500/10',
-    accentGradient: 'from-fuchsia-500 via-purple-500 to-fuchsia-500',
+    softGradient: 'from-fuchsia-500/10 to-accent-gradient-end/10',
+    accentGradient: 'from-fuchsia-500 via-accent-gradient-end to-fuchsia-500',
   },
   resource: {
     labelKey: 'card.type_resource',
@@ -309,8 +309,8 @@ const typeConfig = {
     labelKey: 'card.type_course',
     color: 'primary' as const,
     icon: <BookOpen className="w-3 h-3" aria-hidden="true" />,
-    softGradient: 'from-indigo-500/10 to-violet-500/10',
-    accentGradient: 'from-indigo-500 via-violet-500 to-indigo-500',
+    softGradient: 'from-accent/10 to-violet-500/10',
+    accentGradient: 'from-accent via-violet-500 to-accent-gradient-end',
   },
 };
 
@@ -623,14 +623,14 @@ const FeedCard = React.memo(function FeedCard({
                     size="sm"
                     variant="flat"
                     startContent={<Landmark className="w-3 h-3" aria-hidden="true" />}
-                    className="text-[10px] h-5 bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-400/30"
+                    className="text-[10px] h-5 bg-accent/15 text-accent dark:text-accent border border-accent/30"
                   >
                     {t('feed.official_badge', { ns: 'common' })}
                   </Chip>
                 )}
                 {/* Scheduling indicator — visible only to the post author */}
                 {item.publish_status === 'scheduled' && isOwnPost && item.scheduled_at && (
-                  <Tooltip content={new Date(item.scheduled_at).toLocaleString()} placement="bottom" delay={300} closeDelay={0} size="sm">
+                  <Tooltip content={new Date(item.scheduled_at).toLocaleString(getFormattingLocale())} placement="bottom" delay={300} closeDelay={0} size="sm">
                     <Chip
                       size="sm"
                       variant="flat"
@@ -644,7 +644,7 @@ const FeedCard = React.memo(function FeedCard({
                 )}
               </div>
               <div className="flex items-center gap-1.5">
-                <Tooltip content={new Date(item.created_at).toLocaleString()} placement="bottom" delay={500} closeDelay={0} size="sm">
+                <Tooltip content={new Date(item.created_at).toLocaleString(getFormattingLocale())} placement="bottom" delay={500} closeDelay={0} size="sm">
                   <p className="text-xs text-theme-subtle flex items-center gap-1 cursor-default">
                     <Clock className="w-3 h-3" aria-hidden="true" />
                     <span>
@@ -669,12 +669,11 @@ const FeedCard = React.memo(function FeedCard({
                   <DropdownTrigger>
                     <Button
                       isIconOnly
-                      size="sm"
                       variant="light"
-                      className="text-theme-subtle hover:text-theme-primary min-w-0 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 group-focus-within:opacity-100 transition-opacity"
+                      className="size-11 min-h-11 min-w-11 p-0 text-theme-subtle hover:text-theme-primary opacity-100 pointer-coarse:opacity-100 any-pointer-coarse:opacity-100 pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-within:opacity-100 pointer-fine:focus-visible:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 transition-opacity"
                       aria-label={t('card.post_options')}
                     >
-                      <MoreHorizontal className="w-4 h-4" />
+                      <MoreHorizontal className="size-4" aria-hidden="true" />
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu aria-label={t('card.post_actions')}>
@@ -770,13 +769,12 @@ const FeedCard = React.memo(function FeedCard({
               {/* Mobile: Button that opens BottomSheet */}
               <Button
                 isIconOnly
-                size="sm"
                 variant="light"
-                className="sm:hidden text-theme-subtle hover:text-theme-primary min-w-0"
+                className="size-11 min-h-11 min-w-11 p-0 sm:hidden text-theme-subtle hover:text-theme-primary"
                 aria-label={t('card.post_options')}
                 onPress={() => setIsOptionsSheetOpen(true)}
               >
-                <MoreHorizontal className="w-4 h-4" />
+                <MoreHorizontal className="size-4" aria-hidden="true" />
               </Button>
 
               {/* Mobile BottomSheet for post options */}
@@ -786,7 +784,7 @@ const FeedCard = React.memo(function FeedCard({
                 title={t('card.post_options')}
                 snapPoints={['auto']}
               >
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 [&_.button]:min-h-11">
                   {isOwnPost ? (
                     <>
                       {canViewAnalytics && (
@@ -963,7 +961,7 @@ const FeedCard = React.memo(function FeedCard({
                 <div className="flex items-center gap-2.5">
                   <div className="flex flex-col items-center justify-center rounded-lg overflow-hidden border border-theme-default bg-[var(--surface-base)] w-11 h-12 shadow-sm" aria-hidden="true">
                     <div className="w-full px-1 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-gradient-to-r from-emerald-500 to-green-500 text-white text-center leading-tight">
-                      {dateForChip.toLocaleString(undefined, { month: 'short' })}
+                      {dateForChip.toLocaleString(getFormattingLocale(), { month: 'short' })}
                     </div>
                     <div className="flex-1 flex items-center justify-center text-lg font-bold tabular-nums text-theme-primary leading-none">
                       {dateForChip.getDate()}
@@ -1146,15 +1144,15 @@ const FeedCard = React.memo(function FeedCard({
         ) : item.image_url ? (
           <div
             className="mb-4 -mx-5 overflow-hidden relative"
-            onClick={doubleTapHandler}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doubleTapHandler(); } }}
-            role="button"
-            tabIndex={0}
-            aria-label={t('card.like_action')}
+            onClick={detailPath ? undefined : doubleTapHandler}
+            onKeyDown={detailPath ? undefined : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doubleTapHandler(); } }}
+            role={detailPath ? undefined : 'button'}
+            tabIndex={detailPath ? undefined : 0}
+            aria-label={detailPath ? undefined : t('card.like_action')}
           >
             <HeartOverlay show={showHeartOverlay} />
             {detailPath ? (
-              <Link to={tenantPath(detailPath)}>
+              <Link to={tenantPath(detailPath)} onClick={doubleTapHandler}>
                 <img
                   src={resolveThumbnailUrl(item.image_url, { width: 960, height: 540 })}
                   alt={t('card.image_alt', { type: typeLabel ?? t('card.type_post'), name: author.name })}

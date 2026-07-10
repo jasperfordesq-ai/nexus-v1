@@ -52,7 +52,7 @@ export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
     return (
       <GlassCard className="p-4">
         <div className="flex items-center gap-2 mb-3">
-          <TrendingUp className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+          <TrendingUp className="w-4 h-4 text-accent" aria-hidden="true" />
           <h3 className="font-semibold text-theme-primary text-sm">{t('trending.title')}</h3>
         </div>
         <div className="flex justify-center py-3" role="status" aria-busy="true" aria-label={t('common:loading')}>
@@ -67,7 +67,7 @@ export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
   return (
     <GlassCard className="p-4">
       <div className="flex items-center gap-2 mb-3">
-        <TrendingUp className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+        <TrendingUp className="w-4 h-4 text-accent" aria-hidden="true" />
         <h3 className="font-semibold text-theme-primary text-sm">{t('trending.title')}</h3>
       </div>
 
@@ -81,7 +81,7 @@ export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-xs font-bold text-theme-subtle w-4">{idx + 1}</span>
               <div className="min-w-0">
-                <span className="text-sm font-medium text-theme-primary group-hover:text-indigo-500 transition-colors">
+                <span className="text-sm font-medium text-theme-primary group-hover:text-accent transition-colors">
                   #{hashtag.tag}
                 </span>
                 <p className="text-xs text-theme-subtle">
@@ -100,7 +100,7 @@ export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
 
       <Link
         to={tenantPath('/feed/hashtags')}
-        className="block text-center text-xs text-indigo-500 hover:text-indigo-600 mt-3 pt-2 border-t border-theme-default"
+        className="block text-center text-xs text-accent hover:text-accent mt-3 pt-2 border-t border-theme-default"
       >
         {t('trending.view_all')}
       </Link>

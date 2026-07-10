@@ -132,6 +132,11 @@
     "no_challenges_found": "Níor aimsíodh aon dúshláin",
     "no_matching_challenges": "Níor aimsíodh aon dúshláin mheaitseála",
     "no_status_challenges": "Níor aimsíodh aon dúshláin stádais",
-    "tabs_aria": "Scagaire stádais dúshlán"
+    "tabs_aria": "Scagaire stádais dúshlán",
+    "total_count_few": "Iomlán: {{count}}",
+    "total_count_many": "Iomlán: {{count}}",
+    "total_count_one": "Iomlán: {{count}}",
+    "total_count_other": "Iomlán: {{count}}",
+    "total_count_two": "Iomlán: {{count}}"
   }
 }

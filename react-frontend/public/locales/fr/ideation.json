@@ -44,7 +44,12 @@
     "no_deadline": "Pas de date limite",
     "evaluation_criteria": "Criteres d'evaluation",
     "outcome": "Resultat",
-    "team_links": "Equipes de projet"
+    "team_links": "Equipes de projet",
+    "ideas_count_many": "{{count}} idees",
+    "ideas_count_other": "{{count}} idees",
+    "max_ideas_many": "Max. {{count}} idees par personne",
+    "max_ideas_one": "Max. {{count}} idees par personne",
+    "max_ideas_other": "Max. {{count}} idees par personne"
   },
   "challenges": {
     "title": "Defis",
@@ -87,7 +92,12 @@
     "draft_created": "Cree le {{date}}",
     "new_idea": "Nouvelle idee",
     "sort_label": "Trier les idées",
-    "loading": "Chargement des idées..."
+    "loading": "Chargement des idées...",
+    "your_ideas_many": "Vos idees : {{count}}/{{max}}",
+    "your_ideas_one": "Vos idees : {{count}}/{{max}}",
+    "your_ideas_other": "Vos idees : {{count}}/{{max}}",
+    "comments_many": "{{count}} commentaires",
+    "comments_other": "{{count}} commentaires"
   },
   "idea_detail": {
     "page_title": "Details de l'idee",
@@ -321,7 +331,9 @@
     "fallback_title": "Campagne",
     "feature_not_available": "Idéation non disponible",
     "feature_not_available_desc": "La fonctionnalité d'idéation n'est pas activée pour cette communauté. Contactez votre administrateur de banque de temps pour en savoir plus.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "challenges_count_many": "{{count}} defis",
+    "challenges_count_other": "{{count}} defis"
   },
   "templates": {
     "title": "Modeles de defis",

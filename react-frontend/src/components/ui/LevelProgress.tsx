@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useTranslation } from 'react-i18next';
 
 /**
@@ -37,7 +38,7 @@ export function LevelProgress({ currentXP, requiredXP, level, levelName, compact
             {levelName ? t('level_named', { level, name: levelName }) : t('level_plain', { level })}
           </span>
           <span className="text-theme-subtle text-sm">
-            {t('xp_progress', { current: safeCurrentXP.toLocaleString(), required: safeRequiredXP.toLocaleString() })}
+            {t('xp_progress', { current: safeCurrentXP.toLocaleString(getFormattingLocale()), required: safeRequiredXP.toLocaleString(getFormattingLocale()) })}
           </span>
         </div>
       )}
@@ -50,7 +51,7 @@ export function LevelProgress({ currentXP, requiredXP, level, levelName, compact
         aria-label={t('level_progress_aria', { level, percentage })}
       >
         <div
-          className="absolute inset-y-0 left-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-500"
+          className="absolute inset-y-0 left-0 bg-gradient-to-r from-accent via-accent-gradient-end to-pink-500 rounded-full transition-all duration-500"
           style={{ width: `${percentage}%` }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent dark:from-white/20 dark:to-transparent rounded-full" />
@@ -58,7 +59,7 @@ export function LevelProgress({ currentXP, requiredXP, level, levelName, compact
       {compact && (
         <div className="flex justify-between text-xs">
           <span className="text-theme-muted">
-            {t('xp_progress', { current: safeCurrentXP.toLocaleString(), required: safeRequiredXP.toLocaleString() })}
+            {t('xp_progress', { current: safeCurrentXP.toLocaleString(getFormattingLocale()), required: safeRequiredXP.toLocaleString(getFormattingLocale()) })}
           </span>
           <span className="text-theme-primary font-medium">{percentage}%</span>
         </div>

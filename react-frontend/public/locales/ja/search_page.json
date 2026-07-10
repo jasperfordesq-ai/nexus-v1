@@ -88,5 +88,21 @@
   "tabs_aria": "検索結果の種類のフィルター",
   "results_count_announcement": "{{count}} results found",
   "form_aria": "Search",
-  "delete_confirm": "この保存された検索を削除しますか?これを元に戻すことはできません。"
+  "delete_confirm": "この保存された検索を削除しますか?これを元に戻すことはできません。",
+  "results_count_announcement_other": "{{count}} の結果が見つかりました",
+  "tab_all_other": "すべて ({{count}})",
+  "tab_listings_other": "リスト ({{count}})",
+  "tab_members_other": "メンバー ({{count}})",
+  "tab_events_other": "イベント ({{count}})",
+  "tab_groups_other": "グループ ({{count}})",
+  "section_listings_other": "リスト ({{count}})",
+  "view_all_listings_other": "{{count}} のすべてのリストを表示",
+  "section_members_other": "メンバー ({{count}})",
+  "view_all_members_other": "{{count}} のすべてのメンバーを表示",
+  "section_events_other": "イベント ({{count}})",
+  "view_all_events_other": "{{count}} のすべてのイベントを表示",
+  "section_groups_other": "グループ ({{count}})",
+  "members_count_other": "{{count}} メンバー",
+  "view_all_groups_other": "{{count}} のすべてのグループを表示",
+  "saved_searches_other": "保存された検索 ({{count}})"
 }

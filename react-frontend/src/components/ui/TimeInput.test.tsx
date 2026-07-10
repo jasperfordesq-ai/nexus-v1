@@ -14,7 +14,7 @@ describe('TimeInput', () => {
 
   it('renders at least one group element (the input wrapper)', () => {
     // HeroUI TimeField renders nested group elements (outer field group + inner input group)
-    render(<TimeInput />);
+    render(<TimeInput aria-label="Time" />);
     const groups = screen.getAllByRole('group');
     expect(groups.length).toBeGreaterThanOrEqual(1);
   });
@@ -25,19 +25,20 @@ describe('TimeInput', () => {
   });
 
   it('does not render a label element when label is omitted', () => {
-    render(<TimeInput />);
+    render(<TimeInput aria-label="Time" />);
     // No label text present
     expect(screen.queryByText('Start time')).toBeNull();
   });
 
   it('renders a description when provided and not invalid', () => {
-    render(<TimeInput description="Pick a time" />);
+    render(<TimeInput aria-label="Time" description="Pick a time" />);
     expect(screen.getByText('Pick a time')).toBeInTheDocument();
   });
 
   it('renders errorMessage instead of description when isInvalid is true', () => {
     render(
       <TimeInput
+        aria-label="Time"
         isInvalid
         errorMessage="Time is required"
         description="Pick a time"
@@ -49,17 +50,17 @@ describe('TimeInput', () => {
   });
 
   it('does not render errorMessage when isInvalid is false', () => {
-    render(<TimeInput isInvalid={false} errorMessage="Error text" />);
+    render(<TimeInput aria-label="Time" isInvalid={false} errorMessage="Error text" />);
     expect(screen.queryByText('Error text')).toBeNull();
   });
 
   it('renders startContent when supplied', () => {
-    render(<TimeInput startContent={<span data-testid="prefix">⏰</span>} />);
+    render(<TimeInput aria-label="Time" startContent={<span data-testid="prefix">⏰</span>} />);
     expect(screen.getByTestId('prefix')).toBeInTheDocument();
   });
 
   it('renders endContent when supplied', () => {
-    render(<TimeInput endContent={<span data-testid="suffix">→</span>} />);
+    render(<TimeInput aria-label="Time" endContent={<span data-testid="suffix">→</span>} />);
     expect(screen.getByTestId('suffix')).toBeInTheDocument();
   });
 

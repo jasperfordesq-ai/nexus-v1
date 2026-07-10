@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Switch, Tabs, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -489,7 +490,7 @@ export default function RegionalPointsAdminPage() {
               {items.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell className="text-sm">
-                    {new Date(row.created_at).toLocaleDateString()}
+                    {new Date(row.created_at).toLocaleDateString(getFormattingLocale())}
                   </TableCell>
                   <TableCell className="text-sm">
                     {row.user_name || t('admin.regional_points.ledger.user_fallback', { id: row.user_id })}

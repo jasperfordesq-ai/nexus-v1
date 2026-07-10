@@ -59,13 +59,14 @@ class WebPushService
                 return false;
             }
 
-            $payload = json_encode(array_merge([
-                'title' => $title,
-                'body'  => $body,
-                'url'   => $link,
-                'type'  => $type,
-                'icon'  => '/icon-192.png',
-            ], $options));
+            $payload = $this->buildPayload(
+                $title,
+                $body,
+                $link,
+                $type,
+                $options,
+                \App\Core\TenantContext::getSlugPrefix()
+            );
 
             foreach ($subscriptions as $sub) {
                 $webPush->queueNotification(
@@ -127,6 +128,28 @@ class WebPushService
             }
         }
         return $sent;
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    protected function buildPayload(
+        $title,
+        $body,
+        $link,
+        $type,
+        array $options,
+        string $tenantPath
+    ): string {
+        return json_encode(array_merge([
+            'title' => $title,
+            'body' => $body,
+            'url' => $link,
+            'type' => $type,
+            'icon' => '/icons/icon-192.png',
+        ], $options, [
+            'tenant_path' => rtrim($tenantPath, '/'),
+        ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     }
 
     /**

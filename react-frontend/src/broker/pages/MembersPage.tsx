@@ -53,12 +53,12 @@ import type { AdminUser } from '@/admin/api/types';
 import { DataTable,
   ConfirmModal } from '@/admin/components';
 import type { Column } from '@/admin/components';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { parseServerTimestamp,
   formatServerDate,
   formatServerDateTime } from '@/lib/serverTime';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip, Select, SelectItem } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Textarea, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip, Select, SelectItem } from '@/components/ui';
 import {
   BrokerPageShell,
   BrokerStatCard,
@@ -644,7 +644,7 @@ export default function MembersPage() {
           <div className="flex items-center gap-1.5">
             <Coins size={14} className="text-muted" aria-hidden="true" />
             <span className="text-sm font-medium tabular-nums">
-              {typeof user.balance === 'number' ? user.balance.toLocaleString() : '0'}
+              {typeof user.balance === 'number' ? user.balance.toLocaleString(getFormattingLocale()) : '0'}
             </span>
             <span className="text-xs text-muted">{t('members.hours_short')}</span>
           </div>
@@ -1043,16 +1043,17 @@ export default function MembersPage() {
         <ModalContent>
           {notesUser && (
             <>
-              <ModalHeader className="flex items-center gap-3">
+              <ModalHeader className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3">
                 <Avatar
                   src={resolveAvatarUrl(notesUser.avatar_url || notesUser.avatar) || undefined}
                   name={notesUser.name}
                   size="sm"
+                  className="row-span-2"
                 />
-                <div>
-                  <p className="text-base font-semibold">{t('members.notes_for', { name: notesUser.name })}</p>
-                  <p className="text-xs text-muted font-normal">{notesUser.email}</p>
-                </div>
+                <ModalHeading className="text-base font-semibold">
+                  {t('members.notes_for', { name: notesUser.name })}
+                </ModalHeading>
+                <p className="text-xs text-muted font-normal">{notesUser.email}</p>
               </ModalHeader>
               <ModalBody>
                 {/* Add note */}

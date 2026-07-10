@@ -278,7 +278,9 @@
     "linked": "Połączone",
     "connected_accounts": "Połączone",
     "safeguarding": "Ochrona",
-    "translation": "Tłumaczenie"
+    "translation": "Tłumaczenie",
+    "linked-accounts": "Połączone konta",
+    "connected-accounts": "Połączone konta"
   },
   "safeguarding": {
     "page_title": "Preferencje ochrony",
@@ -588,7 +590,11 @@
     "unblocked_desc": "{{name}} został odblokowany.",
     "unblock_error": "Nie udało się odblokować użytkownika",
     "blocked_on": "Zablokowany na {{date}}",
-    "link": "Zablokowani użytkownicy"
+    "link": "Zablokowani użytkownicy",
+    "count_few": "{{count}} zablokowanych",
+    "count_many": "{{count}} zablokowanych",
+    "count_one": "{{count}} zablokowanych",
+    "count_other": "{{count}} zablokowanych"
   },
   "block_user": {
     "title": "Zablokować {{name}}?",
@@ -615,5 +621,17 @@
   "push_campaign_opt_in": "Otrzymuj promowane powiadomienia push",
   "push_campaign_opt_in_description": "Zezwól lokalnym firmom i organizacjom na wysyłanie ukierunkowanych powiadomień push. Możesz zrezygnować w dowolnym momencie.",
   "tabs_aria": "Sekcje ustawień",
-  "twofa_loading_setup": "Ładowanie konfiguracji dwuskładnikowej..."
+  "twofa_loading_setup": "Ładowanie konfiguracji dwuskładnikowej...",
+  "biometric_all_removed_few": "Usunięto klucze {{count}}.",
+  "biometric_all_removed_many": "Usunięto klucze {{count}}.",
+  "biometric_all_removed_one": "Usunięto klucze {{count}}.",
+  "biometric_all_removed_other": "Usunięto klucze {{count}}.",
+  "biometric_enabled_few": "Zarejestrowano klucz(e) {{count}}",
+  "biometric_enabled_many": "Zarejestrowano klucz(e) {{count}}",
+  "biometric_enabled_one": "Zarejestrowano klucz(e) {{count}}",
+  "biometric_enabled_other": "Zarejestrowano klucz(e) {{count}}",
+  "twofa_backup_remaining_few": "{{count}} kody zapasowe pozostałe",
+  "twofa_backup_remaining_many": "{{count}} kody zapasowe pozostałe",
+  "twofa_backup_remaining_one": "{{count}} kody zapasowe pozostałe",
+  "twofa_backup_remaining_other": "{{count}} kody zapasowe pozostałe"
 }

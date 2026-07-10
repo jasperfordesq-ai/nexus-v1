@@ -104,7 +104,9 @@
       "stats": {
         "total_runs": "Gesamtläufe",
         "total_proposals": "Gesamtvorschläge",
-        "pending_review": "{{count}} wartet auf Überprüfung"
+        "pending_review": "{{count}} wartet auf Überprüfung",
+        "pending_review_one": "{{count}} wartet auf Überprüfung",
+        "pending_review_other": "{{count}} wartet auf Überprüfung"
       },
       "agent_types": {
         "activity_summary": "Aktivitätszusammenfassung",
@@ -219,7 +221,9 @@
         "proposals_table_aria": "Vorschläge ausführen",
         "columns": {
           "subject": "Thema"
-        }
+        },
+        "proposals_count_one": "Vorschläge ({{count}})",
+        "proposals_count_other": "Vorschläge ({{count}})"
       },
       "toasts": {
         "approve_eligible_failed": "Geeignete Vorschläge konnten nicht genehmigt werden.",
@@ -235,7 +239,9 @@
         "run_details_load_failed": "Ausführungsdetails konnten nicht geladen werden.",
         "run_trigger_failed": "Ausführung konnte nicht ausgelöst werden.",
         "run_triggered": "Ausführung ausgelöst: {{count}}-Vorschläge generiert.",
-        "runs_load_failed": "Läufe konnten nicht geladen werden."
+        "runs_load_failed": "Läufe konnten nicht geladen werden.",
+        "run_triggered_one": "Ausführung ausgelöst: {{count}}-Vorschläge generiert.",
+        "run_triggered_other": "Ausführung ausgelöst: {{count}}-Vorschläge generiert."
       }
     },
     "module_docs": {
@@ -302,7 +308,9 @@
         "save_failed": "Speichern fehlgeschlagen.",
         "seed_failed": "Saatgut ist fehlgeschlagen.",
         "seeded": "Vorgegebene {{count}}-Standarddokumente.",
-        "updated": "Dokument aktualisiert."
+        "updated": "Dokument aktualisiert.",
+        "seeded_one": "Vorgegebene {{count}}-Standarddokumente.",
+        "seeded_other": "Vorgegebene {{count}}-Standarddokumente."
       }
     },
     "trace_metrics": {

@@ -147,7 +147,10 @@
         "date": "Data",
         "ip_address": "Indirizzo IP",
         "member_id": "Membro ID"
-      }
+      },
+      "truncated_many": "Mostra i 200 record più recenti. Esporta il registro completo CSV per scaricare tutti i record {{count}}.",
+      "truncated_one": "Mostra i 200 record più recenti. Esporta il registro completo CSV per scaricare tutti i record {{count}}.",
+      "truncated_other": "Mostra i 200 record più recenti. Esporta il registro completo CSV per scaricare tutti i record {{count}}."
     },
     "residency": {
       "article_16": "La comunicazione transfrontaliera dei dati personali è consentita se il Paese di destinazione garantisce un’adeguata protezione dei dati riconosciuta dal Consiglio federale. Gli stati membri Switzerland, EU/EEA e un piccolo elenco di altri paesi sono idonei.",

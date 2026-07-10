@@ -8,6 +8,7 @@
  * DataTable of recent error log entries.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect, useState, useCallback } from 'react';import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
@@ -85,7 +86,7 @@ export function ErrorLogs() {
       key: 'created_at',
       label: t('enterprise.col_date'),
       sortable: true,
-      render: (entry) => new Date(entry.created_at).toLocaleString(),
+      render: (entry) => new Date(entry.created_at).toLocaleString(getFormattingLocale()),
     },
   ];
 

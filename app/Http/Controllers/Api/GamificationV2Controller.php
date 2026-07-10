@@ -734,8 +734,13 @@ class GamificationV2Controller extends BaseApiController
     {
         $userId = $this->getUserId();
         $tenantId = TenantContext::getId();
-        $data = EngagementRecognitionService::getEngagementHistory($tenantId, $userId);
 
-        return $this->respondWithData($data);
+        try {
+            $data = EngagementRecognitionService::getEngagementHistory($tenantId, $userId);
+
+            return $this->respondWithData($data);
+        } catch (\Throwable $e) {
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
+        }
     }
 }

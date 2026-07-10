@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { useDisclosure, Button, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -126,7 +127,7 @@ export function Redirects() {
       key: 'created_at',
       label: t('col_created'),
       sortable: true,
-      render: (item) => new Date(item.created_at).toLocaleDateString(),
+      render: (item) => new Date(item.created_at).toLocaleDateString(getFormattingLocale()),
     },
     {
       key: 'actions',

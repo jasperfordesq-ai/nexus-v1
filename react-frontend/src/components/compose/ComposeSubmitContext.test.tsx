@@ -260,7 +260,7 @@ describe('ComposeSubmitContext / useComposeSubmit', () => {
           isSubmitting: false,
           onSubmit: vi.fn(),
           buttonLabel: 'Post',
-          gradientClass: 'from-purple-500 to-pink-500',
+          gradientClass: 'from-accent to-pink-500',
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
       }, []);
@@ -280,7 +280,7 @@ describe('ComposeSubmitContext / useComposeSubmit', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('gradient')).toHaveTextContent('from-purple-500 to-pink-500');
+      expect(screen.getByTestId('gradient')).toHaveTextContent('from-accent to-pink-500');
     });
   });
 

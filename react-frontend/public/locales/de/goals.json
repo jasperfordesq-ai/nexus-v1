@@ -120,7 +120,13 @@
       "offer_help": "Hilfsangebot",
       "celebration": "Feier",
       "note": "Notiz"
-    }
+    },
+    "streak_value_one": "{{count}} Check-ins",
+    "streak_value_other": "{{count}} Check-ins",
+    "best_streak_one": "Beste Serie: {{count}}",
+    "best_streak_other": "Beste Serie: {{count}}",
+    "checkins_value_one": "{{count}} aufgezeichnet",
+    "checkins_value_other": "{{count}} aufgezeichnet"
   },
   "template_picker": {
     "load_error": "Vorlagen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",

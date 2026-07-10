@@ -100,5 +100,7 @@
   "page_meta": {
     "title": "Polls"
   },
-  "category_filter_label": "Filter by category"
+  "category_filter_label": "Filter by category",
+  "total_ballots_one": "Total ballots: {{count}}",
+  "total_ballots_other": "Total ballots: {{count}}"
 }

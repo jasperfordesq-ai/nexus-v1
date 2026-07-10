@@ -128,7 +128,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
       label: t('org_dashboard.pending_hours'),
       value: stats.pending_hours,
       icon: Clock,
-      color: 'from-violet-500 to-purple-500',
+      color: 'from-violet-500 to-accent-gradient-end',
       tab: 'hours-review',
       badge: stats.pending_hours > 0,
     },
@@ -149,7 +149,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
       label: t('org_dashboard.active_opportunities'),
       value: stats.active_opportunities,
       icon: Briefcase,
-      color: 'from-indigo-500 to-blue-500',
+      color: 'from-accent to-blue-500',
     },
   ];
 

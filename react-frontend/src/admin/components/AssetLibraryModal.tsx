@@ -13,7 +13,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { Button, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from '@/components/ui';
+import { Button, Modal, ModalBody, ModalContent, ModalHeader, ModalHeading, Spinner } from '@/components/ui';
 import Upload from 'lucide-react/icons/upload';
 import { useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
@@ -90,7 +90,7 @@ export function AssetLibraryModal({ isOpen, onClose, onSelect, labels }: AssetLi
     <Modal isOpen={isOpen} onOpenChange={(open) => !open && onClose()} size="3xl" scrollBehavior="inside">
       <ModalContent>
         <ModalHeader className="flex items-center justify-between gap-4">
-          <span>{labels.title}</span>
+          <ModalHeading>{labels.title}</ModalHeading>
           <Button
             size="sm"
             variant="primary"

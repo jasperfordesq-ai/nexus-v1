@@ -92,7 +92,11 @@
     "get_directions": "Directions",
     "promoted": "Promoted",
     "unsave": "Remove from saved",
-    "save": "Save listing"
+    "save": "Save listing",
+    "available_count_one": "{{count}} available",
+    "available_count_other": "{{count}} available",
+    "views_count_one": "{{count}} views",
+    "views_count_other": "{{count}} views"
   },
   "offer": {
     "modal_title": "Make an Offer",
@@ -184,7 +188,9 @@
     "created_success": "Listing created successfully!",
     "created_error": "Failed to create listing",
     "created_error_retry": "Failed to create listing. Please try again.",
-    "draft_saved": "Draft saved"
+    "draft_saved": "Draft saved",
+    "title_char_count_one": "{{count}}/120 characters",
+    "title_char_count_other": "{{count}}/120 characters"
   },
   "search": {
     "category_search": "Search categories...",
@@ -228,7 +234,9 @@
     "price_from": "From {{min}}",
     "price_up_to": "Up to {{max}}",
     "last_days_one": "Last {{count}} day",
-    "last_days_other": "Last {{count}} days"
+    "last_days_other": "Last {{count}} days",
+    "reset_filters_one": "Reset Filters ({{count}})",
+    "reset_filters_other": "Reset Filters ({{count}})"
   },
   "seller": {
     "page_title": "Seller Profile",
@@ -285,7 +293,9 @@
     "results_count_one": "{{count}} result",
     "results_count_other": "{{count}} results",
     "load_more": "Load More",
-    "browse_description": "Browse {{name}} listings in the marketplace."
+    "browse_description": "Browse {{name}} listings in the marketplace.",
+    "reset_filters_one": "Reset Filters ({{count}})",
+    "reset_filters_other": "Reset Filters ({{count}})"
   },
   "common": {
     "loading": "Loading...",
@@ -426,7 +436,9 @@
     "empty_sold_title": "No Sales Yet",
     "empty_sold_description": "You haven't sold any items yet.",
     "empty_expired_title": "No Expired Listings",
-    "empty_expired_description": "You don't have any expired listings."
+    "empty_expired_description": "You don't have any expired listings.",
+    "views_count_aria_one": "{{count}} views",
+    "views_count_aria_other": "{{count}} views"
   },
   "my_offers": {
     "page_title": "My Offers - Marketplace",
@@ -584,7 +596,13 @@
       "declined": "Declined",
       "completed": "Completed",
       "cancelled": "Cancelled"
-    }
+    },
+    "offers_title_count_one": "Delivery Offers ({{count}})",
+    "offers_title_count_other": "Delivery Offers ({{count}})",
+    "time_credits_value_one": "{{count}} TC",
+    "time_credits_value_other": "{{count}} TC",
+    "estimated_minutes_one": "~{{count}} min",
+    "estimated_minutes_other": "~{{count}} min"
   },
   "pickup": {
     "my_pickups_title": "My Pickups",
@@ -613,7 +631,11 @@
     "oversold_protected": "Reject orders that would oversell",
     "sold_out": "Sold out",
     "low_chip": "Inventory: {{count}} (Low)",
-    "count_chip": "Inventory: {{count}}"
+    "count_chip": "Inventory: {{count}}",
+    "low_chip_one": "Inventory: {{count}} (Low)",
+    "low_chip_other": "Inventory: {{count}} (Low)",
+    "count_chip_one": "Inventory: {{count}}",
+    "count_chip_other": "Inventory: {{count}}"
   },
   "ai_reply": {
     "suggest": "Suggest Reply",
@@ -647,7 +669,9 @@
     "search_this_area": "Search This Area",
     "distance_km": "{{km}} km away",
     "distance_meters": "{{m}}m away",
-    "view_toggle": "View mode"
+    "view_toggle": "View mode",
+    "results_count_one": "{{count}} listings found nearby",
+    "results_count_other": "{{count}} listings found nearby"
   },
   "shipping": {
     "title": "Shipping Options",
@@ -778,7 +802,9 @@
       "select_rating": "Please select a rating",
       "success": "Rating submitted successfully!",
       "error": "Failed to submit rating"
-    }
+    },
+    "quantity_multiplier_one": "x{{count}}",
+    "quantity_multiplier_other": "x{{count}}"
   },
   "onboarding": {
     "page_title": "Seller Onboarding - Marketplace",

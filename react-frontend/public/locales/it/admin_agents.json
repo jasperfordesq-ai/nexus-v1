@@ -130,7 +130,10 @@
         "run_failed_with_error": "Esecuzione non riuscita: {{error}}",
         "toggle_failed": "Impossibile attivare/disattivare l'agente",
         "updated": "Agente aggiornato",
-        "update_failed": "Impossibile aggiornare l'agente"
+        "update_failed": "Impossibile aggiornare l'agente",
+        "run_created_many": "Esegui #{{runId}} proposte {{count}} create",
+        "run_created_one": "Esegui #{{runId}} proposte {{count}} create",
+        "run_created_other": "Esegui #{{runId}} proposte {{count}} create"
       }
     },
     "runs": {

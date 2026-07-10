@@ -29,7 +29,7 @@ import { MobileComposeOverlay } from './MobileComposeOverlay';
 import { GroupSelector } from './shared/GroupSelector';
 import { TemplatePicker } from './shared/TemplatePicker';
 import type { ComposeHubProps, ComposeTab, ComposeTabConfig } from './types';
-import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/Spinner';
 import { Tabs, Tab } from '@/components/ui/Tabs';
 
@@ -185,22 +185,19 @@ export function ComposeHub({
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-[var(--text-primary)] pb-2">
-            <div className="flex flex-col gap-3 w-full">
-              {/* Title row */}
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-                  <ActiveIcon className="w-4 h-4 text-white" aria-hidden="true" />
-                </div>
-                <span className="font-semibold flex-1">
-                  {editItem ? t('card.edit_post') : t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
-                </span>
-                {!editItem && <TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />}
-              </div>
+          <ModalHeader className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-3 pb-2 text-[var(--text-primary)]">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-accent-gradient-end flex items-center justify-center flex-shrink-0">
+              <ActiveIcon className="w-4 h-4 text-white" aria-hidden="true" />
+            </div>
+            <ModalHeading className="font-semibold">
+              {editItem ? t('card.edit_post') : t('compose.create_title', { type: t(`compose.tab_${activeTab}`) })}
+            </ModalHeading>
+            {!editItem && <TemplatePicker tab={activeTab} onSelect={handleTemplateSelect} />}
 
-              {/* Underlined tabs — hidden in edit mode (locked to Post tab) */}
-              {!editItem && (
-                <Tabs
+            {/* Underlined tabs — hidden in edit mode (locked to Post tab) */}
+            {!editItem && (
+              <Tabs
+                  className="col-span-3"
                   aria-label={t('compose.type_tabs_aria')}
                   selectedKey={activeTab}
                   onSelectionChange={(key) => setActiveTab(key as ComposeTab)}
@@ -209,7 +206,7 @@ export function ComposeHub({
                   classNames={{
                     tabList: 'gap-2 p-0 border-b border-[var(--border-default)]',
                     tab: 'min-h-[44px] px-3 text-[var(--text-muted)] data-[selected=true]:text-[var(--text-primary)]',
-                    cursor: 'bg-gradient-to-r from-indigo-500 to-purple-600 h-[2px] rounded-full',
+                    cursor: 'bg-gradient-to-r from-accent to-accent-gradient-end h-[2px] rounded-full',
                   }}
                 >
                   {tabs.map((tab) => {
@@ -226,9 +223,8 @@ export function ComposeHub({
                       />
                     );
                   })}
-                </Tabs>
-              )}
-            </div>
+              </Tabs>
+            )}
           </ModalHeader>
 
           <Separator className="bg-[var(--border-default)]" />

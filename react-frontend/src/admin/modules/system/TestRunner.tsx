@@ -1,5 +1,6 @@
 import { Card, CardBody, CardHeader, Button, Chip } from '@/components/ui';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import FlaskConical from 'lucide-react/icons/flask-conical';
 import Play from 'lucide-react/icons/play';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -8,6 +9,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components/PageHeader';
 import { adminTools } from '../../api/adminApi';
+import { formatNumber } from '@/lib/helpers';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -21,20 +23,21 @@ import { adminTools } from '../../api/adminApi';
 
 interface TestResult {
   name: string;
+  labelKey?: string;
   status: 'pending' | 'running' | 'pass' | 'fail';
   duration?: number;
   error?: string;
 }
 
 const INITIAL_TESTS: TestResult[] = [
-  { name: 'API Health Check', status: 'pending' },
-  { name: 'Database Connection', status: 'pending' },
-  { name: 'Redis Connection', status: 'pending' },
-  { name: 'Auth Token Generation', status: 'pending' },
-  { name: 'Tenant Bootstrap', status: 'pending' },
-  { name: 'File Upload (S3/Local)', status: 'pending' },
-  { name: 'Email Service', status: 'pending' },
-  { name: 'Pusher WebSocket', status: 'pending' },
+  { labelKey: 'test_runner.tests.api_health', name: 'API Health Check', status: 'pending' },
+  { labelKey: 'test_runner.tests.database', name: 'Database Connection', status: 'pending' },
+  { labelKey: 'test_runner.tests.redis', name: 'Redis Connection', status: 'pending' },
+  { labelKey: 'test_runner.tests.auth_token', name: 'Auth Token Generation', status: 'pending' },
+  { labelKey: 'test_runner.tests.tenant_bootstrap', name: 'Tenant Bootstrap', status: 'pending' },
+  { labelKey: 'test_runner.tests.file_upload', name: 'File Upload (S3/Local)', status: 'pending' },
+  { labelKey: 'test_runner.tests.email_service', name: 'Email Service', status: 'pending' },
+  { labelKey: 'test_runner.tests.pusher', name: 'Pusher WebSocket', status: 'pending' },
 ];
 
 const statusIcon = (status: string) => {
@@ -47,7 +50,8 @@ const statusIcon = (status: string) => {
 };
 
 export function TestRunner() {
-  usePageTitle("System");
+  const { t } = useTranslation('admin_system');
+  usePageTitle(t('system.test_runner_title'));
   const toast = useToast();
   const [tests, setTests] = useState<TestResult[]>(INITIAL_TESTS);
   const [running, setRunning] = useState(false);
@@ -97,23 +101,23 @@ export function TestRunner() {
 
         const failCount = results.filter(r => r.status !== 'pass').length;
         if (failCount > 0) {
-          toast.warning("Health Check Complete", `Tests failed`);
+          toast.warning(t('system.health_check_complete'), t('system.tests_failed'));
         } else {
-          toast.success("All health checks passed");
+          toast.success(t('system.all_health_checks_passed'));
         }
       } else {
         // API returned but no structured results; mark all as pass
         setTests(prev => prev.map(t => ({ ...t, status: 'pass' as const, duration: 0 })));
-        toast.success("Health checks completed");
+        toast.success(t('system.health_checks_completed'));
       }
     } catch {
       // On API error, mark all as failed
-      setTests(prev => prev.map(t => ({
-        ...t,
+      setTests(prev => prev.map(test => ({
+        ...test,
         status: 'fail' as const,
-        error: 'Health check API unavailable',
+        error: t('system.test_runner.api_unavailable'),
       })));
-      toast.error("Health Check failed", "Health Check Unreachable");
+      toast.error(t('system.health_check_failed'), t('system.health_check_unreachable'));
     } finally {
       setRunning(false);
     }
@@ -125,26 +129,26 @@ export function TestRunner() {
   return (
     <div>
       <PageHeader
-        title={"Test Runner"}
-        description={"Run automated tests to verify platform functionality"}
+        title={t('system.test_runner_title')}
+        description={t('system.test_runner_desc')}
         actions={
           <Button startContent={<Play size={16} />} onPress={runTests} isLoading={running}>
-            Run All Tests
+            {t('system.test_runner.run_all')}
           </Button>
         }
       />
 
       {(passCount > 0 || failCount > 0) && (
         <div className="flex gap-2 mb-4">
-          <Chip color="success" variant="soft">{passCount} passed</Chip>
-          {failCount > 0 && <Chip color="danger" variant="soft">{failCount} failed</Chip>}
+          <Chip color="success" variant="soft">{t('system.passed_count', { count: passCount })}</Chip>
+          {failCount > 0 && <Chip color="danger" variant="soft">{t('system.failed_count', { count: failCount })}</Chip>}
         </div>
       )}
 
       <Card >
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
-            <FlaskConical size={20} /> Test Suites
+            <FlaskConical size={20} /> {t('system.test_runner.suites')}
           </h3>
         </CardHeader>
         <CardBody>
@@ -154,14 +158,20 @@ export function TestRunner() {
                 <div className="flex items-center gap-3">
                   {statusIcon(test.status)}
                   <div>
-                    <span className="font-medium">{test.name}</span>
+                    <span className="font-medium">
+                      {test.labelKey
+                        ? t(test.labelKey)
+                        : t('system.test_runner.unknown_test', { name: test.name })}
+                    </span>
                     {test.error && (
                       <p className="text-xs text-danger mt-0.5">{test.error}</p>
                     )}
                   </div>
                 </div>
                 {test.duration !== undefined && (
-                  <span className="text-xs text-muted">{test.duration}ms</span>
+                  <span className="text-xs text-muted">
+                    {formatNumber(test.duration, { style: 'unit', unit: 'millisecond', unitDisplay: 'narrow' })}
+                  </span>
                 )}
               </div>
             ))}

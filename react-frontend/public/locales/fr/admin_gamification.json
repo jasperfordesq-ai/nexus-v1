@@ -306,6 +306,18 @@
     "audience_badge_holders": "Utilisateurs avec badge spécifique",
     "type_one_time": "Une fois",
     "type_recurring": "Récurrent",
-    "type_triggered": "Déclenché"
+    "type_triggered": "Déclenché",
+    "bulk_award_succeeded_count_many": "Obtention du badge{{count}}",
+    "bulk_award_succeeded_count_one": "Obtention du badge{{count}}",
+    "bulk_award_succeeded_count_other": "Obtention du badge{{count}}",
+    "badge_count_many": "Insignes{{count}}",
+    "badge_count_one": "Insignes{{count}}",
+    "badge_count_other": "Insignes{{count}}",
+    "threshold_count_many": "Seuil:{{count}}",
+    "threshold_count_one": "Seuil:{{count}}",
+    "threshold_count_other": "Seuil:{{count}}",
+    "xp_count_many": "{{count}}XP",
+    "xp_count_one": "{{count}}XP",
+    "xp_count_other": "{{count}}XP"
   }
 }

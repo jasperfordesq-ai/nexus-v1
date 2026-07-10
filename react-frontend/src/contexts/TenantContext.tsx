@@ -346,7 +346,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
   /**
    * Fetch tenant bootstrap data
    */
-  const refreshTenant = useCallback(async () => {
+  const loadTenant = useCallback(async (forceFresh: boolean) => {
     setState((prev) => ({ ...prev, isLoading: true, error: null, notFoundSlug: null }));
 
     try {
@@ -357,7 +357,11 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
         endpoint += `?slug=${encodeURIComponent(effectiveTenantSlug)}`;
       }
 
-      const response = await api.get<TenantConfig>(endpoint, { skipAuth: true, skipTenant: true });
+      const response = await api.get<TenantConfig>(endpoint, {
+        skipAuth: true,
+        skipTenant: true,
+        ...(forceFresh ? { cacheTtlMs: 0 } : {}),
+      });
 
       if (response.success && response.data) {
         const tenant = response.data;
@@ -416,7 +420,7 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
           error: null,
           notFoundSlug: null,
         });
-      } else if (response.code === 'SERVICE_UNAVAILABLE') {
+      } else if (response.code === 'MAINTENANCE_MODE') {
         // API is in maintenance mode — synthesise a tenant that triggers MaintenancePage
         setTelemetryTenant(null);
         setState({
@@ -425,30 +429,50 @@ export function TenantProvider({ children, tenantSlug }: TenantProviderProps) {
           error: null,
           notFoundSlug: null,
         });
-      } else {
-        // Bootstrap failed — if we had a slug, this is an unknown tenant (soft 404)
+      } else if (response.code === 'TENANT_NOT_FOUND' && effectiveTenantSlug) {
+        // Only the backend's explicit tenant lookup 404 may produce the soft-404 UI.
         setTelemetryTenant(null);
         setState({
           tenant: null,
           isLoading: false,
-          error: response.error ?? 'Failed to load tenant configuration',
-          notFoundSlug: effectiveTenantSlug || null,
+          error: response.error ?? 'TENANT_NOT_FOUND',
+          notFoundSlug: effectiveTenantSlug,
         });
+      } else {
+        // Network, timeout, 5xx, and unknown failures are retryable. Preserve a
+        // previously loaded tenant only when it is demonstrably the same tenant.
+        setTelemetryTenant(null);
+        setState((prev) => ({
+          tenant: prev.tenant && (
+            !effectiveTenantSlug || prev.tenant.slug === effectiveTenantSlug
+          ) ? prev.tenant : null,
+          isLoading: false,
+          error: response.error ?? response.code ?? 'TENANT_BOOTSTRAP_FAILED',
+          notFoundSlug: null,
+        }));
       }
     } catch (err) {
-      setState({
-        tenant: null,
+      setTelemetryTenant(null);
+      setState((prev) => ({
+        tenant: prev.tenant && (
+          !effectiveTenantSlug || prev.tenant.slug === effectiveTenantSlug
+        ) ? prev.tenant : null,
         isLoading: false,
-        error: err instanceof Error ? err.message : 'Failed to load tenant configuration',
+        error: err instanceof Error ? err.message : 'TENANT_BOOTSTRAP_FAILED',
         notFoundSlug: null,
-      });
+        }));
     }
   }, [effectiveTenantSlug]);
 
+  const refreshTenant = useCallback(
+    () => loadTenant(true),
+    [loadTenant],
+  );
+
   // Fetch tenant on mount or when slug changes
   useEffect(() => {
-    refreshTenant();
-  }, [refreshTenant]);
+    void loadTenant(false);
+  }, [loadTenant]);
 
   /**
    * Get features with fallback to defaults

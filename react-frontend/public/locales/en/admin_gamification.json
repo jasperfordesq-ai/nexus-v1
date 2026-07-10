@@ -306,6 +306,14 @@
     "audience_badge_holders": "Users with specific badge",
     "type_one_time": "One Time",
     "type_recurring": "Recurring",
-    "type_triggered": "Triggered"
+    "type_triggered": "Triggered",
+    "bulk_award_succeeded_count_one": "Awarded {{count}} badge",
+    "bulk_award_succeeded_count_other": "Awarded {{count}} badge",
+    "badge_count_one": "{{count}} badges",
+    "badge_count_other": "{{count}} badges",
+    "threshold_count_one": "Threshold: {{count}}",
+    "threshold_count_other": "Threshold: {{count}}",
+    "xp_count_one": "{{count}} XP",
+    "xp_count_other": "{{count}} XP"
   }
 }

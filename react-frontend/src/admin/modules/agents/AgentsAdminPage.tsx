@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -191,7 +192,7 @@ export default function AgentsAdminPage() {
                 {def.last_run_at && (
                   <Chip size="sm" variant="soft">
                     {t('agents.definitions.last_run', {
-                      date: new Date(def.last_run_at).toLocaleString(),
+                      date: new Date(def.last_run_at).toLocaleString(getFormattingLocale()),
                     })}
                   </Chip>
                 )}

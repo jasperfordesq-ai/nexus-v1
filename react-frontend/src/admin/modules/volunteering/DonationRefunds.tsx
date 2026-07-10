@@ -15,6 +15,7 @@
  *   POST /v2/admin/donations/{id}/refund   (Stripe full refund)
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -67,7 +68,7 @@ function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
   if (Number.isNaN(d.getTime())) return dateStr;
-  return d.toLocaleDateString(undefined, {
+  return d.toLocaleDateString(getFormattingLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -319,7 +320,7 @@ export function DonationRefunds() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard
           label={t('donation_refunds.total_donations')}
-          value={donations.length.toLocaleString()}
+          value={donations.length.toLocaleString(getFormattingLocale())}
           icon={Heart}
           color="primary"
           loading={loading}

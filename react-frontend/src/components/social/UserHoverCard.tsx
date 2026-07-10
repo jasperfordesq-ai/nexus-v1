@@ -13,7 +13,7 @@
 
 import { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui';
 import UserPlus from 'lucide-react/icons/user-plus';
 import UserCheck from 'lucide-react/icons/user-check';
 import Check from 'lucide-react/icons/check';
@@ -252,6 +252,7 @@ export const UserHoverCard = memo(function UserHoverCard({
         onMouseEnter={handlePopoverMouseEnter}
         onMouseLeave={handlePopoverMouseLeave}
       >
+        <PopoverHeading className="sr-only">{displayName}</PopoverHeading>
         {isLoading && !userData ? (
           <div className="p-4 space-y-3">
             <div className="flex items-center gap-3">
@@ -351,7 +352,7 @@ export const UserHoverCard = memo(function UserHoverCard({
                 <Button
                   size="sm"
                   variant="flat"
-                  className="h-8 min-w-0 w-full px-2 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20"
+                  className="h-8 min-w-0 w-full px-2 bg-accent/10 text-accent dark:text-accent hover:bg-accent/20"
                   startContent={<UserPlus className="w-3.5 h-3.5 shrink-0" />}
                   onPress={handleConnect}
                   isLoading={isConnecting}

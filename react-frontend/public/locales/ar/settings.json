@@ -278,7 +278,9 @@
     "linked": "المرتبطة",
     "connected_accounts": "متصل",
     "safeguarding": "الحماية",
-    "translation": "الترجمة"
+    "translation": "الترجمة",
+    "linked-accounts": "حسابات متصلة",
+    "connected-accounts": "الحسابات المتصلة"
   },
   "safeguarding": {
     "page_title": "تفضيلات الحماية",
@@ -588,7 +590,13 @@
     "unblocked_desc": "تم فك حظر {{name}}.",
     "unblock_error": "فشل في فك حظر المستخدم",
     "blocked_on": "محظور على {{date}}",
-    "link": "المستخدمون المحظورون"
+    "link": "المستخدمون المحظورون",
+    "count_few": "{{count}} محظور",
+    "count_many": "{{count}} محظور",
+    "count_one": "{{count}} محظور",
+    "count_other": "{{count}} محظور",
+    "count_two": "{{count}} محظور",
+    "count_zero": "{{count}} محظور"
   },
   "block_user": {
     "title": "هل تريد حظر {{name}}؟",
@@ -615,5 +623,23 @@
   "push_campaign_opt_in": "تلقي إشعارات دفع مروّجة",
   "push_campaign_opt_in_description": "السماح للشركات والمنظمات المحلية بإرسال إشعارات دفع مستهدفة إليك. يمكنك إلغاء الاشتراك في أي وقت.",
   "tabs_aria": "أقسام الإعدادات",
-  "twofa_loading_setup": "جارٍ تحميل الإعداد الثنائي..."
+  "twofa_loading_setup": "جارٍ تحميل الإعداد الثنائي...",
+  "biometric_all_removed_few": "تمت إزالة مفتاح (مفاتيح) المرور {{count}}.",
+  "biometric_all_removed_many": "تمت إزالة مفتاح (مفاتيح) المرور {{count}}.",
+  "biometric_all_removed_one": "تمت إزالة مفتاح (مفاتيح) المرور {{count}}.",
+  "biometric_all_removed_other": "تمت إزالة مفتاح (مفاتيح) المرور {{count}}.",
+  "biometric_all_removed_two": "تمت إزالة مفتاح (مفاتيح) المرور {{count}}.",
+  "biometric_all_removed_zero": "تمت إزالة مفتاح (مفاتيح) المرور {{count}}.",
+  "biometric_enabled_few": "تم تسجيل مفتاح (مفاتيح) المرور {{count}}",
+  "biometric_enabled_many": "تم تسجيل مفتاح (مفاتيح) المرور {{count}}",
+  "biometric_enabled_one": "تم تسجيل مفتاح (مفاتيح) المرور {{count}}",
+  "biometric_enabled_other": "تم تسجيل مفتاح (مفاتيح) المرور {{count}}",
+  "biometric_enabled_two": "تم تسجيل مفتاح (مفاتيح) المرور {{count}}",
+  "biometric_enabled_zero": "تم تسجيل مفتاح (مفاتيح) المرور {{count}}",
+  "twofa_backup_remaining_few": "{{count}} رموز النسخ الاحتياطي المتبقية",
+  "twofa_backup_remaining_many": "{{count}} رموز النسخ الاحتياطي المتبقية",
+  "twofa_backup_remaining_one": "{{count}} رموز النسخ الاحتياطي المتبقية",
+  "twofa_backup_remaining_other": "{{count}} رموز النسخ الاحتياطي المتبقية",
+  "twofa_backup_remaining_two": "{{count}} رموز النسخ الاحتياطي المتبقية",
+  "twofa_backup_remaining_zero": "{{count}} رموز النسخ الاحتياطي المتبقية"
 }

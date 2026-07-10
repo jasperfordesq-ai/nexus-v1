@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { CardBody, Card } from '@/components/ui/Card';
 import { Pagination } from '@/components/ui/Pagination';
@@ -163,7 +164,7 @@ export default function CollectionDetailPage() {
                       {title}
                     </Link>
                     <div className="text-xs text-[var(--text-muted)]">
-                      {item.item_type} · {new Date(item.saved_at).toLocaleDateString()}
+                      {item.item_type} · {new Date(item.saved_at).toLocaleDateString(getFormattingLocale())}
                     </div>
                     {item.note && <p className="text-sm text-[var(--text-muted)] mt-1">{item.note}</p>}
                   </div>

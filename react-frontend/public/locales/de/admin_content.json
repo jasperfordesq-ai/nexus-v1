@@ -1343,7 +1343,11 @@
     "resync_stripe": "Erneut mit Stripe synchronisieren",
     "sync_to_stripe": "Mit Stripe synchronisieren",
     "sync_stripe": "Mit Stripe synchronisieren",
-    "stripe_sync_description": "Erstellt oder aktualisiert das Stripe-Produkt und die Preise für diesen Plan. Erfordert STRIPE_SECRET_KEY."
+    "stripe_sync_description": "Erstellt oder aktualisiert das Stripe-Produkt und die Preise für diesen Plan. Erfordert STRIPE_SECRET_KEY.",
+    "active_tenants_cannot_delete_one": "{{count}}aktive(r) Mandant(en) – kann nicht gelöscht werden",
+    "active_tenants_cannot_delete_other": "{{count}}aktive(r) Mandant(en) – kann nicht gelöscht werden",
+    "filter_all_one": "Alle ({{count}})",
+    "filter_all_other": "Alle ({{count}})"
   },
   "data_table": {
     "admin_data_table": "Daten",

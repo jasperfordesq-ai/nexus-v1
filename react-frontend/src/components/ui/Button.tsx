@@ -42,13 +42,14 @@ type V2ButtonVariant =
 type V3ButtonVariant = NonNullable<HeroUIButtonProps['variant']>;
 type NativeButtonProps = Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
-  'children' | 'color'
+  'children' | 'color' | 'onClick'
 >;
 
 export type ButtonProps = Omit<
   HeroUIButtonProps,
   | 'children'
   | 'color'
+  | 'onClick'
   | 'variant'
   | 'isPending'
 > &
@@ -93,23 +94,70 @@ function mapVariant(
     return 'ghost';
   }
 
+  if (variant === 'bordered') {
+    return 'outline';
+  }
+
+  if (variant === 'light') {
+    return color === 'danger' ? 'danger-soft' : 'ghost';
+  }
+
+  if (variant === 'flat') {
+    return color === 'danger' ? 'danger-soft' : 'tertiary';
+  }
+
+  if (variant === 'faded') {
+    return 'secondary';
+  }
+
   if (color === 'danger') {
-    return variant === 'flat' || variant === 'light' ? 'danger-soft' : 'danger';
+    return 'danger';
   }
 
   if (color === 'secondary') {
     return 'secondary';
   }
 
-  if (variant === 'bordered' || variant === 'faded') {
-    return 'secondary';
-  }
-
-  if (variant === 'light' || variant === 'flat') {
-    return 'tertiary';
-  }
-
   return 'primary';
+}
+
+function statusIntentClass(
+  color?: V2ButtonColor,
+  variant?: ButtonProps['variant'],
+): string | undefined {
+  if (color !== 'success' && color !== 'warning') {
+    return undefined;
+  }
+
+  const isOutline = variant === 'bordered' || variant === 'ghost' || variant === 'outline';
+  const isSoft =
+    variant === 'flat' ||
+    variant === 'light' ||
+    variant === 'faded' ||
+    variant === 'secondary' ||
+    variant === 'tertiary';
+
+  if (color === 'success') {
+    if (isOutline) {
+      return 'border border-success [--button-bg:transparent] [--button-bg-hover:var(--success-soft)] [--button-bg-pressed:var(--success-soft-hover)] [--button-fg:var(--success-soft-foreground)]';
+    }
+
+    if (isSoft) {
+      return '[--button-bg:var(--success-soft)] [--button-bg-hover:var(--success-soft-hover)] [--button-bg-pressed:var(--success-soft-hover)] [--button-fg:var(--success-soft-foreground)]';
+    }
+
+    return '[--button-bg:var(--success)] [--button-bg-hover:var(--success-hover)] [--button-bg-pressed:var(--success-hover)] [--button-fg:var(--success-foreground)]';
+  }
+
+  if (isOutline) {
+    return 'border border-warning [--button-bg:transparent] [--button-bg-hover:var(--warning-soft)] [--button-bg-pressed:var(--warning-soft-hover)] [--button-fg:var(--warning-soft-foreground)]';
+  }
+
+  if (isSoft) {
+    return '[--button-bg:var(--warning-soft)] [--button-bg-hover:var(--warning-soft-hover)] [--button-bg-pressed:var(--warning-soft-hover)] [--button-fg:var(--warning-soft-foreground)]';
+  }
+
+  return '[--button-bg:var(--warning)] [--button-bg-hover:var(--warning-hover)] [--button-bg-pressed:var(--warning-hover)] [--button-fg:var(--warning-foreground)]';
 }
 
 function radiusClass(radius?: ButtonProps['radius']): string | undefined {
@@ -166,6 +214,8 @@ export function Button(
     const pending = isPending ?? isLoading ?? false;
     const disabledState = isDisabled ?? disabled ?? false;
     const mappedVariant = mapVariant(color, variant);
+    const colorIntent = color === 'success' || color === 'warning' ? color : undefined;
+    const colorIntentClassName = statusIntentClass(color, variant);
     const pendingIndicator = spinner ?? <HeroUISpinner color="current" size="sm" />;
     const content = typeof children === 'function'
       ? children
@@ -180,7 +230,13 @@ export function Button(
         );
 
     const sharedProps = {
-      className: combineClasses(classNames?.base, radiusClass(radius), className),
+      className: combineClasses(
+        classNames?.base,
+        radiusClass(radius),
+        colorIntentClassName,
+        className,
+      ),
+      'data-color-intent': colorIntent,
       fullWidth,
       isDisabled: disabledState,
       isIconOnly,
@@ -209,6 +265,7 @@ export function Button(
         fullWidth && 'w-full',
         classNames?.base,
         radiusClass(radius),
+        colorIntentClassName,
         className,
       );
       const handleClick = (event: MouseEvent<HTMLElement>) => {
@@ -218,7 +275,6 @@ export function Button(
           return;
         }
 
-        props.onClick?.(event as MouseEvent<HTMLButtonElement>);
         onPress?.(event as never);
       };
       const directProps = {
@@ -226,6 +282,7 @@ export function Button(
         'aria-disabled': disabledState || undefined,
         'data-disabled': disabledState || undefined,
         'data-pending': pending || undefined,
+        'data-color-intent': colorIntent,
         className: directClassName,
         onClick: handleClick,
         ref,

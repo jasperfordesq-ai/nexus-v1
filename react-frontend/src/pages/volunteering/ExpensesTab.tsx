@@ -7,6 +7,7 @@
  * ExpensesTab - View and submit volunteer expense claims
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion } from '@/lib/motion';
 
@@ -82,7 +83,7 @@ const STATUS_COLOR: Record<ExpenseStatus, 'warning' | 'success' | 'danger' | 'pr
 /* ───────────────────────── Component ───────────────────────── */
 
 const fmt = (val: number) =>
-  val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  val.toLocaleString(getFormattingLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export function ExpensesTab() {
   const { t } = useTranslation('volunteering');
@@ -313,7 +314,7 @@ export function ExpensesTab() {
                     <p className="text-sm text-theme-secondary mb-1">{expense.description}</p>
                     <div className="flex items-center gap-1 text-xs text-theme-subtle">
                       <Calendar className="w-3 h-3" aria-hidden="true" />
-                      {new Date(expense.submitted_at).toLocaleDateString()}
+                      {new Date(expense.submitted_at).toLocaleDateString(getFormattingLocale())}
                     </div>
                     {expense.review_notes && (
                       <p className="text-xs text-theme-subtle mt-1 italic">

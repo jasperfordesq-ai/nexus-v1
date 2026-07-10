@@ -10,6 +10,10 @@ import './index.css';
 import i18n from './i18n'; // Initialize i18n before App renders
 import type { ErrorInfo, ReactNode } from 'react';
 import { queueSentryBreadcrumb } from '@/lib/telemetryQueue';
+import { configureTenantManifestLink } from '@/lib/pwaManifest';
+import { installServiceWorkerLifecycle } from '@/lib/serviceWorkerLifecycle';
+
+configureTenantManifestLink();
 
 // Log build version to console for deployment verification
 console.info(`[NEXUS] Build: ${__BUILD_COMMIT__} | ${__BUILD_TIME__}`);
@@ -79,87 +83,10 @@ import '@/lib/installPrompt';
 // 5-minute ceiling. Linear / Notion / Slack all do this; the immediate
 // reload variant interrupted users mid-typing.
 if (import.meta.env.PROD) {
-  let _nexusRefreshing = false;
-
-  function isUserEditing(): boolean {
-    const el = document.activeElement as HTMLElement | null;
-    if (!el || el === document.body) return false;
-    const tag = el.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
-    if (el.isContentEditable) return true;
-    // Lexical / Slate / TipTap mount contenteditable inside a wrapper.
-    return !!el.closest?.('[contenteditable="true"]');
-  }
-
-  function performReload(reason: string): void {
-    if (_nexusRefreshing) return;
-    _nexusRefreshing = true;
-    addTelemetryBreadcrumb('SW controllerchange — reloading', 'pwa', { reason }, 'info');
-    const url = new URL(window.location.href);
-    url.searchParams.set('nexus_refresh', String(Date.now()));
-    try {
-      window.location.replace(url.href);
-    } catch {
-      window.location.href = url.href;
-    }
-  }
-
-  function safeReload(): void {
-    if (_nexusRefreshing) return;
-    if (!isUserEditing()) {
-      performReload('immediate');
-      return;
-    }
-    addTelemetryBreadcrumb('SW controllerchange — reload deferred (user editing)', 'pwa', {}, 'info');
-    // Reload at the next natural break-point: blur of the active element,
-    // tab hidden, page hide, or a 5-minute ceiling so we don't wait forever.
-    const ceiling = window.setTimeout(() => performReload('deferred-ceiling'), 5 * 60 * 1000);
-    const fire = (reason: string) => () => {
-      window.clearTimeout(ceiling);
-      performReload(reason);
-    };
-    const onBlur = fire('deferred-blur');
-    const onHidden = () => {
-      if (document.visibilityState === 'hidden') {
-        document.removeEventListener('visibilitychange', onHidden);
-        fire('deferred-tab-hidden')();
-      }
-    };
-    const onPageHide = fire('deferred-pagehide');
-    const editingEl = document.activeElement as HTMLElement | null;
-    editingEl?.addEventListener('blur', onBlur, { once: true });
-    document.addEventListener('visibilitychange', onHidden);
-    window.addEventListener('pagehide', onPageHide, { once: true });
-  }
-
-  navigator.serviceWorker?.addEventListener('controllerchange', safeReload);
-
-  if ('serviceWorker' in navigator) {
-    const registerServiceWorker = () => {
-      navigator.serviceWorker.register('/sw.js', {
-        scope: '/',
-        updateViaCache: 'none',
-      }).then((registration) => {
-        const updateSW = async () => {
-          try { await registration.update(); } catch { /* non-blocking */ }
-        };
-
-        // Periodically poll for SW updates so long-lived sessions eventually
-        // pick up new builds. updateViaCache:'none' on the registration
-        // guarantees this hits the network, not HTTP cache. When a new SW
-        // installs, skipWaiting + clientsClaim activate it immediately and the
-        // controllerchange listener above runs safeReload (deferred if editing).
-        setInterval(updateSW, 5 * 60 * 1000);
-        document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible') updateSW();
-        });
-      }).catch(() => {
-        // PWA registration is optional - app works without it.
-      });
-    };
-
-    runAfterFirstPaintIdle(registerServiceWorker);
-  }
+  installServiceWorkerLifecycle({
+    breadcrumb: addTelemetryBreadcrumb,
+    schedule: runAfterFirstPaintIdle,
+  });
 }
 
 // One-shot cleanup: strip the `?nexus_refresh=…` cache-bust query param that

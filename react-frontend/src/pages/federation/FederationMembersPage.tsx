@@ -43,7 +43,7 @@ import { FederatedTrustBadge } from '@/components/federation';
 import { FederationOptInNotice } from '@/components/federation/FederationOptInNotice';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 import type { FederatedMember, FederationPartner } from '@/types/api';
@@ -364,7 +364,7 @@ export function FederationMembersPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <Globe className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+          <Globe className="w-7 h-7 text-accent dark:text-accent" aria-hidden="true" />
           {t('members.title')}
         </h1>
         <p className="text-theme-muted mt-1">
@@ -467,7 +467,7 @@ export function FederationMembersPage() {
             size="sm"
             className="bg-theme-elevated text-theme-muted"
           >
-            {t('members.showing_count', { shown: visibleResultCount.toLocaleString(), total: totalCount.toLocaleString() })}
+            {t('members.showing_count', { shown: visibleResultCount.toLocaleString(getFormattingLocale()), total: totalCount.toLocaleString(getFormattingLocale()) })}
           </Chip>
           {externalResultCount > 0 && (
             <Chip
@@ -614,7 +614,7 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
           />
           {/* Community badge overlay */}
           <div
-            className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center ring-2 ring-white dark:ring-gray-900"
+            className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-accent flex items-center justify-center ring-2 ring-white dark:ring-gray-900"
             title={member.timebank.name}
           >
             <Globe className="w-3 h-3 text-white" aria-hidden="true" />
@@ -629,7 +629,7 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
             <Chip
               size="sm"
               variant="flat"
-              className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+              className="bg-accent/10 text-accent dark:text-accent"
               startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
             >
               {member.timebank.name}
@@ -638,7 +638,7 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
               <Chip
                 size="sm"
                 variant="flat"
-                className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                className="bg-accent/10 text-accent dark:text-accent"
                 startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
               >
                 {t('external')}

@@ -139,7 +139,21 @@
     "delete_series_note": "Dit is een terugkerend evenement. Als u het verwijdert, worden ook alle toekomstige herhalingen verwijderd.",
     "cancel_series_note": "Dit is een terugkerend evenement. Bij annulering worden ook alle toekomstige herhalingen geannuleerd en worden de deelnemers op de hoogte gebracht.",
     "series_dates_title": "Komende data in deze serie",
-    "series_this_date": "Deze datum"
+    "series_this_date": "Deze datum",
+    "events_in_series_one": "{{count}} gebeurtenissen in serie",
+    "events_in_series_other": "{{count}} gebeurtenissen in serie",
+    "max_capacity_one": "{{count}} maximale capaciteit",
+    "max_capacity_other": "{{count}} maximale capaciteit",
+    "spots_left_one": "{{count}} plekjes vrij",
+    "spots_left_other": "{{count}} plekjes vrij",
+    "waitlist_count_one": "{{count}} op wachtlijst",
+    "waitlist_count_other": "{{count}} op wachtlijst",
+    "more_attendees_one": "+{{count}} meer",
+    "more_attendees_other": "+{{count}} meer",
+    "attendance_total_one": "{{count}} reacties",
+    "attendance_total_other": "{{count}} reacties",
+    "view_all_series_one": "Bekijk alle {{count}} gebeurtenissen in series",
+    "view_all_series_other": "Bekijk alle {{count}} gebeurtenissen in series"
   },
   "card": {
     "cancelled": "Geannuleerd",
@@ -152,7 +166,9 @@
     "repeats_yearly": "Wordt jaarlijks herhaald",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
-    "series_dates_other": "{{count}} dates"
+    "series_dates_other": "{{count}} dates",
+    "spots_left_one": "{{count}} plekjes vrij",
+    "spots_left_other": "{{count}} plekjes vrij"
   },
   "form": {
     "create_title": "Maak een nieuw evenement",
@@ -300,7 +316,9 @@
     "total_votes": "{{count}} stemmen",
     "vote_success": "Stem opgenomen!",
     "vote_failed": "Kan de stemming niet registreren",
-    "view_full": "Bekijk de volledige opiniepeiling"
+    "view_full": "Bekijk de volledige opiniepeiling",
+    "total_votes_one": "{{count}} stemmen",
+    "total_votes_other": "{{count}} stemmen"
   },
   "radius_5": "5 km",
   "radius_10": "10 km",
@@ -318,5 +336,9 @@
   "active_filters": "Actieve filters",
   "active_search": "Zoek: {{query}}",
   "active_near_me": "Binnen {{radius}} km",
-  "clear_filters": "Filters wissen"
+  "clear_filters": "Filters wissen",
+  "going_one": "{{count}} gaat",
+  "going_other": "{{count}} gaat",
+  "interested_one": "{{count}} geïnteresseerd",
+  "interested_other": "{{count}} geïnteresseerd"
 }

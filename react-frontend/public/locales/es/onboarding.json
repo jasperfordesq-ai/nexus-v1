@@ -132,5 +132,17 @@
   "page_meta": {
     "title": "Incorporación"
   },
-  "aria_step_progress": "Step {{step}} of {{total}}"
+  "aria_step_progress": "Step {{step}} of {{total}}",
+  "bio_char_count_many": "{{count}} caracteres",
+  "bio_char_count_one": "{{count}} caracteres",
+  "bio_char_count_other": "{{count}} caracteres",
+  "count_selected_many": "{{count}} seleccionadas",
+  "count_selected_one": "{{count}} seleccionadas",
+  "count_selected_other": "{{count}} seleccionadas",
+  "skills_to_offer_count_many": "{{count}} habilidad(es) para ofrecer",
+  "skills_to_offer_count_one": "{{count}} habilidad(es) para ofrecer",
+  "skills_to_offer_count_other": "{{count}} habilidad(es) para ofrecer",
+  "skills_needed_count_many": "{{count}} habilidad(es) necesitadas",
+  "skills_needed_count_one": "{{count}} habilidad(es) necesitadas",
+  "skills_needed_count_other": "{{count}} habilidad(es) necesitadas"
 }

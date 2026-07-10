@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback } from 'react';
 
 import Activity from 'lucide-react/icons/activity';
@@ -61,7 +62,7 @@ const getDurationColor = (ms: number) => {
 };
 
 const formatTimestamp = (timestamp: string) => {
-  return new Date(timestamp).toLocaleString();
+  return new Date(timestamp).toLocaleString(getFormattingLocale());
 };
 
 export default function PerformanceDashboard() {

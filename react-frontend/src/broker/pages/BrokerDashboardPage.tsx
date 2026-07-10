@@ -14,6 +14,7 @@
  * Parity: PHP BrokerControlsController::dashboard()
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -107,7 +108,7 @@ const tileBgClass: Record<BrokerStatColor, string> = {
 
 function HeroTotal({ value }: { value: number }) {
   const display = useCountUp(value);
-  return <>{display.toLocaleString()}</>;
+  return <>{display.toLocaleString(getFormattingLocale())}</>;
 }
 
 export function BrokerDashboard() {
@@ -596,7 +597,7 @@ function formatTimeAgo(dateStr: string, t: TFunc): string {
   if (diffHrs < 24) return t('dashboard.time_hours_ago', { count: diffHrs });
   const diffDays = Math.floor(diffHrs / 24);
   if (diffDays < 7) return t('dashboard.time_days_ago', { count: diffDays });
-  return date.toLocaleDateString();
+  return date.toLocaleDateString(getFormattingLocale());
 }
 
 export default BrokerDashboard;

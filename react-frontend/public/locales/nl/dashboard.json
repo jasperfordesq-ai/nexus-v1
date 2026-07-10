@@ -90,7 +90,9 @@
     "members_count": "{{count}} leden",
     "empty": "Je bent nog niet lid van groepen",
     "empty_description": "Groepen helpen je gedeelde interesses, projecten en lokale kringen te volgen.",
-    "discover": "Ontdek groepen"
+    "discover": "Ontdek groepen",
+    "members_count_one": "{{count}} leden",
+    "members_count_other": "{{count}} leden"
   },
   "events": {
     "online_event": "Online evenement",
@@ -106,7 +108,9 @@
     "xp_progress": "XP Vooruitgang",
     "start_earning": "Begin XP te verdienen door deel te nemen aan de gemeenschap!",
     "streak_days_one": "{{count}} dag",
-    "streak_days_other": "{{count}} dagen"
+    "streak_days_other": "{{count}} dagen",
+    "xp_value_one": "{{count}} XP",
+    "xp_value_other": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "Laden van lijsten",
@@ -150,5 +154,9 @@
       "active": "Actief"
     },
     "view_all": "Alle uitwisselingen bekijken"
-  }
+  },
+  "likes_count_one": "{{count}} vind-ik-leuks",
+  "likes_count_other": "{{count}} vind-ik-leuks",
+  "comments_count_one": "{{count}} opmerkingen",
+  "comments_count_other": "{{count}} opmerkingen"
 }

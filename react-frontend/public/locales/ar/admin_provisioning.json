@@ -116,7 +116,8 @@
       "intended_use": "الاستخدام المقصود",
       "rejection_reason": "سبب الرفض",
       "provisioning_log": "سجل التزويد"
-    }
+    },
+    "loading": "جارٍ تحميل طلبات التوفير…"
   },
   "loading": "Loading",
   "refresh": "ينعش"

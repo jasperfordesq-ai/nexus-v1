@@ -83,8 +83,8 @@ function getBadgeConfig(t: (key: string) => string): Record<string, BadgeConfigE
     admin_verified: {
       icon: <UserCheck className="w-3.5 h-3.5" />,
       iconSm: <UserCheck className="w-3 h-3" />,
-      color: 'text-indigo-600 dark:text-indigo-400',
-      bgColor: 'bg-indigo-500/10',
+      color: 'text-accent dark:text-accent',
+      bgColor: 'bg-accent/10',
       label: t('verification.badge.admin_verified'),
     },
   };

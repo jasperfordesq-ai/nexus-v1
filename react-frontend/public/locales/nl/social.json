@@ -62,12 +62,20 @@
     "minutes_ago": "{{count}}m geleden",
     "hours_ago": "{{count}}u geleden",
     "days_ago": "{{count}}d geleden",
-    "last_seen": "Laatst gezien {{time}}"
+    "last_seen": "Laatst gezien {{time}}",
+    "minutes_ago_one": "{{count}}m geleden",
+    "minutes_ago_other": "{{count}}m geleden",
+    "hours_ago_one": "{{count}}u geleden",
+    "hours_ago_other": "{{count}}u geleden",
+    "days_ago_one": "{{count}}d geleden",
+    "days_ago_other": "{{count}}d geleden"
   },
   "mention": {
     "suggestions_aria": "Vermelding suggesties, {{count}} resultaten",
     "no_users": "Geen gebruikers gevonden",
-    "connected": "Verbonden"
+    "connected": "Verbonden",
+    "suggestions_aria_one": "Vermelding suggesties, {{count}} resultaten",
+    "suggestions_aria_other": "Vermelding suggesties, {{count}} resultaten"
   },
   "status": {
     "set_status": "Status instellen",
@@ -153,7 +161,9 @@
     "collection_description": "Beschrijving (optioneel)",
     "cancel": "Annuleren",
     "save": "Opslaan",
-    "create": "Aanmaken"
+    "create": "Aanmaken",
+    "count_one": "{{count}} opgeslagen items",
+    "count_other": "{{count}} opgeslagen items"
   },
   "verified": "Geverifieerd",
   "hover_card": {
@@ -163,7 +173,13 @@
     "message": "Bericht",
     "hours_given": "{{count}} uur gegeven",
     "connections": "{{count}} verbindingen",
-    "listings": "{{count}} advertenties"
+    "listings": "{{count}} advertenties",
+    "hours_given_one": "{{count}} uur gegeven",
+    "hours_given_other": "{{count}} uur gegeven",
+    "connections_one": "{{count}} verbindingen",
+    "connections_other": "{{count}} verbindingen",
+    "listings_one": "{{count}} advertenties",
+    "listings_other": "{{count}} advertenties"
   },
   "reactions_tabs_aria": "Reactietypefilter",
   "content_type_tabs_aria": "Voeg een bladwijzer voor het inhoudstypefilter toe",

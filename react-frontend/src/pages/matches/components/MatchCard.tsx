@@ -211,7 +211,7 @@ export function MatchCard({ match, index, highlightId, onDismissed }: MatchCardP
               {/* Explanation or reasons */}
               {match.explanation ? (
                 <div className="flex items-start gap-2 p-2.5 rounded-lg bg-theme-elevated mb-2">
-                  <Sparkles className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                  <Sparkles className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" aria-hidden="true" />
                   <div className="min-w-0">
                     <p className="text-sm text-theme-secondary">{match.explanation}</p>
                     {match.explanation_source === 'ai' && (
@@ -273,7 +273,7 @@ export function MatchCard({ match, index, highlightId, onDismissed }: MatchCardP
                   as={Link}
                   to={tenantPath(`/messages?to=${match.user_id}&listing=${detailId}`)}
                   size="sm"
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                   startContent={<MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />}
                 >
                   {t('card.message')}
@@ -288,7 +288,7 @@ export function MatchCard({ match, index, highlightId, onDismissed }: MatchCardP
                   {!hasJoined && (
                     <Button
                       size="sm"
-                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                      className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                       isLoading={isJoining}
                       onPress={handleJoinGroup}
                     >

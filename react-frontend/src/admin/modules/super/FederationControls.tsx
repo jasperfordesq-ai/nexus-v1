@@ -313,7 +313,13 @@ export function FederationControls() {
               <div className="space-y-2 text-muted">
                 <p>
                   {t('super.jwt_what_p1_intro')}{' '}
-                  <strong>api_key</strong>, <strong>hmac</strong>, <strong>oauth2</strong>, {t('super.common_and')}{' '}
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Authentication method identifier must remain verbatim. */}
+                  <strong>api_key</strong>,
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Authentication method identifier must remain verbatim. */}
+                  <strong>hmac</strong>,
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Authentication method identifier must remain verbatim. */}
+                  <strong>oauth2</strong>, {t('super.common_and')}{' '}
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Authentication method identifier must remain verbatim. */}
                   <strong>jwt</strong>. {t('super.jwt_what_p1_suffix')}
                 </p>
                 <p>
@@ -334,6 +340,7 @@ export function FederationControls() {
               <div className="space-y-3 text-muted">
                 <div>
                   <p className="mb-1"><strong>{t('super.step_number', { number: 1 })}</strong> {t('super.jwt_setup_step_1')}</p>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
                   <Snippet size="sm" symbol="$" hideCopyButton={false}>openssl rand -hex 32</Snippet>
                   <p className="text-xs text-muted mt-1">{t('super.jwt_setup_step_1_note')}</p>
                 </div>
@@ -341,21 +348,50 @@ export function FederationControls() {
                 <div>
                   <p className="mb-1"><strong>{t('super.step_number', { number: 2 })}</strong> {t('super.jwt_setup_step_2')}</p>
                   <ul className="list-disc pl-5 space-y-1 text-xs">
-                    <li><strong>{t('super.jwt_setup_docker_env')}</strong> {t('super.jwt_setup_append_to')} <Code size="sm">/opt/nexus-php/.env</Code>:<br/>
+                    <li><strong>{t('super.jwt_setup_docker_env')}</strong> {t('super.jwt_setup_append_to')}{' '}
+                      {/* eslint-disable-next-line i18next/no-literal-string -- Environment file path must remain verbatim. */}
+                      <Code size="sm">/opt/nexus-php/.env</Code>:<br/>
+                      {/* eslint-disable-next-line i18next/no-literal-string -- Environment assignment must remain verbatim. */}
                       <Code size="sm">FEDERATION_JWT_SECRET=&lt;paste 64-char hex&gt;</Code><br/>
+                      {/* eslint-disable-next-line i18next/no-literal-string -- Environment assignment must remain verbatim. */}
                       <Code size="sm">FEDERATION_JWT_ISSUER=https://api.your-domain.com</Code>
                     </li>
-                    <li><strong>{t('super.jwt_setup_docker_no_env')}</strong> {t('super.jwt_setup_docker_no_env_body')} <Code size="sm">environment:</Code> {t('super.jwt_setup_compose_key_suffix')}</li>
-                    <li><strong>{t('super.jwt_setup_kubernetes')}</strong> {t('super.jwt_setup_kubernetes_body')} <Code size="sm">{t('super.kubernetes_secret_resource')}</Code> {t('super.jwt_setup_and_reference')} <Code size="sm">envFrom</Code> {t('super.common_or')} <Code size="sm">env.valueFrom.secretKeyRef</Code>.</li>
-                    <li><strong>{t('super.jwt_setup_aws')}</strong> {t('super.jwt_setup_aws_body')} <Code size="sm">secrets</Code> {t('super.jwt_setup_aws_middle')} <Code size="sm">environment</Code> {t('super.jwt_setup_aws_suffix')}</li>
-                    <li><strong>{t('super.jwt_setup_paas')}</strong> <Code size="sm">heroku config:set FEDERATION_JWT_SECRET=&lt;hex&gt;</Code> {t('super.jwt_setup_paas_suffix')}</li>
-                    <li><strong>{t('super.jwt_setup_systemd')}</strong> {t('super.jwt_setup_systemd_body')} <Code size="sm">Environment=&quot;FEDERATION_JWT_SECRET=&lt;hex&gt;&quot;</Code> {t('super.jwt_setup_systemd_suffix')}</li>
-                    <li><strong>{t('super.jwt_setup_hosting_panel')}</strong> {t('super.jwt_setup_hosting_panel_body')} <Code size="sm">&lt;environmentVariables&gt;</Code>).</li>
+                    <li><strong>{t('super.jwt_setup_docker_no_env')}</strong> {t('super.jwt_setup_docker_no_env_body')}{' '}
+                      {/* eslint-disable-next-line i18next/no-literal-string -- Compose key must remain verbatim. */}
+                      <Code size="sm">environment:</Code> {t('super.jwt_setup_compose_key_suffix')}
+                    </li>
+                    <li><strong>{t('super.jwt_setup_kubernetes')}</strong> {t('super.jwt_setup_kubernetes_body')} <Code size="sm">{t('super.kubernetes_secret_resource')}</Code> {t('super.jwt_setup_and_reference')}{' '}
+                      {/* eslint-disable-next-line i18next/no-literal-string -- Kubernetes key must remain verbatim. */}
+                      <Code size="sm">envFrom</Code> {t('super.common_or')}{' '}
+                      {/* eslint-disable-next-line i18next/no-literal-string -- Kubernetes key path must remain verbatim. */}
+                      <Code size="sm">env.valueFrom.secretKeyRef</Code>.
+                    </li>
+                    <li><strong>{t('super.jwt_setup_aws')}</strong> {t('super.jwt_setup_aws_body')}{' '}
+                      {/* eslint-disable-next-line i18next/no-literal-string -- AWS configuration key must remain verbatim. */}
+                      <Code size="sm">secrets</Code> {t('super.jwt_setup_aws_middle')}{' '}
+                      {/* eslint-disable-next-line i18next/no-literal-string -- AWS configuration key must remain verbatim. */}
+                      <Code size="sm">environment</Code> {t('super.jwt_setup_aws_suffix')}
+                    </li>
+                    <li><strong>{t('super.jwt_setup_paas')}</strong>{' '}
+                      {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
+                      <Code size="sm">heroku config:set FEDERATION_JWT_SECRET=&lt;hex&gt;</Code> {t('super.jwt_setup_paas_suffix')}
+                    </li>
+                    <li><strong>{t('super.jwt_setup_systemd')}</strong> {t('super.jwt_setup_systemd_body')}{' '}
+                      {/* eslint-disable-next-line i18next/no-literal-string -- systemd assignment must remain verbatim. */}
+                      <Code size="sm">Environment=&quot;FEDERATION_JWT_SECRET=&lt;hex&gt;&quot;</Code> {t('super.jwt_setup_systemd_suffix')}
+                    </li>
+                    <li><strong>{t('super.jwt_setup_hosting_panel')}</strong> {t('super.jwt_setup_hosting_panel_body')}{' '}
+                      {/* eslint-disable-next-line i18next/no-literal-string -- Hosting-panel XML element must remain verbatim. */}
+                      <Code size="sm">&lt;environmentVariables&gt;</Code>).
+                    </li>
                   </ul>
                 </div>
 
                 <div>
-                  <p className="mb-1"><strong>{t('super.step_number', { number: 3 })}</strong> {t('super.jwt_setup_step_3_prefix')} <Code size="sm">php artisan config:cache</Code>{t('super.jwt_setup_step_3_suffix')}</p>
+                  <p className="mb-1"><strong>{t('super.step_number', { number: 3 })}</strong> {t('super.jwt_setup_step_3_prefix')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
+                    <Code size="sm">php artisan config:cache</Code>{t('super.jwt_setup_step_3_suffix')}
+                  </p>
                 </div>
 
                 <div>
@@ -378,7 +414,10 @@ export function FederationControls() {
                 </ul>
                 <p><strong>{t('super.jwt_rotation_procedure')}</strong></p>
                 <ol className="list-decimal pl-5 space-y-1">
-                  <li>{t('super.jwt_rotate_step_1')} <Code size="sm">openssl rand -hex 32</Code>.</li>
+                  <li>{t('super.jwt_rotate_step_1')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
+                    <Code size="sm">openssl rand -hex 32</Code>.
+                  </li>
                   <li>{t('super.jwt_rotate_step_2_prefix')} <Code size="sm">FEDERATION_JWT_SECRET</Code> {t('super.jwt_rotate_step_2_suffix')}</li>
                   <li>{t('super.jwt_rotate_step_3')}</li>
                   <li>{t('super.jwt_rotate_step_4')}</li>
@@ -398,12 +437,21 @@ export function FederationControls() {
                 <p><strong>{t('super.jwt_troubleshoot_not_configured')}</strong></p>
                 <ul className="list-disc pl-5 space-y-1">
                   <li>{t('super.jwt_troubleshoot_restart')}</li>
-                  <li>{t('super.jwt_troubleshoot_config_cache_prefix')} <Code size="sm">php artisan config:cache</Code>{t('super.jwt_troubleshoot_config_cache_suffix')}</li>
-                  <li>{t('super.jwt_troubleshoot_printenv')} <Code size="sm">docker exec nexus-php-app printenv FEDERATION_JWT_SECRET</Code>.</li>
+                  <li>{t('super.jwt_troubleshoot_config_cache_prefix')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
+                    <Code size="sm">php artisan config:cache</Code>{t('super.jwt_troubleshoot_config_cache_suffix')}
+                  </li>
+                  <li>{t('super.jwt_troubleshoot_printenv')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
+                    <Code size="sm">docker exec nexus-php-app printenv FEDERATION_JWT_SECRET</Code>.
+                  </li>
                 </ul>
                 <p className="pt-2"><strong>{t('super.jwt_troubleshoot_low_bits')}</strong></p>
                 <ul className="list-disc pl-5 space-y-1">
-                  <li>{t('super.jwt_troubleshoot_low_bits_body_prefix')} <Code size="sm">openssl rand -hex 32</Code> {t('super.jwt_troubleshoot_low_bits_body_suffix')}</li>
+                  <li>{t('super.jwt_troubleshoot_low_bits_body_prefix')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
+                    <Code size="sm">openssl rand -hex 32</Code> {t('super.jwt_troubleshoot_low_bits_body_suffix')}
+                  </li>
                 </ul>
                 <p className="pt-2"><strong>{t('super.jwt_troubleshoot_needed')}</strong></p>
                 <ul className="list-disc pl-5 space-y-1">

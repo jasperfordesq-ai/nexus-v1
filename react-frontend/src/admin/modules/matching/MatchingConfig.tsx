@@ -1,5 +1,10 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Input, Button, Spinner, Switch, Select, SelectItem, Tooltip, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Slider } from '@/components/ui';
 import { Separator } from '@/components/ui';
@@ -8,17 +13,18 @@ import Save from 'lucide-react/icons/save';
 import Trash2 from 'lucide-react/icons/trash-2';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import Lock from 'lucide-react/icons/lock';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { ConfirmModal } from '../../components/ConfirmModal';
+import { EmptyState } from '../../components/EmptyState';
 import type { SmartMatchingConfig, MatchingGatesConfig, MatchingAiConfig } from '../../api/types';
 import { useTranslation } from 'react-i18next';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
+import { logError } from '@/lib/logger';
+import { isSmartMatchingConfig } from './matchingResponseGuards';
 
 /**
  * Matching Configuration Page
@@ -59,30 +65,42 @@ export function MatchingConfig() {
 
   const [config, setConfig] = useState<SmartMatchingConfig>(DEFAULT_CONFIG);
   const [loading, setLoading] = useState(true);
+  const [hasConfirmedConfig, setHasConfirmedConfig] = useState(false);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [clearModalOpen, setClearModalOpen] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [resetModalOpen, setResetModalOpen] = useState(false);
+  const requestIdRef = useRef(0);
 
   const loadConfig = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     try {
       const res = await adminMatching.getConfig();
-      if (res.success && res.data) {
+      if (requestId !== requestIdRef.current) return;
+      if (res.success && isSmartMatchingConfig(res.data)) {
         setConfig(res.data);
         setDirty(false);
+        setHasConfirmedConfig(true);
+        setLoadFailed(false);
+      } else {
+        setLoadFailed(true);
       }
-    } catch {
-      toast.error(t('matching.failed_to_load_matching_configuration'));
+    } catch (err) {
+      if (requestId !== requestIdRef.current) return;
+      logError('Failed to load matching configuration', err);
+      setLoadFailed(true);
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
-  }, [t, toast])
+  }, []);
 
 
   useEffect(() => {
-    loadConfig();
+    void loadConfig();
+    return () => { requestIdRef.current += 1; };
   }, [loadConfig]);
 
   /** Update a weight value */
@@ -148,12 +166,12 @@ export function MatchingConfig() {
   /** Total of all weights */
   const totalWeight = useMemo(() => {
     return (
-      (config.category_weight ?? 0) +
-      (config.skill_weight ?? 0) +
-      (config.proximity_weight ?? 0) +
-      (config.freshness_weight ?? 0) +
-      (config.reciprocity_weight ?? 0) +
-      (config.quality_weight ?? 0)
+      config.category_weight +
+      config.skill_weight +
+      config.proximity_weight +
+      config.freshness_weight +
+      config.reciprocity_weight +
+      config.quality_weight
     );
   }, [config]);
 
@@ -162,6 +180,11 @@ export function MatchingConfig() {
 
   /** Save config to API */
   const handleSave = useCallback(async () => {
+    if (!hasConfirmedConfig || loadFailed) {
+      toast.error(t('matching.failed_to_load_matching_configuration'));
+      return;
+    }
+
     if (!totalValid) {
       toast.error(t('matching.weights_must_sum_to_100'));
       return;
@@ -181,7 +204,7 @@ export function MatchingConfig() {
     } finally {
       setSaving(false);
     }
-  }, [config, totalValid, t, toast])
+  }, [config, hasConfirmedConfig, loadFailed, totalValid, t, toast])
 
 
   /** Clear cache */
@@ -190,8 +213,12 @@ export function MatchingConfig() {
     try {
       const res = await adminMatching.clearCache();
       if (res.success) {
-        const cleared = (res.data as { entries_cleared?: number })?.entries_cleared ?? 0;
-        toast.success(t('matching.cache_cleared_count', { count: cleared }));
+        const cleared = (res.data as { entries_cleared?: unknown } | undefined)?.entries_cleared;
+        toast.success(
+          typeof cleared === 'number' && Number.isFinite(cleared)
+            ? t('matching.cache_cleared_count', { count: cleared })
+            : t('matching.cache_cleared')
+        );
         setClearModalOpen(false);
       } else {
         toast.error(t('matching.failed_to_clear_cache'));
@@ -213,7 +240,7 @@ export function MatchingConfig() {
   }, [t, toast])
 
 
-  if (loading) {
+  if (loading && !hasConfirmedConfig) {
     return (
       <div>
         <PageHeader
@@ -222,6 +249,17 @@ export function MatchingConfig() {
         />
         <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
+        </div>
+      </div>
+    );
+  }
+
+  if (loadFailed && !hasConfirmedConfig) {
+    return (
+      <div>
+        <PageHeader title={t('matching.matching_config_title')} description={t('matching.matching_config_desc')} />
+        <div role="alert">
+          <EmptyState icon={AlertTriangle} title={t('matching.failed_to_load_matching_configuration')} actionLabel={t('common.retry')} onAction={loadConfig} />
         </div>
       </div>
     );
@@ -243,10 +281,19 @@ export function MatchingConfig() {
               {t('matching.back')}
             </Button>
             <Button
+              variant="tertiary"
+              startContent={<RefreshCw size={16} aria-hidden="true" />}
+              onPress={loadConfig}
+              isLoading={loading}
+              size="sm"
+            >
+              {t('common.refresh')}
+            </Button>
+            <Button
               startContent={<Save size={16} />}
               onPress={handleSave}
               isLoading={saving}
-              isDisabled={!dirty}
+              isDisabled={!dirty || loadFailed}
               size="sm"
             >
               {t('matching.save_changes')}
@@ -254,6 +301,13 @@ export function MatchingConfig() {
           </div>
         }
       />
+
+      {loadFailed && (
+        <div className="mb-4 flex flex-col gap-3 rounded-xl border border-danger/30 bg-danger/5 p-4 text-danger sm:flex-row sm:items-center sm:justify-between" role="alert">
+          <div className="flex items-center gap-2"><AlertTriangle size={18} aria-hidden="true" /><p className="text-sm">{t('matching.failed_to_load_matching_configuration')}</p></div>
+          <Button variant="outline" onPress={loadConfig} isLoading={loading}>{t('common.retry')}</Button>
+        </div>
+      )}
 
       <div className="space-y-6">
         {/* Algorithm Toggles */}

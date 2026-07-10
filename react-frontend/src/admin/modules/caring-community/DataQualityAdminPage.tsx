@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Spinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -72,7 +73,7 @@ function formatTimestamp(ts: string | null | undefined): string {
   if (!ts) return '-';
   const d = new Date(ts);
   if (Number.isNaN(d.getTime())) return ts;
-  return d.toLocaleString();
+  return d.toLocaleString(getFormattingLocale());
 }
 
 // ---------------------------------------------------------------------------
@@ -284,7 +285,7 @@ export default function DataQualityAdminPage() {
                 <CardBody className="space-y-3 pt-3">
                   <div className="flex items-end gap-2">
                     <span className="text-3xl font-extrabold text-foreground">
-                      {check.count.toLocaleString()}
+                      {check.count.toLocaleString(getFormattingLocale())}
                     </span>
                     <span className="pb-1 text-xs text-muted">{t('data_quality.summary.affected')}</span>
                   </div>

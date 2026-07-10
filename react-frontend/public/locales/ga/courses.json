@@ -19,7 +19,13 @@
     "lessons_one": "{{count}} ceacht",
     "lessons_other": "{{count}} ceachtanna",
     "enrolled_one": "{{count}} cláraithe",
-    "enrolled_other": "{{count}} cláraithe"
+    "enrolled_other": "{{count}} cláraithe",
+    "lessons_few": "{{count}} ceachtanna",
+    "lessons_many": "{{count}} ceachtanna",
+    "lessons_two": "{{count}} ceachtanna",
+    "enrolled_few": "{{count}} cláraithe",
+    "enrolled_many": "{{count}} cláraithe",
+    "enrolled_two": "{{count}} cláraithe"
   },
   "detail": {
     "about": "Maidir leis an gcúrsa seo",
@@ -169,7 +175,15 @@
     "rate_n_stars": "Rátáil {{count}} as 5 réalta",
     "submit_error": "Níorbh fhéidir d'athbhreithniú a sheoladh. Bain triail eile as.",
     "count_one": "{{count}} léirmheas",
-    "count_other": "{{count}} léirmheasanna"
+    "count_other": "{{count}} léirmheasanna",
+    "rate_n_stars_few": "Rátáil {{count}} as 5 réalta",
+    "rate_n_stars_many": "Rátáil {{count}} as 5 réalta",
+    "rate_n_stars_one": "Rátáil {{count}} as 5 réalta",
+    "rate_n_stars_other": "Rátáil {{count}} as 5 réalta",
+    "rate_n_stars_two": "Rátáil {{count}} as 5 réalta",
+    "count_few": "{{count}} léirmheasanna",
+    "count_many": "{{count}} léirmheasanna",
+    "count_two": "{{count}} léirmheasanna"
   },
   "admin": {
     "title": "Cúrsaí",

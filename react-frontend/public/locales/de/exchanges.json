@@ -109,7 +109,9 @@
     "ratings": "Bewertungen",
     "rate_exchange": "Diesen Tausch bewerten",
     "prep_time_value": "{{count}}h",
-    "rating_value": "Bewertung: {{rating}} von 5"
+    "rating_value": "Bewertung: {{rating}} von 5",
+    "prep_time_value_one": "{{count}}h",
+    "prep_time_value_other": "{{count}}h"
   },
   "modal": {
     "decline_title": "Tauschanfrage ablehnen",
@@ -174,5 +176,6 @@
     "detail": {
       "title": "Austauschdetails"
     }
-  }
+  },
+  "hours_count_one": "{{count}} Stunde"
 }

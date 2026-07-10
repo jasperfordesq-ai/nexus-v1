@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Spinner, Textarea, Input, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Checkbox } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -65,7 +66,7 @@ function parsePushResult(raw: string | null): PushResult | null {
 
 function formatDate(ts: string | null): string {
   if (!ts) return '-';
-  return new Date(ts).toLocaleString();
+  return new Date(ts).toLocaleString(getFormattingLocale());
 }
 
 const SEVERITY_OPTIONS = [

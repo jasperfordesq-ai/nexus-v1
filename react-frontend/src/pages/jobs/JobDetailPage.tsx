@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { CardRowsSkeleton } from '@/components/ui/Skeletons';
@@ -705,10 +706,10 @@ export function JobDetailPage() {
     const currency = vacancy.salary_currency || '';
     const typeLabel = vacancy.salary_type ? ` / ${t(`salary.${vacancy.salary_type}`)}` : '';
     if (vacancy.salary_min && vacancy.salary_max) {
-      return `${currency}${Number(vacancy.salary_min).toLocaleString()} \u2013 ${currency}${Number(vacancy.salary_max).toLocaleString()}${typeLabel}`;
+      return `${currency}${Number(vacancy.salary_min).toLocaleString(getFormattingLocale())} \u2013 ${currency}${Number(vacancy.salary_max).toLocaleString(getFormattingLocale())}${typeLabel}`;
     }
-    if (vacancy.salary_min) return `${t('salary.min_only', { min: `${currency}${Number(vacancy.salary_min).toLocaleString()}` })}${typeLabel}`;
-    if (vacancy.salary_max) return `${t('salary.max_only', { max: `${currency}${Number(vacancy.salary_max).toLocaleString()}` })}${typeLabel}`;
+    if (vacancy.salary_min) return `${t('salary.min_only', { min: `${currency}${Number(vacancy.salary_min).toLocaleString(getFormattingLocale())}` })}${typeLabel}`;
+    if (vacancy.salary_max) return `${t('salary.max_only', { max: `${currency}${Number(vacancy.salary_max).toLocaleString(getFormattingLocale())}` })}${typeLabel}`;
     return null;
   };
 
@@ -733,13 +734,11 @@ export function JobDetailPage() {
           description={t('detail.not_found_desc')}
           action={
             <div className="flex gap-2">
-              <Link to={tenantPath('/jobs')}>
-                <Button variant="flat" className="bg-theme-elevated text-theme-muted">
-                  {t('detail.browse_vacancies')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath('/jobs')} variant="flat" className="bg-theme-elevated text-theme-muted">
+                {t('detail.browse_vacancies')}
+              </Button>
               <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                 startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
                 onPress={loadVacancy}
               >

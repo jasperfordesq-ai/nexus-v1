@@ -12,6 +12,7 @@
  * SafeguardingPreferenceService::revokePreference backend endpoint.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback } from 'react';
 
 import Shield from 'lucide-react/icons/shield';
@@ -187,7 +188,7 @@ export function SafeguardingTab() {
                       {pref.consent_given_at && (
                         <p className="text-xs text-theme-muted mt-2">
                           {t('safeguarding.selected_on', {
-                            date: new Date(pref.consent_given_at).toLocaleDateString('en-GB'),
+                            date: new Date(pref.consent_given_at).toLocaleDateString(getFormattingLocale()),
                           })}
                         </p>
                       )}

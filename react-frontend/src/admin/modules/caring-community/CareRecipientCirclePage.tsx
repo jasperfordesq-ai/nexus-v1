@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -62,7 +63,7 @@ const RELATIONSHIP_TYPE_KEYS = new Set(['care', 'support', 'family', 'friend', '
 
 function fmtDate(iso: string | null, emptyValue: string): string {
   if (!iso) return emptyValue;
-  return new Date(iso).toLocaleDateString(undefined, {
+  return new Date(iso).toLocaleDateString(getFormattingLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -317,7 +318,7 @@ export default function CareRecipientCirclePage() {
                         </TableCell>
                         <TableCell className="text-sm">{relationshipTypeLabel(rel.type)}</TableCell>
                         <TableCell className="text-sm font-mono">
-                          {rel.hours_logged.toLocaleString()}
+                          {rel.hours_logged.toLocaleString(getFormattingLocale())}
                         </TableCell>
                         <TableCell className="text-sm text-muted whitespace-nowrap">
                           {fmtDate(rel.last_activity_at, t('admin.common.empty_dash'))}

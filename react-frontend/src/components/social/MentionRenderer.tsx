@@ -13,7 +13,7 @@
 
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { Avatar } from '@/components/ui';
@@ -152,6 +152,7 @@ function MentionLink({
         </span>
       </PopoverTrigger>
       <PopoverContent className="bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
+        <PopoverHeading className="sr-only">{displayName}</PopoverHeading>
         <div
           className="p-3 flex items-center gap-3 max-w-[200px]"
           onMouseEnter={cancelClose}

@@ -251,7 +251,13 @@
     "listing_preview_alt": "Voorbeeld van vermelding",
     "image_preview_alt": "Uploadvoorbeeld",
     "type_tabs_aria": "Inhoudstype samenstellen",
-    "compose_post": "Bericht opstellen"
+    "compose_post": "Bericht opstellen",
+    "media_rejected_one": "{{count}} bestand(en) overgeslagen (verkeerd type of te groot)",
+    "media_rejected_other": "{{count}} bestand(en) overgeslagen (verkeerd type of te groot)",
+    "media_compression_failed_one": "{{count}} afbeelding(en) konden niet worden verwerkt",
+    "media_compression_failed_other": "{{count}} afbeelding(en) konden niet worden verwerkt",
+    "group_members_one": "{{count}} leden",
+    "group_members_other": "{{count}} leden"
   },
   "moderation": {
     "unauthorized": "Je hebt geen toestemming om deze actie uit te voeren."
@@ -349,12 +355,16 @@
       "commitment_flexible": "Flexibel"
     },
     "volunteer": {
-      "credits_offered": "{{count}} tijdkredieten"
+      "credits_offered": "{{count}} tijdkredieten",
+      "credits_offered_one": "{{count}} tijdkredieten",
+      "credits_offered_other": "{{count}} tijdkredieten"
     },
     "challenge": {
       "closing_soon": "Sluit binnenkort",
       "closes_on": "Sluit op {{date}}",
-      "ideas_count": "{{count}} ideeën"
+      "ideas_count": "{{count}} ideeën",
+      "ideas_count_one": "{{count}} ideeën",
+      "ideas_count_other": "{{count}} ideeën"
     },
     "review": {
       "rating_aria": "{{rating}} van 5 sterren"
@@ -399,7 +409,9 @@
     "no_posts": "Geen berichten gevonden",
     "no_posts_desc": "Er zijn nog geen berichten getagd met #{{tag}}.",
     "load_more": "Meer laden",
-    "page_description": "Berichten getagd met #{{tag}}"
+    "page_description": "Berichten getagd met #{{tag}}",
+    "post_count_one": "{{count}} berichten",
+    "post_count_other": "{{count}} berichten"
   },
   "hashtags": {
     "title": "Populaire hashtags",
@@ -412,7 +424,9 @@
     "no_hashtags": "Geen hashtags gevonden",
     "no_match": "Geen hashtags die overeenkomen met \"{{query}}\"",
     "no_trending": "Nog geen populaire hashtags in jouw gemeenschap.",
-    "post_count": "{{count}} berichten"
+    "post_count": "{{count}} berichten",
+    "post_count_one": "{{count}} berichten",
+    "post_count_other": "{{count}} berichten"
   },
   "share": {
     "tooltip_remove": "Delen verwijderen",
@@ -452,7 +466,9 @@
     "dm_sent_label": "Verzonden",
     "dm_send": "Verzenden",
     "dm_done": "Klaar",
-    "email": "E-mail"
+    "email": "E-mail",
+    "button_label_count_one": "Deel ({{count}})",
+    "button_label_count_other": "Deel ({{count}})"
   },
   "video": {
     "select": "Video toevoegen",
@@ -474,7 +490,11 @@
     "title": "Populair",
     "view_all": "Bekijk alle hashtags",
     "post_count_one": "{{count}} bericht",
-    "post_count_other": "{{count}} berichten"
+    "post_count_other": "{{count}} berichten",
+    "post_count_one_one": "{{count}} bericht",
+    "post_count_one_other": "{{count}} bericht",
+    "post_count_other_one": "{{count}} berichten",
+    "post_count_other_other": "{{count}} berichten"
   },
   "sidebar": {
     "profile": {
@@ -520,7 +540,9 @@
     "groups": {
       "title": "Populaire Groepen",
       "see_all": "Bekijk Alles",
-      "members": "{{count}} leden"
+      "members": "{{count}} leden",
+      "members_one": "{{count}} leden",
+      "members_other": "{{count}} leden"
     },
     "actions": {
       "title": "Snelle Acties",
@@ -573,7 +595,10 @@
     "go_to_image": "Ga naar afbeelding {{number}}",
     "more_images": "{{count}} meer afbeeldingen",
     "video_of": "Video {{current}} van {{total}}",
-    "role_description": "carrousel"
+    "role_description": "carrousel",
+    "more_images_one": "{{count}} meer afbeeldingen",
+    "more_images_other": "{{count}} meer afbeeldingen",
+    "view_video": "Bekijk video {{current}} van {{total}}"
   },
   "lightbox": {
     "aria_label": "Afbeelding viewer",
@@ -618,7 +643,9 @@
     "connect_failed": "Verzoek verzenden mislukt",
     "pending": "In behandeling",
     "dismiss": "Sluiten",
-    "load_failed": "Suggesties laden mislukt"
+    "load_failed": "Suggesties laden mislukt",
+    "mutual_one": "{{count}} gemeenschappelijke verbindingen",
+    "mutual_other": "{{count}} gemeenschappelijke verbindingen"
   },
   "analytics": {
     "title": "Postanalyse",
@@ -647,5 +674,7 @@
   },
   "aria": {
     "feed_sidebar": "Community-suggesties en hoogtepunten"
-  }
+  },
+  "items_loaded_one": "{{count}} berichten",
+  "items_loaded_other": "{{count}} berichten"
 }

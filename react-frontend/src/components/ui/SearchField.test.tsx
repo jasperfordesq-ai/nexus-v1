@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import i18n from 'i18next';
 import { render, screen, fireEvent } from '@/test/test-utils';
 import { SearchField } from './SearchField';
 
@@ -13,6 +14,10 @@ import { SearchField } from './SearchField';
 describe('SearchField', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  afterEach(async () => {
+    await i18n.changeLanguage('en');
   });
 
   it('renders a search input', () => {
@@ -108,5 +113,26 @@ describe('SearchField', () => {
   it('accepts a defaultValue prop', () => {
     render(<SearchField defaultValue="prefilled" aria-label="Search" />);
     expect((screen.getByRole('searchbox') as HTMLInputElement).value).toBe('prefilled');
+  });
+
+  it('uses the active locale for the clear-search action', async () => {
+    i18n.addResource('fr', 'common', 'search.clear', 'Effacer la recherche');
+    await i18n.changeLanguage('fr');
+
+    render(<SearchField defaultValue="membres" aria-label="Rechercher" />);
+
+    expect(screen.getByRole('button', { name: 'Effacer la recherche' })).toBeInTheDocument();
+  });
+
+  it('accepts a translated search-specific clear label override', () => {
+    render(
+      <SearchField
+        defaultValue="members"
+        aria-label="Search members"
+        clearButtonLabel="Clear member search"
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Clear member search' })).toBeInTheDocument();
   });
 });

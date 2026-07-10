@@ -36,7 +36,7 @@ import { Chip } from '@/components/ui/Chip';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Textarea } from '@/components/ui/Textarea';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 import { useDisclosure } from '@/components/ui/useDisclosure';
@@ -1151,7 +1151,7 @@ export function FeedPage() {
               variant="shadow"
               size="lg"
               classNames={{
-                base: 'cursor-pointer bg-gradient-to-r from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-shadow px-4 py-2 min-h-9',
+                base: 'cursor-pointer bg-gradient-to-r from-accent to-accent-gradient-end shadow-lg shadow-accent/30 hover:shadow-accent/50 transition-shadow px-4 py-2 min-h-9',
                 content: 'flex items-center gap-2 text-white font-medium text-sm',
               }}
               startContent={<ArrowUp className="w-3.5 h-3.5 text-white" aria-hidden="true" />}
@@ -1297,8 +1297,8 @@ export function FeedPage() {
                   <Chip
                     variant="flat"
                     className="border border-theme-default bg-theme-elevated text-theme-muted"
-                    startContent={<span className="w-1.5 h-1.5 rounded-full bg-indigo-400/60" aria-hidden="true" />}
-                    endContent={<span className="w-1.5 h-1.5 rounded-full bg-purple-400/60" aria-hidden="true" />}
+                    startContent={<span className="w-1.5 h-1.5 rounded-full bg-accent/60" aria-hidden="true" />}
+                    endContent={<span className="w-1.5 h-1.5 rounded-full bg-accent/60" aria-hidden="true" />}
                   >
                     {t('feed.end_of_feed')}
                   </Chip>
@@ -1367,13 +1367,11 @@ export function FeedPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
-                <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
-              </div>
-              {t('report.title')}
+          <ModalHeader className="flex items-center gap-3 text-theme-primary">
+            <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
+              <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
             </div>
+            <ModalHeading>{t('report.title')}</ModalHeading>
           </ModalHeader>
           <ModalBody>
             <p className="text-sm text-theme-muted mb-3">

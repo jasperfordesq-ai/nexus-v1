@@ -144,7 +144,7 @@ export function CommunityGuidelinesPage() {
         className="max-w-4xl mx-auto space-y-6"
       >
         <motion.div variants={itemVariants} className="text-center">
-          <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 mb-4">
+          <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-blue-500/20 to-accent-gradient-end/20 mb-4">
             <Users className="w-10 h-10 text-[var(--color-info)]" aria-hidden="true" />
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">

@@ -92,7 +92,15 @@
     "get_directions": "Wskazówki dojazdu",
     "promoted": "Promowane",
     "unsave": "Usuń z zapisanych",
-    "save": "Zapisz ogłoszenie"
+    "save": "Zapisz ogłoszenie",
+    "available_count_few": "Dostępne: {{count}}",
+    "available_count_many": "Dostępne: {{count}}",
+    "available_count_one": "Dostępne: {{count}}",
+    "available_count_other": "Dostępne: {{count}}",
+    "views_count_few": "Wyświetleń: {{count}}",
+    "views_count_many": "Wyświetleń: {{count}}",
+    "views_count_one": "Wyświetleń: {{count}}",
+    "views_count_other": "Wyświetleń: {{count}}"
   },
   "offer": {
     "modal_title": "Złóż ofertę",
@@ -184,7 +192,11 @@
     "created_success": "Ogłoszenie utworzone pomyślnie!",
     "created_error": "Nie udało się utworzyć ogłoszenia",
     "created_error_retry": "Nie udało się utworzyć ogłoszenia. Spróbuj ponownie.",
-    "draft_saved": "Wersja robocza zapisana"
+    "draft_saved": "Wersja robocza zapisana",
+    "title_char_count_few": "{{count}}/120 znaków",
+    "title_char_count_many": "{{count}}/120 znaków",
+    "title_char_count_one": "{{count}}/120 znaków",
+    "title_char_count_other": "{{count}}/120 znaków"
   },
   "search": {
     "category_search": "Szukaj kategorii...",
@@ -228,7 +240,13 @@
     "price_from": "Od {{min}}",
     "price_up_to": "Do {{max}}",
     "last_days_one": "Ostatni {{count}} dzień",
-    "last_days_other": "Ostatnie {{count}} dni"
+    "last_days_other": "Ostatnie {{count}} dni",
+    "reset_filters_few": "Resetuj filtry ({{count}})",
+    "reset_filters_many": "Resetuj filtry ({{count}})",
+    "reset_filters_one": "Resetuj filtry ({{count}})",
+    "reset_filters_other": "Resetuj filtry ({{count}})",
+    "results_count_few": "{{count}} wyników",
+    "results_count_many": "{{count}} wyników"
   },
   "seller": {
     "page_title": "Profil sprzedawcy",
@@ -285,7 +303,15 @@
     "results_count_one": "{{count}} wynik",
     "results_count_other": "{{count}} wyników",
     "load_more": "Załaduj więcej",
-    "browse_description": "Przeglądaj ogłoszenia w kategorii {{name}} na marketplace."
+    "browse_description": "Przeglądaj ogłoszenia w kategorii {{name}} na marketplace.",
+    "reset_filters_few": "Resetuj filtry ({{count}})",
+    "reset_filters_many": "Resetuj filtry ({{count}})",
+    "reset_filters_one": "Resetuj filtry ({{count}})",
+    "reset_filters_other": "Resetuj filtry ({{count}})",
+    "listings_count_few": "{{count}} ogłoszeń",
+    "listings_count_many": "{{count}} ogłoszeń",
+    "results_count_few": "{{count}} wyników",
+    "results_count_many": "{{count}} wyników"
   },
   "common": {
     "loading": "Ładowanie...",
@@ -426,7 +452,11 @@
     "empty_sold_title": "Brak sprzedaży",
     "empty_sold_description": "Nie sprzedałeś jeszcze żadnych przedmiotów.",
     "empty_expired_title": "Brak wygasłych ogłoszeń",
-    "empty_expired_description": "Nie masz żadnych wygasłych ogłoszeń."
+    "empty_expired_description": "Nie masz żadnych wygasłych ogłoszeń.",
+    "views_count_aria_few": "{{count}} wyświetleń",
+    "views_count_aria_many": "{{count}} wyświetleń",
+    "views_count_aria_one": "{{count}} wyświetleń",
+    "views_count_aria_other": "{{count}} wyświetleń"
   },
   "my_offers": {
     "page_title": "Moje oferty - Marketplace",
@@ -485,7 +515,9 @@
     "empty_collections_title": "Brak kolekcji",
     "empty_collections_description": "Utwórz kolekcję, aby uporządkować swoje ulubione przedmioty z marketplace.",
     "sign_in_title": "Wymagane logowanie",
-    "sign_in_description": "Zaloguj się, aby zarządzać swoimi kolekcjami i zapisanymi wyszukiwaniami."
+    "sign_in_description": "Zaloguj się, aby zarządzać swoimi kolekcjami i zapisanymi wyszukiwaniami.",
+    "item_count_few": "{{count}} przedmiotów",
+    "item_count_many": "{{count}} przedmiotów"
   },
   "saved_searches": {
     "tab_title": "Zapisane wyszukiwania",
@@ -518,7 +550,11 @@
     "duration_days_one": "{{count}} dzień",
     "duration_days_other": "{{count}} dni",
     "duration_hours_one": "{{count}} godzina",
-    "duration_hours_other": "{{count}} godzin"
+    "duration_hours_other": "{{count}} godzin",
+    "duration_days_few": "{{count}} dni",
+    "duration_days_many": "{{count}} dni",
+    "duration_hours_few": "{{count}} godzin",
+    "duration_hours_many": "{{count}} godzin"
   },
   "free": {
     "page_title": "Darmowe przedmioty",
@@ -584,7 +620,19 @@
       "declined": "Odrzucona",
       "completed": "Zakończona",
       "cancelled": "Anulowana"
-    }
+    },
+    "offers_title_count_few": "Oferty dostawy ({{count}})",
+    "offers_title_count_many": "Oferty dostawy ({{count}})",
+    "offers_title_count_one": "Oferty dostawy ({{count}})",
+    "offers_title_count_other": "Oferty dostawy ({{count}})",
+    "time_credits_value_few": "{{count}} KC",
+    "time_credits_value_many": "{{count}} KC",
+    "time_credits_value_one": "{{count}} KC",
+    "time_credits_value_other": "{{count}} KC",
+    "estimated_minutes_few": "~{{count}}min",
+    "estimated_minutes_many": "~{{count}}min",
+    "estimated_minutes_one": "~{{count}}min",
+    "estimated_minutes_other": "~{{count}}min"
   },
   "pickup": {
     "my_pickups_title": "Moje odbiory",
@@ -613,7 +661,15 @@
     "oversold_protected": "Odrzucaj zamówienia przekraczające stan magazynowy",
     "sold_out": "Wyprzedane",
     "low_chip": "Stan: {{count}} (Niski)",
-    "count_chip": "Stan: {{count}}"
+    "count_chip": "Stan: {{count}}",
+    "low_chip_few": "Stan: {{count}} (Niski)",
+    "low_chip_many": "Stan: {{count}} (Niski)",
+    "low_chip_one": "Stan: {{count}} (Niski)",
+    "low_chip_other": "Stan: {{count}} (Niski)",
+    "count_chip_few": "Stan: {{count}}",
+    "count_chip_many": "Stan: {{count}}",
+    "count_chip_one": "Stan: {{count}}",
+    "count_chip_other": "Stan: {{count}}"
   },
   "ai_reply": {
     "suggest": "Zaproponuj odpowiedź",
@@ -647,7 +703,11 @@
     "search_this_area": "Przeszukaj ten obszar",
     "distance_km": "{{km}} km stąd",
     "distance_meters": "{{m}} m stąd",
-    "view_toggle": "Tryb przeglądania"
+    "view_toggle": "Tryb przeglądania",
+    "results_count_few": "Znaleziono {{count}} ogłoszeń w pobliżu",
+    "results_count_many": "Znaleziono {{count}} ogłoszeń w pobliżu",
+    "results_count_one": "Znaleziono {{count}} ogłoszeń w pobliżu",
+    "results_count_other": "Znaleziono {{count}} ogłoszeń w pobliżu"
   },
   "shipping": {
     "title": "Opcje wysyłki",
@@ -778,7 +838,11 @@
       "select_rating": "Wybierz ocenę",
       "success": "Ocena wysłana pomyślnie!",
       "error": "Nie udało się wysłać oceny"
-    }
+    },
+    "quantity_multiplier_few": "×{{count}}",
+    "quantity_multiplier_many": "×{{count}}",
+    "quantity_multiplier_one": "×{{count}}",
+    "quantity_multiplier_other": "×{{count}}"
   },
   "onboarding": {
     "page_title": "Wdrożenie sprzedawcy - Marketplace",

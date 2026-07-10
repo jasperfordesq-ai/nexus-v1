@@ -41,12 +41,12 @@ export default tseslint.config(
     },
   },
   {
-    // Admin panel is English-only by design. Hardcoded English is INTENTIONAL.
-    // Disable i18next/no-literal-string for admin/ files to stop the audit loop.
-    // See memory/feedback_admin_english_only.md (2026-04-22).
+    // Admin UI is end-user output too. Keep JSX literals as a blocking error;
+    // true protocol/code/command samples require a narrow documented inline
+    // suppression at the exact rendered technical literal.
     files: ['src/admin/**/*.{ts,tsx}'],
     rules: {
-      'i18next/no-literal-string': 'off',
+      'i18next/no-literal-string': ['error', { markupOnly: true }],
     },
   },
   {

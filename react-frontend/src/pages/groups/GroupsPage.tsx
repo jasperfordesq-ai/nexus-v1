@@ -36,7 +36,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import type { Group } from '@/types/api';
@@ -229,7 +229,7 @@ export function GroupsPage() {
         description={t('subtitle')}
         icon={<Users className="h-6 w-6" aria-hidden="true" />}
         accent="indigo"
-        stats={totalCount != null && !isLoading ? [{ label: t('count_label'), value: totalCount.toLocaleString() }] : undefined}
+        stats={totalCount != null && !isLoading ? [{ label: t('count_label'), value: totalCount.toLocaleString(getFormattingLocale()) }] : undefined}
         action={
           isAuthenticated ? (
             <Button
@@ -259,7 +259,7 @@ export function GroupsPage() {
         <ToggleButton
           id="all"
           variant="ghost"
-          className="bg-theme-elevated text-theme-secondary hover:text-indigo-600 data-[selected=true]:bg-indigo-600 data-[selected=true]:font-semibold data-[selected=true]:text-white data-[selected=true]:shadow-sm"
+          className="bg-theme-elevated text-theme-secondary hover:text-accent data-[selected=true]:bg-accent data-[selected=true]:font-semibold data-[selected=true]:text-white data-[selected=true]:shadow-sm"
         >
           <Users className="w-3.5 h-3.5" aria-hidden="true" />
           {t('filter_all')}
@@ -333,7 +333,7 @@ export function GroupsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-linear-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadGroups()}
           >
@@ -360,11 +360,9 @@ export function GroupsPage() {
               accent="indigo"
               action={
                 isAuthenticated && (
-                  <Link to={tenantPath('/groups/create')}>
-                    <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
-                      {t('create_group')}
-                    </Button>
-                  </Link>
+                  <Button as={Link} to={tenantPath('/groups/create')} className="bg-linear-to-r from-accent to-accent-gradient-end text-white">
+                    {t('create_group')}
+                  </Button>
                 )
               }
             />
@@ -426,12 +424,12 @@ export function GroupsPage() {
                   {totalCount != null && totalCount > 0 && (
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs text-theme-muted px-1">
-                        <span>{groups.length.toLocaleString()} / {totalCount.toLocaleString()}</span>
+                        <span>{groups.length.toLocaleString(getFormattingLocale())} / {totalCount.toLocaleString(getFormattingLocale())}</span>
                         <span className="font-medium text-theme-secondary">{Math.round((groups.length / totalCount) * 100)}%</span>
                       </div>
                       <div className="h-1.5 rounded-full bg-theme-elevated overflow-hidden">
                         <motion.div
-                          className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-600"
+                          className="h-full rounded-full bg-linear-to-r from-accent to-accent-gradient-end"
                           initial={{ width: '0%' }}
                           animate={{ width: `${Math.round((groups.length / totalCount) * 100)}%` }}
                           transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -447,7 +445,7 @@ export function GroupsPage() {
                       isLoading={isLoadingMore}
                     >
                       {totalCount != null && totalCount > groups.length
-                        ? t('load_more_count', { remaining: (totalCount - groups.length).toLocaleString() })
+                        ? t('load_more_count', { remaining: (totalCount - groups.length).toLocaleString(getFormattingLocale()) })
                         : t('load_more')}
                     </Button>
                   </div>
@@ -575,7 +573,7 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
           {/* Member Status */}
           {(group.is_member || group.viewer_membership?.status === 'active') && (
             <div className="mt-4 pt-4 border-t border-theme-default">
-              <Chip size="sm" variant="flat" className="bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
+              <Chip size="sm" variant="flat" className="bg-accent/20 text-accent dark:text-accent">
                 {t('member_status')}
               </Chip>
             </div>

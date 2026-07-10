@@ -126,7 +126,13 @@
     "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
     "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}",
     "rules_title": "Automation Rules",
-    "reviewed": "Reviewed"
+    "reviewed": "Reviewed",
+    "rule_summary_with_target_one": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}",
+    "rule_summary_with_target_other": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}",
+    "rule_summary_one": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+    "rule_summary_other": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+    "generated_name_one": "{{stage}} to {{target}} after {{count}}d",
+    "generated_name_other": "{{stage}} to {{target}} after {{count}}d"
   },
   "employer": {
     "page_title": "Employer Profile",
@@ -160,7 +166,11 @@
     "review_comment_placeholder": "Share your experience working with this employer...",
     "submit_review": "Submit Review",
     "no_reviews": "No reviews yet",
-    "anonymous": "Anonymous"
+    "anonymous": "Anonymous",
+    "meta_description_one": "View this employer profile, open roles, and community reviews across {{count}} current opportunities.",
+    "meta_description_other": "View this employer profile, open roles, and community reviews across {{count}} current opportunities.",
+    "open_roles_count_one": "{{count}} open roles",
+    "open_roles_count_other": "{{count}} open roles"
   },
   "bulk": {
     "select_action": "Move to stage...",
@@ -168,7 +178,9 @@
     "clear": "Clear selection",
     "success": "Applications updated",
     "error": "Bulk update failed",
-    "selected_count": "{{count}} selected"
+    "selected_count": "{{count}} selected",
+    "selected_count_one": "{{count}} selected",
+    "selected_count_other": "{{count}} selected"
   },
   "history": {
     "title": "Status History",
@@ -260,7 +272,15 @@
     "market_avg": "Market Avg",
     "ai_insights": "AI Insights",
     "days_short_value": "{{count}}d",
-    "not_available": "N/A"
+    "not_available": "N/A",
+    "views_tooltip_one": "{{date}}: {{count}} views",
+    "views_tooltip_other": "{{date}}: {{count}} views",
+    "applications_tooltip_one": "{{week}}: {{count}} applications",
+    "applications_tooltip_other": "{{week}}: {{count}} applications",
+    "based_on_one": "Based on {{count}} similar jobs",
+    "based_on_other": "Based on {{count}} similar jobs",
+    "days_short_value_one": "{{count}}d",
+    "days_short_value_other": "{{count}}d"
   },
   "salary": {
     "label": "Compensation",
@@ -304,7 +324,9 @@
     "tab_rejected": "Rejected",
     "empty_all": "You haven't applied to any positions yet.",
     "empty_filtered": "No {{filter}} applications found.",
-    "browse_jobs": "Browse Jobs"
+    "browse_jobs": "Browse Jobs",
+    "days_left_one": "{{count}}d left",
+    "days_left_other": "{{count}}d left"
   },
   "withdraw": {
     "confirm_title": "Withdraw Application?",
@@ -414,7 +436,9 @@
     "cv_size_kb": "({{count}} KB)",
     "message_employer": "Message Employer",
     "cv_parse_error": "Failed to parse CV. You can still submit your application manually.",
-    "quick_apply": "Quick Apply with Saved Profile"
+    "quick_apply": "Quick Apply with Saved Profile",
+    "cv_size_kb_one": "({{count}} KB)",
+    "cv_size_kb_other": "({{count}} KB)"
   },
   "detail": {
     "loading": "Loading vacancy...",
@@ -470,7 +494,11 @@
     "confirm_close_title": "Close this vacancy?",
     "confirm_close": "Closing stops new applications from coming in. You can reopen it at any time.",
     "confirm_reopen_title": "Reopen this vacancy?",
-    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply."
+    "confirm_reopen": "Reopening makes the vacancy visible again and lets people apply.",
+    "owner_has_applicants_one": "{{count}} applicant(s) — scroll down to review",
+    "owner_has_applicants_other": "{{count}} applicant(s) — scroll down to review",
+    "views_one": "{{count}} views",
+    "views_other": "{{count}} views"
   },
   "interview": {
     "schedule": "Schedule Interview",
@@ -768,7 +796,13 @@
     "days_ago": "{{count}} days ago",
     "weeks_ago": "{{count}} weeks ago",
     "skills_description": "Comma-separated skills",
-    "skills_chip": "Skills: {{skills}}"
+    "skills_chip": "Skills: {{skills}}",
+    "days_ago_one": "{{count}} days ago",
+    "days_ago_other": "{{count}} days ago",
+    "weeks_ago_one": "{{count}} weeks ago",
+    "weeks_ago_other": "{{count}} weeks ago",
+    "results_count_one": "{{count}} candidate(s) found",
+    "results_count_other": "{{count}} candidate(s) found"
   },
   "resume_visibility": {
     "label": "Make my profile searchable by employers",
@@ -1049,5 +1083,17 @@
   "jobs": {
     "view_details": "View job details"
   },
-  "tabs_aria": "Jobs view"
+  "tabs_aria": "Jobs view",
+  "match_badge_one": "{{count}}% match",
+  "match_badge_other": "{{count}}% match",
+  "views_one": "{{count}} views",
+  "views_other": "{{count}} views",
+  "applications_one": "{{count}} applications",
+  "applications_other": "{{count}} applications",
+  "char_count_one": "{{count}} / {{max}} characters",
+  "char_count_other": "{{count}} / {{max}} characters",
+  "hours_per_week_one": "{{count}} hrs/week",
+  "hours_per_week_other": "{{count}} hrs/week",
+  "time_credits_label_one": "{{count}} time credits",
+  "time_credits_label_other": "{{count}} time credits"
 }

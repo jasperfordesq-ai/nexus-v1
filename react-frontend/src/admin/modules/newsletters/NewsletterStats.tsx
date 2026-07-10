@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Progress, Skeleton, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -373,26 +374,26 @@ export function NewsletterStats() {
           value={`${engagement.success_rate}%`}
           icon={CheckCircle}
           color="success"
-          description={`${delivery.delivered.toLocaleString()} ${t('newsletters.delivered_label')}`}
+          description={`${delivery.delivered.toLocaleString(getFormattingLocale())} ${t('newsletters.delivered_label')}`}
         />
         <StatCard
           label={t('newsletters.label_open_rate')}
           value={`${engagement.open_rate}%`}
           icon={Eye}
-          description={`${engagement.unique_opens.toLocaleString()} ${t('newsletters.unique_opens_label')}`}
+          description={`${engagement.unique_opens.toLocaleString(getFormattingLocale())} ${t('newsletters.unique_opens_label')}`}
         />
         <StatCard
           label={t('newsletters.label_click_rate')}
           value={`${engagement.click_rate}%`}
           icon={MousePointer}
           color="warning"
-          description={`${engagement.unique_clicks.toLocaleString()} ${t('newsletters.unique_clicks_label')}`}
+          description={`${engagement.unique_clicks.toLocaleString(getFormattingLocale())} ${t('newsletters.unique_clicks_label')}`}
         />
         <StatCard
           label={t('newsletters.label_click_to_open_rate')}
           value={`${engagement.click_to_open_rate}%`}
           icon={BarChart3}
-          description={`${engagement.total_clicks.toLocaleString()} ${t('newsletters.total_clicks_desc')}`}
+          description={`${engagement.total_clicks.toLocaleString(getFormattingLocale())} ${t('newsletters.total_clicks_desc')}`}
         />
       </div>
 
@@ -555,7 +556,7 @@ export function NewsletterStats() {
                       formatter={(value, name) => {
                         const v = Number(value ?? 0);
                         return [
-                          `${v.toLocaleString()} (${deviceTotal > 0 ? Math.round((v / deviceTotal) * 100) : 0}%)`,
+                          `${v.toLocaleString(getFormattingLocale())} (${deviceTotal > 0 ? Math.round((v / deviceTotal) * 100) : 0}%)`,
                           String(name ?? ''),
                         ] as [string, string];
                       }}
@@ -634,7 +635,7 @@ export function NewsletterStats() {
               </div>
               <Separator className="my-3" />
               <p className="text-center text-sm text-muted">
-                {t('newsletters.total_opens_label')}: {engagement.total_opens.toLocaleString()} | {t('newsletters.total_clicks_label')}: {engagement.total_clicks.toLocaleString()}
+                {t('newsletters.total_opens_label')}: {engagement.total_opens.toLocaleString(getFormattingLocale())} | {t('newsletters.total_clicks_label')}: {engagement.total_clicks.toLocaleString(getFormattingLocale())}
                 {peak_engagement && peak_engagement.max_opens_per_hour > 0 && (
                   <> | {t('newsletters.peak_label')}</>
                 )}
@@ -660,7 +661,7 @@ export function NewsletterStats() {
                   <div key={ec.client} className="text-center">
                     <p className="text-2xl font-bold text-foreground">{pct}%</p>
                     <p className="text-sm text-muted">{ec.client}</p>
-                    <p className="text-xs text-muted">{ec.count.toLocaleString()} {t('newsletters.opens_label')}</p>
+                    <p className="text-xs text-muted">{ec.count.toLocaleString(getFormattingLocale())} {t('newsletters.opens_label')}</p>
                   </div>
                 );
               })}
@@ -701,10 +702,10 @@ export function NewsletterStats() {
                       </a>
                     </TableCell>
                     <TableCell>
-                      <span className="font-semibold">{link.clicks.toLocaleString()}</span>
+                      <span className="font-semibold">{link.clicks.toLocaleString(getFormattingLocale())}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-muted">{link.unique_clicks.toLocaleString()}</span>
+                      <span className="text-muted">{link.unique_clicks.toLocaleString(getFormattingLocale())}</span>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -768,7 +769,7 @@ export function NewsletterStats() {
                       </TableCell>
                       <TableCell>
                         <span className="text-sm text-muted">
-                          {new Date(item.action_at).toLocaleString(undefined, {
+                          {new Date(item.action_at).toLocaleString(getFormattingLocale(), {
                             month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
                           })}
                         </span>
@@ -855,7 +856,7 @@ function FunnelBar({
       <div className="mb-1 flex items-center justify-between text-sm">
         <span className="text-foreground">{label}</span>
         <span className="font-semibold text-foreground">
-          {value.toLocaleString()}
+          {value.toLocaleString(getFormattingLocale())}
           {rate !== undefined && <span className="ml-1 text-muted">({rate}%)</span>}
         </span>
       </div>
@@ -886,7 +887,7 @@ function DeliveryBar({
     <div>
       <div className="mb-1 flex items-center justify-between text-sm">
         <span className="text-foreground">{label}</span>
-        <span className="font-semibold text-foreground">{value.toLocaleString()}</span>
+        <span className="font-semibold text-foreground">{value.toLocaleString(getFormattingLocale())}</span>
       </div>
       <Progress
         value={pct}
@@ -950,13 +951,13 @@ function AbVariantCard({
             <p className="text-xs text-muted">{tLocal('newsletters.label_click_rate')}</p>
           </div>
           <div>
-            <p className="text-2xl font-bold text-foreground">{sent.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-foreground">{sent.toLocaleString(getFormattingLocale())}</p>
             <p className="text-xs text-muted">{tLocal('newsletters.col_sent')}</p>
           </div>
         </div>
         <div className="flex justify-center gap-4 border-t border-divider pt-2 text-xs text-muted">
-          <span>{opens.toLocaleString()} {tLocal('newsletters.opens_label')}</span>
-          <span>{clicks.toLocaleString()} {tLocal('newsletters.clicks_label')}</span>
+          <span>{opens.toLocaleString(getFormattingLocale())} {tLocal('newsletters.opens_label')}</span>
+          <span>{clicks.toLocaleString(getFormattingLocale())} {tLocal('newsletters.clicks_label')}</span>
         </div>
       </CardBody>
     </Card>

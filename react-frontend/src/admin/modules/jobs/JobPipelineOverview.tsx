@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Chip, Card, CardBody, Spinner, Select, SelectItem, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -238,7 +239,7 @@ export function JobPipelineOverview() {
         label: t('jobs.pipeline_scheduled_at'),
         sortable: true,
         render: (item) =>
-          new Date(item.scheduled_at).toLocaleDateString(undefined, {
+          new Date(item.scheduled_at).toLocaleDateString(getFormattingLocale(), {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
@@ -306,7 +307,7 @@ export function JobPipelineOverview() {
         sortable: true,
         render: (item) =>
           item.start_date
-            ? new Date(item.start_date).toLocaleDateString(undefined, {
+            ? new Date(item.start_date).toLocaleDateString(getFormattingLocale(), {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
@@ -328,7 +329,7 @@ export function JobPipelineOverview() {
         sortable: true,
         render: (item) =>
           item.expires_at
-            ? new Date(item.expires_at).toLocaleDateString(undefined, {
+            ? new Date(item.expires_at).toLocaleDateString(getFormattingLocale(), {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',

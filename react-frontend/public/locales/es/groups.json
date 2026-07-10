@@ -206,7 +206,22 @@
     "feed_empty_desc": "¡Sé el primero en compartir algo con este grupo!",
     "feed_create_post": "Crear Publicación",
     "feed_load_more": "Cargar Más",
-    "member_actions_aria": "Acciones de miembro"
+    "member_actions_aria": "Acciones de miembro",
+    "meta_description_fallback_many": "Únete a {{name}} y conecta con {{count}} miembros de la comunidad a través de publicaciones, eventos y debates compartidos.",
+    "meta_description_fallback_one": "Únete a {{name}} y conecta con {{count}} miembros de la comunidad a través de publicaciones, eventos y debates compartidos.",
+    "meta_description_fallback_other": "Únete a {{name}} y conecta con {{count}} miembros de la comunidad a través de publicaciones, eventos y debates compartidos.",
+    "members_count_many": "{{count}} miembros",
+    "members_count_one": "{{count}} miembros",
+    "members_count_other": "{{count}} miembros",
+    "reply_count_many": "{{count}} respuestas",
+    "reply_count_one": "{{count}} respuestas",
+    "reply_count_other": "{{count}} respuestas",
+    "tab_subgroups_count_many": "Subgrupos ({{count}})",
+    "tab_subgroups_count_one": "Subgrupos ({{count}})",
+    "tab_subgroups_count_other": "Subgrupos ({{count}})",
+    "posts_count_many": "{{count}} publicaciones",
+    "posts_count_one": "{{count}} publicaciones",
+    "posts_count_other": "{{count}} publicaciones"
   },
   "form": {
     "create_title": "Crear Nuevo Grupo",
@@ -389,7 +404,10 @@
     "size_b": "B",
     "size_kb": "KB",
     "size_mb": "MB",
-    "size_gb": "GB"
+    "size_gb": "GB",
+    "folder_chip_many": "{{name}} ({{count}})",
+    "folder_chip_one": "{{name}} ({{count}})",
+    "folder_chip_other": "{{name}} ({{count}})"
   },
   "media": {
     "filter_all": "Todo",
@@ -450,7 +468,10 @@
     "secret_placeholder": "Secreto de firma para verificar la carga útil",
     "cancel": "Cancelar",
     "create_btn": "Crear webhook",
-    "delete_confirm": "¿Eliminar este webhook? Esto no se puede deshacer."
+    "delete_confirm": "¿Eliminar este webhook? Esto no se puede deshacer.",
+    "failures_many": "{{count}} fallos",
+    "failures_one": "{{count}} fallos",
+    "failures_other": "{{count}} fallos"
   },
   "toast": {
     "left": "Saliste del grupo",
@@ -562,7 +583,13 @@
     "answer_posted_success": "¡Respuesta publicada!",
     "answer_posted_error": "Error al publicar la respuesta",
     "vote_error": "Error al votar",
-    "accept_error": "Error al aceptar la respuesta"
+    "accept_error": "Error al aceptar la respuesta",
+    "answer_count_aria_many": "{{count}} respuestas",
+    "answer_count_aria_one": "{{count}} respuestas",
+    "answer_count_aria_other": "{{count}} respuestas",
+    "answers_heading_many": "{{count}} respuesta(s)",
+    "answers_heading_one": "{{count}} respuesta(s)",
+    "answers_heading_other": "{{count}} respuesta(s)"
   },
   "wiki": {
     "load_failed": "No se pudieron cargar las páginas wiki",
@@ -719,5 +746,14 @@
     "accent_color": "Color de acento",
     "hue": "Tono",
     "preview": "Vista previa"
-  }
+  },
+  "members_many": "{{count}} miembros",
+  "members_one": "{{count}} miembros",
+  "members_other": "{{count}} miembros",
+  "members_count_label_many": "{{count}} miembros",
+  "members_count_label_one": "{{count}} miembros",
+  "members_count_label_other": "{{count}} miembros",
+  "posts_count_label_many": "{{count}} publicaciones",
+  "posts_count_label_one": "{{count}} publicaciones",
+  "posts_count_label_other": "{{count}} publicaciones"
 }

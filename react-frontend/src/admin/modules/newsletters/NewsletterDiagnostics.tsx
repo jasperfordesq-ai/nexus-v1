@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Progress } from '@/components/ui';
 import {
   useState,
@@ -154,7 +155,7 @@ export function NewsletterDiagnostics() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-foreground">{t('newsletter_diagnostics.total')}</span>
-                      <span className="font-semibold">{queueTotal.toLocaleString()}</span>
+                      <span className="font-semibold">{queueTotal.toLocaleString(getFormattingLocale())}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-foreground">{t('newsletter_diagnostics.pending')}</span>
@@ -183,6 +184,7 @@ export function NewsletterDiagnostics() {
                       value={queueHealth}
                       color={queueHealth > 90 ? 'success' : queueHealth > 70 ? 'warning' : 'danger'}
                       size="sm"
+                      aria-label={t('newsletter_diagnostics.success_rate')}
                     />
                   </div>
 
@@ -244,6 +246,7 @@ export function NewsletterDiagnostics() {
                       value={data ? Math.max(0, 100 - (data.bounce_rate * 2)) : 100}
                       color={data && data.bounce_rate < 5 ? 'success' : data && data.bounce_rate < 10 ? 'warning' : 'danger'}
                       size="sm"
+                      aria-label={t('newsletter_diagnostics.health')}
                     />
                   </div>
 
@@ -256,13 +259,16 @@ export function NewsletterDiagnostics() {
                       }`}>
                         {data?.sender_score ?? 100}
                       </span>
-                      <span className="text-sm text-muted">/ 100</span>
+                    <span className="text-sm text-muted">
+                      {t('diagnostics.score_out_of', { maximum: 100 })}
+                    </span>
                     </div>
                     <Progress
                       value={data?.sender_score ?? 100}
                       color={(data?.sender_score ?? 100) >= 80 ? 'success' : (data?.sender_score ?? 100) >= 60 ? 'warning' : 'danger'}
                       size="sm"
                       className="mt-2"
+                      aria-label={t('newsletter_diagnostics.sender_score')}
                     />
                   </div>
 

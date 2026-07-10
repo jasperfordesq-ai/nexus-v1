@@ -19,7 +19,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 
 import { useTranslation } from 'react-i18next';
 interface HourLogUser {
@@ -59,7 +59,7 @@ interface PendingHoursResponse {
 
 const formatDate = (dateStr: string) => {
   try {
-    return new Date(dateStr).toLocaleDateString(undefined, {
+    return new Date(dateStr).toLocaleDateString(getFormattingLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

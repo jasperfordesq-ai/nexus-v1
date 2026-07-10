@@ -326,10 +326,10 @@ export function FederationMemberProfilePage() {
               <Avatar
                 src={resolveAvatarUrl(member.avatar)}
                 name={displayName}
-                className="w-24 h-24 ring-4 ring-indigo-500/20"
+                className="w-24 h-24 ring-4 ring-accent/20"
               />
               <div
-                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center ring-2 ring-white dark:ring-gray-900"
+                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-accent flex items-center justify-center ring-2 ring-white dark:ring-gray-900"
                 title={member.timebank.name}
               >
                 <Globe className="w-4 h-4 text-white" aria-hidden="true" />
@@ -356,7 +356,7 @@ export function FederationMemberProfilePage() {
               <Chip
                 size="sm"
                 variant="flat"
-                className="mt-2 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                className="mt-2 bg-accent/10 text-accent dark:text-accent"
                 startContent={<Globe className="w-3.5 h-3.5" aria-hidden="true" />}
               >
                 {member.timebank.name}
@@ -491,7 +491,7 @@ export function FederationMemberProfilePage() {
                 <Chip
                   key={skill}
                   variant="flat"
-                  className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                  className="bg-accent/10 text-accent dark:text-accent"
                 >
                   {skill}
                 </Chip>

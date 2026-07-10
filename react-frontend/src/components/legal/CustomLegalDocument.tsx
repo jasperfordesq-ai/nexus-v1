@@ -14,10 +14,10 @@
  * handcrafted default legal pages.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import i18n from '@/i18n';
 import { motion } from '@/lib/motion';
 import { Chip } from '@/components/ui/Chip';
 import { sanitizeRichText } from '@/lib/sanitize';
@@ -143,20 +143,20 @@ const ACCENT_STYLES = {
     btnGradient: 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white',
   },
   indigo: {
-    gradientFrom: 'from-indigo-500/20',
-    gradientTo: 'to-purple-500/20',
-    icon: 'text-indigo-500 dark:text-indigo-400',
-    tocHover: 'hover:bg-indigo-500/10',
-    chipBg: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
-    btnGradient: 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white',
+    gradientFrom: 'from-accent/20',
+    gradientTo: 'to-accent-gradient-end/20',
+    icon: 'text-accent dark:text-accent',
+    tocHover: 'hover:bg-accent/10',
+    chipBg: 'bg-accent/10 text-accent dark:text-accent',
+    btnGradient: 'bg-gradient-to-r from-accent to-accent-gradient-end text-white',
   },
   purple: {
-    gradientFrom: 'from-purple-500/20',
+    gradientFrom: 'from-accent/20',
     gradientTo: 'to-pink-500/20',
-    icon: 'text-purple-500 dark:text-purple-400',
-    tocHover: 'hover:bg-purple-500/10',
-    chipBg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
-    btnGradient: 'bg-gradient-to-r from-purple-500 to-pink-600 text-white',
+    icon: 'text-accent dark:text-accent',
+    tocHover: 'hover:bg-accent/10',
+    chipBg: 'bg-accent/10 text-accent dark:text-accent',
+    btnGradient: 'bg-gradient-to-r from-accent to-pink-600 text-white',
   },
   emerald: {
     gradientFrom: 'from-emerald-500/20',
@@ -232,7 +232,7 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
               <>
                 <CalendarDays className="w-4 h-4" aria-hidden="true" />
                 <span>
-                  {t('custom.effective_label', { date: new Date(doc.effective_date).toLocaleDateString(i18n.language, {
+                  {t('custom.effective_label', { date: new Date(doc.effective_date).toLocaleDateString(getFormattingLocale(), {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric',
@@ -272,7 +272,7 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
                     key={section.id}
                     variant="light"
                     onPress={() => scrollToSection(section.id)}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-sm text-theme-muted transition-colors ${styles.tocHover} group min-h-9 min-w-0 w-full justify-start`}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-sm text-theme-muted transition-colors ${styles.tocHover} group min-h-11 w-full justify-start`}
                   >
                     <span
                       className={`inline-flex items-center justify-center w-5 h-5 rounded text-[0.65rem] font-bold ${styles.chipBg} shrink-0`}
@@ -343,14 +343,12 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
               <p className="text-theme-muted text-sm mb-4">
                 {t('custom.cta_body')}
               </p>
-              <Link to={tenantPath('/contact')}>
-                <Button
-                  className={styles.btnGradient}
-                  startContent={<Send className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('custom.contact_us')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath('/contact')}
+                className={styles.btnGradient}
+                startContent={<Send className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('custom.contact_us')}
+              </Button>
             </div>
           </div>
         </GlassCard>

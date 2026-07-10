@@ -40,6 +40,8 @@ const BASE_URL = process.env.E2E_BASE_URL || 'http://localhost:5173';
 const TENANT_SLUG = process.env.E2E_TENANT || 'hour-timebank';
 const HAS_USER_CREDENTIALS = Boolean(process.env.E2E_USER_EMAIL && process.env.E2E_USER_PASSWORD);
 const HAS_ADMIN_CREDENTIALS = Boolean(process.env.E2E_ADMIN_EMAIL && process.env.E2E_ADMIN_PASSWORD);
+const SKIP_DATA_SEED = process.env.E2E_SKIP_DATA_SEED === '1';
+const REQUIRE_CONFIGURED_AUTH = process.env.E2E_REQUIRE_AUTH === '1';
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
 const COOKIE_CONSENT = {
@@ -290,6 +292,7 @@ async function globalSetup(config: FullConfig) {
 
   const browser = await chromium.launch();
   let serverAccessible = false;
+  const authFailures: string[] = [];
 
   try {
     // Verify server is accessible
@@ -316,9 +319,17 @@ async function globalSetup(config: FullConfig) {
 
     await context.close();
 
+    if (REQUIRE_CONFIGURED_AUTH && !serverAccessible) {
+      throw new Error(`Required E2E auth could not run because ${BASE_URL} is unavailable`);
+    }
+
     const configuredUsers = Object.entries(TEST_USERS).filter(([userType]) => (
       userType === 'admin' ? HAS_ADMIN_CREDENTIALS : HAS_USER_CREDENTIALS
     ));
+
+    if (REQUIRE_CONFIGURED_AUTH && (!HAS_USER_CREDENTIALS || !HAS_ADMIN_CREDENTIALS)) {
+      throw new Error('Required E2E auth needs both member and admin credential pairs');
+    }
 
     if (configuredUsers.length === 0) {
       console.log('No E2E auth credentials configured; using empty auth state files.');
@@ -342,6 +353,7 @@ async function globalSetup(config: FullConfig) {
 
           console.log(`✅ Auth session saved for ${userType}\n`);
         } catch (error) {
+          authFailures.push(userType);
           console.warn(`⚠️  Could not create auth session for ${userType}: ${error}`);
           console.warn(`   Tests requiring ${userType} auth may fail.\n`);
         }
@@ -349,10 +361,14 @@ async function globalSetup(config: FullConfig) {
         await authContext.close();
       }
 
+      if (REQUIRE_CONFIGURED_AUTH && authFailures.length > 0) {
+        throw new Error(`Required E2E auth session(s) failed: ${authFailures.join(', ')}`);
+      }
+
       // Seed the deterministic two-actor fixture (balance floor, second actor,
       // listing, exchange) so money/auth specs can assert real outcomes. Best-effort:
       // a seeding failure must not block the suite.
-      if (HAS_USER_CREDENTIALS && HAS_ADMIN_CREDENTIALS) {
+      if (HAS_USER_CREDENTIALS && HAS_ADMIN_CREDENTIALS && !SKIP_DATA_SEED) {
         console.log('🌱 Seeding two-actor fixture...');
         try {
           await seedTwoActors({

@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
@@ -205,7 +206,7 @@ export function MyVereinDuesPage() {
                   {row.paid_at && (
                     <div className="text-xs text-success flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3" />
-                      {t('verein_dues.paid_label')} {new Date(row.paid_at).toLocaleDateString()}
+                      {t('verein_dues.paid_label')} {new Date(row.paid_at).toLocaleDateString(getFormattingLocale())}
                     </div>
                   )}
                 </div>

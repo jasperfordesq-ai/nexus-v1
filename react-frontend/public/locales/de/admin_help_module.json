@@ -84,7 +84,9 @@
       "general_admin": "Allgemeiner Administrator",
       "caring_community": "Fürsorgliche Gemeinschaft",
       "kiss_agoris": "KUSS & Caring Community"
-    }
+    },
+    "search_placeholder_one": "Durchsuchen Sie{{count}}-Hilfeartikel...",
+    "search_placeholder_other": "Durchsuchen Sie{{count}}-Hilfeartikel..."
   },
   "help_faqs": {
     "page_title": "Hilfe-FAQs",

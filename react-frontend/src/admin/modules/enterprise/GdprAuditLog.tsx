@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -196,7 +197,7 @@ export function GdprAuditLog() {
         key: 'created_at',
         label: t('enterprise.gdpr_date'),
         sortable: true,
-        render: (e) => new Date(e.created_at).toLocaleString(),
+        render: (e) => new Date(e.created_at).toLocaleString(getFormattingLocale()),
       },
       {
         key: 'actions',
@@ -373,7 +374,7 @@ export function GdprAuditLog() {
                       </div>
                       <div>
                         <p className="text-xs text-muted">{t('enterprise.gdpr_detail_timestamp')}</p>
-                        <p className="text-sm">{new Date(selectedEntry.created_at).toLocaleString()}</p>
+                        <p className="text-sm">{new Date(selectedEntry.created_at).toLocaleString(getFormattingLocale())}</p>
                       </div>
                     </div>
 

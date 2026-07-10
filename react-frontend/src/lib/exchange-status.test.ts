@@ -82,14 +82,14 @@ describe('exchange-status', () => {
 
     it('returns correct classes for primary', () => {
       const result = getStatusIconBgClass('primary');
-      expect(result).toContain('bg-indigo-500/20');
-      expect(result).toContain('text-indigo-400');
+      expect(result).toContain('bg-accent/20');
+      expect(result).toContain('text-accent');
     });
 
     it('returns correct classes for secondary', () => {
       const result = getStatusIconBgClass('secondary');
-      expect(result).toContain('bg-purple-500/20');
-      expect(result).toContain('text-purple-400');
+      expect(result).toContain('bg-accent/20');
+      expect(result).toContain('text-accent');
     });
 
     it('returns default classes for default color', () => {

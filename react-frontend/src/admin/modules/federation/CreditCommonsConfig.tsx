@@ -17,6 +17,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { PageHeader } from '../../components/PageHeader';
 import { useTranslation } from 'react-i18next';
+import { formatNumber } from '@/lib/helpers';
 import { PartnerTimebankGuidance } from './PartnerTimebankGuidance';
 
 /**
@@ -286,7 +287,15 @@ export function CreditCommonsConfig() {
                 </div>
                 <div>
                   <p className="text-sm text-muted">{t('federation.cc_volume')}</p>
-                  <p className="text-lg font-semibold">{(config?.stats?.volume ?? 0).toFixed(2)}h</p>
+              <p className="text-lg font-semibold">
+                {formatNumber(config?.stats?.volume ?? 0, {
+                  maximumFractionDigits: 2,
+                  minimumFractionDigits: 2,
+                  style: 'unit',
+                  unit: 'hour',
+                  unitDisplay: 'narrow',
+                })}
+              </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted">{t('federation.cc_accounts')}</p>

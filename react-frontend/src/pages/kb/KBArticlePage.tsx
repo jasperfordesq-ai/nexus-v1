@@ -224,17 +224,15 @@ export function KBArticlePage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error.article_title')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <div className="flex gap-2 justify-center">
-            <Link to={tenantPath('/kb')}>
-              <Button
-                variant="flat"
-                className="bg-theme-elevated text-theme-primary"
-                startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('back_to_kb')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/kb')}
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('back_to_kb')}
+            </Button>
             <Button
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
+              className="bg-gradient-to-r from-blue-500 to-accent-gradient-end text-white"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={loadArticle}
             >
@@ -468,15 +466,13 @@ export function KBArticlePage() {
 
       {/* Back link */}
       <div className="flex justify-center">
-        <Link to={tenantPath('/kb')}>
-          <Button
-            variant="flat"
-            className="bg-theme-elevated text-theme-muted"
-            startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-          >
-            {t('back_to_kb')}
-          </Button>
-        </Link>
+        <Button as={Link} to={tenantPath('/kb')}
+          variant="flat"
+          className="bg-theme-elevated text-theme-muted"
+          startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+        >
+          {t('back_to_kb')}
+        </Button>
       </div>
     </div>
   );

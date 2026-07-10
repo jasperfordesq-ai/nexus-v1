@@ -211,7 +211,8 @@
       "report_dismissed": "報告は却下されました。",
       "report_escalated": "報告はエスカレートしました。",
       "feed_valid": "RSSフィードの準備ができました。",
-      "feed_invalid": "RSS フィードに {{count}} の問題があります。"
+      "feed_invalid": "RSS フィードに {{count}} の問題があります。",
+      "feed_invalid_other": "RSS フィードに {{count}} の問題があります。"
     },
     "bulk": {
       "approve_selected": "選択した項目を承認",
@@ -219,7 +220,10 @@
       "done": "{{count}}件をモデレートしました。",
       "partial": "{{ok}}件をモデレートしました。{{failed}}件は失敗しました。",
       "confirm_reject_title": "選択した項目を却下",
-      "confirm_reject_message": "選択した{{count}}件を却下しますか？作成者側では下書きに戻ります。"
-    }
+      "confirm_reject_message": "選択した{{count}}件を却下しますか？作成者側では下書きに戻ります。",
+      "done_other": "{{count}}件をモデレートしました。",
+      "confirm_reject_message_other": "選択した{{count}}件を却下しますか？作成者側では下書きに戻ります。"
+    },
+    "count_other": "{{count}} アイテム"
   }
 }

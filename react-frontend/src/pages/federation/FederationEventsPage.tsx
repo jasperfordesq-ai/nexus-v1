@@ -46,7 +46,7 @@ import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { FederationOptInNotice } from '@/components/federation/FederationOptInNotice';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import type { FederatedEvent, FederationPartner } from '@/types/api';
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -387,12 +387,12 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
       })
     : null;
 
-  const formattedDate = startDate.toLocaleDateString(undefined, {
+  const formattedDate = startDate.toLocaleDateString(getFormattingLocale(), {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
   });
-  const formattedTime = startDate.toLocaleTimeString(undefined, {
+  const formattedTime = startDate.toLocaleTimeString(getFormattingLocale(), {
     hour: 'numeric',
     minute: '2-digit',
   });
@@ -419,13 +419,13 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
                 className="block bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-lg p-2"
               >
                 <span className="text-amber-700 dark:text-amber-400 text-xs font-medium uppercase block">
-                  {startDate.toLocaleString('default', { month: 'short' })}
+                  {startDate.toLocaleString(getFormattingLocale(), { month: 'short' })}
                 </span>
                 <span className="text-theme-primary text-xl sm:text-2xl font-bold block">
                   {startDate.getDate()}
                 </span>
                 <span className="text-theme-subtle text-xs block">
-                  {startDate.toLocaleString('default', { weekday: 'short' })}
+                  {startDate.toLocaleString(getFormattingLocale(), { weekday: 'short' })}
                 </span>
               </time>
             </div>
@@ -491,7 +491,7 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
               <Chip
                 size="sm"
                 variant="flat"
-                className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                className="bg-accent/10 text-accent dark:text-accent"
                 startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
               >
                 {event.timebank.name}

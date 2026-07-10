@@ -187,7 +187,10 @@
         "pause_failed": "Falha ao pausar a campanha",
         "rejected": "Campanha \"{{name}}\" rejeitada",
         "reject_failed": "Falha ao rejeitar campanha"
-      }
+      },
+      "creatives_count_many": "Criativos ({{count}})",
+      "creatives_count_one": "Criativos ({{count}})",
+      "creatives_count_other": "Criativos ({{count}})"
     },
     "push": {
       "page_title": "Campanhas push",

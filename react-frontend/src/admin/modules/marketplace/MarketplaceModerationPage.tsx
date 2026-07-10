@@ -8,6 +8,7 @@
  * Filter, review, approve/reject marketplace listings with moderation notes.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -280,7 +281,7 @@ export function MarketplaceModerationPage() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {new Date(item.created_at).toLocaleDateString()}
+          {new Date(item.created_at).toLocaleDateString(getFormattingLocale())}
         </span>
       ),
     },

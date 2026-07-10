@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, useConfirm } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -194,7 +195,7 @@ export function MySubscriptionPage() {
                 :{' '}
               </span>
               <span className="font-medium">
-                {new Date(sub.current_period_end).toLocaleDateString()}
+                {new Date(sub.current_period_end).toLocaleDateString(getFormattingLocale())}
               </span>
             </div>
           )}
@@ -202,7 +203,7 @@ export function MySubscriptionPage() {
           {sub.grace_period_ends_at && (
             <div className="text-sm rounded-md p-3 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-900 dark:text-yellow-200">
               {t('premium.grace_period_notice', {
-                date: new Date(sub.grace_period_ends_at).toLocaleDateString(),
+                date: new Date(sub.grace_period_ends_at).toLocaleDateString(getFormattingLocale()),
               })}
             </div>
           )}

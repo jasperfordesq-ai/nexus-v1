@@ -5,7 +5,7 @@
 
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Progress } from '@/components/ui/Progress';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Spinner } from '@/components/ui/Spinner';
@@ -161,39 +161,46 @@ export function ApplyModal({
                     </span>
                   </label>
                   <div
-                    className="border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-accent transition-colors"
-                    onClick={() => cvInputRef.current?.click()}
+                    className="border-2 border-dashed border-border rounded-lg p-2 text-center hover:border-accent transition-colors"
                     onDrop={onCvDrop}
                     onDragOver={(e) => e.preventDefault()}
-                    role="button"
-                    tabIndex={0}
-                    aria-label={t('apply.cv_dropzone_aria')}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cvInputRef.current?.click(); } }}
                   >
-                    {cvFile ? (
-                      <div className="flex items-center justify-center gap-2 text-sm text-foreground">
-                        <FileTextIcon size={16} aria-hidden="true" />
-                        <span>{cvFile.name}</span>
-                        <span className="text-muted">
-                          {t('apply.cv_size_kb', { count: Number((cvFile.size / 1024).toFixed(0)) })}
-                        </span>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        fullWidth
+                        variant="ghost"
+                        onPress={() => cvInputRef.current?.click()}
+                        aria-label={t('apply.cv_dropzone_aria')}
+                        className="min-h-14 flex-1 [--button-bg:transparent] [--button-bg-hover:var(--surface-hover)]"
+                      >
+                        {cvFile ? (
+                          <span className="flex min-w-0 items-center justify-center gap-2 text-sm text-foreground">
+                            <FileTextIcon size={16} aria-hidden="true" />
+                            <span className="truncate">{cvFile.name}</span>
+                            <span className="text-muted">
+                              {t('apply.cv_size_kb', { count: Number((cvFile.size / 1024).toFixed(0)) })}
+                            </span>
+                          </span>
+                        ) : (
+                          <span className="text-muted text-sm">
+                            <Upload size={20} className="mx-auto mb-1" aria-hidden="true" />
+                            {t('apply.cv_drop_prompt')}
+                          </span>
+                        )}
+                      </Button>
+                      {cvFile ? (
                         <Button
                           size="sm"
                           variant="danger-soft"
                           color="danger"
                           isIconOnly
-                          onClick={(e) => { e.stopPropagation(); setCvFile(null); }}
+                          onPress={() => setCvFile(null)}
                           aria-label={t('apply.cv_remove')}
                         >
                           <X size={14} aria-hidden="true" />
                         </Button>
-                      </div>
-                    ) : (
-                      <div className="text-muted text-sm">
-                        <Upload size={20} className="mx-auto mb-1" aria-hidden="true" />
-                        {t('apply.cv_drop_prompt')}
-                      </div>
-                    )}
+                      ) : null}
+                    </div>
                   </div>
                   <input
                     ref={cvInputRef}
@@ -289,10 +296,10 @@ export function QualificationModal({
         {(onClose) => (
           <>
             <ModalHeader>
-              <div className="flex items-center gap-2">
+              <ModalHeading className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-accent" aria-hidden="true" />
                 {t('qualified.title')}
-              </div>
+              </ModalHeading>
             </ModalHeader>
             <ModalBody>
               {isLoading ? (

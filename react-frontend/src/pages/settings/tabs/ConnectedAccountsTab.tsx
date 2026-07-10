@@ -12,6 +12,7 @@
  * backend returns 422 in that case).
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useState } from 'react';import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -138,7 +139,7 @@ export function ConnectedAccountsTab() {
                     {linked.linked_at && (
                       <span className="ml-2">
                         {t('oauth.connected_at')}{' '}
-                        {new Date(linked.linked_at).toLocaleDateString()}
+                        {new Date(linked.linked_at).toLocaleDateString(getFormattingLocale())}
                       </span>
                     )}
                   </p>
@@ -161,7 +162,7 @@ export function ConnectedAccountsTab() {
               ) : (
                 <Button
                   size="sm"
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                   isDisabled={isBusy || loading || !isProviderEnabled}
                   isLoading={isBusy}
                   onPress={() => handleConnect(provider)}

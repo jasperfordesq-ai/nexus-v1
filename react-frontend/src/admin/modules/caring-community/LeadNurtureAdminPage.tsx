@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useConfirm } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -349,10 +350,10 @@ export default function LeadNurtureAdminPage() {
                       </TableCell>
                       <TableCell className="text-xs text-muted">{c.source ?? emptyValue}</TableCell>
                       <TableCell className="text-xs text-muted">
-                        {c.consent_at ? new Date(c.consent_at).toLocaleDateString() : emptyValue}
+                        {c.consent_at ? new Date(c.consent_at).toLocaleDateString(getFormattingLocale()) : emptyValue}
                       </TableCell>
                       <TableCell className="text-xs text-muted">
-                        {c.follow_up_at ? new Date(c.follow_up_at).toLocaleDateString() : emptyValue}
+                        {c.follow_up_at ? new Date(c.follow_up_at).toLocaleDateString(getFormattingLocale()) : emptyValue}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">

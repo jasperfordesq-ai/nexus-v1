@@ -23,7 +23,19 @@
       "months_active": "{{count}} لمدة 12 شهرًا",
       "month_active_tooltip": "نشط: أنشطة {{count}}",
       "month_inactive_tooltip": "غير نشط",
-      "description": "الأشهر التي أكملت فيها نشاطًا مفيدًا واحدًا على الأقل (التبادل أو الإدراج أو المراجعة أو ساعات التطوع)."
+      "description": "الأشهر التي أكملت فيها نشاطًا مفيدًا واحدًا على الأقل (التبادل أو الإدراج أو المراجعة أو ساعات التطوع).",
+      "months_active_few": "{{count}} لمدة 12 شهرًا",
+      "months_active_many": "{{count}} لمدة 12 شهرًا",
+      "months_active_one": "{{count}} لمدة 12 شهرًا",
+      "months_active_other": "{{count}} لمدة 12 شهرًا",
+      "months_active_two": "{{count}} لمدة 12 شهرًا",
+      "months_active_zero": "{{count}} لمدة 12 شهرًا",
+      "month_active_tooltip_few": "نشط: أنشطة {{count}}",
+      "month_active_tooltip_many": "نشط: أنشطة {{count}}",
+      "month_active_tooltip_one": "نشط: أنشطة {{count}}",
+      "month_active_tooltip_other": "نشط: أنشطة {{count}}",
+      "month_active_tooltip_two": "نشط: أنشطة {{count}}",
+      "month_active_tooltip_zero": "نشط: أنشطة {{count}}"
     },
     "badge_type": {
       "vol": "التطوع",
@@ -77,7 +89,13 @@
       "claimed_message": "لقد حصلت على {{xp}} XP!",
       "claim_failed": "فشلت المطالبة",
       "claim_failed_desc": "لا يمكن المطالبة بالمكافأة اليومية.",
-      "claim_error": "حدث خطأ ما. يرجى المحاولة مرة أخرى."
+      "claim_error": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+      "day_streak_few": "{{count}} خط يوم",
+      "day_streak_many": "{{count}} خط يوم",
+      "day_streak_one": "{{count}} خط يوم",
+      "day_streak_other": "{{count}} خط يوم",
+      "day_streak_two": "{{count}} خط يوم",
+      "day_streak_zero": "{{count}} خط يوم"
     },
     "challenges": {
       "active_challenges": "التحديات النشطة",
@@ -121,7 +139,13 @@
       "purchase_failed_desc": "لا يمكن إكمال عملية الشراء.",
       "purchase_error": "حدث خطأ ما.",
       "load_failed": "فشل التحميل",
-      "load_failed_desc": "لا يمكن تحميل متجر XP."
+      "load_failed_desc": "لا يمكن تحميل متجر XP.",
+      "stock_left_few": "{{count}} متبقي في المخزون",
+      "stock_left_many": "{{count}} متبقي في المخزون",
+      "stock_left_one": "{{count}} متبقي في المخزون",
+      "stock_left_other": "{{count}} متبقي في المخزون",
+      "stock_left_two": "{{count}} متبقي في المخزون",
+      "stock_left_zero": "{{count}} متبقي في المخزون"
     },
     "loading": "جارٍ تحميل الإنجازات",
     "badge_detail": {
@@ -159,7 +183,13 @@
       "updated_desc": "تم حفظ عرض الشارة الخاصة بك.",
       "save_failed": "فشل الحفظ",
       "save_failed_desc": "لا يمكن تحديث الواجهة.",
-      "save_error": "حدث خطأ ما."
+      "save_error": "حدث خطأ ما.",
+      "select_badges_few": "حدد ما يصل إلى 5 شارات لعرضها على ملفك الشخصي. (تم تحديد {{count}}/5)",
+      "select_badges_many": "حدد ما يصل إلى 5 شارات لعرضها على ملفك الشخصي. (تم تحديد {{count}}/5)",
+      "select_badges_one": "حدد ما يصل إلى 5 شارات لعرضها على ملفك الشخصي. (تم تحديد {{count}}/5)",
+      "select_badges_other": "حدد ما يصل إلى 5 شارات لعرضها على ملفك الشخصي. (تم تحديد {{count}}/5)",
+      "select_badges_two": "حدد ما يصل إلى 5 شارات لعرضها على ملفك الشخصي. (تم تحديد {{count}}/5)",
+      "select_badges_zero": "حدد ما يصل إلى 5 شارات لعرضها على ملفك الشخصي. (تم تحديد {{count}}/5)"
     },
     "load_error": "فشل تحميل الإنجازات. يرجى المحاولة مرة أخرى."
   },
@@ -266,7 +296,13 @@
       "buddy_failed": "فشل في أن يصبح صديقًا",
       "buddy_action_sent": "تم إرسال دعم الأصدقاء",
       "buddy_action_failed": "فشل في إرسال دعم الأصدقاء"
-    }
+    },
+    "streak_label_few": "{{count}} خط تسجيل الوصول",
+    "streak_label_many": "{{count}} خط تسجيل الوصول",
+    "streak_label_one": "{{count}} خط تسجيل الوصول",
+    "streak_label_other": "{{count}} خط تسجيل الوصول",
+    "streak_label_two": "{{count}} خط تسجيل الوصول",
+    "streak_label_zero": "{{count}} خط تسجيل الوصول"
   },
   "frequency": {
     "none": "لا إيقاع",
@@ -328,7 +364,13 @@
       "rank_label": "الرتبة {{rank}}",
       "xp_reward": "{{xp}} XP",
       "load_failed": "فشل التحميل",
-      "load_failed_desc": "تعذر تحميل سجل الموسم."
+      "load_failed_desc": "تعذر تحميل سجل الموسم.",
+      "participants_few": "{{count}} من المشاركين",
+      "participants_many": "{{count}} من المشاركين",
+      "participants_one": "{{count}} من المشاركين",
+      "participants_other": "{{count}} من المشاركين",
+      "participants_two": "{{count}} من المشاركين",
+      "participants_zero": "{{count}} من المشاركين"
     },
     "score_unit": {
       "hours": "ح",
@@ -421,7 +463,19 @@
       "legendary": "الأسطوري"
     },
     "max_score_label": "/ {{max}}",
-    "loading": "جارٍ تحميل NexusScore..."
+    "loading": "جارٍ تحميل NexusScore...",
+    "points_to_next_few": "{{count}} points to {{tier}}",
+    "points_to_next_many": "{{count}} points to {{tier}}",
+    "points_to_next_one": "يشير {{count}} إلى {{tier}}",
+    "points_to_next_other": "يشير {{count}} إلى {{tier}}",
+    "points_to_next_two": "{{count}} points to {{tier}}",
+    "points_to_next_zero": "{{count}} points to {{tier}}",
+    "remaining_count_few": "{{count}} المتبقي",
+    "remaining_count_many": "{{count}} المتبقي",
+    "remaining_count_one": "{{count}} المتبقي",
+    "remaining_count_other": "{{count}} المتبقي",
+    "remaining_count_two": "{{count}} المتبقي",
+    "remaining_count_zero": "{{count}} المتبقي"
   },
   "common": {
     "refresh": "ينعش",

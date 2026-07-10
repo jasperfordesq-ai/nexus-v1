@@ -455,7 +455,23 @@
     "winning_metric": "Winning Méadrach",
     "resend_queued_count": "Ciúáilte{{count}}athsheoladh",
     "resend_queued_count_plural": "Athsheolann scuaine{{count}}",
-    "template_tabs_aria": "Scagaire catagóir nuachtlitir teimpléad"
+    "template_tabs_aria": "Scagaire catagóir nuachtlitir teimpléad",
+    "subscriber_total_few": "Suibscríobhaí iomlán{{count}}",
+    "subscriber_total_many": "Suibscríobhaí iomlán{{count}}",
+    "subscriber_total_two": "Suibscríobhaí iomlán{{count}}",
+    "import_rows_found_few": "Fuarthas síntiúsóir{{count}}in CSV",
+    "import_rows_found_many": "Fuarthas síntiúsóir{{count}}in CSV",
+    "import_rows_found_two": "Fuarthas síntiúsóir{{count}}in CSV",
+    "resend_queued_count_few": "Ciúáilte{{count}}athsheoladh",
+    "resend_queued_count_many": "Ciúáilte{{count}}athsheoladh",
+    "resend_queued_count_one": "Ciúáilte{{count}}athsheoladh",
+    "resend_queued_count_other": "Ciúáilte{{count}}athsheoladh",
+    "resend_queued_count_two": "Ciúáilte{{count}}athsheoladh",
+    "your_average": "Do meán",
+    "industry_avg": "Meán tionscail",
+    "above_benchmark": "Os cionn tagarmharc",
+    "below_benchmark": "Thíos tagarmharc",
+    "benchmark_difference": "{{pointSign}}{{pointValue}} pointe céatadáin ({{percentSign}}{{percentValue}}%)"
   },
   "newsletter_form": {
     "ab_test_label": "Tástáil Ab",
@@ -759,7 +775,10 @@
     "total_records_one": "{{count}}taifead iomlán",
     "total_records_other": "{{count}}taifid iomlána",
     "who_clicked": "Cé a chliceáil",
-    "who_opened": "Cé a d'oscail"
+    "who_opened": "Cé a d'oscail",
+    "total_records_few": "{{count}}taifead iomlán",
+    "total_records_many": "{{count}}taifead iomlán",
+    "total_records_two": "{{count}}taifead iomlán"
   },
   "newsletter_bounces": {
     "bounce_log": "Preab logáil",
@@ -895,7 +914,22 @@
     "subject_override_desc": "Fág bán chun an bunábhar a úsáid.",
     "subject_override_placeholder": "Cuir isteach sárú ar an ábhar...",
     "subtitle": "Seol an nuachtlitir seo chuig fo-thacar faighteoirí spriocdhírithe.",
-    "total_sent": "Iomlán seolta"
+    "total_sent": "Iomlán seolta",
+    "non_openers_count_few": "{{count}}faighteoir nár oscail",
+    "non_openers_count_many": "{{count}}faighteoir nár oscail",
+    "non_openers_count_one": "{{count}}faighteoir nár oscail",
+    "non_openers_count_other": "{{count}}faighteoir nár oscail",
+    "non_openers_count_two": "{{count}}faighteoir nár oscail",
+    "non_clickers_count_few": "Faighteoir{{count}}a d’oscail ach nár chliceáil",
+    "non_clickers_count_many": "Faighteoir{{count}}a d’oscail ach nár chliceáil",
+    "non_clickers_count_one": "Faighteoir{{count}}a d’oscail ach nár chliceáil",
+    "non_clickers_count_other": "Faighteoir{{count}}a d’oscail ach nár chliceáil",
+    "non_clickers_count_two": "Faighteoir{{count}}a d’oscail ach nár chliceáil",
+    "preview_recipient_count_desc_few": "Seolfar an t-athsheoladh seo chuig faighteoir{{count}}",
+    "preview_recipient_count_desc_many": "Seolfar an t-athsheoladh seo chuig faighteoir{{count}}",
+    "preview_recipient_count_desc_one": "Seolfar an t-athsheoladh seo chuig faighteoir{{count}}",
+    "preview_recipient_count_desc_other": "Seolfar an t-athsheoladh seo chuig faighteoir{{count}}",
+    "preview_recipient_count_desc_two": "Seolfar an t-athsheoladh seo chuig faighteoir{{count}}"
   },
   "newsletter_send_time": {
     "day_friday": "Aoine",
@@ -919,7 +953,15 @@
     "not_enough_data": "Níl go leor sonraí rannpháirtíochta fós.",
     "time_period": "Tréimhse ama",
     "title": "Seol optimiser ama",
-    "top_recommended": "Top Recommended"
+    "top_recommended": "Top Recommended",
+    "days_few": "Laethanta{{count}}",
+    "days_many": "Laethanta{{count}}",
+    "days_one": "Laethanta{{count}}",
+    "days_other": "Laethanta{{count}}",
+    "days_two": "Laethanta{{count}}",
+    "heatmap_cell_title_few": "{{day}}{{hour}}:{{count}}rannpháirtíocht",
+    "heatmap_cell_title_many": "{{day}}{{hour}}:{{count}}rannpháirtíocht",
+    "heatmap_cell_title_two": "{{day}}{{hour}}:{{count}}rannpháirtíocht"
   },
   "segment_form": {
     "analyzing_member_data": "Anailís a dhéanamh ar Shonraí Ball",
@@ -1038,5 +1080,8 @@
     "update_template": "Nuashonraigh Teimpléad",
     "usage_stats_sent": "Staitisticí Úsáide seolta",
     "usage_stats_sent_plural": "Usage Stats Sent Plural"
+  },
+  "diagnostics": {
+    "score_out_of": "as {{maximum}}"
   }
 }

@@ -186,7 +186,17 @@
     "time_just_now": "Agora mesmo",
     "time_minutes_ago": "há {{count}} min",
     "time_hours_ago": "há {{count}} h",
-    "time_days_ago": "há {{count}} d"
+    "time_days_ago": "há {{count}} d",
+    "open_items_many": "itens à espera da sua revisão",
+    "time_minutes_ago_many": "há {{count}} min",
+    "time_minutes_ago_one": "há {{count}} min",
+    "time_minutes_ago_other": "há {{count}} min",
+    "time_hours_ago_many": "há {{count}} h",
+    "time_hours_ago_one": "há {{count}} h",
+    "time_hours_ago_other": "há {{count}} h",
+    "time_days_ago_many": "há {{count}} d",
+    "time_days_ago_one": "há {{count}} d",
+    "time_days_ago_other": "há {{count}} d"
   },
   "members": {
     "title": "Membros",
@@ -288,7 +298,20 @@
     "empty_never_logged_in_title": "Todos já iniciaram sessão",
     "empty_never_logged_in_hint": "Não há membros aprovados ainda à espera de iniciar sessão pela primeira vez.",
     "empty_onboarding_incomplete_title": "Todos concluíram a integração",
-    "empty_onboarding_incomplete_hint": "Nenhum membro tem etapas de integração por concluir."
+    "empty_onboarding_incomplete_hint": "Nenhum membro tem etapas de integração por concluir.",
+    "time_minutes_ago_many": "há {{count}} min",
+    "time_minutes_ago_one": "há {{count}} min",
+    "time_minutes_ago_other": "há {{count}} min",
+    "time_hours_ago_many": "há {{count}} h",
+    "time_hours_ago_one": "há {{count}} h",
+    "time_hours_ago_other": "há {{count}} h",
+    "time_days_ago_many": "há {{count}} d",
+    "time_days_ago_one": "há {{count}} d",
+    "time_days_ago_other": "há {{count}} d",
+    "bulk_selected_many": "{{count}} selecionados",
+    "bulk_selected_one": "{{count}} selecionados",
+    "bulk_selected_other": "{{count}} selecionados",
+    "role_all": "Todas as funções"
   },
   "onboarding": {
     "title": "Integração",
@@ -503,7 +526,34 @@
     "empty_queue_title": "Nenhum registo à espera de revisão",
     "empty_queue_hint": "Tudo em dia — as novas submissões aparecerão aqui para revisão.",
     "list_error_title": "Não foi possível carregar os registos de verificação",
-    "list_error_body": "Verifique a sua ligação e tente novamente."
+    "list_error_body": "Verifique a sua ligação e tente novamente.",
+    "expiry_days_left_many": "{{count}}d restantes",
+    "expiry_days_left_one": "{{count}}d restantes",
+    "expiry_days_left_other": "{{count}}d restantes",
+    "toast_bulk_success_many": "{{count}} registos {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_one": "{{count}} registos {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_other": "{{count}} registos {{action}}.{{failedSuffix}}",
+    "toast_bulk_failed_suffix_many": " ({{count}} falharam)",
+    "toast_bulk_failed_suffix_one": " ({{count}} falharam)",
+    "toast_bulk_failed_suffix_other": " ({{count}} falharam)",
+    "stat_of_total_many": "de {{count}} registos no total",
+    "stat_of_total_one": "de {{count}} registos no total",
+    "stat_of_total_other": "de {{count}} registos no total",
+    "stat_expired_hint_many": "{{count}} já expirados",
+    "stat_expired_hint_one": "{{count}} já expirados",
+    "stat_expired_hint_other": "{{count}} já expirados",
+    "records_selected_many": "{{count}} registos selecionados",
+    "records_selected_one": "{{count}} registos selecionados",
+    "records_selected_other": "{{count}} registos selecionados",
+    "bulk_verify_confirm_many": "Verificar todos os registos selecionados?",
+    "bulk_verify_confirm_one": "Verificar todos os registos selecionados?",
+    "bulk_verify_confirm_other": "Verificar todos os registos selecionados?",
+    "bulk_delete_confirm_many": "Tem a certeza de que pretende eliminar todos os registos selecionados? Esta ação não pode ser anulada.",
+    "bulk_delete_confirm_one": "Tem a certeza de que pretende eliminar todos os registos selecionados? Esta ação não pode ser anulada.",
+    "bulk_delete_confirm_other": "Tem a certeza de que pretende eliminar todos os registos selecionados? Esta ação não pode ser anulada.",
+    "bulk_reject_confirm_many": "Indique um motivo para rejeitar todos os registos selecionados.",
+    "bulk_reject_confirm_one": "Indique um motivo para rejeitar todos os registos selecionados.",
+    "bulk_reject_confirm_other": "Indique um motivo para rejeitar todos os registos selecionados."
   },
   "member_detail": {
     "load_failed": "Falha ao carregar o membro.",
@@ -795,7 +845,10 @@
     "retry": "Tentar novamente",
     "detail_not_found_hint": "A cópia da mensagem pode ter sido arquivada ou removida, ou a ligação pode estar errada.",
     "detail_flag_banner_title": "Sinalizada para revisão",
-    "detail_decision_prompt": "Registe uma decisão de revisão para esta cópia de mensagem."
+    "detail_decision_prompt": "Registe uma decisão de revisão para esta cópia de mensagem.",
+    "detail_message_count_many": "{{count}} mensagens",
+    "detail_message_count_one": "{{count}} mensagens",
+    "detail_message_count_other": "{{count}} mensagens"
   },
   "monitoring": {
     "title": "Monitorização de utilizadores",
@@ -855,7 +908,8 @@
     "empty_all_clear_hint": "Todos os membros comunicam livremente. Adicione um membro se algo precisar de uma atenção mais próxima.",
     "load_error_title": "Não foi possível carregar os membros monitorizados",
     "load_error_hint": "Algo correu mal ao obter a lista de monitorização. Atualize para tentar novamente.",
-    "retry_button": "Tentar novamente"
+    "retry_button": "Tentar novamente",
+    "expiry_days_left_many": "{{count}} dias restantes"
   },
   "risk_tags": {
     "title": "Etiquetas de risco",
@@ -939,7 +993,8 @@
     "empty_level_title": "Nenhuma etiqueta neste nível",
     "empty_level_hint": "Nenhum anúncio tem atualmente este nível de risco.",
     "empty_search_title": "Nenhuma etiqueta de risco correspondente",
-    "empty_search_hint": "Experimente um termo de pesquisa diferente ou limpe a pesquisa."
+    "empty_search_hint": "Experimente um termo de pesquisa diferente ou limpe a pesquisa.",
+    "level_all": "Todos os níveis de risco"
   },
   "insurance": {
     "title": "Certificados de seguro",
@@ -1124,7 +1179,10 @@
     "detail_description": "Uma captura congelada e só de leitura de uma cópia de mensagem revista.",
     "frozen_note": "Este registo é preservado exatamente como foi revisto e não pode ser modificado.",
     "record_id": "Registo #{{id}}",
-    "record_unavailable": "Registo indisponível"
+    "record_unavailable": "Registo indisponível",
+    "messages_count_many": "{{count}} mensagens",
+    "messages_count_one": "{{count}} mensagens",
+    "messages_count_other": "{{count}} mensagens"
   },
   "configuration": {
     "title": "Configuração do mediador",

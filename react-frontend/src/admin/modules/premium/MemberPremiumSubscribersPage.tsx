@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -133,10 +134,10 @@ export function MemberPremiumSubscribersPage() {
                       <Chip size="sm" color={statusColor(r.status)} variant="soft">{t(`member_premium_admin.subscribers_page.status.${r.status}`)}</Chip>
                     </TableCell>
                     <TableCell>
-                      {r.current_period_end ? new Date(r.current_period_end).toLocaleDateString() : t('member_premium_admin.empty.value')}
+                      {r.current_period_end ? new Date(r.current_period_end).toLocaleDateString(getFormattingLocale()) : t('member_premium_admin.empty.value')}
                     </TableCell>
                     <TableCell>
-                      {new Date(r.created_at).toLocaleDateString()}
+                      {new Date(r.created_at).toLocaleDateString(getFormattingLocale())}
                     </TableCell>
                   </TableRow>
                 ))}

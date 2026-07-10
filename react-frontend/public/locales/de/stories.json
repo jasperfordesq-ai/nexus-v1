@@ -98,7 +98,9 @@
     "or_divider": "oder",
     "poll_add_option_button": "Option hinzufügen",
     "videos_trimmed_notice": "Videos länger als 60 Sekunden werden auf 60 Sekunden Anzeigedauer gekürzt",
-    "video_duration_seconds": "{{count}}s"
+    "video_duration_seconds": "{{count}}s",
+    "video_duration_seconds_one": "{{count}}s",
+    "video_duration_seconds_other": "{{count}}s"
   },
   "viewer": {
     "story_from": "Story von {{name}}",
@@ -132,7 +134,11 @@
     "reply_placeholder_generic": "Auf Story antworten...",
     "react_with": "Reagiere mit {{type}}",
     "viewers_title_count": "Zuschauer ({{count}})",
-    "delete_story_confirm": "Diese Geschichte löschen? Dies kann nicht rückgängig gemacht werden."
+    "delete_story_confirm": "Diese Geschichte löschen? Dies kann nicht rückgängig gemacht werden.",
+    "poll_votes_one": "{{count}} Stimmen",
+    "poll_votes_other": "{{count}} Stimmen",
+    "viewers_title_count_one": "Zuschauer ({{count}})",
+    "viewers_title_count_other": "Zuschauer ({{count}})"
   },
   "highlights": {
     "no_stories": "Diese Highlight hat keine Geschichten",

@@ -792,7 +792,34 @@
     "no_hub_tenants_found": "Nessun tenant dell'hub trovato",
     "impersonate_user_warning": "La rappresentazione registra ogni azione con l'identità di questo utente. Utilizzare solo quando necessario per il supporto.",
     "partnerships_tabs_aria": "Filtro sullo stato della partnership della federazione",
-    "tenant_list_tabs_aria": "Filtro stato inquilino"
+    "tenant_list_tabs_aria": "Filtro stato inquilino",
+    "tab_with_count_many": "{{label}}({{count}})",
+    "tab_with_count_one": "{{label}}({{count}})",
+    "tab_with_count_other": "{{label}}({{count}})",
+    "users_count_many": "{{count}} utenti",
+    "users_count_one": "{{count}} utenti",
+    "users_count_other": "{{count}} utenti",
+    "bulk_users_moved_count_many": "Utenti in blocco spostati ({{count}})",
+    "bulk_users_moved_count_one": "Utenti in blocco spostati ({{count}})",
+    "bulk_users_moved_count_other": "Utenti in blocco spostati ({{count}})",
+    "bulk_tenants_updated_count_many": "Tenant in blocco aggiornati ({{count}})",
+    "bulk_tenants_updated_count_one": "Tenant in blocco aggiornati ({{count}})",
+    "bulk_tenants_updated_count_other": "Tenant in blocco aggiornati ({{count}})",
+    "move_n_users_many": "Sposta {{count}} utenti",
+    "move_n_users_one": "Sposta {{count}} utenti",
+    "move_n_users_other": "Sposta {{count}} utenti",
+    "apply_to_n_tenants_many": "Applica a {{count}} tenant",
+    "apply_to_n_tenants_one": "Applica a {{count}} tenant",
+    "apply_to_n_tenants_other": "Applica a {{count}} tenant",
+    "bulk_move_confirm_message_with_grant_many": "Sposta {{count}} utente/i e concedi l'accesso super amministratore al tenant.",
+    "bulk_move_confirm_message_with_grant_one": "Sposta {{count}} utente/i e concedi l'accesso super amministratore al tenant.",
+    "bulk_move_confirm_message_with_grant_other": "Sposta {{count}} utente/i e concedi l'accesso super amministratore al tenant.",
+    "bulk_move_confirm_message_many": "Sposta {{count}} utente/i.",
+    "bulk_move_confirm_message_one": "Sposta {{count}} utente/i.",
+    "bulk_move_confirm_message_other": "Sposta {{count}} utente/i.",
+    "bulk_update_confirm_message_many": "Applica questo aggiornamento a {{count}} tenant.",
+    "bulk_update_confirm_message_one": "Applica questo aggiornamento a {{count}} tenant.",
+    "bulk_update_confirm_message_other": "Applica questo aggiornamento a {{count}} tenant."
   },
   "tenant_form": {
     "active": "Attivo",
@@ -997,7 +1024,10 @@
     "view": "Visualizza",
     "whitelisted_tenants_aria": "Inquilini autorizzati",
     "whitelisted_tenants_count": "Tenant autorizzati ({{count}})",
-    "failed_to_load": "Impossibile caricare la lista bianca"
+    "failed_to_load": "Impossibile caricare la lista bianca",
+    "whitelisted_tenants_count_many": "Tenant autorizzati ({{count}})",
+    "whitelisted_tenants_count_one": "Tenant autorizzati ({{count}})",
+    "whitelisted_tenants_count_other": "Tenant autorizzati ({{count}})"
   },
   "pilot_inquiry_admin": {
     "page_title": "Richieste pilota",
@@ -1093,14 +1123,35 @@
       "empty": "-",
       "months": "{{count}} mesi",
       "no": "NO",
-      "yes": "SÌ"
+      "yes": "SÌ",
+      "months_many": "{{count}} mesi",
+      "months_one": "{{count}} mesi",
+      "months_other": "{{count}} mesi"
     },
     "velocity": {
       "avg_to_agreed": "Media da concordare:",
       "avg_to_live": "Media da vivere:",
       "avg_to_proposal": "Media della proposta:",
       "days": "{{count}}d",
-      "title": "Velocità della pipeline: giorni medi dall'invio della richiesta a ogni tappa fondamentale:"
+      "title": "Velocità della pipeline: giorni medi dall'invio della richiesta a ogni tappa fondamentale:",
+      "days_many": "{{count}}d",
+      "days_one": "{{count}}d",
+      "days_other": "{{count}}d"
     }
-  }
+  },
+  "events": "Eventi",
+  "groups": "Gruppi",
+  "gamification": "Ludicizzazione",
+  "goals": "Obiettivi",
+  "blog": "Blog",
+  "resources": "Risorse",
+  "volunteering": "Volontariato",
+  "federation": "Federazione",
+  "listings": "Annunci",
+  "wallet": "Portafoglio",
+  "messages": "Messaggi",
+  "dashboard": "Pannello di controllo",
+  "exchange_workflow": "Flusso di lavoro di scambio",
+  "organisations": "Organizzazioni",
+  "feed": "Foraggio"
 }

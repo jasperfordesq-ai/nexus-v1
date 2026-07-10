@@ -92,7 +92,13 @@
     "get_directions": "Indicazioni",
     "promoted": "Promosso",
     "unsave": "Rimuovi dai salvati",
-    "save": "Salva annuncio"
+    "save": "Salva annuncio",
+    "available_count_many": "{{count}} disponibili",
+    "available_count_one": "{{count}} disponibili",
+    "available_count_other": "{{count}} disponibili",
+    "views_count_many": "{{count}} visualizzazioni",
+    "views_count_one": "{{count}} visualizzazioni",
+    "views_count_other": "{{count}} visualizzazioni"
   },
   "offer": {
     "modal_title": "Fai un'offerta",
@@ -184,7 +190,10 @@
     "created_success": "Annuncio creato con successo!",
     "created_error": "Impossibile creare l'annuncio",
     "created_error_retry": "Impossibile creare l'annuncio. Riprova.",
-    "draft_saved": "Bozza salvata"
+    "draft_saved": "Bozza salvata",
+    "title_char_count_many": "{{count}}/120 caratteri",
+    "title_char_count_one": "{{count}}/120 caratteri",
+    "title_char_count_other": "{{count}}/120 caratteri"
   },
   "search": {
     "category_search": "Cerca categorie...",
@@ -228,7 +237,11 @@
     "price_from": "Da {{min}}",
     "price_up_to": "Fino a {{max}}",
     "last_days_one": "Ultimo {{count}} giorno",
-    "last_days_other": "Ultimi {{count}} giorni"
+    "last_days_other": "Ultimi {{count}} giorni",
+    "reset_filters_many": "Ripristina Filtri ({{count}})",
+    "reset_filters_one": "Ripristina Filtri ({{count}})",
+    "reset_filters_other": "Ripristina Filtri ({{count}})",
+    "results_count_many": "{{count}} risultati"
   },
   "seller": {
     "page_title": "Profilo Venditore",
@@ -285,7 +298,12 @@
     "results_count_one": "{{count}} risultato",
     "results_count_other": "{{count}} risultati",
     "load_more": "Carica di Più",
-    "browse_description": "Sfoglia gli annunci di {{name}} nel mercato."
+    "browse_description": "Sfoglia gli annunci di {{name}} nel mercato.",
+    "reset_filters_many": "Ripristina Filtri ({{count}})",
+    "reset_filters_one": "Ripristina Filtri ({{count}})",
+    "reset_filters_other": "Ripristina Filtri ({{count}})",
+    "listings_count_many": "{{count}} annunci",
+    "results_count_many": "{{count}} risultati"
   },
   "common": {
     "loading": "Caricamento...",
@@ -426,7 +444,10 @@
     "empty_sold_title": "Nessuna Vendita Ancora",
     "empty_sold_description": "Non hai ancora venduto alcun articolo.",
     "empty_expired_title": "Nessun Annuncio Scaduto",
-    "empty_expired_description": "Non hai alcun annuncio scaduto."
+    "empty_expired_description": "Non hai alcun annuncio scaduto.",
+    "views_count_aria_many": "{{count}} visualizzazioni",
+    "views_count_aria_one": "{{count}} visualizzazioni",
+    "views_count_aria_other": "{{count}} visualizzazioni"
   },
   "my_offers": {
     "page_title": "Le Mie Offerte - Marketplace",
@@ -485,7 +506,8 @@
     "empty_collections_title": "Nessuna Collezione Ancora",
     "empty_collections_description": "Crea una collezione per organizzare i tuoi articoli preferiti del marketplace.",
     "sign_in_title": "Accesso Richiesto",
-    "sign_in_description": "Accedi per gestire le tue collezioni e le ricerche salvate."
+    "sign_in_description": "Accedi per gestire le tue collezioni e le ricerche salvate.",
+    "item_count_many": "{{count}} articoli"
   },
   "saved_searches": {
     "tab_title": "Ricerche Salvate",
@@ -518,7 +540,9 @@
     "duration_days_one": "{{count}} giorno",
     "duration_days_other": "{{count}} giorni",
     "duration_hours_one": "{{count}} ora",
-    "duration_hours_other": "{{count}} ore"
+    "duration_hours_other": "{{count}} ore",
+    "duration_days_many": "{{count}} giorni",
+    "duration_hours_many": "{{count}} ore"
   },
   "free": {
     "page_title": "Articoli gratuiti",
@@ -584,7 +608,16 @@
       "declined": "Rifiutata",
       "completed": "Completata",
       "cancelled": "Annullata"
-    }
+    },
+    "offers_title_count_many": "Offerte di consegna ({{count}})",
+    "offers_title_count_one": "Offerte di consegna ({{count}})",
+    "offers_title_count_other": "Offerte di consegna ({{count}})",
+    "time_credits_value_many": "{{count}} CT",
+    "time_credits_value_one": "{{count}} CT",
+    "time_credits_value_other": "{{count}} CT",
+    "estimated_minutes_many": "~{{count}} min",
+    "estimated_minutes_one": "~{{count}} min",
+    "estimated_minutes_other": "~{{count}} min"
   },
   "pickup": {
     "my_pickups_title": "I miei ritiri",
@@ -613,7 +646,13 @@
     "oversold_protected": "Rifiuta gli ordini che eccederebbero le scorte",
     "sold_out": "Esaurito",
     "low_chip": "Inventario: {{count}} (Basso)",
-    "count_chip": "Inventario: {{count}}"
+    "count_chip": "Inventario: {{count}}",
+    "low_chip_many": "Inventario: {{count}} (Basso)",
+    "low_chip_one": "Inventario: {{count}} (Basso)",
+    "low_chip_other": "Inventario: {{count}} (Basso)",
+    "count_chip_many": "Inventario: {{count}}",
+    "count_chip_one": "Inventario: {{count}}",
+    "count_chip_other": "Inventario: {{count}}"
   },
   "ai_reply": {
     "suggest": "Suggerisci Risposta",
@@ -647,7 +686,10 @@
     "search_this_area": "Cerca in quest'area",
     "distance_km": "{{km}} km di distanza",
     "distance_meters": "{{m}}m di distanza",
-    "view_toggle": "Modalità di visualizzazione"
+    "view_toggle": "Modalità di visualizzazione",
+    "results_count_many": "{{count}} annunci trovati nelle vicinanze",
+    "results_count_one": "{{count}} annunci trovati nelle vicinanze",
+    "results_count_other": "{{count}} annunci trovati nelle vicinanze"
   },
   "shipping": {
     "title": "Opzioni di Spedizione",
@@ -778,7 +820,10 @@
       "select_rating": "Seleziona una valutazione",
       "success": "Valutazione inviata con successo!",
       "error": "Impossibile inviare la valutazione"
-    }
+    },
+    "quantity_multiplier_many": "×{{count}}",
+    "quantity_multiplier_one": "×{{count}}",
+    "quantity_multiplier_other": "×{{count}}"
   },
   "onboarding": {
     "page_title": "Onboarding Venditore - Marketplace",

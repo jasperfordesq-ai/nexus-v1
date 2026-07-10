@@ -207,7 +207,8 @@
     "tbi_proxy_independence": "Monetaire waarde van ontvangen uren",
     "tbi_proxy_inclusion": "HACT: behoren tot een buurt (TBI 2023 kalibratie)",
     "pdf_coefficients": "Applied Coefficients",
-    "formula_true_sroi": "SROI-ratio = Totale contante waarde van geverifieerde uitkomsten (na deadweight, verplaatsing, attributie, drop-off en verdiscontering) ÷ Totale investering"
+    "formula_true_sroi": "SROI-ratio = Totale contante waarde van geverifieerde uitkomsten (na deadweight, verplaatsing, attributie, drop-off en verdiscontering) ÷ Totale investering",
+    "multiplier_value": "{{value}}×"
   },
   "impact_report_labels": {
     "transactions": "Transacties",

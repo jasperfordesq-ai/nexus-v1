@@ -4,16 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Regression test: the Cmd+K command palette announces its result count to
- * screen readers, and every result is a reachable, labelled control.
- *
- * (Results are real <button>s reachable via Tab; the sole gap the survey found
- * was that the result count was never announced. A polite live region now
- * announces it. Tested on the synchronous action-mode (`>`) path.)
+ * Regression test: the Cmd+K command palette exposes an ARIA combobox whose
+ * active option remains owned by the input, and announces result-count changes.
  */
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { axe } from 'vitest-axe';
 import { SearchOverlay } from '../SearchOverlay';
 
 vi.mock('react-router-dom', () => ({ useNavigate: () => vi.fn() }));
@@ -45,20 +42,37 @@ vi.mock('@/contexts', () => ({
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn() }),
 }));
 
-describe('SearchOverlay — command palette result announcement', () => {
-  it('announces the result count and keeps every result reachable', () => {
+describe('SearchOverlay — combobox accessibility contract', () => {
+  it('announces results and exposes every command through the controlled listbox', () => {
     render(<SearchOverlay isOpen onClose={vi.fn()} />);
 
-    const input = screen.getByRole('textbox');
-    // "> " enters action mode — populated synchronously from quick actions.
+    const input = screen.getByRole('combobox');
     fireEvent.change(input, { target: { value: '>' } });
 
-    // A polite live region announces how many results are available.
     expect(screen.getByText(/results available/)).toBeInTheDocument();
+    const listbox = screen.getByRole('listbox');
+    const options = screen.getAllByRole('option');
 
-    // Every action is a real, labelled button (reachable by keyboard via Tab).
-    const buttons = screen.getAllByRole('button');
-    expect(buttons.length).toBeGreaterThan(0);
+    expect(input).toHaveAttribute('aria-controls', listbox.id);
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    expect(options.length).toBeGreaterThan(0);
+    options.forEach(option => {
+      expect(option.id).not.toBe('');
+      expect(option).toHaveAttribute('aria-selected');
+      expect(option).toHaveAttribute('tabindex', '-1');
+    });
+
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    expect(input).toHaveAttribute('aria-activedescendant', options[0]?.id);
+    expect(options[0]).toHaveAttribute('aria-selected', 'true');
+    expect(input).toHaveFocus();
     expect(screen.getByText('user_menu.settings')).toBeInTheDocument();
+  });
+
+  it('has no automated accessibility violations in command mode', async () => {
+    render(<SearchOverlay isOpen onClose={vi.fn()} />);
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: '>' } });
+
+    expect(await axe(document.body)).toHaveNoViolations();
   });
 });

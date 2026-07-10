@@ -136,6 +136,20 @@ vi.mock('../ToastContext', () => ({
   useToast: () => stableToastValue,
 }));
 
+const { mockRealtime } = vi.hoisted(() => ({
+  mockRealtime: {
+    isConnected: false,
+    isNotificationChannelReady: false,
+    onNotification: vi.fn(),
+    onUserMessage: vi.fn(),
+    onTransaction: vi.fn(),
+  },
+}));
+
+vi.mock('../PusherContext', () => ({
+  usePusherOptional: () => mockRealtime,
+}));
+
 import { NotificationsProvider, useNotifications } from '../NotificationsContext';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -197,6 +211,29 @@ describe('NotificationsContext', () => {
       disconnect: mockPusherDisconnect,
       connection: { bind: mockConnectionBind },
     }));
+
+    mockRealtime.isConnected = false;
+    mockRealtime.isNotificationChannelReady = false;
+    mockRealtime.onNotification.mockImplementation((handler: EventHandler) => {
+      channelEventHandlers.notification = handler;
+      channelEventHandlers['new-notification'] = handler;
+      return () => {
+        delete channelEventHandlers.notification;
+        delete channelEventHandlers['new-notification'];
+      };
+    });
+    mockRealtime.onUserMessage.mockImplementation((handler: EventHandler) => {
+      channelEventHandlers['new-message'] = handler;
+      return () => {
+        delete channelEventHandlers['new-message'];
+      };
+    });
+    mockRealtime.onTransaction.mockImplementation((handler: EventHandler) => {
+      channelEventHandlers.transaction = handler;
+      return () => {
+        delete channelEventHandlers.transaction;
+      };
+    });
 
     // Default: authenticated
     mockUseAuth.mockReturnValue({
@@ -559,17 +596,16 @@ describe('NotificationsContext', () => {
       expect(mockToastInfo).toHaveBeenCalledWith('New Message', 'Hey, how are you?');
     });
 
-    it('subscribes to private tenant user channel with correct format', async () => {
-      vi.stubEnv('VITE_PUSHER_KEY', 'test-pusher-key');
-
+    it('registers notification bindings with the shared realtime owner', async () => {
       renderHook(() => useNotifications(), { wrapper: notificationsWrapper });
 
       await waitFor(() => {
-        expect(mockPusherSubscribe).toHaveBeenCalled();
+        expect(mockRealtime.onNotification).toHaveBeenCalledOnce();
+        expect(mockRealtime.onUserMessage).toHaveBeenCalledOnce();
+        expect(mockRealtime.onTransaction).toHaveBeenCalledOnce();
       });
 
-      // private-tenant.{tenantId}.user.{userId}
-      expect(mockPusherSubscribe).toHaveBeenCalledWith('private-tenant.2.user.42');
+      expect(MockPusher).not.toHaveBeenCalled();
     });
   });
 

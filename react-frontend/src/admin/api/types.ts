@@ -521,15 +521,15 @@ export interface SmartMatchingConfig {
 }
 
 export interface MatchingOverviewStats {
-  total_matches_today: number;
-  total_matches_week: number;
+  total_matches_today?: number;
+  total_matches_week?: number;
   total_matches_month: number;
   hot_matches_count: number;
-  mutual_matches_count: number;
+  mutual_matches_count?: number;
   avg_match_score: number;
   avg_distance_km: number;
   cache_entries: number;
-  cache_hit_rate: number;
+  cache_hit_rate?: number;
   active_users_matching: number;
 }
 

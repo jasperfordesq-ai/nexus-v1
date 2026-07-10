@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Chip, Spinner, Textarea, Card, CardBody, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -169,6 +170,7 @@ function InquiryDetailModal({
 }) {
   const toast = useToast();
   const { t } = useTranslation('admin_super', { keyPrefix: 'pilot_inquiry_admin' });
+  const { t: tCommon } = useTranslation('common');
   const [newStage, setNewStage]         = useState('');
   const [rejectionReason, setRejReason] = useState('');
   const [internalNotes, setNotes]       = useState('');
@@ -248,10 +250,10 @@ function InquiryDetailModal({
             </div>
             <div>
               <p className="text-muted text-xs uppercase tracking-wide mb-0.5">{t('fields.population')}</p>
-              <p>{inquiry.population?.toLocaleString() ?? t('values.empty')}</p>
+              <p>{inquiry.population?.toLocaleString(getFormattingLocale()) ?? t('values.empty')}</p>
             </div>
             <div>
-              <p className="text-muted text-xs uppercase tracking-wide mb-0.5">Caring Community {t('fields.cooperative')}</p>
+              <p className="text-muted text-xs uppercase tracking-wide mb-0.5">{tCommon('nav.caring_community')} {t('fields.cooperative')}</p>
               <p>{inquiry.has_kiss_cooperative ? t('values.yes') : t('values.no')}</p>
             </div>
             <div>
@@ -374,10 +376,10 @@ function InquiryDetailModal({
 
           {/* Timestamps */}
           <div className="border-t border-border pt-4 grid grid-cols-2 gap-2 text-xs text-muted">
-            <div><span className="font-medium text-foreground">{t('timestamps.submitted')}:</span> {new Date(inquiry.created_at).toLocaleDateString()}</div>
-            {inquiry.proposal_sent_at && <div><span className="font-medium text-foreground">{t('timestamps.proposal')}:</span> {new Date(inquiry.proposal_sent_at).toLocaleDateString()}</div>}
-            {inquiry.pilot_agreed_at  && <div><span className="font-medium text-foreground">{t('timestamps.agreed')}:</span>   {new Date(inquiry.pilot_agreed_at).toLocaleDateString()}</div>}
-            {inquiry.went_live_at     && <div><span className="font-medium text-foreground">{t('timestamps.live')}:</span>      {new Date(inquiry.went_live_at).toLocaleDateString()}</div>}
+            <div><span className="font-medium text-foreground">{t('timestamps.submitted')}:</span> {new Date(inquiry.created_at).toLocaleDateString(getFormattingLocale())}</div>
+            {inquiry.proposal_sent_at && <div><span className="font-medium text-foreground">{t('timestamps.proposal')}:</span> {new Date(inquiry.proposal_sent_at).toLocaleDateString(getFormattingLocale())}</div>}
+            {inquiry.pilot_agreed_at  && <div><span className="font-medium text-foreground">{t('timestamps.agreed')}:</span>   {new Date(inquiry.pilot_agreed_at).toLocaleDateString(getFormattingLocale())}</div>}
+            {inquiry.went_live_at     && <div><span className="font-medium text-foreground">{t('timestamps.live')}:</span>      {new Date(inquiry.went_live_at).toLocaleDateString(getFormattingLocale())}</div>}
           </div>
         </ModalBody>
         <ModalFooter>
@@ -397,6 +399,7 @@ function handleExport() {
 export function PilotInquiryAdminPage() {
   const { t } = useTranslation('admin_super', { keyPrefix: 'pilot_inquiry_admin' });
   const { t: tAdmin } = useTranslation('admin_super');
+  const { t: tCommon } = useTranslation('common');
   usePageTitle(t('page_title'));
   const toast = useToast();
 
@@ -476,7 +479,7 @@ export function PilotInquiryAdminPage() {
               <p className="font-semibold text-accent dark:text-accent">{t('about.title')}</p>
               <p className="text-foreground">
                 {t('about.body_intro_before_gemeinden')}<em>{t('about.gemeinden')}</em>{t('about.body_intro_before_kiss')}
-                Caring Community{t('about.body_intro_after_kiss')}
+                {tCommon('nav.caring_community')}{t('about.body_intro_after_kiss')}
               </p>
               <p className="text-muted">
                 <strong>{t('about.pipeline_stages_label')}</strong> {t('about.pipeline_stages')}{' '}
@@ -493,7 +496,7 @@ export function PilotInquiryAdminPage() {
         <span className="flex items-center gap-1.5"><Chip size="sm" color="success" variant="soft">60-100</Chip>{t('fit_scale.good')}</span>
         <span className="flex items-center gap-1.5"><Chip size="sm" color="warning" variant="soft">40-59</Chip>{t('fit_scale.potential')}</span>
         <span className="flex items-center gap-1.5"><Chip size="sm" color="default" variant="soft">0-39</Chip>{t('fit_scale.weak')}</span>
-        <span className="ml-3 text-muted">{t('fit_scale.factors_before_kiss')}Caring Community{t('fit_scale.factors_after_kiss')}</span>
+        <span className="ml-3 text-muted">{t('fit_scale.factors_before_kiss')}{tCommon('nav.caring_community')}{t('fit_scale.factors_after_kiss')}</span>
       </div>
 
       {/* Stats row */}

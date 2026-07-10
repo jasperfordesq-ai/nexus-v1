@@ -7,6 +7,7 @@
  * SellerPickupSlotsPage — AG45 click-and-collect: seller manages pickup time slots.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect, useState, useCallback } from 'react';
 
 import Calendar from 'lucide-react/icons/calendar';
@@ -43,7 +44,7 @@ const formatRange = (s: string, e: string) => {
   try {
     const a = new Date(s);
     const b = new Date(e);
-    return `${a.toLocaleString()} → ${b.toLocaleTimeString()}`;
+    return `${a.toLocaleString(getFormattingLocale())} → ${b.toLocaleTimeString(getFormattingLocale())}`;
   } catch {
     return `${s} → ${e}`;
   }

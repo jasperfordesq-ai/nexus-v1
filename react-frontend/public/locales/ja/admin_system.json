@@ -266,7 +266,8 @@
       "resume_success": "このコミュニティの登録が再開されました。",
       "resume_failed": "登録の再開に失敗しました。",
       "threshold_prefix": "しきい値はプラットフォーム レベルで設定されます。",
-      "threshold_suffix": "トリップすると、このバナーが赤くなり、ワンクリックで再開ボタンがここに表示されます。"
+      "threshold_suffix": "トリップすると、このバナーが赤くなり、ワンクリックで再開ボタンがここに表示されます。",
+      "signups_this_hour_other": "この時間に {{threshold}} 人中 {{count}} 人が登録しました"
     },
     "col_action": "アクション",
     "col_date": "日付",
@@ -621,7 +622,8 @@
       "welcome_text": "ウェルカムテキスト",
       "welcome_text_desc": "オンボーディングの開始時に新しいメンバーに表示されるウェルカム メッセージ",
       "welcome_text_placeholder": "ウェルカムメッセージ...",
-      "your_community": "あなたのコミュニティ"
+      "your_community": "あなたのコミュニティ",
+      "n_active_other": "{{count}}アクティブ"
     },
     "overdue_jobs": "期限を過ぎたジョブ",
     "page_title": "システム",
@@ -764,7 +766,10 @@
       "waitlist_info": "待機リストのメンバーは管理者によって手動で承認されます",
       "webhook_desc": "受信した Webhook ペイロードの信頼性を検証するために使用されます",
       "your_community": "あなたのコミュニティ",
-      "credentials_remove_confirm": "これらの資格情報を削除しますか?これを元に戻すことはできません。"
+      "credentials_remove_confirm": "これらの資格情報を削除しますか?これを元に戻すことはできません。",
+      "n_configured_other": "{{count}} が設定されました",
+      "n_available_other": "{{count}} が利用可能",
+      "total_codes_count_other": "合計コード: {{count}}"
     },
     "registration_policy_saved_successfully": "登録ポリシーが正常に保存されました",
     "registration_policy_settings_title": "Registration Policy Settings",
@@ -1107,7 +1112,25 @@
     "partner_logo_link_url": "Partner Logo Link URL",
     "partner_logo_link_url_description": "フッター内のパートナー ロゴのオプションの Web サイト リンク。",
     "label_inactivity_timeout": "無操作タイムアウト(分)",
-    "desc_inactivity_timeout": "操作がないままこの分数が経過すると、メンバーを自動的にサインアウトします。0でタイムアウトを無効化。許可範囲は5〜480分。推奨: 120。"
+    "desc_inactivity_timeout": "操作がないままこの分数が経過すると、メンバーを自動的にサインアウトします。0でタイムアウトを無効化。許可範囲は5〜480分。推奨: 120。",
+    "generated_data_for_other": "選択した {{count}} 件のデータタイプのデータを生成しました",
+    "avg_completion_seconds_other": "平均完了秒数",
+    "avg_completion_minutes_other": "平均完了時間（分）",
+    "sessions_count_other": "{{count}}セッション",
+    "passed_count_other": "{{count}}が渡されました",
+    "failed_count_other": "{{count}}が失敗しました",
+    "cron_connection_ok_other": "接続OK -{{count}}の求人があります",
+    "minutes_ago_other": "{{count}}1 分前",
+    "hours_ago_other": "{{count}}1時間前",
+    "days_ago_other": "{{count}}日前",
+    "blog_posts_restored_other": "{{filename}}から復元された{{count}}ブログ投稿",
+    "available_backups_other": "利用可能なバックアップ ({{count}})",
+    "test_runner": {
+      "api_unavailable": "ヘルスチェックAPIを利用できません",
+      "run_all": "すべてのテストを実行",
+      "suites": "テストスイート",
+      "unknown_test": "診断: {{name}}"
+    }
   },
   "verification": {
     "approve": "承認する",
@@ -1171,7 +1194,9 @@
     "total_events": "{{count}} イベント",
     "user_approved_activated": "ユーザーが承認およびアクティブ化",
     "user_verification_rejected": "ユーザー認証が拒否されました",
-    "user_with_id": "ユーザー番号{{id}}"
+    "user_with_id": "ユーザー番号{{id}}",
+    "n_pending_other": "{{count}} 保留中",
+    "total_events_other": "{{count}} イベント"
   },
   "cancel": "キャンセル"
 }

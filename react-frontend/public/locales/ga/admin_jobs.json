@@ -250,7 +250,32 @@
     "moderation_page_title": "Ciumhais Mhodhnóireachta Poist",
     "moderation_page_description": "Athbhreithnigh agus ceadaigh postálacha poist sula dtéann siad beo",
     "templates_empty_description": "Cruthaigh do chéad teimpléad chun am a shábháil ar phostálacha poist amach anseo.",
-    "templates_empty_title": "Níl aon teimpléid fós"
+    "templates_empty_title": "Níl aon teimpléid fós",
+    "jobs_count_few": "poist{{count}}",
+    "jobs_count_many": "poist{{count}}",
+    "jobs_count_one": "poist{{count}}",
+    "jobs_count_other": "poist{{count}}",
+    "jobs_count_two": "poist{{count}}",
+    "application_count_one_few": "Feidhmchlár{{count}}",
+    "application_count_one_many": "Feidhmchlár{{count}}",
+    "application_count_one_one": "Feidhmchlár{{count}}",
+    "application_count_one_other": "Feidhmchlár{{count}}",
+    "application_count_one_two": "Feidhmchlár{{count}}",
+    "application_count_other_few": "Feidhmchláir{{count}}",
+    "application_count_other_many": "Feidhmchláir{{count}}",
+    "application_count_other_one": "Feidhmchláir{{count}}",
+    "application_count_other_other": "Feidhmchláir{{count}}",
+    "application_count_other_two": "Feidhmchláir{{count}}",
+    "stat_pending_offers_few": "{{count}}tairiscintí ar feitheamh",
+    "stat_pending_offers_many": "{{count}}tairiscintí ar feitheamh",
+    "stat_pending_offers_one": "{{count}}tairiscintí ar feitheamh",
+    "stat_pending_offers_other": "{{count}}tairiscintí ar feitheamh",
+    "stat_pending_offers_two": "{{count}}tairiscintí ar feitheamh",
+    "pipeline_minutes_few": "{{count}}nóim",
+    "pipeline_minutes_many": "{{count}}nóim",
+    "pipeline_minutes_one": "{{count}}nóim",
+    "pipeline_minutes_other": "{{count}}nóim",
+    "pipeline_minutes_two": "{{count}}nóim"
   },
   "moderation": {
     "action_failed": "Theip",
@@ -478,5 +503,10 @@
     "blocked_count": "bactha",
     "flagged_count": "Bratach",
     "total_analyzed": "Iomlán Anailísithe"
+  },
+  "premium": {
+    "status": {
+      "unknown": "Anaithnid"
+    }
   }
 }

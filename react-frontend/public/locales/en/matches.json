@@ -138,5 +138,7 @@
       "mutual_matches": "Mutual match alerts",
       "mutual_matches_desc": "Get notified when a match goes both ways."
     }
-  }
+  },
+  "reasons_more_one": "+{{count}} more",
+  "reasons_more_other": "+{{count}} more"
 }

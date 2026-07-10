@@ -9,6 +9,7 @@
  * Parity: PHP Admin\GamificationController@campaigns
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';import Plus from 'lucide-react/icons/plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
@@ -210,7 +211,7 @@ export function CampaignList() {
       sortable: true,
       render: (c) => (
         <span className="text-sm text-muted">
-          {c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'}
+          {c.created_at ? new Date(c.created_at).toLocaleDateString(getFormattingLocale()) : '—'}
         </span>
       ),
     },
@@ -236,11 +237,9 @@ export function CampaignList() {
         title={t('gamification.campaign_list_title')}
         description={t('gamification.campaign_list_desc')}
         actions={
-          <Link to={tenantPath("/admin/gamification/campaigns/create")}>
-            <Button startContent={<Plus size={16} />}>
-              {t('gamification.create_campaign')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath("/admin/gamification/campaigns/create")} startContent={<Plus size={16} />}>
+            {t('gamification.create_campaign')}
+          </Button>
         }
       />
 

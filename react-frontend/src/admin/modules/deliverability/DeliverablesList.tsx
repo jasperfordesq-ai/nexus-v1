@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Button, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -132,7 +133,7 @@ export function DeliverablesList() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.due_date ? new Date(item.due_date).toLocaleDateString() : '--'}
+          {item.due_date ? new Date(item.due_date).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },

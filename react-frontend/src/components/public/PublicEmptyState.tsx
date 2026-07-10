@@ -17,9 +17,9 @@ interface PublicEmptyStateProps {
 
 const accentClasses = {
   emerald: 'from-emerald-500/20 to-teal-500/10 text-emerald-500 dark:text-emerald-300',
-  indigo: 'from-indigo-500/20 to-sky-500/10 text-indigo-500 dark:text-indigo-300',
+  indigo: 'from-accent/20 to-sky-500/10 text-accent dark:text-accent',
   amber: 'from-amber-500/20 to-orange-500/10 text-amber-500 dark:text-amber-300',
-  blue: 'from-blue-500/20 to-indigo-500/10 text-blue-500 dark:text-blue-300',
+  blue: 'from-blue-500/20 to-accent-gradient-end/10 text-blue-500 dark:text-blue-300',
   rose: 'from-rose-500/20 to-fuchsia-500/10 text-rose-500 dark:text-rose-300',
 } satisfies Record<string, string>;
 

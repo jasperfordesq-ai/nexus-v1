@@ -32,10 +32,7 @@ vi.mock('@/contexts', () =>
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // ─── Mock admin sub-components that need full admin context ─────────────────
-vi.mock('../../components', async (importOriginal) => {
-  const { PageHeader: RealPageHeader } = await importOriginal<typeof import('../../components')>();
-  return {
-    PageHeader: RealPageHeader,
+vi.mock('../../components/DataTable', () => ({
     DataTable: ({ data, onRefresh }: { data: unknown[]; onRefresh?: () => void }) => (
       <div data-testid="data-table">
         <span data-testid="row-count">{data.length}</span>
@@ -43,9 +40,16 @@ vi.mock('../../components', async (importOriginal) => {
       </div>
     ),
     StatusBadge: ({ status }: { status: string }) => <span>{status}</span>,
-    EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
-  };
-});
+}));
+
+vi.mock('../../components/EmptyState', () => ({
+  EmptyState: ({ title, actionLabel, onAction }: { title: string; actionLabel?: string; onAction?: () => void }) => (
+    <div data-testid="empty-state">
+      {title}
+      {actionLabel && onAction && <button onClick={onAction}>{actionLabel}</button>}
+    </div>
+  ),
+}));
 
 import { SmartMatchUsers } from './SmartMatchUsers';
 
@@ -142,7 +146,7 @@ describe('SmartMatchUsers — empty state', () => {
     expect(screen.queryByTestId('data-table')).not.toBeInTheDocument();
   });
 
-  it('renders EmptyState when success is false', async () => {
+  it('renders a retryable error when success is false', async () => {
     mockGetApprovals.mockResolvedValue({ success: false });
 
     render(<SmartMatchUsers />);
@@ -150,6 +154,8 @@ describe('SmartMatchUsers — empty state', () => {
     await waitFor(() => {
       expect(screen.getByTestId('empty-state')).toBeInTheDocument();
     });
+    expect(screen.getByRole('alert')).toHaveTextContent(/failed to load match results/i);
+    expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
   });
 });
 
@@ -158,17 +164,18 @@ describe('SmartMatchUsers — error state', () => {
     vi.clearAllMocks();
   });
 
-  it('calls toast.error when API throws', async () => {
+  it('shows a generic error without a toast when API throws', async () => {
     mockGetApprovals.mockRejectedValue(new Error('server down'));
 
     render(<SmartMatchUsers />);
 
     await waitFor(() => {
-      expect(mockToast.error).toHaveBeenCalled();
+      expect(screen.getByRole('alert')).toHaveTextContent(/failed to load match results/i);
     });
+    expect(mockToast.error).not.toHaveBeenCalled();
   });
 
-  it('shows empty state after API error (no crash)', async () => {
+  it('shows retry action after API error', async () => {
     mockGetApprovals.mockRejectedValue(new Error('network'));
 
     render(<SmartMatchUsers />);
@@ -176,6 +183,7 @@ describe('SmartMatchUsers — error state', () => {
     await waitFor(() => {
       expect(screen.getByTestId('empty-state')).toBeInTheDocument();
     });
+    expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
   });
 });
 
@@ -196,8 +204,10 @@ describe('SmartMatchUsers — refresh action', () => {
       expect(screen.getByTestId('data-table')).toBeInTheDocument();
     });
 
-    // The stub DataTable renders a Refresh button that calls onRefresh
-    screen.getByRole('button', { name: /refresh/i }).click();
+    // The stub DataTable renders a Refresh button that calls onRefresh.
+    const tableRefresh = screen.getByTestId('data-table').querySelector('button');
+    expect(tableRefresh).not.toBeNull();
+    tableRefresh?.click();
 
     await waitFor(() => {
       expect(mockGetApprovals).toHaveBeenCalledTimes(2);

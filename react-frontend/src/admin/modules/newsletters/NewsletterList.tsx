@@ -9,6 +9,7 @@
  * Parity: PHP Admin\NewsletterController::index()
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';import Mail from 'lucide-react/icons/mail';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -154,7 +155,7 @@ export function NewsletterList() {
     },
     {
       key: 'recipients_count', label: t('newsletters.col_recipients'),
-      render: (item) => <span>{((item.total_recipients || item.recipients_count) || 0).toLocaleString()}</span>,
+      render: (item) => <span>{((item.total_recipients || item.recipients_count) || 0).toLocaleString(getFormattingLocale())}</span>,
     },
     {
       key: 'open_rate', label: t('newsletters.col_open_rate'),
@@ -169,9 +170,9 @@ export function NewsletterList() {
       render: (item) => (
         <span className="text-sm text-muted">
           {item.sent_at
-            ? new Date(item.sent_at).toLocaleDateString()
+            ? new Date(item.sent_at).toLocaleDateString(getFormattingLocale())
             : item.created_at
-              ? new Date(item.created_at).toLocaleDateString()
+              ? new Date(item.created_at).toLocaleDateString(getFormattingLocale())
               : '--'}
         </span>
       ),

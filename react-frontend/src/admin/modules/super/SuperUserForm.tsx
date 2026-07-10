@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Input, Select, SelectItem, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -186,12 +187,12 @@ export function SuperUserForm() {
                 <Input label={t('super.label_phone')} value={form.phone} onValueChange={(v) => update('phone', v)} />
               </div>
               <Separator />
-              <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg p-4">
+              <div className="bg-gradient-to-br from-accent/10 to-pink-500/10 border border-accent/20 rounded-lg p-4">
                 <Switch
                   isSelected={form.is_tenant_super_admin}
                   onValueChange={(v) => update('is_tenant_super_admin', v)}
                   classNames={{
-                    wrapper: 'group-data-[selected=true]:bg-gradient-to-r group-data-[selected=true]:from-purple-500 group-data-[selected=true]:to-pink-500',
+                    wrapper: 'group-data-[selected=true]:bg-gradient-to-r group-data-[selected=true]:from-accent group-data-[selected=true]:to-pink-500',
                   }}
                 >
                   <div>
@@ -293,15 +294,15 @@ export function SuperUserForm() {
               </CardHeader>
               <Separator />
               <CardBody className="flex flex-col gap-4">
-                <div className="bg-purple-50 dark:bg-purple-50/10 border border-purple-200 dark:border-purple-200/20 rounded-lg p-3">
-                  <p className="text-sm text-purple-700 dark:text-purple-400 font-medium mb-2">{t('super.four_step_workflow')}</p>
-                  <ol className="text-xs text-purple-600 dark:text-purple-300 space-y-1 list-decimal list-inside">
+                <div className="bg-accent-soft dark:bg-accent/10 border border-accent dark:border-accent/20 rounded-lg p-3">
+                  <p className="text-sm text-accent dark:text-accent font-medium mb-2">{t('super.four_step_workflow')}</p>
+                  <ol className="text-xs text-accent dark:text-accent space-y-1 list-decimal list-inside">
                     <li>{t('super.promote_step_1')}</li>
                     <li>{t('super.promote_step_2')}</li>
                     <li>{t('super.promote_step_3')}</li>
                     <li>{t('super.promote_step_4')}</li>
                   </ol>
-                  <p className="text-xs text-purple-600 dark:text-purple-300 mt-2 font-medium">
+                  <p className="text-xs text-accent dark:text-accent mt-2 font-medium">
                     {t('super.hub_tenants_only')}
                   </p>
                 </div>
@@ -352,14 +353,14 @@ export function SuperUserForm() {
                   </div>
                   <div>
                     <p className="text-xs text-muted">{t('super.label_member_since')}</p>
-                    <p className="text-sm">{new Date(user.created_at).toLocaleDateString()}</p>
+                    <p className="text-sm">{new Date(user.created_at).toLocaleDateString(getFormattingLocale())}</p>
                   </div>
                 </div>
               </CardBody>
             </Card>
 
             {/* Super Admin Privileges */}
-            <Card className="bg-gradient-to-br from-purple-500/5 to-pink-500/5 border border-purple-500/20">
+            <Card className="bg-gradient-to-br from-accent/5 to-pink-500/5 border border-accent/20">
               <CardHeader className="font-semibold text-lg">{t('super.super_admin_privileges')}</CardHeader>
               <Separator />
               <CardBody className="flex flex-col gap-3">

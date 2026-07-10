@@ -33,7 +33,7 @@ import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 
@@ -85,7 +85,7 @@ const categoryColorMap: Record<string, string> = {
   blue: 'bg-blue-500/10 text-[var(--color-info)]',
   gray: 'bg-gray-500/10 text-gray-500',
   fuchsia: 'bg-fuchsia-500/10 text-fuchsia-500',
-  purple: 'bg-purple-500/10 text-purple-500',
+  purple: 'bg-accent/10 text-accent',
   green: 'bg-emerald-500/10 text-emerald-500',
   red: 'bg-rose-500/10 text-rose-500',
   yellow: 'bg-amber-500/10 text-[var(--color-warning)]',
@@ -194,7 +194,7 @@ export function BlogPage() {
         description={t('subtitle')}
         accent="blue"
         icon={<BookOpen className="h-7 w-7" aria-hidden="true" />}
-        stats={posts.length > 0 && !isLoading ? [{ label: t('hero_posts_label'), value: posts.length.toLocaleString() }] : undefined}
+        stats={posts.length > 0 && !isLoading ? [{ label: t('hero_posts_label'), value: posts.length.toLocaleString(getFormattingLocale()) }] : undefined}
       />
 
       {/* Search & Filters */}
@@ -228,7 +228,7 @@ export function BlogPage() {
           >
             <ToggleButton
               id="all"
-              className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-blue-500 data-[selected=true]:to-indigo-600 data-[selected=true]:text-white"
+              className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-blue-500 data-[selected=true]:to-accent-gradient-end data-[selected=true]:text-white"
             >
               {t('filter_all')}
             </ToggleButton>
@@ -236,7 +236,7 @@ export function BlogPage() {
               <ToggleButton
                 key={cat.id}
                 id={String(cat.id)}
-                className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-blue-500 data-[selected=true]:to-indigo-600 data-[selected=true]:text-white"
+                className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-blue-500 data-[selected=true]:to-accent-gradient-end data-[selected=true]:text-white"
               >
                 {cat.name}
                 {cat.post_count > 0 && (
@@ -255,7 +255,7 @@ export function BlogPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
+            className="bg-gradient-to-r from-blue-500 to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadPosts()}
           >
@@ -363,7 +363,7 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
       <GlassCard className="overflow-hidden">
         <div className="flex flex-col md:flex-row">
           {/* Image */}
-          <div className="md:w-1/2 h-48 md:h-72 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 flex items-center justify-center overflow-hidden">
+          <div className="md:w-1/2 h-48 md:h-72 bg-gradient-to-br from-blue-500/20 to-accent-gradient-end/20 flex items-center justify-center overflow-hidden">
             {imageProps ? (
               <img
                 {...imageProps}
@@ -402,7 +402,7 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
               </span>
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" aria-hidden="true" />
-                {new Date(post.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                {new Date(post.published_at).toLocaleDateString(getFormattingLocale(), { day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
               <span className="flex items-center gap-1">
                 <Clock className="w-3 h-3" aria-hidden="true" />
@@ -433,7 +433,7 @@ function BlogPostCard({ post, categoryColors }: PostCardProps) {
     <Link to={tenantPath(`/blog/${post.slug}`)} className="block group h-full">
       <GlassCard className="overflow-hidden h-full flex flex-col">
         {/* Image */}
-        <div className="h-48 bg-gradient-to-br from-blue-500/10 to-indigo-600/10 flex items-center justify-center overflow-hidden">
+        <div className="h-48 bg-gradient-to-br from-blue-500/10 to-accent-gradient-end/10 flex items-center justify-center overflow-hidden">
           {imageProps ? (
             <img
               {...imageProps}

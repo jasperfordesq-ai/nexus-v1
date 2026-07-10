@@ -84,7 +84,10 @@
       "general_admin": "Administrador Geral",
       "caring_community": "Comunidade atenciosa",
       "kiss_agoris": "BEIJO E Caring Community"
-    }
+    },
+    "search_placeholder_many": "Pesquise artigos de ajuda do{{count}}...",
+    "search_placeholder_one": "Pesquise artigos de ajuda do{{count}}...",
+    "search_placeholder_other": "Pesquise artigos de ajuda do{{count}}..."
   },
   "help_faqs": {
     "page_title": "FAQs de ajuda",

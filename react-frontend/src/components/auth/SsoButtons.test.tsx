@@ -15,7 +15,7 @@
  *  5. The correct icon is chosen: Building2 for "entra" preset, KeyRound otherwise.
  *  6. Clicking a provider button calls the redirect endpoint for that provider key
  *     and navigates via window.location.href on success.
- *  7. On a failed redirect response the fallback alert is shown.
+ *  7. A failed redirect response renders translated inline feedback.
  *  8. tenantId is forwarded in X-Tenant-Id header and ?tenant_id= param.
  *  9. Network errors on initial fetch cause providers to become [] (renders nothing).
  */
@@ -40,15 +40,6 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.clearAllMocks();
-});
-
-// ---------------------------------------------------------------------------
-// Stub window.alert
-// ---------------------------------------------------------------------------
-let alertSpy: ReturnType<typeof vi.fn>;
-beforeEach(() => {
-  alertSpy = vi.fn();
-  vi.stubGlobal('alert', alertSpy);
 });
 
 // ---------------------------------------------------------------------------
@@ -334,7 +325,7 @@ describe('SsoButtons — click → redirect flow', () => {
     });
   });
 
-  it('calls alert with the server error message when success=false', async () => {
+  it('renders translated inline feedback instead of exposing the server error', async () => {
     stubProvidersAndRedirectFetch(
       [ENTRA_PROVIDER],
       { success: false, message: 'SSO is not configured for this tenant.' }
@@ -345,11 +336,12 @@ describe('SsoButtons — click → redirect flow', () => {
     fireEvent.click(screen.getByText('Sign in with Coventry City Council'));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('SSO is not configured for this tenant.');
+      expect(screen.getByRole('alert')).toHaveTextContent('Sign-in failed. Please try again.');
+      expect(screen.queryByText('SSO is not configured for this tenant.')).not.toBeInTheDocument();
     });
   });
 
-  it('calls alert with the fallback i18n message when redirect_url is missing', async () => {
+  it('renders translated inline feedback when redirect_url is missing', async () => {
     stubProvidersAndRedirectFetch(
       [ENTRA_PROVIDER],
       { success: true } // redirect_url intentionally absent
@@ -360,12 +352,11 @@ describe('SsoButtons — click → redirect flow', () => {
     fireEvent.click(screen.getByText('Sign in with Coventry City Council'));
 
     await waitFor(() => {
-      // common.json: "oauth.callback_failed": "Sign-in failed. Please try again."
-      expect(alertSpy).toHaveBeenCalledWith('Sign-in failed. Please try again.');
+      expect(screen.getByRole('alert')).toHaveTextContent('Sign-in failed. Please try again.');
     });
   });
 
-  it('calls alert with the fallback message when the redirect fetch throws', async () => {
+  it('renders translated inline feedback when the redirect fetch throws', async () => {
     vi.stubGlobal('fetch', vi.fn()
       .mockResolvedValueOnce({
         ok: true,
@@ -379,7 +370,7 @@ describe('SsoButtons — click → redirect flow', () => {
     fireEvent.click(screen.getByText('Sign in with Hivebrite Network'));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Sign-in failed. Please try again.');
+      expect(screen.getByRole('alert')).toHaveTextContent('Sign-in failed. Please try again.');
     });
   });
 });

@@ -76,7 +76,8 @@
     "no_achievements": "Aucun succès pour l'instant",
     "no_achievements_own": "Participez pour gagner des badges et des succès !",
     "no_achievements_other": "Cet utilisateur n'a pas encore obtenu de succès",
-    "view_badges": "Voir les badges disponibles"
+    "view_badges": "Voir les badges disponibles",
+    "badges_many": "{{count}} badges obtenus"
   },
   "toast": {
     "request_sent_title": "Demande envoyée",
@@ -134,7 +135,10 @@
     "characters_count": "{{count}}/{{max}} caractères",
     "cancel": "Annuler",
     "submit": "Soumettre l'avis",
-    "submit_failed_fallback": "Impossible de soumettre l'avis"
+    "submit_failed_fallback": "Impossible de soumettre l'avis",
+    "characters_count_many": "{{count}}/{{max}} caractères",
+    "characters_count_one": "{{count}}/{{max}} caractères",
+    "characters_count_other": "{{count}}/{{max}} caractères"
   },
   "page_meta": {
     "title": "Profil",
@@ -185,5 +189,9 @@
   "read_more": "Lire plus",
   "read_less": "Lire moins",
   "hours_abbrev": "{{hours}}h",
-  "not_available_abbrev": "n/d"
+  "not_available_abbrev": "n/d",
+  "show_more_skills_many": "Afficher {{count}} de plus",
+  "show_more_skills_one": "Afficher {{count}} de plus",
+  "show_more_skills_other": "Afficher {{count}} de plus",
+  "reviews_count_many": "{{count}} évaluations"
 }

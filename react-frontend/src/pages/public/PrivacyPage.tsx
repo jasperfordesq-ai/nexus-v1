@@ -119,8 +119,8 @@ const gdprRightKeys = [
     icon: Download,
     titleKey: 'privacy.right_portability_title',
     descKey: 'privacy.right_portability_desc',
-    color: 'text-purple-500',
-    bg: 'bg-purple-500/20',
+    color: 'text-accent',
+    bg: 'bg-accent/20',
   },
   {
     icon: Ban,
@@ -133,8 +133,8 @@ const gdprRightKeys = [
     icon: UserCheck,
     titleKey: 'privacy.right_withdraw_title',
     descKey: 'privacy.right_withdraw_desc',
-    color: 'text-indigo-500',
-    bg: 'bg-indigo-500/20',
+    color: 'text-accent',
+    bg: 'bg-accent/20',
   },
 ];
 
@@ -191,8 +191,8 @@ export function PrivacyPage() {
       <PageMeta title={t('privacy.page_title')} description={t('privacy.meta_description')} />
       {/* Hero Header */}
       <motion.div variants={itemVariants} className="text-center">
-        <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
-          <Shield className="w-10 h-10 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+        <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 mb-4">
+          <Shield className="w-10 h-10 text-accent dark:text-accent" aria-hidden="true" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">
           {t('privacy.heading')}
@@ -214,9 +214,9 @@ export function PrivacyPage() {
               key={item.id}
               variant="tertiary"
               onPress={() => scrollToSection(item.id)}
-              className="inline-flex min-h-10 min-w-0 items-center gap-2 rounded-xl bg-theme-elevated px-4 py-2 text-sm font-medium text-theme-primary transition-colors hover:bg-indigo-500/10"
+              className="inline-flex min-h-10 min-w-0 items-center gap-2 rounded-xl bg-theme-elevated px-4 py-2 text-sm font-medium text-theme-primary transition-colors hover:bg-accent/10"
             >
-              <item.icon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+              <item.icon className="w-4 h-4 text-accent" aria-hidden="true" />
               {t(item.key)}
             </Button>
           ))}
@@ -226,9 +226,9 @@ export function PrivacyPage() {
       {/* Our Commitment */}
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
-          <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+          <div className="p-4 rounded-xl bg-accent/10 border border-accent/20">
             <h2 className="text-xl font-semibold text-theme-primary mb-3 flex items-center gap-2">
-              <Handshake className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+              <Handshake className="w-5 h-5 text-accent" aria-hidden="true" />
               {t('privacy.commitment_title')}
             </h2>
             <div className="space-y-3 text-theme-muted">
@@ -251,7 +251,7 @@ export function PrivacyPage() {
       <motion.div variants={itemVariants} id="data-collection">
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Database className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+            <Database className="w-5 h-5 text-accent" aria-hidden="true" />
             {t('privacy.data_collection_title')}
           </h2>
           <p className="text-theme-muted mb-6">
@@ -283,7 +283,7 @@ export function PrivacyPage() {
       <motion.div variants={itemVariants} id="data-usage">
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <PieChart className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+            <PieChart className="w-5 h-5 text-accent" aria-hidden="true" />
             {t('privacy.data_usage_title')}
           </h2>
           <p className="text-theme-muted mb-4">
@@ -298,7 +298,7 @@ export function PrivacyPage() {
               { labelKey: 'privacy.usage_legal_label', descKey: 'privacy.usage_legal_desc' },
             ] as const).map((item) => (
               <li key={item.labelKey} className="flex items-start gap-3">
-                <div className="mt-1 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
+                <div className="mt-1 w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
                 <span>
                   <strong className="text-theme-primary">{t(item.labelKey)}:</strong> {t(item.descKey)}
                 </span>
@@ -318,7 +318,7 @@ export function PrivacyPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Eye className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+            <Eye className="w-5 h-5 text-accent" aria-hidden="true" />
             {t('privacy.visibility_title')}
           </h2>
           <div className="space-y-3 text-theme-muted">
@@ -338,7 +338,7 @@ export function PrivacyPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Lock className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+            <Lock className="w-5 h-5 text-accent" aria-hidden="true" />
             {t('privacy.protection_title')}
           </h2>
           <p className="text-theme-muted mb-4">
@@ -356,7 +356,7 @@ export function PrivacyPage() {
                 key={item.labelKey}
                 className="flex items-start gap-3 p-3 rounded-xl bg-theme-elevated"
               >
-                <Lock className="w-4 h-4 text-indigo-500 mt-0.5 flex-shrink-0" aria-hidden="true" />
+                <Lock className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" aria-hidden="true" />
                 <div>
                   <p className="font-medium text-theme-primary text-sm">{t(item.labelKey)}</p>
                   <p className="text-xs text-theme-subtle mt-0.5">{t(item.descKey)}</p>
@@ -370,9 +370,9 @@ export function PrivacyPage() {
       {/* Your Rights (GDPR) */}
       <motion.div variants={itemVariants} id="your-rights">
         <GlassCard className="p-6 sm:p-8">
-          <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 mb-6">
+          <div className="p-4 rounded-xl bg-accent/10 border border-accent/20 mb-6">
             <h2 className="text-xl font-semibold text-theme-primary mb-2 flex items-center gap-2">
-              <UserCheck className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+              <UserCheck className="w-5 h-5 text-accent" aria-hidden="true" />
               {t('privacy.rights_title')}
             </h2>
             <p className="text-theme-muted text-sm">
@@ -407,7 +407,7 @@ export function PrivacyPage() {
       <motion.div variants={itemVariants} id="cookies">
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Cookie className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+            <Cookie className="w-5 h-5 text-accent" aria-hidden="true" />
             {t('privacy.cookies_title')}
           </h2>
           <p className="text-theme-muted mb-4">
@@ -439,7 +439,7 @@ export function PrivacyPage() {
             {t('privacy.cookies_no_ads_before')}{' '}
             <strong className="text-theme-primary">{t('privacy.cookies_no_ads_not')}</strong>{' '}
             {t('privacy.cookies_no_ads_after')}{' '}
-            <Link to={tenantPath('/cookies')} className="text-indigo-500 hover:underline">
+            <Link to={tenantPath('/cookies')} className="text-accent hover:underline">
               {t('privacy.cookie_policy_link')}
             </Link>.
           </p>
@@ -450,7 +450,7 @@ export function PrivacyPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+            <Clock className="w-5 h-5 text-accent" aria-hidden="true" />
             {t('privacy.retention_title')}
           </h2>
           <p className="text-theme-muted mb-4">
@@ -464,7 +464,7 @@ export function PrivacyPage() {
               { labelKey: 'privacy.retention_logs_label', descKey: 'privacy.retention_logs_desc' },
             ] as const).map((item) => (
               <li key={item.labelKey} className="flex items-start gap-3">
-                <div className="mt-1 w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
+                <div className="mt-1 w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
                 <span>
                   <strong className="text-theme-primary">{t(item.labelKey)}:</strong> {t(item.descKey)}
                 </span>
@@ -478,8 +478,8 @@ export function PrivacyPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <div className="text-center">
-            <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
-              <MessageSquare className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+            <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 mb-4">
+              <MessageSquare className="w-8 h-8 text-accent dark:text-accent" aria-hidden="true" />
             </div>
             <h2 className="text-xl font-semibold text-theme-primary mb-2">
               {t('privacy.cta_title')}
@@ -489,23 +489,19 @@ export function PrivacyPage() {
             </p>
             <Separator className="my-4" />
             <div className="flex flex-wrap justify-center gap-3 mt-4">
-              <Link to={tenantPath('/contact')}>
-                <Button
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                  startContent={<Send className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('privacy.contact_privacy_team')}
-                </Button>
-              </Link>
-              <Link to={tenantPath('/cookies')}>
-                <Button
-                  variant="tertiary"
-                  className="bg-theme-elevated text-theme-primary"
-                  startContent={<Cookie className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('privacy.cookie_policy_link')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath('/contact')}
+                className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
+                startContent={<Send className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('privacy.contact_privacy_team')}
+              </Button>
+              <Button as={Link} to={tenantPath('/cookies')}
+                variant="tertiary"
+                className="bg-theme-elevated text-theme-primary"
+                startContent={<Cookie className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('privacy.cookie_policy_link')}
+              </Button>
             </div>
           </div>
         </GlassCard>

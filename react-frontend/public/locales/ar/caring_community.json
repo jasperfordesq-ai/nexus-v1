@@ -108,7 +108,13 @@
       "create": "لا يمكن إنشاء طلب الغلاف",
       "candidates": "لا يمكن تحميل المرشحين البديلين",
       "assign": "لا يمكن مطابقة البديل"
-    }
+    },
+    "skill_matches_few": "مهارات المطابقة{{count}}",
+    "skill_matches_many": "مهارات المطابقة{{count}}",
+    "skill_matches_one": "مهارات المطابقة{{count}}",
+    "skill_matches_other": "مهارات المطابقة{{count}}",
+    "skill_matches_two": "مهارات المطابقة{{count}}",
+    "skill_matches_zero": "مهارات المطابقة{{count}}"
   },
   "providers": {
     "title": "دليل مقدمي الرعاية",
@@ -488,7 +494,8 @@
         "maximum_discount": "الحد الأقصى للخصم لكل طلب (٪)",
         "maximum_discount_description": "الحد الأقصى لمقدار إجمالي الطلب الذي يمكن دفعه في الاعتمادات الزمنية.",
         "save": "حفظ الإعدادات",
-        "view_only": "لا يمكن لمستخدمي العرض فقط تغيير إعدادات الولاء."
+        "view_only": "لا يمكن لمستخدمي العرض فقط تغيير إعدادات الولاء.",
+        "per_hour_short": "/ س"
       },
       "ledger": {
         "title": "عمليات الاسترداد الأخيرة",
@@ -534,6 +541,9 @@
         "pending": "قيد الانتظار",
         "applied": "مُطبَّق",
         "reversed": "عكس"
+      },
+      "table": {
+        "empty_value": "—"
       }
     },
     "hour_transfers": {
@@ -808,7 +818,23 @@
         "days_ago_one": "{{count}}منذ د",
         "days_ago_other": "{{count}}منذ د",
         "months_ago_one": "{{count}}منذ شهر",
-        "months_ago_other": "{{count}}منذ شهر"
+        "months_ago_other": "{{count}}منذ شهر",
+        "minutes_ago_few": "{{count}}م مضت",
+        "minutes_ago_many": "{{count}}م مضت",
+        "minutes_ago_two": "{{count}}م مضت",
+        "minutes_ago_zero": "{{count}}م مضت",
+        "hours_ago_few": "{{count}}منذ ساعة",
+        "hours_ago_many": "{{count}}منذ ساعة",
+        "hours_ago_two": "{{count}}منذ ساعة",
+        "hours_ago_zero": "{{count}}منذ ساعة",
+        "days_ago_few": "{{count}}منذ د",
+        "days_ago_many": "{{count}}منذ د",
+        "days_ago_two": "{{count}}منذ د",
+        "days_ago_zero": "{{count}}منذ د",
+        "months_ago_few": "{{count}}منذ شهر",
+        "months_ago_many": "{{count}}منذ شهر",
+        "months_ago_two": "{{count}}منذ شهر",
+        "months_ago_zero": "{{count}}منذ شهر"
       },
       "messages": {
         "triage_saved": "تم حفظ الفرز",
@@ -944,7 +970,11 @@
       },
       "errors": {
         "load": "فشل تحميل دائرة المستلمين. تحقق من معرف العضو وحاول مرة أخرى."
-      }
+      },
+      "safeguarding_flags_few": "{{count}} أعلام الحماية",
+      "safeguarding_flags_many": "{{count}} أعلام الحماية",
+      "safeguarding_flags_two": "{{count}} أعلام الحماية",
+      "safeguarding_flags_zero": "{{count}} أعلام الحماية"
     },
     "safeguarding_reports": {
       "meta_title": "تقارير الحماية - المشرف",

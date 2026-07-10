@@ -147,7 +147,9 @@
         "date": "Date",
         "ip_address": "IP address",
         "member_id": "Member ID"
-      }
+      },
+      "truncated_one": "Showing the most recent 200 records. Export the full ledger CSV to download all {{count}} records.",
+      "truncated_other": "Showing the most recent 200 records. Export the full ledger CSV to download all {{count}} records."
     },
     "residency": {
       "article_16": "Cross-border disclosure of personal data is permitted if the destination country ensures adequate data protection recognised by the Federal Council. Switzerland, EU/EEA member states, and a small list of other countries qualify.",

@@ -906,7 +906,13 @@
       "bulk_approved_count": "Richiesta di partnership{{count}}approvata",
       "bulk_approved_count_plural": "Richieste di partnership{{count}}approvate",
       "bulk_rejected_count": "Richiesta di partnership{{count}}rifiutata",
-      "bulk_rejected_count_plural": "Richieste di partnership{{count}}rifiutate"
+      "bulk_rejected_count_plural": "Richieste di partnership{{count}}rifiutate",
+      "bulk_approved_count_many": "Richiesta di partnership{{count}}approvata",
+      "bulk_approved_count_one": "Richiesta di partnership{{count}}approvata",
+      "bulk_approved_count_other": "Richiesta di partnership{{count}}approvata",
+      "bulk_rejected_count_many": "Richiesta di partnership{{count}}rifiutata",
+      "bulk_rejected_count_one": "Richiesta di partnership{{count}}rifiutata",
+      "bulk_rejected_count_other": "Richiesta di partnership{{count}}rifiutata"
     },
     "api_docs_tabs_aria": "Selettore di lingua di esempio API",
     "partnership_detail_tabs_aria": "Sezioni dei dettagli della partnership",
@@ -965,7 +971,31 @@
     "event_type_partnership_changed": "Partenariato aggiornato",
     "event_type_partnership_terminated": "La partnership è finita",
     "event_type_profile_viewed": "Profilo visualizzato",
-    "event_type_federated_search": "Ricerca partner"
+    "event_type_federated_search": "Ricerca partner",
+    "bulk_selected_many": "{{count}} selected",
+    "bulk_selected_one": "{{count}} selezionato",
+    "bulk_selected_other": "{{count}} selezionato",
+    "directory_results_count_many": "{{count}} community found",
+    "directory_results_count_one": "Comunità {{count}} trovata",
+    "directory_results_count_other": "Comunità {{count}} trovata",
+    "directory_member_count_many": "{{count}} member",
+    "directory_member_count_one": "membro {{count}}",
+    "directory_member_count_other": "membro {{count}}",
+    "directory_more_topics_many": "+{{count}} more",
+    "directory_more_topics_one": "+{{count}} altro",
+    "directory_more_topics_other": "+{{count}} altro",
+    "members_count_value_many": "{{count}} members",
+    "members_count_value_one": "{{count}} membri",
+    "members_count_value_other": "{{count}} membri",
+    "topics_selected_count_many": "{{count}} argomento selezionato",
+    "topics_selected_count_one": "{{count}} argomento selezionato",
+    "topics_selected_count_other": "{{count}} argomento selezionato",
+    "primary_topics_count_many": "{{count}} principale",
+    "primary_topics_count_one": "{{count}} principale",
+    "primary_topics_count_other": "{{count}} principale",
+    "recent_errors_count_many": "Recent errors: {{count}}",
+    "recent_errors_count_one": "Errori recenti: {{count}}",
+    "recent_errors_count_other": "Errori recenti: {{count}}"
   },
   "federation_admin_guidance": {
     "shared": {
@@ -1218,5 +1248,11 @@
       "load_audit_failed": "Impossibile caricare il registro di audit.",
       "load_preview_failed": "Impossibile caricare l'anteprima."
     }
+  },
+  "api_docs": {
+    "aria_hmac_headers": "Intestazioni HMAC",
+    "aria_rate_limit_headers": "Intestazioni del limite di velocità",
+    "aria_parameters": "Parametri dell'API",
+    "aria_api_documentation_sections": "Sezioni della documentazione API"
   }
 }

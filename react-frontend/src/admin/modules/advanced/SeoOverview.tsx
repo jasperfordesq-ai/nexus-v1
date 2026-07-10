@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Input, Button, Spinner, Chip, Textarea, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -606,7 +607,7 @@ export function SeoOverview() {
             <div className="flex items-center gap-2">
               {serverAudit?.last_run_at && (
                 <span className="text-xs text-muted">
-                  {t('last_run')}: {new Date(serverAudit.last_run_at).toLocaleDateString()}
+                  {t('last_run')}: {new Date(serverAudit.last_run_at).toLocaleDateString(getFormattingLocale())}
                 </span>
               )}
               <Button

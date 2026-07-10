@@ -107,6 +107,9 @@
     "status_completed": "Concluído",
     "status_unknown": "Desconhecido",
     "try_adjusting_search": "Tente ajustar sua pesquisa",
-    "yes": "Sim"
+    "yes": "Sim",
+    "showing_of_total_many": "Mostrando {{count}} de {{total}}",
+    "showing_of_total_one": "Mostrando {{count}} de {{total}}",
+    "showing_of_total_other": "Mostrando {{count}} de {{total}}"
   }
 }

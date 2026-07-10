@@ -7,6 +7,7 @@
  * ShiftSwapsTab - View and manage shift swap requests (V2)
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from '@/lib/motion';
 
@@ -93,7 +94,7 @@ const statusColor = (status: string) => {
 const formatShiftTime = (shift: SwapShift) => {
   const start = new Date(shift.start_time);
   const end = new Date(shift.end_time);
-  return `${start.toLocaleDateString()} ${start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  return `${start.toLocaleDateString(getFormattingLocale())} ${start.toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' })} - ${end.toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' })}`;
 };
 
 export function ShiftSwapsTab() {
@@ -235,7 +236,7 @@ export function ShiftSwapsTab() {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <ArrowLeftRight className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+          <ArrowLeftRight className="w-5 h-5 text-accent" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary">{t('swaps.heading')}</h2>
         </div>
         <Button
@@ -406,7 +407,7 @@ export function ShiftSwapsTab() {
                     )}
 
                     <p className="text-xs text-theme-subtle">
-                      {t('swaps.requested')} {new Date(swap.created_at).toLocaleDateString()}
+                      {t('swaps.requested')} {new Date(swap.created_at).toLocaleDateString(getFormattingLocale())}
                     </p>
                   </div>
 

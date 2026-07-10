@@ -27,8 +27,9 @@ export function useApiErrorHandler() {
       // Map error codes to user-friendly messages
       const userMessage = getErrorMessage(code, message);
 
-      // Don't show toast for session expired (modal handles that)
-      if (code === 'SESSION_EXPIRED') {
+      // Session expiry has its own modal. Intentional caller/upload cancellation
+      // is control flow, not a request failure, and must remain silent.
+      if (code === 'SESSION_EXPIRED' || code === 'CANCELLED' || code === 'UPLOAD_ABORTED') {
         return;
       }
 

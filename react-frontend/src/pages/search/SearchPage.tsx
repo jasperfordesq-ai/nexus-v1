@@ -36,7 +36,7 @@ import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import type { Listing, User as UserType, Event, Group } from '@/types/api';
@@ -261,7 +261,7 @@ export function SearchPage() {
         description={t('subtitle')}
         icon={<Search className="h-6 w-6" aria-hidden="true" />}
         accent="emerald"
-        stats={hasSearched ? [{ label: t('results_label'), value: totalResults.toLocaleString() }] : undefined}
+        stats={hasSearched ? [{ label: t('results_label'), value: totalResults.toLocaleString(getFormattingLocale()) }] : undefined}
       />
 
       {/* Search Form */}
@@ -344,7 +344,7 @@ export function SearchPage() {
               <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error_title')}</h2>
               <p className="text-theme-muted mb-4">{searchError}</p>
               <Button
-                className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+                className="bg-linear-to-r from-accent to-accent-gradient-end text-white"
                 onPress={() => performSearch(query)}
               >
                 {t('try_again')}
@@ -397,7 +397,7 @@ export function SearchPage() {
                 <section>
                   {activeTab === 'all' && (
                     <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                      <ListTodo className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                      <ListTodo className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                       {t('section_listings', { count: results.listings.length })}
                     </h2>
                   )}
@@ -528,7 +528,7 @@ export function SearchPage() {
                             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs text-theme-subtle">
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-3 h-3" aria-hidden="true" />
-                                {event.start_date ? new Date(event.start_date).toLocaleDateString() : '—'}
+                                {event.start_date ? new Date(event.start_date).toLocaleDateString(getFormattingLocale()) : '—'}
                               </span>
                               {event.location && (
                                 <span className="flex min-w-0 items-center gap-1">
@@ -561,7 +561,7 @@ export function SearchPage() {
                 <section>
                   {activeTab === 'all' && (
                     <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                      <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+                      <Users className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                       {t('section_groups', { count: results.groups.length })}
                     </h2>
                   )}

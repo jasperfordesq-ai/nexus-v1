@@ -524,7 +524,35 @@
     "select_all_rows": "Select all rows",
     "no_data": "Sin datos",
     "no_data_available": "No hay datos disponibles",
-    "select_row": "Select row {{id}}"
+    "select_row": "Select row {{id}}",
+    "total_count_many": "{{count}}total",
+    "total_count_one": "{{count}}total",
+    "total_count_other": "{{count}}total",
+    "statuses": {
+      "active": "Activo",
+      "approved": "Aprobado",
+      "banned": "Bloqueado",
+      "bulk_tenants_updated": "Inquilinos actualizados",
+      "bulk_users_moved": "Usuarios trasladados",
+      "completed": "Completado",
+      "draft": "Borrador",
+      "failed": "Fallido",
+      "federation_lockdown": "Bloqueo de federación",
+      "federation_updated": "Federación actualizada",
+      "idle": "Inactivo",
+      "inactive": "Desactivado",
+      "pending": "Pendiente",
+      "published": "Publicado",
+      "rejected": "Rechazado",
+      "scheduled": "Programado",
+      "sent": "Enviado",
+      "suspended": "Suspendido",
+      "tenant_created": "Inquilino creado",
+      "tenant_updated": "Inquilino actualizado",
+      "user_created": "Usuario creado",
+      "user_moved": "Usuario trasladado",
+      "unknown": "Desconocido"
+    }
   },
   "help_drawer": {
     "aria_label": "Ayuda: {{title}}",
@@ -541,7 +569,13 @@
     "confirm_message": "¿Está seguro de que desea obtener artículos {{action}} {{count}}?",
     "destructive_warning": "Esta acción no se puede deshacer.",
     "reason_label": "Razón",
-    "reason_placeholder": "Proporcione una razón para esta acción."
+    "reason_placeholder": "Proporcione una razón para esta acción.",
+    "selected_count_many": "{{count}} seleccionado",
+    "selected_count_one": "{{count}} seleccionado",
+    "selected_count_other": "{{count}} seleccionado",
+    "confirm_message_many": "¿Está seguro de que desea obtener artículos {{action}} {{count}}?",
+    "confirm_message_one": "¿Está seguro de que desea obtener artículos {{action}} {{count}}?",
+    "confirm_message_other": "¿Está seguro de que desea obtener artículos {{action}} {{count}}?"
   },
   "common": {
     "cancel": "Cancelar"
@@ -586,5 +620,8 @@
       "group_exchanges": "Intercambios grupales",
       "search": "Buscar"
     }
-  }
+  },
+  "support_requests_count_many": "{{count}} solicitudes de soporte abiertas",
+  "support_requests_count_one": "{{count}} solicitudes de soporte abiertas",
+  "support_requests_count_other": "{{count}} solicitudes de soporte abiertas"
 }

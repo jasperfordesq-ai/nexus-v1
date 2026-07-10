@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
@@ -95,13 +96,13 @@ const BENCHMARK_CLICK_RATE = 2.6;
 function formatMonth(ym: string): string {
   const [year, month] = ym.split('-');
   const date = new Date(Number(year), Number(month) - 1);
-  return date.toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
+  return date.toLocaleDateString(getFormattingLocale(), { month: 'short', year: '2-digit' });
 }
 
 function formatDate(dateStr: string): string {
   if (!dateStr) return '-';
   const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  return d.toLocaleDateString(getFormattingLocale(), { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 function truncate(str: string, max: number): string {
@@ -317,7 +318,7 @@ export function NewsletterAnalytics() {
                     const v = value as number;
                     const n = name as string;
                     if (n === 'openRate' || n === 'clickRate') return [`${v}%`, n === 'openRate' ? t('newsletters.chart_open_rate') : t('newsletters.chart_click_rate')];
-                    return [v.toLocaleString(), n === 'sent' ? t('newsletters.chart_emails_sent') : n === 'opens' ? t('newsletters.chart_opens') : t('newsletters.chart_clicks')];
+                    return [v.toLocaleString(getFormattingLocale()), n === 'sent' ? t('newsletters.chart_emails_sent') : n === 'opens' ? t('newsletters.chart_opens') : t('newsletters.chart_clicks')];
                   }}
                   labelFormatter={(label) => String(label)}
                 />
@@ -362,13 +363,13 @@ export function NewsletterAnalytics() {
                       <TableCell className="font-medium">{row.label}</TableCell>
                       <TableCell className="text-center">{row.newsletters}</TableCell>
                       <TableCell className="text-center">
-                        {row.sent.toLocaleString()}
+                        {row.sent.toLocaleString(getFormattingLocale())}
                       </TableCell>
                       <TableCell className="text-center">
-                        {row.opens.toLocaleString()}
+                        {row.opens.toLocaleString(getFormattingLocale())}
                       </TableCell>
                       <TableCell className="text-center">
-                        {row.clicks.toLocaleString()}
+                        {row.clicks.toLocaleString(getFormattingLocale())}
                       </TableCell>
                       <TableCell className="text-center">
                         <Chip
@@ -439,7 +440,7 @@ export function NewsletterAnalytics() {
                       <span className="font-medium">{truncate(nl.subject, 55)}</span>
                     </TableCell>
                     <TableCell className="text-center text-muted">
-                      {nl.total_sent.toLocaleString()}
+                      {nl.total_sent.toLocaleString(getFormattingLocale())}
                     </TableCell>
                     <TableCell className="text-center">
                       <Chip
@@ -538,7 +539,7 @@ function EngagementStat({
     <div className="text-center">
       <div className="flex items-center justify-center gap-1">
         {icon}
-        <span className={`text-2xl font-bold ${color}`}>{value.toLocaleString()}</span>
+        <span className={`text-2xl font-bold ${color}`}>{value.toLocaleString(getFormattingLocale())}</span>
       </div>
       <p className="mt-1 text-xs text-muted">{label}</p>
     </div>
@@ -598,9 +599,12 @@ function BenchmarkCard({
             isAbove ? <TrendingUp aria-hidden="true" size={12} /> : <TrendingUp aria-hidden="true" size={12} className="rotate-180" />
           }
         >
-          {isAbove ? '+' : ''}
-          {diff.toFixed(1)}pp ({isAbove ? '+' : ''}
-          {diffPct}%)
+          {tLocal('newsletters.benchmark_difference', {
+            percentSign: isAbove ? '+' : '',
+            percentValue: diffPct,
+            pointSign: isAbove ? '+' : '',
+            pointValue: diff.toFixed(1),
+          })}
         </Chip>
         <span className="text-xs text-muted">
           {isAbove ? tLocal('newsletters.above_benchmark') : tLocal('newsletters.below_benchmark')}

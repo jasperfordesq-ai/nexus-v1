@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Select, SelectItem, Button, Chip, Spinner, Input, Avatar, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -209,7 +210,7 @@ export default function FeedModeration() {
       </TableCell>,
       <TableCell key="created">
         <span className="text-sm text-muted">
-          {new Date(post.created_at).toLocaleDateString()}
+          {new Date(post.created_at).toLocaleDateString(getFormattingLocale())}
         </span>
       </TableCell>,
       <TableCell key="actions">

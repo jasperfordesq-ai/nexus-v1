@@ -393,7 +393,9 @@
     "changes_between": "Changes: v{{old}} to v{{new}}",
     "changes_count": "{{count}} changes",
     "legend_removed": "Removed",
-    "legend_added": "Added"
+    "legend_added": "Added",
+    "changes_count_one": "{{count}} changes",
+    "changes_count_other": "{{count}} changes"
   },
   "platform": {
     "effective_date": "Effective {{date}}",
@@ -480,7 +482,9 @@
     "consent_text": "By clicking Accept, you confirm you have read and agree to the documents listed above.",
     "accept_aria": "Accept all updated legal documents and continue",
     "accepting": "Accepting…",
-    "accept_continue": "Accept & Continue"
+    "accept_continue": "Accept & Continue",
+    "subtitle_other_one": "{{count}} documents have been updated. Please review and accept them to continue.",
+    "subtitle_other_other": "{{count}} documents have been updated. Please review and accept them to continue."
   },
   "custom": {
     "effective_label": "Effective: {{date}}",

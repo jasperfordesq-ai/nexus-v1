@@ -324,7 +324,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
         </h2>
         {isMember && (
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white sm:shrink-0"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white sm:shrink-0"
             size="sm"
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             onPress={createModal.onOpen}
@@ -507,7 +507,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                     </Button>
                     <Button
                       size="sm"
-                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white w-full sm:w-auto"
+                      className="bg-gradient-to-r from-accent to-accent-gradient-end text-white w-full sm:w-auto"
                       onPress={handleSave}
                       isLoading={saving}
                       isDisabled={!editContent.trim()}
@@ -588,7 +588,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                   isMember &&
                   pages.length === 0 && (
                     <Button
-                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                      className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                       startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                       onPress={createModal.onOpen}
                     >
@@ -617,7 +617,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
           {(onModalClose) => (
             <>
               <ModalHeader className="text-theme-primary flex items-center gap-2">
-                <FileText className="w-5 h-5 text-purple-400" aria-hidden="true" />
+                <FileText className="w-5 h-5 text-accent" aria-hidden="true" />
                 {t('wiki.create_title')}
               </ModalHeader>
               <ModalBody className="gap-4">
@@ -674,7 +674,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                   {t('wiki.cancel')}
                 </Button>
                 <Button
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                   isLoading={creating}
                   isDisabled={!newTitle.trim() || !newContent.trim()}
                   onPress={handleCreate}

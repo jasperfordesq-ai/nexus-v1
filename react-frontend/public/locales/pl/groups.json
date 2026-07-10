@@ -206,7 +206,27 @@
     "feed_empty_desc": "Bądź pierwszym, który podzieli się czymś z tą grupą!",
     "feed_create_post": "Utwórz post",
     "feed_load_more": "Załaduj więcej",
-    "member_actions_aria": "Akcje członków"
+    "member_actions_aria": "Akcje członków",
+    "meta_description_fallback_few": "Dołącz do {{name}} i połącz się z {{count}} członkami społeczności poprzez wspólne posty, wydarzenia i dyskusje.",
+    "meta_description_fallback_many": "Dołącz do {{name}} i połącz się z {{count}} członkami społeczności poprzez wspólne posty, wydarzenia i dyskusje.",
+    "meta_description_fallback_one": "Dołącz do {{name}} i połącz się z {{count}} członkami społeczności poprzez wspólne posty, wydarzenia i dyskusje.",
+    "meta_description_fallback_other": "Dołącz do {{name}} i połącz się z {{count}} członkami społeczności poprzez wspólne posty, wydarzenia i dyskusje.",
+    "members_count_few": "{{count}} członków",
+    "members_count_many": "{{count}} członków",
+    "members_count_one": "{{count}} członków",
+    "members_count_other": "{{count}} członków",
+    "reply_count_few": "{{count}} odpowiedzi",
+    "reply_count_many": "{{count}} odpowiedzi",
+    "reply_count_one": "{{count}} odpowiedzi",
+    "reply_count_other": "{{count}} odpowiedzi",
+    "tab_subgroups_count_few": "Podgrupy ({{count}})",
+    "tab_subgroups_count_many": "Podgrupy ({{count}})",
+    "tab_subgroups_count_one": "Podgrupy ({{count}})",
+    "tab_subgroups_count_other": "Podgrupy ({{count}})",
+    "posts_count_few": "{{count}} postów",
+    "posts_count_many": "{{count}} postów",
+    "posts_count_one": "{{count}} postów",
+    "posts_count_other": "{{count}} postów"
   },
   "form": {
     "create_title": "Utwórz nową grupę",
@@ -389,7 +409,11 @@
     "size_b": "B",
     "size_kb": "KB",
     "size_mb": "MB",
-    "size_gb": "GB"
+    "size_gb": "GB",
+    "folder_chip_few": "{{name}} ({{count}})",
+    "folder_chip_many": "{{name}} ({{count}})",
+    "folder_chip_one": "{{name}} ({{count}})",
+    "folder_chip_other": "{{name}} ({{count}})"
   },
   "media": {
     "filter_all": "Wszystkie",
@@ -450,7 +474,11 @@
     "secret_placeholder": "Sekret podpisu do weryfikacji ładunku",
     "cancel": "Anuluj",
     "create_btn": "Utwórz webhook",
-    "delete_confirm": "Usunąć tego webhooka? Tego nie można cofnąć."
+    "delete_confirm": "Usunąć tego webhooka? Tego nie można cofnąć.",
+    "failures_few": "{{count}} błędów",
+    "failures_many": "{{count}} błędów",
+    "failures_one": "{{count}} błędów",
+    "failures_other": "{{count}} błędów"
   },
   "toast": {
     "left": "Opuszczono grupę",
@@ -562,7 +590,15 @@
     "answer_posted_success": "Odpowiedź opublikowana!",
     "answer_posted_error": "Nie udało się opublikować odpowiedzi",
     "vote_error": "Nie udało się zagłosować",
-    "accept_error": "Nie udało się zaakceptować odpowiedzi"
+    "accept_error": "Nie udało się zaakceptować odpowiedzi",
+    "answer_count_aria_few": "{{count}} odpowiedzi",
+    "answer_count_aria_many": "{{count}} odpowiedzi",
+    "answer_count_aria_one": "{{count}} odpowiedzi",
+    "answer_count_aria_other": "{{count}} odpowiedzi",
+    "answers_heading_few": "{{count}} odpowiedź/i",
+    "answers_heading_many": "{{count}} odpowiedź/i",
+    "answers_heading_one": "{{count}} odpowiedź/i",
+    "answers_heading_other": "{{count}} odpowiedź/i"
   },
   "wiki": {
     "load_failed": "Nie udało się załadować stron wiki",
@@ -719,5 +755,17 @@
     "accent_color": "Kolor akcentu",
     "hue": "Odcień",
     "preview": "Podglad"
-  }
+  },
+  "members_few": "{{count}} członków",
+  "members_many": "{{count}} członków",
+  "members_one": "{{count}} członków",
+  "members_other": "{{count}} członków",
+  "members_count_label_few": "{{count}} członków",
+  "members_count_label_many": "{{count}} członków",
+  "members_count_label_one": "{{count}} członków",
+  "members_count_label_other": "{{count}} członków",
+  "posts_count_label_few": "{{count}} postów",
+  "posts_count_label_many": "{{count}} postów",
+  "posts_count_label_one": "{{count}} postów",
+  "posts_count_label_other": "{{count}} postów"
 }

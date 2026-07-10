@@ -120,7 +120,19 @@
       "offer_help": "Oferta pomocy",
       "celebration": "Świętowanie",
       "note": "Notatka"
-    }
+    },
+    "streak_value_few": "{{count}} check-inów",
+    "streak_value_many": "{{count}} check-inów",
+    "streak_value_one": "{{count}} check-inów",
+    "streak_value_other": "{{count}} check-inów",
+    "best_streak_few": "Najlepsza seria: {{count}}",
+    "best_streak_many": "Najlepsza seria: {{count}}",
+    "best_streak_one": "Najlepsza seria: {{count}}",
+    "best_streak_other": "Najlepsza seria: {{count}}",
+    "checkins_value_few": "{{count}} zarejestrowanych",
+    "checkins_value_many": "{{count}} zarejestrowanych",
+    "checkins_value_one": "{{count}} zarejestrowanych",
+    "checkins_value_other": "{{count}} zarejestrowanych"
   },
   "template_picker": {
     "load_error": "Nie udało się załadować szablonów. Proszę spróbować ponownie.",

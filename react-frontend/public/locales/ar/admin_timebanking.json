@@ -210,6 +210,12 @@
     "top_earners": "أعلى أصحاب الدخل",
     "top_spenders": "أعلى المنفقين",
     "user_report_desc": "عرض تقرير ائتماني مفصل للوقت لعضو فردي",
-    "user_report_title": "تقرير المستخدم"
+    "user_report_title": "تقرير المستخدم",
+    "hours_value_few": "{{count}}h",
+    "hours_value_many": "{{count}}h",
+    "hours_value_one": "{{count}}ح",
+    "hours_value_other": "{{count}}ح",
+    "hours_value_two": "{{count}}h",
+    "hours_value_zero": "{{count}}h"
   }
 }

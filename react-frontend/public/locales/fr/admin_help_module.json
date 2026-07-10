@@ -84,7 +84,10 @@
       "general_admin": "Administrateur général",
       "caring_community": "Communauté bienveillante",
       "kiss_agoris": "BAISER & Caring Community"
-    }
+    },
+    "search_placeholder_many": "Rechercher les articles d'aide de{{count}}...",
+    "search_placeholder_one": "Rechercher les articles d'aide de{{count}}...",
+    "search_placeholder_other": "Rechercher les articles d'aide de{{count}}..."
   },
   "help_faqs": {
     "page_title": "FAQ d'aide",

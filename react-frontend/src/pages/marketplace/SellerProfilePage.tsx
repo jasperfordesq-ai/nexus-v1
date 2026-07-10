@@ -40,7 +40,7 @@ import type { MarketplaceListingItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
@@ -310,7 +310,7 @@ export function SellerProfilePage() {
                 )}
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
-                  {t('seller.member_since', { date: new Date(seller.member_since).toLocaleDateString(undefined, { month: 'long', year: 'numeric' }) })}
+                  {t('seller.member_since', { date: new Date(seller.member_since).toLocaleDateString(getFormattingLocale(), { month: 'long', year: 'numeric' }) })}
                 </span>
               </div>
 

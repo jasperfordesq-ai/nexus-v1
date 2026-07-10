@@ -45,7 +45,7 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { CHART_TOKEN_COLORS } from '@/lib/chartColors';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { MemberSearchPicker, type MemberSearchMember } from '../../components/MemberSearchPicker';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
@@ -763,7 +763,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
                         </Chip>
                         <span className="text-sm font-semibold text-foreground">{alert.title}</span>
                         <Chip size="sm" variant="soft" color="default">
-                          {alert.count.toLocaleString()}
+                          {alert.count.toLocaleString(getFormattingLocale())}
                         </Chip>
                       </div>
                       <p className="mt-1 text-xs text-muted">{alert.message}</p>
@@ -1068,7 +1068,7 @@ export default function CaringCommunityWorkflowPage() {
   const signals = summary?.coordinator_signals;
   const rolePack = summary?.role_pack;
   const formatChf = (value: number) => t('caring_workflow.member_statement.chf_value', {
-    value: value.toLocaleString(undefined, { maximumFractionDigits: 0 }),
+    value: value.toLocaleString(getFormattingLocale(), { maximumFractionDigits: 0 }),
   });
 
   const roleCountLabel = useMemo(() => (
@@ -1551,10 +1551,10 @@ export default function CaringCommunityWorkflowPage() {
       />
 
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
-        <StatCard label={t('caring_workflow.stats.pending_reviews')} value={(stats?.pending_count ?? 0).toLocaleString()} icon={ClipboardCheck} color="warning" />
+        <StatCard label={t('caring_workflow.stats.pending_reviews')} value={(stats?.pending_count ?? 0).toLocaleString(getFormattingLocale())} icon={ClipboardCheck} color="warning" />
         <StatCard label={t('caring_workflow.stats.pending_hours')} value={formatHours(stats?.pending_hours ?? 0)} icon={Clock} color="warning" />
         <StatCard label={t('caring_workflow.stats.approved_30d')} value={formatHours(stats?.approved_30d_hours ?? 0)} icon={CheckCircle2} color="success" />
-        <StatCard label={t('caring_workflow.stats.coordinators')} value={(stats?.coordinator_count ?? 0).toLocaleString()} icon={Users} color="default" />
+        <StatCard label={t('caring_workflow.stats.coordinators')} value={(stats?.coordinator_count ?? 0).toLocaleString(getFormattingLocale())} icon={Users} color="default" />
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
@@ -2630,7 +2630,7 @@ export default function CaringCommunityWorkflowPage() {
                     <p className="mt-1 text-xs text-foreground">{generatedCode.label}</p>
                   )}
                   <p className="mt-1 text-xs text-muted">
-                    {t('caring_workflow.invite_codes.expires', { date: new Date(generatedCode.expires_at).toLocaleDateString() })}
+                    {t('caring_workflow.invite_codes.expires', { date: new Date(generatedCode.expires_at).toLocaleDateString(getFormattingLocale()) })}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -2693,7 +2693,7 @@ export default function CaringCommunityWorkflowPage() {
                     <TableRow key={ic.id}>
                       <TableCell className="font-mono font-semibold tracking-wider text-foreground">{ic.code}</TableCell>
                       <TableCell className="text-foreground">{ic.label ?? t('caring_workflow.empty.value')}</TableCell>
-                      <TableCell className="text-muted">{new Date(ic.expires_at).toLocaleDateString()}</TableCell>
+                      <TableCell className="text-muted">{new Date(ic.expires_at).toLocaleDateString(getFormattingLocale())}</TableCell>
                       <TableCell>
                         <Chip
                           size="sm"
@@ -2790,7 +2790,7 @@ function SignalRow({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg bg-surface-secondary px-3 py-2">
       <span className="text-sm text-foreground">{label}</span>
-      <span className="text-sm font-semibold text-foreground">{value.toLocaleString()}</span>
+      <span className="text-sm font-semibold text-foreground">{value.toLocaleString(getFormattingLocale())}</span>
     </div>
   );
 }
@@ -2841,7 +2841,7 @@ function PrintableInviteCard({
       </p>
       <p className="break-all font-mono text-[11px] text-foreground">{inviteUrl}</p>
       <p className="mt-3 text-[11px] text-muted">
-        {t('caring_workflow.invite_card.valid_until', { date: new Date(expiresAt).toLocaleDateString() })}
+        {t('caring_workflow.invite_card.valid_until', { date: new Date(expiresAt).toLocaleDateString(getFormattingLocale()) })}
       </p>
     </div>
   );

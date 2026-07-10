@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { Chip as HeroChip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -425,11 +426,11 @@ export function JobsPage() {
 
       {/* Employer onboarding banner for first-time posters */}
       {isAuthenticated && activeTab === 'browse' && myPostings.length === 0 && !isLoadingMyPostings && (
-        <GlassCard className="p-4 bg-linear-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20">
+        <GlassCard className="p-4 bg-linear-to-r from-accent/10 to-accent-gradient-end/10 border border-accent/20">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-indigo-500/20 flex items-center justify-center flex-shrink-0">
-                <Rocket className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+              <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center flex-shrink-0">
+                <Rocket className="w-5 h-5 text-accent" aria-hidden="true" />
               </div>
               <div>
                 <p className="font-semibold text-theme-primary">{t('onboarding.first_time_banner')}</p>
@@ -440,7 +441,7 @@ export function JobsPage() {
               as={Link}
               to={tenantPath('/jobs/employer-onboarding')}
               size="sm"
-              className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-linear-to-r from-accent to-accent-gradient-end text-white"
               startContent={<Rocket className="w-3.5 h-3.5" aria-hidden="true" />}
             >
               {t('onboarding.start_wizard')}
@@ -574,7 +575,7 @@ export function JobsPage() {
               <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
               <p className="text-theme-muted mb-4">{error}</p>
               <Button
-                className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+                className="bg-linear-to-r from-accent to-accent-gradient-end text-white"
                 startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
                 onPress={() => loadVacancies()}
               >
@@ -599,11 +600,9 @@ export function JobsPage() {
                   description={debouncedQuery ? t('empty_search') : t('empty_description')}
                   action={
                     isAuthenticated && (
-                      <Link to={tenantPath('/jobs/create')}>
-                        <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
-                          {t('create_vacancy')}
-                        </Button>
-                      </Link>
+                      <Button as={Link} to={tenantPath('/jobs/create')} className="bg-linear-to-r from-accent to-accent-gradient-end text-white">
+                        {t('create_vacancy')}
+                      </Button>
                     )
                   }
                 />
@@ -677,14 +676,12 @@ export function JobsPage() {
         <>
           {/* CTA header */}
           <div className="flex justify-end">
-            <Link to={tenantPath('/jobs/create')}>
-              <Button
-                className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('create_vacancy')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/jobs/create')}
+              className="bg-linear-to-r from-accent to-accent-gradient-end text-white"
+              startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('create_vacancy')}
+            </Button>
           </div>
           {isLoadingMyPostings ? (
             <div className="space-y-4" role="status" aria-busy="true" aria-label={t('common:loading')}>
@@ -698,11 +695,9 @@ export function JobsPage() {
               title={t('my_postings.empty_title')}
               description={t('my_postings.empty_description')}
               action={
-                <Link to={tenantPath('/jobs/create')}>
-                  <Button className="bg-linear-to-r from-indigo-500 to-purple-600 text-white">
-                    {t('create_vacancy')}
-                  </Button>
-                </Link>
+                <Button as={Link} to={tenantPath('/jobs/create')} className="bg-linear-to-r from-accent to-accent-gradient-end text-white">
+                  {t('create_vacancy')}
+                </Button>
               }
             />
           ) : (
@@ -758,7 +753,7 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
   }, [currency]);
   const formatCurrency = (value: number) => {
     if (!currencyFormatter) {
-      return `${currency} ${value.toLocaleString()}`;
+      return `${currency} ${value.toLocaleString(getFormattingLocale())}`;
     }
     return currencyFormatter.format(value);
   };
@@ -797,7 +792,7 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
           <div className="flex gap-3 sm:gap-4">
             {/* Icon */}
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-linear-to-br from-blue-500/20 to-indigo-500/20 flex items-center justify-center relative">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-linear-to-br from-blue-500/20 to-accent-gradient-end/20 flex items-center justify-center relative">
                 <Briefcase className="w-6 h-6 text-blue-400" aria-hidden="true" />
                 {/* J10: Featured star */}
                 {vacancy.is_featured && (
@@ -894,7 +889,7 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
                 {deadlineDate && !isPastDeadline && (
                   <span className="flex items-center gap-1">
                     <Clock className="w-4 h-4" aria-hidden="true" />
-                    {`${t('deadline_label')}: ${deadlineDate.toLocaleDateString()}`}
+                    {`${t('deadline_label')}: ${deadlineDate.toLocaleDateString(getFormattingLocale())}`}
                   </span>
                 )}
 
@@ -941,8 +936,8 @@ const MyPostingCard = memo(function MyPostingCard({ vacancy }: MyPostingCardProp
       <div className="flex gap-3 sm:gap-4">
         {/* Icon */}
         <div className="flex-shrink-0">
-          <div className="w-12 h-12 rounded-lg bg-linear-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
-            <Briefcase className="w-6 h-6 text-indigo-400" aria-hidden="true" />
+          <div className="w-12 h-12 rounded-lg bg-linear-to-br from-accent/20 to-accent-gradient-end/20 flex items-center justify-center">
+            <Briefcase className="w-6 h-6 text-accent" aria-hidden="true" />
           </div>
         </div>
 
@@ -979,33 +974,29 @@ const MyPostingCard = memo(function MyPostingCard({ vacancy }: MyPostingCardProp
             </span>
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" aria-hidden="true" />
-              {new Date(vacancy.created_at).toLocaleDateString()}
+              {new Date(vacancy.created_at).toLocaleDateString(getFormattingLocale())}
             </span>
           </div>
 
           {/* Action buttons */}
           <div className="flex flex-wrap gap-2 mt-3">
-            <Link to={tenantPath(`/jobs/${vacancy.id}#applications`)}>
-              <Button
-                size="sm"
-                variant="flat"
-                color={vacancy.applications_count > 0 ? 'primary' : 'default'}
-                className={vacancy.applications_count > 0 ? '' : 'bg-theme-elevated text-theme-muted'}
-                startContent={<FileText className="w-3.5 h-3.5" aria-hidden="true" />}
-              >
-                {t('my_postings.view_applicants')} ({vacancy.applications_count})
-              </Button>
-            </Link>
-            <Link to={tenantPath(`/jobs/${vacancy.id}/edit`)}>
-              <Button
-                size="sm"
-                variant="flat"
-                className="bg-theme-elevated text-theme-muted"
-                startContent={<Edit className="w-3.5 h-3.5" aria-hidden="true" />}
-              >
-                {t('my_postings.edit')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath(`/jobs/${vacancy.id}#applications`)}
+              size="sm"
+              variant="flat"
+              color={vacancy.applications_count > 0 ? 'primary' : 'default'}
+              className={vacancy.applications_count > 0 ? '' : 'bg-theme-elevated text-theme-muted'}
+              startContent={<FileText className="w-3.5 h-3.5" aria-hidden="true" />}
+            >
+              {t('my_postings.view_applicants')} ({vacancy.applications_count})
+            </Button>
+            <Button as={Link} to={tenantPath(`/jobs/${vacancy.id}/edit`)}
+              size="sm"
+              variant="flat"
+              className="bg-theme-elevated text-theme-muted"
+              startContent={<Edit className="w-3.5 h-3.5" aria-hidden="true" />}
+            >
+              {t('my_postings.edit')}
+            </Button>
           </div>
         </div>
 

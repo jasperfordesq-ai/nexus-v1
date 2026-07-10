@@ -54,7 +54,7 @@ export function UpcomingEventsWidget({ events }: UpcomingEventsWidgetProps) {
         </div>
         <Link
           to={tenantPath('/events')}
-          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors duration-200"
+          className="text-xs text-accent hover:text-accent transition-colors duration-200"
         >
           {t('sidebar.events.see_all')}
         </Link>
@@ -80,7 +80,7 @@ export function UpcomingEventsWidget({ events }: UpcomingEventsWidgetProps) {
 
             {/* Event info */}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-500 transition-colors duration-200">
+              <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-accent transition-colors duration-200">
                 {event.title}
               </p>
               {event.start_time && (

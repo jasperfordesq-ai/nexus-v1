@@ -54,7 +54,7 @@ import { Breadcrumbs } from '@/components/navigation';
 import { SocialInteractionPanel } from '@/components/social/SocialInteractionPanel';
 import { useAuth, useTenant } from '@/contexts';
 import { useToast } from '@/contexts';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -128,15 +128,15 @@ type AppStatusFilter = 'all' | 'pending' | 'approved' | 'declined';
 /* ───────────────────────── Helpers ───────────────────────── */
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+  return new Date(d).toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 function formatShortDate(d: string) {
-  return new Date(d).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+  return new Date(d).toLocaleDateString(getFormattingLocale(), { weekday: 'short', month: 'short', day: 'numeric' });
 }
 
 function formatTime(d: string) {
-  return new Date(d).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return new Date(d).toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' });
 }
 
 function statusColor(status: string): 'warning' | 'success' | 'danger' | 'default' {
@@ -242,7 +242,7 @@ function ShiftCheckinPanel({ shifts }: ShiftCheckinPanelProps) {
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
       <GlassCard className="p-6 space-y-4">
         <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-          <QrCode className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+          <QrCode className="w-5 h-5 text-accent" aria-hidden="true" />
           {t('check_in.title')}
         </h2>
         <p className="text-sm text-theme-muted">
@@ -525,7 +525,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
       <GlassCard className="p-6 space-y-4">
         <div className="flex items-center gap-3 flex-wrap">
           <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-            <ClipboardList className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+            <ClipboardList className="w-5 h-5 text-accent" aria-hidden="true" />
             {t('applications.heading')}
             {pendingCount > 0 && statusFilter === 'all' && (
             <Chip size="sm" color="warning" variant="soft">{t('applications.pending_count', { count: pendingCount })}</Chip>
@@ -569,7 +569,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
             <ToggleButton
               key={f.key}
               id={f.key}
-              className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-violet-600 data-[selected=true]:text-white"
+              className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-accent data-[selected=true]:to-violet-600 data-[selected=true]:text-white"
             >
               {f.label}
             </ToggleButton>
@@ -603,8 +603,8 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
         )}
 
         {selected.size > 0 && (
-          <div className="flex flex-col gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 sm:flex-row sm:items-center">
-            <span className="text-sm text-indigo-700 dark:text-indigo-400 font-medium">{t('applications.selected_count', { count: selected.size })}</span>
+          <div className="flex flex-col gap-3 p-3 rounded-xl bg-accent/10 border border-accent/30 sm:flex-row sm:items-center">
+            <span className="text-sm text-accent dark:text-accent font-medium">{t('applications.selected_count', { count: selected.size })}</span>
             <Button
               size="sm"
               variant="secondary"
@@ -1019,7 +1019,7 @@ export function OpportunityDetailPage() {
               <h1 className="text-2xl font-bold text-theme-primary">{opp.title}</h1>
               <Link
                 to={tenantPath(`/organisations/${opp.organization.id}`)}
-                className="text-indigo-500 hover:underline text-sm flex items-center gap-1 mt-1"
+                className="text-accent hover:underline text-sm flex items-center gap-1 mt-1"
               >
                 <Building2 className="w-3.5 h-3.5" aria-hidden="true" />
                 {opp.organization.name}
@@ -1118,8 +1118,8 @@ export function OpportunityDetailPage() {
           {opp.is_owner && hasFeature('federation') && (
             <div className="flex items-center justify-between gap-4 p-4 rounded-xl bg-theme-elevated border border-theme-default">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-indigo-500/20">
-                  <Globe className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                <div className="p-2 rounded-lg bg-accent/20">
+                  <Globe className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="font-medium text-theme-primary">
@@ -1136,7 +1136,7 @@ export function OpportunityDetailPage() {
                 isDisabled={isUpdatingShare}
                 onValueChange={handleFederatedShareChange}
                 classNames={{
-                  wrapper: 'group-data-[selected=true]:bg-indigo-500',
+                  wrapper: 'group-data-[selected=true]:bg-accent',
                 }}
               />
             </div>
@@ -1160,7 +1160,7 @@ export function OpportunityDetailPage() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <GlassCard className="p-6 space-y-4">
             <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-              <Clock className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+              <Clock className="w-5 h-5 text-accent" aria-hidden="true" />
               {t('opportunity.upcoming_shifts')}
             </h2>
             <div className="space-y-2">

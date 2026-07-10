@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { DynamicIcon, ICON_MAP, ICON_NAMES } from '@/components/ui/DynamicIcon';
 import { Input } from '@/components/ui/Input';
-import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody } from '@/components/ui/Modal';
 
 interface IconPickerProps {
   value: string | null;
@@ -80,7 +80,7 @@ export function IconPicker({ value, onChange, label }: IconPickerProps) {
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-2">
-            <span>{t('icon_picker.choose_icon')}</span>
+            <ModalHeading>{t('icon_picker.choose_icon')}</ModalHeading>
             <Input
               placeholder={t('icon_picker.search_icons')}
               aria-label={t('icon_picker.search_icons')}
@@ -107,7 +107,7 @@ export function IconPicker({ value, onChange, label }: IconPickerProps) {
                       variant="tertiary"
                       className={`flex min-h-14 min-w-0 flex-col items-center gap-1 rounded-lg p-2 text-center transition-all hover:bg-theme-hover ${
                         isSelected
-                          ? 'bg-indigo-500/10 ring-2 ring-indigo-500 text-indigo-600 dark:text-indigo-400'
+                          ? 'bg-accent/10 ring-2 ring-accent text-accent dark:text-accent'
                           : 'text-theme-muted'
                       }`}
                       title={name}

@@ -89,7 +89,7 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
               className={[
                 'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors',
                 isDone  ? 'bg-emerald-500 text-white' :
-                isActive ? 'bg-indigo-500 text-white' :
+                isActive ? 'bg-accent text-white' :
                           'bg-theme-elevated text-theme-muted',
               ].join(' ')}
             >
@@ -224,7 +224,7 @@ export function PilotInquiryPage() {
   function fitLabel(score: number): { label: string; color: string } {
     if (score >= 60) return { label: t('success_excellent'), color: 'text-emerald-500' };
     if (score >= 40) return { label: t('success_good'),      color: 'text-amber-500' };
-    return              { label: t('success_interested'),    color: 'text-indigo-500' };
+    return              { label: t('success_interested'),    color: 'text-accent' };
   }
 
   // ─── Success state ────────────────────────────────────────────────────────
@@ -249,15 +249,13 @@ export function PilotInquiryPage() {
               {label}
             </div>
             <p className="text-theme-muted mb-6">{t('success_followup')}</p>
-            <Link to={tenantPath('/')}>
-              <Button
-                variant="tertiary"
-                className="bg-theme-elevated text-theme-muted"
-                startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('success_back')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/')}
+              variant="tertiary"
+              className="bg-theme-elevated text-theme-muted"
+              startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('success_back')}
+            </Button>
           </GlassCard>
         </motion.div>
       </div>
@@ -278,8 +276,8 @@ export function PilotInquiryPage() {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4">
-          <MapPin className="w-7 h-7 text-indigo-500" aria-hidden="true" />
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-accent/20 to-emerald-500/20 mb-4">
+          <MapPin className="w-7 h-7 text-accent" aria-hidden="true" />
         </div>
         <h1 className="text-3xl font-bold text-theme-primary mb-2">
           {t('hero_title')}
@@ -497,7 +495,7 @@ export function PilotInquiryPage() {
           {step < TOTAL_STEPS ? (
             <Button
               variant="primary"
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white font-medium"
               endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
               isDisabled={!canAdvance()}
               onPress={() => setStep(s => s + 1)}
@@ -507,7 +505,7 @@ export function PilotInquiryPage() {
           ) : (
             <Button
               variant="primary"
-              className="bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
+              className="bg-gradient-to-r from-accent to-emerald-600 text-white font-medium"
               isLoading={submitting}
               isDisabled={!canAdvance() || submitting}
               spinner={<Spinner size="sm" />}

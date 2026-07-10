@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Chip, Spinner, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -231,7 +232,7 @@ export function RevenueDashboard() {
             />
             <StatCard
               label={t('billing.total_users')}
-              value={data.total_platform_users.toLocaleString()}
+              value={data.total_platform_users.toLocaleString(getFormattingLocale())}
               icon={<Users aria-hidden="true" className="w-4 h-4" />}
             />
           </div>
@@ -329,7 +330,7 @@ export function RevenueDashboard() {
                       </TableCell>
                       <TableCell>{change.acted_by ?? '—'}</TableCell>
                       <TableCell>
-                        {new Date(change.created_at).toLocaleDateString()}
+                        {new Date(change.created_at).toLocaleDateString(getFormattingLocale())}
                       </TableCell>
                     </TableRow>
                   ))}

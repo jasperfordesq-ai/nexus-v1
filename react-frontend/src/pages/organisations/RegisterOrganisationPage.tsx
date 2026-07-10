@@ -159,7 +159,7 @@ export default function RegisterOrganisationPage() {
       <GlassCard className="p-6 sm:p-8">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Building2 className="w-7 h-7 text-indigo-500" aria-hidden="true" />
+            <Building2 className="w-7 h-7 text-accent" aria-hidden="true" />
             {t('organisations.register_heading')}
           </h1>
           <p className="text-theme-muted mt-1">
@@ -232,7 +232,7 @@ export default function RegisterOrganisationPage() {
           {/* Terms & Conditions */}
           <div className="rounded-lg bg-theme-elevated border border-theme-default p-5 space-y-3">
             <div className="flex items-center gap-2 mb-2">
-              <ShieldCheck className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+              <ShieldCheck className="w-5 h-5 text-accent" aria-hidden="true" />
               <h3 className="text-sm font-semibold text-theme-primary">
                 {t('organisations.terms_heading')}
               </h3>
@@ -276,21 +276,19 @@ export default function RegisterOrganisationPage() {
           <div className="flex gap-3 pt-4">
             <Button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="flex-1 bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={<Save className="w-4 h-4" aria-hidden="true" />}
               isLoading={isSubmitting}
             >
               {t('organisations.form_submit')}
             </Button>
-            <Link to={tenantPath('/organisations')}>
-              <Button
-                type="button"
-                variant="secondary"
-                className="bg-theme-elevated text-theme-primary"
-              >
-                {t('organisations.form_cancel')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/organisations')}
+              type="button"
+              variant="secondary"
+              className="bg-theme-elevated text-theme-primary"
+            >
+              {t('organisations.form_cancel')}
+            </Button>
           </div>
         </form>
       </GlassCard>

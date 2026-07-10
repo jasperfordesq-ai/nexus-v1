@@ -60,7 +60,7 @@ import Upload from 'lucide-react/icons/upload';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { parseServerTimestamp, formatServerDate, formatServerDateTime } from '@/lib/serverTime';
 import { adminVetting, adminUsers } from '@/admin/api/adminApi';
 import { DataTable, ConfirmModal, type Column } from '@/admin/components';
@@ -687,7 +687,7 @@ export function VettingRecords() {
         if (!expiry) return <span className="text-sm text-muted">{'—'}</span>;
         return (
           <div className="flex min-w-0 items-center gap-2">
-            <span className="text-sm tabular-nums text-muted">{expiry.toLocaleDateString()}</span>
+            <span className="text-sm tabular-nums text-muted">{expiry.toLocaleDateString(getFormattingLocale())}</span>
             <ExpiryCountdownChip expiryDate={item.expiry_date} />
           </div>
         );

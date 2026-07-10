@@ -186,7 +186,13 @@
     "time_just_now": "Zojuist",
     "time_minutes_ago": "{{count}}m geleden",
     "time_hours_ago": "{{count}}u geleden",
-    "time_days_ago": "{{count}}d geleden"
+    "time_days_ago": "{{count}}d geleden",
+    "time_minutes_ago_one": "{{count}}m geleden",
+    "time_minutes_ago_other": "{{count}}m geleden",
+    "time_hours_ago_one": "{{count}}u geleden",
+    "time_hours_ago_other": "{{count}}u geleden",
+    "time_days_ago_one": "{{count}}d geleden",
+    "time_days_ago_other": "{{count}}d geleden"
   },
   "members": {
     "title": "Leden",
@@ -288,7 +294,16 @@
     "empty_never_logged_in_title": "Iedereen heeft ingelogd",
     "empty_never_logged_in_hint": "Er zijn geen goedgekeurde leden die nog wachten om voor het eerst in te loggen.",
     "empty_onboarding_incomplete_title": "Iedereen heeft onboarding afgerond",
-    "empty_onboarding_incomplete_hint": "Geen leden hebben nog onvoltooide onboardingstappen."
+    "empty_onboarding_incomplete_hint": "Geen leden hebben nog onvoltooide onboardingstappen.",
+    "time_minutes_ago_one": "{{count}} min geleden",
+    "time_minutes_ago_other": "{{count}} min geleden",
+    "time_hours_ago_one": "{{count}} u geleden",
+    "time_hours_ago_other": "{{count}} u geleden",
+    "time_days_ago_one": "{{count}} d geleden",
+    "time_days_ago_other": "{{count}} d geleden",
+    "bulk_selected_one": "{{count}} geselecteerd",
+    "bulk_selected_other": "{{count}} geselecteerd",
+    "role_all": "Alle rollen"
   },
   "onboarding": {
     "title": "Aan boord",
@@ -503,7 +518,25 @@
     "empty_queue_title": "Geen records wachten op beoordeling",
     "empty_queue_hint": "Alles is bijgewerkt — nieuwe inzendingen verschijnen hier voor beoordeling.",
     "list_error_title": "Screeningrecords konden niet worden geladen",
-    "list_error_body": "Controleer je verbinding en probeer het opnieuw."
+    "list_error_body": "Controleer je verbinding en probeer het opnieuw.",
+    "expiry_days_left_one": "nog {{count}}d",
+    "expiry_days_left_other": "nog {{count}}d",
+    "toast_bulk_success_one": "{{count}} registreert {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_other": "{{count}} registreert {{action}}.{{failedSuffix}}",
+    "toast_bulk_failed_suffix_one": " ({{count}} mislukt)",
+    "toast_bulk_failed_suffix_other": " ({{count}} mislukt)",
+    "stat_of_total_one": "van {{count}} records in totaal",
+    "stat_of_total_other": "van {{count}} records in totaal",
+    "stat_expired_hint_one": "{{count}} al verlopen",
+    "stat_expired_hint_other": "{{count}} al verlopen",
+    "records_selected_one": "{{count}} records geselecteerd",
+    "records_selected_other": "{{count}} records geselecteerd",
+    "bulk_verify_confirm_one": "Alle geselecteerde records verifiëren?",
+    "bulk_verify_confirm_other": "Alle geselecteerde records verifiëren?",
+    "bulk_delete_confirm_one": "Weet u zeker dat u alle geselecteerde records wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+    "bulk_delete_confirm_other": "Weet u zeker dat u alle geselecteerde records wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+    "bulk_reject_confirm_one": "Geef een reden om alle geselecteerde records af te wijzen.",
+    "bulk_reject_confirm_other": "Geef een reden om alle geselecteerde records af te wijzen."
   },
   "member_detail": {
     "load_failed": "Laden van lid mislukt.",
@@ -795,7 +828,9 @@
     "retry": "Opnieuw proberen",
     "detail_not_found_hint": "De berichtkopie is mogelijk gearchiveerd of verwijderd, of de link is onjuist.",
     "detail_flag_banner_title": "Gemarkeerd voor beoordeling",
-    "detail_decision_prompt": "Leg een beoordelingsbeslissing vast voor deze berichtkopie."
+    "detail_decision_prompt": "Leg een beoordelingsbeslissing vast voor deze berichtkopie.",
+    "detail_message_count_one": "{{count}} berichten",
+    "detail_message_count_other": "{{count}} berichten"
   },
   "monitoring": {
     "title": "Gebruikersbewaking",
@@ -939,7 +974,8 @@
     "empty_level_title": "Geen labels op dit niveau",
     "empty_level_hint": "Er zijn momenteel geen advertenties met dit risiconiveau.",
     "empty_search_title": "Geen overeenkomende risicolabels",
-    "empty_search_hint": "Probeer een andere zoekterm of wis de zoekopdracht."
+    "empty_search_hint": "Probeer een andere zoekterm of wis de zoekopdracht.",
+    "level_all": "Alle risiconiveaus"
   },
   "insurance": {
     "title": "Verzekeringscertificaten",
@@ -1124,7 +1160,9 @@
     "detail_description": "Een bevroren, alleen-lezen momentopname van een beoordeelde berichtkopie.",
     "frozen_note": "Dit record is bewaard precies zoals het werd beoordeeld en kan niet worden gewijzigd.",
     "record_id": "Record #{{id}}",
-    "record_unavailable": "Record niet beschikbaar"
+    "record_unavailable": "Record niet beschikbaar",
+    "messages_count_one": "{{count}} berichten",
+    "messages_count_other": "{{count}} berichten"
   },
   "configuration": {
     "title": "Makelaarconfiguratie",

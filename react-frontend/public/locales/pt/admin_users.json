@@ -218,7 +218,9 @@
     "smart_search_text_chip": "Pesquisa: {{query}}",
     "role_super_admin": "Superadministrador",
     "permissions_editor_unavailable_title": "As permissões são apenas de leitura aqui",
-    "permissions_editor_unavailable_desc": "Esta página mostra a função do utilizador e as permissões concedidas, mas não permite alterá-las. Faça a gestão do acesso alterando a função do utilizador na página de edição."
+    "permissions_editor_unavailable_desc": "Esta página mostra a função do utilizador e as permissões concedidas, mas não permite alterá-las. Faça a gestão do acesso alterando a função do utilizador na página de edição.",
+    "role_unknown": "Função desconhecida",
+    "role_tenant_super_admin": "Superadministrador do inquilino"
   },
   "user_edit": {
     "actions": {

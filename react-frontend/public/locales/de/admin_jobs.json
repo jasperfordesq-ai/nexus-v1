@@ -250,7 +250,17 @@
     "moderation_page_title": "Job-Moderationswarteschlange",
     "moderation_page_description": "Überprüfen und genehmigen Sie Stellenausschreibungen, bevor sie online gehen",
     "templates_empty_description": "Erstellen Sie Ihre erste Vorlage, um bei zukünftigen Stellenausschreibungen Zeit zu sparen.",
-    "templates_empty_title": "Noch keine Vorlagen"
+    "templates_empty_title": "Noch keine Vorlagen",
+    "jobs_count_one": "{{count}}-Jobs",
+    "jobs_count_other": "{{count}}-Jobs",
+    "application_count_one_one": "{{count}}-Anwendung",
+    "application_count_one_other": "{{count}}-Anwendung",
+    "application_count_other_one": "{{count}}-Anwendungen",
+    "application_count_other_other": "{{count}}-Anwendungen",
+    "stat_pending_offers_one": "{{count}}ausstehende Angebote",
+    "stat_pending_offers_other": "{{count}}ausstehende Angebote",
+    "pipeline_minutes_one": "{{count}}min",
+    "pipeline_minutes_other": "{{count}}min"
   },
   "moderation": {
     "action_failed": "Fehlgeschlagen",
@@ -478,5 +488,10 @@
     "blocked_count": "Blockiert",
     "flagged_count": "Gekennzeichnet",
     "total_analyzed": "Insgesamt analysiert"
+  },
+  "premium": {
+    "status": {
+      "unknown": "Unbekannt"
+    }
   }
 }

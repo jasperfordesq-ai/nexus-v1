@@ -30,6 +30,7 @@ import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { RelatedPages } from './RelatedPages';
+import { formatNumber } from '@/lib/helpers';
 
 /* ───────────────────────── Animations ───────────────────────── */
 
@@ -69,7 +70,7 @@ export function ImpactSummaryPage() {
         {/* Background blurs */}
         <div className="absolute inset-0 pointer-events-none opacity-20" aria-hidden="true">
           <div className="absolute top-10 left-1/4 w-72 h-72 bg-emerald-500 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-indigo-500 rounded-full blur-3xl" />
+          <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-accent rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -125,8 +126,8 @@ export function ImpactSummaryPage() {
           >
             {[
               { value: '€16', label: t('impact_summary.stat_return_label'), icon: TrendingUp, color: 'text-emerald-500 dark:text-emerald-400', bg: 'bg-emerald-500/15' },
-              { value: '100%', label: t('impact_summary.stat_wellbeing_label'), icon: Heart, color: 'text-rose-500 dark:text-rose-400', bg: 'bg-rose-500/15' },
-              { value: '95%', label: t('impact_summary.stat_connected_label'), icon: Users, color: 'text-indigo-500 dark:text-indigo-400', bg: 'bg-indigo-500/15' },
+              { value: formatNumber(1, { style: 'percent', maximumFractionDigits: 0 }), label: t('impact_summary.stat_wellbeing_label'), icon: Heart, color: 'text-rose-500 dark:text-rose-400', bg: 'bg-rose-500/15' },
+              { value: formatNumber(0.95, { style: 'percent', maximumFractionDigits: 0 }), label: t('impact_summary.stat_connected_label'), icon: Users, color: 'text-accent dark:text-accent', bg: 'bg-accent/15' },
               { value: '€803K', label: t('impact_summary.stat_value_label'), icon: ShieldCheck, color: 'text-[var(--color-warning)]', bg: 'bg-amber-500/15' },
             ].map((stat) => (
               <motion.div key={stat.label} variants={fadeInUp}>
@@ -169,7 +170,9 @@ export function ImpactSummaryPage() {
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
                       <div className="flex-shrink-0 mt-1 w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                        <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">100%</span>
+                        <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                          {formatNumber(1, { style: 'percent', maximumFractionDigits: 0 })}
+                        </span>
                       </div>
                       <p className="text-theme-muted text-sm leading-relaxed">
                         {t('impact_summary.wellbeing_100_text')}
@@ -178,7 +181,9 @@ export function ImpactSummaryPage() {
 
                     <div className="flex items-start gap-3">
                       <div className="flex-shrink-0 mt-1 w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                        <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">95%</span>
+                        <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                          {formatNumber(0.95, { style: 'percent', maximumFractionDigits: 0 })}
+                        </span>
                       </div>
                       <p className="text-theme-muted text-sm leading-relaxed">
                         {t('impact_summary.wellbeing_95_text')}
@@ -213,12 +218,12 @@ export function ImpactSummaryPage() {
             >
               <GlassCard className="p-6 sm:p-8 h-full relative overflow-hidden">
                 {/* Blue accent line */}
-                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-blue-500 rounded-l" aria-hidden="true" />
+                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accent to-blue-500 rounded-l" aria-hidden="true" />
 
                 <div className="pl-4">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2.5 rounded-xl bg-indigo-500/15">
-                      <Stethoscope className="w-6 h-6 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                    <div className="p-2.5 rounded-xl bg-accent/15">
+                      <Stethoscope className="w-6 h-6 text-accent dark:text-accent" aria-hidden="true" />
                     </div>
                     <h2 className="text-xl font-bold text-theme-primary">{t('impact_summary.public_health_heading')}</h2>
                   </div>
@@ -233,9 +238,9 @@ export function ImpactSummaryPage() {
                     </p>
 
                     {/* Blockquote */}
-                    <div className="mt-6 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/20">
+                    <div className="mt-6 p-4 rounded-xl bg-accent/5 border border-accent/20">
                       <div className="flex gap-3">
-                        <Quote className="w-5 h-5 text-indigo-500/60 flex-shrink-0 mt-0.5" aria-hidden="true" />
+                        <Quote className="w-5 h-5 text-accent/60 flex-shrink-0 mt-0.5" aria-hidden="true" />
                         <div>
                           <p className="text-sm italic text-theme-muted leading-relaxed">
                             {t('impact_summary.public_health_quote')}
@@ -255,7 +260,7 @@ export function ImpactSummaryPage() {
       </section>
 
       {/* ─── Strategic Documents ─── */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
+      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-accent/5 to-transparent">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -304,14 +309,14 @@ export function ImpactSummaryPage() {
             >
               <Link to={tenantPath('/strategic-plan')}>
                 <GlassCard hoverable className="p-6 h-full text-center group hover:scale-[1.02] transition-transform">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-500 mb-4">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-accent to-accent-gradient-end mb-4">
                     <Compass className="w-7 h-7 text-white" aria-hidden="true" />
                   </div>
                   <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('impact_summary.strategic_plan_title')}</h3>
                   <p className="text-sm text-theme-muted mb-4">
                     {t('impact_summary.strategic_plan_description')}
                   </p>
-                  <div className="flex items-center justify-center gap-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 group-hover:gap-3 transition-all">
+                  <div className="flex items-center justify-center gap-2 text-sm font-medium text-accent dark:text-accent group-hover:gap-3 transition-all">
                     {t('impact_summary.read_plan')} <ArrowRight className="w-4 h-4" aria-hidden="true" />
                   </div>
                 </GlassCard>
@@ -336,7 +341,7 @@ export function ImpactSummaryPage() {
               {/* Background gradient */}
               <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-accent to-accent-gradient-end rounded-full blur-3xl" />
               </div>
 
               <div className="relative z-10">
@@ -347,15 +352,13 @@ export function ImpactSummaryPage() {
                   {t('impact_summary.cta_subtitle')}
                 </p>
 
-                <Link to={tenantPath('/contact')}>
-                  <Button
-                    size="lg"
-                    className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold px-8"
-                    startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
-                  >
-                    {t('impact_summary.cta_contact')}
-                  </Button>
-                </Link>
+                <Button as={Link} to={tenantPath('/contact')}
+                  size="lg"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold px-8"
+                  startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
+                >
+                  {t('impact_summary.cta_contact')}
+                </Button>
               </div>
             </GlassCard>
           </motion.div>

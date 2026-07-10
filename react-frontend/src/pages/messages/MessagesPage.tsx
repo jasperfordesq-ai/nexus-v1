@@ -438,7 +438,7 @@ export function MessagesPage() {
               </p>
               <Button
                 size="sm"
-                className="mt-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                className="mt-3 bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                 startContent={<ArrowRightLeft className="w-4 h-4" />}
                 onPress={() => navigate(tenantPath('/exchanges'))}
               >
@@ -468,7 +468,7 @@ export function MessagesPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
           <h1 className="flex items-center gap-3 text-2xl font-bold text-theme-primary sm:text-3xl">
-            <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 ring-1 ring-indigo-500/20 dark:text-indigo-300">
+            <span className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-accent/10 text-accent ring-1 ring-accent/20 dark:text-accent">
               <MessageSquare className="h-6 w-6" aria-hidden="true" />
             </span>
             {t('title')}
@@ -477,7 +477,7 @@ export function MessagesPage() {
         </div>
         <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-shrink-0">
           <Button
-            className="min-w-0 bg-gradient-to-r from-indigo-500 to-purple-600 font-medium text-white"
+            className="min-w-0 bg-gradient-to-r from-accent to-accent-gradient-end font-medium text-white"
             startContent={<Plus className="h-4 w-4 flex-shrink-0" aria-hidden="true" />}
             onPress={() => setIsNewMessageOpen(true)}
             isDisabled={!isDirectMessagingEnabled || messagingRestricted}
@@ -640,7 +640,7 @@ export function MessagesPage() {
             <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h3>
             <p className="text-theme-muted mb-4">{error}</p>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
               onPress={() => loadConversations()}
             >
@@ -656,7 +656,7 @@ export function MessagesPage() {
             description={hasSearchQuery ? t('search_empty_subtitle') : t('empty_subtitle')}
             action={!hasSearchQuery && (
               <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                 startContent={<Plus className="h-4 w-4" aria-hidden="true" />}
                 onPress={() => setIsNewMessageOpen(true)}
                 isDisabled={!isDirectMessagingEnabled || messagingRestricted}
@@ -725,9 +725,9 @@ function ConversationCard({ conversation }: ConversationCardProps) {
     <Link
       to={tenantPath(`/messages/${conversation.id}`)}
       aria-label={unread_count > 0 ? t('aria_conversation_unread', { name: displayName, count: unread_count }) : t('aria_conversation', { name: displayName })}
-      className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <GlassCard className={`p-4 transition-colors hover:bg-theme-hover sm:p-5 ${unread_count > 0 ? 'border-l-4 border-l-indigo-500' : ''}`}>
+      <GlassCard className={`p-4 transition-colors hover:bg-theme-hover sm:p-5 ${unread_count > 0 ? 'border-l-4 border-l-accent' : ''}`}>
         <div className="flex items-center gap-3 sm:gap-4">
           <Badge
             content={unread_count > 9 ? '9+' : unread_count}
@@ -766,7 +766,7 @@ function ConversationCard({ conversation }: ConversationCardProps) {
           </div>
 
           {unread_count > 0 && (
-            <Circle className="w-3 h-3 fill-indigo-500 text-indigo-500 flex-shrink-0" aria-hidden="true" />
+            <Circle className="w-3 h-3 fill-accent text-accent flex-shrink-0" aria-hidden="true" />
           )}
         </div>
       </GlassCard>

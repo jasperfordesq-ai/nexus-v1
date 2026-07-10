@@ -39,7 +39,7 @@ import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { GoalProgressHistory } from './components/GoalProgressHistory';
 import { GoalInsightsPanel } from './components/GoalInsightsPanel';
 
@@ -189,7 +189,7 @@ export function GoalDetailPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('goals.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error ?? t('goals.load_error')}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             onPress={loadGoal}
           >
             {t('goals.try_again')}
@@ -279,7 +279,7 @@ export function GoalDetailPage() {
             classNames={{
               indicator: isCompleted
                 ? 'bg-emerald-500'
-                : 'bg-gradient-to-r from-indigo-500 to-purple-600',
+                : 'bg-gradient-to-r from-accent to-accent-gradient-end',
               track: 'bg-theme-hover',
             }}
             size="lg"
@@ -296,7 +296,7 @@ export function GoalDetailPage() {
                 {t('goals.detail.deadline')}
               </div>
               <p className={`text-sm font-medium ${isOverdue ? 'text-red-600 dark:text-red-400' : 'text-theme-primary'}`}>
-                {deadlineDate.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                {deadlineDate.toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'long', day: 'numeric' })}
               </p>
             </div>
           )}
@@ -306,7 +306,7 @@ export function GoalDetailPage() {
               {t('goals.detail.created')}
             </div>
             <p className="text-sm text-theme-primary font-medium">
-              {new Date(goal.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+              {new Date(goal.created_at).toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
           {showPrivateFields && goal.checkin_frequency && (
@@ -369,7 +369,7 @@ export function GoalDetailPage() {
 
         <div>
           <h2 className="text-sm font-semibold text-theme-primary mb-3 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-purple-400" aria-hidden="true" />
+            <Sparkles className="w-4 h-4 text-accent" aria-hidden="true" />
             {t('goals.detail.insights')}
           </h2>
           <GoalInsightsPanel goalId={goal.id} canNudge={goal.is_buddy} />
@@ -390,7 +390,7 @@ export function GoalDetailPage() {
         {(showPrivateFields || goal.is_public) && (
           <div>
             <h2 className="text-sm font-semibold text-theme-primary mb-3 flex items-center gap-2">
-              <History className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+              <History className="w-4 h-4 text-accent" aria-hidden="true" />
               {t('goals.detail.progress_timeline')}
             </h2>
             <GoalProgressHistory goalId={goal.id} />

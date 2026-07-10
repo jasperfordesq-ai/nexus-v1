@@ -186,7 +186,13 @@
     "time_just_now": "Just now",
     "time_minutes_ago": "{{count}}m ago",
     "time_hours_ago": "{{count}}h ago",
-    "time_days_ago": "{{count}}d ago"
+    "time_days_ago": "{{count}}d ago",
+    "time_minutes_ago_one": "{{count}}m ago",
+    "time_minutes_ago_other": "{{count}}m ago",
+    "time_hours_ago_one": "{{count}}h ago",
+    "time_hours_ago_other": "{{count}}h ago",
+    "time_days_ago_one": "{{count}}d ago",
+    "time_days_ago_other": "{{count}}d ago"
   },
   "members": {
     "title": "Members",
@@ -288,7 +294,16 @@
     "empty_never_logged_in_title": "Everyone has logged in",
     "empty_never_logged_in_hint": "No approved members are still waiting to sign in for the first time.",
     "empty_onboarding_incomplete_title": "Everyone finished onboarding",
-    "empty_onboarding_incomplete_hint": "No members have unfinished onboarding steps."
+    "empty_onboarding_incomplete_hint": "No members have unfinished onboarding steps.",
+    "role_all": "All roles",
+    "time_minutes_ago_one": "{{count}}m ago",
+    "time_minutes_ago_other": "{{count}}m ago",
+    "time_hours_ago_one": "{{count}}h ago",
+    "time_hours_ago_other": "{{count}}h ago",
+    "time_days_ago_one": "{{count}}d ago",
+    "time_days_ago_other": "{{count}}d ago",
+    "bulk_selected_one": "{{count}} selected",
+    "bulk_selected_other": "{{count}} selected"
   },
   "onboarding": {
     "title": "Onboarding",
@@ -503,7 +518,25 @@
     "empty_queue_title": "No records awaiting review",
     "empty_queue_hint": "All caught up — new submissions will appear here for review.",
     "list_error_title": "Vetting records couldn't be loaded",
-    "list_error_body": "Check your connection and try again."
+    "list_error_body": "Check your connection and try again.",
+    "expiry_days_left_one": "{{count}}d left",
+    "expiry_days_left_other": "{{count}}d left",
+    "toast_bulk_success_one": "{{count}} records {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_other": "{{count}} records {{action}}.{{failedSuffix}}",
+    "toast_bulk_failed_suffix_one": " ({{count}} failed)",
+    "toast_bulk_failed_suffix_other": " ({{count}} failed)",
+    "stat_of_total_one": "of {{count}} total records",
+    "stat_of_total_other": "of {{count}} total records",
+    "stat_expired_hint_one": "{{count}} already expired",
+    "stat_expired_hint_other": "{{count}} already expired",
+    "records_selected_one": "{{count}} records selected",
+    "records_selected_other": "{{count}} records selected",
+    "bulk_verify_confirm_one": "Verify all selected records?",
+    "bulk_verify_confirm_other": "Verify all selected records?",
+    "bulk_delete_confirm_one": "Are you sure you want to delete all selected records? This action cannot be undone.",
+    "bulk_delete_confirm_other": "Are you sure you want to delete all selected records? This action cannot be undone.",
+    "bulk_reject_confirm_one": "Provide a reason to reject all selected records.",
+    "bulk_reject_confirm_other": "Provide a reason to reject all selected records."
   },
   "member_detail": {
     "load_failed": "Failed to load member.",
@@ -795,7 +828,9 @@
     "retry": "Try again",
     "detail_not_found_hint": "The message copy may have been archived or removed, or the link may be wrong.",
     "detail_flag_banner_title": "Flagged for review",
-    "detail_decision_prompt": "Record a review decision for this message copy."
+    "detail_decision_prompt": "Record a review decision for this message copy.",
+    "detail_message_count_one": "{{count}} messages",
+    "detail_message_count_other": "{{count}} messages"
   },
   "monitoring": {
     "title": "User Monitoring",
@@ -939,7 +974,8 @@
     "empty_level_title": "No tags at this level",
     "empty_level_hint": "No listings currently carry this risk level.",
     "empty_search_title": "No matching risk tags",
-    "empty_search_hint": "Try a different search term or clear the search."
+    "empty_search_hint": "Try a different search term or clear the search.",
+    "level_all": "All risk levels"
   },
   "insurance": {
     "title": "Insurance Certificates",
@@ -1124,7 +1160,9 @@
     "detail_description": "A frozen, read-only snapshot of a reviewed message copy.",
     "frozen_note": "This record is preserved exactly as it was reviewed and cannot be modified.",
     "record_id": "Record #{{id}}",
-    "record_unavailable": "Record unavailable"
+    "record_unavailable": "Record unavailable",
+    "messages_count_one": "{{count}} messages",
+    "messages_count_other": "{{count}} messages"
   },
   "configuration": {
     "title": "Broker Configuration",

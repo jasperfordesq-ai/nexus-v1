@@ -207,7 +207,8 @@
     "tbi_proxy_independence": "Monetary value of hours received",
     "tbi_proxy_inclusion": "HACT: belonging to a neighbourhood (TBI 2023 calibration)",
     "pdf_coefficients": "Applied Coefficients",
-    "formula_true_sroi": "SROI ratio = Total Present Value of verified outcomes (after deadweight, displacement, attribution, drop-off and discounting) ÷ Total Investment"
+    "formula_true_sroi": "SROI ratio = Total Present Value of verified outcomes (after deadweight, displacement, attribution, drop-off and discounting) ÷ Total Investment",
+    "multiplier_value": "{{value}}×"
   },
   "impact_report_labels": {
     "transactions": "Transacciones",

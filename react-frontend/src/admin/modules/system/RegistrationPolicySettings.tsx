@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Spinner, Chip, Input, Select, SelectItem, useDisclosure, Accordion, AccordionItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tooltip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useConfirm } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -752,7 +753,7 @@ export function RegistrationPolicySettings() {
                         <TableCell><span className="text-sm text-muted">{ic.note || '—'}</span></TableCell>
                         <TableCell>
                           <span className="text-sm text-muted">
-                            {ic.expires_at ? new Date(ic.expires_at).toLocaleDateString() : t('system.reg.never')}
+                            {ic.expires_at ? new Date(ic.expires_at).toLocaleDateString(getFormattingLocale()) : t('system.reg.never')}
                           </span>
                         </TableCell>
                         <TableCell>

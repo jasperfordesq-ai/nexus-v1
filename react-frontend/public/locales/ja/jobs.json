@@ -126,7 +126,10 @@
     "rule_summary": "「{{stage}}」に {{count}}日 いる場合 -> {{action}}",
     "rule_summary_with_target": "「{{stage}}」に {{count}}日 いる場合 -> {{action}} -> {{target}}",
     "rules_title": "自動化ルール",
-    "reviewed": "確認済み"
+    "reviewed": "確認済み",
+    "rule_summary_with_target_other": "「{{stage}}」に {{count}}日 いる場合 -> {{action}} -> {{target}}",
+    "rule_summary_other": "「{{stage}}」に {{count}}日 いる場合 -> {{action}}",
+    "generated_name_other": "{{stage}} から {{target}} へ {{count}}日後"
   },
   "employer": {
     "page_title": "雇用者プロフィール",
@@ -160,7 +163,9 @@
     "review_comment_placeholder": "この雇用主との就労経験を共有してください...",
     "submit_review": "レビューを送信",
     "no_reviews": "まだレビューはありません",
-    "anonymous": "匿名"
+    "anonymous": "匿名",
+    "meta_description_other": "{{count}}件の現在の機会から、雇用主のプロフィール、募集中の職務、コミュニティのレビューを表示します。",
+    "open_roles_count_other": "{{count}}件の募集中の職務"
   },
   "bulk": {
     "select_action": "ステージに移動...",
@@ -168,7 +173,8 @@
     "clear": "選択をクリア",
     "success": "応募が更新されました",
     "error": "一括更新に失敗しました",
-    "selected_count": "{{count}} が選択されました"
+    "selected_count": "{{count}} が選択されました",
+    "selected_count_other": "{{count}} が選択されました"
   },
   "history": {
     "title": "ステータス履歴",
@@ -260,7 +266,11 @@
     "market_avg": "市場平均",
     "ai_insights": "AIインサイト",
     "days_short_value": "{{count}}日",
-    "not_available": "該当なし"
+    "not_available": "該当なし",
+    "views_tooltip_other": "{{date}}: {{count}}回の閲覧",
+    "applications_tooltip_other": "{{week}}: {{count}}件の応募",
+    "based_on_other": "{{count}}件の類似求人に基づく",
+    "days_short_value_other": "{{count}}日"
   },
   "salary": {
     "label": "補償",
@@ -304,7 +314,8 @@
     "tab_rejected": "拒否されました",
     "empty_all": "まだどのポジションにも応募していません。",
     "empty_filtered": "応募が見つかりませんでした: {{filter}}",
-    "browse_jobs": "仕事を探す"
+    "browse_jobs": "仕事を探す",
+    "days_left_other": "{{count}}日残っています"
   },
   "withdraw": {
     "confirm_title": "応募を取り下げますか？",
@@ -414,7 +425,8 @@
     "cv_size_kb": "({{count}} KB)",
     "message_employer": "雇用主にメッセージを送る",
     "cv_parse_error": "CVの解析に失敗しました。手動で申請を提出することはできます。",
-    "quick_apply": "保存済みプロフィールで簡単応募"
+    "quick_apply": "保存済みプロフィールで簡単応募",
+    "cv_size_kb_other": "({{count}} KB)"
   },
   "detail": {
     "loading": "求人情報を読み込んでいます...",
@@ -470,7 +482,9 @@
     "confirm_close_title": "この求人を締め切りますか?",
     "confirm_close": "閉じると、新しいアプリケーションの受信が停止されます。いつでも再度開くことができます。",
     "confirm_reopen_title": "この求人を再開しますか?",
-    "confirm_reopen": "再開により求人が再び表示され、応募できるようになります。"
+    "confirm_reopen": "再開により求人が再び表示され、応募できるようになります。",
+    "owner_has_applicants_other": "{{count}} 応募者 — 下にスクロールして確認してください",
+    "views_other": "{{count}} 回覧"
   },
   "interview": {
     "schedule": "面接をスケジュールする",
@@ -768,7 +782,10 @@
     "days_ago": "{{count}}日前",
     "weeks_ago": "{{count}}週間前",
     "skills_description": "カンマ区切りのスキル",
-    "skills_chip": "スキル: {{skills}}"
+    "skills_chip": "スキル: {{skills}}",
+    "days_ago_other": "{{count}}日前",
+    "weeks_ago_other": "{{count}}週間前",
+    "results_count_other": "{{count}} 人の候補が見つかりました"
   },
   "resume_visibility": {
     "label": "私のプロフィールを雇用主が検索できるようにする",
@@ -1049,5 +1066,11 @@
   "jobs": {
     "view_details": "求人詳細を見る"
   },
-  "tabs_aria": "ジョブビュー"
+  "tabs_aria": "ジョブビュー",
+  "match_badge_other": "{{count}}% 一致",
+  "views_other": "{{count}} 回の閲覧",
+  "applications_other": "{{count}} 件の応募",
+  "char_count_other": "{{count}} / {{max}} 文字",
+  "hours_per_week_other": "{{count}} 時間/週",
+  "time_credits_label_other": "{{count}} タイムクレジット"
 }

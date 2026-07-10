@@ -158,7 +158,16 @@
       "delete_confirm_title": "Supprimer les messages sélectionnés ?",
       "publish": "Publier",
       "publish_confirm_message": "Publier les messages sélectionnés par {{count}} ?",
-      "publish_confirm_title": "Publier les articles sélectionnés ?"
+      "publish_confirm_title": "Publier les articles sélectionnés ?",
+      "publish_confirm_message_many": "Publier les messages sélectionnés par {{count}} ?",
+      "publish_confirm_message_one": "Publier les messages sélectionnés par {{count}} ?",
+      "publish_confirm_message_other": "Publier les messages sélectionnés par {{count}} ?",
+      "archive_confirm_message_many": "Cela dépubliera les messages {{count}}. Ils pourront être republiés ultérieurement.",
+      "archive_confirm_message_one": "Cela dépubliera les messages {{count}}. Ils pourront être republiés ultérieurement.",
+      "archive_confirm_message_other": "Cela dépubliera les messages {{count}}. Ils pourront être republiés ultérieurement.",
+      "delete_confirm_message_many": "Supprimer les messages sélectionnés par {{count}} ? Cela ne peut pas être annulé.",
+      "delete_confirm_message_one": "Supprimer les messages sélectionnés par {{count}} ? Cela ne peut pas être annulé.",
+      "delete_confirm_message_other": "Supprimer les messages sélectionnés par {{count}} ? Cela ne peut pas être annulé."
     },
     "marketplace": {
       "reason_label": "Raison",

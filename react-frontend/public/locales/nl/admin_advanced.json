@@ -550,14 +550,18 @@
           "unique_uris": "Unieke URI's"
         },
         "labels": {
-          "spoofed_count": "{{count}} vervalst"
+          "spoofed_count": "{{count}} vervalst",
+          "spoofed_count_one": "{{count}} vervalst",
+          "spoofed_count_other": "{{count}} vervalst"
         },
         "log_summary": "Logboek: {{size}} - sinds {{time}}",
         "sections": {
           "hits_by_crawler": "Hits door crawler",
           "hits_by_status": "Hits op HTTP-status",
           "recent_activity": "Recente activiteit (nieuwste eerst, laatste {{count}})",
-          "top_uris": "Top URIs (top 50 op basis van aantal hits)"
+          "top_uris": "Top URIs (top 50 op basis van aantal hits)",
+          "recent_activity_one": "Recente activiteit (nieuwste eerst, laatste {{count}})",
+          "recent_activity_other": "Recente activiteit (nieuwste eerst, laatste {{count}})"
         },
         "tables": {
           "recent_hits_aria": "Recente bothits",
@@ -573,7 +577,9 @@
         "actions": {
           "open_in_inventory": "Openen in inventaris",
           "refresh": "Vernieuwen",
-          "refresh_all_stale": "Alles vernieuwen ({{count}})"
+          "refresh_all_stale": "Alles vernieuwen ({{count}})",
+          "refresh_all_stale_one": "Alles vernieuwen ({{count}})",
+          "refresh_all_stale_other": "Alles vernieuwen ({{count}})"
         },
         "columns": {
           "actions": "ACTIONS",
@@ -585,7 +591,9 @@
           "tenant": "TENANT"
         },
         "confirm": {
-          "queue_recache": "Wachtrij opnieuw cachen voor {{count}}-tenants?"
+          "queue_recache": "Wachtrij opnieuw cachen voor {{count}}-tenants?",
+          "queue_recache_one": "Wachtrij opnieuw cachen voor {{count}}-tenants?",
+          "queue_recache_other": "Wachtrij opnieuw cachen voor {{count}}-tenants?"
         },
         "empty": "Geen huurders",
         "errors": {
@@ -596,11 +604,15 @@
         "messages": {
           "bulk_queued": "In de wachtrij geplaatste cache voor {{count}}-tenants",
           "no_stale": "Geen oude huurders - de dekking is gezond",
-          "tenant_queued": "#{{id}} in wachtrij geplaatst voor {{slug}}"
+          "tenant_queued": "#{{id}} in wachtrij geplaatst voor {{slug}}",
+          "bulk_queued_one": "In de wachtrij geplaatste cache voor {{count}}-tenants",
+          "bulk_queued_other": "In de wachtrij geplaatste cache voor {{count}}-tenants"
         },
         "summary": {
           "healthy": "Alle {{count}}-huurders gezond.",
-          "needs_work": "{{needing}} van {{total}}-tenants hebben ontbrekende, verouderde of defecte routes."
+          "needs_work": "{{needing}} van {{total}}-tenants hebben ontbrekende, verouderde of defecte routes.",
+          "healthy_one": "Alle {{count}}-huurders gezond.",
+          "healthy_other": "Alle {{count}}-huurders gezond."
         },
         "table_aria": "Dekking"
       },
@@ -628,7 +640,11 @@
           "drift_applied": "Driftdetectie toegepast",
           "drift_dry_run": "Driftdroogloop voltooid",
           "purge_dry_run": "Testrun: {{count}}-snapshots zouden worden verwijderd",
-          "purged_ungated": "{{count}} niet-geregistreerde momentopnamen opgeschoond voor {{tenants}}-tenants"
+          "purged_ungated": "{{count}} niet-geregistreerde momentopnamen opgeschoond voor {{tenants}}-tenants",
+          "purged_ungated_one": "{{count}} niet-geregistreerde momentopnamen opgeschoond voor {{tenants}}-tenants",
+          "purged_ungated_other": "{{count}} niet-geregistreerde momentopnamen opgeschoond voor {{tenants}}-tenants",
+          "purge_dry_run_one": "Testrun: {{count}}-snapshots zouden worden verwijderd",
+          "purge_dry_run_other": "Testrun: {{count}}-snapshots zouden worden verwijderd"
         },
         "no_output": "(geen uitvoer)",
         "purge_ungated": {
@@ -637,7 +653,11 @@
         },
         "result": {
           "deleted": "{{count}}-momentopnamen voor {{tenants}}-tenants verwijderd",
-          "would_delete": "Zou {{count}}-momentopnamen voor {{tenants}}-tenants verwijderen"
+          "would_delete": "Zou {{count}}-momentopnamen voor {{tenants}}-tenants verwijderen",
+          "would_delete_one": "Zou {{count}}-momentopnamen voor {{tenants}}-tenants verwijderen",
+          "would_delete_other": "Zou {{count}}-momentopnamen voor {{tenants}}-tenants verwijderen",
+          "deleted_one": "{{count}}-momentopnamen voor {{tenants}}-tenants verwijderd",
+          "deleted_other": "{{count}}-momentopnamen voor {{tenants}}-tenants verwijderd"
         },
         "title": "Automatisering van versheid"
       },
@@ -694,7 +714,9 @@
           "recache_selected": "Opnieuw cachen geselecteerd ({{count}})",
           "reload": "Herladen",
           "select_all_visible": "Selecteer alles wat zichtbaar is",
-          "select_snapshot": "Selecteer {{path}}"
+          "select_snapshot": "Selecteer {{path}}",
+          "recache_selected_one": "Opnieuw cachen geselecteerd ({{count}})",
+          "recache_selected_other": "Opnieuw cachen geselecteerd ({{count}})"
         },
         "columns": {
           "actions": "Acties",
@@ -729,7 +751,9 @@
           "tenant_slug": "Huurderslak"
         },
         "messages": {
-          "bulk_recache": "Ongeldige {{count}}-snapshots en opnieuw cachen in de wachtrij"
+          "bulk_recache": "Ongeldige {{count}}-snapshots en opnieuw cachen in de wachtrij",
+          "bulk_recache_one": "Ongeldige {{count}}-snapshots en opnieuw cachen in de wachtrij",
+          "bulk_recache_other": "Ongeldige {{count}}-snapshots en opnieuw cachen in de wachtrij"
         },
         "inspect": {
           "age": "Leeftijd",
@@ -762,7 +786,15 @@
           "seo_score": "SEO-score",
           "size": "Maat",
           "tips": "Fooien ({{count}})",
-          "title": "Titel"
+          "title": "Titel",
+          "must_fix_one": "Moet worden opgelost ({{count}})",
+          "must_fix_other": "Moet worden opgelost ({{count}})",
+          "tips_one": "Fooien ({{count}})",
+          "tips_other": "Fooien ({{count}})",
+          "asset_references_one": "Assetreferenties ({{count}})",
+          "asset_references_other": "Assetreferenties ({{count}})",
+          "dead_assets_one": "{{count}} dood",
+          "dead_assets_other": "{{count}} dood"
         },
         "selected": "{{count}} geselecteerd",
         "status": {
@@ -771,7 +803,9 @@
           "content_drifted": "inhoud dwaalde af"
         },
         "summary": "{{filtered}} van {{total}}-snapshots",
-        "table_aria": "Momentopname inventaris"
+        "table_aria": "Momentopname inventaris",
+        "selected_one": "{{count}} geselecteerd",
+        "selected_other": "{{count}} geselecteerd"
       },
       "jobs": {
         "actions": {
@@ -840,7 +874,9 @@
           "tooltip": "prioriteit={{priority}} (lagere winsten)"
         },
         "result": {
-          "invalid": "{{count}} ongeldig"
+          "invalid": "{{count}} ongeldig",
+          "invalid_one": "{{count}} ongeldig",
+          "invalid_other": "{{count}} ongeldig"
         },
         "scope": {
           "all_tenants": "alle huurders"
@@ -872,7 +908,9 @@
           "success": "Succes",
           "supersede": "Vervangen",
           "unknown": "Onbekende gebeurtenis: {{event}}"
-        }
+        },
+        "summary_one": "{{count}}-evenementen",
+        "summary_other": "{{count}}-evenementen"
       },
       "failures": {
         "columns": {
@@ -888,7 +926,10 @@
         "errors": {
           "load": "Kan fouten niet laden"
         },
-        "table_aria": "Mislukkingen"
+        "table_aria": "Mislukkingen",
+        "actions": {
+          "close_breaker_now": "Hervat de wachtrij nu"
+        }
       },
       "live_connected": "Live-updates verbonden",
       "audit": {
@@ -957,7 +998,11 @@
           "cache_unreachable": "Cache onbereikbaar",
           "healthy": "Gezond",
           "missing": "{{count}} ontbreekt",
-          "stale": "{{count}} oud"
+          "stale": "{{count}} oud",
+          "missing_one": "{{count}} ontbreekt",
+          "missing_other": "{{count}} ontbreekt",
+          "stale_one": "{{count}} oud",
+          "stale_other": "{{count}} oud"
         },
         "hints": {
           "active_jobs": "{{count}} actief",
@@ -969,7 +1014,11 @@
           "event_at": "Evenement {{time}}",
           "no_events": "Geen evenementen",
           "prometheus": "Prometheus-tekstformaat",
-          "tenants_routes": "{{tenants}}-huurders x {{routes}}-routes"
+          "tenants_routes": "{{tenants}}-huurders x {{routes}}-routes",
+          "aging_one": "{{count}} veroudering (>7d)",
+          "aging_other": "{{count}} veroudering (>7d)",
+          "active_jobs_one": "{{count}} actief",
+          "active_jobs_other": "{{count}} actief"
         },
         "kpi": {
           "age_stale": "Leeftijd oud (>14d)",
@@ -1025,7 +1074,11 @@
         },
         "messages": {
           "dry_run": "Testrun: {{count}}-snapshots zouden worden verwijderd",
-          "purged": "{{count}}-snapshots{{job}} verwijderd"
+          "purged": "{{count}}-snapshots{{job}} verwijderd",
+          "dry_run_one": "Testrun: {{count}}-snapshots zouden worden verwijderd",
+          "dry_run_other": "Testrun: {{count}}-snapshots zouden worden verwijderd",
+          "purged_one": "{{count}}-snapshots{{job}} verwijderd",
+          "purged_other": "{{count}}-snapshots{{job}} verwijderd"
         },
         "placeholders": {
           "pattern": "/blog/* of /listings/**",
@@ -1033,13 +1086,19 @@
         },
         "result": {
           "deleted": "{{count}}-snapshots verwijderd",
-          "would_delete": "Zou {{count}}-snapshots verwijderen"
+          "would_delete": "Zou {{count}}-snapshots verwijderen",
+          "would_delete_one": "Zou {{count}}-snapshots verwijderen",
+          "would_delete_other": "Zou {{count}}-snapshots verwijderen",
+          "deleted_one": "{{count}}-snapshots verwijderd",
+          "deleted_other": "{{count}}-snapshots verwijderd"
         },
         "title": "Cache met jokertekens leegmaken",
         "preview_gate": {
           "title": "Preview required before live delete",
           "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
-          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
+          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
+          "ready_one": "Overeenkomend voorbeeld gevonden. De live verwijdering is beperkt tot de {{count}} overeenkomende momentopnamen die in het voorbeeld worden weergegeven.",
+          "ready_other": "Overeenkomend voorbeeld gevonden. De live verwijdering is beperkt tot de {{count}} overeenkomende momentopnamen die in het voorbeeld worden weergegeven."
         }
       },
       "ttl_inspector": {
@@ -1066,7 +1125,13 @@
         "units": {
           "days": "{{count}}d",
           "hours": "{{count}}h",
-          "minutes": "{{count}}min"
+          "minutes": "{{count}}min",
+          "minutes_one": "{{count}}min",
+          "minutes_other": "{{count}}min",
+          "hours_one": "{{count}}h",
+          "hours_other": "{{count}}h",
+          "days_one": "{{count}}d",
+          "days_other": "{{count}}d"
         }
       },
       "sitemap_explorer": {
@@ -1076,7 +1141,13 @@
         "counts": {
           "dynamic": "{{count}} dynamisch",
           "static": "{{count}} statisch",
-          "total": "{{count}} totaal"
+          "total": "{{count}} totaal",
+          "static_one": "{{count}} statisch",
+          "static_other": "{{count}} statisch",
+          "dynamic_one": "{{count}} dynamisch",
+          "dynamic_other": "{{count}} dynamisch",
+          "total_one": "{{count}} totaal",
+          "total_other": "{{count}} totaal"
         },
         "description_prefix": "Bekijk precies welke routes de engine voor een huurder wil weergeven: statische verdieping (functie/module gated) plus de dynamische URLs van",
         "description_suffix": "De toneelschrijvermedewerker bezoekt deze lijst.",
@@ -1134,7 +1205,9 @@
         },
         "status": {
           "clean": "No issues found",
-          "needs_attention": "{{count}} item needs attention"
+          "needs_attention": "{{count}} item needs attention",
+          "needs_attention_one": "{{count}} item heeft aandacht nodig",
+          "needs_attention_other": "{{count}} item heeft aandacht nodig"
         },
         "counts": {
           "expected": "Expected",
@@ -1567,7 +1640,30 @@
         "do_not_remove_prerender": "Do not remove prerender fallback.",
         "rollback_path_required": "Rollback path required"
       }
-    }
+    },
+    "health_meta_description_length_one": "{{count}}-tekens (ideaal: 150–160)",
+    "health_meta_description_length_other": "{{count}}-tekens (ideaal: 150–160)",
+    "health_auto_sitemap_active_count_one": "Actief:{{count}}URL's geïndexeerd",
+    "health_auto_sitemap_active_count_other": "Actief:{{count}}URL's geïndexeerd",
+    "pass_count_one": "{{count}} geslaagd",
+    "pass_count_other": "{{count}} geslaagd",
+    "warning_count_one": "{{count}} waarschuwing",
+    "warning_count_other": "{{count}} waarschuwing",
+    "fail_count_one": "{{count}}mislukt",
+    "fail_count_other": "{{count}}mislukt",
+    "meta_description_count_one": "{{count}}/160 metabeschrijvingstekens",
+    "meta_description_count_other": "{{count}}/160 metabeschrijvingstekens",
+    "global_meta_description_count_one": "{{count}}/160 globale metabeschrijvingstekens",
+    "global_meta_description_count_other": "{{count}}/160 globale metabeschrijvingstekens",
+    "passed_count_with_value_one": "{{count}}geslaagd",
+    "passed_count_with_value_other": "{{count}}geslaagd",
+    "warnings_count_with_value_one": "{{count}}-waarschuwingen",
+    "warnings_count_with_value_other": "{{count}}-waarschuwingen",
+    "failed_count_with_value_one": "{{count}}is mislukt",
+    "failed_count_with_value_other": "{{count}}is mislukt",
+    "total_count_one": "Totaal: {{count}}",
+    "total_count_other": "Totaal: {{count}}",
+    "score_out_of": "van {{maximum}}"
   },
   "email_deliverability": {
     "title": "E-mailbezorgbaarheid",
@@ -1606,7 +1702,11 @@
       "trigger_score": "Triggerscore",
       "unconfirmed": "{{count}} geaccepteerd maar niet bevestigd",
       "webhook_confirmed": "Bevestigd door webhook van provider",
-      "window_days": "{{days}} dagvenster"
+      "window_days": "{{days}} dagvenster",
+      "unconfirmed_one": "{{count}} geaccepteerd maar niet bevestigd",
+      "unconfirmed_other": "{{count}} geaccepteerd maar niet bevestigd",
+      "bad_outcomes_one": "{{count}} is mislukt, gestuiterd of onderdrukt",
+      "bad_outcomes_other": "{{count}} is mislukt, gestuiterd of onderdrukt"
     },
     "status": {
       "bounced": "Gestuiterd",
@@ -1968,6 +2068,8 @@
       "fcm": "Mobiel verzonden/mislukt",
       "web": "Web bezorgd",
       "recent_failures": "Recente fouten"
-    }
+    },
+    "trigger_coverage_one": "{{issues}}-problemen in de door {{count}} bewaakte stromen",
+    "trigger_coverage_other": "{{issues}}-problemen in de door {{count}} bewaakte stromen"
   }
 }

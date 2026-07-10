@@ -9,6 +9,7 @@
  * Calls GET /api/v2/admin/events for paginated data.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -93,7 +94,7 @@ function normalizeAdminEvent(item: RawAdminEvent): AdminEvent {
 
 const formatDateTime = (iso: string) => {
   const d = new Date(iso);
-  return d.toLocaleDateString(undefined, {
+  return d.toLocaleDateString(getFormattingLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

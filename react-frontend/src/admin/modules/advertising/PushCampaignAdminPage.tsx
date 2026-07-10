@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, ChipProps, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -130,7 +131,7 @@ const ADVERTISER_LABEL_KEYS: Record<AdvertiserType, string> = {
 
 function formatDate(ts: string | null): string {
   if (!ts) return '—';
-  return new Date(ts).toLocaleString();
+  return new Date(ts).toLocaleString(getFormattingLocale());
 }
 
 function formatCents(cents: number): string {
@@ -211,13 +212,13 @@ function MiniBarChart({
         </span>
       </div>
       <div className="overflow-x-auto">
-        <div className="flex gap-1 items-end min-w-0" style={{ minHeight: 60 }}>
+        <div className="flex min-h-[60px] min-w-0 items-end gap-1">
           {breakdown.map((d) => {
             const sendPct = (d.sends / maxSends) * 100;
             const openPct = maxSends > 0 ? (d.opens / maxSends) * 100 : 0;
             return (
               <div key={d.date} className="flex flex-col items-center gap-0.5 flex-1 min-w-[28px]">
-                <div className="w-full flex gap-0.5 items-end" style={{ height: 48 }}>
+                <div className="flex h-12 w-full items-end gap-0.5">
                   <div
                     className="flex-1 bg-accent rounded-t opacity-80"
                     style={{ height: `${sendPct}%` }}
@@ -469,7 +470,7 @@ export default function PushCampaignAdminPage() {
         <StatCard
           icon={<Users size={16} />}
           label={t('advertising.push.stats.sends_this_month')}
-          value={(stats?.sends_this_month ?? 0).toLocaleString()}
+          value={(stats?.sends_this_month ?? 0).toLocaleString(getFormattingLocale())}
         />
         <StatCard
           icon={<TrendingUp size={16} />}
@@ -577,8 +578,8 @@ export default function PushCampaignAdminPage() {
                     <TableCell>
                       <span className="text-sm">
                         {c.actual_send_count > 0
-                          ? c.actual_send_count.toLocaleString()
-                          : (c.target_count != null ? `~${c.target_count.toLocaleString()}` : '—')}
+                          ? c.actual_send_count.toLocaleString(getFormattingLocale())
+                          : (c.target_count != null ? `~${c.target_count.toLocaleString(getFormattingLocale())}` : '—')}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -717,11 +718,11 @@ export default function PushCampaignAdminPage() {
                 {/* Metrics */}
                 <div className="grid grid-cols-4 gap-3 text-center text-sm">
                   <div>
-                    <p className="text-2xl font-bold">{detailCampaign.actual_send_count.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">{detailCampaign.actual_send_count.toLocaleString(getFormattingLocale())}</p>
                     <p className="text-xs text-muted">{t('advertising.push.metrics.sent')}</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{detailCampaign.open_count.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">{detailCampaign.open_count.toLocaleString(getFormattingLocale())}</p>
                     <p className="text-xs text-muted">{t('advertising.push.metrics.opens')}</p>
                   </div>
                   <div>

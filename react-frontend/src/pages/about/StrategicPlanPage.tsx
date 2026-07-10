@@ -94,14 +94,14 @@ export function StrategicPlanPage() {
       {/* ─── Hero Section ─── */}
       <section className="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none opacity-20" aria-hidden="true">
-          <div className="absolute top-10 left-1/4 w-72 h-72 bg-indigo-500 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-purple-500 rounded-full blur-3xl" />
+          <div className="absolute top-10 left-1/4 w-72 h-72 bg-accent rounded-full blur-3xl" />
+          <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-accent rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div {...fadeInUp} transition={{ duration: 0.6 }}>
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-6">
-              <Compass className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 mb-6">
+              <Compass className="w-8 h-8 text-accent dark:text-accent" aria-hidden="true" />
             </div>
           </motion.div>
 
@@ -138,7 +138,7 @@ export function StrategicPlanPage() {
               href={STRATEGIC_PLAN_PDF}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white font-semibold"
               startContent={<Download className="w-4 h-4" aria-hidden="true" />}
             >
               {t('strategic_plan.download_plan')}
@@ -166,9 +166,9 @@ export function StrategicPlanPage() {
                     type="button"
                     variant="tertiary"
                     onPress={() => scrollTo(section.id)}
-                    className="flex min-h-10 min-w-0 items-center gap-2 rounded-lg px-3 py-2 text-sm text-theme-muted transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400"
+                    className="flex min-h-10 min-w-0 items-center gap-2 rounded-lg px-3 py-2 text-sm text-theme-muted transition-colors hover:bg-accent/10 hover:text-accent dark:hover:text-accent"
                   >
-                    <span className="flex-shrink-0 w-6 h-6 rounded-md bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-md bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 flex items-center justify-center text-xs font-bold text-accent dark:text-accent">
                       {index + 1}
                     </span>
                     <span>{t(`strategic_plan.toc_${section.id}`)}</span>
@@ -209,10 +209,10 @@ export function StrategicPlanPage() {
                     </p>
                   </div>
 
-                  <div className="p-5 rounded-xl bg-gradient-to-br from-indigo-500/10 to-blue-500/10 border border-indigo-500/20">
+                  <div className="p-5 rounded-xl bg-gradient-to-br from-accent/10 to-blue-500/10 border border-accent/20">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 rounded-lg bg-indigo-500/15">
-                        <DollarSign className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                      <div className="p-2 rounded-lg bg-accent/15">
+                        <DollarSign className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                       </div>
                       <h3 className="font-semibold text-theme-primary">{t('strategic_plan.goal_2_heading')}</h3>
                     </div>
@@ -228,7 +228,7 @@ export function StrategicPlanPage() {
       </section>
 
       {/* ─── Section 2: Vision & Mission ─── */}
-      <section id="vision-mission" className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
+      <section id="vision-mission" className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-accent/5 to-transparent">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -240,13 +240,13 @@ export function StrategicPlanPage() {
             <div className="grid sm:grid-cols-2 gap-6 mt-6">
               {/* Mission */}
               <GlassCard className="p-6 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-indigo-500 to-blue-500 rounded-l" aria-hidden="true" />
+                <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-accent to-blue-500 rounded-l" aria-hidden="true" />
                 <div className="pl-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="p-2 rounded-lg bg-indigo-500/15">
-                      <Rocket className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                    <div className="p-2 rounded-lg bg-accent/15">
+                      <Rocket className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                     </div>
-                    <h3 className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{t('strategic_plan.mission_heading')}</h3>
+                    <h3 className="text-lg font-bold text-accent dark:text-accent">{t('strategic_plan.mission_heading')}</h3>
                   </div>
                   <p className="text-sm text-theme-muted leading-relaxed">
                     {t('strategic_plan.mission_text')}
@@ -322,7 +322,7 @@ export function StrategicPlanPage() {
       </section>
 
       {/* ─── Section 4: Strategic Pillars ─── */}
-      <section id="pillars" className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
+      <section id="pillars" className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-accent/5 to-transparent">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -369,10 +369,10 @@ export function StrategicPlanPage() {
 
               {/* Pillar 2 */}
               <GlassCard className="overflow-hidden">
-                <div className="p-5 sm:p-6 border-b border-theme-default bg-gradient-to-r from-indigo-500/5 to-blue-500/5">
+                <div className="p-5 sm:p-6 border-b border-theme-default bg-gradient-to-r from-accent/5 to-blue-500/5">
                   <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-xl bg-indigo-500/15">
-                      <DollarSign className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                    <div className="p-2.5 rounded-xl bg-accent/15">
+                      <DollarSign className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                     </div>
                     <div>
                       <p className="text-xs text-theme-subtle uppercase tracking-wider font-medium">{t('strategic_plan.pillar_2_label')}</p>
@@ -391,7 +391,7 @@ export function StrategicPlanPage() {
                       <TableRow key={idx}>
                         <TableCell className="text-theme-muted">{t(`strategic_plan.pillar_2_row_${idx}_initiative`)}</TableCell>
                         <TableCell>
-                          <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">
+                          <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-accent/15 text-accent dark:text-accent">
                             {t(`strategic_plan.pillar_2_row_${idx}_priority`)}
                           </span>
                         </TableCell>
@@ -521,7 +521,7 @@ export function StrategicPlanPage() {
       </section>
 
       {/* ─── Section 6: Risk & Mitigation ─── */}
-      <section id="risks" className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
+      <section id="risks" className="py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-accent/5 to-transparent">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -566,7 +566,7 @@ export function StrategicPlanPage() {
                               ? 'bg-rose-500/15 text-rose-600 dark:text-rose-400'
                               : row.impact === 'High'
                               ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
-                              : 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400'
+                              : 'bg-accent/15 text-accent dark:text-accent'
                           }`}>
                             {t(`strategic_plan.risk_${idx}_impact`)}
                           </span>
@@ -595,7 +595,7 @@ export function StrategicPlanPage() {
           >
             <GlassCard className="p-10 sm:p-14 text-center relative overflow-hidden">
               <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-3xl" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-accent to-accent-gradient-end rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full blur-3xl" />
               </div>
 
@@ -614,21 +614,19 @@ export function StrategicPlanPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     size="lg"
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
+                    className="bg-gradient-to-r from-accent to-accent-gradient-end text-white font-semibold px-8"
                     startContent={<Download className="w-5 h-5" aria-hidden="true" />}
                   >
                     {t('strategic_plan.cta_download')}
                   </Button>
-                  <Link to={tenantPath('/contact')}>
-                    <Button
-                      size="lg"
-                      variant="bordered"
-                      className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
-                      startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
-                    >
-                      {t('strategic_plan.cta_contact')}
-                    </Button>
-                  </Link>
+                  <Button as={Link} to={tenantPath('/contact')}
+                    size="lg"
+                    variant="bordered"
+                    className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
+                    startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
+                  >
+                    {t('strategic_plan.cta_contact')}
+                  </Button>
                 </div>
               </div>
             </GlassCard>
@@ -652,8 +650,8 @@ function SectionHeading({ icon: Icon, number, title }: SectionHeadingProps) {
   const { t } = useTranslation('about');
   return (
     <div className="flex items-center gap-3">
-      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
-        <Icon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 flex items-center justify-center">
+        <Icon className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
       </div>
       <div>
         <p className="text-xs text-theme-subtle uppercase tracking-wider font-medium">{t('strategic_plan.section_label', { number })}</p>
@@ -690,12 +688,12 @@ const colorMap = {
     bullet: 'text-rose-500 dark:text-rose-400',
   },
   indigo: {
-    gradient: 'from-indigo-500/10 to-blue-500/10',
-    border: 'border-indigo-500/20',
-    iconBg: 'bg-indigo-500/15',
-    iconColor: 'text-indigo-500 dark:text-indigo-400',
-    titleColor: 'text-indigo-600 dark:text-indigo-400',
-    bullet: 'text-indigo-500 dark:text-indigo-400',
+    gradient: 'from-accent/10 to-blue-500/10',
+    border: 'border-accent/20',
+    iconBg: 'bg-accent/15',
+    iconColor: 'text-accent dark:text-accent',
+    titleColor: 'text-accent dark:text-accent',
+    bullet: 'text-accent dark:text-accent',
   },
   amber: {
     gradient: 'from-amber-500/10 to-orange-500/10',
@@ -738,9 +736,9 @@ interface RoadmapBadgeProps {
 }
 
 const styles = {
-  submit: 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400',
+  submit: 'bg-accent/15 text-accent dark:text-accent',
   secure: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400',
-  launch: 'bg-purple-500/15 text-purple-600 dark:text-purple-400',
+  launch: 'bg-accent/15 text-accent dark:text-accent',
   ongoing: 'bg-cyan-500/15 text-cyan-600 dark:text-cyan-400',
   pitch: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
 };

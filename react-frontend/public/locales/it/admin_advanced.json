@@ -550,14 +550,20 @@
           "unique_uris": "TOKEN NEXUSTERM12 unici"
         },
         "labels": {
-          "spoofed_count": "{{count}} falsificato"
+          "spoofed_count": "{{count}} falsificato",
+          "spoofed_count_many": "{{count}} falsificato",
+          "spoofed_count_one": "{{count}} falsificato",
+          "spoofed_count_other": "{{count}} falsificato"
         },
         "log_summary": "Registro: {{size}} - dal {{time}}",
         "sections": {
           "hits_by_crawler": "Colpi del crawler",
           "hits_by_status": "Hit per stato HTTP",
           "recent_activity": "Attività recente (prima il più recente, l'ultimo {{count}})",
-          "top_uris": "I migliori URI (i primi 50 per numero di visite)"
+          "top_uris": "I migliori URI (i primi 50 per numero di visite)",
+          "recent_activity_many": "Attività recente (prima il più recente, l'ultimo {{count}})",
+          "recent_activity_one": "Attività recente (prima il più recente, l'ultimo {{count}})",
+          "recent_activity_other": "Attività recente (prima il più recente, l'ultimo {{count}})"
         },
         "tables": {
           "recent_hits_aria": "Hit recenti dei bot",
@@ -573,7 +579,10 @@
         "actions": {
           "open_in_inventory": "Apri nell'inventario",
           "refresh": "Aggiorna",
-          "refresh_all_stale": "Aggiorna tutto obsoleto ({{count}})"
+          "refresh_all_stale": "Aggiorna tutto obsoleto ({{count}})",
+          "refresh_all_stale_many": "Aggiorna tutto obsoleto ({{count}})",
+          "refresh_all_stale_one": "Aggiorna tutto obsoleto ({{count}})",
+          "refresh_all_stale_other": "Aggiorna tutto obsoleto ({{count}})"
         },
         "columns": {
           "actions": "ACTIONS",
@@ -585,7 +594,10 @@
           "tenant": "TENANT"
         },
         "confirm": {
-          "queue_recache": "Ricocheca della coda per gli inquilini {{count}}?"
+          "queue_recache": "Ricocheca della coda per gli inquilini {{count}}?",
+          "queue_recache_many": "Ricocheca della coda per gli inquilini {{count}}?",
+          "queue_recache_one": "Ricocheca della coda per gli inquilini {{count}}?",
+          "queue_recache_other": "Ricocheca della coda per gli inquilini {{count}}?"
         },
         "empty": "Nessun inquilino",
         "errors": {
@@ -596,11 +608,17 @@
         "messages": {
           "bulk_queued": "Ricoche in coda per i tenant {{count}}",
           "no_stale": "Nessun inquilino stantio: la copertura è sana",
-          "tenant_queued": "#{{id}} accodato per {{slug}}"
+          "tenant_queued": "#{{id}} accodato per {{slug}}",
+          "bulk_queued_many": "Ricoche in coda per i tenant {{count}}",
+          "bulk_queued_one": "Ricoche in coda per i tenant {{count}}",
+          "bulk_queued_other": "Ricoche in coda per i tenant {{count}}"
         },
         "summary": {
           "healthy": "Tutti gli inquilini {{count}} sani.",
-          "needs_work": "{{needing}} dei tenant {{total}} hanno percorsi mancanti, obsoleti o danneggiati."
+          "needs_work": "{{needing}} dei tenant {{total}} hanno percorsi mancanti, obsoleti o danneggiati.",
+          "healthy_many": "Tutti gli inquilini {{count}} sani.",
+          "healthy_one": "Tutti gli inquilini {{count}} sani.",
+          "healthy_other": "Tutti gli inquilini {{count}} sani."
         },
         "table_aria": "Copertura"
       },
@@ -628,7 +646,13 @@
           "drift_applied": "Rilevamento della deriva applicato",
           "drift_dry_run": "Prova di deriva completata",
           "purge_dry_run": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
-          "purged_ungated": "Eliminati gli snapshot non controllati {{count}} tra i tenant {{tenants}}"
+          "purged_ungated": "Eliminati gli snapshot non controllati {{count}} tra i tenant {{tenants}}",
+          "purged_ungated_many": "Eliminati gli snapshot non controllati {{count}} tra i tenant {{tenants}}",
+          "purged_ungated_one": "Eliminati gli snapshot non controllati {{count}} tra i tenant {{tenants}}",
+          "purged_ungated_other": "Eliminati gli snapshot non controllati {{count}} tra i tenant {{tenants}}",
+          "purge_dry_run_many": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
+          "purge_dry_run_one": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
+          "purge_dry_run_other": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati"
         },
         "no_output": "(nessuna uscita)",
         "purge_ungated": {
@@ -637,7 +661,13 @@
         },
         "result": {
           "deleted": "Snapshot {{count}} eliminati nei tenant {{tenants}}",
-          "would_delete": "Eliminerebbe gli snapshot {{count}} tra i tenant {{tenants}}"
+          "would_delete": "Eliminerebbe gli snapshot {{count}} tra i tenant {{tenants}}",
+          "would_delete_many": "Eliminerebbe gli snapshot {{count}} tra i tenant {{tenants}}",
+          "would_delete_one": "Eliminerebbe gli snapshot {{count}} tra i tenant {{tenants}}",
+          "would_delete_other": "Eliminerebbe gli snapshot {{count}} tra i tenant {{tenants}}",
+          "deleted_many": "Snapshot {{count}} eliminati nei tenant {{tenants}}",
+          "deleted_one": "Snapshot {{count}} eliminati nei tenant {{tenants}}",
+          "deleted_other": "Snapshot {{count}} eliminati nei tenant {{tenants}}"
         },
         "title": "Automazione della freschezza"
       },
@@ -666,7 +696,8 @@
           "queue_reset_one": "Reimposta {{count}} riga bloccata; l'interruttore è stato liberato",
           "queue_reset_other": "Reimposta {{count}} righe bloccate; l'interruttore è stato liberato",
           "queue_reset_failed": "Reimpostazione della coda non riuscita",
-          "reset_failed": "Reimpostazione non riuscita"
+          "reset_failed": "Reimpostazione non riuscita",
+          "queue_reset_many": "Reimposta {{count}} righe bloccate; l'interruttore è stato liberato"
         },
         "checks": {
           "cache_readable": "Cache can be read",
@@ -683,7 +714,8 @@
           "sched_prerender-detect-drift": "Drift detector heartbeat",
           "sched_prerender-auto-recache": "Auto-recache heartbeat",
           "sched_prerender-reap-stale": "Stale-job cleanup heartbeat"
-        }
+        },
+        "issue_count_many": "Problemi di {{count}}"
       },
       "inventory": {
         "actions": {
@@ -694,7 +726,10 @@
           "recache_selected": "Memorizza nuovamente nella cache selezionata ({{count}})",
           "reload": "Ricaricare",
           "select_all_visible": "Seleziona tutto visibile",
-          "select_snapshot": "Selezionare {{path}}"
+          "select_snapshot": "Selezionare {{path}}",
+          "recache_selected_many": "Memorizza nuovamente nella cache selezionata ({{count}})",
+          "recache_selected_one": "Memorizza nuovamente nella cache selezionata ({{count}})",
+          "recache_selected_other": "Memorizza nuovamente nella cache selezionata ({{count}})"
         },
         "columns": {
           "actions": "Azioni",
@@ -729,7 +764,10 @@
           "tenant_slug": "Lumaca dell'inquilino"
         },
         "messages": {
-          "bulk_recache": "Istantanee {{count}} e ricodifica in coda non valide"
+          "bulk_recache": "Istantanee {{count}} e ricodifica in coda non valide",
+          "bulk_recache_many": "Istantanee {{count}} e ricodifica in coda non valide",
+          "bulk_recache_one": "Istantanee {{count}} e ricodifica in coda non valide",
+          "bulk_recache_other": "Istantanee {{count}} e ricodifica in coda non valide"
         },
         "inspect": {
           "age": "Età",
@@ -762,7 +800,19 @@
           "seo_score": "Punteggio SEO",
           "size": "Misurare",
           "tips": "Suggerimenti ({{count}})",
-          "title": "Titolo"
+          "title": "Titolo",
+          "must_fix_many": "È necessario correggere ({{count}})",
+          "must_fix_one": "È necessario correggere ({{count}})",
+          "must_fix_other": "È necessario correggere ({{count}})",
+          "tips_many": "Suggerimenti ({{count}})",
+          "tips_one": "Suggerimenti ({{count}})",
+          "tips_other": "Suggerimenti ({{count}})",
+          "asset_references_many": "Riferimenti delle risorse ({{count}})",
+          "asset_references_one": "Riferimenti delle risorse ({{count}})",
+          "asset_references_other": "Riferimenti delle risorse ({{count}})",
+          "dead_assets_many": "{{count}} morto",
+          "dead_assets_one": "{{count}} morto",
+          "dead_assets_other": "{{count}} morto"
         },
         "selected": "{{count}} selezionato",
         "status": {
@@ -771,7 +821,10 @@
           "content_drifted": "il contenuto è andato alla deriva"
         },
         "summary": "{{filtered}} degli snapshot {{total}}",
-        "table_aria": "Inventario delle istantanee"
+        "table_aria": "Inventario delle istantanee",
+        "selected_many": "{{count}} selezionato",
+        "selected_one": "{{count}} selezionato",
+        "selected_other": "{{count}} selezionato"
       },
       "jobs": {
         "actions": {
@@ -840,7 +893,10 @@
           "tooltip": "priorità={{priority}} (vittorie inferiori)"
         },
         "result": {
-          "invalid": "{{count}} non valido"
+          "invalid": "{{count}} non valido",
+          "invalid_many": "{{count}} non valido",
+          "invalid_one": "{{count}} non valido",
+          "invalid_other": "{{count}} non valido"
         },
         "scope": {
           "all_tenants": "tutti gli inquilini"
@@ -872,7 +928,10 @@
           "success": "Successo",
           "supersede": "Sostituire",
           "unknown": "Evento sconosciuto: {{event}}"
-        }
+        },
+        "summary_many": "Eventi {{count}}",
+        "summary_one": "Eventi {{count}}",
+        "summary_other": "Eventi {{count}}"
       },
       "failures": {
         "columns": {
@@ -888,7 +947,10 @@
         "errors": {
           "load": "Impossibile caricare gli errori"
         },
-        "table_aria": "Fallimenti"
+        "table_aria": "Fallimenti",
+        "actions": {
+          "close_breaker_now": "Riprendi la coda adesso"
+        }
       },
       "live_connected": "Aggiornamenti in tempo reale collegati",
       "audit": {
@@ -957,7 +1019,13 @@
           "cache_unreachable": "Cache irraggiungibile",
           "healthy": "Salutare",
           "missing": "{{count}} mancante",
-          "stale": "{{count}} stantio"
+          "stale": "{{count}} stantio",
+          "missing_many": "{{count}} mancante",
+          "missing_one": "{{count}} mancante",
+          "missing_other": "{{count}} mancante",
+          "stale_many": "{{count}} stantio",
+          "stale_one": "{{count}} stantio",
+          "stale_other": "{{count}} stantio"
         },
         "hints": {
           "active_jobs": "{{count}} attivo",
@@ -969,7 +1037,13 @@
           "event_at": "Evento {{time}}",
           "no_events": "Nessun evento",
           "prometheus": "Formato testo Prometeo",
-          "tenants_routes": "Inquilini {{tenants}} x percorsi {{routes}}"
+          "tenants_routes": "Inquilini {{tenants}} x percorsi {{routes}}",
+          "aging_many": "{{count}} invecchiamento (>7d)",
+          "aging_one": "{{count}} invecchiamento (>7d)",
+          "aging_other": "{{count}} invecchiamento (>7d)",
+          "active_jobs_many": "{{count}} attivo",
+          "active_jobs_one": "{{count}} attivo",
+          "active_jobs_other": "{{count}} attivo"
         },
         "kpi": {
           "age_stale": "Età stantia (>14 giorni)",
@@ -1025,7 +1099,13 @@
         },
         "messages": {
           "dry_run": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
-          "purged": "Istantanee {{count}} eliminate{{job}}"
+          "purged": "Istantanee {{count}} eliminate{{job}}",
+          "dry_run_many": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
+          "dry_run_one": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
+          "dry_run_other": "Esecuzione di prova: gli snapshot {{count}} verrebbero eliminati",
+          "purged_many": "Istantanee {{count}} eliminate{{job}}",
+          "purged_one": "Istantanee {{count}} eliminate{{job}}",
+          "purged_other": "Istantanee {{count}} eliminate{{job}}"
         },
         "placeholders": {
           "pattern": "/blog/* o /elenchi/**",
@@ -1033,13 +1113,22 @@
         },
         "result": {
           "deleted": "Istantanee {{count}} eliminate",
-          "would_delete": "Eliminerebbe gli snapshot {{count}}"
+          "would_delete": "Eliminerebbe gli snapshot {{count}}",
+          "would_delete_many": "Eliminerebbe gli snapshot {{count}}",
+          "would_delete_one": "Eliminerebbe gli snapshot {{count}}",
+          "would_delete_other": "Eliminerebbe gli snapshot {{count}}",
+          "deleted_many": "Istantanee {{count}} eliminate",
+          "deleted_one": "Istantanee {{count}} eliminate",
+          "deleted_other": "Istantanee {{count}} eliminate"
         },
         "title": "Eliminazione della cache dei caratteri jolly",
         "preview_gate": {
           "title": "Preview required before live delete",
           "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
-          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
+          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
+          "ready_many": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
+          "ready_one": "Trovata anteprima corrispondente. L'eliminazione in tempo reale è limitata alle istantanee corrispondenti {{count}} mostrate nell'anteprima.",
+          "ready_other": "Trovata anteprima corrispondente. L'eliminazione in tempo reale è limitata alle istantanee corrispondenti {{count}} mostrate nell'anteprima."
         }
       },
       "ttl_inspector": {
@@ -1066,7 +1155,16 @@
         "units": {
           "days": "{{count}} g",
           "hours": "{{count}} h",
-          "minutes": "{{count}} min"
+          "minutes": "{{count}} min",
+          "minutes_many": "{{count}} min",
+          "minutes_one": "{{count}} min",
+          "minutes_other": "{{count}} min",
+          "hours_many": "{{count}} h",
+          "hours_one": "{{count}} h",
+          "hours_other": "{{count}} h",
+          "days_many": "{{count}} g",
+          "days_one": "{{count}} g",
+          "days_other": "{{count}} g"
         }
       },
       "sitemap_explorer": {
@@ -1076,7 +1174,16 @@
         "counts": {
           "dynamic": "{{count}} dinamico",
           "static": "{{count}} statico",
-          "total": "{{count}} totale"
+          "total": "{{count}} totale",
+          "static_many": "{{count}} statico",
+          "static_one": "{{count}} statico",
+          "static_other": "{{count}} statico",
+          "dynamic_many": "{{count}} dinamico",
+          "dynamic_one": "{{count}} dinamico",
+          "dynamic_other": "{{count}} dinamico",
+          "total_many": "{{count}} totale",
+          "total_one": "{{count}} totale",
+          "total_other": "{{count}} totale"
         },
         "description_prefix": "Scopri esattamente quali percorsi il motore intende eseguire per un inquilino: piano statico (funzionalità/modulo recintato) più i URL dinamici da",
         "description_suffix": "L'operaio drammaturgo visita questo elenco.",
@@ -1134,7 +1241,10 @@
         },
         "status": {
           "clean": "No issues found",
-          "needs_attention": "{{count}} item needs attention"
+          "needs_attention": "{{count}} item needs attention",
+          "needs_attention_many": "{{count}} item needs attention",
+          "needs_attention_one": "L'oggetto {{count}} richiede attenzione",
+          "needs_attention_other": "L'oggetto {{count}} richiede attenzione"
         },
         "counts": {
           "expected": "Expected",
@@ -1567,7 +1677,43 @@
         "do_not_remove_prerender": "Do not remove prerender fallback.",
         "rollback_path_required": "Rollback path required"
       }
-    }
+    },
+    "health_meta_description_length_many": "Caratteri{{count}}(ideale: 150–160)",
+    "health_meta_description_length_one": "Caratteri{{count}}(ideale: 150–160)",
+    "health_meta_description_length_other": "Caratteri{{count}}(ideale: 150–160)",
+    "health_auto_sitemap_active_count_many": "Attivo: URL{{count}}indicizzati",
+    "health_auto_sitemap_active_count_one": "Attivo: URL{{count}}indicizzati",
+    "health_auto_sitemap_active_count_other": "Attivo: URL{{count}}indicizzati",
+    "pass_count_many": "{{count}} superato",
+    "pass_count_one": "{{count}} superato",
+    "pass_count_other": "{{count}} superato",
+    "warning_count_many": "{{count}} avviso",
+    "warning_count_one": "{{count}} avviso",
+    "warning_count_other": "{{count}} avviso",
+    "fail_count_many": "{{count}}fallisce",
+    "fail_count_one": "{{count}}fallisce",
+    "fail_count_other": "{{count}}fallisce",
+    "meta_description_count_many": "{{count}}/160 caratteri della meta descrizione",
+    "meta_description_count_one": "{{count}}/160 caratteri della meta descrizione",
+    "meta_description_count_other": "{{count}}/160 caratteri della meta descrizione",
+    "global_meta_description_count_many": "{{count}}/160 caratteri della meta descrizione globale",
+    "global_meta_description_count_one": "{{count}}/160 caratteri della meta descrizione globale",
+    "global_meta_description_count_other": "{{count}}/160 caratteri della meta descrizione globale",
+    "passed_count_with_value_many": "{{count}}superato",
+    "passed_count_with_value_one": "{{count}}superato",
+    "passed_count_with_value_other": "{{count}}superato",
+    "warnings_count_with_value_many": "Avvisi{{count}}",
+    "warnings_count_with_value_one": "Avvisi{{count}}",
+    "warnings_count_with_value_other": "Avvisi{{count}}",
+    "failed_count_with_value_many": "{{count}}non riuscito",
+    "failed_count_with_value_one": "{{count}}non riuscito",
+    "failed_count_with_value_other": "{{count}}non riuscito",
+    "match_count_many": "Corrispondenze{{count}}",
+    "top_matches_for_user_many": "Le migliori partite{{count}}per{{name}}",
+    "total_count_many": "Totale: {{count}}",
+    "total_count_one": "Totale: {{count}}",
+    "total_count_other": "Totale: {{count}}",
+    "score_out_of": "su {{maximum}}"
   },
   "email_deliverability": {
     "title": "Consegnabilità della posta elettronica",
@@ -1606,7 +1752,13 @@
       "trigger_score": "Punteggio trigger",
       "unconfirmed": "{{count}} accettato ma non confermato",
       "webhook_confirmed": "Confermato dal webhook del provider",
-      "window_days": "Finestra del giorno {{days}}"
+      "window_days": "Finestra del giorno {{days}}",
+      "unconfirmed_many": "{{count}} accettato ma non confermato",
+      "unconfirmed_one": "{{count}} accettato ma non confermato",
+      "unconfirmed_other": "{{count}} accettato ma non confermato",
+      "bad_outcomes_many": "{{count}} non è riuscito, è stato respinto o è stato soppresso",
+      "bad_outcomes_one": "{{count}} non è riuscito, è stato respinto o è stato soppresso",
+      "bad_outcomes_other": "{{count}} non è riuscito, è stato respinto o è stato soppresso"
     },
     "status": {
       "bounced": "Rimbalzato",
@@ -1968,6 +2120,9 @@
       "fcm": "Mobile inviate/non riuscite",
       "web": "Web consegnate",
       "recent_failures": "Errori recenti"
-    }
+    },
+    "trigger_coverage_many": "Problemi di {{issues}} nei flussi monitorati di {{count}}",
+    "trigger_coverage_one": "Problemi di {{issues}} nei flussi monitorati di {{count}}",
+    "trigger_coverage_other": "Problemi di {{issues}} nei flussi monitorati di {{count}}"
   }
 }

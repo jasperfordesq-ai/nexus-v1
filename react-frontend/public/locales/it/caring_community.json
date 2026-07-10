@@ -108,7 +108,10 @@
       "create": "Impossibile creare la richiesta di sostituzione",
       "candidates": "Impossibile caricare i candidati sostituti",
       "assign": "Impossibile assegnare il sostituto"
-    }
+    },
+    "skill_matches_many": "{{count}} competenze corrispondenti",
+    "skill_matches_one": "{{count}} competenze corrispondenti",
+    "skill_matches_other": "{{count}} competenze corrispondenti"
   },
   "providers": {
     "title": "Elenco dei fornitori di cura",
@@ -488,7 +491,8 @@
         "maximum_discount": "Sconto massimo per ordine (%)",
         "maximum_discount_description": "Limite alla percentuale del totale dell'ordine che può essere pagata in crediti temporali.",
         "save": "Salva impostazioni",
-        "view_only": "Gli utenti di sola visualizzazione non possono modificare le impostazioni di fedeltà."
+        "view_only": "Gli utenti di sola visualizzazione non possono modificare le impostazioni di fedeltà.",
+        "per_hour_short": "/ h"
       },
       "ledger": {
         "title": "Rimborsi recenti",
@@ -534,6 +538,9 @@
         "pending": "In attesa di",
         "applied": "Applicato",
         "reversed": "Invertito"
+      },
+      "table": {
+        "empty_value": "—"
       }
     },
     "hour_transfers": {
@@ -808,7 +815,11 @@
         "days_ago_one": "{{count}}giorni fa",
         "days_ago_other": "{{count}}giorni fa",
         "months_ago_one": "{{count}}mo fa",
-        "months_ago_other": "{{count}}mo fa"
+        "months_ago_other": "{{count}}mo fa",
+        "minutes_ago_many": "{{count}}m fa",
+        "hours_ago_many": "{{count}}h fa",
+        "days_ago_many": "{{count}}giorni fa",
+        "months_ago_many": "{{count}}mo fa"
       },
       "messages": {
         "triage_saved": "Triage salvato",
@@ -944,7 +955,8 @@
       },
       "errors": {
         "load": "Impossibile caricare la cerchia dei destinatari. Controlla l'ID membro e riprova."
-      }
+      },
+      "safeguarding_flags_many": "{{count}} bandiere di salvaguardia"
     },
     "safeguarding_reports": {
       "meta_title": "Rapporti di salvaguardia - Ammin",

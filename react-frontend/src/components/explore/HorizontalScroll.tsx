@@ -3,10 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useRef, useState, useCallback, useEffect, type ReactNode } from 'react';import ChevronLeft from 'lucide-react/icons/chevron-left';
+import { useRef, useState, useCallback, useEffect, useId, type ReactNode } from 'react';
+import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui';
+import { OverlayActionButton } from '@/components/ui/OverlayActionButton';
 
 interface HorizontalScrollProps {
   children: ReactNode;
@@ -20,6 +21,7 @@ interface HorizontalScrollProps {
  */
 export function HorizontalScroll({ children, className = '' }: HorizontalScrollProps) {
   const { t } = useTranslation('common');
+  const trackId = useId();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -64,21 +66,22 @@ export function HorizontalScroll({ children, className = '' }: HorizontalScrollP
       {canScrollLeft && (
         <>
           <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[var(--background)] to-transparent z-10 pointer-events-none" />
-          <Button
-            isIconOnly
-            variant="flat"
-            size="sm"
-            className="absolute left-1 top-1/2 -translate-y-1/2 z-20 hidden sm:flex bg-[var(--surface-elevated)] border border-[var(--border-default)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity min-w-8 w-8 h-8"
+          <OverlayActionButton
+            variant="secondary"
+            className="absolute left-1 top-1/2 -translate-y-1/2 z-20 hidden rounded-full border border-[var(--border-default)] bg-[var(--surface-elevated)] shadow-md transition-opacity sm:flex"
             onPress={() => scroll('left')}
             aria-label={t('aria.scroll_left')}
+            aria-controls={trackId}
           >
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
+            <ChevronLeft className="size-4" aria-hidden="true" />
+          </OverlayActionButton>
         </>
       )}
 
       {/* Scrollable area */}
       <div
+        id={trackId}
+        data-testid="horizontal-scroll-track"
         ref={scrollRef}
         className="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide [scrollbar-width:none] [-ms-overflow-style:none] pb-2 -mb-2"
       >
@@ -89,16 +92,15 @@ export function HorizontalScroll({ children, className = '' }: HorizontalScrollP
       {canScrollRight && (
         <>
           <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--background)] to-transparent z-10 pointer-events-none" />
-          <Button
-            isIconOnly
-            variant="flat"
-            size="sm"
-            className="absolute right-1 top-1/2 -translate-y-1/2 z-20 hidden sm:flex bg-[var(--surface-elevated)] border border-[var(--border-default)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity min-w-8 w-8 h-8"
+          <OverlayActionButton
+            variant="secondary"
+            className="absolute right-1 top-1/2 -translate-y-1/2 z-20 hidden rounded-full border border-[var(--border-default)] bg-[var(--surface-elevated)] shadow-md transition-opacity sm:flex"
             onPress={() => scroll('right')}
             aria-label={t('aria.scroll_right')}
+            aria-controls={trackId}
           >
-            <ChevronRight className="w-4 h-4" />
-          </Button>
+            <ChevronRight className="size-4" aria-hidden="true" />
+          </OverlayActionButton>
         </>
       )}
     </div>

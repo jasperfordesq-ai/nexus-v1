@@ -63,7 +63,12 @@
     "still_need_help_description": "Ní féidir leat a fháil a bhfuil á lorg agat? Tá ár bhfoireann anseo le cabhrú.",
     "contact_support": "Déan Teagmháil le Tacaíocht",
     "load_error_title": "Níorbh fhéidir na CCanna a luchtú",
-    "load_error_description": "Déan iarracht an leathanach a athnuachan nó déan teagmháil le tacaíocht."
+    "load_error_description": "Déan iarracht an leathanach a athnuachan nó déan teagmháil le tacaíocht.",
+    "articles_count_few": "{{count}} alt",
+    "articles_count_many": "{{count}} alt",
+    "articles_count_one": "{{count}} alt",
+    "articles_count_other": "{{count}} alt",
+    "articles_count_two": "{{count}} alt"
   },
   "resources": {
     "page_title": "Acmhainní",

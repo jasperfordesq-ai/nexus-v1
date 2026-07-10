@@ -130,7 +130,10 @@
         "run_failed_with_error": "Falha na execução: {{error}}",
         "toggle_failed": "Falha ao alternar agente",
         "updated": "Agente atualizado",
-        "update_failed": "Falha ao atualizar o agente"
+        "update_failed": "Falha ao atualizar o agente",
+        "run_created_many": "Execute #{{runId}} propostas {{count}} criadas",
+        "run_created_one": "Execute #{{runId}} propostas {{count}} criadas",
+        "run_created_other": "Execute #{{runId}} propostas {{count}} criadas"
       }
     },
     "runs": {

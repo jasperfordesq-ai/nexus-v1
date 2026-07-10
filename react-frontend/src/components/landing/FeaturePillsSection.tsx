@@ -69,8 +69,8 @@ export function FeaturePillsSection({ content }: FeaturePillsSectionProps) {
           transition={{ delay: index * 0.1 }}
           className="flex items-center gap-3 p-4 rounded-2xl glass-card backdrop-blur-lg"
         >
-          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
-            <pill.Icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 flex items-center justify-center">
+            <pill.Icon className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
           </div>
           <div className="text-left">
             <p className="font-medium text-theme-primary">{pill.title}</p>

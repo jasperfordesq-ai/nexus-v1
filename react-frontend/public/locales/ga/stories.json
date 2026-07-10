@@ -98,7 +98,12 @@
     "or_divider": "nó",
     "poll_add_option_button": "Cuir rogha leis",
     "videos_trimmed_notice": "Gearrfar físeáin níos faide ná 60s go dtí 60s taispeána",
-    "video_duration_seconds": "{{count}}s"
+    "video_duration_seconds": "{{count}}s",
+    "video_duration_seconds_few": "{{count}}s",
+    "video_duration_seconds_many": "{{count}}s",
+    "video_duration_seconds_one": "{{count}}s",
+    "video_duration_seconds_other": "{{count}}s",
+    "video_duration_seconds_two": "{{count}}s"
   },
   "viewer": {
     "story_from": "Scéal ó {{name}}",
@@ -132,7 +137,17 @@
     "reply_placeholder_generic": "Freagair an scéal...",
     "react_with": "Freagair le {{type}}",
     "viewers_title_count": "Breathnóirí ({{count}})",
-    "delete_story_confirm": "Scrios an scéal seo? Ní féidir é seo a chealú."
+    "delete_story_confirm": "Scrios an scéal seo? Ní féidir é seo a chealú.",
+    "poll_votes_few": "{{count}} vóta",
+    "poll_votes_many": "{{count}} vóta",
+    "poll_votes_one": "{{count}} vóta",
+    "poll_votes_other": "{{count}} vóta",
+    "poll_votes_two": "{{count}} vóta",
+    "viewers_title_count_few": "Breathnóirí ({{count}})",
+    "viewers_title_count_many": "Breathnóirí ({{count}})",
+    "viewers_title_count_one": "Breathnóirí ({{count}})",
+    "viewers_title_count_other": "Breathnóirí ({{count}})",
+    "viewers_title_count_two": "Breathnóirí ({{count}})"
   },
   "highlights": {
     "no_stories": "Níl aon scéal sa rogha seo",

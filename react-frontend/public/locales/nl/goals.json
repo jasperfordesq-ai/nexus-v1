@@ -120,7 +120,13 @@
       "offer_help": "Aanbod tot hulp",
       "celebration": "Viering",
       "note": "Notitie"
-    }
+    },
+    "streak_value_one": "{{count}} check-ins",
+    "streak_value_other": "{{count}} check-ins",
+    "best_streak_one": "Beste reeks: {{count}}",
+    "best_streak_other": "Beste reeks: {{count}}",
+    "checkins_value_one": "{{count}} geregistreerd",
+    "checkins_value_other": "{{count}} geregistreerd"
   },
   "template_picker": {
     "load_error": "Sjablonen konden niet worden geladen. Probeer het opnieuw.",

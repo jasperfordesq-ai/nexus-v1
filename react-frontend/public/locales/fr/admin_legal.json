@@ -147,7 +147,10 @@
         "date": "Date",
         "ip_address": "Adresse IP",
         "member_id": "Membre ID"
-      }
+      },
+      "truncated_many": "Affichage des 200 enregistrements les plus récents. Exportez le registre complet CSV pour télécharger tous les enregistrements {{count}}.",
+      "truncated_one": "Affichage des 200 enregistrements les plus récents. Exportez le registre complet CSV pour télécharger tous les enregistrements {{count}}.",
+      "truncated_other": "Affichage des 200 enregistrements les plus récents. Exportez le registre complet CSV pour télécharger tous les enregistrements {{count}}."
     },
     "residency": {
       "article_16": "La divulgation transfrontalière de données personnelles est autorisée si le pays de destination garantit une protection des données adéquate, reconnue par le Conseil fédéral. Les États membres de Switzerland, EU/EEA et une petite liste d'autres pays sont éligibles.",

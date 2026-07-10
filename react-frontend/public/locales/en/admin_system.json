@@ -266,7 +266,9 @@
       "resume_success": "Registration resumed for this community.",
       "resume_failed": "Failed to resume registration.",
       "threshold_prefix": "Threshold is configured at the platform level via",
-      "threshold_suffix": "When tripped, this banner turns red and a one-click resume button appears here."
+      "threshold_suffix": "When tripped, this banner turns red and a one-click resume button appears here.",
+      "signups_this_hour_one": "{{count}} of {{threshold}} signups this hour",
+      "signups_this_hour_other": "{{count}} of {{threshold}} signups this hour"
     },
     "col_action": "Action",
     "col_date": "Date",
@@ -621,7 +623,9 @@
       "welcome_text": "Welcome Text",
       "welcome_text_desc": "Welcome message shown to new members at the start of onboarding",
       "welcome_text_placeholder": "Welcome message...",
-      "your_community": "Your Community"
+      "your_community": "Your Community",
+      "n_active_one": "{{count}} active",
+      "n_active_other": "{{count}} active"
     },
     "overdue_jobs": "Overdue Jobs",
     "page_title": "System",
@@ -764,7 +768,13 @@
       "waitlist_info": "Members on the waitlist are approved manually by an admin",
       "webhook_desc": "Used to verify the authenticity of incoming webhook payloads",
       "your_community": "Your Community",
-      "credentials_remove_confirm": "Remove these credentials? This cannot be undone."
+      "credentials_remove_confirm": "Remove these credentials? This cannot be undone.",
+      "n_configured_one": "{{count}} configured",
+      "n_configured_other": "{{count}} configured",
+      "n_available_one": "{{count}} available",
+      "n_available_other": "{{count}} available",
+      "total_codes_count_one": "Total codes: {{count}}",
+      "total_codes_count_other": "Total codes: {{count}}"
     },
     "registration_policy_saved_successfully": "Registration policy saved successfully",
     "registration_policy_settings_title": "Registration & Identity Verification",
@@ -1107,7 +1117,37 @@
     "partner_logo_link_url": "Partner Logo Link URL",
     "partner_logo_link_url_description": "Optional website link for the partner logo in the footer.",
     "label_inactivity_timeout": "Inactivity timeout (minutes)",
-    "desc_inactivity_timeout": "Automatically sign members out after this many minutes without activity. 0 disables the timeout; allowed range is 5–480 minutes. Recommended: 120."
+    "desc_inactivity_timeout": "Automatically sign members out after this many minutes without activity. 0 disables the timeout; allowed range is 5–480 minutes. Recommended: 120.",
+    "generated_data_for_one": "Generated data for {{count}} selected data types",
+    "generated_data_for_other": "Generated data for {{count}} selected data types",
+    "avg_completion_seconds_one": "Avg Completion Seconds",
+    "avg_completion_seconds_other": "Avg Completion Seconds",
+    "avg_completion_minutes_one": "Avg Completion Minutes",
+    "avg_completion_minutes_other": "Avg Completion Minutes",
+    "sessions_count_one": "{{count}} sessions",
+    "sessions_count_other": "{{count}} sessions",
+    "passed_count_one": "{{count}} passed",
+    "passed_count_other": "{{count}} passed",
+    "failed_count_one": "{{count}} failed",
+    "failed_count_other": "{{count}} failed",
+    "cron_connection_ok_one": "Connection OK - {{count}} jobs available",
+    "cron_connection_ok_other": "Connection OK - {{count}} jobs available",
+    "minutes_ago_one": "{{count}}m ago",
+    "minutes_ago_other": "{{count}}m ago",
+    "hours_ago_one": "{{count}}h ago",
+    "hours_ago_other": "{{count}}h ago",
+    "days_ago_one": "{{count}}d ago",
+    "days_ago_other": "{{count}}d ago",
+    "blog_posts_restored_one": "{{count}} blog posts restored from {{filename}}",
+    "blog_posts_restored_other": "{{count}} blog posts restored from {{filename}}",
+    "available_backups_one": "Available Backups ({{count}})",
+    "available_backups_other": "Available Backups ({{count}})",
+    "test_runner": {
+      "api_unavailable": "Health check API unavailable",
+      "run_all": "Run all tests",
+      "suites": "Test suites",
+      "unknown_test": "Diagnostic: {{name}}"
+    }
   },
   "verification": {
     "approve": "Approve",
@@ -1171,7 +1211,11 @@
     "total_events": "{{count}} events",
     "user_approved_activated": "User approved and activated",
     "user_verification_rejected": "User verification rejected",
-    "user_with_id": "User #{{id}}"
+    "user_with_id": "User #{{id}}",
+    "n_pending_one": "{{count}} pending",
+    "n_pending_other": "{{count}} pending",
+    "total_events_one": "{{count}} events",
+    "total_events_other": "{{count}} events"
   },
   "cancel": "Cancel"
 }

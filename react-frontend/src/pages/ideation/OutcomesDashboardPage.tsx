@@ -11,6 +11,7 @@
  * - List of closed/archived challenges with their outcomes
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Target from 'lucide-react/icons/target';
@@ -64,7 +65,7 @@ const IMPL_STATUS_COLORS: Record<string, 'default' | 'warning' | 'success' | 'da
 const formatDate = (dateStr: string | null) => {
   if (!dateStr) return null;
   try {
-    return new Date(dateStr).toLocaleDateString(undefined, {
+    return new Date(dateStr).toLocaleDateString(getFormattingLocale(), {
       month: 'short',
       day: 'numeric',
       year: 'numeric',

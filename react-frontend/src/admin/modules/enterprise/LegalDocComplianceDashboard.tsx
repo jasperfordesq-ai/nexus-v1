@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Spinner, Input, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import {
   useState,
@@ -156,7 +157,7 @@ export default function LegalDocComplianceDashboard() {
               </div>
               <div>
                 <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.label_total_users')}</p>
-                <p className="text-2xl font-bold">{stats.total_users.toLocaleString()}</p>
+                <p className="text-2xl font-bold">{stats.total_users.toLocaleString(getFormattingLocale())}</p>
               </div>
             </div>
           </CardBody>
@@ -171,7 +172,7 @@ export default function LegalDocComplianceDashboard() {
               <div>
                 <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.fully_compliant')}</p>
                 <p className="text-2xl font-bold">
-                  {(stats.total_users - stats.users_pending_acceptance).toLocaleString()}
+                  {(stats.total_users - stats.users_pending_acceptance).toLocaleString(getFormattingLocale())}
                 </p>
               </div>
             </div>
@@ -187,7 +188,7 @@ export default function LegalDocComplianceDashboard() {
               <div>
                 <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.stat_pending')}</p>
                 <p className="text-2xl font-bold">
-                  {stats.users_pending_acceptance.toLocaleString()}
+                  {stats.users_pending_acceptance.toLocaleString(getFormattingLocale())}
                 </p>
               </div>
             </div>
@@ -245,7 +246,7 @@ export default function LegalDocComplianceDashboard() {
                     <TableCell>{doc.version_number || t('enterprise.not_available')}</TableCell>
                     <TableCell>
                       {doc.effective_date
-                        ? new Date(doc.effective_date).toLocaleDateString()
+                        ? new Date(doc.effective_date).toLocaleDateString(getFormattingLocale())
                         : t('enterprise.not_available')}
                     </TableCell>
                     <TableCell>
@@ -256,6 +257,7 @@ export default function LegalDocComplianceDashboard() {
                             color={getComplianceColor(doc.acceptance_rate)}
                             className="flex-1"
                             size="sm"
+                            aria-label={t('enterprise.col_acceptance_rate')}
                           />
                           <span className="text-sm font-medium w-12 text-right">
                             {doc.acceptance_rate.toFixed(1)}%
@@ -265,12 +267,12 @@ export default function LegalDocComplianceDashboard() {
                     </TableCell>
                     <TableCell>
                       <span className="text-success font-medium">
-                        {doc.users_accepted.toLocaleString()}
+                        {doc.users_accepted.toLocaleString(getFormattingLocale())}
                       </span>
                     </TableCell>
                     <TableCell>
                       <span className="text-warning font-medium">
-                        {doc.users_not_accepted.toLocaleString()}
+                        {doc.users_not_accepted.toLocaleString(getFormattingLocale())}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -376,7 +378,7 @@ export default function LegalDocComplianceDashboard() {
                           <TableCell>{acceptance.user_email}</TableCell>
                           <TableCell>{acceptance.version_number}</TableCell>
                           <TableCell>
-                            {new Date(acceptance.accepted_at).toLocaleString()}
+                            {new Date(acceptance.accepted_at).toLocaleString(getFormattingLocale())}
                           </TableCell>
                           <TableCell>{acceptance.acceptance_method}</TableCell>
                           <TableCell>

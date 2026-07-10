@@ -1,6 +1,6 @@
 # Admin Module
 
-Last reviewed: 2026-06-23
+Last reviewed: 2026-07-10
 
 This guide covers the tenant admin panel and the platform super-admin surface: who can access each tier, how server-side enforcement works, what the audit trail captures, and where the code lives.
 
@@ -27,11 +27,11 @@ The React admin SPA lives at `/{tenantSlug}/admin` and is rendered by `AdminApp.
 | `react-frontend/src/admin/AdminRoute.tsx` | Client-side route guard (redirects non-admins to `/dashboard`) |
 | `react-frontend/src/admin/SuperAdminRoute.tsx` | Client-side guard for super-admin-only child routes |
 | `react-frontend/src/admin/routes.tsx` | Full route map (lazy-loaded; see below) |
-| `react-frontend/src/lib/access.ts` | `hasAdminPanelAccess()` and `hasBrokerPanelAccess()` pure functions |
+| `react-frontend/src/lib/access.ts` | Canonical tenant-admin, tenant-super-admin, and platform-super-admin predicates |
 
 `AdminRoute` uses `hasAdminPanelAccess(user)` from `react-frontend/src/lib/access.ts`, which mirrors the server-side check: it returns `true` if `user.role` is `admin`, `tenant_admin`, or `super_admin`, or if any of the boolean flags `is_admin`, `is_super_admin`, `is_tenant_super_admin`, or `is_god` is `true`. If the user's role is `broker`, access is unconditionally denied regardless of other flags.
 
-`SuperAdminRoute` allows `role=super_admin`, `is_super_admin=true`, `is_tenant_super_admin=true`, or `is_god=true`. Note that this client guard is defence-in-depth only; every sensitive endpoint is independently enforced server-side.
+`SuperAdminRoute` uses `isPlatformSuperAdminUser(user)`: it allows `role=super_admin`, `role=god`, `is_super_admin=true`, or `is_god=true`, and deliberately rejects `is_tenant_super_admin=true`. The admin sidebar uses the same predicate before showing the platform panel link. These client checks are defence-in-depth only; every sensitive endpoint is independently enforced server-side.
 
 Feature-gated admin sections (federation, newsletters, podcasts, partner API, member premium) redirect to `/admin/not-found` when the tenant feature is off, using `FeatureGatedElement` inside `routes.tsx`.
 
@@ -209,8 +209,8 @@ The prerender admin has its own `prerender_audit_log` table, sanitises secret ke
 vendor/bin/phpunit --filter "AdminAccessControlTest|Admin.*Controller" --testsuite=Laravel
 
 # Middleware isolation tests
-vendor/bin/phpunit tests/Laravel/Feature/EnsureIsAdminTest.php
-vendor/bin/phpunit tests/Laravel/Feature/EnsureIsSuperAdminTest.php
+vendor/bin/phpunit tests/Laravel/Unit/Middleware/EnsureIsAdminTest.php
+vendor/bin/phpunit tests/Laravel/Unit/Middleware/EnsureIsSuperAdminTest.php
 
 # Admin access control integration
 vendor/bin/phpunit tests/Laravel/Feature/Controllers/AdminAccessControlTest.php

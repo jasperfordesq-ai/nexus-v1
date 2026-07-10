@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Spinner } from '@/components/ui';
 import { useState, useEffect } from 'react';
 import Target from 'lucide-react/icons/target';
@@ -97,7 +98,7 @@ export function DeliverabilityDashboard() {
                       {t('deliverability.activity_by_user_date', {
                         action: activity.action_type,
                         user: activity.user_name,
-                        date: new Date(activity.action_timestamp).toLocaleDateString(),
+                        date: new Date(activity.action_timestamp).toLocaleDateString(getFormattingLocale()),
                       })}
                     </p>
                   </div>

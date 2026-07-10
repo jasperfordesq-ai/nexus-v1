@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
@@ -61,7 +62,7 @@ function unwrapData<T>(raw: { data?: T } | T): T {
 }
 
 function formatDateTime(value: string): string {
-  return new Date(value).toLocaleString(undefined, {
+  return new Date(value).toLocaleString(getFormattingLocale(), {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',

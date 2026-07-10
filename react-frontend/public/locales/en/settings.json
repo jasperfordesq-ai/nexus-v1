@@ -278,7 +278,9 @@
     "linked": "Linked",
     "connected_accounts": "Connected",
     "safeguarding": "Safeguarding",
-    "translation": "Translation"
+    "translation": "Translation",
+    "linked-accounts": "Linked accounts",
+    "connected-accounts": "Connected accounts"
   },
   "safeguarding": {
     "page_title": "Safeguarding preferences",
@@ -588,7 +590,9 @@
     "unblocked_desc": "{{name}} has been unblocked.",
     "unblock_error": "Failed to unblock user",
     "blocked_on": "Blocked on {{date}}",
-    "link": "Blocked Users"
+    "link": "Blocked Users",
+    "count_one": "{{count}} blocked",
+    "count_other": "{{count}} blocked"
   },
   "block_user": {
     "title": "Block {{name}}?",
@@ -615,5 +619,11 @@
   "push_campaign_opt_in": "Receive promoted push notifications",
   "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time.",
   "tabs_aria": "Settings sections",
-  "twofa_loading_setup": "Loading two-factor setup..."
+  "twofa_loading_setup": "Loading two-factor setup...",
+  "biometric_all_removed_one": "Removed {{count}} passkey(s).",
+  "biometric_all_removed_other": "Removed {{count}} passkey(s).",
+  "biometric_enabled_one": "{{count}} passkey(s) registered",
+  "biometric_enabled_other": "{{count}} passkey(s) registered",
+  "twofa_backup_remaining_one": "{{count}} backup codes remaining",
+  "twofa_backup_remaining_other": "{{count}} backup codes remaining"
 }

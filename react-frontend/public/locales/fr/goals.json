@@ -120,7 +120,16 @@
       "offer_help": "Proposition d'aide",
       "celebration": "Célébration",
       "note": "Note"
-    }
+    },
+    "streak_value_many": "{{count}} enregistrements",
+    "streak_value_one": "{{count}} enregistrements",
+    "streak_value_other": "{{count}} enregistrements",
+    "best_streak_many": "Meilleure série : {{count}}",
+    "best_streak_one": "Meilleure série : {{count}}",
+    "best_streak_other": "Meilleure série : {{count}}",
+    "checkins_value_many": "{{count}} enregistrés",
+    "checkins_value_one": "{{count}} enregistrés",
+    "checkins_value_other": "{{count}} enregistrés"
   },
   "template_picker": {
     "load_error": "Échec du chargement des modèles. Veuillez réessayer.",

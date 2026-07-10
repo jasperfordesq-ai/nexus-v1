@@ -62,7 +62,20 @@
     "reaction_like": "J'aime",
     "reaction_wow": "Ouah",
     "reaction_sad": "Triste",
-    "reaction_celebrate": "Célébrer"
+    "reaction_celebrate": "Célébrer",
+    "min_read_many": "{{count}} min de lecture",
+    "min_read_one": "{{count}} min de lecture",
+    "min_read_other": "{{count}} min de lecture",
+    "views_count_many": "{{count}} vues",
+    "views_count_one": "{{count}} vues",
+    "views_count_other": "{{count}} vues",
+    "comment_count_many": "{{count}} commentaires"
   },
-  "page_description": "Histoires, guides et mises à jour de la communauté de banque du temps — des échanges réussis, des leçons apprises et les dernières nouvelles des groupes locaux et partenaires."
+  "page_description": "Histoires, guides et mises à jour de la communauté de banque du temps — des échanges réussis, des leçons apprises et les dernières nouvelles des groupes locaux et partenaires.",
+  "min_read_many": "{{count}} min de lecture",
+  "min_read_one": "{{count}} min de lecture",
+  "min_read_other": "{{count}} min de lecture",
+  "min_read_short_many": "{{count}}m",
+  "min_read_short_one": "{{count}}m",
+  "min_read_short_other": "{{count}}m"
 }

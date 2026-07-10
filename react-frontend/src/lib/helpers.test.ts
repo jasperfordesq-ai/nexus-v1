@@ -8,16 +8,73 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import i18n from '../i18n';
 import {
   formatRelativeTime,
   formatDate,
+  formatDateValue,
+  formatDateTime,
+  formatNumber,
   formatTime,
+  getFormattingLocale,
   formatHours,
   truncate,
   cn,
   getUserDisplayName,
   getUserInitials,
 } from './helpers';
+
+describe('application-locale formatting', () => {
+  afterEach(async () => {
+    await i18n.changeLanguage('en');
+  });
+
+  it('switches dates and numbers from English to the selected German locale', async () => {
+    const date = new Date('2026-07-10T16:30:00Z');
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric',
+      month: 'long',
+      timeZone: 'UTC',
+      year: 'numeric',
+    };
+
+    await i18n.changeLanguage('en');
+    const englishDate = formatDateTime(date, options);
+    const englishNumber = formatNumber(1234567.89);
+
+    await i18n.changeLanguage('de');
+    expect(getFormattingLocale()).toBe('de');
+    expect(formatDateTime(date, options)).toBe(
+      new Intl.DateTimeFormat('de', options).format(date),
+    );
+    expect(formatDateTime(date, options)).not.toBe(englishDate);
+    expect(formatNumber(1234567.89)).toBe(
+      new Intl.NumberFormat('de').format(1234567.89),
+    );
+    expect(formatNumber(1234567.89)).not.toBe(englishNumber);
+  });
+
+  it('preserves native RTL date and number output for the selected Arabic locale', async () => {
+    await i18n.changeLanguage('ar');
+
+    const number = formatNumber(1234567.89);
+    const date = new Date('2026-07-10T16:30:00Z');
+    const dateOptions: Intl.DateTimeFormatOptions = {
+      dateStyle: 'full',
+      timeZone: 'UTC',
+    };
+    const formattedDate = formatDateTime(date, dateOptions);
+
+    expect(getFormattingLocale()).toBe('ar');
+    expect(number).toBe(new Intl.NumberFormat('ar').format(1234567.89));
+    expect(formattedDate).toBe(new Intl.DateTimeFormat('ar', dateOptions).format(date));
+    expect(formattedDate).toMatch(/\p{Script=Arabic}/u);
+  });
+
+  it('preserves the established fallback for invalid date values', () => {
+    expect(formatDateValue('not-a-date')).toBe('—');
+  });
+});
 
 describe('formatRelativeTime', () => {
   beforeEach(() => {

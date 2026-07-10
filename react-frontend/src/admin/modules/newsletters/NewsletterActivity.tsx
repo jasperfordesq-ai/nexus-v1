@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Button, Chip, Tabs, Tab, Skeleton, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -90,7 +91,7 @@ interface PaginatedResponse<T> {
 
 function formatTime(dateStr: string): string {
   if (!dateStr) return '--';
-  return new Date(dateStr).toLocaleDateString(undefined, {
+  return new Date(dateStr).toLocaleDateString(getFormattingLocale(), {
     year: 'numeric', month: 'short', day: 'numeric',
     hour: '2-digit', minute: '2-digit',
   });

@@ -218,7 +218,9 @@
     "smart_search_text_chip": "Ricerca: {{query}}",
     "role_super_admin": "Super amministratore",
     "permissions_editor_unavailable_title": "Qui i permessi sono di sola lettura",
-    "permissions_editor_unavailable_desc": "Questa pagina mostra il ruolo dell'utente e i permessi concessi, ma non consente di modificarli. Gestisci l'accesso modificando il ruolo dell'utente nella pagina di modifica."
+    "permissions_editor_unavailable_desc": "Questa pagina mostra il ruolo dell'utente e i permessi concessi, ma non consente di modificarli. Gestisci l'accesso modificando il ruolo dell'utente nella pagina di modifica.",
+    "role_unknown": "Ruolo sconosciuto",
+    "role_tenant_super_admin": "Super amministratore del tenant"
   },
   "user_edit": {
     "actions": {

@@ -39,14 +39,14 @@ export function PeopleYouMayKnowWidget({ members }: PeopleYouMayKnowWidgetProps)
     <GlassCard className="p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <UserPlus className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+          <UserPlus className="w-4 h-4 text-accent" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
             {t('sidebar.people.title')}
           </h3>
         </div>
         <Link
           to={tenantPath('/members')}
-          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors duration-200"
+          className="text-xs text-accent hover:text-accent transition-colors duration-200"
         >
           {t('sidebar.people.see_all')}
         </Link>
@@ -86,7 +86,7 @@ export function PeopleYouMayKnowWidget({ members }: PeopleYouMayKnowWidgetProps)
               to={tenantPath(`/profile/${member.id}`)}
               size="sm"
               variant="flat"
-              className="text-xs text-indigo-500 bg-indigo-500/10 hover:bg-indigo-500/20 flex-shrink-0"
+              className="text-xs text-accent bg-accent/10 hover:bg-accent/20 flex-shrink-0"
             >
               {t('sidebar.people.view')}
             </Button>

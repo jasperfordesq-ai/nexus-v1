@@ -89,7 +89,17 @@
     "no_members_found": "Níor aimsíodh aon bhaill a mheaitseálann do chuardach.",
     "done": "Déanta",
     "aria_exchange_participants": "Rannpháirtithe malartú",
-    "aria_hour_split": "Roinnt uaireanta"
+    "aria_hour_split": "Roinnt uaireanta",
+    "participants_heading_few": "Rannpháirtithe ({{count}})",
+    "participants_heading_many": "Rannpháirtithe ({{count}})",
+    "participants_heading_one": "Rannpháirtithe ({{count}})",
+    "participants_heading_other": "Rannpháirtithe ({{count}})",
+    "participants_heading_two": "Rannpháirtithe ({{count}})",
+    "hours_amount_few": "{{count}} u.",
+    "hours_amount_many": "{{count}} u.",
+    "hours_amount_one": "{{count}} u.",
+    "hours_amount_other": "{{count}} u.",
+    "hours_amount_two": "{{count}} u."
   },
   "create": {
     "page_title": "Cruthaigh Malartú Grúpa",
@@ -148,7 +158,17 @@
     "step_of_named": "Céim {{current}} as {{total}}: {{name}}",
     "hours_value": "{{hours}} u.",
     "hours_suffix": "u.",
-    "weight_suffix": "x"
+    "weight_suffix": "x",
+    "providers_count_few": "Soláthraithe ({{count}})",
+    "providers_count_many": "Soláthraithe ({{count}})",
+    "providers_count_one": "Soláthraithe ({{count}})",
+    "providers_count_other": "Soláthraithe ({{count}})",
+    "providers_count_two": "Soláthraithe ({{count}})",
+    "receivers_count_few": "Faighteoirí ({{count}})",
+    "receivers_count_many": "Faighteoirí ({{count}})",
+    "receivers_count_one": "Faighteoirí ({{count}})",
+    "receivers_count_other": "Faighteoirí ({{count}})",
+    "receivers_count_two": "Faighteoirí ({{count}})"
   },
   "toast": {
     "exchange_started": "Malartú tosaithe",
@@ -189,5 +209,11 @@
     }
   },
   "role_provider": "Provider",
-  "role_receiver": "Receiver"
+  "role_receiver": "Receiver",
+  "participants_count_few": "{{count}} rannpháirtithe",
+  "participants_count_many": "{{count}} rannpháirtithe",
+  "participants_count_two": "{{count}} rannpháirtithe",
+  "hours_count_few": "{{count}} uair",
+  "hours_count_many": "{{count}} uair",
+  "hours_count_two": "{{count}} uair"
 }

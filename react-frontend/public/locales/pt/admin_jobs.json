@@ -250,7 +250,22 @@
     "moderation_page_title": "Fila de moderação de trabalhos",
     "moderation_page_description": "Revise e aprove as ofertas de emprego antes de serem publicadas",
     "templates_empty_description": "Crie seu primeiro modelo para economizar tempo em futuras ofertas de emprego.",
-    "templates_empty_title": "Ainda não há modelos"
+    "templates_empty_title": "Ainda não há modelos",
+    "jobs_count_many": "{{count}}empregos",
+    "jobs_count_one": "{{count}}empregos",
+    "jobs_count_other": "{{count}}empregos",
+    "application_count_one_many": "Aplicativo{{count}}",
+    "application_count_one_one": "Aplicativo{{count}}",
+    "application_count_one_other": "Aplicativo{{count}}",
+    "application_count_other_many": "Aplicações{{count}}",
+    "application_count_other_one": "Aplicações{{count}}",
+    "application_count_other_other": "Aplicações{{count}}",
+    "stat_pending_offers_many": "Ofertas pendentes{{count}}",
+    "stat_pending_offers_one": "Ofertas pendentes{{count}}",
+    "stat_pending_offers_other": "Ofertas pendentes{{count}}",
+    "pipeline_minutes_many": "{{count}}min",
+    "pipeline_minutes_one": "{{count}}min",
+    "pipeline_minutes_other": "{{count}}min"
   },
   "moderation": {
     "action_failed": "Falha",
@@ -478,5 +493,10 @@
     "blocked_count": "Bloqueado",
     "flagged_count": "Sinalizado",
     "total_analyzed": "Total Analisado"
+  },
+  "premium": {
+    "status": {
+      "unknown": "Desconhecido"
+    }
   }
 }

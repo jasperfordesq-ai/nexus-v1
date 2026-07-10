@@ -7,8 +7,10 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
+use App\Services\SmartMatchingAnalyticsService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Laravel\Sanctum\Sanctum;
+use Mockery;
 use Tests\Laravel\TestCase;
 
 /**
@@ -114,6 +116,24 @@ class AdminMatchingControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/matching/stats');
 
         $response->assertStatus(403);
+    }
+
+    public function test_stats_returns_failure_envelope_when_analytics_query_fails(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $analytics = Mockery::mock(SmartMatchingAnalyticsService::class);
+        $analytics->shouldReceive('getOverallStats')
+            ->once()
+            ->andThrow(new \RuntimeException('database unavailable'));
+        $this->app->instance(SmartMatchingAnalyticsService::class, $analytics);
+
+        $response = $this->apiGet('/v2/admin/matching/stats');
+
+        $response->assertStatus(500);
+        $response->assertJsonPath('errors.0.code', 'SERVER_ERROR');
+        $response->assertJsonMissing(['data' => ['overview' => []]]);
     }
 
     // ================================================================

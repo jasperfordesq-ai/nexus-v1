@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -199,7 +200,7 @@ export function WalletPage() {
     }
 
     const data = transactions.map((tx) => ({
-      [t('csv.date')]: new Date(tx.created_at).toLocaleDateString(),
+      [t('csv.date')]: new Date(tx.created_at).toLocaleDateString(getFormattingLocale()),
       [t('csv.type')]: tx.type === 'credit' ? t('csv.received') : t('csv.sent'),
       [t('csv.amount')]: tx.amount,
       [t('csv.description')]: tx.description || '',
@@ -266,7 +267,7 @@ export function WalletPage() {
             <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h3>
             <p className="text-theme-muted mb-4">{error}</p>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={<RefreshCw aria-hidden="true" className="w-4 h-4" />}
               onPress={() => loadWalletData()}
             >
@@ -313,7 +314,7 @@ export function WalletPage() {
 
             <div className="flex flex-col gap-3 sm:flex-row lg:w-56 lg:flex-col">
               <Button
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 px-8 font-medium text-white"
+                className="w-full bg-gradient-to-r from-accent to-accent-gradient-end px-8 font-medium text-white"
                 size="lg"
                 startContent={<Send className="h-5 w-5" aria-hidden="true" />}
                 onPress={() => setIsTransferModalOpen(true)}
@@ -382,7 +383,7 @@ export function WalletPage() {
         <GlassCard className="p-4 sm:p-6">
           <div className="flex flex-col gap-3 mb-6 sm:flex-row sm:items-center sm:justify-between">
             <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              <TrendingUp className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
               {t('history')}
             </h2>
 
@@ -579,7 +580,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
             <span className="flex items-center gap-1">
               <Calendar className="w-3 h-3 shrink-0" aria-hidden="true" />
               <time dateTime={transaction.created_at}>
-                {new Date(transaction.created_at).toLocaleDateString()}
+                {new Date(transaction.created_at).toLocaleDateString(getFormattingLocale())}
               </time>
             </span>
           </div>

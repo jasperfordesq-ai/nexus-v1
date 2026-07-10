@@ -906,7 +906,11 @@
       "bulk_approved_count": "Approved {{count}} partnership request",
       "bulk_approved_count_plural": "Approved {{count}} partnership requests",
       "bulk_rejected_count": "Rejected {{count}} partnership request",
-      "bulk_rejected_count_plural": "Rejected {{count}} partnership requests"
+      "bulk_rejected_count_plural": "Rejected {{count}} partnership requests",
+      "bulk_approved_count_one": "Approved {{count}} partnership request",
+      "bulk_approved_count_other": "Approved {{count}} partnership request",
+      "bulk_rejected_count_one": "Rejected {{count}} partnership request",
+      "bulk_rejected_count_other": "Rejected {{count}} partnership request"
     },
     "api_docs_tabs_aria": "API example language selector",
     "partnership_detail_tabs_aria": "Partnership detail sections",
@@ -965,7 +969,23 @@
     "event_type_partnership_changed": "Partnership updated",
     "event_type_partnership_terminated": "Partnership ended",
     "event_type_profile_viewed": "Profile viewed",
-    "event_type_federated_search": "Partner search"
+    "event_type_federated_search": "Partner search",
+    "bulk_selected_one": "{{count}} selected",
+    "bulk_selected_other": "{{count}} selected",
+    "directory_results_count_one": "{{count}} community found",
+    "directory_results_count_other": "{{count}} community found",
+    "directory_member_count_one": "{{count}} member",
+    "directory_member_count_other": "{{count}} member",
+    "directory_more_topics_one": "+{{count}} more",
+    "directory_more_topics_other": "+{{count}} more",
+    "members_count_value_one": "{{count}} members",
+    "members_count_value_other": "{{count}} members",
+    "topics_selected_count_one": "{{count}} topic selected",
+    "topics_selected_count_other": "{{count}} topic selected",
+    "primary_topics_count_one": "{{count}} primary",
+    "primary_topics_count_other": "{{count}} primary",
+    "recent_errors_count_one": "Recent errors: {{count}}",
+    "recent_errors_count_other": "Recent errors: {{count}}"
   },
   "federation_admin_guidance": {
     "shared": {
@@ -1218,5 +1238,11 @@
       "load_audit_failed": "Could not load the audit log.",
       "load_preview_failed": "Could not load the preview."
     }
+  },
+  "api_docs": {
+    "aria_hmac_headers": "HMAC headers",
+    "aria_rate_limit_headers": "Rate-limit headers",
+    "aria_parameters": "API parameters",
+    "aria_api_documentation_sections": "API documentation sections"
   }
 }

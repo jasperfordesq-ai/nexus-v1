@@ -187,7 +187,9 @@
     "terms_required": "Sie müssen den Bedingungen zustimmen, um Ihre Organisation zu registrieren.",
     "opportunity_count_one": "{{count}} Einsatz",
     "opportunity_count_other": "{{count}} Einsätze",
-    "loading": "Laden von Organisationen"
+    "loading": "Laden von Organisationen",
+    "volunteer_count_one": "{{count}} Freiwillige",
+    "volunteer_count_other": "{{count}} Freiwillige"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -231,7 +233,11 @@
     "submit_review": "Bewertung abgeben",
     "review_success": "Bewertung eingereicht.",
     "review_error": "Ihre Bewertung kann nicht übermittelt werden.",
-    "rating_required": "Wählen Sie vor dem Absenden eine Bewertung."
+    "rating_required": "Wählen Sie vor dem Absenden eine Bewertung.",
+    "meta_description_fallback_one": "Entdecken Sie {{name}} und {{count}} aktive Freiwilligenmöglichkeiten in dieser Gemeinschafts-Zeitbank.",
+    "meta_description_fallback_other": "Entdecken Sie {{name}} und {{count}} aktive Freiwilligenmöglichkeiten in dieser Gemeinschafts-Zeitbank.",
+    "review_count_one": "{{count}} Bewertungen",
+    "review_count_other": "{{count}} Bewertungen"
   },
   "emergency_alerts": {
     "heading": "Notfallwarnungen",

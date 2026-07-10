@@ -159,5 +159,11 @@
   "optional": "optional",
   "description_placeholder": "What is this transfer for?",
   "new_balance_after": "Your new balance will be {{balance}} hours",
-  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}"
+  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
+  "pending_in_one": "+{{count}}h pending",
+  "pending_in_other": "+{{count}}h pending",
+  "signed_hours_value_one": "{{sign}}{{count}}h",
+  "signed_hours_value_other": "{{sign}}{{count}}h",
+  "hours_value_one": "{{count}}h",
+  "hours_value_other": "{{count}}h"
 }

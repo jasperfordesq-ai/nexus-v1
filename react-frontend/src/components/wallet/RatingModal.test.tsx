@@ -104,13 +104,14 @@ describe('RatingModal — rendering', () => {
     expect(screen.getByText('How was your exchange with Alice?')).toBeInTheDocument();
   });
 
-  it('renders five individually-labelled star buttons', () => {
+  it('renders five translated radio options in an exactly labelled rating group', () => {
     render(<RatingModal {...defaultProps} />);
-    expect(screen.getByRole('button', { name: '1 star' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '2 stars' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '3 stars' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '4 stars' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '5 stars' })).toBeInTheDocument();
+    expect(screen.getByRole('radiogroup', { name: T.prompt })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: T.poor })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: T.fair })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: T.good })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: T.very_good })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: T.excellent })).toBeInTheDocument();
   });
 
   it('renders the comment textarea with the correct label', () => {
@@ -156,7 +157,7 @@ describe('RatingModal — validation', () => {
 
   it('Submit Rating button becomes enabled after selecting a star', async () => {
     render(<RatingModal {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: '3 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.good }));
     await waitFor(() => {
       const submitBtn = screen.getByText(T.submit).closest('button');
       expect(submitBtn).not.toBeDisabled();
@@ -180,39 +181,39 @@ describe('RatingModal — star selection and rating labels', () => {
 
   it('shows "Poor" after selecting 1 star', async () => {
     render(<RatingModal {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: '1 star' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.poor }));
     await waitFor(() => expect(screen.getByText(T.poor)).toBeInTheDocument());
   });
 
   it('shows "Fair" after selecting 2 stars', async () => {
     render(<RatingModal {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: '2 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.fair }));
     await waitFor(() => expect(screen.getByText(T.fair)).toBeInTheDocument());
   });
 
   it('shows "Good" after selecting 3 stars', async () => {
     render(<RatingModal {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: '3 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.good }));
     await waitFor(() => expect(screen.getByText(T.good)).toBeInTheDocument());
   });
 
   it('shows "Very Good" after selecting 4 stars', async () => {
     render(<RatingModal {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: '4 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.very_good }));
     await waitFor(() => expect(screen.getByText(T.very_good)).toBeInTheDocument());
   });
 
   it('shows "Excellent" after selecting 5 stars', async () => {
     render(<RatingModal {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: '5 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.excellent }));
     await waitFor(() => expect(screen.getByText(T.excellent)).toBeInTheDocument());
   });
 
   it('updates the label when a different star is selected', async () => {
     render(<RatingModal {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: '2 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.fair }));
     await waitFor(() => expect(screen.getByText(T.fair)).toBeInTheDocument());
-    fireEvent.click(screen.getByRole('button', { name: '5 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.excellent }));
     await waitFor(() => {
       expect(screen.queryByText(T.fair)).not.toBeInTheDocument();
       expect(screen.getByText(T.excellent)).toBeInTheDocument();
@@ -229,7 +230,7 @@ describe('RatingModal — successful submission', () => {
     vi.mocked(api.post).mockResolvedValueOnce({ success: true });
     render(<RatingModal {...defaultProps} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '4 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.very_good }));
     await waitFor(() => expect(screen.getByText(T.submit).closest('button')).not.toBeDisabled());
     fireEvent.click(screen.getByText(T.submit));
 
@@ -245,7 +246,7 @@ describe('RatingModal — successful submission', () => {
     vi.mocked(api.post).mockResolvedValueOnce({ success: true });
     render(<RatingModal {...defaultProps} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '5 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.excellent }));
 
     const textarea = screen.getByPlaceholderText(T.commentPlaceholder);
     fireEvent.change(textarea, { target: { value: 'Great service!' } });
@@ -265,7 +266,7 @@ describe('RatingModal — successful submission', () => {
     vi.mocked(api.post).mockResolvedValueOnce({ success: true });
     render(<RatingModal isOpen onClose={vi.fn()} exchangeId={777} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '3 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.good }));
     await waitFor(() => expect(screen.getByText(T.submit).closest('button')).not.toBeDisabled());
     fireEvent.click(screen.getByText(T.submit));
 
@@ -278,7 +279,7 @@ describe('RatingModal — successful submission', () => {
     vi.mocked(api.post).mockResolvedValueOnce({ success: true });
     render(<RatingModal {...defaultProps} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '3 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.good }));
     await waitFor(() => expect(screen.getByText(T.submit).closest('button')).not.toBeDisabled());
     fireEvent.click(screen.getByText(T.submit));
 
@@ -295,7 +296,7 @@ describe('RatingModal — successful submission', () => {
     vi.mocked(api.post).mockResolvedValueOnce({ success: true });
     render(<RatingModal {...defaultProps} onClose={onClose} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '2 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.fair }));
     await waitFor(() => expect(screen.getByText(T.submit).closest('button')).not.toBeDisabled());
     fireEvent.click(screen.getByText(T.submit));
 
@@ -307,7 +308,7 @@ describe('RatingModal — successful submission', () => {
     vi.mocked(api.post).mockResolvedValueOnce({ success: true });
     render(<RatingModal {...defaultProps} onRatingComplete={onRatingComplete} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '5 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.excellent }));
     await waitFor(() => expect(screen.getByText(T.submit).closest('button')).not.toBeDisabled());
     fireEvent.click(screen.getByText(T.submit));
 
@@ -318,7 +319,7 @@ describe('RatingModal — successful submission', () => {
     vi.mocked(api.post).mockResolvedValueOnce({ success: true });
     render(<RatingModal isOpen onClose={vi.fn()} exchangeId={99} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '1 star' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.poor }));
     await waitFor(() => expect(screen.getByText(T.submit).closest('button')).not.toBeDisabled());
     fireEvent.click(screen.getByText(T.submit));
 
@@ -335,7 +336,7 @@ describe('RatingModal — failed submission', () => {
     vi.mocked(api.post).mockResolvedValueOnce({ success: false, error: 'Already rated' });
     render(<RatingModal {...defaultProps} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '3 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.good }));
     await waitFor(() => expect(screen.getByText(T.submit).closest('button')).not.toBeDisabled());
     fireEvent.click(screen.getByText(T.submit));
 
@@ -348,7 +349,7 @@ describe('RatingModal — failed submission', () => {
     vi.mocked(api.post).mockResolvedValueOnce({ success: false });
     render(<RatingModal {...defaultProps} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '3 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.good }));
     await waitFor(() => expect(screen.getByText(T.submit).closest('button')).not.toBeDisabled());
     fireEvent.click(screen.getByText(T.submit));
 
@@ -361,7 +362,7 @@ describe('RatingModal — failed submission', () => {
     vi.mocked(api.post).mockRejectedValueOnce(new Error('Connection refused'));
     render(<RatingModal {...defaultProps} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '4 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.very_good }));
     await waitFor(() => expect(screen.getByText(T.submit).closest('button')).not.toBeDisabled());
     fireEvent.click(screen.getByText(T.submit));
 
@@ -375,7 +376,7 @@ describe('RatingModal — failed submission', () => {
     vi.mocked(api.post).mockResolvedValueOnce({ success: false, error: 'Server error' });
     render(<RatingModal {...defaultProps} onClose={onClose} />);
 
-    fireEvent.click(screen.getByRole('button', { name: '3 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: T.good }));
     await waitFor(() => expect(screen.getByText(T.submit).closest('button')).not.toBeDisabled());
     fireEvent.click(screen.getByText(T.submit));
 

@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Select, SelectItem, Button, Input, Avatar, Tabs, Tab, Checkbox } from '@/components/ui';
 
 /**
@@ -230,7 +231,7 @@ export function VolunteerApprovals() {
       email: i.email,
       opportunity: i.opportunity_title,
       status: i.status,
-      applied: i.created_at ? new Date(i.created_at).toLocaleDateString() : '',
+      applied: i.created_at ? new Date(i.created_at).toLocaleDateString(getFormattingLocale()) : '',
     }));
     exportToCsv(exportData as Array<Record<string, unknown>>, 'volunteer-approvals.csv');
     toast.success(t('volunteering.export_success'));
@@ -268,7 +269,7 @@ export function VolunteerApprovals() {
     },
     {
       key: 'created_at', label: t('volunteering.col_applied'), sortable: true,
-      render: (item) => <span className="text-sm text-muted">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
+      render: (item) => <span className="text-sm text-muted">{item.created_at ? new Date(item.created_at).toLocaleDateString(getFormattingLocale()) : '--'}</span>,
     },
     {
       key: 'actions', label: t('volunteering.col_actions'),

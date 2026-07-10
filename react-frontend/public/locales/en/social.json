@@ -65,12 +65,20 @@
     "minutes_ago": "{{count}}m ago",
     "hours_ago": "{{count}}h ago",
     "days_ago": "{{count}}d ago",
-    "last_seen": "Last seen {{time}}"
+    "last_seen": "Last seen {{time}}",
+    "minutes_ago_one": "{{count}}m ago",
+    "minutes_ago_other": "{{count}}m ago",
+    "hours_ago_one": "{{count}}h ago",
+    "hours_ago_other": "{{count}}h ago",
+    "days_ago_one": "{{count}}d ago",
+    "days_ago_other": "{{count}}d ago"
   },
   "mention": {
     "suggestions_aria": "Mention suggestions, {{count}} results",
     "no_users": "No users found",
-    "connected": "Connected"
+    "connected": "Connected",
+    "suggestions_aria_one": "Mention suggestions, {{count}} results",
+    "suggestions_aria_other": "Mention suggestions, {{count}} results"
   },
   "status": {
     "set_status": "Set status",
@@ -156,7 +164,9 @@
     "collection_description": "Description (optional)",
     "cancel": "Cancel",
     "save": "Save",
-    "create": "Create"
+    "create": "Create",
+    "count_one": "{{count}} saved items",
+    "count_other": "{{count}} saved items"
   },
   "verified": "Verified",
   "hover_card": {
@@ -166,7 +176,13 @@
     "message": "Message",
     "hours_given": "{{count}} hrs given",
     "connections": "{{count}} connections",
-    "listings": "{{count}} listings"
+    "listings": "{{count}} listings",
+    "hours_given_one": "{{count}} hrs given",
+    "hours_given_other": "{{count}} hrs given",
+    "connections_one": "{{count}} connections",
+    "connections_other": "{{count}} connections",
+    "listings_one": "{{count}} listings",
+    "listings_other": "{{count}} listings"
   },
   "reactions_tabs_aria": "Reaction type filter",
   "content_type_tabs_aria": "Bookmark content type filter",

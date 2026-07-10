@@ -177,7 +177,7 @@ export default function CategoryCoefficientsAdminPage() {
                 {t('category_coefficients.about.body_prefix')}{' '}
                 <Abbr term="CHF">{t('category_coefficients.about.chf_amount')}</Abbr>
                 {t('category_coefficients.about.body_middle')}{' '}
-                Caring Community {t('category_coefficients.about.body_suffix')}
+                {t('common:nav.caring_community')} {t('category_coefficients.about.body_suffix')}
               </p>
               <p className="text-muted">
                 {t('category_coefficients.about.range_prefix')} <Abbr term="ROI" /> {t('category_coefficients.about.range_suffix')}
@@ -196,8 +196,10 @@ export default function CategoryCoefficientsAdminPage() {
               <p className="font-semibold">{t('category_coefficients.migration.title')}</p>
               <p className="mt-1">
                 {t('category_coefficients.migration.body_prefix')}{' '}
+                {/* eslint-disable-next-line i18next/no-literal-string -- Database column name must remain verbatim. */}
                 <code className="rounded bg-warning-100 px-1">substitution_coefficient</code>{' '}
                 {t('category_coefficients.migration.body_middle')}{' '}
+                {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
                 <code className="rounded bg-warning-100 px-1">
                   docker exec nexus-php-app php artisan migrate
                 </code>{' '}

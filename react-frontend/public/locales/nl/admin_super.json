@@ -792,7 +792,25 @@
     "no_hub_tenants_found": "Geen hubtenants gevonden",
     "impersonate_user_warning": "Bij imitatie wordt elke actie onder de identiteit van deze gebruiker geregistreerd. Alleen gebruiken wanneer dit nodig is voor ondersteuning.",
     "partnerships_tabs_aria": "Filter voor status van federatiepartnerschap",
-    "tenant_list_tabs_aria": "Filter voor huurderstatus"
+    "tenant_list_tabs_aria": "Filter voor huurderstatus",
+    "tab_with_count_one": "{{label}}({{count}})",
+    "tab_with_count_other": "{{label}}({{count}})",
+    "users_count_one": "{{count}} gebruikers",
+    "users_count_other": "{{count}} gebruikers",
+    "bulk_users_moved_count_one": "Bulkgebruikers verplaatst ({{count}})",
+    "bulk_users_moved_count_other": "Bulkgebruikers verplaatst ({{count}})",
+    "bulk_tenants_updated_count_one": "Bulktenants bijgewerkt ({{count}})",
+    "bulk_tenants_updated_count_other": "Bulktenants bijgewerkt ({{count}})",
+    "move_n_users_one": "Verplaats {{count}} gebruikers",
+    "move_n_users_other": "Verplaats {{count}} gebruikers",
+    "apply_to_n_tenants_one": "Toepassen op {{count}} tenants",
+    "apply_to_n_tenants_other": "Toepassen op {{count}} tenants",
+    "bulk_move_confirm_message_with_grant_one": "Verplaats {{count}} gebruiker(s) en verleen tenant-superbeheerderstoegang.",
+    "bulk_move_confirm_message_with_grant_other": "Verplaats {{count}} gebruiker(s) en verleen tenant-superbeheerderstoegang.",
+    "bulk_move_confirm_message_one": "Verplaats {{count}} gebruiker(s).",
+    "bulk_move_confirm_message_other": "Verplaats {{count}} gebruiker(s).",
+    "bulk_update_confirm_message_one": "Pas deze update toe op {{count}} tenant(s).",
+    "bulk_update_confirm_message_other": "Pas deze update toe op {{count}} tenant(s)."
   },
   "tenant_form": {
     "active": "Actief",
@@ -997,7 +1015,9 @@
     "view": "Bekijk",
     "whitelisted_tenants_aria": "Witte lijst huurders",
     "whitelisted_tenants_count": "Toegestane tenants ({{count}})",
-    "failed_to_load": "Kan de witte lijst niet laden"
+    "failed_to_load": "Kan de witte lijst niet laden",
+    "whitelisted_tenants_count_one": "Toegestane tenants ({{count}})",
+    "whitelisted_tenants_count_other": "Toegestane tenants ({{count}})"
   },
   "pilot_inquiry_admin": {
     "page_title": "Vragen van piloten",
@@ -1093,14 +1113,33 @@
       "empty": "-",
       "months": "{{count}} maanden",
       "no": "Nee",
-      "yes": "Ja"
+      "yes": "Ja",
+      "months_one": "{{count}} maanden",
+      "months_other": "{{count}} maanden"
     },
     "velocity": {
       "avg_to_agreed": "Gem. tot akkoord:",
       "avg_to_live": "Gem. leven:",
       "avg_to_proposal": "Gem. tot voorstel:",
       "days": "{{count}}d",
-      "title": "Pijplijnsnelheid - gemiddelde dagen vanaf het indienen van een aanvraag tot elke mijlpaal:"
+      "title": "Pijplijnsnelheid - gemiddelde dagen vanaf het indienen van een aanvraag tot elke mijlpaal:",
+      "days_one": "{{count}}d",
+      "days_other": "{{count}}d"
     }
-  }
+  },
+  "events": "Evenementen",
+  "groups": "Groepen",
+  "gamification": "Gamificatie",
+  "goals": "Doelen",
+  "blog": "Bloggen",
+  "resources": "Bronnen",
+  "volunteering": "Vrijwilligerswerk",
+  "federation": "Federatie",
+  "wallet": "Portemonnee",
+  "messages": "Berichten",
+  "dashboard": "Dashboard",
+  "exchange_workflow": "Uitwisselingsworkflow",
+  "organisations": "Organisaties",
+  "listings": "Advertenties",
+  "feed": "Voer"
 }

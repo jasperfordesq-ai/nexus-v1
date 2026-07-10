@@ -40,5 +40,13 @@
   },
   "page_meta": {
     "title": "Czat AI"
-  }
+  },
+  "card_wallet_transactions_few": "{{count}} transakcji w ciągu ostatnich 30 dni",
+  "card_wallet_transactions_many": "{{count}} transakcji w ciągu ostatnich 30 dni",
+  "card_wallet_transactions_one": "{{count}} transakcji w ciągu ostatnich 30 dni",
+  "card_wallet_transactions_other": "{{count}} transakcji w ciągu ostatnich 30 dni",
+  "limits_left_today_few": "{{count}} opuścił dzisiaj",
+  "limits_left_today_many": "{{count}} opuścił dzisiaj",
+  "limits_left_today_one": "{{count}} opuścił dzisiaj",
+  "limits_left_today_other": "{{count}} opuścił dzisiaj"
 }

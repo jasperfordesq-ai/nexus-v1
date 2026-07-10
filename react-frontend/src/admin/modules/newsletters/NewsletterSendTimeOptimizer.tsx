@@ -173,10 +173,9 @@ export function NewsletterSendTimeOptimizer() {
               <div className="overflow-x-auto">
                 <div className="inline-block min-w-full">
                   <div
-                    className="grid gap-1"
+                    className="grid grid-cols-[auto_repeat(24,minmax(0,1fr))] gap-1"
                     role="grid"
                     aria-label={t('newsletter_send_time.engagement_heatmap')}
-                    style={{ gridTemplateColumns: 'auto repeat(24, 1fr)' }}
                   >
                     {/* Header row - hours */}
                     <div></div>

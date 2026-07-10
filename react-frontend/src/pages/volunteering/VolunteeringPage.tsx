@@ -7,6 +7,7 @@
  * Volunteering Page - Browse opportunities, track hours, manage applications
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import React, { useState, useEffect, useCallback, useRef, Suspense, type Key } from 'react';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
@@ -182,7 +183,7 @@ function localCalendarDate(d: Date = new Date()): string {
 function formatYearMonthLabel(yearMonth: string): string {
   const [y, m] = yearMonth.split('-').map((n) => parseInt(n, 10));
   if (!y || !m) return yearMonth;
-  return new Date(y, m - 1, 1).toLocaleDateString(undefined, { year: 'numeric', month: 'long' });
+  return new Date(y, m - 1, 1).toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'long' });
 }
 
 const statusColor = (status: string) => {
@@ -891,13 +892,13 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
             <div className="min-w-0">
               <Link
                 to={tenantPath(`/volunteering/opportunities/${opportunity.id}`)}
-                className="font-semibold text-theme-primary text-lg truncate block hover:text-indigo-500 transition-colors"
+                className="font-semibold text-theme-primary text-lg truncate block hover:text-accent transition-colors"
               >
                 {opportunity.title}
               </Link>
               <Link
                 to={tenantPath(`/organisations/${opportunity.organization.id}`)}
-                className="text-sm text-theme-muted hover:text-indigo-500 hover:underline transition-colors"
+                className="text-sm text-theme-muted hover:text-accent hover:underline transition-colors"
               >
                 {opportunity.organization.name}
               </Link>
@@ -931,8 +932,8 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
             {startDate && (
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" aria-hidden="true" />
-                {startDate.toLocaleDateString()}
-                {endDate ? `${t('date_range_separator')}${endDate.toLocaleDateString()}` : ''}
+                {startDate.toLocaleDateString(getFormattingLocale())}
+                {endDate ? `${t('date_range_separator')}${endDate.toLocaleDateString(getFormattingLocale())}` : ''}
               </span>
             )}
             {categoryName && (
@@ -1158,7 +1159,7 @@ function ApplicationsTab() {
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                          <Link to={tenantPath(`/volunteering/opportunities/${app.opportunity.id}`)} className="font-semibold text-theme-primary hover:text-indigo-400 transition-colors">{app.opportunity.title}</Link>
+                          <Link to={tenantPath(`/volunteering/opportunities/${app.opportunity.id}`)} className="font-semibold text-theme-primary hover:text-accent transition-colors">{app.opportunity.title}</Link>
                           <Chip
                             size="sm"
                             color={statusColor(app.status)}
@@ -1175,7 +1176,7 @@ function ApplicationsTab() {
 
                         <Link
                           to={tenantPath(`/organisations/${app.organization.id}`)}
-                          className="text-sm text-theme-muted hover:text-indigo-500 hover:underline transition-colors mb-2 inline-flex items-center gap-1"
+                          className="text-sm text-theme-muted hover:text-accent hover:underline transition-colors mb-2 inline-flex items-center gap-1"
                         >
                           <Building2 className="w-3 h-3" aria-hidden="true" />
                           {app.organization.name}
@@ -1191,7 +1192,7 @@ function ApplicationsTab() {
                         {app.shift && (
                           <p className="text-xs text-theme-subtle flex items-center gap-1 mb-1">
                             <Clock className="w-3 h-3" aria-hidden="true" />
-                            {new Date(app.shift.start_time).toLocaleString()} - {new Date(app.shift.end_time).toLocaleTimeString()}
+                            {new Date(app.shift.start_time).toLocaleString(getFormattingLocale())} - {new Date(app.shift.end_time).toLocaleTimeString(getFormattingLocale())}
                           </p>
                         )}
 
@@ -1203,7 +1204,7 @@ function ApplicationsTab() {
                         )}
 
                         <p className="text-xs text-theme-subtle mt-2">
-                          {t('applied_on', { date: new Date(app.created_at).toLocaleDateString() })}
+                          {t('applied_on', { date: new Date(app.created_at).toLocaleDateString(getFormattingLocale()) })}
                         </p>
                       </div>
 

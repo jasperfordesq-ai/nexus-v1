@@ -276,7 +276,13 @@
     "members_tabs_aria": "Type de rapport de membre",
     "hours_by_category_aria": "Graphique à barres montrant les heures échangées par catégorie",
     "hours_distribution_aria": "Diagramme circulaire montrant la répartition des heures d'échange de temps",
-    "hours_trend_aria": "Graphique en aires montrant les heures échangées au fil du temps"
+    "hours_trend_aria": "Graphique en aires montrant les heures échangées au fil du temps",
+    "members_selected_count_many": "{{count}}sélectionné",
+    "members_selected_count_one": "{{count}}sélectionné",
+    "members_selected_count_other": "{{count}}sélectionné",
+    "days_count_many": "{{count}} jours",
+    "days_count_one": "{{count}} jours",
+    "days_count_other": "{{count}} jours"
   },
   "municipal_reports": {
     "meta": {
@@ -387,7 +393,13 @@
       "hours": "{{count}}h",
       "disabled": "Désactivé",
       "activities": "{{count}} activités",
-      "trend_detail": "{{participants}} participants, {{activities}} activités"
+      "trend_detail": "{{participants}} participants, {{activities}} activités",
+      "hours_many": "{{count}}h",
+      "hours_one": "{{count}}h",
+      "hours_other": "{{count}}h",
+      "activities_many": "{{count}} activités",
+      "activities_one": "{{count}} activités",
+      "activities_other": "{{count}} activités"
     },
     "toast": {
       "load_failed": "Échec du chargement des données d'impact municipal.",
@@ -470,7 +482,10 @@
         "partner_organisations_by_hours": "Organisations partenaires (par heures)",
         "no_partner_activity": "Aucune activité partenaire sur cette période.",
         "top_5_categories": "Top 5 des catégories (répartition géographique/activité)",
-        "no_category_data": "Aucune donnée de catégorie sur cette période."
+        "no_category_data": "Aucune donnée de catégorie sur cette période.",
+        "trusted_total_many": "sur {{count}} total de confiance.",
+        "trusted_total_one": "sur {{count}} total de confiance.",
+        "trusted_total_other": "sur {{count}} total de confiance."
       },
       "cooperative": {
         "empty_title": "Coopérative (cooperative interne)",
@@ -487,8 +502,20 @@
         "coordinator_load": "Charge du coordinateur",
         "coordinator_load_desc": "{{pending}} en attente auprès de {{coordinators}} coordinateurs.",
         "future_care_credit_pool": "Pool de soldes de crédits pour soins futurs",
-        "future_care_credit_pool_desc": "Somme des soldes positifs des membres - la réserve implicite de soins futurs de la coopérative. Base de membres actifs: {{count}}."
-      }
+        "future_care_credit_pool_desc": "Somme des soldes positifs des membres - la réserve implicite de soins futurs de la coopérative. Base de membres actifs: {{count}}.",
+        "member_retention_desc_many": "{{count}} membres actifs à la fois pendant cette période et la période équivalente précédente.",
+        "member_retention_desc_one": "{{count}} membres actifs à la fois pendant cette période et la période équivalente précédente.",
+        "member_retention_desc_other": "{{count}} membres actifs à la fois pendant cette période et la période équivalente précédente.",
+        "reciprocity_rate_desc_many": "Les supporters {{count}} ont également reçu des heures au cours de cette période.",
+        "reciprocity_rate_desc_one": "Les supporters {{count}} ont également reçu des heures au cours de cette période.",
+        "reciprocity_rate_desc_other": "Les supporters {{count}} ont également reçu des heures au cours de cette période.",
+        "future_care_credit_pool_desc_many": "Somme des soldes positifs des membres - la réserve implicite de soins futurs de la coopérative. Base de membres actifs: {{count}}.",
+        "future_care_credit_pool_desc_one": "Somme des soldes positifs des membres - la réserve implicite de soins futurs de la coopérative. Base de membres actifs: {{count}}.",
+        "future_care_credit_pool_desc_other": "Somme des soldes positifs des membres - la réserve implicite de soins futurs de la coopérative. Base de membres actifs: {{count}}."
+      },
+      "logs_count_many": "{{count}} journaux",
+      "logs_count_one": "{{count}} journaux",
+      "logs_count_other": "{{count}} journaux"
     },
     "cards": {
       "verified_hours": {
@@ -519,6 +546,18 @@
         "metric_2": "Avis",
         "metric_3": "Piste d'audit"
       }
+    }
+  },
+  "caring_workflow": {
+    "policy": {
+      "periods": {
+        "last_90_days": "90 derniers jours"
+      }
+    }
+  },
+  "municipal_impact": {
+    "portfolio": {
+      "yoy_value": "{{sign}}{{value}} % sur un an"
     }
   }
 }

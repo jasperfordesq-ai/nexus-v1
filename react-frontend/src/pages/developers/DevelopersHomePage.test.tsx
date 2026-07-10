@@ -51,9 +51,9 @@ describe('DevelopersHomePage', () => {
     // navLinks array has 3 entries rendered as pressable cards/links
     const links = screen.getAllByRole('link');
     const hrefs = links.map((l) => l.getAttribute('href') ?? '');
-    expect(hrefs.some((h) => h.includes('/developers/auth'))).toBe(true);
-    expect(hrefs.some((h) => h.includes('/developers/endpoints'))).toBe(true);
-    expect(hrefs.some((h) => h.includes('/developers/webhooks'))).toBe(true);
+    expect(hrefs).toContain('/test/developers/auth');
+    expect(hrefs).toContain('/test/developers/endpoints');
+    expect(hrefs).toContain('/test/developers/webhooks');
   });
 
   it('renders the request-access CTA link to /contact', () => {
@@ -61,7 +61,8 @@ describe('DevelopersHomePage', () => {
     const contactLinks = screen.getAllByRole('link').filter((l) =>
       (l.getAttribute('href') ?? '').includes('/contact'),
     );
-    expect(contactLinks.length).toBeGreaterThanOrEqual(1);
+    expect(contactLinks).toHaveLength(1);
+    expect(contactLinks[0]).toHaveAttribute('href', '/test/contact');
   });
 
   it('renders an h2 for the section overview', () => {

@@ -124,7 +124,11 @@
         "year": "Rok",
         "yearly": "Rocznie",
         "annual": "Coroczny"
-      }
+      },
+      "total_few": "{{count}} łącznie",
+      "total_many": "{{count}} łącznie",
+      "total_one": "{{count}} łącznie",
+      "total_other": "{{count}} łącznie"
     },
     "table": {
       "aria": "Poziomy premium",
@@ -203,7 +207,11 @@
         "restricted": "Potrzebne działanie",
         "unknown": "Stan nieznany"
       },
-      "connect_fallback_active": "Konto Stripe Connect jest skonfigurowane, ale nie jest jeszcze gotowe do przyjmowania darowizn na żywo. Do momentu zakończenia wdrożenia płatności będą korzystać z platformy zastępczej."
+      "connect_fallback_active": "Konto Stripe Connect jest skonfigurowane, ale nie jest jeszcze gotowe do przyjmowania darowizn na żywo. Do momentu zakończenia wdrożenia płatności będą korzystać z platformy zastępczej.",
+      "requirements_due_few": "Wymagania dotyczące konta Stripe wymagające uwagi: {{count}}.",
+      "requirements_due_many": "Wymagania dotyczące konta Stripe wymagające uwagi: {{count}}.",
+      "requirements_due_one": "Wymagania dotyczące konta Stripe wymagające uwagi: {{count}}.",
+      "requirements_due_other": "Wymagania dotyczące konta Stripe wymagające uwagi: {{count}}."
     },
     "finance": {
       "title": "Operacje finansowe",
@@ -222,7 +230,17 @@
       "past_due_count": "{{count}} past due",
       "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Eksportuj roczne wpływy",
-      "empty": "Nie zarejestrowano jeszcze żadnej działalności finansowej."
+      "empty": "Nie zarejestrowano jeszcze żadnej działalności finansowej.",
+      "donation_count_few": "{{count}} donation",
+      "donation_count_many": "{{count}} donation",
+      "donation_count_one": "Darowizna {{count}}",
+      "declaration_count_few": "{{count}} declaration",
+      "declaration_count_many": "{{count}} declaration",
+      "declaration_count_one": "Deklaracja {{count}}",
+      "past_due_count_few": "{{count}} past due",
+      "past_due_count_many": "{{count}} past due",
+      "past_due_count_one": "{{count}} przeterminowany",
+      "past_due_count_other": "{{count}} przeterminowany"
     }
   }
 }

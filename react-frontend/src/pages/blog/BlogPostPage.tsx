@@ -35,7 +35,7 @@ import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl, resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { resolveAssetUrl, resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -121,7 +121,7 @@ const categoryColorMap: Record<string, string> = {
   blue: 'bg-blue-500/10 text-[var(--color-info)]',
   gray: 'bg-gray-500/10 text-gray-500',
   fuchsia: 'bg-fuchsia-500/10 text-fuchsia-500',
-  purple: 'bg-purple-500/10 text-purple-500',
+  purple: 'bg-accent/10 text-accent',
   green: 'bg-emerald-500/10 text-emerald-500',
   red: 'bg-rose-500/10 text-rose-500',
   yellow: 'bg-amber-500/10 text-[var(--color-warning)]',
@@ -222,7 +222,7 @@ export function BlogPostPage() {
               {t('post.back_to_blog')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
+              className="bg-gradient-to-r from-blue-500 to-accent-gradient-end text-white"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={loadPost}
             >
@@ -335,7 +335,7 @@ export function BlogPostPage() {
 
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" aria-hidden="true" />
-              {new Date(post.published_at).toLocaleDateString('en-GB', {
+              {new Date(post.published_at).toLocaleDateString(getFormattingLocale(), {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',

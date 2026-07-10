@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { GroupPolicy } from '@/admin/api/types';
-import { Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
+import { Button, Input, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter, Switch } from '@/components/ui';
 
 interface GroupPoliciesProps {
   isOpen: boolean;
@@ -165,10 +165,10 @@ export default function GroupPolicies({
     <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside">
       <ModalContent>
         <ModalHeader>
-          <div>
-            <div className="text-lg font-semibold text-foreground">{t('groups.group_policies')}</div>
-            <div className="text-sm font-normal text-muted mt-1">{typeName}</div>
-          </div>
+          <ModalHeading className="text-lg font-semibold text-foreground">
+            {t('groups.group_policies')}
+          </ModalHeading>
+          <p className="mt-1 text-sm font-normal text-muted">{typeName}</p>
         </ModalHeader>
         <ModalBody>
           {loading ? (

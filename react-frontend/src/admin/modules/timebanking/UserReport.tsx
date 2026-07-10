@@ -18,7 +18,7 @@ import Download from 'lucide-react/icons/download';
 import PlusCircle from 'lucide-react/icons/circle-plus';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { formatNumber, resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { adminTimebanking } from '../../api/adminApi';
 import { DataTable, type Column } from '../../components/DataTable';
 import { PageHeader } from '../../components/PageHeader';
@@ -172,7 +172,7 @@ export function UserReport() {
         sortable: true,
         render: (user) => (
           <span className="text-sm font-semibold">
-            {user.balance.toLocaleString()}h
+            {formatNumber(user.balance, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
           </span>
         ),
       },
@@ -182,7 +182,7 @@ export function UserReport() {
         sortable: true,
         render: (user) => (
           <span className="text-sm text-success">
-            +{user.total_earned.toLocaleString()}h
+            {formatNumber(user.total_earned, { signDisplay: 'always', style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
           </span>
         ),
       },
@@ -192,7 +192,7 @@ export function UserReport() {
         sortable: true,
         render: (user) => (
           <span className="text-sm text-danger">
-            -{user.total_spent.toLocaleString()}h
+            {formatNumber(-user.total_spent, { signDisplay: 'always', style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
           </span>
         ),
       },
@@ -280,7 +280,7 @@ export function UserReport() {
             </ModalHeader>
             <ModalBody className="gap-4">
               <p className="text-sm text-muted">
-                {t('timebanking.current_balance')}: <strong>{adjustTarget.balance}h</strong>
+                {t('timebanking.current_balance')}: <strong>{formatNumber(adjustTarget.balance, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}</strong>
               </p>
               <Input
                 label={t('timebanking.label_amount_hours')}

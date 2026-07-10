@@ -116,7 +116,8 @@
       "intended_use": "Uso previsto",
       "rejection_reason": "Motivo del rechazo",
       "provisioning_log": "Registro de aprovisionamiento"
-    }
+    },
+    "loading": "Cargando solicitudes de aprovisionamiento..."
   },
   "loading": "Loading",
   "refresh": "Actualizar"

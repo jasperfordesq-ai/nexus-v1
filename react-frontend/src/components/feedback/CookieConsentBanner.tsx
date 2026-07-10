@@ -63,8 +63,7 @@ export function CookieConsentBanner() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="fixed bottom-0 inset-x-0 z-[700] p-2 sm:p-4"
-        style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}
+        className="fixed bottom-0 inset-x-0 z-[700] p-2 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] sm:p-4"
         role="dialog"
         aria-label={t('cookie_consent.banner_label')}
         aria-modal="false"
@@ -72,10 +71,6 @@ export function CookieConsentBanner() {
       >
         <Card
           className="mx-auto max-h-[calc(100dvh-1.5rem)] max-w-3xl overflow-y-auto rounded-lg border border-[var(--border-strong)] bg-[var(--surface-overlay)] shadow-2xl shadow-black/20 supports-[backdrop-filter]:bg-[var(--glass-bg)]"
-          style={{
-            backdropFilter: 'blur(var(--glass-blur)) saturate(var(--glass-saturate))',
-            WebkitBackdropFilter: 'blur(var(--glass-blur)) saturate(var(--glass-saturate))',
-          }}
         >
           <Card.Content className="p-3 sm:p-5">
             {/* Header row */}
@@ -153,7 +148,7 @@ export function CookieConsentBanner() {
                     {/* Preferences */}
                     <div className="flex items-center justify-between gap-3 rounded-lg border border-[var(--border-default)] bg-[var(--surface-elevated)] p-2.5 sm:rounded-xl sm:p-3">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <Cookie className="w-4 h-4 text-purple-500 flex-shrink-0" aria-hidden="true" />
+                        <Cookie className="w-4 h-4 text-accent flex-shrink-0" aria-hidden="true" />
                         <div>
                           <p className="text-sm font-medium text-[var(--text-primary)]">
                             {t('cookie_consent.preferences')}

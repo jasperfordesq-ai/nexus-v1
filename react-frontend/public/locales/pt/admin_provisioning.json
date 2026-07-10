@@ -116,7 +116,8 @@
       "intended_use": "Uso pretendido",
       "rejection_reason": "Motivo da rejeição",
       "provisioning_log": "Registro de provisionamento"
-    }
+    },
+    "loading": "Carregando solicitações de provisionamento…"
   },
   "loading": "Loading",
   "refresh": "Atualizar"

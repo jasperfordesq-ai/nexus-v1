@@ -132,6 +132,9 @@
     "no_challenges_found": "Aucun défi trouvé trouvé",
     "no_matching_challenges": "Aucun défi correspondant trouvé",
     "no_status_challenges": "Aucun problème de statut trouvé",
-    "tabs_aria": "Filtre de statut de défi"
+    "tabs_aria": "Filtre de statut de défi",
+    "total_count_many": "Total: {{count}}",
+    "total_count_one": "Total : {{count}}",
+    "total_count_other": "Total : {{count}}"
   }
 }

@@ -1074,7 +1074,7 @@ export function GroupDetailPage() {
               {t('detail.browse_groups')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadGroup()}
             >

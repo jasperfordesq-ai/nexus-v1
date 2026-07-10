@@ -90,7 +90,13 @@
     "members_count": "{{count}} أعضاء",
     "empty": "لم تنضم إلى أي مجموعات بعد",
     "empty_description": "تساعدك المجموعات على متابعة الاهتمامات المشتركة والمشاريع والدوائر المحلية.",
-    "discover": "اكتشف المجموعات"
+    "discover": "اكتشف المجموعات",
+    "members_count_few": "{{count}} أعضاء",
+    "members_count_many": "{{count}} أعضاء",
+    "members_count_one": "{{count}} أعضاء",
+    "members_count_other": "{{count}} أعضاء",
+    "members_count_two": "{{count}} أعضاء",
+    "members_count_zero": "{{count}} أعضاء"
   },
   "events": {
     "online_event": "حدث عبر الإنترنت",
@@ -106,7 +112,13 @@
     "xp_progress": "تقدم XP",
     "start_earning": "ابدأ في كسب XP من خلال المشاركة في المجتمع!",
     "streak_days_one": "{{count}} يوم",
-    "streak_days_other": "{{count}} أيام"
+    "streak_days_other": "{{count}} أيام",
+    "xp_value_few": "{{count}} XP",
+    "xp_value_many": "{{count}} XP",
+    "xp_value_one": "{{count}} XP",
+    "xp_value_other": "{{count}} XP",
+    "xp_value_two": "{{count}} XP",
+    "xp_value_zero": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "جارٍ تحميل القوائم",
@@ -150,5 +162,17 @@
       "active": "نشط"
     },
     "view_all": "عرض جميع التبادلات"
-  }
+  },
+  "likes_count_few": "{{count}} likes",
+  "likes_count_many": "{{count}} likes",
+  "likes_count_one": "{{count}} إعجابات",
+  "likes_count_other": "{{count}} إعجابات",
+  "likes_count_two": "{{count}} likes",
+  "likes_count_zero": "{{count}} likes",
+  "comments_count_few": "{{count}} comments",
+  "comments_count_many": "{{count}} comments",
+  "comments_count_one": "{{count}} التعليقات",
+  "comments_count_other": "{{count}} التعليقات",
+  "comments_count_two": "{{count}} comments",
+  "comments_count_zero": "{{count}} comments"
 }

@@ -194,8 +194,8 @@ export function MatchesPage() {
       <div className="flex items-center justify-between gap-2">
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
-              <Sparkles className="w-6 h-6 text-indigo-400" />
+            <div className="p-2 rounded-xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20">
+              <Sparkles className="w-6 h-6 text-accent" />
             </div>
             {t('heading')}
           </h1>
@@ -235,7 +235,7 @@ export function MatchesPage() {
           title={t('banner.no_coords_title')}
           description={t('banner.no_coords_desc')}
           endContent={
-            <Button as={Link} to={tenantPath('/settings?tab=profile')} size="sm" className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
+            <Button as={Link} to={tenantPath('/settings?tab=profile')} size="sm" className="bg-gradient-to-r from-accent to-accent-gradient-end text-white">
               {t('empty.set_location_cta')}
             </Button>
           }
@@ -278,7 +278,7 @@ export function MatchesPage() {
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <GlassCard className="p-4 text-center">
-          <Target className="w-5 h-5 text-indigo-400 mx-auto mb-1" aria-hidden="true" />
+          <Target className="w-5 h-5 text-accent mx-auto mb-1" aria-hidden="true" />
           <p className="text-2xl font-bold text-theme-primary">{totalMatches}</p>
           <p className="text-xs text-theme-subtle">{t('stats_total_matches')}</p>
         </GlassCard>
@@ -295,7 +295,7 @@ export function MatchesPage() {
           <p className="text-xs text-theme-subtle">{t('stats_hot_matches')}</p>
         </GlassCard>
         <GlassCard className="p-4 text-center">
-          <ArrowLeftRight className="w-5 h-5 text-purple-400 mx-auto mb-1" aria-hidden="true" />
+          <ArrowLeftRight className="w-5 h-5 text-accent mx-auto mb-1" aria-hidden="true" />
           <p className="text-2xl font-bold text-theme-primary">{mutualCount}</p>
           <p className="text-xs text-theme-subtle">{t('stats_mutual_matches')}</p>
         </GlassCard>
@@ -367,7 +367,7 @@ export function MatchesPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h2>
           <p className="text-theme-muted mb-4">{t('load_failed')}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadMatches()}
           >

@@ -100,5 +100,8 @@
   "page_meta": {
     "title": "Sondaggi"
   },
-  "category_filter_label": "Filtra per categoria"
+  "category_filter_label": "Filtra per categoria",
+  "total_ballots_many": "Totale schede: {{count}}",
+  "total_ballots_one": "Totale schede: {{count}}",
+  "total_ballots_other": "Totale schede: {{count}}"
 }

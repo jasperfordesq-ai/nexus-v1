@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Textarea, Progress, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
@@ -289,7 +290,7 @@ export function BillingPage() {
                       </p>
                       <p className="font-medium">
                         {subscription.current_period_end
-                          ? new Date(subscription.current_period_end).toLocaleDateString()
+                          ? new Date(subscription.current_period_end).toLocaleDateString(getFormattingLocale())
                           : '--'}
                       </p>
                     </div>
@@ -299,7 +300,7 @@ export function BillingPage() {
                           {t('billing.trial_ends')}
                         </p>
                         <p className="font-medium">
-                          {new Date(subscription.trial_ends_at).toLocaleDateString()}
+                          {new Date(subscription.trial_ends_at).toLocaleDateString(getFormattingLocale())}
                         </p>
                       </div>
                     )}

@@ -33,7 +33,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';
 import { useTenant,
   useToast } from '@/contexts';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { formatNumber, resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { adminUsers,
   type BulkActionResult } from '../../api/adminApi';
@@ -596,7 +596,7 @@ export function UserList() {
       key: 'balance',
       label: t('users.col_balance'),
       sortable: true,
-      render: (user) => <span>{user.balance ?? 0}h</span>,
+      render: (user) => <span>{formatNumber(user.balance ?? 0, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}</span>,
     },
     {
       key: 'created_at',
@@ -604,7 +604,7 @@ export function UserList() {
       sortable: true,
       render: (user) => (
         <span className="text-sm text-muted">
-          {new Date(user.created_at).toLocaleDateString()}
+          {new Date(user.created_at).toLocaleDateString(getFormattingLocale())}
         </span>
       ),
     },

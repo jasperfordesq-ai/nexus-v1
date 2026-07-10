@@ -100,5 +100,9 @@
   "page_meta": {
     "title": "Ankiety"
   },
-  "category_filter_label": "Filtruj według kategorii"
+  "category_filter_label": "Filtruj według kategorii",
+  "total_ballots_few": "Łączna liczba głosów: {{count}}",
+  "total_ballots_many": "Łączna liczba głosów: {{count}}",
+  "total_ballots_one": "Łączna liczba głosów: {{count}}",
+  "total_ballots_other": "Łączna liczba głosów: {{count}}"
 }

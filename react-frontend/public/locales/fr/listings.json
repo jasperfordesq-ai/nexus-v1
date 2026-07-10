@@ -111,7 +111,10 @@
     "service_type_physical": "Uniquement en présentiel",
     "service_type_physical_hint": "Nécessite un lieu physique partagé",
     "service_type_remote": "Uniquement à distance",
-    "service_type_remote_hint": "Peut se faire par téléphone, chat ou vidéo"
+    "service_type_remote_hint": "Peut se faire par téléphone, chat ou vidéo",
+    "character_count_many": "{{count}}/{{max}}",
+    "character_count_one": "{{count}}/{{max}}",
+    "character_count_other": "{{count}}/{{max}}"
   },
   "page_subtitle": "Parcourez les services et demandes de la communauté",
   "hero_eyebrow": "Tableau d'échange communautaire",
@@ -247,7 +250,10 @@
     "placeholder": "Saisissez une compétence et appuyez sur Entrée...",
     "aria_add": "Ajouter une étiquette de compétence",
     "aria_add_count": "Ajouter une balise de compétence ({{current}} sur {{max}})",
-    "aria_results": "{{count}} suggestions de compétences disponibles"
+    "aria_results": "{{count}} suggestions de compétences disponibles",
+    "aria_results_many": "{{count}} suggestions de compétences disponibles",
+    "aria_results_one": "{{count}} suggestions de compétences disponibles",
+    "aria_results_other": "{{count}} suggestions de compétences disponibles"
   },
   "more_filters": "Plus de filtres",
   "filters_label": "Filtres",
@@ -269,7 +275,13 @@
     "load_error": "Impossible de charger les statistiques",
     "retry": "Réessayer",
     "no_data": "Aucune vue pour l'instant — revenez après que votre annonce ait reçu du trafic",
-    "bar_label": "{{date}} : {{count}} vues"
+    "bar_label": "{{date}} : {{count}} vues",
+    "unique_viewers_many": "{{count}} uniques",
+    "unique_viewers_one": "{{count}} uniques",
+    "unique_viewers_other": "{{count}} uniques",
+    "bar_label_many": "{{date}} : {{count}} vues",
+    "bar_label_one": "{{date}} : {{count}} vues",
+    "bar_label_other": "{{date}} : {{count}} vues"
   },
   "filter_hours": "Durée",
   "filter_any_duration": "Toute durée",
@@ -349,5 +361,9 @@
   "listing_image_alt": "Image de la liste",
   "open_listing_aria": "Ouvrir l'annonce : {{title}}",
   "distance_meters": "{{distance}} m",
-  "distance_kilometers": "{{distance}} km"
+  "distance_kilometers": "{{distance}} km",
+  "results_count_many": "{{count}} annonces trouvées",
+  "listings_loaded_count_many": "{{count}} annonces chargées",
+  "detail_hours_many": "{{count}} heures",
+  "detail_renewed_count_many": "Renouvelée {{count}} fois"
 }

@@ -158,7 +158,13 @@
       "delete_confirm_title": "Geselecteerde berichten verwijderen?",
       "publish": "Publiceren",
       "publish_confirm_message": "{{count}} geselecteerde bericht(en) publiceren?",
-      "publish_confirm_title": "Geselecteerde berichten publiceren?"
+      "publish_confirm_title": "Geselecteerde berichten publiceren?",
+      "publish_confirm_message_one": "{{count}} geselecteerde bericht(en) publiceren?",
+      "publish_confirm_message_other": "{{count}} geselecteerde bericht(en) publiceren?",
+      "archive_confirm_message_one": "Hierdoor worden de {{count}}-post(s) ongedaan gemaakt. Ze kunnen later opnieuw worden gepubliceerd.",
+      "archive_confirm_message_other": "Hierdoor worden de {{count}}-post(s) ongedaan gemaakt. Ze kunnen later opnieuw worden gepubliceerd.",
+      "delete_confirm_message_one": "{{count}} geselecteerde bericht(en) verwijderen? Dit kan niet ongedaan worden gemaakt.",
+      "delete_confirm_message_other": "{{count}} geselecteerde bericht(en) verwijderen? Dit kan niet ongedaan worden gemaakt."
     },
     "marketplace": {
       "reason_label": "Reden",

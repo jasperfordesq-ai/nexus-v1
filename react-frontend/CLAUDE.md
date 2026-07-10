@@ -110,7 +110,7 @@ import { Button, Card, Input } from "@heroui/react";
 | File | Purpose |
 |------|---------|
 | `src/index.css` | Tailwind CSS 4 entry, HeroUI plugin, design token imports |
-| `src/hero.ts` | HeroUI Tailwind plugin configuration |
+| `src/contexts/ThemeContext.tsx` | Runtime light/dark/system, contrast, and accent preferences |
 | `src/styles/tokens.css` | CSS custom properties (light/dark themes) |
 
 ## Key Files

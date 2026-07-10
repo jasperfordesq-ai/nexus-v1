@@ -13,7 +13,7 @@
 
 import '@testing-library/jest-dom';
 import * as axeMatchers from 'vitest-axe/matchers';
-import { expect, vi, beforeAll, afterAll, afterEach } from 'vitest';
+import { expect, vi, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 expect.extend(axeMatchers);
 
@@ -30,11 +30,40 @@ if (typeof Element !== 'undefined') {
   }
 }
 
-// Ensure DOM is cleaned up after every test so renders from one test never
-// bleed into the next — critical for singleFork mode where jsdom is shared.
-afterEach(() => {
-  cleanup();
-});
+// axe-core uses a tiny canvas probe to distinguish icon-font ligatures. jsdom
+// exposes getContext() but throws unless the optional native canvas package is
+// installed, which floods otherwise passing accessibility tests and prevents
+// console output from being treated as a real regression signal.
+if (typeof HTMLCanvasElement !== 'undefined') {
+  Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
+    configurable: true,
+    value: vi.fn(function mockCanvasContext(this: HTMLCanvasElement) {
+      return {
+        canvas: this,
+        font: '',
+        textAlign: 'left',
+        textBaseline: 'top',
+        measureText: (text: string) => ({
+          width: Math.max(1, String(text).length * 8),
+        }) as TextMetrics,
+        fillText: () => undefined,
+        clearRect: () => undefined,
+        getImageData: () => ({
+          data: new Uint8ClampedArray([0, 0, 0, 255]),
+        }),
+      } as unknown as CanvasRenderingContext2D;
+    }),
+  });
+}
+
+// axe also asks for pseudo-element styles. jsdom logs a "not implemented"
+// error whenever the optional second argument is supplied, even though axe can
+// safely use the element's computed style as a fallback in component tests.
+if (typeof window !== 'undefined') {
+  const getComputedStyle = window.getComputedStyle.bind(window);
+  window.getComputedStyle = ((element: Element, pseudoElement?: string | null) =>
+    getComputedStyle(element, pseudoElement ? undefined : pseudoElement)) as typeof window.getComputedStyle;
+}
 
 // Global mock for @/components/seo — PageMeta calls useTenant() for branding which
 // is never present in test mocks. Make it a no-op for all tests globally.
@@ -47,10 +76,29 @@ vi.mock('@/components/seo', () => ({
 const originalError = console.error.bind(console);
 const originalWarn = console.warn.bind(console);
 const originalLog = console.log.bind(console);
+const failOnUnexpectedConsole = process.env.NEXUS_FAIL_ON_UNEXPECTED_CONSOLE === '1';
+let unexpectedConsoleOutput: string[] = [];
+
+function formatConsoleArgs(args: unknown[]): string {
+  return args.map((value) => {
+    if (value instanceof Error) return value.stack ?? value.message;
+    if (typeof value === 'string') return value;
+    try { return JSON.stringify(value); } catch { return String(value); }
+  }).join(' ');
+}
+
+beforeEach(() => {
+  unexpectedConsoleOutput = [];
+});
 
 beforeAll(() => {
   console.error = (...args: unknown[]) => {
     const msg = String(args[0] ?? '');
+    if (failOnUnexpectedConsole) {
+      unexpectedConsoleOutput.push(`console.error: ${formatConsoleArgs(args)}`);
+      originalError(...args);
+      return;
+    }
     // Suppress act() warnings, React Router future flags, i18next backend noise
     if (
       msg.includes('not wrapped in act') ||
@@ -62,6 +110,11 @@ beforeAll(() => {
   };
   console.warn = (...args: unknown[]) => {
     const msg = String(args[0] ?? '');
+    if (failOnUnexpectedConsole) {
+      unexpectedConsoleOutput.push(`console.warn: ${formatConsoleArgs(args)}`);
+      originalWarn(...args);
+      return;
+    }
     if (
       msg.includes('React Router Future Flag') ||
       msg.includes('i18next') ||
@@ -97,6 +150,16 @@ afterAll(() => {
   // Workers are long-lived (handle many files); --expose-gc in vitest.config enables this.
   if (typeof (globalThis as Record<string, unknown>).gc === 'function') {
     (globalThis as Record<string, unknown>).gc();
+  }
+});
+
+afterEach(() => {
+  // Always clean portals before reporting captured output. Vitest executes
+  // afterEach hooks in stack order, so keeping cleanup and enforcement in one
+  // hook prevents a warning failure from leaving DOM behind for the next test.
+  cleanup();
+  if (failOnUnexpectedConsole && unexpectedConsoleOutput.length > 0) {
+    throw new Error(`Unexpected console output:\n${unexpectedConsoleOutput.join('\n')}`);
   }
 });
 

@@ -103,10 +103,19 @@ vi.mock('@/components/ui', async (importOriginal) => {
       />
     ),
     Tabs: ({ children, onSelectionChange }: { children?: React.ReactNode; onSelectionChange?: (k: string) => void }) => (
-      <div data-testid="tabs">{children}</div>
+      <div data-testid="tabs">
+        {React.Children.map(children, (child) => {
+          if (!React.isValidElement(child)) return child;
+
+          return React.cloneElement(
+            child as React.ReactElement<{ onSelect?: () => void }>,
+            { onSelect: () => onSelectionChange?.(String(child.key)) },
+          );
+        })}
+      </div>
     ),
-    Tab: ({ key, title }: { key?: string; title?: React.ReactNode }) => (
-      <button onClick={() => {}} data-key={key}>{title}</button>
+    Tab: ({ title, onSelect }: { title?: React.ReactNode; onSelect?: () => void }) => (
+      <button type="button" onClick={onSelect}>{title}</button>
     ),
   };
 });
@@ -249,6 +258,25 @@ describe('KBArticleForm (create mode)', () => {
     await waitFor(() => {
       expect(screen.getByTestId('rich-text-editor')).toBeInTheDocument();
     });
+  });
+
+  it('exposes the upload control to keyboard and assistive technology', async () => {
+    const { KBArticleForm } = await import('./KBArticleForm');
+    render(<KBArticleForm />);
+
+    fireEvent.click(screen.getByRole('button', { name: /upload file/i }));
+
+    const upload = screen.getByLabelText(/drop a file here or click to browse/i);
+    const help = screen.getByText(/supported: markdown/i);
+
+    expect(upload).toHaveAttribute('type', 'file');
+    expect(upload).not.toHaveAttribute('aria-hidden');
+    expect(upload).not.toHaveAttribute('tabindex', '-1');
+    expect(upload).toHaveClass('sr-only');
+    expect(upload).toHaveAttribute('aria-describedby', help.id);
+
+    upload.focus();
+    expect(upload).toHaveFocus();
   });
 });
 

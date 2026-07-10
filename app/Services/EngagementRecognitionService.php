@@ -124,7 +124,7 @@ class EngagementRecognitionService
                 ->toArray();
         } catch (\Throwable $e) {
             Log::error('EngagementRecognitionService::getEngagementHistory error: ' . $e->getMessage());
-            return [];
+            throw $e;
         }
     }
 

@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Select, SelectItem, useDisclosure, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 /**
@@ -424,7 +425,7 @@ export function VolunteerOrganizations() {
       key: 'balance',
       label: t('volunteering.col_balance'),
       sortable: true,
-      render: (item) => <span className="font-mono">{t('volunteering.hours_value', { value: (item.balance ?? 0).toLocaleString() })}</span>,
+      render: (item) => <span className="font-mono">{t('volunteering.hours_value', { value: (item.balance ?? 0).toLocaleString(getFormattingLocale()) })}</span>,
     },
     {
       key: 'opportunity_count',
@@ -442,7 +443,7 @@ export function VolunteerOrganizations() {
       key: 'total_hours',
       label: t('volunteering.col_total_hours'),
       sortable: true,
-      render: (item) => <span className="font-mono">{(item.total_hours ?? 0).toLocaleString()}</span>,
+      render: (item) => <span className="font-mono">{(item.total_hours ?? 0).toLocaleString(getFormattingLocale())}</span>,
     },
     {
       key: 'created_at',
@@ -450,7 +451,7 @@ export function VolunteerOrganizations() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}
+          {item.created_at ? new Date(item.created_at).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },
@@ -666,7 +667,7 @@ export function VolunteerOrganizations() {
                         <div>
                           <p className="text-sm font-medium">{tx.description || tx.type}</p>
                           <p className="text-xs text-muted">
-                            {tx.created_at ? new Date(tx.created_at).toLocaleString() : '--'}
+                            {tx.created_at ? new Date(tx.created_at).toLocaleString(getFormattingLocale()) : '--'}
                             {tx.admin_name && t('volunteering.transaction_by_admin', { name: tx.admin_name })}
                           </p>
                         </div>
@@ -794,7 +795,7 @@ export function VolunteerOrganizations() {
                           </div>
                         </div>
                         <span className="font-mono text-sm text-muted">
-                          {t('volunteering.hours_value', { value: (m.total_hours ?? 0).toLocaleString() })}
+                          {t('volunteering.hours_value', { value: (m.total_hours ?? 0).toLocaleString(getFormattingLocale()) })}
                         </span>
                       </div>
                     ))}

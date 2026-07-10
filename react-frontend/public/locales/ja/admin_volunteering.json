@@ -718,7 +718,25 @@
     "wellbeing_unknown_user": "不明なボランティア",
     "wellbeing_user_number": "ボランティア #{{id}}",
     "wellbeing_unknown_type": "ウェルビーイングに関する懸念",
-    "wellbeing_raised_on": "報告日 {{date}}"
+    "wellbeing_raised_on": "報告日 {{date}}",
+    "bulk_verify_success_other": "{{count}} 件のレコードを検証しました",
+    "bulk_verify_fail_other": "{{count}} 件のレコードの検証に失敗しました",
+    "expiry_alert_title_other": "{{count}} 件のトレーニング記録が 30 日以内に期限切れになります",
+    "bulk_selected_other": "{{count}} 件の保留中レコードが選択されています",
+    "members_count_other": "{{count}}メンバー",
+    "alert_pending_applications_other": "{{count}} 件の応募がレビュー待ちです",
+    "export_truncated_other": "{{count}} ページで書き出しを停止しました。一部の行は含まれていません。",
+    "expiring_consents_warning_other": "{{count}} 件の保護者同意が 30 日以内に期限切れになります",
+    "reminder_job_sent_other": "Reminder job sent {{count}} notification(s)",
+    "delivery_total_sent_other": "{{count}}が送信されました",
+    "bulk_approved_other": "{{count}} 件の応募を承認しました",
+    "bulk_declined_other": "{{count}} 件の応募を却下しました",
+    "selected_count_other": "{{count}} 件選択済み",
+    "bulk_approve_other": "承認 ({{count}})",
+    "bulk_decline_other": "却下 ({{count}})",
+    "bulk_approve_confirm_other": "選択した {{count}} 件の応募を承認しますか？応募者に通知されます。",
+    "bulk_decline_confirm_other": "選択した {{count}} 件の応募を却下しますか？応募者に通知されます。",
+    "decline_confirm": "このボランティアの申し込みを辞退してもよろしいですか?"
   },
   "donation_refunds": {
     "page_title": "寄付の返金",
@@ -761,5 +779,8 @@
     "complete_confirm_label": "完了マークを付ける",
     "complete_success": "寄付が完了としてマークされました",
     "complete_failed": "寄付を完了としてマークできませんでした"
+  },
+  "giving_days": {
+    "hours_target": "/ {{target}}"
   }
 }

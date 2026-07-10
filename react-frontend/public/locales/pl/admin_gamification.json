@@ -306,6 +306,22 @@
     "audience_badge_holders": "Użytkownicy z określoną plakietką",
     "type_one_time": "Jeden raz",
     "type_recurring": "Powtarzające się",
-    "type_triggered": "Wyzwolono"
+    "type_triggered": "Wyzwolono",
+    "bulk_award_succeeded_count_few": "Przyznano odznakę{{count}}",
+    "bulk_award_succeeded_count_many": "Przyznano odznakę{{count}}",
+    "bulk_award_succeeded_count_one": "Przyznano odznakę{{count}}",
+    "bulk_award_succeeded_count_other": "Przyznano odznakę{{count}}",
+    "badge_count_few": "Odznaki{{count}}",
+    "badge_count_many": "Odznaki{{count}}",
+    "badge_count_one": "Odznaki{{count}}",
+    "badge_count_other": "Odznaki{{count}}",
+    "threshold_count_few": "Próg:{{count}}",
+    "threshold_count_many": "Próg:{{count}}",
+    "threshold_count_one": "Próg:{{count}}",
+    "threshold_count_other": "Próg:{{count}}",
+    "xp_count_few": "{{count}}XP",
+    "xp_count_many": "{{count}}XP",
+    "xp_count_one": "{{count}}XP",
+    "xp_count_other": "{{count}}XP"
   }
 }

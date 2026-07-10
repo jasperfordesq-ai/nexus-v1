@@ -187,7 +187,8 @@
     "terms_required": "組織を登録するには、規約に同意する必要があります。",
     "opportunity_count_one": "{{count}} の機会",
     "opportunity_count_other": "{{count}} の機会",
-    "loading": "組織を読み込んでいます"
+    "loading": "組織を読み込んでいます",
+    "volunteer_count_other": "{{count}} ボランティア"
   },
   "organisation_detail": {
     "page_title": "組織",
@@ -231,7 +232,9 @@
     "submit_review": "レビューを送信する",
     "review_success": "レビューが送信されました。",
     "review_error": "レビューを送信できません。",
-    "rating_required": "送信する前に評価を選択してください。"
+    "rating_required": "送信する前に評価を選択してください。",
+    "meta_description_fallback_other": "このコミュニティタイムバンクで {{name}} と {{count}} 件の有効なボランティア機会を見つけましょう。",
+    "review_count_other": "{{count}} のレビュー"
   },
   "emergency_alerts": {
     "heading": "緊急アラート",

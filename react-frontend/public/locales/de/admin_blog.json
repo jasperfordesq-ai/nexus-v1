@@ -158,7 +158,13 @@
       "delete_confirm_title": "Ausgewählte Beiträge löschen?",
       "publish": "Veröffentlichen",
       "publish_confirm_message": "Ausgewählte {{count}}-Beiträge veröffentlichen?",
-      "publish_confirm_title": "Ausgewählte Beiträge veröffentlichen?"
+      "publish_confirm_title": "Ausgewählte Beiträge veröffentlichen?",
+      "publish_confirm_message_one": "Ausgewählte {{count}}-Beiträge veröffentlichen?",
+      "publish_confirm_message_other": "Ausgewählte {{count}}-Beiträge veröffentlichen?",
+      "archive_confirm_message_one": "Dadurch wird die Veröffentlichung von {{count}}-Beiträgen rückgängig gemacht. Sie können später erneut veröffentlicht werden.",
+      "archive_confirm_message_other": "Dadurch wird die Veröffentlichung von {{count}}-Beiträgen rückgängig gemacht. Sie können später erneut veröffentlicht werden.",
+      "delete_confirm_message_one": "{{count}} ausgewählte(n) Beitrag(e) löschen? Dies kann nicht rückgängig gemacht werden.",
+      "delete_confirm_message_other": "{{count}} ausgewählte(n) Beitrag(e) löschen? Dies kann nicht rückgängig gemacht werden."
     },
     "marketplace": {
       "reason_label": "Grund",

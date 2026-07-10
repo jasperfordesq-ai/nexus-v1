@@ -116,7 +116,8 @@
       "intended_use": "Úsáid atá beartaithe",
       "rejection_reason": "Cúis diúltaithe",
       "provisioning_log": "Loga soláthair"
-    }
+    },
+    "loading": "Iarratais soláthair á lódáil…"
   },
   "loading": "Loading",
   "refresh": "Athnuaigh"

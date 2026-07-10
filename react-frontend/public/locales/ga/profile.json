@@ -76,7 +76,10 @@
     "no_achievements": "Gan éachtaí fós",
     "no_achievements_own": "Déan rannpháirtíocht chun suaitheantas agus éachtaí a thuilleamh!",
     "no_achievements_other": "Níor thuill an t-úsáideoir seo aon éacht fós",
-    "view_badges": "Féach ar Shuaitheantas ar Fáil"
+    "view_badges": "Féach ar Shuaitheantas ar Fáil",
+    "badges_few": "{{count}} Suaitheantas Tuillte",
+    "badges_many": "{{count}} Suaitheantas Tuillte",
+    "badges_two": "{{count}} Suaitheantas Tuillte"
   },
   "toast": {
     "request_sent_title": "Iarratas seolta",
@@ -134,7 +137,12 @@
     "characters_count": "{{count}}/{{max}} carachtar",
     "cancel": "Cealaigh",
     "submit": "Seol Léirmheas",
-    "submit_failed_fallback": "Theip ar léirmheas a sheoladh"
+    "submit_failed_fallback": "Theip ar léirmheas a sheoladh",
+    "characters_count_few": "{{count}}/{{max}} carachtar",
+    "characters_count_many": "{{count}}/{{max}} carachtar",
+    "characters_count_one": "{{count}}/{{max}} carachtar",
+    "characters_count_other": "{{count}}/{{max}} carachtar",
+    "characters_count_two": "{{count}}/{{max}} carachtar"
   },
   "page_meta": {
     "title": "Próifíl",
@@ -185,5 +193,13 @@
   "read_more": "Léigh tuilleadh",
   "read_less": "Léigh níos lú",
   "hours_abbrev": "{{hours}}u",
-  "not_available_abbrev": "n/f"
+  "not_available_abbrev": "n/f",
+  "show_more_skills_few": "Taispeáin {{count}} eile",
+  "show_more_skills_many": "Taispeáin {{count}} eile",
+  "show_more_skills_one": "Taispeáin {{count}} eile",
+  "show_more_skills_other": "Taispeáin {{count}} eile",
+  "show_more_skills_two": "Taispeáin {{count}} eile",
+  "reviews_count_few": "{{count}} léirmheas",
+  "reviews_count_many": "{{count}} léirmheas",
+  "reviews_count_two": "{{count}} léirmheas"
 }

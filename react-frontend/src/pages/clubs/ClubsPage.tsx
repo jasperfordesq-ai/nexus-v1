@@ -150,7 +150,7 @@ export function ClubsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <Users className="w-7 h-7 text-indigo-400" aria-hidden="true" />
+          <Users className="w-7 h-7 text-accent" aria-hidden="true" />
           {t('clubs.meta.title')}
         </h1>
         <p className="text-theme-muted mt-1">{t('clubs.subtitle')}</p>
@@ -176,7 +176,7 @@ export function ClubsPage() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{error}</h2>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white mt-4"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white mt-4"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadClubs(1)}
           >
@@ -270,7 +270,7 @@ function ClubCard({ club }: { club: Club }) {
       <div className="flex flex-wrap items-center gap-3 text-xs text-theme-subtle mt-auto">
         {club.meeting_schedule && (
           <span className="flex items-center gap-1">
-            <Calendar className="w-3 h-3 text-indigo-400" aria-hidden="true" />
+            <Calendar className="w-3 h-3 text-accent" aria-hidden="true" />
             {t('clubs.meeting_schedule', { schedule: club.meeting_schedule })}
           </span>
         )}

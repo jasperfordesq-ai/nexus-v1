@@ -396,7 +396,13 @@
       },
       "messages": {
         "recomputed": "تمت إعادة حساب مستويات الثقة لـ {{count}} عضوًا.",
-        "saved": "Trust tier settings saved."
+        "saved": "Trust tier settings saved.",
+        "recomputed_few": "تمت إعادة حساب مستويات الثقة لـ {{count}} عضوًا.",
+        "recomputed_many": "تمت إعادة حساب مستويات الثقة لـ {{count}} عضوًا.",
+        "recomputed_one": "تمت إعادة حساب مستويات الثقة لـ {{count}} عضوًا.",
+        "recomputed_other": "تمت إعادة حساب مستويات الثقة لـ {{count}} عضوًا.",
+        "recomputed_two": "تمت إعادة حساب مستويات الثقة لـ {{count}} عضوًا.",
+        "recomputed_zero": "تمت إعادة حساب مستويات الثقة لـ {{count}} عضوًا."
       },
       "recompute_confirm": "هل تريد إعادة حساب مستويات الثقة لجميع الأعضاء؟ قد يستغرق هذا بضع دقائق."
     },
@@ -741,7 +747,31 @@
       "escalate_failed": "تعذر تصعيد المراجعة.",
       "approve_success": "تمت الموافقة على المراجعة.",
       "decline_success": "تم رفض المراجعة.",
-      "decision_failed": "لا يمكن تسجيل القرار."
+      "decision_failed": "لا يمكن تسجيل القرار.",
+      "manual_escalation_note_few": "تم التصعيد يدويًا بعد أيام {{count}} المعلقة.",
+      "manual_escalation_note_many": "تم التصعيد يدويًا بعد أيام {{count}} المعلقة.",
+      "manual_escalation_note_one": "تم التصعيد يدويًا بعد أيام {{count}} المعلقة.",
+      "manual_escalation_note_other": "تم التصعيد يدويًا بعد أيام {{count}} المعلقة.",
+      "manual_escalation_note_two": "تم التصعيد يدويًا بعد أيام {{count}} المعلقة.",
+      "manual_escalation_note_zero": "تم التصعيد يدويًا بعد أيام {{count}} المعلقة.",
+      "escalated_count_few": "تم تصعيد {{count}}",
+      "escalated_count_many": "تم تصعيد {{count}}",
+      "escalated_count_one": "تم تصعيد {{count}}",
+      "escalated_count_other": "تم تصعيد {{count}}",
+      "escalated_count_two": "تم تصعيد {{count}}",
+      "escalated_count_zero": "تم تصعيد {{count}}",
+      "overdue_count_few": "{{count}} متأخر",
+      "overdue_count_many": "{{count}} متأخر",
+      "overdue_count_one": "{{count}} متأخر",
+      "overdue_count_other": "{{count}} متأخر",
+      "overdue_count_two": "{{count}} متأخر",
+      "overdue_count_zero": "{{count}} متأخر",
+      "age_days_few": "{{count}} عمره يوم",
+      "age_days_many": "{{count}} عمره يوم",
+      "age_days_one": "{{count}} عمره يوم",
+      "age_days_other": "{{count}} عمره يوم",
+      "age_days_two": "{{count}} عمره يوم",
+      "age_days_zero": "{{count}} عمره يوم"
     },
     "paper_onboarding": {
       "title": "Paper Form Intake",
@@ -818,7 +848,19 @@
         "investigating": "التحقيق",
         "resolved": "تم الحل",
         "dismissed": "مرفوض"
-      }
+      },
+      "age_hours_few": "{{count}}ح",
+      "age_hours_many": "{{count}}ح",
+      "age_hours_one": "{{count}}ح",
+      "age_hours_other": "{{count}}ح",
+      "age_hours_two": "{{count}}ح",
+      "age_hours_zero": "{{count}}ح",
+      "age_days_few": "{{count}}د",
+      "age_days_many": "{{count}}د",
+      "age_days_one": "{{count}}د",
+      "age_days_other": "{{count}}د",
+      "age_days_two": "{{count}}د",
+      "age_days_zero": "{{count}}د"
     },
     "role_pack": {
       "title": "الإعدادات المسبقة للدور",
@@ -857,7 +899,13 @@
           "title": "مراجع موثوق",
           "description": "قم بالموافقة على ساعات العمل بسرعة من خلال الإشراف الخفيف."
         }
-      }
+      },
+      "available_count_few": "تتوفر الإعدادات المسبقة لدور {{count}}",
+      "available_count_many": "تتوفر الإعدادات المسبقة لدور {{count}}",
+      "available_count_one": "تتوفر الإعدادات المسبقة لدور {{count}}",
+      "available_count_other": "تتوفر الإعدادات المسبقة لدور {{count}}",
+      "available_count_two": "تتوفر الإعدادات المسبقة لدور {{count}}",
+      "available_count_zero": "تتوفر الإعدادات المسبقة لدور {{count}}"
     },
     "policy": {
       "title": "سياسة سير العمل",
@@ -925,7 +973,13 @@
       "loading_favours": "جارٍ تحميل المزايا...",
       "empty": "لم يتم تسجيل أي تفضل حتى الآن.",
       "anonymous": "مجهول",
-      "unknown": "مجهول"
+      "unknown": "مجهول",
+      "total_recorded_few": "تم تسجيل إجمالي {{count}}",
+      "total_recorded_many": "تم تسجيل إجمالي {{count}}",
+      "total_recorded_one": "تم تسجيل إجمالي {{count}}",
+      "total_recorded_other": "تم تسجيل إجمالي {{count}}",
+      "total_recorded_two": "تم تسجيل إجمالي {{count}}",
+      "total_recorded_zero": "تم تسجيل إجمالي {{count}}"
     },
     "assisted_onboarding": {
       "title": "Assisted Onboarding",
@@ -1103,6 +1157,12 @@
         "completed": "مكتمل",
         "cancelled": "تم الإلغاء"
       }
+    },
+    "invite_card": {
+      "brand": "Community Caring",
+      "subtitle": "دعوة الجار إلى الجار",
+      "instructions": "أدخل هذا الرمز أو قم بزيارة الرابط أدناه للانضمام.",
+      "valid_until": "صالح حتى {{date}}"
     }
   },
   "category_coefficients": {
@@ -1218,7 +1278,13 @@
       "export_empty": "تم إرجاع التصدير فارغًا",
       "exported": "تم تصدير خريطة الحدود",
       "export_failed": "فشل تصدير خريطة الحدود"
-    }
+    },
+    "overrides_count_few": "تجاوز {{count}}",
+    "overrides_count_many": "تجاوز {{count}}",
+    "overrides_count_one": "تجاوز {{count}}",
+    "overrides_count_other": "تجاوز {{count}}",
+    "overrides_count_two": "تجاوز {{count}}",
+    "overrides_count_zero": "تجاوز {{count}}"
   },
   "data_quality": {
     "meta": {
@@ -1255,7 +1321,13 @@
       "label": "ملخص:",
       "count": "{{count}} {{label}}",
       "generated": "تم إنشاؤه {{date}}",
-      "affected": "متأثر"
+      "affected": "متأثر",
+      "count_few": "{{count}} {{label}}",
+      "count_many": "{{count}} {{label}}",
+      "count_one": "{{count}} {{label}}",
+      "count_other": "{{count}} {{label}}",
+      "count_two": "{{count}} {{label}}",
+      "count_zero": "{{count}} {{label}}"
     },
     "drilldown": {
       "subtitle": "ما يصل إلى 50 صفًا متأثرًا - قم بحلها أو توثيقها قبل الإطلاق.",
@@ -1618,7 +1690,37 @@
       "request_meta": "متى: {{when}} - المستخدم رقم {{userId}} - العمر {{age}}",
       "target_hours": "الهدف {{hours}}ح",
       "over_by": "انتهى {{duration}}",
-      "left": "{{duration}} اليسار"
+      "left": "{{duration}} اليسار",
+      "subtitle_few": "{{count}} مفتوح - تم فرزه وتم اختراقه أولاً",
+      "subtitle_many": "{{count}} مفتوح - تم فرزه وتم اختراقه أولاً",
+      "subtitle_one": "{{count}} مفتوح - تم فرزه وتم اختراقه أولاً",
+      "subtitle_other": "{{count}} مفتوح - تم فرزه وتم اختراقه أولاً",
+      "subtitle_two": "{{count}} مفتوح - تم فرزه وتم اختراقه أولاً",
+      "subtitle_zero": "{{count}} مفتوح - تم فرزه وتم اختراقه أولاً",
+      "all_count_few": "الكل ({{count}})",
+      "all_count_many": "الكل ({{count}})",
+      "all_count_one": "الكل ({{count}})",
+      "all_count_other": "الكل ({{count}})",
+      "all_count_two": "الكل ({{count}})",
+      "all_count_zero": "الكل ({{count}})",
+      "breached_count_few": "تم الاختراق ({{count}})",
+      "breached_count_many": "تم الاختراق ({{count}})",
+      "breached_count_one": "تم الاختراق ({{count}})",
+      "breached_count_other": "تم الاختراق ({{count}})",
+      "breached_count_two": "تم الاختراق ({{count}})",
+      "breached_count_zero": "تم الاختراق ({{count}})",
+      "at_risk_count_few": "معرض للخطر ({{count}})",
+      "at_risk_count_many": "معرض للخطر ({{count}})",
+      "at_risk_count_one": "معرض للخطر ({{count}})",
+      "at_risk_count_other": "معرض للخطر ({{count}})",
+      "at_risk_count_two": "معرض للخطر ({{count}})",
+      "at_risk_count_zero": "معرض للخطر ({{count}})",
+      "on_track_count_few": "على المسار الصحيح ({{count}})",
+      "on_track_count_many": "على المسار الصحيح ({{count}})",
+      "on_track_count_one": "على المسار الصحيح ({{count}})",
+      "on_track_count_other": "على المسار الصحيح ({{count}})",
+      "on_track_count_two": "على المسار الصحيح ({{count}})",
+      "on_track_count_zero": "على المسار الصحيح ({{count}})"
     },
     "resolved": {
       "title": "تم حلها مؤخرًا (آخر 72 ساعة)",
@@ -1722,14 +1824,44 @@
       "pending": "معلق: {{count}}",
       "in_progress": "قيد التقدم: {{count}}",
       "decided": "المقرر: {{count}}",
-      "blocked": "محظور: {{count}}"
+      "blocked": "محظور: {{count}}",
+      "pending_few": "معلق: {{count}}",
+      "pending_many": "معلق: {{count}}",
+      "pending_one": "معلق: {{count}}",
+      "pending_other": "معلق: {{count}}",
+      "pending_two": "معلق: {{count}}",
+      "pending_zero": "معلق: {{count}}",
+      "in_progress_few": "قيد التقدم: {{count}}",
+      "in_progress_many": "قيد التقدم: {{count}}",
+      "in_progress_one": "قيد التقدم: {{count}}",
+      "in_progress_other": "قيد التقدم: {{count}}",
+      "in_progress_two": "قيد التقدم: {{count}}",
+      "in_progress_zero": "قيد التقدم: {{count}}",
+      "decided_few": "المقرر: {{count}}",
+      "decided_many": "المقرر: {{count}}",
+      "decided_one": "المقرر: {{count}}",
+      "decided_other": "المقرر: {{count}}",
+      "decided_two": "المقرر: {{count}}",
+      "decided_zero": "المقرر: {{count}}",
+      "blocked_few": "محظور: {{count}}",
+      "blocked_many": "محظور: {{count}}",
+      "blocked_one": "محظور: {{count}}",
+      "blocked_other": "محظور: {{count}}",
+      "blocked_two": "محظور: {{count}}",
+      "blocked_zero": "محظور: {{count}}"
     },
     "gate": {
       "closed": "البوابة مغلقة - جاهزة للانطلاق",
       "open": "البوابة مفتوحة - لا تزال القرارات مطلوبة",
       "decided_count": "تم تحديد {{decided}} من {{total}} من العناصر",
       "blocked_count": "- {{count}} محظور",
-      "progress_aria": "التقدم في بوابة القرار"
+      "progress_aria": "التقدم في بوابة القرار",
+      "blocked_count_few": "- {{count}} محظور",
+      "blocked_count_many": "- {{count}} محظور",
+      "blocked_count_one": "- {{count}} محظور",
+      "blocked_count_other": "- {{count}} محظور",
+      "blocked_count_two": "- {{count}} محظور",
+      "blocked_count_zero": "- {{count}} محظور"
     },
     "fields": {
       "value": "قيمة",
@@ -1874,7 +2006,13 @@
     "contacts": {
       "title": "جهات الاتصال ({{count}})",
       "empty": "لا توجد جهات اتصال تطابق عوامل التصفية الحالية.",
-      "table_aria": "اتصالات رعاية الرصاص"
+      "table_aria": "اتصالات رعاية الرصاص",
+      "title_few": "جهات الاتصال ({{count}})",
+      "title_many": "جهات الاتصال ({{count}})",
+      "title_one": "جهات الاتصال ({{count}})",
+      "title_other": "جهات الاتصال ({{count}})",
+      "title_two": "جهات الاتصال ({{count}})",
+      "title_zero": "جهات الاتصال ({{count}})"
     },
     "table": {
       "name_email": "الاسم / البريد الإلكتروني",
@@ -1961,7 +2099,13 @@
       "audience_description": "حدد من هو هذا الإعلان (على سبيل المثال، \"جميع المقيمين\"، \"المتطوعين\"، \"جهات الاتصال بالبلدية\") حتى يتمكن AI من معايرة النغمة والمفردات بشكل مناسب.",
       "polished_text": "نص مصقول",
       "reason": "سبب",
-      "reason_placeholder": "لماذا يتم رفض هذا الاقتراح؟"
+      "reason_placeholder": "لماذا يتم رفض هذا الاقتراح؟",
+      "character_count_few": "{{count}} / 4000 حرف",
+      "character_count_many": "{{count}} / 4000 حرف",
+      "character_count_one": "{{count}} / 4000 حرف",
+      "character_count_other": "{{count}} / 4000 حرف",
+      "character_count_two": "{{count}} / 4000 حرف",
+      "character_count_zero": "{{count}} / 4000 حرف"
     },
     "status": {
       "proposed": "مقترح",
@@ -2228,7 +2372,13 @@
       "ready_body_suffix": "عندما يكون فريق المنسق الخاص بك جاهزًا لاتخاذ هذا القرار في اتجاه واحد.",
       "blocked_title": "لا يمكن التشغيل بعد - يبقى مانع {{count}}",
       "blocked_title_plural": "لا يمكن التشغيل بعد - تبقى أدوات الحظر {{count}}",
-      "blocked_body": "قم بحل كل قسم أدناه قبل تمكين زر التشغيل."
+      "blocked_body": "قم بحل كل قسم أدناه قبل تمكين زر التشغيل.",
+      "blocked_title_few": "لا يمكن التشغيل بعد - يبقى مانع {{count}}",
+      "blocked_title_many": "لا يمكن التشغيل بعد - يبقى مانع {{count}}",
+      "blocked_title_one": "لا يمكن التشغيل بعد - يبقى مانع {{count}}",
+      "blocked_title_other": "لا يمكن التشغيل بعد - يبقى مانع {{count}}",
+      "blocked_title_two": "لا يمكن التشغيل بعد - يبقى مانع {{count}}",
+      "blocked_title_zero": "لا يمكن التشغيل بعد - يبقى مانع {{count}}"
     },
     "overall": {
       "ready": "الطيار جاهز للانطلاق",
@@ -2277,7 +2427,13 @@
       "load_failed": "تعذر تحميل تقرير جاهزية الإطلاق.",
       "unexpected_response": "أعاد تقرير الاستعداد للإطلاق استجابة غير متوقعة.",
       "unavailable_title": "تقرير الجاهزية غير متاح"
-    }
+    },
+    "more_count_few": "+{{count}} المزيد",
+    "more_count_many": "+{{count}} المزيد",
+    "more_count_one": "+{{count}} المزيد",
+    "more_count_other": "+{{count}} المزيد",
+    "more_count_two": "+{{count}} المزيد",
+    "more_count_zero": "+{{count}} المزيد"
   },
   "pilot_scoreboard": {
     "meta": {
@@ -2419,7 +2575,21 @@
       "placeholder_label": "{{placeholder}}",
       "rendered_markdown": "تم تقديم Markdown ({{count}} من الأحرف)",
       "missing_placeholder_count_one": "العنصر النائب {{count}} مفقود",
-      "missing_placeholder_count_other": "العناصر النائبة {{count}} مفقودة"
+      "missing_placeholder_count_other": "العناصر النائبة {{count}} مفقودة",
+      "placeholder_count_few": "{{count}} العناصر النائبة",
+      "placeholder_count_many": "{{count}} العناصر النائبة",
+      "placeholder_count_two": "{{count}} العناصر النائبة",
+      "placeholder_count_zero": "{{count}} العناصر النائبة",
+      "rendered_markdown_few": "تم تقديم Markdown ({{count}} من الأحرف)",
+      "rendered_markdown_many": "تم تقديم Markdown ({{count}} من الأحرف)",
+      "rendered_markdown_one": "تم تقديم Markdown ({{count}} من الأحرف)",
+      "rendered_markdown_other": "تم تقديم Markdown ({{count}} من الأحرف)",
+      "rendered_markdown_two": "تم تقديم Markdown ({{count}} من الأحرف)",
+      "rendered_markdown_zero": "تم تقديم Markdown ({{count}} من الأحرف)",
+      "missing_placeholder_count_few": "العناصر النائبة {{count}} مفقودة",
+      "missing_placeholder_count_many": "العناصر النائبة {{count}} مفقودة",
+      "missing_placeholder_count_two": "العناصر النائبة {{count}} مفقودة",
+      "missing_placeholder_count_zero": "العناصر النائبة {{count}} مفقودة"
     },
     "exports": {
       "title": "تاريخ تصدير مجموعة البيانات",
@@ -2529,7 +2699,13 @@
       "title": "معاينة التشغيل الجاف",
       "candidates": "{{count}} المرشحين",
       "empty": "لا يوجد مرشحين مؤهلين في الوقت الحالي.",
-      "table_aria": "المرشحين للدفعة الجافة"
+      "table_aria": "المرشحين للدفعة الجافة",
+      "candidates_few": "{{count}} المرشحين",
+      "candidates_many": "{{count}} المرشحين",
+      "candidates_one": "{{count}} المرشحين",
+      "candidates_other": "{{count}} المرشحين",
+      "candidates_two": "{{count}} المرشحين",
+      "candidates_zero": "{{count}} المرشحين"
     },
     "recent": {
       "title": "الدفعات الأخيرة",
@@ -2559,7 +2735,19 @@
       "save_failed": "فشل حفظ التكوين",
       "dry_run": "التشغيل الجاف: {{count}} المرشحين المؤهلين",
       "dispatched": "تم إرسال دفعات {{count}}",
-      "dispatch_failed": "فشل الإرسال"
+      "dispatch_failed": "فشل الإرسال",
+      "dry_run_few": "التشغيل الجاف: {{count}} المرشحين المؤهلين",
+      "dry_run_many": "التشغيل الجاف: {{count}} المرشحين المؤهلين",
+      "dry_run_one": "التشغيل الجاف: {{count}} المرشحين المؤهلين",
+      "dry_run_other": "التشغيل الجاف: {{count}} المرشحين المؤهلين",
+      "dry_run_two": "التشغيل الجاف: {{count}} المرشحين المؤهلين",
+      "dry_run_zero": "التشغيل الجاف: {{count}} المرشحين المؤهلين",
+      "dispatched_few": "تم إرسال دفعات {{count}}",
+      "dispatched_many": "تم إرسال دفعات {{count}}",
+      "dispatched_one": "تم إرسال دفعات {{count}}",
+      "dispatched_other": "تم إرسال دفعات {{count}}",
+      "dispatched_two": "تم إرسال دفعات {{count}}",
+      "dispatched_zero": "تم إرسال دفعات {{count}}"
     }
   },
   "sub_regions": {

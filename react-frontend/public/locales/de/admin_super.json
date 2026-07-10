@@ -792,7 +792,25 @@
     "no_hub_tenants_found": "Keine Hub-Mieter gefunden",
     "impersonate_user_warning": "Beim Identitätswechsel wird jede Aktion unter der Identität dieses Benutzers protokolliert. Nur bei Bedarf zur Unterstützung verwenden.",
     "partnerships_tabs_aria": "Filter für den Status der Föderationspartnerschaft",
-    "tenant_list_tabs_aria": "Mieterstatusfilter"
+    "tenant_list_tabs_aria": "Mieterstatusfilter",
+    "tab_with_count_one": "{{label}}({{count}})",
+    "tab_with_count_other": "{{label}}({{count}})",
+    "users_count_one": "{{count}} Benutzer",
+    "users_count_other": "{{count}} Benutzer",
+    "bulk_users_moved_count_one": "Massenbenutzer verschoben ({{count}})",
+    "bulk_users_moved_count_other": "Massenbenutzer verschoben ({{count}})",
+    "bulk_tenants_updated_count_one": "Massenmieter aktualisiert ({{count}})",
+    "bulk_tenants_updated_count_other": "Massenmieter aktualisiert ({{count}})",
+    "move_n_users_one": "{{count}} Benutzer verschieben",
+    "move_n_users_other": "{{count}} Benutzer verschieben",
+    "apply_to_n_tenants_one": "Auf {{count}} Mieter anwenden",
+    "apply_to_n_tenants_other": "Auf {{count}} Mieter anwenden",
+    "bulk_move_confirm_message_with_grant_one": "Verschieben Sie {{count}} Benutzer und gewähren Sie dem Mandanten Superadministratorzugriff.",
+    "bulk_move_confirm_message_with_grant_other": "Verschieben Sie {{count}} Benutzer und gewähren Sie dem Mandanten Superadministratorzugriff.",
+    "bulk_move_confirm_message_one": "{{count}} Benutzer verschieben.",
+    "bulk_move_confirm_message_other": "{{count}} Benutzer verschieben.",
+    "bulk_update_confirm_message_one": "Wenden Sie dieses Update auf {{count}} Mandanten an.",
+    "bulk_update_confirm_message_other": "Wenden Sie dieses Update auf {{count}} Mandanten an."
   },
   "tenant_form": {
     "active": "Aktiv",
@@ -997,7 +1015,9 @@
     "view": "Ansicht",
     "whitelisted_tenants_aria": "Mieter auf der Whitelist",
     "whitelisted_tenants_count": "Zugelassene Mandanten ({{count}})",
-    "failed_to_load": "Weiße Liste konnte nicht geladen werden"
+    "failed_to_load": "Weiße Liste konnte nicht geladen werden",
+    "whitelisted_tenants_count_one": "Zugelassene Mandanten ({{count}})",
+    "whitelisted_tenants_count_other": "Zugelassene Mandanten ({{count}})"
   },
   "pilot_inquiry_admin": {
     "page_title": "Pilotenanfragen",
@@ -1093,14 +1113,33 @@
       "empty": "-",
       "months": "{{count}} Monate",
       "no": "NEIN",
-      "yes": "Ja"
+      "yes": "Ja",
+      "months_one": "{{count}} Monate",
+      "months_other": "{{count}} Monate"
     },
     "velocity": {
       "avg_to_agreed": "Durchschnittlich bis vereinbart:",
       "avg_to_live": "Durchschnittliche Lebenserwartung:",
       "avg_to_proposal": "Durchschnitt zum Vorschlag:",
       "days": "{{count}}d",
-      "title": "Pipeline-Geschwindigkeit – durchschnittliche Tage von der Einreichung der Anfrage bis zu jedem Meilenstein:"
+      "title": "Pipeline-Geschwindigkeit – durchschnittliche Tage von der Einreichung der Anfrage bis zu jedem Meilenstein:",
+      "days_one": "{{count}}d",
+      "days_other": "{{count}}d"
     }
-  }
+  },
+  "events": "Veranstaltungen",
+  "groups": "Gruppen",
+  "gamification": "Gamifizierung",
+  "goals": "Ziele",
+  "blog": "Blog",
+  "resources": "Ressourcen",
+  "volunteering": "Freiwilligenarbeit",
+  "federation": "Föderation",
+  "wallet": "Geldbörse",
+  "messages": "Nachrichten",
+  "dashboard": "Armaturenbrett",
+  "exchange_workflow": "Exchange-Workflow",
+  "organisations": "Organisationen",
+  "listings": "Einträge",
+  "feed": "Füttern"
 }

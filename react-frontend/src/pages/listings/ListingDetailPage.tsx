@@ -59,7 +59,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useSocialInteractions } from '@/hooks/useSocialInteractions';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import type { Listing, ListingDetail, ExchangeConfig } from '@/types/api';
 
 interface ListingStructuredDataOptions {
@@ -153,7 +153,7 @@ function buildListingStructuredData(listing: Listing, options: ListingStructured
 }
 
 export function ListingDetailPage() {
-  const { t, i18n } = useTranslation('listings');
+  const { t } = useTranslation('listings');
   usePageTitle(t('title'));
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -452,20 +452,18 @@ export function ListingDetailPage() {
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
               {isConnectionError && (
                 <Button
-                  className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+                  className="bg-linear-to-r from-accent to-accent-gradient-end text-white"
                   onPress={() => void loadListing()}
                 >
                   {t('try_again')}
                 </Button>
               )}
-              <Link to={tenantPath('/listings')}>
-                <Button
-                  variant={isConnectionError ? 'flat' : undefined}
-                  className={isConnectionError ? undefined : 'bg-linear-to-r from-indigo-500 to-purple-600 text-white'}
-                >
-                  {t('browse')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath('/listings')}
+                variant={isConnectionError ? 'flat' : undefined}
+                className={isConnectionError ? undefined : 'bg-linear-to-r from-accent to-accent-gradient-end text-white'}
+              >
+                {t('browse')}
+              </Button>
             </div>
           }
         />
@@ -572,16 +570,14 @@ export function ListingDetailPage() {
 
           {isOwner && (
             <div className="flex flex-wrap gap-2 rounded-2xl border border-theme-default bg-theme-hover/60 p-2">
-              <Link to={tenantPath(`/listings/edit/${listing.id}`)}>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  className="bg-theme-elevated text-theme-primary"
-                  startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('detail_edit')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath(`/listings/edit/${listing.id}`)}
+                size="sm"
+                variant="secondary"
+                className="bg-theme-elevated text-theme-primary"
+                startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('detail_edit')}
+              </Button>
               <Button
                 size="sm"
                 variant="secondary"
@@ -620,8 +616,8 @@ export function ListingDetailPage() {
         {/* Meta Grid - Top Row */}
         <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <div className="flex min-w-0 items-center gap-3 rounded-xl border border-theme-default bg-theme-hover/60 p-3 text-theme-muted">
-            <div className="p-2 rounded-lg bg-indigo-500/20" aria-hidden="true">
-              <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <div className="p-2 rounded-lg bg-accent/20" aria-hidden="true">
+              <Clock className="w-5 h-5 text-accent dark:text-accent" />
             </div>
             <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail_duration')}</div>
@@ -640,14 +636,14 @@ export function ListingDetailPage() {
             <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail_posted')}</div>
               <div className="truncate text-sm font-medium text-theme-primary sm:text-base">
-                {new Date(listing.created_at).toLocaleDateString(i18n.language)}
+                {new Date(listing.created_at).toLocaleDateString(getFormattingLocale())}
               </div>
             </div>
           </div>
 
           <div className="flex min-w-0 items-center gap-3 rounded-xl border border-theme-default bg-theme-hover/60 p-3 text-theme-muted">
-            <div className="p-2 rounded-lg bg-purple-500/20" aria-hidden="true">
-              <Tag className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            <div className="p-2 rounded-lg bg-accent/20" aria-hidden="true">
+              <Tag className="w-5 h-5 text-accent dark:text-accent" />
             </div>
             <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail_status')}</div>
@@ -795,49 +791,43 @@ export function ListingDetailPage() {
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {exchangeConfig?.exchange_workflow_enabled ? (
               activeExchange ? (
-                <Link to={tenantPath(`/exchanges/${activeExchange.id}`)}>
-                  <Button
-                    className="w-full bg-theme-elevated text-theme-primary"
-                    startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
-                    endContent={
-                      <Chip size="sm" variant="soft" color={
-                        activeExchange.status === 'accepted' || activeExchange.status === 'in_progress' ? 'success' :
-                        activeExchange.status === 'pending_provider' || activeExchange.status === 'pending_broker' ? 'warning' :
-                        activeExchange.status === 'pending_confirmation' ? 'primary' :
-                        'default'
-                      }>
-                        {activeExchange.status === 'pending_provider' ? t('exchange_status_pending_provider') :
-                         activeExchange.status === 'pending_broker' ? t('exchange_status_pending_broker') :
-                         activeExchange.status === 'accepted' ? t('exchange_status_accepted') :
-                         activeExchange.status === 'in_progress' ? t('exchange_status_in_progress') :
-                         activeExchange.status === 'pending_confirmation' ? t('exchange_status_pending_confirmation') :
-                         activeExchange.status === 'disputed' ? t('exchange_status_disputed') :
-                         activeExchange.status.replace(/_/g, ' ')}
-                      </Chip>
-                    }
-                  >
-                    {t('detail_exchange')}
-                  </Button>
-                </Link>
+                <Button as={Link} to={tenantPath(`/exchanges/${activeExchange.id}`)}
+                  className="w-full bg-theme-elevated text-theme-primary"
+                  startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
+                  endContent={
+                    <Chip size="sm" variant="soft" color={
+                      activeExchange.status === 'accepted' || activeExchange.status === 'in_progress' ? 'success' :
+                      activeExchange.status === 'pending_provider' || activeExchange.status === 'pending_broker' ? 'warning' :
+                      activeExchange.status === 'pending_confirmation' ? 'primary' :
+                      'default'
+                    }>
+                      {activeExchange.status === 'pending_provider' ? t('exchange_status_pending_provider') :
+                       activeExchange.status === 'pending_broker' ? t('exchange_status_pending_broker') :
+                       activeExchange.status === 'accepted' ? t('exchange_status_accepted') :
+                       activeExchange.status === 'in_progress' ? t('exchange_status_in_progress') :
+                       activeExchange.status === 'pending_confirmation' ? t('exchange_status_pending_confirmation') :
+                       activeExchange.status === 'disputed' ? t('exchange_status_disputed') :
+                       activeExchange.status.replace(/_/g, ' ')}
+                    </Chip>
+                  }
+                >
+                  {t('detail_exchange')}
+                </Button>
               ) : (
-                <Link to={tenantPath(`/listings/${listing.id}/request-exchange`)}>
-                  <Button
-                    className="w-full bg-linear-to-r from-emerald-500 to-teal-600 text-white"
-                    startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
-                  >
-                    {t('detail_request_exchange')}
-                  </Button>
-                </Link>
+                <Button as={Link} to={tenantPath(`/listings/${listing.id}/request-exchange`)}
+                  className="w-full bg-linear-to-r from-emerald-500 to-teal-600 text-white"
+                  startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('detail_request_exchange')}
+                </Button>
               )
             ) : (
-              <Link to={tenantPath(`/messages?to=${listing.user_id}&listing=${listing.id}`)}>
-                <Button
-                  className="w-full bg-linear-to-r from-indigo-500 to-purple-600 text-white"
-                  startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('detail_send_message')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath(`/messages?to=${listing.user_id}&listing=${listing.id}`)}
+                className="w-full bg-linear-to-r from-accent to-accent-gradient-end text-white"
+                startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('detail_send_message')}
+              </Button>
             )}
             <Button
               variant="secondary"
@@ -851,7 +841,7 @@ export function ListingDetailPage() {
             </Button>
             <Button
               variant="secondary"
-              className={`w-full ${showComments ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
+              className={`w-full ${showComments ? 'bg-accent/20 text-accent' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
               onPress={toggleComments}
               aria-expanded={showComments}
@@ -861,7 +851,7 @@ export function ListingDetailPage() {
             </Button>
             <Button
               variant="secondary"
-              className={`w-full ${isSaved ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
+              className={`w-full ${isSaved ? 'bg-accent/20 text-accent' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={isSaved ? <Bookmark className="w-4 h-4 fill-current" aria-hidden="true" /> : <Bookmark className="w-4 h-4" aria-hidden="true" />}
               onPress={() => void handleSave()}
               isDisabled={isSaving}
@@ -905,7 +895,7 @@ export function ListingDetailPage() {
             </Button>
             <Button
               variant="secondary"
-              className={`w-full ${showComments ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
+              className={`w-full ${showComments ? 'bg-accent/20 text-accent' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
               onPress={toggleComments}
               aria-expanded={showComments}
@@ -1026,7 +1016,7 @@ export function ListingDetailPage() {
         return (
           <GlassCard className="p-5 sm:p-6">
             <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-              <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              <User className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
               {listing.type === 'offer' ? t('detail_offered_by') : t('detail_requested_by')}
             </h2>
 
@@ -1040,11 +1030,11 @@ export function ListingDetailPage() {
                   src={userAvatar}
                   name={userName}
                   size="lg"
-                  className="ring-2 ring-white/20 group-hover:ring-indigo-500/50 transition-all"
+                  className="ring-2 ring-white/20 group-hover:ring-accent/50 transition-all"
                 />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="truncate font-semibold text-theme-primary transition-colors group-hover:text-indigo-400">
+                    <h3 className="truncate font-semibold text-theme-primary transition-colors group-hover:text-accent">
                       {userName}
                     </h3>
                     {listing.user?.id && <VerificationBadgeRow userId={listing.user.id} size="sm" />}
@@ -1183,8 +1173,8 @@ export function ListingDetailPage() {
             <Calendar className="w-4 h-4 text-theme-muted" aria-hidden="true" />
             <span className="text-theme-muted">
               {listing.status === 'expired'
-                ? t('detail_expired_on', { date: new Date(listing.expires_at).toLocaleDateString(i18n.language) })
-                : t('detail_expires_on', { date: new Date(listing.expires_at).toLocaleDateString(i18n.language) })}
+                ? t('detail_expired_on', { date: new Date(listing.expires_at).toLocaleDateString(getFormattingLocale()) })
+                : t('detail_expires_on', { date: new Date(listing.expires_at).toLocaleDateString(getFormattingLocale()) })}
             </span>
             {listing.renewal_count !== undefined && listing.renewal_count > 0 && (
               <span className="text-xs text-theme-subtle">

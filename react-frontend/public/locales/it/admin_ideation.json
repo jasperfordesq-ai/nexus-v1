@@ -132,6 +132,9 @@
     "no_challenges_found": "Nessuna sfida trovata trovata",
     "no_matching_challenges": "Nessuna sfida corrispondente trovata",
     "no_status_challenges": "Nessun problema di stato trovato",
-    "tabs_aria": "Filtro sullo stato della sfida"
+    "tabs_aria": "Filtro sullo stato della sfida",
+    "total_count_many": "Totale: {{count}}",
+    "total_count_one": "Totale: {{count}}",
+    "total_count_other": "Totale: {{count}}"
   }
 }

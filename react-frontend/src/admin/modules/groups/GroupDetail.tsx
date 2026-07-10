@@ -22,7 +22,7 @@ interface AdminGroupDetail extends AdminGroup {  stats?: { total_exchanges: numb
 import type { GroupMember } from '@/admin/api/types';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { Button, Chip, Input, Textarea, Card, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 
 export default function GroupDetail() {
   const { t } = useTranslation('admin_groups');
@@ -239,7 +239,7 @@ export default function GroupDetail() {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">{t('groups.created')}</div>
-                  <div className="mt-1">{new Date(group.created_at).toLocaleString()}</div>
+                  <div className="mt-1">{new Date(group.created_at).toLocaleString(getFormattingLocale())}</div>
                 </div>
               </>
             )}
@@ -265,7 +265,7 @@ export default function GroupDetail() {
                       </div>
                     </TableCell>
                     <TableCell><Chip size="sm" color={member.role === 'owner' ? 'primary' : member.role === 'admin' ? 'secondary' : 'default'}>{member.role}</Chip></TableCell>
-                    <TableCell>{new Date(member.joined_at).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(member.joined_at).toLocaleDateString(getFormattingLocale())}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         {member.role === 'member' && <Button size="sm" variant="tertiary" onPress={() => handlePromote(member.user_id)}>{t('groups.promote')}</Button>}

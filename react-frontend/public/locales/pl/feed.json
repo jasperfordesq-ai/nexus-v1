@@ -70,7 +70,9 @@
   },
   "realtime": {
     "new_posts_one": "1 new post",
-    "new_posts_other": "{{count}} new posts"
+    "new_posts_other": "{{count}} new posts",
+    "new_posts_few": "{{count}} new posts",
+    "new_posts_many": "{{count}} new posts"
   },
   "compose": {
     "create_title": "Utwórz {{type}}",
@@ -251,7 +253,21 @@
     "listing_preview_alt": "Podgląd ogłoszenia",
     "image_preview_alt": "Podgląd przesyłania",
     "type_tabs_aria": "Utwórz typ zawartości",
-    "compose_post": "Utwórz wpis"
+    "compose_post": "Utwórz wpis",
+    "media_rejected_few": "{{count}} plik(i) pominięty(e) (zły typ lub za duży)",
+    "media_rejected_many": "{{count}} plik(i) pominięty(e) (zły typ lub za duży)",
+    "media_rejected_one": "{{count}} plik(i) pominięty(e) (zły typ lub za duży)",
+    "media_rejected_other": "{{count}} plik(i) pominięty(e) (zły typ lub za duży)",
+    "media_compression_failed_few": "{{count}} obraz(y) nie udało się przetworzyć",
+    "media_compression_failed_many": "{{count}} obraz(y) nie udało się przetworzyć",
+    "media_compression_failed_one": "{{count}} obraz(y) nie udało się przetworzyć",
+    "media_compression_failed_other": "{{count}} obraz(y) nie udało się przetworzyć",
+    "sdg_selected_few": "{{count}} cele wybrane",
+    "sdg_selected_many": "{{count}} cele wybrane",
+    "group_members_few": "{{count}} członków",
+    "group_members_many": "{{count}} członków",
+    "group_members_one": "{{count}} członków",
+    "group_members_other": "{{count}} członków"
   },
   "moderation": {
     "unauthorized": "Nie masz uprawnień do wykonania tej czynności."
@@ -349,12 +365,20 @@
       "commitment_flexible": "Elastyczny"
     },
     "volunteer": {
-      "credits_offered": "{{count}} kredytów czasu"
+      "credits_offered": "{{count}} kredytów czasu",
+      "credits_offered_few": "{{count}} kredytów czasu",
+      "credits_offered_many": "{{count}} kredytów czasu",
+      "credits_offered_one": "{{count}} kredytów czasu",
+      "credits_offered_other": "{{count}} kredytów czasu"
     },
     "challenge": {
       "closing_soon": "Wkrótce kończy",
       "closes_on": "Kończy się {{date}}",
-      "ideas_count": "{{count}} pomysłów"
+      "ideas_count": "{{count}} pomysłów",
+      "ideas_count_few": "{{count}} pomysłów",
+      "ideas_count_many": "{{count}} pomysłów",
+      "ideas_count_one": "{{count}} pomysłów",
+      "ideas_count_other": "{{count}} pomysłów"
     },
     "review": {
       "rating_aria": "{{rating}} na 5 gwiazdek"
@@ -399,7 +423,11 @@
     "no_posts": "Nie znaleziono postów",
     "no_posts_desc": "Żadne posty nie zostały oznaczone tagiem #{{tag}}.",
     "load_more": "Załaduj więcej",
-    "page_description": "Posty oznaczone tagiem #{{tag}}"
+    "page_description": "Posty oznaczone tagiem #{{tag}}",
+    "post_count_few": "{{count}} posty",
+    "post_count_many": "{{count}} posty",
+    "post_count_one": "{{count}} posty",
+    "post_count_other": "{{count}} posty"
   },
   "hashtags": {
     "title": "Popularne hashtagi",
@@ -412,7 +440,11 @@
     "no_hashtags": "Nie znaleziono hashtagów",
     "no_match": "Brak hashtagów pasujących do \"{{query}}\"",
     "no_trending": "Brak popularnych hashtagów w twojej społeczności.",
-    "post_count": "{{count}} posty"
+    "post_count": "{{count}} posty",
+    "post_count_few": "{{count}} posty",
+    "post_count_many": "{{count}} posty",
+    "post_count_one": "{{count}} posty",
+    "post_count_other": "{{count}} posty"
   },
   "share": {
     "tooltip_remove": "Usuń udostępnienie",
@@ -452,7 +484,11 @@
     "dm_sent_label": "Wysłano",
     "dm_send": "Wyślij",
     "dm_done": "Gotowe",
-    "email": "E-mail"
+    "email": "E-mail",
+    "button_label_count_few": "Udostępnij ({{count}})",
+    "button_label_count_many": "Udostępnij ({{count}})",
+    "button_label_count_one": "Udostępnij ({{count}})",
+    "button_label_count_other": "Udostępnij ({{count}})"
   },
   "video": {
     "select": "Dodaj wideo",
@@ -474,7 +510,15 @@
     "title": "Na czasie",
     "view_all": "Zobacz wszystkie hashtagi",
     "post_count_one": "Post {{count}}",
-    "post_count_other": "Posty {{count}}"
+    "post_count_other": "Posty {{count}}",
+    "post_count_one_few": "Post {{count}}",
+    "post_count_one_many": "Post {{count}}",
+    "post_count_one_one": "Post {{count}}",
+    "post_count_one_other": "Post {{count}}",
+    "post_count_other_few": "Posty {{count}}",
+    "post_count_other_many": "Posty {{count}}",
+    "post_count_other_one": "Posty {{count}}",
+    "post_count_other_other": "Posty {{count}}"
   },
   "sidebar": {
     "profile": {
@@ -520,7 +564,11 @@
     "groups": {
       "title": "Popularne grupy",
       "see_all": "Zobacz wszystko",
-      "members": "{{count}} członków"
+      "members": "{{count}} członków",
+      "members_few": "{{count}} członków",
+      "members_many": "{{count}} członków",
+      "members_one": "{{count}} członków",
+      "members_other": "{{count}} członków"
     },
     "actions": {
       "title": "Szybkie działania",
@@ -573,7 +621,12 @@
     "go_to_image": "Przejdź do obrazu {{number}}",
     "more_images": "{{count}} więcej obrazów",
     "video_of": "Wideo {{current}} z {{total}}",
-    "role_description": "karuzela"
+    "role_description": "karuzela",
+    "more_images_few": "{{count}} więcej obrazów",
+    "more_images_many": "{{count}} więcej obrazów",
+    "more_images_one": "{{count}} więcej obrazów",
+    "more_images_other": "{{count}} więcej obrazów",
+    "view_video": "Obejrzyj film {{current}} z {{total}}"
   },
   "lightbox": {
     "aria_label": "Podgląd obrazu",
@@ -618,7 +671,11 @@
     "connect_failed": "Nie udało się wysłać prośby",
     "pending": "Oczekujące",
     "dismiss": "Odrzuć",
-    "load_failed": "Nie udało się załadować sugestii"
+    "load_failed": "Nie udało się załadować sugestii",
+    "mutual_few": "{{count}} wspólnych połączeń",
+    "mutual_many": "{{count}} wspólnych połączeń",
+    "mutual_one": "{{count}} wspólnych połączeń",
+    "mutual_other": "{{count}} wspólnych połączeń"
   },
   "analytics": {
     "title": "Analiza postu",
@@ -647,5 +704,9 @@
   },
   "aria": {
     "feed_sidebar": "Sugestie i najważniejsze informacje społeczności"
-  }
+  },
+  "items_loaded_few": "{{count}} wpisów",
+  "items_loaded_many": "{{count}} wpisów",
+  "items_loaded_one": "{{count}} wpisów",
+  "items_loaded_other": "{{count}} wpisów"
 }

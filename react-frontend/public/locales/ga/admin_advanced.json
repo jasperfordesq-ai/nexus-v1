@@ -550,14 +550,24 @@
           "unique_uris": "URIs uathúla"
         },
         "labels": {
-          "spoofed_count": "{{count}}spoofed"
+          "spoofed_count": "{{count}}spoofed",
+          "spoofed_count_few": "{{count}}spoofed",
+          "spoofed_count_many": "{{count}}spoofed",
+          "spoofed_count_one": "{{count}}spoofed",
+          "spoofed_count_other": "{{count}}spoofed",
+          "spoofed_count_two": "{{count}}spoofed"
         },
         "log_summary": "Logáil: {{size}} - ó {{time}}",
         "sections": {
           "hits_by_crawler": "Hits ag crawler",
           "hits_by_status": "Amas de réir stádas HTTP",
           "recent_activity": "Gníomhaíocht le déanaí (an chéad cheann is déanaí, an ceann deireanach {{count}})",
-          "top_uris": "URIs is fearr (50 barr de réir an chomhairimh)"
+          "top_uris": "URIs is fearr (50 barr de réir an chomhairimh)",
+          "recent_activity_few": "Gníomhaíocht le déanaí (an chéad cheann is déanaí, an ceann deireanach {{count}})",
+          "recent_activity_many": "Gníomhaíocht le déanaí (an chéad cheann is déanaí, an ceann deireanach {{count}})",
+          "recent_activity_one": "Gníomhaíocht le déanaí (an chéad cheann is déanaí, an ceann deireanach {{count}})",
+          "recent_activity_other": "Gníomhaíocht le déanaí (an chéad cheann is déanaí, an ceann deireanach {{count}})",
+          "recent_activity_two": "Gníomhaíocht le déanaí (an chéad cheann is déanaí, an ceann deireanach {{count}})"
         },
         "tables": {
           "recent_hits_aria": "Amas bot le déanaí",
@@ -573,7 +583,12 @@
         "actions": {
           "open_in_inventory": "Oscail san fhardal",
           "refresh": "Athnuaigh",
-          "refresh_all_stale": "Athnuaigh an seanscéal ({{count}})"
+          "refresh_all_stale": "Athnuaigh an seanscéal ({{count}})",
+          "refresh_all_stale_few": "Athnuaigh an seanscéal ({{count}})",
+          "refresh_all_stale_many": "Athnuaigh an seanscéal ({{count}})",
+          "refresh_all_stale_one": "Athnuaigh an seanscéal ({{count}})",
+          "refresh_all_stale_other": "Athnuaigh an seanscéal ({{count}})",
+          "refresh_all_stale_two": "Athnuaigh an seanscéal ({{count}})"
         },
         "columns": {
           "actions": "ACTIONS",
@@ -585,7 +600,12 @@
           "tenant": "TENANT"
         },
         "confirm": {
-          "queue_recache": "Reache scuaine do thionóntaí {{count}}?"
+          "queue_recache": "Reache scuaine do thionóntaí {{count}}?",
+          "queue_recache_few": "Reache scuaine do thionóntaí {{count}}?",
+          "queue_recache_many": "Reache scuaine do thionóntaí {{count}}?",
+          "queue_recache_one": "Reache scuaine do thionóntaí {{count}}?",
+          "queue_recache_other": "Reache scuaine do thionóntaí {{count}}?",
+          "queue_recache_two": "Reache scuaine do thionóntaí {{count}}?"
         },
         "empty": "Uimh tionóntaí",
         "errors": {
@@ -596,11 +616,21 @@
         "messages": {
           "bulk_queued": "Reache scuaine do thionóntaí {{count}}",
           "no_stale": "Uimh tionóntaí stale - clúdach sláintiúil",
-          "tenant_queued": "Cuireadh #{{id}} sa scuaine do {{slug}}"
+          "tenant_queued": "Cuireadh #{{id}} sa scuaine do {{slug}}",
+          "bulk_queued_few": "Reache scuaine do thionóntaí {{count}}",
+          "bulk_queued_many": "Reache scuaine do thionóntaí {{count}}",
+          "bulk_queued_one": "Reache scuaine do thionóntaí {{count}}",
+          "bulk_queued_other": "Reache scuaine do thionóntaí {{count}}",
+          "bulk_queued_two": "Reache scuaine do thionóntaí {{count}}"
         },
         "summary": {
           "healthy": "Gach tionónta {{count}} sláintiúil.",
-          "needs_work": "{{needing}} ó thionóntaí {{total}} tá bealaí in easnamh, sean, nó sócmhainní briste."
+          "needs_work": "{{needing}} ó thionóntaí {{total}} tá bealaí in easnamh, sean, nó sócmhainní briste.",
+          "healthy_few": "Gach tionónta {{count}} sláintiúil.",
+          "healthy_many": "Gach tionónta {{count}} sláintiúil.",
+          "healthy_one": "Gach tionónta {{count}} sláintiúil.",
+          "healthy_other": "Gach tionónta {{count}} sláintiúil.",
+          "healthy_two": "Gach tionónta {{count}} sláintiúil."
         },
         "table_aria": "Clúdach"
       },
@@ -628,7 +658,17 @@
           "drift_applied": "Cuireadh braite srutha i bhfeidhm",
           "drift_dry_run": "Drift tirim-rith críochnaithe",
           "purge_dry_run": "Rith tirim: ghlanfaí pictiúir {{count}}",
-          "purged_ungated": "Glanghlacadóirí {{count}} gan ghá thar thionóntaí {{tenants}}"
+          "purged_ungated": "Glanghlacadóirí {{count}} gan ghá thar thionóntaí {{tenants}}",
+          "purged_ungated_few": "Glanghlacadóirí {{count}} gan ghá thar thionóntaí {{tenants}}",
+          "purged_ungated_many": "Glanghlacadóirí {{count}} gan ghá thar thionóntaí {{tenants}}",
+          "purged_ungated_one": "Glanghlacadóirí {{count}} gan ghá thar thionóntaí {{tenants}}",
+          "purged_ungated_other": "Glanghlacadóirí {{count}} gan ghá thar thionóntaí {{tenants}}",
+          "purged_ungated_two": "Glanghlacadóirí {{count}} gan ghá thar thionóntaí {{tenants}}",
+          "purge_dry_run_few": "Rith tirim: ghlanfaí pictiúir {{count}}",
+          "purge_dry_run_many": "Rith tirim: ghlanfaí pictiúir {{count}}",
+          "purge_dry_run_one": "Rith tirim: ghlanfaí pictiúir {{count}}",
+          "purge_dry_run_other": "Rith tirim: ghlanfaí pictiúir {{count}}",
+          "purge_dry_run_two": "Rith tirim: ghlanfaí pictiúir {{count}}"
         },
         "no_output": "(gan aschur)",
         "purge_ungated": {
@@ -637,7 +677,17 @@
         },
         "result": {
           "deleted": "Scriosadh pictiúir {{count}} thar thionóntaí {{tenants}}",
-          "would_delete": "An scriosfaí pictiúir {{count}} thar thionóntaí {{tenants}}"
+          "would_delete": "An scriosfaí pictiúir {{count}} thar thionóntaí {{tenants}}",
+          "would_delete_few": "An scriosfaí pictiúir {{count}} thar thionóntaí {{tenants}}",
+          "would_delete_many": "An scriosfaí pictiúir {{count}} thar thionóntaí {{tenants}}",
+          "would_delete_one": "An scriosfaí pictiúir {{count}} thar thionóntaí {{tenants}}",
+          "would_delete_other": "An scriosfaí pictiúir {{count}} thar thionóntaí {{tenants}}",
+          "would_delete_two": "An scriosfaí pictiúir {{count}} thar thionóntaí {{tenants}}",
+          "deleted_few": "Scriosadh pictiúir {{count}} thar thionóntaí {{tenants}}",
+          "deleted_many": "Scriosadh pictiúir {{count}} thar thionóntaí {{tenants}}",
+          "deleted_one": "Scriosadh pictiúir {{count}} thar thionóntaí {{tenants}}",
+          "deleted_other": "Scriosadh pictiúir {{count}} thar thionóntaí {{tenants}}",
+          "deleted_two": "Scriosadh pictiúir {{count}} thar thionóntaí {{tenants}}"
         },
         "title": "Uathoibriú úire"
       },
@@ -666,7 +716,10 @@
           "queue_reset_one": "Athshocraigh sraith greamaithe {{count}}; breaker glanta",
           "queue_reset_other": "Athshocraigh sraitheanna greamaithe {{count}}; breaker glanta",
           "queue_reset_failed": "Theip ar athshocrú na scuaine",
-          "reset_failed": "Theip ar an athshocrú"
+          "reset_failed": "Theip ar an athshocrú",
+          "queue_reset_few": "Athshocraigh sraitheanna greamaithe {{count}}; breaker glanta",
+          "queue_reset_many": "Athshocraigh sraitheanna greamaithe {{count}}; breaker glanta",
+          "queue_reset_two": "Athshocraigh sraitheanna greamaithe {{count}}; breaker glanta"
         },
         "checks": {
           "cache_readable": "Is féidir taisce a léamh",
@@ -683,7 +736,10 @@
           "sched_prerender-detect-drift": "Buille croí braite sruth",
           "sched_prerender-auto-recache": "Buille croí uathoibríoch-recache",
           "sched_prerender-reap-stale": "Buille croí glanta seanphoist"
-        }
+        },
+        "issue_count_few": "{{count}} saincheisteanna",
+        "issue_count_many": "{{count}} saincheisteanna",
+        "issue_count_two": "{{count}} saincheisteanna"
       },
       "inventory": {
         "actions": {
@@ -694,7 +750,12 @@
           "recache_selected": "Recache roghnaithe ({{count}})",
           "reload": "Athlódáil",
           "select_all_visible": "Roghnaigh gach infheicthe",
-          "select_snapshot": "Roghnaigh {{path}}"
+          "select_snapshot": "Roghnaigh {{path}}",
+          "recache_selected_few": "Recache roghnaithe ({{count}})",
+          "recache_selected_many": "Recache roghnaithe ({{count}})",
+          "recache_selected_one": "Recache roghnaithe ({{count}})",
+          "recache_selected_other": "Recache roghnaithe ({{count}})",
+          "recache_selected_two": "Recache roghnaithe ({{count}})"
         },
         "columns": {
           "actions": "Gníomhartha",
@@ -729,7 +790,12 @@
           "tenant_slug": "Drúchtín tionónta"
         },
         "messages": {
-          "bulk_recache": "Neamhbhailíochtú pictiúir {{count}} agus reache scuaine"
+          "bulk_recache": "Neamhbhailíochtú pictiúir {{count}} agus reache scuaine",
+          "bulk_recache_few": "Neamhbhailíochtú pictiúir {{count}} agus reache scuaine",
+          "bulk_recache_many": "Neamhbhailíochtú pictiúir {{count}} agus reache scuaine",
+          "bulk_recache_one": "Neamhbhailíochtú pictiúir {{count}} agus reache scuaine",
+          "bulk_recache_other": "Neamhbhailíochtú pictiúir {{count}} agus reache scuaine",
+          "bulk_recache_two": "Neamhbhailíochtú pictiúir {{count}} agus reache scuaine"
         },
         "inspect": {
           "age": "Aois",
@@ -762,7 +828,27 @@
           "seo_score": "SEO scór",
           "size": "Méid",
           "tips": "Leideanna ({{count}})",
-          "title": "Teideal"
+          "title": "Teideal",
+          "must_fix_few": "Ní mór a shocrú ({{count}})",
+          "must_fix_many": "Ní mór a shocrú ({{count}})",
+          "must_fix_one": "Ní mór a shocrú ({{count}})",
+          "must_fix_other": "Ní mór a shocrú ({{count}})",
+          "must_fix_two": "Ní mór a shocrú ({{count}})",
+          "tips_few": "Leideanna ({{count}})",
+          "tips_many": "Leideanna ({{count}})",
+          "tips_one": "Leideanna ({{count}})",
+          "tips_other": "Leideanna ({{count}})",
+          "tips_two": "Leideanna ({{count}})",
+          "asset_references_few": "Tagairtí sócmhainní ({{count}})",
+          "asset_references_many": "Tagairtí sócmhainní ({{count}})",
+          "asset_references_one": "Tagairtí sócmhainní ({{count}})",
+          "asset_references_other": "Tagairtí sócmhainní ({{count}})",
+          "asset_references_two": "Tagairtí sócmhainní ({{count}})",
+          "dead_assets_few": "{{count}} marbh",
+          "dead_assets_many": "{{count}} marbh",
+          "dead_assets_one": "{{count}} marbh",
+          "dead_assets_other": "{{count}} marbh",
+          "dead_assets_two": "{{count}} marbh"
         },
         "selected": "{{count}} roghnaithe",
         "status": {
@@ -771,7 +857,12 @@
           "content_drifted": "ábhar drifted"
         },
         "summary": "{{filtered}} de na pictiúir {{total}}",
-        "table_aria": "fardal seat"
+        "table_aria": "fardal seat",
+        "selected_few": "{{count}} roghnaithe",
+        "selected_many": "{{count}} roghnaithe",
+        "selected_one": "{{count}} roghnaithe",
+        "selected_other": "{{count}} roghnaithe",
+        "selected_two": "{{count}} roghnaithe"
       },
       "jobs": {
         "actions": {
@@ -840,7 +931,12 @@
           "tooltip": "tosaíocht={{priority}} (bua níos ísle)"
         },
         "result": {
-          "invalid": "{{count}} neamhbhailí"
+          "invalid": "{{count}} neamhbhailí",
+          "invalid_few": "{{count}} neamhbhailí",
+          "invalid_many": "{{count}} neamhbhailí",
+          "invalid_one": "{{count}} neamhbhailí",
+          "invalid_other": "{{count}} neamhbhailí",
+          "invalid_two": "{{count}} neamhbhailí"
         },
         "scope": {
           "all_tenants": "gach tionónta"
@@ -872,7 +968,12 @@
           "success": "Rath",
           "supersede": "ionad",
           "unknown": "Imeacht anaithnid: {{event}}"
-        }
+        },
+        "summary_few": "Imeachtaí {{count}}",
+        "summary_many": "Imeachtaí {{count}}",
+        "summary_one": "Imeachtaí {{count}}",
+        "summary_other": "Imeachtaí {{count}}",
+        "summary_two": "Imeachtaí {{count}}"
       },
       "failures": {
         "columns": {
@@ -888,7 +989,10 @@
         "errors": {
           "load": "Theip ar theipeanna a luchtú"
         },
-        "table_aria": "Teipeanna"
+        "table_aria": "Teipeanna",
+        "actions": {
+          "close_breaker_now": "Lean ar aghaidh sa scuaine anois"
+        }
       },
       "live_connected": "Nuashonruithe beo ceangailte",
       "audit": {
@@ -957,7 +1061,17 @@
           "cache_unreachable": "Ní féidir teacht ar thaisce",
           "healthy": "sláintiúil",
           "missing": "{{count}} in easnamh",
-          "stale": "{{count}} sean"
+          "stale": "{{count}} sean",
+          "missing_few": "{{count}} in easnamh",
+          "missing_many": "{{count}} in easnamh",
+          "missing_one": "{{count}} in easnamh",
+          "missing_other": "{{count}} in easnamh",
+          "missing_two": "{{count}} in easnamh",
+          "stale_few": "{{count}} sean",
+          "stale_many": "{{count}} sean",
+          "stale_one": "{{count}} sean",
+          "stale_other": "{{count}} sean",
+          "stale_two": "{{count}} sean"
         },
         "hints": {
           "active_jobs": "{{count}} gníomhach",
@@ -969,7 +1083,17 @@
           "event_at": "Imeacht {{time}}",
           "no_events": "Gan imeachtaí",
           "prometheus": "Prometheus i bhformáid téacs",
-          "tenants_routes": "Tionóntaí {{tenants}} x bealaí {{routes}}"
+          "tenants_routes": "Tionóntaí {{tenants}} x bealaí {{routes}}",
+          "aging_few": "{{count}} ag dul in aois (>7d)",
+          "aging_many": "{{count}} ag dul in aois (>7d)",
+          "aging_one": "{{count}} ag dul in aois (>7d)",
+          "aging_other": "{{count}} ag dul in aois (>7d)",
+          "aging_two": "{{count}} ag dul in aois (>7d)",
+          "active_jobs_few": "{{count}} gníomhach",
+          "active_jobs_many": "{{count}} gníomhach",
+          "active_jobs_one": "{{count}} gníomhach",
+          "active_jobs_other": "{{count}} gníomhach",
+          "active_jobs_two": "{{count}} gníomhach"
         },
         "kpi": {
           "age_stale": "Aois sean (>14d)",
@@ -1025,7 +1149,17 @@
         },
         "messages": {
           "dry_run": "Rith tirim: ghlanfaí pictiúir {{count}}",
-          "purged": "Glanghlacadóirí {{count}}{{job}}"
+          "purged": "Glanghlacadóirí {{count}}{{job}}",
+          "dry_run_few": "Rith tirim: ghlanfaí pictiúir {{count}}",
+          "dry_run_many": "Rith tirim: ghlanfaí pictiúir {{count}}",
+          "dry_run_one": "Rith tirim: ghlanfaí pictiúir {{count}}",
+          "dry_run_other": "Rith tirim: ghlanfaí pictiúir {{count}}",
+          "dry_run_two": "Rith tirim: ghlanfaí pictiúir {{count}}",
+          "purged_few": "Glanghlacadóirí {{count}}{{job}}",
+          "purged_many": "Glanghlacadóirí {{count}}{{job}}",
+          "purged_one": "Glanghlacadóirí {{count}}{{job}}",
+          "purged_other": "Glanghlacadóirí {{count}}{{job}}",
+          "purged_two": "Glanghlacadóirí {{count}}{{job}}"
         },
         "placeholders": {
           "pattern": "/blog/* nó /listings/**",
@@ -1033,13 +1167,28 @@
         },
         "result": {
           "deleted": "Scriosadh pictiúir {{count}}",
-          "would_delete": "Scriosfaí pictiúir {{count}}"
+          "would_delete": "Scriosfaí pictiúir {{count}}",
+          "would_delete_few": "Scriosfaí pictiúir {{count}}",
+          "would_delete_many": "Scriosfaí pictiúir {{count}}",
+          "would_delete_one": "Scriosfaí pictiúir {{count}}",
+          "would_delete_other": "Scriosfaí pictiúir {{count}}",
+          "would_delete_two": "Scriosfaí pictiúir {{count}}",
+          "deleted_few": "Scriosadh pictiúir {{count}}",
+          "deleted_many": "Scriosadh pictiúir {{count}}",
+          "deleted_one": "Scriosadh pictiúir {{count}}",
+          "deleted_other": "Scriosadh pictiúir {{count}}",
+          "deleted_two": "Scriosadh pictiúir {{count}}"
         },
         "title": "Glantóir taisce saoróg",
         "preview_gate": {
           "title": "Réamhamharc riachtanach roimh scriosadh beo",
           "required": "Tá scriosadh beo faoi ghlas go dtí go ndéanann tú réamhamharc ar an bpatrún bealaigh céanna agus ar an raon feidhme tionónta.",
-          "ready": "Aimsíodh réamhamharc meaitseála. Tá an scriosadh beo teoranta do na pictiúir {{count}} meaitseála a thaispeánann an réamhamharc."
+          "ready": "Aimsíodh réamhamharc meaitseála. Tá an scriosadh beo teoranta do na pictiúir {{count}} meaitseála a thaispeánann an réamhamharc.",
+          "ready_few": "Aimsíodh réamhamharc meaitseála. Tá an scriosadh beo teoranta do na pictiúir {{count}} meaitseála a thaispeánann an réamhamharc.",
+          "ready_many": "Aimsíodh réamhamharc meaitseála. Tá an scriosadh beo teoranta do na pictiúir {{count}} meaitseála a thaispeánann an réamhamharc.",
+          "ready_one": "Aimsíodh réamhamharc meaitseála. Tá an scriosadh beo teoranta do na pictiúir {{count}} meaitseála a thaispeánann an réamhamharc.",
+          "ready_other": "Aimsíodh réamhamharc meaitseála. Tá an scriosadh beo teoranta do na pictiúir {{count}} meaitseála a thaispeánann an réamhamharc.",
+          "ready_two": "Aimsíodh réamhamharc meaitseála. Tá an scriosadh beo teoranta do na pictiúir {{count}} meaitseála a thaispeánann an réamhamharc."
         }
       },
       "ttl_inspector": {
@@ -1066,7 +1215,22 @@
         "units": {
           "days": "{{count}}d",
           "hours": "{{count}}h",
-          "minutes": "{{count}} nóim"
+          "minutes": "{{count}} nóim",
+          "minutes_few": "{{count}} nóim",
+          "minutes_many": "{{count}} nóim",
+          "minutes_one": "{{count}} nóim",
+          "minutes_other": "{{count}} nóim",
+          "minutes_two": "{{count}} nóim",
+          "hours_few": "{{count}}h",
+          "hours_many": "{{count}}h",
+          "hours_one": "{{count}}h",
+          "hours_other": "{{count}}h",
+          "hours_two": "{{count}}h",
+          "days_few": "{{count}}d",
+          "days_many": "{{count}}d",
+          "days_one": "{{count}}d",
+          "days_other": "{{count}}d",
+          "days_two": "{{count}}d"
         }
       },
       "sitemap_explorer": {
@@ -1076,7 +1240,22 @@
         "counts": {
           "dynamic": "{{count}} dinimiciúil",
           "static": "{{count}} statach",
-          "total": "{{count}} iomlán"
+          "total": "{{count}} iomlán",
+          "static_few": "{{count}} statach",
+          "static_many": "{{count}} statach",
+          "static_one": "{{count}} statach",
+          "static_other": "{{count}} statach",
+          "static_two": "{{count}} statach",
+          "dynamic_few": "{{count}} dinimiciúil",
+          "dynamic_many": "{{count}} dinimiciúil",
+          "dynamic_one": "{{count}} dinimiciúil",
+          "dynamic_other": "{{count}} dinimiciúil",
+          "dynamic_two": "{{count}} dinimiciúil",
+          "total_few": "{{count}} iomlán",
+          "total_many": "{{count}} iomlán",
+          "total_one": "{{count}} iomlán",
+          "total_other": "{{count}} iomlán",
+          "total_two": "{{count}} iomlán"
         },
         "description_prefix": "Féach go díreach cé na bealaí atá beartaithe ag an inneall a sholáthar do thionónta - urlár statach (gné / modúl le geata) móide na URLanna dinimiciúla ó",
         "description_suffix": "Tugann oibrí na nDrámadóir cuairt ar an liosta seo.",
@@ -1134,7 +1313,12 @@
         },
         "status": {
           "clean": "Níor aimsíodh aon fhadhb",
-          "needs_attention": "Ní mór aird a thabhairt ar mhír {{count}}"
+          "needs_attention": "Ní mór aird a thabhairt ar mhír {{count}}",
+          "needs_attention_few": "Ní mór aird a thabhairt ar mhír {{count}}",
+          "needs_attention_many": "Ní mór aird a thabhairt ar mhír {{count}}",
+          "needs_attention_one": "Ní mór aird a thabhairt ar mhír {{count}}",
+          "needs_attention_other": "Ní mór aird a thabhairt ar mhír {{count}}",
+          "needs_attention_two": "Ní mór aird a thabhairt ar mhír {{count}}"
         },
         "counts": {
           "expected": "Expected",
@@ -1567,7 +1751,69 @@
         "do_not_remove_prerender": "Ná bain an réamhbhabhta ar ais.",
         "rollback_path_required": "Tá gá le cosán aisfhillte"
       }
-    }
+    },
+    "health_meta_description_length_few": "Carachtair{{count}}(idéalach: 150–160)",
+    "health_meta_description_length_many": "Carachtair{{count}}(idéalach: 150–160)",
+    "health_meta_description_length_one": "Carachtair{{count}}(idéalach: 150–160)",
+    "health_meta_description_length_other": "Carachtair{{count}}(idéalach: 150–160)",
+    "health_meta_description_length_two": "Carachtair{{count}}(idéalach: 150–160)",
+    "health_auto_sitemap_active_count_few": "Gníomhach - URLanna{{count}}innéacsaithe",
+    "health_auto_sitemap_active_count_many": "Gníomhach - URLanna{{count}}innéacsaithe",
+    "health_auto_sitemap_active_count_one": "Gníomhach - URLanna{{count}}innéacsaithe",
+    "health_auto_sitemap_active_count_other": "Gníomhach - URLanna{{count}}innéacsaithe",
+    "health_auto_sitemap_active_count_two": "Gníomhach - URLanna{{count}}innéacsaithe",
+    "pass_count_few": "{{count}} pas",
+    "pass_count_many": "{{count}} pas",
+    "pass_count_one": "{{count}} pas",
+    "pass_count_other": "{{count}} pas",
+    "pass_count_two": "{{count}} pas",
+    "warning_count_few": "{{count}} rabhadh",
+    "warning_count_many": "{{count}} rabhadh",
+    "warning_count_one": "{{count}} rabhadh",
+    "warning_count_other": "{{count}} rabhadh",
+    "warning_count_two": "{{count}} rabhadh",
+    "fail_count_few": "{{count}}teip",
+    "fail_count_many": "{{count}}teip",
+    "fail_count_one": "{{count}}teip",
+    "fail_count_other": "{{count}}teip",
+    "fail_count_two": "{{count}}teip",
+    "meta_description_count_few": "{{count}}/160 carachtar meiti-thuairisce",
+    "meta_description_count_many": "{{count}}/160 carachtar meiti-thuairisce",
+    "meta_description_count_one": "{{count}}/160 carachtar meiti-thuairisce",
+    "meta_description_count_other": "{{count}}/160 carachtar meiti-thuairisce",
+    "meta_description_count_two": "{{count}}/160 carachtar meiti-thuairisce",
+    "global_meta_description_count_few": "{{count}}/160 carachtar meiti-thuairisce domhanda",
+    "global_meta_description_count_many": "{{count}}/160 carachtar meiti-thuairisce domhanda",
+    "global_meta_description_count_one": "{{count}}/160 carachtar meiti-thuairisce domhanda",
+    "global_meta_description_count_other": "{{count}}/160 carachtar meiti-thuairisce domhanda",
+    "global_meta_description_count_two": "{{count}}/160 carachtar meiti-thuairisce domhanda",
+    "passed_count_with_value_few": "{{count}}rith",
+    "passed_count_with_value_many": "{{count}}rith",
+    "passed_count_with_value_one": "{{count}}rith",
+    "passed_count_with_value_other": "{{count}}rith",
+    "passed_count_with_value_two": "{{count}}rith",
+    "warnings_count_with_value_few": "Rabhadh{{count}}",
+    "warnings_count_with_value_many": "Rabhadh{{count}}",
+    "warnings_count_with_value_one": "Rabhadh{{count}}",
+    "warnings_count_with_value_other": "Rabhadh{{count}}",
+    "warnings_count_with_value_two": "Rabhadh{{count}}",
+    "failed_count_with_value_few": "Theip ar{{count}}",
+    "failed_count_with_value_many": "Theip ar{{count}}",
+    "failed_count_with_value_one": "Theip ar{{count}}",
+    "failed_count_with_value_other": "Theip ar{{count}}",
+    "failed_count_with_value_two": "Theip ar{{count}}",
+    "match_count_few": "Cluichí ar líne saor in aisce{{count}}",
+    "match_count_many": "Cluichí ar líne saor in aisce{{count}}",
+    "match_count_two": "Cluichí ar líne saor in aisce{{count}}",
+    "top_matches_for_user_few": "Na cluichí is fearr do{{count}}do{{name}}",
+    "top_matches_for_user_many": "Na cluichí is fearr do{{count}}do{{name}}",
+    "top_matches_for_user_two": "Na cluichí is fearr do{{count}}do{{name}}",
+    "total_count_few": "Iomlán: {{count}}",
+    "total_count_many": "Iomlán: {{count}}",
+    "total_count_one": "Iomlán: {{count}}",
+    "total_count_other": "Iomlán: {{count}}",
+    "total_count_two": "Iomlán: {{count}}",
+    "score_out_of": "as {{maximum}}"
   },
   "email_deliverability": {
     "title": "Inseachadacht Ríomhphoist",
@@ -1606,7 +1852,17 @@
       "trigger_score": "Scór truicear",
       "unconfirmed": "{{count}} glactha ach gan daingniú",
       "webhook_confirmed": "Deimhnithe ag an soláthraí gréasáin",
-      "window_days": "Fuinneog lae {{days}}"
+      "window_days": "Fuinneog lae {{days}}",
+      "unconfirmed_few": "{{count}} glactha ach gan daingniú",
+      "unconfirmed_many": "{{count}} glactha ach gan daingniú",
+      "unconfirmed_one": "{{count}} glactha ach gan daingniú",
+      "unconfirmed_other": "{{count}} glactha ach gan daingniú",
+      "unconfirmed_two": "{{count}} glactha ach gan daingniú",
+      "bad_outcomes_few": "Theip ar {{count}}, preabadh nó cuireadh faoi chois é",
+      "bad_outcomes_many": "Theip ar {{count}}, preabadh nó cuireadh faoi chois é",
+      "bad_outcomes_one": "Theip ar {{count}}, preabadh nó cuireadh faoi chois é",
+      "bad_outcomes_other": "Theip ar {{count}}, preabadh nó cuireadh faoi chois é",
+      "bad_outcomes_two": "Theip ar {{count}}, preabadh nó cuireadh faoi chois é"
     },
     "status": {
       "bounced": "Preab",
@@ -1968,6 +2224,11 @@
       "fcm": "Móibíleach seolta/teipthe",
       "web": "Gréasán seachadta",
       "recent_failures": "Teipeanna le déanaí"
-    }
+    },
+    "trigger_coverage_few": "Saincheisteanna {{issues}} trasna sreafaí monatóireachta {{count}}",
+    "trigger_coverage_many": "Saincheisteanna {{issues}} trasna sreafaí monatóireachta {{count}}",
+    "trigger_coverage_one": "Saincheisteanna {{issues}} trasna sreafaí monatóireachta {{count}}",
+    "trigger_coverage_other": "Saincheisteanna {{issues}} trasna sreafaí monatóireachta {{count}}",
+    "trigger_coverage_two": "Saincheisteanna {{issues}} trasna sreafaí monatóireachta {{count}}"
   }
 }

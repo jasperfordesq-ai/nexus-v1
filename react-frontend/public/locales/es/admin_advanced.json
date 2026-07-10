@@ -550,14 +550,20 @@
           "unique_uris": "URI únicos"
         },
         "labels": {
-          "spoofed_count": "{{count}} falsificado"
+          "spoofed_count": "{{count}} falsificado",
+          "spoofed_count_many": "{{count}} falsificado",
+          "spoofed_count_one": "{{count}} falsificado",
+          "spoofed_count_other": "{{count}} falsificado"
         },
         "log_summary": "Registro: {{size}} - desde {{time}}",
         "sections": {
           "hits_by_crawler": "Golpes del rastreador",
           "hits_by_status": "Visitas por estado HTTP",
           "recent_activity": "Actividad reciente (lo más nuevo primero, el último {{count}})",
-          "top_uris": "Principales URI (50 principales por recuento de visitas)"
+          "top_uris": "Principales URI (50 principales por recuento de visitas)",
+          "recent_activity_many": "Actividad reciente (lo más nuevo primero, el último {{count}})",
+          "recent_activity_one": "Actividad reciente (lo más nuevo primero, el último {{count}})",
+          "recent_activity_other": "Actividad reciente (lo más nuevo primero, el último {{count}})"
         },
         "tables": {
           "recent_hits_aria": "Golpes recientes de bots",
@@ -573,7 +579,10 @@
         "actions": {
           "open_in_inventory": "Abrir en inventario",
           "refresh": "Refrescar",
-          "refresh_all_stale": "Actualizar todo obsoleto ({{count}})"
+          "refresh_all_stale": "Actualizar todo obsoleto ({{count}})",
+          "refresh_all_stale_many": "Actualizar todo obsoleto ({{count}})",
+          "refresh_all_stale_one": "Actualizar todo obsoleto ({{count}})",
+          "refresh_all_stale_other": "Actualizar todo obsoleto ({{count}})"
         },
         "columns": {
           "actions": "ACTIONS",
@@ -585,7 +594,10 @@
           "tenant": "TENANT"
         },
         "confirm": {
-          "queue_recache": "¿Recaché de cola para inquilinos de {{count}}?"
+          "queue_recache": "¿Recaché de cola para inquilinos de {{count}}?",
+          "queue_recache_many": "¿Recaché de cola para inquilinos de {{count}}?",
+          "queue_recache_one": "¿Recaché de cola para inquilinos de {{count}}?",
+          "queue_recache_other": "¿Recaché de cola para inquilinos de {{count}}?"
         },
         "empty": "Sin inquilinos",
         "errors": {
@@ -596,11 +608,17 @@
         "messages": {
           "bulk_queued": "Recuperación de caché en cola para inquilinos de {{count}}",
           "no_stale": "Sin inquilinos obsoletos: la cobertura es saludable",
-          "tenant_queued": "#{{id}} en cola para {{slug}}"
+          "tenant_queued": "#{{id}} en cola para {{slug}}",
+          "bulk_queued_many": "Recuperación de caché en cola para inquilinos de {{count}}",
+          "bulk_queued_one": "Recuperación de caché en cola para inquilinos de {{count}}",
+          "bulk_queued_other": "Recuperación de caché en cola para inquilinos de {{count}}"
         },
         "summary": {
           "healthy": "Todos los inquilinos de {{count}} sanos.",
-          "needs_work": "{{needing}} de los inquilinos de {{total}} tienen rutas faltantes, obsoletas o con activos rotos."
+          "needs_work": "{{needing}} de los inquilinos de {{total}} tienen rutas faltantes, obsoletas o con activos rotos.",
+          "healthy_many": "Todos los inquilinos de {{count}} sanos.",
+          "healthy_one": "Todos los inquilinos de {{count}} sanos.",
+          "healthy_other": "Todos los inquilinos de {{count}} sanos."
         },
         "table_aria": "Cobertura"
       },
@@ -628,7 +646,13 @@
           "drift_applied": "Detección de deriva aplicada",
           "drift_dry_run": "Se completó el ensayo de deriva",
           "purge_dry_run": "Ejecución en seco: las instantáneas de {{count}} se eliminarían",
-          "purged_ungated": "Instantáneas no controladas de {{count}} eliminadas en los inquilinos de {{tenants}}"
+          "purged_ungated": "Instantáneas no controladas de {{count}} eliminadas en los inquilinos de {{tenants}}",
+          "purged_ungated_many": "Instantáneas no controladas de {{count}} eliminadas en los inquilinos de {{tenants}}",
+          "purged_ungated_one": "Instantáneas no controladas de {{count}} eliminadas en los inquilinos de {{tenants}}",
+          "purged_ungated_other": "Instantáneas no controladas de {{count}} eliminadas en los inquilinos de {{tenants}}",
+          "purge_dry_run_many": "Ejecución en seco: las instantáneas de {{count}} se eliminarían",
+          "purge_dry_run_one": "Ejecución en seco: las instantáneas de {{count}} se eliminarían",
+          "purge_dry_run_other": "Ejecución en seco: las instantáneas de {{count}} se eliminarían"
         },
         "no_output": "(sin salida)",
         "purge_ungated": {
@@ -637,7 +661,13 @@
         },
         "result": {
           "deleted": "Instantáneas de {{count}} eliminadas en los inquilinos de {{tenants}}",
-          "would_delete": "Eliminaría instantáneas de {{count}} en los inquilinos de {{tenants}}"
+          "would_delete": "Eliminaría instantáneas de {{count}} en los inquilinos de {{tenants}}",
+          "would_delete_many": "Eliminaría instantáneas de {{count}} en los inquilinos de {{tenants}}",
+          "would_delete_one": "Eliminaría instantáneas de {{count}} en los inquilinos de {{tenants}}",
+          "would_delete_other": "Eliminaría instantáneas de {{count}} en los inquilinos de {{tenants}}",
+          "deleted_many": "Instantáneas de {{count}} eliminadas en los inquilinos de {{tenants}}",
+          "deleted_one": "Instantáneas de {{count}} eliminadas en los inquilinos de {{tenants}}",
+          "deleted_other": "Instantáneas de {{count}} eliminadas en los inquilinos de {{tenants}}"
         },
         "title": "Automatización de frescura"
       },
@@ -666,7 +696,8 @@
           "queue_reset_one": "Restablecer la fila atascada de {{count}}; interruptor despejado",
           "queue_reset_other": "Restablecer las filas atascadas de {{count}}; interruptor despejado",
           "queue_reset_failed": "Error al restablecer la cola",
-          "reset_failed": "Error al restablecer"
+          "reset_failed": "Error al restablecer",
+          "queue_reset_many": "Restablecer las filas atascadas de {{count}}; interruptor despejado"
         },
         "checks": {
           "cache_readable": "Cache can be read",
@@ -683,7 +714,8 @@
           "sched_prerender-detect-drift": "Drift detector heartbeat",
           "sched_prerender-auto-recache": "Auto-recache heartbeat",
           "sched_prerender-reap-stale": "Stale-job cleanup heartbeat"
-        }
+        },
+        "issue_count_many": "Problemas con {{count}}"
       },
       "inventory": {
         "actions": {
@@ -694,7 +726,10 @@
           "recache_selected": "Recuperación de caché seleccionada ({{count}})",
           "reload": "Recargar",
           "select_all_visible": "Seleccionar todo visible",
-          "select_snapshot": "Seleccione {{path}}"
+          "select_snapshot": "Seleccione {{path}}",
+          "recache_selected_many": "Recuperación de caché seleccionada ({{count}})",
+          "recache_selected_one": "Recuperación de caché seleccionada ({{count}})",
+          "recache_selected_other": "Recuperación de caché seleccionada ({{count}})"
         },
         "columns": {
           "actions": "Comportamiento",
@@ -729,7 +764,10 @@
           "tenant_slug": "babosa inquilino"
         },
         "messages": {
-          "bulk_recache": "Instantáneas de {{count}} no validadas y recuperación de caché en cola"
+          "bulk_recache": "Instantáneas de {{count}} no validadas y recuperación de caché en cola",
+          "bulk_recache_many": "Instantáneas de {{count}} no validadas y recuperación de caché en cola",
+          "bulk_recache_one": "Instantáneas de {{count}} no validadas y recuperación de caché en cola",
+          "bulk_recache_other": "Instantáneas de {{count}} no validadas y recuperación de caché en cola"
         },
         "inspect": {
           "age": "Edad",
@@ -762,7 +800,19 @@
           "seo_score": "Puntuación SEO",
           "size": "Tamaño",
           "tips": "Consejos ({{count}})",
-          "title": "Título"
+          "title": "Título",
+          "must_fix_many": "Debe arreglar ({{count}})",
+          "must_fix_one": "Debe arreglar ({{count}})",
+          "must_fix_other": "Debe arreglar ({{count}})",
+          "tips_many": "Consejos ({{count}})",
+          "tips_one": "Consejos ({{count}})",
+          "tips_other": "Consejos ({{count}})",
+          "asset_references_many": "Referencias de activos ({{count}})",
+          "asset_references_one": "Referencias de activos ({{count}})",
+          "asset_references_other": "Referencias de activos ({{count}})",
+          "dead_assets_many": "{{count}} muerto",
+          "dead_assets_one": "{{count}} muerto",
+          "dead_assets_other": "{{count}} muerto"
         },
         "selected": "{{count}} seleccionado",
         "status": {
@@ -771,7 +821,10 @@
           "content_drifted": "el contenido se desvió"
         },
         "summary": "{{filtered}} de instantáneas de {{total}}",
-        "table_aria": "Inventario instantáneo"
+        "table_aria": "Inventario instantáneo",
+        "selected_many": "{{count}} seleccionado",
+        "selected_one": "{{count}} seleccionado",
+        "selected_other": "{{count}} seleccionado"
       },
       "jobs": {
         "actions": {
@@ -840,7 +893,10 @@
           "tooltip": "prioridad={{priority}} (ganancias más bajas)"
         },
         "result": {
-          "invalid": "{{count}} no válido"
+          "invalid": "{{count}} no válido",
+          "invalid_many": "{{count}} no válido",
+          "invalid_one": "{{count}} no válido",
+          "invalid_other": "{{count}} no válido"
         },
         "scope": {
           "all_tenants": "todos los inquilinos"
@@ -872,7 +928,10 @@
           "success": "Éxito",
           "supersede": "Reemplazar",
           "unknown": "Evento desconocido: {{event}}"
-        }
+        },
+        "summary_many": "Eventos {{count}}",
+        "summary_one": "Eventos {{count}}",
+        "summary_other": "Eventos {{count}}"
       },
       "failures": {
         "columns": {
@@ -888,7 +947,10 @@
         "errors": {
           "load": "No se pudieron cargar fallas"
         },
-        "table_aria": "Fallos"
+        "table_aria": "Fallos",
+        "actions": {
+          "close_breaker_now": "Reanudar cola ahora"
+        }
       },
       "live_connected": "Actualizaciones en vivo conectadas",
       "audit": {
@@ -957,7 +1019,13 @@
           "cache_unreachable": "Caché inalcanzable",
           "healthy": "Saludable",
           "missing": "Falta {{count}}",
-          "stale": "{{count}} obsoleto"
+          "stale": "{{count}} obsoleto",
+          "missing_many": "Falta {{count}}",
+          "missing_one": "Falta {{count}}",
+          "missing_other": "Falta {{count}}",
+          "stale_many": "{{count}} obsoleto",
+          "stale_one": "{{count}} obsoleto",
+          "stale_other": "{{count}} obsoleto"
         },
         "hints": {
           "active_jobs": "{{count}} activo",
@@ -969,7 +1037,13 @@
           "event_at": "Evento {{time}}",
           "no_events": "Sin eventos",
           "prometheus": "Formato de texto Prometeo",
-          "tenants_routes": "Inquilinos {{tenants}} x rutas {{routes}}"
+          "tenants_routes": "Inquilinos {{tenants}} x rutas {{routes}}",
+          "aging_many": "Antigüedad del {{count}} (>7d)",
+          "aging_one": "Antigüedad del {{count}} (>7d)",
+          "aging_other": "Antigüedad del {{count}} (>7d)",
+          "active_jobs_many": "{{count}} activo",
+          "active_jobs_one": "{{count}} activo",
+          "active_jobs_other": "{{count}} activo"
         },
         "kpi": {
           "age_stale": "Edad obsoleta (>14d)",
@@ -1025,7 +1099,13 @@
         },
         "messages": {
           "dry_run": "Ejecución en seco: las instantáneas de {{count}} se eliminarían",
-          "purged": "Instantáneas {{count}} purgadas{{job}}"
+          "purged": "Instantáneas {{count}} purgadas{{job}}",
+          "dry_run_many": "Ejecución en seco: las instantáneas de {{count}} se eliminarían",
+          "dry_run_one": "Ejecución en seco: las instantáneas de {{count}} se eliminarían",
+          "dry_run_other": "Ejecución en seco: las instantáneas de {{count}} se eliminarían",
+          "purged_many": "Instantáneas {{count}} purgadas{{job}}",
+          "purged_one": "Instantáneas {{count}} purgadas{{job}}",
+          "purged_other": "Instantáneas {{count}} purgadas{{job}}"
         },
         "placeholders": {
           "pattern": "/blog/* o /listings/**",
@@ -1033,13 +1113,22 @@
         },
         "result": {
           "deleted": "Instantáneas {{count}} eliminadas",
-          "would_delete": "Eliminaría instantáneas de {{count}}"
+          "would_delete": "Eliminaría instantáneas de {{count}}",
+          "would_delete_many": "Eliminaría instantáneas de {{count}}",
+          "would_delete_one": "Eliminaría instantáneas de {{count}}",
+          "would_delete_other": "Eliminaría instantáneas de {{count}}",
+          "deleted_many": "Instantáneas {{count}} eliminadas",
+          "deleted_one": "Instantáneas {{count}} eliminadas",
+          "deleted_other": "Instantáneas {{count}} eliminadas"
         },
         "title": "Purga de caché con comodines",
         "preview_gate": {
           "title": "Preview required before live delete",
           "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
-          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
+          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
+          "ready_many": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
+          "ready_one": "Se encontró una vista previa coincidente. La eliminación en vivo se limita a las instantáneas coincidentes {{count}} que se muestran en la vista previa.",
+          "ready_other": "Se encontró una vista previa coincidente. La eliminación en vivo se limita a las instantáneas coincidentes {{count}} que se muestran en la vista previa."
         }
       },
       "ttl_inspector": {
@@ -1066,7 +1155,16 @@
         "units": {
           "days": "{{count}}d",
           "hours": "{{count}}h",
-          "minutes": "{{count}}min"
+          "minutes": "{{count}}min",
+          "minutes_many": "{{count}}min",
+          "minutes_one": "{{count}}min",
+          "minutes_other": "{{count}}min",
+          "hours_many": "{{count}}h",
+          "hours_one": "{{count}}h",
+          "hours_other": "{{count}}h",
+          "days_many": "{{count}}d",
+          "days_one": "{{count}}d",
+          "days_other": "{{count}}d"
         }
       },
       "sitemap_explorer": {
@@ -1076,7 +1174,16 @@
         "counts": {
           "dynamic": "{{count}} dinámico",
           "static": "{{count}} estático",
-          "total": "{{count}}total"
+          "total": "{{count}}total",
+          "static_many": "{{count}} estático",
+          "static_one": "{{count}} estático",
+          "static_other": "{{count}} estático",
+          "dynamic_many": "{{count}} dinámico",
+          "dynamic_one": "{{count}} dinámico",
+          "dynamic_other": "{{count}} dinámico",
+          "total_many": "{{count}}total",
+          "total_one": "{{count}}total",
+          "total_other": "{{count}}total"
         },
         "description_prefix": "Vea exactamente qué rutas planea representar el motor para un inquilino: piso estático (función/módulo cerrado) más los URL dinámicos de",
         "description_suffix": "El trabajador del Dramaturgo visita esta lista.",
@@ -1134,7 +1241,10 @@
         },
         "status": {
           "clean": "No issues found",
-          "needs_attention": "{{count}} item needs attention"
+          "needs_attention": "{{count}} item needs attention",
+          "needs_attention_many": "{{count}} item needs attention",
+          "needs_attention_one": "{{count}} elemento necesita atención",
+          "needs_attention_other": "{{count}} elemento necesita atención"
         },
         "counts": {
           "expected": "Expected",
@@ -1567,7 +1677,43 @@
         "do_not_remove_prerender": "Do not remove prerender fallback.",
         "rollback_path_required": "Rollback path required"
       }
-    }
+    },
+    "health_meta_description_length_many": "Caracteres{{count}}(ideal: 150–160)",
+    "health_meta_description_length_one": "Caracteres{{count}}(ideal: 150–160)",
+    "health_meta_description_length_other": "Caracteres{{count}}(ideal: 150–160)",
+    "health_auto_sitemap_active_count_many": "Activo: URL{{count}}indexadas",
+    "health_auto_sitemap_active_count_one": "Activo: URL{{count}}indexadas",
+    "health_auto_sitemap_active_count_other": "Activo: URL{{count}}indexadas",
+    "pass_count_many": "{{count}} aprobado",
+    "pass_count_one": "{{count}} aprobado",
+    "pass_count_other": "{{count}} aprobado",
+    "warning_count_many": "{{count}} advertencia",
+    "warning_count_one": "{{count}} advertencia",
+    "warning_count_other": "{{count}} advertencia",
+    "fail_count_many": "{{count}}falla",
+    "fail_count_one": "{{count}}falla",
+    "fail_count_other": "{{count}}falla",
+    "meta_description_count_many": "{{count}}/160 caracteres de meta descripción",
+    "meta_description_count_one": "{{count}}/160 caracteres de meta descripción",
+    "meta_description_count_other": "{{count}}/160 caracteres de meta descripción",
+    "global_meta_description_count_many": "{{count}}/160 caracteres de meta descripción global",
+    "global_meta_description_count_one": "{{count}}/160 caracteres de meta descripción global",
+    "global_meta_description_count_other": "{{count}}/160 caracteres de meta descripción global",
+    "passed_count_with_value_many": "{{count}}pasó",
+    "passed_count_with_value_one": "{{count}}pasó",
+    "passed_count_with_value_other": "{{count}}pasó",
+    "warnings_count_with_value_many": "Advertencias de{{count}}",
+    "warnings_count_with_value_one": "Advertencias de{{count}}",
+    "warnings_count_with_value_other": "Advertencias de{{count}}",
+    "failed_count_with_value_many": "{{count}}falló",
+    "failed_count_with_value_one": "{{count}}falló",
+    "failed_count_with_value_other": "{{count}}falló",
+    "match_count_many": "Partidos{{count}}",
+    "top_matches_for_user_many": "Los mejores partidos de{{count}}para{{name}}",
+    "total_count_many": "totales: {{count}}",
+    "total_count_one": "totales: {{count}}",
+    "total_count_other": "totales: {{count}}",
+    "score_out_of": "de {{maximum}}"
   },
   "email_deliverability": {
     "title": "Capacidad de entrega del correo electrónico",
@@ -1606,7 +1752,13 @@
       "trigger_score": "Puntuación de activación",
       "unconfirmed": "{{count}} aceptado pero no confirmado",
       "webhook_confirmed": "Confirmado por el webhook del proveedor",
-      "window_days": "Ventana del día {{days}}"
+      "window_days": "Ventana del día {{days}}",
+      "unconfirmed_many": "{{count}} aceptado pero no confirmado",
+      "unconfirmed_one": "{{count}} aceptado pero no confirmado",
+      "unconfirmed_other": "{{count}} aceptado pero no confirmado",
+      "bad_outcomes_many": "{{count}} falló, rebotó o se suprimió",
+      "bad_outcomes_one": "{{count}} falló, rebotó o se suprimió",
+      "bad_outcomes_other": "{{count}} falló, rebotó o se suprimió"
     },
     "status": {
       "bounced": "Rebotado",
@@ -1968,6 +2120,9 @@
       "fcm": "Móvil enviadas/fallidas",
       "web": "Web entregadas",
       "recent_failures": "Fallos recientes"
-    }
+    },
+    "trigger_coverage_many": "Problemas de {{issues}} en los flujos monitoreados de {{count}}",
+    "trigger_coverage_one": "Problemas de {{issues}} en los flujos monitoreados de {{count}}",
+    "trigger_coverage_other": "Problemas de {{issues}} en los flujos monitoreados de {{count}}"
   }
 }

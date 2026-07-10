@@ -63,7 +63,9 @@
     "still_need_help_description": "Can't find what you're looking for? Our team is here to help.",
     "contact_support": "Contact Support",
     "load_error_title": "Could not load FAQs",
-    "load_error_description": "Please try refreshing the page or contact support."
+    "load_error_description": "Please try refreshing the page or contact support.",
+    "articles_count_one": "{{count}} articles",
+    "articles_count_other": "{{count}} articles"
   },
   "resources": {
     "page_title": "Resources",

@@ -62,12 +62,24 @@
     "minutes_ago": "Il y a {{count}} min",
     "hours_ago": "Il y a {{count}} h",
     "days_ago": "Il y a {{count}} j",
-    "last_seen": "Vu(e) {{time}}"
+    "last_seen": "Vu(e) {{time}}",
+    "minutes_ago_many": "Il y a {{count}} min",
+    "minutes_ago_one": "Il y a {{count}} min",
+    "minutes_ago_other": "Il y a {{count}} min",
+    "hours_ago_many": "Il y a {{count}} h",
+    "hours_ago_one": "Il y a {{count}} h",
+    "hours_ago_other": "Il y a {{count}} h",
+    "days_ago_many": "Il y a {{count}} j",
+    "days_ago_one": "Il y a {{count}} j",
+    "days_ago_other": "Il y a {{count}} j"
   },
   "mention": {
     "suggestions_aria": "Suggestions de mentions, {{count}} résultats",
     "no_users": "Aucun utilisateur trouvé",
-    "connected": "Connecté(e)"
+    "connected": "Connecté(e)",
+    "suggestions_aria_many": "Suggestions de mentions, {{count}} résultats",
+    "suggestions_aria_one": "Suggestions de mentions, {{count}} résultats",
+    "suggestions_aria_other": "Suggestions de mentions, {{count}} résultats"
   },
   "status": {
     "set_status": "Définir le statut",
@@ -153,7 +165,10 @@
     "collection_description": "Description (facultatif)",
     "cancel": "Annuler",
     "save": "Enregistrer",
-    "create": "Créer"
+    "create": "Créer",
+    "count_many": "{{count}} éléments enregistrés",
+    "count_one": "{{count}} éléments enregistrés",
+    "count_other": "{{count}} éléments enregistrés"
   },
   "verified": "Vérifié",
   "hover_card": {
@@ -163,7 +178,16 @@
     "message": "Message",
     "hours_given": "{{count}} h données",
     "connections": "{{count}} connexions",
-    "listings": "{{count}} annonces"
+    "listings": "{{count}} annonces",
+    "hours_given_many": "{{count}} h données",
+    "hours_given_one": "{{count}} h données",
+    "hours_given_other": "{{count}} h données",
+    "connections_many": "{{count}} connexions",
+    "connections_one": "{{count}} connexions",
+    "connections_other": "{{count}} connexions",
+    "listings_many": "{{count}} annonces",
+    "listings_one": "{{count}} annonces",
+    "listings_other": "{{count}} annonces"
   },
   "reactions_tabs_aria": "Filtre de type de réaction",
   "content_type_tabs_aria": "Filtre de type de contenu de signet",
@@ -175,5 +199,7 @@
     "image_alt_domain": "Aperçu de {{domain}}",
     "favicon_alt": "Icône de {{site}}",
     "video_fallback": "Vidéo"
-  }
+  },
+  "likes_count_many": "{{count}} j'aime",
+  "comments_count_many": "{{count}} commentaires"
 }

@@ -13,7 +13,7 @@
  *     and render the returned providers (or nothing on empty / error).
  *  3. Clicking a provider button fetches /api/v2/auth/oauth/{provider}/redirect
  *     and navigates via window.location.href on success.
- *  4. On a failed redirect response, alert() is called with the fallback message.
+ *  4. A failed redirect response renders translated inline feedback.
  *  5. tenant_id / X-Tenant-Id forwarding.
  */
 
@@ -37,15 +37,6 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.clearAllMocks();
-});
-
-// ---------------------------------------------------------------------------
-// Stub window.alert (used by the component on redirect failure)
-// ---------------------------------------------------------------------------
-let alertSpy: ReturnType<typeof vi.fn>;
-beforeEach(() => {
-  alertSpy = vi.fn();
-  vi.stubGlobal('alert', alertSpy);
 });
 
 // ---------------------------------------------------------------------------
@@ -251,7 +242,7 @@ describe('OAuthButtons — click → redirect flow', () => {
     });
   });
 
-  it('calls alert with the server message when success=false', async () => {
+  it('renders translated inline feedback instead of exposing the server message', async () => {
     const fetchSpy = vi.fn()
       .mockResolvedValueOnce({
         ok: true,
@@ -268,11 +259,12 @@ describe('OAuthButtons — click → redirect flow', () => {
     fireEvent.click(screen.getByText('Continue with Google'));
 
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('OAuth is disabled for this tenant.');
+      expect(screen.getByRole('alert')).toHaveTextContent('Sign-in failed. Please try again.');
+      expect(screen.queryByText('OAuth is disabled for this tenant.')).not.toBeInTheDocument();
     });
   });
 
-  it('calls alert with the fallback message when redirect fetch fails with network error', async () => {
+  it('renders translated inline feedback when redirect fetch fails with network error', async () => {
     const fetchSpy = vi.fn()
       .mockResolvedValueOnce({
         ok: true,
@@ -286,8 +278,7 @@ describe('OAuthButtons — click → redirect flow', () => {
     fireEvent.click(screen.getByText('Continue with Apple'));
 
     await waitFor(() => {
-      // Fallback message from common.json: "Sign-in failed. Please try again."
-      expect(alertSpy).toHaveBeenCalledWith('Sign-in failed. Please try again.');
+      expect(screen.getByRole('alert')).toHaveTextContent('Sign-in failed. Please try again.');
     });
   });
 });

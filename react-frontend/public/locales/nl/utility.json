@@ -63,7 +63,9 @@
     "still_need_help_description": "Kun je niet vinden wat je zoekt? Ons team staat voor je klaar.",
     "contact_support": "Contact opnemen met ondersteuning",
     "load_error_title": "Kan veelgestelde vragen niet laden",
-    "load_error_description": "Probeer de pagina te vernieuwen of neem contact op met de ondersteuning."
+    "load_error_description": "Probeer de pagina te vernieuwen of neem contact op met de ondersteuning.",
+    "articles_count_one": "{{count}} artikelen",
+    "articles_count_other": "{{count}} artikelen"
   },
   "resources": {
     "page_title": "Bronnen",

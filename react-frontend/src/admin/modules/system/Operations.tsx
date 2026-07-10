@@ -10,6 +10,7 @@
  * Previously lived inside /admin/tenant-features (now retired).
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Spinner, Button } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { Separator } from '@/components/ui';
@@ -136,7 +137,7 @@ export default function Operations() {
                   <p className="text-sm font-medium">{job.name}</p>
                   <p className="text-xs text-muted">
                     {job.last_run_at
-                      ? t('operations.last_run', { date: new Date(job.last_run_at).toLocaleString() })
+                      ? t('operations.last_run', { date: new Date(job.last_run_at).toLocaleString(getFormattingLocale()) })
                       : t('operations.never_run')}
                   </p>
                 </div>

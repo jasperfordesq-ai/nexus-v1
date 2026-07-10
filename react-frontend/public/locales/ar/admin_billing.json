@@ -203,6 +203,12 @@
     "your_plan_usage": "استخدام خطتك",
     "over_limit_warning": "لقد وصلت إلى حدود خطتك. الترقية للمتابعة.",
     "upgrade_modal_desc": "قم بترقية خطتك لفتح الميزات والسعة الإضافية.",
-    "upgrade_mailto_subject": "طلب ترقية الخطة"
+    "upgrade_mailto_subject": "طلب ترقية الخطة",
+    "user_count_label_few": "{{count}} / {{max}} مستخدمًا",
+    "user_count_label_many": "{{count}} / {{max}} مستخدمًا",
+    "user_count_label_one": "{{count}} / {{max}} مستخدمًا",
+    "user_count_label_other": "{{count}} / {{max}} مستخدمًا",
+    "user_count_label_two": "{{count}} / {{max}} مستخدمًا",
+    "user_count_label_zero": "{{count}} / {{max}} مستخدمًا"
   }
 }

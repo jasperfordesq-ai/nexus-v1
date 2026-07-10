@@ -44,7 +44,12 @@
     "no_deadline": "Sin fecha límite",
     "evaluation_criteria": "Criterios de Evaluación",
     "outcome": "Resultado",
-    "team_links": "Equipos de Proyecto"
+    "team_links": "Equipos de Proyecto",
+    "ideas_count_many": "{{count}} ideas",
+    "ideas_count_other": "{{count}} ideas",
+    "max_ideas_many": "Máx {{count}} ideas por persona",
+    "max_ideas_one": "Máx {{count}} ideas por persona",
+    "max_ideas_other": "Máx {{count}} ideas por persona"
   },
   "challenges": {
     "title": "Retos",
@@ -87,7 +92,12 @@
     "draft_created": "Creado {{date}}",
     "new_idea": "Nueva Idea",
     "sort_label": "Ordenar ideas",
-    "loading": "Cargando ideas..."
+    "loading": "Cargando ideas...",
+    "your_ideas_many": "Tus ideas: {{count}}/{{max}}",
+    "your_ideas_one": "Tus ideas: {{count}}/{{max}}",
+    "your_ideas_other": "Tus ideas: {{count}}/{{max}}",
+    "comments_many": "{{count}} comentarios",
+    "comments_other": "{{count}} comentarios"
   },
   "idea_detail": {
     "page_title": "Detalles de la Idea",
@@ -321,7 +331,9 @@
     "fallback_title": "Campaña",
     "feature_not_available": "Ideación no disponible",
     "feature_not_available_desc": "La función de ideación no está habilitada para esta comunidad. Contacta con tu administrador del banco de tiempo para obtener más información.",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "challenges_count_many": "{{count}} retos",
+    "challenges_count_other": "{{count}} retos"
   },
   "templates": {
     "title": "Plantillas de Reto",

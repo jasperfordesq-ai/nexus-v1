@@ -45,10 +45,10 @@ import { Button, Input, Modal, ModalBody, ModalContent, Textarea } from '@/compo
 type StoryMode = 'photo' | 'video' | 'text' | 'poll';
 
 const GRADIENT_PRESETS = [
-  { labelKey: 'creator.gradient_purple_blue', class: 'from-purple-600 to-blue-500', css: 'linear-gradient(135deg, #9333ea, #3b82f6)' },
+  { labelKey: 'creator.gradient_purple_blue', class: 'from-accent to-blue-500', css: 'linear-gradient(135deg, #9333ea, #3b82f6)' },
   { labelKey: 'creator.gradient_orange_pink', class: 'from-orange-500 to-pink-500', css: 'linear-gradient(135deg, #f97316, #ec4899)' },
   { labelKey: 'creator.gradient_green_teal', class: 'from-green-500 to-teal-500', css: 'linear-gradient(135deg, #22c55e, #14b8a6)' },
-  { labelKey: 'creator.gradient_blue_indigo', class: 'from-blue-600 to-indigo-500', css: 'linear-gradient(135deg, #2563eb, #6366f1)' },
+  { labelKey: 'creator.gradient_blue_indigo', class: 'from-blue-600 to-accent-gradient-end', css: 'linear-gradient(135deg, #2563eb, #6366f1)' },
   { labelKey: 'creator.gradient_red_yellow', class: 'from-red-500 to-yellow-500', css: 'linear-gradient(135deg, #ef4444, #eab308)' },
   { labelKey: 'creator.gradient_dark', class: 'from-gray-700 to-gray-900', css: 'linear-gradient(135deg, #374151, #111827)' },
   { labelKey: 'creator.gradient_pink_rose', class: 'from-pink-500 to-rose-400', css: 'linear-gradient(135deg, #ec4899, #fb7185)' },
@@ -540,7 +540,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
         wrapper: 'p-0',
       }}
     >
-      <ModalContent>
+      <ModalContent aria-label={t('creator.title')}>
         <ModalBody className="flex h-dvh flex-col overflow-hidden" aria-label={t('creator.title')}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 z-10">
@@ -933,11 +933,9 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
             >
               {textContent ? (
                 <p
-                  className="text-white text-center max-w-sm drop-shadow-lg"
+                  className="max-w-sm text-center text-2xl leading-[1.4] text-white drop-shadow-lg"
                   style={{
-                    fontSize: '1.5rem',
                     fontFamily: (FONT_STYLES[selectedFont] ?? FONT_STYLES[0])?.family,
-                    lineHeight: 1.4,
                   }}
                 >
                   {textContent}
@@ -1182,7 +1180,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
           </Button>
 
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white font-medium"
             onPress={handleSubmit}
             isLoading={isSubmitting}
             startContent={!isSubmitting ? <Send className="w-4 h-4" /> : undefined}

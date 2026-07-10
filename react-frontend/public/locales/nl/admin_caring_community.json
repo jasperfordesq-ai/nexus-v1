@@ -396,7 +396,9 @@
       },
       "messages": {
         "recomputed": "Vertrouwensniveaus opnieuw berekend voor {{count}} leden.",
-        "saved": "Trust tier settings saved."
+        "saved": "Trust tier settings saved.",
+        "recomputed_one": "Vertrouwensniveaus opnieuw berekend voor {{count}} leden.",
+        "recomputed_other": "Vertrouwensniveaus opnieuw berekend voor {{count}} leden."
       },
       "recompute_confirm": "Vertrouwensniveaus voor alle leden opnieuw berekenen? Dit kan enkele minuten duren."
     },
@@ -741,7 +743,15 @@
       "escalate_failed": "Kan de beoordeling niet escaleren.",
       "approve_success": "Beoordeling goedgekeurd.",
       "decline_success": "Beoordeling afgewezen.",
-      "decision_failed": "Kan beslissing niet opnemen."
+      "decision_failed": "Kan beslissing niet opnemen.",
+      "manual_escalation_note_one": "Handmatig geëscaleerd na dagen in behandeling met {{count}}.",
+      "manual_escalation_note_other": "Handmatig geëscaleerd na dagen in behandeling met {{count}}.",
+      "escalated_count_one": "{{count}} geëscaleerd",
+      "escalated_count_other": "{{count}} geëscaleerd",
+      "overdue_count_one": "{{count}} te laat",
+      "overdue_count_other": "{{count}} te laat",
+      "age_days_one": "{{count}} dag oud",
+      "age_days_other": "{{count}} dag oud"
     },
     "paper_onboarding": {
       "title": "Paper Form Intake",
@@ -818,7 +828,11 @@
         "investigating": "Onderzoeken",
         "resolved": "Opgelost",
         "dismissed": "Afgewezen"
-      }
+      },
+      "age_hours_one": "{{count}}u",
+      "age_hours_other": "{{count}}u",
+      "age_days_one": "{{count}}d",
+      "age_days_other": "{{count}}d"
     },
     "role_pack": {
       "title": "Voorinstellingen voor rollen",
@@ -857,7 +871,9 @@
           "title": "Vertrouwde recensent",
           "description": "Keur uren snel goed met eenvoudig overzicht."
         }
-      }
+      },
+      "available_count_one": "{{count}} rolvoorinstellingen beschikbaar",
+      "available_count_other": "{{count}} rolvoorinstellingen beschikbaar"
     },
     "policy": {
       "title": "Workflow-beleid",
@@ -925,7 +941,9 @@
       "loading_favours": "Gunsten laden...",
       "empty": "Er zijn nog geen gunsten geregistreerd.",
       "anonymous": "Anoniem",
-      "unknown": "Onbekend"
+      "unknown": "Onbekend",
+      "total_recorded_one": "{{count}} totaal geregistreerd",
+      "total_recorded_other": "{{count}} totaal geregistreerd"
     },
     "assisted_onboarding": {
       "title": "Assisted Onboarding",
@@ -1103,6 +1121,12 @@
         "completed": "Voltooid",
         "cancelled": "Geannuleerd"
       }
+    },
+    "invite_card": {
+      "brand": "Community Caring",
+      "subtitle": "Buren-tot-buur uitnodiging",
+      "instructions": "Voer deze code in of ga naar de onderstaande link om mee te doen.",
+      "valid_until": "Geldig tot {{date}}"
     }
   },
   "category_coefficients": {
@@ -1218,7 +1242,9 @@
       "export_empty": "Export is leeg geretourneerd",
       "exported": "Grenskaart geëxporteerd",
       "export_failed": "Kan grenskaart niet exporteren"
-    }
+    },
+    "overrides_count_one": "{{count}} overschrijven",
+    "overrides_count_other": "{{count}} overschrijven"
   },
   "data_quality": {
     "meta": {
@@ -1255,7 +1281,9 @@
       "label": "Samenvatting:",
       "count": "{{count}} {{label}}",
       "generated": "Gegenereerd {{date}}",
-      "affected": "aangetast"
+      "affected": "aangetast",
+      "count_one": "{{count}} {{label}}",
+      "count_other": "{{count}} {{label}}"
     },
     "drilldown": {
       "subtitle": "Maximaal 50 betrokken rijen - oplossen of documenteren vóór lancering.",
@@ -1618,7 +1646,17 @@
       "request_meta": "Wanneer: {{when}} - gebruiker #{{userId}} - leeftijd {{age}}",
       "target_hours": "Doel {{hours}}u",
       "over_by": "Over {{duration}}",
-      "left": "{{duration}} over"
+      "left": "{{duration}} over",
+      "subtitle_one": "{{count}} open - eerst de inbreuk gesorteerd",
+      "subtitle_other": "{{count}} open - eerst de inbreuk gesorteerd",
+      "all_count_one": "Alles ({{count}})",
+      "all_count_other": "Alles ({{count}})",
+      "breached_count_one": "Schending ({{count}})",
+      "breached_count_other": "Schending ({{count}})",
+      "at_risk_count_one": "In gevaar ({{count}})",
+      "at_risk_count_other": "In gevaar ({{count}})",
+      "on_track_count_one": "Op schema ({{count}})",
+      "on_track_count_other": "Op schema ({{count}})"
     },
     "resolved": {
       "title": "Recent opgelost (laatste 72 uur)",
@@ -1722,14 +1760,24 @@
       "pending": "In behandeling: {{count}}",
       "in_progress": "In uitvoering: {{count}}",
       "decided": "Besloten: {{count}}",
-      "blocked": "Geblokkeerd: {{count}}"
+      "blocked": "Geblokkeerd: {{count}}",
+      "pending_one": "In behandeling: {{count}}",
+      "pending_other": "In behandeling: {{count}}",
+      "in_progress_one": "In uitvoering: {{count}}",
+      "in_progress_other": "In uitvoering: {{count}}",
+      "decided_one": "Besloten: {{count}}",
+      "decided_other": "Besloten: {{count}}",
+      "blocked_one": "Geblokkeerd: {{count}}",
+      "blocked_other": "Geblokkeerd: {{count}}"
     },
     "gate": {
       "closed": "Poort gesloten - klaar om te lanceren",
       "open": "Poort open - beslissingen zijn nog steeds vereist",
       "decided_count": "{{decided}} van {{total}} punten besloten",
       "blocked_count": "- {{count}} geblokkeerd",
-      "progress_aria": "Vooruitgang op het gebied van besluitvorming"
+      "progress_aria": "Vooruitgang op het gebied van besluitvorming",
+      "blocked_count_one": "- {{count}} geblokkeerd",
+      "blocked_count_other": "- {{count}} geblokkeerd"
     },
     "fields": {
       "value": "Waarde",
@@ -1874,7 +1922,9 @@
     "contacts": {
       "title": "Contacten ({{count}})",
       "empty": "Er zijn geen contacten die overeenkomen met de huidige filters.",
-      "table_aria": "Leid nurture-contacten"
+      "table_aria": "Leid nurture-contacten",
+      "title_one": "Contacten ({{count}})",
+      "title_other": "Contacten ({{count}})"
     },
     "table": {
       "name_email": "Naam / E-mail",
@@ -1961,7 +2011,9 @@
       "audience_description": "Geef aan voor wie deze mededeling bedoeld is (bijvoorbeeld 'alle bewoners', 'vrijwilligers', 'gemeentecontacten'), zodat de AI de toon en de woordenschat op de juiste manier kan kalibreren.",
       "polished_text": "Gepolijste tekst",
       "reason": "Reden",
-      "reason_placeholder": "Waarom wordt dit voorstel afgewezen?"
+      "reason_placeholder": "Waarom wordt dit voorstel afgewezen?",
+      "character_count_one": "{{count}} / 4000 tekens",
+      "character_count_other": "{{count}} / 4000 tekens"
     },
     "status": {
       "proposed": "Voorgesteld",
@@ -2228,7 +2280,9 @@
       "ready_body_suffix": "wanneer uw coördinatorenteam er klaar voor is om dit een eenrichtingsbeslissing te laten nemen.",
       "blocked_title": "Kan nog niet starten - {{count}} blocker blijft bestaan",
       "blocked_title_plural": "Kan nog niet starten - {{count}} blokkers blijven bestaan",
-      "blocked_body": "Los elk gedeelte hieronder op voordat de startknop wordt ingeschakeld."
+      "blocked_body": "Los elk gedeelte hieronder op voordat de startknop wordt ingeschakeld.",
+      "blocked_title_one": "Kan nog niet starten - {{count}} blocker blijft bestaan",
+      "blocked_title_other": "Kan nog niet starten - {{count}} blocker blijft bestaan"
     },
     "overall": {
       "ready": "Piloot is klaar om te lanceren",
@@ -2277,7 +2331,9 @@
       "load_failed": "Het rapport over de gereedheid voor lancering kan niet worden geladen.",
       "unexpected_response": "Het rapport over de gereedheid voor lancering gaf een onverwacht antwoord.",
       "unavailable_title": "Gereedheidsrapport niet beschikbaar"
-    }
+    },
+    "more_count_one": "+{{count}} meer",
+    "more_count_other": "+{{count}} meer"
   },
   "pilot_scoreboard": {
     "meta": {
@@ -2419,7 +2475,9 @@
       "placeholder_label": "{{placeholder}}",
       "rendered_markdown": "Weergegeven Markdown ({{count}} tekens)",
       "missing_placeholder_count_one": "{{count}} tijdelijke aanduiding ontbreekt",
-      "missing_placeholder_count_other": "{{count}} tijdelijke aanduidingen ontbreken"
+      "missing_placeholder_count_other": "{{count}} tijdelijke aanduidingen ontbreken",
+      "rendered_markdown_one": "Weergegeven Markdown ({{count}} tekens)",
+      "rendered_markdown_other": "Weergegeven Markdown ({{count}} tekens)"
     },
     "exports": {
       "title": "Gegevensset-exportgeschiedenis",
@@ -2529,7 +2587,9 @@
       "title": "Voorbeeld van droogdraaien",
       "candidates": "{{count}} kandidaten",
       "empty": "Er zijn momenteel geen geschikte kandidaten.",
-      "table_aria": "Kandidaten voor een dry-run-nudge"
+      "table_aria": "Kandidaten voor een dry-run-nudge",
+      "candidates_one": "{{count}} kandidaten",
+      "candidates_other": "{{count}} kandidaten"
     },
     "recent": {
       "title": "Recente duwtjes",
@@ -2559,7 +2619,11 @@
       "save_failed": "Kan configuratie niet opslaan",
       "dry_run": "Testrun: {{count}} geschikte kandidaten",
       "dispatched": "{{count}} duwtjes verzonden",
-      "dispatch_failed": "Verzending mislukt"
+      "dispatch_failed": "Verzending mislukt",
+      "dry_run_one": "Testrun: {{count}} geschikte kandidaten",
+      "dry_run_other": "Testrun: {{count}} geschikte kandidaten",
+      "dispatched_one": "{{count}} duwtjes verzonden",
+      "dispatched_other": "{{count}} duwtjes verzonden"
     }
   },
   "sub_regions": {

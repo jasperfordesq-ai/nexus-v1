@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, Progress, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -260,7 +261,7 @@ export default function IsolatedNodeAdminPage() {
               <p className="font-semibold text-accent dark:text-accent">{t('isolated_node.about.title')}</p>
               <p className="text-muted">
                 {t('isolated_node.about.body_prefix')} <Abbr term="NEXUS" /> {t('isolated_node.about.body_middle')}{' '}
-                Caring Community {t('isolated_node.about.body_suffix')}
+                {t('common:nav.caring_community')} {t('isolated_node.about.body_suffix')}
               </p>
               <p className="text-muted">
                 {t('isolated_node.about.workflow')}
@@ -407,7 +408,7 @@ export default function IsolatedNodeAdminPage() {
               <Separator />
               <p className="text-xs text-muted">
                 {t('isolated_node.timestamps.last_updated', {
-                  date: new Date(data.last_updated_at).toLocaleString(),
+                  date: new Date(data.last_updated_at).toLocaleString(getFormattingLocale()),
                 })}
               </p>
             </>

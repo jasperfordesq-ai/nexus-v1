@@ -276,7 +276,19 @@
     "members_tabs_aria": "نوع تقرير العضو",
     "hours_by_category_aria": "مخطط شريطي يوضح الساعات المتبادلة حسب الفئة",
     "hours_distribution_aria": "رسم بياني دائري يوضح توزيع ساعات تبادل الوقت",
-    "hours_trend_aria": "مخطط مساحي يوضح الساعات المتبادلة مع مرور الوقت"
+    "hours_trend_aria": "مخطط مساحي يوضح الساعات المتبادلة مع مرور الوقت",
+    "members_selected_count_few": "تم تحديد{{count}}",
+    "members_selected_count_many": "تم تحديد{{count}}",
+    "members_selected_count_one": "تم تحديد{{count}}",
+    "members_selected_count_other": "تم تحديد{{count}}",
+    "members_selected_count_two": "تم تحديد{{count}}",
+    "members_selected_count_zero": "تم تحديد{{count}}",
+    "days_count_few": "{{count}} يومًا",
+    "days_count_many": "{{count}} يومًا",
+    "days_count_one": "{{count}} يومًا",
+    "days_count_other": "{{count}} يومًا",
+    "days_count_two": "{{count}} يومًا",
+    "days_count_zero": "{{count}} يومًا"
   },
   "municipal_reports": {
     "meta": {
@@ -387,7 +399,19 @@
       "hours": "{{count}}ح",
       "disabled": "عاجز",
       "activities": "أنشطة {{count}}",
-      "trend_detail": "{{participants}} مشارك، {{activities}} أنشطة"
+      "trend_detail": "{{participants}} مشارك، {{activities}} أنشطة",
+      "hours_few": "{{count}}ح",
+      "hours_many": "{{count}}ح",
+      "hours_one": "{{count}}ح",
+      "hours_other": "{{count}}ح",
+      "hours_two": "{{count}}ح",
+      "hours_zero": "{{count}}ح",
+      "activities_few": "أنشطة {{count}}",
+      "activities_many": "أنشطة {{count}}",
+      "activities_one": "أنشطة {{count}}",
+      "activities_other": "أنشطة {{count}}",
+      "activities_two": "أنشطة {{count}}",
+      "activities_zero": "أنشطة {{count}}"
     },
     "toast": {
       "load_failed": "فشل تحميل بيانات التأثير البلدي.",
@@ -470,7 +494,13 @@
         "partner_organisations_by_hours": "المنظمات الشريكة (بالساعات)",
         "no_partner_activity": "لا يوجد نشاط شريك في هذه الفترة.",
         "top_5_categories": "أهم 5 فئات (التقسيم الجغرافي/النشاط)",
-        "no_category_data": "لا توجد بيانات فئة في هذه الفترة."
+        "no_category_data": "لا توجد بيانات فئة في هذه الفترة.",
+        "trusted_total_few": "من {{count}} الإجمالي الموثوق به.",
+        "trusted_total_many": "من {{count}} الإجمالي الموثوق به.",
+        "trusted_total_one": "من {{count}} الإجمالي الموثوق به.",
+        "trusted_total_other": "من {{count}} الإجمالي الموثوق به.",
+        "trusted_total_two": "من {{count}} الإجمالي الموثوق به.",
+        "trusted_total_zero": "من {{count}} الإجمالي الموثوق به."
       },
       "cooperative": {
         "empty_title": "تعاونية (cooperative داخلية)",
@@ -487,8 +517,32 @@
         "coordinator_load": "تحميل المنسق",
         "coordinator_load_desc": "{{pending}} معلق عبر منسقي {{coordinators}}.",
         "future_care_credit_pool": "تجمع الرصيد الائتماني للرعاية المستقبلية",
-        "future_care_credit_pool_desc": "مجموع أرصدة الأعضاء الإيجابية - الاحتياطي الضمني للرعاية المستقبلية للتعاونية. قاعدة الأعضاء النشطة: {{count}}."
-      }
+        "future_care_credit_pool_desc": "مجموع أرصدة الأعضاء الإيجابية - الاحتياطي الضمني للرعاية المستقبلية للتعاونية. قاعدة الأعضاء النشطة: {{count}}.",
+        "member_retention_desc_few": "{{count}} عضو نشط في كل من هذه الفترة والفترة المماثلة السابقة.",
+        "member_retention_desc_many": "{{count}} عضو نشط في كل من هذه الفترة والفترة المماثلة السابقة.",
+        "member_retention_desc_one": "{{count}} عضو نشط في كل من هذه الفترة والفترة المماثلة السابقة.",
+        "member_retention_desc_other": "{{count}} عضو نشط في كل من هذه الفترة والفترة المماثلة السابقة.",
+        "member_retention_desc_two": "{{count}} عضو نشط في كل من هذه الفترة والفترة المماثلة السابقة.",
+        "member_retention_desc_zero": "{{count}} عضو نشط في كل من هذه الفترة والفترة المماثلة السابقة.",
+        "reciprocity_rate_desc_few": "تلقى مؤيدو {{count}} أيضًا ساعات في هذه الفترة.",
+        "reciprocity_rate_desc_many": "تلقى مؤيدو {{count}} أيضًا ساعات في هذه الفترة.",
+        "reciprocity_rate_desc_one": "تلقى مؤيدو {{count}} أيضًا ساعات في هذه الفترة.",
+        "reciprocity_rate_desc_other": "تلقى مؤيدو {{count}} أيضًا ساعات في هذه الفترة.",
+        "reciprocity_rate_desc_two": "تلقى مؤيدو {{count}} أيضًا ساعات في هذه الفترة.",
+        "reciprocity_rate_desc_zero": "تلقى مؤيدو {{count}} أيضًا ساعات في هذه الفترة.",
+        "future_care_credit_pool_desc_few": "مجموع أرصدة الأعضاء الإيجابية - الاحتياطي الضمني للرعاية المستقبلية للتعاونية. قاعدة الأعضاء النشطة: {{count}}.",
+        "future_care_credit_pool_desc_many": "مجموع أرصدة الأعضاء الإيجابية - الاحتياطي الضمني للرعاية المستقبلية للتعاونية. قاعدة الأعضاء النشطة: {{count}}.",
+        "future_care_credit_pool_desc_one": "مجموع أرصدة الأعضاء الإيجابية - الاحتياطي الضمني للرعاية المستقبلية للتعاونية. قاعدة الأعضاء النشطة: {{count}}.",
+        "future_care_credit_pool_desc_other": "مجموع أرصدة الأعضاء الإيجابية - الاحتياطي الضمني للرعاية المستقبلية للتعاونية. قاعدة الأعضاء النشطة: {{count}}.",
+        "future_care_credit_pool_desc_two": "مجموع أرصدة الأعضاء الإيجابية - الاحتياطي الضمني للرعاية المستقبلية للتعاونية. قاعدة الأعضاء النشطة: {{count}}.",
+        "future_care_credit_pool_desc_zero": "مجموع أرصدة الأعضاء الإيجابية - الاحتياطي الضمني للرعاية المستقبلية للتعاونية. قاعدة الأعضاء النشطة: {{count}}."
+      },
+      "logs_count_few": "سجلات {{count}}",
+      "logs_count_many": "سجلات {{count}}",
+      "logs_count_one": "سجلات {{count}}",
+      "logs_count_other": "سجلات {{count}}",
+      "logs_count_two": "سجلات {{count}}",
+      "logs_count_zero": "سجلات {{count}}"
     },
     "cards": {
       "verified_hours": {
@@ -519,6 +573,18 @@
         "metric_2": "التعليقات",
         "metric_3": "مسار التدقيق"
       }
+    }
+  },
+  "caring_workflow": {
+    "policy": {
+      "periods": {
+        "last_90_days": "آخر 90 يومًا"
+      }
+    }
+  },
+  "municipal_impact": {
+    "portfolio": {
+      "yoy_value": "{{sign}}{{value}}٪ على أساس سنوي"
     }
   }
 }

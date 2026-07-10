@@ -1343,7 +1343,19 @@
     "resync_stripe": "إعادة المزامنة مع الشريط",
     "sync_to_stripe": "المزامنة مع الشريط",
     "sync_stripe": "المزامنة مع الشريط",
-    "stripe_sync_description": "يقوم بإنشاء أو تحديث منتج Stripe وأسعاره لهذه الخطة. يتطلب STRIPE_SECRET_KEY."
+    "stripe_sync_description": "يقوم بإنشاء أو تحديث منتج Stripe وأسعاره لهذه الخطة. يتطلب STRIPE_SECRET_KEY.",
+    "active_tenants_cannot_delete_few": "{{count}}المستأجر (المستأجرون) النشطون - لا يمكن حذفهم",
+    "active_tenants_cannot_delete_many": "{{count}}المستأجر (المستأجرون) النشطون - لا يمكن حذفهم",
+    "active_tenants_cannot_delete_one": "{{count}}المستأجر (المستأجرون) النشطون - لا يمكن حذفهم",
+    "active_tenants_cannot_delete_other": "{{count}}المستأجر (المستأجرون) النشطون - لا يمكن حذفهم",
+    "active_tenants_cannot_delete_two": "{{count}}المستأجر (المستأجرون) النشطون - لا يمكن حذفهم",
+    "active_tenants_cannot_delete_zero": "{{count}}المستأجر (المستأجرون) النشطون - لا يمكن حذفهم",
+    "filter_all_few": "الكل ({{count}})",
+    "filter_all_many": "الكل ({{count}})",
+    "filter_all_one": "الكل ({{count}})",
+    "filter_all_other": "الكل ({{count}})",
+    "filter_all_two": "الكل ({{count}})",
+    "filter_all_zero": "الكل ({{count}})"
   },
   "data_table": {
     "admin_data_table": "بيانات",

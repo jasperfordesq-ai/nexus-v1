@@ -120,7 +120,13 @@
       "offer_help": "Offer to help",
       "celebration": "Celebration",
       "note": "Note"
-    }
+    },
+    "streak_value_one": "{{count}} check-ins",
+    "streak_value_other": "{{count}} check-ins",
+    "best_streak_one": "Best streak: {{count}}",
+    "best_streak_other": "Best streak: {{count}}",
+    "checkins_value_one": "{{count}} recorded",
+    "checkins_value_other": "{{count}} recorded"
   },
   "template_picker": {
     "load_error": "Failed to load templates. Please try again.",

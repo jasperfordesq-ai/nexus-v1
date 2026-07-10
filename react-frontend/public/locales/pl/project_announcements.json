@@ -37,5 +37,7 @@
     "link_copied": "Link skopiowany",
     "copy_failed": "Nie udało się skopiować linku",
     "share_text": "{{title}} - {{description}}"
-  }
+  },
+  "subscriber_count_few": "{{count}} obserwujących",
+  "subscriber_count_many": "{{count}} obserwujących"
 }

@@ -190,7 +190,7 @@ describe('PublicEmptyState', () => {
     const { container } = render(
       <PublicEmptyState icon={<span />} title="Empty" description="Desc" />,
     );
-    const iconWrapper = container.querySelector('.from-indigo-500\\/20');
+    const iconWrapper = container.querySelector('.from-accent\\/20');
     expect(iconWrapper).toBeInTheDocument();
   });
 

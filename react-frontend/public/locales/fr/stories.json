@@ -98,7 +98,10 @@
     "or_divider": "ou",
     "poll_add_option_button": "Ajouter une option",
     "videos_trimmed_notice": "Les vidéos de plus de 60s seront réduites à 60s de durée d'affichage",
-    "video_duration_seconds": "{{count}}s"
+    "video_duration_seconds": "{{count}}s",
+    "video_duration_seconds_many": "{{count}}s",
+    "video_duration_seconds_one": "{{count}}s",
+    "video_duration_seconds_other": "{{count}}s"
   },
   "viewer": {
     "story_from": "Story de {{name}}",
@@ -132,7 +135,13 @@
     "reply_placeholder_generic": "Répondre à la story...",
     "react_with": "Réagir avec {{type}}",
     "viewers_title_count": "Spectateurs ({{count}})",
-    "delete_story_confirm": "Supprimer cette histoire ? Cela ne peut pas être annulé."
+    "delete_story_confirm": "Supprimer cette histoire ? Cela ne peut pas être annulé.",
+    "poll_votes_many": "{{count}} votes",
+    "poll_votes_one": "{{count}} votes",
+    "poll_votes_other": "{{count}} votes",
+    "viewers_title_count_many": "Spectateurs ({{count}})",
+    "viewers_title_count_one": "Spectateurs ({{count}})",
+    "viewers_title_count_other": "Spectateurs ({{count}})"
   },
   "highlights": {
     "no_stories": "Ce highlight n'a pas de stories",

@@ -37,5 +37,9 @@
     "native": "مشاركة",
     "share_text": "{{title}} - {{description}}",
     "title": "مشاركة المشروع"
-  }
+  },
+  "subscriber_count_few": "{{count}} متابع",
+  "subscriber_count_many": "{{count}} متابع",
+  "subscriber_count_two": "{{count}} متابع",
+  "subscriber_count_zero": "{{count}} متابع"
 }

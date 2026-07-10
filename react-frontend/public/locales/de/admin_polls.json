@@ -104,6 +104,8 @@
     "unknown": "Unbekannt",
     "votes": "Stimmen",
     "no_matching_polls": "Keine passenden Umfragen gefunden",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found found",
+    "total_count_one": "Insgesamt: {{count}}",
+    "total_count_other": "Insgesamt: {{count}}"
   }
 }

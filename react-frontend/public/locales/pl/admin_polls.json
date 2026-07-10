@@ -104,6 +104,10 @@
     "unknown": "Nieznany",
     "votes": "Głosy",
     "no_matching_polls": "Nie znaleziono pasujących ankiet",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found found",
+    "total_count_few": "Razem: {{count}}",
+    "total_count_many": "Razem: {{count}}",
+    "total_count_one": "Razem: {{count}}",
+    "total_count_other": "Razem: {{count}}"
   }
 }

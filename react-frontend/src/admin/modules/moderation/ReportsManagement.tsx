@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Input, Chip, Spinner, Card, CardBody, Select, SelectItem, Avatar, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, Drawer, DrawerContent, DrawerHeader, DrawerBody, DrawerFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -288,7 +289,7 @@ export default function ReportsManagement() {
       </TableCell>,
       <TableCell key="created">
         <span className="text-sm text-muted">
-          {new Date(report.created_at).toLocaleDateString()}
+          {new Date(report.created_at).toLocaleDateString(getFormattingLocale())}
         </span>
       </TableCell>,
       <TableCell key="actions">
@@ -680,12 +681,12 @@ export default function ReportsManagement() {
                 <section className="grid grid-cols-2 gap-3 text-sm">
                   <div className="flex flex-col">
                     <span className="text-xs text-muted">{t('moderation.col_created')}</span>
-                    <span>{new Date(detailReport.created_at).toLocaleString()}</span>
+                    <span>{new Date(detailReport.created_at).toLocaleString(getFormattingLocale())}</span>
                   </div>
                   {detailReport.updated_at && (
                     <div className="flex flex-col">
                       <span className="text-xs text-muted">{t('moderation.label_updated')}</span>
-                      <span>{new Date(detailReport.updated_at).toLocaleString()}</span>
+                      <span>{new Date(detailReport.updated_at).toLocaleString(getFormattingLocale())}</span>
                     </div>
                   )}
                 </section>

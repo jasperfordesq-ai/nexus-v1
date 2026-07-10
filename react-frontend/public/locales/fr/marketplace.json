@@ -92,7 +92,13 @@
     "get_directions": "Itinéraire",
     "promoted": "Mis en avant",
     "unsave": "Retirer des favoris",
-    "save": "Sauvegarder l'annonce"
+    "save": "Sauvegarder l'annonce",
+    "available_count_many": "{{count}} disponible",
+    "available_count_one": "{{count}} disponible",
+    "available_count_other": "{{count}} disponible",
+    "views_count_many": "{{count}} vues",
+    "views_count_one": "{{count}} vues",
+    "views_count_other": "{{count}} vues"
   },
   "offer": {
     "modal_title": "Faire une offre",
@@ -184,7 +190,10 @@
     "created_success": "Annonce créée avec succès !",
     "created_error": "Échec de la création de l'annonce",
     "created_error_retry": "Échec de la création de l'annonce. Veuillez réessayer.",
-    "draft_saved": "Brouillon enregistré"
+    "draft_saved": "Brouillon enregistré",
+    "title_char_count_many": "{{count}}/120 caractères",
+    "title_char_count_one": "{{count}}/120 caractères",
+    "title_char_count_other": "{{count}}/120 caractères"
   },
   "search": {
     "category_search": "Rechercher des catégories...",
@@ -228,7 +237,11 @@
     "price_from": "De {{min}}",
     "price_up_to": "Jusqu'à {{max}}",
     "last_days_one": "Dernier {{count}} jour",
-    "last_days_other": "Derniers {{count}} jours"
+    "last_days_other": "Derniers {{count}} jours",
+    "reset_filters_many": "Réinitialiser les filtres ({{count}})",
+    "reset_filters_one": "Réinitialiser les filtres ({{count}})",
+    "reset_filters_other": "Réinitialiser les filtres ({{count}})",
+    "results_count_many": "{{count}} résultats"
   },
   "seller": {
     "page_title": "Profil du vendeur",
@@ -285,7 +298,12 @@
     "results_count_one": "Résultat de {{count}}",
     "results_count_other": "Résultats de {{count}}",
     "load_more": "Charger plus",
-    "browse_description": "Parcourir les annonces de {{name}} sur le marché."
+    "browse_description": "Parcourir les annonces de {{name}} sur le marché.",
+    "reset_filters_many": "Réinitialiser les filtres ({{count}})",
+    "reset_filters_one": "Réinitialiser les filtres ({{count}})",
+    "reset_filters_other": "Réinitialiser les filtres ({{count}})",
+    "listings_count_many": "Annonces de {{count}}",
+    "results_count_many": "Résultats de {{count}}"
   },
   "common": {
     "loading": "Chargement...",
@@ -426,7 +444,10 @@
     "empty_sold_title": "Pas encore de ventes",
     "empty_sold_description": "Vous n'avez pas encore vendu d'articles.",
     "empty_expired_title": "Aucune annonce expirée",
-    "empty_expired_description": "Vous n'avez aucune annonce expirée."
+    "empty_expired_description": "Vous n'avez aucune annonce expirée.",
+    "views_count_aria_many": "{{count}} vues",
+    "views_count_aria_one": "{{count}} vues",
+    "views_count_aria_other": "{{count}} vues"
   },
   "my_offers": {
     "page_title": "Mes offres - Marché",
@@ -485,7 +506,8 @@
     "empty_collections_title": "Pas encore de Collections",
     "empty_collections_description": "Créez une collection pour organiser vos articles préférés du marché.",
     "sign_in_title": "Connexion Requise",
-    "sign_in_description": "Connectez-vous pour gérer vos collections et vos recherches enregistrées."
+    "sign_in_description": "Connectez-vous pour gérer vos collections et vos recherches enregistrées.",
+    "item_count_many": "{{count}} articles"
   },
   "saved_searches": {
     "tab_title": "Recherches Enregistrées",
@@ -518,7 +540,9 @@
     "duration_days_one": "{{count}} jour",
     "duration_days_other": "{{count}} jours",
     "duration_hours_one": "{{count}} heure",
-    "duration_hours_other": "{{count}} heures"
+    "duration_hours_other": "{{count}} heures",
+    "duration_days_many": "{{count}} jours",
+    "duration_hours_many": "{{count}} heures"
   },
   "free": {
     "page_title": "Articles gratuits",
@@ -584,7 +608,16 @@
       "declined": "Refusée",
       "completed": "Terminée",
       "cancelled": "Annulée"
-    }
+    },
+    "offers_title_count_many": "Offres de livraison ({{count}})",
+    "offers_title_count_one": "Offres de livraison ({{count}})",
+    "offers_title_count_other": "Offres de livraison ({{count}})",
+    "time_credits_value_many": "{{count}} CT",
+    "time_credits_value_one": "{{count}} CT",
+    "time_credits_value_other": "{{count}} CT",
+    "estimated_minutes_many": "~{{count}} min",
+    "estimated_minutes_one": "~{{count}} min",
+    "estimated_minutes_other": "~{{count}} min"
   },
   "pickup": {
     "my_pickups_title": "Mes retraits",
@@ -613,7 +646,13 @@
     "oversold_protected": "Refuser les commandes qui dépasseraient le stock",
     "sold_out": "Épuisé",
     "low_chip": "Stock : {{count}} (Faible)",
-    "count_chip": "Stock : {{count}}"
+    "count_chip": "Stock : {{count}}",
+    "low_chip_many": "Stock : {{count}} (Faible)",
+    "low_chip_one": "Stock : {{count}} (Faible)",
+    "low_chip_other": "Stock : {{count}} (Faible)",
+    "count_chip_many": "Stock : {{count}}",
+    "count_chip_one": "Stock : {{count}}",
+    "count_chip_other": "Stock : {{count}}"
   },
   "ai_reply": {
     "suggest": "Suggérer une réponse",
@@ -647,7 +686,10 @@
     "search_this_area": "Rechercher dans cette zone",
     "distance_km": "{{km}} km de distance",
     "distance_meters": "{{m}}m de distance",
-    "view_toggle": "Mode d'affichage"
+    "view_toggle": "Mode d'affichage",
+    "results_count_many": "{{count}} annonces trouvées à proximité",
+    "results_count_one": "{{count}} annonces trouvées à proximité",
+    "results_count_other": "{{count}} annonces trouvées à proximité"
   },
   "shipping": {
     "title": "Options d'expédition",
@@ -778,7 +820,10 @@
       "select_rating": "Veuillez sélectionner une évaluation",
       "success": "Évaluation soumise avec succès !",
       "error": "Échec de la soumission de l'évaluation"
-    }
+    },
+    "quantity_multiplier_many": "×{{count}}",
+    "quantity_multiplier_one": "×{{count}}",
+    "quantity_multiplier_other": "×{{count}}"
   },
   "onboarding": {
     "page_title": "Intégration des vendeurs - Marché",

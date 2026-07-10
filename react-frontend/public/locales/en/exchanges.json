@@ -109,7 +109,9 @@
     "ratings": "Ratings",
     "rate_exchange": "Rate This Exchange",
     "prep_time_value": "{{count}}h",
-    "rating_value": "Rating: {{rating}} out of 5"
+    "rating_value": "Rating: {{rating}} out of 5",
+    "prep_time_value_one": "{{count}}h",
+    "prep_time_value_other": "{{count}}h"
   },
   "modal": {
     "decline_title": "Decline Exchange Request",
@@ -174,5 +176,6 @@
     "detail": {
       "title": "Exchange Details"
     }
-  }
+  },
+  "hours_count_one": "{{count}} hour"
 }

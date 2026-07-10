@@ -98,7 +98,9 @@
     "or_divider": "of",
     "poll_add_option_button": "Optie toevoegen",
     "videos_trimmed_notice": "Video's langer dan 60s worden bijgeknipt tot 60s weergaveduur",
-    "video_duration_seconds": "{{count}}s"
+    "video_duration_seconds": "{{count}}s",
+    "video_duration_seconds_one": "{{count}}s",
+    "video_duration_seconds_other": "{{count}}s"
   },
   "viewer": {
     "story_from": "Verhaal van {{name}}",
@@ -132,7 +134,11 @@
     "reply_placeholder_generic": "Beantwoord verhaal...",
     "react_with": "Reageer met {{type}}",
     "viewers_title_count": "Kijkers ({{count}})",
-    "delete_story_confirm": "Dit verhaal verwijderen? Dit kan niet ongedaan worden gemaakt."
+    "delete_story_confirm": "Dit verhaal verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "poll_votes_one": "{{count}} stemmen",
+    "poll_votes_other": "{{count}} stemmen",
+    "viewers_title_count_one": "Kijkers ({{count}})",
+    "viewers_title_count_other": "Kijkers ({{count}})"
   },
   "highlights": {
     "no_stories": "Dit highlight heeft geen verhalen",

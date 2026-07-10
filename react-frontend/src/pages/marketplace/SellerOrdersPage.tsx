@@ -40,7 +40,7 @@ import type { MarketplaceOrderItem } from '@/types/marketplace';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl, getFormattingLocale } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
@@ -160,7 +160,7 @@ function SellerOrderCard({
               )}
             </div>
             <span className="text-xs text-muted">
-              #{order.order_number} - {new Date(order.created_at).toLocaleDateString()}
+              #{order.order_number} - {new Date(order.created_at).toLocaleDateString(getFormattingLocale())}
             </span>
           </div>
 

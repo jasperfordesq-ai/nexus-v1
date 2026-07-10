@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Select, SelectItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 
 /**
@@ -209,7 +210,7 @@ export function DonationCheckout({
   };
 
   const formattedAmount = amount
-    ? parseFloat(amount).toLocaleString(undefined, {
+    ? parseFloat(amount).toLocaleString(getFormattingLocale(), {
         style: 'currency',
         currency,
         minimumFractionDigits: 2,

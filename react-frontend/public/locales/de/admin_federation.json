@@ -906,7 +906,11 @@
       "bulk_approved_count": "Genehmigte{{count}}-Partnerschaftsanfrage",
       "bulk_approved_count_plural": "Genehmigte{{count}}-Partnerschaftsanfragen",
       "bulk_rejected_count": "{{count}}-Partnerschaftsanfrage abgelehnt",
-      "bulk_rejected_count_plural": "Abgelehnte{{count}}-Partnerschaftsanfragen"
+      "bulk_rejected_count_plural": "Abgelehnte{{count}}-Partnerschaftsanfragen",
+      "bulk_approved_count_one": "Genehmigte{{count}}-Partnerschaftsanfrage",
+      "bulk_approved_count_other": "Genehmigte{{count}}-Partnerschaftsanfrage",
+      "bulk_rejected_count_one": "{{count}}-Partnerschaftsanfrage abgelehnt",
+      "bulk_rejected_count_other": "{{count}}-Partnerschaftsanfrage abgelehnt"
     },
     "api_docs_tabs_aria": "API-Beispiel-Sprachauswahl",
     "partnership_detail_tabs_aria": "Abschnitte mit Einzelheiten zur Partnerschaft",
@@ -965,7 +969,23 @@
     "event_type_partnership_changed": "Partnerschaft aktualisiert",
     "event_type_partnership_terminated": "Partnerschaft beendet",
     "event_type_profile_viewed": "Profil angesehen",
-    "event_type_federated_search": "Partnersuche"
+    "event_type_federated_search": "Partnersuche",
+    "bulk_selected_one": "{{count}} ausgewählt",
+    "bulk_selected_other": "{{count}} ausgewählt",
+    "directory_results_count_one": "{{count}}-Community gefunden",
+    "directory_results_count_other": "{{count}}-Community gefunden",
+    "directory_member_count_one": "{{count}}-Mitglied",
+    "directory_member_count_other": "{{count}}-Mitglied",
+    "directory_more_topics_one": "+{{count}} mehr",
+    "directory_more_topics_other": "+{{count}} mehr",
+    "members_count_value_one": "{{count}}-Mitglieder",
+    "members_count_value_other": "{{count}}-Mitglieder",
+    "topics_selected_count_one": "{{count}} Thema ausgewählt",
+    "topics_selected_count_other": "{{count}} Thema ausgewählt",
+    "primary_topics_count_one": "{{count}} primär",
+    "primary_topics_count_other": "{{count}} primär",
+    "recent_errors_count_one": "Aktuelle Fehler: {{count}}",
+    "recent_errors_count_other": "Aktuelle Fehler: {{count}}"
   },
   "federation_admin_guidance": {
     "shared": {
@@ -1218,5 +1238,11 @@
       "load_audit_failed": "Audit-Log konnte nicht geladen werden.",
       "load_preview_failed": "Vorschau konnte nicht geladen werden."
     }
+  },
+  "api_docs": {
+    "aria_hmac_headers": "HMAC-Header",
+    "aria_rate_limit_headers": "Rate-Limit-Header",
+    "aria_parameters": "API-Parameter",
+    "aria_api_documentation_sections": "Abschnitte zur API-Dokumentation"
   }
 }

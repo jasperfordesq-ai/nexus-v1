@@ -34,7 +34,11 @@
     "tab_hours_review": "Stundenprüfung",
     "tab_volunteers": "Freiwillige",
     "tab_wallet": "Geldbörse",
-    "tab_settings": "Einstellungen"
+    "tab_settings": "Einstellungen",
+    "review_applications_one": "{{count}} Bewerbungen prüfen",
+    "review_applications_other": "{{count}} Bewerbungen prüfen",
+    "review_hours_one": "{{count}} Stunden prüfen",
+    "review_hours_other": "{{count}} Stunden prüfen"
   },
   "page_title": "Freiwilligenarbeit",
   "heading": "Freiwilligenarbeit",
@@ -346,7 +350,13 @@
       "cancelled": "Abgebrochen"
     },
     "support_aria": "Dieses Projekt unterstützen ({{count}} Unterstützer)",
-    "unsupport_aria": "Unterstützung zurückziehen ({{count}} Unterstützer)"
+    "unsupport_aria": "Unterstützung zurückziehen ({{count}} Unterstützer)",
+    "volunteers_needed_one": "{{count}} benötigt",
+    "volunteers_needed_other": "{{count}} benötigt",
+    "unsupport_aria_one": "Unterstützung zurückziehen ({{count}} Unterstützer)",
+    "unsupport_aria_other": "Unterstützung zurückziehen ({{count}} Unterstützer)",
+    "support_aria_one": "Dieses Projekt unterstützen ({{count}} Unterstützer)",
+    "support_aria_other": "Dieses Projekt unterstützen ({{count}} Unterstützer)"
   },
   "donations": {
     "heading": "Spenden",
@@ -453,7 +463,9 @@
     "receipt_method": "Zahlungsmethode",
     "receipt_message": "Nachricht",
     "receipt_error": "Beleg konnte nicht geladen werden.",
-    "receipt_not_found": "Beleg nicht gefunden."
+    "receipt_not_found": "Beleg nicht gefunden.",
+    "donors_count_one": "{{count}} Spender",
+    "donors_count_other": "{{count}} Spender"
   },
   "safeguarding": {
     "heading": "Kinderschutz",
@@ -592,7 +604,9 @@
     "cancel": "Abbrechen",
     "upload_credential": "Nachweis hochladen",
     "aria_remove_file": "Ausgewählte Datei entfernen",
-    "aria_upload_document": "Nachweis-Dokument hochladen"
+    "aria_upload_document": "Nachweis-Dokument hochladen",
+    "expiring_soon_desc_one": "{{count}} Nachweis(e) laufen innerhalb von 30 Tagen ab.",
+    "expiring_soon_desc_other": "{{count}} Nachweis(e) laufen innerhalb von 30 Tagen ab."
   },
   "waitlist": {
     "heading": "Meine Wartelisten",
@@ -612,7 +626,9 @@
     "claim": "Platz beanspruchen",
     "claim_success": "Sie sind dabei – haben Sie sich für die Schicht angemeldet!",
     "claim_failed": "Konnte den Platz nicht beanspruchen",
-    "claim_hint": "Ein Platz ist für Sie frei geworden. Beanspruchen Sie es bald – nicht beanspruchte Plätze gehen nach 48 Stunden an die nächste Person über."
+    "claim_hint": "Ein Platz ist für Sie frei geworden. Beanspruchen Sie es bald – nicht beanspruchte Plätze gehen nach 48 Stunden an die nächste Person über.",
+    "spots_one": "{{count}} Plätze",
+    "spots_other": "{{count}} Plätze"
   },
   "swaps": {
     "heading": "Schichttausch",
@@ -751,7 +767,13 @@
     "select_limit": "Sie können höchstens {{max}} Bewerbungen gleichzeitig auswählen.",
     "bulk_success": "{{count}} Bewerbungen aktualisiert.",
     "bulk_failed": "{{count}} Bewerbungen konnten nicht aktualisiert werden.",
-    "bulk_rate_limited": "{{count}} konnten nicht aktualisiert werden – zu schnell. Warten Sie eine Minute und versuchen Sie es erneut."
+    "bulk_rate_limited": "{{count}} konnten nicht aktualisiert werden – zu schnell. Warten Sie eine Minute und versuchen Sie es erneut.",
+    "pending_count_one": "{{count}} ausstehend",
+    "pending_count_other": "{{count}} ausstehend",
+    "selected_count_one": "{{count}} ausgewählt",
+    "selected_count_other": "{{count}} ausgewählt",
+    "decline_modal_description_one": "Fügen Sie vor der Ablehnung eine Notiz zur {{count}}-Bewerbung hinzu.",
+    "decline_modal_description_other": "Fügen Sie vor der Ablehnung eine Notiz zur {{count}}-Bewerbung hinzu."
   },
   "org_wallet_balance": "Wallet-Guthaben:",
   "auto_pay_on": "Automatische Zahlung EIN",
@@ -845,7 +867,9 @@
     "organization_hours": "{{name}} ({{hours}}h)",
     "generated_on": "Erstellt",
     "download": "Herunterladen",
-    "verify": "Überprüfen"
+    "verify": "Überprüfen",
+    "verified_hours_one": "{{count}} bestätigte Stunden",
+    "verified_hours_other": "{{count}} bestätigte Stunden"
   },
   "emergency": {
     "title": "Notfall-Benachrichtigungen",
@@ -866,7 +890,9 @@
     "respond_error": "Antwort auf Benachrichtigung fehlgeschlagen.",
     "respond_error_generic": "Antwort auf Benachrichtigung fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "from": "Von",
-    "expires": "Läuft ab"
+    "expires": "Läuft ab",
+    "pending_count_one": "{{count}} ausstehend",
+    "pending_count_other": "{{count}} ausstehend"
   },
   "wellbeing": {
     "heading": "Wohlbefinden der Freiwilligen",
@@ -1039,5 +1065,9 @@
   "form_remote_description": "Freiwillige können online oder telefonisch teilnehmen.",
   "my_organisations_declined": "Abgelehnt",
   "my_organisations_declined_desc": "Dieser Antrag wurde nicht genehmigt. Wenden Sie sich für Details an Ihre Community-Administration.",
-  "hours_invalid_range": "Geben Sie zwischen 0,25 und 24 Stunden ein."
+  "hours_invalid_range": "Geben Sie zwischen 0,25 und 24 Stunden ein.",
+  "org_callout_you_manage_many_one": "Sie verwalten {{count}}-Organisationen",
+  "org_callout_you_manage_many_other": "Sie verwalten {{count}}-Organisationen",
+  "more_sections_one": "Mehr ({{count}})",
+  "more_sections_other": "Mehr ({{count}})"
 }

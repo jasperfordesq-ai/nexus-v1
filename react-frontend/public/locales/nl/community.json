@@ -187,7 +187,9 @@
     "terms_required": "Om uw organisatie te kunnen registreren, moet u akkoord gaan met de voorwaarden.",
     "opportunity_count_one": "{{count}} mogelijkheid",
     "opportunity_count_other": "{{count}} mogelijkheden",
-    "loading": "Organisaties laden"
+    "loading": "Organisaties laden",
+    "volunteer_count_one": "{{count}} vrijwilligers",
+    "volunteer_count_other": "{{count}} vrijwilligers"
   },
   "organisation_detail": {
     "page_title": "Organisatie",
@@ -231,7 +233,11 @@
     "submit_review": "Beoordeling indienen",
     "review_success": "Beoordeling ingediend.",
     "review_error": "Kan uw beoordeling niet verzenden.",
-    "rating_required": "Kies een beoordeling voordat u deze verzendt."
+    "rating_required": "Kies een beoordeling voordat u deze verzendt.",
+    "meta_description_fallback_one": "Ontdek {{name}} en {{count}} actieve vrijwilligersmogelijkheden op deze gemeenschapstijdbank.",
+    "meta_description_fallback_other": "Ontdek {{name}} en {{count}} actieve vrijwilligersmogelijkheden op deze gemeenschapstijdbank.",
+    "review_count_one": "{{count}} beoordelingen",
+    "review_count_other": "{{count}} beoordelingen"
   },
   "emergency_alerts": {
     "heading": "Noodmeldingen",

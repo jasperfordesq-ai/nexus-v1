@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Input, Chip, Spinner, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
@@ -47,7 +48,7 @@ type ViewMode = 'summary' | 'members';
 
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr);
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(getFormattingLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

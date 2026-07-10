@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 
+import { getFormattingLocale } from '@/lib/helpers';
 import Lock from 'lucide-react/icons/lock';
 import Key from 'lucide-react/icons/key';
 import LogOut from 'lucide-react/icons/log-out';
@@ -183,8 +184,8 @@ export function SecurityTab({
               onPress={passwordModalOnOpen}
             >
               <div className="flex min-w-0 items-center gap-3">
-                <div className="p-2 rounded-lg bg-indigo-500/20">
-                  <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                <div className="p-2 rounded-lg bg-accent/20">
+                  <Lock className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                 </div>
                 <div className="min-w-0 leading-tight">
                   <p className="font-medium text-theme-primary">{t('change_password')}</p>
@@ -296,7 +297,7 @@ export function SecurityTab({
                         )}
                       </div>
                       <p className="text-xs text-theme-subtle">
-                        {session.ip_address} - {t('session_last_active')} {new Date(session.last_active).toLocaleDateString()}
+                        {session.ip_address} - {t('session_last_active')} {new Date(session.last_active).toLocaleDateString(getFormattingLocale())}
                       </p>
                     </div>
                   </div>
@@ -458,7 +459,7 @@ export function SecurityTab({
             ) : (
               <div className="space-y-6">
                 {/* What is an authenticator app? */}
-                <div className="p-4 rounded-lg bg-indigo-500/10 border border-indigo-500/20">
+                <div className="p-4 rounded-lg bg-accent/10 border border-accent/20">
                   <p className="text-sm font-medium text-theme-primary mb-2">{t('twofa_what_is')}</p>
                   <p className="text-xs text-theme-muted mb-3">
                     {t('twofa_what_is_desc')}

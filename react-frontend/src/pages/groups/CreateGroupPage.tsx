@@ -303,17 +303,15 @@ export function CreateGroupPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('form.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <div className="flex justify-center gap-3">
-            <Link to={tenantPath("/groups")}>
-              <Button
-                variant="flat"
-                className="bg-theme-elevated text-theme-primary"
-                startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('form.back_to_groups')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath("/groups")}
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+              startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('form.back_to_groups')}
+            </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadGroup()}
             >
@@ -363,7 +361,7 @@ export function CreateGroupPage() {
       {/* Form */}
       <GlassCard className="p-5 sm:p-8">
         <h2 className="mb-6 flex items-center gap-3 text-xl font-bold text-theme-primary">
-          <Users className="w-7 h-7 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+          <Users className="w-7 h-7 text-accent dark:text-accent" aria-hidden="true" />
           {t('form.essentials_section')}
         </h2>
 
@@ -552,7 +550,7 @@ export function CreateGroupPage() {
           <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row">
             <Button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="flex-1 bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={isEditing ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
               isLoading={isSubmitting || isUploadingImage}
             >

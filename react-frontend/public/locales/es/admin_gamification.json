@@ -306,6 +306,18 @@
     "audience_badge_holders": "Usuarios con insignia específica",
     "type_one_time": "una vez",
     "type_recurring": "recurrente",
-    "type_triggered": "Activado"
+    "type_triggered": "Activado",
+    "bulk_award_succeeded_count_many": "Obtuvo la insignia{{count}}",
+    "bulk_award_succeeded_count_one": "Obtuvo la insignia{{count}}",
+    "bulk_award_succeeded_count_other": "Obtuvo la insignia{{count}}",
+    "badge_count_many": "Insignias{{count}}",
+    "badge_count_one": "Insignias{{count}}",
+    "badge_count_other": "Insignias{{count}}",
+    "threshold_count_many": "Umbral:{{count}}",
+    "threshold_count_one": "Umbral:{{count}}",
+    "threshold_count_other": "Umbral:{{count}}",
+    "xp_count_many": "{{count}}XP",
+    "xp_count_one": "{{count}}XP",
+    "xp_count_other": "{{count}}XP"
   }
 }

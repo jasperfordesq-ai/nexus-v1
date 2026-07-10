@@ -8,6 +8,7 @@
  * View, filter, verify, and suspend marketplace seller profiles.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback } from 'react';
 
 import Store from 'lucide-react/icons/store';
@@ -239,7 +240,7 @@ export function MarketplaceSellerAdmin() {
       render: (item) => (
         <span className="text-sm text-muted">
           {item.joined_marketplace_at
-            ? new Date(item.joined_marketplace_at).toLocaleDateString()
+            ? new Date(item.joined_marketplace_at).toLocaleDateString(getFormattingLocale())
             : '--'}
         </span>
       ),

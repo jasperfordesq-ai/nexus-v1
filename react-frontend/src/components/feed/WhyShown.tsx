@@ -12,7 +12,7 @@
  * Only renders in "For You" (ranking) mode, not chronological.
  */
 
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui/Popover';
 import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import type { FeedItem } from './types';
@@ -43,17 +43,16 @@ export function WhyShown({ item, feedMode }: WhyShownProps) {
         <Button
           isIconOnly
           variant="ghost"
-          size="sm"
-          className="size-8 min-w-8 min-h-8 -my-1 p-1.5 flex items-center justify-center text-[var(--text-subtle)] opacity-70 transition-colors hover:text-[var(--text-muted)] focus-visible:opacity-100 sm:opacity-40 sm:group-hover:opacity-100"
+          className="size-11 min-h-11 min-w-11 -my-1 p-0 flex items-center justify-center text-[var(--text-subtle)] opacity-70 transition-colors hover:text-[var(--text-muted)] focus-visible:opacity-100 sm:opacity-40 sm:group-hover:opacity-100"
           aria-label={t('why_shown.label')}
         >
-          <Info className="w-3.5 h-3.5" />
+          <Info className="size-4" aria-hidden="true" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-3 max-w-[240px] bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
-        <p className="text-xs font-semibold text-[var(--text-primary)] mb-2">
+        <PopoverHeading className="text-xs font-semibold text-[var(--text-primary)] mb-2">
           {t('why_shown.title')}
-        </p>
+        </PopoverHeading>
         <ul className="space-y-1">
           {reasons.map((reason, i) => (
             <li key={i} className="text-xs text-[var(--text-muted)] flex items-start gap-1.5">

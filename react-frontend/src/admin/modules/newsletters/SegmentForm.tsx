@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardHeader, CardBody, Input, Chip, Spinner, Select, SelectItem, Switch, Tooltip } from '@/components/ui';
 // Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -531,7 +532,7 @@ export function SegmentForm() {
               <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-secondary">
                 <Users size={18} className="text-accent" />
                 <span className="text-lg font-semibold text-foreground">
-                  {previewCount.toLocaleString()}
+                  {previewCount.toLocaleString(getFormattingLocale())}
                 </span>
                 <span className="text-sm text-muted">
                   {t('segment_form.members_match')}

@@ -84,7 +84,10 @@
       "title": "Bhí fadhbanna ag roinnt nasc le déanaí",
       "hint_one": "{{count}} theip ar ghlao ó chóras comhpháirtíochta le 30 lá anuas.",
       "hint_other": "{{count}} ar theip ar ghlaonna ó chórais chomhpháirtíochta le 30 lá anuas.",
-      "cta": "Féach ar ghníomhaíocht"
+      "cta": "Féach ar ghníomhaíocht",
+      "hint_few": "{{count}} ar theip ar ghlaonna ó chórais chomhpháirtíochta le 30 lá anuas.",
+      "hint_many": "{{count}} ar theip ar ghlaonna ó chórais chomhpháirtíochta le 30 lá anuas.",
+      "hint_two": "{{count}} ar theip ar ghlaonna ó chórais chomhpháirtíochta le 30 lá anuas."
     },
     "stats": {
       "active_partners": "Comhpháirtithe gníomhacha",
@@ -111,7 +114,10 @@
       "empty_title": "Níl aon ghníomhaíocht comhpháirtíochta fós",
       "empty_hint": "Nuair a nascann tú le banc ama comhpháirtíochta, taispeántar a ngníomhaíocht anseo.",
       "activity_one": "{{count}} malartú",
-      "activity_other": "{{count}} malartuithe"
+      "activity_other": "{{count}} malartuithe",
+      "activity_few": "{{count}} malartuithe",
+      "activity_many": "{{count}} malartuithe",
+      "activity_two": "{{count}} malartuithe"
     },
     "federation_off": {
       "title": "Tá comhpháirtíocht le bainc ama eile múchta",

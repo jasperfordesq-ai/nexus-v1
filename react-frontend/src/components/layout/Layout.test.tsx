@@ -38,6 +38,7 @@ vi.mock('./Footer', () => ({
   Footer: () => <footer data-testid="footer">Footer Mock</footer>,
 }));
 vi.mock('@/components/feedback/FloatingReportProblemButton', () => ({
+  default: () => <button type="button">Report a problem</button>,
   FloatingReportProblemButton: () => <button type="button">Report a problem</button>,
 }));
 vi.mock('@/components/ui/BackToTop', () => ({
@@ -95,9 +96,12 @@ describe('Layout', () => {
     vi.clearAllMocks();
     mockUseAuth.mockReturnValue({
       user: null,
+      isAuthenticated: true,
     });
     mockUseTenant.mockReturnValue({
       tenantPath: (path: string) => path,
+      branding: { logoShape: 'wide' },
+      hasFeature: () => false,
     });
   });
 
@@ -172,6 +176,14 @@ describe('Layout', () => {
     const { container } = render(<Layout showNavbar={true} withNavbarPadding={false} />);
     const main = container.querySelector('main');
     expect(main?.className).not.toContain('pt-20');
+  });
+
+  it('exposes the main landmark as a programmatic route-focus target', () => {
+    const { container } = render(<Layout />);
+    const main = container.querySelector('#main-content');
+
+    expect(main).toBeInstanceOf(HTMLElement);
+    expect(main).toHaveAttribute('tabindex', '-1');
   });
 });
 

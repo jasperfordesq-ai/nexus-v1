@@ -70,7 +70,11 @@
   },
   "realtime": {
     "new_posts_one": "منشور جديد واحد — انقر للعرض",
-    "new_posts_other": "{{count}} منشور جديد — انقر للعرض"
+    "new_posts_other": "{{count}} منشور جديد — انقر للعرض",
+    "new_posts_few": "{{count}} منشور جديد — انقر للعرض",
+    "new_posts_many": "{{count}} منشور جديد — انقر للعرض",
+    "new_posts_two": "{{count}} منشور جديد — انقر للعرض",
+    "new_posts_zero": "{{count}} منشور جديد — انقر للعرض"
   },
   "compose": {
     "create_title": "إنشاء {{type}}",
@@ -251,7 +255,29 @@
     "listing_preview_alt": "معاينة الإعلان",
     "image_preview_alt": "معاينة الرفع",
     "type_tabs_aria": "يؤلف نوع المحتوى",
-    "compose_post": "إنشاء مشاركة"
+    "compose_post": "إنشاء مشاركة",
+    "media_rejected_few": "{{count}} ملف(ملفات) تم تخطيها (نوع خاطئ أو كبيرة جدًا)",
+    "media_rejected_many": "{{count}} ملف(ملفات) تم تخطيها (نوع خاطئ أو كبيرة جدًا)",
+    "media_rejected_one": "{{count}} ملف(ملفات) تم تخطيها (نوع خاطئ أو كبيرة جدًا)",
+    "media_rejected_other": "{{count}} ملف(ملفات) تم تخطيها (نوع خاطئ أو كبيرة جدًا)",
+    "media_rejected_two": "{{count}} ملف(ملفات) تم تخطيها (نوع خاطئ أو كبيرة جدًا)",
+    "media_rejected_zero": "{{count}} ملف(ملفات) تم تخطيها (نوع خاطئ أو كبيرة جدًا)",
+    "media_compression_failed_few": "{{count}} صورة(صور) فشلت في المعالجة",
+    "media_compression_failed_many": "{{count}} صورة(صور) فشلت في المعالجة",
+    "media_compression_failed_one": "{{count}} صورة(صور) فشلت في المعالجة",
+    "media_compression_failed_other": "{{count}} صورة(صور) فشلت في المعالجة",
+    "media_compression_failed_two": "{{count}} صورة(صور) فشلت في المعالجة",
+    "media_compression_failed_zero": "{{count}} صورة(صور) فشلت في المعالجة",
+    "sdg_selected_few": "{{count}} أهداف محددة",
+    "sdg_selected_many": "{{count}} أهداف محددة",
+    "sdg_selected_two": "{{count}} أهداف محددة",
+    "sdg_selected_zero": "{{count}} أهداف محددة",
+    "group_members_few": "{{count}} أعضاء",
+    "group_members_many": "{{count}} أعضاء",
+    "group_members_one": "{{count}} أعضاء",
+    "group_members_other": "{{count}} أعضاء",
+    "group_members_two": "{{count}} أعضاء",
+    "group_members_zero": "{{count}} أعضاء"
   },
   "moderation": {
     "unauthorized": "ليس لديك صلاحية لتنفيذ هذا الإجراء."
@@ -349,12 +375,24 @@
       "commitment_flexible": "مرن"
     },
     "volunteer": {
-      "credits_offered": "{{count}} رصيد وقت"
+      "credits_offered": "{{count}} رصيد وقت",
+      "credits_offered_few": "{{count}} رصيد وقت",
+      "credits_offered_many": "{{count}} رصيد وقت",
+      "credits_offered_one": "{{count}} رصيد وقت",
+      "credits_offered_other": "{{count}} رصيد وقت",
+      "credits_offered_two": "{{count}} رصيد وقت",
+      "credits_offered_zero": "{{count}} رصيد وقت"
     },
     "challenge": {
       "closing_soon": "ينتهي قريباً",
       "closes_on": "ينتهي {{date}}",
-      "ideas_count": "{{count}} فكرة"
+      "ideas_count": "{{count}} فكرة",
+      "ideas_count_few": "{{count}} فكرة",
+      "ideas_count_many": "{{count}} فكرة",
+      "ideas_count_one": "{{count}} فكرة",
+      "ideas_count_other": "{{count}} فكرة",
+      "ideas_count_two": "{{count}} فكرة",
+      "ideas_count_zero": "{{count}} فكرة"
     },
     "review": {
       "rating_aria": "{{rating}} من 5 نجوم"
@@ -399,7 +437,13 @@
     "no_posts": "لم يتم العثور على مشاركات",
     "no_posts_desc": "لم يتم وضع علامات على أي مشاركات بـ #{{tag}} بعد.",
     "load_more": "تحميل المزيد",
-    "page_description": "المشاركات المميزة بـ #{{tag}}"
+    "page_description": "المشاركات المميزة بـ #{{tag}}",
+    "post_count_few": "{{count}} منشورات",
+    "post_count_many": "{{count}} منشورات",
+    "post_count_one": "{{count}} منشورات",
+    "post_count_other": "{{count}} منشورات",
+    "post_count_two": "{{count}} منشورات",
+    "post_count_zero": "{{count}} منشورات"
   },
   "hashtags": {
     "title": "الهاشتاجات الرائجة",
@@ -412,7 +456,13 @@
     "no_hashtags": "لم يتم العثور على هاشتاجات",
     "no_match": "لا توجد هاشتاجات تتطابق مع \"{{query}}\"",
     "no_trending": "لا توجد هاشتاجات رائجة في مجتمعك بعد.",
-    "post_count": "{{count}} مشاركات"
+    "post_count": "{{count}} مشاركات",
+    "post_count_few": "{{count}} مشاركات",
+    "post_count_many": "{{count}} مشاركات",
+    "post_count_one": "{{count}} مشاركات",
+    "post_count_other": "{{count}} مشاركات",
+    "post_count_two": "{{count}} مشاركات",
+    "post_count_zero": "{{count}} مشاركات"
   },
   "share": {
     "tooltip_remove": "إزالة المشاركة",
@@ -452,7 +502,13 @@
     "dm_sent_label": "تم الإرسال",
     "dm_send": "إرسال",
     "dm_done": "تم",
-    "email": "البريد الإلكتروني"
+    "email": "البريد الإلكتروني",
+    "button_label_count_few": "شارك ({{count}})",
+    "button_label_count_many": "شارك ({{count}})",
+    "button_label_count_one": "شارك ({{count}})",
+    "button_label_count_other": "شارك ({{count}})",
+    "button_label_count_two": "شارك ({{count}})",
+    "button_label_count_zero": "شارك ({{count}})"
   },
   "video": {
     "select": "إضافة فيديو",
@@ -474,7 +530,19 @@
     "title": "الأكثر رواجاً",
     "view_all": "عرض جميع الوسوم",
     "post_count_one": "{{count}} منشور",
-    "post_count_other": "{{count}} منشورات"
+    "post_count_other": "{{count}} منشورات",
+    "post_count_one_few": "{{count}} منشور",
+    "post_count_one_many": "{{count}} منشور",
+    "post_count_one_one": "{{count}} منشور",
+    "post_count_one_other": "{{count}} منشور",
+    "post_count_one_two": "{{count}} منشور",
+    "post_count_one_zero": "{{count}} منشور",
+    "post_count_other_few": "{{count}} منشورات",
+    "post_count_other_many": "{{count}} منشورات",
+    "post_count_other_one": "{{count}} منشورات",
+    "post_count_other_other": "{{count}} منشورات",
+    "post_count_other_two": "{{count}} منشورات",
+    "post_count_other_zero": "{{count}} منشورات"
   },
   "sidebar": {
     "profile": {
@@ -520,7 +588,13 @@
     "groups": {
       "title": "المجموعات الشائعة",
       "see_all": "عرض الكل",
-      "members": "{{count}} الأعضاء"
+      "members": "{{count}} الأعضاء",
+      "members_few": "{{count}} الأعضاء",
+      "members_many": "{{count}} الأعضاء",
+      "members_one": "{{count}} الأعضاء",
+      "members_other": "{{count}} الأعضاء",
+      "members_two": "{{count}} الأعضاء",
+      "members_zero": "{{count}} الأعضاء"
     },
     "actions": {
       "title": "إجراءات سريعة",
@@ -573,7 +647,14 @@
     "go_to_image": "اذهب إلى الصورة {{number}}",
     "more_images": "{{count}} صور إضافية",
     "video_of": "فيديو {{current}} من {{total}}",
-    "role_description": "شريط عرض دوّار"
+    "role_description": "شريط عرض دوّار",
+    "more_images_few": "{{count}} صور إضافية",
+    "more_images_many": "{{count}} صور إضافية",
+    "more_images_one": "{{count}} صور إضافية",
+    "more_images_other": "{{count}} صور إضافية",
+    "more_images_two": "{{count}} صور إضافية",
+    "more_images_zero": "{{count}} صور إضافية",
+    "view_video": "شاهد الفيديو {{current}} الخاص بـ {{total}}"
   },
   "lightbox": {
     "aria_label": "عارض الصور",
@@ -618,7 +699,13 @@
     "connect_failed": "فشل في إرسال الطلب",
     "pending": "قيد الانتظار",
     "dismiss": "تجاهل",
-    "load_failed": "فشل في تحميل الاقتراحات"
+    "load_failed": "فشل في تحميل الاقتراحات",
+    "mutual_few": "{{count}} معارف مشتركون",
+    "mutual_many": "{{count}} معارف مشتركون",
+    "mutual_one": "{{count}} معارف مشتركون",
+    "mutual_other": "{{count}} معارف مشتركون",
+    "mutual_two": "{{count}} معارف مشتركون",
+    "mutual_zero": "{{count}} معارف مشتركون"
   },
   "analytics": {
     "title": "تحليلات المنشور",
@@ -647,5 +734,11 @@
   },
   "aria": {
     "feed_sidebar": "اقتراحات المجتمع وأبرزها"
-  }
+  },
+  "items_loaded_few": "{{count}} منشور",
+  "items_loaded_many": "{{count}} منشور",
+  "items_loaded_one": "{{count}} منشور",
+  "items_loaded_other": "{{count}} منشور",
+  "items_loaded_two": "{{count}} منشور",
+  "items_loaded_zero": "{{count}} منشور"
 }

@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { useDisclosure, Button, Input, Textarea, Card, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -183,7 +184,7 @@ export default function GroupTypes() {
                 </TableCell>
                 <TableCell>{type.member_count}</TableCell>
                 <TableCell>{type.policy_count}</TableCell>
-                <TableCell>{new Date(type.created_at).toLocaleDateString()}</TableCell>
+                <TableCell>{new Date(type.created_at).toLocaleDateString(getFormattingLocale())}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Button

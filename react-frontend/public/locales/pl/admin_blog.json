@@ -158,7 +158,19 @@
       "delete_confirm_title": "Usunąć wybrane posty?",
       "publish": "Publikuj",
       "publish_confirm_message": "Opublikować {{count}} wybrane posty?",
-      "publish_confirm_title": "Opublikować wybrane posty?"
+      "publish_confirm_title": "Opublikować wybrane posty?",
+      "publish_confirm_message_few": "Opublikować {{count}} wybrane posty?",
+      "publish_confirm_message_many": "Opublikować {{count}} wybrane posty?",
+      "publish_confirm_message_one": "Opublikować {{count}} wybrane posty?",
+      "publish_confirm_message_other": "Opublikować {{count}} wybrane posty?",
+      "archive_confirm_message_few": "Spowoduje to cofnięcie publikacji postów {{count}}. Można je później ponownie opublikować.",
+      "archive_confirm_message_many": "Spowoduje to cofnięcie publikacji postów {{count}}. Można je później ponownie opublikować.",
+      "archive_confirm_message_one": "Spowoduje to cofnięcie publikacji postów {{count}}. Można je później ponownie opublikować.",
+      "archive_confirm_message_other": "Spowoduje to cofnięcie publikacji postów {{count}}. Można je później ponownie opublikować.",
+      "delete_confirm_message_few": "Usunąć wybrane posty {{count}}? Tego nie można cofnąć.",
+      "delete_confirm_message_many": "Usunąć wybrane posty {{count}}? Tego nie można cofnąć.",
+      "delete_confirm_message_one": "Usunąć wybrane posty {{count}}? Tego nie można cofnąć.",
+      "delete_confirm_message_other": "Usunąć wybrane posty {{count}}? Tego nie można cofnąć."
     },
     "marketplace": {
       "reason_label": "Powód",

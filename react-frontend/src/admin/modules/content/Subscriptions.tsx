@@ -9,16 +9,20 @@
  * Wired to adminPlans.getSubscriptions() API.
  */
 
-import { useState, useEffect, useCallback } from 'react';import CreditCard from 'lucide-react/icons/credit-card';
+import { getFormattingLocale } from '@/lib/helpers';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import CreditCard from 'lucide-react/icons/credit-card';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
+import { logError } from '@/lib/logger';
 import { adminPlans } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable, StatusBadge, type Column } from '../../components/DataTable';
 import { EmptyState } from '../../components/EmptyState';
 
 import { useTranslation } from 'react-i18next';
-import { Spinner } from '@/components/ui';
+import { Button, Spinner } from '@/components/ui';
 interface SubscriptionItem {
   id: number;
   tenant_name: string;
@@ -31,37 +35,55 @@ interface SubscriptionItem {
   stripe_subscription_id: string | null;
 }
 
+function parseSubscriptions(value: unknown): SubscriptionItem[] | null {
+  if (Array.isArray(value)) return value as SubscriptionItem[];
+  if (typeof value !== 'object' || value === null) return null;
+
+  const page = value as { data?: unknown };
+  return Array.isArray(page.data) ? page.data as SubscriptionItem[] : null;
+}
+
 export function Subscriptions() {
   const { t } = useTranslation('admin_content');
-  usePageTitle("Content");
-  const toast = useToast();
+  usePageTitle(t('content.page_title'));
 
-  const [data, setData] = useState<SubscriptionItem[]>([]);
+  const [data, setData] = useState<SubscriptionItem[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const requestIdRef = useRef(0);
 
   const fetchData = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
+
     try {
       const res = await adminPlans.getSubscriptions();
-      if (res.success && res.data) {
-        const result = res.data as unknown;
-        if (Array.isArray(result)) {
-          setData(result);
-        } else if (result && typeof result === 'object') {
-          const pd = result as { data?: SubscriptionItem[] };
-          setData(pd.data || []);
-        }
+      if (requestId !== requestIdRef.current) return;
+
+      const parsed = res.success ? parseSubscriptions(res.data) : null;
+      if (parsed) {
+        setData(parsed);
+        setLoadFailed(false);
+      } else {
+        setLoadFailed(true);
       }
-    } catch {
-      toast.error("Failed to load subscriptions");
+    } catch (err) {
+      if (requestId !== requestIdRef.current) return;
+      logError('Failed to load subscriptions', err);
+      setLoadFailed(true);
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
     }
-  }, [toast])
+  }, []);
 
 
   useEffect(() => {
-    fetchData();
+    void fetchData();
+    return () => {
+      requestIdRef.current += 1;
+    };
   }, [fetchData]);
 
   const columns: Column<SubscriptionItem>[] = [
@@ -73,13 +95,13 @@ export function Subscriptions() {
     },
     {
       key: 'plan_name',
-      label: "Plans",
+      label: t('content.plan'),
       sortable: true,
       render: (item) => <span className="text-sm text-muted">{item.plan_name || '--'}</span>,
     },
     {
       key: 'status',
-      label: "Status",
+      label: t('content.label_status'),
       sortable: true,
       render: (item) => <StatusBadge status={item.status || 'inactive'} />,
     },
@@ -95,7 +117,7 @@ export function Subscriptions() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.starts_at ? new Date(item.starts_at).toLocaleDateString() : '--'}
+          {item.starts_at ? new Date(item.starts_at).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },
@@ -105,7 +127,7 @@ export function Subscriptions() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.expires_at ? new Date(item.expires_at).toLocaleDateString() : '--'}
+          {item.expires_at ? new Date(item.expires_at).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },
@@ -115,7 +137,7 @@ export function Subscriptions() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.trial_ends_at ? new Date(item.trial_ends_at).toLocaleDateString() : '--'}
+          {item.trial_ends_at ? new Date(item.trial_ends_at).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },
@@ -131,32 +153,47 @@ export function Subscriptions() {
     },
   ];
 
-  if (loading) {
-    return (
-      <div>
-        <PageHeader title={"Subscriptions"} description={"View and manage active member subscriptions"} />
-        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>
+  const refreshAction = (
+    <Button variant="secondary" onPress={fetchData} isLoading={loading} startContent={<RefreshCw size={16} aria-hidden="true" />}>
+      {t('common.refresh')}
+    </Button>
+  );
+
+  const staleDataWarning = loadFailed && data !== null ? (
+    <div className="mb-4 flex flex-col gap-3 rounded-xl border border-danger/30 bg-danger/5 p-4 text-danger sm:flex-row sm:items-center sm:justify-between" role="alert">
+      <div className="flex items-center gap-2">
+        <AlertTriangle size={18} className="shrink-0" aria-hidden="true" />
+        <p className="text-sm">{t('content.failed_to_load_subscriptions')}</p>
       </div>
-    );
-  }
+      <Button variant="outline" onPress={fetchData} isLoading={loading}>{t('common.retry')}</Button>
+    </div>
+  ) : null;
 
   return (
     <div>
-      <PageHeader title={"Subscriptions"} description={"View and manage active member subscriptions"} />
+      <PageHeader title={t('content.subscriptions_title')} description={t('content.subscriptions_desc')} actions={refreshAction} />
 
-      {data.length === 0 ? (
-        <EmptyState
-          icon={CreditCard}
-          title={"No data available"}
-          description={"Subscriptions will appear here once members start joining plans"}
-        />
+      {loading && data === null ? (
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-12"><Spinner size="lg" /></div>
+      ) : loadFailed && data === null ? (
+        <div role="alert">
+          <EmptyState icon={AlertTriangle} title={t('content.failed_to_load_subscriptions')} actionLabel={t('common.retry')} onAction={fetchData} />
+        </div>
       ) : (
-        <DataTable
-          columns={columns}
-          data={data}
-          searchPlaceholder={t('data_table.search')}
-          onRefresh={fetchData}
-        />
+        <>
+          {staleDataWarning}
+          {(data ?? []).length === 0 ? (
+            <EmptyState
+              icon={CreditCard}
+              title={t('content.no_data_available')}
+              description={t('content.desc_subscriptions_will_appear_here_once_memb')}
+              actionLabel={t('common.refresh')}
+              onAction={fetchData}
+            />
+          ) : (
+            <DataTable columns={columns} data={data ?? []} searchPlaceholder={t('shared.search')} onRefresh={fetchData} />
+          )}
+        </>
       )}
     </div>
   );

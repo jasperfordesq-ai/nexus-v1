@@ -792,7 +792,16 @@
     "no_hub_tenants_found": "ハブテナントが見つかりませんでした",
     "impersonate_user_warning": "偽装は、このユーザーの ID でのすべてのアクションをログに記録します。サポートに必要な場合にのみ使用してください。",
     "partnerships_tabs_aria": "フェデレーション パートナーシップ ステータス フィルター",
-    "tenant_list_tabs_aria": "テナントステータスフィルター"
+    "tenant_list_tabs_aria": "テナントステータスフィルター",
+    "tab_with_count_other": "{{label}} ({{count}})",
+    "users_count_other": "{{count}} ユーザー",
+    "bulk_users_moved_count_other": "一括ユーザーが移動しました ({{count}})",
+    "bulk_tenants_updated_count_other": "一括テナントが更新されました ({{count}})",
+    "move_n_users_other": "{{count}} 人のユーザーを移動する",
+    "apply_to_n_tenants_other": "{{count}} テナントに適用する",
+    "bulk_move_confirm_message_with_grant_other": "{{count}} 人のユーザーを移動し、テナントにスーパー管理者アクセスを付与します。",
+    "bulk_move_confirm_message_other": "{{count}} 人のユーザーを移動します。",
+    "bulk_update_confirm_message_other": "この更新を {{count}} テナントに適用します。"
   },
   "tenant_form": {
     "active": "アクティブ",
@@ -997,7 +1006,8 @@
     "view": "見る",
     "whitelisted_tenants_aria": "ホワイトリストに登録されたテナント",
     "whitelisted_tenants_count": "ホワイトリスト登録済みテナント ({{count}})",
-    "failed_to_load": "ホワイトリストの読み込みに失敗しました"
+    "failed_to_load": "ホワイトリストの読み込みに失敗しました",
+    "whitelisted_tenants_count_other": "ホワイトリスト登録済みテナント ({{count}})"
   },
   "pilot_inquiry_admin": {
     "page_title": "パイロットに関するお問い合わせ",
@@ -1093,14 +1103,31 @@
       "empty": "-",
       "months": "{{count}} か月",
       "no": "いいえ",
-      "yes": "はい"
+      "yes": "はい",
+      "months_other": "{{count}} か月"
     },
     "velocity": {
       "avg_to_agreed": "同意までの平均:",
       "avg_to_live": "平均生存期間:",
       "avg_to_proposal": "プロポーザルまでの平均:",
       "days": "{{count}}d",
-      "title": "パイプラインの速度 - 問い合わせの送信から各マイルストーンまでの平均日数:"
+      "title": "パイプラインの速度 - 問い合わせの送信から各マイルストーンまでの平均日数:",
+      "days_other": "{{count}}d"
     }
-  }
+  },
+  "events": "イベント",
+  "groups": "グループ",
+  "gamification": "ゲーミフィケーション",
+  "goals": "目標",
+  "blog": "ブログ",
+  "resources": "リソース",
+  "volunteering": "ボランティア活動",
+  "federation": "フェデレーション",
+  "wallet": "財布",
+  "messages": "メッセージ",
+  "dashboard": "ダッシュボード",
+  "exchange_workflow": "交換ワークフロー",
+  "organisations": "組織",
+  "listings": "リスト",
+  "feed": "餌"
 }

@@ -187,7 +187,12 @@
         "pause_failed": "Theip ar an bhfeachtas a chur ar sos",
         "rejected": "Diúltaíodh don fheachtas \"{{name}}\".",
         "reject_failed": "Theip ar an bhfeachtas a dhiúltú"
-      }
+      },
+      "creatives_count_few": "Cruthaitheacha ({{count}})",
+      "creatives_count_many": "Cruthaitheacha ({{count}})",
+      "creatives_count_one": "Cruthaitheacha ({{count}})",
+      "creatives_count_other": "Cruthaitheacha ({{count}})",
+      "creatives_count_two": "Cruthaitheacha ({{count}})"
     },
     "push": {
       "page_title": "Feachtais brú",

@@ -393,7 +393,13 @@
     "changes_between": "التغييرات: v{{old}} إلى v{{new}}",
     "changes_count": "تغييرات {{count}}",
     "legend_removed": "تمت الإزالة",
-    "legend_added": "تمت الإضافة"
+    "legend_added": "تمت الإضافة",
+    "changes_count_few": "تغييرات {{count}}",
+    "changes_count_many": "تغييرات {{count}}",
+    "changes_count_one": "تغييرات {{count}}",
+    "changes_count_other": "تغييرات {{count}}",
+    "changes_count_two": "تغييرات {{count}}",
+    "changes_count_zero": "تغييرات {{count}}"
   },
   "platform": {
     "effective_date": "ساري المفعول {{date}}",
@@ -480,7 +486,13 @@
     "consent_text": "بالنقر على قبول، تؤكد أنك قد قرأت وتوافق على الوثائق المذكورة أعلاه.",
     "accept_aria": "قبول جميع الوثائق القانونية المحدثة والمتابعة",
     "accepting": "جارٍ القبول…",
-    "accept_continue": "قبول ومتابعة"
+    "accept_continue": "قبول ومتابعة",
+    "subtitle_other_few": "{{count}} تم تحديث الوثائق. يرجى مراجعتها وقبولها للمتابعة.",
+    "subtitle_other_many": "{{count}} تم تحديث الوثائق. يرجى مراجعتها وقبولها للمتابعة.",
+    "subtitle_other_one": "{{count}} تم تحديث الوثائق. يرجى مراجعتها وقبولها للمتابعة.",
+    "subtitle_other_other": "{{count}} تم تحديث الوثائق. يرجى مراجعتها وقبولها للمتابعة.",
+    "subtitle_other_two": "{{count}} تم تحديث الوثائق. يرجى مراجعتها وقبولها للمتابعة.",
+    "subtitle_other_zero": "{{count}} تم تحديث الوثائق. يرجى مراجعتها وقبولها للمتابعة."
   },
   "custom": {
     "effective_label": "ساري المفعول: {{date}}",

@@ -206,7 +206,22 @@
     "feed_empty_desc": "Sii il primo a condividere qualcosa con questo gruppo!",
     "feed_create_post": "Crea Post",
     "feed_load_more": "Carica Altro",
-    "member_actions_aria": "Azioni membro"
+    "member_actions_aria": "Azioni membro",
+    "meta_description_fallback_many": "Unisciti a {{name}} e connettiti con {{count}} membri della community tramite post, eventi e discussioni condivisi.",
+    "meta_description_fallback_one": "Unisciti a {{name}} e connettiti con {{count}} membri della community tramite post, eventi e discussioni condivisi.",
+    "meta_description_fallback_other": "Unisciti a {{name}} e connettiti con {{count}} membri della community tramite post, eventi e discussioni condivisi.",
+    "members_count_many": "{{count}} membri",
+    "members_count_one": "{{count}} membri",
+    "members_count_other": "{{count}} membri",
+    "reply_count_many": "{{count}} risposte",
+    "reply_count_one": "{{count}} risposte",
+    "reply_count_other": "{{count}} risposte",
+    "tab_subgroups_count_many": "Sottogruppi ({{count}})",
+    "tab_subgroups_count_one": "Sottogruppi ({{count}})",
+    "tab_subgroups_count_other": "Sottogruppi ({{count}})",
+    "posts_count_many": "{{count}} post",
+    "posts_count_one": "{{count}} post",
+    "posts_count_other": "{{count}} post"
   },
   "form": {
     "create_title": "Crea nuovo gruppo",
@@ -389,7 +404,10 @@
     "size_b": "B",
     "size_kb": "KB",
     "size_mb": "MB",
-    "size_gb": "GB"
+    "size_gb": "GB",
+    "folder_chip_many": "{{name}} ({{count}})",
+    "folder_chip_one": "{{name}} ({{count}})",
+    "folder_chip_other": "{{name}} ({{count}})"
   },
   "media": {
     "filter_all": "Tutti",
@@ -450,7 +468,10 @@
     "secret_placeholder": "Segreto di firma per la verifica del payload",
     "cancel": "Annulla",
     "create_btn": "Crea webhook",
-    "delete_confirm": "Eliminare questo webhook? Questa operazione non può essere annullata."
+    "delete_confirm": "Eliminare questo webhook? Questa operazione non può essere annullata.",
+    "failures_many": "{{count}} errori",
+    "failures_one": "{{count}} errori",
+    "failures_other": "{{count}} errori"
   },
   "toast": {
     "left": "Ha lasciato il gruppo",
@@ -562,7 +583,13 @@
     "answer_posted_success": "Risposta pubblicata!",
     "answer_posted_error": "Impossibile pubblicare la risposta",
     "vote_error": "Impossibile votare",
-    "accept_error": "Impossibile accettare la risposta"
+    "accept_error": "Impossibile accettare la risposta",
+    "answer_count_aria_many": "{{count}} risposte",
+    "answer_count_aria_one": "{{count}} risposte",
+    "answer_count_aria_other": "{{count}} risposte",
+    "answers_heading_many": "{{count}} risposta(e)",
+    "answers_heading_one": "{{count}} risposta(e)",
+    "answers_heading_other": "{{count}} risposta(e)"
   },
   "wiki": {
     "load_failed": "Impossibile caricare le pagine wiki",
@@ -719,5 +746,14 @@
     "accent_color": "Colore accento",
     "hue": "Tonalità",
     "preview": "Anteprima"
-  }
+  },
+  "members_many": "{{count}} membri",
+  "members_one": "{{count}} membri",
+  "members_other": "{{count}} membri",
+  "members_count_label_many": "{{count}} membri",
+  "members_count_label_one": "{{count}} membri",
+  "members_count_label_other": "{{count}} membri",
+  "posts_count_label_many": "{{count}} post",
+  "posts_count_label_one": "{{count}} post",
+  "posts_count_label_other": "{{count}} post"
 }

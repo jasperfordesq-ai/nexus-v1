@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Select, SelectItem, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -227,7 +228,7 @@ export function NewsletterBounces() {
               <span className="text-sm text-muted">{t('newsletter_bounces.stat_total_bounces_7d')}</span>
               <AlertTriangle size={20} className="text-warning" />
             </div>
-            <p className="text-2xl font-bold">{totalBounces7d.toLocaleString()}</p>
+            <p className="text-2xl font-bold">{totalBounces7d.toLocaleString(getFormattingLocale())}</p>
           </CardBody>
         </Card>
 
@@ -237,7 +238,7 @@ export function NewsletterBounces() {
               <span className="text-sm text-muted">{t('newsletter_bounces.stat_hard_bounces')}</span>
               <AlertTriangle size={20} className="text-danger" />
             </div>
-            <p className="text-2xl font-bold">{hardBounces.toLocaleString()}</p>
+            <p className="text-2xl font-bold">{hardBounces.toLocaleString(getFormattingLocale())}</p>
           </CardBody>
         </Card>
 
@@ -247,7 +248,7 @@ export function NewsletterBounces() {
               <span className="text-sm text-muted">{t('newsletter_bounces.stat_suppressed_emails')}</span>
               <Trash2 size={20} className="text-muted" />
             </div>
-            <p className="text-2xl font-bold">{suppressedCount.toLocaleString()}</p>
+            <p className="text-2xl font-bold">{suppressedCount.toLocaleString(getFormattingLocale())}</p>
           </CardBody>
         </Card>
       </div>
@@ -371,7 +372,7 @@ export function NewsletterBounces() {
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-muted">
-                        {new Date(bounce.bounced_at).toLocaleDateString()}
+                        {new Date(bounce.bounced_at).toLocaleDateString(getFormattingLocale())}
                       </span>
                     </TableCell>
                   </TableRow>
@@ -404,7 +405,7 @@ export function NewsletterBounces() {
                     </TableCell>
                     <TableCell>
                       <span className="text-sm text-muted">
-                        {new Date(entry.suppressed_at).toLocaleDateString()}
+                        {new Date(entry.suppressed_at).toLocaleDateString(getFormattingLocale())}
                       </span>
                     </TableCell>
                     <TableCell>

@@ -306,6 +306,26 @@
     "pillar_trust": "Trust",
     "pillar_aria": "{{label}}: {{percent}}%",
     "of_active_users": "{{total}} aktywnych użytkowników",
-    "of_active_listings": "z {{total}} aktywnych aukcji"
+    "of_active_listings": "z {{total}} aktywnych aukcji",
+    "cache_cleared_count_few": "Wyczyszczono wpis w pamięci podręcznej{{count}}",
+    "cache_cleared_count_many": "Wyczyszczono wpis w pamięci podręcznej{{count}}",
+    "cache_cleared_count_one": "Wyczyszczono wpis w pamięci podręcznej{{count}}",
+    "cache_cleared_count_other": "Wyczyszczono wpis w pamięci podręcznej{{count}}",
+    "clear_cache_confirm_with_count_few": "Czy na pewno chcesz wyczyścić buforowane mecze{{count}}?",
+    "clear_cache_confirm_with_count_many": "Czy na pewno chcesz wyczyścić buforowane mecze{{count}}?",
+    "clear_cache_confirm_with_count_one": "Czy na pewno chcesz wyczyścić buforowane mecze{{count}}?",
+    "clear_cache_confirm_with_count_other": "Czy na pewno chcesz wyczyścić buforowane mecze{{count}}?",
+    "distribution_aria_few": "{{label}}: dopasowania{{count}}({{percent}}%)",
+    "distribution_aria_many": "{{label}}: dopasowania{{count}}({{percent}}%)",
+    "distribution_aria_one": "{{label}}: dopasowania{{count}}({{percent}}%)",
+    "distribution_aria_other": "{{label}}: dopasowania{{count}}({{percent}}%)",
+    "feedback_reason_aria_few": "{{label}}: {{count}} ({{percent}}%)",
+    "feedback_reason_aria_many": "{{label}}: {{count}} ({{percent}}%)",
+    "feedback_reason_aria_one": "{{label}}: {{count}} ({{percent}}%)",
+    "feedback_reason_aria_other": "{{label}}: {{count}} ({{percent}}%)",
+    "pillar_averages_sample_size_few": "Na podstawie dopasowań {{count}}",
+    "pillar_averages_sample_size_many": "Na podstawie dopasowań {{count}}",
+    "pillar_averages_sample_size_one": "Na podstawie dopasowań {{count}}",
+    "pillar_averages_sample_size_other": "Na podstawie dopasowań {{count}}"
   }
 }

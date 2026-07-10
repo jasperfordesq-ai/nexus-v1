@@ -44,7 +44,10 @@
     "no_deadline": "Geen deadline",
     "evaluation_criteria": "Evaluatiecriteria",
     "outcome": "Resultaat",
-    "team_links": "Projectteams"
+    "team_links": "Projectteams",
+    "ideas_count_other": "{{count}} ideeën",
+    "max_ideas_one": "Maximaal {{count}} ideeën per persoon",
+    "max_ideas_other": "Maximaal {{count}} ideeën per persoon"
   },
   "challenges": {
     "title": "Uitdagingen",
@@ -87,7 +90,10 @@
     "draft_created": "Aangemaakt {{date}}",
     "new_idea": "Nieuw Idee",
     "sort_label": "Ideeën sorteren",
-    "loading": "Ideeën laden..."
+    "loading": "Ideeën laden...",
+    "your_ideas_one": "Jouw ideeën: {{count}}/{{max}}",
+    "your_ideas_other": "Jouw ideeën: {{count}}/{{max}}",
+    "comments_other": "{{count}} opmerkingen"
   },
   "idea_detail": {
     "page_title": "Idee Details",
@@ -321,7 +327,8 @@
     "fallback_title": "Campagne",
     "feature_not_available": "Ideevorming niet beschikbaar",
     "feature_not_available_desc": "De ideevormingsfunctie is niet ingeschakeld voor deze community. Neem contact op met je tijdbank-beheerder voor meer informatie.",
-    "retry": "Opnieuw proberen"
+    "retry": "Opnieuw proberen",
+    "challenges_count_other": "{{count}} uitdagingen"
   },
   "templates": {
     "title": "Uitdaging Sjablonen",

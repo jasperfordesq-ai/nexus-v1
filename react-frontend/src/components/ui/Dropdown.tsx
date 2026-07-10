@@ -10,8 +10,11 @@ import {
   isValidElement,
   use,
   type ComponentProps,
+  type ReactElement,
   type ReactNode,
 } from 'react';
+import { Pressable } from '@react-aria/interactions';
+import type { DOMAttributes } from '@react-types/shared';
 import { Description } from '@heroui/react/description';
 import { Dropdown as HeroDropdown, type Dropdown as HeroDropdownTypes } from '@heroui/react/dropdown';
 import { Header } from '@heroui/react/header';
@@ -63,10 +66,26 @@ export function Dropdown({ children, placement, shouldBlockScroll, ...props }: D
   );
 }
 
-export type DropdownTriggerProps = HeroDropdownTriggerProps;
+export type DropdownTriggerProps = Omit<HeroDropdownTriggerProps, 'children'> & {
+  children: ReactElement;
+};
+
+const NATIVE_PRESSABLE_TAGS = new Set(['a', 'area', 'button', 'input', 'select', 'summary', 'textarea']);
+
+function isProjectButton(child: ReactElement): boolean {
+  if (typeof child.type === 'string') return false;
+
+  return (child.type as { displayName?: string }).displayName === 'Button';
+}
+
+function isNativePressable(
+  child: ReactElement,
+): child is ReactElement<DOMAttributes, string> {
+  return typeof child.type === 'string' && NATIVE_PRESSABLE_TAGS.has(child.type);
+}
 
 export function DropdownTrigger({ children, className, ...props }: DropdownTriggerProps) {
-  if (isValidElement<{ className?: string }>(children)) {
+  if (isValidElement<{ className?: string }>(children) && isProjectButton(children)) {
     const childClassName = typeof children.props.className === 'string' ? children.props.className : undefined;
     const triggerClassName = typeof className === 'string' ? className : undefined;
 
@@ -74,6 +93,17 @@ export function DropdownTrigger({ children, className, ...props }: DropdownTrigg
       ...(props as Record<string, unknown>),
       className: cn(childClassName, triggerClassName),
     } as { className?: string });
+  }
+
+  if (isValidElement(children) && isNativePressable(children)) {
+    const childClassName = typeof children.props.className === 'string' ? children.props.className : undefined;
+    const triggerClassName = typeof className === 'string' ? className : undefined;
+    const pressableChild = cloneElement(children, {
+      ...(props as Record<string, unknown>),
+      className: cn(childClassName, triggerClassName),
+    } as DOMAttributes) as ReactElement<DOMAttributes, string>;
+
+    return <Pressable>{pressableChild}</Pressable>;
   }
 
   return <HeroDropdown.Trigger {...props} className={className}>{children}</HeroDropdown.Trigger>;
@@ -102,9 +132,12 @@ export function DropdownMenu<T extends object = object>({
   ...props
 }: DropdownMenuProps<T>) {
   const { placement, shouldBlockScroll } = use(DropdownContext);
-  const popoverProps = shouldBlockScroll === undefined
-    ? {}
-    : ({ shouldBlockScroll } as Partial<HeroDropdownPopoverProps>);
+  // HeroUI 3.1.0's underlying React Aria Popover locks document scrolling
+  // unless it is non-modal. `shouldBlockScroll` is a v2 compatibility prop,
+  // not a current Popover prop, so map its false case to the supported inverse.
+  const popoverProps: Partial<HeroDropdownPopoverProps> = shouldBlockScroll === false
+    ? { isNonModal: true }
+    : {};
   const selectionMode = (props as { selectionMode?: 'none' | 'single' | 'multiple' }).selectionMode;
 
   return (

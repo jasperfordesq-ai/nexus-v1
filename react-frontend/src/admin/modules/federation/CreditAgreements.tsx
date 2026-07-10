@@ -27,7 +27,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { adminFederation } from '../../api/adminApi';
 import { logError } from '@/lib/logger';
-import { formatRelativeTime } from '@/lib/helpers';
+import { formatRelativeTime, getFormattingLocale } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
 import { ConfirmModal } from '../../components/ConfirmModal';
@@ -694,12 +694,12 @@ export function CreditAgreements() {
                           </div>
                           <div>
                             <p className="text-muted">{t('federation.label_created')}</p>
-                            <p>{new Date(selectedAgreement.created_at).toLocaleDateString()}</p>
+                            <p>{new Date(selectedAgreement.created_at).toLocaleDateString(getFormattingLocale())}</p>
                           </div>
                           {selectedAgreement.updated_at && (
                             <div>
                               <p className="text-muted">{t('federation.label_last_updated')}</p>
-                              <p>{new Date(selectedAgreement.updated_at).toLocaleDateString()}</p>
+                              <p>{new Date(selectedAgreement.updated_at).toLocaleDateString(getFormattingLocale())}</p>
                             </div>
                           )}
                         </div>
@@ -756,7 +756,7 @@ export function CreditAgreements() {
                               {detailTransactions.map((tx) => (
                                 <TableRow key={tx.id}>
                                   <TableCell>
-                                    <span className="text-sm">{new Date(tx.created_at).toLocaleDateString()}</span>
+                                    <span className="text-sm">{new Date(tx.created_at).toLocaleDateString(getFormattingLocale())}</span>
                                   </TableCell>
                                   <TableCell>
                                     <Chip

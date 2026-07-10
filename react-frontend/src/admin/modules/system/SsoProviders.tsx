@@ -13,6 +13,7 @@
  * encrypted, never returned.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import KeyRound from 'lucide-react/icons/key-round';
 import Plus from 'lucide-react/icons/plus';
@@ -94,7 +95,7 @@ const EMPTY_FORM: ProviderForm = {
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, {
+  return d.toLocaleDateString(getFormattingLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

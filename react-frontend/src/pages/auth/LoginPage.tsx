@@ -354,8 +354,8 @@ export function LoginPage() {
       <PageMeta title={t("login_meta_title")} description={t("login_meta_description")} noIndex />
       <div className="min-h-screen flex items-center justify-center p-4">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ y: 20 }}
+          animate={{ y: 0 }}
           transition={{ duration: 0.5 }}
           className="w-full max-w-md relative z-10"
         >
@@ -374,9 +374,9 @@ export function LoginPage() {
                     <motion.div
                       initial={{ scale: 0.8 }}
                       animate={{ scale: 1 }}
-                      className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
+                      className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 mb-4"
                     >
-                      <Mail className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                      <Mail className="w-8 h-8 text-accent dark:text-accent" aria-hidden="true" />
                     </motion.div>
                     <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{t('login.title')}</h1>
                     <p className="text-theme-muted mt-2">
@@ -590,7 +590,7 @@ export function LoginPage() {
                     <div className="flex items-center justify-end">
                       <Link
                         to={tenantPath('/password/forgot')}
-                        className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors"
+                        className="text-sm text-accent dark:text-accent hover:text-accent dark:hover:text-accent transition-colors"
                       >
                         {t('login.forgot_password')}
                       </Link>
@@ -625,11 +625,11 @@ export function LoginPage() {
                         onPress={handleBiometricLogin}
                         isLoading={biometricLoading}
                         isDisabled={isLoading}
-                        className="w-full border-indigo-500/30 text-theme-primary hover:bg-indigo-500/10"
+                        className="w-full border-accent/30 text-theme-primary hover:bg-accent/10"
                         size="lg"
                         startContent={
                           !biometricLoading ? (
-                            <Fingerprint className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+                            <Fingerprint className="w-5 h-5 text-accent" aria-hidden="true" />
                           ) : undefined
                         }
                         spinner={<Spinner size="sm" />}
@@ -650,7 +650,7 @@ export function LoginPage() {
                     {t('login.no_account')}{' '}
                     <Link
                       to={tenantPath('/register')}
-                      className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium transition-colors"
+                      className="text-accent dark:text-accent hover:text-accent dark:hover:text-accent font-medium transition-colors"
                     >
                       {t('login.create_account_link')}
                     </Link>
@@ -669,9 +669,9 @@ export function LoginPage() {
                     <motion.div
                       initial={{ scale: 0.8 }}
                       animate={{ scale: 1 }}
-                      className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4"
+                      className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 mb-4"
                     >
-                      <Shield className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                      <Shield className="w-8 h-8 text-accent dark:text-accent" aria-hidden="true" />
                     </motion.div>
                     <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">
                       {t('login.twofa_title')}
@@ -773,12 +773,7 @@ export function LoginPage() {
           </GlassCard>
 
           {/* Back to home link */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="mt-6 text-center"
-          >
+          <div className="mt-6 text-center">
             <Link
               to={tenantPath('/')}
               className="inline-flex items-center gap-2 text-theme-subtle hover:text-theme-secondary text-sm transition-colors"
@@ -786,7 +781,7 @@ export function LoginPage() {
               <ArrowLeft className="w-4 h-4" aria-hidden="true" />
               {t('login.back_to_home')}
             </Link>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </>

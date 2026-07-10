@@ -60,7 +60,7 @@ export function HashtagRenderer({
           {part.type === 'hashtag' ? (
             <Link
               to={tenantPath(`/feed/hashtag/${part.value}`)}
-              className="text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium transition-colors"
+              className="text-accent hover:text-accent dark:text-accent dark:hover:text-accent font-medium transition-colors"
               onClick={(e) => e.stopPropagation()}
             >
               #{part.value}

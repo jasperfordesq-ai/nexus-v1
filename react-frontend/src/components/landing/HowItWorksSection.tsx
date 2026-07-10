@@ -21,10 +21,10 @@ interface ResolvedStep {
   color: string;
 }
 
-const FALLBACK_META = { icon: UserPlus, color: 'from-indigo-500 to-blue-500' } as const;
+const FALLBACK_META = { icon: UserPlus, color: 'from-accent to-blue-500' } as const;
 const defaultStepMeta: { icon: LucideIcon; color: string }[] = [
   FALLBACK_META,
-  { icon: Search, color: 'from-purple-500 to-pink-500' },
+  { icon: Search, color: 'from-accent to-pink-500' },
   { icon: Handshake, color: 'from-cyan-500 to-teal-500' },
   { icon: Coins, color: 'from-amber-500 to-orange-500' },
 ];
@@ -55,13 +55,13 @@ export function HowItWorksSection({ content }: HowItWorksSectionProps) {
             Icon: UserPlus,
             title: t('home.how_it_works.steps.0.title'),
             description: t('home.how_it_works.steps.0.description'),
-            color: 'from-indigo-500 to-blue-500',
+            color: 'from-accent to-blue-500',
           },
           {
             Icon: Search,
             title: t('home.how_it_works.steps.1.title'),
             description: t('home.how_it_works.steps.1.description'),
-            color: 'from-purple-500 to-pink-500',
+            color: 'from-accent to-pink-500',
           },
           {
             Icon: Handshake,
@@ -105,7 +105,7 @@ export function HowItWorksSection({ content }: HowItWorksSectionProps) {
               transition={{ delay: index * 0.1 }}
             >
               <GlassCard className="p-6 h-full text-center relative group motion-safe:hover:scale-[1.02] motion-safe:transition-transform">
-                <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-gradient-to-br from-accent to-accent-gradient-end flex items-center justify-center text-white text-sm font-bold shadow-lg">
                   {index + 1}
                 </div>
                 <div className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${step.color} mb-4`}>

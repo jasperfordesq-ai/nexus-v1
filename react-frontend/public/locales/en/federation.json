@@ -82,7 +82,11 @@
     "quick_link_7_title": "Federation Settings",
     "quick_link_7_description": "Configure your federation privacy and communication preferences.",
     "quick_link_6_title": "Federation Connections",
-    "quick_link_6_description": "Manage your connection requests across partner communities."
+    "quick_link_6_description": "Manage your connection requests across partner communities.",
+    "view_all_one": "View all ({{count}})",
+    "view_all_other": "View all ({{count}})",
+    "member_count_one": "{{count}} members",
+    "member_count_other": "{{count}} members"
   },
   "partners": {
     "page_title": "Partner Communities",
@@ -115,7 +119,9 @@
     "browse_members": "Browse Members",
     "browse_listings": "Browse Listings",
     "close": "Close",
-    "view_details": "View Details"
+    "view_details": "View Details",
+    "member_count_one": "{{count}} members",
+    "member_count_other": "{{count}} members"
   },
   "members": {
     "page_title": "Federation Members",
@@ -156,7 +162,13 @@
     "external_profile_title": "External Member",
     "external_profile_message": "This member is on an external partner platform. Direct profile viewing is not available.",
     "external_member": "External Member",
-    "member_fallback": "Member"
+    "member_fallback": "Member",
+    "external_source_note_external_only_one": "Showing {{count}} external partner results.",
+    "external_source_note_external_only_other": "Showing {{count}} external partner results.",
+    "external_source_note_one": "Includes {{count}} external partner results; load more continues internal partner results.",
+    "external_source_note_other": "Includes {{count}} external partner results; load more continues internal partner results.",
+    "more_skills_one": "+{{count}} more",
+    "more_skills_other": "+{{count}} more"
   },
   "messages": {
     "page_title": "Federation Messages",
@@ -227,7 +239,11 @@
     "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
     "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages",
     "recipient_fallback": "Recipient",
-    "user_number": "User #{{id}}"
+    "user_number": "User #{{id}}",
+    "thread_aria_unread_plural_one": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages",
+    "thread_aria_unread_plural_other": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages",
+    "thread_aria_unread_one": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
+    "thread_aria_unread_other": "Conversation with {{name}} from {{tenant}}, {{count}} unread message"
   },
   "listings": {
     "page_title": "Federation Listings",
@@ -259,7 +275,11 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "View Profile",
     "contact_author": "Contact",
-    "close": "Close"
+    "close": "Close",
+    "external_source_note_external_only_one": "Showing {{count}} external partner listings.",
+    "external_source_note_external_only_other": "Showing {{count}} external partner listings.",
+    "external_source_note_one": "Includes {{count}} external partner listings; load more continues internal partner listings.",
+    "external_source_note_other": "Includes {{count}} external partner listings; load more continues internal partner listings."
   },
   "settings": {
     "page_title": "Federation Settings",
@@ -364,7 +384,9 @@
     "load_more_error": "Could not load more groups.",
     "member_count": "{{count}} member",
     "member_count_plural": "{{count}} members",
-    "private": "Private"
+    "private": "Private",
+    "member_count_one": "{{count}} member",
+    "member_count_other": "{{count}} member"
   },
   "connections": {
     "page_title": "Federation Connections",
@@ -495,7 +517,9 @@
     "partners_available_other": "{{count}} partner communities available",
     "member_count_one": "{{count}} member",
     "member_count_other": "{{count}} members",
-    "and_more": "+{{count}} more"
+    "and_more": "+{{count}} more",
+    "and_more_one": "+{{count}} more",
+    "and_more_other": "+{{count}} more"
   },
   "member_profile": {
     "page_title": "Member Profile",
@@ -544,7 +568,15 @@
     "tooltip_federated": "Reputation aggregated across {{count}} partner communities",
     "tooltip_local": "Based on {{count}} reviews in this community",
     "chip_label": "{{score}} ({{count}})",
-    "aria_label": "Federated reputation {{score}} from {{count}} reviews"
+    "aria_label": "Federated reputation {{score}} from {{count}} reviews",
+    "tooltip_federated_one": "Reputation aggregated across {{count}} partner communities",
+    "tooltip_federated_other": "Reputation aggregated across {{count}} partner communities",
+    "tooltip_local_one": "Based on {{count}} reviews in this community",
+    "tooltip_local_other": "Based on {{count}} reviews in this community",
+    "chip_label_one": "{{score}} ({{count}})",
+    "chip_label_other": "{{score}} ({{count}})",
+    "aria_label_one": "Federated reputation {{score}} from {{count}} reviews",
+    "aria_label_other": "Federated reputation {{score}} from {{count}} reviews"
   },
   "reviews": {
     "unavailable": "Reviews not yet available for this federated member",

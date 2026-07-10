@@ -44,7 +44,7 @@ export interface ReactionSummaryProps {
 
 const renderEmoji = (type: string) => {
   if (type === 'time_credit') {
-    return <Clock className="w-3 h-3 text-purple-400" aria-hidden="true" />;
+    return <Clock className="w-3 h-3 text-accent" aria-hidden="true" />;
   }
   return (
     <span role="img" aria-label={REACTION_LABEL_MAP[type as ReactionType] ?? type}>

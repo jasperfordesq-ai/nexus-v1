@@ -187,7 +187,15 @@
     "terms_required": "Ní mór duit aontú leis na téarmaí chun d'eagras a chlárú.",
     "opportunity_count_one": "{{count}} deis",
     "opportunity_count_other": "{{count}} deiseanna",
-    "loading": "Eagraíochtaí á lódáil"
+    "loading": "Eagraíochtaí á lódáil",
+    "opportunity_count_few": "{{count}} deiseanna",
+    "opportunity_count_many": "{{count}} deiseanna",
+    "opportunity_count_two": "{{count}} deiseanna",
+    "volunteer_count_few": "{{count}} oibrí deonach",
+    "volunteer_count_many": "{{count}} oibrí deonach",
+    "volunteer_count_one": "{{count}} oibrí deonach",
+    "volunteer_count_other": "{{count}} oibrí deonach",
+    "volunteer_count_two": "{{count}} oibrí deonach"
   },
   "organisation_detail": {
     "page_title": "Eagras",
@@ -231,7 +239,17 @@
     "submit_review": "Cuir isteach athbhreithniú",
     "review_success": "Athbhreithniú curtha isteach.",
     "review_error": "Ní féidir do léirmheas a chur isteach.",
-    "rating_required": "Roghnaigh rátáil roimh chur isteach."
+    "rating_required": "Roghnaigh rátáil roimh chur isteach.",
+    "meta_description_fallback_few": "Faigh amach faoi {{name}} agus {{count}} deis dheonach gníomhach ar an mbanc ama pobail seo.",
+    "meta_description_fallback_many": "Faigh amach faoi {{name}} agus {{count}} deis dheonach gníomhach ar an mbanc ama pobail seo.",
+    "meta_description_fallback_one": "Faigh amach faoi {{name}} agus {{count}} deis dheonach gníomhach ar an mbanc ama pobail seo.",
+    "meta_description_fallback_other": "Faigh amach faoi {{name}} agus {{count}} deis dheonach gníomhach ar an mbanc ama pobail seo.",
+    "meta_description_fallback_two": "Faigh amach faoi {{name}} agus {{count}} deis dheonach gníomhach ar an mbanc ama pobail seo.",
+    "review_count_few": "{{count}} léirmheas",
+    "review_count_many": "{{count}} léirmheas",
+    "review_count_one": "{{count}} léirmheas",
+    "review_count_other": "{{count}} léirmheas",
+    "review_count_two": "{{count}} léirmheas"
   },
   "emergency_alerts": {
     "heading": "Foláirimh Éigeandála",

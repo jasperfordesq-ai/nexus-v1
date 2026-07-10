@@ -223,7 +223,9 @@ function OverviewTab() {
               {t('federation.api_doc_technical_tabs_hint')}
             </p>
             <p className="mt-2">
-              {t('federation.api_doc_full_manual')} <code>docs/FEDERATION_API_MANUAL.md</code>.
+              {t('federation.api_doc_full_manual')}{' '}
+              {/* eslint-disable-next-line i18next/no-literal-string -- Documentation path must remain verbatim. */}
+              <code>docs/FEDERATION_API_MANUAL.md</code>.
             </p>
           </div>
         </CardBody>
@@ -296,19 +298,31 @@ BODY
             </TableHeader>
             <TableBody>
               <TableRow key="sig">
-                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Federation-Signature</code></TableCell>
+                <TableCell>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- HTTP header name must remain verbatim. */}
+                  <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Federation-Signature</code>
+                </TableCell>
                 <TableCell>{t('federation.api_doc_header_signature_desc')}</TableCell>
               </TableRow>
               <TableRow key="ts">
-                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Federation-Timestamp</code></TableCell>
+                <TableCell>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- HTTP header name must remain verbatim. */}
+                  <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Federation-Timestamp</code>
+                </TableCell>
                 <TableCell>{t('federation.api_doc_header_timestamp_desc')}</TableCell>
               </TableRow>
               <TableRow key="nonce">
-                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Federation-Nonce</code></TableCell>
+                <TableCell>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- HTTP header name must remain verbatim. */}
+                  <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Federation-Nonce</code>
+                </TableCell>
                 <TableCell>{t('federation.api_doc_header_nonce_desc')}</TableCell>
               </TableRow>
               <TableRow key="platform-id">
-                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Federation-Platform-Id</code></TableCell>
+                <TableCell>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- HTTP header name must remain verbatim. */}
+                  <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Federation-Platform-Id</code>
+                </TableCell>
                 <TableCell>{t('federation.api_doc_header_platform_id_desc')}</TableCell>
               </TableRow>
             </TableBody>
@@ -370,15 +384,24 @@ grant_type=client_credentials&scope=members:read listings:read
             </TableHeader>
             <TableBody>
               <TableRow key="limit">
-                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-RateLimit-Limit</code></TableCell>
+                <TableCell>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- HTTP header name must remain verbatim. */}
+                  <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-RateLimit-Limit</code>
+                </TableCell>
                 <TableCell>{t('federation.api_doc_rate_limit_limit_desc')}</TableCell>
               </TableRow>
               <TableRow key="remaining">
-                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-RateLimit-Remaining</code></TableCell>
+                <TableCell>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- HTTP header name must remain verbatim. */}
+                  <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-RateLimit-Remaining</code>
+                </TableCell>
                 <TableCell>{t('federation.api_doc_rate_limit_remaining_desc')}</TableCell>
               </TableRow>
               <TableRow key="reset">
-                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-RateLimit-Reset</code></TableCell>
+                <TableCell>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- HTTP header name must remain verbatim. */}
+                  <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-RateLimit-Reset</code>
+                </TableCell>
                 <TableCell>{t('federation.api_doc_rate_limit_reset_desc')}</TableCell>
               </TableRow>
             </TableBody>
@@ -1201,6 +1224,7 @@ function WebhooksTab() {
         <CardBody className="space-y-3">
           <p className="text-sm text-muted">
             {t('federation.api_doc_signature_verification_desc')}{' '}
+            {/* eslint-disable-next-line i18next/no-literal-string -- HTTP header name must remain verbatim. */}
             <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Webhook-Signature</code>.
           </p>
 

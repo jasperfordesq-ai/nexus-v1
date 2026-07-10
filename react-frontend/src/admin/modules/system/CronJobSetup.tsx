@@ -75,8 +75,12 @@ export function CronJobSetup() {
                 {t('system.cron_notice_title')}
               </p>
               <p className="text-xs text-muted">
-                {t('system.cron_notice_body_prefix')} <Code className="text-xs">artisan schedule:run</Code>{' '}
-                {t('system.cron_notice_body_middle')} <Code className="text-xs">/cron/*</Code>{' '}
+                {t('system.cron_notice_body_prefix')}{' '}
+                {/* eslint-disable-next-line i18next/no-literal-string -- Scheduler command must remain verbatim. */}
+                <Code className="text-xs">artisan schedule:run</Code>{' '}
+                {t('system.cron_notice_body_middle')}{' '}
+                {/* eslint-disable-next-line i18next/no-literal-string -- Cron route glob must remain verbatim. */}
+                <Code className="text-xs">/cron/*</Code>{' '}
                 {t('system.cron_notice_body_suffix')}
               </p>
             </div>
@@ -127,9 +131,8 @@ export function CronJobSetup() {
                     {t('system.cron_docker_step_1_desc')}
                   </p>
                   <div className="flex items-center gap-2">
-                    <Code className="flex-1 text-xs break-all">
-                      * * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run {'>'}{'>'}  /var/log/nexus-scheduler.log 2{'>'}&1
-                    </Code>
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Crontab command must remain verbatim. */}
+                    <Code className="flex-1 text-xs break-all">* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run {'>'}{'>'}  /var/log/nexus-scheduler.log 2{'>'}&1</Code>
                     <Button
                         size="sm"
                         variant="ghost"
@@ -146,6 +149,7 @@ export function CronJobSetup() {
 
                 <div>
                   <h3 className="text-base font-semibold mb-2">{t('system.verify')}</h3>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
                   <Code className="block text-xs">sudo crontab -l</Code>
                 </div>
 
@@ -164,15 +168,15 @@ export function CronJobSetup() {
               <div className="space-y-4 pt-4">
                 <div>
                   <h3 className="text-base font-semibold mb-2">{t('system.cron_linux_step_1_title')}</h3>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
                   <Code className="block text-xs">crontab -e</Code>
                 </div>
 
                 <div>
                   <h3 className="text-base font-semibold mb-2">{t('system.cron_linux_step_2_title')}</h3>
                   <div className="flex items-center gap-2">
-                    <Code className="flex-1 text-xs break-all">
-                      * * * * * cd /path/to/your/project && php artisan schedule:run {'>'}{'>'}  /dev/null 2{'>'}&1
-                    </Code>
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Crontab command must remain verbatim. */}
+                    <Code className="flex-1 text-xs break-all">* * * * * cd /path/to/your/project && php artisan schedule:run {'>'}{'>'}  /dev/null 2{'>'}&1</Code>
                     <Button
                         size="sm"
                         variant="ghost"
@@ -186,13 +190,16 @@ export function CronJobSetup() {
                     </Button>
                   </div>
                   <p className="text-xs text-muted mt-1">
-                    {t('system.replace')} <Code className="text-xs">/path/to/your/project</Code>{' '}
+                    {t('system.replace')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Filesystem path placeholder must remain verbatim. */}
+                    <Code className="text-xs">/path/to/your/project</Code>{' '}
                     {t('system.with_actual_project_root')}
                   </p>
                 </div>
 
                 <div>
                   <h3 className="text-base font-semibold mb-2">{t('system.verify')}</h3>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
                   <Code className="block text-xs">crontab -l</Code>
                 </div>
               </div>
@@ -211,13 +218,14 @@ export function CronJobSetup() {
                 <div>
                   <h3 className="text-base font-semibold mb-2">{t('system.cron_cpanel_step_2_title')}</h3>
                   <p className="text-sm text-muted mb-2">
-                    {t('system.cron_cpanel_step_2_desc_prefix')} <Code className="text-xs">* * * * *</Code>{' '}
+                    {t('system.cron_cpanel_step_2_desc_prefix')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Cron expression must remain verbatim. */}
+                    <Code className="text-xs">* * * * *</Code>{' '}
                     {t('system.cron_cpanel_step_2_desc_suffix')}
                   </p>
                   <div className="flex items-center gap-2">
-                    <Code className="flex-1 text-xs break-all">
-                      cd /home/username/public_html && php artisan schedule:run {'>'}{'>'}  /dev/null 2{'>'}&1
-                    </Code>
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Crontab command must remain verbatim. */}
+                    <Code className="flex-1 text-xs break-all">cd /home/username/public_html && php artisan schedule:run {'>'}{'>'}  /dev/null 2{'>'}&1</Code>
                     <Button
                       size="sm"
                       variant="ghost"
@@ -231,7 +239,9 @@ export function CronJobSetup() {
                     </Button>
                   </div>
                   <p className="text-xs text-muted mt-1">
-                    {t('system.replace')} <Code className="text-xs">/home/username/public_html</Code>{' '}
+                    {t('system.replace')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Filesystem path placeholder must remain verbatim. */}
+                    <Code className="text-xs">/home/username/public_html</Code>{' '}
                     {t('system.with_absolute_project_path')}
                   </p>
                 </div>
@@ -243,15 +253,15 @@ export function CronJobSetup() {
               <div className="space-y-4 pt-4">
                 <div>
                   <h3 className="text-base font-semibold mb-2">{t('system.cron_azure_step_1_title')}</h3>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- SSH command must remain verbatim. */}
                   <Code className="block text-xs">ssh azureuser@your-vm-ip</Code>
                 </div>
 
                 <div>
                   <h3 className="text-base font-semibold mb-2">{t('system.cron_azure_step_2_title')}</h3>
                   <div className="flex items-center gap-2">
-                    <Code className="flex-1 text-xs break-all">
-                      * * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run {'>'}{'>'}  /var/log/nexus-scheduler.log 2{'>'}&1
-                    </Code>
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Crontab command must remain verbatim. */}
+                    <Code className="flex-1 text-xs break-all">* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run {'>'}{'>'}  /var/log/nexus-scheduler.log 2{'>'}&1</Code>
                     <Button
                       size="sm"
                       variant="ghost"
@@ -270,7 +280,9 @@ export function CronJobSetup() {
                   <AlertTriangle size={16} className="text-warning mt-0.5 shrink-0" />
                   <p className="text-xs text-warning-700 dark:text-warning-300">
                     {t('system.do_word')} <strong>{t('system.not_word')}</strong>{' '}
-                    {t('system.cron_http_warning_prefix')} <Code className="text-xs">artisan schedule:run</Code>{' '}
+                    {t('system.cron_http_warning_prefix')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Scheduler command must remain verbatim. */}
+                    <Code className="text-xs">artisan schedule:run</Code>{' '}
                     {t('system.only_word')}
                   </p>
                 </div>
@@ -282,15 +294,15 @@ export function CronJobSetup() {
               <div className="space-y-4 pt-4">
                 <div>
                   <h3 className="text-base font-semibold mb-2">{t('system.cron_gcp_step_1_title')}</h3>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Cloud CLI command must remain verbatim. */}
                   <Code className="block text-xs">gcloud compute ssh your-instance-name</Code>
                 </div>
 
                 <div>
                   <h3 className="text-base font-semibold mb-2">{t('system.cron_gcp_step_2_title')}</h3>
                   <div className="flex items-center gap-2">
-                    <Code className="flex-1 text-xs break-all">
-                      * * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run {'>'}{'>'}  /var/log/nexus-scheduler.log 2{'>'}&1
-                    </Code>
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Crontab command must remain verbatim. */}
+                    <Code className="flex-1 text-xs break-all">* * * * * docker exec nexus-php-app php /var/www/html/artisan schedule:run {'>'}{'>'}  /var/log/nexus-scheduler.log 2{'>'}&1</Code>
                     <Button
                       size="sm"
                       variant="ghost"
@@ -309,7 +321,9 @@ export function CronJobSetup() {
                   <AlertTriangle size={16} className="text-warning mt-0.5 shrink-0" />
                   <p className="text-xs text-warning-700 dark:text-warning-300">
                     {t('system.do_word')} <strong>{t('system.not_word')}</strong>{' '}
-                    {t('system.cron_cloud_scheduler_warning_prefix')} <Code className="text-xs">artisan schedule:run</Code>{' '}
+                    {t('system.cron_cloud_scheduler_warning_prefix')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Scheduler command must remain verbatim. */}
+                    <Code className="text-xs">artisan schedule:run</Code>{' '}
                     {t('system.only_word')}
                   </p>
                 </div>
@@ -329,6 +343,7 @@ export function CronJobSetup() {
           <div className="flex items-center gap-2">
             <CheckCircle size={16} className="text-success" />
             <span className="text-sm">
+              {/* eslint-disable-next-line i18next/no-literal-string -- Scheduler command must remain verbatim. */}
               <Code className="text-xs">artisan schedule:run</Code> {t('system.check_schedule_runs')}
             </span>
           </div>

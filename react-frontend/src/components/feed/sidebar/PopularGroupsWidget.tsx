@@ -42,7 +42,7 @@ export function PopularGroupsWidget({ groups }: PopularGroupsWidgetProps) {
         </div>
         <Link
           to={tenantPath('/groups')}
-          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors duration-200"
+          className="text-xs text-accent hover:text-accent transition-colors duration-200"
         >
           {t('sidebar.groups.see_all')}
         </Link>
@@ -72,7 +72,7 @@ export function PopularGroupsWidget({ groups }: PopularGroupsWidgetProps) {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-500 transition-colors duration-200">
+              <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-accent transition-colors duration-200">
                 {group.name}
               </p>
               <p className="text-xs text-[var(--text-muted)]">

@@ -100,5 +100,7 @@
   "page_meta": {
     "title": "Abstimmungen"
   },
-  "category_filter_label": "Nach Kategorie filtern"
+  "category_filter_label": "Nach Kategorie filtern",
+  "total_ballots_one": "Gesamtstimmzettel: {{count}}",
+  "total_ballots_other": "Gesamtstimmzettel: {{count}}"
 }

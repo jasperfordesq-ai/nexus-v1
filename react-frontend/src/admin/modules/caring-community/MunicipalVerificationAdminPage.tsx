@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Code, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tabs, Tab } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -272,7 +273,7 @@ export default function MunicipalVerificationAdminPage() {
               </div>
               {active.verified_at && (
                 <p className="text-xs text-muted">
-                  {t('municipal_verification.current.verified_on', { date: new Date(active.verified_at).toLocaleString() })}
+                  {t('municipal_verification.current.verified_on', { date: new Date(active.verified_at).toLocaleString(getFormattingLocale()) })}
                 </p>
               )}
               {active.attestation_note && (
@@ -379,7 +380,7 @@ export default function MunicipalVerificationAdminPage() {
                         <span className="text-xs text-muted">{t('municipal_verification.history.via_method', { method: item.method })}</span>
                       </div>
                       <p className="text-xs text-muted mt-1">
-                        {t('municipal_verification.history.updated', { date: new Date(item.updated_at).toLocaleString() })}
+                        {t('municipal_verification.history.updated', { date: new Date(item.updated_at).toLocaleString(getFormattingLocale()) })}
                       </p>
                     </div>
                     {item.status !== 'revoked' && (

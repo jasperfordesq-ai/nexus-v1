@@ -62,12 +62,24 @@
     "minutes_ago": "{{count}}m atrás",
     "hours_ago": "{{count}}h atrás",
     "days_ago": "{{count}}d atrás",
-    "last_seen": "Visto pela última vez {{time}}"
+    "last_seen": "Visto pela última vez {{time}}",
+    "minutes_ago_many": "{{count}}m atrás",
+    "minutes_ago_one": "{{count}}m atrás",
+    "minutes_ago_other": "{{count}}m atrás",
+    "hours_ago_many": "{{count}}h atrás",
+    "hours_ago_one": "{{count}}h atrás",
+    "hours_ago_other": "{{count}}h atrás",
+    "days_ago_many": "{{count}}d atrás",
+    "days_ago_one": "{{count}}d atrás",
+    "days_ago_other": "{{count}}d atrás"
   },
   "mention": {
     "suggestions_aria": "Sugestões de menção, {{count}} resultados",
     "no_users": "Nenhum utilizador encontrado",
-    "connected": "Conectado"
+    "connected": "Conectado",
+    "suggestions_aria_many": "Sugestões de menção, {{count}} resultados",
+    "suggestions_aria_one": "Sugestões de menção, {{count}} resultados",
+    "suggestions_aria_other": "Sugestões de menção, {{count}} resultados"
   },
   "status": {
     "set_status": "Definir estado",
@@ -153,7 +165,10 @@
     "collection_description": "Descrição (opcional)",
     "cancel": "Cancelar",
     "save": "Guardar",
-    "create": "Criar"
+    "create": "Criar",
+    "count_many": "{{count}} itens salvos",
+    "count_one": "{{count}} itens salvos",
+    "count_other": "{{count}} itens salvos"
   },
   "verified": "Verificado",
   "hover_card": {
@@ -163,7 +178,16 @@
     "message": "Mensagem",
     "hours_given": "{{count}} h dadas",
     "connections": "{{count}} ligações",
-    "listings": "{{count}} anúncios"
+    "listings": "{{count}} anúncios",
+    "hours_given_many": "{{count}} h dadas",
+    "hours_given_one": "{{count}} h dadas",
+    "hours_given_other": "{{count}} h dadas",
+    "connections_many": "{{count}} ligações",
+    "connections_one": "{{count}} ligações",
+    "connections_other": "{{count}} ligações",
+    "listings_many": "{{count}} anúncios",
+    "listings_one": "{{count}} anúncios",
+    "listings_other": "{{count}} anúncios"
   },
   "reactions_tabs_aria": "Filtro de tipo de reação",
   "content_type_tabs_aria": "Filtro de tipo de conteúdo de marcador",
@@ -175,5 +199,7 @@
     "image_alt_domain": "Pré-visualização de {{domain}}",
     "favicon_alt": "Ícone de {{site}}",
     "video_fallback": "Vídeo"
-  }
+  },
+  "likes_count_many": "{{count}} gostos",
+  "comments_count_many": "{{count}} comentários"
 }

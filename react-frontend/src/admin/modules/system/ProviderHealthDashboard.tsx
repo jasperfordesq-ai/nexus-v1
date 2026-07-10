@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Chip, Spinner, Progress, Tooltip } from '@/components/ui';
 import {
   useState,
@@ -86,7 +87,7 @@ function formatRelativeTime(dateStr: string | null, t: (key: string, options?: R
     return t('system.days_ago', { count: days });
   }
 
-  return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  return date.toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 /**

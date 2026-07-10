@@ -781,7 +781,13 @@
     "option_marketplace_listing_duration_days_label": "Duração da listagem (dias)",
     "option_marketplace_listing_duration_days_desc": "Número de dias antes da expiração automática das listagens do mercado",
     "option_identity_verification_fee_cents_label": "Taxa de verificação (centavos)",
-    "option_identity_verification_fee_cents_desc": "Taxa única cobrada para verificação de identidade. Defina como 0 para verificação gratuita. Valor em cêntimos (ex. 500 = 5,00€)"
+    "option_identity_verification_fee_cents_desc": "Taxa única cobrada para verificação de identidade. Defina como 0 para verificação gratuita. Valor em cêntimos (ex. 500 = 5,00€)",
+    "option_count_many": "Opções{{count}}",
+    "option_count_one": "Opções{{count}}",
+    "option_count_other": "Opções{{count}}",
+    "planned_count_many": "{{count}}planejado",
+    "planned_count_one": "{{count}}planejado",
+    "planned_count_other": "{{count}}planejado"
   },
   "tenant_features": {
     "refresh": "Atualizar",

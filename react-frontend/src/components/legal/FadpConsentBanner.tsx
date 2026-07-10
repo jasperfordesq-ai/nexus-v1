@@ -36,6 +36,7 @@ export function FadpConsentBanner() {
     () => safeLocalStorageGet(STORAGE_KEY) === 'true'
   );
   const [loading, setLoading] = useState<'accept' | 'decline' | null>(null);
+  const [saveFailed, setSaveFailed] = useState(false);
 
   // Only render for tenants with FADP compliance feature
   if (!hasFeature('fadp_compliance')) return null;
@@ -48,21 +49,27 @@ export function FadpConsentBanner() {
 
   const handleConsent = async (action: 'granted' | 'withdrawn') => {
     setLoading(action === 'granted' ? 'accept' : 'decline');
+    setSaveFailed(false);
     try {
-      await api.post('/v2/me/fadp/consent', {
+      const result = await api.post('/v2/me/fadp/consent', {
         consent_type: 'profiling',
         action,
       });
+      if (result.success) {
+        dismiss();
+        return;
+      }
+      setSaveFailed(true);
     } catch {
-      // Non-blocking — the banner can still be dismissed even if the request fails
+      setSaveFailed(true);
     } finally {
-      dismiss();
+      setLoading(null);
     }
   };
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 pt-2 pointer-events-none"
+      className="fixed bottom-[calc(5rem+var(--safe-area-bottom)+var(--miniplayer-offset,0rem))] left-0 right-0 z-[310] px-4 pt-2 pointer-events-none md:bottom-[calc(1rem+var(--miniplayer-offset,0rem))]"
       role="region"
       aria-label={t('fadp.fadp_banner_title')}
       data-nosnippet
@@ -98,6 +105,12 @@ export function FadpConsentBanner() {
                 <X size={16} />
               </Button>
             </div>
+
+            {saveFailed && (
+              <p className="mt-3 text-sm text-danger" role="alert">
+                {t('common:errors.connection_failed_detail')}
+              </p>
+            )}
 
             {/* Action buttons */}
             <div className="flex flex-wrap gap-2 mt-4 pl-13">

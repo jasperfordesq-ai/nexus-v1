@@ -82,7 +82,11 @@
     "quick_link_7_title": "Federatie-instellingen",
     "quick_link_7_description": "Configureer uw federatieprivacy- en communicatievoorkeuren.",
     "quick_link_6_title": "Federatieverbindingen",
-    "quick_link_6_description": "Beheer je verbindingsverzoeken tussen partnergemeenschappen."
+    "quick_link_6_description": "Beheer je verbindingsverzoeken tussen partnergemeenschappen.",
+    "view_all_one": "Alles bekijken ({{count}})",
+    "view_all_other": "Alles bekijken ({{count}})",
+    "member_count_one": "{{count}} leden",
+    "member_count_other": "{{count}} leden"
   },
   "partners": {
     "page_title": "Partnergemeenschappen",
@@ -115,7 +119,9 @@
     "browse_members": "Blader door leden",
     "browse_listings": "Blader door vermeldingen",
     "close": "Dichtbij",
-    "view_details": "Details bekijken"
+    "view_details": "Details bekijken",
+    "member_count_one": "{{count}} leden",
+    "member_count_other": "{{count}} leden"
   },
   "members": {
     "page_title": "Leden van de Federatie",
@@ -156,7 +162,13 @@
     "external_profile_title": "Extern lid",
     "external_profile_message": "Dit lid bevindt zich op een extern partnerplatform. Directe profielweergave is niet beschikbaar.",
     "external_member": "Extern lid",
-    "member_fallback": "Lid"
+    "member_fallback": "Lid",
+    "external_source_note_external_only_one": "Toont {{count}} resultaten van externe partners.",
+    "external_source_note_external_only_other": "Toont {{count}} resultaten van externe partners.",
+    "external_source_note_one": "Bevat {{count}} resultaten van externe partners; meer laden gaat verder met interne partnerresultaten.",
+    "external_source_note_other": "Bevat {{count}} resultaten van externe partners; meer laden gaat verder met interne partnerresultaten.",
+    "more_skills_one": "+{{count}} meer",
+    "more_skills_other": "+{{count}} meer"
   },
   "messages": {
     "page_title": "Federatie berichten",
@@ -227,7 +239,11 @@
     "thread_aria_unread": "Gesprek met {{name}} van {{tenant}}, {{count}} ongelezen bericht",
     "thread_aria_unread_plural": "Gesprek met {{name}} van {{tenant}}, {{count}} ongelezen berichten",
     "recipient_fallback": "Ontvanger",
-    "user_number": "Gebruiker #{{id}}"
+    "user_number": "Gebruiker #{{id}}",
+    "thread_aria_unread_plural_one": "Gesprek met {{name}} van {{tenant}}, {{count}} ongelezen berichten",
+    "thread_aria_unread_plural_other": "Gesprek met {{name}} van {{tenant}}, {{count}} ongelezen berichten",
+    "thread_aria_unread_one": "Gesprek met {{name}} van {{tenant}}, {{count}} ongelezen bericht",
+    "thread_aria_unread_other": "Gesprek met {{name}} van {{tenant}}, {{count}} ongelezen bericht"
   },
   "listings": {
     "page_title": "Federatie-vermeldingen",
@@ -259,7 +275,11 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "Bekijk profiel",
     "contact_author": "Contact",
-    "close": "Dichtbij"
+    "close": "Dichtbij",
+    "external_source_note_external_only_one": "Toont {{count}} vermeldingen van externe partners.",
+    "external_source_note_external_only_other": "Toont {{count}} vermeldingen van externe partners.",
+    "external_source_note_one": "Bevat {{count}} vermeldingen van externe partners; meer laden gaat verder met interne partnervermeldingen.",
+    "external_source_note_other": "Bevat {{count}} vermeldingen van externe partners; meer laden gaat verder met interne partnervermeldingen."
   },
   "settings": {
     "page_title": "Federatie-instellingen",
@@ -364,7 +384,9 @@
     "load_more_error": "Kan niet meer groepen laden.",
     "member_count": "{{count}} lid",
     "member_count_plural": "{{count}} leden",
-    "private": "Privé"
+    "private": "Privé",
+    "member_count_one": "{{count}} lid",
+    "member_count_other": "{{count}} lid"
   },
   "connections": {
     "page_title": "Federatieverbindingen",
@@ -495,7 +517,9 @@
     "partners_available_other": "{{count}} partnercommunity's beschikbaar",
     "member_count_one": "{{count}} lid",
     "member_count_other": "{{count}} leden",
-    "and_more": "+{{count}} meer"
+    "and_more": "+{{count}} meer",
+    "and_more_one": "+{{count}} meer",
+    "and_more_other": "+{{count}} meer"
   },
   "member_profile": {
     "page_title": "Ledenprofiel",
@@ -544,7 +568,15 @@
     "tooltip_federated": "Reputatie verzameld in {{count}} partnergemeenschappen",
     "tooltip_local": "Gebaseerd op {{count}} beoordelingen in deze community",
     "chip_label": "{{score}} ({{count}})",
-    "aria_label": "Federatieve reputatie {{score}} uit {{count}} beoordelingen"
+    "aria_label": "Federatieve reputatie {{score}} uit {{count}} beoordelingen",
+    "tooltip_federated_one": "Reputatie verzameld in {{count}} partnergemeenschappen",
+    "tooltip_federated_other": "Reputatie verzameld in {{count}} partnergemeenschappen",
+    "tooltip_local_one": "Gebaseerd op {{count}} beoordelingen in deze community",
+    "tooltip_local_other": "Gebaseerd op {{count}} beoordelingen in deze community",
+    "chip_label_one": "{{score}} ({{count}})",
+    "chip_label_other": "{{score}} ({{count}})",
+    "aria_label_one": "Federatieve reputatie {{score}} uit {{count}} beoordelingen",
+    "aria_label_other": "Federatieve reputatie {{score}} uit {{count}} beoordelingen"
   },
   "reviews": {
     "unavailable": "Er zijn nog geen beoordelingen beschikbaar voor dit federatieve lid",

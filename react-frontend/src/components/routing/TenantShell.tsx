@@ -36,6 +36,11 @@ import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
 import { LoadingScreen } from '@/components/feedback/LoadingScreen';
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { listenForImpersonationToken } from '@/lib/impersonate';
+import {
+  loadRouteRegistry,
+  type AppRoutesFactory,
+  type LoadableRouteRegistryKind,
+} from '@/routes/routeRegistryLoader';
 
 const MaintenancePage = lazy(() => import('@/pages/public/MaintenancePage'));
 const TenantPublicProviders = lazy(() => import('./TenantPublicProviders'));
@@ -46,8 +51,7 @@ const CookieConsentBanner = lazy(() =>
   })),
 );
 
-type AppRoutesFactory = () => React.ReactNode;
-type RouteRegistryKind = 'auth' | 'public' | 'app' | 'provided';
+type RouteRegistryKind = LoadableRouteRegistryKind | 'provided';
 
 interface LoadedRouteRegistry {
   kind: RouteRegistryKind;
@@ -67,6 +71,11 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
   const [loadedRouteRegistry, setLoadedRouteRegistry] = useState<LoadedRouteRegistry | null>(
     appRoutes ? { kind: 'provided', routes: appRoutes } : null,
   );
+  const [routeRegistryLoadError, setRouteRegistryLoadError] = useState<{
+    kind: LoadableRouteRegistryKind;
+    error: unknown;
+  } | null>(null);
+  const [routeRegistryAttempt, setRouteRegistryAttempt] = useState(0);
 
   // Listen for impersonation token handoff from admin tab via BroadcastChannel.
   // Token is set in tokenManager (memory → localStorage, same as normal login)
@@ -114,6 +123,7 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
   useEffect(() => {
     if (appRoutes) {
       setLoadedRouteRegistry({ kind: 'provided', routes: appRoutes });
+      setRouteRegistryLoadError(null);
       return;
     }
 
@@ -121,31 +131,26 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
     setLoadedRouteRegistry((current) => (
       current?.kind === desiredRouteRegistryKind ? current : null
     ));
+    setRouteRegistryLoadError(null);
 
-    if (desiredRouteRegistryKind === 'auth') {
-      import('@/routes/AuthRoutes').then(({ AuthRoutes }) => {
+    if (desiredRouteRegistryKind === 'provided') return;
+
+    void loadRouteRegistry(desiredRouteRegistryKind)
+      .then((registry) => {
         if (mounted) {
-          setLoadedRouteRegistry({ kind: 'auth', routes: AuthRoutes });
+          setLoadedRouteRegistry(registry);
+        }
+      })
+      .catch((error: unknown) => {
+        if (mounted) {
+          setRouteRegistryLoadError({ kind: desiredRouteRegistryKind, error });
         }
       });
-    } else if (desiredRouteRegistryKind === 'public') {
-      import('@/routes/PublicAppRoutes').then(({ PublicAppRoutes }) => {
-        if (mounted) {
-          setLoadedRouteRegistry({ kind: 'public', routes: PublicAppRoutes });
-        }
-      });
-    } else {
-      import('@/routes/AppRoutes').then(({ AppRoutes }) => {
-        if (mounted) {
-          setLoadedRouteRegistry({ kind: 'app', routes: AppRoutes });
-        }
-      });
-    }
 
     return () => {
       mounted = false;
     };
-  }, [appRoutes, desiredRouteRegistryKind]);
+  }, [appRoutes, desiredRouteRegistryKind, routeRegistryAttempt]);
 
   // Cross-tenant slug-recovery redirect REMOVED (2026-05-08). The previous
   // logic re-prepended a stored slug from localStorage when a user hit a
@@ -163,6 +168,11 @@ export function TenantShell({ appRoutes }: TenantShellProps) {
           appRoutes={loadedRouteRegistry?.kind === desiredRouteRegistryKind ? loadedRouteRegistry.routes : null}
           isAuthRoute={isAuthRoute}
           slugPrefix={effectiveSlug}
+          routeRegistryLoadFailed={routeRegistryLoadError?.kind === desiredRouteRegistryKind}
+          onRetryRouteRegistry={() => {
+            setRouteRegistryLoadError(null);
+            setRouteRegistryAttempt((attempt) => attempt + 1);
+          }}
         />
         <DeferredCookieConsentBanner />
       </AuthProvider>
@@ -174,15 +184,26 @@ function TenantShellRuntime({
   appRoutes,
   isAuthRoute,
   slugPrefix,
+  routeRegistryLoadFailed,
+  onRetryRouteRegistry,
 }: {
   appRoutes: AppRoutesFactory | null;
   isAuthRoute: boolean;
   slugPrefix?: string;
+  routeRegistryLoadFailed: boolean;
+  onRetryRouteRegistry: () => void;
 }) {
   const location = useLocation();
 
   if (isAuthRoute) {
-    return <TenantRouteSurface slugPrefix={slugPrefix} appRoutes={appRoutes} />;
+    return (
+      <TenantRouteSurface
+        slugPrefix={slugPrefix}
+        appRoutes={appRoutes}
+        routeRegistryLoadFailed={routeRegistryLoadFailed}
+        onRetryRouteRegistry={onRetryRouteRegistry}
+      />
+    );
   }
 
   const needsFullRuntime = routeNeedsTenantAppRuntime(location.pathname, slugPrefix);
@@ -191,7 +212,12 @@ function TenantShellRuntime({
   return (
     <Suspense fallback={<LoadingScreen />}>
       <Providers>
-        <TenantRouteSurface slugPrefix={slugPrefix} appRoutes={appRoutes} />
+        <TenantRouteSurface
+          slugPrefix={slugPrefix}
+          appRoutes={appRoutes}
+          routeRegistryLoadFailed={routeRegistryLoadFailed}
+          onRetryRouteRegistry={onRetryRouteRegistry}
+        />
       </Providers>
     </Suspense>
   );
@@ -200,11 +226,22 @@ function TenantShellRuntime({
 function TenantRouteSurface({
   slugPrefix,
   appRoutes,
+  routeRegistryLoadFailed,
+  onRetryRouteRegistry,
 }: {
   slugPrefix?: string;
   appRoutes: AppRoutesFactory | null;
+  routeRegistryLoadFailed: boolean;
+  onRetryRouteRegistry: () => void;
 }) {
-  return <TenantGuard slugPrefix={slugPrefix} appRoutes={appRoutes} />;
+  return (
+    <TenantGuard
+      slugPrefix={slugPrefix}
+      appRoutes={appRoutes}
+      routeRegistryLoadFailed={routeRegistryLoadFailed}
+      onRetryRouteRegistry={onRetryRouteRegistry}
+    />
+  );
 }
 
 function DeferredCookieConsentBanner() {
@@ -473,12 +510,16 @@ function normalizeTenantRoutePath(pathname: string, slugPrefix?: string): string
 function TenantGuard({
   slugPrefix,
   appRoutes,
+  routeRegistryLoadFailed,
+  onRetryRouteRegistry,
 }: {
   slugPrefix?: string;
   appRoutes: AppRoutesFactory | null;
+  routeRegistryLoadFailed: boolean;
+  onRetryRouteRegistry: () => void;
 }) {
   const { t } = useTranslation('common');
-  const { isLoading, notFoundSlug, tenant, error } = useTenant();
+  const { isLoading, notFoundSlug, tenant, error, refreshTenant } = useTenant();
   const { user } = useAuth();
   const location = useLocation();
 
@@ -498,7 +539,11 @@ function TenantGuard({
   // Bootstrap failed (network error, server error, or offline first launch).
   // Show a retry screen instead of a blank page or partial render.
   if (!tenant && error) {
-    return <BootstrapError onRetry={() => window.location.reload()} />;
+    return <BootstrapError onRetry={() => { void refreshTenant(); }} />;
+  }
+
+  if (routeRegistryLoadFailed) {
+    return <BootstrapError onRetry={onRetryRouteRegistry} />;
   }
 
   // Check for maintenance mode (after tenant is loaded)

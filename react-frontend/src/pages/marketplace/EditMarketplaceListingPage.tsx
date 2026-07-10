@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Button } from '@/components/ui/Button';
+import { OverlayActionButton } from '@/components/ui/OverlayActionButton';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
@@ -557,17 +558,17 @@ export function EditMarketplaceListingPage() {
             <p className="text-xs text-muted mt-1">
               {t('create.drop_zone_limits', { max: MAX_IMAGES })}
             </p>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) => handleImageSelect(e.target.files)}
-              className="hidden"
-              aria-hidden="true"
-              tabIndex={-1}
-            />
           </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => handleImageSelect(e.target.files)}
+            className="hidden"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
 
           {/* Image previews */}
           {images.length > 0 && (
@@ -586,16 +587,14 @@ export function EditMarketplaceListingPage() {
                       </Chip>
                     </div>
                   )}
-                  <Button
-                    isIconOnly
+                  <OverlayActionButton
                     variant="danger"
-                    size="sm"
                     onPress={() => removeImage(img.id)}
-                    className="absolute top-1 right-1 min-h-7 min-w-7 rounded-full p-1 opacity-0 transition-opacity group-hover:opacity-100"
+                    className="absolute top-1 right-1 rounded-full transition-opacity"
                     aria-label={t('create.remove_image')}
                   >
-                    <X className="w-3 h-3" />
-                  </Button>
+                    <X className="size-4" aria-hidden="true" />
+                  </OverlayActionButton>
                 </div>
               ))}
 

@@ -132,6 +132,8 @@
     "no_challenges_found": "Geen uitdagingen gevonden gevonden",
     "no_matching_challenges": "Geen overeenkomende uitdagingen gevonden",
     "no_status_challenges": "Geen statusuitdagingen gevonden",
-    "tabs_aria": "Uitdagingsstatusfilter"
+    "tabs_aria": "Uitdagingsstatusfilter",
+    "total_count_one": "Totaal: {{count}}",
+    "total_count_other": "Totaal: {{count}}"
   }
 }

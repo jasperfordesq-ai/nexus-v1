@@ -59,8 +59,6 @@ vi.mock('@/contexts/ToastContext', async (importOriginal) => {
 
 vi.mock('@/hooks/useApi', () => ({
   useApi: () => mockUseApiState,
-  useMutation: vi.fn(),
-  usePaginatedApi: vi.fn(),
 }));
 
 vi.mock('@/hooks', () => ({

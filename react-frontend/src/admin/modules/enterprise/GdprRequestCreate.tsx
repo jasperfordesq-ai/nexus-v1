@@ -179,7 +179,11 @@ export function GdprRequestCreate() {
                   color="accent"
                   size="lg"
                 >
-                  {selectedUser.name} ({selectedUser.email}) â€” ID #{selectedUser.id}
+                  {t('enterprise.gdpr_selected_user', {
+                    email: selectedUser.email,
+                    id: selectedUser.id,
+                    name: selectedUser.name,
+                  })}
                 </Chip>
               </div>
             ) : (
@@ -216,7 +220,9 @@ export function GdprRequestCreate() {
                       >
                         <span className="font-medium text-sm">{user.name}</span>
                         <span className="text-muted text-sm"> ({user.email})</span>
-                        <span className="text-muted text-xs ml-1">â€” ID #{user.id}</span>
+                        <span className="text-muted text-xs ml-1">
+                          {t('enterprise.gdpr_user_id_suffix', { id: user.id })}
+                        </span>
                       </Button>
                     ))}
                   </div>

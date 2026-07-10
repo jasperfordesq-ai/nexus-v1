@@ -139,7 +139,28 @@
     "delete_series_note": "Este es un evento periódico. Al eliminarlo, también se eliminarán todas sus repeticiones futuras.",
     "cancel_series_note": "Este es un evento periódico. Al cancelarlo, también se cancelarán todas las repeticiones futuras y se notificará a sus asistentes.",
     "series_dates_title": "Próximas fechas de esta serie",
-    "series_this_date": "esta fecha"
+    "series_this_date": "esta fecha",
+    "events_in_series_many": "{{count}} eventos en la serie",
+    "events_in_series_one": "{{count}} eventos en la serie",
+    "events_in_series_other": "{{count}} eventos en la serie",
+    "max_capacity_many": "{{count}} capacidad máxima",
+    "max_capacity_one": "{{count}} capacidad máxima",
+    "max_capacity_other": "{{count}} capacidad máxima",
+    "spots_left_many": "{{count}} plazas disponibles",
+    "spots_left_one": "{{count}} plazas disponibles",
+    "spots_left_other": "{{count}} plazas disponibles",
+    "waitlist_count_many": "{{count}} en lista de espera",
+    "waitlist_count_one": "{{count}} en lista de espera",
+    "waitlist_count_other": "{{count}} en lista de espera",
+    "more_attendees_many": "+{{count}} más",
+    "more_attendees_one": "+{{count}} más",
+    "more_attendees_other": "+{{count}} más",
+    "attendance_total_many": "{{count}} respuestas",
+    "attendance_total_one": "{{count}} respuestas",
+    "attendance_total_other": "{{count}} respuestas",
+    "view_all_series_many": "Ver los {{count}} eventos de la serie",
+    "view_all_series_one": "Ver los {{count}} eventos de la serie",
+    "view_all_series_other": "Ver los {{count}} eventos de la serie"
   },
   "card": {
     "cancelled": "Cancelado",
@@ -152,7 +173,11 @@
     "repeats_yearly": "Se repite anualmente",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
-    "series_dates_other": "{{count}} dates"
+    "series_dates_other": "{{count}} dates",
+    "series_dates_many": "{{count}} dates",
+    "spots_left_many": "{{count}} plazas disponibles",
+    "spots_left_one": "{{count}} plazas disponibles",
+    "spots_left_other": "{{count}} plazas disponibles"
   },
   "form": {
     "create_title": "Crear Nuevo Evento",
@@ -300,7 +325,10 @@
     "total_votes": "{{count}} votos",
     "vote_success": "Voto registrado!",
     "vote_failed": "No se pudo registrar el voto",
-    "view_full": "Ver encuesta completa"
+    "view_full": "Ver encuesta completa",
+    "total_votes_many": "{{count}} votos",
+    "total_votes_one": "{{count}} votos",
+    "total_votes_other": "{{count}} votos"
   },
   "radius_5": "5 kilometros",
   "radius_10": "10 kilometros",
@@ -318,5 +346,11 @@
   "active_filters": "Filtros activos",
   "active_search": "Buscar: {{query}}",
   "active_near_me": "Dentro de {{radius}} km",
-  "clear_filters": "Limpiar filtros"
+  "clear_filters": "Limpiar filtros",
+  "going_many": "{{count}} asistirán",
+  "going_one": "{{count}} asistirán",
+  "going_other": "{{count}} asistirán",
+  "interested_many": "{{count}} interesados",
+  "interested_one": "{{count}} interesados",
+  "interested_other": "{{count}} interesados"
 }

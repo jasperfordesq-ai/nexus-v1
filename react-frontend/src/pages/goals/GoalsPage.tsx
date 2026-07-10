@@ -11,7 +11,7 @@ import { DatePicker } from '@/components/ui/DatePicker';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Progress } from '@/components/ui/Progress';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -65,7 +65,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { GoalTemplatePickerModal } from './components/GoalTemplatePickerModal';
 import { GoalCheckinModal } from './components/GoalCheckinModal';
 import { GoalReminderToggle } from './components/GoalReminderToggle';
@@ -500,7 +500,7 @@ export function GoalsPage() {
               {t('goals.from_template')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               onPress={onOpen}
             >
@@ -523,7 +523,7 @@ export function GoalsPage() {
         <ToggleButton
           id="my"
           variant="ghost"
-          className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white"
+          className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-accent data-[selected=true]:to-accent-gradient-end data-[selected=true]:text-white"
         >
           <Target className="w-4 h-4" aria-hidden="true" />
           {t('goals.tab_my')}
@@ -531,7 +531,7 @@ export function GoalsPage() {
         <ToggleButton
           id="buddying"
           variant="ghost"
-          className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white"
+          className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-accent data-[selected=true]:to-accent-gradient-end data-[selected=true]:text-white"
         >
           <Users className="w-4 h-4" aria-hidden="true" />
           {t('goals.tab_buddying')}
@@ -539,7 +539,7 @@ export function GoalsPage() {
         <ToggleButton
           id="discover"
           variant="ghost"
-          className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white"
+          className="bg-theme-elevated text-theme-muted data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-accent data-[selected=true]:to-accent-gradient-end data-[selected=true]:text-white"
         >
           <Globe className="w-4 h-4" aria-hidden="true" />
           {t('goals.tab_discover')}
@@ -549,7 +549,7 @@ export function GoalsPage() {
       <section className="rounded-lg border border-theme-default bg-theme-elevated/60 p-4 sm:p-5">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-4 lg:items-center">
           <div className="flex gap-3">
-            <div className="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-purple-500/10 text-purple-400">
+            <div className="mt-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
               <Users className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
@@ -569,7 +569,7 @@ export function GoalsPage() {
               </div>
             </div>
             <div className="flex gap-3">
-              <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400">
+              <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
                 <Target className="w-3.5 h-3.5" aria-hidden="true" />
               </div>
               <div>
@@ -588,7 +588,7 @@ export function GoalsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('goals.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadGoals()}
           >
@@ -621,14 +621,14 @@ export function GoalsPage() {
               action={
                 tab === 'my' && isAuthenticated ? (
                   <Button
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                     onPress={onOpen}
                   >
                     {t('goals.create_goal')}
                   </Button>
                 ) : tab === 'buddying' && isAuthenticated ? (
                   <Button
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                     onPress={() => setTab('discover')}
                     startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
                   >
@@ -749,7 +749,7 @@ export function GoalsPage() {
           <ModalFooter>
             <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('goals.modal.cancel')}</Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               onPress={handleCreate}
               isLoading={isCreating}
               isDisabled={!newGoal.title.trim()}
@@ -823,7 +823,7 @@ export function GoalsPage() {
           <ModalFooter>
             <Button variant="flat" onPress={onEditClose} className="text-theme-muted">{t('goals.modal.cancel')}</Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               onPress={handleSaveEdit}
               isLoading={isSavingEdit}
               isDisabled={!editForm.title.trim()}
@@ -894,10 +894,10 @@ export function GoalsPage() {
           {detailGoal && (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                <div className="flex items-center gap-2 text-theme-primary">
+                <ModalHeading className="flex items-center gap-2 text-theme-primary">
                   <Target className="w-5 h-5 text-emerald-400" aria-hidden="true" />
                   {detailGoal.title}
-                </div>
+                </ModalHeading>
                 <div className="flex items-center gap-2 flex-wrap">
                   {detailGoal.status === 'completed' ? (
                     <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle className="w-3 h-3" aria-hidden="true" />}>
@@ -939,7 +939,7 @@ export function GoalsPage() {
                     classNames={{
                       indicator: detailGoal.status === 'completed'
                         ? 'bg-emerald-500'
-                        : 'bg-gradient-to-r from-indigo-500 to-purple-600',
+                        : 'bg-gradient-to-r from-accent to-accent-gradient-end',
                       track: 'bg-theme-hover',
                     }}
                     size="lg"
@@ -956,7 +956,7 @@ export function GoalsPage() {
                         {t('goals.detail.deadline')}
                       </div>
                       <p className="text-sm text-theme-primary font-medium">
-                        {new Date(detailGoal.deadline).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                        {new Date(detailGoal.deadline).toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'long', day: 'numeric' })}
                       </p>
                     </div>
                   )}
@@ -966,7 +966,7 @@ export function GoalsPage() {
                       {t('goals.detail.created')}
                     </div>
                     <p className="text-sm text-theme-primary font-medium">
-                      {new Date(detailGoal.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
+                      {new Date(detailGoal.created_at).toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
                   </div>
                   {detailGoal.buddy_name && (
@@ -1034,7 +1034,7 @@ export function GoalsPage() {
 
                 <div>
                   <h4 className="text-sm font-semibold text-theme-primary mb-3 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-purple-400" aria-hidden="true" />
+                    <Sparkles className="w-4 h-4 text-accent" aria-hidden="true" />
                     {t('goals.detail.insights')}
                   </h4>
                   <GoalInsightsPanel goalId={detailGoal.id} canNudge={detailGoal.is_buddy} />
@@ -1043,7 +1043,7 @@ export function GoalsPage() {
                 {/* G5 - Full Progress History Timeline */}
                 <div>
                   <h4 className="text-sm font-semibold text-theme-primary mb-3 flex items-center gap-2">
-                    <History className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+                    <History className="w-4 h-4 text-accent" aria-hidden="true" />
                     {t('goals.detail.progress_timeline')}
                   </h4>
                   <GoalProgressHistory goalId={detailGoal.id} />
@@ -1052,7 +1052,7 @@ export function GoalsPage() {
               <ModalFooter>
                 {tab === 'discover' && detailGoal && !detailGoal.is_owner && detailGoal.is_public && !detailGoal.buddy_id && !detailGoal.is_buddy && user && (
                   <Button
-                    className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white"
+                    className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                     startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
                     onPress={() => {
                       handleBecomeBuddy(detailGoal);
@@ -1126,7 +1126,7 @@ function GoalCard({
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <Button
               variant="ghost"
-              className="min-h-[32px] justify-start px-0 py-0 text-left text-lg font-semibold text-theme-primary hover:text-indigo-400"
+              className="min-h-[32px] justify-start px-0 py-0 text-left text-lg font-semibold text-theme-primary hover:text-accent"
               onPress={() => onOpenDetail(goal)}
             >
               {goal.title}
@@ -1167,7 +1167,7 @@ function GoalCard({
               classNames={{
                 indicator: isCompleted
                   ? 'bg-emerald-500'
-                  : 'bg-gradient-to-r from-indigo-500 to-purple-600',
+                  : 'bg-gradient-to-r from-accent to-accent-gradient-end',
                 track: 'bg-theme-hover',
               }}
               size="md"
@@ -1186,7 +1186,7 @@ function GoalCard({
             {deadlineDate && (
               <span className={`flex items-center gap-1 ${isOverdue ? 'text-red-600 dark:text-red-400' : ''}`}>
                 <Calendar className="w-3 h-3" aria-hidden="true" />
-                {isOverdue ? t('goals.overdue') : t('goals.due')}{deadlineDate.toLocaleDateString()}
+                {isOverdue ? t('goals.overdue') : t('goals.due')}{deadlineDate.toLocaleDateString(getFormattingLocale())}
               </span>
             )}
             {goal.buddy_name && !isBuddyingTab && (
@@ -1263,7 +1263,7 @@ function GoalCard({
             <Button
               size="sm"
               variant="flat"
-              className="bg-indigo-500/10 text-indigo-700 dark:text-indigo-400"
+              className="bg-accent/10 text-accent dark:text-accent"
               startContent={<ClipboardCheck className="w-4 h-4" aria-hidden="true" />}
               onPress={() => onCheckin(goal)}
             >
@@ -1301,7 +1301,7 @@ function GoalCard({
             <Button
               size="sm"
               variant="flat"
-              className="bg-purple-500/10 text-purple-700 dark:text-purple-400"
+              className="bg-accent/10 text-accent dark:text-accent"
               startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
               onPress={() => onBecomeBuddy(goal)}
             >
@@ -1313,7 +1313,7 @@ function GoalCard({
             <Button
               size="sm"
               variant="flat"
-              className="bg-purple-500/10 text-purple-700 dark:text-purple-400"
+              className="bg-accent/10 text-accent dark:text-accent"
               startContent={<MessageCircle className="w-4 h-4" aria-hidden="true" />}
               onPress={() => onBuddyAction(goal, 'nudge')}
             >

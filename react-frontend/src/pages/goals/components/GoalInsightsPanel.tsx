@@ -167,7 +167,7 @@ export function GoalInsightsPanel({ goalId, canNudge = false }: GoalInsightsPane
         />
         <div className="rounded-lg bg-theme-elevated p-3">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase text-theme-subtle">
-            <Flag className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+            <Flag className="w-4 h-4 text-accent" aria-hidden="true" />
             {t('insights.milestones')}
           </div>
           <div className="mt-2 flex items-center justify-between text-sm">
@@ -179,7 +179,7 @@ export function GoalInsightsPanel({ goalId, canNudge = false }: GoalInsightsPane
           <Progress
             value={milestonePercent}
             size="sm"
-            classNames={{ indicator: 'bg-gradient-to-r from-indigo-500 to-purple-600', track: 'bg-theme-hover' }}
+            classNames={{ indicator: 'bg-gradient-to-r from-accent to-accent-gradient-end', track: 'bg-theme-hover' }}
             aria-label={t('insights.milestones_progress_aria', { percent: milestonePercent })}
           />
         </div>
@@ -188,7 +188,7 @@ export function GoalInsightsPanel({ goalId, canNudge = false }: GoalInsightsPane
       {insights.milestones.length > 0 && (
         <div className="rounded-lg bg-theme-elevated p-3">
           <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase text-theme-subtle">
-            <Flag className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+            <Flag className="w-4 h-4 text-accent" aria-hidden="true" />
             {t('insights.milestone_plan')}
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -207,9 +207,9 @@ export function GoalInsightsPanel({ goalId, canNudge = false }: GoalInsightsPane
       )}
 
       {canNudge && (
-        <div className="rounded-lg bg-purple-500/10 p-3">
+        <div className="rounded-lg bg-accent/10 p-3">
           <div className="flex items-start gap-3">
-            <HandHeart className="mt-0.5 w-5 h-5 text-purple-400" aria-hidden="true" />
+            <HandHeart className="mt-0.5 w-5 h-5 text-accent" aria-hidden="true" />
             <div className="flex-1">
               <h3 className="text-sm font-semibold text-theme-primary">{t('insights.buddy_actions_title')}</h3>
               <p className="text-xs text-theme-muted mt-1">{t('insights.buddy_actions_body')}</p>
@@ -232,7 +232,7 @@ export function GoalInsightsPanel({ goalId, canNudge = false }: GoalInsightsPane
       {insights.buddy_notes.length > 0 && (
         <div className="rounded-lg bg-theme-elevated p-3">
           <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase text-theme-subtle">
-            <Sparkles className="w-4 h-4 text-purple-400" aria-hidden="true" />
+            <Sparkles className="w-4 h-4 text-accent" aria-hidden="true" />
             {t('insights.recent_buddy_support')}
           </div>
           <div className="space-y-2">

@@ -84,7 +84,8 @@
       "title": "Certaines connexions ont eu des problèmes récemment",
       "hint_one": "{{count}} échec de l'appel depuis un système partenaire au cours des 30 derniers jours.",
       "hint_other": "{{count}} appels ayant échoué depuis les systèmes partenaires au cours des 30 derniers jours.",
-      "cta": "Afficher l'activité"
+      "cta": "Afficher l'activité",
+      "hint_many": "{{count}} appels ayant échoué depuis les systèmes partenaires au cours des 30 derniers jours."
     },
     "stats": {
       "active_partners": "Partenaires actifs",
@@ -111,7 +112,8 @@
       "empty_title": "Aucune activité de partenaire pour l'instant",
       "empty_hint": "Une fois que vous vous connectez à une banque de temps partenaire, son activité apparaît ici.",
       "activity_one": "{{count}} échange",
-      "activity_other": "{{count}} échanges"
+      "activity_other": "{{count}} échanges",
+      "activity_many": "{{count}} échanges"
     },
     "federation_off": {
       "title": "Le partenariat avec d'autres banques de temps est désactivé",

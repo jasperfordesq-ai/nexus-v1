@@ -132,5 +132,25 @@
   "page_meta": {
     "title": "Ar Bord"
   },
-  "aria_step_progress": "Step {{step}} of {{total}}"
+  "aria_step_progress": "Step {{step}} of {{total}}",
+  "bio_char_count_few": "{{count}} carachtar",
+  "bio_char_count_many": "{{count}} carachtar",
+  "bio_char_count_one": "{{count}} carachtar",
+  "bio_char_count_other": "{{count}} carachtar",
+  "bio_char_count_two": "{{count}} carachtar",
+  "count_selected_few": "{{count}} roghnaithe",
+  "count_selected_many": "{{count}} roghnaithe",
+  "count_selected_one": "{{count}} roghnaithe",
+  "count_selected_other": "{{count}} roghnaithe",
+  "count_selected_two": "{{count}} roghnaithe",
+  "skills_to_offer_count_few": "{{count}} scil le tairiscint",
+  "skills_to_offer_count_many": "{{count}} scil le tairiscint",
+  "skills_to_offer_count_one": "{{count}} scil le tairiscint",
+  "skills_to_offer_count_other": "{{count}} scil le tairiscint",
+  "skills_to_offer_count_two": "{{count}} scil le tairiscint",
+  "skills_needed_count_few": "{{count}} scil de dhíth",
+  "skills_needed_count_many": "{{count}} scil de dhíth",
+  "skills_needed_count_one": "{{count}} scil de dhíth",
+  "skills_needed_count_other": "{{count}} scil de dhíth",
+  "skills_needed_count_two": "{{count}} scil de dhíth"
 }

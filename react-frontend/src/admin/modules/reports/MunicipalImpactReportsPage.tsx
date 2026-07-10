@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, useConfirm } from '@/components/ui';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -470,8 +471,8 @@ export default function MunicipalImpactReportsPage() {
 
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
         <StatCard label={t('municipal_reports.stats.verified_hours')} value={formatHours(metric('verified_hours'))} icon={Heart} color="success" />
-        <StatCard label={t('municipal_reports.stats.participants')} value={metric('participating_members').toLocaleString()} icon={Users} color="warning" />
-        <StatCard label={t('municipal_reports.stats.organisations')} value={metric('trusted_organisations').toLocaleString()} icon={Building2} color="success" />
+        <StatCard label={t('municipal_reports.stats.participants')} value={metric('participating_members').toLocaleString(getFormattingLocale())} icon={Users} color="warning" />
+        <StatCard label={t('municipal_reports.stats.organisations')} value={metric('trusted_organisations').toLocaleString(getFormattingLocale())} icon={Building2} color="success" />
         <StatCard label={t('municipal_reports.stats.total_value')} value={currencyFormatter.format(metric('total_value'))} icon={Download} color="default" />
       </div>
 
@@ -637,7 +638,7 @@ export default function MunicipalImpactReportsPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {reportCards.map((report) => {
           const Icon = report.icon;
-          const value = report.statKey === 'pending_hours' ? formatHours(metric(report.statKey)) : metric(report.statKey).toLocaleString();
+          const value = report.statKey === 'pending_hours' ? formatHours(metric(report.statKey)) : metric(report.statKey).toLocaleString(getFormattingLocale());
           return (
             <Card key={report.key} className="border border-border bg-surface">
               <CardHeader className="flex items-start gap-3">
@@ -701,7 +702,7 @@ export default function MunicipalImpactReportsPage() {
                         {t(`municipal_reports.readiness.status.${signal.status}`)}
                       </Chip>
                     </div>
-                    <p className="mt-2 text-2xl font-semibold text-foreground">{signal.value.toLocaleString(undefined, { maximumFractionDigits: 1 })}</p>
+                    <p className="mt-2 text-2xl font-semibold text-foreground">{signal.value.toLocaleString(getFormattingLocale(), { maximumFractionDigits: 1 })}</p>
                     {help && (
                       <p className="mt-1 text-xs text-muted">
                         {t(signal.status === 'needs_data' ? help.fixKey : help.whatKey)}
@@ -941,8 +942,10 @@ function CantonNarrativeSection({
       <Chip size="sm" variant="soft">{t('municipal_reports.narrative.no_prior_data')}</Chip>
     ) : (
       <Chip size="sm" color={yoy >= 0 ? 'success' : 'warning'} variant="soft">
-        {yoy >= 0 ? '+' : ''}
-        {yoy.toFixed(1)}% YoY
+        {t('municipal_impact.portfolio.yoy_value', {
+          sign: yoy >= 0 ? '+' : '',
+          value: yoy.toFixed(1),
+        })}
       </Chip>
     );
 
@@ -959,7 +962,7 @@ function CantonNarrativeSection({
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <div className="rounded-lg border border-border bg-surface-secondary p-3">
           <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.canton.municipalities_reporting')}</p>
-          <p className="mt-1 text-2xl font-semibold">{variant.aggregate_municipalities_count.toLocaleString()}</p>
+          <p className="mt-1 text-2xl font-semibold">{variant.aggregate_municipalities_count.toLocaleString(getFormattingLocale())}</p>
           <p className="mt-1 text-xs text-muted">
             {t('municipal_reports.narrative.canton.municipalities_reporting_desc')}
           </p>
@@ -967,7 +970,7 @@ function CantonNarrativeSection({
         <div className="rounded-lg border border-border bg-surface-secondary p-3">
           <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.canton.multi_node_total_hours')}</p>
           <p className="mt-1 text-2xl font-semibold">
-            {variant.multi_node_total_hours.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+            {variant.multi_node_total_hours.toLocaleString(getFormattingLocale(), { maximumFractionDigits: 1 })}
           </p>
           <p className="mt-1 text-xs text-muted">{t('municipal_reports.narrative.canton.multi_node_total_hours_desc')}</p>
         </div>
@@ -990,7 +993,7 @@ function CantonNarrativeSection({
           {t('municipal_reports.narrative.canton.prior_period_detail', {
             from: variant.yoy_prior_period.from,
             to: variant.yoy_prior_period.to,
-            hours: variant.yoy_prior_hours.toLocaleString(undefined, { maximumFractionDigits: 1 }),
+            hours: variant.yoy_prior_hours.toLocaleString(getFormattingLocale(), { maximumFractionDigits: 1 }),
           })}
         </p>
       </div>
@@ -1039,7 +1042,7 @@ function MunicipalityNarrativeSection({
         </div>
         <div className="rounded-lg border border-border bg-surface-secondary p-3">
           <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.municipality.recipients_reached')}</p>
-          <p className="mt-1 text-2xl font-semibold">{variant.recipients_reached_count.toLocaleString()}</p>
+          <p className="mt-1 text-2xl font-semibold">{variant.recipients_reached_count.toLocaleString(getFormattingLocale())}</p>
           <p className="mt-1 text-xs text-muted">{t('municipal_reports.narrative.municipality.recipients_reached_desc')}</p>
         </div>
         <div className="rounded-lg border border-border bg-surface-secondary p-3">

@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -78,7 +79,7 @@ const statusColors: Record<string, 'default' | 'success' | 'warning' | 'danger' 
 
 function formatDate(value: string | null): string {
   if (!value) return '-';
-  return new Date(value).toLocaleDateString();
+  return new Date(value).toLocaleDateString(getFormattingLocale());
 }
 
 export default function ResearchPartnershipsAdminPage() {

@@ -265,11 +265,9 @@ export function LegalVersionHistoryPage() {
           <GlassCard className="p-8 text-center">
             <FileText className="w-12 h-12 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
             <p className="text-theme-muted">{t('version_history.no_versions')}</p>
-            <Link to={tenantPath(backRoute)} className="mt-4 inline-block">
-              <Button size="sm" variant="tertiary" className="bg-theme-elevated text-theme-primary">
-                {t('version_history.view_current')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath(backRoute)} size="sm" variant="tertiary" className="mt-4 inline-block bg-theme-elevated text-theme-primary">
+              {t('version_history.view_current')}
+            </Button>
           </GlassCard>
         </motion.div>
       )}
@@ -487,15 +485,13 @@ export function LegalVersionHistoryPage() {
 
       {/* Back CTA */}
       <motion.div variants={itemVariants} className="text-center pt-2">
-        <Link to={tenantPath(backRoute)}>
-          <Button
-            variant="tertiary"
-            className="bg-theme-elevated text-theme-primary"
-            startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-          >
-            {t('version_history.back_to_current', { title })}
-          </Button>
-        </Link>
+        <Button as={Link} to={tenantPath(backRoute)}
+          variant="tertiary"
+          className="bg-theme-elevated text-theme-primary"
+          startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+        >
+          {t('version_history.back_to_current', { title })}
+        </Button>
       </motion.div>
     </motion.div>
   );

@@ -7,9 +7,8 @@
  * Accessibility regression tests for the 5 critical Caring Community pages
  * covered by the AG39 a11y audit. Each page is rendered in isolation with
  * mocked contexts/hooks/api and run through axe-core. The suite asserts
- * ZERO serious or critical violations — moderate/minor violations are
- * surfaced (logged) but do not fail the test, so the audit baseline is
- * preserved without blocking unrelated work.
+ * ZERO axe violations at any impact level. Accessibility regressions must be
+ * fixed rather than downgraded to non-blocking console output.
  *
  * Pages covered (under react-frontend/src/pages/caring-community/):
  *   1. CaringCommunityPage         (the hub)
@@ -153,7 +152,10 @@ import SafeguardingReportPage from '../SafeguardingReportPage';
 function renderWithProviders(ui: React.ReactElement) {
   return render(
     <>
-      <MemoryRouter initialEntries={['/test-timebank/caring-community']}>
+      <MemoryRouter
+        initialEntries={['/test-timebank/caring-community']}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
         {ui}
       </MemoryRouter>
     </>,
@@ -161,37 +163,20 @@ function renderWithProviders(ui: React.ReactElement) {
 }
 
 /**
- * Assert zero `serious` and `critical` axe violations. Lower-impact
- * violations (`moderate`, `minor`) are logged but don't fail — they should
- * be triaged separately rather than blocking unrelated PRs.
+ * Assert zero axe violations at every impact level.
  */
-function assertNoSeriousViolations(results: AxeResults, label: string) {
+function assertNoViolations(results: AxeResults, label: string) {
   const violations = results.violations as Result[];
-  const blocking = violations.filter(
-    (v) => v.impact === 'serious' || v.impact === 'critical',
-  );
-  const nonBlocking = violations.filter(
-    (v) => v.impact !== 'serious' && v.impact !== 'critical',
-  );
-
-  if (nonBlocking.length > 0) {
-    // eslint-disable-next-line no-console
-    console.info(
-      `[a11y][${label}] ${nonBlocking.length} non-blocking violation(s):`,
-      nonBlocking.map((v) => `${v.id} (${v.impact})`).join(', '),
-    );
-  }
-
-  if (blocking.length > 0) {
-    const summary = blocking
+  if (violations.length > 0) {
+    const summary = violations
       .map((v) => `  - ${v.id} [${v.impact}]: ${v.help} (${v.nodes.length} node(s))`)
       .join('\n');
     throw new Error(
-      `[a11y][${label}] ${blocking.length} serious/critical violation(s):\n${summary}`,
+      `[a11y][${label}] ${violations.length} violation(s):\n${summary}`,
     );
   }
 
-  expect(blocking).toEqual([]);
+  expect(violations).toEqual([]);
 }
 
 // ─── Tests ───────────────────────────────────────────────────────────────────
@@ -208,33 +193,33 @@ describe('Caring Community a11y regression (AG39 baseline)', () => {
     }
   });
 
-  it('CaringCommunityPage (hub) has no serious/critical violations', async () => {
+  it('CaringCommunityPage (hub) has no axe violations', async () => {
     const { container } = renderWithProviders(<CaringCommunityPage />);
     const results = await axe(container);
-    assertNoSeriousViolations(results, 'CaringCommunityPage');
+    assertNoViolations(results, 'CaringCommunityPage');
   });
 
-  it('RequestHelpPage has no serious/critical violations', async () => {
+  it('RequestHelpPage has no axe violations', async () => {
     const { container } = renderWithProviders(<RequestHelpPage />);
     const results = await axe(container);
-    assertNoSeriousViolations(results, 'RequestHelpPage');
+    assertNoViolations(results, 'RequestHelpPage');
   });
 
-  it('OfferFavourPage has no serious/critical violations', async () => {
+  it('OfferFavourPage has no axe violations', async () => {
     const { container } = renderWithProviders(<OfferFavourPage />);
     const results = await axe(container);
-    assertNoSeriousViolations(results, 'OfferFavourPage');
+    assertNoViolations(results, 'OfferFavourPage');
   });
 
-  it('MySupportRelationshipsPage has no serious/critical violations', async () => {
+  it('MySupportRelationshipsPage has no axe violations', async () => {
     const { container } = renderWithProviders(<MySupportRelationshipsPage />);
     const results = await axe(container);
-    assertNoSeriousViolations(results, 'MySupportRelationshipsPage');
+    assertNoViolations(results, 'MySupportRelationshipsPage');
   });
 
-  it('SafeguardingReportPage has no serious/critical violations', async () => {
+  it('SafeguardingReportPage has no axe violations', async () => {
     const { container } = renderWithProviders(<SafeguardingReportPage />);
     const results = await axe(container);
-    assertNoSeriousViolations(results, 'SafeguardingReportPage');
+    assertNoViolations(results, 'SafeguardingReportPage');
   });
 });

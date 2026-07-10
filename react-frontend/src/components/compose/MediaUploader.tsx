@@ -34,6 +34,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { compressImage } from '@/lib/compress-image';
 import { Button, Input } from '@/components/ui';
+import { OverlayActionButton } from '@/components/ui/OverlayActionButton';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -98,17 +99,15 @@ function SortableMediaItem({
       } transition-all`}
     >
       {/* Drag handle */}
-      <Button
-        isIconOnly
-        size="sm"
+      <OverlayActionButton
         variant="tertiary"
-        className="absolute top-1.5 left-1.5 z-10 size-8 min-h-8 cursor-grab rounded-lg bg-black/60 p-1.5 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover/item:opacity-100 focus:opacity-100 active:cursor-grabbing"
+        className="absolute top-1.5 left-1.5 z-10 cursor-grab rounded-lg bg-black/60 text-white backdrop-blur-sm transition-opacity pointer-fine:group-hover/item:opacity-100 active:cursor-grabbing"
         aria-label={tc('aria.drag_to_reorder')}
         {...attributes}
         {...listeners}
       >
-        <GripVertical className="w-4 h-4" />
-      </Button>
+        <GripVertical className="size-4" aria-hidden="true" />
+      </OverlayActionButton>
 
       {/* Order badge */}
       <div className="absolute top-1.5 left-1/2 -translate-x-1/2 z-10 bg-black/60 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center backdrop-blur-sm pointer-events-none">
@@ -124,32 +123,30 @@ function SortableMediaItem({
       />
 
       {/* Remove button */}
-      <Button
-        isIconOnly
+      <OverlayActionButton
+        revealOnFinePointer={false}
         variant="tertiary"
-        size="sm"
-        className="absolute top-1.5 right-1.5 z-10 size-8 min-h-8 bg-black/60 text-white backdrop-blur-sm"
+        className="absolute top-1.5 right-1.5 z-10 rounded-full bg-black/60 text-white backdrop-blur-sm"
         onPress={() => onRemove(index)}
         aria-label={t('compose.image_remove_number_aria', { number: index + 1 })}
       >
-        <X className="w-4 h-4" />
-      </Button>
+        <X className="size-4" aria-hidden="true" />
+      </OverlayActionButton>
 
       {/* Alt text toggle button */}
-      <Button
-        isIconOnly
+      <OverlayActionButton
+        revealOnFinePointer={!item.altText}
         variant="tertiary"
-        size="sm"
-        className={`absolute bottom-1.5 right-1.5 z-10 size-8 min-h-8 backdrop-blur-sm ${
+        className={`absolute bottom-1.5 right-1.5 z-10 rounded-full backdrop-blur-sm ${
           item.altText
             ? 'bg-[var(--color-primary)]/80 text-white'
-            : 'bg-black/60 text-white opacity-0 group-hover/item:opacity-100 focus:opacity-100'
+            : 'bg-black/60 text-white pointer-fine:group-hover/item:opacity-100'
         } transition-opacity`}
         onPress={() => setShowAltInput(!showAltInput)}
         aria-label={item.altText ? t('compose.alt_text_edit') : t('compose.alt_text_add')}
       >
-        <Type className="w-3.5 h-3.5" />
-      </Button>
+        <Type className="size-4" aria-hidden="true" />
+      </OverlayActionButton>
 
       {/* Alt text input overlay */}
       {showAltInput && (

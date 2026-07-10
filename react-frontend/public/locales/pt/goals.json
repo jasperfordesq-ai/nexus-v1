@@ -120,7 +120,16 @@
       "offer_help": "Oferta de ajuda",
       "celebration": "Celebração",
       "note": "Nota"
-    }
+    },
+    "streak_value_many": "{{count}} check-ins",
+    "streak_value_one": "{{count}} check-ins",
+    "streak_value_other": "{{count}} check-ins",
+    "best_streak_many": "Melhor sequência: {{count}}",
+    "best_streak_one": "Melhor sequência: {{count}}",
+    "best_streak_other": "Melhor sequência: {{count}}",
+    "checkins_value_many": "{{count}} registados",
+    "checkins_value_one": "{{count}} registados",
+    "checkins_value_other": "{{count}} registados"
   },
   "template_picker": {
     "load_error": "Falha ao carregar os modelos. Por favor, tente novamente.",

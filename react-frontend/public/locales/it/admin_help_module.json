@@ -84,7 +84,10 @@
       "general_admin": "Amministratore generale",
       "caring_community": "Comunità premurosa",
       "kiss_agoris": "BACIO E AGORI"
-    }
+    },
+    "search_placeholder_many": "Cerca negli articoli della guida{{count}}...",
+    "search_placeholder_one": "Cerca negli articoli della guida{{count}}...",
+    "search_placeholder_other": "Cerca negli articoli della guida{{count}}..."
   },
   "help_faqs": {
     "page_title": "FAQ di aiuto",

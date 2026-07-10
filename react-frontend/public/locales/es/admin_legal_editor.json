@@ -228,5 +228,32 @@
       "retention_save_failed": "No se pudo guardar la configuración de retención.",
       "retention_saved": "Configuración de retención guardada."
     }
+  },
+  "rte": {
+    "enter_url": "Ingrese la URL",
+    "undo": "Deshacer",
+    "redo": "Rehacer",
+    "heading_2": "2",
+    "heading_3": "3",
+    "bold": "Negrita",
+    "italic": "cursiva",
+    "underline": "subrayado",
+    "strikethrough": "Tachado",
+    "inline_code": "Inline Code",
+    "bullet_list": "Bullet List",
+    "numbered_list": "Numbered List",
+    "block_quote": "Block Quote",
+    "remove_link": "Remove Link",
+    "insert_link": "Insert Link",
+    "notice_box": "Notice Box",
+    "notice_title_placeholder": "Enter notice title...",
+    "notice_body_placeholder": "Enter notice body...",
+    "preview_title_placeholder": "Enter preview title...",
+    "content_html": "Contenido HTML",
+    "editor_only": "Editor Only",
+    "split_view": "Split View",
+    "content_placeholder": "Content...",
+    "preview": "Vista previa",
+    "content_helper": "Content"
   }
 }

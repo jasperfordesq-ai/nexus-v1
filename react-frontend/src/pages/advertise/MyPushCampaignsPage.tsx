@@ -50,6 +50,7 @@ interface PushCampaign {
   body: string;
   status: CampaignStatus;
   schedule_at: string | null;
+  // i18next-instrument-ignore-next-line -- API contract field, not user-facing copy.
   audience_radius_km: number;
   audience_min_trust_tier: TrustTier;
   created_at: string;

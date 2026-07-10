@@ -12,6 +12,7 @@
  * toggle (approval is always "on").
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from '@/lib/motion';
 
@@ -385,7 +386,7 @@ export function OrgWalletTab({ orgId, balance, onBalanceChange }: OrgWalletTabPr
                         )}
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" aria-hidden="true" />
-                          {new Date(tx.created_at).toLocaleDateString()}
+                          {new Date(tx.created_at).toLocaleDateString(getFormattingLocale())}
                         </span>
                         <span className="text-theme-muted">
                           {t('org_wallet.balance_after', {

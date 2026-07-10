@@ -23,7 +23,7 @@ import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { PageMeta } from '@/components/seo';
 import { ReviewModal } from '@/components/reviews/ReviewModal';
 import { SocialInteractionPanel } from '@/components/social/SocialInteractionPanel';
@@ -140,7 +140,7 @@ function ReviewCard({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <span className="text-xs text-[var(--color-text-muted)]">
-              {new Date(review.created_at).toLocaleDateString()}
+              {new Date(review.created_at).toLocaleDateString(getFormattingLocale())}
             </span>
             {canDelete && (
               <Button
@@ -237,7 +237,7 @@ function GivenReviewCard({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <span className="text-xs text-[var(--color-text-muted)]">
-              {new Date(review.created_at).toLocaleDateString()}
+              {new Date(review.created_at).toLocaleDateString(getFormattingLocale())}
             </span>
             <Button
               isIconOnly

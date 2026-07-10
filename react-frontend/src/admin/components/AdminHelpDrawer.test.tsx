@@ -3,15 +3,15 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { useState } from 'react';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { createMockContexts } from '@/test/mock-contexts';
 
-// ── mock @/contexts ───────────────────────────────────────────────────────────
+import { createMockContexts } from '@/test/mock-contexts';
+import { render, screen, waitFor } from '@/test/test-utils';
+
 vi.mock('@/contexts', () => createMockContexts());
 
-// ── stable article fixture ────────────────────────────────────────────────────
 const FULL_ARTICLE = vi.hoisted(() => ({
   title: 'Legal Documents Hub',
   summary: 'Manage your tenant legal documents from this screen.',
@@ -34,115 +34,142 @@ const MINIMAL_ARTICLE = vi.hoisted(() => ({
 
 import { AdminHelpDrawer } from './AdminHelpDrawer';
 
-describe('AdminHelpDrawer — open state', () => {
+function isHiddenByModal(element: HTMLElement): boolean {
+  let current: HTMLElement | null = element;
+
+  while (current && current !== document.body) {
+    if (current.inert || current.getAttribute('aria-hidden') === 'true') {
+      return true;
+    }
+    current = current.parentElement;
+  }
+
+  return false;
+}
+
+function ControlledAdminHelpDrawer() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div>
+      <button type="button" onClick={() => setIsOpen(true)}>Open help</button>
+      <button type="button" data-testid="background-action">Background action</button>
+      <AdminHelpDrawer
+        article={FULL_ARTICLE}
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+      />
+    </div>
+  );
+}
+
+describe('AdminHelpDrawer — official modal drawer contract', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders the dialog panel when isOpen=true', () => {
+  it('uses the HeroUI anatomy and exposes a translated accessible name', () => {
     render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen onClose={vi.fn()} />);
 
-    const dialog = screen.getByRole('dialog');
-    expect(dialog).toBeInTheDocument();
+    const dialog = screen.getByRole('dialog', { name: 'Help: Legal Documents Hub' });
+    expect(dialog).toHaveAttribute('data-slot', 'drawer-dialog');
+    expect(dialog.querySelector('[data-slot="drawer-heading"]')).toHaveTextContent(
+      'Legal Documents Hub',
+    );
+    expect(dialog.closest('[data-slot="drawer-content"]')).not.toBeNull();
+    expect(document.querySelector('[data-slot="drawer-backdrop"]')).not.toBeNull();
   });
 
-  it('renders article title and summary', () => {
+  it('does not leave an off-screen dialog or backdrop in the DOM when closed', () => {
+    render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen={false} onClose={vi.fn()} />);
+
+    expect(screen.queryByRole('dialog', { hidden: true })).not.toBeInTheDocument();
+    expect(document.querySelector('[data-slot="drawer-backdrop"]')).toBeNull();
+  });
+
+  it('renders article title, summary, steps, tips, caution, and related links', () => {
     render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen onClose={vi.fn()} />);
 
     expect(screen.getByText('Legal Documents Hub')).toBeInTheDocument();
     expect(screen.getByText('Manage your tenant legal documents from this screen.')).toBeInTheDocument();
-  });
-
-  it('renders numbered steps', () => {
-    render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen onClose={vi.fn()} />);
-
     expect(screen.getByText('Create a document')).toBeInTheDocument();
-    expect(screen.getByText('Publish the document')).toBeInTheDocument();
     expect(screen.getByText('Use the + button to add a new document.')).toBeInTheDocument();
-  });
-
-  it('renders tips list', () => {
-    render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen onClose={vi.fn()} />);
-
     expect(screen.getByText('Keep your terms up to date.')).toBeInTheDocument();
-    expect(screen.getByText('Always review before publishing.')).toBeInTheDocument();
+    expect(screen.getByText('Deleting a document is permanent and cannot be undone.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Privacy Policy' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument();
   });
 
-  it('renders caution block', () => {
-    render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen onClose={vi.fn()} />);
-
-    expect(
-      screen.getByText('Deleting a document is permanent and cannot be undone.')
-    ).toBeInTheDocument();
-  });
-
-  it('renders related page chips as links', () => {
-    render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen onClose={vi.fn()} />);
-
-    expect(screen.getByText('Privacy Policy')).toBeInTheDocument();
-    expect(screen.getByText('Settings')).toBeInTheDocument();
-  });
-
-  it('calls onClose when close button clicked', async () => {
-    const user = userEvent.setup();
-    const onClose = vi.fn();
-    render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen onClose={onClose} />);
-
-    const closeBtn = screen.getByRole('button', { name: /close/i });
-    await user.click(closeBtn);
-
-    expect(onClose).toHaveBeenCalled();
-  });
-
-  it('calls onClose when Escape key pressed', async () => {
-    const user = userEvent.setup();
-    const onClose = vi.fn();
-    render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen onClose={onClose} />);
-
-    await user.keyboard('{Escape}');
-
-    await waitFor(() => {
-      expect(onClose).toHaveBeenCalled();
-    });
-  });
-
-  it('calls onClose when backdrop clicked', async () => {
-    const user = userEvent.setup();
-    const onClose = vi.fn();
-    const { container } = render(
-      <AdminHelpDrawer article={FULL_ARTICLE} isOpen onClose={onClose} />
-    );
-
-    // The backdrop is the first div inside the fragment (aria-hidden)
-    const backdrop = container.querySelector('[aria-hidden="true"]') as HTMLElement;
-    expect(backdrop).not.toBeNull();
-    await user.click(backdrop);
-
-    expect(onClose).toHaveBeenCalled();
-  });
-});
-
-describe('AdminHelpDrawer — closed state', () => {
-  it('still renders the panel (CSS hides it via translate-x-full) but no backdrop clicks fire', () => {
-    // When closed, the dialog panel is in the DOM but shifted off-screen
-    render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen={false} onClose={vi.fn()} />);
-
-    // role=dialog is still present
-    const dialog = screen.getByRole('dialog', { hidden: true });
-    expect(dialog).toBeInTheDocument();
-    // panel has inert attribute set
-    expect(dialog).toHaveAttribute('inert');
-  });
-});
-
-describe('AdminHelpDrawer — minimal article (no optional fields)', () => {
-  it('renders without crashing when steps/tips/caution/relatedPaths are absent', () => {
+  it('renders a minimal article without optional sections', () => {
     render(<AdminHelpDrawer article={MINIMAL_ARTICLE} isOpen onClose={vi.fn()} />);
 
     expect(screen.getByText('Simple Article')).toBeInTheDocument();
     expect(screen.getByText('Just a summary, nothing else.')).toBeInTheDocument();
-    // No numbered steps, tips, or caution
     expect(screen.queryByText(/how to use/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/tips/i)).not.toBeInTheDocument();
+  });
+
+  it('dismisses with the translated close trigger', async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen onClose={onClose} />);
+
+    await user.click(screen.getByRole('button', { name: 'Close help panel' }));
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('dismisses through the official backdrop contract', async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen onClose={onClose} />);
+
+    const backdrop = document.querySelector<HTMLElement>('[data-slot="drawer-backdrop"]');
+    expect(backdrop).not.toBeNull();
+    await user.click(backdrop!);
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('closes when a related page is chosen', async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    render(<AdminHelpDrawer article={FULL_ARTICLE} isOpen onClose={onClose} />);
+
+    await user.click(screen.getByRole('link', { name: 'Settings' }));
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('contains focus, inerts the page, locks scroll, and restores the opener after Escape', async () => {
+    const user = userEvent.setup();
+    render(<ControlledAdminHelpDrawer />);
+
+    const trigger = screen.getByRole('button', { name: 'Open help' });
+    const backgroundAction = screen.getByTestId('background-action');
+    await user.click(trigger);
+
+    const dialog = await screen.findByRole('dialog', { name: 'Help: Legal Documents Hub' });
+    const closeButton = screen.getByRole('button', { name: 'Close help panel' });
+    await waitFor(() => expect(dialog).toHaveFocus());
+
+    expect(isHiddenByModal(backgroundAction)).toBe(true);
+    expect(document.documentElement.style.overflow).toBe('hidden');
+
+    await user.tab();
+    expect(closeButton).toHaveFocus();
+    await user.tab({ shift: true });
+    expect(dialog).toContainElement(document.activeElement as HTMLElement);
+    expect(screen.getByRole('link', { name: 'Settings' })).toHaveFocus();
+    await user.tab();
+    expect(closeButton).toHaveFocus();
+    expect(backgroundAction).not.toHaveFocus();
+
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(trigger).toHaveFocus());
+    expect(document.documentElement.style.overflow).not.toBe('hidden');
+    expect(isHiddenByModal(backgroundAction)).toBe(false);
   });
 });

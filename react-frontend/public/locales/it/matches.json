@@ -138,5 +138,8 @@
   },
   "stats_mutual_matches": "Mutual Matches",
   "filter_people_listings": "Listings",
-  "source_event": "Event"
+  "source_event": "Event",
+  "reasons_more_many": "+{{count}} altri",
+  "reasons_more_one": "+{{count}} altri",
+  "reasons_more_other": "+{{count}} altri"
 }

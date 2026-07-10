@@ -159,5 +159,11 @@
   "optional": "optional",
   "description_placeholder": "Wofür ist diese Überweisung?",
   "new_balance_after": "Ihr neues Guthaben beträgt {{balance}} Stunden",
-  "transfer_summary": "Sie sind dabei, {{amount}} {{unit}} an {{name}} zu senden"
+  "transfer_summary": "Sie sind dabei, {{amount}} {{unit}} an {{name}} zu senden",
+  "pending_in_one": "+{{count}}h ausstehend",
+  "pending_in_other": "+{{count}}h ausstehend",
+  "signed_hours_value_one": "{{sign}}{{count}}h",
+  "signed_hours_value_other": "{{sign}}{{count}}h",
+  "hours_value_one": "{{count}}h",
+  "hours_value_other": "{{count}}h"
 }

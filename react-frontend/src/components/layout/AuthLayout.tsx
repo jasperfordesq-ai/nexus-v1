@@ -30,7 +30,7 @@ export function AuthLayout() {
 
       <div className="absolute top-[calc(var(--safe-area-top)+1rem)] right-[calc(var(--safe-area-right)+1rem)] z-20">
         <LanguageSwitcher
-          triggerClassName="border-white/15 bg-white/10 text-white shadow-sm backdrop-blur hover:border-white/30 hover:bg-white/15"
+          triggerClassName="border border-theme-default bg-theme-elevated text-theme-primary shadow-sm backdrop-blur hover:border-theme-primary/40 hover:bg-theme-hover"
         />
       </div>
 
@@ -40,9 +40,9 @@ export function AuthLayout() {
 
       <footer className="relative z-10 px-4 py-4 pb-[calc(var(--safe-area-bottom)+1rem)] text-center" data-nosnippet>
         <div className="flex flex-col items-center justify-center gap-2">
-          <SourceRepositoryLink inverse compact className="max-w-[18rem] justify-center" />
-          <p className="text-xs text-white/55">
-            <span className="font-medium text-white/75">{t('footer.project_nexus')}</span>
+          <SourceRepositoryLink compact className="max-w-[18rem] justify-center" />
+          <p className="text-xs text-theme-subtle">
+            <span className="font-medium text-theme-secondary">{t('footer.project_nexus')}</span>
             <span aria-hidden="true"> &middot; </span>
             <span>{t('footer.agpl_notice', { year })}</span>
           </p>

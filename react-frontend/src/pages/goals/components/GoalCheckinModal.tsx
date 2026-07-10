@@ -6,7 +6,7 @@
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Separator } from '@/components/ui/Separator';
 import { Slider } from '@/components/ui/Slider';
 import { Spinner } from '@/components/ui/Spinner';
@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/Textarea';
  * G3 - Goal Check-in Modal
  *
  * Allows users to log periodic check-ins on their goals with:
- * - Progress slider (0-100%)
+ * - Progress slider (percentage range)
  * - Text note
  * - Mood selector (emoji picker)
  *
@@ -70,7 +70,7 @@ const MOODS = [
   { value: 'good', labelKey: 'mood.good', icon: Smile, color: 'text-emerald-400' },
   { value: 'okay', labelKey: 'mood.okay', icon: Meh, color: 'text-blue-400' },
   { value: 'struggling', labelKey: 'mood.struggling', icon: Frown, color: 'text-orange-400' },
-  { value: 'motivated', labelKey: 'mood.motivated', icon: Zap, color: 'text-purple-400' },
+  { value: 'motivated', labelKey: 'mood.motivated', icon: Zap, color: 'text-accent' },
   { value: 'grateful', labelKey: 'mood.grateful', icon: Heart, color: 'text-rose-400' },
 ] as const;
 
@@ -200,10 +200,10 @@ export function GoalCheckinModal({
     >
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 text-theme-primary">
+          <ModalHeading className="flex items-center gap-2 text-theme-primary">
             <ClipboardCheck className="w-5 h-5 text-emerald-400" aria-hidden="true" />
             {t('checkin.title')}
-          </div>
+          </ModalHeading>
           <p className="text-sm text-theme-muted font-normal">{goalTitle}</p>
         </ModalHeader>
         <ModalBody className="space-y-5">
@@ -213,7 +213,7 @@ export function GoalCheckinModal({
               size="sm"
               variant={!showHistory ? 'solid' : 'flat'}
               className={!showHistory
-                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                ? 'bg-gradient-to-r from-accent to-accent-gradient-end text-white'
                 : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setShowHistory(false)}
               startContent={<ClipboardCheck className="w-4 h-4" aria-hidden="true" />}
@@ -224,7 +224,7 @@ export function GoalCheckinModal({
               size="sm"
               variant={showHistory ? 'solid' : 'flat'}
               className={showHistory
-                ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                ? 'bg-gradient-to-r from-accent to-accent-gradient-end text-white'
                 : 'bg-theme-elevated text-theme-muted'}
               onPress={() => setShowHistory(true)}
               startContent={<Clock className="w-4 h-4" aria-hidden="true" />}
@@ -325,15 +325,17 @@ export function GoalCheckinModal({
                   className="max-w-full"
                   classNames={{
                     track: 'bg-theme-hover',
-                    filler: 'bg-gradient-to-r from-indigo-500 to-purple-600',
-                    thumb: 'bg-white shadow-md border-2 border-indigo-500',
+                    filler: 'bg-gradient-to-r from-accent to-accent-gradient-end',
+                    thumb: 'bg-white shadow-md border-2 border-accent',
                   }}
                   aria-label={t('checkin.aria_progress_percentage')}
                 />
                 <div className="flex justify-between text-xs text-theme-subtle mt-1">
-                  <span>0%</span>
-                  <span className="font-semibold text-theme-primary">{progressValue}%</span>
-                  <span>100%</span>
+                  <span>{t('checkin.progress_value', { percent: 0 })}</span>
+                  <span className="font-semibold text-theme-primary">
+                    {t('checkin.progress_value', { percent: progressValue })}
+                  </span>
+                  <span>{t('checkin.progress_value', { percent: 100 })}</span>
                 </div>
               </div>
 
@@ -354,7 +356,7 @@ export function GoalCheckinModal({
                         size="sm"
                         variant={isSelected ? 'solid' : 'flat'}
                         className={isSelected
-                          ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                          ? 'bg-gradient-to-r from-accent to-accent-gradient-end text-white'
                           : 'bg-theme-elevated text-theme-muted'}
                         startContent={<Icon className={`w-4 h-4 ${isSelected ? 'text-white' : mood.color}`} aria-hidden="true" />}
                         onPress={() => setSelectedMood(isSelected ? null : mood.value)}
@@ -393,7 +395,7 @@ export function GoalCheckinModal({
           </Button>
           {!showHistory && (
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               onPress={handleSubmit}
               isLoading={isSubmitting}
             >

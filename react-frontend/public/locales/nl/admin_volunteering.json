@@ -718,7 +718,42 @@
     "wellbeing_unknown_user": "Onbekende vrijwilliger",
     "wellbeing_user_number": "Vrijwilliger #{{id}}",
     "wellbeing_unknown_type": "Welzijnszorg",
-    "wellbeing_raised_on": "Gemeld op {{date}}"
+    "wellbeing_raised_on": "Gemeld op {{date}}",
+    "bulk_verify_success_one": "{{count}} record geverifieerd",
+    "bulk_verify_success_other": "{{count}} record geverifieerd",
+    "bulk_verify_fail_one": "{{count}} record kon niet worden geverifieerd",
+    "bulk_verify_fail_other": "{{count}} record kon niet worden geverifieerd",
+    "expiry_alert_title_one": "{{count}} trainingsrecord verloopt binnen 30 dagen",
+    "expiry_alert_title_other": "{{count}} trainingsrecord verloopt binnen 30 dagen",
+    "bulk_selected_one": "{{count}} openstaand record geselecteerd",
+    "bulk_selected_other": "{{count}} openstaand record geselecteerd",
+    "members_count_one": "{{count}}-lid",
+    "members_count_other": "{{count}}-lid",
+    "alert_pending_applications_one": "{{count}} aanvragen wachten op beoordeling",
+    "alert_pending_applications_other": "{{count}} aanvragen wachten op beoordeling",
+    "export_truncated_one": "Export gestopt na {{count}} pagina's; sommige rijen zijn weggelaten.",
+    "export_truncated_other": "Export gestopt na {{count}} pagina's; sommige rijen zijn weggelaten.",
+    "expiring_consents_warning_one": "{{count}} toestemming van voogd verloopt binnen 30 dagen",
+    "expiring_consents_warning_other": "{{count}} toestemming van voogd verloopt binnen 30 dagen",
+    "reminder_job_sent_one": "Reminder job sent {{count}} notification(s)",
+    "reminder_job_sent_other": "Reminder job sent {{count}} notification(s)",
+    "delivery_total_sent_one": "{{count}}verzonden",
+    "delivery_total_sent_other": "{{count}}verzonden",
+    "bulk_approved_one": "{{count}} aanvragen goedgekeurd",
+    "bulk_approved_other": "{{count}} aanvragen goedgekeurd",
+    "bulk_declined_one": "{{count}} aanvragen afgewezen",
+    "bulk_declined_other": "{{count}} aanvragen afgewezen",
+    "selected_count_one": "{{count}} geselecteerd",
+    "selected_count_other": "{{count}} geselecteerd",
+    "bulk_approve_one": "Goedkeuren ({{count}})",
+    "bulk_approve_other": "Goedkeuren ({{count}})",
+    "bulk_decline_one": "Afwijzen ({{count}})",
+    "bulk_decline_other": "Afwijzen ({{count}})",
+    "bulk_approve_confirm_one": "{{count}} geselecteerde aanvragen goedkeuren? De aanvragers worden op de hoogte gebracht.",
+    "bulk_approve_confirm_other": "{{count}} geselecteerde aanvragen goedkeuren? De aanvragers worden op de hoogte gebracht.",
+    "bulk_decline_confirm_one": "{{count}} geselecteerde aanvragen weigeren? De aanvragers worden op de hoogte gebracht.",
+    "bulk_decline_confirm_other": "{{count}} geselecteerde aanvragen weigeren? De aanvragers worden op de hoogte gebracht.",
+    "decline_confirm": "Weet je zeker dat je deze vrijwilligersaanvraag wilt afwijzen?"
   },
   "donation_refunds": {
     "page_title": "Donatieterugbetalingen",
@@ -761,5 +796,8 @@
     "complete_confirm_label": "Markeer voltooid",
     "complete_success": "Donatie gemarkeerd als voltooid",
     "complete_failed": "Het is niet gelukt om de donatie als voltooid te markeren"
+  },
+  "giving_days": {
+    "hours_target": "/ {{target}}"
   }
 }

@@ -266,7 +266,9 @@
       "resume_success": "De registratie voor deze community is hervat.",
       "resume_failed": "Kan de registratie niet hervatten.",
       "threshold_prefix": "De drempelwaarde wordt op platformniveau geconfigureerd via",
-      "threshold_suffix": "Wanneer deze wordt geactiveerd, wordt deze banner rood en verschijnt hier een hervatten-knop met één klik."
+      "threshold_suffix": "Wanneer deze wordt geactiveerd, wordt deze banner rood en verschijnt hier een hervatten-knop met één klik.",
+      "signups_this_hour_one": "{{count}} van {{threshold}} aanmeldingen dit uur",
+      "signups_this_hour_other": "{{count}} van {{threshold}} aanmeldingen dit uur"
     },
     "col_action": "Actie",
     "col_date": "Datum",
@@ -621,7 +623,9 @@
       "welcome_text": "Welkomsttekst",
       "welcome_text_desc": "Welkomstbericht dat aan nieuwe leden wordt getoond aan het begin van de onboarding",
       "welcome_text_placeholder": "Welkomstbericht...",
-      "your_community": "Jouw gemeenschap"
+      "your_community": "Jouw gemeenschap",
+      "n_active_one": "{{count}}actief",
+      "n_active_other": "{{count}}actief"
     },
     "overdue_jobs": "Achterstallige banen",
     "page_title": "Systeem",
@@ -764,7 +768,13 @@
       "waitlist_info": "Leden op de wachtlijst worden handmatig goedgekeurd door een beheerder",
       "webhook_desc": "Wordt gebruikt om de authenticiteit van inkomende webhook-payloads te verifiëren",
       "your_community": "Jouw gemeenschap",
-      "credentials_remove_confirm": "Deze inloggegevens verwijderen? Dit kan niet ongedaan worden gemaakt."
+      "credentials_remove_confirm": "Deze inloggegevens verwijderen? Dit kan niet ongedaan worden gemaakt.",
+      "n_configured_one": "{{count}} geconfigureerd",
+      "n_configured_other": "{{count}} geconfigureerd",
+      "n_available_one": "{{count}} beschikbaar",
+      "n_available_other": "{{count}} beschikbaar",
+      "total_codes_count_one": "Totaal aantal codes: {{count}}",
+      "total_codes_count_other": "Totaal aantal codes: {{count}}"
     },
     "registration_policy_saved_successfully": "Registratiebeleid succesvol opgeslagen",
     "registration_policy_settings_title": "Registration Policy Settings",
@@ -1107,7 +1117,37 @@
     "partner_logo_link_url": "Partner Logo Link URL",
     "partner_logo_link_url_description": "Optionele websitelink voor het partnerlogo in de voettekst.",
     "label_inactivity_timeout": "Inactiviteitstime-out (minuten)",
-    "desc_inactivity_timeout": "Leden automatisch afmelden na dit aantal minuten zonder activiteit. 0 schakelt de time-out uit; het toegestane bereik is 5–480 minuten. Aanbevolen: 120."
+    "desc_inactivity_timeout": "Leden automatisch afmelden na dit aantal minuten zonder activiteit. 0 schakelt de time-out uit; het toegestane bereik is 5–480 minuten. Aanbevolen: 120.",
+    "generated_data_for_one": "Gegevens gegenereerd voor {{count}} geselecteerde gegevenstypen",
+    "generated_data_for_other": "Gegevens gegenereerd voor {{count}} geselecteerde gegevenstypen",
+    "avg_completion_seconds_one": "Gem. voltooiingsseconden",
+    "avg_completion_seconds_other": "Gem. voltooiingsseconden",
+    "avg_completion_minutes_one": "Gem. voltooiingsminuten",
+    "avg_completion_minutes_other": "Gem. voltooiingsminuten",
+    "sessions_count_one": "{{count}}-sessies",
+    "sessions_count_other": "{{count}}-sessies",
+    "passed_count_one": "{{count}}geslaagd",
+    "passed_count_other": "{{count}}geslaagd",
+    "failed_count_one": "{{count}}is mislukt",
+    "failed_count_other": "{{count}}is mislukt",
+    "cron_connection_ok_one": "Verbinding OK -{{count}}-taken beschikbaar",
+    "cron_connection_ok_other": "Verbinding OK -{{count}}-taken beschikbaar",
+    "minutes_ago_one": "{{count}}m geleden",
+    "minutes_ago_other": "{{count}}m geleden",
+    "hours_ago_one": "{{count}}uur geleden",
+    "hours_ago_other": "{{count}}uur geleden",
+    "days_ago_one": "{{count}}d geleden",
+    "days_ago_other": "{{count}}d geleden",
+    "blog_posts_restored_one": "{{count}}-blogposts hersteld van{{filename}}",
+    "blog_posts_restored_other": "{{count}}-blogposts hersteld van{{filename}}",
+    "available_backups_one": "Beschikbare back-ups ({{count}})",
+    "available_backups_other": "Beschikbare back-ups ({{count}})",
+    "test_runner": {
+      "api_unavailable": "API voor statuscontrole niet beschikbaar",
+      "run_all": "Alle tests uitvoeren",
+      "suites": "Testsuites",
+      "unknown_test": "Diagnose: {{name}}"
+    }
   },
   "verification": {
     "approve": "Goedkeuren",
@@ -1171,7 +1211,11 @@
     "total_events": "{{count}}-evenementen",
     "user_approved_activated": "Door gebruiker goedgekeurd en geactiveerd",
     "user_verification_rejected": "Gebruikersverificatie afgewezen",
-    "user_with_id": "Gebruiker #{{id}}"
+    "user_with_id": "Gebruiker #{{id}}",
+    "n_pending_one": "{{count}} in behandeling",
+    "n_pending_other": "{{count}} in behandeling",
+    "total_events_one": "{{count}}-evenementen",
+    "total_events_other": "{{count}}-evenementen"
   },
   "cancel": "Annuleer"
 }

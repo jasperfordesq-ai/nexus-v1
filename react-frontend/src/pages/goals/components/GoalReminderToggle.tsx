@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Button } from '@/components/ui/Button';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui/Popover';
 import { Separator } from '@/components/ui/Separator';
 /**
  * G4 - Goal Reminder Toggle
@@ -133,7 +133,7 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
           isIconOnly
           size="sm"
           variant="flat"
-          className={`${hasReminder ? 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'} ${className}`}
+          className={`${hasReminder ? 'bg-accent/10 text-accent dark:text-accent' : 'bg-theme-elevated text-theme-muted'} ${className}`}
           isLoading={isLoading}
           aria-label={hasReminder ? t('reminder.aria_active') : t('reminder.aria_set')}
         >
@@ -146,9 +146,9 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
       </PopoverTrigger>
       <PopoverContent className="bg-overlay border border-theme-default p-3 w-52">
         <div className="space-y-2">
-          <p className="text-sm font-semibold text-theme-primary">
+          <PopoverHeading className="text-sm font-semibold text-theme-primary">
             {hasReminder ? t('reminder.active') : t('reminder.set')}
-          </p>
+          </PopoverHeading>
 
           {hasReminder && reminder && (
             <p className="text-xs text-theme-subtle">
@@ -166,7 +166,7 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
                 variant="flat"
                 className={`w-full justify-start text-sm ${
                   reminder?.frequency === freq.value
-                    ? 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-400'
+                    ? 'bg-accent/10 text-accent dark:text-accent'
                     : 'bg-transparent text-theme-muted hover:bg-theme-hover'
                 }`}
                 onPress={() => handleSetReminder(freq.value)}

@@ -306,6 +306,21 @@
     "pillar_trust": "Trust",
     "pillar_aria": "{{label}}: {{percent}}%",
     "of_active_users": "di {{total}} utenti attivi",
-    "of_active_listings": "di {{total}} schede attive"
+    "of_active_listings": "di {{total}} schede attive",
+    "cache_cleared_count_many": "Cancellata la voce della cache{{count}}",
+    "cache_cleared_count_one": "Cancellata la voce della cache{{count}}",
+    "cache_cleared_count_other": "Cancellata la voce della cache{{count}}",
+    "clear_cache_confirm_with_count_many": "Vuoi cancellare le corrispondenze memorizzate nella cache di{{count}}?",
+    "clear_cache_confirm_with_count_one": "Vuoi cancellare le corrispondenze memorizzate nella cache di{{count}}?",
+    "clear_cache_confirm_with_count_other": "Vuoi cancellare le corrispondenze memorizzate nella cache di{{count}}?",
+    "distribution_aria_many": "{{label}}: partite{{count}}({{percent}}%)",
+    "distribution_aria_one": "{{label}}: partite{{count}}({{percent}}%)",
+    "distribution_aria_other": "{{label}}: partite{{count}}({{percent}}%)",
+    "feedback_reason_aria_many": "{{label}}: {{count}} ({{percent}}%)",
+    "feedback_reason_aria_one": "{{label}}: {{count}} ({{percent}}%)",
+    "feedback_reason_aria_other": "{{label}}: {{count}} ({{percent}}%)",
+    "pillar_averages_sample_size_many": "Basato sulle corrispondenze {{count}}",
+    "pillar_averages_sample_size_one": "Basato sulle corrispondenze {{count}}",
+    "pillar_averages_sample_size_other": "Basato sulle corrispondenze {{count}}"
   }
 }

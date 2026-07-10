@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -105,8 +106,8 @@ const METRIC_KEYS: Array<{
 function formatValue(v: number | null, fmt: string): string {
   if (v === null || v === undefined) return '—';
   switch (fmt) {
-    case 'int':    return v.toLocaleString();
-    case 'float':  return v.toLocaleString(undefined, { maximumFractionDigits: 1 });
+    case 'int':    return v.toLocaleString(getFormattingLocale());
+    case 'float':  return v.toLocaleString(getFormattingLocale(), { maximumFractionDigits: 1 });
     case 'pct':    return `${v.toFixed(1)}%`;
     case 'hours':  return `${v.toFixed(1)} h`;
     case 'chf':    return CHF.format(v);
@@ -256,7 +257,7 @@ export default function PilotScoreboardAdminPage() {
                 {t('pilot_scoreboard.about.body')}
               </p>
               <p className="text-muted">
-                {t('pilot_scoreboard.about.methodology_prefix')} Caring Community{' '}
+                {t('pilot_scoreboard.about.methodology_prefix')} {t('common:nav.caring_community')}{' '}
                 {t('pilot_scoreboard.about.methodology_middle')} <Abbr term="CHF">{t('pilot_scoreboard.currency.chf')}</Abbr>{' '}
                 {t('pilot_scoreboard.about.methodology_suffix')}
               </p>
@@ -273,7 +274,7 @@ export default function PilotScoreboardAdminPage() {
               <span className="text-sm">
                 {t('pilot_scoreboard.quarterly.next_review')}{' '}
                 <span className="font-semibold">
-                  {new Date(quarterly.next_due_at).toLocaleDateString()}
+                  {new Date(quarterly.next_due_at).toLocaleDateString(getFormattingLocale())}
                 </span>
               </span>
             </div>
@@ -298,7 +299,7 @@ export default function PilotScoreboardAdminPage() {
             <span className="font-semibold text-sm">{t('pilot_scoreboard.sections.metrics')}</span>
             <span className="text-xs text-muted">
               {prePilot
-                ? t('pilot_scoreboard.sections.comparing_baseline', { date: new Date(prePilot.captured_at).toLocaleDateString() })
+                ? t('pilot_scoreboard.sections.comparing_baseline', { date: new Date(prePilot.captured_at).toLocaleDateString(getFormattingLocale()) })
                 : t('pilot_scoreboard.sections.no_baseline')}
             </span>
           </CardHeader>
@@ -380,7 +381,7 @@ export default function PilotScoreboardAdminPage() {
                 {baselines.map((b) => (
                   <TableRow key={b.id}>
                     <TableCell className="font-mono text-xs">{b.label}</TableCell>
-                    <TableCell>{new Date(b.captured_at).toLocaleString()}</TableCell>
+                    <TableCell>{new Date(b.captured_at).toLocaleString(getFormattingLocale())}</TableCell>
                     <TableCell className="text-xs">
                       {b.baseline_period.start} → {b.baseline_period.end}
                     </TableCell>

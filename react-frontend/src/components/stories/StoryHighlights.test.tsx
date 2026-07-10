@@ -156,6 +156,40 @@ describe('StoryHighlights', () => {
     });
   });
 
+  it('renders owner actions as sibling 44px targets with touch/focus discovery', async () => {
+    const { StoryHighlights } = await import('./StoryHighlights');
+    render(<StoryHighlights {...defaultProps} />);
+
+    await waitFor(() => expect(screen.getByText('Summer Memories')).toBeInTheDocument());
+
+    const viewButton = screen.getAllByRole('button').find((button) =>
+      button.getAttribute('aria-label')?.toLowerCase().includes('view'),
+    );
+    const editButton = screen.getAllByRole('button').find((button) =>
+      button.getAttribute('aria-label')?.toLowerCase().includes('edit'),
+    );
+    const deleteButton = screen.getAllByRole('button').find((button) =>
+      button.getAttribute('aria-label')?.toLowerCase().includes('delete'),
+    );
+
+    expect(viewButton).toBeDefined();
+    expect(editButton).toBeDefined();
+    expect(deleteButton).toBeDefined();
+    expect(viewButton).not.toContainElement(editButton!);
+    expect(viewButton).not.toContainElement(deleteButton!);
+
+    for (const action of [editButton!, deleteButton!]) {
+      expect(action).toHaveClass('size-11', 'min-h-11', 'min-w-11');
+      expect(action).toHaveClass(
+        'pointer-coarse:opacity-100',
+        'pointer-fine:opacity-0',
+        'pointer-fine:group-hover:opacity-100',
+        'group-focus-within:opacity-100',
+        'focus-visible:opacity-100',
+      );
+    }
+  });
+
   it('shows create button for owner', async () => {
     const { StoryHighlights } = await import('./StoryHighlights');
     render(<StoryHighlights {...defaultProps} />);

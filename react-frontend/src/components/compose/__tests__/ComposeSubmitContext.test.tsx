@@ -60,7 +60,7 @@ describe('ComposeSubmitContext', () => {
       isSubmitting: false,
       onSubmit: vi.fn(),
       buttonLabel: 'Post',
-      gradientClass: 'from-indigo-500 to-purple-600',
+      gradientClass: 'from-accent to-accent-gradient-end',
     };
 
     const { result } = renderHook(() => useComposeSubmit(), {
@@ -82,7 +82,7 @@ describe('ComposeSubmitContext', () => {
       isSubmitting: false,
       onSubmit: vi.fn(),
       buttonLabel: 'Post',
-      gradientClass: 'from-indigo-500 to-purple-600',
+      gradientClass: 'from-accent to-accent-gradient-end',
     };
 
     const { result } = renderHook(() => useComposeSubmit(), {

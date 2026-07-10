@@ -206,7 +206,22 @@
     "feed_empty_desc": "Soyez le premier à partager quelque chose avec ce groupe !",
     "feed_create_post": "Créer une publication",
     "feed_load_more": "Charger plus",
-    "member_actions_aria": "Actions sur le membre"
+    "member_actions_aria": "Actions sur le membre",
+    "meta_description_fallback_many": "Rejoignez {{name}} et connectez-vous avec {{count}} membres de la communauté via des publications, des événements et des discussions partagés.",
+    "meta_description_fallback_one": "Rejoignez {{name}} et connectez-vous avec {{count}} membres de la communauté via des publications, des événements et des discussions partagés.",
+    "meta_description_fallback_other": "Rejoignez {{name}} et connectez-vous avec {{count}} membres de la communauté via des publications, des événements et des discussions partagés.",
+    "members_count_many": "{{count}} membres",
+    "members_count_one": "{{count}} membres",
+    "members_count_other": "{{count}} membres",
+    "reply_count_many": "{{count}} réponses",
+    "reply_count_one": "{{count}} réponses",
+    "reply_count_other": "{{count}} réponses",
+    "tab_subgroups_count_many": "Sous-groupes ({{count}})",
+    "tab_subgroups_count_one": "Sous-groupes ({{count}})",
+    "tab_subgroups_count_other": "Sous-groupes ({{count}})",
+    "posts_count_many": "{{count}} publications",
+    "posts_count_one": "{{count}} publications",
+    "posts_count_other": "{{count}} publications"
   },
   "form": {
     "create_title": "Créer un nouveau groupe",
@@ -389,7 +404,10 @@
     "size_b": "o",
     "size_kb": "Ko",
     "size_mb": "Mo",
-    "size_gb": "Go"
+    "size_gb": "Go",
+    "folder_chip_many": "{{name}} ({{count}})",
+    "folder_chip_one": "{{name}} ({{count}})",
+    "folder_chip_other": "{{name}} ({{count}})"
   },
   "media": {
     "filter_all": "Tout",
@@ -450,7 +468,10 @@
     "secret_placeholder": "Secret de signature pour vérifier la charge utile",
     "cancel": "Annuler",
     "create_btn": "Créer le webhook",
-    "delete_confirm": "Supprimer ce webhook ? Cela ne peut pas être annulé."
+    "delete_confirm": "Supprimer ce webhook ? Cela ne peut pas être annulé.",
+    "failures_many": "{{count}} échecs",
+    "failures_one": "{{count}} échecs",
+    "failures_other": "{{count}} échecs"
   },
   "toast": {
     "left": "Vous avez quitté le groupe",
@@ -562,7 +583,13 @@
     "answer_posted_success": "Réponse postée !",
     "answer_posted_error": "Échec de la publication de la réponse",
     "vote_error": "Je n'ai pas réussi à voter",
-    "accept_error": "Échec de l'acceptation de la réponse"
+    "accept_error": "Échec de l'acceptation de la réponse",
+    "answer_count_aria_many": "{{count}} réponses",
+    "answer_count_aria_one": "{{count}} réponses",
+    "answer_count_aria_other": "{{count}} réponses",
+    "answers_heading_many": "{{count}} réponse(s)",
+    "answers_heading_one": "{{count}} réponse(s)",
+    "answers_heading_other": "{{count}} réponse(s)"
   },
   "wiki": {
     "load_failed": "Échec du chargement des pages wiki",
@@ -719,5 +746,14 @@
     "accent_color": "Couleur d accent",
     "hue": "Teinte",
     "preview": "Apercu"
-  }
+  },
+  "members_many": "{{count}} membres",
+  "members_one": "{{count}} membres",
+  "members_other": "{{count}} membres",
+  "members_count_label_many": "{{count}} membres",
+  "members_count_label_one": "{{count}} membres",
+  "members_count_label_other": "{{count}} membres",
+  "posts_count_label_many": "{{count}} publications",
+  "posts_count_label_one": "{{count}} publications",
+  "posts_count_label_other": "{{count}} publications"
 }

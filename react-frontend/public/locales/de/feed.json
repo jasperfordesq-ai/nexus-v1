@@ -251,7 +251,13 @@
     "listing_preview_alt": "Vorschau des Eintrags",
     "image_preview_alt": "Upload-Vorschau",
     "type_tabs_aria": "Inhaltstyp erstellen",
-    "compose_post": "Beitrag verfassen"
+    "compose_post": "Beitrag verfassen",
+    "media_rejected_one": "{{count}} Datei(en) übersprungen (falscher Typ oder zu gross)",
+    "media_rejected_other": "{{count}} Datei(en) übersprungen (falscher Typ oder zu gross)",
+    "media_compression_failed_one": "{{count}} Bild(er) konnten nicht verarbeitet werden",
+    "media_compression_failed_other": "{{count}} Bild(er) konnten nicht verarbeitet werden",
+    "group_members_one": "{{count}} Mitglieder",
+    "group_members_other": "{{count}} Mitglieder"
   },
   "moderation": {
     "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."
@@ -349,12 +355,16 @@
       "commitment_flexible": "Flexibel"
     },
     "volunteer": {
-      "credits_offered": "{{count}} Zeitgutschriften"
+      "credits_offered": "{{count}} Zeitgutschriften",
+      "credits_offered_one": "{{count}} Zeitgutschriften",
+      "credits_offered_other": "{{count}} Zeitgutschriften"
     },
     "challenge": {
       "closing_soon": "Endet bald",
       "closes_on": "Endet am {{date}}",
-      "ideas_count": "{{count}} Ideen"
+      "ideas_count": "{{count}} Ideen",
+      "ideas_count_one": "{{count}} Ideen",
+      "ideas_count_other": "{{count}} Ideen"
     },
     "review": {
       "rating_aria": "{{rating}} von 5 Sternen"
@@ -399,7 +409,9 @@
     "no_posts": "Keine Beiträge gefunden",
     "no_posts_desc": "Es wurden noch keine Beiträge mit #{{tag}} markiert.",
     "load_more": "Mehr laden",
-    "page_description": "Beiträge mit #{{tag}}"
+    "page_description": "Beiträge mit #{{tag}}",
+    "post_count_one": "{{count}} Beiträge",
+    "post_count_other": "{{count}} Beiträge"
   },
   "hashtags": {
     "title": "Trend-Hashtags",
@@ -412,7 +424,9 @@
     "no_hashtags": "Keine Hashtags gefunden",
     "no_match": "Keine Hashtags passend zu \"{{query}}\"",
     "no_trending": "Noch keine Trend-Hashtags in Ihrer Gemeinschaft.",
-    "post_count": "{{count}} Beiträge"
+    "post_count": "{{count}} Beiträge",
+    "post_count_one": "{{count}} Beiträge",
+    "post_count_other": "{{count}} Beiträge"
   },
   "share": {
     "tooltip_remove": "Teilen rückgängig machen",
@@ -452,7 +466,9 @@
     "dm_sent_label": "Gesendet",
     "dm_send": "Senden",
     "dm_done": "Fertig",
-    "email": "E-Mail"
+    "email": "E-Mail",
+    "button_label_count_one": "Teilen ({{count}})",
+    "button_label_count_other": "Teilen ({{count}})"
   },
   "video": {
     "select": "Video hinzufügen",
@@ -474,7 +490,11 @@
     "title": "Im Trend",
     "view_all": "Alle Hashtags anzeigen",
     "post_count_one": "{{count}} Beitrag",
-    "post_count_other": "{{count}} Beiträge"
+    "post_count_other": "{{count}} Beiträge",
+    "post_count_one_one": "{{count}} Beitrag",
+    "post_count_one_other": "{{count}} Beitrag",
+    "post_count_other_one": "{{count}} Beiträge",
+    "post_count_other_other": "{{count}} Beiträge"
   },
   "sidebar": {
     "profile": {
@@ -520,7 +540,9 @@
     "groups": {
       "title": "Beliebte Gruppen",
       "see_all": "Alle anzeigen",
-      "members": "{{count}} Mitglieder"
+      "members": "{{count}} Mitglieder",
+      "members_one": "{{count}} Mitglieder",
+      "members_other": "{{count}} Mitglieder"
     },
     "actions": {
       "title": "Schnellaktionen",
@@ -573,7 +595,10 @@
     "go_to_image": "Zu Bild {{number}} gehen",
     "more_images": "{{count}} weitere Bilder",
     "video_of": "Video {{current}} von {{total}}",
-    "role_description": "Karussell"
+    "role_description": "Karussell",
+    "more_images_one": "{{count}} weitere Bilder",
+    "more_images_other": "{{count}} weitere Bilder",
+    "view_video": "Sehen Sie sich das Video {{current}} von {{total}} an"
   },
   "lightbox": {
     "aria_label": "Bildansicht",
@@ -618,7 +643,9 @@
     "connect_failed": "Anfrage konnte nicht gesendet werden",
     "pending": "Ausstehend",
     "dismiss": "Ablehnen",
-    "load_failed": "Vorschläge konnten nicht geladen werden"
+    "load_failed": "Vorschläge konnten nicht geladen werden",
+    "mutual_one": "{{count}} gemeinsame Kontakte",
+    "mutual_other": "{{count}} gemeinsame Kontakte"
   },
   "analytics": {
     "title": "Beitragsanalyse",
@@ -647,5 +674,7 @@
   },
   "aria": {
     "feed_sidebar": "Community-Vorschläge und Highlights"
-  }
+  },
+  "items_loaded_one": "{{count}} Beiträge",
+  "items_loaded_other": "{{count}} Beiträge"
 }

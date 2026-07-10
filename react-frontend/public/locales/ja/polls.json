@@ -100,5 +100,6 @@
   "page_meta": {
     "title": "投票"
   },
-  "category_filter_label": "カテゴリでフィルタリングする"
+  "category_filter_label": "カテゴリでフィルタリングする",
+  "total_ballots_other": "総投票数: {{count}}"
 }

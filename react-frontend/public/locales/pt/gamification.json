@@ -23,7 +23,13 @@
       "months_active": "{{count}} de 12 meses",
       "month_active_tooltip": "Ativo: atividades {{count}}",
       "month_inactive_tooltip": "Inativo",
-      "description": "Meses em que completou pelo menos uma atividade significativa (troca, anúncio, avaliação ou horas de voluntariado)."
+      "description": "Meses em que completou pelo menos uma atividade significativa (troca, anúncio, avaliação ou horas de voluntariado).",
+      "months_active_many": "{{count}} de 12 meses",
+      "months_active_one": "{{count}} de 12 meses",
+      "months_active_other": "{{count}} de 12 meses",
+      "month_active_tooltip_many": "Ativo: atividades {{count}}",
+      "month_active_tooltip_one": "Ativo: atividades {{count}}",
+      "month_active_tooltip_other": "Ativo: atividades {{count}}"
     },
     "badge_type": {
       "vol": "Voluntariado",
@@ -77,7 +83,10 @@
       "claimed_message": "Ganhou {{xp}} XP!",
       "claim_failed": "Falha ao Reclamar",
       "claim_failed_desc": "Não foi possível reclamar a recompensa diária.",
-      "claim_error": "Algo correu mal. Tente novamente."
+      "claim_error": "Algo correu mal. Tente novamente.",
+      "day_streak_many": "{{count}} dias consecutivos",
+      "day_streak_one": "{{count}} dias consecutivos",
+      "day_streak_other": "{{count}} dias consecutivos"
     },
     "challenges": {
       "active_challenges": "Desafios Ativos",
@@ -121,7 +130,10 @@
       "purchase_failed_desc": "Não foi possível concluir a compra.",
       "purchase_error": "Algo correu mal.",
       "load_failed": "Falha ao Carregar",
-      "load_failed_desc": "Não foi possível carregar a loja XP."
+      "load_failed_desc": "Não foi possível carregar a loja XP.",
+      "stock_left_many": "{{count}} restante(s) em stock",
+      "stock_left_one": "{{count}} restante(s) em stock",
+      "stock_left_other": "{{count}} restante(s) em stock"
     },
     "loading": "A carregar conquistas",
     "badge_detail": {
@@ -159,7 +171,10 @@
       "updated_desc": "A sua montra de insígnias foi guardada.",
       "save_failed": "Falha ao Guardar",
       "save_failed_desc": "Não foi possível atualizar a montra.",
-      "save_error": "Algo correu mal."
+      "save_error": "Algo correu mal.",
+      "select_badges_many": "Selecione até 5 insígnias para mostrar no seu perfil. ({{count}}/5 selecionadas)",
+      "select_badges_one": "Selecione até 5 insígnias para mostrar no seu perfil. ({{count}}/5 selecionadas)",
+      "select_badges_other": "Selecione até 5 insígnias para mostrar no seu perfil. ({{count}}/5 selecionadas)"
     },
     "load_error": "Falha ao carregar as conquistas. Tente novamente."
   },
@@ -266,7 +281,10 @@
       "buddy_failed": "Falha ao tornar-se parceiro",
       "buddy_action_sent": "Suporte amigo enviado",
       "buddy_action_failed": "Falha ao enviar suporte de amigo"
-    }
+    },
+    "streak_label_many": "{{count}} sequência de check-in",
+    "streak_label_one": "{{count}} sequência de check-in",
+    "streak_label_other": "{{count}} sequência de check-in"
   },
   "frequency": {
     "none": "Sem cadência",
@@ -328,7 +346,10 @@
       "rank_label": "Classificação {{rank}}",
       "xp_reward": "{{xp}}XP",
       "load_failed": "Falha ao Carregar",
-      "load_failed_desc": "Não foi possível carregar o histórico de temporadas."
+      "load_failed_desc": "Não foi possível carregar o histórico de temporadas.",
+      "participants_many": "{{count}} participantes",
+      "participants_one": "{{count}} participantes",
+      "participants_other": "{{count}} participantes"
     },
     "score_unit": {
       "hours": "h",
@@ -421,7 +442,13 @@
       "legendary": "Lendário"
     },
     "max_score_label": "/{{max}}",
-    "loading": "Carregando seu NexusScore..."
+    "loading": "Carregando seu NexusScore...",
+    "points_to_next_many": "{{count}} points to {{tier}}",
+    "points_to_next_one": "{{count}} aponta para {{tier}}",
+    "points_to_next_other": "{{count}} aponta para {{tier}}",
+    "remaining_count_many": "{{count}} restante",
+    "remaining_count_one": "{{count}} restante",
+    "remaining_count_other": "{{count}} restante"
   },
   "common": {
     "refresh": "Atualizar",

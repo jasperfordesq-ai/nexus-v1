@@ -3,12 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import i18n from 'i18next';
 import { render, screen, fireEvent } from '@/test/test-utils';
 import {
   Drawer,
   DrawerContent,
   DrawerHeader,
+  DrawerHeading,
   DrawerBody,
   DrawerFooter,
 } from './Drawer';
@@ -24,7 +26,7 @@ describe('Drawer — open/closed gate', () => {
   it('renders children when isOpen=true', () => {
     render(
       <Drawer isOpen>
-        <DrawerContent>
+        <DrawerContent aria-label="Open drawer example">
           <DrawerBody><p>drawer body</p></DrawerBody>
         </DrawerContent>
       </Drawer>
@@ -35,7 +37,7 @@ describe('Drawer — open/closed gate', () => {
   it('does not render drawer dialog when isOpen=false', () => {
     render(
       <Drawer isOpen={false}>
-        <DrawerContent>
+        <DrawerContent aria-label="Drawer title example">
           <DrawerBody><p>hidden content</p></DrawerBody>
         </DrawerContent>
       </Drawer>
@@ -49,18 +51,20 @@ describe('Drawer — compound sections', () => {
     render(
       <Drawer isOpen>
         <DrawerContent>
-          <DrawerHeader><h2>Drawer Title</h2></DrawerHeader>
+          <DrawerHeader><DrawerHeading>Drawer Title</DrawerHeading></DrawerHeader>
           <DrawerBody><p>body</p></DrawerBody>
         </DrawerContent>
       </Drawer>
     );
-    expect(screen.getByText('Drawer Title')).toBeInTheDocument();
+    const dialog = screen.getByRole('dialog', { name: 'Drawer Title' });
+    expect(dialog.querySelector('[data-slot="drawer-header"]')).not.toBeNull();
+    expect(dialog.querySelector('[data-slot="drawer-heading"]')).toHaveTextContent('Drawer Title');
   });
 
   it('renders DrawerBody children', () => {
     render(
       <Drawer isOpen>
-        <DrawerContent>
+        <DrawerContent aria-label="Drawer footer example">
           <DrawerBody><span>Body content</span></DrawerBody>
         </DrawerContent>
       </Drawer>
@@ -71,7 +75,7 @@ describe('Drawer — compound sections', () => {
   it('renders DrawerFooter children', () => {
     render(
       <Drawer isOpen>
-        <DrawerContent>
+        <DrawerContent aria-label="Render property drawer example">
           <DrawerBody><p>body</p></DrawerBody>
           <DrawerFooter><button>Confirm action</button></DrawerFooter>
         </DrawerContent>
@@ -87,7 +91,7 @@ describe('Drawer — render prop children', () => {
     const onClose = vi.fn();
     render(
       <Drawer isOpen onClose={onClose} onOpenChange={(open) => { if (!open) onClose(); }}>
-        <DrawerContent>
+        <DrawerContent aria-label="Render property drawer example">
           {(close) => (
             <DrawerBody>
               <button onClick={close}>Close via prop</button>
@@ -116,5 +120,38 @@ describe('Drawer — onClose / onOpenChange', () => {
     // HeroUI renders a CloseTrigger button inside the dialog
     const allButtons = screen.queryAllByRole('button');
     expect(allButtons.length).toBeGreaterThan(0);
+  });
+});
+
+describe('Drawer — localized close trigger', () => {
+  afterEach(async () => {
+    await i18n.changeLanguage('en');
+  });
+
+  it('uses the active locale for the built-in close trigger label', async () => {
+    i18n.addResource('fr', 'common', 'accessibility.close', 'Fermer');
+    await i18n.changeLanguage('fr');
+
+    render(
+      <Drawer isOpen>
+        <DrawerContent aria-label="Exemple de tiroir">
+          <DrawerBody><p>Contenu</p></DrawerBody>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Fermer' })).toBeInTheDocument();
+  });
+
+  it('allows a translated context-specific close label override', () => {
+    render(
+      <Drawer isOpen closeLabel="Close notifications">
+        <DrawerContent aria-label="Notifications">
+          <DrawerBody><p>Notification list</p></DrawerBody>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Close notifications' })).toBeInTheDocument();
   });
 });

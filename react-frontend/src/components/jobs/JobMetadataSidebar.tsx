@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Separator } from '@/components/ui/Separator';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -107,10 +108,10 @@ export function JobMetadataSidebar({
             {t('benchmark.market_rate', {
               role: benchmark.role_keyword,
               currency: benchmark.currency,
-              min: (benchmark.salary_min ?? 0).toLocaleString(),
-              max: (benchmark.salary_max ?? 0).toLocaleString(),
+              min: (benchmark.salary_min ?? 0).toLocaleString(getFormattingLocale()),
+              max: (benchmark.salary_max ?? 0).toLocaleString(getFormattingLocale()),
               type: benchmark.salary_type,
-              median: (benchmark.salary_median ?? 0).toLocaleString(),
+              median: (benchmark.salary_median ?? 0).toLocaleString(getFormattingLocale()),
 
             })}
           </p>

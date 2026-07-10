@@ -37,5 +37,7 @@
   "page_meta": {
     "title": "Verbindungen"
   },
-  "loading": "Verbindungen werden geladen..."
+  "loading": "Verbindungen werden geladen...",
+  "pending_count_one": "{{count}} ausstehend",
+  "pending_count_other": "{{count}} ausstehend"
 }

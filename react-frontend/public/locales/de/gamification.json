@@ -23,7 +23,11 @@
       "months_active": "{{count}} von 12 Monaten",
       "month_active_tooltip": "Aktiv: {{count}}-Aktivitäten",
       "month_inactive_tooltip": "Inaktiv",
-      "description": "Monate, in denen Sie mindestens eine sinnvolle Aktivität durchgeführt haben (Austausch, Inserat, Bewertung oder Freiwilligenstunden)."
+      "description": "Monate, in denen Sie mindestens eine sinnvolle Aktivität durchgeführt haben (Austausch, Inserat, Bewertung oder Freiwilligenstunden).",
+      "months_active_one": "{{count}} von 12 Monaten",
+      "months_active_other": "{{count}} von 12 Monaten",
+      "month_active_tooltip_one": "Aktiv: {{count}}-Aktivitäten",
+      "month_active_tooltip_other": "Aktiv: {{count}}-Aktivitäten"
     },
     "badge_type": {
       "vol": "Freiwilligenarbeit",
@@ -77,7 +81,9 @@
       "claimed_message": "Sie haben {{xp}} XP verdient!",
       "claim_failed": "Abholen fehlgeschlagen",
       "claim_failed_desc": "Tägliche Belohnung konnte nicht abgeholt werden.",
-      "claim_error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+      "claim_error": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+      "day_streak_one": "{{count}} Tage in Folge",
+      "day_streak_other": "{{count}} Tage in Folge"
     },
     "challenges": {
       "active_challenges": "Aktive Herausforderungen",
@@ -121,7 +127,9 @@
       "purchase_failed_desc": "Der Kauf konnte nicht abgeschlossen werden.",
       "purchase_error": "Etwas ist schiefgelaufen.",
       "load_failed": "Laden fehlgeschlagen",
-      "load_failed_desc": "Der XP-Shop konnte nicht geladen werden."
+      "load_failed_desc": "Der XP-Shop konnte nicht geladen werden.",
+      "stock_left_one": "{{count}} auf Lager",
+      "stock_left_other": "{{count}} auf Lager"
     },
     "loading": "Errungenschaften werden geladen",
     "badge_detail": {
@@ -159,7 +167,9 @@
       "updated_desc": "Ihre Abzeichen-Vitrine wurde gespeichert.",
       "save_failed": "Speichern fehlgeschlagen",
       "save_failed_desc": "Die Vitrine konnte nicht aktualisiert werden.",
-      "save_error": "Etwas ist schiefgelaufen."
+      "save_error": "Etwas ist schiefgelaufen.",
+      "select_badges_one": "Wählen Sie bis zu 5 Abzeichen für Ihr Profil aus. ({{count}}/5 ausgewählt)",
+      "select_badges_other": "Wählen Sie bis zu 5 Abzeichen für Ihr Profil aus. ({{count}}/5 ausgewählt)"
     },
     "load_error": "Erfolge konnten nicht geladen werden. Bitte versuchen Sie es erneut."
   },
@@ -266,7 +276,9 @@
       "buddy_failed": "Begleiter werden fehlgeschlagen",
       "buddy_action_sent": "Buddy-Support gesendet",
       "buddy_action_failed": "Buddy-Support konnte nicht gesendet werden"
-    }
+    },
+    "streak_label_one": "{{count}} Check-in-Strecke",
+    "streak_label_other": "{{count}} Check-in-Strecke"
   },
   "frequency": {
     "none": "Keine Trittfrequenz",
@@ -328,7 +340,9 @@
       "rank_label": "Rang {{rank}}",
       "xp_reward": "{{xp}} XP",
       "load_failed": "Laden fehlgeschlagen",
-      "load_failed_desc": "Saisonverlauf konnte nicht geladen werden."
+      "load_failed_desc": "Saisonverlauf konnte nicht geladen werden.",
+      "participants_one": "{{count}} Teilnehmende",
+      "participants_other": "{{count}} Teilnehmende"
     },
     "score_unit": {
       "hours": "H",
@@ -421,7 +435,11 @@
       "legendary": "Legendär"
     },
     "max_score_label": "/ {{max}}",
-    "loading": "Ihr NexusScore wird geladen..."
+    "loading": "Ihr NexusScore wird geladen...",
+    "points_to_next_one": "{{count}} zeigt auf {{tier}}",
+    "points_to_next_other": "{{count}} zeigt auf {{tier}}",
+    "remaining_count_one": "{{count}} übrig",
+    "remaining_count_other": "{{count}} übrig"
   },
   "common": {
     "refresh": "Aktualisieren",

@@ -90,7 +90,8 @@
     "members_count": "{{count}} メンバー",
     "empty": "まだグループに参加していません",
     "empty_description": "グループは共通の興味、プロジェクト、地域のサークルをフォローするのに役立ちます。",
-    "discover": "グループを見つける"
+    "discover": "グループを見つける",
+    "members_count_other": "{{count}} メンバー"
   },
   "events": {
     "online_event": "オンラインイベント",
@@ -106,7 +107,8 @@
     "xp_progress": "XPの進捗",
     "start_earning": "コミュニティに参加してXPを獲得し始めましょう！",
     "streak_days_one": "{{count}} 日",
-    "streak_days_other": "{{count}} 日間"
+    "streak_days_other": "{{count}} 日間",
+    "xp_value_other": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "リストを読み込み中",
@@ -150,5 +152,7 @@
       "active": "進行中"
     },
     "view_all": "すべての交換を表示"
-  }
+  },
+  "likes_count_other": "{{count}} が「いいね！」",
+  "comments_count_other": "{{count}} コメント"
 }

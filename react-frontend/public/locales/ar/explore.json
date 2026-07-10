@@ -23,14 +23,26 @@
     "title": "الفعاليات القادمة",
     "subtitle": "انضم إلى مجتمعك",
     "online": "عبر الإنترنت",
-    "attending": "{{count}} يحضر"
+    "attending": "{{count}} يحضر",
+    "attending_few": "{{count}} يحضر",
+    "attending_many": "{{count}} يحضر",
+    "attending_one": "{{count}} يحضر",
+    "attending_other": "{{count}} يحضر",
+    "attending_two": "{{count}} يحضر",
+    "attending_zero": "{{count}} يحضر"
   },
   "active_groups": {
     "title": "المجموعات النشطة",
     "subtitle": "تواصل مع أعضاء ذوي اهتمامات مشابهة",
     "members": "{{count}} أعضاء",
     "view_group": "عرض المجموعة",
-    "view_group_named": "View group: {{name}}"
+    "view_group_named": "View group: {{name}}",
+    "members_few": "{{count}} أعضاء",
+    "members_many": "{{count}} أعضاء",
+    "members_one": "{{count}} أعضاء",
+    "members_other": "{{count}} أعضاء",
+    "members_two": "{{count}} أعضاء",
+    "members_zero": "{{count}} أعضاء"
   },
   "top_contributors": {
     "title": "أفضل المساهمين",
@@ -56,12 +68,30 @@
     "subtitle": "شارك أفكارك واصنع تأثيرًا",
     "ideas_count": "{{count}} أفكار",
     "ends": "ينتهي {{date}}",
-    "progress": "تقدم التحدي"
+    "progress": "تقدم التحدي",
+    "ideas_count_few": "{{count}} أفكار",
+    "ideas_count_many": "{{count}} أفكار",
+    "ideas_count_one": "{{count}} أفكار",
+    "ideas_count_other": "{{count}} أفكار",
+    "ideas_count_two": "{{count}} أفكار",
+    "ideas_count_zero": "{{count}} أفكار"
   },
   "time_ago": {
     "just_now": "الآن",
     "hours_ago": "{{count}} ساعة مضت",
-    "days_ago": "{{count}} يوم مضى"
+    "days_ago": "{{count}} يوم مضى",
+    "hours_ago_few": "{{count}} ساعة مضت",
+    "hours_ago_many": "{{count}} ساعة مضت",
+    "hours_ago_one": "{{count}} ساعة مضت",
+    "hours_ago_other": "{{count}} ساعة مضت",
+    "hours_ago_two": "{{count}} ساعة مضت",
+    "hours_ago_zero": "{{count}} ساعة مضت",
+    "days_ago_few": "{{count}} يوم مضى",
+    "days_ago_many": "{{count}} يوم مضى",
+    "days_ago_one": "{{count}} يوم مضى",
+    "days_ago_other": "{{count}} يوم مضى",
+    "days_ago_two": "{{count}} يوم مضى",
+    "days_ago_zero": "{{count}} يوم مضى"
   },
   "error_loading": "لم نتمكن من تحميل صفحة الاكتشاف. قد تكون هذه مشكلة مؤقتة.",
   "retry": "إعادة المحاولة",
@@ -82,18 +112,42 @@
     "title": "من المدونة",
     "subtitle": "أحدث القصص من مجتمعك",
     "read_time": "{{count}} دقيقة قراءة",
-    "views": "{{count}} مشاهدات"
+    "views": "{{count}} مشاهدات",
+    "read_time_few": "{{count}} دقيقة قراءة",
+    "read_time_many": "{{count}} دقيقة قراءة",
+    "read_time_one": "{{count}} دقيقة قراءة",
+    "read_time_other": "{{count}} دقيقة قراءة",
+    "read_time_two": "{{count}} دقيقة قراءة",
+    "read_time_zero": "{{count}} دقيقة قراءة",
+    "views_few": "{{count}} مشاهدات",
+    "views_many": "{{count}} مشاهدات",
+    "views_one": "{{count}} مشاهدات",
+    "views_other": "{{count}} مشاهدات",
+    "views_two": "{{count}} مشاهدات",
+    "views_zero": "{{count}} مشاهدات"
   },
   "volunteering": {
     "title": "فرص التطوع",
     "subtitle": "أحدث فرقًا في مجتمعك",
     "applications": "{{count}} تقدم",
-    "view_opportunity": "عرض الفرصة"
+    "view_opportunity": "عرض الفرصة",
+    "applications_few": "{{count}} تقدم",
+    "applications_many": "{{count}} تقدم",
+    "applications_one": "{{count}} تقدم",
+    "applications_other": "{{count}} تقدم",
+    "applications_two": "{{count}} تقدم",
+    "applications_zero": "{{count}} تقدم"
   },
   "organisations": {
     "title": "المنظمات",
     "subtitle": "شركاء المجتمع الذين يحدثون تأثيرًا",
-    "opportunities": "{{count}} فرص"
+    "opportunities": "{{count}} فرص",
+    "opportunities_few": "{{count}} فرص",
+    "opportunities_many": "{{count}} فرص",
+    "opportunities_one": "{{count}} فرص",
+    "opportunities_other": "{{count}} فرص",
+    "opportunities_two": "{{count}} فرص",
+    "opportunities_zero": "{{count}} فرص"
   },
   "polls": {
     "title": "استطلاعات نشطة",
@@ -102,19 +156,43 @@
     "options": "{{count}} خيارات",
     "vote_now": "صوت الآن",
     "vote_now_for": "التصويت الآن على: {{question}}",
-    "closes": "يغلق {{date}}"
+    "closes": "يغلق {{date}}",
+    "options_few": "{{count}} خيارات",
+    "options_many": "{{count}} خيارات",
+    "options_one": "{{count}} خيارات",
+    "options_other": "{{count}} خيارات",
+    "options_two": "{{count}} خيارات",
+    "options_zero": "{{count}} خيارات",
+    "votes_few": "{{count}} أصوات",
+    "votes_many": "{{count}} أصوات",
+    "votes_one": "{{count}} أصوات",
+    "votes_other": "{{count}} أصوات",
+    "votes_two": "{{count}} أصوات",
+    "votes_zero": "{{count}} أصوات"
   },
   "in_demand_skills": {
     "title": "المهارات المطلوبة",
     "subtitle": "أكثر المهارات طلبًا في مجتمعك",
     "requested": "{{count}} يطلب",
     "offered": "{{count}} يقدم",
-    "you_can_help": "يمكنك المساعدة!"
+    "you_can_help": "يمكنك المساعدة!",
+    "requested_few": "{{count}} يطلب",
+    "requested_many": "{{count}} يطلب",
+    "requested_one": "{{count}} يطلب",
+    "requested_other": "{{count}} يطلب",
+    "requested_two": "{{count}} يطلب",
+    "requested_zero": "{{count}} يطلب"
   },
   "resources": {
     "title": "الموارد المميزة",
     "subtitle": "أدلة ومواد لمجتمعك",
-    "views": "{{count}} مشاهدات"
+    "views": "{{count}} مشاهدات",
+    "views_few": "{{count}} مشاهدات",
+    "views_many": "{{count}} مشاهدات",
+    "views_one": "{{count}} مشاهدات",
+    "views_other": "{{count}} مشاهدات",
+    "views_two": "{{count}} مشاهدات",
+    "views_zero": "{{count}} مشاهدات"
   },
   "jobs": {
     "title": "فرص العمل",

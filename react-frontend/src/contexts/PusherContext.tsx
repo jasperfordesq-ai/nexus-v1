@@ -21,6 +21,7 @@ import type { Channel } from 'pusher-js';
 import { useAuth } from './AuthContext';
 import { api, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import type { Notification } from '@/types';
 
 interface PusherConfig {
   key: string;
@@ -32,6 +33,8 @@ interface PusherConfig {
 interface PusherContextValue {
   /** Whether Pusher is connected */
   isConnected: boolean;
+  /** Whether the authenticated user's private channel is subscribed and healthy. */
+  isNotificationChannelReady: boolean;
   /** Raw Pusher client for subscribing to arbitrary channels */
   client: Pusher | null;
   /** Current tenant ID (needed for channel names) */
@@ -42,6 +45,12 @@ interface PusherContextValue {
   unsubscribeFromConversation: (otherUserId: number) => void;
   /** Register a callback for new messages */
   onNewMessage: (callback: (message: NewMessageEvent) => void) => () => void;
+  /** Register a callback for messages received on the authenticated user's channel. */
+  onUserMessage: (callback: (message: NewMessageEvent) => void) => () => void;
+  /** Register a callback for notifications received on the authenticated user's channel. */
+  onNotification: (callback: (notification: Notification) => void) => () => void;
+  /** Register a callback for transactions received on the authenticated user's channel. */
+  onTransaction: (callback: (event: TransactionEvent) => void) => () => void;
   /** Register a callback for typing indicators */
   onTyping: (callback: (event: TypingEvent) => void) => () => void;
   /** Register a callback for unread count updates */
@@ -63,6 +72,13 @@ export interface NewMessageEvent {
   from_user_id?: number;
   /** Some event payloads include a preview field instead of body */
   preview?: string;
+  /** Some event payloads use message instead of body. */
+  message?: string;
+}
+
+export interface TransactionEvent {
+  type: string;
+  amount: number;
 }
 
 export interface TypingEvent {
@@ -101,6 +117,7 @@ interface PusherProviderProps {
 export function PusherProvider({ children }: PusherProviderProps) {
   const { user, isAuthenticated } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
+  const [isNotificationChannelReady, setIsNotificationChannelReady] = useState(false);
   const [config, setConfig] = useState<PusherConfig | null>(null);
 
   const pusherRef = useRef<Pusher | null>(null);
@@ -109,21 +126,30 @@ export function PusherProvider({ children }: PusherProviderProps) {
 
   // Event listeners
   const messageListenersRef = useRef<Set<(message: NewMessageEvent) => void>>(new Set());
+  const userMessageListenersRef = useRef<Set<(message: NewMessageEvent) => void>>(new Set());
+  const notificationListenersRef = useRef<Set<(notification: Notification) => void>>(new Set());
+  const transactionListenersRef = useRef<Set<(event: TransactionEvent) => void>>(new Set());
   const typingListenersRef = useRef<Set<(event: TypingEvent) => void>>(new Set());
   const unreadListenersRef = useRef<Set<(event: UnreadCountEvent) => void>>(new Set());
   const feedPostListenersRef = useRef<Set<(event: FeedPostEvent) => void>>(new Set());
+  const seenNotificationIdsRef = useRef<Set<number>>(new Set());
 
   // Tenant feed channel ref (unsubscribed on cleanup alongside user channel)
   const feedChannelRef = useRef<Channel | null>(null);
 
   // Load Pusher config from API (only when authenticated)
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      setConfig(null);
+      return;
+    }
+
+    let didCancel = false;
 
     async function loadConfig() {
       try {
         const response = await api.get<PusherConfig>('/v2/realtime/config');
-        if (response.success && response.data?.enabled) {
+        if (!didCancel && response.success && response.data?.enabled) {
           setConfig(response.data);
         }
       } catch (error) {
@@ -132,7 +158,10 @@ export function PusherProvider({ children }: PusherProviderProps) {
       }
     }
 
-    loadConfig();
+    void loadConfig();
+    return () => {
+      didCancel = true;
+    };
   }, [isAuthenticated]);
 
   // Initialize Pusher when authenticated and config is available
@@ -148,6 +177,7 @@ export function PusherProvider({ children }: PusherProviderProps) {
     let didCancel = false;
     let reconnectAttempts = 0;
     const reconnectTimeouts: ReturnType<typeof setTimeout>[] = [];
+    const seenNotificationIds = seenNotificationIdsRef.current;
 
     void import('pusher-js')
       .then(({ default: PusherClient }) => {
@@ -207,11 +237,13 @@ export function PusherProvider({ children }: PusherProviderProps) {
 
     pusher.connection.bind('disconnected', () => {
       setIsConnected(false);
+      setIsNotificationChannelReady(false);
     });
 
     pusher.connection.bind('error', (err: unknown) => {
       logError('Pusher connection error', err);
       setIsConnected(false);
+      setIsNotificationChannelReady(false);
 
       // Exponential backoff: 2s, 4s, 8s, 16s, 32s, max 60s
       const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 60000);
@@ -243,12 +275,42 @@ export function PusherProvider({ children }: PusherProviderProps) {
     }
     const userChannel = pusher.subscribe(`private-tenant.${tenantId}.user.${user.id}`);
 
+    userChannel.bind('pusher:subscription_succeeded', () => {
+      setIsNotificationChannelReady(true);
+    });
+
+    userChannel.bind('pusher:subscription_error', (error: unknown) => {
+      logError('Pusher user channel subscription error', error);
+      setIsNotificationChannelReady(false);
+    });
+
     userChannel.bind('new-message', (data: NewMessageEvent) => {
       messageListenersRef.current.forEach((listener) => listener(data));
+      userMessageListenersRef.current.forEach((listener) => listener(data));
     });
 
     userChannel.bind('unread-count', (data: UnreadCountEvent) => {
       unreadListenersRef.current.forEach((listener) => listener(data));
+    });
+
+    const emitNotification = (data: Notification) => {
+      // The backend has used several event aliases over time. If more than one
+      // alias is emitted for the same notification, dispatch it only once.
+      if (seenNotificationIds.has(data.id)) return;
+      seenNotificationIds.add(data.id);
+      if (seenNotificationIds.size > 500) {
+        const oldestId = seenNotificationIds.values().next().value;
+        if (oldestId !== undefined) seenNotificationIds.delete(oldestId);
+      }
+      notificationListenersRef.current.forEach((listener) => listener(data));
+    };
+
+    userChannel.bind('notification', emitNotification);
+    userChannel.bind('notification.created', emitNotification);
+    userChannel.bind('new-notification', emitNotification);
+
+    userChannel.bind('transaction', (data: TransactionEvent) => {
+      transactionListenersRef.current.forEach((listener) => listener(data));
     });
 
     userChannelRef.current = userChannel;
@@ -292,7 +354,9 @@ export function PusherProvider({ children }: PusherProviderProps) {
       userChannelRef.current = null;
       feedChannelRef.current = null;
       currentConversationChannels.clear();
+      seenNotificationIds.clear();
       setIsConnected(false);
+      setIsNotificationChannelReady(false);
       try { delete (window as NexusWindow).__nexus_disconnectPusher; } catch { /* non-blocking */ }
     };
   }, [isAuthenticated, user?.id, config, user?.tenant_id]);
@@ -369,6 +433,30 @@ export function PusherProvider({ children }: PusherProviderProps) {
     };
   }, []);
 
+  /** Register for messages delivered specifically on the user's private channel. */
+  const onUserMessage = useCallback((callback: (message: NewMessageEvent) => void) => {
+    userMessageListenersRef.current.add(callback);
+    return () => {
+      userMessageListenersRef.current.delete(callback);
+    };
+  }, []);
+
+  /** Register for notification events delivered on the user's private channel. */
+  const onNotification = useCallback((callback: (notification: Notification) => void) => {
+    notificationListenersRef.current.add(callback);
+    return () => {
+      notificationListenersRef.current.delete(callback);
+    };
+  }, []);
+
+  /** Register for transaction events delivered on the user's private channel. */
+  const onTransaction = useCallback((callback: (event: TransactionEvent) => void) => {
+    transactionListenersRef.current.add(callback);
+    return () => {
+      transactionListenersRef.current.delete(callback);
+    };
+  }, []);
+
   /**
    * Register a callback for typing indicators
    * Returns an unsubscribe function
@@ -421,17 +509,21 @@ export function PusherProvider({ children }: PusherProviderProps) {
   const value = useMemo<PusherContextValue>(
     () => ({
       isConnected,
+      isNotificationChannelReady,
       client: pusherRef.current,
       tenantId: tenantIdValue,
       subscribeToConversation,
       unsubscribeFromConversation,
       onNewMessage,
+      onUserMessage,
+      onNotification,
+      onTransaction,
       onTyping,
       onUnreadCount,
       onFeedPost,
       sendTyping,
     }),
-    [isConnected, tenantIdValue, subscribeToConversation, unsubscribeFromConversation, onNewMessage, onTyping, onUnreadCount, onFeedPost, sendTyping]
+    [isConnected, isNotificationChannelReady, tenantIdValue, subscribeToConversation, unsubscribeFromConversation, onNewMessage, onUserMessage, onNotification, onTransaction, onTyping, onUnreadCount, onFeedPost, sendTyping]
   );
 
   return (

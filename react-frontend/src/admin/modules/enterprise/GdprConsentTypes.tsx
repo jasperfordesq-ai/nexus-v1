@@ -1,4 +1,5 @@
-import { CardBody, Card, Select, SelectItem, Progress, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
+import { getFormattingLocale } from '@/lib/helpers';
+import { CardBody, Card, Select, SelectItem, Progress, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter, Switch } from '@/components/ui';
 // Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -223,7 +224,7 @@ export function GdprConsentTypes() {
       key: 'given_at',
       label: t('enterprise.gdpr_col_date'),
       sortable: true,
-      render: (u) => u.given_at ? new Date(u.given_at).toLocaleDateString() : '---',
+      render: (u) => u.given_at ? new Date(u.given_at).toLocaleDateString(getFormattingLocale()) : '---',
     },
     {
       key: 'ip_address',
@@ -303,7 +304,13 @@ export function GdprConsentTypes() {
                 <div>
                   <div className="flex justify-between text-xs text-muted mb-1">
                     <span>{t('enterprise.gdpr_consent_rate')}</span>
-                    <span>{consentRate.toFixed(1)}% ({ct.granted_count}/{totalResponses})</span>
+                    <span>
+                      {t('enterprise.gdpr_consent_rate_summary', {
+                        granted: ct.granted_count,
+                        percentage: consentRate.toFixed(1),
+                        total: totalResponses,
+                      })}
+                    </span>
                   </div>
                   <Progress
                     value={consentRate}
@@ -454,7 +461,7 @@ export function GdprConsentTypes() {
       <Modal isOpen={usersOpen} onClose={() => setUsersOpen(false)} size="4xl" scrollBehavior="inside">
         <ModalContent>
           <ModalHeader className="flex justify-between items-center gap-4">
-            <span>{t('enterprise.gdpr_users_modal_title', { name: usersName })}</span>
+            <ModalHeading>{t('enterprise.gdpr_users_modal_title', { name: usersName })}</ModalHeading>
             <Button
               size="sm"
               variant="secondary"

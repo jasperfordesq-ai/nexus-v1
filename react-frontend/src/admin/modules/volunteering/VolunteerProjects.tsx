@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Select, SelectItem, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 /**
@@ -205,7 +206,7 @@ export default function VolunteerProjects() {
       label: t('volunteering.col_date'),
       sortable: true,
       render: (row) => (
-        <span>{row.created_at ? new Date(row.created_at).toLocaleDateString() : '-'}</span>
+        <span>{row.created_at ? new Date(row.created_at).toLocaleDateString(getFormattingLocale()) : '-'}</span>
       ),
     },
     {

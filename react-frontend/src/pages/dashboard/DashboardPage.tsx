@@ -160,8 +160,8 @@ function formatActivityAction(item: FeedActivityItem, t: (key: string) => string
 }
 
 const iconContainerColors = {
-  indigo: 'bg-indigo-500/15 dark:bg-indigo-500/20',
-  purple: 'bg-purple-500/15 dark:bg-purple-500/20',
+  indigo: 'bg-accent/15 dark:bg-accent/20',
+  purple: 'bg-accent/15 dark:bg-accent/20',
   amber: 'bg-amber-500/15 dark:bg-amber-500/20',
   teal: 'bg-teal-500/15 dark:bg-teal-500/20',
   rose: 'bg-rose-500/15 dark:bg-rose-500/20',
@@ -356,7 +356,7 @@ export function DashboardPage() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="mb-5 text-sm leading-6 text-theme-muted">{error}</p>
-          <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />} onPress={() => loadDashboardData()}>{t('try_again')}</Button>
+          <Button className="bg-gradient-to-r from-accent to-accent-gradient-end text-white" startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />} onPress={() => loadDashboardData()}>{t('try_again')}</Button>
         </GlassCard>
       </>
     );
@@ -369,16 +369,16 @@ export function DashboardPage() {
         {/* Onboarding Banner */}
         {user && user.onboarding_completed === false && (
           <motion.div variants={itemVariants}>
-            <GlassCard className="border-l-4 border-l-indigo-500 p-4 sm:p-5">
+            <GlassCard className="border-l-4 border-l-accent p-4 sm:p-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex min-w-0 items-start gap-3">
-                  <SectionIcon color="indigo"><Sparkles className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" /></SectionIcon>
+                  <SectionIcon color="indigo"><Sparkles className="w-4 h-4 text-accent dark:text-accent" aria-hidden="true" /></SectionIcon>
                   <div className="min-w-0">
                     <p className="font-semibold text-theme-primary">{t('onboarding.banner_title')}</p>
                     <p className="mt-1 text-sm leading-5 text-theme-muted">{t('onboarding.banner_subtitle')}</p>
                   </div>
                 </div>
-                <Button as={Link} to={tenantPath('/onboarding')} size="sm" className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white sm:w-auto" endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}>{t('onboarding.get_started')}</Button>
+                <Button as={Link} to={tenantPath('/onboarding')} size="sm" className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white sm:w-auto" endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}>{t('onboarding.get_started')}</Button>
               </div>
             </GlassCard>
           </motion.div>
@@ -393,7 +393,7 @@ export function DashboardPage() {
                 <p className="mt-1 max-w-2xl text-sm leading-6 text-theme-muted sm:text-base">{t('community_activity', { community: branding.name })}</p>
               </div>
               <div className="flex shrink-0 gap-3">
-                <Button as={Link} to={tenantPath('/listings/create')} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white sm:w-auto" startContent={<Plus className="w-4 h-4" aria-hidden="true" />}>{t('new_listing')}</Button>
+                <Button as={Link} to={tenantPath('/listings/create')} className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white sm:w-auto" startContent={<Plus className="w-4 h-4" aria-hidden="true" />}>{t('new_listing')}</Button>
               </div>
             </div>
           </GlassCard>
@@ -443,7 +443,7 @@ export function DashboardPage() {
           {/* Recent Listings (span 2) */}
           <motion.div variants={itemVariants} className="md:col-span-2">
             <GlassCard className="h-full p-5 sm:p-6">
-              <SectionHeader icon={<ListTodo className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />} iconColor="indigo" title={t('sections.recent_listings')} linkTo={tenantPath('/listings')} linkText={t('view_all')} linkAriaLabel={t('aria.view_all_listings')} />
+              <SectionHeader icon={<ListTodo className="w-4 h-4 text-accent dark:text-accent" aria-hidden="true" />} iconColor="indigo" title={t('sections.recent_listings')} linkTo={tenantPath('/listings')} linkText={t('view_all')} linkAriaLabel={t('aria.view_all_listings')} />
               {isLoading ? (
                 <div aria-label={t('aria.loading_listings')} role="status" aria-busy="true" className="space-y-3">
                   {Array.from({ length: 3 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-16 rounded-lg bg-surface-tertiary" /></Skeleton>))}
@@ -481,7 +481,7 @@ export function DashboardPage() {
           {hasFeedModule && (
             <motion.div variants={itemVariants} className="md:col-span-2">
               <GlassCard className="h-full p-5 sm:p-6">
-                <SectionHeader icon={<Activity className="w-4 h-4 text-purple-500 dark:text-purple-400" aria-hidden="true" />} iconColor="purple" title={t('sections.recent_activity')} linkTo={tenantPath('/feed')} linkText={t('view_all_caps')} linkAriaLabel={t('aria.view_all_activity')} />
+                <SectionHeader icon={<Activity className="w-4 h-4 text-accent dark:text-accent" aria-hidden="true" />} iconColor="purple" title={t('sections.recent_activity')} linkTo={tenantPath('/feed')} linkText={t('view_all_caps')} linkAriaLabel={t('aria.view_all_activity')} />
                 {activityLoading ? (
                   <div aria-label={t('aria.loading_activity')} role="status" aria-busy="true" className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
@@ -660,7 +660,7 @@ export function DashboardPage() {
           {hasListingsModule && (
             <motion.div variants={itemVariants} className="md:col-span-2">
               <GlassCard className="relative h-full overflow-hidden p-5 sm:p-6">
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/10 via-transparent to-purple-500/10 pointer-events-none" />
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-accent/10 via-transparent to-accent-gradient-end/10 pointer-events-none" />
                 <div className="relative">
                   <SectionHeader icon={<Sparkles className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.suggested_for_you')} linkTo={tenantPath('/matches')} linkText={t('suggestions.see_all_matches')} linkAriaLabel={t('aria.browse_all_listings')} />
                   {suggestedLoading ? (
@@ -703,7 +703,7 @@ export function DashboardPage() {
           {(isLoading || stats.myEndorsements.length > 0) && (
             <motion.div variants={itemVariants} className="md:col-span-1">
               <GlassCard className="h-full p-5 sm:p-6">
-                <SectionHeader icon={<ThumbsUp className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />} iconColor="indigo" title={t('sections.endorsements')} linkTo={tenantPath(`/profile/${user?.id}`)} linkText={t('view_all')} linkAriaLabel={t('aria.view_all_endorsements')} />
+                <SectionHeader icon={<ThumbsUp className="w-4 h-4 text-accent dark:text-accent" aria-hidden="true" />} iconColor="indigo" title={t('sections.endorsements')} linkTo={tenantPath(`/profile/${user?.id}`)} linkText={t('view_all')} linkAriaLabel={t('aria.view_all_endorsements')} />
                 {isLoading ? (
                   <div aria-label={t('aria.loading_endorsements')} role="status" aria-busy="true" className="space-y-2">
                     {Array.from({ length: 3 }).map((_, i) => (<div key={i} className="flex items-center justify-between p-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-2/3" /></Skeleton><Skeleton className="rounded-full"><div className="h-5 w-8 rounded-full bg-surface-tertiary" /></Skeleton></div>))}
@@ -713,7 +713,7 @@ export function DashboardPage() {
                     {stats.myEndorsements.map(({ skill, count }) => (
                       <div key={skill} className="flex items-center justify-between py-2.5 first:pt-0 last:pb-0">
                         <span className="text-sm text-theme-primary truncate">{skill}</span>
-                        <span className="flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 ml-2 shrink-0"><ThumbsUp className="w-3 h-3" aria-hidden="true" />{count}</span>
+                        <span className="flex items-center gap-1 text-xs font-semibold text-accent dark:text-accent ml-2 shrink-0"><ThumbsUp className="w-3 h-3" aria-hidden="true" />{count}</span>
                       </div>
                     ))}
                   </div>
@@ -758,7 +758,7 @@ interface StatCardProps {
 }
 
 const colorClasses = {
-  indigo: 'bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300',
+  indigo: 'bg-accent/10 text-accent dark:bg-accent/15 dark:text-accent',
   emerald: 'bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300',
   amber: 'bg-amber-500/10 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300',
   rose: 'bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300',

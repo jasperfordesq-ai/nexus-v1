@@ -847,11 +847,9 @@ export function AdminSettings() {
         <Card>
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">{t('system.section_registration_access')}</h3>
-            <Link to={tenantPath("/admin/settings/registration-policy")}>
-              <Button size="sm" variant="secondary" startContent={<ShieldCheck size={14} />}>
-                {t('system.advanced_policy')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath("/admin/settings/registration-policy")} size="sm" variant="secondary" startContent={<ShieldCheck size={14} />}>
+              {t('system.advanced_policy')}
+            </Button>
           </CardHeader>
           <CardBody className="space-y-3">
             <div className="flex items-center justify-between">
@@ -922,7 +920,10 @@ export function AdminSettings() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-muted">{t('system.maintenance_mode_read_only')}</p>
-                <p className="text-sm text-muted">{t('system.maintenance_mode_cli_prefix')} <code className="rounded bg-surface-secondary px-1 text-xs">sudo bash scripts/maintenance.sh on|off</code></p>
+                <p className="text-sm text-muted">{t('system.maintenance_mode_cli_prefix')}{' '}
+                  {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
+                  <code className="rounded bg-surface-secondary px-1 text-xs">sudo bash scripts/maintenance.sh on|off</code>
+                </p>
               </div>
               <Switch
                 isSelected={form.maintenance_mode}

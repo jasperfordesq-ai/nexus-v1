@@ -187,7 +187,9 @@
     "terms_required": "You must agree to the terms to register your organisation.",
     "opportunity_count_one": "{{count}} opportunity",
     "opportunity_count_other": "{{count}} opportunities",
-    "loading": "Loading organisations"
+    "loading": "Loading organisations",
+    "volunteer_count_one": "{{count}} volunteers",
+    "volunteer_count_other": "{{count}} volunteers"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -231,7 +233,11 @@
     "submit_review": "Submit review",
     "review_success": "Review submitted.",
     "review_error": "Unable to submit your review.",
-    "rating_required": "Choose a rating before submitting."
+    "rating_required": "Choose a rating before submitting.",
+    "meta_description_fallback_one": "Explore {{name}} and {{count}} active volunteer opportunities on this community timebank.",
+    "meta_description_fallback_other": "Explore {{name}} and {{count}} active volunteer opportunities on this community timebank.",
+    "review_count_one": "{{count}} reviews",
+    "review_count_other": "{{count}} reviews"
   },
   "emergency_alerts": {
     "heading": "Emergency Alerts",

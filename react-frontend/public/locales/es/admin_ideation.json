@@ -132,6 +132,9 @@
     "no_challenges_found": "No se encontraron desafíos encontrados",
     "no_matching_challenges": "No se encontraron desafíos coincidentes",
     "no_status_challenges": "No se encontraron desafíos de estado",
-    "tabs_aria": "Challenge status filter"
+    "tabs_aria": "Challenge status filter",
+    "total_count_many": "totales: {{count}}",
+    "total_count_one": "totales: {{count}}",
+    "total_count_other": "totales: {{count}}"
   }
 }

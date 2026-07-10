@@ -45,7 +45,7 @@ import { useAuth, useToast, useTenant, useFeature } from '@/contexts';
 import { usePresenceOptional } from '@/contexts/PresenceContext';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { safeLocalStorageGet, safeLocalStorageSet } from '@/lib/safeStorage';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { usePageTitle } from '@/hooks';
@@ -344,7 +344,7 @@ export function MembersPage() {
         description={t('members.subtitle')}
         icon={<Users className="h-6 w-6" aria-hidden="true" />}
         accent="blue"
-        stats={totalCount != null && !isLoading ? [{ label: t('members.count_label'), value: totalCount.toLocaleString() }] : undefined}
+        stats={totalCount != null && !isLoading ? [{ label: t('members.count_label'), value: totalCount.toLocaleString(getFormattingLocale()) }] : undefined}
         action={
           isAuthenticated && user ? (
             <Button
@@ -380,7 +380,7 @@ export function MembersPage() {
         <ToggleButton
           id="all"
           variant="ghost"
-          className="bg-theme-elevated text-theme-secondary transition-colors hover:bg-indigo-500/5 hover:text-indigo-500 data-[selected=true]:bg-indigo-600 data-[selected=true]:text-white data-[selected=true]:shadow-sm"
+          className="bg-theme-elevated text-theme-secondary transition-colors hover:bg-accent/5 hover:text-accent data-[selected=true]:bg-accent data-[selected=true]:text-white data-[selected=true]:shadow-sm"
         >
           <Users className="w-3.5 h-3.5" aria-hidden="true" />
           {t('members.all')}
@@ -494,7 +494,7 @@ export function MembersPage() {
                 isIconOnly
                 variant="ghost"
                 aria-label={t('aria.grid_view')}
-                className="rounded-none bg-theme-elevated text-theme-muted transition-colors data-[selected=true]:bg-indigo-500/10 data-[selected=true]:text-indigo-500 dark:data-[selected=true]:text-indigo-400"
+                className="rounded-none bg-theme-elevated text-theme-muted transition-colors data-[selected=true]:bg-accent/10 data-[selected=true]:text-accent dark:data-[selected=true]:text-accent"
               >
                 <Grid className="w-4 h-4" aria-hidden="true" />
               </ToggleButton>
@@ -503,7 +503,7 @@ export function MembersPage() {
                 isIconOnly
                 variant="ghost"
                 aria-label={t('aria.list_view')}
-                className="rounded-none bg-theme-elevated text-theme-muted transition-colors data-[selected=true]:bg-indigo-500/10 data-[selected=true]:text-indigo-500 dark:data-[selected=true]:text-indigo-400"
+                className="rounded-none bg-theme-elevated text-theme-muted transition-colors data-[selected=true]:bg-accent/10 data-[selected=true]:text-accent dark:data-[selected=true]:text-accent"
               >
                 <List className="w-4 h-4" aria-hidden="true" />
               </ToggleButton>
@@ -513,7 +513,7 @@ export function MembersPage() {
                   isIconOnly
                   variant="ghost"
                   aria-label={t('aria.map_view')}
-                  className="rounded-none bg-theme-elevated text-theme-muted transition-colors data-[selected=true]:bg-indigo-500/10 data-[selected=true]:text-indigo-500 dark:data-[selected=true]:text-indigo-400"
+                  className="rounded-none bg-theme-elevated text-theme-muted transition-colors data-[selected=true]:bg-accent/10 data-[selected=true]:text-accent dark:data-[selected=true]:text-accent"
                 >
                   <MapIcon className="w-4 h-4" aria-hidden="true" />
                 </ToggleButton>
@@ -560,7 +560,7 @@ export function MembersPage() {
           <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('members.unable_to_load')}</h3>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadMembers()}
           >
@@ -598,7 +598,7 @@ export function MembersPage() {
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   {debouncedQuery && totalCount !== null ? (
                     <p role="status" className="text-sm text-theme-muted">
-                      {t('members.results_matching', { shown: members.length.toLocaleString(), total: totalCount.toLocaleString(), query: debouncedQuery })}
+                      {t('members.results_matching', { shown: members.length.toLocaleString(getFormattingLocale()), total: totalCount.toLocaleString(getFormattingLocale()), query: debouncedQuery })}
                     </p>
                   ) : (
                     <p role="status" className="text-sm text-theme-muted">
@@ -684,12 +684,12 @@ export function MembersPage() {
                   {totalCount != null && totalCount > 0 && (
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs text-theme-muted px-1">
-                        <span>{members.length.toLocaleString()} / {totalCount.toLocaleString()}</span>
+                        <span>{members.length.toLocaleString(getFormattingLocale())} / {totalCount.toLocaleString(getFormattingLocale())}</span>
                         <span className="font-medium text-theme-secondary">{Math.round((members.length / totalCount) * 100)}%</span>
                       </div>
                       <div className="h-1.5 rounded-full bg-theme-elevated overflow-hidden">
                         <motion.div
-                          className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-600"
+                          className="h-full rounded-full bg-linear-to-r from-accent to-accent-gradient-end"
                           initial={{ width: '0%' }}
                           animate={{ width: `${Math.round((members.length / totalCount) * 100)}%` }}
                           transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -705,7 +705,7 @@ export function MembersPage() {
                       isLoading={isLoadingMore}
                     >
                       {totalCount != null && totalCount > members.length
-                        ? t('members.load_more_count', { remaining: (totalCount - members.length).toLocaleString() })
+                        ? t('members.load_more_count', { remaining: (totalCount - members.length).toLocaleString(getFormattingLocale()) })
                         : t('members.load_more')}
                     </Button>
                   </div>
@@ -744,7 +744,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
   // Format join date for "New members" sort
   const joinedLabel = sortBy === 'joined' && member.created_at
     ? t('members.joined_date', {
-        date: new Date(member.created_at).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }),
+        date: new Date(member.created_at).toLocaleDateString(getFormattingLocale(), { month: 'short', year: 'numeric' }),
       })
     : null;
 
@@ -757,7 +757,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
     return (
       <Link to={tenantPath(`/profile/${member.id}`)} aria-label={t('members.profile_aria', { name: displayName })}>
         <article>
-          <GlassCard className="p-4 hover:bg-theme-hover hover:shadow-md hover:shadow-indigo-500/5 border-l-4 border-l-indigo-500/20 hover:border-l-indigo-500/50 transition-all duration-200">
+          <GlassCard className="p-4 hover:bg-theme-hover hover:shadow-md hover:shadow-accent/5 border-l-4 border-l-accent/20 hover:border-l-accent/50 transition-all duration-200">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
               <div className="relative inline-block">
                 <Avatar
@@ -779,7 +779,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                     </Tooltip>
                   )}
                   {hasGamification && level > 0 && (
-                    <Chip size="sm" variant="soft" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
+                    <Chip size="sm" variant="soft" className="bg-accent-soft dark:bg-accent/40 text-accent dark:text-accent text-xs h-5 min-w-0">
                       {t('level_short', { level })}
                     </Chip>
                   )}
@@ -815,7 +815,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                   <span>{t('members.hours_short', { count: (member.total_hours_given ?? 0) + (member.total_hours_received ?? 0) })}</span>
                 </span>
                 {joinedLabel && (
-                  <span className="flex items-center gap-1 shrink-0 whitespace-nowrap text-indigo-500 dark:text-indigo-400">
+                  <span className="flex items-center gap-1 shrink-0 whitespace-nowrap text-accent dark:text-accent">
                     <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
                     <span>{joinedLabel}</span>
                   </span>
@@ -845,12 +845,12 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
   return (
       <Link to={tenantPath(`/profile/${member.id}`)} aria-label={t('members.profile_aria', { name: displayName })} className="group h-full">
       <article>
-        <GlassCard className="flex h-full min-h-[272px] flex-col p-5 text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:shadow-indigo-500/10">
+        <GlassCard className="flex h-full min-h-[272px] flex-col p-5 text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:shadow-accent/10">
           <div className="relative inline-block mx-auto mb-3">
             <Avatar
               src={avatarSrc}
               name={displayName}
-              className="w-20 h-20 ring-2 ring-theme-muted/20 group-hover:ring-indigo-400/50 transition-all duration-200"
+              className="w-20 h-20 ring-2 ring-theme-muted/20 group-hover:ring-accent/50 transition-all duration-200"
             />
             <PresenceIndicator userId={member.id} size="md" />
           </div>
@@ -864,7 +864,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
               </Tooltip>
             )}
             {hasGamification && level > 0 && (
-              <Chip size="sm" variant="soft" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
+              <Chip size="sm" variant="soft" className="bg-accent-soft dark:bg-accent/40 text-accent dark:text-accent text-xs h-5 min-w-0">
                 {t('level_short', { level })}
               </Chip>
             )}
@@ -922,7 +922,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
           )}
 
           {joinedLabel && (
-            <p className="text-xs text-indigo-500 dark:text-indigo-400 mt-1 flex items-center justify-center gap-1">
+            <p className="text-xs text-accent dark:text-accent mt-1 flex items-center justify-center gap-1">
               <Sparkles className="w-3 h-3" aria-hidden="true" />
               <span>{joinedLabel}</span>
             </p>

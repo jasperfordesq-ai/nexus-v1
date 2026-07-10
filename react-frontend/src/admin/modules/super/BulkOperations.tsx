@@ -183,7 +183,7 @@ export function BulkOperations() {
                 isSelected={grantSA}
                 onValueChange={setGrantSA}
                 classNames={{
-                  wrapper: 'group-data-[selected=true]:bg-gradient-to-r group-data-[selected=true]:from-purple-500 group-data-[selected=true]:to-pink-500',
+                  wrapper: 'group-data-[selected=true]:bg-gradient-to-r group-data-[selected=true]:from-accent group-data-[selected=true]:to-pink-500',
                 }}
               >
                 <div>

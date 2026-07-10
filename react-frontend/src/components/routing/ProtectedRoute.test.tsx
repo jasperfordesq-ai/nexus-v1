@@ -29,6 +29,7 @@ vi.mock('@/lib/motion', () => ({
 // Mock contexts
 const mockUseAuth = vi.fn();
 const mockUseTenant = vi.fn();
+const mockUseLegalGate = vi.fn();
 vi.mock('@/contexts', () => ({
   useAuth: (...args: unknown[]) => mockUseAuth(...args),
   useTenant: (...args: unknown[]) => mockUseTenant(...args),
@@ -54,13 +55,7 @@ vi.mock('@/contexts/TenantContext', () => ({
 }));
 
 vi.mock('@/hooks/useLegalGate', () => ({
-  useLegalGate: () => ({
-    hasPending: false,
-    pendingDocs: [],
-    acceptAll: vi.fn(),
-    isAccepting: false,
-    isLoading: false,
-  }),
+  useLegalGate: (...args: unknown[]) => mockUseLegalGate(...args),
 }));
 
 vi.mock('@/components/legal/LegalAcceptanceGate', () => ({
@@ -100,6 +95,15 @@ describe('ProtectedRoute', () => {
     });
     mockUseTenant.mockReturnValue({
       tenantPath: (p: string) => `/test${p}`,
+    });
+    mockUseLegalGate.mockReturnValue({
+      hasPending: false,
+      pendingDocs: [],
+      acceptAll: vi.fn(),
+      isAccepting: false,
+      isLoading: false,
+      error: null,
+      refresh: vi.fn(),
     });
   });
 
@@ -141,6 +145,72 @@ describe('ProtectedRoute', () => {
         <div>Protected Content</div>
       </ProtectedRoute>
     );
+    expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
+  });
+
+  it('does not mount protected children while legal status is loading', () => {
+    mockUseLegalGate.mockReturnValue({
+      hasPending: false,
+      pendingDocs: [],
+      acceptAll: vi.fn(),
+      isAccepting: false,
+      isLoading: true,
+      error: null,
+      refresh: vi.fn(),
+    });
+
+    render(
+      <ProtectedRoute>
+        <div>Protected Content</div>
+      </ProtectedRoute>
+    );
+
+    expect(screen.getByTestId('loading')).toBeInTheDocument();
+    expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
+  });
+
+  it('does not mount protected children when legal status cannot be confirmed', () => {
+    const refresh = vi.fn();
+    mockUseLegalGate.mockReturnValue({
+      hasPending: false,
+      pendingDocs: [],
+      acceptAll: vi.fn(),
+      isAccepting: false,
+      isLoading: false,
+      error: 'NETWORK_ERROR',
+      refresh,
+    });
+
+    render(
+      <ProtectedRoute>
+        <div>Protected Content</div>
+      </ProtectedRoute>
+    );
+
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
+    screen.getByRole('button').click();
+    expect(refresh).toHaveBeenCalledOnce();
+  });
+
+  it('renders only the acceptance gate while documents are pending', async () => {
+    mockUseLegalGate.mockReturnValue({
+      hasPending: true,
+      pendingDocs: [{ document_id: 1 }],
+      acceptAll: vi.fn(),
+      isAccepting: false,
+      isLoading: false,
+      error: null,
+      refresh: vi.fn(),
+    });
+
+    render(
+      <ProtectedRoute>
+        <div>Protected Content</div>
+      </ProtectedRoute>
+    );
+
+    expect(await screen.findByTestId('legal-acceptance-gate')).toBeInTheDocument();
     expect(screen.queryByText('Protected Content')).not.toBeInTheDocument();
   });
 });

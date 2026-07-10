@@ -781,7 +781,9 @@
     "option_marketplace_listing_duration_days_label": "リスト期間 (日)",
     "option_marketplace_listing_duration_days_desc": "マーケットプレイスの出品が自動期限切れになるまでの日数",
     "option_identity_verification_fee_cents_label": "検証手数料 (セント)",
-    "option_identity_verification_fee_cents_desc": "本人確認に1回限りの手数料がかかります。無料検証の場合は 0 に設定します。セント単位の価値 (例: 500 = €5.00)"
+    "option_identity_verification_fee_cents_desc": "本人確認に1回限りの手数料がかかります。無料検証の場合は 0 に設定します。セント単位の価値 (例: 500 = €5.00)",
+    "option_count_other": "{{count}}のオプション",
+    "planned_count_other": "{{count}}計画中"
   },
   "tenant_features": {
     "refresh": "リフレッシュ",

@@ -98,7 +98,8 @@
     "or_divider": "または",
     "poll_add_option_button": "選択肢を追加",
     "videos_trimmed_notice": "60秒を超える動画は60秒の表示時間にトリミングされます",
-    "video_duration_seconds": "{{count}}秒"
+    "video_duration_seconds": "{{count}}秒",
+    "video_duration_seconds_other": "{{count}}秒"
   },
   "viewer": {
     "story_from": "ストーリー from {{name}}",
@@ -132,7 +133,9 @@
     "reply_placeholder_generic": "ストーリーに返信...",
     "react_with": "{{type}}でリアクション",
     "viewers_title_count": "視聴者 ({{count}})",
-    "delete_story_confirm": "このストーリーを削除しますか?これを元に戻すことはできません。"
+    "delete_story_confirm": "このストーリーを削除しますか?これを元に戻すことはできません。",
+    "poll_votes_other": "{{count}}票",
+    "viewers_title_count_other": "視聴者 ({{count}})"
   },
   "highlights": {
     "no_stories": "このハイライトにはストーリーがありません",

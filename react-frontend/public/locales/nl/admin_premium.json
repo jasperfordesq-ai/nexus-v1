@@ -124,7 +124,9 @@
         "year": "Jaar",
         "yearly": "Jaarlijks",
         "annual": "Jaarlijks"
-      }
+      },
+      "total_one": "{{count}} totaal",
+      "total_other": "{{count}} totaal"
     },
     "table": {
       "aria": "Premium-niveaus",
@@ -203,7 +205,9 @@
         "restricted": "Actie nodig",
         "unknown": "Status onbekend"
       },
-      "connect_fallback_active": "Er is een Stripe Connect-account geconfigureerd, maar deze is nog niet klaar voor live donaties. Betalingen maken gebruik van de fallback van het platform totdat de onboarding is voltooid."
+      "connect_fallback_active": "Er is een Stripe Connect-account geconfigureerd, maar deze is nog niet klaar voor live donaties. Betalingen maken gebruik van de fallback van het platform totdat de onboarding is voltooid.",
+      "requirements_due_one": "Stripe-accountvereisten vereisen aandacht: {{count}}.",
+      "requirements_due_other": "Stripe-accountvereisten vereisen aandacht: {{count}}."
     },
     "finance": {
       "title": "Financiële operaties",
@@ -222,7 +226,11 @@
       "past_due_count": "{{count}} past due",
       "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Jaarbonnen exporteren",
-      "empty": "Er zijn nog geen financiële activiteiten geregistreerd."
+      "empty": "Er zijn nog geen financiële activiteiten geregistreerd.",
+      "donation_count_one": "{{count}} donatie",
+      "declaration_count_one": "{{count}} verklaring",
+      "past_due_count_one": "{{count}} achterstallig",
+      "past_due_count_other": "{{count}} achterstallig"
     }
   }
 }

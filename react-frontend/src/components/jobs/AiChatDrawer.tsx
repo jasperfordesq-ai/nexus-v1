@@ -3,13 +3,22 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Spinner } from '@/components/ui/Spinner';
-import { useRef, useEffect } from 'react';import Sparkles from 'lucide-react/icons/sparkles';
-import X from 'lucide-react/icons/x';
+import { useEffect, useRef } from 'react';
+import Sparkles from 'lucide-react/icons/sparkles';
 import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
+
+import { Button } from '@/components/ui/Button';
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerHeading,
+} from '@/components/ui/Drawer';
+import { Input } from '@/components/ui/Input';
+import { Spinner } from '@/components/ui/Spinner';
 
 interface AiChatMessage {
   role: 'user' | 'assistant';
@@ -39,7 +48,6 @@ export function AiChatDrawer({
 }: AiChatDrawerProps) {
   const { t } = useTranslation('jobs');
   const endRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   // Keep a live ref to onClose/isOpen so the unmount cleanup never closes over a stale value.
   const onCloseRef = useRef(onClose);
@@ -49,20 +57,6 @@ export function AiChatDrawer({
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
-  // Focus the input when the drawer opens, and close on Escape while open.
-  useEffect(() => {
-    if (!isOpen) return;
-    inputRef.current?.focus();
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        onClose();
-      }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
 
   // Ensure the drawer is closed if the component unmounts (e.g. route change) while open.
   useEffect(() => {
@@ -83,29 +77,27 @@ export function AiChatDrawer({
       >
         <Sparkles size={22} aria-hidden="true" />
       </Button>
-      {isOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={t('ai_chat.title')}
-          className="fixed bottom-0 right-0 z-50 w-full max-w-md h-[min(500px,100dvh)] max-h-[100dvh] bg-background border-l border-t border-divider rounded-tl-2xl shadow-2xl flex flex-col"
-        >
-          <div className="flex items-center justify-between p-4 border-b border-divider">
+      <Drawer
+        isOpen={isOpen}
+        onClose={onClose}
+        placement="right"
+        size="md"
+        closeLabel={t('ai_chat.close')}
+        classNames={{
+          base: '!h-[min(500px,100dvh)] !w-full self-end !max-w-md !rounded-tl-2xl border-l border-t border-divider !p-0',
+          closeButton: '!top-[calc(var(--safe-area-top)+0.5rem)] right-2 size-11 text-muted',
+        }}
+      >
+        <DrawerContent>
+          <DrawerHeader className="shrink-0 border-b border-divider px-4 py-4 pr-14 pt-[calc(var(--safe-area-top)+1rem)]">
             <div className="flex items-center gap-2">
               <Sparkles size={18} className="text-accent" aria-hidden="true" />
-              <span className="font-semibold text-sm">{t('ai_chat.title')}</span>
+              <DrawerHeading className="text-sm font-semibold text-foreground">
+                {t('ai_chat.title')}
+              </DrawerHeading>
             </div>
-            <Button
-              isIconOnly
-              size="sm"
-              variant="tertiary"
-              onPress={onClose}
-              aria-label={t('ai_chat.close')}
-            >
-              <X size={16} aria-hidden="true" />
-            </Button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          </DrawerHeader>
+          <DrawerBody className="!m-0 space-y-3 !p-4">
             {messages.length === 0 && (
               <div className="text-center text-muted text-sm py-8">
                 <Sparkles size={24} className="mx-auto mb-2 text-accent" aria-hidden="true" />
@@ -127,10 +119,10 @@ export function AiChatDrawer({
               </div>
             )}
             <div ref={endRef} />
-          </div>
-          <div className="p-3 border-t border-divider flex gap-2">
+          </DrawerBody>
+          <DrawerFooter className="shrink-0 border-t border-divider p-3 pb-[calc(var(--safe-area-bottom)+0.75rem)]">
             <Input
-              ref={inputRef}
+              autoFocus
               size="sm"
               placeholder={t('ai_chat.placeholder')}
               aria-label={t('ai_chat.placeholder')}
@@ -145,12 +137,13 @@ export function AiChatDrawer({
               onPress={onSend}
               isDisabled={!inputValue.trim() || isLoading}
               aria-label={t('ai_chat.send')}
+              className="size-11 shrink-0"
             >
               <Send size={14} aria-hidden="true" />
             </Button>
-          </div>
-        </div>
-      )}
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 }

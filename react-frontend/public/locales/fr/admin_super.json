@@ -792,7 +792,34 @@
     "no_hub_tenants_found": "Aucun locataire de hub trouvé",
     "impersonate_user_warning": "L'usurpation d'identité enregistre chaque action sous l'identité de cet utilisateur. À utiliser uniquement lorsque cela est nécessaire pour le support.",
     "partnerships_tabs_aria": "Filtre de statut de partenariat de fédération",
-    "tenant_list_tabs_aria": "Filtre de statut de locataire"
+    "tenant_list_tabs_aria": "Filtre de statut de locataire",
+    "tab_with_count_many": "{{label}}({{count}})",
+    "tab_with_count_one": "{{label}}({{count}})",
+    "tab_with_count_other": "{{label}}({{count}})",
+    "users_count_many": "{{count}} utilisateurs",
+    "users_count_one": "{{count}} utilisateurs",
+    "users_count_other": "{{count}} utilisateurs",
+    "bulk_users_moved_count_many": "Utilisateurs groupés déplacés ({{count}})",
+    "bulk_users_moved_count_one": "Utilisateurs groupés déplacés ({{count}})",
+    "bulk_users_moved_count_other": "Utilisateurs groupés déplacés ({{count}})",
+    "bulk_tenants_updated_count_many": "Locataires groupés mis à jour ({{count}})",
+    "bulk_tenants_updated_count_one": "Locataires groupés mis à jour ({{count}})",
+    "bulk_tenants_updated_count_other": "Locataires groupés mis à jour ({{count}})",
+    "move_n_users_many": "Déplacer {{count}} utilisateurs",
+    "move_n_users_one": "Déplacer {{count}} utilisateurs",
+    "move_n_users_other": "Déplacer {{count}} utilisateurs",
+    "apply_to_n_tenants_many": "Appliquer aux locataires {{count}}",
+    "apply_to_n_tenants_one": "Appliquer aux locataires {{count}}",
+    "apply_to_n_tenants_other": "Appliquer aux locataires {{count}}",
+    "bulk_move_confirm_message_with_grant_many": "Déplacez {{count}} utilisateur(s) et accordez au locataire un accès super-administrateur.",
+    "bulk_move_confirm_message_with_grant_one": "Déplacez {{count}} utilisateur(s) et accordez au locataire un accès super-administrateur.",
+    "bulk_move_confirm_message_with_grant_other": "Déplacez {{count}} utilisateur(s) et accordez au locataire un accès super-administrateur.",
+    "bulk_move_confirm_message_many": "Déplacer {{count}} utilisateur(s).",
+    "bulk_move_confirm_message_one": "Déplacer {{count}} utilisateur(s).",
+    "bulk_move_confirm_message_other": "Déplacer {{count}} utilisateur(s).",
+    "bulk_update_confirm_message_many": "Appliquez cette mise à jour au(x) locataire(s) {{count}}.",
+    "bulk_update_confirm_message_one": "Appliquez cette mise à jour au(x) locataire(s) {{count}}.",
+    "bulk_update_confirm_message_other": "Appliquez cette mise à jour au(x) locataire(s) {{count}}."
   },
   "tenant_form": {
     "active": "Actif",
@@ -997,7 +1024,10 @@
     "view": "Voir",
     "whitelisted_tenants_aria": "Locataires sur liste blanche",
     "whitelisted_tenants_count": "Locataires autorisés ({{count}})",
-    "failed_to_load": "Échec du chargement de la liste blanche"
+    "failed_to_load": "Échec du chargement de la liste blanche",
+    "whitelisted_tenants_count_many": "Locataires autorisés ({{count}})",
+    "whitelisted_tenants_count_one": "Locataires autorisés ({{count}})",
+    "whitelisted_tenants_count_other": "Locataires autorisés ({{count}})"
   },
   "pilot_inquiry_admin": {
     "page_title": "Enquêtes pilotes",
@@ -1093,14 +1123,35 @@
       "empty": "-",
       "months": "{{count}} mois",
       "no": "Non",
-      "yes": "Oui"
+      "yes": "Oui",
+      "months_many": "{{count}} mois",
+      "months_one": "{{count}} mois",
+      "months_other": "{{count}} mois"
     },
     "velocity": {
       "avg_to_agreed": "Moyenne à convenir:",
       "avg_to_live": "Moyenne à vivre:",
       "avg_to_proposal": "Moyenne par proposition:",
       "days": "{{count}}d",
-      "title": "Vitesse du pipeline - nombre moyen de jours entre la soumission de la demande et chaque étape:"
+      "title": "Vitesse du pipeline - nombre moyen de jours entre la soumission de la demande et chaque étape:",
+      "days_many": "{{count}}d",
+      "days_one": "{{count}}d",
+      "days_other": "{{count}}d"
     }
-  }
+  },
+  "events": "Événements",
+  "groups": "Groupes",
+  "gamification": "Gamification",
+  "goals": "Objectifs",
+  "blog": "Blogue",
+  "resources": "Ressources",
+  "volunteering": "Volontariat",
+  "federation": "Fédération",
+  "listings": "Annonces",
+  "wallet": "Portefeuille",
+  "messages": "Messages",
+  "dashboard": "Tableau de bord",
+  "exchange_workflow": "Flux de travail d'échange",
+  "organisations": "Organisations",
+  "feed": "Alimentation"
 }

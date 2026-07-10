@@ -187,7 +187,9 @@
         "pause_failed": "Kan de campagne niet onderbreken",
         "rejected": "Campagne '{{name}}' afgewezen",
         "reject_failed": "Kan de campagne niet afwijzen"
-      }
+      },
+      "creatives_count_one": "Advertenties ({{count}})",
+      "creatives_count_other": "Advertenties ({{count}})"
     },
     "push": {
       "page_title": "Push-campagnes",

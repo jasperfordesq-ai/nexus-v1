@@ -76,7 +76,8 @@
     "no_achievements": "Ainda sem conquistas",
     "no_achievements_own": "Comece a participar para ganhar insígnias e conquistas!",
     "no_achievements_other": "Este utilizador ainda não obteve conquistas",
-    "view_badges": "Ver Insígnias Disponíveis"
+    "view_badges": "Ver Insígnias Disponíveis",
+    "badges_many": "{{count}} Insígnias Obtidas"
   },
   "toast": {
     "request_sent_title": "Pedido enviado",
@@ -134,7 +135,10 @@
     "characters_count": "{{count}}/{{max}} caracteres",
     "cancel": "Cancelar",
     "submit": "Submeter avaliação",
-    "submit_failed_fallback": "Falha ao submeter avaliação"
+    "submit_failed_fallback": "Falha ao submeter avaliação",
+    "characters_count_many": "{{count}}/{{max}} caracteres",
+    "characters_count_one": "{{count}}/{{max}} caracteres",
+    "characters_count_other": "{{count}}/{{max}} caracteres"
   },
   "page_meta": {
     "title": "Perfil",
@@ -185,5 +189,9 @@
   "read_more": "Ler mais",
   "read_less": "Ler menos",
   "hours_abbrev": "{{hours}}h",
-  "not_available_abbrev": "n/d"
+  "not_available_abbrev": "n/d",
+  "show_more_skills_many": "Mostrar {{count}} mais",
+  "show_more_skills_one": "Mostrar {{count}} mais",
+  "show_more_skills_other": "Mostrar {{count}} mais",
+  "reviews_count_many": "{{count}} avaliações"
 }

@@ -93,7 +93,7 @@ export function GroupMembersTab({
                         </Chip>
                       )}
                       {memberIsAdmin && !memberIsOwner && (
-                        <Chip size="sm" variant="flat" className="bg-purple-500/20 text-purple-600 dark:text-purple-400" startContent={<Shield className="w-3 h-3" aria-hidden="true" />}>
+                        <Chip size="sm" variant="flat" className="bg-accent/20 text-accent dark:text-accent" startContent={<Shield className="w-3 h-3" aria-hidden="true" />}>
                           {t('detail.member_admin')}
                         </Chip>
                       )}

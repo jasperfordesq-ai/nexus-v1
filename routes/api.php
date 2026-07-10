@@ -40,6 +40,8 @@ Route::post('/v2/sales/orders', [\App\Http\Controllers\Api\SalesOrderController:
 // Source: httpdocs/routes/tenant-bootstrap.php
 // ============================================
 Route::get('/v2/tenant/bootstrap', [\App\Http\Controllers\Api\TenantBootstrapController::class, 'bootstrap']);
+Route::get('/v2/pwa/manifest', [\App\Http\Controllers\Api\PwaManifestController::class, 'show'])
+    ->middleware('throttle:60,1');
 Route::get('/v2/tenants', [\App\Http\Controllers\Api\TenantBootstrapController::class, 'list']);
 Route::get('/v2/platform/stats', [\App\Http\Controllers\Api\TenantBootstrapController::class, 'platformStats']);
 Route::get('/v2/config/algorithms', [\App\Http\Controllers\Api\AdminConfigController::class, 'getAlgorithmInfo']);

@@ -34,7 +34,11 @@
     "tab_hours_review": "Hours Review",
     "tab_volunteers": "Volunteers",
     "tab_wallet": "Wallet",
-    "tab_settings": "Settings"
+    "tab_settings": "Settings",
+    "review_applications_one": "Review {{count}} Applications",
+    "review_applications_other": "Review {{count}} Applications",
+    "review_hours_one": "Review {{count}} Hours",
+    "review_hours_other": "Review {{count}} Hours"
   },
   "page_title": "Volunteering",
   "heading": "Volunteering",
@@ -346,7 +350,13 @@
       "cancelled": "Cancelled"
     },
     "support_aria": "Support this project ({{count}} supporters)",
-    "unsupport_aria": "Remove your support ({{count}} supporters)"
+    "unsupport_aria": "Remove your support ({{count}} supporters)",
+    "volunteers_needed_one": "{{count}} needed",
+    "volunteers_needed_other": "{{count}} needed",
+    "unsupport_aria_one": "Remove your support ({{count}} supporters)",
+    "unsupport_aria_other": "Remove your support ({{count}} supporters)",
+    "support_aria_one": "Support this project ({{count}} supporters)",
+    "support_aria_other": "Support this project ({{count}} supporters)"
   },
   "donations": {
     "heading": "Donations",
@@ -453,7 +463,9 @@
     "receipt_method": "Payment Method",
     "receipt_message": "Message",
     "receipt_error": "Failed to load receipt.",
-    "receipt_not_found": "Receipt not found."
+    "receipt_not_found": "Receipt not found.",
+    "donors_count_one": "{{count}} donors",
+    "donors_count_other": "{{count}} donors"
   },
   "safeguarding": {
     "heading": "Safeguarding",
@@ -592,7 +604,9 @@
     "cancel": "Cancel",
     "upload_credential": "Upload Credential",
     "aria_remove_file": "Remove selected file",
-    "aria_upload_document": "Upload credential document"
+    "aria_upload_document": "Upload credential document",
+    "expiring_soon_desc_one": "{{count}} credential(s) will expire within 30 days.",
+    "expiring_soon_desc_other": "{{count}} credential(s) will expire within 30 days."
   },
   "waitlist": {
     "heading": "My Waitlists",
@@ -612,7 +626,9 @@
     "claim": "Claim spot",
     "claim_success": "You're in — signed up for the shift!",
     "claim_failed": "Couldn't claim the spot",
-    "claim_hint": "A spot opened up for you. Claim it soon — unclaimed spots pass to the next person after 48 hours."
+    "claim_hint": "A spot opened up for you. Claim it soon — unclaimed spots pass to the next person after 48 hours.",
+    "spots_one": "{{count}} spots",
+    "spots_other": "{{count}} spots"
   },
   "swaps": {
     "heading": "Shift Swaps",
@@ -751,7 +767,13 @@
     "select_limit": "You can select at most {{max}} applications at once.",
     "bulk_success": "{{count}} applications updated.",
     "bulk_failed": "{{count}} applications couldn't be updated.",
-    "bulk_rate_limited": "{{count}} couldn't be updated — you're going too fast. Wait a minute and retry."
+    "bulk_rate_limited": "{{count}} couldn't be updated — you're going too fast. Wait a minute and retry.",
+    "pending_count_one": "{{count}} pending",
+    "pending_count_other": "{{count}} pending",
+    "selected_count_one": "{{count}} selected",
+    "selected_count_other": "{{count}} selected",
+    "decline_modal_description_one": "Add a note for {{count}} application before declining.",
+    "decline_modal_description_other": "Add a note for {{count}} application before declining."
   },
   "org_wallet_balance": "Wallet balance:",
   "auto_pay_on": "Auto-pay ON",
@@ -845,7 +867,9 @@
     "organization_hours": "{{name}} ({{hours}}h)",
     "generated_on": "Generated",
     "download": "Download",
-    "verify": "Verify"
+    "verify": "Verify",
+    "verified_hours_one": "{{count}} Verified Hours",
+    "verified_hours_other": "{{count}} Verified Hours"
   },
   "emergency": {
     "title": "Emergency Alerts",
@@ -866,7 +890,9 @@
     "respond_error": "Failed to respond to alert.",
     "respond_error_generic": "Failed to respond to alert. Please try again.",
     "from": "From",
-    "expires": "Expires"
+    "expires": "Expires",
+    "pending_count_one": "{{count}} pending",
+    "pending_count_other": "{{count}} pending"
   },
   "wellbeing": {
     "heading": "Volunteer Wellbeing",
@@ -1039,5 +1065,9 @@
   "form_remote_description": "Volunteers can take part online or by phone.",
   "my_organisations_declined": "Declined",
   "my_organisations_declined_desc": "This application wasn't approved. Contact your community administrator for details.",
-  "hours_invalid_range": "Enter between 0.25 and 24 hours."
+  "hours_invalid_range": "Enter between 0.25 and 24 hours.",
+  "org_callout_you_manage_many_one": "You manage {{count}} organisations",
+  "org_callout_you_manage_many_other": "You manage {{count}} organisations",
+  "more_sections_one": "More ({{count}})",
+  "more_sections_other": "More ({{count}})"
 }

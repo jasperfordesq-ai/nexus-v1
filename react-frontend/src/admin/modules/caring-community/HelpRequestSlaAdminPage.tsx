@@ -1,3 +1,4 @@
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Spinner, Tab, Tabs, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -182,12 +183,14 @@ export default function HelpRequestSlaAdminPage() {
                 <p>
                   <span className="font-medium">{t('help_request_sla.about.first_response_label')}:</span>{' '}
                   {t('help_request_sla.about.first_response_prefix')}{' '}
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Workflow state identifier must remain verbatim. */}
                   <code className="text-xs bg-surface-secondary px-1 rounded">pending</code>
                   {t('help_request_sla.about.first_response_suffix')}
                 </p>
                 <p>
                   <span className="font-medium">{t('help_request_sla.about.resolution_label')}:</span>{' '}
                   {t('help_request_sla.about.resolution_prefix')}{' '}
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Workflow state identifier must remain verbatim. */}
                   <code className="text-xs bg-surface-secondary px-1 rounded">closed</code>
                   {t('help_request_sla.about.resolution_suffix')}
                 </p>
@@ -215,14 +218,14 @@ export default function HelpRequestSlaAdminPage() {
                   <div>
                     <span className="font-semibold">{t('help_request_sla.about.first_response_label')}:</span>{' '}
                     <Chip size="sm" variant="soft" color="accent">
-                      {policy.first_response_hours}h
+                      {formatNumber(policy.first_response_hours, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
                     </Chip>{' '}
                     <span className="text-muted">{t('help_request_sla.policy.first_response_description')}</span>
                   </div>
                   <div>
                     <span className="font-semibold">{t('help_request_sla.about.resolution_label')}:</span>{' '}
                     <Chip size="sm" variant="soft" color="accent">
-                      {policy.resolution_hours}h
+                      {formatNumber(policy.resolution_hours, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
                     </Chip>{' '}
                     <span className="text-muted">{t('help_request_sla.policy.resolution_description')}</span>
                   </div>
@@ -371,7 +374,7 @@ export default function HelpRequestSlaAdminPage() {
                         </TableCell>
                         <TableCell>
                           <span className="text-xs text-muted">
-                            {new Date(req.created_at).toLocaleDateString()}
+                            {new Date(req.created_at).toLocaleDateString(getFormattingLocale())}
                           </span>
                         </TableCell>
                       </TableRow>
@@ -424,7 +427,7 @@ export default function HelpRequestSlaAdminPage() {
                         </TableCell>
                         <TableCell>
                           <span className="text-xs text-muted">
-                            {req.updated_at ? new Date(req.updated_at).toLocaleString() : emptyValue}
+                            {req.updated_at ? new Date(req.updated_at).toLocaleString(getFormattingLocale()) : emptyValue}
                           </span>
                         </TableCell>
                       </TableRow>
@@ -437,9 +440,11 @@ export default function HelpRequestSlaAdminPage() {
 
           <Separator />
           <p className="text-xs text-muted">
-            {t('help_request_sla.footer.generated', { date: new Date(data.generated_at).toLocaleString() })}{' '}
+            {t('help_request_sla.footer.generated', { date: new Date(data.generated_at).toLocaleString(getFormattingLocale()) })}{' '}
             <Abbr term="SLA" /> {t('help_request_sla.footer.proxy_prefix')}{' '}
+            {/* eslint-disable-next-line i18next/no-literal-string -- Workflow state identifier must remain verbatim. */}
             <code>pending</code>; {t('help_request_sla.footer.proxy_middle')}{' '}
+            {/* eslint-disable-next-line i18next/no-literal-string -- Workflow state identifier must remain verbatim. */}
             <code>closed</code>. {t('help_request_sla.footer.proxy_suffix')} <Abbr term="SLA" />{' '}
             {t('help_request_sla.footer.proxy_end')}
           </p>

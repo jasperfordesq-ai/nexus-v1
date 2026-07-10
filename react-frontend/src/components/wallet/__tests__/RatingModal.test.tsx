@@ -80,16 +80,15 @@ describe('RatingModal', () => {
     expect(screen.getByText(/with Alice/i)).toBeInTheDocument();
   });
 
-  it('renders 5 star buttons', () => {
+  it('renders 5 translated star radio options', () => {
     render(<RatingModal {...defaultProps} />);
-    const starButtons = screen.getAllByRole('button', { name: /star/i });
-    expect(starButtons).toHaveLength(5);
+    expect(screen.getAllByRole('radio')).toHaveLength(5);
   });
 
-  it('star buttons have correct aria-labels', () => {
+  it('star radios have translated accessible names', () => {
     render(<RatingModal {...defaultProps} />);
-    expect(screen.getByRole('button', { name: '1 star' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '5 stars' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Poor' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'Excellent' })).toBeInTheDocument();
   });
 
   it('does not show rating description text before a star is selected', () => {
@@ -100,7 +99,7 @@ describe('RatingModal', () => {
 
   it('shows "Poor" text when 1 star is selected', async () => {
     render(<RatingModal {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: '1 star' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Poor' }));
     await waitFor(() => {
       expect(screen.getByText('Poor')).toBeInTheDocument();
     });
@@ -108,7 +107,7 @@ describe('RatingModal', () => {
 
   it('shows "Excellent" text when 5 stars are selected', async () => {
     render(<RatingModal {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: '5 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Excellent' }));
     await waitFor(() => {
       expect(screen.getByText('Excellent')).toBeInTheDocument();
     });
@@ -134,7 +133,7 @@ describe('RatingModal', () => {
 
   it('enables Submit Rating button after selecting a star', async () => {
     render(<RatingModal {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: '3 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Good' }));
     await waitFor(() => {
       const submitBtn = screen.getByRole('button', { name: /submit rating/i });
       expect(submitBtn).not.toBeDisabled();
@@ -154,7 +153,7 @@ describe('RatingModal', () => {
       />
     );
 
-    fireEvent.click(screen.getByRole('button', { name: '4 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Very Good' }));
     fireEvent.click(screen.getByRole('button', { name: /submit rating/i }));
 
     await waitFor(() => {
@@ -172,7 +171,7 @@ describe('RatingModal', () => {
     vi.mocked(api.post).mockResolvedValueOnce({ success: false, error: 'Error' });
 
     render(<RatingModal {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: '2 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Fair' }));
     fireEvent.click(screen.getByRole('button', { name: /submit rating/i }));
 
     await waitFor(() => {
@@ -184,7 +183,7 @@ describe('RatingModal', () => {
     vi.mocked(api.post).mockRejectedValueOnce(new Error('Network error'));
 
     render(<RatingModal {...defaultProps} />);
-    fireEvent.click(screen.getByRole('button', { name: '5 stars' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Excellent' }));
     fireEvent.click(screen.getByRole('button', { name: /submit rating/i }));
 
     await waitFor(() => {

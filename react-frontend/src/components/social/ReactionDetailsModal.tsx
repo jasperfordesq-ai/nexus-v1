@@ -13,7 +13,7 @@ import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
-import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/Spinner';
 import { Tab, Tabs } from '@/components/ui/Tabs';
 import {
@@ -42,7 +42,7 @@ interface ReactionDetailsModalProps {
 
 const renderEmoji = (type: string) => {
   if (type === 'time_credit') {
-    return <Clock className="w-3 h-3 text-purple-400" aria-hidden="true" />;
+    return <Clock className="w-3 h-3 text-accent" aria-hidden="true" />;
   }
 
   return (
@@ -150,20 +150,20 @@ export function ReactionDetailsModal({
       }}
     >
       <ModalContent>
-        <ModalHeader className="text-[var(--text-primary)] pb-0">
-          <div className="flex items-center gap-3">
-            <div className="flex -space-x-1">
-              {sortedTypes.slice(0, 3).map(([type]) => (
-                <span
-                  key={type}
-                  className="w-7 h-7 rounded-full bg-[var(--surface-elevated)] border-2 border-[var(--glass-bg)] flex items-center justify-center text-sm"
-                >
-                  {renderEmoji(type)}
-                </span>
-              ))}
-            </div>
-            {tr('card.reactions_title', 'Reactions')} ({total})
+        <ModalHeader className="flex items-center gap-3 pb-0 text-[var(--text-primary)]">
+          <div className="flex -space-x-1" aria-hidden="true">
+            {sortedTypes.slice(0, 3).map(([type]) => (
+              <span
+                key={type}
+                className="w-7 h-7 rounded-full bg-[var(--surface-elevated)] border-2 border-[var(--glass-bg)] flex items-center justify-center text-sm"
+              >
+                {renderEmoji(type)}
+              </span>
+            ))}
           </div>
+          <ModalHeading>
+            {tr('card.reactions_title', 'Reactions')} ({total})
+          </ModalHeading>
         </ModalHeader>
         <ModalBody className="pb-4 pt-2">
           <Tabs

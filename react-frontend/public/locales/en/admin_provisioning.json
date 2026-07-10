@@ -116,7 +116,8 @@
       "intended_use": "Intended use",
       "rejection_reason": "Rejection reason",
       "provisioning_log": "Provisioning log"
-    }
+    },
+    "loading": "Loading provisioning requests…"
   },
   "loading": "Loading",
   "refresh": "Refresh"

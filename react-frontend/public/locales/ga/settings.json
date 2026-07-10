@@ -278,7 +278,9 @@
     "linked": "Nasctha",
     "connected_accounts": "Ceangailte",
     "safeguarding": "Cosaint",
-    "translation": "Aistriúchán"
+    "translation": "Aistriúchán",
+    "linked-accounts": "Cuntais nasctha",
+    "connected-accounts": "Cuntais nasctha"
   },
   "safeguarding": {
     "page_title": "Sainroghanna cosanta",
@@ -588,7 +590,12 @@
     "unblocked_desc": "Baineadh an bac de {{name}}.",
     "unblock_error": "Níorbh fhéidir an bac a bhaint den úsáideoir",
     "blocked_on": "Cuireadh bac ar {{date}}",
-    "link": "Úsáideoirí a bhfuil bac orthu"
+    "link": "Úsáideoirí a bhfuil bac orthu",
+    "count_few": "{{count}} bactha",
+    "count_many": "{{count}} bactha",
+    "count_one": "{{count}} bactha",
+    "count_other": "{{count}} bactha",
+    "count_two": "{{count}} bactha"
   },
   "block_user": {
     "title": "An bhfuil fonn ort {{name}} a bhlocáil?",
@@ -615,5 +622,20 @@
   "push_campaign_opt_in": "Fógraí brú maoinithe a fháil",
   "push_campaign_opt_in_description": "Ceadaigh do ghnólachtaí agus eagraíochtaí áitiúla fógraí brú dírithe a sheoladh chugat. Is féidir leat díliostáil am ar bith.",
   "tabs_aria": "Codanna socruithe",
-  "twofa_loading_setup": "Socrú dhá-fhachtóir á lódáil..."
+  "twofa_loading_setup": "Socrú dhá-fhachtóir á lódáil...",
+  "biometric_all_removed_few": "Baineadh pasfhocal {{count}}.",
+  "biometric_all_removed_many": "Baineadh pasfhocal {{count}}.",
+  "biometric_all_removed_one": "Baineadh pasfhocal {{count}}.",
+  "biometric_all_removed_other": "Baineadh pasfhocal {{count}}.",
+  "biometric_all_removed_two": "Baineadh pasfhocal {{count}}.",
+  "biometric_enabled_few": "Pasfhocal {{count}} cláraithe",
+  "biometric_enabled_many": "Pasfhocal {{count}} cláraithe",
+  "biometric_enabled_one": "Pasfhocal {{count}} cláraithe",
+  "biometric_enabled_other": "Pasfhocal {{count}} cláraithe",
+  "biometric_enabled_two": "Pasfhocal {{count}} cláraithe",
+  "twofa_backup_remaining_few": "{{count}} cód cúltaca fágtha",
+  "twofa_backup_remaining_many": "{{count}} cód cúltaca fágtha",
+  "twofa_backup_remaining_one": "{{count}} cód cúltaca fágtha",
+  "twofa_backup_remaining_other": "{{count}} cód cúltaca fágtha",
+  "twofa_backup_remaining_two": "{{count}} cód cúltaca fágtha"
 }

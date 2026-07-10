@@ -9,7 +9,7 @@
  */
 
 import { useMemo, useRef, useState } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
+import { Popover, PopoverContent, PopoverHeading, PopoverTrigger } from '@/components/ui';
 import Search from 'lucide-react/icons/search';
 import Smile from 'lucide-react/icons/smile';
 import { useTranslation } from 'react-i18next';
@@ -103,6 +103,7 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-72 p-2 bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
+        <PopoverHeading className="sr-only">{t('compose.emoji_search')}</PopoverHeading>
         {/* Search */}
         <Input
           size="sm"

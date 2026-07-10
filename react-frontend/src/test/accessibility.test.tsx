@@ -103,12 +103,30 @@ vi.mock('@/contexts', () => ({
   }),
 }));
 
+// Breadcrumbs imports the direct context module rather than the barrel above.
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: () => ({
+    tenant: { id: 2, name: 'Test Timebank', slug: 'test-timebank' },
+    tenantSlug: 'test-timebank',
+    tenantPath: (path: string) => `/test-timebank${path}`,
+    hasFeature: () => true,
+    hasModule: () => true,
+    features: {},
+    modules: {},
+    branding: {},
+    isLoading: false,
+    error: null,
+    notFoundSlug: null,
+    refreshTenant: () => Promise.resolve(),
+  }),
+}));
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function withProviders(ui: React.ReactElement) {
   return render(
     <>
-      <MemoryRouter>
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         {ui}
       </MemoryRouter>
     </>

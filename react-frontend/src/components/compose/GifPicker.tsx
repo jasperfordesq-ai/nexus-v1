@@ -9,7 +9,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
+import { Popover, PopoverContent, PopoverHeading, PopoverTrigger } from '@/components/ui';
 import Film from 'lucide-react/icons/film';
 import { useTranslation } from 'react-i18next';
 
@@ -102,6 +102,7 @@ export function GifPicker({ onSelect }: GifPickerProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-2 bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
+        <PopoverHeading className="sr-only">{t('gif.button_label')}</PopoverHeading>
         {/* Search input */}
         <SearchField
           size="sm"

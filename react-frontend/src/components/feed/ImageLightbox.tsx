@@ -142,7 +142,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
         wrapper: 'p-0',
       }}
     >
-      <ModalContent>
+      <ModalContent aria-label={t('lightbox.aria_label')}>
         <ModalBody
       ref={containerRef}
       className="relative flex h-dvh items-center justify-center overflow-hidden"
@@ -157,7 +157,6 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
         size="sm"
         className="absolute top-4 right-4 z-10 bg-theme-elevated text-theme-primary rounded-full shadow-lg"
         onPress={onClose}
-        onClick={(e) => e.stopPropagation()}
         aria-label={t('lightbox.close')}
       >
         <X className="w-6 h-6 stroke-[2.5]" />
@@ -245,7 +244,6 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
           size="sm"
           className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm text-white rounded-full"
           onPress={goPrev}
-          onClick={(e) => e.stopPropagation()}
           aria-label={t('carousel.previous')}
         >
           <ChevronLeft className="w-6 h-6" />
@@ -260,7 +258,6 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
           size="sm"
           className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/10 backdrop-blur-sm text-white rounded-full"
           onPress={goNext}
-          onClick={(e) => e.stopPropagation()}
           aria-label={t('carousel.next')}
         >
           <ChevronRight className="w-6 h-6" />
@@ -288,7 +285,6 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
                       : 'after:bg-white/40 hover:after:bg-white/60'
                   }`}
                   onPress={() => { setDirection(idx > currentIndex ? 1 : -1); setCurrentIndex(idx); }}
-                  onClick={(e) => e.stopPropagation()}
                   aria-label={t('carousel.go_to_image', { number: idx + 1 })}
                   aria-current={idx === currentIndex ? 'true' : undefined}
                 />
@@ -306,7 +302,6 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
                     : 'after:bg-white/40 hover:after:bg-white/60'
                 }`}
                 onPress={() => { setDirection(idx > currentIndex ? 1 : -1); setCurrentIndex(idx); }}
-                onClick={(e) => e.stopPropagation()}
                 aria-label={t('carousel.go_to_image', { number: idx + 1 })}
                 aria-current={idx === currentIndex ? 'true' : undefined}
               />

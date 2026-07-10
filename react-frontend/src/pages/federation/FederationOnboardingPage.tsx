@@ -275,7 +275,7 @@ export function FederationOnboardingPage() {
         <Progress
           value={(currentStep / TOTAL_STEPS) * 100}
           classNames={{
-            indicator: 'bg-gradient-to-r from-indigo-500 to-purple-600',
+            indicator: 'bg-gradient-to-r from-accent to-accent-gradient-end',
             track: 'bg-theme-elevated',
           }}
           aria-label={t('onboarding.progress_aria', { current: currentStep, total: TOTAL_STEPS })}
@@ -302,16 +302,16 @@ export function FederationOnboardingPage() {
                   <motion.div
                     animate={{ y: [0, -6, 0] }}
                     transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
-                    className="p-4 rounded-2xl bg-indigo-500/20"
+                    className="p-4 rounded-2xl bg-accent/20"
                   >
-                    <Globe className="w-10 h-10 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                    <Globe className="w-10 h-10 text-accent dark:text-accent" aria-hidden="true" />
                   </motion.div>
                   <motion.div
                     animate={{ y: [0, -6, 0] }}
                     transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut', delay: 0.4 }}
-                    className="p-4 rounded-2xl bg-purple-500/20"
+                    className="p-4 rounded-2xl bg-accent/20"
                   >
-                    <Users className="w-10 h-10 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+                    <Users className="w-10 h-10 text-accent dark:text-accent" aria-hidden="true" />
                   </motion.div>
                   <motion.div
                     animate={{ y: [0, -6, 0] }}
@@ -333,12 +333,12 @@ export function FederationOnboardingPage() {
               {/* Benefit cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <BenefitCard
-                  icon={<Sparkles className="w-6 h-6 text-indigo-500" />}
+                  icon={<Sparkles className="w-6 h-6 text-accent" />}
                   title={t('onboarding.benefit_discover_title')}
                   description={t('onboarding.benefit_discover_description')}
                 />
                 <BenefitCard
-                  icon={<HandHeart className="w-6 h-6 text-purple-500" />}
+                  icon={<HandHeart className="w-6 h-6 text-accent" />}
                   title={t('onboarding.benefit_meet_title')}
                   description={t('onboarding.benefit_meet_description')}
                 />
@@ -353,7 +353,7 @@ export function FederationOnboardingPage() {
               <div className="flex justify-center">
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-8"
+                  className="bg-gradient-to-r from-accent to-accent-gradient-end text-white px-8"
                   endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                   onPress={goNextAnimated}
                 >
@@ -368,7 +368,7 @@ export function FederationOnboardingPage() {
             <div className="space-y-6">
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                  <Eye className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                   {t('onboarding.profile_visibility')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
@@ -377,35 +377,35 @@ export function FederationOnboardingPage() {
 
                 <div className="space-y-1">
                   <OnboardingToggle
-                    icon={<Globe className="w-4 h-4 text-indigo-500" />}
+                    icon={<Globe className="w-4 h-4 text-accent" />}
                     label={t('onboarding.toggle_profile_visible')}
                     description={t('onboarding.toggle_profile_visible_desc')}
                     checked={settings.profile_visible_federated}
                     onChange={(v) => updateSetting('profile_visible_federated', v)}
                   />
                   <OnboardingToggle
-                    icon={<Search className="w-4 h-4 text-indigo-500" />}
+                    icon={<Search className="w-4 h-4 text-accent" />}
                     label={t('onboarding.toggle_search_visible')}
                     description={t('onboarding.toggle_search_visible_desc')}
                     checked={settings.appear_in_federated_search}
                     onChange={(v) => updateSetting('appear_in_federated_search', v)}
                   />
                   <OnboardingToggle
-                    icon={<Zap className="w-4 h-4 text-indigo-500" />}
+                    icon={<Zap className="w-4 h-4 text-accent" />}
                     label={t('onboarding.toggle_skills_shared')}
                     description={t('onboarding.toggle_skills_shared_desc')}
                     checked={settings.show_skills_federated}
                     onChange={(v) => updateSetting('show_skills_federated', v)}
                   />
                   <OnboardingToggle
-                    icon={<MapPin className="w-4 h-4 text-indigo-500" />}
+                    icon={<MapPin className="w-4 h-4 text-accent" />}
                     label={t('onboarding.toggle_location_shared')}
                     description={t('onboarding.toggle_location_shared_desc')}
                     checked={settings.show_location_federated}
                     onChange={(v) => updateSetting('show_location_federated', v)}
                   />
                   <OnboardingToggle
-                    icon={<Star className="w-4 h-4 text-indigo-500" />}
+                    icon={<Star className="w-4 h-4 text-accent" />}
                     label={t('onboarding.toggle_reviews_visible')}
                     description={t('onboarding.toggle_reviews_visible_desc')}
                     checked={settings.show_reviews_federated}
@@ -426,7 +426,7 @@ export function FederationOnboardingPage() {
             <div className="space-y-6">
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                  <Shield className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                   {t('onboarding.communication_preferences')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
@@ -435,21 +435,21 @@ export function FederationOnboardingPage() {
 
                 <div className="space-y-1">
                   <OnboardingToggle
-                    icon={<Send className="w-4 h-4 text-indigo-500" />}
+                    icon={<Send className="w-4 h-4 text-accent" />}
                     label={t('onboarding.toggle_messaging')}
                     description={t('onboarding.toggle_messaging_desc')}
                     checked={settings.messaging_enabled_federated}
                     onChange={(v) => updateSetting('messaging_enabled_federated', v)}
                   />
                   <OnboardingToggle
-                    icon={<CreditCard className="w-4 h-4 text-indigo-500" />}
+                    icon={<CreditCard className="w-4 h-4 text-accent" />}
                     label={t('onboarding.toggle_transactions')}
                     description={t('onboarding.toggle_transactions_desc')}
                     checked={settings.transactions_enabled_federated}
                     onChange={(v) => updateSetting('transactions_enabled_federated', v)}
                   />
                   <OnboardingToggle
-                    icon={<Mail className="w-4 h-4 text-indigo-500" />}
+                    icon={<Mail className="w-4 h-4 text-accent" />}
                     label={t('onboarding.toggle_email_notifications')}
                     description={t('onboarding.toggle_email_notifications_desc')}
                     checked={settings.email_notifications}
@@ -460,7 +460,7 @@ export function FederationOnboardingPage() {
 
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                  <MapPin className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                   {t('onboarding.service_reach')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
@@ -607,7 +607,7 @@ export function FederationOnboardingPage() {
               {/* Partner communities preview */}
               <GlassCard className="p-6">
                 <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                  <Globe className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                   {t('onboarding.partner_communities')}
                 </h2>
 
@@ -627,8 +627,8 @@ export function FederationOnboardingPage() {
                           className="flex items-center justify-between p-3 rounded-lg bg-theme-elevated"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="p-2 rounded-lg bg-indigo-500/20">
-                              <Globe className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+                            <div className="p-2 rounded-lg bg-accent/20">
+                              <Globe className="w-4 h-4 text-accent" aria-hidden="true" />
                             </div>
                             <div>
                               <p className="font-medium text-theme-primary text-sm">{partner.name}</p>
@@ -680,7 +680,7 @@ export function FederationOnboardingPage() {
                   </Button>
                   <Button
                     size="lg"
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                     onPress={handleComplete}
                     isLoading={isSubmitting}
                     startContent={!isSubmitting && <CheckCircle className="w-5 h-5" aria-hidden="true" />}
@@ -726,7 +726,7 @@ function OnboardingToggle({ label, description, checked, onChange, icon }: Onboa
         isSelected={checked}
         onValueChange={onChange}
         classNames={{
-          wrapper: 'group-data-[selected=true]:bg-indigo-500',
+          wrapper: 'group-data-[selected=true]:bg-accent',
         }}
       />
     </div>
@@ -791,7 +791,7 @@ function StepNavigation({ onBack, onNext, nextLabel, isLoading }: StepNavigation
         {t('onboarding.back')}
       </Button>
       <Button
-        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+        className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
         endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
         onPress={onNext}
         isLoading={isLoading}

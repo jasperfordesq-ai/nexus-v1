@@ -396,7 +396,9 @@
       },
       "messages": {
         "recomputed": "Trust tiers recomputed for {{count}} members.",
-        "saved": "Trust tier configuration saved. Changes apply on the next recompute run."
+        "saved": "Trust tier configuration saved. Changes apply on the next recompute run.",
+        "recomputed_one": "Trust tiers recomputed for {{count}} members.",
+        "recomputed_other": "Trust tiers recomputed for {{count}} members."
       },
       "recompute_confirm": "Recompute trust tiers for all members? This may take a few minutes."
     },
@@ -741,7 +743,15 @@
       "escalate_failed": "Could not escalate review.",
       "approve_success": "Review approved.",
       "decline_success": "Review declined.",
-      "decision_failed": "Could not record decision."
+      "decision_failed": "Could not record decision.",
+      "manual_escalation_note_one": "Manually escalated after {{count}} pending days.",
+      "manual_escalation_note_other": "Manually escalated after {{count}} pending days.",
+      "escalated_count_one": "{{count}} escalated",
+      "escalated_count_other": "{{count}} escalated",
+      "overdue_count_one": "{{count}} overdue",
+      "overdue_count_other": "{{count}} overdue",
+      "age_days_one": "{{count}} day old",
+      "age_days_other": "{{count}} day old"
     },
     "paper_onboarding": {
       "title": "Paper onboarding (OCR)",
@@ -818,7 +828,11 @@
         "investigating": "Investigating",
         "resolved": "Resolved",
         "dismissed": "Dismissed"
-      }
+      },
+      "age_hours_one": "{{count}}h",
+      "age_hours_other": "{{count}}h",
+      "age_days_one": "{{count}}d",
+      "age_days_other": "{{count}}d"
     },
     "role_pack": {
       "title": "Role presets",
@@ -857,7 +871,9 @@
           "title": "Trusted Reviewer",
           "description": "Approve hours quickly with light-touch oversight."
         }
-      }
+      },
+      "available_count_one": "{{count}} role presets available",
+      "available_count_other": "{{count}} role presets available"
     },
     "policy": {
       "title": "Workflow policy",
@@ -925,7 +941,9 @@
       "loading_favours": "Loading favours...",
       "empty": "No favours recorded yet.",
       "anonymous": "Anonymous",
-      "unknown": "Unknown"
+      "unknown": "Unknown",
+      "total_recorded_one": "{{count}} total recorded",
+      "total_recorded_other": "{{count}} total recorded"
     },
     "assisted_onboarding": {
       "title": "Assisted onboarding",
@@ -1103,6 +1121,12 @@
         "completed": "Completed",
         "cancelled": "Cancelled"
       }
+    },
+    "invite_card": {
+      "brand": "Community Caring",
+      "subtitle": "Neighbour-to-neighbour invitation",
+      "instructions": "Enter this code or visit the link below to join.",
+      "valid_until": "Valid until {{date}}"
     }
   },
   "category_coefficients": {
@@ -1218,7 +1242,9 @@
       "export_empty": "Export returned empty",
       "exported": "Boundary map exported",
       "export_failed": "Failed to export boundary map"
-    }
+    },
+    "overrides_count_one": "{{count}} override",
+    "overrides_count_other": "{{count}} override"
   },
   "data_quality": {
     "meta": {
@@ -1255,7 +1281,9 @@
       "label": "Summary:",
       "count": "{{count}} {{label}}",
       "generated": "Generated {{date}}",
-      "affected": "affected"
+      "affected": "affected",
+      "count_one": "{{count}} {{label}}",
+      "count_other": "{{count}} {{label}}"
     },
     "drilldown": {
       "subtitle": "Up to 50 affected rows - resolve or document before launch.",
@@ -1618,7 +1646,17 @@
       "request_meta": "When: {{when}} - user #{{userId}} - age {{age}}",
       "target_hours": "Target {{hours}}h",
       "over_by": "Over by {{duration}}",
-      "left": "{{duration}} left"
+      "left": "{{duration}} left",
+      "subtitle_one": "{{count}} open - sorted breached first",
+      "subtitle_other": "{{count}} open - sorted breached first",
+      "all_count_one": "All ({{count}})",
+      "all_count_other": "All ({{count}})",
+      "breached_count_one": "Breached ({{count}})",
+      "breached_count_other": "Breached ({{count}})",
+      "at_risk_count_one": "At risk ({{count}})",
+      "at_risk_count_other": "At risk ({{count}})",
+      "on_track_count_one": "On track ({{count}})",
+      "on_track_count_other": "On track ({{count}})"
     },
     "resolved": {
       "title": "Recently resolved (last 72h)",
@@ -1722,14 +1760,24 @@
       "pending": "Pending: {{count}}",
       "in_progress": "In progress: {{count}}",
       "decided": "Decided: {{count}}",
-      "blocked": "Blocked: {{count}}"
+      "blocked": "Blocked: {{count}}",
+      "pending_one": "Pending: {{count}}",
+      "pending_other": "Pending: {{count}}",
+      "in_progress_one": "In progress: {{count}}",
+      "in_progress_other": "In progress: {{count}}",
+      "decided_one": "Decided: {{count}}",
+      "decided_other": "Decided: {{count}}",
+      "blocked_one": "Blocked: {{count}}",
+      "blocked_other": "Blocked: {{count}}"
     },
     "gate": {
       "closed": "Gate closed - ready to launch",
       "open": "Gate open - decisions still required",
       "decided_count": "{{decided}} of {{total}} items decided",
       "blocked_count": " - {{count}} blocked",
-      "progress_aria": "Decision-gate progress"
+      "progress_aria": "Decision-gate progress",
+      "blocked_count_one": " - {{count}} blocked",
+      "blocked_count_other": " - {{count}} blocked"
     },
     "fields": {
       "value": "Value",
@@ -1874,7 +1922,9 @@
     "contacts": {
       "title": "Contacts ({{count}})",
       "empty": "No contacts match the current filters.",
-      "table_aria": "Lead nurture contacts"
+      "table_aria": "Lead nurture contacts",
+      "title_one": "Contacts ({{count}})",
+      "title_other": "Contacts ({{count}})"
     },
     "table": {
       "name_email": "Name / Email",
@@ -1961,7 +2011,9 @@
       "audience_description": "Specify who this announcement is for (e.g. 'all residents', 'volunteers', 'municipality contacts') so the AI can calibrate the tone and vocabulary appropriately.",
       "polished_text": "Polished text",
       "reason": "Reason",
-      "reason_placeholder": "Why is this proposal being rejected?"
+      "reason_placeholder": "Why is this proposal being rejected?",
+      "character_count_one": "{{count}} / 4000 characters",
+      "character_count_other": "{{count}} / 4000 characters"
     },
     "status": {
       "proposed": "Proposed",
@@ -2228,7 +2280,9 @@
       "ready_body_suffix": "when your coordinator team is ready to make this a one-way decision.",
       "blocked_title": "Cannot launch yet - {{count}} blocker remains",
       "blocked_title_plural": "Cannot launch yet - {{count}} blockers remain",
-      "blocked_body": "Resolve every section below before the launch button is enabled."
+      "blocked_body": "Resolve every section below before the launch button is enabled.",
+      "blocked_title_one": "Cannot launch yet - {{count}} blocker remains",
+      "blocked_title_other": "Cannot launch yet - {{count}} blocker remains"
     },
     "overall": {
       "ready": "Pilot is ready to launch",
@@ -2277,7 +2331,9 @@
       "load_failed": "The launch-readiness report could not be loaded.",
       "unexpected_response": "The launch-readiness report returned an unexpected response.",
       "unavailable_title": "Readiness report unavailable"
-    }
+    },
+    "more_count_one": "+{{count}} more",
+    "more_count_other": "+{{count}} more"
   },
   "pilot_scoreboard": {
     "meta": {
@@ -2419,7 +2475,9 @@
       "placeholder_label": "{{placeholder}}",
       "rendered_markdown": "Rendered Markdown ({{count}} chars)",
       "missing_placeholder_count_one": "{{count}} placeholder missing",
-      "missing_placeholder_count_other": "{{count}} placeholders missing"
+      "missing_placeholder_count_other": "{{count}} placeholders missing",
+      "rendered_markdown_one": "Rendered Markdown ({{count}} chars)",
+      "rendered_markdown_other": "Rendered Markdown ({{count}} chars)"
     },
     "exports": {
       "title": "Dataset Export History",
@@ -2529,7 +2587,9 @@
       "title": "Dry-run preview",
       "candidates": "{{count}} candidates",
       "empty": "No eligible candidates right now.",
-      "table_aria": "Dry-run nudge candidates"
+      "table_aria": "Dry-run nudge candidates",
+      "candidates_one": "{{count}} candidates",
+      "candidates_other": "{{count}} candidates"
     },
     "recent": {
       "title": "Recent nudges",
@@ -2559,7 +2619,11 @@
       "save_failed": "Failed to save configuration",
       "dry_run": "Dry run: {{count}} eligible candidates",
       "dispatched": "Dispatched {{count}} nudges",
-      "dispatch_failed": "Dispatch failed"
+      "dispatch_failed": "Dispatch failed",
+      "dry_run_one": "Dry run: {{count}} eligible candidates",
+      "dry_run_other": "Dry run: {{count}} eligible candidates",
+      "dispatched_one": "Dispatched {{count}} nudges",
+      "dispatched_other": "Dispatched {{count}} nudges"
     }
   },
   "sub_regions": {

@@ -1583,7 +1583,7 @@ export function ConversationPage() {
               {t('back_to_messages')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               onPress={() => loadConversation()}
             >
               {t('try_again')}
@@ -1693,7 +1693,7 @@ export function ConversationPage() {
                   variant="secondary"
                   size="sm"
                   className={autoTranslateOn
-                    ? 'bg-indigo-500/20 text-indigo-500 ring-1 ring-indigo-500/30'
+                    ? 'bg-accent/20 text-accent ring-1 ring-accent/30'
                     : 'bg-theme-elevated text-theme-muted'
                   }
                   aria-label={autoTranslateOn ? t('auto_translate.tooltip_on') : t('auto_translate.tooltip_off')}
@@ -1881,7 +1881,7 @@ export function ConversationPage() {
           <div className="flex shrink-0 items-center gap-2 sm:flex-col sm:items-stretch">
             <Button
               size="sm"
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white dark:text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white dark:text-white"
               onPress={requestCoordinatorHelp}
               isLoading={isRequestingCoordinator}
               isDisabled={coordinatorRequestSent}
@@ -1919,9 +1919,9 @@ export function ConversationPage() {
 
       {/* Translation feature hint — shown once, dismissible */}
       {translationFeatureEnabled && !translationHintDismissed && (
-        <div className="flex shrink-0 items-start gap-3 rounded-lg border border-indigo-500/20 bg-indigo-500/10 p-3" role="status">
-          <Languages className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
-          <div className="flex-1 text-sm text-indigo-700 dark:text-indigo-300">
+        <div className="flex shrink-0 items-start gap-3 rounded-lg border border-accent/20 bg-accent/10 p-3" role="status">
+          <Languages className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <div className="flex-1 text-sm text-accent dark:text-accent">
             <p className="font-medium">{t('translate_hint.title')}</p>
             <p className="mt-0.5 opacity-80">{t('translate_hint.body')}</p>
           </div>
@@ -1929,7 +1929,7 @@ export function ConversationPage() {
             isIconOnly
             size="sm"
             variant="tertiary"
-            className="text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-200 flex-shrink-0 -mt-0.5"
+            className="text-accent hover:text-accent dark:hover:text-accent flex-shrink-0 -mt-0.5"
             onPress={dismissTranslationHint}
             aria-label={t('translate_hint.dismiss')}
           >
@@ -1940,15 +1940,15 @@ export function ConversationPage() {
 
       {/* Auto-translate active indicator */}
       {translationFeatureEnabled && autoTranslateOn && (
-        <div className="flex shrink-0 items-center gap-2 rounded-lg bg-indigo-500/10 px-3 py-2" role="status">
-          <Languages className="w-4 h-4 text-indigo-500 flex-shrink-0" aria-hidden="true" />
-          <p className="text-xs text-indigo-600 dark:text-indigo-300 flex-1">
+        <div className="flex shrink-0 items-center gap-2 rounded-lg bg-accent/10 px-3 py-2" role="status">
+          <Languages className="w-4 h-4 text-accent flex-shrink-0" aria-hidden="true" />
+          <p className="text-xs text-accent dark:text-accent flex-1">
             {t('auto_translate.active_banner')}
           </p>
           <Button
             size="sm"
             variant="tertiary"
-            className="min-h-6 min-w-0 px-2 text-xs text-indigo-500"
+            className="min-h-6 min-w-0 px-2 text-xs text-accent"
             onPress={handleAutoTranslateToggle}
           >
             {t('auto_translate.turn_off')}
@@ -2078,9 +2078,9 @@ export function ConversationPage() {
             <div className="border-t border-theme-default px-4 py-2">
               <div className="flex min-w-0 items-center gap-2 text-sm text-theme-subtle">
                 <div className="flex gap-1" aria-hidden="true">
-                  <span className="w-1.5 h-1.5 bg-indigo-500/60 rounded-full animate-bounce" />
-                  <span className="w-1.5 h-1.5 bg-indigo-500/60 rounded-full animate-bounce [animation-delay:150ms]" />
-                  <span className="w-1.5 h-1.5 bg-indigo-500/60 rounded-full animate-bounce [animation-delay:300ms]" />
+                  <span className="w-1.5 h-1.5 bg-accent/60 rounded-full animate-bounce" />
+                  <span className="w-1.5 h-1.5 bg-accent/60 rounded-full animate-bounce [animation-delay:150ms]" />
+                  <span className="w-1.5 h-1.5 bg-accent/60 rounded-full animate-bounce [animation-delay:300ms]" />
                 </div>
                 <span className="min-w-0 truncate">{t('typing_indicator', { name: other_user.name })}</span>
               </div>

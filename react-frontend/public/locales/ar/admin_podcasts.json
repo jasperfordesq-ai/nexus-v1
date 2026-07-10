@@ -117,7 +117,23 @@
       "media_jobs_one": "{{count}} مهمة الوسائط في انتظار",
       "media_jobs_other": "{{count}} وظائف الوسائط في انتظار",
       "rss_ready_one": "يمكن التحقق من العرض المنشور {{count}}",
-      "rss_ready_other": "يمكن التحقق من العروض المنشورة {{count}}"
+      "rss_ready_other": "يمكن التحقق من العروض المنشورة {{count}}",
+      "pending_items_few": "{{count}} العناصر في انتظار المراجعة",
+      "pending_items_many": "{{count}} العناصر في انتظار المراجعة",
+      "pending_items_two": "{{count}} العناصر في انتظار المراجعة",
+      "pending_items_zero": "{{count}} العناصر في انتظار المراجعة",
+      "open_reports_few": "{{count}} فتح تقارير الأعضاء",
+      "open_reports_many": "{{count}} فتح تقارير الأعضاء",
+      "open_reports_two": "{{count}} فتح تقارير الأعضاء",
+      "open_reports_zero": "{{count}} فتح تقارير الأعضاء",
+      "media_jobs_few": "{{count}} وظائف الوسائط في انتظار",
+      "media_jobs_many": "{{count}} وظائف الوسائط في انتظار",
+      "media_jobs_two": "{{count}} وظائف الوسائط في انتظار",
+      "media_jobs_zero": "{{count}} وظائف الوسائط في انتظار",
+      "rss_ready_few": "يمكن التحقق من العروض المنشورة {{count}}",
+      "rss_ready_many": "يمكن التحقق من العروض المنشورة {{count}}",
+      "rss_ready_two": "يمكن التحقق من العروض المنشورة {{count}}",
+      "rss_ready_zero": "يمكن التحقق من العروض المنشورة {{count}}"
     },
     "feed_validation": {
       "title": "التحقق من صحة آر إس إس",
@@ -211,7 +227,13 @@
       "report_dismissed": "تم رفض التقرير.",
       "report_escalated": "تصاعد التقرير.",
       "feed_valid": "تغذية RSS جاهزة.",
-      "feed_invalid": "يحتوي موجز RSS على مشكلة (قضايا) {{count}}."
+      "feed_invalid": "يحتوي موجز RSS على مشكلة (قضايا) {{count}}.",
+      "feed_invalid_few": "يحتوي موجز RSS على مشكلة (قضايا) {{count}}.",
+      "feed_invalid_many": "يحتوي موجز RSS على مشكلة (قضايا) {{count}}.",
+      "feed_invalid_one": "يحتوي موجز RSS على مشكلة (قضايا) {{count}}.",
+      "feed_invalid_other": "يحتوي موجز RSS على مشكلة (قضايا) {{count}}.",
+      "feed_invalid_two": "يحتوي موجز RSS على مشكلة (قضايا) {{count}}.",
+      "feed_invalid_zero": "يحتوي موجز RSS على مشكلة (قضايا) {{count}}."
     },
     "bulk": {
       "approve_selected": "اعتماد المحدد",
@@ -219,7 +241,25 @@
       "done": "تم الإشراف على {{count}} عنصرًا/عناصر.",
       "partial": "تم الإشراف على {{ok}}؛ فشل {{failed}}.",
       "confirm_reject_title": "رفض العناصر المحددة",
-      "confirm_reject_message": "هل تريد رفض {{count}} من العناصر المحددة؟ سيراها المنشئون تعود إلى مسودات."
-    }
+      "confirm_reject_message": "هل تريد رفض {{count}} من العناصر المحددة؟ سيراها المنشئون تعود إلى مسودات.",
+      "done_few": "تم الإشراف على {{count}} عنصرًا/عناصر.",
+      "done_many": "تم الإشراف على {{count}} عنصرًا/عناصر.",
+      "done_one": "تم الإشراف على {{count}} عنصرًا/عناصر.",
+      "done_other": "تم الإشراف على {{count}} عنصرًا/عناصر.",
+      "done_two": "تم الإشراف على {{count}} عنصرًا/عناصر.",
+      "done_zero": "تم الإشراف على {{count}} عنصرًا/عناصر.",
+      "confirm_reject_message_few": "هل تريد رفض {{count}} من العناصر المحددة؟ سيراها المنشئون تعود إلى مسودات.",
+      "confirm_reject_message_many": "هل تريد رفض {{count}} من العناصر المحددة؟ سيراها المنشئون تعود إلى مسودات.",
+      "confirm_reject_message_one": "هل تريد رفض {{count}} من العناصر المحددة؟ سيراها المنشئون تعود إلى مسودات.",
+      "confirm_reject_message_other": "هل تريد رفض {{count}} من العناصر المحددة؟ سيراها المنشئون تعود إلى مسودات.",
+      "confirm_reject_message_two": "هل تريد رفض {{count}} من العناصر المحددة؟ سيراها المنشئون تعود إلى مسودات.",
+      "confirm_reject_message_zero": "هل تريد رفض {{count}} من العناصر المحددة؟ سيراها المنشئون تعود إلى مسودات."
+    },
+    "count_few": "{{count}} items",
+    "count_many": "{{count}} items",
+    "count_one": "{{count}} العناصر",
+    "count_other": "{{count}} العناصر",
+    "count_two": "{{count}} items",
+    "count_zero": "{{count}} items"
   }
 }

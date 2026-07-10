@@ -550,14 +550,26 @@
           "unique_uris": "رموز URI الفريدة"
         },
         "labels": {
-          "spoofed_count": "{{count}} مخادع"
+          "spoofed_count": "{{count}} مخادع",
+          "spoofed_count_few": "{{count}} مخادع",
+          "spoofed_count_many": "{{count}} مخادع",
+          "spoofed_count_one": "{{count}} مخادع",
+          "spoofed_count_other": "{{count}} مخادع",
+          "spoofed_count_two": "{{count}} مخادع",
+          "spoofed_count_zero": "{{count}} مخادع"
         },
         "log_summary": "السجل: {{size}} - منذ {{time}}",
         "sections": {
           "hits_by_crawler": "الزيارات بواسطة الزاحف",
           "hits_by_status": "الزيارات حسب حالة HTTP",
           "recent_activity": "النشاط الأخير (الأحدث أولاً، الأخير {{count}})",
-          "top_uris": "أهم URIs (أعلى 50 حسب عدد النتائج)"
+          "top_uris": "أهم URIs (أعلى 50 حسب عدد النتائج)",
+          "recent_activity_few": "النشاط الأخير (الأحدث أولاً، الأخير {{count}})",
+          "recent_activity_many": "النشاط الأخير (الأحدث أولاً، الأخير {{count}})",
+          "recent_activity_one": "النشاط الأخير (الأحدث أولاً، الأخير {{count}})",
+          "recent_activity_other": "النشاط الأخير (الأحدث أولاً، الأخير {{count}})",
+          "recent_activity_two": "النشاط الأخير (الأحدث أولاً، الأخير {{count}})",
+          "recent_activity_zero": "النشاط الأخير (الأحدث أولاً، الأخير {{count}})"
         },
         "tables": {
           "recent_hits_aria": "زيارات الروبوت الأخيرة",
@@ -573,7 +585,13 @@
         "actions": {
           "open_in_inventory": "فتح في المخزون",
           "refresh": "ينعش",
-          "refresh_all_stale": "تحديث الكل القديم ({{count}})"
+          "refresh_all_stale": "تحديث الكل القديم ({{count}})",
+          "refresh_all_stale_few": "تحديث الكل القديم ({{count}})",
+          "refresh_all_stale_many": "تحديث الكل القديم ({{count}})",
+          "refresh_all_stale_one": "تحديث الكل القديم ({{count}})",
+          "refresh_all_stale_other": "تحديث الكل القديم ({{count}})",
+          "refresh_all_stale_two": "تحديث الكل القديم ({{count}})",
+          "refresh_all_stale_zero": "تحديث الكل القديم ({{count}})"
         },
         "columns": {
           "actions": "ACTIONS",
@@ -585,7 +603,13 @@
           "tenant": "TENANT"
         },
         "confirm": {
-          "queue_recache": "هل تريد استعادة قائمة الانتظار لمستأجري {{count}}؟"
+          "queue_recache": "هل تريد استعادة قائمة الانتظار لمستأجري {{count}}؟",
+          "queue_recache_few": "هل تريد استعادة قائمة الانتظار لمستأجري {{count}}؟",
+          "queue_recache_many": "هل تريد استعادة قائمة الانتظار لمستأجري {{count}}؟",
+          "queue_recache_one": "هل تريد استعادة قائمة الانتظار لمستأجري {{count}}؟",
+          "queue_recache_other": "هل تريد استعادة قائمة الانتظار لمستأجري {{count}}؟",
+          "queue_recache_two": "هل تريد استعادة قائمة الانتظار لمستأجري {{count}}؟",
+          "queue_recache_zero": "هل تريد استعادة قائمة الانتظار لمستأجري {{count}}؟"
         },
         "empty": "لا يوجد مستأجرين",
         "errors": {
@@ -596,11 +620,23 @@
         "messages": {
           "bulk_queued": "إعادة التخزين المؤقت في قائمة الانتظار لمستأجري {{count}}",
           "no_stale": "لا يوجد مستأجرين قديمين - التغطية صحية",
-          "tenant_queued": "تمت جدولة #{{id}} لـ {{slug}}"
+          "tenant_queued": "تمت جدولة #{{id}} لـ {{slug}}",
+          "bulk_queued_few": "إعادة التخزين المؤقت في قائمة الانتظار لمستأجري {{count}}",
+          "bulk_queued_many": "إعادة التخزين المؤقت في قائمة الانتظار لمستأجري {{count}}",
+          "bulk_queued_one": "إعادة التخزين المؤقت في قائمة الانتظار لمستأجري {{count}}",
+          "bulk_queued_other": "إعادة التخزين المؤقت في قائمة الانتظار لمستأجري {{count}}",
+          "bulk_queued_two": "إعادة التخزين المؤقت في قائمة الانتظار لمستأجري {{count}}",
+          "bulk_queued_zero": "إعادة التخزين المؤقت في قائمة الانتظار لمستأجري {{count}}"
         },
         "summary": {
           "healthy": "جميع مستأجري {{count}} يتمتعون بصحة جيدة.",
-          "needs_work": "{{needing}} من مستأجري {{total}} لديهم مسارات مفقودة أو قديمة أو معطلة."
+          "needs_work": "{{needing}} من مستأجري {{total}} لديهم مسارات مفقودة أو قديمة أو معطلة.",
+          "healthy_few": "جميع مستأجري {{count}} يتمتعون بصحة جيدة.",
+          "healthy_many": "جميع مستأجري {{count}} يتمتعون بصحة جيدة.",
+          "healthy_one": "جميع مستأجري {{count}} يتمتعون بصحة جيدة.",
+          "healthy_other": "جميع مستأجري {{count}} يتمتعون بصحة جيدة.",
+          "healthy_two": "جميع مستأجري {{count}} يتمتعون بصحة جيدة.",
+          "healthy_zero": "جميع مستأجري {{count}} يتمتعون بصحة جيدة."
         },
         "table_aria": "التغطية"
       },
@@ -628,7 +664,19 @@
           "drift_applied": "تم تطبيق كشف الانجراف",
           "drift_dry_run": "اكتمل التشغيل الجاف للانجراف",
           "purge_dry_run": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
-          "purged_ungated": "تمت إزالة لقطات {{count}} غير المحظورة عبر مستأجري {{tenants}}"
+          "purged_ungated": "تمت إزالة لقطات {{count}} غير المحظورة عبر مستأجري {{tenants}}",
+          "purged_ungated_few": "تمت إزالة لقطات {{count}} غير المحظورة عبر مستأجري {{tenants}}",
+          "purged_ungated_many": "تمت إزالة لقطات {{count}} غير المحظورة عبر مستأجري {{tenants}}",
+          "purged_ungated_one": "تمت إزالة لقطات {{count}} غير المحظورة عبر مستأجري {{tenants}}",
+          "purged_ungated_other": "تمت إزالة لقطات {{count}} غير المحظورة عبر مستأجري {{tenants}}",
+          "purged_ungated_two": "تمت إزالة لقطات {{count}} غير المحظورة عبر مستأجري {{tenants}}",
+          "purged_ungated_zero": "تمت إزالة لقطات {{count}} غير المحظورة عبر مستأجري {{tenants}}",
+          "purge_dry_run_few": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "purge_dry_run_many": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "purge_dry_run_one": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "purge_dry_run_other": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "purge_dry_run_two": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "purge_dry_run_zero": "التشغيل الجاف: ستتم إزالة لقطات {{count}}"
         },
         "no_output": "(لا يوجد إخراج)",
         "purge_ungated": {
@@ -637,7 +685,19 @@
         },
         "result": {
           "deleted": "تم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
-          "would_delete": "سيتم حذف لقطات {{count}} عبر مستأجري {{tenants}}"
+          "would_delete": "سيتم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "would_delete_few": "سيتم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "would_delete_many": "سيتم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "would_delete_one": "سيتم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "would_delete_other": "سيتم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "would_delete_two": "سيتم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "would_delete_zero": "سيتم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "deleted_few": "تم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "deleted_many": "تم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "deleted_one": "تم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "deleted_other": "تم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "deleted_two": "تم حذف لقطات {{count}} عبر مستأجري {{tenants}}",
+          "deleted_zero": "تم حذف لقطات {{count}} عبر مستأجري {{tenants}}"
         },
         "title": "أتمتة النضارة"
       },
@@ -666,7 +726,11 @@
           "queue_reset_one": "إعادة تعيين الصف العالق {{count}}؛ تم مسح الكسارة",
           "queue_reset_other": "إعادة تعيين الصفوف العالقة {{count}}؛ تم مسح الكسارة",
           "queue_reset_failed": "فشلت إعادة تعيين قائمة الانتظار",
-          "reset_failed": "فشلت إعادة التعيين"
+          "reset_failed": "فشلت إعادة التعيين",
+          "queue_reset_few": "إعادة تعيين الصفوف العالقة {{count}}؛ تم مسح الكسارة",
+          "queue_reset_many": "إعادة تعيين الصفوف العالقة {{count}}؛ تم مسح الكسارة",
+          "queue_reset_two": "إعادة تعيين الصفوف العالقة {{count}}؛ تم مسح الكسارة",
+          "queue_reset_zero": "إعادة تعيين الصفوف العالقة {{count}}؛ تم مسح الكسارة"
         },
         "checks": {
           "cache_readable": "يمكن قراءة ذاكرة التخزين المؤقت",
@@ -683,7 +747,11 @@
           "sched_prerender-detect-drift": "كاشف نبضات القلب الانجراف",
           "sched_prerender-auto-recache": "استعادة نبضات القلب تلقائيًا",
           "sched_prerender-reap-stale": "نبضات تنظيف مهمة قديمة"
-        }
+        },
+        "issue_count_few": "مشكلات {{count}}",
+        "issue_count_many": "مشكلات {{count}}",
+        "issue_count_two": "مشكلات {{count}}",
+        "issue_count_zero": "مشكلات {{count}}"
       },
       "inventory": {
         "actions": {
@@ -694,7 +762,13 @@
           "recache_selected": "تم تحديد ذاكرة التخزين المؤقت ({{count}})",
           "reload": "إعادة تحميل",
           "select_all_visible": "حدد كل ما هو مرئي",
-          "select_snapshot": "حدد {{path}}"
+          "select_snapshot": "حدد {{path}}",
+          "recache_selected_few": "تم تحديد ذاكرة التخزين المؤقت ({{count}})",
+          "recache_selected_many": "تم تحديد ذاكرة التخزين المؤقت ({{count}})",
+          "recache_selected_one": "تم تحديد ذاكرة التخزين المؤقت ({{count}})",
+          "recache_selected_other": "تم تحديد ذاكرة التخزين المؤقت ({{count}})",
+          "recache_selected_two": "تم تحديد ذاكرة التخزين المؤقت ({{count}})",
+          "recache_selected_zero": "تم تحديد ذاكرة التخزين المؤقت ({{count}})"
         },
         "columns": {
           "actions": "الإجراءات",
@@ -729,7 +803,13 @@
           "tenant_slug": "سبيكة المستأجر"
         },
         "messages": {
-          "bulk_recache": "لقطات {{count}} غير صالحة وتم وضع ذاكرة التخزين المؤقت في قائمة الانتظار"
+          "bulk_recache": "لقطات {{count}} غير صالحة وتم وضع ذاكرة التخزين المؤقت في قائمة الانتظار",
+          "bulk_recache_few": "لقطات {{count}} غير صالحة وتم وضع ذاكرة التخزين المؤقت في قائمة الانتظار",
+          "bulk_recache_many": "لقطات {{count}} غير صالحة وتم وضع ذاكرة التخزين المؤقت في قائمة الانتظار",
+          "bulk_recache_one": "لقطات {{count}} غير صالحة وتم وضع ذاكرة التخزين المؤقت في قائمة الانتظار",
+          "bulk_recache_other": "لقطات {{count}} غير صالحة وتم وضع ذاكرة التخزين المؤقت في قائمة الانتظار",
+          "bulk_recache_two": "لقطات {{count}} غير صالحة وتم وضع ذاكرة التخزين المؤقت في قائمة الانتظار",
+          "bulk_recache_zero": "لقطات {{count}} غير صالحة وتم وضع ذاكرة التخزين المؤقت في قائمة الانتظار"
         },
         "inspect": {
           "age": "عمر",
@@ -762,7 +842,31 @@
           "seo_score": "النتيجة SEO",
           "size": "مقاس",
           "tips": "نصائح ({{count}})",
-          "title": "عنوان"
+          "title": "عنوان",
+          "must_fix_few": "يجب إصلاح ({{count}})",
+          "must_fix_many": "يجب إصلاح ({{count}})",
+          "must_fix_one": "يجب إصلاح ({{count}})",
+          "must_fix_other": "يجب إصلاح ({{count}})",
+          "must_fix_two": "يجب إصلاح ({{count}})",
+          "must_fix_zero": "يجب إصلاح ({{count}})",
+          "tips_few": "نصائح ({{count}})",
+          "tips_many": "نصائح ({{count}})",
+          "tips_one": "نصائح ({{count}})",
+          "tips_other": "نصائح ({{count}})",
+          "tips_two": "نصائح ({{count}})",
+          "tips_zero": "نصائح ({{count}})",
+          "asset_references_few": "مراجع الأصول ({{count}})",
+          "asset_references_many": "مراجع الأصول ({{count}})",
+          "asset_references_one": "مراجع الأصول ({{count}})",
+          "asset_references_other": "مراجع الأصول ({{count}})",
+          "asset_references_two": "مراجع الأصول ({{count}})",
+          "asset_references_zero": "مراجع الأصول ({{count}})",
+          "dead_assets_few": "{{count}} ميت",
+          "dead_assets_many": "{{count}} ميت",
+          "dead_assets_one": "{{count}} ميت",
+          "dead_assets_other": "{{count}} ميت",
+          "dead_assets_two": "{{count}} ميت",
+          "dead_assets_zero": "{{count}} ميت"
         },
         "selected": "تم تحديد {{count}}",
         "status": {
@@ -771,7 +875,13 @@
           "content_drifted": "انجرف المحتوى"
         },
         "summary": "{{filtered}} من لقطات {{total}}",
-        "table_aria": "جرد لقطة"
+        "table_aria": "جرد لقطة",
+        "selected_few": "تم تحديد {{count}}",
+        "selected_many": "تم تحديد {{count}}",
+        "selected_one": "تم تحديد {{count}}",
+        "selected_other": "تم تحديد {{count}}",
+        "selected_two": "تم تحديد {{count}}",
+        "selected_zero": "تم تحديد {{count}}"
       },
       "jobs": {
         "actions": {
@@ -840,7 +950,13 @@
           "tooltip": "الأولوية = {{priority}} (انتصارات أقل)"
         },
         "result": {
-          "invalid": "{{count}} غير صالح"
+          "invalid": "{{count}} غير صالح",
+          "invalid_few": "{{count}} غير صالح",
+          "invalid_many": "{{count}} غير صالح",
+          "invalid_one": "{{count}} غير صالح",
+          "invalid_other": "{{count}} غير صالح",
+          "invalid_two": "{{count}} غير صالح",
+          "invalid_zero": "{{count}} غير صالح"
         },
         "scope": {
           "all_tenants": "جميع المستأجرين"
@@ -872,7 +988,13 @@
           "success": "نجاح",
           "supersede": "يحل محل",
           "unknown": "حدث غير معروف: {{event}}"
-        }
+        },
+        "summary_few": "أحداث {{count}}",
+        "summary_many": "أحداث {{count}}",
+        "summary_one": "أحداث {{count}}",
+        "summary_other": "أحداث {{count}}",
+        "summary_two": "أحداث {{count}}",
+        "summary_zero": "أحداث {{count}}"
       },
       "failures": {
         "columns": {
@@ -888,7 +1010,10 @@
         "errors": {
           "load": "فشل تحميل الفشل"
         },
-        "table_aria": "الفشل"
+        "table_aria": "الفشل",
+        "actions": {
+          "close_breaker_now": "استئناف قائمة الانتظار الآن"
+        }
       },
       "live_connected": "التحديثات الحية متصلة",
       "audit": {
@@ -957,7 +1082,19 @@
           "cache_unreachable": "ذاكرة التخزين المؤقت غير قابلة للوصول",
           "healthy": "صحيح",
           "missing": "{{count}} مفقود",
-          "stale": "{{count}} قديمة"
+          "stale": "{{count}} قديمة",
+          "missing_few": "{{count}} مفقود",
+          "missing_many": "{{count}} مفقود",
+          "missing_one": "{{count}} مفقود",
+          "missing_other": "{{count}} مفقود",
+          "missing_two": "{{count}} مفقود",
+          "missing_zero": "{{count}} مفقود",
+          "stale_few": "{{count}} قديمة",
+          "stale_many": "{{count}} قديمة",
+          "stale_one": "{{count}} قديمة",
+          "stale_other": "{{count}} قديمة",
+          "stale_two": "{{count}} قديمة",
+          "stale_zero": "{{count}} قديمة"
         },
         "hints": {
           "active_jobs": "{{count}} نشط",
@@ -969,7 +1106,19 @@
           "event_at": "الحدث {{time}}",
           "no_events": "لا توجد أحداث",
           "prometheus": "تنسيق نص بروميثيوس",
-          "tenants_routes": "مستأجرو {{tenants}} × مسارات {{routes}}"
+          "tenants_routes": "مستأجرو {{tenants}} × مسارات {{routes}}",
+          "aging_few": "تقادم {{count}} (> 7 أيام)",
+          "aging_many": "تقادم {{count}} (> 7 أيام)",
+          "aging_one": "تقادم {{count}} (> 7 أيام)",
+          "aging_other": "تقادم {{count}} (> 7 أيام)",
+          "aging_two": "تقادم {{count}} (> 7 أيام)",
+          "aging_zero": "تقادم {{count}} (> 7 أيام)",
+          "active_jobs_few": "{{count}} نشط",
+          "active_jobs_many": "{{count}} نشط",
+          "active_jobs_one": "{{count}} نشط",
+          "active_jobs_other": "{{count}} نشط",
+          "active_jobs_two": "{{count}} نشط",
+          "active_jobs_zero": "{{count}} نشط"
         },
         "kpi": {
           "age_stale": "العمر قديم (> 14 يومًا)",
@@ -1025,7 +1174,19 @@
         },
         "messages": {
           "dry_run": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
-          "purged": "تم مسح لقطات {{count}}{{job}}"
+          "purged": "تم مسح لقطات {{count}}{{job}}",
+          "dry_run_few": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "dry_run_many": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "dry_run_one": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "dry_run_other": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "dry_run_two": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "dry_run_zero": "التشغيل الجاف: ستتم إزالة لقطات {{count}}",
+          "purged_few": "تم مسح لقطات {{count}}{{job}}",
+          "purged_many": "تم مسح لقطات {{count}}{{job}}",
+          "purged_one": "تم مسح لقطات {{count}}{{job}}",
+          "purged_other": "تم مسح لقطات {{count}}{{job}}",
+          "purged_two": "تم مسح لقطات {{count}}{{job}}",
+          "purged_zero": "تم مسح لقطات {{count}}{{job}}"
         },
         "placeholders": {
           "pattern": "/blog/* أو /listings/**",
@@ -1033,13 +1194,31 @@
         },
         "result": {
           "deleted": "لقطات {{count}} المحذوفة",
-          "would_delete": "سيتم حذف لقطات {{count}}"
+          "would_delete": "سيتم حذف لقطات {{count}}",
+          "would_delete_few": "سيتم حذف لقطات {{count}}",
+          "would_delete_many": "سيتم حذف لقطات {{count}}",
+          "would_delete_one": "سيتم حذف لقطات {{count}}",
+          "would_delete_other": "سيتم حذف لقطات {{count}}",
+          "would_delete_two": "سيتم حذف لقطات {{count}}",
+          "would_delete_zero": "سيتم حذف لقطات {{count}}",
+          "deleted_few": "لقطات {{count}} المحذوفة",
+          "deleted_many": "لقطات {{count}} المحذوفة",
+          "deleted_one": "لقطات {{count}} المحذوفة",
+          "deleted_other": "لقطات {{count}} المحذوفة",
+          "deleted_two": "لقطات {{count}} المحذوفة",
+          "deleted_zero": "لقطات {{count}} المحذوفة"
         },
         "title": "تطهير ذاكرة التخزين المؤقت لأحرف البدل",
         "preview_gate": {
           "title": "المعاينة مطلوبة قبل الحذف المباشر",
           "required": "يتم تأمين الحذف المباشر حتى تقوم بمعاينة نفس نمط المسار ونطاق المستأجر.",
-          "ready": "تم العثور على معاينة مطابقة. يقتصر الحذف المباشر على لقطات {{count}} المطابقة التي تظهرها المعاينة."
+          "ready": "تم العثور على معاينة مطابقة. يقتصر الحذف المباشر على لقطات {{count}} المطابقة التي تظهرها المعاينة.",
+          "ready_few": "تم العثور على معاينة مطابقة. يقتصر الحذف المباشر على لقطات {{count}} المطابقة التي تظهرها المعاينة.",
+          "ready_many": "تم العثور على معاينة مطابقة. يقتصر الحذف المباشر على لقطات {{count}} المطابقة التي تظهرها المعاينة.",
+          "ready_one": "تم العثور على معاينة مطابقة. يقتصر الحذف المباشر على لقطات {{count}} المطابقة التي تظهرها المعاينة.",
+          "ready_other": "تم العثور على معاينة مطابقة. يقتصر الحذف المباشر على لقطات {{count}} المطابقة التي تظهرها المعاينة.",
+          "ready_two": "تم العثور على معاينة مطابقة. يقتصر الحذف المباشر على لقطات {{count}} المطابقة التي تظهرها المعاينة.",
+          "ready_zero": "تم العثور على معاينة مطابقة. يقتصر الحذف المباشر على لقطات {{count}} المطابقة التي تظهرها المعاينة."
         }
       },
       "ttl_inspector": {
@@ -1066,7 +1245,25 @@
         "units": {
           "days": "{{count}} د",
           "hours": "{{count}} ح",
-          "minutes": "{{count}} دقيقة"
+          "minutes": "{{count}} دقيقة",
+          "minutes_few": "{{count}} دقيقة",
+          "minutes_many": "{{count}} دقيقة",
+          "minutes_one": "{{count}} دقيقة",
+          "minutes_other": "{{count}} دقيقة",
+          "minutes_two": "{{count}} دقيقة",
+          "minutes_zero": "{{count}} دقيقة",
+          "hours_few": "{{count}} ح",
+          "hours_many": "{{count}} ح",
+          "hours_one": "{{count}} ح",
+          "hours_other": "{{count}} ح",
+          "hours_two": "{{count}} ح",
+          "hours_zero": "{{count}} ح",
+          "days_few": "{{count}} د",
+          "days_many": "{{count}} د",
+          "days_one": "{{count}} د",
+          "days_other": "{{count}} د",
+          "days_two": "{{count}} د",
+          "days_zero": "{{count}} د"
         }
       },
       "sitemap_explorer": {
@@ -1076,7 +1273,25 @@
         "counts": {
           "dynamic": "{{count}} ديناميكي",
           "static": "{{count}} ثابت",
-          "total": "إجمالي {{count}}"
+          "total": "إجمالي {{count}}",
+          "static_few": "{{count}} ثابت",
+          "static_many": "{{count}} ثابت",
+          "static_one": "{{count}} ثابت",
+          "static_other": "{{count}} ثابت",
+          "static_two": "{{count}} ثابت",
+          "static_zero": "{{count}} ثابت",
+          "dynamic_few": "{{count}} ديناميكي",
+          "dynamic_many": "{{count}} ديناميكي",
+          "dynamic_one": "{{count}} ديناميكي",
+          "dynamic_other": "{{count}} ديناميكي",
+          "dynamic_two": "{{count}} ديناميكي",
+          "dynamic_zero": "{{count}} ديناميكي",
+          "total_few": "إجمالي {{count}}",
+          "total_many": "إجمالي {{count}}",
+          "total_one": "إجمالي {{count}}",
+          "total_other": "إجمالي {{count}}",
+          "total_two": "إجمالي {{count}}",
+          "total_zero": "إجمالي {{count}}"
         },
         "description_prefix": "تعرف بالضبط على المسارات التي يخطط المحرك لتقديمها للمستأجر - الأرضية الثابتة (الميزة/الوحدة النمطية) بالإضافة إلى URLs الديناميكية من",
         "description_suffix": "العامل المسرحي يزور هذه القائمة.",
@@ -1134,7 +1349,13 @@
         },
         "status": {
           "clean": "لم يتم العثور على أي مشاكل",
-          "needs_attention": "العنصر {{count}} يحتاج إلى الاهتمام"
+          "needs_attention": "العنصر {{count}} يحتاج إلى الاهتمام",
+          "needs_attention_few": "العنصر {{count}} يحتاج إلى الاهتمام",
+          "needs_attention_many": "العنصر {{count}} يحتاج إلى الاهتمام",
+          "needs_attention_one": "العنصر {{count}} يحتاج إلى الاهتمام",
+          "needs_attention_other": "العنصر {{count}} يحتاج إلى الاهتمام",
+          "needs_attention_two": "العنصر {{count}} يحتاج إلى الاهتمام",
+          "needs_attention_zero": "العنصر {{count}} يحتاج إلى الاهتمام"
         },
         "counts": {
           "expected": "Expected",
@@ -1567,7 +1788,82 @@
         "do_not_remove_prerender": "لا تقم بإزالة الإجراء الاحتياطي للعرض المسبق.",
         "rollback_path_required": "مطلوب مسار التراجع"
       }
-    }
+    },
+    "health_meta_description_length_few": "أحرف{{count}}(المثالي: 150-160)",
+    "health_meta_description_length_many": "أحرف{{count}}(المثالي: 150-160)",
+    "health_meta_description_length_one": "أحرف{{count}}(المثالي: 150-160)",
+    "health_meta_description_length_other": "أحرف{{count}}(المثالي: 150-160)",
+    "health_meta_description_length_two": "أحرف{{count}}(المثالي: 150-160)",
+    "health_meta_description_length_zero": "أحرف{{count}}(المثالي: 150-160)",
+    "health_auto_sitemap_active_count_few": "نشط — تمت فهرسة عناوين URL لـ{{count}}",
+    "health_auto_sitemap_active_count_many": "نشط — تمت فهرسة عناوين URL لـ{{count}}",
+    "health_auto_sitemap_active_count_one": "نشط — تمت فهرسة عناوين URL لـ{{count}}",
+    "health_auto_sitemap_active_count_other": "نشط — تمت فهرسة عناوين URL لـ{{count}}",
+    "health_auto_sitemap_active_count_two": "نشط — تمت فهرسة عناوين URL لـ{{count}}",
+    "health_auto_sitemap_active_count_zero": "نشط — تمت فهرسة عناوين URL لـ{{count}}",
+    "pass_count_few": "{{count}} ناجح",
+    "pass_count_many": "{{count}} ناجح",
+    "pass_count_one": "{{count}} ناجح",
+    "pass_count_other": "{{count}} ناجح",
+    "pass_count_two": "{{count}} ناجح",
+    "pass_count_zero": "{{count}} ناجح",
+    "warning_count_few": "{{count}} تحذير",
+    "warning_count_many": "{{count}} تحذير",
+    "warning_count_one": "{{count}} تحذير",
+    "warning_count_other": "{{count}} تحذير",
+    "warning_count_two": "{{count}} تحذير",
+    "warning_count_zero": "{{count}} تحذير",
+    "fail_count_few": "فشل{{count}}",
+    "fail_count_many": "فشل{{count}}",
+    "fail_count_one": "فشل{{count}}",
+    "fail_count_other": "فشل{{count}}",
+    "fail_count_two": "فشل{{count}}",
+    "fail_count_zero": "فشل{{count}}",
+    "meta_description_count_few": "{{count}}/160 حرفًا للوصف التعريفي",
+    "meta_description_count_many": "{{count}}/160 حرفًا للوصف التعريفي",
+    "meta_description_count_one": "{{count}}/160 حرفًا للوصف التعريفي",
+    "meta_description_count_other": "{{count}}/160 حرفًا للوصف التعريفي",
+    "meta_description_count_two": "{{count}}/160 حرفًا للوصف التعريفي",
+    "meta_description_count_zero": "{{count}}/160 حرفًا للوصف التعريفي",
+    "global_meta_description_count_few": "{{count}}/160 حرفًا للوصف التعريفي العام",
+    "global_meta_description_count_many": "{{count}}/160 حرفًا للوصف التعريفي العام",
+    "global_meta_description_count_one": "{{count}}/160 حرفًا للوصف التعريفي العام",
+    "global_meta_description_count_other": "{{count}}/160 حرفًا للوصف التعريفي العام",
+    "global_meta_description_count_two": "{{count}}/160 حرفًا للوصف التعريفي العام",
+    "global_meta_description_count_zero": "{{count}}/160 حرفًا للوصف التعريفي العام",
+    "passed_count_with_value_few": "تم تمرير{{count}}",
+    "passed_count_with_value_many": "تم تمرير{{count}}",
+    "passed_count_with_value_one": "تم تمرير{{count}}",
+    "passed_count_with_value_other": "تم تمرير{{count}}",
+    "passed_count_with_value_two": "تم تمرير{{count}}",
+    "passed_count_with_value_zero": "تم تمرير{{count}}",
+    "warnings_count_with_value_few": "تحذيرات{{count}}",
+    "warnings_count_with_value_many": "تحذيرات{{count}}",
+    "warnings_count_with_value_one": "تحذيرات{{count}}",
+    "warnings_count_with_value_other": "تحذيرات{{count}}",
+    "warnings_count_with_value_two": "تحذيرات{{count}}",
+    "warnings_count_with_value_zero": "تحذيرات{{count}}",
+    "failed_count_with_value_few": "فشل{{count}}",
+    "failed_count_with_value_many": "فشل{{count}}",
+    "failed_count_with_value_one": "فشل{{count}}",
+    "failed_count_with_value_other": "فشل{{count}}",
+    "failed_count_with_value_two": "فشل{{count}}",
+    "failed_count_with_value_zero": "فشل{{count}}",
+    "match_count_few": "مباريات{{count}}",
+    "match_count_many": "مباريات{{count}}",
+    "match_count_two": "مباريات{{count}}",
+    "match_count_zero": "مباريات{{count}}",
+    "top_matches_for_user_few": "أهم مباريات{{count}}لـ{{name}}",
+    "top_matches_for_user_many": "أهم مباريات{{count}}لـ{{name}}",
+    "top_matches_for_user_two": "أهم مباريات{{count}}لـ{{name}}",
+    "top_matches_for_user_zero": "أهم مباريات{{count}}لـ{{name}}",
+    "total_count_few": "المجموع: {{count}}",
+    "total_count_many": "المجموع: {{count}}",
+    "total_count_one": "المجموع: {{count}}",
+    "total_count_other": "المجموع: {{count}}",
+    "total_count_two": "المجموع: {{count}}",
+    "total_count_zero": "المجموع: {{count}}",
+    "score_out_of": "من {{maximum}}"
   },
   "email_deliverability": {
     "title": "إمكانية تسليم البريد الإلكتروني",
@@ -1606,7 +1902,19 @@
       "trigger_score": "درجة الزناد",
       "unconfirmed": "تم قبول {{count}} ولكن لم يتم تأكيده",
       "webhook_confirmed": "تم التأكيد بواسطة خطاف الويب للموفر",
-      "window_days": "نافذة اليوم {{days}}"
+      "window_days": "نافذة اليوم {{days}}",
+      "unconfirmed_few": "تم قبول {{count}} ولكن لم يتم تأكيده",
+      "unconfirmed_many": "تم قبول {{count}} ولكن لم يتم تأكيده",
+      "unconfirmed_one": "تم قبول {{count}} ولكن لم يتم تأكيده",
+      "unconfirmed_other": "تم قبول {{count}} ولكن لم يتم تأكيده",
+      "unconfirmed_two": "تم قبول {{count}} ولكن لم يتم تأكيده",
+      "unconfirmed_zero": "تم قبول {{count}} ولكن لم يتم تأكيده",
+      "bad_outcomes_few": "فشل {{count}}، أو ارتد، أو تم منعه",
+      "bad_outcomes_many": "فشل {{count}}، أو ارتد، أو تم منعه",
+      "bad_outcomes_one": "فشل {{count}}، أو ارتد، أو تم منعه",
+      "bad_outcomes_other": "فشل {{count}}، أو ارتد، أو تم منعه",
+      "bad_outcomes_two": "فشل {{count}}، أو ارتد، أو تم منعه",
+      "bad_outcomes_zero": "فشل {{count}}، أو ارتد، أو تم منعه"
     },
     "status": {
       "bounced": "ارتد",
@@ -1968,6 +2276,12 @@
       "fcm": "الجوال مُرسل/فاشل",
       "web": "الويب مُسلَّم",
       "recent_failures": "حالات الفشل الأخيرة"
-    }
+    },
+    "trigger_coverage_few": "مشكلات {{issues}} عبر التدفقات التي تتم مراقبتها بواسطة {{count}}",
+    "trigger_coverage_many": "مشكلات {{issues}} عبر التدفقات التي تتم مراقبتها بواسطة {{count}}",
+    "trigger_coverage_one": "مشكلات {{issues}} عبر التدفقات التي تتم مراقبتها بواسطة {{count}}",
+    "trigger_coverage_other": "مشكلات {{issues}} عبر التدفقات التي تتم مراقبتها بواسطة {{count}}",
+    "trigger_coverage_two": "مشكلات {{issues}} عبر التدفقات التي تتم مراقبتها بواسطة {{count}}",
+    "trigger_coverage_zero": "مشكلات {{issues}} عبر التدفقات التي تتم مراقبتها بواسطة {{count}}"
   }
 }

@@ -57,6 +57,10 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => mockAuthValue,
 }));
 
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: () => ({ tenantPath: (path: string) => `/test${path}` }),
+}));
+
 vi.mock('@/lib/api', () => ({
   SESSION_EXPIRING_EVENT: 'nexus:session_expiring',
   tokenManager: {
@@ -83,11 +87,18 @@ vi.mock('@/lib/logger', () => ({
 // ─── Import AFTER mocks ───────────────────────────────────────────────────────
 
 import { SessionTimeoutWarning } from './SessionTimeoutWarning';
+import { tokenManager } from '@/lib/api';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function dispatchExpiringEvent() {
   window.dispatchEvent(new Event('nexus:session_expiring'));
+}
+
+function jwtExpiringIn(seconds: number): string {
+  const header = btoa(JSON.stringify({ alg: 'none', typ: 'JWT' }));
+  const payload = btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + seconds }));
+  return `${header}.${payload}.signature`;
 }
 
 /** Wait for a text pattern to appear anywhere in document.body */
@@ -146,6 +157,22 @@ describe('SessionTimeoutWarning — opens on event (real timers)', () => {
     // Both "Log out" and "Extend session" buttons should be present
     const buttons = document.querySelectorAll('button');
     expect(buttons.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('cannot be closed with Escape and exposes no close trigger', async () => {
+    render(<SessionTimeoutWarning />);
+
+    await act(async () => {
+      dispatchExpiringEvent();
+    });
+    await waitForText('30');
+
+    expect(document.querySelectorAll('button')).toHaveLength(2);
+    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
+
+    await waitFor(() => {
+      expect(document.querySelector('[role="dialog"]')).toBeInTheDocument();
+    });
   });
 
   it('calls logout when the logout button is clicked', async () => {
@@ -232,5 +259,51 @@ describe('SessionTimeoutWarning — unauthenticated guard', () => {
     // Our stable mock has isAuthenticated=true but no event has been dispatched.
     render(<SessionTimeoutWarning />);
     expect(screen.queryByText(/session/i)).toBeNull();
+  });
+});
+
+describe('SessionTimeoutWarning — restored and refreshed token scheduling', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('schedules a restored authenticated JWT from its remaining lifetime', async () => {
+    vi.mocked(tokenManager.getAccessToken).mockReturnValue(jwtExpiringIn(120));
+
+    render(<SessionTimeoutWarning />);
+
+    await waitFor(() => expect(scheduleSessionWarningSpy).toHaveBeenCalledOnce());
+    expect(scheduleSessionWarningSpy.mock.calls[0][0]).toBeGreaterThanOrEqual(118);
+  });
+
+  it('opens immediately when a restored token is inside the five-second scheduling buffer', async () => {
+    vi.mocked(tokenManager.getAccessToken).mockReturnValue(jwtExpiringIn(34));
+
+    render(<SessionTimeoutWarning />);
+
+    await waitForText(/3[3-4]/);
+    expect(document.querySelector('[role="dialog"]')).toBeInTheDocument();
+    expect(scheduleSessionWarningSpy).not.toHaveBeenCalled();
+  });
+
+  it('reschedules after the API client silently rotates the access token', async () => {
+    vi.useFakeTimers();
+    let accessToken = jwtExpiringIn(120);
+    vi.mocked(tokenManager.getAccessToken).mockImplementation(() => accessToken);
+
+    render(<SessionTimeoutWarning />);
+    expect(scheduleSessionWarningSpy).toHaveBeenCalledOnce();
+
+    accessToken = jwtExpiringIn(240);
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5000);
+    });
+
+    expect(scheduleSessionWarningSpy).toHaveBeenCalledTimes(2);
+    expect(scheduleSessionWarningSpy.mock.calls[1][0]).toBeGreaterThanOrEqual(234);
   });
 });

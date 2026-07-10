@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { CardBody, Card } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
@@ -53,7 +54,7 @@ const STATUS_COLOR: Record<FeedbackStatus, 'default' | 'primary' | 'warning' | '
 
 function fmtDate(iso: string): string {
   if (!iso) return '—';
-  return new Date(iso).toLocaleString(undefined, {
+  return new Date(iso).toLocaleString(getFormattingLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

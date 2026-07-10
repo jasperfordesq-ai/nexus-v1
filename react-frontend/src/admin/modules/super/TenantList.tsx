@@ -8,6 +8,7 @@
  * Full tenant management with search, filter, and CRUD actions.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -249,7 +250,7 @@ export function TenantList() {
       sortable: true,
       render: (tenant) => (
         <span className="text-sm text-muted">
-          {new Date(tenant.created_at).toLocaleDateString()}
+          {new Date(tenant.created_at).toLocaleDateString(getFormattingLocale())}
         </span>
       ),
     },
@@ -282,7 +283,7 @@ export function TenantList() {
           <div className="flex items-center gap-2">
             {lastRefreshed && (
               <span className="text-xs text-muted">
-                {t('super.updated_at', { time: lastRefreshed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) })}
+                {t('super.updated_at', { time: lastRefreshed.toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' }) })}
               </span>
             )}
             <Button

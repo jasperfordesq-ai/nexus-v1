@@ -18,6 +18,7 @@
  * into the right queue.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -237,7 +238,7 @@ export function MatchApprovalsPage() {
       sortable: true,
       render: (item) => (
         <span className="text-sm tabular-nums text-muted">
-          {new Date(item.created_at).toLocaleDateString()}
+          {new Date(item.created_at).toLocaleDateString(getFormattingLocale())}
         </span>
       ),
     },

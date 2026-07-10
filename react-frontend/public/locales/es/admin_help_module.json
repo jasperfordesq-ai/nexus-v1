@@ -84,7 +84,10 @@
       "general_admin": "administrador general",
       "caring_community": "Comunidad solidaria",
       "kiss_agoris": "BESO Y Caring Community"
-    }
+    },
+    "search_placeholder_many": "Buscar artículos de ayuda de{{count}}...",
+    "search_placeholder_one": "Buscar artículos de ayuda de{{count}}...",
+    "search_placeholder_other": "Buscar artículos de ayuda de{{count}}..."
   },
   "help_faqs": {
     "page_title": "FAQ de ayuda",

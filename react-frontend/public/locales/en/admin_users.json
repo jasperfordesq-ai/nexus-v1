@@ -218,7 +218,9 @@
     "smart_search_text_chip": "Query: {{query}}",
     "role_super_admin": "Super Admin",
     "permissions_editor_unavailable_title": "Permissions are read-only here",
-    "permissions_editor_unavailable_desc": "This page shows the user's role and granted permissions but can't change them. Manage access by changing the user's role on the user edit page."
+    "permissions_editor_unavailable_desc": "This page shows the user's role and granted permissions but can't change them. Manage access by changing the user's role on the user edit page.",
+    "role_unknown": "Unknown role",
+    "role_tenant_super_admin": "Tenant Super Admin"
   },
   "user_edit": {
     "actions": {

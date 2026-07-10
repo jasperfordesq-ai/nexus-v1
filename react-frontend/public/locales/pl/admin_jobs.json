@@ -250,7 +250,27 @@
     "moderation_page_title": "Kolejka do moderacji zadań",
     "moderation_page_description": "Przeglądaj i zatwierdzaj oferty pracy, zanim zostaną opublikowane",
     "templates_empty_description": "Utwórz swój pierwszy szablon, aby zaoszczędzić czas na przyszłych ofertach pracy.",
-    "templates_empty_title": "Nie ma jeszcze żadnych szablonów"
+    "templates_empty_title": "Nie ma jeszcze żadnych szablonów",
+    "jobs_count_few": "Zadania{{count}}",
+    "jobs_count_many": "Zadania{{count}}",
+    "jobs_count_one": "Zadania{{count}}",
+    "jobs_count_other": "Zadania{{count}}",
+    "application_count_one_few": "Aplikacja{{count}}",
+    "application_count_one_many": "Aplikacja{{count}}",
+    "application_count_one_one": "Aplikacja{{count}}",
+    "application_count_one_other": "Aplikacja{{count}}",
+    "application_count_other_few": "Aplikacje{{count}}",
+    "application_count_other_many": "Aplikacje{{count}}",
+    "application_count_other_one": "Aplikacje{{count}}",
+    "application_count_other_other": "Aplikacje{{count}}",
+    "stat_pending_offers_few": "{{count}}oferty oczekujące",
+    "stat_pending_offers_many": "{{count}}oferty oczekujące",
+    "stat_pending_offers_one": "{{count}}oferty oczekujące",
+    "stat_pending_offers_other": "{{count}}oferty oczekujące",
+    "pipeline_minutes_few": "{{count}}min",
+    "pipeline_minutes_many": "{{count}}min",
+    "pipeline_minutes_one": "{{count}}min",
+    "pipeline_minutes_other": "{{count}}min"
   },
   "moderation": {
     "action_failed": "Nie udało się",
@@ -478,5 +498,10 @@
     "blocked_count": "Zablokowany",
     "flagged_count": "Oznaczone",
     "total_analyzed": "Łącznie przeanalizowane"
+  },
+  "premium": {
+    "status": {
+      "unknown": "Nieznany"
+    }
   }
 }

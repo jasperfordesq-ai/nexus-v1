@@ -147,7 +147,10 @@
         "date": "Fecha",
         "ip_address": "Dirección IP",
         "member_id": "Miembro ID"
-      }
+      },
+      "truncated_many": "Mostrando los 200 registros más recientes. Exporte el libro mayor completo CSV para descargar todos los registros {{count}}.",
+      "truncated_one": "Mostrando los 200 registros más recientes. Exporte el libro mayor completo CSV para descargar todos los registros {{count}}.",
+      "truncated_other": "Mostrando los 200 registros más recientes. Exporte el libro mayor completo CSV para descargar todos los registros {{count}}."
     },
     "residency": {
       "article_16": "Se permite la divulgación transfronteriza de datos personales si el país de destino garantiza una protección de datos adecuada reconocida por el Consejo Federal. Switzerland, EU/EEA member states, and a small list of other countries qualify.",

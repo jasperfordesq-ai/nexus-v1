@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -60,7 +60,7 @@ interface SkillSearchResult {
 const proficiencyConfig: Record<string, { color: string; dots: number }> = {
   beginner: { color: 'text-emerald-500', dots: 1 },
   intermediate: { color: 'text-[var(--color-info)]', dots: 2 },
-  advanced: { color: 'text-purple-500', dots: 3 },
+  advanced: { color: 'text-accent', dots: 3 },
   expert: { color: 'text-[var(--color-warning)]', dots: 4 },
 };
 
@@ -109,7 +109,7 @@ export function SkillChip({
   const { t } = useTranslation('common');
 
   return (
-    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/20">
       <span className="text-sm font-medium text-theme-primary">{skill.skill_name}</span>
       {showProficiency && (
         <ProficiencyDots level={skill.proficiency_level} />
@@ -317,7 +317,7 @@ export function SkillSelector({
       {/* Add Skill Button */}
       <Button
         variant="flat"
-        className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+        className="bg-accent/10 text-accent dark:text-accent"
         startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
         onPress={onOpen}
       >
@@ -335,13 +335,11 @@ export function SkillSelector({
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-indigo-500" aria-hidden="true" />
-              </div>
-              {tc('skills.add_a_skill')}
+          <ModalHeader className="flex items-center gap-3 text-theme-primary">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-accent" aria-hidden="true" />
             </div>
+            <ModalHeading>{tc('skills.add_a_skill')}</ModalHeading>
           </ModalHeader>
           <ModalBody>
             {/* Search */}
@@ -415,7 +413,7 @@ export function SkillSelector({
                 <Button
                   size="sm"
                   variant="flat"
-                  className="mt-2 bg-indigo-500/10 text-indigo-500"
+                  className="mt-2 bg-accent/10 text-accent"
                   onPress={() => setSelectedSkill(searchQuery)}
                 >
                   {tc('skills.use_custom', { query: searchQuery })}
@@ -464,7 +462,7 @@ export function SkillSelector({
               <div className="p-3 rounded-lg bg-theme-elevated border border-theme-default">
                 <p className="text-xs text-theme-subtle mb-1">{tc('skills.skill_to_add')}</p>
                 <div className="flex items-center gap-3">
-                  <Chip variant="flat" className="bg-indigo-500/20 text-indigo-600 dark:text-indigo-300">
+                  <Chip variant="flat" className="bg-accent/20 text-accent dark:text-accent">
                     {selectedSkill || searchQuery}
                   </Chip>
                   <ProficiencyDots level={proficiency} />
@@ -477,7 +475,7 @@ export function SkillSelector({
               {tc('cancel')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               onPress={() => handleAddSkill()}
               isLoading={isAdding}
               isDisabled={!selectedSkill && !searchQuery}

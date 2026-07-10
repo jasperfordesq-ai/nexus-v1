@@ -71,8 +71,8 @@ export function AudienceCardsSection({ content }: AudienceCardsSectionProps) {
               : null;
             const cardInner = (
               <>
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500/15 to-purple-500/15 flex items-center justify-center mb-4">
-                  <Icon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-accent/15 to-accent-gradient-end/15 flex items-center justify-center mb-4">
+                  <Icon className="w-6 h-6 text-accent dark:text-accent" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold text-theme-primary mb-2">
                   {card.title}
@@ -80,7 +80,7 @@ export function AudienceCardsSection({ content }: AudienceCardsSectionProps) {
                 <p className="text-sm text-theme-muted mb-4 flex-1">
                   {card.description}
                 </p>
-                <span className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                <span className="inline-flex items-center gap-1 text-sm font-medium text-accent dark:text-accent">
                   {card.cta_label}
                   <ArrowRight className="w-4 h-4" aria-hidden="true" />
                 </span>

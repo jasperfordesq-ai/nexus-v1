@@ -31,7 +31,10 @@
     "empty": "Nessuna notifica ancora",
     "view_all": "Vedi tutte le notifiche",
     "close": "Chiudi le notifiche",
-    "unread_dot_aria": "Non letta"
+    "unread_dot_aria": "Non letta",
+    "bell_unread_aria_many": "Notifiche, {{count}} non lette",
+    "bell_unread_aria_one": "Notifiche, {{count}} non lette",
+    "bell_unread_aria_other": "Notifiche, {{count}} non lette"
   },
   "type": {
     "message": "Messaggio",
@@ -96,5 +99,14 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "unread_badge_many": "{{count}} nuove",
+  "unread_badge_one": "{{count}} nuove",
+  "unread_badge_other": "{{count}} nuove",
+  "filter_unread_many": "Non lette ({{count}})",
+  "filter_unread_one": "Non lette ({{count}})",
+  "filter_unread_other": "Non lette ({{count}})",
+  "and_others_many": "e altri {{count}}",
+  "and_others_one": "e altri {{count}}",
+  "and_others_other": "e altri {{count}}"
 }

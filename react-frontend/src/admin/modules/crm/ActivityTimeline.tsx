@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Avatar, Pagination } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -109,7 +110,7 @@ function getActivityIcon(type: string) {
 }
 
 function formatDateTime(dateStr: string): string {
-  return new Date(dateStr).toLocaleString(undefined, {
+  return new Date(dateStr).toLocaleString(getFormattingLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

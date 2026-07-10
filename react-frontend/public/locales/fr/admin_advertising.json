@@ -187,7 +187,10 @@
         "pause_failed": "Échec de la mise en veille de la campagne",
         "rejected": "Campagne \"{{name}}\" rejetée",
         "reject_failed": "Échec du rejet de la campagne"
-      }
+      },
+      "creatives_count_many": "Créations ({{count}})",
+      "creatives_count_one": "Créations ({{count}})",
+      "creatives_count_other": "Créations ({{count}})"
     },
     "push": {
       "page_title": "Campagnes push",

@@ -132,5 +132,13 @@
   },
   "page_meta": {
     "title": "Onboarding"
-  }
+  },
+  "bio_char_count_one": "{{count}} characters",
+  "bio_char_count_other": "{{count}} characters",
+  "count_selected_one": "{{count}} selected",
+  "count_selected_other": "{{count}} selected",
+  "skills_to_offer_count_one": "{{count}} skill(s) to offer",
+  "skills_to_offer_count_other": "{{count}} skill(s) to offer",
+  "skills_needed_count_one": "{{count}} skill(s) needed",
+  "skills_needed_count_other": "{{count}} skill(s) needed"
 }

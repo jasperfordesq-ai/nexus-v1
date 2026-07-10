@@ -117,7 +117,11 @@
       "media_jobs_one": "{{count}} media job waiting",
       "media_jobs_other": "{{count}} media jobs waiting",
       "rss_ready_one": "{{count}} published show can be checked",
-      "rss_ready_other": "{{count}} published shows can be checked"
+      "rss_ready_other": "{{count}} published shows can be checked",
+      "pending_items_many": "{{count}} items waiting for review",
+      "open_reports_many": "{{count}} open member reports",
+      "media_jobs_many": "{{count}} media jobs waiting",
+      "rss_ready_many": "{{count}} published shows can be checked"
     },
     "feed_validation": {
       "title": "RSS validation",
@@ -211,7 +215,10 @@
       "report_dismissed": "Report dismissed.",
       "report_escalated": "Report escalated.",
       "feed_valid": "RSS feed is ready.",
-      "feed_invalid": "RSS feed has {{count}} issue(s)."
+      "feed_invalid": "RSS feed has {{count}} issue(s).",
+      "feed_invalid_many": "RSS feed has {{count}} issue(s).",
+      "feed_invalid_one": "La fuente RSS tiene {{count}} problemas.",
+      "feed_invalid_other": "La fuente RSS tiene {{count}} problemas."
     },
     "bulk": {
       "approve_selected": "Aprobar seleccionados",
@@ -219,7 +226,16 @@
       "done": "{{count}} elemento(s) moderado(s).",
       "partial": "{{ok}} elemento(s) moderado(s); {{failed}} con error.",
       "confirm_reject_title": "Rechazar los elementos seleccionados",
-      "confirm_reject_message": "¿Rechazar {{count}} elemento(s) seleccionado(s)? Los creadores los verán volver a borrador."
-    }
+      "confirm_reject_message": "¿Rechazar {{count}} elemento(s) seleccionado(s)? Los creadores los verán volver a borrador.",
+      "done_many": "{{count}} elemento(s) moderado(s).",
+      "done_one": "{{count}} elemento(s) moderado(s).",
+      "done_other": "{{count}} elemento(s) moderado(s).",
+      "confirm_reject_message_many": "¿Rechazar {{count}} elemento(s) seleccionado(s)? Los creadores los verán volver a borrador.",
+      "confirm_reject_message_one": "¿Rechazar {{count}} elemento(s) seleccionado(s)? Los creadores los verán volver a borrador.",
+      "confirm_reject_message_other": "¿Rechazar {{count}} elemento(s) seleccionado(s)? Los creadores los verán volver a borrador."
+    },
+    "count_many": "{{count}} items",
+    "count_one": "{{count}} elementos",
+    "count_other": "{{count}} elementos"
   }
 }

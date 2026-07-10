@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -86,7 +87,7 @@ function ResultCard({ cardType, item }: ResultCardProps) {
   const url = typeof item.url === 'string' ? item.url : undefined;
   const card = (
     <Card
-      className="bg-[var(--color-surface-elevated)] border border-[var(--border-default)] hover:border-indigo-400 transition-all cursor-pointer max-w-[20rem]"
+      className="bg-[var(--color-surface-elevated)] border border-[var(--border-default)] hover:border-accent transition-all cursor-pointer max-w-[20rem]"
       isPressable={Boolean(url)}
       radius="md"
       shadow="none"
@@ -143,7 +144,7 @@ function ListingCard({ item }: { item: Record<string, unknown> }) {
   return (
     <>
       <div className="flex items-start gap-2">
-        <Tag className="w-3.5 h-3.5 mt-0.5 text-indigo-500 shrink-0" />
+        <Tag className="w-3.5 h-3.5 mt-0.5 text-accent shrink-0" />
         <p className="text-sm font-semibold text-[var(--color-text)] line-clamp-2 flex-1">{String(item.title ?? '')}</p>
       </div>
       <div className="flex flex-wrap items-center gap-1.5 text-xs text-[var(--color-text-muted)]">
@@ -162,7 +163,7 @@ function MemberCard({ item }: { item: Record<string, unknown> }) {
   return (
     <>
       <div className="flex items-start gap-2">
-        <User className="w-3.5 h-3.5 mt-0.5 text-indigo-500 shrink-0" />
+        <User className="w-3.5 h-3.5 mt-0.5 text-accent shrink-0" />
         <p className="text-sm font-semibold text-[var(--color-text)] line-clamp-1 flex-1">{String(item.name ?? '')}</p>
       </div>
       {item.tagline ? <p className="text-xs text-[var(--color-text-muted)] line-clamp-2">{String(item.tagline)}</p> : null}
@@ -178,13 +179,13 @@ function MemberCard({ item }: { item: Record<string, unknown> }) {
 
 function EventCard({ item }: { item: Record<string, unknown> }) {
   const { t } = useTranslation('chat');
-  const start = item.start_time ? new Date(String(item.start_time)).toLocaleString([], {
+  const start = item.start_time ? new Date(String(item.start_time)).toLocaleString(getFormattingLocale(), {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   }) : null;
   return (
     <>
       <div className="flex items-start gap-2">
-        <Calendar className="w-3.5 h-3.5 mt-0.5 text-indigo-500 shrink-0" />
+        <Calendar className="w-3.5 h-3.5 mt-0.5 text-accent shrink-0" />
         <p className="text-sm font-semibold text-[var(--color-text)] line-clamp-2 flex-1">{String(item.title ?? '')}</p>
       </div>
       <div className="flex flex-wrap items-center gap-1.5 text-xs text-[var(--color-text-muted)]">
@@ -201,7 +202,7 @@ function JobCard({ item }: { item: Record<string, unknown> }) {
   return (
     <>
       <div className="flex items-start gap-2">
-        <Briefcase className="w-3.5 h-3.5 mt-0.5 text-indigo-500 shrink-0" />
+        <Briefcase className="w-3.5 h-3.5 mt-0.5 text-accent shrink-0" />
         <p className="text-sm font-semibold text-[var(--color-text)] line-clamp-2 flex-1">{String(item.title ?? '')}</p>
       </div>
       {item.tagline ? <p className="text-xs text-[var(--color-text-muted)] line-clamp-1">{String(item.tagline)}</p> : null}
@@ -219,7 +220,7 @@ function MarketplaceCard({ item }: { item: Record<string, unknown> }) {
   return (
     <>
       <div className="flex items-start gap-2">
-        <ShoppingBag className="w-3.5 h-3.5 mt-0.5 text-indigo-500 shrink-0" />
+        <ShoppingBag className="w-3.5 h-3.5 mt-0.5 text-accent shrink-0" />
         <p className="text-sm font-semibold text-[var(--color-text)] line-clamp-2 flex-1">{String(item.title ?? '')}</p>
       </div>
       <div className="flex flex-wrap items-center gap-1.5 text-xs text-[var(--color-text-muted)]">
@@ -235,7 +236,7 @@ function KbCard({ item }: { item: Record<string, unknown> }) {
   return (
     <>
       <div className="flex items-start gap-2">
-        <BookOpen className="w-3.5 h-3.5 mt-0.5 text-indigo-500 shrink-0" />
+        <BookOpen className="w-3.5 h-3.5 mt-0.5 text-accent shrink-0" />
         <p className="text-sm font-semibold text-[var(--color-text)] line-clamp-2 flex-1">{String(item.title ?? '')}</p>
       </div>
       {item.excerpt ? <p className="text-xs text-[var(--color-text-muted)] line-clamp-3">{String(item.excerpt)}</p> : null}
@@ -248,7 +249,7 @@ function WalletCard({ item }: { item: Record<string, unknown> }) {
   return (
     <>
       <div className="flex items-start gap-2">
-        <Wallet className="w-3.5 h-3.5 mt-0.5 text-indigo-500 shrink-0" />
+        <Wallet className="w-3.5 h-3.5 mt-0.5 text-accent shrink-0" />
         <p className="text-sm font-semibold text-[var(--color-text)]">{t('card_wallet_title')}</p>
       </div>
       <p className="text-2xl font-bold text-[var(--color-text)]">{t('common:hours_short', { count: Number(Number(item.balance ?? 0).toFixed(2)) })}</p>

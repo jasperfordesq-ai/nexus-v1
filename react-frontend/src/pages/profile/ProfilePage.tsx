@@ -60,7 +60,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import type { User as UserType, Listing, Review } from '@/types/api';
 
 type ConnectionStatus = 'none' | 'pending_sent' | 'pending_received' | 'connected';
@@ -575,7 +575,7 @@ export function ProfilePage() {
   const profileName = profile.name || profile.first_name || t('member_fallback');
   const profileAvatar = profile.avatar_url || profile.avatar;
   const joinedDate = profile.created_at
-    ? new Date(profile.created_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+    ? new Date(profile.created_at).toLocaleDateString(getFormattingLocale(), { month: 'long', year: 'numeric' })
     : null;
   const metaDescription = t('page_meta.description', { name: profileName });
   const earnedBadgeCount = gamification?.total_badges ?? gamification?.badges.length ?? 0;
@@ -689,7 +689,7 @@ export function ProfilePage() {
                   isOwnProfile ? (
                     <Link
                       to={tenantPath('/nexus-score')}
-                      className="inline-flex items-center gap-1 rounded-full bg-indigo-500/15 px-2.5 py-1 text-xs font-semibold text-indigo-600 transition-colors hover:bg-indigo-500/25 dark:text-indigo-400"
+                      className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2.5 py-1 text-xs font-semibold text-accent transition-colors hover:bg-accent/25 dark:text-accent"
                       aria-label={t('aria.nexus_score_link', {
                         score: profile.nexus_score.total_score,
                         tier: profile.nexus_score.tier,
@@ -701,7 +701,7 @@ export function ProfilePage() {
                     </Link>
                   ) : (
                     <span
-                      className="inline-flex items-center gap-1 rounded-full bg-indigo-500/15 px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400"
+                      className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2.5 py-1 text-xs font-semibold text-accent dark:text-accent"
                       aria-label={t('aria.nexus_score_summary', {
                         score: profile.nexus_score.total_score,
                         tier: profile.nexus_score.tier,
@@ -774,7 +774,7 @@ export function ProfilePage() {
                           connectionStatus === 'pending_sent'
                             ? 'w-full bg-amber-500/20 text-amber-600 dark:text-amber-400 sm:w-auto'
                             : connectionStatus === 'pending_received'
-                            ? 'w-full bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 sm:w-auto'
+                            ? 'w-full bg-accent/20 text-accent dark:text-accent sm:w-auto'
                             : 'w-full bg-theme-elevated text-theme-primary sm:w-auto'
                         }
                         startContent={
@@ -1008,7 +1008,7 @@ export function ProfilePage() {
                         <Chip
                           variant="flat"
                           size="sm"
-                          className="max-w-[12rem] bg-indigo-500/20 text-indigo-600 dark:text-indigo-300"
+                          className="max-w-[12rem] bg-accent/20 text-accent dark:text-accent"
                         >
                           <span className="block truncate">{skill}</span>
                         </Chip>
@@ -1440,8 +1440,8 @@ interface ProfileStatCardProps {
 
 const colorClasses: Record<string, string> = {
   emerald: 'from-emerald-500/20 to-teal-500/20 text-emerald-500',
-  indigo: 'from-indigo-500/20 to-blue-500/20 text-indigo-500',
-  purple: 'from-purple-500/20 to-fuchsia-500/20 text-purple-500',
+  indigo: 'from-accent/20 to-blue-500/20 text-accent',
+  purple: 'from-accent/20 to-fuchsia-500/20 text-accent',
   amber: 'from-amber-500/20 to-orange-500/20 text-[var(--color-warning)]',
   rose: 'from-rose-500/20 to-pink-500/20 text-rose-500',
 };
@@ -1506,7 +1506,7 @@ function ReviewCard({ review }: ReviewCardProps) {
               dateTime={review.created_at}
               className="text-xs text-theme-subtle flex-shrink-0"
             >
-              {new Date(review.created_at).toLocaleDateString(undefined, {
+              {new Date(review.created_at).toLocaleDateString(getFormattingLocale(), {
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric',

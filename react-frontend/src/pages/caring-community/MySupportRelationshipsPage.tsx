@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -22,7 +23,7 @@ import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui/Modal';
+import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ModalHeading } from '@/components/ui/Modal';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { Textarea } from '@/components/ui/Textarea';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -78,7 +79,7 @@ function isOverdue(nextCheckInAt: string | null): boolean {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString(undefined, {
+  return new Date(dateStr).toLocaleDateString(getFormattingLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -156,7 +157,7 @@ function RelationshipCard({ relationship, t, onPause, onEnd, onResume, busyId }:
                 color="secondary"
                 variant="flat"
                 startContent={<HeartHandshake className="h-3 w-3" aria-hidden="true" />}
-                classNames={{ base: 'bg-purple-500/15 text-purple-700 dark:text-purple-300' }}
+                classNames={{ base: 'bg-accent/15 text-accent dark:text-accent' }}
               >
                 {t('inter_gen.badge')}
               </Chip>
@@ -330,7 +331,9 @@ function ActionModal({ kind, relationship, isSubmitting, onCancel, onConfirm }: 
     <Modal isOpen={isOpen} onClose={isSubmitting ? undefined : onCancel} size="md" placement="center">
       <ModalContent>
         <ModalHeader>
-          <h2 className="text-lg font-semibold text-theme-primary">{t(titleKey)}</h2>
+          <ModalHeading className="text-lg font-semibold text-theme-primary">
+            {t(titleKey)}
+          </ModalHeading>
         </ModalHeader>
         <ModalBody>
           <p className="text-sm leading-6 text-theme-muted">{t(descKey)}</p>

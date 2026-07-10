@@ -62,12 +62,24 @@
     "minutes_ago": "{{count}}m fa",
     "hours_ago": "{{count}}h fa",
     "days_ago": "{{count}}g fa",
-    "last_seen": "Ultimo accesso {{time}}"
+    "last_seen": "Ultimo accesso {{time}}",
+    "minutes_ago_many": "{{count}}m fa",
+    "minutes_ago_one": "{{count}}m fa",
+    "minutes_ago_other": "{{count}}m fa",
+    "hours_ago_many": "{{count}}h fa",
+    "hours_ago_one": "{{count}}h fa",
+    "hours_ago_other": "{{count}}h fa",
+    "days_ago_many": "{{count}}g fa",
+    "days_ago_one": "{{count}}g fa",
+    "days_ago_other": "{{count}}g fa"
   },
   "mention": {
     "suggestions_aria": "Suggerimenti menzione, {{count}} risultati",
     "no_users": "Nessun utente trovato",
-    "connected": "Connesso"
+    "connected": "Connesso",
+    "suggestions_aria_many": "Suggerimenti menzione, {{count}} risultati",
+    "suggestions_aria_one": "Suggerimenti menzione, {{count}} risultati",
+    "suggestions_aria_other": "Suggerimenti menzione, {{count}} risultati"
   },
   "status": {
     "set_status": "Imposta stato",
@@ -153,7 +165,10 @@
     "collection_description": "Descrizione (opzionale)",
     "cancel": "Annulla",
     "save": "Salva",
-    "create": "Crea"
+    "create": "Crea",
+    "count_many": "{{count}} elementi salvati",
+    "count_one": "{{count}} elementi salvati",
+    "count_other": "{{count}} elementi salvati"
   },
   "verified": "Verificato",
   "hover_card": {
@@ -163,7 +178,16 @@
     "message": "Messaggio",
     "hours_given": "{{count}} ore donate",
     "connections": "{{count}} connessioni",
-    "listings": "{{count}} annunci"
+    "listings": "{{count}} annunci",
+    "hours_given_many": "{{count}} ore donate",
+    "hours_given_one": "{{count}} ore donate",
+    "hours_given_other": "{{count}} ore donate",
+    "connections_many": "{{count}} connessioni",
+    "connections_one": "{{count}} connessioni",
+    "connections_other": "{{count}} connessioni",
+    "listings_many": "{{count}} annunci",
+    "listings_one": "{{count}} annunci",
+    "listings_other": "{{count}} annunci"
   },
   "reactions_tabs_aria": "Filtro del tipo di reazione",
   "content_type_tabs_aria": "Filtro del tipo di contenuto dei segnalibri",
@@ -175,5 +199,7 @@
     "image_alt_domain": "Anteprima da {{domain}}",
     "favicon_alt": "Icona di {{site}}",
     "video_fallback": "Video"
-  }
+  },
+  "likes_count_many": "{{count}} mi piace",
+  "comments_count_many": "{{count}} commenti"
 }

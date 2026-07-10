@@ -31,7 +31,9 @@
     "empty": "No notifications yet",
     "view_all": "View all notifications",
     "close": "Close notifications",
-    "unread_dot_aria": "Unread"
+    "unread_dot_aria": "Unread",
+    "bell_unread_aria_one": "Notifications, {{count}} unread",
+    "bell_unread_aria_other": "Notifications, {{count}} unread"
   },
   "type": {
     "message": "Message",
@@ -96,5 +98,11 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "unread_badge_one": "{{count}} new",
+  "unread_badge_other": "{{count}} new",
+  "filter_unread_one": "Unread ({{count}})",
+  "filter_unread_other": "Unread ({{count}})",
+  "and_others_one": "and {{count}} others",
+  "and_others_other": "and {{count}} others"
 }

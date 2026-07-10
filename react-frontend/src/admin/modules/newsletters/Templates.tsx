@@ -9,6 +9,7 @@
  * Parity: PHP Admin newsletter template management.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -241,7 +242,7 @@ export function Templates() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}
+          {item.created_at ? new Date(item.created_at).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },

@@ -306,6 +306,26 @@
     "audience_badge_holders": "Úsáideoirí le suaitheantas ar leith",
     "type_one_time": "Uair amháin",
     "type_recurring": "Athfhillteach",
-    "type_triggered": "Spreagtha"
+    "type_triggered": "Spreagtha",
+    "bulk_award_succeeded_count_few": "Bronnadh suaitheantas{{count}}",
+    "bulk_award_succeeded_count_many": "Bronnadh suaitheantas{{count}}",
+    "bulk_award_succeeded_count_one": "Bronnadh suaitheantas{{count}}",
+    "bulk_award_succeeded_count_other": "Bronnadh suaitheantas{{count}}",
+    "bulk_award_succeeded_count_two": "Bronnadh suaitheantas{{count}}",
+    "badge_count_few": "Suaitheantais{{count}}",
+    "badge_count_many": "Suaitheantais{{count}}",
+    "badge_count_one": "Suaitheantais{{count}}",
+    "badge_count_other": "Suaitheantais{{count}}",
+    "badge_count_two": "Suaitheantais{{count}}",
+    "threshold_count_few": "Tairseach:{{count}}",
+    "threshold_count_many": "Tairseach:{{count}}",
+    "threshold_count_one": "Tairseach:{{count}}",
+    "threshold_count_other": "Tairseach:{{count}}",
+    "threshold_count_two": "Tairseach:{{count}}",
+    "xp_count_few": "{{count}}XP",
+    "xp_count_many": "{{count}}XP",
+    "xp_count_one": "{{count}}XP",
+    "xp_count_other": "{{count}}XP",
+    "xp_count_two": "{{count}}XP"
   }
 }

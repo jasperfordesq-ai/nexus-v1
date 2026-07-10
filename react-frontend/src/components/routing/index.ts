@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 export { ProtectedRoute } from './ProtectedRoute';
-export { FeatureGate, withFeatureGate } from './FeatureGate';
+export { FeatureGate } from './FeatureGate';
 export { ScrollToTop } from './ScrollToTop';
 export { TenantShell } from './TenantShell';
-export { PremiumGate, invalidatePremiumCache } from './PremiumGate';

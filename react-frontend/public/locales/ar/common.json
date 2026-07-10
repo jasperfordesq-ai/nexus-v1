@@ -73,7 +73,13 @@
     "features": "الميزات",
     "courses": "الدورات",
     "podcasts": "البودكاست",
-    "switch_community": "تبديل المجتمع"
+    "switch_community": "تبديل المجتمع",
+    "unread_notifications_few": "{{count}} إشعارات غير مقروءة",
+    "unread_notifications_many": "{{count}} إشعارات غير مقروءة",
+    "unread_notifications_one": "{{count}} إشعارات غير مقروءة",
+    "unread_notifications_other": "{{count}} إشعارات غير مقروءة",
+    "unread_notifications_two": "{{count}} إشعارات غير مقروءة",
+    "unread_notifications_zero": "{{count}} إشعارات غير مقروءة"
   },
   "landing_links": {
     "title": "استكشف هذا المجتمع",
@@ -239,6 +245,7 @@
     "accessibility_alpha_new_tab": "افتح إمكانية الوصول (تجريبي) في علامة تبويب جديدة",
     "menu_opened": "تم فتح قائمة التنقل",
     "close": "إغلاق",
+    "clear_input": "مسح الإدخال",
     "scroll_to_top": "التمرير إلى الأعلى",
     "breadcrumb": "مسار التنقل"
   },
@@ -367,7 +374,25 @@
     "load_failed": "فشل تحميل الأعضاء",
     "load_more_failed": "فشل تحميل المزيد من الأعضاء",
     "my_profile": "ملفي الشخصي",
-    "load_more_count": "تحميل المزيد (يتبقى {{remaining}})"
+    "load_more_count": "تحميل المزيد (يتبقى {{remaining}})",
+    "results_count_few": "{{count}} عضو معروض",
+    "results_count_many": "{{count}} عضو معروض",
+    "results_count_one": "{{count}} عضو معروض",
+    "results_count_other": "{{count}} عضو معروض",
+    "results_count_two": "{{count}} عضو معروض",
+    "results_count_zero": "{{count}} عضو معروض",
+    "hours_exchanged_aria_few": "{{count}} ساعة متبادلة",
+    "hours_exchanged_aria_many": "{{count}} ساعة متبادلة",
+    "hours_exchanged_aria_one": "{{count}} ساعة متبادلة",
+    "hours_exchanged_aria_other": "{{count}} ساعة متبادلة",
+    "hours_exchanged_aria_two": "{{count}} ساعة متبادلة",
+    "hours_exchanged_aria_zero": "{{count}} ساعة متبادلة",
+    "hours_short_few": "{{count}} س",
+    "hours_short_many": "{{count}} س",
+    "hours_short_one": "{{count}} س",
+    "hours_short_other": "{{count}} س",
+    "hours_short_two": "{{count}} س",
+    "hours_short_zero": "{{count}} س"
   },
   "error_boundary": {
     "title": "حدث خطأ ما",
@@ -879,7 +904,19 @@
     "user_menu_trigger": "قائمة المستخدم لـ {{name}}",
     "feed_sidebar": "الشريط الجانبي للمجتمع",
     "filter_panel": "لوحة التصفية",
-    "remove": "Remove"
+    "remove": "Remove",
+    "location_results_few": "{{count}} اقتراحات العناوين متاحة",
+    "location_results_many": "{{count}} اقتراحات العناوين متاحة",
+    "location_results_one": "{{count}} اقتراحات العناوين متاحة",
+    "location_results_other": "{{count}} اقتراحات العناوين متاحة",
+    "location_results_two": "{{count}} اقتراحات العناوين متاحة",
+    "location_results_zero": "{{count}} اقتراحات العناوين متاحة",
+    "search_results_few": "{{count}} results available",
+    "search_results_many": "{{count}} results available",
+    "search_results_one": "{{count}} النتائج المتاحة",
+    "search_results_other": "{{count}} النتائج المتاحة",
+    "search_results_two": "{{count}} results available",
+    "search_results_zero": "{{count}} results available"
   },
   "skills": {
     "browse_title": "دليل مهارات المجتمع",
@@ -929,7 +966,13 @@
     "aria_clear_search": "مسح البحث",
     "aria_close_members_list": "إغلاق قائمة الأعضاء",
     "category_optional": "الفئة (اختياري)",
-    "proficiency_level": "مستوى الإتقان"
+    "proficiency_level": "مستوى الإتقان",
+    "aria_results_few": "{{count}} اقتراحات المهارات متاحة",
+    "aria_results_many": "{{count}} اقتراحات المهارات متاحة",
+    "aria_results_one": "{{count}} اقتراحات المهارات متاحة",
+    "aria_results_other": "{{count}} اقتراحات المهارات متاحة",
+    "aria_results_two": "{{count}} اقتراحات المهارات متاحة",
+    "aria_results_zero": "{{count}} اقتراحات المهارات متاحة"
   },
   "hours_display_one": "{{count}} ساعة",
   "hours_display_other": "{{count}} ساعات",
@@ -1108,7 +1151,13 @@
     },
     "errors": {
       "load_failed": "تعذّر تحميل الأندية. يُرجى المحاولة مرة أخرى."
-    }
+    },
+    "member_count_few": "{{count}} عضو",
+    "member_count_many": "{{count}} عضو",
+    "member_count_one": "{{count}} عضو",
+    "member_count_other": "{{count}} عضو",
+    "member_count_two": "{{count}} عضو",
+    "member_count_zero": "{{count}} عضو"
   },
   "feed": {
     "personalisation": {
@@ -1191,7 +1240,13 @@
       "format": "التنسيق",
       "size": "الحجم",
       "count": "{{count}} عمليات تصدير",
-      "empty": "لم تقم بتصدير بياناتك بعد."
+      "empty": "لم تقم بتصدير بياناتك بعد.",
+      "count_few": "{{count}} عمليات تصدير",
+      "count_many": "{{count}} عمليات تصدير",
+      "count_one": "{{count}} عمليات تصدير",
+      "count_other": "{{count}} عمليات تصدير",
+      "count_two": "{{count}} عمليات تصدير",
+      "count_zero": "{{count}} عمليات تصدير"
     },
     "errors": {
       "rate_limit": "يمكنك طلب 5 عمليات تصدير في اليوم. يُرجى المحاولة غدًا.",
@@ -1436,7 +1491,13 @@
     "created_success": "تم إنشاء حملة الدفع بنجاح.",
     "create_error": "تعذّر إنشاء حملة الدفع. يرجى المحاولة مرة أخرى.",
     "submit_create": "إنشاء الحملة",
-    "feature_disabled": "حملات الدفع غير متاحة لحسابك."
+    "feature_disabled": "حملات الدفع غير متاحة لحسابك.",
+    "estimate_result_few": "الوصول المُقدَّر: {{count}} عضوًا",
+    "estimate_result_many": "الوصول المُقدَّر: {{count}} عضوًا",
+    "estimate_result_one": "الوصول المُقدَّر: {{count}} عضوًا",
+    "estimate_result_other": "الوصول المُقدَّر: {{count}} عضوًا",
+    "estimate_result_two": "الوصول المُقدَّر: {{count}} عضوًا",
+    "estimate_result_zero": "الوصول المُقدَّر: {{count}} عضوًا"
   },
   "push_campaign_opt_in": "تلقّي إشعارات دفع تروج لها",
   "push_campaign_opt_in_description": "اسمح للشركات والمنظمات المحلية بإرسال إشعارات دفع مستهدفة إليك. يمكنك إلغاء الاشتراك في أي وقت.",
@@ -1505,7 +1566,13 @@
       "view_redemptions": "عرض الاستبدالات",
       "usage_count": "استُخدمت {{count}} مرة",
       "saved": "تم حفظ القسيمة",
-      "deleted": "تم حذف القسيمة"
+      "deleted": "تم حذف القسيمة",
+      "usage_count_few": "استُخدمت {{count}} مرة",
+      "usage_count_many": "استُخدمت {{count}} مرة",
+      "usage_count_one": "استُخدمت {{count}} مرة",
+      "usage_count_other": "استُخدمت {{count}} مرة",
+      "usage_count_two": "استُخدمت {{count}} مرة",
+      "usage_count_zero": "استُخدمت {{count}} مرة"
     },
     "qr_code_alt": "رمز QR"
   },
@@ -1989,7 +2056,10 @@
     "error": "حدث خطأ ما",
     "someone": "شخص ما",
     "unknown_user": "مستخدم",
-    "not_available": "غير متاح"
+    "not_available": "غير متاح",
+    "edit": "يحرر",
+    "collapse": "ينهار",
+    "expand": "يوسع"
   },
   "verein_federation": {
     "panel_title": "الاتحاد مع نوادٍ أخرى",
@@ -2063,7 +2133,13 @@
       "today": "اليوم",
       "from_label": "من",
       "load_failed": "تعذّر تحميل التقويم."
-    }
+    },
+    "char_count_few": "{{count}}/500",
+    "char_count_many": "{{count}}/500",
+    "char_count_one": "{{count}}/500",
+    "char_count_other": "{{count}}/500",
+    "char_count_two": "{{count}}/500",
+    "char_count_zero": "{{count}}/500"
   },
   "oauth": {
     "continue_with_google": "المتابعة باستخدام Google",
@@ -2167,7 +2243,20 @@
       "generate_failed": "فشل الإنشاء.",
       "reminder_failed": "تعذّر إرسال التذكير.",
       "waive_failed": "تعذّر إعفاء الرسوم."
-    }
+    },
+    "admin_bulk_reminder_sent_few": "تم إرسال {{count}} تذكيرًا.",
+    "admin_bulk_reminder_sent_many": "تم إرسال {{count}} تذكيرًا.",
+    "admin_bulk_reminder_sent_one": "تم إرسال {{count}} تذكيرًا.",
+    "admin_bulk_reminder_sent_other": "تم إرسال {{count}} تذكيرًا.",
+    "admin_bulk_reminder_sent_two": "تم إرسال {{count}} تذكيرًا.",
+    "admin_bulk_reminder_sent_zero": "تم إرسال {{count}} تذكيرًا.",
+    "admin_overdue_count_few": "{{count}} عضو(ًا) لديهم رسوم متأخرة.",
+    "admin_overdue_count_many": "{{count}} عضو(ًا) لديهم رسوم متأخرة.",
+    "admin_overdue_count_one": "{{count}} عضو(ًا) لديهم رسوم متأخرة.",
+    "admin_overdue_count_other": "{{count}} عضو(ًا) لديهم رسوم متأخرة.",
+    "admin_overdue_count_two": "{{count}} عضو(ًا) لديهم رسوم متأخرة.",
+    "admin_overdue_count_zero": "{{count}} عضو(ًا) لديهم رسوم متأخرة.",
+    "badge_none": "لا مستحقات"
   },
   "collections": {
     "save": "حفظ",
@@ -2311,7 +2400,13 @@
   },
   "max_characters": "بحد أقصى {{count}} حرفًا",
   "map": {
-    "listings_here": "{{count}} إعلان هنا"
+    "listings_here": "{{count}} إعلان هنا",
+    "listings_here_few": "{{count}} إعلان هنا",
+    "listings_here_many": "{{count}} إعلان هنا",
+    "listings_here_one": "{{count}} إعلان هنا",
+    "listings_here_other": "{{count}} إعلان هنا",
+    "listings_here_two": "{{count}} إعلان هنا",
+    "listings_here_zero": "{{count}} إعلان هنا"
   },
   "time_credits_short": "{{count}} ساعة من الرصيد",
   "level_plain": "المستوى {{level}}",
@@ -2329,5 +2424,819 @@
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "alpha_badge": "ألفا"
+  "alpha_badge": "ألفا",
+  "hours_display_few": "{{count}} ساعات",
+  "hours_display_many": "{{count}} ساعات",
+  "hours_display_two": "{{count}} ساعات",
+  "hours_display_zero": "{{count}} ساعات",
+  "wellbeing": {
+    "mood_struggling": "يكافح",
+    "mood_low": "قليل",
+    "mood_okay": "تمام",
+    "mood_good": "جيد",
+    "mood_great": "عظيم",
+    "mood_unknown": "مجهول",
+    "score_excellent": "ممتاز",
+    "score_good": "جيد",
+    "score_fair": "عدل",
+    "score_needs_attention": "يحتاج إلى اهتمام",
+    "score_critical": "شديد الأهمية"
+  },
+  "credentials": {
+    "status_pending": "في انتظار المراجعة",
+    "status_verified": "تم التحقق منه",
+    "status_expired": "منتهي الصلاحية",
+    "status_rejected": "مرفوض"
+  },
+  "nexus_score": {
+    "tier_threshold": "{{tier}} ({{min}}+)"
+  },
+  "application_status": {
+    "applied": "تم التقديم",
+    "pending": "قيد الانتظار",
+    "screening": "فرز",
+    "reviewed": "تمت المراجعة",
+    "interview": "مقابلة",
+    "offer": "عرض",
+    "accepted": "مقبول",
+    "rejected": "مرفوض",
+    "withdrawn": "تم السحب"
+  },
+  "salary": {
+    "currency_eur": "EUR",
+    "min_only": "من {{min}}",
+    "max_only": "حتى {{max}}"
+  },
+  "salary_display": "{{min}} – {{max}}",
+  "activity": {
+    "action_listing": "شارك قائمة",
+    "action_event": "نشر عن حدث",
+    "action_poll": "أنشأ استطلاعًا",
+    "action_goal": "حدد هدفًا جديدًا",
+    "action_post": "شارك منشورًا"
+  },
+  "hours_short_few": "{{count}} س",
+  "hours_short_many": "{{count}} س",
+  "hours_short_one": "{{count}} س",
+  "hours_short_other": "{{count}} س",
+  "hours_short_two": "{{count}} س",
+  "hours_short_zero": "{{count}} س",
+  "time_credits_short_few": "{{count}} ساعة من الرصيد",
+  "time_credits_short_many": "{{count}} ساعة من الرصيد",
+  "time_credits_short_one": "{{count}} ساعة من الرصيد",
+  "time_credits_short_other": "{{count}} ساعة من الرصيد",
+  "time_credits_short_two": "{{count}} ساعة من الرصيد",
+  "time_credits_short_zero": "{{count}} ساعة من الرصيد",
+  "question_required": "مطلوب",
+  "yes": "نعم",
+  "no": "No",
+  "likert_options": {
+    "1": "غير راضٍ تماماً",
+    "2": "غير راضٍ",
+    "3": "محايد",
+    "4": "راضٍ",
+    "5": "راضٍ جداً"
+  },
+  "required_error": "يرجى الإجابة على جميع الأسئلة المطلوبة.",
+  "already_responded": "لقد شاركت بالفعل في هذا الاستطلاع.",
+  "time_ago_just_now": "الآن",
+  "time_ago_hours_few": "منذ {{count}} ساعة",
+  "time_ago_hours_many": "منذ {{count}} ساعة",
+  "time_ago_hours_one": "منذ {{count}} ساعة",
+  "time_ago_hours_other": "منذ {{count}} ساعة",
+  "time_ago_hours_two": "منذ {{count}} ساعة",
+  "time_ago_hours_zero": "منذ {{count}} ساعة",
+  "time_ago_days_few": "منذ {{count}} يوم",
+  "time_ago_days_many": "منذ {{count}} يوم",
+  "time_ago_days_one": "منذ {{count}} يوم",
+  "time_ago_days_other": "منذ {{count}} يوم",
+  "time_ago_days_two": "منذ {{count}} يوم",
+  "time_ago_days_zero": "منذ {{count}} يوم",
+  "providers": {
+    "filter_spitex": "سبيتكس",
+    "filter_tagesstte": "المراكز النهارية",
+    "filter_private": "خاص",
+    "filter_verein": "الجمعيات",
+    "filter_volunteer": "المتطوعين",
+    "verified_badge": "تم التحقق منه",
+    "call_aria": "مزود الاتصال في{{phone}}",
+    "email_aria": "مزود البريد الإلكتروني في{{email}}",
+    "website_aria": "قم بزيارة موقع المزود{{url}}",
+    "website": "موقع إلكتروني"
+  },
+  "caregiver": {
+    "burnout_high": "عبء كبير على مقدمي الرعاية: ساعات{{hours}}هذا الأسبوع",
+    "burnout_moderate": "التحميل المتوسط: ساعات{{hours}}هذا الأسبوع",
+    "burnout_warning": "لقد قمت بتسجيل عدة ساعات هذا الأسبوع - يرجى التأكد من الراحة",
+    "upcoming_care": "الرعاية القادمة",
+    "no_upcoming_care": "لا يوجد دعم مجدول حتى الآن",
+    "recent_care": "الرعاية الأخيرة",
+    "no_recent_care": "لا توجد سجلات رعاية حديثة حتى الآن",
+    "view_schedule": "عرض جدول الرعاية",
+    "request_on_behalf": "طلب المساعدة نيابة عنهم",
+    "hours_short": "{{hours}}ح"
+  },
+  "cover": {
+    "title": "رعاية الغطاء"
+  },
+  "viewer": {
+    "time_just_now": "الآن",
+    "time_minutes_ago_few": "{{count}} دقيقة مضت",
+    "time_minutes_ago_many": "{{count}} دقيقة مضت",
+    "time_minutes_ago_one": "{{count}} دقيقة مضت",
+    "time_minutes_ago_other": "{{count}} دقيقة مضت",
+    "time_minutes_ago_two": "{{count}} دقيقة مضت",
+    "time_minutes_ago_zero": "{{count}} دقيقة مضت",
+    "time_hours_ago_few": "{{count}} ساعة مضت",
+    "time_hours_ago_many": "{{count}} ساعة مضت",
+    "time_hours_ago_one": "{{count}} ساعة مضت",
+    "time_hours_ago_other": "{{count}} ساعة مضت",
+    "time_hours_ago_two": "{{count}} ساعة مضت",
+    "time_hours_ago_zero": "{{count}} ساعة مضت",
+    "time_days_ago_few": "{{count}} يوم مضى",
+    "time_days_ago_many": "{{count}} يوم مضى",
+    "time_days_ago_one": "{{count}} يوم مضى",
+    "time_days_ago_other": "{{count}} يوم مضى",
+    "time_days_ago_two": "{{count}} يوم مضى",
+    "time_days_ago_zero": "{{count}} يوم مضى"
+  },
+  "biometric": {
+    "label_builtin": "المصادق المدمج",
+    "label_external": "المصادق الخارجي",
+    "label_passkey": "مفتاح المرور",
+    "platform_windows_title": "الإعداد على Windows",
+    "platform_windows_step1": "انقر على «هذا الحاسوب» لإنشاء مفتاح مرور مخزّن على هذا الجهاز. ستؤكد برقم PIN الخاص بـ Windows Hello أو بصمة الإصبع أو الوجه.",
+    "platform_windows_step2": "الشرط: يجب إعداد Windows Hello أولاً. انتقل إلى إعدادات Windows > الحسابات > خيارات تسجيل الدخول > PIN لإعداده.",
+    "platform_windows_step3": "أو انقر على «الهاتف أو الجهاز اللوحي أو مفتاح الأمان» لمسح رمز QR بهاتفك.",
+    "platform_windows_step4": "لإعداد مفاتيح المرور على هاتفك أيضاً، افتح هذه الصفحة على هاتفك واضغط على «هذا الجهاز».",
+    "platform_mac_title": "الإعداد على Mac",
+    "platform_mac_step1": "انقر على «هذا Mac» — سيطلب المتصفح Touch ID أو كلمة مرور Mac الخاصة بك.",
+    "platform_mac_step2": "يتزامن مفتاح المرور عبر iCloud Keychain مع iPhone وiPad وأجهزة Mac الأخرى تلقائياً.",
+    "platform_mac_step3": "أو انقر على «الهاتف أو الجهاز اللوحي أو مفتاح الأمان» لتسجيل جهاز مختلف.",
+    "platform_iphone_title": "الإعداد على iPhone",
+    "platform_iphone_step1": "اضغط على «هذا الجهاز» لإنشاء مفتاح مرور باستخدام Face ID أو Touch ID.",
+    "platform_iphone_step2": "يُحفظ مفتاح المرور في iCloud Keychain ويعمل على جميع أجهزة Apple الخاصة بك.",
+    "platform_iphone_step3": "يمكنك أيضاً الضغط على «الهاتف أو الجهاز اللوحي أو مفتاح الأمان» لتسجيل مفتاح أمان.",
+    "platform_ipad_title": "الإعداد على iPad",
+    "platform_ipad_step1": "اضغط على «هذا الجهاز» لإنشاء مفتاح مرور باستخدام Face ID أو Touch ID.",
+    "platform_ipad_step2": "يُحفظ مفتاح المرور في iCloud Keychain ويعمل على جميع أجهزة Apple الخاصة بك.",
+    "platform_ipad_step3": "يمكنك أيضاً الضغط على «الهاتف أو الجهاز اللوحي أو مفتاح الأمان» لتسجيل مفتاح أمان.",
+    "platform_android_title": "الإعداد على Android",
+    "platform_android_step1": "اضغط على «هذا الجهاز» لإنشاء مفتاح مرور باستخدام بصمة الإصبع أو الوجه أو قفل الشاشة.",
+    "platform_android_step2": "يُحفظ مفتاح المرور في مدير كلمات مرور Google ويعمل على جميع أجهزة Android والمتصفحات.",
+    "platform_android_step3": "يمكنك أيضاً الضغط على «الهاتف أو الجهاز اللوحي أو مفتاح الأمان» لتسجيل مفتاح أمان.",
+    "platform_linux_title": "الإعداد على Linux",
+    "platform_linux_step1": "انقر على «هذا الجهاز» — سيستخدم متصفحك مدير مفاتيح المرور المدمج.",
+    "platform_linux_step2": "أو انقر على «الهاتف أو الجهاز اللوحي أو مفتاح الأمان» لاستخدام مفتاح أمان USB أو مسح رمز QR بهاتفك.",
+    "platform_unknown_title": "إعداد مفتاح مرور",
+    "platform_unknown_step1": "انقر على «هذا الجهاز» لإنشاء مفتاح مرور على الجهاز الذي تستخدمه الآن.",
+    "platform_unknown_step2": "أو انقر على «الهاتف أو الجهاز اللوحي أو مفتاح الأمان» لتسجيل جهاز مختلف."
+  },
+  "discussion": {
+    "delete": "يمسح",
+    "reply": "رد"
+  },
+  "page_builder": {
+    "starter": {
+      "kicker": "صفحة المجتمع",
+      "hero_title": "إنشاء صفحة مخصصة جميلة",
+      "hero_body": "استخدم الأقسام والبطاقات والصور والعبارات التي تحث المستخدم على اتخاذ إجراء لإخبار قصة المستأجر.",
+      "cta": "استكشف المجتمع",
+      "card_one_title": "شارك ما يهم",
+      "card_one_body": "تقديم المشاريع أو الخدمات أو الشركاء أو التقارير أو السياسات أو الفرص المحلية.",
+      "card_two_title": "اجعلها سريعة الاستجابة",
+      "card_two_body": "قم بمعاينة سطح المكتب والكمبيوتر اللوحي والهاتف المحمول أثناء التصميم."
+    },
+    "blocks": {
+      "category_nexus": "أقسام نيكزس",
+      "hero_label": "قسم البطل",
+      "hero_kicker": "قصة المجتمع",
+      "hero_title": "عنوان الصفحة مع الحضور",
+      "hero_body": "أضف مقدمة واضحة تبدو خاصة ببنك الوقت الخاص بك.",
+      "hero_cta": "دعوة للعمل",
+      "feature_grid_label": "شبكة مميزة",
+      "feature_one_title": "ميزة واحدة",
+      "feature_one_body": "وصف النتيجة أو الخدمة أو الوعد.",
+      "feature_two_title": "الميزة الثانية",
+      "feature_two_body": "احتفظ بالنسخة ملموسة وسهلة المسح.",
+      "story_band_label": "فرقة القصة",
+      "story_kicker": "التأثير المحلي",
+      "story_title": "أخبر القصة في فرقة محتوى سخية",
+      "story_body": "استخدم هذا للتقارير أو شروحات البرنامج أو صفحات الشركاء أو الإرشادات."
+    }
+  },
+  "newsletter_content_editor": {
+    "tip_device_desktop": "عرض سطح المكتب",
+    "tip_device_tablet": "عرض الجهاز اللوحي",
+    "tip_device_mobile": "عرض الجوال",
+    "toolbar_label": "شريط أدوات منشئ البريد الإلكتروني",
+    "tip_undo": "تراجع",
+    "tip_redo": "إعادة",
+    "tip_borders": "تبديل الحدود",
+    "tip_code": "عرض الكود",
+    "tip_clear": "مسح اللوحة"
+  },
+  "newsletter_builder": {
+    "insert_image": "أدخل الصورة",
+    "library_title": "مكتبة الصور",
+    "preview": "معاينة",
+    "templates": "القوالب",
+    "preview_title": "معاينة البريد الإلكتروني",
+    "preview_device_label": "جهاز المعاينة",
+    "preview_desktop": "سطح المكتب",
+    "preview_mobile": "الجوال"
+  },
+  "dismiss_reasons": {
+    "too_far": "بعيدا جدا",
+    "not_my_skills": "ليست مهاراتي",
+    "not_interested": "غير مهتم"
+  },
+  "qa": {
+    "upvote_aria": "تصويت إيجابي",
+    "vote_count_aria_few": "{{count}} صوتًا",
+    "vote_count_aria_many": "{{count}} صوتًا",
+    "vote_count_aria_one": "{{count}} صوتًا",
+    "vote_count_aria_other": "{{count}} صوتًا",
+    "vote_count_aria_two": "{{count}} صوتًا",
+    "vote_count_aria_zero": "{{count}} صوتًا",
+    "downvote_aria": "تصويت سلبي"
+  },
+  "challenges": {
+    "time_ended": "منتهٍ",
+    "time_remaining_days_hours": "متبقٍّ {{days}} يوم و {{hours}} ساعة",
+    "time_remaining_hours_minutes": "متبقٍّ {{hours}} ساعة و {{minutes}} دقيقة"
+  },
+  "max_characters_few": "بحد أقصى {{count}} حرفًا",
+  "max_characters_many": "بحد أقصى {{count}} حرفًا",
+  "max_characters_one": "بحد أقصى {{count}} حرفًا",
+  "max_characters_other": "بحد أقصى {{count}} حرفًا",
+  "max_characters_two": "بحد أقصى {{count}} حرفًا",
+  "max_characters_zero": "بحد أقصى {{count}} حرفًا",
+  "users": {
+    "action_edit": "يحرر",
+    "action_approve": "يعتمد",
+    "action_suspend": "تعليق",
+    "action_ban": "حظر",
+    "action_reactivate": "إعادة التنشيط",
+    "action_reset_2fa": "إعادة تعيين 2FA",
+    "action_permissions": "الأذونات",
+    "action_impersonate": "انتحال شخصية",
+    "action_delete": "يمسح",
+    "actions_menu": "قائمة الإجراءات"
+  },
+  "volunteering": {
+    "time_just_now": "الآن",
+    "time_minutes_ago_few": "{{count}}منذ دقيقة",
+    "time_minutes_ago_many": "{{count}}منذ دقيقة",
+    "time_minutes_ago_one": "{{count}}منذ دقيقة",
+    "time_minutes_ago_other": "{{count}}منذ دقيقة",
+    "time_minutes_ago_two": "{{count}}منذ دقيقة",
+    "time_minutes_ago_zero": "{{count}}منذ دقيقة",
+    "time_hours_ago_few": "{{count}}منذ ساعة",
+    "time_hours_ago_many": "{{count}}منذ ساعة",
+    "time_hours_ago_one": "{{count}}منذ ساعة",
+    "time_hours_ago_other": "{{count}}منذ ساعة",
+    "time_hours_ago_two": "{{count}}منذ ساعة",
+    "time_hours_ago_zero": "{{count}}منذ ساعة",
+    "time_days_ago_few": "{{count}}منذ يوم واحد",
+    "time_days_ago_many": "{{count}}منذ يوم واحد",
+    "time_days_ago_one": "{{count}}منذ يوم واحد",
+    "time_days_ago_other": "{{count}}منذ يوم واحد",
+    "time_days_ago_two": "{{count}}منذ يوم واحد",
+    "time_days_ago_zero": "{{count}}منذ يوم واحد",
+    "wellbeing_user_number": "متطوع رقم {{id}}",
+    "wellbeing_unknown_user": "متطوع غير معروف",
+    "wellbeing_unknown_type": "مسألة تتعلق بالرفاهية"
+  },
+  "system": {
+    "never": "أبداً",
+    "just_now": "الآن",
+    "minutes_ago_few": "{{count}}م مضت",
+    "minutes_ago_many": "{{count}}م مضت",
+    "minutes_ago_one": "{{count}}م مضت",
+    "minutes_ago_other": "{{count}}م مضت",
+    "minutes_ago_two": "{{count}}م مضت",
+    "minutes_ago_zero": "{{count}}م مضت",
+    "hours_ago_few": "{{count}}منذ ساعة",
+    "hours_ago_many": "{{count}}منذ ساعة",
+    "hours_ago_one": "{{count}}منذ ساعة",
+    "hours_ago_other": "{{count}}منذ ساعة",
+    "hours_ago_two": "{{count}}منذ ساعة",
+    "hours_ago_zero": "{{count}}منذ ساعة",
+    "days_ago_few": "{{count}}منذ د",
+    "days_ago_many": "{{count}}منذ د",
+    "days_ago_one": "{{count}}منذ د",
+    "days_ago_other": "{{count}}منذ د",
+    "days_ago_two": "{{count}}منذ د",
+    "days_ago_zero": "{{count}}منذ د"
+  },
+  "super": {
+    "tenant_actions": "إجراءات المستأجر",
+    "action_view": "منظر",
+    "disable_hub": "تعطيل المحور",
+    "enable_hub": "تمكين المحور",
+    "deactivate": "إلغاء التنشيط",
+    "reactivate": "إعادة التنشيط",
+    "status_active_label": "Active Label",
+    "status_inactive_label": "Inactive Label",
+    "hub": "مَركَز"
+  },
+  "help_faqs": {
+    "actions_aria": "إجراءات السؤال الشائع"
+  },
+  "groups": {
+    "policy_features": "ميزات السياسة",
+    "policy_moderation": "الاعتدال في السياسة",
+    "policy_membership": "عضوية السياسة",
+    "policy_creation": "خلق السياسات",
+    "policy_content": "محتوى السياسة",
+    "policy_notifications": "إشعارات السياسة"
+  },
+  "gamification": {
+    "label_campaign_actions": "إجراءات الحملة",
+    "edit": "يحرر",
+    "activate": "فعل",
+    "pause": "يوقف",
+    "resume": "سيرة ذاتية",
+    "delete": "يمسح"
+  },
+  "federation": {
+    "event_type_message_sent": "تم إرسال الرسالة",
+    "event_type_transaction": "عملية",
+    "event_type_connection": "طلب الاتصال",
+    "event_type_listing_shared": "القائمة مشتركة",
+    "event_type_listing_unshared": "القائمة غير مشتركة",
+    "event_type_listing_viewed": "تم الاطلاع على القائمة",
+    "event_type_partnership_requested": "طلبت الشراكة",
+    "event_type_partnership_approved": "تمت الموافقة على الشراكة",
+    "event_type_partnership_rejected": "رفضت الشراكة",
+    "event_type_partnership_changed": "تم تحديث الشراكة",
+    "event_type_partnership_terminated": "انتهت الشراكة",
+    "event_type_profile_viewed": "تم عرض الملف الشخصي",
+    "event_type_federated_search": "بحث الشريك"
+  },
+  "enterprise": {
+    "config_group_general": "عام",
+    "config_group_general_desc": "هوية الموقع والترجمة ونص التذييل.",
+    "config_site_name": "اسم الموقع",
+    "config_site_name_desc": "يظهر الاسم العام في الرأس وعلامة تبويب المتصفح ورسائل البريد الإلكتروني.",
+    "config_site_description": "وصف الموقع",
+    "config_site_description_desc": "سطر وصف قصير يستخدم في البيانات الوصفية والروابط المشتركة.",
+    "config_contact_email": "البريد الإلكتروني للاتصال",
+    "config_contact_email_desc": "العنوان الذي يستخدمه الأعضاء للوصول إلى الدعم.",
+    "config_contact_phone": "اتصل بالهاتف",
+    "config_contact_phone_desc": "رقم الهاتف العام لاستفسارات الدعم.",
+    "config_timezone": "المنطقة الزمنية",
+    "config_timezone_desc": "معرف المنطقة الزمنية IANA المستخدم للجدولة والطوابع الزمنية.",
+    "config_footer_text": "تذييل النص القانوني",
+    "config_footer_text_desc": "رقم المؤسسة الخيرية أو تسجيل الشركة أو أي نص قانوني آخر معروض في التذييل.",
+    "config_locale": "اللغة الافتراضية",
+    "config_locale_desc": "اللغة المستخدمة للأعضاء الجدد حتى يختاروا لغتهم الخاصة.",
+    "config_group_registration": "التسجيل والتأهيل",
+    "config_group_registration_desc": "من يمكنه التسجيل، وما الذي يتحققون منه، وكيف يتم الترحيب بهم.",
+    "config_registration_enabled": "تم تمكين التسجيل",
+    "config_registration_enabled_desc": "قم بإيقاف التشغيل لإغلاق عمليات الاشتراك بالكامل.",
+    "config_require_approval": "مطلوب موافقة المشرف",
+    "config_require_approval_desc": "يجب أن تتم الموافقة على الحسابات الجديدة من قبل المسؤول قبل أن يتمكنوا من تسجيل الدخول.",
+    "config_require_email_verification": "تتطلب التحقق من البريد الإلكتروني",
+    "config_require_email_verification_desc": "يجب على الأعضاء التحقق من عنوان بريدهم الإلكتروني قبل الوصول إلى المنصة.",
+    "config_maintenance_mode": "وضع الصيانة",
+    "config_maintenance_mode_desc": "للقراءة فقط. قم بالتبديل عبر scripts/maintenance.sh على الخادم.",
+    "config_onboarding_enabled": "عرض تدفق الإعداد",
+    "config_onboarding_enabled_desc": "قم بتوجيه الأعضاء الجدد من خلال إعداد الملف الشخصي والمهارات بعد التسجيل.",
+    "config_configure_steps": "تكوين الخطوات",
+    "config_welcome_message": "رسالة ترحيب",
+    "config_welcome_message_desc": "تظهر للأعضاء الجدد عند تسجيل دخولهم لأول مرة.",
+    "config_group_wallet": "المحفظة والائتمانات",
+    "config_group_wallet_desc": "رصيد رصيد الوقت، وحدود التحويل، وكيفية تسمية العملة.",
+    "config_starting_balance": "رصيد البداية",
+    "config_starting_balance_desc": "الاعتمادات الزمنية الممنوحة للأعضاء الجدد عند التسجيل. اضبط على 0 للتعطيل.",
+    "config_max_transaction": "الحد الأقصى للتحويل",
+    "config_max_transaction_desc": "أكبر عملية نقل فردية بين الأعضاء. اضبط على 0 بلا حدود.",
+    "config_currency_name": "اسم العملة",
+    "config_currency_name_desc": "الاسم المعروض لعملة بنك الوقت.",
+    "config_currency_symbol": "رمز العملة",
+    "config_currency_symbol_desc": "رمز قصير يظهر بجوار الأرصدة.",
+    "config_group_content": "المحتوى والاعتدال",
+    "config_group_content_desc": "قواعد الموافقة ومرشحات المحتوى للقوائم والمشاركات.",
+    "config_auto_approve_listings": "الموافقة التلقائية على القوائم",
+    "config_auto_approve_listings_desc": "قم بنشر قوائم جديدة على الفور بدلاً من إخضاعها لمراجعة المشرف.",
+    "config_auto_approve_blog": "الموافقة التلقائية على مشاركات المدونة",
+    "config_auto_approve_blog_desc": "انشر منشورات المدونة الجديدة على الفور بدلاً من إخضاعها لمراجعة المشرف.",
+    "config_max_listing_images": "الحد الأقصى لعدد الصور لكل قائمة",
+    "config_max_listing_images_desc": "الحد الأعلى للصور المرفقة بقائمة واحدة.",
+    "config_profanity_filter": "مرشح الألفاظ النابية",
+    "config_profanity_filter_desc": "منع المشاركات التي تحتوي على كلمات في قائمة الألفاظ النابية بالمنصة.",
+    "config_group_notifications": "إشعارات",
+    "config_group_notifications_desc": "قنوات التسليم الافتراضية للحسابات الجديدة والإيقاع الملخص.",
+    "config_email_notifications_enabled": "تم تفعيل إشعارات البريد الإلكتروني",
+    "config_email_notifications_enabled_desc": "الافتراضي للحسابات الجديدة. يمكن للأعضاء تجاوز الإعدادات الخاصة بهم.",
+    "config_push_notifications_enabled": "تم تمكين دفع الإخطارات",
+    "config_push_notifications_enabled_desc": "الافتراضي للحسابات الجديدة. يمكن للأعضاء تجاوز الإعدادات الخاصة بهم.",
+    "config_digest_frequency": "تردد الملخص",
+    "config_digest_frequency_desc": "عدد مرات إرسال ملخص النشاط عبر البريد الإلكتروني.",
+    "config_digest_daily": "يوميًا",
+    "config_digest_weekly": "أسبوعي",
+    "config_digest_monthly": "شهريا",
+    "config_digest_never": "أبداً",
+    "config_group_limits": "حدود",
+    "config_group_limits_desc": "الحد الأقصى لكل عضو وحجم التحميل.",
+    "config_max_listings_per_user": "الحد الأقصى للقوائم لكل عضو",
+    "config_max_listings_per_user_desc": "يمكن أن تكون معظم قوائم البيانات نشطة لعضو واحد في وقت واحد. اضبط على 0 بلا حدود.",
+    "config_max_groups_per_user": "الحد الأقصى للمجموعات لكل عضو",
+    "config_max_groups_per_user_desc": "معظم المجموعات يمكن لعضو واحد الانضمام إليها. اضبط على 0 بلا حدود.",
+    "config_max_file_upload_mb": "الحد الأقصى لحجم التحميل (ميجابايت)",
+    "config_max_file_upload_mb_desc": "الحد الأقصى لحجم التحميل لكل ملف. يتم رفض الملفات الأكبر حجمًا على الخادم.",
+    "validation_required": "مطلوب",
+    "validation_email": "أدخل عنوان بريد إلكتروني صالحًا (e.g., name@example.com)",
+    "validation_url": "أدخل URL صالحًا يبدأ بـ http:// أو https://",
+    "validation_number": "يجب أن يكون رقما",
+    "validation_min": "يجب أن يكون {{value}} أو أكبر",
+    "validation_max": "يجب أن يكون {{value}} أو أقل",
+    "validation_format": "التنسيق غير صالح",
+    "gdpr_sla_overdue_few": "تأخر موعد الاستحقاق بمقدار {{count}} يوم",
+    "gdpr_sla_overdue_many": "تأخر موعد الاستحقاق بمقدار {{count}} يوم",
+    "gdpr_sla_overdue_one": "تأخر موعد الاستحقاق بمقدار {{count}} يوم",
+    "gdpr_sla_overdue_other": "تأخر موعد الاستحقاق بمقدار {{count}} يوم",
+    "gdpr_sla_overdue_two": "تأخر موعد الاستحقاق بمقدار {{count}} يوم",
+    "gdpr_sla_overdue_zero": "تأخر موعد الاستحقاق بمقدار {{count}} يوم",
+    "gdpr_sla_days_left_few": "متبقي {{count}} يوم",
+    "gdpr_sla_days_left_many": "متبقي {{count}} يوم",
+    "gdpr_sla_days_left_one": "متبقي {{count}} يوم",
+    "gdpr_sla_days_left_other": "متبقي {{count}} يوم",
+    "gdpr_sla_days_left_two": "متبقي {{count}} يوم",
+    "gdpr_sla_days_left_zero": "متبقي {{count}} يوم"
+  },
+  "crm": {
+    "just_now": "Just Now",
+    "minutes_ago_few": "منذ {{count}} دقيقة",
+    "minutes_ago_many": "منذ {{count}} دقيقة",
+    "minutes_ago_one": "منذ {{count}} دقيقة",
+    "minutes_ago_other": "منذ {{count}} دقيقة",
+    "minutes_ago_two": "منذ {{count}} دقيقة",
+    "minutes_ago_zero": "منذ {{count}} دقيقة",
+    "hours_ago_few": "منذ {{count}} ساعة",
+    "hours_ago_many": "منذ {{count}} ساعة",
+    "hours_ago_one": "منذ {{count}} ساعة",
+    "hours_ago_other": "منذ {{count}} ساعة",
+    "hours_ago_two": "منذ {{count}} ساعة",
+    "hours_ago_zero": "منذ {{count}} ساعة",
+    "days_ago_few": "منذ {{count}} يوم",
+    "days_ago_many": "منذ {{count}} يوم",
+    "days_ago_one": "منذ {{count}} يوم",
+    "days_ago_other": "منذ {{count}} يوم",
+    "days_ago_two": "منذ {{count}} يوم",
+    "days_ago_zero": "منذ {{count}} يوم"
+  },
+  "config": {
+    "module_name_dashboard": "لوحة القيادة",
+    "module_name_feed": "يٌطعم",
+    "module_name_listings": "القوائم",
+    "module_name_messages": "رسائل",
+    "module_name_wallet": "محفظة",
+    "module_name_members": "أعضاء",
+    "module_name_groups": "المجموعات",
+    "module_name_events": "الأحداث",
+    "module_name_connections": "اتصالات",
+    "module_name_volunteering": "التطوع",
+    "module_name_organisations": "المنظمات",
+    "module_name_goals": "الأهداف",
+    "module_name_blog": "مدونة",
+    "module_name_resources": "موارد",
+    "module_name_courses": "الدورات",
+    "module_name_podcasts": "البودكاست",
+    "module_name_job_vacancies": "وظائف شاغرة",
+    "module_name_marketplace": "السوق",
+    "module_name_leaderboard": "المتصدرين",
+    "module_name_achievements": "الإنجازات"
+  },
+  "menu_builder": {
+    "group_core": "جوهر",
+    "group_community": "مجتمع",
+    "group_features": "سمات",
+    "group_gamification": "التلعيب",
+    "route_about": "عن",
+    "group_info": "معلومات",
+    "route_faq": "FAQ",
+    "route_explore": "يستكشف",
+    "location_header_main": "الرأس الرئيسي",
+    "location_header_secondary": "رأس ثانوي",
+    "location_footer": "تذييل",
+    "location_sidebar": "الشريط الجانبي",
+    "location_mobile": "متحرك",
+    "type_link_label": "الرابط الداخلي",
+    "type_link_desc": "رابط إلى صفحة داخل هذه المنصة",
+    "type_external_label": "رابط خارجي",
+    "type_external_desc": "رابط إلى موقع خارجي",
+    "type_dropdown_label": "اسقاط",
+    "type_dropdown_desc": "قائمة منسدلة تحتوي على عناصر فرعية",
+    "type_page_label": "صفحة مخصصة",
+    "type_page_desc": "رابط إلى صفحة مخصصة على هذا النظام الأساسي",
+    "type_route_label": "الطريق المسمى",
+    "type_route_desc": "الارتباط باستخدام مسار تطبيق مسمى",
+    "type_divider_label": "مقسم",
+    "type_divider_desc": "فاصل مرئي بين عناصر القائمة",
+    "live_preview": "معاينة حية",
+    "preview": "معاينة",
+    "no_data": "لا توجد بيانات متاحة",
+    "drag_hint": "اسحب العناصر لإعادة ترتيبها",
+    "drag_to_reorder": "اسحب لإعادة الترتيب",
+    "sub_items_few": "{{count}} العناصر الفرعية",
+    "sub_items_many": "{{count}} العناصر الفرعية",
+    "sub_items_one": "{{count}} العناصر الفرعية",
+    "sub_items_other": "{{count}} العناصر الفرعية",
+    "sub_items_two": "{{count}} العناصر الفرعية",
+    "sub_items_zero": "{{count}} العناصر الفرعية",
+    "edit_item": "تحرير العنصر",
+    "delete_item": "حذف العنصر"
+  },
+  "content": {
+    "label_attribute_actions": "إجراءات السمة",
+    "label_edit_item": "تحرير العنصر",
+    "label_delete_item": "حذف العنصر"
+  },
+  "categories": {
+    "label_category_actions": "إجراءات الفئة"
+  },
+  "pilot_launch_readiness": {
+    "missing": {
+      "controller_name": "اسم وحدة التحكم",
+      "controller_contact_email": "البريد الإلكتروني للاتصال المراقب المالي",
+      "controller_data_protection_officer": "مسؤول حماية البيانات",
+      "incident_response_contact_email": "البريد الإلكتروني لجهة الاتصال الخاصة بالاستجابة للحادث",
+      "workshop_not_run": "لم يتم تشغيل ورشة عمل سياسة التشغيل",
+      "policy_appendix_url": "ملحق السياسة URL",
+      "safeguarding_escalation_user_id": "حماية اتصال التصعيد",
+      "acknowledgement": "اعتراف المنسق",
+      "pre_pilot_baseline": "خط الأساس للوحة النتائج قبل الطيار",
+      "danger_checks": "قضايا جودة البيانات",
+      "backlog_empty": "تراكم التكامل فارغ"
+    }
+  },
+  "municipal_verification": {
+    "status": {
+      "verified": "تم التحقق منه",
+      "pending_dns": "في انتظار DNS"
+    }
+  },
+  "admin": {
+    "surveys": {
+      "analytics": {
+        "total_responses": "مجموع الردود",
+        "answer_count_few": "إجابات{{count}}",
+        "answer_count_many": "إجابات{{count}}",
+        "answer_count_one": "الإجابة{{count}}",
+        "answer_count_other": "إجابات{{count}}",
+        "answer_count_two": "إجابات{{count}}",
+        "answer_count_zero": "إجابات{{count}}",
+        "no_open_text": "لا توجد ردود نصية مفتوحة حتى الآن."
+      }
+    }
+  },
+  "municipal_copilot": {
+    "empty": {
+      "value": "-"
+    }
+  },
+  "kpi_baselines": {
+    "comparison": {
+      "comparing": "المقارنة:",
+      "captured": "(تم التقاطه {{date}})",
+      "impact_achieved": "تم تحقيق التأثير",
+      "baseline": "خط الأساس",
+      "now": "الآن"
+    },
+    "actions": {
+      "close": "يغلق"
+    },
+    "empty": {
+      "no_data": "لا توجد بيانات متاحة"
+    },
+    "fields": {
+      "notes_label_prefix": "ملحوظات:"
+    }
+  },
+  "commercial_boundary": {
+    "meta": {
+      "title": "خريطة الحدود التجارية",
+      "subtitle": "AG82 - ما هو AGPL عام أو قابل للتكوين بواسطة المستأجر أو طبقة نشر أو تجاري"
+    },
+    "export": {
+      "last_updated": "آخر تحديث: {{date}}",
+      "capability": "القدرة",
+      "classification": "تصنيف",
+      "agpl_module": "الوحدة النمطية AGPL",
+      "default": "تقصير",
+      "overridden": "تم تجاوزه",
+      "notes": "ملحوظات",
+      "yes": "نعم",
+      "no": "لا",
+      "generated": "تم إنشاء {{date}} من لوحة الإدارة NEXUS."
+    },
+    "sections": {
+      "classifications": "التصنيفات"
+    },
+    "empty": {
+      "value": "-"
+    }
+  },
+  "caring_workflow": {
+    "predictive": {
+      "trend_growing": "نمو {{value}}%",
+      "trend_declining": "انخفاض {{value}}%",
+      "trend_stable": "مستقر",
+      "not_enough_activity": "لا يوجد نشاط كافٍ حتى الآن للتنبؤ به. أعود في غضون بضعة أسابيع.",
+      "history": "تاريخ",
+      "forecast": "تنبؤ بالمناخ",
+      "confidence": "ثقة",
+      "severity": {
+        "critical": "شديد الأهمية",
+        "warning": "تحذير",
+        "info": "معلومات"
+      },
+      "title": "رؤى تنبؤية",
+      "subtitle": "توقعات تطلعية وتنبيهات استباقية. اكتشف أوجه القصور في الرعاية الإقليمية قبل أن تصبح حالات طوارئ.",
+      "no_forecast": "لا توجد بيانات توقعات متاحة حتى الآن.",
+      "hours_forecast": "توقعات ساعات",
+      "active_members": "الأعضاء النشطين",
+      "recipients_reached": "وصلت المستلمين",
+      "sub_region_coverage": "تغطية المنطقة الفرعية (آخر {{days}} أيام)",
+      "under_supplied_count_few": "{{count}} غير متوفر",
+      "under_supplied_count_many": "{{count}} غير متوفر",
+      "under_supplied_count_one": "{{count}} غير متوفر",
+      "under_supplied_count_other": "{{count}} غير متوفر",
+      "under_supplied_count_two": "{{count}} غير متوفر",
+      "under_supplied_count_zero": "{{count}} غير متوفر",
+      "sub_region_coverage_aria": "تغطية المنطقة الفرعية",
+      "columns": {
+        "sub_region": "المنطقة الفرعية",
+        "requested_90d": "مطلوب (90د)",
+        "fulfilled_90d": "مستوفاة (90 د)",
+        "coverage": "التغطية",
+        "status": "حالة",
+        "category": "فئة",
+        "prior_active": "نشط مسبقًا",
+        "lapsed": "انقضت",
+        "churn_rate": "معدل الزبد",
+        "baseline": "خط الأساس",
+        "expected_hrs": "الساعات المتوقعة",
+        "observed_hrs": "ساعات ملاحظه",
+        "drift": "الانجراف",
+        "sample": "عينة"
+      },
+      "status": {
+        "under_supplied": "نقص المعروض",
+        "ok": "نعم"
+      },
+      "helper_churn": "التغيير المساعد (منقضي >= {{days}} من الأيام)",
+      "overall_percent": "{{value}}% بشكل عام",
+      "helper_churn_note": "{{lapsed}} من {{prior}} المساعدون النشطون سابقًا لم يسجلوا ساعات العمل مؤخرًا.",
+      "helper_churn_aria": "مساعد بعنف حسب الفئة",
+      "coefficient_drift": "معامل الفئة الانجراف",
+      "drifting_count_few": "{{count}} الانجراف",
+      "drifting_count_many": "{{count}} الانجراف",
+      "drifting_count_one": "{{count}} الانجراف",
+      "drifting_count_other": "{{count}} الانجراف",
+      "drifting_count_two": "{{count}} الانجراف",
+      "drifting_count_zero": "{{count}} الانجراف",
+      "coefficient_drift_note": "يتم وضع علامة على الفئات ذات الانجراف المطلق > {{threshold}}%. قم بمراجعة المعاملات الأساسية في محرر معاملات الفئة.",
+      "coefficient_drift_aria": "معامل الفئة الانجراف",
+      "proactive_alerts": "تنبيهات استباقية"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "actions": {
+      "refresh": "ينعش",
+      "retry": "أعد المحاولة"
+    }
+  },
+  "billing": {
+    "status_active": "نشيط",
+    "status_trialing": "محاكمة",
+    "status_past_due": "تاريخ الاستحقاق الماضي",
+    "status_cancelled": "تم الإلغاء",
+    "status_expired": "منتهي الصلاحية",
+    "status_incomplete": "غير مكتمل"
+  },
+  "analytics": {
+    "regional": {
+      "loading": {
+        "section": "جارٍ تحميل التحليلات"
+      },
+      "errors": {
+        "data_unavailable": "البيانات غير متوفرة لهذه الفترة.",
+        "load_data": "تعذر تحميل قسم التحليلات هذا: {{error}}"
+      },
+      "heatmap": {
+        "description": "أفضل المواقع حسب نشاط الأعضاء وكثافتهم."
+      },
+      "sections": {
+        "geographic_activity_density": "كثافة النشاط الجغرافي",
+        "demand_supply_by_category": "الطلب مقابل العرض حسب الفئة",
+        "monthly_engagement_metrics": "مقاييس المشاركة الشهرية"
+      },
+      "columns": {
+        "rank": "رتبة",
+        "latitude": "خط العرض",
+        "longitude": "خط الطول",
+        "members": "أعضاء",
+        "density": "كثافة",
+        "month": "شهر",
+        "new_members": "أعضاء جدد",
+        "cumulative_total": "المجموع التراكمي",
+        "category": "فئة",
+        "requests": "الطلبات",
+        "offers": "العروض",
+        "ratio": "نسبة",
+        "trend": "اتجاه",
+        "active_members": "الأعضاء النشطين",
+        "vol_hours": "ساعات تطوعية",
+        "new_listings": "قوائم جديدة",
+        "new_events": "أحداث جديدة",
+        "help_requests": "طلبات المساعدة",
+        "organisation": "منظمة",
+        "volunteers": "المتطوعين",
+        "total": "المجموع",
+        "resolved": "تم الحل",
+        "resolution_rate": "معدل القرار",
+        "avg_days_to_resolve": "متوسط أيام لحلها"
+      },
+      "empty": {
+        "no_geographic_data": "لا توجد بيانات جغرافية متاحة لهذه الفترة.",
+        "infinity": "∞",
+        "no_listing_data": "لا تتوفر بيانات طلب الإدراج لهذه الفترة.",
+        "no_engagement_data": "لا تتوفر بيانات المشاركة لهذه الفترة.",
+        "no_organisation_data": "لا يوجد نشاط تنظيمي متاح لهذه الفترة.",
+        "no_help_request_data": "لا توجد بيانات لطلب المساعدة متاحة لهذه الفترة."
+      },
+      "demographics": {
+        "age_distribution": "التوزيع العمري",
+        "total_with_data": "أعضاء {{total}} مع البيانات الديموغرافية",
+        "language_distribution": "توزيع اللغة",
+        "total_active_members": "{{total}} الأعضاء النشطين",
+        "member_growth_12m": "نمو الأعضاء، آخر 12 شهرًا"
+      },
+      "age_groups": {
+        "under_25": "تحت 25",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
+        "65_plus": "65+",
+        "unknown": "مجهول"
+      },
+      "volunteer": {
+        "total_hours": "إجمالي الساعات",
+        "avg_hours_per_volunteer": "متوسط ساعة لكل متطوع",
+        "reciprocity_ratio": "نسبة المعاملة بالمثل",
+        "reciprocity_description": "التوازن بين الساعات المقدمة والساعات المستلمة في جميع أنحاء المنطقة.",
+        "top_orgs_title": "أهم المنظمات التطوعية"
+      },
+      "help": {
+        "by_category": "طلبات المساعدة حسب الفئة",
+        "resolution_trend_6m": "اتجاه القرار، آخر 6 أشهر"
+      },
+      "units": {
+        "days_count_few": "{{count}} من الأيام",
+        "days_count_many": "{{count}} من الأيام",
+        "days_count_one": "{{count}} من الأيام",
+        "days_count_other": "{{count}} من الأيام",
+        "days_count_two": "{{count}} من الأيام",
+        "days_count_zero": "{{count}} من الأيام"
+      },
+      "empty_value": "-"
+    }
+  },
+  "advertising": {
+    "push": {
+      "no_daily_data": "لا توجد بيانات يومية حتى الآن.",
+      "metrics": {
+        "sends": "يرسل",
+        "opens": "يفتح"
+      },
+      "chart_sends_title_few": "يرسل {{count}}",
+      "chart_sends_title_many": "يرسل {{count}}",
+      "chart_sends_title_one": "يرسل {{count}}",
+      "chart_sends_title_other": "يرسل {{count}}",
+      "chart_sends_title_two": "يرسل {{count}}",
+      "chart_sends_title_zero": "يرسل {{count}}",
+      "chart_opens_title_few": "يتم فتح {{count}}",
+      "chart_opens_title_many": "يتم فتح {{count}}",
+      "chart_opens_title_one": "يتم فتح {{count}}",
+      "chart_opens_title_other": "يتم فتح {{count}}",
+      "chart_opens_title_two": "يتم فتح {{count}}",
+      "chart_opens_title_zero": "يتم فتح {{count}}"
+    }
+  },
+  "submit_error": "لا يمكن تقديم. يرجى المحاولة مرة أخرى.",
+  "submitting": "تقديم…",
+  "submit": "يُقدِّم",
+  "under_25": "تحت 25",
+  "25_34": "25–34",
+  "35_44": "35–44",
+  "45_54": "45–54",
+  "55_64": "55–64",
+  "65_plus": "65+",
+  "unknown": "مجهول"
 }

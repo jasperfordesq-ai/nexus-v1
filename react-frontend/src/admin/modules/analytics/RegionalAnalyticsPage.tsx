@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Select, SelectItem, Tabs, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -153,11 +154,11 @@ function PercentBar({ label, value, total, color = 'bg-accent' }: { label: strin
   return (
     <div className="flex items-center gap-3 py-1.5">
       <div className="w-28 shrink-0 text-right text-sm text-muted">{label}</div>
-      <div className="flex-1 rounded-full bg-surface-secondary" style={{ height: 12 }}>
+      <div className="h-3 flex-1 rounded-full bg-surface-secondary">
         <div className={`h-full rounded-full ${color}`} style={{ width: `${width}%`, minWidth: width > 0 ? 4 : 0 }} />
       </div>
       <div className="w-20 shrink-0 text-sm text-muted">
-        {value.toLocaleString()} ({width}%)
+        {value.toLocaleString(getFormattingLocale())} ({width}%)
       </div>
     </div>
   );
@@ -234,7 +235,7 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
               />
             );
           })}
-          <p className="mt-3 text-xs text-muted">{t('analytics.regional.demographics.total_with_data', { total: totalAge.toLocaleString() })}</p>
+          <p className="mt-3 text-xs text-muted">{t('analytics.regional.demographics.total_with_data', { total: totalAge.toLocaleString(getFormattingLocale()) })}</p>
         </CardBody>
       </Card>
 
@@ -253,7 +254,7 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
               color="bg-surface-tertiary"
             />
           ))}
-          <p className="mt-3 text-xs text-muted">{t('analytics.regional.demographics.total_active_members', { total: totalLang.toLocaleString() })}</p>
+          <p className="mt-3 text-xs text-muted">{t('analytics.regional.demographics.total_active_members', { total: totalLang.toLocaleString(getFormattingLocale()) })}</p>
         </CardBody>
       </Card>
 
@@ -273,8 +274,8 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
               {data.monthly_growth.map((row) => (
                 <TableRow key={row.month}>
                   <TableCell className="font-mono">{row.month}</TableCell>
-                  <TableCell className="font-semibold text-success">{row.new_members.toLocaleString()}</TableCell>
-                  <TableCell className="text-muted">{row.cumulative.toLocaleString()}</TableCell>
+                  <TableCell className="font-semibold text-success">{row.new_members.toLocaleString(getFormattingLocale())}</TableCell>
+                  <TableCell className="text-muted">{row.cumulative.toLocaleString(getFormattingLocale())}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -300,8 +301,8 @@ function DemandSupplyTab({ data, t }: { data: DemandSupplyRow[]; t: AdminT }) {
           {data.map((row) => (
             <TableRow key={row.category_id}>
               <TableCell className="font-medium">{row.category_name}</TableCell>
-              <TableCell>{row.request_count.toLocaleString()}</TableCell>
-              <TableCell>{row.offer_count.toLocaleString()}</TableCell>
+              <TableCell>{row.request_count.toLocaleString(getFormattingLocale())}</TableCell>
+              <TableCell>{row.offer_count.toLocaleString(getFormattingLocale())}</TableCell>
               <TableCell>
                 <Chip
                   size="sm"
@@ -348,13 +349,13 @@ function EngagementTab({ data, t }: { data: EngagementRow[]; t: AdminT }) {
                     <div className="h-3 w-20 rounded-full bg-surface-secondary">
                       <div className="h-full rounded-full bg-accent" style={{ width: `${barWidth}%` }} />
                     </div>
-                    <span className="font-semibold">{row.active_members.toLocaleString()}</span>
+                    <span className="font-semibold">{row.active_members.toLocaleString(getFormattingLocale())}</span>
                   </div>
                 </TableCell>
-                <TableCell>{row.vol_hours.toLocaleString()}</TableCell>
-                <TableCell>{row.new_listings.toLocaleString()}</TableCell>
-                <TableCell>{row.new_events.toLocaleString()}</TableCell>
-                <TableCell>{row.help_requests.toLocaleString()}</TableCell>
+                <TableCell>{row.vol_hours.toLocaleString(getFormattingLocale())}</TableCell>
+                <TableCell>{row.new_listings.toLocaleString(getFormattingLocale())}</TableCell>
+                <TableCell>{row.new_events.toLocaleString(getFormattingLocale())}</TableCell>
+                <TableCell>{row.help_requests.toLocaleString(getFormattingLocale())}</TableCell>
               </TableRow>
             );
           })}
@@ -375,13 +376,13 @@ function VolunteerTab({ data, t }: { data: VolunteerData; t: AdminT }) {
         <Card >
           <CardBody className="p-4">
             <p className="text-xs text-muted">{t('analytics.regional.volunteer.total_hours')}</p>
-            <p className="text-2xl font-bold text-accent">{data.total_hours.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-accent">{data.total_hours.toLocaleString(getFormattingLocale())}</p>
           </CardBody>
         </Card>
         <Card >
           <CardBody className="p-4">
             <p className="text-xs text-muted">{t('analytics.regional.volunteer.avg_hours_per_volunteer')}</p>
-            <p className="text-2xl font-bold text-success">{data.avg_hours_per_volunteer.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-success">{data.avg_hours_per_volunteer.toLocaleString(getFormattingLocale())}</p>
           </CardBody>
         </Card>
         <Card >
@@ -411,8 +412,8 @@ function VolunteerTab({ data, t }: { data: VolunteerData; t: AdminT }) {
                 <TableRow key={org.org_id}>
                   <TableCell className="text-muted">{i + 1}</TableCell>
                   <TableCell className="font-medium">{org.org_name}</TableCell>
-                  <TableCell className="font-semibold">{org.total_hours.toLocaleString()}</TableCell>
-                  <TableCell>{org.volunteers.toLocaleString()}</TableCell>
+                  <TableCell className="font-semibold">{org.total_hours.toLocaleString(getFormattingLocale())}</TableCell>
+                  <TableCell>{org.volunteers.toLocaleString(getFormattingLocale())}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -445,8 +446,8 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
               {data.by_category.map((row) => (
                 <TableRow key={row.category}>
                   <TableCell className="font-medium capitalize">{row.category}</TableCell>
-                  <TableCell>{row.total.toLocaleString()}</TableCell>
-                  <TableCell>{row.resolved_count.toLocaleString()}</TableCell>
+                  <TableCell>{row.total.toLocaleString(getFormattingLocale())}</TableCell>
+                  <TableCell>{row.resolved_count.toLocaleString(getFormattingLocale())}</TableCell>
                   <TableCell>
                     <Chip
                       size="sm"
@@ -486,8 +487,8 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
               {data.resolution_trend.map((row) => (
                 <TableRow key={row.month}>
                   <TableCell className="font-mono">{row.month}</TableCell>
-                  <TableCell>{row.total.toLocaleString()}</TableCell>
-                  <TableCell>{row.resolved.toLocaleString()}</TableCell>
+                  <TableCell>{row.total.toLocaleString(getFormattingLocale())}</TableCell>
+                  <TableCell>{row.resolved.toLocaleString(getFormattingLocale())}</TableCell>
                   <TableCell>
                     <Chip
                       size="sm"

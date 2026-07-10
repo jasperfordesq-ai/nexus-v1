@@ -393,7 +393,10 @@
     "changes_between": "Modifiche: v{{old}} a v{{new}}",
     "changes_count": "{{count}} modifiche",
     "legend_removed": "Rimosso",
-    "legend_added": "Aggiunto"
+    "legend_added": "Aggiunto",
+    "changes_count_many": "{{count}} modifiche",
+    "changes_count_one": "{{count}} modifiche",
+    "changes_count_other": "{{count}} modifiche"
   },
   "platform": {
     "effective_date": "In vigore dal {{date}}",
@@ -480,7 +483,10 @@
     "consent_text": "Cliccando Accetta, confermi di aver letto e accettato i documenti sopra elencati.",
     "accept_aria": "Accetta tutti i documenti legali aggiornati e continua",
     "accepting": "Accettazione in corso…",
-    "accept_continue": "Accetta e Continua"
+    "accept_continue": "Accetta e Continua",
+    "subtitle_other_many": "{{count}} documenti sono stati aggiornati. Esaminali e accettali per continuare.",
+    "subtitle_other_one": "{{count}} documenti sono stati aggiornati. Esaminali e accettali per continuare.",
+    "subtitle_other_other": "{{count}} documenti sono stati aggiornati. Esaminali e accettali per continuare."
   },
   "custom": {
     "effective_label": "In vigore dal: {{date}}",

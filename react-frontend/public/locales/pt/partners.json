@@ -84,7 +84,8 @@
       "title": "Algumas conexões tiveram problemas recentemente",
       "hint_one": "{{count}} falhou na chamada de um sistema parceiro nos últimos 30 dias.",
       "hint_other": "{{count}} falhou chamadas de sistemas parceiros nos últimos 30 dias.",
-      "cta": "Ver atividade"
+      "cta": "Ver atividade",
+      "hint_many": "{{count}} falhou chamadas de sistemas parceiros nos últimos 30 dias."
     },
     "stats": {
       "active_partners": "Parceiros ativos",
@@ -111,7 +112,8 @@
       "empty_title": "Nenhuma atividade de parceiro ainda",
       "empty_hint": "Depois que você se conectar a um banco de tempo parceiro, a atividade dele aparecerá aqui.",
       "activity_one": "{{count}} troca",
-      "activity_other": "{{count}} trocas"
+      "activity_other": "{{count}} trocas",
+      "activity_many": "{{count}} trocas"
     },
     "federation_off": {
       "title": "A parceria com outros bancos de tempo está desativada",

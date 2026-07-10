@@ -63,7 +63,13 @@
     "still_need_help_description": "لا تجد ما تبحث عنه؟ فريقنا هنا للمساعدة.",
     "contact_support": "الاتصال بالدعم",
     "load_error_title": "تعذّر تحميل الأسئلة الشائعة",
-    "load_error_description": "يرجى محاولة تحديث الصفحة أو التواصل مع الدعم الفني."
+    "load_error_description": "يرجى محاولة تحديث الصفحة أو التواصل مع الدعم الفني.",
+    "articles_count_few": "{{count}} مقالات",
+    "articles_count_many": "{{count}} مقالات",
+    "articles_count_one": "{{count}} مقالات",
+    "articles_count_other": "{{count}} مقالات",
+    "articles_count_two": "{{count}} مقالات",
+    "articles_count_zero": "{{count}} مقالات"
   },
   "resources": {
     "page_title": "الموارد",

@@ -792,7 +792,25 @@
     "no_hub_tenants_found": "No hub tenants found",
     "impersonate_user_warning": "Impersonation logs every action under this user's identity. Use only when necessary for support.",
     "partnerships_tabs_aria": "Federation partnership status filter",
-    "tenant_list_tabs_aria": "Tenant status filter"
+    "tenant_list_tabs_aria": "Tenant status filter",
+    "tab_with_count_one": "{{label}} ({{count}})",
+    "tab_with_count_other": "{{label}} ({{count}})",
+    "users_count_one": "{{count}} users",
+    "users_count_other": "{{count}} users",
+    "bulk_users_moved_count_one": "Bulk users moved ({{count}})",
+    "bulk_users_moved_count_other": "Bulk users moved ({{count}})",
+    "bulk_tenants_updated_count_one": "Bulk tenants updated ({{count}})",
+    "bulk_tenants_updated_count_other": "Bulk tenants updated ({{count}})",
+    "move_n_users_one": "Move {{count}} users",
+    "move_n_users_other": "Move {{count}} users",
+    "apply_to_n_tenants_one": "Apply to {{count}} tenants",
+    "apply_to_n_tenants_other": "Apply to {{count}} tenants",
+    "bulk_move_confirm_message_with_grant_one": "Move {{count}} user(s) and grant tenant super-admin access.",
+    "bulk_move_confirm_message_with_grant_other": "Move {{count}} user(s) and grant tenant super-admin access.",
+    "bulk_move_confirm_message_one": "Move {{count}} user(s).",
+    "bulk_move_confirm_message_other": "Move {{count}} user(s).",
+    "bulk_update_confirm_message_one": "Apply this update to {{count}} tenant(s).",
+    "bulk_update_confirm_message_other": "Apply this update to {{count}} tenant(s)."
   },
   "tenant_form": {
     "active": "Active",
@@ -997,7 +1015,9 @@
     "view": "View",
     "whitelisted_tenants_aria": "Whitelisted tenants",
     "whitelisted_tenants_count": "Whitelisted tenants ({{count}})",
-    "failed_to_load": "Failed to load the whitelist"
+    "failed_to_load": "Failed to load the whitelist",
+    "whitelisted_tenants_count_one": "Whitelisted tenants ({{count}})",
+    "whitelisted_tenants_count_other": "Whitelisted tenants ({{count}})"
   },
   "pilot_inquiry_admin": {
     "page_title": "Pilot Inquiries",
@@ -1093,14 +1113,33 @@
       "empty": "-",
       "months": "{{count}} months",
       "no": "No",
-      "yes": "Yes"
+      "yes": "Yes",
+      "months_one": "{{count}} months",
+      "months_other": "{{count}} months"
     },
     "velocity": {
       "avg_to_agreed": "Avg to agreed:",
       "avg_to_live": "Avg to live:",
       "avg_to_proposal": "Avg to proposal:",
       "days": "{{count}}d",
-      "title": "Pipeline velocity - average days from inquiry submission to each milestone:"
+      "title": "Pipeline velocity - average days from inquiry submission to each milestone:",
+      "days_one": "{{count}}d",
+      "days_other": "{{count}}d"
     }
-  }
+  },
+  "events": "Events",
+  "exchange_workflow": "Exchange workflow",
+  "organisations": "Organisations",
+  "listings": "Listings",
+  "feed": "Feed",
+  "groups": "Groups",
+  "gamification": "Gamification",
+  "goals": "Goals",
+  "blog": "Blog",
+  "resources": "Resources",
+  "volunteering": "Volunteering",
+  "federation": "Federation",
+  "wallet": "Wallet",
+  "messages": "Messages",
+  "dashboard": "Dashboard"
 }

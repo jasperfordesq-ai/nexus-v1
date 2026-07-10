@@ -23,14 +23,18 @@
     "title": "Bevorstehende Veranstaltungen",
     "subtitle": "Treten Sie Ihrer Gemeinschaft bei",
     "online": "Online",
-    "attending": "{{count}} nehmen teil"
+    "attending": "{{count}} nehmen teil",
+    "attending_one": "{{count}} nehmen teil",
+    "attending_other": "{{count}} nehmen teil"
   },
   "active_groups": {
     "title": "Aktive Gruppen",
     "subtitle": "Mit Gleichgesinnten vernetzen",
     "members": "{{count}} Mitglieder",
     "view_group": "Gruppe ansehen",
-    "view_group_named": "View group: {{name}}"
+    "view_group_named": "View group: {{name}}",
+    "members_one": "{{count}} Mitglieder",
+    "members_other": "{{count}} Mitglieder"
   },
   "top_contributors": {
     "title": "Top-Beitragende",
@@ -56,12 +60,18 @@
     "subtitle": "Teilen Sie Ihre Ideen und bewirken Sie etwas",
     "ideas_count": "{{count}} Ideen",
     "ends": "Endet am {{date}}",
-    "progress": "Fortschritt der Herausforderung"
+    "progress": "Fortschritt der Herausforderung",
+    "ideas_count_one": "{{count}} Ideen",
+    "ideas_count_other": "{{count}} Ideen"
   },
   "time_ago": {
     "just_now": "Gerade eben",
     "hours_ago": "vor {{count}}Std",
-    "days_ago": "vor {{count}}T"
+    "days_ago": "vor {{count}}T",
+    "hours_ago_one": "vor {{count}}Std",
+    "hours_ago_other": "vor {{count}}Std",
+    "days_ago_one": "vor {{count}}T",
+    "days_ago_other": "vor {{count}}T"
   },
   "error_loading": "Die Entdecken-Seite konnte nicht geladen werden. Dies könnte ein vorübergehendes Problem sein.",
   "retry": "Erneut versuchen",
@@ -82,18 +92,26 @@
     "title": "Aus dem Blog",
     "subtitle": "Neueste Geschichten aus Ihrer Gemeinschaft",
     "read_time": "{{count}} Min. Lesezeit",
-    "views": "{{count}} Aufrufe"
+    "views": "{{count}} Aufrufe",
+    "read_time_one": "{{count}} Min. Lesezeit",
+    "read_time_other": "{{count}} Min. Lesezeit",
+    "views_one": "{{count}} Aufrufe",
+    "views_other": "{{count}} Aufrufe"
   },
   "volunteering": {
     "title": "Freiwilligenmöglichkeiten",
     "subtitle": "Machen Sie einen Unterschied in Ihrer Gemeinschaft",
     "applications": "{{count}} beworben",
-    "view_opportunity": "Möglichkeit ansehen"
+    "view_opportunity": "Möglichkeit ansehen",
+    "applications_one": "{{count}} beworben",
+    "applications_other": "{{count}} beworben"
   },
   "organisations": {
     "title": "Organisationen",
     "subtitle": "Gemeinschaftspartner mit Wirkung",
-    "opportunities": "{{count}} Möglichkeiten"
+    "opportunities": "{{count}} Möglichkeiten",
+    "opportunities_one": "{{count}} Möglichkeiten",
+    "opportunities_other": "{{count}} Möglichkeiten"
   },
   "polls": {
     "title": "Aktive Umfragen",
@@ -102,19 +120,27 @@
     "options": "{{count}} Optionen",
     "vote_now": "Jetzt abstimmen",
     "vote_now_for": "Jetzt abstimmen über: {{question}}",
-    "closes": "Endet am {{date}}"
+    "closes": "Endet am {{date}}",
+    "options_one": "{{count}} Optionen",
+    "options_other": "{{count}} Optionen",
+    "votes_one": "{{count}} Stimmen",
+    "votes_other": "{{count}} Stimmen"
   },
   "in_demand_skills": {
     "title": "Gefragte Fähigkeiten",
     "subtitle": "Die meistgefragten Fähigkeiten in Ihrer Gemeinschaft",
     "requested": "{{count}} suchen",
     "offered": "{{count}} bieten an",
-    "you_can_help": "Sie können helfen!"
+    "you_can_help": "Sie können helfen!",
+    "requested_one": "{{count}} suchen",
+    "requested_other": "{{count}} suchen"
   },
   "resources": {
     "title": "Empfohlene Ressourcen",
     "subtitle": "Anleitungen und Materialien für Ihre Gemeinschaft",
-    "views": "{{count}} Aufrufe"
+    "views": "{{count}} Aufrufe",
+    "views_one": "{{count}} Aufrufe",
+    "views_other": "{{count}} Aufrufe"
   },
   "jobs": {
     "title": "Stellenangebote",

@@ -24,6 +24,7 @@ import { logError } from '@/lib/logger';
 import { Button } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { StarRating } from '@/components/ui/StarRating';
 import { Textarea } from '@/components/ui/Textarea';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -38,50 +39,7 @@ interface RatingModalProps {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Star Rating Component
 // ─────────────────────────────────────────────────────────────────────────────
-
-function StarRating({
-  value,
-  onChange,
-}: {
-  value: number;
-  onChange: (v: number) => void;
-}) {
-  const { t } = useTranslation('marketplace');
-  const [hovered, setHovered] = useState(0);
-
-  return (
-    <div className="flex items-center gap-1" role="radiogroup" aria-label={t('orders.rating.stars_label')}>
-      {[1, 2, 3, 4, 5].map((star) => {
-        const filled = star <= (hovered || value);
-        return (
-          <Button
-            key={star}
-            isIconOnly
-            variant="tertiary"
-            size="sm"
-            onPress={() => onChange(star)}
-            onMouseEnter={() => setHovered(star)}
-            onMouseLeave={() => setHovered(0)}
-            className="p-0.5 transition-transform hover:scale-110"
-            aria-label={t('orders.rating.star_n', { n: star })}
-            role="radio"
-            aria-checked={star === value}
-          >
-            <Star
-              className={`w-8 h-8 transition-colors ${
-                filled
-                  ? 'fill-warning text-warning'
-                  : 'text-muted'
-              }`}
-            />
-          </Button>
-        );
-      })}
-    </div>
-  );
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Main Component
@@ -147,10 +105,16 @@ export function RatingModal({ orderId, isOpen, onClose, onSuccess }: RatingModal
 
         <ModalBody className="space-y-4">
           <div>
-            <p className="text-sm text-muted mb-2">
+            <p className="mb-2 text-sm text-muted">
               {t('orders.rating.how_was_experience')}
             </p>
-            <StarRating value={rating} onChange={setRating} />
+            <StarRating
+              value={rating}
+              onChange={setRating}
+              label={t('orders.rating.stars_label')}
+              getOptionLabel={(star) => t('orders.rating.star_n', { n: star })}
+              isRequired
+            />
           </div>
 
           <Textarea
@@ -178,7 +142,6 @@ export function RatingModal({ orderId, isOpen, onClose, onSuccess }: RatingModal
             {t('common.cancel')}
           </Button>
           <Button
-
             onPress={handleSubmit}
             isLoading={isSubmitting}
             isDisabled={rating < 1}

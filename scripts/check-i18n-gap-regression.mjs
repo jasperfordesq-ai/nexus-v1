@@ -43,12 +43,28 @@ const NO_TRANSLATE_VALUES = new Set([
   'Google',
   'Google Authenticator',
   'Microsoft Authenticator',
+  'Community Caring',
   'Spitex',
   'member@example.com',
   'vs',
 ]);
 
-const UNIT_OR_FORMAT_PATTERN = /^[\s\d.,:;()+\-/%]*[a-zA-Z]{0,3}[\s\d.,:;()+\-/%]*$/;
+const LOCALE_IDENTITY_VALUES = new Map([
+  ['es', new Set(['{{count}} total', '{{count}} ideas'])],
+  ['fr', new Set([
+    '{{count}} messages',
+    '{{count}} total',
+    '{{count}} participants',
+    'Participants ({{count}})',
+    '{{count}} votes',
+    '{{count}} articles',
+  ])],
+  ['it', new Set(['{{count}} post'])],
+  ['nl', new Set(['{{count}} check-ins'])],
+  ['pt', new Set(['Total: {{count}}', '{{count}} total', '{{count}} check-ins'])],
+]);
+
+const UNIT_OR_FORMAT_PATTERN = /^[\s\d.,:;()+\-–—~/%×∞]*[a-zA-Z]{0,3}[\s\d.,:;()+\-–—~/%×∞]*$/u;
 
 function flattenKeys(obj, prefix = '') {
   const result = {};
@@ -65,11 +81,37 @@ function flattenKeys(obj, prefix = '') {
   return result;
 }
 
-function shouldSkipValue(value) {
+const PLURAL_CATEGORIES = ['zero', 'one', 'two', 'few', 'many', 'other'];
+
+function describePluralKey(key) {
+  const ordinalMatch = key.match(/^(.*)_ordinal_(zero|one|two|few|many|other)$/u);
+  if (ordinalMatch) return { base: ordinalMatch[1], category: ordinalMatch[2], ordinal: true };
+  const cardinalMatch = key.match(/^(.*)_(zero|one|two|few|many|other)$/u);
+  return cardinalMatch
+    ? { base: cardinalMatch[1], category: cardinalMatch[2], ordinal: false }
+    : null;
+}
+
+function isExpectedMissingPluralVariant(key, targetKeys, locale) {
+  const descriptor = describePluralKey(key);
+  if (!descriptor) return false;
+  const prefix = descriptor.ordinal ? `${descriptor.base}_ordinal_` : `${descriptor.base}_`;
+  const hasTargetFamily = targetKeys.has(descriptor.base)
+    || PLURAL_CATEGORIES.some((category) => targetKeys.has(`${prefix}${category}`));
+  if (!hasTargetFamily) return false;
+  const supportedCategories = new Set(
+    new Intl.PluralRules(locale, { type: descriptor.ordinal ? 'ordinal' : 'cardinal' })
+      .resolvedOptions().pluralCategories,
+  );
+  return !supportedCategories.has(descriptor.category);
+}
+
+function shouldSkipValue(value, locale) {
   if (typeof value !== 'string') return true;
   const trimmed = value.trim();
   if (!trimmed) return true;
   if (NO_TRANSLATE_VALUES.has(trimmed)) return true;
+  if (LOCALE_IDENTITY_VALUES.get(locale)?.has(trimmed)) return true;
   if (NO_TRANSLATE_PATTERNS.some((pattern) => pattern.test(trimmed))) return true;
 
   const withoutPlaceholders = trimmed.replace(PLACEHOLDER_OR_TAG_PATTERN, '').trim();
@@ -99,15 +141,19 @@ function buildSnapshot() {
       const langData = fs.existsSync(langPath) ? readJson(langPath) : {};
       const enFlat = flattenKeys(enData);
       const langFlat = flattenKeys(langData);
+      const langKeys = new Set(Object.keys(langFlat));
 
       let gapCount = 0;
 
       for (const [key, enValue] of Object.entries(enFlat)) {
         if (typeof enValue !== 'string') continue;
-        if (shouldSkipValue(enValue)) continue;
+        if (shouldSkipValue(enValue, lang)) continue;
 
         const langValue = langFlat[key];
-        if (langValue === undefined || langValue === enValue) {
+        if (
+          (langValue === undefined && !isExpectedMissingPluralVariant(key, langKeys, lang))
+          || langValue === enValue
+        ) {
           gapCount += 1;
         }
       }

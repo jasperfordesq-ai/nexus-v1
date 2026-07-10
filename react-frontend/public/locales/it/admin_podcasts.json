@@ -117,7 +117,11 @@
       "media_jobs_one": "{{count}} processo multimediale in attesa",
       "media_jobs_other": "{{count}} processi multimediali in attesa",
       "rss_ready_one": "È possibile controllare lo spettacolo pubblicato {{count}}",
-      "rss_ready_other": "È possibile controllare gli spettacoli pubblicati {{count}}"
+      "rss_ready_other": "È possibile controllare gli spettacoli pubblicati {{count}}",
+      "pending_items_many": "{{count}} elementi in attesa di revisione",
+      "open_reports_many": "{{count}} rapporti aperti sui membri",
+      "media_jobs_many": "{{count}} processi multimediali in attesa",
+      "rss_ready_many": "È possibile controllare gli spettacoli pubblicati {{count}}"
     },
     "feed_validation": {
       "title": "Convalida RSS",
@@ -211,7 +215,10 @@
       "report_dismissed": "Rapporto respinto.",
       "report_escalated": "Rapporto intensificato.",
       "feed_valid": "Il feed RSS è pronto.",
-      "feed_invalid": "Il feed RSS presenta {{count}} problemi."
+      "feed_invalid": "Il feed RSS presenta {{count}} problemi.",
+      "feed_invalid_many": "Il feed RSS presenta {{count}} problemi.",
+      "feed_invalid_one": "Il feed RSS presenta {{count}} problemi.",
+      "feed_invalid_other": "Il feed RSS presenta {{count}} problemi."
     },
     "bulk": {
       "approve_selected": "Approva selezionati",
@@ -219,7 +226,16 @@
       "done": "{{count}} elemento/i moderato/i.",
       "partial": "{{ok}} elemento/i moderato/i; {{failed}} non riusciti.",
       "confirm_reject_title": "Rifiuta gli elementi selezionati",
-      "confirm_reject_message": "Rifiutare {{count}} elemento/i selezionato/i? I creatori li vedranno tornare in bozza."
-    }
+      "confirm_reject_message": "Rifiutare {{count}} elemento/i selezionato/i? I creatori li vedranno tornare in bozza.",
+      "done_many": "{{count}} elemento/i moderato/i.",
+      "done_one": "{{count}} elemento/i moderato/i.",
+      "done_other": "{{count}} elemento/i moderato/i.",
+      "confirm_reject_message_many": "Rifiutare {{count}} elemento/i selezionato/i? I creatori li vedranno tornare in bozza.",
+      "confirm_reject_message_one": "Rifiutare {{count}} elemento/i selezionato/i? I creatori li vedranno tornare in bozza.",
+      "confirm_reject_message_other": "Rifiutare {{count}} elemento/i selezionato/i? I creatori li vedranno tornare in bozza."
+    },
+    "count_many": "{{count}} items",
+    "count_one": "{{count}} elementi",
+    "count_other": "{{count}} elementi"
   }
 }

@@ -92,6 +92,15 @@ describe('TenantLogo', () => {
     expect(screen.getByText('TT')).toBeInTheDocument();
   });
 
+  it('uses the accessible foreground for a mid-tone tenant brand color', () => {
+    const { container } = render(<TenantLogo />);
+    const fallback = container.querySelector<HTMLElement>('[data-slot="avatar-fallback"]');
+    const avatar = fallback?.parentElement;
+
+    expect(avatar).toHaveStyle({ backgroundColor: '#6366f1', color: '#000000' });
+    expect(fallback).toHaveClass('!text-black');
+  });
+
   it('renders logo image when branding has logo', () => {
     mockUseTenant.mockReturnValue({
       ...mockTenantBase,
@@ -104,9 +113,9 @@ describe('TenantLogo', () => {
     });
 
     render(<TenantLogo />);
-    const img = screen.getByAltText('Test Timebank');
-    expect(img).toBeInTheDocument();
-    expect(img).toHaveAttribute('src', '/logo.png');
+    const images = screen.getAllByAltText('Test Timebank');
+    expect(images).toHaveLength(2);
+    images.forEach((image) => expect(image).toHaveAttribute('src', '/logo.png'));
   });
 
   it('hides name when showName is false', () => {

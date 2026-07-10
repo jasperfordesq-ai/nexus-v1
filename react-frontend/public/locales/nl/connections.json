@@ -37,5 +37,7 @@
   "page_meta": {
     "title": "Verbindingen"
   },
-  "loading": "Verbindingen laden..."
+  "loading": "Verbindingen laden...",
+  "pending_count_one": "{{count}} in behandeling",
+  "pending_count_other": "{{count}} in behandeling"
 }

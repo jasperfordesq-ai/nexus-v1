@@ -70,8 +70,8 @@ export function AccessibilityPage() {
       <PageMeta title={t('accessibility.page_title')} description={t('accessibility.meta_description')} />
       {/* Hero */}
       <motion.div variants={itemVariants} className="text-center">
-        <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
-          <Accessibility className="w-10 h-10 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+        <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 mb-4">
+          <Accessibility className="w-10 h-10 text-accent dark:text-accent" aria-hidden="true" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">
           {t('accessibility.heading')}
@@ -85,7 +85,7 @@ export function AccessibilityPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Eye className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+            <Eye className="w-5 h-5 text-accent" aria-hidden="true" />
             {t('accessibility.commitment_title')}
           </h2>
           <div className="space-y-4 text-theme-muted">
@@ -125,8 +125,8 @@ export function AccessibilityPage() {
                 key={feature.titleKey}
                 className="flex items-start gap-3 p-4 rounded-xl bg-theme-elevated"
               >
-                <div className="p-2 rounded-lg bg-indigo-500/20 flex-shrink-0">
-                  <feature.icon className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                <div className="p-2 rounded-lg bg-accent/20 flex-shrink-0">
+                  <feature.icon className="w-4 h-4 text-accent dark:text-accent" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="font-medium text-theme-primary text-sm">{t(feature.titleKey)}</p>
@@ -205,22 +205,18 @@ export function AccessibilityPage() {
             </ul>
 
             <div className="flex flex-wrap gap-3 mt-4">
-              <Link to={tenantPath("/contact")}>
-                <Button
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                  startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('accessibility.report_issue')}
-                </Button>
-              </Link>
-              <Link to={tenantPath("/help")}>
-                <Button
-                  variant="tertiary"
-                  className="bg-theme-elevated text-theme-primary"
-                >
-                  {t('accessibility.help_center')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath("/contact")}
+                className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
+                startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('accessibility.report_issue')}
+              </Button>
+              <Button as={Link} to={tenantPath("/help")}
+                variant="tertiary"
+                className="bg-theme-elevated text-theme-primary"
+              >
+                {t('accessibility.help_center')}
+              </Button>
             </div>
           </div>
         </GlassCard>

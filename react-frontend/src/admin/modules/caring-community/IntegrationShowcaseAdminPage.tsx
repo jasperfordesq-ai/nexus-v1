@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Spinner, Snippet, Accordion, AccordionItem, Tooltip } from '@/components/ui';
 import {
   useCallback,
@@ -99,7 +100,7 @@ export default function IntegrationShowcaseAdminPage() {
   }, [load]);
 
   const updatedLabel = useMemo(
-    () => (data?.updated_at ? new Date(data.updated_at).toLocaleString() : t('integration_showcase.empty.value')),
+    () => (data?.updated_at ? new Date(data.updated_at).toLocaleString(getFormattingLocale()) : t('integration_showcase.empty.value')),
     [data?.updated_at, t],
   );
 

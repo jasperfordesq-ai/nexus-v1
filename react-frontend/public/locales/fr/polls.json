@@ -100,5 +100,8 @@
   "page_meta": {
     "title": "Sondages"
   },
-  "category_filter_label": "Filtrer par catégorie"
+  "category_filter_label": "Filtrer par catégorie",
+  "total_ballots_many": "Total des bulletins : {{count}}",
+  "total_ballots_one": "Total des bulletins : {{count}}",
+  "total_ballots_other": "Total des bulletins : {{count}}"
 }

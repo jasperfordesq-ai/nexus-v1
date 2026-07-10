@@ -23,14 +23,16 @@
     "title": "今後のイベント",
     "subtitle": "あなたのコミュニティに参加しましょう",
     "online": "オンライン",
-    "attending": "{{count}} が参加中"
+    "attending": "{{count}} が参加中",
+    "attending_other": "{{count}} が参加中"
   },
   "active_groups": {
     "title": "アクティブなグループ",
     "subtitle": "志を同じくするメンバーとつながりましょう",
     "members": "{{count}} メンバー",
     "view_group": "グループを見る",
-    "view_group_named": "View group: {{name}}"
+    "view_group_named": "View group: {{name}}",
+    "members_other": "{{count}} メンバー"
   },
   "top_contributors": {
     "title": "トップ貢献者",
@@ -56,12 +58,15 @@
     "subtitle": "あなたのアイデアを共有して影響を与えましょう",
     "ideas_count": "{{count}} アイデア",
     "ends": "終了 {{date}}",
-    "progress": "チャレンジの進捗"
+    "progress": "チャレンジの進捗",
+    "ideas_count_other": "{{count}} アイデア"
   },
   "time_ago": {
     "just_now": "たった今",
     "hours_ago": "{{count}}時間前",
-    "days_ago": "{{count}}日前"
+    "days_ago": "{{count}}日前",
+    "hours_ago_other": "{{count}}時間前",
+    "days_ago_other": "{{count}}日前"
   },
   "error_loading": "Discoverページを読み込めませんでした。これは一時的な問題かもしれません。",
   "retry": "再試行",
@@ -82,18 +87,22 @@
     "title": "ブログから",
     "subtitle": "あなたのコミュニティの最新のストーリー",
     "read_time": "{{count}}分で読めます",
-    "views": "{{count}}回の閲覧"
+    "views": "{{count}}回の閲覧",
+    "read_time_other": "{{count}}分で読めます",
+    "views_other": "{{count}}回の閲覧"
   },
   "volunteering": {
     "title": "ボランティアの機会",
     "subtitle": "あなたのコミュニティに変化をもたらしましょう",
     "applications": "{{count}}件応募済み",
-    "view_opportunity": "機会を表示"
+    "view_opportunity": "機会を表示",
+    "applications_other": "{{count}}件応募済み"
   },
   "organisations": {
     "title": "組織",
     "subtitle": "影響を与えるコミュニティパートナー",
-    "opportunities": "{{count}}件の機会"
+    "opportunities": "{{count}}件の機会",
+    "opportunities_other": "{{count}}件の機会"
   },
   "polls": {
     "title": "アクティブな投票",
@@ -102,19 +111,23 @@
     "options": "{{count}}の選択肢",
     "vote_now": "今すぐ投票",
     "vote_now_for": "今すぐ投票してください: {{question}}",
-    "closes": "締切 {{date}}"
+    "closes": "締切 {{date}}",
+    "options_other": "{{count}}の選択肢",
+    "votes_other": "{{count}}票"
   },
   "in_demand_skills": {
     "title": "需要のあるスキル",
     "subtitle": "あなたのコミュニティで最もリクエストされているスキル",
     "requested": "{{count}} リクエスト中",
     "offered": "{{count}} 提供中",
-    "you_can_help": "あなたは助けることができます！"
+    "you_can_help": "あなたは助けることができます！",
+    "requested_other": "{{count}} リクエスト中"
   },
   "resources": {
     "title": "特集リソース",
     "subtitle": "あなたのコミュニティのためのガイドと資料",
-    "views": "{{count}} ビュー"
+    "views": "{{count}} ビュー",
+    "views_other": "{{count}} ビュー"
   },
   "jobs": {
     "title": "仕事の機会",

@@ -19,7 +19,8 @@ import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
 export interface BottomSheetProps {
   isOpen: boolean;
   onClose: () => void;
-  title?: string;
+  /** Visible title and accessible dialog name. */
+  title: string;
   children: React.ReactNode;
   snapPoints?: ('full' | 'half' | 'auto')[];
   className?: string;
@@ -79,19 +80,16 @@ export function BottomSheet({
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.6 }}
             onDragEnd={handleDragEnd}
-            className="flex max-h-[inherit] flex-col"
-            style={{ touchAction: 'none' }}
+            className="flex max-h-[inherit] touch-none flex-col"
           >
             {/* Drag handle bar (mobile only) */}
             <div className="flex justify-center pt-3 pb-1 sm:hidden cursor-grab active:cursor-grabbing">
               <div className="w-10 h-1 rounded-full bg-[var(--text-subtle)]/40" />
             </div>
 
-            {title && (
-              <ModalHeader className="text-[var(--text-primary)] text-base font-semibold px-5 pt-2 pb-3">
-                {title}
-              </ModalHeader>
-            )}
+            <ModalHeader className="text-[var(--text-primary)] text-base font-semibold px-5 pt-2 pb-3">
+              {title}
+            </ModalHeader>
 
             <ModalBody className="min-h-0 overflow-y-auto overscroll-contain px-5 pb-[calc(var(--safe-area-bottom)+1.25rem)] pt-0">
               {children}

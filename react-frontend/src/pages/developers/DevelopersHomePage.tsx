@@ -1,4 +1,3 @@
-import { CardBody, Card, Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,6 +12,8 @@ import { CardBody, Card, Button } from '@/components/ui';
 
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { CardBody, Card, Button } from '@/components/ui';
+import { useTenant } from '@/contexts';
 
 import Code from 'lucide-react/icons/code';
 import { usePageTitle } from '@/hooks';
@@ -38,6 +39,7 @@ const navLinks = [
 
 export default function DevelopersHomePage() {
   const { t } = useTranslation('common');
+  const { tenantPath } = useTenant();
   usePageTitle(t('developers.page_title'));
 
   return (
@@ -86,7 +88,7 @@ export default function DevelopersHomePage() {
             <p className="text-[var(--color-text-muted)] mb-4">
               {t('developers.request_access_body')}
             </p>
-            <Button as={Link} to="/contact" variant="primary" endContent={<ArrowRight size={16} aria-hidden="true" />}>
+        <Button as={Link} to={tenantPath('/contact')} variant="primary" endContent={<ArrowRight size={16} aria-hidden="true" />}>
               {t('developers.request_access_cta')}
             </Button>
           </CardBody>
@@ -99,7 +101,7 @@ export default function DevelopersHomePage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {navLinks.map(({ to, icon: Icon, key }) => (
-            <Card key={to} as={Link} to={to} isPressable className="block">
+            <Card key={to} as={Link} to={tenantPath(to)} isPressable className="block">
               <CardBody className="p-4 flex flex-row items-center gap-3">
                 <Icon size={20} className="text-[var(--color-primary)]" aria-hidden="true" />
                 <span className="font-medium text-[var(--color-text)]">{t(key)}</span>

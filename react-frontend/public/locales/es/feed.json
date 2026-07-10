@@ -70,7 +70,8 @@
   },
   "realtime": {
     "new_posts_one": "1 nueva publicación",
-    "new_posts_other": "{{count}} nuevas publicaciones"
+    "new_posts_other": "{{count}} nuevas publicaciones",
+    "new_posts_many": "{{count}} nuevas publicaciones"
   },
   "compose": {
     "create_title": "Crear {{type}}",
@@ -251,7 +252,17 @@
     "listing_preview_alt": "Vista previa del anuncio",
     "image_preview_alt": "Vista previa de la carga",
     "type_tabs_aria": "Redactar tipo de contenido",
-    "compose_post": "Redactar publicación"
+    "compose_post": "Redactar publicación",
+    "media_rejected_many": "{{count}} archivo(s) omitido(s) (tipo incorrecto o demasiado grande)",
+    "media_rejected_one": "{{count}} archivo(s) omitido(s) (tipo incorrecto o demasiado grande)",
+    "media_rejected_other": "{{count}} archivo(s) omitido(s) (tipo incorrecto o demasiado grande)",
+    "media_compression_failed_many": "{{count}} imagen(es) no se pudieron procesar",
+    "media_compression_failed_one": "{{count}} imagen(es) no se pudieron procesar",
+    "media_compression_failed_other": "{{count}} imagen(es) no se pudieron procesar",
+    "sdg_selected_many": "{{count}} objetivos seleccionados",
+    "group_members_many": "{{count}} miembros",
+    "group_members_one": "{{count}} miembros",
+    "group_members_other": "{{count}} miembros"
   },
   "moderation": {
     "unauthorized": "No tienes permiso para realizar esta acción."
@@ -349,12 +360,18 @@
       "commitment_flexible": "Flexible"
     },
     "volunteer": {
-      "credits_offered": "{{count}} créditos de tiempo"
+      "credits_offered": "{{count}} créditos de tiempo",
+      "credits_offered_many": "{{count}} créditos de tiempo",
+      "credits_offered_one": "{{count}} créditos de tiempo",
+      "credits_offered_other": "{{count}} créditos de tiempo"
     },
     "challenge": {
       "closing_soon": "Cierra pronto",
       "closes_on": "Cierra el {{date}}",
-      "ideas_count": "{{count}} ideas"
+      "ideas_count": "{{count}} ideas",
+      "ideas_count_many": "{{count}} ideas",
+      "ideas_count_one": "{{count}} ideas",
+      "ideas_count_other": "{{count}} ideas"
     },
     "review": {
       "rating_aria": "{{rating}} de 5 estrellas"
@@ -399,7 +416,10 @@
     "no_posts": "No se encontraron publicaciones",
     "no_posts_desc": "Aún no hay publicaciones etiquetadas con #{{tag}}.",
     "load_more": "Cargar Más",
-    "page_description": "Publicaciones etiquetadas con #{{tag}}"
+    "page_description": "Publicaciones etiquetadas con #{{tag}}",
+    "post_count_many": "{{count}} publicaciones",
+    "post_count_one": "{{count}} publicaciones",
+    "post_count_other": "{{count}} publicaciones"
   },
   "hashtags": {
     "title": "Hashtags Tendencia",
@@ -412,7 +432,10 @@
     "no_hashtags": "No se encontraron hashtags",
     "no_match": "No hay hashtags que coincidan con \"{{query}}\"",
     "no_trending": "Aún no hay hashtags en tendencia en tu comunidad.",
-    "post_count": "{{count}} publicaciones"
+    "post_count": "{{count}} publicaciones",
+    "post_count_many": "{{count}} publicaciones",
+    "post_count_one": "{{count}} publicaciones",
+    "post_count_other": "{{count}} publicaciones"
   },
   "share": {
     "tooltip_remove": "Quitar compartido",
@@ -452,7 +475,10 @@
     "dm_sent_label": "Enviado",
     "dm_send": "Enviar",
     "dm_done": "Hecho",
-    "email": "Correo electrónico"
+    "email": "Correo electrónico",
+    "button_label_count_many": "Compartir ({{count}})",
+    "button_label_count_one": "Compartir ({{count}})",
+    "button_label_count_other": "Compartir ({{count}})"
   },
   "video": {
     "select": "Añadir Vídeo",
@@ -474,7 +500,13 @@
     "title": "Tendencias",
     "view_all": "Ver todos los hashtags",
     "post_count_one": "{{count}} publicación",
-    "post_count_other": "{{count}} publicaciones"
+    "post_count_other": "{{count}} publicaciones",
+    "post_count_one_many": "{{count}} publicación",
+    "post_count_one_one": "{{count}} publicación",
+    "post_count_one_other": "{{count}} publicación",
+    "post_count_other_many": "{{count}} publicaciones",
+    "post_count_other_one": "{{count}} publicaciones",
+    "post_count_other_other": "{{count}} publicaciones"
   },
   "sidebar": {
     "profile": {
@@ -520,7 +552,10 @@
     "groups": {
       "title": "Grupos Populares",
       "see_all": "Ver Todo",
-      "members": "{{count}} miembros"
+      "members": "{{count}} miembros",
+      "members_many": "{{count}} miembros",
+      "members_one": "{{count}} miembros",
+      "members_other": "{{count}} miembros"
     },
     "actions": {
       "title": "Acciones Rápidas",
@@ -573,7 +608,11 @@
     "go_to_image": "Ir a imagen {{number}}",
     "more_images": "{{count}} imágenes más",
     "video_of": "Vídeo {{current}} de {{total}}",
-    "role_description": "carrusel"
+    "role_description": "carrusel",
+    "more_images_many": "{{count}} imágenes más",
+    "more_images_one": "{{count}} imágenes más",
+    "more_images_other": "{{count}} imágenes más",
+    "view_video": "Ver vídeo {{current}} de {{total}}"
   },
   "lightbox": {
     "aria_label": "Visor de imágenes",
@@ -618,7 +657,10 @@
     "connect_failed": "Error al enviar la solicitud",
     "pending": "Pendiente",
     "dismiss": "Descartar",
-    "load_failed": "Error al cargar sugerencias"
+    "load_failed": "Error al cargar sugerencias",
+    "mutual_many": "{{count}} contactos en común",
+    "mutual_one": "{{count}} contactos en común",
+    "mutual_other": "{{count}} contactos en común"
   },
   "analytics": {
     "title": "Análisis de publicaciones",
@@ -647,5 +689,8 @@
   },
   "aria": {
     "feed_sidebar": "Sugerencias y aspectos destacados de la comunidad"
-  }
+  },
+  "items_loaded_many": "{{count}} publicaciones",
+  "items_loaded_one": "{{count}} publicaciones",
+  "items_loaded_other": "{{count}} publicaciones"
 }

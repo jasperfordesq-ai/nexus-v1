@@ -276,7 +276,15 @@
     "members_tabs_aria": "Typ raportu członkowskiego",
     "hours_by_category_aria": "Wykres słupkowy pokazujący godziny zamienione według kategorii",
     "hours_distribution_aria": "Wykres kołowy przedstawiający rozkład godzin wymiany czasu",
-    "hours_trend_aria": "Wykres warstwowy przedstawiający godziny zamienione w czasie"
+    "hours_trend_aria": "Wykres warstwowy przedstawiający godziny zamienione w czasie",
+    "members_selected_count_few": "Wybrano{{count}}",
+    "members_selected_count_many": "Wybrano{{count}}",
+    "members_selected_count_one": "Wybrano{{count}}",
+    "members_selected_count_other": "Wybrano{{count}}",
+    "days_count_few": "{{count}} dni",
+    "days_count_many": "{{count}} dni",
+    "days_count_one": "{{count}} dni",
+    "days_count_other": "{{count}} dni"
   },
   "municipal_reports": {
     "meta": {
@@ -387,7 +395,15 @@
       "hours": "{{count}}godz",
       "disabled": "Wyłączony",
       "activities": "{{count}} działania",
-      "trend_detail": "{{participants}} uczestnicy, {{activities}} działania"
+      "trend_detail": "{{participants}} uczestnicy, {{activities}} działania",
+      "hours_few": "{{count}}godz",
+      "hours_many": "{{count}}godz",
+      "hours_one": "{{count}}godz",
+      "hours_other": "{{count}}godz",
+      "activities_few": "{{count}} działania",
+      "activities_many": "{{count}} działania",
+      "activities_one": "{{count}} działania",
+      "activities_other": "{{count}} działania"
     },
     "toast": {
       "load_failed": "Nie udało się załadować danych o wpływie na gminy.",
@@ -470,7 +486,11 @@
         "partner_organisations_by_hours": "Organizacje partnerskie (według godzin)",
         "no_partner_activity": "Brak aktywności partnera w tym okresie.",
         "top_5_categories": "5 najlepszych kategorii (podział geograficzny/aktywność)",
-        "no_category_data": "Brak danych kategorii w tym okresie."
+        "no_category_data": "Brak danych kategorii w tym okresie.",
+        "trusted_total_few": "z {{count}} zaufanej sumy.",
+        "trusted_total_many": "z {{count}} zaufanej sumy.",
+        "trusted_total_one": "z {{count}} zaufanej sumy.",
+        "trusted_total_other": "z {{count}} zaufanej sumy."
       },
       "cooperative": {
         "empty_title": "Spółdzielnia (cooperative wewnętrzna)",
@@ -487,8 +507,24 @@
         "coordinator_load": "Obciążenie koordynatora",
         "coordinator_load_desc": "{{pending}} w toku u {{coordinators}} koordynatorów.",
         "future_care_credit_pool": "Pula salda kredytu na przyszłość",
-        "future_care_credit_pool_desc": "Suma dodatnich sald członków – ukryta rezerwa spółdzielni na przyszłość. Aktywna baza członków: {{count}}."
-      }
+        "future_care_credit_pool_desc": "Suma dodatnich sald członków – ukryta rezerwa spółdzielni na przyszłość. Aktywna baza członków: {{count}}.",
+        "member_retention_desc_few": "{{count}} członków aktywnych zarówno w tym okresie, jak i w poprzednim równoważnym okresie.",
+        "member_retention_desc_many": "{{count}} członków aktywnych zarówno w tym okresie, jak i w poprzednim równoważnym okresie.",
+        "member_retention_desc_one": "{{count}} członków aktywnych zarówno w tym okresie, jak i w poprzednim równoważnym okresie.",
+        "member_retention_desc_other": "{{count}} członków aktywnych zarówno w tym okresie, jak i w poprzednim równoważnym okresie.",
+        "reciprocity_rate_desc_few": "{{count}} kibice również otrzymali godziny w tym okresie.",
+        "reciprocity_rate_desc_many": "{{count}} kibice również otrzymali godziny w tym okresie.",
+        "reciprocity_rate_desc_one": "{{count}} kibice również otrzymali godziny w tym okresie.",
+        "reciprocity_rate_desc_other": "{{count}} kibice również otrzymali godziny w tym okresie.",
+        "future_care_credit_pool_desc_few": "Suma dodatnich sald członków – ukryta rezerwa spółdzielni na przyszłość. Aktywna baza członków: {{count}}.",
+        "future_care_credit_pool_desc_many": "Suma dodatnich sald członków – ukryta rezerwa spółdzielni na przyszłość. Aktywna baza członków: {{count}}.",
+        "future_care_credit_pool_desc_one": "Suma dodatnich sald członków – ukryta rezerwa spółdzielni na przyszłość. Aktywna baza członków: {{count}}.",
+        "future_care_credit_pool_desc_other": "Suma dodatnich sald członków – ukryta rezerwa spółdzielni na przyszłość. Aktywna baza członków: {{count}}."
+      },
+      "logs_count_few": "{{count}} dzienniki",
+      "logs_count_many": "{{count}} dzienniki",
+      "logs_count_one": "{{count}} dzienniki",
+      "logs_count_other": "{{count}} dzienniki"
     },
     "cards": {
       "verified_hours": {
@@ -519,6 +555,18 @@
         "metric_2": "Recenzje",
         "metric_3": "Ścieżka audytu"
       }
+    }
+  },
+  "caring_workflow": {
+    "policy": {
+      "periods": {
+        "last_90_days": "Ostatnie 90 dni"
+      }
+    }
+  },
+  "municipal_impact": {
+    "portfolio": {
+      "yoy_value": "{{sign}}{{value}}% rok do roku"
     }
   }
 }

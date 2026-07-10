@@ -43,29 +43,41 @@ export interface LegalGateState {
   isLoading: boolean;
   /** True while saving acceptances */
   isAccepting: boolean;
+  /** Non-null when status lookup or acceptance could not be confirmed */
+  error: string | null;
   /** Refreshes acceptance status from the server */
   refresh: () => void;
 }
+
+type LegalRequestState = 'idle' | 'loading' | 'ready' | 'error';
 
 export function useLegalGate(): LegalGateState {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [hasPending, setHasPending] = useState(false);
   const [pendingDocs, setPendingDocs] = useState<PendingDocument[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [requestState, setRequestState] = useState<LegalRequestState>('idle');
   const [isAccepting, setIsAccepting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
 
-  const refresh = useCallback(() => setRefreshTick((t) => t + 1), []);
+  const refresh = useCallback(() => {
+    setError(null);
+    setRequestState('loading');
+    setRefreshTick((t) => t + 1);
+  }, []);
 
   useEffect(() => {
     if (authLoading || !isAuthenticated) {
       setHasPending(false);
       setPendingDocs([]);
+      setError(null);
+      setRequestState('idle');
       return;
     }
 
     let cancelled = false;
-    setIsLoading(true);
+    setError(null);
+    setRequestState('loading');
 
     api
       .get<LegalStatusResponse>('/v2/legal/acceptance/status')
@@ -79,19 +91,16 @@ export function useLegalGate(): LegalGateState {
               (d) => d.acceptance_status !== 'current'
             )
           );
+          setRequestState('ready');
         } else {
-          // Silently suppress errors — gate should not block the app if API fails
-          setHasPending(false);
-          setPendingDocs([]);
+          setError(result.error ?? result.code ?? 'LEGAL_STATUS_UNAVAILABLE');
+          setRequestState('error');
         }
       })
-      .catch(() => {
+      .catch((reason: unknown) => {
         if (cancelled) return;
-        setHasPending(false);
-        setPendingDocs([]);
-      })
-      .finally(() => {
-        if (!cancelled) setIsLoading(false);
+        setError(reason instanceof Error ? reason.message : 'LEGAL_STATUS_UNAVAILABLE');
+        setRequestState('error');
       });
 
     return () => { cancelled = true; };
@@ -99,18 +108,38 @@ export function useLegalGate(): LegalGateState {
 
   const acceptAll = useCallback(async () => {
     setIsAccepting(true);
+    setError(null);
     try {
       const result = await api.post('/v2/legal/acceptance/accept-all', {});
       if (result.success) {
         setHasPending(false);
         setPendingDocs([]);
+        setRequestState('ready');
+      } else {
+        setError(result.error ?? result.code ?? 'LEGAL_ACCEPTANCE_FAILED');
+        setRequestState('error');
       }
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'LEGAL_ACCEPTANCE_FAILED');
+      setRequestState('error');
     } finally {
       setIsAccepting(false);
     }
   }, []);
 
-  return { hasPending, pendingDocs, acceptAll, isLoading, isAccepting, refresh };
+  const isLoading = authLoading || (isAuthenticated && (
+    requestState === 'idle' || requestState === 'loading'
+  ));
+
+  return {
+    hasPending,
+    pendingDocs,
+    acceptAll,
+    isLoading,
+    isAccepting,
+    error,
+    refresh,
+  };
 }
 
 export default useLegalGate;

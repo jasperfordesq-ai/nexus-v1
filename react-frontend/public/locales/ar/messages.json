@@ -234,5 +234,17 @@
     "sent": "تم إخطار المنسق — وسيتواصل معك لمساعدتك في ترتيب التواصل.",
     "error": "تعذّر إرسال طلبك في الوقت الحالي. يرجى المحاولة مرة أخرى بعد قليل."
   },
-  "composer_blocked_safeguarding": "المراسلة المباشرة غير متاحة مع هذا العضو. استخدم الخيار أعلاه لطلب مساعدة منسق في ترتيب التواصل."
+  "composer_blocked_safeguarding": "المراسلة المباشرة غير متاحة مع هذا العضو. استخدم الخيار أعلاه لطلب مساعدة منسق في ترتيب التواصل.",
+  "aria_conversation_unread_few": "محادثة مع {{name}}، {{count}} غير مقروءة",
+  "aria_conversation_unread_many": "محادثة مع {{name}}، {{count}} غير مقروءة",
+  "aria_conversation_unread_one": "محادثة مع {{name}}، {{count}} غير مقروءة",
+  "aria_conversation_unread_other": "محادثة مع {{name}}، {{count}} غير مقروءة",
+  "aria_conversation_unread_two": "محادثة مع {{name}}، {{count}} غير مقروءة",
+  "aria_conversation_unread_zero": "محادثة مع {{name}}، {{count}} غير مقروءة",
+  "selected_members_few": "المحدد ({{count}})",
+  "selected_members_many": "المحدد ({{count}})",
+  "selected_members_one": "المحدد ({{count}})",
+  "selected_members_other": "المحدد ({{count}})",
+  "selected_members_two": "المحدد ({{count}})",
+  "selected_members_zero": "المحدد ({{count}})"
 }

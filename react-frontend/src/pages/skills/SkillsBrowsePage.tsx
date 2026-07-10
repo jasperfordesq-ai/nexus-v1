@@ -70,7 +70,7 @@ interface SkillMember {
 const proficiencyConfig: Record<string, { labelKey: string; color: string; bg: string; dots: number }> = {
   beginner: { labelKey: 'skills.proficiency.beginner', color: 'text-emerald-500', bg: 'bg-emerald-500', dots: 1 },
   intermediate: { labelKey: 'skills.proficiency.intermediate', color: 'text-[var(--color-info)]', bg: 'bg-blue-500', dots: 2 },
-  advanced: { labelKey: 'skills.proficiency.advanced', color: 'text-purple-500', bg: 'bg-purple-500', dots: 3 },
+  advanced: { labelKey: 'skills.proficiency.advanced', color: 'text-accent', bg: 'bg-accent', dots: 3 },
   expert: { labelKey: 'skills.proficiency.expert', color: 'text-[var(--color-warning)]', bg: 'bg-amber-500', dots: 4 },
 };
 

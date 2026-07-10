@@ -210,6 +210,8 @@
     "top_earners": "Spitzenverdiener",
     "top_spenders": "Top-Spender",
     "user_report_desc": "Sehen Sie sich eine detaillierte Zeitkreditauskunft für ein einzelnes Mitglied an",
-    "user_report_title": "Benutzerbericht"
+    "user_report_title": "Benutzerbericht",
+    "hours_value_one": "{{count}}h",
+    "hours_value_other": "{{count}}h"
   }
 }

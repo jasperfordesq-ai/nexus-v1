@@ -250,7 +250,37 @@
     "moderation_page_title": "قائمة انتظار الإشراف على الوظائف",
     "moderation_page_description": "قم بمراجعة إعلانات الوظائف والموافقة عليها قبل نشرها",
     "templates_empty_description": "قم بإنشاء القالب الأول الخاص بك لتوفير الوقت في إعلانات الوظائف المستقبلية.",
-    "templates_empty_title": "لا توجد قوالب حتى الآن"
+    "templates_empty_title": "لا توجد قوالب حتى الآن",
+    "jobs_count_few": "وظائف{{count}}",
+    "jobs_count_many": "وظائف{{count}}",
+    "jobs_count_one": "وظائف{{count}}",
+    "jobs_count_other": "وظائف{{count}}",
+    "jobs_count_two": "وظائف{{count}}",
+    "jobs_count_zero": "وظائف{{count}}",
+    "application_count_one_few": "تطبيق{{count}}",
+    "application_count_one_many": "تطبيق{{count}}",
+    "application_count_one_one": "تطبيق{{count}}",
+    "application_count_one_other": "تطبيق{{count}}",
+    "application_count_one_two": "تطبيق{{count}}",
+    "application_count_one_zero": "تطبيق{{count}}",
+    "application_count_other_few": "تطبيقات{{count}}",
+    "application_count_other_many": "تطبيقات{{count}}",
+    "application_count_other_one": "تطبيقات{{count}}",
+    "application_count_other_other": "تطبيقات{{count}}",
+    "application_count_other_two": "تطبيقات{{count}}",
+    "application_count_other_zero": "تطبيقات{{count}}",
+    "stat_pending_offers_few": "العروض المعلقة{{count}}",
+    "stat_pending_offers_many": "العروض المعلقة{{count}}",
+    "stat_pending_offers_one": "العروض المعلقة{{count}}",
+    "stat_pending_offers_other": "العروض المعلقة{{count}}",
+    "stat_pending_offers_two": "العروض المعلقة{{count}}",
+    "stat_pending_offers_zero": "العروض المعلقة{{count}}",
+    "pipeline_minutes_few": "{{count}}دقيقة",
+    "pipeline_minutes_many": "{{count}}دقيقة",
+    "pipeline_minutes_one": "{{count}}دقيقة",
+    "pipeline_minutes_other": "{{count}}دقيقة",
+    "pipeline_minutes_two": "{{count}}دقيقة",
+    "pipeline_minutes_zero": "{{count}}دقيقة"
   },
   "moderation": {
     "action_failed": "فشل",
@@ -478,5 +508,10 @@
     "blocked_count": "محظور",
     "flagged_count": "تم وضع علامة عليها",
     "total_analyzed": "إجمالي التحليل"
+  },
+  "premium": {
+    "status": {
+      "unknown": "غير معروف"
+    }
   }
 }

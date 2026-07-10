@@ -73,9 +73,9 @@ export function ProfileCardWidget() {
           name={displayName}
           size="lg"
           isBordered
-          className="ring-2 ring-indigo-500/30 mb-2"
+          className="ring-2 ring-accent/30 mb-2"
         />
-        <h3 className="font-semibold text-sm text-[var(--text-primary)] group-hover:text-indigo-500 transition-colors duration-200">
+        <h3 className="font-semibold text-sm text-[var(--text-primary)] group-hover:text-accent transition-colors duration-200">
           {displayName}
         </h3>
         {handle && (
@@ -97,7 +97,7 @@ export function ProfileCardWidget() {
         <>
           <div className="flex justify-center gap-6 mt-3 pt-3 border-t border-[var(--border-default)]">
             <Link to={tenantPath('/listings')} className="text-center group">
-              <p className="text-sm font-bold text-[var(--text-primary)] group-hover:text-indigo-500">
+              <p className="text-sm font-bold text-[var(--text-primary)] group-hover:text-accent">
                 {stats.listings_count}
               </p>
               <p className="text-xs text-[var(--text-muted)]">{t('sidebar.profile.listings')}</p>

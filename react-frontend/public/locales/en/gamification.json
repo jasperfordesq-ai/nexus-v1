@@ -23,7 +23,11 @@
       "months_active": "{{count}} of 12 months",
       "month_active_tooltip": "Active: {{count}} activities",
       "month_inactive_tooltip": "Inactive",
-      "description": "Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours)."
+      "description": "Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours).",
+      "months_active_one": "{{count}} of 12 months",
+      "months_active_other": "{{count}} of 12 months",
+      "month_active_tooltip_one": "Active: {{count}} activities",
+      "month_active_tooltip_other": "Active: {{count}} activities"
     },
     "badge_type": {
       "vol": "Volunteering",
@@ -77,7 +81,9 @@
       "claimed_message": "You earned {{xp}} XP!",
       "claim_failed": "Claim Failed",
       "claim_failed_desc": "Could not claim daily reward.",
-      "claim_error": "Something went wrong. Please try again."
+      "claim_error": "Something went wrong. Please try again.",
+      "day_streak_one": "{{count}} day streak",
+      "day_streak_other": "{{count}} day streak"
     },
     "challenges": {
       "active_challenges": "Active Challenges",
@@ -121,7 +127,9 @@
       "purchase_failed_desc": "Could not complete purchase.",
       "purchase_error": "Something went wrong.",
       "load_failed": "Load Failed",
-      "load_failed_desc": "Could not load the XP shop."
+      "load_failed_desc": "Could not load the XP shop.",
+      "stock_left_one": "{{count}} left in stock",
+      "stock_left_other": "{{count}} left in stock"
     },
     "loading": "Loading achievements",
     "badge_detail": {
@@ -159,7 +167,9 @@
       "updated_desc": "Your badge showcase has been saved.",
       "save_failed": "Save Failed",
       "save_failed_desc": "Could not update showcase.",
-      "save_error": "Something went wrong."
+      "save_error": "Something went wrong.",
+      "select_badges_one": "Select up to 5 badges to showcase on your profile. ({{count}}/5 selected)",
+      "select_badges_other": "Select up to 5 badges to showcase on your profile. ({{count}}/5 selected)"
     },
     "load_error": "Failed to load achievements. Please try again."
   },
@@ -266,7 +276,9 @@
       "buddy_failed": "Failed to become buddy",
       "buddy_action_sent": "Buddy support sent",
       "buddy_action_failed": "Failed to send buddy support"
-    }
+    },
+    "streak_label_one": "{{count}} check-in streak",
+    "streak_label_other": "{{count}} check-in streak"
   },
   "frequency": {
     "none": "No cadence",
@@ -328,7 +340,9 @@
       "rank_label": "Rank {{rank}}",
       "xp_reward": "{{xp}} XP",
       "load_failed": "Load Failed",
-      "load_failed_desc": "Could not load season history."
+      "load_failed_desc": "Could not load season history.",
+      "participants_one": "{{count}} participants",
+      "participants_other": "{{count}} participants"
     },
     "score_unit": {
       "hours": "h",
@@ -421,7 +435,11 @@
       "legendary": "Legendary"
     },
     "max_score_label": "/ {{max}}",
-    "loading": "Loading your NexusScore..."
+    "loading": "Loading your NexusScore...",
+    "points_to_next_one": "{{count}} points to {{tier}}",
+    "points_to_next_other": "{{count}} points to {{tier}}",
+    "remaining_count_one": "{{count}} remaining",
+    "remaining_count_other": "{{count}} remaining"
   },
   "common": {
     "refresh": "Refresh",

@@ -124,7 +124,8 @@
         "year": "年",
         "yearly": "毎年",
         "annual": "年間"
-      }
+      },
+      "total_other": "{{count}} 合計"
     },
     "table": {
       "aria": "プレミアム層",
@@ -203,7 +204,8 @@
         "restricted": "必要なアクション",
         "unknown": "ステータス不明"
       },
-      "connect_fallback_active": "Stripe Connect アカウントは構成されていますが、まだライブ寄付を行う準備ができていません。オンボーディングが完了するまで、支払いにはプラットフォームのフォールバックが使用されます。"
+      "connect_fallback_active": "Stripe Connect アカウントは構成されていますが、まだライブ寄付を行う準備ができていません。オンボーディングが完了するまで、支払いにはプラットフォームのフォールバックが使用されます。",
+      "requirements_due_other": "注意が必要な Stripe アカウント要件: {{count}}。"
     },
     "finance": {
       "title": "財務業務",
@@ -222,7 +224,8 @@
       "past_due_count": "{{count}} past due",
       "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "年間領収書をエクスポートする",
-      "empty": "財務活動はまだ記録されていません。"
+      "empty": "財務活動はまだ記録されていません。",
+      "past_due_count_other": "{{count}} 期限を過ぎました"
     }
   }
 }

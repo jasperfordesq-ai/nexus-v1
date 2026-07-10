@@ -250,7 +250,12 @@
     "moderation_page_title": "ジョブモデレーションキュー",
     "moderation_page_description": "求人情報を公開する前にレビューして承認する",
     "templates_empty_description": "最初のテンプレートを作成して、今後の求人情報の掲載にかかる時間を節約します。",
-    "templates_empty_title": "まだテンプレートがありません"
+    "templates_empty_title": "まだテンプレートがありません",
+    "jobs_count_other": "{{count}}の求人",
+    "application_count_one_other": "{{count}}アプリケーション",
+    "application_count_other_other": "{{count}}アプリケーション",
+    "stat_pending_offers_other": "{{count}}保留中のオファー",
+    "pipeline_minutes_other": "{{count}}分"
   },
   "moderation": {
     "action_failed": "失敗しました",
@@ -478,5 +483,10 @@
     "blocked_count": "ブロックされました",
     "flagged_count": "フラグ付き",
     "total_analyzed": "分析合計"
+  },
+  "premium": {
+    "status": {
+      "unknown": "不明"
+    }
   }
 }

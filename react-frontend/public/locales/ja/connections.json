@@ -37,5 +37,6 @@
   "page_meta": {
     "title": "つながり"
   },
-  "loading": "接続を読み込み中..."
+  "loading": "接続を読み込み中...",
+  "pending_count_other": "{{count}} 保留中"
 }

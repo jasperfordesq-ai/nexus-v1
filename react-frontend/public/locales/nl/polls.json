@@ -100,5 +100,7 @@
   "page_meta": {
     "title": "Peilingen"
   },
-  "category_filter_label": "Filter op categorie"
+  "category_filter_label": "Filter op categorie",
+  "total_ballots_one": "Totaal stembiljetten: {{count}}",
+  "total_ballots_other": "Totaal stembiljetten: {{count}}"
 }

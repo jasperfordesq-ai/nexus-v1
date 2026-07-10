@@ -74,10 +74,10 @@ export function Spinner({
 
   const spinner = (
     <HeroUISpinner
-      aria-label={resolvedAriaLabel}
       className={combineClasses(classNames?.wrapper, classNames?.circle1, classNames?.circle2, className)}
       color={mapColor(color)}
       {...props}
+      aria-hidden="true"
     />
   );
 

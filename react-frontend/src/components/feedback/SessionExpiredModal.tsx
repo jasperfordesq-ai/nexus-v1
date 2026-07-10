@@ -17,7 +17,7 @@ import Clock from 'lucide-react/icons/clock';
 import { SESSION_EXPIRED_EVENT } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/contexts/TenantContext';
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui';
 
 export function SessionExpiredModal() {
   const { t } = useTranslation('errors');
@@ -64,7 +64,6 @@ export function SessionExpiredModal() {
         {(onClose) => (
           <>
             <ModalHeader
-              id="session-expired-title"
               className="flex flex-col items-center gap-0 pt-6 pb-2"
             >
               {/* Icon */}
@@ -73,7 +72,12 @@ export function SessionExpiredModal() {
                   <Clock className="w-8 h-8 text-amber-600 dark:text-amber-400" />
                 </div>
               </div>
-              <span className="text-xl font-semibold text-theme-primary">{t('session_expired')}</span>
+              <ModalHeading
+                id="session-expired-title"
+                className="text-xl font-semibold text-theme-primary"
+              >
+                {t('session_expired')}
+              </ModalHeading>
             </ModalHeader>
 
             <ModalBody
@@ -94,7 +98,7 @@ export function SessionExpiredModal() {
                 {t('dismiss')}
               </Button>
               <Button
-                className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                className="flex-1 bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                 startContent={<LogIn className="w-4 h-4" />}
                 onPress={handleLogin}
               >

@@ -306,6 +306,16 @@
     "pillar_trust": "Trust",
     "pillar_aria": "{{label}}: {{percent}}%",
     "of_active_users": "von {{total}} aktiven Benutzern",
-    "of_active_listings": "von {{total}} aktiven Einträgen"
+    "of_active_listings": "von {{total}} aktiven Einträgen",
+    "cache_cleared_count_one": "{{count}}-Cache-Eintrag gelöscht",
+    "cache_cleared_count_other": "{{count}}-Cache-Eintrag gelöscht",
+    "clear_cache_confirm_with_count_one": "Sind Sie sicher, dass Sie zwischengespeicherte{{count}}-Übereinstimmungen löschen möchten?",
+    "clear_cache_confirm_with_count_other": "Sind Sie sicher, dass Sie zwischengespeicherte{{count}}-Übereinstimmungen löschen möchten?",
+    "distribution_aria_one": "{{label}}:{{count}}stimmt überein ({{percent}}%)",
+    "distribution_aria_other": "{{label}}:{{count}}stimmt überein ({{percent}}%)",
+    "feedback_reason_aria_one": "{{label}}: {{count}} ({{percent}}%)",
+    "feedback_reason_aria_other": "{{label}}: {{count}} ({{percent}}%)",
+    "pillar_averages_sample_size_one": "Basierend auf {{count}}-Übereinstimmungen",
+    "pillar_averages_sample_size_other": "Basierend auf {{count}}-Übereinstimmungen"
   }
 }

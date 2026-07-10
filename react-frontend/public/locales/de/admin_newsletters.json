@@ -455,7 +455,14 @@
     "winning_metric": "Erfolgsmetrik",
     "resend_queued_count": "{{count}}erneut gesendet in der Warteschlange",
     "resend_queued_count_plural": "{{count}}in der Warteschlange wird erneut gesendet",
-    "template_tabs_aria": "Kategorienfilter für Newsletter-Vorlagen"
+    "template_tabs_aria": "Kategorienfilter für Newsletter-Vorlagen",
+    "resend_queued_count_one": "{{count}}erneut gesendet in der Warteschlange",
+    "resend_queued_count_other": "{{count}}erneut gesendet in der Warteschlange",
+    "your_average": "Ihr Durchschnitt",
+    "industry_avg": "Branchendurchschnitt",
+    "above_benchmark": "Über dem Benchmark",
+    "below_benchmark": "Unter dem Benchmark",
+    "benchmark_difference": "{{pointSign}}{{pointValue}} Prozentpunkte ({{percentSign}}{{percentValue}} %)"
   },
   "newsletter_form": {
     "ab_test_label": "Ab-Test",
@@ -895,7 +902,13 @@
     "subject_override_desc": "Lassen Sie das Feld leer, um den ursprünglichen Betreff zu verwenden.",
     "subject_override_placeholder": "Geben Sie eine Betreffüberschreibung ein...",
     "subtitle": "Versenden Sie diesen Newsletter an eine gezielte Untergruppe von Empfängern.",
-    "total_sent": "Insgesamt gesendet"
+    "total_sent": "Insgesamt gesendet",
+    "non_openers_count_one": "{{count}}-Empfänger, der nicht geöffnet hat",
+    "non_openers_count_other": "{{count}}-Empfänger, der nicht geöffnet hat",
+    "non_clickers_count_one": "{{count}}-Empfänger, der geöffnet, aber nicht geklickt hat",
+    "non_clickers_count_other": "{{count}}-Empfänger, der geöffnet, aber nicht geklickt hat",
+    "preview_recipient_count_desc_one": "Dieser erneute Versand wird an den{{count}}-Empfänger gesendet",
+    "preview_recipient_count_desc_other": "Dieser erneute Versand wird an den{{count}}-Empfänger gesendet"
   },
   "newsletter_send_time": {
     "day_friday": "Fr",
@@ -919,7 +932,9 @@
     "not_enough_data": "Noch nicht genügend Engagement-Daten.",
     "time_period": "Zeitraum",
     "title": "Zeitoptimierer senden",
-    "top_recommended": "Top Recommended"
+    "top_recommended": "Top Recommended",
+    "days_one": "{{count}}Tage",
+    "days_other": "{{count}}Tage"
   },
   "segment_form": {
     "analyzing_member_data": "Mitgliederdaten analysieren",
@@ -1038,5 +1053,8 @@
     "update_template": "Vorlage aktualisieren",
     "usage_stats_sent": "Nutzungsstatistiken gesendet",
     "usage_stats_sent_plural": "Nutzungsstatistiken im Plural gesendet"
+  },
+  "diagnostics": {
+    "score_out_of": "von {{maximum}}"
   }
 }

@@ -1,12 +1,18 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Spinner, Progress } from '@/components/ui';
 import {
   useState,
   useCallback,
-  useEffect } from 'react';
+  useEffect,
+  useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Separator } from '@/components/ui';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
-import BarChart3 from 'lucide-react/icons/chart-column';
 import Target from 'lucide-react/icons/target';
 import MapPin from 'lucide-react/icons/map-pin';
 import TrendingUp from 'lucide-react/icons/trending-up';
@@ -14,21 +20,20 @@ import Users from 'lucide-react/icons/users';
 import Zap from 'lucide-react/icons/zap';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import ThumbsDown from 'lucide-react/icons/thumbs-down';
 import Compass from 'lucide-react/icons/compass';
 import Gauge from 'lucide-react/icons/gauge';
 import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
 import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
 import { EmptyState } from '../../components/EmptyState';
 import type { MatchingStatsResponse } from '../../api/types';
 import { useTranslation } from 'react-i18next';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
+import { logError } from '@/lib/logger';
+import { parseMatchingStatsResponse } from './matchingResponseGuards';
 
 /**
  * Matching Analytics Page
@@ -88,39 +93,44 @@ export function MatchingAnalytics() {
   const { t } = useTranslation('admin_matching');
   usePageTitle(t('matching.page_title'));
   const { tenantPath } = useTenant();
-  const toast = useToast();
   const navigate = useNavigate();
 
   const [stats, setStats] = useState<MatchingStatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const requestIdRef = useRef(0);
 
   const loadStats = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     try {
       const res = await adminMatching.getMatchingStats();
-      if (res.success && res.data) {
-        setStats(res.data);
+      if (requestId !== requestIdRef.current) return;
+      const parsed = res.success ? parseMatchingStatsResponse(res.data) : null;
+      if (parsed) {
+        setStats(parsed);
+        setLoadFailed(false);
+      } else {
+        setLoadFailed(true);
       }
-    } catch {
-      toast.error(t('matching.failed_to_load_matching_analytics'));
+    } catch (err) {
+      if (requestId !== requestIdRef.current) return;
+      logError('Failed to load matching analytics', err);
+      setLoadFailed(true);
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
-  }, [t, toast])
+  }, []);
 
 
   useEffect(() => {
-    loadStats();
+    void loadStats();
+    return () => { requestIdRef.current += 1; };
   }, [loadStats]);
 
   const overview = stats?.overview;
 
-  // Check if there is any data at all
-  const hasData =
-    overview &&
-    (overview.cache_entries > 0 ||
-      overview.total_matches_month > 0 ||
-      overview.total_matches_week > 0);
+  const initialLoading = loading && stats === null;
 
   return (
     <div>
@@ -150,20 +160,22 @@ export function MatchingAnalytics() {
         }
       />
 
-      {loading ? (
+      {initialLoading ? (
         <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-64 items-center justify-center">
           <Spinner size="lg" />
         </div>
-      ) : !hasData ? (
-        <EmptyState
-          icon={BarChart3}
-          title={t('matching.no_matching_data_yet')}
-          description={t('matching.no_matching_data_desc')}
-          actionLabel={t('matching.configure_matching')}
-          onAction={() => navigate(tenantPath('/admin/smart-matching/configuration'))}
-        />
-      ) : (
+      ) : loadFailed && stats === null ? (
+        <div role="alert">
+          <EmptyState icon={AlertTriangle} title={t('matching.failed_to_load_matching_analytics')} actionLabel={t('common.retry')} onAction={loadStats} />
+        </div>
+      ) : stats !== null ? (
         <>
+          {loadFailed && (
+            <div className="mb-4 flex flex-col gap-3 rounded-xl border border-danger/30 bg-danger/5 p-4 text-danger sm:flex-row sm:items-center sm:justify-between" role="alert">
+              <div className="flex items-center gap-2"><AlertTriangle size={18} aria-hidden="true" /><p className="text-sm">{t('matching.failed_to_load_matching_analytics')}</p></div>
+              <Button variant="outline" onPress={loadStats} isLoading={loading}>{t('common.retry')}</Button>
+            </div>
+          )}
           {/* Stats Row */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
             <StatCard
@@ -206,7 +218,7 @@ export function MatchingAnalytics() {
                 <h3 className="font-semibold">{t('matching.score_distribution')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">
-                {stats?.score_distribution ? (
+                {Object.keys(stats.score_distribution).length > 0 ? (
                   <div className="space-y-4">
                     {Object.entries(stats.score_distribution).map(([range, count]) => {
                       const total = Object.values(stats.score_distribution).reduce(
@@ -253,7 +265,7 @@ export function MatchingAnalytics() {
                 <h3 className="font-semibold">{t('matching.distance_distribution')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">
-                {stats?.distance_distribution ? (
+                {Object.keys(stats.distance_distribution).length > 0 ? (
                   <div className="space-y-4">
                     {Object.entries(stats.distance_distribution).map(
                       ([band, count]) => {
@@ -306,12 +318,12 @@ export function MatchingAnalytics() {
                   <div className="space-y-3">
                     <ActivityRow
                       label={t('matching.label_matches_today')}
-                      value={overview.total_matches_today}
+                      value={overview.total_matches_today ?? '---'}
                     />
                     <Separator />
                     <ActivityRow
                       label={t('matching.label_matches_this_week')}
-                      value={overview.total_matches_week}
+                      value={overview.total_matches_week ?? '---'}
                     />
                     <Separator />
                     <ActivityRow
@@ -326,7 +338,7 @@ export function MatchingAnalytics() {
                     <Separator />
                     <ActivityRow
                       label={t('matching.label_mutual_matches')}
-                      value={overview.mutual_matches_count}
+                      value={overview.mutual_matches_count ?? '---'}
                     />
                     <Separator />
                     <ActivityRow
@@ -529,7 +541,7 @@ export function MatchingAnalytics() {
             )}
           </div>
         </>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -541,14 +553,14 @@ function ActivityRow({
   color,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   color?: string;
 }) {
   return (
     <div className="flex items-center justify-between py-1">
       <span className="text-sm text-muted">{label}</span>
       <span className={`text-sm font-bold tabular-nums ${color ?? 'text-foreground'}`}>
-        {value.toLocaleString()}
+        {typeof value === 'number' ? value.toLocaleString(getFormattingLocale()) : value}
       </span>
     </div>
   );

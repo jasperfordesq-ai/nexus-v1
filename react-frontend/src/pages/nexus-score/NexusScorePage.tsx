@@ -77,7 +77,7 @@ const TIERS = [
   { name: 'Developing',    key: 'developing',   min: 300, color: 'text-emerald-600 dark:text-emerald-400', bar: 'bg-emerald-400' },
   { name: 'Intermediate',  key: 'intermediate', min: 400, color: 'text-cyan-600    dark:text-cyan-400',    bar: 'bg-cyan-400'    },
   { name: 'Proficient',    key: 'proficient',   min: 500, color: 'text-violet-600  dark:text-violet-400',  bar: 'bg-violet-400'  },
-  { name: 'Advanced',      key: 'advanced',     min: 600, color: 'text-indigo-600  dark:text-indigo-400',  bar: 'bg-indigo-400'  },
+  { name: 'Advanced',      key: 'advanced',     min: 600, color: 'text-accent  dark:text-accent',  bar: 'bg-accent'  },
   { name: 'Expert',        key: 'expert',       min: 700, color: 'text-orange-600  dark:text-orange-400',  bar: 'bg-orange-400'  },
   { name: 'Elite',         key: 'elite',        min: 800, color: 'text-pink-600    dark:text-pink-400',    bar: 'bg-pink-400'    },
   { name: 'Legendary',     key: 'legendary',    min: 900, color: 'text-yellow-600  dark:text-yellow-400',  bar: 'bg-yellow-400'  },
@@ -278,7 +278,7 @@ export default function NexusScorePage() {
       <motion.div variants={itemVariants} className="flex items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-2">
-            <Trophy className="w-6 h-6 text-indigo-400" aria-hidden="true" />
+            <Trophy className="w-6 h-6 text-accent" aria-hidden="true" />
             {t('nexus_score.title')}
           </h1>
           <p className="text-sm text-theme-subtle mt-0.5">
@@ -412,7 +412,7 @@ export default function NexusScorePage() {
         <motion.div variants={itemVariants}>
           <GlassCard className="p-5">
             <h2 className="text-base font-semibold text-theme-primary mb-3 flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+              <TrendingUp className="w-4 h-4 text-accent" aria-hidden="true" />
               {t('nexus_score.insights_title')}
             </h2>
             <ul className="space-y-2">
@@ -420,7 +420,7 @@ export default function NexusScorePage() {
                 const text = typeof insight === 'string' ? insight : (insight as Record<string, string>).message ?? (insight as Record<string, string>).title ?? '';
                 return (
                   <li key={i} className="flex items-start gap-2 text-sm text-theme-subtle">
-                    <span className="text-indigo-400 font-bold mt-0.5" aria-hidden="true">-</span>
+                    <span className="text-accent font-bold mt-0.5" aria-hidden="true">-</span>
                     {text}
                   </li>
                 );

@@ -221,7 +221,10 @@ describe('CouponDetailPage', () => {
     await waitFor(() => {
       // Should show a back button but no coupon title
       expect(screen.queryByText('20% Off Everything')).not.toBeInTheDocument();
-      expect(screen.getByRole('link', { name: /back|coupons/i })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /back|coupons/i })).toHaveAttribute(
+        'href',
+        '/test/coupons',
+      );
     });
   });
 

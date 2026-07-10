@@ -44,7 +44,12 @@
     "no_deadline": "Sem prazo",
     "evaluation_criteria": "Critérios de Avaliação",
     "outcome": "Resultado",
-    "team_links": "Equipas de Projeto"
+    "team_links": "Equipas de Projeto",
+    "ideas_count_many": "{{count}} ideias",
+    "ideas_count_other": "{{count}} ideias",
+    "max_ideas_many": "Máx. {{count}} ideias por pessoa",
+    "max_ideas_one": "Máx. {{count}} ideias por pessoa",
+    "max_ideas_other": "Máx. {{count}} ideias por pessoa"
   },
   "challenges": {
     "title": "Desafios",
@@ -87,7 +92,12 @@
     "draft_created": "Criado {{date}}",
     "new_idea": "Nova Ideia",
     "sort_label": "Ordenar ideias",
-    "loading": "Carregando ideias..."
+    "loading": "Carregando ideias...",
+    "your_ideas_many": "As suas ideias: {{count}}/{{max}}",
+    "your_ideas_one": "As suas ideias: {{count}}/{{max}}",
+    "your_ideas_other": "As suas ideias: {{count}}/{{max}}",
+    "comments_many": "{{count}} comentários",
+    "comments_other": "{{count}} comentários"
   },
   "idea_detail": {
     "page_title": "Detalhes da Ideia",
@@ -321,7 +331,9 @@
     "fallback_title": "Campanha",
     "feature_not_available": "Funcionalidade de ideação não disponível",
     "feature_not_available_desc": "A funcionalidade de ideação não está ativada para esta comunidade. Contacte o seu administrador do banco de tempo para saber mais.",
-    "retry": "Tentar novamente"
+    "retry": "Tentar novamente",
+    "challenges_count_many": "{{count}} desafios",
+    "challenges_count_other": "{{count}} desafios"
   },
   "templates": {
     "title": "Modelos de Desafio",

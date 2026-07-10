@@ -5,7 +5,7 @@ import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui/Dropdown';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { Spinner } from '@/components/ui/Spinner';
 import { Textarea } from '@/components/ui/Textarea';
@@ -709,9 +709,9 @@ export function IdeaDetailPage() {
       {/* Convert to Group Modal */}
       <Modal isOpen={isConvertOpen} onClose={() => setIsConvertOpen(false)} size="lg">
         <ModalContent>
-          <ModalHeader className="flex flex-col gap-1">
-            <span>{t('convert_to_group.title')}</span>
-            <p className="text-sm font-normal text-[var(--color-text-tertiary)]">
+            <ModalHeader className="flex flex-col gap-1">
+              <ModalHeading>{t('convert_to_group.title')}</ModalHeading>
+              <p className="text-sm font-normal text-[var(--color-text-tertiary)]">
               {t('convert_to_group.description')}
             </p>
           </ModalHeader>

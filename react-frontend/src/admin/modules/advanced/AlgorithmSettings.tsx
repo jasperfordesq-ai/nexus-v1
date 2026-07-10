@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Spinner, Chip, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { Slider } from '@/components/ui';
@@ -399,7 +400,10 @@ export function AlgorithmSettings() {
                   </div>
                   {(!health.fulltext.listings || !health.fulltext.users || !health.fulltext.feed_activity) && (
                     <p className="text-xs text-warning mt-2">
-                      {t('missing_indexes_hint_prefix')} <code className="bg-surface-secondary px-1 rounded">php scripts/safe_migrate.php</code> {t('missing_indexes_hint_suffix')}
+                      {t('missing_indexes_hint_prefix')}{' '}
+                      {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
+                      <code className="bg-surface-secondary px-1 rounded">php scripts/safe_migrate.php</code>{' '}
+                      {t('missing_indexes_hint_suffix')}
                     </p>
                   )}
                 </div>
@@ -413,11 +417,11 @@ export function AlgorithmSettings() {
                   </p>
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
-                      <span className="font-medium">{health.collaborative_filtering.listing_interactions.toLocaleString()}</span>
+                      <span className="font-medium">{health.collaborative_filtering.listing_interactions.toLocaleString(getFormattingLocale())}</span>
                       <span className="text-theme-muted ml-1">{t('listing_saves')}</span>
                     </span>
                     <span>
-                      <span className="font-medium">{health.collaborative_filtering.member_interactions.toLocaleString()}</span>
+                      <span className="font-medium">{health.collaborative_filtering.member_interactions.toLocaleString(getFormattingLocale())}</span>
                       <span className="text-theme-muted ml-1">{t('member_transactions')}</span>
                     </span>
                   </div>
@@ -437,11 +441,11 @@ export function AlgorithmSettings() {
                   </p>
                   <div className="flex flex-wrap gap-3 text-sm">
                     <span>
-                      <span className="font-medium">{health.embeddings.listing_count.toLocaleString()}</span>
+                      <span className="font-medium">{health.embeddings.listing_count.toLocaleString(getFormattingLocale())}</span>
                       <span className="text-theme-muted ml-1">{t('label_listings')}</span>
                     </span>
                     <span>
-                      <span className="font-medium">{health.embeddings.user_count.toLocaleString()}</span>
+                      <span className="font-medium">{health.embeddings.user_count.toLocaleString(getFormattingLocale())}</span>
                       <span className="text-theme-muted ml-1">{t('label_users')}</span>
                     </span>
                     <Chip
@@ -454,7 +458,10 @@ export function AlgorithmSettings() {
                   </div>
                   {health.embeddings.total === 0 && (
                     <p className="text-xs text-theme-subtle mt-2">
-                      {t('generate_embeddings_hint_prefix')} <code className="bg-surface-secondary px-1 rounded">php scripts/backfill_embeddings.php --tenant=&lt;id&gt;</code> {t('generate_embeddings_hint_suffix')}
+                      {t('generate_embeddings_hint_prefix')}{' '}
+                      {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
+                      <code className="bg-surface-secondary px-1 rounded">php scripts/backfill_embeddings.php --tenant=&lt;id&gt;</code>{' '}
+                      {t('generate_embeddings_hint_suffix')}
                     </p>
                   )}
                 </div>
@@ -478,7 +485,10 @@ export function AlgorithmSettings() {
                       </div>
                       {!health.search.meilisearch_available && (
                         <p className="text-xs text-theme-subtle mt-2">
-                          {t('sync_search_hint_prefix')} <code className="bg-surface-secondary px-1 rounded">php scripts/sync_search_index.php --all-tenants</code> {t('sync_search_hint_suffix')}
+                          {t('sync_search_hint_prefix')}{' '}
+                          {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
+                          <code className="bg-surface-secondary px-1 rounded">php scripts/sync_search_index.php --all-tenants</code>{' '}
+                          {t('sync_search_hint_suffix')}
                         </p>
                       )}
                     </div>

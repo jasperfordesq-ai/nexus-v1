@@ -37,8 +37,8 @@ export function QuickActionsWidget() {
       label: t('sidebar.actions.create_poll'),
       icon: BarChart3,
       path: '/polls',
-      color: 'text-indigo-500',
-      bg: 'bg-indigo-500/10 hover:bg-indigo-500/20',
+      color: 'text-accent',
+      bg: 'bg-accent/10 hover:bg-accent/20',
       feature: 'polls' as const,
     },
     {
@@ -67,7 +67,7 @@ export function QuickActionsWidget() {
       <Button
         as={Link}
         to={tenantPath('/listings/create')}
-        className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow font-medium"
+        className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white shadow-lg shadow-accent/25 hover:shadow-accent/40 transition-shadow font-medium"
         startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
       >
         {t('sidebar.actions.create_listing')}

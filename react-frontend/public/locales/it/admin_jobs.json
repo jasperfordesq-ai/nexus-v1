@@ -250,7 +250,22 @@
     "moderation_page_title": "Coda di moderazione lavori",
     "moderation_page_description": "Esamina e approva le offerte di lavoro prima che vengano pubblicate",
     "templates_empty_description": "Crea il tuo primo modello per risparmiare tempo sulle offerte di lavoro future.",
-    "templates_empty_title": "Nessun modello ancora"
+    "templates_empty_title": "Nessun modello ancora",
+    "jobs_count_many": "Lavori{{count}}",
+    "jobs_count_one": "Lavori{{count}}",
+    "jobs_count_other": "Lavori{{count}}",
+    "application_count_one_many": "Applicazione{{count}}",
+    "application_count_one_one": "Applicazione{{count}}",
+    "application_count_one_other": "Applicazione{{count}}",
+    "application_count_other_many": "applicazioni{{count}}",
+    "application_count_other_one": "applicazioni{{count}}",
+    "application_count_other_other": "applicazioni{{count}}",
+    "stat_pending_offers_many": "{{count}}offerte in sospeso",
+    "stat_pending_offers_one": "{{count}}offerte in sospeso",
+    "stat_pending_offers_other": "{{count}}offerte in sospeso",
+    "pipeline_minutes_many": "{{count}} min",
+    "pipeline_minutes_one": "{{count}} min",
+    "pipeline_minutes_other": "{{count}} min"
   },
   "moderation": {
     "action_failed": "Fallito",
@@ -478,5 +493,10 @@
     "blocked_count": "Bloccato",
     "flagged_count": "Contrassegnato",
     "total_analyzed": "Totale analizzato"
+  },
+  "premium": {
+    "status": {
+      "unknown": "Sconosciuto"
+    }
   }
 }

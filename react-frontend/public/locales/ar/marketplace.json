@@ -92,7 +92,19 @@
     "get_directions": "الاتجاهات",
     "promoted": "مُروَّج",
     "unsave": "إزالة من المحفوظات",
-    "save": "حفظ القائمة"
+    "save": "حفظ القائمة",
+    "available_count_few": "{{count}} متاحة",
+    "available_count_many": "{{count}} متاحة",
+    "available_count_one": "{{count}} متاحة",
+    "available_count_other": "{{count}} متاحة",
+    "available_count_two": "{{count}} متاحة",
+    "available_count_zero": "{{count}} متاحة",
+    "views_count_few": "{{count}} مشاهدات",
+    "views_count_many": "{{count}} مشاهدات",
+    "views_count_one": "{{count}} مشاهدات",
+    "views_count_other": "{{count}} مشاهدات",
+    "views_count_two": "{{count}} مشاهدات",
+    "views_count_zero": "{{count}} مشاهدات"
   },
   "offer": {
     "modal_title": "قدم عرضاً",
@@ -184,7 +196,13 @@
     "created_success": "تم إنشاء القائمة بنجاح!",
     "created_error": "فشل في إنشاء القائمة",
     "created_error_retry": "فشل في إنشاء القائمة. يرجى المحاولة مرة أخرى.",
-    "draft_saved": "تم حفظ المسودة"
+    "draft_saved": "تم حفظ المسودة",
+    "title_char_count_few": "{{count}}/120 حرف",
+    "title_char_count_many": "{{count}}/120 حرف",
+    "title_char_count_one": "{{count}}/120 حرف",
+    "title_char_count_other": "{{count}}/120 حرف",
+    "title_char_count_two": "{{count}}/120 حرف",
+    "title_char_count_zero": "{{count}}/120 حرف"
   },
   "search": {
     "category_search": "البحث في الفئات...",
@@ -228,7 +246,17 @@
     "price_from": "من {{min}}",
     "price_up_to": "حتى {{max}}",
     "last_days_one": "آخر {{count}} يوم",
-    "last_days_other": "آخر {{count}} أيام"
+    "last_days_other": "آخر {{count}} أيام",
+    "reset_filters_few": "إعادة تعيين الفلاتر ({{count}})",
+    "reset_filters_many": "إعادة تعيين الفلاتر ({{count}})",
+    "reset_filters_one": "إعادة تعيين الفلاتر ({{count}})",
+    "reset_filters_other": "إعادة تعيين الفلاتر ({{count}})",
+    "reset_filters_two": "إعادة تعيين الفلاتر ({{count}})",
+    "reset_filters_zero": "إعادة تعيين الفلاتر ({{count}})",
+    "results_count_few": "{{count}} نتائج",
+    "results_count_many": "{{count}} نتائج",
+    "results_count_two": "{{count}} نتائج",
+    "results_count_zero": "{{count}} نتائج"
   },
   "seller": {
     "page_title": "ملف البائع",
@@ -285,7 +313,21 @@
     "results_count_one": "{{count}} نتيجة",
     "results_count_other": "{{count}} نتائج",
     "load_more": "تحميل المزيد",
-    "browse_description": "تصفح قوائم {{name}} في السوق."
+    "browse_description": "تصفح قوائم {{name}} في السوق.",
+    "reset_filters_few": "إعادة تعيين الفلاتر ({{count}})",
+    "reset_filters_many": "إعادة تعيين الفلاتر ({{count}})",
+    "reset_filters_one": "إعادة تعيين الفلاتر ({{count}})",
+    "reset_filters_other": "إعادة تعيين الفلاتر ({{count}})",
+    "reset_filters_two": "إعادة تعيين الفلاتر ({{count}})",
+    "reset_filters_zero": "إعادة تعيين الفلاتر ({{count}})",
+    "listings_count_few": "{{count}} قوائم",
+    "listings_count_many": "{{count}} قوائم",
+    "listings_count_two": "{{count}} قوائم",
+    "listings_count_zero": "{{count}} قوائم",
+    "results_count_few": "{{count}} نتائج",
+    "results_count_many": "{{count}} نتائج",
+    "results_count_two": "{{count}} نتائج",
+    "results_count_zero": "{{count}} نتائج"
   },
   "common": {
     "loading": "جارٍ التحميل...",
@@ -426,7 +468,13 @@
     "empty_sold_title": "لا مبيعات حتى الآن",
     "empty_sold_description": "لم تقم ببيع أي عناصر حتى الآن.",
     "empty_expired_title": "لا توجد قوائم منتهية",
-    "empty_expired_description": "ليس لديك أي قوائم منتهية."
+    "empty_expired_description": "ليس لديك أي قوائم منتهية.",
+    "views_count_aria_few": "{{count}} مشاهدة",
+    "views_count_aria_many": "{{count}} مشاهدة",
+    "views_count_aria_one": "{{count}} مشاهدة",
+    "views_count_aria_other": "{{count}} مشاهدة",
+    "views_count_aria_two": "{{count}} مشاهدة",
+    "views_count_aria_zero": "{{count}} مشاهدة"
   },
   "my_offers": {
     "page_title": "عروضى - السوق",
@@ -485,7 +533,11 @@
     "empty_collections_title": "لا توجد مجموعات بعد",
     "empty_collections_description": "أنشئ مجموعة لتنظيم العناصر المفضلة لديك في السوق.",
     "sign_in_title": "تسجيل الدخول مطلوب",
-    "sign_in_description": "قم بتسجيل الدخول لإدارة مجموعاتك والبحث المحفوظ."
+    "sign_in_description": "قم بتسجيل الدخول لإدارة مجموعاتك والبحث المحفوظ.",
+    "item_count_few": "{{count}} عناصر",
+    "item_count_many": "{{count}} عناصر",
+    "item_count_two": "{{count}} عناصر",
+    "item_count_zero": "{{count}} عناصر"
   },
   "saved_searches": {
     "tab_title": "البحث المحفوظ",
@@ -518,7 +570,15 @@
     "duration_days_one": "{{count}} يوم",
     "duration_days_other": "{{count}} أيام",
     "duration_hours_one": "{{count}} ساعة",
-    "duration_hours_other": "{{count}} ساعات"
+    "duration_hours_other": "{{count}} ساعات",
+    "duration_days_few": "{{count}} أيام",
+    "duration_days_many": "{{count}} أيام",
+    "duration_days_two": "{{count}} أيام",
+    "duration_days_zero": "{{count}} أيام",
+    "duration_hours_few": "{{count}} ساعات",
+    "duration_hours_many": "{{count}} ساعات",
+    "duration_hours_two": "{{count}} ساعات",
+    "duration_hours_zero": "{{count}} ساعات"
   },
   "free": {
     "page_title": "أشياء مجانية",
@@ -584,7 +644,25 @@
       "declined": "مرفوض",
       "completed": "مكتمل",
       "cancelled": "ملغى"
-    }
+    },
+    "offers_title_count_few": "عروض التوصيل ({{count}})",
+    "offers_title_count_many": "عروض التوصيل ({{count}})",
+    "offers_title_count_one": "عروض التوصيل ({{count}})",
+    "offers_title_count_other": "عروض التوصيل ({{count}})",
+    "offers_title_count_two": "عروض التوصيل ({{count}})",
+    "offers_title_count_zero": "عروض التوصيل ({{count}})",
+    "time_credits_value_few": "{{count}} رصيد زمني",
+    "time_credits_value_many": "{{count}} رصيد زمني",
+    "time_credits_value_one": "{{count}} رصيد زمني",
+    "time_credits_value_other": "{{count}} رصيد زمني",
+    "time_credits_value_two": "{{count}} رصيد زمني",
+    "time_credits_value_zero": "{{count}} رصيد زمني",
+    "estimated_minutes_few": "~{{count}} دقيقة",
+    "estimated_minutes_many": "~{{count}} دقيقة",
+    "estimated_minutes_one": "~{{count}} دقيقة",
+    "estimated_minutes_other": "~{{count}} دقيقة",
+    "estimated_minutes_two": "~{{count}} دقيقة",
+    "estimated_minutes_zero": "~{{count}} دقيقة"
   },
   "pickup": {
     "my_pickups_title": "عمليات الاستلام الخاصة بي",
@@ -613,7 +691,19 @@
     "oversold_protected": "رفض الطلبات التي تتجاوز المخزون",
     "sold_out": "نفذت الكمية",
     "low_chip": "المخزون: {{count}} (منخفض)",
-    "count_chip": "المخزون: {{count}}"
+    "count_chip": "المخزون: {{count}}",
+    "low_chip_few": "المخزون: {{count}} (منخفض)",
+    "low_chip_many": "المخزون: {{count}} (منخفض)",
+    "low_chip_one": "المخزون: {{count}} (منخفض)",
+    "low_chip_other": "المخزون: {{count}} (منخفض)",
+    "low_chip_two": "المخزون: {{count}} (منخفض)",
+    "low_chip_zero": "المخزون: {{count}} (منخفض)",
+    "count_chip_few": "المخزون: {{count}}",
+    "count_chip_many": "المخزون: {{count}}",
+    "count_chip_one": "المخزون: {{count}}",
+    "count_chip_other": "المخزون: {{count}}",
+    "count_chip_two": "المخزون: {{count}}",
+    "count_chip_zero": "المخزون: {{count}}"
   },
   "ai_reply": {
     "suggest": "اقترح ردًا",
@@ -647,7 +737,13 @@
     "search_this_area": "ابحث في هذه المنطقة",
     "distance_km": "{{km}} كم بعيد",
     "distance_meters": "{{m}}م بعيد",
-    "view_toggle": "وضع العرض"
+    "view_toggle": "وضع العرض",
+    "results_count_few": "{{count}} قوائم وجدت بالقرب",
+    "results_count_many": "{{count}} قوائم وجدت بالقرب",
+    "results_count_one": "{{count}} قوائم وجدت بالقرب",
+    "results_count_other": "{{count}} قوائم وجدت بالقرب",
+    "results_count_two": "{{count}} قوائم وجدت بالقرب",
+    "results_count_zero": "{{count}} قوائم وجدت بالقرب"
   },
   "shipping": {
     "title": "خيارات الشحن",
@@ -778,7 +874,13 @@
       "select_rating": "يرجى اختيار تقييم",
       "success": "تم إرسال التقييم بنجاح!",
       "error": "فشل في إرسال التقييم"
-    }
+    },
+    "quantity_multiplier_few": "×{{count}}",
+    "quantity_multiplier_many": "×{{count}}",
+    "quantity_multiplier_one": "×{{count}}",
+    "quantity_multiplier_other": "×{{count}}",
+    "quantity_multiplier_two": "×{{count}}",
+    "quantity_multiplier_zero": "×{{count}}"
   },
   "onboarding": {
     "page_title": "توجيه البائع - السوق",

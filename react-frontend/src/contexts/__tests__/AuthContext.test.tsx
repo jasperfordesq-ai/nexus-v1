@@ -179,6 +179,17 @@ describe('AuthContext', () => {
       expect(result.current.user).toBeNull();
     });
 
+    it('does not delete a refresh-only credential during cold-start restoration', async () => {
+      mockTokenManager.hasAccessToken.mockReturnValue(false);
+      mockTokenManager.hasRefreshToken.mockReturnValue(true);
+
+      const { result } = renderHook(() => useAuth(), { wrapper: authWrapper });
+
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+      expect(mockApiGet).not.toHaveBeenCalled();
+      expect(mockTokenManager.clearTokens).not.toHaveBeenCalled();
+    });
+
     it('exposes the expected API surface (login, logout, refreshUser, clearError)', async () => {
       mockApiGet.mockResolvedValue({ success: false });
 
@@ -220,7 +231,11 @@ describe('AuthContext', () => {
 
     it('sets isAuthenticated false and clears tokens when stored token is invalid', async () => {
       mockTokenManager.hasAccessToken.mockReturnValue(true);
-      mockApiGet.mockResolvedValue({ success: false, error: 'Token invalid' });
+      mockApiGet.mockResolvedValue({
+        success: false,
+        error: 'Token invalid',
+        code: 'AUTH_TOKEN_INVALID',
+      });
 
       const { result } = renderHook(() => useAuth(), { wrapper: authWrapper });
 
@@ -233,18 +248,67 @@ describe('AuthContext', () => {
       expect(mockTokenManager.clearTokens).toHaveBeenCalled();
     });
 
-    it('goes to idle (not error) when token fetch throws a network error', async () => {
+    it.each([
+      ['network failure', { success: false, code: 'NETWORK_ERROR' }],
+      ['timeout', { success: false, code: 'TIMEOUT' }],
+      ['caller cancellation', { success: false, code: 'CANCELLED' }],
+      ['server failure', { success: false, code: 'HTTP_500' }],
+      ['maintenance response', { success: false, code: 'SERVICE_UNAVAILABLE' }],
+      ['refresh transport failure', { success: false, code: 'AUTH_REFRESH_UNAVAILABLE' }],
+    ])('keeps a cold-start token in a recoverable state after %s', async (_label, response) => {
       mockTokenManager.hasAccessToken.mockReturnValue(true);
-      mockApiGet.mockRejectedValue(new Error('Network error'));
+      mockApiGet.mockResolvedValue(response);
 
       const { result } = renderHook(() => useAuth(), { wrapper: authWrapper });
 
       await waitFor(() => {
-        expect(result.current.isLoading).toBe(false);
+        expect(mockApiGet).toHaveBeenCalledWith('/v2/users/me');
       });
 
+      expect(mockTokenManager.clearTokens).not.toHaveBeenCalled();
       expect(result.current.isAuthenticated).toBe(false);
-      expect(result.current.status).toBe('idle');
+      expect(result.current.status).toBe('loading');
+      expect(result.current.isLoading).toBe(true);
+    });
+
+    it('retries a recoverable cold-start check when the browser comes online', async () => {
+      mockTokenManager.hasAccessToken.mockReturnValue(true);
+      mockApiGet
+        .mockResolvedValueOnce({ success: false, code: 'NETWORK_ERROR' })
+        .mockResolvedValueOnce({ success: true, data: mockUser });
+
+      const { result } = renderHook(() => useAuth(), { wrapper: authWrapper });
+
+      await waitFor(() => expect(mockApiGet).toHaveBeenCalledTimes(1));
+      act(() => window.dispatchEvent(new Event('online')));
+
+      await waitFor(() => expect(result.current.isAuthenticated).toBe(true));
+      expect(mockApiGet).toHaveBeenCalledTimes(2);
+      expect(mockTokenManager.clearTokens).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ['NETWORK_ERROR'],
+      ['TIMEOUT'],
+      ['CANCELLED'],
+      ['HTTP_500'],
+      ['AUTH_REFRESH_UNAVAILABLE'],
+    ])('preserves the authenticated shell when refreshUser resolves %s', async (code) => {
+      mockTokenManager.hasAccessToken.mockReturnValue(true);
+      mockApiGet
+        .mockResolvedValueOnce({ success: true, data: mockUser })
+        .mockResolvedValueOnce({ success: false, code });
+
+      const { result } = renderHook(() => useAuth(), { wrapper: authWrapper });
+      await waitFor(() => expect(result.current.isAuthenticated).toBe(true));
+
+      await act(async () => {
+        await result.current.refreshUser();
+      });
+
+      expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user).toEqual(mockUser);
+      expect(mockTokenManager.clearTokens).not.toHaveBeenCalled();
     });
   });
 

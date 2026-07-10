@@ -57,11 +57,11 @@ interface GoalTemplatePickerModalProps {
 const categoryColors: Record<string, string> = {
   health: 'from-emerald-500 to-green-600',
   fitness: 'from-orange-500 to-red-500',
-  learning: 'from-blue-500 to-indigo-600',
-  social: 'from-purple-500 to-pink-500',
+  learning: 'from-blue-500 to-accent-gradient-end',
+  social: 'from-accent to-pink-500',
   community: 'from-amber-500 to-orange-600',
   financial: 'from-yellow-500 to-amber-600',
-  personal: 'from-indigo-500 to-purple-600',
+  personal: 'from-accent to-accent-gradient-end',
   default: 'from-gray-500 to-gray-600',
 };
 
@@ -190,7 +190,7 @@ export function GoalTemplatePickerModal({
                     size="sm"
                     variant={!selectedCategory ? 'solid' : 'flat'}
                     className={!selectedCategory
-                      ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                      ? 'bg-gradient-to-r from-accent to-accent-gradient-end text-white'
                       : 'bg-theme-elevated text-theme-muted'}
                     onPress={() => setSelectedCategory(null)}
                   >
@@ -270,13 +270,13 @@ export function GoalTemplatePickerModal({
                         <Button
                           size="sm"
                           isIconOnly
-                          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white opacity-80 group-hover:opacity-100 transition-opacity"
+                          className="size-11 min-h-11 min-w-11 p-0 bg-gradient-to-r from-accent to-accent-gradient-end text-white opacity-80 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
                           onPress={() => handleUseTemplate(template)}
                           isLoading={creatingFromId === template.id}
                           isDisabled={creatingFromId !== null}
                           aria-label={t('template.use_template_aria', { title: template.title })}
                         >
-                          <ChevronRight className="w-4 h-4" />
+                          <ChevronRight className="size-4" aria-hidden="true" />
                         </Button>
                       </div>
                     </GlassCard>

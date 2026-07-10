@@ -43,7 +43,7 @@ import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { formatDateTime, formatDateValue, formatMonthShort, responsiveThumbnailProps } from '@/lib/helpers';
+import { formatDateTime, formatDateValue, formatMonthShort, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import type { ProximityFilterParams } from '@/components/proximity/ProximityFilter';
@@ -280,18 +280,16 @@ export function EventsPage() {
         description={t('page_description')}
         accent="amber"
         icon={<CalendarDays className="h-7 w-7" aria-hidden="true" />}
-        stats={totalCount != null && !isLoading ? [{ label: t('hero_events_label'), value: totalCount.toLocaleString() }] : undefined}
+        stats={totalCount != null && !isLoading ? [{ label: t('hero_events_label'), value: totalCount.toLocaleString(getFormattingLocale()) }] : undefined}
         action={
           isAuthenticated ? (
-            <Link to={tenantPath('/events/create')}>
-              <Button
-                color="primary"
-                className="font-semibold"
-                startContent={<Plus className="w-4 h-4" />}
-              >
-                {t('create_event')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/events/create')}
+              color="primary"
+              className="font-semibold"
+              startContent={<Plus className="w-4 h-4" />}
+            >
+              {t('create_event')}
+            </Button>
           ) : undefined
         }
       />
@@ -380,7 +378,7 @@ export function EventsPage() {
               key={cat.id}
               id={cat.id}
               variant="ghost"
-              className="bg-theme-elevated text-theme-muted transition-colors hover:bg-theme-hover data-[selected=true]:bg-linear-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white"
+              className="bg-theme-elevated text-theme-muted transition-colors hover:bg-theme-hover data-[selected=true]:bg-linear-to-r data-[selected=true]:from-accent data-[selected=true]:to-accent-gradient-end data-[selected=true]:text-white"
             >
               <IconComp className="w-3.5 h-3.5" aria-hidden="true" />
               {cat.name}
@@ -438,11 +436,9 @@ export function EventsPage() {
               tips={[t('empty_tip_workshops'), t('empty_tip_social'), t('empty_tip_online')]}
               action={
                 isAuthenticated && (
-                  <Link to={tenantPath('/events/create')}>
-                    <Button color="primary">
-                      {t('create_event')}
-                    </Button>
-                  </Link>
+                  <Button as={Link} to={tenantPath('/events/create')} color="primary">
+                    {t('create_event')}
+                  </Button>
                 )
               }
             />
@@ -479,7 +475,7 @@ export function EventsPage() {
                   {totalCount != null && totalCount > 0 && (
                     <div className="space-y-1.5">
                       <div className="flex justify-between text-xs text-theme-muted px-1">
-                        <span>{events.length.toLocaleString()} / {totalCount.toLocaleString()}</span>
+                        <span>{events.length.toLocaleString(getFormattingLocale())} / {totalCount.toLocaleString(getFormattingLocale())}</span>
                         <span className="font-medium text-theme-secondary">{Math.round((events.length / totalCount) * 100)}%</span>
                       </div>
                       <Progress
@@ -498,7 +494,7 @@ export function EventsPage() {
                       isLoading={isLoadingMore}
                     >
                       {totalCount != null && totalCount > events.length
-                        ? t('load_more_count', { remaining: (totalCount - events.length).toLocaleString() })
+                        ? t('load_more_count', { remaining: (totalCount - events.length).toLocaleString(getFormattingLocale()) })
                         : t('load_more')}
                     </Button>
                   </div>

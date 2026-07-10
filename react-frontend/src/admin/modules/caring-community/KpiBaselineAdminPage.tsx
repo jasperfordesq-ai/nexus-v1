@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -68,11 +69,11 @@ type AdminT = (key: string, options?: Record<string, unknown>) => string;
 
 function fmt(val: number | null): string {
   if (val === null || val === undefined) return '—';
-  return Number.isInteger(val) ? val.toLocaleString() : val.toFixed(1);
+  return Number.isInteger(val) ? val.toLocaleString(getFormattingLocale()) : val.toFixed(1);
 }
 
 function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  return new Date(iso).toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 // ---------------------------------------------------------------------------

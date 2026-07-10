@@ -104,7 +104,9 @@
       "stats": {
         "total_runs": "total runs",
         "total_proposals": "total proposals",
-        "pending_review": "{{count}} pending review"
+        "pending_review": "{{count}} pending review",
+        "pending_review_one": "{{count}} pending review",
+        "pending_review_other": "{{count}} pending review"
       },
       "agent_types": {
         "activity_summary": "Activity Summary",
@@ -219,7 +221,9 @@
         "proposals_table_aria": "Run proposals",
         "columns": {
           "subject": "Subject"
-        }
+        },
+        "proposals_count_one": "Proposals ({{count}})",
+        "proposals_count_other": "Proposals ({{count}})"
       },
       "toasts": {
         "approve_eligible_failed": "Failed to approve eligible proposals.",
@@ -235,7 +239,9 @@
         "run_details_load_failed": "Failed to load run details.",
         "run_trigger_failed": "Failed to trigger run.",
         "run_triggered": "Run triggered: {{count}} proposals generated.",
-        "runs_load_failed": "Failed to load runs."
+        "runs_load_failed": "Failed to load runs.",
+        "run_triggered_one": "Run triggered: {{count}} proposals generated.",
+        "run_triggered_other": "Run triggered: {{count}} proposals generated."
       }
     },
     "module_docs": {
@@ -302,7 +308,9 @@
         "save_failed": "Save failed.",
         "seed_failed": "Seed failed.",
         "seeded": "Seeded {{count}} default doc(s).",
-        "updated": "Doc updated."
+        "updated": "Doc updated.",
+        "seeded_one": "Seeded {{count}} default doc(s).",
+        "seeded_other": "Seeded {{count}} default doc(s)."
       }
     },
     "trace_metrics": {

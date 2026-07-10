@@ -23,14 +23,18 @@
     "title": "Aankomende Evenementen",
     "subtitle": "Sluit je aan bij jouw gemeenschap",
     "online": "Online",
-    "attending": "{{count}} aanwezig"
+    "attending": "{{count}} aanwezig",
+    "attending_one": "{{count}} aanwezig",
+    "attending_other": "{{count}} aanwezig"
   },
   "active_groups": {
     "title": "Actieve Groepen",
     "subtitle": "Verbind met gelijkgestemde leden",
     "members": "{{count}} leden",
     "view_group": "Bekijk Groep",
-    "view_group_named": "View group: {{name}}"
+    "view_group_named": "View group: {{name}}",
+    "members_one": "{{count}} leden",
+    "members_other": "{{count}} leden"
   },
   "top_contributors": {
     "title": "Top Bijdragers",
@@ -56,12 +60,18 @@
     "subtitle": "Deel je ideeën en maak impact",
     "ideas_count": "{{count}} ideeën",
     "ends": "Eindigt {{date}}",
-    "progress": "Voortgang van de uitdaging"
+    "progress": "Voortgang van de uitdaging",
+    "ideas_count_one": "{{count}} ideeën",
+    "ideas_count_other": "{{count}} ideeën"
   },
   "time_ago": {
     "just_now": "Zojuist",
     "hours_ago": "{{count}} uur geleden",
-    "days_ago": "{{count}} dagen geleden"
+    "days_ago": "{{count}} dagen geleden",
+    "hours_ago_one": "{{count}} uur geleden",
+    "hours_ago_other": "{{count}} uur geleden",
+    "days_ago_one": "{{count}} dagen geleden",
+    "days_ago_other": "{{count}} dagen geleden"
   },
   "error_loading": "We konden de Ontdek-pagina niet laden. Dit kan een tijdelijk probleem zijn.",
   "retry": "Opnieuw proberen",
@@ -82,18 +92,26 @@
     "title": "Van de Blog",
     "subtitle": "Laatste verhalen uit jouw gemeenschap",
     "read_time": "{{count}} min lezen",
-    "views": "{{count}} weergaven"
+    "views": "{{count}} weergaven",
+    "read_time_one": "{{count}} min lezen",
+    "read_time_other": "{{count}} min lezen",
+    "views_one": "{{count}} weergaven",
+    "views_other": "{{count}} weergaven"
   },
   "volunteering": {
     "title": "Vrijwilligersmogelijkheden",
     "subtitle": "Maak een verschil in jouw gemeenschap",
     "applications": "{{count}} aangemeld",
-    "view_opportunity": "Bekijk Kans"
+    "view_opportunity": "Bekijk Kans",
+    "applications_one": "{{count}} aangemeld",
+    "applications_other": "{{count}} aangemeld"
   },
   "organisations": {
     "title": "Organisaties",
     "subtitle": "Gemeenschapspartners die impact maken",
-    "opportunities": "{{count}} mogelijkheden"
+    "opportunities": "{{count}} mogelijkheden",
+    "opportunities_one": "{{count}} mogelijkheden",
+    "opportunities_other": "{{count}} mogelijkheden"
   },
   "polls": {
     "title": "Actieve Peilingen",
@@ -102,19 +120,27 @@
     "options": "{{count}} opties",
     "vote_now": "Stem Nu",
     "vote_now_for": "Stem nu op: {{question}}",
-    "closes": "Sluit {{date}}"
+    "closes": "Sluit {{date}}",
+    "options_one": "{{count}} opties",
+    "options_other": "{{count}} opties",
+    "votes_one": "{{count}} stemmen",
+    "votes_other": "{{count}} stemmen"
   },
   "in_demand_skills": {
     "title": "Vaardigheden in Vraag",
     "subtitle": "Meest gevraagde vaardigheden in jouw gemeenschap",
     "requested": "{{count}} vraagt aan",
     "offered": "{{count}} biedt aan",
-    "you_can_help": "Je kunt helpen!"
+    "you_can_help": "Je kunt helpen!",
+    "requested_one": "{{count}} vraagt aan",
+    "requested_other": "{{count}} vraagt aan"
   },
   "resources": {
     "title": "Uitgelichte bronnen",
     "subtitle": "Gidsen en materialen voor jouw gemeenschap",
-    "views": "{{count}} weergaven"
+    "views": "{{count}} weergaven",
+    "views_one": "{{count}} weergaven",
+    "views_other": "{{count}} weergaven"
   },
   "jobs": {
     "title": "Vacatures",

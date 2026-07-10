@@ -33,6 +33,10 @@ describe('HeroUI visual contract smoke guard', () => {
 
     expect(source).toContain('@/components/LanguageSwitcher');
     expect(source).toContain('./SourceRepositoryLink');
+    expect(source).toContain('text-theme-primary');
+    expect(source).toContain('text-theme-subtle');
+    expect(source).not.toContain('<SourceRepositoryLink inverse');
+    expect(source).not.toMatch(/text-white\//);
     expect(source).not.toMatch(/<select\b/);
     expect(source).not.toMatch(/<option\b/);
   });

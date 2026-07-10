@@ -396,7 +396,8 @@
       },
       "messages": {
         "recomputed": "{{count}} 人のメンバーの信頼レベルを再計算しました。",
-        "saved": "Trust tier settings saved."
+        "saved": "Trust tier settings saved.",
+        "recomputed_other": "{{count}} 人のメンバーの信頼レベルを再計算しました。"
       },
       "recompute_confirm": "すべてのメンバーの信頼層を再計算しますか?これには数分かかる場合があります。"
     },
@@ -741,7 +742,11 @@
       "escalate_failed": "レビューをエスカレーションできませんでした。",
       "approve_success": "レビューが承認されました。",
       "decline_success": "レビューは拒否されました。",
-      "decision_failed": "決定を記録できませんでした。"
+      "decision_failed": "決定を記録できませんでした。",
+      "manual_escalation_note_other": "{{count}} の保留日数が経過した後、手動でエスカレーションされました。",
+      "escalated_count_other": "{{count}} がエスカレーションされました",
+      "overdue_count_other": "{{count}} 期限切れ",
+      "age_days_other": "{{count}} 1 日目"
     },
     "paper_onboarding": {
       "title": "Paper Form Intake",
@@ -818,7 +823,9 @@
         "investigating": "調査中",
         "resolved": "解決済み",
         "dismissed": "解雇されました"
-      }
+      },
+      "age_hours_other": "{{count}}h",
+      "age_days_other": "{{count}}日"
     },
     "role_pack": {
       "title": "役割のプリセット",
@@ -857,7 +864,8 @@
           "title": "信頼できるレビュアー",
           "description": "軽いタッチで監視しながら時間をすばやく承認します。"
         }
-      }
+      },
+      "available_count_other": "{{count}} 件のロールプリセットが利用可能"
     },
     "policy": {
       "title": "ワークフローポリシー",
@@ -925,7 +933,8 @@
       "loading_favours": "好意を読み込んでいます...",
       "empty": "まだ好意は記録されていません。",
       "anonymous": "匿名",
-      "unknown": "未知"
+      "unknown": "未知",
+      "total_recorded_other": "合計 {{count}} 件記録済み"
     },
     "assisted_onboarding": {
       "title": "Assisted Onboarding",
@@ -1103,6 +1112,12 @@
         "completed": "完了しました",
         "cancelled": "キャンセル"
       }
+    },
+    "invite_card": {
+      "brand": "Community Caring",
+      "subtitle": "隣人から隣人への招待状",
+      "instructions": "このコードを入力するか、下のリンクにアクセスして参加してください。",
+      "valid_until": "{{date}} まで有効"
     }
   },
   "category_coefficients": {
@@ -1218,7 +1233,8 @@
       "export_empty": "エクスポートが空で返されました",
       "exported": "境界マップがエクスポートされました",
       "export_failed": "境界マップのエクスポートに失敗しました"
-    }
+    },
+    "overrides_count_other": "{{count}} オーバーライド"
   },
   "data_quality": {
     "meta": {
@@ -1255,7 +1271,8 @@
       "label": "まとめ：",
       "count": "{{count}} {{label}}",
       "generated": "生成 {{date}}",
-      "affected": "影響を受ける"
+      "affected": "影響を受ける",
+      "count_other": "{{count}} {{label}}"
     },
     "drilldown": {
       "subtitle": "影響を受ける行は最大 50 行 - 起動前に解決または文書化します。",
@@ -1618,7 +1635,12 @@
       "request_meta": "時期: {{when}} - ユーザー番号{{userId}} - 年齢 {{age}}",
       "target_hours": "ターゲット {{hours}}h",
       "over_by": "{{duration}}までに終了",
-      "left": "{{duration}} 左"
+      "left": "{{duration}} 左",
+      "subtitle_other": "{{count}} オープン - 最初にソート違反",
+      "all_count_other": "すべて ({{count}})",
+      "breached_count_other": "侵害されました ({{count}})",
+      "at_risk_count_other": "危険にさらされています ({{count}})",
+      "on_track_count_other": "順調に進んでいます ({{count}})"
     },
     "resolved": {
       "title": "最近解決されました (過去 72 時間)",
@@ -1722,14 +1744,19 @@
       "pending": "保留中: {{count}}",
       "in_progress": "進行中: {{count}}",
       "decided": "決定: {{count}}",
-      "blocked": "ブロックされました: {{count}}"
+      "blocked": "ブロックされました: {{count}}",
+      "pending_other": "保留中: {{count}}",
+      "in_progress_other": "進行中: {{count}}",
+      "decided_other": "決定: {{count}}",
+      "blocked_other": "ブロックされました: {{count}}"
     },
     "gate": {
       "closed": "ゲートは閉じています - 発射準備完了",
       "open": "ゲートは開いています - 依然として決定が必要です",
       "decided_count": "{{total}} 件中 {{decided}} 件が決定しました",
       "blocked_count": "- {{count}} がブロックされました",
-      "progress_aria": "意思決定ゲートの進捗状況"
+      "progress_aria": "意思決定ゲートの進捗状況",
+      "blocked_count_other": "- {{count}} がブロックされました"
     },
     "fields": {
       "value": "価値",
@@ -1874,7 +1901,8 @@
     "contacts": {
       "title": "連絡先 ({{count}})",
       "empty": "現在のフィルターに一致する連絡先がありません。",
-      "table_aria": "リードナーチャリングの連絡先"
+      "table_aria": "リードナーチャリングの連絡先",
+      "title_other": "連絡先 ({{count}})"
     },
     "table": {
       "name_email": "名前/メールアドレス",
@@ -1961,7 +1989,8 @@
       "audience_description": "AI がトーンと語彙を適切に調整できるように、このアナウンスの対象者 (例: 「すべての住民」、「ボランティア」、「自治体の連絡先」) を指定します。",
       "polished_text": "洗練されたテキスト",
       "reason": "理由",
-      "reason_placeholder": "なぜこの提案は拒否されるのでしょうか?"
+      "reason_placeholder": "なぜこの提案は拒否されるのでしょうか?",
+      "character_count_other": "{{count}} / 4000 文字"
     },
     "status": {
       "proposed": "提案された",
@@ -2228,7 +2257,8 @@
       "ready_body_suffix": "コーディネーター チームがこれを一方的な決定を下す準​​備ができているとき。",
       "blocked_title": "まだ起動できません - {{count}} ブロッカーが残っています",
       "blocked_title_plural": "まだ起動できません - {{count}} ブロッカーが残っています",
-      "blocked_body": "起動ボタンを有効にする前に、以下のすべてのセクションを解決してください。"
+      "blocked_body": "起動ボタンを有効にする前に、以下のすべてのセクションを解決してください。",
+      "blocked_title_other": "まだ起動できません - {{count}} ブロッカーが残っています"
     },
     "overall": {
       "ready": "パイロットは打ち上げの準備ができています",
@@ -2277,7 +2307,8 @@
       "load_failed": "打ち上げ準備レポートをロードできませんでした。",
       "unexpected_response": "打ち上げ準備状況レポートから予期しない応答が返されました。",
       "unavailable_title": "準備状況レポートは利用できません"
-    }
+    },
+    "more_count_other": "+{{count}} もっと見る"
   },
   "pilot_scoreboard": {
     "meta": {
@@ -2419,7 +2450,8 @@
       "placeholder_label": "{{placeholder}}",
       "rendered_markdown": "レンダリングされた Markdown ({{count}} 文字)",
       "missing_placeholder_count_one": "{{count}} プレースホルダーがありません",
-      "missing_placeholder_count_other": "{{count}} プレースホルダーがありません"
+      "missing_placeholder_count_other": "{{count}} プレースホルダーがありません",
+      "rendered_markdown_other": "レンダリングされた Markdown ({{count}} 文字)"
     },
     "exports": {
       "title": "データセットのエクスポート履歴",
@@ -2529,7 +2561,8 @@
       "title": "ドライランプレビュー",
       "candidates": "{{count}} 人の候補者",
       "empty": "現在適格な候補者はいません。",
-      "table_aria": "ナッジ候補のドライラン"
+      "table_aria": "ナッジ候補のドライラン",
+      "candidates_other": "{{count}} 人の候補者"
     },
     "recent": {
       "title": "最近のナッジ",
@@ -2559,7 +2592,9 @@
       "save_failed": "設定の保存に失敗しました",
       "dry_run": "予行演習: {{count}} 人の適格な候補者",
       "dispatched": "{{count}} ナッジをディスパッチしました",
-      "dispatch_failed": "派遣失敗"
+      "dispatch_failed": "派遣失敗",
+      "dry_run_other": "予行演習: {{count}} 人の適格な候補者",
+      "dispatched_other": "{{count}} ナッジをディスパッチしました"
     }
   },
   "sub_regions": {

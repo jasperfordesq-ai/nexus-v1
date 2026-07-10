@@ -5,6 +5,7 @@
 
 import { Button } from '@/components/ui/Button';
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { StarRating } from '@/components/ui/StarRating';
 import { Textarea } from '@/components/ui/Textarea';
 /**
  * RatingModal - Modal for rating a completed exchange (W10)
@@ -30,7 +31,6 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
   const toast = useToast();
   const { t } = useTranslation('wallet');
   const [rating, setRating] = useState(0);
-  const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -66,7 +66,16 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
     }
   }
 
-  const displayRating = hoveredRating || rating;
+  const ratingDescriptions = [
+    t('rating.poor'),
+    t('rating.fair'),
+    t('rating.good'),
+    t('rating.very_good'),
+    t('rating.excellent'),
+  ];
+  const ratingPrompt = otherPartyName
+    ? t('rating.prompt_with_name', { name: otherPartyName })
+    : t('rating.prompt');
 
   return (
     <Modal
@@ -84,44 +93,17 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
           {t('rating.title')}
         </ModalHeader>
         <ModalBody>
-          <p className="text-theme-muted mb-4">
-            {otherPartyName ? t('rating.prompt_with_name', { name: otherPartyName }) : t('rating.prompt')}
-          </p>
-
-          {/* Star Rating */}
-          <div className="flex justify-center gap-2 mb-6">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Button
-                key={star}
-                isIconOnly
-                size="sm"
-                variant="tertiary"
-                onPress={() => setRating(star)}
-                onMouseEnter={() => setHoveredRating(star)}
-                onMouseLeave={() => setHoveredRating(0)}
-                className="min-h-12 min-w-12 p-1 transition-transform hover:scale-110"
-                aria-label={`${star} star${star > 1 ? 's' : ''}`}
-              >
-                <Star
-                  className={`w-10 h-10 transition-colors ${
-                    star <= displayRating
-                      ? 'text-amber-400 fill-amber-400'
-                      : 'text-theme-muted'
-                  }`}
-                />
-              </Button>
-            ))}
-          </div>
-
-          {displayRating > 0 && (
-            <p className="text-center text-sm text-theme-muted mb-4">
-              {displayRating === 1 && t('rating.poor')}
-              {displayRating === 2 && t('rating.fair')}
-              {displayRating === 3 && t('rating.good')}
-              {displayRating === 4 && t('rating.very_good')}
-              {displayRating === 5 && t('rating.excellent')}
-            </p>
-          )}
+          <StarRating
+            value={rating}
+            onChange={setRating}
+            label={ratingPrompt}
+            getOptionLabel={(star) => ratingDescriptions[star - 1] ?? String(star)}
+            getValueDescription={(star) => ratingDescriptions[star - 1]}
+            labelClassName="mb-3 basis-full text-left text-sm text-theme-muted"
+            descriptionClassName="mb-4 mt-1 text-center"
+            className="mb-2 justify-center"
+            isRequired
+          />
 
           <Textarea
             label={t('rating.comment_label')}

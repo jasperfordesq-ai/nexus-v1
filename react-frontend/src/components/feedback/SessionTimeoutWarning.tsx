@@ -25,11 +25,28 @@ import LogOut from 'lucide-react/icons/log-out';
 import { SESSION_EXPIRING_EVENT, tokenManager } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/contexts/TenantContext';
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui';
 
 // How long to count down in the warning (seconds shown to user)
 const COUNTDOWN_SECONDS = 30;
+const TOKEN_CHECK_INTERVAL_MS = 5000;
 const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+
+function getTokenSecondsUntilExpiry(token: string | null): number | null {
+  if (!token) return null;
+
+  try {
+    const encodedPayload = token.split('.')[1];
+    if (!encodedPayload) return null;
+    const base64 = encodedPayload.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+    const payload = JSON.parse(atob(padded)) as { exp?: unknown };
+    if (typeof payload.exp !== 'number') return null;
+    return Math.ceil(payload.exp - Date.now() / 1000);
+  } catch {
+    return null;
+  }
+}
 
 export function SessionTimeoutWarning() {
   const { t } = useTranslation('errors');
@@ -42,6 +59,7 @@ export function SessionTimeoutWarning() {
   const [isExtending, setIsExtending] = useState(false);
 
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const observedAccessTokenRef = useRef<string | null>(null);
   const isAuthenticatedRef = useRef(isAuthenticated);
   isAuthenticatedRef.current = isAuthenticated;
 
@@ -52,9 +70,9 @@ export function SessionTimeoutWarning() {
     }
   }, []);
 
-  const startCountdown = useCallback(() => {
+  const startCountdown = useCallback((initialSeconds = COUNTDOWN_SECONDS) => {
     stopCountdown();
-    setCountdown(COUNTDOWN_SECONDS);
+    setCountdown(Math.max(1, Math.ceil(initialSeconds)));
     countdownRef.current = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -76,8 +94,9 @@ export function SessionTimeoutWarning() {
     try {
       const refreshToken = tokenManager.getRefreshToken();
       if (!refreshToken) {
-        // Nothing to refresh — close the warning silently
         handleClose();
+        await logout();
+        navigate(tenantPath('/login'));
         return;
       }
 
@@ -98,6 +117,7 @@ export function SessionTimeoutWarning() {
       if (response.ok) {
         const data = await response.json();
         if (data.success && data.access_token) {
+          observedAccessTokenRef.current = data.access_token;
           tokenManager.setAccessToken(data.access_token);
           if (data.refresh_token) {
             tokenManager.setRefreshToken(data.refresh_token);
@@ -135,11 +155,15 @@ export function SessionTimeoutWarning() {
 
   // Listen for the warning event from AuthContext
   useEffect(() => {
-    const handleExpiring = () => {
+    const handleExpiring = (event: Event) => {
       // Only show if user is currently authenticated
       if (!isAuthenticatedRef.current) return;
+      const requestedSeconds = event instanceof CustomEvent
+        && typeof event.detail?.secondsRemaining === 'number'
+        ? event.detail.secondsRemaining
+        : COUNTDOWN_SECONDS;
       setIsOpen(true);
-      startCountdown();
+      startCountdown(requestedSeconds);
     };
 
     window.addEventListener(SESSION_EXPIRING_EVENT, handleExpiring);
@@ -148,6 +172,42 @@ export function SessionTimeoutWarning() {
       stopCountdown();
     };
   }, [startCountdown, stopCountdown]);
+
+  // Interactive login flows are scheduled by AuthContext. Restored sessions
+  // and API-client refreshes do not carry that callback, so observe the JWT
+  // expiry and schedule those token lifetimes here as well.
+  useEffect(() => {
+    if (!isAuthenticated) {
+      observedAccessTokenRef.current = null;
+      return;
+    }
+
+    const syncAccessTokenExpiry = () => {
+      const accessToken = tokenManager.getAccessToken();
+      if (!accessToken || accessToken === observedAccessTokenRef.current) return;
+
+      observedAccessTokenRef.current = accessToken;
+      const secondsRemaining = getTokenSecondsUntilExpiry(accessToken);
+      if (secondsRemaining === null || secondsRemaining <= 0) return;
+
+      if (secondsRemaining <= COUNTDOWN_SECONDS + 5) {
+        window.dispatchEvent(new CustomEvent(SESSION_EXPIRING_EVENT, {
+          detail: { secondsRemaining },
+        }));
+      } else {
+        scheduleSessionWarning(secondsRemaining);
+      }
+    };
+
+    syncAccessTokenExpiry();
+    const interval = window.setInterval(syncAccessTokenExpiry, TOKEN_CHECK_INTERVAL_MS);
+    window.addEventListener('storage', syncAccessTokenExpiry);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener('storage', syncAccessTokenExpiry);
+    };
+  }, [isAuthenticated, scheduleSessionWarning]);
 
   // Close and cancel countdown when the user is no longer authenticated
   // (e.g., they logged out in another tab)
@@ -160,9 +220,10 @@ export function SessionTimeoutWarning() {
   return (
     <Modal
       isOpen={isOpen}
-      onClose={handleClose}
       size="sm"
       isDismissable={false}
+      isKeyboardDismissDisabled
+      hideCloseButton
       classNames={{
         base: 'bg-overlay border border-theme-default',
       }}
@@ -173,7 +234,6 @@ export function SessionTimeoutWarning() {
         {() => (
           <>
             <ModalHeader
-              id="session-timeout-title"
               className="flex flex-col items-center gap-0 pt-6 pb-2"
             >
               <div className="flex justify-center mb-4">
@@ -188,9 +248,12 @@ export function SessionTimeoutWarning() {
                   </span>
                 </div>
               </div>
-              <span className="text-xl font-semibold text-theme-primary">
+              <ModalHeading
+                id="session-timeout-title"
+                className="text-xl font-semibold text-theme-primary"
+              >
                 {t('session_expiring')}
-              </span>
+              </ModalHeading>
             </ModalHeader>
 
             <ModalBody
@@ -225,7 +288,7 @@ export function SessionTimeoutWarning() {
                 {t('auth.log_out', { ns: 'common' })}
               </Button>
               <Button
-                className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                className="flex-1 bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                 startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
                 isLoading={isExtending}
                 onPress={() => { void handleExtend(); }}

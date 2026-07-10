@@ -393,7 +393,12 @@
     "changes_between": "Athruithe: v{{old}} go v{{new}}",
     "changes_count": "{{count}} athru",
     "legend_removed": "Bainte",
-    "legend_added": "Curtha leis"
+    "legend_added": "Curtha leis",
+    "changes_count_few": "{{count}} athru",
+    "changes_count_many": "{{count}} athru",
+    "changes_count_one": "{{count}} athru",
+    "changes_count_other": "{{count}} athru",
+    "changes_count_two": "{{count}} athru"
   },
   "platform": {
     "effective_date": "I bhfeidhm {{date}}",
@@ -480,7 +485,12 @@
     "consent_text": "Trí Glacadh a chliceáil, deimhníonn tú go bhfuil na doiciméid liostaithe thuas léite agat agus go n-aontaíonn tú leo.",
     "accept_aria": "Glac le gach doiciméad dlíthiúil nuashonraithe agus lean ar aghaidh",
     "accepting": "Ag Glacadh…",
-    "accept_continue": "Glac & Lean Ar Aghaidh"
+    "accept_continue": "Glac & Lean Ar Aghaidh",
+    "subtitle_other_few": "Tá {{count}} doiciméad nuashonraithe. Athbhreithnigh agus glac leo chun leanúint ar aghaidh le do thoil.",
+    "subtitle_other_many": "Tá {{count}} doiciméad nuashonraithe. Athbhreithnigh agus glac leo chun leanúint ar aghaidh le do thoil.",
+    "subtitle_other_one": "Tá {{count}} doiciméad nuashonraithe. Athbhreithnigh agus glac leo chun leanúint ar aghaidh le do thoil.",
+    "subtitle_other_other": "Tá {{count}} doiciméad nuashonraithe. Athbhreithnigh agus glac leo chun leanúint ar aghaidh le do thoil.",
+    "subtitle_other_two": "Tá {{count}} doiciméad nuashonraithe. Athbhreithnigh agus glac leo chun leanúint ar aghaidh le do thoil."
   },
   "custom": {
     "effective_label": "I bhfeidhm: {{date}}",

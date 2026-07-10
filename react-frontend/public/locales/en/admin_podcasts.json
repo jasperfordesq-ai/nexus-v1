@@ -211,7 +211,9 @@
       "report_dismissed": "Report dismissed.",
       "report_escalated": "Report escalated.",
       "feed_valid": "RSS feed is ready.",
-      "feed_invalid": "RSS feed has {{count}} issue(s)."
+      "feed_invalid": "RSS feed has {{count}} issue(s).",
+      "feed_invalid_one": "RSS feed has {{count}} issue(s).",
+      "feed_invalid_other": "RSS feed has {{count}} issue(s)."
     },
     "bulk": {
       "approve_selected": "Approve selected",
@@ -219,7 +221,13 @@
       "done": "Moderated {{count}} item(s).",
       "partial": "Moderated {{ok}} item(s); {{failed}} failed.",
       "confirm_reject_title": "Reject selected items",
-      "confirm_reject_message": "Reject {{count}} selected item(s)? Creators will see them revert to draft."
-    }
+      "confirm_reject_message": "Reject {{count}} selected item(s)? Creators will see them revert to draft.",
+      "done_one": "Moderated {{count}} item(s).",
+      "done_other": "Moderated {{count}} item(s).",
+      "confirm_reject_message_one": "Reject {{count}} selected item(s)? Creators will see them revert to draft.",
+      "confirm_reject_message_other": "Reject {{count}} selected item(s)? Creators will see them revert to draft."
+    },
+    "count_one": "{{count}} items",
+    "count_other": "{{count}} items"
   }
 }

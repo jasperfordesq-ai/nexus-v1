@@ -524,7 +524,34 @@
     "select_all_rows": "Select all rows",
     "no_data": "Keine Daten",
     "no_data_available": "Keine Daten verfügbar",
-    "select_row": "Select row {{id}}"
+    "select_row": "Select row {{id}}",
+    "total_count_one": "{{count}}insgesamt",
+    "total_count_other": "{{count}}insgesamt",
+    "statuses": {
+      "active": "Aktiv",
+      "approved": "Genehmigt",
+      "banned": "Gesperrt",
+      "bulk_tenants_updated": "Mandanten aktualisiert",
+      "bulk_users_moved": "Benutzer verschoben",
+      "completed": "Abgeschlossen",
+      "draft": "Entwurf",
+      "failed": "Fehlgeschlagen",
+      "federation_lockdown": "Föderationssperre",
+      "federation_updated": "Föderation aktualisiert",
+      "idle": "Untätig",
+      "inactive": "Inaktiv",
+      "pending": "Ausstehend",
+      "published": "Veröffentlicht",
+      "rejected": "Abgelehnt",
+      "scheduled": "Geplant",
+      "sent": "Gesendet",
+      "suspended": "Suspendiert",
+      "tenant_created": "Mandant erstellt",
+      "tenant_updated": "Mandant aktualisiert",
+      "user_created": "Benutzer erstellt",
+      "user_moved": "Benutzer verschoben",
+      "unknown": "Unbekannt"
+    }
   },
   "help_drawer": {
     "aria_label": "Hilfe: {{title}}",
@@ -541,7 +568,11 @@
     "confirm_message": "Sind Sie sicher, dass Sie Elemente {{action}} {{count}} möchten?",
     "destructive_warning": "Diese Aktion kann nicht rückgängig gemacht werden.",
     "reason_label": "Grund",
-    "reason_placeholder": "Geben Sie einen Grund für diese Aktion an"
+    "reason_placeholder": "Geben Sie einen Grund für diese Aktion an",
+    "selected_count_one": "{{count}} ausgewählt",
+    "selected_count_other": "{{count}} ausgewählt",
+    "confirm_message_one": "Sind Sie sicher, dass Sie Elemente {{action}} {{count}} möchten?",
+    "confirm_message_other": "Sind Sie sicher, dass Sie Elemente {{action}} {{count}} möchten?"
   },
   "common": {
     "cancel": "Abbrechen"
@@ -586,5 +617,7 @@
       "group_exchanges": "Gruppenaustausch",
       "search": "Suchen"
     }
-  }
+  },
+  "support_requests_count_one": "{{count}} offene Support-Anfragen",
+  "support_requests_count_other": "{{count}} offene Support-Anfragen"
 }

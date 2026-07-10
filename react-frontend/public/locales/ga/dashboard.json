@@ -90,7 +90,12 @@
     "members_count": "{{count}} comhalta",
     "empty": "Níl tú páirteach in aon ghrúpa fós",
     "empty_description": "Cuidíonn grúpaí leat leanúint le suimeanna comhroinnte, tionscadail, agus ciorcail áitiúla.",
-    "discover": "Faigh grúpaí"
+    "discover": "Faigh grúpaí",
+    "members_count_few": "{{count}} comhalta",
+    "members_count_many": "{{count}} comhalta",
+    "members_count_one": "{{count}} comhalta",
+    "members_count_other": "{{count}} comhalta",
+    "members_count_two": "{{count}} comhalta"
   },
   "events": {
     "online_event": "Imeacht ar líne",
@@ -106,7 +111,12 @@
     "xp_progress": "Dul Chun Cinn XP",
     "start_earning": "Tosaigh ag tuilleamh XP trí bheith rannpháirteach sa phobal!",
     "streak_days_one": "{{count}} la",
-    "streak_days_other": "{{count}} la"
+    "streak_days_other": "{{count}} la",
+    "xp_value_few": "{{count}} XP",
+    "xp_value_many": "{{count}} XP",
+    "xp_value_one": "{{count}} XP",
+    "xp_value_other": "{{count}} XP",
+    "xp_value_two": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "Liostaí á luchtú",
@@ -150,5 +160,15 @@
       "active": "Gníomhach"
     },
     "view_all": "Féach ar gach malartú"
-  }
+  },
+  "likes_count_few": "{{count}} likes",
+  "likes_count_many": "{{count}} likes",
+  "likes_count_one": "Is maith {{count}}",
+  "likes_count_other": "Is maith {{count}}",
+  "likes_count_two": "{{count}} likes",
+  "comments_count_few": "{{count}} comments",
+  "comments_count_many": "{{count}} comments",
+  "comments_count_one": "{{count}} tuairimí",
+  "comments_count_other": "{{count}} tuairimí",
+  "comments_count_two": "{{count}} comments"
 }

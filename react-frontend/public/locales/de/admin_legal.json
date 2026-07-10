@@ -147,7 +147,9 @@
         "date": "Datum",
         "ip_address": "IP-Adresse",
         "member_id": "Mitglied ID"
-      }
+      },
+      "truncated_one": "Zeigt die letzten 200 Datensätze an. Exportieren Sie das vollständige Hauptbuch CSV, um alle {{count}}-Datensätze herunterzuladen.",
+      "truncated_other": "Zeigt die letzten 200 Datensätze an. Exportieren Sie das vollständige Hauptbuch CSV, um alle {{count}}-Datensätze herunterzuladen."
     },
     "residency": {
       "article_16": "Eine grenzüberschreitende Weitergabe von Personendaten ist zulässig, wenn das Zielland einen angemessenen, vom Bundesrat anerkannten Datenschutz gewährleistet. Switzerland-, EU/EEA-Mitgliedsstaaten und eine kleine Liste anderer Länder sind qualifiziert.",

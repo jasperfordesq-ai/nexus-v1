@@ -21,6 +21,7 @@ import {
   DropdownItem,
   DropdownSection,
 } from './Dropdown';
+import { Button } from './Button';
 
 vi.mock('@/contexts', () => createMockContexts());
 
@@ -52,6 +53,7 @@ function renderOpenDropdown(items: React.ReactNode, selectionMode?: 'single' | '
 
 describe('Dropdown / DropdownTrigger', () => {
   it('renders the trigger element', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(
       <Dropdown>
         <DropdownTrigger>
@@ -63,6 +65,8 @@ describe('Dropdown / DropdownTrigger', () => {
       </Dropdown>,
     );
     expect(screen.getByRole('button', { name: 'Menu' })).toBeInTheDocument();
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('PressResponder'));
+    warn.mockRestore();
   });
 
   it('clones className onto a valid trigger child', () => {
@@ -79,6 +83,54 @@ describe('Dropdown / DropdownTrigger', () => {
     const btn = screen.getByRole('button', { name: 'Trigger' });
     expect(btn.className).toContain('base-class');
     expect(btn.className).toContain('extra-class');
+  });
+
+  it('adapts non-pressable content with one official trigger button', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <Dropdown>
+        <DropdownTrigger><span>Custom menu</span></DropdownTrigger>
+        <DropdownMenu>
+          <DropdownItem id="custom">Custom item</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Custom menu' });
+    expect(button.querySelector('button')).toBeNull();
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('PressResponder'));
+    warn.mockRestore();
+  });
+
+  it('uses a project Button directly as the documented pressable trigger', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <Dropdown>
+        <DropdownTrigger><Button>Project menu</Button></DropdownTrigger>
+        <DropdownMenu><DropdownItem id="project">Project item</DropdownItem></DropdownMenu>
+      </Dropdown>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Project menu' });
+    expect(button.querySelector('button')).toBeNull();
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('PressResponder'));
+    warn.mockRestore();
+  });
+
+  it('honours shouldBlockScroll=false through the supported non-modal popover contract', () => {
+    render(
+      <Dropdown defaultOpen shouldBlockScroll={false}>
+        <DropdownTrigger>
+          <button>Non-blocking menu</button>
+        </DropdownTrigger>
+        <DropdownMenu>
+          <DropdownItem id="item">Item</DropdownItem>
+        </DropdownMenu>
+      </Dropdown>,
+    );
+
+    expect(screen.getByText('Item')).toBeInTheDocument();
+    expect(document.documentElement.style.overflow).not.toBe('hidden');
   });
 });
 

@@ -73,7 +73,10 @@
     "features": "Funciones",
     "courses": "Cursos",
     "podcasts": "Pódcasts",
-    "switch_community": "Cambiar comunidad"
+    "switch_community": "Cambiar comunidad",
+    "unread_notifications_many": "{{count}} notificaciones no leídas",
+    "unread_notifications_one": "{{count}} notificaciones no leídas",
+    "unread_notifications_other": "{{count}} notificaciones no leídas"
   },
   "landing_links": {
     "title": "Explora esta comunidad",
@@ -239,6 +242,7 @@
     "accessibility_alpha_new_tab": "Abrir Accesibilidad (alfa) en una pestaña nueva",
     "menu_opened": "Menú de navegación abierto",
     "close": "Cerrar",
+    "clear_input": "Borrar entrada",
     "scroll_to_top": "Ir arriba",
     "breadcrumb": "Migas de pan"
   },
@@ -367,7 +371,16 @@
     "load_failed": "Error al cargar miembros",
     "load_more_failed": "Error al cargar más miembros",
     "my_profile": "Mi perfil",
-    "load_more_count": "Cargar más ({{remaining}} restantes)"
+    "load_more_count": "Cargar más ({{remaining}} restantes)",
+    "results_count_many": "{{count}} miembros mostrados",
+    "results_count_one": "{{count}} miembros mostrados",
+    "results_count_other": "{{count}} miembros mostrados",
+    "hours_exchanged_aria_many": "{{count}} horas intercambiadas",
+    "hours_exchanged_aria_one": "{{count}} horas intercambiadas",
+    "hours_exchanged_aria_other": "{{count}} horas intercambiadas",
+    "hours_short_many": "{{count}} h",
+    "hours_short_one": "{{count}} h",
+    "hours_short_other": "{{count}} h"
   },
   "error_boundary": {
     "title": "Algo salió mal",
@@ -879,7 +892,13 @@
     "user_menu_trigger": "Menú de usuario para {{name}}",
     "feed_sidebar": "Barra lateral de la comunidad",
     "filter_panel": "Panel de filtro",
-    "remove": "Remove"
+    "remove": "Remove",
+    "location_results_many": "{{count}} sugerencias de direcciones disponibles",
+    "location_results_one": "{{count}} sugerencias de direcciones disponibles",
+    "location_results_other": "{{count}} sugerencias de direcciones disponibles",
+    "search_results_many": "{{count}} results available",
+    "search_results_one": "{{count}} resultados disponibles",
+    "search_results_other": "{{count}} resultados disponibles"
   },
   "skills": {
     "browse_title": "Directorio de Habilidades de la Comunidad",
@@ -929,7 +948,10 @@
     "aria_clear_search": "Limpiar búsqueda",
     "aria_close_members_list": "Cerrar lista de miembros",
     "category_optional": "Categoría (opcional)",
-    "proficiency_level": "Nivel de competencia"
+    "proficiency_level": "Nivel de competencia",
+    "aria_results_many": "{{count}} sugerencias de habilidades disponibles",
+    "aria_results_one": "{{count}} sugerencias de habilidades disponibles",
+    "aria_results_other": "{{count}} sugerencias de habilidades disponibles"
   },
   "hours_display_one": "{{count}} hora",
   "hours_display_other": "{{count}} horas",
@@ -1108,7 +1130,10 @@
     },
     "errors": {
       "load_failed": "No se pudieron cargar los clubes. Inténtalo de nuevo."
-    }
+    },
+    "member_count_many": "{{count}} miembros",
+    "member_count_one": "{{count}} miembros",
+    "member_count_other": "{{count}} miembros"
   },
   "feed": {
     "personalisation": {
@@ -1191,7 +1216,10 @@
       "format": "Formato",
       "size": "Tamaño",
       "count": "{{count}} exportaciones",
-      "empty": "Aún no has exportado tus datos."
+      "empty": "Aún no has exportado tus datos.",
+      "count_many": "{{count}} exportaciones",
+      "count_one": "{{count}} exportaciones",
+      "count_other": "{{count}} exportaciones"
     },
     "errors": {
       "rate_limit": "Puedes solicitar 5 exportaciones al día. Inténtalo de nuevo mañana.",
@@ -1436,7 +1464,10 @@
     "created_success": "Campaña push creada correctamente.",
     "create_error": "No se pudo crear la campaña push. Inténtalo de nuevo.",
     "submit_create": "Crear campaña",
-    "feature_disabled": "Las campañas push no están disponibles para tu cuenta."
+    "feature_disabled": "Las campañas push no están disponibles para tu cuenta.",
+    "estimate_result_many": "Alcance estimado: {{count}} miembros",
+    "estimate_result_one": "Alcance estimado: {{count}} miembros",
+    "estimate_result_other": "Alcance estimado: {{count}} miembros"
   },
   "push_campaign_opt_in": "Recibir notificaciones push promocionadas",
   "push_campaign_opt_in_description": "Permite que negocios y organizaciones locales te envíen notificaciones push dirigidas. Puedes darte de baja en cualquier momento.",
@@ -1505,7 +1536,10 @@
       "view_redemptions": "Ver canjes",
       "usage_count": "Usado {{count}} veces",
       "saved": "Cupón guardado",
-      "deleted": "Cupón eliminado"
+      "deleted": "Cupón eliminado",
+      "usage_count_many": "Usado {{count}} veces",
+      "usage_count_one": "Usado {{count}} veces",
+      "usage_count_other": "Usado {{count}} veces"
     },
     "qr_code_alt": "Código QR"
   },
@@ -1989,7 +2023,10 @@
     "error": "Algo salió mal",
     "someone": "Alguien",
     "unknown_user": "Usuario",
-    "not_available": "No disponible"
+    "not_available": "No disponible",
+    "edit": "Editar",
+    "collapse": "Colapso",
+    "expand": "Expandir"
   },
   "verein_federation": {
     "panel_title": "Federación con otros clubes",
@@ -2063,7 +2100,10 @@
       "today": "Hoy",
       "from_label": "De",
       "load_failed": "No se pudo cargar el calendario."
-    }
+    },
+    "char_count_many": "{{count}}/500",
+    "char_count_one": "{{count}}/500",
+    "char_count_other": "{{count}}/500"
   },
   "oauth": {
     "continue_with_google": "Continuar con Google",
@@ -2167,7 +2207,14 @@
       "generate_failed": "La generación falló.",
       "reminder_failed": "No se pudo enviar el recordatorio.",
       "waive_failed": "No se pudieron eximir las cuotas."
-    }
+    },
+    "admin_bulk_reminder_sent_many": "{{count}} recordatorios enviados.",
+    "admin_bulk_reminder_sent_one": "{{count}} recordatorios enviados.",
+    "admin_bulk_reminder_sent_other": "{{count}} recordatorios enviados.",
+    "admin_overdue_count_many": "{{count}} miembro(s) tienen cuotas vencidas.",
+    "admin_overdue_count_one": "{{count}} miembro(s) tienen cuotas vencidas.",
+    "admin_overdue_count_other": "{{count}} miembro(s) tienen cuotas vencidas.",
+    "badge_none": "Sin cuotas"
   },
   "collections": {
     "save": "Guardar",
@@ -2311,7 +2358,10 @@
   },
   "max_characters": "máx. {{count}} caracteres",
   "map": {
-    "listings_here": "{{count}} anuncios aquí"
+    "listings_here": "{{count}} anuncios aquí",
+    "listings_here_many": "{{count}} anuncios aquí",
+    "listings_here_one": "{{count}} anuncios aquí",
+    "listings_here_other": "{{count}} anuncios aquí"
   },
   "time_credits_short": "{{count}}h de créditos",
   "level_plain": "Nivel {{level}}",
@@ -2329,5 +2379,735 @@
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "alpha_badge": "Alfa"
+  "alpha_badge": "Alfa",
+  "hours_display_many": "{{count}} horas",
+  "wellbeing": {
+    "mood_low": "Bajo",
+    "mood_okay": "Regular",
+    "mood_good": "Bien",
+    "mood_unknown": "Desconocido",
+    "score_excellent": "Excelente",
+    "score_critical": "Crítico",
+    "mood_struggling": "Luchando",
+    "mood_great": "Excelente",
+    "score_good": "Bien",
+    "score_fair": "Justo",
+    "score_needs_attention": "necesita atencion"
+  },
+  "credentials": {
+    "status_verified": "Verificado",
+    "status_rejected": "Rechazado",
+    "status_pending": "Pendiente de revisión",
+    "status_expired": "Venció"
+  },
+  "nexus_score": {
+    "tier_threshold": "{{tier}} ({{min}}+)"
+  },
+  "application_status": {
+    "applied": "Solicitado",
+    "pending": "Pendiente",
+    "screening": "Preselección",
+    "reviewed": "Revisado",
+    "interview": "Entrevista",
+    "offer": "Oferta",
+    "accepted": "Aceptado",
+    "rejected": "Rechazado",
+    "withdrawn": "Retirado"
+  },
+  "salary": {
+    "currency_eur": "EUR",
+    "min_only": "Desde {{min}}",
+    "max_only": "Hasta {{max}}"
+  },
+  "salary_display": "{{min}} – {{max}}",
+  "activity": {
+    "action_listing": "compartió un anuncio",
+    "action_event": "publicó sobre un evento",
+    "action_poll": "creó una encuesta",
+    "action_goal": "estableció una nueva meta",
+    "action_post": "compartió una publicación"
+  },
+  "hours_short_many": "{{count}} h",
+  "hours_short_one": "{{count}} h",
+  "hours_short_other": "{{count}} h",
+  "time_credits_short_many": "{{count}}h de créditos",
+  "time_credits_short_one": "{{count}}h de créditos",
+  "time_credits_short_other": "{{count}}h de créditos",
+  "question_required": "Obligatorio",
+  "yes": "Sí",
+  "no": "No",
+  "likert_options": {
+    "1": "Muy insatisfecho",
+    "2": "Insatisfecho",
+    "3": "Neutral",
+    "4": "Satisfecho",
+    "5": "Muy satisfecho"
+  },
+  "required_error": "Por favor, responde todas las preguntas obligatorias.",
+  "already_responded": "Ya has participado en esta encuesta.",
+  "time_ago_just_now": "Ahora mismo",
+  "time_ago_hours_many": "hace {{count}}h",
+  "time_ago_hours_one": "hace {{count}}h",
+  "time_ago_hours_other": "hace {{count}}h",
+  "time_ago_days_many": "hace {{count}}d",
+  "time_ago_days_one": "hace {{count}}d",
+  "time_ago_days_other": "hace {{count}}d",
+  "providers": {
+    "filter_spitex": "Spitex",
+    "filter_tagesstte": "Centros de Día",
+    "filter_private": "Privado",
+    "filter_verein": "Asociaciones",
+    "filter_volunteer": "Voluntarios",
+    "verified_badge": "Verificado",
+    "call_aria": "Proveedor de llamadas en{{phone}}",
+    "email_aria": "Proveedor de correo electrónico en{{email}}",
+    "website_aria": "Visite el sitio web del proveedor{{url}}",
+    "website": "Sitio web"
+  },
+  "caregiver": {
+    "burnout_high": "Alta carga de cuidadores: horas{{hours}}esta semana",
+    "burnout_moderate": "Carga moderada: horas{{hours}}esta semana",
+    "burnout_warning": "Has registrado muchas horas esta semana; asegúrate de descansar",
+    "upcoming_care": "próxima atención",
+    "no_upcoming_care": "Aún no hay soporte programado",
+    "recent_care": "Atención reciente",
+    "no_recent_care": "Aún no hay registros de atención recientes",
+    "view_schedule": "Ver cronograma de atención",
+    "request_on_behalf": "Solicite ayuda en su nombre",
+    "hours_short": "{{hours}}h"
+  },
+  "cover": {
+    "title": "Cuidado de la cubierta"
+  },
+  "viewer": {
+    "time_just_now": "Ahora mismo",
+    "time_minutes_ago_many": "Hace {{count}}m",
+    "time_minutes_ago_one": "Hace {{count}}m",
+    "time_minutes_ago_other": "Hace {{count}}m",
+    "time_hours_ago_many": "Hace {{count}}h",
+    "time_hours_ago_one": "Hace {{count}}h",
+    "time_hours_ago_other": "Hace {{count}}h",
+    "time_days_ago_many": "Hace {{count}}d",
+    "time_days_ago_one": "Hace {{count}}d",
+    "time_days_ago_other": "Hace {{count}}d"
+  },
+  "biometric": {
+    "label_builtin": "Autenticador integrado",
+    "label_external": "Autenticador externo",
+    "label_passkey": "Llave maestra",
+    "platform_windows_title": "Configurando en Windows",
+    "platform_windows_step1": "Haz clic en \"Este PC\" para crear una clave de acceso almacenada en este ordenador. Confirmarás con tu PIN de Windows Hello, huella digital o rostro.",
+    "platform_windows_step2": "Requisito: Debes tener configurado Windows Hello primero. Ve a Configuración de Windows > Cuentas > Opciones de inicio de sesión > PIN para configurarlo.",
+    "platform_windows_step3": "O haz clic en \"Teléfono, tableta o clave de seguridad\" para escanear un código QR con tu teléfono en su lugar.",
+    "platform_windows_step4": "Para configurar claves de acceso en tu teléfono también, abre esta página en tu teléfono y toca \"Este dispositivo\".",
+    "platform_mac_title": "Configurando en Mac",
+    "platform_mac_step1": "Haz clic en \"Este Mac\" — tu navegador te pedirá Touch ID o la contraseña de tu Mac.",
+    "platform_mac_step2": "La clave de acceso se sincroniza automáticamente a través de iCloud Keychain con tu iPhone, iPad y otros Macs.",
+    "platform_mac_step3": "O haz clic en \"Teléfono, tableta o clave de seguridad\" para registrar un dispositivo diferente.",
+    "platform_iphone_title": "Configurando en iPhone",
+    "platform_iphone_step1": "Toca \"Este dispositivo\" para crear una clave de acceso usando Face ID o Touch ID.",
+    "platform_iphone_step2": "La clave de acceso se guarda en iCloud Keychain y funciona en todos tus dispositivos Apple.",
+    "platform_iphone_step3": "También puedes tocar \"Teléfono, tableta o clave de seguridad\" para registrar una clave de seguridad.",
+    "platform_ipad_title": "Configurando en iPad",
+    "platform_ipad_step1": "Toca \"Este dispositivo\" para crear una clave de acceso usando Face ID o Touch ID.",
+    "platform_ipad_step2": "La clave de acceso se guarda en iCloud Keychain y funciona en todos tus dispositivos Apple.",
+    "platform_ipad_step3": "También puedes tocar \"Teléfono, tableta o clave de seguridad\" para registrar una clave de seguridad.",
+    "platform_android_title": "Configurando en Android",
+    "platform_android_step1": "Toca \"Este dispositivo\" para crear una clave de acceso usando tu huella digital, rostro o bloqueo de pantalla.",
+    "platform_android_step2": "La clave de acceso se guarda en Google Password Manager y funciona en todos tus dispositivos Android y navegadores Chrome.",
+    "platform_android_step3": "También puedes tocar \"Teléfono, tableta o clave de seguridad\" para registrar una clave de seguridad.",
+    "platform_linux_title": "Configurando en Linux",
+    "platform_linux_step1": "Haz clic en \"Este dispositivo\"; tu navegador utilizará su administrador de claves de acceso integrado.",
+    "platform_linux_step2": "O haz clic en \"Teléfono, tableta o clave de seguridad\" para usar una clave de seguridad USB o escanear un código QR con tu teléfono.",
+    "platform_unknown_title": "Configurando una clave de acceso",
+    "platform_unknown_step1": "Haz clic en \"Este dispositivo\" para crear una clave de acceso en el dispositivo que estás usando ahora.",
+    "platform_unknown_step2": "O haz clic en \"Teléfono, tableta o clave de seguridad\" para registrar un dispositivo diferente."
+  },
+  "discussion": {
+    "delete": "Borrar",
+    "reply": "Responder"
+  },
+  "page_builder": {
+    "starter": {
+      "kicker": "página de la comunidad",
+      "hero_title": "Crea una hermosa página personalizada",
+      "hero_body": "Utilice secciones, tarjetas, imágenes y llamados a la acción para contar la historia de su inquilino.",
+      "cta": "Explora la comunidad",
+      "card_one_title": "Comparte lo que importa",
+      "card_one_body": "Presentar proyectos, servicios, socios, informes, políticas u oportunidades locales.",
+      "card_two_title": "Mantenlo receptivo",
+      "card_two_body": "Obtenga una vista previa de su computadora, tableta y dispositivo móvil mientras diseña."
+    },
+    "blocks": {
+      "category_nexus": "Secciones NEXO",
+      "hero_label": "Sección de héroe",
+      "hero_kicker": "historia de la comunidad",
+      "hero_title": "Un titular de página con presencia",
+      "hero_body": "Agregue una introducción clara que parezca específica de su banco de tiempo.",
+      "hero_cta": "Llamado a la acción",
+      "feature_grid_label": "Cuadrícula de características",
+      "feature_one_title": "Característica uno",
+      "feature_one_body": "Describe un resultado, servicio o promesa.",
+      "feature_two_title": "Característica dos",
+      "feature_two_body": "Mantenga la copia concreta y fácil de escanear.",
+      "story_band_label": "banda de historia",
+      "story_kicker": "Impacto local",
+      "story_title": "Cuente la historia en una banda de contenido generosa",
+      "story_body": "Úselo para informes, explicaciones de programas, páginas de socios u orientación."
+    }
+  },
+  "newsletter_content_editor": {
+    "tip_device_desktop": "Vista de escritorio",
+    "tip_device_tablet": "Vista de tableta",
+    "tip_device_mobile": "Vista móvil",
+    "toolbar_label": "Barra de herramientas del creador de correos",
+    "tip_undo": "Deshacer",
+    "tip_redo": "Rehacer",
+    "tip_borders": "Alternar bordes",
+    "tip_code": "Ver código",
+    "tip_clear": "Borrar lienzo"
+  },
+  "newsletter_builder": {
+    "insert_image": "Insertar imagen",
+    "library_title": "Biblioteca de imágenes",
+    "preview": "Vista previa",
+    "templates": "Plantillas",
+    "preview_title": "Vista previa de correo electrónico",
+    "preview_device_label": "Dispositivo de vista previa",
+    "preview_desktop": "Escritorio",
+    "preview_mobile": "Móvil"
+  },
+  "dismiss_reasons": {
+    "too_far": "demasiado lejos",
+    "not_my_skills": "No mis habilidades",
+    "not_interested": "No interesado"
+  },
+  "qa": {
+    "upvote_aria": "Voto positivo",
+    "vote_count_aria_many": "{{count}} votos",
+    "vote_count_aria_one": "{{count}} votos",
+    "vote_count_aria_other": "{{count}} votos",
+    "downvote_aria": "Voto negativo"
+  },
+  "challenges": {
+    "time_ended": "Finalizado",
+    "time_remaining_days_hours": "{{days}}d {{hours}}h restantes",
+    "time_remaining_hours_minutes": "{{hours}}h {{minutes}}m restantes"
+  },
+  "max_characters_many": "máx. {{count}} caracteres",
+  "max_characters_one": "máx. {{count}} caracteres",
+  "max_characters_other": "máx. {{count}} caracteres",
+  "volunteering": {
+    "time_just_now": "Justo ahora",
+    "time_minutes_ago_many": "{{count}}hace un minuto",
+    "time_minutes_ago_one": "{{count}}hace un minuto",
+    "time_minutes_ago_other": "{{count}}hace un minuto",
+    "time_hours_ago_many": "{{count}}hace una hora",
+    "time_hours_ago_one": "{{count}}hace una hora",
+    "time_hours_ago_other": "{{count}}hace una hora",
+    "time_days_ago_many": "{{count}}hace un día",
+    "time_days_ago_one": "{{count}}hace un día",
+    "time_days_ago_other": "{{count}}hace un día",
+    "wellbeing_user_number": "Voluntario n.º {{id}}",
+    "wellbeing_unknown_user": "Voluntario desconocido",
+    "wellbeing_unknown_type": "Preocupación de bienestar"
+  },
+  "users": {
+    "action_edit": "Editar",
+    "action_approve": "Aprobar",
+    "action_suspend": "suspender",
+    "action_ban": "Prohibición",
+    "action_reactivate": "Reactivar",
+    "action_reset_2fa": "Restablecer 2FA",
+    "action_permissions": "Permisos",
+    "action_impersonate": "Suplantar",
+    "action_delete": "Eliminar",
+    "actions_menu": "Menú de acciones"
+  },
+  "system": {
+    "never": "nunca",
+    "just_now": "Justo ahora",
+    "minutes_ago_many": "{{count}}hace m",
+    "minutes_ago_one": "{{count}}hace m",
+    "minutes_ago_other": "{{count}}hace m",
+    "hours_ago_many": "{{count}}hace h",
+    "hours_ago_one": "{{count}}hace h",
+    "hours_ago_other": "{{count}}hace h",
+    "days_ago_many": "{{count}}hace d",
+    "days_ago_one": "{{count}}hace d",
+    "days_ago_other": "{{count}}hace d"
+  },
+  "super": {
+    "tenant_actions": "Acciones del inquilino",
+    "action_view": "Ver",
+    "disable_hub": "Deshabilitar concentrador",
+    "enable_hub": "Habilitar concentrador",
+    "deactivate": "Desactivar",
+    "reactivate": "Reactivar",
+    "status_active_label": "Active Label",
+    "status_inactive_label": "Inactive Label",
+    "hub": "Centro"
+  },
+  "help_faqs": {
+    "actions_aria": "Acciones de FAQ"
+  },
+  "groups": {
+    "policy_features": "Características de la política",
+    "policy_moderation": "Moderación de políticas",
+    "policy_membership": "Membresía de la política",
+    "policy_creation": "Creación de políticas",
+    "policy_content": "Contenido de la política",
+    "policy_notifications": "Notificaciones de políticas"
+  },
+  "gamification": {
+    "label_campaign_actions": "Acciones de campaña",
+    "edit": "Editar",
+    "activate": "Activar",
+    "pause": "Pausa",
+    "resume": "Currículum",
+    "delete": "Eliminar"
+  },
+  "federation": {
+    "event_type_message_sent": "Mensaje enviado",
+    "event_type_transaction": "Transacción",
+    "event_type_connection": "Solicitud de conexión",
+    "event_type_listing_shared": "Listado compartido",
+    "event_type_listing_unshared": "Listado no compartido",
+    "event_type_listing_viewed": "Listado visto",
+    "event_type_partnership_requested": "Asociación solicitada",
+    "event_type_partnership_approved": "Asociación aprobada",
+    "event_type_partnership_rejected": "Asociación rechazada",
+    "event_type_partnership_changed": "Asociación actualizada",
+    "event_type_partnership_terminated": "La asociación terminó",
+    "event_type_profile_viewed": "Perfil visto",
+    "event_type_federated_search": "Búsqueda de socios"
+  },
+  "enterprise": {
+    "config_group_general": "generales",
+    "config_group_general_desc": "Identidad del sitio, localización y texto de pie de página.",
+    "config_site_name": "Nombre del sitio",
+    "config_site_name_desc": "Nombre público que se muestra en el encabezado, la pestaña del navegador y los correos electrónicos.",
+    "config_site_description": "Descripción del sitio",
+    "config_site_description_desc": "Lema corto utilizado en metadatos y enlaces compartidos.",
+    "config_contact_email": "Correo electrónico de contacto",
+    "config_contact_email_desc": "Dirección que utilizan los miembros para buscar soporte.",
+    "config_contact_phone": "Teléfono de contacto",
+    "config_contact_phone_desc": "Número de teléfono público para consultas de soporte.",
+    "config_timezone": "Zona horaria",
+    "config_timezone_desc": "Identificador de zona horaria de IANA utilizado para programación y marcas de tiempo.",
+    "config_footer_text": "Texto legal de pie de página",
+    "config_footer_text_desc": "Número de organización benéfica, registro de empresa u otro texto legal que se muestra en el pie de página.",
+    "config_locale": "Configuración regional predeterminada",
+    "config_locale_desc": "Idioma utilizado por los nuevos miembros hasta que eligen el suyo propio.",
+    "config_group_registration": "Registro e incorporación",
+    "config_group_registration_desc": "Quién puede registrarse, qué verifica y cómo es bienvenido.",
+    "config_registration_enabled": "Registro habilitado",
+    "config_registration_enabled_desc": "Desactívelo para cerrar los registros por completo.",
+    "config_require_approval": "Se requiere aprobación del administrador",
+    "config_require_approval_desc": "Las cuentas nuevas deben ser aprobadas por un administrador antes de que puedan iniciar sesión.",
+    "config_require_email_verification": "Requerir verificación por correo electrónico",
+    "config_require_email_verification_desc": "Los miembros deben verificar su dirección de correo electrónico antes de acceder a la plataforma.",
+    "config_maintenance_mode": "Modo de mantenimiento",
+    "config_maintenance_mode_desc": "Sólo lectura. Alternar a través de scripts/maintenance.sh en el servidor.",
+    "config_onboarding_enabled": "Mostrar flujo de incorporación",
+    "config_onboarding_enabled_desc": "Guíe a los nuevos miembros a través de la configuración del perfil y las habilidades después del registro.",
+    "config_configure_steps": "Configurar pasos",
+    "config_welcome_message": "Mensaje de bienvenida",
+    "config_welcome_message_desc": "Se muestra a los nuevos miembros en su primer inicio de sesión.",
+    "config_group_wallet": "Monedero y créditos",
+    "config_group_wallet_desc": "Saldo de crédito a tiempo, límites de transferencia y cómo se denomina la moneda.",
+    "config_starting_balance": "Saldo inicial",
+    "config_starting_balance_desc": "Créditos de tiempo otorgados a nuevos miembros al registrarse. Establezca en 0 para desactivar.",
+    "config_max_transaction": "Transferencia máxima",
+    "config_max_transaction_desc": "Mayor transferencia individual entre miembros. Establezca en 0 para que no haya límite.",
+    "config_currency_name": "Nombre de la moneda",
+    "config_currency_name_desc": "Nombre para mostrar de la moneda del banco de tiempo.",
+    "config_currency_symbol": "símbolo de moneda",
+    "config_currency_symbol_desc": "Símbolo corto que se muestra junto a las balanzas.",
+    "config_group_content": "Contenido y moderación",
+    "config_group_content_desc": "Reglas de aprobación y filtros de contenido para listados y publicaciones.",
+    "config_auto_approve_listings": "Anuncios de aprobación automática",
+    "config_auto_approve_listings_desc": "Publique nuevos listados inmediatamente en lugar de retenerlos para que los revise el moderador.",
+    "config_auto_approve_blog": "Aprobar publicaciones de blog automáticamente",
+    "config_auto_approve_blog_desc": "Publique nuevas publicaciones de blog inmediatamente en lugar de retenerlas para que las revise el moderador.",
+    "config_max_listing_images": "Máximo de imágenes por listado",
+    "config_max_listing_images_desc": "Límite superior de fotografías adjuntas a un solo anuncio.",
+    "config_profanity_filter": "Filtro de malas palabras",
+    "config_profanity_filter_desc": "Bloquee envíos que contengan palabras en la lista de malas palabras de la plataforma.",
+    "config_group_notifications": "Notificaciones",
+    "config_group_notifications_desc": "Canales de entrega predeterminados para cuentas nuevas y cadencia de resumen.",
+    "config_email_notifications_enabled": "Notificaciones por correo electrónico habilitadas",
+    "config_email_notifications_enabled_desc": "Predeterminado para cuentas nuevas. Los miembros pueden anular en su propia configuración.",
+    "config_push_notifications_enabled": "Notificaciones push habilitadas",
+    "config_push_notifications_enabled_desc": "Predeterminado para cuentas nuevas. Los miembros pueden anular en su propia configuración.",
+    "config_digest_frequency": "Frecuencia de resumen",
+    "config_digest_frequency_desc": "Con qué frecuencia se envía el correo electrónico de resumen de actividad.",
+    "config_digest_daily": "A diario",
+    "config_digest_weekly": "Semanalmente",
+    "config_digest_monthly": "Mensual",
+    "config_digest_never": "Nunca",
+    "config_group_limits": "Límites",
+    "config_group_limits_desc": "Límites por miembro y tamaño de carga.",
+    "config_max_listings_per_user": "Listados máximos por miembro",
+    "config_max_listings_per_user_desc": "La mayoría de los listados que un solo miembro puede tener activos a la vez. Establezca en 0 para que no haya límite.",
+    "config_max_groups_per_user": "Grupos máximos por miembro",
+    "config_max_groups_per_user_desc": "A la mayoría de los grupos puede unirse un solo miembro. Establezca en 0 para que no haya límite.",
+    "config_max_file_upload_mb": "Tamaño máximo de carga (MB)",
+    "config_max_file_upload_mb_desc": "Límite de tamaño de carga por archivo. Los archivos más grandes se rechazan en el servidor.",
+    "validation_required": "Requerido",
+    "validation_email": "Introduzca una dirección de correo electrónico válida (e.g., name@example.com)",
+    "validation_url": "Ingrese un URL válido que comience con http:// o https://",
+    "validation_number": "debe ser un numero",
+    "validation_min": "Debe ser {{value}} o mayor",
+    "validation_max": "Debe ser {{value}} o menos",
+    "validation_format": "Formato no válido",
+    "gdpr_sla_overdue_many": "{{count}} días de retraso",
+    "gdpr_sla_overdue_one": "{{count}} días de retraso",
+    "gdpr_sla_overdue_other": "{{count}} días de retraso",
+    "gdpr_sla_days_left_many": "Quedan {{count}} días",
+    "gdpr_sla_days_left_one": "Quedan {{count}} días",
+    "gdpr_sla_days_left_other": "Quedan {{count}} días"
+  },
+  "crm": {
+    "just_now": "Just Now",
+    "minutes_ago_many": "hace {{count}} minutos",
+    "minutes_ago_one": "hace {{count}} minutos",
+    "minutes_ago_other": "hace {{count}} minutos",
+    "hours_ago_many": "hace {{count}} horas",
+    "hours_ago_one": "hace {{count}} horas",
+    "hours_ago_other": "hace {{count}} horas",
+    "days_ago_many": "hace {{count}} días",
+    "days_ago_one": "hace {{count}} días",
+    "days_ago_other": "hace {{count}} días"
+  },
+  "config": {
+    "module_name_dashboard": "Panel de control",
+    "module_name_feed": "alimentar",
+    "module_name_listings": "Listados",
+    "module_name_messages": "Mensajes",
+    "module_name_wallet": "Cartera",
+    "module_name_members": "Miembros",
+    "module_name_groups": "Grupos",
+    "module_name_events": "Eventos",
+    "module_name_connections": "Conexiones",
+    "module_name_volunteering": "voluntariado",
+    "module_name_organisations": "Organizaciones",
+    "module_name_goals": "Metas",
+    "module_name_blog": "Blog",
+    "module_name_resources": "Recursos",
+    "module_name_courses": "Cursos",
+    "module_name_podcasts": "Pódcasts",
+    "module_name_job_vacancies": "Ofertas de empleo",
+    "module_name_marketplace": "Mercado",
+    "module_name_leaderboard": "Tabla de clasificación",
+    "module_name_achievements": "Logros"
+  },
+  "menu_builder": {
+    "group_core": "Núcleo",
+    "group_community": "Comunidad",
+    "group_features": "Características",
+    "group_gamification": "Gamificación",
+    "route_about": "Acerca de",
+    "group_info": "Información",
+    "route_faq": "FAQ",
+    "route_explore": "Explorar",
+    "location_header_main": "Encabezado principal",
+    "location_header_secondary": "Encabezado secundario",
+    "location_footer": "Pie de página",
+    "location_sidebar": "Barra lateral",
+    "location_mobile": "Móvil",
+    "type_link_label": "Enlace interno",
+    "type_link_desc": "Enlace a una página dentro de esta plataforma",
+    "type_external_label": "Enlace externo",
+    "type_external_desc": "Enlace a un sitio web externo",
+    "type_dropdown_label": "Menú desplegable",
+    "type_dropdown_desc": "Un menú desplegable que contiene elementos secundarios.",
+    "type_page_label": "Página personalizada",
+    "type_page_desc": "Enlace a una página personalizada en esta plataforma",
+    "type_route_label": "Ruta con nombre",
+    "type_route_desc": "Enlace utilizando una ruta de aplicación con nombre",
+    "type_divider_label": "Divisor",
+    "type_divider_desc": "Un separador visual entre los elementos del menú.",
+    "live_preview": "Vista previa en vivo",
+    "preview": "Avance",
+    "no_data": "No hay datos disponibles",
+    "drag_hint": "Arrastra elementos para reordenarlos",
+    "drag_to_reorder": "Arrastra para reordenar",
+    "sub_items_many": "Subelementos {{count}}",
+    "sub_items_one": "Subelementos {{count}}",
+    "sub_items_other": "Subelementos {{count}}",
+    "edit_item": "Editar elemento",
+    "delete_item": "Eliminar elemento"
+  },
+  "content": {
+    "label_attribute_actions": "Acciones de atributos",
+    "label_edit_item": "Editar artículo",
+    "label_delete_item": "Eliminar artículo"
+  },
+  "categories": {
+    "label_category_actions": "Acciones de categoría"
+  },
+  "pilot_launch_readiness": {
+    "missing": {
+      "controller_name": "Nombre del controlador",
+      "controller_contact_email": "Correo electrónico de contacto del controlador",
+      "controller_data_protection_officer": "Delegado de protección de datos",
+      "incident_response_contact_email": "Correo electrónico de contacto de respuesta a incidentes",
+      "workshop_not_run": "Taller de política operativa no realizado",
+      "policy_appendix_url": "Apéndice de política URL",
+      "safeguarding_escalation_user_id": "Contacto de protección de escalada",
+      "acknowledgement": "Reconocimiento del coordinador",
+      "pre_pilot_baseline": "Línea de base del marcador previo al piloto",
+      "danger_checks": "Problemas de calidad de datos",
+      "backlog_empty": "Trabajo pendiente de integración vacío"
+    }
+  },
+  "municipal_verification": {
+    "status": {
+      "verified": "Verificado",
+      "pending_dns": "Pendiente DNS"
+    }
+  },
+  "admin": {
+    "surveys": {
+      "analytics": {
+        "total_responses": "Respuestas totales",
+        "answer_count_many": "{{count}}respuestas",
+        "answer_count_one": "{{count}}respuesta",
+        "answer_count_other": "{{count}}respuestas",
+        "no_open_text": "Aún no hay respuestas de texto abierto."
+      }
+    }
+  },
+  "municipal_copilot": {
+    "empty": {
+      "value": "-"
+    }
+  },
+  "kpi_baselines": {
+    "comparison": {
+      "comparing": "Comparando:",
+      "captured": "(capturado {{date}})",
+      "impact_achieved": "Impacto logrado",
+      "baseline": "Base",
+      "now": "Ahora"
+    },
+    "actions": {
+      "close": "Cerca"
+    },
+    "empty": {
+      "no_data": "No hay datos disponibles"
+    },
+    "fields": {
+      "notes_label_prefix": "Notas:"
+    }
+  },
+  "commercial_boundary": {
+    "meta": {
+      "title": "Mapa de límites comerciales",
+      "subtitle": "AG82: ¿qué es AGPL público, configurable por inquilino, de capa de implementación o comercial?"
+    },
+    "export": {
+      "last_updated": "Última actualización: {{date}}",
+      "capability": "Capacidad",
+      "classification": "Clasificación",
+      "agpl_module": "módulo AGPL",
+      "default": "Por defecto",
+      "overridden": "Anulado",
+      "notes": "Notas",
+      "yes": "Sí",
+      "no": "No",
+      "generated": "Generado {{date}} desde el panel de administración NEXUS."
+    },
+    "sections": {
+      "classifications": "Clasificaciones"
+    },
+    "empty": {
+      "value": "-"
+    }
+  },
+  "caring_workflow": {
+    "predictive": {
+      "trend_growing": "{{value}}% en crecimiento",
+      "trend_declining": "{{value}}% decreciente",
+      "trend_stable": "Estable",
+      "not_enough_activity": "Aún no hay suficiente actividad para pronosticar. Vuelve en unas semanas.",
+      "history": "Historia",
+      "forecast": "Pronóstico",
+      "confidence": "Confianza",
+      "severity": {
+        "critical": "Crítico",
+        "warning": "Advertencia",
+        "info": "Información"
+      },
+      "title": "Información predictiva",
+      "subtitle": "Previsiones prospectivas y alertas proactivas. Detectar los déficits de atención regionales antes de que se conviertan en emergencias.",
+      "no_forecast": "Aún no hay datos de pronóstico disponibles.",
+      "hours_forecast": "Previsión de horas",
+      "active_members": "Miembros activos",
+      "recipients_reached": "Destinatarios alcanzados",
+      "sub_region_coverage": "Cobertura de subregión (últimos días {{days}})",
+      "under_supplied_count_many": "{{count}} insuficientemente abastecido",
+      "under_supplied_count_one": "{{count}} insuficientemente abastecido",
+      "under_supplied_count_other": "{{count}} insuficientemente abastecido",
+      "sub_region_coverage_aria": "Cobertura subregional",
+      "columns": {
+        "sub_region": "Subregión",
+        "requested_90d": "Solicitado (90d)",
+        "fulfilled_90d": "Cumplido (90d)",
+        "coverage": "Cobertura",
+        "status": "Estado",
+        "category": "Categoría",
+        "prior_active": "activo previo",
+        "lapsed": "Transcurrido",
+        "churn_rate": "tasa de abandono",
+        "baseline": "Base",
+        "expected_hrs": "Horas esperadas",
+        "observed_hrs": "Horas observadas",
+        "drift": "Deriva",
+        "sample": "Muestra"
+      },
+      "status": {
+        "under_supplied": "Subabastecido",
+        "ok": "DE ACUERDO"
+      },
+      "helper_churn": "Rotación de asistentes (transcurridos >= {{days}} días)",
+      "overall_percent": "{{value}}% general",
+      "helper_churn_note": "{{lapsed}} de {{prior}} los ayudantes previamente activos no han registrado horas recientemente.",
+      "helper_churn_aria": "Rotación de ayudantes por categoría",
+      "coefficient_drift": "Deriva del coeficiente de categoría",
+      "drifting_count_many": "{{count}} a la deriva",
+      "drifting_count_one": "{{count}} a la deriva",
+      "drifting_count_other": "{{count}} a la deriva",
+      "coefficient_drift_note": "Las categorías con deriva absoluta > {{threshold}}% están marcadas. Revise los coeficientes de referencia en el editor de coeficientes de categoría.",
+      "coefficient_drift_aria": "Deriva del coeficiente de categoría",
+      "proactive_alerts": "Alertas proactivas"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "actions": {
+      "refresh": "Actualizar",
+      "retry": "Rever"
+    }
+  },
+  "billing": {
+    "status_active": "Activo",
+    "status_trialing": "Ensayo",
+    "status_past_due": "Vencido",
+    "status_cancelled": "Cancelado",
+    "status_expired": "Caducado",
+    "status_incomplete": "Incompleto"
+  },
+  "analytics": {
+    "regional": {
+      "loading": {
+        "section": "Cargando análisis"
+      },
+      "errors": {
+        "data_unavailable": "No hay datos disponibles para este período.",
+        "load_data": "No se pudo cargar esta sección de análisis: {{error}}"
+      },
+      "heatmap": {
+        "description": "Principales ubicaciones por actividad y densidad de miembros."
+      },
+      "sections": {
+        "geographic_activity_density": "Densidad de actividad geográfica",
+        "demand_supply_by_category": "Demanda vs oferta por categoría",
+        "monthly_engagement_metrics": "Métricas de participación mensuales"
+      },
+      "columns": {
+        "rank": "Rango",
+        "latitude": "Latitud",
+        "longitude": "Longitud",
+        "members": "Miembros",
+        "density": "Densidad",
+        "month": "Mes",
+        "new_members": "Nuevos miembros",
+        "cumulative_total": "Total acumulado",
+        "category": "Categoría",
+        "requests": "Solicitudes",
+        "offers": "Ofertas",
+        "ratio": "Relación",
+        "trend": "Tendencia",
+        "active_members": "Miembros activos",
+        "vol_hours": "Horas de voluntariado",
+        "new_listings": "Nuevos listados",
+        "new_events": "Nuevos eventos",
+        "help_requests": "Solicitudes de ayuda",
+        "organisation": "Organización",
+        "volunteers": "Voluntarios",
+        "total": "totales",
+        "resolved": "Resuelto",
+        "resolution_rate": "Tasa de resolución",
+        "avg_days_to_resolve": "Promedio días para resolver"
+      },
+      "empty": {
+        "no_geographic_data": "No hay datos geográficos disponibles para este período.",
+        "infinity": "∞",
+        "no_listing_data": "No hay datos sobre la demanda de cotización disponibles para este período.",
+        "no_engagement_data": "No hay datos de participación disponibles para este período.",
+        "no_organisation_data": "No hay actividad de la organización disponible para este período.",
+        "no_help_request_data": "No hay datos de solicitudes de ayuda disponibles para este período."
+      },
+      "demographics": {
+        "age_distribution": "Distribución por edades",
+        "total_with_data": "Miembros de {{total}} con datos demográficos",
+        "language_distribution": "Distribución de idiomas",
+        "total_active_members": "{{total}} miembros activos",
+        "member_growth_12m": "Crecimiento de miembros, últimos 12 meses"
+      },
+      "age_groups": {
+        "under_25": "menores de 25 años",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
+        "65_plus": "65+",
+        "unknown": "Desconocido"
+      },
+      "volunteer": {
+        "total_hours": "Horas totales",
+        "avg_hours_per_volunteer": "Promedio horas por voluntario",
+        "reciprocity_ratio": "Relación de reciprocidad",
+        "reciprocity_description": "Saldo entre horas dadas y horas recibidas en toda la región.",
+        "top_orgs_title": "Principales organizaciones de voluntariado"
+      },
+      "help": {
+        "by_category": "Solicitudes de ayuda por categoría",
+        "resolution_trend_6m": "Tendencia de resolución, últimos 6 meses"
+      },
+      "units": {
+        "days_count_many": "{{count}} días",
+        "days_count_one": "{{count}} días",
+        "days_count_other": "{{count}} días"
+      },
+      "empty_value": "-"
+    }
+  },
+  "unknown": "Desconocido",
+  "advertising": {
+    "push": {
+      "no_daily_data": "Aún no hay datos diarios.",
+      "metrics": {
+        "sends": "Envía",
+        "opens": "Abre"
+      },
+      "chart_sends_title_many": "{{count}} envía",
+      "chart_sends_title_one": "{{count}} envía",
+      "chart_sends_title_other": "{{count}} envía",
+      "chart_opens_title_many": "Se abre {{count}}",
+      "chart_opens_title_one": "Se abre {{count}}",
+      "chart_opens_title_other": "Se abre {{count}}"
+    }
+  },
+  "submit_error": "No se pudo enviar. Por favor inténtalo de nuevo.",
+  "submitting": "Sumisión…",
+  "submit": "Entregar",
+  "under_25": "menores de 25 años",
+  "25_34": "25–34",
+  "35_44": "35–44",
+  "45_54": "45–54",
+  "55_64": "55–64",
+  "65_plus": "65+"
 }

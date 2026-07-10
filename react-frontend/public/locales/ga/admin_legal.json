@@ -147,7 +147,12 @@
         "date": "Dáta",
         "ip_address": "Seoladh IP",
         "member_id": "Ball ID"
-      }
+      },
+      "truncated_few": "Ag taispeáint an 200 taifead is déanaí. Easpórtáil an mórleabhar iomlán CSV chun gach taifead {{count}} a íoslódáil.",
+      "truncated_many": "Ag taispeáint an 200 taifead is déanaí. Easpórtáil an mórleabhar iomlán CSV chun gach taifead {{count}} a íoslódáil.",
+      "truncated_one": "Ag taispeáint an 200 taifead is déanaí. Easpórtáil an mórleabhar iomlán CSV chun gach taifead {{count}} a íoslódáil.",
+      "truncated_other": "Ag taispeáint an 200 taifead is déanaí. Easpórtáil an mórleabhar iomlán CSV chun gach taifead {{count}} a íoslódáil.",
+      "truncated_two": "Ag taispeáint an 200 taifead is déanaí. Easpórtáil an mórleabhar iomlán CSV chun gach taifead {{count}} a íoslódáil."
     },
     "residency": {
       "article_16": "Ceadaítear nochtadh trasteorann sonraí pearsanta má áirithíonn an tír chinn scríbe cosaint leordhóthanach sonraí arna aithint ag an gComhairle Chónaidhme. Cáilíonn ballstáit Switzerland, EU/EEA, agus liosta beag de thíortha eile.",

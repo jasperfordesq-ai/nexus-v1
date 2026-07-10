@@ -8,6 +8,7 @@
  * Pending membership approval requests with approve/reject actions.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';import Check from 'lucide-react/icons/check';
 import X from 'lucide-react/icons/x';
@@ -130,7 +131,7 @@ export function GroupApprovals() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}
+          {item.created_at ? new Date(item.created_at).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },

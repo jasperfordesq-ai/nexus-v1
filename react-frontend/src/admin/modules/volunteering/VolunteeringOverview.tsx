@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Avatar, Skeleton, Select, SelectItem } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { ButtonGroup } from '@/components/ui';
@@ -125,7 +126,7 @@ function formatTimestamp(ts: string, t: TFunction): string {
   if (hours < 24) return t('volunteering.time_hours_ago', { count: hours });
   const days = Math.floor(hours / 24);
   if (days < 7) return t('volunteering.time_days_ago', { count: days });
-  return date.toLocaleDateString();
+  return date.toLocaleDateString(getFormattingLocale());
 }
 
 // ── Wellbeing alerts ───────────────────────────────────────────────────────────
@@ -481,7 +482,7 @@ export function VolunteeringOverview() {
                       </div>
                       {alert.created_at && (
                         <p className="text-xs text-muted mt-1">
-                          {t('volunteering.wellbeing_raised_on', { date: new Date(alert.created_at).toLocaleDateString() })}
+                          {t('volunteering.wellbeing_raised_on', { date: new Date(alert.created_at).toLocaleDateString(getFormattingLocale()) })}
                         </p>
                       )}
                     </div>

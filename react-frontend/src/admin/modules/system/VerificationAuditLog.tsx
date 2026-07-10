@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Spinner, Chip, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -93,7 +94,7 @@ export function VerificationAuditLog() {
     <Card className="shadow-sm">
       <CardHeader className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center px-6 pt-5 pb-0">
         <div className="flex items-center gap-2">
-          <ScrollText className="w-5 h-5 text-indigo-500" />
+          <ScrollText className="w-5 h-5 text-accent" />
           <h3 className="text-lg font-semibold">{t('verification.audit_log_title')}</h3>
           <Chip size="sm" variant="soft">{t('verification.total_events', { count: total })}</Chip>
         </div>
@@ -159,7 +160,7 @@ export function VerificationAuditLog() {
                   return (
                     <TableRow key={event.id}>
                       <TableCell className="whitespace-nowrap text-xs text-theme-muted">
-                        {new Date(event.created_at).toLocaleString()}
+                        {new Date(event.created_at).toLocaleString(getFormattingLocale())}
                       </TableCell>
                       <TableCell>
                         <div className="text-sm font-medium">{userName}</div>

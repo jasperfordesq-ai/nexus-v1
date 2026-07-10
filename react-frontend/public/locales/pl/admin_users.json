@@ -218,7 +218,9 @@
     "smart_search_text_chip": "Zapytanie: {{query}}",
     "role_super_admin": "Superadministrator",
     "permissions_editor_unavailable_title": "Uprawnienia są tutaj tylko do odczytu",
-    "permissions_editor_unavailable_desc": "Ta strona pokazuje rolę użytkownika i przyznane uprawnienia, ale nie pozwala ich zmieniać. Zarządzaj dostępem, zmieniając rolę użytkownika na stronie edycji."
+    "permissions_editor_unavailable_desc": "Ta strona pokazuje rolę użytkownika i przyznane uprawnienia, ale nie pozwala ich zmieniać. Zarządzaj dostępem, zmieniając rolę użytkownika na stronie edycji.",
+    "role_unknown": "Nieznana rola",
+    "role_tenant_super_admin": "Superadministrator dzierżawcy"
   },
   "user_edit": {
     "actions": {

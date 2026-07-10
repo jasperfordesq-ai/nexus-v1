@@ -9,6 +9,7 @@
  * Parity: PHP CronJobController::index()
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useState } from 'react';
 import { Separator } from '@/components/ui';
 import Activity from 'lucide-react/icons/activity';
@@ -78,7 +79,7 @@ export function CronJobs() {
   const formatDate = useCallback((dateStr: string | null): string => {
     if (!dateStr) return t('system.never');
     const d = new Date(dateStr);
-    return d.toLocaleDateString(undefined, {
+    return d.toLocaleDateString(getFormattingLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -298,7 +299,7 @@ export function CronJobs() {
                           </p>
                         </div>
                         <span className="shrink-0 text-xs text-muted">
-                          {new Date(failure.failed_at).toLocaleDateString()}
+                          {new Date(failure.failed_at).toLocaleDateString(getFormattingLocale())}
                         </span>
                       </div>
                     </div>

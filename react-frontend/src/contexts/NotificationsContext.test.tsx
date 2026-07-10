@@ -49,9 +49,11 @@ describe('NotificationsContext', () => {
     expect(content).toContain('markAllAsRead');
   });
 
-  it('integrates with Pusher for real-time updates', () => {
+  it('consumes the canonical Pusher context without constructing a client', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
-    expect(content).toContain('pusher');
+    expect(content).toContain('usePusherOptional');
+    expect(content).not.toContain("import('pusher-js')");
+    expect(content).not.toContain('new PusherClient');
   });
 
   it('uses auth context for user state', () => {

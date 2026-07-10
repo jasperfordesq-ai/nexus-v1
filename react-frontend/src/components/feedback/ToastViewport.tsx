@@ -24,7 +24,7 @@ export default function ToastViewport({ toasts, onRemove }: ToastViewportProps) 
   const politeToasts = toasts.filter((toast) => toast.type === 'success' || toast.type === 'info');
 
   return (
-    <div className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+    <div className="pointer-events-none fixed inset-x-3 bottom-[calc(5rem+var(--safe-area-bottom)+var(--miniplayer-offset,0rem))] z-[9999] flex w-auto max-w-sm flex-col gap-2 sm:start-auto sm:end-4 sm:w-[calc(100vw-2rem)] md:bottom-[calc(1rem+var(--safe-area-bottom)+var(--miniplayer-offset,0rem))]">
       <div
         role="alert"
         aria-live="assertive"
@@ -111,7 +111,7 @@ function ToastItem({ toast, onRemove, ref }: ToastItemProps & { ref?: Ref<HTMLDi
         <button
           type="button"
           onClick={() => onRemove(toast.id)}
-          className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full p-0 text-white/40 transition-colors hover:text-white focus:outline-none focus:ring-2 focus:ring-white/60"
+          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full p-0 text-white/40 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
           aria-label={t('toast.aria_dismiss_notification')}
         >
           <X className="w-4 h-4" aria-hidden="true" />

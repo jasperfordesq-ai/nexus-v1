@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Textarea, Card, CardBody, Chip, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -113,7 +114,7 @@ function TypingIndicator() {
         icon={<Bot className="w-4 h-4" aria-hidden="true" />}
         size="sm"
         classNames={{
-          base: 'bg-gradient-to-br from-indigo-500 to-purple-600 flex-shrink-0',
+          base: 'bg-gradient-to-br from-accent to-accent-gradient-end flex-shrink-0',
           icon: 'text-white',
         }}
       />
@@ -122,7 +123,7 @@ function TypingIndicator() {
           {[0, 1, 2].map((i) => (
             <motion.span
               key={i}
-              className="w-2 h-2 rounded-full bg-indigo-400"
+              className="w-2 h-2 rounded-full bg-accent"
               animate={{ opacity: [0.3, 1, 0.3], y: [0, -4, 0] }}
               transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.15 }}
             />
@@ -147,7 +148,7 @@ interface MessageBubbleProps {
 function MessageBubble({ message, userName, userAvatar, onFeedback }: MessageBubbleProps) {
   const { t } = useTranslation('chat');
   const isUser = message.role === 'user';
-  const time = message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const time = message.timestamp.toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' });
   const sources = !isUser && message.sources?.length ? message.sources.slice(0, 4) : [];
   const toolInvocations = !isUser && message.toolInvocations?.length ? message.toolInvocations : [];
 
@@ -172,7 +173,7 @@ function MessageBubble({ message, userName, userAvatar, onFeedback }: MessageBub
           icon={<Bot className="w-4 h-4" aria-hidden="true" />}
           size="sm"
           classNames={{
-            base: 'bg-gradient-to-br from-indigo-500 to-purple-600 flex-shrink-0',
+            base: 'bg-gradient-to-br from-accent to-accent-gradient-end flex-shrink-0',
             icon: 'text-white',
           }}
         />
@@ -183,7 +184,7 @@ function MessageBubble({ message, userName, userAvatar, onFeedback }: MessageBub
         <div
           className={`px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap break-words ${
             isUser
-              ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-br-sm'
+              ? 'bg-gradient-to-br from-accent to-accent-gradient-end text-white rounded-br-sm'
               : message.isError
               ? 'bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 rounded-bl-sm'
               : 'bg-[var(--color-surface)] border border-[var(--border-default)] text-[var(--color-text)] rounded-bl-sm'
@@ -289,8 +290,8 @@ function FeatureNotAvailable() {
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-6 py-16 text-center">
-      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 flex items-center justify-center mb-4">
-        <Bot className="w-8 h-8 text-indigo-500" aria-hidden="true" />
+      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent to-accent-gradient-end dark:from-accent/30 dark:to-accent-gradient-end/30 flex items-center justify-center mb-4">
+        <Bot className="w-8 h-8 text-accent" aria-hidden="true" />
       </div>
       <h2 className="text-xl font-semibold text-[var(--color-text)] mb-2">{t('feature_unavailable_title')}</h2>
       <p className="text-[var(--color-text-muted)] max-w-sm">
@@ -321,7 +322,7 @@ function EmptyState({ onQuestionClick, starters }: EmptyStateProps) {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.4 }}
-        className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center mb-5 shadow-lg"
+        className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-accent-gradient-end flex items-center justify-center mb-5 shadow-lg"
       >
         <Sparkles className="w-10 h-10 text-white" aria-hidden="true" />
       </motion.div>
@@ -358,7 +359,7 @@ function EmptyState({ onQuestionClick, starters }: EmptyStateProps) {
               <Button
                 variant="flat"
                 onPress={() => onQuestionClick(question)}
-                className="w-full text-left px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--border-default)] text-sm text-[var(--color-text)] hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-all justify-start min-h-9"
+                className="w-full text-left px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--border-default)] text-sm text-[var(--color-text)] hover:border-accent hover:bg-accent-soft dark:hover:bg-accent/20 transition-all justify-start min-h-9"
               >
                 {question}
               </Button>
@@ -558,7 +559,7 @@ export default function AiChatPage() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-default)] bg-[var(--color-surface)] flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-accent-gradient-end flex items-center justify-center">
             <Bot className="w-5 h-5 text-white" aria-hidden="true" />
           </div>
           <div>
@@ -657,7 +658,7 @@ export default function AiChatPage() {
                 <Button
                   isIconOnly
                   color="primary"
-                  className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex-shrink-0 mb-0.5"
+                  className="bg-gradient-to-br from-accent to-accent-gradient-end text-white flex-shrink-0 mb-0.5"
                   size="sm"
                   onPress={() => void sendMessage(input)}
                   isDisabled={!input.trim() || isLoading}

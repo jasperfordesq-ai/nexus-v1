@@ -13,12 +13,9 @@
 import { lazy, Suspense, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 
-import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import ListTodo from 'lucide-react/icons/list-todo';
-import MessageSquare from 'lucide-react/icons/message-square';
 import Wallet from 'lucide-react/icons/wallet';
 import Users from 'lucide-react/icons/users';
-import Users2 from 'lucide-react/icons/users-round';
 import Calendar from 'lucide-react/icons/calendar';
 import Settings from 'lucide-react/icons/settings';
 import LogOut from 'lucide-react/icons/log-out';
@@ -29,37 +26,13 @@ import Sun from 'lucide-react/icons/sun';
 import Moon from 'lucide-react/icons/moon';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import ChevronDown from 'lucide-react/icons/chevron-down';
-import Trophy from 'lucide-react/icons/trophy';
-import Medal from 'lucide-react/icons/medal';
-import Target from 'lucide-react/icons/target';
-import HelpCircle from 'lucide-react/icons/circle-help';
 import UserCircle from 'lucide-react/icons/circle-user';
-import Newspaper from 'lucide-react/icons/newspaper';
-import BookOpen from 'lucide-react/icons/book-open';
-import FolderOpen from 'lucide-react/icons/folder-open';
-import Heart from 'lucide-react/icons/heart';
 import Building2 from 'lucide-react/icons/building-2';
 import Globe from 'lucide-react/icons/globe';
-import Info from 'lucide-react/icons/info';
-import Sparkles from 'lucide-react/icons/sparkles';
 import FileText from 'lucide-react/icons/file-text';
 import Shield from 'lucide-react/icons/shield';
-import Handshake from 'lucide-react/icons/handshake';
-import Stethoscope from 'lucide-react/icons/stethoscope';
-import TrendingUp from 'lucide-react/icons/trending-up';
-import BarChart3 from 'lucide-react/icons/chart-column';
-import Compass from 'lucide-react/icons/compass';
-import Bot from 'lucide-react/icons/bot';
-import Briefcase from 'lucide-react/icons/briefcase';
-import Lightbulb from 'lucide-react/icons/lightbulb';
-import GraduationCap from 'lucide-react/icons/graduation-cap';
-import Podcast from 'lucide-react/icons/podcast';
-import Activity from 'lucide-react/icons/activity';
-import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Fingerprint from 'lucide-react/icons/fingerprint';
 import ShieldCheck from 'lucide-react/icons/shield-check';
-import Bookmark from 'lucide-react/icons/bookmark';
-import Crown from 'lucide-react/icons/crown';
 import BadgeCheck from 'lucide-react/icons/badge-check';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Download from 'lucide-react/icons/download';
@@ -83,7 +56,11 @@ import { DesktopNavPanel, type DesktopNavPanelSection } from '@/components/layou
 import { ThemePicker } from '@/components/layout/ThemePicker';
 import { TenantLogo } from '@/components/branding';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
-import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
+import {
+  getNavigationItems,
+  type DesktopNavigationSection,
+  type NavigationItemPolicy,
+} from '@/components/navigation/navigationRegistry';
 import type { TenantFeatures } from '@/types/api';
 
 import { Avatar } from '@/components/ui/Avatar';
@@ -144,10 +121,10 @@ const utilityBarActionBase = 'utility-bar-action inline-flex items-center justif
 const utilityBarActionClass = `${utilityBarActionBase} text-theme-muted hover:text-theme-primary`;
 const utilityBarIconActionClass = `${utilityBarActionClass} w-8 min-w-8 px-0`;
 // Verified / "Verify Identity" affordance — green. Built from the colourless base
-// (not utilityBarActionClass) so it never inherits text-theme-muted, and the emerald
-// utilities use the important modifier because the `.text-theme-*` helpers in
-// index.css are unlayered and would otherwise win over Tailwind's layered colours.
-const utilityBarSuccessActionClass = `${utilityBarActionBase} !text-emerald-600 hover:!text-emerald-700 dark:!text-emerald-400 dark:hover:!text-emerald-300 font-semibold`;
+// (not utilityBarActionClass) so it never inherits text-theme-muted. The shared
+// status token is WCAG-safe on both light and dark utility-bar surfaces and also
+// supplies HeroUI's success-soft foreground.
+const utilityBarSuccessActionClass = `${utilityBarActionBase} !text-[var(--status-success-foreground)] hover:!text-[var(--status-success-foreground)] font-semibold`;
 const utilityBarDividerClass = 'text-[var(--border-default)] text-xs select-none shrink-0 opacity-70';
 
 export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChange, isMobileMenuOpen }: NavbarProps) {
@@ -303,70 +280,66 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
   };
 
   // ─── Memoized nav item arrays ──────────────────────────────────────────────
-  const isHourTimebank = tenant?.slug === 'hour-timebank';
+  type ResolvedDesktopNavigationItem = NavigationItemPolicy & {
+    label: string;
+    desc: string;
+    path: string;
+    href: string;
+  };
+  const resolveDesktopSection = useCallback((section: DesktopNavigationSection): ResolvedDesktopNavigationItem[] => (
+    getNavigationItems('desktop', section, {
+      isAuthenticated,
+      tenantSlug: tenant?.slug,
+      hasFeature,
+      hasModule,
+    }).map(item => ({
+      ...item,
+      label: t(item.labelKey),
+      desc: item.descriptionKey ? t(item.descriptionKey) : '',
+      path: item.href,
+      href: tenantPath(item.href),
+    }))
+  ), [hasFeature, hasModule, isAuthenticated, t, tenant?.slug, tenantPath]);
 
   // Timebanking dropdown — replaces top-level Listings link
-  const timebankingItems = useMemo(() => [
-    { label: t('nav.listings'), desc: t('nav_desc.timebanking_listings'), href: tenantPath('/listings'), icon: ListTodo, module: 'listings' as const },
-    { label: t('nav.exchanges'), desc: t('nav_desc.exchanges'), href: tenantPath('/exchanges'), icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
-    { label: t('nav.group_exchanges'), desc: t('nav_desc.group_exchanges'), href: tenantPath('/group-exchanges'), icon: Users, feature: 'group_exchanges' as const },
-    { label: t('nav.wallet'), desc: t('nav_desc.wallet'), href: tenantPath('/wallet'), icon: Wallet, module: 'wallet' as const },
-  ].filter(item => {
-    if ('feature' in item && item.feature) return hasFeature(item.feature as Parameters<typeof hasFeature>[0]);
-    if ('module' in item && item.module) return hasModule(item.module as Parameters<typeof hasModule>[0]);
-    return true;
-  }), [t, tenantPath, hasFeature, hasModule]);
+  const timebankingItems = useMemo(
+    () => resolveDesktopSection('timebanking'),
+    [resolveDesktopSection],
+  );
 
+  const communityMainItems = useMemo(
+    () => resolveDesktopSection('community-main'),
+    [resolveDesktopSection],
+  );
+  const communityLocalItems = useMemo(
+    () => resolveDesktopSection('community-local'),
+    [resolveDesktopSection],
+  );
+  const communityExploreItems = useMemo(
+    () => resolveDesktopSection('community-explore'),
+    [resolveDesktopSection],
+  );
   const communityItems = useMemo<CommunityNavItem[]>(() => {
-    const items: CommunityNavItem[] = [];
-    // Dashboard — authenticated users with the dashboard module (sits at the top of the dropdown)
-    if (isAuthenticated && hasModule('dashboard')) {
-      items.push({ label: t('nav.dashboard'), desc: t('nav_desc.dashboard'), path: '/dashboard', href: tenantPath('/dashboard'), icon: LayoutDashboard });
-    }
-    items.push(
-      { label: t('nav.members'), desc: t('nav_desc.members'), path: '/members', href: tenantPath('/members'), icon: Users, feature: 'connections' as const },
-      { label: t('nav.connections'), desc: t('nav_desc.connections'), path: '/connections', href: tenantPath('/connections'), icon: Users2, feature: 'connections' as const },
-      { label: t('nav.events'), desc: t('nav_desc.events'), path: '/events', href: tenantPath('/events'), icon: Calendar, feature: 'events' as const },
-      { label: t('nav.groups'), desc: t('nav_desc.groups'), path: '/groups', href: tenantPath('/groups'), icon: Users, feature: 'groups' as const },
-      { label: t('nav.volunteering'), desc: t('nav_desc.volunteering'), path: '/volunteering', href: tenantPath('/volunteering'), icon: Heart, feature: 'volunteering' as const },
-      { label: t('nav.organisations'), desc: t('nav_desc.organisations'), path: '/organisations', href: tenantPath('/organisations'), icon: Building2, feature: 'volunteering' as const },
-    );
-    // Partner Communities — authenticated users with federation; sits directly below Volunteering
-    if (isAuthenticated && hasFeature('federation')) {
-      items.push({ label: t('nav.partner_communities'), desc: t('nav_desc.partner_communities'), path: '/federation', href: tenantPath('/federation'), icon: Building2, feature: 'federation' as const });
-    }
-    items.push(
-      { label: t('nav.caring_community'), desc: t('nav_desc.caring_community'), path: CARING_COMMUNITY_ROUTE.href, href: tenantPath(CARING_COMMUNITY_ROUTE.href), icon: Heart, feature: CARING_COMMUNITY_ROUTE.feature },
-    );
-    items.push(
-      { label: t('nav.resources'), desc: t('nav_desc.resources'), path: '/resources', href: tenantPath('/resources'), icon: FolderOpen, feature: 'resources' as const },
-      { label: t('nav.jobs'), desc: t('nav_desc.jobs'), path: '/jobs', href: tenantPath('/jobs'), icon: Briefcase, feature: 'job_vacancies' as const },
-      { label: t('nav.marketplace'), desc: t('nav_desc.marketplace'), path: '/marketplace', href: tenantPath('/marketplace'), icon: ShoppingBag, feature: 'marketplace' as const },
-      { label: t('nav.courses'), desc: t('nav_desc.courses'), path: '/courses', href: tenantPath('/courses'), icon: GraduationCap, feature: 'courses' as const },
-      { label: t('nav.podcasts'), desc: t('nav_desc.podcasts'), path: '/podcasts', href: tenantPath('/podcasts'), icon: Podcast, feature: 'podcasts' as const },
-      { label: t('nav.premium'), desc: t('nav_desc.premium'), path: '/premium', href: tenantPath('/premium'), icon: Crown, feature: 'member_premium' as const },
-    );
+    const items: CommunityNavItem[] = [
+      ...communityMainItems,
+      ...communityLocalItems,
+      ...communityExploreItems,
+    ];
     return items;
-  }, [t, tenantPath, isAuthenticated, hasModule, hasFeature]);
+  }, [communityExploreItems, communityLocalItems, communityMainItems]);
   const visibleCommunityItems = useMemo(
     () => communityItems.filter(item => !item.feature || hasFeature(item.feature)),
     [communityItems, hasFeature],
   );
   const communityLeftSections = useMemo<DesktopNavPanelSection[]>(() => {
-    const mainPaths = new Set(['/dashboard']);
-    const communityPathsSet = new Set(['/members', '/connections', '/events', '/groups', '/volunteering', '/organisations', '/federation', CARING_COMMUNITY_ROUTE.href]);
     const toPanelItem = (item: CommunityNavItem) => ({
       label: item.label,
       desc: item.desc,
       href: item.href,
       icon: item.icon,
     });
-    const mainItems = visibleCommunityItems
-      .filter(item => mainPaths.has(item.path))
-      .map(toPanelItem);
-    const localCommunityItems = visibleCommunityItems
-      .filter(item => communityPathsSet.has(item.path))
-      .map(toPanelItem);
+    const mainItems = communityMainItems.map(toPanelItem);
+    const localCommunityItems = communityLocalItems.map(toPanelItem);
 
     return [
       ...(mainItems.length > 0 ? [{
@@ -380,45 +353,45 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
         items: localCommunityItems,
       }] : []),
     ];
-  }, [visibleCommunityItems, t]);
+  }, [communityLocalItems, communityMainItems, t]);
   const communityRightSections = useMemo<DesktopNavPanelSection[]>(() => {
-    const mainPaths = new Set(['/dashboard']);
-    const communityPathsSet = new Set(['/members', '/connections', '/events', '/groups', '/volunteering', '/organisations', '/federation', CARING_COMMUNITY_ROUTE.href]);
     const toPanelItem = (item: CommunityNavItem) => ({
       label: item.label,
       desc: item.desc,
       href: item.href,
       icon: item.icon,
     });
-    const exploreItems = visibleCommunityItems
-      .filter(item => !mainPaths.has(item.path) && !communityPathsSet.has(item.path))
-      .map(toPanelItem);
+    const exploreItems = communityExploreItems.map(toPanelItem);
 
     return exploreItems.length > 0 ? [{
       key: 'explore',
       title: t('sections.explore'),
       items: exploreItems,
     }] : [];
-  }, [visibleCommunityItems, t]);
-
-  // Helper to filter items by feature/module gates
-  const gateFilter = useCallback((item: Record<string, unknown> & { feature?: string; module?: string }) => {
-    if ('feature' in item && item.feature && !hasFeature(item.feature as Parameters<typeof hasFeature>[0])) return false;
-    if ('module' in item && item.module && !hasModule(item.module as Parameters<typeof hasModule>[0])) return false;
-    return true;
-  }, [hasFeature, hasModule]);
+  }, [communityExploreItems, t]);
 
   // ─── Collapsed primary nav items → overflow into MegaMenu ────────────────
+  const primaryNavigationItems = useMemo(
+    () => resolveDesktopSection('primary'),
+    [resolveDesktopSection],
+  );
+  const feedNavigationItem = primaryNavigationItems.find(item => item.id === 'feed');
+  const exploreNavigationItem = primaryNavigationItems.find(item => item.id === 'explore');
+  const messagesNavigationItem = primaryNavigationItems.find(item => item.id === 'messages');
   const overflowNavItems = useMemo(() => {
-    const items: { label: string; desc: string; href: string; icon: typeof LayoutDashboard; module?: string }[] = [];
-    if (hasModule('feed') && maxVisibleNav < 1)
-      items.push({ label: t('nav.feed'), desc: t('nav_desc.feed'), href: tenantPath('/feed'), icon: Newspaper, module: 'feed' });
-    if (hasFeature('explore') && maxVisibleNav < 2)
-      items.push({ label: t('nav.explore'), desc: t('nav_desc.explore'), href: tenantPath('/explore'), icon: Compass });
-    if (hasModule('messages') && maxVisibleNav < 4)
-      items.push({ label: t('nav.messages'), desc: t('nav_desc.messages'), href: tenantPath('/messages'), icon: MessageSquare, module: 'messages' });
-    return items;
-  }, [maxVisibleNav, hasModule, hasFeature, t, tenantPath]);
+    const slotThreshold: Partial<Record<NavigationItemPolicy['id'], number>> = {
+      feed: 1,
+      explore: 2,
+      messages: 4,
+    };
+    return primaryNavigationItems.filter(item => maxVisibleNav < (slotThreshold[item.id] ?? 0));
+  }, [maxVisibleNav, primaryNavigationItems]);
+  const engageNavigationItems = useMemo(() => resolveDesktopSection('engage'), [resolveDesktopSection]);
+  const progressNavigationItems = useMemo(() => resolveDesktopSection('progress'), [resolveDesktopSection]);
+  const toolsNavigationItems = useMemo(() => resolveDesktopSection('tools'), [resolveDesktopSection]);
+  const federationNavigationItems = useMemo(() => resolveDesktopSection('federation'), [resolveDesktopSection]);
+  const aboutNavigationItems = useMemo(() => resolveDesktopSection('about'), [resolveDesktopSection]);
+  const impactNavigationItems = useMemo(() => resolveDesktopSection('impact'), [resolveDesktopSection]);
 
   // ─── Left column sections ────────────────────────────────────────────────
   const leftSections = useMemo(() => [
@@ -431,51 +404,30 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
     {
       key: 'engage',
       title: t('sections.engage'),
-      items: [
-        { label: t('nav.goals'), desc: t('nav_desc.goals'), href: tenantPath('/goals'), icon: Target, feature: 'goals' },
-        { label: t('nav.polls'), desc: t('nav_desc.polls'), href: tenantPath('/polls'), icon: BarChart3, feature: 'polls' },
-        { label: t('nav.ideation'), desc: t('nav_desc.ideation'), href: tenantPath('/ideation'), icon: Lightbulb, feature: 'ideation_challenges' },
-      ].filter(gateFilter),
+      items: engageNavigationItems,
     },
     {
       key: 'progress',
       title: t('sections.progress'),
       collapsible: true,
       defaultExpanded: false,
-      items: [
-        { label: t('nav.achievements'), desc: t('nav_desc.achievements'), href: tenantPath('/achievements'), icon: Trophy, feature: 'gamification' },
-        { label: t('nav.leaderboard'), desc: t('nav_desc.leaderboard'), href: tenantPath('/leaderboard'), icon: Medal, feature: 'gamification' },
-        { label: t('nav.nexus_score'), desc: t('nav_desc.nexus_score'), href: tenantPath('/nexus-score'), icon: BarChart3, feature: 'gamification' },
-      ].filter(gateFilter),
+      items: progressNavigationItems,
     },
     {
       key: 'tools',
       title: t('sections.tools'),
       collapsible: true,
       defaultExpanded: false,
-      items: [
-        { label: t('nav.matches'), desc: t('nav_desc.matches'), href: tenantPath('/matches'), icon: Handshake },
-        { label: t('nav.skills'), desc: t('nav_desc.skills'), href: tenantPath('/skills'), icon: GraduationCap },
-        { label: t('nav.saved'), desc: t('nav_desc.saved'), href: tenantPath('/saved'), icon: Bookmark },
-        { label: t('nav.activity'), desc: t('nav_desc.activity'), href: tenantPath('/activity'), icon: Activity },
-        { label: t('nav.ai_chat'), desc: t('nav_desc.ai_chat'), href: tenantPath('/chat'), icon: Bot, feature: 'ai_chat' },
-      ].filter(gateFilter),
+      items: toolsNavigationItems,
     },
-    ...(hasFeature('federation') ? [{
+    ...(federationNavigationItems.length > 0 ? [{
       key: 'federation',
       title: t('sections.partner_communities'),
       collapsible: true,
       defaultExpanded: false,
-      items: [
-        { label: t('nav.federation_hub'), desc: t('nav_desc.federation_hub'), href: tenantPath('/federation'), icon: Globe },
-        { label: t('nav.federated_members'), desc: t('nav_desc.federated_members'), href: tenantPath('/federation/members'), icon: Users },
-        { label: t('nav.federated_messages'), desc: t('nav_desc.federated_messages'), href: tenantPath('/federation/messages'), icon: MessageSquare },
-        { label: t('nav.federated_listings'), desc: t('nav_desc.federated_listings'), href: tenantPath('/federation/listings'), icon: ListTodo },
-        { label: t('nav.federated_events'), desc: t('nav_desc.federated_events'), href: tenantPath('/federation/events'), icon: Calendar },
-        { label: t('nav.federation_settings'), desc: t('nav_desc.federation_settings'), href: tenantPath('/federation/settings'), icon: Settings },
-      ],
+      items: federationNavigationItems,
     }] : []),
-  ], [t, tenantPath, overflowNavItems, gateFilter, hasFeature]);
+  ], [engageNavigationItems, federationNavigationItems, overflowNavItems, progressNavigationItems, t, toolsNavigationItems]);
 
   // ─── Right column sections ───────────────────────────────────────────────
   const rightSections = useMemo(() => [
@@ -483,33 +435,23 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       key: 'about',
       title: t('sections.about'),
       items: [
-        { label: t('nav.about'), desc: t('nav_desc.about'), href: tenantPath('/about'), icon: Info },
-        { label: t('nav.features'), desc: t('nav_desc.features'), href: tenantPath('/features'), icon: Sparkles },
-        { label: t('nav.blog'), desc: t('nav_desc.blog'), href: tenantPath('/blog'), icon: BookOpen, feature: 'blog' },
-        { label: t('nav.faq'), desc: t('nav_desc.faq'), href: tenantPath('/faq'), icon: HelpCircle },
-        { label: t('nav.timebanking_guide'), desc: t('nav_desc.timebanking_guide'), href: tenantPath('/timebanking-guide'), icon: BookOpen },
+        ...aboutNavigationItems,
         ...(tenant?.menu_pages?.about || []).map((pg: { title: string; slug: string }) => ({
           label: pg.title,
           desc: undefined as string | undefined,
           href: tenantPath(`/page/${pg.slug}`),
           icon: FileText,
         })),
-      ].filter(gateFilter),
+      ],
     },
-    ...(isHourTimebank ? [{
+    ...(impactNavigationItems.length > 0 ? [{
       key: 'impact',
       title: t('sections.impact'),
       collapsible: true,
       defaultExpanded: false,
-      items: [
-        { label: t('nav.partner_with_us'), desc: t('nav_desc.partner_with_us'), href: tenantPath('/partner'), icon: Handshake },
-        { label: t('nav.social_prescribing'), desc: t('nav_desc.social_prescribing'), href: tenantPath('/social-prescribing'), icon: Stethoscope },
-        { label: t('nav.our_impact'), desc: t('nav_desc.our_impact'), href: tenantPath('/impact-summary'), icon: TrendingUp },
-        { label: t('nav.impact_report'), desc: t('nav_desc.impact_report'), href: tenantPath('/impact-report'), icon: BarChart3 },
-        { label: t('nav.strategic_plan'), desc: t('nav_desc.strategic_plan'), href: tenantPath('/strategic-plan'), icon: Compass },
-      ],
+      items: impactNavigationItems,
     }] : []),
-  ], [t, tenantPath, isHourTimebank, tenant?.menu_pages?.about, gateFilter]);
+  ], [aboutNavigationItems, impactNavigationItems, t, tenant?.menu_pages?.about, tenantPath]);
 
   const timebankingPaths = useMemo(() => timebankingItems.map(i => i.href), [timebankingItems]);
   const communityPaths = useMemo(() => visibleCommunityItems.map(i => i.href), [visibleCommunityItems]);
@@ -549,7 +491,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
       {/* Skip-to-content link lives in Layout.tsx (single source). Rendering
           another one here produced two consecutive "Skip to main content"
           links in the DOM — flagged by accessibility audits. */}
-      <header className={`fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip transition-transform duration-200 ${isMobileMenuOpen ? '-translate-y-full md:translate-y-0' : ''}`} style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+      <header className={`fixed top-0 left-0 right-0 z-300 backdrop-blur-xl border-b border-theme-default glass-surface overflow-x-clip pt-[env(safe-area-inset-top,0px)] transition-transform duration-200 ${isMobileMenuOpen ? '-translate-y-full md:translate-y-0' : ''}`}>
         {/* Utility Bar — slim top strip, auto-hides on scroll down */}
         <div
           className={`hidden sm:block border-b border-[var(--border-default)] bg-[var(--surface-elevated)] transition-all duration-200 overflow-hidden ${
@@ -714,9 +656,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               ) : (
               <>
               {/* Primary nav items — collapse into More when space is tight */}
-              {hasModule('feed') && maxVisibleNav >= 1 && (
+              {feedNavigationItem && maxVisibleNav >= 1 && (
                 <NavLink
-                  to={tenantPath('/feed')}
+                  to={feedNavigationItem.href}
                   className={({ isActive }) =>
                     `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                       isActive
@@ -725,15 +667,15 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     }`
                   }
                 >
-                  <Newspaper className="w-4 h-4" aria-hidden="true" />
-                  <span>{t('nav.feed')}</span>
+                  <feedNavigationItem.icon className="w-4 h-4" aria-hidden="true" />
+                  <span>{feedNavigationItem.label}</span>
                 </NavLink>
               )}
 
               {/* Explore / Discover */}
-              {maxVisibleNav >= 2 && hasFeature('explore') && (
+              {exploreNavigationItem && maxVisibleNav >= 2 && (
                 <NavLink
-                  to={tenantPath('/explore')}
+                  to={exploreNavigationItem.href}
                   className={({ isActive }) =>
                     `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                       isActive
@@ -742,8 +684,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     }`
                   }
                 >
-                  <Compass className="w-4 h-4" aria-hidden="true" />
-                  <span>{t('nav.explore')}</span>
+                  <exploreNavigationItem.icon className="w-4 h-4" aria-hidden="true" />
+                  <span>{exploreNavigationItem.label}</span>
                 </NavLink>
               )}
 
@@ -801,9 +743,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </Dropdown>
               )}
 
-              {hasModule('messages') && maxVisibleNav >= 4 && (
+              {messagesNavigationItem && maxVisibleNav >= 4 && (
                 <NavLink
-                  to={tenantPath('/messages')}
+                  to={messagesNavigationItem.href}
                   className={({ isActive }) =>
                     `flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                       isActive
@@ -812,8 +754,8 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     }`
                   }
                 >
-                  <MessageSquare className="w-4 h-4" aria-hidden="true" />
-                  <span>{t('nav.messages')}</span>
+                  <messagesNavigationItem.icon className="w-4 h-4" aria-hidden="true" />
+                  <span>{messagesNavigationItem.label}</span>
                   {counts.messages > 0 && isAuthenticated && (
                     <span
                       className="ms-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold bg-red-500 text-white rounded-full"
@@ -907,11 +849,6 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       ) : null}
                     </DropdownMenu>
                   </Dropdown>
-
-                  {/* Language Switcher — mobile only (desktop uses utility bar) */}
-                  <div className="hidden min-[390px]:block sm:hidden">
-                    <LanguageSwitcher />
-                  </div>
 
                   {/* Notification Flyout — rich popover instead of simple navigate */}
                   <Suspense fallback={null}>
@@ -1049,22 +986,13 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 </>
               ) : (
                 <>
-                  {/* Theme Picker + Language Switcher — mobile only (desktop uses utility bar) */}
-                  <div className="hidden min-[390px]:flex items-center gap-1 sm:hidden">
-                    <ThemePicker triggerSize="sm" placement="bottom-end" />
-                    <LanguageSwitcher />
-                  </div>
-
-                  <Link to={tenantPath('/login')} className="hidden min-[360px]:inline-flex">
-                    <Button variant="light" size="sm" className="text-theme-secondary hover:text-theme-primary min-w-0 px-2 sm:px-3">
-                      {t('auth.log_in')}
-                    </Button>
-                  </Link>
-                  <Link to={tenantPath('/register')}>
-                    <Button size="sm" color="primary" className="font-medium min-w-0 px-2 sm:px-3">
-                      {t('auth.sign_up')}
-                    </Button>
-                  </Link>
+                  {/* Secondary guest controls live in the drawer at narrow widths. */}
+                  <Button as={Link} to={tenantPath('/login')} variant="light" size="sm" className="hidden min-[480px]:inline-flex text-theme-secondary hover:text-theme-primary min-w-0 px-2 sm:px-3">
+                    {t('auth.log_in')}
+                  </Button>
+                  <Button as={Link} to={tenantPath('/register')} size="sm" color="primary" className="font-medium min-w-0 px-2 sm:px-3">
+                    {t('auth.sign_up')}
+                  </Button>
                 </>
               )}
             </div>

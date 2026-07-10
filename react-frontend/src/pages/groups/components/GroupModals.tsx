@@ -6,7 +6,7 @@
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/Spinner';
 import { Switch } from '@/components/ui/Switch';
 import { Textarea } from '@/components/ui/Textarea';
@@ -83,7 +83,7 @@ export function NewDiscussionModal({
         {(onClose) => (
           <>
             <ModalHeader className="text-theme-primary flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-purple-400" aria-hidden="true" />
+              <MessageSquare className="w-5 h-5 text-accent" aria-hidden="true" />
               {t('detail.new_discussion_modal_title')}
             </ModalHeader>
             <ModalBody className="gap-4">
@@ -208,7 +208,7 @@ export function GroupSettingsModal({
         {(onClose) => (
           <>
             <ModalHeader className="text-theme-primary flex items-center gap-2">
-              <Settings className="w-5 h-5 text-purple-400" aria-hidden="true" />
+              <Settings className="w-5 h-5 text-accent" aria-hidden="true" />
               {t('detail.settings_modal_title')}
             </ModalHeader>
             <ModalBody className="gap-4">
@@ -576,7 +576,7 @@ export function GroupInviteModal({
         {(onClose) => (
           <>
             <ModalHeader className="text-theme-primary flex items-center gap-2">
-              <UserPlus className="w-5 h-5 text-purple-400" aria-hidden="true" />
+              <UserPlus className="w-5 h-5 text-accent" aria-hidden="true" />
               {t('detail.invite_members')}
             </ModalHeader>
             <ModalBody>
@@ -674,13 +674,11 @@ export function GroupReportModal({
       }}
     >
       <ModalContent>
-        <ModalHeader className="text-theme-primary">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
-              <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
-            </div>
-            {t('detail.report_title')}
+        <ModalHeader className="flex items-center gap-3 text-theme-primary">
+          <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
+            <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
           </div>
+          <ModalHeading>{t('detail.report_title')}</ModalHeading>
         </ModalHeader>
         <ModalBody>
           <p className="text-sm text-theme-muted mb-3">

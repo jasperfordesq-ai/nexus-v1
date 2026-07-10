@@ -116,7 +116,8 @@
       "intended_use": "使用目的",
       "rejection_reason": "拒否理由",
       "provisioning_log": "プロビジョニングログ"
-    }
+    },
+    "loading": "プロビジョニング リクエストを読み込んでいます…"
   },
   "loading": "Loading",
   "refresh": "リフレッシュ"

@@ -35,7 +35,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { CardRowsSkeleton } from '@/components/ui/Skeletons';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
@@ -43,7 +43,7 @@ import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import type { FederationPartner } from '@/types/api';
 
@@ -71,7 +71,7 @@ const FEDERATION_LEVELS: Record<number, FederationLevelMeta> = {
   3: {
     label: 'partners.level_economic',
     color: 'secondary',
-    className: 'bg-purple-500/20 text-purple-600 dark:text-purple-400',
+    className: 'bg-accent/20 text-accent dark:text-accent',
   },
   4: {
     label: 'partners.level_integrated',
@@ -180,7 +180,7 @@ export function FederationPartnersPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <Handshake className="w-7 h-7 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+          <Handshake className="w-7 h-7 text-accent dark:text-accent" aria-hidden="true" />
           {t('partners.heading')}
         </h1>
         <p className="text-theme-muted mt-1">
@@ -206,7 +206,7 @@ export function FederationPartnersPage() {
           </h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadPartners}
           >
@@ -256,23 +256,21 @@ export function FederationPartnersPage() {
         <ModalContent>
           {selectedPartner && (
             <>
-              <ModalHeader className="flex items-center gap-3">
+              <ModalHeader className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3">
                 <Avatar
                   name={selectedPartner.name[0]}
                   src={resolveAvatarUrl(selectedPartner.logo)}
                   size="md"
-                  className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex-shrink-0"
+                  className="row-span-2 bg-gradient-to-br from-accent to-accent-gradient-end text-white flex-shrink-0"
                 />
-                <div>
-                  <h2 className="text-lg font-bold text-theme-primary">
-                    {selectedPartner.name}
-                  </h2>
-                  {selectedPartner.tagline && (
-                    <p className="text-sm text-theme-muted font-normal">
-                      {selectedPartner.tagline}
-                    </p>
-                  )}
-                </div>
+                <ModalHeading className="text-lg font-bold text-theme-primary">
+                  {selectedPartner.name}
+                </ModalHeading>
+                {selectedPartner.tagline && (
+                  <p className="text-sm text-theme-muted font-normal">
+                    {selectedPartner.tagline}
+                  </p>
+                )}
               </ModalHeader>
               <ModalBody>
                 <div className="space-y-5">
@@ -293,7 +291,7 @@ export function FederationPartnersPage() {
                       <span className="flex items-center gap-1.5 text-theme-muted">
                         <Shield className="w-4 h-4" aria-hidden="true" />
                         {t('partners.partner_since', {
-                          date: new Date(selectedPartner.partnership_since).toLocaleDateString(undefined, {
+                          date: new Date(selectedPartner.partnership_since).toLocaleDateString(getFormattingLocale(), {
                             month: 'long',
                             year: 'numeric',
                           }),
@@ -368,7 +366,7 @@ export function FederationPartnersPage() {
                       {t('partners.browse_members')}
                     </Button>
                     <Button
-                      className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                      className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                       startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
                       onPress={() => {
                         const path = tenantPath(`/federation/listings?partner_id=${selectedPartner.id}`);
@@ -419,7 +417,7 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
           name={partner.name}
           src={resolveAvatarUrl(partner.logo)}
           size="lg"
-          className="bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex-shrink-0"
+          className="bg-gradient-to-br from-accent to-accent-gradient-end text-white flex-shrink-0"
         />
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-theme-primary text-lg truncate">
@@ -465,7 +463,7 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
             <Chip
               size="sm"
               variant="flat"
-              className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+              className="bg-accent/10 text-accent dark:text-accent"
               startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
             >
               {t('external')}
@@ -474,7 +472,7 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
           {partner.partnership_since && (
             <span className="text-xs text-theme-subtle">
               {t('partners.since_date', {
-                date: new Date(partner.partnership_since).toLocaleDateString(undefined, {
+                date: new Date(partner.partnership_since).toLocaleDateString(getFormattingLocale(), {
                   month: 'short',
                   year: 'numeric',
                 }),

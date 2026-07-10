@@ -9,6 +9,7 @@
  * Uses V2 API: GET /api/v2/volunteering/organisations
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';
@@ -212,29 +213,25 @@ export function OrganisationsPage() {
         description={t('organisations.subtitle')}
         accent="indigo"
         icon={<Building2 className="h-7 w-7" aria-hidden="true" />}
-        stats={organisations.length > 0 && !isLoading ? [{ label: t('organisations.hero_showing_label'), value: organisations.length.toLocaleString() }] : undefined}
+        stats={organisations.length > 0 && !isLoading ? [{ label: t('organisations.hero_showing_label'), value: organisations.length.toLocaleString(getFormattingLocale()) }] : undefined}
         action={
           isAuthenticated ? (
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
               {manageableOrgs.length > 0 && (
-                <Link to={manageHref}>
-                  <Button
-                    className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                    startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
-                  >
-                    {t('organisations.manage_my_button')}
-                  </Button>
-                </Link>
-              )}
-              <Link to={tenantPath('/organisations/register')}>
-                <Button
-                  variant={manageableOrgs.length > 0 ? 'secondary' : 'primary'}
-                  className={manageableOrgs.length > 0 ? 'w-full sm:w-auto' : 'w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white'}
-                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+                <Button as={Link} to={manageHref}
+                  className="w-full sm:w-auto bg-gradient-to-r from-accent to-accent-gradient-end text-white"
+                  startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
                 >
-                  {t('organisations.register_button')}
+                  {t('organisations.manage_my_button')}
                 </Button>
-              </Link>
+              )}
+              <Button as={Link} to={tenantPath('/organisations/register')}
+                variant={manageableOrgs.length > 0 ? 'secondary' : 'primary'}
+                className={manageableOrgs.length > 0 ? 'w-full sm:w-auto' : 'w-full sm:w-auto bg-gradient-to-r from-accent to-accent-gradient-end text-white'}
+                startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('organisations.register_button')}
+              </Button>
             </div>
           ) : undefined
         }
@@ -261,7 +258,7 @@ export function OrganisationsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('organisations.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadOrganisations()}
           >
@@ -288,11 +285,9 @@ export function OrganisationsPage() {
               tips={[t('organisations.empty_tip_volunteer'), t('organisations.empty_tip_partner'), t('organisations.empty_tip_register')]}
               action={
                 isAuthenticated ? (
-                  <Link to={tenantPath('/organisations/register')}>
-                    <Button variant="primary" startContent={<Plus className="w-4 h-4" aria-hidden="true" />}>
-                      {t('organisations.register_button')}
-                    </Button>
-                  </Link>
+                  <Button as={Link} to={tenantPath('/organisations/register')} variant="primary" startContent={<Plus className="w-4 h-4" aria-hidden="true" />}>
+                    {t('organisations.register_button')}
+                  </Button>
                 ) : undefined
               }
             />
@@ -369,7 +364,7 @@ function OrganisationCard({ organisation }: OrganisationCardProps) {
           )}
           {organisation.volunteer_count > 0 && (
             <span className="flex items-center gap-1">
-              <Users className="w-3 h-3 text-indigo-400" aria-hidden="true" />
+              <Users className="w-3 h-3 text-accent" aria-hidden="true" />
               {t('organisations.volunteer_count', { count: organisation.volunteer_count })}
             </span>
           )}

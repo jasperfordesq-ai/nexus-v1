@@ -479,6 +479,14 @@ jobs:
         working-directory: react-frontend
         run: npx eslint src --max-warnings 30
 
+      - name: Component Accessibility Gate (BLOCKING)
+        working-directory: react-frontend
+        run: npm run test:a11y -- --run
+
+      - name: UI Contract Console Gate (BLOCKING)
+        working-directory: react-frontend
+        run: npm run test:ui-contracts -- --run
+
       - name: Vitest Focused Smoke Tests (non-blocking — systemic hang, see note)
         # TEMP non-blocking: this focused-smoke run hangs to its timeout under
         # Vitest's parallel worker pool (ERR_IPC_CHANNEL_CLOSED / "Channel
@@ -1212,6 +1220,74 @@ jobs:
             setting_type = VALUES(setting_type),
             category = VALUES(category),
             updated_at = NOW();
+
+          -- Ephemeral CI-only actors for the authenticated member/admin browser
+          -- accessibility matrix. The bcrypt hash is the standard hash for the
+          -- CI-only password "password"; these rows exist only in nexus_test.
+          INSERT INTO users (
+            id,
+            tenant_id,
+            name,
+            first_name,
+            last_name,
+            email,
+            username,
+            password_hash,
+            role,
+            is_admin,
+            is_approved,
+            is_verified,
+            email_verified_at,
+            status,
+            onboarding_completed,
+            totp_setup_required,
+            is_active,
+            created_at,
+            updated_at
+          )
+          VALUES
+            (
+              900001,
+              2,
+              'E2E Member',
+              'E2E',
+              'Member',
+              'e2e-member@example.test',
+              'e2e_member_ci',
+              '$2y$10$VFWMDLbUqq./1RyaCRXQ2.2Brj9rgZZ4yeDWgBvbJb8tU1koIYl6W',
+              'member',
+              0,
+              1,
+              1,
+              NOW(),
+              'active',
+              1,
+              0,
+              1,
+              NOW(),
+              NOW()
+            ),
+            (
+              900002,
+              2,
+              'E2E Administrator',
+              'E2E',
+              'Administrator',
+              'e2e-admin@example.test',
+              'e2e_admin_ci',
+              '$2y$10$VFWMDLbUqq./1RyaCRXQ2.2Brj9rgZZ4yeDWgBvbJb8tU1koIYl6W',
+              'admin',
+              1,
+              1,
+              1,
+              NOW(),
+              'active',
+              1,
+              0,
+              1,
+              NOW(),
+              NOW()
+            );
           SQL
 
       - name: Start Application Stack
@@ -1247,6 +1323,62 @@ jobs:
         env:
           E2E_BASE_URL: http://localhost:3000
           E2E_API_URL: http://localhost:3000
+          E2E_USER_EMAIL: e2e-member@example.test
+          E2E_USER_PASSWORD: password
+          E2E_ADMIN_EMAIL: e2e-admin@example.test
+          E2E_ADMIN_PASSWORD: password
+          E2E_REQUIRE_AUTH: 1
+          CI: true
+
+      - name: Run Real-Browser Accessibility Gate
+        run: |
+          npx playwright test e2e/tests/accessibility-audit.spec.ts --project=accessibility || {
+            echo "::group::App container logs"
+            docker compose -f compose.ci.yml logs --no-color app || true
+            echo "::endgroup::"
+            echo "::group::Frontend container logs"
+            docker compose -f compose.ci.yml logs --no-color frontend || true
+            echo "::endgroup::"
+            exit 1
+          }
+        env:
+          E2E_BASE_URL: http://localhost:3000
+          E2E_API_URL: http://localhost:3000
+          E2E_USER_EMAIL: e2e-member@example.test
+          E2E_USER_PASSWORD: password
+          E2E_ADMIN_EMAIL: e2e-admin@example.test
+          E2E_ADMIN_PASSWORD: password
+          E2E_SKIP_DATA_SEED: 1
+          E2E_REQUIRE_AUTH: 1
+          CI: true
+
+      - name: Run Production PWA Offline Gate
+        run: |
+          npm run test:e2e:pwa || {
+            echo "::group::App container logs"
+            docker compose -f compose.ci.yml logs --no-color app || true
+            echo "::endgroup::"
+            echo "::group::Frontend container logs"
+            docker compose -f compose.ci.yml logs --no-color frontend || true
+            echo "::endgroup::"
+            exit 1
+          }
+        env:
+          E2E_BASE_URL: http://localhost:3000
+          E2E_API_URL: http://localhost:3000
+          CI: true
+
+      - name: Verify Editor Bundle Isolation
+        run: npm run test:e2e:editor-isolation
+        env:
+          E2E_BASE_URL: http://localhost:3000
+          E2E_API_URL: http://localhost:3000
+          E2E_USER_EMAIL: e2e-member@example.test
+          E2E_USER_PASSWORD: password
+          E2E_ADMIN_EMAIL: e2e-admin@example.test
+          E2E_ADMIN_PASSWORD: password
+          E2E_SKIP_DATA_SEED: 1
+          E2E_REQUIRE_AUTH: 1
           CI: true
 
       - name: Upload Smoke Test Results

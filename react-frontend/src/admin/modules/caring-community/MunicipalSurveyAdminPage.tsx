@@ -1,3 +1,4 @@
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Progress, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -119,7 +120,7 @@ function statusChip(status: SurveyStatus, label: string) {
 
 function formatDate(ts: string | null, fallback: string): string {
   if (!ts) return fallback;
-  return new Date(ts).toLocaleDateString();
+  return new Date(ts).toLocaleDateString(getFormattingLocale());
 }
 
 function emptyQuestion(idx: number): QuestionDraft {
@@ -172,7 +173,12 @@ function AnalyticsView({ analytics, t }: { analytics: Analytics; t: TFunction<'c
                 classNames={{ indicator: 'bg-accent' }}
               />
               <span className="text-xs text-muted sm:text-right">
-                {b.percentage}% ({b.count})
+                {formatNumber(b.percentage / 100, {
+                  style: 'percent',
+                  maximumFractionDigits: 1,
+                })}
+                {' · '}
+                {t('admin.surveys.analytics.answer_count', { count: b.count })}
               </span>
             </div>
           ))}

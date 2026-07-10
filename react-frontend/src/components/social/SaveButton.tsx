@@ -13,7 +13,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui';
 import { Separator } from '@/components/ui';
 import Bookmark from 'lucide-react/icons/bookmark';
 import BookmarkPlus from 'lucide-react/icons/bookmark-plus';
@@ -187,9 +187,9 @@ export function SaveButton({
 
       <PopoverContent className="p-2 min-w-[240px] bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
         <div className="w-full">
-          <p className="text-xs font-semibold uppercase tracking-wider px-2 pt-1 pb-2 text-[var(--text-muted)]">
+          <PopoverHeading className="text-xs font-semibold uppercase tracking-wider px-2 pt-1 pb-2 text-[var(--text-muted)]">
             {t('collections.save_to')}
-          </p>
+          </PopoverHeading>
 
           {isLoading ? (
             <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label={t('common:loading')}><Spinner size="sm" /></div>

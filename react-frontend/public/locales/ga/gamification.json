@@ -23,7 +23,17 @@
       "months_active": "{{count}} as 12 mhí",
       "month_active_tooltip": "Gníomhach: gníomhaíochtaí {{count}}",
       "month_inactive_tooltip": "Neamhghníomhach",
-      "description": "Míonna inar chomáin tú gníomhaíocht fhiúntach amháin ar a laghad (malartú, liostú, léirmheas, nó uaireanta deonacha)."
+      "description": "Míonna inar chomáin tú gníomhaíocht fhiúntach amháin ar a laghad (malartú, liostú, léirmheas, nó uaireanta deonacha).",
+      "months_active_few": "{{count}} as 12 mhí",
+      "months_active_many": "{{count}} as 12 mhí",
+      "months_active_one": "{{count}} as 12 mhí",
+      "months_active_other": "{{count}} as 12 mhí",
+      "months_active_two": "{{count}} as 12 mhí",
+      "month_active_tooltip_few": "Gníomhach: gníomhaíochtaí {{count}}",
+      "month_active_tooltip_many": "Gníomhach: gníomhaíochtaí {{count}}",
+      "month_active_tooltip_one": "Gníomhach: gníomhaíochtaí {{count}}",
+      "month_active_tooltip_other": "Gníomhach: gníomhaíochtaí {{count}}",
+      "month_active_tooltip_two": "Gníomhach: gníomhaíochtaí {{count}}"
     },
     "badge_type": {
       "vol": "Obair dheonach",
@@ -77,7 +87,12 @@
       "claimed_message": "Thuill tú {{xp}} XP!",
       "claim_failed": "Theip ar Éileamh",
       "claim_failed_desc": "Ní fhéadfaí duais laethúil a éileamh.",
-      "claim_error": "Chuaigh rud éigin mícheart. Bain triail eile as."
+      "claim_error": "Chuaigh rud éigin mícheart. Bain triail eile as.",
+      "day_streak_few": "Sraith {{count}} lá",
+      "day_streak_many": "Sraith {{count}} lá",
+      "day_streak_one": "Sraith {{count}} lá",
+      "day_streak_other": "Sraith {{count}} lá",
+      "day_streak_two": "Sraith {{count}} lá"
     },
     "challenges": {
       "active_challenges": "Dúshláin Ghníomhacha",
@@ -121,7 +136,12 @@
       "purchase_failed_desc": "Ní fhéadfaí an ceannach a chríochnú.",
       "purchase_error": "Chuaigh rud éigin mícheart.",
       "load_failed": "Theip ar Lódáil",
-      "load_failed_desc": "Ní fhéadfaí an siopa XP a lódáil."
+      "load_failed_desc": "Ní fhéadfaí an siopa XP a lódáil.",
+      "stock_left_few": "{{count}} fágtha ar stoc",
+      "stock_left_many": "{{count}} fágtha ar stoc",
+      "stock_left_one": "{{count}} fágtha ar stoc",
+      "stock_left_other": "{{count}} fágtha ar stoc",
+      "stock_left_two": "{{count}} fágtha ar stoc"
     },
     "loading": "Éachtaí á lódáil",
     "badge_detail": {
@@ -159,7 +179,12 @@
       "updated_desc": "Sábháladh do thaispeántas suaitheantais.",
       "save_failed": "Theip ar Shábháil",
       "save_failed_desc": "Ní fhéadfaí an taispeántas a nuashonrú.",
-      "save_error": "Chuaigh rud éigin mícheart."
+      "save_error": "Chuaigh rud éigin mícheart.",
+      "select_badges_few": "Roghnaigh suas le 5 suaitheantas le taispeáint ar do phróifíl. ({{count}}/5 roghnaithe)",
+      "select_badges_many": "Roghnaigh suas le 5 suaitheantas le taispeáint ar do phróifíl. ({{count}}/5 roghnaithe)",
+      "select_badges_one": "Roghnaigh suas le 5 suaitheantas le taispeáint ar do phróifíl. ({{count}}/5 roghnaithe)",
+      "select_badges_other": "Roghnaigh suas le 5 suaitheantas le taispeáint ar do phróifíl. ({{count}}/5 roghnaithe)",
+      "select_badges_two": "Roghnaigh suas le 5 suaitheantas le taispeáint ar do phróifíl. ({{count}}/5 roghnaithe)"
     },
     "load_error": "Theip ar lódáil na n-éachtaí. Bain triail eile as le do thoil."
   },
@@ -266,7 +291,12 @@
       "buddy_failed": "Theip ar bheith i do chara",
       "buddy_action_sent": "Tacaíocht cara seolta",
       "buddy_action_failed": "Theip ar thacaíocht charad a sheoladh"
-    }
+    },
+    "streak_label_few": "Stráice seiceála isteach {{count}}",
+    "streak_label_many": "Stráice seiceála isteach {{count}}",
+    "streak_label_one": "Stráice seiceála isteach {{count}}",
+    "streak_label_other": "Stráice seiceála isteach {{count}}",
+    "streak_label_two": "Stráice seiceála isteach {{count}}"
   },
   "frequency": {
     "none": "Gan deireadh",
@@ -328,7 +358,12 @@
       "rank_label": "Céim {{rank}}",
       "xp_reward": "{{xp}} XP",
       "load_failed": "Theip ar Lódáil",
-      "load_failed_desc": "Ní fhéadfaí stair séasúir a lódáil."
+      "load_failed_desc": "Ní fhéadfaí stair séasúir a lódáil.",
+      "participants_few": "{{count}} rannpháirtí",
+      "participants_many": "{{count}} rannpháirtí",
+      "participants_one": "{{count}} rannpháirtí",
+      "participants_other": "{{count}} rannpháirtí",
+      "participants_two": "{{count}} rannpháirtí"
     },
     "score_unit": {
       "hours": "h",
@@ -421,7 +456,17 @@
       "legendary": "Finscéalach"
     },
     "max_score_label": "/ {{max}}",
-    "loading": "Do NexusScore á lódáil..."
+    "loading": "Do NexusScore á lódáil...",
+    "points_to_next_few": "{{count}} points to {{tier}}",
+    "points_to_next_many": "{{count}} points to {{tier}}",
+    "points_to_next_one": "Díríonn {{count}} ar {{tier}}",
+    "points_to_next_other": "Díríonn {{count}} ar {{tier}}",
+    "points_to_next_two": "{{count}} points to {{tier}}",
+    "remaining_count_few": "{{count}} fágtha",
+    "remaining_count_many": "{{count}} fágtha",
+    "remaining_count_one": "{{count}} fágtha",
+    "remaining_count_other": "{{count}} fágtha",
+    "remaining_count_two": "{{count}} fágtha"
   },
   "common": {
     "refresh": "Athnuaigh",

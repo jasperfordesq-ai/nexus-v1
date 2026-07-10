@@ -9,6 +9,7 @@
  * Features: Counter-proposals, detail drawer, permissions matrix, audit timeline, * incoming requests tab, partnership statistics.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
@@ -473,7 +474,7 @@ export function Partnerships() {
     },
     {
       key: 'created_at', label: t('federation.col_since'), sortable: true,
-      render: (item) => <span className="text-sm text-muted">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
+      render: (item) => <span className="text-sm text-muted">{item.created_at ? new Date(item.created_at).toLocaleDateString(getFormattingLocale()) : '--'}</span>,
     },
     {
       key: 'actions', label: t('federation.label_actions'),
@@ -863,12 +864,12 @@ export function Partnerships() {
                             </div>
                             <div>
                               <p className="text-muted">{t('federation.label_created')}</p>
-                              <p>{detailPartnership.created_at ? new Date(detailPartnership.created_at).toLocaleDateString() : '--'}</p>
+                              <p>{detailPartnership.created_at ? new Date(detailPartnership.created_at).toLocaleDateString(getFormattingLocale()) : '--'}</p>
                             </div>
                             {detailPartnership.approved_at && (
                               <div>
                                 <p className="text-muted">{t('federation.label_approved')}</p>
-                                <p>{new Date(detailPartnership.approved_at).toLocaleDateString()}</p>
+                                <p>{new Date(detailPartnership.approved_at).toLocaleDateString(getFormattingLocale())}</p>
                               </div>
                             )}
                           </div>
@@ -956,7 +957,7 @@ export function Partnerships() {
                                         : t('federation.system')
                                       }
                                       {' — '}
-                                      {new Date(entry.created_at).toLocaleString()}
+                                      {new Date(entry.created_at).toLocaleString(getFormattingLocale())}
                                     </p>
                                     {entry.details && (() => {
                                       try {

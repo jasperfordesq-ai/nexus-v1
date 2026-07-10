@@ -207,7 +207,8 @@
     "tbi_proxy_independence": "Wartość pieniężna otrzymanych godzin",
     "tbi_proxy_inclusion": "HACT: przynależność do sąsiedztwa (kalibracja TBI 2023)",
     "pdf_coefficients": "Applied Coefficients",
-    "formula_true_sroi": "Wskaźnik SROI = Całkowita wartość bieżąca zweryfikowanych wyników (po uwzględnieniu efektu deadweight, przemieszczenia, przypisania, porzucenia i dyskontowania) ÷ Całkowita inwestycja"
+    "formula_true_sroi": "Wskaźnik SROI = Całkowita wartość bieżąca zweryfikowanych wyników (po uwzględnieniu efektu deadweight, przemieszczenia, przypisania, porzucenia i dyskontowania) ÷ Całkowita inwestycja",
+    "multiplier_value": "{{value}}×"
   },
   "impact_report_labels": {
     "transactions": "Transakcje",

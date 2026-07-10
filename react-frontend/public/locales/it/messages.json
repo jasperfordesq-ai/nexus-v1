@@ -234,5 +234,11 @@
     "sent": "Coordinatore avvisato — ti contatterà per aiutarti a organizzare il contatto.",
     "error": "Non è stato possibile inviare la tua richiesta in questo momento. Riprova tra poco."
   },
-  "composer_blocked_safeguarding": "La messaggistica diretta non è disponibile con questo membro. Usa l'opzione qui sopra per chiedere a un coordinatore di aiutarti a organizzare il contatto."
+  "composer_blocked_safeguarding": "La messaggistica diretta non è disponibile con questo membro. Usa l'opzione qui sopra per chiedere a un coordinatore di aiutarti a organizzare il contatto.",
+  "aria_conversation_unread_many": "Conversazione con {{name}}, {{count}} non letti",
+  "aria_conversation_unread_one": "Conversazione con {{name}}, {{count}} non letti",
+  "aria_conversation_unread_other": "Conversazione con {{name}}, {{count}} non letti",
+  "selected_members_many": "Selezionati ({{count}})",
+  "selected_members_one": "Selezionati ({{count}})",
+  "selected_members_other": "Selezionati ({{count}})"
 }

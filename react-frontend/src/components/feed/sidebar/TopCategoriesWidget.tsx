@@ -24,7 +24,7 @@ interface TopCategoriesWidgetProps {
 }
 
 const COLOR_CLASSES = [
-  'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20',
+  'bg-accent/10 text-accent dark:text-accent hover:bg-accent/20',
   'bg-pink-500/10 text-pink-600 dark:text-pink-400 hover:bg-pink-500/20',
   'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20',
   'bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20',
@@ -51,7 +51,7 @@ export function TopCategoriesWidget({ categories }: TopCategoriesWidgetProps) {
         </div>
         <Link
           to={tenantPath('/listings')}
-          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors duration-200"
+          className="text-xs text-accent hover:text-accent transition-colors duration-200"
         >
           {t('sidebar.categories.all_listings')}
         </Link>

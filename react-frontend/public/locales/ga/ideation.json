@@ -44,7 +44,16 @@
     "no_deadline": "Gan spriocdhata",
     "evaluation_criteria": "Criteir Measunaithe",
     "outcome": "Toradh",
-    "team_links": "Foirne Tionscadail"
+    "team_links": "Foirne Tionscadail",
+    "ideas_count_few": "{{count}} smaoineamh",
+    "ideas_count_many": "{{count}} smaoineamh",
+    "ideas_count_other": "{{count}} smaoineamh",
+    "ideas_count_two": "{{count}} smaoineamh",
+    "max_ideas_few": "Uasmheid {{count}} smaoineamh in aghaidh an duine",
+    "max_ideas_many": "Uasmheid {{count}} smaoineamh in aghaidh an duine",
+    "max_ideas_one": "Uasmheid {{count}} smaoineamh in aghaidh an duine",
+    "max_ideas_other": "Uasmheid {{count}} smaoineamh in aghaidh an duine",
+    "max_ideas_two": "Uasmheid {{count}} smaoineamh in aghaidh an duine"
   },
   "challenges": {
     "title": "Dushshlain",
@@ -87,7 +96,16 @@
     "draft_created": "Cruthaithe {{date}}",
     "new_idea": "Smaoineamh Nua",
     "sort_label": "Sórtáil smaointe",
-    "loading": "Smaointe á lódáil..."
+    "loading": "Smaointe á lódáil...",
+    "your_ideas_few": "Do chuid smaointe: {{count}}/{{max}}",
+    "your_ideas_many": "Do chuid smaointe: {{count}}/{{max}}",
+    "your_ideas_one": "Do chuid smaointe: {{count}}/{{max}}",
+    "your_ideas_other": "Do chuid smaointe: {{count}}/{{max}}",
+    "your_ideas_two": "Do chuid smaointe: {{count}}/{{max}}",
+    "comments_few": "{{count}} tracht",
+    "comments_many": "{{count}} tracht",
+    "comments_other": "{{count}} tracht",
+    "comments_two": "{{count}} tracht"
   },
   "idea_detail": {
     "page_title": "Sonrai an Smaoineamh",
@@ -321,7 +339,11 @@
     "fallback_title": "Feachtas",
     "feature_not_available": "Cumadóireacht Smaointe Gan Fáil",
     "feature_not_available_desc": "Níl an ghné chumadóireachta smaointe cumasaithe don phobal seo. Déan teagmháil le do riarthóir bainc ama le haghaidh tuilleadh eolais.",
-    "retry": "Déan arís"
+    "retry": "Déan arís",
+    "challenges_count_few": "{{count}} dúshlán",
+    "challenges_count_many": "{{count}} dúshlán",
+    "challenges_count_other": "{{count}} dúshlán",
+    "challenges_count_two": "{{count}} dúshlán"
   },
   "templates": {
     "title": "Teimpléid Dúshláin",

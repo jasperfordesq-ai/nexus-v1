@@ -158,7 +158,16 @@
       "delete_confirm_title": "¿Eliminar publicaciones seleccionadas?",
       "publish": "Publicar",
       "publish_confirm_message": "¿Publicar las publicaciones seleccionadas de {{count}}?",
-      "publish_confirm_title": "¿Publicar publicaciones seleccionadas?"
+      "publish_confirm_title": "¿Publicar publicaciones seleccionadas?",
+      "publish_confirm_message_many": "¿Publicar las publicaciones seleccionadas de {{count}}?",
+      "publish_confirm_message_one": "¿Publicar las publicaciones seleccionadas de {{count}}?",
+      "publish_confirm_message_other": "¿Publicar las publicaciones seleccionadas de {{count}}?",
+      "archive_confirm_message_many": "Esto cancelará la publicación de las publicaciones de {{count}}. Se pueden volver a publicar más tarde.",
+      "archive_confirm_message_one": "Esto cancelará la publicación de las publicaciones de {{count}}. Se pueden volver a publicar más tarde.",
+      "archive_confirm_message_other": "Esto cancelará la publicación de las publicaciones de {{count}}. Se pueden volver a publicar más tarde.",
+      "delete_confirm_message_many": "¿Eliminar las publicaciones seleccionadas de {{count}}? Esto no se puede deshacer.",
+      "delete_confirm_message_one": "¿Eliminar las publicaciones seleccionadas de {{count}}? Esto no se puede deshacer.",
+      "delete_confirm_message_other": "¿Eliminar las publicaciones seleccionadas de {{count}}? Esto no se puede deshacer."
     },
     "marketplace": {
       "reason_label": "Razón",

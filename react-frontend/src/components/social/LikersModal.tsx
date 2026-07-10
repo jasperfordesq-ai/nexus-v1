@@ -16,7 +16,7 @@ import { useTenant } from '@/contexts';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import { UserHoverCard } from './UserHoverCard';
 import type { LikerUser, LikersResult } from '@/hooks/useSocialInteractions';
-import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, Avatar } from '@/components/ui';
+import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, Avatar } from '@/components/ui';
 
 export interface LikersModalProps {
   isOpen: boolean;
@@ -85,13 +85,13 @@ export function LikersModal({ isOpen, onClose, loadLikers, likesCount }: LikersM
       }}
     >
       <ModalContent>
-        <ModalHeader className="text-[var(--text-primary)]">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center">
-              <Heart className="w-4 h-4 text-rose-500 fill-rose-500" aria-hidden="true" />
-            </div>
-            {t('likers_title')} {totalCount > 0 && `(${totalCount})`}
+        <ModalHeader className="flex items-center gap-3 text-[var(--text-primary)]">
+          <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center">
+            <Heart className="w-4 h-4 text-rose-500 fill-rose-500" aria-hidden="true" />
           </div>
+          <ModalHeading>
+            {t('likers_title')} {totalCount > 0 && `(${totalCount})`}
+          </ModalHeading>
         </ModalHeader>
         <ModalBody className="pb-4">
           {isLoading && likers.length === 0 ? (

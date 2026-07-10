@@ -23,7 +23,7 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import Flag from 'lucide-react/icons/flag';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Textarea } from '@/components/ui/Textarea';
 import { useDisclosure } from '@/components/ui/useDisclosure';
 import { PageMeta } from '@/components/seo';
@@ -362,19 +362,17 @@ export function HashtagPage() {
 
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Link to={tenantPath('/feed')}>
-          <Button
-            isIconOnly
-            variant="flat"
-            className="bg-theme-elevated text-theme-muted"
-            aria-label={t('hashtag.back_to_feed')}
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-        </Link>
+        <Button as={Link} to={tenantPath('/feed')}
+          isIconOnly
+          variant="flat"
+          className="bg-theme-elevated text-theme-muted"
+          aria-label={t('hashtag.back_to_feed')}
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-2">
-            <Hash className="w-6 h-6 text-indigo-500" aria-hidden="true" />
+            <Hash className="w-6 h-6 text-accent" aria-hidden="true" />
             {tag}
           </h1>
           {postCount > 0 && (
@@ -392,7 +390,7 @@ export function HashtagPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('hashtag.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadPosts()}
           >
@@ -477,13 +475,11 @@ export function HashtagPage() {
       }}
     >
       <ModalContent>
-        <ModalHeader className="text-[var(--text-primary)]">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
-              <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
-            </div>
-            {t('report.title')}
+        <ModalHeader className="flex items-center gap-3 text-[var(--text-primary)]">
+          <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
+            <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
           </div>
+          <ModalHeading>{t('report.title')}</ModalHeading>
         </ModalHeader>
         <ModalBody>
           <p className="text-sm text-[var(--text-muted)] mb-3">

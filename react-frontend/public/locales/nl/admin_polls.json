@@ -104,6 +104,8 @@
     "unknown": "Onbekend",
     "votes": "Stemmen",
     "no_matching_polls": "Geen overeenkomende opiniepeilingen gevonden",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found found",
+    "total_count_one": "Totaal: {{count}}",
+    "total_count_other": "Totaal: {{count}}"
   }
 }

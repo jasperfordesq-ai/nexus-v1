@@ -108,10 +108,10 @@ const REACTIONS = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 const GRADIENT_MAP: Record<string, string> = {
-  'from-purple-600 to-blue-500': 'linear-gradient(135deg, #9333ea, #3b82f6)',
+  'from-accent to-blue-500': 'linear-gradient(135deg, #9333ea, #3b82f6)',
   'from-orange-500 to-pink-500': 'linear-gradient(135deg, #f97316, #ec4899)',
   'from-green-500 to-teal-500': 'linear-gradient(135deg, #22c55e, #14b8a6)',
-  'from-blue-600 to-indigo-500': 'linear-gradient(135deg, #2563eb, #6366f1)',
+  'from-blue-600 to-accent-gradient-end': 'linear-gradient(135deg, #2563eb, #6366f1)',
   'from-red-500 to-yellow-500': 'linear-gradient(135deg, #ef4444, #eab308)',
   'from-gray-700 to-gray-900': 'linear-gradient(135deg, #374151, #111827)',
   'from-pink-500 to-rose-400': 'linear-gradient(135deg, #ec4899, #fb7185)',
@@ -565,7 +565,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
         wrapper: 'p-0',
       }}
     >
-      <ModalContent>
+      <ModalContent aria-label={t('viewer.story_from', { name: currentUserStory.name })}>
         <ModalBody
       className="relative flex h-dvh items-center justify-center overflow-hidden"
       aria-label={t('viewer.story_from', { name: currentUserStory.name })}
@@ -738,15 +738,14 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                     className="w-full h-full flex items-center justify-center p-8"
                     style={{
                       background: resolveGradient(currentStory.background_gradient),
-                      backgroundColor: currentStory.background_color || 'var(--color-neutral-700, #1f2937)',
+                      backgroundColor: currentStory.background_color || 'var(--surface-solid)',
                     }}
                   >
                     <p
-                      className="text-white text-center max-w-sm drop-shadow-lg"
+                      className="max-w-sm text-center text-2xl leading-[1.4] text-white drop-shadow-lg"
                       style={{
-                        fontSize: currentStory.text_style?.fontSize || '1.5rem',
+                        fontSize: currentStory.text_style?.fontSize,
                         fontFamily: currentStory.text_style?.fontFamily || 'sans-serif',
-                        lineHeight: 1.4,
                       }}
                     >
                       {currentStory.text_content}
@@ -796,7 +795,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                     className="w-full h-full flex flex-col items-center justify-center p-8 gap-6"
                     style={{
                       background: resolveGradient(currentStory.background_gradient),
-                      backgroundColor: currentStory.background_color || 'var(--color-neutral-700, #1f2937)',
+                      backgroundColor: currentStory.background_color || 'var(--surface-solid)',
                     }}
                   >
                     <h3 className="text-white text-xl font-bold text-center drop-shadow-lg max-w-sm">

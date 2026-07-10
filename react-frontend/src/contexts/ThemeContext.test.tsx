@@ -26,7 +26,15 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 function TestComponent() {
-  const { theme, resolvedTheme, isInitialized, setTheme, toggleTheme, isLoading } = useTheme();
+  const {
+    theme,
+    resolvedTheme,
+    isInitialized,
+    setTheme,
+    toggleTheme,
+    isLoading,
+    setAccentColor,
+  } = useTheme();
 
   return (
     <div>
@@ -38,6 +46,8 @@ function TestComponent() {
       <button onClick={() => setTheme('dark')}>Set Dark</button>
       <button onClick={() => setTheme('system')}>Set System</button>
       <button onClick={() => toggleTheme()}>Toggle</button>
+      <button onClick={() => setAccentColor('#22c55e')}>Set Green Accent</button>
+      <button onClick={() => setAccentColor('#111827')}>Set Dark Accent</button>
     </div>
   );
 }
@@ -218,5 +228,40 @@ describe('ThemeContext', () => {
     );
 
     await screen.findByText('true', { selector: '[data-testid="initialized"]' });
+  });
+
+  it('bridges the runtime accent to HeroUI canonical variables', async () => {
+    render(
+      <ThemeProvider>
+        <TestComponent />
+      </ThemeProvider>
+    );
+
+    await act(async () => {
+      screen.getByRole('button', { name: 'Set Green Accent' }).click();
+    });
+
+    const htmlStyle = document.documentElement.style;
+    expect(htmlStyle.getPropertyValue('--accent-color')).toBe('#22c55e');
+    expect(htmlStyle.getPropertyValue('--accent')).toBe('#22c55e');
+    expect(htmlStyle.getPropertyValue('--accent-foreground')).toBe('#000000');
+    expect(htmlStyle.getPropertyValue('--focus')).toBe('#22c55e');
+    expect(htmlStyle.getPropertyValue('--link')).toBe('#22c55e');
+    expect(htmlStyle.getPropertyValue('--border-focus')).toContain('#22c55e');
+    expect(htmlStyle.getPropertyValue('--input-focus-border')).toContain('#22c55e');
+  });
+
+  it('uses a light foreground for dark accent colors', async () => {
+    render(
+      <ThemeProvider>
+        <TestComponent />
+      </ThemeProvider>
+    );
+
+    await act(async () => {
+      screen.getByRole('button', { name: 'Set Dark Accent' }).click();
+    });
+
+    expect(document.documentElement.style.getPropertyValue('--accent-foreground')).toBe('#ffffff');
   });
 });

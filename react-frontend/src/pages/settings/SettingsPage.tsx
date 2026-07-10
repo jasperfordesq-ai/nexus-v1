@@ -934,7 +934,7 @@ export function SettingsPage() {
               {isDirty ? t('header.unsaved_badge') : t('header.badge')}
             </Chip>
             <h1 className="flex items-center gap-3 text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
-              <Settings className="h-8 w-8 text-indigo-500" aria-hidden="true" />
+              <Settings className="h-8 w-8 text-accent" aria-hidden="true" />
               {t('header.title')}
             </h1>
             <p className="mt-2 text-sm leading-6 text-theme-muted sm:text-base">{t('header.subtitle')}</p>
@@ -1080,7 +1080,7 @@ export function SettingsPage() {
             {/* Appearance Preferences (not included in ProfileTab component) */}
             <GlassCard className="p-6 mt-6">
               <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+                <Sparkles className="w-5 h-5 text-accent" aria-hidden="true" />
                 {t('appearance_prefs.title')}
               </h2>
               <AppearanceSettings />
@@ -1268,7 +1268,7 @@ export function SettingsPage() {
               {t('cancel')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               onPress={() => { marketingConsentModal.onClose(); applyMarketingConsent(true); }}
               isLoading={marketingConsentLoading}
             >
@@ -1328,7 +1328,7 @@ export function SettingsPage() {
               {t("cancel")}
             </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               onPress={handleGdprRequest}
               isLoading={isSubmittingGdpr}
             >

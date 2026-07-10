@@ -59,7 +59,7 @@ export function HeroSection({ content }: HeroSectionProps) {
           {/* Badge */}
           <motion.div variants={fadeInUp} className="mb-6">
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card backdrop-blur-lg text-sm text-theme-muted">
-              <span className="text-indigo-500 dark:text-indigo-400">✨</span>
+              <span className="text-accent dark:text-accent">✨</span>
               <span>{badgeText}</span>
             </span>
           </motion.div>
@@ -93,7 +93,7 @@ export function HeroSection({ content }: HeroSectionProps) {
                 as={Link}
                 to={tenantPath('/feed')}
                 size="lg"
-                className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
+                className="w-full sm:w-auto bg-gradient-to-r from-accent to-accent-gradient-end text-white font-semibold px-8 shadow-lg shadow-accent/25 hover:shadow-accent/50 transition-shadow"
                 endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
               >
                 {ctaFeedText}
@@ -104,7 +104,7 @@ export function HeroSection({ content }: HeroSectionProps) {
                   as={Link}
                   to={tenantPath(ctaPrimaryLink)}
                   size="lg"
-                  className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white font-semibold px-8 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-shadow"
+                  className="w-full sm:w-auto bg-gradient-to-r from-accent to-accent-gradient-end text-white font-semibold px-8 shadow-lg shadow-accent/25 hover:shadow-accent/50 transition-shadow"
                   endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                 >
                   {ctaPrimaryText}

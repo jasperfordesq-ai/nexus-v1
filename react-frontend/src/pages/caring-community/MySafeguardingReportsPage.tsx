@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, Navigate } from 'react-router-dom';import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -170,7 +171,7 @@ export default function MySafeguardingReportsPage(): ReactNode {
                       </p>
                       <p className="mt-2 text-xs text-theme-muted">
                         {t('safeguarding_reports.my_reports.submitted_at', {
-                          date: new Date(r.created_at).toLocaleDateString(),
+                          date: new Date(r.created_at).toLocaleDateString(getFormattingLocale()),
                         })}
                       </p>
                     </div>

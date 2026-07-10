@@ -460,23 +460,19 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
             </p>
             <Separator className="my-4" />
             <div className="flex flex-wrap justify-center gap-3 mt-4">
-              <Link to={tenantPath('/contact')}>
-                <Button
-                  className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white"
-                  startContent={<Send className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('terms.contact_us')}
-                </Button>
-              </Link>
-              <Link to={tenantPath('/privacy')}>
-                <Button
-                  variant="tertiary"
-                  className="bg-theme-elevated text-theme-primary"
-                  startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('terms.privacy_policy_link')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath('/contact')}
+                className="bg-gradient-to-r from-blue-500 to-cyan-600 text-white"
+                startContent={<Send className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('terms.contact_us')}
+              </Button>
+              <Button as={Link} to={tenantPath('/privacy')}
+                variant="tertiary"
+                className="bg-theme-elevated text-theme-primary"
+                startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('terms.privacy_policy_link')}
+              </Button>
             </div>
           </div>
         </GlassCard>

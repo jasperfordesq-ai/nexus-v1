@@ -285,6 +285,21 @@ describe('AdminSidebar', () => {
     expect(screen.getByRole('link', { name: 'Super Admin Panel' })).toHaveAttribute('href', '/test/super-admin');
   });
 
+  it('hides the platform Super Admin Panel from tenant-scoped super admins', () => {
+    Object.assign(mockUser, {
+      role: 'admin',
+      is_super_admin: false,
+      is_tenant_super_admin: true,
+      is_god: false,
+    });
+
+    render(
+      <W><AdminSidebar collapsed={false} onToggle={mockOnToggle} /></W>
+    );
+
+    expect(screen.queryByRole('link', { name: 'Super Admin Panel' })).not.toBeInTheDocument();
+  });
+
   it('hides god-only Plans & Billing but shows Donations & Support to non-god super admins', () => {
     // Donations & Support (member_premium) is a tenant-level feature — its route
     // is only feature-gated, so a non-god super admin who has the feature must

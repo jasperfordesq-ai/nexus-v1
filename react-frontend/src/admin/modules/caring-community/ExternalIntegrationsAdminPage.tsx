@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Select, SelectItem, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -382,7 +383,7 @@ export default function ExternalIntegrationsAdminPage(): ReactNode {
           <CardBody>
             {lastUpdatedAt && (
               <p className="mb-3 text-xs text-muted">
-                {t('external_integrations.last_updated', { date: new Date(lastUpdatedAt).toLocaleString() })}
+                {t('external_integrations.last_updated', { date: new Date(lastUpdatedAt).toLocaleString(getFormattingLocale()) })}
               </p>
             )}
             <Table aria-label={t('external_integrations.table.aria')} removeWrapper>
@@ -462,7 +463,7 @@ export default function ExternalIntegrationsAdminPage(): ReactNode {
                     </TableCell>
                     <TableCell>
                       <span className="text-xs text-muted">
-                        {new Date(item.updated_at).toLocaleDateString()}
+                        {new Date(item.updated_at).toLocaleDateString(getFormattingLocale())}
                       </span>
                     </TableCell>
                     <TableCell>

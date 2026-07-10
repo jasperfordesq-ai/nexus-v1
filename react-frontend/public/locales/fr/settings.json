@@ -278,7 +278,9 @@
     "linked": "Lié",
     "connected_accounts": "Connecté",
     "safeguarding": "Sauvegarde",
-    "translation": "Traduction"
+    "translation": "Traduction",
+    "linked-accounts": "Comptes liés",
+    "connected-accounts": "Comptes connectés"
   },
   "safeguarding": {
     "page_title": "Préférences de protection",
@@ -588,7 +590,10 @@
     "unblocked_desc": "{{name}} a été débloqué.",
     "unblock_error": "Échec du déblocage de l'utilisateur",
     "blocked_on": "Bloqué sur {{date}}",
-    "link": "Utilisateurs bloqués"
+    "link": "Utilisateurs bloqués",
+    "count_many": "{{count}} bloqué(s)",
+    "count_one": "{{count}} bloqué(s)",
+    "count_other": "{{count}} bloqué(s)"
   },
   "block_user": {
     "title": "Bloquer {{name}} ?",
@@ -615,5 +620,14 @@
   "push_campaign_opt_in": "Recevoir des notifications push sponsorisées",
   "push_campaign_opt_in_description": "Autorisez les entreprises et organisations locales à vous envoyer des notifications push ciblées. Vous pouvez vous désabonner à tout moment.",
   "tabs_aria": "Sections de paramètres",
-  "twofa_loading_setup": "Chargement de la configuration à deux facteurs..."
+  "twofa_loading_setup": "Chargement de la configuration à deux facteurs...",
+  "biometric_all_removed_many": "Suppression des clés d'accès {{count}}.",
+  "biometric_all_removed_one": "Suppression des clés d'accès {{count}}.",
+  "biometric_all_removed_other": "Suppression des clés d'accès {{count}}.",
+  "biometric_enabled_many": "{{count}} mot(s) d'accès enregistré(s)",
+  "biometric_enabled_one": "{{count}} mot(s) d'accès enregistré(s)",
+  "biometric_enabled_other": "{{count}} mot(s) d'accès enregistré(s)",
+  "twofa_backup_remaining_many": "{{count}} codes de secours restants",
+  "twofa_backup_remaining_one": "{{count}} codes de secours restants",
+  "twofa_backup_remaining_other": "{{count}} codes de secours restants"
 }

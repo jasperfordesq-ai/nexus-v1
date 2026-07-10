@@ -11,24 +11,61 @@
 //   { title, body, url, icon, badge, tag, type, ... }
 // All fields except title+body are optional.
 
+function normalizeTenantPath(value) {
+  if (typeof value !== 'string') return '';
+
+  const segments = value
+    .trim()
+    .split('/')
+    .filter((segment) => segment && segment !== '.' && segment !== '..');
+
+  return segments.length > 0 ? `/${segments.join('/')}` : '';
+}
+
+function normalizePushTarget(value, tenantPathValue) {
+  const tenantPath = normalizeTenantPath(tenantPathValue);
+  const fallback = tenantPath ? `${tenantPath}/` : '/';
+  let target;
+
+  try {
+    target = new URL(typeof value === 'string' && value ? value : fallback, self.location.origin);
+  } catch {
+    return fallback;
+  }
+
+  if (target.origin !== self.location.origin) return fallback;
+
+  let path = target.pathname || '/';
+  if (tenantPath && path !== tenantPath && !path.startsWith(`${tenantPath}/`)) {
+    path = path === '/' ? `${tenantPath}/` : `${tenantPath}${path.startsWith('/') ? path : `/${path}`}`;
+  }
+
+  return `${path}${target.search}${target.hash}`;
+}
+
 self.addEventListener('push', (event) => {
   if (!event.data) return;
 
   let payload = {};
   try {
     payload = event.data.json();
-  } catch (_e) {
+  } catch {
     // Some senders push plain text — fall back to body-only.
     payload = { title: 'NEXUS', body: event.data.text() };
   }
 
   const title = payload.title || 'NEXUS';
+  const tenantPath = normalizeTenantPath(payload.tenant_path);
   const options = {
     body: payload.body || '',
     icon: payload.icon || '/icons/icon-192.png',
     badge: payload.badge || '/icons/icon-192.png',
     tag: payload.tag || 'nexus-notification',
-    data: { url: payload.url || '/', type: payload.type || 'general' },
+    data: {
+      url: normalizePushTarget(payload.url, tenantPath),
+      tenant_path: tenantPath,
+      type: payload.type || 'general',
+    },
     // Re-show the OS notification even if a previous one with the same tag was
     // dismissed. Without this, repeat notifications silently coalesce.
     renotify: !!payload.tag,
@@ -40,7 +77,8 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  const targetUrl = (event.notification.data && event.notification.data.url) || '/';
+  const notificationData = event.notification.data || {};
+  const targetUrl = normalizePushTarget(notificationData.url, notificationData.tenant_path);
 
   event.waitUntil((async () => {
     const allClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
@@ -53,11 +91,11 @@ self.addEventListener('notificationclick', (event) => {
         if (sameOrigin && 'focus' in client) {
           await client.focus();
           if ('navigate' in client && targetUrl) {
-            try { await client.navigate(targetUrl); } catch (_e) { /* cross-origin or detached — ignore */ }
+            try { await client.navigate(targetUrl); } catch { /* cross-origin or detached — ignore */ }
           }
           return;
         }
-      } catch (_e) {
+      } catch {
         // Malformed client URL — skip.
       }
     }
@@ -76,7 +114,7 @@ self.addEventListener('pushsubscriptionchange', (event) => {
   event.waitUntil((async () => {
     const allClients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     for (const client of allClients) {
-      try { client.postMessage({ type: 'nexus:push_subscription_changed' }); } catch (_e) { /* ignore */ }
+      try { client.postMessage({ type: 'nexus:push_subscription_changed' }); } catch { /* ignore */ }
     }
   })());
 });

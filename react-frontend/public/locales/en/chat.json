@@ -40,5 +40,9 @@
   },
   "page_meta": {
     "title": "AI Chat"
-  }
+  },
+  "card_wallet_transactions_one": "{{count}} transactions in last 30 days",
+  "card_wallet_transactions_other": "{{count}} transactions in last 30 days",
+  "limits_left_today_one": "{{count}} left today",
+  "limits_left_today_other": "{{count}} left today"
 }

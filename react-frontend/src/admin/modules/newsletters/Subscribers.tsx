@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Chip, Card, CardBody, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -557,7 +558,7 @@ export function Subscribers() {
                 {sourceLabel(sub.source)}
               </TableCell>
               <TableCell className="text-sm text-muted">
-                {sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '--'}
+                {sub.created_at ? new Date(sub.created_at).toLocaleDateString(getFormattingLocale()) : '--'}
               </TableCell>
               <TableCell className="text-right">
                 <Tooltip content={t('newsletters.remove_subscriber')}>
@@ -702,6 +703,7 @@ export function Subscribers() {
               <Card className="bg-surface">
                 <CardBody className="p-3">
                   <p className="text-xs font-medium text-foreground">{t('newsletters.required_csv_format')}</p>
+                  {/* eslint-disable-next-line i18next/no-literal-string -- CSV schema header must remain verbatim. */}
                   <code className="mt-1 block text-xs text-muted">
                     email,first_name,last_name
                   </code>

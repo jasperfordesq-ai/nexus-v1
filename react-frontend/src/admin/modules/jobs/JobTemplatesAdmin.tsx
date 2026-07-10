@@ -8,6 +8,7 @@
  * List, search, and delete job templates with pagination.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 
 import Copy from 'lucide-react/icons/copy';
@@ -189,7 +190,7 @@ export function JobTemplatesAdmin() {
       label: t('jobs.templates_col_created'),
       sortable: true,
       render: (tpl) =>
-        new Date(tpl.created_at).toLocaleDateString(undefined, {
+        new Date(tpl.created_at).toLocaleDateString(getFormattingLocale(), {
           year: 'numeric',
           month: 'short',
           day: 'numeric',

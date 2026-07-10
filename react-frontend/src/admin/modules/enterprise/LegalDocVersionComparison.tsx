@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback } from 'react';
 
 import { sanitizeRichText } from '@/lib/sanitize';
@@ -83,11 +84,11 @@ export default function LegalDocVersionComparison({
                   )}
                 </div>
                 <p className="text-sm text-[var(--color-text-secondary)]">
-                  {t('enterprise.comparison.created')}: {new Date(comparison.version1.created_at).toLocaleDateString()}
+                  {t('enterprise.comparison.created')}: {new Date(comparison.version1.created_at).toLocaleDateString(getFormattingLocale())}
                 </p>
                 {comparison.version1.effective_date && (
                   <p className="text-sm text-[var(--color-text-secondary)]">
-                    {t('enterprise.version_list.effective')}: {new Date(comparison.version1.effective_date).toLocaleDateString()}
+                    {t('enterprise.version_list.effective')}: {new Date(comparison.version1.effective_date).toLocaleDateString(getFormattingLocale())}
                   </p>
                 )}
               </div>
@@ -103,11 +104,11 @@ export default function LegalDocVersionComparison({
                   )}
                 </div>
                 <p className="text-sm text-[var(--color-text-secondary)]">
-                  {t('enterprise.comparison.created')}: {new Date(comparison.version2.created_at).toLocaleDateString()}
+                  {t('enterprise.comparison.created')}: {new Date(comparison.version2.created_at).toLocaleDateString(getFormattingLocale())}
                 </p>
                 {comparison.version2.effective_date && (
                   <p className="text-sm text-[var(--color-text-secondary)]">
-                    {t('enterprise.version_list.effective')}: {new Date(comparison.version2.effective_date).toLocaleDateString()}
+                    {t('enterprise.version_list.effective')}: {new Date(comparison.version2.effective_date).toLocaleDateString(getFormattingLocale())}
                   </p>
                 )}
               </div>

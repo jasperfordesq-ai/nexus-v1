@@ -62,12 +62,36 @@
     "minutes_ago": "{{count}}منذ",
     "hours_ago": "{{count}}ساعة مضت",
     "days_ago": "{{count}}يوم مضى",
-    "last_seen": "آخر ظهور {{time}}"
+    "last_seen": "آخر ظهور {{time}}",
+    "minutes_ago_few": "{{count}}منذ",
+    "minutes_ago_many": "{{count}}منذ",
+    "minutes_ago_one": "{{count}}منذ",
+    "minutes_ago_other": "{{count}}منذ",
+    "minutes_ago_two": "{{count}}منذ",
+    "minutes_ago_zero": "{{count}}منذ",
+    "hours_ago_few": "{{count}}ساعة مضت",
+    "hours_ago_many": "{{count}}ساعة مضت",
+    "hours_ago_one": "{{count}}ساعة مضت",
+    "hours_ago_other": "{{count}}ساعة مضت",
+    "hours_ago_two": "{{count}}ساعة مضت",
+    "hours_ago_zero": "{{count}}ساعة مضت",
+    "days_ago_few": "{{count}}يوم مضى",
+    "days_ago_many": "{{count}}يوم مضى",
+    "days_ago_one": "{{count}}يوم مضى",
+    "days_ago_other": "{{count}}يوم مضى",
+    "days_ago_two": "{{count}}يوم مضى",
+    "days_ago_zero": "{{count}}يوم مضى"
   },
   "mention": {
     "suggestions_aria": "اقتراحات للذكر، {{count}} نتائج",
     "no_users": "لم يتم العثور على مستخدمين",
-    "connected": "متصل"
+    "connected": "متصل",
+    "suggestions_aria_few": "اقتراحات للذكر، {{count}} نتائج",
+    "suggestions_aria_many": "اقتراحات للذكر، {{count}} نتائج",
+    "suggestions_aria_one": "اقتراحات للذكر، {{count}} نتائج",
+    "suggestions_aria_other": "اقتراحات للذكر، {{count}} نتائج",
+    "suggestions_aria_two": "اقتراحات للذكر، {{count}} نتائج",
+    "suggestions_aria_zero": "اقتراحات للذكر، {{count}} نتائج"
   },
   "status": {
     "set_status": "تعيين الحالة",
@@ -153,7 +177,13 @@
     "collection_description": "الوصف (اختياري)",
     "cancel": "إلغاء",
     "save": "حفظ",
-    "create": "إنشاء"
+    "create": "إنشاء",
+    "count_few": "{{count}} عناصر محفوظة",
+    "count_many": "{{count}} عناصر محفوظة",
+    "count_one": "{{count}} عناصر محفوظة",
+    "count_other": "{{count}} عناصر محفوظة",
+    "count_two": "{{count}} عناصر محفوظة",
+    "count_zero": "{{count}} عناصر محفوظة"
   },
   "verified": "موثق",
   "hover_card": {
@@ -163,7 +193,25 @@
     "message": "رسالة",
     "hours_given": "{{count}} ساعة مُقدَّمة",
     "connections": "{{count}} متصل",
-    "listings": "{{count}} إعلان"
+    "listings": "{{count}} إعلان",
+    "hours_given_few": "{{count}} ساعة مُقدَّمة",
+    "hours_given_many": "{{count}} ساعة مُقدَّمة",
+    "hours_given_one": "{{count}} ساعة مُقدَّمة",
+    "hours_given_other": "{{count}} ساعة مُقدَّمة",
+    "hours_given_two": "{{count}} ساعة مُقدَّمة",
+    "hours_given_zero": "{{count}} ساعة مُقدَّمة",
+    "connections_few": "{{count}} متصل",
+    "connections_many": "{{count}} متصل",
+    "connections_one": "{{count}} متصل",
+    "connections_other": "{{count}} متصل",
+    "connections_two": "{{count}} متصل",
+    "connections_zero": "{{count}} متصل",
+    "listings_few": "{{count}} إعلان",
+    "listings_many": "{{count}} إعلان",
+    "listings_one": "{{count}} إعلان",
+    "listings_other": "{{count}} إعلان",
+    "listings_two": "{{count}} إعلان",
+    "listings_zero": "{{count}} إعلان"
   },
   "reactions_tabs_aria": "مرشح نوع رد الفعل",
   "content_type_tabs_aria": "مرشح نوع محتوى الإشارة المرجعية",
@@ -175,5 +223,13 @@
     "image_alt_domain": "معاينة من {{domain}}",
     "favicon_alt": "أيقونة {{site}}",
     "video_fallback": "فيديو"
-  }
+  },
+  "likes_count_few": "{{count}} إعجاب",
+  "likes_count_many": "{{count}} إعجاب",
+  "likes_count_two": "{{count}} إعجاب",
+  "likes_count_zero": "{{count}} إعجاب",
+  "comments_count_few": "{{count}} تعليقات",
+  "comments_count_many": "{{count}} تعليقات",
+  "comments_count_two": "{{count}} تعليقات",
+  "comments_count_zero": "{{count}} تعليقات"
 }

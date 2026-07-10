@@ -82,7 +82,13 @@
     "quick_link_7_title": "Configurações de Federação",
     "quick_link_7_description": "Configure suas preferências de privacidade e comunicação da federação.",
     "quick_link_6_title": "Conexões da federação",
-    "quick_link_6_description": "Gerencie suas solicitações de conexão entre comunidades parceiras."
+    "quick_link_6_description": "Gerencie suas solicitações de conexão entre comunidades parceiras.",
+    "view_all_many": "Ver tudo ({{count}})",
+    "view_all_one": "Ver tudo ({{count}})",
+    "view_all_other": "Ver tudo ({{count}})",
+    "member_count_many": "{{count}} membros",
+    "member_count_one": "{{count}} membros",
+    "member_count_other": "{{count}} membros"
   },
   "partners": {
     "page_title": "Comunidades parceiras",
@@ -115,7 +121,10 @@
     "browse_members": "Procure membros",
     "browse_listings": "Navegar nas listagens",
     "close": "Fechar",
-    "view_details": "Ver detalhes"
+    "view_details": "Ver detalhes",
+    "member_count_many": "{{count}} membros",
+    "member_count_one": "{{count}} membros",
+    "member_count_other": "{{count}} membros"
   },
   "members": {
     "page_title": "Membros da Federação",
@@ -156,7 +165,16 @@
     "external_profile_title": "Membro Externo",
     "external_profile_message": "Este membro está em uma plataforma de parceiro externo. A visualização direta do perfil não está disponível.",
     "external_member": "Membro Externo",
-    "member_fallback": "Membro"
+    "member_fallback": "Membro",
+    "external_source_note_external_only_many": "Mostrando {{count}} resultados de parceiros externos.",
+    "external_source_note_external_only_one": "Mostrando {{count}} resultados de parceiros externos.",
+    "external_source_note_external_only_other": "Mostrando {{count}} resultados de parceiros externos.",
+    "external_source_note_many": "Inclui {{count}} resultados de parceiros externos; carregar mais continua com resultados de parceiros internos.",
+    "external_source_note_one": "Inclui {{count}} resultados de parceiros externos; carregar mais continua com resultados de parceiros internos.",
+    "external_source_note_other": "Inclui {{count}} resultados de parceiros externos; carregar mais continua com resultados de parceiros internos.",
+    "more_skills_many": "+{{count}} mais",
+    "more_skills_one": "+{{count}} mais",
+    "more_skills_other": "+{{count}} mais"
   },
   "messages": {
     "page_title": "Mensagens da Federação",
@@ -227,7 +245,13 @@
     "thread_aria_unread": "Conversa com {{name}} de {{tenant}}, {{count}} mensagem não lida",
     "thread_aria_unread_plural": "Conversa com {{name}} de {{tenant}}, {{count}} mensagens não lidas",
     "recipient_fallback": "Destinatário",
-    "user_number": "Usuário #{{id}}"
+    "user_number": "Usuário #{{id}}",
+    "thread_aria_unread_plural_many": "Conversa com {{name}} de {{tenant}}, {{count}} mensagens não lidas",
+    "thread_aria_unread_plural_one": "Conversa com {{name}} de {{tenant}}, {{count}} mensagens não lidas",
+    "thread_aria_unread_plural_other": "Conversa com {{name}} de {{tenant}}, {{count}} mensagens não lidas",
+    "thread_aria_unread_many": "Conversa com {{name}} de {{tenant}}, {{count}} mensagem não lida",
+    "thread_aria_unread_one": "Conversa com {{name}} de {{tenant}}, {{count}} mensagem não lida",
+    "thread_aria_unread_other": "Conversa com {{name}} de {{tenant}}, {{count}} mensagem não lida"
   },
   "listings": {
     "page_title": "Listagens da Federação",
@@ -259,7 +283,13 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "Ver perfil",
     "contact_author": "Contato",
-    "close": "Fechar"
+    "close": "Fechar",
+    "external_source_note_external_only_many": "Mostrando {{count}} listagens de parceiros externos.",
+    "external_source_note_external_only_one": "Mostrando {{count}} listagens de parceiros externos.",
+    "external_source_note_external_only_other": "Mostrando {{count}} listagens de parceiros externos.",
+    "external_source_note_many": "Inclui {{count}} listagens de parceiros externos; carregar mais continua com listagens de parceiros internos.",
+    "external_source_note_one": "Inclui {{count}} listagens de parceiros externos; carregar mais continua com listagens de parceiros internos.",
+    "external_source_note_other": "Inclui {{count}} listagens de parceiros externos; carregar mais continua com listagens de parceiros internos."
   },
   "settings": {
     "page_title": "Configurações de Federação",
@@ -343,7 +373,8 @@
     "date_at_time": "{{date}} às {{time}}",
     "attendees_going_one": "{{count}} participante",
     "attendees_going_other": "{{count}} participantes",
-    "organizer_fallback": "Organizador"
+    "organizer_fallback": "Organizador",
+    "attendees_going_many": "{{count}} participantes"
   },
   "groups": {
     "page_title": "Grupos da Federação",
@@ -364,7 +395,10 @@
     "load_more_error": "Não foi possível carregar mais grupos.",
     "member_count": "membro {{count}}",
     "member_count_plural": "{{count}} membros",
-    "private": "Privado"
+    "private": "Privado",
+    "member_count_many": "membro {{count}}",
+    "member_count_one": "membro {{count}}",
+    "member_count_other": "membro {{count}}"
   },
   "connections": {
     "page_title": "Conexões da Federação",
@@ -416,7 +450,8 @@
     "level_prefix": "Nível {{level}}",
     "member_count_one": "{{count}} membro",
     "member_count_other": "{{count}} membros",
-    "partner_since": "Parceiro desde {{date}}"
+    "partner_since": "Parceiro desde {{date}}",
+    "member_count_many": "{{count}} membros"
   },
   "onboarding": {
     "page_title": "Configuração da Federação",
@@ -495,7 +530,12 @@
     "partners_available_other": "{{count}} comunidades parceiras disponíveis",
     "member_count_one": "{{count}} membro",
     "member_count_other": "{{count}} membros",
-    "and_more": "+{{count}} mais"
+    "and_more": "+{{count}} mais",
+    "partners_available_many": "{{count}} comunidades parceiras disponíveis",
+    "member_count_many": "{{count}} membros",
+    "and_more_many": "+{{count}} mais",
+    "and_more_one": "+{{count}} mais",
+    "and_more_other": "+{{count}} mais"
   },
   "member_profile": {
     "page_title": "Perfil do membro",
@@ -544,7 +584,19 @@
     "tooltip_federated": "Reputação agregada em comunidades parceiras {{count}}",
     "tooltip_local": "Baseado em avaliações de {{count}} nesta comunidade",
     "chip_label": "{{score}} ({{count}})",
-    "aria_label": "Reputação federada {{score}} de avaliações {{count}}"
+    "aria_label": "Reputação federada {{score}} de avaliações {{count}}",
+    "tooltip_federated_many": "Reputação agregada em comunidades parceiras {{count}}",
+    "tooltip_federated_one": "Reputação agregada em comunidades parceiras {{count}}",
+    "tooltip_federated_other": "Reputação agregada em comunidades parceiras {{count}}",
+    "tooltip_local_many": "Baseado em avaliações de {{count}} nesta comunidade",
+    "tooltip_local_one": "Baseado em avaliações de {{count}} nesta comunidade",
+    "tooltip_local_other": "Baseado em avaliações de {{count}} nesta comunidade",
+    "chip_label_many": "{{score}} ({{count}})",
+    "chip_label_one": "{{score}} ({{count}})",
+    "chip_label_other": "{{score}} ({{count}})",
+    "aria_label_many": "Reputação federada {{score}} de avaliações {{count}}",
+    "aria_label_one": "Reputação federada {{score}} de avaliações {{count}}",
+    "aria_label_other": "Reputação federada {{score}} de avaliações {{count}}"
   },
   "reviews": {
     "unavailable": "Avaliações ainda não disponíveis para este membro federado",

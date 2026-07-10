@@ -117,7 +117,15 @@
       "media_jobs_one": "{{count}} zadanie multimedialne oczekuje",
       "media_jobs_other": "{{count}} zadania multimedialne czekają",
       "rss_ready_one": "Można sprawdzić opublikowany program {{count}}",
-      "rss_ready_other": "Można sprawdzić opublikowane programy {{count}}"
+      "rss_ready_other": "Można sprawdzić opublikowane programy {{count}}",
+      "pending_items_few": "{{count}} elementy oczekujące na sprawdzenie",
+      "pending_items_many": "{{count}} elementy oczekujące na sprawdzenie",
+      "open_reports_few": "{{count}} otwórz raporty członków",
+      "open_reports_many": "{{count}} otwórz raporty członków",
+      "media_jobs_few": "{{count}} zadania multimedialne czekają",
+      "media_jobs_many": "{{count}} zadania multimedialne czekają",
+      "rss_ready_few": "Można sprawdzić opublikowane programy {{count}}",
+      "rss_ready_many": "Można sprawdzić opublikowane programy {{count}}"
     },
     "feed_validation": {
       "title": "Walidacja RSS",
@@ -211,7 +219,11 @@
       "report_dismissed": "Raport odrzucony.",
       "report_escalated": "Raport eskalował.",
       "feed_valid": "Kanał RSS jest gotowy.",
-      "feed_invalid": "Kanał RSS zawiera problemy {{count}}."
+      "feed_invalid": "Kanał RSS zawiera problemy {{count}}.",
+      "feed_invalid_few": "Kanał RSS zawiera problemy {{count}}.",
+      "feed_invalid_many": "Kanał RSS zawiera problemy {{count}}.",
+      "feed_invalid_one": "Kanał RSS zawiera problemy {{count}}.",
+      "feed_invalid_other": "Kanał RSS zawiera problemy {{count}}."
     },
     "bulk": {
       "approve_selected": "Zatwierdź zaznaczone",
@@ -219,7 +231,19 @@
       "done": "Zmoderowano {{count}} element(y/ów).",
       "partial": "Zmoderowano {{ok}}; {{failed}} nie powiodło się.",
       "confirm_reject_title": "Odrzuć zaznaczone elementy",
-      "confirm_reject_message": "Odrzucić {{count}} zaznaczonych elementów? Twórcy zobaczą je z powrotem jako szkice."
-    }
+      "confirm_reject_message": "Odrzucić {{count}} zaznaczonych elementów? Twórcy zobaczą je z powrotem jako szkice.",
+      "done_few": "Zmoderowano {{count}} element(y/ów).",
+      "done_many": "Zmoderowano {{count}} element(y/ów).",
+      "done_one": "Zmoderowano {{count}} element(y/ów).",
+      "done_other": "Zmoderowano {{count}} element(y/ów).",
+      "confirm_reject_message_few": "Odrzucić {{count}} zaznaczonych elementów? Twórcy zobaczą je z powrotem jako szkice.",
+      "confirm_reject_message_many": "Odrzucić {{count}} zaznaczonych elementów? Twórcy zobaczą je z powrotem jako szkice.",
+      "confirm_reject_message_one": "Odrzucić {{count}} zaznaczonych elementów? Twórcy zobaczą je z powrotem jako szkice.",
+      "confirm_reject_message_other": "Odrzucić {{count}} zaznaczonych elementów? Twórcy zobaczą je z powrotem jako szkice."
+    },
+    "count_few": "{{count}} items",
+    "count_many": "{{count}} items",
+    "count_one": "{{count}} elementy",
+    "count_other": "{{count}} elementy"
   }
 }

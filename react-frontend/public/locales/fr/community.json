@@ -187,7 +187,11 @@
     "terms_required": "Vous devez accepter les conditions pour enregistrer votre organisation.",
     "opportunity_count_one": "{{count}} opportunité",
     "opportunity_count_other": "{{count}} opportunités",
-    "loading": "Chargement des organisations"
+    "loading": "Chargement des organisations",
+    "opportunity_count_many": "{{count}} opportunités",
+    "volunteer_count_many": "{{count}} bénévoles",
+    "volunteer_count_one": "{{count}} bénévoles",
+    "volunteer_count_other": "{{count}} bénévoles"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -231,7 +235,13 @@
     "submit_review": "Envoyer l'avis",
     "review_success": "Avis soumis.",
     "review_error": "Impossible de soumettre votre avis.",
-    "rating_required": "Choisissez une note avant de soumettre."
+    "rating_required": "Choisissez une note avant de soumettre.",
+    "meta_description_fallback_many": "Explorez {{name}} et {{count}} opportunités de bénévolat actives sur cette banque de temps communautaire.",
+    "meta_description_fallback_one": "Explorez {{name}} et {{count}} opportunités de bénévolat actives sur cette banque de temps communautaire.",
+    "meta_description_fallback_other": "Explorez {{name}} et {{count}} opportunités de bénévolat actives sur cette banque de temps communautaire.",
+    "review_count_many": "{{count}} avis",
+    "review_count_one": "{{count}} avis",
+    "review_count_other": "{{count}} avis"
   },
   "emergency_alerts": {
     "heading": "Alertes d'urgence",

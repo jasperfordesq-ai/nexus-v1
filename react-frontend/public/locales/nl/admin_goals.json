@@ -107,6 +107,8 @@
     "status_completed": "Voltooid",
     "status_unknown": "Onbekend",
     "try_adjusting_search": "Probeer uw zoekopdracht aan te passen",
-    "yes": "Ja"
+    "yes": "Ja",
+    "showing_of_total_one": "Toont {{count}} van {{total}}",
+    "showing_of_total_other": "Toont {{count}} van {{total}}"
   }
 }

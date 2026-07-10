@@ -21,14 +21,13 @@ import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import UserCog from 'lucide-react/icons/user-cog';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { safeLocalStorageSet } from '@/lib/safeStorage';
 import { adminSuper, adminUsers } from '../../api/adminApi';
 import { PageHeader } from '../../components/PageHeader';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import type { SuperAdminUserDetail, SuperAdminTenant } from '../../api/types';
 import { useTranslation } from 'react-i18next';
-import i18n from '@/i18n';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -50,7 +49,7 @@ function getPrivilegeLevel(user: SuperAdminUserDetail) {
 
 function formatDate(dateStr: string | null | undefined, neverLabel = 'Never'): string {
   if (!dateStr) return neverLabel;
-  return new Date(dateStr).toLocaleDateString(i18n.language, {
+  return new Date(dateStr).toLocaleDateString(getFormattingLocale(), {
     year: 'numeric', month: 'long', day: 'numeric',
   });
 }
@@ -404,14 +403,14 @@ export function UserShow() {
         {/* Right column - 1/3 width */}
         <div className="flex flex-col gap-6">
           {/* GOD-Level Super Admin Actions */}
-          <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-2 border-purple-500/30">
+          <Card className="bg-gradient-to-br from-accent/10 to-pink-500/10 border-2 border-accent/30">
             <CardHeader className="font-semibold text-lg flex items-center gap-2">
-              <ShieldAlert aria-hidden="true" size={18} className="text-purple-600 dark:text-purple-400" />
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <ShieldAlert aria-hidden="true" size={18} className="text-accent dark:text-accent" />
+              <span className="bg-gradient-to-r from-accent to-pink-600 bg-clip-text text-transparent">
                 {t('super.god_level_access')}
               </span>
             </CardHeader>
-            <Separator className="bg-purple-500/20" />
+            <Separator className="bg-accent/20" />
             <CardBody className="flex flex-col gap-3">
               <p className="text-xs text-muted">
                 {t('super.god_level_desc')}
@@ -431,15 +430,15 @@ export function UserShow() {
                 <div>
                   <Button
                     variant="secondary"
-                    className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-500/50 w-full"
+                    className="bg-gradient-to-r from-accent/20 to-pink-500/20 border-2 border-accent/50 w-full"
                     startContent={<ShieldAlert aria-hidden="true" size={16} />}
                     onPress={() => setConfirmAction('grant-global')}
                   >
-                    <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent font-semibold">
+                    <span className="bg-gradient-to-r from-accent to-pink-600 bg-clip-text text-transparent font-semibold">
                       {t('super.grant_global_sa')}
                     </span>
                   </Button>
-                  <p className="text-[10px] text-purple-700 dark:text-purple-400 mt-2 text-center font-medium">
+                  <p className="text-[10px] text-accent dark:text-accent mt-2 text-center font-medium">
                     {t('super.god_level_caution')}
                   </p>
                 </div>
@@ -486,14 +485,14 @@ export function UserShow() {
             <CardBody>
               <div className="flex flex-col items-center gap-3 py-2">
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                  privilege.level === 4 ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20' :
+                  privilege.level === 4 ? 'bg-gradient-to-br from-accent/20 to-pink-500/20' :
                   privilege.level === 3 ? 'bg-accent-soft' :
                   privilege.level === 2 ? 'bg-accent/10' :
                   'bg-surface-tertiary'
                 }`}>
                   {privilege.level >= 3 ? (
                     <CrownIcon aria-hidden="true" size={28} className={
-                      privilege.level === 4 ? 'text-purple-600' : 'text-accent'
+                      privilege.level === 4 ? 'text-accent' : 'text-accent'
                     } />
                   ) : (
                     <Shield aria-hidden="true" size={28} className={
@@ -511,7 +510,7 @@ export function UserShow() {
                       key={level}
                       className={`h-2 flex-1 rounded-full ${
                         level <= privilege.level
-                          ? privilege.level === 4 ? 'bg-gradient-to-r from-purple-500 to-pink-500'
+                          ? privilege.level === 4 ? 'bg-gradient-to-r from-accent to-pink-500'
                             : privilege.level === 3 ? 'bg-muted'
                             : privilege.level === 2 ? 'bg-accent'
                             : 'bg-muted/50'

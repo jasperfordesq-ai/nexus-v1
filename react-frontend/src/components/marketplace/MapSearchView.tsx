@@ -190,7 +190,7 @@ export function MapSearchView({
   // ─── Empty state ──────────────────────────────────────────────────────────
   if (markers.length === 0) {
     return (
-      <GlassCard className={`flex flex-col items-center justify-center gap-4 p-8 ${className}`} style={{ minHeight: '300px' }}>
+      <GlassCard className={`flex min-h-[300px] flex-col items-center justify-center gap-4 p-8 ${className}`}>
         <MapPin className="w-12 h-12 text-muted" aria-hidden="true" />
         <div className="text-center space-y-1">
           <h3 className="font-semibold text-foreground">

@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Spinner, Chip, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -47,7 +48,7 @@ const STATUS_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'success
 };
 
 const formatDate = (dateStr: string): string => {
-  return new Date(dateStr).toLocaleString();
+  return new Date(dateStr).toLocaleString(getFormattingLocale());
 };
 
 const formatProvider = (slug: string): string => {

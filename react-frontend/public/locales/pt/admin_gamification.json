@@ -306,6 +306,18 @@
     "audience_badge_holders": "Usuários com crachá específico",
     "type_one_time": "Uma vez",
     "type_recurring": "Recorrente",
-    "type_triggered": "Acionado"
+    "type_triggered": "Acionado",
+    "bulk_award_succeeded_count_many": "Distintivo{{count}}premiado",
+    "bulk_award_succeeded_count_one": "Distintivo{{count}}premiado",
+    "bulk_award_succeeded_count_other": "Distintivo{{count}}premiado",
+    "badge_count_many": "Emblemas{{count}}",
+    "badge_count_one": "Emblemas{{count}}",
+    "badge_count_other": "Emblemas{{count}}",
+    "threshold_count_many": "Limite:{{count}}",
+    "threshold_count_one": "Limite:{{count}}",
+    "threshold_count_other": "Limite:{{count}}",
+    "xp_count_many": "{{count}}XP",
+    "xp_count_one": "{{count}}XP",
+    "xp_count_other": "{{count}}XP"
   }
 }

@@ -178,7 +178,8 @@
         "episode_missing_audio_url": "有効なHTTP音声URLがないエピソードがあります。",
         "episode_missing_audio_length": "音声のファイルサイズがないエピソードがあります。",
         "episode_missing_audio_mime": "音声のMIMEタイプがないエピソードがあります。"
-      }
+      },
+      "skipped_episodes_other": "音声が修正されるまで、{{count}}件のエピソードがフィードから除外されます。"
     },
     "stats": {
       "title": "リスナー統計",
@@ -188,7 +189,8 @@
       "subscribers": "登録者",
       "top_episodes": "人気エピソード",
       "listen_count": "{{count}}回再生",
-      "last_days": "再生アクティビティは過去{{days}}日間が対象です。"
+      "last_days": "再生アクティビティは過去{{days}}日間が対象です。",
+      "listen_count_other": "{{count}}回再生"
     }
   },
   "fields": {

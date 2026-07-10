@@ -119,7 +119,7 @@ export function VerifyEmailPage() {
           className="w-full max-w-md"
         >
           <GlassCard className="p-8 text-center">
-            <div role="status" aria-busy="true" aria-label={t('verify_email.loading_title')} className="w-16 h-16 mx-auto mb-6 rounded-full bg-indigo-500/20 flex items-center justify-center">
+            <div role="status" aria-busy="true" aria-label={t('verify_email.loading_title')} className="w-16 h-16 mx-auto mb-6 rounded-full bg-accent/20 flex items-center justify-center">
               <Spinner size="lg" aria-hidden="true" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('verify_email.loading_title')}</h1>
@@ -171,17 +171,13 @@ export function VerifyEmailPage() {
             )}
 
             {isAuthenticated ? (
-              <Link to={tenantPath('/dashboard')}>
-                <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                  {t('verify_email.go_to_dashboard')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath('/dashboard')} className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white">
+                {t('verify_email.go_to_dashboard')}
+              </Button>
             ) : (
-              <Link to={tenantPath('/login')}>
-                <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                  {requiresApproval ? t('verify_email.back_to_login') : t('verify_email.go_to_login')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath('/login')} className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white">
+                {requiresApproval ? t('verify_email.back_to_login') : t('verify_email.go_to_login')}
+              </Button>
             )}
           </GlassCard>
 
@@ -222,7 +218,7 @@ export function VerifyEmailPage() {
                 <Button
                   onPress={handleResendVerification}
                   isLoading={isResending}
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                   startContent={!isResending ? <Mail aria-hidden="true" className="w-4 h-4" /> : undefined}
                 >
                   {t('verify_email.resend')}
@@ -234,15 +230,13 @@ export function VerifyEmailPage() {
               </p>
             )}
 
-            <Link to={isAuthenticated ? tenantPath('/dashboard') : tenantPath('/login')}>
-              <Button
-                variant="flat"
-                className="w-full bg-theme-elevated text-theme-primary"
-                startContent={<ArrowLeft aria-hidden="true" className="w-4 h-4" />}
-              >
-                {isAuthenticated ? t('verify_email.back_to_dashboard') : t('verify_email.back_to_login')}
-              </Button>
-            </Link>
+            <Button as={Link} to={isAuthenticated ? tenantPath('/dashboard') : tenantPath('/login')}
+              variant="flat"
+              className="w-full bg-theme-elevated text-theme-primary"
+              startContent={<ArrowLeft aria-hidden="true" className="w-4 h-4" />}
+            >
+              {isAuthenticated ? t('verify_email.back_to_dashboard') : t('verify_email.back_to_login')}
+            </Button>
           </div>
         </GlassCard>
 

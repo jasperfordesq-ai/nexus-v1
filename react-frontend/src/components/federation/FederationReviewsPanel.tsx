@@ -22,7 +22,7 @@ import StarHalf from 'lucide-react/icons/star-half';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 
 export interface FederationReviewItem {
@@ -107,12 +107,12 @@ function reviewerName(r: FederationReviewItem['reviewer']): string {
 function partnerChipClass(partnerId: number | string | undefined): string {
   // Deterministic color-coding by partner id
   const palette = [
-    'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
+    'bg-accent/10 text-accent dark:text-accent',
     'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
     'bg-amber-500/10 text-amber-600 dark:text-amber-400',
     'bg-rose-500/10 text-rose-600 dark:text-rose-400',
     'bg-sky-500/10 text-sky-600 dark:text-sky-400',
-    'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+    'bg-accent/10 text-accent dark:text-accent',
   ];
   const str = String(partnerId ?? '0');
   let hash = 0;
@@ -127,7 +127,7 @@ function partnerChipClass(partnerId: number | string | undefined): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function FederationReviewsPanel({ memberId, tenantId }: FederationReviewsPanelProps) {
-  const { t, i18n } = useTranslation('federation');
+  const { t } = useTranslation('federation');
   const [reviews, setReviews] = useState<FederationReviewItem[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [unavailable, setUnavailable] = useState(false);
@@ -244,8 +244,6 @@ export function FederationReviewsPanel({ memberId, tenantId }: FederationReviews
   }
 
   // ─── List ───────────────────────────────────────────────────────────────
-  const dateLocale = i18n.language || undefined;
-
   return (
     <div className="space-y-3">
       {reviews.map((r) => {
@@ -255,7 +253,7 @@ export function FederationReviewsPanel({ memberId, tenantId }: FederationReviews
         });
         const formattedDate = (() => {
           try {
-            return new Date(r.created_at).toLocaleDateString(dateLocale, {
+            return new Date(r.created_at).toLocaleDateString(getFormattingLocale(), {
               year: 'numeric',
               month: 'short',
               day: 'numeric',

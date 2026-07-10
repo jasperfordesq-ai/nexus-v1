@@ -108,7 +108,10 @@
       "create": "No se pudo crear la solicitud de cobertura",
       "candidates": "No se pudieron cargar candidatos sustitutos",
       "assign": "El sustituto no pudo ser igualado"
-    }
+    },
+    "skill_matches_many": "Habilidades de combinación{{count}}",
+    "skill_matches_one": "Habilidades de combinación{{count}}",
+    "skill_matches_other": "Habilidades de combinación{{count}}"
   },
   "providers": {
     "title": "Directorio de proveedores de atención",
@@ -488,7 +491,8 @@
         "maximum_discount": "Descuento máximo por pedido (%)",
         "maximum_discount_description": "Límite sobre la cantidad del total del pedido que se puede pagar en créditos de tiempo.",
         "save": "Guardar configuración",
-        "view_only": "Los usuarios de solo lectura no pueden cambiar la configuración de fidelización."
+        "view_only": "Los usuarios de solo lectura no pueden cambiar la configuración de fidelización.",
+        "per_hour_short": "/ h"
       },
       "ledger": {
         "title": "Canjes recientes",
@@ -534,6 +538,9 @@
         "pending": "Pendiente",
         "applied": "Aplicado",
         "reversed": "invertido"
+      },
+      "table": {
+        "empty_value": "—"
       }
     },
     "hour_transfers": {
@@ -808,7 +815,11 @@
         "days_ago_one": "{{count}}hace d",
         "days_ago_other": "{{count}}hace d",
         "months_ago_one": "{{count}}hace meses",
-        "months_ago_other": "{{count}}hace meses"
+        "months_ago_other": "{{count}}hace meses",
+        "minutes_ago_many": "{{count}}hace m",
+        "hours_ago_many": "{{count}}hace h",
+        "days_ago_many": "{{count}}hace d",
+        "months_ago_many": "{{count}}hace meses"
       },
       "messages": {
         "triage_saved": "Triaje guardado",
@@ -944,7 +955,8 @@
       },
       "errors": {
         "load": "No se pudo cargar el círculo de destinatarios. Verifique el ID de miembro y vuelva a intentarlo."
-      }
+      },
+      "safeguarding_flags_many": "{{count}} salvaguardando banderas"
     },
     "safeguarding_reports": {
       "meta_title": "Informes de protección: administrador",

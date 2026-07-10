@@ -46,6 +46,7 @@ vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
 vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: (url: string) => url || '/default.png',
+  resolveThumbnailUrl: (url: string) => url || '/default.png',
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   resolveAvatarUrl: (url: string | null) => url || '/default-avatar.png',
   tenantPath: (p: string) => '/test' + p,
@@ -93,7 +94,7 @@ const mockTextStory = {
   media_type: 'text' as const,
   media_url: null,
   text_content: 'Hello from my story!',
-  background_gradient: 'from-purple-600 to-blue-500',
+  background_gradient: 'from-accent to-blue-500',
   background_color: null,
   duration: 5,
   view_count: 12,
@@ -123,7 +124,7 @@ const mockPollStory = {
   media_type: 'poll' as const,
   media_url: null,
   text_content: null,
-  background_gradient: 'from-blue-600 to-indigo-500',
+  background_gradient: 'from-blue-600 to-accent-gradient-end',
   background_color: null,
   duration: 10,
   view_count: 20,
@@ -158,7 +159,7 @@ describe('StoryViewer', () => {
     // The modal mock does not emit role="dialog"; the viewer's labelled region
     // (ModalBody aria-label) stands in for the dialog presence assertion.
     await waitFor(() => {
-      expect(screen.getByLabelText('Story from Story Author')).toBeInTheDocument();
+      expect(screen.getAllByLabelText('Story from Story Author')[0]).toBeInTheDocument();
     });
   });
 
@@ -167,7 +168,7 @@ describe('StoryViewer', () => {
     // React Aria's Modal puts the accessible label on the ModalBody region;
     // assert that labelled region carries the user-specific story label.
     await waitFor(() => {
-      expect(screen.getByLabelText('Story from Story Author')).toBeInTheDocument();
+      expect(screen.getAllByLabelText('Story from Story Author')[0]).toBeInTheDocument();
     });
   });
 
@@ -192,7 +193,7 @@ describe('StoryViewer', () => {
     // Wait for the viewer to mount (modal mock emits no role="dialog"; use the
     // labelled region) before dispatching the Escape key handled on window.
     await waitFor(() => {
-      expect(screen.getByLabelText('Story from Story Author')).toBeInTheDocument();
+      expect(screen.getAllByLabelText('Story from Story Author')[0]).toBeInTheDocument();
     });
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(defaultProps.onClose).toHaveBeenCalled();

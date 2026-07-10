@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { Checkbox } from '@/components/ui/Checkbox';
 import { Chip } from '@/components/ui/Chip';
@@ -41,7 +42,6 @@ import Package from 'lucide-react/icons/package';
 import Route from 'lucide-react/icons/route';
 import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';
-import i18n from '@/i18n';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
@@ -457,7 +457,7 @@ function ChallengesTab() {
       {activeChallenges.length > 0 && (
         <div>
           <h3 className="text-lg font-semibold text-theme-primary mb-3 flex items-center gap-2">
-            <Target className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+            <Target className="w-5 h-5 text-accent" aria-hidden="true" />
             {t('achievements.challenges.active_challenges')}
           </h3>
           <motion.div
@@ -475,8 +475,8 @@ function ChallengesTab() {
                 <motion.div key={challenge.id} variants={itemVariants}>
                   <GlassCard className="p-5" hoverable>
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center flex-shrink-0">
-                        <Target className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 flex items-center justify-center flex-shrink-0">
+                        <Target className="w-5 h-5 text-accent" aria-hidden="true" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
@@ -491,7 +491,7 @@ function ChallengesTab() {
                           value={progressPct}
                           className="mb-2"
                           classNames={{
-                            indicator: 'bg-gradient-to-r from-indigo-500 to-purple-600',
+                            indicator: 'bg-gradient-to-r from-accent to-accent-gradient-end',
                             track: 'bg-theme-hover',
                           }}
                           size="sm"
@@ -502,7 +502,7 @@ function ChallengesTab() {
                           {challenge.end_date && (
                             <span className="flex items-center gap-1">
                               <Clock className="w-3 h-3" aria-hidden="true" />
-                              {new Date(challenge.end_date).toLocaleDateString()}
+                              {new Date(challenge.end_date).toLocaleDateString(getFormattingLocale())}
                             </span>
                           )}
                         </div>
@@ -680,7 +680,7 @@ function JourneysTab() {
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div>
                   <h4 className="font-semibold text-theme-primary flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+                    <Layers className="w-4 h-4 text-accent" aria-hidden="true" />
                     {collection.name}
                     {collection.completed && (
                       <Chip size="sm" color="success" variant="flat">{t('achievements.collections.complete')}</Chip>
@@ -702,7 +702,7 @@ function JourneysTab() {
                 classNames={{
                   indicator: collection.completed
                     ? 'bg-gradient-to-r from-emerald-500 to-green-500'
-                    : 'bg-gradient-to-r from-indigo-500 to-purple-600',
+                    : 'bg-gradient-to-r from-accent to-accent-gradient-end',
                   track: 'bg-theme-hover',
                 }}
                 size="sm"
@@ -750,30 +750,48 @@ interface EngagementMonth {
   activity_count: number;
 }
 
-function EngagementTab() {
+export function EngagementTab() {
   const { t } = useTranslation('gamification');
-  const [history, setHistory] = useState<EngagementMonth[]>([]);
+  const [history, setHistory] = useState<EngagementMonth[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const requestIdRef = useRef(0);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setIsLoading(true);
-        // Try the engagement endpoint; fall back to empty if not available
-        const res = await api.get<EngagementMonth[]>('/v2/gamification/engagement-history');
-        if (res.success && res.data && Array.isArray(res.data)) {
-          setHistory(res.data);
-        }
-      } catch {
-        // Endpoint may not exist yet — show empty state gracefully
-      } finally {
+  const load = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
+    setIsLoading(true);
+
+    try {
+      const res = await api.get<EngagementMonth[]>('/v2/gamification/engagement-history');
+      if (requestId !== requestIdRef.current) return;
+
+      if (res.success && Array.isArray(res.data)) {
+        setHistory(res.data);
+        setLoadFailed(false);
+      } else {
+        // A resolved failure envelope is still a failure. Keep previously
+        // confirmed history visible instead of replacing it with fabricated zeroes.
+        setLoadFailed(true);
+      }
+    } catch (err) {
+      if (requestId !== requestIdRef.current) return;
+      logError('Failed to load engagement history', err);
+      setLoadFailed(true);
+    } finally {
+      if (requestId === requestIdRef.current) {
         setIsLoading(false);
       }
-    };
-    load();
+    }
   }, []);
 
-  if (isLoading) {
+  useEffect(() => {
+    void load();
+    return () => {
+      requestIdRef.current += 1;
+    };
+  }, [load]);
+
+  if (isLoading && history === null) {
     return (
       <div className="mt-4 space-y-4">
         <GlassCard className="p-5">
@@ -788,6 +806,63 @@ function EngagementTab() {
     );
   }
 
+  if (history === null) {
+    return (
+      <div className="mt-4" role="alert">
+        <EmptyState
+          icon={<AlertTriangle className="h-10 w-10 text-danger" aria-hidden="true" />}
+          title={t('achievements.load_error')}
+          action={{ label: t('achievements.try_again'), onClick: load }}
+        />
+      </div>
+    );
+  }
+
+  const staleDataWarning = loadFailed ? (
+    <div
+      className="flex flex-col gap-3 rounded-xl border border-danger/30 bg-danger/5 p-4 text-danger sm:flex-row sm:items-center sm:justify-between"
+      role="alert"
+    >
+      <div className="flex items-center gap-2">
+        <AlertTriangle className="h-5 w-5 shrink-0" aria-hidden="true" />
+        <p className="text-sm">{t('achievements.load_error')}</p>
+      </div>
+      <Button
+        variant="outline"
+        onPress={load}
+        isLoading={isLoading}
+        startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
+      >
+        {t('achievements.try_again')}
+      </Button>
+    </div>
+  ) : null;
+
+  if (history.length === 0) {
+    return (
+      <div className="mt-4 space-y-4">
+        {staleDataWarning}
+        <GlassCard className="p-5">
+          <EmptyState
+            icon={<Calendar className="h-10 w-10 text-accent" aria-hidden="true" />}
+            title={t('achievements.engagement.title')}
+            description={t('achievements.engagement.description')}
+            action={(
+              <Button
+                variant="secondary"
+                onPress={load}
+                isLoading={isLoading}
+                startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
+              >
+                {t('common.refresh')}
+              </Button>
+            )}
+          />
+        </GlassCard>
+      </div>
+    );
+  }
+
   // Generate last 12 months for the grid
   const months: Array<{ label: string; ym: string; active: boolean; count: number }> = [];
   const historyMap = new Map(history.map((h) => [h.year_month, h]));
@@ -796,7 +871,7 @@ function EngagementTab() {
     const d = new Date();
     d.setMonth(d.getMonth() - i);
     const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    const label = d.toLocaleDateString(i18n.language, { month: 'short', year: '2-digit' });
+    const label = d.toLocaleDateString(getFormattingLocale(), { month: 'short', year: '2-digit' });
     const entry = historyMap.get(ym);
     months.push({
       label,
@@ -810,15 +885,29 @@ function EngagementTab() {
 
   return (
     <div className="mt-4 space-y-4">
+      {staleDataWarning}
       <GlassCard className="p-5">
         <div className="flex items-center justify-between mb-4">
           <h4 className="font-semibold text-theme-primary flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+            <Calendar className="w-4 h-4 text-accent" aria-hidden="true" />
             {t('achievements.engagement.title')}
           </h4>
-          <Chip size="sm" color={activeCount >= 6 ? 'success' : 'default'} variant="flat">
-            {t('achievements.engagement.months_active', { count: activeCount })}
-          </Chip>
+          <div className="flex items-center gap-2">
+            <Chip size="sm" color={activeCount >= 6 ? 'success' : 'default'} variant="flat">
+              {t('achievements.engagement.months_active', { count: activeCount })}
+            </Chip>
+            <Button
+              isIconOnly
+              size="sm"
+              variant="tertiary"
+              onPress={load}
+              isLoading={isLoading}
+              aria-label={t('common.refresh')}
+              title={t('common.refresh')}
+            >
+              <RefreshCw className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-12 gap-2">
@@ -971,13 +1060,13 @@ function XpShopTab({ userXp }: { userXp: number }) {
   return (
     <div className="space-y-4 mt-4">
       {/* XP Balance */}
-      <GlassCard className="p-4 border-l-4 border-indigo-500">
+      <GlassCard className="p-4 border-l-4 border-accent">
         <div className="flex items-center gap-3">
-          <Gem className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+          <Gem className="w-5 h-5 text-accent" aria-hidden="true" />
           <span className="text-theme-primary font-medium">
             {t('achievements.shop.your_balance')}:{' '}
-            <strong className="text-indigo-700 dark:text-indigo-400">
-              {t('achievements.xp_value', { xp: currentXp.toLocaleString() })}
+            <strong className="text-accent dark:text-accent">
+              {t('achievements.xp_value', { xp: currentXp.toLocaleString(getFormattingLocale()) })}
             </strong>
           </span>
         </div>
@@ -1009,17 +1098,17 @@ function XpShopTab({ userXp }: { userXp: number }) {
                   hoverable={!isOwned}
                 >
                   {/* Item icon */}
-                  <div className="w-14 h-14 mx-auto mb-3 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
+                  <div className="w-14 h-14 mx-auto mb-3 rounded-lg bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 flex items-center justify-center">
                     {item.icon ? (
                       <span className="text-2xl">{item.icon}</span>
                     ) : item.item_type === 'badge' ? (
                       <Medal className="w-7 h-7 text-amber-400" aria-hidden="true" />
                     ) : item.item_type === 'title' ? (
-                      <Crown className="w-7 h-7 text-purple-400" aria-hidden="true" />
+                      <Crown className="w-7 h-7 text-accent" aria-hidden="true" />
                     ) : item.item_type === 'theme' ? (
-                      <Sparkles className="w-7 h-7 text-indigo-400" aria-hidden="true" />
+                      <Sparkles className="w-7 h-7 text-accent" aria-hidden="true" />
                     ) : (
-                      <Package className="w-7 h-7 text-indigo-400" aria-hidden="true" />
+                      <Package className="w-7 h-7 text-accent" aria-hidden="true" />
                     )}
                   </div>
 
@@ -1034,7 +1123,7 @@ function XpShopTab({ userXp }: { userXp: number }) {
                       variant="flat"
                     >
                       <Gem className="w-3 h-3 inline mr-1" aria-hidden="true" />
-                      {t('achievements.xp_value', { xp: cost.toLocaleString() })}
+                      {t('achievements.xp_value', { xp: cost.toLocaleString(getFormattingLocale()) })}
                     </Chip>
                     {item.stock_limit !== null && item.stock_limit !== undefined && !isOwned && (
                       <p className="text-xs text-theme-subtle mt-1">{t('achievements.shop.stock_left', { count: item.stock_limit })}</p>
@@ -1054,7 +1143,7 @@ function XpShopTab({ userXp }: { userXp: number }) {
                       size="sm"
                       className={
                         canAfford
-                          ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                          ? 'bg-gradient-to-r from-accent to-accent-gradient-end text-white'
                           : 'bg-theme-hover text-theme-subtle'
                       }
                       startContent={
@@ -1222,7 +1311,7 @@ function BadgeDetailModal({ isOpen, onClose, badgeKey }: BadgeDetailModalProps) 
                   <div className="flex items-center gap-2 mb-5 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20">
                     <CheckCircle className="w-4 h-4 text-emerald-400" aria-hidden="true" />
                     <span className="text-sm text-emerald-700 dark:text-emerald-400 font-medium">
-                      {t('achievements.badge_detail.earned_on', { date: new Date(badge.earned_at).toLocaleDateString() })}
+                      {t('achievements.badge_detail.earned_on', { date: new Date(badge.earned_at).toLocaleDateString(getFormattingLocale()) })}
                     </span>
                   </div>
                 ) : (
@@ -1354,31 +1443,24 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
                 const isDisabled = !isSelected && selectedKeys.size >= 5;
 
                 return (
-                  <div
+                  <Checkbox
                     key={badge.badge_key}
-                    className={`flex items-center gap-3 p-3 rounded-lg border transition-colors cursor-pointer ${
+                    isSelected={isSelected}
+                    isDisabled={isDisabled}
+                    onValueChange={() => toggleBadge(badge.badge_key)}
+                    aria-label={t('achievements.showcase.showcase_badge', { name: badge.name })}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-colors ${
                       isSelected
                         ? 'border-amber-400/50 bg-amber-500/10'
                         : isDisabled
                           ? 'border-white/5 bg-theme-hover opacity-50 cursor-not-allowed'
                           : 'border-white/10 bg-theme-elevated hover:bg-theme-hover'
                     }`}
-                    role="checkbox"
-                    tabIndex={isDisabled ? -1 : 0}
-                    aria-checked={isSelected}
-                    aria-disabled={isDisabled}
-                    onClick={() => { if (!isDisabled) toggleBadge(badge.badge_key); }}
-                    onKeyDown={(e) => { if (!isDisabled && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleBadge(badge.badge_key); } }}
+                    classNames={{
+                      wrapper: 'flex-shrink-0',
+                      label: 'flex min-w-0 flex-1 items-center gap-3',
+                    }}
                   >
-                    <Checkbox
-                      isSelected={isSelected}
-                      isDisabled={isDisabled}
-                      onValueChange={() => toggleBadge(badge.badge_key)}
-                      aria-label={t('achievements.showcase.showcase_badge', { name: badge.name })}
-                      classNames={{
-                        wrapper: 'flex-shrink-0',
-                      }}
-                    />
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center text-sm flex-shrink-0">
                       {badge.icon || <Medal className="w-4 h-4 text-amber-400" aria-hidden="true" />}
                     </div>
@@ -1391,7 +1473,7 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
                       </p>
                       <p className="text-xs text-theme-subtle truncate">{badge.description}</p>
                     </div>
-                  </div>
+                  </Checkbox>
                 );
               })}
             </div>
@@ -1402,7 +1484,7 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
             {t('achievements.showcase.cancel')}
           </Button>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={
               isSaving ? (
                 <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center py-4"><Spinner size="sm" color="white" /></div>
@@ -1546,7 +1628,7 @@ export function AchievementsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('achievements.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadData}
           >
@@ -1604,7 +1686,7 @@ export function AchievementsPage() {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     <div className="flex items-center gap-4 flex-1">
                       <div className="relative">
-                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-accent to-accent-gradient-end flex items-center justify-center">
                           <span className="text-white text-xl font-bold">{profile.level}</span>
                         </div>
                         <Sparkles className="w-5 h-5 text-amber-400 absolute -top-1 -right-1" aria-hidden="true" />
@@ -1615,14 +1697,14 @@ export function AchievementsPage() {
                           {/* Coerce defensively: a degraded profile (backend catch-fallback
                               missing xp / level_progress) used to crash this card and blank
                               the whole Achievements page via the error boundary. */}
-                          {t('achievements.xp_total', { xp: (profile.xp ?? 0).toLocaleString() })}
+                          {t('achievements.xp_total', { xp: (profile.xp ?? 0).toLocaleString(getFormattingLocale()) })}
                         </p>
                         <div className="mt-2">
                           <Progress
                             value={profile.level_progress?.progress_percentage ?? 0}
                             className="max-w-md"
                             classNames={{
-                              indicator: 'bg-gradient-to-r from-indigo-500 to-purple-600',
+                              indicator: 'bg-gradient-to-r from-accent to-accent-gradient-end',
                               track: 'bg-theme-hover',
                             }}
                             size="sm"
@@ -1651,7 +1733,7 @@ export function AchievementsPage() {
                 aria-label={t('achievements.sections_aria')}
                 classNames={{
                   tabList: 'bg-theme-elevated border border-white/10 rounded-lg p-1',
-                  cursor: 'bg-gradient-to-r from-indigo-500 to-purple-600',
+                  cursor: 'bg-gradient-to-r from-accent to-accent-gradient-end',
                   tab: 'text-theme-muted data-[selected=true]:text-white',
                   tabContent: 'group-data-[selected=true]:text-white',
                 }}
@@ -1783,7 +1865,7 @@ export function AchievementsPage() {
                             )}
                             {badge.earned_at ? (
                               <p className="text-xs text-theme-subtle mt-2">
-                                {t('achievements.earned_date', { date: new Date(badge.earned_at).toLocaleDateString() })}
+                                {t('achievements.earned_date', { date: new Date(badge.earned_at).toLocaleDateString(getFormattingLocale()) })}
                               </p>
                             ) : badge.earned === false ? (
                               <div className="flex items-center justify-center gap-1 mt-2 text-xs text-theme-subtle">

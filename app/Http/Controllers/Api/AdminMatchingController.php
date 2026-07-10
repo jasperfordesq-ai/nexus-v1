@@ -390,14 +390,10 @@ class AdminMatchingController extends BaseApiController
             $pendingApprovals = 0;
             $approvedCount = 0;
             $rejectedCount = 0;
-            try {
-                $tenantId = $this->getTenantId();
-                $pendingApprovals = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'pending'", [$tenantId])->cnt;
-                $approvedCount = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'approved'", [$tenantId])->cnt;
-                $rejectedCount = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'rejected'", [$tenantId])->cnt;
-            } catch (\Throwable $e) {
-                \Log::warning('Matching stats approval query failed', ['error' => $e->getMessage()]);
-            }
+            $tenantId = $this->getTenantId();
+            $pendingApprovals = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'pending'", [$tenantId])->cnt;
+            $approvedCount = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'approved'", [$tenantId])->cnt;
+            $rejectedCount = (int) DB::selectOne("SELECT COUNT(*) as cnt FROM match_approvals WHERE tenant_id = ? AND status = 'rejected'", [$tenantId])->cnt;
 
             $totalReviewed = $approvedCount + $rejectedCount;
             $approvalRate = $totalReviewed > 0 ? round(($approvedCount / $totalReviewed) * 100, 1) : 0;
@@ -412,7 +408,7 @@ class AdminMatchingController extends BaseApiController
                 'pillar_averages' => $this->smartMatchingAnalyticsService->getPillarAverages(),
             ]);
         } catch (\Throwable $e) {
-            return $this->respondWithError('SERVER_ERROR', __('api.fetch_failed', ['resource' => 'matching stats']), null, 500);
+            return $this->respondWithError('SERVER_ERROR', __('api.server_error'), null, 500);
         }
     }
 

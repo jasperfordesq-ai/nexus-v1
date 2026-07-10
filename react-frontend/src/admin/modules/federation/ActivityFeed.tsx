@@ -29,7 +29,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Inbox from 'lucide-react/icons/inbox';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
-import { formatRelativeTime } from '@/lib/helpers';
+import { formatRelativeTime, getFormattingLocale } from '@/lib/helpers';
 import { adminFederation } from '../../api/adminApi';
 import { BrokerEmptyState } from '@/broker/components';
 import { PageHeader } from '../../components/PageHeader';
@@ -144,7 +144,7 @@ function TimelineItem({ item }: { item: ActivityItem }) {
   const config = getEventConfig(item.type, ((key: string) => t(key)) as (key: string, defaultValue?: string) => string);
   const Icon = config.icon;
 
-  const absoluteTime = new Date(item.timestamp).toLocaleString();
+  const absoluteTime = new Date(item.timestamp).toLocaleString(getFormattingLocale());
 
   // Build description string
   let desc = item.description;

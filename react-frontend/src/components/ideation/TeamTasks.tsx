@@ -38,7 +38,7 @@ import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -94,7 +94,7 @@ const isOverdue = (dueDate: string | null) => {
 const formatDate = (dateStr: string | null) => {
   if (!dateStr) return null;
   try {
-    return new Date(dateStr).toLocaleDateString(undefined, {
+    return new Date(dateStr).toLocaleDateString(getFormattingLocale(), {
       month: 'short',
       day: 'numeric',
     });

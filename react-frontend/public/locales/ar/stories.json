@@ -98,7 +98,13 @@
     "or_divider": "أو",
     "poll_add_option_button": "إضافة خيار",
     "videos_trimmed_notice": "سيتم قطع الفيديوهات الأطول من 60 ثانية إلى 60 ثانية مدة عرض",
-    "video_duration_seconds": "{{count}}ث"
+    "video_duration_seconds": "{{count}}ث",
+    "video_duration_seconds_few": "{{count}}ث",
+    "video_duration_seconds_many": "{{count}}ث",
+    "video_duration_seconds_one": "{{count}}ث",
+    "video_duration_seconds_other": "{{count}}ث",
+    "video_duration_seconds_two": "{{count}}ث",
+    "video_duration_seconds_zero": "{{count}}ث"
   },
   "viewer": {
     "story_from": "قصة من {{name}}",
@@ -132,7 +138,19 @@
     "reply_placeholder_generic": "رد على القصة...",
     "react_with": "تفاعل بـ {{type}}",
     "viewers_title_count": "المشاهدون ({{count}})",
-    "delete_story_confirm": "هل تريد حذف هذه القصة؟ لا يمكن التراجع عن هذا."
+    "delete_story_confirm": "هل تريد حذف هذه القصة؟ لا يمكن التراجع عن هذا.",
+    "poll_votes_few": "{{count}} تصويت",
+    "poll_votes_many": "{{count}} تصويت",
+    "poll_votes_one": "{{count}} تصويت",
+    "poll_votes_other": "{{count}} تصويت",
+    "poll_votes_two": "{{count}} تصويت",
+    "poll_votes_zero": "{{count}} تصويت",
+    "viewers_title_count_few": "المشاهدون ({{count}})",
+    "viewers_title_count_many": "المشاهدون ({{count}})",
+    "viewers_title_count_one": "المشاهدون ({{count}})",
+    "viewers_title_count_other": "المشاهدون ({{count}})",
+    "viewers_title_count_two": "المشاهدون ({{count}})",
+    "viewers_title_count_zero": "المشاهدون ({{count}})"
   },
   "highlights": {
     "no_stories": "لا توجد قصص في هذا التسليط",

@@ -49,7 +49,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import CommunityImpactTab from './CommunityImpactTab';
 import PersonalJourneyTab from './PersonalJourneyTab';
 import MemberSpotlightTab from './MemberSpotlightTab';
@@ -127,7 +127,7 @@ const typeIcons: Record<LeaderboardType, React.ReactNode> = {
   xp: <Zap className="w-4 h-4 text-theme-subtle" aria-hidden="true" />,
   volunteer_hours: <Clock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />,
   credits_earned: <Coins className="w-4 h-4 text-theme-subtle" aria-hidden="true" />,
-  nexus_score: <Trophy className="w-4 h-4 text-indigo-400" aria-hidden="true" />,
+  nexus_score: <Trophy className="w-4 h-4 text-accent" aria-hidden="true" />,
 };
 
 const containerVariants = {
@@ -269,11 +269,11 @@ function SeasonCard() {
 
   return (
     <div className="space-y-3">
-      <GlassCard className="p-5 border-l-4 border-purple-500">
+      <GlassCard className="p-5 border-l-4 border-accent">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div>
             <h3 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-              <Flame className="w-5 h-5 text-purple-400" aria-hidden="true" />
+              <Flame className="w-5 h-5 text-accent" aria-hidden="true" />
               {seasonInfo.name}
             </h3>
           </div>
@@ -285,7 +285,7 @@ function SeasonCard() {
 
         {/* Season date range */}
         <p className="text-xs text-theme-subtle mb-3">
-          {new Date(seasonInfo.start_date).toLocaleDateString()} &mdash; {new Date(seasonInfo.end_date).toLocaleDateString()}
+          {new Date(seasonInfo.start_date).toLocaleDateString(getFormattingLocale())} &mdash; {new Date(seasonInfo.end_date).toLocaleDateString(getFormattingLocale())}
           {' '}&middot; {t('leaderboard.season.participants', { count: season.total_participants })}
         </p>
 
@@ -296,12 +296,12 @@ function SeasonCard() {
               <span className="text-sm font-medium text-theme-primary">{t('leaderboard.season.your_progress')}</span>
               <div className="flex items-center gap-2">
                 {userPosition && (
-                  <span className="text-sm font-bold text-indigo-700 dark:text-indigo-400">#{userPosition}</span>
+                  <span className="text-sm font-bold text-accent dark:text-accent">#{userPosition}</span>
                 )}
               </div>
             </div>
             <p className="text-xs text-theme-subtle mt-1">
-              {t('leaderboard.season.xp_earned', { xp: (userData.xp_earned ?? 0).toLocaleString() })}
+              {t('leaderboard.season.xp_earned', { xp: (userData.xp_earned ?? 0).toLocaleString(getFormattingLocale()) })}
             </p>
           </div>
         )}
@@ -330,7 +330,7 @@ function SeasonCard() {
           <Button
             variant="light"
             size="sm"
-            className="text-purple-700 dark:text-purple-400"
+            className="text-accent dark:text-accent"
             endContent={
               <ChevronRight
                 className={`w-4 h-4 transition-transform ${showAllSeasons ? 'rotate-90' : ''}`}
@@ -359,12 +359,12 @@ function SeasonCard() {
                 <div
                   key={s.id}
                   className={`flex items-center justify-between p-2 rounded-lg ${
-                    isActive ? 'bg-purple-500/10 border border-purple-500/30' : 'bg-theme-hover/30'
+                    isActive ? 'bg-accent/10 border border-accent/30' : 'bg-theme-hover/30'
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     {isActive ? (
-                      <Flame className="w-4 h-4 text-purple-400 flex-shrink-0" aria-hidden="true" />
+                      <Flame className="w-4 h-4 text-accent flex-shrink-0" aria-hidden="true" />
                     ) : (
                       <Calendar className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
                     )}
@@ -376,7 +376,7 @@ function SeasonCard() {
                         )}
                       </p>
                       <p className="text-xs text-theme-subtle">
-                        {new Date(s.start_date).toLocaleDateString()} - {new Date(s.end_date).toLocaleDateString()}
+                        {new Date(s.start_date).toLocaleDateString(getFormattingLocale())} - {new Date(s.end_date).toLocaleDateString(getFormattingLocale())}
                       </p>
                     </div>
                   </div>
@@ -509,21 +509,21 @@ export function LeaderboardPage() {
       case 'volunteer_hours':
         return (
           <>
-            <span className="font-bold text-theme-primary">{value.toLocaleString()}</span>
+            <span className="font-bold text-theme-primary">{value.toLocaleString(getFormattingLocale())}</span>
             <span className="text-xs text-theme-subtle ml-1">{t('leaderboard.score_unit.hours')}</span>
           </>
         );
       case 'credits_earned':
         return (
           <>
-            <span className="font-bold text-theme-primary">{value.toLocaleString()}</span>
+            <span className="font-bold text-theme-primary">{value.toLocaleString(getFormattingLocale())}</span>
             <span className="text-xs text-theme-subtle ml-1">{t('leaderboard.score_unit.credits')}</span>
           </>
         );
       case 'nexus_score':
         return (
           <>
-            <span className="font-bold text-indigo-700 dark:text-indigo-400">{value.toLocaleString()}</span>
+            <span className="font-bold text-accent dark:text-accent">{value.toLocaleString(getFormattingLocale())}</span>
             <span className="text-xs text-theme-subtle ml-1">{t('leaderboard.score_unit.nexus_score')}</span>
           </>
         );
@@ -531,7 +531,7 @@ export function LeaderboardPage() {
       default:
         return (
           <>
-            <span className="font-bold text-theme-primary">{value.toLocaleString()}</span>
+            <span className="font-bold text-theme-primary">{value.toLocaleString(getFormattingLocale())}</span>
             <span className="text-xs text-theme-subtle ml-1">{t('leaderboard.score_unit.xp')}</span>
           </>
         );
@@ -763,9 +763,9 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
         const displayTotal = meta?.total_entries ?? entries.length;
         if (!displayPosition) return null;
         return (
-          <GlassCard className="p-4 border-l-4 border-indigo-500">
+          <GlassCard className="p-4 border-l-4 border-accent">
             <div className="flex items-center gap-3">
-              <Star className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+              <Star className="w-5 h-5 text-accent" aria-hidden="true" />
               <span className="text-theme-primary font-medium">
                 {t('leaderboard.your_rank', {
                   position: displayPosition,
@@ -842,7 +842,7 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
                       <Link
                         to={tenantPath(`/profile/${entry.user.id}`)}
                         className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-theme-hover transition-colors ${
-                          entry.is_current_user ? 'bg-indigo-500/10 border-l-2 border-indigo-500' : ''
+                          entry.is_current_user ? 'bg-accent/10 border-l-2 border-accent' : ''
                         } ${entry.position <= 3 ? 'bg-gradient-to-r from-amber-500/5 to-transparent' : ''}`}
                       >
                         {/* Rank */}
@@ -861,9 +861,9 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
 
                         {/* Name & Level */}
                         <div className="flex-1 min-w-0">
-                          <p className={`font-medium truncate ${entry.is_current_user ? 'text-indigo-700 dark:text-indigo-400' : 'text-theme-primary'}`}>
+                          <p className={`font-medium truncate ${entry.is_current_user ? 'text-accent dark:text-accent' : 'text-theme-primary'}`}>
                             {entry.user.name}
-                            {entry.is_current_user && <span className="text-xs ml-2 text-indigo-700 dark:text-indigo-400">{t('leaderboard.you')}</span>}
+                            {entry.is_current_user && <span className="text-xs ml-2 text-accent dark:text-accent">{t('leaderboard.you')}</span>}
                           </p>
                           <p className="text-xs text-theme-subtle">{t('leaderboard.level', { level: entry.level })}</p>
                         </div>

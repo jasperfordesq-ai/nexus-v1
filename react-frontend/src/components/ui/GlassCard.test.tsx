@@ -7,13 +7,22 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 import { GlassCard } from './GlassCard';
 
-// Mock framer-motion to strip animation props and render as regular elements
+// Keep the mock focused on animation mechanics while preventing motion-only
+// props from leaking into the DOM and masking React contract warnings.
 vi.mock('@/lib/motion', () => {
+  const motionProps = new Set([
+    'animate', 'drag', 'dragConstraints', 'dragElastic', 'dragMomentum',
+    'exit', 'initial', 'layout', 'layoutId', 'onDragEnd', 'transition',
+    'variants', 'viewport', 'whileHover', 'whileInView', 'whileTap',
+  ]);
   const handler = {
     get: (_target: Record<string, unknown>, tag: string) => {
       return ({ children, ...rest }: Record<string, unknown>) => {
         const Tag = typeof tag === 'string' ? tag : 'div';
-        return <Tag {...rest}>{children}</Tag>;
+        const clean = Object.fromEntries(
+          Object.entries(rest).filter(([key]) => !motionProps.has(key)),
+        );
+        return <Tag {...clean}>{children}</Tag>;
       };
     },
   };

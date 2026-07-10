@@ -37,5 +37,8 @@
     "link_copied": "Cóipeáladh an nasc",
     "copy_failed": "Níorbh fhéidir an nasc a chóipeáil",
     "share_text": "{{title}} - {{description}}"
-  }
+  },
+  "subscriber_count_few": "{{count}} leantóir",
+  "subscriber_count_many": "{{count}} leantóir",
+  "subscriber_count_two": "{{count}} leantóir"
 }

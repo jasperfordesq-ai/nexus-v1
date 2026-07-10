@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
@@ -143,7 +144,7 @@ export default function SellerCouponsPage() {
                     </TableCell>
                     <TableCell>{c.usage_count}</TableCell>
                     <TableCell>
-                      {c.valid_until ? new Date(c.valid_until).toLocaleDateString() : '—'}
+                      {c.valid_until ? new Date(c.valid_until).toLocaleDateString(getFormattingLocale()) : '—'}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1 justify-end">

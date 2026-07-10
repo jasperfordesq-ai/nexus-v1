@@ -117,7 +117,11 @@
       "media_jobs_one": "{{count}} travail multimédia en attente",
       "media_jobs_other": "{{count}} tâches multimédia en attente",
       "rss_ready_one": "{{count}} l'émission publiée peut être vérifiée",
-      "rss_ready_other": "{{count}} les émissions publiées peuvent être vérifiées"
+      "rss_ready_other": "{{count}} les émissions publiées peuvent être vérifiées",
+      "pending_items_many": "{{count}} éléments en attente d'examen",
+      "open_reports_many": "{{count}} rapports de membres ouverts",
+      "media_jobs_many": "{{count}} tâches multimédia en attente",
+      "rss_ready_many": "{{count}} les émissions publiées peuvent être vérifiées"
     },
     "feed_validation": {
       "title": "Validation RSS",
@@ -211,7 +215,10 @@
       "report_dismissed": "Rapport rejeté.",
       "report_escalated": "Le rapport s'est intensifié.",
       "feed_valid": "Le flux RSS est prêt.",
-      "feed_invalid": "Le flux RSS présente {{count}} problème(s)."
+      "feed_invalid": "Le flux RSS présente {{count}} problème(s).",
+      "feed_invalid_many": "Le flux RSS présente {{count}} problème(s).",
+      "feed_invalid_one": "Le flux RSS présente {{count}} problème(s).",
+      "feed_invalid_other": "Le flux RSS présente {{count}} problème(s)."
     },
     "bulk": {
       "approve_selected": "Approuver la sélection",
@@ -219,7 +226,16 @@
       "done": "{{count}} élément(s) modéré(s).",
       "partial": "{{ok}} élément(s) modéré(s) ; {{failed}} en échec.",
       "confirm_reject_title": "Rejeter les éléments sélectionnés",
-      "confirm_reject_message": "Rejeter {{count}} élément(s) sélectionné(s) ? Les créateurs les verront repasser en brouillon."
-    }
+      "confirm_reject_message": "Rejeter {{count}} élément(s) sélectionné(s) ? Les créateurs les verront repasser en brouillon.",
+      "done_many": "{{count}} élément(s) modéré(s).",
+      "done_one": "{{count}} élément(s) modéré(s).",
+      "done_other": "{{count}} élément(s) modéré(s).",
+      "confirm_reject_message_many": "Rejeter {{count}} élément(s) sélectionné(s) ? Les créateurs les verront repasser en brouillon.",
+      "confirm_reject_message_one": "Rejeter {{count}} élément(s) sélectionné(s) ? Les créateurs les verront repasser en brouillon.",
+      "confirm_reject_message_other": "Rejeter {{count}} élément(s) sélectionné(s) ? Les créateurs les verront repasser en brouillon."
+    },
+    "count_many": "{{count}} items",
+    "count_one": "{{count}} éléments",
+    "count_other": "{{count}} éléments"
   }
 }

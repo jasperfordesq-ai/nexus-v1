@@ -17,6 +17,7 @@ import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
 import type { TimebankingStats } from '../../api/types';
 import { useTranslation } from 'react-i18next';
+import { formatNumber } from '@/lib/helpers';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -136,7 +137,7 @@ export function TimebankingDashboard() {
                       </Link>
                     </div>
                     <span className="text-sm font-semibold text-success">
-                      {earner.amount}h
+                      {formatNumber(earner.amount, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
                     </span>
                   </div>
                 ))}
@@ -179,7 +180,7 @@ export function TimebankingDashboard() {
                       </Link>
                     </div>
                     <span className="text-sm font-semibold text-warning">
-                      {spender.amount}h
+                      {formatNumber(spender.amount, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
                     </span>
                   </div>
                 ))}

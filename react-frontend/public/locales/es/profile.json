@@ -76,7 +76,8 @@
     "no_achievements": "Aún no hay logros",
     "no_achievements_own": "¡Empieza a participar para ganar insignias y logros!",
     "no_achievements_other": "Este usuario aún no ha ganado ningún logro",
-    "view_badges": "Ver Insignias Disponibles"
+    "view_badges": "Ver Insignias Disponibles",
+    "badges_many": "{{count}} Insignias Ganadas"
   },
   "toast": {
     "request_sent_title": "Solicitud enviada",
@@ -134,7 +135,10 @@
     "characters_count": "{{count}}/{{max}} caracteres",
     "cancel": "Cancelar",
     "submit": "Enviar reseña",
-    "submit_failed_fallback": "No se pudo enviar la reseña"
+    "submit_failed_fallback": "No se pudo enviar la reseña",
+    "characters_count_many": "{{count}}/{{max}} caracteres",
+    "characters_count_one": "{{count}}/{{max}} caracteres",
+    "characters_count_other": "{{count}}/{{max}} caracteres"
   },
   "page_meta": {
     "title": "Perfil",
@@ -185,5 +189,9 @@
   "read_more": "Leer más",
   "read_less": "Leer menos",
   "hours_abbrev": "{{hours}}h",
-  "not_available_abbrev": "n/d"
+  "not_available_abbrev": "n/d",
+  "show_more_skills_many": "Mostrar {{count}} más",
+  "show_more_skills_one": "Mostrar {{count}} más",
+  "show_more_skills_other": "Mostrar {{count}} más",
+  "reviews_count_many": "{{count}} reseñas"
 }

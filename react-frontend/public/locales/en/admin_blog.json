@@ -158,7 +158,13 @@
       "delete_confirm_title": "Delete selected posts?",
       "publish": "Publish",
       "publish_confirm_message": "Publish {{count}} selected post(s)?",
-      "publish_confirm_title": "Publish selected posts?"
+      "publish_confirm_title": "Publish selected posts?",
+      "publish_confirm_message_one": "Publish {{count}} selected post(s)?",
+      "publish_confirm_message_other": "Publish {{count}} selected post(s)?",
+      "archive_confirm_message_one": "This will unpublish {{count}} post(s). They can be republished later.",
+      "archive_confirm_message_other": "This will unpublish {{count}} post(s). They can be republished later.",
+      "delete_confirm_message_one": "Delete {{count}} selected post(s)? This cannot be undone.",
+      "delete_confirm_message_other": "Delete {{count}} selected post(s)? This cannot be undone."
     },
     "marketplace": {
       "reason_label": "Reason",

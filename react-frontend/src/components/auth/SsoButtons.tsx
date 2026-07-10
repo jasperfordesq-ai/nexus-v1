@@ -32,6 +32,7 @@ export function SsoButtons({ tenantId }: SsoButtonsProps) {
   const { t } = useTranslation('common');
 
   const [providers, setProviders] = useState<SsoProvider[] | null>(null);
+  const [flowError, setFlowError] = useState<string | null>(null);
 
   useEffect(() => {
     const headers: Record<string, string> = {};
@@ -53,6 +54,7 @@ export function SsoButtons({ tenantId }: SsoButtonsProps) {
   }
 
   function startFlow(key: string) {
+    setFlowError(null);
     const params = new URLSearchParams();
     if (tenantId) params.set('tenant_id', String(tenantId));
     const qs = params.toString();
@@ -67,14 +69,19 @@ export function SsoButtons({ tenantId }: SsoButtonsProps) {
         if (data?.success && data.redirect_url) {
           window.location.href = data.redirect_url;
         } else {
-          alert(data?.message || t('oauth.callback_failed'));
+          setFlowError(t('oauth.callback_failed'));
         }
       })
-      .catch(() => alert(t('oauth.callback_failed')));
+      .catch(() => setFlowError(t('oauth.callback_failed')));
   }
 
   return (
     <div className="space-y-3">
+      {flowError && (
+        <p role="alert" className="rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
+          {flowError}
+        </p>
+      )}
       {providers.map((provider) => {
         const Icon = provider.preset === 'entra' ? Building2 : KeyRound;
         return (

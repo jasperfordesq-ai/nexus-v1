@@ -23,14 +23,18 @@
     "title": "Upcoming Events",
     "subtitle": "Join your community",
     "online": "Online",
-    "attending": "{{count}} attending"
+    "attending": "{{count}} attending",
+    "attending_one": "{{count}} attending",
+    "attending_other": "{{count}} attending"
   },
   "active_groups": {
     "title": "Active Groups",
     "subtitle": "Connect with like-minded members",
     "members": "{{count}} members",
     "view_group": "View Group",
-    "view_group_named": "View group: {{name}}"
+    "view_group_named": "View group: {{name}}",
+    "members_one": "{{count}} members",
+    "members_other": "{{count}} members"
   },
   "top_contributors": {
     "title": "Top Contributors",
@@ -56,12 +60,18 @@
     "subtitle": "Share your ideas and make an impact",
     "ideas_count": "{{count}} ideas",
     "ends": "Ends {{date}}",
-    "progress": "Challenge progress"
+    "progress": "Challenge progress",
+    "ideas_count_one": "{{count}} ideas",
+    "ideas_count_other": "{{count}} ideas"
   },
   "time_ago": {
     "just_now": "Just now",
     "hours_ago": "{{count}}h ago",
-    "days_ago": "{{count}}d ago"
+    "days_ago": "{{count}}d ago",
+    "hours_ago_one": "{{count}}h ago",
+    "hours_ago_other": "{{count}}h ago",
+    "days_ago_one": "{{count}}d ago",
+    "days_ago_other": "{{count}}d ago"
   },
   "error_loading": "We couldn't load the Discover page. This may be a temporary issue.",
   "retry": "Retry",
@@ -82,18 +92,26 @@
     "title": "From the Blog",
     "subtitle": "Latest stories from your community",
     "read_time": "{{count}} min read",
-    "views": "{{count}} views"
+    "views": "{{count}} views",
+    "read_time_one": "{{count}} min read",
+    "read_time_other": "{{count}} min read",
+    "views_one": "{{count}} views",
+    "views_other": "{{count}} views"
   },
   "volunteering": {
     "title": "Volunteer Opportunities",
     "subtitle": "Make a difference in your community",
     "applications": "{{count}} applied",
-    "view_opportunity": "View Opportunity"
+    "view_opportunity": "View Opportunity",
+    "applications_one": "{{count}} applied",
+    "applications_other": "{{count}} applied"
   },
   "organisations": {
     "title": "Organisations",
     "subtitle": "Community partners making an impact",
-    "opportunities": "{{count}} opportunities"
+    "opportunities": "{{count}} opportunities",
+    "opportunities_one": "{{count}} opportunities",
+    "opportunities_other": "{{count}} opportunities"
   },
   "polls": {
     "title": "Active Polls",
@@ -102,19 +120,27 @@
     "options": "{{count}} options",
     "vote_now": "Vote Now",
     "vote_now_for": "Vote now on: {{question}}",
-    "closes": "Closes {{date}}"
+    "closes": "Closes {{date}}",
+    "options_one": "{{count}} options",
+    "options_other": "{{count}} options",
+    "votes_one": "{{count}} votes",
+    "votes_other": "{{count}} votes"
   },
   "in_demand_skills": {
     "title": "Skills In Demand",
     "subtitle": "Most requested skills in your community",
     "requested": "{{count}} requesting",
     "offered": "{{count}} offering",
-    "you_can_help": "You can help!"
+    "you_can_help": "You can help!",
+    "requested_one": "{{count}} requesting",
+    "requested_other": "{{count}} requesting"
   },
   "resources": {
     "title": "Featured Resources",
     "subtitle": "Guides and materials for your community",
-    "views": "{{count}} views"
+    "views": "{{count}} views",
+    "views_one": "{{count}} views",
+    "views_other": "{{count}} views"
   },
   "jobs": {
     "title": "Job Opportunities",

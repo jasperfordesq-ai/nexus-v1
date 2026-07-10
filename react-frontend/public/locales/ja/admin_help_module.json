@@ -84,7 +84,8 @@
       "general_admin": "一般管理者",
       "caring_community": "思いやりのあるコミュニティ",
       "kiss_agoris": "キス＆アゴリス"
-    }
+    },
+    "search_placeholder_other": "{{count}}ヘルプ記事を検索..."
   },
   "help_faqs": {
     "page_title": "ヘルプFAQ",

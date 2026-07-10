@@ -158,7 +158,16 @@
       "delete_confirm_title": "Excluir postagens selecionadas?",
       "publish": "Publicar",
       "publish_confirm_message": "Publicar postagens selecionadas do {{count}}?",
-      "publish_confirm_title": "Publicar postagens selecionadas?"
+      "publish_confirm_title": "Publicar postagens selecionadas?",
+      "publish_confirm_message_many": "Publicar postagens selecionadas do {{count}}?",
+      "publish_confirm_message_one": "Publicar postagens selecionadas do {{count}}?",
+      "publish_confirm_message_other": "Publicar postagens selecionadas do {{count}}?",
+      "archive_confirm_message_many": "Isso cancelará a publicação da(s) postagem(ões) {{count}}. Eles podem ser republicados posteriormente.",
+      "archive_confirm_message_one": "Isso cancelará a publicação da(s) postagem(ões) {{count}}. Eles podem ser republicados posteriormente.",
+      "archive_confirm_message_other": "Isso cancelará a publicação da(s) postagem(ões) {{count}}. Eles podem ser republicados posteriormente.",
+      "delete_confirm_message_many": "Excluir postagem(ões) selecionada(s) {{count}}? Isto não pode ser desfeito.",
+      "delete_confirm_message_one": "Excluir postagem(ões) selecionada(s) {{count}}? Isto não pode ser desfeito.",
+      "delete_confirm_message_other": "Excluir postagem(ões) selecionada(s) {{count}}? Isto não pode ser desfeito."
     },
     "marketplace": {
       "reason_label": "Razão",

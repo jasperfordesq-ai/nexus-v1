@@ -360,7 +360,8 @@
     "geocode_description": "グループの位置を地理コード化して、地図表示と距離ベースの検出を可能にします。",
     "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet.",
     "detail_tabs_aria": "グループ詳細セクション",
-    "status_tabs_aria": "グループステータスフィルター"
+    "status_tabs_aria": "グループステータスフィルター",
+    "selected_count_other": "{{count}}が選択されました"
   },
   "group_organization": {
     "page_title": "グループの整理",

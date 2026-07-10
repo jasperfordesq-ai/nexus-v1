@@ -210,6 +210,8 @@
     "top_earners": "Topverdieners",
     "top_spenders": "Topbestedingen",
     "user_report_desc": "Bekijk een gedetailleerd tijdskredietrapport voor een individueel lid",
-    "user_report_title": "Gebruikersrapport"
+    "user_report_title": "Gebruikersrapport",
+    "hours_value_one": "{{count}}u",
+    "hours_value_other": "{{count}}u"
   }
 }

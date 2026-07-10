@@ -58,6 +58,7 @@ vi.mock('@/components/ui', async (importOriginal) => {
       <div>{typeof children === 'function' ? children(() => {}) : children}</div>
     ),
     ModalHeader: ({ children }: { children: React.ReactNode }) => <div data-testid="modal-header">{children}</div>,
+    ModalHeading: ({ children }: { children: React.ReactNode }) => <h2>{children}</h2>,
     ModalBody: ({ children }: { children: React.ReactNode }) => <div data-testid="modal-body">{children}</div>,
     ModalFooter: ({ children }: { children: React.ReactNode }) => <div data-testid="modal-footer">{children}</div>,
     Select: ({ label, children }: { label?: string; children: React.ReactNode; [key: string]: unknown }) => (

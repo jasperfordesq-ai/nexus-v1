@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Input, Button, Chip, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tooltip } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -654,7 +655,7 @@ export function NewsletterForm() {
                   <span className="text-sm text-muted">{t('newsletter_form.calculating')}</span>
                 ) : recipientCount !== null ? (
                   <div>
-                    <p className="text-3xl font-bold text-accent">{recipientCount.toLocaleString()}</p>
+                    <p className="text-3xl font-bold text-accent">{recipientCount.toLocaleString(getFormattingLocale())}</p>
                     <p className="text-xs text-muted">
                       {targetAudience === 'segment' ? t('newsletter_form.matching_segment_rules') : targetAudience.replace(/_/g, ' ')}
                     </p>
@@ -939,7 +940,7 @@ export function NewsletterForm() {
                       isDisabled={recipientCount === 0}
                       className="w-full"
                     >
-                      {t('newsletters.send_now')}{recipientCount !== null ? ` (${recipientCount.toLocaleString()})` : ''}
+                      {t('newsletters.send_now')}{recipientCount !== null ? ` (${recipientCount.toLocaleString(getFormattingLocale())})` : ''}
                     </Button>
                   </Tooltip>
                 )}
@@ -991,7 +992,7 @@ export function NewsletterForm() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">{t('newsletter_form.label_recipients')}</span>
-                    <span className="font-medium text-accent">{recipientCount?.toLocaleString() || '--'}</span>
+                    <span className="font-medium text-accent">{recipientCount?.toLocaleString(getFormattingLocale()) || '--'}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">{t('newsletter_form.section_target_audience')}</span>

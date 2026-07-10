@@ -37,5 +37,11 @@
   "page_meta": {
     "title": "الاتصالات"
   },
-  "loading": "جارٍ تحميل الاتصالات..."
+  "loading": "جارٍ تحميل الاتصالات...",
+  "pending_count_few": "{{count}} قيد الانتظار",
+  "pending_count_many": "{{count}} قيد الانتظار",
+  "pending_count_one": "{{count}} قيد الانتظار",
+  "pending_count_other": "{{count}} قيد الانتظار",
+  "pending_count_two": "{{count}} قيد الانتظار",
+  "pending_count_zero": "{{count}} قيد الانتظار"
 }

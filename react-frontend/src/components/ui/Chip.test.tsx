@@ -44,12 +44,14 @@ describe('Chip', () => {
     expect(() => render(<Chip variant="bordered">Bordered</Chip>)).not.toThrow();
   });
 
-  it('renders with light variant (maps to soft) without throwing', () => {
-    expect(() => render(<Chip variant="light">Light</Chip>)).not.toThrow();
+  it('maps the legacy light variant to the documented transparent tertiary style', () => {
+    render(<Chip variant="light">Light</Chip>);
+    expect(screen.getByText('Light').closest('[data-slot="chip"]')).toHaveClass('chip--tertiary');
   });
 
-  it('renders with flat variant (maps to tertiary) without throwing', () => {
-    expect(() => render(<Chip variant="flat">Flat</Chip>)).not.toThrow();
+  it('maps the legacy flat variant to the documented muted-background soft style', () => {
+    render(<Chip variant="flat">Flat</Chip>);
+    expect(screen.getByText('Flat').closest('[data-slot="chip"]')).toHaveClass('chip--soft');
   });
 
   it('renders dot indicator when variant=dot and no startContent', () => {

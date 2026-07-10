@@ -100,5 +100,10 @@
   "page_meta": {
     "title": "Pobalbhreith"
   },
-  "category_filter_label": "Scag de réir catagóire"
+  "category_filter_label": "Scag de réir catagóire",
+  "total_ballots_few": "Iomlán ballot: {{count}}",
+  "total_ballots_many": "Iomlán ballot: {{count}}",
+  "total_ballots_one": "Iomlán ballot: {{count}}",
+  "total_ballots_other": "Iomlán ballot: {{count}}",
+  "total_ballots_two": "Iomlán ballot: {{count}}"
 }

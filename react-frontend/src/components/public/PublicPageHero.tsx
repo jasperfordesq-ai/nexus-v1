@@ -25,30 +25,34 @@ interface PublicPageHeroProps {
 const accentClasses = {
   emerald: {
     icon: 'from-emerald-500/20 to-teal-500/20 text-emerald-500 dark:text-emerald-300',
-    chip: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300',
+    chipColor: 'success',
     line: 'from-emerald-500 via-teal-500 to-cyan-500',
   },
   indigo: {
-    icon: 'from-indigo-500/20 to-sky-500/20 text-indigo-500 dark:text-indigo-300',
-    chip: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-300',
-    line: 'from-indigo-500 via-sky-500 to-cyan-500',
+    icon: 'from-accent/20 to-sky-500/20 text-accent dark:text-accent',
+    chipColor: 'accent',
+    line: 'from-accent via-sky-500 to-cyan-500',
   },
   amber: {
     icon: 'from-amber-500/20 to-orange-500/20 text-amber-500 dark:text-amber-300',
-    chip: 'bg-amber-500/10 text-amber-600 dark:text-amber-300',
+    chipColor: 'warning',
     line: 'from-amber-500 via-orange-500 to-rose-500',
   },
   blue: {
-    icon: 'from-blue-500/20 to-indigo-500/20 text-blue-500 dark:text-blue-300',
-    chip: 'bg-blue-500/10 text-blue-600 dark:text-blue-300',
-    line: 'from-blue-500 via-indigo-500 to-violet-500',
+    icon: 'from-blue-500/20 to-accent-gradient-end/20 text-blue-500 dark:text-blue-300',
+    chipColor: 'accent',
+    line: 'from-blue-500 via-accent to-violet-500',
   },
   rose: {
     icon: 'from-rose-500/20 to-fuchsia-500/20 text-rose-500 dark:text-rose-300',
-    chip: 'bg-rose-500/10 text-rose-600 dark:text-rose-300',
-    line: 'from-rose-500 via-fuchsia-500 to-indigo-500',
+    chipColor: 'danger',
+    line: 'from-rose-500 via-fuchsia-500 to-accent-gradient-end',
   },
-} satisfies Record<string, { icon: string; chip: string; line: string }>;
+} satisfies Record<string, {
+  icon: string;
+  chipColor: 'accent' | 'success' | 'warning' | 'danger';
+  line: string;
+}>;
 
 export function PublicPageHero({
   eyebrow,
@@ -70,9 +74,10 @@ export function PublicPageHero({
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
           <Chip
+            color={classes.chipColor}
             size="sm"
-            variant="tertiary"
-            className={`${classes.chip} mb-4 font-medium`}
+            variant="soft"
+            className="mb-4 font-medium"
           >
             <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
             {eyebrow}

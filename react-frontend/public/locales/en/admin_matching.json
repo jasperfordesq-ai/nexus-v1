@@ -306,6 +306,16 @@
     "pillar_trust": "Trust",
     "pillar_aria": "{{label}}: {{percent}}%",
     "of_active_users": "of {{total}} active users",
-    "of_active_listings": "of {{total}} active listings"
+    "of_active_listings": "of {{total}} active listings",
+    "cache_cleared_count_one": "Cleared {{count}} cache entry",
+    "cache_cleared_count_other": "Cleared {{count}} cache entry",
+    "clear_cache_confirm_with_count_one": "Are you sure you want to clear {{count}} cached matches?",
+    "clear_cache_confirm_with_count_other": "Are you sure you want to clear {{count}} cached matches?",
+    "distribution_aria_one": "{{label}}: {{count}} matches ({{percent}}%)",
+    "distribution_aria_other": "{{label}}: {{count}} matches ({{percent}}%)",
+    "feedback_reason_aria_one": "{{label}}: {{count}} ({{percent}}%)",
+    "feedback_reason_aria_other": "{{label}}: {{count}} ({{percent}}%)",
+    "pillar_averages_sample_size_one": "Based on {{count}} matches",
+    "pillar_averages_sample_size_other": "Based on {{count}} matches"
   }
 }

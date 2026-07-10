@@ -102,8 +102,8 @@ export function EndorseButton({
           isDisabled={isLoading}
           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs transition-all min-h-9 min-w-0 ${
             localIsEndorsed
-              ? 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
-              : 'bg-theme-elevated text-theme-subtle hover:bg-indigo-500/10 hover:text-indigo-500'
+              ? 'bg-accent/20 text-accent dark:text-accent'
+              : 'bg-theme-elevated text-theme-subtle hover:bg-accent/10 hover:text-accent'
           }`}
           aria-label={localIsEndorsed ? t('endorse.aria_remove', { skillName }) : t('endorse.aria_endorse', { skillName })}
         >
@@ -120,8 +120,8 @@ export function EndorseButton({
       variant={localIsEndorsed ? 'flat' : 'bordered'}
       className={
         localIsEndorsed
-          ? 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
-          : 'border-theme-default text-theme-muted hover:border-indigo-500/30 hover:text-indigo-500'
+          ? 'bg-accent/20 text-accent dark:text-accent'
+          : 'border-theme-default text-theme-muted hover:border-accent/30 hover:text-accent'
       }
       startContent={
         <ThumbsUp

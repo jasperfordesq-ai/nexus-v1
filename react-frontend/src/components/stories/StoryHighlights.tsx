@@ -1,4 +1,3 @@
-import { useDisclosure, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Skeleton, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,6 +13,8 @@ import { useDisclosure, Button, Input, Modal, ModalContent, ModalHeader, ModalBo
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useDisclosure, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Skeleton, useConfirm } from '@/components/ui';
+import { OverlayActionButton } from '@/components/ui/OverlayActionButton';
 
 import Plus from 'lucide-react/icons/plus';
 import X from 'lucide-react/icons/x';
@@ -23,7 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveThumbnailUrl, getFormattingLocale } from '@/lib/helpers';
 import { StoryViewer } from '@/components/stories/StoryViewer';
 import type { StoryUser } from '@/components/feed/StoriesBar';
 
@@ -169,8 +170,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
     }
   };
 
-  const handleDeleteHighlight = async (highlightId: number, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleDeleteHighlight = async (highlightId: number) => {
     const ok = await confirm({
       title: t('highlights.delete_confirm'),
       status: 'danger',
@@ -190,8 +190,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
 
   // ── Edit highlight handlers ──────────────────────────────────────────────
 
-  const handleEditClick = async (highlight: Highlight, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleEditClick = async (highlight: Highlight) => {
     setEditingHighlight(highlight);
     setEditTitle(highlight.title);
     setEditStories([]);
@@ -325,62 +324,66 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
 
           {/* Highlight circles */}
           {highlights.map((highlight) => (
-            <Button
+            <div
               key={highlight.id}
-              variant="ghost"
-              onPress={() => handleHighlightClick(highlight)}
-              className="relative flex min-h-[92px] w-18 flex-shrink-0 flex-col items-center gap-1.5 p-0 group"
-              aria-label={t('highlights.aria_view', { title: highlight.title })}
+              className="group relative w-18 flex-shrink-0"
             >
-              <div className="w-16 h-16 rounded-full p-[2px] bg-[var(--border-default)] group-hover:bg-gradient-to-tr group-hover:from-yellow-400 group-hover:via-red-500 group-hover:to-purple-600 transition-all">
-                <div className="w-full h-full rounded-full bg-[var(--surface-elevated)] p-[2px]">
-                  {highlight.cover_url ? (
-                    <img
-                      src={resolveThumbnailUrl(highlight.cover_url, { width: 160, height: 160 })}
-                      alt={highlight.title}
-                      className="w-full h-full rounded-full object-cover"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  ) : (
-                    <div className="w-full h-full rounded-full bg-[var(--surface-elevated)] flex items-center justify-center">
-                      <span className="text-lg text-[var(--text-muted)]">
-                        {highlight.title.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
+              <Button
+                variant="ghost"
+                onPress={() => handleHighlightClick(highlight)}
+                className="flex min-h-[92px] w-18 flex-col items-center gap-1.5 p-0"
+                aria-label={t('highlights.aria_view', { title: highlight.title })}
+              >
+                <div className="w-16 h-16 rounded-full p-[2px] bg-[var(--border-default)] group-hover:bg-gradient-to-tr group-hover:from-yellow-400 group-hover:via-red-500 group-hover:to-accent-gradient-end transition-all">
+                  <div className="w-full h-full rounded-full bg-[var(--surface-elevated)] p-[2px]">
+                    {highlight.cover_url ? (
+                      <img
+                        src={resolveThumbnailUrl(highlight.cover_url, { width: 160, height: 160 })}
+                        alt={highlight.title}
+                        className="w-full h-full rounded-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <div className="w-full h-full rounded-full bg-[var(--surface-elevated)] flex items-center justify-center">
+                        <span className="text-lg text-[var(--text-muted)]">
+                          {highlight.title.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <span className="text-xs text-[var(--text-primary)] text-center truncate w-full">
-                {highlight.title}
-              </span>
+                <span className="text-xs text-[var(--text-primary)] text-center truncate w-full">
+                  {highlight.title}
+                </span>
+              </Button>
 
-              {/* Owner action buttons */}
+              {/* Sibling actions avoid nested controls; touch keeps them visible. */}
               {isOwner && (
                 <>
-                  {/* Edit button */}
-                  <Button
-                    isIconOnly
-                    variant="secondary"
-                    className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[var(--color-primary)] text-white opacity-0 group-hover:opacity-100 transition-opacity min-w-0 p-0"
-                    onClick={(e) => { e.stopPropagation(); handleEditClick(highlight, e); }}
+                  <OverlayActionButton
+                    variant="ghost"
+                    className="absolute -top-3 -left-2 rounded-full transition-opacity [--button-bg:transparent] [--button-bg-hover:transparent]"
+                    onPress={() => handleEditClick(highlight)}
                     aria-label={t('highlights.aria_edit', { title: highlight.title })}
                   >
-                    <Pencil className="w-3 h-3" />
-                  </Button>
-                  {/* Delete button */}
-                  <Button
-                    isIconOnly
-                    variant="danger"
-                    className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity min-w-0 p-0"
-                    onClick={(e) => { e.stopPropagation(); handleDeleteHighlight(highlight.id, e); }}
+                    <span className="flex size-6 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-sm">
+                      <Pencil className="size-3" aria-hidden="true" />
+                    </span>
+                  </OverlayActionButton>
+                  <OverlayActionButton
+                    variant="ghost"
+                    className="absolute top-8 -right-2 rounded-full transition-opacity [--button-bg:transparent] [--button-bg-hover:transparent]"
+                    onPress={() => handleDeleteHighlight(highlight.id)}
                     aria-label={t('highlights.aria_delete', { title: highlight.title })}
                   >
-                    <X className="w-3 h-3" />
-                  </Button>
+                    <span className="flex size-6 items-center justify-center rounded-full bg-danger text-danger-foreground shadow-sm">
+                      <X className="size-3" aria-hidden="true" />
+                    </span>
+                  </OverlayActionButton>
                 </>
               )}
-            </Button>
+            </div>
           ))}
         </div>
       </div>
@@ -493,7 +496,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                           {getStorySummary(story)}
                         </p>
                         <p className="text-xs text-[var(--text-muted)]">
-                          {new Date(story.created_at).toLocaleDateString()}
+                          {new Date(story.created_at).toLocaleDateString(getFormattingLocale())}
                         </p>
                       </div>
 
@@ -502,11 +505,12 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                         size="sm"
                         variant="danger-soft"
                         isIconOnly
+                        className="size-11 min-h-11 min-w-11 p-0"
                         isLoading={removingStoryId === story.id}
                         onPress={() => handleRemoveStory(story.id)}
                         aria-label={t('highlights.aria_remove_story')}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="size-4" aria-hidden="true" />
                       </Button>
                     </div>
                   ))}

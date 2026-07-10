@@ -9,6 +9,7 @@
  * Parity: PHP Admin resource management
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -164,7 +165,7 @@ export function ResourcesAdmin() {
       render: (item) => (
         <div className="flex items-center gap-1 text-sm text-muted">
           <Eye aria-hidden="true" size={14} className="text-muted" />
-          {(item.views ?? 0).toLocaleString()}
+          {(item.views ?? 0).toLocaleString(getFormattingLocale())}
         </div>
       ),
     },
@@ -175,7 +176,7 @@ export function ResourcesAdmin() {
       render: (item) => (
         <div className="flex items-center gap-1 text-sm text-muted">
           <ThumbsUp aria-hidden="true" size={14} className="text-muted" />
-          {(item.helpful_votes ?? 0).toLocaleString()}
+          {(item.helpful_votes ?? 0).toLocaleString(getFormattingLocale())}
         </div>
       ),
     },
@@ -200,7 +201,7 @@ export function ResourcesAdmin() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.updated_at ? new Date(item.updated_at).toLocaleDateString() : '--'}
+          {item.updated_at ? new Date(item.updated_at).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },

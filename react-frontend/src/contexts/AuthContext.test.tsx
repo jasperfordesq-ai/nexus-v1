@@ -150,11 +150,12 @@ describe('AuthContext', () => {
       expect(api.get).toHaveBeenCalledWith('/v2/users/me');
     });
 
-    it('clears tokens and goes to idle when user fetch fails', async () => {
+    it('clears tokens and goes to idle when user fetch proves the session invalid', async () => {
       vi.mocked(tokenManager.hasAccessToken).mockReturnValue(true);
       vi.mocked(api.get).mockResolvedValueOnce({
         success: false,
         error: 'Token expired',
+        code: 'AUTH_TOKEN_EXPIRED',
       });
 
       render(

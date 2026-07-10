@@ -24,7 +24,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 
 interface BlockedUser {
   block_id: number;
@@ -173,7 +173,7 @@ export function BlockedUsersPage() {
                   <h3 className="font-semibold text-theme-primary truncate">{user.name}</h3>
                   <p className="text-xs text-theme-subtle">
                     {t('blocked_users.blocked_on', {
-                      date: new Date(user.blocked_at).toLocaleDateString(undefined, {
+                      date: new Date(user.blocked_at).toLocaleDateString(getFormattingLocale(), {
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',

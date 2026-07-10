@@ -186,6 +186,7 @@ export function Layout({
       {/* Main Content — padding adapts when utility bar hides on scroll */}
       <main
         id="main-content"
+        tabIndex={-1}
         // --logo-extra grows the top offset to match the navbar when it expands
         // for a tall square/stacked logo; 0 for wide/landscape (compact bar).
         // Applied at sm+ only: on mobile the navbar collapses the logo to a
@@ -278,7 +279,9 @@ export function AuthLayout() {
 
       {/* Language switcher — top-right on auth pages */}
       <div className="absolute top-[calc(var(--safe-area-top)+1rem)] right-[calc(var(--safe-area-right)+1rem)] z-20">
-        <LanguageSwitcher />
+        <LanguageSwitcher
+          triggerClassName="border border-theme-default bg-theme-elevated text-theme-primary shadow-sm backdrop-blur hover:border-theme-primary/40 hover:bg-theme-hover"
+        />
       </div>
 
       {/* Main Content */}
@@ -289,9 +292,9 @@ export function AuthLayout() {
       {/* Attribution (AGPL Section 7(b) — required on all pages) */}
       <footer className="relative z-10 px-4 py-4 pb-[calc(var(--safe-area-bottom)+1rem)] text-center" data-nosnippet>
         <div className="flex flex-col items-center justify-center gap-2">
-          <SourceRepositoryLink inverse compact className="max-w-[18rem] justify-center" />
-          <p className="text-xs text-white/55">
-            <span className="font-medium text-white/75">{t('footer.project_nexus')}</span>
+          <SourceRepositoryLink compact className="max-w-[18rem] justify-center" />
+          <p className="text-xs text-theme-subtle">
+            <span className="font-medium text-theme-secondary">{t('footer.project_nexus')}</span>
             <span aria-hidden="true"> &middot; </span>
             <span>{t('footer.agpl_notice', { year })}</span>
           </p>

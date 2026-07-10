@@ -87,7 +87,7 @@ export function PageHeader({ title, description, subtitle, icon, actions }: Page
                     isIconOnly
                     size="sm"
                     variant="tertiary"
-                    onClick={() => setHelpOpen(true)}
+                    onPress={() => setHelpOpen(true)}
                     className="ml-1 shrink-0 text-muted hover:text-accent"
                     aria-label={t('shared.open_page_help')}
                     title={t('shared.help')}

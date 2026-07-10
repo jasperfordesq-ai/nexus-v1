@@ -117,7 +117,11 @@
       "media_jobs_one": "{{count}} trabalho de mídia aguardando",
       "media_jobs_other": "{{count}} trabalhos de mídia aguardando",
       "rss_ready_one": "{{count}} programa publicado pode ser verificado",
-      "rss_ready_other": "{{count}} programas publicados podem ser verificados"
+      "rss_ready_other": "{{count}} programas publicados podem ser verificados",
+      "pending_items_many": "{{count}} itens aguardando revisão",
+      "open_reports_many": "{{count}} abrir relatórios de membros",
+      "media_jobs_many": "{{count}} trabalhos de mídia aguardando",
+      "rss_ready_many": "{{count}} programas publicados podem ser verificados"
     },
     "feed_validation": {
       "title": "Validação RSS",
@@ -211,7 +215,10 @@
       "report_dismissed": "Relatório rejeitado.",
       "report_escalated": "Relatório escalado.",
       "feed_valid": "O feed RSS está pronto.",
-      "feed_invalid": "O feed RSS tem {{count}} problemas."
+      "feed_invalid": "O feed RSS tem {{count}} problemas.",
+      "feed_invalid_many": "O feed RSS tem {{count}} problemas.",
+      "feed_invalid_one": "O feed RSS tem {{count}} problemas.",
+      "feed_invalid_other": "O feed RSS tem {{count}} problemas."
     },
     "bulk": {
       "approve_selected": "Aprovar selecionados",
@@ -219,7 +226,16 @@
       "done": "{{count}} item(ns) moderado(s).",
       "partial": "{{ok}} item(ns) moderado(s); {{failed}} falharam.",
       "confirm_reject_title": "Rejeitar os itens selecionados",
-      "confirm_reject_message": "Rejeitar {{count}} item(ns) selecionado(s)? Os criadores vê-los-ão voltar a rascunho."
-    }
+      "confirm_reject_message": "Rejeitar {{count}} item(ns) selecionado(s)? Os criadores vê-los-ão voltar a rascunho.",
+      "done_many": "{{count}} item(ns) moderado(s).",
+      "done_one": "{{count}} item(ns) moderado(s).",
+      "done_other": "{{count}} item(ns) moderado(s).",
+      "confirm_reject_message_many": "Rejeitar {{count}} item(ns) selecionado(s)? Os criadores vê-los-ão voltar a rascunho.",
+      "confirm_reject_message_one": "Rejeitar {{count}} item(ns) selecionado(s)? Os criadores vê-los-ão voltar a rascunho.",
+      "confirm_reject_message_other": "Rejeitar {{count}} item(ns) selecionado(s)? Os criadores vê-los-ão voltar a rascunho."
+    },
+    "count_many": "{{count}} items",
+    "count_one": "{{count}} itens",
+    "count_other": "{{count}} itens"
   }
 }

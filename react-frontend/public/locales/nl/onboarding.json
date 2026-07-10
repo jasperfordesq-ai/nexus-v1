@@ -132,5 +132,13 @@
   "page_meta": {
     "title": "Aan boord"
   },
-  "aria_step_progress": "Step {{step}} of {{total}}"
+  "aria_step_progress": "Step {{step}} of {{total}}",
+  "bio_char_count_one": "{{count}} tekens",
+  "bio_char_count_other": "{{count}} tekens",
+  "count_selected_one": "{{count}} geselecteerd",
+  "count_selected_other": "{{count}} geselecteerd",
+  "skills_to_offer_count_one": "{{count}} vaardigheid(en) om aan te bieden",
+  "skills_to_offer_count_other": "{{count}} vaardigheid(en) om aan te bieden",
+  "skills_needed_count_one": "{{count}} vaardigheid(en) nodig",
+  "skills_needed_count_other": "{{count}} vaardigheid(en) nodig"
 }

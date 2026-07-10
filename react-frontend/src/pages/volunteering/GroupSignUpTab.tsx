@@ -38,7 +38,7 @@ import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useAuth, useToast } from '@/contexts';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -548,13 +548,13 @@ export function GroupSignUpTab() {
                       )}
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" aria-hidden="true" />
-                        {new Date(res.shift.start_time).toLocaleDateString()}
+                        {new Date(res.shift.start_time).toLocaleDateString(getFormattingLocale())}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" aria-hidden="true" />
-                        {new Date(res.shift.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(res.shift.start_time).toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' })}
                         {' - '}
-                        {new Date(res.shift.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(res.shift.end_time).toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
 
@@ -596,7 +596,7 @@ export function GroupSignUpTab() {
                     </div>
 
                     <p className="text-xs text-theme-subtle mt-2">
-                      {t('group_signup.created')} {new Date(res.created_at).toLocaleDateString()}
+                      {t('group_signup.created')} {new Date(res.created_at).toLocaleDateString(getFormattingLocale())}
                     </p>
                   </div>
 
@@ -754,9 +754,9 @@ export function GroupSignUpTab() {
               {shiftOptions.map((shift) => (
                 <SelectItem key={shift.id.toString()} id={shift.id.toString()}>
                   {t('group_signup.reserve_shift_option', {
-                    date: new Date(shift.start_time).toLocaleDateString(),
-                    start: new Date(shift.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    end: new Date(shift.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    date: new Date(shift.start_time).toLocaleDateString(getFormattingLocale()),
+                    start: new Date(shift.start_time).toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' }),
+                    end: new Date(shift.end_time).toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' }),
                   })}
                 </SelectItem>
               ))}

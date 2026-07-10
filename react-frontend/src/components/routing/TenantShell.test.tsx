@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router-dom';
 import React from 'react';
 
@@ -19,6 +19,12 @@ let capturedTenantSlug: string | undefined;
 
 const mockUseTenant = vi.fn();
 const mockUseAuth = vi.fn();
+const mockRefreshTenant = vi.fn(() => Promise.resolve());
+const mockLoadRouteRegistry = vi.hoisted(() => vi.fn());
+
+vi.mock('@/routes/routeRegistryLoader', () => ({
+  loadRouteRegistry: (kind: 'auth' | 'public' | 'app') => mockLoadRouteRegistry(kind),
+}));
 
 vi.mock('@/contexts', () => ({
   TenantProvider: ({ children, tenantSlug }: { children: React.ReactNode; tenantSlug?: string }) => {
@@ -195,6 +201,8 @@ function setupDefaultMocks(overrides: {
   mockUseTenant.mockReturnValue({
     isLoading: false,
     notFoundSlug: null,
+    error: null,
+    refreshTenant: mockRefreshTenant,
     tenant: { id: 2, name: 'Test Tenant', slug: 'test-tenant', settings: {} },
     ...overrides.tenant,
   });
@@ -229,6 +237,17 @@ describe('TenantShell', () => {
     vi.clearAllMocks();
     capturedTenantSlug = undefined;
     setupDefaultMocks();
+    mockLoadRouteRegistry.mockImplementation(async (kind: 'auth' | 'public' | 'app') => ({
+      kind,
+      routes: () => React.createElement(Route, {
+        path: '*',
+        element: React.createElement(
+          'div',
+          { 'data-testid': `${kind}-routes` },
+          `${kind} routes`,
+        ),
+      }),
+    }));
   });
 
   describe('Tenant slug detection', () => {
@@ -335,6 +354,21 @@ describe('TenantShell', () => {
       expect(await screen.findByTestId('auth-routes')).toBeInTheDocument();
     });
 
+    it('shows a translated retry state when a route registry import fails', async () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
+      mockLoadRouteRegistry.mockRejectedValueOnce(new Error('Network import failure'));
+
+      renderWithRouter('/dashboard');
+
+      expect(await screen.findByText('Unable to connect')).toBeInTheDocument();
+      expect(screen.queryByTestId('app-routes')).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+
+      expect(await screen.findByTestId('app-routes')).toBeInTheDocument();
+      expect(mockLoadRouteRegistry).toHaveBeenCalledTimes(2);
+    });
+
     it('uses full app providers for protected routes even before auth is settled', async () => {
       mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
       setupDefaultMocks({
@@ -397,6 +431,28 @@ describe('TenantShell', () => {
       const findCommunity = await screen.findByText('Find a community');
       // Full-document navigation (<a href="/login">), not an SPA <Link> — see above.
       expect(findCommunity.closest('a')).toHaveAttribute('href', '/login');
+    });
+  });
+
+  describe('Retryable bootstrap failure', () => {
+    it('shows the translated retry screen instead of CommunityNotFound', async () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: 'hour-timebank', source: 'path' });
+      setupDefaultMocks({
+        tenant: {
+          isLoading: false,
+          notFoundSlug: null,
+          tenant: null,
+          error: 'Network unavailable',
+        },
+      });
+
+      renderWithRouter('/hour-timebank/events');
+
+      expect(await screen.findByText('Unable to connect')).toBeInTheDocument();
+      expect(screen.queryByText('Community not found')).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+      expect(mockRefreshTenant).toHaveBeenCalledOnce();
     });
   });
 

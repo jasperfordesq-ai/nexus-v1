@@ -13,7 +13,7 @@ import { useLocation } from 'react-router-dom';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
+import { Popover, PopoverContent, PopoverHeading, PopoverTrigger } from '@/components/ui/Popover';
 import { ScrollShadow } from '@/components/ui/ScrollShadow';
 
 export interface DesktopNavPanelItem {
@@ -273,6 +273,7 @@ export function DesktopNavPanel({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="p-0 bg-[var(--surface-dropdown)] border border-[var(--border-default)] shadow-2xl rounded-xl max-h-[75vh] max-w-[calc(100vw-2rem)] overflow-hidden">
+        <PopoverHeading className="sr-only">{ariaLabel}</PopoverHeading>
         <ScrollShadow className="max-h-[75vh]" size={56}>
           <nav
             ref={menuRef}

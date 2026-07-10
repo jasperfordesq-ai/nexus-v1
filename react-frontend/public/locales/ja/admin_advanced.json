@@ -550,14 +550,16 @@
           "unique_uris": "ユニークな URI"
         },
         "labels": {
-          "spoofed_count": "{{count}} がなりすましされました"
+          "spoofed_count": "{{count}} がなりすましされました",
+          "spoofed_count_other": "{{count}} がなりすましされました"
         },
         "log_summary": "ログ: {{size}} - {{time}} 以降",
         "sections": {
           "hits_by_crawler": "クローラーによるヒット",
           "hits_by_status": "HTTP ステータスによるヒット数",
           "recent_activity": "最近のアクティビティ (新しい順、最後の {{count}})",
-          "top_uris": "上位 URI (ヒット数上位 50 件)"
+          "top_uris": "上位 URI (ヒット数上位 50 件)",
+          "recent_activity_other": "最近のアクティビティ (新しい順、最後の {{count}})"
         },
         "tables": {
           "recent_hits_aria": "最近のボットのヒット数",
@@ -573,7 +575,8 @@
         "actions": {
           "open_in_inventory": "インベントリで開く",
           "refresh": "リフレッシュ",
-          "refresh_all_stale": "古いものをすべて更新 ({{count}})"
+          "refresh_all_stale": "古いものをすべて更新 ({{count}})",
+          "refresh_all_stale_other": "古いものをすべて更新 ({{count}})"
         },
         "columns": {
           "actions": "NEXUSTERM25トークン",
@@ -585,7 +588,8 @@
           "tenant": "NEXUSTERM30トークン"
         },
         "confirm": {
-          "queue_recache": "{{count}} 件のテナントの再キャッシュをキューに入れますか?"
+          "queue_recache": "{{count}} 件のテナントの再キャッシュをキューに入れますか?",
+          "queue_recache_other": "{{count}} 件のテナントの再キャッシュをキューに入れますか?"
         },
         "empty": "テナントなし",
         "errors": {
@@ -596,11 +600,13 @@
         "messages": {
           "bulk_queued": "{{count}} テナントのキューに入れられた再キャッシュ",
           "no_stale": "古いテナントはありません - カバレッジは健全です",
-          "tenant_queued": "{{slug}} の #{{id}} をキューに入れました"
+          "tenant_queued": "{{slug}} の #{{id}} をキューに入れました",
+          "bulk_queued_other": "{{count}} テナントのキューに入れられた再キャッシュ"
         },
         "summary": {
           "healthy": "{{count}} 件のテナントすべてが正常です。",
-          "needs_work": "{{total}} テナントの {{needing}} には、ルートが見つからないか、古くなっているか、資産が壊れています。"
+          "needs_work": "{{total}} テナントの {{needing}} には、ルートが見つからないか、古くなっているか、資産が壊れています。",
+          "healthy_other": "{{count}} 件のテナントすべてが正常です。"
         },
         "table_aria": "カバレッジ"
       },
@@ -628,7 +634,9 @@
           "drift_applied": "ドリフト検出が適用されました",
           "drift_dry_run": "ドリフト予行演習完了",
           "purge_dry_run": "ドライラン: {{count}} 件のスナップショットが削除される見込みです",
-          "purged_ungated": "{{tenants}} テナント全体で {{count}} のゲートされていないスナップショットをパージしました"
+          "purged_ungated": "{{tenants}} テナント全体で {{count}} のゲートされていないスナップショットをパージしました",
+          "purged_ungated_other": "{{tenants}} テナント全体で {{count}} のゲートされていないスナップショットをパージしました",
+          "purge_dry_run_other": "ドライラン: {{count}} 件のスナップショットが削除される見込みです"
         },
         "no_output": "(出力なし)",
         "purge_ungated": {
@@ -637,7 +645,9 @@
         },
         "result": {
           "deleted": "{{tenants}} テナント全体で削除された {{count}} スナップショット",
-          "would_delete": "{{tenants}} テナント全体で {{count}} スナップショットを削除します"
+          "would_delete": "{{tenants}} テナント全体で {{count}} スナップショットを削除します",
+          "would_delete_other": "{{tenants}} テナント全体で {{count}} スナップショットを削除します",
+          "deleted_other": "{{tenants}} テナント全体で削除された {{count}} スナップショット"
         },
         "title": "鮮度自動化"
       },
@@ -694,7 +704,8 @@
           "recache_selected": "再キャッシュが選択されました ({{count}})",
           "reload": "リロード",
           "select_all_visible": "表示されているものをすべて選択します",
-          "select_snapshot": "{{path}}を選択します"
+          "select_snapshot": "{{path}}を選択します",
+          "recache_selected_other": "再キャッシュが選択されました ({{count}})"
         },
         "columns": {
           "actions": "アクション",
@@ -729,7 +740,8 @@
           "tenant_slug": "テナントナメクジ"
         },
         "messages": {
-          "bulk_recache": "無効化された {{count}} スナップショットとキューに入れられた再キャッシュ"
+          "bulk_recache": "無効化された {{count}} スナップショットとキューに入れられた再キャッシュ",
+          "bulk_recache_other": "無効化された {{count}} スナップショットとキューに入れられた再キャッシュ"
         },
         "inspect": {
           "age": "年",
@@ -762,7 +774,11 @@
           "seo_score": "SEO スコア",
           "size": "サイズ",
           "tips": "ヒント ({{count}})",
-          "title": "タイトル"
+          "title": "タイトル",
+          "must_fix_other": "修正する必要があります ({{count}})",
+          "tips_other": "ヒント ({{count}})",
+          "asset_references_other": "アセット参照 ({{count}})",
+          "dead_assets_other": "{{count}} が死亡しました"
         },
         "selected": "{{count}} が選択されました",
         "status": {
@@ -771,7 +787,8 @@
           "content_drifted": "内容がずれた"
         },
         "summary": "{{total}} スナップショットのうちの {{filtered}}",
-        "table_aria": "スナップショットインベントリ"
+        "table_aria": "スナップショットインベントリ",
+        "selected_other": "{{count}} が選択されました"
       },
       "jobs": {
         "actions": {
@@ -840,7 +857,8 @@
           "tooltip": "priority={{priority}} (小さいほど優先)"
         },
         "result": {
-          "invalid": "{{count}} 件が無効"
+          "invalid": "{{count}} 件が無効",
+          "invalid_other": "{{count}} 件が無効"
         },
         "scope": {
           "all_tenants": "すべてのテナント"
@@ -872,7 +890,8 @@
           "success": "成功",
           "supersede": "置き換える",
           "unknown": "不明なイベント: {{event}}"
-        }
+        },
+        "summary_other": "{{count}} イベント"
       },
       "failures": {
         "columns": {
@@ -888,7 +907,10 @@
         "errors": {
           "load": "失敗のロードに失敗しました"
         },
-        "table_aria": "失敗"
+        "table_aria": "失敗",
+        "actions": {
+          "close_breaker_now": "今すぐキューを再開します"
+        }
       },
       "live_connected": "ライブアップデートが接続されています",
       "audit": {
@@ -957,7 +979,9 @@
           "cache_unreachable": "キャッシュに到達できません",
           "healthy": "健康",
           "missing": "{{count}} がありません",
-          "stale": "{{count}} が古い"
+          "stale": "{{count}} が古い",
+          "missing_other": "{{count}} がありません",
+          "stale_other": "{{count}} が古い"
         },
         "hints": {
           "active_jobs": "{{count}} アクティブ",
@@ -969,7 +993,9 @@
           "event_at": "イベント {{time}}",
           "no_events": "イベントはありません",
           "prometheus": "プロメテウスのテキスト形式",
-          "tenants_routes": "{{tenants}} テナント x {{routes}} ルート"
+          "tenants_routes": "{{tenants}} テナント x {{routes}} ルート",
+          "aging_other": "{{count}} のエージング (7 日以上)",
+          "active_jobs_other": "{{count}} アクティブ"
         },
         "kpi": {
           "age_stale": "古い (>14 日)",
@@ -1025,7 +1051,9 @@
         },
         "messages": {
           "dry_run": "ドライラン: {{count}} 件のスナップショットが削除される見込みです",
-          "purged": "パージされた {{count}} スナップショット{{job}}"
+          "purged": "パージされた {{count}} スナップショット{{job}}",
+          "dry_run_other": "ドライラン: {{count}} 件のスナップショットが削除される見込みです",
+          "purged_other": "パージされた {{count}} スナップショット{{job}}"
         },
         "placeholders": {
           "pattern": "/blog/* または /listings/**",
@@ -1033,13 +1061,16 @@
         },
         "result": {
           "deleted": "{{count}} 件のスナップショットを削除しました",
-          "would_delete": "{{count}} 件のスナップショットが削除される見込みです"
+          "would_delete": "{{count}} 件のスナップショットが削除される見込みです",
+          "would_delete_other": "{{count}} 件のスナップショットが削除される見込みです",
+          "deleted_other": "{{count}} 件のスナップショットを削除しました"
         },
         "title": "ワイルドカードキャッシュのパージ",
         "preview_gate": {
           "title": "Preview required before live delete",
           "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
-          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
+          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
+          "ready_other": "一致するプレビューが見つかりました。ライブ削除は、プレビューに表示される {{count}} の一致するスナップショットに限定されます。"
         }
       },
       "ttl_inspector": {
@@ -1066,7 +1097,10 @@
         "units": {
           "days": "{{count}} 日",
           "hours": "{{count}}h",
-          "minutes": "{{count}} 分"
+          "minutes": "{{count}} 分",
+          "minutes_other": "{{count}} 分",
+          "hours_other": "{{count}}h",
+          "days_other": "{{count}} 日"
         }
       },
       "sitemap_explorer": {
@@ -1076,7 +1110,10 @@
         "counts": {
           "dynamic": "{{count}} ダイナミック",
           "static": "{{count}} 静的",
-          "total": "{{count}} 合計"
+          "total": "{{count}} 合計",
+          "static_other": "{{count}} 静的",
+          "dynamic_other": "{{count}} ダイナミック",
+          "total_other": "{{count}} 合計"
         },
         "description_prefix": "エンジンがテナントに対してどのルートをレンダリングする予定であるかを正確に確認します - 静的フロア (機能/モジュール ゲート) と、からの動的 URL",
         "description_suffix": "Playwright ワーカーはこのリストにアクセスします。",
@@ -1134,7 +1171,8 @@
         },
         "status": {
           "clean": "No issues found",
-          "needs_attention": "{{count}} item needs attention"
+          "needs_attention": "{{count}} item needs attention",
+          "needs_attention_other": "{{count}} 項目には注意が必要です"
         },
         "counts": {
           "expected": "Expected",
@@ -1567,7 +1605,19 @@
         "do_not_remove_prerender": "Do not remove prerender fallback.",
         "rollback_path_required": "Rollback path required"
       }
-    }
+    },
+    "health_meta_description_length_other": "{{count}}文字 (理想: 150 ～ 160)",
+    "health_auto_sitemap_active_count_other": "アクティブ —{{count}}URL がインデックス付けされました",
+    "pass_count_other": "合格 {{count}} 件",
+    "warning_count_other": "警告 {{count}} 件",
+    "fail_count_other": "{{count}}が失敗しました",
+    "meta_description_count_other": "{{count}}/160 メタ記述文字",
+    "global_meta_description_count_other": "{{count}}/160 グローバル メタ記述文字",
+    "passed_count_with_value_other": "{{count}}が渡されました",
+    "warnings_count_with_value_other": "{{count}}の警告",
+    "failed_count_with_value_other": "{{count}}が失敗しました",
+    "total_count_other": "合計: {{count}}",
+    "score_out_of": "{{maximum}}点満点"
   },
   "email_deliverability": {
     "title": "電子メールの到達性",
@@ -1606,7 +1656,9 @@
       "trigger_score": "トリガースコア",
       "unconfirmed": "{{count}} 件は受理済みですが未確認です",
       "webhook_confirmed": "プロバイダー Webhook で確認済み",
-      "window_days": "{{days}} の日枠"
+      "window_days": "{{days}} の日枠",
+      "unconfirmed_other": "{{count}} 件は受理済みですが未確認です",
+      "bad_outcomes_other": "{{count}} が失敗、バウンス、または抑制されました"
     },
     "status": {
       "bounced": "跳ね返った",
@@ -1968,6 +2020,7 @@
       "fcm": "モバイル送信/失敗",
       "web": "ウェブ配信",
       "recent_failures": "最近の失敗"
-    }
+    },
+    "trigger_coverage_other": "{{count}} が監視するフロー全体にわたる {{issues}} の問題"
   }
 }

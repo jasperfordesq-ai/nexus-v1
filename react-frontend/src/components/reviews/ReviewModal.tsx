@@ -9,12 +9,12 @@
 
 import { useState } from 'react';
 
-import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { StarRating } from '@/components/ui/StarRating';
 
 interface ReviewModalProps {
   isOpen: boolean;
@@ -38,7 +38,6 @@ export function ReviewModal({
   const toast = useToast();
   const { t } = useTranslation('profile');
   const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -76,7 +75,6 @@ export function ReviewModal({
 
   const handleClose = () => {
     setRating(0);
-    setHoverRating(0);
     setComment('');
     onClose();
   };
@@ -85,7 +83,9 @@ export function ReviewModal({
     <Modal isOpen={isOpen} onClose={handleClose} size="lg">
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
-          <h2 className="text-xl font-bold text-theme-primary">{t('review_modal.title')}</h2>
+          <ModalHeading className="text-xl font-bold text-theme-primary">
+            {t('review_modal.title')}
+          </ModalHeading>
           <p className="text-sm text-theme-subtle font-normal">
             {t('review_modal.subtitle', { name: receiverName })}
           </p>
@@ -108,44 +108,29 @@ export function ReviewModal({
             </div>
           </div>
 
-          {/* Rating Stars */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-theme-primary">
-              {t('review_modal.rating_label')} <span className="text-[var(--color-error)]">{t('review_modal.rating_required')}</span>
-            </label>
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Button
-                  key={star}
-                  type="button"
-                  variant="light"
-                  isIconOnly
-                  onPress={() => setRating(star)}
-                  onMouseEnter={() => setHoverRating(star)}
-                  onMouseLeave={() => setHoverRating(0)}
-                  className="focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded min-w-0 min-h-9 p-0"
-                  aria-label={t('review_modal.rate_star', { star })}
-                >
-                  <Star
-                    className={`w-8 h-8 transition-colors ${
-                      star <= (hoverRating || rating)
-                        ? 'text-amber-400 fill-amber-400'
-                        : 'text-theme-subtle'
-                    }`}
-                  />
-                </Button>
-              ))}
-              {rating > 0 && (
-                <span className="ml-2 text-sm text-theme-muted">
-                  {rating === 1 && t('review_modal.rating_poor')}
-                  {rating === 2 && t('review_modal.rating_fair')}
-                  {rating === 3 && t('review_modal.rating_good')}
-                  {rating === 4 && t('review_modal.rating_very_good')}
-                  {rating === 5 && t('review_modal.rating_excellent')}
+          <StarRating
+            value={rating}
+            onChange={setRating}
+            label={(
+              <>
+                {t('review_modal.rating_label')}{' '}
+                <span aria-hidden="true" className="text-[var(--color-error)]">
+                  {t('review_modal.rating_required')}
                 </span>
-              )}
-            </div>
-          </div>
+              </>
+            )}
+            getOptionLabel={(star) => t('review_modal.rate_star', { star })}
+            getValueDescription={(star) => [
+              t('review_modal.rating_poor'),
+              t('review_modal.rating_fair'),
+              t('review_modal.rating_good'),
+              t('review_modal.rating_very_good'),
+              t('review_modal.rating_excellent'),
+            ][star - 1]}
+            labelClassName="mb-1 basis-full text-sm font-medium text-theme-primary"
+            descriptionClassName="mt-1"
+            isRequired
+          />
 
           {/* Comment */}
           <div className="space-y-2">
@@ -183,7 +168,7 @@ export function ReviewModal({
             onPress={handleSubmit}
             isLoading={isSubmitting}
             isDisabled={rating === 0}
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
           >
             {t('review_modal.submit')}
           </Button>

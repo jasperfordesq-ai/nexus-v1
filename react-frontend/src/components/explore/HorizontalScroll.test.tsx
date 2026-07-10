@@ -4,7 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import userEvent from '@testing-library/user-event';
+import { fireEvent, render, screen, waitFor } from '@/test/test-utils';
 import { HorizontalScroll } from './HorizontalScroll';
 
 // ---------------------------------------------------------------------------
@@ -16,16 +17,9 @@ import { createMockContexts } from '@/test/mock-contexts';
 vi.mock('@/contexts', () => createMockContexts());
 
 // ---------------------------------------------------------------------------
-// Notes on what can and cannot be tested here:
-//
-// The left/right scroll buttons are conditionally rendered only when
-// canScrollLeft / canScrollRight is true.  Those flags are driven by
-// scrollLeft / clientWidth / scrollWidth on the container div — all of which
-// are zero in jsdom (no layout engine).  ResizeObserver is already mocked to
-// a no-op in setup.ts, so checkScroll() never observes actual overflow and the
-// buttons never appear.  Testing the scroll-button branches would require
-// overriding scrollLeft/scrollWidth per element — a brittle approach.
-// We assert that the component renders children correctly and does not crash.
+// jsdom has no layout engine. The overflow branch test configures dimensions
+// only on the rendered track, then dispatches the same scroll event used in
+// the browser. This avoids global layout mocks while exercising both controls.
 // ---------------------------------------------------------------------------
 
 describe('HorizontalScroll', () => {
@@ -66,24 +60,64 @@ describe('HorizontalScroll', () => {
     expect(outer).toHaveClass('my-scroll');
   });
 
-  it('does not render left scroll button in jsdom (no overflow)', () => {
+  it('does not render scroll controls without overflow', () => {
     render(
       <HorizontalScroll>
         <div>A</div>
       </HorizontalScroll>
     );
-    // aria.scroll_left is the i18n key used in the button's aria-label
-    // In jsdom scrollLeft = 0 so canScrollLeft = false → button is absent
     expect(screen.queryByRole('button')).toBeNull();
   });
 
-  it('does not render right scroll button in jsdom (no overflow)', () => {
+  it('renders 44px touch-aware controls and scrolls in both directions', async () => {
+    const user = userEvent.setup();
+    render(
+      <HorizontalScroll>
+        <div>A</div>
+        <div>B</div>
+      </HorizontalScroll>
+    );
+
+    const track = screen.getByTestId('horizontal-scroll-track');
+    const scrollBy = vi.fn();
+    Object.defineProperties(track, {
+      clientWidth: { configurable: true, value: 100 },
+      scrollLeft: { configurable: true, value: 20, writable: true },
+      scrollWidth: { configurable: true, value: 300 },
+      scrollBy: { configurable: true, value: scrollBy },
+    });
+    fireEvent.scroll(track);
+
+    const left = await screen.findByRole('button', { name: /scroll left/i });
+    const right = screen.getByRole('button', { name: /scroll right/i });
+
+    for (const button of [left, right]) {
+      expect(button).toHaveClass('size-11', 'min-h-11', 'min-w-11');
+      expect(button).toHaveClass(
+        'pointer-coarse:opacity-100',
+        'any-pointer-coarse:opacity-100',
+        'pointer-fine:opacity-0',
+        'pointer-fine:group-hover:opacity-100',
+        'group-focus-within:opacity-100',
+        'focus-visible:opacity-100',
+      );
+      expect(button).toHaveAttribute('aria-controls', track.id);
+    }
+
+    await user.click(left);
+    expect(scrollBy).toHaveBeenLastCalledWith({ left: -75, behavior: 'smooth' });
+    await user.click(right);
+    expect(scrollBy).toHaveBeenLastCalledWith({ left: 75, behavior: 'smooth' });
+    await waitFor(() => expect(scrollBy).toHaveBeenCalledTimes(2));
+  });
+
+  it('keeps the touch-swipe track available without arrow controls', () => {
     render(
       <HorizontalScroll>
         <div>A</div>
       </HorizontalScroll>
     );
-    expect(screen.queryByRole('button')).toBeNull();
+    expect(screen.getByTestId('horizontal-scroll-track')).toHaveClass('overflow-x-auto');
   });
 
   it('renders many children without crashing', () => {

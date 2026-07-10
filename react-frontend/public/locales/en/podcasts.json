@@ -178,7 +178,9 @@
         "episode_missing_audio_url": "An episode is missing a valid HTTP audio URL.",
         "episode_missing_audio_length": "An episode is missing the audio file size.",
         "episode_missing_audio_mime": "An episode is missing the audio MIME type."
-      }
+      },
+      "skipped_episodes_one": "{{count}} episode(s) would be left out of the feed until their audio is fixed.",
+      "skipped_episodes_other": "{{count}} episode(s) would be left out of the feed until their audio is fixed."
     },
     "stats": {
       "title": "Listener stats",
@@ -188,7 +190,9 @@
       "subscribers": "Subscribers",
       "top_episodes": "Top episodes",
       "listen_count": "{{count}} listens",
-      "last_days": "Listen activity covers the last {{days}} days."
+      "last_days": "Listen activity covers the last {{days}} days.",
+      "listen_count_one": "{{count}} listens",
+      "listen_count_other": "{{count}} listens"
     }
   },
   "fields": {

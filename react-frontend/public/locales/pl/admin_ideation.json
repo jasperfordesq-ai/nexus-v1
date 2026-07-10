@@ -132,6 +132,10 @@
     "no_challenges_found": "Nie znaleziono żadnych wyzwań",
     "no_matching_challenges": "Nie znaleziono pasujących wyzwań",
     "no_status_challenges": "Nie znaleziono żadnych wyzwań związanych ze stanem",
-    "tabs_aria": "Filtr stanu wyzwania"
+    "tabs_aria": "Filtr stanu wyzwania",
+    "total_count_few": "Razem: {{count}}",
+    "total_count_many": "Razem: {{count}}",
+    "total_count_one": "Razem: {{count}}",
+    "total_count_other": "Razem: {{count}}"
   }
 }

@@ -84,7 +84,9 @@
       "general_admin": "General Admin",
       "caring_community": "Caring Community",
       "kiss_agoris": "Caring Community"
-    }
+    },
+    "search_placeholder_one": "Search {{count}} help articles...",
+    "search_placeholder_other": "Search {{count}} help articles..."
   },
   "help_faqs": {
     "page_title": "Help FAQs",

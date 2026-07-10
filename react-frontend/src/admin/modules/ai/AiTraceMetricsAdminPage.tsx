@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Select, SelectItem, Chip, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -96,11 +97,11 @@ export default function AiTraceMetricsAdminPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <Stat icon={MessageSquare} label={t('ai.trace_metrics.stats.turns')} value={metrics?.turns.toLocaleString() ?? t('ai.common.empty_dash')} loading={loading} />
+        <Stat icon={MessageSquare} label={t('ai.trace_metrics.stats.turns')} value={metrics?.turns.toLocaleString(getFormattingLocale()) ?? t('ai.common.empty_dash')} loading={loading} />
         <Stat icon={DollarSign} label={t('ai.trace_metrics.stats.cost')} value={metrics ? `$${metrics.cost_usd.toFixed(2)}` : t('ai.common.empty_dash')} loading={loading} />
         <Stat icon={Clock} label={t('ai.trace_metrics.stats.avg_latency')} value={metrics ? t('ai.trace_metrics.stats.latency_value', { value: metrics.avg_latency_ms }) : t('ai.common.empty_dash')} loading={loading} />
-        <Stat icon={ThumbsUp} label={t('ai.trace_metrics.stats.thumbs_up')} value={metrics?.thumbs_up.toLocaleString() ?? t('ai.common.empty_dash')} loading={loading} color="success" />
-        <Stat icon={ThumbsDown} label={t('ai.trace_metrics.stats.thumbs_down')} value={metrics?.thumbs_down.toLocaleString() ?? t('ai.common.empty_dash')} loading={loading} color="danger" />
+        <Stat icon={ThumbsUp} label={t('ai.trace_metrics.stats.thumbs_up')} value={metrics?.thumbs_up.toLocaleString(getFormattingLocale()) ?? t('ai.common.empty_dash')} loading={loading} color="success" />
+        <Stat icon={ThumbsDown} label={t('ai.trace_metrics.stats.thumbs_down')} value={metrics?.thumbs_down.toLocaleString(getFormattingLocale()) ?? t('ai.common.empty_dash')} loading={loading} color="danger" />
       </div>
 
       <Card>
@@ -144,7 +145,7 @@ export default function AiTraceMetricsAdminPage() {
               {(metrics?.unanswered ?? []).map((u) => (
                 <TableRow key={u.id}>
                   <TableCell>
-                    <span className="text-xs">{u.at ? new Date(u.at).toLocaleString() : t('ai.common.empty_dash')}</span>
+                    <span className="text-xs">{u.at ? new Date(u.at).toLocaleString(getFormattingLocale()) : t('ai.common.empty_dash')}</span>
                   </TableCell>
                   <TableCell>
                     <span className="text-sm line-clamp-2 max-w-[20rem] block">{u.user_text}</span>

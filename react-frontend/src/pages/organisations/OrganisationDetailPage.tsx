@@ -45,7 +45,7 @@ import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { getOpportunityCategoryName, type OpportunityCategory } from '@/lib/volunteering';
@@ -289,17 +289,15 @@ export function OrganisationDetailPage() {
           <p className="text-theme-muted mb-4" role="alert">{error}</p>
           <div className="flex gap-3 justify-center">
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadData()}
             >
               {t('organisation_detail.try_again')}
             </Button>
-            <Link to={tenantPath("/organisations")}>
-              <Button variant="secondary" className="bg-theme-elevated text-theme-muted">
-                {t('organisation_detail.browse_organisations')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath("/organisations")} variant="secondary" className="bg-theme-elevated text-theme-muted">
+              {t('organisation_detail.browse_organisations')}
+            </Button>
           </div>
         </GlassCard>
       </div>
@@ -362,37 +360,31 @@ export function OrganisationDetailPage() {
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3 mt-4">
               {canManage && (
-                <Link to={tenantPath(`/volunteering/org/${organisation.id}/dashboard`)}>
-                  <Button
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                    startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
-                  >
-                    {t('organisation_detail.manage_button')}
-                  </Button>
-                </Link>
+                <Button as={Link} to={tenantPath(`/volunteering/org/${organisation.id}/dashboard`)}
+                  className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
+                  startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('organisation_detail.manage_button')}
+                </Button>
               )}
               {organisation.website && (
-                <a href={organisation.website} target="_blank" rel="noopener noreferrer">
-                  <Button
-                    variant="secondary"
-                    className="bg-theme-elevated text-theme-muted"
-                    startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
-                    endContent={<ExternalLink className="w-3 h-3" aria-hidden="true" />}
-                  >
-                    {t('organisation_detail.website')}
-                  </Button>
-                </a>
+                <Button as="a" href={organisation.website} target="_blank" rel="noopener noreferrer"
+                  variant="secondary"
+                  className="bg-theme-elevated text-theme-muted"
+                  startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
+                  endContent={<ExternalLink className="w-3 h-3" aria-hidden="true" />}
+                >
+                  {t('organisation_detail.website')}
+                </Button>
               )}
               {organisation.contact_email && (
-                <a href={`mailto:${organisation.contact_email}`}>
-                  <Button
-                    variant="secondary"
-                    className="bg-theme-elevated text-theme-muted"
-                    startContent={<Mail className="w-4 h-4" aria-hidden="true" />}
-                  >
-                    {t('organisation_detail.contact')}
-                  </Button>
-                </a>
+                <Button as="a" href={`mailto:${organisation.contact_email}`}
+                  variant="secondary"
+                  className="bg-theme-elevated text-theme-muted"
+                  startContent={<Mail className="w-4 h-4" aria-hidden="true" />}
+                >
+                  {t('organisation_detail.contact')}
+                </Button>
               )}
             </div>
           </div>
@@ -412,8 +404,8 @@ export function OrganisationDetailPage() {
         </GlassCard>
 
         <GlassCard className="p-4 text-center">
-          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-500/10 mx-auto mb-2">
-            <Users className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+          <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent/10 mx-auto mb-2">
+            <Users className="w-5 h-5 text-accent" aria-hidden="true" />
           </div>
           <dl>
             <dd className="text-xl font-bold text-theme-primary">{organisation.volunteer_count}</dd>
@@ -494,8 +486,8 @@ export function OrganisationDetailPage() {
                       {opp.start_date && (
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" aria-hidden="true" />
-                          {new Date(opp.start_date).toLocaleDateString()}
-                          {opp.end_date ? `${t('date_range_separator', { ns: 'volunteering' })}${new Date(opp.end_date).toLocaleDateString()}` : ''}
+                          {new Date(opp.start_date).toLocaleDateString(getFormattingLocale())}
+                          {opp.end_date ? `${t('date_range_separator', { ns: 'volunteering' })}${new Date(opp.end_date).toLocaleDateString(getFormattingLocale())}` : ''}
                         </span>
                       )}
                       {getOpportunityCategoryName(opp.category) && (
@@ -601,7 +593,7 @@ export function OrganisationDetailPage() {
                       ))}
                     </div>
                     <span className="text-xs text-theme-subtle">
-                      {new Date(review.created_at).toLocaleDateString()}
+                      {new Date(review.created_at).toLocaleDateString(getFormattingLocale())}
                     </span>
                   </div>
                   {review.comment && (

@@ -550,14 +550,20 @@
           "unique_uris": "URI exclusivos"
         },
         "labels": {
-          "spoofed_count": "{{count}} falsificado"
+          "spoofed_count": "{{count}} falsificado",
+          "spoofed_count_many": "{{count}} falsificado",
+          "spoofed_count_one": "{{count}} falsificado",
+          "spoofed_count_other": "{{count}} falsificado"
         },
         "log_summary": "Registro: {{size}} - desde {{time}}",
         "sections": {
           "hits_by_crawler": "Acessos por rastreador",
           "hits_by_status": "Acessos por status HTTP",
           "recent_activity": "Atividade recente (mais recente primeiro, último {{count}})",
-          "top_uris": "Principais URIs (50 principais por contagem de acessos)"
+          "top_uris": "Principais URIs (50 principais por contagem de acessos)",
+          "recent_activity_many": "Atividade recente (mais recente primeiro, último {{count}})",
+          "recent_activity_one": "Atividade recente (mais recente primeiro, último {{count}})",
+          "recent_activity_other": "Atividade recente (mais recente primeiro, último {{count}})"
         },
         "tables": {
           "recent_hits_aria": "Acessos recentes de bot",
@@ -573,7 +579,10 @@
         "actions": {
           "open_in_inventory": "Aberto no inventário",
           "refresh": "Atualizar",
-          "refresh_all_stale": "Atualizar tudo obsoleto ({{count}})"
+          "refresh_all_stale": "Atualizar tudo obsoleto ({{count}})",
+          "refresh_all_stale_many": "Atualizar tudo obsoleto ({{count}})",
+          "refresh_all_stale_one": "Atualizar tudo obsoleto ({{count}})",
+          "refresh_all_stale_other": "Atualizar tudo obsoleto ({{count}})"
         },
         "columns": {
           "actions": "ACTIONS",
@@ -585,7 +594,10 @@
           "tenant": "TENANT"
         },
         "confirm": {
-          "queue_recache": "Recache de fila para locatários {{count}}?"
+          "queue_recache": "Recache de fila para locatários {{count}}?",
+          "queue_recache_many": "Recache de fila para locatários {{count}}?",
+          "queue_recache_one": "Recache de fila para locatários {{count}}?",
+          "queue_recache_other": "Recache de fila para locatários {{count}}?"
         },
         "empty": "Sem inquilinos",
         "errors": {
@@ -596,11 +608,17 @@
         "messages": {
           "bulk_queued": "Recache em fila para locatários {{count}}",
           "no_stale": "Sem inquilinos obsoletos – a cobertura é saudável",
-          "tenant_queued": "#{{id}} na fila para {{slug}}"
+          "tenant_queued": "#{{id}} na fila para {{slug}}",
+          "bulk_queued_many": "Recache em fila para locatários {{count}}",
+          "bulk_queued_one": "Recache em fila para locatários {{count}}",
+          "bulk_queued_other": "Recache em fila para locatários {{count}}"
         },
         "summary": {
           "healthy": "Todos os locatários {{count}} estão íntegros.",
-          "needs_work": "{{needing}} dos locatários {{total}} têm rotas ausentes, obsoletas ou com ativos quebrados."
+          "needs_work": "{{needing}} dos locatários {{total}} têm rotas ausentes, obsoletas ou com ativos quebrados.",
+          "healthy_many": "Todos os locatários {{count}} estão íntegros.",
+          "healthy_one": "Todos os locatários {{count}} estão íntegros.",
+          "healthy_other": "Todos os locatários {{count}} estão íntegros."
         },
         "table_aria": "Cobertura"
       },
@@ -628,7 +646,13 @@
           "drift_applied": "Detecção de desvio aplicada",
           "drift_dry_run": "Teste de deriva concluído",
           "purge_dry_run": "Teste: os instantâneos {{count}} seriam eliminados",
-          "purged_ungated": "Instantâneos não bloqueados de {{count}} eliminados em locatários {{tenants}}"
+          "purged_ungated": "Instantâneos não bloqueados de {{count}} eliminados em locatários {{tenants}}",
+          "purged_ungated_many": "Instantâneos não bloqueados de {{count}} eliminados em locatários {{tenants}}",
+          "purged_ungated_one": "Instantâneos não bloqueados de {{count}} eliminados em locatários {{tenants}}",
+          "purged_ungated_other": "Instantâneos não bloqueados de {{count}} eliminados em locatários {{tenants}}",
+          "purge_dry_run_many": "Teste: os instantâneos {{count}} seriam eliminados",
+          "purge_dry_run_one": "Teste: os instantâneos {{count}} seriam eliminados",
+          "purge_dry_run_other": "Teste: os instantâneos {{count}} seriam eliminados"
         },
         "no_output": "(sem saída)",
         "purge_ungated": {
@@ -637,7 +661,13 @@
         },
         "result": {
           "deleted": "Instantâneos {{count}} excluídos em locatários {{tenants}}",
-          "would_delete": "Excluiria snapshots {{count}} em locatários {{tenants}}"
+          "would_delete": "Excluiria snapshots {{count}} em locatários {{tenants}}",
+          "would_delete_many": "Excluiria snapshots {{count}} em locatários {{tenants}}",
+          "would_delete_one": "Excluiria snapshots {{count}} em locatários {{tenants}}",
+          "would_delete_other": "Excluiria snapshots {{count}} em locatários {{tenants}}",
+          "deleted_many": "Instantâneos {{count}} excluídos em locatários {{tenants}}",
+          "deleted_one": "Instantâneos {{count}} excluídos em locatários {{tenants}}",
+          "deleted_other": "Instantâneos {{count}} excluídos em locatários {{tenants}}"
         },
         "title": "Automação de frescor"
       },
@@ -666,7 +696,8 @@
           "queue_reset_one": "Redefinir linha presa {{count}}; disjuntor liberado",
           "queue_reset_other": "Redefinir linhas presas em {{count}}; disjuntor liberado",
           "queue_reset_failed": "Falha na redefinição da fila",
-          "reset_failed": "Falha na redefinição"
+          "reset_failed": "Falha na redefinição",
+          "queue_reset_many": "Redefinir linhas presas em {{count}}; disjuntor liberado"
         },
         "checks": {
           "cache_readable": "Cache pode ser lido",
@@ -683,7 +714,8 @@
           "sched_prerender-detect-drift": "Batimento cardíaco do detector de deriva",
           "sched_prerender-auto-recache": "Recache automático dos batimentos cardíacos",
           "sched_prerender-reap-stale": "Pulsação de limpeza de trabalho obsoleto"
-        }
+        },
+        "issue_count_many": "Problemas com {{count}}"
       },
       "inventory": {
         "actions": {
@@ -694,7 +726,10 @@
           "recache_selected": "Recache selecionado ({{count}})",
           "reload": "Recarregar",
           "select_all_visible": "Selecione tudo visível",
-          "select_snapshot": "Selecione {{path}}"
+          "select_snapshot": "Selecione {{path}}",
+          "recache_selected_many": "Recache selecionado ({{count}})",
+          "recache_selected_one": "Recache selecionado ({{count}})",
+          "recache_selected_other": "Recache selecionado ({{count}})"
         },
         "columns": {
           "actions": "Ações",
@@ -729,7 +764,10 @@
           "tenant_slug": "Lesma inquilina"
         },
         "messages": {
-          "bulk_recache": "Instantâneos {{count}} invalidados e recache em fila"
+          "bulk_recache": "Instantâneos {{count}} invalidados e recache em fila",
+          "bulk_recache_many": "Instantâneos {{count}} invalidados e recache em fila",
+          "bulk_recache_one": "Instantâneos {{count}} invalidados e recache em fila",
+          "bulk_recache_other": "Instantâneos {{count}} invalidados e recache em fila"
         },
         "inspect": {
           "age": "Idade",
@@ -762,7 +800,19 @@
           "seo_score": "Pontuação SEO",
           "size": "Tamanho",
           "tips": "Dicas ({{count}})",
-          "title": "Título"
+          "title": "Título",
+          "must_fix_many": "Deve corrigir ({{count}})",
+          "must_fix_one": "Deve corrigir ({{count}})",
+          "must_fix_other": "Deve corrigir ({{count}})",
+          "tips_many": "Dicas ({{count}})",
+          "tips_one": "Dicas ({{count}})",
+          "tips_other": "Dicas ({{count}})",
+          "asset_references_many": "Referências de ativos ({{count}})",
+          "asset_references_one": "Referências de ativos ({{count}})",
+          "asset_references_other": "Referências de ativos ({{count}})",
+          "dead_assets_many": "{{count}} morto",
+          "dead_assets_one": "{{count}} morto",
+          "dead_assets_other": "{{count}} morto"
         },
         "selected": "{{count}} selecionado",
         "status": {
@@ -771,7 +821,10 @@
           "content_drifted": "conteúdo desviado"
         },
         "summary": "{{filtered}} de instantâneos {{total}}",
-        "table_aria": "Inventário instantâneo"
+        "table_aria": "Inventário instantâneo",
+        "selected_many": "{{count}} selecionado",
+        "selected_one": "{{count}} selecionado",
+        "selected_other": "{{count}} selecionado"
       },
       "jobs": {
         "actions": {
@@ -840,7 +893,10 @@
           "tooltip": "prioridade = {{priority}} (vitórias menores)"
         },
         "result": {
-          "invalid": "{{count}} inválido"
+          "invalid": "{{count}} inválido",
+          "invalid_many": "{{count}} inválido",
+          "invalid_one": "{{count}} inválido",
+          "invalid_other": "{{count}} inválido"
         },
         "scope": {
           "all_tenants": "todos os inquilinos"
@@ -872,7 +928,10 @@
           "success": "Sucesso",
           "supersede": "Substituir",
           "unknown": "Evento desconhecido: {{event}}"
-        }
+        },
+        "summary_many": "Eventos {{count}}",
+        "summary_one": "Eventos {{count}}",
+        "summary_other": "Eventos {{count}}"
       },
       "failures": {
         "columns": {
@@ -888,7 +947,10 @@
         "errors": {
           "load": "Falha ao carregar falhas"
         },
-        "table_aria": "Falhas"
+        "table_aria": "Falhas",
+        "actions": {
+          "close_breaker_now": "Retomar fila agora"
+        }
       },
       "live_connected": "Atualizações ao vivo conectadas",
       "audit": {
@@ -957,7 +1019,13 @@
           "cache_unreachable": "Cache inacessível",
           "healthy": "Saudável",
           "missing": "{{count}} ausente",
-          "stale": "{{count}} obsoleto"
+          "stale": "{{count}} obsoleto",
+          "missing_many": "{{count}} ausente",
+          "missing_one": "{{count}} ausente",
+          "missing_other": "{{count}} ausente",
+          "stale_many": "{{count}} obsoleto",
+          "stale_one": "{{count}} obsoleto",
+          "stale_other": "{{count}} obsoleto"
         },
         "hints": {
           "active_jobs": "{{count}} ativo",
@@ -969,7 +1037,13 @@
           "event_at": "Evento {{time}}",
           "no_events": "Nenhum evento",
           "prometheus": "Formato de texto Prometheus",
-          "tenants_routes": "Inquilinos {{tenants}} x rotas {{routes}}"
+          "tenants_routes": "Inquilinos {{tenants}} x rotas {{routes}}",
+          "aging_many": "Envelhecimento {{count}} (>7d)",
+          "aging_one": "Envelhecimento {{count}} (>7d)",
+          "aging_other": "Envelhecimento {{count}} (>7d)",
+          "active_jobs_many": "{{count}} ativo",
+          "active_jobs_one": "{{count}} ativo",
+          "active_jobs_other": "{{count}} ativo"
         },
         "kpi": {
           "age_stale": "Idade obsoleta (>14d)",
@@ -1025,7 +1099,13 @@
         },
         "messages": {
           "dry_run": "Teste: os instantâneos {{count}} seriam eliminados",
-          "purged": "Instantâneos {{count}} eliminados{{job}}"
+          "purged": "Instantâneos {{count}} eliminados{{job}}",
+          "dry_run_many": "Teste: os instantâneos {{count}} seriam eliminados",
+          "dry_run_one": "Teste: os instantâneos {{count}} seriam eliminados",
+          "dry_run_other": "Teste: os instantâneos {{count}} seriam eliminados",
+          "purged_many": "Instantâneos {{count}} eliminados{{job}}",
+          "purged_one": "Instantâneos {{count}} eliminados{{job}}",
+          "purged_other": "Instantâneos {{count}} eliminados{{job}}"
         },
         "placeholders": {
           "pattern": "/blog/* ou /listagens/**",
@@ -1033,13 +1113,22 @@
         },
         "result": {
           "deleted": "Instantâneos {{count}} excluídos",
-          "would_delete": "Excluiria os instantâneos {{count}}"
+          "would_delete": "Excluiria os instantâneos {{count}}",
+          "would_delete_many": "Excluiria os instantâneos {{count}}",
+          "would_delete_one": "Excluiria os instantâneos {{count}}",
+          "would_delete_other": "Excluiria os instantâneos {{count}}",
+          "deleted_many": "Instantâneos {{count}} excluídos",
+          "deleted_one": "Instantâneos {{count}} excluídos",
+          "deleted_other": "Instantâneos {{count}} excluídos"
         },
         "title": "Limpeza de cache curinga",
         "preview_gate": {
           "title": "Pré-visualização necessária antes da exclusão ao vivo",
           "required": "Uma exclusão ao vivo é bloqueada até que você visualize o mesmo padrão de rota e escopo de locatário.",
-          "ready": "Visualização correspondente encontrada. A exclusão ao vivo é limitada aos instantâneos correspondentes {{count}} mostrados pela visualização."
+          "ready": "Visualização correspondente encontrada. A exclusão ao vivo é limitada aos instantâneos correspondentes {{count}} mostrados pela visualização.",
+          "ready_many": "Visualização correspondente encontrada. A exclusão ao vivo é limitada aos instantâneos correspondentes {{count}} mostrados pela visualização.",
+          "ready_one": "Visualização correspondente encontrada. A exclusão ao vivo é limitada aos instantâneos correspondentes {{count}} mostrados pela visualização.",
+          "ready_other": "Visualização correspondente encontrada. A exclusão ao vivo é limitada aos instantâneos correspondentes {{count}} mostrados pela visualização."
         }
       },
       "ttl_inspector": {
@@ -1066,7 +1155,16 @@
         "units": {
           "days": "{{count}}d",
           "hours": "{{count}}h",
-          "minutes": "{{count}}min"
+          "minutes": "{{count}}min",
+          "minutes_many": "{{count}}min",
+          "minutes_one": "{{count}}min",
+          "minutes_other": "{{count}}min",
+          "hours_many": "{{count}}h",
+          "hours_one": "{{count}}h",
+          "hours_other": "{{count}}h",
+          "days_many": "{{count}}d",
+          "days_one": "{{count}}d",
+          "days_other": "{{count}}d"
         }
       },
       "sitemap_explorer": {
@@ -1076,7 +1174,16 @@
         "counts": {
           "dynamic": "{{count}} dinâmico",
           "static": "{{count}} estático",
-          "total": "{{count}}total"
+          "total": "{{count}}total",
+          "static_many": "{{count}} estático",
+          "static_one": "{{count}} estático",
+          "static_other": "{{count}} estático",
+          "dynamic_many": "{{count}} dinâmico",
+          "dynamic_one": "{{count}} dinâmico",
+          "dynamic_other": "{{count}} dinâmico",
+          "total_many": "{{count}}total",
+          "total_one": "{{count}}total",
+          "total_other": "{{count}}total"
         },
         "description_prefix": "Veja exatamente quais rotas o mecanismo planeja renderizar para um locatário - piso estático (recurso/módulo fechado) mais os URLs dinâmicos de",
         "description_suffix": "O trabalhador do dramaturgo visita esta lista.",
@@ -1134,7 +1241,10 @@
         },
         "status": {
           "clean": "Nenhum problema encontrado",
-          "needs_attention": "{{count}} item precisa de atenção"
+          "needs_attention": "{{count}} item precisa de atenção",
+          "needs_attention_many": "{{count}} item precisa de atenção",
+          "needs_attention_one": "{{count}} item precisa de atenção",
+          "needs_attention_other": "{{count}} item precisa de atenção"
         },
         "counts": {
           "expected": "Expected",
@@ -1567,7 +1677,43 @@
         "do_not_remove_prerender": "Não remova o substituto de pré-renderização.",
         "rollback_path_required": "Caminho de reversão obrigatório"
       }
-    }
+    },
+    "health_meta_description_length_many": "Caracteres{{count}}(ideal: 150–160)",
+    "health_meta_description_length_one": "Caracteres{{count}}(ideal: 150–160)",
+    "health_meta_description_length_other": "Caracteres{{count}}(ideal: 150–160)",
+    "health_auto_sitemap_active_count_many": "Ativo — URLs{{count}}indexados",
+    "health_auto_sitemap_active_count_one": "Ativo — URLs{{count}}indexados",
+    "health_auto_sitemap_active_count_other": "Ativo — URLs{{count}}indexados",
+    "pass_count_many": "{{count}} aprovado",
+    "pass_count_one": "{{count}} aprovado",
+    "pass_count_other": "{{count}} aprovado",
+    "warning_count_many": "{{count}} aviso",
+    "warning_count_one": "{{count}} aviso",
+    "warning_count_other": "{{count}} aviso",
+    "fail_count_many": "Falha em{{count}}",
+    "fail_count_one": "Falha em{{count}}",
+    "fail_count_other": "Falha em{{count}}",
+    "meta_description_count_many": "{{count}}/160 caracteres de meta descrição",
+    "meta_description_count_one": "{{count}}/160 caracteres de meta descrição",
+    "meta_description_count_other": "{{count}}/160 caracteres de meta descrição",
+    "global_meta_description_count_many": "{{count}}/160 caracteres de meta descrição global",
+    "global_meta_description_count_one": "{{count}}/160 caracteres de meta descrição global",
+    "global_meta_description_count_other": "{{count}}/160 caracteres de meta descrição global",
+    "passed_count_with_value_many": "{{count}}aprovado",
+    "passed_count_with_value_one": "{{count}}aprovado",
+    "passed_count_with_value_other": "{{count}}aprovado",
+    "warnings_count_with_value_many": "Avisos{{count}}",
+    "warnings_count_with_value_one": "Avisos{{count}}",
+    "warnings_count_with_value_other": "Avisos{{count}}",
+    "failed_count_with_value_many": "{{count}}falhou",
+    "failed_count_with_value_one": "{{count}}falhou",
+    "failed_count_with_value_other": "{{count}}falhou",
+    "match_count_many": "Partidas de{{count}}",
+    "top_matches_for_user_many": "Principais correspondências de{{count}}para{{name}}",
+    "total_count_many": "Total: {{count}}",
+    "total_count_one": "Total: {{count}}",
+    "total_count_other": "Total: {{count}}",
+    "score_out_of": "de {{maximum}}"
   },
   "email_deliverability": {
     "title": "Capacidade de entrega de e-mail",
@@ -1606,7 +1752,13 @@
       "trigger_score": "Pontuação de gatilho",
       "unconfirmed": "{{count}} aceito, mas não confirmado",
       "webhook_confirmed": "Confirmado pelo webhook do provedor",
-      "window_days": "Janela do dia {{days}}"
+      "window_days": "Janela do dia {{days}}",
+      "unconfirmed_many": "{{count}} aceito, mas não confirmado",
+      "unconfirmed_one": "{{count}} aceito, mas não confirmado",
+      "unconfirmed_other": "{{count}} aceito, mas não confirmado",
+      "bad_outcomes_many": "{{count}} falhou, foi devolvido ou suprimido",
+      "bad_outcomes_one": "{{count}} falhou, foi devolvido ou suprimido",
+      "bad_outcomes_other": "{{count}} falhou, foi devolvido ou suprimido"
     },
     "status": {
       "bounced": "Devolvido",
@@ -1968,6 +2120,9 @@
       "fcm": "Móvel enviadas/falhadas",
       "web": "Web entregues",
       "recent_failures": "Falhas recentes"
-    }
+    },
+    "trigger_coverage_many": "Problemas de {{issues}} em fluxos monitorados de {{count}}",
+    "trigger_coverage_one": "Problemas de {{issues}} em fluxos monitorados de {{count}}",
+    "trigger_coverage_other": "Problemas de {{issues}} em fluxos monitorados de {{count}}"
   }
 }

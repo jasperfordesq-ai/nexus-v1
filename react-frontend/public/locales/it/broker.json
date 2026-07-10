@@ -186,7 +186,17 @@
     "time_just_now": "Proprio ora",
     "time_minutes_ago": "{{count}} min fa",
     "time_hours_ago": "{{count}} h fa",
-    "time_days_ago": "{{count}} g fa"
+    "time_days_ago": "{{count}} g fa",
+    "open_items_many": "elementi in attesa della tua revisione",
+    "time_minutes_ago_many": "{{count}} min fa",
+    "time_minutes_ago_one": "{{count}} min fa",
+    "time_minutes_ago_other": "{{count}} min fa",
+    "time_hours_ago_many": "{{count}} h fa",
+    "time_hours_ago_one": "{{count}} h fa",
+    "time_hours_ago_other": "{{count}} h fa",
+    "time_days_ago_many": "{{count}} g fa",
+    "time_days_ago_one": "{{count}} g fa",
+    "time_days_ago_other": "{{count}} g fa"
   },
   "members": {
     "title": "Membri",
@@ -288,7 +298,20 @@
     "empty_never_logged_in_title": "Tutti hanno effettuato l'accesso",
     "empty_never_logged_in_hint": "Nessun membro approvato è ancora in attesa di accedere per la prima volta.",
     "empty_onboarding_incomplete_title": "Tutti hanno completato l'onboarding",
-    "empty_onboarding_incomplete_hint": "Nessun membro ha passaggi di onboarding incompleti."
+    "empty_onboarding_incomplete_hint": "Nessun membro ha passaggi di onboarding incompleti.",
+    "time_minutes_ago_many": "{{count}} min fa",
+    "time_minutes_ago_one": "{{count}} min fa",
+    "time_minutes_ago_other": "{{count}} min fa",
+    "time_hours_ago_many": "{{count}} h fa",
+    "time_hours_ago_one": "{{count}} h fa",
+    "time_hours_ago_other": "{{count}} h fa",
+    "time_days_ago_many": "{{count}} g fa",
+    "time_days_ago_one": "{{count}} g fa",
+    "time_days_ago_other": "{{count}} g fa",
+    "bulk_selected_many": "{{count}} selezionati",
+    "bulk_selected_one": "{{count}} selezionati",
+    "bulk_selected_other": "{{count}} selezionati",
+    "role_all": "Tutti i ruoli"
   },
   "onboarding": {
     "title": "Onboarding",
@@ -503,7 +526,34 @@
     "empty_queue_title": "Nessun record in attesa di revisione",
     "empty_queue_hint": "Tutto in pari — le nuove segnalazioni appariranno qui per la revisione.",
     "list_error_title": "Impossibile caricare i record di verifica",
-    "list_error_body": "Controlla la connessione e riprova."
+    "list_error_body": "Controlla la connessione e riprova.",
+    "expiry_days_left_many": "{{count}}g rimanenti",
+    "expiry_days_left_one": "{{count}}g rimanenti",
+    "expiry_days_left_other": "{{count}}g rimanenti",
+    "toast_bulk_success_many": "{{count}} record {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_one": "{{count}} record {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_other": "{{count}} record {{action}}.{{failedSuffix}}",
+    "toast_bulk_failed_suffix_many": " ({{count}} non riusciti)",
+    "toast_bulk_failed_suffix_one": " ({{count}} non riusciti)",
+    "toast_bulk_failed_suffix_other": " ({{count}} non riusciti)",
+    "stat_of_total_many": "su {{count}} record totali",
+    "stat_of_total_one": "su {{count}} record totali",
+    "stat_of_total_other": "su {{count}} record totali",
+    "stat_expired_hint_many": "{{count}} già scaduti",
+    "stat_expired_hint_one": "{{count}} già scaduti",
+    "stat_expired_hint_other": "{{count}} già scaduti",
+    "records_selected_many": "{{count}} record selezionati",
+    "records_selected_one": "{{count}} record selezionati",
+    "records_selected_other": "{{count}} record selezionati",
+    "bulk_verify_confirm_many": "Verificare tutti i record selezionati?",
+    "bulk_verify_confirm_one": "Verificare tutti i record selezionati?",
+    "bulk_verify_confirm_other": "Verificare tutti i record selezionati?",
+    "bulk_delete_confirm_many": "Vuoi davvero eliminare tutti i record selezionati? Questa azione non può essere annullata.",
+    "bulk_delete_confirm_one": "Vuoi davvero eliminare tutti i record selezionati? Questa azione non può essere annullata.",
+    "bulk_delete_confirm_other": "Vuoi davvero eliminare tutti i record selezionati? Questa azione non può essere annullata.",
+    "bulk_reject_confirm_many": "Fornisci un motivo per respingere tutti i record selezionati.",
+    "bulk_reject_confirm_one": "Fornisci un motivo per respingere tutti i record selezionati.",
+    "bulk_reject_confirm_other": "Fornisci un motivo per respingere tutti i record selezionati."
   },
   "member_detail": {
     "load_failed": "Impossibile caricare il membro.",
@@ -795,7 +845,10 @@
     "retry": "Riprova",
     "detail_not_found_hint": "La copia del messaggio potrebbe essere stata archiviata o rimossa, oppure il link potrebbe essere errato.",
     "detail_flag_banner_title": "Segnalato per revisione",
-    "detail_decision_prompt": "Registra una decisione di revisione per questa copia del messaggio."
+    "detail_decision_prompt": "Registra una decisione di revisione per questa copia del messaggio.",
+    "detail_message_count_many": "{{count}} messaggi",
+    "detail_message_count_one": "{{count}} messaggi",
+    "detail_message_count_other": "{{count}} messaggi"
   },
   "monitoring": {
     "title": "Monitoraggio utenti",
@@ -855,7 +908,8 @@
     "empty_all_clear_hint": "Tutti i membri comunicano liberamente. Aggiungi un membro se qualcosa richiede un controllo più attento.",
     "load_error_title": "Impossibile caricare gli utenti monitorati",
     "load_error_hint": "Si è verificato un errore durante il recupero dell'elenco di monitoraggio. Aggiorna per riprovare.",
-    "retry_button": "Riprova"
+    "retry_button": "Riprova",
+    "expiry_days_left_many": "{{count}} giorni rimanenti"
   },
   "risk_tags": {
     "title": "Tag di rischio",
@@ -939,7 +993,8 @@
     "empty_level_title": "Nessun tag a questo livello",
     "empty_level_hint": "Nessun annuncio ha attualmente questo livello di rischio.",
     "empty_search_title": "Nessun tag di rischio corrispondente",
-    "empty_search_hint": "Prova un termine di ricerca diverso o cancella la ricerca."
+    "empty_search_hint": "Prova un termine di ricerca diverso o cancella la ricerca.",
+    "level_all": "Tutti i livelli di rischio"
   },
   "insurance": {
     "title": "Certificati assicurativi",
@@ -1124,7 +1179,10 @@
     "detail_description": "Un'istantanea congelata e di sola lettura di una copia di messaggio revisionata.",
     "frozen_note": "Questo record è conservato esattamente come è stato revisionato e non può essere modificato.",
     "record_id": "Record #{{id}}",
-    "record_unavailable": "Record non disponibile"
+    "record_unavailable": "Record non disponibile",
+    "messages_count_many": "{{count}} messaggi",
+    "messages_count_one": "{{count}} messaggi",
+    "messages_count_other": "{{count}} messaggi"
   },
   "configuration": {
     "title": "Configurazione del broker",

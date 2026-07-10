@@ -276,7 +276,17 @@
     "members_tabs_aria": "Cineál tuairisce ball",
     "hours_by_category_aria": "Barrachairt a thaispeánann uaireanta a mhalartaítear de réir catagóire",
     "hours_distribution_aria": "Píchairt a thaispeánann dáileadh uaireanta malartaithe ama",
-    "hours_trend_aria": "Cairt achair a thaispeánann uaireanta a mhalartaítear le himeacht ama"
+    "hours_trend_aria": "Cairt achair a thaispeánann uaireanta a mhalartaítear le himeacht ama",
+    "members_selected_count_few": "{{count}}roghnaithe",
+    "members_selected_count_many": "{{count}}roghnaithe",
+    "members_selected_count_one": "{{count}}roghnaithe",
+    "members_selected_count_other": "{{count}}roghnaithe",
+    "members_selected_count_two": "{{count}}roghnaithe",
+    "days_count_few": "{{count}} lá",
+    "days_count_many": "{{count}} lá",
+    "days_count_one": "{{count}} lá",
+    "days_count_other": "{{count}} lá",
+    "days_count_two": "{{count}} lá"
   },
   "municipal_reports": {
     "meta": {
@@ -387,7 +397,17 @@
       "hours": "{{count}}u",
       "disabled": "faoi ​​mhíchumas",
       "activities": "{{count}} gníomhaíochtaí",
-      "trend_detail": "{{participants}} rannpháirtithe, {{activities}} gníomhaíochtaí"
+      "trend_detail": "{{participants}} rannpháirtithe, {{activities}} gníomhaíochtaí",
+      "hours_few": "{{count}}u",
+      "hours_many": "{{count}}u",
+      "hours_one": "{{count}}u",
+      "hours_other": "{{count}}u",
+      "hours_two": "{{count}}u",
+      "activities_few": "{{count}} gníomhaíochtaí",
+      "activities_many": "{{count}} gníomhaíochtaí",
+      "activities_one": "{{count}} gníomhaíochtaí",
+      "activities_other": "{{count}} gníomhaíochtaí",
+      "activities_two": "{{count}} gníomhaíochtaí"
     },
     "toast": {
       "load_failed": "Theip ar lódáil sonraí tionchair chathrach.",
@@ -470,7 +490,12 @@
         "partner_organisations_by_hours": "Eagraíochtaí comhpháirtíochta (de réir uaireanta)",
         "no_partner_activity": "Gan aon ghníomhaíocht chomhpháirtí sa tréimhse seo.",
         "top_5_categories": "Na 5 chatagóir is fearr (roinnte geografach / gníomhaíochta)",
-        "no_category_data": "Níl aon sonraí catagóir sa tréimhse seo."
+        "no_category_data": "Níl aon sonraí catagóir sa tréimhse seo.",
+        "trusted_total_few": "de {{count}} iomlán iontaofa.",
+        "trusted_total_many": "de {{count}} iomlán iontaofa.",
+        "trusted_total_one": "de {{count}} iomlán iontaofa.",
+        "trusted_total_other": "de {{count}} iomlán iontaofa.",
+        "trusted_total_two": "de {{count}} iomlán iontaofa."
       },
       "cooperative": {
         "empty_title": "Comharchumann (cooperative inmheánach)",
@@ -487,8 +512,28 @@
         "coordinator_load": "Comhordaitheoir ualach",
         "coordinator_load_desc": "{{pending}} ar feitheamh trasna {{coordinators}} comhordaitheoirí.",
         "future_care_credit_pool": "Comhthiomsú iarmhéid creidmheasa cúraim don todhchaí",
-        "future_care_credit_pool_desc": "Suim na n-iarmhéideanna ball dearfach - cúlchiste intuigthe cúram todhchaí an chomharchumainn. Bonn ball gníomhach: {{count}}."
-      }
+        "future_care_credit_pool_desc": "Suim na n-iarmhéideanna ball dearfach - cúlchiste intuigthe cúram todhchaí an chomharchumainn. Bonn ball gníomhach: {{count}}.",
+        "member_retention_desc_few": "{{count}} baill atá gníomhach sa tréimhse seo agus sa tréimhse choibhéiseach roimhe sin.",
+        "member_retention_desc_many": "{{count}} baill atá gníomhach sa tréimhse seo agus sa tréimhse choibhéiseach roimhe sin.",
+        "member_retention_desc_one": "{{count}} baill atá gníomhach sa tréimhse seo agus sa tréimhse choibhéiseach roimhe sin.",
+        "member_retention_desc_other": "{{count}} baill atá gníomhach sa tréimhse seo agus sa tréimhse choibhéiseach roimhe sin.",
+        "member_retention_desc_two": "{{count}} baill atá gníomhach sa tréimhse seo agus sa tréimhse choibhéiseach roimhe sin.",
+        "reciprocity_rate_desc_few": "Fuair ​​lucht tacaíochta {{count}} uaireanta sa tréimhse freisin.",
+        "reciprocity_rate_desc_many": "Fuair ​​lucht tacaíochta {{count}} uaireanta sa tréimhse freisin.",
+        "reciprocity_rate_desc_one": "Fuair ​​lucht tacaíochta {{count}} uaireanta sa tréimhse freisin.",
+        "reciprocity_rate_desc_other": "Fuair ​​lucht tacaíochta {{count}} uaireanta sa tréimhse freisin.",
+        "reciprocity_rate_desc_two": "Fuair ​​lucht tacaíochta {{count}} uaireanta sa tréimhse freisin.",
+        "future_care_credit_pool_desc_few": "Suim na n-iarmhéideanna ball dearfach - cúlchiste intuigthe cúram todhchaí an chomharchumainn. Bonn ball gníomhach: {{count}}.",
+        "future_care_credit_pool_desc_many": "Suim na n-iarmhéideanna ball dearfach - cúlchiste intuigthe cúram todhchaí an chomharchumainn. Bonn ball gníomhach: {{count}}.",
+        "future_care_credit_pool_desc_one": "Suim na n-iarmhéideanna ball dearfach - cúlchiste intuigthe cúram todhchaí an chomharchumainn. Bonn ball gníomhach: {{count}}.",
+        "future_care_credit_pool_desc_other": "Suim na n-iarmhéideanna ball dearfach - cúlchiste intuigthe cúram todhchaí an chomharchumainn. Bonn ball gníomhach: {{count}}.",
+        "future_care_credit_pool_desc_two": "Suim na n-iarmhéideanna ball dearfach - cúlchiste intuigthe cúram todhchaí an chomharchumainn. Bonn ball gníomhach: {{count}}."
+      },
+      "logs_count_few": "{{count}} loga",
+      "logs_count_many": "{{count}} loga",
+      "logs_count_one": "{{count}} loga",
+      "logs_count_other": "{{count}} loga",
+      "logs_count_two": "{{count}} loga"
     },
     "cards": {
       "verified_hours": {
@@ -519,6 +564,18 @@
         "metric_2": "Léirmheasanna",
         "metric_3": "Rian iniúchta"
       }
+    }
+  },
+  "caring_workflow": {
+    "policy": {
+      "periods": {
+        "last_90_days": "90 lá seo caite"
+      }
+    }
+  },
+  "municipal_impact": {
+    "portfolio": {
+      "yoy_value": "{{sign}}{{value}}% bliain ar bhliain"
     }
   }
 }

@@ -132,5 +132,21 @@
   "page_meta": {
     "title": "Wdrożenie"
   },
-  "aria_step_progress": "Step {{step}} of {{total}}"
+  "aria_step_progress": "Step {{step}} of {{total}}",
+  "bio_char_count_few": "{{count}} znaków",
+  "bio_char_count_many": "{{count}} znaków",
+  "bio_char_count_one": "{{count}} znaków",
+  "bio_char_count_other": "{{count}} znaków",
+  "count_selected_few": "{{count}} wybrane",
+  "count_selected_many": "{{count}} wybrane",
+  "count_selected_one": "{{count}} wybrane",
+  "count_selected_other": "{{count}} wybrane",
+  "skills_to_offer_count_few": "{{count}} umiejętność(i) do zaoferowania",
+  "skills_to_offer_count_many": "{{count}} umiejętność(i) do zaoferowania",
+  "skills_to_offer_count_one": "{{count}} umiejętność(i) do zaoferowania",
+  "skills_to_offer_count_other": "{{count}} umiejętność(i) do zaoferowania",
+  "skills_needed_count_few": "{{count}} umiejętność(i) potrzebne",
+  "skills_needed_count_many": "{{count}} umiejętność(i) potrzebne",
+  "skills_needed_count_one": "{{count}} umiejętność(i) potrzebne",
+  "skills_needed_count_other": "{{count}} umiejętność(i) potrzebne"
 }

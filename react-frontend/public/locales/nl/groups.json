@@ -206,7 +206,17 @@
     "feed_empty_desc": "Wees de eerste om iets met deze groep te delen!",
     "feed_create_post": "Bericht aanmaken",
     "feed_load_more": "Laad meer",
-    "member_actions_aria": "Acties van leden"
+    "member_actions_aria": "Acties van leden",
+    "meta_description_fallback_one": "Word lid van {{name}} en verbind met {{count}} communityleden via gedeelde berichten, evenementen en discussies.",
+    "meta_description_fallback_other": "Word lid van {{name}} en verbind met {{count}} communityleden via gedeelde berichten, evenementen en discussies.",
+    "members_count_one": "{{count}} leden",
+    "members_count_other": "{{count}} leden",
+    "reply_count_one": "{{count}} reacties",
+    "reply_count_other": "{{count}} reacties",
+    "tab_subgroups_count_one": "Subgroepen ({{count}})",
+    "tab_subgroups_count_other": "Subgroepen ({{count}})",
+    "posts_count_one": "{{count}} berichten",
+    "posts_count_other": "{{count}} berichten"
   },
   "form": {
     "create_title": "Nieuwe groep aanmaken",
@@ -389,7 +399,9 @@
     "size_b": "B",
     "size_kb": "KB",
     "size_mb": "MB",
-    "size_gb": "GB"
+    "size_gb": "GB",
+    "folder_chip_one": "{{name}} ({{count}})",
+    "folder_chip_other": "{{name}} ({{count}})"
   },
   "media": {
     "filter_all": "Alle",
@@ -450,7 +462,9 @@
     "secret_placeholder": "Ondertekeningsgeheim voor payload-verificatie",
     "cancel": "Annuleren",
     "create_btn": "Webhook maken",
-    "delete_confirm": "Deze webhook verwijderen? Dit kan niet ongedaan worden gemaakt."
+    "delete_confirm": "Deze webhook verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "failures_one": "{{count}} mislukkingen",
+    "failures_other": "{{count}} mislukkingen"
   },
   "toast": {
     "left": "Verliet de groep",
@@ -562,7 +576,11 @@
     "answer_posted_success": "Antwoord geplaatst!",
     "answer_posted_error": "Het plaatsen van het antwoord is mislukt",
     "vote_error": "Stemmen is mislukt",
-    "accept_error": "Accepteren van het antwoord is mislukt"
+    "accept_error": "Accepteren van het antwoord is mislukt",
+    "answer_count_aria_one": "{{count}} antwoorden",
+    "answer_count_aria_other": "{{count}} antwoorden",
+    "answers_heading_one": "{{count}} antwoord(en)",
+    "answers_heading_other": "{{count}} antwoord(en)"
   },
   "wiki": {
     "load_failed": "Wikipagina's konden niet worden geladen",
@@ -719,5 +737,11 @@
     "accent_color": "Accentkleur",
     "hue": "Tint",
     "preview": "Voorbeeld"
-  }
+  },
+  "members_one": "{{count}} leden",
+  "members_other": "{{count}} leden",
+  "members_count_label_one": "{{count}} leden",
+  "members_count_label_other": "{{count}} leden",
+  "posts_count_label_one": "{{count}} berichten",
+  "posts_count_label_other": "{{count}} berichten"
 }

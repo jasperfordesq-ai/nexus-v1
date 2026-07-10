@@ -1343,7 +1343,13 @@
     "resync_stripe": "Volver a sincronizar con Stripe",
     "sync_to_stripe": "Sincronizar con Stripe",
     "sync_stripe": "Sincronizar con Stripe",
-    "stripe_sync_description": "Crea o actualiza el producto Stripe y los precios para este plan. Requiere STRIPE_SECRET_KEY."
+    "stripe_sync_description": "Crea o actualiza el producto Stripe y los precios para este plan. Requiere STRIPE_SECRET_KEY.",
+    "active_tenants_cannot_delete_many": "{{count}}inquilino(s) activo(s): no se puede eliminar",
+    "active_tenants_cannot_delete_one": "{{count}}inquilino(s) activo(s): no se puede eliminar",
+    "active_tenants_cannot_delete_other": "{{count}}inquilino(s) activo(s): no se puede eliminar",
+    "filter_all_many": "Todos ({{count}})",
+    "filter_all_one": "Todos ({{count}})",
+    "filter_all_other": "Todos ({{count}})"
   },
   "data_table": {
     "admin_data_table": "Datos",

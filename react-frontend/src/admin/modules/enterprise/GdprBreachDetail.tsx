@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Chip, Button, Spinner, Textarea, Progress } from '@/components/ui';
 import {
   useEffect,
@@ -274,13 +275,13 @@ export function GdprBreachDetail() {
                 <div>
                   <p className="text-sm text-muted">{t('enterprise.gdpr_detected')}</p>
                   <p className="font-medium text-sm">
-                    {breach.detected_at ? new Date(breach.detected_at).toLocaleString() : 'N/A'}
+                    {breach.detected_at ? new Date(breach.detected_at).toLocaleString(getFormattingLocale()) : 'N/A'}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm text-muted">{t('enterprise.gdpr_occurred')}</p>
                   <p className="font-medium text-sm">
-                    {breach.occurred_at ? new Date(breach.occurred_at).toLocaleString() : 'N/A'}
+                    {breach.occurred_at ? new Date(breach.occurred_at).toLocaleString(getFormattingLocale()) : 'N/A'}
                   </p>
                 </div>
               </div>
@@ -371,7 +372,7 @@ export function GdprBreachDetail() {
                         </div>
                         {completed && (
                           <p className="text-xs text-muted mt-0.5 ml-6">
-                            {new Date(dateValue!).toLocaleString()}
+                            {new Date(dateValue!).toLocaleString(getFormattingLocale())}
                           </p>
                         )}
                       </div>
@@ -400,7 +401,7 @@ export function GdprBreachDetail() {
                   <div>
                     <p className="text-sm text-muted">{t('enterprise.gdpr_date')}</p>
                     <p className="font-medium text-sm">
-                      {new Date(breach.dpa_notified_at).toLocaleString()}
+                      {new Date(breach.dpa_notified_at).toLocaleString(getFormattingLocale())}
                     </p>
                   </div>
                   {breach.authority_reference && (
@@ -427,6 +428,7 @@ export function GdprBreachDetail() {
                           color={isOverdue ? 'danger' : hoursRemaining < 24 ? 'warning' : 'success'}
                           size="sm"
                           className="mt-3"
+                          aria-label={t('enterprise.gdpr_dpa_deadline')}
                         />
                       </CardBody>
                     </Card>

@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Select, SelectItem, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -139,8 +140,8 @@ function toPayload(form: FormState): Record<string, unknown> {
 }
 
 const formatDelta = (s: SuccessStory): string => {
-  const before = s.before_value === null ? '—' : s.before_value.toLocaleString();
-  const after = s.after_value === null ? '—' : s.after_value.toLocaleString();
+  const before = s.before_value === null ? '—' : s.before_value.toLocaleString(getFormattingLocale());
+  const after = s.after_value === null ? '—' : s.after_value.toLocaleString(getFormattingLocale());
   const unit = s.unit ? ` ${s.unit}` : '';
   return `${before}${unit} → ${after}${unit}`;
 };

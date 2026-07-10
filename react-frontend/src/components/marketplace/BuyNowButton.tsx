@@ -7,6 +7,7 @@
  * BuyNowButton — Creates a marketplace order and starts Stripe payment.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { lazy, Suspense, useState, useCallback, useEffect, useMemo } from 'react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import { useTranslation } from 'react-i18next';
@@ -239,7 +240,7 @@ export function BuyNowButton({
 
   const formatSlotLabel = (s: PickupSlotOption) => {
     try {
-      return s.slot_start ? new Date(s.slot_start).toLocaleString() : t('pickup.slot_fallback', { id: s.id });
+      return s.slot_start ? new Date(s.slot_start).toLocaleString(getFormattingLocale()) : t('pickup.slot_fallback', { id: s.id });
     } catch {
       return t('pickup.slot_fallback', { id: s.id });
     }

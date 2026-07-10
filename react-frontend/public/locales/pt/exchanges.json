@@ -109,7 +109,10 @@
     "ratings": "Avaliações",
     "rate_exchange": "Avaliar Esta Troca",
     "prep_time_value": "{{count}}h",
-    "rating_value": "Avaliação: {{rating}} de 5"
+    "rating_value": "Avaliação: {{rating}} de 5",
+    "prep_time_value_many": "{{count}}h",
+    "prep_time_value_one": "{{count}}h",
+    "prep_time_value_other": "{{count}}h"
   },
   "modal": {
     "decline_title": "Recusar Pedido de Troca",
@@ -174,5 +177,7 @@
     "detail": {
       "title": "Detalhes da Troca"
     }
-  }
+  },
+  "hours_count_many": "{{count}} hora",
+  "hours_count_one": "{{count}} hora"
 }

@@ -93,15 +93,13 @@ export function ForgotPasswordPage() {
               >
                 {t('forgot_password.try_again')}
               </Button>
-              <Link to={tenantPath('/login')}>
-                <Button
-                  variant="flat"
-                  className="w-full bg-theme-elevated text-theme-primary"
-                  startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('forgot_password.back_to_login')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath('/login')}
+                variant="flat"
+                className="w-full bg-theme-elevated text-theme-primary"
+                startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('forgot_password.back_to_login')}
+              </Button>
             </div>
           </GlassCard>
         </motion.div>
@@ -164,7 +162,7 @@ export function ForgotPasswordPage() {
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               isLoading={isLoading}
               isDisabled={!email.trim()}
             >
@@ -175,7 +173,7 @@ export function ForgotPasswordPage() {
           {/* Footer */}
           <div className="mt-6 text-center text-sm text-theme-subtle">
             {t('forgot_password.remember_password')}{' '}
-            <Link to={tenantPath('/login')} className="text-indigo-600 dark:text-indigo-400 hover:underline">
+            <Link to={tenantPath('/login')} className="text-accent dark:text-accent hover:underline">
               {t('forgot_password.sign_in_link')}
             </Link>
           </div>

@@ -1,5 +1,6 @@
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import { OverlayActionButton } from '@/components/ui/OverlayActionButton';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -182,7 +183,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
     return (
       <GlassCard className="p-3">
         <div className="flex items-center gap-2 mb-3">
-          <Users className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+          <Users className="w-4 h-4 text-accent" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
             {t('suggestions.title')}
           </h3>
@@ -194,16 +195,15 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
               className="flex-shrink-0 w-36 bg-[var(--surface-elevated)] border border-[var(--border-default)]"
             >
               <CardBody className="p-3 text-center space-y-2">
-                <Button
-                  isIconOnly
-                  size="sm"
-                  variant="light"
-                  className="absolute top-1 right-1 w-5 h-5 min-w-0 text-[var(--text-subtle)]"
+                <OverlayActionButton
+                  revealOnFinePointer={false}
+                  variant="ghost"
+                  className="absolute -top-1 -right-1 rounded-full text-[var(--text-subtle)]"
                   onPress={() => handleDismiss(suggestion.id)}
                   aria-label={t('suggestions.dismiss')}
                 >
-                  <X className="w-3 h-3" />
-                </Button>
+                  <X className="size-4" aria-hidden="true" />
+                </OverlayActionButton>
                 <Link to={tenantPath(`/profile/${suggestion.id}`)}>
                   <Avatar
                     name={suggestion.name}
@@ -236,7 +236,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
                   <Button
                     size="sm"
                     variant="flat"
-                    className="w-full text-[10px] bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20"
+                    className="w-full text-[10px] bg-accent/10 text-accent hover:bg-accent/20"
                     startContent={<UserPlus className="w-3 h-3" />}
                     onPress={() => handleConnect(suggestion)}
                     isLoading={connectingIds.has(suggestion.id)}
@@ -257,14 +257,14 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
     <GlassCard className="p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Users className="w-4 h-4 text-indigo-500" aria-hidden="true" />
+          <Users className="w-4 h-4 text-accent" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
             {t('suggestions.title')}
           </h3>
         </div>
         <Link
           to={tenantPath('/members')}
-          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors"
+          className="text-xs text-accent hover:text-accent transition-colors"
         >
           {t('suggestions.see_all')}
         </Link>
@@ -276,16 +276,14 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
             key={suggestion.id}
             className="flex items-center gap-3 p-2 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors duration-200 relative group"
           >
-            <Button
-              isIconOnly
-              size="sm"
-              variant="light"
-              className="absolute top-1 right-1 w-5 h-5 min-w-0 text-[var(--text-subtle)] opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity duration-150"
+            <OverlayActionButton
+              variant="ghost"
+              className="absolute -top-1 -right-1 rounded-full text-[var(--text-subtle)] transition-opacity duration-150"
               onPress={() => handleDismiss(suggestion.id)}
               aria-label={t('suggestions.dismiss')}
             >
-              <X className="w-3 h-3" />
-            </Button>
+              <X className="size-4" aria-hidden="true" />
+            </OverlayActionButton>
 
             <Link to={tenantPath(`/profile/${suggestion.id}`)} className="flex-shrink-0">
               <Avatar
@@ -336,7 +334,7 @@ export function ConnectionSuggestionsWidget({ layout = 'sidebar' }: ConnectionSu
               <Button
                 size="sm"
                 variant="flat"
-                className="text-[10px] bg-indigo-500/10 text-indigo-600 hover:bg-indigo-500/20 flex-shrink-0"
+                className="text-[10px] bg-accent/10 text-accent hover:bg-accent/20 flex-shrink-0"
                 startContent={<UserPlus className="w-3 h-3" />}
                 onPress={() => handleConnect(suggestion)}
                 isLoading={connectingIds.has(suggestion.id)}

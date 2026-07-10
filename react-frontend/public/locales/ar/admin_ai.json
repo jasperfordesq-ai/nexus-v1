@@ -104,7 +104,13 @@
       "stats": {
         "total_runs": "إجمالي أشواط",
         "total_proposals": "مجموع المقترحات",
-        "pending_review": "{{count}} في انتظار المراجعة"
+        "pending_review": "{{count}} في انتظار المراجعة",
+        "pending_review_few": "{{count}} في انتظار المراجعة",
+        "pending_review_many": "{{count}} في انتظار المراجعة",
+        "pending_review_one": "{{count}} في انتظار المراجعة",
+        "pending_review_other": "{{count}} في انتظار المراجعة",
+        "pending_review_two": "{{count}} في انتظار المراجعة",
+        "pending_review_zero": "{{count}} في انتظار المراجعة"
       },
       "agent_types": {
         "activity_summary": "ملخص النشاط",
@@ -219,7 +225,13 @@
         "proposals_table_aria": "تشغيل المقترحات",
         "columns": {
           "subject": "موضوع"
-        }
+        },
+        "proposals_count_few": "المقترحات ({{count}})",
+        "proposals_count_many": "المقترحات ({{count}})",
+        "proposals_count_one": "المقترحات ({{count}})",
+        "proposals_count_other": "المقترحات ({{count}})",
+        "proposals_count_two": "المقترحات ({{count}})",
+        "proposals_count_zero": "المقترحات ({{count}})"
       },
       "toasts": {
         "approve_eligible_failed": "فشل في الموافقة على المقترحات المؤهلة.",
@@ -235,7 +247,13 @@
         "run_details_load_failed": "فشل تحميل تفاصيل التشغيل.",
         "run_trigger_failed": "فشل في تشغيل التشغيل.",
         "run_triggered": "تم تشغيل التشغيل: تم إنشاء مقترحات {{count}}.",
-        "runs_load_failed": "فشل في تحميل عمليات التشغيل."
+        "runs_load_failed": "فشل في تحميل عمليات التشغيل.",
+        "run_triggered_few": "تم تشغيل التشغيل: تم إنشاء مقترحات {{count}}.",
+        "run_triggered_many": "تم تشغيل التشغيل: تم إنشاء مقترحات {{count}}.",
+        "run_triggered_one": "تم تشغيل التشغيل: تم إنشاء مقترحات {{count}}.",
+        "run_triggered_other": "تم تشغيل التشغيل: تم إنشاء مقترحات {{count}}.",
+        "run_triggered_two": "تم تشغيل التشغيل: تم إنشاء مقترحات {{count}}.",
+        "run_triggered_zero": "تم تشغيل التشغيل: تم إنشاء مقترحات {{count}}."
       }
     },
     "module_docs": {
@@ -302,7 +320,13 @@
         "save_failed": "فشل الحفظ.",
         "seed_failed": "فشلت البذور.",
         "seeded": "المستند (المستندات) الافتراضي {{count}} المصنف.",
-        "updated": "تم تحديث المستند."
+        "updated": "تم تحديث المستند.",
+        "seeded_few": "المستند (المستندات) الافتراضي {{count}} المصنف.",
+        "seeded_many": "المستند (المستندات) الافتراضي {{count}} المصنف.",
+        "seeded_one": "المستند (المستندات) الافتراضي {{count}} المصنف.",
+        "seeded_other": "المستند (المستندات) الافتراضي {{count}} المصنف.",
+        "seeded_two": "المستند (المستندات) الافتراضي {{count}} المصنف.",
+        "seeded_zero": "المستند (المستندات) الافتراضي {{count}} المصنف."
       }
     },
     "trace_metrics": {

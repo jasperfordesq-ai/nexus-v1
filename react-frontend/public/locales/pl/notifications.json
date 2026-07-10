@@ -31,7 +31,11 @@
     "empty": "Brak powiadomień jak na razie",
     "view_all": "Zobacz wszystkie powiadomienia",
     "close": "Zamknij powiadomienia",
-    "unread_dot_aria": "Unread"
+    "unread_dot_aria": "Unread",
+    "bell_unread_aria_few": "Powiadomienia, {{count}} nieprzeczytane",
+    "bell_unread_aria_many": "Powiadomienia, {{count}} nieprzeczytane",
+    "bell_unread_aria_one": "Powiadomienia, {{count}} nieprzeczytane",
+    "bell_unread_aria_other": "Powiadomienia, {{count}} nieprzeczytane"
   },
   "type": {
     "message": "Message",
@@ -96,5 +100,17 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "unread_badge_few": "{{count}} nowe",
+  "unread_badge_many": "{{count}} nowe",
+  "unread_badge_one": "{{count}} nowe",
+  "unread_badge_other": "{{count}} nowe",
+  "filter_unread_few": "Nieprzeczytane ({{count}})",
+  "filter_unread_many": "Nieprzeczytane ({{count}})",
+  "filter_unread_one": "Nieprzeczytane ({{count}})",
+  "filter_unread_other": "Nieprzeczytane ({{count}})",
+  "and_others_few": "i {{count}} innych",
+  "and_others_many": "i {{count}} innych",
+  "and_others_one": "i {{count}} innych",
+  "and_others_other": "i {{count}} innych"
 }

@@ -250,7 +250,17 @@
     "moderation_page_title": "Wachtrij voor taakmoderatie",
     "moderation_page_description": "Controleer en keur vacatures goed voordat ze live gaan",
     "templates_empty_description": "Maak uw eerste sjabloon om tijd te besparen bij toekomstige vacatures.",
-    "templates_empty_title": "Nog geen sjablonen"
+    "templates_empty_title": "Nog geen sjablonen",
+    "jobs_count_one": "{{count}}-banen",
+    "jobs_count_other": "{{count}}-banen",
+    "application_count_one_one": "{{count}}-applicatie",
+    "application_count_one_other": "{{count}}-applicatie",
+    "application_count_other_one": "{{count}}-applicaties",
+    "application_count_other_other": "{{count}}-applicaties",
+    "stat_pending_offers_one": "{{count}}lopende aanbiedingen",
+    "stat_pending_offers_other": "{{count}}lopende aanbiedingen",
+    "pipeline_minutes_one": "{{count}}min",
+    "pipeline_minutes_other": "{{count}}min"
   },
   "moderation": {
     "action_failed": "Mislukt",
@@ -478,5 +488,10 @@
     "blocked_count": "Geblokkeerd",
     "flagged_count": "Gemarkeerd",
     "total_analyzed": "Totaal geanalyseerd"
+  },
+  "premium": {
+    "status": {
+      "unknown": "Onbekend"
+    }
   }
 }

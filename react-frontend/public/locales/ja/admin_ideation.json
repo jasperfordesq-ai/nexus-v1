@@ -132,6 +132,7 @@
     "no_challenges_found": "チャレンジが見つかりませんでした",
     "no_matching_challenges": "一致するチャレンジが見つかりませんでした",
     "no_status_challenges": "ステータスチャレンジが見つかりませんでした",
-    "tabs_aria": "チャレンジステータスフィルター"
+    "tabs_aria": "チャレンジステータスフィルター",
+    "total_count_other": "合計: {{count}}"
   }
 }

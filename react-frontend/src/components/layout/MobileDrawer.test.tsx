@@ -48,12 +48,32 @@ vi.mock('@/contexts', () => ({
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: (...args: unknown[]) => mockUseAuth(...args),
+}));
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
+}));
+vi.mock('@/contexts/NotificationsContext', () => ({
+  useNotificationsOptional: (...args: unknown[]) => mockUseNotifications(...args),
+}));
+vi.mock('@/contexts/CookieConsentContext', () => ({
+  useCookieConsent: () => ({ resetConsent: vi.fn() }),
+}));
+vi.mock('@/contexts/MenuContextCore', () => ({
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+}));
+vi.mock('@/contexts/ThemeContext', () => ({
+  useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn(), accentColor: '#3b82f6', setAccentColor: vi.fn() }),
+}));
+
 const i18nMap: Record<string, string> = {
   'nav.home': 'Home', 'nav.dashboard': 'Dashboard', 'nav.feed': 'Feed',
   'nav.listings': 'Listings', 'nav.messages': 'Messages', 'nav.groups': 'Groups',
   'nav.events': 'Events', 'nav.connections': 'Connections', 'nav.exchanges': 'Exchanges',
   'nav.wallet': 'Wallet', 'nav.volunteering': 'Volunteering', 'nav.blog': 'Blog',
   'nav.resources': 'Resources', 'nav.members': 'Members', 'nav.about': 'About',
+  'nav.caring_community': 'Caring Community', 'nav.premium': 'Premium',
   'nav.achievements': 'Achievements', 'nav.leaderboard': 'Leaderboard', 'nav.goals': 'Goals',
   'nav.ai_chat': 'AI Chat', 'nav.our_impact': 'Our Impact',
   'nav.timebanking_guide': 'Timebanking Guide', 'nav.faq': 'FAQ',
@@ -63,6 +83,10 @@ const i18nMap: Record<string, string> = {
   'nav.group_exchanges': 'Group Exchanges',
   'nav.accessibility_alpha': 'Accessibility (alpha)',
   'nav.federation_hub': 'Federation Hub', 'nav.federated_members': 'Federated Members',
+  'nav.federation_hub_short': 'Hub', 'nav.federation_partners_short': 'Communities',
+  'nav.federation_members_short': 'Members', 'nav.federation_messages_short': 'Messages',
+  'nav.federation_listings_short': 'Listings', 'nav.federation_events_short': 'Events',
+  'nav.federation_settings_short': 'Settings',
   'nav.federated_listings': 'Federated Listings', 'nav.federated_messages': 'Federated Messages',
   'nav.federated_events': 'Federated Events',
   'auth.log_in': 'Log In', 'auth.sign_up': 'Sign Up',
@@ -125,6 +149,16 @@ vi.mock('@/components/LanguageSwitcher', () => ({
   LanguageSwitcher: () => null,
 }));
 
+vi.mock('@/components/pwa/InstallAppButton', () => ({
+  InstallAppButton: ({ children }: {
+    children: (args: { onClick: () => void; label: string; sublabel: string }) => React.ReactNode;
+  }) => children({
+    onClick: vi.fn(),
+    label: 'Install app',
+    sublabel: 'Faster access, works offline',
+  }),
+}));
+
 vi.mock('@/components/navigation', () => ({
   DesktopMenuItems: () => null,
   MobileMenuItems: () => null,
@@ -136,9 +170,12 @@ vi.mock('@/components/feedback/ReportProblemButton', () => ({
   ),
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock('@/lib/helpers', async (importOriginal) => ({
+  ...await importOriginal<typeof import('@/lib/helpers')>(),
   resolveAvatarUrl: (url: string | undefined) => url || '/default-avatar.png',
   resolveAssetUrl: (url: string | null | undefined) => url ?? null,
+  resolveBrandingImageUrl: (url: string | null | undefined) => url ?? null,
+  resolveThumbnailUrl: (url: string | null | undefined) => url ?? null,
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
 }));
 
@@ -226,6 +263,13 @@ describe('MobileDrawer', () => {
       render(<MobileDrawer {...defaultProps} />);
       expect(screen.getByLabelText('Open search')).toBeInTheDocument();
     });
+
+    it('uses readable semantic text colors for the install affordance', () => {
+      render(<MobileDrawer {...defaultProps} />);
+
+      expect(screen.getByRole('button', { name: /Install app/i })).toHaveClass('text-theme-primary');
+      expect(screen.getByText('Faster access, works offline')).toHaveClass('text-theme-secondary');
+    });
   });
 
   describe('Navigation links', () => {
@@ -272,7 +316,7 @@ describe('MobileDrawer', () => {
       });
       render(<MobileDrawer {...defaultProps} />);
       const link = screen.getByRole('link', { name: 'Open Accessibility (alpha) in a new tab' });
-      expect(link).toHaveAttribute('href', 'https://accessible.project-nexus.ie/hour-timebank/alpha');
+      expect(link).toHaveAttribute('href', 'https://accessible.project-nexus.ie/hour-timebank/accessible');
       expect(link).toHaveAttribute('target', '_blank');
       expect(link).toHaveAttribute('rel', 'noopener noreferrer');
       expect(screen.getByText('Accessibility (alpha)')).toBeInTheDocument();
@@ -518,6 +562,32 @@ describe('MobileDrawer', () => {
 
       expect(screen.getByText('Volunteering')).toBeInTheDocument();
       expect(screen.getByText('Organisations')).toBeInTheDocument();
+    });
+
+    it('renders Caring Community, Premium, and federation partners from the shared registry', () => {
+      setupDefaultMocks({
+        auth: {
+          user: { id: 1, first_name: 'A', last_name: 'B', email: 'a@b.com' },
+          isAuthenticated: true,
+          logout: vi.fn(),
+        },
+        tenant: {
+          hasFeature: vi.fn((feature: string) => [
+            'caring_community',
+            'member_premium',
+            'federation',
+          ].includes(feature)),
+          hasModule: vi.fn(() => false),
+        },
+      });
+
+      render(<MobileDrawer {...defaultProps} />);
+      expandSection(/^community$/i);
+      expect(screen.getByText('Caring Community')).toBeInTheDocument();
+      expect(screen.getByText('Premium')).toBeInTheDocument();
+
+      expandSection(/^partner communities$/i);
+      expect(screen.getByText('Communities')).toBeInTheDocument();
     });
 
     it('shows Explore section when gamification feature is enabled', () => {

@@ -11,6 +11,7 @@
  * Backend: GET /v2/admin/search/{analytics,trending,zero-results}
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -62,7 +63,7 @@ const PERIOD_OPTIONS = [7, 14, 30, 60, 90] as const;
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
   if (Number.isNaN(d.getTime())) return dateStr;
-  return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  return d.toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 export function SearchAnalytics() {
@@ -167,13 +168,13 @@ export function SearchAnalytics() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <StatCard
               label={t('search_analytics.total_searches')}
-              value={summary.total_searches.toLocaleString()}
+              value={summary.total_searches.toLocaleString(getFormattingLocale())}
               icon={SearchIcon}
               color="primary"
             />
             <StatCard
               label={t('search_analytics.unique_queries')}
-              value={summary.unique_queries.toLocaleString()}
+              value={summary.unique_queries.toLocaleString(getFormattingLocale())}
               icon={Hash}
               color="secondary"
             />
@@ -185,7 +186,7 @@ export function SearchAnalytics() {
             />
             <StatCard
               label={t('search_analytics.avg_results')}
-              value={summary.avg_results.toLocaleString()}
+              value={summary.avg_results.toLocaleString(getFormattingLocale())}
               icon={BarChart3}
               color="default"
             />
@@ -250,7 +251,7 @@ export function SearchAnalytics() {
                 <div className="flex flex-wrap gap-2">
                   {summary.searches_by_type.map((entry) => (
                     <Chip key={entry.type ?? 'unknown'} size="md" variant="soft" color="primary">
-                      {(entry.type || t('common.unknown'))}: {entry.count.toLocaleString()}
+                      {(entry.type || t('common.unknown'))}: {entry.count.toLocaleString(getFormattingLocale())}
                     </Chip>
                   ))}
                 </div>

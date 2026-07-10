@@ -18,6 +18,7 @@
  * (useCountUp handles reduced-motion and test mode).
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import type { ReactNode } from 'react';
 import { isValidElement } from 'react';
 import { Link } from 'react-router-dom';
@@ -71,7 +72,7 @@ const sparkClass: Record<BrokerStatColor, string> = {
 
 function AnimatedNumber({ value }: { value: number }) {
   const display = useCountUp(value);
-  return <>{display.toLocaleString()}</>;
+  return <>{display.toLocaleString(getFormattingLocale())}</>;
 }
 
 export function BrokerStatCard({

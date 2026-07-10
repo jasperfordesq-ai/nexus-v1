@@ -62,12 +62,16 @@
     "minutes_ago": "{{count}}分前",
     "hours_ago": "{{count}}時間前",
     "days_ago": "{{count}}日前",
-    "last_seen": "最後に見たのは{{time}}"
+    "last_seen": "最後に見たのは{{time}}",
+    "minutes_ago_other": "{{count}}分前",
+    "hours_ago_other": "{{count}}時間前",
+    "days_ago_other": "{{count}}日前"
   },
   "mention": {
     "suggestions_aria": "メンションの提案、{{count}}件の結果",
     "no_users": "ユーザーが見つかりませんでした",
-    "connected": "つながり済み"
+    "connected": "つながり済み",
+    "suggestions_aria_other": "メンションの提案、{{count}}件の結果"
   },
   "status": {
     "set_status": "ステータスを設定",
@@ -153,7 +157,8 @@
     "collection_description": "説明（任意）",
     "cancel": "キャンセル",
     "save": "保存",
-    "create": "作成"
+    "create": "作成",
+    "count_other": "{{count}}の保存したアイテム"
   },
   "verified": "認証済み",
   "hover_card": {
@@ -163,7 +168,10 @@
     "message": "メッセージ",
     "hours_given": "{{count}}時間提供",
     "connections": "{{count}}件のつながり",
-    "listings": "{{count}}件のリスト"
+    "listings": "{{count}}件のリスト",
+    "hours_given_other": "{{count}}時間提供",
+    "connections_other": "{{count}}件のつながり",
+    "listings_other": "{{count}}件のリスト"
   },
   "reactions_tabs_aria": "反応型フィルター",
   "content_type_tabs_aria": "ブックマークコンテンツタイプフィルター",

@@ -112,16 +112,12 @@ export function TemplateGalleryModal({ isOpen, onClose, templates, onSelect }: T
                       ) : isMjml(tpl.content) ? (
                         <LayoutTemplate size={40} className="text-muted" aria-hidden="true" />
                       ) : (
-                        <div
-                          className="pointer-events-none absolute left-0 top-0 origin-top-left"
-                          style={{ width: 600, transform: 'scale(0.52)' }}
-                        >
+                        <div className="pointer-events-none absolute left-0 top-0 w-[600px] origin-top-left scale-[0.52]">
                           <iframe
                             title={t('newsletter_content_editor.gallery_preview_alt')}
                             srcDoc={tpl.content || ''}
                             sandbox=""
-                            className="block bg-white"
-                            style={{ width: 600, height: 700, border: 'none' }}
+                            className="block h-[700px] w-[600px] border-0 bg-white"
                             tabIndex={-1}
                             aria-hidden="true"
                           />

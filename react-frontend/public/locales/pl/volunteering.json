@@ -34,7 +34,15 @@
     "tab_hours_review": "Przegląd godzin",
     "tab_volunteers": "Wolontariusze",
     "tab_wallet": "Portfel",
-    "tab_settings": "Ustawienia"
+    "tab_settings": "Ustawienia",
+    "review_applications_few": "Przejrzyj aplikacje {{count}}",
+    "review_applications_many": "Przejrzyj aplikacje {{count}}",
+    "review_applications_one": "Przejrzyj aplikacje {{count}}",
+    "review_applications_other": "Przejrzyj aplikacje {{count}}",
+    "review_hours_few": "Przejrzyj godziny {{count}}",
+    "review_hours_many": "Przejrzyj godziny {{count}}",
+    "review_hours_one": "Przejrzyj godziny {{count}}",
+    "review_hours_other": "Przejrzyj godziny {{count}}"
   },
   "page_title": "Zgłaszanie się na ochotnika",
   "heading": "Zgłaszanie się na ochotnika",
@@ -346,7 +354,19 @@
       "cancelled": "Odwołany"
     },
     "support_aria": "Wesprzyj ten projekt ({{count}} wspierających)",
-    "unsupport_aria": "Wycofaj wsparcie ({{count}} wspierających)"
+    "unsupport_aria": "Wycofaj wsparcie ({{count}} wspierających)",
+    "volunteers_needed_few": "Potrzebny {{count}}",
+    "volunteers_needed_many": "Potrzebny {{count}}",
+    "volunteers_needed_one": "Potrzebny {{count}}",
+    "volunteers_needed_other": "Potrzebny {{count}}",
+    "unsupport_aria_few": "Wycofaj wsparcie ({{count}} wspierających)",
+    "unsupport_aria_many": "Wycofaj wsparcie ({{count}} wspierających)",
+    "unsupport_aria_one": "Wycofaj wsparcie ({{count}} wspierających)",
+    "unsupport_aria_other": "Wycofaj wsparcie ({{count}} wspierających)",
+    "support_aria_few": "Wesprzyj ten projekt ({{count}} wspierających)",
+    "support_aria_many": "Wesprzyj ten projekt ({{count}} wspierających)",
+    "support_aria_one": "Wesprzyj ten projekt ({{count}} wspierających)",
+    "support_aria_other": "Wesprzyj ten projekt ({{count}} wspierających)"
   },
   "donations": {
     "heading": "Darowizny",
@@ -453,7 +473,11 @@
     "receipt_method": "Metoda płatności",
     "receipt_message": "Wiadomość",
     "receipt_error": "Nie udało się załadować potwierdzenia.",
-    "receipt_not_found": "Nie znaleziono rachunku."
+    "receipt_not_found": "Nie znaleziono rachunku.",
+    "donors_count_few": "Darczyńcy {{count}}",
+    "donors_count_many": "Darczyńcy {{count}}",
+    "donors_count_one": "Darczyńcy {{count}}",
+    "donors_count_other": "Darczyńcy {{count}}"
   },
   "safeguarding": {
     "heading": "Ochrona",
@@ -592,7 +616,11 @@
     "cancel": "Anulować",
     "upload_credential": "Prześlij dane uwierzytelniające",
     "aria_remove_file": "Usuń wybrany plik",
-    "aria_upload_document": "Prześlij dokument uwierzytelniający"
+    "aria_upload_document": "Prześlij dokument uwierzytelniający",
+    "expiring_soon_desc_few": "Dane uwierzytelniające {{count}} wygasną w ciągu 30 dni.",
+    "expiring_soon_desc_many": "Dane uwierzytelniające {{count}} wygasną w ciągu 30 dni.",
+    "expiring_soon_desc_one": "Dane uwierzytelniające {{count}} wygasną w ciągu 30 dni.",
+    "expiring_soon_desc_other": "Dane uwierzytelniające {{count}} wygasną w ciągu 30 dni."
   },
   "waitlist": {
     "heading": "Moje listy oczekujących",
@@ -612,7 +640,11 @@
     "claim": "Zgłoś miejsce",
     "claim_success": "Jesteś gotowy — zapisałeś się na zmianę!",
     "claim_failed": "Nie udało się zająć tego miejsca",
-    "claim_hint": "Otworzyło się dla Ciebie miejsce. Odbierz go szybko – nieodebrane miejsca przechodzą na następną osobę po 48 godzinach."
+    "claim_hint": "Otworzyło się dla Ciebie miejsce. Odbierz go szybko – nieodebrane miejsca przechodzą na następną osobę po 48 godzinach.",
+    "spots_few": "Miejsca {{count}}",
+    "spots_many": "Miejsca {{count}}",
+    "spots_one": "Miejsca {{count}}",
+    "spots_other": "Miejsca {{count}}"
   },
   "swaps": {
     "heading": "Zamiana zmian",
@@ -751,7 +783,19 @@
     "select_limit": "Możesz wybrać maksymalnie {{max}} zgłoszeń naraz.",
     "bulk_success": "Zaktualizowano zgłoszenia: {{count}}.",
     "bulk_failed": "Nie udało się zaktualizować zgłoszeń: {{count}}.",
-    "bulk_rate_limited": "Nie udało się zaktualizować {{count}} — działasz za szybko. Odczekaj minutę i spróbuj ponownie."
+    "bulk_rate_limited": "Nie udało się zaktualizować {{count}} — działasz za szybko. Odczekaj minutę i spróbuj ponownie.",
+    "pending_count_few": "{{count}} w oczekiwaniu",
+    "pending_count_many": "{{count}} w oczekiwaniu",
+    "pending_count_one": "{{count}} w oczekiwaniu",
+    "pending_count_other": "{{count}} w oczekiwaniu",
+    "selected_count_few": "Wybrano {{count}}",
+    "selected_count_many": "Wybrano {{count}}",
+    "selected_count_one": "Wybrano {{count}}",
+    "selected_count_other": "Wybrano {{count}}",
+    "decline_modal_description_few": "Przed odrzuceniem dodaj notatkę dotyczącą aplikacji {{count}}.",
+    "decline_modal_description_many": "Przed odrzuceniem dodaj notatkę dotyczącą aplikacji {{count}}.",
+    "decline_modal_description_one": "Przed odrzuceniem dodaj notatkę dotyczącą aplikacji {{count}}.",
+    "decline_modal_description_other": "Przed odrzuceniem dodaj notatkę dotyczącą aplikacji {{count}}."
   },
   "org_wallet_balance": "Saldo portfela:",
   "auto_pay_on": "Płatność automatyczna WŁĄCZONA",
@@ -845,7 +889,11 @@
     "organization_hours": "{{name}} ({{hours}}h)",
     "generated_on": "Wygenerowano",
     "download": "Pobierać",
-    "verify": "Zweryfikować"
+    "verify": "Zweryfikować",
+    "verified_hours_few": "{{count}} zweryfikowane godziny",
+    "verified_hours_many": "{{count}} zweryfikowane godziny",
+    "verified_hours_one": "{{count}} zweryfikowane godziny",
+    "verified_hours_other": "{{count}} zweryfikowane godziny"
   },
   "emergency": {
     "title": "Alerty awaryjne",
@@ -866,7 +914,11 @@
     "respond_error": "Nie udało się odpowiedzieć na alert.",
     "respond_error_generic": "Nie udało się odpowiedzieć na alert. Spróbuj ponownie.",
     "from": "Z",
-    "expires": "Wygasa"
+    "expires": "Wygasa",
+    "pending_count_few": "{{count}} w oczekiwaniu",
+    "pending_count_many": "{{count}} w oczekiwaniu",
+    "pending_count_one": "{{count}} w oczekiwaniu",
+    "pending_count_other": "{{count}} w oczekiwaniu"
   },
   "wellbeing": {
     "heading": "Dobre samopoczucie wolontariuszy",
@@ -1039,5 +1091,13 @@
   "form_remote_description": "Wolontariusze mogą brać udział online lub telefonicznie.",
   "my_organisations_declined": "Odrzucono",
   "my_organisations_declined_desc": "Ten wniosek nie został zatwierdzony. Skontaktuj się z administratorem swojej społeczności, aby uzyskać szczegóły.",
-  "hours_invalid_range": "Wprowadź od 0,25 do 24 godzin."
+  "hours_invalid_range": "Wprowadź od 0,25 do 24 godzin.",
+  "org_callout_you_manage_many_few": "Zarządzasz organizacjami {{count}}",
+  "org_callout_you_manage_many_many": "Zarządzasz organizacjami {{count}}",
+  "org_callout_you_manage_many_one": "Zarządzasz organizacjami {{count}}",
+  "org_callout_you_manage_many_other": "Zarządzasz organizacjami {{count}}",
+  "more_sections_few": "More ({{count}})",
+  "more_sections_many": "More ({{count}})",
+  "more_sections_one": "Więcej ({{count}})",
+  "more_sections_other": "Więcej ({{count}})"
 }

@@ -51,7 +51,7 @@ const outcomeStats = [
   {
     value: '95%',
     icon: Users,
-    color: 'from-blue-500 to-indigo-500',
+    color: 'from-blue-500 to-accent-gradient-end',
     bgAccent: 'bg-blue-500/10',
     textAccent: 'text-blue-600 dark:text-blue-400',
   },
@@ -68,7 +68,7 @@ const referralSteps = [
   {
     key: 'referral',
     icon: ClipboardList,
-    color: 'from-blue-500 to-indigo-500',
+    color: 'from-blue-500 to-accent-gradient-end',
     bgAccent: 'bg-blue-500/10',
     textAccent: 'text-blue-600 dark:text-blue-400',
   },
@@ -82,9 +82,9 @@ const referralSteps = [
   {
     key: 'connect',
     icon: Link2,
-    color: 'from-purple-500 to-pink-500',
-    bgAccent: 'bg-purple-500/10',
-    textAccent: 'text-purple-600 dark:text-purple-400',
+    color: 'from-accent to-pink-500',
+    bgAccent: 'bg-accent/10',
+    textAccent: 'text-accent dark:text-accent',
   },
   {
     key: 'attend',
@@ -219,8 +219,8 @@ export function SocialPrescribingPage() {
           >
             <GlassCard className="p-6 sm:p-8">
               <div className="flex items-start gap-4 mb-4">
-                <div className="flex-shrink-0 p-3 rounded-xl bg-indigo-500/15">
-                  <ShieldCheck className="w-6 h-6 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                <div className="flex-shrink-0 p-3 rounded-xl bg-accent/15">
+                  <ShieldCheck className="w-6 h-6 text-accent dark:text-accent" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold text-theme-primary pt-2">
                   {t('social_prescribing.strategic_fit_heading')}
@@ -346,7 +346,7 @@ export function SocialPrescribingPage() {
               {/* Background gradient */}
               <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-blue-500 to-indigo-500 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-blue-500 to-accent-gradient-end rounded-full blur-3xl" />
               </div>
 
               <div className="relative z-10">
@@ -365,26 +365,22 @@ export function SocialPrescribingPage() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link to={tenantPath('/contact')}>
-                    <Button
-                      size="lg"
-                      className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold px-8"
-                      endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
-                    >
-                      {t('social_prescribing.cta_contact')}
-                    </Button>
-                  </Link>
+                  <Button as={Link} to={tenantPath('/contact')}
+                    size="lg"
+                    className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold px-8"
+                    endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
+                  >
+                    {t('social_prescribing.cta_contact')}
+                  </Button>
 
-                  <Link to={tenantPath('/partner')}>
-                    <Button
-                      size="lg"
-                      variant="bordered"
-                      className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
-                      startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
-                    >
-                      {t('social_prescribing.cta_partnership')}
-                    </Button>
-                  </Link>
+                  <Button as={Link} to={tenantPath('/partner')}
+                    size="lg"
+                    variant="bordered"
+                    className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
+                    startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
+                  >
+                    {t('social_prescribing.cta_partnership')}
+                  </Button>
                 </div>
               </div>
             </GlassCard>

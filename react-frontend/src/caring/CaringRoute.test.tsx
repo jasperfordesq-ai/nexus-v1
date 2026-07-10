@@ -27,6 +27,7 @@ const {
   };
   const tenantState = {
     tenant: { id: 2, name: 'hOUR Timebank', slug: 'hour-timebank' },
+    tenantSlug: 'hour-timebank',
     tenantPath: (p: string) => `/hour-timebank${p}`,
     _hasFeature: true,
     hasFeature: (f: string) => tenantState._hasFeature,
@@ -42,6 +43,7 @@ vi.mock('@/contexts', () => ({
   // TenantContext
   useTenant: () => ({
     tenant: tenantState.tenant,
+    tenantSlug: tenantState.tenantSlug,
     tenantPath: tenantState.tenantPath,
     hasFeature: tenantState.hasFeature,
     hasModule: tenantState.hasModule,
@@ -167,6 +169,16 @@ describe('CaringRoute', () => {
     render(<CaringRoute />);
     // fullAccess=true → second feature check skipped → Outlet renders
     expect(screen.getByTestId('outlet')).toBeInTheDocument();
+  });
+
+  it('renders the feature-disabled overview when the router pathname is already slug-stripped', async () => {
+    authState.user = { id: 3, name: 'Dave', role: 'super_admin', is_admin: false };
+    tenantState._hasFeature = false;
+    locationState.pathname = '/caring';
+    const { CaringRoute } = await import('./CaringRoute');
+    render(<CaringRoute />);
+    expect(screen.getByTestId('outlet')).toBeInTheDocument();
+    expect(screen.queryByTestId('redirect')).toBeNull();
   });
 
   it('does NOT show loading screen once auth resolves', async () => {

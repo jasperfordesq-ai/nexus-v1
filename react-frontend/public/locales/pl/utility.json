@@ -63,7 +63,11 @@
     "still_need_help_description": "Nie możesz znaleźć tego, czego szukasz? Nasz zespół jest tu, aby pomóc.",
     "contact_support": "Skontaktuj się z pomocą techniczną",
     "load_error_title": "Nie udało się załadować często zadawanych pytań",
-    "load_error_description": "Spróbuj odświeżyć stronę lub skontaktuj się z pomocą techniczną."
+    "load_error_description": "Spróbuj odświeżyć stronę lub skontaktuj się z pomocą techniczną.",
+    "articles_count_few": "{{count}} artykułów",
+    "articles_count_many": "{{count}} artykułów",
+    "articles_count_one": "{{count}} artykułów",
+    "articles_count_other": "{{count}} artykułów"
   },
   "resources": {
     "page_title": "Zasoby",

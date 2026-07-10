@@ -111,7 +111,9 @@
     "service_type_physical": "Alleen persoonlijk",
     "service_type_physical_hint": "Heeft een gedeelde fysieke locatie nodig",
     "service_type_remote": "Alleen op afstand",
-    "service_type_remote_hint": "Kan via telefoon, chat of video plaatsvinden"
+    "service_type_remote_hint": "Kan via telefoon, chat of video plaatsvinden",
+    "character_count_one": "{{count}}/{{max}}",
+    "character_count_other": "{{count}}/{{max}}"
   },
   "page_subtitle": "Blader door diensten en verzoeken van de gemeenschap",
   "hero_eyebrow": "Community-uitwisselingsbord",
@@ -247,7 +249,9 @@
     "placeholder": "Typ een vaardigheid en druk op Enter...",
     "aria_add": "Voeg vaardigheidstag toe",
     "aria_add_count": "Vaardigheidstag toevoegen ({{current}} van {{max}})",
-    "aria_results": "{{count}} vaardigheidssuggesties beschikbaar"
+    "aria_results": "{{count}} vaardigheidssuggesties beschikbaar",
+    "aria_results_one": "{{count}} vaardigheidssuggesties beschikbaar",
+    "aria_results_other": "{{count}} vaardigheidssuggesties beschikbaar"
   },
   "more_filters": "Meer filters",
   "filters_label": "Filters",
@@ -269,7 +273,11 @@
     "load_error": "Analyses konden niet worden geladen",
     "retry": "Opnieuw proberen",
     "no_data": "Nog geen weergaven — kom later terug zodra uw vermelding verkeer heeft gekregen",
-    "bar_label": "{{date}}: {{count}} weergaven"
+    "bar_label": "{{date}}: {{count}} weergaven",
+    "unique_viewers_one": "{{count}} uniek",
+    "unique_viewers_other": "{{count}} uniek",
+    "bar_label_one": "{{date}}: {{count}} weergaven",
+    "bar_label_other": "{{date}}: {{count}} weergaven"
   },
   "filter_hours": "Duur",
   "filter_any_duration": "Elke duur",

@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -70,7 +71,7 @@ function inputToCents(v: string): number {
 }
 
 function formatAmount(cents: number): string {
-  return (cents / 100).toLocaleString(undefined, {
+  return (cents / 100).toLocaleString(getFormattingLocale(), {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });

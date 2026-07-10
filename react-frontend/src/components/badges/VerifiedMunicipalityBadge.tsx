@@ -11,6 +11,7 @@
  */
 
 
+import { getFormattingLocale } from '@/lib/helpers';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import { useTranslation } from 'react-i18next';
 import { Chip, Tooltip } from '@/components/ui';
@@ -30,7 +31,7 @@ export function VerifiedMunicipalityBadge({ domain, verifiedAt, size = 'sm', cla
   if (domain) tooltipParts.push(t('verified_municipality.domain', { domain }));
   if (verifiedAt) {
     try {
-      tooltipParts.push(t('verified_municipality.verified_on', { date: new Date(verifiedAt).toLocaleDateString() }));
+      tooltipParts.push(t('verified_municipality.verified_on', { date: new Date(verifiedAt).toLocaleDateString(getFormattingLocale()) }));
     } catch {
       /* ignore */
     }

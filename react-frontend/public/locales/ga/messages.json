@@ -234,5 +234,15 @@
     "sent": "Comhordaitheoir curtha ar an eolas — beidh siad i dteagmháil leat chun cabhrú leis an teagmháil a eagrú.",
     "error": "Níorbh fhéidir do iarratas a sheoladh faoi láthair. Bain triail eile as ar ball."
   },
-  "composer_blocked_safeguarding": "Níl teachtaireachtaí díreacha ar fáil leis an gcomhalta seo. Úsáid an rogha thuas chun iarraidh ar chomhordaitheoir cabhrú leis an teagmháil a eagrú."
+  "composer_blocked_safeguarding": "Níl teachtaireachtaí díreacha ar fáil leis an gcomhalta seo. Úsáid an rogha thuas chun iarraidh ar chomhordaitheoir cabhrú leis an teagmháil a eagrú.",
+  "aria_conversation_unread_few": "Comhrá le {{name}}, {{count}} neamhléite",
+  "aria_conversation_unread_many": "Comhrá le {{name}}, {{count}} neamhléite",
+  "aria_conversation_unread_one": "Comhrá le {{name}}, {{count}} neamhléite",
+  "aria_conversation_unread_other": "Comhrá le {{name}}, {{count}} neamhléite",
+  "aria_conversation_unread_two": "Comhrá le {{name}}, {{count}} neamhléite",
+  "selected_members_few": "Roghnaithe ({{count}})",
+  "selected_members_many": "Roghnaithe ({{count}})",
+  "selected_members_one": "Roghnaithe ({{count}})",
+  "selected_members_other": "Roghnaithe ({{count}})",
+  "selected_members_two": "Roghnaithe ({{count}})"
 }

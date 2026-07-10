@@ -7,6 +7,7 @@
  * CoursePlayerPage — lesson viewer with progress tracking and completion.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -155,7 +156,7 @@ export default function CoursePlayerPage() {
                   <Lock size={32} aria-hidden="true" />
                   <p className="text-sm">
                     {availability[activeLesson.id]?.unlock_at
-                      ? t('player.locked_until', { date: new Date(availability[activeLesson.id]!.unlock_at as string).toLocaleDateString() })
+                      ? t('player.locked_until', { date: new Date(availability[activeLesson.id]!.unlock_at as string).toLocaleDateString(getFormattingLocale()) })
                       : t('player.locked')}
                   </p>
                 </div>

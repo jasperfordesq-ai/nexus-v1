@@ -546,7 +546,7 @@ export function RegisterPage() {
             {tenant?.id && (
               <div className="p-3 rounded-xl bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10">
                 <div className="flex items-center gap-3">
-                  <Building2 className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                  <Building2 className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                   <div>
                     <p className="text-gray-900 dark:text-white font-medium">{tenant.name}</p>
                     {tenant.tagline && (
@@ -561,7 +561,7 @@ export function RegisterPage() {
             {!tenant?.id && !tenantsLoading && tenants.length === 1 && (
               <div className="p-3 rounded-xl bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10">
                 <div className="flex items-center gap-3">
-                  <Building2 className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                  <Building2 className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                   <div>
                     <p className="text-gray-900 dark:text-white font-medium">{tenants[0]?.name}</p>
                     {tenants[0]?.tagline && (
@@ -934,8 +934,8 @@ export function RegisterPage() {
                     i18nKey="register.terms_agreement"
                     t={t}
                     components={{
-                      termsLink: <Link to={tenantPath('/terms')} className="text-indigo-600 dark:text-indigo-400 hover:underline" />,
-                      privacyLink: <Link to={tenantPath('/privacy')} className="text-indigo-600 dark:text-indigo-400 hover:underline" />,
+                      termsLink: <Link to={tenantPath('/terms')} className="text-accent dark:text-accent hover:underline" />,
+                      privacyLink: <Link to={tenantPath('/privacy')} className="text-accent dark:text-accent hover:underline" />,
                     }} />
                 </span>
               </Checkbox>
@@ -961,7 +961,7 @@ export function RegisterPage() {
               <p>
                 <Link
                   to={tenantPath('/privacy')}
-                  className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                  className="text-accent dark:text-accent hover:underline"
                 >
                   {t('register.data_protection_privacy_link')}
                 </Link>
@@ -1040,10 +1040,7 @@ export function RegisterPage() {
           )}
           {/* Honeypot — single field, off-screen. Multi-field decoys were
               autofilled by browsers and silently blocked real users. */}
-          <div
-            aria-hidden="true"
-            style={{ position: 'absolute', left: '-10000px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}
-          >
+          <div aria-hidden="true" className="sr-only">
             <label htmlFor="website">{t('register.honeypot_label')}</label>
             <input ref={honeypotRef} type="text" name="website" id="website" tabIndex={-1} autoComplete="off" />
           </div>
@@ -1080,10 +1077,7 @@ export function RegisterPage() {
           </div>
         )}
         {/* Honeypot — single field, off-screen. See desktop block above. */}
-        <div
-          aria-hidden="true"
-          style={{ position: 'absolute', left: '-10000px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}
-        >
+        <div aria-hidden="true" className="sr-only">
           <label htmlFor="website">{t('register.honeypot_label')}</label>
           <input ref={honeypotRef} type="text" name="website" id="website" tabIndex={-1} autoComplete="off" />
         </div>
@@ -1206,7 +1200,7 @@ export function RegisterPage() {
                 className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-success/15"
               >
                 {pendingResult.requiresWaitlist ? (
-                  <Users className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                  <Users className="w-8 h-8 text-accent dark:text-accent" aria-hidden="true" />
                 ) : pendingResult.requiresVerification ? (
                   <MailCheck className="w-8 h-8 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
                 ) : (
@@ -1220,16 +1214,16 @@ export function RegisterPage() {
 
               <div className="space-y-3 mt-4 text-left">
                 {pendingResult.requiresWaitlist && (
-                  <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-sm">
+                  <div className="p-3 rounded-xl bg-accent/10 border border-accent/20 text-sm">
                     <div className="flex items-start gap-3">
-                      <Clock aria-hidden="true" className="w-5 h-5 text-indigo-500 dark:text-indigo-400 flex-shrink-0 mt-0.5" />
+                      <Clock aria-hidden="true" className="w-5 h-5 text-accent dark:text-accent flex-shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-medium text-indigo-600 dark:text-indigo-400">
+                        <p className="font-medium text-accent dark:text-accent">
                           {pendingResult.waitlistPosition
                             ? t('register.waitlist_position', { position: pendingResult.waitlistPosition })
                             : t('register.waitlist_joined')}
                         </p>
-                        <p className="text-indigo-600/80 dark:text-indigo-300/80 mt-1">
+                        <p className="text-accent/80 dark:text-accent/80 mt-1">
                           {t('register.waitlist_body')}
                         </p>
                       </div>
@@ -1312,7 +1306,7 @@ export function RegisterPage() {
               animate={{ scale: 1 }}
               className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 sm:h-16 sm:w-16"
             >
-              <User className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              <User className="w-7 h-7 sm:w-8 sm:h-8 text-accent dark:text-accent" aria-hidden="true" />
             </motion.div>
             <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{registerHeaderTitle}</h1>
             {registerHeaderSubtitle && (
@@ -1351,7 +1345,7 @@ export function RegisterPage() {
             {t('register.have_account')}{' '}
             <Link
               to={tenantPath('/login')}
-              className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium transition-colors"
+              className="text-accent dark:text-accent hover:text-accent dark:hover:text-accent font-medium transition-colors"
             >
               {t('register.sign_in_link')}
             </Link>

@@ -307,11 +307,37 @@ const statusColorMap: Record<string, 'success' | 'warning' | 'danger' | 'default
 };
 
 export function StatusBadge({ status }: { status: string }) {
+  const { t } = useTranslation('admin_nav');
   const safeStatus = status || 'unknown';
-  const color = statusColorMap[safeStatus.toLowerCase()] || 'default';
+  const normalizedStatus = safeStatus.toLowerCase();
+  const color = statusColorMap[normalizedStatus] || 'default';
+  const statusLabels: Record<string, string> = {
+    active: t('shared.statuses.active'),
+    approved: t('shared.statuses.approved'),
+    banned: t('shared.statuses.banned'),
+    bulk_tenants_updated: t('shared.statuses.bulk_tenants_updated'),
+    bulk_users_moved: t('shared.statuses.bulk_users_moved'),
+    completed: t('shared.statuses.completed'),
+    draft: t('shared.statuses.draft'),
+    failed: t('shared.statuses.failed'),
+    federation_lockdown: t('shared.statuses.federation_lockdown'),
+    federation_updated: t('shared.statuses.federation_updated'),
+    idle: t('shared.statuses.idle'),
+    inactive: t('shared.statuses.inactive'),
+    pending: t('shared.statuses.pending'),
+    published: t('shared.statuses.published'),
+    rejected: t('shared.statuses.rejected'),
+    scheduled: t('shared.statuses.scheduled'),
+    sent: t('shared.statuses.sent'),
+    suspended: t('shared.statuses.suspended'),
+    tenant_created: t('shared.statuses.tenant_created'),
+    tenant_updated: t('shared.statuses.tenant_updated'),
+    user_created: t('shared.statuses.user_created'),
+    user_moved: t('shared.statuses.user_moved'),
+  };
   return (
-    <Chip size="sm" variant="soft" color={color} className="capitalize">
-      {safeStatus}
+    <Chip size="sm" variant="soft" color={color}>
+      {statusLabels[normalizedStatus] ?? t('shared.statuses.unknown')}
     </Chip>
   );
 }

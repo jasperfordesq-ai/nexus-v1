@@ -187,7 +187,10 @@
         "pause_failed": "Impossibile mettere in pausa la campagna",
         "rejected": "Campagna \"{{name}}\" rifiutata",
         "reject_failed": "Impossibile rifiutare la campagna"
-      }
+      },
+      "creatives_count_many": "Creatività ({{count}})",
+      "creatives_count_one": "Creatività ({{count}})",
+      "creatives_count_other": "Creatività ({{count}})"
     },
     "push": {
       "page_title": "Campagne push",

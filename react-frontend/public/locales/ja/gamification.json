@@ -23,7 +23,9 @@
       "months_active": "{{count}}/12 か月",
       "month_active_tooltip": "アクティブ: {{count}} アクティビティ",
       "month_inactive_tooltip": "非アクティブ",
-      "description": "少なくとも 1 つの有意義な活動 (交換、リスト、レビュー、またはボランティア時間) を完了した月。"
+      "description": "少なくとも 1 つの有意義な活動 (交換、リスト、レビュー、またはボランティア時間) を完了した月。",
+      "months_active_other": "{{count}}/12 か月",
+      "month_active_tooltip_other": "アクティブ: {{count}} アクティビティ"
     },
     "badge_type": {
       "vol": "ボランティア活動",
@@ -77,7 +79,8 @@
       "claimed_message": "{{xp}} XP を獲得しました!",
       "claim_failed": "請求が失敗しました",
       "claim_failed_desc": "毎日の報酬を請求できませんでした。",
-      "claim_error": "何か問題が発生しました。もう一度試してください。"
+      "claim_error": "何か問題が発生しました。もう一度試してください。",
+      "day_streak_other": "{{count}} 日の連続記録"
     },
     "challenges": {
       "active_challenges": "積極的な挑戦",
@@ -121,7 +124,8 @@
       "purchase_failed_desc": "購入を完了できませんでした。",
       "purchase_error": "何か問題が発生しました。",
       "load_failed": "ロードに失敗しました",
-      "load_failed_desc": "XP ショップをロードできませんでした。"
+      "load_failed_desc": "XP ショップをロードできませんでした。",
+      "stock_left_other": "{{count}} の在庫が残っています"
     },
     "loading": "実績をロードしています",
     "badge_detail": {
@@ -159,7 +163,8 @@
       "updated_desc": "バッジ ショーケースが保存されました。",
       "save_failed": "保存に失敗しました",
       "save_failed_desc": "ショーケースを更新できませんでした。",
-      "save_error": "何か問題が発生しました。"
+      "save_error": "何か問題が発生しました。",
+      "select_badges_other": "プロフィールに表示するバッジを最大 5 つ選択します。 ({{count}}/5 が選択されました)"
     },
     "load_error": "実績のロードに失敗しました。もう一度試してください。"
   },
@@ -266,7 +271,8 @@
       "buddy_failed": "仲間になれませんでした",
       "buddy_action_sent": "バディサポートを送信しました",
       "buddy_action_failed": "バディサポートを送信できませんでした"
-    }
+    },
+    "streak_label_other": "{{count}} 連続チェックイン"
   },
   "frequency": {
     "none": "リズムなし",
@@ -328,7 +334,8 @@
       "rank_label": "ランク{{rank}}",
       "xp_reward": "{{xp}} XP",
       "load_failed": "ロードに失敗しました",
-      "load_failed_desc": "シーズン履歴を読み込めませんでした。"
+      "load_failed_desc": "シーズン履歴を読み込めませんでした。",
+      "participants_other": "{{count}} 参加者"
     },
     "score_unit": {
       "hours": "h",
@@ -421,7 +428,9 @@
       "legendary": "伝説の"
     },
     "max_score_label": "/{{max}}",
-    "loading": "NexusScore を読み込んでいます..."
+    "loading": "NexusScore を読み込んでいます...",
+    "points_to_next_other": "{{count}} は {{tier}} を指します",
+    "remaining_count_other": "{{count}} 残り"
   },
   "common": {
     "refresh": "リフレッシュ",

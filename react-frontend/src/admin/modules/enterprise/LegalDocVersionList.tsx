@@ -1,4 +1,5 @@
-import { Card, CardBody, CardHeader, Button, Spinner, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, RadioGroup, Radio } from '@/components/ui';
+import { getFormattingLocale } from '@/lib/helpers';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter, Tooltip, RadioGroup, Radio } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -244,18 +245,18 @@ export default function LegalDocVersionList() {
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar size={14} />
-                        <span>{new Date(version.created_at).toLocaleDateString()}</span>
+                        <span>{new Date(version.created_at).toLocaleDateString(getFormattingLocale())}</span>
                       </div>
                       {version.effective_date && (
                         <div className="flex items-center gap-1">
                           <Clock size={14} />
-                          <span>{t('enterprise.effective_date_label')} {new Date(version.effective_date).toLocaleDateString()}</span>
+                          <span>{t('enterprise.effective_date_label')} {new Date(version.effective_date).toLocaleDateString(getFormattingLocale())}</span>
                         </div>
                       )}
                       {version.published_at && (
                         <div className="flex items-center gap-1">
                           <CheckCircle2 size={14} />
-                          <span>{t('enterprise.published_date_label')} {new Date(version.published_at).toLocaleDateString()}</span>
+                          <span>{t('enterprise.published_date_label')} {new Date(version.published_at).toLocaleDateString(getFormattingLocale())}</span>
                         </div>
                       )}
                     </div>
@@ -433,26 +434,26 @@ export default function LegalDocVersionList() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                <div className="flex items-center gap-2">
+                <ModalHeading className="flex items-center gap-2">
                   <FileText size={20} />
                   <span>
                     {viewingVersion ? t('enterprise.version_number_label', { version: viewingVersion.version_number }) : t('enterprise.label_version')}
                     {viewingVersion?.version_label ? ` — ${viewingVersion.version_label}` : ''}
                   </span>
-                </div>
+                </ModalHeading>
               </ModalHeader>
               <ModalBody className="space-y-4">
                 <div className="flex flex-wrap gap-4 text-sm text-[var(--color-text-secondary)]">
                   {viewingVersion?.effective_date && (
                     <div className="flex items-center gap-1">
                       <Clock size={14} />
-                      <span>{t('enterprise.effective_date_label')} {new Date(viewingVersion.effective_date).toLocaleDateString()}</span>
+                      <span>{t('enterprise.effective_date_label')} {new Date(viewingVersion.effective_date).toLocaleDateString(getFormattingLocale())}</span>
                     </div>
                   )}
                   {viewingVersion?.published_at && (
                     <div className="flex items-center gap-1">
                       <CheckCircle2 size={14} />
-                      <span>{t('enterprise.published_date_label')} {new Date(viewingVersion.published_at).toLocaleDateString()}</span>
+                      <span>{t('enterprise.published_date_label')} {new Date(viewingVersion.published_at).toLocaleDateString(getFormattingLocale())}</span>
                     </div>
                   )}
                 </div>

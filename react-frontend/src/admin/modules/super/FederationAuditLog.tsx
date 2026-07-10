@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Select, SelectItem, Button, Chip, Input } from '@/components/ui';
 
 /**
@@ -229,7 +230,7 @@ export function FederationAuditLog() {
       sortable: true,
       render: (entry) => (
         <span className="text-sm text-muted">
-          {new Date(entry.created_at).toLocaleString()}
+          {new Date(entry.created_at).toLocaleString(getFormattingLocale())}
         </span>
       ),
     },

@@ -20,7 +20,7 @@ describe('BottomSheet', () => {
 
   it('renders children when isOpen is true', () => {
     render(
-      <BottomSheet isOpen onClose={onClose}>
+      <BottomSheet isOpen onClose={onClose} title="Sheet title">
         <p>Sheet body content</p>
       </BottomSheet>
     );
@@ -29,7 +29,7 @@ describe('BottomSheet', () => {
 
   it('does not render children when isOpen is false', () => {
     render(
-      <BottomSheet isOpen={false} onClose={onClose}>
+      <BottomSheet isOpen={false} onClose={onClose} title="Sheet title">
         <p>Hidden content</p>
       </BottomSheet>
     );
@@ -46,19 +46,18 @@ describe('BottomSheet', () => {
     expect(screen.getByText('Choose action')).toBeInTheDocument();
   });
 
-  it('does not render a heading element when title is omitted', () => {
+  it('uses the required visible title as the dialog heading', () => {
     render(
-      <BottomSheet isOpen onClose={onClose}>
+      <BottomSheet isOpen onClose={onClose} title="Required sheet title">
         <p>Content</p>
       </BottomSheet>
     );
-    // "Choose action" was from a different test — here no title text should appear
-    expect(screen.queryByRole('heading')).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Required sheet title' })).toBeInTheDocument();
   });
 
   it('renders with snapPoints="half" without crashing', () => {
     render(
-      <BottomSheet isOpen onClose={onClose} snapPoints={['half']}>
+      <BottomSheet isOpen onClose={onClose} title="Half sheet title" snapPoints={['half']}>
         <p>Half sheet</p>
       </BottomSheet>
     );
@@ -67,7 +66,7 @@ describe('BottomSheet', () => {
 
   it('renders with snapPoints="full" without crashing', () => {
     render(
-      <BottomSheet isOpen onClose={onClose} snapPoints={['full']}>
+      <BottomSheet isOpen onClose={onClose} title="Full sheet title" snapPoints={['full']}>
         <p>Full sheet</p>
       </BottomSheet>
     );
@@ -76,7 +75,7 @@ describe('BottomSheet', () => {
 
   it('accepts a custom className without crashing', () => {
     render(
-      <BottomSheet isOpen onClose={onClose} className="test-class">
+      <BottomSheet isOpen onClose={onClose} title="Styled sheet title" className="test-class">
         <p>Styled sheet</p>
       </BottomSheet>
     );

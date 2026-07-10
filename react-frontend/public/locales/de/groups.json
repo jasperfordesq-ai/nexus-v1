@@ -206,7 +206,17 @@
     "feed_empty_desc": "Teilen Sie als Erster etwas mit dieser Gruppe!",
     "feed_create_post": "Beitrag erstellen",
     "feed_load_more": "Mehr laden",
-    "member_actions_aria": "Mitglieder-Aktionen"
+    "member_actions_aria": "Mitglieder-Aktionen",
+    "meta_description_fallback_one": "Tritt {{name}} bei und verbinde dich mit {{count}} Community-Mitgliedern durch gemeinsame Beiträge, Veranstaltungen und Diskussionen.",
+    "meta_description_fallback_other": "Tritt {{name}} bei und verbinde dich mit {{count}} Community-Mitgliedern durch gemeinsame Beiträge, Veranstaltungen und Diskussionen.",
+    "tab_subgroups_count_one": "Untergruppen ({{count}})",
+    "tab_subgroups_count_other": "Untergruppen ({{count}})",
+    "members_count_one": "{{count}} Mitglieder",
+    "members_count_other": "{{count}} Mitglieder",
+    "posts_count_one": "{{count}} Beiträge",
+    "posts_count_other": "{{count}} Beiträge",
+    "reply_count_one": "{{count}} Antworten",
+    "reply_count_other": "{{count}} Antworten"
   },
   "form": {
     "create_title": "Neue Gruppe erstellen",
@@ -389,7 +399,9 @@
     "size_b": "B",
     "size_kb": "KB",
     "size_mb": "MB",
-    "size_gb": "GB"
+    "size_gb": "GB",
+    "folder_chip_one": "{{name}} ({{count}})",
+    "folder_chip_other": "{{name}} ({{count}})"
   },
   "media": {
     "filter_all": "Alle",
@@ -450,7 +462,9 @@
     "secret_placeholder": "Signatur-Secret zur Payload-Verifizierung",
     "cancel": "Abbrechen",
     "create_btn": "Webhook erstellen",
-    "delete_confirm": "Diesen Webhook löschen? Dies kann nicht rückgängig gemacht werden."
+    "delete_confirm": "Diesen Webhook löschen? Dies kann nicht rückgängig gemacht werden.",
+    "failures_one": "{{count}} Fehler",
+    "failures_other": "{{count}} Fehler"
   },
   "toast": {
     "left": "Gruppe verlassen",
@@ -562,7 +576,11 @@
     "answer_posted_success": "Antwort gepostet!",
     "answer_posted_error": "Fehler beim Posten der Antwort",
     "vote_error": "Fehler beim Abstimmen",
-    "accept_error": "Fehler beim Akzeptieren der Antwort"
+    "accept_error": "Fehler beim Akzeptieren der Antwort",
+    "answer_count_aria_one": "{{count}} Antworten",
+    "answer_count_aria_other": "{{count}} Antworten",
+    "answers_heading_one": "{{count}} Antwort(en)",
+    "answers_heading_other": "{{count}} Antwort(en)"
   },
   "wiki": {
     "load_failed": "Wiki-Seiten konnten nicht geladen werden",
@@ -719,5 +737,11 @@
     "accent_color": "Akzentfarbe",
     "hue": "Farbton",
     "preview": "Vorschau"
-  }
+  },
+  "members_one": "{{count}} Mitglieder",
+  "members_other": "{{count}} Mitglieder",
+  "members_count_label_one": "{{count}} Mitglieder",
+  "members_count_label_other": "{{count}} Mitglieder",
+  "posts_count_label_one": "{{count}} Beiträge",
+  "posts_count_label_other": "{{count}} Beiträge"
 }

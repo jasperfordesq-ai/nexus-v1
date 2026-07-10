@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Button, Chip, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -143,7 +144,7 @@ export default function AdminCouponsPage() {
                     </TableCell>
                     <TableCell>{c.usage_count}</TableCell>
                     <TableCell>
-                      {c.valid_until ? new Date(c.valid_until).toLocaleDateString() : t('marketplace.coupons.no_expiry')}
+                      {c.valid_until ? new Date(c.valid_until).toLocaleDateString(getFormattingLocale()) : t('marketplace.coupons.no_expiry')}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">

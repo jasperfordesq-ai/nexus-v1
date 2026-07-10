@@ -84,8 +84,8 @@ export function PilotApplyStatusPage() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <GlassCard className="p-6 sm:p-8">
           <div className="flex items-center gap-3 mb-5">
-            <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-500/10">
-              <Building className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-accent/10">
+              <Building className="w-5 h-5 text-accent" aria-hidden="true" />
             </div>
             <h1 className="text-xl font-semibold text-theme-primary">{t('provisioning.status_title')}</h1>
           </div>
@@ -121,15 +121,13 @@ export function PilotApplyStatusPage() {
           )}
 
           <div className="mt-6">
-            <Link to={tenantPath('/')}>
-              <Button
-                variant="tertiary"
-                className="bg-theme-elevated text-theme-muted"
-                startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('provisioning.success_back')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/')}
+              variant="tertiary"
+              className="bg-theme-elevated text-theme-muted"
+              startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('provisioning.success_back')}
+            </Button>
           </div>
         </GlassCard>
       </motion.div>

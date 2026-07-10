@@ -48,7 +48,7 @@ import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
+import { resolveAvatarUrl, formatRelativeTime, getFormattingLocale } from '@/lib/helpers';
 import { EXCHANGE_STATUS_CONFIG, MAX_EXCHANGE_HOURS, getStatusIconBgClass } from '@/lib/exchange-status';
 import type { Exchange, ExchangeHistoryEntry, ExchangeRating } from '@/types/api';
 
@@ -105,7 +105,7 @@ function getTimelineColor(action: string, newStatus?: string | null): string {
     return 'bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/30';
   }
   // Blue for neutral actions
-  return 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 border-indigo-500/30';
+  return 'bg-accent/20 text-accent dark:text-accent border-accent/30';
 }
 
 function getTimelineLabelKey(action: string, newStatus?: string | null): string {
@@ -382,11 +382,9 @@ export function ExchangeDetailPage() {
           title={t('detail.not_found_title')}
           description={error || t('detail.not_found_description')}
           action={
-            <Link to={tenantPath("/exchanges")}>
-              <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                {t('detail.view_exchanges')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath("/exchanges")} className="bg-gradient-to-r from-accent to-accent-gradient-end text-white">
+              {t('detail.view_exchanges')}
+            </Button>
           }
         />
       </>
@@ -515,15 +513,13 @@ export function ExchangeDetailPage() {
         {/* Message Other Party */}
         {isActive && otherParty && otherPartyId && (
           <div className="mb-6">
-            <Link to={tenantPath(`/messages/new/${otherPartyId}`)}>
-              <Button
-                variant="flat"
-                className="bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"
-                startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('detail.message_party', { name: otherParty.name || t('detail.other_party') })}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath(`/messages/new/${otherPartyId}`)}
+              variant="flat"
+              className="bg-accent/10 text-accent hover:bg-accent/20"
+              startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('detail.message_party', { name: otherParty.name || t('detail.other_party') })}
+            </Button>
           </div>
         )}
 
@@ -543,7 +539,7 @@ export function ExchangeDetailPage() {
             <p className="text-sm text-theme-muted">{t('detail.created')}</p>
             <p className="text-sm font-medium text-theme-primary">
               <time dateTime={exchange.created_at}>
-                {new Date(exchange.created_at).toLocaleDateString()}
+                {new Date(exchange.created_at).toLocaleDateString(getFormattingLocale())}
               </time>
             </p>
           </div>
@@ -690,7 +686,7 @@ export function ExchangeDetailPage() {
       {timeline.length > 0 && (
         <GlassCard className="p-6">
           <h2 className="text-xl font-semibold text-theme-primary mb-6 flex items-center gap-3">
-            <Clock className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+            <Clock className="w-5 h-5 text-accent" aria-hidden="true" />
             {t('detail.timeline_title')}
           </h2>
 
@@ -747,7 +743,7 @@ export function ExchangeDetailPage() {
                       <time dateTime={entry.timestamp}>
                         {formatRelativeTime(entry.timestamp)}
                         {' \u00b7 '}
-                        {new Date(entry.timestamp).toLocaleString()}
+                        {new Date(entry.timestamp).toLocaleString(getFormattingLocale())}
                       </time>
                     </p>
                     {entry.notes && (

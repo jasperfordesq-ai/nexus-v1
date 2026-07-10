@@ -234,5 +234,9 @@
     "sent": "Koordinator benachrichtigt — er wird sich melden, um den Kontakt zu vermitteln.",
     "error": "Ihre Anfrage konnte gerade nicht gesendet werden. Bitte versuchen Sie es in Kürze erneut."
   },
-  "composer_blocked_safeguarding": "Direktnachrichten sind mit diesem Mitglied nicht verfügbar. Nutzen Sie die obige Option, um einen Koordinator um Hilfe bei der Kontaktvermittlung zu bitten."
+  "composer_blocked_safeguarding": "Direktnachrichten sind mit diesem Mitglied nicht verfügbar. Nutzen Sie die obige Option, um einen Koordinator um Hilfe bei der Kontaktvermittlung zu bitten.",
+  "aria_conversation_unread_one": "Gespräch mit {{name}}, {{count}} ungelesen",
+  "aria_conversation_unread_other": "Gespräch mit {{name}}, {{count}} ungelesen",
+  "selected_members_one": "Ausgewählt ({{count}})",
+  "selected_members_other": "Ausgewählt ({{count}})"
 }

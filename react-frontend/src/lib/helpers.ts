@@ -15,6 +15,15 @@ import { safeLocalStorageGetJSON, safeLocalStorageSetJSON, safeLocalStorageRemov
 type DateValue = Date | number | string;
 
 /**
+ * Return the language selected inside NEXUS for every user-facing Intl call.
+ * Do not rely on an omitted locale: that silently follows the browser/OS
+ * language even when the user has selected a different application language.
+ */
+export function getFormattingLocale(): string {
+  return i18n.language || 'en';
+}
+
+/**
  * API Base URL for resolving relative image/asset URLs
  * This is the PHP backend URL where uploads are stored
  */
@@ -228,7 +237,7 @@ export function formatRelativeTime(dateString: string | null | undefined): strin
   const diffDays = Math.floor(diffHours / 24);
   const diffWeeks = Math.floor(diffDays / 7);
 
-  const rtf = new Intl.RelativeTimeFormat(i18n.language, { numeric: 'auto', style: 'narrow' });
+  const rtf = new Intl.RelativeTimeFormat(getFormattingLocale(), { numeric: 'auto', style: 'narrow' });
 
   if (diffSecs < 60) return rtf.format(-diffSecs, 'second');
   if (diffMins < 60) return rtf.format(-diffMins, 'minute');
@@ -257,7 +266,7 @@ function toDateValue(value: DateValue | null | undefined): Date {
 export function formatDateValue(value: DateValue | null | undefined, options?: Intl.DateTimeFormatOptions): string {
   const date = toDateValue(value);
   if (isNaN(date.getTime())) return '—';
-  return date.toLocaleDateString(i18n.language, options ?? {
+  return date.toLocaleDateString(getFormattingLocale(), options ?? {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -275,14 +284,14 @@ export function formatDate(dateString: string, options?: Intl.DateTimeFormatOpti
  * Format a date-time value for display.
  */
 export function formatDateTime(value: DateValue, options?: Intl.DateTimeFormatOptions): string {
-  return toDateValue(value).toLocaleString(i18n.language, options);
+  return toDateValue(value).toLocaleString(getFormattingLocale(), options);
 }
 
 /**
  * Format a time for display.
  */
 export function formatTime(dateString: string): string {
-  return toDateValue(dateString).toLocaleTimeString(i18n.language, {
+  return toDateValue(dateString).toLocaleTimeString(getFormattingLocale(), {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -292,7 +301,7 @@ export function formatTime(dateString: string): string {
  * Format a locale-aware number string.
  */
 export function formatNumber(value: number, options?: Intl.NumberFormatOptions): string {
-  return new Intl.NumberFormat(i18n.language, options).format(value);
+  return new Intl.NumberFormat(getFormattingLocale(), options).format(value);
 }
 
 /**
@@ -303,7 +312,7 @@ export function formatCurrency(
   currency: string,
   options?: Omit<Intl.NumberFormatOptions, 'style' | 'currency'>
 ): string {
-  return new Intl.NumberFormat(i18n.language, {
+  return new Intl.NumberFormat(getFormattingLocale(), {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,
@@ -315,7 +324,7 @@ export function formatCurrency(
  * Format a short month label for date badges and compact cards.
  */
 export function formatMonthShort(value: DateValue, uppercase = false): string {
-  const formatted = new Intl.DateTimeFormat(i18n.language, { month: 'short' }).format(toDateValue(value));
+  const formatted = new Intl.DateTimeFormat(getFormattingLocale(), { month: 'short' }).format(toDateValue(value));
   return uppercase ? formatted.toUpperCase() : formatted;
 }
 

@@ -42,12 +42,12 @@ class SmartMatchingAnalyticsServiceTest extends TestCase
         $this->assertArrayHasKey('match_type_breakdown', $result);
     }
 
-    public function test_getOverallStats_returns_defaults_on_error(): void
+    public function test_getOverallStats_propagates_query_errors(): void
     {
         DB::shouldReceive('selectOne')->andThrow(new \RuntimeException('fail'));
 
-        $result = $this->service->getOverallStats();
-        $this->assertEquals(0, $result['total_cached_matches']);
+        $this->expectException(\RuntimeException::class);
+        $this->service->getOverallStats();
     }
 
     // ── getScoreDistribution ──
@@ -62,11 +62,11 @@ class SmartMatchingAnalyticsServiceTest extends TestCase
         $this->assertEquals('81-100', $result[4]['range']);
     }
 
-    public function test_getScoreDistribution_returns_empty_on_error(): void
+    public function test_getScoreDistribution_propagates_query_errors(): void
     {
         DB::shouldReceive('selectOne')->andThrow(new \RuntimeException('fail'));
-        $result = $this->service->getScoreDistribution();
-        $this->assertEquals([], $result);
+        $this->expectException(\RuntimeException::class);
+        $this->service->getScoreDistribution();
     }
 
     // ── getDistanceDistribution ──
@@ -78,6 +78,13 @@ class SmartMatchingAnalyticsServiceTest extends TestCase
         $result = $this->service->getDistanceDistribution();
         $this->assertGreaterThanOrEqual(5, count($result));
         $this->assertEquals('0-5km', $result[0]['range']);
+    }
+
+    public function test_getDistanceDistribution_propagates_query_errors(): void
+    {
+        DB::shouldReceive('selectOne')->andThrow(new \RuntimeException('fail'));
+        $this->expectException(\RuntimeException::class);
+        $this->service->getDistanceDistribution();
     }
 
     // ── getConversionFunnel ──
@@ -106,6 +113,27 @@ class SmartMatchingAnalyticsServiceTest extends TestCase
 
         $result = $this->service->getConversionFunnel();
         $this->assertEquals(0, $result['conversion_rate']);
+    }
+
+    public function test_getConversionFunnel_propagates_query_errors(): void
+    {
+        DB::shouldReceive('selectOne')->andThrow(new \RuntimeException('fail'));
+        $this->expectException(\RuntimeException::class);
+        $this->service->getConversionFunnel();
+    }
+
+    public function test_getGateImpact_propagates_query_errors(): void
+    {
+        DB::shouldReceive('selectOne')->andThrow(new \RuntimeException('fail'));
+        $this->expectException(\RuntimeException::class);
+        $this->service->getGateImpact();
+    }
+
+    public function test_getPillarAverages_propagates_query_errors(): void
+    {
+        DB::shouldReceive('select')->andThrow(new \RuntimeException('fail'));
+        $this->expectException(\RuntimeException::class);
+        $this->service->getPillarAverages();
     }
 
     // ── getDashboardSummary ──

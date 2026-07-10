@@ -1,4 +1,4 @@
-import { useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch } from '@/components/ui';
+import { useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter, Avatar, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -388,13 +388,13 @@ export function SubAccountsManager() {
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
-          <Users className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+          <Users className="w-5 h-5 text-accent" aria-hidden="true" />
           <h3 className="font-semibold text-theme-primary">{t('sub_accounts.title')}</h3>
         </div>
         <Button
           size="sm"
           variant="flat"
-          className="shrink-0 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+          className="shrink-0 bg-accent/10 text-accent dark:text-accent"
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={onOpen}
         >
@@ -433,7 +433,7 @@ export function SubAccountsManager() {
           action={
             <Button
               variant="flat"
-              className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+              className="bg-accent/10 text-accent dark:text-accent"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               onPress={onOpen}
             >
@@ -480,13 +480,11 @@ export function SubAccountsManager() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-theme-primary">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center">
-                <UserPlus className="w-4 h-4 text-indigo-500" aria-hidden="true" />
-              </div>
-              {t('sub_accounts.modal_title')}
+          <ModalHeader className="flex items-center gap-3 text-theme-primary">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 flex items-center justify-center">
+              <UserPlus className="w-4 h-4 text-accent" aria-hidden="true" />
             </div>
+            <ModalHeading>{t('sub_accounts.modal_title')}</ModalHeading>
           </ModalHeader>
           <ModalBody>
             <p className="text-sm text-theme-muted mb-3">
@@ -511,7 +509,7 @@ export function SubAccountsManager() {
               {t('sub_accounts.cancel')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               onPress={handleAdd}
               isLoading={isAdding}
               isDisabled={!addEmail.trim()}

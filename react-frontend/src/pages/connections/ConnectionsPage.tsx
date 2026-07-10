@@ -28,7 +28,7 @@ import Send from 'lucide-react/icons/send';
 import { useTenant, useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { stripHtmlToText } from '@/lib/sanitize';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
@@ -115,7 +115,7 @@ interface ConnectionCardProps {
 function ConnectionCard({ connection, onDisconnect, isActing, tenantPathFn }: ConnectionCardProps) {
   const { t } = useTranslation('connections');
   const { user } = connection;
-  const joinedDate = new Date(connection.created_at).toLocaleDateString([], {
+  const joinedDate = new Date(connection.created_at).toLocaleDateString(getFormattingLocale(), {
     year: 'numeric',
     month: 'short',
   });
@@ -127,7 +127,7 @@ function ConnectionCard({ connection, onDisconnect, isActing, tenantPathFn }: Co
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.2 }}
     >
-      <Card className="bg-theme-elevated border border-theme-default hover:border-indigo-300 dark:hover:border-indigo-700 transition-colors">
+      <Card className="bg-theme-elevated border border-theme-default hover:border-accent dark:hover:border-accent transition-colors">
         <CardBody className="p-4">
           <div className="flex items-start gap-3">
             <Link to={tenantPathFn(`/profile/${user.id}`)}>
@@ -142,7 +142,7 @@ function ConnectionCard({ connection, onDisconnect, isActing, tenantPathFn }: Co
             <div className="flex-1 min-w-0">
               <Link
                 to={tenantPathFn(`/profile/${user.id}`)}
-                className="font-semibold text-theme-primary hover:text-indigo-500 transition-colors truncate block"
+                className="font-semibold text-theme-primary hover:text-accent transition-colors truncate block"
               >
                 {user.name}
               </Link>
@@ -225,7 +225,7 @@ function PendingCard({ connection, onAccept, onDecline, isActing, tenantPathFn }
             <div className="flex-1 min-w-0">
               <Link
                 to={tenantPathFn(`/profile/${user.id}`)}
-                className="font-semibold text-theme-primary hover:text-indigo-500 transition-colors truncate block"
+                className="font-semibold text-theme-primary hover:text-accent transition-colors truncate block"
               >
                 {user.name}
               </Link>
@@ -310,7 +310,7 @@ function SentCard({ connection, onCancel, isActing, tenantPathFn }: SentCardProp
             <div className="flex-1 min-w-0">
               <Link
                 to={tenantPathFn(`/profile/${user.id}`)}
-                className="font-semibold text-theme-primary hover:text-indigo-500 transition-colors truncate block"
+                className="font-semibold text-theme-primary hover:text-accent transition-colors truncate block"
               >
                 {user.name}
               </Link>
@@ -321,8 +321,8 @@ function SentCard({ connection, onCancel, isActing, tenantPathFn }: SentCardProp
                 <p className="text-sm text-theme-muted mt-1 line-clamp-2">{stripHtmlToText(user.bio)}</p>
               )}
               <div className="flex items-center gap-1 mt-1.5">
-                <Send className="w-3 h-3 text-indigo-500" aria-hidden="true" />
-                <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium">
+                <Send className="w-3 h-3 text-accent" aria-hidden="true" />
+                <p className="text-xs text-accent dark:text-accent font-medium">
                   {t('request_pending')}
                 </p>
               </div>
@@ -569,7 +569,7 @@ export default function ConnectionsPage() {
         {/* Hero Banner */}
         <div className="relative overflow-hidden rounded-xl border border-theme-default bg-theme-surface p-5 shadow-sm sm:p-6 mb-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="rounded-lg bg-indigo-500/10 p-2 text-indigo-600 dark:text-indigo-400">
+            <div className="rounded-lg bg-accent/10 p-2 text-accent dark:text-accent">
               <Users2 className="w-5 h-5" aria-hidden="true" />
             </div>
             <h1 className="text-xl font-bold text-theme-primary">{t('title')}</h1>
@@ -598,7 +598,7 @@ export default function ConnectionsPage() {
             aria-label={t('search_placeholder')}
             variant="bordered"
             classNames={{
-              inputWrapper: 'bg-theme-elevated border-theme-default hover:border-indigo-400',
+              inputWrapper: 'bg-theme-elevated border-theme-default hover:border-accent',
             }}
             isClearable
             onClear={() => setSearchQuery('')}
@@ -612,9 +612,9 @@ export default function ConnectionsPage() {
           variant="underlined"
           classNames={{
             tabList: 'gap-4 border-b border-theme-default',
-            cursor: 'bg-indigo-500',
+            cursor: 'bg-accent',
             tab: 'text-sm font-medium',
-            tabContent: 'text-theme-muted group-data-[selected=true]:text-indigo-500',
+            tabContent: 'text-theme-muted group-data-[selected=true]:text-accent',
           }}
           aria-label={t('title')}
         >

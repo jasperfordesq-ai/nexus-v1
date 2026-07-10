@@ -22,7 +22,7 @@ import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { safeLocalStorageGet, safeLocalStorageSet, safeLocalStorageRemove } from '@/lib/safeStorage';
-import { Button, Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
+import { Button, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody } from '@/components/ui';
 
 export type OnboardingChoice = 'recipient' | 'helper' | 'browse';
 
@@ -114,9 +114,9 @@ export function OnboardingChoiceModal({ isOpen, onChoice, onClose, tenantScope }
     >
       <ModalContent>
         <ModalHeader className="flex flex-col items-start gap-1">
-          <h2 className="text-xl font-semibold text-theme-primary">
+          <ModalHeading className="text-xl font-semibold text-theme-primary">
             {t('caring_community:onboarding.title')}
-          </h2>
+          </ModalHeading>
           <p className="text-sm font-normal text-theme-muted">
             {t('caring_community:onboarding.intro')}
           </p>

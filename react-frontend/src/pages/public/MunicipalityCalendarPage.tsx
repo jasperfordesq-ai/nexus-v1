@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -110,7 +111,7 @@ export default function MunicipalityCalendarPage() {
   }, [monthOffset]);
 
   const monthLabel = useMemo(() => {
-    return monthStart.toLocaleString(undefined, { month: 'long', year: 'numeric' });
+    return monthStart.toLocaleString(getFormattingLocale(), { month: 'long', year: 'numeric' });
   }, [monthStart]);
 
   const daysInMonth = useMemo(() => {

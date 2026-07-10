@@ -108,7 +108,9 @@
       "create": "Anfrage für Stellvertretung konnte nicht erstellt werden",
       "candidates": "Stellvertretungs-Kandidat/innen konnten nicht geladen werden",
       "assign": "Stellvertretung konnte nicht zugeordnet werden"
-    }
+    },
+    "skill_matches_one": "{{count}} passende Fähigkeiten",
+    "skill_matches_other": "{{count}} passende Fähigkeiten"
   },
   "providers": {
     "title": "Anbieter-Verzeichnis",
@@ -488,7 +490,8 @@
         "maximum_discount": "Maximaler Rabatt pro Bestellung (%)",
         "maximum_discount_description": "Begrenzen Sie, wie viel von der Bestellsumme in Form von Zeitguthaben bezahlt werden kann.",
         "save": "Einstellungen speichern",
-        "view_only": "Benutzer mit Leseberechtigung können die Treueeinstellungen nicht ändern."
+        "view_only": "Benutzer mit Leseberechtigung können die Treueeinstellungen nicht ändern.",
+        "per_hour_short": "/ Std."
       },
       "ledger": {
         "title": "Aktuelle Einlösungen",
@@ -534,6 +537,9 @@
         "pending": "Ausstehend",
         "applied": "Angewandt",
         "reversed": "Umgedreht"
+      },
+      "table": {
+        "empty_value": "—"
       }
     },
     "hour_transfers": {

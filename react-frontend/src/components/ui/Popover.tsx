@@ -9,8 +9,11 @@ import {
   isValidElement,
   use,
   type ComponentPropsWithoutRef,
+  type ReactElement,
   type ReactNode,
 } from 'react';
+import { Pressable } from '@react-aria/interactions';
+import type { DOMAttributes } from '@react-types/shared';
 import { Popover as HeroUIPopover } from '@heroui/react/popover';
 
 type HeroUIPopoverProps = ComponentPropsWithoutRef<typeof HeroUIPopover>;
@@ -58,7 +61,9 @@ export type PopoverProps = Omit<HeroUIPopoverProps, 'children'> & {
   size?: string;
 };
 
-export type PopoverTriggerProps = HeroUIPopoverTriggerProps;
+export type PopoverTriggerProps = Omit<HeroUIPopoverTriggerProps, 'children'> & {
+  children: ReactElement;
+};
 
 export type PopoverContentProps = Omit<HeroUIPopoverContentProps, 'children' | 'className'> & {
   children?: ReactNode;
@@ -76,6 +81,20 @@ function combineClasses(...classes: Array<string | false | undefined>): string |
 
 function normalizePlacement(placement?: LegacyPlacement): HeroUIPopoverContentProps['placement'] | undefined {
   return placement?.replace('-', ' ') as HeroUIPopoverContentProps['placement'] | undefined;
+}
+
+const NATIVE_PRESSABLE_TAGS = new Set(['a', 'area', 'button', 'input', 'select', 'summary', 'textarea']);
+
+function isProjectButton(child: ReactElement): boolean {
+  if (typeof child.type === 'string') return false;
+
+  return (child.type as { displayName?: string }).displayName === 'Button';
+}
+
+function isNativePressable(
+  child: ReactElement,
+): child is ReactElement<DOMAttributes, string> {
+  return typeof child.type === 'string' && NATIVE_PRESSABLE_TAGS.has(child.type);
 }
 
 export function Popover({
@@ -123,11 +142,20 @@ export function PopoverTrigger({ children, className, ...props }: PopoverTrigger
   const { classNames } = use(PopoverContext);
   const triggerClassName = combineClasses(classNames?.trigger, className);
 
-  if (isValidElement<{ className?: string }>(children)) {
+  if (isValidElement<{ className?: string }>(children) && isProjectButton(children)) {
     return cloneElement(children, {
       ...(props as Record<string, unknown>),
       className: combineClasses(children.props.className, triggerClassName),
     } as { className?: string });
+  }
+
+  if (isValidElement(children) && isNativePressable(children)) {
+    const pressableChild = cloneElement(children, {
+      ...(props as Record<string, unknown>),
+      className: combineClasses(children.props.className, triggerClassName),
+    } as DOMAttributes) as ReactElement<DOMAttributes, string>;
+
+    return <Pressable>{pressableChild}</Pressable>;
   }
 
   return (
@@ -147,13 +175,21 @@ export function PopoverContent({
   containerPadding,
   offset,
   placement,
-  shouldBlockScroll: _shouldBlockScroll,
+  shouldBlockScroll,
   shouldFlip,
   showArrow,
+  isNonModal,
   ...props
 }: PopoverContentProps) {
   const context = use(PopoverContext);
   const shouldRenderArrow = showArrow ?? context.showArrow;
+  const effectiveShouldBlockScroll = shouldBlockScroll ?? context.shouldBlockScroll;
+
+  // React Aria's modal Popover owns scroll locking and exposes the inverse
+  // contract through `isNonModal`. HeroUI 3.1.0 does not consume the legacy
+  // `shouldBlockScroll` prop directly, so map false explicitly instead of
+  // forwarding a no-op DOM prop. An explicit v3 `isNonModal` always wins.
+  const effectiveIsNonModal = isNonModal ?? (effectiveShouldBlockScroll === false ? true : undefined);
 
   return (
     <HeroUIPopover.Content
@@ -161,6 +197,7 @@ export function PopoverContent({
       containerPadding={containerPadding ?? context.containerPadding}
       offset={offset ?? context.offset}
       placement={(normalizePlacement(placement) ?? context.placement) as HeroUIPopoverContentProps['placement']}
+      isNonModal={effectiveIsNonModal}
       shouldFlip={shouldFlip ?? context.shouldFlip}
       UNSTABLE_portalContainer={context.portalContainer}
       {...props}

@@ -6,12 +6,16 @@
 import { Navigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth, useTenant } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
+import { stripTenantSlug } from '@/lib/tenant-routing';
 import { hasFullCaringAccess, hasSafeguardingAccess } from './access';
 
 export function CaringRoute() {
   const { user, isAuthenticated, isLoading, status } = useAuth();
-  const { tenantPath, hasFeature } = useTenant();
+  const { tenantPath, tenantSlug, hasFeature } = useTenant();
   const location = useLocation();
+  const routePath = tenantSlug
+    ? stripTenantSlug(location.pathname, tenantSlug)
+    : location.pathname;
 
   if (isLoading || status === 'loading') {
     return <LoadingScreen />;
@@ -33,17 +37,15 @@ export function CaringRoute() {
   }
 
   if (!fullAccess) {
-    const safeguardingPath = tenantPath('/caring/safeguarding');
-    if (!location.pathname.startsWith(safeguardingPath)) {
-      return <Navigate to={safeguardingPath} replace />;
+    if (!routePath.startsWith('/caring/safeguarding')) {
+      return <Navigate to={tenantPath('/caring/safeguarding')} replace />;
     }
   }
 
   if (!hasFeature('caring_community')) {
-    const caringPath = tenantPath('/caring');
+    const normalizedRoutePath = routePath.replace(/\/+$/, '') || '/';
     const isCaringOverview =
-      location.pathname === caringPath ||
-      location.pathname === `${caringPath}/`;
+      normalizedRoutePath === '/caring';
 
     if (!isCaringOverview) {
       return <Navigate to={tenantPath('/caring')} replace />;

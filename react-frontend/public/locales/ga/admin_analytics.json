@@ -245,7 +245,15 @@
         "65_plus": "65+",
         "unknown": "Anaithnid"
       }
-    }
+    },
+    "location_marker_title_few": "{{area}}: baill{{count}}",
+    "location_marker_title_many": "{{area}}: baill{{count}}",
+    "location_marker_title_one": "{{area}}: baill{{count}}",
+    "location_marker_title_other": "{{area}}: baill{{count}}",
+    "location_marker_title_two": "{{area}}: baill{{count}}",
+    "member_count_few": "baill{{count}}",
+    "member_count_many": "baill{{count}}",
+    "member_count_two": "baill{{count}}"
   },
   "search_analytics": {
     "page_title": "Anailísíocht Cuardaigh",
@@ -270,6 +278,11 @@
     "load_failed": "Níorbh fhéidir anailísíocht chuardaigh a lódáil",
     "empty_description": "Níor logáladh aon chuardach sa tréimhse roghnaithe.",
     "no_trending": "Níl aon chuardach i dtreocht sa tréimhse seo.",
-    "no_zero_results": "Níl aon chuardach gan torthaí sa tréimhse seo — fuair gach cuardach rud éigin."
+    "no_zero_results": "Níl aon chuardach gan torthaí sa tréimhse seo — fuair gach cuardach rud éigin.",
+    "count_value_few": "{{count}}×",
+    "count_value_many": "{{count}}×",
+    "count_value_one": "{{count}}×",
+    "count_value_other": "{{count}}×",
+    "count_value_two": "{{count}}×"
   }
 }

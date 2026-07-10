@@ -34,7 +34,7 @@ import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 
@@ -191,7 +191,7 @@ export function TalentSearchPage() {
     if (diffDays === 1) return t('talent_search.yesterday');
     if (diffDays < 7) return t('talent_search.days_ago', { count: diffDays });
     if (diffDays < 30) return t('talent_search.weeks_ago', { count: Math.floor(diffDays / 7) });
-    return date.toLocaleDateString();
+    return date.toLocaleDateString(getFormattingLocale());
   };
 
   return (
@@ -209,7 +209,7 @@ export function TalentSearchPage() {
       {/* Header */}
       <GlassCard className="p-6">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent to-accent-gradient-end flex items-center justify-center">
             <UserSearch className="w-5 h-5 text-white" aria-hidden="true" />
           </div>
           <div>

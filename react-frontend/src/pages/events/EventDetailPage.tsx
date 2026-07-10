@@ -518,16 +518,14 @@ export function EventDetailPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('detail.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <div className="flex justify-center gap-3">
-            <Link to={tenantPath("/events")}>
-              <Button
-                variant="flat"
-                className="bg-theme-elevated text-theme-primary"
-              >
-                {t('detail.browse_events')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath("/events")}
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+            >
+              {t('detail.browse_events')}
+            </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={() => loadEvent()}
             >
@@ -548,11 +546,9 @@ export function EventDetailPage() {
           title={t('detail.not_found')}
           description={t('detail.not_found_desc')}
           action={
-            <Link to={tenantPath("/events")}>
-              <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                {t('detail.browse_events')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath("/events")} className="bg-gradient-to-r from-accent to-accent-gradient-end text-white">
+              {t('detail.browse_events')}
+            </Button>
           }
         />
       </>
@@ -644,7 +640,7 @@ export function EventDetailPage() {
             loading="eager"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 via-indigo-500/10 to-emerald-500/20" aria-hidden="true" />
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 via-accent/10 to-emerald-500/20" aria-hidden="true" />
         )}
         <div className="absolute inset-0 bg-black/55" aria-hidden="true" />
         <div className="relative flex min-h-[22rem] flex-col justify-between gap-8 p-5 sm:min-h-[26rem] sm:p-8">
@@ -839,8 +835,8 @@ export function EventDetailPage() {
           </div>
 
           <div className="flex min-w-0 items-center gap-3 rounded-lg border border-theme-default bg-theme-elevated p-4 text-theme-muted">
-            <div className="flex-shrink-0 rounded-lg bg-indigo-500/20 p-2">
-              <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+            <div className="flex-shrink-0 rounded-lg bg-accent/20 p-2">
+              <Clock className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
             </div>
             <div className="min-w-0">
               <div className="text-xs text-theme-subtle">{t('detail.time_label')}</div>
@@ -900,7 +896,7 @@ export function EventDetailPage() {
           classNames={{
             tabList: 'border-b border-theme-default mb-6',
             tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
-            cursor: 'bg-gradient-to-r from-indigo-500 to-purple-600',
+            cursor: 'bg-gradient-to-r from-accent to-accent-gradient-end',
           }}
         >
           <Tab key="details" title={t('detail.tab_details')} />
@@ -977,7 +973,7 @@ export function EventDetailPage() {
               {!isLoadingPolls && eventPolls.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                    <BarChart3 className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                     {t('polls.title')}
                   </h2>
                   <div className="space-y-4">
@@ -1017,7 +1013,7 @@ export function EventDetailPage() {
                                   </div>
                                   <div className="w-full h-2 rounded-full bg-theme-hover overflow-hidden">
                                     <div
-                                      className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-500"
+                                      className="h-full rounded-full bg-gradient-to-r from-accent to-accent-gradient-end transition-all duration-500"
                                       style={{ width: `${opt.percentage}%` }}
                                     />
                                   </div>
@@ -1033,7 +1029,7 @@ export function EventDetailPage() {
                                 <Button
                                   key={opt.id}
                                   variant="flat"
-                                  className="w-full justify-start bg-theme-hover text-theme-primary hover:bg-indigo-500/20 transition-colors"
+                                  className="w-full justify-start bg-theme-hover text-theme-primary hover:bg-accent/20 transition-colors"
                                   onPress={() => handlePollVote(poll.id, opt.id)}
                                   isLoading={votingPollId === poll.id}
                                   isDisabled={votingPollId !== null}
@@ -1045,15 +1041,13 @@ export function EventDetailPage() {
                           )}
 
                           {/* Link to full poll page */}
-                          <Link to={tenantPath(`/polls/${poll.id}`)} className="block">
-                            <Button
-                              variant="light"
-                              size="sm"
-                              className="text-indigo-500 dark:text-indigo-400 p-0"
-                            >
-                              {t('polls.view_full')}
-                            </Button>
-                          </Link>
+                          <Button as={Link} to={tenantPath(`/polls/${poll.id}`)}
+                            variant="light"
+                            size="sm"
+                            className="block text-accent dark:text-accent p-0"
+                          >
+                            {t('polls.view_full')}
+                          </Button>
                         </CardBody>
                       </Card>
                     ))}
@@ -1071,7 +1065,7 @@ export function EventDetailPage() {
               {attendees.length > 0 && (
                 <div className="mb-8">
                   <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                    <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+                    <Users className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                     {t('detail.attendees')}
                   </h2>
                   <div className="flex items-center gap-4">
@@ -1238,7 +1232,7 @@ export function EventDetailPage() {
                       ) : (
                         <Button
                           size="sm"
-                          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                          className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                           startContent={<UserCheck className="w-3.5 h-3.5" aria-hidden="true" />}
                           isLoading={checkingInUserId === attendee.id}
                           onPress={() => handleCheckIn(attendee.id)}
@@ -1403,7 +1397,7 @@ export function EventDetailPage() {
       {event.series_occurrences && event.series_occurrences.length > 1 && (
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Repeat className="w-5 h-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+            <Repeat className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
             {t('detail.series_dates_title')}
           </h2>
           <div className="space-y-3">
@@ -1422,11 +1416,11 @@ export function EventDetailPage() {
                 >
                   <Card
                     isPressable
-                    className={`bg-theme-elevated border transition-colors ${isCurrent ? 'border-purple-500/60' : 'border-theme-default hover:border-purple-500/50'}`}
+                    className={`bg-theme-elevated border transition-colors ${isCurrent ? 'border-accent/60' : 'border-theme-default hover:border-accent/50'}`}
                   >
                     <CardBody className="flex flex-row items-center gap-4 p-3">
-                      <div className="bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-lg p-2 text-center min-w-[48px]">
-                        <div className="text-purple-700 dark:text-purple-400 text-[10px] font-medium uppercase leading-none">
+                      <div className="bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 rounded-lg p-2 text-center min-w-[48px]">
+                        <div className="text-accent dark:text-accent text-[10px] font-medium uppercase leading-none">
                           {monthLabel}
                         </div>
                         <div className="text-theme-primary text-lg font-bold leading-tight">
@@ -1454,7 +1448,7 @@ export function EventDetailPage() {
       {event.series && (
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <CalendarRange className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+            <CalendarRange className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
             {t('detail.other_series_events')}
           </h2>
 
@@ -1474,7 +1468,7 @@ export function EventDetailPage() {
                   <Link key={seriesEvent.id} to={tenantPath(`/events/${seriesEvent.id}`)}>
                     <Card
                       isPressable
-                      className="bg-theme-elevated border border-theme-default hover:border-indigo-500/50 transition-colors"
+                      className="bg-theme-elevated border border-theme-default hover:border-accent/50 transition-colors"
                     >
                       <CardBody className="flex flex-row items-center gap-4 p-3">
                         {/* Mini Date Badge */}
@@ -1506,16 +1500,14 @@ export function EventDetailPage() {
 
               {/* View all link */}
               {event.series.event_count > 5 && (
-                <Link to={tenantPath(`/events?series=${event.series.id}`)} className="block text-center">
-                  <Button
-                    variant="flat"
-                    size="sm"
-                    className="bg-theme-elevated text-theme-primary"
-                    endContent={<ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />}
-                  >
-                    {t('detail.view_all_series', { count: event.series.event_count })}
-                  </Button>
-                </Link>
+                <Button as={Link} to={tenantPath(`/events?series=${event.series.id}`)}
+                  variant="flat"
+                  size="sm"
+                  className="block text-center bg-theme-elevated text-theme-primary"
+                  endContent={<ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />}
+                >
+                  {t('detail.view_all_series', { count: event.series.event_count })}
+                </Button>
               )}
             </div>
           ) : (

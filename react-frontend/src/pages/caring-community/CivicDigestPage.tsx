@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
+import { Popover, PopoverContent, PopoverHeading, PopoverTrigger } from '@/components/ui/Popover';
 import { useTranslation } from 'react-i18next';
 import type { LucideIcon } from 'lucide-react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
@@ -325,9 +325,9 @@ export function CivicDigestPage() {
                             </PopoverTrigger>
                             <PopoverContent className="max-w-xs">
                               <div className="px-1 py-2 space-y-2">
-                                <p className="text-xs font-semibold text-theme-primary">
+                                <PopoverHeading className="text-xs font-semibold text-theme-primary">
                                   {t('transparency.why_button')}
-                                </p>
+                                </PopoverHeading>
                                 {reasons.length === 0 ? (
                                   <p className="text-xs text-theme-muted">
                                     {t('transparency.no_reasons')}

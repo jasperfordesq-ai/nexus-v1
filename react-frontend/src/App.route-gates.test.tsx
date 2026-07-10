@@ -11,6 +11,9 @@ const appSource = readFileSync(path.resolve(__dirname, 'routes/AppRoutes.tsx'), 
 const authRoutesSource = readFileSync(path.resolve(__dirname, 'routes/AuthRoutes.tsx'), 'utf8');
 const publicRoutesSource = readFileSync(path.resolve(__dirname, 'routes/PublicAppRoutes.tsx'), 'utf8');
 const tenantShellSource = readFileSync(path.resolve(__dirname, 'components/routing/TenantShell.tsx'), 'utf8');
+const protectedRoutesStart = appSource.indexOf('{/* Protected Routes */}');
+const protectedRoutesEnd = appSource.indexOf('{/* Admin Panel', protectedRoutesStart);
+const protectedRoutesSource = appSource.slice(protectedRoutesStart, protectedRoutesEnd);
 
 describe('App route feature gates', () => {
   it('gates matches routes behind the listings module', () => {
@@ -58,6 +61,30 @@ describe('App route feature gates', () => {
     expect(tenantShellSource).toContain('^courses\\/[^/]+\\/learn$');
     expect(tenantShellSource).toContain('^jobs\\/[^/]+\\/kanban$');
     expect(tenantShellSource).toContain('^marketplace\\/[^/]+\\/edit$');
+  });
+
+  it('keeps seller coupon and listing-edit routes inside the authenticated route tree', () => {
+    const protectedSellerRoutes = [
+      'marketplace/seller/coupons',
+      'marketplace/seller/coupons/new',
+      'marketplace/seller/coupons/:id/edit',
+      'marketplace/:id/edit',
+    ];
+
+    expect(protectedRoutesStart).toBeGreaterThan(-1);
+    expect(protectedRoutesEnd).toBeGreaterThan(protectedRoutesStart);
+
+    for (const routePath of protectedSellerRoutes) {
+      const declaration = `path="${routePath}"`;
+      expect(protectedRoutesSource).toContain(declaration);
+      expect(appSource.split(declaration)).toHaveLength(2);
+      expect(publicRoutesSource).not.toContain(declaration);
+    }
+
+    expect(protectedRoutesSource).toMatch(/path="marketplace\/seller\/coupons"[\s\S]*?<FeatureGate feature="merchant_coupons"/);
+    expect(protectedRoutesSource).toMatch(/path="marketplace\/seller\/coupons\/new"[\s\S]*?<FeatureGate feature="merchant_coupons"/);
+    expect(protectedRoutesSource).toMatch(/path="marketplace\/seller\/coupons\/:id\/edit"[\s\S]*?<FeatureGate feature="merchant_coupons"/);
+    expect(protectedRoutesSource).toMatch(/path="marketplace\/:id\/edit"[\s\S]*?<FeatureGate feature="marketplace"/);
   });
 
   it('keeps public marketplace profile/list routes in the public route registry', () => {

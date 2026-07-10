@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Button, Chip, Card, CardBody, CardHeader, Input, Textarea, Spinner, Progress, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tab, Tabs } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
@@ -306,8 +307,8 @@ export default function VolunteerGivingDays() {
         return (
           <div className="min-w-[120px]">
             <div className="flex justify-between text-xs mb-1">
-              <span>{raised.toLocaleString()}</span>
-              <span className="text-muted/80">/ {target.toLocaleString()}</span>
+              <span>{raised.toLocaleString(getFormattingLocale())}</span>
+              <span className="text-muted/80">/ {target.toLocaleString(getFormattingLocale())}</span>
             </div>
             <Progress size="sm" value={Math.min(pct, 100)} color={getProgressColor(pct)} aria-label={t('volunteering.amount_progress_aria')} />
           </div>
@@ -325,8 +326,12 @@ export default function VolunteerGivingDays() {
         return (
           <div className="min-w-[120px]">
             <div className="flex justify-between text-xs mb-1">
-              <span>{logged.toLocaleString()}h</span>
-              <span className="text-muted/80">/ {target.toLocaleString()}h</span>
+              <span>{formatNumber(logged, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}</span>
+              <span className="text-muted/80">
+                {t('giving_days.hours_target', {
+                  target: formatNumber(target, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' }),
+                })}
+              </span>
             </div>
             <Progress size="sm" value={Math.min(pct, 100)} color={getProgressColor(pct)} aria-label={t('volunteering.hours_progress_aria')} />
           </div>
@@ -337,13 +342,13 @@ export default function VolunteerGivingDays() {
       key: 'start_date',
       label: t('volunteering.col_start_date'),
       sortable: true,
-      render: (row) => <span>{row.start_date ? new Date(row.start_date).toLocaleDateString() : '-'}</span>,
+      render: (row) => <span>{row.start_date ? new Date(row.start_date).toLocaleDateString(getFormattingLocale()) : '-'}</span>,
     },
     {
       key: 'end_date',
       label: t('volunteering.col_end_date'),
       sortable: true,
-      render: (row) => <span>{row.end_date ? new Date(row.end_date).toLocaleDateString() : '-'}</span>,
+      render: (row) => <span>{row.end_date ? new Date(row.end_date).toLocaleDateString(getFormattingLocale()) : '-'}</span>,
     },
     {
       key: 'is_active',
@@ -500,7 +505,7 @@ export default function VolunteerGivingDays() {
               <Card className="border border-success/20 bg-success-50/30 shadow-sm shadow-success/10">
                 <CardBody className="p-3 text-center">
                   <p className="text-xs text-muted">{t('volunteering.total_raised')}</p>
-                  <p className="text-lg font-bold text-success">{donorStats.total_raised.toLocaleString()}</p>
+                  <p className="text-lg font-bold text-success">{donorStats.total_raised.toLocaleString(getFormattingLocale())}</p>
                 </CardBody>
               </Card>
               <Card className="border border-divider/70 bg-surface-secondary/50">
@@ -562,9 +567,9 @@ export default function VolunteerGivingDays() {
                             )}
                           </div>
                           <div className="text-right flex-shrink-0">
-                            <p className="text-sm font-semibold text-success">{donor.amount.toLocaleString()}</p>
+                            <p className="text-sm font-semibold text-success">{donor.amount.toLocaleString(getFormattingLocale())}</p>
                             <p className="text-xs text-muted/80">
-                              {donor.donated_at ? new Date(donor.donated_at).toLocaleDateString() : ''}
+                              {donor.donated_at ? new Date(donor.donated_at).toLocaleDateString(getFormattingLocale()) : ''}
                             </p>
                           </div>
                         </div>

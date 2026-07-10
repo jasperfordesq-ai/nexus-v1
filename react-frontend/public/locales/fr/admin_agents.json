@@ -130,7 +130,10 @@
         "run_failed_with_error": "Échec de l'exécution : {{error}}",
         "toggle_failed": "Échec du basculement de l'agent",
         "updated": "Agent mis à jour",
-        "update_failed": "Échec de la mise à jour de l'agent"
+        "update_failed": "Échec de la mise à jour de l'agent",
+        "run_created_many": "Exécuter #{{runId}} a créé une ou plusieurs propositions {{count}}",
+        "run_created_one": "Exécuter #{{runId}} a créé une ou plusieurs propositions {{count}}",
+        "run_created_other": "Exécuter #{{runId}} a créé une ou plusieurs propositions {{count}}"
       }
     },
     "runs": {

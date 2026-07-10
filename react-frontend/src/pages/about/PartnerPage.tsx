@@ -54,7 +54,7 @@ const impactCards = [
   {
     key: 'wellbeing',
     icon: ShieldCheck,
-    color: 'from-blue-500 to-indigo-500',
+    color: 'from-blue-500 to-accent-gradient-end',
     bgAccent: 'bg-blue-500/10',
     textAccent: 'text-blue-600 dark:text-blue-400',
     borderAccent: 'border-blue-500/30',
@@ -62,10 +62,10 @@ const impactCards = [
   {
     key: 'scalability',
     icon: Rocket,
-    color: 'from-purple-500 to-pink-500',
-    bgAccent: 'bg-purple-500/10',
-    textAccent: 'text-purple-600 dark:text-purple-400',
-    borderAccent: 'border-purple-500/30',
+    color: 'from-accent to-pink-500',
+    bgAccent: 'bg-accent/10',
+    textAccent: 'text-accent dark:text-accent',
+    borderAccent: 'border-accent/30',
   },
 ];
 
@@ -141,12 +141,12 @@ export function PartnerPage() {
         {/* Background decoration */}
         <div className="absolute inset-0 pointer-events-none opacity-20" aria-hidden="true">
           <div className="absolute top-10 left-1/3 w-72 h-72 bg-emerald-500 rounded-full blur-3xl" />
-          <div className="absolute bottom-10 right-1/3 w-72 h-72 bg-purple-500 rounded-full blur-3xl" />
+          <div className="absolute bottom-10 right-1/3 w-72 h-72 bg-accent rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div {...fadeInUp} transition={{ duration: 0.6 }}>
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mb-6">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-accent-gradient-end/20 mb-6">
               <Handshake className="w-8 h-8 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
             </div>
           </motion.div>
@@ -239,11 +239,11 @@ export function PartnerPage() {
             transition={{ duration: 0.6 }}
           >
             <GlassCard className="p-8 sm:p-10 text-center relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500" aria-hidden="true" />
-              <div className="inline-flex items-center justify-center p-2 rounded-xl bg-indigo-500/10 mb-4">
-                <Laptop className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-accent to-accent-gradient-end" aria-hidden="true" />
+              <div className="inline-flex items-center justify-center p-2 rounded-xl bg-accent/10 mb-4">
+                <Laptop className="w-5 h-5 text-accent" aria-hidden="true" />
               </div>
-              <p className="text-sm font-semibold uppercase tracking-widest text-indigo-500 dark:text-indigo-400 mb-4">
+              <p className="text-sm font-semibold uppercase tracking-widest text-accent dark:text-accent mb-4">
                 {t('partner.tech_partner_label')}
               </p>
               <picture>
@@ -412,8 +412,8 @@ export function PartnerPage() {
               >
                 <GlassCard className="p-6 h-full group hover:scale-[1.01] transition-transform">
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 p-3 rounded-xl bg-gradient-to-br from-indigo-500/15 to-purple-500/15">
-                      <type.icon className="w-6 h-6 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                    <div className="flex-shrink-0 p-3 rounded-xl bg-gradient-to-br from-accent/15 to-accent-gradient-end/15">
+                      <type.icon className="w-6 h-6 text-accent dark:text-accent" aria-hidden="true" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-theme-primary text-lg mb-1">{t(`partner.partnership_type_${index}_title`)}</h3>
@@ -428,7 +428,7 @@ export function PartnerPage() {
       </section>
 
       {/* ─── Learn More Links ─── */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
+      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-accent/5 to-transparent">
         <div className="max-w-3xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -453,14 +453,14 @@ export function PartnerPage() {
                 <Link to={tenantPath(link.to)} className="block">
                   <GlassCard className="p-5 group hover:scale-[1.01] transition-transform">
                     <div className="flex items-center gap-4">
-                      <div className="flex-shrink-0 p-2.5 rounded-xl bg-indigo-500/15">
-                        <link.icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                      <div className="flex-shrink-0 p-2.5 rounded-xl bg-accent/15">
+                        <link.icon className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-theme-primary">{t(`partner.learn_more_${linkIndex}_title`)}</h3>
                         <p className="text-sm text-theme-muted">{t(`partner.learn_more_${linkIndex}_description`)}</p>
                       </div>
-                      <ArrowRight className="w-5 h-5 text-theme-subtle group-hover:text-indigo-500 transition-colors flex-shrink-0" aria-hidden="true" />
+                      <ArrowRight className="w-5 h-5 text-theme-subtle group-hover:text-accent transition-colors flex-shrink-0" aria-hidden="true" />
                     </div>
                   </GlassCard>
                 </Link>
@@ -485,11 +485,11 @@ export function PartnerPage() {
               {/* Background gradient */}
               <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full blur-3xl" />
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-purple-500 to-indigo-500 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-accent to-accent-gradient-end rounded-full blur-3xl" />
               </div>
 
               <div className="relative z-10">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-purple-500/20 mb-6">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-accent-gradient-end/20 mb-6">
                   <Users className="w-7 h-7 text-emerald-500 dark:text-emerald-400" aria-hidden="true" />
                 </div>
 
@@ -501,26 +501,22 @@ export function PartnerPage() {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link to={tenantPath('/contact')}>
-                    <Button
-                      size="lg"
-                      className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold px-8"
-                      endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
-                    >
-                      {t('partner.cta_contact')}
-                    </Button>
-                  </Link>
+                  <Button as={Link} to={tenantPath('/contact')}
+                    size="lg"
+                    className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold px-8"
+                    endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
+                  >
+                    {t('partner.cta_contact')}
+                  </Button>
 
-                  <Link to={tenantPath('/strategic-plan')}>
-                    <Button
-                      size="lg"
-                      variant="bordered"
-                      className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
-                      startContent={<Target className="w-5 h-5" aria-hidden="true" />}
-                    >
-                      {t('partner.cta_view_plan')}
-                    </Button>
-                  </Link>
+                  <Button as={Link} to={tenantPath('/strategic-plan')}
+                    size="lg"
+                    variant="bordered"
+                    className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
+                    startContent={<Target className="w-5 h-5" aria-hidden="true" />}
+                  >
+                    {t('partner.cta_view_plan')}
+                  </Button>
                 </div>
               </div>
             </GlassCard>

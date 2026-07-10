@@ -19,6 +19,7 @@ import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { FeatureErrorBoundary } from '@/components/feedback/FeatureErrorBoundary';
 import { FeatureGate } from '@/components/routing/FeatureGate';
 import { lazyWithRetry } from './lazyWithRetry';
+import { renderSharedPublicFeatureRoutes } from './sharedPublicFeatureRoutes';
 
 const Layout = lazyWithRetry(() => import('@/components/layout/Layout'));
 const HomePage = lazyWithRetry(() => import('@/pages/public/HomePage'));
@@ -50,7 +51,6 @@ const CouponDetailPage = lazyWithRetry(() => import('@/pages/coupons/CouponDetai
 const PricingPage = lazyWithRetry(() => import('@/pages/premium/PricingPage'));
 const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
 const OpportunityDetailPage = lazyWithRetry(() => import('@/pages/volunteering/OpportunityDetailPage'));
-const GuardianConsentVerifyPage = lazyWithRetry(() => import('@/pages/volunteering/GuardianConsentVerifyPage'));
 const ResourcesPage = lazyWithRetry(() => import('@/pages/resources/ResourcesPage'));
 const KnowledgeBasePage = lazyWithRetry(() => import('@/pages/kb/KnowledgeBasePage'));
 const KBArticlePage = lazyWithRetry(() => import('@/pages/kb/KBArticlePage'));
@@ -64,7 +64,6 @@ const InviteRedemptionPage = lazyWithRetry(() => import('@/pages/caring-communit
 const BlogPage = lazyWithRetry(() => import('@/pages/blog/BlogPage'));
 const BlogPostPage = lazyWithRetry(() => import('@/pages/blog/BlogPostPage'));
 const NewsletterUnsubscribePage = lazyWithRetry(() => import('@/pages/newsletter/NewsletterUnsubscribePage'));
-const ExplorePage = lazyWithRetry(() => import('@/pages/explore/ExplorePage'));
 const NotFoundPage = lazyWithRetry(() => import('@/pages/errors/NotFoundPage'));
 const ComingSoonPage = lazyWithRetry(() => import('@/pages/errors/ComingSoonPage'));
 
@@ -155,8 +154,7 @@ export function PublicAppRoutes() {
         <Route path="regional-analytics" element={<ErrorBoundary><RegionalAnalyticsLandingPage /></ErrorBoundary>} />
         <Route path="partner-analytics/dashboard" element={<ErrorBoundary><PartnerDashboardPage /></ErrorBoundary>} />
         <Route path="newsletter/unsubscribe" element={<ErrorBoundary><NewsletterUnsubscribePage /></ErrorBoundary>} />
-        <Route path="volunteering/guardian-consent/verify/:token" element={<ErrorBoundary><GuardianConsentVerifyPage /></ErrorBoundary>} />
-        <Route path="explore" element={<ErrorBoundary><ExplorePage /></ErrorBoundary>} />
+        {renderSharedPublicFeatureRoutes()}
         <Route path="partner" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><PartnerPage /></TenantSlugGate></ErrorBoundary>} />
         <Route path="social-prescribing" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><SocialPrescribingPage /></TenantSlugGate></ErrorBoundary>} />
         <Route path="impact-summary" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><ImpactSummaryPage /></TenantSlugGate></ErrorBoundary>} />

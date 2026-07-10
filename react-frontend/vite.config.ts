@@ -78,16 +78,19 @@ export default defineConfig(({ command, mode }) => {
         // listeners to the workbox-generated SW is otherwise impossible
         // without switching to InjectManifest.
         importScripts: ['/sw-push-handler.js'],
-        // PRECACHE: only content-hashed, immutable build artefacts. The HTML
-        // shell (index.html) is intentionally NOT included — it's served
-        // NetworkFirst at runtime so every navigation hits the network for the
-        // current shell, falling back to the most recent cached copy only when
-        // the network is slow or offline. This is the pattern GitHub, Linear,
-        // Vercel, Notion, and most production SPAs use. Precaching the HTML
-        // is what forced this codebase into the "click Update to get fresh
-        // code" workflow that PWAs are notorious for. Removing it makes
-        // deploys propagate to users on their next navigation, with no UI.
+        // PRECACHE: the HTML fallback, content-hashed startup graph, and install
+        // metadata. Navigations still use NetworkFirst, so online users receive
+        // the current shell. The precached index is consulted only when both the
+        // network and runtime HTML cache miss (the clean-install offline case).
+        // The entry module, its HTML modulepreloads, and its stylesheet must be
+        // available after a clean install even though their first request may
+        // precede service-worker control. Route/editor chunks remain lazy.
         globPatterns: [
+          'index.html',
+          'assets/app-*.js',
+          'assets/index-*.css',
+          'assets/vendor-react-*.js',
+          'assets/vendor-i18n-*.js',
           'sw-push-handler.js',
           'manifest.json',
           'favicon.svg',
@@ -96,8 +99,7 @@ export default defineConfig(({ command, mode }) => {
         ],
         // Do not make first-visit SW install compete with login/register by
         // precaching heavyweight route-only bundles. These remain immutable
-        // hashed assets and are fetched/cached by the browser when their route
-        // or editor is actually opened.
+        // hashed assets and are fetched when their route/editor is opened.
         globIgnores: [
           '**/NewsletterBuilder-*.js',
           '**/AssetLibraryModal-*.js',
@@ -120,6 +122,39 @@ export default defineConfig(({ command, mode }) => {
         clientsClaim: true,
         cleanupOutdatedCaches: true,
         runtimeCaching: [
+          // Route chunks are content-hashed and immutable. Cache every chunk
+          // actually used by a controlled page so a clean install can restart
+          // its current route offline without precaching heavyweight editors.
+          {
+            urlPattern: ({ url }) => (
+              url.origin === self.location.origin
+              && /^\/assets\/[^/]+\.(?:js|css)$/.test(url.pathname)
+            ),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'nexus-immutable-assets-v1',
+              expiration: { maxEntries: 500, maxAgeSeconds: 365 * 86400 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+          // The SPA cannot render even its public/login shell until tenant
+          // bootstrap resolves. Cache each slug-qualified successful response
+          // so a previously installed tenant can restart offline; NetworkFirst
+          // keeps online identity/settings current and never caches failures.
+          {
+            urlPattern: ({ request, url }) => (
+              request.method === 'GET'
+              && url.origin === self.location.origin
+              && url.pathname === '/api/v2/tenant/bootstrap'
+            ),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'nexus-tenant-bootstrap-v1',
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 32, maxAgeSeconds: 7 * 86400 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
           // HTML shell — NetworkFirst with a 3s timeout. Online: every nav
           // gets the freshly deployed shell. Slow network or offline: falls
           // back to the most recent cached HTML so the app still loads.
@@ -155,6 +190,10 @@ export default defineConfig(({ command, mode }) => {
                 statuses: [200],
                 headers: { 'X-Nexus-Spa-Shell': '1' },
               },
+              // A newly installed worker did not control the navigation that
+              // loaded it, so the runtime cache can still be empty. Fall back
+              // to the revisioned precache shell for the first offline restart.
+              precacheFallback: { fallbackURL: 'index.html' },
             },
           },
           {
@@ -340,6 +379,9 @@ export default defineConfig(({ command, mode }) => {
       // Guard all usages with window.Capacitor?.isNativePlatform?.() checks.
       external: ['@capacitor/app', '@capacitor/push-notifications'],
       output: {
+        // A stable prefix lets Workbox select only the HTML entry instead of
+        // every dynamic chunk whose Rollup name happens to be `index`.
+        entryFileNames: 'assets/app-[hash].js',
         manualChunks(id) {
           if (!id.includes('node_modules')) return;
 

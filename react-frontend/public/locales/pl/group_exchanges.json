@@ -89,7 +89,15 @@
     "no_members_found": "Nie znaleziono członków pasujących do twojego wyszukiwania.",
     "done": "Gotowe",
     "aria_exchange_participants": "Uczestnicy wymiany",
-    "aria_hour_split": "Podział godzin"
+    "aria_hour_split": "Podział godzin",
+    "participants_heading_few": "Uczestnicy ({{count}})",
+    "participants_heading_many": "Uczestnicy ({{count}})",
+    "participants_heading_one": "Uczestnicy ({{count}})",
+    "participants_heading_other": "Uczestnicy ({{count}})",
+    "hours_amount_few": "{{count}} godz.",
+    "hours_amount_many": "{{count}} godz.",
+    "hours_amount_one": "{{count}} godz.",
+    "hours_amount_other": "{{count}} godz."
   },
   "create": {
     "page_title": "Utwórz Wymianę Grupową",
@@ -148,7 +156,15 @@
     "step_of_named": "Krok {{current}} z {{total}}: {{name}}",
     "hours_value": "{{hours}} godz.",
     "hours_suffix": "godz.",
-    "weight_suffix": "X"
+    "weight_suffix": "X",
+    "providers_count_few": "Dostawcy ({{count}})",
+    "providers_count_many": "Dostawcy ({{count}})",
+    "providers_count_one": "Dostawcy ({{count}})",
+    "providers_count_other": "Dostawcy ({{count}})",
+    "receivers_count_few": "Odbiorcy ({{count}})",
+    "receivers_count_many": "Odbiorcy ({{count}})",
+    "receivers_count_one": "Odbiorcy ({{count}})",
+    "receivers_count_other": "Odbiorcy ({{count}})"
   },
   "toast": {
     "exchange_started": "Wymiana rozpoczęta",
@@ -189,5 +205,9 @@
     }
   },
   "role_provider": "Provider",
-  "role_receiver": "Receiver"
+  "role_receiver": "Receiver",
+  "participants_count_few": "{{count}} uczestników",
+  "participants_count_many": "{{count}} uczestników",
+  "hours_count_few": "{{count}} godziny",
+  "hours_count_many": "{{count}} godziny"
 }

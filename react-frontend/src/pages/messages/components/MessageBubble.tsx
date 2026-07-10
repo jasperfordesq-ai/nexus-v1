@@ -18,7 +18,7 @@ import Check from 'lucide-react/icons/check';
 import CheckCheck from 'lucide-react/icons/check-check';
 import FileText from 'lucide-react/icons/file-text';
 import Languages from 'lucide-react/icons/languages';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { formatNumber, resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { api } from '@/lib/api';
 import { useTenant } from '@/contexts/TenantContext';
 import type { Message } from '@/types/api';
@@ -202,7 +202,7 @@ export const MessageBubble = memo(function MessageBubble({
           className={`
             inline-block max-w-full break-words px-3 py-2 sm:px-4 rounded-2xl relative [overflow-wrap:anywhere]
             ${isOwn
-              ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-br-md'
+              ? 'bg-gradient-to-r from-accent to-accent-gradient-end text-white rounded-br-md'
               : 'bg-theme-elevated text-theme-primary rounded-bl-md'
             }
           `}
@@ -229,10 +229,10 @@ export const MessageBubble = memo(function MessageBubble({
                 }}
               />
               <div className="flex gap-2 mt-2 justify-end">
-                <Button size="sm" variant="secondary" className="bg-black/10 dark:bg-white/10 text-inherit/70" onPress={onCancelEdit}>
+                <Button size="sm" variant="secondary" className="min-h-11 bg-black/10 dark:bg-white/10 text-inherit/70" onPress={onCancelEdit}>
                   {t('cancel')}
                 </Button>
-                <Button size="sm" className="bg-black/20 dark:bg-white/20 text-inherit" onPress={onSaveEdit}>
+                <Button size="sm" className="min-h-11 bg-black/20 dark:bg-white/20 text-inherit" onPress={onSaveEdit}>
                   {t('save')}
                 </Button>
               </div>
@@ -254,7 +254,7 @@ export const MessageBubble = memo(function MessageBubble({
                     <Button
                       size="sm"
                       variant="tertiary"
-                      className={`min-h-6 min-w-0 px-2 text-xs gap-1 ${isOwn ? 'text-white/60 hover:text-white/100' : 'opacity-60 hover:opacity-100'} ${isTranslating ? 'animate-pulse' : ''}`}
+                      className={`min-h-11 px-2 text-xs gap-1 ${isOwn ? 'text-white/60 hover:text-white/100' : 'opacity-60 hover:opacity-100'} ${isTranslating ? 'animate-pulse' : ''}`}
                       onPress={handleTranslate}
                       isDisabled={isTranslating}
                       startContent={<Languages className="w-3 h-3" aria-hidden="true" />}
@@ -306,7 +306,7 @@ export const MessageBubble = memo(function MessageBubble({
                   <Button
                     size="sm"
                     variant="tertiary"
-                    className={`min-h-6 min-w-0 px-2 text-xs gap-1 ${isOwn ? 'text-white/60 hover:text-white/100' : 'opacity-60 hover:opacity-100'} ${isTranslating ? 'animate-pulse' : ''}`}
+                    className={`min-h-11 px-2 text-xs gap-1 ${isOwn ? 'text-white/60 hover:text-white/100' : 'opacity-60 hover:opacity-100'} ${isTranslating ? 'animate-pulse' : ''}`}
                     onPress={handleTranslate}
                     isDisabled={isTranslating}
                     startContent={<Languages className="w-3 h-3" aria-hidden="true" />}
@@ -353,7 +353,12 @@ export const MessageBubble = memo(function MessageBubble({
                           <div className="flex min-w-0 flex-col">
                             <span className="max-w-[min(150px,55vw)] truncate text-xs opacity-80">{attachment.name}</span>
                             <span className="text-[10px] opacity-40">
-                              {(attachment.size / 1024).toFixed(1)} KB
+                              {formatNumber(attachment.size / 1024, {
+                                style: 'unit',
+                                unit: 'kilobyte',
+                                unitDisplay: 'short',
+                                maximumFractionDigits: 1,
+                              })}
                             </span>
                           </div>
                         </div>
@@ -369,30 +374,28 @@ export const MessageBubble = memo(function MessageBubble({
 
           {/* Action buttons - shows on hover (only when not editing) */}
           {!isEditing && !isDeleted && (
-            <div className={`absolute -bottom-2 ${isOwn ? '-left-8 sm:-left-12' : '-right-8 sm:-right-12'} flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity`}>
+            <div className={`absolute -bottom-2 ${isOwn ? '-left-24' : '-right-24'} flex gap-1 opacity-100 pointer-coarse:opacity-100 any-pointer-coarse:opacity-100 pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-within:opacity-100 transition-opacity`}>
               {/* Reaction button */}
               <Button
                 isIconOnly
-                size="sm"
                 variant="tertiary"
-                className="min-h-5 w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
+                className="size-11 min-h-11 min-w-11 p-0 bg-theme-elevated rounded-full border border-theme-default focus-visible:opacity-100"
                 onPress={() => setShowReactionPicker(!showReactionPicker)}
                 aria-label={t('aria_add_reaction')}
               >
-                <SmilePlus className="w-3 h-3 text-theme-muted" aria-hidden="true" />
+                <SmilePlus className="size-4 text-theme-muted" aria-hidden="true" />
               </Button>
 
               {/* Edit/Delete button — shown for all messages (receiver can delete for themselves or everyone) */}
               {!isVoiceMessage && (
                 <Button
                   isIconOnly
-                  size="sm"
                   variant="tertiary"
-                  className="min-h-5 w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
+                  className="size-11 min-h-11 min-w-11 p-0 bg-theme-elevated rounded-full border border-theme-default focus-visible:opacity-100"
                   onPress={() => setShowMessageMenu(!showMessageMenu)}
                   aria-label={t('aria_message_options')}
                 >
-                  <MoreVertical className="w-3 h-3 text-theme-muted" aria-hidden="true" />
+                  <MoreVertical className="size-4 text-theme-muted" aria-hidden="true" />
                 </Button>
               )}
             </div>
@@ -414,9 +417,8 @@ export const MessageBubble = memo(function MessageBubble({
                 <Button
                   key={emoji}
                   isIconOnly
-                  size="sm"
                   variant="tertiary"
-                  className="w-7 h-7 min-w-0 rounded-full"
+                  className="size-11 min-h-11 min-w-11 p-0 rounded-full"
                   onPress={() => {
                     onReact?.(message.id, emoji);
                     setShowReactionPicker(false);
@@ -445,7 +447,7 @@ export const MessageBubble = memo(function MessageBubble({
                 <Button
                   variant="tertiary"
                   size="sm"
-                  className="justify-start text-sm text-theme-muted"
+                  className="min-h-11 justify-start text-sm text-theme-muted"
                   startContent={<Pencil className="w-3 h-3" aria-hidden="true" />}
                   onPress={() => {
                     onEdit?.(message);
@@ -459,7 +461,7 @@ export const MessageBubble = memo(function MessageBubble({
               <Button
                 variant="danger-soft"
                 size="sm"
-                className="justify-start text-sm text-red-600 dark:text-red-400"
+                className="min-h-11 justify-start text-sm text-red-600 dark:text-red-400"
                 startContent={<Trash2 className="w-3 h-3" aria-hidden="true" />}
                 onPress={() => {
                   onDelete?.(message.id);
@@ -481,7 +483,7 @@ export const MessageBubble = memo(function MessageBubble({
                 key={emoji}
                 size="sm"
                 variant="tertiary"
-                className="min-h-6 min-w-0 px-1.5 py-0.5 bg-theme-elevated rounded-full text-xs gap-0.5"
+                className="min-h-11 px-2 py-0.5 bg-theme-elevated rounded-full text-xs gap-0.5"
                 onPress={() => onReact?.(message.id, emoji)}
                 aria-label={t('aria_toggle_reaction', { emoji })}
               >
@@ -496,7 +498,7 @@ export const MessageBubble = memo(function MessageBubble({
 
         <div className={`flex items-center gap-1 mt-1 px-2 ${isOwn ? 'justify-end' : 'justify-start'}`}>
           <span className="text-xs text-theme-subtle">
-            {new Date(message.created_at || message.sent_at || Date.now()).toLocaleTimeString([], {
+            {new Date(message.created_at || message.sent_at || Date.now()).toLocaleTimeString(getFormattingLocale(), {
               hour: '2-digit',
               minute: '2-digit',
             })}

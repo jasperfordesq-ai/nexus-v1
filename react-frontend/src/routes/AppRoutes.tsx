@@ -21,6 +21,7 @@ import { FeatureGate } from '@/components/routing/FeatureGate';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { FeatureErrorBoundary } from '@/components/feedback/FeatureErrorBoundary';
 import { lazyWithRetry } from './lazyWithRetry';
+import { renderSharedPublicFeatureRoutes } from './sharedPublicFeatureRoutes';
 
 const VerifyIdentityOptionalPage = lazyWithRetry(() => import('@/pages/settings/VerifyIdentityOptionalPage'));
 
@@ -138,7 +139,6 @@ const OpportunityDetailPage = lazyWithRetry(() => import('@/pages/volunteering/O
 const VolOrgDashboardPage = lazyWithRetry(() => import('@/pages/volunteering/VolOrgDashboardPage'));
 const MyOrganisationsPage = lazyWithRetry(() => import('@/pages/volunteering/MyOrganisationsPage'));
 const DonationReceiptPage = lazyWithRetry(() => import('@/pages/volunteering/DonationReceiptPage'));
-const GuardianConsentVerifyPage = lazyWithRetry(() => import('@/pages/volunteering/GuardianConsentVerifyPage'));
 const CheckInVerifyPage = lazyWithRetry(() => import('@/pages/volunteering/CheckInVerifyPage'));
 const OrganisationsPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationsPage'));
 const OrganisationDetailPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationDetailPage'));
@@ -177,7 +177,6 @@ const ActivityDashboardPage = lazyWithRetry(() => import('@/pages/activity/Activ
 const HashtagPage = lazyWithRetry(() => import('@/pages/feed/HashtagPage'));
 const HashtagsDiscoveryPage = lazyWithRetry(() => import('@/pages/feed/HashtagsDiscoveryPage'));
 const PostDetailPage = lazyWithRetry(() => import('@/pages/feed/PostDetailPage'));
-const ExplorePage = lazyWithRetry(() => import('@/pages/explore/ExplorePage'));
 
 // Marketplace Pages
 const MarketplacePage = lazyWithRetry(() => import('@/pages/marketplace/MarketplacePage'));
@@ -335,11 +334,8 @@ export function AppRoutes() {
         {/* Newsletter unsubscribe â€” public, no auth, token-based */}
         <Route path="newsletter/unsubscribe" element={<ErrorBoundary><NewsletterUnsubscribePage /></ErrorBoundary>} />
 
-        {/* Guardian consent approval â€” public, no auth, token-based (linked from the consent email) */}
-        <Route path="volunteering/guardian-consent/verify/:token" element={<ErrorBoundary><FeatureGate feature="volunteering" redirect="/"><GuardianConsentVerifyPage /></FeatureGate></ErrorBoundary>} />
-
-        {/* Explore / Discover â€” curated discovery page */}
-        <Route path="explore" element={<ErrorBoundary><FeatureGate feature="explore" redirect="/"><ExplorePage /></FeatureGate></ErrorBoundary>} />
+        {/* Shared public routes use one path/auth/feature policy in both registries. */}
+        {renderSharedPublicFeatureRoutes()}
 
         {/* Tenant 2 (hOUR Timebank) specific pages â€” redirect other tenants to /about */}
         <Route path="partner" element={<ErrorBoundary><TenantSlugGate slug="hour-timebank"><PartnerPage /></TenantSlugGate></ErrorBoundary>} />
@@ -606,27 +602,6 @@ export function AppRoutes() {
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
-        <Route path="marketplace/seller/coupons" element={
-          <FeatureGate feature="merchant_coupons" redirect="/">
-            <FeatureErrorBoundary featureName="Merchant Coupons">
-              <SellerCouponsPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="marketplace/seller/coupons/new" element={
-          <FeatureGate feature="merchant_coupons" redirect="/">
-            <FeatureErrorBoundary featureName="Merchant Coupons">
-              <SellerCouponEditPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="marketplace/seller/coupons/:id/edit" element={
-          <FeatureGate feature="merchant_coupons" redirect="/">
-            <FeatureErrorBoundary featureName="Merchant Coupons">
-              <SellerCouponEditPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
         <Route path="coupons" element={
           <FeatureGate feature="merchant_coupons" fallback={<ComingSoonPage feature={t('coming_soon.features.coupons')} />}>
             <FeatureErrorBoundary featureName="Coupons">
@@ -638,13 +613,6 @@ export function AppRoutes() {
           <FeatureGate feature="merchant_coupons" redirect="/coupons">
             <FeatureErrorBoundary featureName="Coupons">
               <CouponDetailPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="marketplace/:id/edit" element={
-          <FeatureGate feature="marketplace" redirect="/">
-            <FeatureErrorBoundary featureName="Marketplace">
-              <EditMarketplaceListingPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
@@ -1387,10 +1355,38 @@ export function AppRoutes() {
           } />
 
           {/* Feature-gated: Marketplace (create/sell only â€” view routes are public) */}
+          <Route path="marketplace/seller/coupons" element={
+            <FeatureGate feature="merchant_coupons" redirect="/">
+              <FeatureErrorBoundary featureName="Merchant Coupons">
+                <SellerCouponsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/seller/coupons/new" element={
+            <FeatureGate feature="merchant_coupons" redirect="/">
+              <FeatureErrorBoundary featureName="Merchant Coupons">
+                <SellerCouponEditPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/seller/coupons/:id/edit" element={
+            <FeatureGate feature="merchant_coupons" redirect="/">
+              <FeatureErrorBoundary featureName="Merchant Coupons">
+                <SellerCouponEditPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
           <Route path="marketplace/sell" element={
             <FeatureGate feature="marketplace" redirect="/dashboard">
               <FeatureErrorBoundary featureName="Marketplace">
                 <CreateMarketplaceListingPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/:id/edit" element={
+            <FeatureGate feature="marketplace" redirect="/">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <EditMarketplaceListingPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
@@ -1746,5 +1742,4 @@ export function AppRoutes() {
     </>
   );
 }
-
 

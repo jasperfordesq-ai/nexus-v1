@@ -5,6 +5,7 @@
 
 import { SearchField as HeroUISearchField, type SearchFieldProps as HeroUISearchFieldProps } from '@heroui/react/search-field';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type LegacyVariant = 'flat' | 'bordered' | 'underlined' | 'faded';
 type V3Variant = NonNullable<HeroUISearchFieldProps['variant']>;
@@ -16,6 +17,7 @@ export type SearchFieldProps = Omit<HeroUISearchFieldProps, 'children' | 'onChan
     input?: string;
     inputWrapper?: string;
   };
+  clearButtonLabel?: string;
   endContent?: ReactNode;
   isClearable?: boolean;
   onChange?: (event: { target: { value: string } }) => void;
@@ -52,6 +54,7 @@ function sizeClass(size?: SearchFieldProps['size']): string | undefined {
 export function SearchField({
   className,
   classNames,
+  clearButtonLabel,
   endContent,
   isClearable: _isClearable,
   onChange,
@@ -62,6 +65,8 @@ export function SearchField({
   variant,
   ...props
 }: SearchFieldProps) {
+  const { t } = useTranslation('common');
+
   return (
     <HeroUISearchField
       {...props}
@@ -76,7 +81,9 @@ export function SearchField({
         <HeroUISearchField.SearchIcon>{startContent}</HeroUISearchField.SearchIcon>
         <HeroUISearchField.Input className={classNames?.input} placeholder={placeholder} />
         {endContent}
-        <HeroUISearchField.ClearButton />
+        <HeroUISearchField.ClearButton
+          aria-label={clearButtonLabel ?? t('search.clear')}
+        />
       </HeroUISearchField.Group>
     </HeroUISearchField>
   );

@@ -37,5 +37,10 @@
   "page_meta": {
     "title": "Naisc"
   },
-  "loading": "Naisc á lódáil..."
+  "loading": "Naisc á lódáil...",
+  "pending_count_few": "{{count}} ar feitheamh",
+  "pending_count_many": "{{count}} ar feitheamh",
+  "pending_count_one": "{{count}} ar feitheamh",
+  "pending_count_other": "{{count}} ar feitheamh",
+  "pending_count_two": "{{count}} ar feitheamh"
 }

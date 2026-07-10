@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Progress, Button, Chip, Spinner, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -112,7 +113,7 @@ const progressPercent = (goal: Goal): number => {
 };
 
 const formatDate = (iso: string): string =>
-  new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  new Date(iso).toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'short', day: 'numeric' });
 
 // ---------------------------------------------------------------------------
 // Component

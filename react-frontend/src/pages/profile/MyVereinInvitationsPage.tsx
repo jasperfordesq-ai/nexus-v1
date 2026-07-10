@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
@@ -134,7 +135,7 @@ export default function MyVereinInvitationsPage() {
 
                 {inv.expires_at ? (
                   <p className="text-xs text-muted">
-                    {t('verein_federation.expires_label')}: {new Date(inv.expires_at).toLocaleDateString()}
+                    {t('verein_federation.expires_label')}: {new Date(inv.expires_at).toLocaleDateString(getFormattingLocale())}
                   </p>
                 ) : null}
 

@@ -130,7 +130,13 @@
         "run_failed_with_error": "فشل التشغيل: {{error}}",
         "toggle_failed": "فشل في تبديل الوكيل",
         "updated": "تم تحديث الوكيل",
-        "update_failed": "فشل تحديث الوكيل"
+        "update_failed": "فشل تحديث الوكيل",
+        "run_created_few": "تشغيل #{{runId}} تم إنشاء مقترحات {{count}}",
+        "run_created_many": "تشغيل #{{runId}} تم إنشاء مقترحات {{count}}",
+        "run_created_one": "تشغيل #{{runId}} تم إنشاء مقترحات {{count}}",
+        "run_created_other": "تشغيل #{{runId}} تم إنشاء مقترحات {{count}}",
+        "run_created_two": "تشغيل #{{runId}} تم إنشاء مقترحات {{count}}",
+        "run_created_zero": "تشغيل #{{runId}} تم إنشاء مقترحات {{count}}"
       }
     },
     "runs": {

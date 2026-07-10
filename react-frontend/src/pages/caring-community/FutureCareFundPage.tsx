@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -56,14 +57,14 @@ interface FutureCareFundSummary {
 // ---------------------------------------------------------------------------
 
 function formatHours(hours: number): string {
-  return hours.toLocaleString(undefined, {
+  return hours.toLocaleString(getFormattingLocale(), {
     minimumFractionDigits: hours % 1 === 0 ? 0 : 1,
     maximumFractionDigits: 1,
   });
 }
 
 function formatChf(value: number): string {
-  return value.toLocaleString(undefined, {
+  return value.toLocaleString(getFormattingLocale(), {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   });
@@ -77,7 +78,7 @@ function formatHoursShort(
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString(undefined, {
+  return new Date(dateStr).toLocaleDateString(getFormattingLocale(), {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

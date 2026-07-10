@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -113,7 +114,7 @@ export default function CommunityImpactTab() {
     { label: t('community.total_members'), value: num(data.total_members), icon: <Users className="w-5 h-5" />, color: 'text-[var(--color-info)]', bg: 'bg-blue-500/10' },
     { label: t('community.total_badges'), value: num(data.total_badges_awarded), icon: <Award className="w-5 h-5" />, color: 'text-[var(--color-warning)]', bg: 'bg-amber-500/10' },
     { label: t('community.volunteer_hours'), value: num(data.total_volunteer_hours), icon: <Clock className="w-5 h-5" />, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    { label: t('community.total_xp'), value: num(data.total_xp).toLocaleString(), icon: <Zap className="w-5 h-5" />, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    { label: t('community.total_xp'), value: num(data.total_xp).toLocaleString(getFormattingLocale()), icon: <Zap className="w-5 h-5" />, color: 'text-accent', bg: 'bg-accent/10' },
   ];
 
   const secondaryStats = [
@@ -142,7 +143,7 @@ export default function CommunityImpactTab() {
                 <div className={`p-1.5 rounded-lg ${stat.bg} ${stat.color}`}>{stat.icon}</div>
                 <span className="text-xs text-muted">{stat.label}</span>
               </div>
-              <p className="text-2xl font-bold">{typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}</p>
+              <p className="text-2xl font-bold">{typeof stat.value === 'number' ? stat.value.toLocaleString(getFormattingLocale()) : stat.value}</p>
             </GlassCard>
           </motion.div>
         ))}

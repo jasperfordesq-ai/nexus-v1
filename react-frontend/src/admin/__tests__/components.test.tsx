@@ -484,7 +484,7 @@ describe('StatusBadge', () => {
         <StatusBadge status="active" />
       </>
     );
-    expect(screen.getByText('active')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
   it('handles unknown status', () => {
@@ -493,7 +493,7 @@ describe('StatusBadge', () => {
         <StatusBadge status="custom_status" />
       </>
     );
-    expect(screen.getByText('custom_status')).toBeInTheDocument();
+    expect(screen.getByText('Unknown')).toBeInTheDocument();
   });
 
   it('handles empty status gracefully', () => {
@@ -502,7 +502,7 @@ describe('StatusBadge', () => {
         <StatusBadge status="" />
       </>
     );
-    expect(screen.getByText('unknown')).toBeInTheDocument();
+    expect(screen.getByText('Unknown')).toBeInTheDocument();
   });
 });
 

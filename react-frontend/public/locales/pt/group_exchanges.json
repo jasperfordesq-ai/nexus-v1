@@ -89,7 +89,13 @@
     "no_members_found": "Nenhum membro encontrado correspondente à sua pesquisa.",
     "done": "Concluído",
     "aria_exchange_participants": "Participantes da troca",
-    "aria_hour_split": "Divisão de horas"
+    "aria_hour_split": "Divisão de horas",
+    "participants_heading_many": "Participantes ({{count}})",
+    "participants_heading_one": "Participantes ({{count}})",
+    "participants_heading_other": "Participantes ({{count}})",
+    "hours_amount_many": "{{count}} h",
+    "hours_amount_one": "{{count}} h",
+    "hours_amount_other": "{{count}} h"
   },
   "create": {
     "page_title": "Criar Troca de Grupo",
@@ -148,7 +154,13 @@
     "step_of_named": "Etapa {{current}} de {{total}}: {{name}}",
     "hours_value": "{{hours}} h",
     "hours_suffix": "h",
-    "weight_suffix": "x"
+    "weight_suffix": "x",
+    "providers_count_many": "Prestadores ({{count}})",
+    "providers_count_one": "Prestadores ({{count}})",
+    "providers_count_other": "Prestadores ({{count}})",
+    "receivers_count_many": "Recetores ({{count}})",
+    "receivers_count_one": "Recetores ({{count}})",
+    "receivers_count_other": "Recetores ({{count}})"
   },
   "toast": {
     "exchange_started": "Troca iniciada",
@@ -189,5 +201,7 @@
     }
   },
   "role_provider": "Provider",
-  "role_receiver": "Receiver"
+  "role_receiver": "Receiver",
+  "participants_count_many": "{{count}} participantes",
+  "hours_count_many": "{{count}} horas"
 }

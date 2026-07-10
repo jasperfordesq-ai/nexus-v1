@@ -124,7 +124,10 @@
         "year": "Année",
         "yearly": "Annuel",
         "annual": "Annuel"
-      }
+      },
+      "total_many": "{{count}} total",
+      "total_one": "{{count}} total",
+      "total_other": "{{count}} total"
     },
     "table": {
       "aria": "Niveaux Premium",
@@ -203,7 +206,10 @@
         "restricted": "Action needed",
         "unknown": "Status unknown"
       },
-      "connect_fallback_active": "A Stripe Connect account is configured, but it is not ready for live donations yet. Payments will use the platform fallback until onboarding is complete."
+      "connect_fallback_active": "A Stripe Connect account is configured, but it is not ready for live donations yet. Payments will use the platform fallback until onboarding is complete.",
+      "requirements_due_many": "Stripe account requirements needing attention: {{count}}.",
+      "requirements_due_one": "Conditions requises pour le compte Stripe nécessitant une attention : {{count}}.",
+      "requirements_due_other": "Conditions requises pour le compte Stripe nécessitant une attention : {{count}}."
     },
     "finance": {
       "title": "Finance operations",
@@ -222,7 +228,14 @@
       "past_due_count": "{{count}} past due",
       "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Export annual receipts",
-      "empty": "No finance activity has been recorded yet."
+      "empty": "No finance activity has been recorded yet.",
+      "donation_count_many": "{{count}} donation",
+      "donation_count_one": "Don {{count}}",
+      "declaration_count_many": "{{count}} declaration",
+      "declaration_count_one": "Déclaration {{count}}",
+      "past_due_count_many": "{{count}} past due",
+      "past_due_count_one": "{{count}} en souffrance",
+      "past_due_count_other": "{{count}} en souffrance"
     }
   }
 }

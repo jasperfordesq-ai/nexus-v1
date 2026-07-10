@@ -207,7 +207,8 @@
     "tbi_proxy_independence": "Valeur monétaire des heures reçues",
     "tbi_proxy_inclusion": "HACT : appartenance à un quartier (calibrage TBI 2023)",
     "pdf_coefficients": "Applied Coefficients",
-    "formula_true_sroi": "Ratio SROI = Valeur actuelle totale des résultats vérifiés (après effet d'aubaine, déplacement, attribution, abandon et actualisation) ÷ Investissement total"
+    "formula_true_sroi": "Ratio SROI = Valeur actuelle totale des résultats vérifiés (après effet d'aubaine, déplacement, attribution, abandon et actualisation) ÷ Investissement total",
+    "multiplier_value": "{{value}}×"
   },
   "impact_report_labels": {
     "transactions": "Opérations",

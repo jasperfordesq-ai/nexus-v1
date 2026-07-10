@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Chip, Input, Textarea, Card, CardBody, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tab, Tabs, Checkbox, RadioGroup, Radio } from '@/components/ui';
 
 /**
@@ -1041,7 +1042,7 @@ function RemindersTab() {
                       {t(`volunteering.channel_${log.channel}`)}
                     </Chip>
                     <span className="text-xs text-muted whitespace-nowrap">
-                      {log.sent_at ? new Date(log.sent_at).toLocaleString() : ''}
+                      {log.sent_at ? new Date(log.sent_at).toLocaleString(getFormattingLocale()) : ''}
                     </span>
                   </div>
                 </CardBody>
@@ -1457,7 +1458,7 @@ function WebhooksTab() {
                           </Chip>
                         </div>
                         <span className="text-xs text-muted">
-                          {log.created_at ? new Date(log.created_at).toLocaleString() : '-'}
+                          {log.created_at ? new Date(log.created_at).toLocaleString(getFormattingLocale()) : '-'}
                         </span>
                       </div>
                       {log.response_body && (

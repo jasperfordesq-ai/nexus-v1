@@ -19,7 +19,9 @@
     "lessons_one": "{{count}} lição",
     "lessons_other": "{{count}} lições",
     "enrolled_one": "{{count}} inscrito",
-    "enrolled_other": "{{count}} inscrito"
+    "enrolled_other": "{{count}} inscrito",
+    "lessons_many": "{{count}} lições",
+    "enrolled_many": "{{count}} inscrito"
   },
   "detail": {
     "about": "Sobre este curso",
@@ -169,7 +171,11 @@
     "rate_n_stars": "Avaliar {{count}} de 5 estrelas",
     "submit_error": "Não foi possível enviar a sua avaliação. Tente novamente.",
     "count_one": "{{count}} revisão",
-    "count_other": "{{count}} comentários"
+    "count_other": "{{count}} comentários",
+    "rate_n_stars_many": "Avaliar {{count}} de 5 estrelas",
+    "rate_n_stars_one": "Avaliar {{count}} de 5 estrelas",
+    "rate_n_stars_other": "Avaliar {{count}} de 5 estrelas",
+    "count_many": "{{count}} comentários"
   },
   "admin": {
     "title": "Cursos",

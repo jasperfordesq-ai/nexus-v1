@@ -111,9 +111,9 @@ interface DashboardData {
 
 const activityIcons: Record<string, { icon: React.ReactNode; color: string }> = {
   exchange: { icon: <ArrowUpRight className="w-4 h-4" aria-hidden="true" />, color: 'text-emerald-500 bg-emerald-500/10' },
-  listing: { icon: <ListTodo className="w-4 h-4" aria-hidden="true" />, color: 'text-indigo-500 bg-indigo-500/10' },
+  listing: { icon: <ListTodo className="w-4 h-4" aria-hidden="true" />, color: 'text-accent bg-accent/10' },
   connection: { icon: <Users className="w-4 h-4" aria-hidden="true" />, color: 'text-[var(--color-info)] bg-blue-500/10' },
-  event: { icon: <CalendarCheck className="w-4 h-4" aria-hidden="true" />, color: 'text-purple-500 bg-purple-500/10' },
+  event: { icon: <CalendarCheck className="w-4 h-4" aria-hidden="true" />, color: 'text-accent bg-accent/10' },
   message: { icon: <MessageSquare className="w-4 h-4" aria-hidden="true" />, color: 'text-cyan-500 bg-cyan-500/10' },
   review: { icon: <Star className="w-4 h-4" aria-hidden="true" />, color: 'text-[var(--color-warning)] bg-amber-500/10' },
   post: { icon: <Activity className="w-4 h-4" aria-hidden="true" />, color: 'text-rose-500 bg-rose-500/10' },
@@ -163,7 +163,7 @@ function SimpleBarChart({ data, givenLabel, receivedLabel }: { data: MonthlyEntr
           <span>{givenLabel}</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3 h-3 rounded-sm bg-indigo-500" />
+          <div className="w-3 h-3 rounded-sm bg-accent" />
           <span>{receivedLabel}</span>
         </div>
       </div>
@@ -176,7 +176,7 @@ function SimpleBarChart({ data, givenLabel, receivedLabel }: { data: MonthlyEntr
                 style={{ height: `${Math.max((item.given / maxVal) * 100, 4)}%` }}
               />
               <div
-                className="flex-1 bg-indigo-500/60 rounded-t-sm transition-all"
+                className="flex-1 bg-accent/60 rounded-t-sm transition-all"
                 style={{ height: `${Math.max((item.received / maxVal) * 100, 4)}%` }}
               />
             </div>
@@ -262,7 +262,7 @@ export function ActivityDashboardPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadDashboard}
           >
@@ -295,7 +295,7 @@ export function ActivityDashboardPage() {
       {/* Header */}
       <motion.div variants={itemVariants}>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-accent to-accent-gradient-end flex items-center justify-center shadow-lg shadow-accent/20">
             <Activity className="w-5 h-5 text-white" aria-hidden="true" />
           </div>
           {t('page_title')}
@@ -317,7 +317,7 @@ export function ActivityDashboardPage() {
           icon={<ArrowDownLeft className="w-5 h-5" aria-hidden="true" />}
           label={t('stats.hours_received')}
           value={hours_summary.hours_received}
-          color="from-indigo-500/20 to-blue-500/20 text-indigo-500"
+          color="from-accent/20 to-blue-500/20 text-accent"
         />
         <StatCard
           icon={<Users className="w-5 h-5" aria-hidden="true" />}
@@ -329,7 +329,7 @@ export function ActivityDashboardPage() {
           icon={<ListTodo className="w-5 h-5" aria-hidden="true" />}
           label={t('stats.exchanges')}
           value={hours_summary.transactions_given + hours_summary.transactions_received}
-          color="from-purple-500/20 to-fuchsia-500/20 text-purple-500"
+          color="from-accent/20 to-fuchsia-500/20 text-accent"
         />
       </motion.div>
 
@@ -341,7 +341,7 @@ export function ActivityDashboardPage() {
           {monthly_hours.some(m => m.given > 0 || m.received > 0) && (
             <GlassCard className="p-5">
               <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+                <BarChart3 className="w-5 h-5 text-accent" aria-hidden="true" />
                 <h3 className="font-semibold text-theme-primary">{t('chart.monthly_activity')}</h3>
               </div>
               <div role="img" aria-label={t('chart.monthly_activity_aria')}>
@@ -354,7 +354,7 @@ export function ActivityDashboardPage() {
           <GlassCard className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+                <Clock className="w-5 h-5 text-accent" aria-hidden="true" />
                 <h3 className="font-semibold text-theme-primary">{t('recent_activity')}</h3>
               </div>
             </div>
@@ -443,7 +443,7 @@ export function ActivityDashboardPage() {
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-600 dark:text-blue-400">{t('skill_request')}</span>
                       )}
                       {skill.endorsements > 0 && (
-                        <span className="text-[10px] text-indigo-500 font-semibold">×{skill.endorsements}</span>
+                        <span className="text-[10px] text-accent font-semibold">×{skill.endorsements}</span>
                       )}
                     </div>
                   </div>

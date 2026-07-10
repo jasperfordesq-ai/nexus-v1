@@ -60,9 +60,22 @@
     "reaction_like": "Mi piace",
     "reaction_wow": "Oh",
     "reaction_sad": "Triste",
-    "reaction_celebrate": "Celebrare"
+    "reaction_celebrate": "Celebrare",
+    "min_read_many": "{{count}} min di lettura",
+    "min_read_one": "{{count}} min di lettura",
+    "min_read_other": "{{count}} min di lettura",
+    "views_count_many": "{{count}} visualizzazioni",
+    "views_count_one": "{{count}} visualizzazioni",
+    "views_count_other": "{{count}} visualizzazioni",
+    "comment_count_many": "{{count}} commenti"
   },
   "page_description": "Storie, guide e aggiornamenti dalla comunità di banca del tempo — scambi riusciti, lezioni apprese e le ultime notizie dai gruppi locali e dai partner.",
   "filter_by_category": "Filtra per categoria",
-  "loading_posts": "Caricamento degli articoli del blog"
+  "loading_posts": "Caricamento degli articoli del blog",
+  "min_read_many": "{{count}} min di lettura",
+  "min_read_one": "{{count}} min di lettura",
+  "min_read_other": "{{count}} min di lettura",
+  "min_read_short_many": "{{count}}m",
+  "min_read_short_one": "{{count}}m",
+  "min_read_short_other": "{{count}}m"
 }

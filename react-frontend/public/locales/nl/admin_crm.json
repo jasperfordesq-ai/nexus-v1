@@ -345,6 +345,22 @@
     "days_ago": "{{count}} dagen geleden",
     "hours_ago": "{{count}} uur geleden",
     "just_now": "Just Now",
-    "minutes_ago": "{{count}} minuten geleden"
+    "minutes_ago": "{{count}} minuten geleden",
+    "loss_between_stages_one": "{{count}}verloren tussen fasen",
+    "loss_between_stages_other": "{{count}}verloren tussen fasen",
+    "lost_since_previous_stage_one": "{{count}}verloren sinds de vorige fase",
+    "lost_since_previous_stage_other": "{{count}}verloren sinds de vorige fase",
+    "members_lost_at_step_one": "Bij deze stap gaan{{count}}-leden verloren.",
+    "members_lost_at_step_other": "Bij deze stap gaan{{count}}-leden verloren.",
+    "tasks_total_count_one": "{{count}}Taken Totaal",
+    "tasks_total_count_other": "{{count}}Taken Totaal",
+    "activity_type_login": "Login",
+    "activity_type_signup": "Aanmelden",
+    "activity_type_listing_created": "Advertentie gemaakt",
+    "activity_type_exchange_completed": "Uitwisseling voltooid",
+    "activity_type_note_added": "Opmerking toegevoegd",
+    "activity_type_task_created": "Taak gemaakt",
+    "activity_type_profile_updated": "Profiel bijgewerkt",
+    "activity_type_group_joined": "Groep is lid geworden"
   }
 }

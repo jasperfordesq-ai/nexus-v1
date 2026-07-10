@@ -211,7 +211,9 @@
       "report_dismissed": "Rapport afgewezen.",
       "report_escalated": "Rapport geëscaleerd.",
       "feed_valid": "RSS-feed is klaar.",
-      "feed_invalid": "RSS-feed heeft {{count}} probleem(en)."
+      "feed_invalid": "RSS-feed heeft {{count}} probleem(en).",
+      "feed_invalid_one": "RSS-feed heeft {{count}} probleem(en).",
+      "feed_invalid_other": "RSS-feed heeft {{count}} probleem(en)."
     },
     "bulk": {
       "approve_selected": "Selectie goedkeuren",
@@ -219,7 +221,13 @@
       "done": "{{count}} item(s) gemodereerd.",
       "partial": "{{ok}} item(s) gemodereerd; {{failed}} mislukt.",
       "confirm_reject_title": "Geselecteerde items afwijzen",
-      "confirm_reject_message": "{{count}} geselecteerde item(s) afwijzen? Makers zien ze terugkeren naar concept."
-    }
+      "confirm_reject_message": "{{count}} geselecteerde item(s) afwijzen? Makers zien ze terugkeren naar concept.",
+      "done_one": "{{count}} item(s) gemodereerd.",
+      "done_other": "{{count}} item(s) gemodereerd.",
+      "confirm_reject_message_one": "{{count}} geselecteerde item(s) afwijzen? Makers zien ze terugkeren naar concept.",
+      "confirm_reject_message_other": "{{count}} geselecteerde item(s) afwijzen? Makers zien ze terugkeren naar concept."
+    },
+    "count_one": "{{count}} artikelen",
+    "count_other": "{{count}} artikelen"
   }
 }

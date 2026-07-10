@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import {
   useCallback,
   useEffect,
@@ -68,7 +69,7 @@ function unwrapData<T>(raw: { data?: T } | T): T {
 
 function formatDate(value: string | null, fallback: string): string {
   if (!value) return fallback;
-  return new Date(value).toLocaleDateString();
+  return new Date(value).toLocaleDateString(getFormattingLocale());
 }
 
 function statusColor(status: ProjectStatus): 'primary' | 'warning' | 'success' | 'default' | 'danger' {

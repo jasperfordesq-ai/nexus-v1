@@ -89,6 +89,7 @@ export default defineConfig({
     // Desktop Chrome - React app
     {
       name: 'chromium-modern',
+      testIgnore: ['**/accessibility-audit.spec.ts', '**/pwa/offline-install.spec.ts'],
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'e2e/fixtures/.auth/user.json',
@@ -99,6 +100,7 @@ export default defineConfig({
     // Desktop Firefox - React app
     {
       name: 'firefox-modern',
+      testIgnore: ['**/accessibility-audit.spec.ts', '**/pwa/offline-install.spec.ts'],
       use: {
         ...devices['Desktop Firefox'],
         storageState: 'e2e/fixtures/.auth/user.json',
@@ -109,6 +111,7 @@ export default defineConfig({
     // Mobile Chrome - Modern Theme
     {
       name: 'mobile-chrome',
+      testIgnore: ['**/accessibility-audit.spec.ts', '**/pwa/offline-install.spec.ts'],
       use: {
         ...devices['Pixel 5'],
         storageState: 'e2e/fixtures/.auth/user.json',
@@ -119,9 +122,34 @@ export default defineConfig({
     // Mobile Safari - React app
     {
       name: 'mobile-safari',
+      testIgnore: ['**/accessibility-audit.spec.ts', '**/pwa/offline-install.spec.ts'],
       use: {
         ...devices['iPhone 12'],
         storageState: 'e2e/fixtures/.auth/user.json',
+      },
+      dependencies: ['setup'],
+    },
+
+    // Chromium-only production PWA install/offline lifecycle. This project is
+    // invoked against the built live stack; Vite development intentionally has
+    // service-worker generation disabled.
+    {
+      name: 'pwa',
+      testMatch: '**/pwa/offline-install.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
+      },
+      dependencies: ['setup'],
+    },
+
+    // Blocking real-browser WCAG gate. The spec supplies explicit anonymous,
+    // member, admin, mobile, theme, and locale storage/context profiles, so it
+    // runs once in Chromium rather than being duplicated by every broad project.
+    {
+      name: 'accessibility',
+      testMatch: '**/accessibility-audit.spec.ts',
+      use: {
+        ...devices['Desktop Chrome'],
       },
       dependencies: ['setup'],
     },

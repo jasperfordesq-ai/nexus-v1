@@ -104,7 +104,9 @@
       "stats": {
         "total_runs": "totaal aantal runs",
         "total_proposals": "totale voorstellen",
-        "pending_review": "{{count}} in afwachting van beoordeling"
+        "pending_review": "{{count}} in afwachting van beoordeling",
+        "pending_review_one": "{{count}} in afwachting van beoordeling",
+        "pending_review_other": "{{count}} in afwachting van beoordeling"
       },
       "agent_types": {
         "activity_summary": "Samenvatting van activiteiten",
@@ -219,7 +221,9 @@
         "proposals_table_aria": "Voorstellen uitvoeren",
         "columns": {
           "subject": "Onderwerp"
-        }
+        },
+        "proposals_count_one": "Voorstellen ({{count}})",
+        "proposals_count_other": "Voorstellen ({{count}})"
       },
       "toasts": {
         "approve_eligible_failed": "Kan in aanmerking komende voorstellen niet goedkeuren.",
@@ -235,7 +239,9 @@
         "run_details_load_failed": "Kan uitvoeringsdetails niet laden.",
         "run_trigger_failed": "Kan run niet activeren.",
         "run_triggered": "Run geactiveerd: {{count}}-voorstellen gegenereerd.",
-        "runs_load_failed": "Kan runs niet laden."
+        "runs_load_failed": "Kan runs niet laden.",
+        "run_triggered_one": "Run geactiveerd: {{count}}-voorstellen gegenereerd.",
+        "run_triggered_other": "Run geactiveerd: {{count}}-voorstellen gegenereerd."
       }
     },
     "module_docs": {
@@ -302,7 +308,9 @@
         "save_failed": "Opslaan mislukt.",
         "seed_failed": "Zaad is mislukt.",
         "seeded": "{{count}} standaarddocument(en) geplaatst.",
-        "updated": "Document bijgewerkt."
+        "updated": "Document bijgewerkt.",
+        "seeded_one": "{{count}} standaarddocument(en) geplaatst.",
+        "seeded_other": "{{count}} standaarddocument(en) geplaatst."
       }
     },
     "trace_metrics": {

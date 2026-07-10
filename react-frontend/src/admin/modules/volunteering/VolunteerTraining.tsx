@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Chip, Card, CardBody, Select, SelectItem, Checkbox, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from '@/components/ui';
 
 /**
@@ -315,7 +316,7 @@ export function VolunteerTraining() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.completed_date ? new Date(item.completed_date).toLocaleDateString() : '--'}
+          {item.completed_date ? new Date(item.completed_date).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },
@@ -328,7 +329,7 @@ export function VolunteerTraining() {
         const isExpired = new Date(item.expires_date) < new Date();
         return (
           <span className={`text-sm ${isExpired ? 'text-danger font-medium' : 'text-muted'}`}>
-            {new Date(item.expires_date).toLocaleDateString()}
+            {new Date(item.expires_date).toLocaleDateString(getFormattingLocale())}
           </span>
         );
       },
@@ -470,7 +471,7 @@ export function VolunteerTraining() {
                       {t(`volunteering.type_${r.training_type}`)}
                       {' — '}
                       {t('volunteering.expires_on', {
-                        date: new Date(r.expires_date!).toLocaleDateString(),
+                        date: new Date(r.expires_date!).toLocaleDateString(getFormattingLocale()),
                       })}
                     </li>
                   ))}

@@ -104,7 +104,11 @@
       "stats": {
         "total_runs": "suma przebiegów",
         "total_proposals": "propozycje ogółem",
-        "pending_review": "{{count}} oczekuje na sprawdzenie"
+        "pending_review": "{{count}} oczekuje na sprawdzenie",
+        "pending_review_few": "{{count}} oczekuje na sprawdzenie",
+        "pending_review_many": "{{count}} oczekuje na sprawdzenie",
+        "pending_review_one": "{{count}} oczekuje na sprawdzenie",
+        "pending_review_other": "{{count}} oczekuje na sprawdzenie"
       },
       "agent_types": {
         "activity_summary": "Podsumowanie działalności",
@@ -219,7 +223,11 @@
         "proposals_table_aria": "Uruchom propozycje",
         "columns": {
           "subject": "Temat"
-        }
+        },
+        "proposals_count_few": "Propozycje ({{count}})",
+        "proposals_count_many": "Propozycje ({{count}})",
+        "proposals_count_one": "Propozycje ({{count}})",
+        "proposals_count_other": "Propozycje ({{count}})"
       },
       "toasts": {
         "approve_eligible_failed": "Nie udało się zatwierdzić kwalifikujących się propozycji.",
@@ -235,7 +243,11 @@
         "run_details_load_failed": "Nie udało się wczytać szczegółów przebiegu.",
         "run_trigger_failed": "Nie udało się uruchomić biegu.",
         "run_triggered": "Uruchomiono uruchomienie: wygenerowano propozycje {{count}}.",
-        "runs_load_failed": "Nie udało się załadować przebiegów."
+        "runs_load_failed": "Nie udało się załadować przebiegów.",
+        "run_triggered_few": "Uruchomiono uruchomienie: wygenerowano propozycje {{count}}.",
+        "run_triggered_many": "Uruchomiono uruchomienie: wygenerowano propozycje {{count}}.",
+        "run_triggered_one": "Uruchomiono uruchomienie: wygenerowano propozycje {{count}}.",
+        "run_triggered_other": "Uruchomiono uruchomienie: wygenerowano propozycje {{count}}."
       }
     },
     "module_docs": {
@@ -302,7 +314,11 @@
         "save_failed": "Zapisywanie nie powiodło się.",
         "seed_failed": "Nasienie nie powiodło się.",
         "seeded": "Domyślne dokumenty {{count}} zostały rozstawione.",
-        "updated": "Dokument zaktualizowany."
+        "updated": "Dokument zaktualizowany.",
+        "seeded_few": "Domyślne dokumenty {{count}} zostały rozstawione.",
+        "seeded_many": "Domyślne dokumenty {{count}} zostały rozstawione.",
+        "seeded_one": "Domyślne dokumenty {{count}} zostały rozstawione.",
+        "seeded_other": "Domyślne dokumenty {{count}} zostały rozstawione."
       }
     },
     "trace_metrics": {

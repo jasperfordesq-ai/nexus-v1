@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -49,6 +50,7 @@ interface AdCampaign {
   start_date: string;
   end_date: string;
   budget_cents: number;
+  // i18next-instrument-ignore-next-line -- API contract field, not user-facing copy.
   targeting_radius_km?: number | null;
   created_at: string;
 }
@@ -191,7 +193,7 @@ export function MyAdCampaignsPage() {
   };
 
   const formatMetric = (value: number | undefined) =>
-    value == null ? t('empty_dash') : value.toLocaleString();
+    value == null ? t('empty_dash') : value.toLocaleString(getFormattingLocale());
 
   if (!hasFeature('local_advertising')) {
     return (

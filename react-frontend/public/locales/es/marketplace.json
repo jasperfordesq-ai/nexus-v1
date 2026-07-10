@@ -92,7 +92,13 @@
     "get_directions": "Cómo llegar",
     "promoted": "Promocionado",
     "unsave": "Quitar de guardados",
-    "save": "Guardar anuncio"
+    "save": "Guardar anuncio",
+    "available_count_many": "{{count}} disponible",
+    "available_count_one": "{{count}} disponible",
+    "available_count_other": "{{count}} disponible",
+    "views_count_many": "{{count}} vistas",
+    "views_count_one": "{{count}} vistas",
+    "views_count_other": "{{count}} vistas"
   },
   "offer": {
     "modal_title": "Hacer una oferta",
@@ -184,7 +190,10 @@
     "created_success": "¡Anuncio creado con éxito!",
     "created_error": "Error al crear el anuncio",
     "created_error_retry": "Error al crear el anuncio. Por favor, intenta de nuevo.",
-    "draft_saved": "Borrador guardado"
+    "draft_saved": "Borrador guardado",
+    "title_char_count_many": "{{count}}/120 caracteres",
+    "title_char_count_one": "{{count}}/120 caracteres",
+    "title_char_count_other": "{{count}}/120 caracteres"
   },
   "search": {
     "category_search": "Buscar categorías...",
@@ -228,7 +237,11 @@
     "price_from": "Desde {{min}}",
     "price_up_to": "Hasta {{max}}",
     "last_days_one": "Último {{count}} día",
-    "last_days_other": "Últimos {{count}} días"
+    "last_days_other": "Últimos {{count}} días",
+    "reset_filters_many": "Restablecer Filtros ({{count}})",
+    "reset_filters_one": "Restablecer Filtros ({{count}})",
+    "reset_filters_other": "Restablecer Filtros ({{count}})",
+    "results_count_many": "{{count}} resultados"
   },
   "seller": {
     "page_title": "Perfil del Vendedor",
@@ -285,7 +298,12 @@
     "results_count_one": "{{count}} resultado",
     "results_count_other": "{{count}} resultados",
     "load_more": "Cargar Más",
-    "browse_description": "Explorar listados de {{name}} en el mercado."
+    "browse_description": "Explorar listados de {{name}} en el mercado.",
+    "reset_filters_many": "Restablecer Filtros ({{count}})",
+    "reset_filters_one": "Restablecer Filtros ({{count}})",
+    "reset_filters_other": "Restablecer Filtros ({{count}})",
+    "listings_count_many": "{{count}} listados",
+    "results_count_many": "{{count}} resultados"
   },
   "common": {
     "loading": "Cargando...",
@@ -426,7 +444,10 @@
     "empty_sold_title": "No hay ventas aún",
     "empty_sold_description": "No has vendido ningún artículo aún.",
     "empty_expired_title": "No hay anuncios expirados",
-    "empty_expired_description": "No tienes ningún anuncio expirado."
+    "empty_expired_description": "No tienes ningún anuncio expirado.",
+    "views_count_aria_many": "{{count}} vistas",
+    "views_count_aria_one": "{{count}} vistas",
+    "views_count_aria_other": "{{count}} vistas"
   },
   "my_offers": {
     "page_title": "Mis Ofertas - Mercado",
@@ -485,7 +506,8 @@
     "empty_collections_title": "Sin Colecciones Aún",
     "empty_collections_description": "Crea una colección para organizar tus artículos favoritos del mercado.",
     "sign_in_title": "Se requiere iniciar sesión",
-    "sign_in_description": "Inicia sesión para administrar tus colecciones y búsquedas guardadas."
+    "sign_in_description": "Inicia sesión para administrar tus colecciones y búsquedas guardadas.",
+    "item_count_many": "{{count}} artículos"
   },
   "saved_searches": {
     "tab_title": "Búsquedas Guardadas",
@@ -518,7 +540,9 @@
     "duration_days_one": "{{count}} día",
     "duration_days_other": "{{count}} días",
     "duration_hours_one": "{{count}} hora",
-    "duration_hours_other": "{{count}} horas"
+    "duration_hours_other": "{{count}} horas",
+    "duration_days_many": "{{count}} días",
+    "duration_hours_many": "{{count}} horas"
   },
   "free": {
     "page_title": "Artículos gratis",
@@ -584,7 +608,16 @@
       "declined": "Rechazada",
       "completed": "Completada",
       "cancelled": "Cancelada"
-    }
+    },
+    "offers_title_count_many": "Ofertas de entrega ({{count}})",
+    "offers_title_count_one": "Ofertas de entrega ({{count}})",
+    "offers_title_count_other": "Ofertas de entrega ({{count}})",
+    "time_credits_value_many": "{{count}} CT",
+    "time_credits_value_one": "{{count}} CT",
+    "time_credits_value_other": "{{count}} CT",
+    "estimated_minutes_many": "~{{count}} min",
+    "estimated_minutes_one": "~{{count}} min",
+    "estimated_minutes_other": "~{{count}} min"
   },
   "pickup": {
     "my_pickups_title": "Mis recogidas",
@@ -613,7 +646,13 @@
     "oversold_protected": "Rechazar pedidos que superen el stock",
     "sold_out": "Agotado",
     "low_chip": "Inventario: {{count}} (Bajo)",
-    "count_chip": "Inventario: {{count}}"
+    "count_chip": "Inventario: {{count}}",
+    "low_chip_many": "Inventario: {{count}} (Bajo)",
+    "low_chip_one": "Inventario: {{count}} (Bajo)",
+    "low_chip_other": "Inventario: {{count}} (Bajo)",
+    "count_chip_many": "Inventario: {{count}}",
+    "count_chip_one": "Inventario: {{count}}",
+    "count_chip_other": "Inventario: {{count}}"
   },
   "ai_reply": {
     "suggest": "Sugerir Respuesta",
@@ -647,7 +686,10 @@
     "search_this_area": "Buscar en Esta Área",
     "distance_km": "{{km}} km de distancia",
     "distance_meters": "{{m}}m de distancia",
-    "view_toggle": "Modo de visualización"
+    "view_toggle": "Modo de visualización",
+    "results_count_many": "{{count}} listados encontrados cerca",
+    "results_count_one": "{{count}} listados encontrados cerca",
+    "results_count_other": "{{count}} listados encontrados cerca"
   },
   "shipping": {
     "title": "Opciones de Envío",
@@ -778,7 +820,10 @@
       "select_rating": "Por favor, selecciona una calificación",
       "success": "¡Calificación enviada con éxito!",
       "error": "Error al enviar la calificación"
-    }
+    },
+    "quantity_multiplier_many": "x{{count}}",
+    "quantity_multiplier_one": "x{{count}}",
+    "quantity_multiplier_other": "x{{count}}"
   },
   "onboarding": {
     "page_title": "Incorporación de Vendedores - Mercado",

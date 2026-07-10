@@ -104,7 +104,8 @@
       "stats": {
         "total_runs": "総実行数",
         "total_proposals": "トータル提案",
-        "pending_review": "{{count}} の審査待ち"
+        "pending_review": "{{count}} の審査待ち",
+        "pending_review_other": "{{count}} の審査待ち"
       },
       "agent_types": {
         "activity_summary": "活動の概要",
@@ -219,7 +220,8 @@
         "proposals_table_aria": "提案を実行する",
         "columns": {
           "subject": "主題"
-        }
+        },
+        "proposals_count_other": "提案 ({{count}})"
       },
       "toasts": {
         "approve_eligible_failed": "適格な提案を承認できませんでした。",
@@ -235,7 +237,8 @@
         "run_details_load_failed": "実行の詳細をロードできませんでした。",
         "run_trigger_failed": "実行のトリガーに失敗しました。",
         "run_triggered": "実行がトリガーされました: {{count}} 件の提案が生成されました。",
-        "runs_load_failed": "実行のロードに失敗しました。"
+        "runs_load_failed": "実行のロードに失敗しました。",
+        "run_triggered_other": "実行がトリガーされました: {{count}} 件の提案が生成されました。"
       }
     },
     "module_docs": {
@@ -302,7 +305,8 @@
         "save_failed": "保存に失敗しました。",
         "seed_failed": "シードに失敗しました。",
         "seeded": "シードされた{{count}}のデフォルト・ドキュメント。",
-        "updated": "ドキュメントが更新されました。"
+        "updated": "ドキュメントが更新されました。",
+        "seeded_other": "シードされた{{count}}のデフォルト・ドキュメント。"
       }
     },
     "trace_metrics": {

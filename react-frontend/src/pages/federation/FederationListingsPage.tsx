@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { ListBoxItem as AutocompleteItem } from '@/components/ui/ListBox';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { SearchField } from '@/components/ui/SearchField';
 import { CardRowsSkeleton } from '@/components/ui/Skeletons';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
@@ -49,7 +49,7 @@ import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { FederationOptInNotice } from '@/components/federation/FederationOptInNotice';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import type { FederatedListing, FederationPartner } from '@/types/api';
 
 type ListingTypeFilter = 'all' | 'offer' | 'request';
@@ -477,9 +477,9 @@ export function FederationListingsPage() {
 
             return (
               <>
-                <ModalHeader className="flex items-center gap-3">
+                <ModalHeader className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3">
                   <div
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    className={`row-span-2 w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       isOffer ? 'bg-emerald-500/20' : 'bg-amber-500/20'
                     }`}
                   >
@@ -492,35 +492,33 @@ export function FederationListingsPage() {
                       aria-hidden="true"
                     />
                   </div>
-                  <div className="min-w-0">
-                    <h2 className="text-lg font-bold text-theme-primary line-clamp-2">
-                      {selectedListing.title}
-                    </h2>
-                    <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                      <Chip
-                        size="sm"
-                        variant="flat"
-                        className={
-                          isOffer
-                            ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
-                            : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
-                        }
-                      >
-                        {isOffer ? t('listings.offer') : t('listings.request')}
+                  <ModalHeading className="min-w-0 text-lg font-bold text-theme-primary line-clamp-2">
+                    {selectedListing.title}
+                  </ModalHeading>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-2">
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      className={
+                        isOffer
+                          ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                          : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                      }
+                    >
+                      {isOffer ? t('listings.offer') : t('listings.request')}
+                    </Chip>
+                    {selectedListing.category_name && (
+                      <Chip size="sm" variant="flat" className="bg-theme-hover text-theme-muted">
+                        {selectedListing.category_name}
                       </Chip>
-                      {selectedListing.category_name && (
-                        <Chip size="sm" variant="flat" className="bg-theme-hover text-theme-muted">
-                          {selectedListing.category_name}
-                        </Chip>
-                      )}
-                      {isExternal && (
-                        <Chip size="sm" variant="flat" className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-                          startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
-                        >
-                          {t('listings.external_partner')}
-                        </Chip>
-                      )}
-                    </div>
+                    )}
+                    {isExternal && (
+                      <Chip size="sm" variant="flat" className="bg-accent/10 text-accent dark:text-accent"
+                        startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
+                      >
+                        {t('listings.external_partner')}
+                      </Chip>
+                    )}
                   </div>
                 </ModalHeader>
                 <ModalBody>
@@ -562,7 +560,7 @@ export function FederationListingsPage() {
                       {selectedListing.created_at && (
                         <span className="flex items-center gap-1.5 text-theme-muted">
                           <Clock className="w-4 h-4" aria-hidden="true" />
-                          {new Date(selectedListing.created_at).toLocaleDateString()}
+                          {new Date(selectedListing.created_at).toLocaleDateString(getFormattingLocale())}
                         </span>
                       )}
                     </div>
@@ -597,7 +595,7 @@ export function FederationListingsPage() {
                       <Chip
                         size="sm"
                         variant="flat"
-                        className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+                        className="bg-accent/10 text-accent dark:text-accent"
                         startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
                       >
                         {selectedListing.timebank.name}
@@ -736,7 +734,7 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
           <Chip
             size="sm"
             variant="flat"
-            className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+            className="bg-accent/10 text-accent dark:text-accent"
             startContent={<Globe className="w-3 h-3" />}
           >
             {t('external')}
@@ -784,7 +782,7 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
         <Chip
           size="sm"
           variant="flat"
-          className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+          className="bg-accent/10 text-accent dark:text-accent"
           startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
         >
           {listing.timebank.name}

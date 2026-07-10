@@ -1,3 +1,4 @@
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Input, Button, Spinner, Chip, Textarea } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import Wallet from 'lucide-react/icons/wallet';
@@ -154,7 +155,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
                     <div className="text-right shrink-0 ml-3">
                       <p className="text-xs text-muted">{t('timebanking.col_balance')}</p>
                       <p className="text-sm font-semibold text-foreground">
-                        {user.balance}h
+                        {formatNumber(user.balance, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
                       </p>
                     </div>
                   </Button>
@@ -178,7 +179,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
                   {selectedUser.name}
                 </p>
                 <p className="text-xs text-muted">
-                  {selectedUser.email} &middot; {t('timebanking.current_balance')}: {selectedUser.balance}h
+                  {selectedUser.email} &middot; {t('timebanking.current_balance')}: {formatNumber(selectedUser.balance, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
                 </p>
               </div>
             </div>
@@ -300,7 +301,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
       sortable: true,
       render: (item) => (
         <Chip size="sm" variant="soft" color="success">
-          +{item.amount}h
+          {formatNumber(item.amount, { signDisplay: 'always', style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
         </Chip>
       ),
     },
@@ -329,7 +330,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {new Date(item.created_at).toLocaleDateString()}
+          {new Date(item.created_at).toLocaleDateString(getFormattingLocale())}
         </span>
       ),
     },

@@ -52,6 +52,7 @@ const STATS_RESPONSE = {
       total_matches_today: 12,
       avg_match_score: 73,
       avg_distance_km: 4.2,
+      cache_hit_rate: 75,
       hot_matches_count: 15,
       mutual_matches_count: 30,
       active_users_matching: 80,
@@ -76,6 +77,7 @@ const EMPTY_STATS_RESPONSE = {
       total_matches_today: 0,
       avg_match_score: 0,
       avg_distance_km: 0,
+      cache_hit_rate: 0,
       hot_matches_count: 0,
       mutual_matches_count: 0,
       active_users_matching: 0,
@@ -103,13 +105,16 @@ describe('MatchingAnalytics', () => {
     expect(spinner).toBeInTheDocument();
   });
 
-  it('shows empty state when no data', async () => {
+  it('renders legitimate numeric zeroes without treating them as a load failure', async () => {
     mockAdminMatching.getMatchingStats.mockResolvedValue(EMPTY_STATS_RESPONSE);
     render(<MatchingAnalytics />);
     await waitFor(() => {
-      // Empty state title — exact translation key match avoids ambiguity with description text
-      expect(screen.getByText('No matching data yet')).toBeInTheDocument();
+      // A fully shaped all-zero response is valid data, not an empty/error response.
+      expect(screen.getAllByText('0%').length).toBeGreaterThan(0);
     });
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByText(/no score data/i)).toBeInTheDocument();
+    expect(screen.getByText(/no distance data/i)).toBeInTheDocument();
   });
 
   it('renders stat cards after data loads', async () => {
@@ -162,13 +167,15 @@ describe('MatchingAnalytics', () => {
     });
   });
 
-  it('shows error toast when API fails', async () => {
+  it('shows a retryable error without a toast when API fails', async () => {
     mockAdminMatching.getMatchingStats.mockRejectedValue(new Error('Network error'));
     render(<MatchingAnalytics />);
 
     await waitFor(() => {
-      expect(mockToast.error).toHaveBeenCalled();
+      expect(screen.getByRole('alert')).toHaveTextContent(/failed to load matching analytics/i);
     });
+    expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
+    expect(mockToast.error).not.toHaveBeenCalled();
   });
 
   it('has a Back button that navigates', async () => {

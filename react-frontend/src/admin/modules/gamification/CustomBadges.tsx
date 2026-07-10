@@ -1,4 +1,3 @@
-import { CardBody, Card, Button, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,6 +11,8 @@ import { CardBody, Card, Button, Skeleton } from '@/components/ui';
 
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { CardBody, Card, Button, Skeleton } from '@/components/ui';
+import { OverlayActionButton } from '@/components/ui/OverlayActionButton';
 
 import Plus from 'lucide-react/icons/plus';
 import Award from 'lucide-react/icons/award';
@@ -84,11 +85,9 @@ export function CustomBadges() {
         title={t('gamification.custom_badges_title')}
         description={t('gamification.custom_badges_desc')}
         actions={
-          <Link to={tenantPath("/admin/custom-badges/create")}>
-            <Button startContent={<Plus size={16} />}>
-              {t('gamification.create_badge')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath("/admin/custom-badges/create")} startContent={<Plus size={16} />}>
+            {t('gamification.create_badge')}
+          </Button>
         }
       />
 
@@ -134,16 +133,14 @@ export function CustomBadges() {
                       {t('gamification.users_awarded')}
                     </p>
                   </div>
-                  <Button
-                    isIconOnly
-                    size="sm"
+                  <OverlayActionButton
                     variant="danger"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="rounded-full transition-opacity"
                     onPress={() => setDeleteTarget(badge)}
                     aria-label={t('gamification.delete_badge_aria', { name: badge.name })}
                   >
-                    <Trash2 size={16} />
-                  </Button>
+                    <Trash2 size={16} aria-hidden="true" />
+                  </OverlayActionButton>
                 </div>
                 {badge.description && (
                   <p className="mt-2 text-sm text-muted line-clamp-2">{badge.description}</p>

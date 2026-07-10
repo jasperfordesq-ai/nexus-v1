@@ -8,6 +8,7 @@
  * Full CRUD for audience segments used in targeted newsletter campaigns.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';import Filter from 'lucide-react/icons/filter';
@@ -131,7 +132,7 @@ export function Segments() {
       render: (item) => (
         <div className="flex items-center gap-1.5">
           <Users aria-hidden="true" size={14} className="text-muted" />
-          <span>{(item.subscriber_count || 0).toLocaleString()}</span>
+          <span>{(item.subscriber_count || 0).toLocaleString(getFormattingLocale())}</span>
         </div>
       ),
     },
@@ -141,7 +142,7 @@ export function Segments() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}
+          {item.created_at ? new Date(item.created_at).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },

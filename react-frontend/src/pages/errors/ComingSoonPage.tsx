@@ -45,14 +45,12 @@ export function ComingSoonPage({ feature = 'This feature' }: ComingSoonPageProps
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link to={tenantPath('/dashboard')} className="flex-1">
-              <Button
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={<Home className="w-4 h-4" />}
-              >
-                {t('coming_soon.dashboard')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/dashboard')}
+              className="flex-1 w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white"
+              startContent={<Home className="w-4 h-4" />}
+            >
+              {t('coming_soon.dashboard')}
+            </Button>
             <Button
               variant="flat"
               className="w-full bg-theme-elevated text-theme-muted flex-1"

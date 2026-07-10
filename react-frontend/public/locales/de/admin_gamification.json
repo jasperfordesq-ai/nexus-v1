@@ -306,6 +306,14 @@
     "audience_badge_holders": "Benutzer mit spezifischem Abzeichen",
     "type_one_time": "Einmal",
     "type_recurring": "Wiederkehrend",
-    "type_triggered": "Ausgelöst"
+    "type_triggered": "Ausgelöst",
+    "bulk_award_succeeded_count_one": "Mit dem{{count}}-Abzeichen ausgezeichnet",
+    "bulk_award_succeeded_count_other": "Mit dem{{count}}-Abzeichen ausgezeichnet",
+    "badge_count_one": "{{count}}-Abzeichen",
+    "badge_count_other": "{{count}}-Abzeichen",
+    "threshold_count_one": "Schwellenwert:{{count}}",
+    "threshold_count_other": "Schwellenwert:{{count}}",
+    "xp_count_one": "{{count}}XP",
+    "xp_count_other": "{{count}}XP"
   }
 }

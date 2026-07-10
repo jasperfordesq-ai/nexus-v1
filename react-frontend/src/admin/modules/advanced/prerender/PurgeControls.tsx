@@ -106,7 +106,10 @@ export function PurgeControls({
       <CardBody className="gap-3">
         <p className="text-sm text-muted">
           {t('description_prefix')} <code>*</code> {t('description_middle')}
-          <code className="ml-1">**</code> {t('description_suffix')} <code>/blog/*</code>,
+          <code className="ml-1">**</code> {t('description_suffix')}{' '}
+          {/* eslint-disable-next-line i18next/no-literal-string -- Route glob example must remain verbatim. */}
+          <code>/blog/*</code>,
+          {/* eslint-disable-next-line i18next/no-literal-string -- Route glob example must remain verbatim. */}
           <code className="ml-1">/listings/**</code>, <code className="ml-1">/</code>.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

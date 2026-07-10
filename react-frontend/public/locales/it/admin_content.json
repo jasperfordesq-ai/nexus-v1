@@ -1343,7 +1343,13 @@
     "resync_stripe": "Risincronizza con Stripe",
     "sync_to_stripe": "Sincronizza con Stripe",
     "sync_stripe": "Sincronizza con Stripe",
-    "stripe_sync_description": "Crea o aggiorna il prodotto Stripe e i prezzi per questo piano. Richiede STRIPE_SECRET_KEY."
+    "stripe_sync_description": "Crea o aggiorna il prodotto Stripe e i prezzi per questo piano. Richiede STRIPE_SECRET_KEY.",
+    "active_tenants_cannot_delete_many": "{{count}}tenant attivi: impossibile eliminare",
+    "active_tenants_cannot_delete_one": "{{count}}tenant attivi: impossibile eliminare",
+    "active_tenants_cannot_delete_other": "{{count}}tenant attivi: impossibile eliminare",
+    "filter_all_many": "Tutti ({{count}})",
+    "filter_all_one": "Tutti ({{count}})",
+    "filter_all_other": "Tutti ({{count}})"
   },
   "data_table": {
     "admin_data_table": "Dati",

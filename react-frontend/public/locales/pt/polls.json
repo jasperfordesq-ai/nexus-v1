@@ -100,5 +100,8 @@
   "page_meta": {
     "title": "Enquetes"
   },
-  "category_filter_label": "Filtrar por categoria"
+  "category_filter_label": "Filtrar por categoria",
+  "total_ballots_many": "Total de cédulas: {{count}}",
+  "total_ballots_one": "Total de cédulas: {{count}}",
+  "total_ballots_other": "Total de cédulas: {{count}}"
 }

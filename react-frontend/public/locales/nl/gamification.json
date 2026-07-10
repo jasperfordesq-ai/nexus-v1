@@ -23,7 +23,11 @@
       "months_active": "{{count}} van 12 maanden",
       "month_active_tooltip": "Actief: {{count}} activiteiten",
       "month_inactive_tooltip": "Inactief",
-      "description": "Maanden waarin je ten minste één betekenisvolle activiteit hebt voltooid (uitwisseling, vermelding, beoordeling of vrijwilligersuren)."
+      "description": "Maanden waarin je ten minste één betekenisvolle activiteit hebt voltooid (uitwisseling, vermelding, beoordeling of vrijwilligersuren).",
+      "months_active_one": "{{count}} van 12 maanden",
+      "months_active_other": "{{count}} van 12 maanden",
+      "month_active_tooltip_one": "Actief: {{count}} activiteiten",
+      "month_active_tooltip_other": "Actief: {{count}} activiteiten"
     },
     "badge_type": {
       "vol": "Vrijwilligerswerk",
@@ -77,7 +81,9 @@
       "claimed_message": "Je hebt {{xp}} XP verdiend!",
       "claim_failed": "Claimen Mislukt",
       "claim_failed_desc": "Kon dagelijkse beloning niet claimen.",
-      "claim_error": "Er is iets misgegaan. Probeer het opnieuw."
+      "claim_error": "Er is iets misgegaan. Probeer het opnieuw.",
+      "day_streak_one": "{{count}} dagen streak",
+      "day_streak_other": "{{count}} dagen streak"
     },
     "challenges": {
       "active_challenges": "Actieve Uitdagingen",
@@ -121,7 +127,9 @@
       "purchase_failed_desc": "Kon de aankoop niet voltooien.",
       "purchase_error": "Er is iets misgegaan.",
       "load_failed": "Laden mislukt",
-      "load_failed_desc": "Kon de XP-winkel niet laden."
+      "load_failed_desc": "Kon de XP-winkel niet laden.",
+      "stock_left_one": "{{count}} op voorraad",
+      "stock_left_other": "{{count}} op voorraad"
     },
     "loading": "Prestaties laden",
     "badge_detail": {
@@ -159,7 +167,9 @@
       "updated_desc": "Je badge showcase is opgeslagen.",
       "save_failed": "Opslaan Mislukt",
       "save_failed_desc": "Kon de showcase niet bijwerken.",
-      "save_error": "Er is iets misgegaan."
+      "save_error": "Er is iets misgegaan.",
+      "select_badges_one": "Selecteer tot 5 badges om op je profiel te tonen. ({{count}}/5 geselecteerd)",
+      "select_badges_other": "Selecteer tot 5 badges om op je profiel te tonen. ({{count}}/5 geselecteerd)"
     },
     "load_error": "Kon de prestaties niet laden. Probeer het opnieuw."
   },
@@ -266,7 +276,9 @@
       "buddy_failed": "Mislukt om buddy te worden",
       "buddy_action_sent": "Buddy-ondersteuning verzonden",
       "buddy_action_failed": "Kan buddy-ondersteuning niet verzenden"
-    }
+    },
+    "streak_label_one": "{{count}} check-inreeks",
+    "streak_label_other": "{{count}} check-inreeks"
   },
   "frequency": {
     "none": "Geen cadans",
@@ -328,7 +340,9 @@
       "rank_label": "Rang {{rank}}",
       "xp_reward": "{{xp}} XP",
       "load_failed": "Laden Mislukt",
-      "load_failed_desc": "Kon seizoen geschiedenis niet laden."
+      "load_failed_desc": "Kon seizoen geschiedenis niet laden.",
+      "participants_one": "{{count}} deelnemers",
+      "participants_other": "{{count}} deelnemers"
     },
     "score_unit": {
       "hours": "H",
@@ -421,7 +435,11 @@
       "legendary": "Legendarisch"
     },
     "max_score_label": "/ {{max}}",
-    "loading": "Uw NexusScore laden..."
+    "loading": "Uw NexusScore laden...",
+    "points_to_next_one": "{{count}} verwijst naar {{tier}}",
+    "points_to_next_other": "{{count}} verwijst naar {{tier}}",
+    "remaining_count_one": "{{count}} resterend",
+    "remaining_count_other": "{{count}} resterend"
   },
   "common": {
     "refresh": "Vernieuwen",

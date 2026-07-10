@@ -1,13 +1,24 @@
-import { CardBody, Card, Button, Spinner, SearchField, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, RadioGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-
 import Globe from 'lucide-react/icons/globe';
 import { useTranslation } from 'react-i18next';
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalHeading,
+  Radio,
+  RadioGroup,
+  SearchField,
+  Spinner,
+} from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
@@ -101,7 +112,7 @@ export function FederationCommunityPicker({ isOpen, onClose, onSelect }: Props) 
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
           <Globe className="h-5 w-5 text-accent" aria-hidden="true" />
-          <span>{t('federation_picker.title')}</span>
+          <ModalHeading>{t('federation_picker.title')}</ModalHeading>
         </ModalHeader>
         <ModalBody className="gap-4">
           <SearchField
@@ -125,46 +136,36 @@ export function FederationCommunityPicker({ isOpen, onClose, onSelect }: Props) 
               value={selectedSlug ?? ''}
               onValueChange={setSelectedSlug}
               aria-label={t('federation_picker.title')}
+              className="flex flex-col gap-2"
             >
-              <div className="flex flex-col gap-2">
-                {filteredPeers.map((peer) => (
-                  <Card
-                    key={peer.id}
-                    isPressable
-                    onPress={() => setSelectedSlug(peer.slug)}
-                    className={`border ${
-                      selectedSlug === peer.slug
-                        ? 'border-accent bg-accent/5'
-                        : 'border-border'
-                    }`}
-                  >
-                    <CardBody className="flex flex-row items-start gap-3 px-4 py-3">
-                      <input
-                        type="radio"
-                        className="mt-1 h-4 w-4 accent-[var(--accent)]"
-                        checked={selectedSlug === peer.slug}
-                        onChange={() => setSelectedSlug(peer.slug)}
-                        aria-label={peer.display_name}
-                      />
-                      <div className="flex-1">
-                        <p className="font-semibold text-theme-primary">
-                          {peer.display_name}
-                        </p>
-                        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-theme-muted">
-                          {peer.region && <span>{peer.region}</span>}
-                          {peer.member_count_bucket && (
-                            <span>
-                              {peer.member_count_bucket}{' '}
-                              {t('federation_picker.member_count_label')}
-                            </span>
-                          )}
-                          <span className="font-mono">{peer.slug}</span>
-                        </div>
-                      </div>
-                    </CardBody>
-                  </Card>
-                ))}
-              </div>
+              {filteredPeers.map((peer) => (
+                <Radio
+                  key={peer.id}
+                  value={peer.slug}
+                  aria-label={peer.display_name}
+                  className="min-h-11 rounded-xl border border-border px-4 py-3 transition-colors data-[selected=true]:border-accent data-[selected=true]:bg-accent/5"
+                  classNames={{
+                    wrapper: 'mt-1',
+                    labelWrapper: 'min-w-0 flex-1',
+                  }}
+                >
+                  <div className="min-w-0">
+                    <p className="font-semibold text-theme-primary">
+                      {peer.display_name}
+                    </p>
+                    <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-theme-muted">
+                      {peer.region && <span>{peer.region}</span>}
+                      {peer.member_count_bucket && (
+                        <span>
+                          {peer.member_count_bucket}{' '}
+                          {t('federation_picker.member_count_label')}
+                        </span>
+                      )}
+                      <span className="font-mono">{peer.slug}</span>
+                    </div>
+                  </div>
+                </Radio>
+              ))}
             </RadioGroup>
           )}
         </ModalBody>

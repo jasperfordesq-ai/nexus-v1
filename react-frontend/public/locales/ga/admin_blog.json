@@ -158,7 +158,22 @@
       "delete_confirm_title": "An bhfuil fonn ort na postálacha roghnaithe a scriosadh?",
       "publish": "Foilsigh",
       "publish_confirm_message": "An bhfuil fonn ort postáil roghnaithe {{count}} a fhoilsiú?",
-      "publish_confirm_title": "An bhfuil fonn ort postálacha roghnaithe a fhoilsiú?"
+      "publish_confirm_title": "An bhfuil fonn ort postálacha roghnaithe a fhoilsiú?",
+      "publish_confirm_message_few": "An bhfuil fonn ort postáil roghnaithe {{count}} a fhoilsiú?",
+      "publish_confirm_message_many": "An bhfuil fonn ort postáil roghnaithe {{count}} a fhoilsiú?",
+      "publish_confirm_message_one": "An bhfuil fonn ort postáil roghnaithe {{count}} a fhoilsiú?",
+      "publish_confirm_message_other": "An bhfuil fonn ort postáil roghnaithe {{count}} a fhoilsiú?",
+      "publish_confirm_message_two": "An bhfuil fonn ort postáil roghnaithe {{count}} a fhoilsiú?",
+      "archive_confirm_message_few": "Déanfaidh sé seo postáil(í) {{count}} a dhífhoilsiú. Is féidir iad a athfhoilsiú níos déanaí.",
+      "archive_confirm_message_many": "Déanfaidh sé seo postáil(í) {{count}} a dhífhoilsiú. Is féidir iad a athfhoilsiú níos déanaí.",
+      "archive_confirm_message_one": "Déanfaidh sé seo postáil(í) {{count}} a dhífhoilsiú. Is féidir iad a athfhoilsiú níos déanaí.",
+      "archive_confirm_message_other": "Déanfaidh sé seo postáil(í) {{count}} a dhífhoilsiú. Is féidir iad a athfhoilsiú níos déanaí.",
+      "archive_confirm_message_two": "Déanfaidh sé seo postáil(í) {{count}} a dhífhoilsiú. Is féidir iad a athfhoilsiú níos déanaí.",
+      "delete_confirm_message_few": "Scrios {{count}} post(í) roghnaithe? Ní féidir é seo a chealú.",
+      "delete_confirm_message_many": "Scrios {{count}} post(í) roghnaithe? Ní féidir é seo a chealú.",
+      "delete_confirm_message_one": "Scrios {{count}} post(í) roghnaithe? Ní féidir é seo a chealú.",
+      "delete_confirm_message_other": "Scrios {{count}} post(í) roghnaithe? Ní féidir é seo a chealú.",
+      "delete_confirm_message_two": "Scrios {{count}} post(í) roghnaithe? Ní féidir é seo a chealú."
     },
     "marketplace": {
       "reason_label": "Cúis",

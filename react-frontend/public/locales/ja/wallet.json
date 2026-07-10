@@ -159,5 +159,8 @@
   "optional": "任意",
   "description_placeholder": "この送金は何のためですか？",
   "new_balance_after": "あなたの新しい残高は{{balance}}時間になります",
-  "transfer_summary": "{{amount}} {{unit}}を {{name}} に送ろうとしています"
+  "transfer_summary": "{{amount}} {{unit}}を {{name}} に送ろうとしています",
+  "pending_in_other": "+{{count}}時間の保留中",
+  "signed_hours_value_other": "{{sign}}{{count}}h",
+  "hours_value_other": "{{count}}h"
 }

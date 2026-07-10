@@ -104,7 +104,12 @@
       "stats": {
         "total_runs": "ritheann iomlán",
         "total_proposals": "tograí iomlána",
-        "pending_review": "{{count}} ar feitheamh athbhreithnithe"
+        "pending_review": "{{count}} ar feitheamh athbhreithnithe",
+        "pending_review_few": "{{count}} ar feitheamh athbhreithnithe",
+        "pending_review_many": "{{count}} ar feitheamh athbhreithnithe",
+        "pending_review_one": "{{count}} ar feitheamh athbhreithnithe",
+        "pending_review_other": "{{count}} ar feitheamh athbhreithnithe",
+        "pending_review_two": "{{count}} ar feitheamh athbhreithnithe"
       },
       "agent_types": {
         "activity_summary": "Achoimre ar Ghníomhaíocht",
@@ -219,7 +224,12 @@
         "proposals_table_aria": "Rith tograí",
         "columns": {
           "subject": "Ábhar"
-        }
+        },
+        "proposals_count_few": "Tograí ({{count}})",
+        "proposals_count_many": "Tograí ({{count}})",
+        "proposals_count_one": "Tograí ({{count}})",
+        "proposals_count_other": "Tograí ({{count}})",
+        "proposals_count_two": "Tograí ({{count}})"
       },
       "toasts": {
         "approve_eligible_failed": "Theip ar thograí incháilithe a cheadú.",
@@ -235,7 +245,12 @@
         "run_details_load_failed": "Theip ar lódáil sonraí an rith.",
         "run_trigger_failed": "Theip ar rith a spreagadh.",
         "run_triggered": "Spreag an rith: Gineadh tograí {{count}}.",
-        "runs_load_failed": "Theip ar ritheanna a lódáil."
+        "runs_load_failed": "Theip ar ritheanna a lódáil.",
+        "run_triggered_few": "Spreag an rith: Gineadh tograí {{count}}.",
+        "run_triggered_many": "Spreag an rith: Gineadh tograí {{count}}.",
+        "run_triggered_one": "Spreag an rith: Gineadh tograí {{count}}.",
+        "run_triggered_other": "Spreag an rith: Gineadh tograí {{count}}.",
+        "run_triggered_two": "Spreag an rith: Gineadh tograí {{count}}."
       }
     },
     "module_docs": {
@@ -302,7 +317,12 @@
         "save_failed": "Theip ar shábháil.",
         "seed_failed": "Theip ar shíol.",
         "seeded": "Doiciméid réamhshocraithe {{count}} sílithe.",
-        "updated": "Doc nuashonraithe."
+        "updated": "Doc nuashonraithe.",
+        "seeded_few": "Doiciméid réamhshocraithe {{count}} sílithe.",
+        "seeded_many": "Doiciméid réamhshocraithe {{count}} sílithe.",
+        "seeded_one": "Doiciméid réamhshocraithe {{count}} sílithe.",
+        "seeded_other": "Doiciméid réamhshocraithe {{count}} sílithe.",
+        "seeded_two": "Doiciméid réamhshocraithe {{count}} sílithe."
       }
     },
     "trace_metrics": {

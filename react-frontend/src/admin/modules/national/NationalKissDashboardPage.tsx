@@ -1,3 +1,4 @@
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -262,7 +263,7 @@ export function NationalKissDashboardPage() {
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('national_kiss_dashboard.about.title')}</p>
               <p className="text-muted">
-                {t('national_kiss_dashboard.about.body_prefix')} Caring Community {t('national_kiss_dashboard.about.body_suffix')}
+                {t('national_kiss_dashboard.about.body_prefix')} {t('common:nav.caring_community')} {t('national_kiss_dashboard.about.body_suffix')}
               </p>
               <p className="text-muted">
                 {t('national_kiss_dashboard.about.health_prefix')} <strong>{t('national_kiss_dashboard.status.thriving')}</strong> =
@@ -453,7 +454,7 @@ export function NationalKissDashboardPage() {
             </div>
           ) : sortedRows.length === 0 ? (
             <p className="text-sm text-muted">
-              {t('national_kiss_dashboard.comparative.empty_prefix')} Caring Community {t('national_kiss_dashboard.comparative.empty_middle')} <strong>{t('national_kiss_dashboard.comparative.super_admin_tenants')}</strong> {t('national_kiss_dashboard.comparative.empty_suffix')}{' '}
+              {t('national_kiss_dashboard.comparative.empty_prefix')} {t('common:nav.caring_community')} {t('national_kiss_dashboard.comparative.empty_middle')} <strong>{t('national_kiss_dashboard.comparative.super_admin_tenants')}</strong> {t('national_kiss_dashboard.comparative.empty_suffix')}{' '}
               {t('national_kiss_dashboard.comparative.empty_tail')}
             </p>
           ) : (
@@ -559,7 +560,9 @@ export function NationalKissDashboardPage() {
                 {summary.top_5_cooperatives_by_hours.map((c, idx) => (
                   <li key={c.tenant_id} className="flex items-center justify-between text-sm">
                     <span><span className="font-mono text-muted">#{idx + 1}</span> {c.name}</span>
-                    <Chip variant="soft" size="sm" color="success">{c.hours.toFixed(1)} h</Chip>
+                    <Chip variant="soft" size="sm" color="success">
+                      {formatNumber(c.hours, { maximumFractionDigits: 1, minimumFractionDigits: 1, style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
+                    </Chip>
                   </li>
                 ))}
               </ol>
@@ -579,7 +582,9 @@ export function NationalKissDashboardPage() {
                 {summary.bottom_5_active_cooperatives_by_hours.map((c, idx) => (
                   <li key={c.tenant_id} className="flex items-center justify-between text-sm">
                     <span><span className="font-mono text-muted">#{idx + 1}</span> {c.name}</span>
-                    <Chip variant="soft" size="sm" color="danger">{c.hours.toFixed(1)} h</Chip>
+                    <Chip variant="soft" size="sm" color="danger">
+                      {formatNumber(c.hours, { maximumFractionDigits: 1, minimumFractionDigits: 1, style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
+                    </Chip>
                   </li>
                 ))}
               </ol>
@@ -594,7 +599,7 @@ export function NationalKissDashboardPage() {
       {summary && (
         <p className="text-xs text-muted">
           {t('national_kiss_dashboard.footer.generated_at', {
-            date: new Date(summary.generated_at).toLocaleString(),
+            date: new Date(summary.generated_at).toLocaleString(getFormattingLocale()),
           })}{' '}
           {t('national_kiss_dashboard.footer.privacy_note')}
         </p>

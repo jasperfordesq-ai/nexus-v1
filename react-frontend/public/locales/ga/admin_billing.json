@@ -203,6 +203,11 @@
     "your_plan_usage": "Úsáid do Phlean",
     "over_limit_warning": "Tá teorainneacha do phlean sroichte agat. Uasghrádú chun leanúint ar aghaidh.",
     "upgrade_modal_desc": "Uasghrádaigh do phlean chun gnéithe agus acmhainn bhreise a dhíghlasáil.",
-    "upgrade_mailto_subject": "Iarratas ar Uasghrádú Plean"
+    "upgrade_mailto_subject": "Iarratas ar Uasghrádú Plean",
+    "user_count_label_few": "{{count}} / {{max}} úsáideoir",
+    "user_count_label_many": "{{count}} / {{max}} úsáideoir",
+    "user_count_label_one": "{{count}} / {{max}} úsáideoir",
+    "user_count_label_other": "{{count}} / {{max}} úsáideoir",
+    "user_count_label_two": "{{count}} / {{max}} úsáideoir"
   }
 }

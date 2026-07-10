@@ -37,5 +37,7 @@
   "page_meta": {
     "title": "Connections"
   },
-  "loading": "Loading connections..."
+  "loading": "Loading connections...",
+  "pending_count_one": "{{count}} pending",
+  "pending_count_other": "{{count}} pending"
 }

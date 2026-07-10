@@ -186,7 +186,13 @@
     "time_just_now": "Gerade eben",
     "time_minutes_ago": "vor {{count}} Min.",
     "time_hours_ago": "vor {{count}} Std.",
-    "time_days_ago": "vor {{count}} Tg."
+    "time_days_ago": "vor {{count}} Tg.",
+    "time_minutes_ago_one": "vor {{count}} Min.",
+    "time_minutes_ago_other": "vor {{count}} Min.",
+    "time_hours_ago_one": "vor {{count}} Std.",
+    "time_hours_ago_other": "vor {{count}} Std.",
+    "time_days_ago_one": "vor {{count}} Tg.",
+    "time_days_ago_other": "vor {{count}} Tg."
   },
   "members": {
     "title": "Mitglieder",
@@ -288,7 +294,16 @@
     "empty_never_logged_in_title": "Alle haben sich bereits angemeldet",
     "empty_never_logged_in_hint": "Keine genehmigten Mitglieder warten noch auf ihre erste Anmeldung.",
     "empty_onboarding_incomplete_title": "Alle haben das Onboarding abgeschlossen",
-    "empty_onboarding_incomplete_hint": "Kein Mitglied hat noch unvollständige Onboarding-Schritte."
+    "empty_onboarding_incomplete_hint": "Kein Mitglied hat noch unvollständige Onboarding-Schritte.",
+    "time_minutes_ago_one": "vor {{count}} Min.",
+    "time_minutes_ago_other": "vor {{count}} Min.",
+    "time_hours_ago_one": "vor {{count}} Std.",
+    "time_hours_ago_other": "vor {{count}} Std.",
+    "time_days_ago_one": "vor {{count}} Tg.",
+    "time_days_ago_other": "vor {{count}} Tg.",
+    "bulk_selected_one": "{{count}} ausgewählt",
+    "bulk_selected_other": "{{count}} ausgewählt",
+    "role_all": "Alle Rollen"
   },
   "onboarding": {
     "title": "Onboarding",
@@ -503,7 +518,25 @@
     "empty_queue_title": "Keine Datensätze zur Prüfung ausstehend",
     "empty_queue_hint": "Alles erledigt — neue Einreichungen erscheinen hier zur Prüfung.",
     "list_error_title": "Prüfdatensätze konnten nicht geladen werden",
-    "list_error_body": "Prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
+    "list_error_body": "Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "expiry_days_left_one": "noch {{count}} Tg.",
+    "expiry_days_left_other": "noch {{count}} Tg.",
+    "toast_bulk_success_one": "{{count}} Datensätze {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_other": "{{count}} Datensätze {{action}}.{{failedSuffix}}",
+    "toast_bulk_failed_suffix_one": " ({{count}} fehlgeschlagen)",
+    "toast_bulk_failed_suffix_other": " ({{count}} fehlgeschlagen)",
+    "stat_of_total_one": "von {{count}} Datensätzen insgesamt",
+    "stat_of_total_other": "von {{count}} Datensätzen insgesamt",
+    "stat_expired_hint_one": "{{count}} bereits abgelaufen",
+    "stat_expired_hint_other": "{{count}} bereits abgelaufen",
+    "records_selected_one": "{{count}} Datensätze ausgewählt",
+    "records_selected_other": "{{count}} Datensätze ausgewählt",
+    "bulk_verify_confirm_one": "Alle ausgewählten Datensätze verifizieren?",
+    "bulk_verify_confirm_other": "Alle ausgewählten Datensätze verifizieren?",
+    "bulk_delete_confirm_one": "Möchten Sie alle ausgewählten Datensätze wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "bulk_delete_confirm_other": "Möchten Sie alle ausgewählten Datensätze wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "bulk_reject_confirm_one": "Geben Sie einen Grund für die Ablehnung aller ausgewählten Datensätze an.",
+    "bulk_reject_confirm_other": "Geben Sie einen Grund für die Ablehnung aller ausgewählten Datensätze an."
   },
   "member_detail": {
     "load_failed": "Mitglied konnte nicht geladen werden.",
@@ -795,7 +828,9 @@
     "retry": "Erneut versuchen",
     "detail_not_found_hint": "Die Nachrichtenkopie wurde möglicherweise archiviert oder entfernt, oder der Link ist falsch.",
     "detail_flag_banner_title": "Zur Prüfung markiert",
-    "detail_decision_prompt": "Erfassen Sie eine Prüfentscheidung für diese Nachrichtenkopie."
+    "detail_decision_prompt": "Erfassen Sie eine Prüfentscheidung für diese Nachrichtenkopie.",
+    "detail_message_count_one": "{{count}} Nachrichten",
+    "detail_message_count_other": "{{count}} Nachrichten"
   },
   "monitoring": {
     "title": "Nutzerüberwachung",
@@ -939,7 +974,8 @@
     "empty_level_title": "Keine Tags auf dieser Stufe",
     "empty_level_hint": "Derzeit trägt kein Inserat diese Risikostufe.",
     "empty_search_title": "Keine passenden Risiko-Tags",
-    "empty_search_hint": "Versuchen Sie einen anderen Suchbegriff oder löschen Sie die Suche."
+    "empty_search_hint": "Versuchen Sie einen anderen Suchbegriff oder löschen Sie die Suche.",
+    "level_all": "Alle Risikostufen"
   },
   "insurance": {
     "title": "Versicherungszertifikate",
@@ -1124,7 +1160,9 @@
     "detail_description": "Eine eingefrorene, schreibgeschützte Momentaufnahme einer geprüften Nachrichtenkopie.",
     "frozen_note": "Dieser Datensatz ist genau so erhalten, wie er geprüft wurde, und kann nicht geändert werden.",
     "record_id": "Datensatz #{{id}}",
-    "record_unavailable": "Datensatz nicht verfügbar"
+    "record_unavailable": "Datensatz nicht verfügbar",
+    "messages_count_one": "{{count}} Nachrichten",
+    "messages_count_other": "{{count}} Nachrichten"
   },
   "configuration": {
     "title": "Broker-Konfiguration",

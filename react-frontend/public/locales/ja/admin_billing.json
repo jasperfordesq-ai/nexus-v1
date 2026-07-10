@@ -203,6 +203,7 @@
     "your_plan_usage": "プランの使用状況",
     "over_limit_warning": "プランの制限に達しました。続行するにはアップグレードしてください。",
     "upgrade_modal_desc": "プランをアップグレードすると、追加の機能と容量が利用可能になります。",
-    "upgrade_mailto_subject": "プランアップグレードのリクエスト"
+    "upgrade_mailto_subject": "プランアップグレードのリクエスト",
+    "user_count_label_other": "{{count}} / {{max}} ユーザー"
   }
 }

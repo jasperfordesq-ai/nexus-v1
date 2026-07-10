@@ -169,7 +169,9 @@
     "rate_n_stars": "{{count}} von 5 Sternen bewerten",
     "submit_error": "Ihre Bewertung konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
     "count_one": "{{count}}-Rezension",
-    "count_other": "{{count}} Bewertungen"
+    "count_other": "{{count}} Bewertungen",
+    "rate_n_stars_one": "{{count}} von 5 Sternen bewerten",
+    "rate_n_stars_other": "{{count}} von 5 Sternen bewerten"
   },
   "admin": {
     "title": "Kurse",

@@ -10,7 +10,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui/Popover';
 import Bell from 'lucide-react/icons/bell';
 import MessageSquare from 'lucide-react/icons/message-square';
 import ListTodo from 'lucide-react/icons/list-todo';
@@ -142,7 +142,7 @@ export function NotificationFlyout() {
           <Button
             variant="light"
             size="sm"
-            className="text-xs text-indigo-500 dark:text-indigo-400 h-7 min-w-0 px-2 gap-1"
+            className="text-xs text-accent dark:text-accent h-7 min-w-0 px-2 gap-1"
             onPress={handleMarkAllRead}
           >
             <CheckCheck className="w-3.5 h-3.5" aria-hidden="true" />
@@ -200,7 +200,7 @@ export function NotificationFlyout() {
                 variant="light"
                 onPress={() => handleNotificationClick(notification)}
                 className={`w-full flex items-start gap-3 px-4 py-3 text-start transition-colors hover:bg-theme-hover h-auto min-h-14 justify-start rounded-none ${
-                  isUnread ? 'bg-indigo-50/50 dark:bg-indigo-500/5' : ''
+                  isUnread ? 'bg-accent/50 dark:bg-accent/5' : ''
                 }`}
               >
                 {isGrouped && notification.actors && notification.actors.length > 1 ? (
@@ -220,7 +220,7 @@ export function NotificationFlyout() {
                 ) : (
                   <div className={`mt-0.5 p-1.5 rounded-full shrink-0 ${
                     isUnread
-                      ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
+                      ? 'bg-accent-soft dark:bg-accent/20 text-accent dark:text-accent'
                       : 'bg-[var(--surface-elevated)] text-theme-subtle'
                   }`}>
                     {getIcon(notification.type)}
@@ -242,7 +242,7 @@ export function NotificationFlyout() {
                   </div>
                 </div>
                 {isUnread && (
-                  <span className="w-2 h-2 mt-2 rounded-full bg-indigo-500 shrink-0" aria-label={t('flyout.unread_dot_aria')} />
+                  <span className="w-2 h-2 mt-2 rounded-full bg-accent shrink-0" aria-label={t('flyout.unread_dot_aria')} />
                 )}
               </Button>
             );
@@ -258,7 +258,7 @@ export function NotificationFlyout() {
         variant="light"
         fullWidth
         size="sm"
-        className="text-sm text-indigo-500 dark:text-indigo-400 h-8 gap-1.5"
+        className="text-sm text-accent dark:text-accent h-8 gap-1.5"
         onPress={handleViewAll}
       >
         {t('flyout.view_all')}
@@ -273,7 +273,7 @@ export function NotificationFlyout() {
       isIconOnly
       variant="light"
       size="sm"
-      className={`relative text-theme-muted hover:text-theme-primary ${unreadCount > 0 ? 'text-indigo-500 dark:text-indigo-400' : ''}`}
+      className={`relative text-theme-muted hover:text-theme-primary ${unreadCount > 0 ? 'text-accent dark:text-accent' : ''}`}
       aria-label={unreadCount > 0 ? t('flyout.bell_unread_aria', { count: unreadCount }) : t('flyout.bell_aria')}
       {...(isMobile ? { onPress: () => setIsOpen(true) } : {})}
     >
@@ -301,7 +301,7 @@ export function NotificationFlyout() {
             body: 'p-0',
           }}
         >
-          <DrawerContent aria-label={t('title')} style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+          <DrawerContent aria-label={t('title')} className="pb-[env(safe-area-inset-bottom,0px)]">
             <DrawerHeader>
               {/* Drag handle */}
               <div className="flex justify-center pt-2 pb-1">
@@ -335,6 +335,7 @@ export function NotificationFlyout() {
         {bellButton}
       </PopoverTrigger>
       <PopoverContent className="p-0 overflow-hidden isolate bg-[var(--surface-solid)] border border-[var(--border-default)] shadow-2xl rounded-xl w-[360px] max-w-[90vw]">
+        <PopoverHeading className="sr-only">{t('title')}</PopoverHeading>
         {notificationHeader}
         <div className="max-h-[400px] overflow-y-auto bg-[var(--surface-solid)]">
           {notificationBody}

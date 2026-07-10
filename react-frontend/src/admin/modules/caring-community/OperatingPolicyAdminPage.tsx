@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Input, Spinner, Select, SelectItem, Tooltip } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -301,7 +302,7 @@ export default function OperatingPolicyAdminPage() {
           <Separator />
           <p className="text-xs text-muted">
             {t('admin.operating_policy.last_updated', {
-              date: new Date(data.last_updated_at).toLocaleString(),
+              date: new Date(data.last_updated_at).toLocaleString(getFormattingLocale()),
             })}
           </p>
         </>

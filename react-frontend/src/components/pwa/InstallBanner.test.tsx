@@ -19,6 +19,7 @@ const defaultInstallState = {
 };
 
 let mockInstallState = { ...defaultInstallState };
+let mockCookieBannerVisible = false;
 let mockTenantContext = {
   branding: {
     name: 'Hour Timebank',
@@ -33,6 +34,10 @@ vi.mock('@/lib/installPrompt', () => ({
 
 vi.mock('@/contexts/TenantContext', () => ({
   useTenant: () => mockTenantContext,
+}));
+
+vi.mock('@/contexts/CookieConsentContext', () => ({
+  useCookieConsent: () => ({ showBanner: mockCookieBannerVisible }),
 }));
 
 // Control localStorage in isolation
@@ -57,6 +62,10 @@ import { InstallBanner } from './InstallBanner';
 function setFirstSeenLongAgo() {
   mockStorageMap['nexus_install_banner_first_seen'] = String(Date.now() - 70_000);
 }
+
+beforeEach(() => {
+  mockCookieBannerVisible = false;
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Group A: tests that should never show the banner (no timer dependency)
@@ -85,6 +94,19 @@ describe('InstallBanner — permanently hidden', () => {
     setFirstSeenLongAgo(); // make sure elapsed check passes, only dismissed blocks it
     render(<InstallBanner />);
     expect(screen.queryByRole('region')).not.toBeInTheDocument();
+  });
+
+  it('waits until cookie consent is resolved before starting the install prompt', () => {
+    mockInstallState = { ...defaultInstallState, canPrompt: true };
+    setFirstSeenLongAgo();
+    mockCookieBannerVisible = true;
+    const { rerender } = render(<InstallBanner />);
+
+    expect(screen.queryByRole('region')).not.toBeInTheDocument();
+
+    mockCookieBannerVisible = false;
+    rerender(<InstallBanner />);
+    expect(screen.getByRole('region')).toBeInTheDocument();
   });
 });
 

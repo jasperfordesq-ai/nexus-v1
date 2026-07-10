@@ -245,7 +245,8 @@
         "65_plus": "65歳以上",
         "unknown": "未知"
       }
-    }
+    },
+    "location_marker_title_other": "{{area}}:{{count}}メンバー"
   },
   "search_analytics": {
     "page_title": "検索アナリティクス",
@@ -270,6 +271,7 @@
     "load_failed": "検索アナリティクスの読み込みに失敗しました",
     "empty_description": "選択した期間に検索は記録されていません。",
     "no_trending": "この期間に人気の検索はありません。",
-    "no_zero_results": "この期間に結果ゼロの検索はありません。すべての検索で何かが見つかりました。"
+    "no_zero_results": "この期間に結果ゼロの検索はありません。すべての検索で何かが見つかりました。",
+    "count_value_other": "{{count}}回"
   }
 }

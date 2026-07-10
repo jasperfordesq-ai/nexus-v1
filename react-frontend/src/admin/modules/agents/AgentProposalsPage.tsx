@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tab, Tabs } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -213,7 +214,7 @@ export default function AgentProposalsPage() {
                 }>{t(`agents.proposal_status.${p.status}`, p.status)}</Chip>
               </div>
               <span className="text-xs text-muted">
-                {new Date(p.created_at).toLocaleString()}
+                {new Date(p.created_at).toLocaleString(getFormattingLocale())}
               </span>
             </CardHeader>
             <CardBody className="space-y-3">

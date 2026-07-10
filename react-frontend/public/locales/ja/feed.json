@@ -251,7 +251,10 @@
     "listing_preview_alt": "リスティングのプレビュー",
     "image_preview_alt": "アップロードのプレビュー",
     "type_tabs_aria": "コンテンツタイプを作成する",
-    "compose_post": "投稿を作成する"
+    "compose_post": "投稿を作成する",
+    "media_rejected_other": "{{count}}ファイルがスキップされました（タイプが間違っているか、サイズが大きすぎます）",
+    "media_compression_failed_other": "{{count}}画像の処理に失敗しました",
+    "group_members_other": "{{count}}人のメンバー"
   },
   "moderation": {
     "unauthorized": "この操作を実行する権限がありません。"
@@ -349,12 +352,14 @@
       "commitment_flexible": "フレキシブル"
     },
     "volunteer": {
-      "credits_offered": "{{count}}タイムクレジット"
+      "credits_offered": "{{count}}タイムクレジット",
+      "credits_offered_other": "{{count}}タイムクレジット"
     },
     "challenge": {
       "closing_soon": "まもなく締切",
       "closes_on": "{{date}}締切",
-      "ideas_count": "{{count}}件のアイデア"
+      "ideas_count": "{{count}}件のアイデア",
+      "ideas_count_other": "{{count}}件のアイデア"
     },
     "review": {
       "rating_aria": "5つ星中{{rating}}"
@@ -399,7 +404,8 @@
     "no_posts": "投稿が見つかりません",
     "no_posts_desc": "まだ #{{tag}} がタグ付けされた投稿はありません。",
     "load_more": "もっと読み込む",
-    "page_description": "タグ付けされた投稿 #{{tag}}"
+    "page_description": "タグ付けされた投稿 #{{tag}}",
+    "post_count_other": "{{count}}の投稿"
   },
   "hashtags": {
     "title": "トレンドのハッシュタグ",
@@ -412,7 +418,8 @@
     "no_hashtags": "ハッシュタグが見つかりません",
     "no_match": "「{{query}}」に一致するハッシュタグはありません",
     "no_trending": "あなたのコミュニティにはまだトレンドのハッシュタグがありません。",
-    "post_count": "{{count}} の投稿"
+    "post_count": "{{count}} の投稿",
+    "post_count_other": "{{count}} の投稿"
   },
   "share": {
     "tooltip_remove": "共有を削除",
@@ -452,7 +459,8 @@
     "dm_sent_label": "送信済み",
     "dm_send": "送信",
     "dm_done": "完了",
-    "email": "メール"
+    "email": "メール",
+    "button_label_count_other": "共有 ({{count}})"
   },
   "video": {
     "select": "動画を追加",
@@ -474,7 +482,9 @@
     "title": "トレンド",
     "view_all": "すべてのハッシュタグを見る",
     "post_count_one": "{{count}}の投稿",
-    "post_count_other": "{{count}}の投稿"
+    "post_count_other": "{{count}}の投稿",
+    "post_count_one_other": "{{count}}の投稿",
+    "post_count_other_other": "{{count}}の投稿"
   },
   "sidebar": {
     "profile": {
@@ -520,7 +530,8 @@
     "groups": {
       "title": "人気のグループ",
       "see_all": "すべて見る",
-      "members": "{{count}} メンバー"
+      "members": "{{count}} メンバー",
+      "members_other": "{{count}} メンバー"
     },
     "actions": {
       "title": "クイックアクション",
@@ -573,7 +584,9 @@
     "go_to_image": "画像 {{number}} に移動",
     "more_images": "{{count}} 枚の画像がさらにあります",
     "video_of": "動画 {{current}} / {{total}}",
-    "role_description": "カルーセル"
+    "role_description": "カルーセル",
+    "more_images_other": "{{count}} 枚の画像がさらにあります",
+    "view_video": "{{total}} のビデオ {{current}} を表示します"
   },
   "lightbox": {
     "aria_label": "画像ビューア",
@@ -618,7 +631,8 @@
     "connect_failed": "リクエストの送信に失敗しました",
     "pending": "保留中",
     "dismiss": "却下",
-    "load_failed": "候補の読み込みに失敗しました"
+    "load_failed": "候補の読み込みに失敗しました",
+    "mutual_other": "{{count}}人の共通のつながり"
   },
   "analytics": {
     "title": "投稿分析",
@@ -647,5 +661,6 @@
   },
   "aria": {
     "feed_sidebar": "コミュニティの提案とハイライト"
-  }
+  },
+  "items_loaded_other": "{{count}}件の投稿"
 }

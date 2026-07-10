@@ -219,6 +219,18 @@ export interface ApiError {
   fieldErrors?: Record<string, string[]>;
 }
 
+type TokenRefreshOutcome = 'refreshed' | 'invalid' | 'transient';
+
+interface PendingRefreshWaiter {
+  accessTokenAtWait: string | null;
+  resolve: (outcome: TokenRefreshOutcome) => void;
+  timeoutId: ReturnType<typeof setTimeout>;
+}
+
+function isAbortError(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && 'name' in error && error.name === 'AbortError';
+}
+
 export interface PaginationMeta {
   per_page: number;
   has_more: boolean;
@@ -399,11 +411,8 @@ export const tokenManager = {
 class ApiClient {
   private baseUrl: string;
   private isRefreshing = false;
-  private refreshPromise: Promise<boolean> | null = null;
-  private pendingRequests: Array<{
-    resolve: (value: boolean) => void;
-    reject: (error: Error) => void;
-  }> = [];
+  private refreshPromise: Promise<TokenRefreshOutcome> | null = null;
+  private pendingRefreshWaiters = new Set<PendingRefreshWaiter>();
 
   // Request deduplication: track in-flight GET requests
   private inflightRequests: Map<string, Promise<ApiResponse<unknown>>> = new Map();
@@ -419,15 +428,90 @@ class ApiClient {
     // Listen for cross-tab token updates
     if (typeof window !== 'undefined') {
       window.addEventListener('storage', (e) => {
-        if (e.key === TOKEN_KEY && e.newValue && this.isRefreshing) {
-          // Another tab successfully refreshed — resolve our pending requests
-          this.pendingRequests.forEach(({ resolve }) => resolve(true));
-          this.pendingRequests = [];
-          this.isRefreshing = false;
-          this.refreshPromise = null;
+        if (e.key === TOKEN_KEY && this.pendingRefreshWaiters.size > 0) {
+          // A value means the other tab refreshed successfully. Removal means
+          // it proved that the shared session is invalid.
+          if (e.newValue) {
+            this.inflightRequests.clear();
+            this.resolvePendingRefreshWaiters('refreshed');
+          } else {
+            this.resolvePendingRefreshWaiters('invalid');
+          }
+          return;
+        }
+
+        if (
+          e.key === ApiClient.REFRESH_LOCK_KEY &&
+          e.newValue === null &&
+          this.pendingRefreshWaiters.size > 0
+        ) {
+          // Refresh can finish without changing the token when its endpoint is
+          // temporarily unavailable. Compare token generations so lock release
+          // never masquerades as a successful refresh.
+          const currentToken = tokenManager.getAccessToken();
+          for (const waiter of [...this.pendingRefreshWaiters]) {
+            const outcome = currentToken && currentToken !== waiter.accessTokenAtWait
+              ? 'refreshed'
+              : 'transient';
+            this.resolvePendingRefreshWaiter(waiter, outcome);
+          }
         }
       });
     }
+  }
+
+  private resolvePendingRefreshWaiter(
+    waiter: PendingRefreshWaiter,
+    outcome: TokenRefreshOutcome,
+  ): void {
+    if (!this.pendingRefreshWaiters.delete(waiter)) return;
+    clearTimeout(waiter.timeoutId);
+    waiter.resolve(outcome);
+  }
+
+  private resolvePendingRefreshWaiters(outcome: TokenRefreshOutcome): void {
+    for (const waiter of [...this.pendingRefreshWaiters]) {
+      this.resolvePendingRefreshWaiter(waiter, outcome);
+    }
+  }
+
+  private waitForExternalTokenRefresh(accessTokenAtWait: string | null): Promise<TokenRefreshOutcome> {
+    return new Promise<TokenRefreshOutcome>((resolve) => {
+      const waiter = {} as PendingRefreshWaiter;
+      waiter.accessTokenAtWait = accessTokenAtWait;
+      waiter.resolve = resolve;
+      waiter.timeoutId = setTimeout(() => {
+        this.resolvePendingRefreshWaiter(waiter, 'transient');
+      }, ApiClient.REFRESH_LOCK_TTL);
+      this.pendingRefreshWaiters.add(waiter);
+
+      // Close the gap between observing a held lock and registering this
+      // waiter. The other tab may already have written its token and released
+      // the lock before our storage listener was ready.
+      const currentToken = tokenManager.getAccessToken();
+      if (currentToken !== accessTokenAtWait) {
+        this.resolvePendingRefreshWaiter(waiter, currentToken ? 'refreshed' : 'invalid');
+      } else if (localStorage.getItem(ApiClient.REFRESH_LOCK_KEY) === null) {
+        this.resolvePendingRefreshWaiter(waiter, 'transient');
+      }
+    });
+  }
+
+  private expireSession(): void {
+    tokenManager.clearTokens();
+    this.dispatchSessionExpired();
+  }
+
+  private sessionExpiredResponse<T>(): ApiResponse<T> {
+    return {
+      success: false,
+      error: 'Session expired. Please log in again.',
+      code: 'SESSION_EXPIRED',
+    };
+  }
+
+  private refreshUnavailableResponse<T>(): ApiResponse<T> {
+    return { success: false, code: 'AUTH_REFRESH_UNAVAILABLE' };
   }
 
   /**
@@ -545,10 +629,10 @@ class ApiClient {
   /**
    * Attempt to refresh the access token
    */
-  private async refreshAccessToken(): Promise<boolean> {
+  private async refreshAccessToken(): Promise<TokenRefreshOutcome> {
     const refreshToken = tokenManager.getRefreshToken();
     if (!refreshToken) {
-      return false;
+      return 'invalid';
     }
 
     try {
@@ -569,7 +653,13 @@ class ApiClient {
       });
 
       if (!response.ok) {
-        return false;
+        // Credential and account-policy rejections are authoritative. Server,
+        // rate-limit, and transport failures are temporary and must not delete
+        // an otherwise valid refresh token.
+        if (response.status >= 400 && response.status < 500 && response.status !== 408 && response.status !== 429) {
+          return 'invalid';
+        }
+        return 'transient';
       }
 
       const data = await response.json();
@@ -582,12 +672,12 @@ class ApiClient {
           tokenManager.setRefreshToken(data.refresh_token);
         }
 
-        return true;
+        return 'refreshed';
       }
 
-      return false;
+      return 'invalid';
     } catch {
-      return false;
+      return 'transient';
     }
   }
 
@@ -615,47 +705,41 @@ class ApiClient {
   /**
    * Handle token refresh with request queuing and cross-tab coordination
    */
-  private async handleTokenRefresh(): Promise<boolean> {
+  private async handleTokenRefresh(): Promise<TokenRefreshOutcome> {
     // If this tab is already refreshing, wait for the result
     if (this.isRefreshing && this.refreshPromise) {
       return this.refreshPromise;
     }
 
+    // Capture the token generation before checking the lock. If the other tab
+    // completes between these operations and waiter registration, the waiter
+    // performs an immediate generation/lock re-check.
+    const accessTokenBeforeLock = tokenManager.getAccessToken();
+
     // Check if another tab is currently refreshing
     if (!this.acquireRefreshLock()) {
-      // Another tab is refreshing — wait for the storage event to signal completion
-      return new Promise<boolean>((resolve, reject) => {
-        this.pendingRequests.push({ resolve, reject });
-        // Timeout fallback: if the other tab's refresh doesn't complete, retry ourselves
-        setTimeout(() => {
-          if (this.pendingRequests.length > 0) {
-            this.pendingRequests.forEach(({ resolve: r }) => r(false));
-            this.pendingRequests = [];
-          }
-        }, ApiClient.REFRESH_LOCK_TTL);
-      });
+      // Another tab is refreshing. Wait for its token or lock storage event;
+      // lock ownership is deliberately independent from waiter state.
+      const outcome = await this.waitForExternalTokenRefresh(accessTokenBeforeLock);
+      if (outcome === 'invalid') this.expireSession();
+      return outcome;
     }
 
     this.isRefreshing = true;
     this.refreshPromise = this.refreshAccessToken();
 
     try {
-      const success = await this.refreshPromise;
+      const outcome = await this.refreshPromise;
 
-      // Resolve all pending requests
-      this.pendingRequests.forEach(({ resolve }) => resolve(success));
-      this.pendingRequests = [];
-
-      if (success) {
+      if (outcome === 'refreshed') {
         // Clear the in-flight request cache so retries after token refresh
         // get a fresh response with the new token rather than the cached 401.
         this.inflightRequests.clear();
-      } else {
-        tokenManager.clearTokens();
-        this.dispatchSessionExpired();
+      } else if (outcome === 'invalid') {
+        this.expireSession();
       }
 
-      return success;
+      return outcome;
     } finally {
       this.isRefreshing = false;
       this.refreshPromise = null;
@@ -682,7 +766,11 @@ class ApiClient {
     // Request timeout (default 30s, configurable per-request)
     const timeout = options.timeout ?? 30000;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    let didTimeout = false;
+    const timeoutId = setTimeout(() => {
+      didTimeout = true;
+      controller.abort();
+    }, timeout);
 
     // Combine timeout signal with caller-provided signal (if any) so that
     // either aborting the timeout OR the caller's AbortController cancels the fetch.
@@ -723,24 +811,46 @@ class ApiClient {
       // to /api/sw-reset if the mismatch persists past the grace window.
       checkStaleBuild(response);
 
-      // Handle 401 Unauthorized with token refresh
-      if (response.status === 401 && retryOnUnauthorized && !options.skipAuth) {
-        const refreshed = await this.handleTokenRefresh();
+      // Handle 401 Unauthorized with exactly one token refresh and retry.
+      if (response.status === 401 && !options.skipAuth) {
+        if (retryOnUnauthorized) {
+          const outcome = await this.handleTokenRefresh();
 
-        if (refreshed) {
-          // Retry the request with new token
-          return this.request<T>(endpoint, options, false);
+          if (outcome === 'refreshed') {
+            return this.request<T>(endpoint, options, false);
+          }
+          if (outcome === 'transient') {
+            return this.refreshUnavailableResponse<T>();
+          }
+          return this.sessionExpiredResponse<T>();
         }
 
-        return {
-          success: false,
-          error: 'Session expired. Please log in again.',
-          code: 'SESSION_EXPIRED',
-        };
+        // A freshly-issued access token was explicitly rejected. Do not enter
+        // another refresh cycle; deterministically expire the session.
+        this.expireSession();
+        return this.sessionExpiredResponse<T>();
       }
 
       // Handle 503 Service Unavailable (maintenance mode — body may be HTML, not JSON)
       if (response.status === 503) {
+        try {
+          const maintenanceData = await response.json() as Record<string, unknown>;
+          const errors = Array.isArray(maintenanceData.errors)
+            ? maintenanceData.errors as ApiErrorDetail[]
+            : undefined;
+          const firstError = errors?.[0];
+          const code = maintenanceData.code ?? firstError?.code;
+          if (code === 'MAINTENANCE_MODE') {
+            return {
+              success: false,
+              error: (maintenanceData.error ?? firstError?.message ?? maintenanceData.message) as string | undefined,
+              code,
+            };
+          }
+        } catch {
+          // Apache/proxies may return an HTML 503. Use the generic retryable
+          // service-unavailable result below in that case.
+        }
         return {
           success: false,
           error: 'Service temporarily unavailable',
@@ -838,8 +948,13 @@ class ApiClient {
     } catch (error) {
       clearTimeout(timeoutId);
 
-      // Handle timeout abort
-      if (error instanceof DOMException && error.name === 'AbortError') {
+      // Caller cancellation is an expected control-flow outcome and must not
+      // be surfaced as a timeout or dispatched to the global error UI.
+      if (isAbortError(error)) {
+        if (callerSignal?.aborted && !didTimeout) {
+          return { success: false, code: 'CANCELLED' };
+        }
+
         const duration = performance.now() - startTime;
         captureTelemetryApiCall(method, endpoint, 408, duration); // 408 Request Timeout
         recordApiDiagnostic({ method, endpoint, status: 408, durationMs: duration });
@@ -964,6 +1079,14 @@ class ApiClient {
     endpoint: string,
     options: RequestOptions & { filename?: string } = {}
   ): Promise<Blob> {
+    return this.downloadWithRetry(endpoint, options, true);
+  }
+
+  private async downloadWithRetry(
+    endpoint: string,
+    options: RequestOptions & { filename?: string },
+    retryOnUnauthorized: boolean,
+  ): Promise<Blob> {
     const url = `${this.baseUrl}${endpoint}`;
     const headers = this.buildHeaders(options);
     // Override Accept to allow any content type from the server
@@ -980,13 +1103,19 @@ class ApiClient {
     // Stale-client gate — same check as request(), gates blob downloads too.
     checkStaleBuild(response);
 
-    // Handle 401 with token refresh
+    // Handle 401 with exactly one token refresh and retry.
     if (response.status === 401 && !options.skipAuth) {
-      const refreshed = await this.handleTokenRefresh();
-      if (refreshed) {
-        return this.download(endpoint, options);
+      if (retryOnUnauthorized) {
+        const outcome = await this.handleTokenRefresh();
+        if (outcome === 'refreshed') {
+          return this.downloadWithRetry(endpoint, options, false);
+        }
+        if (outcome === 'transient') {
+          throw new Error(`Download failed (HTTP ${response.status})`);
+        }
+      } else {
+        this.expireSession();
       }
-      this.dispatchSessionExpired();
       throw new Error('Session expired. Please log in again.');
     }
 
@@ -1029,6 +1158,16 @@ class ApiClient {
     fieldName = 'file',
     options?: RequestOptions
   ): Promise<ApiResponse<T>> {
+    return this.uploadWithRetry<T>(endpoint, files, fieldName, options, true);
+  }
+
+  private async uploadWithRetry<T>(
+    endpoint: string,
+    files: File | File[] | FormData,
+    fieldName: string,
+    options: RequestOptions | undefined,
+    retryOnUnauthorized: boolean,
+  ): Promise<ApiResponse<T>> {
     let formData: FormData;
 
     if (files instanceof FormData) {
@@ -1070,12 +1209,23 @@ class ApiClient {
 
     // Progress-aware uploads use XHR — fetch() exposes no upload progress events.
     if (options?.onUploadProgress) {
-      return this.xhrUpload<T>(endpoint, formData, headers, options, options.onUploadProgress);
+      return this.xhrUpload<T>(
+        endpoint,
+        formData,
+        headers,
+        options,
+        options.onUploadProgress,
+        retryOnUnauthorized,
+      );
     }
 
     // Uploads should not be subject to the 30s default timeout — use 2 minutes
     const uploadController = new AbortController();
-    const uploadTimeoutId = setTimeout(() => uploadController.abort(), 120000);
+    let uploadTimedOut = false;
+    const uploadTimeoutId = setTimeout(() => {
+      uploadTimedOut = true;
+      uploadController.abort();
+    }, 120000);
 
     // H9: Combine upload timeout signal with optional caller AbortSignal
     const callerSignal = options?.signal as AbortSignal | undefined;
@@ -1105,16 +1255,19 @@ class ApiClient {
       // Stale-client gate — uploads count as API calls too.
       checkStaleBuild(response);
 
-      if (response.status === 401) {
-        const refreshed = await this.handleTokenRefresh();
-        if (refreshed) {
-          return this.upload<T>(endpoint, files, fieldName, options);
+      if (response.status === 401 && !options?.skipAuth) {
+        if (retryOnUnauthorized) {
+          const outcome = await this.handleTokenRefresh();
+          if (outcome === 'refreshed') {
+            return this.uploadWithRetry<T>(endpoint, files, fieldName, options, false);
+          }
+          if (outcome === 'transient') {
+            return this.refreshUnavailableResponse<T>();
+          }
+        } else {
+          this.expireSession();
         }
-        return {
-          success: false,
-          error: 'Session expired',
-          code: 'SESSION_EXPIRED',
-        };
+        return this.sessionExpiredResponse<T>();
       }
 
       const data = await response.json();
@@ -1148,6 +1301,12 @@ class ApiClient {
       };
     } catch (error) {
       clearTimeout(uploadTimeoutId);
+      if (isAbortError(error)) {
+        if (callerSignal?.aborted && !uploadTimedOut) {
+          return { success: false, error: 'Upload cancelled', code: 'UPLOAD_ABORTED' };
+        }
+        return { success: false, error: 'Upload timed out. Please try again.', code: 'UPLOAD_TIMEOUT' };
+      }
       const rawMessage = error instanceof Error ? error.message : 'Upload failed';
       const message = import.meta.env.PROD
         ? 'Upload failed. Please try again.'
@@ -1168,7 +1327,8 @@ class ApiClient {
     formData: FormData,
     headers: Headers,
     options: RequestOptions | undefined,
-    onProgress: (percent: number) => void
+    onProgress: (percent: number) => void,
+    retryOnUnauthorized: boolean,
   ): Promise<ApiResponse<T>> {
     return new Promise<ApiResponse<T>>((resolve) => {
       const xhr = new XMLHttpRequest();
@@ -1204,13 +1364,21 @@ class ApiClient {
       };
 
       xhr.onload = () => {
-        if (xhr.status === 401) {
-          void this.handleTokenRefresh().then((refreshed) => {
-            resolve(
-              refreshed
-                ? this.upload<T>(endpoint, formData, 'file', options)
-                : { success: false, error: 'Session expired', code: 'SESSION_EXPIRED' }
-            );
+        if (xhr.status === 401 && !options?.skipAuth) {
+          if (!retryOnUnauthorized) {
+            this.expireSession();
+            resolve(this.sessionExpiredResponse<T>());
+            return;
+          }
+
+          void this.handleTokenRefresh().then((outcome) => {
+            if (outcome === 'refreshed') {
+              resolve(this.uploadWithRetry<T>(endpoint, formData, 'file', options, false));
+            } else if (outcome === 'transient') {
+              resolve(this.refreshUnavailableResponse<T>());
+            } else {
+              resolve(this.sessionExpiredResponse<T>());
+            }
           });
           return;
         }

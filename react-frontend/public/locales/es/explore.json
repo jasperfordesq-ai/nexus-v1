@@ -23,14 +23,20 @@
     "title": "Próximos Eventos",
     "subtitle": "Únete a tu comunidad",
     "online": "En línea",
-    "attending": "{{count}} asistentes"
+    "attending": "{{count}} asistentes",
+    "attending_many": "{{count}} asistentes",
+    "attending_one": "{{count}} asistentes",
+    "attending_other": "{{count}} asistentes"
   },
   "active_groups": {
     "title": "Grupos Activos",
     "subtitle": "Conéctate con miembros afines",
     "members": "{{count}} miembros",
     "view_group": "Ver Grupo",
-    "view_group_named": "View group: {{name}}"
+    "view_group_named": "View group: {{name}}",
+    "members_many": "{{count}} miembros",
+    "members_one": "{{count}} miembros",
+    "members_other": "{{count}} miembros"
   },
   "top_contributors": {
     "title": "Principales Colaboradores",
@@ -56,12 +62,21 @@
     "subtitle": "Comparte tus ideas y genera un impacto",
     "ideas_count": "Ideas {{count}}",
     "ends": "Termina {{date}}",
-    "progress": "Progreso del desafío"
+    "progress": "Progreso del desafío",
+    "ideas_count_many": "Ideas {{count}}",
+    "ideas_count_one": "Ideas {{count}}",
+    "ideas_count_other": "Ideas {{count}}"
   },
   "time_ago": {
     "just_now": "Ahora mismo",
     "hours_ago": "hace {{count}}h",
-    "days_ago": "hace {{count}}d"
+    "days_ago": "hace {{count}}d",
+    "hours_ago_many": "hace {{count}}h",
+    "hours_ago_one": "hace {{count}}h",
+    "hours_ago_other": "hace {{count}}h",
+    "days_ago_many": "hace {{count}}d",
+    "days_ago_one": "hace {{count}}d",
+    "days_ago_other": "hace {{count}}d"
   },
   "error_loading": "No se pudo cargar la página Descubrir. Es posible que sea un problema temporal.",
   "retry": "Reintentar",
@@ -82,18 +97,30 @@
     "title": "Del Blog",
     "subtitle": "Últimas historias de tu comunidad",
     "read_time": "{{count}} min de lectura",
-    "views": "{{count}} vistas"
+    "views": "{{count}} vistas",
+    "read_time_many": "{{count}} min de lectura",
+    "read_time_one": "{{count}} min de lectura",
+    "read_time_other": "{{count}} min de lectura",
+    "views_many": "{{count}} vistas",
+    "views_one": "{{count}} vistas",
+    "views_other": "{{count}} vistas"
   },
   "volunteering": {
     "title": "Oportunidades de Voluntariado",
     "subtitle": "Marca la diferencia en tu comunidad",
     "applications": "{{count}} postulados",
-    "view_opportunity": "Ver Oportunidad"
+    "view_opportunity": "Ver Oportunidad",
+    "applications_many": "{{count}} postulados",
+    "applications_one": "{{count}} postulados",
+    "applications_other": "{{count}} postulados"
   },
   "organisations": {
     "title": "Organizaciones",
     "subtitle": "Socios comunitarios que generan impacto",
-    "opportunities": "{{count}} oportunidades"
+    "opportunities": "{{count}} oportunidades",
+    "opportunities_many": "{{count}} oportunidades",
+    "opportunities_one": "{{count}} oportunidades",
+    "opportunities_other": "{{count}} oportunidades"
   },
   "polls": {
     "title": "Encuestas Activas",
@@ -102,19 +129,31 @@
     "options": "{{count}} opciones",
     "vote_now": "Votar Ahora",
     "vote_now_for": "Vota ahora por: {{question}}",
-    "closes": "Cierra el {{date}}"
+    "closes": "Cierra el {{date}}",
+    "options_many": "{{count}} opciones",
+    "options_one": "{{count}} opciones",
+    "options_other": "{{count}} opciones",
+    "votes_many": "{{count}} votos",
+    "votes_one": "{{count}} votos",
+    "votes_other": "{{count}} votos"
   },
   "in_demand_skills": {
     "title": "Habilidades en Demanda",
     "subtitle": "Las habilidades más solicitadas en tu comunidad",
     "requested": "{{count}} solicitando",
     "offered": "{{count}} ofreciendo",
-    "you_can_help": "¡Puedes ayudar!"
+    "you_can_help": "¡Puedes ayudar!",
+    "requested_many": "{{count}} solicitando",
+    "requested_one": "{{count}} solicitando",
+    "requested_other": "{{count}} solicitando"
   },
   "resources": {
     "title": "Recursos Destacados",
     "subtitle": "Guías y materiales para tu comunidad",
-    "views": "{{count}} vistas"
+    "views": "{{count}} vistas",
+    "views_many": "{{count}} vistas",
+    "views_one": "{{count}} vistas",
+    "views_other": "{{count}} vistas"
   },
   "jobs": {
     "title": "Oportunidades de Empleo",

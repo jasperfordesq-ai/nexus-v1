@@ -14,47 +14,14 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Separator } from '@/components/ui/Separator';
 import X from 'lucide-react/icons/x';
-import Home from 'lucide-react/icons/house';
-import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
-import ListTodo from 'lucide-react/icons/list-todo';
 import MessageSquare from 'lucide-react/icons/message-square';
-import Wallet from 'lucide-react/icons/wallet';
-import Users from 'lucide-react/icons/users';
-import Users2 from 'lucide-react/icons/users-round';
-import Calendar from 'lucide-react/icons/calendar';
 import Settings from 'lucide-react/icons/settings';
 import LogOut from 'lucide-react/icons/log-out';
 import HelpCircle from 'lucide-react/icons/circle-help';
-import Trophy from 'lucide-react/icons/trophy';
-import Medal from 'lucide-react/icons/medal';
-import Target from 'lucide-react/icons/target';
-import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
-import Newspaper from 'lucide-react/icons/newspaper';
-import BookOpen from 'lucide-react/icons/book-open';
-import FolderOpen from 'lucide-react/icons/folder-open';
-import Heart from 'lucide-react/icons/heart';
-import Building2 from 'lucide-react/icons/building-2';
 import Search from 'lucide-react/icons/search';
 import Shield from 'lucide-react/icons/shield';
-import Globe from 'lucide-react/icons/globe';
-import Info from 'lucide-react/icons/info';
-import Sparkles from 'lucide-react/icons/sparkles';
 import FileText from 'lucide-react/icons/file-text';
-import Handshake from 'lucide-react/icons/handshake';
-import Stethoscope from 'lucide-react/icons/stethoscope';
-import TrendingUp from 'lucide-react/icons/trending-up';
-import BarChart3 from 'lucide-react/icons/chart-column';
-import Compass from 'lucide-react/icons/compass';
-import Cookie from 'lucide-react/icons/cookie';
-import Bot from 'lucide-react/icons/bot';
-import Briefcase from 'lucide-react/icons/briefcase';
-import ShoppingBag from 'lucide-react/icons/shopping-bag';
-import Lightbulb from 'lucide-react/icons/lightbulb';
-import GraduationCap from 'lucide-react/icons/graduation-cap';
-import Podcast from 'lucide-react/icons/podcast';
-import Activity from 'lucide-react/icons/activity';
 import Fingerprint from 'lucide-react/icons/fingerprint';
-import Bookmark from 'lucide-react/icons/bookmark';
 import BadgeCheck from 'lucide-react/icons/badge-check';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Download from 'lucide-react/icons/download';
@@ -71,12 +38,15 @@ import { useCookieConsent } from '@/contexts/CookieConsentContext';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { hasAdminPanelAccess, hasBrokerPanelAccess } from '@/lib/access';
 import { buildAccessibleFrontendUrl } from '@/lib/accessible-frontend';
-import type { TenantFeatures,
-  TenantModules } from '@/types/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ThemePicker } from '@/components/layout/ThemePicker';
 import { useMenuContext } from '@/contexts/MenuContextCore';
 import { MobileMenuItems } from '@/components/navigation';
+import {
+  getNavigationItems,
+  type MobileNavigationSection,
+  type NavigationItemPolicy,
+} from '@/components/navigation/navigationRegistry';
 
 import { Accordion, AccordionItem } from '@/components/ui/Accordion';
 import { Avatar } from '@/components/ui/Avatar';
@@ -171,88 +141,34 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
   // Track which accordion sections are expanded
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set(['main']));
 
-  // Nav item arrays
-  const mainNavItems = [
-    { label: t('nav.home'), href: '/', icon: Home },
-    { label: t('nav.feed'), href: '/feed', icon: Newspaper, auth: true, module: 'feed' as keyof TenantModules },
-    { label: t('nav.dashboard'), href: '/dashboard', icon: LayoutDashboard, auth: true, module: 'dashboard' as keyof TenantModules },
-    { label: t('nav.explore'), href: '/explore', icon: Compass, feature: 'explore' as keyof TenantFeatures },
-    { label: t('nav.messages'), href: '/messages', icon: MessageSquare, auth: true, module: 'messages' as keyof TenantModules },
-    { label: t('nav.saved'), href: '/saved', icon: Bookmark, auth: true },
-    { label: t('nav.activity'), href: '/activity', icon: Activity, auth: true },
-  ];
+  type ResolvedMobileNavigationItem = NavigationItemPolicy & { label: string };
+  const resolveMobileSection = (section: MobileNavigationSection): ResolvedMobileNavigationItem[] => (
+    getNavigationItems('mobile', section, {
+      isAuthenticated,
+      tenantSlug: tenant?.slug,
+      hasFeature,
+      hasModule,
+    }).map(item => ({ ...item, label: t(item.labelKey) }))
+  );
 
-  const timebankingNavItems = [
-    { label: t('nav.listings'), href: '/listings', icon: ListTodo, module: 'listings' as keyof TenantModules },
-    { label: t('nav.exchanges'), href: '/exchanges', icon: ArrowRightLeft, feature: 'exchange_workflow' as const },
-    { label: t('nav.group_exchanges'), href: '/group-exchanges', icon: Users, feature: 'group_exchanges' as keyof TenantFeatures },
-    { label: t('nav.wallet'), href: '/wallet', icon: Wallet, auth: true, module: 'wallet' as keyof TenantModules },
-  ];
+  // Presentation stays local to the drawer; all route and entitlement policy is shared.
+  const mainNavItems = resolveMobileSection('main');
 
-  const communityNavItems = [
-    { label: t('nav.members'), href: '/members', icon: Users, feature: 'connections' as const },
-    { label: t('nav.connections'), href: '/connections', icon: Users2, feature: 'connections' as keyof TenantFeatures },
-    { label: t('nav.events'), href: '/events', icon: Calendar, feature: 'events' as const },
-    { label: t('nav.groups'), href: '/groups', icon: Users, feature: 'groups' as const },
-    { label: t('nav.volunteering'), href: '/volunteering', icon: Heart, feature: 'volunteering' as const },
-    { label: t('nav.organisations'), href: '/organisations', icon: Building2, feature: 'volunteering' as const },
-    { label: t('nav.resources'), href: '/resources', icon: FolderOpen, feature: 'resources' as const },
-    { label: t('nav.jobs'), href: '/jobs', icon: Briefcase, feature: 'job_vacancies' as const },
-    { label: t('nav.marketplace'), href: '/marketplace', icon: ShoppingBag, feature: 'marketplace' as const },
-    { label: t('nav.courses'), href: '/courses', icon: GraduationCap, feature: 'courses' as const },
-    { label: t('nav.podcasts'), href: '/podcasts', icon: Podcast, feature: 'podcasts' as const },
-  ];
+  const timebankingNavItems = resolveMobileSection('timebanking');
 
-  const engageNavItems = [
-    { label: t('nav.goals'), href: '/goals', icon: Target, feature: 'goals' as const },
-    { label: t('nav.polls'), href: '/polls', icon: BarChart3, feature: 'polls' as const },
-    { label: t('nav.ideation'), href: '/ideation', icon: Lightbulb, feature: 'ideation_challenges' as keyof TenantFeatures },
-  ];
+  const communityNavItems = resolveMobileSection('community');
 
-  const exploreNavItems = [
-    { label: t('nav.matches'), href: '/matches', icon: Handshake },
-    { label: t('nav.achievements'), href: '/achievements', icon: Trophy, feature: 'gamification' as const },
-    { label: t('nav.leaderboard'), href: '/leaderboard', icon: Medal, feature: 'gamification' as const },
-    { label: t('nav.nexus_score'), href: '/nexus-score', icon: BarChart3, feature: 'gamification' as const },
-    { label: t('nav.skills'), href: '/skills', icon: GraduationCap },
-    { label: t('nav.ai_chat'), href: '/chat', icon: Bot, feature: 'ai_chat' as keyof TenantFeatures },
-  ];
+  const engageNavItems = resolveMobileSection('engage');
+
+  const exploreNavItems = resolveMobileSection('explore');
 
   // Section header is "Partner Communities" — drop the redundant "Federated" / "Federation" prefix on each item.
   // Fallback strings on t() let i18next show the short label until translators add proper keys.
-  const federationNavItems = [
-    { label: t('nav.federation_hub_short'), href: '/federation', icon: Globe, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_partners_short'), href: '/federation/partners', icon: Building2, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_members_short'), href: '/federation/members', icon: Users, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_messages_short'), href: '/federation/messages', icon: MessageSquare, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_listings_short'), href: '/federation/listings', icon: ListTodo, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_events_short'), href: '/federation/events', icon: Calendar, feature: 'federation' as keyof TenantFeatures },
-    { label: t('nav.federation_settings_short'), href: '/federation/settings', icon: Settings, feature: 'federation' as keyof TenantFeatures },
-  ];
+  const federationNavItems = resolveMobileSection('federation');
 
-  const aboutNavItems = [
-    { label: t('nav.about'), href: '/about', icon: Info },
-    { label: t('nav.features'), href: '/features', icon: Sparkles },
-    { label: t('nav.blog'), href: '/blog', icon: BookOpen, feature: 'blog' as const },
-    { label: t('nav.faq'), href: '/faq', icon: HelpCircle },
-    { label: t('nav.timebanking_guide'), href: '/timebanking-guide', icon: BookOpen },
-  ];
+  const aboutNavItems = resolveMobileSection('about');
 
-  const hourTimebankAboutItems = [
-    { label: t('nav.partner_with_us'), href: '/partner', icon: Handshake },
-    { label: t('nav.social_prescribing'), href: '/social-prescribing', icon: Stethoscope },
-    { label: t('nav.our_impact'), href: '/impact-summary', icon: TrendingUp },
-    { label: t('nav.impact_report'), href: '/impact-report', icon: BarChart3 },
-    { label: t('nav.strategic_plan'), href: '/strategic-plan', icon: Compass },
-  ];
-
-  const legalNavItems = [
-    { label: t('legal.legal_hub'), href: '/legal', icon: FileText },
-    { label: t('legal.terms_of_service'), href: '/terms', icon: FileText },
-    { label: t('legal.privacy_policy'), href: '/privacy', icon: FileText },
-    { label: t('legal.cookie_policy'), href: '/cookies', icon: Cookie },
-    { label: t('legal.accessibility'), href: '/accessibility', icon: FileText },
-  ];
+  const legalNavItems = resolveMobileSection('legal');
 
   // Track previous pathname to only close on actual navigation
   const prevPathRef = useRef(pathname);
@@ -270,18 +186,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
     navigate(tenantPath('/login'));
   };
 
-  const renderNavLink = (item: {
-    label: string;
-    href: string;
-    icon: React.ComponentType<{ className?: string }>;
-    auth?: boolean;
-    feature?: keyof TenantFeatures;
-    module?: keyof TenantModules;
-  }) => {
-    if (item.feature && !hasFeature(item.feature)) return null;
-    if (item.module && !hasModule(item.module)) return null;
-    if (item.auth && !isAuthenticated) return null;
-
+  const renderNavLink = (item: Pick<ResolvedMobileNavigationItem, 'label' | 'href' | 'icon'>) => {
     const Icon = item.icon;
     const resolvedHref = tenantPath(item.href);
     const isActive = pathname === resolvedHref || pathname.startsWith(resolvedHref + '/');
@@ -291,8 +196,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         key={item.href}
         variant="light"
         onPress={() => navigateAndClose(item.href)}
-        style={{ minHeight: 'var(--nav-row-min-h, 48px)', paddingTop: 'var(--nav-row-py, 0.875rem)', paddingBottom: 'var(--nav-row-py, 0.875rem)' }}
-        className={`flex items-center gap-3 px-4 rounded-xl text-base font-medium transition-all w-full text-start min-h-9 justify-start min-w-0 ${
+        className={`flex items-center gap-3 px-4 rounded-xl text-base font-medium transition-all w-full text-start min-h-9 [min-height:var(--nav-row-min-h,48px)] [padding-block:var(--nav-row-py,0.875rem)] justify-start min-w-0 ${
           isActive
             ? 'bg-theme-active text-theme-primary'
             : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
@@ -303,17 +207,6 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
       </Button>
     );
   };
-
-  // Filter nav arrays to count visible items (for hiding empty sections)
-  const visibleTimebanking = timebankingNavItems.filter(i => {
-    if ('feature' in i && i.feature) return hasFeature(i.feature as keyof TenantFeatures);
-    if ('module' in i && i.module) return hasModule(i.module as keyof TenantModules);
-    return true;
-  });
-  const visibleCommunity = communityNavItems.filter(i => !i.feature || hasFeature(i.feature));
-  const visibleEngage = engageNavItems.filter(i => !i.feature || hasFeature(i.feature as keyof TenantFeatures));
-  const visibleExplore = exploreNavItems.filter(i => !i.feature || hasFeature(i.feature));
-  const visibleFederation = federationNavItems.filter(i => !i.feature || hasFeature(i.feature));
 
   // Accordion section header style
   const sectionTitleClass = 'text-sm font-semibold uppercase tracking-wider text-theme-muted';
@@ -327,18 +220,18 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
       hideCloseButton
       classNames={{
         base: 'bg-[var(--surface-dropdown)] border-l border-[var(--border-default)] shadow-2xl w-[min(28rem,100dvw)] max-w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right))]',
-        header: 'border-b border-[var(--border-default)] p-4',
+        header: 'border-b border-[var(--border-default)] p-3',
         body: 'p-0',
       }}
     >
-      <DrawerContent id="mobile-drawer" aria-label={t('aria.mobile_navigation')} style={{ paddingTop: 'var(--safe-area-top)', paddingRight: 'var(--safe-area-right)', paddingBottom: 'var(--safe-area-bottom)' }}>
+      <DrawerContent id="mobile-drawer" aria-label={t('aria.mobile_navigation')} className="pt-[var(--safe-area-top)] pr-[var(--safe-area-right)] pb-[var(--safe-area-bottom)]">
         {/* Header */}
-        <DrawerHeader className="flex items-center justify-between">
-          <TenantLogo size="lg" showName />
+        <DrawerHeader className="flex-row items-center justify-between gap-3">
+          <TenantLogo size="md" showName collapseLogoOnMobile className="min-w-0 flex-1" />
           <Button
             isIconOnly
             variant="light"
-            className="text-theme-muted hover:text-theme-primary min-w-[48px] min-h-[48px]"
+            className="shrink-0 text-theme-muted hover:text-theme-primary min-w-[48px] min-h-[48px]"
             onPress={onClose}
             aria-label={t('accessibility.close_menu')}
           >
@@ -354,13 +247,13 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 <Button
                   variant="flat"
                   fullWidth
-                  className="flex min-h-9 min-h-[48px] min-w-0 items-center justify-start gap-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3.5 text-accent hover:bg-accent/20"
+                  className="flex min-h-9 min-h-[48px] min-w-0 items-center justify-start gap-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3.5 text-theme-primary hover:bg-accent/20"
                   onPress={() => { onClose(); setTimeout(onClick, DRAWER_CLOSE_MS); }}
                 >
                   <Download className="w-5 h-5 shrink-0" aria-hidden="true" />
                   <div className="min-w-0 flex-1 text-start">
                     <div className="text-base font-semibold truncate">{label}</div>
-                    <div className="text-sm text-theme-muted truncate">{sublabel}</div>
+                    <div className="text-sm text-theme-secondary truncate">{sublabel}</div>
                   </div>
                 </Button>
               </div>
@@ -482,7 +375,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               </AccordionItem>
 
               {/* Timebanking */}
-              {visibleTimebanking.length > 0 ? (
+              {timebankingNavItems.length > 0 ? (
                 <AccordionItem key="timebanking" id="timebanking" title={t('nav.timebanking')} aria-label={t('aria.timebanking_navigation')}>
                   <div className="space-y-1">
                     {timebankingNavItems.map(renderNavLink)}
@@ -491,7 +384,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               ) : null}
 
               {/* Community */}
-              {visibleCommunity.length > 0 ? (
+              {communityNavItems.length > 0 ? (
                 <AccordionItem key="community" id="community" title={t('sections.community')} aria-label={t('aria.community_navigation')}>
                   <div className="space-y-1">
                     {communityNavItems.map(renderNavLink)}
@@ -500,7 +393,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               ) : null}
 
               {/* Engage */}
-              {visibleEngage.length > 0 ? (
+              {engageNavItems.length > 0 ? (
                 <AccordionItem key="engage" id="engage" title={t('sections.engage')} aria-label={t('aria.engage_navigation')}>
                   <div className="space-y-1">
                     {engageNavItems.map(renderNavLink)}
@@ -509,7 +402,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               ) : null}
 
               {/* Explore / Activity */}
-              {visibleExplore.length > 0 ? (
+              {exploreNavItems.length > 0 ? (
                 <AccordionItem key="explore" id="explore" title={t('sections.explore')} aria-label={t('aria.explore_navigation')}>
                   <div className="space-y-1">
                     {exploreNavItems.map(renderNavLink)}
@@ -518,7 +411,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               ) : null}
 
               {/* Partner Communities (federation) */}
-              {visibleFederation.length > 0 && isAuthenticated ? (
+              {federationNavItems.length > 0 ? (
                 <AccordionItem
                   key="federation" id="federation"
                   title={t('sections.partner_communities')}
@@ -534,7 +427,6 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               <AccordionItem key="about" id="about" title={t('sections.about')} aria-label={t('aria.about_navigation')}>
                 <div className="space-y-1">
                   {aboutNavItems.map(renderNavLink)}
-                  {tenant?.slug === 'hour-timebank' && hourTimebankAboutItems.map(renderNavLink)}
                   {(tenant?.menu_pages?.about || []).map((p: { title: string; slug: string }) => renderNavLink({
                     label: p.title,
                     href: `/page/${p.slug}`,

@@ -130,7 +130,9 @@
         "run_failed_with_error": "Run failed: {{error}}",
         "toggle_failed": "Failed to toggle agent",
         "updated": "Agent updated",
-        "update_failed": "Failed to update agent"
+        "update_failed": "Failed to update agent",
+        "run_created_one": "Run #{{runId}} created {{count}} proposal(s)",
+        "run_created_other": "Run #{{runId}} created {{count}} proposal(s)"
       }
     },
     "runs": {

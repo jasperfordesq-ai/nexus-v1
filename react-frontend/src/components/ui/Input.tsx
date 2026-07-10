@@ -10,6 +10,7 @@ import {
   type ReactNode,
   type Ref,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CloseButton as HeroUICloseButton } from '@heroui/react/close-button';
 import { Description } from '@heroui/react/description';
 import { FieldError } from '@heroui/react/field-error';
@@ -33,6 +34,7 @@ export type InputProps = Omit<
     description?: string;
     errorMessage?: string;
   };
+  clearButtonLabel?: string;
   color?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
   description?: ReactNode;
   errorMessage?: ReactNode | ((value: string) => ReactNode);
@@ -116,9 +118,33 @@ function decoratedWrapperClass(
   );
 }
 
+function InputClearButton({
+  label,
+  onClear,
+  onValueChange,
+}: {
+  label?: string;
+  onClear?: () => void;
+  onValueChange?: (value: string) => void;
+}) {
+  const { t } = useTranslation('common');
+
+  return (
+    <HeroUICloseButton
+      aria-label={label ?? t('accessibility.clear_input')}
+      className="shrink-0"
+      onPress={() => {
+        onClear?.();
+        onValueChange?.('');
+      }}
+    />
+  );
+}
+
 export function Input({
   className,
   classNames,
+  clearButtonLabel,
   color: _color,
   description,
   errorMessage,
@@ -149,12 +175,10 @@ export function Input({
   };
 
   const clearButton = isClearable ? (
-    <HeroUICloseButton
-      className="shrink-0"
-      onPress={() => {
-        onClear?.();
-        onValueChange?.('');
-      }}
+    <InputClearButton
+      label={clearButtonLabel}
+      onClear={onClear}
+      onValueChange={onValueChange}
     />
   ) : null;
   const trailingContent = endContent ?? clearButton;

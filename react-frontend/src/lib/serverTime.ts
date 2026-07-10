@@ -41,6 +41,7 @@
  * - Bare `YYYY-MM-DD HH:MM:SS` (MySQL DATETIME) is promoted to ISO UTC
  *   by replacing the space with `T` and appending `Z`.
  */
+import { getFormattingLocale } from '@/lib/helpers';
 export function parseServerTimestamp(value: string | null | undefined): Date | null {
   if (!value) return null;
   // Already-zoned ISO string — trust it.
@@ -61,13 +62,13 @@ export function parseServerTimestamp(value: string | null | undefined): Date | n
 /** Render a server timestamp as a localised date, falling back to a dash. */
 export function formatServerDate(value: string | null | undefined): string {
   const d = parseServerTimestamp(value);
-  return d ? d.toLocaleDateString() : '—';
+  return d ? d.toLocaleDateString(getFormattingLocale()) : '—';
 }
 
 /** Render a server timestamp as a localised date+time, falling back to a dash. */
 export function formatServerDateTime(value: string | null | undefined): string {
   const d = parseServerTimestamp(value);
-  return d ? d.toLocaleString() : '—';
+  return d ? d.toLocaleString(getFormattingLocale()) : '—';
 }
 
 /**

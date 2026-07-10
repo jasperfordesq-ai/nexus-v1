@@ -9,6 +9,7 @@
  * Parity: PHP Admin\TimebankingController::alerts()
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -167,7 +168,7 @@ export function FraudAlerts() {
         sortable: true,
         render: (alert) => (
           <span className="text-sm text-muted">
-            {new Date(alert.created_at).toLocaleDateString()}
+            {new Date(alert.created_at).toLocaleDateString(getFormattingLocale())}
           </span>
         ),
       },

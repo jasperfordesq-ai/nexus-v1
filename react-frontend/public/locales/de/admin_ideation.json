@@ -132,6 +132,8 @@
     "no_challenges_found": "Keine Herausforderungen gefunden",
     "no_matching_challenges": "Keine passenden Herausforderungen gefunden",
     "no_status_challenges": "Keine Statusherausforderungen gefunden",
-    "tabs_aria": "Herausforderungsstatusfilter"
+    "tabs_aria": "Herausforderungsstatusfilter",
+    "total_count_one": "Insgesamt: {{count}}",
+    "total_count_other": "Insgesamt: {{count}}"
   }
 }

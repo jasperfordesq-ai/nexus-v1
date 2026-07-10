@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Progress, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -125,7 +126,7 @@ export default function GroupRecommendations() {
                     {rec.joined ? t('groups.joined') : t('groups.pending')}
                   </Chip>
                 </TableCell>
-                <TableCell>{new Date(rec.created_at).toLocaleDateString()}</TableCell>
+                <TableCell>{new Date(rec.created_at).toLocaleDateString(getFormattingLocale())}</TableCell>
               </TableRow>
             )}
           </TableBody>

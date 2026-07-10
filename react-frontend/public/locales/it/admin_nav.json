@@ -524,7 +524,35 @@
     "select_all_rows": "Select all rows",
     "no_data": "Nessun dato",
     "no_data_available": "Nessun dato disponibile",
-    "select_row": "Select row {{id}}"
+    "select_row": "Select row {{id}}",
+    "total_count_many": "{{count}}totale",
+    "total_count_one": "{{count}}totale",
+    "total_count_other": "{{count}}totale",
+    "statuses": {
+      "active": "Attivo",
+      "approved": "Approvato",
+      "banned": "Bloccato",
+      "bulk_tenants_updated": "Tenant aggiornati",
+      "bulk_users_moved": "Utenti spostati",
+      "completed": "Completato",
+      "draft": "Bozza",
+      "failed": "Non riuscito",
+      "federation_lockdown": "Blocco della federazione",
+      "federation_updated": "Federazione aggiornata",
+      "idle": "Inattivo",
+      "inactive": "Disattivato",
+      "pending": "In sospeso",
+      "published": "Pubblicato",
+      "rejected": "Rifiutato",
+      "scheduled": "Pianificato",
+      "sent": "Inviato",
+      "suspended": "Sospeso",
+      "tenant_created": "Tenant creato",
+      "tenant_updated": "Tenant aggiornato",
+      "user_created": "Utente creato",
+      "user_moved": "Utente spostato",
+      "unknown": "Sconosciuto"
+    }
   },
   "help_drawer": {
     "aria_label": "Aiuto: {{title}}",
@@ -541,7 +569,13 @@
     "confirm_message": "Sei sicuro di volere gli articoli {{action}} {{count}}?",
     "destructive_warning": "Questa azione non può essere annullata.",
     "reason_label": "Motivo",
-    "reason_placeholder": "Fornire una ragione per questa azione"
+    "reason_placeholder": "Fornire una ragione per questa azione",
+    "selected_count_many": "{{count}} selezionato",
+    "selected_count_one": "{{count}} selezionato",
+    "selected_count_other": "{{count}} selezionato",
+    "confirm_message_many": "Sei sicuro di volere gli articoli {{action}} {{count}}?",
+    "confirm_message_one": "Sei sicuro di volere gli articoli {{action}} {{count}}?",
+    "confirm_message_other": "Sei sicuro di volere gli articoli {{action}} {{count}}?"
   },
   "common": {
     "cancel": "Annulla"
@@ -586,5 +620,8 @@
       "group_exchanges": "Scambi di gruppo",
       "search": "Cerca"
     }
-  }
+  },
+  "support_requests_count_many": "{{count}} richieste di supporto aperte",
+  "support_requests_count_one": "{{count}} richieste di supporto aperte",
+  "support_requests_count_other": "{{count}} richieste di supporto aperte"
 }

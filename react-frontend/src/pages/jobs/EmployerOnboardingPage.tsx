@@ -271,8 +271,8 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
 
   return (
     <GlassCard className="p-8 text-center space-y-6">
-      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center mx-auto">
-        <Rocket className="w-10 h-10 text-indigo-400" aria-hidden="true" />
+      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 flex items-center justify-center mx-auto">
+        <Rocket className="w-10 h-10 text-accent" aria-hidden="true" />
       </div>
       <div>
         <h1 className="text-2xl font-bold text-theme-primary mb-3">
@@ -283,7 +283,7 @@ function StepWelcome({ onNext }: { onNext: () => void }) {
         </p>
       </div>
       <Button
-        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+        className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
         size="lg"
         endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
         onPress={onNext}
@@ -409,7 +409,7 @@ function StepOrganization({ state, user, onChange, onNext, onBack }: StepOrgProp
             {t('onboarding.skip')}
           </Button>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
             onPress={onNext}
           >
@@ -630,7 +630,7 @@ function StepPostJob({ state, errors, isSubmitting, onChange, onSubmit, onBack }
           {t('onboarding.back')}
         </Button>
         <Button
-          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+          className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
           onPress={onSubmit}
           isLoading={isSubmitting}
         >
@@ -668,23 +668,19 @@ function StepSuccess({ state, tenantPath, onFinish }: StepSuccessProps) {
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         {state.createdJobId && (
-          <Link to={tenantPath(`/jobs/${state.createdJobId}`)}>
-            <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<Briefcase className="w-4 h-4" aria-hidden="true" />}
-            >
-              {t('onboarding.view_job')}
-            </Button>
-          </Link>
-        )}
-        <Link to={tenantPath('/jobs/create')}>
-          <Button
-            variant="flat"
-            className="bg-theme-elevated text-theme-muted"
+          <Button as={Link} to={tenantPath(`/jobs/${state.createdJobId}`)}
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
+            startContent={<Briefcase className="w-4 h-4" aria-hidden="true" />}
           >
-            {t('onboarding.post_another')}
+            {t('onboarding.view_job')}
           </Button>
-        </Link>
+        )}
+        <Button as={Link} to={tenantPath('/jobs/create')}
+          variant="flat"
+          className="bg-theme-elevated text-theme-muted"
+        >
+          {t('onboarding.post_another')}
+        </Button>
       </div>
 
       {/* Tips */}

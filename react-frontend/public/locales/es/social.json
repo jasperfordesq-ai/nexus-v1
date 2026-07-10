@@ -62,12 +62,24 @@
     "minutes_ago": "hace {{count}}m",
     "hours_ago": "hace {{count}}h",
     "days_ago": "hace {{count}}d",
-    "last_seen": "Visto por última vez {{time}}"
+    "last_seen": "Visto por última vez {{time}}",
+    "minutes_ago_many": "hace {{count}}m",
+    "minutes_ago_one": "hace {{count}}m",
+    "minutes_ago_other": "hace {{count}}m",
+    "hours_ago_many": "hace {{count}}h",
+    "hours_ago_one": "hace {{count}}h",
+    "hours_ago_other": "hace {{count}}h",
+    "days_ago_many": "hace {{count}}d",
+    "days_ago_one": "hace {{count}}d",
+    "days_ago_other": "hace {{count}}d"
   },
   "mention": {
     "suggestions_aria": "Sugerencias de mención, {{count}} resultados",
     "no_users": "No se encontraron usuarios",
-    "connected": "Conectado"
+    "connected": "Conectado",
+    "suggestions_aria_many": "Sugerencias de mención, {{count}} resultados",
+    "suggestions_aria_one": "Sugerencias de mención, {{count}} resultados",
+    "suggestions_aria_other": "Sugerencias de mención, {{count}} resultados"
   },
   "status": {
     "set_status": "Establecer estado",
@@ -153,7 +165,10 @@
     "collection_description": "Descripción (opcional)",
     "cancel": "Cancelar",
     "save": "Guardar",
-    "create": "Crear"
+    "create": "Crear",
+    "count_many": "{{count}} artículos guardados",
+    "count_one": "{{count}} artículos guardados",
+    "count_other": "{{count}} artículos guardados"
   },
   "verified": "Verificado",
   "hover_card": {
@@ -163,7 +178,16 @@
     "message": "Mensaje",
     "hours_given": "{{count}} hrs aportadas",
     "connections": "{{count}} conexiones",
-    "listings": "{{count}} anuncios"
+    "listings": "{{count}} anuncios",
+    "hours_given_many": "{{count}} hrs aportadas",
+    "hours_given_one": "{{count}} hrs aportadas",
+    "hours_given_other": "{{count}} hrs aportadas",
+    "connections_many": "{{count}} conexiones",
+    "connections_one": "{{count}} conexiones",
+    "connections_other": "{{count}} conexiones",
+    "listings_many": "{{count}} anuncios",
+    "listings_one": "{{count}} anuncios",
+    "listings_other": "{{count}} anuncios"
   },
   "reactions_tabs_aria": "Filtro de tipo de reacción",
   "content_type_tabs_aria": "Filtro de tipo de contenido de marcador",
@@ -175,5 +199,7 @@
     "image_alt_domain": "Vista previa de {{domain}}",
     "favicon_alt": "Icono de {{site}}",
     "video_fallback": "Vídeo"
-  }
+  },
+  "likes_count_many": "{{count}} me gusta",
+  "comments_count_many": "{{count}} comentarios"
 }

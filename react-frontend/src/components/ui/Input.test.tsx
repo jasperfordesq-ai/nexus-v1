@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import i18n from 'i18next';
 import { render, screen, fireEvent } from '@/test/test-utils';
 import userEvent from '@testing-library/user-event';
 import { Input } from './Input';
@@ -95,6 +96,10 @@ describe('Input — startContent / endContent', () => {
 });
 
 describe('Input — isClearable / onClear', () => {
+  afterEach(async () => {
+    await i18n.changeLanguage('en');
+  });
+
   it('calls onClear and onValueChange with empty string when clear button pressed', async () => {
     const onClear = vi.fn();
     const onValueChange = vi.fn();
@@ -103,6 +108,21 @@ describe('Input — isClearable / onClear', () => {
     await userEvent.click(clearBtn);
     expect(onClear).toHaveBeenCalled();
     expect(onValueChange).toHaveBeenCalledWith('');
+  });
+
+  it('uses a context-correct translated clear label', async () => {
+    i18n.addResource('fr', 'common', 'accessibility.clear_input', 'Effacer la saisie');
+    await i18n.changeLanguage('fr');
+
+    render(<Input isClearable defaultValue="texte" />);
+
+    expect(screen.getByRole('button', { name: 'Effacer la saisie' })).toBeInTheDocument();
+  });
+
+  it('accepts a translated field-specific clear label override', () => {
+    render(<Input isClearable defaultValue="query" clearButtonLabel="Clear member filter" />);
+
+    expect(screen.getByRole('button', { name: 'Clear member filter' })).toBeInTheDocument();
   });
 });
 

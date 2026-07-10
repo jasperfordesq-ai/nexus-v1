@@ -38,7 +38,7 @@ export function NotFoundPage() {
         className="w-full max-w-md"
       >
         <GlassCard className="p-8 text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 mb-6">
             <span className="text-5xl font-bold text-gradient">404</span>
           </div>
 
@@ -48,23 +48,19 @@ export function NotFoundPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link to={tenantPath('/')} className="flex-1">
-              <Button
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                startContent={<Home className="w-4 h-4" />}
-              >
-                {t('not_found.go_home')}
-              </Button>
-            </Link>
-            <Link to={tenantPath('/search')} className="flex-1">
-              <Button
-                variant="flat"
-                className="w-full bg-theme-elevated text-theme-muted"
-                startContent={<Search className="w-4 h-4" />}
-              >
-                {t('not_found.search')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/')}
+              className="flex-1 w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white"
+              startContent={<Home className="w-4 h-4" />}
+            >
+              {t('not_found.go_home')}
+            </Button>
+            <Button as={Link} to={tenantPath('/search')}
+              variant="flat"
+              className="flex-1 w-full bg-theme-elevated text-theme-muted"
+              startContent={<Search className="w-4 h-4" />}
+            >
+              {t('not_found.search')}
+            </Button>
           </div>
 
           <Button

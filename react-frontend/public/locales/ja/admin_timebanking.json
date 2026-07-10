@@ -210,6 +210,7 @@
     "top_earners": "上位の収益者",
     "top_spenders": "支出上位者",
     "user_report_desc": "個々のメンバーの詳細な時間クレジット レポートを表示する",
-    "user_report_title": "ユーザーレポート"
+    "user_report_title": "ユーザーレポート",
+    "hours_value_other": "{{count}}h"
   }
 }

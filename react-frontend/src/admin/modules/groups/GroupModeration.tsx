@@ -8,6 +8,7 @@
  * Displays groups with reported or flagged content for moderation review.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';import ShieldAlert from 'lucide-react/icons/shield-alert';
 import Flag from 'lucide-react/icons/flag';
@@ -99,7 +100,7 @@ export function GroupModeration() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {new Date(item.created_at).toLocaleDateString()}
+          {new Date(item.created_at).toLocaleDateString(getFormattingLocale())}
         </span>
       ),
     },

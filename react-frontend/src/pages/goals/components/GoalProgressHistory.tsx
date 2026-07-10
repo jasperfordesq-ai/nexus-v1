@@ -85,12 +85,12 @@ function getEventColor(type: string): string {
     case 'progress_update':
       return 'bg-blue-500';
     case 'checkin':
-      return 'bg-indigo-500';
+      return 'bg-accent';
     case 'milestone':
       return 'bg-amber-500';
     case 'buddy_joined':
     case 'buddy_action':
-      return 'bg-purple-500';
+      return 'bg-accent';
     case 'completed':
       return 'bg-emerald-500';
     case 'created':
@@ -118,7 +118,7 @@ function getMoodIcon(mood: string) {
     case 'good': return <Smile className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />;
     case 'okay': return <Meh className="w-3.5 h-3.5 text-blue-400" aria-hidden="true" />;
     case 'struggling': return <Frown className="w-3.5 h-3.5 text-orange-400" aria-hidden="true" />;
-    case 'motivated': return <Zap className="w-3.5 h-3.5 text-purple-400" aria-hidden="true" />;
+    case 'motivated': return <Zap className="w-3.5 h-3.5 text-accent" aria-hidden="true" />;
     case 'grateful': return <Heart className="w-3.5 h-3.5 text-rose-400" aria-hidden="true" />;
     default: return null;
   }
@@ -136,7 +136,7 @@ function ProgressValueBar({ data }: { data: Record<string, unknown> | undefined 
         value={numVal}
         size="sm"
         classNames={{
-          indicator: 'bg-gradient-to-r from-indigo-500 to-purple-600',
+          indicator: 'bg-gradient-to-r from-accent to-accent-gradient-end',
           track: 'bg-theme-hover',
         }}
         aria-label={`${numVal}%`}

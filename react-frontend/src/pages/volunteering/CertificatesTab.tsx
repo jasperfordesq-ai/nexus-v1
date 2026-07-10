@@ -7,6 +7,7 @@
  * CertificatesTab - Generate and view volunteer impact certificates
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';
@@ -218,11 +219,11 @@ export function CertificatesTab() {
                     <div className="flex flex-wrap items-center gap-3 text-xs text-theme-subtle mb-3">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" aria-hidden="true" />
-                        {new Date(cert.date_range.start).toLocaleDateString()}{t('date_range_separator')}{new Date(cert.date_range.end).toLocaleDateString()}
+                        {new Date(cert.date_range.start).toLocaleDateString(getFormattingLocale())}{t('date_range_separator')}{new Date(cert.date_range.end).toLocaleDateString(getFormattingLocale())}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" aria-hidden="true" />
-                        {t('certificates.generated_on')} {new Date(cert.generated_at).toLocaleDateString()}
+                        {t('certificates.generated_on')} {new Date(cert.generated_at).toLocaleDateString(getFormattingLocale())}
                       </span>
                       <span className="flex items-center gap-1">
                         <QrCode className="w-3 h-3" aria-hidden="true" />

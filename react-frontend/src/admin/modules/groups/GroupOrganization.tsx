@@ -14,6 +14,7 @@
  *    their location, interest, role, or attribute
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -63,7 +64,7 @@ const RULE_TYPES: GroupAutoAssignRuleType[] = ['location', 'interest', 'role', '
 
 const EMPTY_COLLECTION_FORM = { name: '', description: '', image_url: '', sort_order: '0', is_active: true };
 
-const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleDateString() : '—');
+const formatDate = (value?: string | null) => (value ? new Date(value).toLocaleDateString(getFormattingLocale()) : '—');
 
 export default function GroupOrganization() {
   const { t } = useTranslation('admin_groups');
@@ -753,7 +754,9 @@ export default function GroupOrganization() {
                 isRequired
               >
                 {allGroups.map((group) => (
-                  <SelectItem key={String(group.id)}>{group.name}</SelectItem>
+                  <SelectItem key={String(group.id)} id={String(group.id)}>
+                    {group.name}
+                  </SelectItem>
                 ))}
               </Select>
               <Select
@@ -768,7 +771,9 @@ export default function GroupOrganization() {
                 isRequired
               >
                 {RULE_TYPES.map((type) => (
-                  <SelectItem key={type}>{t(`group_organization.rule_type_${type}`)}</SelectItem>
+                  <SelectItem key={type} id={type}>
+                    {t(`group_organization.rule_type_${type}`)}
+                  </SelectItem>
                 ))}
               </Select>
               <Input

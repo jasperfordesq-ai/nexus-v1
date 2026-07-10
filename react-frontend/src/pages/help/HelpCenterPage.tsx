@@ -192,7 +192,7 @@ export function HelpCenterPage() {
             <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('help.no_results_found')}</h2>
             <p className="text-theme-muted mb-4">
               {t('help.no_results_description_before')}{' '}
-              <Link to={tenantPath('/contact')} className="text-indigo-500 hover:underline">
+              <Link to={tenantPath('/contact')} className="text-accent hover:underline">
                 {t('help.no_results_contact_link')}
               </Link>{' '}
               {t('help.no_results_description_after')}
@@ -222,7 +222,7 @@ export function HelpCenterPage() {
                 title={group.category}
                 subtitle={t('help.articles_count', { count: group.faqs.length })}
                 startContent={
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-600 dark:text-indigo-400">
+                  <div className="p-2 rounded-lg bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 text-accent dark:text-accent">
                     <HelpCircle className="w-5 h-5" aria-hidden="true" />
                   </div>
                 }
@@ -268,7 +268,7 @@ export function HelpCenterPage() {
           <Button
             as={Link}
             to={tenantPath('/contact')}
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
           >
             {t('help.contact_support')}
@@ -291,7 +291,7 @@ function QuickLink({ to, icon, label }: QuickLinkProps) {
   return (
     <Link to={to}>
       <GlassCard className="p-4 text-center hover:scale-[1.02] transition-transform">
-        <div className="inline-flex p-2 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-600 dark:text-indigo-400 mb-2">
+        <div className="inline-flex p-2 rounded-lg bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 text-accent dark:text-accent mb-2">
           {icon}
         </div>
         <p className="text-sm font-medium text-theme-primary">{label}</p>

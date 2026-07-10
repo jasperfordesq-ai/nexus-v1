@@ -10,6 +10,7 @@
  * Police Check, First Aid, Background Check, Safeguarding, etc.
  */
 
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from '@/lib/motion';
 
@@ -30,7 +31,7 @@ import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { CardRowsSkeleton } from '@/components/ui/Skeletons';
 import { useDisclosure } from '@/components/ui/useDisclosure';
@@ -384,7 +385,7 @@ export function CredentialVerificationTab() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
-                      <FileText className="w-5 h-5 text-indigo-400 flex-shrink-0" aria-hidden="true" />
+                      <FileText className="w-5 h-5 text-accent flex-shrink-0" aria-hidden="true" />
                       <h3 className="font-semibold text-theme-primary">{credential.type_label}</h3>
                       <Chip
                         size="sm"
@@ -403,12 +404,12 @@ export function CredentialVerificationTab() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" aria-hidden="true" />
-                        {t('credentials.uploaded')} {new Date(credential.upload_date).toLocaleDateString()}
+                        {t('credentials.uploaded')} {new Date(credential.upload_date).toLocaleDateString(getFormattingLocale())}
                       </span>
                       {credential.expiry_date && (
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" aria-hidden="true" />
-                          {t('credentials.expires')} {new Date(credential.expiry_date).toLocaleDateString()}
+                          {t('credentials.expires')} {new Date(credential.expiry_date).toLocaleDateString(getFormattingLocale())}
                         </span>
                       )}
                     </div>
@@ -451,10 +452,10 @@ export function CredentialVerificationTab() {
       }}>
         <ModalContent>
           <ModalHeader className="text-theme-primary">
-            <div className="flex items-center gap-2">
+            <ModalHeading className="flex items-center gap-2">
               <Upload className="w-5 h-5 text-rose-400" aria-hidden="true" />
               {t('credentials.upload_new')}
-            </div>
+            </ModalHeading>
           </ModalHeader>
           <ModalBody className="space-y-4">
             <p className="text-sm text-theme-muted">
@@ -497,7 +498,12 @@ export function CredentialVerificationTab() {
                     <div className="text-left">
                       <p className="text-sm font-medium text-theme-primary">{selectedFile.name}</p>
                       <p className="text-xs text-theme-muted">
-                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                        {formatNumber(selectedFile.size / 1024 / 1024, {
+                          style: 'unit',
+                          unit: 'megabyte',
+                          unitDisplay: 'short',
+                          maximumFractionDigits: 2,
+                        })}
                       </p>
                     </div>
                     <Button

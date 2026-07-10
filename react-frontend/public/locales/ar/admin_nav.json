@@ -524,7 +524,38 @@
     "select_all_rows": "Select all rows",
     "no_data": "لا توجد بيانات",
     "no_data_available": "لا توجد بيانات متاحة",
-    "select_row": "Select row {{id}}"
+    "select_row": "Select row {{id}}",
+    "total_count_few": "إجمالي{{count}}",
+    "total_count_many": "إجمالي{{count}}",
+    "total_count_one": "إجمالي{{count}}",
+    "total_count_other": "إجمالي{{count}}",
+    "total_count_two": "إجمالي{{count}}",
+    "total_count_zero": "إجمالي{{count}}",
+    "statuses": {
+      "active": "نشط",
+      "approved": "تمت الموافقة",
+      "banned": "محظور",
+      "bulk_tenants_updated": "تم تحديث المستأجرين",
+      "bulk_users_moved": "تم نقل المستخدمين",
+      "completed": "مكتمل",
+      "draft": "مسودة",
+      "failed": "فشل",
+      "federation_lockdown": "إغلاق الاتحاد",
+      "federation_updated": "تم تحديث الاتحاد",
+      "idle": "خامل",
+      "inactive": "غير نشط",
+      "pending": "قيد الانتظار",
+      "published": "منشور",
+      "rejected": "مرفوض",
+      "scheduled": "مجدول",
+      "sent": "مُرسل",
+      "suspended": "معلّق",
+      "tenant_created": "تم إنشاء المستأجر",
+      "tenant_updated": "تم تحديث المستأجر",
+      "user_created": "تم إنشاء المستخدم",
+      "user_moved": "تم نقل المستخدم",
+      "unknown": "غير معروف"
+    }
   },
   "help_drawer": {
     "aria_label": "مساعدة: {{title}}",
@@ -541,7 +572,19 @@
     "confirm_message": "هل أنت متأكد أنك تريد عناصر {{action}} {{count}}؟",
     "destructive_warning": "لا يمكن التراجع عن هذا الإجراء.",
     "reason_label": "سبب",
-    "reason_placeholder": "تقديم سبب لهذا الإجراء"
+    "reason_placeholder": "تقديم سبب لهذا الإجراء",
+    "selected_count_few": "تم تحديد {{count}}",
+    "selected_count_many": "تم تحديد {{count}}",
+    "selected_count_one": "تم تحديد {{count}}",
+    "selected_count_other": "تم تحديد {{count}}",
+    "selected_count_two": "تم تحديد {{count}}",
+    "selected_count_zero": "تم تحديد {{count}}",
+    "confirm_message_few": "هل أنت متأكد أنك تريد عناصر {{action}} {{count}}؟",
+    "confirm_message_many": "هل أنت متأكد أنك تريد عناصر {{action}} {{count}}؟",
+    "confirm_message_one": "هل أنت متأكد أنك تريد عناصر {{action}} {{count}}؟",
+    "confirm_message_other": "هل أنت متأكد أنك تريد عناصر {{action}} {{count}}؟",
+    "confirm_message_two": "هل أنت متأكد أنك تريد عناصر {{action}} {{count}}؟",
+    "confirm_message_zero": "هل أنت متأكد أنك تريد عناصر {{action}} {{count}}؟"
   },
   "common": {
     "cancel": "يلغي"
@@ -586,5 +629,11 @@
       "group_exchanges": "التبادلات الجماعية",
       "search": "يبحث"
     }
-  }
+  },
+  "support_requests_count_few": "{{count}} طلبات دعم مفتوحة",
+  "support_requests_count_many": "{{count}} طلبات دعم مفتوحة",
+  "support_requests_count_one": "{{count}} طلبات دعم مفتوحة",
+  "support_requests_count_other": "{{count}} طلبات دعم مفتوحة",
+  "support_requests_count_two": "{{count}} طلبات دعم مفتوحة",
+  "support_requests_count_zero": "{{count}} طلبات دعم مفتوحة"
 }

@@ -13,8 +13,8 @@ import { IdleLogoutGuard } from '@/components/security/IdleLogoutGuard';
 
 export default function TenantAppProviders({ children }: { children: ReactNode }) {
   return (
-    <NotificationsProvider>
-      <PusherProvider>
+    <PusherProvider>
+      <NotificationsProvider>
         <PresenceProvider>
           <MenuProvider>
             <PodcastPlayerProvider>
@@ -23,7 +23,7 @@ export default function TenantAppProviders({ children }: { children: ReactNode }
             <IdleLogoutGuard />
           </MenuProvider>
         </PresenceProvider>
-      </PusherProvider>
-    </NotificationsProvider>
+      </NotificationsProvider>
+    </PusherProvider>
   );
 }

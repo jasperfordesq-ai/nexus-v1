@@ -44,7 +44,9 @@
     "no_deadline": "締切なし",
     "evaluation_criteria": "評価基準",
     "outcome": "成果",
-    "team_links": "プロジェクトチーム"
+    "team_links": "プロジェクトチーム",
+    "ideas_count_other": "{{count}} アイデア",
+    "max_ideas_other": "1人あたり最大 {{count}} アイデア"
   },
   "challenges": {
     "title": "チャレンジ",
@@ -87,7 +89,9 @@
     "draft_created": "作成された {{date}}",
     "new_idea": "新しいアイデア",
     "sort_label": "アイデアを並べ替え",
-    "loading": "アイデアを読み込んでいます..."
+    "loading": "アイデアを読み込んでいます...",
+    "your_ideas_other": "あなたのアイデア: {{count}}/{{max}}",
+    "comments_other": "{{count}} コメント"
   },
   "idea_detail": {
     "page_title": "アイデアの詳細",
@@ -321,7 +325,8 @@
     "fallback_title": "キャンペーン",
     "feature_not_available": "アイデア機能は利用できません",
     "feature_not_available_desc": "アイデア機能はこのコミュニティでは有効になっていません。詳細はタイムバンク管理者にお問い合わせください。",
-    "retry": "再試行"
+    "retry": "再試行",
+    "challenges_count_other": "{{count}} 課題"
   },
   "templates": {
     "title": "課題テンプレート",

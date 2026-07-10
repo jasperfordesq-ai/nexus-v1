@@ -8,6 +8,7 @@
  * Read-only DataTable of consent records.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect, useState, useCallback } from 'react';import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -82,7 +83,7 @@ export function GdprConsents() {
       key: 'created_at',
       label: t('enterprise.gdpr_date'),
       sortable: true,
-      render: (c) => new Date(c.consented_at || c.created_at).toLocaleDateString(),
+      render: (c) => new Date(c.consented_at || c.created_at).toLocaleDateString(getFormattingLocale()),
     },
   ];
 

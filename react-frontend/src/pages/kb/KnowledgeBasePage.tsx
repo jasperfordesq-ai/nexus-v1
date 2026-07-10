@@ -204,7 +204,7 @@ export function KnowledgeBasePage() {
       <PageMeta title={t('page_title')} description={t('page_description')} />
       {/* Header */}
       <div className="text-center py-4">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 mb-4">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-accent-gradient-end mb-4">
           <BookOpen className="w-7 h-7 text-white" aria-hidden="true" />
         </div>
         <h1 className="text-3xl font-bold text-theme-primary">
@@ -294,7 +294,7 @@ export function KnowledgeBasePage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error.title')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white"
+            className="bg-gradient-to-r from-blue-500 to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadArticles}
           >
@@ -329,7 +329,7 @@ export function KnowledgeBasePage() {
                 <motion.div key={category} variants={itemVariants}>
                   <GlassCard className="overflow-hidden">
                     {/* Category header */}
-                    <div className="px-5 py-3 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 border-b border-theme-default">
+                    <div className="px-5 py-3 bg-gradient-to-r from-blue-500/5 to-accent-gradient-end/5 border-b border-theme-default">
                       <h2 className="text-sm font-semibold text-theme-primary flex items-center gap-2">
                         <Folder className="w-4 h-4 text-blue-400" aria-hidden="true" />
                         {category}
@@ -347,7 +347,7 @@ export function KnowledgeBasePage() {
                           to={tenantPath(`/kb/${article.id}`)}
                           className="flex items-center gap-4 px-5 py-4 hover:bg-theme-hover/40 transition-colors group"
                         >
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 flex items-center justify-center flex-shrink-0">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/10 to-accent-gradient-end/10 flex items-center justify-center flex-shrink-0">
                             <FileText className="w-5 h-5 text-blue-400" aria-hidden="true" />
                           </div>
                           <div className="flex-1 min-w-0">

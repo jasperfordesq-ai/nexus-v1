@@ -308,7 +308,7 @@ export function TransferModal({
         {(onModalClose) => (
           <>
             <ModalHeader className="text-xl font-semibold text-theme-primary flex items-center gap-2">
-              <Send className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              <Send className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
               {t('send_credits')}
             </ModalHeader>
 
@@ -509,7 +509,7 @@ export function TransferModal({
 
               {/* Transfer Summary */}
               {formData.recipient && parsedAmount > 0 && !isOverBalance && (
-                <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-lg p-4">
+                <div className="bg-accent/10 border border-accent/30 rounded-lg p-4">
                   <p className="text-theme-muted text-sm">
                     {t('transfer_summary', {
                       amount: parsedAmount,
@@ -539,7 +539,7 @@ export function TransferModal({
                 {t('cancel')}
               </Button>
               <Button
-                className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                className="flex-1 bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                 startContent={!isSubmitting && <Send className="w-4 h-4" aria-hidden="true" />}
                 isLoading={isSubmitting}
                 isDisabled={!formData.recipient || !parsedAmount || isOverBalance}

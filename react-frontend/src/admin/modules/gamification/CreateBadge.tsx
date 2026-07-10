@@ -134,11 +134,9 @@ export function CreateBadge() {
         title={t('gamification.create_badge')}
         description={t('gamification.create_badge_desc')}
         actions={
-          <Link to={tenantPath("/admin/custom-badges")}>
-            <Button variant="tertiary" startContent={<ArrowLeft size={16} />}>
-              {t('gamification.back_to_badges')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath("/admin/custom-badges")} variant="tertiary" startContent={<ArrowLeft size={16} />}>
+            {t('gamification.back_to_badges')}
+          </Button>
         }
       />
 
@@ -247,9 +245,7 @@ export function CreateBadge() {
           </div>
 
           <div className="flex justify-end gap-2 pt-2">
-            <Link to={tenantPath("/admin/custom-badges")}>
-              <Button variant="tertiary" isDisabled={saving}>{t('gamification.cancel')}</Button>
-            </Link>
+            <Button as={Link} to={tenantPath("/admin/custom-badges")} variant="tertiary" isDisabled={saving}>{t('gamification.cancel')}</Button>
             <Button
               startContent={<Save size={16} />}
               onPress={handleSave}

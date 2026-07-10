@@ -210,6 +210,10 @@
     "top_earners": "Najlepiej zarabiający",
     "top_spenders": "Najwięcej wydawców",
     "user_report_desc": "Wyświetl szczegółowy raport kredytu czasowego dla pojedynczego członka",
-    "user_report_title": "Raport użytkownika"
+    "user_report_title": "Raport użytkownika",
+    "hours_value_few": "{{count}}h",
+    "hours_value_many": "{{count}}h",
+    "hours_value_one": "{{count}}godz",
+    "hours_value_other": "{{count}}godz"
   }
 }

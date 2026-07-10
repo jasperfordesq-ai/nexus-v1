@@ -276,7 +276,11 @@
     "members_tabs_aria": "Type ledenrapport",
     "hours_by_category_aria": "Staafdiagram met uitgewisselde uren per categorie",
     "hours_distribution_aria": "Cirkeldiagram dat de verdeling van de tijduitwisselingsuren weergeeft",
-    "hours_trend_aria": "Vlakdiagram met uitgewisselde uren in de loop van de tijd"
+    "hours_trend_aria": "Vlakdiagram met uitgewisselde uren in de loop van de tijd",
+    "members_selected_count_one": "{{count}}geselecteerd",
+    "members_selected_count_other": "{{count}}geselecteerd",
+    "days_count_one": "{{count}} dagen",
+    "days_count_other": "{{count}} dagen"
   },
   "municipal_reports": {
     "meta": {
@@ -387,7 +391,11 @@
       "hours": "{{count}}u",
       "disabled": "Gehandicapt",
       "activities": "{{count}} activiteiten",
-      "trend_detail": "{{participants}} deelnemers, {{activities}} activiteiten"
+      "trend_detail": "{{participants}} deelnemers, {{activities}} activiteiten",
+      "hours_one": "{{count}}u",
+      "hours_other": "{{count}}u",
+      "activities_one": "{{count}} activiteiten",
+      "activities_other": "{{count}} activiteiten"
     },
     "toast": {
       "load_failed": "Kan gemeentelijke impactgegevens niet laden.",
@@ -470,7 +478,9 @@
         "partner_organisations_by_hours": "Partnerorganisaties (per uren)",
         "no_partner_activity": "Geen partneractiviteit in deze periode.",
         "top_5_categories": "Top 5 categorieën (geografisch/activiteitenverdeling)",
-        "no_category_data": "Geen categoriegegevens in deze periode."
+        "no_category_data": "Geen categoriegegevens in deze periode.",
+        "trusted_total_one": "van {{count}} vertrouwd totaal.",
+        "trusted_total_other": "van {{count}} vertrouwd totaal."
       },
       "cooperative": {
         "empty_title": "Coöperatief (cooperative intern)",
@@ -487,8 +497,16 @@
         "coordinator_load": "Coördinator belasting",
         "coordinator_load_desc": "{{pending}} in behandeling bij {{coordinators}} coördinatoren.",
         "future_care_credit_pool": "Kredietbalanspool voor toekomstige zorg",
-        "future_care_credit_pool_desc": "Som van de positieve ledensaldi: de impliciete reserve voor toekomstige zorg van de coöperatie. Actief ledenbestand: {{count}}."
-      }
+        "future_care_credit_pool_desc": "Som van de positieve ledensaldi: de impliciete reserve voor toekomstige zorg van de coöperatie. Actief ledenbestand: {{count}}.",
+        "member_retention_desc_one": "{{count}} leden actief in zowel deze periode als de voorgaande equivalente periode.",
+        "member_retention_desc_other": "{{count}} leden actief in zowel deze periode als de voorgaande equivalente periode.",
+        "reciprocity_rate_desc_one": "{{count}}-supporters kregen in de periode ook uren.",
+        "reciprocity_rate_desc_other": "{{count}}-supporters kregen in de periode ook uren.",
+        "future_care_credit_pool_desc_one": "Som van de positieve ledensaldi: de impliciete reserve voor toekomstige zorg van de coöperatie. Actief ledenbestand: {{count}}.",
+        "future_care_credit_pool_desc_other": "Som van de positieve ledensaldi: de impliciete reserve voor toekomstige zorg van de coöperatie. Actief ledenbestand: {{count}}."
+      },
+      "logs_count_one": "{{count}} logt",
+      "logs_count_other": "{{count}} logt"
     },
     "cards": {
       "verified_hours": {
@@ -519,6 +537,18 @@
         "metric_2": "Recensies",
         "metric_3": "Audittrail"
       }
+    }
+  },
+  "caring_workflow": {
+    "policy": {
+      "periods": {
+        "last_90_days": "Laatste 90 dagen"
+      }
+    }
+  },
+  "municipal_impact": {
+    "portfolio": {
+      "yoy_value": "{{sign}}{{value}}% op jaarbasis"
     }
   }
 }

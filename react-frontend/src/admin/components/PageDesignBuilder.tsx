@@ -28,7 +28,7 @@ import Copy from 'lucide-react/icons/copy';
 import Info from 'lucide-react/icons/info';
 import X from 'lucide-react/icons/x';
 import { logError } from '@/lib/logger';
-import { useToast } from '@/contexts';
+import { useTenant, useToast } from '@/contexts';
 import { adminBuilderAssets } from '../api/adminApi';
 import { BuilderToolbar, type BuilderDevice } from './BuilderToolbar';
 import { BuilderBlockPalette } from './BuilderBlockPalette';
@@ -57,14 +57,14 @@ type UndoLike = { hasUndo?: () => boolean; hasRedo?: () => boolean; undo?: () =>
 
 const AUTOSAVE_DEBOUNCE_MS = 800;
 
-function pageStarterHtml(t: (key: string) => string): string {
+function pageStarterHtml(t: (key: string) => string, tenantRoot: string): string {
   return `
 <section class="nexus-page-section nexus-page-hero">
   <div class="nexus-page-container">
     <p class="nexus-page-kicker">${t('page_builder.starter.kicker')}</p>
     <h1>${t('page_builder.starter.hero_title')}</h1>
     <p class="nexus-page-lede">${t('page_builder.starter.hero_body')}</p>
-    <a class="nexus-page-button" href="/">${t('page_builder.starter.cta')}</a>
+    <a class="nexus-page-button" href="${tenantRoot}">${t('page_builder.starter.cta')}</a>
   </div>
 </section>
 <section class="nexus-page-section">
@@ -117,13 +117,13 @@ function exportProject(ed: Editor): { html: string; designJson: string } {
   };
 }
 
-function addNexusBlocks(ed: Editor, t: (key: string) => string): void {
+function addNexusBlocks(ed: Editor, t: (key: string) => string, tenantRoot: string): void {
   const bm = ed.BlockManager;
   const category = t('page_builder.blocks.category_nexus');
   bm.add('nexus-hero', {
     label: t('page_builder.blocks.hero_label'),
     category,
-    content: `<section class="nexus-page-section nexus-page-hero"><div class="nexus-page-container"><p class="nexus-page-kicker">${t('page_builder.blocks.hero_kicker')}</p><h1>${t('page_builder.blocks.hero_title')}</h1><p class="nexus-page-lede">${t('page_builder.blocks.hero_body')}</p><a class="nexus-page-button" href="/">${t('page_builder.blocks.hero_cta')}</a></div></section>`,
+    content: `<section class="nexus-page-section nexus-page-hero"><div class="nexus-page-container"><p class="nexus-page-kicker">${t('page_builder.blocks.hero_kicker')}</p><h1>${t('page_builder.blocks.hero_title')}</h1><p class="nexus-page-lede">${t('page_builder.blocks.hero_body')}</p><a class="nexus-page-button" href="${tenantRoot}">${t('page_builder.blocks.hero_cta')}</a></div></section>`,
   });
   bm.add('nexus-feature-grid', {
     label: t('page_builder.blocks.feature_grid_label'),
@@ -154,6 +154,8 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
   ref,
 ) {
   const { t } = useTranslation('admin_editor');
+  const { tenantPath } = useTenant();
+  const tenantRoot = tenantPath('/');
   const toast = useToast();
   const confirm = useConfirm();
 
@@ -271,7 +273,7 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
       });
 
       editorRef.current = ed;
-      addNexusBlocks(ed, t);
+      addNexusBlocks(ed, t, tenantRoot);
       ed.Css.setRule('.nexus-page-section', {});
       ed.addStyle(DEFAULT_PAGE_CSS);
 
@@ -292,10 +294,10 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
           const doc = new DOMParser().parseFromString(seed, 'text/html');
           const styleText = Array.from(doc.querySelectorAll('style')).map((style) => style.textContent || '').join('\n');
           doc.querySelectorAll('style, script').forEach((node) => node.remove());
-          ed.setComponents(doc.body.innerHTML || pageStarterHtml(t));
+          ed.setComponents(doc.body.innerHTML || pageStarterHtml(t, tenantRoot));
           ed.addStyle(styleText || DEFAULT_PAGE_CSS);
         } else {
-          ed.setComponents(pageStarterHtml(t));
+          ed.setComponents(pageStarterHtml(t, tenantRoot));
         }
       }
 
@@ -352,7 +354,7 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
       setFailed(true);
       return undefined;
     }
-  }, [t, toast]);
+  }, [t, tenantRoot, toast]);
 
   const handleUndo = () => {
     (editorRef.current?.UndoManager as unknown as UndoLike | undefined)?.undo?.();
@@ -394,7 +396,7 @@ export const PageDesignBuilder = forwardRef<PageDesignBuilderHandle, PageDesignB
       confirmLabel: t('page_builder.reset'),
     });
     if (!ok) return;
-    editorRef.current?.setComponents(pageStarterHtml(t));
+    editorRef.current?.setComponents(pageStarterHtml(t, tenantRoot));
     editorRef.current?.setStyle(DEFAULT_PAGE_CSS);
     setLegacyNotice(false);
   };

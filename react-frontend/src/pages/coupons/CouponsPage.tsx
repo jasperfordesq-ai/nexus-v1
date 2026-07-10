@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Button, Chip, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -106,7 +107,7 @@ export default function CouponsPage() {
                 </div>
                 {c.valid_until && (
                   <p className="text-xs text-[var(--color-text-secondary)] mb-3">
-                    {t('coupon.valid_until')}: {new Date(c.valid_until).toLocaleDateString()}
+                    {t('coupon.valid_until')}: {new Date(c.valid_until).toLocaleDateString(getFormattingLocale())}
                   </p>
                 )}
                 <Button as={Link} to={tenantPath(`/coupons/${c.id}`)} color="primary" size="sm" fullWidth>

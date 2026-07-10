@@ -65,7 +65,7 @@ describe('SuperAdminRoute', () => {
     });
 
     renderWithRouter();
-    expect(screen.getByText('Checking Permissions')).toBeInTheDocument();
+    expect(screen.getByText('Loading super admin')).toBeInTheDocument();
   });
 
   it('redirects non-super-admin to admin dashboard', () => {
@@ -99,6 +99,23 @@ describe('SuperAdminRoute', () => {
 
     renderWithRouter();
     expect(screen.getByTestId('super-content')).toBeInTheDocument();
+  });
+
+  it('blocks tenant-scoped super admins from the platform panel', () => {
+    mockUseAuth.mockReturnValue({
+      user: {
+        id: 1,
+        role: 'admin',
+        is_super_admin: false,
+        is_tenant_super_admin: true,
+      },
+      isLoading: false,
+      status: 'authenticated',
+    });
+
+    renderWithRouter();
+    expect(screen.queryByTestId('super-content')).not.toBeInTheDocument();
+    expect(screen.getByTestId('admin-redirect')).toBeInTheDocument();
   });
 
   it('allows god users through', () => {

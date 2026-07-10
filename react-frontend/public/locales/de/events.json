@@ -139,7 +139,21 @@
     "delete_series_note": "Dies ist ein wiederkehrender Termin. Beim Löschen werden auch alle zukünftigen Termine der Serie gelöscht.",
     "cancel_series_note": "Dies ist ein wiederkehrender Termin. Bei der Absage werden auch alle zukünftigen Termine abgesagt und deren Teilnehmende benachrichtigt.",
     "series_dates_title": "Kommende Termine in dieser Reihe",
-    "series_this_date": "Dieses Datum"
+    "series_this_date": "Dieses Datum",
+    "events_in_series_one": "{{count}} Veranstaltungen in der Reihe",
+    "events_in_series_other": "{{count}} Veranstaltungen in der Reihe",
+    "max_capacity_one": "Max. {{count}} Personen",
+    "max_capacity_other": "Max. {{count}} Personen",
+    "spots_left_one": "{{count}} Plätze frei",
+    "spots_left_other": "{{count}} Plätze frei",
+    "waitlist_count_one": "{{count}} auf der Warteliste",
+    "waitlist_count_other": "{{count}} auf der Warteliste",
+    "more_attendees_one": "+{{count}} weitere",
+    "more_attendees_other": "+{{count}} weitere",
+    "attendance_total_one": "{{count}} Antworten",
+    "attendance_total_other": "{{count}} Antworten",
+    "view_all_series_one": "Alle {{count}} Veranstaltungen der Reihe anzeigen",
+    "view_all_series_other": "Alle {{count}} Veranstaltungen der Reihe anzeigen"
   },
   "card": {
     "cancelled": "Abgesagt",
@@ -152,7 +166,9 @@
     "repeats_yearly": "Wird jährlich wiederholt",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
-    "series_dates_other": "{{count}} dates"
+    "series_dates_other": "{{count}} dates",
+    "spots_left_one": "{{count}} Plätze frei",
+    "spots_left_other": "{{count}} Plätze frei"
   },
   "form": {
     "create_title": "Neue Veranstaltung erstellen",
@@ -300,7 +316,9 @@
     "total_votes": "{{count}} Stimmen",
     "vote_success": "Stimme erfasst!",
     "vote_failed": "Stimme konnte nicht erfasst werden",
-    "view_full": "Vollständige Umfrage anzeigen"
+    "view_full": "Vollständige Umfrage anzeigen",
+    "total_votes_one": "{{count}} Stimmen",
+    "total_votes_other": "{{count}} Stimmen"
   },
   "radius_5": "5 km",
   "radius_10": "10 km",
@@ -318,5 +336,9 @@
   "active_filters": "Aktive Filter",
   "active_search": "Suche: {{query}}",
   "active_near_me": "Innerhalb von {{radius}} km",
-  "clear_filters": "Filter löschen"
+  "clear_filters": "Filter löschen",
+  "going_one": "{{count}} Teilnehmer",
+  "going_other": "{{count}} Teilnehmer",
+  "interested_one": "{{count}} Interessierte",
+  "interested_other": "{{count}} Interessierte"
 }

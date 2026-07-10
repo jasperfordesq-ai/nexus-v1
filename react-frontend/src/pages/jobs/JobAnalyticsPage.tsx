@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -233,11 +234,9 @@ export function JobAnalyticsPage() {
         title={error || t('analytics.no_data')}
         action={
           <div className="flex gap-2">
-            <Link to={tenantPath(`/jobs/${id}`)}>
-              <Button variant="flat" className="bg-theme-elevated text-theme-muted">
-                {t('detail.browse_vacancies')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath(`/jobs/${id}`)} variant="flat" className="bg-theme-elevated text-theme-muted">
+              {t('detail.browse_vacancies')}
+            </Button>
             <Button
               color="primary"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
@@ -290,17 +289,17 @@ export function JobAnalyticsPage() {
         <MetricCard
           icon={<Eye className="w-5 h-5 text-blue-400" aria-hidden="true" />}
           label={t('analytics.total_views')}
-          value={analytics.total_views.toLocaleString()}
+          value={analytics.total_views.toLocaleString(getFormattingLocale())}
         />
         <MetricCard
           icon={<Users className="w-5 h-5 text-green-400" aria-hidden="true" />}
           label={t('analytics.unique_viewers')}
-          value={analytics.unique_viewers.toLocaleString()}
+          value={analytics.unique_viewers.toLocaleString(getFormattingLocale())}
         />
         <MetricCard
-          icon={<FileText className="w-5 h-5 text-purple-400" aria-hidden="true" />}
+          icon={<FileText className="w-5 h-5 text-accent" aria-hidden="true" />}
           label={t('analytics.total_applications')}
-          value={analytics.total_applications.toLocaleString()}
+          value={analytics.total_applications.toLocaleString(getFormattingLocale())}
         />
         <MetricCard
           icon={<TrendingUp className="w-5 h-5 text-amber-400" aria-hidden="true" />}
@@ -318,14 +317,14 @@ export function JobAnalyticsPage() {
                 <Share2 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
                 <div className="min-w-0">
                   <p className="text-xs text-theme-subtle">{t('analytics.referral_shares')}</p>
-                  <p className="text-lg font-bold text-theme-primary">{analytics.referral_stats.total_shares.toLocaleString()}</p>
+                  <p className="text-lg font-bold text-theme-primary">{analytics.referral_stats.total_shares.toLocaleString(getFormattingLocale())}</p>
                 </div>
               </GlassCard>
               <GlassCard className="flex min-w-[12rem] flex-1 items-center gap-3 p-4 sm:flex-none">
                 <Users className="w-4 h-4 text-theme-subtle" aria-hidden="true" />
                 <div className="min-w-0">
                   <p className="text-xs text-theme-subtle">{t('analytics.referral_apps')}</p>
-                  <p className="text-lg font-bold text-theme-primary">{analytics.referral_stats.referral_applications.toLocaleString()}</p>
+                  <p className="text-lg font-bold text-theme-primary">{analytics.referral_stats.referral_applications.toLocaleString(getFormattingLocale())}</p>
                 </div>
               </GlassCard>
               <GlassCard className="flex min-w-[12rem] flex-1 items-center gap-3 p-4 sm:flex-none">
@@ -400,7 +399,7 @@ export function JobAnalyticsPage() {
                     <div className={`w-full rounded-t bg-accent ${getBarHeightClass(count, maxViews)}`} />
                   </Tooltip>
                   <span className="text-[9px] text-theme-subtle rotate-[-45deg] origin-top-left whitespace-nowrap">
-                    {new Date(day.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    {new Date(day.date).toLocaleDateString(getFormattingLocale(), { month: 'short', day: 'numeric' })}
                   </span>
                 </div>
               );
@@ -541,12 +540,12 @@ export function JobAnalyticsPage() {
                 <div className="flex items-center gap-4">
                   <div>
                     <p className="text-sm text-muted">{t('analytics.yours')}</p>
-                    <p className="text-lg font-bold">{predictions.salary_comparison.your_salary.toLocaleString()}</p>
+                    <p className="text-lg font-bold">{predictions.salary_comparison.your_salary.toLocaleString(getFormattingLocale())}</p>
                   </div>
                   <div className="text-muted">{t('analytics.versus')}</div>
                   <div>
                     <p className="text-sm text-muted">{t('analytics.market_avg')}</p>
-                    <p className="text-lg font-bold">{predictions.salary_comparison.market_avg.toLocaleString()}</p>
+                    <p className="text-lg font-bold">{predictions.salary_comparison.market_avg.toLocaleString(getFormattingLocale())}</p>
                   </div>
                   <Chip size="sm" variant="tertiary" color={predictions.salary_comparison.diff_percent >= 0 ? 'success' : 'danger'}>
                     {predictions.salary_comparison.diff_percent > 0 ? '+' : ''}{predictions.salary_comparison.diff_percent}% {predictions.salary_comparison.label}

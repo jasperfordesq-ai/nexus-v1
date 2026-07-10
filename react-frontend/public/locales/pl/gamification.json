@@ -23,7 +23,15 @@
       "months_active": "{{count}} z 12 miesięcy",
       "month_active_tooltip": "Aktywne: {{count}} działania",
       "month_inactive_tooltip": "Nieaktywny",
-      "description": "Miesiące, w których wykonałeś co najmniej jedno znaczące działanie (wymiana, wystawianie ofert, przeglądanie lub godziny wolontariatu)."
+      "description": "Miesiące, w których wykonałeś co najmniej jedno znaczące działanie (wymiana, wystawianie ofert, przeglądanie lub godziny wolontariatu).",
+      "months_active_few": "{{count}} z 12 miesięcy",
+      "months_active_many": "{{count}} z 12 miesięcy",
+      "months_active_one": "{{count}} z 12 miesięcy",
+      "months_active_other": "{{count}} z 12 miesięcy",
+      "month_active_tooltip_few": "Aktywne: {{count}} działania",
+      "month_active_tooltip_many": "Aktywne: {{count}} działania",
+      "month_active_tooltip_one": "Aktywne: {{count}} działania",
+      "month_active_tooltip_other": "Aktywne: {{count}} działania"
     },
     "badge_type": {
       "vol": "Zgłaszanie się na ochotnika",
@@ -77,7 +85,11 @@
       "claimed_message": "Zdobyłeś {{xp}} PD!",
       "claim_failed": "Roszczenie nie powiodło się",
       "claim_failed_desc": "Nie można odebrać nagrody dziennej.",
-      "claim_error": "Coś poszło nie tak. Spróbuj ponownie."
+      "claim_error": "Coś poszło nie tak. Spróbuj ponownie.",
+      "day_streak_few": "Seria dni {{count}}",
+      "day_streak_many": "Seria dni {{count}}",
+      "day_streak_one": "Seria dni {{count}}",
+      "day_streak_other": "Seria dni {{count}}"
     },
     "challenges": {
       "active_challenges": "Aktywne wyzwania",
@@ -121,7 +133,11 @@
       "purchase_failed_desc": "Nie udało się dokończyć zakupu.",
       "purchase_error": "Coś poszło nie tak.",
       "load_failed": "Ładowanie nie powiodło się",
-      "load_failed_desc": "Nie można załadować sklepu XP."
+      "load_failed_desc": "Nie można załadować sklepu XP.",
+      "stock_left_few": "Pozostało {{count}} w magazynie",
+      "stock_left_many": "Pozostało {{count}} w magazynie",
+      "stock_left_one": "Pozostało {{count}} w magazynie",
+      "stock_left_other": "Pozostało {{count}} w magazynie"
     },
     "loading": "Ładowanie osiągnięć",
     "badge_detail": {
@@ -159,7 +175,11 @@
       "updated_desc": "Prezentacja Twojej odznaki została zapisana.",
       "save_failed": "Zapisywanie nie powiodło się",
       "save_failed_desc": "Nie udało się zaktualizować prezentacji.",
-      "save_error": "Coś poszło nie tak."
+      "save_error": "Coś poszło nie tak.",
+      "select_badges_few": "Wybierz maksymalnie 5 odznak, które chcesz zaprezentować w swoim profilu. (wybrano {{count}}/5)",
+      "select_badges_many": "Wybierz maksymalnie 5 odznak, które chcesz zaprezentować w swoim profilu. (wybrano {{count}}/5)",
+      "select_badges_one": "Wybierz maksymalnie 5 odznak, które chcesz zaprezentować w swoim profilu. (wybrano {{count}}/5)",
+      "select_badges_other": "Wybierz maksymalnie 5 odznak, które chcesz zaprezentować w swoim profilu. (wybrano {{count}}/5)"
     },
     "load_error": "Nie udało się wczytać osiągnięć. Spróbuj ponownie."
   },
@@ -266,7 +286,11 @@
       "buddy_failed": "Nie udało się zostać kumplem",
       "buddy_action_sent": "Wysłano wsparcie znajomego",
       "buddy_action_failed": "Nie udało się wysłać wsparcia do znajomych"
-    }
+    },
+    "streak_label_few": "Seria meldunków {{count}}",
+    "streak_label_many": "Seria meldunków {{count}}",
+    "streak_label_one": "Seria meldunków {{count}}",
+    "streak_label_other": "Seria meldunków {{count}}"
   },
   "frequency": {
     "none": "Brak rytmu",
@@ -328,7 +352,11 @@
       "rank_label": "Ranga {{rank}}",
       "xp_reward": "{{xp}} PD",
       "load_failed": "Ładowanie nie powiodło się",
-      "load_failed_desc": "Nie można wczytać historii sezonu."
+      "load_failed_desc": "Nie można wczytać historii sezonu.",
+      "participants_few": "{{count}} uczestników",
+      "participants_many": "{{count}} uczestników",
+      "participants_one": "{{count}} uczestników",
+      "participants_other": "{{count}} uczestników"
     },
     "score_unit": {
       "hours": "H",
@@ -421,7 +449,15 @@
       "legendary": "Legendarny"
     },
     "max_score_label": "/{{max}}",
-    "loading": "Ładowanie wyniku NexusScore..."
+    "loading": "Ładowanie wyniku NexusScore...",
+    "points_to_next_few": "{{count}} points to {{tier}}",
+    "points_to_next_many": "{{count}} points to {{tier}}",
+    "points_to_next_one": "{{count}} wskazuje na {{tier}}",
+    "points_to_next_other": "{{count}} wskazuje na {{tier}}",
+    "remaining_count_few": "Pozostało {{count}}",
+    "remaining_count_many": "Pozostało {{count}}",
+    "remaining_count_one": "Pozostało {{count}}",
+    "remaining_count_other": "Pozostało {{count}}"
   },
   "common": {
     "refresh": "Odświeżać",

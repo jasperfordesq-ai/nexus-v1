@@ -108,7 +108,10 @@
       "create": "Impossible de créer la demande de remplacement",
       "candidates": "Impossible de charger les candidat·es de remplacement",
       "assign": "Impossible d'attribuer le ou la remplaçant·e"
-    }
+    },
+    "skill_matches_many": "{{count}} compétences correspondantes",
+    "skill_matches_one": "{{count}} compétences correspondantes",
+    "skill_matches_other": "{{count}} compétences correspondantes"
   },
   "providers": {
     "title": "Annuaire des prestataires de soins",
@@ -488,7 +491,8 @@
         "maximum_discount": "Remise maximale par commande (%)",
         "maximum_discount_description": "Plafonnement du montant total de la commande pouvant être payé en crédits-temps.",
         "save": "Enregistrer les paramètres",
-        "view_only": "Les utilisateurs en lecture seule ne peuvent pas modifier les paramètres de fidélité."
+        "view_only": "Les utilisateurs en lecture seule ne peuvent pas modifier les paramètres de fidélité.",
+        "per_hour_short": "/ h"
       },
       "ledger": {
         "title": "Rachats récents",
@@ -534,6 +538,9 @@
         "pending": "En attente",
         "applied": "Appliqué",
         "reversed": "Renversé"
+      },
+      "table": {
+        "empty_value": "—"
       }
     },
     "hour_transfers": {
@@ -808,7 +815,11 @@
         "days_ago_one": "{{count}}il y a j",
         "days_ago_other": "{{count}}il y a j",
         "months_ago_one": "{{count}}il y a mois",
-        "months_ago_other": "{{count}}il y a mois"
+        "months_ago_other": "{{count}}il y a mois",
+        "minutes_ago_many": "{{count}}il y a m",
+        "hours_ago_many": "{{count}}il y a h",
+        "days_ago_many": "{{count}}il y a j",
+        "months_ago_many": "{{count}}il y a mois"
       },
       "messages": {
         "triage_saved": "Triage enregistré",
@@ -944,7 +955,8 @@
       },
       "errors": {
         "load": "Échec du chargement du cercle de destinataires. Vérifiez l'identifiant du membre et réessayez."
-      }
+      },
+      "safeguarding_flags_many": "Drapeaux de sauvegarde {{count}}"
     },
     "safeguarding_reports": {
       "meta_title": "Rapports de sauvegarde - Administrateur",

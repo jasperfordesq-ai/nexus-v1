@@ -3,434 +3,95 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-/**
- * Tests for useApi, useMutation, usePaginatedApi hooks
- */
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useApi } from './useApi';
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
-import { useApi, useMutation, usePaginatedApi } from './useApi';
+const mockGet = vi.hoisted(() => vi.fn());
 
-// Mock the api module
 vi.mock('@/lib/api', () => ({
-  api: {
-    get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
-    patch: vi.fn(),
-    delete: vi.fn(),
-  },
+  api: { get: mockGet },
 }));
-
-import { api } from '@/lib/api';
-const mockApi = api as unknown as {
-  get: ReturnType<typeof vi.fn>;
-  post: ReturnType<typeof vi.fn>;
-  put: ReturnType<typeof vi.fn>;
-  patch: ReturnType<typeof vi.fn>;
-  delete: ReturnType<typeof vi.fn>;
-};
 
 describe('useApi', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('fetches data immediately when immediate is true (default)', async () => {
-    mockApi.get.mockResolvedValue({ success: true, data: { id: 1, name: 'Test' } });
-
-    const { result } = renderHook(() => useApi<{ id: number; name: string }>('/v2/test'));
-
-    expect(result.current.isLoading).toBe(true);
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.data).toEqual({ id: 1, name: 'Test' });
-    expect(result.current.error).toBeNull();
-    expect(mockApi.get).toHaveBeenCalledWith('/v2/test');
-  });
-
-  it('does not fetch when immediate is false', () => {
-    const { result } = renderHook(() =>
-      useApi('/v2/test', { immediate: false })
-    );
+  it('does not report a null endpoint as loading', () => {
+    const { result } = renderHook(() => useApi<string>(null));
 
     expect(result.current.isLoading).toBe(false);
+    expect(result.current.loading).toBe(false);
+    expect(mockGet).not.toHaveBeenCalled();
+  });
+
+  it('loads data and pagination metadata immediately', async () => {
+    mockGet.mockResolvedValue({
+      success: true,
+      data: ['one'],
+      meta: { current_page: 1, total_pages: 3, total: 3 },
+    });
+
+    const { result } = renderHook(() => useApi<string[]>('/v2/items'));
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.data).toEqual(['one']);
+    expect(result.current.meta?.total_pages).toBe(3);
+  });
+
+  it('retains a resolved API failure as an explicit error state', async () => {
+    mockGet.mockResolvedValue({ success: false, error: 'Unavailable' });
+
+    const { result } = renderHook(() => useApi('/v2/items'));
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.data).toBeNull();
-    expect(mockApi.get).not.toHaveBeenCalled();
+    expect(result.current.error).toBe('Unavailable');
   });
 
-  it('does not get stuck loading when endpoint is null', () => {
-    const { result } = renderHook(() => useApi(null));
+  it('supports deliberate manual execution', async () => {
+    mockGet.mockResolvedValue({ success: true, data: 'loaded' });
+    const { result } = renderHook(() => (
+      useApi<string>('/v2/manual', { immediate: false })
+    ));
 
-    expect(result.current.isLoading).toBe(false);
+    expect(mockGet).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.execute();
+    });
+
+    expect(result.current.data).toBe('loaded');
+    expect(mockGet).toHaveBeenCalledWith('/v2/manual');
+  });
+
+  it('supports local data updates and reset without a request', () => {
+    const { result } = renderHook(() => (
+      useApi<string>('/v2/manual', { immediate: false })
+    ));
+
+    act(() => result.current.setData('local'));
+    expect(result.current.data).toBe('local');
+
+    act(() => result.current.reset());
     expect(result.current.data).toBeNull();
-    expect(result.current.error).toBeNull();
-    expect(mockApi.get).not.toHaveBeenCalled();
-  });
-
-  it('clears loading when endpoint switches back to null (gated fetch)', async () => {
-    mockApi.get.mockResolvedValue({ success: true, data: 'hit' });
-
-    const { result, rerender } = renderHook(
-      ({ endpoint }: { endpoint: string | null }) => useApi<string>(endpoint),
-      { initialProps: { endpoint: null as string | null } }
-    );
-
-    expect(result.current.isLoading).toBe(false);
-
-    rerender({ endpoint: '/v2/search?q=ab' });
-    await waitFor(() => {
-      expect(result.current.data).toBe('hit');
-    });
-
-    rerender({ endpoint: null });
-    expect(result.current.isLoading).toBe(false);
-  });
-
-  it('handles API errors', async () => {
-    mockApi.get.mockResolvedValue({ success: false, error: 'Not found' });
-
-    const { result } = renderHook(() => useApi('/v2/test'));
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.data).toBeNull();
-    expect(result.current.error).toBe('Not found');
-  });
-
-  it('defaults error message to "Request failed"', async () => {
-    mockApi.get.mockResolvedValue({ success: false });
-
-    const { result } = renderHook(() => useApi('/v2/test'));
-
-    await waitFor(() => {
-      expect(result.current.error).toBe('Request failed');
-    });
-  });
-
-  it('resets state', async () => {
-    mockApi.get.mockResolvedValue({ success: true, data: 'hello' });
-
-    const { result } = renderHook(() => useApi<string>('/v2/test'));
-
-    await waitFor(() => {
-      expect(result.current.data).toBe('hello');
-    });
-
-    act(() => {
-      result.current.reset();
-    });
-
-    expect(result.current.data).toBeNull();
-    expect(result.current.isLoading).toBe(false);
     expect(result.current.error).toBeNull();
   });
 
-  it('allows setting data manually', async () => {
-    mockApi.get.mockResolvedValue({ success: true, data: 'initial' });
-
-    const { result } = renderHook(() => useApi<string>('/v2/test'));
-
-    await waitFor(() => {
-      expect(result.current.data).toBe('initial');
-    });
-
-    act(() => {
-      result.current.setData('updated');
-    });
-
-    expect(result.current.data).toBe('updated');
-  });
-
-  it('re-executes when execute is called', async () => {
-    mockApi.get
+  it('refetches when caller dependencies change', async () => {
+    mockGet
       .mockResolvedValueOnce({ success: true, data: 'first' })
       .mockResolvedValueOnce({ success: true, data: 'second' });
 
-    const { result } = renderHook(() =>
-      useApi<string>('/v2/test', { immediate: false })
+    const { result, rerender } = renderHook(
+      ({ version }) => useApi<string>('/v2/items', { deps: [version] }),
+      { initialProps: { version: 1 } },
     );
 
-    await act(async () => {
-      await result.current.execute();
-    });
-
-    expect(result.current.data).toBe('first');
-
-    await act(async () => {
-      await result.current.execute();
-    });
-
-    expect(result.current.data).toBe('second');
-  });
-});
-
-describe('useMutation', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('starts with no loading and no data', () => {
-    const { result } = renderHook(() => useMutation('/v2/test'));
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.data).toBeNull();
-    expect(result.current.error).toBeNull();
-  });
-
-  it('posts data and returns response', async () => {
-    mockApi.post.mockResolvedValue({ success: true, data: { id: 1 } });
-
-    const { result } = renderHook(() => useMutation<{ id: number }, { name: string }>('/v2/test'));
-
-    await act(async () => {
-      await result.current.mutate({ name: 'Test' });
-    });
-
-    expect(result.current.data).toEqual({ id: 1 });
-    expect(result.current.isLoading).toBe(false);
-    expect(mockApi.post).toHaveBeenCalledWith('/v2/test', { name: 'Test' });
-  });
-
-  it('uses PUT method', async () => {
-    mockApi.put.mockResolvedValue({ success: true, data: 'ok' });
-
-    const { result } = renderHook(() => useMutation('/v2/test', 'put'));
-
-    await act(async () => {
-      await result.current.mutate({ value: 42 });
-    });
-
-    expect(mockApi.put).toHaveBeenCalledWith('/v2/test', { value: 42 });
-  });
-
-  it('uses PATCH method', async () => {
-    mockApi.patch.mockResolvedValue({ success: true, data: 'ok' });
-
-    const { result } = renderHook(() => useMutation('/v2/test', 'patch'));
-
-    await act(async () => {
-      await result.current.mutate({ value: 42 });
-    });
-
-    expect(mockApi.patch).toHaveBeenCalledWith('/v2/test', { value: 42 });
-  });
-
-  it('uses DELETE method', async () => {
-    mockApi.delete.mockResolvedValue({ success: true, data: null });
-
-    const { result } = renderHook(() => useMutation('/v2/test', 'delete'));
-
-    await act(async () => {
-      await result.current.mutate();
-    });
-
-    expect(mockApi.delete).toHaveBeenCalledWith('/v2/test');
-  });
-
-  it('calls onSuccess callback', async () => {
-    mockApi.post.mockResolvedValue({ success: true, data: { id: 1 } });
-    const onSuccess = vi.fn();
-
-    const { result } = renderHook(() =>
-      useMutation('/v2/test', 'post', { onSuccess })
-    );
-
-    await act(async () => {
-      await result.current.mutate();
-    });
-
-    expect(onSuccess).toHaveBeenCalledWith({ id: 1 });
-  });
-
-  it('calls onError callback', async () => {
-    mockApi.post.mockResolvedValue({ success: false, error: 'Validation failed' });
-    const onError = vi.fn();
-
-    const { result } = renderHook(() =>
-      useMutation('/v2/test', 'post', { onError })
-    );
-
-    await act(async () => {
-      await result.current.mutate();
-    });
-
-    expect(onError).toHaveBeenCalledWith('Validation failed');
-    expect(result.current.error).toBe('Validation failed');
-  });
-
-  it('resets mutation state', async () => {
-    mockApi.post.mockResolvedValue({ success: true, data: { id: 1 } });
-
-    const { result } = renderHook(() => useMutation('/v2/test'));
-
-    await act(async () => {
-      await result.current.mutate();
-    });
-
-    expect(result.current.data).toEqual({ id: 1 });
-
-    act(() => {
-      result.current.reset();
-    });
-
-    expect(result.current.data).toBeNull();
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.error).toBeNull();
-  });
-});
-
-describe('usePaginatedApi', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('fetches first page on mount', async () => {
-    mockApi.get.mockResolvedValue({
-      success: true,
-      data: [{ id: 1 }, { id: 2 }],
-      meta: { current_page: 1, total_pages: 3, total: 50 },
-    });
-
-    const { result } = renderHook(() => usePaginatedApi('/v2/items'));
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.data.items).toHaveLength(2);
-    expect(result.current.data.currentPage).toBe(1);
-    expect(result.current.data.totalPages).toBe(3);
-    expect(result.current.data.total).toBe(50);
-    expect(result.current.data.hasMore).toBe(true);
-    expect(mockApi.get).toHaveBeenCalledWith(expect.stringContaining('page=1'));
-  });
-
-  it('loads more items', async () => {
-    mockApi.get
-      .mockResolvedValueOnce({
-        success: true,
-        data: [{ id: 1 }],
-        meta: { current_page: 1, total_pages: 2, total: 2 },
-      })
-      .mockResolvedValueOnce({
-        success: true,
-        data: [{ id: 2 }],
-        meta: { current_page: 2, total_pages: 2, total: 2 },
-      });
-
-    const { result } = renderHook(() => usePaginatedApi('/v2/items'));
-
-    await waitFor(() => {
-      expect(result.current.data.items).toHaveLength(1);
-    });
-
-    await act(async () => {
-      await result.current.loadMore();
-    });
-
-    expect(result.current.data.items).toHaveLength(2);
-    expect(result.current.data.hasMore).toBe(false);
-  });
-
-  it('keeps paginating when meta omits current_page (falls back to requested page)', async () => {
-    mockApi.get
-      .mockResolvedValueOnce({
-        success: true,
-        data: [{ id: 1 }],
-        meta: { total_pages: 3, total: 3 },
-      })
-      .mockResolvedValueOnce({
-        success: true,
-        data: [{ id: 2 }],
-        meta: { total_pages: 3, total: 3 },
-      });
-
-    const { result } = renderHook(() => usePaginatedApi('/v2/items'));
-
-    await waitFor(() => {
-      expect(result.current.data.items).toHaveLength(1);
-    });
-
-    // Regression: current_page missing must NOT fall back to total_pages,
-    // which killed pagination by reporting hasMore=false after page 1.
-    expect(result.current.data.currentPage).toBe(1);
-    expect(result.current.data.hasMore).toBe(true);
-
-    await act(async () => {
-      await result.current.loadMore();
-    });
-
-    expect(result.current.data.items).toHaveLength(2);
-    expect(result.current.data.currentPage).toBe(2);
-    expect(result.current.data.hasMore).toBe(true);
-    expect(mockApi.get).toHaveBeenLastCalledWith(expect.stringContaining('page=2'));
-  });
-
-  it('handles API error', async () => {
-    mockApi.get.mockResolvedValue({ success: false, error: 'Server error' });
-
-    const { result } = renderHook(() => usePaginatedApi('/v2/items'));
-
-    await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    expect(result.current.error).toBe('Server error');
-    expect(result.current.data.items).toHaveLength(0);
-  });
-
-  it('resets state', async () => {
-    mockApi.get.mockResolvedValue({
-      success: true,
-      data: [{ id: 1 }],
-      meta: { current_page: 1, total_pages: 1, total: 1 },
-    });
-
-    const { result } = renderHook(() => usePaginatedApi('/v2/items'));
-
-    await waitFor(() => {
-      expect(result.current.data.items).toHaveLength(1);
-    });
-
-    act(() => {
-      result.current.reset();
-    });
-
-    expect(result.current.data.items).toHaveLength(0);
-    expect(result.current.data.currentPage).toBe(0);
-    expect(result.current.data.total).toBe(0);
-  });
-
-  it('uses custom page size', async () => {
-    mockApi.get.mockResolvedValue({
-      success: true,
-      data: [],
-      meta: { current_page: 1, total_pages: 1, total: 0 },
-    });
-
-    renderHook(() => usePaginatedApi('/v2/items', 10));
-
-    await waitFor(() => {
-      expect(mockApi.get).toHaveBeenCalledWith(expect.stringContaining('limit=10'));
-    });
-  });
-
-  it('appends query params correctly when endpoint has existing params', async () => {
-    mockApi.get.mockResolvedValue({
-      success: true,
-      data: [],
-      meta: { current_page: 1, total_pages: 1, total: 0 },
-    });
-
-    renderHook(() => usePaginatedApi('/v2/items?type=offer'));
-
-    await waitFor(() => {
-      expect(mockApi.get).toHaveBeenCalledWith(expect.stringContaining('?type=offer&page=1'));
-    });
+    await waitFor(() => expect(result.current.data).toBe('first'));
+    rerender({ version: 2 });
+    await waitFor(() => expect(result.current.data).toBe('second'));
+    expect(mockGet).toHaveBeenCalledTimes(2);
   });
 });

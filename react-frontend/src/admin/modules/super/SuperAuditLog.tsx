@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Select, SelectItem, Button, Input } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -163,7 +164,7 @@ export default function SuperAuditLog() {
       key: 'created_at', label: t('super.col_date'), sortable: true,
       render: (entry) => (
         <span className="text-sm text-muted">
-          {new Date(entry.created_at).toLocaleString()}
+          {new Date(entry.created_at).toLocaleString(getFormattingLocale())}
         </span>
       ),
     },

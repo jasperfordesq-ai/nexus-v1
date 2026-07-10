@@ -36,14 +36,14 @@ export function SuggestedListingsWidget({ listings }: SuggestedListingsWidgetPro
     <GlassCard className="p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-purple-500" aria-hidden="true" />
+          <Sparkles className="w-4 h-4 text-accent" aria-hidden="true" />
           <h3 className="font-semibold text-sm text-[var(--text-primary)]">
             {t('sidebar.suggested.title')}
           </h3>
         </div>
         <Link
           to={tenantPath('/listings')}
-          className="text-xs text-indigo-500 hover:text-indigo-600 transition-colors duration-200"
+          className="text-xs text-accent hover:text-accent transition-colors duration-200"
         >
           {t('sidebar.suggested.see_all')}
         </Link>
@@ -66,7 +66,7 @@ export function SuggestedListingsWidget({ listings }: SuggestedListingsWidgetPro
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-indigo-500 transition-colors duration-200">
+              <p className="text-sm font-medium text-[var(--text-primary)] truncate group-hover:text-accent transition-colors duration-200">
                 {listing.title}
               </p>
               <p className="text-xs text-[var(--text-muted)] truncate">

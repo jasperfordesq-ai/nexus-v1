@@ -1,3 +1,4 @@
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Input, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -349,7 +350,13 @@ export function CronJobLogs() {
                     </TableCell>
                     <TableCell className="w-28 min-w-28 whitespace-nowrap align-top">
                       <span className="text-sm tabular-nums">
-                        {Number(log.duration_seconds).toFixed(2)}s
+                        {formatNumber(Number(log.duration_seconds), {
+                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 2,
+                          style: 'unit',
+                          unit: 'second',
+                          unitDisplay: 'narrow',
+                        })}
                       </span>
                     </TableCell>
                     <TableCell className="w-[34rem] min-w-[34rem] max-w-[34rem] align-top">
@@ -360,7 +367,7 @@ export function CronJobLogs() {
                     <TableCell className="w-52 min-w-52 whitespace-nowrap align-top">
                       <div className="flex items-center gap-1.5 text-sm">
                         <Calendar size={14} className="flex-none text-muted" />
-                        <span>{new Date(log.executed_at).toLocaleString()}</span>
+                        <span>{new Date(log.executed_at).toLocaleString(getFormattingLocale())}</span>
                       </div>
                     </TableCell>
                     <TableCell className="w-32 min-w-32 whitespace-nowrap align-top">
@@ -426,13 +433,19 @@ export function CronJobLogs() {
                   <div>
                     <p className="text-xs text-muted mb-1">{t('system.modal_label_duration')}</p>
                     <p className="text-sm font-medium">
-                      {Number(selectedLog.duration_seconds).toFixed(2)}s
+                      {formatNumber(Number(selectedLog.duration_seconds), {
+                        maximumFractionDigits: 2,
+                        minimumFractionDigits: 2,
+                        style: 'unit',
+                        unit: 'second',
+                        unitDisplay: 'narrow',
+                      })}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-muted mb-1">{t('system.modal_label_executed_at')}</p>
                     <p className="text-sm font-medium">
-                      {new Date(selectedLog.executed_at).toLocaleString()}
+                      {new Date(selectedLog.executed_at).toLocaleString(getFormattingLocale())}
                     </p>
                   </div>
                   <div>

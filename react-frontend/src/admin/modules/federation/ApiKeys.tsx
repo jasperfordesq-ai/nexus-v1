@@ -8,6 +8,7 @@
  * Manage API keys for federation integrations.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';import Key from 'lucide-react/icons/key';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -120,16 +121,16 @@ export function ApiKeys({ onCreateClick, refreshToken }: ApiKeysProps = {}) {
       render: (item) => {
         if (!item.expires_at) return <span className="text-sm text-muted">{t('federation.never_expires')}</span>;
         const isExpired = new Date(item.expires_at) < new Date();
-        return <span className={`text-sm ${isExpired ? 'text-warning' : 'text-muted'}`}>{new Date(item.expires_at).toLocaleDateString()}</span>;
+        return <span className={`text-sm ${isExpired ? 'text-warning' : 'text-muted'}`}>{new Date(item.expires_at).toLocaleDateString(getFormattingLocale())}</span>;
       },
     },
     {
       key: 'last_used_at', label: t('federation.col_last_used'),
-      render: (item) => <span className="text-sm text-muted">{item.last_used_at ? new Date(item.last_used_at).toLocaleDateString() : t('federation.never')}</span>,
+      render: (item) => <span className="text-sm text-muted">{item.last_used_at ? new Date(item.last_used_at).toLocaleDateString(getFormattingLocale()) : t('federation.never')}</span>,
     },
     {
       key: 'created_at', label: t('federation.col_created'), sortable: true,
-      render: (item) => <span className="text-sm text-muted">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
+      render: (item) => <span className="text-sm text-muted">{item.created_at ? new Date(item.created_at).toLocaleDateString(getFormattingLocale()) : '--'}</span>,
     },
     {
       key: 'actions' as keyof ApiKey, label: '',

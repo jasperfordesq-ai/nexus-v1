@@ -138,5 +138,7 @@
       "mutual_matches": "Wederzijdse wedstrijdwaarschuwingen",
       "mutual_matches_desc": "Ontvang een melding wanneer een wedstrijd beide kanten op gaat."
     }
-  }
+  },
+  "reasons_more_one": "+{{count}} meer",
+  "reasons_more_other": "+{{count}} meer"
 }

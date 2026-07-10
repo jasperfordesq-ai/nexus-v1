@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Button, Chip, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -173,9 +174,13 @@ export function EnterpriseDashboard() {
                   <div className="flex items-center gap-2">
                     <Chip size="sm" variant="soft">{entry.action}</Chip>
                     <span className="text-muted">{entry.entity_type}</span>
-                    {entry.user_name && <span className="text-muted">by {entry.user_name}</span>}
+                    {entry.user_name && (
+                      <span className="text-muted">
+                        {t('enterprise.activity_by_user', { name: entry.user_name })}
+                      </span>
+                    )}
                   </div>
-                  <span className="text-muted text-xs">{new Date(entry.created_at).toLocaleString()}</span>
+                  <span className="text-muted text-xs">{new Date(entry.created_at).toLocaleString(getFormattingLocale())}</span>
                 </div>
               ))}
             </div>

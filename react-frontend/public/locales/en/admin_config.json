@@ -781,7 +781,11 @@
     "option_marketplace_listing_duration_days_label": "Listing Duration (Days)",
     "option_marketplace_listing_duration_days_desc": "Number of days before marketplace listings auto-expire",
     "option_identity_verification_fee_cents_label": "Verification Fee (cents)",
-    "option_identity_verification_fee_cents_desc": "One-time fee charged for identity verification. Set to 0 for free verification. Value in cents (e.g. 500 = €5.00)"
+    "option_identity_verification_fee_cents_desc": "One-time fee charged for identity verification. Set to 0 for free verification. Value in cents (e.g. 500 = €5.00)",
+    "option_count_one": "{{count}} options",
+    "option_count_other": "{{count}} options",
+    "planned_count_one": "{{count}} planned",
+    "planned_count_other": "{{count}} planned"
   },
   "tenant_features": {
     "refresh": "Refresh",

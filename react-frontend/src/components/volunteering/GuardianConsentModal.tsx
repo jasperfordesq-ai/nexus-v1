@@ -22,6 +22,7 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  ModalHeading,
   Select,
   SelectItem,
   Spinner,
@@ -133,14 +134,14 @@ export default function GuardianConsentModal({ isOpen, onOpenChange, onClose, op
         {() => (
           <>
             <ModalHeader>
-              <div className="flex items-center gap-2">
+              <ModalHeading className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-[var(--color-primary)]" aria-hidden="true" />
                 {stage === 'pending'
                   ? t('guardian.pending_title')
                   : stage === 'sent'
                     ? t('guardian.request_sent_title')
                     : t('guardian.consent_required_title')}
-              </div>
+              </ModalHeading>
             </ModalHeader>
             <ModalBody>
               {stage === 'loading' && (

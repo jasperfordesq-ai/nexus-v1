@@ -278,7 +278,9 @@
     "linked": "Gekoppeld",
     "connected_accounts": "Verbonden",
     "safeguarding": "Beveiliging",
-    "translation": "Vertaling"
+    "translation": "Vertaling",
+    "linked-accounts": "Gekoppelde accounts",
+    "connected-accounts": "Verbonden accounts"
   },
   "safeguarding": {
     "page_title": "Veiligheidsvoorkeuren",
@@ -588,7 +590,9 @@
     "unblocked_desc": "{{name}} is ontgrendeld.",
     "unblock_error": "Kon gebruiker niet ontgrendelen",
     "blocked_on": "Geblokkeerd op {{date}}",
-    "link": "Geblokkeerde gebruikers"
+    "link": "Geblokkeerde gebruikers",
+    "count_one": "{{count}} geblokkeerd",
+    "count_other": "{{count}} geblokkeerd"
   },
   "block_user": {
     "title": "Blokkeer {{name}}?",
@@ -615,5 +619,11 @@
   "push_campaign_opt_in": "Gesponsorde pushmeldingen ontvangen",
   "push_campaign_opt_in_description": "Sta lokale bedrijven en organisaties toe om gerichte pushmeldingen naar je te sturen. Je kunt je op elk moment afmelden.",
   "tabs_aria": "Instellingensecties",
-  "twofa_loading_setup": "Tweefactorconfiguratie laden..."
+  "twofa_loading_setup": "Tweefactorconfiguratie laden...",
+  "biometric_all_removed_one": "{{count}}-wachtwoord(en) verwijderd.",
+  "biometric_all_removed_other": "{{count}}-wachtwoord(en) verwijderd.",
+  "biometric_enabled_one": "{{count}}-wachtwoord(en) geregistreerd",
+  "biometric_enabled_other": "{{count}}-wachtwoord(en) geregistreerd",
+  "twofa_backup_remaining_one": "{{count}} back-upcodes over",
+  "twofa_backup_remaining_other": "{{count}} back-upcodes over"
 }

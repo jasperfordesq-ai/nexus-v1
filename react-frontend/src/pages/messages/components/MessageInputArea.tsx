@@ -102,7 +102,7 @@ export function MessageInputArea({
   const isComposerBlocked = !!messagingRestriction?.messaging_disabled || isInteractionBlocked;
 
   return (
-    <div className="border-t border-theme-default p-3 sm:p-4" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
+    <div className="border-t border-theme-default p-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] sm:p-4">
       {/* Messaging disabled notice (feature flag) */}
       {!isDirectMessagingEnabled && (
         <div className="flex flex-col items-stretch gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-center sm:flex-row sm:items-center">
@@ -111,7 +111,7 @@ export function MessageInputArea({
           </span>
           <Button
             size="sm"
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             onPress={() => navigate(tenantPath('/exchanges'))}
           >
             {t('exchanges_link')}
@@ -161,7 +161,7 @@ export function MessageInputArea({
             </Button>
             <Button
               size="sm"
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white dark:text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white dark:text-white"
               onPress={onSendVoiceMessage}
               isLoading={isSending}
             >
@@ -314,7 +314,7 @@ export function MessageInputArea({
               type="submit"
               isIconOnly
               aria-label={t('aria_send_message')}
-              className="shrink-0 bg-gradient-to-r from-indigo-500 to-purple-600 text-white dark:text-white"
+              className="shrink-0 bg-gradient-to-r from-accent to-accent-gradient-end text-white dark:text-white"
               isLoading={isSending}
             >
               <Send className="w-4 h-4" />

@@ -550,14 +550,20 @@
           "unique_uris": "URI uniques"
         },
         "labels": {
-          "spoofed_count": "{{count}} usurpé"
+          "spoofed_count": "{{count}} usurpé",
+          "spoofed_count_many": "{{count}} usurpé",
+          "spoofed_count_one": "{{count}} usurpé",
+          "spoofed_count_other": "{{count}} usurpé"
         },
         "log_summary": "Journal : {{size}} - depuis {{time}}",
         "sections": {
           "hits_by_crawler": "Clics par robot",
           "hits_by_status": "Clics par statut HTTP",
           "recent_activity": "Activité récente (la plus récente en premier, la dernière {{count}})",
-          "top_uris": "Top URI (top 50 par nombre de hits)"
+          "top_uris": "Top URI (top 50 par nombre de hits)",
+          "recent_activity_many": "Activité récente (la plus récente en premier, la dernière {{count}})",
+          "recent_activity_one": "Activité récente (la plus récente en premier, la dernière {{count}})",
+          "recent_activity_other": "Activité récente (la plus récente en premier, la dernière {{count}})"
         },
         "tables": {
           "recent_hits_aria": "Hits récents de robots",
@@ -573,7 +579,10 @@
         "actions": {
           "open_in_inventory": "Ouvert en inventaire",
           "refresh": "Rafraîchir",
-          "refresh_all_stale": "Actualiser tous les éléments obsolètes ({{count}})"
+          "refresh_all_stale": "Actualiser tous les éléments obsolètes ({{count}})",
+          "refresh_all_stale_many": "Actualiser tous les éléments obsolètes ({{count}})",
+          "refresh_all_stale_one": "Actualiser tous les éléments obsolètes ({{count}})",
+          "refresh_all_stale_other": "Actualiser tous les éléments obsolètes ({{count}})"
         },
         "columns": {
           "actions": "ACTIONS",
@@ -585,7 +594,10 @@
           "tenant": "TENANT"
         },
         "confirm": {
-          "queue_recache": "Remise en file d'attente pour les locataires {{count}} ?"
+          "queue_recache": "Remise en file d'attente pour les locataires {{count}} ?",
+          "queue_recache_many": "Remise en file d'attente pour les locataires {{count}} ?",
+          "queue_recache_one": "Remise en file d'attente pour les locataires {{count}} ?",
+          "queue_recache_other": "Remise en file d'attente pour les locataires {{count}} ?"
         },
         "empty": "Aucun locataire",
         "errors": {
@@ -596,11 +608,17 @@
         "messages": {
           "bulk_queued": "Remise en file d'attente pour les locataires {{count}}",
           "no_stale": "Pas de locataires périmés - la couverture est saine",
-          "tenant_queued": "#{{id}} mis en file d'attente pour {{slug}}"
+          "tenant_queued": "#{{id}} mis en file d'attente pour {{slug}}",
+          "bulk_queued_many": "Remise en file d'attente pour les locataires {{count}}",
+          "bulk_queued_one": "Remise en file d'attente pour les locataires {{count}}",
+          "bulk_queued_other": "Remise en file d'attente pour les locataires {{count}}"
         },
         "summary": {
           "healthy": "Tous les locataires de {{count}} en bonne santé.",
-          "needs_work": "Les locataires {{needing}} des {{total}} ont des routes manquantes, obsolètes ou dont les actifs sont endommagés."
+          "needs_work": "Les locataires {{needing}} des {{total}} ont des routes manquantes, obsolètes ou dont les actifs sont endommagés.",
+          "healthy_many": "Tous les locataires de {{count}} en bonne santé.",
+          "healthy_one": "Tous les locataires de {{count}} en bonne santé.",
+          "healthy_other": "Tous les locataires de {{count}} en bonne santé."
         },
         "table_aria": "Couverture"
       },
@@ -628,7 +646,13 @@
           "drift_applied": "Détection de dérive appliquée",
           "drift_dry_run": "Essai à sec de dérive terminé",
           "purge_dry_run": "Essai à sec : les instantanés {{count}} seraient purgés",
-          "purged_ungated": "Suppression des instantanés non protégés de {{count}} sur les locataires {{tenants}}"
+          "purged_ungated": "Suppression des instantanés non protégés de {{count}} sur les locataires {{tenants}}",
+          "purged_ungated_many": "Suppression des instantanés non protégés de {{count}} sur les locataires {{tenants}}",
+          "purged_ungated_one": "Suppression des instantanés non protégés de {{count}} sur les locataires {{tenants}}",
+          "purged_ungated_other": "Suppression des instantanés non protégés de {{count}} sur les locataires {{tenants}}",
+          "purge_dry_run_many": "Essai à sec : les instantanés {{count}} seraient purgés",
+          "purge_dry_run_one": "Essai à sec : les instantanés {{count}} seraient purgés",
+          "purge_dry_run_other": "Essai à sec : les instantanés {{count}} seraient purgés"
         },
         "no_output": "(pas de sortie)",
         "purge_ungated": {
@@ -637,7 +661,13 @@
         },
         "result": {
           "deleted": "Instantanés {{count}} supprimés dans les locataires {{tenants}}",
-          "would_delete": "Supprimerait les instantanés {{count}} sur les locataires {{tenants}}"
+          "would_delete": "Supprimerait les instantanés {{count}} sur les locataires {{tenants}}",
+          "would_delete_many": "Supprimerait les instantanés {{count}} sur les locataires {{tenants}}",
+          "would_delete_one": "Supprimerait les instantanés {{count}} sur les locataires {{tenants}}",
+          "would_delete_other": "Supprimerait les instantanés {{count}} sur les locataires {{tenants}}",
+          "deleted_many": "Instantanés {{count}} supprimés dans les locataires {{tenants}}",
+          "deleted_one": "Instantanés {{count}} supprimés dans les locataires {{tenants}}",
+          "deleted_other": "Instantanés {{count}} supprimés dans les locataires {{tenants}}"
         },
         "title": "Automatisation de la fraîcheur"
       },
@@ -666,7 +696,8 @@
           "queue_reset_one": "Réinitialiser la ligne bloquée {{count}} ; disjoncteur dégagé",
           "queue_reset_other": "Réinitialiser les lignes bloquées {{count}} ; disjoncteur dégagé",
           "queue_reset_failed": "Échec de la réinitialisation de la file d'attente",
-          "reset_failed": "Échec de la réinitialisation"
+          "reset_failed": "Échec de la réinitialisation",
+          "queue_reset_many": "Réinitialiser les lignes bloquées {{count}} ; disjoncteur dégagé"
         },
         "checks": {
           "cache_readable": "Le cache peut être lu",
@@ -683,7 +714,8 @@
           "sched_prerender-detect-drift": "Battement de coeur du détecteur de dérive",
           "sched_prerender-auto-recache": "Récupération automatique du rythme cardiaque",
           "sched_prerender-reap-stale": "Battement de coeur de nettoyage de tâches périmées"
-        }
+        },
+        "issue_count_many": "Problèmes {{count}}"
       },
       "inventory": {
         "actions": {
@@ -694,7 +726,10 @@
           "recache_selected": "Remise en cache sélectionnée ({{count}})",
           "reload": "Recharger",
           "select_all_visible": "Sélectionner tout ce qui est visible",
-          "select_snapshot": "Sélectionnez {{path}}"
+          "select_snapshot": "Sélectionnez {{path}}",
+          "recache_selected_many": "Remise en cache sélectionnée ({{count}})",
+          "recache_selected_one": "Remise en cache sélectionnée ({{count}})",
+          "recache_selected_other": "Remise en cache sélectionnée ({{count}})"
         },
         "columns": {
           "actions": "Actes",
@@ -729,7 +764,10 @@
           "tenant_slug": "Limace de locataire"
         },
         "messages": {
-          "bulk_recache": "Instantanés {{count}} invalidés et remise en cache en file d'attente"
+          "bulk_recache": "Instantanés {{count}} invalidés et remise en cache en file d'attente",
+          "bulk_recache_many": "Instantanés {{count}} invalidés et remise en cache en file d'attente",
+          "bulk_recache_one": "Instantanés {{count}} invalidés et remise en cache en file d'attente",
+          "bulk_recache_other": "Instantanés {{count}} invalidés et remise en cache en file d'attente"
         },
         "inspect": {
           "age": "Âge",
@@ -762,7 +800,19 @@
           "seo_score": "Score SEO",
           "size": "Taille",
           "tips": "Conseils ({{count}})",
-          "title": "Titre"
+          "title": "Titre",
+          "must_fix_many": "Doit être corrigé ({{count}})",
+          "must_fix_one": "Doit être corrigé ({{count}})",
+          "must_fix_other": "Doit être corrigé ({{count}})",
+          "tips_many": "Conseils ({{count}})",
+          "tips_one": "Conseils ({{count}})",
+          "tips_other": "Conseils ({{count}})",
+          "asset_references_many": "Références d'actifs ({{count}})",
+          "asset_references_one": "Références d'actifs ({{count}})",
+          "asset_references_other": "Références d'actifs ({{count}})",
+          "dead_assets_many": "{{count}} mort",
+          "dead_assets_one": "{{count}} mort",
+          "dead_assets_other": "{{count}} mort"
         },
         "selected": "{{count}} sélectionné",
         "status": {
@@ -771,7 +821,10 @@
           "content_drifted": "contenu dérivé"
         },
         "summary": "{{filtered}} sur les instantanés {{total}}",
-        "table_aria": "Inventaire instantané"
+        "table_aria": "Inventaire instantané",
+        "selected_many": "{{count}} sélectionné",
+        "selected_one": "{{count}} sélectionné",
+        "selected_other": "{{count}} sélectionné"
       },
       "jobs": {
         "actions": {
@@ -840,7 +893,10 @@
           "tooltip": "priorité = {{priority}} (gains inférieurs)"
         },
         "result": {
-          "invalid": "{{count}} invalide"
+          "invalid": "{{count}} invalide",
+          "invalid_many": "{{count}} invalide",
+          "invalid_one": "{{count}} invalide",
+          "invalid_other": "{{count}} invalide"
         },
         "scope": {
           "all_tenants": "tous les locataires"
@@ -872,7 +928,10 @@
           "success": "Succès",
           "supersede": "Remplacer",
           "unknown": "Événement inconnu : {{event}}"
-        }
+        },
+        "summary_many": "Événements {{count}}",
+        "summary_one": "Événements {{count}}",
+        "summary_other": "Événements {{count}}"
       },
       "failures": {
         "columns": {
@@ -888,7 +947,10 @@
         "errors": {
           "load": "Échec du chargement des échecs"
         },
-        "table_aria": "Échecs"
+        "table_aria": "Échecs",
+        "actions": {
+          "close_breaker_now": "Reprendre la file d'attente maintenant"
+        }
       },
       "live_connected": "Mises à jour en direct connectées",
       "audit": {
@@ -957,7 +1019,13 @@
           "cache_unreachable": "Cache inaccessible",
           "healthy": "En bonne santé",
           "missing": "{{count}} manquant",
-          "stale": "{{count}} périmé"
+          "stale": "{{count}} périmé",
+          "missing_many": "{{count}} manquant",
+          "missing_one": "{{count}} manquant",
+          "missing_other": "{{count}} manquant",
+          "stale_many": "{{count}} périmé",
+          "stale_one": "{{count}} périmé",
+          "stale_other": "{{count}} périmé"
         },
         "hints": {
           "active_jobs": "{{count}} actif",
@@ -969,7 +1037,13 @@
           "event_at": "Événement {{time}}",
           "no_events": "Aucun événement",
           "prometheus": "Format de texte Prométhée",
-          "tenants_routes": "Locataires {{tenants}} x itinéraires {{routes}}"
+          "tenants_routes": "Locataires {{tenants}} x itinéraires {{routes}}",
+          "aging_many": "Vieillissement {{count}} (>7j)",
+          "aging_one": "Vieillissement {{count}} (>7j)",
+          "aging_other": "Vieillissement {{count}} (>7j)",
+          "active_jobs_many": "{{count}} actif",
+          "active_jobs_one": "{{count}} actif",
+          "active_jobs_other": "{{count}} actif"
         },
         "kpi": {
           "age_stale": "Âge périmé (> 14 jours)",
@@ -1025,7 +1099,13 @@
         },
         "messages": {
           "dry_run": "Essai à sec : les instantanés {{count}} seraient purgés",
-          "purged": "Instantanés {{count}} purgés{{job}}"
+          "purged": "Instantanés {{count}} purgés{{job}}",
+          "dry_run_many": "Essai à sec : les instantanés {{count}} seraient purgés",
+          "dry_run_one": "Essai à sec : les instantanés {{count}} seraient purgés",
+          "dry_run_other": "Essai à sec : les instantanés {{count}} seraient purgés",
+          "purged_many": "Instantanés {{count}} purgés{{job}}",
+          "purged_one": "Instantanés {{count}} purgés{{job}}",
+          "purged_other": "Instantanés {{count}} purgés{{job}}"
         },
         "placeholders": {
           "pattern": "/blog/* ou /listings/**",
@@ -1033,13 +1113,22 @@
         },
         "result": {
           "deleted": "Instantanés {{count}} supprimés",
-          "would_delete": "Supprimerait les instantanés {{count}}"
+          "would_delete": "Supprimerait les instantanés {{count}}",
+          "would_delete_many": "Supprimerait les instantanés {{count}}",
+          "would_delete_one": "Supprimerait les instantanés {{count}}",
+          "would_delete_other": "Supprimerait les instantanés {{count}}",
+          "deleted_many": "Instantanés {{count}} supprimés",
+          "deleted_one": "Instantanés {{count}} supprimés",
+          "deleted_other": "Instantanés {{count}} supprimés"
         },
         "title": "Purge du cache générique",
         "preview_gate": {
           "title": "Aperçu requis avant la suppression en direct",
           "required": "Une suppression en direct est verrouillée jusqu'à ce que vous prévisualisiez le même modèle de routage et la même portée de locataire.",
-          "ready": "Aperçu correspondant trouvé. La suppression en direct est limitée aux instantanés {{count}} correspondants affichés par l'aperçu."
+          "ready": "Aperçu correspondant trouvé. La suppression en direct est limitée aux instantanés {{count}} correspondants affichés par l'aperçu.",
+          "ready_many": "Aperçu correspondant trouvé. La suppression en direct est limitée aux instantanés {{count}} correspondants affichés par l'aperçu.",
+          "ready_one": "Aperçu correspondant trouvé. La suppression en direct est limitée aux instantanés {{count}} correspondants affichés par l'aperçu.",
+          "ready_other": "Aperçu correspondant trouvé. La suppression en direct est limitée aux instantanés {{count}} correspondants affichés par l'aperçu."
         }
       },
       "ttl_inspector": {
@@ -1066,7 +1155,16 @@
         "units": {
           "days": "{{count}}d",
           "hours": "{{count}}h",
-          "minutes": "{{count}}min"
+          "minutes": "{{count}}min",
+          "minutes_many": "{{count}}min",
+          "minutes_one": "{{count}}min",
+          "minutes_other": "{{count}}min",
+          "hours_many": "{{count}}h",
+          "hours_one": "{{count}}h",
+          "hours_other": "{{count}}h",
+          "days_many": "{{count}}d",
+          "days_one": "{{count}}d",
+          "days_other": "{{count}}d"
         }
       },
       "sitemap_explorer": {
@@ -1076,7 +1174,16 @@
         "counts": {
           "dynamic": "{{count}} dynamique",
           "static": "{{count}} statique",
-          "total": "{{count}}total"
+          "total": "{{count}}total",
+          "static_many": "{{count}} statique",
+          "static_one": "{{count}} statique",
+          "static_other": "{{count}} statique",
+          "dynamic_many": "{{count}} dynamique",
+          "dynamic_one": "{{count}} dynamique",
+          "dynamic_other": "{{count}} dynamique",
+          "total_many": "{{count}}total",
+          "total_one": "{{count}}total",
+          "total_other": "{{count}}total"
         },
         "description_prefix": "Découvrez exactement les itinéraires que le moteur prévoit de restituer pour un locataire - étage statique (fonctionnalité/module fermé) plus les URL dynamiques de",
         "description_suffix": "L'ouvrier dramaturge visite cette liste.",
@@ -1134,7 +1241,10 @@
         },
         "status": {
           "clean": "Aucun problème trouvé",
-          "needs_attention": "L'élément {{count}} nécessite votre attention"
+          "needs_attention": "L'élément {{count}} nécessite votre attention",
+          "needs_attention_many": "L'élément {{count}} nécessite votre attention",
+          "needs_attention_one": "L'élément {{count}} nécessite votre attention",
+          "needs_attention_other": "L'élément {{count}} nécessite votre attention"
         },
         "counts": {
           "expected": "Expected",
@@ -1567,7 +1677,43 @@
         "do_not_remove_prerender": "Ne supprimez pas la solution de secours avant le rendu.",
         "rollback_path_required": "Chemin de restauration requis"
       }
-    }
+    },
+    "health_meta_description_length_many": "Caractères{{count}}(idéal: 150-160)",
+    "health_meta_description_length_one": "Caractères{{count}}(idéal: 150-160)",
+    "health_meta_description_length_other": "Caractères{{count}}(idéal: 150-160)",
+    "health_auto_sitemap_active_count_many": "Actif — URL{{count}}indexées",
+    "health_auto_sitemap_active_count_one": "Actif — URL{{count}}indexées",
+    "health_auto_sitemap_active_count_other": "Actif — URL{{count}}indexées",
+    "pass_count_many": "{{count}} réussi",
+    "pass_count_one": "{{count}} réussi",
+    "pass_count_other": "{{count}} réussi",
+    "warning_count_many": "{{count}} avertissement",
+    "warning_count_one": "{{count}} avertissement",
+    "warning_count_other": "{{count}} avertissement",
+    "fail_count_many": "Échec de{{count}}",
+    "fail_count_one": "Échec de{{count}}",
+    "fail_count_other": "Échec de{{count}}",
+    "meta_description_count_many": "{{count}}/160 caractères de méta-description",
+    "meta_description_count_one": "{{count}}/160 caractères de méta-description",
+    "meta_description_count_other": "{{count}}/160 caractères de méta-description",
+    "global_meta_description_count_many": "{{count}}/160 caractères de méta-description globale",
+    "global_meta_description_count_one": "{{count}}/160 caractères de méta-description globale",
+    "global_meta_description_count_other": "{{count}}/160 caractères de méta-description globale",
+    "passed_count_with_value_many": "{{count}}réussi",
+    "passed_count_with_value_one": "{{count}}réussi",
+    "passed_count_with_value_other": "{{count}}réussi",
+    "warnings_count_with_value_many": "Avertissements{{count}}",
+    "warnings_count_with_value_one": "Avertissements{{count}}",
+    "warnings_count_with_value_other": "Avertissements{{count}}",
+    "failed_count_with_value_many": "Échec de{{count}}",
+    "failed_count_with_value_one": "Échec de{{count}}",
+    "failed_count_with_value_other": "Échec de{{count}}",
+    "match_count_many": "Matchs{{count}}",
+    "top_matches_for_user_many": "Meilleurs matchs de{{count}}pour{{name}}",
+    "total_count_many": "Total: {{count}}",
+    "total_count_one": "Total : {{count}}",
+    "total_count_other": "Total : {{count}}",
+    "score_out_of": "sur {{maximum}}"
   },
   "email_deliverability": {
     "title": "Délivrabilité des e-mails",
@@ -1606,7 +1752,13 @@
       "trigger_score": "Score de déclenchement",
       "unconfirmed": "{{count}} accepté mais non confirmé",
       "webhook_confirmed": "Confirmé par le webhook du fournisseur",
-      "window_days": "Fenêtre de jour {{days}}"
+      "window_days": "Fenêtre de jour {{days}}",
+      "unconfirmed_many": "{{count}} accepté mais non confirmé",
+      "unconfirmed_one": "{{count}} accepté mais non confirmé",
+      "unconfirmed_other": "{{count}} accepté mais non confirmé",
+      "bad_outcomes_many": "{{count}} a échoué, a été renvoyé ou supprimé",
+      "bad_outcomes_one": "{{count}} a échoué, a été renvoyé ou supprimé",
+      "bad_outcomes_other": "{{count}} a échoué, a été renvoyé ou supprimé"
     },
     "status": {
       "bounced": "Rebondi",
@@ -1968,6 +2120,9 @@
       "fcm": "Mobile envoyées/échouées",
       "web": "Web distribuées",
       "recent_failures": "Échecs récents"
-    }
+    },
+    "trigger_coverage_many": "Problèmes {{issues}} dans les flux surveillés {{count}}",
+    "trigger_coverage_one": "Problèmes {{issues}} dans les flux surveillés {{count}}",
+    "trigger_coverage_other": "Problèmes {{issues}} dans les flux surveillés {{count}}"
   }
 }

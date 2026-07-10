@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -81,7 +82,7 @@ type AdminT = (key: string, options?: Record<string, unknown>) => string;
 function formatTime(iso: string | null, t: AdminT): string {
   if (!iso) return t('municipal_copilot.empty.value');
   try {
-    return new Date(iso).toLocaleString();
+    return new Date(iso).toLocaleString(getFormattingLocale());
   } catch {
     return iso;
   }
@@ -349,7 +350,7 @@ export default function MunicipalCopilotAdminPage() {
                   </Chip>
                 </div>
                 <p className="text-xs text-muted">
-                  {t('municipal_copilot.tone_legend.prefix')} <span className="font-medium">too_formal</span>: {t('municipal_copilot.tone_legend.too_formal')}; <span className="font-medium">too_informal</span>: {t('municipal_copilot.tone_legend.too_informal')}; <span className="font-medium">condescending</span>: {t('municipal_copilot.tone_legend.condescending')}; <span className="font-medium">ok</span>: {t('municipal_copilot.tone_legend.ok')}.
+                  {t('municipal_copilot.tone_legend.prefix')} <span className="font-medium">{t('municipal_copilot.tone.too_formal')}</span>: {t('municipal_copilot.tone_legend.too_formal')}; <span className="font-medium">{t('municipal_copilot.tone.too_informal')}</span>: {t('municipal_copilot.tone_legend.too_informal')}; <span className="font-medium">{t('municipal_copilot.tone.condescending')}</span>: {t('municipal_copilot.tone_legend.condescending')}; <span className="font-medium">{t('municipal_copilot.tone.ok')}</span>: {t('municipal_copilot.tone_legend.ok')}.
                 </p>
 
                 {latest.clarity_warnings.length > 0 && (

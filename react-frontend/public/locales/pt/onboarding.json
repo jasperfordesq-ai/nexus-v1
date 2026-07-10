@@ -132,5 +132,17 @@
   "page_meta": {
     "title": "Integração"
   },
-  "aria_step_progress": "Step {{step}} of {{total}}"
+  "aria_step_progress": "Step {{step}} of {{total}}",
+  "bio_char_count_many": "{{count}} caracteres",
+  "bio_char_count_one": "{{count}} caracteres",
+  "bio_char_count_other": "{{count}} caracteres",
+  "count_selected_many": "{{count}} selecionados",
+  "count_selected_one": "{{count}} selecionados",
+  "count_selected_other": "{{count}} selecionados",
+  "skills_to_offer_count_many": "{{count}} competência(s) a oferecer",
+  "skills_to_offer_count_one": "{{count}} competência(s) a oferecer",
+  "skills_to_offer_count_other": "{{count}} competência(s) a oferecer",
+  "skills_needed_count_many": "{{count}} competência(s) necessária(s)",
+  "skills_needed_count_one": "{{count}} competência(s) necessária(s)",
+  "skills_needed_count_other": "{{count}} competência(s) necessária(s)"
 }

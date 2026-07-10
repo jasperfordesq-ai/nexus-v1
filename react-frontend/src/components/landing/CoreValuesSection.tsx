@@ -7,10 +7,10 @@ import { motion } from '@/lib/motion';
 import { useTranslation } from 'react-i18next';
 import type { CoreValuesContent } from '@/types';
 
-const FALLBACK_GRADIENT = 'from-indigo-500 to-blue-500';
+const FALLBACK_GRADIENT = 'from-accent to-blue-500';
 const defaultGradients = [
   FALLBACK_GRADIENT,
-  'from-purple-500 to-pink-500',
+  'from-accent to-pink-500',
   'from-cyan-500 to-teal-500',
 ];
 
@@ -41,12 +41,12 @@ export function CoreValuesSection({ content }: CoreValuesSectionProps) {
           {
             title: t('home.why_timebanking.values.0.title'),
             description: t('home.why_timebanking.values.0.description'),
-            gradient: 'from-indigo-500 to-blue-500',
+            gradient: 'from-accent to-blue-500',
           },
           {
             title: t('home.why_timebanking.values.1.title'),
             description: t('home.why_timebanking.values.1.description'),
-            gradient: 'from-purple-500 to-pink-500',
+            gradient: 'from-accent to-pink-500',
           },
           {
             title: t('home.why_timebanking.values.2.title'),
@@ -56,7 +56,7 @@ export function CoreValuesSection({ content }: CoreValuesSectionProps) {
         ];
 
   return (
-    <section aria-labelledby="core-values-heading" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
+    <section aria-labelledby="core-values-heading" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-accent/5 to-transparent">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

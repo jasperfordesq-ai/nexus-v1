@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Textarea, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
@@ -209,7 +210,7 @@ export default function FederationWhitelist() {
                   <TableCell className="text-sm text-muted">{entry.domain}</TableCell>
                   <TableCell className="text-sm text-muted">{entry.approved_by_name}</TableCell>
                   <TableCell className="text-sm text-muted">
-                    {new Date(entry.approved_at).toLocaleDateString()}
+                    {new Date(entry.approved_at).toLocaleDateString(getFormattingLocale())}
                   </TableCell>
                   <TableCell className="text-sm text-muted max-w-xs truncate">
                     {entry.notes || '-'}

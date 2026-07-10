@@ -38,6 +38,42 @@ function flattenKeys(obj, prefix = '') {
   return keys;
 }
 
+const PLURAL_CATEGORIES = ['zero', 'one', 'two', 'few', 'many', 'other'];
+
+function describePluralKey(key) {
+  const ordinalMatch = key.match(/^(.*)_ordinal_(zero|one|two|few|many|other)$/u);
+  if (ordinalMatch) {
+    return { base: ordinalMatch[1], category: ordinalMatch[2], ordinal: true };
+  }
+  const cardinalMatch = key.match(/^(.*)_(zero|one|two|few|many|other)$/u);
+  return cardinalMatch
+    ? { base: cardinalMatch[1], category: cardinalMatch[2], ordinal: false }
+    : null;
+}
+
+function pluralCategoriesFor(locale, ordinal) {
+  return new Set(new Intl.PluralRules(locale, { type: ordinal ? 'ordinal' : 'cardinal' })
+    .resolvedOptions().pluralCategories);
+}
+
+function hasPluralFamily(keys, descriptor) {
+  if (keys.has(descriptor.base)) return true;
+  const prefix = descriptor.ordinal ? `${descriptor.base}_ordinal_` : `${descriptor.base}_`;
+  return PLURAL_CATEGORIES.some((category) => keys.has(`${prefix}${category}`));
+}
+
+function isExpectedMissingPluralVariant(key, targetKeys, locale) {
+  const descriptor = describePluralKey(key);
+  if (!descriptor || !hasPluralFamily(targetKeys, descriptor)) return false;
+  return !pluralCategoriesFor(locale, descriptor.ordinal).has(descriptor.category);
+}
+
+function isExpectedLocalePluralVariant(key, englishKeys, locale) {
+  const descriptor = describePluralKey(key);
+  if (!descriptor || !hasPluralFamily(englishKeys, descriptor)) return false;
+  return pluralCategoriesFor(locale, descriptor.ordinal).has(descriptor.category);
+}
+
 // ─── Main ────────────────────────────────────────────────────
 
 if (!existsSync(LOCALES_DIR)) {
@@ -72,6 +108,7 @@ console.log('');
 
 let totalMissing = 0;
 let totalExtra = 0;
+let totalExpectedLocaleVariants = 0;
 let totalMissingFiles = 0;
 let totalFilesChecked = 0;
 
@@ -93,8 +130,13 @@ for (const file of enFiles) {
     const langContent = JSON.parse(readFileSync(langFile, 'utf8'));
     const langKeys = new Set(flattenKeys(langContent));
 
-    const missing = [...enKeys].filter(k => !langKeys.has(k));
-    const extra = [...langKeys].filter(k => !enKeys.has(k));
+    const missing = [...enKeys].filter(k => (
+      !langKeys.has(k) && !isExpectedMissingPluralVariant(k, langKeys, lang)
+    ));
+    const rawExtra = [...langKeys].filter(k => !enKeys.has(k));
+    const expectedLocaleVariants = rawExtra.filter(k => isExpectedLocalePluralVariant(k, enKeys, lang));
+    const extra = rawExtra.filter(k => !isExpectedLocalePluralVariant(k, enKeys, lang));
+    totalExpectedLocaleVariants += expectedLocaleVariants.length;
 
     if (missing.length > 0) {
       totalMissing += missing.length;
@@ -120,6 +162,7 @@ console.log(`  Files checked: ${totalFilesChecked}`);
 console.log(`  Missing files: ${totalMissingFiles}`);
 console.log(`  Missing keys:  ${totalMissing}`);
 console.log(`  Extra keys:    ${totalExtra}`);
+console.log(`  Expected locale-specific plural variants: ${totalExpectedLocaleVariants}`);
 console.log('============================================================');
 
 if (totalMissing > 0 || totalMissingFiles > 0) {

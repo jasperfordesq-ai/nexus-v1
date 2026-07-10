@@ -52,7 +52,7 @@ import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api, API_BASE, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { formatRelativeTime } from '@/lib/helpers';
+import { formatRelativeTime, getFormattingLocale } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 
@@ -109,7 +109,7 @@ const categoryColorMap: Record<string, string> = {
   blue: 'bg-blue-500/10 text-[var(--color-info)]',
   gray: 'bg-gray-500/10 text-gray-500',
   fuchsia: 'bg-fuchsia-500/10 text-fuchsia-500',
-  purple: 'bg-purple-500/10 text-purple-500',
+  purple: 'bg-accent/10 text-accent',
   green: 'bg-emerald-500/10 text-emerald-500',
   red: 'bg-rose-500/10 text-rose-500',
   yellow: 'bg-amber-500/10 text-[var(--color-warning)]',
@@ -129,7 +129,7 @@ function getFileIcon(path: string) {
   if (['pdf'].includes(ext)) return <FileText className="w-5 h-5 text-red-400" aria-hidden="true" />;
   if (['doc', 'docx', 'txt', 'rtf', 'odt'].includes(ext)) return <FileText className="w-5 h-5 text-blue-400" aria-hidden="true" />;
   if (['xls', 'xlsx', 'csv', 'ods'].includes(ext)) return <FileSpreadsheet className="w-5 h-5 text-emerald-400" aria-hidden="true" />;
-  if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) return <FileImage className="w-5 h-5 text-purple-400" aria-hidden="true" />;
+  if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) return <FileImage className="w-5 h-5 text-accent" aria-hidden="true" />;
 
   return <File className="w-5 h-5 text-gray-400" aria-hidden="true" />;
 }
@@ -554,7 +554,7 @@ export function ResourcesPage() {
         description={t('resources.subtitle')}
         accent="amber"
         icon={<FolderOpen className="h-7 w-7" aria-hidden="true" />}
-        stats={resources.length > 0 && !isLoading ? [{ label: t('resources.hero_resources_label'), value: resources.length.toLocaleString() }] : undefined}
+        stats={resources.length > 0 && !isLoading ? [{ label: t('resources.hero_resources_label'), value: resources.length.toLocaleString(getFormattingLocale()) }] : undefined}
         action={
           isAuthenticated ? (
             <Button

@@ -43,6 +43,15 @@ export function UserPermissions() {
 
   const [user, setUser] = useState<AdminUserDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const roleLabels: Record<string, string> = {
+    admin: t('users.role_admin'),
+    broker: t('users.role_broker'),
+    member: t('users.role_member'),
+    moderator: t('users.role_moderator'),
+    newsletter_admin: t('users.role_newsletter_admin'),
+    super_admin: t('users.role_super_admin'),
+    tenant_admin: t('users.role_tenant_admin'),
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -97,16 +106,16 @@ export function UserPermissions() {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm font-medium">{t('users.role_label')}:</span>
                 <Chip color={roleColorFor(user.role)} variant="soft" size="sm">
-                  {user.role}
+                  {roleLabels[user.role] ?? t('users.role_unknown')}
                 </Chip>
                 {user.is_super_admin && (
-                  <Chip variant="soft" size="sm">super_admin</Chip>
+                  <Chip variant="soft" size="sm">{t('users.role_super_admin')}</Chip>
                 )}
                 {user.is_tenant_super_admin && (
-                  <Chip variant="soft" size="sm">tenant_super_admin</Chip>
+                  <Chip variant="soft" size="sm">{t('users.role_tenant_super_admin')}</Chip>
                 )}
                 {user.is_admin && (
-                  <Chip variant="soft" size="sm">admin</Chip>
+                  <Chip variant="soft" size="sm">{t('users.role_admin')}</Chip>
                 )}
               </div>
 

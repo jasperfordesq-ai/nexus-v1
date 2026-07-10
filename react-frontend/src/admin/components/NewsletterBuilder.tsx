@@ -550,9 +550,8 @@ export function NewsletterBuilder({ designJson, initialMjml, readOnly, fill, ena
       className={
         fill
           ? 'nb-root relative flex min-h-0 flex-1 flex-col overflow-hidden bg-surface'
-          : 'nb-root relative flex flex-col overflow-hidden rounded-lg border-2 border-border bg-surface'
+          : 'nb-root relative flex h-[720px] flex-col overflow-hidden rounded-lg border-2 border-border bg-surface'
       }
-      style={fill ? undefined : { height: 720 }}
     >
       <BuilderToolbar
         ready={Boolean(editor)}

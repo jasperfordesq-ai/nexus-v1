@@ -75,11 +75,9 @@ export function GamificationAnalytics() {
         title={t('gamification.gamification_analytics_title')}
         description={t('gamification.gamification_analytics_desc')}
         actions={
-          <Link to={tenantPath("/admin/gamification")}>
-            <Button variant="tertiary" startContent={<ArrowLeft size={16} />}>
-              {t('gamification.back_to_hub')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath("/admin/gamification")} variant="tertiary" startContent={<ArrowLeft size={16} />}>
+            {t('gamification.back_to_hub')}
+          </Button>
         }
       />
 

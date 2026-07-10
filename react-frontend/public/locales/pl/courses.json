@@ -19,7 +19,11 @@
     "lessons_one": "Lekcja {{count}}",
     "lessons_other": "{{count}} lekcje",
     "enrolled_one": "{{count}} zarejestrowany",
-    "enrolled_other": "{{count}} zarejestrowany"
+    "enrolled_other": "{{count}} zarejestrowany",
+    "lessons_few": "{{count}} lekcje",
+    "lessons_many": "{{count}} lekcje",
+    "enrolled_few": "{{count}} zarejestrowany",
+    "enrolled_many": "{{count}} zarejestrowany"
   },
   "detail": {
     "about": "O tym kursie",
@@ -169,7 +173,13 @@
     "rate_n_stars": "Oceń {{count}} na 5 gwiazdek",
     "submit_error": "Nie udało się wysłać recenzji. Spróbuj ponownie.",
     "count_one": "Recenzja {{count}}",
-    "count_other": "Recenzje {{count}}"
+    "count_other": "Recenzje {{count}}",
+    "rate_n_stars_few": "Oceń {{count}} na 5 gwiazdek",
+    "rate_n_stars_many": "Oceń {{count}} na 5 gwiazdek",
+    "rate_n_stars_one": "Oceń {{count}} na 5 gwiazdek",
+    "rate_n_stars_other": "Oceń {{count}} na 5 gwiazdek",
+    "count_few": "Recenzje {{count}}",
+    "count_many": "Recenzje {{count}}"
   },
   "admin": {
     "title": "Kursy",

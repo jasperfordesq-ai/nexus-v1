@@ -245,7 +245,11 @@
         "65_plus": "65+",
         "unknown": "Desconhecido"
       }
-    }
+    },
+    "location_marker_title_many": "{{area}}: membros{{count}}",
+    "location_marker_title_one": "{{area}}: membros{{count}}",
+    "location_marker_title_other": "{{area}}: membros{{count}}",
+    "member_count_many": "Membros{{count}}"
   },
   "search_analytics": {
     "page_title": "Análise de pesquisas",
@@ -270,6 +274,9 @@
     "load_failed": "Falha ao carregar a análise de pesquisas",
     "empty_description": "Nenhuma pesquisa foi registada no período selecionado.",
     "no_trending": "Sem pesquisas em tendência neste período.",
-    "no_zero_results": "Sem pesquisas sem resultados neste período — todas as pesquisas encontraram algo."
+    "no_zero_results": "Sem pesquisas sem resultados neste período — todas as pesquisas encontraram algo.",
+    "count_value_many": "{{count}}×",
+    "count_value_one": "{{count}}×",
+    "count_value_other": "{{count}}×"
   }
 }

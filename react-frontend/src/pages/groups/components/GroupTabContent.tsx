@@ -147,7 +147,7 @@ export function GroupTabContent({
         action={
           isAuthenticated ? (
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               onPress={onJoinLeave}
               isLoading={isJoining}
             >

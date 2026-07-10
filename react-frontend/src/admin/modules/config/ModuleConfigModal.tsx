@@ -1,4 +1,4 @@
-import { Card, CardBody, Input, Button, Chip, Spinner, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
+import { Card, CardBody, Input, Button, Chip, Spinner, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -454,9 +454,9 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
   return (
     <Modal size="4xl" isOpen={isOpen} onClose={onClose} scrollBehavior="inside">
       <ModalContent>
-        <ModalHeader className="flex items-center gap-3">
+        <ModalHeader className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3">
           <div
-            className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+            className={`row-span-2 flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
               module.type === 'core'
                 ? 'bg-accent-soft text-accent'
                 : 'bg-accent/10 text-accent'
@@ -464,21 +464,19 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
           >
             <Icon size={20} aria-hidden="true" />
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span>{moduleName}</span>
-              {module.stage ? (
-                <Chip size="sm" variant="soft" color={module.stage === 'alpha' ? 'warning' : 'secondary'} startContent={<Construction size={12} aria-hidden="true" />}>
-                  {t(`config.stage_${module.stage}`)}
-                </Chip>
-              ) : !isEditable && (
-                <Chip size="sm" variant="soft" color="warning" startContent={<Construction size={12} aria-hidden="true" />}>
-                  {t('config.beta')}
-                </Chip>
-              )}
-            </div>
-            <p className="text-sm font-normal text-muted">{moduleDesc}</p>
-          </div>
+          <ModalHeading className="flex min-w-0 items-center gap-2">
+            <span>{moduleName}</span>
+            {module.stage ? (
+              <Chip size="sm" variant="soft" color={module.stage === 'alpha' ? 'warning' : 'secondary'} startContent={<Construction size={12} aria-hidden="true" />}>
+                {t(`config.stage_${module.stage}`)}
+              </Chip>
+            ) : !isEditable && (
+              <Chip size="sm" variant="soft" color="warning" startContent={<Construction size={12} aria-hidden="true" />}>
+                {t('config.beta')}
+              </Chip>
+            )}
+          </ModalHeading>
+          <p className="text-sm font-normal text-muted">{moduleDesc}</p>
         </ModalHeader>
 
         <ModalBody>

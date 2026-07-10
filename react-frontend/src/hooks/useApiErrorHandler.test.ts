@@ -14,7 +14,7 @@ import { API_ERROR_EVENT } from '@/lib/api';
 
 // Mock ToastContext
 const mockError = vi.fn();
-vi.mock('@/contexts', () => ({
+vi.mock('@/contexts/ToastContext', () => ({
   useToast: () => ({
     error: mockError,
     success: vi.fn(),
@@ -137,6 +137,20 @@ describe('useApiErrorHandler', () => {
       window.dispatchEvent(
         new CustomEvent(API_ERROR_EVENT, {
           detail: { message: 'Session expired', code: 'SESSION_EXPIRED' },
+        })
+      );
+    });
+
+    expect(mockError).not.toHaveBeenCalled();
+  });
+
+  it.each(['CANCELLED', 'UPLOAD_ABORTED'])('does NOT show toast for intentional %s control flow', (code) => {
+    renderHook(() => useApiErrorHandler());
+
+    act(() => {
+      window.dispatchEvent(
+        new CustomEvent(API_ERROR_EVENT, {
+          detail: { message: 'Cancelled', code },
         })
       );
     });

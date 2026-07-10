@@ -524,7 +524,35 @@
     "select_all_rows": "Select all rows",
     "no_data": "Sem dados",
     "no_data_available": "Não há dados disponíveis",
-    "select_row": "Select row {{id}}"
+    "select_row": "Select row {{id}}",
+    "total_count_many": "{{count}}total",
+    "total_count_one": "{{count}}total",
+    "total_count_other": "{{count}}total",
+    "statuses": {
+      "active": "Ativo",
+      "approved": "Aprovado",
+      "banned": "Bloqueado",
+      "bulk_tenants_updated": "Inquilinos atualizados",
+      "bulk_users_moved": "Utilizadores movidos",
+      "completed": "Concluído",
+      "draft": "Rascunho",
+      "failed": "Falhou",
+      "federation_lockdown": "Bloqueio da federação",
+      "federation_updated": "Federação atualizada",
+      "idle": "Inativo",
+      "inactive": "Desativado",
+      "pending": "Pendente",
+      "published": "Publicado",
+      "rejected": "Rejeitado",
+      "scheduled": "Agendado",
+      "sent": "Enviado",
+      "suspended": "Suspenso",
+      "tenant_created": "Inquilino criado",
+      "tenant_updated": "Inquilino atualizado",
+      "user_created": "Utilizador criado",
+      "user_moved": "Utilizador movido",
+      "unknown": "Desconhecido"
+    }
   },
   "help_drawer": {
     "aria_label": "Ajuda: {{title}}",
@@ -541,7 +569,13 @@
     "confirm_message": "Tem certeza de que deseja itens {{action}} {{count}}?",
     "destructive_warning": "Esta ação não pode ser desfeita.",
     "reason_label": "Razão",
-    "reason_placeholder": "Forneça um motivo para esta ação"
+    "reason_placeholder": "Forneça um motivo para esta ação",
+    "selected_count_many": "{{count}} selecionado",
+    "selected_count_one": "{{count}} selecionado",
+    "selected_count_other": "{{count}} selecionado",
+    "confirm_message_many": "Tem certeza de que deseja itens {{action}} {{count}}?",
+    "confirm_message_one": "Tem certeza de que deseja itens {{action}} {{count}}?",
+    "confirm_message_other": "Tem certeza de que deseja itens {{action}} {{count}}?"
   },
   "common": {
     "cancel": "Cancelar"
@@ -586,5 +620,8 @@
       "group_exchanges": "Trocas de grupo",
       "search": "Pesquisar"
     }
-  }
+  },
+  "support_requests_count_many": "{{count}} pedidos de suporte abertos",
+  "support_requests_count_one": "{{count}} pedidos de suporte abertos",
+  "support_requests_count_other": "{{count}} pedidos de suporte abertos"
 }

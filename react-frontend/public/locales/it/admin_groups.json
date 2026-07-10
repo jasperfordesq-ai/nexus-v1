@@ -360,7 +360,10 @@
     "geocode_description": "Geocodifica le posizioni dei gruppi per consentire la visualizzazione della mappa e il rilevamento basato sulla distanza.",
     "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet.",
     "detail_tabs_aria": "Sezioni dei dettagli del gruppo",
-    "status_tabs_aria": "Filtro stato gruppo"
+    "status_tabs_aria": "Filtro stato gruppo",
+    "selected_count_many": "{{count}}selezionato",
+    "selected_count_one": "{{count}}selezionato",
+    "selected_count_other": "{{count}}selezionato"
   },
   "group_organization": {
     "page_title": "Organizzazione dei gruppi",

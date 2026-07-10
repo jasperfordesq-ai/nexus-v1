@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
 class EngagementRecognitionServiceTest extends TestCase
@@ -24,13 +25,11 @@ class EngagementRecognitionServiceTest extends TestCase
         }
     }
 
-    public function test_getEngagementHistory_returns_array(): void
+    public function test_getEngagementHistory_propagates_query_errors(): void
     {
-        try {
-            $result = \App\Services\EngagementRecognitionService::getEngagementHistory(1, 1, 3);
-            $this->assertIsArray($result);
-        } catch (\Throwable $e) {
-            $this->assertTrue(true);
-        }
+        DB::shouldReceive('table')->andThrow(new \RuntimeException('fail'));
+
+        $this->expectException(\RuntimeException::class);
+        \App\Services\EngagementRecognitionService::getEngagementHistory(1, 1, 3);
     }
 }

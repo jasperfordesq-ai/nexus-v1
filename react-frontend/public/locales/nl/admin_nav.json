@@ -524,7 +524,34 @@
     "select_all_rows": "Select all rows",
     "no_data": "Geen gegevens",
     "no_data_available": "Geen gegevens beschikbaar",
-    "select_row": "Select row {{id}}"
+    "select_row": "Select row {{id}}",
+    "total_count_one": "{{count}}totaal",
+    "total_count_other": "{{count}}totaal",
+    "statuses": {
+      "active": "Actief",
+      "approved": "Goedgekeurd",
+      "banned": "Geblokkeerd",
+      "bulk_tenants_updated": "Tenants bijgewerkt",
+      "bulk_users_moved": "Gebruikers verplaatst",
+      "completed": "Voltooid",
+      "draft": "Concept",
+      "failed": "Mislukt",
+      "federation_lockdown": "Federatievergrendeling",
+      "federation_updated": "Federatie bijgewerkt",
+      "idle": "Inactief",
+      "inactive": "Uitgeschakeld",
+      "pending": "In behandeling",
+      "published": "Gepubliceerd",
+      "rejected": "Afgewezen",
+      "scheduled": "Ingepland",
+      "sent": "Verzonden",
+      "suspended": "Geschorst",
+      "tenant_created": "Tenant aangemaakt",
+      "tenant_updated": "Tenant bijgewerkt",
+      "user_created": "Gebruiker aangemaakt",
+      "user_moved": "Gebruiker verplaatst",
+      "unknown": "Onbekend"
+    }
   },
   "help_drawer": {
     "aria_label": "Hulp: {{title}}",
@@ -541,7 +568,11 @@
     "confirm_message": "Weet u zeker dat u {{action}} {{count}}-items wilt hebben?",
     "destructive_warning": "Deze actie kan niet ongedaan worden gemaakt.",
     "reason_label": "Reden",
-    "reason_placeholder": "Geef een reden voor deze actie"
+    "reason_placeholder": "Geef een reden voor deze actie",
+    "selected_count_one": "{{count}} geselecteerd",
+    "selected_count_other": "{{count}} geselecteerd",
+    "confirm_message_one": "Weet u zeker dat u {{action}} {{count}}-items wilt hebben?",
+    "confirm_message_other": "Weet u zeker dat u {{action}} {{count}}-items wilt hebben?"
   },
   "common": {
     "cancel": "Annuleer"
@@ -586,5 +617,7 @@
       "group_exchanges": "Groepsuitwisselingen",
       "search": "Zoeken"
     }
-  }
+  },
+  "support_requests_count_one": "{{count}} openstaande ondersteuningsverzoeken",
+  "support_requests_count_other": "{{count}} openstaande ondersteuningsverzoeken"
 }

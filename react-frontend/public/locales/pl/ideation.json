@@ -44,7 +44,14 @@
     "no_deadline": "Brak terminu",
     "evaluation_criteria": "Kryteria Oceny",
     "outcome": "Wynik",
-    "team_links": "Zespoły Projektowe"
+    "team_links": "Zespoły Projektowe",
+    "ideas_count_few": "{{count}} pomysłów",
+    "ideas_count_many": "{{count}} pomysłów",
+    "ideas_count_other": "{{count}} pomysłów",
+    "max_ideas_few": "Maksymalnie {{count}} pomysłów na osobę",
+    "max_ideas_many": "Maksymalnie {{count}} pomysłów na osobę",
+    "max_ideas_one": "Maksymalnie {{count}} pomysłów na osobę",
+    "max_ideas_other": "Maksymalnie {{count}} pomysłów na osobę"
   },
   "challenges": {
     "title": "Wyzwania",
@@ -87,7 +94,14 @@
     "draft_created": "Utworzono {{date}}",
     "new_idea": "Nowy Pomysł",
     "sort_label": "Sortuj pomysły",
-    "loading": "Ładowanie pomysłów..."
+    "loading": "Ładowanie pomysłów...",
+    "your_ideas_few": "Twoje pomysły: {{count}}/{{max}}",
+    "your_ideas_many": "Twoje pomysły: {{count}}/{{max}}",
+    "your_ideas_one": "Twoje pomysły: {{count}}/{{max}}",
+    "your_ideas_other": "Twoje pomysły: {{count}}/{{max}}",
+    "comments_few": "{{count}} komentarzy",
+    "comments_many": "{{count}} komentarzy",
+    "comments_other": "{{count}} komentarzy"
   },
   "idea_detail": {
     "page_title": "Szczegóły Pomysłu",
@@ -321,7 +335,10 @@
     "fallback_title": "Kampania",
     "feature_not_available": "Funkcja tworzenia pomysłów niedostępna",
     "feature_not_available_desc": "Funkcja tworzenia pomysłów nie jest włączona dla tej społeczności. Skontaktuj się z administratorem banku czasu, aby dowiedzieć się więcej.",
-    "retry": "Ponów próbę"
+    "retry": "Ponów próbę",
+    "challenges_count_few": "{{count}} wyzwań",
+    "challenges_count_many": "{{count}} wyzwań",
+    "challenges_count_other": "{{count}} wyzwań"
   },
   "templates": {
     "title": "Szablony wyzwań",

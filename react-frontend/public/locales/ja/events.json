@@ -139,7 +139,14 @@
     "delete_series_note": "これは定期イベントです。削除すると、今後のすべての開催回も削除されます。",
     "cancel_series_note": "これは定期イベントです。中止すると、今後のすべての開催回も中止され、参加者に通知されます。",
     "series_dates_title": "このシリーズの今後の日程",
-    "series_this_date": "この日付"
+    "series_this_date": "この日付",
+    "events_in_series_other": "{{count}} の一連のイベント",
+    "max_capacity_other": "{{count}} 最大容量",
+    "spots_left_other": "{{count}} 枠が残っています",
+    "waitlist_count_other": "{{count}} は順番待ちリストにあります",
+    "more_attendees_other": "+{{count}} 詳細",
+    "attendance_total_other": "{{count}} 件の返信",
+    "view_all_series_other": "すべての {{count}} イベントをシリーズで表示する"
   },
   "card": {
     "cancelled": "キャンセル",
@@ -152,7 +159,8 @@
     "repeats_yearly": "毎年繰り返す",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
-    "series_dates_other": "{{count}} dates"
+    "series_dates_other": "{{count}} dates",
+    "spots_left_other": "{{count}} 枠が残っています"
   },
   "form": {
     "create_title": "新しいイベントの作成",
@@ -300,7 +308,8 @@
     "total_votes": "{{count}} 票",
     "vote_success": "投票が記録されました！",
     "vote_failed": "投票を記録できませんでした",
-    "view_full": "アンケート全文を見る"
+    "view_full": "アンケート全文を見る",
+    "total_votes_other": "{{count}} 票"
   },
   "radius_5": "5km",
   "radius_10": "10km",
@@ -318,5 +327,7 @@
   "active_filters": "アクティブフィルター",
   "active_search": "検索: {{query}}",
   "active_near_me": "{{radius}} キロ以内",
-  "clear_filters": "フィルターをクリアする"
+  "clear_filters": "フィルターをクリアする",
+  "going_other": "{{count}} は進行中です",
+  "interested_other": "{{count}} 興味があります"
 }

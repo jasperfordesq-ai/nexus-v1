@@ -39,7 +39,9 @@
     "unsubscribed": "Mostra non seguito.",
     "subscribe_failed": "Impossibile aggiornare la preferenza Segui.",
     "episodes": "Episodes",
-    "no_episodes": "Nessun episodio ancora pubblicato."
+    "no_episodes": "Nessun episodio ancora pubblicato.",
+    "episode_count_many": "{{count}} episodes",
+    "follower_count_many": "{{count}} follower"
   },
   "episode": {
     "title": "Episodio podcast",
@@ -74,7 +76,8 @@
       "full": "Episodio completo",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "reactions_count_many": "{{count}} reactions"
   },
   "player": {
     "unsupported": "Il tuo browser non supporta il lettore audio.",
@@ -178,7 +181,10 @@
         "episode_missing_audio_url": "A un episodio manca un URL audio HTTP valido.",
         "episode_missing_audio_length": "A un episodio manca la dimensione del file audio.",
         "episode_missing_audio_mime": "A un episodio manca il tipo MIME audio."
-      }
+      },
+      "skipped_episodes_many": "{{count}} episodio/i resterebbero fuori dal feed finché il loro audio non viene corretto.",
+      "skipped_episodes_one": "{{count}} episodio/i resterebbero fuori dal feed finché il loro audio non viene corretto.",
+      "skipped_episodes_other": "{{count}} episodio/i resterebbero fuori dal feed finché il loro audio non viene corretto."
     },
     "stats": {
       "title": "Statistiche degli ascoltatori",
@@ -188,8 +194,12 @@
       "subscribers": "Iscritti",
       "top_episodes": "Episodi più ascoltati",
       "listen_count": "{{count}} ascolti",
-      "last_days": "L'attività di ascolto copre gli ultimi {{days}} giorni."
-    }
+      "last_days": "L'attività di ascolto copre gli ultimi {{days}} giorni.",
+      "listen_count_many": "{{count}} ascolti",
+      "listen_count_one": "{{count}} ascolti",
+      "listen_count_other": "{{count}} ascolti"
+    },
+    "chapter_format_warning_many": "Le righe dei capitoli {{count}} non hanno timestamp e inizieranno alle 0:00."
   },
   "fields": {
     "show": "Show",

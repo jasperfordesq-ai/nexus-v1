@@ -13,6 +13,7 @@
  * pending-members approval queue.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -127,7 +128,7 @@ function formatMonthLabel(value: string): string {
   const year = Number(match[1]);
   const monthIndex = Number(match[2]) - 1;
   if (monthIndex < 0 || monthIndex > 11) return value;
-  return new Date(year, monthIndex, 1).toLocaleDateString(undefined, {
+  return new Date(year, monthIndex, 1).toLocaleDateString(getFormattingLocale(), {
     month: 'short',
     year: 'numeric',
   });
@@ -516,7 +517,7 @@ export default function OnboardingPage() {
                         <div className="min-w-0 sm:w-44 sm:shrink-0">
                           <p className="truncate text-sm font-medium text-foreground">{label}</p>
                           <p className="text-xs tabular-nums text-muted">
-                            {stage.count.toLocaleString()}
+                            {stage.count.toLocaleString(getFormattingLocale())}
                           </p>
                         </div>
                         <div className="min-w-0 flex-1">
@@ -623,7 +624,7 @@ export default function OnboardingPage() {
                     labelFormatter={(value) => formatMonthLabel(String(value))}
                     formatter={(value) =>
                       [
-                        Number(value ?? 0).toLocaleString(),
+                        Number(value ?? 0).toLocaleString(getFormattingLocale()),
                         t('onboarding.trend_registrations'),
                       ] as [string, string]
                     }
@@ -657,7 +658,7 @@ export default function OnboardingPage() {
         </h2>
         {!membersLoading && total > 0 && (
           <Chip size="sm" variant="soft" color="warning" className="tabular-nums">
-            {total.toLocaleString()}
+            {total.toLocaleString(getFormattingLocale())}
           </Chip>
         )}
       </div>

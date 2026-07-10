@@ -159,5 +159,11 @@
   "optional": "optioneel",
   "description_placeholder": "Waar is deze overdracht voor?",
   "new_balance_after": "Uw nieuwe saldo is {{balance}} uren",
-  "transfer_summary": "U staat op het punt {{amount}} {{unit}} te sturen naar {{name}}"
+  "transfer_summary": "U staat op het punt {{amount}} {{unit}} te sturen naar {{name}}",
+  "pending_in_one": "+{{count}}h in afwachting",
+  "pending_in_other": "+{{count}}h in afwachting",
+  "signed_hours_value_one": "{{sign}}{{count}}u",
+  "signed_hours_value_other": "{{sign}}{{count}}u",
+  "hours_value_one": "{{count}}u",
+  "hours_value_other": "{{count}}u"
 }

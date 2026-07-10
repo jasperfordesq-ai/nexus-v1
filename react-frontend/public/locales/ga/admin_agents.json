@@ -130,7 +130,12 @@
         "run_failed_with_error": "Theip ar rith: {{error}}",
         "toggle_failed": "Theip ar an ngníomhaire a scoránaigh",
         "updated": "Nuashonraíodh an gníomhaire",
-        "update_failed": "Theip ar an ngníomhaire a nuashonrú"
+        "update_failed": "Theip ar an ngníomhaire a nuashonrú",
+        "run_created_few": "Rith #{{runId}} togra(í) cruthaithe {{count}}",
+        "run_created_many": "Rith #{{runId}} togra(í) cruthaithe {{count}}",
+        "run_created_one": "Rith #{{runId}} togra(í) cruthaithe {{count}}",
+        "run_created_other": "Rith #{{runId}} togra(í) cruthaithe {{count}}",
+        "run_created_two": "Rith #{{runId}} togra(í) cruthaithe {{count}}"
       }
     },
     "runs": {

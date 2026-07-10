@@ -203,6 +203,9 @@
     "your_plan_usage": "Utilisation de votre forfait",
     "over_limit_warning": "Vous avez atteint les limites de votre forfait. Mettez à niveau pour continuer.",
     "upgrade_modal_desc": "Mettez à niveau votre forfait pour débloquer des fonctionnalités et des capacités supplémentaires.",
-    "upgrade_mailto_subject": "Demande de changement de forfait"
+    "upgrade_mailto_subject": "Demande de changement de forfait",
+    "user_count_label_many": "{{count}} / {{max}} utilisateurs",
+    "user_count_label_one": "{{count}} / {{max}} utilisateurs",
+    "user_count_label_other": "{{count}} / {{max}} utilisateurs"
   }
 }

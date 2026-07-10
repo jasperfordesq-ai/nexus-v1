@@ -13,8 +13,11 @@
  * the onSend callback, and the close button triggers onClose.
  */
 
+import { useState } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@/test/test-utils';
+import userEvent from '@testing-library/user-event';
+
+import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
 import { createMockContexts } from '@/test/mock-contexts';
 import { AiChatDrawer } from './AiChatDrawer';
 
@@ -56,6 +59,36 @@ const DEFAULT_PROPS = {
   onSend: vi.fn(),
 };
 
+function isHiddenByModal(element: HTMLElement): boolean {
+  let current: HTMLElement | null = element;
+
+  while (current && current !== document.body) {
+    if (current.inert || current.getAttribute('aria-hidden') === 'true') {
+      return true;
+    }
+    current = current.parentElement;
+  }
+
+  return false;
+}
+
+function ControlledAiChatDrawer() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div>
+      <button type="button" data-testid="background-action">Background action</button>
+      <AiChatDrawer
+        {...DEFAULT_PROPS}
+        isOpen={isOpen}
+        inputValue="A question"
+        onOpen={() => setIsOpen(true)}
+        onClose={() => setIsOpen(false)}
+      />
+    </div>
+  );
+}
+
 describe('AiChatDrawer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -84,7 +117,13 @@ describe('AiChatDrawer', () => {
 
   it('renders the dialog panel when isOpen is true', () => {
     render(<AiChatDrawer {...DEFAULT_PROPS} isOpen={true} />);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    const dialog = screen.getByRole('dialog', { name: 'Ask AI about this job' });
+
+    expect(dialog).toHaveAttribute('data-slot', 'drawer-dialog');
+    expect(dialog.querySelector('[data-slot="drawer-heading"]')).toHaveTextContent(
+      'Ask AI about this job',
+    );
+    expect(dialog.closest('[data-slot="drawer-content"]')).not.toBeNull();
   });
 
   it('shows empty-state hint when message list is empty and drawer is open', () => {
@@ -262,11 +301,47 @@ describe('AiChatDrawer', () => {
     expect(onInputChange).toHaveBeenCalled();
   });
 
-  /**
-   * SKIPPED: Testing that the drawer closes on Escape keydown is not reliably
-   * testable because document.addEventListener is used directly (not a React
-   * synthetic handler), and jsdom's fireEvent.keyDown on document dispatches
-   * a non-trusted event that does not bubble through the registered listener in
-   * the same tick in all environments.
-   */
+  it('uses the modal contract for focus containment, background inerting, scroll lock, Escape, and restoration', async () => {
+    const user = userEvent.setup();
+    render(<ControlledAiChatDrawer />);
+
+    const trigger = screen.getByRole('button', { name: 'Ask AI about this job' });
+    const backgroundAction = screen.getByTestId('background-action');
+    trigger.focus();
+    await user.click(trigger);
+
+    const dialog = await screen.findByRole('dialog', { name: 'Ask AI about this job' });
+    const input = screen.getByRole('textbox', { name: 'Type your question...' });
+
+    await waitFor(() => expect(input).toHaveFocus());
+    expect(isHiddenByModal(backgroundAction)).toBe(true);
+    expect(document.documentElement.style.overflow).toBe('hidden');
+
+    await user.tab();
+    expect(dialog).toContainElement(document.activeElement as HTMLElement);
+    await user.tab();
+    expect(dialog).toContainElement(document.activeElement as HTMLElement);
+    await user.tab();
+    expect(dialog).toContainElement(document.activeElement as HTMLElement);
+    expect(backgroundAction).not.toHaveFocus();
+
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(trigger).toHaveFocus());
+    expect(document.documentElement.style.overflow).not.toBe('hidden');
+    expect(isHiddenByModal(backgroundAction)).toBe(false);
+  });
+
+  it('dismisses through the official backdrop contract', async () => {
+    const user = userEvent.setup();
+    render(<ControlledAiChatDrawer />);
+
+    await user.click(screen.getByRole('button', { name: 'Ask AI about this job' }));
+    const backdrop = document.querySelector<HTMLElement>('[data-slot="drawer-backdrop"]');
+
+    expect(backdrop).not.toBeNull();
+    await user.click(backdrop!);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
 });

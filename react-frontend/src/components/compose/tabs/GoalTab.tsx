@@ -120,7 +120,7 @@ export function GoalTab({ onSuccess, onClose, templateData }: TabSubmitProps) {
       isSubmitting,
       onSubmit: () => submitRef.current(),
       buttonLabel: t('compose.create_goal'),
-      gradientClass: 'from-purple-500 to-pink-600',
+      gradientClass: 'from-accent to-pink-600',
     });
     return unregister;
   }, [canSubmit, isSubmitting, register, unregister, t]);
@@ -200,7 +200,7 @@ export function GoalTab({ onSuccess, onClose, templateData }: TabSubmitProps) {
             </Button>
             <Button
               size="sm"
-              className="bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg shadow-purple-500/20"
+              className="bg-gradient-to-r from-accent to-pink-600 text-white shadow-lg shadow-accent/20"
               onPress={handleSubmit}
               isLoading={isSubmitting}
               isDisabled={!canSubmit}

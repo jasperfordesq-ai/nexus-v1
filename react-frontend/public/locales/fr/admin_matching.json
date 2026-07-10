@@ -306,6 +306,21 @@
     "pillar_trust": "Trust",
     "pillar_aria": "{{label}}: {{percent}}%",
     "of_active_users": "de {{total}} utilisateurs actifs",
-    "of_active_listings": "sur {{total}} annonces actives"
+    "of_active_listings": "sur {{total}} annonces actives",
+    "cache_cleared_count_many": "Entrée du cache{{count}}effacée",
+    "cache_cleared_count_one": "Entrée du cache{{count}}effacée",
+    "cache_cleared_count_other": "Entrée du cache{{count}}effacée",
+    "clear_cache_confirm_with_count_many": "Êtes-vous sûr de vouloir effacer les correspondances mises en cache par{{count}}?",
+    "clear_cache_confirm_with_count_one": "Êtes-vous sûr de vouloir effacer les correspondances mises en cache par{{count}}?",
+    "clear_cache_confirm_with_count_other": "Êtes-vous sûr de vouloir effacer les correspondances mises en cache par{{count}}?",
+    "distribution_aria_many": "{{label}}:{{count}}correspond ({{percent}}%)",
+    "distribution_aria_one": "{{label}}:{{count}}correspond ({{percent}}%)",
+    "distribution_aria_other": "{{label}}:{{count}}correspond ({{percent}}%)",
+    "feedback_reason_aria_many": "{{label}}: {{count}} ({{percent}}%)",
+    "feedback_reason_aria_one": "{{label}} : {{count}} ({{percent}}%)",
+    "feedback_reason_aria_other": "{{label}} : {{count}} ({{percent}}%)",
+    "pillar_averages_sample_size_many": "Basé sur les correspondances {{count}}",
+    "pillar_averages_sample_size_one": "Basé sur les correspondances {{count}}",
+    "pillar_averages_sample_size_other": "Basé sur les correspondances {{count}}"
   }
 }

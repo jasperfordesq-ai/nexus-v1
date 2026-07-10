@@ -92,7 +92,11 @@
     "get_directions": "Wegbeschreibung",
     "promoted": "Beworben",
     "unsave": "Aus gespeicherten Artikeln entfernen",
-    "save": "Inserat speichern"
+    "save": "Inserat speichern",
+    "available_count_one": "{{count}} verfügbar",
+    "available_count_other": "{{count}} verfügbar",
+    "views_count_one": "{{count}} Aufrufe",
+    "views_count_other": "{{count}} Aufrufe"
   },
   "offer": {
     "modal_title": "Angebot machen",
@@ -184,7 +188,9 @@
     "created_success": "Inserat erfolgreich erstellt!",
     "created_error": "Inserat konnte nicht erstellt werden",
     "created_error_retry": "Inserat konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
-    "draft_saved": "Entwurf gespeichert"
+    "draft_saved": "Entwurf gespeichert",
+    "title_char_count_one": "{{count}}/120 Zeichen",
+    "title_char_count_other": "{{count}}/120 Zeichen"
   },
   "search": {
     "category_search": "Kategorien suchen...",
@@ -228,7 +234,9 @@
     "price_from": "Ab {{min}}",
     "price_up_to": "Bis zu {{max}}",
     "last_days_one": "Letzter {{count}} Tag",
-    "last_days_other": "Letzte {{count}} Tage"
+    "last_days_other": "Letzte {{count}} Tage",
+    "reset_filters_one": "Filter zurücksetzen ({{count}})",
+    "reset_filters_other": "Filter zurücksetzen ({{count}})"
   },
   "seller": {
     "page_title": "Verkäuferprofil",
@@ -285,7 +293,9 @@
     "results_count_one": "{{count}} Ergebnis",
     "results_count_other": "{{count}} Ergebnisse",
     "load_more": "Mehr laden",
-    "browse_description": "Inserate in {{name}} auf dem Marktplatz durchsuchen."
+    "browse_description": "Inserate in {{name}} auf dem Marktplatz durchsuchen.",
+    "reset_filters_one": "Filter zurücksetzen ({{count}})",
+    "reset_filters_other": "Filter zurücksetzen ({{count}})"
   },
   "common": {
     "loading": "Wird geladen...",
@@ -426,7 +436,9 @@
     "empty_sold_title": "Noch keine Verkäufe",
     "empty_sold_description": "Sie haben noch keine Artikel verkauft.",
     "empty_expired_title": "Keine abgelaufenen Inserate",
-    "empty_expired_description": "Sie haben keine abgelaufenen Inserate."
+    "empty_expired_description": "Sie haben keine abgelaufenen Inserate.",
+    "views_count_aria_one": "{{count}} Aufrufe",
+    "views_count_aria_other": "{{count}} Aufrufe"
   },
   "my_offers": {
     "page_title": "Meine Angebote – Marktplatz",
@@ -584,7 +596,13 @@
       "declined": "Abgelehnt",
       "completed": "Abgeschlossen",
       "cancelled": "Storniert"
-    }
+    },
+    "offers_title_count_one": "Lieferangebote ({{count}})",
+    "offers_title_count_other": "Lieferangebote ({{count}})",
+    "time_credits_value_one": "{{count}} ZK",
+    "time_credits_value_other": "{{count}} ZK",
+    "estimated_minutes_one": "~{{count}} Min.",
+    "estimated_minutes_other": "~{{count}} Min."
   },
   "pickup": {
     "my_pickups_title": "Meine Abholungen",
@@ -613,7 +631,11 @@
     "oversold_protected": "Bestellungen ablehnen, die den Bestand überschreiten",
     "sold_out": "Ausverkauft",
     "low_chip": "Bestand: {{count}} (niedrig)",
-    "count_chip": "Bestand: {{count}}"
+    "count_chip": "Bestand: {{count}}",
+    "low_chip_one": "Bestand: {{count}} (niedrig)",
+    "low_chip_other": "Bestand: {{count}} (niedrig)",
+    "count_chip_one": "Bestand: {{count}}",
+    "count_chip_other": "Bestand: {{count}}"
   },
   "ai_reply": {
     "suggest": "Antwort vorschlagen",
@@ -647,7 +669,9 @@
     "search_this_area": "Diesen Bereich durchsuchen",
     "distance_km": "{{km}} km entfernt",
     "distance_meters": "{{m}} m entfernt",
-    "view_toggle": "Ansichtsmodus"
+    "view_toggle": "Ansichtsmodus",
+    "results_count_one": "{{count}} Inserate in der Nähe gefunden",
+    "results_count_other": "{{count}} Inserate in der Nähe gefunden"
   },
   "shipping": {
     "title": "Versandoptionen",
@@ -778,7 +802,9 @@
       "select_rating": "Bitte wählen Sie eine Bewertung aus",
       "success": "Bewertung erfolgreich eingereicht!",
       "error": "Bewertung konnte nicht eingereicht werden"
-    }
+    },
+    "quantity_multiplier_one": "×{{count}}",
+    "quantity_multiplier_other": "×{{count}}"
   },
   "onboarding": {
     "page_title": "Verkäufer-Onboarding – Marktplatz",

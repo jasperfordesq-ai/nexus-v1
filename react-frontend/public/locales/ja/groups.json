@@ -206,7 +206,12 @@
     "feed_empty_desc": "このグループで最初に何かをシェアしましょう！",
     "feed_create_post": "投稿を作成",
     "feed_load_more": "もっと読み込む",
-    "member_actions_aria": "メンバーのアクション"
+    "member_actions_aria": "メンバーのアクション",
+    "meta_description_fallback_other": "{{name}} に参加し、共有された投稿、イベント、ディスカッションを通じて {{count}} 人のコミュニティメンバーとつながりましょう。",
+    "members_count_other": "{{count}}人のメンバー",
+    "reply_count_other": "{{count}}件の返信",
+    "tab_subgroups_count_other": "サブグループ ({{count}})",
+    "posts_count_other": "{{count}}件の投稿"
   },
   "form": {
     "create_title": "新しいグループを作成",
@@ -389,7 +394,8 @@
     "size_b": "B",
     "size_kb": "KB",
     "size_mb": "MB",
-    "size_gb": "GB"
+    "size_gb": "GB",
+    "folder_chip_other": "{{name}} ({{count}})"
   },
   "media": {
     "filter_all": "すべて",
@@ -450,7 +456,8 @@
     "secret_placeholder": "ペイロード検証用の署名シークレット",
     "cancel": "キャンセル",
     "create_btn": "Webhook を作成",
-    "delete_confirm": "この Webhook を削除しますか?これを元に戻すことはできません。"
+    "delete_confirm": "この Webhook を削除しますか?これを元に戻すことはできません。",
+    "failures_other": "{{count}} 件の失敗"
   },
   "toast": {
     "left": "グループを脱退",
@@ -562,7 +569,9 @@
     "answer_posted_success": "答えが投稿されました！",
     "answer_posted_error": "回答の投稿に失敗しました",
     "vote_error": "投票に失敗しました",
-    "accept_error": "回答を受け入れられませんでした"
+    "accept_error": "回答を受け入れられませんでした",
+    "answer_count_aria_other": "{{count}} 件の回答",
+    "answers_heading_other": "{{count}} 件の回答"
   },
   "wiki": {
     "load_failed": "Wiki ページの読み込みに失敗しました",
@@ -719,5 +728,8 @@
     "accent_color": "アクセントカラー",
     "hue": "色相",
     "preview": "プレビュー"
-  }
+  },
+  "members_other": "{{count}}人のメンバー",
+  "members_count_label_other": "{{count}}人のメンバー",
+  "posts_count_label_other": "{{count}}件の投稿"
 }

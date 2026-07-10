@@ -360,7 +360,9 @@
     "geocode_description": "Geocode group locations to enable map display and distance-based discovery.",
     "geocode_not_migrated_desc": "The batch geocoding admin screen has not yet been rebuilt in React. For now, run the Artisan command on the server:",
     "detail_tabs_aria": "Group detail sections",
-    "status_tabs_aria": "Group status filter"
+    "status_tabs_aria": "Group status filter",
+    "selected_count_one": "{{count}} selected",
+    "selected_count_other": "{{count}} selected"
   },
   "group_organization": {
     "page_title": "Group Organization",

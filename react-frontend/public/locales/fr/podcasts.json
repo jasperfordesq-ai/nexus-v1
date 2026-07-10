@@ -39,7 +39,9 @@
     "unsubscribed": "Afficher non suivi.",
     "subscribe_failed": "Impossible de mettre à jour les préférences de suivi.",
     "episodes": "Episodes",
-    "no_episodes": "Aucun épisode publié pour l'instant."
+    "no_episodes": "Aucun épisode publié pour l'instant.",
+    "episode_count_many": "{{count}} episodes",
+    "follower_count_many": "{{count}} abonnés"
   },
   "episode": {
     "title": "Épisode de podcast",
@@ -74,7 +76,8 @@
       "full": "Épisode complet",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "reactions_count_many": "{{count}} reactions"
   },
   "player": {
     "unsupported": "Votre navigateur ne prend pas en charge le lecteur audio.",
@@ -178,7 +181,10 @@
         "episode_missing_audio_url": "Un épisode n’a pas d’URL audio HTTP valide.",
         "episode_missing_audio_length": "Un épisode n’a pas de taille de fichier audio.",
         "episode_missing_audio_mime": "Un épisode n’a pas de type MIME audio."
-      }
+      },
+      "skipped_episodes_many": "{{count}} épisode(s) seraient exclus du flux tant que leur audio n’est pas corrigé.",
+      "skipped_episodes_one": "{{count}} épisode(s) seraient exclus du flux tant que leur audio n’est pas corrigé.",
+      "skipped_episodes_other": "{{count}} épisode(s) seraient exclus du flux tant que leur audio n’est pas corrigé."
     },
     "stats": {
       "title": "Statistiques d'écoute",
@@ -188,8 +194,12 @@
       "subscribers": "Abonnés",
       "top_episodes": "Meilleurs épisodes",
       "listen_count": "{{count}} écoutes",
-      "last_days": "L'activité d'écoute couvre les {{days}} derniers jours."
-    }
+      "last_days": "L'activité d'écoute couvre les {{days}} derniers jours.",
+      "listen_count_many": "{{count}} écoutes",
+      "listen_count_one": "{{count}} écoutes",
+      "listen_count_other": "{{count}} écoutes"
+    },
+    "chapter_format_warning_many": "Les lignes de chapitre {{count}} n'ont pas d'horodatage et commenceront à 0h00."
   },
   "fields": {
     "show": "Show",

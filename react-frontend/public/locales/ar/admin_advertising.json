@@ -187,7 +187,13 @@
         "pause_failed": "فشل إيقاف الحملة مؤقتًا",
         "rejected": "تم رفض الحملة \"{{name}}\".",
         "reject_failed": "فشل رفض الحملة"
-      }
+      },
+      "creatives_count_few": "التصميمات ({{count}})",
+      "creatives_count_many": "التصميمات ({{count}})",
+      "creatives_count_one": "التصميمات ({{count}})",
+      "creatives_count_other": "التصميمات ({{count}})",
+      "creatives_count_two": "التصميمات ({{count}})",
+      "creatives_count_zero": "التصميمات ({{count}})"
     },
     "push": {
       "page_title": "حملات الإشعارات الفورية",

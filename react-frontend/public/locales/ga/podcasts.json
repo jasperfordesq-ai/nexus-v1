@@ -39,7 +39,13 @@
     "unsubscribed": "Taispeáin gan leanúint.",
     "subscribe_failed": "Níorbh fhéidir an rogha a leanúint a nuashonrú.",
     "episodes": "Episodes",
-    "no_episodes": "Níl aon eipeasóid foilsithe fós."
+    "no_episodes": "Níl aon eipeasóid foilsithe fós.",
+    "episode_count_few": "{{count}} episodes",
+    "episode_count_many": "{{count}} episodes",
+    "episode_count_two": "{{count}} episodes",
+    "follower_count_few": "{{count}} leantóir",
+    "follower_count_many": "{{count}} leantóir",
+    "follower_count_two": "{{count}} leantóir"
   },
   "episode": {
     "title": "Eipeasóid podchraolta",
@@ -74,7 +80,10 @@
       "full": "Eipeasóid iomlán",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "reactions_count_few": "{{count}} reactions",
+    "reactions_count_many": "{{count}} reactions",
+    "reactions_count_two": "{{count}} reactions"
   },
   "player": {
     "unsupported": "Ní thacaíonn do bhrabhsálaí leis an seinnteoir fuaime.",
@@ -178,7 +187,12 @@
         "episode_missing_audio_url": "Tá URL fuaime HTTP bailí in easnamh ar eipeasóid.",
         "episode_missing_audio_length": "Tá méid an chomhaid fuaime in easnamh ar eipeasóid.",
         "episode_missing_audio_mime": "Tá cineál MIME na fuaime in easnamh ar eipeasóid."
-      }
+      },
+      "skipped_episodes_few": "Fágfar {{count}} eipeasóid(í) as an bhfotha go dtí go ndeiseofar a gcuid fuaime.",
+      "skipped_episodes_many": "Fágfar {{count}} eipeasóid(í) as an bhfotha go dtí go ndeiseofar a gcuid fuaime.",
+      "skipped_episodes_one": "Fágfar {{count}} eipeasóid(í) as an bhfotha go dtí go ndeiseofar a gcuid fuaime.",
+      "skipped_episodes_other": "Fágfar {{count}} eipeasóid(í) as an bhfotha go dtí go ndeiseofar a gcuid fuaime.",
+      "skipped_episodes_two": "Fágfar {{count}} eipeasóid(í) as an bhfotha go dtí go ndeiseofar a gcuid fuaime."
     },
     "stats": {
       "title": "Staitisticí éisteoirí",
@@ -188,8 +202,16 @@
       "subscribers": "Síntiúsóirí",
       "top_episodes": "Na heipeasóidí is mó éisteachta",
       "listen_count": "{{count}} éisteacht",
-      "last_days": "Clúdaíonn gníomhaíocht éisteachta na {{days}} lá dheireanacha."
-    }
+      "last_days": "Clúdaíonn gníomhaíocht éisteachta na {{days}} lá dheireanacha.",
+      "listen_count_few": "{{count}} éisteacht",
+      "listen_count_many": "{{count}} éisteacht",
+      "listen_count_one": "{{count}} éisteacht",
+      "listen_count_other": "{{count}} éisteacht",
+      "listen_count_two": "{{count}} éisteacht"
+    },
+    "chapter_format_warning_few": "Níl stampa ama ar línte caibidle {{count}} agus tosóidh siad ag 0:00.",
+    "chapter_format_warning_many": "Níl stampa ama ar línte caibidle {{count}} agus tosóidh siad ag 0:00.",
+    "chapter_format_warning_two": "Níl stampa ama ar línte caibidle {{count}} agus tosóidh siad ag 0:00."
   },
   "fields": {
     "show": "Show",

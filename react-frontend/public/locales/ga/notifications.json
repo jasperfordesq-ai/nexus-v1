@@ -31,7 +31,12 @@
     "empty": "Níl fógraí ann fós",
     "view_all": "Féach ar gach fógra",
     "close": "Dún fógraí",
-    "unread_dot_aria": "Neamhléite"
+    "unread_dot_aria": "Neamhléite",
+    "bell_unread_aria_few": "Fógraí, {{count}} neamhléite",
+    "bell_unread_aria_many": "Fógraí, {{count}} neamhléite",
+    "bell_unread_aria_one": "Fógraí, {{count}} neamhléite",
+    "bell_unread_aria_other": "Fógraí, {{count}} neamhléite",
+    "bell_unread_aria_two": "Fógraí, {{count}} neamhléite"
   },
   "type": {
     "message": "Teachtaireacht",
@@ -96,5 +101,20 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "unread_badge_few": "{{count}} nua",
+  "unread_badge_many": "{{count}} nua",
+  "unread_badge_one": "{{count}} nua",
+  "unread_badge_other": "{{count}} nua",
+  "unread_badge_two": "{{count}} nua",
+  "filter_unread_few": "Neamhléite ({{count}})",
+  "filter_unread_many": "Neamhléite ({{count}})",
+  "filter_unread_one": "Neamhléite ({{count}})",
+  "filter_unread_other": "Neamhléite ({{count}})",
+  "filter_unread_two": "Neamhléite ({{count}})",
+  "and_others_few": "agus {{count}} eile",
+  "and_others_many": "agus {{count}} eile",
+  "and_others_one": "agus {{count}} eile",
+  "and_others_other": "agus {{count}} eile",
+  "and_others_two": "agus {{count}} eile"
 }

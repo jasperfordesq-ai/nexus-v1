@@ -38,7 +38,7 @@ import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import type { FederationPartner } from '@/types/api';
 
@@ -62,7 +62,7 @@ const FEDERATION_LEVELS: Record<number, FederationLevelMeta> = {
   },
   3: {
     label: 'partners.level_economic',
-    className: 'bg-purple-500/20 text-purple-600 dark:text-purple-400',
+    className: 'bg-accent/20 text-accent dark:text-accent',
   },
   4: {
     label: 'partners.level_integrated',
@@ -172,7 +172,7 @@ export function FederationPartnerDetailPage() {
               {t('partner_detail.back_to_partners')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={loadPartner}
             >
@@ -207,10 +207,10 @@ export function FederationPartnerDetailPage() {
               <Avatar
                 name={partner.name}
                 src={resolveAvatarUrl(partner.logo)}
-                className="w-24 h-24 ring-4 ring-indigo-500/20 bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-3xl"
+                className="w-24 h-24 ring-4 ring-accent/20 bg-gradient-to-br from-accent to-accent-gradient-end text-white text-3xl"
               />
               <div
-                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-indigo-500 flex items-center justify-center ring-2 ring-white dark:ring-gray-900"
+                className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-accent flex items-center justify-center ring-2 ring-white dark:ring-gray-900"
                 title={t('partner_detail.federation_partner_badge')}
               >
                 <Handshake className="w-4 h-4 text-white" aria-hidden="true" />
@@ -254,7 +254,7 @@ export function FederationPartnerDetailPage() {
                   <span className="flex items-center gap-1.5">
                     <Shield className="w-4 h-4" aria-hidden="true" />
                     {t('partner_detail.partner_since', {
-                      date: new Date(partner.partnership_since).toLocaleDateString(undefined, {
+                      date: new Date(partner.partnership_since).toLocaleDateString(getFormattingLocale(), {
                         month: 'long',
                         year: 'numeric',
                       }),
@@ -267,23 +267,19 @@ export function FederationPartnerDetailPage() {
               <div className="flex flex-wrap gap-3 mt-4">
                 {isAuthenticated && (
                   <>
-                    <Link to={tenantPath(`/federation/members?partner_id=${partner.id}`)}>
-                      <Button
-                        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                        startContent={<Users className="w-4 h-4" aria-hidden="true" />}
-                      >
-                        {t('partner_detail.browse_members')}
-                      </Button>
-                    </Link>
-                    <Link to={tenantPath(`/federation/listings?partner_id=${partner.id}`)}>
-                      <Button
-                        variant="flat"
-                        className="bg-theme-elevated text-theme-primary"
-                        startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
-                      >
-                        {t('partner_detail.browse_listings')}
-                      </Button>
-                    </Link>
+                    <Button as={Link} to={tenantPath(`/federation/members?partner_id=${partner.id}`)}
+                      className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
+                      startContent={<Users className="w-4 h-4" aria-hidden="true" />}
+                    >
+                      {t('partner_detail.browse_members')}
+                    </Button>
+                    <Button as={Link} to={tenantPath(`/federation/listings?partner_id=${partner.id}`)}
+                      variant="flat"
+                      className="bg-theme-elevated text-theme-primary"
+                      startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
+                    >
+                      {t('partner_detail.browse_listings')}
+                    </Button>
                   </>
                 )}
                 <Button
@@ -305,7 +301,7 @@ export function FederationPartnerDetailPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <GlassCard className="p-6">
             <h2 className="text-lg font-semibold text-theme-primary mb-3 flex items-center gap-2">
-              <Globe className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+              <Globe className="w-5 h-5 text-accent" aria-hidden="true" />
               {t('partner_detail.available_features')}
             </h2>
             <div className="flex flex-wrap gap-2">

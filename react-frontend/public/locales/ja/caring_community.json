@@ -108,7 +108,8 @@
       "create": "カバーリクエストを作成できませんでした",
       "candidates": "代替候補をロードできませんでした",
       "assign": "代替者が一致しませんでした"
-    }
+    },
+    "skill_matches_other": "{{count}}マッチングスキル"
   },
   "providers": {
     "title": "介護提供者ディレクトリ",
@@ -488,7 +489,8 @@
         "maximum_discount": "注文ごとの最大割引率 (%)",
         "maximum_discount_description": "クレジットで期限内に支払える注文総額の上限を設定します。",
         "save": "設定を保存する",
-        "view_only": "表示専用ユーザーはロイヤルティ設定を変更できません。"
+        "view_only": "表示専用ユーザーはロイヤルティ設定を変更できません。",
+        "per_hour_short": "/ 時"
       },
       "ledger": {
         "title": "最近の引き換え",
@@ -534,6 +536,9 @@
         "pending": "保留中",
         "applied": "適用済み",
         "reversed": "逆向き"
+      },
+      "table": {
+        "empty_value": "—"
       }
     },
     "hour_transfers": {

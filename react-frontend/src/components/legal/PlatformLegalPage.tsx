@@ -195,16 +195,14 @@ export function PlatformLegalPage({
             <h2 className="font-semibold text-theme-primary mb-3">{t('platform.related_documents')}</h2>
             <div className="flex flex-wrap gap-2">
               {crossLinks.map((link) => (
-                <Link key={link.to} to={tenantPath(link.to)}>
-                  <Button
-                    size="sm"
-                    variant="flat"
-                    className="bg-slate-500/10 text-theme-primary"
-                    endContent={<ArrowRight className="w-3.5 h-3.5" />}
-                  >
-                    {link.label}
-                  </Button>
-                </Link>
+                <Button as={Link} key={link.to} to={tenantPath(link.to)}
+                  size="sm"
+                  variant="flat"
+                  className="bg-slate-500/10 text-theme-primary"
+                  endContent={<ArrowRight className="w-3.5 h-3.5" />}
+                >
+                  {link.label}
+                </Button>
               ))}
             </div>
           </GlassCard>
@@ -225,26 +223,18 @@ export function PlatformLegalPage({
               {t('platform.cta_body', { tenant: tenantName })}
             </p>
             <div className="flex justify-center gap-3 flex-wrap">
-              <a
-                href="https://project-nexus.ie"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Button as="a" href="https://project-nexus.ie" target="_blank" rel="noopener noreferrer"
+                className="bg-gradient-to-r from-slate-600 to-blue-600 text-white"
+                startContent={<ExternalLink className="w-4 h-4" aria-hidden="true" />}
               >
-                <Button
-                  className="bg-gradient-to-r from-slate-600 to-blue-600 text-white"
-                  startContent={<ExternalLink className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('platform.nexus_website')}
-                </Button>
-              </a>
-              <Link to={tenantPath('/contact')}>
-                <Button
-                  variant="flat"
-                  className="bg-theme-elevated text-theme-primary"
-                >
-                  {t('platform.contact_tenant', { tenant: tenantName })}
-                </Button>
-              </Link>
+                {t('platform.nexus_website')}
+              </Button>
+              <Button as={Link} to={tenantPath('/contact')}
+                variant="flat"
+                className="bg-theme-elevated text-theme-primary"
+              >
+                {t('platform.contact_tenant', { tenant: tenantName })}
+              </Button>
             </div>
           </div>
         </GlassCard>

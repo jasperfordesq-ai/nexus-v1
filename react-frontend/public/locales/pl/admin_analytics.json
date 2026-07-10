@@ -245,7 +245,13 @@
         "65_plus": "65+",
         "unknown": "Nieznany"
       }
-    }
+    },
+    "location_marker_title_few": "{{area}}: Członkowie{{count}}",
+    "location_marker_title_many": "{{area}}: Członkowie{{count}}",
+    "location_marker_title_one": "{{area}}: Członkowie{{count}}",
+    "location_marker_title_other": "{{area}}: Członkowie{{count}}",
+    "member_count_few": "Członkowie{{count}}",
+    "member_count_many": "Członkowie{{count}}"
   },
   "search_analytics": {
     "page_title": "Analityka wyszukiwania",
@@ -270,6 +276,10 @@
     "load_failed": "Nie udało się wczytać analityki wyszukiwania",
     "empty_description": "W wybranym okresie nie zarejestrowano żadnych wyszukiwań.",
     "no_trending": "Brak popularnych wyszukiwań w tym okresie.",
-    "no_zero_results": "Brak wyszukiwań bez wyników w tym okresie — każde wyszukiwanie coś znalazło."
+    "no_zero_results": "Brak wyszukiwań bez wyników w tym okresie — każde wyszukiwanie coś znalazło.",
+    "count_value_few": "{{count}}×",
+    "count_value_many": "{{count}}×",
+    "count_value_one": "{{count}}×",
+    "count_value_other": "{{count}}×"
   }
 }

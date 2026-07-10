@@ -455,7 +455,13 @@
     "winning_metric": "勝利の指標",
     "resend_queued_count": "キューに登録された{{count}}の再送信",
     "resend_queued_count_plural": "キューに登録された{{count}}が再送信されます",
-    "template_tabs_aria": "ニュースレター テンプレート カテゴリ フィルター"
+    "template_tabs_aria": "ニュースレター テンプレート カテゴリ フィルター",
+    "resend_queued_count_other": "キューに登録された{{count}}の再送信",
+    "your_average": "あなたの平均",
+    "industry_avg": "業界平均",
+    "above_benchmark": "ベンチマークを上回る",
+    "below_benchmark": "ベンチマークを下回る",
+    "benchmark_difference": "{{pointSign}}{{pointValue}}ポイント（{{percentSign}}{{percentValue}}%）"
   },
   "newsletter_form": {
     "ab_test_label": "腹筋テスト",
@@ -895,7 +901,10 @@
     "subject_override_desc": "元の件名を使用する場合は空白のままにします。",
     "subject_override_placeholder": "件名のオーバーライドを入力してください...",
     "subtitle": "このニュースレターを対象の受信者の一部に送信します。",
-    "total_sent": "送信された合計"
+    "total_sent": "送信された合計",
+    "non_openers_count_other": "開かなかった{{count}}受信者",
+    "non_clickers_count_other": "開封したがクリックしなかった{{count}}受信者",
+    "preview_recipient_count_desc_other": "この再送信は{{count}}受信者に送信されます"
   },
   "newsletter_send_time": {
     "day_friday": "金",
@@ -919,7 +928,8 @@
     "not_enough_data": "まだ十分なエンゲージメント データがありません。",
     "time_period": "期間",
     "title": "送信時間オプティマイザー",
-    "top_recommended": "Top Recommended"
+    "top_recommended": "Top Recommended",
+    "days_other": "{{count}}日"
   },
   "segment_form": {
     "analyzing_member_data": "会員データの分析",
@@ -1038,5 +1048,8 @@
     "update_template": "テンプレートを更新する",
     "usage_stats_sent": "送信された使用状況統計",
     "usage_stats_sent_plural": "複数の使用統計が送信されました"
+  },
+  "diagnostics": {
+    "score_out_of": "{{maximum}}点満点"
   }
 }

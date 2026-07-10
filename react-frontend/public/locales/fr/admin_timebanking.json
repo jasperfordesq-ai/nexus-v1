@@ -210,6 +210,9 @@
     "top_earners": "Meilleurs salariés",
     "top_spenders": "Meilleurs dépensiers",
     "user_report_desc": "Afficher un rapport détaillé du crédit-temps pour un membre individuel",
-    "user_report_title": "Rapport utilisateur"
+    "user_report_title": "Rapport utilisateur",
+    "hours_value_many": "{{count}}h",
+    "hours_value_one": "{{count}}h",
+    "hours_value_other": "{{count}}h"
   }
 }

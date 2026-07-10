@@ -126,7 +126,7 @@ function makeStory(overrides: Partial<{
     user_id: 10,
     media_type: 'text' as const,
     text_content: 'Hello story!',
-    background_gradient: 'from-purple-600 to-blue-500',
+    background_gradient: 'from-accent to-blue-500',
     duration: 5,
     view_count: 42,
     is_viewed: false,

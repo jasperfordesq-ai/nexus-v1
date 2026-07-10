@@ -110,7 +110,7 @@ describe('MobileComposeOverlay', () => {
         isSubmitting: false,
         onSubmit: vi.fn(),
         buttonLabel: 'Publish',
-        gradientClass: 'from-indigo-500 to-purple-600',
+        gradientClass: 'from-accent to-accent-gradient-end',
       },
       register: vi.fn(),
       unregister: vi.fn(),

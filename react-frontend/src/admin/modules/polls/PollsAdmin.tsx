@@ -8,6 +8,7 @@
  * List, search, view, and delete polls with pagination.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';import BarChart3 from 'lucide-react/icons/chart-column';
 import Eye from 'lucide-react/icons/eye';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -201,7 +202,7 @@ export function PollsAdmin() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {new Date(item.created_at).toLocaleDateString()}
+          {new Date(item.created_at).toLocaleDateString(getFormattingLocale())}
         </span>
       ),
     },
@@ -330,7 +331,7 @@ export function PollsAdmin() {
             <div>
               <span className="text-sm font-medium text-muted">{t('polls.created')}</span>
               <p className="text-foreground">
-                {new Date(detailPoll.created_at).toLocaleString()}
+                {new Date(detailPoll.created_at).toLocaleString(getFormattingLocale())}
               </p>
             </div>
           </div>

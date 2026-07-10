@@ -524,7 +524,37 @@
     "select_all_rows": "Select all rows",
     "no_data": "Gan sonraí",
     "no_data_available": "Níl aon sonraí ar fáil",
-    "select_row": "Select row {{id}}"
+    "select_row": "Select row {{id}}",
+    "total_count_few": "{{count}}iomlán",
+    "total_count_many": "{{count}}iomlán",
+    "total_count_one": "{{count}}iomlán",
+    "total_count_other": "{{count}}iomlán",
+    "total_count_two": "{{count}}iomlán",
+    "statuses": {
+      "active": "Gníomhach",
+      "approved": "Faofa",
+      "banned": "Toirmiscthe",
+      "bulk_tenants_updated": "Tionóntaí nuashonraithe",
+      "bulk_users_moved": "Úsáideoirí bogtha",
+      "completed": "Críochnaithe",
+      "draft": "Dréacht",
+      "failed": "Teipthe",
+      "federation_lockdown": "Glasáil cónaidhme",
+      "federation_updated": "Cónaidhm nuashonraithe",
+      "idle": "Díomhaoin",
+      "inactive": "Neamhghníomhach",
+      "pending": "Ar feitheamh",
+      "published": "Foilsithe",
+      "rejected": "Diúltaithe",
+      "scheduled": "Sceidealaithe",
+      "sent": "Seolta",
+      "suspended": "Curtha ar fionraí",
+      "tenant_created": "Tionónta cruthaithe",
+      "tenant_updated": "Tionónta nuashonraithe",
+      "user_created": "Úsáideoir cruthaithe",
+      "user_moved": "Úsáideoir bogtha",
+      "unknown": "Anaithnid"
+    }
   },
   "help_drawer": {
     "aria_label": "Cabhair: {{title}}",
@@ -541,7 +571,17 @@
     "confirm_message": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?",
     "destructive_warning": "Ní féidir an gníomh seo a chealú.",
     "reason_label": "Cúis",
-    "reason_placeholder": "Tabhair cúis leis an ngníomh seo"
+    "reason_placeholder": "Tabhair cúis leis an ngníomh seo",
+    "selected_count_few": "{{count}} roghnaithe",
+    "selected_count_many": "{{count}} roghnaithe",
+    "selected_count_one": "{{count}} roghnaithe",
+    "selected_count_other": "{{count}} roghnaithe",
+    "selected_count_two": "{{count}} roghnaithe",
+    "confirm_message_few": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?",
+    "confirm_message_many": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?",
+    "confirm_message_one": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?",
+    "confirm_message_other": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?",
+    "confirm_message_two": "An bhfuil tú cinnte gur mhaith leat míreanna {{action}} {{count}} a chur?"
   },
   "common": {
     "cancel": "Cealaigh"
@@ -586,5 +626,10 @@
       "group_exchanges": "Malartuithe Grúpa",
       "search": "Cuardach"
     }
-  }
+  },
+  "support_requests_count_few": "{{count}} iarratas tacaíochta oscailte",
+  "support_requests_count_many": "{{count}} iarratas tacaíochta oscailte",
+  "support_requests_count_one": "{{count}} iarratas tacaíochta oscailte",
+  "support_requests_count_other": "{{count}} iarratas tacaíochta oscailte",
+  "support_requests_count_two": "{{count}} iarratas tacaíochta oscailte"
 }

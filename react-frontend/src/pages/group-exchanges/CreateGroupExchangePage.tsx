@@ -84,11 +84,11 @@ const TOTAL_STEPS = 4;
 const SPLIT_TYPE_CARDS: { value: SplitType; icon: React.ReactNode }[] = [
   {
     value: 'equal',
-    icon: <Scale className="w-6 h-6 text-indigo-500" />,
+    icon: <Scale className="w-6 h-6 text-accent" />,
   },
   {
     value: 'custom',
-    icon: <Clock className="w-6 h-6 text-purple-500" />,
+    icon: <Clock className="w-6 h-6 text-accent" />,
   },
   {
     value: 'weighted',
@@ -396,8 +396,8 @@ export function CreateGroupExchangePage() {
       <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
         <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
-            <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-500/15">
-              <ArrowLeftRight className="h-7 w-7 text-indigo-500" aria-hidden="true" />
+            <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15">
+              <ArrowLeftRight className="h-7 w-7 text-accent" aria-hidden="true" />
             </div>
             <h1 className="text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
               {t('create.title')}
@@ -428,9 +428,9 @@ export function CreateGroupExchangePage() {
                 <div className={`
                   w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all
                   ${isComplete
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white'
+                    ? 'bg-gradient-to-r from-accent to-accent-gradient-end text-white'
                     : isCurrent
-                      ? 'bg-indigo-500/20 text-indigo-400 ring-2 ring-indigo-500'
+                      ? 'bg-accent/20 text-accent ring-2 ring-accent'
                       : 'bg-theme-elevated text-theme-subtle'}
                 `}>
                   {isComplete ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : stepNum}
@@ -442,9 +442,9 @@ export function CreateGroupExchangePage() {
               {idx < stepLabels.length - 1 && (
                 <div className={`flex-1 h-0.5 mx-2 rounded-full transition-all ${
                   currentStep > stepNum + 1
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600'
+                    ? 'bg-gradient-to-r from-accent to-accent-gradient-end'
                     : currentStep > stepNum
-                      ? 'bg-indigo-500/40'
+                      ? 'bg-accent/40'
                       : 'bg-theme-elevated'
                 }`} />
               )}
@@ -456,7 +456,7 @@ export function CreateGroupExchangePage() {
         value={(currentStep / TOTAL_STEPS) * 100}
         size="sm"
         classNames={{
-          indicator: 'bg-gradient-to-r from-indigo-500 to-purple-600',
+          indicator: 'bg-gradient-to-r from-accent to-accent-gradient-end',
           track: 'bg-theme-elevated',
         }}
         aria-label={t('create.step_of', { current: currentStep, total: TOTAL_STEPS })}
@@ -479,7 +479,7 @@ export function CreateGroupExchangePage() {
             <div className="space-y-6">
               <GlassCard className="p-6 sm:p-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
-                  <ArrowLeftRight className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                  <ArrowLeftRight className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                   {t('create.exchange_details')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
@@ -532,7 +532,7 @@ export function CreateGroupExchangePage() {
               {/* Split Type Selection */}
               <GlassCard className="p-6 sm:p-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
-                  <Scale className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                  <Scale className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                   {t('create.split_type_heading')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-4">
@@ -549,7 +549,7 @@ export function CreateGroupExchangePage() {
                     <Radio
                       key={card.value}
                       value={card.value}
-                      className="cursor-pointer rounded-xl border-2 border-theme-default bg-theme-elevated p-4 text-center transition-all hover:border-indigo-500/30 hover:bg-theme-hover data-[selected=true]:border-indigo-500 data-[selected=true]:bg-indigo-500/10"
+                      className="cursor-pointer rounded-xl border-2 border-theme-default bg-theme-elevated p-4 text-center transition-all hover:border-accent/30 hover:bg-theme-hover data-[selected=true]:border-accent data-[selected=true]:bg-accent/10"
                     >
                       {() => (
                         <div>
@@ -572,7 +572,7 @@ export function CreateGroupExchangePage() {
               {/* Navigation */}
               <div className="flex items-center justify-end">
                 <Button
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                   endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
                   onPress={goNext}
                   isDisabled={!canProceedStep1}
@@ -589,7 +589,7 @@ export function CreateGroupExchangePage() {
               {/* Search */}
               <GlassCard className="p-6 sm:p-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
-                  <UserPlus className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                  <UserPlus className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                   {t('create.add_participants')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-4">
@@ -674,7 +674,7 @@ export function CreateGroupExchangePage() {
               {/* Current Participants */}
               <GlassCard className="p-6 sm:p-8">
                 <h3 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                  <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                  <Users className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                   {t('detail.participants_heading', { count: participants.length })}
                 </h3>
 
@@ -754,7 +754,7 @@ export function CreateGroupExchangePage() {
             <div className="space-y-6">
               <GlassCard className="p-6 sm:p-8">
                 <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
-                  <Scale className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                  <Scale className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                   {t('create.hour_split_preview')}
                 </h2>
                 <p className="text-theme-muted text-sm mb-6">
@@ -946,7 +946,7 @@ export function CreateGroupExchangePage() {
                 </Button>
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                  className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                   onPress={handleCreate}
                   isLoading={isSubmitting}
                   startContent={!isSubmitting && <CheckCircle className="w-5 h-5" aria-hidden="true" />}
@@ -1067,7 +1067,7 @@ function StepNavigation({ onBack, onNext, nextLabel, isLoading, isNextDisabled }
         {t('create.back')}
       </Button>
       <Button
-        className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+        className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
         endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
         onPress={onNext}
         isLoading={isLoading}

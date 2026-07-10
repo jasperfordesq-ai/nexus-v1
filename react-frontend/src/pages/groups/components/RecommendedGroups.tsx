@@ -97,7 +97,7 @@ export function RecommendedGroups() {
   return (
     <div className="space-y-3">
       <h2 className="flex items-center gap-2 text-sm font-semibold text-theme-primary">
-        <Sparkles className="w-4 h-4 text-indigo-400" aria-hidden="true" />
+        <Sparkles className="w-4 h-4 text-accent" aria-hidden="true" />
         {t('recommended.title')}
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -137,7 +137,7 @@ export function RecommendedGroups() {
                 {!hasJoined && group.group_id != null && (
                   <Button
                     size="sm"
-                    className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white flex-1"
+                    className="bg-gradient-to-r from-accent to-accent-gradient-end text-white flex-1"
                     isLoading={joiningId === group.group_id}
                     onPress={() => handleJoin(group.group_id!)}
                   >

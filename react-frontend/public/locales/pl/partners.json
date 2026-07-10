@@ -84,7 +84,9 @@
       "title": "Niektóre połączenia miały ostatnio problemy",
       "hint_one": "{{count}} nie powiodło się połączenie z systemu partnerskiego w ciągu ostatnich 30 dni.",
       "hint_other": "{{count}} nieudane wywołania z systemów partnerskich w ciągu ostatnich 30 dni.",
-      "cta": "Zobacz aktywność"
+      "cta": "Zobacz aktywność",
+      "hint_few": "{{count}} nieudane wywołania z systemów partnerskich w ciągu ostatnich 30 dni.",
+      "hint_many": "{{count}} nieudane wywołania z systemów partnerskich w ciągu ostatnich 30 dni."
     },
     "stats": {
       "active_partners": "Aktywni partnerzy",
@@ -111,7 +113,9 @@
       "empty_title": "Brak aktywności partnera",
       "empty_hint": "Gdy połączysz się z bankiem czasu partnera, jego aktywność pojawi się tutaj.",
       "activity_one": "{{count}} wymiana",
-      "activity_other": "{{count}} wymian"
+      "activity_other": "{{count}} wymian",
+      "activity_few": "{{count}} wymian",
+      "activity_many": "{{count}} wymian"
     },
     "federation_off": {
       "title": "Współpraca z innymi bankami czasu jest wyłączona",

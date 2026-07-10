@@ -130,7 +130,10 @@
         "run_failed_with_error": "Error de ejecución: {{error}}",
         "toggle_failed": "No se pudo alternar agente",
         "updated": "Agente actualizado",
-        "update_failed": "No se pudo actualizar el agente"
+        "update_failed": "No se pudo actualizar el agente",
+        "run_created_many": "Ejecute #{{runId}} las propuestas {{count}} creadas",
+        "run_created_one": "Ejecute #{{runId}} las propuestas {{count}} creadas",
+        "run_created_other": "Ejecute #{{runId}} las propuestas {{count}} creadas"
       }
     },
     "runs": {

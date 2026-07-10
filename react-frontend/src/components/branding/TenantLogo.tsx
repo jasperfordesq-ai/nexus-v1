@@ -11,6 +11,7 @@ import { useTenant } from '@/contexts';
 import { Avatar } from '@/components/ui/Avatar';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { resolveBrandingImageUrl } from '@/lib/helpers';
+import { getAccessibleForegroundColor } from '@/lib/colorContrast';
 
 /** Extract 1–2 initials from a tenant name. */
 function getInitials(name: string): string {
@@ -19,15 +20,6 @@ function getInitials(name: string): string {
   const lastWord = words[words.length - 1] ?? '';
   if (words.length === 1) return firstWord.substring(0, 2).toUpperCase();
   return ((firstWord[0] ?? '') + (lastWord[0] ?? '')).toUpperCase();
-}
-
-/** Returns true when the background is light enough to need dark text. */
-function shouldUseDarkText(hex: string): boolean {
-  if (!hex || !hex.startsWith('#') || hex.length < 7) return false;
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return (0.299 * r + 0.587 * g + 0.114 * b) / 255 > 0.6;
 }
 
 /* ─── size maps ──────────────────────────────────────────────── */
@@ -111,7 +103,7 @@ export function TenantLogo({
   const { branding, tenantPath } = useTenant();
 
   const primaryColor = branding.primaryColor || '#6366f1';
-  const darkText = shouldUseDarkText(primaryColor);
+  const primaryForeground = getAccessibleForegroundColor(primaryColor);
   const needsTooltip = branding.name.length > 20;
 
   // A custom uploaded logo (light variant, dark variant, or both) takes
@@ -176,10 +168,11 @@ export function TenantLogo({
       size={avatarSizeMap[effectiveSize]}
       classNames={{
         base: 'ring-2 ring-offset-1 ring-offset-transparent ring-border dark:ring-border shrink-0 transition-all duration-200',
+        fallback: primaryForeground === '#000000' ? '!text-black' : '!text-white',
       }}
       style={{
         backgroundColor: primaryColor,
-        color: darkText ? '#1a1a2e' : '#ffffff',
+        color: primaryForeground,
       }}
       aria-hidden="true"
     />

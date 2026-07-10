@@ -158,7 +158,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 <div className="flex flex-col gap-3">
                   <Button
                     onPress={this.handleTryAgain}
-                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                     startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
                   >
                     {i18n.t('error_boundary.try_again', { ns: 'common' })}

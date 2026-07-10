@@ -171,6 +171,17 @@ describe('Tabs component', () => {
     // Just assert it renders without error and tab list is present
     expect(screen.getByRole('tablist')).toBeInTheDocument();
   });
+
+  it('maps the legacy underlined variant to the documented v3 secondary style', () => {
+    const { container } = render(
+      <Tabs aria-label="Underlined tabs" variant="underlined">
+        <Tab title="Alpha">Content A</Tab>
+      </Tabs>,
+    );
+
+    expect(container.querySelector('[data-slot="tabs"]')).toHaveClass('tabs--secondary');
+    expect(container.querySelector('[data-slot="tabs-indicator"]')).toBeInTheDocument();
+  });
 });
 
 describe('Tabs scrollAffordance', () => {

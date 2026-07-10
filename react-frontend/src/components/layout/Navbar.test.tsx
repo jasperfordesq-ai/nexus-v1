@@ -65,6 +65,22 @@ vi.mock('@/contexts', () => ({
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: (...args: unknown[]) => mockUseAuth(...args),
+}));
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
+}));
+vi.mock('@/contexts/NotificationsContext', () => ({
+  useNotificationsOptional: (...args: unknown[]) => mockUseNotifications(...args),
+}));
+vi.mock('@/contexts/ThemeContext', () => ({
+  useTheme: (...args: unknown[]) => mockUseTheme(...args),
+}));
+vi.mock('@/contexts/MenuContextCore', () => ({
+  useMenuContext: () => ({ headerMenus: [], mobileMenus: [], hasCustomMenus: false }),
+}));
+
 vi.mock('@/components/LanguageSwitcher', () => ({
   LanguageSwitcher: ({ triggerClassName }: { triggerClassName?: string }) => (
     <button type="button" className={triggerClassName} aria-label="Language switcher">Language</button>
@@ -175,9 +191,12 @@ vi.mock('react-i18next', () => ({
   initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 
-vi.mock('@/lib/helpers', () => ({
+vi.mock('@/lib/helpers', async (importOriginal) => ({
+  ...await importOriginal<typeof import('@/lib/helpers')>(),
   resolveAvatarUrl: (url: string | undefined) => url || '/default-avatar.png',
   resolveAssetUrl: (url: string | null | undefined) => url ?? null,
+  resolveBrandingImageUrl: (url: string | null | undefined) => url ?? null,
+  resolveThumbnailUrl: (url: string | null | undefined) => url ?? null,
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
 }));
 
@@ -345,10 +364,10 @@ describe('Navbar', () => {
       expect(screen.getAllByLabelText('Search (Ctrl+K)').length).toBeGreaterThanOrEqual(1);
     });
 
-    it('renders notification bell button', () => {
+    it('renders notification bell button', async () => {
       render(<Navbar />);
       // HeroUI Badge may duplicate aria-labels; use getAllByLabelText and check at least one
-      const bells = screen.getAllByLabelText('Notifications');
+      const bells = await screen.findAllByLabelText('Notifications');
       expect(bells.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -593,7 +612,7 @@ describe('Navbar', () => {
       });
       render(<Navbar />);
       const link = screen.getByRole('link', { name: 'Open Accessibility (alpha) in a new tab' });
-      expect(link).toHaveAttribute('href', 'https://accessible.project-nexus.ie/hour-timebank/alpha');
+      expect(link).toHaveAttribute('href', 'https://accessible.project-nexus.ie/hour-timebank/accessible');
       expect(link).toHaveAttribute('target', '_blank');
       expect(link).toHaveAttribute('rel', 'noopener noreferrer');
       expect(screen.getByText('Accessibility (alpha)')).toBeInTheDocument();
@@ -883,10 +902,11 @@ describe('Navbar', () => {
     });
 
     it('calls onMobileMenuOpen when mobile menu button is pressed', async () => {
+      const user = userEvent.setup();
       const onMobileMenuOpen = vi.fn();
       render(<Navbar onMobileMenuOpen={onMobileMenuOpen} />);
       const menuButton = screen.getByLabelText('Open menu');
-      menuButton.click();
+      await user.click(menuButton);
       expect(onMobileMenuOpen).toHaveBeenCalledTimes(1);
     });
   });

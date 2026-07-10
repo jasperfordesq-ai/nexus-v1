@@ -1,3 +1,4 @@
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui/Modal';
 import { Spinner } from '@/components/ui/Spinner';
@@ -90,7 +91,7 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
     { label: t('analytics.views'), value: data.views_count, icon: Eye, color: 'text-[var(--color-info)]', bg: 'bg-blue-500/10' },
     { label: t('analytics.likes'), value: data.likes_count, icon: Heart, color: 'text-rose-500', bg: 'bg-rose-500/10' },
     { label: t('analytics.comments'), value: data.comments_count, icon: MessageCircle, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    { label: t('analytics.shares'), value: data.shares_count, icon: Repeat2, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+    { label: t('analytics.shares'), value: data.shares_count, icon: Repeat2, color: 'text-accent', bg: 'bg-accent/10' },
     { label: t('analytics.reach'), value: data.reach_estimate, icon: Users, color: 'text-[var(--color-warning)]', bg: 'bg-amber-500/10' },
   ] : [];
 
@@ -128,7 +129,7 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
                           <Icon className={`w-5 h-5 ${stat.color}`} aria-hidden="true" />
                         </div>
                         <p className="text-2xl font-bold text-[var(--text-primary)]">
-                          {stat.value.toLocaleString()}
+                          {stat.value.toLocaleString(getFormattingLocale())}
                         </p>
                         <p className="text-xs text-[var(--text-muted)]">{stat.label}</p>
                       </CardBody>
@@ -157,7 +158,9 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
                             <div className="flex-1">
                               <div className="flex items-center justify-between mb-1">
                                 <span className="text-xs text-[var(--text-secondary)] capitalize">{type}</span>
-                                <span className="text-xs text-[var(--text-muted)]">{count} ({pct}%)</span>
+                                <span className="text-xs text-[var(--text-muted)]">
+                                  {count} ({formatNumber(pct / 100, { style: 'percent', maximumFractionDigits: 0 })})
+                                </span>
                               </div>
                               <div className="h-2 rounded-full bg-[var(--surface-hover)] overflow-hidden">
                                 <div

@@ -207,7 +207,8 @@
     "tbi_proxy_independence": "受け取った時間の金銭的価値",
     "tbi_proxy_inclusion": "HACT: 近隣に属している (TBI 2023 校正)",
     "pdf_coefficients": "Applied Coefficients",
-    "formula_true_sroi": "SROI 比率 = 検証された結果の合計現在価値 (載貨重量、移動量、帰属、ドロップオフおよび割引後) ÷ 総投資額"
+    "formula_true_sroi": "SROI 比率 = 検証された結果の合計現在価値 (載貨重量、移動量、帰属、ドロップオフおよび割引後) ÷ 総投資額",
+    "multiplier_value": "{{value}}倍"
   },
   "impact_report_labels": {
     "transactions": "取引",

@@ -39,7 +39,9 @@
     "unsubscribed": "Mostrar no seguido.",
     "subscribe_failed": "No se pudo actualizar la preferencia de seguimiento.",
     "episodes": "Episodes",
-    "no_episodes": "Aún no hay episodios publicados."
+    "no_episodes": "Aún no hay episodios publicados.",
+    "episode_count_many": "{{count}} episodes",
+    "follower_count_many": "{{count}} seguidores"
   },
   "episode": {
     "title": "episodio de podcast",
@@ -74,7 +76,8 @@
       "full": "episodio completo",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "reactions_count_many": "{{count}} reactions"
   },
   "player": {
     "unsupported": "Su navegador no soporta el reproductor de audio.",
@@ -178,7 +181,10 @@
         "episode_missing_audio_url": "A un episodio le falta una URL de audio HTTP válida.",
         "episode_missing_audio_length": "A un episodio le falta el tamaño del archivo de audio.",
         "episode_missing_audio_mime": "A un episodio le falta el tipo MIME del audio."
-      }
+      },
+      "skipped_episodes_many": "{{count}} episodio(s) quedarían fuera del feed hasta que se corrija su audio.",
+      "skipped_episodes_one": "{{count}} episodio(s) quedarían fuera del feed hasta que se corrija su audio.",
+      "skipped_episodes_other": "{{count}} episodio(s) quedarían fuera del feed hasta que se corrija su audio."
     },
     "stats": {
       "title": "Estadísticas de oyentes",
@@ -188,8 +194,12 @@
       "subscribers": "Suscriptores",
       "top_episodes": "Episodios más escuchados",
       "listen_count": "{{count}} escuchas",
-      "last_days": "La actividad de escucha cubre los últimos {{days}} días."
-    }
+      "last_days": "La actividad de escucha cubre los últimos {{days}} días.",
+      "listen_count_many": "{{count}} escuchas",
+      "listen_count_one": "{{count}} escuchas",
+      "listen_count_other": "{{count}} escuchas"
+    },
+    "chapter_format_warning_many": "Las líneas de capítulo {{count}} no tienen marca de tiempo y comenzarán a las 0:00."
   },
   "fields": {
     "show": "Show",

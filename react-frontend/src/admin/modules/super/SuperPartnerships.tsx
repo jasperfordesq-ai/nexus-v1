@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 
@@ -318,7 +319,7 @@ export default function Partnerships() {
                     </Chip>
                   </TableCell>
                   <TableCell className="text-sm text-muted">
-                    {new Date(partnership.created_at).toLocaleDateString()}
+                    {new Date(partnership.created_at).toLocaleDateString(getFormattingLocale())}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">

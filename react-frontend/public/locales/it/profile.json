@@ -76,7 +76,8 @@
     "no_achievements": "Nessun traguardo ancora",
     "no_achievements_own": "Partecipa per guadagnare badge e traguardi!",
     "no_achievements_other": "Questo utente non ha ancora ottenuto traguardi",
-    "view_badges": "Vedi Badge Disponibili"
+    "view_badges": "Vedi Badge Disponibili",
+    "badges_many": "{{count}} Badge Guadagnati"
   },
   "toast": {
     "request_sent_title": "Richiesta inviata",
@@ -134,7 +135,10 @@
     "characters_count": "{{count}}/{{max}} caratteri",
     "cancel": "Annulla",
     "submit": "Invia recensione",
-    "submit_failed_fallback": "Impossibile inviare la recensione"
+    "submit_failed_fallback": "Impossibile inviare la recensione",
+    "characters_count_many": "{{count}}/{{max}} caratteri",
+    "characters_count_one": "{{count}}/{{max}} caratteri",
+    "characters_count_other": "{{count}}/{{max}} caratteri"
   },
   "page_meta": {
     "title": "Profilo",
@@ -185,5 +189,9 @@
   "read_more": "Leggi di più",
   "read_less": "Leggi di meno",
   "hours_abbrev": "{{hours}}h",
-  "not_available_abbrev": "n/d"
+  "not_available_abbrev": "n/d",
+  "show_more_skills_many": "Mostra {{count}} in più",
+  "show_more_skills_one": "Mostra {{count}} in più",
+  "show_more_skills_other": "Mostra {{count}} in più",
+  "reviews_count_many": "{{count}} recensioni"
 }

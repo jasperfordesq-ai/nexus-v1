@@ -293,7 +293,7 @@ describe('StatusBadge', () => {
     const { StatusBadge } = await import('./DataTable');
     render(<StatusBadge status="active" />);
     const chip = screen.getByTestId('chip');
-    expect(chip).toHaveTextContent('active');
+    expect(chip).toHaveTextContent('Active');
     expect(chip).toHaveAttribute('data-color', 'success');
   });
 
@@ -308,13 +308,22 @@ describe('StatusBadge', () => {
     const { StatusBadge } = await import('./DataTable');
     render(<StatusBadge status="unknown_xyz" />);
     const chip = screen.getByTestId('chip');
+    expect(chip).toHaveTextContent('Unknown');
     expect(chip).toHaveAttribute('data-color', 'default');
+  });
+
+  it('renders translated multi-word labels instead of API identifiers', async () => {
+    const { StatusBadge } = await import('./DataTable');
+    render(<StatusBadge status="bulk_users_moved" />);
+    const chip = screen.getByTestId('chip');
+    expect(chip).toHaveTextContent('Users moved');
+    expect(chip).not.toHaveTextContent('bulk_users_moved');
   });
 
   it('handles empty string status gracefully', async () => {
     const { StatusBadge } = await import('./DataTable');
     render(<StatusBadge status="" />);
     const chip = screen.getByTestId('chip');
-    expect(chip).toHaveTextContent('unknown');
+    expect(chip).toHaveTextContent('Unknown');
   });
 });

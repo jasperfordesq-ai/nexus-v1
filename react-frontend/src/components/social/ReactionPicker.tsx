@@ -45,7 +45,7 @@ const getReactionColor = (type: ReactionType | null): string => {
     case 'clap':
       return 'text-orange-500 font-medium';
     case 'time_credit':
-      return 'text-purple-500 font-medium';
+      return 'text-accent font-medium';
     default:
       return 'text-[var(--text-muted)]';
   }

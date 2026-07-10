@@ -40,5 +40,15 @@
   },
   "page_meta": {
     "title": "Comhrá AI"
-  }
+  },
+  "card_wallet_transactions_few": "{{count}} idirbheart le 30 lá anuas",
+  "card_wallet_transactions_many": "{{count}} idirbheart le 30 lá anuas",
+  "card_wallet_transactions_one": "{{count}} idirbheart le 30 lá anuas",
+  "card_wallet_transactions_other": "{{count}} idirbheart le 30 lá anuas",
+  "card_wallet_transactions_two": "{{count}} idirbheart le 30 lá anuas",
+  "limits_left_today_few": "{{count}} fágtha inniu",
+  "limits_left_today_many": "{{count}} fágtha inniu",
+  "limits_left_today_one": "{{count}} fágtha inniu",
+  "limits_left_today_other": "{{count}} fágtha inniu",
+  "limits_left_today_two": "{{count}} fágtha inniu"
 }

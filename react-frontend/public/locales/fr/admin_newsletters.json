@@ -455,7 +455,17 @@
     "winning_metric": "Métrique gagnante",
     "resend_queued_count": "Renvoi{{count}}en file d'attente",
     "resend_queued_count_plural": "Renvois{{count}}en file d'attente",
-    "template_tabs_aria": "Filtre de catégorie de modèle de newsletter"
+    "template_tabs_aria": "Filtre de catégorie de modèle de newsletter",
+    "subscriber_total_many": "Nombre total d'abonnés à{{count}}",
+    "import_rows_found_many": "Abonné{{count}}trouvé dans CSV",
+    "resend_queued_count_many": "Renvoi{{count}}en file d'attente",
+    "resend_queued_count_one": "Renvoi{{count}}en file d'attente",
+    "resend_queued_count_other": "Renvoi{{count}}en file d'attente",
+    "your_average": "Votre moyenne",
+    "industry_avg": "Moyenne du secteur",
+    "above_benchmark": "Au-dessus de la référence",
+    "below_benchmark": "En dessous de la référence",
+    "benchmark_difference": "{{pointSign}}{{pointValue}} points ({{percentSign}}{{percentValue}} %)"
   },
   "newsletter_form": {
     "ab_test_label": "Test abdominaux",
@@ -759,7 +769,8 @@
     "total_records_one": "{{count}}record total",
     "total_records_other": "{{count}}enregistrements totaux",
     "who_clicked": "Qui a cliqué",
-    "who_opened": "Qui a ouvert"
+    "who_opened": "Qui a ouvert",
+    "total_records_many": "{{count}}record total"
   },
   "newsletter_bounces": {
     "bounce_log": "Journal de rebond",
@@ -895,7 +906,16 @@
     "subject_override_desc": "Laissez vide pour utiliser le sujet d'origine.",
     "subject_override_placeholder": "Entrez un remplacement de sujet...",
     "subtitle": "Envoyez cette newsletter à un sous-ensemble ciblé de destinataires.",
-    "total_sent": "Total envoyé"
+    "total_sent": "Total envoyé",
+    "non_openers_count_many": "Destinataire{{count}}qui n'a pas ouvert",
+    "non_openers_count_one": "Destinataire{{count}}qui n'a pas ouvert",
+    "non_openers_count_other": "Destinataire{{count}}qui n'a pas ouvert",
+    "non_clickers_count_many": "Destinataire{{count}}qui a ouvert mais n'a pas cliqué",
+    "non_clickers_count_one": "Destinataire{{count}}qui a ouvert mais n'a pas cliqué",
+    "non_clickers_count_other": "Destinataire{{count}}qui a ouvert mais n'a pas cliqué",
+    "preview_recipient_count_desc_many": "Ce renvoi sera envoyé au destinataire de{{count}}",
+    "preview_recipient_count_desc_one": "Ce renvoi sera envoyé au destinataire de{{count}}",
+    "preview_recipient_count_desc_other": "Ce renvoi sera envoyé au destinataire de{{count}}"
   },
   "newsletter_send_time": {
     "day_friday": "Ven",
@@ -919,7 +939,11 @@
     "not_enough_data": "Pas encore assez de données d’engagement.",
     "time_period": "Période",
     "title": "Optimiseur de temps d'envoi",
-    "top_recommended": "Top Recommended"
+    "top_recommended": "Top Recommended",
+    "days_many": "{{count}}jours",
+    "days_one": "{{count}}jours",
+    "days_other": "{{count}}jours",
+    "heatmap_cell_title_many": "{{day}}{{hour}}: Engagement{{count}}"
   },
   "segment_form": {
     "analyzing_member_data": "Analyse des données des membres",
@@ -1038,5 +1062,8 @@
     "update_template": "Modèle de mise à jour",
     "usage_stats_sent": "Statistiques d'utilisation envoyées",
     "usage_stats_sent_plural": "Statistiques d'utilisation envoyées au pluriel"
+  },
+  "diagnostics": {
+    "score_out_of": "sur {{maximum}}"
   }
 }

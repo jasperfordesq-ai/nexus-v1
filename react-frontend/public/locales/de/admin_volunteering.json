@@ -718,7 +718,42 @@
     "wellbeing_unknown_user": "Unbekannte:r Freiwillige:r",
     "wellbeing_user_number": "Freiwillige:r #{{id}}",
     "wellbeing_unknown_type": "Wohlergehen-Bedenken",
-    "wellbeing_raised_on": "Gemeldet {{date}}"
+    "wellbeing_raised_on": "Gemeldet {{date}}",
+    "bulk_verify_success_one": "{{count}} Datensatz verifiziert",
+    "bulk_verify_success_other": "{{count}} Datensatz verifiziert",
+    "bulk_verify_fail_one": "{{count}} Datensatz konnte nicht verifiziert werden",
+    "bulk_verify_fail_other": "{{count}} Datensatz konnte nicht verifiziert werden",
+    "expiry_alert_title_one": "{{count}} Schulungsdatensatz läuft innerhalb von 30 Tagen ab",
+    "expiry_alert_title_other": "{{count}} Schulungsdatensatz läuft innerhalb von 30 Tagen ab",
+    "bulk_selected_one": "{{count}} ausstehender Datensatz ausgewählt",
+    "bulk_selected_other": "{{count}} ausstehender Datensatz ausgewählt",
+    "members_count_one": "{{count}}-Mitglied",
+    "members_count_other": "{{count}}-Mitglied",
+    "alert_pending_applications_one": "{{count}} Anträge warten auf Prüfung",
+    "alert_pending_applications_other": "{{count}} Anträge warten auf Prüfung",
+    "export_truncated_one": "Export nach {{count}} Seiten abgebrochen – einige Zeilen wurden ausgelassen.",
+    "export_truncated_other": "Export nach {{count}} Seiten abgebrochen – einige Zeilen wurden ausgelassen.",
+    "expiring_consents_warning_one": "{{count}} Zustimmung eines Erziehungsberechtigten läuft innerhalb von 30 Tagen ab",
+    "expiring_consents_warning_other": "{{count}} Zustimmung eines Erziehungsberechtigten läuft innerhalb von 30 Tagen ab",
+    "reminder_job_sent_one": "Reminder job sent {{count}} notification(s)",
+    "reminder_job_sent_other": "Reminder job sent {{count}} notification(s)",
+    "delivery_total_sent_one": "{{count}}gesendet",
+    "delivery_total_sent_other": "{{count}}gesendet",
+    "bulk_approved_one": "{{count}} Anträge genehmigt",
+    "bulk_approved_other": "{{count}} Anträge genehmigt",
+    "bulk_declined_one": "{{count}} Anträge abgelehnt",
+    "bulk_declined_other": "{{count}} Anträge abgelehnt",
+    "selected_count_one": "{{count}} ausgewählt",
+    "selected_count_other": "{{count}} ausgewählt",
+    "bulk_approve_one": "Genehmigen ({{count}})",
+    "bulk_approve_other": "Genehmigen ({{count}})",
+    "bulk_decline_one": "Ablehnen ({{count}})",
+    "bulk_decline_other": "Ablehnen ({{count}})",
+    "bulk_approve_confirm_one": "{{count}} ausgewählte Anträge genehmigen? Die Bewerber werden benachrichtigt.",
+    "bulk_approve_confirm_other": "{{count}} ausgewählte Anträge genehmigen? Die Bewerber werden benachrichtigt.",
+    "bulk_decline_confirm_one": "{{count}} ausgewählte Anträge ablehnen? Die Bewerber werden benachrichtigt.",
+    "bulk_decline_confirm_other": "{{count}} ausgewählte Anträge ablehnen? Die Bewerber werden benachrichtigt.",
+    "decline_confirm": "Sind Sie sicher, dass Sie diese Freiwilligenbewerbung ablehnen möchten?"
   },
   "donation_refunds": {
     "page_title": "Spenden-Rückerstattungen",
@@ -761,5 +796,8 @@
     "complete_confirm_label": "Markierung abgeschlossen",
     "complete_success": "Spende als abgeschlossen markiert",
     "complete_failed": "Die Spende konnte nicht als abgeschlossen markiert werden"
+  },
+  "giving_days": {
+    "hours_target": "/ {{target}}"
   }
 }

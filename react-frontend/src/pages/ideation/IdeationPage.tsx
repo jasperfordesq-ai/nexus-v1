@@ -50,7 +50,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveThumbnailUrl } from '@/lib/helpers';
+import { resolveThumbnailUrl, getFormattingLocale } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -111,7 +111,7 @@ const truncate = (text: string, maxLength: number) => {
 const formatDate = (dateStr: string | null) => {
   if (!dateStr) return null;
   try {
-    return new Date(dateStr).toLocaleDateString(undefined, {
+    return new Date(dateStr).toLocaleDateString(getFormattingLocale(), {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -282,9 +282,7 @@ export function IdeationPage() {
     setSelectedCategory(selected ? String(selected) : '');
   };
 
-  const handleToggleFavorite = async (e: React.MouseEvent, challengeId: number) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleToggleFavorite = async (challengeId: number) => {
     if (favoritingIds.has(challengeId)) return;
 
     setFavoritingIds(prev => new Set(prev).add(challengeId));
@@ -511,10 +509,10 @@ export function IdeationPage() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {challenges.map((challenge) => (
+              <div key={challenge.id} className="relative h-full">
               <Link
-                key={challenge.id}
                 to={tenantPath(`/ideation/${challenge.id}`)}
-                className="block"
+                className="block h-full"
               >
                 <GlassCard className="h-full hover:shadow-lg transition-shadow cursor-pointer overflow-hidden">
                   {/* Cover Image */}
@@ -547,7 +545,7 @@ export function IdeationPage() {
                           </Chip>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
+                      <div className="mr-10 flex items-center gap-2 shrink-0">
                         {/* Status Badge (I11) */}
                         <Chip
                           size="sm"
@@ -557,23 +555,6 @@ export function IdeationPage() {
                           {t(`status.${challenge.status}`)}
                         </Chip>
                         {/* Favorite Button (I8) — uses onClick to stop Link propagation */}
-                        <span
-                          role="button"
-                          tabIndex={0}
-                          onClick={(e) => handleToggleFavorite(e, challenge.id)}
-                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); void handleToggleFavorite(e as unknown as React.MouseEvent, challenge.id); } }}
-                          aria-label={challenge.is_favorited ? t('favorites.remove') : t('favorites.add')}
-                          aria-disabled={favoritingIds.has(challenge.id)}
-                          className="p-1 rounded-full hover:bg-[var(--color-surface-hover)] transition-colors inline-flex items-center"
-                        >
-                          <Heart
-                            className={`w-4 h-4 ${
-                              challenge.is_favorited
-                                ? 'text-[var(--color-error)] fill-current'
-                                : 'text-[var(--color-text-tertiary)]'
-                            }`}
-                          />
-                        </span>
                       </div>
                     </div>
 
@@ -637,6 +618,27 @@ export function IdeationPage() {
                   </div>
                 </GlassCard>
               </Link>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="ghost"
+                onPress={() => handleToggleFavorite(challenge.id)}
+                aria-label={challenge.is_favorited ? t('favorites.remove') : t('favorites.add')}
+                isDisabled={favoritingIds.has(challenge.id)}
+                className={`absolute right-3 z-10 size-11 min-h-11 min-w-11 rounded-full ${
+                  challenge.cover_image ? 'top-[10.75rem]' : 'top-3'
+                }`}
+              >
+                <Heart
+                  className={`w-4 h-4 ${
+                    challenge.is_favorited
+                      ? 'text-[var(--color-error)] fill-current'
+                      : 'text-[var(--color-text-tertiary)]'
+                  }`}
+                  aria-hidden="true"
+                />
+              </Button>
+              </div>
             ))}
           </div>
 

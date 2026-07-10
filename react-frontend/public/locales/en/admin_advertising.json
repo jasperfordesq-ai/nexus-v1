@@ -187,7 +187,9 @@
         "pause_failed": "Failed to pause campaign",
         "rejected": "Campaign \"{{name}}\" rejected",
         "reject_failed": "Failed to reject campaign"
-      }
+      },
+      "creatives_count_one": "Creatives ({{count}})",
+      "creatives_count_other": "Creatives ({{count}})"
     },
     "push": {
       "page_title": "Push Campaigns",

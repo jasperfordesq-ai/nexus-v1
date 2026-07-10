@@ -1,4 +1,5 @@
-import { Button, Input, Card, CardBody, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, RadioGroup, Radio } from '@/components/ui';
+import { getFormattingLocale } from '@/lib/helpers';
+import { Button, Input, Card, CardBody, Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter, RadioGroup, Radio } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -100,10 +101,10 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
         {(onModalClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              <div className="flex items-center gap-2">
+              <ModalHeading className="flex items-center gap-2">
                 <Mail size={20} />
                 <span>{t('newsletter_resend.resend_newsletter')}</span>
-              </div>
+              </ModalHeading>
               <p className="text-sm font-normal text-muted">
                 {t('newsletter_resend.subtitle')}
               </p>
@@ -120,15 +121,15 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div>
                           <p className="text-sm text-muted">{t('newsletter_resend.total_sent')}</p>
-                          <p className="text-2xl font-bold">{info.total_sent.toLocaleString()}</p>
+                          <p className="text-2xl font-bold">{info.total_sent.toLocaleString(getFormattingLocale())}</p>
                         </div>
                         <div>
                           <p className="text-sm text-muted">{t('newsletter_resend.opened')}</p>
-                          <p className="text-2xl font-bold text-success">{info.total_opened.toLocaleString()}</p>
+                          <p className="text-2xl font-bold text-success">{info.total_opened.toLocaleString(getFormattingLocale())}</p>
                         </div>
                         <div>
                           <p className="text-sm text-muted">{t('newsletter_resend.clicked')}</p>
-                          <p className="text-2xl font-bold text-accent">{info.total_clicked.toLocaleString()}</p>
+                          <p className="text-2xl font-bold text-accent">{info.total_clicked.toLocaleString(getFormattingLocale())}</p>
                         </div>
                       </div>
                     </CardBody>

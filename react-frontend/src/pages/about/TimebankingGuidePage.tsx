@@ -41,9 +41,9 @@ import { RelatedPages } from './RelatedPages';
 const impactStats = [
   {
     value: '16:1',
-    color: 'from-indigo-500 to-blue-500',
-    bgAccent: 'bg-indigo-500/10',
-    textAccent: 'text-indigo-600 dark:text-indigo-400',
+    color: 'from-accent to-blue-500',
+    bgAccent: 'bg-accent/10',
+    textAccent: 'text-accent dark:text-accent',
     icon: TrendingUp,
   },
   {
@@ -66,7 +66,7 @@ const steps = [
   {
     key: 'offer',
     icon: Handshake,
-    color: 'from-indigo-500 to-purple-500',
+    color: 'from-accent to-accent-gradient-end',
   },
   {
     key: 'earn',
@@ -84,8 +84,8 @@ const values = [
   {
     key: 'equality',
     icon: Gem,
-    color: 'text-indigo-500 dark:text-indigo-400',
-    bg: 'bg-indigo-500/15',
+    color: 'text-accent dark:text-accent',
+    bg: 'bg-accent/15',
   },
   {
     key: 'reciprocity',
@@ -145,14 +145,14 @@ export function TimebankingGuidePage() {
       <section className="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 pointer-events-none opacity-20" aria-hidden="true">
-          <div className="absolute top-10 left-1/4 w-72 h-72 bg-indigo-500 rounded-full blur-3xl" />
+          <div className="absolute top-10 left-1/4 w-72 h-72 bg-accent rounded-full blur-3xl" />
           <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-emerald-500 rounded-full blur-3xl" />
         </div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.div {...fadeInUp} transition={{ duration: 0.6 }}>
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-6">
-              <BookOpen className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-emerald-500/20 mb-6">
+              <BookOpen className="w-8 h-8 text-accent dark:text-accent" aria-hidden="true" />
             </div>
           </motion.div>
 
@@ -175,7 +175,7 @@ export function TimebankingGuidePage() {
       </section>
 
       {/* ─── Impact Stats ─── */}
-      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
+      <section className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-accent/5 to-transparent">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -251,7 +251,7 @@ export function TimebankingGuidePage() {
               >
                 <GlassCard className="p-8 h-full text-center relative group hover:scale-[1.02] transition-transform overflow-hidden">
                   {/* Step number badge */}
-                  <div className="absolute top-2 right-2 w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                  <div className="absolute top-2 right-2 w-9 h-9 rounded-full bg-gradient-to-br from-accent to-accent-gradient-end flex items-center justify-center text-white text-sm font-bold shadow-lg">
                     {index + 1}
                   </div>
 
@@ -271,7 +271,7 @@ export function TimebankingGuidePage() {
       </section>
 
       {/* ─── Our Fundamental Values ─── */}
-      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-purple-500/5 to-transparent">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-accent-gradient-end/5 to-transparent">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -331,13 +331,13 @@ export function TimebankingGuidePage() {
             <GlassCard className="p-10 sm:p-14 text-center relative overflow-hidden">
               {/* Background gradient */}
               <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-3xl" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-accent to-accent-gradient-end rounded-full blur-3xl" />
                 <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full blur-3xl" />
               </div>
 
               <div className="relative z-10">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-6">
-                  <Sparkles className="w-7 h-7 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-accent/20 to-emerald-500/20 mb-6">
+                  <Sparkles className="w-7 h-7 text-accent dark:text-accent" aria-hidden="true" />
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-bold text-theme-primary mb-4">
@@ -353,7 +353,7 @@ export function TimebankingGuidePage() {
                       as={Link}
                       to={tenantPath('/listings')}
                       size="lg"
-                      className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
+                      className="w-full sm:w-auto bg-gradient-to-r from-accent to-accent-gradient-end text-white font-semibold px-8"
                       endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                     >
                       {t('timebanking_guide.cta_browse_listings')}
@@ -363,7 +363,7 @@ export function TimebankingGuidePage() {
                       as={Link}
                       to={tenantPath('/register')}
                       size="lg"
-                      className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
+                      className="w-full sm:w-auto bg-gradient-to-r from-accent to-accent-gradient-end text-white font-semibold px-8"
                       endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                     >
                       {t('timebanking_guide.cta_join_free')}

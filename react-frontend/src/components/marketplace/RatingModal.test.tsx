@@ -48,9 +48,9 @@ const DEFAULT_PROPS = {
   onSuccess: vi.fn(),
 };
 
-/** Query the nth star button (1-indexed) by its aria-label. */
+/** Query the nth star radio (1-indexed) by its translated accessible name. */
 function getStar(n: number): HTMLElement {
-  return screen.getByRole('button', { name: `${n} stars` });
+  return screen.getByRole('radio', { name: `${n} stars` });
 }
 
 describe('RatingModal', () => {
@@ -65,17 +65,19 @@ describe('RatingModal', () => {
     expect(screen.getByText('Rate Your Order')).toBeInTheDocument();
   });
 
-  it('renders 5 star buttons with aria-labels', () => {
+  it('renders 5 star radios with translated accessible names', () => {
     render(<RatingModal {...DEFAULT_PROPS} />);
-    // HeroUI Button does not forward role="radio" to the DOM; query by aria-label instead
     for (let i = 1; i <= 5; i++) {
-      expect(screen.getByRole('button', { name: `${i} stars` })).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: `${i} stars` })).toBeInTheDocument();
     }
   });
 
   it('renders a radiogroup wrapper around the stars', () => {
     render(<RatingModal {...DEFAULT_PROPS} />);
-    expect(screen.getByRole('radiogroup')).toBeInTheDocument();
+    expect(screen.getByRole('radiogroup', { name: 'Rating' })).toHaveAttribute(
+      'aria-required',
+      'true',
+    );
   });
 
   it('renders the comment textarea', () => {
@@ -113,10 +115,8 @@ describe('RatingModal', () => {
   });
 
   // ─── Star selection state ─────────────────────────────────────────────────
-  // Note: HeroUI v3 Button strips custom aria-checked from the rendered DOM
-  // element, so we cannot assert that attribute directly. Instead we verify
-  // the observable side-effects of star selection (Submit enables, API payload
-  // includes the correct rating value). Those tests are in the Submit section.
+  // HeroUI v3 Radio exposes native checked state and preserves the selected
+  // value in the submitted API payload.
 
   it('clicking any star enables the Submit Rating button (confirms state update)', async () => {
     render(<RatingModal {...DEFAULT_PROPS} />);

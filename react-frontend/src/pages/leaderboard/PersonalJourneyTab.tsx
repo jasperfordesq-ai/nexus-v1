@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Skeleton } from '@/components/ui/Skeleton';
 /**
@@ -132,8 +133,8 @@ export default function PersonalJourneyTab() {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <SummaryCard
           label={summary.level_name || t('journey.level', { level: summary.level ?? 0 })}
-          value={t('journey.xp_value', { xp: (summary.xp ?? 0).toLocaleString() })}
-          icon={<TrendingUp aria-hidden="true" className="w-4 h-4 text-purple-500" />}
+          value={t('journey.xp_value', { xp: (summary.xp ?? 0).toLocaleString(getFormattingLocale()) })}
+          icon={<TrendingUp aria-hidden="true" className="w-4 h-4 text-accent" />}
           isText
         />
         <SummaryCard
@@ -186,11 +187,10 @@ export default function PersonalJourneyTab() {
               return (
                 <motion.div
                   key={month.month}
-                  className="flex-1 flex flex-col items-center gap-1"
+                  className="flex-1 origin-bottom flex flex-col items-center gap-1"
                   initial={{ scaleY: 0 }}
                   animate={{ scaleY: 1 }}
                   transition={{ delay: i * 0.05, duration: 0.3 }}
-                  style={{ transformOrigin: 'bottom' }}
                 >
                   <span className="text-[10px] text-muted font-medium">
                     {month.xp_earned || ''}
@@ -289,7 +289,7 @@ function SummaryCard({
         <span className="text-xs text-muted">{label}</span>
       </div>
       <p className={isText ? 'text-sm font-medium' : 'text-xl font-bold'}>
-        {typeof value === 'number' ? value.toLocaleString() : value}
+        {typeof value === 'number' ? value.toLocaleString(getFormattingLocale()) : value}
       </p>
     </GlassCard>
   );

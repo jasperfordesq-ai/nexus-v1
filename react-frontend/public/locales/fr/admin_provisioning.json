@@ -116,7 +116,8 @@
       "intended_use": "Utilisation prévue",
       "rejection_reason": "Motif du refus",
       "provisioning_log": "Journal de provisionnement"
-    }
+    },
+    "loading": "Chargement des demandes de provisionnement…"
   },
   "loading": "Loading",
   "refresh": "Actualiser"

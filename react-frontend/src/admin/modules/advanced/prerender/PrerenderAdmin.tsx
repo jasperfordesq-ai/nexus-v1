@@ -329,7 +329,12 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
         <KpiCard label={t('kpi.status')} value={healthBadge} hint={summary.cache_path} />
         <KpiCard
           label={t('kpi.metrics')}
-          value={<a href="/api/v2/admin/prerender/metrics" target="_blank" rel="noopener noreferrer" className="text-accent text-sm hover:underline">/metrics</a>}
+          value={
+            <>
+              {/* eslint-disable-next-line i18next/no-literal-string -- Metrics route must remain verbatim. */}
+              <a href="/api/v2/admin/prerender/metrics" target="_blank" rel="noopener noreferrer" className="text-accent text-sm hover:underline">/metrics</a>
+            </>
+          }
           hint={t('hints.prometheus')}
         />
       </div>
@@ -2054,7 +2059,11 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
           <ModalHeader>{t('modal.title')}</ModalHeader>
           <ModalBody>
             <p>
-              {t('modal.body_prefix')} <code>claimed</code> {t('modal.body_middle')} <code>running</code> {t('modal.body_suffix')}
+              {t('modal.body_prefix')}{' '}
+              {/* eslint-disable-next-line i18next/no-literal-string -- Queue state identifier must remain verbatim. */}
+              <code>claimed</code> {t('modal.body_middle')}{' '}
+              {/* eslint-disable-next-line i18next/no-literal-string -- Queue state identifier must remain verbatim. */}
+              <code>running</code> {t('modal.body_suffix')}
             </p>
             <p className="text-warning-700 text-sm">
               {t('modal.warning')}
@@ -2216,7 +2225,9 @@ function TtlInspector() {
       </CardHeader>
       <CardBody className="space-y-3">
         <p className="text-sm text-muted">
-          {t('description_prefix')} <code>config/prerender.php</code> {t('description_suffix')}
+          {t('description_prefix')}{' '}
+          {/* eslint-disable-next-line i18next/no-literal-string -- Configuration path must remain verbatim. */}
+          <code>config/prerender.php</code> {t('description_suffix')}
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
           <Input
@@ -2303,7 +2314,9 @@ function SitemapExplorer() {
       </CardHeader>
       <CardBody className="space-y-3">
         <p className="text-sm text-muted">
-          {t('description_prefix')} <code>SitemapService</code>. {t('description_suffix')}
+          {t('description_prefix')}{' '}
+          {/* eslint-disable-next-line i18next/no-literal-string -- PHP service class name must remain verbatim. */}
+          <code>SitemapService</code>. {t('description_suffix')}
         </p>
         <div className="flex gap-2 items-end">
           <Input

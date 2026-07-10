@@ -23,7 +23,13 @@
       "months_active": "{{count}} sur 12 mois",
       "month_active_tooltip": "Actif : activités {{count}}",
       "month_inactive_tooltip": "Inactif",
-      "description": "Mois au cours desquels vous avez effectué au moins une activité significative (échange, annonce, avis ou heures de bénévolat)."
+      "description": "Mois au cours desquels vous avez effectué au moins une activité significative (échange, annonce, avis ou heures de bénévolat).",
+      "months_active_many": "{{count}} sur 12 mois",
+      "months_active_one": "{{count}} sur 12 mois",
+      "months_active_other": "{{count}} sur 12 mois",
+      "month_active_tooltip_many": "Actif : activités {{count}}",
+      "month_active_tooltip_one": "Actif : activités {{count}}",
+      "month_active_tooltip_other": "Actif : activités {{count}}"
     },
     "badge_type": {
       "vol": "Volontariat",
@@ -77,7 +83,10 @@
       "claimed_message": "Vous avez gagné {{xp}} XP !",
       "claim_failed": "Échec de la réclamation",
       "claim_failed_desc": "Impossible de réclamer la récompense quotidienne.",
-      "claim_error": "Une erreur est survenue. Veuillez réessayer."
+      "claim_error": "Une erreur est survenue. Veuillez réessayer.",
+      "day_streak_many": "Série de {{count}} jours",
+      "day_streak_one": "Série de {{count}} jours",
+      "day_streak_other": "Série de {{count}} jours"
     },
     "challenges": {
       "active_challenges": "Défis actifs",
@@ -121,7 +130,10 @@
       "purchase_failed_desc": "Impossible de finaliser l'achat.",
       "purchase_error": "Une erreur est survenue.",
       "load_failed": "Échec du chargement",
-      "load_failed_desc": "Impossible de charger la boutique XP."
+      "load_failed_desc": "Impossible de charger la boutique XP.",
+      "stock_left_many": "{{count}} en stock",
+      "stock_left_one": "{{count}} en stock",
+      "stock_left_other": "{{count}} en stock"
     },
     "loading": "Chargement des réalisations",
     "badge_detail": {
@@ -159,7 +171,10 @@
       "updated_desc": "Votre vitrine de badges a été enregistrée.",
       "save_failed": "Échec de l'enregistrement",
       "save_failed_desc": "Impossible de mettre à jour la vitrine.",
-      "save_error": "Une erreur est survenue."
+      "save_error": "Une erreur est survenue.",
+      "select_badges_many": "Sélectionnez jusqu'à 5 badges à afficher sur votre profil. ({{count}}/5 sélectionnés)",
+      "select_badges_one": "Sélectionnez jusqu'à 5 badges à afficher sur votre profil. ({{count}}/5 sélectionnés)",
+      "select_badges_other": "Sélectionnez jusqu'à 5 badges à afficher sur votre profil. ({{count}}/5 sélectionnés)"
     },
     "load_error": "Échec du chargement des réalisations. Veuillez réessayer."
   },
@@ -266,7 +281,10 @@
       "buddy_failed": "Impossible de devenir partenaire",
       "buddy_action_sent": "Soutien d'ami envoyé",
       "buddy_action_failed": "Échec de l'envoi de l'assistance d'un ami"
-    }
+    },
+    "streak_label_many": "{{count}} séquence d'enregistrement",
+    "streak_label_one": "{{count}} séquence d'enregistrement",
+    "streak_label_other": "{{count}} séquence d'enregistrement"
   },
   "frequency": {
     "none": "Pas de cadence",
@@ -328,7 +346,10 @@
       "rank_label": "Rang {{rank}}",
       "xp_reward": "{{xp}} XP",
       "load_failed": "Échec du chargement",
-      "load_failed_desc": "Impossible de charger l'historique des saisons."
+      "load_failed_desc": "Impossible de charger l'historique des saisons.",
+      "participants_many": "{{count}} participants",
+      "participants_one": "{{count}} participants",
+      "participants_other": "{{count}} participants"
     },
     "score_unit": {
       "hours": "h",
@@ -421,7 +442,13 @@
       "legendary": "Légendaire"
     },
     "max_score_label": "/ {{max}}",
-    "loading": "Chargement de votre NexusScore..."
+    "loading": "Chargement de votre NexusScore...",
+    "points_to_next_many": "{{count}} points to {{tier}}",
+    "points_to_next_one": "{{count}} pointe vers {{tier}}",
+    "points_to_next_other": "{{count}} pointe vers {{tier}}",
+    "remaining_count_many": "{{count}} restant",
+    "remaining_count_one": "{{count}} restant",
+    "remaining_count_other": "{{count}} restant"
   },
   "common": {
     "refresh": "Rafraîchir",

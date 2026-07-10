@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Select, SelectItem } from '@/components/ui/Select';
@@ -103,7 +104,7 @@ function SettingToggle({ label, description, checked, onChange }: SettingToggleP
         onValueChange={onChange}
         className="shrink-0"
         classNames={{
-          wrapper: 'group-data-[selected=true]:bg-indigo-500',
+          wrapper: 'group-data-[selected=true]:bg-accent',
         }}
       />
     </div>
@@ -200,7 +201,7 @@ export function PrivacyTab({
 
           <Button
             onPress={onSavePrivacy}
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<Save className="w-4 h-4" aria-hidden="true" />}
             isLoading={isSavingPrivacy}
           >
@@ -217,8 +218,8 @@ export function PrivacyTab({
             className="w-full justify-between text-theme-primary min-h-16 px-4 py-4"
             startContent={
               <div className="flex min-w-0 items-center gap-3">
-                <div className="p-2 rounded-lg bg-indigo-500/20">
-                  <Globe className="w-4 h-4 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+                <div className="p-2 rounded-lg bg-accent/20">
+                  <Globe className="w-4 h-4 text-accent dark:text-accent" aria-hidden="true" />
                 </div>
                 <div className={rowContentClass}>
                   <p className="font-medium">{t('federation.title')}</p>
@@ -256,7 +257,7 @@ export function PrivacyTab({
       {/* GDPR Section */}
       <GlassCard className="p-6">
         <h2 className="text-lg font-semibold text-theme-primary mb-2 flex items-center gap-2">
-          <FileText className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+          <FileText className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
           {t('gdpr.title')}
         </h2>
         <p className="text-theme-subtle text-sm mb-6">
@@ -268,8 +269,8 @@ export function PrivacyTab({
             variant="secondary"
             className={actionRowClass}
             startContent={
-              <div className="p-2 rounded-lg bg-indigo-500/20">
-                <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+              <div className="p-2 rounded-lg bg-accent/20">
+                <Download className="w-4 h-4 text-accent dark:text-accent" aria-hidden="true" />
               </div>
             }
             endContent={<ChevronRight className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
@@ -385,7 +386,7 @@ export function PrivacyTab({
                         </p>
                         <p className="text-xs text-theme-muted">
                           {cert.provider_name || t('insurance.unknown_provider')}
-                          {cert.expiry_date ? ` ${t('insurance.expires', { date: new Date(cert.expiry_date).toLocaleDateString() })}` : ''}
+                          {cert.expiry_date ? ` ${t('insurance.expires', { date: new Date(cert.expiry_date).toLocaleDateString(getFormattingLocale()) })}` : ''}
                         </p>
                       </div>
                       <span className={`text-xs px-2 py-1 rounded-full font-medium ${

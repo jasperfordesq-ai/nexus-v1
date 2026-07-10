@@ -108,7 +108,7 @@ export function ReactionPickerMenu({
               type="button"
             >
               {config.type === 'time_credit' ? (
-                <Clock className="w-5 h-5 text-purple-400" aria-hidden="true" />
+                <Clock className="w-5 h-5 text-accent" aria-hidden="true" />
               ) : (
                 <span role="img" aria-label={t(config.label)}>{config.emoji}</span>
               )}

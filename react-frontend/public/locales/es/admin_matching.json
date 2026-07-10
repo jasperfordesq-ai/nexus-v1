@@ -306,6 +306,21 @@
     "pillar_trust": "Trust",
     "pillar_aria": "{{label}}: {{percent}}%",
     "of_active_users": "of {{total}} active users",
-    "of_active_listings": "of {{total}} active listings"
+    "of_active_listings": "of {{total}} active listings",
+    "cache_cleared_count_many": "Entrada de caché{{count}}borrada",
+    "cache_cleared_count_one": "Entrada de caché{{count}}borrada",
+    "cache_cleared_count_other": "Entrada de caché{{count}}borrada",
+    "clear_cache_confirm_with_count_many": "¿Está seguro de que desea borrar las coincidencias almacenadas en caché de{{count}}?",
+    "clear_cache_confirm_with_count_one": "¿Está seguro de que desea borrar las coincidencias almacenadas en caché de{{count}}?",
+    "clear_cache_confirm_with_count_other": "¿Está seguro de que desea borrar las coincidencias almacenadas en caché de{{count}}?",
+    "distribution_aria_many": "{{label}}: Coincidencias de{{count}}({{percent}}%)",
+    "distribution_aria_one": "{{label}}: Coincidencias de{{count}}({{percent}}%)",
+    "distribution_aria_other": "{{label}}: Coincidencias de{{count}}({{percent}}%)",
+    "feedback_reason_aria_many": "{{label}}: {{count}} ({{percent}}%)",
+    "feedback_reason_aria_one": "{{label}}: {{count}} ({{percent}}%)",
+    "feedback_reason_aria_other": "{{label}}: {{count}} ({{percent}}%)",
+    "pillar_averages_sample_size_many": "Based on {{count}} matches",
+    "pillar_averages_sample_size_one": "Basado en coincidencias de {{count}}",
+    "pillar_averages_sample_size_other": "Basado en coincidencias de {{count}}"
   }
 }

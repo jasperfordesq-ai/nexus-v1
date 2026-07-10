@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -422,12 +423,12 @@ export default function SafeguardingReportsAdminPage(): ReactNode {
                           {t('admin.safeguarding_reports.overdue')}
                         </Chip>
                       ) : r.review_due_at ? (
-                        new Date(r.review_due_at).toLocaleString()
+                        new Date(r.review_due_at).toLocaleString(getFormattingLocale())
                       ) : (
                         t('admin.safeguarding_reports.empty_dash')
                       )}
                     </TableCell>
-                    <TableCell>{new Date(r.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(r.created_at).toLocaleDateString(getFormattingLocale())}</TableCell>
                     <TableCell>
                       <Button size="sm" variant="tertiary" onPress={() => void openDetail(r.id)}>
                         {t('admin.safeguarding_reports.open')}
@@ -609,7 +610,7 @@ export default function SafeguardingReportsAdminPage(): ReactNode {
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-medium">{a.action}</p>
                             <p className="text-xs text-muted">
-                              {new Date(a.created_at).toLocaleString()}
+                              {new Date(a.created_at).toLocaleString(getFormattingLocale())}
                             </p>
                           </div>
                           <p className="mt-1 text-xs text-muted">

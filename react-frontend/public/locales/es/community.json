@@ -187,7 +187,11 @@
     "terms_required": "Debes aceptar los términos para registrar tu organización.",
     "opportunity_count_one": "{{count}} oportunidad",
     "opportunity_count_other": "{{count}} oportunidades",
-    "loading": "Organizaciones de carga"
+    "loading": "Organizaciones de carga",
+    "opportunity_count_many": "{{count}} oportunidades",
+    "volunteer_count_many": "{{count}} voluntarios",
+    "volunteer_count_one": "{{count}} voluntarios",
+    "volunteer_count_other": "{{count}} voluntarios"
   },
   "organisation_detail": {
     "page_title": "Organización",
@@ -231,7 +235,13 @@
     "submit_review": "Enviar reseña",
     "review_success": "Revisión enviada.",
     "review_error": "No se puede enviar su reseña.",
-    "rating_required": "Elija una calificación antes de enviarla."
+    "rating_required": "Elija una calificación antes de enviarla.",
+    "meta_description_fallback_many": "Explora {{name}} y {{count}} oportunidades activas de voluntariado en este banco de tiempo comunitario.",
+    "meta_description_fallback_one": "Explora {{name}} y {{count}} oportunidades activas de voluntariado en este banco de tiempo comunitario.",
+    "meta_description_fallback_other": "Explora {{name}} y {{count}} oportunidades activas de voluntariado en este banco de tiempo comunitario.",
+    "review_count_many": "{{count}} reseñas",
+    "review_count_one": "{{count}} reseñas",
+    "review_count_other": "{{count}} reseñas"
   },
   "emergency_alerts": {
     "heading": "Alertas de Emergencia",

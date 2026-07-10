@@ -84,7 +84,9 @@
       "general_admin": "Algemeen beheerder",
       "caring_community": "Zorgzame gemeenschap",
       "kiss_agoris": "KUS & Caring Community"
-    }
+    },
+    "search_placeholder_one": "Help-artikelen voor{{count}}zoeken...",
+    "search_placeholder_other": "Help-artikelen voor{{count}}zoeken..."
   },
   "help_faqs": {
     "page_title": "Help-FAQ’s",

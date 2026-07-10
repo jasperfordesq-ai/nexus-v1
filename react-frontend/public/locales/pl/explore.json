@@ -23,14 +23,22 @@
     "title": "Nadchodzące wydarzenia",
     "subtitle": "Dołącz do swojej społeczności",
     "online": "W Internecie",
-    "attending": "{{count}} uczestniczy"
+    "attending": "{{count}} uczestniczy",
+    "attending_few": "{{count}} uczestniczy",
+    "attending_many": "{{count}} uczestniczy",
+    "attending_one": "{{count}} uczestniczy",
+    "attending_other": "{{count}} uczestniczy"
   },
   "active_groups": {
     "title": "Aktywne grupy",
     "subtitle": "Połącz się z podobnie myślącymi członkami",
     "members": "{{count}} członków",
     "view_group": "Zobacz grupę",
-    "view_group_named": "View group: {{name}}"
+    "view_group_named": "View group: {{name}}",
+    "members_few": "{{count}} członków",
+    "members_many": "{{count}} członków",
+    "members_one": "{{count}} członków",
+    "members_other": "{{count}} członków"
   },
   "top_contributors": {
     "title": "Najlepsi współpracownicy",
@@ -56,12 +64,24 @@
     "subtitle": "Podziel się swoimi pomysłami i wprowadź zmiany",
     "ideas_count": "{{count}} pomysłów",
     "ends": "Kończy się {{date}}",
-    "progress": "Postęp wyzwania"
+    "progress": "Postęp wyzwania",
+    "ideas_count_few": "{{count}} pomysłów",
+    "ideas_count_many": "{{count}} pomysłów",
+    "ideas_count_one": "{{count}} pomysłów",
+    "ideas_count_other": "{{count}} pomysłów"
   },
   "time_ago": {
     "just_now": "Właśnie teraz",
     "hours_ago": "{{count}}h temu",
-    "days_ago": "{{count}}d temu"
+    "days_ago": "{{count}}d temu",
+    "hours_ago_few": "{{count}}h temu",
+    "hours_ago_many": "{{count}}h temu",
+    "hours_ago_one": "{{count}}h temu",
+    "hours_ago_other": "{{count}}h temu",
+    "days_ago_few": "{{count}}d temu",
+    "days_ago_many": "{{count}}d temu",
+    "days_ago_one": "{{count}}d temu",
+    "days_ago_other": "{{count}}d temu"
   },
   "error_loading": "Nie mogliśmy załadować strony Odkryj. To może być tymczasowy problem.",
   "retry": "Spróbuj ponownie",
@@ -82,18 +102,34 @@
     "title": "Z bloga",
     "subtitle": "Najnowsze historie z Twojej społeczności",
     "read_time": "{{count}} min czytania",
-    "views": "{{count}} wyświetleń"
+    "views": "{{count}} wyświetleń",
+    "read_time_few": "{{count}} min czytania",
+    "read_time_many": "{{count}} min czytania",
+    "read_time_one": "{{count}} min czytania",
+    "read_time_other": "{{count}} min czytania",
+    "views_few": "{{count}} wyświetleń",
+    "views_many": "{{count}} wyświetleń",
+    "views_one": "{{count}} wyświetleń",
+    "views_other": "{{count}} wyświetleń"
   },
   "volunteering": {
     "title": "Możliwości wolontariatu",
     "subtitle": "Zrób różnicę w swojej społeczności",
     "applications": "{{count}} aplikacji",
-    "view_opportunity": "Zobacz możliwość"
+    "view_opportunity": "Zobacz możliwość",
+    "applications_few": "{{count}} aplikacji",
+    "applications_many": "{{count}} aplikacji",
+    "applications_one": "{{count}} aplikacji",
+    "applications_other": "{{count}} aplikacji"
   },
   "organisations": {
     "title": "Organizacje",
     "subtitle": "Partnerzy społecznościowi, którzy mają wpływ",
-    "opportunities": "{{count}} możliwości"
+    "opportunities": "{{count}} możliwości",
+    "opportunities_few": "{{count}} możliwości",
+    "opportunities_many": "{{count}} możliwości",
+    "opportunities_one": "{{count}} możliwości",
+    "opportunities_other": "{{count}} możliwości"
   },
   "polls": {
     "title": "Aktywne ankiety",
@@ -102,19 +138,35 @@
     "options": "{{count}} opcji",
     "vote_now": "Głosuj teraz",
     "vote_now_for": "Zagłosuj teraz na: {{question}}",
-    "closes": "Zamknięcie {{date}}"
+    "closes": "Zamknięcie {{date}}",
+    "options_few": "{{count}} opcji",
+    "options_many": "{{count}} opcji",
+    "options_one": "{{count}} opcji",
+    "options_other": "{{count}} opcji",
+    "votes_few": "{{count}} głosów",
+    "votes_many": "{{count}} głosów",
+    "votes_one": "{{count}} głosów",
+    "votes_other": "{{count}} głosów"
   },
   "in_demand_skills": {
     "title": "Umiejętności w popycie",
     "subtitle": "Najczęściej poszukiwane umiejętności w Twojej społeczności",
     "requested": "{{count}} prosi o pomoc",
     "offered": "{{count}} oferuje pomoc",
-    "you_can_help": "Możesz pomóc!"
+    "you_can_help": "Możesz pomóc!",
+    "requested_few": "{{count}} prosi o pomoc",
+    "requested_many": "{{count}} prosi o pomoc",
+    "requested_one": "{{count}} prosi o pomoc",
+    "requested_other": "{{count}} prosi o pomoc"
   },
   "resources": {
     "title": "Wyróżnione zasoby",
     "subtitle": "Przewodniki i materiały dla Twojej społeczności",
-    "views": "{{count}} wyświetleń"
+    "views": "{{count}} wyświetleń",
+    "views_few": "{{count}} wyświetleń",
+    "views_many": "{{count}} wyświetleń",
+    "views_one": "{{count}} wyświetleń",
+    "views_other": "{{count}} wyświetleń"
   },
   "jobs": {
     "title": "Oferty pracy",

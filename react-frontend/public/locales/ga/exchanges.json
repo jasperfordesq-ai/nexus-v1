@@ -109,7 +109,12 @@
     "ratings": "Rátálacha",
     "rate_exchange": "Rátáil an Malartú seo",
     "prep_time_value": "{{count}}h",
-    "rating_value": "Rátáil: {{rating}} as 5"
+    "rating_value": "Rátáil: {{rating}} as 5",
+    "prep_time_value_few": "{{count}}h",
+    "prep_time_value_many": "{{count}}h",
+    "prep_time_value_one": "{{count}}h",
+    "prep_time_value_other": "{{count}}h",
+    "prep_time_value_two": "{{count}}h"
   },
   "modal": {
     "decline_title": "Diúltaigh d'Iarratas Malartaithe",
@@ -174,5 +179,9 @@
     "detail": {
       "title": "Sonraí Malartú"
     }
-  }
+  },
+  "hours_count_few": "{{count}} uair",
+  "hours_count_many": "{{count}} uair",
+  "hours_count_one": "{{count}} uair",
+  "hours_count_two": "{{count}} uair"
 }

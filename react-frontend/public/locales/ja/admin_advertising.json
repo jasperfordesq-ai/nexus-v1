@@ -187,7 +187,8 @@
         "pause_failed": "キャンペーンを一時停止できませんでした",
         "rejected": "キャンペーン「{{name}}」が拒否されました",
         "reject_failed": "キャンペーンを拒否できませんでした"
-      }
+      },
+      "creatives_count_other": "クリエイティブ ({{count}})"
     },
     "push": {
       "page_title": "プッシュキャンペーン",

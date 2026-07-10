@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Button, Chip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -123,7 +124,7 @@ export default function AgentRunsPage() {
                   <TableCell>{r.id}</TableCell>
                   <TableCell>{r.agent_type}</TableCell>
                   <TableCell>
-                    {r.started_at ? new Date(r.started_at).toLocaleString() : t('agents.common.empty_dash')}
+                    {r.started_at ? new Date(r.started_at).toLocaleString(getFormattingLocale()) : t('agents.common.empty_dash')}
                   </TableCell>
                   <TableCell>
                     <Chip size="sm" variant="soft" color={statusColor(r.status)}>
@@ -161,7 +162,7 @@ export default function AgentRunsPage() {
                         {r.completed_at && (
                           <p className="text-xs text-muted">
                             {t('agents.runs.detail.completed', {
-                              date: new Date(r.completed_at).toLocaleString(),
+                              date: new Date(r.completed_at).toLocaleString(getFormattingLocale()),
                             })}
                           </p>
                         )}

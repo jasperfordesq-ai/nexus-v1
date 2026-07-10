@@ -117,7 +117,19 @@
       "media_jobs_one": "{{count}} media ag fanacht",
       "media_jobs_other": "{{count}} poist sna meáin ag fanacht",
       "rss_ready_one": "Is féidir seó foilsithe {{count}} a sheiceáil",
-      "rss_ready_other": "Is féidir seónna foilsithe {{count}} a sheiceáil"
+      "rss_ready_other": "Is féidir seónna foilsithe {{count}} a sheiceáil",
+      "pending_items_few": "{{count}} míreanna ag fanacht le hathbhreithniú",
+      "pending_items_many": "{{count}} míreanna ag fanacht le hathbhreithniú",
+      "pending_items_two": "{{count}} míreanna ag fanacht le hathbhreithniú",
+      "open_reports_few": "{{count}} tuarascálacha ball oscailte",
+      "open_reports_many": "{{count}} tuarascálacha ball oscailte",
+      "open_reports_two": "{{count}} tuarascálacha ball oscailte",
+      "media_jobs_few": "{{count}} poist sna meáin ag fanacht",
+      "media_jobs_many": "{{count}} poist sna meáin ag fanacht",
+      "media_jobs_two": "{{count}} poist sna meáin ag fanacht",
+      "rss_ready_few": "Is féidir seónna foilsithe {{count}} a sheiceáil",
+      "rss_ready_many": "Is féidir seónna foilsithe {{count}} a sheiceáil",
+      "rss_ready_two": "Is féidir seónna foilsithe {{count}} a sheiceáil"
     },
     "feed_validation": {
       "title": "Bailíochtú RSS",
@@ -211,7 +223,12 @@
       "report_dismissed": "Díbhe an tuairisc.",
       "report_escalated": "Ardaíodh an tuairisc.",
       "feed_valid": "Tá fotha RSS réidh.",
-      "feed_invalid": "Tá {{count}} saincheist(eanna) ag fotha RSS."
+      "feed_invalid": "Tá {{count}} saincheist(eanna) ag fotha RSS.",
+      "feed_invalid_few": "Tá {{count}} saincheist(eanna) ag fotha RSS.",
+      "feed_invalid_many": "Tá {{count}} saincheist(eanna) ag fotha RSS.",
+      "feed_invalid_one": "Tá {{count}} saincheist(eanna) ag fotha RSS.",
+      "feed_invalid_other": "Tá {{count}} saincheist(eanna) ag fotha RSS.",
+      "feed_invalid_two": "Tá {{count}} saincheist(eanna) ag fotha RSS."
     },
     "bulk": {
       "approve_selected": "Faomh a bhfuil roghnaithe",
@@ -219,7 +236,22 @@
       "done": "Modhnaíodh {{count}} mír(eanna).",
       "partial": "Modhnaíodh {{ok}}; theip ar {{failed}}.",
       "confirm_reject_title": "Diúltaigh na míreanna roghnaithe",
-      "confirm_reject_message": "An bhfuil fonn ort {{count}} mír roghnaithe a dhiúltú? Fillfidh siad ar stádas dréachta do na cruthaitheoirí."
-    }
+      "confirm_reject_message": "An bhfuil fonn ort {{count}} mír roghnaithe a dhiúltú? Fillfidh siad ar stádas dréachta do na cruthaitheoirí.",
+      "done_few": "Modhnaíodh {{count}} mír(eanna).",
+      "done_many": "Modhnaíodh {{count}} mír(eanna).",
+      "done_one": "Modhnaíodh {{count}} mír(eanna).",
+      "done_other": "Modhnaíodh {{count}} mír(eanna).",
+      "done_two": "Modhnaíodh {{count}} mír(eanna).",
+      "confirm_reject_message_few": "An bhfuil fonn ort {{count}} mír roghnaithe a dhiúltú? Fillfidh siad ar stádas dréachta do na cruthaitheoirí.",
+      "confirm_reject_message_many": "An bhfuil fonn ort {{count}} mír roghnaithe a dhiúltú? Fillfidh siad ar stádas dréachta do na cruthaitheoirí.",
+      "confirm_reject_message_one": "An bhfuil fonn ort {{count}} mír roghnaithe a dhiúltú? Fillfidh siad ar stádas dréachta do na cruthaitheoirí.",
+      "confirm_reject_message_other": "An bhfuil fonn ort {{count}} mír roghnaithe a dhiúltú? Fillfidh siad ar stádas dréachta do na cruthaitheoirí.",
+      "confirm_reject_message_two": "An bhfuil fonn ort {{count}} mír roghnaithe a dhiúltú? Fillfidh siad ar stádas dréachta do na cruthaitheoirí."
+    },
+    "count_few": "{{count}} items",
+    "count_many": "{{count}} items",
+    "count_one": "{{count}} míreanna",
+    "count_other": "{{count}} míreanna",
+    "count_two": "{{count}} items"
   }
 }

@@ -7,6 +7,7 @@
  * MyPickupsPage — AG45 click-and-collect: buyer's reservations with QR display.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect, useState } from 'react';import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import QrCode from 'lucide-react/icons/qr-code';
 import { useTranslation } from 'react-i18next';
@@ -32,7 +33,7 @@ interface Reservation {
   slot: { slot_start: string | null; slot_end: string | null } | null;
 }
 
-const formatTime = (s: string | null) => (s ? new Date(s).toLocaleString() : '—');
+const formatTime = (s: string | null) => (s ? new Date(s).toLocaleString(getFormattingLocale()) : '—');
 
 const statusColor = (s: string): 'primary' | 'success' | 'warning' | 'danger' => {
   if (s === 'picked_up') return 'success';

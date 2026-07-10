@@ -207,7 +207,8 @@
     "tbi_proxy_independence": "Luach airgid na n-uaireanta faighte",
     "tbi_proxy_inclusion": "HACT: a bhaineann le comharsanacht (calabrú TBI 2023)",
     "pdf_coefficients": "Applied Coefficients",
-    "formula_true_sroi": "Cóimheas SROI = Luach Reatha Iomlán na dtorthaí fíoraithe (tar éis marbh-ualaithe, díláithrithe, sannadh, titim as agus lascaine) ÷ Infheistíocht Iomlán"
+    "formula_true_sroi": "Cóimheas SROI = Luach Reatha Iomlán na dtorthaí fíoraithe (tar éis marbh-ualaithe, díláithrithe, sannadh, titim as agus lascaine) ÷ Infheistíocht Iomlán",
+    "multiplier_value": "{{value}}×"
   },
   "impact_report_labels": {
     "transactions": "Idirbhearta",

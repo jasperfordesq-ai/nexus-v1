@@ -53,9 +53,9 @@ const legalDocumentDefs = [
     descKey: 'hub.doc_privacy_desc',
     icon: Shield,
     path: '/privacy',
-    color: 'text-indigo-500',
-    bg: 'bg-indigo-500/20',
-    gradient: 'from-indigo-500/20 to-purple-500/20',
+    color: 'text-accent',
+    bg: 'bg-accent/20',
+    gradient: 'from-accent/20 to-accent-gradient-end/20',
     updatedKey: 'hub.doc_updated_feb_2026',
   },
   {
@@ -115,7 +115,7 @@ const legalDocumentDefs = [
     path: '/trust-and-safety',
     color: 'text-emerald-500',
     bg: 'bg-emerald-500/20',
-    gradient: 'from-emerald-500/20 to-indigo-500/20',
+    gradient: 'from-emerald-500/20 to-accent-gradient-end/20',
     updatedKey: 'hub.doc_updated_feb_2026',
   },
 ];
@@ -135,8 +135,8 @@ export function LegalHubPage() {
       <PageMeta title={t('page_meta.legal_hub.title')} description={t('page_meta.legal_hub.description')} />
       {/* Hero Header */}
       <motion.div variants={itemVariants} className="text-center">
-        <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
-          <Scale className="w-10 h-10 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+        <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 mb-4">
+          <Scale className="w-10 h-10 text-accent dark:text-accent" aria-hidden="true" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-bold text-theme-primary mb-3">
           {t('hub.heading')}
@@ -170,9 +170,9 @@ export function LegalHubPage() {
       {/* GDPR Commitment Banner */}
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
-          <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+          <div className="p-4 rounded-xl bg-accent/10 border border-accent/20">
             <h2 className="text-xl font-semibold text-theme-primary mb-3 flex items-center gap-2">
-              <Handshake className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+              <Handshake className="w-5 h-5 text-accent" aria-hidden="true" />
               {t('hub.commitment_title')}
             </h2>
             <div className="space-y-3 text-theme-muted">
@@ -209,15 +209,13 @@ export function LegalHubPage() {
               <p className="text-sm text-theme-muted flex-1 mb-4">
                 {t(doc.descKey)}
               </p>
-              <Link to={tenantPath(doc.path)}>
-                <Button
-                  variant="tertiary"
-                  className="w-full bg-theme-elevated text-theme-primary"
-                  endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('hub.read_document')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath(doc.path)}
+                variant="tertiary"
+                className="w-full bg-theme-elevated text-theme-primary"
+                endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('hub.read_document')}
+              </Button>
             </GlassCard>
           ))}
         </div>
@@ -240,36 +238,30 @@ export function LegalHubPage() {
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <Link to={tenantPath('/platform/terms')}>
-              <Button
-                variant="tertiary"
-                className="w-full bg-slate-500/10 text-theme-primary justify-start gap-2"
-                startContent={<FileText className="w-4 h-4 text-slate-500" aria-hidden="true" />}
-                endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
-              >
-                {t('hub.platform_terms')}
-              </Button>
-            </Link>
-            <Link to={tenantPath('/platform/privacy')}>
-              <Button
-                variant="tertiary"
-                className="w-full bg-slate-500/10 text-theme-primary justify-start gap-2"
-                startContent={<Shield className="w-4 h-4 text-slate-500" aria-hidden="true" />}
-                endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
-              >
-                {t('hub.platform_privacy')}
-              </Button>
-            </Link>
-            <Link to={tenantPath('/platform/disclaimer')}>
-              <Button
-                variant="tertiary"
-                className="w-full bg-slate-500/10 text-theme-primary justify-start gap-2"
-                startContent={<AlertTriangle className="w-4 h-4 text-slate-500" aria-hidden="true" />}
-                endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
-              >
-                {t('hub.platform_disclaimer')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/platform/terms')}
+              variant="tertiary"
+              className="w-full bg-slate-500/10 text-theme-primary justify-start gap-2"
+              startContent={<FileText className="w-4 h-4 text-slate-500" aria-hidden="true" />}
+              endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
+            >
+              {t('hub.platform_terms')}
+            </Button>
+            <Button as={Link} to={tenantPath('/platform/privacy')}
+              variant="tertiary"
+              className="w-full bg-slate-500/10 text-theme-primary justify-start gap-2"
+              startContent={<Shield className="w-4 h-4 text-slate-500" aria-hidden="true" />}
+              endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
+            >
+              {t('hub.platform_privacy')}
+            </Button>
+            <Button as={Link} to={tenantPath('/platform/disclaimer')}
+              variant="tertiary"
+              className="w-full bg-slate-500/10 text-theme-primary justify-start gap-2"
+              startContent={<AlertTriangle className="w-4 h-4 text-slate-500" aria-hidden="true" />}
+              endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
+            >
+              {t('hub.platform_disclaimer')}
+            </Button>
           </div>
         </GlassCard>
       </motion.div>
@@ -278,8 +270,8 @@ export function LegalHubPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <div className="text-center">
-            <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
-              <Scale className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+            <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 mb-4">
+              <Scale className="w-8 h-8 text-accent dark:text-accent" aria-hidden="true" />
             </div>
             <h2 className="text-xl font-semibold text-theme-primary mb-2">
               {t('hub.cta_title')}
@@ -289,23 +281,19 @@ export function LegalHubPage() {
             </p>
             <Separator className="my-4" />
             <div className="flex flex-wrap justify-center gap-3 mt-4">
-              <Link to={tenantPath('/contact')}>
-                <Button
-                  className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-                  startContent={<Send className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('hub.contact_team')}
-                </Button>
-              </Link>
-              <Link to={tenantPath('/privacy')}>
-                <Button
-                  variant="tertiary"
-                  className="bg-theme-elevated text-theme-primary"
-                  startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('hub.privacy_policy_link')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath('/contact')}
+                className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
+                startContent={<Send className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('hub.contact_team')}
+              </Button>
+              <Button as={Link} to={tenantPath('/privacy')}
+                variant="tertiary"
+                className="bg-theme-elevated text-theme-primary"
+                startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('hub.privacy_policy_link')}
+              </Button>
             </div>
           </div>
         </GlassCard>

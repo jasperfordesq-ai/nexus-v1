@@ -86,7 +86,7 @@ export function HybridPriceDisplay({
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 border border-accent/20">
             <Clock className={`${classes.icon} text-accent`} aria-hidden="true" />
             <span className={`${classes.tc} font-bold text-accent`}>
-              {timeCreditPrice} TC
+              {t('community_delivery.time_credits_value', { count: timeCreditPrice })}
             </span>
           </div>
         </Tooltip>

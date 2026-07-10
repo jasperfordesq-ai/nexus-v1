@@ -11,7 +11,7 @@
 import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import type { DateInputValue } from '@/components/ui';
 import { DatePicker } from '@/components/ui';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import Calendar from 'lucide-react/icons/calendar';
 import X from 'lucide-react/icons/x';
@@ -251,7 +251,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
       isSubmitting,
       onSubmit: () => submitRef.current(),
       buttonLabel: isEditing ? t('compose.save_changes') : t('compose.post_button'),
-      gradientClass: 'from-indigo-500 to-purple-600',
+      gradientClass: 'from-accent to-accent-gradient-end',
     });
     return unregister;
   }, [canSubmit, isEditing, isSubmitting, register, unregister, t]);
@@ -352,7 +352,9 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
               </Button>
             </PopoverTrigger>
             <PopoverContent className="p-4 w-72 space-y-3 bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
-              <p className="text-sm font-medium text-[var(--text-primary)]">{t('compose.schedule_label')}</p>
+              <PopoverHeading className="text-sm font-medium text-[var(--text-primary)]">
+                {t('compose.schedule_label')}
+              </PopoverHeading>
               <DatePicker
                 label={t('compose.schedule_date_label')}
                 variant="secondary"
@@ -404,7 +406,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
             </Button>
             <Button
               size="sm"
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/20"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white shadow-lg shadow-accent/20"
               onPress={handleSubmit}
               isLoading={isSubmitting}
               isDisabled={!canSubmit}

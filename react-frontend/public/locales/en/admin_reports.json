@@ -276,7 +276,11 @@
     "members_tabs_aria": "Member report type",
     "hours_by_category_aria": "Bar chart showing hours exchanged by category",
     "hours_distribution_aria": "Pie chart showing distribution of time exchange hours",
-    "hours_trend_aria": "Area chart showing hours exchanged over time"
+    "hours_trend_aria": "Area chart showing hours exchanged over time",
+    "members_selected_count_one": "{{count}} selected",
+    "members_selected_count_other": "{{count}} selected",
+    "days_count_one": "{{count}} days",
+    "days_count_other": "{{count}} days"
   },
   "municipal_reports": {
     "meta": {
@@ -387,7 +391,11 @@
       "hours": "{{count}}h",
       "disabled": "Disabled",
       "activities": "{{count}} activities",
-      "trend_detail": "{{participants}} participants, {{activities}} activities"
+      "trend_detail": "{{participants}} participants, {{activities}} activities",
+      "hours_one": "{{count}}h",
+      "hours_other": "{{count}}h",
+      "activities_one": "{{count}} activities",
+      "activities_other": "{{count}} activities"
     },
     "toast": {
       "load_failed": "Failed to load municipal impact data.",
@@ -470,7 +478,9 @@
         "partner_organisations_by_hours": "Partner organisations (by hours)",
         "no_partner_activity": "No partner activity in this period.",
         "top_5_categories": "Top 5 categories (geographic / activity split)",
-        "no_category_data": "No category data in this period."
+        "no_category_data": "No category data in this period.",
+        "trusted_total_one": "of {{count}} trusted total.",
+        "trusted_total_other": "of {{count}} trusted total."
       },
       "cooperative": {
         "empty_title": "Cooperative (cooperative internal)",
@@ -487,8 +497,16 @@
         "coordinator_load": "Coordinator load",
         "coordinator_load_desc": "{{pending}} pending across {{coordinators}} coordinators.",
         "future_care_credit_pool": "Future-care credit balance pool",
-        "future_care_credit_pool_desc": "Sum of positive member balances - the cooperative's implicit future-care reserve. Active member base: {{count}}."
-      }
+        "future_care_credit_pool_desc": "Sum of positive member balances - the cooperative's implicit future-care reserve. Active member base: {{count}}.",
+        "member_retention_desc_one": "{{count}} members active in both this period and the prior equivalent period.",
+        "member_retention_desc_other": "{{count}} members active in both this period and the prior equivalent period.",
+        "reciprocity_rate_desc_one": "{{count}} supporters also received hours in the period.",
+        "reciprocity_rate_desc_other": "{{count}} supporters also received hours in the period.",
+        "future_care_credit_pool_desc_one": "Sum of positive member balances - the cooperative's implicit future-care reserve. Active member base: {{count}}.",
+        "future_care_credit_pool_desc_other": "Sum of positive member balances - the cooperative's implicit future-care reserve. Active member base: {{count}}."
+      },
+      "logs_count_one": "{{count}} logs",
+      "logs_count_other": "{{count}} logs"
     },
     "cards": {
       "verified_hours": {
@@ -519,6 +537,18 @@
         "metric_2": "Reviews",
         "metric_3": "Audit trail"
       }
+    }
+  },
+  "caring_workflow": {
+    "policy": {
+      "periods": {
+        "last_90_days": "Last 90 days"
+      }
+    }
+  },
+  "municipal_impact": {
+    "portfolio": {
+      "yoy_value": "{{sign}}{{value}}% YoY"
     }
   }
 }

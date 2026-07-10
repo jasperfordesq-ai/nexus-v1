@@ -124,7 +124,10 @@
         "year": "Ano",
         "yearly": "Anual",
         "annual": "Anual"
-      }
+      },
+      "total_many": "{{count}} total",
+      "total_one": "{{count}} total",
+      "total_other": "{{count}} total"
     },
     "table": {
       "aria": "Camadas premium",
@@ -203,7 +206,10 @@
         "restricted": "Ação necessária",
         "unknown": "Estado desconhecido"
       },
-      "connect_fallback_active": "Uma conta Stripe Connect está configurada, mas ainda não está pronta para doações ao vivo. Os pagamentos usarão o substituto da plataforma até que a integração seja concluída."
+      "connect_fallback_active": "Uma conta Stripe Connect está configurada, mas ainda não está pronta para doações ao vivo. Os pagamentos usarão o substituto da plataforma até que a integração seja concluída.",
+      "requirements_due_many": "Requisitos de conta Stripe que precisam de atenção: {{count}}.",
+      "requirements_due_one": "Requisitos de conta Stripe que precisam de atenção: {{count}}.",
+      "requirements_due_other": "Requisitos de conta Stripe que precisam de atenção: {{count}}."
     },
     "finance": {
       "title": "Operações financeiras",
@@ -222,7 +228,14 @@
       "past_due_count": "{{count}} past due",
       "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Exportar receitas anuais",
-      "empty": "Nenhuma atividade financeira foi registrada ainda."
+      "empty": "Nenhuma atividade financeira foi registrada ainda.",
+      "donation_count_many": "{{count}} donation",
+      "donation_count_one": "{{count}} doação",
+      "declaration_count_many": "{{count}} declaration",
+      "declaration_count_one": "Declaração {{count}}",
+      "past_due_count_many": "{{count}} past due",
+      "past_due_count_one": "{{count}} vencido",
+      "past_due_count_other": "{{count}} vencido"
     }
   }
 }

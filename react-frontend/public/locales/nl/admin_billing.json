@@ -203,6 +203,8 @@
     "your_plan_usage": "Uw abonnementsgebruik",
     "over_limit_warning": "U heeft de limieten van uw abonnement bereikt. Upgrade om door te gaan.",
     "upgrade_modal_desc": "Upgrade uw abonnement om extra functies en capaciteit te ontgrendelen.",
-    "upgrade_mailto_subject": "Verzoek tot planupgrade"
+    "upgrade_mailto_subject": "Verzoek tot planupgrade",
+    "user_count_label_one": "{{count}} / {{max}} gebruikers",
+    "user_count_label_other": "{{count}} / {{max}} gebruikers"
   }
 }

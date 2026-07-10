@@ -9,6 +9,7 @@
  * Parity: PHP Admin\TimebankingController::orgWallets()
  */
 
+import { formatNumber, getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';import Building2 from 'lucide-react/icons/building-2';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -71,7 +72,7 @@ export function OrgWallets() {
         sortable: true,
         render: (wallet) => (
           <span className="text-sm font-semibold">
-            {wallet.balance.toLocaleString()}h
+            {formatNumber(wallet.balance, { style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
           </span>
         ),
       },
@@ -81,7 +82,7 @@ export function OrgWallets() {
         sortable: true,
         render: (wallet) => (
           <span className="text-sm text-success">
-            +{wallet.total_in.toLocaleString()}h
+            {formatNumber(wallet.total_in, { signDisplay: 'always', style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
           </span>
         ),
       },
@@ -91,7 +92,7 @@ export function OrgWallets() {
         sortable: true,
         render: (wallet) => (
           <span className="text-sm text-danger">
-            -{wallet.total_out.toLocaleString()}h
+            {formatNumber(-wallet.total_out, { signDisplay: 'always', style: 'unit', unit: 'hour', unitDisplay: 'narrow' })}
           </span>
         ),
       },
@@ -109,7 +110,7 @@ export function OrgWallets() {
         sortable: true,
         render: (wallet) => (
           <span className="text-sm text-muted">
-            {new Date(wallet.created_at).toLocaleDateString()}
+            {new Date(wallet.created_at).toLocaleDateString(getFormattingLocale())}
           </span>
         ),
       },

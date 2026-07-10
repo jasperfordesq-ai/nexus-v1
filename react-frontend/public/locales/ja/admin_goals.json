@@ -107,6 +107,7 @@
     "status_completed": "完了しました",
     "status_unknown": "未知",
     "try_adjusting_search": "検索を調整してみてください",
-    "yes": "はい"
+    "yes": "はい",
+    "showing_of_total_other": "{{total}} の {{count}} を表示しています"
   }
 }

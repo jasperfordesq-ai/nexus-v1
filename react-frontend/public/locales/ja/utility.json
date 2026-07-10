@@ -63,7 +63,8 @@
     "still_need_help_description": "お探しのものが見つかりませんか？チームがお手伝いします。",
     "contact_support": "サポートに連絡",
     "load_error_title": "よくある質問を読み込めませんでした",
-    "load_error_description": "ページを更新するか、サポートにお問い合わせください。"
+    "load_error_description": "ページを更新するか、サポートにお問い合わせください。",
+    "articles_count_other": "{{count}}件の記事"
   },
   "resources": {
     "page_title": "リソース",

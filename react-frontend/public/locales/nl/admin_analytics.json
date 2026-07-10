@@ -245,7 +245,9 @@
         "65_plus": "65+",
         "unknown": "Onbekend"
       }
-    }
+    },
+    "location_marker_title_one": "{{area}}:{{count}}-leden",
+    "location_marker_title_other": "{{area}}:{{count}}-leden"
   },
   "search_analytics": {
     "page_title": "Zoekanalyse",
@@ -270,6 +272,8 @@
     "load_failed": "Kan zoekanalyse niet laden",
     "empty_description": "Er zijn geen zoekopdrachten geregistreerd in de geselecteerde periode.",
     "no_trending": "Geen populaire zoekopdrachten in deze periode.",
-    "no_zero_results": "Geen zoekopdrachten zonder resultaat in deze periode — elke zoekopdracht vond iets."
+    "no_zero_results": "Geen zoekopdrachten zonder resultaat in deze periode — elke zoekopdracht vond iets.",
+    "count_value_one": "{{count}}×",
+    "count_value_other": "{{count}}×"
   }
 }

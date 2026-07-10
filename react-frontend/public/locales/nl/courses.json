@@ -169,7 +169,9 @@
     "rate_n_stars": "Beoordeel {{count}} van de 5 sterren",
     "submit_error": "Kan je beoordeling niet verzenden. Probeer het opnieuw.",
     "count_one": "{{count}} beoordeling",
-    "count_other": "{{count}} beoordelingen"
+    "count_other": "{{count}} beoordelingen",
+    "rate_n_stars_one": "Beoordeel {{count}} van de 5 sterren",
+    "rate_n_stars_other": "Beoordeel {{count}} van de 5 sterren"
   },
   "admin": {
     "title": "Cursussen",

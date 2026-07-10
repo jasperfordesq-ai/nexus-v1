@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Input, Spinner, Textarea, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -369,7 +370,7 @@ export function FadpAdminPage() {
   }
 
   const renderedGeneratedAt = (registerData as { generated_at?: string } | null)?.generated_at
-    ? new Date((registerData as { generated_at: string }).generated_at).toLocaleString()
+    ? new Date((registerData as { generated_at: string }).generated_at).toLocaleString(getFormattingLocale())
     : t('fadp.common.empty_dash');
 
   return (
@@ -616,7 +617,7 @@ export function FadpAdminPage() {
                           </TableCell>
                           <TableCell>
                             <span className="text-sm text-muted">
-                              {new Date(r.created_at).toLocaleString()}
+                              {new Date(r.created_at).toLocaleString(getFormattingLocale())}
                             </span>
                           </TableCell>
                         </TableRow>

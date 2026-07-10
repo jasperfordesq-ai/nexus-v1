@@ -78,10 +78,10 @@ function mapVariant(variant?: ChipProps['variant']): V3ChipVariant {
     case 'faded':
       return 'secondary';
     case 'light':
-      return 'soft';
-    case 'flat':
     case 'dot':
       return 'tertiary';
+    case 'flat':
+      return 'soft';
     case 'primary':
     case 'secondary':
     case 'tertiary':

@@ -419,10 +419,11 @@ describe('TenantContext', () => {
       expect(result.current.error).toBe('Tenant not found');
     });
 
-    it('sets notFoundSlug when a named slug fails to resolve', async () => {
+    it('sets notFoundSlug only for an explicit TENANT_NOT_FOUND response', async () => {
       mockApiGet.mockResolvedValue({
         success: false,
         error: 'Not found',
+        code: 'TENANT_NOT_FOUND',
       });
 
       const { result } = renderHook(() => useTenant(), {
@@ -432,6 +433,40 @@ describe('TenantContext', () => {
       await waitFor(() => expect(result.current.isLoading).toBe(false));
 
       expect(result.current.notFoundSlug).toBe('ghost-timebank');
+    });
+
+    it.each(['NETWORK_ERROR', 'TIMEOUT', 'SERVICE_UNAVAILABLE', 'SERVER_ERROR'])(
+      'keeps %s failures retryable instead of rendering a tenant 404',
+      async (code) => {
+        mockApiGet.mockResolvedValue({
+          success: false,
+          error: 'Temporarily unavailable',
+          code,
+        });
+
+        const { result } = renderHook(() => useTenant(), {
+          wrapper: tenantWrapperWithSlug('hour-timebank'),
+        });
+
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+        expect(result.current.notFoundSlug).toBeNull();
+        expect(result.current.error).toBe('Temporarily unavailable');
+      },
+    );
+
+    it('uses maintenance mode only for the explicit MAINTENANCE_MODE code', async () => {
+      mockApiGet.mockResolvedValue({
+        success: false,
+        error: 'Maintenance',
+        code: 'MAINTENANCE_MODE',
+      });
+
+      const { result } = renderHook(() => useTenant(), { wrapper: tenantWrapper });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      expect(result.current.tenant?.settings?.maintenance_mode).toBe(true);
+      expect(result.current.notFoundSlug).toBeNull();
     });
 
     it('captures thrown errors and sets error state without crashing', async () => {
@@ -493,6 +528,31 @@ describe('TenantContext', () => {
       });
 
       expect(result.current.tenant?.name).toBe('Updated Timebank');
+      expect(mockApiGet).toHaveBeenLastCalledWith(
+        '/v2/tenant/bootstrap',
+        expect.objectContaining({ cacheTtlMs: 0 }),
+      );
+    });
+
+    it('retains the current tenant when an explicit refresh fails transiently', async () => {
+      const { result } = renderHook(() => useTenant(), {
+        wrapper: tenantWrapperWithSlug('hour-timebank'),
+      });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      mockApiGet.mockResolvedValueOnce({
+        success: false,
+        code: 'NETWORK_ERROR',
+        error: 'Offline',
+      });
+
+      await act(async () => {
+        await result.current.refreshTenant();
+      });
+
+      expect(result.current.tenant?.slug).toBe('hour-timebank');
+      expect(result.current.error).toBe('Offline');
+      expect(result.current.notFoundSlug).toBeNull();
     });
   });
 

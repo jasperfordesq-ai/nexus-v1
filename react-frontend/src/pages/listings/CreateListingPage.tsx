@@ -846,15 +846,13 @@ export function CreateListingPage() {
 
           {/* Submit */}
           <div className="flex flex-col-reverse gap-3 border-t border-theme-default pt-6 sm:flex-row sm:items-center sm:justify-end">
-            <Link to={tenantPath("/listings")} className="sm:mr-auto">
-              <Button
-                type="button"
-                variant="tertiary"
-                className="w-full bg-theme-elevated text-theme-primary sm:w-auto sm:min-w-24"
-              >
-                {t('form.cancel')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath("/listings")}
+              type="button"
+              variant="tertiary"
+              className="sm:mr-auto w-full bg-theme-elevated text-theme-primary sm:w-auto sm:min-w-24"
+            >
+              {t('form.cancel')}
+            </Button>
             <Button
               type="submit"
               variant="primary"

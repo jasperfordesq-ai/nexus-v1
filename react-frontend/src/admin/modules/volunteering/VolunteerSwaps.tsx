@@ -11,6 +11,7 @@
  * Parity: VolunteerCommunityController::adminPendingSwaps() + adminDecideSwap().
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useState } from 'react';
 
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
@@ -48,10 +49,10 @@ interface SwapRequest {
 function formatShift(shift: ShiftRef): string {
   if (!shift?.start_time) return '--';
   const start = new Date(shift.start_time);
-  const startStr = start.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+  const startStr = start.toLocaleString(getFormattingLocale(), { dateStyle: 'medium', timeStyle: 'short' });
   if (shift.end_time) {
     const end = new Date(shift.end_time);
-    return `${startStr} – ${end.toLocaleTimeString(undefined, { timeStyle: 'short' })}`;
+    return `${startStr} – ${end.toLocaleTimeString(getFormattingLocale(), { timeStyle: 'short' })}`;
   }
   return startStr;
 }

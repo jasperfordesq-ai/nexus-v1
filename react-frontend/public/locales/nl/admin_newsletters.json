@@ -455,7 +455,14 @@
     "winning_metric": "Winnende maatstaf",
     "resend_queued_count": "{{count}}opnieuw verzonden in wachtrij",
     "resend_queued_count_plural": "In de wachtrij geplaatste{{count}}wordt opnieuw verzonden",
-    "template_tabs_aria": "Categoriefilter voor nieuwsbriefsjabloon"
+    "template_tabs_aria": "Categoriefilter voor nieuwsbriefsjabloon",
+    "resend_queued_count_one": "{{count}}opnieuw verzonden in wachtrij",
+    "resend_queued_count_other": "{{count}}opnieuw verzonden in wachtrij",
+    "your_average": "Jouw gemiddelde",
+    "industry_avg": "Industriegemiddelde",
+    "above_benchmark": "Boven de maatstaf",
+    "below_benchmark": "Onder de maatstaf",
+    "benchmark_difference": "{{pointSign}}{{pointValue}} procentpunt ({{percentSign}}{{percentValue}}%)"
   },
   "newsletter_form": {
     "ab_test_label": "Ab-test",
@@ -895,7 +902,13 @@
     "subject_override_desc": "Laat dit veld leeg als u het originele onderwerp wilt gebruiken.",
     "subject_override_placeholder": "Voer een onderwerpoverschrijving in...",
     "subtitle": "Stuur deze nieuwsbrief naar een gerichte subset van ontvangers.",
-    "total_sent": "Totaal verzonden"
+    "total_sent": "Totaal verzonden",
+    "non_openers_count_one": "{{count}}-ontvanger die niet heeft geopend",
+    "non_openers_count_other": "{{count}}-ontvanger die niet heeft geopend",
+    "non_clickers_count_one": "{{count}}-ontvanger die heeft geopend maar niet heeft geklikt",
+    "non_clickers_count_other": "{{count}}-ontvanger die heeft geopend maar niet heeft geklikt",
+    "preview_recipient_count_desc_one": "Deze nieuwe verzending wordt verzonden naar de{{count}}-ontvanger",
+    "preview_recipient_count_desc_other": "Deze nieuwe verzending wordt verzonden naar de{{count}}-ontvanger"
   },
   "newsletter_send_time": {
     "day_friday": "Vr",
@@ -919,7 +932,9 @@
     "not_enough_data": "Nog niet voldoende betrokkenheidsgegevens.",
     "time_period": "Tijdsperiode",
     "title": "Verzend tijdoptimalisatie",
-    "top_recommended": "Top Recommended"
+    "top_recommended": "Top Recommended",
+    "days_one": "{{count}}dagen",
+    "days_other": "{{count}}dagen"
   },
   "segment_form": {
     "analyzing_member_data": "Analyseren van ledengegevens",
@@ -1038,5 +1053,8 @@
     "update_template": "Sjabloon bijwerken",
     "usage_stats_sent": "Gebruiksstatistieken verzonden",
     "usage_stats_sent_plural": "Gebruiksstatistieken verzonden meervoud"
+  },
+  "diagnostics": {
+    "score_out_of": "van {{maximum}}"
   }
 }

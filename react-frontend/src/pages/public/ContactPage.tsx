@@ -126,8 +126,8 @@ export function ContactPage() {
       >
         <GlassCard className="p-5 sm:p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-4">
-              <MessageSquare aria-hidden="true" className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+            <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 mb-4">
+              <MessageSquare aria-hidden="true" className="w-8 h-8 text-accent dark:text-accent" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary">{t('contact.title')}</h1>
             <p className="text-theme-muted mt-2">
@@ -144,15 +144,13 @@ export function ContactPage() {
               <p className="text-theme-muted mb-4">
                 {t('contact.success_message')}
               </p>
-              <Link to={tenantPath('/help')}>
-                <Button
-                  variant="tertiary"
-                  className="bg-theme-elevated text-theme-muted"
-                  startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-                >
-                  {t('contact.back_to_help')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath('/help')}
+                variant="tertiary"
+                className="bg-theme-elevated text-theme-muted"
+                startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+              >
+                {t('contact.back_to_help')}
+              </Button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} onFocusCapture={() => setTurnstileArmed(true)} className="space-y-5">
@@ -236,7 +234,7 @@ export function ContactPage() {
                 type="submit"
                 isLoading={isSubmitting}
                 isDisabled={!formData.name.trim() || !formData.email.trim() || !formData.message.trim() || (!!turnstileSiteKey && turnstileArmed && !turnstileToken)}
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
+                className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white font-medium"
                 size="lg"
                 spinner={<Spinner size="sm" aria-hidden="true" />}
               >
@@ -246,7 +244,7 @@ export function ContactPage() {
               {!isAuthenticated && (
                 <p className="text-xs text-theme-subtle text-center">
                   {t('contact.form.login_prompt_before')}{' '}
-                  <Link to={tenantPath('/login')} className="text-indigo-500 hover:underline">
+                  <Link to={tenantPath('/login')} className="text-accent hover:underline">
                     {t('contact.form.login_link')}
                   </Link>{' '}
                   {t('contact.form.login_prompt_after')}

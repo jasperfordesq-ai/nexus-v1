@@ -44,7 +44,10 @@
     "no_deadline": "No deadline",
     "evaluation_criteria": "Evaluation Criteria",
     "outcome": "Outcome",
-    "team_links": "Project Teams"
+    "team_links": "Project Teams",
+    "ideas_count_other": "{{count}} ideas",
+    "max_ideas_one": "Max {{count}} ideas per person",
+    "max_ideas_other": "Max {{count}} ideas per person"
   },
   "challenges": {
     "title": "Challenges",
@@ -87,7 +90,10 @@
     "draft_created": "Created {{date}}",
     "new_idea": "New Idea",
     "sort_label": "Sort ideas",
-    "loading": "Loading ideas..."
+    "loading": "Loading ideas...",
+    "your_ideas_one": "Your ideas: {{count}}/{{max}}",
+    "your_ideas_other": "Your ideas: {{count}}/{{max}}",
+    "comments_other": "{{count}} comments"
   },
   "idea_detail": {
     "page_title": "Idea Details",
@@ -321,7 +327,8 @@
     "fallback_title": "Campaign",
     "feature_not_available": "Ideation Not Available",
     "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "challenges_count_other": "{{count}} challenges"
   },
   "templates": {
     "title": "Challenge Templates",

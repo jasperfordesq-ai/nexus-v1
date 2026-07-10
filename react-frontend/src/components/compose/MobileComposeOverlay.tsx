@@ -67,14 +67,11 @@ export function MobileComposeOverlay({
           role="dialog"
           aria-modal="true"
           aria-label={t('compose.compose_post')}
-          className="fixed inset-0 z-[400] flex flex-col bg-[var(--surface-base)]"
+          className="fixed inset-0 z-[400] flex flex-col bg-[var(--surface-base)] pt-[env(safe-area-inset-top,0px)]"
           initial={{ y: '100%' }}
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-          style={{
-            paddingTop: 'env(safe-area-inset-top, 0px)',
-          }}
         >
           {/* ── Sticky Header ── */}
           <div className="flex items-center gap-2 h-14 px-3 border-b border-[var(--border-default)] shrink-0">
@@ -122,7 +119,7 @@ export function MobileComposeOverlay({
               size="sm"
               classNames={{
                 tabList: 'gap-1 p-0',
-                tab: 'min-h-[40px] px-3 data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-indigo-500 data-[selected=true]:to-purple-600 data-[selected=true]:text-white rounded-full',
+                tab: 'min-h-[40px] px-3 data-[selected=true]:bg-gradient-to-r data-[selected=true]:from-accent data-[selected=true]:to-accent-gradient-end data-[selected=true]:text-white rounded-full',
                 cursor: 'hidden',
               }}
             >
@@ -145,10 +142,7 @@ export function MobileComposeOverlay({
 
           {/* ── Scrollable Body ── */}
           <ScrollShadow
-            className="flex-1 overflow-y-auto px-4 pt-4"
-            style={{
-              paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
-            }}
+            className="flex-1 overflow-y-auto px-4 pt-4 pb-[calc(env(safe-area-inset-bottom,0px)+16px)]"
           >
             {children}
           </ScrollShadow>

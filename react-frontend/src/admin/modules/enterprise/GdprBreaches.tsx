@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Select, SelectItem, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -128,7 +129,7 @@ export function GdprBreaches() {
       key: 'reported_at',
       label: t('enterprise.gdpr_reported'),
       sortable: true,
-      render: (b) => b.reported_at ? new Date(b.reported_at).toLocaleDateString() : '---',
+      render: (b) => b.reported_at ? new Date(b.reported_at).toLocaleDateString(getFormattingLocale()) : '---',
     },
   ];
 

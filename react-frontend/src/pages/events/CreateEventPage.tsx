@@ -605,14 +605,12 @@ export function CreateEventPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('form.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <div className="flex justify-center gap-3">
-            <Link to={tenantPath("/events")}>
-              <Button
-                variant="flat"
-                className="bg-theme-elevated text-theme-primary"
-              >
-                {t('form.back_to_events')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath("/events")}
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+            >
+              {t('form.back_to_events')}
+            </Button>
             <Button
               color="primary"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
@@ -732,7 +730,7 @@ export function CreateEventPage() {
               </div>
             ) : (
               <div
-                className="border-2 border-dashed border-theme-default rounded-xl p-8 text-center cursor-pointer hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-colors"
+                className="border-2 border-dashed border-theme-default rounded-xl p-8 text-center cursor-pointer hover:border-accent/50 hover:bg-accent/5 transition-colors"
                 onClick={() => fileInputRef.current?.click()}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
@@ -908,8 +906,8 @@ export function CreateEventPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 rounded-xl bg-theme-elevated border border-theme-default">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-purple-500/20">
-                  <Repeat className="w-5 h-5 text-purple-600 dark:text-purple-400" aria-hidden="true" />
+                <div className="p-2 rounded-lg bg-accent/20">
+                  <Repeat className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="font-medium text-theme-primary">
@@ -925,7 +923,7 @@ export function CreateEventPage() {
                 isSelected={formData.isRecurring}
                 onValueChange={(checked) => setFormData((prev) => ({ ...prev, isRecurring: checked }))}
                 classNames={{
-                  wrapper: 'group-data-[selected=true]:bg-purple-500',
+                  wrapper: 'group-data-[selected=true]:bg-accent',
                 }}
               />
             </div>
@@ -936,7 +934,7 @@ export function CreateEventPage() {
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
-                className="space-y-4 p-4 rounded-xl border border-purple-500/30 bg-purple-500/5"
+                className="space-y-4 p-4 rounded-xl border border-accent/30 bg-accent/5"
               >
                 {/* Frequency */}
                 <Select
@@ -976,7 +974,7 @@ export function CreateEventPage() {
                           key={key}
                           value={key}
                           classNames={{
-                            base: 'px-3 py-1.5 rounded-lg border border-theme-default bg-theme-elevated data-[selected=true]:bg-purple-500/20 data-[selected=true]:border-purple-500/50 cursor-pointer',
+                            base: 'px-3 py-1.5 rounded-lg border border-theme-default bg-theme-elevated data-[selected=true]:bg-accent/20 data-[selected=true]:border-accent/50 cursor-pointer',
                             label: 'text-sm text-theme-primary',
                           }}
                         >
@@ -1215,15 +1213,13 @@ export function CreateEventPage() {
                   : t('form.submit_create')
               }
             </Button>
-            <Link to={tenantPath("/events")}>
-              <Button
-                type="button"
-                variant="flat"
-                className="bg-theme-elevated text-theme-primary"
-              >
-                {t('form.cancel')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath("/events")}
+              type="button"
+              variant="flat"
+              className="bg-theme-elevated text-theme-primary"
+            >
+              {t('form.cancel')}
+            </Button>
           </div>
         </form>
       </GlassCard>

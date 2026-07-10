@@ -14,6 +14,7 @@
  * 5. CTA section
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from '@/lib/motion';import Hexagon from 'lucide-react/icons/hexagon';
@@ -62,11 +63,11 @@ interface PlatformStats {
 const steps = [
   {
     icon: UserPlus,
-    color: 'from-indigo-500 to-blue-500',
+    color: 'from-accent to-blue-500',
   },
   {
     icon: Search,
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-accent to-pink-500',
   },
   {
     icon: Handshake,
@@ -81,8 +82,8 @@ const steps = [
 const values = [
   {
     icon: Scale,
-    color: 'text-indigo-500 dark:text-indigo-400',
-    bg: 'bg-indigo-500/15',
+    color: 'text-accent dark:text-accent',
+    bg: 'bg-accent/15',
   },
   {
     icon: Heart,
@@ -106,7 +107,7 @@ const values = [
 function formatStatNumber(num: number): string {
   if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
   if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-  return num.toLocaleString();
+  return num.toLocaleString(getFormattingLocale());
 }
 
 /* ─────────────── Animations ─────────────── */
@@ -174,14 +175,14 @@ export function AboutPage() {
         <section className="relative py-20 sm:py-28 px-4 sm:px-6 lg:px-8 overflow-hidden">
           {/* Background blurs */}
           <div className="absolute inset-0 pointer-events-none opacity-20" aria-hidden="true">
-            <div className="absolute top-10 left-1/4 w-72 h-72 bg-indigo-500 rounded-full blur-3xl" />
-            <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-purple-500 rounded-full blur-3xl" />
+            <div className="absolute top-10 left-1/4 w-72 h-72 bg-accent rounded-full blur-3xl" />
+            <div className="absolute bottom-10 right-1/4 w-72 h-72 bg-accent rounded-full blur-3xl" />
           </div>
 
           <div className="max-w-4xl mx-auto text-center relative z-10">
             <motion.div {...fadeInUp} transition={{ duration: 0.6 }}>
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 mb-6">
-                <Hexagon className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 mb-6">
+                <Hexagon className="w-8 h-8 text-accent dark:text-accent" aria-hidden="true" />
               </div>
             </motion.div>
 
@@ -231,7 +232,7 @@ export function AboutPage() {
                 >
                   <GlassCard className="p-6 h-full text-center relative group hover:scale-[1.02] transition-transform overflow-hidden">
                     {/* Step number */}
-                    <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold">
+                    <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-gradient-to-br from-accent to-accent-gradient-end flex items-center justify-center text-white text-sm font-bold">
                       {index + 1}
                     </div>
 
@@ -249,7 +250,7 @@ export function AboutPage() {
         </section>
 
         {/* ─── Our Values ─── */}
-        <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
+        <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-accent/5 to-transparent">
           <div className="max-w-5xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -305,8 +306,8 @@ export function AboutPage() {
                 {statItems.map((stat) => (
                   <motion.div key={stat.label} variants={fadeInUp}>
                     <GlassCard className="p-6 text-center">
-                      <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-500/15 mb-3">
-                        <stat.icon className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                      <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-accent/15 mb-3">
+                        <stat.icon className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                       </div>
                       <p className="text-2xl sm:text-3xl font-bold text-gradient">{stat.value}</p>
                       <p className="text-sm text-theme-subtle mt-1">{stat.label}</p>
@@ -319,7 +320,7 @@ export function AboutPage() {
         )}
 
         {/* ─── Credits & Open Source ─── */}
-        <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-indigo-500/5 to-transparent">
+        <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent via-accent/5 to-transparent">
           <div className="max-w-4xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -344,8 +345,8 @@ export function AboutPage() {
               >
                 <GlassCard className="p-6 h-full">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2.5 rounded-xl bg-indigo-500/15">
-                      <Crown className="w-5 h-5 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                    <div className="p-2.5 rounded-xl bg-accent/15">
+                      <Crown className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                     </div>
                     <h3 className="font-semibold text-theme-primary text-lg">{t('about.credits.creator')}</h3>
                   </div>
@@ -370,8 +371,8 @@ export function AboutPage() {
               >
                 <GlassCard className="p-6 h-full">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-2.5 rounded-xl bg-purple-500/15">
-                      <Star className="w-5 h-5 text-purple-500 dark:text-purple-400" aria-hidden="true" />
+                    <div className="p-2.5 rounded-xl bg-accent/15">
+                      <Star className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
                     </div>
                     <h3 className="font-semibold text-theme-primary text-lg">{t('about.credits.contributors')}</h3>
                   </div>
@@ -436,7 +437,7 @@ export function AboutPage() {
                       href="https://github.com/jasperfordesq-ai/nexus-v1"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-medium text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-accent dark:text-accent hover:text-accent dark:hover:text-accent transition-colors"
                     >
                       <BookOpen className="w-4 h-4" aria-hidden="true" />
                       {t('about.credits.v1_source')}
@@ -445,7 +446,7 @@ export function AboutPage() {
                       href="https://github.com/jasperfordesq-ai/api.project-nexus.net"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-medium text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-accent dark:text-accent hover:text-accent dark:hover:text-accent transition-colors"
                     >
                       <BookOpen className="w-4 h-4" aria-hidden="true" />
                       {t('about.credits.v2_source')}
@@ -468,7 +469,7 @@ export function AboutPage() {
               <GlassCard className="p-6 sm:p-10 lg:p-14 text-center relative overflow-hidden">
                 {/* Background gradient */}
                 <div className="absolute inset-0 opacity-10 pointer-events-none" aria-hidden="true">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full blur-3xl" />
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-accent to-accent-gradient-end rounded-full blur-3xl" />
                   <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-emerald-500 to-teal-500 rounded-full blur-3xl" />
                 </div>
 
@@ -486,7 +487,7 @@ export function AboutPage() {
                         as={Link}
                         to={tenantPath("/dashboard")}
                         size="lg"
-                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
+                        className="w-full sm:w-auto bg-gradient-to-r from-accent to-accent-gradient-end text-white font-semibold px-8"
                         endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                       >
                         {t('about.cta.dashboard')}
@@ -496,7 +497,7 @@ export function AboutPage() {
                         as={Link}
                         to={tenantPath("/register")}
                         size="lg"
-                        className="w-full sm:w-auto bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-8"
+                        className="w-full sm:w-auto bg-gradient-to-r from-accent to-accent-gradient-end text-white font-semibold px-8"
                         endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
                       >
                         {t('about.cta.join')}

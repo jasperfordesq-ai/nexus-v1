@@ -86,119 +86,76 @@ vi.mock('@/components/ui', async (importOriginal) => {
 });
 
 // ─── @react-aria/focus stub ──────────────────────────────────────────────────
-vi.mock('@react-aria/focus', () => ({
-  FocusScope: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
-
 // ─────────────────────────────────────────────────────────────────────────────
-describe('SearchOverlay', () => {
+describe('SearchOverlay — async search and activation', () => {
   const onClose = vi.fn();
 
   beforeEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
     mockApi.get.mockResolvedValue({ success: false, data: null });
   });
 
-  it('renders nothing when isOpen=false', async () => {
+  it('renders no dialog when closed', async () => {
     const { SearchOverlay } = await import('./SearchOverlay');
     render(<SearchOverlay isOpen={false} onClose={onClose} />);
-    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('renders dialog when isOpen=true', async () => {
+  it('renders a named modal with a collapsed combobox when open', async () => {
     const { SearchOverlay } = await import('./SearchOverlay');
-    render(<SearchOverlay isOpen={true} onClose={onClose} />);
-    expect(document.querySelector('[role="dialog"]')).toBeTruthy();
+    render(<SearchOverlay isOpen onClose={onClose} />);
+    const input = screen.getByRole('combobox');
+    const inputLabel = input.getAttribute('aria-label') ?? '';
+
+    expect(screen.getByRole('dialog', { name: inputLabel })).toBeInTheDocument();
+    expect(input).toHaveAttribute('aria-autocomplete', 'list');
+    expect(input).toHaveAttribute('aria-expanded', 'false');
+    expect(input).not.toHaveAttribute('aria-controls');
   });
 
-  it('shows search input placeholder text', async () => {
+  it('shows quick links by default', async () => {
     const { SearchOverlay } = await import('./SearchOverlay');
-    render(<SearchOverlay isOpen={true} onClose={onClose} />);
-    const input = document.querySelector('input[type="text"]');
-    expect(input).toBeTruthy();
+    render(<SearchOverlay isOpen onClose={onClose} />);
+    expect(screen.getAllByRole('button').length).toBeGreaterThan(0);
   });
 
-  it('shows quick links section by default', async () => {
+  it('calls onClose from the explicit close button', async () => {
     const { SearchOverlay } = await import('./SearchOverlay');
-    render(<SearchOverlay isOpen={true} onClose={onClose} />);
-    // At least one quick-link button should be present
-    const buttons = screen.getAllByRole('button');
-    expect(buttons.length).toBeGreaterThan(0);
+    render(<SearchOverlay isOpen onClose={onClose} />);
+    const closeButton = screen.getAllByRole('button').find(button =>
+      button.getAttribute('aria-label')?.toLowerCase().includes('close'));
+
+    expect(closeButton).toBeDefined();
+    fireEvent.click(closeButton!);
+    expect(onClose).toHaveBeenCalledOnce();
   });
 
-  it('calls onClose when ESC key is pressed', async () => {
+  it('exposes action mode as a labelled listbox controlled by the input', async () => {
     const { SearchOverlay } = await import('./SearchOverlay');
-    render(<SearchOverlay isOpen={true} onClose={onClose} />);
-    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' });
-    await waitFor(() => {
-      expect(onClose).toHaveBeenCalled();
-    });
-  });
-
-  it('calls onClose when close button is clicked', async () => {
-    const { SearchOverlay } = await import('./SearchOverlay');
-    render(<SearchOverlay isOpen={true} onClose={onClose} />);
-    const closeBtn = screen.getAllByRole('button').find(
-      (b) => b.getAttribute('aria-label')?.toLowerCase().includes('close') ||
-             b.getAttribute('aria-label')?.toLowerCase().includes('esc')
-    );
-    if (closeBtn) fireEvent.click(closeBtn);
-    await waitFor(() => {
-      expect(onClose).toHaveBeenCalled();
-    });
-  });
-
-  it('shows action mode results when query starts with >', async () => {
-    const { SearchOverlay } = await import('./SearchOverlay');
-    render(<SearchOverlay isOpen={true} onClose={onClose} />);
-    const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+    render(<SearchOverlay isOpen onClose={onClose} />);
+    const input = screen.getByRole('combobox');
     fireEvent.change(input, { target: { value: '>' } });
-    // Action mode text should appear
-    await waitFor(() => {
-      expect(document.body.textContent?.toLowerCase()).toMatch(/action/i);
-    });
+
+    const listbox = await screen.findByRole('listbox');
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    expect(input).toHaveAttribute('aria-controls', listbox.id);
+    expect(screen.getAllByRole('option').length).toBeGreaterThan(0);
   });
 
-  it('shows loading spinner while fetching suggestions', async () => {
-    // Never resolves to keep loading state
+  it('shows a busy state while fetching suggestions', async () => {
     mockApi.get.mockImplementation(() => new Promise(() => {}));
     const { SearchOverlay } = await import('./SearchOverlay');
-    render(<SearchOverlay isOpen={true} onClose={onClose} />);
-    const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+    render(<SearchOverlay isOpen onClose={onClose} />);
+    const input = screen.getByRole('combobox');
     fireEvent.change(input, { target: { value: 'hello' } });
 
-    // Wait for debounce (250ms) + loading to appear
-    await waitFor(
-      () => {
-        const spinners = screen.queryAllByRole('status');
-        const busy = spinners.find((el) => el.getAttribute('aria-busy') === 'true');
-        expect(busy).toBeDefined();
-      },
-      { timeout: 1000 }
-    );
-  });
-
-  it('renders suggestions returned by API', async () => {
-    mockApi.get.mockResolvedValue({
-      success: true,
-      data: {
-        listings: [{ id: 10, title: 'Garden Help', type: 'listing' }],
-        users: [],
-        events: [],
-        groups: [],
-      },
-    });
-    const { SearchOverlay } = await import('./SearchOverlay');
-    render(<SearchOverlay isOpen={true} onClose={onClose} />);
-    const input = document.querySelector('input[type="text"]') as HTMLInputElement;
-    fireEvent.change(input, { target: { value: 'garden' } });
-
     await waitFor(() => {
-      expect(screen.getByText('Garden Help')).toBeInTheDocument();
+      expect(input).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getAllByRole('status').some(status => status.getAttribute('aria-busy') === 'true')).toBe(true);
     }, { timeout: 1000 });
   });
 
-  it('navigates when a suggestion is clicked', async () => {
+  it('relates returned suggestions to the combobox', async () => {
     mockApi.get.mockResolvedValue({
       success: true,
       data: {
@@ -209,40 +166,85 @@ describe('SearchOverlay', () => {
       },
     });
     const { SearchOverlay } = await import('./SearchOverlay');
-    render(<SearchOverlay isOpen={true} onClose={onClose} />);
-    const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+    render(<SearchOverlay isOpen onClose={onClose} />);
+    const input = screen.getByRole('combobox');
     fireEvent.change(input, { target: { value: 'garden' } });
 
-    await waitFor(() => screen.getByText('Garden Help'), { timeout: 1000 });
-    fireEvent.click(screen.getByText('Garden Help'));
+    const option = await screen.findByRole('option', { name: /garden help/i }, { timeout: 1000 });
+    const listbox = screen.getByRole('listbox');
+    expect(input).toHaveAttribute('aria-controls', listbox.id);
+    expect(option).toHaveAttribute('aria-selected', 'false');
+  });
 
+  it('updates aria-activedescendant and activates a suggestion with ArrowDown + Enter', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: {
+        listings: [{ id: 10, title: 'Garden Help', type: 'listing' }],
+        users: [],
+        events: [],
+        groups: [],
+      },
+    });
+    const { SearchOverlay } = await import('./SearchOverlay');
+    render(<SearchOverlay isOpen onClose={onClose} />);
+    const input = screen.getByRole('combobox');
+    fireEvent.change(input, { target: { value: 'garden' } });
+    const option = await screen.findByRole('option', { name: /garden help/i }, { timeout: 1000 });
+
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    expect(input).toHaveAttribute('aria-activedescendant', option.id);
+    expect(option).toHaveAttribute('aria-selected', 'true');
+
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('10'));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('activates a suggestion by pointer', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: {
+        listings: [{ id: 10, title: 'Garden Help', type: 'listing' }],
+        users: [],
+        events: [],
+        groups: [],
+      },
+    });
+    const { SearchOverlay } = await import('./SearchOverlay');
+    render(<SearchOverlay isOpen onClose={onClose} />);
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'garden' } });
+
+    fireEvent.click(await screen.findByRole('option', { name: /garden help/i }, { timeout: 1000 }));
     expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('10'));
   });
 
-  it('shows no-results message when API returns empty', async () => {
-    mockApi.get.mockResolvedValue({ success: true, data: { listings: [], users: [], events: [], groups: [] } });
+  it('shows the no-results action when the API returns an empty collection', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: { listings: [], users: [], events: [], groups: [] },
+    });
     const { SearchOverlay } = await import('./SearchOverlay');
-    render(<SearchOverlay isOpen={true} onClose={onClose} />);
-    const input = document.querySelector('input[type="text"]') as HTMLInputElement;
-    fireEvent.change(input, { target: { value: 'zzznotfound' } });
+    render(<SearchOverlay isOpen onClose={onClose} />);
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'zzznotfound' } });
 
     await waitFor(() => {
       expect(document.body.textContent).toMatch(/zzznotfound/);
+      expect(screen.getByRole('combobox')).toHaveAttribute('aria-expanded', 'false');
     }, { timeout: 1000 });
   });
 
-  it('shows clear button when query is non-empty', async () => {
+  it('clears the query and returns focus to the combobox', async () => {
     const { SearchOverlay } = await import('./SearchOverlay');
-    render(<SearchOverlay isOpen={true} onClose={onClose} />);
-    const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+    render(<SearchOverlay isOpen onClose={onClose} />);
+    const input = screen.getByRole('combobox') as HTMLInputElement;
     fireEvent.change(input, { target: { value: 'something' } });
+    const clearButton = screen.getAllByRole('button').find(button =>
+      button.getAttribute('aria-label')?.toLowerCase().includes('clear'));
 
-    // aria-label on clear button
-    await waitFor(() => {
-      const clearBtn = screen.queryAllByRole('button').find(
-        (b) => b.getAttribute('aria-label')?.toLowerCase().includes('clear')
-      );
-      expect(clearBtn).toBeTruthy();
-    });
+    expect(clearButton).toBeDefined();
+    fireEvent.click(clearButton!);
+    expect(input).toHaveValue('');
+    expect(input).toHaveFocus();
   });
 });

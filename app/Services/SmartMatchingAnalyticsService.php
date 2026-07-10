@@ -40,11 +40,7 @@ class SmartMatchingAnalyticsService
             ];
         } catch (\Exception $e) {
             Log::error('[MatchingAnalytics] getDashboardSummary failed', ['error' => $e->getMessage()]);
-            return [
-                'overview' => [],
-                'conversion' => [],
-                'period' => 'last_30_days',
-            ];
+            throw $e;
         }
     }
 
@@ -114,15 +110,7 @@ class SmartMatchingAnalyticsService
             ];
         } catch (\Exception $e) {
             Log::error('[MatchingAnalytics] getOverallStats failed', ['error' => $e->getMessage()]);
-            return [
-                'total_cached_matches' => 0,
-                'total_matches_month' => 0,
-                'average_score' => 0,
-                'average_distance_km' => 0,
-                'match_type_breakdown' => [],
-                'active_users_with_matches' => 0,
-                'hot_matches' => 0,
-            ];
+            throw $e;
         }
     }
 
@@ -159,7 +147,7 @@ class SmartMatchingAnalyticsService
             return $distribution;
         } catch (\Exception $e) {
             Log::error('[MatchingAnalytics] getScoreDistribution failed', ['error' => $e->getMessage()]);
-            return [];
+            throw $e;
         }
     }
 
@@ -209,7 +197,7 @@ class SmartMatchingAnalyticsService
             return $distribution;
         } catch (\Exception $e) {
             Log::error('[MatchingAnalytics] getDistanceDistribution failed', ['error' => $e->getMessage()]);
-            return [];
+            throw $e;
         }
     }
 
@@ -264,6 +252,7 @@ class SmartMatchingAnalyticsService
             )->cnt ?? 0);
         } catch (\Exception $e) {
             Log::error('[MatchingAnalytics] getGateImpact user/listing counts failed', ['error' => $e->getMessage()]);
+            throw $e;
         }
 
         try {
@@ -277,7 +266,8 @@ class SmartMatchingAnalyticsService
                 $result['dismiss_reasons'][(string) $row->reason] = (int) $row->cnt;
             }
         } catch (\Exception $e) {
-            // match_dismissals may not exist — non-fatal.
+            Log::error('[MatchingAnalytics] getGateImpact dismiss reasons failed', ['error' => $e->getMessage()]);
+            throw $e;
         }
 
         try {
@@ -290,7 +280,8 @@ class SmartMatchingAnalyticsService
                 $result['algorithm_version_mix'][(string) $row->algorithm_version] = (int) $row->cnt;
             }
         } catch (\Exception $e) {
-            // algorithm_version column may pre-date the v2 migration — non-fatal.
+            Log::error('[MatchingAnalytics] getGateImpact algorithm versions failed', ['error' => $e->getMessage()]);
+            throw $e;
         }
 
         return $result;
@@ -327,8 +318,8 @@ class SmartMatchingAnalyticsService
                 $count++;
             }
         } catch (\Exception $e) {
-            // Column may not exist yet — return empty averages.
-            return ['sample_size' => 0, 'pillars' => []];
+            Log::error('[MatchingAnalytics] getPillarAverages failed', ['error' => $e->getMessage()]);
+            throw $e;
         }
 
         if ($count === 0) {
@@ -386,14 +377,7 @@ class SmartMatchingAnalyticsService
             ];
         } catch (\Exception $e) {
             Log::error('[MatchingAnalytics] getConversionFunnel failed', ['error' => $e->getMessage()]);
-            return [
-                'total_generated' => 0,
-                'viewed' => 0,
-                'contacted' => 0,
-                'saved' => 0,
-                'dismissed' => 0,
-                'conversion_rate' => 0,
-            ];
+            throw $e;
         }
     }
 }

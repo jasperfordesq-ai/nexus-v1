@@ -139,7 +139,21 @@
     "delete_series_note": "This is a recurring event. Deleting it will also delete all of its future occurrences.",
     "cancel_series_note": "This is a recurring event. Cancelling it will also cancel all future occurrences and notify their attendees.",
     "series_dates_title": "Upcoming dates in this series",
-    "series_this_date": "This date"
+    "series_this_date": "This date",
+    "events_in_series_one": "{{count}} events in series",
+    "events_in_series_other": "{{count}} events in series",
+    "max_capacity_one": "{{count}} max capacity",
+    "max_capacity_other": "{{count}} max capacity",
+    "spots_left_one": "{{count}} spots left",
+    "spots_left_other": "{{count}} spots left",
+    "waitlist_count_one": "{{count}} on waitlist",
+    "waitlist_count_other": "{{count}} on waitlist",
+    "more_attendees_one": "+{{count}} more",
+    "more_attendees_other": "+{{count}} more",
+    "attendance_total_one": "{{count}} responses",
+    "attendance_total_other": "{{count}} responses",
+    "view_all_series_one": "View all {{count}} events in series",
+    "view_all_series_other": "View all {{count}} events in series"
   },
   "card": {
     "cancelled": "Cancelled",
@@ -152,7 +166,9 @@
     "repeats_yearly": "Repeats yearly",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
-    "series_dates_other": "{{count}} dates"
+    "series_dates_other": "{{count}} dates",
+    "spots_left_one": "{{count}} spots left",
+    "spots_left_other": "{{count}} spots left"
   },
   "form": {
     "create_title": "Create New Event",
@@ -300,7 +316,9 @@
     "total_votes": "{{count}} votes",
     "vote_success": "Vote recorded!",
     "vote_failed": "Failed to record vote",
-    "view_full": "View full poll"
+    "view_full": "View full poll",
+    "total_votes_one": "{{count}} votes",
+    "total_votes_other": "{{count}} votes"
   },
   "radius_5": "5 km",
   "radius_10": "10 km",
@@ -318,5 +336,9 @@
   "active_filters": "Active filters",
   "active_search": "Search: {{query}}",
   "active_near_me": "Within {{radius}} km",
-  "clear_filters": "Clear filters"
+  "clear_filters": "Clear filters",
+  "going_one": "{{count}} going",
+  "going_other": "{{count}} going",
+  "interested_one": "{{count}} interested",
+  "interested_other": "{{count}} interested"
 }

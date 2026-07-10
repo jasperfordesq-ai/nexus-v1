@@ -51,7 +51,7 @@ import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -125,8 +125,8 @@ interface StatusConfig {
 const STATUS_CONFIGS: Record<GroupExchangeStatus, StatusConfig> = {
   draft: { color: 'default', bgClass: 'bg-gray-500/20 text-gray-600 dark:text-gray-400' },
   pending_participants: { color: 'warning', bgClass: 'bg-amber-500/20 text-amber-700 dark:text-amber-400' },
-  pending_broker: { color: 'secondary', bgClass: 'bg-purple-500/20 text-purple-700 dark:text-purple-400' },
-  active: { color: 'primary', bgClass: 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-400' },
+  pending_broker: { color: 'secondary', bgClass: 'bg-accent/20 text-accent dark:text-accent' },
+  active: { color: 'primary', bgClass: 'bg-accent/20 text-accent dark:text-accent' },
   pending_confirmation: { color: 'warning', bgClass: 'bg-amber-500/20 text-amber-700 dark:text-amber-400' },
   completed: { color: 'success', bgClass: 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' },
   cancelled: { color: 'danger', bgClass: 'bg-red-500/20 text-red-600 dark:text-red-400' },
@@ -439,11 +439,9 @@ export function GroupExchangeDetailPage() {
           title={t('detail.not_found')}
           description={error || t('detail.not_found_desc')}
           action={
-            <Link to={tenantPath('/group-exchanges')}>
-              <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                {t('detail.view_exchanges')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/group-exchanges')} className="bg-gradient-to-r from-accent to-accent-gradient-end text-white">
+              {t('detail.view_exchanges')}
+            </Button>
           }
         />
       </>
@@ -524,7 +522,7 @@ export function GroupExchangeDetailPage() {
             <p className="text-sm text-theme-muted">{t('detail.created')}</p>
             <p className="text-sm font-medium text-theme-primary">
               <time dateTime={exchange.created_at}>
-                {new Date(exchange.created_at).toLocaleDateString()}
+                {new Date(exchange.created_at).toLocaleDateString(getFormattingLocale())}
               </time>
             </p>
           </div>
@@ -546,7 +544,7 @@ export function GroupExchangeDetailPage() {
               {t('detail.exchange_completed')}
             </h3>
             <p className="text-theme-muted text-sm">
-              {t('detail.completed_on', { date: new Date(exchange.completed_at).toLocaleDateString() })}
+              {t('detail.completed_on', { date: new Date(exchange.completed_at).toLocaleDateString(getFormattingLocale()) })}
             </p>
           </div>
         )}
@@ -628,7 +626,7 @@ export function GroupExchangeDetailPage() {
       {/* Participants */}
       <GlassCard className="p-6">
         <h2 className="text-xl font-semibold text-theme-primary mb-6 flex items-center gap-3">
-          <Users className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+          <Users className="w-5 h-5 text-accent" aria-hidden="true" />
           {t('detail.participants_heading', { count: exchange.participants.length })}
         </h2>
 
@@ -722,7 +720,7 @@ export function GroupExchangeDetailPage() {
       {splitRows.length > 0 && (
         <GlassCard className="p-6">
           <h2 className="text-xl font-semibold text-theme-primary mb-6 flex items-center gap-3">
-            <Scale className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+            <Scale className="w-5 h-5 text-accent" aria-hidden="true" />
             {t('detail.hour_split')}
           </h2>
 

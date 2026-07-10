@@ -393,7 +393,10 @@
     "changes_between": "Alteracoes: v{{old}} a v{{new}}",
     "changes_count": "{{count}} alteracoes",
     "legend_removed": "Removido",
-    "legend_added": "Adicionado"
+    "legend_added": "Adicionado",
+    "changes_count_many": "{{count}} alteracoes",
+    "changes_count_one": "{{count}} alteracoes",
+    "changes_count_other": "{{count}} alteracoes"
   },
   "platform": {
     "effective_date": "Vigente desde {{date}}",
@@ -480,7 +483,10 @@
     "consent_text": "Ao clicar em Aceitar, confirma que leu e concorda com os documentos listados acima.",
     "accept_aria": "Aceitar todos os documentos legais atualizados e continuar",
     "accepting": "A aceitar…",
-    "accept_continue": "Aceitar e Continuar"
+    "accept_continue": "Aceitar e Continuar",
+    "subtitle_other_many": "{{count}} documentos foram atualizados. Por favor, reveja e aceite para continuar.",
+    "subtitle_other_one": "{{count}} documentos foram atualizados. Por favor, reveja e aceite para continuar.",
+    "subtitle_other_other": "{{count}} documentos foram atualizados. Por favor, reveja e aceite para continuar."
   },
   "custom": {
     "effective_label": "Vigente: {{date}}",

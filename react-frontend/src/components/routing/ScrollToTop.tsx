@@ -14,26 +14,38 @@ import { useEffect, useState, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export function ScrollToTop() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const [announcement, setAnnouncement] = useState('');
   const prevPathRef = useRef(pathname);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    const pathChanged = prevPathRef.current !== pathname;
+
+    // Preserve native/deep-link anchor positioning. Same-page hash changes do
+    // not represent a new page and must not steal focus from the activated link.
+    if (!hash) {
+      window.scrollTo(0, 0);
+    }
 
     // Announce route change to screen readers after a short delay
     // to allow usePageTitle to update document.title first
-    if (prevPathRef.current !== pathname) {
+    if (pathChanged) {
       prevPathRef.current = pathname;
       const timer = setTimeout(() => {
         const title = document.title;
         if (title) {
           setAnnouncement(title);
         }
+
+        // Move keyboard/screen-reader focus into the newly rendered page.
+        // Layout exposes this programmatic-only target with tabIndex={-1}.
+        if (!hash) {
+          document.getElementById('main-content')?.focus({ preventScroll: true });
+        }
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [pathname]);
+  }, [hash, pathname]);
 
   return (
     <div

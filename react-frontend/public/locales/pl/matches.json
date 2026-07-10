@@ -138,5 +138,9 @@
       "mutual_matches": "Alerty o wzajemnych dopasowaniach",
       "mutual_matches_desc": "Otrzymuj powiadomienia, gdy dopasowanie przebiega w obie strony."
     }
-  }
+  },
+  "reasons_more_few": "+{{count}} więcej",
+  "reasons_more_many": "+{{count}} więcej",
+  "reasons_more_one": "+{{count}} więcej",
+  "reasons_more_other": "+{{count}} więcej"
 }

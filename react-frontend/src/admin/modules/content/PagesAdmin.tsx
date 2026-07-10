@@ -9,6 +9,7 @@
  * Wired to adminPages API for full CRUD.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback } from 'react';
 import FileText from 'lucide-react/icons/file-text';
 import Plus from 'lucide-react/icons/plus';
@@ -139,7 +140,7 @@ export function PagesAdmin() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {new Date(item.created_at).toLocaleDateString()}
+          {new Date(item.created_at).toLocaleDateString(getFormattingLocale())}
         </span>
       ),
     },

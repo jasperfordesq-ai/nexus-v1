@@ -92,7 +92,11 @@
     "get_directions": "Routebeschrijving",
     "promoted": "Gesponsord",
     "unsave": "Verwijderen uit opgeslagen",
-    "save": "Advertentie opslaan"
+    "save": "Advertentie opslaan",
+    "available_count_one": "{{count}} beschikbaar",
+    "available_count_other": "{{count}} beschikbaar",
+    "views_count_one": "{{count}} weergaven",
+    "views_count_other": "{{count}} weergaven"
   },
   "offer": {
     "modal_title": "Doe een bod",
@@ -184,7 +188,9 @@
     "created_success": "Advertentie succesvol aangemaakt!",
     "created_error": "Mislukt om advertentie aan te maken",
     "created_error_retry": "Mislukt om advertentie aan te maken. Probeer het opnieuw.",
-    "draft_saved": "Concept opgeslagen"
+    "draft_saved": "Concept opgeslagen",
+    "title_char_count_one": "{{count}}/120 tekens",
+    "title_char_count_other": "{{count}}/120 tekens"
   },
   "search": {
     "category_search": "Categorieën zoeken...",
@@ -228,7 +234,9 @@
     "price_from": "Van {{min}}",
     "price_up_to": "Tot {{max}}",
     "last_days_one": "Laatste {{count}} dag",
-    "last_days_other": "Laatste {{count}} dagen"
+    "last_days_other": "Laatste {{count}} dagen",
+    "reset_filters_one": "Filters resetten ({{count}})",
+    "reset_filters_other": "Filters resetten ({{count}})"
   },
   "seller": {
     "page_title": "Verkoper profiel",
@@ -285,7 +293,9 @@
     "results_count_one": "{{count}} resultaat",
     "results_count_other": "{{count}} resultaten",
     "load_more": "Laad Meer",
-    "browse_description": "Blader door {{name}} lijsten op de marktplaats."
+    "browse_description": "Blader door {{name}} lijsten op de marktplaats.",
+    "reset_filters_one": "Filters Resetten ({{count}})",
+    "reset_filters_other": "Filters Resetten ({{count}})"
   },
   "common": {
     "loading": "Laden...",
@@ -426,7 +436,9 @@
     "empty_sold_title": "Nog Geen Verkopen",
     "empty_sold_description": "Je hebt nog geen artikelen verkocht.",
     "empty_expired_title": "Geen Verlopen Aanbiedingen",
-    "empty_expired_description": "Je hebt geen verlopen aanbiedingen."
+    "empty_expired_description": "Je hebt geen verlopen aanbiedingen.",
+    "views_count_aria_one": "{{count}} weergaven",
+    "views_count_aria_other": "{{count}} weergaven"
   },
   "my_offers": {
     "page_title": "Mijn Aanbiedingen - Marketplace",
@@ -584,7 +596,13 @@
       "declined": "Geweigerd",
       "completed": "Voltooid",
       "cancelled": "Geannuleerd"
-    }
+    },
+    "offers_title_count_one": "Bezorgaanbiedingen ({{count}})",
+    "offers_title_count_other": "Bezorgaanbiedingen ({{count}})",
+    "time_credits_value_one": "{{count}} TC",
+    "time_credits_value_other": "{{count}} TC",
+    "estimated_minutes_one": "~{{count}} min",
+    "estimated_minutes_other": "~{{count}} min"
   },
   "pickup": {
     "my_pickups_title": "Mijn afhalingen",
@@ -613,7 +631,11 @@
     "oversold_protected": "Bestellingen weigeren die de voorraad overschrijden",
     "sold_out": "Uitverkocht",
     "low_chip": "Voorraad: {{count}} (Laag)",
-    "count_chip": "Voorraad: {{count}}"
+    "count_chip": "Voorraad: {{count}}",
+    "low_chip_one": "Voorraad: {{count}} (Laag)",
+    "low_chip_other": "Voorraad: {{count}} (Laag)",
+    "count_chip_one": "Voorraad: {{count}}",
+    "count_chip_other": "Voorraad: {{count}}"
   },
   "ai_reply": {
     "suggest": "Stel Antwoord Voor",
@@ -647,7 +669,9 @@
     "search_this_area": "Zoek Dit Gebied",
     "distance_km": "{{km}} km afstand",
     "distance_meters": "{{m}}m afstand",
-    "view_toggle": "Bekijk modus"
+    "view_toggle": "Bekijk modus",
+    "results_count_one": "{{count}} vermeldingen gevonden in de buurt",
+    "results_count_other": "{{count}} vermeldingen gevonden in de buurt"
   },
   "shipping": {
     "title": "Verzendopties",
@@ -778,7 +802,9 @@
       "select_rating": "Selecteer een beoordeling",
       "success": "Beoordeling succesvol ingediend!",
       "error": "Het indienen van de beoordeling is mislukt"
-    }
+    },
+    "quantity_multiplier_one": "×{{count}}",
+    "quantity_multiplier_other": "×{{count}}"
   },
   "onboarding": {
     "page_title": "Verkoper Onboarding - Marketplace",

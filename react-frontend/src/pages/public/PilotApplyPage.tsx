@@ -202,20 +202,18 @@ export function PilotApplyPage() {
             <p className="text-theme-muted mb-6">{t('provisioning.success_body')}</p>
             {statusToken && (
               <p className="text-xs text-theme-subtle mb-6 break-all">
-                <Link to={tenantPath(`/pilot-apply/status/${statusToken}`)} className="text-indigo-500 hover:underline">
+                <Link to={tenantPath(`/pilot-apply/status/${statusToken}`)} className="text-accent hover:underline">
                   {t('provisioning.status_title')}
                 </Link>
               </p>
             )}
-            <Link to={tenantPath('/')}>
-              <Button
-                variant="tertiary"
-                className="bg-theme-elevated text-theme-muted"
-                startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
-              >
-                {t('provisioning.success_back')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/')}
+              variant="tertiary"
+              className="bg-theme-elevated text-theme-muted"
+              startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
+            >
+              {t('provisioning.success_back')}
+            </Button>
           </GlassCard>
         </motion.div>
       </div>
@@ -227,8 +225,8 @@ export function PilotApplyPage() {
       <PageMeta title={t('provisioning.meta.title')} description={t('provisioning.meta.description')} />
 
       <motion.div className="text-center mb-8" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4">
-          <Building className="w-7 h-7 text-indigo-500" aria-hidden="true" />
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-accent/20 to-emerald-500/20 mb-4">
+          <Building className="w-7 h-7 text-accent" aria-hidden="true" />
         </div>
         <h1 className="text-3xl font-bold text-theme-primary mb-2">{t('provisioning.hero_title')}</h1>
         <p className="text-theme-muted">{t('provisioning.hero_subtitle')}</p>
@@ -410,7 +408,7 @@ export function PilotApplyPage() {
             type="submit"
             isLoading={submitting}
             isDisabled={!canSubmit || submitting}
-            className="w-full bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
+            className="w-full bg-gradient-to-r from-accent to-emerald-600 text-white font-medium"
             size="lg"
             spinner={<Spinner size="sm" />}
           >

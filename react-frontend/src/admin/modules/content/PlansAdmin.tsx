@@ -206,7 +206,7 @@ export function PlansAdmin() {
       label: t('content.label_status'),
       render: (item) => (
         <Chip size="sm" variant="soft" color={item.is_active ? 'success' : 'default'}>
-          {item.is_active ? t('content.label_active') : t('reports.label_inactive')}
+          {item.is_active ? t('content.label_active') : t('content.label_inactive')}
         </Chip>
       ),
     },

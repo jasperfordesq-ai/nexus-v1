@@ -234,5 +234,11 @@
     "sent": "Coordenador notificado — entrará em contacto para ajudar a organizar a comunicação.",
     "error": "Não foi possível enviar o seu pedido neste momento. Por favor, tente novamente em breve."
   },
-  "composer_blocked_safeguarding": "A troca de mensagens diretas não está disponível com este membro. Utilize a opção acima para pedir a um coordenador que ajude a organizar o contacto."
+  "composer_blocked_safeguarding": "A troca de mensagens diretas não está disponível com este membro. Utilize a opção acima para pedir a um coordenador que ajude a organizar o contacto.",
+  "aria_conversation_unread_many": "Conversa com {{name}}, {{count}} por ler",
+  "aria_conversation_unread_one": "Conversa com {{name}}, {{count}} por ler",
+  "aria_conversation_unread_other": "Conversa com {{name}}, {{count}} por ler",
+  "selected_members_many": "Selecionados ({{count}})",
+  "selected_members_one": "Selecionados ({{count}})",
+  "selected_members_other": "Selecionados ({{count}})"
 }

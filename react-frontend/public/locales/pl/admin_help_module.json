@@ -84,7 +84,11 @@
       "general_admin": "Administrator generalny",
       "caring_community": "Troskliwa społeczność",
       "kiss_agoris": "POCAŁUNEK I Caring Community"
-    }
+    },
+    "search_placeholder_few": "Przeszukaj artykuły pomocy{{count}}...",
+    "search_placeholder_many": "Przeszukaj artykuły pomocy{{count}}...",
+    "search_placeholder_one": "Przeszukaj artykuły pomocy{{count}}...",
+    "search_placeholder_other": "Przeszukaj artykuły pomocy{{count}}..."
   },
   "help_faqs": {
     "page_title": "FAQ pomocy",

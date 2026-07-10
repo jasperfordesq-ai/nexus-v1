@@ -37,8 +37,7 @@ export function OfflineIndicator() {
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed top-0 left-0 right-0 z-[60] overflow-hidden"
-          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+          className="fixed top-0 left-0 right-0 z-[60] overflow-hidden pt-[env(safe-area-inset-top,0px)]"
           role="alert"
           data-nosnippet
         >

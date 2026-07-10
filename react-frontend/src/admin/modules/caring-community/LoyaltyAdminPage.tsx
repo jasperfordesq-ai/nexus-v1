@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -283,7 +284,7 @@ export default function LoyaltyAdminPage() {
         <StatCard
           icon={Coins}
           label={t('admin.loyalty.stats.total_redemptions')}
-          value={stats.total_redemptions.toLocaleString()}
+          value={stats.total_redemptions.toLocaleString(getFormattingLocale())}
           color="warning"
         />
         <StatCard
@@ -365,7 +366,7 @@ export default function LoyaltyAdminPage() {
                       min="0"
                       step="0.5"
                       startContent={<span className="text-muted text-xs">CHF</span>}
-                      endContent={<span className="text-muted text-xs">/ h</span>}
+                      endContent={<span className="text-muted text-xs">{t('admin.loyalty.settings.per_hour_short')}</span>}
                       isDisabled={!settings.accepts_time_credits || !canManage}
                     />
                     <Input
@@ -436,7 +437,7 @@ export default function LoyaltyAdminPage() {
               {redemptions.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell className="text-sm">
-                    {new Date(row.redeemed_at).toLocaleDateString()}
+                    {new Date(row.redeemed_at).toLocaleDateString(getFormattingLocale())}
                   </TableCell>
                   <TableCell className="text-sm">{row.member_name || t('admin.loyalty.ledger.empty_value')}</TableCell>
                   <TableCell className="text-sm">{row.merchant_name || t('admin.loyalty.ledger.empty_value')}</TableCell>
@@ -520,7 +521,7 @@ export default function LoyaltyAdminPage() {
                     })}
                   </div>
                   <div>
-                    {t('admin.loyalty.reverse_modal.redeemed', { date: new Date(reverseTarget.redeemed_at).toLocaleString() })}
+                    {t('admin.loyalty.reverse_modal.redeemed', { date: new Date(reverseTarget.redeemed_at).toLocaleString(getFormattingLocale()) })}
                   </div>
                 </div>
                 <Textarea

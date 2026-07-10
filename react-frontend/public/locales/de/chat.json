@@ -40,5 +40,9 @@
   },
   "page_meta": {
     "title": "KI-Chat"
-  }
+  },
+  "card_wallet_transactions_one": "{{count}} Transaktionen in den letzten 30 Tagen",
+  "card_wallet_transactions_other": "{{count}} Transaktionen in den letzten 30 Tagen",
+  "limits_left_today_one": "{{count}} heute übrig",
+  "limits_left_today_other": "{{count}} heute übrig"
 }

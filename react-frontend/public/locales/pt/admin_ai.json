@@ -104,7 +104,10 @@
       "stats": {
         "total_runs": "total de corridas",
         "total_proposals": "propostas totais",
-        "pending_review": "{{count}} com revisão pendente"
+        "pending_review": "{{count}} com revisão pendente",
+        "pending_review_many": "{{count}} com revisão pendente",
+        "pending_review_one": "{{count}} com revisão pendente",
+        "pending_review_other": "{{count}} com revisão pendente"
       },
       "agent_types": {
         "activity_summary": "Resumo da atividade",
@@ -219,7 +222,10 @@
         "proposals_table_aria": "Executar propostas",
         "columns": {
           "subject": "Assunto"
-        }
+        },
+        "proposals_count_many": "Propostas ({{count}})",
+        "proposals_count_one": "Propostas ({{count}})",
+        "proposals_count_other": "Propostas ({{count}})"
       },
       "toasts": {
         "approve_eligible_failed": "Falha ao aprovar propostas elegíveis.",
@@ -235,7 +241,10 @@
         "run_details_load_failed": "Falha ao carregar detalhes da execução.",
         "run_trigger_failed": "Falha ao acionar a execução.",
         "run_triggered": "Execução acionada: propostas {{count}} geradas.",
-        "runs_load_failed": "Falha ao carregar execuções."
+        "runs_load_failed": "Falha ao carregar execuções.",
+        "run_triggered_many": "Execução acionada: propostas {{count}} geradas.",
+        "run_triggered_one": "Execução acionada: propostas {{count}} geradas.",
+        "run_triggered_other": "Execução acionada: propostas {{count}} geradas."
       }
     },
     "module_docs": {
@@ -302,7 +311,10 @@
         "save_failed": "Falha ao salvar.",
         "seed_failed": "A semente falhou.",
         "seeded": "Documentos padrão {{count}} propagados.",
-        "updated": "Documento atualizado."
+        "updated": "Documento atualizado.",
+        "seeded_many": "Documentos padrão {{count}} propagados.",
+        "seeded_one": "Documentos padrão {{count}} propagados.",
+        "seeded_other": "Documentos padrão {{count}} propagados."
       }
     },
     "trace_metrics": {

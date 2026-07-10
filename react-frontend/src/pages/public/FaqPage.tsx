@@ -148,7 +148,7 @@ export function FaqPage() {
                 <li>{t('faq.categories.time_credits.q3.option1')}</li>
                 <li>{t('faq.categories.time_credits.q3.option2')}</li>
               </ul>
-              <p>{t('faq.categories.time_credits.q3.answer_link_before')}<Link to={tenantPath('/wallet')} className="text-indigo-500 dark:text-indigo-400 hover:underline">{t('faq.categories.time_credits.q3.wallet_link')}</Link>{t('faq.categories.time_credits.q3.answer_link_after')}</p>
+              <p>{t('faq.categories.time_credits.q3.answer_link_before')}<Link to={tenantPath('/wallet')} className="text-accent dark:text-accent hover:underline">{t('faq.categories.time_credits.q3.wallet_link')}</Link>{t('faq.categories.time_credits.q3.answer_link_after')}</p>
             </>
           ),
         },
@@ -269,7 +269,7 @@ export function FaqPage() {
         {
           question: t('faq.categories.badges_rewards.q3.question'),
           answer: (
-            <p>{t('faq.categories.badges_rewards.q3.answer_before_link')}<Link to={tenantPath('/settings')} className="text-indigo-500 dark:text-indigo-400 hover:underline">{t('faq.categories.badges_rewards.q3.settings_link')}</Link>{t('faq.categories.badges_rewards.q3.answer_after_link')}</p>
+            <p>{t('faq.categories.badges_rewards.q3.answer_before_link')}<Link to={tenantPath('/settings')} className="text-accent dark:text-accent hover:underline">{t('faq.categories.badges_rewards.q3.settings_link')}</Link>{t('faq.categories.badges_rewards.q3.answer_after_link')}</p>
           ),
         },
       ],
@@ -281,7 +281,7 @@ export function FaqPage() {
         {
           question: t('faq.categories.account_privacy.q1.question'),
           answer: (
-            <p>{t('faq.categories.account_privacy.q1.answer_before_link')}<Link to={tenantPath('/settings')} className="text-indigo-500 dark:text-indigo-400 hover:underline">{t('faq.categories.account_privacy.q1.settings_link')}</Link>{t('faq.categories.account_privacy.q1.answer_after_link')}</p>
+            <p>{t('faq.categories.account_privacy.q1.answer_before_link')}<Link to={tenantPath('/settings')} className="text-accent dark:text-accent hover:underline">{t('faq.categories.account_privacy.q1.settings_link')}</Link>{t('faq.categories.account_privacy.q1.answer_after_link')}</p>
           ),
         },
         {
@@ -294,7 +294,7 @@ export function FaqPage() {
                 <li>{t('faq.categories.account_privacy.q2.item2')}</li>
                 <li>{t('faq.categories.account_privacy.q2.item3')}</li>
               </ul>
-              <p>{t('faq.categories.account_privacy.q2.answer_link_before')}<Link to={tenantPath('/settings')} className="text-indigo-500 dark:text-indigo-400 hover:underline">{t('faq.categories.account_privacy.q2.settings_link')}</Link>{t('faq.categories.account_privacy.q2.answer_link_after')}</p>
+              <p>{t('faq.categories.account_privacy.q2.answer_link_before')}<Link to={tenantPath('/settings')} className="text-accent dark:text-accent hover:underline">{t('faq.categories.account_privacy.q2.settings_link')}</Link>{t('faq.categories.account_privacy.q2.answer_link_after')}</p>
             </>
           ),
         },
@@ -388,14 +388,14 @@ export function FaqPage() {
         <motion.div variants={itemVariants}>
           <GlassCard className="p-8 sm:p-10">
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 rounded-xl bg-indigo-500/10">
-                <HelpCircle aria-hidden="true" className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+              <div className="p-2 rounded-xl bg-accent/10">
+                <HelpCircle aria-hidden="true" className="w-8 h-8 text-accent dark:text-accent" />
               </div>
               <h1 className="text-3xl font-bold text-theme-primary">{t('faq.title')}</h1>
             </div>
             <p className="text-theme-muted mb-6">
               {t('faq.subtitle_before_link')}{' '}
-              <Link to={tenantPath('/help')} className="text-indigo-500 dark:text-indigo-400 hover:underline">
+              <Link to={tenantPath('/help')} className="text-accent dark:text-accent hover:underline">
                 {t('faq.help_center_link')}
               </Link>{' '}
               {t('faq.subtitle_after_link')}
@@ -429,8 +429,8 @@ export function FaqPage() {
               <motion.div key={cat.title} variants={itemVariants}>
                 <GlassCard className="p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="p-1.5 rounded-lg bg-indigo-500/10">
-                      <Icon aria-hidden="true" className="w-5 h-5 text-indigo-500 dark:text-indigo-400" />
+                    <div className="p-1.5 rounded-lg bg-accent/10">
+                      <Icon aria-hidden="true" className="w-5 h-5 text-accent dark:text-accent" />
                     </div>
                     <h2 className="text-lg font-semibold text-theme-primary">{cat.title}</h2>
                   </div>
@@ -470,8 +470,8 @@ export function FaqPage() {
             <Link
               to={tenantPath('/contact')}
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl
-                         bg-indigo-500 text-white font-medium
-                         hover:bg-indigo-600 transition-colors"
+                         bg-accent text-white font-medium
+                         hover:bg-accent transition-colors"
             >
               {t('faq.cta_button')}
             </Link>

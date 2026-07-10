@@ -10,7 +10,7 @@ import { DatePicker } from '@/components/ui/DatePicker';
 import type { DateInputValue } from '@/components/ui/DatePicker';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Input } from '@/components/ui/Input';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Progress } from '@/components/ui/Progress';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { Separator } from '@/components/ui/Separator';
@@ -61,7 +61,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { api, API_BASE, tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
+import { resolveAvatarUrl, formatNumber, formatRelativeTime } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -291,7 +291,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
                       color={isVotedOption ? 'primary' : 'default'}
                       classNames={{
                         track: 'bg-[var(--surface-hover)]',
-                        indicator: isVotedOption ? 'bg-gradient-to-r from-indigo-500 to-purple-500' : '',
+                        indicator: isVotedOption ? 'bg-gradient-to-r from-accent to-accent-gradient-end' : '',
                       }}
                       aria-label={`${option.label}: ${option.percentage !== null ? `${option.percentage}%` : '—'}`}
                     />
@@ -323,7 +323,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
         {poll.poll_type === 'ranked' && isOpen && !hasVoted && (
           <Button
             size="sm"
-            className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white mb-3"
+            className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white mb-3"
             startContent={<ListOrdered className="w-4 h-4" aria-hidden="true" />}
             onPress={() => onRankedVote(poll)}
           >
@@ -1069,7 +1069,7 @@ export function PollsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('errors.load_failed')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadPolls()}
           >
@@ -1152,10 +1152,10 @@ export function PollsPage() {
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-[var(--text-primary)]">
-              <ListOrdered className="w-5 h-5 text-purple-400" aria-hidden="true" />
+            <ModalHeading className="flex items-center gap-2 text-[var(--text-primary)]">
+              <ListOrdered className="w-5 h-5 text-accent" aria-hidden="true" />
               {t('rank_preferences')}
-            </div>
+            </ModalHeading>
             {rankedPoll && (
               <p className="text-sm text-[var(--text-muted)] font-normal">{rankedPoll.question}</p>
             )}
@@ -1176,7 +1176,7 @@ export function PollsPage() {
                         key={optionId}
                         className="flex items-center gap-3 p-3 rounded-xl bg-[var(--surface-elevated)] border border-[var(--border-default)]"
                       >
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        <div className="w-7 h-7 rounded-full bg-gradient-to-r from-accent to-accent-gradient-end flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                           {index + 1}
                         </div>
                         <span className="flex-1 text-sm font-medium text-[var(--text-primary)]">
@@ -1257,9 +1257,11 @@ export function PollsPage() {
                                         size="sm"
                                         value={pct}
                                         className="w-24"
-                                        classNames={{ track: 'bg-[var(--surface-hover)]', indicator: 'bg-gradient-to-r from-purple-500 to-indigo-500' }}
+                                        classNames={{ track: 'bg-[var(--surface-hover)]', indicator: 'bg-gradient-to-r from-accent to-accent-gradient-end' }}
                                       />
-                                      <span className="text-xs text-theme-muted w-12 text-right">{count} ({pct}%)</span>
+                                      <span className="text-xs text-theme-muted w-12 text-right">
+                                        {count} ({formatNumber(pct / 100, { style: 'percent', maximumFractionDigits: 0 })})
+                                      </span>
                                     </div>
                                   );
                                 })}
@@ -1286,7 +1288,7 @@ export function PollsPage() {
             </Button>
             {rankedPoll?.status === 'open' && (
               <Button
-                className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white"
+                className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                 onPress={handleRankedSubmit}
                 isLoading={isSubmittingRank}
               >

@@ -396,7 +396,9 @@
       },
       "messages": {
         "recomputed": "Vertrauensstufen für {{count}} Mitglieder neu berechnet.",
-        "saved": "Trust tier settings saved."
+        "saved": "Trust tier settings saved.",
+        "recomputed_one": "Vertrauensstufen für {{count}} Mitglieder neu berechnet.",
+        "recomputed_other": "Vertrauensstufen für {{count}} Mitglieder neu berechnet."
       },
       "recompute_confirm": "Vertrauensstufen für alle Mitglieder neu berechnen? Dies kann einige Minuten dauern."
     },
@@ -741,7 +743,15 @@
       "escalate_failed": "Die Bewertung konnte nicht eskaliert werden.",
       "approve_success": "Rezension genehmigt.",
       "decline_success": "Rezension abgelehnt.",
-      "decision_failed": "Entscheidung konnte nicht aufgezeichnet werden."
+      "decision_failed": "Entscheidung konnte nicht aufgezeichnet werden.",
+      "manual_escalation_note_one": "Manuell eskaliert nach {{count}} ausstehenden Tagen.",
+      "manual_escalation_note_other": "Manuell eskaliert nach {{count}} ausstehenden Tagen.",
+      "escalated_count_one": "{{count}} eskaliert",
+      "escalated_count_other": "{{count}} eskaliert",
+      "overdue_count_one": "{{count}} überfällig",
+      "overdue_count_other": "{{count}} überfällig",
+      "age_days_one": "{{count}} Tag alt",
+      "age_days_other": "{{count}} Tag alt"
     },
     "paper_onboarding": {
       "title": "Paper Form Intake",
@@ -818,7 +828,11 @@
         "investigating": "Untersuchen",
         "resolved": "Gelöst",
         "dismissed": "Entlassen"
-      }
+      },
+      "age_hours_one": "{{count}}h",
+      "age_hours_other": "{{count}}h",
+      "age_days_one": "{{count}}d",
+      "age_days_other": "{{count}}d"
     },
     "role_pack": {
       "title": "Rollenvoreinstellungen",
@@ -857,7 +871,9 @@
           "title": "Vertrauenswürdiger Rezensent",
           "description": "Genehmigen Sie Stunden schnell mit einfacher Aufsicht."
         }
-      }
+      },
+      "available_count_one": "{{count}}-Rollenvoreinstellungen verfügbar",
+      "available_count_other": "{{count}}-Rollenvoreinstellungen verfügbar"
     },
     "policy": {
       "title": "Workflow-Richtlinie",
@@ -925,7 +941,9 @@
       "loading_favours": "Gefälligkeiten werden geladen...",
       "empty": "Es wurden noch keine Gefälligkeiten erfasst.",
       "anonymous": "Anonym",
-      "unknown": "Unbekannt"
+      "unknown": "Unbekannt",
+      "total_recorded_one": "{{count}} insgesamt aufgezeichnet",
+      "total_recorded_other": "{{count}} insgesamt aufgezeichnet"
     },
     "assisted_onboarding": {
       "title": "Assisted Onboarding",
@@ -1103,6 +1121,12 @@
         "completed": "Vollendet",
         "cancelled": "Abgesagt"
       }
+    },
+    "invite_card": {
+      "brand": "Community Caring",
+      "subtitle": "Einladung von Nachbar zu Nachbar",
+      "instructions": "Geben Sie diesen Code ein oder besuchen Sie den untenstehenden Link, um beizutreten.",
+      "valid_until": "Gültig bis {{date}}"
     }
   },
   "category_coefficients": {
@@ -1218,7 +1242,9 @@
       "export_empty": "Der Export wurde leer zurückgegeben",
       "exported": "Grenzkarte exportiert",
       "export_failed": "Grenzkarte konnte nicht exportiert werden"
-    }
+    },
+    "overrides_count_one": "{{count}} überschreiben",
+    "overrides_count_other": "{{count}} überschreiben"
   },
   "data_quality": {
     "meta": {
@@ -1255,7 +1281,9 @@
       "label": "Zusammenfassung:",
       "count": "{{count}} {{label}}",
       "generated": "{{date}} generiert",
-      "affected": "betroffen"
+      "affected": "betroffen",
+      "count_one": "{{count}} {{label}}",
+      "count_other": "{{count}} {{label}}"
     },
     "drilldown": {
       "subtitle": "Bis zu 50 betroffene Zeilen – vor dem Start auflösen oder dokumentieren.",
@@ -1618,7 +1646,17 @@
       "request_meta": "Wann: {{when}} – Benutzer #{{userId}} – Alter {{age}}",
       "target_hours": "Ziel {{hours}}h",
       "over_by": "Vorbei um {{duration}}",
-      "left": "{{duration}} übrig"
+      "left": "{{duration}} übrig",
+      "subtitle_one": "{{count}} offen – zuerst nach Verstößen sortiert",
+      "subtitle_other": "{{count}} offen – zuerst nach Verstößen sortiert",
+      "all_count_one": "Alle ({{count}})",
+      "all_count_other": "Alle ({{count}})",
+      "breached_count_one": "Verstoß ({{count}})",
+      "breached_count_other": "Verstoß ({{count}})",
+      "at_risk_count_one": "Gefährdet ({{count}})",
+      "at_risk_count_other": "Gefährdet ({{count}})",
+      "on_track_count_one": "Auf Kurs ({{count}})",
+      "on_track_count_other": "Auf Kurs ({{count}})"
     },
     "resolved": {
       "title": "Kürzlich gelöst (letzte 72 Stunden)",
@@ -1722,14 +1760,24 @@
       "pending": "Ausstehend: {{count}}",
       "in_progress": "In Bearbeitung: {{count}}",
       "decided": "Beschlossen: {{count}}",
-      "blocked": "Blockiert: {{count}}"
+      "blocked": "Blockiert: {{count}}",
+      "pending_one": "Ausstehend: {{count}}",
+      "pending_other": "Ausstehend: {{count}}",
+      "in_progress_one": "In Bearbeitung: {{count}}",
+      "in_progress_other": "In Bearbeitung: {{count}}",
+      "decided_one": "Beschlossen: {{count}}",
+      "decided_other": "Beschlossen: {{count}}",
+      "blocked_one": "Blockiert: {{count}}",
+      "blocked_other": "Blockiert: {{count}}"
     },
     "gate": {
       "closed": "Tor geschlossen – startbereit",
       "open": "Tor offen – es stehen noch Entscheidungen an",
       "decided_count": "{{decided}} von {{total}} Elementen entschieden",
       "blocked_count": "- {{count}} blockiert",
-      "progress_aria": "Fortschritt am Entscheidungspunkt"
+      "progress_aria": "Fortschritt am Entscheidungspunkt",
+      "blocked_count_one": "- {{count}} blockiert",
+      "blocked_count_other": "- {{count}} blockiert"
     },
     "fields": {
       "value": "Wert",
@@ -1874,7 +1922,9 @@
     "contacts": {
       "title": "Kontakte ({{count}})",
       "empty": "Keine Kontakte entsprechen den aktuellen Filtern.",
-      "table_aria": "Lead-Nurture-Kontakte"
+      "table_aria": "Lead-Nurture-Kontakte",
+      "title_one": "Kontakte ({{count}})",
+      "title_other": "Kontakte ({{count}})"
     },
     "table": {
       "name_email": "Name / E-Mail",
@@ -1961,7 +2011,9 @@
       "audience_description": "Geben Sie an, an wen sich diese Ankündigung richtet (z. B. „alle Bewohner“, „Freiwillige“, „Kontakte der Gemeinde“), damit AI den Ton und den Wortschatz entsprechend kalibrieren kann.",
       "polished_text": "Polierter Text",
       "reason": "Grund",
-      "reason_placeholder": "Warum wird dieser Vorschlag abgelehnt?"
+      "reason_placeholder": "Warum wird dieser Vorschlag abgelehnt?",
+      "character_count_one": "{{count}} / 4000 Zeichen",
+      "character_count_other": "{{count}} / 4000 Zeichen"
     },
     "status": {
       "proposed": "Vorgeschlagen",
@@ -2228,7 +2280,9 @@
       "ready_body_suffix": "wenn Ihr Koordinatorteam bereit ist, diese Entscheidung in eine Richtung zu treffen.",
       "blocked_title": "Kann noch nicht gestartet werden – {{count}}-Blocker bleibt bestehen",
       "blocked_title_plural": "Kann noch nicht gestartet werden – {{count}}-Blocker bleiben bestehen",
-      "blocked_body": "Lösen Sie alle folgenden Abschnitte, bevor die Startschaltfläche aktiviert wird."
+      "blocked_body": "Lösen Sie alle folgenden Abschnitte, bevor die Startschaltfläche aktiviert wird.",
+      "blocked_title_one": "Kann noch nicht gestartet werden – {{count}}-Blocker bleibt bestehen",
+      "blocked_title_other": "Kann noch nicht gestartet werden – {{count}}-Blocker bleibt bestehen"
     },
     "overall": {
       "ready": "Der Pilot ist startbereit",
@@ -2277,7 +2331,9 @@
       "load_failed": "Der Startbereitschaftsbericht konnte nicht geladen werden.",
       "unexpected_response": "Der Startbereitschaftsbericht lieferte eine unerwartete Antwort.",
       "unavailable_title": "Bereitschaftsbericht nicht verfügbar"
-    }
+    },
+    "more_count_one": "+{{count}} mehr",
+    "more_count_other": "+{{count}} mehr"
   },
   "pilot_scoreboard": {
     "meta": {
@@ -2419,7 +2475,9 @@
       "placeholder_label": "{{placeholder}}",
       "rendered_markdown": "Gerendert Markdown ({{count}} Zeichen)",
       "missing_placeholder_count_one": "Platzhalter {{count}} fehlt",
-      "missing_placeholder_count_other": "{{count}} Platzhalter fehlen"
+      "missing_placeholder_count_other": "{{count}} Platzhalter fehlen",
+      "rendered_markdown_one": "Gerendert Markdown ({{count}} Zeichen)",
+      "rendered_markdown_other": "Gerendert Markdown ({{count}} Zeichen)"
     },
     "exports": {
       "title": "Datensatz-Exportverlauf",
@@ -2529,7 +2587,9 @@
       "title": "Probelaufvorschau",
       "candidates": "{{count}} Kandidaten",
       "empty": "Derzeit sind keine geeigneten Kandidaten verfügbar.",
-      "table_aria": "Probieren Sie Nudge-Kandidaten aus"
+      "table_aria": "Probieren Sie Nudge-Kandidaten aus",
+      "candidates_one": "{{count}} Kandidaten",
+      "candidates_other": "{{count}} Kandidaten"
     },
     "recent": {
       "title": "Aktuelle Anstöße",
@@ -2559,7 +2619,11 @@
       "save_failed": "Konfiguration konnte nicht gespeichert werden",
       "dry_run": "Probelauf: {{count}} geeignete Kandidaten",
       "dispatched": "{{count}}-Anstöße wurden gesendet",
-      "dispatch_failed": "Der Versand ist fehlgeschlagen"
+      "dispatch_failed": "Der Versand ist fehlgeschlagen",
+      "dry_run_one": "Probelauf: {{count}} geeignete Kandidaten",
+      "dry_run_other": "Probelauf: {{count}} geeignete Kandidaten",
+      "dispatched_one": "{{count}}-Anstöße wurden gesendet",
+      "dispatched_other": "{{count}}-Anstöße wurden gesendet"
     }
   },
   "sub_regions": {

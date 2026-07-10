@@ -52,6 +52,10 @@ const CONFIG_RESPONSE = {
     max_distance_km: 50,
     broker_approval_enabled: false,
     max_matches_per_user: 20,
+    proximity_bands: [
+      { distance_km: 5, score: 1 },
+      { distance_km: 25, score: 0.75 },
+    ],
   },
 };
 
@@ -65,6 +69,7 @@ const STATS_RESPONSE = {
       total_matches_today: 18,
       avg_match_score: 68,
       avg_distance_km: 5.5,
+      cache_hit_rate: 80,
       hot_matches_count: 20,
       mutual_matches_count: 45,
       active_users_matching: 90,
@@ -230,13 +235,14 @@ describe('SmartMatchingOverview', () => {
     });
   });
 
-  it('shows "no configuration loaded" text when config request fails', async () => {
+  it('shows a retryable configuration error when config request fails', async () => {
     mockAdminMatching.getConfig.mockResolvedValue({ success: false });
     mockAdminMatching.getMatchingStats.mockResolvedValue(STATS_RESPONSE);
     render(<SmartMatchingOverview />);
 
     await waitFor(() => {
-      expect(screen.getByText(/no configuration loaded/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/failed to load matching configuration/i).length).toBeGreaterThan(0);
+      expect(screen.getByRole('button', { name: /retry/i })).toBeInTheDocument();
     });
   });
 

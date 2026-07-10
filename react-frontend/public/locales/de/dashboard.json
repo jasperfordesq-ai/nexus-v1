@@ -90,7 +90,9 @@
     "members_count": "{{count}} Mitglieder",
     "empty": "Sie sind noch keiner Gruppe beigetreten",
     "empty_description": "Gruppen helfen dir, gemeinsamen Interessen, Projekten und lokalen Kreisen zu folgen.",
-    "discover": "Gruppen entdecken"
+    "discover": "Gruppen entdecken",
+    "members_count_one": "{{count}} Mitglieder",
+    "members_count_other": "{{count}} Mitglieder"
   },
   "events": {
     "online_event": "Online-Veranstaltung",
@@ -106,7 +108,9 @@
     "xp_progress": "XP-Fortschritt",
     "start_earning": "Verdienen Sie XP, indem Sie an der Gemeinschaft teilnehmen!",
     "streak_days_one": "{{count}} Tag",
-    "streak_days_other": "{{count}} Tage"
+    "streak_days_other": "{{count}} Tage",
+    "xp_value_one": "{{count}} XP",
+    "xp_value_other": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "Inserate werden geladen",
@@ -150,5 +154,9 @@
       "active": "Aktiv"
     },
     "view_all": "Alle Austausche ansehen"
-  }
+  },
+  "likes_count_one": "{{count}} gefällt mir",
+  "likes_count_other": "{{count}} gefällt mir",
+  "comments_count_one": "{{count}} Kommentare",
+  "comments_count_other": "{{count}} Kommentare"
 }

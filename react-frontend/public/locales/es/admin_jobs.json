@@ -250,7 +250,22 @@
     "moderation_page_title": "Cola de moderación de trabajos",
     "moderation_page_description": "Revisar y aprobar ofertas de trabajo antes de que se publiquen",
     "templates_empty_description": "Crea tu primera plantilla para ahorrar tiempo en futuras ofertas de trabajo.",
-    "templates_empty_title": "Aún no hay plantillas"
+    "templates_empty_title": "Aún no hay plantillas",
+    "jobs_count_many": "Empleos de{{count}}",
+    "jobs_count_one": "Empleos de{{count}}",
+    "jobs_count_other": "Empleos de{{count}}",
+    "application_count_one_many": "Aplicación{{count}}",
+    "application_count_one_one": "Aplicación{{count}}",
+    "application_count_one_other": "Aplicación{{count}}",
+    "application_count_other_many": "Aplicaciones{{count}}",
+    "application_count_other_one": "Aplicaciones{{count}}",
+    "application_count_other_other": "Aplicaciones{{count}}",
+    "stat_pending_offers_many": "{{count}}ofertas pendientes",
+    "stat_pending_offers_one": "{{count}}ofertas pendientes",
+    "stat_pending_offers_other": "{{count}}ofertas pendientes",
+    "pipeline_minutes_many": "{{count}}min",
+    "pipeline_minutes_one": "{{count}}min",
+    "pipeline_minutes_other": "{{count}}min"
   },
   "moderation": {
     "action_failed": "Fallido",
@@ -478,5 +493,10 @@
     "blocked_count": "Bloqueado",
     "flagged_count": "Marcado",
     "total_analyzed": "Total analizado"
+  },
+  "premium": {
+    "status": {
+      "unknown": "Desconocido"
+    }
   }
 }

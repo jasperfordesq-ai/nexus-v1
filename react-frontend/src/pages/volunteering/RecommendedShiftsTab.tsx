@@ -7,6 +7,7 @@
  * RecommendedShiftsTab - Skills-based shift recommendations (V4)
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import {
   useState,
   useEffect,
@@ -269,13 +270,13 @@ export function RecommendedShiftsTab() {
                       )}
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" aria-hidden="true" />
-                        {new Date(item.shift.start_time).toLocaleDateString()}
+                        {new Date(item.shift.start_time).toLocaleDateString(getFormattingLocale())}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3" aria-hidden="true" />
-                        {new Date(item.shift.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(item.shift.start_time).toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' })}
                         {' - '}
-                        {new Date(item.shift.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        {new Date(item.shift.end_time).toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
 
@@ -309,7 +310,7 @@ export function RecommendedShiftsTab() {
                         item.match_score >= 75
                           ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400'
                           : item.match_score >= 50
-                            ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                            ? 'border-accent text-accent dark:text-accent'
                             : 'border-amber-500 text-amber-600 dark:text-amber-400'
                       }`}
                       role="img"

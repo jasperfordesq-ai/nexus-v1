@@ -276,7 +276,9 @@
     "members_tabs_aria": "メンバーレポートの種類",
     "hours_by_category_aria": "カテゴリごとの交換時間を示す棒グラフ",
     "hours_distribution_aria": "交換時間の分布を示す円グラフ",
-    "hours_trend_aria": "時間の経過に伴う交換時間を示す面グラフ"
+    "hours_trend_aria": "時間の経過に伴う交換時間を示す面グラフ",
+    "members_selected_count_other": "{{count}}が選択されました",
+    "days_count_other": "{{count}} 日"
   },
   "municipal_reports": {
     "meta": {
@@ -387,7 +389,9 @@
       "hours": "{{count}}h",
       "disabled": "無効",
       "activities": "{{count}} アクティビティ",
-      "trend_detail": "{{participants}} 人の参加者、{{activities}} 人のアクティビティ"
+      "trend_detail": "{{participants}} 人の参加者、{{activities}} 人のアクティビティ",
+      "hours_other": "{{count}}h",
+      "activities_other": "{{count}} アクティビティ"
     },
     "toast": {
       "load_failed": "地方自治体の影響データをロードできませんでした。",
@@ -470,7 +474,8 @@
         "partner_organisations_by_hours": "パートナー組織（時間別）",
         "no_partner_activity": "この期間はパートナーによるアクティビティはありません。",
         "top_5_categories": "上位 5 カテゴリ (地理的/アクティビティ分割)",
-        "no_category_data": "この期間にはカテゴリ データがありません。"
+        "no_category_data": "この期間にはカテゴリ データがありません。",
+        "trusted_total_other": "{{count}} 件の信頼できる合計。"
       },
       "cooperative": {
         "empty_title": "協力的 (cooperative 内部)",
@@ -487,8 +492,12 @@
         "coordinator_load": "コーディネーターの負荷",
         "coordinator_load_desc": "{{pending}} は {{coordinators}} コーディネーター間で保留中です。",
         "future_care_credit_pool": "フューチャーケア信用残高プール",
-        "future_care_credit_pool_desc": "正の組合員残高の合計 - 協同組合の暗黙の将来介護準備金。アクティブなメンバー ベース: {{count}}。"
-      }
+        "future_care_credit_pool_desc": "正の組合員残高の合計 - 協同組合の暗黙の将来介護準備金。アクティブなメンバー ベース: {{count}}。",
+        "member_retention_desc_other": "{{count}} メンバーは、この期間と以前の同等の期間の両方でアクティブでした。",
+        "reciprocity_rate_desc_other": "{{count}} サポーターも期間中に何時間も受け取りました。",
+        "future_care_credit_pool_desc_other": "正の組合員残高の合計 - 協同組合の暗黙の将来介護準備金。アクティブなメンバー ベース: {{count}}。"
+      },
+      "logs_count_other": "{{count}} ログ"
     },
     "cards": {
       "verified_hours": {
@@ -519,6 +528,18 @@
         "metric_2": "レビュー",
         "metric_3": "監査証跡"
       }
+    }
+  },
+  "caring_workflow": {
+    "policy": {
+      "periods": {
+        "last_90_days": "過去90日間"
+      }
+    }
+  },
+  "municipal_impact": {
+    "portfolio": {
+      "yoy_value": "前年比 {{sign}}{{value}}%"
     }
   }
 }

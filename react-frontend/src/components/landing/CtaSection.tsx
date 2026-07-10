@@ -37,7 +37,7 @@ export function CtaSection({ content }: CtaSectionProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="p-6 sm:p-8 lg:p-12 rounded-3xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-theme-default"
+          className="p-6 sm:p-8 lg:p-12 rounded-3xl bg-gradient-to-br from-accent/10 to-accent-gradient-end/10 border border-theme-default"
         >
           <h2 id="cta-heading" className="text-3xl sm:text-4xl font-bold text-theme-primary mb-4">
             {title}
@@ -49,7 +49,7 @@ export function CtaSection({ content }: CtaSectionProps) {
             as={Link}
             to={tenantPath(buttonLink)}
             size="lg"
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold px-10"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white font-semibold px-10"
             endContent={<ArrowRight className="w-5 h-5" aria-hidden="true" />}
           >
             {buttonText}

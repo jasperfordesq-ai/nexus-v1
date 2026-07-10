@@ -124,7 +124,13 @@
         "year": "سنة",
         "yearly": "سنوي",
         "annual": "سنوي"
-      }
+      },
+      "total_few": "{{count}} الإجمالي",
+      "total_many": "{{count}} الإجمالي",
+      "total_one": "{{count}} الإجمالي",
+      "total_other": "{{count}} الإجمالي",
+      "total_two": "{{count}} الإجمالي",
+      "total_zero": "{{count}} الإجمالي"
     },
     "table": {
       "aria": "طبقات متميزة",
@@ -203,7 +209,13 @@
         "restricted": "الإجراء المطلوب",
         "unknown": "الحالة غير معروفة"
       },
-      "connect_fallback_active": "تم تكوين حساب Stripe Connect، ولكنه ليس جاهزًا للتبرعات الحية بعد. ستستخدم الدفعات النظام الأساسي الاحتياطي حتى اكتمال عملية الإعداد."
+      "connect_fallback_active": "تم تكوين حساب Stripe Connect، ولكنه ليس جاهزًا للتبرعات الحية بعد. ستستخدم الدفعات النظام الأساسي الاحتياطي حتى اكتمال عملية الإعداد.",
+      "requirements_due_few": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}.",
+      "requirements_due_many": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}.",
+      "requirements_due_one": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}.",
+      "requirements_due_other": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}.",
+      "requirements_due_two": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}.",
+      "requirements_due_zero": "متطلبات حساب الشريط التي تحتاج إلى الاهتمام: {{count}}."
     },
     "finance": {
       "title": "العمليات المالية",
@@ -222,7 +234,23 @@
       "past_due_count": "{{count}} past due",
       "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "تصدير الإيصالات السنوية",
-      "empty": "لم يتم تسجيل أي نشاط تمويلي حتى الآن."
+      "empty": "لم يتم تسجيل أي نشاط تمويلي حتى الآن.",
+      "donation_count_few": "{{count}} donation",
+      "donation_count_many": "{{count}} donation",
+      "donation_count_one": "{{count}} التبرع",
+      "donation_count_two": "{{count}} donation",
+      "donation_count_zero": "{{count}} donation",
+      "declaration_count_few": "{{count}} declaration",
+      "declaration_count_many": "{{count}} declaration",
+      "declaration_count_one": "إعلان {{count}}",
+      "declaration_count_two": "{{count}} declaration",
+      "declaration_count_zero": "{{count}} declaration",
+      "past_due_count_few": "{{count}} past due",
+      "past_due_count_many": "{{count}} past due",
+      "past_due_count_one": "{{count}} فات موعد استحقاقه",
+      "past_due_count_other": "{{count}} فات موعد استحقاقه",
+      "past_due_count_two": "{{count}} past due",
+      "past_due_count_zero": "{{count}} past due"
     }
   }
 }

@@ -186,7 +186,17 @@
     "time_just_now": "À l'instant",
     "time_minutes_ago": "il y a {{count}} min",
     "time_hours_ago": "il y a {{count}} h",
-    "time_days_ago": "il y a {{count}} j"
+    "time_days_ago": "il y a {{count}} j",
+    "open_items_many": "éléments en attente de votre examen",
+    "time_minutes_ago_many": "il y a {{count}} min",
+    "time_minutes_ago_one": "il y a {{count}} min",
+    "time_minutes_ago_other": "il y a {{count}} min",
+    "time_hours_ago_many": "il y a {{count}} h",
+    "time_hours_ago_one": "il y a {{count}} h",
+    "time_hours_ago_other": "il y a {{count}} h",
+    "time_days_ago_many": "il y a {{count}} j",
+    "time_days_ago_one": "il y a {{count}} j",
+    "time_days_ago_other": "il y a {{count}} j"
   },
   "members": {
     "title": "Membres",
@@ -288,7 +298,20 @@
     "empty_never_logged_in_title": "Tout le monde s'est déjà connecté",
     "empty_never_logged_in_hint": "Aucun membre approuvé n'attend encore de se connecter pour la première fois.",
     "empty_onboarding_incomplete_title": "Tout le monde a terminé son intégration",
-    "empty_onboarding_incomplete_hint": "Aucun membre n'a d'étapes d'intégration inachevées."
+    "empty_onboarding_incomplete_hint": "Aucun membre n'a d'étapes d'intégration inachevées.",
+    "time_minutes_ago_many": "il y a {{count}} min",
+    "time_minutes_ago_one": "il y a {{count}} min",
+    "time_minutes_ago_other": "il y a {{count}} min",
+    "time_hours_ago_many": "il y a {{count}} h",
+    "time_hours_ago_one": "il y a {{count}} h",
+    "time_hours_ago_other": "il y a {{count}} h",
+    "time_days_ago_many": "il y a {{count}} j",
+    "time_days_ago_one": "il y a {{count}} j",
+    "time_days_ago_other": "il y a {{count}} j",
+    "bulk_selected_many": "{{count}} sélectionné(s)",
+    "bulk_selected_one": "{{count}} sélectionné(s)",
+    "bulk_selected_other": "{{count}} sélectionné(s)",
+    "role_all": "Tous les rôles"
   },
   "onboarding": {
     "title": "Intégration",
@@ -503,7 +526,34 @@
     "empty_queue_title": "Aucun dossier en attente d'examen",
     "empty_queue_hint": "Vous êtes à jour — les nouvelles soumissions apparaîtront ici pour examen.",
     "list_error_title": "Impossible de charger les dossiers de vérification",
-    "list_error_body": "Vérifiez votre connexion et réessayez."
+    "list_error_body": "Vérifiez votre connexion et réessayez.",
+    "expiry_days_left_many": "{{count}} j restants",
+    "expiry_days_left_one": "{{count}} j restants",
+    "expiry_days_left_other": "{{count}} j restants",
+    "toast_bulk_success_many": "{{count}} dossiers {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_one": "{{count}} dossiers {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_other": "{{count}} dossiers {{action}}.{{failedSuffix}}",
+    "toast_bulk_failed_suffix_many": " ({{count}} échouées)",
+    "toast_bulk_failed_suffix_one": " ({{count}} échouées)",
+    "toast_bulk_failed_suffix_other": " ({{count}} échouées)",
+    "stat_of_total_many": "sur {{count}} dossiers au total",
+    "stat_of_total_one": "sur {{count}} dossiers au total",
+    "stat_of_total_other": "sur {{count}} dossiers au total",
+    "stat_expired_hint_many": "{{count}} déjà expirés",
+    "stat_expired_hint_one": "{{count}} déjà expirés",
+    "stat_expired_hint_other": "{{count}} déjà expirés",
+    "records_selected_many": "{{count}} dossiers sélectionnés",
+    "records_selected_one": "{{count}} dossiers sélectionnés",
+    "records_selected_other": "{{count}} dossiers sélectionnés",
+    "bulk_verify_confirm_many": "Vérifier tous les dossiers sélectionnés ?",
+    "bulk_verify_confirm_one": "Vérifier tous les dossiers sélectionnés ?",
+    "bulk_verify_confirm_other": "Vérifier tous les dossiers sélectionnés ?",
+    "bulk_delete_confirm_many": "Voulez-vous vraiment supprimer tous les dossiers sélectionnés ? Cette action est irréversible.",
+    "bulk_delete_confirm_one": "Voulez-vous vraiment supprimer tous les dossiers sélectionnés ? Cette action est irréversible.",
+    "bulk_delete_confirm_other": "Voulez-vous vraiment supprimer tous les dossiers sélectionnés ? Cette action est irréversible.",
+    "bulk_reject_confirm_many": "Indiquez une raison pour rejeter tous les dossiers sélectionnés.",
+    "bulk_reject_confirm_one": "Indiquez une raison pour rejeter tous les dossiers sélectionnés.",
+    "bulk_reject_confirm_other": "Indiquez une raison pour rejeter tous les dossiers sélectionnés."
   },
   "member_detail": {
     "load_failed": "Échec du chargement du membre.",
@@ -795,7 +845,10 @@
     "retry": "Réessayer",
     "detail_not_found_hint": "La copie du message a peut-être été archivée ou supprimée, ou le lien est peut-être incorrect.",
     "detail_flag_banner_title": "Signalé pour examen",
-    "detail_decision_prompt": "Enregistrez une décision d'examen pour ce message."
+    "detail_decision_prompt": "Enregistrez une décision d'examen pour ce message.",
+    "detail_message_count_many": "{{count}} messages",
+    "detail_message_count_one": "{{count}} messages",
+    "detail_message_count_other": "{{count}} messages"
   },
   "monitoring": {
     "title": "Surveillance des utilisateurs",
@@ -855,7 +908,8 @@
     "empty_all_clear_hint": "Tous les membres communiquent librement. Ajoutez un membre si quelque chose mérite d'être examiné de plus près.",
     "load_error_title": "Impossible de charger les membres surveillés",
     "load_error_hint": "Une erreur s'est produite lors de la récupération de la liste de surveillance. Actualisez pour réessayer.",
-    "retry_button": "Réessayer"
+    "retry_button": "Réessayer",
+    "expiry_days_left_many": "{{count}} jours restants"
   },
   "risk_tags": {
     "title": "Étiquettes de risque",
@@ -939,7 +993,8 @@
     "empty_level_title": "Aucune étiquette à ce niveau",
     "empty_level_hint": "Aucune annonce ne porte actuellement ce niveau de risque.",
     "empty_search_title": "Aucune étiquette de risque correspondante",
-    "empty_search_hint": "Essayez un autre terme de recherche ou effacez la recherche."
+    "empty_search_hint": "Essayez un autre terme de recherche ou effacez la recherche.",
+    "level_all": "Tous niveaux de risque"
   },
   "insurance": {
     "title": "Certificats d'assurance",
@@ -1124,7 +1179,10 @@
     "detail_description": "Un instantané figé, en lecture seule, d'un message examiné.",
     "frozen_note": "Ce dossier est conservé exactement tel qu'il a été examiné et ne peut pas être modifié.",
     "record_id": "Dossier n° {{id}}",
-    "record_unavailable": "Dossier indisponible"
+    "record_unavailable": "Dossier indisponible",
+    "messages_count_many": "{{count}} messages",
+    "messages_count_one": "{{count}} messages",
+    "messages_count_other": "{{count}} messages"
   },
   "configuration": {
     "title": "Configuration du courtier",

@@ -1343,7 +1343,17 @@
     "resync_stripe": "Athshioncronú le Stripe",
     "sync_to_stripe": "Sioncronaigh le Stripe",
     "sync_stripe": "Sioncronaigh le Stripe",
-    "stripe_sync_description": "Cruthaíonn nó nuashonraítear an táirge Stripe agus na praghsanna don phlean seo. STRIPE_SECRET_KEY ag teastáil."
+    "stripe_sync_description": "Cruthaíonn nó nuashonraítear an táirge Stripe agus na praghsanna don phlean seo. STRIPE_SECRET_KEY ag teastáil.",
+    "active_tenants_cannot_delete_few": "Tionónta(í) gníomhacha{{count}}- ní féidir iad a scriosadh",
+    "active_tenants_cannot_delete_many": "Tionónta(í) gníomhacha{{count}}- ní féidir iad a scriosadh",
+    "active_tenants_cannot_delete_one": "Tionónta(í) gníomhacha{{count}}- ní féidir iad a scriosadh",
+    "active_tenants_cannot_delete_other": "Tionónta(í) gníomhacha{{count}}- ní féidir iad a scriosadh",
+    "active_tenants_cannot_delete_two": "Tionónta(í) gníomhacha{{count}}- ní féidir iad a scriosadh",
+    "filter_all_few": "Uile ({{count}})",
+    "filter_all_many": "Uile ({{count}})",
+    "filter_all_one": "Uile ({{count}})",
+    "filter_all_other": "Uile ({{count}})",
+    "filter_all_two": "Uile ({{count}})"
   },
   "data_table": {
     "admin_data_table": "Sonraí",

@@ -180,7 +180,6 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
             variant="flat"
             className="absolute left-2 top-1/2 -translate-y-1/2 bg-[var(--surface-overlay)] backdrop-blur-sm text-white min-w-[44px] min-h-[44px] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 focus-visible:opacity-100 transition-opacity duration-200"
             onPress={goPrev}
-            onClick={(e) => e.stopPropagation()}
             aria-label={t('carousel.previous')}
           >
             <ChevronLeft className="w-5 h-5" />
@@ -196,7 +195,6 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
             variant="flat"
             className="absolute right-2 top-1/2 -translate-y-1/2 bg-[var(--surface-overlay)] backdrop-blur-sm text-white min-w-[44px] min-h-[44px] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 focus-visible:opacity-100 transition-opacity duration-200"
             onPress={goNext}
-            onClick={(e) => e.stopPropagation()}
             aria-label={t('carousel.next')}
           >
             <ChevronRight className="w-5 h-5" />

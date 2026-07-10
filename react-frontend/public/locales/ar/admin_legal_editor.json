@@ -228,5 +228,32 @@
       "retention_save_failed": "فشل حفظ تكوين الاحتفاظ.",
       "retention_saved": "تم حفظ تكوين الاحتفاظ."
     }
+  },
+  "rte": {
+    "enter_url": "أدخل عنوان URL",
+    "undo": "تراجع",
+    "redo": "إعادة",
+    "heading_2": "2",
+    "heading_3": "3",
+    "bold": "عريض",
+    "italic": "مائل",
+    "underline": "تسطير",
+    "strikethrough": "يتوسطه خط",
+    "inline_code": "Inline Code",
+    "bullet_list": "Bullet List",
+    "numbered_list": "Numbered List",
+    "block_quote": "Block Quote",
+    "remove_link": "Remove Link",
+    "insert_link": "Insert Link",
+    "notice_box": "Notice Box",
+    "notice_title_placeholder": "Enter notice title...",
+    "notice_body_placeholder": "Enter notice body...",
+    "preview_title_placeholder": "Enter preview title...",
+    "content_html": "محتوى HTML",
+    "editor_only": "Editor Only",
+    "split_view": "Split View",
+    "content_placeholder": "Content...",
+    "preview": "معاينة",
+    "content_helper": "Content"
   }
 }

@@ -239,12 +239,10 @@ export default function MyOrganisationsPage() {
                     {/* CTA — the my-organisations API never returns a balance,
                         so the old balance stat rendered nothing. Removed. */}
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 sm:flex-shrink-0">
-                      <Button
-                        className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
-                        endContent={<ArrowRight className="w-4 h-4" />}
-                      >
+                      <span className="button button--primary button--md bg-gradient-to-r from-rose-500 to-pink-600 text-white">
                         {t('manage')}
-                      </Button>
+                        <ArrowRight className="w-4 h-4" aria-hidden="true" />
+                      </span>
                     </div>
                   </div>
                 </GlassCard>

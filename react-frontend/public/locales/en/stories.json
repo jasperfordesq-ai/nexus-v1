@@ -98,7 +98,9 @@
     "or_divider": "or",
     "poll_add_option_button": "Add Option",
     "videos_trimmed_notice": "Videos longer than 60s will be trimmed to 60s display duration",
-    "video_duration_seconds": "{{count}}s"
+    "video_duration_seconds": "{{count}}s",
+    "video_duration_seconds_one": "{{count}}s",
+    "video_duration_seconds_other": "{{count}}s"
   },
   "viewer": {
     "story_from": "Story from {{name}}",
@@ -132,7 +134,11 @@
     "reply_placeholder_generic": "Reply to story...",
     "react_with": "React with {{type}}",
     "viewers_title_count": "Viewers ({{count}})",
-    "delete_story_confirm": "Delete this story? This cannot be undone."
+    "delete_story_confirm": "Delete this story? This cannot be undone.",
+    "poll_votes_one": "{{count}} votes",
+    "poll_votes_other": "{{count}} votes",
+    "viewers_title_count_one": "Viewers ({{count}})",
+    "viewers_title_count_other": "Viewers ({{count}})"
   },
   "highlights": {
     "no_stories": "This highlight has no stories",

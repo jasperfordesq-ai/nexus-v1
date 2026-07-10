@@ -218,7 +218,9 @@
     "smart_search_text_chip": "Iarratas: {{query}}",
     "role_super_admin": "Sárriarthóir",
     "permissions_editor_unavailable_title": "Tá na ceadanna inléite amháin anseo",
-    "permissions_editor_unavailable_desc": "Taispeánann an leathanach seo ról an úsáideora agus na ceadanna a deonaíodh, ach ní féidir iad a athrú anseo. Bainistigh rochtain trí ról an úsáideora a athrú ar an leathanach eagarthóireachta."
+    "permissions_editor_unavailable_desc": "Taispeánann an leathanach seo ról an úsáideora agus na ceadanna a deonaíodh, ach ní féidir iad a athrú anseo. Bainistigh rochtain trí ról an úsáideora a athrú ar an leathanach eagarthóireachta.",
+    "role_unknown": "Ról anaithnid",
+    "role_tenant_super_admin": "Sár-riarthóir tionónta"
   },
   "user_edit": {
     "actions": {

@@ -211,7 +211,9 @@
       "report_dismissed": "Bericht abgewiesen.",
       "report_escalated": "Der Bericht eskalierte.",
       "feed_valid": "Der RSS-Feed ist fertig.",
-      "feed_invalid": "Der RSS-Feed weist {{count}}-Probleme auf."
+      "feed_invalid": "Der RSS-Feed weist {{count}}-Probleme auf.",
+      "feed_invalid_one": "Der RSS-Feed weist {{count}}-Probleme auf.",
+      "feed_invalid_other": "Der RSS-Feed weist {{count}}-Probleme auf."
     },
     "bulk": {
       "approve_selected": "Ausgewählte freigeben",
@@ -219,7 +221,13 @@
       "done": "{{count}} Element(e) moderiert.",
       "partial": "{{ok}} Element(e) moderiert; {{failed}} fehlgeschlagen.",
       "confirm_reject_title": "Ausgewählte Elemente ablehnen",
-      "confirm_reject_message": "{{count}} ausgewählte(s) Element(e) ablehnen? Für die Ersteller werden sie wieder zu Entwürfen."
-    }
+      "confirm_reject_message": "{{count}} ausgewählte(s) Element(e) ablehnen? Für die Ersteller werden sie wieder zu Entwürfen.",
+      "done_one": "{{count}} Element(e) moderiert.",
+      "done_other": "{{count}} Element(e) moderiert.",
+      "confirm_reject_message_one": "{{count}} ausgewählte(s) Element(e) ablehnen? Für die Ersteller werden sie wieder zu Entwürfen.",
+      "confirm_reject_message_other": "{{count}} ausgewählte(s) Element(e) ablehnen? Für die Ersteller werden sie wieder zu Entwürfen."
+    },
+    "count_one": "{{count}} Elemente",
+    "count_other": "{{count}} Elemente"
   }
 }

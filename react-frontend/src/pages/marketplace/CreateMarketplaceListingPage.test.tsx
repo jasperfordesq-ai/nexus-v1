@@ -61,7 +61,7 @@ vi.mock('@/hooks', () => ({
 vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 
 // Stub location picker to avoid Google Maps / Leaflet in jsdom
-vi.mock('@/components/location', () => ({
+vi.mock('@/components/location/PlaceAutocompleteInput', () => ({
   PlaceAutocompleteInput: ({ onPlaceSelect, label, onChange }: {
     onPlaceSelect?: (place: { formattedAddress: string; lat?: number; lng?: number }) => void;
     onChange?: (v: string) => void;

@@ -234,5 +234,9 @@
     "sent": "Coördinator op de hoogte gesteld — zij nemen contact op om het gesprek te helpen regelen.",
     "error": "We konden uw verzoek op dit moment niet verzenden. Probeer het binnenkort opnieuw."
   },
-  "composer_blocked_safeguarding": "Directe berichten zijn niet beschikbaar met dit lid. Gebruik de optie hierboven om een coördinator te vragen het contact te helpen regelen."
+  "composer_blocked_safeguarding": "Directe berichten zijn niet beschikbaar met dit lid. Gebruik de optie hierboven om een coördinator te vragen het contact te helpen regelen.",
+  "aria_conversation_unread_one": "Gesprek met {{name}}, {{count}} ongelezen",
+  "aria_conversation_unread_other": "Gesprek met {{name}}, {{count}} ongelezen",
+  "selected_members_one": "Geselecteerd ({{count}})",
+  "selected_members_other": "Geselecteerd ({{count}})"
 }

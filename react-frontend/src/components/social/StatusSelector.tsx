@@ -10,7 +10,7 @@
  * Provides options: Online, Away, Do Not Disturb, and Custom status.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, type ReactElement, type ReactNode } from 'react';
 
 import Circle from 'lucide-react/icons/circle';
 import Moon from 'lucide-react/icons/moon';
@@ -25,7 +25,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 interface StatusSelectorProps {
   /** Optional trigger element (defaults to a small status dot button) */
-  children?: React.ReactNode;
+  children?: ReactElement;
 }
 
 /**
@@ -34,7 +34,7 @@ interface StatusSelectorProps {
 const STATUS_OPTIONS: Array<{
   key: PresenceStatus;
   labelKey: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: string;
   descriptionKey: string;
 }> = [

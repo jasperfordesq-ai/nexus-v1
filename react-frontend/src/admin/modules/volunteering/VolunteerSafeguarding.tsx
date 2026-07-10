@@ -8,6 +8,7 @@
  * Admin page for managing safeguarding incidents and DLP assignments.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -274,7 +275,7 @@ export function VolunteerSafeguarding() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.date ? new Date(item.date).toLocaleDateString() : '--'}
+          {item.date ? new Date(item.date).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },
@@ -476,7 +477,7 @@ export function VolunteerSafeguarding() {
                           </p>
                         )}
                         <p className="text-xs text-muted/80 mt-0.5">
-                          {incident.date ? new Date(incident.date).toLocaleString() : '--'}
+                          {incident.date ? new Date(incident.date).toLocaleString(getFormattingLocale()) : '--'}
                         </p>
                       </div>
                     </div>

@@ -30,8 +30,12 @@ vi.mock('@/contexts', () => ({
   useTenant: () => ({ tenant: { id: 2, name: 'Test', slug: 'test', tagline: null }, branding: { name: 'Test', logo_url: null }, tenantSlug: 'test', tenantPath: (p) => '/test' + p, isLoading: false, hasFeature: vi.fn(() => true), hasModule: vi.fn(() => true) }),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(),
+}));
+
 import { api } from '@/lib/api';
-import { useAuth } from '@/contexts';
+import { useAuth } from '@/contexts/AuthContext';
 
 const mockApi = api as unknown as { get: ReturnType<typeof vi.fn>; post: ReturnType<typeof vi.fn> };
 const mockUseAuth = useAuth as ReturnType<typeof vi.fn>;
@@ -56,7 +60,7 @@ describe('useLegalGate', () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: false, isLoading: true });
     const { result } = renderHook(() => useLegalGate());
     expect(result.current.hasPending).toBe(false);
-    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isLoading).toBe(true);
   });
 
   it('returns hasPending false when unauthenticated', () => {
@@ -94,7 +98,7 @@ describe('useLegalGate', () => {
     expect(result.current.pendingDocs).toHaveLength(0);
   });
 
-  it('handles API failure gracefully — does not block app', async () => {
+  it('fails closed when the status request rejects', async () => {
     mockApi.get.mockRejectedValue(new Error('Network error'));
 
     const { result } = renderHook(() => useLegalGate());
@@ -102,15 +106,17 @@ describe('useLegalGate', () => {
 
     expect(result.current.hasPending).toBe(false);
     expect(result.current.pendingDocs).toHaveLength(0);
+    expect(result.current.error).toBe('Network error');
   });
 
-  it('handles API returning success false', async () => {
+  it('fails closed when the API resolves a failure envelope', async () => {
     mockApi.get.mockResolvedValue({ success: false, error: 'Server error' });
 
     const { result } = renderHook(() => useLegalGate());
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.hasPending).toBe(false);
+    expect(result.current.error).toBe('Server error');
   });
 
   it('acceptAll calls post and clears pending state on success', async () => {
@@ -154,6 +160,25 @@ describe('useLegalGate', () => {
     });
 
     expect(result.current.isAccepting).toBe(false);
+  });
+
+  it('preserves pending documents and exposes an error when acceptance fails', async () => {
+    mockApi.get.mockResolvedValue({
+      success: true,
+      data: { has_pending: true, documents: [pendingDoc] },
+    });
+    mockApi.post.mockResolvedValue({ success: false, error: 'Could not record acceptance' });
+
+    const { result } = renderHook(() => useLegalGate());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => {
+      await result.current.acceptAll();
+    });
+
+    expect(result.current.hasPending).toBe(true);
+    expect(result.current.pendingDocs).toEqual([pendingDoc]);
+    expect(result.current.error).toBe('Could not record acceptance');
   });
 
   it('refresh triggers a re-fetch', async () => {

@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Chip, Input, Card, CardBody, CardHeader, Select, SelectItem, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
@@ -336,7 +337,7 @@ export function VolunteerHoursAudit() {
         organization: item.org_name || '',
         hours: item.hours,
         status: item.status,
-        date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '',
+        date: item.created_at ? new Date(item.created_at).toLocaleDateString(getFormattingLocale()) : '',
         paid: (item.paid === 1 || item.paid === true) ? t('volunteering.yes') : t('volunteering.no'),
         paid_amount: item.paid_amount || 0,
       }));
@@ -380,7 +381,7 @@ export function VolunteerHoursAudit() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}
+          {item.created_at ? new Date(item.created_at).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },
@@ -682,7 +683,7 @@ export function VolunteerHoursAudit() {
                           {toNum(entry.paid_amount) > 0 ? toNum(entry.paid_amount).toFixed(2) : '--'}
                         </TableCell>
                         <TableCell className="text-muted">
-                          {entry.created_at ? new Date(entry.created_at).toLocaleDateString() : '--'}
+                          {entry.created_at ? new Date(entry.created_at).toLocaleDateString(getFormattingLocale()) : '--'}
                         </TableCell>
                       </TableRow>
                     ))}

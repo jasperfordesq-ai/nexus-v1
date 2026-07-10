@@ -4,46 +4,34 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * NEXUS Notifications Context
- *
- * Provides:
- * - Real-time notifications via Pusher
- * - Unread count tracking
- * - Toast notifications for new events
- * - Notification polling fallback
+ * NotificationsContext owns notification counts and presentation side effects.
+ * PusherContext is the sole realtime client/channel owner; this provider only
+ * consumes its typed event manager and polls while realtime is unavailable.
  */
 
 import {
   createContext,
   use,
-  useState,
-  useEffect,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
+  useState,
   type ReactNode,
 } from 'react';
-import type Pusher from 'pusher-js';
-import type { Channel } from 'pusher-js';
 import i18n from 'i18next';
-import { api, tokenManager } from '@/lib/api';
+import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { useAuth } from './AuthContext';
-import { useToast } from './ToastContext';
 import type { Notification } from '@/types';
+import { useAuth } from './AuthContext';
+import {
+  usePusherOptional,
+  type NewMessageEvent,
+  type TransactionEvent,
+} from './PusherContext';
+import { useToast } from './ToastContext';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Configuration
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Read at call-site (not module load) so vi.stubEnv() in tests takes effect.
-const getPusherKey = () => import.meta.env.VITE_PUSHER_KEY as string | undefined;
-const getPusherCluster = () => (import.meta.env.VITE_PUSHER_CLUSTER as string | undefined) || 'eu';
-const POLLING_INTERVAL = 60000; // 60 seconds fallback polling
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────────────────────
+const POLLING_INTERVAL = 60_000;
 
 interface NotificationCounts {
   total: number;
@@ -60,21 +48,18 @@ interface NotificationCounts {
 interface NotificationsState {
   unreadCount: number;
   counts: NotificationCounts;
-  isConnected: boolean;
-  connectionError: string | null;
 }
 
 interface NotificationsContextValue extends NotificationsState {
+  /** True only when both the socket and authenticated user channel are healthy. */
+  isConnected: boolean;
+  connectionError: string | null;
   refreshCounts: () => Promise<void>;
-  /** Resolves true only if the server confirmed the change (callers gate optimistic UI on this). */
+  /** Resolves true only if the server confirmed the change. */
   markAsRead: (id: number) => Promise<boolean>;
-  /** Resolves true only if the server confirmed the change (callers gate optimistic UI on this). */
+  /** Resolves true only if the server confirmed the change. */
   markAllAsRead: () => Promise<boolean>;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Context
-// ─────────────────────────────────────────────────────────────────────────────
 
 const NotificationsContext = createContext<NotificationsContextValue | null>(null);
 
@@ -100,109 +85,68 @@ const emptyNotificationsContext: NotificationsContextValue = {
   markAllAsRead: async () => false,
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Provider
-// ─────────────────────────────────────────────────────────────────────────────
-
-interface NotificationsProviderProps {
-  children: ReactNode;
-}
-
-export function NotificationsProvider({ children }: NotificationsProviderProps) {
+export function NotificationsProvider({ children }: { children: ReactNode }) {
   const { user, isAuthenticated } = useAuth();
+  const realtime = usePusherOptional();
   const toast = useToast();
-
-  // Stable ref so toast methods can be called inside useCallback/useEffect
-  // without listing `toast` as a dependency — the same pattern used for
-  // refreshCountsRef below. This prevents the Pusher effect from being torn
-  // down and re-initialised every time a toast is added/removed, which was
-  // causing the "Maximum update depth exceeded" infinite loop.
   const toastRef = useRef(toast);
   toastRef.current = toast;
 
   const [state, setState] = useState<NotificationsState>({
     unreadCount: 0,
-    counts: {
-      total: 0,
-      messages: 0,
-      listings: 0,
-      transactions: 0,
-      connections: 0,
-      events: 0,
-      groups: 0,
-      achievements: 0,
-      system: 0,
-    },
-    isConnected: false,
-    connectionError: null,
+    counts: { ...emptyCounts },
   });
-
-  const pusherRef = useRef<Pusher | null>(null);
-  const channelRef = useRef<Channel | null>(null);
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Fetch Notification Counts
-  // ─────────────────────────────────────────────────────────────────────────
 
   const refreshCounts = useCallback(async () => {
     if (!isAuthenticated) return;
 
     try {
-      // Fetch both notification counts and unread message count in parallel
-      const [notifResponse, messagesResponse] = await Promise.all([
+      const [notificationResponse, messagesResponse] = await Promise.all([
         api.get<NotificationCounts>('/v2/notifications/counts'),
         api.get<{ count: number }>('/v2/messages/unread-count').catch(() => null),
       ]);
 
-      if (notifResponse.success && notifResponse.data) {
-        const counts = notifResponse.data;
-        // Use actual unread message count from Messages API (not notification count)
-        const unreadMessages = messagesResponse?.success ? messagesResponse.data?.count ?? 0 : 0;
+      if (!notificationResponse.success || !notificationResponse.data) return;
 
-        setState((prev) => ({
-          ...prev,
-          unreadCount: counts.total ?? 0,
-          counts: {
-            total: counts.total ?? 0,
-            messages: unreadMessages, // Use actual unread messages, not notification count
-            listings: counts.listings ?? 0,
-            transactions: counts.transactions ?? 0,
-            connections: counts.connections ?? 0,
-            events: counts.events ?? 0,
-            groups: counts.groups ?? 0,
-            achievements: counts.achievements ?? 0,
-            system: counts.system ?? 0,
-          },
-        }));
-      }
+      const counts = notificationResponse.data;
+      const unreadMessages = messagesResponse?.success
+        ? messagesResponse.data?.count ?? 0
+        : 0;
+
+      setState({
+        unreadCount: counts.total ?? 0,
+        counts: {
+          total: counts.total ?? 0,
+          messages: unreadMessages,
+          listings: counts.listings ?? 0,
+          transactions: counts.transactions ?? 0,
+          connections: counts.connections ?? 0,
+          events: counts.events ?? 0,
+          groups: counts.groups ?? 0,
+          achievements: counts.achievements ?? 0,
+          system: counts.system ?? 0,
+        },
+      });
     } catch (error) {
       logError('Failed to fetch notification counts', error);
     }
   }, [isAuthenticated]);
 
-  // Stable ref to refreshCounts — updated on every render so the Pusher effect
-  // can call the latest version without listing refreshCounts as a dependency.
   const refreshCountsRef = useRef(refreshCounts);
   useEffect(() => {
     refreshCountsRef.current = refreshCounts;
   }, [refreshCounts]);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Mark as Read
-  // ─────────────────────────────────────────────────────────────────────────
-
   const markAsRead = useCallback(async (id: number): Promise<boolean> => {
     try {
       const response = await api.post(`/v2/notifications/${id}/read`);
-      if (response.success) {
-        setState((prev) => ({
-          ...prev,
-          unreadCount: Math.max(0, prev.unreadCount - 1),
-        }));
-        return true;
-      }
-      return false;
+      if (!response.success) return false;
+
+      setState((previous) => ({
+        ...previous,
+        unreadCount: Math.max(0, previous.unreadCount - 1),
+      }));
+      return true;
     } catch (error) {
       logError('Failed to mark notification as read', error);
       return false;
@@ -212,266 +156,140 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   const markAllAsRead = useCallback(async (): Promise<boolean> => {
     try {
       const response = await api.post('/v2/notifications/read-all');
-      if (response.success) {
-        setState((prev) => ({
-          ...prev,
-          unreadCount: 0,
-          counts: {
-            ...prev.counts,
-            total: 0,
-            // Preserve messages count — messages and notifications are separate systems
-            listings: 0,
-            transactions: 0,
-            connections: 0,
-            events: 0,
-            groups: 0,
-            achievements: 0,
-            system: 0,
-          },
-        }));
-        return true;
-      }
-      return false;
+      if (!response.success) return false;
+
+      setState((previous) => ({
+        unreadCount: 0,
+        counts: {
+          ...emptyCounts,
+          // Messages and notifications are separate systems.
+          messages: previous.counts.messages,
+        },
+      }));
+      return true;
     } catch (error) {
       logError('Failed to mark all notifications as read', error);
       return false;
     }
   }, []);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Handle Incoming Notification
-  // ─────────────────────────────────────────────────────────────────────────
-
   const handleNewNotification = useCallback((data: Notification) => {
-    // Update unread count
-    setState((prev) => ({
-      ...prev,
-      unreadCount: prev.unreadCount + 1,
+    setState((previous) => ({
+      ...previous,
+      unreadCount: previous.unreadCount + 1,
     }));
 
-    // Show toast notification — access via ref so `toast` is not a dep of
-    // this callback, preventing the Pusher useEffect from re-firing on every
-    // toast state change (which was the source of the infinite update loop).
     const toastConfig = getToastConfig(data.type);
-    toastRef.current.info(toastConfig.title, data.message || data.body || data.title);
+    toastRef.current.info(
+      toastConfig.title,
+      data.message || data.body || data.title
+    );
   }, []);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Initialize Pusher
-  // ─────────────────────────────────────────────────────────────────────────
+  const handleNewMessage = useCallback((data: NewMessageEvent) => {
+    setState((previous) => ({
+      ...previous,
+      unreadCount: previous.unreadCount + 1,
+      counts: {
+        ...previous.counts,
+        messages: previous.counts.messages + 1,
+      },
+    }));
 
+    const text = data.body || data.preview || data.message || '';
+    toastRef.current.info(
+      i18n.t('realtime.new_message', { ns: 'notifications' }),
+      text.substring(0, 50) ||
+        i18n.t('realtime.new_message_fallback', { ns: 'notifications' })
+    );
+  }, []);
+
+  const handleTransaction = useCallback((data: TransactionEvent) => {
+    void refreshCountsRef.current();
+    toastRef.current.success(
+      i18n.t('realtime.transaction_complete', { ns: 'notifications' }),
+      i18n.t('realtime.transaction_amount', {
+        ns: 'notifications',
+        sign: data.type === 'credit' ? '+' : '-',
+        amount: data.amount,
+      })
+    );
+  }, []);
+
+  // Fetch once per authenticated tenant/user identity and clear tenant-scoped
+  // notification state on logout before another identity can be rendered.
   useEffect(() => {
     if (!isAuthenticated || !user?.id) {
-      // Clean up if logged out
-      if (pusherRef.current) {
-        pusherRef.current.disconnect();
-        pusherRef.current = null;
-        channelRef.current = null;
-      }
-      if (pollingRef.current) {
-        clearInterval(pollingRef.current);
-        pollingRef.current = null;
-      }
-      setState((prev) => ({
-        ...prev,
-        isConnected: false,
-        unreadCount: 0,
-      }));
+      setState({ unreadCount: 0, counts: { ...emptyCounts } });
       return;
     }
 
-    // Fetch initial counts via ref to avoid making refreshCounts a dep of this effect
-    refreshCountsRef.current();
-
-    // Initialize Pusher (skip if key not configured)
-    const pusherKey = getPusherKey();
-    if (!pusherKey) {
-      if (import.meta.env.DEV) {
-        console.warn('[NotificationsContext] VITE_PUSHER_KEY is not set — real-time notifications disabled, using polling.');
-      }
-      // Still set up polling fallback even without Pusher
-      pollingRef.current = setInterval(() => refreshCountsRef.current(), POLLING_INTERVAL);
-      return () => {
-        if (pollingRef.current) {
-          clearInterval(pollingRef.current);
-          pollingRef.current = null;
-        }
-      };
-    }
-    let didCancel = false;
-
-    void import('pusher-js')
-      .then(({ default: PusherClient }) => {
-    if (didCancel) return;
-
-    try {
-      const pusher = new PusherClient(pusherKey, {
-        cluster: getPusherCluster(),
-        // Use a custom authorizer instead of authEndpoint so that the request
-        // goes through our api client, which handles CORS, content-type, and
-        // token refresh — avoiding the 405 error that occurs when Pusher's
-        // built-in XHR POST hits the backend without proper CORS headers.
-        authorizer: (channel) => ({
-          authorize: (socketId, callback) => {
-            // Use user.tenant_id (from JWT) so X-Tenant-ID matches the channel name.
-            // localStorage tenant may point to a different tenant when admins navigate cross-tenant.
-            const authTenantId = user?.tenant_id ? String(user.tenant_id) : (tokenManager.getTenantId() ?? '');
-            api.post<{ auth: string; channel_data?: string }>('/pusher/auth', {
-              socket_id: socketId,
-              channel_name: channel.name,
-            }, { skipTenant: true, headers: { ...(authTenantId ? { 'X-Tenant-ID': authTenantId } : {}) } })
-              .then((response) => {
-                if (response.success && response.data) {
-                  callback(null, response.data as { auth: string });
-                } else {
-                  callback(new Error(response.error || 'Pusher auth failed'), null as never);
-                }
-              })
-              .catch((err) => {
-                callback(err instanceof Error ? err : new Error('Pusher auth failed'), null as never);
-              });
-          },
-        }),
-      });
-
-      pusherRef.current = pusher;
-
-      // Subscribe to private user channel (must match backend PusherService::getUserChannel format)
-      const tenantId = user.tenant_id || tokenManager.getTenantId();
-      if (!tenantId) {
-        logError('Cannot subscribe to Pusher: no tenant_id available');
-        return;
-      }
-      const channelName = `private-tenant.${tenantId}.user.${user.id}`;
-      const channel = pusher.subscribe(channelName);
-      channelRef.current = channel;
-
-      // Bind to events
-      channel.bind('pusher:subscription_succeeded', () => {
-        setState((prev) => ({
-          ...prev,
-          isConnected: true,
-          connectionError: null,
-        }));
-      });
-
-      channel.bind('pusher:subscription_error', (error: unknown) => {
-        logError('Pusher subscription error', error);
-        setState((prev) => ({
-          ...prev,
-          isConnected: false,
-          connectionError: 'Failed to connect to notifications',
-        }));
-      });
-
-      // Notification events
-      channel.bind('notification', handleNewNotification);
-      channel.bind('new-notification', handleNewNotification);
-
-      // Message events (update unread count)
-      // Backend sends: { sender_id, body, preview, from_user_id, ... }
-      channel.bind('new-message', (data: { body?: string; preview?: string; message?: string }) => {
-        setState((prev) => ({
-          ...prev,
-          unreadCount: prev.unreadCount + 1,
-          counts: {
-            ...prev.counts,
-            messages: prev.counts.messages + 1,
-          },
-        }));
-        const text = data.body || data.preview || data.message || '';
-        toastRef.current.info(i18n.t('realtime.new_message', { ns: 'notifications' }), text.substring(0, 50) || i18n.t('realtime.new_message_fallback', { ns: 'notifications' }));
-      });
-
-      // Transaction events
-      channel.bind('transaction', (data: { type: string; amount: number }) => {
-        refreshCountsRef.current();
-        toastRef.current.success(
-          i18n.t('realtime.transaction_complete', { ns: 'notifications' }),
-          i18n.t('realtime.transaction_amount', { ns: 'notifications', sign: data.type === 'credit' ? '+' : '-', amount: data.amount })
-        );
-      });
-
-      // Connection state
-      pusher.connection.bind('connected', () => {
-        setState((prev) => ({ ...prev, isConnected: true, connectionError: null }));
-      });
-
-      pusher.connection.bind('disconnected', () => {
-        setState((prev) => ({ ...prev, isConnected: false }));
-      });
-
-      pusher.connection.bind('error', (error: unknown) => {
-        logError('Pusher connection error', error);
-        setState((prev) => ({
-          ...prev,
-          isConnected: false,
-          connectionError: 'Connection error',
-        }));
-      });
-
-    } catch (error) {
-      logError('Pusher initialization error', error);
-      setState((prev) => ({
-        ...prev,
-        connectionError: 'Failed to initialize real-time notifications',
-      }));
-    }
-      })
-      .catch((error) => {
-        logError('Pusher client failed to load', error);
-        setState((prev) => ({
-          ...prev,
-          connectionError: 'Failed to initialize real-time notifications',
-        }));
-      });
-
-    // Set up polling fallback — uses ref so interval doesn't need to be recreated
-    // when refreshCounts identity changes (e.g., after isAuthenticated toggles)
-    pollingRef.current = setInterval(() => refreshCountsRef.current(), POLLING_INTERVAL);
-
-    // Cleanup — disconnect() handles unsubscribing internally;
-    // calling unsubscribe() before disconnect() causes "WebSocket is already
-    // in CLOSING or CLOSED state" warnings because unsubscribe queues an
-    // async send that fires after disconnect starts closing the socket.
-    return () => {
-      didCancel = true;
-      if (pusherRef.current) {
-        if (channelRef.current) {
-          channelRef.current.unbind_all();
-        }
-        pusherRef.current.disconnect();
-        pusherRef.current = null;
-        channelRef.current = null;
-      }
-      if (pollingRef.current) {
-        clearInterval(pollingRef.current);
-        pollingRef.current = null;
-      }
-    };
-  // refreshCounts is intentionally excluded from deps — it is accessed via
-  // refreshCountsRef so the Pusher connection is not torn down and rebuilt
-  // whenever refreshCounts identity changes (e.g., after isAuthenticated toggles).
-  // handleNewNotification and toast are also intentionally excluded: both are
-  // accessed via stable refs (handleNewNotification has empty deps; toast via
-  // toastRef) so listing them here would cause the Pusher connection to be
-  // recreated on every toast state change, triggering the infinite update loop
-  // (React error #185 — "Maximum update depth exceeded").
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    void refreshCountsRef.current();
   }, [isAuthenticated, user?.id, user?.tenant_id]);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // Context Value
-  // ─────────────────────────────────────────────────────────────────────────
+  const onNotification = realtime?.onNotification;
+  const onUserMessage = realtime?.onUserMessage;
+  const onTransaction = realtime?.onTransaction;
+
+  // Consume the canonical user's channel. This provider deliberately contains
+  // no pusher-js import, client construction, subscription, or disconnection.
+  useEffect(() => {
+    if (
+      !isAuthenticated ||
+      !user?.id ||
+      !onNotification ||
+      !onUserMessage ||
+      !onTransaction
+    ) {
+      return;
+    }
+
+    const unsubscribeNotification = onNotification(handleNewNotification);
+    const unsubscribeMessage = onUserMessage(handleNewMessage);
+    const unsubscribeTransaction = onTransaction(handleTransaction);
+
+    return () => {
+      unsubscribeNotification();
+      unsubscribeMessage();
+      unsubscribeTransaction();
+    };
+  }, [
+    isAuthenticated,
+    user?.id,
+    onNotification,
+    onUserMessage,
+    onTransaction,
+    handleNewNotification,
+    handleNewMessage,
+    handleTransaction,
+  ]);
+
+  const isRealtimeHealthy = Boolean(
+    realtime?.isConnected && realtime.isNotificationChannelReady
+  );
+
+  // Polling is a fallback, never a parallel primary transport. It pauses as
+  // soon as the private user channel is healthy and resumes on degradation.
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id || isRealtimeHealthy) return;
+
+    const interval = setInterval(() => {
+      void refreshCountsRef.current();
+    }, POLLING_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, user?.id, user?.tenant_id, isRealtimeHealthy]);
 
   const value = useMemo<NotificationsContextValue>(
     () => ({
       ...state,
+      isConnected: isRealtimeHealthy,
+      connectionError: null,
       refreshCounts,
       markAsRead,
       markAllAsRead,
     }),
-    [state, refreshCounts, markAsRead, markAllAsRead]
+    [state, isRealtimeHealthy, refreshCounts, markAsRead, markAllAsRead]
   );
 
   return (
@@ -481,27 +299,17 @@ export function NotificationsProvider({ children }: NotificationsProviderProps) 
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Hook
-// ─────────────────────────────────────────────────────────────────────────────
-
 export function useNotifications(): NotificationsContextValue {
   const context = use(NotificationsContext);
-
   if (!context) {
     throw new Error('useNotifications must be used within a NotificationsProvider');
   }
-
   return context;
 }
 
 export function useNotificationsOptional(): NotificationsContextValue {
   return use(NotificationsContext) ?? emptyNotificationsContext;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Helper Functions
-// ─────────────────────────────────────────────────────────────────────────────
 
 function getNotificationToastTitle(key: string): string {
   return i18n.t(`realtime.toast_${key}`, { ns: 'notifications' });

@@ -13,6 +13,7 @@
  * module and restyled to the broker design language.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -354,7 +355,7 @@ export function MatchApprovalDetailPage() {
               <div className="flex items-center gap-3">
                 <p className="text-sm text-muted">{t('matching.reviewed_at')}</p>
                 <p className="text-sm tabular-nums text-foreground">
-                  {new Date(item.reviewed_at).toLocaleString()}
+                  {new Date(item.reviewed_at).toLocaleString(getFormattingLocale())}
                 </p>
               </div>
               {item.notes && (

@@ -22,7 +22,7 @@ import Trophy from 'lucide-react/icons/trophy';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import { usePageTitle } from '@/hooks';
 import { api, tokenManager } from '@/lib/api';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
@@ -243,7 +243,7 @@ export function MemberReportsPage() {
                 </TableCell>
                 <TableCell>
                   <span className="text-sm text-muted">
-                    {m.last_login ? new Date(m.last_login).toLocaleDateString() : t('reports.never')}
+                    {m.last_login ? new Date(m.last_login).toLocaleDateString(getFormattingLocale()) : t('reports.never')}
                   </span>
                 </TableCell>
                 <TableCell>
@@ -252,7 +252,7 @@ export function MemberReportsPage() {
                 <TableCell className="text-sm text-success font-medium">{m.hours_given?.toFixed(1) ?? '0.0'}</TableCell>
                 <TableCell className="text-sm text-warning font-medium">{m.hours_received?.toFixed(1) ?? '0.0'}</TableCell>
                 <TableCell className="text-sm text-muted">
-                  {m.joined_at ? new Date(m.joined_at).toLocaleDateString() : '---'}
+                  {m.joined_at ? new Date(m.joined_at).toLocaleDateString(getFormattingLocale()) : '---'}
                 </TableCell>
               </TableRow>
             ))}
@@ -414,7 +414,7 @@ export function MemberReportsPage() {
                 <Skeleton role="status" aria-busy="true" aria-label={t('common.loading')} className="mt-1 h-7 w-20 rounded bg-surface-secondary" />
               ) : (
                 <p className="text-2xl font-bold text-foreground">
-                  {metrics?.total_active_30d?.toLocaleString() ?? 0} / {metrics?.total_members?.toLocaleString() ?? 0}
+                  {metrics?.total_active_30d?.toLocaleString(getFormattingLocale()) ?? 0} / {metrics?.total_members?.toLocaleString(getFormattingLocale()) ?? 0}
                 </p>
               )}
             </CardBody>
@@ -534,12 +534,12 @@ export function MemberReportsPage() {
                     variant="soft"
                     color={m.last_login ? 'default' : 'danger'}
                   >
-                    {m.last_login ? new Date(m.last_login).toLocaleDateString() : t('reports.never')}
+                    {m.last_login ? new Date(m.last_login).toLocaleDateString(getFormattingLocale()) : t('reports.never')}
                   </Chip>
                 </TableCell>
                 <TableCell className="text-sm">{m.transaction_count}</TableCell>
                 <TableCell className="text-sm text-muted">
-                  {m.joined_at ? new Date(m.joined_at).toLocaleDateString() : '---'}
+                  {m.joined_at ? new Date(m.joined_at).toLocaleDateString(getFormattingLocale()) : '---'}
                 </TableCell>
               </TableRow>
             ))}

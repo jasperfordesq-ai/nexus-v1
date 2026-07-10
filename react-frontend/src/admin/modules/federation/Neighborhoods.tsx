@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Spinner, Input, Textarea, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -355,7 +356,7 @@ export function Neighborhoods() {
                 </div>
 
                 <div className="text-xs text-muted pt-1">
-                  {t('federation.created_date', { date: new Date(neighborhood.created_at).toLocaleDateString() })}
+                  {t('federation.created_date', { date: new Date(neighborhood.created_at).toLocaleDateString(getFormattingLocale()) })}
                 </div>
               </CardBody>
             </Card>

@@ -781,7 +781,19 @@
     "option_marketplace_listing_duration_days_label": "مدة الإدراج (أيام)",
     "option_marketplace_listing_duration_days_desc": "عدد الأيام التي تسبق انتهاء صلاحية قوائم السوق تلقائيًا",
     "option_identity_verification_fee_cents_label": "رسوم التحقق (سنتا)",
-    "option_identity_verification_fee_cents_desc": "يتم فرض رسوم لمرة واحدة للتحقق من الهوية. اضبط على 0 للتحقق المجاني. القيمة بالسنت (على سبيل المثال 500 = 5.00 يورو)"
+    "option_identity_verification_fee_cents_desc": "يتم فرض رسوم لمرة واحدة للتحقق من الهوية. اضبط على 0 للتحقق المجاني. القيمة بالسنت (على سبيل المثال 500 = 5.00 يورو)",
+    "option_count_few": "خيارات{{count}}",
+    "option_count_many": "خيارات{{count}}",
+    "option_count_one": "خيارات{{count}}",
+    "option_count_other": "خيارات{{count}}",
+    "option_count_two": "خيارات{{count}}",
+    "option_count_zero": "خيارات{{count}}",
+    "planned_count_few": "تم التخطيط لـ{{count}}",
+    "planned_count_many": "تم التخطيط لـ{{count}}",
+    "planned_count_one": "تم التخطيط لـ{{count}}",
+    "planned_count_other": "تم التخطيط لـ{{count}}",
+    "planned_count_two": "تم التخطيط لـ{{count}}",
+    "planned_count_zero": "تم التخطيط لـ{{count}}"
   },
   "tenant_features": {
     "refresh": "ينعش",

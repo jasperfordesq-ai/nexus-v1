@@ -124,7 +124,9 @@
         "year": "Jahr",
         "yearly": "Jährlich",
         "annual": "Jährlich"
-      }
+      },
+      "total_one": "{{count}} insgesamt",
+      "total_other": "{{count}} insgesamt"
     },
     "table": {
       "aria": "Premium-Stufen",
@@ -203,7 +205,9 @@
         "restricted": "Handlungsbedarf",
         "unknown": "Status unbekannt"
       },
-      "connect_fallback_active": "Ein Stripe Connect-Konto ist konfiguriert, aber noch nicht für Live-Spenden bereit. Zahlungen nutzen das Plattform-Fallback, bis das Onboarding abgeschlossen ist."
+      "connect_fallback_active": "Ein Stripe Connect-Konto ist konfiguriert, aber noch nicht für Live-Spenden bereit. Zahlungen nutzen das Plattform-Fallback, bis das Onboarding abgeschlossen ist.",
+      "requirements_due_one": "Anforderungen an Stripe-Konten, die beachtet werden müssen: {{count}}.",
+      "requirements_due_other": "Anforderungen an Stripe-Konten, die beachtet werden müssen: {{count}}."
     },
     "finance": {
       "title": "Finanzoperationen",
@@ -222,7 +226,11 @@
       "past_due_count": "{{count}} past due",
       "export_gift_aid": "Export Gift Aid",
       "export_annual_receipts": "Jahresbelege exportieren",
-      "empty": "Es wurden noch keine Finanzaktivitäten verzeichnet."
+      "empty": "Es wurden noch keine Finanzaktivitäten verzeichnet.",
+      "donation_count_one": "{{count}} Spende",
+      "declaration_count_one": "{{count}}-Deklaration",
+      "past_due_count_one": "{{count}} überfällig",
+      "past_due_count_other": "{{count}} überfällig"
     }
   }
 }

@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
@@ -1140,10 +1141,10 @@ export function CreateJobPage() {
                 {t('benchmark.market_rate', {
                   role: benchmark.role_keyword,
                   currency: benchmark.currency,
-                  min: benchmark.salary_min.toLocaleString(),
-                  max: benchmark.salary_max.toLocaleString(),
+                  min: benchmark.salary_min.toLocaleString(getFormattingLocale()),
+                  max: benchmark.salary_max.toLocaleString(getFormattingLocale()),
                   type: benchmark.salary_type,
-                  median: benchmark.salary_median.toLocaleString(),
+                  median: benchmark.salary_median.toLocaleString(getFormattingLocale()),
 
                 })}
               </p>
@@ -1460,7 +1461,7 @@ export function CreateJobPage() {
               </Button>
             )}
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               onPress={handleSubmit}
               isLoading={isSubmitting}
               isDisabled={isSubmitting || !form.title.trim() || !form.description.trim()}
@@ -1513,7 +1514,7 @@ export function CreateJobPage() {
               {t('form.cancel')}
             </Button>
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               onPress={() => void handleSaveTemplate()}
               isLoading={isSavingTemplate}
               isDisabled={!templateName.trim()}
@@ -1574,7 +1575,7 @@ export function CreateJobPage() {
                 <DollarSign className="w-4 h-4" aria-hidden="true" />
                 {form.salary_negotiable
                   ? t('salary.negotiable')
-                  : `${form.salary_currency || ''} ${form.salary_min ? Number(form.salary_min).toLocaleString() : '?'} - ${form.salary_max ? Number(form.salary_max).toLocaleString() : '?'}${form.salary_type ? ` / ${t(`salary.${form.salary_type}`)}` : ''}`
+                  : `${form.salary_currency || ''} ${form.salary_min ? Number(form.salary_min).toLocaleString(getFormattingLocale()) : '?'} - ${form.salary_max ? Number(form.salary_max).toLocaleString(getFormattingLocale()) : '?'}${form.salary_type ? ` / ${t(`salary.${form.salary_type}`)}` : ''}`
                 }
               </div>
             )}
@@ -1607,7 +1608,7 @@ export function CreateJobPage() {
             {form.deadline && (
               <div className="flex items-center gap-2 text-sm text-theme-muted">
                 <Calendar className="w-4 h-4" aria-hidden="true" />
-                {t('deadline_label')}: {form.deadline ? new Date(form.deadline).toLocaleDateString() : ''}
+                {t('deadline_label')}: {form.deadline ? new Date(form.deadline).toLocaleDateString(getFormattingLocale()) : ''}
               </div>
             )}
 

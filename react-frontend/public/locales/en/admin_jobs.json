@@ -250,7 +250,17 @@
     "moderation_page_title": "Job Moderation Queue",
     "moderation_page_description": "Review and approve job postings before they go live",
     "templates_empty_description": "Create your first template to save time on future job postings.",
-    "templates_empty_title": "No templates yet"
+    "templates_empty_title": "No templates yet",
+    "jobs_count_one": "{{count}} jobs",
+    "jobs_count_other": "{{count}} jobs",
+    "application_count_one_one": "{{count}} application",
+    "application_count_one_other": "{{count}} application",
+    "application_count_other_one": "{{count}} applications",
+    "application_count_other_other": "{{count}} applications",
+    "stat_pending_offers_one": "{{count}} pending offers",
+    "stat_pending_offers_other": "{{count}} pending offers",
+    "pipeline_minutes_one": "{{count}} min",
+    "pipeline_minutes_other": "{{count}} min"
   },
   "moderation": {
     "action_failed": "Failed",
@@ -478,5 +488,10 @@
     "blocked_count": "Blocked",
     "flagged_count": "Flagged",
     "total_analyzed": "Total Analyzed"
+  },
+  "premium": {
+    "status": {
+      "unknown": "Unknown"
+    }
   }
 }

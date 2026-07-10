@@ -792,7 +792,34 @@
     "no_hub_tenants_found": "No se encontraron inquilinos del centro",
     "impersonate_user_warning": "La suplantación registra cada acción bajo la identidad de este usuario. Úselo sólo cuando sea necesario como soporte.",
     "partnerships_tabs_aria": "Filtro de estado de asociación de federación",
-    "tenant_list_tabs_aria": "Filtro de estado de inquilino"
+    "tenant_list_tabs_aria": "Filtro de estado de inquilino",
+    "tab_with_count_many": "{{label}}({{count}})",
+    "tab_with_count_one": "{{label}}({{count}})",
+    "tab_with_count_other": "{{label}}({{count}})",
+    "users_count_many": "{{count}} usuarios",
+    "users_count_one": "{{count}} usuarios",
+    "users_count_other": "{{count}} usuarios",
+    "bulk_users_moved_count_many": "Se han movido usuarios en masa ({{count}})",
+    "bulk_users_moved_count_one": "Se han movido usuarios en masa ({{count}})",
+    "bulk_users_moved_count_other": "Se han movido usuarios en masa ({{count}})",
+    "bulk_tenants_updated_count_many": "Inquilinos masivos actualizados ({{count}})",
+    "bulk_tenants_updated_count_one": "Inquilinos masivos actualizados ({{count}})",
+    "bulk_tenants_updated_count_other": "Inquilinos masivos actualizados ({{count}})",
+    "move_n_users_many": "Mover {{count}} usuarios",
+    "move_n_users_one": "Mover {{count}} usuarios",
+    "move_n_users_other": "Mover {{count}} usuarios",
+    "apply_to_n_tenants_many": "Aplicar a {{count}} inquilinos",
+    "apply_to_n_tenants_one": "Aplicar a {{count}} inquilinos",
+    "apply_to_n_tenants_other": "Aplicar a {{count}} inquilinos",
+    "bulk_move_confirm_message_with_grant_many": "Mover {{count}} usuarios y otorgar acceso de superadministrador al inquilino.",
+    "bulk_move_confirm_message_with_grant_one": "Mover {{count}} usuarios y otorgar acceso de superadministrador al inquilino.",
+    "bulk_move_confirm_message_with_grant_other": "Mover {{count}} usuarios y otorgar acceso de superadministrador al inquilino.",
+    "bulk_move_confirm_message_many": "Mover {{count}} usuario(s).",
+    "bulk_move_confirm_message_one": "Mover {{count}} usuario(s).",
+    "bulk_move_confirm_message_other": "Mover {{count}} usuario(s).",
+    "bulk_update_confirm_message_many": "Aplique esta actualización a {{count}} inquilinos.",
+    "bulk_update_confirm_message_one": "Aplique esta actualización a {{count}} inquilinos.",
+    "bulk_update_confirm_message_other": "Aplique esta actualización a {{count}} inquilinos."
   },
   "tenant_form": {
     "active": "Activo",
@@ -997,7 +1024,10 @@
     "view": "Ver",
     "whitelisted_tenants_aria": "Inquilinos incluidos en la lista blanca",
     "whitelisted_tenants_count": "Comunidades permitidas ({{count}})",
-    "failed_to_load": "No se pudo cargar la lista blanca"
+    "failed_to_load": "No se pudo cargar la lista blanca",
+    "whitelisted_tenants_count_many": "Comunidades permitidas ({{count}})",
+    "whitelisted_tenants_count_one": "Comunidades permitidas ({{count}})",
+    "whitelisted_tenants_count_other": "Comunidades permitidas ({{count}})"
   },
   "pilot_inquiry_admin": {
     "page_title": "Consultas piloto",
@@ -1093,14 +1123,35 @@
       "empty": "-",
       "months": "{{count}} meses",
       "no": "No",
-      "yes": "Sí"
+      "yes": "Sí",
+      "months_many": "{{count}} meses",
+      "months_one": "{{count}} meses",
+      "months_other": "{{count}} meses"
     },
     "velocity": {
       "avg_to_agreed": "Promedio acordado:",
       "avg_to_live": "Promedio de vida:",
       "avg_to_proposal": "Promedio de la propuesta:",
       "days": "{{count}}D",
-      "title": "Velocidad del proceso: promedio de días desde el envío de la consulta hasta cada hito:"
+      "title": "Velocidad del proceso: promedio de días desde el envío de la consulta hasta cada hito:",
+      "days_many": "{{count}}D",
+      "days_one": "{{count}}D",
+      "days_other": "{{count}}D"
     }
-  }
+  },
+  "events": "Eventos",
+  "groups": "Grupos",
+  "gamification": "Gamificación",
+  "goals": "Objetivos",
+  "blog": "Blog",
+  "resources": "Recursos",
+  "volunteering": "Voluntariado",
+  "federation": "Federación",
+  "wallet": "Billetera",
+  "messages": "Mensajes",
+  "dashboard": "Panel",
+  "exchange_workflow": "Flujo de trabajo de intercambio",
+  "organisations": "Organizaciones",
+  "listings": "Listados",
+  "feed": "Alimentar"
 }

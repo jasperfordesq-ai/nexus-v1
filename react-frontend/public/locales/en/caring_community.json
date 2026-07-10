@@ -108,7 +108,9 @@
       "create": "Cover request could not be created",
       "candidates": "Substitute candidates could not be loaded",
       "assign": "Substitute could not be matched"
-    }
+    },
+    "skill_matches_one": "{{count}} matching skills",
+    "skill_matches_other": "{{count}} matching skills"
   },
   "providers": {
     "title": "Care Provider Directory",
@@ -488,7 +490,8 @@
         "maximum_discount": "Maximum discount per order (%)",
         "maximum_discount_description": "Cap on how much of the order total can be paid in time credits.",
         "save": "Save settings",
-        "view_only": "View-only users cannot change loyalty settings."
+        "view_only": "View-only users cannot change loyalty settings.",
+        "per_hour_short": "/ h"
       },
       "ledger": {
         "title": "Recent Redemptions",
@@ -534,6 +537,9 @@
         "pending": "Pending",
         "applied": "Applied",
         "reversed": "Reversed"
+      },
+      "table": {
+        "empty_value": "—"
       }
     },
     "hour_transfers": {

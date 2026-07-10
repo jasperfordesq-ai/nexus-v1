@@ -109,7 +109,11 @@
     "ratings": "Oceny",
     "rate_exchange": "Oceń tę wymianę",
     "prep_time_value": "{{count}}godz",
-    "rating_value": "Ocena: {{rating}} na 5"
+    "rating_value": "Ocena: {{rating}} na 5",
+    "prep_time_value_few": "{{count}}godz",
+    "prep_time_value_many": "{{count}}godz",
+    "prep_time_value_one": "{{count}}godz",
+    "prep_time_value_other": "{{count}}godz"
   },
   "modal": {
     "decline_title": "Odrzuć prośbę o wymianę",
@@ -174,5 +178,8 @@
     "detail": {
       "title": "Szczegóły wymiany"
     }
-  }
+  },
+  "hours_count_few": "{{count}} godzina",
+  "hours_count_many": "{{count}} godzina",
+  "hours_count_one": "{{count}} godzina"
 }

@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -259,7 +260,7 @@ export default function MunicipalRoiAdminPage() {
               <p className="font-semibold text-accent dark:text-accent">{t('municipal_roi_page.about.title')}</p>
               <p className="text-muted">
                 {t('municipal_roi_page.about.body_prefix')} <Abbr term="ROI" /> {t('municipal_roi_page.about.body_middle')}{' '}
-                Caring Community {t('municipal_roi_page.about.body_suffix')}
+                {t('common:nav.caring_community')} {t('municipal_roi_page.about.body_suffix')}
               </p>
               <p className="text-muted">
                 {t('municipal_roi_page.about.formula_prefix')} <Abbr term="CHF" /> {t('municipal_roi_page.about.formula_suffix')}
@@ -342,7 +343,7 @@ export default function MunicipalRoiAdminPage() {
                 ). {t('municipal_roi_page.methodology.prevention_value_prefix', {
                   multiplier: data.methodology.prevention_multiplier,
                 })}{' '}
-                Caring Community {t('municipal_roi_page.methodology.prevention_value_suffix')}{' '}
+                {t('common:nav.caring_community')} {t('municipal_roi_page.methodology.prevention_value_suffix')}{' '}
                 {data.methodology.substitution_applied
                   ? t('municipal_roi_page.methodology.substitution_applied')
                   : t('municipal_roi_page.methodology.substitution_not_applied')}
@@ -353,7 +354,7 @@ export default function MunicipalRoiAdminPage() {
                 <Abbr term="CHF">{t('municipal_roi_page.methodology.default_rate')}</Abbr>{' '}
                 ({t('municipal_roi_page.methodology.default_source')}).{' '}
                 {t('municipal_roi_page.methodology.default_prevention_prefix')}{' '}
-                Caring Community {t('municipal_roi_page.methodology.default_prevention_suffix')}
+                {t('common:nav.caring_community')} {t('municipal_roi_page.methodology.default_prevention_suffix')}
               </>
             )}
           </p>
@@ -374,7 +375,7 @@ export default function MunicipalRoiAdminPage() {
             <div>
               <StatCard
                 label={t('municipal_roi_page.stats.total_hours')}
-                value={data.total_hours.toLocaleString()}
+                value={data.total_hours.toLocaleString(getFormattingLocale())}
                 icon={Clock}
                 color="default"
               />
@@ -392,19 +393,19 @@ export default function MunicipalRoiAdminPage() {
             </div>
             <StatCard
               label={t('municipal_roi_page.stats.active_members')}
-              value={data.active_members.toLocaleString()}
+              value={data.active_members.toLocaleString(getFormattingLocale())}
               icon={Users}
               color="success"
             />
             <StatCard
               label={t('municipal_roi_page.stats.active_relationships')}
-              value={data.active_relationships.toLocaleString()}
+              value={data.active_relationships.toLocaleString(getFormattingLocale())}
               icon={Heart}
               color="default"
             />
             <StatCard
               label={t('municipal_roi_page.stats.care_recipients')}
-              value={data.recipient_count.toLocaleString()}
+              value={data.recipient_count.toLocaleString(getFormattingLocale())}
               icon={Building2}
               color="warning"
             />
@@ -457,7 +458,7 @@ export default function MunicipalRoiAdminPage() {
                     {t('municipal_roi_page.roi.social_isolation_supported')}
                   </p>
                   <p className="text-2xl font-bold">
-                    {data.roi.social_isolation_prevented.toLocaleString()}
+                    {data.roi.social_isolation_prevented.toLocaleString(getFormattingLocale())}
                   </p>
                 </div>
               </div>

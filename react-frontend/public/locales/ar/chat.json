@@ -40,5 +40,17 @@
   },
   "page_meta": {
     "title": "دردشة الذكاء الاصطناعي"
-  }
+  },
+  "card_wallet_transactions_few": "{{count}} معاملة خلال آخر 30 يوماً",
+  "card_wallet_transactions_many": "{{count}} معاملة خلال آخر 30 يوماً",
+  "card_wallet_transactions_one": "{{count}} معاملة خلال آخر 30 يوماً",
+  "card_wallet_transactions_other": "{{count}} معاملة خلال آخر 30 يوماً",
+  "card_wallet_transactions_two": "{{count}} معاملة خلال آخر 30 يوماً",
+  "card_wallet_transactions_zero": "{{count}} معاملة خلال آخر 30 يوماً",
+  "limits_left_today_few": "{{count}} ترك اليوم",
+  "limits_left_today_many": "{{count}} ترك اليوم",
+  "limits_left_today_one": "{{count}} ترك اليوم",
+  "limits_left_today_other": "{{count}} ترك اليوم",
+  "limits_left_today_two": "{{count}} ترك اليوم",
+  "limits_left_today_zero": "{{count}} ترك اليوم"
 }

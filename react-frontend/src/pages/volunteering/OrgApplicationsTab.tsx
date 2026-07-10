@@ -378,7 +378,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
       {/* Header */}
       <div className="flex items-center gap-3 flex-wrap">
         <h2 className="text-lg font-semibold text-theme-primary flex items-center gap-2">
-          <ClipboardList className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+          <ClipboardList className="w-5 h-5 text-accent" aria-hidden="true" />
           {t('applications.heading')}
           {pendingCount > 0 && (
             <Chip size="sm" color="warning" variant="soft">
@@ -418,7 +418,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
             variant={statusFilter === f.key ? 'primary' : 'tertiary'}
             className={
               statusFilter === f.key
-                ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white'
+                ? 'bg-gradient-to-r from-accent to-violet-600 text-white'
                 : 'bg-theme-elevated text-theme-muted'
             }
             onPress={() => setStatusFilter(f.key)}
@@ -457,8 +457,8 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
 
       {/* Bulk action bar */}
       {selected.size > 0 && (
-        <div className="flex flex-col gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 sm:flex-row sm:items-center">
-          <span className="text-sm text-indigo-700 dark:text-indigo-400 font-medium">
+        <div className="flex flex-col gap-3 p-3 rounded-xl bg-accent/10 border border-accent/30 sm:flex-row sm:items-center">
+          <span className="text-sm text-accent dark:text-accent font-medium">
             {t('applications.selected_count', { count: selected.size })}
           </span>
           <Button
@@ -494,8 +494,8 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
       {/* Empty state — action-led: tell the owner what to do next. */}
       {!isLoading && filteredApplications.length === 0 && (
         <div className="flex flex-col items-center gap-3 py-10 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center">
-            <Users className="w-7 h-7 text-indigo-400" aria-hidden="true" />
+          <div className="w-14 h-14 rounded-2xl bg-accent/10 flex items-center justify-center">
+            <Users className="w-7 h-7 text-accent" aria-hidden="true" />
           </div>
           <div>
             <p className="text-theme-primary font-semibold">{t('applications.empty_title')}</p>

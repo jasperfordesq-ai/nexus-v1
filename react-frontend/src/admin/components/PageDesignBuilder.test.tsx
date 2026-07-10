@@ -91,12 +91,26 @@ describe('PageDesignBuilder', () => {
     mockEditor.loadProjectData.mockReset();
     mockEditor.setComponents.mockClear();
     mockEditor.addStyle.mockClear();
+    mockEditor.BlockManager.add.mockClear();
     mockEditor.AssetManager.add.mockClear();
     mockEditor.addComponents.mockClear();
     mockEditor.select.mockClear();
     mockEditor.getSelected.mockReset();
     mockAdminBuilderAssets.uploadImage.mockReset();
     mockAdminBuilderAssets.listImages.mockReset();
+  });
+
+  it('uses the tenant-aware home path in generated starter blocks', async () => {
+    renderBuilder(null);
+
+    await waitFor(() => {
+      expect(mockEditor.BlockManager.add).toHaveBeenCalledWith(
+        'nexus-hero',
+        expect.objectContaining({
+          content: expect.stringContaining('href="/test/"'),
+        }),
+      );
+    });
   });
 
   it('falls back to saved HTML and shows a notice when saved design_json is invalid', async () => {

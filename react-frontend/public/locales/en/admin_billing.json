@@ -203,6 +203,8 @@
     "your_plan_usage": "Your Plan Usage",
     "over_limit_warning": "You've reached your plan limits. Upgrade to continue.",
     "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity.",
-    "upgrade_mailto_subject": "Plan Upgrade Request"
+    "upgrade_mailto_subject": "Plan Upgrade Request",
+    "user_count_label_one": "{{count}} / {{max}} users",
+    "user_count_label_other": "{{count}} / {{max}} users"
   }
 }

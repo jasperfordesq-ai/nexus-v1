@@ -120,7 +120,22 @@
       "offer_help": "Tairiscint cabhrach",
       "celebration": "Ceiliúradh",
       "note": "Nóta"
-    }
+    },
+    "streak_value_few": "{{count}} clárú isteach",
+    "streak_value_many": "{{count}} clárú isteach",
+    "streak_value_one": "{{count}} clárú isteach",
+    "streak_value_other": "{{count}} clárú isteach",
+    "streak_value_two": "{{count}} clárú isteach",
+    "best_streak_few": "Sraith is fearr: {{count}}",
+    "best_streak_many": "Sraith is fearr: {{count}}",
+    "best_streak_one": "Sraith is fearr: {{count}}",
+    "best_streak_other": "Sraith is fearr: {{count}}",
+    "best_streak_two": "Sraith is fearr: {{count}}",
+    "checkins_value_few": "{{count}} taifeadta",
+    "checkins_value_many": "{{count}} taifeadta",
+    "checkins_value_one": "{{count}} taifeadta",
+    "checkins_value_other": "{{count}} taifeadta",
+    "checkins_value_two": "{{count}} taifeadta"
   },
   "template_picker": {
     "load_error": "Theip ar luchtú teimpléid. Déan iarracht arís.",

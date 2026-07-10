@@ -32,7 +32,7 @@ import Activity from 'lucide-react/icons/activity';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts/ToastContext';
 import { api, tokenManager } from '@/lib/api';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { StatCard } from '../../components/StatCard';
 import { PageHeader } from '../../components/PageHeader';
 
@@ -354,7 +354,7 @@ export function InactiveMembersPage() {
           <CardBody className="p-4">
             <p className="text-sm text-muted">{t('reports.label_active_members')}</p>
             <p className="text-2xl font-bold text-foreground">
-              {stats?.total_active_members?.toLocaleString() ?? '\u2014'}
+              {stats?.total_active_members?.toLocaleString(getFormattingLocale()) ?? '\u2014'}
             </p>
           </CardBody>
         </Card>
@@ -362,7 +362,7 @@ export function InactiveMembersPage() {
           <CardBody className="p-4">
             <p className="text-sm text-muted">{t('reports.at_risk')}</p>
             <p className="text-2xl font-bold text-warning">
-              {stats?.at_risk_count?.toLocaleString() ?? '\u2014'}
+              {stats?.at_risk_count?.toLocaleString(getFormattingLocale()) ?? '\u2014'}
             </p>
           </CardBody>
         </Card>
@@ -370,7 +370,7 @@ export function InactiveMembersPage() {
           <CardBody className="p-4">
             <p className="text-sm text-muted">{t('reports.already_notified')}</p>
             <p className="text-2xl font-bold text-foreground">
-              {stats?.notified_count?.toLocaleString() ?? '\u2014'}
+              {stats?.notified_count?.toLocaleString(getFormattingLocale()) ?? '\u2014'}
             </p>
           </CardBody>
         </Card>
@@ -449,15 +449,15 @@ export function InactiveMembersPage() {
                 </span>
               </TableCell>
               <TableCell className="text-sm text-muted">
-                {m.last_activity ? new Date(m.last_activity).toLocaleDateString() : t('reports.never')}
+                {m.last_activity ? new Date(m.last_activity).toLocaleDateString(getFormattingLocale()) : t('reports.never')}
               </TableCell>
               <TableCell className="text-sm text-muted">
-                {m.last_login ? new Date(m.last_login).toLocaleDateString() : t('reports.never')}
+                {m.last_login ? new Date(m.last_login).toLocaleDateString(getFormattingLocale()) : t('reports.never')}
               </TableCell>
               <TableCell>
                 {m.notified_at ? (
                   <Chip size="sm" variant="soft" color="default">
-                    {new Date(m.notified_at).toLocaleDateString()}
+                    {new Date(m.notified_at).toLocaleDateString(getFormattingLocale())}
                   </Chip>
                 ) : (
                   <Chip size="sm" variant="soft" color="default">{t('reports.not_yet')}</Chip>

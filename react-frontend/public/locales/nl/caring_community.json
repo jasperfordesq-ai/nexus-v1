@@ -108,7 +108,9 @@
       "create": "Er kon geen dekkingsverzoek worden aangemaakt",
       "candidates": "Vervangende kandidaten konden niet worden geladen",
       "assign": "De vervanger kon niet worden geëvenaard"
-    }
+    },
+    "skill_matches_one": "{{count}}-matchingvaardigheden",
+    "skill_matches_other": "{{count}}-matchingvaardigheden"
   },
   "providers": {
     "title": "Lijst met zorgverleners",
@@ -488,7 +490,8 @@
         "maximum_discount": "Maximale korting per bestelling (%)",
         "maximum_discount_description": "Beperk het bedrag van het totaalbedrag van de bestelling dat in tijdskredieten kan worden betaald.",
         "save": "Instellingen opslaan",
-        "view_only": "Alleen-lezen-gebruikers kunnen de loyaliteitsinstellingen niet wijzigen."
+        "view_only": "Alleen-lezen-gebruikers kunnen de loyaliteitsinstellingen niet wijzigen.",
+        "per_hour_short": "/ u"
       },
       "ledger": {
         "title": "Recente aflossingen",
@@ -534,6 +537,9 @@
         "pending": "In behandeling",
         "applied": "Toegepast",
         "reversed": "Teruggedraaid"
+      },
+      "table": {
+        "empty_value": "—"
       }
     },
     "hour_transfers": {

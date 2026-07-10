@@ -89,7 +89,11 @@
     "no_members_found": "Geen leden gevonden die overeenkomen met je zoekopdracht.",
     "done": "Gereed",
     "aria_exchange_participants": "Ruil deelnemers",
-    "aria_hour_split": "Uren verdeling"
+    "aria_hour_split": "Uren verdeling",
+    "participants_heading_one": "Deelnemers ({{count}})",
+    "participants_heading_other": "Deelnemers ({{count}})",
+    "hours_amount_one": "{{count}} u",
+    "hours_amount_other": "{{count}} u"
   },
   "create": {
     "page_title": "Creëer Groepsruil",
@@ -148,7 +152,11 @@
     "step_of_named": "Stap {{current}} van {{total}}: {{name}}",
     "hours_value": "{{hours}} u",
     "hours_suffix": "u",
-    "weight_suffix": "X"
+    "weight_suffix": "X",
+    "providers_count_one": "Aanbieders ({{count}})",
+    "providers_count_other": "Aanbieders ({{count}})",
+    "receivers_count_one": "Ontvangers ({{count}})",
+    "receivers_count_other": "Ontvangers ({{count}})"
   },
   "toast": {
     "exchange_started": "Uitwisseling gestart",

@@ -360,7 +360,9 @@
     "geocode_description": "Geocodeer locaties om kaarten weer te geven en op afstand gebaseerde ontdekkingen mogelijk te maken.",
     "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet.",
     "detail_tabs_aria": "Groepsdetailsecties",
-    "status_tabs_aria": "Groepsstatusfilter"
+    "status_tabs_aria": "Groepsstatusfilter",
+    "selected_count_one": "{{count}}geselecteerd",
+    "selected_count_other": "{{count}}geselecteerd"
   },
   "group_organization": {
     "page_title": "Groepsorganisatie",

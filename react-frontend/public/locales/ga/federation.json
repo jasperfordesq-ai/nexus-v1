@@ -82,7 +82,17 @@
     "quick_link_7_title": "Socruithe Cónaidhme",
     "quick_link_7_description": "Cumraigh do phríobháideacht chónaidhme agus roghanna cumarsáide.",
     "quick_link_6_title": "Naisc chónaidhme",
-    "quick_link_6_description": "Bainistigh d'iarratais naisc ar fud na gcomhphobal comhpháirtíochta."
+    "quick_link_6_description": "Bainistigh d'iarratais naisc ar fud na gcomhphobal comhpháirtíochta.",
+    "view_all_few": "Féach ar gach rud ({{count}})",
+    "view_all_many": "Féach ar gach rud ({{count}})",
+    "view_all_one": "Féach ar gach rud ({{count}})",
+    "view_all_other": "Féach ar gach rud ({{count}})",
+    "view_all_two": "Féach ar gach rud ({{count}})",
+    "member_count_few": "baill {{count}}",
+    "member_count_many": "baill {{count}}",
+    "member_count_one": "baill {{count}}",
+    "member_count_other": "baill {{count}}",
+    "member_count_two": "baill {{count}}"
   },
   "partners": {
     "page_title": "Pobail Chomhpháirtithe",
@@ -115,7 +125,12 @@
     "browse_members": "Brabhsáil Baill",
     "browse_listings": "Brabhsáil Liostaí",
     "close": "Dún",
-    "view_details": "Sonraí Amharc"
+    "view_details": "Sonraí Amharc",
+    "member_count_few": "baill {{count}}",
+    "member_count_many": "baill {{count}}",
+    "member_count_one": "baill {{count}}",
+    "member_count_other": "baill {{count}}",
+    "member_count_two": "baill {{count}}"
   },
   "members": {
     "page_title": "Comhaltaí Cónaidhme",
@@ -156,7 +171,22 @@
     "external_profile_title": "Ball Seachtrach",
     "external_profile_message": "Tá an comhalta seo ar ardán comhpháirtíochta seachtrach. Níl féachaint ar phróifíl dhíreach ar fáil.",
     "external_member": "Ball Seachtrach",
-    "member_fallback": "Ball"
+    "member_fallback": "Ball",
+    "external_source_note_external_only_few": "Ag taispeáint {{count}} toradh ó chomhpháirtithe seachtracha.",
+    "external_source_note_external_only_many": "Ag taispeáint {{count}} toradh ó chomhpháirtithe seachtracha.",
+    "external_source_note_external_only_one": "Ag taispeáint {{count}} toradh ó chomhpháirtithe seachtracha.",
+    "external_source_note_external_only_other": "Ag taispeáint {{count}} toradh ó chomhpháirtithe seachtracha.",
+    "external_source_note_external_only_two": "Ag taispeáint {{count}} toradh ó chomhpháirtithe seachtracha.",
+    "external_source_note_few": "Áirítear {{count}} toradh ó chomhpháirtithe seachtracha; leanann tuilleadh luchtaithe le torthaí comhpháirtithe inmheánacha.",
+    "external_source_note_many": "Áirítear {{count}} toradh ó chomhpháirtithe seachtracha; leanann tuilleadh luchtaithe le torthaí comhpháirtithe inmheánacha.",
+    "external_source_note_one": "Áirítear {{count}} toradh ó chomhpháirtithe seachtracha; leanann tuilleadh luchtaithe le torthaí comhpháirtithe inmheánacha.",
+    "external_source_note_other": "Áirítear {{count}} toradh ó chomhpháirtithe seachtracha; leanann tuilleadh luchtaithe le torthaí comhpháirtithe inmheánacha.",
+    "external_source_note_two": "Áirítear {{count}} toradh ó chomhpháirtithe seachtracha; leanann tuilleadh luchtaithe le torthaí comhpháirtithe inmheánacha.",
+    "more_skills_few": "+{{count}} níos mó",
+    "more_skills_many": "+{{count}} níos mó",
+    "more_skills_one": "+{{count}} níos mó",
+    "more_skills_other": "+{{count}} níos mó",
+    "more_skills_two": "+{{count}} níos mó"
   },
   "messages": {
     "page_title": "Teachtaireachtaí Cónaidhme",
@@ -227,7 +257,17 @@
     "thread_aria_unread": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireacht neamhléite",
     "thread_aria_unread_plural": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireachtaí neamhléite",
     "recipient_fallback": "Faighteoir",
-    "user_number": "Úsáideoir #{{id}}"
+    "user_number": "Úsáideoir #{{id}}",
+    "thread_aria_unread_plural_few": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireachtaí neamhléite",
+    "thread_aria_unread_plural_many": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireachtaí neamhléite",
+    "thread_aria_unread_plural_one": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireachtaí neamhléite",
+    "thread_aria_unread_plural_other": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireachtaí neamhléite",
+    "thread_aria_unread_plural_two": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireachtaí neamhléite",
+    "thread_aria_unread_few": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireacht neamhléite",
+    "thread_aria_unread_many": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireacht neamhléite",
+    "thread_aria_unread_one": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireacht neamhléite",
+    "thread_aria_unread_other": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireacht neamhléite",
+    "thread_aria_unread_two": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireacht neamhléite"
   },
   "listings": {
     "page_title": "Liostaí Cónaidhme",
@@ -259,7 +299,17 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "Próifíl Amharc",
     "contact_author": "Teagmháil",
-    "close": "Dún"
+    "close": "Dún",
+    "external_source_note_external_only_few": "Ag taispeáint {{count}} liostú ó chomhpháirtithe seachtracha.",
+    "external_source_note_external_only_many": "Ag taispeáint {{count}} liostú ó chomhpháirtithe seachtracha.",
+    "external_source_note_external_only_one": "Ag taispeáint {{count}} liostú ó chomhpháirtithe seachtracha.",
+    "external_source_note_external_only_other": "Ag taispeáint {{count}} liostú ó chomhpháirtithe seachtracha.",
+    "external_source_note_external_only_two": "Ag taispeáint {{count}} liostú ó chomhpháirtithe seachtracha.",
+    "external_source_note_few": "Áirítear {{count}} liostú ó chomhpháirtithe seachtracha; leanann tuilleadh luchtaithe le liostuithe comhpháirtithe inmheánacha.",
+    "external_source_note_many": "Áirítear {{count}} liostú ó chomhpháirtithe seachtracha; leanann tuilleadh luchtaithe le liostuithe comhpháirtithe inmheánacha.",
+    "external_source_note_one": "Áirítear {{count}} liostú ó chomhpháirtithe seachtracha; leanann tuilleadh luchtaithe le liostuithe comhpháirtithe inmheánacha.",
+    "external_source_note_other": "Áirítear {{count}} liostú ó chomhpháirtithe seachtracha; leanann tuilleadh luchtaithe le liostuithe comhpháirtithe inmheánacha.",
+    "external_source_note_two": "Áirítear {{count}} liostú ó chomhpháirtithe seachtracha; leanann tuilleadh luchtaithe le liostuithe comhpháirtithe inmheánacha."
   },
   "settings": {
     "page_title": "Socruithe Cónaidhme",
@@ -343,7 +393,10 @@
     "date_at_time": "{{date}} ag {{time}}",
     "attendees_going_one": "{{count}} ag dul",
     "attendees_going_other": "{{count}} ag dul",
-    "organizer_fallback": "Eagraí"
+    "organizer_fallback": "Eagraí",
+    "attendees_going_few": "{{count}} ag dul",
+    "attendees_going_many": "{{count}} ag dul",
+    "attendees_going_two": "{{count}} ag dul"
   },
   "groups": {
     "page_title": "Grúpaí Cónaidhme",
@@ -364,7 +417,12 @@
     "load_more_error": "Níorbh fhéidir níos mó grúpaí a lódáil.",
     "member_count": "ball {{count}}",
     "member_count_plural": "baill {{count}}",
-    "private": "Príobháideach"
+    "private": "Príobháideach",
+    "member_count_few": "ball {{count}}",
+    "member_count_many": "ball {{count}}",
+    "member_count_one": "ball {{count}}",
+    "member_count_other": "ball {{count}}",
+    "member_count_two": "ball {{count}}"
   },
   "connections": {
     "page_title": "Cónaidhm Naisc",
@@ -416,7 +474,10 @@
     "level_prefix": "Leibhéal {{level}}",
     "member_count_one": "{{count}} bhall",
     "member_count_other": "{{count}} ball",
-    "partner_since": "Comhpháirtí ó {{date}}"
+    "partner_since": "Comhpháirtí ó {{date}}",
+    "member_count_few": "{{count}} ball",
+    "member_count_many": "{{count}} ball",
+    "member_count_two": "{{count}} ball"
   },
   "onboarding": {
     "page_title": "Socrú Cónaidhm",
@@ -495,7 +556,18 @@
     "partners_available_other": "{{count}} pobal comhpháirtíochta ar fáil",
     "member_count_one": "{{count}} bhall",
     "member_count_other": "{{count}} ball",
-    "and_more": "+{{count}} eile"
+    "and_more": "+{{count}} eile",
+    "partners_available_few": "{{count}} pobal comhpháirtíochta ar fáil",
+    "partners_available_many": "{{count}} pobal comhpháirtíochta ar fáil",
+    "partners_available_two": "{{count}} pobal comhpháirtíochta ar fáil",
+    "member_count_few": "{{count}} ball",
+    "member_count_many": "{{count}} ball",
+    "member_count_two": "{{count}} ball",
+    "and_more_few": "+{{count}} eile",
+    "and_more_many": "+{{count}} eile",
+    "and_more_one": "+{{count}} eile",
+    "and_more_other": "+{{count}} eile",
+    "and_more_two": "+{{count}} eile"
   },
   "member_profile": {
     "page_title": "Próifíl na mBall",
@@ -544,7 +616,27 @@
     "tooltip_federated": "Clú comhiomlánaithe ar fud na bpobal comhpháirtíochta {{count}}",
     "tooltip_local": "Bunaithe ar athbhreithnithe {{count}} sa phobal seo",
     "chip_label": "{{score}} ({{count}})",
-    "aria_label": "Cáil chónaidhme {{score}} ó athbhreithnithe {{count}}"
+    "aria_label": "Cáil chónaidhme {{score}} ó athbhreithnithe {{count}}",
+    "tooltip_federated_few": "Clú comhiomlánaithe ar fud na bpobal comhpháirtíochta {{count}}",
+    "tooltip_federated_many": "Clú comhiomlánaithe ar fud na bpobal comhpháirtíochta {{count}}",
+    "tooltip_federated_one": "Clú comhiomlánaithe ar fud na bpobal comhpháirtíochta {{count}}",
+    "tooltip_federated_other": "Clú comhiomlánaithe ar fud na bpobal comhpháirtíochta {{count}}",
+    "tooltip_federated_two": "Clú comhiomlánaithe ar fud na bpobal comhpháirtíochta {{count}}",
+    "tooltip_local_few": "Bunaithe ar athbhreithnithe {{count}} sa phobal seo",
+    "tooltip_local_many": "Bunaithe ar athbhreithnithe {{count}} sa phobal seo",
+    "tooltip_local_one": "Bunaithe ar athbhreithnithe {{count}} sa phobal seo",
+    "tooltip_local_other": "Bunaithe ar athbhreithnithe {{count}} sa phobal seo",
+    "tooltip_local_two": "Bunaithe ar athbhreithnithe {{count}} sa phobal seo",
+    "chip_label_few": "{{score}} ({{count}})",
+    "chip_label_many": "{{score}} ({{count}})",
+    "chip_label_one": "{{score}} ({{count}})",
+    "chip_label_other": "{{score}} ({{count}})",
+    "chip_label_two": "{{score}} ({{count}})",
+    "aria_label_few": "Cáil chónaidhme {{score}} ó athbhreithnithe {{count}}",
+    "aria_label_many": "Cáil chónaidhme {{score}} ó athbhreithnithe {{count}}",
+    "aria_label_one": "Cáil chónaidhme {{score}} ó athbhreithnithe {{count}}",
+    "aria_label_other": "Cáil chónaidhme {{score}} ó athbhreithnithe {{count}}",
+    "aria_label_two": "Cáil chónaidhme {{score}} ó athbhreithnithe {{count}}"
   },
   "reviews": {
     "unavailable": "Níl léirmheasanna ar fáil go fóill don chomhalta cónasctha seo",

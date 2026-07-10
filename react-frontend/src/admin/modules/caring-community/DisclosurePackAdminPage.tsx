@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Tab, Tabs, Tooltip } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -424,7 +425,7 @@ export default function DisclosurePackAdminPage() {
           <Separator />
           <p className="text-xs text-muted flex items-center gap-2">
             <FileText size={12} />
-            {t('disclosure_pack.footer.last_saved', { date: new Date(data.last_updated_at).toLocaleString() })}
+            {t('disclosure_pack.footer.last_saved', { date: new Date(data.last_updated_at).toLocaleString(getFormattingLocale()) })}
             {data.is_customised && (
               <Chip size="sm" variant="soft" color="accent">{t('disclosure_pack.footer.customised')}</Chip>
             )}

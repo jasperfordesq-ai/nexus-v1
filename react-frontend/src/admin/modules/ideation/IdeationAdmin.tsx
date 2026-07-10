@@ -8,6 +8,7 @@
  * List, search, filter, change status, and delete ideation challenges.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 
 import Lightbulb from 'lucide-react/icons/lightbulb';
@@ -322,7 +323,7 @@ export function IdeationAdmin() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.start_date ? new Date(item.start_date).toLocaleDateString() : '\u2014'}
+          {item.start_date ? new Date(item.start_date).toLocaleDateString(getFormattingLocale()) : '\u2014'}
         </span>
       ),
     },
@@ -332,7 +333,7 @@ export function IdeationAdmin() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.end_date ? new Date(item.end_date).toLocaleDateString() : '\u2014'}
+          {item.end_date ? new Date(item.end_date).toLocaleDateString(getFormattingLocale()) : '\u2014'}
         </span>
       ),
     },
@@ -477,7 +478,7 @@ export function IdeationAdmin() {
                 <span className="text-sm font-medium text-muted">{t('ideation.col_start_date')}</span>
                 <p className="text-foreground">
                   {detailItem.start_date
-                    ? new Date(detailItem.start_date).toLocaleDateString()
+                    ? new Date(detailItem.start_date).toLocaleDateString(getFormattingLocale())
                     : '\u2014'}
                 </p>
               </div>
@@ -485,7 +486,7 @@ export function IdeationAdmin() {
                 <span className="text-sm font-medium text-muted">{t('ideation.col_end_date')}</span>
                 <p className="text-foreground">
                   {detailItem.end_date
-                    ? new Date(detailItem.end_date).toLocaleDateString()
+                    ? new Date(detailItem.end_date).toLocaleDateString(getFormattingLocale())
                     : '\u2014'}
                 </p>
               </div>
@@ -493,7 +494,7 @@ export function IdeationAdmin() {
             <div>
               <span className="text-sm font-medium text-muted">{t('ideation.col_created')}</span>
               <p className="text-foreground">
-                {new Date(detailItem.created_at).toLocaleString()}
+                {new Date(detailItem.created_at).toLocaleString(getFormattingLocale())}
               </p>
             </div>
           </div>

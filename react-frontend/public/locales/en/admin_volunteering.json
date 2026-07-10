@@ -718,7 +718,42 @@
     "wellbeing_unknown_user": "Unknown volunteer",
     "wellbeing_user_number": "Volunteer #{{id}}",
     "wellbeing_unknown_type": "Wellbeing concern",
-    "wellbeing_raised_on": "Raised {{date}}"
+    "wellbeing_raised_on": "Raised {{date}}",
+    "decline_confirm": "Are you sure you want to decline this volunteer application?",
+    "bulk_verify_success_one": "{{count}} record verified",
+    "bulk_verify_success_other": "{{count}} record verified",
+    "bulk_verify_fail_one": "{{count}} record failed to verify",
+    "bulk_verify_fail_other": "{{count}} record failed to verify",
+    "expiry_alert_title_one": "{{count}} training record expiring within 30 days",
+    "expiry_alert_title_other": "{{count}} training record expiring within 30 days",
+    "bulk_selected_one": "{{count}} pending record selected",
+    "bulk_selected_other": "{{count}} pending record selected",
+    "members_count_one": "{{count}} member",
+    "members_count_other": "{{count}} member",
+    "alert_pending_applications_one": "{{count}} applications pending review",
+    "alert_pending_applications_other": "{{count}} applications pending review",
+    "export_truncated_one": "Export stopped after {{count}} pages — some rows were left out.",
+    "export_truncated_other": "Export stopped after {{count}} pages — some rows were left out.",
+    "expiring_consents_warning_one": "{{count}} guardian consent expires within 30 days",
+    "expiring_consents_warning_other": "{{count}} guardian consent expires within 30 days",
+    "reminder_job_sent_one": "Reminder job sent {{count}} notification",
+    "reminder_job_sent_other": "Reminder job sent {{count}} notification",
+    "delivery_total_sent_one": "{{count}} sent",
+    "delivery_total_sent_other": "{{count}} sent",
+    "bulk_approved_one": "{{count}} applications approved",
+    "bulk_approved_other": "{{count}} applications approved",
+    "bulk_declined_one": "{{count}} applications declined",
+    "bulk_declined_other": "{{count}} applications declined",
+    "selected_count_one": "{{count}} selected",
+    "selected_count_other": "{{count}} selected",
+    "bulk_approve_one": "Approve ({{count}})",
+    "bulk_approve_other": "Approve ({{count}})",
+    "bulk_decline_one": "Decline ({{count}})",
+    "bulk_decline_other": "Decline ({{count}})",
+    "bulk_approve_confirm_one": "Approve {{count}} selected applications? Applicants will be notified.",
+    "bulk_approve_confirm_other": "Approve {{count}} selected applications? Applicants will be notified.",
+    "bulk_decline_confirm_one": "Decline {{count}} selected applications? Applicants will be notified.",
+    "bulk_decline_confirm_other": "Decline {{count}} selected applications? Applicants will be notified."
   },
   "donation_refunds": {
     "page_title": "Donation Refunds",
@@ -761,5 +796,8 @@
     "complete_confirm_label": "Mark completed",
     "complete_success": "Donation marked as completed",
     "complete_failed": "Failed to mark donation as completed"
+  },
+  "giving_days": {
+    "hours_target": "/ {{target}}"
   }
 }

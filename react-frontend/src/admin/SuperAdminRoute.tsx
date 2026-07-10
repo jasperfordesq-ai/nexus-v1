@@ -10,25 +10,21 @@
  */
 
 import { Navigate, Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import { LoadingScreen } from '@/components/feedback';
+import { isPlatformSuperAdminUser } from '@/lib/access';
 
 export function SuperAdminRoute() {
+  const { t } = useTranslation('super_admin');
   const { user, isLoading, status } = useAuth();
   const { tenantPath } = useTenant();
 
   if (isLoading || status === 'loading') {
-    return <LoadingScreen message={"Checking Permissions"} />;
+    return <LoadingScreen message={t('layout.loading')} />;
   }
 
-  const userRecord = user as Record<string, unknown> | null;
-  const isSuperAdmin =
-    (user?.role as string) === 'super_admin' ||
-    userRecord?.is_super_admin === true ||
-    userRecord?.is_tenant_super_admin === true ||
-    userRecord?.is_god === true;
-
-  if (!isSuperAdmin) {
+  if (!isPlatformSuperAdminUser(user)) {
     return <Navigate to={tenantPath('/admin')} replace />;
   }
 

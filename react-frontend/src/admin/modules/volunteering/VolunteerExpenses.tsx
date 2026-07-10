@@ -8,6 +8,7 @@
  * Admin page for managing volunteer expense submissions, reviews, and policies.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Building2 from 'lucide-react/icons/building-2';
@@ -385,7 +386,7 @@ export function VolunteerExpenses() {
         currency: item.currency || '',
         type: item.type,
         status: item.status,
-        submitted: item.submitted_at ? new Date(item.submitted_at).toLocaleDateString() : '',
+        submitted: item.submitted_at ? new Date(item.submitted_at).toLocaleDateString(getFormattingLocale()) : '',
         has_receipt: item.has_receipt ? t('volunteering.yes') : t('volunteering.no'),
         payment_reference: item.payment_reference || '',
       }));
@@ -485,7 +486,7 @@ export function VolunteerExpenses() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.submitted_at ? new Date(item.submitted_at).toLocaleDateString() : '--'}
+          {item.submitted_at ? new Date(item.submitted_at).toLocaleDateString(getFormattingLocale()) : '--'}
         </span>
       ),
     },

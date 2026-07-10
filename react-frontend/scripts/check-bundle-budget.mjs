@@ -17,7 +17,9 @@ const budgets = {
   mainCssGzipBytes: 100 * 1024,
   adminLocaleJsonBytes: 8 * 1024,
   authRouteStaticJsGzipBytes: 420 * 1024,
-  serviceWorkerPrecacheBytes: 256 * 1024,
+  // Raw bytes; transfer remains compressed. This fits only the startup graph
+  // and install metadata, not route/editor chunks.
+  serviceWorkerPrecacheBytes: 2 * 1024 * 1024,
 };
 
 const disallowedShellPreloads = [
@@ -37,7 +39,13 @@ const disallowedShellPreloads = [
     pattern: /sentry-/,
     message: 'index.html must not modulepreload Sentry; telemetry should load after first paint/idle or on demand.',
   },
+  {
+    pattern: /(?:vendor-(?:grapesjs|codemirror)|PageDesignBuilder|NewsletterBuilder|HtmlSourceEditor)-/,
+    message: 'index.html must not modulepreload editor code; visual/HTML editors belong only to explicit admin editing flows.',
+  },
 ];
+
+const forbiddenOrdinaryRouteEditorAsset = /^(?:vendor-(?:grapesjs|codemirror)|PageDesignBuilder|NewsletterBuilder|HtmlSourceEditor)-[^/]+\.(?:js|css)$/i;
 
 const startupImportBudgets = [
   {
@@ -311,9 +319,9 @@ const startupImportBudgets = [
     message: 'AppRoutes.tsx must not carry auth layout/page imports; auth-entry routes live in src/routes/AuthRoutes.tsx.',
   },
   {
-    file: 'src/components/routing/PremiumGate.tsx',
+    file: 'src/components/routing/FeatureGate.tsx',
     pattern: /from ['"]@\/components\/ui['"]/,
-    message: 'PremiumGate.tsx can be imported by shared routing surfaces, so it must avoid the full @/components/ui barrel.',
+    message: 'FeatureGate.tsx is imported by shared routing surfaces, so it must avoid the full @/components/ui barrel.',
   },
   {
     file: 'src/components/compose/ComposeHub.tsx',
@@ -1173,7 +1181,7 @@ async function staticRouteGraphGzip(prefix) {
     bytes += await gzipSize(path.join(distDir, asset));
   }
 
-  return { entry, bytes, count: graph.size };
+  return { entry, bytes, count: graph.size, graph };
 }
 
 async function serviceWorkerPrecacheSize() {
@@ -1271,7 +1279,28 @@ async function main() {
     }
   }
 
+  for (const routePrefix of ['HomePage', 'LoginPage', 'RegisterPage', 'DashboardPage']) {
+    const routeGraph = await staticRouteGraphGzip(routePrefix);
+    const leakedEditors = [...routeGraph.graph]
+      .filter((asset) => forbiddenOrdinaryRouteEditorAsset.test(asset));
+    if (leakedEditors.length > 0) {
+      failures.push(`${routeGraph.entry} ordinary-route graph includes editor-only assets: ${leakedEditors.join(', ')}.`);
+    }
+  }
+
   const precache = await serviceWorkerPrecacheSize();
+  const precacheUrls = new Set(precache.entries.map((entry) => entry.url.replace(/^\//, '')));
+  const requiredOfflineStartupAssets = [mainJs, mainCss, ...modulePreloads]
+    .filter(Boolean)
+    .map((asset) => `assets/${asset}`);
+  requiredOfflineStartupAssets.unshift('index.html');
+
+  for (const asset of requiredOfflineStartupAssets) {
+    if (!precacheUrls.has(asset)) {
+      failures.push(`service worker precache is missing startup asset ${asset}; a clean PWA install cannot restart offline.`);
+    }
+  }
+
   if (precache.bytes > budgets.serviceWorkerPrecacheBytes) {
     const largest = precache.entries
       .sort((a, b) => b.bytes - a.bytes)

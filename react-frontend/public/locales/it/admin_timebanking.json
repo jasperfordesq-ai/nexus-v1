@@ -210,6 +210,9 @@
     "top_earners": "I migliori guadagni",
     "top_spenders": "I migliori spendaccioni",
     "user_report_desc": "Visualizza un rapporto dettagliato sul credito temporale per un singolo membro",
-    "user_report_title": "Rapporto utente"
+    "user_report_title": "Rapporto utente",
+    "hours_value_many": "{{count}}h",
+    "hours_value_one": "{{count}}h",
+    "hours_value_other": "{{count}}h"
   }
 }

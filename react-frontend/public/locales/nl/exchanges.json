@@ -109,7 +109,9 @@
     "ratings": "Beoordelingen",
     "rate_exchange": "Beoordeel Deze Uitwisseling",
     "prep_time_value": "{{count}}u",
-    "rating_value": "Beoordeling: {{rating}} uit 5"
+    "rating_value": "Beoordeling: {{rating}} uit 5",
+    "prep_time_value_one": "{{count}}u",
+    "prep_time_value_other": "{{count}}u"
   },
   "modal": {
     "decline_title": "Weiger Uitwisselingsverzoek",
@@ -174,5 +176,6 @@
     "detail": {
       "title": "Uitwisselingsdetails"
     }
-  }
+  },
+  "hours_count_one": "{{count}} uur"
 }

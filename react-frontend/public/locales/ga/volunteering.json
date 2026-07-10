@@ -34,7 +34,17 @@
     "tab_hours_review": "Athbhreithniú Uaireanta",
     "tab_volunteers": "Oibrithe Deonacha",
     "tab_wallet": "Sparán",
-    "tab_settings": "Socruithe"
+    "tab_settings": "Socruithe",
+    "review_applications_few": "Athbhreithnigh {{count}} Iarratais",
+    "review_applications_many": "Athbhreithnigh {{count}} Iarratais",
+    "review_applications_one": "Athbhreithnigh {{count}} Iarratais",
+    "review_applications_other": "Athbhreithnigh {{count}} Iarratais",
+    "review_applications_two": "Athbhreithnigh {{count}} Iarratais",
+    "review_hours_few": "Athbhreithnigh {{count}} Uaireanta",
+    "review_hours_many": "Athbhreithnigh {{count}} Uaireanta",
+    "review_hours_one": "Athbhreithnigh {{count}} Uaireanta",
+    "review_hours_other": "Athbhreithnigh {{count}} Uaireanta",
+    "review_hours_two": "Athbhreithnigh {{count}} Uaireanta"
   },
   "page_title": "Obair Dheonach",
   "heading": "Obair Dheonach",
@@ -346,7 +356,22 @@
       "cancelled": "Cealaithe"
     },
     "support_aria": "Tacaigh leis an tionscadal seo ({{count}} lucht tacaíochta)",
-    "unsupport_aria": "Bain do thacaíocht ({{count}} lucht tacaíochta)"
+    "unsupport_aria": "Bain do thacaíocht ({{count}} lucht tacaíochta)",
+    "volunteers_needed_few": "{{count}} de dhíth",
+    "volunteers_needed_many": "{{count}} de dhíth",
+    "volunteers_needed_one": "{{count}} de dhíth",
+    "volunteers_needed_other": "{{count}} de dhíth",
+    "volunteers_needed_two": "{{count}} de dhíth",
+    "unsupport_aria_few": "Bain do thacaíocht ({{count}} lucht tacaíochta)",
+    "unsupport_aria_many": "Bain do thacaíocht ({{count}} lucht tacaíochta)",
+    "unsupport_aria_one": "Bain do thacaíocht ({{count}} lucht tacaíochta)",
+    "unsupport_aria_other": "Bain do thacaíocht ({{count}} lucht tacaíochta)",
+    "unsupport_aria_two": "Bain do thacaíocht ({{count}} lucht tacaíochta)",
+    "support_aria_few": "Tacaigh leis an tionscadal seo ({{count}} lucht tacaíochta)",
+    "support_aria_many": "Tacaigh leis an tionscadal seo ({{count}} lucht tacaíochta)",
+    "support_aria_one": "Tacaigh leis an tionscadal seo ({{count}} lucht tacaíochta)",
+    "support_aria_other": "Tacaigh leis an tionscadal seo ({{count}} lucht tacaíochta)",
+    "support_aria_two": "Tacaigh leis an tionscadal seo ({{count}} lucht tacaíochta)"
   },
   "donations": {
     "heading": "Tabhartais",
@@ -453,7 +478,12 @@
     "receipt_method": "Modh Íocaíochta",
     "receipt_message": "Teachtaireacht",
     "receipt_error": "Theip ar admháil a lódáil.",
-    "receipt_not_found": "Admháil gan aimsiú."
+    "receipt_not_found": "Admháil gan aimsiú.",
+    "donors_count_few": "{{count}} deontóir",
+    "donors_count_many": "{{count}} deontóir",
+    "donors_count_one": "{{count}} deontóir",
+    "donors_count_other": "{{count}} deontóir",
+    "donors_count_two": "{{count}} deontóir"
   },
   "safeguarding": {
     "heading": "Cosaint",
@@ -592,7 +622,12 @@
     "cancel": "Cealaigh",
     "upload_credential": "Uaslódáil Creidmheasa",
     "aria_remove_file": "Bain an comhad roghnaithe",
-    "aria_upload_document": "Uaslódáil doiciméad dintiúir"
+    "aria_upload_document": "Uaslódáil doiciméad dintiúir",
+    "expiring_soon_desc_few": "Rachaidh an dintiúir {{count}} in éag laistigh de 30 lá.",
+    "expiring_soon_desc_many": "Rachaidh an dintiúir {{count}} in éag laistigh de 30 lá.",
+    "expiring_soon_desc_one": "Rachaidh an dintiúir {{count}} in éag laistigh de 30 lá.",
+    "expiring_soon_desc_other": "Rachaidh an dintiúir {{count}} in éag laistigh de 30 lá.",
+    "expiring_soon_desc_two": "Rachaidh an dintiúir {{count}} in éag laistigh de 30 lá."
   },
   "waitlist": {
     "heading": "Mo Liosta Feithimh",
@@ -612,7 +647,12 @@
     "claim": "Áit éilimh",
     "claim_success": "Tá tú istigh - cláraithe don shift!",
     "claim_failed": "Níorbh fhéidir an láthair a éileamh",
-    "claim_hint": "D'oscail láthair duit. Éiligh go luath é - aistrítear spotaí neamhéilithe chuig an gcéad duine eile tar éis 48 uair an chloig."
+    "claim_hint": "D'oscail láthair duit. Éiligh go luath é - aistrítear spotaí neamhéilithe chuig an gcéad duine eile tar éis 48 uair an chloig.",
+    "spots_few": "{{count}} spotaí",
+    "spots_many": "{{count}} spotaí",
+    "spots_one": "{{count}} spotaí",
+    "spots_other": "{{count}} spotaí",
+    "spots_two": "{{count}} spotaí"
   },
   "swaps": {
     "heading": "Babhtálacha Aistrithe",
@@ -751,7 +791,22 @@
     "select_limit": "Is féidir leat {{max}} iarratas ar a mhéad a roghnú ag an am.",
     "bulk_success": "{{count}} iarratas nuashonraithe.",
     "bulk_failed": "Níorbh fhéidir {{count}} iarratas a nuashonrú.",
-    "bulk_rate_limited": "Níorbh fhéidir {{count}} a nuashonrú — tá tú ró-thapa. Fan nóiméad agus bain triail eile as."
+    "bulk_rate_limited": "Níorbh fhéidir {{count}} a nuashonrú — tá tú ró-thapa. Fan nóiméad agus bain triail eile as.",
+    "pending_count_few": "{{count}} ar feitheamh",
+    "pending_count_many": "{{count}} ar feitheamh",
+    "pending_count_one": "{{count}} ar feitheamh",
+    "pending_count_other": "{{count}} ar feitheamh",
+    "pending_count_two": "{{count}} ar feitheamh",
+    "selected_count_few": "{{count}} roghnaithe",
+    "selected_count_many": "{{count}} roghnaithe",
+    "selected_count_one": "{{count}} roghnaithe",
+    "selected_count_other": "{{count}} roghnaithe",
+    "selected_count_two": "{{count}} roghnaithe",
+    "decline_modal_description_few": "Cuir nóta leis d'iarratas {{count}} roimh an laghdú.",
+    "decline_modal_description_many": "Cuir nóta leis d'iarratas {{count}} roimh an laghdú.",
+    "decline_modal_description_one": "Cuir nóta leis d'iarratas {{count}} roimh an laghdú.",
+    "decline_modal_description_other": "Cuir nóta leis d'iarratas {{count}} roimh an laghdú.",
+    "decline_modal_description_two": "Cuir nóta leis d'iarratas {{count}} roimh an laghdú."
   },
   "org_wallet_balance": "Iarmhéid sparán:",
   "auto_pay_on": "Uath-íoc AR",
@@ -845,7 +900,12 @@
     "organization_hours": "{{name}} ({{hours}}h)",
     "generated_on": "Ginte",
     "download": "Íoslódáil",
-    "verify": "Fíoraigh"
+    "verify": "Fíoraigh",
+    "verified_hours_few": "{{count}} Uair Dheimhnithe",
+    "verified_hours_many": "{{count}} Uair Dheimhnithe",
+    "verified_hours_one": "{{count}} Uair Dheimhnithe",
+    "verified_hours_other": "{{count}} Uair Dheimhnithe",
+    "verified_hours_two": "{{count}} Uair Dheimhnithe"
   },
   "emergency": {
     "title": "Foláirimh Éigeandála",
@@ -866,7 +926,12 @@
     "respond_error": "Theip ar fhreagra a thabhairt ar fholáireamh.",
     "respond_error_generic": "Theip ar fhreagra a thabhairt ar fholáireamh. Bain triail eile as le do thoil.",
     "from": "Ó",
-    "expires": "Ag Dul in Éag"
+    "expires": "Ag Dul in Éag",
+    "pending_count_few": "{{count}} ar feitheamh",
+    "pending_count_many": "{{count}} ar feitheamh",
+    "pending_count_one": "{{count}} ar feitheamh",
+    "pending_count_other": "{{count}} ar feitheamh",
+    "pending_count_two": "{{count}} ar feitheamh"
   },
   "wellbeing": {
     "heading": "Folláine an Oibrí Dheonaigh",
@@ -1039,5 +1104,15 @@
   "form_remote_description": "Is féidir le hoibrithe deonacha páirt a ghlacadh ar líne nó ar an nguthán.",
   "my_organisations_declined": "Diúltaithe",
   "my_organisations_declined_desc": "Níor ceadaíodh an t-iarratas seo. Déan teagmháil le riarthóir do phobail le haghaidh sonraí.",
-  "hours_invalid_range": "Cuir isteach idir 0.25 agus 24 uair."
+  "hours_invalid_range": "Cuir isteach idir 0.25 agus 24 uair.",
+  "org_callout_you_manage_many_few": "Bainistíonn tú eagraíochtaí {{count}}",
+  "org_callout_you_manage_many_many": "Bainistíonn tú eagraíochtaí {{count}}",
+  "org_callout_you_manage_many_one": "Bainistíonn tú eagraíochtaí {{count}}",
+  "org_callout_you_manage_many_other": "Bainistíonn tú eagraíochtaí {{count}}",
+  "org_callout_you_manage_many_two": "Bainistíonn tú eagraíochtaí {{count}}",
+  "more_sections_few": "More ({{count}})",
+  "more_sections_many": "More ({{count}})",
+  "more_sections_one": "Tuilleadh ({{count}})",
+  "more_sections_other": "Tuilleadh ({{count}})",
+  "more_sections_two": "More ({{count}})"
 }

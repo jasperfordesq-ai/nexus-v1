@@ -108,7 +108,11 @@
       "create": "Nie można utworzyć żądania okładki",
       "candidates": "Nie można załadować kandydatów na zastępców",
       "assign": "Nie udało się dopasować zamiennika"
-    }
+    },
+    "skill_matches_few": "{{count}}pasujące umiejętności",
+    "skill_matches_many": "{{count}}pasujące umiejętności",
+    "skill_matches_one": "{{count}}pasujące umiejętności",
+    "skill_matches_other": "{{count}}pasujące umiejętności"
   },
   "providers": {
     "title": "Katalog dostawców usług opieki",
@@ -488,7 +492,8 @@
         "maximum_discount": "Maksymalny rabat na zamówienie (%)",
         "maximum_discount_description": "Limit określający, jaką część całkowitego zamówienia można opłacić w formie kredytów czasowych.",
         "save": "Zapisz ustawienia",
-        "view_only": "Użytkownicy z uprawnieniami tylko do przeglądania nie mogą zmieniać ustawień programu lojalnościowego."
+        "view_only": "Użytkownicy z uprawnieniami tylko do przeglądania nie mogą zmieniać ustawień programu lojalnościowego.",
+        "per_hour_short": "/ godz."
       },
       "ledger": {
         "title": "Ostatnie odkupienia",
@@ -534,6 +539,9 @@
         "pending": "Aż do",
         "applied": "Stosowany",
         "reversed": "Wywrócony"
+      },
+      "table": {
+        "empty_value": "—"
       }
     },
     "hour_transfers": {
@@ -808,7 +816,15 @@
         "days_ago_one": "{{count}}d temu",
         "days_ago_other": "{{count}}d temu",
         "months_ago_one": "{{count}}miesiąc temu",
-        "months_ago_other": "{{count}}miesiąc temu"
+        "months_ago_other": "{{count}}miesiąc temu",
+        "minutes_ago_few": "{{count}}m temu",
+        "minutes_ago_many": "{{count}}m temu",
+        "hours_ago_few": "{{count}}godz. temu",
+        "hours_ago_many": "{{count}}godz. temu",
+        "days_ago_few": "{{count}}d temu",
+        "days_ago_many": "{{count}}d temu",
+        "months_ago_few": "{{count}}miesiąc temu",
+        "months_ago_many": "{{count}}miesiąc temu"
       },
       "messages": {
         "triage_saved": "Segregacja zapisana",
@@ -944,7 +960,9 @@
       },
       "errors": {
         "load": "Nie udało się załadować kręgu odbiorców. Sprawdź identyfikator członka i spróbuj ponownie."
-      }
+      },
+      "safeguarding_flags_few": "{{count}} flagi zabezpieczające",
+      "safeguarding_flags_many": "{{count}} flagi zabezpieczające"
     },
     "safeguarding_reports": {
       "meta_title": "Raporty zabezpieczające — administrator",

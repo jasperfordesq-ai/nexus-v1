@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import ThumbsDown from 'lucide-react/icons/thumbs-down';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { Button } from '@/components/ui/Button';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from '@/components/ui/Popover';
 import { useMediaQuery } from '@/hooks';
 import type { DismissReason } from '../types';
 
@@ -86,6 +86,7 @@ export function DismissReasonPopover({ onDismiss, isLoading, isOpen, onOpenChang
     <Popover isOpen={isOpen} onOpenChange={onOpenChange} placement="top">
       <PopoverTrigger>{trigger}</PopoverTrigger>
       <PopoverContent>
+        <PopoverHeading className="sr-only">{t('card.dismiss')}</PopoverHeading>
         <ReasonButtons onDismiss={onDismiss} isLoading={isLoading} t={t} />
       </PopoverContent>
     </Popover>

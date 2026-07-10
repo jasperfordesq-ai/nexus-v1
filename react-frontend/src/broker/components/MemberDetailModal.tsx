@@ -22,7 +22,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Avatar, Button, Chip, Separator, Input, Textarea,
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
+  Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter,
   Tabs, Tab, Tooltip, Select, SelectItem,
 } from '@/components/ui';
 import UserCheck from 'lucide-react/icons/user-check';
@@ -46,7 +46,7 @@ import Circle from 'lucide-react/icons/circle';
 import { useToast } from '@/contexts';
 import { adminUsers, adminTimebanking, adminVetting, adminInsurance, adminCrm } from '@/admin/api/adminApi';
 import type { AdminUserDetail, VettingRecord, InsuranceCertificate } from '@/admin/api/types';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { formatServerDate, formatServerDateTime } from '@/lib/serverTime';
 import { BrokerStatusChip } from './BrokerStatusChip';
 import { BrokerSkeleton } from './BrokerSkeleton';
@@ -389,17 +389,17 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
             </ModalBody>
           ) : (
             <>
-              <ModalHeader className="flex items-center gap-3">
+              <ModalHeader className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3">
                 <Avatar
                   src={resolveAvatarUrl(detail.avatar_url || detail.avatar) || undefined}
                   name={detail.name}
                   size="md"
+                  className="row-span-2"
                 />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-base font-semibold tracking-tight">{detail.name}</p>
-                  <p className="truncate text-xs font-normal text-muted">{detail.email}</p>
-                </div>
-                <div className="flex flex-wrap items-center gap-1">
+                <ModalHeading className="min-w-0 truncate text-base font-semibold tracking-tight">
+                  {detail.name}
+                </ModalHeading>
+                <div className="row-span-2 flex flex-wrap items-center gap-1">
                   <BrokerStatusChip status={detail.status} />
                   <Chip size="sm" variant="tertiary" color={detail.role === 'member' ? 'default' : 'accent'}>
                     {t(`members.role_${detail.role}`, { defaultValue: detail.role })}
@@ -408,6 +408,7 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
                     {detail.email_verified_at ? t('members.email_verified') : t('members.email_unverified')}
                   </Chip>
                 </div>
+                <p className="col-start-2 min-w-0 truncate text-xs font-normal text-muted">{detail.email}</p>
               </ModalHeader>
 
               <ModalBody className="gap-3">
@@ -431,7 +432,7 @@ export function MemberDetailModal({ userId, onClose, onChanged }: MemberDetailMo
                       <StatusTimeline detail={detail} />
 
                       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        <Overview label={t('member_detail.label_balance')} value={`${typeof detail.balance === 'number' ? detail.balance.toLocaleString() : '0'} ${t('members.hours_short')}`} />
+                        <Overview label={t('member_detail.label_balance')} value={`${typeof detail.balance === 'number' ? detail.balance.toLocaleString(getFormattingLocale()) : '0'} ${t('members.hours_short')}`} />
                         <Overview label={t('member_detail.label_joined')} value={formatServerDate(detail.created_at)} />
                         <Overview label={t('member_detail.label_last_active')} value={detail.last_active_at ? formatServerDate(detail.last_active_at) : t('members.time_never')} />
                         <Overview label={t('member_detail.label_onboarding')} value={detail.onboarding_completed ? t('member_detail.onboarding_complete') : t('member_detail.onboarding_incomplete')} />

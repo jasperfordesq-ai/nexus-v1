@@ -130,7 +130,9 @@
         "run_failed_with_error": "Uitvoering mislukt: {{error}}",
         "toggle_failed": "Kan agent niet wisselen",
         "updated": "Agent bijgewerkt",
-        "update_failed": "Kan agent niet updaten"
+        "update_failed": "Kan agent niet updaten",
+        "run_created_one": "Voer #{{runId}} uit en heeft {{count}}-voorstellen gemaakt",
+        "run_created_other": "Voer #{{runId}} uit en heeft {{count}}-voorstellen gemaakt"
       }
     },
     "runs": {

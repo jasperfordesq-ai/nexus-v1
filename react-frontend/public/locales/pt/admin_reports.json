@@ -276,7 +276,13 @@
     "members_tabs_aria": "Tipo de relatório de membro",
     "hours_by_category_aria": "Gráfico de barras mostrando as horas trocadas por categoria",
     "hours_distribution_aria": "Gráfico de pizza mostrando a distribuição das horas de troca de tempo",
-    "hours_trend_aria": "Gráfico de área mostrando as horas trocadas ao longo do tempo"
+    "hours_trend_aria": "Gráfico de área mostrando as horas trocadas ao longo do tempo",
+    "members_selected_count_many": "{{count}}selecionado",
+    "members_selected_count_one": "{{count}}selecionado",
+    "members_selected_count_other": "{{count}}selecionado",
+    "days_count_many": "{{count}} dias",
+    "days_count_one": "{{count}} dias",
+    "days_count_other": "{{count}} dias"
   },
   "municipal_reports": {
     "meta": {
@@ -387,7 +393,13 @@
       "hours": "{{count}}h",
       "disabled": "Desabilitado",
       "activities": "{{count}} atividades",
-      "trend_detail": "{{participants}} participantes, {{activities}} atividades"
+      "trend_detail": "{{participants}} participantes, {{activities}} atividades",
+      "hours_many": "{{count}}h",
+      "hours_one": "{{count}}h",
+      "hours_other": "{{count}}h",
+      "activities_many": "{{count}} atividades",
+      "activities_one": "{{count}} atividades",
+      "activities_other": "{{count}} atividades"
     },
     "toast": {
       "load_failed": "Falha ao carregar dados de impacto municipal.",
@@ -470,7 +482,10 @@
         "partner_organisations_by_hours": "Organizações parceiras (por horas)",
         "no_partner_activity": "Nenhuma atividade de parceiro neste período.",
         "top_5_categories": "5 principais categorias (divisão geográfica/atividade)",
-        "no_category_data": "Não há dados de categoria neste período."
+        "no_category_data": "Não há dados de categoria neste período.",
+        "trusted_total_many": "de {{count}} total confiável.",
+        "trusted_total_one": "de {{count}} total confiável.",
+        "trusted_total_other": "de {{count}} total confiável."
       },
       "cooperative": {
         "empty_title": "Cooperativo (cooperative interno)",
@@ -487,8 +502,20 @@
         "coordinator_load": "Carga do coordenador",
         "coordinator_load_desc": "{{pending}} pendente nos coordenadores {{coordinators}}.",
         "future_care_credit_pool": "Pool de saldo de crédito para cuidados futuros",
-        "future_care_credit_pool_desc": "Soma dos saldos positivos dos associados - reserva implícita de assistência futura da cooperativa. Base de membros ativos: {{count}}."
-      }
+        "future_care_credit_pool_desc": "Soma dos saldos positivos dos associados - reserva implícita de assistência futura da cooperativa. Base de membros ativos: {{count}}.",
+        "member_retention_desc_many": "{{count}} membros ativos neste período e no período equivalente anterior.",
+        "member_retention_desc_one": "{{count}} membros ativos neste período e no período equivalente anterior.",
+        "member_retention_desc_other": "{{count}} membros ativos neste período e no período equivalente anterior.",
+        "reciprocity_rate_desc_many": "{{count}} apoiadores também receberam horas no período.",
+        "reciprocity_rate_desc_one": "{{count}} apoiadores também receberam horas no período.",
+        "reciprocity_rate_desc_other": "{{count}} apoiadores também receberam horas no período.",
+        "future_care_credit_pool_desc_many": "Soma dos saldos positivos dos associados - reserva implícita de assistência futura da cooperativa. Base de membros ativos: {{count}}.",
+        "future_care_credit_pool_desc_one": "Soma dos saldos positivos dos associados - reserva implícita de assistência futura da cooperativa. Base de membros ativos: {{count}}.",
+        "future_care_credit_pool_desc_other": "Soma dos saldos positivos dos associados - reserva implícita de assistência futura da cooperativa. Base de membros ativos: {{count}}."
+      },
+      "logs_count_many": "{{count}} registros",
+      "logs_count_one": "{{count}} registros",
+      "logs_count_other": "{{count}} registros"
     },
     "cards": {
       "verified_hours": {
@@ -519,6 +546,18 @@
         "metric_2": "Avaliações",
         "metric_3": "Trilha de auditoria"
       }
+    }
+  },
+  "caring_workflow": {
+    "policy": {
+      "periods": {
+        "last_90_days": "Últimos 90 dias"
+      }
+    }
+  },
+  "municipal_impact": {
+    "portfolio": {
+      "yoy_value": "{{sign}}{{value}}% homólogo"
     }
   }
 }

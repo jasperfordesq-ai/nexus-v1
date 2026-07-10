@@ -31,7 +31,8 @@
     "empty": "まだ通知はありません",
     "view_all": "すべての通知を見る",
     "close": "通知を閉じる",
-    "unread_dot_aria": "Unread"
+    "unread_dot_aria": "Unread",
+    "bell_unread_aria_other": "通知、{{count}} 件の未読"
   },
   "type": {
     "message": "Message",
@@ -96,5 +97,8 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "unread_badge_other": "{{count}} 件の新着",
+  "filter_unread_other": "未読 ({{count}})",
+  "and_others_other": "他{{count}}件"
 }

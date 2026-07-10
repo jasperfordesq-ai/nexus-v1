@@ -5,6 +5,7 @@
 
 import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
+import { OverlayActionButton } from '@/components/ui/OverlayActionButton';
 import { Chip } from '@/components/ui/Chip';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { Input } from '@/components/ui/Input';
@@ -524,16 +525,14 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                             {formatRelativeTime(msg.created_at)}
                           </span>
                           {isAdmin && (
-                            <Button
-                              isIconOnly
-                              size="sm"
-                              variant="light"
+                            <OverlayActionButton
+                              variant="ghost"
                               onPress={() => handleUnpinMessage(msg.id)}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 min-w-0 w-auto min-h-9"
+                              className="rounded-full transition-opacity"
                               aria-label={tGroups('chatrooms.unpin')}
                             >
-                              <PinOff className="w-3 h-3 text-[var(--color-text-tertiary)] hover:text-warning" />
-                            </Button>
+                              <PinOff className="size-3 text-[var(--color-text-tertiary)] hover:text-warning" aria-hidden="true" />
+                            </OverlayActionButton>
                           )}
                         </div>
                         <p className="text-xs text-[var(--color-text-secondary)] whitespace-pre-wrap line-clamp-2">
@@ -583,37 +582,33 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                       )}
                       {isAdmin && (
                         <Tooltip content={pinnedIds.has(msg.id) ? tGroups('chatrooms.unpin') : tGroups('chatrooms.pin')}>
-                          <Button
-                            isIconOnly
-                            size="sm"
-                            variant="light"
+                          <OverlayActionButton
+                            variant="ghost"
                             onPress={() =>
                               pinnedIds.has(msg.id)
                                 ? handleUnpinMessage(msg.id)
                                 : handlePinMessage(msg.id)
                             }
-                            className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 min-w-0 w-auto min-h-9"
+                            className="rounded-full transition-opacity"
                             aria-label={pinnedIds.has(msg.id) ? tGroups('chatrooms.unpin') : tGroups('chatrooms.pin')}
                           >
                             {pinnedIds.has(msg.id) ? (
-                              <PinOff className="w-3 h-3 text-warning" />
+                              <PinOff className="size-3 text-warning" aria-hidden="true" />
                             ) : (
-                              <Pin className="w-3 h-3 text-[var(--color-text-tertiary)] hover:text-warning" />
+                              <Pin className="size-3 text-[var(--color-text-tertiary)] hover:text-warning" aria-hidden="true" />
                             )}
-                          </Button>
+                          </OverlayActionButton>
                         </Tooltip>
                       )}
                       {(user?.id === msg.user_id || isAdmin) && (
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          variant="light"
+                        <OverlayActionButton
+                          variant="ghost"
                           onPress={() => handleDeleteMessage(msg.id)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 min-w-0 w-auto min-h-9"
+                          className="rounded-full transition-opacity"
                           aria-label={t('comments.delete')}
                         >
-                          <Trash2 className="w-3 h-3 text-[var(--color-text-tertiary)] hover:text-danger" />
-                        </Button>
+                          <Trash2 className="size-3 text-[var(--color-text-tertiary)] hover:text-danger" aria-hidden="true" />
+                        </OverlayActionButton>
                       )}
                     </div>
                     <p className="text-sm text-[var(--color-text-secondary)] whitespace-pre-wrap">

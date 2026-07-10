@@ -45,7 +45,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -209,7 +209,7 @@ function AppKanbanCard({ application, onDragStart, onStageChange, onDownloadCv, 
         <div className="flex flex-wrap items-center gap-2 text-xs text-theme-subtle">
           <span className="flex items-center gap-1">
             <Calendar size={11} aria-hidden="true" />
-            {appliedDate.toLocaleDateString()}
+            {appliedDate.toLocaleDateString(getFormattingLocale())}
           </span>
           {application.match_percentage != null && (
             <span className="flex items-center gap-1 text-accent font-medium">
@@ -850,11 +850,9 @@ export function JobKanbanPage() {
       <div className="text-center py-16 space-y-4">
         <Briefcase className="w-12 h-12 mx-auto text-theme-subtle" aria-hidden="true" />
         <p className="text-theme-muted">{error || t('detail.not_found')}</p>
-        <Link to={tenantPath('/jobs')}>
-          <Button variant="flat" className="bg-theme-elevated text-theme-muted">
-            {t('detail.browse_vacancies')}
-          </Button>
-        </Link>
+        <Button as={Link} to={tenantPath('/jobs')} variant="flat" className="bg-theme-elevated text-theme-muted">
+          {t('detail.browse_vacancies')}
+        </Button>
       </div>
     );
   }
@@ -864,11 +862,9 @@ export function JobKanbanPage() {
       <div className="text-center py-16 space-y-4">
         <Briefcase className="w-12 h-12 mx-auto text-theme-subtle" aria-hidden="true" />
         <p className="text-theme-muted">{t('kanban.not_authorized')}</p>
-        <Link to={tenantPath(`/jobs/${id}`)}>
-          <Button variant="flat" className="bg-theme-elevated text-theme-muted">
-            {t('detail.browse_vacancies')}
-          </Button>
-        </Link>
+        <Button as={Link} to={tenantPath(`/jobs/${id}`)} variant="flat" className="bg-theme-elevated text-theme-muted">
+          {t('detail.browse_vacancies')}
+        </Button>
       </div>
     );
   }
@@ -887,7 +883,7 @@ export function JobKanbanPage() {
             {t('detail.browse_vacancies')}
           </Link>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Briefcase className="w-7 h-7 text-indigo-400" aria-hidden="true" />
+            <Briefcase className="w-7 h-7 text-accent" aria-hidden="true" />
             {t('kanban.pipeline_title')}
           </h1>
           <p className="text-theme-muted text-sm mt-1">{vacancy.title}</p>
@@ -1008,7 +1004,7 @@ export function JobKanbanPage() {
                     <div className="flex items-center gap-2 mt-1 text-xs text-muted">
                       <span>{event.actor}</span>
                       <span>·</span>
-                      <span>{new Date(event.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                      <span>{new Date(event.timestamp).toLocaleString(getFormattingLocale(), { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                     {event.details && (
                       <p className="text-xs text-muted mt-1.5 bg-surface-tertiary rounded px-2 py-1">{event.details}</p>

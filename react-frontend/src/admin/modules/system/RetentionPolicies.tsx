@@ -12,6 +12,7 @@
  * indefinitely. Enforcement runs nightly via `retention:enforce`.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import DatabaseZap from 'lucide-react/icons/database-zap';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -50,7 +51,7 @@ interface RetentionRun {
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, {
+  return d.toLocaleDateString(getFormattingLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -186,7 +187,7 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
               <TableRow key={entry.id}>
                 <TableCell>
                   <span className="text-xs text-muted whitespace-nowrap">
-                    {new Date(entry.created_at).toLocaleString()}
+                    {new Date(entry.created_at).toLocaleString(getFormattingLocale())}
                   </span>
                 </TableCell>
                 <TableCell>

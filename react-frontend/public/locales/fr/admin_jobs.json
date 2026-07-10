@@ -250,7 +250,22 @@
     "moderation_page_title": "File d'attente de modération des tâches",
     "moderation_page_description": "Examiner et approuver les offres d'emploi avant leur mise en ligne",
     "templates_empty_description": "Créez votre premier modèle pour gagner du temps sur les futures offres d'emploi.",
-    "templates_empty_title": "Aucun modèle pour l'instant"
+    "templates_empty_title": "Aucun modèle pour l'instant",
+    "jobs_count_many": "Emplois{{count}}",
+    "jobs_count_one": "Emplois{{count}}",
+    "jobs_count_other": "Emplois{{count}}",
+    "application_count_one_many": "Application{{count}}",
+    "application_count_one_one": "Application{{count}}",
+    "application_count_one_other": "Application{{count}}",
+    "application_count_other_many": "Applications{{count}}",
+    "application_count_other_one": "Applications{{count}}",
+    "application_count_other_other": "Applications{{count}}",
+    "stat_pending_offers_many": "{{count}}offres en attente",
+    "stat_pending_offers_one": "{{count}}offres en attente",
+    "stat_pending_offers_other": "{{count}}offres en attente",
+    "pipeline_minutes_many": "{{count}}min",
+    "pipeline_minutes_one": "{{count}}min",
+    "pipeline_minutes_other": "{{count}}min"
   },
   "moderation": {
     "action_failed": "Échec",
@@ -478,5 +493,10 @@
     "blocked_count": "Bloqué",
     "flagged_count": "Marqué",
     "total_analyzed": "Total analysé"
+  },
+  "premium": {
+    "status": {
+      "unknown": "Inconnu"
+    }
   }
 }

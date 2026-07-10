@@ -104,7 +104,10 @@
       "stats": {
         "total_runs": "courses totales",
         "total_proposals": "propositions totales",
-        "pending_review": "{{count}} en attente d'examen"
+        "pending_review": "{{count}} en attente d'examen",
+        "pending_review_many": "{{count}} en attente d'examen",
+        "pending_review_one": "{{count}} en attente d'examen",
+        "pending_review_other": "{{count}} en attente d'examen"
       },
       "agent_types": {
         "activity_summary": "Résumé de l'activité",
@@ -219,7 +222,10 @@
         "proposals_table_aria": "Exécuter des propositions",
         "columns": {
           "subject": "Sujet"
-        }
+        },
+        "proposals_count_many": "Propositions ({{count}})",
+        "proposals_count_one": "Propositions ({{count}})",
+        "proposals_count_other": "Propositions ({{count}})"
       },
       "toasts": {
         "approve_eligible_failed": "Échec de l'approbation des propositions éligibles.",
@@ -235,7 +241,10 @@
         "run_details_load_failed": "Échec du chargement des détails de l'exécution.",
         "run_trigger_failed": "Échec du déclenchement de l'exécution.",
         "run_triggered": "Exécution déclenchée : propositions {{count}} générées.",
-        "runs_load_failed": "Échec du chargement des exécutions."
+        "runs_load_failed": "Échec du chargement des exécutions.",
+        "run_triggered_many": "Exécution déclenchée : propositions {{count}} générées.",
+        "run_triggered_one": "Exécution déclenchée : propositions {{count}} générées.",
+        "run_triggered_other": "Exécution déclenchée : propositions {{count}} générées."
       }
     },
     "module_docs": {
@@ -302,7 +311,10 @@
         "save_failed": "L'enregistrement a échoué.",
         "seed_failed": "La graine a échoué.",
         "seeded": "Documents par défaut {{count}} prédéfinis.",
-        "updated": "Doc mis à jour."
+        "updated": "Doc mis à jour.",
+        "seeded_many": "Documents par défaut {{count}} prédéfinis.",
+        "seeded_one": "Documents par défaut {{count}} prédéfinis.",
+        "seeded_other": "Documents par défaut {{count}} prédéfinis."
       }
     },
     "trace_metrics": {

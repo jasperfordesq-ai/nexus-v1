@@ -6,14 +6,14 @@
 /**
  * Search Overlay / Command Palette
  *
- * SIMPLE implementation using portal + basic React.
- * No HeroUI Modal, no complex refs, no fancy abstractions.
- * Just works.
+ * HeroUI Modal owns the overlay stack, focus containment/restoration, Escape,
+ * backdrop dismissal, and document scroll locking. Search suggestions keep DOM
+ * focus on the input and implement the ARIA combobox/listbox contract with
+ * aria-activedescendant.
  */
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { createPortal } from 'react-dom';
-import { FocusScope } from '@react-aria/focus';
+import { type ReactNode, useState, useEffect, useCallback, useMemo, useId, useRef } from 'react';
+import { usePress } from '@react-aria/interactions';
 import { useNavigate } from 'react-router-dom';
 import Search from 'lucide-react/icons/search';
 import X from 'lucide-react/icons/x';
@@ -27,13 +27,12 @@ import HelpCircle from 'lucide-react/icons/circle-help';
 import Clock from 'lucide-react/icons/clock';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/contexts/AuthContext';
-import { useTenant } from '@/contexts/TenantContext';
-import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth, useTenant, useTheme } from '@/contexts';
 import { api } from '@/lib/api';
 import { safeLocalStorageGetJSON, safeLocalStorageSetJSON, safeLocalStorageRemove } from '@/lib/safeStorage';
 import { Button } from '@/components/ui/Button';
 import { Kbd } from '@/components/ui/Kbd';
+import { Modal, ModalBody, ModalContent } from '@/components/ui/Modal';
 
 const RECENT_SEARCHES_KEY = 'nexus_recent_searches';
 
@@ -49,6 +48,47 @@ interface SearchOverlayProps {
   onClose: () => void;
 }
 
+interface ComboboxOptionProps {
+  children: ReactNode;
+  className: string;
+  id: string;
+  isSelected: boolean;
+  onHover: () => void;
+  onPress: () => void;
+}
+
+function ComboboxOption({
+  children,
+  className,
+  id,
+  isSelected,
+  onHover,
+  onPress,
+}: ComboboxOptionProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { isPressed, pressProps } = usePress({
+    onPress,
+    preventFocusOnPress: true,
+    ref,
+  });
+
+  return (
+    <div
+      {...pressProps}
+      ref={ref}
+      aria-selected={isSelected}
+      className={`${className} cursor-pointer select-none`}
+      data-pressed={isPressed || undefined}
+      id={id}
+      onMouseEnter={onHover}
+      role="option"
+      tabIndex={-1}
+    >
+      {children}
+    </div>
+  );
+}
+
 export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
@@ -56,9 +96,8 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const { isAuthenticated } = useAuth();
   const { resolvedTheme, toggleTheme } = useTheme();
 
-  // Stable ref for t — avoids re-creating callbacks when i18n namespace loads
-  const tRef = useRef(t);
-  tRef.current = t;
+  const inputRef = useRef<HTMLInputElement>(null);
+  const listboxId = useId();
 
   // ─── State ─────────────────────────────────────────────────────────────
   const [query, setQuery] = useState('');
@@ -71,37 +110,10 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const handleClose = useCallback(() => {
     setQuery('');
     setSuggestions([]);
+    setIsLoading(false);
     setSelectedIndex(-1);
     onClose();
   }, [onClose]);
-
-  // ─── ESC key handler (on document) ─────────────────────────────────────
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        e.stopPropagation();
-        handleClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEsc, true);
-    return () => document.removeEventListener('keydown', handleEsc, true);
-  }, [isOpen, handleClose]);
-
-  // ─── Lock body scroll when open ────────────────────────────────────────
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
 
   // ─── Load recent searches on open ──────────────────────────────────────
   // Done during render with a prev-prop comparison (not useEffect) so users
@@ -115,52 +127,56 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     }
   }
 
-  // ─── Clear stale suggestions when the query is too short ────────────────
-  // Synchronous reset reacting to query/isOpen — moved out of the debounced
-  // search effect to render-time so the cleared frame is never stale.
   const trimmedQuery = query.trim();
   const queryIsSearchable = isOpen && trimmedQuery.length >= 2 && !trimmedQuery.startsWith('>');
-  const [prevQueryWasSearchable, setPrevQueryWasSearchable] = useState(queryIsSearchable);
-  if (queryIsSearchable !== prevQueryWasSearchable) {
-    setPrevQueryWasSearchable(queryIsSearchable);
-    if (!queryIsSearchable) {
-      setSuggestions([]);
-    }
-  }
+
+  const handleQueryChange = useCallback((value: string) => {
+    setQuery(value);
+    setSelectedIndex(-1);
+    setSuggestions([]);
+
+    const nextQuery = value.trim();
+    setIsLoading(nextQuery.length >= 2 && !nextQuery.startsWith('>'));
+  }, []);
 
   // ─── Debounced search ──────────────────────────────────────────────────
   useEffect(() => {
     if (!queryIsSearchable) return;
 
+    const controller = new AbortController();
+    let isCurrentRequest = true;
     setIsLoading(true);
     const timer = setTimeout(async () => {
       try {
         const response = await api.get<Record<string, SearchSuggestion[]>>(
-          `/v2/search/suggestions?q=${encodeURIComponent(trimmedQuery)}&limit=5`
+          `/v2/search/suggestions?q=${encodeURIComponent(trimmedQuery)}&limit=5`,
+          { signal: controller.signal },
         );
-        if (response.success && response.data) {
+        if (isCurrentRequest && response.success && response.data) {
           const all: SearchSuggestion[] = [];
           const d = response.data;
           if (d.listings) all.push(...d.listings.map(s => ({ ...s, type: 'listing' as const })));
           if (d.users) all.push(...d.users.map(s => ({ ...s, type: 'user' as const })));
           if (d.events) all.push(...d.events.map(s => ({ ...s, type: 'event' as const })));
           if (d.groups) all.push(...d.groups.map(s => ({ ...s, type: 'group' as const })));
+          setSelectedIndex(-1);
           setSuggestions(all.slice(0, 8));
         }
       } catch {
         // ignore
       } finally {
-        setIsLoading(false);
+        if (isCurrentRequest) {
+          setIsLoading(false);
+        }
       }
     }, 250);
 
-    return () => clearTimeout(timer);
+    return () => {
+      isCurrentRequest = false;
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [queryIsSearchable, trimmedQuery]);
-
-  // Reset selection when suggestions change
-  useEffect(() => {
-    setSelectedIndex(-1);
-  }, [suggestions]);
 
   // ─── Recent searches helpers ───────────────────────────────────────────
   const saveRecent = useCallback((q: string) => {
@@ -229,14 +245,23 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   // ─── Keyboard navigation in input ──────────────────────────────────────
   const items = isActionMode ? filteredActions : suggestions;
   const itemCount = items.length;
+  const isListboxVisible = itemCount > 0;
+  const activeOptionId = selectedIndex >= 0 && selectedIndex < itemCount
+    ? `${listboxId}-option-${selectedIndex}`
+    : undefined;
+  const showLoading = queryIsSearchable && isLoading;
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex(i => (i + 1) % Math.max(itemCount, 1));
+      if (itemCount > 0) {
+        setSelectedIndex(i => (i < 0 ? 0 : (i + 1) % itemCount));
+      }
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setSelectedIndex(i => (i <= 0 ? Math.max(itemCount - 1, 0) : i - 1));
+      if (itemCount > 0) {
+        setSelectedIndex(i => (i <= 0 ? itemCount - 1 : i - 1));
+      }
     } else if (e.key === 'Enter') {
       e.preventDefault();
       if (selectedIndex >= 0 && selectedIndex < itemCount) {
@@ -247,7 +272,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
           const suggestion = suggestions[selectedIndex];
           if (suggestion) goToSuggestion(suggestion);
         }
-      } else {
+      } else if (!isActionMode) {
         goToSearch();
       }
     }
@@ -261,71 +286,78 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     group: { label: t('search.type_group'), color: 'bg-surface-secondary text-accent dark:bg-surface-secondary dark:text-accent' },
   };
 
-  // ─── Don't render if not open ──────────────────────────────────────────
-  if (!isOpen) return null;
-
-  // ─── Render via portal ─────────────────────────────────────────────────
-  return createPortal(
-    <FocusScope contain restoreFocus autoFocus>
-    <div className="fixed inset-0 z-[9999]">
-      {/* Backdrop - clicking closes */}
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={handleClose}
-        aria-hidden="true"
-      />
-
-      {/* Modal panel */}
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label={t('search.placeholder')}
-        className="absolute top-[calc(var(--safe-area-top)+1rem)] sm:top-[calc(var(--safe-area-top)+4.5rem)] left-1/2 -translate-x-1/2 w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right)-1rem)] max-w-xl"
-        onClick={e => e.stopPropagation()}
-      >
-        <div className="flex max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-2rem)] flex-col overflow-hidden rounded-xl border border-divider bg-overlay shadow-large">
-          {/* Search input row */}
-          <div className="flex shrink-0 items-center gap-2 px-3 sm:px-4 py-3 border-b border-divider">
-            <Search className="w-5 h-5 text-muted flex-shrink-0" />
+  return (
+    <Modal
+      backdrop="blur"
+      classNames={{
+        backdrop: 'z-[9999] bg-black/60',
+        base: 'max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-2rem)] max-w-xl overflow-hidden rounded-xl border border-divider bg-overlay p-0 shadow-large sm:max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-5.5rem)]',
+        body: '!m-0 flex min-h-0 flex-1 flex-col !overflow-hidden !p-0',
+        wrapper: 'box-border items-start ps-[calc(var(--safe-area-left)+0.5rem)] pe-[calc(var(--safe-area-right)+0.5rem)] pt-[calc(var(--safe-area-top)+1rem)] pb-[calc(var(--safe-area-bottom)+1rem)] sm:ps-[calc(var(--safe-area-left)+2.5rem)] sm:pe-[calc(var(--safe-area-right)+2.5rem)] sm:pt-[calc(var(--safe-area-top)+4.5rem)]',
+      }}
+      hideCloseButton
+      isDismissable
+      isOpen={isOpen}
+      onClose={handleClose}
+      placement="top"
+      scrollBehavior="inside"
+      size="xl"
+    >
+      <ModalContent aria-label={t('search.placeholder')}>
+        <ModalBody>
+          <div className="flex shrink-0 items-center gap-2 border-b border-divider px-3 py-3 sm:px-4">
+            <Search aria-hidden="true" className="h-5 w-5 shrink-0 text-muted" />
             <input
-              type="text"
-              value={query}
-              onChange={e => setQuery(e.target.value)}
+              ref={inputRef}
+              aria-activedescendant={activeOptionId}
+              aria-autocomplete="list"
+              aria-busy={showLoading || undefined}
+              aria-controls={isListboxVisible ? listboxId : undefined}
+              aria-expanded={isListboxVisible}
+              aria-haspopup="listbox"
+              aria-label={t('search.placeholder')}
+              autoComplete="off"
+              autoFocus
+              className="min-w-0 flex-1 appearance-none bg-transparent text-base text-foreground outline-none placeholder:text-muted focus-visible:ring-2 focus-visible:ring-accent/50 [&::-webkit-search-cancel-button]:appearance-none"
+              onChange={event => handleQueryChange(event.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={t('search.placeholder')}
-              aria-label={t('search.placeholder')}
-              autoFocus
-              className="min-w-0 flex-1 bg-transparent text-foreground placeholder:text-muted text-base outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+              role="combobox"
+              spellCheck={false}
+              type="search"
+              value={query}
             />
             {query && (
               <Button
-                isIconOnly
-                variant="tertiary"
-                size="sm"
-                onPress={() => setQuery('')}
-                className="min-h-8 min-w-8 p-1 text-muted hover:text-foreground"
                 aria-label={t('aria.clear')}
+                className="min-h-8 min-w-8 p-1 text-muted hover:text-foreground"
+                isIconOnly
+                onPress={() => {
+                  handleQueryChange('');
+                  inputRef.current?.focus();
+                }}
+                size="sm"
+                variant="tertiary"
               >
-                <X className="w-4 h-4" />
+                <X aria-hidden="true" className="h-4 w-4" />
               </Button>
             )}
             <Button
-              variant="secondary"
-              size="sm"
-              onPress={handleClose}
-              className="hidden min-h-8 items-center gap-1.5 rounded-md px-2 py-1 text-xs min-[360px]:flex"
               aria-label={t('accessibility.close')}
+              className="hidden min-h-8 items-center gap-1.5 rounded-md px-2 py-1 text-xs min-[360px]:flex"
+              onPress={handleClose}
+              size="sm"
+              variant="secondary"
             >
-              <X className="w-3.5 h-3.5" />
+              <X aria-hidden="true" className="h-3.5 w-3.5" />
               <Kbd className="text-[10px]">
                 <Kbd.Content>ESC</Kbd.Content>
               </Kbd>
             </Button>
           </div>
 
-          {/* Screen-reader result announcements */}
-          <div className="sr-only" role="status" aria-live="polite">
-            {isLoading
+          <div aria-live="polite" className="sr-only" role="status">
+            {showLoading
               ? t('search.searching')
               : itemCount > 0
                 ? t('aria.search_results', { count: itemCount })
@@ -334,32 +366,36 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   : ''}
           </div>
 
-          {/* Results area */}
-          <div className="min-h-0 flex-1 overflow-y-auto px-3 sm:px-4 py-3 overscroll-contain">
-            {/* Action mode */}
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-3 sm:px-4">
             {isActionMode ? (
               <div>
-                <p className="text-xs text-muted mb-2">{t('search.actions')}</p>
+                <p className="mb-2 text-xs text-muted">{t('search.actions')}</p>
                 {filteredActions.length > 0 ? (
-                  <div className="space-y-1">
+                  <div
+                    aria-label={t('search.actions')}
+                    className="space-y-1"
+                    id={listboxId}
+                    role="listbox"
+                  >
                     {filteredActions.map((action, i) => {
                       const Icon = action.icon;
                       return (
-                        <Button
+                        <ComboboxOption
+                          id={`${listboxId}-option-${i}`}
                           key={action.label}
-                          variant="tertiary"
-                          onPress={() => { action.action(); handleClose(); }}
-                          onMouseEnter={() => setSelectedIndex(i)}
-                          onFocus={() => setSelectedIndex(i)}
-                          className={`w-full flex min-h-10 items-center justify-start gap-3 rounded-lg px-3 py-2 text-start min-w-0 ${
-                            i === selectedIndex
-                              ? 'bg-accent-soft'
-                              : 'hover:bg-surface-secondary'
+                          className={`flex min-h-10 w-full min-w-0 items-center justify-start gap-3 rounded-lg px-3 py-2 text-start ${
+                            i === selectedIndex ? 'bg-accent-soft' : 'hover:bg-surface-secondary'
                           }`}
+                          isSelected={i === selectedIndex}
+                          onHover={() => setSelectedIndex(i)}
+                          onPress={() => {
+                            action.action();
+                            handleClose();
+                          }}
                         >
-                          <Icon className="w-4 h-4 shrink-0 text-muted" />
+                          <Icon aria-hidden="true" className="h-4 w-4 shrink-0 text-muted" />
                           <span className="min-w-0 truncate text-sm text-foreground">{action.label}</span>
-                        </Button>
+                        </ComboboxOption>
                       );
                     })}
                   </div>
@@ -368,97 +404,109 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 )}
               </div>
             ) : suggestions.length > 0 ? (
-              /* Suggestions */
               <div>
-                <p className="text-xs text-muted mb-2">{t('search.suggestions')}</p>
-                <div className="space-y-1">
-                  {suggestions.map((s, i) => {
-                    const type = typeLabels[s.type] || { label: s.type, color: 'bg-surface-secondary text-muted' };
+                <p className="mb-2 text-xs text-muted">{t('search.suggestions')}</p>
+                <div
+                  aria-label={t('search.suggestions')}
+                  className="space-y-1"
+                  id={listboxId}
+                  role="listbox"
+                >
+                  {suggestions.map((suggestion, i) => {
+                    const type = typeLabels[suggestion.type] || {
+                      label: suggestion.type,
+                      color: 'bg-surface-secondary text-muted',
+                    };
                     return (
-                      <Button
-                        key={`${s.type}-${s.id}`}
-                        variant="tertiary"
-                        onPress={() => goToSuggestion(s)}
-                        onMouseEnter={() => setSelectedIndex(i)}
-                        className={`w-full flex min-h-10 items-center justify-between gap-2 rounded-lg px-3 py-2 text-start min-w-0 ${
-                          i === selectedIndex
-                            ? 'bg-accent-soft'
-                            : 'hover:bg-surface-secondary'
+                      <ComboboxOption
+                        id={`${listboxId}-option-${i}`}
+                        key={`${suggestion.type}-${suggestion.id}`}
+                        className={`flex min-h-10 w-full min-w-0 items-center justify-between gap-2 rounded-lg px-3 py-2 text-start ${
+                          i === selectedIndex ? 'bg-accent-soft' : 'hover:bg-surface-secondary'
                         }`}
+                        isSelected={i === selectedIndex}
+                        onHover={() => setSelectedIndex(i)}
+                        onPress={() => goToSuggestion(suggestion)}
                       >
-                        <span className="min-w-0 truncate text-sm text-foreground">{s.title || s.name}</span>
-                        <span className={`text-[10px] px-2 py-0.5 rounded-full ${type.color} ms-2 flex-shrink-0`}>{type.label}</span>
-                      </Button>
+                        <span className="min-w-0 truncate text-sm text-foreground">
+                          {suggestion.title || suggestion.name}
+                        </span>
+                        <span className={`ms-2 shrink-0 rounded-full px-2 py-0.5 text-[10px] ${type.color}`}>
+                          {type.label}
+                        </span>
+                      </ComboboxOption>
                     );
                   })}
                 </div>
                 <Button
-                  variant="tertiary"
+                  className="mt-3 flex min-h-10 w-full items-center justify-center gap-2 rounded-none border-t border-divider pt-3 text-sm text-accent hover:underline"
                   onPress={goToSearch}
-                  className="w-full flex min-h-10 items-center justify-center gap-2 rounded-none border-t border-divider pt-3 mt-3 text-sm text-accent hover:underline"
+                  variant="tertiary"
                 >
-                  <Search className="w-4 h-4" />
+                  <Search aria-hidden="true" className="h-4 w-4" />
                   {t('search.view_all')}
-                  <ArrowRight className="w-3 h-3" />
+                  <ArrowRight aria-hidden="true" className="h-3 w-3" />
                 </Button>
               </div>
-            ) : isLoading ? (
-              /* Loading */
-              <div role="status" aria-busy="true" aria-label={t('loading')} className="flex items-center gap-2 py-4">
-                <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+            ) : showLoading ? (
+              <div
+                aria-busy="true"
+                aria-label={t('loading')}
+                className="flex items-center gap-2 py-4"
+                role="status"
+              >
+                <div aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
                 <span className="text-sm text-muted">{t('search.searching')}</span>
               </div>
             ) : query.trim().length >= 2 ? (
-              /* No results */
               <div className="py-4 text-center">
-                <p className="text-sm text-muted mb-2">{t('search.no_suggestions')}</p>
+                <p className="mb-2 text-sm text-muted">{t('search.no_suggestions')}</p>
                 <Button
-                  variant="tertiary"
-                  onPress={goToSearch}
                   className="inline-flex min-h-10 items-center gap-2 text-sm text-accent hover:underline"
+                  onPress={goToSearch}
+                  variant="tertiary"
                 >
-                  <Search className="w-4 h-4" />
+                  <Search aria-hidden="true" className="h-4 w-4" />
                   {t('search.search_for')} "{query.trim()}"
                 </Button>
               </div>
             ) : (
-              /* Default state: recent + quick links */
               <div>
                 {recentSearches.length > 0 && (
                   <div className="mb-4">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="mb-2 flex items-center justify-between">
                       <p className="text-xs text-muted">{t('search.recent')}</p>
                       <Button
-                        variant="tertiary"
-                        size="sm"
-                        onPress={clearRecent}
                         className="min-h-7 min-w-0 px-1 py-0 text-[10px] text-muted hover:text-foreground"
+                        onPress={clearRecent}
+                        size="sm"
+                        variant="tertiary"
                       >
                         {t('search.clear')}
                       </Button>
                     </div>
                     <div className="space-y-1">
-                      {recentSearches.map(q => (
+                      {recentSearches.map(recentQuery => (
                         <Button
-                          key={q}
-                          variant="tertiary"
+                          key={recentQuery}
+                          className="flex min-h-9 w-full min-w-0 items-center justify-start gap-2 rounded-lg px-3 py-1.5 text-start hover:bg-surface-secondary"
                           onPress={() => {
-                            saveRecent(q);
-                            navigate(tenantPath(`/search?q=${encodeURIComponent(q)}`));
+                            saveRecent(recentQuery);
+                            navigate(tenantPath(`/search?q=${encodeURIComponent(recentQuery)}`));
                             handleClose();
                           }}
-                          className="w-full flex min-h-9 items-center justify-start gap-2 rounded-lg px-3 py-1.5 text-start hover:bg-surface-secondary min-w-0"
+                          variant="tertiary"
                         >
-                          <Clock className="w-3.5 h-3.5 shrink-0 text-muted" />
-                          <span className="min-w-0 truncate text-sm text-muted">{q}</span>
+                          <Clock aria-hidden="true" className="h-3.5 w-3.5 shrink-0 text-muted" />
+                          <span className="min-w-0 truncate text-sm text-muted">{recentQuery}</span>
                         </Button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                <p className="text-xs text-muted mb-2">{t('search.quick_links')}</p>
-                <div className="flex flex-wrap gap-2 mb-4">
+                <p className="mb-2 text-xs text-muted">{t('search.quick_links')}</p>
+                <div className="mb-4 flex flex-wrap gap-2">
                   {[
                     { label: t('nav.listings'), path: tenantPath('/listings') },
                     ...(hasFeature('connections') ? [{ label: t('nav.members'), path: tenantPath('/members') }] : []),
@@ -467,27 +515,28 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   ].map(link => (
                     <Button
                       key={link.path}
-                      variant="secondary"
-                      size="sm"
-                      onPress={() => { navigate(link.path); handleClose(); }}
                       className="min-h-9 rounded-lg px-3 py-1.5 text-sm"
+                      onPress={() => {
+                        navigate(link.path);
+                        handleClose();
+                      }}
+                      size="sm"
+                      variant="secondary"
                     >
                       {link.label}
                     </Button>
                   ))}
                 </div>
 
-                <p className="text-[11px] text-muted pt-2 border-t border-divider">
+                <p className="border-t border-divider pt-2 text-[11px] text-muted">
                   {t('search.actions_hint')}
                 </p>
               </div>
             )}
           </div>
-        </div>
-      </div>
-    </div>
-    </FocusScope>,
-    document.body
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }
 

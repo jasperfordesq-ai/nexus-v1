@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Select, SelectItem, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Avatar, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -167,7 +168,7 @@ export function SuperUserList() {
       render: (user) => (
         <span className="text-sm text-muted">
           {user.last_login_at
-            ? new Date(user.last_login_at).toLocaleDateString()
+            ? new Date(user.last_login_at).toLocaleDateString(getFormattingLocale())
             : t('super.never')}
         </span>
       ),
@@ -222,7 +223,7 @@ export function SuperUserList() {
           <div className="flex items-center gap-2">
             {lastRefreshed && (
               <span className="text-xs text-muted">
-                {t('super.updated_at', { time: lastRefreshed.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) })}
+                {t('super.updated_at', { time: lastRefreshed.toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' }) })}
               </span>
             )}
             <Button startContent={<Plus size={16} />}

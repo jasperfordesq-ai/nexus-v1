@@ -186,7 +186,17 @@
     "time_just_now": "Justo ahora",
     "time_minutes_ago": "hace {{count}} min",
     "time_hours_ago": "hace {{count}} h",
-    "time_days_ago": "hace {{count}} d"
+    "time_days_ago": "hace {{count}} d",
+    "open_items_many": "elementos esperando tu revisión",
+    "time_minutes_ago_many": "hace {{count}} min",
+    "time_minutes_ago_one": "hace {{count}} min",
+    "time_minutes_ago_other": "hace {{count}} min",
+    "time_hours_ago_many": "hace {{count}} h",
+    "time_hours_ago_one": "hace {{count}} h",
+    "time_hours_ago_other": "hace {{count}} h",
+    "time_days_ago_many": "hace {{count}} d",
+    "time_days_ago_one": "hace {{count}} d",
+    "time_days_ago_other": "hace {{count}} d"
   },
   "members": {
     "title": "Miembros",
@@ -288,7 +298,20 @@
     "empty_never_logged_in_title": "Todos han iniciado sesión",
     "empty_never_logged_in_hint": "Ningún miembro aprobado está aún esperando iniciar sesión por primera vez.",
     "empty_onboarding_incomplete_title": "Todos completaron la incorporación",
-    "empty_onboarding_incomplete_hint": "Ningún miembro tiene pasos de incorporación pendientes."
+    "empty_onboarding_incomplete_hint": "Ningún miembro tiene pasos de incorporación pendientes.",
+    "time_minutes_ago_many": "hace {{count}} min",
+    "time_minutes_ago_one": "hace {{count}} min",
+    "time_minutes_ago_other": "hace {{count}} min",
+    "time_hours_ago_many": "hace {{count}} h",
+    "time_hours_ago_one": "hace {{count}} h",
+    "time_hours_ago_other": "hace {{count}} h",
+    "time_days_ago_many": "hace {{count}} d",
+    "time_days_ago_one": "hace {{count}} d",
+    "time_days_ago_other": "hace {{count}} d",
+    "bulk_selected_many": "{{count}} seleccionados",
+    "bulk_selected_one": "{{count}} seleccionados",
+    "bulk_selected_other": "{{count}} seleccionados",
+    "role_all": "Todos los roles"
   },
   "onboarding": {
     "title": "Incorporación",
@@ -503,7 +526,34 @@
     "empty_queue_title": "No hay registros pendientes de revisión",
     "empty_queue_hint": "Todo al día — las nuevas solicitudes aparecerán aquí para su revisión.",
     "list_error_title": "No se pudieron cargar los registros de verificación",
-    "list_error_body": "Comprueba tu conexión e inténtalo de nuevo."
+    "list_error_body": "Comprueba tu conexión e inténtalo de nuevo.",
+    "expiry_days_left_many": "quedan {{count}} días",
+    "expiry_days_left_one": "quedan {{count}} días",
+    "expiry_days_left_other": "quedan {{count}} días",
+    "toast_bulk_success_many": "{{count}} registros {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_one": "{{count}} registros {{action}}.{{failedSuffix}}",
+    "toast_bulk_success_other": "{{count}} registros {{action}}.{{failedSuffix}}",
+    "toast_bulk_failed_suffix_many": " ({{count}} fallidos)",
+    "toast_bulk_failed_suffix_one": " ({{count}} fallidos)",
+    "toast_bulk_failed_suffix_other": " ({{count}} fallidos)",
+    "stat_of_total_many": "de {{count}} registros totales",
+    "stat_of_total_one": "de {{count}} registros totales",
+    "stat_of_total_other": "de {{count}} registros totales",
+    "stat_expired_hint_many": "{{count}} ya caducados",
+    "stat_expired_hint_one": "{{count}} ya caducados",
+    "stat_expired_hint_other": "{{count}} ya caducados",
+    "records_selected_many": "{{count}} registros seleccionados",
+    "records_selected_one": "{{count}} registros seleccionados",
+    "records_selected_other": "{{count}} registros seleccionados",
+    "bulk_verify_confirm_many": "¿Verificar todos los registros seleccionados?",
+    "bulk_verify_confirm_one": "¿Verificar todos los registros seleccionados?",
+    "bulk_verify_confirm_other": "¿Verificar todos los registros seleccionados?",
+    "bulk_delete_confirm_many": "¿Seguro que quieres eliminar todos los registros seleccionados? Esta acción no se puede deshacer.",
+    "bulk_delete_confirm_one": "¿Seguro que quieres eliminar todos los registros seleccionados? Esta acción no se puede deshacer.",
+    "bulk_delete_confirm_other": "¿Seguro que quieres eliminar todos los registros seleccionados? Esta acción no se puede deshacer.",
+    "bulk_reject_confirm_many": "Indica un motivo para rechazar todos los registros seleccionados.",
+    "bulk_reject_confirm_one": "Indica un motivo para rechazar todos los registros seleccionados.",
+    "bulk_reject_confirm_other": "Indica un motivo para rechazar todos los registros seleccionados."
   },
   "member_detail": {
     "load_failed": "No se pudo cargar el miembro.",
@@ -795,7 +845,10 @@
     "retry": "Intentar de nuevo",
     "detail_not_found_hint": "Es posible que la copia del mensaje se haya archivado o eliminado, o que el enlace sea incorrecto.",
     "detail_flag_banner_title": "Marcado para revisión",
-    "detail_decision_prompt": "Registra una decisión de revisión para esta copia del mensaje."
+    "detail_decision_prompt": "Registra una decisión de revisión para esta copia del mensaje.",
+    "detail_message_count_many": "{{count}} mensajes",
+    "detail_message_count_one": "{{count}} mensajes",
+    "detail_message_count_other": "{{count}} mensajes"
   },
   "monitoring": {
     "title": "Monitorización de usuarios",
@@ -855,7 +908,8 @@
     "empty_all_clear_hint": "Todos los miembros se comunican libremente. Añade un miembro si algo necesita una revisión más detallada.",
     "load_error_title": "No se pudieron cargar los miembros monitorizados",
     "load_error_hint": "Algo salió mal al obtener la lista de monitorización. Actualiza para intentarlo de nuevo.",
-    "retry_button": "Intentar de nuevo"
+    "retry_button": "Intentar de nuevo",
+    "expiry_days_left_many": "quedan {{count}} días"
   },
   "risk_tags": {
     "title": "Etiquetas de riesgo",
@@ -939,7 +993,8 @@
     "empty_level_title": "No hay etiquetas en este nivel",
     "empty_level_hint": "Actualmente ningún anuncio tiene este nivel de riesgo.",
     "empty_search_title": "No hay etiquetas de riesgo coincidentes",
-    "empty_search_hint": "Prueba con otro término de búsqueda o borra la búsqueda."
+    "empty_search_hint": "Prueba con otro término de búsqueda o borra la búsqueda.",
+    "level_all": "Todos los niveles de riesgo"
   },
   "insurance": {
     "title": "Certificados de seguro",
@@ -1124,7 +1179,10 @@
     "detail_description": "Una instantánea congelada y de solo lectura de una copia del mensaje revisado.",
     "frozen_note": "Este registro se conserva exactamente como fue revisado y no se puede modificar.",
     "record_id": "Registro #{{id}}",
-    "record_unavailable": "Registro no disponible"
+    "record_unavailable": "Registro no disponible",
+    "messages_count_many": "{{count}} mensajes",
+    "messages_count_one": "{{count}} mensajes",
+    "messages_count_other": "{{count}} mensajes"
   },
   "configuration": {
     "title": "Configuración del bróker",

@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -221,11 +222,9 @@ export function MarketplaceAdmin() {
       <Card className="border border-divider/70 bg-surface">
         <CardHeader className="flex items-center justify-between px-4 pt-4">
           <h3 className="text-lg font-semibold text-foreground">{t('marketplace.recent_listings')}</h3>
-          <Link to={tenantPath('/admin/marketplace/moderation')}>
-            <Button size="sm" variant="secondary">
-              {t('marketplace.view_all')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath('/admin/marketplace/moderation')} size="sm" variant="secondary">
+            {t('marketplace.view_all')}
+          </Button>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           {loading ? (
@@ -278,7 +277,7 @@ export function MarketplaceAdmin() {
                       </Chip>
                     </TableCell>
                     <TableCell className="text-muted">
-                      {new Date(listing.created_at).toLocaleDateString()}
+                      {new Date(listing.created_at).toLocaleDateString(getFormattingLocale())}
                     </TableCell>
                   </TableRow>
                 ))}

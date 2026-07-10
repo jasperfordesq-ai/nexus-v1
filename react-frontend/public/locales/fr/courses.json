@@ -19,7 +19,9 @@
     "lessons_one": "{{count}} leçon",
     "lessons_other": "{{count}} cours",
     "enrolled_one": "{{count}} inscrit",
-    "enrolled_other": "{{count}} inscrit"
+    "enrolled_other": "{{count}} inscrit",
+    "lessons_many": "{{count}} cours",
+    "enrolled_many": "{{count}} inscrit"
   },
   "detail": {
     "about": "À propos de ce cours",
@@ -169,7 +171,11 @@
     "rate_n_stars": "Noter {{count}} sur 5 étoiles",
     "submit_error": "Impossible d'envoyer votre avis. Veuillez réessayer.",
     "count_one": "{{count}} avis",
-    "count_other": "{{count}} avis"
+    "count_other": "{{count}} avis",
+    "rate_n_stars_many": "Noter {{count}} sur 5 étoiles",
+    "rate_n_stars_one": "Noter {{count}} sur 5 étoiles",
+    "rate_n_stars_other": "Noter {{count}} sur 5 étoiles",
+    "count_many": "{{count}} avis"
   },
   "admin": {
     "title": "Cours",

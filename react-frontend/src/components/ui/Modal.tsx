@@ -4,23 +4,28 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import {
+  Children,
   createContext,
   type ComponentType,
   type HTMLAttributes,
+  isValidElement,
   type ReactNode,
   type Ref,
   useCallback,
   use,
   useMemo,
-} from 'react';
-import { Modal as HeroUIModal, ModalHeading as HeroUIModalHeading } from '@heroui/react/modal';
+} from "react";
+import { useTranslation } from "react-i18next";
+import { Modal as HeroUIModal } from "@heroui/react/modal";
 
-import { cn } from '@/lib/helpers';
+import { cn } from "@/lib/helpers";
 
-type ModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | 'full';
-type ModalPlacement = 'auto' | 'top' | 'top-center' | 'center' | 'bottom' | 'bottom-center';
-type ModalBackdrop = 'opaque' | 'blur' | 'transparent';
-type ModalScrollBehavior = 'inside' | 'outside' | 'normal';
+type ModalSize =
+  "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "full";
+type ModalPlacement =
+  "auto" | "top" | "top-center" | "center" | "bottom" | "bottom-center";
+type ModalBackdrop = "opaque" | "blur" | "transparent";
+type ModalScrollBehavior = "inside" | "outside" | "normal";
 
 type ModalClassNames = Partial<{
   base: string;
@@ -35,7 +40,8 @@ type ModalClassNames = Partial<{
 type ModalContextValue = {
   backdrop?: ModalBackdrop;
   classNames?: ModalClassNames;
-  dialogProps?: Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'className'>;
+  closeLabel?: string;
+  dialogProps?: Omit<HTMLAttributes<HTMLDivElement>, "children" | "className">;
   hideCloseButton?: boolean;
   isDismissable?: boolean;
   isKeyboardDismissDisabled?: boolean;
@@ -50,8 +56,12 @@ type ModalContextValue = {
 };
 
 export interface ModalProps
-  extends ModalContextValue,
-  Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'className' | 'onChange'> {
+  extends
+    ModalContextValue,
+    Omit<
+      HTMLAttributes<HTMLDivElement>,
+      "children" | "className" | "onChange"
+    > {
   children?: ReactNode;
   className?: string;
   defaultOpen?: boolean;
@@ -61,7 +71,10 @@ export interface ModalProps
 
 export type ModalContentRenderProp = (onClose: () => void) => ReactNode;
 
-export interface ModalContentProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface ModalContentProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   children?: ReactNode | ModalContentRenderProp;
 }
 
@@ -69,21 +82,37 @@ export interface ModalSectionProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode;
 }
 
-const ModalContext = createContext<ModalContextValue>({});
-const ModalDialog = HeroUIModal.Dialog as ComponentType<any>;
+export interface ModalHeadingProps extends HTMLAttributes<HTMLHeadingElement> {
+  children?: ReactNode;
+  level?: number;
+}
 
-const CONTAINER_SIZES = new Set<ModalSize>(['xs', 'sm', 'md', 'lg', 'full']);
+const ModalContext = createContext<ModalContextValue>({});
+
+type ModalDialogRenderProps = { close: () => void };
+type CompatModalDialogProps = Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "children"
+> & {
+  children: (renderProps: ModalDialogRenderProps) => ReactNode;
+  ref?: Ref<HTMLDivElement>;
+};
+
+const ModalDialog =
+  HeroUIModal.Dialog as unknown as ComponentType<CompatModalDialogProps>;
+
+const CONTAINER_SIZES = new Set<ModalSize>(["xs", "sm", "md", "lg", "full"]);
 
 const sizeClassName: Partial<Record<ModalSize, string>> = {
-  xl: 'sm:max-w-xl',
-  '2xl': 'sm:max-w-2xl',
-  '3xl': 'sm:max-w-3xl',
-  '4xl': 'sm:max-w-4xl',
-  '5xl': 'sm:max-w-5xl',
+  xl: "sm:max-w-xl",
+  "2xl": "sm:max-w-2xl",
+  "3xl": "sm:max-w-3xl",
+  "4xl": "sm:max-w-4xl",
+  "5xl": "sm:max-w-5xl",
 };
 
 function normalizeScroll(scrollBehavior?: ModalScrollBehavior) {
-  return scrollBehavior === 'normal' ? 'inside' : scrollBehavior;
+  return scrollBehavior === "normal" ? "inside" : scrollBehavior;
 }
 
 function normalizeContainerSize(size?: ModalSize) {
@@ -91,16 +120,18 @@ function normalizeContainerSize(size?: ModalSize) {
     return undefined;
   }
 
-  return CONTAINER_SIZES.has(size) ? (size as 'xs' | 'sm' | 'md' | 'lg' | 'full') : 'lg';
+  return CONTAINER_SIZES.has(size)
+    ? (size as "xs" | "sm" | "md" | "lg" | "full")
+    : "lg";
 }
 
 function normalizePlacement(placement?: ModalPlacement) {
-  if (placement === 'top-center') {
-    return 'top';
+  if (placement === "top-center") {
+    return "top";
   }
 
-  if (placement === 'bottom-center') {
-    return 'bottom';
+  if (placement === "bottom-center") {
+    return "bottom";
   }
 
   return placement;
@@ -111,6 +142,7 @@ export function Modal({
   children,
   className,
   classNames,
+  closeLabel,
   defaultOpen,
   hideCloseButton,
   isDismissable,
@@ -125,56 +157,64 @@ export function Modal({
   size,
   ...dialogProps
 }: ModalProps) {
-  const value = useMemo<ModalContextValue>(() => ({
-    backdrop,
-    classNames: {
-      ...classNames,
-      base: cn(classNames?.base, className),
-    },
-    dialogProps,
-    hideCloseButton,
-    isDismissable,
-    isKeyboardDismissDisabled,
-    isOpen: isOpen ?? defaultOpen,
-    onClose,
-    onOpenChange,
-    placement,
-    portalContainer,
-    scrollBehavior,
-    shouldBlockScroll,
-    size,
-  }), [
-    backdrop,
-    className,
-    classNames,
-    defaultOpen,
-    dialogProps,
-    hideCloseButton,
-    isDismissable,
-    isKeyboardDismissDisabled,
-    isOpen,
-    onClose,
-    onOpenChange,
-    placement,
-    portalContainer,
-    scrollBehavior,
-    shouldBlockScroll,
-    size,
-  ]);
+  const value = useMemo<ModalContextValue>(
+    () => ({
+      backdrop,
+      classNames: {
+        ...classNames,
+        base: cn(classNames?.base, className),
+      },
+      closeLabel,
+      dialogProps,
+      hideCloseButton,
+      isDismissable,
+      isKeyboardDismissDisabled,
+      isOpen: isOpen ?? defaultOpen,
+      onClose,
+      onOpenChange,
+      placement,
+      portalContainer,
+      scrollBehavior,
+      shouldBlockScroll,
+      size,
+    }),
+    [
+      backdrop,
+      className,
+      classNames,
+      closeLabel,
+      defaultOpen,
+      dialogProps,
+      hideCloseButton,
+      isDismissable,
+      isKeyboardDismissDisabled,
+      isOpen,
+      onClose,
+      onOpenChange,
+      placement,
+      portalContainer,
+      scrollBehavior,
+      shouldBlockScroll,
+      size,
+    ],
+  );
 
   return (
-    <ModalContext.Provider value={value}>
-      {children}
-    </ModalContext.Provider>
+    <ModalContext.Provider value={value}>{children}</ModalContext.Provider>
   );
 }
 
-export function ModalContent(
-  { children, className, ref, ...props }: ModalContentProps & { ref?: Ref<HTMLDivElement> },
-) {
+export function ModalContent({
+  children,
+  className,
+  ref,
+  ...props
+}: ModalContentProps & { ref?: Ref<HTMLDivElement> }) {
+  const { t } = useTranslation("common");
   const {
     backdrop,
     classNames,
+    closeLabel,
     dialogProps,
     hideCloseButton,
     isDismissable,
@@ -188,12 +228,15 @@ export function ModalContent(
     size,
   } = use(ModalContext);
 
-  const handleOpenChange = useCallback((nextOpen: boolean) => {
-    onOpenChange?.(nextOpen);
-    if (!nextOpen) {
-      onClose?.();
-    }
-  }, [onClose, onOpenChange]);
+  const handleOpenChange = useCallback(
+    (nextOpen: boolean) => {
+      onOpenChange?.(nextOpen);
+      if (!nextOpen) {
+        onClose?.();
+      }
+    },
+    [onClose, onOpenChange],
+  );
 
   return (
     <HeroUIModal.Backdrop
@@ -213,19 +256,26 @@ export function ModalContent(
       >
         <ModalDialog
           ref={ref}
-          className={cn(size ? sizeClassName[size] : undefined, classNames?.base, className)}
+          className={cn(
+            size ? sizeClassName[size] : undefined,
+            classNames?.base,
+            className,
+          )}
           {...dialogProps}
           {...props}
         >
-          {(renderProps: { close: () => void }) => (
+          {(renderProps: ModalDialogRenderProps) => (
             <>
               {!hideCloseButton && (
-                <HeroUIModal.CloseTrigger className={classNames?.closeButton} />
+                <HeroUIModal.CloseTrigger
+                  aria-label={closeLabel ?? t("accessibility.close")}
+                  className={classNames?.closeButton}
+                />
               )}
-              {typeof children === 'function'
+              {typeof children === "function"
                 ? (children as ModalContentRenderProp)(() => {
-                  renderProps.close();
-                })
+                    renderProps.close();
+                  })
                 : children}
             </>
           )}
@@ -235,25 +285,47 @@ export function ModalContent(
   );
 }
 
-export function ModalHeader(
-  { children, className, ref, ...props }: ModalSectionProps & { ref?: Ref<HTMLHeadingElement> },
-) {
+export function ModalHeading({
+  className,
+  ref,
+  ...props
+}: ModalHeadingProps & { ref?: Ref<HTMLHeadingElement> }) {
+  return <HeroUIModal.Heading ref={ref} className={className} {...props} />;
+}
+
+export function ModalHeader({
+  children,
+  className,
+  id,
+  ref,
+  ...props
+}: ModalSectionProps & { ref?: Ref<HTMLDivElement> }) {
   const { classNames } = use(ModalContext);
+  const hasExplicitHeading = Children.toArray(children).some(
+    (child) => isValidElement(child) && child.type === ModalHeading,
+  );
 
   return (
-    <HeroUIModalHeading
+    <HeroUIModal.Header
       ref={ref}
       className={cn(classNames?.header, className)}
+      id={hasExplicitHeading ? id : undefined}
       {...props}
     >
-      {children}
-    </HeroUIModalHeading>
+      {hasExplicitHeading ? (
+        children
+      ) : (
+        <ModalHeading id={id}>{children}</ModalHeading>
+      )}
+    </HeroUIModal.Header>
   );
 }
 
-export function ModalBody(
-  { className, ref, ...props }: ModalSectionProps & { ref?: Ref<HTMLDivElement> },
-) {
+export function ModalBody({
+  className,
+  ref,
+  ...props
+}: ModalSectionProps & { ref?: Ref<HTMLDivElement> }) {
   const { classNames } = use(ModalContext);
 
   return (
@@ -265,9 +337,11 @@ export function ModalBody(
   );
 }
 
-export function ModalFooter(
-  { className, ref, ...props }: ModalSectionProps & { ref?: Ref<HTMLDivElement> },
-) {
+export function ModalFooter({
+  className,
+  ref,
+  ...props
+}: ModalSectionProps & { ref?: Ref<HTMLDivElement> }) {
   const { classNames } = use(ModalContext);
 
   return (

@@ -8,6 +8,7 @@
  * DataTable of legal documents with CRUD + version management entry points.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Plus from 'lucide-react/icons/plus';
@@ -161,7 +162,7 @@ export function LegalDocList() {
       key: 'updated_at',
       label: t('enterprise.label_last_updated'),
       sortable: true,
-      render: (doc) => doc.updated_at ? new Date(doc.updated_at).toLocaleDateString() : '—',
+      render: (doc) => doc.updated_at ? new Date(doc.updated_at).toLocaleDateString(getFormattingLocale()) : '—',
     },
     {
       key: 'actions',

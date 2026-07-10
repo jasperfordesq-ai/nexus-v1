@@ -117,11 +117,9 @@ export function CustomPage() {
           <p className="text-theme-secondary mb-6">
             {t('custom_page.not_found_description')}
           </p>
-          <Link to={tenantPath('/')}>
-            <Button variant="primary" startContent={<ArrowLeft size={16} />}>
-              {t('custom_page.back_to_home')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath('/')} variant="primary" startContent={<ArrowLeft size={16} />}>
+            {t('custom_page.back_to_home')}
+          </Button>
         </GlassCard>
       </div>
     );

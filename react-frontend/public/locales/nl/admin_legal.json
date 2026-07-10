@@ -147,7 +147,9 @@
         "date": "Datum",
         "ip_address": "IP-adres",
         "member_id": "Lid ID"
-      }
+      },
+      "truncated_one": "Toont de meest recente 200 records. Exporteer het volledige grootboek CSV om alle {{count}}-records te downloaden.",
+      "truncated_other": "Toont de meest recente 200 records. Exporteer het volledige grootboek CSV om alle {{count}}-records te downloaden."
     },
     "residency": {
       "article_16": "Grensoverschrijdende openbaarmaking van persoonsgegevens is toegestaan ​​als het land van bestemming een adequate gegevensbescherming waarborgt, erkend door de Federale Raad. Switzerland, EU/EEA-lidstaten en een kleine lijst met andere landen komen in aanmerking.",

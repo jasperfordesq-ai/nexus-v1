@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Spinner, Progress, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@/components/ui';
 import {
   useCallback,
@@ -278,7 +279,7 @@ export default function PilotLaunchReadinessAdminPage() {
                   <p className="text-sm text-muted">
                     {t('pilot_launch_readiness.states.launched_body', {
                       date: report.launched
-                        ? new Date(report.launched.launched_at).toLocaleString()
+                        ? new Date(report.launched.launched_at).toLocaleString(getFormattingLocale())
                         : t('pilot_launch_readiness.empty.value'),
                       user: report.launched?.launched_by_id
                         ? t('pilot_launch_readiness.states.launched_by_user', {
@@ -462,7 +463,7 @@ export default function PilotLaunchReadinessAdminPage() {
                   {section.last_updated_at && (
                     <p className="text-[11px] text-muted">
                       {t('pilot_launch_readiness.timestamps.last_updated', {
-                        date: new Date(section.last_updated_at).toLocaleString(),
+                        date: new Date(section.last_updated_at).toLocaleString(getFormattingLocale()),
                       })}
                     </p>
                   )}
@@ -474,7 +475,7 @@ export default function PilotLaunchReadinessAdminPage() {
           <Separator />
           <p className="text-xs text-muted">
             {t('pilot_launch_readiness.timestamps.report_generated', {
-              date: new Date(report.generated_at).toLocaleString(),
+              date: new Date(report.generated_at).toLocaleString(getFormattingLocale()),
             })}
           </p>
         </>

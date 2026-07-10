@@ -40,5 +40,9 @@
   },
   "page_meta": {
     "title": "AI Gesprek"
-  }
+  },
+  "card_wallet_transactions_one": "{{count}} transacties in de afgelopen 30 dagen",
+  "card_wallet_transactions_other": "{{count}} transacties in de afgelopen 30 dagen",
+  "limits_left_today_one": "{{count}} is vandaag vertrokken",
+  "limits_left_today_other": "{{count}} is vandaag vertrokken"
 }

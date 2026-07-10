@@ -23,14 +23,20 @@
     "title": "Événements à venir",
     "subtitle": "Rejoignez votre communauté",
     "online": "En ligne",
-    "attending": "{{count}} participant(s)"
+    "attending": "{{count}} participant(s)",
+    "attending_many": "{{count}} participant(s)",
+    "attending_one": "{{count}} participant(s)",
+    "attending_other": "{{count}} participant(s)"
   },
   "active_groups": {
     "title": "Groupes actifs",
     "subtitle": "Connectez-vous avec des membres partageant les mêmes idées",
     "members": "{{count}} membres",
     "view_group": "Voir le groupe",
-    "view_group_named": "View group: {{name}}"
+    "view_group_named": "View group: {{name}}",
+    "members_many": "{{count}} membres",
+    "members_one": "{{count}} membres",
+    "members_other": "{{count}} membres"
   },
   "top_contributors": {
     "title": "Meilleurs contributeurs",
@@ -56,12 +62,21 @@
     "subtitle": "Partagez vos idées et faites une différence",
     "ideas_count": "{{count}} idées",
     "ends": "Fin le {{date}}",
-    "progress": "Progression du défi"
+    "progress": "Progression du défi",
+    "ideas_count_many": "{{count}} idées",
+    "ideas_count_one": "{{count}} idées",
+    "ideas_count_other": "{{count}} idées"
   },
   "time_ago": {
     "just_now": "À l'instant",
     "hours_ago": "Il y a {{count}} h",
-    "days_ago": "Il y a {{count}} j"
+    "days_ago": "Il y a {{count}} j",
+    "hours_ago_many": "Il y a {{count}} h",
+    "hours_ago_one": "Il y a {{count}} h",
+    "hours_ago_other": "Il y a {{count}} h",
+    "days_ago_many": "Il y a {{count}} j",
+    "days_ago_one": "Il y a {{count}} j",
+    "days_ago_other": "Il y a {{count}} j"
   },
   "error_loading": "Impossible de charger la page Découvrir. Il peut s'agir d'un problème temporaire.",
   "retry": "Réessayer",
@@ -82,18 +97,30 @@
     "title": "Du Blog",
     "subtitle": "Dernières actualités de votre communauté",
     "read_time": "{{count}} min de lecture",
-    "views": "{{count}} vues"
+    "views": "{{count}} vues",
+    "read_time_many": "{{count}} min de lecture",
+    "read_time_one": "{{count}} min de lecture",
+    "read_time_other": "{{count}} min de lecture",
+    "views_many": "{{count}} vues",
+    "views_one": "{{count}} vues",
+    "views_other": "{{count}} vues"
   },
   "volunteering": {
     "title": "Opportunités de Bénévolat",
     "subtitle": "Faites une différence dans votre communauté",
     "applications": "{{count}} candidatures",
-    "view_opportunity": "Voir l'opportunité"
+    "view_opportunity": "Voir l'opportunité",
+    "applications_many": "{{count}} candidatures",
+    "applications_one": "{{count}} candidatures",
+    "applications_other": "{{count}} candidatures"
   },
   "organisations": {
     "title": "Organisations",
     "subtitle": "Partenaires communautaires qui font la différence",
-    "opportunities": "{{count}} opportunités"
+    "opportunities": "{{count}} opportunités",
+    "opportunities_many": "{{count}} opportunités",
+    "opportunities_one": "{{count}} opportunités",
+    "opportunities_other": "{{count}} opportunités"
   },
   "polls": {
     "title": "Sondages Actifs",
@@ -102,19 +129,31 @@
     "options": "Options de {{count}}",
     "vote_now": "Voter Maintenant",
     "vote_now_for": "Votez maintenant sur : {{question}}",
-    "closes": "Se termine le {{date}}"
+    "closes": "Se termine le {{date}}",
+    "options_many": "Options de {{count}}",
+    "options_one": "Options de {{count}}",
+    "options_other": "Options de {{count}}",
+    "votes_many": "Votes {{count}}",
+    "votes_one": "Votes {{count}}",
+    "votes_other": "Votes {{count}}"
   },
   "in_demand_skills": {
     "title": "Compétences Recherchées",
     "subtitle": "Les compétences les plus demandées dans votre communauté",
     "requested": "{{count}} demandent",
     "offered": "{{count}} proposent",
-    "you_can_help": "Vous pouvez aider !"
+    "you_can_help": "Vous pouvez aider !",
+    "requested_many": "{{count}} demandent",
+    "requested_one": "{{count}} demandent",
+    "requested_other": "{{count}} demandent"
   },
   "resources": {
     "title": "Ressources en Vedette",
     "subtitle": "Guides et documents pour votre communauté",
-    "views": "{{count}} vues"
+    "views": "{{count}} vues",
+    "views_many": "{{count}} vues",
+    "views_one": "{{count}} vues",
+    "views_other": "{{count}} vues"
   },
   "jobs": {
     "title": "Offres d'Emploi",

@@ -455,7 +455,26 @@
     "winning_metric": "مقياس الفوز",
     "resend_queued_count": "إعادة إرسال{{count}}في قائمة الانتظار",
     "resend_queued_count_plural": "يتم إعادة إرسال{{count}}في قائمة الانتظار",
-    "template_tabs_aria": "مرشح فئة قالب النشرة الإخبارية"
+    "template_tabs_aria": "مرشح فئة قالب النشرة الإخبارية",
+    "subscriber_total_few": "{{count}}إجمالي المشتركين",
+    "subscriber_total_many": "{{count}}إجمالي المشتركين",
+    "subscriber_total_two": "{{count}}إجمالي المشتركين",
+    "subscriber_total_zero": "{{count}}إجمالي المشتركين",
+    "import_rows_found_few": "تم العثور على مشترك{{count}}في ملف CSV",
+    "import_rows_found_many": "تم العثور على مشترك{{count}}في ملف CSV",
+    "import_rows_found_two": "تم العثور على مشترك{{count}}في ملف CSV",
+    "import_rows_found_zero": "تم العثور على مشترك{{count}}في ملف CSV",
+    "resend_queued_count_few": "إعادة إرسال{{count}}في قائمة الانتظار",
+    "resend_queued_count_many": "إعادة إرسال{{count}}في قائمة الانتظار",
+    "resend_queued_count_one": "إعادة إرسال{{count}}في قائمة الانتظار",
+    "resend_queued_count_other": "إعادة إرسال{{count}}في قائمة الانتظار",
+    "resend_queued_count_two": "إعادة إرسال{{count}}في قائمة الانتظار",
+    "resend_queued_count_zero": "إعادة إرسال{{count}}في قائمة الانتظار",
+    "your_average": "المتوسط ​​الخاص بك",
+    "industry_avg": "متوسط ​​الصناعة",
+    "above_benchmark": "فوق المعيار",
+    "below_benchmark": "أقل من المعيار",
+    "benchmark_difference": "{{pointSign}}{{pointValue}} نقطة مئوية ({{percentSign}}{{percentValue}}٪)"
   },
   "newsletter_form": {
     "ab_test_label": "اختبار أب",
@@ -759,7 +778,11 @@
     "total_records_one": "{{count}}إجمالي السجل",
     "total_records_other": "{{count}}إجمالي السجلات",
     "who_clicked": "من نقر",
-    "who_opened": "من فتح"
+    "who_opened": "من فتح",
+    "total_records_few": "{{count}}إجمالي السجل",
+    "total_records_many": "{{count}}إجمالي السجل",
+    "total_records_two": "{{count}}إجمالي السجل",
+    "total_records_zero": "{{count}}إجمالي السجل"
   },
   "newsletter_bounces": {
     "bounce_log": "سجل ترتد",
@@ -895,7 +918,25 @@
     "subject_override_desc": "اتركه فارغا لاستخدام الموضوع الأصلي.",
     "subject_override_placeholder": "أدخل تجاوز الموضوع...",
     "subtitle": "أرسل هذه الرسالة الإخبارية إلى مجموعة فرعية مستهدفة من المستلمين.",
-    "total_sent": "إجمالي المرسلة"
+    "total_sent": "إجمالي المرسلة",
+    "non_openers_count_few": "{{count}}المستلم الذي لم يفتح",
+    "non_openers_count_many": "{{count}}المستلم الذي لم يفتح",
+    "non_openers_count_one": "{{count}}المستلم الذي لم يفتح",
+    "non_openers_count_other": "{{count}}المستلم الذي لم يفتح",
+    "non_openers_count_two": "{{count}}المستلم الذي لم يفتح",
+    "non_openers_count_zero": "{{count}}المستلم الذي لم يفتح",
+    "non_clickers_count_few": "{{count}}المستلم الذي فتح ولكن لم ينقر",
+    "non_clickers_count_many": "{{count}}المستلم الذي فتح ولكن لم ينقر",
+    "non_clickers_count_one": "{{count}}المستلم الذي فتح ولكن لم ينقر",
+    "non_clickers_count_other": "{{count}}المستلم الذي فتح ولكن لم ينقر",
+    "non_clickers_count_two": "{{count}}المستلم الذي فتح ولكن لم ينقر",
+    "non_clickers_count_zero": "{{count}}المستلم الذي فتح ولكن لم ينقر",
+    "preview_recipient_count_desc_few": "سيتم إرسال إعادة الإرسال هذه إلى مستلم{{count}}",
+    "preview_recipient_count_desc_many": "سيتم إرسال إعادة الإرسال هذه إلى مستلم{{count}}",
+    "preview_recipient_count_desc_one": "سيتم إرسال إعادة الإرسال هذه إلى مستلم{{count}}",
+    "preview_recipient_count_desc_other": "سيتم إرسال إعادة الإرسال هذه إلى مستلم{{count}}",
+    "preview_recipient_count_desc_two": "سيتم إرسال إعادة الإرسال هذه إلى مستلم{{count}}",
+    "preview_recipient_count_desc_zero": "سيتم إرسال إعادة الإرسال هذه إلى مستلم{{count}}"
   },
   "newsletter_send_time": {
     "day_friday": "الجمعة",
@@ -919,7 +960,17 @@
     "not_enough_data": "لا توجد بيانات مشاركة كافية حتى الآن.",
     "time_period": "الفترة الزمنية",
     "title": "إرسال محسن الوقت",
-    "top_recommended": "Top Recommended"
+    "top_recommended": "Top Recommended",
+    "days_few": "أيام{{count}}",
+    "days_many": "أيام{{count}}",
+    "days_one": "أيام{{count}}",
+    "days_other": "أيام{{count}}",
+    "days_two": "أيام{{count}}",
+    "days_zero": "أيام{{count}}",
+    "heatmap_cell_title_few": "{{day}}{{hour}}: مشاركة{{count}}",
+    "heatmap_cell_title_many": "{{day}}{{hour}}: مشاركة{{count}}",
+    "heatmap_cell_title_two": "{{day}}{{hour}}: مشاركة{{count}}",
+    "heatmap_cell_title_zero": "{{day}}{{hour}}: مشاركة{{count}}"
   },
   "segment_form": {
     "analyzing_member_data": "تحليل بيانات الأعضاء",
@@ -1038,5 +1089,8 @@
     "update_template": "تحديث القالب",
     "usage_stats_sent": "تم إرسال إحصائيات الاستخدام",
     "usage_stats_sent_plural": "إحصائيات الاستخدام المرسلة بصيغة الجمع"
+  },
+  "diagnostics": {
+    "score_out_of": "من {{maximum}}"
   }
 }

@@ -393,7 +393,8 @@
     "changes_between": "変更: v{{old}} から v{{new}}",
     "changes_count": "{{count}} の変更",
     "legend_removed": "削除されました",
-    "legend_added": "追加した"
+    "legend_added": "追加した",
+    "changes_count_other": "{{count}} の変更"
   },
   "platform": {
     "effective_date": "有効 {{date}}",
@@ -480,7 +481,8 @@
     "consent_text": "「同意する」をクリックすることで、上記の文書を読み、同意したことを確認します。",
     "accept_aria": "すべての更新された法的文書に同意して続行する",
     "accepting": "受け入れ中…",
-    "accept_continue": "受け入れて続行"
+    "accept_continue": "受け入れて続行",
+    "subtitle_other_other": "{{count}}の文書が更新されました。続行するには、レビューして受け入れてください。"
   },
   "custom": {
     "effective_label": "有効期限: {{date}}",

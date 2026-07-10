@@ -218,7 +218,9 @@
     "smart_search_text_chip": "الاستعلام: {{query}}",
     "role_super_admin": "مشرف عام",
     "permissions_editor_unavailable_title": "الأذونات هنا للقراءة فقط",
-    "permissions_editor_unavailable_desc": "تعرض هذه الصفحة دور المستخدم والأذونات الممنوحة له، لكن لا يمكن تغييرها هنا. يمكن إدارة الوصول عبر تغيير دور المستخدم في صفحة تعديل المستخدم."
+    "permissions_editor_unavailable_desc": "تعرض هذه الصفحة دور المستخدم والأذونات الممنوحة له، لكن لا يمكن تغييرها هنا. يمكن إدارة الوصول عبر تغيير دور المستخدم في صفحة تعديل المستخدم.",
+    "role_unknown": "دور غير معروف",
+    "role_tenant_super_admin": "مسؤول أعلى للمستأجر"
   },
   "user_edit": {
     "actions": {

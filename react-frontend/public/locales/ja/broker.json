@@ -186,7 +186,10 @@
     "time_just_now": "たった今",
     "time_minutes_ago": "{{count}}分前",
     "time_hours_ago": "{{count}}時間前",
-    "time_days_ago": "{{count}}日前"
+    "time_days_ago": "{{count}}日前",
+    "time_minutes_ago_other": "{{count}}分前",
+    "time_hours_ago_other": "{{count}}時間前",
+    "time_days_ago_other": "{{count}}日前"
   },
   "members": {
     "title": "メンバー",
@@ -288,7 +291,12 @@
     "empty_never_logged_in_title": "全員がログイン済みです",
     "empty_never_logged_in_hint": "初回サインインを待っている承認済みメンバーはいません。",
     "empty_onboarding_incomplete_title": "全員がオンボーディングを完了しました",
-    "empty_onboarding_incomplete_hint": "オンボーディング手順が未完了のメンバーはいません。"
+    "empty_onboarding_incomplete_hint": "オンボーディング手順が未完了のメンバーはいません。",
+    "time_minutes_ago_other": "{{count}}分前",
+    "time_hours_ago_other": "{{count}}時間前",
+    "time_days_ago_other": "{{count}}日前",
+    "bulk_selected_other": "{{count}}件選択中",
+    "role_all": "すべての役割"
   },
   "onboarding": {
     "title": "オンボーディング",
@@ -503,7 +511,16 @@
     "empty_queue_title": "レビュー待ちの記録はありません",
     "empty_queue_hint": "すべて対応済みです — 新しい提出があると、ここにレビュー用として表示されます。",
     "list_error_title": "審査記録を読み込めませんでした",
-    "list_error_body": "接続を確認して、もう一度お試しください。"
+    "list_error_body": "接続を確認して、もう一度お試しください。",
+    "expiry_days_left_other": "残り{{count}}日",
+    "toast_bulk_success_other": "{{count}}件の記録が{{action}}されました。{{failedSuffix}}",
+    "toast_bulk_failed_suffix_other": " ({{count}}件失敗)",
+    "stat_of_total_other": "全{{count}}件中",
+    "stat_expired_hint_other": "{{count}}件はすでに期限切れ",
+    "records_selected_other": "{{count}}件の記録が選択されています",
+    "bulk_verify_confirm_other": "選択したすべての記録を検証しますか?",
+    "bulk_delete_confirm_other": "選択したすべての記録を削除してもよろしいですか?この操作は取り消せません。",
+    "bulk_reject_confirm_other": "選択したすべての記録を却下する理由を入力してください。"
   },
   "member_detail": {
     "load_failed": "メンバーの読み込みに失敗しました。",
@@ -795,7 +812,8 @@
     "retry": "もう一度試す",
     "detail_not_found_hint": "メッセージコピーがアーカイブまたは削除されたか、リンクが間違っている可能性があります。",
     "detail_flag_banner_title": "レビュー用にフラグ付き",
-    "detail_decision_prompt": "このメッセージコピーのレビュー決定を記録してください。"
+    "detail_decision_prompt": "このメッセージコピーのレビュー決定を記録してください。",
+    "detail_message_count_other": "{{count}}件のメッセージ"
   },
   "monitoring": {
     "title": "ユーザー監視",
@@ -939,7 +957,8 @@
     "empty_level_title": "このレベルのタグはありません",
     "empty_level_hint": "現在このリスクレベルのリスティングはありません。",
     "empty_search_title": "一致するリスクタグはありません",
-    "empty_search_hint": "別の検索語でお試しいただくか、検索をクリアしてください。"
+    "empty_search_hint": "別の検索語でお試しいただくか、検索をクリアしてください。",
+    "level_all": "すべてのリスクレベル"
   },
   "insurance": {
     "title": "保険証明書",
@@ -1124,7 +1143,8 @@
     "detail_description": "レビュー済みメッセージコピーの、固定された読み取り専用のスナップショット。",
     "frozen_note": "この記録はレビュー時のまま正確に保存されており、変更できません。",
     "record_id": "記録 #{{id}}",
-    "record_unavailable": "記録は利用できません"
+    "record_unavailable": "記録は利用できません",
+    "messages_count_other": "{{count}}件のメッセージ"
   },
   "configuration": {
     "title": "ブローカー設定",

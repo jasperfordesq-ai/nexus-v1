@@ -524,7 +524,36 @@
     "select_all_rows": "Select all rows",
     "no_data": "Brak danych",
     "no_data_available": "Brak dostępnych danych",
-    "select_row": "Select row {{id}}"
+    "select_row": "Select row {{id}}",
+    "total_count_few": "Łącznie{{count}}",
+    "total_count_many": "Łącznie{{count}}",
+    "total_count_one": "Łącznie{{count}}",
+    "total_count_other": "Łącznie{{count}}",
+    "statuses": {
+      "active": "Aktywny",
+      "approved": "Zatwierdzony",
+      "banned": "Zablokowany",
+      "bulk_tenants_updated": "Zaktualizowano dzierżawców",
+      "bulk_users_moved": "Przeniesiono użytkowników",
+      "completed": "Ukończony",
+      "draft": "Wersja robocza",
+      "failed": "Niepowodzenie",
+      "federation_lockdown": "Blokada federacji",
+      "federation_updated": "Zaktualizowano federację",
+      "idle": "Bezczynny",
+      "inactive": "Nieaktywny",
+      "pending": "Oczekujący",
+      "published": "Opublikowany",
+      "rejected": "Odrzucony",
+      "scheduled": "Zaplanowany",
+      "sent": "Wysłany",
+      "suspended": "Zawieszony",
+      "tenant_created": "Utworzono dzierżawcę",
+      "tenant_updated": "Zaktualizowano dzierżawcę",
+      "user_created": "Utworzono użytkownika",
+      "user_moved": "Przeniesiono użytkownika",
+      "unknown": "Nieznany"
+    }
   },
   "help_drawer": {
     "aria_label": "Pomoc: {{title}}",
@@ -541,7 +570,15 @@
     "confirm_message": "Czy na pewno chcesz {{action}} {{count}}?",
     "destructive_warning": "Tej akcji nie można cofnąć.",
     "reason_label": "Powód",
-    "reason_placeholder": "Podaj powód tego działania"
+    "reason_placeholder": "Podaj powód tego działania",
+    "selected_count_few": "Wybrano {{count}}",
+    "selected_count_many": "Wybrano {{count}}",
+    "selected_count_one": "Wybrano {{count}}",
+    "selected_count_other": "Wybrano {{count}}",
+    "confirm_message_few": "Czy na pewno chcesz {{action}} {{count}}?",
+    "confirm_message_many": "Czy na pewno chcesz {{action}} {{count}}?",
+    "confirm_message_one": "Czy na pewno chcesz {{action}} {{count}}?",
+    "confirm_message_other": "Czy na pewno chcesz {{action}} {{count}}?"
   },
   "common": {
     "cancel": "Anuluj"
@@ -586,5 +623,9 @@
       "group_exchanges": "Wymiany grupowe",
       "search": "Szukaj"
     }
-  }
+  },
+  "support_requests_count_few": "{{count}} otwartych zgłoszeń do pomocy",
+  "support_requests_count_many": "{{count}} otwartych zgłoszeń do pomocy",
+  "support_requests_count_one": "{{count}} otwartych zgłoszeń do pomocy",
+  "support_requests_count_other": "{{count}} otwartych zgłoszeń do pomocy"
 }

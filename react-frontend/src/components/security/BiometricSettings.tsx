@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { useDisclosure, Button, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -249,8 +250,8 @@ export function BiometricSettings() {
     return (
       <div className="w-full p-4 rounded-lg bg-theme-elevated text-left" role="status" aria-busy="true" aria-label={t('common:loading')}>
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-indigo-500/20">
-            <Fingerprint className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+          <div className="p-2 rounded-lg bg-accent/20">
+            <Fingerprint className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
           </div>
           <div className="flex items-center gap-2">
             <Spinner size="sm" />
@@ -270,8 +271,8 @@ export function BiometricSettings() {
       {/* Header row */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-indigo-500/20">
-            <Fingerprint className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+          <div className="p-2 rounded-lg bg-accent/20">
+            <Fingerprint className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
           </div>
           <div>
             <p className="font-medium text-theme-primary">
@@ -308,8 +309,8 @@ export function BiometricSettings() {
 
       {/* Platform-specific instructions */}
       {showInstructions && (
-        <div className="p-3 rounded-lg bg-indigo-500/5 border border-indigo-500/20 space-y-2">
-          <p className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
+        <div className="p-3 rounded-lg bg-accent/5 border border-accent/20 space-y-2">
+          <p className="text-sm font-medium text-accent dark:text-accent">
             {instructions.title} - {t('passkey_setup_subtitle')}
           </p>
           <ol className="text-sm text-theme-subtle space-y-1 list-decimal list-inside">
@@ -317,7 +318,7 @@ export function BiometricSettings() {
               <li key={step}>{step}</li>
             ))}
           </ol>
-          <div className="pt-2 border-t border-indigo-500/10">
+          <div className="pt-2 border-t border-accent/10">
             <p className="text-xs text-theme-muted">
               {t('passkey_multi_device_note')}
             </p>
@@ -328,7 +329,7 @@ export function BiometricSettings() {
       {/* Registration button — no attachment restriction, let browser show all options */}
       <Button
         size="md"
-        className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+        className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white"
         onPress={() => handleRegister(undefined)}
         isLoading={registering}
         startContent={!registering ? <Fingerprint className="w-4 h-4" /> : undefined}
@@ -375,14 +376,14 @@ export function BiometricSettings() {
                     <div className="flex items-center gap-2 text-xs text-theme-subtle">
                       <span>
                         {t('biometric_registered_on')}{' '}
-                        {new Date(cred.created_at).toLocaleDateString()}
+                        {new Date(cred.created_at).toLocaleDateString(getFormattingLocale())}
                       </span>
                       {cred.last_used_at && (
                         <>
                           <span>&middot;</span>
                           <span>
                             {t('biometric_last_used')}{' '}
-                            {new Date(cred.last_used_at).toLocaleDateString()}
+                            {new Date(cred.last_used_at).toLocaleDateString(getFormattingLocale())}
                           </span>
                         </>
                       )}
@@ -444,7 +445,7 @@ export function BiometricSettings() {
           <Button
             variant="tertiary"
             size="sm"
-            className="min-h-7 min-w-0 px-1 text-indigo-500 hover:underline"
+            className="min-h-7 min-w-0 px-1 text-accent hover:underline"
             onPress={() => setShowInstructions(true)}
           >
             {t('passkey_setup_guide')}

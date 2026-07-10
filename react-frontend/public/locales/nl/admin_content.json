@@ -1343,7 +1343,11 @@
     "resync_stripe": "Synchroniseer opnieuw met Stripe",
     "sync_to_stripe": "Synchroniseren met Stripe",
     "sync_stripe": "Synchroniseren met Stripe",
-    "stripe_sync_description": "Creëert of updatet het Stripe-product en de prijzen voor dit plan. Vereist STRIPE_SECRET_KEY."
+    "stripe_sync_description": "Creëert of updatet het Stripe-product en de prijzen voor dit plan. Vereist STRIPE_SECRET_KEY.",
+    "active_tenants_cannot_delete_one": "{{count}}actieve tenant(s) - kan niet verwijderen",
+    "active_tenants_cannot_delete_other": "{{count}}actieve tenant(s) - kan niet verwijderen",
+    "filter_all_one": "Alles ({{count}})",
+    "filter_all_other": "Alles ({{count}})"
   },
   "data_table": {
     "admin_data_table": "Gegevens",

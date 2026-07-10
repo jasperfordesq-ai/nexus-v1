@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Button, Spinner } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'lucide-react/icons/image';
@@ -99,19 +100,19 @@ export function WebpConverter() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="rounded-lg border border-border p-4 text-center">
                   <p className="text-2xl font-bold text-foreground">
-                    {stats?.total_images?.toLocaleString() ?? '--'}
+                    {stats?.total_images?.toLocaleString(getFormattingLocale()) ?? '--'}
                   </p>
                   <p className="text-sm text-muted">{t('system.total_images')}</p>
                 </div>
                 <div className="rounded-lg border border-border p-4 text-center">
                   <p className="text-2xl font-bold text-success">
-                    {stats?.webp_images?.toLocaleString() ?? '--'}
+                    {stats?.webp_images?.toLocaleString(getFormattingLocale()) ?? '--'}
                   </p>
                   <p className="text-sm text-muted">{t('system.already_webp')}</p>
                 </div>
                 <div className="rounded-lg border border-border p-4 text-center">
                   <p className="text-2xl font-bold text-warning">
-                    {stats?.pending_conversion?.toLocaleString() ?? '--'}
+                    {stats?.pending_conversion?.toLocaleString(getFormattingLocale()) ?? '--'}
                   </p>
                   <p className="text-sm text-muted">{t('system.pending_conversion')}</p>
                 </div>

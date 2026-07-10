@@ -39,7 +39,11 @@
     "unsubscribed": "Pokaż nieobserwowanych.",
     "subscribe_failed": "Nie można zaktualizować preferencji obserwowania.",
     "episodes": "Episodes",
-    "no_episodes": "Nie ma jeszcze opublikowanych odcinków."
+    "no_episodes": "Nie ma jeszcze opublikowanych odcinków.",
+    "episode_count_few": "{{count}} episodes",
+    "episode_count_many": "{{count}} episodes",
+    "follower_count_few": "{{count}} obserwujących",
+    "follower_count_many": "{{count}} obserwujących"
   },
   "episode": {
     "title": "Odcinek podcastu",
@@ -74,7 +78,9 @@
       "full": "Pełny odcinek",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "reactions_count_few": "{{count}} reactions",
+    "reactions_count_many": "{{count}} reactions"
   },
   "player": {
     "unsupported": "Twoja przeglądarka nie obsługuje odtwarzacza audio.",
@@ -178,7 +184,11 @@
         "episode_missing_audio_url": "W odcinku brakuje prawidłowego adresu URL audio HTTP.",
         "episode_missing_audio_length": "W odcinku brakuje rozmiaru pliku audio.",
         "episode_missing_audio_mime": "W odcinku brakuje typu MIME audio."
-      }
+      },
+      "skipped_episodes_few": "{{count}} odcinek/odcinki zostaną pominięte w kanale, dopóki ich audio nie zostanie naprawione.",
+      "skipped_episodes_many": "{{count}} odcinek/odcinki zostaną pominięte w kanale, dopóki ich audio nie zostanie naprawione.",
+      "skipped_episodes_one": "{{count}} odcinek/odcinki zostaną pominięte w kanale, dopóki ich audio nie zostanie naprawione.",
+      "skipped_episodes_other": "{{count}} odcinek/odcinki zostaną pominięte w kanale, dopóki ich audio nie zostanie naprawione."
     },
     "stats": {
       "title": "Statystyki słuchaczy",
@@ -188,8 +198,14 @@
       "subscribers": "Subskrybenci",
       "top_episodes": "Najpopularniejsze odcinki",
       "listen_count": "{{count}} odsłuchań",
-      "last_days": "Aktywność słuchaczy obejmuje ostatnie {{days}} dni."
-    }
+      "last_days": "Aktywność słuchaczy obejmuje ostatnie {{days}} dni.",
+      "listen_count_few": "{{count}} odsłuchań",
+      "listen_count_many": "{{count}} odsłuchań",
+      "listen_count_one": "{{count}} odsłuchań",
+      "listen_count_other": "{{count}} odsłuchań"
+    },
+    "chapter_format_warning_few": "Linie rozdziałów {{count}} nie mają sygnatury czasowej i rozpoczynają się o 0:00.",
+    "chapter_format_warning_many": "Linie rozdziałów {{count}} nie mają sygnatury czasowej i rozpoczynają się o 0:00."
   },
   "fields": {
     "show": "Show",

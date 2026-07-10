@@ -11,6 +11,7 @@
  */
 
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Link } from 'react-router-dom';
 import { isValidElement } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -78,7 +79,7 @@ export function StatCard({
           <Skeleton role="status" aria-busy="true" aria-label={t('shared.loading')} className="mt-1 h-7 w-20 rounded bg-surface-tertiary" />
         ) : (
           <p className="mt-0.5 text-2xl font-semibold text-foreground">
-            {typeof value === 'number' ? value.toLocaleString() : value}
+            {typeof value === 'number' ? value.toLocaleString(getFormattingLocale()) : value}
           </p>
         )}
         {description && (

@@ -234,5 +234,9 @@
     "sent": "Coordinator notified — they will be in touch to help arrange contact.",
     "error": "We could not send your request just now. Please try again shortly."
   },
-  "composer_blocked_safeguarding": "Direct messaging is not available with this member. Use the option above to ask a coordinator to help arrange contact."
+  "composer_blocked_safeguarding": "Direct messaging is not available with this member. Use the option above to ask a coordinator to help arrange contact.",
+  "aria_conversation_unread_one": "Conversation with {{name}}, {{count}} unread",
+  "aria_conversation_unread_other": "Conversation with {{name}}, {{count}} unread",
+  "selected_members_one": "Selected ({{count}})",
+  "selected_members_other": "Selected ({{count}})"
 }

@@ -524,7 +524,34 @@
     "select_all_rows": "Select all rows",
     "no_data": "No data",
     "no_data_available": "No data available",
-    "select_row": "Select row {{id}}"
+    "select_row": "Select row {{id}}",
+    "total_count_one": "{{count}} total",
+    "total_count_other": "{{count}} total",
+    "statuses": {
+      "active": "Active",
+      "approved": "Approved",
+      "banned": "Banned",
+      "bulk_tenants_updated": "Tenants updated",
+      "bulk_users_moved": "Users moved",
+      "completed": "Completed",
+      "draft": "Draft",
+      "failed": "Failed",
+      "federation_lockdown": "Federation lockdown",
+      "federation_updated": "Federation updated",
+      "idle": "Idle",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "published": "Published",
+      "rejected": "Rejected",
+      "scheduled": "Scheduled",
+      "sent": "Sent",
+      "suspended": "Suspended",
+      "tenant_created": "Tenant created",
+      "tenant_updated": "Tenant updated",
+      "user_created": "User created",
+      "user_moved": "User moved",
+      "unknown": "Unknown"
+    }
   },
   "help_drawer": {
     "aria_label": "Help: {{title}}",
@@ -541,7 +568,11 @@
     "confirm_message": "Are you sure you want to {{action}} {{count}} items?",
     "destructive_warning": "This action cannot be undone.",
     "reason_label": "Reason",
-    "reason_placeholder": "Provide a reason for this action"
+    "reason_placeholder": "Provide a reason for this action",
+    "selected_count_one": "{{count}} selected",
+    "selected_count_other": "{{count}} selected",
+    "confirm_message_one": "Are you sure you want to {{action}} {{count}} items?",
+    "confirm_message_other": "Are you sure you want to {{action}} {{count}} items?"
   },
   "common": {
     "cancel": "Cancel"
@@ -586,5 +617,7 @@
       "group_exchanges": "Group Exchanges",
       "search": "Search"
     }
-  }
+  },
+  "support_requests_count_one": "{{count}} open support requests",
+  "support_requests_count_other": "{{count}} open support requests"
 }

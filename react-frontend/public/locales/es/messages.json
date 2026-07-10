@@ -234,5 +234,11 @@
     "sent": "Coordinador notificado — se pondrá en contacto contigo para ayudar a gestionar el contacto.",
     "error": "No pudimos enviar tu solicitud en este momento. Por favor, inténtalo de nuevo en breve."
   },
-  "composer_blocked_safeguarding": "La mensajería directa no está disponible con este miembro. Usa la opción anterior para pedir a un coordinador que ayude a gestionar el contacto."
+  "composer_blocked_safeguarding": "La mensajería directa no está disponible con este miembro. Usa la opción anterior para pedir a un coordinador que ayude a gestionar el contacto.",
+  "aria_conversation_unread_many": "Conversación con {{name}}, {{count}} sin leer",
+  "aria_conversation_unread_one": "Conversación con {{name}}, {{count}} sin leer",
+  "aria_conversation_unread_other": "Conversación con {{name}}, {{count}} sin leer",
+  "selected_members_many": "Seleccionados ({{count}})",
+  "selected_members_one": "Seleccionados ({{count}})",
+  "selected_members_other": "Seleccionados ({{count}})"
 }

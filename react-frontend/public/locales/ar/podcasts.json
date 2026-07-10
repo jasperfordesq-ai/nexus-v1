@@ -39,7 +39,15 @@
     "unsubscribed": "إظهار غير المتابعة.",
     "subscribe_failed": "تعذر تحديث تفضيلات المتابعة.",
     "episodes": "Episodes",
-    "no_episodes": "لم يتم نشر أي حلقات بعد."
+    "no_episodes": "لم يتم نشر أي حلقات بعد.",
+    "episode_count_few": "{{count}} episodes",
+    "episode_count_many": "{{count}} episodes",
+    "episode_count_two": "{{count}} episodes",
+    "episode_count_zero": "{{count}} episodes",
+    "follower_count_few": "{{count}} متابعين",
+    "follower_count_many": "{{count}} متابعين",
+    "follower_count_two": "{{count}} متابعين",
+    "follower_count_zero": "{{count}} متابعين"
   },
   "episode": {
     "title": "حلقة بودكاست",
@@ -74,7 +82,11 @@
       "full": "الحلقة كاملة",
       "trailer": "Trailer",
       "bonus": "Bonus"
-    }
+    },
+    "reactions_count_few": "{{count}} reactions",
+    "reactions_count_many": "{{count}} reactions",
+    "reactions_count_two": "{{count}} reactions",
+    "reactions_count_zero": "{{count}} reactions"
   },
   "player": {
     "unsupported": "متصفحك لا يدعم مشغل الصوت.",
@@ -178,7 +190,13 @@
         "episode_missing_audio_url": "توجد حلقة تفتقد رابط صوت HTTP صالحًا.",
         "episode_missing_audio_length": "توجد حلقة تفتقد حجم الملف الصوتي.",
         "episode_missing_audio_mime": "توجد حلقة تفتقد نوع MIME للصوت."
-      }
+      },
+      "skipped_episodes_few": "سيتم استبعاد {{count}} حلقة/حلقات من الخلاصة حتى يتم إصلاح الصوت.",
+      "skipped_episodes_many": "سيتم استبعاد {{count}} حلقة/حلقات من الخلاصة حتى يتم إصلاح الصوت.",
+      "skipped_episodes_one": "سيتم استبعاد {{count}} حلقة/حلقات من الخلاصة حتى يتم إصلاح الصوت.",
+      "skipped_episodes_other": "سيتم استبعاد {{count}} حلقة/حلقات من الخلاصة حتى يتم إصلاح الصوت.",
+      "skipped_episodes_two": "سيتم استبعاد {{count}} حلقة/حلقات من الخلاصة حتى يتم إصلاح الصوت.",
+      "skipped_episodes_zero": "سيتم استبعاد {{count}} حلقة/حلقات من الخلاصة حتى يتم إصلاح الصوت."
     },
     "stats": {
       "title": "إحصاءات المستمعين",
@@ -188,8 +206,18 @@
       "subscribers": "المشتركون",
       "top_episodes": "أكثر الحلقات استماعًا",
       "listen_count": "{{count}} استماعًا",
-      "last_days": "يغطي نشاط الاستماع آخر {{days}} يومًا."
-    }
+      "last_days": "يغطي نشاط الاستماع آخر {{days}} يومًا.",
+      "listen_count_few": "{{count}} استماعًا",
+      "listen_count_many": "{{count}} استماعًا",
+      "listen_count_one": "{{count}} استماعًا",
+      "listen_count_other": "{{count}} استماعًا",
+      "listen_count_two": "{{count}} استماعًا",
+      "listen_count_zero": "{{count}} استماعًا"
+    },
+    "chapter_format_warning_few": "{{count}} لا تحتوي أسطر الفصل على طابع زمني وستبدأ عند الساعة 0:00.",
+    "chapter_format_warning_many": "{{count}} لا تحتوي أسطر الفصل على طابع زمني وستبدأ عند الساعة 0:00.",
+    "chapter_format_warning_two": "{{count}} لا تحتوي أسطر الفصل على طابع زمني وستبدأ عند الساعة 0:00.",
+    "chapter_format_warning_zero": "{{count}} لا تحتوي أسطر الفصل على طابع زمني وستبدأ عند الساعة 0:00."
   },
   "fields": {
     "show": "Show",

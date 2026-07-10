@@ -147,7 +147,10 @@
         "date": "Data",
         "ip_address": "Endereço IP",
         "member_id": "Membro ID"
-      }
+      },
+      "truncated_many": "Mostrando os 200 registros mais recentes. Exporte o razão completo CSV para fazer download de todos os registros {{count}}.",
+      "truncated_one": "Mostrando os 200 registros mais recentes. Exporte o razão completo CSV para fazer download de todos os registros {{count}}.",
+      "truncated_other": "Mostrando os 200 registros mais recentes. Exporte o razão completo CSV para fazer download de todos os registros {{count}}."
     },
     "residency": {
       "article_16": "A divulgação transfronteiriça de dados pessoais é permitida se o país de destino garantir proteção de dados adequada reconhecida pelo Conselho Federal. Os estados membros Switzerland, EU/EEA e uma pequena lista de outros países se qualificam.",

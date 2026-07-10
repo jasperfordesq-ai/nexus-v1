@@ -208,11 +208,9 @@ export function VerifyIdentityPage() {
           <p className="text-theme-muted mb-4">
             {t('verify_identity.login_required')}
           </p>
-          <Link to={tenantPath('/login')}>
-            <Button color="primary">
-              {t('verify_identity.go_to_login')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath('/login')} color="primary">
+            {t('verify_identity.go_to_login')}
+          </Button>
         </GlassCard>
       </div>
     );
@@ -252,11 +250,9 @@ export function VerifyIdentityPage() {
             <p className="text-theme-muted mb-6">
               {t('verify_identity.active_subtitle')}
             </p>
-            <Link to={tenantPath('/dashboard')}>
-              <Button color="primary" className="w-full">
-                {t('verify_identity.go_to_dashboard')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/dashboard')} color="primary" className="w-full">
+              {t('verify_identity.go_to_dashboard')}
+            </Button>
           </GlassCard>
           <p className="text-center text-theme-subtle text-sm mt-6">{branding.name}</p>
         </motion.div>
@@ -294,11 +290,9 @@ export function VerifyIdentityPage() {
                 </div>
               </div>
             )}
-            <Link to={tenantPath('/login')}>
-              <Button variant="flat" className="w-full bg-theme-elevated text-theme-primary" startContent={<ArrowLeft className="w-4 h-4" />}>
-                {t('verify_identity.back_to_login')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/login')} variant="flat" className="w-full bg-theme-elevated text-theme-primary" startContent={<ArrowLeft className="w-4 h-4" />}>
+              {t('verify_identity.back_to_login')}
+            </Button>
           </GlassCard>
           <p className="text-center text-theme-subtle text-sm mt-6">{branding.name}</p>
         </motion.div>
@@ -336,11 +330,9 @@ export function VerifyIdentityPage() {
               >
                 {t('verify_identity.retry')}
               </Button>
-              <Link to={tenantPath('/login')}>
-                <Button variant="flat" className="w-full bg-theme-elevated text-theme-primary" startContent={<ArrowLeft className="w-4 h-4" />}>
-                  {t('verify_identity.back_to_login')}
-                </Button>
-              </Link>
+              <Button as={Link} to={tenantPath('/login')} variant="flat" className="w-full bg-theme-elevated text-theme-primary" startContent={<ArrowLeft className="w-4 h-4" />}>
+                {t('verify_identity.back_to_login')}
+              </Button>
             </div>
           </GlassCard>
           <p className="text-center text-theme-subtle text-sm mt-6">{branding.name}</p>

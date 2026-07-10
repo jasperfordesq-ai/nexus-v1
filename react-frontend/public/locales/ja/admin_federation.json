@@ -906,7 +906,9 @@
       "bulk_approved_count": "承認された{{count}}パートナーシップリクエスト",
       "bulk_approved_count_plural": "承認された{{count}}パートナーシップ リクエスト",
       "bulk_rejected_count": "{{count}}パートナーシップ要求が拒否されました",
-      "bulk_rejected_count_plural": "{{count}}パートナーシップ リクエストが拒否されました"
+      "bulk_rejected_count_plural": "{{count}}パートナーシップ リクエストが拒否されました",
+      "bulk_approved_count_other": "承認された{{count}}パートナーシップリクエスト",
+      "bulk_rejected_count_other": "{{count}}パートナーシップ要求が拒否されました"
     },
     "api_docs_tabs_aria": "API サンプル言語セレクター",
     "partnership_detail_tabs_aria": "パートナーシップの詳細セクション",
@@ -965,7 +967,15 @@
     "event_type_partnership_changed": "パートナーシップを更新しました",
     "event_type_partnership_terminated": "パートナーシップが終了しました",
     "event_type_profile_viewed": "プロフィールを閲覧しました",
-    "event_type_federated_search": "パートナー検索"
+    "event_type_federated_search": "パートナー検索",
+    "bulk_selected_other": "{{count}} が選択されました",
+    "directory_results_count_other": "{{count}} コミュニティが見つかりました",
+    "directory_member_count_other": "{{count}} メンバー",
+    "directory_more_topics_other": "+{{count}} 詳細",
+    "members_count_value_other": "{{count}} メンバー",
+    "topics_selected_count_other": "{{count}} トピックが選択されました",
+    "primary_topics_count_other": "{{count}} プライマリ",
+    "recent_errors_count_other": "最近のエラー: {{count}}"
   },
   "federation_admin_guidance": {
     "shared": {
@@ -1218,5 +1228,11 @@
       "load_audit_failed": "監査ログを読み込めませんでした。",
       "load_preview_failed": "プレビューを読み込めませんでした。"
     }
+  },
+  "api_docs": {
+    "aria_hmac_headers": "HMAC ヘッダー",
+    "aria_rate_limit_headers": "レート制限ヘッダー",
+    "aria_parameters": "APIパラメータ",
+    "aria_api_documentation_sections": "API ドキュメントのセクション"
   }
 }

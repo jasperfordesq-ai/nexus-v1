@@ -10,6 +10,7 @@
  * suggested rest days, and a mood check-in form.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from '@/lib/motion';
 
@@ -27,7 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Progress } from '@/components/ui/Progress';
 import { CardRowsSkeleton } from '@/components/ui/Skeletons';
 import { Textarea } from '@/components/ui/Textarea';
@@ -288,8 +289,8 @@ export function WellbeingTab() {
             {/* Hours This Week */}
             <GlassCard className="p-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center">
-                  <Activity className="w-5 h-5 text-indigo-400" aria-hidden="true" />
+                <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-accent" aria-hidden="true" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-theme-primary">{t('hours_abbrev', { hours: data.hours_this_week })}</p>
@@ -398,7 +399,7 @@ export function WellbeingTab() {
                       color="accent"
                       startContent={<Sun className="w-3 h-3" />}
                     >
-                      {parsed.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                      {parsed.toLocaleDateString(getFormattingLocale(), { weekday: 'short', month: 'short', day: 'numeric' })}
                     </Chip>
                   ))}
                 </div>
@@ -424,7 +425,7 @@ export function WellbeingTab() {
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-medium text-theme-primary">{getMoodLabel(checkin.mood, (key) => t(key))}</span>
                           <span className="text-xs text-theme-subtle">
-                            {new Date(checkin.created_at).toLocaleDateString(undefined, {
+                            {new Date(checkin.created_at).toLocaleDateString(getFormattingLocale(), {
                               month: 'short',
                               day: 'numeric',
                               hour: '2-digit',
@@ -486,10 +487,10 @@ export function WellbeingTab() {
       }}>
         <ModalContent>
           <ModalHeader className="text-theme-primary">
-            <div className="flex items-center gap-2">
+            <ModalHeading className="flex items-center gap-2">
               <Smile className="w-5 h-5 text-rose-400" aria-hidden="true" />
               {t('wellbeing.how_feeling')}
-            </div>
+            </ModalHeading>
           </ModalHeader>
           <ModalBody className="space-y-6">
             <p className="text-sm text-theme-muted">

@@ -37,7 +37,7 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronUp from 'lucide-react/icons/chevron-up';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/feedback';
-import { useToast, useTenant, useNotifications, useAuth } from '@/contexts';
+import { useToast, useTenant, useNotifications } from '@/contexts';
 import { usePusherOptional } from '@/contexts/PusherContext';
 import { api } from '@/lib/api';
 import { formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
@@ -67,8 +67,8 @@ export function NotificationsPage() {
   usePageTitle(t('page_title'));
   const { tenantPath } = useTenant();
   const toast = useToast();
-  const { user } = useAuth();
   const pusher = usePusherOptional();
+  const onNotification = pusher?.onNotification;
   const { refreshCounts, markAsRead: contextMarkAsRead, markAllAsRead: contextMarkAllAsRead } = useNotifications();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -152,14 +152,9 @@ export function NotificationsPage() {
     loadNotifications();
   }, [loadNotifications]);
 
-  // Subscribe to the user's private Pusher channel for live notification events
+  // Consume live notifications from the canonical shared user channel.
   useEffect(() => {
-    if (!pusher?.client || !user?.id) return;
-    const tenantId = pusher.tenantId;
-    if (!tenantId) return;
-
-    const channelName = `private-tenant.${tenantId}.user.${user.id}`;
-    const channel = pusher.client.subscribe(channelName);
+    if (!onNotification) return;
 
     const handleNewNotification = (data: Notification) => {
       setNotifications((prev) => {
@@ -170,18 +165,8 @@ export function NotificationsPage() {
       refreshCounts();
     };
 
-    channel.bind('notification.created', handleNewNotification);
-    channel.bind('new-notification', handleNewNotification);
-
-    return () => {
-      channel.unbind('notification.created', handleNewNotification);
-      channel.unbind('new-notification', handleNewNotification);
-      // Only unsubscribe if still connected (PusherContext manages the channel)
-      if (pusher.client && pusher.isConnected) {
-        pusher.client.unsubscribe(channelName);
-      }
-    };
-  }, [pusher, user?.id, refreshCounts]);
+    return onNotification(handleNewNotification);
+  }, [onNotification, refreshCounts]);
 
   async function markAsRead(id: number) {
     // The context performs the API call + updates the bell badge, and resolves
@@ -326,7 +311,7 @@ export function NotificationsPage() {
               {unreadCount > 0 ? t('unread_badge', { count: unreadCount }) : t('caught_up_badge')}
             </Chip>
             <h1 className="flex items-center gap-3 text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
-              <Bell className="h-8 w-8 text-indigo-500" aria-hidden="true" />
+              <Bell className="h-8 w-8 text-accent" aria-hidden="true" />
               {t('title')}
             </h1>
             <p className="mt-2 text-sm leading-6 text-theme-muted sm:text-base">{t('subtitle')}</p>
@@ -393,7 +378,7 @@ export function NotificationsPage() {
             <Button
               size="sm"
               variant="flat"
-              className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
+              className="bg-accent/10 text-accent dark:text-accent"
               onPress={handleUndoDelete}
             >
               {t('undo')}
@@ -409,7 +394,7 @@ export function NotificationsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error_title')}</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
-            className="bg-linear-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-linear-to-r from-accent to-accent-gradient-end text-white"
             onPress={loadNotifications}
           >
             {t('try_again')}
@@ -498,10 +483,10 @@ const iconMap: Record<string, { icon: React.ReactNode; color: string }> = {
 };
 
 const colorClasses: Record<string, string> = {
-  indigo: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400',
+  indigo: 'bg-accent/20 text-accent dark:text-accent',
   emerald: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
   amber: 'bg-amber-500/20 text-amber-600 dark:text-amber-400',
-  purple: 'bg-purple-500/20 text-purple-600 dark:text-purple-400',
+  purple: 'bg-accent/20 text-accent dark:text-accent',
   rose: 'bg-rose-500/20 text-rose-600 dark:text-rose-400',
   teal: 'bg-teal-500/20 text-teal-600 dark:text-teal-400',
   orange: 'bg-orange-500/20 text-orange-600 dark:text-orange-400',
@@ -530,7 +515,7 @@ const NotificationCard = memo(function NotificationCard({ notification, onMarkRe
   const { icon, color } = iconMap[notification.type] || { icon: <Bell className="w-5 h-5" aria-hidden="true" />, color: 'gray' };
 
   return (
-    <GlassCard className={`p-4 ${isUnread ? 'ring-1 ring-indigo-500/30' : ''} ${hasLink ? 'hover:bg-theme-hover/50 transition-colors' : ''}`}>
+    <GlassCard className={`p-4 ${isUnread ? 'ring-1 ring-accent/30' : ''} ${hasLink ? 'hover:bg-theme-hover/50 transition-colors' : ''}`}>
       <div className="flex items-start gap-3 sm:gap-4">
         <div
           className={`flex items-start gap-3 sm:gap-4 flex-1 min-w-0 ${hasLink ? 'cursor-pointer' : ''}`}

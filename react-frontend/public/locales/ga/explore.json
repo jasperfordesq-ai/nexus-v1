@@ -23,14 +23,24 @@
     "title": "Imeachtaí Le Teacht",
     "subtitle": "Bí páirteach i do phobal",
     "online": "Ar Líne",
-    "attending": "{{count}} ag freastal"
+    "attending": "{{count}} ag freastal",
+    "attending_few": "{{count}} ag freastal",
+    "attending_many": "{{count}} ag freastal",
+    "attending_one": "{{count}} ag freastal",
+    "attending_other": "{{count}} ag freastal",
+    "attending_two": "{{count}} ag freastal"
   },
   "active_groups": {
     "title": "Grúpaí Gníomhacha",
     "subtitle": "Ceangail le baill den tuairim chéanna",
     "members": "{{count}} ball",
     "view_group": "Féach ar Ghrúpa",
-    "view_group_named": "View group: {{name}}"
+    "view_group_named": "View group: {{name}}",
+    "members_few": "{{count}} ball",
+    "members_many": "{{count}} ball",
+    "members_one": "{{count}} ball",
+    "members_other": "{{count}} ball",
+    "members_two": "{{count}} ball"
   },
   "top_contributors": {
     "title": "Barrannpháirtithe",
@@ -56,12 +66,27 @@
     "subtitle": "Roinn do smaointe agus déan tionchar",
     "ideas_count": "{{count}} smaoineamh",
     "ends": "Ag críochnú {{date}}",
-    "progress": "Dul chun cinn an dúshláin"
+    "progress": "Dul chun cinn an dúshláin",
+    "ideas_count_few": "{{count}} smaoineamh",
+    "ideas_count_many": "{{count}} smaoineamh",
+    "ideas_count_one": "{{count}} smaoineamh",
+    "ideas_count_other": "{{count}} smaoineamh",
+    "ideas_count_two": "{{count}} smaoineamh"
   },
   "time_ago": {
     "just_now": "Díreach anois",
     "hours_ago": "{{count}}u ó shin",
-    "days_ago": "{{count}}l ó shin"
+    "days_ago": "{{count}}l ó shin",
+    "hours_ago_few": "{{count}}u ó shin",
+    "hours_ago_many": "{{count}}u ó shin",
+    "hours_ago_one": "{{count}}u ó shin",
+    "hours_ago_other": "{{count}}u ó shin",
+    "hours_ago_two": "{{count}}u ó shin",
+    "days_ago_few": "{{count}}l ó shin",
+    "days_ago_many": "{{count}}l ó shin",
+    "days_ago_one": "{{count}}l ó shin",
+    "days_ago_other": "{{count}}l ó shin",
+    "days_ago_two": "{{count}}l ó shin"
   },
   "error_loading": "Níorbh fhéidir leathanach Aimsigh a luchtú. D'fhéadfadh sé seo a bheith ina fhadhb shealadach.",
   "retry": "Atriail",
@@ -82,18 +107,38 @@
     "title": "Ón mBlag",
     "subtitle": "Na scéalta is déanaí ó do phobal",
     "read_time": "{{count}} nóim léitheoireachta",
-    "views": "{{count}} amharc"
+    "views": "{{count}} amharc",
+    "read_time_few": "{{count}} nóim léitheoireachta",
+    "read_time_many": "{{count}} nóim léitheoireachta",
+    "read_time_one": "{{count}} nóim léitheoireachta",
+    "read_time_other": "{{count}} nóim léitheoireachta",
+    "read_time_two": "{{count}} nóim léitheoireachta",
+    "views_few": "{{count}} amharc",
+    "views_many": "{{count}} amharc",
+    "views_one": "{{count}} amharc",
+    "views_other": "{{count}} amharc",
+    "views_two": "{{count}} amharc"
   },
   "volunteering": {
     "title": "Deiseanna Oibre Deonaí",
     "subtitle": "Déan difríocht i do phobal",
     "applications": "{{count}} iarratas",
-    "view_opportunity": "Féach ar Dheis"
+    "view_opportunity": "Féach ar Dheis",
+    "applications_few": "{{count}} iarratas",
+    "applications_many": "{{count}} iarratas",
+    "applications_one": "{{count}} iarratas",
+    "applications_other": "{{count}} iarratas",
+    "applications_two": "{{count}} iarratas"
   },
   "organisations": {
     "title": "Eagraíochtaí",
     "subtitle": "Comhpháirtithe pobail ag déanamh tionchar",
-    "opportunities": "{{count}} deis"
+    "opportunities": "{{count}} deis",
+    "opportunities_few": "{{count}} deis",
+    "opportunities_many": "{{count}} deis",
+    "opportunities_one": "{{count}} deis",
+    "opportunities_other": "{{count}} deis",
+    "opportunities_two": "{{count}} deis"
   },
   "polls": {
     "title": "Pobalbhreitheanna Gníomhacha",
@@ -102,19 +147,39 @@
     "options": "{{count}} rogha",
     "vote_now": "Vótáil Anois",
     "vote_now_for": "Vóta anois ar: {{question}}",
-    "closes": "Ag dúnadh {{date}}"
+    "closes": "Ag dúnadh {{date}}",
+    "options_few": "{{count}} rogha",
+    "options_many": "{{count}} rogha",
+    "options_one": "{{count}} rogha",
+    "options_other": "{{count}} rogha",
+    "options_two": "{{count}} rogha",
+    "votes_few": "{{count}} vóta",
+    "votes_many": "{{count}} vóta",
+    "votes_one": "{{count}} vóta",
+    "votes_other": "{{count}} vóta",
+    "votes_two": "{{count}} vóta"
   },
   "in_demand_skills": {
     "title": "Scileanna atá ag Teastáil",
     "subtitle": "Na scileanna is mó éileamh i do phobal",
     "requested": "{{count}} ag iarraidh",
     "offered": "{{count}} ag tairiscint",
-    "you_can_help": "Is féidir leat cabhrú!"
+    "you_can_help": "Is féidir leat cabhrú!",
+    "requested_few": "{{count}} ag iarraidh",
+    "requested_many": "{{count}} ag iarraidh",
+    "requested_one": "{{count}} ag iarraidh",
+    "requested_other": "{{count}} ag iarraidh",
+    "requested_two": "{{count}} ag iarraidh"
   },
   "resources": {
     "title": "Acmhainní Roghnaithe",
     "subtitle": "Treoracha agus ábhair do do phobal",
-    "views": "{{count}} amharc"
+    "views": "{{count}} amharc",
+    "views_few": "{{count}} amharc",
+    "views_many": "{{count}} amharc",
+    "views_one": "{{count}} amharc",
+    "views_other": "{{count}} amharc",
+    "views_two": "{{count}} amharc"
   },
   "jobs": {
     "title": "Deiseanna Fostaíochta",

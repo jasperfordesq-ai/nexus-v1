@@ -12,6 +12,7 @@
  * awards the member the "Verified residency" badge.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -53,7 +54,7 @@ function statusColor(status: ResidencyVerification['status']): 'warning' | 'succ
 
 const formatDate = (value?: string | null) =>
   value
-    ? new Date(value).toLocaleDateString(undefined, {
+    ? new Date(value).toLocaleDateString(getFormattingLocale(), {
         year: 'numeric',
         month: 'short',
         day: 'numeric',

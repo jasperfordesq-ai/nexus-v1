@@ -90,7 +90,9 @@
     "members_count": "{{count}} members",
     "empty": "You haven't joined any groups yet",
     "empty_description": "Groups help you follow shared interests, projects, and local circles.",
-    "discover": "Discover groups"
+    "discover": "Discover groups",
+    "members_count_one": "{{count}} members",
+    "members_count_other": "{{count}} members"
   },
   "events": {
     "online_event": "Online event",
@@ -106,7 +108,9 @@
     "xp_progress": "XP Progress",
     "start_earning": "Start earning XP by participating in the community!",
     "streak_days_one": "{{count}} day",
-    "streak_days_other": "{{count}} days"
+    "streak_days_other": "{{count}} days",
+    "xp_value_one": "{{count}} XP",
+    "xp_value_other": "{{count}} XP"
   },
   "aria": {
     "loading_listings": "Loading listings",
@@ -150,5 +154,9 @@
       "active": "Active"
     },
     "view_all": "View all exchanges"
-  }
+  },
+  "likes_count_one": "{{count}} likes",
+  "likes_count_other": "{{count}} likes",
+  "comments_count_one": "{{count}} comments",
+  "comments_count_other": "{{count}} comments"
 }

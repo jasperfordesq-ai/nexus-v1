@@ -5,7 +5,8 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@/test/test-utils';
-import { Popover, PopoverTrigger, PopoverContent } from './Popover';
+import { Popover, PopoverTrigger, PopoverContent, PopoverHeading } from './Popover';
+import { Button } from './Button';
 
 vi.mock('@/contexts', () => ({
   useTheme: () => ({ resolvedTheme: 'light', theme: 'system', toggleTheme: vi.fn(), setTheme: vi.fn() }),
@@ -36,6 +37,7 @@ describe('Popover', () => {
           <button>Open Popover</button>
         </PopoverTrigger>
         <PopoverContent>
+          <PopoverHeading className="sr-only">Popover body</PopoverHeading>
           <p>Popover body</p>
         </PopoverContent>
       </Popover>
@@ -51,6 +53,7 @@ describe('Popover', () => {
           <button>Toggle</button>
         </PopoverTrigger>
         <PopoverContent>
+          <PopoverHeading className="sr-only">Hidden popover</PopoverHeading>
           <p>Should be hidden</p>
         </PopoverContent>
       </Popover>
@@ -67,6 +70,7 @@ describe('Popover', () => {
           <button>Trigger</button>
         </PopoverTrigger>
         <PopoverContent>
+          <PopoverHeading className="sr-only">Default open popover</PopoverHeading>
           <p>Default open content</p>
         </PopoverContent>
       </Popover>
@@ -74,6 +78,7 @@ describe('Popover', () => {
 
     // HeroUI Popover renders the portal into document.body
     expect(screen.getByText('Default open content')).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Default open popover' })).toBeInTheDocument();
   });
 
   it('opens popover content when controlled isOpen becomes true', () => {
@@ -89,6 +94,7 @@ describe('Popover', () => {
           <button>Click me</button>
         </PopoverTrigger>
         <PopoverContent>
+          <PopoverHeading className="sr-only">Controlled popover</PopoverHeading>
           <p>Click-revealed content</p>
         </PopoverContent>
       </Popover>
@@ -102,6 +108,7 @@ describe('Popover', () => {
           <button>Click me</button>
         </PopoverTrigger>
         <PopoverContent>
+          <PopoverHeading className="sr-only">Controlled popover</PopoverHeading>
           <p>Click-revealed content</p>
         </PopoverContent>
       </Popover>
@@ -117,6 +124,7 @@ describe('Popover', () => {
           <button>Arrow trigger</button>
         </PopoverTrigger>
         <PopoverContent showArrow>
+          <PopoverHeading className="sr-only">Arrow popover</PopoverHeading>
           <p>Arrow content</p>
         </PopoverContent>
       </Popover>
@@ -139,6 +147,7 @@ describe('Popover', () => {
           <button>Toggle</button>
         </PopoverTrigger>
         <PopoverContent>
+          <PopoverHeading className="sr-only">Toggleable popover</PopoverHeading>
           <p>Toggleable content</p>
         </PopoverContent>
       </Popover>
@@ -152,6 +161,7 @@ describe('Popover', () => {
           <button>Toggle</button>
         </PopoverTrigger>
         <PopoverContent>
+          <PopoverHeading className="sr-only">Toggleable popover</PopoverHeading>
           <p>Toggleable content</p>
         </PopoverContent>
       </Popover>
@@ -168,6 +178,7 @@ describe('Popover', () => {
           <button>Placed trigger</button>
         </PopoverTrigger>
         <PopoverContent>
+          <PopoverHeading className="sr-only">Placed popover</PopoverHeading>
           <span>Placed content</span>
         </PopoverContent>
       </Popover>
@@ -176,18 +187,92 @@ describe('Popover', () => {
     expect(screen.getByText('Placed content')).toBeInTheDocument();
   });
 
-  it('renders a plain element trigger (non-element child) via PopoverTrigger wrapper', () => {
-    // When PopoverTrigger children is NOT a valid React element, it renders
-    // via HeroUIPopover.Trigger — smoke test that branch
+  it('honours shouldBlockScroll=false through the supported non-modal contract', () => {
     render(
-      <Popover defaultOpen>
-        <PopoverTrigger>Open</PopoverTrigger>
+      <Popover shouldBlockScroll={false} defaultOpen>
+        <PopoverTrigger>
+          <button>Non-blocking trigger</button>
+        </PopoverTrigger>
         <PopoverContent>
+          <PopoverHeading className="sr-only">Non-blocking popover</PopoverHeading>
+          <p>Non-blocking content</p>
+        </PopoverContent>
+      </Popover>,
+    );
+
+    expect(screen.getByText('Non-blocking content')).toBeInTheDocument();
+    expect(document.documentElement.style.overflow).not.toBe('hidden');
+  });
+
+  it('retains React Aria scroll locking when shouldBlockScroll=true', () => {
+    render(
+      <Popover shouldBlockScroll defaultOpen>
+        <PopoverTrigger>
+          <button>Blocking trigger</button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <PopoverHeading className="sr-only">Blocking popover</PopoverHeading>
+          <p>Blocking content</p>
+        </PopoverContent>
+      </Popover>,
+    );
+
+    expect(screen.getByText('Blocking content')).toBeInTheDocument();
+    expect(document.documentElement.style.overflow).toBe('hidden');
+  });
+
+  it('adapts a non-pressable element through the official Popover.Trigger', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // Non-pressable content uses HeroUI's documented Trigger wrapper.
+    render(
+      <Popover defaultOpen shouldBlockScroll={false}>
+        <PopoverTrigger><span>Open</span></PopoverTrigger>
+        <PopoverContent>
+          <PopoverHeading className="sr-only">Text trigger popover</PopoverHeading>
           <p>Text trigger content</p>
         </PopoverContent>
       </Popover>
     );
 
+    expect(screen.getByRole('button', { name: 'Open' })).toBeInTheDocument();
     expect(screen.getByText('Text trigger content')).toBeInTheDocument();
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('PressResponder'));
+    warn.mockRestore();
+  });
+
+  it('adapts a native button without PressResponder warnings or nested buttons', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <Popover>
+        <PopoverTrigger><button>Native trigger</button></PopoverTrigger>
+        <PopoverContent>
+          <PopoverHeading className="sr-only">Native trigger popover</PopoverHeading>
+          <p>Body</p>
+        </PopoverContent>
+      </Popover>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Native trigger' });
+    expect(button.querySelector('button')).toBeNull();
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('PressResponder'));
+    warn.mockRestore();
+  });
+
+  it('uses a project Button directly as the documented pressable trigger', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <Popover>
+        <PopoverTrigger><Button>Project trigger</Button></PopoverTrigger>
+        <PopoverContent>
+          <PopoverHeading className="sr-only">Project trigger popover</PopoverHeading>
+          <p>Body</p>
+        </PopoverContent>
+      </Popover>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Project trigger' });
+    expect(button.querySelector('button')).toBeNull();
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('PressResponder'));
+    warn.mockRestore();
   });
 });

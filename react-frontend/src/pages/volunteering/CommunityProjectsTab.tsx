@@ -7,6 +7,7 @@
  * CommunityProjectsTab - Browse and propose community volunteer projects
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from '@/lib/motion';
 
@@ -287,7 +288,7 @@ export function CommunityProjectsTab() {
                   {project.proposed_date && (
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" aria-hidden="true" />
-                      {new Date(project.proposed_date).toLocaleDateString()}
+                      {new Date(project.proposed_date).toLocaleDateString(getFormattingLocale())}
                     </span>
                   )}
                   {project.target_volunteers != null && (
@@ -301,7 +302,7 @@ export function CommunityProjectsTab() {
                 {/* Support row */}
                 <div className="mt-auto flex items-center justify-between pt-2 border-t border-theme-default">
                   <span className="text-xs text-theme-subtle">
-                    {new Date(project.created_at).toLocaleDateString()}
+                    {new Date(project.created_at).toLocaleDateString(getFormattingLocale())}
                   </span>
                   <Button
                     size="sm"

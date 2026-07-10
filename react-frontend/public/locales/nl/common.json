@@ -73,7 +73,9 @@
     "features": "Functies",
     "courses": "Cursussen",
     "podcasts": "Podcasts",
-    "switch_community": "Van gemeenschap wisselen"
+    "switch_community": "Van gemeenschap wisselen",
+    "unread_notifications_one": "{{count}} ongelezen meldingen",
+    "unread_notifications_other": "{{count}} ongelezen meldingen"
   },
   "landing_links": {
     "title": "Verken deze gemeenschap",
@@ -239,6 +241,7 @@
     "accessibility_alpha_new_tab": "Toegankelijkheid (alpha) in een nieuw tabblad openen",
     "menu_opened": "Navigatiemenu geopend",
     "close": "Sluiten",
+    "clear_input": "Invoer wissen",
     "scroll_to_top": "Naar boven scrollen",
     "breadcrumb": "Kruimelpad"
   },
@@ -367,7 +370,13 @@
     "load_failed": "Kan leden niet laden",
     "load_more_failed": "Kan meer leden niet laden",
     "my_profile": "Mijn profiel",
-    "load_more_count": "Meer laden ({{remaining}} resterend)"
+    "load_more_count": "Meer laden ({{remaining}} resterend)",
+    "results_count_one": "{{count}} leden getoond",
+    "results_count_other": "{{count}} leden getoond",
+    "hours_exchanged_aria_one": "{{count}} uur uitgewisseld",
+    "hours_exchanged_aria_other": "{{count}} uur uitgewisseld",
+    "hours_short_one": "{{count}} u",
+    "hours_short_other": "{{count}} u"
   },
   "error_boundary": {
     "title": "Er ging iets mis",
@@ -879,7 +888,11 @@
     "user_menu_trigger": "Gebruikersmenu voor {{name}}",
     "feed_sidebar": "Zijbalk van de community",
     "filter_panel": "Filterpaneel",
-    "remove": "Remove"
+    "remove": "Remove",
+    "location_results_one": "{{count}} adressuggesties beschikbaar",
+    "location_results_other": "{{count}} adressuggesties beschikbaar",
+    "search_results_one": "{{count}} resultaten beschikbaar",
+    "search_results_other": "{{count}} resultaten beschikbaar"
   },
   "skills": {
     "browse_title": "Gemeenschaps vaardigheidsgids",
@@ -929,7 +942,9 @@
     "aria_clear_search": "Zoekopdracht wissen",
     "aria_close_members_list": "Ledenlijst sluiten",
     "category_optional": "Categorie (optioneel)",
-    "proficiency_level": "Vaardigheidsniveau"
+    "proficiency_level": "Vaardigheidsniveau",
+    "aria_results_one": "{{count}} vaardigheidssuggesties beschikbaar",
+    "aria_results_other": "{{count}} vaardigheidssuggesties beschikbaar"
   },
   "hours_display_one": "{{count}} uur",
   "hours_display_other": "{{count}} uren",
@@ -1108,7 +1123,9 @@
     },
     "errors": {
       "load_failed": "Clubs konden niet worden geladen. Probeer het opnieuw."
-    }
+    },
+    "member_count_one": "{{count}} leden",
+    "member_count_other": "{{count}} leden"
   },
   "feed": {
     "personalisation": {
@@ -1191,7 +1208,9 @@
       "format": "Formaat",
       "size": "Grootte",
       "count": "{{count}} exporteert",
-      "empty": "Je hebt je gegevens nog niet geëxporteerd."
+      "empty": "Je hebt je gegevens nog niet geëxporteerd.",
+      "count_one": "{{count}} exporteert",
+      "count_other": "{{count}} exporteert"
     },
     "errors": {
       "rate_limit": "Je kunt 5 exports per dag aanvragen. Probeer het morgen opnieuw.",
@@ -1436,7 +1455,9 @@
     "created_success": "Pushcampagne succesvol aangemaakt.",
     "create_error": "Pushcampagne kon niet worden aangemaakt. Probeer opnieuw.",
     "submit_create": "Campagne aanmaken",
-    "feature_disabled": "Pushcampagnes zijn niet beschikbaar voor uw account."
+    "feature_disabled": "Pushcampagnes zijn niet beschikbaar voor uw account.",
+    "estimate_result_one": "Geschat bereik: {{count}} leden",
+    "estimate_result_other": "Geschat bereik: {{count}} leden"
   },
   "push_campaign_opt_in": "Gepromote pushmeldingen ontvangen",
   "push_campaign_opt_in_description": "Sta lokale bedrijven en organisaties toe u gerichte pushmeldingen te sturen. U kunt zich op elk moment afmelden.",
@@ -1505,7 +1526,9 @@
       "view_redemptions": "Inwisselingen bekijken",
       "usage_count": "{{count}} keer gebruikt",
       "saved": "Kortingsbon opgeslagen",
-      "deleted": "Kortingsbon verwijderd"
+      "deleted": "Kortingsbon verwijderd",
+      "usage_count_one": "{{count}} keer gebruikt",
+      "usage_count_other": "{{count}} keer gebruikt"
     },
     "qr_code_alt": "QR-code"
   },
@@ -1989,7 +2012,10 @@
     "error": "Er is iets misgegaan",
     "someone": "Iemand",
     "unknown_user": "Gebruiker",
-    "not_available": "Niet beschikbaar"
+    "not_available": "Niet beschikbaar",
+    "edit": "Bewerken",
+    "collapse": "Samenvouwen",
+    "expand": "Uitbreiden"
   },
   "verein_federation": {
     "panel_title": "Federatie met andere clubs",
@@ -2063,7 +2089,9 @@
       "today": "Vandaag",
       "from_label": "Van",
       "load_failed": "Kon kalender niet laden."
-    }
+    },
+    "char_count_one": "{{count}}/500",
+    "char_count_other": "{{count}}/500"
   },
   "oauth": {
     "continue_with_google": "Doorgaan met Google",
@@ -2167,7 +2195,12 @@
       "generate_failed": "Genereren mislukt.",
       "reminder_failed": "Kon herinnering niet verzenden.",
       "waive_failed": "Kon contributies niet kwijtschelden."
-    }
+    },
+    "admin_bulk_reminder_sent_one": "{{count}} herinneringen verzonden.",
+    "admin_bulk_reminder_sent_other": "{{count}} herinneringen verzonden.",
+    "admin_overdue_count_one": "{{count}} lid/leden hebben achterstallige contributies.",
+    "admin_overdue_count_other": "{{count}} lid/leden hebben achterstallige contributies.",
+    "badge_none": "Geen contributie"
   },
   "collections": {
     "save": "Opslaan",
@@ -2311,7 +2344,9 @@
   },
   "max_characters": "max. {{count}} tekens",
   "map": {
-    "listings_here": "{{count}} aanbiedingen hier"
+    "listings_here": "{{count}} aanbiedingen hier",
+    "listings_here_one": "{{count}} aanbiedingen hier",
+    "listings_here_other": "{{count}} aanbiedingen hier"
   },
   "time_credits_short": "{{count}}u tegoeden",
   "level_plain": "Niveau {{level}}",
@@ -2329,5 +2364,707 @@
     "scheme_dark": "Dark",
     "scheme_system": "System"
   },
-  "alpha_badge": "Alfa"
+  "alpha_badge": "Alfa",
+  "wellbeing": {
+    "mood_struggling": "Worstelend",
+    "mood_low": "Laag",
+    "mood_okay": "Oké",
+    "mood_good": "Goed",
+    "mood_great": "Geweldig",
+    "mood_unknown": "Onbekend",
+    "score_excellent": "Uitstekend",
+    "score_good": "Goed",
+    "score_fair": "Eerlijk",
+    "score_needs_attention": "Heeft aandacht nodig",
+    "score_critical": "Kritisch"
+  },
+  "credentials": {
+    "status_pending": "In afwachting van beoordeling",
+    "status_verified": "Geverifieerd",
+    "status_expired": "Verlopen",
+    "status_rejected": "Afgewezen"
+  },
+  "nexus_score": {
+    "tier_threshold": "{{tier}} ({{min}}+)"
+  },
+  "application_status": {
+    "applied": "Toegepast",
+    "pending": "In afwachting",
+    "screening": "Screening",
+    "reviewed": "Beoordeeld",
+    "interview": "Sollicitatiegesprek",
+    "offer": "Aanbod",
+    "accepted": "Geaccepteerd",
+    "rejected": "Afgewezen",
+    "withdrawn": "Ingetrokken"
+  },
+  "salary": {
+    "currency_eur": "EUR",
+    "min_only": "Van {{min}}",
+    "max_only": "Tot {{max}}"
+  },
+  "salary_display": "{{min}} – {{max}}",
+  "activity": {
+    "action_listing": "deelde een aanbieding",
+    "action_event": "geplaatst over een evenement",
+    "action_poll": "heeft een poll aangemaakt",
+    "action_goal": "heeft een nieuw doel gesteld",
+    "action_post": "heeft een bericht gedeeld"
+  },
+  "hours_short_one": "{{count}} u",
+  "hours_short_other": "{{count}} u",
+  "time_credits_short_one": "{{count}}u tegoeden",
+  "time_credits_short_other": "{{count}}u tegoeden",
+  "question_required": "Verplicht",
+  "yes": "Ja",
+  "no": "No",
+  "likert_options": {
+    "1": "Zeer ontevreden",
+    "2": "Ontevreden",
+    "3": "Neutraal",
+    "4": "Tevreden",
+    "5": "Zeer tevreden"
+  },
+  "required_error": "Beantwoord alle verplichte vragen.",
+  "already_responded": "U heeft al deelgenomen aan deze enquête.",
+  "submitting": "Verzenden…",
+  "time_ago_just_now": "Zojuist",
+  "time_ago_hours_one": "{{count}}u geleden",
+  "time_ago_hours_other": "{{count}}u geleden",
+  "time_ago_days_one": "{{count}}d geleden",
+  "time_ago_days_other": "{{count}}d geleden",
+  "providers": {
+    "filter_spitex": "Spitex",
+    "filter_tagesstte": "Dagcentra",
+    "filter_private": "Privé",
+    "filter_verein": "Verenigingen",
+    "filter_volunteer": "Vrijwilligers",
+    "verified_badge": "Geverifieerd",
+    "call_aria": "Bel provider op{{phone}}",
+    "email_aria": "E-mailprovider bij{{email}}",
+    "website_aria": "Bezoek de website van de provider{{url}}",
+    "website": "Website"
+  },
+  "caregiver": {
+    "burnout_high": "Hoge belasting voor zorgverleners:{{hours}}-uren deze week",
+    "burnout_moderate": "Matige belasting:{{hours}}-uren deze week",
+    "burnout_warning": "Je hebt deze week veel uren geregistreerd. Zorg ervoor dat je rust neemt",
+    "upcoming_care": "Aankomende zorg",
+    "no_upcoming_care": "Nog geen geplande ondersteuning",
+    "recent_care": "Recente zorg",
+    "no_recent_care": "Nog geen recente zorglogboeken",
+    "view_schedule": "Bekijk het zorgschema",
+    "request_on_behalf": "Vraag namens hen hulp aan",
+    "hours_short": "{{hours}}u"
+  },
+  "cover": {
+    "title": "Dekking zorg"
+  },
+  "viewer": {
+    "time_just_now": "Zojuist",
+    "time_minutes_ago_one": "{{count}}m geleden",
+    "time_minutes_ago_other": "{{count}}m geleden",
+    "time_hours_ago_one": "{{count}}u geleden",
+    "time_hours_ago_other": "{{count}}u geleden",
+    "time_days_ago_one": "{{count}}d geleden",
+    "time_days_ago_other": "{{count}}d geleden"
+  },
+  "biometric": {
+    "label_builtin": "Ingebouwde authenticator",
+    "label_external": "Externe authenticator",
+    "label_passkey": "Wachtwoord",
+    "platform_windows_title": "Instellen op Windows",
+    "platform_windows_step1": "Klik op \"Deze pc\" om een passkey aan te maken die op deze computer is opgeslagen. Je bevestigt met je Windows Hello-pincode, vingerafdruk of gezicht.",
+    "platform_windows_step2": "Vereiste: Je moet Windows Hello eerst instellen. Ga naar Windows-instellingen > Accounts > Aanmeldopties > Pincode om dit in te stellen.",
+    "platform_windows_step3": "Of klik op \"Telefoon, tablet of beveiligingssleutel\" om een QR-code te scannen met je telefoon.",
+    "platform_windows_step4": "Om ook passkeys op je telefoon in te stellen, open je deze pagina op je telefoon en tik je op \"Dit apparaat\".",
+    "platform_mac_title": "Instellen op Mac",
+    "platform_mac_step1": "Klik op \"Deze Mac\" — je browser vraagt om Touch ID of je Mac-wachtwoord.",
+    "platform_mac_step2": "De passkey synchroniseert via iCloud Sleutelhanger naar je iPhone, iPad en andere Macs automatisch.",
+    "platform_mac_step3": "Of klik op \"Telefoon, tablet of beveiligingssleutel\" om een ander apparaat te registreren.",
+    "platform_iphone_title": "Instellen op iPhone",
+    "platform_iphone_step1": "Tik op \"Dit apparaat\" om een passkey aan te maken met Face ID of Touch ID.",
+    "platform_iphone_step2": "De passkey wordt opgeslagen in iCloud Sleutelhanger en werkt op al je Apple-apparaten.",
+    "platform_iphone_step3": "Je kunt ook tikken op \"Telefoon, tablet of beveiligingssleutel\" om een beveiligingssleutel te registreren.",
+    "platform_ipad_title": "Instellen op iPad",
+    "platform_ipad_step1": "Tik op \"Dit apparaat\" om een passkey aan te maken met Face ID of Touch ID.",
+    "platform_ipad_step2": "De passkey wordt opgeslagen in iCloud Sleutelhanger en werkt op al je Apple-apparaten.",
+    "platform_ipad_step3": "Je kunt ook tikken op \"Telefoon, tablet of beveiligingssleutel\" om een beveiligingssleutel te registreren.",
+    "platform_android_title": "Instellen op Android",
+    "platform_android_step1": "Tik op \"Dit apparaat\" om een passkey aan te maken met je vingerafdruk, gezicht of schermvergrendeling.",
+    "platform_android_step2": "De passkey wordt opgeslagen in Google Wachtwoordbeheer en werkt op al je Android-apparaten en Chrome-browsers.",
+    "platform_android_step3": "Je kunt ook tikken op \"Telefoon, tablet of beveiligingssleutel\" om een beveiligingssleutel te registreren.",
+    "platform_linux_title": "Instellen op Linux",
+    "platform_linux_step1": "Klik op \"Dit apparaat\" — je browser gebruikt de ingebouwde passkey-beheerder.",
+    "platform_linux_step2": "Of klik op \"Telefoon, tablet of beveiligingssleutel\" om een USB-beveiligingssleutel te gebruiken of een QR-code te scannen met je telefoon.",
+    "platform_unknown_title": "Een passkey instellen",
+    "platform_unknown_step1": "Klik op \"Dit apparaat\" om een passkey aan te maken op het apparaat dat je nu gebruikt.",
+    "platform_unknown_step2": "Of klik op \"Telefoon, tablet of beveiligingssleutel\" om een ander apparaat te registreren."
+  },
+  "discussion": {
+    "delete": "Verwijderen",
+    "reply": "Antwoord"
+  },
+  "page_builder": {
+    "starter": {
+      "kicker": "Community-pagina",
+      "hero_title": "Bouw een prachtige aangepaste pagina",
+      "hero_body": "Gebruik secties, kaarten, afbeeldingen en call-to-actions om het verhaal van uw huurder te vertellen.",
+      "cta": "Verken de gemeenschap",
+      "card_one_title": "Deel wat belangrijk is",
+      "card_one_body": "Introduceer projecten, diensten, partners, rapporten, beleid of lokale kansen.",
+      "card_two_title": "Houd het responsief",
+      "card_two_body": "Bekijk een voorbeeld van desktop, tablet en mobiel terwijl u ontwerpt."
+    },
+    "blocks": {
+      "category_nexus": "NEXUS-secties",
+      "hero_label": "Heldensectie",
+      "hero_kicker": "Gemeenschapsverhaal",
+      "hero_title": "Een paginakop met aanwezigheid",
+      "hero_body": "Voeg een duidelijke introductie toe die specifiek aanvoelt voor uw tijdbank.",
+      "hero_cta": "Oproep tot actie",
+      "feature_grid_label": "Functieraster",
+      "feature_one_title": "Kenmerk één",
+      "feature_one_body": "Beschrijf een resultaat, dienst of belofte.",
+      "feature_two_title": "Kenmerk twee",
+      "feature_two_body": "Houd de kopie concreet en makkelijk scanbaar.",
+      "story_band_label": "Verhaalband",
+      "story_kicker": "Lokale impact",
+      "story_title": "Vertel het verhaal in een royale contentband",
+      "story_body": "Gebruik dit voor rapporten, programma-uitleg, partnerpagina's of begeleiding."
+    }
+  },
+  "newsletter_content_editor": {
+    "tip_device_desktop": "Bureaubladweergave",
+    "tip_device_tablet": "Tabletweergave",
+    "tip_device_mobile": "Mobiele weergave",
+    "toolbar_label": "Werkbalk van de e-mailbouwer",
+    "tip_undo": "Ongedaan maken",
+    "tip_redo": "Opnieuw",
+    "tip_borders": "Randen in-/uitschakelen",
+    "tip_code": "Code bekijken",
+    "tip_clear": "Canvas wissen"
+  },
+  "newsletter_builder": {
+    "insert_image": "Afbeelding invoegen",
+    "library_title": "Beeldbibliotheek",
+    "preview": "Voorbeeld",
+    "templates": "Sjablonen",
+    "preview_title": "E-mailvoorbeeld",
+    "preview_device_label": "Voorbeeldapparaat",
+    "preview_desktop": "Bureaublad",
+    "preview_mobile": "Mobiel"
+  },
+  "dismiss_reasons": {
+    "too_far": "Te ver weg",
+    "not_my_skills": "Niet mijn vaardigheden",
+    "not_interested": "Niet geïnteresseerd"
+  },
+  "qa": {
+    "upvote_aria": "Omhoog stemmen",
+    "vote_count_aria_one": "{{count}} stemmen",
+    "vote_count_aria_other": "{{count}} stemmen",
+    "downvote_aria": "Omlaag stemmen"
+  },
+  "challenges": {
+    "time_ended": "Beëindigd",
+    "time_remaining_days_hours": "Nog {{days}}d {{hours}}u",
+    "time_remaining_hours_minutes": "Nog {{hours}}u {{minutes}}m"
+  },
+  "max_characters_one": "max. {{count}} tekens",
+  "max_characters_other": "max. {{count}} tekens",
+  "volunteering": {
+    "time_just_now": "Zojuist",
+    "time_minutes_ago_one": "{{count}}minuut geleden",
+    "time_minutes_ago_other": "{{count}}minuut geleden",
+    "time_hours_ago_one": "{{count}}uur geleden",
+    "time_hours_ago_other": "{{count}}uur geleden",
+    "time_days_ago_one": "{{count}}dag geleden",
+    "time_days_ago_other": "{{count}}dag geleden",
+    "wellbeing_user_number": "Vrijwilliger #{{id}}",
+    "wellbeing_unknown_user": "Onbekende vrijwilliger",
+    "wellbeing_unknown_type": "Welzijnszorg"
+  },
+  "users": {
+    "action_edit": "Bewerken",
+    "action_approve": "Goedkeuren",
+    "action_suspend": "Opschorten",
+    "action_ban": "Verbod",
+    "action_reactivate": "Opnieuw activeren",
+    "action_reset_2fa": "2FA opnieuw instellen",
+    "action_permissions": "Machtigingen",
+    "action_impersonate": "Doe na",
+    "action_delete": "Verwijderen",
+    "actions_menu": "Actiemenu"
+  },
+  "system": {
+    "never": "Nooit",
+    "just_now": "Zojuist",
+    "minutes_ago_one": "{{count}}m geleden",
+    "minutes_ago_other": "{{count}}m geleden",
+    "hours_ago_one": "{{count}}uur geleden",
+    "hours_ago_other": "{{count}}uur geleden",
+    "days_ago_one": "{{count}}d geleden",
+    "days_ago_other": "{{count}}d geleden"
+  },
+  "super": {
+    "tenant_actions": "Acties van huurders",
+    "action_view": "Bekijk",
+    "disable_hub": "Hub uitschakelen",
+    "enable_hub": "Hub inschakelen",
+    "deactivate": "Deactiveren",
+    "reactivate": "Opnieuw activeren",
+    "status_active_label": "Active Label",
+    "status_inactive_label": "Inactive Label",
+    "hub": "Naaf"
+  },
+  "help_faqs": {
+    "actions_aria": "FAQ-acties"
+  },
+  "groups": {
+    "policy_features": "Beleidsfuncties",
+    "policy_moderation": "Beleidsmoderatie",
+    "policy_membership": "Beleid lidmaatschap",
+    "policy_creation": "Beleidscreatie",
+    "policy_content": "Beleidsinhoud",
+    "policy_notifications": "Beleidsmeldingen"
+  },
+  "gamification": {
+    "label_campaign_actions": "Campagne-acties",
+    "edit": "Bewerken",
+    "activate": "Activeer",
+    "pause": "Pauze",
+    "resume": "Hervatten",
+    "delete": "Verwijderen"
+  },
+  "federation": {
+    "event_type_message_sent": "Bericht verzonden",
+    "event_type_transaction": "Transactie",
+    "event_type_connection": "Verbindingsverzoek",
+    "event_type_listing_shared": "Lijst gedeeld",
+    "event_type_listing_unshared": "Advertentie niet gedeeld",
+    "event_type_listing_viewed": "Advertentie bekeken",
+    "event_type_partnership_requested": "Partnerschap aangevraagd",
+    "event_type_partnership_approved": "Partnerschap goedgekeurd",
+    "event_type_partnership_rejected": "Het partnerschap is afgenomen",
+    "event_type_partnership_changed": "Partnerschap bijgewerkt",
+    "event_type_partnership_terminated": "Partnerschap beëindigd",
+    "event_type_profile_viewed": "Profiel bekeken",
+    "event_type_federated_search": "Zoeken naar partners"
+  },
+  "enterprise": {
+    "config_group_general": "Algemeen",
+    "config_group_general_desc": "Site-identiteit, lokalisatie en voettekst.",
+    "config_site_name": "Sitenaam",
+    "config_site_name_desc": "Openbare naam weergegeven in de koptekst, het browsertabblad en in e-mails.",
+    "config_site_description": "Sitebeschrijving",
+    "config_site_description_desc": "Korte slogan gebruikt in metadata en gedeelde links.",
+    "config_contact_email": "E-mailadres voor contact",
+    "config_contact_email_desc": "Adres dat leden gebruiken om ondersteuning te bereiken.",
+    "config_contact_phone": "Neem contact op met telefoon",
+    "config_contact_phone_desc": "Openbaar telefoonnummer voor ondersteuningsvragen.",
+    "config_timezone": "Tijdzone",
+    "config_timezone_desc": "IANA-tijdzone-ID gebruikt voor planning en tijdstempels.",
+    "config_footer_text": "Voettekst juridische tekst",
+    "config_footer_text_desc": "Liefdadigheidsnummer, bedrijfsregistratie of andere juridische tekst weergegeven in de voettekst.",
+    "config_locale": "Standaardlandinstelling",
+    "config_locale_desc": "Taal die wordt gebruikt voor nieuwe leden totdat ze hun eigen taal kiezen.",
+    "config_group_registration": "Registratie en onboarding",
+    "config_group_registration_desc": "Wie zich kan aanmelden, wat ze verifiëren en hoe ze worden verwelkomd.",
+    "config_registration_enabled": "Registratie ingeschakeld",
+    "config_registration_enabled_desc": "Schakel dit uit om aanmeldingen volledig te sluiten.",
+    "config_require_approval": "Goedkeuring van de beheerder vereist",
+    "config_require_approval_desc": "Nieuwe accounts moeten worden goedgekeurd door een beheerder voordat ze kunnen inloggen.",
+    "config_require_email_verification": "E-mailverificatie vereisen",
+    "config_require_email_verification_desc": "Leden moeten hun e-mailadres verifiëren voordat ze toegang krijgen tot het platform.",
+    "config_maintenance_mode": "Onderhoudsmodus",
+    "config_maintenance_mode_desc": "Alleen-lezen. Schakel via scripts/maintenance.sh op de server.",
+    "config_onboarding_enabled": "Onboardingstroom weergeven",
+    "config_onboarding_enabled_desc": "Leid nieuwe leden door het instellen van profielen en vaardigheden na aanmelding.",
+    "config_configure_steps": "Configureer stappen",
+    "config_welcome_message": "Welkomstbericht",
+    "config_welcome_message_desc": "Wordt aan nieuwe leden getoond bij hun eerste aanmelding.",
+    "config_group_wallet": "Portemonnee en tegoeden",
+    "config_group_wallet_desc": "Tijdskredietsaldo, overdrachtslimieten en hoe de valuta wordt genoemd.",
+    "config_starting_balance": "Beginsaldo",
+    "config_starting_balance_desc": "Tijdkredieten toegekend aan nieuwe leden bij aanmelding. Stel in op 0 om uit te schakelen.",
+    "config_max_transaction": "Maximale overdracht",
+    "config_max_transaction_desc": "Grootste enkele overdracht tussen leden. Stel in op 0 voor geen limiet.",
+    "config_currency_name": "Valutanaam",
+    "config_currency_name_desc": "Weergavenaam voor de tijdbankvaluta.",
+    "config_currency_symbol": "Valutasymbool",
+    "config_currency_symbol_desc": "Kort symbool weergegeven naast saldi.",
+    "config_group_content": "Inhoud en moderatie",
+    "config_group_content_desc": "Goedkeuringsregels en inhoudsfilters voor vermeldingen en berichten.",
+    "config_auto_approve_listings": "Advertenties automatisch goedkeuren",
+    "config_auto_approve_listings_desc": "Publiceer nieuwe vermeldingen onmiddellijk in plaats van ze vast te houden voor beoordeling door de moderator.",
+    "config_auto_approve_blog": "Blogposts automatisch goedkeuren",
+    "config_auto_approve_blog_desc": "Publiceer nieuwe blogposts onmiddellijk in plaats van ze vast te houden voor beoordeling door de moderator.",
+    "config_max_listing_images": "Max. aantal afbeeldingen per advertentie",
+    "config_max_listing_images_desc": "Bovengrens voor foto's die aan één advertentie zijn gekoppeld.",
+    "config_profanity_filter": "Godslastering filter",
+    "config_profanity_filter_desc": "Blokkeer inzendingen die woorden bevatten die op de godslasteringlijst van het platform staan.",
+    "config_group_notifications": "Meldingen",
+    "config_group_notifications_desc": "Standaard leveringskanalen voor nieuwe accounts en samenvattingscadans.",
+    "config_email_notifications_enabled": "E-mailmeldingen ingeschakeld",
+    "config_email_notifications_enabled_desc": "Standaard voor nieuwe accounts. Leden kunnen deze in hun eigen instellingen overschrijven.",
+    "config_push_notifications_enabled": "Pushmeldingen ingeschakeld",
+    "config_push_notifications_enabled_desc": "Standaard voor nieuwe accounts. Leden kunnen deze in hun eigen instellingen overschrijven.",
+    "config_digest_frequency": "Digest-frequentie",
+    "config_digest_frequency_desc": "Hoe vaak de e-mail met activiteitenoverzichten wordt verzonden.",
+    "config_digest_daily": "Dagelijks",
+    "config_digest_weekly": "Wekelijks",
+    "config_digest_monthly": "Maandelijks",
+    "config_digest_never": "Nooit",
+    "config_group_limits": "Grenzen",
+    "config_group_limits_desc": "Caps per lid en uploadgrootte.",
+    "config_max_listings_per_user": "Max. vermeldingen per lid",
+    "config_max_listings_per_user_desc": "De meeste vermeldingen die één lid tegelijk actief kan hebben. Stel in op 0 voor geen limiet.",
+    "config_max_groups_per_user": "Max. groepen per lid",
+    "config_max_groups_per_user_desc": "Bij de meeste groepen kan één lid lid worden. Stel in op 0 voor geen limiet.",
+    "config_max_file_upload_mb": "Maximale uploadgrootte (MB)",
+    "config_max_file_upload_mb_desc": "Maximale uploadgrootte per bestand. Grotere bestanden worden op de server afgewezen.",
+    "validation_required": "Vereist",
+    "validation_email": "Voer een geldig e-mailadres in (e.g., name@example.com)",
+    "validation_url": "Voer een geldige URL in die begint met http:// of https://",
+    "validation_number": "Moet een getal zijn",
+    "validation_min": "Moet {{value}} of groter zijn",
+    "validation_max": "Moet {{value}} of minder zijn",
+    "validation_format": "Ongeldig formaat",
+    "gdpr_sla_overdue_one": "{{count}} dagen te laat",
+    "gdpr_sla_overdue_other": "{{count}} dagen te laat",
+    "gdpr_sla_days_left_one": "{{count}} dagen resterend",
+    "gdpr_sla_days_left_other": "{{count}} dagen resterend"
+  },
+  "crm": {
+    "just_now": "Just Now",
+    "minutes_ago_one": "{{count}} minuten geleden",
+    "minutes_ago_other": "{{count}} minuten geleden",
+    "hours_ago_one": "{{count}} uur geleden",
+    "hours_ago_other": "{{count}} uur geleden",
+    "days_ago_one": "{{count}} dagen geleden",
+    "days_ago_other": "{{count}} dagen geleden"
+  },
+  "config": {
+    "module_name_dashboard": "Dashboard",
+    "module_name_feed": "Voer",
+    "module_name_listings": "Advertenties",
+    "module_name_messages": "Berichten",
+    "module_name_wallet": "Portemonnee",
+    "module_name_members": "Leden",
+    "module_name_groups": "Groepen",
+    "module_name_events": "Evenementen",
+    "module_name_connections": "Verbindingen",
+    "module_name_volunteering": "Vrijwilligerswerk",
+    "module_name_organisations": "Organisaties",
+    "module_name_goals": "Doelen",
+    "module_name_blog": "Bloggen",
+    "module_name_resources": "Hulpbronnen",
+    "module_name_courses": "Cursussen",
+    "module_name_podcasts": "Podcasts",
+    "module_name_job_vacancies": "Vacatures",
+    "module_name_marketplace": "Marktplaats",
+    "module_name_leaderboard": "Leiderbord",
+    "module_name_achievements": "Prestaties"
+  },
+  "menu_builder": {
+    "group_core": "Kern",
+    "group_community": "Gemeenschap",
+    "group_features": "Kenmerken",
+    "group_gamification": "Gamificatie",
+    "route_about": "Over",
+    "group_info": "Info",
+    "route_faq": "FAQ",
+    "route_explore": "Ontdek",
+    "location_header_main": "Hoofdkop",
+    "location_header_secondary": "Secundaire kop",
+    "location_footer": "Voettekst",
+    "location_sidebar": "Zijbalk",
+    "location_mobile": "Mobiel",
+    "type_link_label": "Interne koppeling",
+    "type_link_desc": "Link naar een pagina binnen dit platform",
+    "type_external_label": "Externe koppeling",
+    "type_external_desc": "Link naar een externe website",
+    "type_dropdown_label": "Dropdownmenu",
+    "type_dropdown_desc": "Een vervolgkeuzemenu met onderliggende items",
+    "type_page_label": "Aangepaste pagina",
+    "type_page_desc": "Link naar een aangepaste pagina op dit platform",
+    "type_route_label": "Genoemde Route",
+    "type_route_desc": "Koppeling via een benoemde applicatieroute",
+    "type_divider_label": "Verdeler",
+    "type_divider_desc": "Een visuele scheiding tussen menu-items",
+    "live_preview": "Live-voorbeeld",
+    "preview": "Voorbeeld",
+    "no_data": "Geen gegevens beschikbaar",
+    "drag_hint": "Sleep items om de volgorde te wijzigen",
+    "drag_to_reorder": "Sleep om de volgorde te wijzigen",
+    "sub_items_one": "{{count}} subitem(s)",
+    "sub_items_other": "{{count}} subitem(s)",
+    "edit_item": "Artikel bewerken",
+    "delete_item": "Artikel verwijderen"
+  },
+  "content": {
+    "label_attribute_actions": "Kenmerkacties",
+    "label_edit_item": "Artikel bewerken",
+    "label_delete_item": "Artikel verwijderen"
+  },
+  "categories": {
+    "label_category_actions": "Categorie Acties"
+  },
+  "pilot_launch_readiness": {
+    "missing": {
+      "controller_name": "Naam van controller",
+      "controller_contact_email": "E-mailadres voor contactpersoon van de controller",
+      "controller_data_protection_officer": "Functionaris voor gegevensbescherming",
+      "incident_response_contact_email": "Contact-e-mailadres voor reactie op incidenten",
+      "workshop_not_run": "Workshop over operationeel beleid wordt niet uitgevoerd",
+      "policy_appendix_url": "Beleidsbijlage URL",
+      "safeguarding_escalation_user_id": "Borgen van escalatiecontact",
+      "acknowledgement": "Erkenning coördinator",
+      "pre_pilot_baseline": "Basislijn scorebord vóór de pilot",
+      "danger_checks": "Problemen met de gegevenskwaliteit",
+      "backlog_empty": "Integratieachterstand leeg"
+    }
+  },
+  "municipal_verification": {
+    "status": {
+      "verified": "Geverifieerd",
+      "pending_dns": "In behandeling DNS"
+    }
+  },
+  "admin": {
+    "surveys": {
+      "analytics": {
+        "total_responses": "Totaal aantal reacties",
+        "answer_count_one": "{{count}}antwoord",
+        "answer_count_other": "{{count}}antwoorden",
+        "no_open_text": "Nog geen open-tekstreacties."
+      }
+    }
+  },
+  "municipal_copilot": {
+    "empty": {
+      "value": "-"
+    }
+  },
+  "kpi_baselines": {
+    "comparison": {
+      "comparing": "Vergelijken:",
+      "captured": "(vastgelegd {{date}})",
+      "impact_achieved": "Impact bereikt",
+      "baseline": "Basislijn",
+      "now": "Nu"
+    },
+    "actions": {
+      "close": "Dichtbij"
+    },
+    "empty": {
+      "no_data": "Geen gegevens beschikbaar"
+    },
+    "fields": {
+      "notes_label_prefix": "Opmerkingen:"
+    }
+  },
+  "commercial_boundary": {
+    "meta": {
+      "title": "Commerciële grenskaart",
+      "subtitle": "AG82 - wat is AGPL openbaar, tenant-configureerbaar, implementatielaag of commercieel"
+    },
+    "export": {
+      "last_updated": "Laatst bijgewerkt: {{date}}",
+      "capability": "Vermogen",
+      "classification": "Classificatie",
+      "agpl_module": "AGPL-module",
+      "default": "Standaard",
+      "overridden": "Overschreven",
+      "notes": "Opmerkingen",
+      "yes": "Ja",
+      "no": "Nee",
+      "generated": "Gegenereerd {{date}} vanuit het NEXUS beheerdersdashboard."
+    },
+    "sections": {
+      "classifications": "Classificaties"
+    },
+    "empty": {
+      "value": "-"
+    }
+  },
+  "caring_workflow": {
+    "predictive": {
+      "trend_growing": "Groeiende {{value}}%",
+      "trend_declining": "Dalende {{value}}%",
+      "trend_stable": "Stabiel",
+      "not_enough_activity": "Nog niet genoeg activiteit om te voorspellen. Kom over een paar weken terug.",
+      "history": "Geschiedenis",
+      "forecast": "Voorspelling",
+      "confidence": "Vertrouwen",
+      "severity": {
+        "critical": "Kritisch",
+        "warning": "Waarschuwing",
+        "info": "Info"
+      },
+      "title": "Voorspellende inzichten",
+      "subtitle": "Toekomstgerichte voorspellingen en proactieve waarschuwingen. Spoor regionale zorgtekorten op voordat ze een noodsituatie worden.",
+      "no_forecast": "Er zijn nog geen prognosegegevens beschikbaar.",
+      "hours_forecast": "Uur voorspelling",
+      "active_members": "Actieve leden",
+      "recipients_reached": "Ontvangers bereikt",
+      "sub_region_coverage": "Subregiodekking (laatste {{days}}-dagen)",
+      "under_supplied_count_one": "{{count}} onvoldoende geleverd",
+      "under_supplied_count_other": "{{count}} onvoldoende geleverd",
+      "sub_region_coverage_aria": "Subregiodekking",
+      "columns": {
+        "sub_region": "Subregio",
+        "requested_90d": "Aangevraagd (90d)",
+        "fulfilled_90d": "Vervuld (90d)",
+        "coverage": "Dekking",
+        "status": "Status",
+        "category": "Categorie",
+        "prior_active": "Eerder actief",
+        "lapsed": "Vervallen",
+        "churn_rate": "Verlooppercentage",
+        "baseline": "Basislijn",
+        "expected_hrs": "Verwachte uren",
+        "observed_hrs": "Waargenomen uur",
+        "drift": "Afdrijven",
+        "sample": "Steekproef"
+      },
+      "status": {
+        "under_supplied": "Te weinig geleverd",
+        "ok": "OK"
+      },
+      "helper_churn": "Helperchurn (verstreken >= {{days}} dagen)",
+      "overall_percent": "{{value}}% in totaal",
+      "helper_churn_note": "{{lapsed}} van {{prior}} eerder actieve helpers hebben de laatste tijd geen uren geregistreerd.",
+      "helper_churn_aria": "Helperverloop per categorie",
+      "coefficient_drift": "Categoriecoëfficiëntafwijking",
+      "drifting_count_one": "{{count}} drijft af",
+      "drifting_count_other": "{{count}} drijft af",
+      "coefficient_drift_note": "Categorieën met absolute afwijking > {{threshold}}% zijn gemarkeerd. Bekijk de basislijncoëfficiënten in de categoriecoëfficiënteditor.",
+      "coefficient_drift_aria": "Categoriecoëfficiëntafwijking",
+      "proactive_alerts": "Proactieve waarschuwingen"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "retry": "Opnieuw proberen"
+    }
+  },
+  "billing": {
+    "status_active": "Actief",
+    "status_trialing": "Proeven",
+    "status_past_due": "Verleden tijd",
+    "status_cancelled": "Geannuleerd",
+    "status_expired": "Verlopen",
+    "status_incomplete": "Onvolledig"
+  },
+  "analytics": {
+    "regional": {
+      "loading": {
+        "section": "Analyses laden"
+      },
+      "errors": {
+        "data_unavailable": "Voor deze periode zijn er geen gegevens beschikbaar.",
+        "load_data": "Kan deze analysesectie niet laden: {{error}}"
+      },
+      "heatmap": {
+        "description": "Toplocaties op basis van ledenactiviteit en dichtheid."
+      },
+      "sections": {
+        "geographic_activity_density": "Geografische activiteitsdichtheid",
+        "demand_supply_by_category": "Vraag versus aanbod per categorie",
+        "monthly_engagement_metrics": "Maandelijkse betrokkenheidsstatistieken"
+      },
+      "columns": {
+        "rank": "Rang",
+        "latitude": "Breedte",
+        "longitude": "Lengte",
+        "members": "Leden",
+        "density": "Dikte",
+        "month": "Maand",
+        "new_members": "Nieuwe leden",
+        "cumulative_total": "Cumulatief totaal",
+        "category": "Categorie",
+        "requests": "Verzoeken",
+        "offers": "Aanbiedingen",
+        "ratio": "Verhouding",
+        "trend": "Trend",
+        "active_members": "Actieve leden",
+        "vol_hours": "Vrijwilligers uren",
+        "new_listings": "Nieuwe vermeldingen",
+        "new_events": "Nieuwe evenementen",
+        "help_requests": "Hulpverzoeken",
+        "organisation": "Organisatie",
+        "volunteers": "Vrijwilligers",
+        "total": "Totaal",
+        "resolved": "Opgelost",
+        "resolution_rate": "Resolutiepercentage",
+        "avg_days_to_resolve": "Gem. dagen op te lossen"
+      },
+      "empty": {
+        "no_geographic_data": "Voor deze periode zijn geen geografische gegevens beschikbaar.",
+        "infinity": "∞",
+        "no_listing_data": "Er zijn voor deze periode geen gegevens over de vraag naar vermeldingen beschikbaar.",
+        "no_engagement_data": "Voor deze periode zijn geen engagementgegevens beschikbaar.",
+        "no_organisation_data": "Er zijn geen organisatieactiviteiten beschikbaar voor deze periode.",
+        "no_help_request_data": "Voor deze periode zijn geen hulpvraaggegevens beschikbaar."
+      },
+      "demographics": {
+        "age_distribution": "Leeftijdsverdeling",
+        "total_with_data": "{{total}}-leden met demografische gegevens",
+        "language_distribution": "Taaldistributie",
+        "total_active_members": "{{total}} actieve leden",
+        "member_growth_12m": "Ledengroei, afgelopen 12 maanden"
+      },
+      "age_groups": {
+        "under_25": "Onder de 25",
+        "25_34": "25-34",
+        "35_44": "35-44",
+        "45_54": "45-54",
+        "55_64": "55-64",
+        "65_plus": "65+",
+        "unknown": "Onbekend"
+      },
+      "volunteer": {
+        "total_hours": "Totaal uren",
+        "avg_hours_per_volunteer": "Gem. uur per vrijwilliger",
+        "reciprocity_ratio": "Wederkerigheid verhouding",
+        "reciprocity_description": "Saldo tussen gegeven en ontvangen uren voor de hele regio.",
+        "top_orgs_title": "Top vrijwilligersorganisaties"
+      },
+      "help": {
+        "by_category": "Hulpverzoeken per categorie",
+        "resolution_trend_6m": "Resolutietrend, afgelopen 6 maanden"
+      },
+      "units": {
+        "days_count_one": "{{count}} dagen",
+        "days_count_other": "{{count}} dagen"
+      },
+      "empty_value": "-"
+    }
+  },
+  "unknown": "Onbekend",
+  "advertising": {
+    "push": {
+      "no_daily_data": "Nog geen dagelijkse gegevens.",
+      "metrics": {
+        "sends": "Verzendt",
+        "opens": "Opent"
+      },
+      "chart_sends_title_one": "{{count}} verzendt",
+      "chart_sends_title_other": "{{count}} verzendt",
+      "chart_opens_title_one": "{{count}} wordt geopend",
+      "chart_opens_title_other": "{{count}} wordt geopend"
+    }
+  },
+  "submit_error": "Kan niet indienen. Probeer het opnieuw.",
+  "submit": "Indienen",
+  "under_25": "Onder de 25",
+  "25_34": "25–34",
+  "35_44": "35–44",
+  "45_54": "45–54",
+  "55_64": "55–64",
+  "65_plus": "65+"
 }

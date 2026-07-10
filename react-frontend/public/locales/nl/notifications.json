@@ -31,7 +31,9 @@
     "empty": "Nog geen notificaties",
     "view_all": "Bekijk alle notificaties",
     "close": "Meldingen sluiten",
-    "unread_dot_aria": "Unread"
+    "unread_dot_aria": "Unread",
+    "bell_unread_aria_one": "Notificaties, {{count}} ongelezen",
+    "bell_unread_aria_other": "Notificaties, {{count}} ongelezen"
   },
   "type": {
     "message": "Message",
@@ -96,5 +98,11 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "unread_badge_one": "{{count}} nieuw",
+  "unread_badge_other": "{{count}} nieuw",
+  "filter_unread_one": "Ongelezen ({{count}})",
+  "filter_unread_other": "Ongelezen ({{count}})",
+  "and_others_one": "en {{count}} anderen",
+  "and_others_other": "en {{count}} anderen"
 }

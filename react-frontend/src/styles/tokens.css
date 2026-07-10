@@ -42,7 +42,7 @@
   /* SEMANTIC BORDER COLORS */
   --border-default: rgba(255, 255, 255, 0.10);
   --border-hover: rgba(255, 255, 255, 0.20);
-  --border-focus: rgba(99, 102, 241, 0.5);
+  --border-focus: color-mix(in srgb, var(--accent-color) 50%, transparent);
 
   /* SCROLLBAR */
   --scrollbar-track: rgba(255, 255, 255, 0.02);
@@ -50,8 +50,8 @@
   --scrollbar-thumb-hover: rgba(255, 255, 255, 0.2);
 
   /* BLOB DECORATIONS */
-  --blob-indigo: rgba(99, 102, 241, 0.2);
-  --blob-purple: rgba(168, 85, 247, 0.15);
+  --blob-accent: color-mix(in srgb, var(--accent-color) 20%, transparent);
+  --blob-accent-end: color-mix(in srgb, var(--accent-gradient-end) 15%, transparent);
   --blob-cyan: rgba(6, 182, 212, 0.1);
 
   /* GLASS SURFACE — de-glassed: solid opaque surfaces, no blur.
@@ -67,19 +67,19 @@
   --glass-blur: 0px;
   --glass-saturate: 100%;
 
-  /* BRAND COLORS (solid) */
-  --color-primary: #818cf8;       /* Indigo-400 — ↑ from #6366f1; gives 6.97:1 as link text on dark bg */
-  --color-secondary: #a855f7;     /* Purple */
+  /* BRAND COLORS (runtime accent-derived) */
+  --color-primary: color-mix(in oklch, var(--accent-color) 78%, white);
+  --color-secondary: var(--accent-gradient-end);
   --color-accent: #06b6d4;        /* Cyan */
 
   /* GLOW COLORS (for box-shadow effects) */
-  --glow-primary: rgba(99, 102, 241, 0.5);
-  --glow-primary-subtle: rgba(99, 102, 241, 0.25);
-  --glow-primary-intense: rgba(99, 102, 241, 0.7);
+  --glow-primary: color-mix(in srgb, var(--accent-color) 50%, transparent);
+  --glow-primary-subtle: color-mix(in srgb, var(--accent-color) 25%, transparent);
+  --glow-primary-intense: color-mix(in srgb, var(--accent-color) 70%, transparent);
 
-  --glow-secondary: rgba(168, 85, 247, 0.5);
-  --glow-secondary-subtle: rgba(168, 85, 247, 0.25);
-  --glow-secondary-intense: rgba(168, 85, 247, 0.7);
+  --glow-secondary: color-mix(in srgb, var(--accent-gradient-end) 50%, transparent);
+  --glow-secondary-subtle: color-mix(in srgb, var(--accent-gradient-end) 25%, transparent);
+  --glow-secondary-intense: color-mix(in srgb, var(--accent-gradient-end) 70%, transparent);
 
   --glow-accent: rgba(6, 182, 212, 0.5);
   --glow-accent-subtle: rgba(6, 182, 212, 0.25);
@@ -102,14 +102,41 @@
   /* Input/form colors */
   --input-bg: rgba(255, 255, 255, 0.05);
   --input-border: rgba(255, 255, 255, 0.10);
-  --input-focus-border: rgba(99, 102, 241, 0.5);
+  --input-focus-border: color-mix(in srgb, var(--accent-color) 50%, transparent);
   --input-placeholder: rgba(255, 255, 255, 0.55);  /* ↑ was 0.4 — matches --text-subtle fix */
 
   /* Status colors */
   --color-success: #22c55e;
+  --status-success-foreground: #4ade80;
   --color-warning: #f59e0b;
   --color-error: #ef4444;
   --color-info: #3b82f6;
+
+  /* HeroUI v3 semantic bridge. Keep these mapped to the NEXUS source tokens
+     so surfaces, fields, overlays, focus, and runtime accents stay coherent. */
+  --surface: var(--surface-solid);
+  --surface-foreground: var(--text-primary);
+  --surface-secondary: color-mix(in srgb, var(--surface-solid) 92%, white);
+  --surface-secondary-foreground: var(--text-primary);
+  --surface-tertiary: color-mix(in srgb, var(--surface-solid) 86%, white);
+  --surface-tertiary-foreground: var(--text-primary);
+  --overlay: var(--surface-dropdown);
+  --overlay-foreground: var(--text-primary);
+  --muted: var(--text-muted);
+  --default: var(--surface-elevated);
+  --default-foreground: var(--text-primary);
+  --accent: var(--accent-color);
+  --accent-foreground: #ffffff;
+  --success-soft-foreground: var(--status-success-foreground);
+  --field-background: var(--input-bg);
+  --field-foreground: var(--text-primary);
+  --field-placeholder: var(--input-placeholder);
+  --field-border: var(--input-border);
+  --border: var(--border-default);
+  --separator: var(--border-default);
+  --focus: var(--accent-color);
+  --link: var(--accent-color);
+  --backdrop: rgba(0, 0, 0, 0.6);
 }
 
 /* ─────────────────────────────────────────────
@@ -141,7 +168,7 @@
   /* SEMANTIC BORDER COLORS */
   --border-default: rgba(0, 0, 0, 0.08);
   --border-hover: rgba(0, 0, 0, 0.15);
-  --border-focus: rgba(79, 70, 229, 0.5);
+  --border-focus: color-mix(in srgb, var(--accent-color) 50%, transparent);
 
   /* SCROLLBAR */
   --scrollbar-track: rgba(0, 0, 0, 0.03);
@@ -149,8 +176,8 @@
   --scrollbar-thumb-hover: rgba(0, 0, 0, 0.25);
 
   /* BLOB DECORATIONS (subtler for light mode) */
-  --blob-indigo: rgba(99, 102, 241, 0.08);
-  --blob-purple: rgba(168, 85, 247, 0.06);
+  --blob-accent: color-mix(in srgb, var(--accent-color) 8%, transparent);
+  --blob-accent-end: color-mix(in srgb, var(--accent-gradient-end) 6%, transparent);
   --blob-cyan: rgba(6, 182, 212, 0.05);
 
   /* GLASS SURFACE (light) — de-glassed: solid opaque surfaces, no blur. */
@@ -164,19 +191,19 @@
   --glass-blur: 0px;
   --glass-saturate: 100%;
 
-  /* BRAND COLORS - slightly darker for contrast on light bg */
-  --color-primary: #4f46e5;       /* Indigo-600 */
-  --color-secondary: #9333ea;     /* Purple-600 */
+  /* BRAND COLORS — runtime accent-derived and darkened for light surfaces */
+  --color-primary: color-mix(in oklch, var(--accent-color) 78%, black);
+  --color-secondary: var(--accent-gradient-end);
   --color-accent: #0891b2;        /* Cyan-600 */
 
   /* GLOW COLORS (subtler for light mode) */
-  --glow-primary: rgba(79, 70, 229, 0.3);
-  --glow-primary-subtle: rgba(79, 70, 229, 0.15);
-  --glow-primary-intense: rgba(79, 70, 229, 0.5);
+  --glow-primary: color-mix(in srgb, var(--accent-color) 30%, transparent);
+  --glow-primary-subtle: color-mix(in srgb, var(--accent-color) 15%, transparent);
+  --glow-primary-intense: color-mix(in srgb, var(--accent-color) 50%, transparent);
 
-  --glow-secondary: rgba(147, 51, 234, 0.3);
-  --glow-secondary-subtle: rgba(147, 51, 234, 0.15);
-  --glow-secondary-intense: rgba(147, 51, 234, 0.5);
+  --glow-secondary: color-mix(in srgb, var(--accent-gradient-end) 30%, transparent);
+  --glow-secondary-subtle: color-mix(in srgb, var(--accent-gradient-end) 15%, transparent);
+  --glow-secondary-intense: color-mix(in srgb, var(--accent-gradient-end) 50%, transparent);
 
   --glow-accent: rgba(8, 145, 178, 0.3);
   --glow-accent-subtle: rgba(8, 145, 178, 0.15);
@@ -199,14 +226,40 @@
   /* Input/form colors */
   --input-bg: rgba(255, 255, 255, 0.8);
   --input-border: rgba(0, 0, 0, 0.12);
-  --input-focus-border: rgba(79, 70, 229, 0.5);
+  --input-focus-border: color-mix(in srgb, var(--accent-color) 50%, transparent);
   --input-placeholder: rgba(0, 0, 0, 0.60);  /* ≥4.5:1 on white input bg; was 0.4 (≈2.9:1, failed) */
 
   /* Status colors (same, but slightly adjusted for contrast) */
   --color-success: #16a34a;
+  --status-success-foreground: #047857;
   --color-warning: #d97706;
   --color-error: #dc2626;
   --color-info: #2563eb;
+
+  /* HeroUI v3 semantic bridge — light theme. */
+  --surface: var(--surface-solid);
+  --surface-foreground: var(--text-primary);
+  --surface-secondary: color-mix(in srgb, var(--surface-solid) 96%, black);
+  --surface-secondary-foreground: var(--text-primary);
+  --surface-tertiary: color-mix(in srgb, var(--surface-solid) 92%, black);
+  --surface-tertiary-foreground: var(--text-primary);
+  --overlay: var(--surface-dropdown);
+  --overlay-foreground: var(--text-primary);
+  --muted: var(--text-muted);
+  --default: var(--surface-elevated);
+  --default-foreground: var(--text-primary);
+  --accent: var(--accent-color);
+  --accent-foreground: #ffffff;
+  --success-soft-foreground: var(--status-success-foreground);
+  --field-background: var(--input-bg);
+  --field-foreground: var(--text-primary);
+  --field-placeholder: var(--input-placeholder);
+  --field-border: var(--input-border);
+  --border: var(--border-default);
+  --separator: var(--border-default);
+  --focus: var(--accent-color);
+  --link: var(--accent-color);
+  --backdrop: rgba(15, 23, 42, 0.5);
 }
 
 /* ─────────────────────────────────────────────
@@ -286,66 +339,16 @@ html {
   --nav-row-py: calc(0.875rem * var(--spacing-multiplier, 1));
 }
 
-/* Accent color fallbacks — use var(--accent-color) where brand primary is used */
+/* Runtime brand gradient. HeroUI owns --accent; this second semantic stop keeps
+   decorative gradients tenant-aware without leaking a raw palette name. */
 :root {
-  --accent-color-hover: color-mix(in srgb, var(--accent-color) 85%, white);
-  --accent-color-subtle: color-mix(in srgb, var(--accent-color) 20%, transparent);
-  --accent-color-end: color-mix(in srgb, var(--accent-color), #000 22%);
-  --accent-glow: color-mix(in srgb, var(--accent-color) 50%, transparent);
-  --accent-glow-subtle: color-mix(in srgb, var(--accent-color) 25%, transparent);
-  --accent-glow-intense: color-mix(in srgb, var(--accent-color) 70%, transparent);
+  --accent-gradient-end: color-mix(in srgb, var(--accent-color), #000 22%);
 }
 
-/* ─────────────────────────────────────────────
-   ACCENT COLOR — REMAP HARDCODED INDIGO/PURPLE
-   The brand primary is sprinkled across ~1,250 hardcoded
-   Tailwind utility classes (from-indigo-500 to-purple-600,
-   bg-indigo-500, text-indigo-500, border-indigo-500). Rather
-   than sweep them all, we override the underlying CSS so the
-   accent picker actually changes the UI.
-   ───────────────────────────────────────────── */
-.bg-indigo-500,
-.bg-indigo-600 {
-  background-color: var(--accent-color) !important;
-}
-
-.text-indigo-500,
-.text-indigo-600 {
-  color: var(--accent-color) !important;
-}
-
-.border-indigo-500,
-.border-indigo-600 {
-  border-color: var(--accent-color) !important;
-}
-
-/* Brand gradient: from-indigo-500 → to-purple-600 becomes accent → darker accent */
-.from-indigo-500 {
-  --tw-gradient-from: var(--accent-color) !important;
-  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position, ), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position)) !important;
-}
-
-.to-purple-600 {
-  --tw-gradient-to: var(--accent-color-end) !important;
-  --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position, ), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position)) !important;
-}
-
-/* Hover variants */
-.hover\:bg-indigo-600:hover,
-.hover\:bg-indigo-700:hover {
-  background-color: var(--accent-color-hover) !important;
-}
-
-.hover\:text-indigo-500:hover,
-.hover\:text-indigo-600:hover {
-  color: var(--accent-color-hover) !important;
-}
-
-/* Ring/focus utilities */
-.ring-indigo-500,
-.focus\:ring-indigo-500:focus,
-.focus-visible\:ring-indigo-500:focus-visible {
-  --tw-ring-color: var(--accent-color) !important;
+/* Tailwind v4 bridge for the one project-specific semantic color. HeroUI
+   already exposes --accent, --accent-soft, and their foreground/hover tokens. */
+@theme inline {
+  --color-accent-gradient-end: var(--accent-gradient-end);
 }
 
 /* ─────────────────────────────────────────────
@@ -383,7 +386,7 @@ html[data-high-contrast="true"] {
   /* Dark theme high contrast */
   --border-default: rgba(255, 255, 255, 0.25);
   --border-hover: rgba(255, 255, 255, 0.40);
-  --border-focus: rgba(99, 102, 241, 0.8);
+  --border-focus: color-mix(in srgb, var(--accent-color) 80%, transparent);
 
   --text-muted: rgba(255, 255, 255, 0.8);
   --text-subtle: rgba(255, 255, 255, 0.65);
@@ -394,25 +397,39 @@ html[data-high-contrast="true"] {
 
   --card-border: rgba(255, 255, 255, 0.20);
   --input-border: rgba(255, 255, 255, 0.25);
-  --input-focus-border: rgba(99, 102, 241, 0.8);
+  --input-focus-border: color-mix(in srgb, var(--accent-color) 80%, transparent);
+
+  /* HeroUI canonical high-contrast tokens */
+  --border: rgba(255, 255, 255, 0.35);
+  --separator: rgba(255, 255, 255, 0.3);
+  --field-border: rgba(255, 255, 255, 0.4);
+  --field-border-width: 2px;
+  --focus: var(--accent-color);
 }
 
 html[data-high-contrast="true"][data-theme="light"] {
   /* Light theme high contrast */
   --border-default: rgba(0, 0, 0, 0.20);
   --border-hover: rgba(0, 0, 0, 0.35);
-  --border-focus: rgba(79, 70, 229, 0.8);
+  --border-focus: color-mix(in srgb, var(--accent-color) 80%, transparent);
 
   --text-muted: #334155;
   --text-subtle: #475569;
 
   --glass-border: rgba(0, 0, 0, 0.20);
   --glass-border-hover: rgba(0, 0, 0, 0.30);
-  --glass-border-focus: rgba(79, 70, 229, 0.6);
+  --glass-border-focus: color-mix(in srgb, var(--accent-color) 60%, transparent);
 
   --card-border: rgba(0, 0, 0, 0.15);
   --input-border: rgba(0, 0, 0, 0.25);
-  --input-focus-border: rgba(79, 70, 229, 0.8);
+  --input-focus-border: color-mix(in srgb, var(--accent-color) 80%, transparent);
+
+  /* HeroUI canonical high-contrast tokens */
+  --border: rgba(0, 0, 0, 0.4);
+  --separator: rgba(0, 0, 0, 0.32);
+  --field-border: rgba(0, 0, 0, 0.45);
+  --field-border-width: 2px;
+  --focus: var(--accent-color);
 }
 
 /* High contrast: increase border widths and use solid borders */

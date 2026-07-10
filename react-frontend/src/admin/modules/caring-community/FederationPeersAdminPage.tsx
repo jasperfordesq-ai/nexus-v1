@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useConfirm } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -313,7 +314,7 @@ export default function FederationPeersAdminPage() {
                     <TableCell>
                       <span className="text-xs text-muted">
                         {peer.last_handshake_at
-                          ? new Date(peer.last_handshake_at).toLocaleString()
+                          ? new Date(peer.last_handshake_at).toLocaleString(getFormattingLocale())
                           : t('federation_peers_admin.empty.never')}
                       </span>
                     </TableCell>

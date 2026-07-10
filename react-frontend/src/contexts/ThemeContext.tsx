@@ -27,6 +27,7 @@ import {
 import { api, tokenManager } from '@/lib/api';
 import { logWarn } from '@/lib/logger';
 import { safeLocalStorageGet, safeLocalStorageSet, safeLocalStorageSetJSON } from '@/lib/safeStorage';
+import { getAccessibleForegroundColor } from '@/lib/colorContrast';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -139,7 +140,24 @@ function applyPreferencesToDOM(prefs: ThemePreferences): void {
 
   const html = document.documentElement;
 
+  const accentForeground = getAccessibleForegroundColor(prefs.accentColor);
+
+  // Keep NEXUS and HeroUI v3 on one runtime accent source. HeroUI consumes
+  // the canonical --accent/--focus/--link variables; legacy NEXUS utilities
+  // consume --accent-color and the derived variables in tokens.css.
   html.style.setProperty('--accent-color', prefs.accentColor);
+  html.style.setProperty('--accent', prefs.accentColor);
+  html.style.setProperty('--accent-foreground', accentForeground);
+  html.style.setProperty('--focus', prefs.accentColor);
+  html.style.setProperty('--link', prefs.accentColor);
+  html.style.setProperty(
+    '--border-focus',
+    `color-mix(in srgb, ${prefs.accentColor} 70%, transparent)`
+  );
+  html.style.setProperty(
+    '--input-focus-border',
+    `color-mix(in srgb, ${prefs.accentColor} 70%, transparent)`
+  );
   html.style.setProperty(
     '--font-size-base',
     FONT_SIZE_MAP[prefs.largeText ? 'large' : prefs.fontSize]

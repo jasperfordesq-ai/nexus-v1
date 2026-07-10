@@ -251,7 +251,13 @@
     "listing_preview_alt": "Listing preview",
     "image_preview_alt": "Upload preview",
     "type_tabs_aria": "Compose content type",
-    "compose_post": "Compose post"
+    "compose_post": "Compose post",
+    "media_rejected_one": "{{count}} file(s) skipped (wrong type or too large)",
+    "media_rejected_other": "{{count}} file(s) skipped (wrong type or too large)",
+    "media_compression_failed_one": "{{count}} image(s) failed to process",
+    "media_compression_failed_other": "{{count}} image(s) failed to process",
+    "group_members_one": "{{count}} members",
+    "group_members_other": "{{count}} members"
   },
   "moderation": {
     "unauthorized": "You do not have permission to perform this action."
@@ -349,12 +355,16 @@
       "commitment_flexible": "Flexible"
     },
     "volunteer": {
-      "credits_offered": "{{count}} time credits"
+      "credits_offered": "{{count}} time credits",
+      "credits_offered_one": "{{count}} time credits",
+      "credits_offered_other": "{{count}} time credits"
     },
     "challenge": {
       "closing_soon": "Closing soon",
       "closes_on": "Closes {{date}}",
-      "ideas_count": "{{count}} ideas"
+      "ideas_count": "{{count}} ideas",
+      "ideas_count_one": "{{count}} ideas",
+      "ideas_count_other": "{{count}} ideas"
     },
     "review": {
       "rating_aria": "{{rating}} out of 5 stars"
@@ -399,7 +409,9 @@
     "no_posts": "No posts found",
     "no_posts_desc": "No posts have been tagged with #{{tag}} yet.",
     "load_more": "Load More",
-    "page_description": "Posts tagged with #{{tag}}"
+    "page_description": "Posts tagged with #{{tag}}",
+    "post_count_one": "{{count}} posts",
+    "post_count_other": "{{count}} posts"
   },
   "hashtags": {
     "title": "Trending Hashtags",
@@ -412,7 +424,9 @@
     "no_hashtags": "No hashtags found",
     "no_match": "No hashtags matching \"{{query}}\"",
     "no_trending": "No trending hashtags in your community yet.",
-    "post_count": "{{count}} posts"
+    "post_count": "{{count}} posts",
+    "post_count_one": "{{count}} posts",
+    "post_count_other": "{{count}} posts"
   },
   "share": {
     "tooltip_remove": "Remove share",
@@ -452,7 +466,9 @@
     "dm_sent_label": "Sent",
     "dm_send": "Send",
     "dm_done": "Done",
-    "email": "Email"
+    "email": "Email",
+    "button_label_count_one": "Share ({{count}})",
+    "button_label_count_other": "Share ({{count}})"
   },
   "video": {
     "select": "Add Video",
@@ -474,7 +490,11 @@
     "title": "Trending",
     "view_all": "View all hashtags",
     "post_count_one": "{{count}} post",
-    "post_count_other": "{{count}} posts"
+    "post_count_other": "{{count}} posts",
+    "post_count_one_one": "{{count}} post",
+    "post_count_one_other": "{{count}} post",
+    "post_count_other_one": "{{count}} posts",
+    "post_count_other_other": "{{count}} posts"
   },
   "sidebar": {
     "profile": {
@@ -520,7 +540,9 @@
     "groups": {
       "title": "Popular Groups",
       "see_all": "See All",
-      "members": "{{count}} members"
+      "members": "{{count}} members",
+      "members_one": "{{count}} members",
+      "members_other": "{{count}} members"
     },
     "actions": {
       "title": "Quick Actions",
@@ -573,7 +595,10 @@
     "go_to_image": "Go to image {{number}}",
     "more_images": "{{count}} more images",
     "video_of": "Video {{current}} of {{total}}",
-    "role_description": "carousel"
+    "role_description": "carousel",
+    "view_video": "View video {{current}} of {{total}}",
+    "more_images_one": "{{count}} more images",
+    "more_images_other": "{{count}} more images"
   },
   "lightbox": {
     "aria_label": "Image viewer",
@@ -618,7 +643,9 @@
     "connect_failed": "Failed to send request",
     "pending": "Pending",
     "dismiss": "Dismiss",
-    "load_failed": "Failed to load suggestions"
+    "load_failed": "Failed to load suggestions",
+    "mutual_one": "{{count}} mutual connections",
+    "mutual_other": "{{count}} mutual connections"
   },
   "analytics": {
     "title": "Post Analytics",
@@ -647,5 +674,7 @@
   },
   "aria": {
     "feed_sidebar": "Community suggestions and highlights"
-  }
+  },
+  "items_loaded_one": "{{count}} posts",
+  "items_loaded_other": "{{count}} posts"
 }

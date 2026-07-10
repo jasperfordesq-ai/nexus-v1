@@ -70,7 +70,10 @@
   },
   "realtime": {
     "new_posts_one": "1 postáil nua",
-    "new_posts_other": "{{count}} postáil nua"
+    "new_posts_other": "{{count}} postáil nua",
+    "new_posts_few": "{{count}} postáil nua",
+    "new_posts_many": "{{count}} postáil nua",
+    "new_posts_two": "{{count}} postáil nua"
   },
   "compose": {
     "create_title": "Cruthaigh {{type}}",
@@ -251,7 +254,25 @@
     "listing_preview_alt": "Réamhamharc liostála",
     "image_preview_alt": "Réamhamharc uaslódála",
     "type_tabs_aria": "Cum cineál ábhair",
-    "compose_post": "Cum post"
+    "compose_post": "Cum post",
+    "media_rejected_few": "{{count}} comhad curtha ar leataobh (cineál mícheart nó ró-mhór)",
+    "media_rejected_many": "{{count}} comhad curtha ar leataobh (cineál mícheart nó ró-mhór)",
+    "media_rejected_one": "{{count}} comhad curtha ar leataobh (cineál mícheart nó ró-mhór)",
+    "media_rejected_other": "{{count}} comhad curtha ar leataobh (cineál mícheart nó ró-mhór)",
+    "media_rejected_two": "{{count}} comhad curtha ar leataobh (cineál mícheart nó ró-mhór)",
+    "media_compression_failed_few": "Theip ar {{count}} íomhá a phróiseáil",
+    "media_compression_failed_many": "Theip ar {{count}} íomhá a phróiseáil",
+    "media_compression_failed_one": "Theip ar {{count}} íomhá a phróiseáil",
+    "media_compression_failed_other": "Theip ar {{count}} íomhá a phróiseáil",
+    "media_compression_failed_two": "Theip ar {{count}} íomhá a phróiseáil",
+    "sdg_selected_few": "{{count}} sprioc roghnaithe",
+    "sdg_selected_many": "{{count}} sprioc roghnaithe",
+    "sdg_selected_two": "{{count}} sprioc roghnaithe",
+    "group_members_few": "{{count}} comhalta",
+    "group_members_many": "{{count}} comhalta",
+    "group_members_one": "{{count}} comhalta",
+    "group_members_other": "{{count}} comhalta",
+    "group_members_two": "{{count}} comhalta"
   },
   "moderation": {
     "unauthorized": "Níl cead agat an gníomh seo a dhéanamh."
@@ -349,12 +370,22 @@
       "commitment_flexible": "Solúbtha"
     },
     "volunteer": {
-      "credits_offered": "{{count}} creidmheas ama"
+      "credits_offered": "{{count}} creidmheas ama",
+      "credits_offered_few": "{{count}} creidmheas ama",
+      "credits_offered_many": "{{count}} creidmheas ama",
+      "credits_offered_one": "{{count}} creidmheas ama",
+      "credits_offered_other": "{{count}} creidmheas ama",
+      "credits_offered_two": "{{count}} creidmheas ama"
     },
     "challenge": {
       "closing_soon": "Ag dúnadh go luath",
       "closes_on": "Dúnann {{date}}",
-      "ideas_count": "{{count}} smaoineamh"
+      "ideas_count": "{{count}} smaoineamh",
+      "ideas_count_few": "{{count}} smaoineamh",
+      "ideas_count_many": "{{count}} smaoineamh",
+      "ideas_count_one": "{{count}} smaoineamh",
+      "ideas_count_other": "{{count}} smaoineamh",
+      "ideas_count_two": "{{count}} smaoineamh"
     },
     "review": {
       "rating_aria": "{{rating}} as 5 réalta"
@@ -399,7 +430,12 @@
     "no_posts": "Gan postálacha le fáil",
     "no_posts_desc": "Níor clibeáladh aon phostálacha le #{{tag}} fós.",
     "load_more": "Lódáil Tuilleadh",
-    "page_description": "Postálacha clibeáilte le #{{tag}}"
+    "page_description": "Postálacha clibeáilte le #{{tag}}",
+    "post_count_few": "{{count}} postáil",
+    "post_count_many": "{{count}} postáil",
+    "post_count_one": "{{count}} postáil",
+    "post_count_other": "{{count}} postáil",
+    "post_count_two": "{{count}} postáil"
   },
   "hashtags": {
     "title": "Haischlibeanna Treochta",
@@ -412,7 +448,12 @@
     "no_hashtags": "Gan haischlibeanna le fáil",
     "no_match": "Gan haischlibeanna ag meaitseáil \"{{query}}\"",
     "no_trending": "Gan haischlibeanna treochta i do phobal fós.",
-    "post_count": "{{count}} postáil"
+    "post_count": "{{count}} postáil",
+    "post_count_few": "{{count}} postáil",
+    "post_count_many": "{{count}} postáil",
+    "post_count_one": "{{count}} postáil",
+    "post_count_other": "{{count}} postáil",
+    "post_count_two": "{{count}} postáil"
   },
   "share": {
     "tooltip_remove": "Bain comhroinnt",
@@ -452,7 +493,12 @@
     "dm_sent_label": "Seolta",
     "dm_send": "Seol",
     "dm_done": "Déanta",
-    "email": "Ríomhphost"
+    "email": "Ríomhphost",
+    "button_label_count_few": "Comhroinn ({{count}})",
+    "button_label_count_many": "Comhroinn ({{count}})",
+    "button_label_count_one": "Comhroinn ({{count}})",
+    "button_label_count_other": "Comhroinn ({{count}})",
+    "button_label_count_two": "Comhroinn ({{count}})"
   },
   "video": {
     "select": "Cuir Físeán Leis",
@@ -474,7 +520,17 @@
     "title": "Ag Treocht",
     "view_all": "Féach ar gach haischlib",
     "post_count_one": "{{count}} postáil",
-    "post_count_other": "{{count}} postálacha"
+    "post_count_other": "{{count}} postálacha",
+    "post_count_one_few": "{{count}} postáil",
+    "post_count_one_many": "{{count}} postáil",
+    "post_count_one_one": "{{count}} postáil",
+    "post_count_one_other": "{{count}} postáil",
+    "post_count_one_two": "{{count}} postáil",
+    "post_count_other_few": "{{count}} postálacha",
+    "post_count_other_many": "{{count}} postálacha",
+    "post_count_other_one": "{{count}} postálacha",
+    "post_count_other_other": "{{count}} postálacha",
+    "post_count_other_two": "{{count}} postálacha"
   },
   "sidebar": {
     "profile": {
@@ -520,7 +576,12 @@
     "groups": {
       "title": "Grúpaí Coitianta",
       "see_all": "Féach Gach",
-      "members": "{{count}} ball"
+      "members": "{{count}} ball",
+      "members_few": "{{count}} ball",
+      "members_many": "{{count}} ball",
+      "members_one": "{{count}} ball",
+      "members_other": "{{count}} ball",
+      "members_two": "{{count}} ball"
     },
     "actions": {
       "title": "Meargníomhartha",
@@ -573,7 +634,13 @@
     "go_to_image": "Téigh chuig íomhá {{number}}",
     "more_images": "{{count}} íomhá eile",
     "video_of": "Físeán {{current}} as {{total}}",
-    "role_description": "timpeallán"
+    "role_description": "timpeallán",
+    "more_images_few": "{{count}} íomhá eile",
+    "more_images_many": "{{count}} íomhá eile",
+    "more_images_one": "{{count}} íomhá eile",
+    "more_images_other": "{{count}} íomhá eile",
+    "more_images_two": "{{count}} íomhá eile",
+    "view_video": "Féach ar fhíseán {{current}} de {{total}}"
   },
   "lightbox": {
     "aria_label": "Amharcóir íomhánna",
@@ -618,7 +685,12 @@
     "connect_failed": "Theip ar an iarratas a sheoladh",
     "pending": "Ar Feitheamh",
     "dismiss": "Díbir",
-    "load_failed": "Theip ar mholtaí a luchtú"
+    "load_failed": "Theip ar mholtaí a luchtú",
+    "mutual_few": "{{count}} nasc coitianta",
+    "mutual_many": "{{count}} nasc coitianta",
+    "mutual_one": "{{count}} nasc coitianta",
+    "mutual_other": "{{count}} nasc coitianta",
+    "mutual_two": "{{count}} nasc coitianta"
   },
   "analytics": {
     "title": "Anailísíocht Postála",
@@ -647,5 +719,10 @@
   },
   "aria": {
     "feed_sidebar": "Moltaí agus buaicphointí pobail"
-  }
+  },
+  "items_loaded_few": "{{count}} postáil",
+  "items_loaded_many": "{{count}} postáil",
+  "items_loaded_one": "{{count}} postáil",
+  "items_loaded_other": "{{count}} postáil",
+  "items_loaded_two": "{{count}} postáil"
 }

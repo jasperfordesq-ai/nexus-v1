@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Link } from 'react-router-dom';
 
 import ArrowRight from 'lucide-react/icons/arrow-right';
@@ -28,7 +29,7 @@ interface ReciprocalBalanceData {
 // ---------------------------------------------------------------------------
 
 function formatHours(hours: number): string {
-  return hours.toLocaleString(undefined, {
+  return hours.toLocaleString(getFormattingLocale(), {
     minimumFractionDigits: hours % 1 === 0 ? 0 : 1,
     maximumFractionDigits: 1,
   });

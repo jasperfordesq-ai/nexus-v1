@@ -126,7 +126,13 @@
     "rule_summary": "Als in \"{{stage}}\" gedurende {{count}}d -> {{action}}",
     "rule_summary_with_target": "Als in \"{{stage}}\" gedurende {{count}}d -> {{action}} -> {{target}}",
     "rules_title": "Automatiseringsregels",
-    "reviewed": "Beoordeeld"
+    "reviewed": "Beoordeeld",
+    "rule_summary_with_target_one": "Als in \"{{stage}}\" gedurende {{count}}d -> {{action}} -> {{target}}",
+    "rule_summary_with_target_other": "Als in \"{{stage}}\" gedurende {{count}}d -> {{action}} -> {{target}}",
+    "rule_summary_one": "Als in \"{{stage}}\" gedurende {{count}}d -> {{action}}",
+    "rule_summary_other": "Als in \"{{stage}}\" gedurende {{count}}d -> {{action}}",
+    "generated_name_one": "{{stage}} naar {{target}} na {{count}}d",
+    "generated_name_other": "{{stage}} naar {{target}} na {{count}}d"
   },
   "employer": {
     "page_title": "Werkgeversprofiel",
@@ -160,7 +166,11 @@
     "review_comment_placeholder": "Deel je ervaring met deze werkgever...",
     "submit_review": "Recensie versturen",
     "no_reviews": "Nog geen recensies",
-    "anonymous": "Anoniem"
+    "anonymous": "Anoniem",
+    "meta_description_one": "Bekijk dit werkgeversprofiel, openstaande vacatures en community-recensies over {{count}} actuele kansen.",
+    "meta_description_other": "Bekijk dit werkgeversprofiel, openstaande vacatures en community-recensies over {{count}} actuele kansen.",
+    "open_roles_count_one": "{{count}} openstaande vacatures",
+    "open_roles_count_other": "{{count}} openstaande vacatures"
   },
   "bulk": {
     "select_action": "Verplaatsen naar fase...",
@@ -168,7 +178,9 @@
     "clear": "Selectie wissen",
     "success": "Aanvragen bijgewerkt",
     "error": "Bulkupdate mislukt",
-    "selected_count": "{{count}} geselecteerd"
+    "selected_count": "{{count}} geselecteerd",
+    "selected_count_one": "{{count}} geselecteerd",
+    "selected_count_other": "{{count}} geselecteerd"
   },
   "history": {
     "title": "Statusgeschiedenis",
@@ -260,7 +272,15 @@
     "market_avg": "Marktgemiddelde",
     "ai_insights": "AI-inzichten",
     "days_short_value": "{{count}} d",
-    "not_available": "N.v.t."
+    "not_available": "N.v.t.",
+    "views_tooltip_one": "{{date}}: {{count}} weergaven",
+    "views_tooltip_other": "{{date}}: {{count}} weergaven",
+    "applications_tooltip_one": "{{week}}: {{count}} sollicitaties",
+    "applications_tooltip_other": "{{week}}: {{count}} sollicitaties",
+    "based_on_one": "Gebaseerd op {{count}} vergelijkbare banen",
+    "based_on_other": "Gebaseerd op {{count}} vergelijkbare banen",
+    "days_short_value_one": "{{count}} d",
+    "days_short_value_other": "{{count}} d"
   },
   "salary": {
     "label": "Compensatie",
@@ -304,7 +324,9 @@
     "tab_rejected": "Afgewezen",
     "empty_all": "Je hebt nog niet op enige posities solliciteerd.",
     "empty_filtered": "Geen {{filter}} aanvragen gevonden.",
-    "browse_jobs": "Blader door vacatures"
+    "browse_jobs": "Blader door vacatures",
+    "days_left_one": "{{count}}d over",
+    "days_left_other": "{{count}}d over"
   },
   "withdraw": {
     "confirm_title": "Aanvraag intrekken?",
@@ -414,7 +436,9 @@
     "cv_size_kb": "({{count}} KB)",
     "message_employer": "Bericht Werkgever",
     "cv_parse_error": "Kon CV niet parseren. Je kunt je aanvraag nog steeds handmatig indienen.",
-    "quick_apply": "Snel solliciteren met opgeslagen profiel"
+    "quick_apply": "Snel solliciteren met opgeslagen profiel",
+    "cv_size_kb_one": "({{count}} KB)",
+    "cv_size_kb_other": "({{count}} KB)"
   },
   "detail": {
     "loading": "Vacature laden...",
@@ -470,7 +494,11 @@
     "confirm_close_title": "Deze vacature sluiten?",
     "confirm_close": "Als u sluit, komen er geen nieuwe aanvragen meer binnen. U kunt deze op elk gewenst moment opnieuw openen.",
     "confirm_reopen_title": "Deze vacature heropenen?",
-    "confirm_reopen": "Door het heropenen wordt de vacature weer zichtbaar en kunnen mensen solliciteren."
+    "confirm_reopen": "Door het heropenen wordt de vacature weer zichtbaar en kunnen mensen solliciteren.",
+    "owner_has_applicants_one": "{{count}} sollicitant(en) — scroll naar beneden om te bekijken",
+    "owner_has_applicants_other": "{{count}} sollicitant(en) — scroll naar beneden om te bekijken",
+    "views_one": "{{count}} weergaven",
+    "views_other": "{{count}} weergaven"
   },
   "interview": {
     "schedule": "Plan Interview",
@@ -768,7 +796,13 @@
     "days_ago": "{{count}} dagen geleden",
     "weeks_ago": "{{count}} weken geleden",
     "skills_description": "Komma-gescheiden vaardigheden",
-    "skills_chip": "Vaardigheden: {{skills}}"
+    "skills_chip": "Vaardigheden: {{skills}}",
+    "days_ago_one": "{{count}} dagen geleden",
+    "days_ago_other": "{{count}} dagen geleden",
+    "weeks_ago_one": "{{count}} weken geleden",
+    "weeks_ago_other": "{{count}} weken geleden",
+    "results_count_one": "{{count}} kandidaat(en) gevonden",
+    "results_count_other": "{{count}} kandidaat(en) gevonden"
   },
   "resume_visibility": {
     "label": "Maak mijn profiel door werkgevers doorzoekbaar",
@@ -1049,5 +1083,17 @@
   "jobs": {
     "view_details": "Vacaturedetails bekijken"
   },
-  "tabs_aria": "Vacatures bekijken"
+  "tabs_aria": "Vacatures bekijken",
+  "match_badge_one": "{{count}}% overeenkomst",
+  "match_badge_other": "{{count}}% overeenkomst",
+  "views_one": "{{count}} weergaven",
+  "views_other": "{{count}} weergaven",
+  "applications_one": "{{count}} aanvragen",
+  "applications_other": "{{count}} aanvragen",
+  "char_count_one": "{{count}} / {{max}} tekens",
+  "char_count_other": "{{count}} / {{max}} tekens",
+  "hours_per_week_one": "{{count}} uur/week",
+  "hours_per_week_other": "{{count}} uur/week",
+  "time_credits_label_one": "{{count}} tijdcredits",
+  "time_credits_label_other": "{{count}} tijdcredits"
 }

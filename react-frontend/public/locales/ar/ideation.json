@@ -44,7 +44,18 @@
     "no_deadline": "لا يوجد موعد نهائي",
     "evaluation_criteria": "معايير التقييم",
     "outcome": "النتيجة",
-    "team_links": "فرق المشروع"
+    "team_links": "فرق المشروع",
+    "ideas_count_few": "{{count}} أفكار",
+    "ideas_count_many": "{{count}} أفكار",
+    "ideas_count_other": "{{count}} أفكار",
+    "ideas_count_two": "{{count}} أفكار",
+    "ideas_count_zero": "{{count}} أفكار",
+    "max_ideas_few": "حد أقصى {{count}} أفكار لكل شخص",
+    "max_ideas_many": "حد أقصى {{count}} أفكار لكل شخص",
+    "max_ideas_one": "حد أقصى {{count}} أفكار لكل شخص",
+    "max_ideas_other": "حد أقصى {{count}} أفكار لكل شخص",
+    "max_ideas_two": "حد أقصى {{count}} أفكار لكل شخص",
+    "max_ideas_zero": "حد أقصى {{count}} أفكار لكل شخص"
   },
   "challenges": {
     "title": "التحديات",
@@ -87,7 +98,18 @@
     "draft_created": "تم إنشاء {{date}}",
     "new_idea": "فكرة جديدة",
     "sort_label": "ترتيب الأفكار",
-    "loading": "جارٍ تحميل الأفكار..."
+    "loading": "جارٍ تحميل الأفكار...",
+    "your_ideas_few": "أفكارك: {{count}}/{{max}}",
+    "your_ideas_many": "أفكارك: {{count}}/{{max}}",
+    "your_ideas_one": "أفكارك: {{count}}/{{max}}",
+    "your_ideas_other": "أفكارك: {{count}}/{{max}}",
+    "your_ideas_two": "أفكارك: {{count}}/{{max}}",
+    "your_ideas_zero": "أفكارك: {{count}}/{{max}}",
+    "comments_few": "{{count}} تعليقات",
+    "comments_many": "{{count}} تعليقات",
+    "comments_other": "{{count}} تعليقات",
+    "comments_two": "{{count}} تعليقات",
+    "comments_zero": "{{count}} تعليقات"
   },
   "idea_detail": {
     "page_title": "تفاصيل الفكرة",
@@ -321,7 +343,12 @@
     "fallback_title": "حملة",
     "feature_not_available": "ميزة الأفكار غير متاحة",
     "feature_not_available_desc": "ميزة الأفكار غير مفعّلة لهذا المجتمع. تواصل مع مسؤول بنك الوقت لمعرفة المزيد.",
-    "retry": "إعادة المحاولة"
+    "retry": "إعادة المحاولة",
+    "challenges_count_few": "{{count}} تحديات",
+    "challenges_count_many": "{{count}} تحديات",
+    "challenges_count_other": "{{count}} تحديات",
+    "challenges_count_two": "{{count}} تحديات",
+    "challenges_count_zero": "{{count}} تحديات"
   },
   "templates": {
     "title": "قوالب التحديات",

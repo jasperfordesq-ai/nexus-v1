@@ -107,6 +107,11 @@
     "status_completed": "Críochnaithe",
     "status_unknown": "Anaithnid",
     "try_adjusting_search": "Bain triail as do chuardach a choigeartú",
-    "yes": "Tá"
+    "yes": "Tá",
+    "showing_of_total_few": "Ag taispeáint {{count}} de {{total}}",
+    "showing_of_total_many": "Ag taispeáint {{count}} de {{total}}",
+    "showing_of_total_one": "Ag taispeáint {{count}} de {{total}}",
+    "showing_of_total_other": "Ag taispeáint {{count}} de {{total}}",
+    "showing_of_total_two": "Ag taispeáint {{count}} de {{total}}"
   }
 }

@@ -62,12 +62,20 @@
     "minutes_ago": "vor {{count}}Min",
     "hours_ago": "vor {{count}}Std",
     "days_ago": "vor {{count}}T",
-    "last_seen": "Zuletzt gesehen {{time}}"
+    "last_seen": "Zuletzt gesehen {{time}}",
+    "minutes_ago_one": "vor {{count}}Min",
+    "minutes_ago_other": "vor {{count}}Min",
+    "hours_ago_one": "vor {{count}}Std",
+    "hours_ago_other": "vor {{count}}Std",
+    "days_ago_one": "vor {{count}}T",
+    "days_ago_other": "vor {{count}}T"
   },
   "mention": {
     "suggestions_aria": "Erwähnungsvorschläge, {{count}} Ergebnisse",
     "no_users": "Keine Benutzer gefunden",
-    "connected": "Verbunden"
+    "connected": "Verbunden",
+    "suggestions_aria_one": "Erwähnungsvorschläge, {{count}} Ergebnisse",
+    "suggestions_aria_other": "Erwähnungsvorschläge, {{count}} Ergebnisse"
   },
   "status": {
     "set_status": "Status setzen",
@@ -153,7 +161,9 @@
     "collection_description": "Beschreibung (optional)",
     "cancel": "Abbrechen",
     "save": "Speichern",
-    "create": "Erstellen"
+    "create": "Erstellen",
+    "count_one": "{{count}} gespeicherte Artikel",
+    "count_other": "{{count}} gespeicherte Artikel"
   },
   "verified": "Verifiziert",
   "hover_card": {
@@ -163,7 +173,13 @@
     "message": "Nachricht",
     "hours_given": "{{count}} Std. gegeben",
     "connections": "{{count}} Verbindungen",
-    "listings": "{{count}} Inserate"
+    "listings": "{{count}} Inserate",
+    "hours_given_one": "{{count}} Std. gegeben",
+    "hours_given_other": "{{count}} Std. gegeben",
+    "connections_one": "{{count}} Verbindungen",
+    "connections_other": "{{count}} Verbindungen",
+    "listings_one": "{{count}} Inserate",
+    "listings_other": "{{count}} Inserate"
   },
   "reactions_tabs_aria": "Reaktionstypfilter",
   "content_type_tabs_aria": "Lesezeichen-Inhaltstypfilter",

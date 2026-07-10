@@ -251,7 +251,7 @@ export function FederationSettingsPage() {
         ]} />
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <Settings className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+            <Settings className="w-7 h-7 text-accent dark:text-accent" aria-hidden="true" />
             {t('settings.heading')}
           </h1>
           <p className="text-theme-muted mt-1">
@@ -276,7 +276,7 @@ export function FederationSettingsPage() {
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             onPress={loadSettings}
           >
             {t('settings.try_again')}
@@ -307,7 +307,7 @@ export function FederationSettingsPage() {
       {/* Header */}
       <motion.div variants={itemVariants}>
         <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-          <Settings className="w-7 h-7 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+          <Settings className="w-7 h-7 text-accent dark:text-accent" aria-hidden="true" />
           {t('settings.heading')}
         </h1>
         <p className="text-theme-muted mt-1">
@@ -356,7 +356,7 @@ export function FederationSettingsPage() {
                 </div>
               </div>
               <Button
-                className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
                 onPress={handleToggleFederation}
                 isLoading={isTogglingStatus}
               >
@@ -371,41 +371,41 @@ export function FederationSettingsPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
-            <Eye className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+            <Eye className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
             {t('settings.profile_visibility')}
           </h2>
 
           <div className="space-y-1">
             <SettingToggle
-              icon={<Globe className="w-4 h-4 text-indigo-500" />}
+              icon={<Globe className="w-4 h-4 text-accent" />}
               label={t('settings.show_profile_label')}
               description={t('settings.show_profile_description')}
               checked={settings.profile_visible_federated}
               onChange={(v) => updateSetting('profile_visible_federated', v)}
             />
             <SettingToggle
-              icon={<Search className="w-4 h-4 text-indigo-500" />}
+              icon={<Search className="w-4 h-4 text-accent" />}
               label={t('settings.appear_search_label')}
               description={t('settings.appear_search_description')}
               checked={settings.appear_in_federated_search}
               onChange={(v) => updateSetting('appear_in_federated_search', v)}
             />
             <SettingToggle
-              icon={<Zap className="w-4 h-4 text-indigo-500" />}
+              icon={<Zap className="w-4 h-4 text-accent" />}
               label={t('settings.share_skills_label')}
               description={t('settings.share_skills_description')}
               checked={settings.show_skills_federated}
               onChange={(v) => updateSetting('show_skills_federated', v)}
             />
             <SettingToggle
-              icon={<MapPin className="w-4 h-4 text-indigo-500" />}
+              icon={<MapPin className="w-4 h-4 text-accent" />}
               label={t('settings.share_location_label')}
               description={t('settings.share_location_description')}
               checked={settings.show_location_federated}
               onChange={(v) => updateSetting('show_location_federated', v)}
             />
             <SettingToggle
-              icon={<Star className="w-4 h-4 text-indigo-500" />}
+              icon={<Star className="w-4 h-4 text-accent" />}
               label={t('settings.show_reviews_label')}
               description={t('settings.show_reviews_description')}
               checked={settings.show_reviews_federated}
@@ -420,27 +420,27 @@ export function FederationSettingsPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
-            <MessageSquare className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+            <MessageSquare className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
             {t('settings.communication')}
           </h2>
 
           <div className="space-y-1">
             <SettingToggle
-              icon={<Send className="w-4 h-4 text-indigo-500" />}
+              icon={<Send className="w-4 h-4 text-accent" />}
               label={t('settings.allow_messaging_label')}
               description={t('settings.allow_messaging_description')}
               checked={settings.messaging_enabled_federated}
               onChange={(v) => updateSetting('messaging_enabled_federated', v)}
             />
             <SettingToggle
-              icon={<CreditCard className="w-4 h-4 text-indigo-500" />}
+              icon={<CreditCard className="w-4 h-4 text-accent" />}
               label={t('settings.allow_transactions_label')}
               description={t('settings.allow_transactions_description')}
               checked={settings.transactions_enabled_federated}
               onChange={(v) => updateSetting('transactions_enabled_federated', v)}
             />
             <SettingToggle
-              icon={<Mail className="w-4 h-4 text-indigo-500" />}
+              icon={<Mail className="w-4 h-4 text-accent" />}
               label={t('settings.email_notifications_label')}
               description={t('settings.email_notifications_description')}
               checked={settings.email_notifications}
@@ -454,7 +454,7 @@ export function FederationSettingsPage() {
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6">
           <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
+            <MapPin className="w-5 h-5 text-accent dark:text-accent" aria-hidden="true" />
             {t('settings.service_reach')}
           </h2>
 
@@ -507,7 +507,7 @@ export function FederationSettingsPage() {
       <motion.div variants={itemVariants} className="flex justify-end">
         <Button
           onPress={handleSave}
-          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+          className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
           startContent={<Save className="w-4 h-4" aria-hidden="true" />}
           isLoading={isSaving}
           isDisabled={!isDirty}
@@ -552,7 +552,7 @@ function SettingToggle({ label, description, checked, onChange, icon, help }: Se
         isSelected={checked}
         onValueChange={onChange}
         classNames={{
-          wrapper: 'group-data-[selected=true]:bg-indigo-500',
+          wrapper: 'group-data-[selected=true]:bg-accent',
         }}
       />
     </div>

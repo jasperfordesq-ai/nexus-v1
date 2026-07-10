@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import type { PendingDocument } from '@/hooks/useLegalGate';
 import { useTenant } from '@/contexts/TenantContext';
 import { Button } from '@/components/ui/Button';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 
 // Label keys are resolved via i18n below; this map serves as fallback
 const TYPE_LABEL_KEYS: Record<string, string> = {
@@ -63,11 +63,11 @@ export function LegalAcceptanceGate({
       aria-labelledby="legal-gate-title"
     >
       <ModalContent>
-        <ModalHeader id="legal-gate-title" className="flex flex-col gap-1">
-          <div className="flex items-center gap-2">
+        <ModalHeader className="flex flex-col gap-1">
+          <ModalHeading id="legal-gate-title" className="flex items-center gap-2">
             <FileText className="w-5 h-5 text-warning shrink-0" aria-hidden="true" />
             <span>{t('gate.title')}</span>
-          </div>
+          </ModalHeading>
           <p className="text-sm font-normal text-theme-muted">
             {pendingDocs.length === 1
               ? t('gate.subtitle_one')

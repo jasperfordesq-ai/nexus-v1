@@ -312,7 +312,7 @@ export function VerifyIdentityOptionalPage() {
             {failureReason && <p className="text-red-600 dark:text-red-400 text-sm mb-4">{failureReason}</p>}
             <p className="text-theme-subtle text-sm mb-6">{t('identity.failed_hint')}</p>
             <div className="flex flex-col gap-3">
-              <Button onPress={handleStartVerification} isLoading={isStarting} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={!isStarting ? <RefreshCw className="w-4 h-4" /> : undefined}>{t('identity.try_again')}</Button>
+              <Button onPress={handleStartVerification} isLoading={isStarting} className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white" startContent={!isStarting ? <RefreshCw className="w-4 h-4" /> : undefined}>{t('identity.try_again')}</Button>
               <Button variant="tertiary" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.back_to_dashboard')}</Button>
             </div>
           </GlassCard>
@@ -332,7 +332,7 @@ export function VerifyIdentityOptionalPage() {
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('identity.error_title')}</h1>
             <p className="text-theme-muted mb-6">{errorMessage}</p>
-            <Button onPress={() => { setPageState('loading'); fetchStatus(); }} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<RefreshCw className="w-4 h-4" />}>{t('identity.try_again')}</Button>
+            <Button onPress={() => { setPageState('loading'); fetchStatus(); }} className="w-full bg-gradient-to-r from-accent to-accent-gradient-end text-white" startContent={<RefreshCw className="w-4 h-4" />}>{t('identity.try_again')}</Button>
           </GlassCard>
         </motion.div>
       </div>
@@ -348,8 +348,8 @@ export function VerifyIdentityOptionalPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-5 sm:p-8">
             <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4">
-                <CalendarDays className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-emerald-500/20 mb-4">
+                <CalendarDays className="w-8 h-8 text-accent dark:text-accent" aria-hidden="true" />
               </div>
               <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{t('identity.dob_title')}</h1>
               <p className="text-theme-muted mt-2">{t('identity.dob_body')}</p>
@@ -373,7 +373,7 @@ export function VerifyIdentityOptionalPage() {
               <Button
                 onPress={handleSaveDob}
                 isLoading={isSavingDob}
-                className="w-full bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
+                className="w-full bg-gradient-to-r from-accent to-emerald-600 text-white font-medium"
                 size="lg"
                 isDisabled={!dob}
               >
@@ -399,8 +399,8 @@ export function VerifyIdentityOptionalPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-5 sm:p-8">
             <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4">
-                <CreditCard className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-emerald-500/20 mb-4">
+                <CreditCard className="w-8 h-8 text-accent dark:text-accent" aria-hidden="true" />
               </div>
               <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{t('identity.fee_title')}</h1>
               <p className="text-theme-muted mt-2">{t('identity.fee_body', { fee: feeDisplay })}</p>
@@ -413,7 +413,7 @@ export function VerifyIdentityOptionalPage() {
 
             {!clientSecret ? (
               <div className="space-y-4">
-                <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-center">
+                <div className="p-4 rounded-xl bg-accent/5 border border-accent/10 text-center">
                   <p className="text-3xl font-bold text-theme-primary">{feeDisplay}</p>
                   <p className="text-xs text-theme-muted mt-1">{t('identity.fee_one_time_label')}</p>
                 </div>
@@ -421,7 +421,7 @@ export function VerifyIdentityOptionalPage() {
                 <Button
                   onPress={handleCreatePayment}
                   isLoading={isCreatingPayment}
-                  className="w-full bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
+                  className="w-full bg-gradient-to-r from-accent to-emerald-600 text-white font-medium"
                   size="lg"
                   startContent={!isCreatingPayment ? <CreditCard className="w-5 h-5" aria-hidden="true" /> : undefined}
                 >
@@ -457,7 +457,7 @@ export function VerifyIdentityOptionalPage() {
             <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4"
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-emerald-500/20 mb-4"
             >
               {pageState === 'in_progress' ? (
                 <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center py-4"><Spinner size="lg" color="accent" /></div>
@@ -494,7 +494,7 @@ export function VerifyIdentityOptionalPage() {
               <Button
                 onPress={handleStartVerification}
                 isLoading={isStarting}
-                className="w-full bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
+                className="w-full bg-gradient-to-r from-accent to-emerald-600 text-white font-medium"
                 size="lg"
                 startContent={!isStarting ? <ShieldCheck className="w-5 h-5" aria-hidden="true" /> : undefined}
                 spinner={<Spinner size="sm" />}
@@ -509,7 +509,7 @@ export function VerifyIdentityOptionalPage() {
           {pageState === 'in_progress' && (
             <div className="space-y-4">
               {redirectUrl && (
-                <Button as="a" href={redirectUrl} target="_blank" rel="noopener noreferrer" variant="outline" className="w-full border-indigo-500/30 text-theme-primary hover:bg-indigo-500/10" size="lg" startContent={<ExternalLink className="w-4 h-4" />}>
+                <Button as="a" href={redirectUrl} target="_blank" rel="noopener noreferrer" variant="outline" className="w-full border-accent/30 text-theme-primary hover:bg-accent/10" size="lg" startContent={<ExternalLink className="w-4 h-4" />}>
                   {t('identity.open_window')}
                 </Button>
               )}

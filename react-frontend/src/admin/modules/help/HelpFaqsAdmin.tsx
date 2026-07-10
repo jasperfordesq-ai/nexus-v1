@@ -10,6 +10,7 @@
  * Backend: GET/POST /v2/admin/help/faqs, PUT/DELETE /v2/admin/help/faqs/{id}
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -295,7 +296,7 @@ export function HelpFaqsAdmin() {
       sortable: true,
       render: (faq) => (
         <span className="text-sm text-muted">
-          {faq.created_at ? new Date(faq.created_at).toLocaleDateString() : '—'}
+          {faq.created_at ? new Date(faq.created_at).toLocaleDateString(getFormattingLocale()) : '—'}
         </span>
       ),
     },

@@ -90,7 +90,7 @@ const mockScoreData = {
   max_score: 1000,
   percentage: 65,
   percentile: 80,
-  tier: { name: 'Advanced', icon: '🏅', color: 'text-indigo-400' },
+  tier: { name: 'Advanced', icon: '🏅', color: 'text-accent' },
   breakdown: [
     { key: 'engagement', label: 'Engagement', score: 120, max: 200, percentage: 60, details: {} },
     { key: 'quality', label: 'Quality', score: 150, max: 200, percentage: 75, details: {} },

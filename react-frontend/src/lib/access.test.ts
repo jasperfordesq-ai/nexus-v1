@@ -9,6 +9,7 @@ import {
   hasBrokerPanelAccess,
   hasBrokerRole,
   hasPartnerPanelAccess,
+  isPlatformSuperAdminUser,
   isSuperAdminUser,
 } from './access';
 
@@ -90,6 +91,28 @@ describe('isSuperAdminUser', () => {
   it('requires boolean flags to be strictly true', () => {
     expect(isSuperAdminUser({ is_super_admin: 1 })).toBe(false);
     expect(isSuperAdminUser({ is_tenant_super_admin: 'yes' })).toBe(false);
+  });
+});
+
+describe('isPlatformSuperAdminUser', () => {
+  it('grants platform access for platform super-admin and god roles or flags', () => {
+    expect(isPlatformSuperAdminUser({ role: 'super_admin' })).toBe(true);
+    expect(isPlatformSuperAdminUser({ role: 'god' })).toBe(true);
+    expect(isPlatformSuperAdminUser({ is_super_admin: true })).toBe(true);
+    expect(isPlatformSuperAdminUser({ is_god: true })).toBe(true);
+  });
+
+  it('rejects tenant-scoped super admins and ordinary admin tiers', () => {
+    expect(isPlatformSuperAdminUser({ is_tenant_super_admin: true })).toBe(false);
+    expect(isPlatformSuperAdminUser({ role: 'tenant_admin' })).toBe(false);
+    expect(isPlatformSuperAdminUser({ role: 'admin', is_admin: true })).toBe(false);
+    expect(isPlatformSuperAdminUser({ role: 'member' })).toBe(false);
+    expect(isPlatformSuperAdminUser(null)).toBe(false);
+  });
+
+  it('requires platform boolean flags to be strictly true', () => {
+    expect(isPlatformSuperAdminUser({ is_super_admin: 1 })).toBe(false);
+    expect(isPlatformSuperAdminUser({ is_god: 'yes' })).toBe(false);
   });
 });
 

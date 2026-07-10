@@ -218,7 +218,9 @@
     "smart_search_text_chip": "Suche: {{query}}",
     "role_super_admin": "Superadmin",
     "permissions_editor_unavailable_title": "Berechtigungen sind hier schreibgeschützt",
-    "permissions_editor_unavailable_desc": "Diese Seite zeigt die Rolle und die erteilten Berechtigungen des Benutzers, kann sie aber nicht ändern. Verwalten Sie den Zugriff, indem Sie die Rolle des Benutzers auf der Bearbeitungsseite ändern."
+    "permissions_editor_unavailable_desc": "Diese Seite zeigt die Rolle und die erteilten Berechtigungen des Benutzers, kann sie aber nicht ändern. Verwalten Sie den Zugriff, indem Sie die Rolle des Benutzers auf der Bearbeitungsseite ändern.",
+    "role_unknown": "Unbekannte Rolle",
+    "role_tenant_super_admin": "Mandanten-Superadministrator"
   },
   "user_edit": {
     "actions": {

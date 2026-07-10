@@ -658,8 +658,12 @@ export default interface Resources {
       "error404_tracking_desc": "Track pages that return 404 errors so you can create redirects or fix broken links",
       "error404_tracking_title": "404 Error Tracking",
       "fail_count": "{{count}} fail",
+      "fail_count_one": "{{count}} fail",
+      "fail_count_other": "{{count}} fail",
       "failed_count": "Failed to count",
       "failed_count_with_value": "{{count}} failed",
+      "failed_count_with_value_one": "{{count}} failed",
+      "failed_count_with_value_other": "{{count}} failed",
       "failed_to_clear_sitemap_cache": "Failed to clear sitemap cache",
       "failed_to_copy": "Failed to copy",
       "failed_to_create_redirect": "Failed to create redirect",
@@ -700,8 +704,12 @@ export default interface Resources {
       "generate_embeddings_hint_prefix": "Run",
       "generate_embeddings_hint_suffix": "to generate embeddings.",
       "global_meta_description_count": "{{count}}/160 global meta description characters",
+      "global_meta_description_count_one": "{{count}}/160 global meta description characters",
+      "global_meta_description_count_other": "{{count}}/160 global meta description characters",
       "gmail_api_configuration": "Gmail API Configuration",
       "health_auto_sitemap_active_count": "Active — {{count}} URLs indexed",
+      "health_auto_sitemap_active_count_one": "Active — {{count}} URLs indexed",
+      "health_auto_sitemap_active_count_other": "Active — {{count}} URLs indexed",
       "health_auto_sitemap_disabled": "Disabled — search engines cannot discover your pages",
       "health_canonical_disabled": "Disabled — search results may see duplicate content",
       "health_canonical_enabled": "Enabled — duplicate content is prevented",
@@ -714,6 +722,8 @@ export default interface Resources {
       "health_loading": "Loading algorithm health...",
       "health_meta_description": "Meta description",
       "health_meta_description_length": "{{count}} characters (ideal: 150–160)",
+      "health_meta_description_length_one": "{{count}} characters (ideal: 150–160)",
+      "health_meta_description_length_other": "{{count}} characters (ideal: 150–160)",
       "health_meta_description_missing": "No default meta description set",
       "health_og_image_configured": "Default social sharing image is configured",
       "health_og_image_missing": "No default OG image — social shares will use the fallback image",
@@ -798,6 +808,8 @@ export default interface Resources {
       "meilisearch_online": "Meilisearch Online",
       "member_transactions": "Member Transactions",
       "meta_description_count": "{{count}}/160 meta description characters",
+      "meta_description_count_one": "{{count}}/160 meta description characters",
+      "meta_description_count_other": "{{count}}/160 meta description characters",
       "meta_tags_heading": "Meta Tags",
       "missing_indexes_hint_prefix": "Run",
       "missing_indexes_hint_suffix": "to create missing indexes.",
@@ -1207,8 +1219,12 @@ export default interface Resources {
       "param_time_decay_weight": "Time Decay Weight",
       "param_time_decay_weight_desc": "How strongly post age reduces ranking",
       "pass_count": "{{count}} pass",
+      "pass_count_one": "{{count}} pass",
+      "pass_count_other": "{{count}} pass",
       "passed_count": "Passed",
       "passed_count_with_value": "{{count}} passed",
+      "passed_count_with_value_one": "{{count}} passed",
+      "passed_count_with_value_other": "{{count}} passed",
       "placeholder_a_short_description_of_your_timebank": "A Short Description of Your Timebank...",
       "placeholder_community_timebanking_platform": "Community Timebanking Platform...",
       "placeholder_current": "Enter current...",
@@ -1269,13 +1285,17 @@ export default interface Resources {
             "unique_uris": "Unique URIs"
           },
           "labels": {
-            "spoofed_count": "{{count}} spoofed"
+            "spoofed_count": "{{count}} spoofed",
+            "spoofed_count_one": "{{count}} spoofed",
+            "spoofed_count_other": "{{count}} spoofed"
           },
           "log_summary": "Log: {{size}} - since {{time}}",
           "sections": {
             "hits_by_crawler": "Hits by crawler",
             "hits_by_status": "Hits by HTTP status",
             "recent_activity": "Recent activity (newest first, last {{count}})",
+            "recent_activity_one": "Recent activity (newest first, last {{count}})",
+            "recent_activity_other": "Recent activity (newest first, last {{count}})",
             "top_uris": "Top URIs (top 50 by hit count)"
           },
           "tables": {
@@ -1334,7 +1354,9 @@ export default interface Resources {
           "actions": {
             "open_in_inventory": "Open in inventory",
             "refresh": "Refresh",
-            "refresh_all_stale": "Refresh all stale ({{count}})"
+            "refresh_all_stale": "Refresh all stale ({{count}})",
+            "refresh_all_stale_one": "Refresh all stale ({{count}})",
+            "refresh_all_stale_other": "Refresh all stale ({{count}})"
           },
           "columns": {
             "actions": "ACTIONS",
@@ -1346,7 +1368,9 @@ export default interface Resources {
             "tenant": "TENANT"
           },
           "confirm": {
-            "queue_recache": "Queue recache for {{count}} tenants?"
+            "queue_recache": "Queue recache for {{count}} tenants?",
+            "queue_recache_one": "Queue recache for {{count}} tenants?",
+            "queue_recache_other": "Queue recache for {{count}} tenants?"
           },
           "empty": "No tenants",
           "errors": {
@@ -1356,11 +1380,15 @@ export default interface Resources {
           },
           "messages": {
             "bulk_queued": "Queued recache for {{count}} tenants",
+            "bulk_queued_one": "Queued recache for {{count}} tenants",
+            "bulk_queued_other": "Queued recache for {{count}} tenants",
             "no_stale": "No stale tenants - coverage is healthy",
             "tenant_queued": "Queued #{{id}} for {{slug}}"
           },
           "summary": {
             "healthy": "All {{count}} tenants healthy.",
+            "healthy_one": "All {{count}} tenants healthy.",
+            "healthy_other": "All {{count}} tenants healthy.",
             "needs_work": "{{needing}} of {{total}} tenants have missing, stale, or asset-broken routes."
           },
           "table_aria": "Coverage"
@@ -1384,6 +1412,8 @@ export default interface Resources {
             "limit": "Limit"
           },
           "summary": "{{count}} events",
+          "summary_one": "{{count}} events",
+          "summary_other": "{{count}} events",
           "table_aria": "Events",
           "types": {
             "fail": "Fail",
@@ -1394,6 +1424,9 @@ export default interface Resources {
           }
         },
         "failures": {
+          "actions": {
+            "close_breaker_now": "Resume queue now"
+          },
           "columns": {
             "age": "Age",
             "cache_path": "Cache path",
@@ -1433,7 +1466,11 @@ export default interface Resources {
             "drift_applied": "Drift detection applied",
             "drift_dry_run": "Drift dry-run complete",
             "purge_dry_run": "Dry run: {{count}} snapshots would be purged",
-            "purged_ungated": "Purged {{count}} ungated snapshots across {{tenants}} tenants"
+            "purge_dry_run_one": "Dry run: {{count}} snapshots would be purged",
+            "purge_dry_run_other": "Dry run: {{count}} snapshots would be purged",
+            "purged_ungated": "Purged {{count}} ungated snapshots across {{tenants}} tenants",
+            "purged_ungated_one": "Purged {{count}} ungated snapshots across {{tenants}} tenants",
+            "purged_ungated_other": "Purged {{count}} ungated snapshots across {{tenants}} tenants"
           },
           "no_output": "(no output)",
           "purge_ungated": {
@@ -1442,7 +1479,11 @@ export default interface Resources {
           },
           "result": {
             "deleted": "Deleted {{count}} snapshots across {{tenants}} tenants",
-            "would_delete": "Would delete {{count}} snapshots across {{tenants}} tenants"
+            "deleted_one": "Deleted {{count}} snapshots across {{tenants}} tenants",
+            "deleted_other": "Deleted {{count}} snapshots across {{tenants}} tenants",
+            "would_delete": "Would delete {{count}} snapshots across {{tenants}} tenants",
+            "would_delete_one": "Would delete {{count}} snapshots across {{tenants}} tenants",
+            "would_delete_other": "Would delete {{count}} snapshots across {{tenants}} tenants"
           },
           "title": "Freshness automation"
         },
@@ -1517,6 +1558,8 @@ export default interface Resources {
             "inspect_snapshot": "Inspect {{path}}",
             "open_rendered_url": "Open rendered URL",
             "recache_selected": "Recache selected ({{count}})",
+            "recache_selected_one": "Recache selected ({{count}})",
+            "recache_selected_other": "Recache selected ({{count}})",
             "reload": "Reload",
             "select_all_visible": "Select all visible",
             "select_snapshot": "Select {{path}}"
@@ -1557,8 +1600,12 @@ export default interface Resources {
             "age": "Age",
             "all_valid": "all valid",
             "asset_references": "Asset references ({{count}})",
+            "asset_references_one": "Asset references ({{count}})",
+            "asset_references_other": "Asset references ({{count}})",
             "canonical": "Canonical",
             "dead_assets": "{{count}} dead",
+            "dead_assets_one": "{{count}} dead",
+            "dead_assets_other": "{{count}} dead",
             "flags": "Flags",
             "h1_count": "H1 (count)",
             "html_parse_warnings": "HTML parse warnings",
@@ -1575,6 +1622,8 @@ export default interface Resources {
             "modal_title": "Snapshot inspection",
             "modified": "Modified",
             "must_fix": "Must fix ({{count}})",
+            "must_fix_one": "Must fix ({{count}})",
+            "must_fix_other": "Must fix ({{count}})",
             "no_structured_data": "No structured data",
             "no_type": "(no @type)",
             "none": "(none)",
@@ -1584,12 +1633,18 @@ export default interface Resources {
             "seo_score": "SEO score",
             "size": "Size",
             "tips": "Tips ({{count}})",
+            "tips_one": "Tips ({{count}})",
+            "tips_other": "Tips ({{count}})",
             "title": "Title"
           },
           "messages": {
-            "bulk_recache": "Invalidated {{count}} snapshots and queued recache"
+            "bulk_recache": "Invalidated {{count}} snapshots and queued recache",
+            "bulk_recache_one": "Invalidated {{count}} snapshots and queued recache",
+            "bulk_recache_other": "Invalidated {{count}} snapshots and queued recache"
           },
           "selected": "{{count}} selected",
+          "selected_one": "{{count}} selected",
+          "selected_other": "{{count}} selected",
           "status": {
             "asset": "asset",
             "content": "content",
@@ -1665,7 +1720,9 @@ export default interface Resources {
             "tooltip": "priority={{priority}} (lower wins)"
           },
           "result": {
-            "invalid": "{{count}} invalid"
+            "invalid": "{{count}} invalid",
+            "invalid_one": "{{count}} invalid",
+            "invalid_other": "{{count}} invalid"
           },
           "scope": {
             "all_tenants": "all tenants"
@@ -1697,11 +1754,19 @@ export default interface Resources {
             "cache_unreachable": "Cache unreachable",
             "healthy": "Healthy",
             "missing": "{{count}} missing",
-            "stale": "{{count}} stale"
+            "missing_one": "{{count}} missing",
+            "missing_other": "{{count}} missing",
+            "stale": "{{count}} stale",
+            "stale_one": "{{count}} stale",
+            "stale_other": "{{count}} stale"
           },
           "hints": {
             "active_jobs": "{{count}} active",
+            "active_jobs_one": "{{count}} active",
+            "active_jobs_other": "{{count}} active",
             "aging": "{{count}} aging (>7d)",
+            "aging_one": "{{count}} aging (>7d)",
+            "aging_other": "{{count}} aging (>7d)",
             "asset_broken": "References dead /assets/*",
             "backoff_window": "In 6h backoff window",
             "cache_age": "Oldest {{oldest}} / newest {{newest}}",
@@ -1765,7 +1830,11 @@ export default interface Resources {
           },
           "messages": {
             "dry_run": "Dry run: {{count}} snapshots would be purged",
-            "purged": "Purged {{count}} snapshots{{job}}"
+            "dry_run_one": "Dry run: {{count}} snapshots would be purged",
+            "dry_run_other": "Dry run: {{count}} snapshots would be purged",
+            "purged": "Purged {{count}} snapshots{{job}}",
+            "purged_one": "Purged {{count}} snapshots{{job}}",
+            "purged_other": "Purged {{count}} snapshots{{job}}"
           },
           "placeholders": {
             "pattern": "/blog/* or /listings/**",
@@ -1773,12 +1842,18 @@ export default interface Resources {
           },
           "preview_gate": {
             "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
+            "ready_one": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
+            "ready_other": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
             "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
             "title": "Preview required before live delete"
           },
           "result": {
             "deleted": "Deleted {{count}} snapshots",
-            "would_delete": "Would delete {{count}} snapshots"
+            "deleted_one": "Deleted {{count}} snapshots",
+            "deleted_other": "Deleted {{count}} snapshots",
+            "would_delete": "Would delete {{count}} snapshots",
+            "would_delete_one": "Would delete {{count}} snapshots",
+            "would_delete_other": "Would delete {{count}} snapshots"
           },
           "title": "Delete snapshots by route pattern"
         },
@@ -1793,8 +1868,14 @@ export default interface Resources {
           },
           "counts": {
             "dynamic": "{{count}} dynamic",
+            "dynamic_one": "{{count}} dynamic",
+            "dynamic_other": "{{count}} dynamic",
             "static": "{{count}} static",
-            "total": "{{count}} total"
+            "static_one": "{{count}} static",
+            "static_other": "{{count}} static",
+            "total": "{{count}} total",
+            "total_one": "{{count}} total",
+            "total_other": "{{count}} total"
           },
           "description_prefix": "See the public routes the engine believes belong to this tenant: built-in public pages plus dynamic URLs from",
           "description_suffix": "The worker uses this list when it refreshes snapshots.",
@@ -1901,7 +1982,9 @@ export default interface Resources {
           },
           "status": {
             "clean": "No issues found",
-            "needs_attention": "{{count}} item needs attention"
+            "needs_attention": "{{count}} item needs attention",
+            "needs_attention_one": "{{count}} item needs attention",
+            "needs_attention_other": "{{count}} item needs attention"
           },
           "tables": {
             "attention_aria": "Tenant snapshot items needing attention"
@@ -1932,8 +2015,14 @@ export default interface Resources {
           "title": "Freshness rule lookup",
           "units": {
             "days": "{{count}} d",
+            "days_one": "{{count}} d",
+            "days_other": "{{count}} d",
             "hours": "{{count}} h",
-            "minutes": "{{count}} min"
+            "hours_one": "{{count}} h",
+            "hours_other": "{{count}} h",
+            "minutes": "{{count}} min",
+            "minutes_one": "{{count}} min",
+            "minutes_other": "{{count}} min"
           }
         },
         "workflows": {
@@ -1989,6 +2078,7 @@ export default interface Resources {
       "score_breakdown": "Score Breakdown",
       "score_category": "Category Match",
       "score_freshness": "Freshness",
+      "score_out_of": "out of {{maximum}}",
       "score_proximity": "Proximity",
       "score_quality": "Quality",
       "score_reciprocity": "Reciprocity",
@@ -2044,14 +2134,20 @@ export default interface Resources {
       "top_matches_for_user_one": "Top {{count}} match for {{name}}",
       "top_matches_for_user_other": "Top {{count}} matches for {{name}}",
       "total_count": "Total: {{count}}",
+      "total_count_one": "Total: {{count}}",
+      "total_count_other": "Total: {{count}}",
       "twitter_cards": "Twitter Cards",
       "twitter_cards_desc": "Configure Twitter Card meta tags for rich link previews on Twitter",
       "unable_to_load_sitemap_stats": "Unable to Load Sitemap Stats",
       "usage_limits_heading": "Usage Limits",
       "verification_robots_heading": "Verification Robots",
       "warning_count": "{{count}} warning",
+      "warning_count_one": "{{count}} warning",
+      "warning_count_other": "{{count}} warning",
       "warnings_count": "Warnings",
       "warnings_count_with_value": "{{count}} warnings",
+      "warnings_count_with_value_one": "{{count}} warnings",
+      "warnings_count_with_value_other": "{{count}} warnings",
       "webhook_u_r_l_copied": "Webhook URL copied",
       "webhook_url_hint": "Webhook URL for receiving notifications",
       "webhook_url_label": "Webhook URL"
@@ -2142,12 +2238,16 @@ export default interface Resources {
       "metrics": {
         "accepted": "Accepted",
         "bad_outcomes": "{{count}} failed, bounced, or suppressed",
+        "bad_outcomes_one": "{{count}} failed, bounced, or suppressed",
+        "bad_outcomes_other": "{{count}} failed, bounced, or suppressed",
         "bounced": "Bounced",
         "delivered": "Delivered",
         "not_available": "No trigger audit data",
         "total": "Total",
         "trigger_score": "Trigger score",
         "unconfirmed": "{{count}} accepted but unconfirmed",
+        "unconfirmed_one": "{{count}} accepted but unconfirmed",
+        "unconfirmed_other": "{{count}} accepted but unconfirmed",
         "webhook_confirmed": "Confirmed by provider webhook",
         "window_days": "{{days}} day window"
       },
@@ -2256,6 +2356,8 @@ export default interface Resources {
       },
       "title": "Email Deliverability",
       "trigger_coverage": "{{issues}} issues across {{count}} monitored flows",
+      "trigger_coverage_one": "{{issues}} issues across {{count}} monitored flows",
+      "trigger_coverage_other": "{{issues}} issues across {{count}} monitored flows",
       "trigger_health": {
         "critical": "Critical trigger issues",
         "monitored": "Monitored flows",
@@ -2542,6 +2644,8 @@ export default interface Resources {
         "create_title": "Create ad campaign",
         "creative_alt": "Creative",
         "creatives_count": "Creatives ({{count}})",
+        "creatives_count_one": "Creatives ({{count}})",
+        "creatives_count_other": "Creatives ({{count}})",
         "fields": {
           "audience_filters": "Audience filters (JSON, optional)",
           "end_date": "End date",
@@ -2834,6 +2938,8 @@ export default interface Resources {
           "invalid_json": "Config is not valid JSON",
           "load_failed": "Failed to load agent definitions",
           "run_created": "Run #{{runId}} created {{count}} proposal(s)",
+          "run_created_one": "Run #{{runId}} created {{count}} proposal(s)",
+          "run_created_other": "Run #{{runId}} created {{count}} proposal(s)",
           "run_failed": "Failed to run agent",
           "run_failed_with_error": "Run failed: {{error}}",
           "toggle_failed": "Failed to toggle agent",
@@ -3116,6 +3222,8 @@ export default interface Resources {
           "duration": "Duration:",
           "proposals_applied": "Proposals applied:",
           "proposals_count": "Proposals ({{count}})",
+          "proposals_count_one": "Proposals ({{count}})",
+          "proposals_count_other": "Proposals ({{count}})",
           "proposals_generated": "Proposals generated:",
           "proposals_table_aria": "Run proposals",
           "started": "Started:",
@@ -3142,6 +3250,8 @@ export default interface Resources {
         },
         "stats": {
           "pending_review": "{{count}} pending review",
+          "pending_review_one": "{{count}} pending review",
+          "pending_review_other": "{{count}} pending review",
           "total_proposals": "total proposals",
           "total_runs": "total runs"
         },
@@ -3178,6 +3288,8 @@ export default interface Resources {
           "run_details_load_failed": "Failed to load run details.",
           "run_trigger_failed": "Failed to trigger run.",
           "run_triggered": "Run triggered: {{count}} proposals generated.",
+          "run_triggered_one": "Run triggered: {{count}} proposals generated.",
+          "run_triggered_other": "Run triggered: {{count}} proposals generated.",
           "runs_load_failed": "Failed to load runs."
         },
         "triggered_by": {
@@ -3249,6 +3361,8 @@ export default interface Resources {
           "save_failed": "Save failed.",
           "seed_failed": "Seed failed.",
           "seeded": "Seeded {{count}} default doc(s).",
+          "seeded_one": "Seeded {{count}} default doc(s).",
+          "seeded_other": "Seeded {{count}} default doc(s).",
           "updated": "Doc updated."
         }
       },
@@ -3406,6 +3520,8 @@ export default interface Resources {
       "listings_count": "Listings",
       "loading": "Loading analytics",
       "location_marker_title": "{{area}}: {{count}} members",
+      "location_marker_title_one": "{{area}}: {{count}} members",
+      "location_marker_title_other": "{{area}}: {{count}} members",
       "member_count_one": "{{count}} member",
       "member_count_other": "{{count}} members",
       "member_growth_title": "Member Growth",
@@ -3597,6 +3713,8 @@ export default interface Resources {
     "search_analytics": {
       "avg_results": "Avg. results per search",
       "count_value": "{{count}}×",
+      "count_value_one": "{{count}}×",
+      "count_value_other": "{{count}}×",
       "daily_volume": "Daily search volume",
       "days_14": "Last 14 days",
       "days_30": "Last 30 days",
@@ -3955,6 +4073,8 @@ export default interface Resources {
       "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity.",
       "upgrade_sent": "Upgrade sent",
       "user_count_label": "{{count}} / {{max}} users",
+      "user_count_label_one": "{{count}} / {{max}} users",
+      "user_count_label_other": "{{count}} / {{max}} users",
       "view_invoices": "View Invoices",
       "yearly": "Yearly",
       "yearly_suffix": "yr",
@@ -4108,12 +4228,18 @@ export default interface Resources {
       "blog": {
         "archive": "Archive",
         "archive_confirm_message": "This will unpublish {{count}} post(s). They can be republished later.",
+        "archive_confirm_message_one": "This will unpublish {{count}} post(s). They can be republished later.",
+        "archive_confirm_message_other": "This will unpublish {{count}} post(s). They can be republished later.",
         "archive_confirm_title": "Archive selected posts?",
         "delete": "Delete",
         "delete_confirm_message": "Delete {{count}} selected post(s)? This cannot be undone.",
+        "delete_confirm_message_one": "Delete {{count}} selected post(s)? This cannot be undone.",
+        "delete_confirm_message_other": "Delete {{count}} selected post(s)? This cannot be undone.",
         "delete_confirm_title": "Delete selected posts?",
         "publish": "Publish",
         "publish_confirm_message": "Publish {{count}} selected post(s)?",
+        "publish_confirm_message_one": "Publish {{count}} selected post(s)?",
+        "publish_confirm_message_other": "Publish {{count}} selected post(s)?",
         "publish_confirm_title": "Publish selected posts?"
       },
       "clear_selection": "Clear selection",
@@ -4907,6 +5033,8 @@ export default interface Resources {
         "loading": "Loading trust tier configuration",
         "messages": {
           "recomputed": "Trust tiers recomputed for {{count}} members.",
+          "recomputed_one": "Trust tiers recomputed for {{count}} members.",
+          "recomputed_other": "Trust tiers recomputed for {{count}} members.",
           "saved": "Trust tier configuration saved. Changes apply on the next recompute run."
         },
         "meta": {
@@ -5194,7 +5322,15 @@ export default interface Resources {
         "loading_favours": "Loading favours...",
         "title": "Informal Favours",
         "total_recorded": "{{count}} total recorded",
+        "total_recorded_one": "{{count}} total recorded",
+        "total_recorded_other": "{{count}} total recorded",
         "unknown": "Unknown"
+      },
+      "invite_card": {
+        "brand": "Community Caring",
+        "instructions": "Enter this code or visit the link below to join.",
+        "subtitle": "Neighbour-to-neighbour invitation",
+        "valid_until": "Valid until {{date}}"
       },
       "invite_codes": {
         "columns": {
@@ -5282,6 +5418,8 @@ export default interface Resources {
       },
       "pending": {
         "age_days": "{{count}} day old",
+        "age_days_one": "{{count}} day old",
+        "age_days_other": "{{count}} day old",
         "age_days_plural": "{{count}} days old",
         "approve_success": "Review approved.",
         "assign_coordinator": "Assign coordinator",
@@ -5299,10 +5437,16 @@ export default interface Resources {
         "escalate_success": "Review escalated.",
         "escalated_at": "Escalated {{date}}",
         "escalated_count": "{{count}} escalated",
+        "escalated_count_one": "{{count}} escalated",
+        "escalated_count_other": "{{count}} escalated",
         "logged": "Logged {{date}}",
         "manual_escalation_note": "Manually escalated after {{count}} pending days.",
+        "manual_escalation_note_one": "Manually escalated after {{count}} pending days.",
+        "manual_escalation_note_other": "Manually escalated after {{count}} pending days.",
         "needs_review": "Needs review",
         "overdue_count": "{{count}} overdue",
+        "overdue_count_one": "{{count}} overdue",
+        "overdue_count_other": "{{count}} overdue",
         "submitted": "Submitted {{date}}",
         "title": "Pending Reviews"
       },
@@ -5442,6 +5586,8 @@ export default interface Resources {
       },
       "role_pack": {
         "available_count": "{{count}} role presets available",
+        "available_count_one": "{{count}} role presets available",
+        "available_count_other": "{{count}} role presets available",
         "description": "Pre-configured permission sets for each caring community role. Install the full role pack to quickly set up your coordinators with the correct access. {{countLabel}}.",
         "install": "Install role pack",
         "install_failed": "Could not install role pack.",
@@ -5481,7 +5627,11 @@ export default interface Resources {
       },
       "safeguarding": {
         "age_days": "{{count}}d",
+        "age_days_one": "{{count}}d",
+        "age_days_other": "{{count}}d",
         "age_hours": "{{count}}h",
+        "age_hours_one": "{{count}}h",
+        "age_hours_other": "{{count}}h",
         "columns": {
           "action": "Action",
           "age": "Age",
@@ -5673,6 +5823,8 @@ export default interface Resources {
         "title": "Commercial Boundary Map"
       },
       "overrides_count": "{{count}} override",
+      "overrides_count_one": "{{count}} override",
+      "overrides_count_other": "{{count}} override",
       "overrides_count_plural": "{{count}} overrides",
       "sections": {
         "classifications": "Classifications"
@@ -5777,6 +5929,8 @@ export default interface Resources {
       "summary": {
         "affected": "affected",
         "count": "{{count}} {{label}}",
+        "count_one": "{{count}} {{label}}",
+        "count_other": "{{count}} {{label}}",
         "generated": "Generated {{date}}",
         "label": "Summary:"
       },
@@ -6138,15 +6292,25 @@ export default interface Resources {
       },
       "open": {
         "all_count": "All ({{count}})",
+        "all_count_one": "All ({{count}})",
+        "all_count_other": "All ({{count}})",
         "at_risk_count": "At risk ({{count}})",
+        "at_risk_count_one": "At risk ({{count}})",
+        "at_risk_count_other": "At risk ({{count}})",
         "breached_count": "Breached ({{count}})",
+        "breached_count_one": "Breached ({{count}})",
+        "breached_count_other": "Breached ({{count}})",
         "bucket_filter_aria": "Bucket filter",
         "empty_bucket": "No open help requests in this bucket.",
         "left": "{{duration}} left",
         "on_track_count": "On track ({{count}})",
+        "on_track_count_one": "On track ({{count}})",
+        "on_track_count_other": "On track ({{count}})",
         "over_by": "Over by {{duration}}",
         "request_meta": "When: {{when}} - user #{{userId}} - age {{age}}",
         "subtitle": "{{count}} open - sorted breached first",
+        "subtitle_one": "{{count}} open - sorted breached first",
+        "subtitle_other": "{{count}} open - sorted breached first",
         "table_aria": "Open help requests",
         "target_hours": "Target {{hours}}h",
         "title": "Open help requests"
@@ -6231,6 +6395,8 @@ export default interface Resources {
       },
       "gate": {
         "blocked_count": " - {{count}} blocked",
+        "blocked_count_one": " - {{count}} blocked",
+        "blocked_count_other": " - {{count}} blocked",
         "closed": "Gate closed - ready to launch",
         "decided_count": "{{decided}} of {{total}} items decided",
         "open": "Gate open - decisions still required",
@@ -6253,9 +6419,17 @@ export default interface Resources {
       },
       "status_counts": {
         "blocked": "Blocked: {{count}}",
+        "blocked_one": "Blocked: {{count}}",
+        "blocked_other": "Blocked: {{count}}",
         "decided": "Decided: {{count}}",
+        "decided_one": "Decided: {{count}}",
+        "decided_other": "Decided: {{count}}",
         "in_progress": "In progress: {{count}}",
-        "pending": "Pending: {{count}}"
+        "in_progress_one": "In progress: {{count}}",
+        "in_progress_other": "In progress: {{count}}",
+        "pending": "Pending: {{count}}",
+        "pending_one": "Pending: {{count}}",
+        "pending_other": "Pending: {{count}}"
       },
       "timestamps": {
         "last_updated": "Last updated {{date}}"
@@ -6370,7 +6544,9 @@ export default interface Resources {
       "contacts": {
         "empty": "No contacts match the current filters.",
         "table_aria": "Lead nurture contacts",
-        "title": "Contacts ({{count}})"
+        "title": "Contacts ({{count}})",
+        "title_one": "Contacts ({{count}})",
+        "title_other": "Contacts ({{count}})"
       },
       "empty": {
         "value": "-"
@@ -6464,6 +6640,8 @@ export default interface Resources {
         "audience_hint": "Audience hint (optional)",
         "audience_placeholder": "e.g. caregivers in north sub-region",
         "character_count": "{{count}} / 4000 characters",
+        "character_count_one": "{{count}} / 4000 characters",
+        "character_count_other": "{{count}} / 4000 characters",
         "draft_announcement": "Draft announcement",
         "draft_placeholder": "Paste a rough draft - the copilot will polish, check tone, and flag issues.",
         "polished_text": "Polished text",
@@ -6761,6 +6939,8 @@ export default interface Resources {
         "title": "Launch the pilot?"
       },
       "more_count": "+{{count}} more",
+      "more_count_one": "+{{count}} more",
+      "more_count_other": "+{{count}} more",
       "overall": {
         "blocked": "Launch blocked - fix issues first",
         "needs_review": "Pilot needs coordinator review",
@@ -6774,6 +6954,8 @@ export default interface Resources {
       "states": {
         "blocked_body": "Resolve every section below before the launch button is enabled.",
         "blocked_title": "Cannot launch yet - {{count}} blocker remains",
+        "blocked_title_one": "Cannot launch yet - {{count}} blocker remains",
+        "blocked_title_other": "Cannot launch yet - {{count}} blocker remains",
         "blocked_title_plural": "Cannot launch yet - {{count}} blockers remain",
         "launched_body": "Launched on {{date}}{{user}}. This is a one-way milestone - readiness checks remain visible for audit.",
         "launched_by_user": " by user #{{id}}",
@@ -6987,6 +7169,8 @@ export default interface Resources {
         "placeholder_count_other": "{{count}} placeholders",
         "placeholder_label": "{{placeholder}}",
         "rendered_markdown": "Rendered Markdown ({{count}} chars)",
+        "rendered_markdown_one": "Rendered Markdown ({{count}} chars)",
+        "rendered_markdown_other": "Rendered Markdown ({{count}} chars)",
         "subtitle": "FADP/nDSG-aligned drafts for legal review",
         "title": "Agreement Templates"
       },
@@ -7070,6 +7254,8 @@ export default interface Resources {
       },
       "dry_run": {
         "candidates": "{{count}} candidates",
+        "candidates_one": "{{count}} candidates",
+        "candidates_other": "{{count}} candidates",
         "empty": "No eligible candidates right now.",
         "table_aria": "Dry-run nudge candidates",
         "title": "Dry-run preview"
@@ -7106,7 +7292,11 @@ export default interface Resources {
         "config_saved": "Nudge config saved. The updated rules will apply on the next scheduled run.",
         "dispatch_failed": "Dispatch failed",
         "dispatched": "Dispatched {{count}} nudges",
+        "dispatched_one": "Dispatched {{count}} nudges",
+        "dispatched_other": "Dispatched {{count}} nudges",
         "dry_run": "Dry run: {{count}} eligible candidates",
+        "dry_run_one": "Dry run: {{count}} eligible candidates",
+        "dry_run_other": "Dry run: {{count}} eligible candidates",
         "load_failed": "Failed to load nudge analytics",
         "save_failed": "Failed to save configuration"
       }
@@ -7818,6 +8008,8 @@ export default interface Resources {
       "option_copy_new_member_messages_desc": "Broker receives copy of new member messages",
       "option_copy_new_member_messages_label": "Copy New Member Messages",
       "option_count": "{{count}} options",
+      "option_count_one": "{{count}} options",
+      "option_count_other": "{{count}} options",
       "option_dashboard_show_quick_actions_desc": "Display quick action buttons on the dashboard",
       "option_dashboard_show_quick_actions_label": "Show Quick Actions",
       "option_dashboard_show_recent_activity_desc": "Display recent activity feed on the dashboard",
@@ -8233,6 +8425,8 @@ export default interface Resources {
       "optional_features": "Optional Features",
       "page_title": "Config",
       "planned_count": "{{count}} planned",
+      "planned_count_one": "{{count}} planned",
+      "planned_count_other": "{{count}} planned",
       "platform_infrastructure": "Platform Infrastructure",
       "platform_infrastructure_desc": "Tenant-wide settings: languages, maps, and API keys.",
       "refresh": "Refresh",
@@ -9473,6 +9667,8 @@ export default interface Resources {
       "about": "About",
       "about_section": "About Section",
       "active_tenants_cannot_delete": "{{count}} active tenant(s) - cannot delete",
+      "active_tenants_cannot_delete_one": "{{count}} active tenant(s) - cannot delete",
+      "active_tenants_cannot_delete_other": "{{count}} active tenant(s) - cannot delete",
       "advanced_options": "Advanced Options",
       "an_unexpected_error_occurred": "An unexpected error occurred",
       "annual_price": "Annual Price",
@@ -9538,6 +9734,8 @@ export default interface Resources {
       "features_description": "One feature per line. These are displayed as bullet points on the pricing page.",
       "features_placeholder": "Up to 500 community members\nFull listings, wallet and exchanges\nEvents and group coordination",
       "filter_all": "All ({{count}})",
+      "filter_all_one": "All ({{count}})",
+      "filter_all_other": "All ({{count}})",
       "filter_by_location": "Filter by location",
       "footer": "Footer",
       "free": "Free",
@@ -11074,6 +11272,14 @@ export default interface Resources {
       "activity_summary_title": "Activity Summary",
       "activity_timeline_desc": "Chronological timeline of member actions and coordinator interactions",
       "activity_timeline_title": "Activity Timeline",
+      "activity_type_exchange_completed": "Exchange completed",
+      "activity_type_group_joined": "Group joined",
+      "activity_type_listing_created": "Listing created",
+      "activity_type_login": "Login",
+      "activity_type_note_added": "Note added",
+      "activity_type_profile_updated": "Profile updated",
+      "activity_type_signup": "Sign-up",
+      "activity_type_task_created": "Task created",
       "add_note": "Add Note",
       "add_note_title": "Add Note",
       "add_tag": "Add Tag",
@@ -11187,8 +11393,12 @@ export default interface Resources {
       "loading_tags": "Loading Tags",
       "loading_tasks": "Loading Tasks",
       "loss_between_stages": "{{count}} lost between stages",
+      "loss_between_stages_one": "{{count}} lost between stages",
+      "loss_between_stages_other": "{{count}} lost between stages",
       "lost_since_previous": "lost since previous stage",
       "lost_since_previous_stage": "{{count}} lost since previous stage",
+      "lost_since_previous_stage_one": "{{count}} lost since previous stage",
+      "lost_since_previous_stage_other": "{{count}} lost since previous stage",
       "mark_task_as_status": "Mark \"{{title}}\" as {{status}}",
       "member_count": "Member",
       "member_funnel_desc": "A stage-by-stage view of how many entrants are still moving toward first exchange.",
@@ -11203,6 +11413,8 @@ export default interface Resources {
       "members_count": "Members",
       "members_logged_in_recently": "Members active in the last 30 days",
       "members_lost_at_step": "{{count}} members are lost at this step.",
+      "members_lost_at_step_one": "{{count}} members are lost at this step.",
+      "members_lost_at_step_other": "{{count}} members are lost at this step.",
       "members_not_signed_in": "Members not signed in",
       "members_tagged": "Members Tagged",
       "minutes_ago": "{{count}} minutes ago",
@@ -11324,6 +11536,8 @@ export default interface Resources {
       "task_updated": "Task Updated",
       "tasks_total": "Tasks Total",
       "tasks_total_count": "{{count}} Tasks Total",
+      "tasks_total_count_one": "{{count}} Tasks Total",
+      "tasks_total_count_other": "{{count}} Tasks Total",
       "title_is_required": "Title is required",
       "transition_health_desc": "Volume and conversion strength for every stage in one glance.",
       "transition_health_help": "Share of entrants tells you how much of the original cohort remains. Conversion from previous stage tells you how efficiently members move through the immediate handoff.",
@@ -12260,6 +12474,7 @@ export default interface Resources {
       "underline": "Underline",
       "undo": "Undo"
     },
+    "saving": "Saving…",
     "shared": {
       "broker_actions": "Broker Actions",
       "content": "Content",
@@ -12337,10 +12552,13 @@ export default interface Resources {
     },
     "enterprise": {
       "action_cannot_be_undone": "Cannot Be Undone",
+      "activity_by_user": "by {{name}}",
+      "all_checks_passed": "All checks passed",
       "api": "API",
       "auto_refresh_label": "Auto Refresh",
       "back_to_roles": "Back to Roles",
       "basic_information": "Basic Information",
+      "below_minimum_version": "Below minimum version",
       "breach_reported_successfully": "Breach reported successfully",
       "btn_cancel_modal": "Cancel Modal",
       "btn_clear": "Clear",
@@ -12489,6 +12707,7 @@ export default interface Resources {
       "create_role": "Create Role",
       "create_role_desc": "Define a new custom role with specific permissions",
       "created_by": "Created by",
+      "critical_issues_found": "Critical issues found",
       "database": "Database",
       "delete": "Delete",
       "delete_document_confirm": "Are you sure you want to delete this document? This cannot be undone.",
@@ -12523,6 +12742,7 @@ export default interface Resources {
       "export_downloaded_successfully": "Export Downloaded Successfully",
       "export_filter_description": "Exports use the optional date range above.",
       "export_options_title": "Export Options",
+      "extensions_summary": "{{loaded}} of {{total}} extensions loaded ({{required}} required)",
       "failed": "Failed",
       "failed_to_clear_log_file": "Failed to clear log file",
       "failed_to_create_role": "Failed to create role",
@@ -12621,6 +12841,7 @@ export default interface Resources {
       "gdpr_compliance_score": "Compliance score",
       "gdpr_consent_coverage": "Consent coverage",
       "gdpr_consent_rate": "Consent rate",
+      "gdpr_consent_rate_summary": "{{percentage}}% ({{granted}}/{{total}})",
       "gdpr_consent_type_created": "Consent type created",
       "gdpr_consent_type_deleted": "Consent type deleted",
       "gdpr_consent_type_updated": "Consent type updated",
@@ -12740,6 +12961,8 @@ export default interface Resources {
       "gdpr_occurred": "Occurred",
       "gdpr_old_value": "Old value",
       "gdpr_overdue_requests": "{{count}} overdue requests need attention",
+      "gdpr_overdue_requests_one": "{{count}} overdue requests need attention",
+      "gdpr_overdue_requests_other": "{{count}} overdue requests need attention",
       "gdpr_overview": "Overview",
       "gdpr_pending_requests": "Pending requests",
       "gdpr_prevention_measures": "Prevention measures",
@@ -12788,6 +13011,7 @@ export default interface Resources {
       "gdpr_search_user": "Search user",
       "gdpr_search_user_placeholder": "Search user...",
       "gdpr_select_request_type": "Select a request type",
+      "gdpr_selected_user": "{{name}} ({{email}}) — ID #{{id}}",
       "gdpr_severity_label": "Severity",
       "gdpr_sla": "SLA",
       "gdpr_sla_breached": "SLA breached",
@@ -12809,6 +13033,7 @@ export default interface Resources {
       "gdpr_update": "Update",
       "gdpr_user": "User",
       "gdpr_user_id": "User ID",
+      "gdpr_user_id_suffix": "— ID #{{id}}",
       "gdpr_users": "Users",
       "gdpr_users_affected": "Users affected",
       "gdpr_users_modal_title": "Users - {{name}}",
@@ -12821,6 +13046,13 @@ export default interface Resources {
       "health_check_history": "Health check history",
       "health_check_title": "Health Check",
       "history": "History",
+      "ini_max_execution_time": "Maximum execution time",
+      "ini_max_input_time": "Maximum input time",
+      "ini_max_input_vars": "Maximum input variables",
+      "ini_memory_limit": "Memory limit",
+      "ini_post_max_size": "Maximum POST size",
+      "ini_settings": "PHP configuration settings",
+      "ini_upload_max_filesize": "Maximum upload file size",
       "label_actions": "Actions",
       "label_affected_users": "Affected Users",
       "label_consent_records": "Consent Records",
@@ -12856,6 +13088,8 @@ export default interface Resources {
       "label_version": "Version",
       "label_view_full_content": "View Full Content",
       "last_n_checks": "Last {{count}} checks",
+      "last_n_checks_one": "Last {{count}} checks",
+      "last_n_checks_other": "Last {{count}} checks",
       "latency_ms": "{{value}} ms",
       "legal_compliance_dashboard": "Legal Compliance Dashboard",
       "legal_doc_list_desc": "Manage legal documents including Terms, Privacy Policy, and Cookie Policy",
@@ -12879,6 +13113,7 @@ export default interface Resources {
       "log_file_cleared": "Log File Cleared",
       "log_files": "Log Files",
       "log_files_desc": "Review application log files.",
+      "log_files_title": "Log files",
       "log_level_all": "All levels",
       "log_level_debug": "Debug",
       "log_level_error": "Error",
@@ -12895,6 +13130,7 @@ export default interface Resources {
       "log_viewer_title_fallback": "Log Viewer Title Fallback",
       "mark_completed": "Mark Completed",
       "mark_processing": "Mark Processing",
+      "meets_minimum_version": "Meets minimum version",
       "memory": "Memory",
       "memory_available": "{{value}} available",
       "metric_database_size": "Database Size",
@@ -12923,9 +13159,11 @@ export default interface Resources {
       "no_history_available": "No history available",
       "no_legal_documents": "No legal documents",
       "no_log_file_found": "No log file found",
+      "no_log_files": "No log files found",
       "no_roles_found": "No roles found",
       "no_versions_found": "No versions found",
       "not_available": "N/A",
+      "not_writable_status": "Not writable",
       "notification_sent_all": "Notification Sent All",
       "notification_sent_non_accepted": "Notification Sent Non Accepted",
       "notify_all_active": "Notify All Active",
@@ -12934,16 +13172,23 @@ export default interface Resources {
       "open_related_page": "Open {{name}}",
       "operational": "Operational",
       "overall_compliance": "Overall Compliance",
+      "overall_status": "Overall status",
       "page_title": "Enterprise",
       "page_title_create_role": "Create Role",
       "page_title_edit_role": "Edit Role",
       "pending_users_count": "{{count}} members still need to accept this version",
+      "pending_users_count_one": "{{count}} members still need to accept this version",
+      "pending_users_count_other": "{{count}} members still need to accept this version",
       "permission_browser_desc": "Browse all available permissions in the system",
       "permission_browser_title": "Permission Browser",
       "permissions_count": "{{count}} permissions",
       "permissions_count_label": "Permissions",
+      "permissions_count_one": "{{count}} permissions",
+      "permissions_count_other": "{{count}} permissions",
+      "php_extensions": "PHP extensions",
       "php_memory_usage": "PHP memory usage",
       "php_process_memory": "PHP Process Memory",
+      "php_version": "PHP version",
       "placeholder_breach_description": "Describe the breach...",
       "placeholder_brief_description_of_the_breach": "Brief Description of the Breach...",
       "placeholder_document_content": "Enter document content...",
@@ -13006,12 +13251,14 @@ export default interface Resources {
       "role_updated": "Role Updated",
       "save_changes": "Save Changes",
       "save_failed": "Save Failed",
+      "search_extensions_placeholder": "Search extensions",
       "secret_rotation_manual_update": "Secret Rotation Manual Update",
       "secret_rotation_title": "Secret Rotation",
       "secrets_n_of_m_set": "Secrets N of M Set",
       "secrets_vault_desc": "Manage stored secrets and API credentials",
       "secrets_vault_title": "Secrets Vault",
       "server_error_config_warning": "Server Error Config Warning",
+      "services": "Services",
       "set": "Set",
       "settings_not_loaded": "Settings have not loaded yet. Reload before saving.",
       "settings_saved": "Settings saved.",
@@ -13019,6 +13266,7 @@ export default interface Resources {
       "sla_days_left_plural": "SLA Days Left Plural",
       "sla_overdue": "SLA Overdue",
       "sla_overdue_plural": "SLA Overdue Plural",
+      "some_warnings_detected": "Some warnings detected",
       "stat_pending": "Pending acceptance",
       "status_all": "All",
       "status_completed": "Completed",
@@ -13121,6 +13369,7 @@ export default interface Resources {
       "system_monitoring_title": "System Monitoring",
       "system_requirements": "System Requirements",
       "system_requirements_desc": "Review server requirements.",
+      "system_requirements_title": "System requirements",
       "system_status": "System Status",
       "title_is_required": "Title is Required",
       "title_required": "Title is required",
@@ -13189,6 +13438,8 @@ export default interface Resources {
       "view_details": "View Details",
       "vm_memory": "VM Memory",
       "vm_memory_usage": "VM memory usage",
+      "writable_directories": "Writable directories",
+      "writable_status": "Writable",
       "yes": "Yes"
     },
     "legal_doc_form": {
@@ -13271,6 +13522,8 @@ export default interface Resources {
       "filter_cron": "Cron",
       "filter_errors": "Errors",
       "lines_count": "{{count}} lines",
+      "lines_count_one": "{{count}} lines",
+      "lines_count_other": "{{count}} lines",
       "search_placeholder": "Enter search...",
       "total_files": "Total Files",
       "total_size": "Total Size"
@@ -13300,6 +13553,19 @@ export default interface Resources {
       "select_all_rows": "Select all rows",
       "select_row": "Select row {{id}}",
       "total_count": "{{count}} total"
+    },
+    "system": {
+      "lang_ar": "Arabic",
+      "lang_de": "German",
+      "lang_en": "English",
+      "lang_es": "Spanish",
+      "lang_fr": "French",
+      "lang_ga": "Irish",
+      "lang_it": "Italian",
+      "lang_ja": "Japanese",
+      "lang_nl": "Dutch",
+      "lang_pl": "Polish",
+      "lang_pt": "Portuguese"
     }
   },
   "admin_events": {
@@ -13413,6 +13679,12 @@ export default interface Resources {
     }
   },
   "admin_federation": {
+    "api_docs": {
+      "aria_api_documentation_sections": "API documentation sections",
+      "aria_hmac_headers": "HMAC headers",
+      "aria_parameters": "API parameters",
+      "aria_rate_limit_headers": "Rate-limit headers"
+    },
     "common": {
       "actions": "Actions",
       "active": "Active",
@@ -13666,6 +13938,8 @@ export default interface Resources {
       "bulk_reject": "Bulk Reject",
       "bulk_rejected": "Bulk Rejected",
       "bulk_selected": "{{count}} selected",
+      "bulk_selected_one": "{{count}} selected",
+      "bulk_selected_other": "{{count}} selected",
       "cancel": "Cancel",
       "categories_description": "Categories",
       "category_care": "Category Care",
@@ -13823,9 +14097,15 @@ export default interface Resources {
       "direction_to": "Outgoing",
       "directory_empty": "No directory found",
       "directory_member_count": "{{count}} member",
+      "directory_member_count_one": "{{count}} member",
+      "directory_member_count_other": "{{count}} member",
       "directory_member_count_plural": "{{count}} members",
       "directory_more_topics": "+{{count}} more",
+      "directory_more_topics_one": "+{{count}} more",
+      "directory_more_topics_other": "+{{count}} more",
       "directory_results_count": "{{count}} community found",
+      "directory_results_count_one": "{{count}} community found",
+      "directory_results_count_other": "{{count}} community found",
       "directory_results_count_plural": "{{count}} communities found",
       "disabled": "Disabled",
       "done": "Done",
@@ -14069,6 +14349,8 @@ export default interface Resources {
       "member_search_enabled": "Member Search Enabled",
       "members_count": "Members",
       "members_count_value": "{{count}} members",
+      "members_count_value_one": "{{count}} members",
+      "members_count_value_other": "{{count}} members",
       "message_optional": "Message Optional",
       "messaging_enabled": "Messaging Enabled",
       "monthly_limit_must_be_positive": "Monthly Limit Must Be Positive",
@@ -14138,8 +14420,12 @@ export default interface Resources {
       "partnership_with": "Partnership",
       "partnerships": {
         "bulk_approved_count": "Approved {{count}} partnership request",
+        "bulk_approved_count_one": "Approved {{count}} partnership request",
+        "bulk_approved_count_other": "Approved {{count}} partnership request",
         "bulk_approved_count_plural": "Approved {{count}} partnership requests",
         "bulk_rejected_count": "Rejected {{count}} partnership request",
+        "bulk_rejected_count_one": "Rejected {{count}} partnership request",
+        "bulk_rejected_count_other": "Rejected {{count}} partnership request",
         "bulk_rejected_count_plural": "Rejected {{count}} partnership requests"
       },
       "partnerships_desc": "See who you're partnered with and respond to new partnership requests",
@@ -14174,6 +14460,8 @@ export default interface Resources {
       "placeholder_select_a_partner": "Select a Partner...",
       "primary_count": "Primary Count",
       "primary_topics_count": "{{count}} primary",
+      "primary_topics_count_one": "{{count}} primary",
+      "primary_topics_count_other": "{{count}} primary",
       "profile_not_available": "Profile not Available",
       "protocol_credit_commons": "Credit Commons",
       "protocol_komunitin": "Komunitin (JSON:API)",
@@ -14192,6 +14480,8 @@ export default interface Resources {
       "reactivate_partnership_confirm": "Reactivate this partnership? Members of both timebanks will regain access to each other.",
       "received": "Received",
       "recent_errors_count": "Recent errors: {{count}}",
+      "recent_errors_count_one": "Recent errors: {{count}}",
+      "recent_errors_count_other": "Recent errors: {{count}}",
       "recent_errors_title": "Recent Errors",
       "refresh": "Refresh",
       "reject": "Reject",
@@ -14272,6 +14562,8 @@ export default interface Resources {
       "topic_tags_title": "Topic Tags",
       "topics_selected": "Topics Selected",
       "topics_selected_count": "{{count}} topic selected",
+      "topics_selected_count_one": "{{count}} topic selected",
+      "topics_selected_count_other": "{{count}} topic selected",
       "topics_selected_count_plural": "{{count}} topics selected",
       "topics_updated_successfully": "Topics Updated Successfully",
       "transaction_history": "Transaction History",
@@ -14550,6 +14842,63 @@ export default interface Resources {
         "steps_title": "Recommended order"
       }
     },
+    "federation_aggregates": {
+      "actions": {
+        "close": "Close",
+        "preview_payload": "Preview payload",
+        "refresh": "Refresh",
+        "rotate_secret": "Replace signing key",
+        "show_audit_log": "Audit log"
+      },
+      "audit": {
+        "columns": {
+          "period": "Period",
+          "requester": "Requester",
+          "signature": "Signature",
+          "time": "Time"
+        },
+        "empty": "No aggregate queries recorded yet.",
+        "loading": "Loading audit log…",
+        "period_range": "{{from}} to {{to}}",
+        "table_aria": "Recent aggregate feed queries",
+        "title": "Aggregate feed audit log",
+        "unknown_requester": "Unknown"
+      },
+      "consent": {
+        "enable_label": "Share anonymised aggregate statistics",
+        "endpoint_prefix": "When enabled, the signed public feed at",
+        "endpoint_suffix": "returns anonymised monthly aggregates to partner networks.",
+        "loading": "Loading consent settings…",
+        "title": "Aggregate sharing consent"
+      },
+      "meta": {
+        "description": "Share anonymised community statistics with partner networks and control the signed public feed.",
+        "title": "Federation aggregates"
+      },
+      "preview": {
+        "empty": "No preview available.",
+        "loading": "Preparing preview…",
+        "title": "Aggregate payload preview"
+      },
+      "status": {
+        "disabled": "Disabled",
+        "enabled": "Enabled",
+        "last_rotated": "Key last replaced {{date}}",
+        "never_rotated": "Key never replaced",
+        "no_signing_secret": "No signing key",
+        "signing_secret_present": "Signing key present"
+      },
+      "toasts": {
+        "disabled": "Aggregate sharing disabled.",
+        "enabled": "Aggregate sharing enabled.",
+        "load_audit_failed": "Could not load the audit log.",
+        "load_consent_failed": "Could not load the aggregate sharing settings.",
+        "load_preview_failed": "Could not load the preview.",
+        "rotate_failed": "Could not replace the signing key.",
+        "secret_rotated": "Signing key replaced.",
+        "update_failed": "Could not update aggregate sharing."
+      }
+    },
     "shared": {
       "broker_actions": "Broker Actions",
       "content": "Content",
@@ -14650,6 +14999,8 @@ export default interface Resources {
       "badge_configuration_desc": "Enable, disable, and reset badge availability for this tenant",
       "badge_configuration_title": "Badge Configuration",
       "badge_count": "{{count}} badges",
+      "badge_count_one": "{{count}} badges",
+      "badge_count_other": "{{count}} badges",
       "badge_created": "Badge created",
       "badge_deleted_msg": "Badge deleted",
       "badge_desc_placeholder": "Describe what this badge is awarded for...",
@@ -14691,6 +15042,8 @@ export default interface Resources {
       "bulk_award_select_badge": "Bulk Award Select Badge",
       "bulk_award_submit": "Bulk Award Submit",
       "bulk_award_succeeded_count": "Awarded {{count}} badge",
+      "bulk_award_succeeded_count_one": "Awarded {{count}} badge",
+      "bulk_award_succeeded_count_other": "Awarded {{count}} badge",
       "bulk_award_succeeded_count_plural": "Awarded {{count}} badges",
       "bulk_award_success": "Bulk Award succeeded",
       "bulk_award_users_hint": "Bulk Award Users.",
@@ -14849,6 +15202,8 @@ export default interface Resources {
       "status_paused": "Paused",
       "target_audience": "Target Audience",
       "threshold_count": "Threshold: {{count}}",
+      "threshold_count_one": "Threshold: {{count}}",
+      "threshold_count_other": "Threshold: {{count}}",
       "toggle_badge_aria": "Toggle {{name}}",
       "top_10_badges": "Top 10 Badges",
       "total_badges": "Total Badges",
@@ -14858,6 +15213,8 @@ export default interface Resources {
       "users_awarded": "Users Awarded",
       "xp_amount": "XP Amount",
       "xp_count": "{{count}} XP",
+      "xp_count_one": "{{count}} XP",
+      "xp_count_other": "{{count}} XP",
       "xp_value": "XP Value",
       "xp_value_description": "XP awarded when this badge is earned"
     },
@@ -14966,6 +15323,8 @@ export default interface Resources {
       "progress_complete": "{{percent}}% complete",
       "search": "Search",
       "showing_of_total": "Showing {{count}} of {{total}}",
+      "showing_of_total_one": "Showing {{count}} of {{total}}",
+      "showing_of_total_other": "Showing {{count}} of {{total}}",
       "status_abandoned": "Abandoned",
       "status_active": "Active",
       "status_completed": "Completed",
@@ -15402,6 +15761,8 @@ export default interface Resources {
       "select_all": "Select All",
       "select_item": "Select Item",
       "selected_count": "{{count}} selected",
+      "selected_count_one": "{{count}} selected",
+      "selected_count_other": "{{count}} selected",
       "status_active": "Active",
       "status_all": "All",
       "status_archived": "Archived",
@@ -15465,6 +15826,8 @@ export default interface Resources {
       "page_title": "Help Centre",
       "search_aria": "Search help articles",
       "search_placeholder": "Search {{count}} help articles...",
+      "search_placeholder_one": "Search {{count}} help articles...",
+      "search_placeholder_other": "Search {{count}} help articles...",
       "title": "Admin Help Centre",
       "view_help": "View help"
     },
@@ -15683,6 +16046,8 @@ export default interface Resources {
       "top_matches_for_user_one": "Top {{count}} match for {{name}}",
       "top_matches_for_user_other": "Top {{count}} matches for {{name}}",
       "total_count": "Total: {{count}}",
+      "total_count_one": "Total: {{count}}",
+      "total_count_other": "Total: {{count}}",
       "unknown": "Unknown",
       "view_details": "View Details"
     },
@@ -15848,6 +16213,7 @@ export default interface Resources {
       "label_unique_skills": "Unique Skills",
       "label_value_multiplier": "Social Value Multiplier",
       "modal_sroi_config_title": "SROI Configuration",
+      "multiplier_value": "{{value}}×",
       "page_title": "Impact",
       "pdf_coefficients": "Applied Coefficients",
       "pdf_community_health_metrics": "Community Health Metrics",
@@ -15981,7 +16347,11 @@ export default interface Resources {
     "jobs": {
       "add_edit_notes": "Add / Edit Notes",
       "application_count_one": "{{count}} application",
+      "application_count_one_one": "{{count}} application",
+      "application_count_one_other": "{{count}} application",
       "application_count_other": "{{count}} applications",
+      "application_count_other_one": "{{count}} applications",
+      "application_count_other_other": "{{count}} applications",
       "application_updated": "Application updated",
       "applied_date": "Applied:",
       "bias_accepted": "Accepted",
@@ -16046,6 +16416,8 @@ export default interface Resources {
       "interview_label": "Interview",
       "job_deleted": "Job deleted",
       "jobs_count": "{{count}} jobs",
+      "jobs_count_one": "{{count}} jobs",
+      "jobs_count_other": "{{count}} jobs",
       "loading_applications": "Loading applications...",
       "moderation_page_description": "Review and approve job postings before they go live",
       "moderation_page_title": "Job Moderation Queue",
@@ -16075,6 +16447,8 @@ export default interface Resources {
       "pipeline_load_error_offers": "Failed to load offers",
       "pipeline_loading": "Loading pipeline...",
       "pipeline_minutes": "{{count}} min",
+      "pipeline_minutes_one": "{{count}} min",
+      "pipeline_minutes_other": "{{count}} min",
       "pipeline_no_interviews": "No interviews scheduled",
       "pipeline_no_interviews_desc": "When candidates are selected for interviews, they will appear here.",
       "pipeline_no_offers": "No active offers",
@@ -16113,6 +16487,8 @@ export default interface Resources {
       "stat_conversion": "Conversion Rate",
       "stat_interviews": "Active Interviews",
       "stat_pending_offers": "{{count}} pending offers",
+      "stat_pending_offers_one": "{{count}} pending offers",
+      "stat_pending_offers_other": "{{count}} pending offers",
       "stat_total_jobs": "Total Jobs",
       "status_all": "All",
       "status_closed": "Closed",
@@ -16377,6 +16753,11 @@ export default interface Resources {
       "view_member": "View member",
       "visible": "Visible"
     },
+    "premium": {
+      "status": {
+        "unknown": "Unknown"
+      }
+    },
     "shared": {
       "broker_actions": "Broker Actions",
       "content": "Content",
@@ -16526,7 +16907,9 @@ export default interface Resources {
         "description": "Immutable audit log of member consent decisions. Required by Art. 6 nDSG to demonstrate lawfulness.",
         "empty": "No consent records yet.",
         "table_aria": "Consent records",
-        "truncated": "Showing the most recent 200 records. Export the full ledger CSV to download all {{count}} records."
+        "truncated": "Showing the most recent 200 records. Export the full ledger CSV to download all {{count}} records.",
+        "truncated_one": "Showing the most recent 200 records. Export the full ledger CSV to download all {{count}} records.",
+        "truncated_other": "Showing the most recent 200 records. Export the full ledger CSV to download all {{count}} records."
       },
       "legal_basis": {
         "consent": "Consent",
@@ -16848,6 +17231,33 @@ export default interface Resources {
         "retention_save_failed": "Failed to save retention config.",
         "retention_saved": "Retention configuration saved."
       }
+    },
+    "rte": {
+      "block_quote": "Block quote",
+      "bold": "Bold",
+      "bullet_list": "Bullet list",
+      "content_helper": "Use headings for sections, notice boxes for important legal callouts, and preview before publishing.",
+      "content_html": "Content HTML",
+      "content_placeholder": "Start writing the legal document content...",
+      "editor_only": "Editor only",
+      "enter_url": "Enter URL",
+      "heading_2": "Heading 2",
+      "heading_3": "Heading 3",
+      "inline_code": "Inline code",
+      "insert_link": "Insert link",
+      "italic": "Italic",
+      "notice_body_placeholder": "Add the notice details here.",
+      "notice_box": "Notice box",
+      "notice_title_placeholder": "Important notice",
+      "numbered_list": "Numbered list",
+      "preview": "Preview",
+      "preview_title_placeholder": "Legal document preview",
+      "redo": "Redo",
+      "remove_link": "Remove link",
+      "split_view": "Split view",
+      "strikethrough": "Strikethrough",
+      "underline": "Underline",
+      "undo": "Undo"
     },
     "shared": {
       "broker_actions": "Broker Actions",
@@ -17339,12 +17749,16 @@ export default interface Resources {
       "broker_approvals": "Broker Approvals",
       "cache_cleared": "Cache Cleared",
       "cache_cleared_count": "Cleared {{count}} cache entry",
+      "cache_cleared_count_one": "Cleared {{count}} cache entry",
+      "cache_cleared_count_other": "Cleared {{count}} cache entry",
       "cache_cleared_count_plural": "Cleared {{count}} cache entries",
       "cache_management": "Cache Management",
       "cancel": "Cancel",
       "clear_cache_btn": "Clear Cache",
       "clear_cache_confirm": "Are you sure you want to clear the match cache?",
       "clear_cache_confirm_with_count": "Are you sure you want to clear {{count}} cached matches?",
+      "clear_cache_confirm_with_count_one": "Are you sure you want to clear {{count}} cached matches?",
+      "clear_cache_confirm_with_count_other": "Are you sure you want to clear {{count}} cached matches?",
       "clear_match_cache": "Clear Match Cache",
       "col_actions": "Actions",
       "col_band": "Band",
@@ -17372,6 +17786,8 @@ export default interface Resources {
       "distance": "Distance",
       "distance_distribution": "Distance Distribution",
       "distribution_aria": "{{label}}: {{count}} matches ({{percent}}%)",
+      "distribution_aria_one": "{{label}}: {{count}} matches ({{percent}}%)",
+      "distribution_aria_other": "{{label}}: {{count}} matches ({{percent}}%)",
       "dormancy_days_desc": "Days of inactivity before a member is excluded from matching (0 = off)",
       "enabled": "Enabled",
       "explanation_top_n_desc": "How many top matches per member get an AI-generated explanation (1-10)",
@@ -17383,6 +17799,8 @@ export default interface Resources {
       "failed_to_reject_match": "Failed to reject match",
       "failed_to_save_configuration": "Failed to save configuration",
       "feedback_reason_aria": "{{label}}: {{count}} ({{percent}}%)",
+      "feedback_reason_aria_one": "{{label}}: {{count}} ({{percent}}%)",
+      "feedback_reason_aria_other": "{{label}}: {{count}} ({{percent}}%)",
       "feedback_reasons": "Feedback Reasons",
       "feedback_reasons_desc": "Why members are dismissing suggested matches",
       "gate_impact": "Location Data Readiness",
@@ -17486,6 +17904,8 @@ export default interface Resources {
       "pillar_averages": "Pillar Averages",
       "pillar_averages_desc": "Average score contribution per matching pillar across recent matches",
       "pillar_averages_sample_size": "Based on {{count}} matches",
+      "pillar_averages_sample_size_one": "Based on {{count}} matches",
+      "pillar_averages_sample_size_other": "Based on {{count}} matches",
       "pillar_feasibility": "Feasibility",
       "pillar_relevance": "Relevance",
       "pillar_trust": "Trust",
@@ -18324,11 +18744,15 @@ export default interface Resources {
     "bulk": {
       "clear_selection": "Clear selection",
       "confirm_message": "Are you sure you want to {{action}} {{count}} items?",
+      "confirm_message_one": "Are you sure you want to {{action}} {{count}} items?",
+      "confirm_message_other": "Are you sure you want to {{action}} {{count}} items?",
       "confirm_title": "Confirm {{action}}",
       "destructive_warning": "This action cannot be undone.",
       "reason_label": "Reason",
       "reason_placeholder": "Provide a reason for this action",
-      "selected_count": "{{count}} selected"
+      "selected_count": "{{count}} selected",
+      "selected_count_one": "{{count}} selected",
+      "selected_count_other": "{{count}} selected"
     },
     "campaigns": "Campaigns",
     "care_recipient_circle": "Care Recipient Circle",
@@ -18554,7 +18978,34 @@ export default interface Resources {
       "search": "Search...",
       "select_all_rows": "Select all rows",
       "select_row": "Select row {{id}}",
-      "total_count": "{{count}} total"
+      "statuses": {
+        "active": "Active",
+        "approved": "Approved",
+        "banned": "Banned",
+        "bulk_tenants_updated": "Tenants updated",
+        "bulk_users_moved": "Users moved",
+        "completed": "Completed",
+        "draft": "Draft",
+        "failed": "Failed",
+        "federation_lockdown": "Federation lockdown",
+        "federation_updated": "Federation updated",
+        "idle": "Idle",
+        "inactive": "Inactive",
+        "pending": "Pending",
+        "published": "Published",
+        "rejected": "Rejected",
+        "scheduled": "Scheduled",
+        "sent": "Sent",
+        "suspended": "Suspended",
+        "tenant_created": "Tenant created",
+        "tenant_updated": "Tenant updated",
+        "unknown": "Unknown",
+        "user_created": "User created",
+        "user_moved": "User moved"
+      },
+      "total_count": "{{count}} total",
+      "total_count_one": "{{count}} total",
+      "total_count_other": "{{count}} total"
     },
     "sidebar": {
       "admin": "Admin",
@@ -18584,6 +19035,8 @@ export default interface Resources {
     "support_reports": "Support Reports",
     "support_requests": "Support requests",
     "support_requests_count": "{{count}} open support requests",
+    "support_requests_count_one": "{{count}} open support requests",
+    "support_requests_count_other": "{{count}} open support requests",
     "system": "System",
     "system_config": "System Configuration",
     "templates": "Templates",
@@ -18689,6 +19142,9 @@ export default interface Resources {
       "unfeature": "Unfeature",
       "unknown": "Unknown",
       "yes": "Yes"
+    },
+    "diagnostics": {
+      "score_out_of": "out of {{maximum}}"
     },
     "newsletter_activity": {
       "all_events": "All events",
@@ -19079,13 +19535,19 @@ export default interface Resources {
       "no_recipients_desc": "There are no recipients matching your selection criteria.",
       "non_clickers": "Non-clickers",
       "non_clickers_count": "{{count}} recipient who opened but did not click",
+      "non_clickers_count_one": "{{count}} recipient who opened but did not click",
+      "non_clickers_count_other": "{{count}} recipient who opened but did not click",
       "non_clickers_count_plural": "{{count}} recipients who opened but did not click",
       "non_openers": "Non-openers",
       "non_openers_count": "{{count}} recipient who did not open",
+      "non_openers_count_one": "{{count}} recipient who did not open",
+      "non_openers_count_other": "{{count}} recipient who did not open",
       "non_openers_count_plural": "{{count}} recipients who did not open",
       "opened": "Opened",
       "preview_recipient_count": "Preview Recipient Count",
       "preview_recipient_count_desc": "This resend will be sent to {{count}} recipient",
+      "preview_recipient_count_desc_one": "This resend will be sent to {{count}} recipient",
+      "preview_recipient_count_desc_other": "This resend will be sent to {{count}} recipient",
       "preview_recipient_count_desc_plural": "This resend will be sent to {{count}} recipients",
       "queue_resend": "Queue Resend",
       "resend_newsletter": "Resend Newsletter",
@@ -19120,6 +19582,8 @@ export default interface Resources {
       "day_tuesday": "Tue",
       "day_wednesday": "Wed",
       "days": "{{count}} days",
+      "days_one": "{{count}} days",
+      "days_other": "{{count}} days",
       "description": "Find the best time to send each campaign based on recent engagement.",
       "empty_hint": "Send a few newsletters to reveal engagement patterns.",
       "engagement_heatmap": "Engagement Heatmap",
@@ -19158,6 +19622,7 @@ export default interface Resources {
       "ab_label": "A/B",
       "ab_split_info": "Ab Split Info",
       "ab_test": "A/B Test",
+      "above_benchmark": "Above benchmark",
       "accepted_format_csv": "CSV with email, first_name, and last_name columns",
       "action_clicked": "Clicked",
       "action_delete": "Delete",
@@ -19173,7 +19638,9 @@ export default interface Resources {
       "back_to_newsletters": "Back to Newsletters",
       "back_to_stats": "Back to Stats",
       "back_to_templates": "Back to Templates",
+      "below_benchmark": "Below benchmark",
       "benchmark_desc": "Benchmark.",
+      "benchmark_difference": "{{pointSign}}{{pointValue}} pp ({{percentSign}}{{percentValue}}%)",
       "bounce_type_all": "All bounce types",
       "bounce_type_complaint": "Complaint",
       "bounce_type_hard": "Hard bounce",
@@ -19324,6 +19791,7 @@ export default interface Resources {
       "import_rows_found_other": "{{count}} subscribers found in CSV",
       "import_rows_found_plural": "{{count}} subscribers found in CSV",
       "import_subscribers_from_csv": "Import Subscribers From CSV",
+      "industry_avg": "Industry average",
       "label_actions": "Actions",
       "label_active": "Active",
       "label_avg_click_rate": "Avg Click Rate",
@@ -19433,6 +19901,8 @@ export default interface Resources {
       "required_csv_format": "Required CSV format",
       "resend_queued": "Resend Queued",
       "resend_queued_count": "Queued {{count}} resend",
+      "resend_queued_count_one": "Queued {{count}} resend",
+      "resend_queued_count_other": "Queued {{count}} resend",
       "resend_queued_count_plural": "Queued {{count}} resends",
       "resend_to_non_openers": "Resend to Non Openers",
       "resend_to_non_openers_count": "Resend to Non Openers Count",
@@ -19537,7 +20007,8 @@ export default interface Resources {
       "winner": "Winner",
       "winner_selected": "Winner Selected",
       "winner_subject": "Winner Subject",
-      "winning_metric": "Winning Metric"
+      "winning_metric": "Winning Metric",
+      "your_average": "Your average"
     },
     "segment_form": {
       "analyzing_member_data": "Analyzing Member Data",
@@ -19929,8 +20400,12 @@ export default interface Resources {
       "bulk": {
         "approve_selected": "Approve selected",
         "confirm_reject_message": "Reject {{count}} selected item(s)? Creators will see them revert to draft.",
+        "confirm_reject_message_one": "Reject {{count}} selected item(s)? Creators will see them revert to draft.",
+        "confirm_reject_message_other": "Reject {{count}} selected item(s)? Creators will see them revert to draft.",
         "confirm_reject_title": "Reject selected items",
         "done": "Moderated {{count}} item(s).",
+        "done_one": "Moderated {{count}} item(s).",
+        "done_other": "Moderated {{count}} item(s).",
         "partial": "Moderated {{ok}} item(s); {{failed}} failed.",
         "reject_selected": "Reject selected"
       },
@@ -19951,6 +20426,8 @@ export default interface Resources {
         "updated": "Updated"
       },
       "count": "{{count}} items",
+      "count_one": "{{count}} items",
+      "count_other": "{{count}} items",
       "description": "Review community shows and episodes, including content held for tenant moderation.",
       "empty": {
         "analytics": "No analytics breakdown yet.",
@@ -20055,6 +20532,8 @@ export default interface Resources {
         "episode_flag": "Episode flagged.",
         "episode_reject": "Episode rejected.",
         "feed_invalid": "RSS feed has {{count}} issue(s).",
+        "feed_invalid_one": "RSS feed has {{count}} issue(s).",
+        "feed_invalid_other": "RSS feed has {{count}} issue(s).",
         "feed_valid": "RSS feed is ready.",
         "report_dismissed": "Report dismissed.",
         "report_escalated": "Report escalated.",
@@ -20170,6 +20649,8 @@ export default interface Resources {
       "status_active": "Active",
       "status_ended": "Ended",
       "total_count": "Total: {{count}}",
+      "total_count_one": "Total: {{count}}",
+      "total_count_other": "Total: {{count}}",
       "unknown": "Unknown",
       "votes": "Votes"
     },
@@ -20268,9 +20749,11 @@ export default interface Resources {
         "active_recurring": "Active recurring",
         "completed_volume": "Completed volume",
         "declaration_count": "{{count}} declaration",
+        "declaration_count_one": "{{count}} declaration",
         "declaration_count_other": "{{count}} declarations",
         "description": "Track tenant Connect routing, platform fallback liability, Gift Aid readiness, disputes, and receipt follow-up for this tenant.",
         "donation_count": "{{count}} donation",
+        "donation_count_one": "{{count}} donation",
         "donation_count_other": "{{count}} donations",
         "empty": "No finance activity has been recorded yet.",
         "export_annual_receipts": "Export annual receipts",
@@ -20279,6 +20762,8 @@ export default interface Resources {
         "gift_aid_ready": "Gift Aid ready",
         "open_disputes": "Open disputes",
         "past_due_count": "{{count}} past due",
+        "past_due_count_one": "{{count}} past due",
+        "past_due_count_other": "{{count}} past due",
         "platform_fallback_volume": "Platform fallback volume",
         "tenant_connect_volume": "Tenant Connect volume",
         "title": "Finance operations"
@@ -20308,6 +20793,8 @@ export default interface Resources {
         "continue_onboarding": "Continue Stripe onboarding",
         "description": "Leave this blank to use the platform Stripe account with tenant metadata. Connect a tenant Stripe account to send future one-off and regular donations to that tenant account.",
         "requirements_due": "Stripe account requirements needing attention: {{count}}.",
+        "requirements_due_one": "Stripe account requirements needing attention: {{count}}.",
+        "requirements_due_other": "Stripe account requirements needing attention: {{count}}.",
         "route_platform_default": "Platform fallback",
         "route_tenant_connect": "Tenant Connect",
         "save": "Save routing",
@@ -20365,6 +20852,8 @@ export default interface Resources {
         "table_aria": "Recurring supporters",
         "title": "Recurring Supporters",
         "total": "{{count}} total",
+        "total_one": "{{count}} total",
+        "total_other": "{{count}} total",
         "user_fallback": "User #{{id}}"
       },
       "table": {
@@ -20499,6 +20988,7 @@ export default interface Resources {
       },
       "languages_value": "{{languages}} (default: {{defaultLanguage}})",
       "load_failed": "Failed to load provisioning requests",
+      "loading": "Loading provisioning requests…",
       "page_subtitle": "Review and approve self-service tenant provisioning requests",
       "page_title": "Provisioning Queue",
       "refresh": "Refresh",
@@ -20710,6 +21200,13 @@ export default interface Resources {
     }
   },
   "admin_reports": {
+    "caring_workflow": {
+      "policy": {
+        "periods": {
+          "last_90_days": "Last 90 days"
+        }
+      }
+    },
     "common": {
       "actions": "Actions",
       "active": "Active",
@@ -20756,6 +21253,11 @@ export default interface Resources {
       "unfeature": "Unfeature",
       "unknown": "Unknown",
       "yes": "Yes"
+    },
+    "municipal_impact": {
+      "portfolio": {
+        "yoy_value": "{{sign}}{{value}}% YoY"
+      }
     },
     "municipal_reports": {
       "about": {
@@ -20865,14 +21367,22 @@ export default interface Resources {
           "empty_title": "Cooperative (cooperative internal)",
           "future_care_credit_pool": "Future-care credit balance pool",
           "future_care_credit_pool_desc": "Sum of positive member balances - the cooperative's implicit future-care reserve. Active member base: {{count}}.",
+          "future_care_credit_pool_desc_one": "Sum of positive member balances - the cooperative's implicit future-care reserve. Active member base: {{count}}.",
+          "future_care_credit_pool_desc_other": "Sum of positive member balances - the cooperative's implicit future-care reserve. Active member base: {{count}}.",
           "member_retention": "Member retention",
           "member_retention_desc": "{{count}} members active in both this period and the prior equivalent period.",
+          "member_retention_desc_one": "{{count}} members active in both this period and the prior equivalent period.",
+          "member_retention_desc_other": "{{count}} members active in both this period and the prior equivalent period.",
           "reciprocity_rate": "Reciprocity rate",
           "reciprocity_rate_desc": "{{count}} supporters also received hours in the period.",
+          "reciprocity_rate_desc_one": "{{count}} supporters also received hours in the period.",
+          "reciprocity_rate_desc_other": "{{count}} supporters also received hours in the period.",
           "title": "Cooperative internal report - {{from}} to {{to}}"
         },
         "in_export": "In export",
         "logs_count": "{{count}} logs",
+        "logs_count_one": "{{count}} logs",
+        "logs_count_other": "{{count}} logs",
         "municipality": {
           "description": "Local participation, named partner organisations, geographic / category split, recipient reach.",
           "empty_body": "Switch to Municipality mode to load the municipality-level narrative.",
@@ -20888,7 +21398,9 @@ export default interface Resources {
           "top_5_categories": "Top 5 categories (geographic / activity split)",
           "top_categories": "Top categories",
           "top_categories_desc": "Listed below by hours.",
-          "trusted_total": "of {{count}} trusted total."
+          "trusted_total": "of {{count}} trusted total.",
+          "trusted_total_one": "of {{count}} trusted total.",
+          "trusted_total_other": "of {{count}} trusted total."
         },
         "no_prior_data": "No prior data"
       },
@@ -20995,8 +21507,12 @@ export default interface Resources {
       },
       "values": {
         "activities": "{{count}} activities",
+        "activities_one": "{{count}} activities",
+        "activities_other": "{{count}} activities",
         "disabled": "Disabled",
         "hours": "{{count}}h",
+        "hours_one": "{{count}}h",
+        "hours_other": "{{count}}h",
         "trend_detail": "{{participants}} participants, {{activities}} activities"
       }
     },
@@ -21055,6 +21571,8 @@ export default interface Resources {
       "content_type_listing": "Listing",
       "content_type_post": "Post",
       "days_count": "{{count}} days",
+      "days_count_one": "{{count}} days",
+      "days_count_other": "{{count}} days",
       "detection_complete": "Detection Complete",
       "detection_failed": "Detection Failed",
       "ellipsis": "...",
@@ -21143,6 +21661,8 @@ export default interface Resources {
       "members_marked_notified": "Members marked as notified",
       "members_selected": "Members Selected",
       "members_selected_count": "{{count}} selected",
+      "members_selected_count_one": "{{count}} selected",
+      "members_selected_count_other": "{{count}} selected",
       "members_tabs_aria": "Member report type",
       "moderation_pending": "Pending",
       "moderation_queue_page_desc": "Review pending and flagged content before it appears in the community.",
@@ -23307,6 +23827,7 @@ export default interface Resources {
     }
   },
   "admin_super": {
+    "blog": "Blog",
     "common": {
       "actions": "Actions",
       "active": "Active",
@@ -23354,6 +23875,10 @@ export default interface Resources {
       "unknown": "Unknown",
       "yes": "Yes"
     },
+    "dashboard": "Dashboard",
+    "events": "Events",
+    "exchange_workflow": "Exchange workflow",
+    "federation": "Federation",
     "federation_whitelist": {
       "add_tenant_to_whitelist": "Add Tenant to Whitelist",
       "add_to_whitelist": "Add to Whitelist",
@@ -23364,6 +23889,7 @@ export default interface Resources {
       "col_notes": "Notes",
       "col_tenant": "Tenant",
       "failed_to_add": "Failed to add",
+      "failed_to_load": "Failed to load the whitelist",
       "failed_to_remove": "Failed to remove",
       "label_notes_optional": "Notes Optional",
       "no_tenants_whitelisted": "No tenants are currently whitelisted.",
@@ -23379,8 +23905,17 @@ export default interface Resources {
       "tenant_removed_from_whitelist": "Tenant removed from whitelist",
       "view": "View",
       "whitelisted_tenants_aria": "Whitelisted tenants",
-      "whitelisted_tenants_count": "Whitelisted tenants ({{count}})"
+      "whitelisted_tenants_count": "Whitelisted tenants ({{count}})",
+      "whitelisted_tenants_count_one": "Whitelisted tenants ({{count}})",
+      "whitelisted_tenants_count_other": "Whitelisted tenants ({{count}})"
     },
+    "feed": "Feed",
+    "gamification": "Gamification",
+    "goals": "Goals",
+    "groups": "Groups",
+    "listings": "Listings",
+    "messages": "Messages",
+    "organisations": "Organisations",
     "pilot_inquiry_admin": {
       "about": {
         "body_intro_after_kiss": " pilot. Each inquiry is submitted via the public interest form and scored automatically using a fit algorithm (population size, existing Caring Community cooperative, digital readiness, budget indication, and timeline). Use this board to move inquiries through the pipeline, assign them to a sales or community contact, and track when proposals are sent and pilots go live.",
@@ -23474,6 +24009,8 @@ export default interface Resources {
         "asap": "ASAP",
         "empty": "-",
         "months": "{{count}} months",
+        "months_one": "{{count}} months",
+        "months_other": "{{count}} months",
         "no": "No",
         "yes": "Yes"
       },
@@ -23482,9 +24019,12 @@ export default interface Resources {
         "avg_to_live": "Avg to live:",
         "avg_to_proposal": "Avg to proposal:",
         "days": "{{count}}d",
+        "days_one": "{{count}}d",
+        "days_other": "{{count}}d",
         "title": "Pipeline velocity - average days from inquiry submission to each milestone:"
       }
     },
+    "resources": "Resources",
     "shared": {
       "broker_actions": "Broker Actions",
       "content": "Content",
@@ -23534,6 +24074,8 @@ export default interface Resources {
       "an_error_occurred": "An error occurred",
       "apply": "Apply",
       "apply_to_n_tenants": "Apply to {{count}} tenants",
+      "apply_to_n_tenants_one": "Apply to {{count}} tenants",
+      "apply_to_n_tenants_other": "Apply to {{count}} tenants",
       "aria_remove_admin": "Remove {{name}} as admin",
       "audit_log": "Audit Log",
       "back": "Back",
@@ -23547,7 +24089,11 @@ export default interface Resources {
       "breadcrumb_tenants": "Tenants",
       "breadcrumb_users": "Breadcrumb Users",
       "bulk_move_confirm_message": "Move {{count}} user(s).",
+      "bulk_move_confirm_message_one": "Move {{count}} user(s).",
+      "bulk_move_confirm_message_other": "Move {{count}} user(s).",
       "bulk_move_confirm_message_with_grant": "Move {{count}} user(s) and grant tenant super-admin access.",
+      "bulk_move_confirm_message_with_grant_one": "Move {{count}} user(s) and grant tenant super-admin access.",
+      "bulk_move_confirm_message_with_grant_other": "Move {{count}} user(s) and grant tenant super-admin access.",
       "bulk_move_confirm_title": "Are you sure you want to bulk move these users?",
       "bulk_move_failed": "Bulk Move failed",
       "bulk_move_users": "Bulk Move Users",
@@ -23557,13 +24103,19 @@ export default interface Resources {
       "bulk_operations_title": "Bulk Operations",
       "bulk_tenants_updated": "Bulk Tenants updated",
       "bulk_tenants_updated_count": "Bulk tenants updated ({{count}})",
+      "bulk_tenants_updated_count_one": "Bulk tenants updated ({{count}})",
+      "bulk_tenants_updated_count_other": "Bulk tenants updated ({{count}})",
       "bulk_update_confirm_message": "Apply this update to {{count}} tenant(s).",
+      "bulk_update_confirm_message_one": "Apply this update to {{count}} tenant(s).",
+      "bulk_update_confirm_message_other": "Apply this update to {{count}} tenant(s).",
       "bulk_update_confirm_title": "Are you sure you want to bulk update these tenants?",
       "bulk_update_failed": "Bulk Update failed",
       "bulk_update_tenants": "Bulk Update Tenants",
       "bulk_update_tenants_desc": "Update multiple tenants in one operation.",
       "bulk_users_moved": "Bulk Users Moved",
       "bulk_users_moved_count": "Bulk users moved ({{count}})",
+      "bulk_users_moved_count_one": "Bulk users moved ({{count}})",
+      "bulk_users_moved_count_other": "Bulk users moved ({{count}})",
       "can_create_subtenants": "Can Create Subtenants",
       "cancel": "Cancel",
       "cat_all_categories": "All categories",
@@ -23987,6 +24539,8 @@ export default interface Resources {
       "move_and_promote_to_hub": "Move and Promote to Hub",
       "move_and_promote_warning": "Move and Promote Warning",
       "move_n_users": "Move {{count}} users",
+      "move_n_users_one": "Move {{count}} users",
+      "move_n_users_other": "Move {{count}} users",
       "move_step_1": "Choose the target tenant.",
       "move_step_2": "Move the user account and memberships.",
       "move_step_3": "Refresh tenant-specific permissions.",
@@ -24153,6 +24707,8 @@ export default interface Resources {
       "tab_suspended": "Suspended",
       "tab_terminated": "Terminated",
       "tab_with_count": "{{label}} ({{count}})",
+      "tab_with_count_one": "{{label}} ({{count}})",
+      "tab_with_count_other": "{{label}} ({{count}})",
       "target_hub_tenant": "Target Hub Tenant",
       "target_tenant": "Target Tenant",
       "target_type_bulk": "Target Type Bulk",
@@ -24220,6 +24776,8 @@ export default interface Resources {
       "user_with_id": "User #{{id}}",
       "users": "Users",
       "users_count": "{{count}} users",
+      "users_count_one": "{{count}} users",
+      "users_count_other": "{{count}} users",
       "users_error": "Users error",
       "users_error_detail": "Users: {{error}}",
       "view_all_tenants": "View All Tenants",
@@ -24409,7 +24967,9 @@ export default interface Resources {
       "toggle_feature_aria": "Toggle {{label}}",
       "twitter_label": "Twitter",
       "youtube_label": "Youtube"
-    }
+    },
+    "volunteering": "Volunteering",
+    "wallet": "Wallet"
   },
   "admin_support": {
     "common": {
@@ -24928,12 +25488,20 @@ export default interface Resources {
       "auto_resize": "Auto Resize",
       "auto_resize_desc": "Resize images that exceed the configured maximum dimensions.",
       "available_backups": "Available Backups ({{count}})",
+      "available_backups_one": "Available Backups ({{count}})",
+      "available_backups_other": "Available Backups ({{count}})",
       "average_across_all_jobs": "Average across all jobs",
       "avg_completion_minutes": "Avg Completion Minutes",
+      "avg_completion_minutes_one": "Avg Completion Minutes",
+      "avg_completion_minutes_other": "Avg Completion Minutes",
       "avg_completion_seconds": "Avg Completion Seconds",
+      "avg_completion_seconds_one": "Avg Completion Seconds",
+      "avg_completion_seconds_other": "Avg Completion Seconds",
       "below_minimum_version": "Below minimum (requires 8.2+)",
       "blog_data_restored": "Blog data restored from {{filename}}",
       "blog_posts_restored": "{{count}} blog posts restored from {{filename}}",
+      "blog_posts_restored_one": "{{count}} blog posts restored from {{filename}}",
+      "blog_posts_restored_other": "{{count}} blog posts restored from {{filename}}",
       "blog_restore_desc": "Restore blog posts from automatic backups",
       "blog_restore_title": "Blog Restore",
       "blog_restore_warning": "Blog Restore Warning",
@@ -24984,6 +25552,8 @@ export default interface Resources {
       "cron_azure_step_2_title": "Step 2: Add a host crontab entry",
       "cron_cloud_scheduler_warning_prefix": "use Cloud Scheduler to hit HTTP cron endpoints. The host cron must invoke",
       "cron_connection_ok": "Connection OK - {{count}} jobs available",
+      "cron_connection_ok_one": "Connection OK - {{count}} jobs available",
+      "cron_connection_ok_other": "Connection OK - {{count}} jobs available",
       "cron_cpanel_step_1_desc": "In cPanel, navigate to the Advanced section and open Cron Jobs.",
       "cron_cpanel_step_1_title": "Step 1: Open Cron Jobs in cPanel",
       "cron_cpanel_step_2_desc_prefix": "Set the schedule to",
@@ -25024,6 +25594,8 @@ export default interface Resources {
       "currency_jpy": "JPY - Japanese Yen",
       "currency_usd": "USD - US Dollar",
       "days_ago": "{{count}}d ago",
+      "days_ago_one": "{{count}}d ago",
+      "days_ago_other": "{{count}}d ago",
       "desc_apple_push_notification_service_key": "Apple Push Notification Service (APNs) private key for iOS push notifications",
       "desc_blog_post_backups_will_appear_here_when_": "Blog post backups will appear here when auto-backup is enabled",
       "desc_codes_expire_at_midnight_on_this_date_l": "Codes expire at midnight on this date. Leave empty for no expiry.",
@@ -25053,6 +25625,8 @@ export default interface Resources {
       "expected": "Expected",
       "extensions_summary": "{{loaded}} of {{total}} loaded ({{required}} required)",
       "failed_count": "{{count}} failed",
+      "failed_count_one": "{{count}} failed",
+      "failed_count_other": "{{count}} failed",
       "failed_to_action_verification": "Failed to action verification",
       "failed_to_action_verification_session": "Failed to action verification session",
       "failed_to_clear_logs": "Failed to clear logs",
@@ -25082,6 +25656,8 @@ export default interface Resources {
       "generate_thumbnails": "Generate Thumbnails",
       "generate_thumbnails_desc": "Generate smaller thumbnail variants for listings, profiles, and cards.",
       "generated_data_for": "Generated data for {{count}} selected data types",
+      "generated_data_for_one": "Generated data for {{count}} selected data types",
+      "generated_data_for_other": "Generated data for {{count}} selected data types",
       "global_settings_saved_successfully": "Global settings saved successfully",
       "god_only_chip": "God only",
       "health_check_complete": "Health Check Complete",
@@ -25090,6 +25666,8 @@ export default interface Resources {
       "health_checks_completed": "Health checks completed",
       "health_score": "Health Score",
       "hours_ago": "{{count}}h ago",
+      "hours_ago_one": "{{count}}h ago",
+      "hours_ago_other": "{{count}}h ago",
       "image_conversion": "Image Conversion",
       "image_settings_desc": "Configure image upload settings including formats, resizing, and WebP conversion",
       "image_settings_saved_successfully": "Image settings saved successfully",
@@ -25198,6 +25776,8 @@ export default interface Resources {
       "maintenance_mode_read_only": "Maintenance mode (read only)",
       "meets_minimum_version": "Meets minimum (8.2+)",
       "minutes_ago": "{{count}}m ago",
+      "minutes_ago_one": "{{count}}m ago",
+      "minutes_ago_other": "{{count}}m ago",
       "modal_label_duration": "Duration",
       "modal_label_executed_at": "Executed at",
       "modal_label_executed_by": "Executed by",
@@ -25337,6 +25917,8 @@ export default interface Resources {
         "module_control": "Module Control",
         "module_control_desc": "Control which modules are available during the onboarding flow",
         "n_active": "{{count}} active",
+        "n_active_one": "{{count}} active",
+        "n_active_other": "{{count}} active",
         "no_changes": "No changes",
         "no_options_configured": "No options configured",
         "onboarding_enabled": "Onboarding Enabled",
@@ -25407,6 +25989,8 @@ export default interface Resources {
       "partner_logo_link_url": "Partner Logo Link URL",
       "partner_logo_link_url_description": "Optional website link for the partner logo in the footer.",
       "passed_count": "{{count}} passed",
+      "passed_count_one": "{{count}} passed",
+      "passed_count_other": "{{count}} passed",
       "pending_conversion": "Pending Conversion",
       "php_extensions": "Php Extensions",
       "php_version": "Php Version",
@@ -25526,7 +26110,11 @@ export default interface Resources {
         "mode_waitlist": "Mode Waitlist",
         "mode_waitlist_desc": "Registrations are added to a waitlist",
         "n_available": "{{count}} available",
+        "n_available_one": "{{count}} available",
+        "n_available_other": "{{count}} available",
         "n_configured": "{{count}} configured",
+        "n_configured_one": "{{count}} configured",
+        "n_configured_other": "{{count}} configured",
         "never": "Never",
         "no_invite_codes": "No invite codes",
         "no_invite_codes_hint": "No invite codes have been generated yet. Generate some above.",
@@ -25569,6 +26157,8 @@ export default interface Resources {
         "tip_change_modes": "Changing the registration mode takes effect immediately for new registrations",
         "total_codes": "Total Codes",
         "total_codes_count": "Total codes: {{count}}",
+        "total_codes_count_one": "Total codes: {{count}}",
+        "total_codes_count_other": "Total codes: {{count}}",
         "unavailable": "Unavailable",
         "understanding_modes": "Understanding Registration Modes",
         "verification_settings": "Verification Settings",
@@ -25586,6 +26176,8 @@ export default interface Resources {
         "resume_now": "Resume signups now",
         "resume_success": "Registration resumed for this community.",
         "signups_this_hour": "{{count}} of {{threshold}} signups this hour",
+        "signups_this_hour_one": "{{count}} of {{threshold}} signups this hour",
+        "signups_this_hour_other": "{{count}} of {{threshold}} signups this hour",
         "status_active": "Signups active",
         "status_paused": "Signups paused",
         "threshold_percent": "({{percent}}% of threshold)",
@@ -25627,6 +26219,8 @@ export default interface Resources {
       "service_worker_enabled_desc": "Service Worker Enabled.",
       "services": "Services",
       "sessions_count": "{{count}} sessions",
+      "sessions_count_one": "{{count}} sessions",
+      "sessions_count_other": "{{count}} sessions",
       "settings_saved": "Settings Saved",
       "seven_day_success_rate": "7-Day Success Rate",
       "some_warnings_detected": "Some warnings detected",
@@ -25653,6 +26247,12 @@ export default interface Resources {
       "test_connection_successful": "Test connection successful",
       "test_cron_api": "Test the cron API",
       "test_cron_api_desc": "Verify that the cron runner can be reached and lists scheduled jobs",
+      "test_runner": {
+        "api_unavailable": "Health check API unavailable",
+        "run_all": "Run all tests",
+        "suites": "Test suites",
+        "unknown_test": "Diagnostic: {{name}}"
+      },
       "test_runner_desc": "Run automated tests to verify platform functionality",
       "test_runner_title": "Test Runner",
       "tests_failed": "Tests failed",
@@ -25723,6 +26323,8 @@ export default interface Resources {
       "filter_all_events": "Filter events...",
       "filter_events_aria": "Filter verification events",
       "n_pending": "{{count}} pending",
+      "n_pending_one": "{{count}} pending",
+      "n_pending_other": "{{count}} pending",
       "next": "Next",
       "no_events": "No audit events found.",
       "no_pending_reviews": "No pending reviews.",
@@ -25745,6 +26347,8 @@ export default interface Resources {
       "status_processing": "Processing",
       "status_started": "Started",
       "total_events": "{{count}} events",
+      "total_events_one": "{{count}} events",
+      "total_events_other": "{{count}} events",
       "user_approved_activated": "User approved and activated",
       "user_verification_rejected": "User verification rejected",
       "user_with_id": "User #{{id}}"
@@ -25909,6 +26513,8 @@ export default interface Resources {
       "grant_starting_credits": "Grant Starting Credits",
       "granted_credits": "Granted Credits",
       "hours_value": "{{count}}h",
+      "hours_value_one": "{{count}}h",
+      "hours_value_other": "{{count}}h",
       "label_actions": "Actions",
       "label_active_alerts": "Active Alerts",
       "label_alert_actions": "Alert Actions",
@@ -26382,8 +26988,8 @@ export default interface Resources {
       "password_description": "Set an initial password for this user",
       "pending": "Pending",
       "permissions_description": "Permissions.",
-      "permissions_editor_coming_soon_desc": "Permissions Editor Coming Soon.",
-      "permissions_editor_coming_soon_title": "Permissions Editor Coming Soon",
+      "permissions_editor_unavailable_desc": "This page shows the user's role and granted permissions but can't change them. Manage access by changing the user's role on the user edit page.",
+      "permissions_editor_unavailable_title": "Permissions are read-only here",
       "permissions_granted": "Permissions Granted",
       "permissions_title": "Permissions",
       "placeholder_a_short_biography_for_this_user": "A Short Biography for This User...",
@@ -26413,6 +27019,8 @@ export default interface Resources {
       "role_newsletter_admin": "Newsletter Admin",
       "role_super_admin": "Super Admin",
       "role_tenant_admin": "Tenant Admin",
+      "role_tenant_super_admin": "Tenant Super Admin",
+      "role_unknown": "Unknown role",
       "search_placeholder": "Search users...",
       "send_welcome_email": "Send Welcome Email",
       "send_welcome_email_description": "Send a welcome email with login instructions to the new user",
@@ -26528,6 +27136,9 @@ export default interface Resources {
       "total_donations": "Total donations",
       "user_number": "User #{{id}}"
     },
+    "giving_days": {
+      "hours_target": "/ {{target}}"
+    },
     "shared": {
       "broker_actions": "Broker Actions",
       "content": "Content",
@@ -26573,6 +27184,8 @@ export default interface Resources {
       "adjust_failed": "Failed to adjust balance",
       "adjust_wallet_title": "Adjust wallet balance",
       "alert_pending_applications": "{{count}} applications pending review",
+      "alert_pending_applications_one": "{{count}} applications pending review",
+      "alert_pending_applications_other": "{{count}} applications pending review",
       "amount_label": "Amount (positive adds, negative deducts)",
       "amount_nonzero": "Amount must be a non-zero number",
       "amount_placeholder": "e.g. 50 or -20",
@@ -26603,18 +27216,36 @@ export default interface Resources {
       "balance_adjusted": "Balance adjusted",
       "bulk_approve": "Approve ({{count}})",
       "bulk_approve_confirm": "Approve {{count}} selected applications? Applicants will be notified.",
+      "bulk_approve_confirm_one": "Approve {{count}} selected applications? Applicants will be notified.",
+      "bulk_approve_confirm_other": "Approve {{count}} selected applications? Applicants will be notified.",
+      "bulk_approve_one": "Approve ({{count}})",
+      "bulk_approve_other": "Approve ({{count}})",
       "bulk_approve_title": "Approve applications",
       "bulk_approved": "{{count}} applications approved",
+      "bulk_approved_one": "{{count}} applications approved",
+      "bulk_approved_other": "{{count}} applications approved",
       "bulk_decline": "Decline ({{count}})",
       "bulk_decline_confirm": "Decline {{count}} selected applications? Applicants will be notified.",
+      "bulk_decline_confirm_one": "Decline {{count}} selected applications? Applicants will be notified.",
+      "bulk_decline_confirm_other": "Decline {{count}} selected applications? Applicants will be notified.",
+      "bulk_decline_one": "Decline ({{count}})",
+      "bulk_decline_other": "Decline ({{count}})",
       "bulk_decline_title": "Decline applications",
       "bulk_declined": "{{count}} applications declined",
+      "bulk_declined_one": "{{count}} applications declined",
+      "bulk_declined_other": "{{count}} applications declined",
       "bulk_selected": "{{count}} pending record selected",
+      "bulk_selected_one": "{{count}} pending record selected",
+      "bulk_selected_other": "{{count}} pending record selected",
       "bulk_selected_plural": "{{count}} pending records selected",
       "bulk_verify": "Verify selected",
       "bulk_verify_fail": "{{count}} record failed to verify",
+      "bulk_verify_fail_one": "{{count}} record failed to verify",
+      "bulk_verify_fail_other": "{{count}} record failed to verify",
       "bulk_verify_fail_plural": "{{count}} records failed to verify",
       "bulk_verify_success": "{{count}} record verified",
+      "bulk_verify_success_one": "{{count}} record verified",
+      "bulk_verify_success_other": "{{count}} record verified",
       "bulk_verify_success_plural": "{{count}} records verified",
       "by_name": "By {{name}}",
       "campaign_analytics": "Campaign Analytics",
@@ -26716,6 +27347,7 @@ export default interface Resources {
       "deactivate_giving_day_confirm": "Deactivate {{name}}? The campaign will stop accepting donations until it is reactivated.",
       "deactivate_giving_day_title": "Deactivate giving day",
       "decline": "Decline",
+      "decline_confirm": "Are you sure you want to decline this volunteer application?",
       "decline_hours_confirm": "Decline {{hours}} hours logged by {{name}}? The volunteer will not be credited.",
       "decline_hours_title": "Decline hours",
       "declined": "Declined",
@@ -26725,6 +27357,8 @@ export default interface Resources {
       "delete_webhook_confirm": "Delete this webhook? This action cannot be undone.",
       "delete_webhook_title": "Delete webhook",
       "delivery_total_sent": "{{count}} sent",
+      "delivery_total_sent_one": "{{count}} sent",
+      "delivery_total_sent_other": "{{count}} sent",
       "desc_all_volunteer_applications_have_been_rev": "All volunteer applications have been reviewed",
       "desc_no_volunteer_organizations_have_been_cre": "No volunteer organisations have been created yet",
       "desc_no_volunteer_organizations_have_cre": "No volunteer organisations have been created yet.",
@@ -26764,8 +27398,12 @@ export default interface Resources {
       "expired": "Expired",
       "expires_on": "expires {{date}}",
       "expiring_consents_warning": "{{count}} guardian consent expires within 30 days",
+      "expiring_consents_warning_one": "{{count}} guardian consent expires within 30 days",
+      "expiring_consents_warning_other": "{{count}} guardian consent expires within 30 days",
       "expiring_consents_warning_plural": "{{count}} guardian consents expire within 30 days",
       "expiry_alert_title": "{{count}} training record expiring within 30 days",
+      "expiry_alert_title_one": "{{count}} training record expiring within 30 days",
+      "expiry_alert_title_other": "{{count}} training record expiring within 30 days",
       "expiry_alert_title_plural": "{{count}} training records expiring within 30 days",
       "export": "Export",
       "export_csv": "Export CSV",
@@ -26775,6 +27413,8 @@ export default interface Resources {
       "export_started": "Export Started",
       "export_success": "Exported successfully",
       "export_truncated": "Export stopped after {{count}} pages — some rows were left out.",
+      "export_truncated_one": "Export stopped after {{count}} pages — some rows were left out.",
+      "export_truncated_other": "Export stopped after {{count}} pages — some rows were left out.",
       "failed_load_hours": "Failed to load hours",
       "failed_load_members": "Failed to load members",
       "failed_load_transactions": "Failed to load transactions",
@@ -26899,6 +27539,8 @@ export default interface Resources {
       "meeting_schedule_placeholder": "e.g. Tuesdays 7pm at the community hall",
       "members": "Members",
       "members_count": "{{count}} member",
+      "members_count_one": "{{count}} member",
+      "members_count_other": "{{count}} member",
       "members_count_plural": "{{count}} members",
       "monthly": "Monthly",
       "move_down": "Move down",
@@ -27001,6 +27643,8 @@ export default interface Resources {
       "reminder_credential_expiry": "Credential Expiry",
       "reminder_job_failed": "Failed to send reminder job",
       "reminder_job_sent": "Reminder job sent {{count}} notification",
+      "reminder_job_sent_one": "Reminder job sent {{count}} notification",
+      "reminder_job_sent_other": "Reminder job sent {{count}} notification",
       "reminder_job_sent_plural": "Reminder job sent {{count}} notifications",
       "reminder_lapsed_volunteer": "Lapsed Volunteer",
       "reminder_post_shift_feedback": "Post-shift Feedback",
@@ -27041,6 +27685,8 @@ export default interface Resources {
       "select_record": "Select {{name}}",
       "select_status": "Please select a review status",
       "selected_count": "{{count}} selected",
+      "selected_count_one": "{{count}} selected",
+      "selected_count_other": "{{count}} selected",
       "send_test": "Send test",
       "severity_critical": "Critical",
       "severity_high": "High",
@@ -27828,6 +28474,8 @@ export default interface Resources {
         "title": "Verify Identity"
       }
     },
+    "passkey_error_domain": "Passkeys aren't available on this site's address yet. Please sign in with your password.",
+    "passkey_login_failed": "Passkey sign-in failed. Try again, or sign in with your password.",
     "passkey_not_found": "No passkey found for this account. Log in with your password, then go to Settings to register a passkey.",
     "register": {
       "admin_only_note": "Only visible to admins",
@@ -28048,7 +28696,11 @@ export default interface Resources {
     "loading_post": "Loading blog post...",
     "loading_posts": "Loading blog posts",
     "min_read": "{{count}} min read",
+    "min_read_one": "{{count}} min read",
+    "min_read_other": "{{count}} min read",
     "min_read_short": "{{count}}m",
+    "min_read_short_one": "{{count}}m",
+    "min_read_short_other": "{{count}}m",
     "page_description": "Stories, guides, and updates from the timebanking community — exchanges that worked, lessons learned, and the latest from local groups and partners.",
     "page_title": "Blog",
     "post": {
@@ -28066,6 +28718,8 @@ export default interface Resources {
       "error_load": "Failed to load this blog post. Please try again.",
       "hide": "Hide",
       "min_read": "{{count}} min read",
+      "min_read_one": "{{count}} min read",
+      "min_read_other": "{{count}} min read",
       "no_comments": "No comments yet. Be the first to share your thoughts!",
       "not_found": "Blog post not found.",
       "not_found_desc": "This post may have been removed or the link may be incorrect.",
@@ -28091,6 +28745,8 @@ export default interface Resources {
       "sign_in_prompt": "Sign in to join the conversation",
       "unknown_author": "Unknown author",
       "views_count": "{{count}} views",
+      "views_count_one": "{{count}} views",
+      "views_count_other": "{{count}} views",
       "you": "You"
     },
     "search_placeholder": "Search posts...",
@@ -28147,6 +28803,8 @@ export default interface Resources {
       "load_failed": "Failed to load archive.",
       "load_record_failed": "Failed to load archive record.",
       "messages_count": "{{count}} messages",
+      "messages_count_one": "{{count}} messages",
+      "messages_count_other": "{{count}} messages",
       "no_snapshot": "No conversation snapshot available.",
       "not_found": "Archive record not found.",
       "page_title": "Review Archive",
@@ -28417,9 +29075,15 @@ export default interface Resources {
       "safeguarding_alerts": "Safeguarding Alerts",
       "safeguarding_flags": "Onboarding Flags",
       "time_days_ago": "{{count}}d ago",
+      "time_days_ago_one": "{{count}}d ago",
+      "time_days_ago_other": "{{count}}d ago",
       "time_hours_ago": "{{count}}h ago",
+      "time_hours_ago_one": "{{count}}h ago",
+      "time_hours_ago_other": "{{count}}h ago",
       "time_just_now": "Just now",
       "time_minutes_ago": "{{count}}m ago",
+      "time_minutes_ago_one": "{{count}}m ago",
+      "time_minutes_ago_other": "{{count}}m ago",
       "title": "Broker Dashboard",
       "unreviewed_messages": "Unreviewed Messages",
       "vetting_expiring": "Expiring Soon",
@@ -28908,6 +29572,8 @@ export default interface Resources {
       "bulk_approved_success": "Approved {{count}} member(s).",
       "bulk_clear": "Clear selection",
       "bulk_selected": "{{count}} selected",
+      "bulk_selected_one": "{{count}} selected",
+      "bulk_selected_other": "{{count}} selected",
       "bulk_suspend": "Suspend selected",
       "bulk_suspended_success": "Suspended {{count}} member(s).",
       "check_vetting": "Check Vetting",
@@ -28970,6 +29636,7 @@ export default interface Resources {
       "reactivate": "Reactivate",
       "reactivated_success": "Member reactivated successfully.",
       "role_admin": "Admin",
+      "role_all": "All roles",
       "role_broker": "Broker",
       "role_coordinator": "Coordinator",
       "role_member": "Member",
@@ -28994,9 +29661,15 @@ export default interface Resources {
       "tab_suspended": "Suspended",
       "tabs_aria": "Member status filter",
       "time_days_ago": "{{count}}d ago",
+      "time_days_ago_one": "{{count}}d ago",
+      "time_days_ago_other": "{{count}}d ago",
       "time_hours_ago": "{{count}}h ago",
+      "time_hours_ago_one": "{{count}}h ago",
+      "time_hours_ago_other": "{{count}}h ago",
       "time_just_now": "Just now",
       "time_minutes_ago": "{{count}}m ago",
+      "time_minutes_ago_one": "{{count}}m ago",
+      "time_minutes_ago_other": "{{count}}m ago",
       "time_never": "Never",
       "title": "Members",
       "view_details": "View details",
@@ -29053,6 +29726,8 @@ export default interface Resources {
       "detail_load_failed": "Failed to load message detail.",
       "detail_mark_reviewed": "Mark Reviewed",
       "detail_message_count": "{{count}} messages",
+      "detail_message_count_one": "{{count}} messages",
+      "detail_message_count_other": "{{count}} messages",
       "detail_message_deleted": "Message deleted",
       "detail_metadata": "Metadata",
       "detail_no_thread_messages": "No messages in this conversation.",
@@ -29312,6 +29987,7 @@ export default interface Resources {
       "id_label": "ID",
       "insurance_required_description": "Members must have valid insurance to engage with this listing.",
       "insurance_required_label": "Insurance required",
+      "level_all": "All risk levels",
       "level_critical": "Critical",
       "level_high": "High",
       "level_low": "Low",
@@ -29453,11 +30129,17 @@ export default interface Resources {
       "bulk_clear": "Clear selection",
       "bulk_delete": "Delete",
       "bulk_delete_confirm": "Are you sure you want to delete all selected records? This action cannot be undone.",
+      "bulk_delete_confirm_one": "Are you sure you want to delete all selected records? This action cannot be undone.",
+      "bulk_delete_confirm_other": "Are you sure you want to delete all selected records? This action cannot be undone.",
       "bulk_delete_title": "Delete Selected Records",
       "bulk_reject": "Reject",
       "bulk_reject_confirm": "Provide a reason to reject all selected records.",
+      "bulk_reject_confirm_one": "Provide a reason to reject all selected records.",
+      "bulk_reject_confirm_other": "Provide a reason to reject all selected records.",
       "bulk_verify": "Verify",
       "bulk_verify_confirm": "Verify all selected records?",
+      "bulk_verify_confirm_one": "Verify all selected records?",
+      "bulk_verify_confirm_other": "Verify all selected records?",
       "bulk_verify_title": "Verify Selected Records",
       "cancel": "Cancel",
       "change": "Change",
@@ -29489,6 +30171,8 @@ export default interface Resources {
       "empty_title": "No vetting records",
       "empty_try_filter": "Try adjusting your filters or search terms.",
       "expiry_days_left": "{{count}}d left",
+      "expiry_days_left_one": "{{count}}d left",
+      "expiry_days_left_other": "{{count}}d left",
       "field_expiry_date": "Expiry Date",
       "field_issue_date": "Issue Date",
       "field_notes": "Notes",
@@ -29509,6 +30193,8 @@ export default interface Resources {
       "page_title": "Vetting & DBS",
       "reason": "Reason",
       "records_selected": "{{count}} records selected",
+      "records_selected_one": "{{count}} records selected",
+      "records_selected_other": "{{count}} records selected",
       "reject": "Reject",
       "reject_all": "Reject All",
       "reject_confirm_prefix": "Reject ",
@@ -29529,9 +30215,13 @@ export default interface Resources {
       "search_member_placeholder": "Type to search...",
       "search_placeholder": "Search by member name...",
       "stat_expired_hint": "{{count}} already expired",
+      "stat_expired_hint_one": "{{count}} already expired",
+      "stat_expired_hint_other": "{{count}} already expired",
       "stat_expiring": "Expiring Soon",
       "stat_expiring_soon": "Expiring Soon",
       "stat_of_total": "of {{count}} total records",
+      "stat_of_total_one": "of {{count}} total records",
+      "stat_of_total_other": "of {{count}} total records",
       "stat_pending": "Pending",
       "stat_pending_review": "Pending Review",
       "stat_rejected": "Rejected",
@@ -29552,8 +30242,12 @@ export default interface Resources {
       "title": "Vetting & DBS",
       "toast_bulk_failed": "Bulk action failed.",
       "toast_bulk_failed_suffix": " ({{count}} failed)",
+      "toast_bulk_failed_suffix_one": " ({{count}} failed)",
+      "toast_bulk_failed_suffix_other": " ({{count}} failed)",
       "toast_bulk_reject_reason_required": "A reason is required to reject the selected records.",
       "toast_bulk_success": "{{count}} records {{action}}.{{failedSuffix}}",
+      "toast_bulk_success_one": "{{count}} records {{action}}.{{failedSuffix}}",
+      "toast_bulk_success_other": "{{count}} records {{action}}.{{failedSuffix}}",
       "toast_create_failed": "Failed to create vetting record.",
       "toast_created": "Vetting record created.",
       "toast_delete_failed": "Failed to delete vetting record.",
@@ -29898,6 +30592,7 @@ export default interface Resources {
           "maximum_discount": "Maximum discount per order (%)",
           "maximum_discount_description": "Cap on how much of the order total can be paid in time credits.",
           "no_matching_members": "No matching members",
+          "per_hour_short": "/ h",
           "save": "Save settings",
           "seller_label": "Seller (member)",
           "seller_placeholder": "Search by name or email",
@@ -29913,6 +30608,9 @@ export default interface Resources {
           "applied": "Applied",
           "pending": "Pending",
           "reversed": "Reversed"
+        },
+        "table": {
+          "empty_value": "—"
         },
         "title": "Loyalty Programme"
       },
@@ -30488,6 +31186,8 @@ export default interface Resources {
       "location_unknown": "Location not set",
       "matched_with": "Matched with {{name}}",
       "skill_matches": "{{count}} matching skills",
+      "skill_matches_one": "{{count}} matching skills",
+      "skill_matches_other": "{{count}} matching skills",
       "status": {
         "accepted": "Accepted",
         "cancelled": "Cancelled",
@@ -30775,6 +31475,8 @@ export default interface Resources {
     "card_remote": "Remote",
     "card_wallet_title": "Your wallet",
     "card_wallet_transactions": "{{count}} transactions in last 30 days",
+    "card_wallet_transactions_one": "{{count}} transactions in last 30 days",
+    "card_wallet_transactions_other": "{{count}} transactions in last 30 days",
     "disclaimer": "AI responses may not always be accurate. Verify important information.",
     "empty_description": "Ask me anything about timebanking, your account, or this community.",
     "empty_title": "AI Assistant",
@@ -30789,6 +31491,8 @@ export default interface Resources {
     "input_aria": "Message",
     "input_placeholder": "Ask me anything... (Enter to send, Shift+Enter for new line)",
     "limits_left_today": "{{count}} left today",
+    "limits_left_today_one": "{{count}} left today",
+    "limits_left_today_other": "{{count}} left today",
     "messages_region": "Chat messages",
     "new_conversation_aria": "Start new conversation",
     "page_meta": {
@@ -30807,6 +31511,7 @@ export default interface Resources {
     "toast_connection_error": "Failed to reach AI service",
     "toast_rate_limit": "Usage limit reached",
     "tool_results": {
+      "result_fallback": "Result",
       "view": "View"
     },
     "try_asking": "Try asking...",
@@ -30876,9 +31581,15 @@ export default interface Resources {
     }
   },
   "common": {
+    "25_34": "25–34",
+    "35_44": "35–44",
+    "45_54": "45–54",
+    "55_64": "55–64",
+    "65_plus": "65+",
     "accessibility": {
       "accessibility_alpha_new_tab": "Open WCAG 2.2 AA accessible version in a new tab",
       "breadcrumb": "Breadcrumb",
+      "clear_input": "Clear input",
       "close": "Close",
       "close_menu": "Close menu",
       "create_new": "Create new",
@@ -30900,6 +31611,23 @@ export default interface Resources {
     },
     "actions": {
       "retry": "Try again"
+    },
+    "activity": {
+      "action_event": "posted about an event",
+      "action_goal": "set a new goal",
+      "action_listing": "shared a listing",
+      "action_poll": "created a poll",
+      "action_post": "shared a post"
+    },
+    "admin": {
+      "surveys": {
+        "analytics": {
+          "answer_count_one": "{{count}} answer",
+          "answer_count_other": "{{count}} answers",
+          "no_open_text": "No open-text responses yet.",
+          "total_responses": "Total responses"
+        }
+      }
     },
     "admin_tools": {
       "admin_panel": "Admin Panel",
@@ -30987,12 +31715,124 @@ export default interface Resources {
       "type_feed": "Feed",
       "validation_required": "Please fill in all required fields."
     },
+    "advertising": {
+      "push": {
+        "chart_opens_title_one": "{{count}} opens",
+        "chart_opens_title_other": "{{count}} opens",
+        "chart_sends_title_one": "{{count}} sends",
+        "chart_sends_title_other": "{{count}} sends",
+        "metrics": {
+          "opens": "Opens",
+          "sends": "Sends"
+        },
+        "no_daily_data": "No daily data yet."
+      }
+    },
     "alpha_badge": "Alpha",
+    "already_responded": "You have already participated in this survey.",
+    "analytics": {
+      "regional": {
+        "age_groups": {
+          "25_34": "25-34",
+          "35_44": "35-44",
+          "45_54": "45-54",
+          "55_64": "55-64",
+          "65_plus": "65+",
+          "under_25": "Under 25",
+          "unknown": "Unknown"
+        },
+        "columns": {
+          "active_members": "Active members",
+          "avg_days_to_resolve": "Avg. days to resolve",
+          "category": "Category",
+          "cumulative_total": "Cumulative total",
+          "density": "Density",
+          "help_requests": "Help requests",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "members": "Members",
+          "month": "Month",
+          "new_events": "New events",
+          "new_listings": "New listings",
+          "new_members": "New members",
+          "offers": "Offers",
+          "organisation": "Organisation",
+          "rank": "Rank",
+          "ratio": "Ratio",
+          "requests": "Requests",
+          "resolution_rate": "Resolution rate",
+          "resolved": "Resolved",
+          "total": "Total",
+          "trend": "Trend",
+          "vol_hours": "Volunteer hours",
+          "volunteers": "Volunteers"
+        },
+        "demographics": {
+          "age_distribution": "Age distribution",
+          "language_distribution": "Language distribution",
+          "member_growth_12m": "Member growth, last 12 months",
+          "total_active_members": "{{total}} active members",
+          "total_with_data": "{{total}} members with demographic data"
+        },
+        "empty": {
+          "infinity": "∞",
+          "no_engagement_data": "No engagement data is available for this period.",
+          "no_geographic_data": "No geographic data is available for this period.",
+          "no_help_request_data": "No help-request data is available for this period.",
+          "no_listing_data": "No listing demand data is available for this period.",
+          "no_organisation_data": "No organisation activity is available for this period."
+        },
+        "empty_value": "-",
+        "errors": {
+          "data_unavailable": "Data is unavailable for this period.",
+          "load_data": "Could not load this analytics section: {{error}}"
+        },
+        "heatmap": {
+          "description": "Top locations by member activity and density."
+        },
+        "help": {
+          "by_category": "Help requests by category",
+          "resolution_trend_6m": "Resolution trend, last 6 months"
+        },
+        "loading": {
+          "section": "Loading analytics"
+        },
+        "sections": {
+          "demand_supply_by_category": "Demand vs supply by category",
+          "geographic_activity_density": "Geographic activity density",
+          "monthly_engagement_metrics": "Monthly engagement metrics"
+        },
+        "units": {
+          "days_count_one": "{{count}} days",
+          "days_count_other": "{{count}} days"
+        },
+        "volunteer": {
+          "avg_hours_per_volunteer": "Avg. hours per volunteer",
+          "reciprocity_description": "Balance between hours given and hours received across the region.",
+          "reciprocity_ratio": "Reciprocity ratio",
+          "top_orgs_title": "Top volunteer organisations",
+          "total_hours": "Total hours"
+        }
+      }
+    },
+    "application_status": {
+      "accepted": "Accepted",
+      "applied": "Applied",
+      "interview": "Interview",
+      "offer": "Offer",
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "reviewed": "Reviewed",
+      "screening": "Screening",
+      "withdrawn": "Withdrawn"
+    },
     "apply": "Apply",
     "appreciations": {
       "chars_remaining": "{{n}} characters left",
       "empty_desc": "Thank-you notes will appear here.",
       "empty_title": "No appreciations yet",
+      "load_error_desc": "Something went wrong while loading appreciations. Please try again.",
+      "load_error_title": "Couldn't load appreciations",
       "message_label": "Your message",
       "message_placeholder": "What are you thanking them for?",
       "most_empty": "No appreciations yet",
@@ -31007,6 +31847,7 @@ export default interface Resources {
       "reaction_clap": "Clap",
       "reaction_heart": "Heart",
       "reaction_star": "Star",
+      "retry": "Try again",
       "say_thanks": "Say thanks",
       "send": "Send thanks",
       "send_failed": "Could not send thank-you",
@@ -31044,6 +31885,8 @@ export default interface Resources {
       "loading_community": "Loading community",
       "loading_members": "Loading members",
       "location_results": "{{count}} address suggestions available",
+      "location_results_one": "{{count}} address suggestions available",
+      "location_results_other": "{{count}} address suggestions available",
       "main_navigation": "Main navigation",
       "map_view": "Map view",
       "mobile_navigation": "Mobile navigation",
@@ -31056,6 +31899,8 @@ export default interface Resources {
       "scroll_left": "Scroll left",
       "scroll_right": "Scroll right",
       "search_results": "{{count}} results available",
+      "search_results_one": "{{count}} results available",
+      "search_results_other": "{{count}} results available",
       "search_skills": "Search skills",
       "select_category": "Select a category",
       "select_language": "Select language",
@@ -31075,7 +31920,59 @@ export default interface Resources {
     },
     "back": "Back",
     "back_to_login": "Back to login",
+    "billing": {
+      "status_active": "Active",
+      "status_cancelled": "Cancelled",
+      "status_expired": "Expired",
+      "status_incomplete": "Incomplete",
+      "status_past_due": "Past Due",
+      "status_trialing": "Trialing"
+    },
+    "biometric": {
+      "label_builtin": "Built-in authenticator",
+      "label_external": "External authenticator",
+      "label_passkey": "Passkey",
+      "platform_android_step1": "Tap \"This device\" to create a passkey using your fingerprint, face, or screen lock.",
+      "platform_android_step2": "The passkey is saved to Google Password Manager and works on all your Android devices and Chrome browsers.",
+      "platform_android_step3": "You can also tap \"Phone, tablet, or security key\" to register a security key.",
+      "platform_android_title": "Setting up on Android",
+      "platform_ipad_step1": "Tap \"This device\" to create a passkey using Face ID or Touch ID.",
+      "platform_ipad_step2": "The passkey is saved to iCloud Keychain and works on all your Apple devices.",
+      "platform_ipad_step3": "You can also tap \"Phone, tablet, or security key\" to register a security key.",
+      "platform_ipad_title": "Setting up on iPad",
+      "platform_iphone_step1": "Tap \"This device\" to create a passkey using Face ID or Touch ID.",
+      "platform_iphone_step2": "The passkey is saved to iCloud Keychain and works on all your Apple devices.",
+      "platform_iphone_step3": "You can also tap \"Phone, tablet, or security key\" to register a security key.",
+      "platform_iphone_title": "Setting up on iPhone",
+      "platform_linux_step1": "Click \"This device\" — your browser will use its built-in passkey manager.",
+      "platform_linux_step2": "Or click \"Phone, tablet, or security key\" to use a USB security key or scan a QR code with your phone.",
+      "platform_linux_title": "Setting up on Linux",
+      "platform_mac_step1": "Click \"This Mac\" — your browser will prompt Touch ID or your Mac password.",
+      "platform_mac_step2": "The passkey syncs via iCloud Keychain to your iPhone, iPad, and other Macs automatically.",
+      "platform_mac_step3": "Or click \"Phone, tablet, or security key\" to register a different device.",
+      "platform_mac_title": "Setting up on Mac",
+      "platform_unknown_step1": "Click \"This device\" to create a passkey on the device you're using now.",
+      "platform_unknown_step2": "Or click \"Phone, tablet, or security key\" to register a different device.",
+      "platform_unknown_title": "Setting up a passkey",
+      "platform_windows_step1": "Click \"This PC\" to create a passkey stored on this computer. You'll confirm with your Windows Hello PIN, fingerprint, or face.",
+      "platform_windows_step2": "Requirement: You must have Windows Hello set up first. Go to Windows Settings > Accounts > Sign-in options > PIN to set it up.",
+      "platform_windows_step3": "Or click \"Phone, tablet, or security key\" to scan a QR code with your phone instead.",
+      "platform_windows_step4": "To set up passkeys on your phone too, open this page on your phone and tap \"This device\".",
+      "platform_windows_title": "Setting up on Windows"
+    },
     "cancel": "Cancel",
+    "caregiver": {
+      "burnout_high": "High caregiver load: {{hours}} hours this week",
+      "burnout_moderate": "Moderate load: {{hours}} hours this week",
+      "burnout_warning": "You've logged many hours this week — please make sure to rest",
+      "hours_short": "{{hours}}h",
+      "no_recent_care": "No recent care logs yet",
+      "no_upcoming_care": "No scheduled support yet",
+      "recent_care": "Recent care",
+      "request_on_behalf": "Request help on their behalf",
+      "upcoming_care": "Upcoming care",
+      "view_schedule": "View care schedule"
+    },
     "caring_community": {
       "actions": {
         "become_caregiver": "Become a caregiver",
@@ -31254,6 +32151,77 @@ export default interface Resources {
       "welcome_banner": "Welcome! Here you can ask for help, offer your time, or simply record a neighbourly kindness. Every contribution — big or small — makes your community stronger.",
       "your_hours_note": "These are the same time credits used across the timebank — one shared balance, not a separate caring-community currency."
     },
+    "caring_workflow": {
+      "actions": {
+        "refresh": "Refresh",
+        "retry": "Retry"
+      },
+      "empty": {
+        "value": "-"
+      },
+      "predictive": {
+        "active_members": "Active members",
+        "coefficient_drift": "Category coefficient drift",
+        "coefficient_drift_aria": "Category coefficient drift",
+        "coefficient_drift_note": "Categories with absolute drift > {{threshold}}% are flagged. Review baseline coefficients in the category coefficient editor.",
+        "columns": {
+          "baseline": "Baseline",
+          "category": "Category",
+          "churn_rate": "Churn rate",
+          "coverage": "Coverage",
+          "drift": "Drift",
+          "expected_hrs": "Expected hrs",
+          "fulfilled_90d": "Fulfilled (90d)",
+          "lapsed": "Lapsed",
+          "observed_hrs": "Observed hrs",
+          "prior_active": "Prior active",
+          "requested_90d": "Requested (90d)",
+          "sample": "Sample",
+          "status": "Status",
+          "sub_region": "Sub-region"
+        },
+        "confidence": "Confidence",
+        "drifting_count_one": "{{count}} drifting",
+        "drifting_count_other": "{{count}} drifting",
+        "forecast": "Forecast",
+        "helper_churn": "Helper churn (lapsed >= {{days}} days)",
+        "helper_churn_aria": "Helper churn by category",
+        "helper_churn_note": "{{lapsed}} of {{prior}} previously active helpers haven't logged hours recently.",
+        "history": "History",
+        "hours_forecast": "Hours forecast",
+        "no_forecast": "No forecast data available yet.",
+        "not_enough_activity": "Not enough activity yet to forecast. Come back in a few weeks.",
+        "overall_percent": "{{value}}% overall",
+        "proactive_alerts": "Proactive alerts",
+        "recipients_reached": "Recipients reached",
+        "severity": {
+          "critical": "Critical",
+          "info": "Info",
+          "warning": "Warning"
+        },
+        "status": {
+          "ok": "OK",
+          "under_supplied": "Under-supplied"
+        },
+        "sub_region_coverage": "Sub-region coverage (last {{days}} days)",
+        "sub_region_coverage_aria": "Sub-region coverage",
+        "subtitle": "Forward-looking forecasts and proactive alerts. Spot regional care deficits before they become emergencies.",
+        "title": "Predictive Insights",
+        "trend_declining": "Declining {{value}}%",
+        "trend_growing": "Growing {{value}}%",
+        "trend_stable": "Stable",
+        "under_supplied_count_one": "{{count}} under-supplied",
+        "under_supplied_count_other": "{{count}} under-supplied"
+      }
+    },
+    "categories": {
+      "label_category_actions": "Category Actions"
+    },
+    "challenges": {
+      "time_ended": "Ended",
+      "time_remaining_days_hours": "{{days}}d {{hours}}h remaining",
+      "time_remaining_hours_minutes": "{{hours}}h {{minutes}}m remaining"
+    },
     "checking_authentication": "Checking authentication...",
     "clubs": {
       "empty": {
@@ -31265,6 +32233,8 @@ export default interface Resources {
       },
       "meeting_schedule": "Meets: {{schedule}}",
       "member_count": "{{count}} members",
+      "member_count_one": "{{count}} members",
+      "member_count_other": "{{count}} members",
       "meta": {
         "description": "Discover local clubs and associations in your community",
         "title": "Clubs & Associations"
@@ -31285,6 +32255,7 @@ export default interface Resources {
       "empty_title": "No collections yet",
       "item_removed": "Removed",
       "items_count": "{{n}} items",
+      "load_error": "We couldn't load your collections.",
       "make_public": "Make public",
       "my_title": "My Collections",
       "name_label": "Name",
@@ -31298,15 +32269,43 @@ export default interface Resources {
       "public_title": "Public Collections",
       "remove": "Remove from saved",
       "remove_item": "Remove from collection",
+      "retry": "Try again",
       "save": "Save",
       "save_to": "Save to collection"
     },
+    "commercial_boundary": {
+      "empty": {
+        "value": "-"
+      },
+      "export": {
+        "agpl_module": "AGPL module",
+        "capability": "Capability",
+        "classification": "Classification",
+        "default": "Default",
+        "generated": "Generated {{date}} from the NEXUS admin panel.",
+        "last_updated": "Last updated: {{date}}",
+        "no": "no",
+        "notes": "Notes",
+        "overridden": "Overridden",
+        "yes": "yes"
+      },
+      "meta": {
+        "subtitle": "AG82 - what is AGPL public, tenant-configurable, deployment-layer, or commercial",
+        "title": "Commercial Boundary Map"
+      },
+      "sections": {
+        "classifications": "Classifications"
+      }
+    },
     "common": {
       "cancel": "Cancel",
+      "collapse": "Collapse",
       "create": "Create",
       "delete": "Delete",
       "dismiss": "Dismiss",
+      "edit": "Edit",
       "error": "Something went wrong",
+      "expand": "Expand",
       "loading": "Loading...",
       "not_available": "Not available",
       "someone": "Someone",
@@ -31318,7 +32317,34 @@ export default interface Resources {
       "placeholder_hours": "1",
       "placeholder_url": "https://example.com"
     },
+    "config": {
+      "module_name_achievements": "Achievements",
+      "module_name_blog": "Blog",
+      "module_name_connections": "Connections",
+      "module_name_courses": "Courses",
+      "module_name_dashboard": "Dashboard",
+      "module_name_events": "Events",
+      "module_name_feed": "Feed",
+      "module_name_goals": "Goals",
+      "module_name_groups": "Groups",
+      "module_name_job_vacancies": "Job Vacancies",
+      "module_name_leaderboard": "Leaderboard",
+      "module_name_listings": "Listings",
+      "module_name_marketplace": "Marketplace",
+      "module_name_members": "Members",
+      "module_name_messages": "Messages",
+      "module_name_organisations": "Organisations",
+      "module_name_podcasts": "Podcasts",
+      "module_name_resources": "Resources",
+      "module_name_volunteering": "Volunteering",
+      "module_name_wallet": "Wallet"
+    },
     "confirm": "Confirm",
+    "content": {
+      "label_attribute_actions": "Attribute Actions",
+      "label_delete_item": "Delete Item",
+      "label_edit_item": "Edit Item"
+    },
     "cookie_consent": {
       "accept_all": "Accept all",
       "always_on": "Always on",
@@ -31397,6 +32423,8 @@ export default interface Resources {
         "status_paused": "Paused",
         "table_aria": "Seller coupons",
         "usage_count": "Used {{count}} times",
+        "usage_count_one": "Used {{count}} times",
+        "usage_count_other": "Used {{count}} times",
         "valid_from": "Valid from",
         "valid_until": "Valid until",
         "view_redemptions": "View redemptions"
@@ -31409,9 +32437,27 @@ export default interface Resources {
       "use_online": "Use online",
       "valid_until": "Valid until"
     },
+    "cover": {
+      "title": "Cover Care"
+    },
     "create": {
       "new_event": "New Event",
       "new_listing": "New Listing"
+    },
+    "credentials": {
+      "status_expired": "Expired",
+      "status_pending": "Pending Review",
+      "status_rejected": "Rejected",
+      "status_verified": "Verified"
+    },
+    "crm": {
+      "days_ago_one": "{{count}} days ago",
+      "days_ago_other": "{{count}} days ago",
+      "hours_ago_one": "{{count}} hours ago",
+      "hours_ago_other": "{{count}} hours ago",
+      "just_now": "Just now",
+      "minutes_ago_one": "{{count}} minutes ago",
+      "minutes_ago_other": "{{count}} minutes ago"
     },
     "data_export": {
       "download_button": "Download my data",
@@ -31429,6 +32475,8 @@ export default interface Resources {
       },
       "history": {
         "count": "{{count}} exports",
+        "count_one": "{{count}} exports",
+        "count_other": "{{count}} exports",
         "date": "Requested",
         "empty": "You haven't exported your data yet.",
         "format": "Format",
@@ -31513,7 +32561,100 @@ export default interface Resources {
       "webhooks_intro": "Subscribe to events with HTTPS callback URLs. Each delivery includes an X-Partner-Signature header — an HMAC-SHA256 of the raw body, keyed by the subscription secret returned at creation time.",
       "webhooks_meta_title": "API Webhooks"
     },
+    "discussion": {
+      "delete": "Delete",
+      "reply": "Reply"
+    },
+    "dismiss_reasons": {
+      "not_interested": "Not interested",
+      "not_my_skills": "Not my skills",
+      "too_far": "Too far away"
+    },
     "empty_dash": "-",
+    "enterprise": {
+      "config_auto_approve_blog": "Auto-approve blog posts",
+      "config_auto_approve_blog_desc": "Publish new blog posts immediately instead of holding them for moderator review.",
+      "config_auto_approve_listings": "Auto-approve listings",
+      "config_auto_approve_listings_desc": "Publish new listings immediately instead of holding them for moderator review.",
+      "config_configure_steps": "Configure steps",
+      "config_contact_email": "Contact email",
+      "config_contact_email_desc": "Address members use to reach support.",
+      "config_contact_phone": "Contact phone",
+      "config_contact_phone_desc": "Public phone number for support enquiries.",
+      "config_currency_name": "Currency name",
+      "config_currency_name_desc": "Display name for the time-bank currency.",
+      "config_currency_symbol": "Currency symbol",
+      "config_currency_symbol_desc": "Short symbol shown next to balances.",
+      "config_digest_daily": "Daily",
+      "config_digest_frequency": "Digest frequency",
+      "config_digest_frequency_desc": "How often the activity digest email is sent.",
+      "config_digest_monthly": "Monthly",
+      "config_digest_never": "Never",
+      "config_digest_weekly": "Weekly",
+      "config_email_notifications_enabled": "Email notifications enabled",
+      "config_email_notifications_enabled_desc": "Default for new accounts. Members can override in their own settings.",
+      "config_footer_text": "Footer legal text",
+      "config_footer_text_desc": "Charity number, company registration, or other legal text displayed in the footer.",
+      "config_group_content": "Content & moderation",
+      "config_group_content_desc": "Approval rules and content filters for listings and posts.",
+      "config_group_general": "General",
+      "config_group_general_desc": "Site identity, localization, and footer text.",
+      "config_group_limits": "Limits",
+      "config_group_limits_desc": "Per-member caps and upload size.",
+      "config_group_notifications": "Notifications",
+      "config_group_notifications_desc": "Default delivery channels for new accounts and digest cadence.",
+      "config_group_registration": "Registration & onboarding",
+      "config_group_registration_desc": "Who can sign up, what they verify, and how they are welcomed.",
+      "config_group_wallet": "Wallet & credits",
+      "config_group_wallet_desc": "Time-credit balance, transfer caps, and how the currency is named.",
+      "config_locale": "Default locale",
+      "config_locale_desc": "Language used for new members until they pick their own.",
+      "config_maintenance_mode": "Maintenance mode",
+      "config_maintenance_mode_desc": "Read-only. Toggle via scripts/maintenance.sh on the server.",
+      "config_max_file_upload_mb": "Max upload size (MB)",
+      "config_max_file_upload_mb_desc": "Per-file upload size limit. Larger files are rejected at the server.",
+      "config_max_groups_per_user": "Max groups per member",
+      "config_max_groups_per_user_desc": "Most groups a single member can join. Set to 0 for no limit.",
+      "config_max_listing_images": "Max images per listing",
+      "config_max_listing_images_desc": "Upper limit on photos attached to a single listing.",
+      "config_max_listings_per_user": "Max listings per member",
+      "config_max_listings_per_user_desc": "Most listings a single member can have active at once. Set to 0 for no limit.",
+      "config_max_transaction": "Maximum transfer",
+      "config_max_transaction_desc": "Largest single transfer between members. Set to 0 for no limit.",
+      "config_onboarding_enabled": "Show onboarding flow",
+      "config_onboarding_enabled_desc": "Walk new members through profile and skills setup after sign-up.",
+      "config_profanity_filter": "Profanity filter",
+      "config_profanity_filter_desc": "Block submissions containing words on the platform's profanity list.",
+      "config_push_notifications_enabled": "Push notifications enabled",
+      "config_push_notifications_enabled_desc": "Default for new accounts. Members can override in their own settings.",
+      "config_registration_enabled": "Registration enabled",
+      "config_registration_enabled_desc": "Turn off to close sign-ups entirely.",
+      "config_require_approval": "Admin approval required",
+      "config_require_approval_desc": "New accounts must be approved by an admin before they can sign in.",
+      "config_require_email_verification": "Require email verification",
+      "config_require_email_verification_desc": "Members must verify their email address before accessing the platform.",
+      "config_site_description": "Site description",
+      "config_site_description_desc": "Short tagline used in metadata and shared links.",
+      "config_site_name": "Site name",
+      "config_site_name_desc": "Public name shown in the header, browser tab, and emails.",
+      "config_starting_balance": "Starting balance",
+      "config_starting_balance_desc": "Time credits granted to new members on sign-up. Set to 0 to disable.",
+      "config_timezone": "Timezone",
+      "config_timezone_desc": "IANA timezone identifier used for scheduling and timestamps.",
+      "config_welcome_message": "Welcome message",
+      "config_welcome_message_desc": "Shown to new members on their first sign-in.",
+      "gdpr_sla_days_left_one": "{{count}} days left",
+      "gdpr_sla_days_left_other": "{{count}} days left",
+      "gdpr_sla_overdue_one": "{{count}} days overdue",
+      "gdpr_sla_overdue_other": "{{count}} days overdue",
+      "validation_email": "Enter a valid email address (e.g., name@example.com)",
+      "validation_format": "Invalid format",
+      "validation_max": "Must be {{value}} or less",
+      "validation_min": "Must be {{value}} or greater",
+      "validation_number": "Must be a number",
+      "validation_required": "Required",
+      "validation_url": "Enter a valid URL that starts with http:// or https://"
+    },
     "error_boundary": {
       "component_stack": "Component Stack",
       "description": "An unexpected error occurred. Please try again or go back to the home page.",
@@ -31529,6 +32670,21 @@ export default interface Resources {
     },
     "feature_error": {
       "load_failed": "We couldn't load {{feature}}. This section may be temporarily unavailable."
+    },
+    "federation": {
+      "event_type_connection": "Connection request",
+      "event_type_federated_search": "Partner search",
+      "event_type_listing_shared": "Listing shared",
+      "event_type_listing_unshared": "Listing unshared",
+      "event_type_listing_viewed": "Listing viewed",
+      "event_type_message_sent": "Message Sent",
+      "event_type_partnership_approved": "Partnership approved",
+      "event_type_partnership_changed": "Partnership updated",
+      "event_type_partnership_rejected": "Partnership declined",
+      "event_type_partnership_requested": "Partnership requested",
+      "event_type_partnership_terminated": "Partnership ended",
+      "event_type_profile_viewed": "Profile viewed",
+      "event_type_transaction": "Transaction"
     },
     "federation_aggregates": {
       "consent_disabled": "Federation aggregates disabled",
@@ -31621,6 +32777,14 @@ export default interface Resources {
       "subhead": "Worth approximately CHF {{value}} — care you can call on when you need it",
       "title": "Your Future Care Fund"
     },
+    "gamification": {
+      "activate": "Activate",
+      "delete": "Delete",
+      "edit": "Edit",
+      "label_campaign_actions": "Campaign Actions",
+      "pause": "Pause",
+      "resume": "Resume"
+    },
     "gif": {
       "button_label": "Add GIF",
       "no_results": "No GIFs found",
@@ -31631,6 +32795,17 @@ export default interface Resources {
       "trending": "Trending"
     },
     "go_back": "Go back",
+    "groups": {
+      "policy_content": "Policy Content",
+      "policy_creation": "Policy Creation",
+      "policy_features": "Policy Features",
+      "policy_membership": "Policy Membership",
+      "policy_moderation": "Policy Moderation",
+      "policy_notifications": "Policy Notifications"
+    },
+    "help_faqs": {
+      "actions_aria": "FAQ actions"
+    },
     "hour_gift": {
       "back": "Back to Community Hub",
       "errors": {
@@ -31738,6 +32913,8 @@ export default interface Resources {
     "hours_display_one": "{{count}} hour",
     "hours_display_other": "{{count}} hours",
     "hours_short": "{{count}}h",
+    "hours_short_one": "{{count}}h",
+    "hours_short_other": "{{count}}h",
     "identity_not_verified": "Identity not verified",
     "install": {
       "android_chrome_intro": "Add NEXUS to your home screen from the Chrome menu:",
@@ -31826,6 +33003,24 @@ export default interface Resources {
       "command_symbol": "⌘",
       "k_key": "K"
     },
+    "kpi_baselines": {
+      "actions": {
+        "close": "Close"
+      },
+      "comparison": {
+        "baseline": "Baseline",
+        "captured": "(captured {{date}})",
+        "comparing": "Comparing:",
+        "impact_achieved": "Impact achieved",
+        "now": "Now"
+      },
+      "empty": {
+        "no_data": "No data available"
+      },
+      "fields": {
+        "notes_label_prefix": "Notes:"
+      }
+    },
     "landing_links": {
       "aria_label": "Explore community sections",
       "title": "Explore this community"
@@ -31843,6 +33038,13 @@ export default interface Resources {
     "level_plain": "Level {{level}}",
     "level_progress_aria": "Level {{level}} progress: {{percentage}}%",
     "level_short": "Lv. {{level}}",
+    "likert_options": {
+      "1": "Very dissatisfied",
+      "2": "Dissatisfied",
+      "3": "Neutral",
+      "4": "Satisfied",
+      "5": "Very satisfied"
+    },
     "loading": "Loading...",
     "location": {
       "powered_by_google": "Powered by Google",
@@ -31892,7 +33094,9 @@ export default interface Resources {
       "section_title": "Use Your Time Credits"
     },
     "map": {
-      "listings_here": "{{count}} listings here"
+      "listings_here": "{{count}} listings here",
+      "listings_here_one": "{{count}} listings here",
+      "listings_here_other": "{{count}} listings here"
     },
     "map_unavailable": "Map view is not available",
     "marketplace": {
@@ -31982,6 +33186,8 @@ export default interface Resources {
       "view": "View"
     },
     "max_characters": "max {{count}} characters",
+    "max_characters_one": "max {{count}} characters",
+    "max_characters_other": "max {{count}} characters",
     "members": {
       "active": "Most Active",
       "all": "All Members",
@@ -31997,7 +33203,11 @@ export default interface Resources {
       "fallback_name": "Member",
       "hero_eyebrow": "Community directory",
       "hours_exchanged_aria": "{{count}} hours exchanged",
+      "hours_exchanged_aria_one": "{{count}} hours exchanged",
+      "hours_exchanged_aria_other": "{{count}} hours exchanged",
       "hours_short": "{{count}}h",
+      "hours_short_one": "{{count}}h",
+      "hours_short_other": "{{count}}h",
       "joined_date": "Joined {{date}}",
       "load_failed": "Failed to load members",
       "load_more": "Load More",
@@ -32018,6 +33228,8 @@ export default interface Resources {
       "radius_label": "Radius",
       "rating_aria": "Rating: {{rating}} out of 5",
       "results_count": "{{count}} members shown",
+      "results_count_one": "{{count}} members shown",
+      "results_count_other": "{{count}} members shown",
       "results_matching": "{{shown}} of {{total}} members matching \"{{query}}\"",
       "search_filter": "Search: {{query}}",
       "search_placeholder": "Search members...",
@@ -32035,10 +33247,57 @@ export default interface Resources {
       "unable_to_load": "Unable to Load Members",
       "verified_member": "Verified member"
     },
+    "menu_builder": {
+      "delete_item": "Delete item",
+      "drag_hint": "Drag items to reorder",
+      "drag_to_reorder": "Drag to reorder",
+      "edit_item": "Edit item",
+      "group_community": "Community",
+      "group_core": "Core",
+      "group_features": "Features",
+      "group_gamification": "Gamification",
+      "group_info": "Info",
+      "live_preview": "Live preview",
+      "location_footer": "Footer",
+      "location_header_main": "Main Header",
+      "location_header_secondary": "Secondary Header",
+      "location_mobile": "Mobile",
+      "location_sidebar": "Sidebar",
+      "no_data": "No data available",
+      "preview": "Preview",
+      "route_about": "About",
+      "route_explore": "Explore",
+      "route_faq": "FAQ",
+      "sub_items_one": "{{count}} sub-item(s)",
+      "sub_items_other": "{{count}} sub-item(s)",
+      "type_divider_desc": "A visual separator between menu items",
+      "type_divider_label": "Divider",
+      "type_dropdown_desc": "A dropdown menu containing child items",
+      "type_dropdown_label": "Dropdown",
+      "type_external_desc": "Link to an external website",
+      "type_external_label": "External Link",
+      "type_link_desc": "Link to a page within this platform",
+      "type_link_label": "Internal Link",
+      "type_page_desc": "Link to a custom page on this platform",
+      "type_page_label": "Custom Page",
+      "type_route_desc": "Link using a named application route",
+      "type_route_label": "Named Route"
+    },
     "mobile_tab": {
       "create": "Create",
       "create_new_content": "Create new content",
       "menu": "Menu"
+    },
+    "municipal_copilot": {
+      "empty": {
+        "value": "-"
+      }
+    },
+    "municipal_verification": {
+      "status": {
+        "pending_dns": "Pending DNS",
+        "verified": "Verified"
+      }
     },
     "my_support_relationships": {
       "back": "Back to Community Hub",
@@ -32148,6 +33407,8 @@ export default interface Resources {
       "timebanking": "Timebanking",
       "timebanking_guide": "Timebanking Guide",
       "unread_notifications": "{{count}} unread notifications",
+      "unread_notifications_one": "{{count}} unread notifications",
+      "unread_notifications_other": "{{count}} unread notifications",
       "verify_identity": "Verify Your Identity",
       "volunteering": "Volunteering",
       "wallet": "Wallet"
@@ -32205,6 +33466,31 @@ export default interface Resources {
       "volunteering": "Find opportunities & log your hours",
       "wallet": "Time credit balance & history"
     },
+    "newsletter_builder": {
+      "insert_image": "Insert image",
+      "library_title": "Image library",
+      "preview": "Preview",
+      "preview_desktop": "Desktop",
+      "preview_device_label": "Preview device",
+      "preview_mobile": "Mobile",
+      "preview_title": "Email preview",
+      "templates": "Templates"
+    },
+    "newsletter_content_editor": {
+      "tip_borders": "Toggle borders",
+      "tip_clear": "Clear canvas",
+      "tip_code": "View code",
+      "tip_device_desktop": "Desktop view",
+      "tip_device_mobile": "Mobile view",
+      "tip_device_tablet": "Tablet view",
+      "tip_redo": "Redo",
+      "tip_undo": "Undo",
+      "toolbar_label": "Email builder toolbar"
+    },
+    "nexus_score": {
+      "tier_threshold": "{{tier}} ({{min}}+)"
+    },
+    "no": "No",
     "no_activity_title": "No activity yet",
     "not_available": "Not available",
     "oauth": {
@@ -32269,6 +33555,35 @@ export default interface Resources {
         "title": "Thank You!"
       }
     },
+    "page_builder": {
+      "blocks": {
+        "category_nexus": "NEXUS sections",
+        "feature_grid_label": "Feature grid",
+        "feature_one_body": "Describe an outcome, service or promise.",
+        "feature_one_title": "Feature one",
+        "feature_two_body": "Keep the copy concrete and easy to scan.",
+        "feature_two_title": "Feature two",
+        "hero_body": "Add a clear introduction that feels specific to your timebank.",
+        "hero_cta": "Call to action",
+        "hero_kicker": "Community story",
+        "hero_label": "Hero section",
+        "hero_title": "A page headline with presence",
+        "story_band_label": "Story band",
+        "story_body": "Use this for reports, programme explainers, partner pages or guidance.",
+        "story_kicker": "Local impact",
+        "story_title": "Tell the story in a generous content band"
+      },
+      "starter": {
+        "card_one_body": "Introduce projects, services, partners, reports, policies or local opportunities.",
+        "card_one_title": "Share what matters",
+        "card_two_body": "Preview desktop, tablet and mobile while you design.",
+        "card_two_title": "Keep it responsive",
+        "cta": "Explore the community",
+        "hero_body": "Use sections, cards, images and calls to action to tell your tenant's story.",
+        "hero_title": "Build a beautiful custom page",
+        "kicker": "Community page"
+      }
+    },
     "page_meta": {
       "members": {
         "description": "Browse community members, connect and exchange time credits.",
@@ -32324,6 +33639,21 @@ export default interface Resources {
       "tab_trends": "Trends",
       "tabs_aria": "Analytics tabs",
       "title": "Regional analytics"
+    },
+    "pilot_launch_readiness": {
+      "missing": {
+        "acknowledgement": "Coordinator acknowledgement",
+        "backlog_empty": "Integration backlog empty",
+        "controller_contact_email": "Controller contact email",
+        "controller_data_protection_officer": "Data protection officer",
+        "controller_name": "Controller name",
+        "danger_checks": "Data quality issues",
+        "incident_response_contact_email": "Incident response contact email",
+        "policy_appendix_url": "Policy appendix URL",
+        "pre_pilot_baseline": "Pre-pilot scoreboard baseline",
+        "safeguarding_escalation_user_id": "Safeguarding escalation contact",
+        "workshop_not_run": "Operating policy workshop not run"
+      }
     },
     "premium": {
       "back_to_pricing": "Back to support levels",
@@ -32392,6 +33722,18 @@ export default interface Resources {
       "unavailable_title": "Donations are not available in this community yet",
       "view_pricing_cta": "View support levels",
       "yearly": "Yearly"
+    },
+    "providers": {
+      "call_aria": "Call provider at {{phone}}",
+      "email_aria": "Email provider at {{email}}",
+      "filter_private": "Private",
+      "filter_spitex": "Spitex",
+      "filter_tagesstte": "Day Centres",
+      "filter_verein": "Associations",
+      "filter_volunteer": "Volunteers",
+      "verified_badge": "Verified",
+      "website": "Website",
+      "website_aria": "Visit provider website {{url}}"
     },
     "provisioning": {
       "back": "Back",
@@ -32502,6 +33844,8 @@ export default interface Resources {
       "estimate_error": "Could not estimate audience. Please try again.",
       "estimate_label": "Estimated audience",
       "estimate_result": "Estimated reach: {{count}} members",
+      "estimate_result_one": "Estimated reach: {{count}} members",
+      "estimate_result_other": "Estimated reach: {{count}} members",
       "feature_disabled": "Push campaigns are not available for your account.",
       "field_body": "Message",
       "field_body_desc": "The main body text of the push notification.",
@@ -32566,6 +33910,13 @@ export default interface Resources {
     },
     "push_campaign_opt_in": "Receive promoted push notifications",
     "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time.",
+    "qa": {
+      "downvote_aria": "Downvote",
+      "upvote_aria": "Upvote",
+      "vote_count_aria_one": "{{count}} votes",
+      "vote_count_aria_other": "{{count}} votes"
+    },
+    "question_required": "Required",
     "quick_create": {
       "close_aria": "Close create menu",
       "new_event": "New Event",
@@ -32661,7 +34012,16 @@ export default interface Resources {
         "empty": "No transactions yet.",
         "table_aria": "Regional points activity",
         "title": "Recent activity",
-        "type": "Type"
+        "type": "Type",
+        "types": {
+          "admin_adjustment": "Admin adjustment",
+          "admin_issue": "Issued by admin",
+          "earned_for_hours": "Earned for hours",
+          "redemption": "Redemption",
+          "reversal": "Reversal",
+          "transfer_in": "Transfer received",
+          "transfer_out": "Transfer sent"
+        }
       },
       "lifetime_earned": "Lifetime earned",
       "lifetime_spent": "Lifetime spent",
@@ -32757,6 +34117,7 @@ export default interface Resources {
         "transcript_label": "What we heard"
       }
     },
+    "required_error": "Please answer all required questions.",
     "safeguarding_reports": {
       "back": "Back to Community Hub",
       "errors": {
@@ -32824,6 +34185,12 @@ export default interface Resources {
         "title": "Report a Safeguarding Concern"
       }
     },
+    "salary": {
+      "currency_eur": "EUR",
+      "max_only": "Up to {{max}}",
+      "min_only": "From {{min}}"
+    },
+    "salary_display": "{{min}} – {{max}}",
     "save": "Save",
     "search": {
       "actions": "Actions",
@@ -32876,6 +34243,8 @@ export default interface Resources {
       "aria_clear_search": "Clear search",
       "aria_close_members_list": "Close members list",
       "aria_results": "{{count}} skill suggestions available",
+      "aria_results_one": "{{count}} skill suggestions available",
+      "aria_results_other": "{{count}} skill suggestions available",
       "browse_title": "Community Skills Directory",
       "categories": "Categories",
       "category_optional": "Category (optional)",
@@ -32933,9 +34302,33 @@ export default interface Resources {
       "type_other": "Area",
       "type_quartier": "Neighbourhood"
     },
+    "submit": "Submit",
+    "submit_error": "Could not submit. Please try again.",
+    "submitting": "Submitting…",
+    "super": {
+      "action_view": "View",
+      "deactivate": "Deactivate",
+      "disable_hub": "Disable Hub",
+      "enable_hub": "Enable Hub",
+      "hub": "Hub",
+      "reactivate": "Reactivate",
+      "status_active_label": "Active",
+      "status_inactive_label": "Inactive",
+      "tenant_actions": "Tenant Actions"
+    },
     "support": {
       "contact": "Contact",
       "help_center": "Help Center"
+    },
+    "system": {
+      "days_ago_one": "{{count}}d ago",
+      "days_ago_other": "{{count}}d ago",
+      "hours_ago_one": "{{count}}h ago",
+      "hours_ago_other": "{{count}}h ago",
+      "just_now": "Just now",
+      "minutes_ago_one": "{{count}}m ago",
+      "minutes_ago_other": "{{count}}m ago",
+      "never": "Never"
     },
     "theme_picker": {
       "color_scheme": "Color scheme",
@@ -32946,7 +34339,14 @@ export default interface Resources {
       "subtitle": "Tune color scheme, accent, and density.",
       "title": "Appearance"
     },
+    "time_ago_days_one": "{{count}}d ago",
+    "time_ago_days_other": "{{count}}d ago",
+    "time_ago_hours_one": "{{count}}h ago",
+    "time_ago_hours_other": "{{count}}h ago",
+    "time_ago_just_now": "Just now",
     "time_credits_short": "{{count}}h credits",
+    "time_credits_short_one": "{{count}}h credits",
+    "time_credits_short_other": "{{count}}h credits",
     "toast": {
       "aria_dismiss_notification": "Dismiss notification",
       "aria_notifications": "Notifications",
@@ -32959,6 +34359,8 @@ export default interface Resources {
       "translated_label": "Translated",
       "translating": "Translating…"
     },
+    "under_25": "Under 25",
+    "unknown": "Unknown",
     "user_fallback": "User",
     "user_menu": {
       "admin": "Admin",
@@ -32972,6 +34374,18 @@ export default interface Resources {
       "settings": "Settings",
       "wallet": "Wallet"
     },
+    "users": {
+      "action_approve": "Approve",
+      "action_ban": "Ban",
+      "action_delete": "Delete",
+      "action_edit": "Edit",
+      "action_impersonate": "Impersonate",
+      "action_permissions": "Permissions",
+      "action_reactivate": "Reactivate",
+      "action_reset_2fa": "Reset 2FA",
+      "action_suspend": "Suspend",
+      "actions_menu": "Actions Menu"
+    },
     "verein_dues": {
       "action_remind": "Remind",
       "action_waive": "Waive",
@@ -32979,6 +34393,8 @@ export default interface Resources {
       "admin_billing_cycle": "Billing cycle",
       "admin_bulk_remind": "Send reminders to all overdue",
       "admin_bulk_reminder_sent": "{{count}} reminders sent.",
+      "admin_bulk_reminder_sent_one": "{{count}} reminders sent.",
+      "admin_bulk_reminder_sent_other": "{{count}} reminders sent.",
       "admin_config_saved": "Fee configuration saved.",
       "admin_confirm_waive": "Waive",
       "admin_currency": "Currency",
@@ -32993,6 +34409,8 @@ export default interface Resources {
       "admin_members": "Members",
       "admin_no_rows": "No dues records yet.",
       "admin_overdue_count": "{{count}} member(s) have overdue dues.",
+      "admin_overdue_count_one": "{{count}} member(s) have overdue dues.",
+      "admin_overdue_count_other": "{{count}} member(s) have overdue dues.",
       "admin_overdue_title": "Overdue dues",
       "admin_page_title": "Membership dues",
       "admin_reminder_sent": "Reminder sent.",
@@ -33003,6 +34421,7 @@ export default interface Resources {
       "admin_waived": "Dues waived.",
       "admin_year": "Year",
       "badge_member_year": "Member {{year}}",
+      "badge_none": "No dues",
       "badge_overdue": "Dues overdue",
       "badge_pending": "Dues pending",
       "cancel": "Cancel",
@@ -33064,6 +34483,8 @@ export default interface Resources {
         "today": "Today"
       },
       "char_count": "{{count}}/500",
+      "char_count_one": "{{count}}/500",
+      "char_count_other": "{{count}}/500",
       "consent_save_failed": "Could not save federation settings.",
       "consent_saved": "Federation settings saved.",
       "consent_scope_label": "What to share",
@@ -33192,7 +34613,42 @@ export default interface Resources {
       "verified_on": "Verified on {{date}}"
     },
     "verify_identity": "Verify Identity",
-    "xp_progress": "{{current}} / {{required}} XP"
+    "viewer": {
+      "time_days_ago_one": "{{count}}d ago",
+      "time_days_ago_other": "{{count}}d ago",
+      "time_hours_ago_one": "{{count}}h ago",
+      "time_hours_ago_other": "{{count}}h ago",
+      "time_just_now": "Just now",
+      "time_minutes_ago_one": "{{count}}m ago",
+      "time_minutes_ago_other": "{{count}}m ago"
+    },
+    "volunteering": {
+      "time_days_ago_one": "{{count}} day ago",
+      "time_days_ago_other": "{{count}} day ago",
+      "time_hours_ago_one": "{{count}} hour ago",
+      "time_hours_ago_other": "{{count}} hour ago",
+      "time_just_now": "Just now",
+      "time_minutes_ago_one": "{{count}} minute ago",
+      "time_minutes_ago_other": "{{count}} minute ago",
+      "wellbeing_unknown_type": "Wellbeing concern",
+      "wellbeing_unknown_user": "Unknown volunteer",
+      "wellbeing_user_number": "Volunteer #{{id}}"
+    },
+    "wellbeing": {
+      "mood_good": "Good",
+      "mood_great": "Great",
+      "mood_low": "Low",
+      "mood_okay": "Okay",
+      "mood_struggling": "Struggling",
+      "mood_unknown": "Unknown",
+      "score_critical": "Critical",
+      "score_excellent": "Excellent",
+      "score_fair": "Fair",
+      "score_good": "Good",
+      "score_needs_attention": "Needs Attention"
+    },
+    "xp_progress": "{{current}} / {{required}} XP",
+    "yes": "Yes"
   },
   "community": {
     "certificates_tab": {
@@ -33316,6 +34772,8 @@ export default interface Resources {
       "loading": "Loading organisation...",
       "manage_button": "Manage this organisation",
       "meta_description_fallback": "Explore {{name}} and {{count}} active volunteer opportunities on this community timebank.",
+      "meta_description_fallback_one": "Explore {{name}} and {{count}} active volunteer opportunities on this community timebank.",
+      "meta_description_fallback_other": "Explore {{name}} and {{count}} active volunteer opportunities on this community timebank.",
       "no_active_opportunities": "No active opportunities",
       "no_opportunities_description": "This organisation has no open volunteer opportunities right now",
       "no_reviews": "No reviews",
@@ -33327,6 +34785,8 @@ export default interface Resources {
       "rating_sr": "{{n}} out of 5 stars",
       "remote": "Remote",
       "review_count": "{{count}} reviews",
+      "review_count_one": "{{count}} reviews",
+      "review_count_other": "{{count}} reviews",
       "review_error": "Unable to submit your review.",
       "review_modal_title": "Review this organisation",
       "review_success": "Review submitted.",
@@ -33400,6 +34860,8 @@ export default interface Resources {
       "try_different_search": "Try a different search term",
       "unable_to_load": "Unable to Load Organisations",
       "volunteer_count": "{{count}} volunteers",
+      "volunteer_count_one": "{{count}} volunteers",
+      "volunteer_count_other": "{{count}} volunteers",
       "website": "Website"
     },
     "page_meta": {
@@ -33526,6 +34988,8 @@ export default interface Resources {
       "title": "Connections"
     },
     "pending_count": "{{count}} pending",
+    "pending_count_one": "{{count}} pending",
+    "pending_count_other": "{{count}} pending",
     "request_pending": "Request pending",
     "search_placeholder": "Search by name or location...",
     "subtitle": "Manage your community connections",
@@ -33788,6 +35252,8 @@ export default interface Resources {
       "count_other": "{{count}} reviews",
       "empty": "No reviews yet.",
       "rate_n_stars": "Rate {{count}} out of 5 stars",
+      "rate_n_stars_one": "Rate {{count}} out of 5 stars",
+      "rate_n_stars_other": "Rate {{count}} out of 5 stars",
       "rating_required": "Please choose a star rating.",
       "submit": "Submit review",
       "submit_error": "Couldn't submit your review. Please try again.",
@@ -33841,6 +35307,8 @@ export default interface Resources {
       "title": "Caring Community"
     },
     "comments_count": "{{count}} comments",
+    "comments_count_one": "{{count}} comments",
+    "comments_count_other": "{{count}} comments",
     "common": {
       "loading": "Loading"
     },
@@ -33872,15 +35340,21 @@ export default interface Resources {
       "streak_days_one": "{{count}} day",
       "streak_days_other": "{{count}} days",
       "xp_progress": "XP Progress",
-      "xp_value": "{{count}} XP"
+      "xp_value": "{{count}} XP",
+      "xp_value_one": "{{count}} XP",
+      "xp_value_other": "{{count}} XP"
     },
     "groups": {
       "discover": "Discover groups",
       "empty": "You haven't joined any groups yet",
       "empty_description": "Groups help you follow shared interests, projects, and local circles.",
-      "members_count": "{{count}} members"
+      "members_count": "{{count}} members",
+      "members_count_one": "{{count}} members",
+      "members_count_other": "{{count}} members"
     },
     "likes_count": "{{count}} likes",
+    "likes_count_one": "{{count}} likes",
+    "likes_count_other": "{{count}} likes",
     "listings": {
       "create_first": "Create your first listing",
       "empty": "No recent listings",
@@ -35613,7 +37087,9 @@ export default interface Resources {
       "repeats_yearly": "Repeats yearly",
       "series_dates_one": "{{count}} date",
       "series_dates_other": "{{count}} dates",
-      "spots_left": "{{count}} spots left"
+      "spots_left": "{{count}} spots left",
+      "spots_left_one": "{{count}} spots left",
+      "spots_left_other": "{{count}} spots left"
     },
     "category": {
       "all": "All",
@@ -35632,6 +37108,8 @@ export default interface Resources {
     "detail": {
       "about": "About this event",
       "attendance_total": "{{count}} responses",
+      "attendance_total_one": "{{count}} responses",
+      "attendance_total_other": "{{count}} responses",
       "attendee_checked_in": "Checked in",
       "attendee_going": "Going",
       "attendee_interested": "Interested",
@@ -35668,6 +37146,8 @@ export default interface Resources {
       "event_link_aria": "Open event link for {{title}}",
       "event_location": "Event Location",
       "events_in_series": "{{count}} events in series",
+      "events_in_series_one": "{{count}} events in series",
+      "events_in_series_other": "{{count}} events in series",
       "going_btn": "Going",
       "going_count": "going",
       "interested_btn": "Interested",
@@ -35682,8 +37162,12 @@ export default interface Resources {
       "loading": "Loading event...",
       "location_label": "Location",
       "max_capacity": "{{count}} max capacity",
+      "max_capacity_one": "{{count}} max capacity",
+      "max_capacity_other": "{{count}} max capacity",
       "meta_description_fallback": "{{title}} is a community event on {{date}} with {{organizer}} at {{location}}.",
       "more_attendees": "+{{count}} more",
+      "more_attendees_one": "+{{count}} more",
+      "more_attendees_other": "+{{count}} more",
       "no_attendees": "No attendees yet. Be the first to RSVP!",
       "no_attendees_title": "No attendees yet",
       "no_checkin_attendees": "No attendees to check in yet.",
@@ -35713,6 +37197,8 @@ export default interface Resources {
       "share": "Share",
       "share_aria": "Copy link to {{title}}",
       "spots_left": "{{count}} spots left",
+      "spots_left_one": "{{count}} spots left",
+      "spots_left_other": "{{count}} spots left",
       "tab_attendees": "Attendees",
       "tab_checkin": "Check-in",
       "tab_details": "Details",
@@ -35721,7 +37207,11 @@ export default interface Resources {
       "try_again": "Try Again",
       "unable_to_load": "Unable to Load Event",
       "view_all_series": "View all {{count}} events in series",
+      "view_all_series_one": "View all {{count}} events in series",
+      "view_all_series_other": "View all {{count}} events in series",
       "waitlist_count": "{{count}} on waitlist",
+      "waitlist_count_one": "{{count}} on waitlist",
+      "waitlist_count_other": "{{count}} on waitlist",
       "waitlist_label": "Waitlist"
     },
     "empty_tip_online": "Online sessions",
@@ -35847,8 +37337,12 @@ export default interface Resources {
       "weekday_wed": "Wed"
     },
     "going": "{{count}} going",
+    "going_one": "{{count}} going",
+    "going_other": "{{count}} going",
     "hero_events_label": "Events",
     "interested": "{{count}} interested",
+    "interested_one": "{{count}} interested",
+    "interested_other": "{{count}} interested",
     "load_more": "Load More Events",
     "load_more_count": "Load more ({{remaining}} remaining)",
     "loading_aria": "Loading events",
@@ -35874,6 +37368,8 @@ export default interface Resources {
       "status_open": "Open",
       "title": "Event Polls",
       "total_votes": "{{count}} votes",
+      "total_votes_one": "{{count}} votes",
+      "total_votes_other": "{{count}} votes",
       "view_full": "View full poll",
       "vote_failed": "Failed to record vote",
       "vote_success": "Vote recorded!"
@@ -35957,6 +37453,8 @@ export default interface Resources {
       "page_title": "Exchange Details",
       "prep_time": "Preparation Time",
       "prep_time_value": "{{count}}h",
+      "prep_time_value_one": "{{count}}h",
+      "prep_time_value_other": "{{count}}h",
       "proposed_hours": "Proposed Hours",
       "provider": "Provider",
       "rate_exchange": "Rate This Exchange",
@@ -35992,6 +37490,7 @@ export default interface Resources {
       "unable_to_load": "Unable to Load Exchanges"
     },
     "hours_count": "{{count}} hour",
+    "hours_count_one": "{{count}} hour",
     "hours_count_other": "{{count}} hours",
     "load_more": "Load More",
     "loading": "Loading exchanges...",
@@ -36101,6 +37600,8 @@ export default interface Resources {
   "explore": {
     "active_groups": {
       "members": "{{count}} members",
+      "members_one": "{{count}} members",
+      "members_other": "{{count}} members",
       "subtitle": "Connect with like-minded members",
       "title": "Active Groups",
       "view_group": "View Group",
@@ -36111,9 +37612,13 @@ export default interface Resources {
     },
     "blog_posts": {
       "read_time": "{{count}} min read",
+      "read_time_one": "{{count}} min read",
+      "read_time_other": "{{count}} min read",
       "subtitle": "Latest stories from your community",
       "title": "From the Blog",
-      "views": "{{count}} views"
+      "views": "{{count}} views",
+      "views_one": "{{count}} views",
+      "views_other": "{{count}} views"
     },
     "create_event": "Create Event",
     "create_group": "Create Group",
@@ -36133,6 +37638,8 @@ export default interface Resources {
     "featured_challenges": {
       "ends": "Ends {{date}}",
       "ideas_count": "{{count}} ideas",
+      "ideas_count_one": "{{count}} ideas",
+      "ideas_count_other": "{{count}} ideas",
       "progress": "Challenge progress",
       "subtitle": "Share your ideas and make an impact",
       "title": "Featured Challenges"
@@ -36142,6 +37649,8 @@ export default interface Resources {
     "in_demand_skills": {
       "offered": "{{count}} offering",
       "requested": "{{count}} requesting",
+      "requested_one": "{{count}} requesting",
+      "requested_other": "{{count}} requesting",
       "subtitle": "Most requested skills in your community",
       "title": "Skills In Demand",
       "you_can_help": "You can help!"
@@ -36166,6 +37675,8 @@ export default interface Resources {
     },
     "organisations": {
       "opportunities": "{{count}} opportunities",
+      "opportunities_one": "{{count}} opportunities",
+      "opportunities_other": "{{count}} opportunities",
       "subtitle": "Community partners making an impact",
       "title": "Organisations"
     },
@@ -36174,11 +37685,15 @@ export default interface Resources {
     "polls": {
       "closes": "Closes {{date}}",
       "options": "{{count}} options",
+      "options_one": "{{count}} options",
+      "options_other": "{{count}} options",
       "subtitle": "Have your say on community topics",
       "title": "Active Polls",
       "vote_now": "Vote Now",
       "vote_now_for": "Vote now on: {{question}}",
-      "votes": "{{count}} votes"
+      "votes": "{{count}} votes",
+      "votes_one": "{{count}} votes",
+      "votes_other": "{{count}} votes"
     },
     "popular_listings": {
       "subtitle": "Most viewed offers and requests",
@@ -36197,7 +37712,9 @@ export default interface Resources {
     "resources": {
       "subtitle": "Guides and materials for your community",
       "title": "Featured Resources",
-      "views": "{{count}} views"
+      "views": "{{count}} views",
+      "views_one": "{{count}} views",
+      "views_other": "{{count}} views"
     },
     "retry": "Retry",
     "search_placeholder": "Discover skills, events, groups...",
@@ -36228,7 +37745,11 @@ export default interface Resources {
     },
     "time_ago": {
       "days_ago": "{{count}}d ago",
+      "days_ago_one": "{{count}}d ago",
+      "days_ago_other": "{{count}}d ago",
       "hours_ago": "{{count}}h ago",
+      "hours_ago_one": "{{count}}h ago",
+      "hours_ago_other": "{{count}}h ago",
       "just_now": "Just now"
     },
     "top_contributors": {
@@ -36246,12 +37767,16 @@ export default interface Resources {
     },
     "upcoming_events": {
       "attending": "{{count}} attending",
+      "attending_one": "{{count}} attending",
+      "attending_other": "{{count}} attending",
       "online": "Online",
       "subtitle": "Join your community",
       "title": "Upcoming Events"
     },
     "volunteering": {
       "applications": "{{count}} applied",
+      "applications_one": "{{count}} applied",
+      "applications_other": "{{count}} applied",
       "subtitle": "Make a difference in your community",
       "title": "Volunteer Opportunities",
       "view_opportunity": "View Opportunity"
@@ -36305,6 +37830,7 @@ export default interface Resources {
       "load_more": "Load More",
       "load_more_error": "Could not load more events.",
       "online": "Online",
+      "organizer_fallback": "Organizer",
       "page_title": "Federation Events",
       "search_communities": "Search communities",
       "search_placeholder": "Search events...",
@@ -36326,6 +37852,8 @@ export default interface Resources {
       "load_more": "Load More",
       "load_more_error": "Could not load more groups.",
       "member_count": "{{count}} member",
+      "member_count_one": "{{count}} member",
+      "member_count_other": "{{count}} member",
       "member_count_plural": "{{count}} members",
       "page_title": "Federation Groups",
       "private": "Private",
@@ -36364,6 +37892,8 @@ export default interface Resources {
       "how_it_works_2_title": "Exchange Services",
       "loading": "Loading federation data...",
       "member_count": "{{count}} members",
+      "member_count_one": "{{count}} members",
+      "member_count_other": "{{count}} members",
       "no_activity_description": "Activity from partner communities will appear here.",
       "no_activity_yet": "No federation activity yet",
       "no_partners_description": "Your community will appear here once partnerships are established.",
@@ -36383,8 +37913,12 @@ export default interface Resources {
       "quick_link_3_title": "Federation Listings",
       "quick_link_4_description": "Discover events happening across partner communities.",
       "quick_link_4_title": "Federation Events",
-      "quick_link_5_description": "Configure your federation privacy and communication preferences.",
-      "quick_link_5_title": "Federation Settings",
+      "quick_link_5_description": "Browse groups shared by partner communities.",
+      "quick_link_5_title": "Federation Groups",
+      "quick_link_6_description": "Manage your connection requests across partner communities.",
+      "quick_link_6_title": "Federation Connections",
+      "quick_link_7_description": "Configure your federation privacy and communication preferences.",
+      "quick_link_7_title": "Federation Settings",
       "recent_activity": "Recent Activity",
       "stat_exchanges": "Exchanges",
       "stat_messages": "Messages",
@@ -36409,6 +37943,8 @@ export default interface Resources {
       "try_again": "Try Again",
       "unable_to_load": "Unable to Load",
       "view_all": "View all ({{count}})",
+      "view_all_one": "View all ({{count}})",
+      "view_all_other": "View all ({{count}})",
       "view_community": "View Community",
       "your_community": "your community"
     },
@@ -36422,6 +37958,10 @@ export default interface Resources {
       "external_partner": "External Partner",
       "external_source_note": "Includes {{count}} external partner listings; load more continues internal partner listings.",
       "external_source_note_external_only": "Showing {{count}} external partner listings.",
+      "external_source_note_external_only_one": "Showing {{count}} external partner listings.",
+      "external_source_note_external_only_other": "Showing {{count}} external partner listings.",
+      "external_source_note_one": "Includes {{count}} external partner listings; load more continues internal partner listings.",
+      "external_source_note_other": "Includes {{count}} external partner listings; load more continues internal partner listings.",
       "filter_by_community": "Filter by community",
       "filter_by_type": "Filter by type",
       "hours_estimated": "~{{hours}}h",
@@ -36499,6 +38039,10 @@ export default interface Resources {
       "external_profile_title": "External Member",
       "external_source_note": "Includes {{count}} external partner results; load more continues internal partner results.",
       "external_source_note_external_only": "Showing {{count}} external partner results.",
+      "external_source_note_external_only_one": "Showing {{count}} external partner results.",
+      "external_source_note_external_only_other": "Showing {{count}} external partner results.",
+      "external_source_note_one": "Includes {{count}} external partner results; load more continues internal partner results.",
+      "external_source_note_other": "Includes {{count}} external partner results; load more continues internal partner results.",
       "federation_not_enabled": "Federation is not enabled for your account.",
       "load_error": "Could not load members. Please try again.",
       "load_more": "Load More",
@@ -36506,6 +38050,8 @@ export default interface Resources {
       "loading": "Loading members...",
       "member_fallback": "Member",
       "more_skills": "+{{count}} more",
+      "more_skills_one": "+{{count}} more",
+      "more_skills_other": "+{{count}} more",
       "no_members_available": "No members are available in partner communities yet.",
       "no_members_found": "No Members Found",
       "no_members_search": "Try adjusting your search or filters.",
@@ -36564,6 +38110,7 @@ export default interface Resources {
       "optin_required_description": "You need to opt into federation before sending messages to partner communities.",
       "page_title": "Federation Messages",
       "realtime_new_message": "New message from {{name}}",
+      "recipient_fallback": "Recipient",
       "recipient_label": "Recipient",
       "recipient_placeholder": "Search for a member...",
       "reply_placeholder": "Write a reply...",
@@ -36581,7 +38128,11 @@ export default interface Resources {
       "the_recipient": "the recipient",
       "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
       "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
+      "thread_aria_unread_one": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
+      "thread_aria_unread_other": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
       "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages",
+      "thread_aria_unread_plural_one": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages",
+      "thread_aria_unread_plural_other": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages",
       "title": "Federation Messages",
       "toast_compose_sent": "Message sent to {{name}}",
       "toast_error": "Error",
@@ -36594,11 +38145,14 @@ export default interface Resources {
       "try_again": "Try Again",
       "unable_to_load": "Unable to Load Messages",
       "unable_to_load_description": "Could not load your federation messages. Please try again.",
+      "user_number": "User #{{id}}",
       "view_original": "View original",
       "you_prefix": "You: "
     },
     "onboarding": {
       "and_more": "+{{count}} more",
+      "and_more_one": "+{{count}} more",
+      "and_more_other": "+{{count}} more",
       "back": "Back",
       "benefit_discover_description": "Find and connect with partner communities worldwide.",
       "benefit_discover_title": "Discover Partners",
@@ -36676,6 +38230,11 @@ export default interface Resources {
       "welcome_description": "Connect with members from timebanks and communities around the world.",
       "welcome_title": "Welcome to the Federation"
     },
+    "optin_notice": {
+      "cta": "Set Up Federation",
+      "description": "You need to opt into federation to see content from partner communities.",
+      "title": "Federation Opt-In Required"
+    },
     "partner_detail": {
       "available_features": "Available Features",
       "back_to_partners": "Back to Partners",
@@ -36716,6 +38275,8 @@ export default interface Resources {
       "level_unknown": "Unknown",
       "load_error": "Could not load partner communities. Please try again.",
       "member_count": "{{count}} members",
+      "member_count_one": "{{count}} members",
+      "member_count_other": "{{count}} members",
       "page_title": "Partner Communities",
       "partner_since": "Partner since {{date}}",
       "permission_events": "Events",
@@ -36735,18 +38296,31 @@ export default interface Resources {
     "relay_url_blocked": "Relay target URL blocked by security filter",
     "reputation": {
       "aria_label": "Federated reputation {{score}} from {{count}} reviews",
+      "aria_label_one": "Federated reputation {{score}} from {{count}} reviews",
+      "aria_label_other": "Federated reputation {{score}} from {{count}} reviews",
       "chip_label": "{{score}} ({{count}})",
+      "chip_label_one": "{{score}} ({{count}})",
+      "chip_label_other": "{{score}} ({{count}})",
       "tooltip_federated": "Reputation aggregated across {{count}} partner communities",
-      "tooltip_local": "Based on {{count}} reviews in this community"
+      "tooltip_federated_one": "Reputation aggregated across {{count}} partner communities",
+      "tooltip_federated_other": "Reputation aggregated across {{count}} partner communities",
+      "tooltip_local": "Based on {{count}} reviews in this community",
+      "tooltip_local_one": "Based on {{count}} reviews in this community",
+      "tooltip_local_other": "Based on {{count}} reviews in this community"
     },
     "reviews": {
       "anonymous": "Anonymous",
+      "empty": "This member has no reviews yet.",
       "from_partner": "via {{partner}}",
+      "load_error": "Could not load reviews. Please try again.",
       "rating_label": "Rated {{rating}} out of 5",
       "title": "Reviews",
-      "unavailable": "Reviews not yet available for this federated member"
+      "unavailable": "Reviews not yet available for this federated member",
+      "verified": "Verified"
     },
     "settings": {
+      "action_disabled": "disabled",
+      "action_enabled": "enabled",
       "action_failed": "Action Failed",
       "allow_messaging_description": "Allow members from partner communities to send you messages.",
       "allow_messaging_label": "Allow messaging",
@@ -36831,7 +38405,9 @@ export default interface Resources {
       "challenge": {
         "closes_on": "Closes {{date}}",
         "closing_soon": "Closing soon",
-        "ideas_count": "{{count}} ideas"
+        "ideas_count": "{{count}} ideas",
+        "ideas_count_one": "{{count}} ideas",
+        "ideas_count_other": "{{count}} ideas"
       },
       "comment": "comment",
       "comment_action": "Comment",
@@ -36927,7 +38503,9 @@ export default interface Resources {
       "view_comments": "View comments",
       "view_reactions_aria": "View reactions: {{summary}}",
       "volunteer": {
-        "credits_offered": "{{count}} time credits"
+        "credits_offered": "{{count}} time credits",
+        "credits_offered_one": "{{count}} time credits",
+        "credits_offered_other": "{{count}} time credits"
       },
       "volunteer_hours_title": "Volunteered {{hours}} hours",
       "vote": "vote",
@@ -36939,11 +38517,14 @@ export default interface Resources {
       "go_to_image": "Go to image {{number}}",
       "image_of": "Image {{current}} of {{total}}",
       "more_images": "{{count}} more images",
+      "more_images_one": "{{count}} more images",
+      "more_images_other": "{{count}} more images",
       "next": "Next image",
       "previous": "Previous image",
       "role_description": "carousel",
       "video_of": "Video {{current}} of {{total}}",
-      "view_image": "View image {{current}} of {{total}}"
+      "view_image": "View image {{current}} of {{total}}",
+      "view_video": "View video {{current}} of {{total}}"
     },
     "compose": {
       "add_option": "Add Option",
@@ -37007,6 +38588,8 @@ export default interface Resources {
       "goal_title_placeholder": "e.g., Give 10 hours this month",
       "group_label": "Post to",
       "group_members": "{{count}} members",
+      "group_members_one": "{{count}} members",
+      "group_members_other": "{{count}} members",
       "group_placeholder": "Public Feed",
       "group_search": "Search groups",
       "groups_load_error": "Failed to load groups.",
@@ -37041,9 +38624,13 @@ export default interface Resources {
       "make_public": "Make Public",
       "make_public_desc": "Others can see and support your goal",
       "media_compression_failed": "{{count}} image(s) failed to process",
+      "media_compression_failed_one": "{{count}} image(s) failed to process",
+      "media_compression_failed_other": "{{count}} image(s) failed to process",
       "media_drag_drop": "Click or drag photos here",
       "media_formats": "JPEG, PNG, GIF, WebP up to 10MB each",
       "media_rejected": "{{count}} file(s) skipped (wrong type or too large)",
+      "media_rejected_one": "{{count}} file(s) skipped (wrong type or too large)",
+      "media_rejected_other": "{{count}} file(s) skipped (wrong type or too large)",
       "media_upload_error": "Failed to process images",
       "numbered_list": "Numbered list",
       "placeholder_hours": "1",
@@ -37084,18 +38671,37 @@ export default interface Resources {
       "target_value_placeholder": "e.g., 10",
       "template_button": "Template",
       "template_event_gathering": "Community gathering",
+      "template_event_gathering_content": "Join us for a friendly community get-together! All welcome.",
+      "template_event_gathering_title": "Community Gathering",
       "template_event_social": "Social event",
+      "template_event_social_content": "Come along for a relaxed social event. A great chance to meet new people and have fun!",
+      "template_event_social_title": "Social Event: ",
       "template_event_workshop": "Workshop",
+      "template_event_workshop_content": "Learn about... in this hands-on workshop.\n\nWhat to bring:\n- \n\nSuitable for: beginners/all levels",
+      "template_event_workshop_title": "Workshop: ",
       "template_goal_hours": "Give hours this month",
+      "template_goal_hours_content": "My goal is to contribute X hours of my time to the community this month.",
+      "template_goal_hours_title": "Give X hours this month",
       "template_goal_skills": "Learn a new skill",
+      "template_goal_skills_content": "I want to learn... by connecting with community members who have this expertise.",
+      "template_goal_skills_title": "Learn a new skill",
       "template_label": "Use a template",
       "template_listing_offer": "Offering a skill",
+      "template_listing_offer_content": "I have experience in... and would love to help someone who needs...",
+      "template_listing_offer_title": "I can help with...",
       "template_listing_request": "Looking for help",
+      "template_listing_request_content": "I need someone who can help me with... Estimated time: about X hours.",
+      "template_listing_request_title": "Looking for help with...",
       "template_poll_opinion": "Ask for opinions",
+      "template_poll_opinion_content": "What do you think about...?",
       "template_poll_preference": "Ask a preference",
+      "template_poll_preference_content": "Which do you prefer?",
       "template_post_achievement": "Share an achievement",
+      "template_post_achievement_content": "🎉 I just completed...",
       "template_post_help": "Ask for help",
+      "template_post_help_content": "👋 Hi everyone! I'm looking for help with...",
       "template_post_recommend": "Recommend someone",
+      "template_post_recommend_content": "⭐ I want to recommend @... for their amazing...",
       "type_tabs_aria": "Compose content type",
       "underline": "Underline",
       "upload_preview_alt": "Upload preview {{number}}",
@@ -37156,6 +38762,8 @@ export default interface Resources {
       "no_posts_desc": "No posts have been tagged with #{{tag}} yet.",
       "page_description": "Posts tagged with #{{tag}}",
       "post_count": "{{count}} posts",
+      "post_count_one": "{{count}} posts",
+      "post_count_other": "{{count}} posts",
       "title": "Hashtag",
       "try_again": "Try Again",
       "unable_to_load": "Unable to Load Posts"
@@ -37167,6 +38775,8 @@ export default interface Resources {
       "no_match": "No hashtags matching \"{{query}}\"",
       "no_trending": "No trending hashtags in your community yet.",
       "post_count": "{{count}} posts",
+      "post_count_one": "{{count}} posts",
+      "post_count_other": "{{count}} posts",
       "search_placeholder": "Search hashtags...",
       "subtitle": "Discover what your community is talking about",
       "title": "Trending Hashtags",
@@ -37174,6 +38784,8 @@ export default interface Resources {
       "unable_to_load": "Unable to Load Hashtags"
     },
     "items_loaded": "{{count}} posts",
+    "items_loaded_one": "{{count}} posts",
+    "items_loaded_other": "{{count}} posts",
     "lightbox": {
       "aria_label": "Image viewer",
       "close": "Close image viewer",
@@ -37251,6 +38863,8 @@ export default interface Resources {
     "share": {
       "button_label": "Share",
       "button_label_count": "Share ({{count}})",
+      "button_label_count_one": "Share ({{count}})",
+      "button_label_count_other": "Share ({{count}})",
       "cannot_share_own_post": "You cannot share your own post",
       "copy_failed": "Failed to copy link",
       "copy_link": "Copy Link",
@@ -37264,6 +38878,7 @@ export default interface Resources {
       "dm_sent": "Post shared with {{name}}",
       "dm_sent_label": "Sent",
       "dm_title": "Send via Message",
+      "email": "Email",
       "external": "Share...",
       "external_title": "Share Post",
       "link_copied": "Link copied to clipboard",
@@ -37314,6 +38929,8 @@ export default interface Resources {
       },
       "groups": {
         "members": "{{count}} members",
+        "members_one": "{{count}} members",
+        "members_other": "{{count}} members",
         "see_all": "See All",
         "title": "Popular Groups"
       },
@@ -37368,6 +38985,8 @@ export default interface Resources {
       "dismiss": "Dismiss",
       "load_failed": "Failed to load suggestions",
       "mutual": "{{count}} mutual connections",
+      "mutual_one": "{{count}} mutual connections",
+      "mutual_other": "{{count}} mutual connections",
       "pending": "Pending",
       "see_all": "See All",
       "title": "People You May Know"
@@ -37394,7 +39013,11 @@ export default interface Resources {
     },
     "trending": {
       "post_count_one": "{{count}} post",
+      "post_count_one_one": "{{count}} post",
+      "post_count_one_other": "{{count}} post",
       "post_count_other": "{{count}} posts",
+      "post_count_other_one": "{{count}} posts",
+      "post_count_other_other": "{{count}} posts",
       "title": "Trending",
       "view_all": "View all hashtags"
     },
@@ -37529,6 +39152,8 @@ export default interface Resources {
         "claiming": "Claiming...",
         "come_back_tomorrow": "Come back tomorrow for {{xp}} XP!",
         "day_streak": "{{count}} day streak",
+        "day_streak_one": "{{count}} day streak",
+        "day_streak_other": "{{count}} day streak",
         "loading": "Loading daily reward",
         "title": "Daily Reward"
       },
@@ -37538,8 +39163,12 @@ export default interface Resources {
       "engagement": {
         "description": "Months where you completed at least one meaningful activity (exchange, listing, review, or volunteer hours).",
         "month_active_tooltip": "Active: {{count}} activities",
+        "month_active_tooltip_one": "Active: {{count}} activities",
+        "month_active_tooltip_other": "Active: {{count}} activities",
         "month_inactive_tooltip": "Inactive",
         "months_active": "{{count}} of 12 months",
+        "months_active_one": "{{count}} of 12 months",
+        "months_active_other": "{{count}} of 12 months",
         "title": "Monthly Engagement"
       },
       "filter_badges_aria": "Filter badges by type",
@@ -37568,6 +39197,8 @@ export default interface Resources {
         "purchase_failed": "Purchase Failed",
         "purchase_failed_desc": "Could not complete purchase.",
         "stock_left": "{{count}} left in stock",
+        "stock_left_one": "{{count}} left in stock",
+        "stock_left_other": "{{count}} left in stock",
         "unavailable": "Unavailable",
         "your_balance": "Your balance"
       },
@@ -37581,6 +39212,8 @@ export default interface Resources {
         "save_failed_desc": "Could not update showcase.",
         "saving": "Saving...",
         "select_badges": "Select up to 5 badges to showcase on your profile. ({{count}}/5 selected)",
+        "select_badges_one": "Select up to 5 badges to showcase on your profile. ({{count}}/5 selected)",
+        "select_badges_other": "Select up to 5 badges to showcase on your profile. ({{count}}/5 selected)",
         "showcase_badge": "Showcase {{name}}",
         "updated": "Showcase Updated",
         "updated_desc": "Your badge showcase has been saved."
@@ -37710,6 +39343,8 @@ export default interface Resources {
         "completed": "Completed"
       },
       "streak_label": "{{count}} check-in streak",
+      "streak_label_one": "{{count}} check-in streak",
+      "streak_label_other": "{{count}} check-in streak",
       "subtitle": "Set goals and track your progress",
       "tab_buddying": "Goal Buddies",
       "tab_discover": "Discover",
@@ -37789,6 +39424,8 @@ export default interface Resources {
         "load_failed_desc": "Could not load season history.",
         "loading": "Loading season",
         "participants": "{{count}} participants",
+        "participants_one": "{{count}} participants",
+        "participants_other": "{{count}} participants",
         "progress_aria": "Season progress",
         "rank_label": "Rank {{rank}}",
         "rewards": "Season Rewards",
@@ -37835,10 +39472,14 @@ export default interface Resources {
       "max_tier": "You have reached the highest tier!",
       "my_profile": "My Profile",
       "points_to_next": "{{count}} points to {{tier}}",
+      "points_to_next_one": "{{count}} points to {{tier}}",
+      "points_to_next_other": "{{count}} points to {{tier}}",
       "refresh": "Refresh",
       "refresh_error": "Refresh failed",
       "remaining": "remaining",
       "remaining_count": "{{count}} remaining",
+      "remaining_count_one": "{{count}} remaining",
+      "remaining_count_other": "{{count}} remaining",
       "subtitle": "Your community reputation score",
       "tier_threshold": "{{tier}} ({{min}}+)",
       "tiers": {
@@ -37942,6 +39583,8 @@ export default interface Resources {
       "action_nudge": "Send nudge",
       "action_offer_help": "Offer help",
       "best_streak": "Best streak: {{count}}",
+      "best_streak_one": "Best streak: {{count}}",
+      "best_streak_other": "Best streak: {{count}}",
       "buddy_actions_body": "Send a small, visible bit of support. Nudges are gentle reminders, not pressure.",
       "buddy_actions_title": "Buddy actions",
       "buddy_failed": "Failed to send buddy support.",
@@ -37949,6 +39592,8 @@ export default interface Resources {
       "checkin_due": "A check-in is due",
       "checkins": "Check-ins",
       "checkins_value": "{{count}} recorded",
+      "checkins_value_one": "{{count}} recorded",
+      "checkins_value_other": "{{count}} recorded",
       "current_streak": "Current streak",
       "frequency": "{{frequency}} cadence",
       "last_checkin": "Last check-in {{time}}",
@@ -37972,7 +39617,9 @@ export default interface Resources {
         "offer_help": "Offer to help"
       },
       "recent_buddy_support": "Recent buddy support",
-      "streak_value": "{{count}} check-ins"
+      "streak_value": "{{count}} check-ins",
+      "streak_value_one": "{{count}} check-ins",
+      "streak_value_other": "{{count}} check-ins"
     },
     "mood": {
       "good": "Good",
@@ -38044,7 +39691,11 @@ export default interface Resources {
       "participants_label": "Participants",
       "per_participant_summary": "Per-Participant Summary",
       "providers_count": "Providers ({{count}})",
+      "providers_count_one": "Providers ({{count}})",
+      "providers_count_other": "Providers ({{count}})",
       "receivers_count": "Receivers ({{count}})",
+      "receivers_count_one": "Receivers ({{count}})",
+      "receivers_count_other": "Receivers ({{count}})",
       "receiving": "receiving",
       "review": "Review",
       "review_your_exchange": "Review Your Exchange",
@@ -38106,6 +39757,8 @@ export default interface Resources {
       "gives_to": "gives to",
       "hour_split": "Hour Split",
       "hours_amount": "{{count}}h",
+      "hours_amount_one": "{{count}}h",
+      "hours_amount_other": "{{count}}h",
       "keep_exchange": "Keep Exchange",
       "loading": "Loading group exchange...",
       "no_members_found": "No members found matching your search.",
@@ -38115,6 +39768,8 @@ export default interface Resources {
       "organized_by": "Organized by",
       "page_title": "Group Exchange",
       "participants_heading": "Participants ({{count}})",
+      "participants_heading_one": "Participants ({{count}})",
+      "participants_heading_other": "Participants ({{count}})",
       "pending": "Pending",
       "providers": "Providers",
       "receivers": "Receivers",
@@ -38194,6 +39849,7 @@ export default interface Resources {
       "exchange_cancelled": "Exchange cancelled",
       "exchange_completed": "Exchange completed!",
       "exchange_completed_desc": "All transactions have been created.",
+      "exchange_started": "Exchange started",
       "exchange_updated": "Exchange updated",
       "hours_confirmed": "Hours confirmed!",
       "load_more_failed": "Failed to load more exchanges",
@@ -38201,6 +39857,7 @@ export default interface Resources {
       "participant_removed": "Participant removed",
       "remove_participant_failed": "Failed to remove participant",
       "something_wrong": "Something went wrong. Please try again.",
+      "start_failed": "Failed to start exchange",
       "update_failed": "Failed to update exchange"
     },
     "try_again": "Try Again",
@@ -38430,8 +40087,12 @@ export default interface Resources {
       "member_joined": "Joined {{date}}",
       "member_owner": "Owner",
       "members_count": "{{count}} members",
+      "members_count_one": "{{count}} members",
+      "members_count_other": "{{count}} members",
       "members_loading_aria": "Loading group members",
       "meta_description_fallback": "Join {{name}} and connect with {{count}} community members through shared posts, events, and discussions.",
+      "meta_description_fallback_one": "Join {{name}} and connect with {{count}} community members through shared posts, events, and discussions.",
+      "meta_description_fallback_other": "Join {{name}} and connect with {{count}} community members through shared posts, events, and discussions.",
       "new_discussion": "New Discussion",
       "new_discussion_modal_title": "New Discussion",
       "no_description": "No description provided for this group.",
@@ -38447,6 +40108,8 @@ export default interface Resources {
       "past_chip": "Past",
       "pending_requests_title": "Pending Join Requests",
       "posts_count": "{{count}} posts",
+      "posts_count_one": "{{count}} posts",
+      "posts_count_other": "{{count}} posts",
       "private_chip": "Private",
       "private_desc": "Only approved members can see posts and join",
       "private_group": "Private Group",
@@ -38459,6 +40122,8 @@ export default interface Resources {
       "remove_from_group": "Remove from Group",
       "reply_aria": "Reply to discussion",
       "reply_count": "{{count}} replies",
+      "reply_count_one": "{{count}} replies",
+      "reply_count_other": "{{count}} replies",
       "reply_placeholder": "Write a reply...",
       "report_description": "Help us understand why you are reporting this post.",
       "report_reason_label": "Reason",
@@ -38500,6 +40165,8 @@ export default interface Resources {
       "tab_section_label": "{{section}} - {{label}}",
       "tab_subgroups": "Subgroups",
       "tab_subgroups_count": "Subgroups ({{count}})",
+      "tab_subgroups_count_one": "Subgroups ({{count}})",
+      "tab_subgroups_count_other": "Subgroups ({{count}})",
       "tab_tasks": "Tasks",
       "tab_wiki": "Wiki",
       "try_again": "Try Again",
@@ -38545,6 +40212,8 @@ export default interface Resources {
       "empty_title": "No files yet",
       "file_deleted": "File deleted",
       "folder_chip": "{{name}} ({{count}})",
+      "folder_chip_one": "{{name}} ({{count}})",
+      "folder_chip_other": "{{name}} ({{count}})",
       "folder_label": "Folder (optional)",
       "folder_placeholder": "e.g. Documents, Photos",
       "heading": "Files",
@@ -38682,6 +40351,10 @@ export default interface Resources {
     "member_status": "Member",
     "members": "{{count}} members",
     "members_count_label": "{{count}} members",
+    "members_count_label_one": "{{count}} members",
+    "members_count_label_other": "{{count}} members",
+    "members_one": "{{count}} members",
+    "members_other": "{{count}} members",
     "my_groups": "My Groups",
     "no_description": "No description provided",
     "no_groups": "No groups found",
@@ -38706,6 +40379,8 @@ export default interface Resources {
     "page_title": "Groups",
     "posts": "Posts",
     "posts_count_label": "{{count}} posts",
+    "posts_count_label_one": "{{count}} posts",
+    "posts_count_label_other": "{{count}} posts",
     "private_title": "Private group",
     "public_title": "Public group",
     "qa": {
@@ -38717,6 +40392,8 @@ export default interface Resources {
       "accepted_answer": "Accepted Answer",
       "accepted_badge": "Has accepted answer",
       "answer_count_aria": "{{count}} answers",
+      "answer_count_aria_one": "{{count}} answers",
+      "answer_count_aria_other": "{{count}} answers",
       "answer_error": "Failed to post answer",
       "answer_input_aria": "Your answer",
       "answer_placeholder": "Write your answer...",
@@ -38725,6 +40402,8 @@ export default interface Resources {
       "answer_success": "Answer posted",
       "answers": "answers",
       "answers_heading": "{{count}} Answer(s)",
+      "answers_heading_one": "{{count}} Answer(s)",
+      "answers_heading_other": "{{count}} Answer(s)",
       "ask_button": "Ask Question",
       "ask_error": "Failed to post question",
       "ask_question": "Ask Question",
@@ -38858,6 +40537,8 @@ export default interface Resources {
       "events_label": "Events",
       "events_required": "Select at least one event",
       "failures": "{{count}} failures",
+      "failures_one": "{{count}} failures",
+      "failures_other": "{{count}} failures",
       "inactive": "Inactive",
       "last_fired": "Last fired",
       "load_failed": "Failed to load webhooks",
@@ -38957,6 +40638,7 @@ export default interface Resources {
     "campaigns": {
       "challenges_count": "{{count}} challenges",
       "challenges_count_one": "{{count}} challenge",
+      "challenges_count_other": "{{count}} challenges",
       "confirm_unlink": "Confirm",
       "confirm_unlink_label": "Confirm unlink",
       "create": "Create Campaign",
@@ -38989,7 +40671,10 @@ export default interface Resources {
       "evaluation_criteria": "Evaluation Criteria",
       "ideas_count": "{{count}} ideas",
       "ideas_count_one": "{{count}} idea",
+      "ideas_count_other": "{{count}} ideas",
       "max_ideas": "Max {{count}} ideas per person",
+      "max_ideas_one": "Max {{count}} ideas per person",
+      "max_ideas_other": "Max {{count}} ideas per person",
       "no_deadline": "No deadline",
       "outcome": "Outcome",
       "prize": "Prize",
@@ -39172,6 +40857,7 @@ export default interface Resources {
       "back_to_challenge": "Back to Challenge",
       "comments": "{{count}} comments",
       "comments_one": "{{count}} comment",
+      "comments_other": "{{count}} comments",
       "delete": "Delete Idea",
       "delete_confirm": "Are you sure you want to delete this idea? This action cannot be undone.",
       "draft": "Draft",
@@ -39199,7 +40885,9 @@ export default interface Resources {
       "votes": "{{count}} votes",
       "votes_one": "{{count}} vote",
       "your_drafts": "Your Drafts",
-      "your_ideas": "Your ideas: {{count}}/{{max}}"
+      "your_ideas": "Your ideas: {{count}}/{{max}}",
+      "your_ideas_one": "Your ideas: {{count}}/{{max}}",
+      "your_ideas_other": "Your ideas: {{count}}/{{max}}"
     },
     "loading": "Loading...",
     "media": {
@@ -39422,14 +41110,20 @@ export default interface Resources {
       "ai_insights": "AI Insights",
       "applications_by_stage": "Applications by Stage",
       "applications_tooltip": "{{week}}: {{count}} applications",
+      "applications_tooltip_one": "{{week}}: {{count}} applications",
+      "applications_tooltip_other": "{{week}}: {{count}} applications",
       "avg": "Avg",
       "avg_time_to_apply": "Avg. Time to Apply",
       "based_on": "Based on {{count}} similar jobs",
+      "based_on_one": "Based on {{count}} similar jobs",
+      "based_on_other": "Based on {{count}} similar jobs",
       "conversion_comparison": "Conversion Rate",
       "conversion_rate": "Conversion Rate",
       "current": "Current",
       "days": "days",
       "days_short_value": "{{count}}d",
+      "days_short_value_one": "{{count}}d",
+      "days_short_value_other": "{{count}}d",
       "expected_apps": "Expected Applications",
       "export_csv": "Export CSV",
       "hours": "hours",
@@ -39454,6 +41148,8 @@ export default interface Resources {
       "versus": "vs",
       "views_over_time": "Views Over Time",
       "views_tooltip": "{{date}}: {{count}} views",
+      "views_tooltip_one": "{{date}}: {{count}} views",
+      "views_tooltip_other": "{{date}}: {{count}} views",
       "weekly_trend": "Weekly Applications (last 8 weeks)",
       "yours": "Yours"
     },
@@ -39472,6 +41168,8 @@ export default interface Resources {
     "application_status_label": "Application Status",
     "application_withdrawn": "Application withdrawn successfully.",
     "applications": "{{count}} applications",
+    "applications_one": "{{count}} applications",
+    "applications_other": "{{count}} applications",
     "apply": {
       "applied": "Applied",
       "button": "Apply Now",
@@ -39486,6 +41184,8 @@ export default interface Resources {
       "cv_parse_error": "Failed to parse CV. You can still submit your application manually.",
       "cv_remove": "Remove CV",
       "cv_size_kb": "({{count}} KB)",
+      "cv_size_kb_one": "({{count}} KB)",
+      "cv_size_kb_other": "({{count}} KB)",
       "cv_too_large": "CV file must be under 5MB",
       "error": "Failed to submit application",
       "login_required": "Log in to apply",
@@ -39582,10 +41282,14 @@ export default interface Resources {
       "error": "Bulk update failed",
       "select_action": "Move to stage...",
       "selected_count": "{{count}} selected",
+      "selected_count_one": "{{count}} selected",
+      "selected_count_other": "{{count}} selected",
       "success": "Applications updated"
     },
     "cancel": "Cancel",
     "char_count": "{{count}} / {{max}} characters",
+    "char_count_one": "{{count}} / {{max}} characters",
+    "char_count_other": "{{count}} / {{max}} characters",
     "commitment": {
       "all": "All",
       "flexible": "Flexible",
@@ -39643,6 +41347,8 @@ export default interface Resources {
       "offer": "Offer",
       "owner_banner_title": "You posted this vacancy",
       "owner_has_applicants": "{{count}} applicant(s) — scroll down to review",
+      "owner_has_applicants_one": "{{count}} applicant(s) — scroll down to review",
+      "owner_has_applicants_other": "{{count}} applicant(s) — scroll down to review",
       "owner_no_applicants": "No applicants yet — share this listing to get more visibility",
       "posted_by": "Posted by",
       "refresh": "Refresh",
@@ -39659,7 +41365,9 @@ export default interface Resources {
       "try_again": "Try Again",
       "type_label": "Type",
       "unable_to_load": "Unable to Load Vacancy",
-      "views": "{{count}} views"
+      "views": "{{count}} views",
+      "views_one": "{{count}} views",
+      "views_other": "{{count}} views"
     },
     "download_cv": "Download CV",
     "duplicate": {
@@ -39678,10 +41386,14 @@ export default interface Resources {
       "error": "Unable to load employer profile",
       "leave_review": "Leave a Review",
       "meta_description": "View this employer profile, open roles, and community reviews across {{count}} current opportunities.",
+      "meta_description_one": "View this employer profile, open roles, and community reviews across {{count}} current opportunities.",
+      "meta_description_other": "View this employer profile, open roles, and community reviews across {{count}} current opportunities.",
       "no_reviews": "No reviews yet",
       "no_roles": "No open roles at this time",
       "open_roles": "open roles",
       "open_roles_count": "{{count}} open roles",
+      "open_roles_count_one": "{{count}} open roles",
+      "open_roles_count_other": "{{count}} open roles",
       "open_roles_heading": "Open Roles",
       "overall_rating": "Overall Rating",
       "page_title": "Employer Profile",
@@ -39797,6 +41509,8 @@ export default interface Resources {
       "title": "Status History"
     },
     "hours_per_week": "{{count}} hrs/week",
+    "hours_per_week_one": "{{count}} hrs/week",
+    "hours_per_week_other": "{{count}} hrs/week",
     "inline_response": {
       "decline_notes_label": "Reason (optional)",
       "decline_notes_placeholder": "Let the employer know why...",
@@ -39892,6 +41606,8 @@ export default interface Resources {
       "you_have": "You have:"
     },
     "match_badge": "{{count}}% match",
+    "match_badge_one": "{{count}}% match",
+    "match_badge_other": "{{count}}% match",
     "moderation": {
       "approve": "Approve",
       "approve_error": "Failed to approve job",
@@ -39949,6 +41665,8 @@ export default interface Resources {
       "applied_date": "Applied: {{date}}",
       "browse_jobs": "Browse Jobs",
       "days_left": "{{count}}d left",
+      "days_left_one": "{{count}}d left",
+      "days_left_other": "{{count}}d left",
       "deadline_today": "Deadline today",
       "empty_all": "You haven't applied to any positions yet.",
       "empty_description": "Your job applications will appear here",
@@ -40092,6 +41810,8 @@ export default interface Resources {
       "days": "Days",
       "delete": "Delete",
       "generated_name": "{{stage}} to {{target}} after {{count}}d",
+      "generated_name_one": "{{stage}} to {{target}} after {{count}}d",
+      "generated_name_other": "{{stage}} to {{target}} after {{count}}d",
       "interview": "Interview",
       "move_to": "Move to {{stage}}",
       "no_rules": "No automation rules yet.",
@@ -40099,7 +41819,11 @@ export default interface Resources {
       "rejected": "Rejected",
       "reviewed": "Reviewed",
       "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+      "rule_summary_one": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
+      "rule_summary_other": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
       "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}",
+      "rule_summary_with_target_one": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}",
+      "rule_summary_with_target_other": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}",
       "rules_title": "Automation Rules",
       "screening": "Screening",
       "target": "Move to",
@@ -40313,6 +42037,8 @@ export default interface Resources {
     "talent_search": {
       "clear_filters": "Clear Filters",
       "days_ago": "{{count}} days ago",
+      "days_ago_one": "{{count}} days ago",
+      "days_ago_other": "{{count}} days ago",
       "error": "Failed to load candidates",
       "headline_placeholder": "No headline set",
       "last_active": "Last active",
@@ -40324,6 +42050,8 @@ export default interface Resources {
       "no_results_description": "Try adjusting your search criteria or check back later",
       "no_results_title": "No candidates found",
       "results_count": "{{count}} candidate(s) found",
+      "results_count_one": "{{count}} candidate(s) found",
+      "results_count_other": "{{count}} candidate(s) found",
       "search_button": "Search",
       "search_placeholder": "Search by name, skills, or keywords...",
       "skills_chip": "Skills: {{skills}}",
@@ -40335,6 +42063,8 @@ export default interface Resources {
       "today": "Today",
       "view_profile": "View Profile",
       "weeks_ago": "{{count}} weeks ago",
+      "weeks_ago_one": "{{count}} weeks ago",
+      "weeks_ago_other": "{{count}} weeks ago",
       "yesterday": "Yesterday"
     },
     "team": {
@@ -40381,6 +42111,8 @@ export default interface Resources {
       "title": "Templates"
     },
     "time_credits_label": "{{count}} time credits",
+    "time_credits_label_one": "{{count}} time credits",
+    "time_credits_label_other": "{{count}} time credits",
     "timeline": {
       "accepted": "Accepted",
       "applied": "Applied",
@@ -40408,6 +42140,8 @@ export default interface Resources {
     "vacancy_closed": "Vacancy closed",
     "vacancy_reopened": "Vacancy reopened",
     "views": "{{count}} views",
+    "views_one": "{{count}} views",
+    "views_other": "{{count}} views",
     "withdraw": {
       "button": "Withdraw",
       "cancel": "Cancel",
@@ -40808,6 +42542,8 @@ export default interface Resources {
       "read": "Read",
       "subtitle_one": "A document has been updated. Please review and accept it to continue.",
       "subtitle_other": "{{count}} documents have been updated. Please review and accept them to continue.",
+      "subtitle_other_one": "{{count}} documents have been updated. Please review and accept them to continue.",
+      "subtitle_other_other": "{{count}} documents have been updated. Please review and accept them to continue.",
       "title": "Updated legal documents",
       "type_acceptable_use": "Acceptable Use Policy",
       "type_accessibility": "Accessibility Statement",
@@ -41251,6 +42987,8 @@ export default interface Resources {
       "back_to_current": "Back to Current {{title}}",
       "changes_between": "Changes: v{{old}} to v{{new}}",
       "changes_count": "{{count}} changes",
+      "changes_count_one": "{{count}} changes",
+      "changes_count_other": "{{count}} changes",
       "current": "Current",
       "document": "document",
       "effective": "Effective {{date}}",
@@ -41275,6 +43013,8 @@ export default interface Resources {
     "all": "All",
     "analytics": {
       "bar_label": "{{date}}: {{count}} views",
+      "bar_label_one": "{{date}}: {{count}} views",
+      "bar_label_other": "{{date}}: {{count}} views",
       "contact_rate": "{{rate}}% rate",
       "contacts": "Contacts",
       "load_error": "Failed to load analytics",
@@ -41286,6 +43026,8 @@ export default interface Resources {
       "total_views": "Total Views",
       "trend_7day": "7-Day Trend",
       "unique_viewers": "{{count}} unique",
+      "unique_viewers_one": "{{count}} unique",
+      "unique_viewers_other": "{{count}} unique",
       "views_last_days": "Views (Last {{days}} Days)",
       "vs_previous_week": "vs. previous week"
     },
@@ -41428,6 +43170,8 @@ export default interface Resources {
       "category_required": "Please select a category",
       "category_search": "Search categories",
       "character_count": "{{count}}/{{max}}",
+      "character_count_one": "{{count}}/{{max}}",
+      "character_count_other": "{{count}}/{{max}}",
       "create_intro": "Share a useful offer or ask for help with enough detail for the right community members to respond.",
       "create_success": "Listing created successfully",
       "create_title": "Create New Listing",
@@ -41605,6 +43349,8 @@ export default interface Resources {
       "aria_add": "Add skill tag",
       "aria_add_count": "Add skill tag ({{current}} of {{max}})",
       "aria_results": "{{count}} skill suggestions available",
+      "aria_results_one": "{{count}} skill suggestions available",
+      "aria_results_other": "{{count}} skill suggestions available",
       "label": "Skill Tags",
       "placeholder": "Type a skill and press Enter..."
     },
@@ -41666,6 +43412,8 @@ export default interface Resources {
       "price_min": "Min",
       "price_range": "Price Range",
       "reset_filters": "Reset Filters ({{count}})",
+      "reset_filters_one": "Reset Filters ({{count}})",
+      "reset_filters_other": "Reset Filters ({{count}})",
       "results_count_one": "{{count}} result",
       "results_count_other": "{{count}} results",
       "search_placeholder": "Search in {{name}}...",
@@ -41752,6 +43500,8 @@ export default interface Resources {
       "delivery_confirmed": "Delivery confirmed! Time credits awarded.",
       "description": "A community member can deliver this item and earn time credits.",
       "estimated_minutes": "~{{count}} min",
+      "estimated_minutes_one": "~{{count}} min",
+      "estimated_minutes_other": "~{{count}} min",
       "estimated_time_label": "Estimated Delivery Time (minutes)",
       "estimated_time_placeholder": "30",
       "notes_label": "Notes (optional)",
@@ -41763,6 +43513,8 @@ export default interface Resources {
       "offer_sent": "Delivery offer sent!",
       "offer_to_deliver": "Offer to Deliver",
       "offers_title_count": "Delivery Offers ({{count}})",
+      "offers_title_count_one": "Delivery Offers ({{count}})",
+      "offers_title_count_other": "Delivery Offers ({{count}})",
       "send_offer": "Send Offer",
       "status": {
         "accepted": "Accepted",
@@ -41778,6 +43530,8 @@ export default interface Resources {
       "time_credits_label": "Time Credits (hours)",
       "time_credits_placeholder": "1.0",
       "time_credits_value": "{{count}} TC",
+      "time_credits_value_one": "{{count}} TC",
+      "time_credits_value_other": "{{count}} TC",
       "title": "Community Delivery",
       "tooltip": "Community delivery is a NEXUS feature where community members offer to deliver items for time credits instead of cash. This supports the local community and the timebanking ecosystem.",
       "unknown": "Unknown"
@@ -41839,6 +43593,8 @@ export default interface Resources {
       "subtitle": "Create a new marketplace listing",
       "title": "Sell Something",
       "title_char_count": "{{count}}/120 characters",
+      "title_char_count_one": "{{count}}/120 characters",
+      "title_char_count_other": "{{count}}/120 characters",
       "title_label": "Title",
       "title_placeholder": "What are you selling?",
       "title_required": "Title is required",
@@ -41968,7 +43724,11 @@ export default interface Resources {
     "inventory": {
       "count": "Stock count",
       "count_chip": "Inventory: {{count}}",
+      "count_chip_one": "Inventory: {{count}}",
+      "count_chip_other": "Inventory: {{count}}",
       "low_chip": "Inventory: {{count}} (Low)",
+      "low_chip_one": "Inventory: {{count}} (Low)",
+      "low_chip_other": "Inventory: {{count}} (Low)",
       "low_stock_threshold": "Low-stock alert at",
       "oversold_protected": "Reject orders that would oversell",
       "section_subtitle": "Track stock and prevent over-selling.",
@@ -41979,6 +43739,8 @@ export default interface Resources {
     "listing": {
       "approximate_location": "Approximate location",
       "available_count": "{{count}} available",
+      "available_count_one": "{{count}} available",
+      "available_count_other": "{{count}} available",
       "back_to_marketplace": "Back to Marketplace",
       "delivery": "Delivery",
       "description": "Description",
@@ -42030,7 +43792,9 @@ export default interface Resources {
       "view_all": "View All",
       "view_image": "View image {{number}}",
       "view_profile": "View Profile",
-      "views_count": "{{count}} views"
+      "views_count": "{{count}} views",
+      "views_count_one": "{{count}} views",
+      "views_count_other": "{{count}} views"
     },
     "listing_location": {
       "approximate_location": "Approximate location",
@@ -42056,6 +43820,8 @@ export default interface Resources {
       "radius_option": "{{km}} km",
       "refresh": "Refresh",
       "results_count": "{{count}} listings found nearby",
+      "results_count_one": "{{count}} listings found nearby",
+      "results_count_other": "{{count}} listings found nearby",
       "search_failed": "Map search failed. Please try again.",
       "search_placeholder": "Search nearby listings...",
       "search_this_area": "Search This Area",
@@ -42093,7 +43859,9 @@ export default interface Resources {
       "tab_expired": "Expired",
       "tab_sold": "Sold",
       "title": "My Listings",
-      "views_count_aria": "{{count}} views"
+      "views_count_aria": "{{count}} views",
+      "views_count_aria_one": "{{count}} views",
+      "views_count_aria_other": "{{count}} views"
     },
     "my_listings_tabs_aria": "My listings status filter",
     "my_offers": {
@@ -42211,6 +43979,8 @@ export default interface Resources {
       },
       "load_error": "Failed to load orders",
       "quantity_multiplier": "x{{count}}",
+      "quantity_multiplier_one": "x{{count}}",
+      "quantity_multiplier_other": "x{{count}}",
       "rating": {
         "anonymous": "Submit anonymously",
         "comment_label": "Comment (optional)",
@@ -42367,6 +44137,8 @@ export default interface Resources {
       "price_up_to": "Up to {{max}}",
       "private": "Private",
       "reset_filters": "Reset Filters ({{count}})",
+      "reset_filters_one": "Reset Filters ({{count}})",
+      "reset_filters_other": "Reset Filters ({{count}})",
       "results_count_one": "{{count}} result",
       "results_count_other": "{{count}} results",
       "results_for": "for",
@@ -42392,8 +44164,8 @@ export default interface Resources {
       "page_title": "Seller Profile",
       "private": "Private",
       "response_time": "Response Time",
-      "reviews_coming_soon_description": "Buyer reviews will be available in Phase 2. Check back later to see what the community thinks about this seller.",
-      "reviews_coming_soon_title": "Reviews Coming Soon",
+      "reviews_unavailable_description": "Individual reviews for this seller can't be displayed here. Their overall rating appears in the profile summary above.",
+      "reviews_unavailable_title": "Reviews not available",
       "seller_type_business": "Business",
       "seller_type_private": "Private Seller",
       "tab_listings": "Listings",
@@ -42529,6 +44301,7 @@ export default interface Resources {
     "filter_people_listings": "Listings",
     "filter_tabs_aria": "Match module filter",
     "heading": "Your Matches",
+    "load_error_title": "Unable to load matches",
     "load_failed": "Failed to load matches",
     "loading": "Loading matches...",
     "match_hidden": "Match hidden — we'll show you fewer like this",
@@ -42545,6 +44318,7 @@ export default interface Resources {
         "title": "Category interests"
       },
       "heading": "Match Preferences",
+      "load_error_desc": "Your saved preferences couldn't be loaded. Editing is disabled so they aren't overwritten with defaults.",
       "load_failed": "Failed to load your match preferences",
       "notifications": {
         "daily": "Daily",
@@ -42565,6 +44339,7 @@ export default interface Resources {
         "description": "When paused, you won't get new match suggestions or notifications.",
         "title": "Pause matching"
       },
+      "retry": "Try again",
       "save": "Save preferences",
       "save_failed": "Failed to save match preferences",
       "save_success": "Match preferences saved",
@@ -42582,7 +44357,10 @@ export default interface Resources {
     },
     "preferences_link": "Match preferences",
     "reasons_more": "+{{count}} more",
+    "reasons_more_one": "+{{count}} more",
+    "reasons_more_other": "+{{count}} more",
     "refresh": "Refresh",
+    "retry": "Try again",
     "score_label": "Match score: {{score}}%",
     "score_percent": "{{score}}% match",
     "source_event": "Event",
@@ -42671,6 +44449,8 @@ export default interface Resources {
     "aria_conversation": "Conversation with {{name}}",
     "aria_conversation_actions": "Conversation actions",
     "aria_conversation_unread": "Conversation with {{name}}, {{count}} unread",
+    "aria_conversation_unread_one": "Conversation with {{name}}, {{count}} unread",
+    "aria_conversation_unread_other": "Conversation with {{name}}, {{count}} unread",
     "aria_dismiss_safeguarding": "Dismiss safeguarding notice",
     "aria_edit_message": "Edit message",
     "aria_loading_archived": "Loading archived conversations",
@@ -42839,6 +44619,8 @@ export default interface Resources {
     "search_placeholder": "Search conversations...",
     "search_result_count": "{{current}} of {{total}}",
     "selected_members": "Selected ({{count}})",
+    "selected_members_one": "Selected ({{count}})",
+    "selected_members_other": "Selected ({{count}})",
     "send": "Send",
     "send_error": "Failed to send message. Please try again.",
     "stop_recording": "Stop",
@@ -42954,6 +44736,8 @@ export default interface Resources {
   },
   "notifications": {
     "and_others": "and {{count}} others",
+    "and_others_one": "and {{count}} others",
+    "and_others_other": "and {{count}} others",
     "caught_up_badge": "Caught up",
     "collapse_group": "Collapse",
     "delete_aria": "Delete notification",
@@ -42966,9 +44750,13 @@ export default interface Resources {
     "expand_group": "Expand",
     "filter_all": "All",
     "filter_unread": "Unread ({{count}})",
+    "filter_unread_one": "Unread ({{count}})",
+    "filter_unread_other": "Unread ({{count}})",
     "flyout": {
       "bell_aria": "Notifications",
       "bell_unread_aria": "Notifications, {{count}} unread",
+      "bell_unread_aria_one": "Notifications, {{count}} unread",
+      "bell_unread_aria_other": "Notifications, {{count}} unread",
       "close": "Close notifications",
       "empty": "No notifications yet",
       "unread_count": "unread",
@@ -43050,7 +44838,9 @@ export default interface Resources {
       "transaction": "Transaction"
     },
     "undo": "Undo",
-    "unread_badge": "{{count}} new"
+    "unread_badge": "{{count}} new",
+    "unread_badge_one": "{{count}} new",
+    "unread_badge_other": "{{count}} new"
   },
   "onboarding": {
     "aria_completed": " (completed)",
@@ -43066,6 +44856,8 @@ export default interface Resources {
     "benefit_skills_desc": "Offer your talents and discover what your community can do",
     "benefit_skills_title": "Share Your Skills",
     "bio_char_count": "{{count}} characters",
+    "bio_char_count_one": "{{count}} characters",
+    "bio_char_count_other": "{{count}} characters",
     "bio_label": "About you",
     "bio_min_chars": "At least {{min}} characters required ({{current}}/{{min}})",
     "bio_placeholder": "Tell the community about yourself — your interests, skills, or what you hope to get from timebanking...",
@@ -43077,6 +44869,8 @@ export default interface Resources {
     "complete_welcome_to": "Welcome to {{name}}",
     "confirm_title": "Review Your Setup",
     "count_selected": "{{count}} selected",
+    "count_selected_one": "{{count}} selected",
+    "count_selected_other": "{{count}} selected",
     "edit": "Edit",
     "edit_profile": "Edit profile",
     "finish": "Finish",
@@ -43143,9 +44937,13 @@ export default interface Resources {
     "skills_need_description": "Select categories you need help with. We'll create request listings for you.",
     "skills_need_title": "I need help with",
     "skills_needed_count": "{{count}} skill(s) needed",
+    "skills_needed_count_one": "{{count}} skill(s) needed",
+    "skills_needed_count_other": "{{count}} skill(s) needed",
     "skills_offer_description": "Select skills you can offer to others. We'll create listings for you.",
     "skills_offer_title": "I can offer",
     "skills_to_offer_count": "{{count}} skill(s) to offer",
+    "skills_to_offer_count_one": "{{count}} skill(s) to offer",
+    "skills_to_offer_count_other": "{{count}} skill(s) to offer",
     "skip": "Skip",
     "skip_for_now": "Skip for now",
     "step_confirm": "Confirm",
@@ -43617,6 +45415,8 @@ export default interface Resources {
           "show_not_public": "The show must be public, published, and approved before directories can read it."
         },
         "skipped_episodes": "{{count}} episode(s) would be left out of the feed until their audio is fixed.",
+        "skipped_episodes_one": "{{count}} episode(s) would be left out of the feed until their audio is fixed.",
+        "skipped_episodes_other": "{{count}} episode(s) would be left out of the feed until their audio is fixed.",
         "title": "Feed check — {{title}}",
         "valid": "Your RSS feed is ready for podcast directories.",
         "warnings": "Recommended fixes"
@@ -43662,6 +45462,8 @@ export default interface Resources {
         "completion_rate": "Completion rate",
         "last_days": "Listen activity covers the last {{days}} days.",
         "listen_count": "{{count}} listens",
+        "listen_count_one": "{{count}} listens",
+        "listen_count_other": "{{count}} listens",
         "listens": "Listens",
         "subscribers": "Subscribers",
         "title": "Listener stats",
@@ -43775,6 +45577,8 @@ export default interface Resources {
       "voted": "Vote recorded!"
     },
     "total_ballots": "Total ballots: {{count}}",
+    "total_ballots_one": "Total ballots: {{count}}",
+    "total_ballots_other": "Total ballots: {{count}}",
     "total_votes": "{{count}} votes",
     "total_votes_one": "{{count}} vote",
     "try_again": "Try Again",
@@ -43912,6 +45716,8 @@ export default interface Resources {
     "review_modal": {
       "cancel": "Cancel",
       "characters_count": "{{count}}/{{max}} characters",
+      "characters_count_one": "{{count}}/{{max}} characters",
+      "characters_count_other": "{{count}}/{{max}} characters",
       "comment_label": "Comment (Optional)",
       "comment_placeholder": "Share details about your experience...",
       "general_review": "General Review",
@@ -43937,6 +45743,8 @@ export default interface Resources {
     "settings": "Settings",
     "show_less": "Show less",
     "show_more_skills": "Show {{count}} more",
+    "show_more_skills_one": "Show {{count}} more",
+    "show_more_skills_other": "Show {{count}} more",
     "skills": "Skills",
     "stats": {
       "active_listings": "Active Listings",
@@ -45027,6 +46835,8 @@ export default interface Resources {
     "listing_offering": "Offering",
     "listing_requesting": "Requesting",
     "members_count": "{{count}} members",
+    "members_count_one": "{{count}} members",
+    "members_count_other": "{{count}} members",
     "no_query": "No query",
     "no_results_desc": "No results for \"{{query}}\". Try a different search term.",
     "no_results_title": "No results found",
@@ -45036,6 +46846,8 @@ export default interface Resources {
     },
     "page_title": "Search",
     "results_count_announcement": "{{count}} results found",
+    "results_count_announcement_one": "{{count}} results found",
+    "results_count_announcement_other": "{{count}} results found",
     "results_label": "Results found",
     "run_search": "Run search",
     "save": "Save",
@@ -45044,18 +46856,38 @@ export default interface Resources {
     "saved_result_count_one": "({{count}} result)",
     "saved_result_count_other": "({{count}} results)",
     "saved_searches": "Saved Searches ({{count}})",
+    "saved_searches_one": "Saved Searches ({{count}})",
+    "saved_searches_other": "Saved Searches ({{count}})",
     "search_button": "Search",
     "search_placeholder": "Search for anything...",
     "section_events": "Events ({{count}})",
+    "section_events_one": "Events ({{count}})",
+    "section_events_other": "Events ({{count}})",
     "section_groups": "Groups ({{count}})",
+    "section_groups_one": "Groups ({{count}})",
+    "section_groups_other": "Groups ({{count}})",
     "section_listings": "Listings ({{count}})",
+    "section_listings_one": "Listings ({{count}})",
+    "section_listings_other": "Listings ({{count}})",
     "section_members": "Members ({{count}})",
+    "section_members_one": "Members ({{count}})",
+    "section_members_other": "Members ({{count}})",
     "subtitle": "Find listings, members, events, and groups",
     "tab_all": "All ({{count}})",
+    "tab_all_one": "All ({{count}})",
+    "tab_all_other": "All ({{count}})",
     "tab_events": "Events ({{count}})",
+    "tab_events_one": "Events ({{count}})",
+    "tab_events_other": "Events ({{count}})",
     "tab_groups": "Groups ({{count}})",
+    "tab_groups_one": "Groups ({{count}})",
+    "tab_groups_other": "Groups ({{count}})",
     "tab_listings": "Listings ({{count}})",
+    "tab_listings_one": "Listings ({{count}})",
+    "tab_listings_other": "Listings ({{count}})",
     "tab_members": "Members ({{count}})",
+    "tab_members_one": "Members ({{count}})",
+    "tab_members_other": "Members ({{count}})",
     "tabs_aria": "Search result type filter",
     "title": "Search",
     "toast": {
@@ -45067,9 +46899,17 @@ export default interface Resources {
     "toast_search_saved": "Search saved",
     "try_again": "Try Again",
     "view_all_events": "View all {{count}} events",
+    "view_all_events_one": "View all {{count}} events",
+    "view_all_events_other": "View all {{count}} events",
     "view_all_groups": "View all {{count}} groups",
+    "view_all_groups_one": "View all {{count}} groups",
+    "view_all_groups_other": "View all {{count}} groups",
     "view_all_listings": "View all {{count}} listings",
-    "view_all_members": "View all {{count}} members"
+    "view_all_listings_one": "View all {{count}} listings",
+    "view_all_listings_other": "View all {{count}} listings",
+    "view_all_members": "View all {{count}} members",
+    "view_all_members_one": "View all {{count}} members",
+    "view_all_members_other": "View all {{count}} members"
   },
   "settings": {
     "account": "Account",
@@ -45146,8 +46986,12 @@ export default interface Resources {
       "platform_windows_title": "Setting up on Windows"
     },
     "biometric_all_removed": "Removed {{count}} passkey(s).",
+    "biometric_all_removed_one": "Removed {{count}} passkey(s).",
+    "biometric_all_removed_other": "Removed {{count}} passkey(s).",
     "biometric_checking": "Checking passkey support...",
     "biometric_enabled": "{{count}} passkey(s) registered",
+    "biometric_enabled_one": "{{count}} passkey(s) registered",
+    "biometric_enabled_other": "{{count}} passkey(s) registered",
     "biometric_last_used": "Last used",
     "biometric_not_enabled": "Sign in faster with fingerprint, face, or PIN.",
     "biometric_not_supported": "Passkeys are not supported in this browser.",
@@ -45169,11 +47013,16 @@ export default interface Resources {
     "blocked_users": {
       "blocked_on": "Blocked on {{date}}",
       "count": "{{count}} blocked",
+      "count_one": "{{count}} blocked",
+      "count_other": "{{count}} blocked",
       "description": "Blocked members cannot view your profile, message you, or interact with your content.",
       "empty": "No blocked users",
       "empty_desc": "Users you block won't be able to see your profile, message you, or interact with your content.",
       "link": "Blocked Users",
+      "load_error": "We couldn't load your blocked users",
+      "load_error_desc": "Your blocked users list could not be loaded, so it may be out of date. Please try again.",
       "privacy_badge": "Privacy control",
+      "retry": "Try again",
       "subtitle": "Manage users you have blocked",
       "summary_label": "Blocked members",
       "title": "Blocked Users",
@@ -45385,12 +47234,14 @@ export default interface Resources {
       "title": "Settings"
     },
     "passkey_add_another": "Add another passkey",
+    "passkey_cancelled": "Passkey setup was cancelled.",
     "passkey_confirm_remove_all_body": "Are you sure you want to remove all passkeys? You'll need to set them up again on each device.",
     "passkey_confirm_remove_all_cancel": "Cancel",
     "passkey_confirm_remove_all_confirm": "Remove All",
     "passkey_confirm_remove_all_title": "Remove All Passkeys",
     "passkey_create": "Create a passkey",
     "passkey_device_tip": "Register a passkey on each device you use. To add your phone, open this page on your phone.",
+    "passkey_error_domain": "Passkeys aren't available on this site's address yet. Please contact your community admin.",
     "passkey_multi_device_note": "You can register passkeys on multiple devices. Each device needs its own passkey unless your passkey provider syncs them (e.g., iCloud Keychain syncs across Apple devices, Google Password Manager syncs across Android and Chrome).",
     "passkey_registration_failed": "Registration failed",
     "passkey_remove_all_confirm": "Remove All",
@@ -45421,16 +47272,13 @@ export default interface Resources {
     },
     "privacy": "Privacy",
     "privacy_descriptions": {
-      "allow_contact": "Allow other members to contact me",
       "search_indexing": "Allow search engines to index your profile"
     },
     "privacy_prefs": {
-      "allow_contact": "Allow Contact",
       "profile_visibility": "Who can see your profile",
       "search_indexing": "Search Engine Indexing"
     },
     "privacy_sections": {
-      "contact_preferences": "Contact Preferences",
       "profile_visibility": "Profile Visibility",
       "search_discovery": "Search & Discovery",
       "title": "Privacy Settings"
@@ -45497,7 +47345,9 @@ export default interface Resources {
     "session_current": "Current",
     "session_last_active": "Last active:",
     "session_on": "on",
-    "sessions_coming_soon": "Session management coming soon",
+    "sessions_empty": "No active sessions found.",
+    "sessions_load_error": "We couldn't load your active sessions.",
+    "sessions_retry": "Try again",
     "skills": {
       "description": "Add skills to your profile so other members can find you. Community members can endorse your skills.",
       "loading": "Loading skills...",
@@ -45550,8 +47400,10 @@ export default interface Resources {
     },
     "tabs": {
       "availability": "Availability",
+      "connected-accounts": "Connected accounts",
       "connected_accounts": "Connected",
       "linked": "Linked",
+      "linked-accounts": "Linked accounts",
       "notifications": "Notifications",
       "privacy": "Privacy",
       "profile": "Profile",
@@ -45650,6 +47502,8 @@ export default interface Resources {
     "twofa_app_google": "Google Authenticator",
     "twofa_app_microsoft": "Microsoft Authenticator",
     "twofa_backup_remaining": "{{count}} backup codes remaining",
+    "twofa_backup_remaining_one": "{{count}} backup codes remaining",
+    "twofa_backup_remaining_other": "{{count}} backup codes remaining",
     "twofa_cancel": "Cancel",
     "twofa_checking": "Checking status...",
     "twofa_code_description": "Enter the 6-digit code from your authenticator app",
@@ -45712,6 +47566,8 @@ export default interface Resources {
       "collection_search": "Search collections",
       "collection_updated": "Collection updated",
       "count": "{{count}} saved items",
+      "count_one": "{{count}} saved items",
+      "count_other": "{{count}} saved items",
       "create": "Create",
       "create_collection_title": "Create Collection",
       "delete_collection": "Delete",
@@ -45779,8 +47635,14 @@ export default interface Resources {
       "connect": "Connect",
       "connected": "Connected",
       "connections": "{{count}} connections",
+      "connections_one": "{{count}} connections",
+      "connections_other": "{{count}} connections",
       "hours_given": "{{count}} hrs given",
+      "hours_given_one": "{{count}} hrs given",
+      "hours_given_other": "{{count}} hrs given",
       "listings": "{{count}} listings",
+      "listings_one": "{{count}} listings",
+      "listings_other": "{{count}} listings",
       "message": "Message",
       "pending": "Pending"
     },
@@ -45790,12 +47652,20 @@ export default interface Resources {
     "likes_count_one": "{{count}} like",
     "likes_count_other": "{{count}} likes",
     "link_copied": "Link copied to clipboard",
+    "link_preview": {
+      "favicon_alt": "{{site}} icon",
+      "image_alt_domain": "Preview from {{domain}}",
+      "image_alt_title": "Preview for {{title}}",
+      "video_fallback": "Video"
+    },
     "load_more": "Load More",
     "login_to_share": "Log in to share",
     "mention": {
       "connected": "Connected",
       "no_users": "No users found",
-      "suggestions_aria": "Mention suggestions, {{count}} results"
+      "suggestions_aria": "Mention suggestions, {{count}} results",
+      "suggestions_aria_one": "Mention suggestions, {{count}} results",
+      "suggestions_aria_other": "Mention suggestions, {{count}} results"
     },
     "no_comments": "No comments yet. Be the first to comment!",
     "no_likes": "No likes yet",
@@ -45803,11 +47673,17 @@ export default interface Resources {
     "presence": {
       "away": "Away",
       "days_ago": "{{count}}d ago",
+      "days_ago_one": "{{count}}d ago",
+      "days_ago_other": "{{count}}d ago",
       "dnd": "Do Not Disturb",
       "hours_ago": "{{count}}h ago",
+      "hours_ago_one": "{{count}}h ago",
+      "hours_ago_other": "{{count}}h ago",
       "just_now": "Just now",
       "last_seen": "Last seen {{time}}",
       "minutes_ago": "{{count}}m ago",
+      "minutes_ago_one": "{{count}}m ago",
+      "minutes_ago_other": "{{count}}m ago",
       "offline": "Offline",
       "online": "Online"
     },
@@ -45956,6 +47832,8 @@ export default interface Resources {
       "upload_video": "Upload a video",
       "use_your_camera": "Use your camera",
       "video_duration_seconds": "{{count}}s",
+      "video_duration_seconds_one": "{{count}}s",
+      "video_duration_seconds_other": "{{count}}s",
       "videos_trimmed_notice": "Videos longer than 60s will be trimmed to 60s display duration"
     },
     "empty": {
@@ -46001,6 +47879,8 @@ export default interface Resources {
       "paused": "Paused",
       "poll_vote": "Vote",
       "poll_votes": "{{count}} votes",
+      "poll_votes_one": "{{count}} votes",
+      "poll_votes_other": "{{count}} votes",
       "previous_story": "Previous story",
       "previous_user": "Previous user",
       "react_with": "React with {{type}}",
@@ -46021,6 +47901,8 @@ export default interface Resources {
       "viewers_empty": "No viewers yet",
       "viewers_title": "Viewers",
       "viewers_title_count": "Viewers ({{count}})",
+      "viewers_title_count_one": "Viewers ({{count}})",
+      "viewers_title_count_other": "Viewers ({{count}})",
       "views": "{{count}} views",
       "views_one": "1 view"
     }
@@ -47118,6 +49000,8 @@ export default interface Resources {
     },
     "help": {
       "articles_count": "{{count}} articles",
+      "articles_count_one": "{{count}} articles",
+      "articles_count_other": "{{count}} articles",
       "contact_support": "Contact Support",
       "faq_cat_0_a_0": "Timebanking is a community-based exchange system where everyone's time is valued equally. You earn time credits by helping others and spend them to receive help. One hour of service equals one time credit, regardless of the type of service.",
       "faq_cat_0_a_1": "Click \"Sign Up\" on the home page, select your community, fill in your details, and verify your email. Your community coordinator may need to approve your account before you can start exchanging.",
@@ -47341,6 +49225,8 @@ export default interface Resources {
       "decline_all": "Decline All",
       "decline_confirm": "Decline application",
       "decline_modal_description": "Add a note for {{count}} application before declining.",
+      "decline_modal_description_one": "Add a note for {{count}} application before declining.",
+      "decline_modal_description_other": "Add a note for {{count}} application before declining.",
       "decline_modal_title": "Decline application",
       "decline_note_label": "Decision note",
       "decline_note_placeholder": "Share the reason or next steps for the volunteer.",
@@ -47365,12 +49251,16 @@ export default interface Resources {
       "none_matching_search": "No applications match your search.",
       "none_yet": "No applications yet.",
       "pending_count": "{{count}} pending",
+      "pending_count_one": "{{count}} pending",
+      "pending_count_other": "{{count}} pending",
       "search_partial_hint": "Search covers only loaded applications. Load all to search everyone.",
       "search_placeholder": "Search by name...",
       "select_all": "Select all",
       "select_all_capped": "Selected the first {{max}}. Process these, then select more.",
       "select_limit": "You can select at most {{max}} applications at once.",
-      "selected_count": "{{count}} selected"
+      "selected_count": "{{count}} selected",
+      "selected_count_one": "{{count}} selected",
+      "selected_count_other": "{{count}} selected"
     },
     "applications_empty_cta": "Browse opportunities",
     "applications_heading": "Applications",
@@ -47413,6 +49303,8 @@ export default interface Resources {
       "organization_hours": "{{name}} ({{hours}}h)",
       "title": "Impact Certificates",
       "verified_hours": "{{count}} Verified Hours",
+      "verified_hours_one": "{{count}} Verified Hours",
+      "verified_hours_other": "{{count}} Verified Hours",
       "verify": "Verify"
     },
     "check_in": {
@@ -47477,11 +49369,17 @@ export default interface Resources {
         "under_review": "Under Review"
       },
       "support_aria": "Support this project ({{count}} supporters)",
+      "support_aria_one": "Support this project ({{count}} supporters)",
+      "support_aria_other": "Support this project ({{count}} supporters)",
       "support_failed": "Failed to update support. Please try again.",
       "title_required": "Title and description are required.",
       "try_again": "Try Again",
       "unsupport_aria": "Remove your support ({{count}} supporters)",
-      "volunteers_needed": "{{count}} needed"
+      "unsupport_aria_one": "Remove your support ({{count}} supporters)",
+      "unsupport_aria_other": "Remove your support ({{count}} supporters)",
+      "volunteers_needed": "{{count}} needed",
+      "volunteers_needed_one": "{{count}} needed",
+      "volunteers_needed_other": "{{count}} needed"
     },
     "cover_message_label": "Cover Message (optional)",
     "cover_message_placeholder": "Tell the organisation why you'd like to volunteer...",
@@ -47496,6 +49394,8 @@ export default interface Resources {
       "expires": "Expires",
       "expiring_soon": "Expiring Soon",
       "expiring_soon_desc": "{{count}} credential(s) will expire within 30 days.",
+      "expiring_soon_desc_one": "{{count}} credential(s) will expire within 30 days.",
+      "expiring_soon_desc_other": "{{count}} credential(s) will expire within 30 days.",
       "expiring_soon_title": "Credentials expiring soon",
       "expiry_label": "Expiry Date (optional)",
       "expiry_placeholder": "Leave blank if no expiry",
@@ -47571,6 +49471,8 @@ export default interface Resources {
       "donate": "Pledge by bank transfer",
       "donate_with_card": "Donate by card",
       "donors_count": "{{count}} donors",
+      "donors_count_one": "{{count}} donors",
+      "donors_count_other": "{{count}} donors",
       "empty_description": "When a fundraising campaign is running, you can donate money here to support the community. This is separate from time credits, which you earn by volunteering.",
       "empty_title": "No fundraising campaigns right now",
       "form": {
@@ -47665,6 +49567,8 @@ export default interface Resources {
       "expires": "Expires",
       "from": "From",
       "pending_count": "{{count}} pending",
+      "pending_count_one": "{{count}} pending",
+      "pending_count_other": "{{count}} pending",
       "priority_critical": "CRITICAL",
       "priority_normal": "NORMAL",
       "priority_urgent": "URGENT",
@@ -47891,6 +49795,8 @@ export default interface Resources {
     },
     "more_sections": "More ({{count}})",
     "more_sections_caption": "Other sections — optional extras like recommendations, certificates, wellbeing, alerts and donations.",
+    "more_sections_one": "More ({{count}})",
+    "more_sections_other": "More ({{count}})",
     "my_organisations": "My Organisations",
     "my_organisations_declined": "Declined",
     "my_organisations_declined_desc": "This application wasn't approved. Contact your community administrator for details.",
@@ -47960,6 +49866,8 @@ export default interface Resources {
     "org_balance_low_warning": "Balance may be insufficient for {{count}} pending hours.",
     "org_callout_desc": "Post opportunities, review applications, and approve volunteer hours.",
     "org_callout_you_manage_many": "You manage {{count}} organisations",
+    "org_callout_you_manage_many_one": "You manage {{count}} organisations",
+    "org_callout_you_manage_many_other": "You manage {{count}} organisations",
     "org_callout_you_manage_one": "You manage {{name}}",
     "org_dashboard": {
       "access_denied": "Access Denied",
@@ -47983,7 +49891,11 @@ export default interface Resources {
       "post_opportunity": "Post Opportunity",
       "quick_actions": "Quick Actions",
       "review_applications": "Review {{count}} Applications",
+      "review_applications_one": "Review {{count}} Applications",
+      "review_applications_other": "Review {{count}} Applications",
       "review_hours": "Review {{count}} Hours",
+      "review_hours_one": "Review {{count}} Hours",
+      "review_hours_other": "Review {{count}} Hours",
       "stats_unavailable": "Unable to load organization stats.",
       "tab_applications": "Applications",
       "tab_hours_review": "Hours Review",
@@ -48256,6 +50168,8 @@ export default interface Resources {
       "refresh": "Refresh",
       "spot_available": "Spot available!",
       "spots": "{{count}} spots",
+      "spots_one": "{{count}} spots",
+      "spots_other": "{{count}} spots",
       "try_again": "Try Again"
     },
     "wallet": "Wallet",
@@ -48345,6 +50259,10 @@ export default interface Resources {
     "available_balance": "Available Balance",
     "balance": "Balance",
     "cancel": "Cancel",
+    "category_select": {
+      "label": "Category",
+      "placeholder": "Select a category"
+    },
     "community_fund": "Community Fund",
     "community_fund_deposited": "Deposited",
     "community_fund_desc": "Shared time credit pool",
@@ -48410,6 +50328,8 @@ export default interface Resources {
     "history": "Transaction History",
     "hours": "Hours",
     "hours_value": "{{count}}h",
+    "hours_value_one": "{{count}}h",
+    "hours_value_other": "{{count}}h",
     "load_more": "Load More",
     "new_balance_after": "Your new balance will be {{balance}} hours",
     "no_filtered_transactions": "No matching transactions",
@@ -48421,6 +50341,8 @@ export default interface Resources {
     "optional": "optional",
     "pending": "Pending",
     "pending_in": "+{{count}}h pending",
+    "pending_in_one": "+{{count}}h pending",
+    "pending_in_other": "+{{count}}h pending",
     "pending_reviews": "Pending Reviews",
     "rating": {
       "comment_label": "Comment (optional)",
@@ -48447,6 +50369,8 @@ export default interface Resources {
     "send_credits": "Send Credits",
     "sent": "Sent",
     "signed_hours_value": "{{sign}}{{count}}h",
+    "signed_hours_value_one": "{{sign}}{{count}}h",
+    "signed_hours_value_other": "{{sign}}{{count}}h",
     "stats": {
       "earned": "Earned",
       "pending": "Pending",

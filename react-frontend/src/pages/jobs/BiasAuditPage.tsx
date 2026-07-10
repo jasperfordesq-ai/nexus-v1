@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Autocomplete } from '@/components/ui/Autocomplete';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
@@ -229,7 +230,7 @@ export function BiasAuditPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <ShieldCheck className="w-7 h-7 text-indigo-400" aria-hidden="true" />
+            <ShieldCheck className="w-7 h-7 text-accent" aria-hidden="true" />
             {t('bias_audit.title')}
           </h1>
           <p className="text-sm text-theme-muted mt-1">{t('bias_audit.subtitle')}</p>
@@ -237,9 +238,9 @@ export function BiasAuditPage() {
       </div>
 
       {/* Privacy notice */}
-      <GlassCard className="p-4 border-l-4 border-indigo-400">
+      <GlassCard className="p-4 border-l-4 border-accent">
         <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-indigo-400 mt-0.5 shrink-0" aria-hidden="true" />
+          <Info className="w-5 h-5 text-accent mt-0.5 shrink-0" aria-hidden="true" />
           <p className="text-sm text-theme-muted">{t('bias_audit.note_privacy')}</p>
         </div>
       </GlassCard>
@@ -305,7 +306,7 @@ export function BiasAuditPage() {
           title={error}
           action={
             <Button
-              className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+              className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
               startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
               onPress={loadReport}
             >
@@ -321,9 +322,9 @@ export function BiasAuditPage() {
           {/* Key Metrics */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <MetricCard
-              icon={<Users className="w-5 h-5 text-indigo-400" aria-hidden="true" />}
+              icon={<Users className="w-5 h-5 text-accent" aria-hidden="true" />}
               label={t('bias_audit.total_applications')}
-              value={report.total_applications.toLocaleString()}
+              value={report.total_applications.toLocaleString(getFormattingLocale())}
             />
             <MetricCard
               icon={<Clock className="w-5 h-5 text-blue-400" aria-hidden="true" />}
@@ -467,7 +468,7 @@ export function BiasAuditPage() {
                   <p className="text-xs text-theme-muted">{t('bias_audit.rejected_count')}</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-3xl font-bold text-indigo-500">
+                  <p className="text-3xl font-bold text-accent">
                     {report.skills_match_correlation.acceptance_rate}%
                   </p>
                   <p className="text-xs text-theme-muted">{t('bias_audit.acceptance_rate')}</p>

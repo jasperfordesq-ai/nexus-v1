@@ -48,7 +48,7 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { parseServerTimestamp, formatServerDate } from '@/lib/serverTime';
 import { adminBroker, adminUsers } from '@/admin/api/adminApi';
 import { DataTable, ConfirmModal, type Column } from '@/admin/components';
@@ -414,7 +414,7 @@ export function UserMonitoring() {
               </Chip.Label>
             </Chip>
             <span className="text-xs tabular-nums text-muted">
-              {expiresAt.toLocaleDateString()}
+              {expiresAt.toLocaleDateString(getFormattingLocale())}
             </span>
           </div>
         );

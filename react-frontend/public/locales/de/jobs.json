@@ -126,7 +126,13 @@
     "rule_summary": "Wenn in \"{{stage}}\" für {{count}}T -> {{action}}",
     "rule_summary_with_target": "Wenn in \"{{stage}}\" für {{count}}T -> {{action}} -> {{target}}",
     "rules_title": "Automatisierungsregeln",
-    "reviewed": "Überprüft"
+    "reviewed": "Überprüft",
+    "rule_summary_with_target_one": "Wenn in \"{{stage}}\" für {{count}}T -> {{action}} -> {{target}}",
+    "rule_summary_with_target_other": "Wenn in \"{{stage}}\" für {{count}}T -> {{action}} -> {{target}}",
+    "rule_summary_one": "Wenn in \"{{stage}}\" für {{count}}T -> {{action}}",
+    "rule_summary_other": "Wenn in \"{{stage}}\" für {{count}}T -> {{action}}",
+    "generated_name_one": "{{stage}} zu {{target}} nach {{count}}T",
+    "generated_name_other": "{{stage}} zu {{target}} nach {{count}}T"
   },
   "employer": {
     "page_title": "Arbeitgeberprofil",
@@ -160,7 +166,11 @@
     "review_comment_placeholder": "Teilen Sie Ihre Erfahrung mit diesem Arbeitgeber...",
     "submit_review": "Bewertung einreichen",
     "no_reviews": "Noch keine Bewertungen",
-    "anonymous": "Anonym"
+    "anonymous": "Anonym",
+    "meta_description_one": "Sehen Sie das Arbeitgeberprofil, offene Stellen und Community-Bewertungen über {{count}} aktuelle Möglichkeiten an.",
+    "meta_description_other": "Sehen Sie das Arbeitgeberprofil, offene Stellen und Community-Bewertungen über {{count}} aktuelle Möglichkeiten an.",
+    "open_roles_count_one": "{{count}} offene Stellen",
+    "open_roles_count_other": "{{count}} offene Stellen"
   },
   "bulk": {
     "select_action": "In Phase verschieben...",
@@ -168,7 +178,9 @@
     "clear": "Auswahl löschen",
     "success": "Bewerbungen aktualisiert",
     "error": "Massenaktualisierung fehlgeschlagen",
-    "selected_count": "{{count}} ausgewählt"
+    "selected_count": "{{count}} ausgewählt",
+    "selected_count_one": "{{count}} ausgewählt",
+    "selected_count_other": "{{count}} ausgewählt"
   },
   "history": {
     "title": "Statusverlauf",
@@ -260,7 +272,15 @@
     "market_avg": "Marktdurchschnitt",
     "ai_insights": "KI-Erkenntnisse",
     "days_short_value": "{{count}} T",
-    "not_available": "k. A."
+    "not_available": "k. A.",
+    "views_tooltip_one": "{{date}}: {{count}} Aufrufe",
+    "views_tooltip_other": "{{date}}: {{count}} Aufrufe",
+    "applications_tooltip_one": "{{week}}: {{count}} Bewerbungen",
+    "applications_tooltip_other": "{{week}}: {{count}} Bewerbungen",
+    "based_on_one": "Basierend auf {{count}} ähnlichen Stellen",
+    "based_on_other": "Basierend auf {{count}} ähnlichen Stellen",
+    "days_short_value_one": "{{count}} T",
+    "days_short_value_other": "{{count}} T"
   },
   "salary": {
     "label": "Vergütung",
@@ -304,7 +324,9 @@
     "tab_rejected": "Abgelehnt",
     "empty_all": "Sie haben sich noch auf keine Stellen beworben.",
     "empty_filtered": "Keine {{filter}}-Bewerbungen gefunden.",
-    "browse_jobs": "Stellen durchsuchen"
+    "browse_jobs": "Stellen durchsuchen",
+    "days_left_one": "{{count}}T übrig",
+    "days_left_other": "{{count}}T übrig"
   },
   "withdraw": {
     "confirm_title": "Bewerbung zurückziehen?",
@@ -414,7 +436,9 @@
     "cv_size_kb": "({{count}} KB)",
     "message_employer": "Arbeitgeber kontaktieren",
     "cv_parse_error": "Lebenslauf konnte nicht analysiert werden. Sie können Ihre Bewerbung trotzdem manuell einreichen.",
-    "quick_apply": "Schnell bewerben mit gespeichertem Profil"
+    "quick_apply": "Schnell bewerben mit gespeichertem Profil",
+    "cv_size_kb_one": "({{count}} KB)",
+    "cv_size_kb_other": "({{count}} KB)"
   },
   "detail": {
     "loading": "Stelle wird geladen...",
@@ -470,7 +494,11 @@
     "confirm_close_title": "Diese Stelle schließen?",
     "confirm_close": "Durch das Schließen wird verhindert, dass neue Bewerbungen eingehen. Sie können es jederzeit wieder öffnen.",
     "confirm_reopen_title": "Diese Stelle erneut eröffnen?",
-    "confirm_reopen": "Durch die Wiedereröffnung wird die Stelle wieder sichtbar und es können sich Menschen bewerben."
+    "confirm_reopen": "Durch die Wiedereröffnung wird die Stelle wieder sichtbar und es können sich Menschen bewerben.",
+    "owner_has_applicants_one": "{{count}} Bewerber — nach unten scrollen zur Überprüfung",
+    "owner_has_applicants_other": "{{count}} Bewerber — nach unten scrollen zur Überprüfung",
+    "views_one": "{{count}} Aufrufe",
+    "views_other": "{{count}} Aufrufe"
   },
   "interview": {
     "schedule": "Vorstellungsgespräch planen",
@@ -768,7 +796,13 @@
     "days_ago": "vor {{count}} Tagen",
     "weeks_ago": "vor {{count}} Wochen",
     "skills_description": "Kommagetrennte Fähigkeiten",
-    "skills_chip": "Fähigkeiten: {{skills}}"
+    "skills_chip": "Fähigkeiten: {{skills}}",
+    "days_ago_one": "vor {{count}} Tagen",
+    "days_ago_other": "vor {{count}} Tagen",
+    "weeks_ago_one": "vor {{count}} Wochen",
+    "weeks_ago_other": "vor {{count}} Wochen",
+    "results_count_one": "{{count}} Kandidat(en) gefunden",
+    "results_count_other": "{{count}} Kandidat(en) gefunden"
   },
   "resume_visibility": {
     "label": "Mein Profil für Arbeitgeber durchsuchbar machen",
@@ -1049,5 +1083,17 @@
   "jobs": {
     "view_details": "Stellendetails anzeigen"
   },
-  "tabs_aria": "Jobansicht"
+  "tabs_aria": "Jobansicht",
+  "match_badge_one": "{{count}}% Übereinstimmung",
+  "match_badge_other": "{{count}}% Übereinstimmung",
+  "views_one": "{{count}} Aufrufe",
+  "views_other": "{{count}} Aufrufe",
+  "applications_one": "{{count}} Bewerbungen",
+  "applications_other": "{{count}} Bewerbungen",
+  "char_count_one": "{{count}} / {{max}} Zeichen",
+  "char_count_other": "{{count}} / {{max}} Zeichen",
+  "hours_per_week_one": "{{count}} Std./Woche",
+  "hours_per_week_other": "{{count}} Std./Woche",
+  "time_credits_label_one": "{{count}} Zeitguthaben",
+  "time_credits_label_other": "{{count}} Zeitguthaben"
 }

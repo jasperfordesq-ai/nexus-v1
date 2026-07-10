@@ -15,6 +15,7 @@ import {
   use,
   useMemo,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Drawer as HeroUIDrawer } from '@heroui/react/drawer';
 
 import { cn } from '@/lib/helpers';
@@ -36,6 +37,7 @@ type DrawerClassNames = Partial<{
 type DrawerContextValue = {
   backdrop?: DrawerBackdrop;
   classNames?: DrawerClassNames;
+  closeLabel?: string;
   hideCloseButton?: boolean;
   isDismissable?: boolean;
   isKeyboardDismissDisabled?: boolean;
@@ -98,6 +100,7 @@ export function Drawer({
   children,
   className,
   classNames,
+  closeLabel,
   defaultOpen,
   hideCloseButton,
   isDismissable,
@@ -115,6 +118,7 @@ export function Drawer({
       ...classNames,
       base: cn(classNames?.base, className),
     },
+    closeLabel,
     hideCloseButton,
     isDismissable,
     isKeyboardDismissDisabled,
@@ -128,6 +132,7 @@ export function Drawer({
     backdrop,
     className,
     classNames,
+    closeLabel,
     defaultOpen,
     hideCloseButton,
     isDismissable,
@@ -150,9 +155,11 @@ export function Drawer({
 export function DrawerContent(
   { children, className, ref, ...props }: DrawerContentProps & { ref?: Ref<HTMLDivElement> },
 ) {
+  const { t } = useTranslation('common');
   const {
     backdrop,
     classNames,
+    closeLabel,
     hideCloseButton,
     isDismissable,
     isKeyboardDismissDisabled,
@@ -195,7 +202,10 @@ export function DrawerContent(
           {...props}
         >
           {!hideCloseButton && (
-            <HeroUIDrawer.CloseTrigger className={classNames?.closeButton} />
+            <HeroUIDrawer.CloseTrigger
+              aria-label={closeLabel ?? t('accessibility.close')}
+              className={classNames?.closeButton}
+            />
           )}
           {typeof children === 'function'
             ? (children as DrawerContentRenderProp)(close)
@@ -220,6 +230,10 @@ export function DrawerHeader(
       {children}
     </HeroUIDrawer.Header>
   );
+}
+
+export function DrawerHeading(props: ComponentProps<typeof HeroUIDrawer.Heading>) {
+  return <HeroUIDrawer.Heading {...props} />;
 }
 
 export function DrawerBody(

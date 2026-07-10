@@ -7,6 +7,7 @@
  * EmergencyAlertsTab - View and respond to urgent shift-fill requests (V9)
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from '@/lib/motion';
@@ -228,11 +229,11 @@ export function EmergencyAlertsTab() {
                         )}
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" aria-hidden="true" />
-                          {new Date(alert.shift.start_time).toLocaleDateString()}
+                          {new Date(alert.shift.start_time).toLocaleDateString(getFormattingLocale())}
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" aria-hidden="true" />
-                          {new Date(alert.shift.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(alert.shift.start_time).toLocaleTimeString(getFormattingLocale(), { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
 
@@ -248,7 +249,7 @@ export function EmergencyAlertsTab() {
 
                       <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-theme-subtle">
                         <span>{t('emergency.from')} {alert.coordinator.name}</span>
-                        <span>{t('emergency.expires')} {new Date(alert.expires_at).toLocaleString()}</span>
+                        <span>{t('emergency.expires')} {new Date(alert.expires_at).toLocaleString(getFormattingLocale())}</span>
                       </div>
                     </div>
 

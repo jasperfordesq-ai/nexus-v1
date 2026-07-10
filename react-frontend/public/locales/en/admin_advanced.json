@@ -550,14 +550,18 @@
           "unique_uris": "Unique URIs"
         },
         "labels": {
-          "spoofed_count": "{{count}} spoofed"
+          "spoofed_count": "{{count}} spoofed",
+          "spoofed_count_one": "{{count}} spoofed",
+          "spoofed_count_other": "{{count}} spoofed"
         },
         "log_summary": "Log: {{size}} - since {{time}}",
         "sections": {
           "hits_by_crawler": "Hits by crawler",
           "hits_by_status": "Hits by HTTP status",
           "recent_activity": "Recent activity (newest first, last {{count}})",
-          "top_uris": "Top URIs (top 50 by hit count)"
+          "top_uris": "Top URIs (top 50 by hit count)",
+          "recent_activity_one": "Recent activity (newest first, last {{count}})",
+          "recent_activity_other": "Recent activity (newest first, last {{count}})"
         },
         "tables": {
           "recent_hits_aria": "Recent bot hits",
@@ -573,7 +577,9 @@
         "actions": {
           "open_in_inventory": "Open in inventory",
           "refresh": "Refresh",
-          "refresh_all_stale": "Refresh all stale ({{count}})"
+          "refresh_all_stale": "Refresh all stale ({{count}})",
+          "refresh_all_stale_one": "Refresh all stale ({{count}})",
+          "refresh_all_stale_other": "Refresh all stale ({{count}})"
         },
         "columns": {
           "actions": "ACTIONS",
@@ -585,7 +591,9 @@
           "tenant": "TENANT"
         },
         "confirm": {
-          "queue_recache": "Queue recache for {{count}} tenants?"
+          "queue_recache": "Queue recache for {{count}} tenants?",
+          "queue_recache_one": "Queue recache for {{count}} tenants?",
+          "queue_recache_other": "Queue recache for {{count}} tenants?"
         },
         "empty": "No tenants",
         "errors": {
@@ -596,11 +604,15 @@
         "messages": {
           "bulk_queued": "Queued recache for {{count}} tenants",
           "no_stale": "No stale tenants - coverage is healthy",
-          "tenant_queued": "Queued #{{id}} for {{slug}}"
+          "tenant_queued": "Queued #{{id}} for {{slug}}",
+          "bulk_queued_one": "Queued recache for {{count}} tenants",
+          "bulk_queued_other": "Queued recache for {{count}} tenants"
         },
         "summary": {
           "healthy": "All {{count}} tenants healthy.",
-          "needs_work": "{{needing}} of {{total}} tenants have missing, stale, or asset-broken routes."
+          "needs_work": "{{needing}} of {{total}} tenants have missing, stale, or asset-broken routes.",
+          "healthy_one": "All {{count}} tenants healthy.",
+          "healthy_other": "All {{count}} tenants healthy."
         },
         "table_aria": "Coverage"
       },
@@ -628,7 +640,11 @@
           "drift_applied": "Drift detection applied",
           "drift_dry_run": "Drift dry-run complete",
           "purge_dry_run": "Dry run: {{count}} snapshots would be purged",
-          "purged_ungated": "Purged {{count}} ungated snapshots across {{tenants}} tenants"
+          "purged_ungated": "Purged {{count}} ungated snapshots across {{tenants}} tenants",
+          "purged_ungated_one": "Purged {{count}} ungated snapshots across {{tenants}} tenants",
+          "purged_ungated_other": "Purged {{count}} ungated snapshots across {{tenants}} tenants",
+          "purge_dry_run_one": "Dry run: {{count}} snapshots would be purged",
+          "purge_dry_run_other": "Dry run: {{count}} snapshots would be purged"
         },
         "no_output": "(no output)",
         "purge_ungated": {
@@ -637,7 +653,11 @@
         },
         "result": {
           "deleted": "Deleted {{count}} snapshots across {{tenants}} tenants",
-          "would_delete": "Would delete {{count}} snapshots across {{tenants}} tenants"
+          "would_delete": "Would delete {{count}} snapshots across {{tenants}} tenants",
+          "would_delete_one": "Would delete {{count}} snapshots across {{tenants}} tenants",
+          "would_delete_other": "Would delete {{count}} snapshots across {{tenants}} tenants",
+          "deleted_one": "Deleted {{count}} snapshots across {{tenants}} tenants",
+          "deleted_other": "Deleted {{count}} snapshots across {{tenants}} tenants"
         },
         "title": "Freshness automation"
       },
@@ -694,7 +714,9 @@
           "recache_selected": "Recache selected ({{count}})",
           "reload": "Reload",
           "select_all_visible": "Select all visible",
-          "select_snapshot": "Select {{path}}"
+          "select_snapshot": "Select {{path}}",
+          "recache_selected_one": "Recache selected ({{count}})",
+          "recache_selected_other": "Recache selected ({{count}})"
         },
         "columns": {
           "actions": "Actions",
@@ -729,7 +751,9 @@
           "tenant_slug": "Tenant slug"
         },
         "messages": {
-          "bulk_recache": "Invalidated {{count}} snapshots and queued recache"
+          "bulk_recache": "Invalidated {{count}} snapshots and queued recache",
+          "bulk_recache_one": "Invalidated {{count}} snapshots and queued recache",
+          "bulk_recache_other": "Invalidated {{count}} snapshots and queued recache"
         },
         "inspect": {
           "age": "Age",
@@ -762,7 +786,15 @@
           "seo_score": "SEO score",
           "size": "Size",
           "tips": "Tips ({{count}})",
-          "title": "Title"
+          "title": "Title",
+          "must_fix_one": "Must fix ({{count}})",
+          "must_fix_other": "Must fix ({{count}})",
+          "tips_one": "Tips ({{count}})",
+          "tips_other": "Tips ({{count}})",
+          "asset_references_one": "Asset references ({{count}})",
+          "asset_references_other": "Asset references ({{count}})",
+          "dead_assets_one": "{{count}} dead",
+          "dead_assets_other": "{{count}} dead"
         },
         "selected": "{{count}} selected",
         "status": {
@@ -771,7 +803,9 @@
           "content_drifted": "content drifted"
         },
         "summary": "{{filtered}} of {{total}} snapshots",
-        "table_aria": "Snapshot inventory"
+        "table_aria": "Snapshot inventory",
+        "selected_one": "{{count}} selected",
+        "selected_other": "{{count}} selected"
       },
       "jobs": {
         "actions": {
@@ -840,7 +874,9 @@
           "tooltip": "priority={{priority}} (lower wins)"
         },
         "result": {
-          "invalid": "{{count}} invalid"
+          "invalid": "{{count}} invalid",
+          "invalid_one": "{{count}} invalid",
+          "invalid_other": "{{count}} invalid"
         },
         "scope": {
           "all_tenants": "all tenants"
@@ -872,7 +908,9 @@
           "success": "Success",
           "supersede": "Supersede",
           "unknown": "Unknown event: {{event}}"
-        }
+        },
+        "summary_one": "{{count}} events",
+        "summary_other": "{{count}} events"
       },
       "failures": {
         "columns": {
@@ -888,7 +926,10 @@
         "errors": {
           "load": "Failed to load failures"
         },
-        "table_aria": "Failures"
+        "table_aria": "Failures",
+        "actions": {
+          "close_breaker_now": "Resume queue now"
+        }
       },
       "live_connected": "Live updates connected",
       "audit": {
@@ -957,7 +998,11 @@
           "cache_unreachable": "Cache unreachable",
           "healthy": "Healthy",
           "missing": "{{count}} missing",
-          "stale": "{{count}} stale"
+          "stale": "{{count}} stale",
+          "missing_one": "{{count}} missing",
+          "missing_other": "{{count}} missing",
+          "stale_one": "{{count}} stale",
+          "stale_other": "{{count}} stale"
         },
         "hints": {
           "active_jobs": "{{count}} active",
@@ -969,7 +1014,11 @@
           "event_at": "Event {{time}}",
           "no_events": "No events",
           "prometheus": "Prometheus text format",
-          "tenants_routes": "{{tenants}} tenants x {{routes}} routes"
+          "tenants_routes": "{{tenants}} tenants x {{routes}} routes",
+          "aging_one": "{{count}} aging (>7d)",
+          "aging_other": "{{count}} aging (>7d)",
+          "active_jobs_one": "{{count}} active",
+          "active_jobs_other": "{{count}} active"
         },
         "kpi": {
           "age_stale": "Age stale (>14d)",
@@ -1025,7 +1074,11 @@
         },
         "messages": {
           "dry_run": "Dry run: {{count}} snapshots would be purged",
-          "purged": "Purged {{count}} snapshots{{job}}"
+          "purged": "Purged {{count}} snapshots{{job}}",
+          "dry_run_one": "Dry run: {{count}} snapshots would be purged",
+          "dry_run_other": "Dry run: {{count}} snapshots would be purged",
+          "purged_one": "Purged {{count}} snapshots{{job}}",
+          "purged_other": "Purged {{count}} snapshots{{job}}"
         },
         "placeholders": {
           "pattern": "/blog/* or /listings/**",
@@ -1033,13 +1086,19 @@
         },
         "result": {
           "deleted": "Deleted {{count}} snapshots",
-          "would_delete": "Would delete {{count}} snapshots"
+          "would_delete": "Would delete {{count}} snapshots",
+          "would_delete_one": "Would delete {{count}} snapshots",
+          "would_delete_other": "Would delete {{count}} snapshots",
+          "deleted_one": "Deleted {{count}} snapshots",
+          "deleted_other": "Deleted {{count}} snapshots"
         },
         "title": "Delete snapshots by route pattern",
         "preview_gate": {
           "title": "Preview required before live delete",
           "required": "A live delete is locked until you preview the same route pattern and tenant scope.",
-          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
+          "ready": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
+          "ready_one": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview.",
+          "ready_other": "Matching preview found. The live delete is limited to the {{count}} matching snapshots shown by the preview."
         }
       },
       "ttl_inspector": {
@@ -1066,7 +1125,13 @@
         "units": {
           "days": "{{count}} d",
           "hours": "{{count}} h",
-          "minutes": "{{count}} min"
+          "minutes": "{{count}} min",
+          "minutes_one": "{{count}} min",
+          "minutes_other": "{{count}} min",
+          "hours_one": "{{count}} h",
+          "hours_other": "{{count}} h",
+          "days_one": "{{count}} d",
+          "days_other": "{{count}} d"
         }
       },
       "sitemap_explorer": {
@@ -1076,7 +1141,13 @@
         "counts": {
           "dynamic": "{{count}} dynamic",
           "static": "{{count}} static",
-          "total": "{{count}} total"
+          "total": "{{count}} total",
+          "static_one": "{{count}} static",
+          "static_other": "{{count}} static",
+          "dynamic_one": "{{count}} dynamic",
+          "dynamic_other": "{{count}} dynamic",
+          "total_one": "{{count}} total",
+          "total_other": "{{count}} total"
         },
         "description_prefix": "See the public routes the engine believes belong to this tenant: built-in public pages plus dynamic URLs from",
         "description_suffix": "The worker uses this list when it refreshes snapshots.",
@@ -1134,7 +1205,9 @@
         },
         "status": {
           "clean": "No issues found",
-          "needs_attention": "{{count}} item needs attention"
+          "needs_attention": "{{count}} item needs attention",
+          "needs_attention_one": "{{count}} item needs attention",
+          "needs_attention_other": "{{count}} item needs attention"
         },
         "counts": {
           "expected": "Expected",
@@ -1567,7 +1640,30 @@
         "do_not_remove_prerender": "Do not remove prerender fallback.",
         "rollback_path_required": "Rollback path required"
       }
-    }
+    },
+    "health_meta_description_length_one": "{{count}} characters (ideal: 150–160)",
+    "health_meta_description_length_other": "{{count}} characters (ideal: 150–160)",
+    "health_auto_sitemap_active_count_one": "Active — {{count}} URLs indexed",
+    "health_auto_sitemap_active_count_other": "Active — {{count}} URLs indexed",
+    "pass_count_one": "{{count}} pass",
+    "pass_count_other": "{{count}} pass",
+    "warning_count_one": "{{count}} warning",
+    "warning_count_other": "{{count}} warning",
+    "fail_count_one": "{{count}} fail",
+    "fail_count_other": "{{count}} fail",
+    "meta_description_count_one": "{{count}}/160 meta description characters",
+    "meta_description_count_other": "{{count}}/160 meta description characters",
+    "global_meta_description_count_one": "{{count}}/160 global meta description characters",
+    "global_meta_description_count_other": "{{count}}/160 global meta description characters",
+    "passed_count_with_value_one": "{{count}} passed",
+    "passed_count_with_value_other": "{{count}} passed",
+    "warnings_count_with_value_one": "{{count}} warnings",
+    "warnings_count_with_value_other": "{{count}} warnings",
+    "failed_count_with_value_one": "{{count}} failed",
+    "failed_count_with_value_other": "{{count}} failed",
+    "total_count_one": "Total: {{count}}",
+    "total_count_other": "Total: {{count}}",
+    "score_out_of": "out of {{maximum}}"
   },
   "email_deliverability": {
     "title": "Email Deliverability",
@@ -1606,7 +1702,11 @@
       "trigger_score": "Trigger score",
       "unconfirmed": "{{count}} accepted but unconfirmed",
       "webhook_confirmed": "Confirmed by provider webhook",
-      "window_days": "{{days}} day window"
+      "window_days": "{{days}} day window",
+      "unconfirmed_one": "{{count}} accepted but unconfirmed",
+      "unconfirmed_other": "{{count}} accepted but unconfirmed",
+      "bad_outcomes_one": "{{count}} failed, bounced, or suppressed",
+      "bad_outcomes_other": "{{count}} failed, bounced, or suppressed"
     },
     "status": {
       "bounced": "Bounced",
@@ -1968,6 +2068,8 @@
       "fcm": "Mobile sent/failed",
       "web": "Web delivered",
       "recent_failures": "Recent failures"
-    }
+    },
+    "trigger_coverage_one": "{{issues}} issues across {{count}} monitored flows",
+    "trigger_coverage_other": "{{issues}} issues across {{count}} monitored flows"
   }
 }

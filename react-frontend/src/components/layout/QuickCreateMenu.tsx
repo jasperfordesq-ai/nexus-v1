@@ -69,7 +69,7 @@ const createOptionDefs: CreateOptionDef[] = [
     descKey: 'quick_create.new_group_desc',
     href: '/groups/create',
     icon: Users,
-    color: 'from-purple-500 to-pink-600',
+    color: 'from-accent to-pink-600',
     feature: 'groups',
   },
   {
@@ -118,7 +118,7 @@ export function QuickCreateMenu({ isOpen, onClose }: QuickCreateMenuProps) {
         body: 'p-0',
       }}
     >
-      <ModalContent>
+      <ModalContent aria-label={t('quick_create.title')}>
         <ModalBody>
           <AnimatePresence>
             {isOpen && (

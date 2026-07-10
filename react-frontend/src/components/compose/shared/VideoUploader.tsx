@@ -94,8 +94,8 @@ export function VideoUploader({ onVideoSelect, onVideoRemove, selectedVideo }: V
 
       {selectedVideo && (
         <div className="flex items-center gap-3 p-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-elevated)]">
-          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-500/10">
-            <Video className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+          <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-accent/10">
+            <Video className="w-5 h-5 text-accent" aria-hidden="true" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate text-[var(--text-primary)]">

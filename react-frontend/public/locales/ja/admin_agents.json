@@ -130,7 +130,8 @@
         "run_failed_with_error": "実行に失敗しました: {{error}}",
         "toggle_failed": "エージェントの切り替えに失敗しました",
         "updated": "エージェントが更新されました",
-        "update_failed": "エージェントの更新に失敗しました"
+        "update_failed": "エージェントの更新に失敗しました",
+        "run_created_other": "#{{runId}} を実行して {{count}} プロポーザルを作成しました"
       }
     },
     "runs": {

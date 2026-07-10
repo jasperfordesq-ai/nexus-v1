@@ -34,7 +34,13 @@
     "tab_hours_review": "Revisión de horas",
     "tab_volunteers": "Voluntarios",
     "tab_wallet": "Billetera",
-    "tab_settings": "Ajustes"
+    "tab_settings": "Ajustes",
+    "review_applications_many": "Revisar las aplicaciones {{count}}",
+    "review_applications_one": "Revisar las aplicaciones {{count}}",
+    "review_applications_other": "Revisar las aplicaciones {{count}}",
+    "review_hours_many": "Revisar {{count}} Horas",
+    "review_hours_one": "Revisar {{count}} Horas",
+    "review_hours_other": "Revisar {{count}} Horas"
   },
   "page_title": "Voluntariado",
   "heading": "Voluntariado",
@@ -346,7 +352,16 @@
       "cancelled": "Cancelado"
     },
     "support_aria": "Apoyar este proyecto ({{count}} personas)",
-    "unsupport_aria": "Retirar tu apoyo ({{count}} personas)"
+    "unsupport_aria": "Retirar tu apoyo ({{count}} personas)",
+    "volunteers_needed_many": "{{count}} necesarios",
+    "volunteers_needed_one": "{{count}} necesarios",
+    "volunteers_needed_other": "{{count}} necesarios",
+    "unsupport_aria_many": "Retirar tu apoyo ({{count}} personas)",
+    "unsupport_aria_one": "Retirar tu apoyo ({{count}} personas)",
+    "unsupport_aria_other": "Retirar tu apoyo ({{count}} personas)",
+    "support_aria_many": "Apoyar este proyecto ({{count}} personas)",
+    "support_aria_one": "Apoyar este proyecto ({{count}} personas)",
+    "support_aria_other": "Apoyar este proyecto ({{count}} personas)"
   },
   "donations": {
     "heading": "Donaciones",
@@ -453,7 +468,10 @@
     "receipt_method": "Método de pago",
     "receipt_message": "Mensaje",
     "receipt_error": "No se pudo cargar el recibo.",
-    "receipt_not_found": "Recibo no encontrado."
+    "receipt_not_found": "Recibo no encontrado.",
+    "donors_count_many": "{{count}} donantes",
+    "donors_count_one": "{{count}} donantes",
+    "donors_count_other": "{{count}} donantes"
   },
   "safeguarding": {
     "heading": "Protección",
@@ -592,7 +610,10 @@
     "cancel": "Cancelar",
     "upload_credential": "Cargar credencial",
     "aria_remove_file": "Eliminar archivo seleccionado",
-    "aria_upload_document": "Subir documento de credencial"
+    "aria_upload_document": "Subir documento de credencial",
+    "expiring_soon_desc_many": "Las credenciales de {{count}} caducarán en un plazo de 30 días.",
+    "expiring_soon_desc_one": "Las credenciales de {{count}} caducarán en un plazo de 30 días.",
+    "expiring_soon_desc_other": "Las credenciales de {{count}} caducarán en un plazo de 30 días."
   },
   "waitlist": {
     "heading": "Mis listas de espera",
@@ -612,7 +633,10 @@
     "claim": "Reclamar lugar",
     "claim_success": "Ya estás dentro, ¡registrado para el turno!",
     "claim_failed": "No se pudo reclamar el lugar",
-    "claim_hint": "Se abrió un lugar para ti. Reclámelo pronto: los espacios no reclamados pasan a la siguiente persona después de 48 horas."
+    "claim_hint": "Se abrió un lugar para ti. Reclámelo pronto: los espacios no reclamados pasan a la siguiente persona después de 48 horas.",
+    "spots_many": "{{count}} lugares",
+    "spots_one": "{{count}} lugares",
+    "spots_other": "{{count}} lugares"
   },
   "swaps": {
     "heading": "Intercambios de turnos",
@@ -751,7 +775,16 @@
     "select_limit": "Puedes seleccionar como máximo {{max}} solicitudes a la vez.",
     "bulk_success": "{{count}} solicitudes actualizadas.",
     "bulk_failed": "No se pudieron actualizar {{count}} solicitudes.",
-    "bulk_rate_limited": "No se pudieron actualizar {{count}}: vas demasiado rápido. Espera un minuto y vuelve a intentarlo."
+    "bulk_rate_limited": "No se pudieron actualizar {{count}}: vas demasiado rápido. Espera un minuto y vuelve a intentarlo.",
+    "pending_count_many": "{{count}} pendiente",
+    "pending_count_one": "{{count}} pendiente",
+    "pending_count_other": "{{count}} pendiente",
+    "selected_count_many": "{{count}} seleccionado",
+    "selected_count_one": "{{count}} seleccionado",
+    "selected_count_other": "{{count}} seleccionado",
+    "decline_modal_description_many": "Agregue una nota para la solicitud {{count}} antes de rechazarla.",
+    "decline_modal_description_one": "Agregue una nota para la solicitud {{count}} antes de rechazarla.",
+    "decline_modal_description_other": "Agregue una nota para la solicitud {{count}} antes de rechazarla."
   },
   "org_wallet_balance": "Saldo de la billetera:",
   "auto_pay_on": "Pago automático activado",
@@ -845,7 +878,10 @@
     "organization_hours": "{{name}} ({{hours}}h)",
     "generated_on": "Generado",
     "download": "Descargar",
-    "verify": "Verificar"
+    "verify": "Verificar",
+    "verified_hours_many": "{{count}} Horas Verificadas",
+    "verified_hours_one": "{{count}} Horas Verificadas",
+    "verified_hours_other": "{{count}} Horas Verificadas"
   },
   "emergency": {
     "title": "Alertas de Emergencia",
@@ -866,7 +902,10 @@
     "respond_error": "Error al responder a la alerta.",
     "respond_error_generic": "Error al responder a la alerta. Por favor, inténtelo de nuevo.",
     "from": "De",
-    "expires": "Expira"
+    "expires": "Expira",
+    "pending_count_many": "{{count}} pendientes",
+    "pending_count_one": "{{count}} pendientes",
+    "pending_count_other": "{{count}} pendientes"
   },
   "wellbeing": {
     "heading": "Bienestar del Voluntario",
@@ -1039,5 +1078,11 @@
   "form_remote_description": "Los voluntarios pueden participar online o por teléfono.",
   "my_organisations_declined": "Rechazada",
   "my_organisations_declined_desc": "Esta solicitud no fue aprobada. Ponte en contacto con la administración de tu comunidad para más detalles.",
-  "hours_invalid_range": "Introduce entre 0,25 y 24 horas."
+  "hours_invalid_range": "Introduce entre 0,25 y 24 horas.",
+  "org_callout_you_manage_many_many": "Administras organizaciones {{count}}",
+  "org_callout_you_manage_many_one": "Administras organizaciones {{count}}",
+  "org_callout_you_manage_many_other": "Administras organizaciones {{count}}",
+  "more_sections_many": "More ({{count}})",
+  "more_sections_one": "Más ({{count}})",
+  "more_sections_other": "Más ({{count}})"
 }

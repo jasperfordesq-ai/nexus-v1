@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -404,7 +405,7 @@ export function CommunityFund() {
         sortable: true,
         render: (transaction) => (
           <span className="text-sm text-muted">
-            {new Date(transaction.created_at).toLocaleString()}
+            {new Date(transaction.created_at).toLocaleString(getFormattingLocale())}
           </span>
         ),
       },

@@ -11,6 +11,7 @@ import { Label } from '@heroui/react/label';
 import { ListBox, type ListBox as HeroListBoxTypes } from '@heroui/react/list-box';
 import { Select as HeroSelect, type Select as HeroSelectTypes } from '@heroui/react/select';
 import { Separator } from '@heroui/react/separator';
+import { Spinner } from '@heroui/react/spinner';
 import { cn } from '@/lib/helpers';
 
 type HeroSelectProps = HeroSelectTypes['Props'];
@@ -34,6 +35,12 @@ interface LegacySelectClassNames {
   selectorIcon?: string;
   trigger?: string;
   value?: string;
+}
+
+interface LegacySelectItemClassNames {
+  base?: string;
+  description?: string;
+  title?: string;
 }
 
 export interface SelectProps<T extends object = object>
@@ -74,7 +81,7 @@ export interface SelectProps<T extends object = object>
   selectedKeys?: SelectionLike;
   selectorIcon?: ReactNode;
   selectionMode?: 'single' | 'multiple';
-  size?: string;
+  size?: 'sm' | 'md' | 'lg';
   startContent?: ReactNode;
   value?: HeroSelectProps['value'];
   variant?: HeroSelectProps['variant'] | 'flat' | 'faded' | 'bordered' | 'underlined';
@@ -92,7 +99,7 @@ export function Select<T extends object = object>({
   endContent,
   errorMessage,
   isClearable: _isClearable,
-  isLoading: _isLoading,
+  isLoading = false,
   items,
   label,
   labelPlacement: _labelPlacement,
@@ -105,7 +112,7 @@ export function Select<T extends object = object>({
   scrollShadowProps: _scrollShadowProps,
   selectedKeys,
   selectorIcon,
-  size: _size,
+  size = 'md',
   startContent,
   value,
   variant,
@@ -119,7 +126,10 @@ export function Select<T extends object = object>({
     <HeroSelectCompat
       {...props}
       className={cn(classNames?.base, classNames?.mainWrapper, className)}
+      data-loading={isLoading || undefined}
+      data-size={size}
       defaultValue={resolvedDefaultValue}
+      isDisabled={Boolean(props.isDisabled || isLoading)}
       items={items}
       onChange={(nextValue: SelectKey | readonly SelectKey[] | null) => {
         const values = valueToArray(nextValue);
@@ -130,10 +140,10 @@ export function Select<T extends object = object>({
         onChange?.({ target: { value: firstValue }, currentTarget: { value: firstValue } });
       }}
       value={resolvedValue}
-      variant={variant === 'bordered' || variant === 'underlined' ? 'secondary' : mapVariant(variant)}
+      variant={variant === 'underlined' ? 'secondary' : mapVariant(variant)}
     >
       {label && <Label className={classNames?.label}>{label}</Label>}
-      <HeroSelect.Trigger className={classNames?.trigger}>
+      <HeroSelect.Trigger className={cn(SELECT_TRIGGER_SIZE_CLASSES[size], classNames?.trigger)}>
         {startContent}
         <HeroSelect.Value className={classNames?.value}>
           {renderValue
@@ -148,7 +158,11 @@ export function Select<T extends object = object>({
             : undefined}
         </HeroSelect.Value>
         {endContent}
-        <HeroSelect.Indicator className={classNames?.selectorIcon}>{selectorIcon}</HeroSelect.Indicator>
+        {isLoading ? (
+          <Spinner aria-hidden="true" className="shrink-0" size="sm" />
+        ) : (
+          <HeroSelect.Indicator className={classNames?.selectorIcon}>{selectorIcon}</HeroSelect.Indicator>
+        )}
       </HeroSelect.Trigger>
       {description && <Description className={classNames?.description}>{description}</Description>}
       <HeroSelect.Popover
@@ -173,10 +187,16 @@ export function Select<T extends object = object>({
   );
 }
 
+const SELECT_TRIGGER_SIZE_CLASSES: Record<NonNullable<SelectProps['size']>, string> = {
+  sm: 'min-h-8 px-2 py-1 text-sm',
+  md: 'min-h-9 px-3 py-2 text-sm',
+  lg: 'min-h-12 px-4 py-3 text-base',
+};
+
 export interface SelectItemProps
   extends Omit<HeroListBoxItemProps, 'children' | 'id' | 'textValue' | 'variant'> {
   children?: ReactNode;
-  classNames?: { base?: string; description?: string; title?: string };
+  classNames?: LegacySelectItemClassNames;
   color?: string;
   description?: ReactNode;
   endContent?: ReactNode;
@@ -212,11 +232,11 @@ export function SelectItem({
       {startContent}
       {description ? (
         <div className="flex flex-col">
-          {renderLabel(children)}
+          {renderLabel(children, classNames?.title)}
           <Description className={classNames?.description}>{description}</Description>
         </div>
       ) : (
-        renderLabel(children)
+        renderLabel(children, classNames?.title)
       )}
       {endContent}
       <ListBox.ItemIndicator />
@@ -272,9 +292,13 @@ function valueToArray(value: SelectKey | readonly SelectKey[] | null) {
   return value == null ? [] : [value];
 }
 
-function renderLabel(children: ReactNode) {
+function renderLabel(children: ReactNode, className?: string) {
   if (typeof children === 'string' || typeof children === 'number') {
-    return <Label>{children}</Label>;
+    return <Label className={className}>{children}</Label>;
+  }
+
+  if (className) {
+    return <span className={className}>{children}</span>;
   }
 
   return children;

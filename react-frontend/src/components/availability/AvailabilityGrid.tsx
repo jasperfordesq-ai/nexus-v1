@@ -279,7 +279,7 @@ export function AvailabilityGrid({
       {editable && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+            <Calendar className="w-5 h-5 text-accent" aria-hidden="true" />
             <h3 className="font-semibold text-theme-primary">{tAvail('set_your_availability')}</h3>
           </div>
           {isDirty && (

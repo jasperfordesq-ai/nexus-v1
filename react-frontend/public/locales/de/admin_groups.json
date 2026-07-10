@@ -360,7 +360,9 @@
     "geocode_description": "Geokodieren Sie Gruppenstandorte, um die Kartenanzeige und die entfernungsbasierte Erkennung zu ermöglichen.",
     "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet.",
     "detail_tabs_aria": "Gruppendetailabschnitte",
-    "status_tabs_aria": "Gruppenstatusfilter"
+    "status_tabs_aria": "Gruppenstatusfilter",
+    "selected_count_one": "{{count}}ausgewählt",
+    "selected_count_other": "{{count}}ausgewählt"
   },
   "group_organization": {
     "page_title": "Gruppenorganisation",

@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Chip, Button, Spinner, Textarea, Input, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import {
   useEffect,
@@ -298,12 +299,12 @@ export function GdprRequestDetail() {
                 </div>
                 <div>
                   <p className="text-sm text-muted">{t('enterprise.gdpr_created')}</p>
-                  <p className="font-medium">{new Date(request.created_at).toLocaleString()}</p>
+                  <p className="font-medium">{new Date(request.created_at).toLocaleString(getFormattingLocale())}</p>
                 </div>
                 {request.completed_at && (
                   <div>
                     <p className="text-sm text-muted">{t('enterprise.gdpr_completed')}</p>
-                    <p className="font-medium">{new Date(request.completed_at).toLocaleString()}</p>
+                    <p className="font-medium">{new Date(request.completed_at).toLocaleString(getFormattingLocale())}</p>
                   </div>
                 )}
               </div>
@@ -360,7 +361,7 @@ export function GdprRequestDetail() {
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-xs text-muted">
-                              {new Date(entry.created_at).toLocaleString()}
+                              {new Date(entry.created_at).toLocaleString(getFormattingLocale())}
                             </span>
                             <Chip
                               size="sm"
@@ -405,7 +406,7 @@ export function GdprRequestDetail() {
             <CardBody className="p-4 space-y-3">
               <div>
                 <p className="text-sm text-muted">{t('enterprise.gdpr_deadline')}</p>
-                <p className="font-medium">{slaDeadline.toLocaleDateString()}</p>
+                <p className="font-medium">{slaDeadline.toLocaleDateString(getFormattingLocale())}</p>
               </div>
               <div>
                 <p className="mb-1 text-sm text-muted">

@@ -104,7 +104,10 @@
       "stats": {
         "total_runs": "carreras totales",
         "total_proposals": "propuestas totales",
-        "pending_review": "{{count}} pendiente de revisión"
+        "pending_review": "{{count}} pendiente de revisión",
+        "pending_review_many": "{{count}} pendiente de revisión",
+        "pending_review_one": "{{count}} pendiente de revisión",
+        "pending_review_other": "{{count}} pendiente de revisión"
       },
       "agent_types": {
         "activity_summary": "Resumen de actividad",
@@ -219,7 +222,10 @@
         "proposals_table_aria": "Ejecutar propuestas",
         "columns": {
           "subject": "Sujeto"
-        }
+        },
+        "proposals_count_many": "Propuestas ({{count}})",
+        "proposals_count_one": "Propuestas ({{count}})",
+        "proposals_count_other": "Propuestas ({{count}})"
       },
       "toasts": {
         "approve_eligible_failed": "No se pudieron aprobar las propuestas elegibles.",
@@ -235,7 +241,10 @@
         "run_details_load_failed": "No se pudieron cargar los detalles de la ejecución.",
         "run_trigger_failed": "No se pudo activar la ejecución.",
         "run_triggered": "Ejecución activada: propuestas {{count}} generadas.",
-        "runs_load_failed": "No se pudieron cargar las ejecuciones."
+        "runs_load_failed": "No se pudieron cargar las ejecuciones.",
+        "run_triggered_many": "Ejecución activada: propuestas {{count}} generadas.",
+        "run_triggered_one": "Ejecución activada: propuestas {{count}} generadas.",
+        "run_triggered_other": "Ejecución activada: propuestas {{count}} generadas."
       }
     },
     "module_docs": {
@@ -302,7 +311,10 @@
         "save_failed": "Error al guardar.",
         "seed_failed": "La semilla falló.",
         "seeded": "Documentos predeterminados {{count}} inicializados.",
-        "updated": "Documento actualizado."
+        "updated": "Documento actualizado.",
+        "seeded_many": "Documentos predeterminados {{count}} inicializados.",
+        "seeded_one": "Documentos predeterminados {{count}} inicializados.",
+        "seeded_other": "Documentos predeterminados {{count}} inicializados."
       }
     },
     "trace_metrics": {

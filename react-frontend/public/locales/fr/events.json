@@ -139,7 +139,28 @@
     "delete_series_note": "Il s'agit d'un événement récurrent. Sa suppression supprimera également toutes ses occurrences futures.",
     "cancel_series_note": "Il s'agit d'un événement récurrent. Son annulation annulera également toutes les occurrences futures et leurs participants seront informés.",
     "series_dates_title": "Dates à venir dans cette série",
-    "series_this_date": "Cette date"
+    "series_this_date": "Cette date",
+    "events_in_series_many": "{{count}} événements dans la série",
+    "events_in_series_one": "{{count}} événements dans la série",
+    "events_in_series_other": "{{count}} événements dans la série",
+    "max_capacity_many": "Capacité max. {{count}}",
+    "max_capacity_one": "Capacité max. {{count}}",
+    "max_capacity_other": "Capacité max. {{count}}",
+    "spots_left_many": "{{count}} places restantes",
+    "spots_left_one": "{{count}} places restantes",
+    "spots_left_other": "{{count}} places restantes",
+    "waitlist_count_many": "{{count}} en liste d'attente",
+    "waitlist_count_one": "{{count}} en liste d'attente",
+    "waitlist_count_other": "{{count}} en liste d'attente",
+    "more_attendees_many": "+{{count}} de plus",
+    "more_attendees_one": "+{{count}} de plus",
+    "more_attendees_other": "+{{count}} de plus",
+    "attendance_total_many": "{{count}} réponses",
+    "attendance_total_one": "{{count}} réponses",
+    "attendance_total_other": "{{count}} réponses",
+    "view_all_series_many": "Voir les {{count}} événements de la série",
+    "view_all_series_one": "Voir les {{count}} événements de la série",
+    "view_all_series_other": "Voir les {{count}} événements de la série"
   },
   "card": {
     "cancelled": "Annulé",
@@ -152,7 +173,11 @@
     "repeats_yearly": "Se répète chaque année",
     "repeats_generic": "Recurring",
     "series_dates_one": "{{count}} date",
-    "series_dates_other": "{{count}} dates"
+    "series_dates_other": "{{count}} dates",
+    "series_dates_many": "{{count}} dates",
+    "spots_left_many": "{{count}} places restantes",
+    "spots_left_one": "{{count}} places restantes",
+    "spots_left_other": "{{count}} places restantes"
   },
   "form": {
     "create_title": "Créer un nouvel événement",
@@ -300,7 +325,10 @@
     "total_votes": "{{count}} voix",
     "vote_success": "Vote enregistré !",
     "vote_failed": "Impossible d'enregistrer le vote",
-    "view_full": "Voir le sondage complet"
+    "view_full": "Voir le sondage complet",
+    "total_votes_many": "{{count}} voix",
+    "total_votes_one": "{{count}} voix",
+    "total_votes_other": "{{count}} voix"
   },
   "radius_5": "5km",
   "radius_10": "10km",
@@ -318,5 +346,11 @@
   "active_filters": "Filtres actifs",
   "active_search": "Rechercher : {{query}}",
   "active_near_me": "Dans un rayon de {{radius}} km",
-  "clear_filters": "Effacer les filtres"
+  "clear_filters": "Effacer les filtres",
+  "going_many": "{{count}} participant(s)",
+  "going_one": "{{count}} participant(s)",
+  "going_other": "{{count}} participant(s)",
+  "interested_many": "{{count}} intéressé(s)",
+  "interested_one": "{{count}} intéressé(s)",
+  "interested_other": "{{count}} intéressé(s)"
 }

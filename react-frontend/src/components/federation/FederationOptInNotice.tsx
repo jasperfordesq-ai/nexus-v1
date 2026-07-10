@@ -21,9 +21,9 @@ export function FederationOptInNotice() {
   const { tenantPath } = useTenant();
 
   return (
-    <GlassCard className="p-4 border-l-4 border-indigo-500 bg-indigo-500/10">
+    <GlassCard className="p-4 border-l-4 border-accent bg-accent/10">
       <div className="flex items-start gap-3">
-        <Globe className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" aria-hidden="true" />
+        <Globe className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" aria-hidden="true" />
         <div className="flex-1">
           <h3 className="font-semibold text-theme-primary">{t('optin_notice.title')}</h3>
           <p className="text-sm text-theme-muted mt-1">{t('optin_notice.description')}</p>
@@ -32,7 +32,7 @@ export function FederationOptInNotice() {
           as={Link}
           to={tenantPath('/federation/onboarding')}
           size="sm"
-          className="bg-indigo-500 text-white flex-shrink-0"
+          className="bg-accent text-white flex-shrink-0"
         >
           {t('optin_notice.cta')}
         </Button>

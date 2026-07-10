@@ -89,7 +89,19 @@
     "no_members_found": "لم يتم العثور على أعضاء يتطابقون مع بحثك.",
     "done": "تم",
     "aria_exchange_participants": "مشاركو المبادلة",
-    "aria_hour_split": "تقسيم الساعات"
+    "aria_hour_split": "تقسيم الساعات",
+    "participants_heading_few": "المشاركون ({{count}})",
+    "participants_heading_many": "المشاركون ({{count}})",
+    "participants_heading_one": "المشاركون ({{count}})",
+    "participants_heading_other": "المشاركون ({{count}})",
+    "participants_heading_two": "المشاركون ({{count}})",
+    "participants_heading_zero": "المشاركون ({{count}})",
+    "hours_amount_few": "{{count}}س",
+    "hours_amount_many": "{{count}}س",
+    "hours_amount_one": "{{count}}س",
+    "hours_amount_other": "{{count}}س",
+    "hours_amount_two": "{{count}}س",
+    "hours_amount_zero": "{{count}}س"
   },
   "create": {
     "page_title": "إنشاء مبادلة جماعية",
@@ -148,7 +160,19 @@
     "step_of_named": "الخطوة {{current}} من {{total}}: {{name}}",
     "hours_value": "{{hours}}س",
     "hours_suffix": "س",
-    "weight_suffix": "×"
+    "weight_suffix": "×",
+    "providers_count_few": "المزودون ({{count}})",
+    "providers_count_many": "المزودون ({{count}})",
+    "providers_count_one": "المزودون ({{count}})",
+    "providers_count_other": "المزودون ({{count}})",
+    "providers_count_two": "المزودون ({{count}})",
+    "providers_count_zero": "المزودون ({{count}})",
+    "receivers_count_few": "المستلمون ({{count}})",
+    "receivers_count_many": "المستلمون ({{count}})",
+    "receivers_count_one": "المستلمون ({{count}})",
+    "receivers_count_other": "المستلمون ({{count}})",
+    "receivers_count_two": "المستلمون ({{count}})",
+    "receivers_count_zero": "المستلمون ({{count}})"
   },
   "toast": {
     "exchange_started": "بدأ التبادل",
@@ -189,5 +213,13 @@
     }
   },
   "role_provider": "Provider",
-  "role_receiver": "Receiver"
+  "role_receiver": "Receiver",
+  "participants_count_few": "{{count}} مشاركون",
+  "participants_count_many": "{{count}} مشاركون",
+  "participants_count_two": "{{count}} مشاركون",
+  "participants_count_zero": "{{count}} مشاركون",
+  "hours_count_few": "{{count}} ساعات",
+  "hours_count_many": "{{count}} ساعات",
+  "hours_count_two": "{{count}} ساعات",
+  "hours_count_zero": "{{count}} ساعات"
 }

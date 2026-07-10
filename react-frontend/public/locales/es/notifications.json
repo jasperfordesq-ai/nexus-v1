@@ -31,7 +31,10 @@
     "empty": "Sin notificaciones aún",
     "view_all": "Ver todas las notificaciones",
     "close": "Cerrar notificaciones",
-    "unread_dot_aria": "Sin leer"
+    "unread_dot_aria": "Sin leer",
+    "bell_unread_aria_many": "Notificaciones, {{count}} sin leer",
+    "bell_unread_aria_one": "Notificaciones, {{count}} sin leer",
+    "bell_unread_aria_other": "Notificaciones, {{count}} sin leer"
   },
   "type": {
     "message": "Mensaje",
@@ -96,5 +99,14 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "unread_badge_many": "{{count}} nuevas",
+  "unread_badge_one": "{{count}} nuevas",
+  "unread_badge_other": "{{count}} nuevas",
+  "filter_unread_many": "Sin leer ({{count}})",
+  "filter_unread_one": "Sin leer ({{count}})",
+  "filter_unread_other": "Sin leer ({{count}})",
+  "and_others_many": "y {{count}} más",
+  "and_others_one": "y {{count}} más",
+  "and_others_other": "y {{count}} más"
 }

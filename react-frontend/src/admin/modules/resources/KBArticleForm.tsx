@@ -1,4 +1,3 @@
-import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Switch, Tabs, Tab, useConfirm } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,10 +14,25 @@ import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Texta
  * Detects edit mode via URL param `:id`.
  */
 
-import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { Separator } from '@/components/ui';
+import {
+  CardBody,
+  Card,
+  Select,
+  SelectItem,
+  Button,
+  Chip,
+  Spinner,
+  Input,
+  Textarea,
+  Switch,
+  Tabs,
+  Tab,
+  useConfirm,
+  Separator,
+} from '@/components/ui';
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
 );
@@ -95,7 +109,6 @@ export function KBArticleForm() {
   const { tenantPath } = useTenant();
   const toast = useToast();
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Loading states
   const [loading, setLoading] = useState(isEdit);
@@ -523,38 +536,39 @@ export function KBArticleForm() {
 
             {/* Content — Upload mode drop zone */}
             {mode === 'upload' && !content && (
-              <div
+              <label
+                htmlFor="kb-article-upload"
                 onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                 onDragLeave={() => setIsDragging(false)}
                 onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
                 className={`
-                  flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-10 cursor-pointer transition-colors
+                  flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-10 transition-colors
+                  focus-within:outline-none focus-within:ring-2 focus-within:ring-focus focus-within:ring-offset-2 focus-within:ring-offset-background
                   ${isDragging
                     ? 'border-accent bg-accent/5'
                     : 'border-border hover:border-accent hover:bg-surface-secondary'
                   }
                 `}
               >
-                <Upload size={32} className="text-muted" />
+                <Upload size={32} className="text-muted" aria-hidden="true" />
                 <div className="text-center">
                   <p className="text-sm font-medium text-foreground">
                     {t('resources.drop_file')}
                   </p>
-                  <p className="text-xs text-muted mt-1">
+                  <p id="kb-article-upload-formats" className="text-xs text-muted mt-1">
                     {t('resources.supported_formats')}
                   </p>
                 </div>
                 <input
-                  ref={fileInputRef}
+                  id="kb-article-upload"
                   type="file"
                   accept={ACCEPTED_FILE_TYPES}
                   onChange={handleFileSelect}
-                  className="hidden"
-                  aria-hidden="true"
-                  tabIndex={-1}
+                  className="sr-only"
+                  aria-label={t('resources.drop_file')}
+                  aria-describedby="kb-article-upload-formats"
                 />
-              </div>
+              </label>
             )}
 
             {/* Pending file indicator */}

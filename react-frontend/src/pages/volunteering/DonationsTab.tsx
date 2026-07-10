@@ -7,6 +7,7 @@
  * DonationsTab - Active giving days with progress and donation history
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { lazy, Suspense, useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from '@/lib/motion';
 
@@ -307,7 +308,7 @@ export function DonationsTab() {
           <GlassCard className="p-3 text-center">
             <p className="text-xs text-theme-muted">{t('donations.stats.total_raised')}</p>
             <p className="text-lg font-bold text-theme-primary">
-              {stats.total_raised.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {stats.total_raised.toLocaleString(getFormattingLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </GlassCard>
           <GlassCard className="p-3 text-center">
@@ -396,7 +397,7 @@ export function DonationsTab() {
                         <div className="flex flex-wrap items-center gap-3 text-xs text-theme-subtle">
                           <span className="flex items-center gap-1">
                             <Banknote className="w-3 h-3" aria-hidden="true" />
-                            {day.raised_amount.toLocaleString()} / {day.goal_amount.toLocaleString()}
+                            {day.raised_amount.toLocaleString(getFormattingLocale())} / {day.goal_amount.toLocaleString(getFormattingLocale())}
                           </span>
                           <span className="flex items-center gap-1">
                             <Users className="w-3 h-3" aria-hidden="true" />
@@ -404,7 +405,7 @@ export function DonationsTab() {
                           </span>
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" aria-hidden="true" />
-                            {new Date(day.ends_at ?? day.end_date).toLocaleDateString()}
+                            {new Date(day.ends_at ?? day.end_date).toLocaleDateString(getFormattingLocale())}
                           </span>
                         </div>
                       </div>
@@ -455,7 +456,7 @@ export function DonationsTab() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-semibold text-theme-primary">
-                          {d.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          {d.amount.toLocaleString(getFormattingLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                         <Chip size="sm" color={STATUS_COLOR[d.status] || 'default'} variant="soft">
                           {t(`donations.status.${d.status}`)}
@@ -474,7 +475,7 @@ export function DonationsTab() {
                         </span>
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" aria-hidden="true" />
-                          {new Date(d.created_at).toLocaleDateString()}
+                          {new Date(d.created_at).toLocaleDateString(getFormattingLocale())}
                         </span>
                       </div>
                       {d.message && (

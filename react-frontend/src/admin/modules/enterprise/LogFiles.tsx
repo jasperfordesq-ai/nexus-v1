@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { CardBody, Card, Button, Chip, Spinner, Input } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -206,7 +207,7 @@ export function LogFiles() {
                         </span>
                       </div>
                       <p className="text-xs text-muted mt-1">
-                        {new Date(file.modified_at).toLocaleString()}
+                        {new Date(file.modified_at).toLocaleString(getFormattingLocale())}
                       </p>
                     </div>
                     <Button

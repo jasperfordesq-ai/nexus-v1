@@ -218,7 +218,9 @@
     "smart_search_text_chip": "Recherche : {{query}}",
     "role_super_admin": "Super administrateur",
     "permissions_editor_unavailable_title": "Les autorisations sont en lecture seule ici",
-    "permissions_editor_unavailable_desc": "Cette page affiche le rôle de l'utilisateur et les autorisations accordées, mais ne permet pas de les modifier. Gérez l'accès en modifiant le rôle de l'utilisateur sur la page de modification."
+    "permissions_editor_unavailable_desc": "Cette page affiche le rôle de l'utilisateur et les autorisations accordées, mais ne permet pas de les modifier. Gérez l'accès en modifiant le rôle de l'utilisateur sur la page de modification.",
+    "role_unknown": "Rôle inconnu",
+    "role_tenant_super_admin": "Super-administrateur du locataire"
   },
   "user_edit": {
     "actions": {

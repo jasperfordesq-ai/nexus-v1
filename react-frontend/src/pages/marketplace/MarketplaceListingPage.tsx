@@ -56,7 +56,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveThumbnailUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveThumbnailUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
@@ -667,7 +667,7 @@ export function MarketplaceListingPage() {
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" aria-hidden="true" />
-                  {new Date(listing.created_at).toLocaleDateString()}
+                  {new Date(listing.created_at).toLocaleDateString(getFormattingLocale())}
                 </span>
               </div>
 

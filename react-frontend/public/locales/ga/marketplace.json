@@ -92,7 +92,17 @@
     "get_directions": "Treoracha",
     "promoted": "Cur chun cinn",
     "unsave": "Bain ó shábháilte",
-    "save": "Sábháil liostáil"
+    "save": "Sábháil liostáil",
+    "available_count_few": "{{count}} ar fáil",
+    "available_count_many": "{{count}} ar fáil",
+    "available_count_one": "{{count}} ar fáil",
+    "available_count_other": "{{count}} ar fáil",
+    "available_count_two": "{{count}} ar fáil",
+    "views_count_few": "{{count}} amharc",
+    "views_count_many": "{{count}} amharc",
+    "views_count_one": "{{count}} amharc",
+    "views_count_other": "{{count}} amharc",
+    "views_count_two": "{{count}} amharc"
   },
   "offer": {
     "modal_title": "Déan Tairiscint",
@@ -184,7 +194,12 @@
     "created_success": "D'éirigh le cruthú an liosta!",
     "created_error": "Theip ar chruthú an liosta",
     "created_error_retry": "Theip ar chruthú an liosta. Bain triail eile as.",
-    "draft_saved": "Dréacht sábháilte"
+    "draft_saved": "Dréacht sábháilte",
+    "title_char_count_few": "{{count}}/120 carachtar",
+    "title_char_count_many": "{{count}}/120 carachtar",
+    "title_char_count_one": "{{count}}/120 carachtar",
+    "title_char_count_other": "{{count}}/120 carachtar",
+    "title_char_count_two": "{{count}}/120 carachtar"
   },
   "search": {
     "category_search": "Cuardaigh catagóirí...",
@@ -228,7 +243,15 @@
     "price_from": "Ó {{min}}",
     "price_up_to": "Suas le {{max}}",
     "last_days_one": "{{count}} lá seo caite",
-    "last_days_other": "{{count}} lá seo caite"
+    "last_days_other": "{{count}} lá seo caite",
+    "reset_filters_few": "Athshocraigh Scagairí ({{count}})",
+    "reset_filters_many": "Athshocraigh Scagairí ({{count}})",
+    "reset_filters_one": "Athshocraigh Scagairí ({{count}})",
+    "reset_filters_other": "Athshocraigh Scagairí ({{count}})",
+    "reset_filters_two": "Athshocraigh Scagairí ({{count}})",
+    "results_count_few": "{{count}} toradh",
+    "results_count_many": "{{count}} toradh",
+    "results_count_two": "{{count}} toradh"
   },
   "seller": {
     "page_title": "Próifíl an Díoltóra",
@@ -285,7 +308,18 @@
     "results_count_one": "{{count}} toradh",
     "results_count_other": "{{count}} toradh",
     "load_more": "Luchtaigh Tuilleadh",
-    "browse_description": "Brabhsáil liostaí {{name}} sa mhargadh."
+    "browse_description": "Brabhsáil liostaí {{name}} sa mhargadh.",
+    "reset_filters_few": "Athshocraigh Scagairí ({{count}})",
+    "reset_filters_many": "Athshocraigh Scagairí ({{count}})",
+    "reset_filters_one": "Athshocraigh Scagairí ({{count}})",
+    "reset_filters_other": "Athshocraigh Scagairí ({{count}})",
+    "reset_filters_two": "Athshocraigh Scagairí ({{count}})",
+    "listings_count_few": "{{count}} liosta",
+    "listings_count_many": "{{count}} liosta",
+    "listings_count_two": "{{count}} liosta",
+    "results_count_few": "{{count}} toradh",
+    "results_count_many": "{{count}} toradh",
+    "results_count_two": "{{count}} toradh"
   },
   "common": {
     "loading": "Á Lódáil...",
@@ -426,7 +460,12 @@
     "empty_sold_title": "Gan Díolacháin Fós",
     "empty_sold_description": "Níor dhíol tú aon earra fós.",
     "empty_expired_title": "Gan Liostaí in Éag",
-    "empty_expired_description": "Níl aon liostaí in éag agat."
+    "empty_expired_description": "Níl aon liostaí in éag agat.",
+    "views_count_aria_few": "{{count}} amharc",
+    "views_count_aria_many": "{{count}} amharc",
+    "views_count_aria_one": "{{count}} amharc",
+    "views_count_aria_other": "{{count}} amharc",
+    "views_count_aria_two": "{{count}} amharc"
   },
   "my_offers": {
     "page_title": "Mo Thairiscintí - Margadh",
@@ -485,7 +524,10 @@
     "empty_collections_title": "Gan Bailiúcháin Fós",
     "empty_collections_description": "Cruthaigh bailiúchán chun na hearraí margaidh is fearr leat a eagrú.",
     "sign_in_title": "Síniú Isteach de Dhíth",
-    "sign_in_description": "Sínigh isteach chun do bhailiúcháin agus cuardaigh shábháilte a bhainistiú."
+    "sign_in_description": "Sínigh isteach chun do bhailiúcháin agus cuardaigh shábháilte a bhainistiú.",
+    "item_count_few": "{{count}} earra",
+    "item_count_many": "{{count}} earra",
+    "item_count_two": "{{count}} earra"
   },
   "saved_searches": {
     "tab_title": "Cuardaigh Shábháilte",
@@ -518,7 +560,13 @@
     "duration_days_one": "{{count}} lá",
     "duration_days_other": "{{count}} lá",
     "duration_hours_one": "{{count}} uair",
-    "duration_hours_other": "{{count}} uair"
+    "duration_hours_other": "{{count}} uair",
+    "duration_days_few": "{{count}} lá",
+    "duration_days_many": "{{count}} lá",
+    "duration_days_two": "{{count}} lá",
+    "duration_hours_few": "{{count}} uair",
+    "duration_hours_many": "{{count}} uair",
+    "duration_hours_two": "{{count}} uair"
   },
   "free": {
     "page_title": "Earraí Saor in Aisce",
@@ -584,7 +632,22 @@
       "declined": "Diúltaithe",
       "completed": "Críochnaithe",
       "cancelled": "Cealaithe"
-    }
+    },
+    "offers_title_count_few": "Tairiscintí seachadta ({{count}})",
+    "offers_title_count_many": "Tairiscintí seachadta ({{count}})",
+    "offers_title_count_one": "Tairiscintí seachadta ({{count}})",
+    "offers_title_count_other": "Tairiscintí seachadta ({{count}})",
+    "offers_title_count_two": "Tairiscintí seachadta ({{count}})",
+    "time_credits_value_few": "{{count}} CA",
+    "time_credits_value_many": "{{count}} CA",
+    "time_credits_value_one": "{{count}} CA",
+    "time_credits_value_other": "{{count}} CA",
+    "time_credits_value_two": "{{count}} CA",
+    "estimated_minutes_few": "~{{count}} nóim",
+    "estimated_minutes_many": "~{{count}} nóim",
+    "estimated_minutes_one": "~{{count}} nóim",
+    "estimated_minutes_other": "~{{count}} nóim",
+    "estimated_minutes_two": "~{{count}} nóim"
   },
   "pickup": {
     "my_pickups_title": "Mo bhailiúcháin",
@@ -613,7 +676,17 @@
     "oversold_protected": "Diúltaigh d'orduithe a sháródh an stoc",
     "sold_out": "Díolta amach",
     "low_chip": "Stoc: {{count}} (Íseal)",
-    "count_chip": "Stoc: {{count}}"
+    "count_chip": "Stoc: {{count}}",
+    "low_chip_few": "Stoc: {{count}} (Íseal)",
+    "low_chip_many": "Stoc: {{count}} (Íseal)",
+    "low_chip_one": "Stoc: {{count}} (Íseal)",
+    "low_chip_other": "Stoc: {{count}} (Íseal)",
+    "low_chip_two": "Stoc: {{count}} (Íseal)",
+    "count_chip_few": "Stoc: {{count}}",
+    "count_chip_many": "Stoc: {{count}}",
+    "count_chip_one": "Stoc: {{count}}",
+    "count_chip_other": "Stoc: {{count}}",
+    "count_chip_two": "Stoc: {{count}}"
   },
   "ai_reply": {
     "suggest": "Mol Freagra",
@@ -647,7 +720,12 @@
     "search_this_area": "Cuardaigh an Limistéar Seo",
     "distance_km": "{{km}} km ar shiúl",
     "distance_meters": "{{m}}m ar shiúl",
-    "view_toggle": "Mód amhairc"
+    "view_toggle": "Mód amhairc",
+    "results_count_few": "{{count}} liosta aimsithe in aice láimhe",
+    "results_count_many": "{{count}} liosta aimsithe in aice láimhe",
+    "results_count_one": "{{count}} liosta aimsithe in aice láimhe",
+    "results_count_other": "{{count}} liosta aimsithe in aice láimhe",
+    "results_count_two": "{{count}} liosta aimsithe in aice láimhe"
   },
   "shipping": {
     "title": "Roghanna Loingseoireachta",
@@ -778,7 +856,12 @@
       "select_rating": "Roghnaigh rátáil, le do thoil",
       "success": "Cuireadh an rátáil isteach go rathúil!",
       "error": "Theip ar chur isteach na rátála"
-    }
+    },
+    "quantity_multiplier_few": "×{{count}}",
+    "quantity_multiplier_many": "×{{count}}",
+    "quantity_multiplier_one": "×{{count}}",
+    "quantity_multiplier_other": "×{{count}}",
+    "quantity_multiplier_two": "×{{count}}"
   },
   "onboarding": {
     "page_title": "Ionduchtú an Díoltóra - Margadh",

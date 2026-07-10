@@ -132,6 +132,8 @@
     "no_challenges_found": "No challenges found found",
     "no_matching_challenges": "No matching challenges found",
     "no_status_challenges": "No status challenges found",
-    "tabs_aria": "Challenge status filter"
+    "tabs_aria": "Challenge status filter",
+    "total_count_one": "Total: {{count}}",
+    "total_count_other": "Total: {{count}}"
   }
 }

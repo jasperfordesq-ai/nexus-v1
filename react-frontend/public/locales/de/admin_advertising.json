@@ -187,7 +187,9 @@
         "pause_failed": "Die Kampagne konnte nicht angehalten werden",
         "rejected": "Kampagne „{{name}}“ abgelehnt",
         "reject_failed": "Kampagne konnte nicht abgelehnt werden"
-      }
+      },
+      "creatives_count_one": "Motive ({{count}})",
+      "creatives_count_other": "Motive ({{count}})"
     },
     "push": {
       "page_title": "Push-Kampagnen",

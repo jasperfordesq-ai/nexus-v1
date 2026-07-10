@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useEffect, useRef, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -58,7 +59,7 @@ export function ExploreStatCard({ icon: Icon, label, value, suffix = '' }: Explo
   }, [value]);
 
   const formattedValue = Number.isInteger(displayValue)
-    ? displayValue.toLocaleString()
+    ? displayValue.toLocaleString(getFormattingLocale())
     : displayValue.toFixed(1);
 
   return (

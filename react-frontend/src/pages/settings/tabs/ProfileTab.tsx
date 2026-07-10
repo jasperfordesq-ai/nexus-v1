@@ -300,7 +300,7 @@ export function ProfileTab({
       {/* Language & Appearance */}
       <GlassCard className="p-6">
         <h2 className="text-lg font-semibold text-theme-primary mb-6 flex items-center gap-2">
-          <Monitor className="w-5 h-5 text-indigo-500" aria-hidden="true" />
+          <Monitor className="w-5 h-5 text-accent" aria-hidden="true" />
           {t('language_appearance')}
         </h2>
 

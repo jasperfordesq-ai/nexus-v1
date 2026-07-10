@@ -222,11 +222,9 @@ export function CampaignForm() {
         title={t(isEdit ? 'gamification.edit_campaign' : 'gamification.create_campaign')}
         description={t(isEdit ? 'gamification.edit_campaign_desc' : 'gamification.create_campaign_desc')}
         actions={
-          <Link to={tenantPath("/admin/gamification/campaigns")}>
-            <Button variant="tertiary" startContent={<ArrowLeft size={16} />}>
-              {t('gamification.back_to_campaigns')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath("/admin/gamification/campaigns")} variant="tertiary" startContent={<ArrowLeft size={16} />}>
+            {t('gamification.back_to_campaigns')}
+          </Button>
         }
       />
 
@@ -353,9 +351,7 @@ export function CampaignForm() {
           )}
 
           <div className="flex justify-end gap-2 pt-2">
-            <Link to={tenantPath("/admin/gamification/campaigns")}>
-              <Button variant="tertiary" isDisabled={saving}>{t('gamification.cancel')}</Button>
-            </Link>
+            <Button as={Link} to={tenantPath("/admin/gamification/campaigns")} variant="tertiary" isDisabled={saving}>{t('gamification.cancel')}</Button>
             <Button
               startContent={<Save size={16} />}
               onPress={handleSave}

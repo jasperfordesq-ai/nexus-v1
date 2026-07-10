@@ -32,7 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable, type Column } from '../../components/DataTable';
 import { ConfirmModal } from '../../components/ConfirmModal';
@@ -71,7 +71,7 @@ function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) 
             <Chip size='sm' variant='soft' color={appStatusColor[application.status] ?? 'default'} className='capitalize shrink-0'>{t(`jobs.stage_${application.status}`)}</Chip>
           </div>
           {application.applicant.email && <p className='text-xs text-muted truncate mt-0.5'>{application.applicant.email}</p>}
-          <p className='text-xs text-muted/80 mt-0.5'>{t('jobs.applied_date')}{' '}{new Date(application.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</p>
+          <p className='text-xs text-muted/80 mt-0.5'>{t('jobs.applied_date')}{' '}{new Date(application.created_at).toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'short', day: 'numeric' })}</p>
           <div className='flex items-center gap-1.5 mt-1 flex-wrap'>
             {application.cv_url && (
               <Chip size='sm' variant='soft' color='accent' startContent={<FileText aria-hidden="true" size={10} />} className='h-5 text-[10px]'>{t('jobs.cv_label')}</Chip>
@@ -322,7 +322,7 @@ export function JobsAdmin() {
       ),
     },
     { key: 'status', label: t('jobs.col_status'), render: (item) => <Chip size='sm' variant='soft' color={statusColorMap[item.status] || 'default'} className='capitalize'>{t(`jobs.status_${item.status}`)}</Chip> },
-    { key: 'deadline', label: t('jobs.col_deadline'), render: (item) => <span className='text-sm text-muted'>{item.deadline ? new Date(item.deadline).toLocaleDateString() : '--'}</span> },
+    { key: 'deadline', label: t('jobs.col_deadline'), render: (item) => <span className='text-sm text-muted'>{item.deadline ? new Date(item.deadline).toLocaleDateString(getFormattingLocale()) : '--'}</span> },
     {
       key: 'actions', label: t('jobs.col_actions'),
       render: (item) => (

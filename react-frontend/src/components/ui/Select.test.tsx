@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, waitFor } from '@/test/test-utils';
+import { render, screen, waitFor, within } from '@/test/test-utils';
 import userEvent from '@testing-library/user-event';
 import { Select, SelectItem } from './Select';
 
@@ -102,7 +102,7 @@ describe('Select — onSelectionChange', () => {
     await userEvent.click(appleEl as HTMLElement);
 
     await waitFor(() => {
-      expect(onSelectionChange).toHaveBeenCalled();
+      expect(onSelectionChange).toHaveBeenCalledWith(new Set(['apple']));
     });
   });
 });
@@ -138,9 +138,9 @@ describe('Select — onValueChange', () => {
 });
 
 describe('Select — variant forwarding', () => {
-  it('renders without errors for bordered variant', () => {
-    render(<Select label="Fruit" variant="bordered">{OPTIONS}</Select>);
-    expect(screen.getByText('Fruit')).toBeInTheDocument();
+  it('maps the legacy bordered variant to the documented standard v3 primary field', () => {
+    const { container } = render(<Select label="Fruit" variant="bordered">{OPTIONS}</Select>);
+    expect(container.querySelector('[data-slot="select"]')).toHaveClass('select--primary');
   });
 
   it('renders without errors for secondary variant', () => {
@@ -157,6 +157,36 @@ describe('Select — disabled', () => {
       </Select>,
     );
     expect(screen.getByText('Fruit')).toBeInTheDocument();
+  });
+});
+
+describe('Select compatibility contracts', () => {
+  it('disables the trigger and exposes a busy spinner while loading', () => {
+    const { container } = render(
+      <Select label="Fruit" isLoading>
+        {OPTIONS}
+      </Select>,
+    );
+
+    expect(screen.getByRole('button')).toBeDisabled();
+    expect(container.querySelector('[data-slot="select"]')).toHaveAttribute('data-loading', 'true');
+    expect(container.querySelector('[data-slot="spinner"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="select-indicator"]')).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['sm', ['min-h-8', 'px-2', 'py-1', 'text-sm']],
+    ['md', ['min-h-9', 'px-3', 'py-2', 'text-sm']],
+    ['lg', ['min-h-12', 'px-4', 'py-3', 'text-base']],
+  ] as const)('applies the requested %s trigger size instead of dropping it', (size, expectedClasses) => {
+    const { container } = render(
+      <Select label="Fruit" size={size}>
+        {OPTIONS}
+      </Select>,
+    );
+
+    expect(container.querySelector('[data-slot="select"]')).toHaveAttribute('data-size', size);
+    expect(screen.getByRole('button')).toHaveClass(...expectedClasses);
   });
 });
 
@@ -182,5 +212,26 @@ describe('SelectItem', () => {
     );
 
     expect(mangoEl).toBeTruthy();
+  });
+
+  it('maps retained item class slots onto the v3 list-box anatomy', async () => {
+    render(
+      <Select label="Fruit">
+        <SelectItem
+          id="mango"
+          classNames={{ base: 'item-base', description: 'item-description', title: 'item-title' }}
+          description="Tropical fruit"
+        >
+          Mango
+        </SelectItem>
+      </Select>,
+    );
+
+    await userEvent.click(screen.getByRole('button'));
+    const option = await screen.findByRole('option');
+
+    expect(option).toHaveClass('item-base');
+    expect(within(option).getByText('Mango')).toHaveClass('item-title');
+    expect(within(option).getByText('Tropical fruit')).toHaveClass('item-description');
   });
 });

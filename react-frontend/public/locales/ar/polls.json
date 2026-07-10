@@ -100,5 +100,11 @@
   "page_meta": {
     "title": "استطلاعات"
   },
-  "category_filter_label": "تصفية حسب الفئة"
+  "category_filter_label": "تصفية حسب الفئة",
+  "total_ballots_few": "إجمالي الأصوات: {{count}}",
+  "total_ballots_many": "إجمالي الأصوات: {{count}}",
+  "total_ballots_one": "إجمالي الأصوات: {{count}}",
+  "total_ballots_other": "إجمالي الأصوات: {{count}}",
+  "total_ballots_two": "إجمالي الأصوات: {{count}}",
+  "total_ballots_zero": "إجمالي الأصوات: {{count}}"
 }

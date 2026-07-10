@@ -104,6 +104,12 @@
     "unknown": "مجهول",
     "votes": "الأصوات",
     "no_matching_polls": "لم يتم العثور على أي استطلاعات مطابقة",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found found",
+    "total_count_few": "المجموع: {{count}}",
+    "total_count_many": "المجموع: {{count}}",
+    "total_count_one": "المجموع: {{count}}",
+    "total_count_other": "المجموع: {{count}}",
+    "total_count_two": "المجموع: {{count}}",
+    "total_count_zero": "المجموع: {{count}}"
   }
 }

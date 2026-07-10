@@ -21,7 +21,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import type { Density, ThemeMode } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/Button';
 import { ButtonGroup } from '@/components/ui/ButtonGroup';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
+import { Popover, PopoverContent, PopoverHeading, PopoverTrigger } from '@/components/ui/Popover';
 import Sun from 'lucide-react/icons/sun';
 import Moon from 'lucide-react/icons/moon';
 import Monitor from 'lucide-react/icons/monitor';
@@ -115,9 +115,9 @@ export function ThemePicker({
         <div className="space-y-4">
           {/* Title */}
           <div>
-            <p className="text-sm font-semibold text-theme-primary">
+            <PopoverHeading className="text-sm font-semibold text-theme-primary">
               {t('theme_picker.title', { ns: 'common' })}
-            </p>
+            </PopoverHeading>
             <p className="text-xs text-theme-muted mt-0.5">
               {t('theme_picker.subtitle', { ns: 'common' })}
             </p>
@@ -140,7 +140,7 @@ export function ThemePicker({
                     aria-pressed={isSelected}
                     aria-label={t(`theme_picker.scheme_${key}`, { ns: 'common' })}
                     className={`flex-1 gap-1 ${
-                      isSelected ? 'bg-indigo-500 text-white' : 'text-theme-secondary'
+                      isSelected ? 'bg-accent text-white' : 'text-theme-secondary'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" aria-hidden="true" />
@@ -203,7 +203,7 @@ export function ThemePicker({
                     onPress={() => setDensity(d)}
                     aria-pressed={isSelected}
                     className={`flex-1 text-xs ${
-                      isSelected ? 'bg-indigo-500 text-white' : 'text-theme-secondary'
+                      isSelected ? 'bg-accent text-white' : 'text-theme-secondary'
                     }`}
                   >
                     {t(`appearance_prefs.density_${d}`, { ns: 'settings' })}

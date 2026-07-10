@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Chip, Card, CardBody, Input, Spinner, Tabs, Tab, Tooltip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
@@ -171,7 +172,7 @@ function FeaturedListingsPanel() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {new Date(item.featured_at).toLocaleDateString()}
+          {new Date(item.featured_at).toLocaleDateString(getFormattingLocale())}
         </span>
       ),
     },
@@ -443,7 +444,7 @@ export function ListingsAdmin() {
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {new Date(item.created_at).toLocaleDateString()}
+          {new Date(item.created_at).toLocaleDateString(getFormattingLocale())}
         </span>
       ),
     },

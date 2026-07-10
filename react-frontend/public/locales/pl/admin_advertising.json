@@ -187,7 +187,11 @@
         "pause_failed": "Nie udało się wstrzymać kampanii",
         "rejected": "Kampania „{{name}}” została odrzucona",
         "reject_failed": "Nie udało się odrzucić kampanii"
-      }
+      },
+      "creatives_count_few": "Kreacje ({{count}})",
+      "creatives_count_many": "Kreacje ({{count}})",
+      "creatives_count_one": "Kreacje ({{count}})",
+      "creatives_count_other": "Kreacje ({{count}})"
     },
     "push": {
       "page_title": "Kampanie push",

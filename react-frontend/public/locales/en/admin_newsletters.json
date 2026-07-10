@@ -455,7 +455,14 @@
     "winning_metric": "Winning Metric",
     "resend_queued_count": "Queued {{count}} resend",
     "resend_queued_count_plural": "Queued {{count}} resends",
-    "template_tabs_aria": "Newsletter template category filter"
+    "template_tabs_aria": "Newsletter template category filter",
+    "your_average": "Your average",
+    "industry_avg": "Industry average",
+    "above_benchmark": "Above benchmark",
+    "below_benchmark": "Below benchmark",
+    "resend_queued_count_one": "Queued {{count}} resend",
+    "resend_queued_count_other": "Queued {{count}} resend",
+    "benchmark_difference": "{{pointSign}}{{pointValue}} pp ({{percentSign}}{{percentValue}}%)"
   },
   "newsletter_form": {
     "ab_test_label": "Ab Test",
@@ -895,7 +902,13 @@
     "subject_override_desc": "Leave blank to use the original subject.",
     "subject_override_placeholder": "Enter a subject override...",
     "subtitle": "Send this newsletter to a targeted subset of recipients.",
-    "total_sent": "Total sent"
+    "total_sent": "Total sent",
+    "non_openers_count_one": "{{count}} recipient who did not open",
+    "non_openers_count_other": "{{count}} recipient who did not open",
+    "non_clickers_count_one": "{{count}} recipient who opened but did not click",
+    "non_clickers_count_other": "{{count}} recipient who opened but did not click",
+    "preview_recipient_count_desc_one": "This resend will be sent to {{count}} recipient",
+    "preview_recipient_count_desc_other": "This resend will be sent to {{count}} recipient"
   },
   "newsletter_send_time": {
     "day_friday": "Fri",
@@ -919,7 +932,9 @@
     "not_enough_data": "Not enough engagement data yet.",
     "time_period": "Time period",
     "title": "Send time optimiser",
-    "top_recommended": "Best send windows"
+    "top_recommended": "Best send windows",
+    "days_one": "{{count}} days",
+    "days_other": "{{count}} days"
   },
   "segment_form": {
     "analyzing_member_data": "Analyzing Member Data",
@@ -1038,5 +1053,8 @@
     "update_template": "Update Template",
     "usage_stats_sent": "Usage Stats sent",
     "usage_stats_sent_plural": "Usage Stats Sent Plural"
+  },
+  "diagnostics": {
+    "score_out_of": "out of {{maximum}}"
   }
 }

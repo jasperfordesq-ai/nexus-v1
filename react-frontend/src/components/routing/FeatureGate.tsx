@@ -80,25 +80,4 @@ export function FeatureGate({
   return <>{children}</>;
 }
 
-/**
- * Higher-order component version of FeatureGate
- */
-export function withFeatureGate<P extends object>(
-  Component: React.ComponentType<P>,
-  feature: keyof TenantFeatures,
-  options?: { fallback?: ReactNode; redirect?: string }
-) {
-  return function WrappedComponent(props: P) {
-    return (
-      <FeatureGate
-        feature={feature}
-        fallback={options?.fallback}
-        redirect={options?.redirect}
-      >
-        <Component {...props} />
-      </FeatureGate>
-    );
-  };
-}
-
 export default FeatureGate;

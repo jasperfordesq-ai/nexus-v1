@@ -360,7 +360,13 @@
     "geocode_description": "قم بترميز مواقع المجموعة جغرافيًا لتمكين عرض الخريطة والاكتشاف المستند إلى المسافة.",
     "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet.",
     "detail_tabs_aria": "أقسام تفاصيل المجموعة",
-    "status_tabs_aria": "مرشح حالة المجموعة"
+    "status_tabs_aria": "مرشح حالة المجموعة",
+    "selected_count_few": "تم تحديد{{count}}",
+    "selected_count_many": "تم تحديد{{count}}",
+    "selected_count_one": "تم تحديد{{count}}",
+    "selected_count_other": "تم تحديد{{count}}",
+    "selected_count_two": "تم تحديد{{count}}",
+    "selected_count_zero": "تم تحديد{{count}}"
   },
   "group_organization": {
     "page_title": "تنظيم المجموعات",

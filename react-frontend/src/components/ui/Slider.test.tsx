@@ -163,6 +163,96 @@ describe('Slider component', () => {
     expect(screen.getByTestId('custom-label')).toHaveTextContent('Base label');
   });
 
+  it('renders an indicator for each discrete value when showSteps is enabled', () => {
+    const { container } = render(
+      <Slider label="Score" defaultValue={3} minValue={1} maxValue={5} step={1} showSteps />,
+    );
+
+    const steps = container.querySelectorAll('[data-slot="slider-step"]');
+    expect(steps).toHaveLength(5);
+    expect(Array.from(steps, (step) => step.getAttribute('data-value'))).toEqual(['1', '2', '3', '4', '5']);
+    expect(steps[0]).toHaveClass('bg-surface', 'ring-border');
+  });
+
+  it('renders numerically stable fractional step indicators', () => {
+    const { container } = render(
+      <Slider label="Score" defaultValue={0.5} minValue={0} maxValue={1} step={0.25} showSteps />,
+    );
+
+    expect(Array.from(
+      container.querySelectorAll('[data-slot="slider-step"]'),
+      (step) => step.getAttribute('data-value'),
+    )).toEqual(['0', '0.25', '0.5', '0.75', '1']);
+  });
+
+  it.each([
+    ['sm', 'h-4', 'border-x-[0.75rem]', 'w-6'],
+    ['md', 'slider__track', null, 'slider__thumb'],
+    ['lg', 'h-6', 'border-x-[1rem]', 'w-8'],
+  ] as const)(
+    'applies explicit %s sizing to the v3 track and thumb anatomy',
+    (size, trackClass, trackBorderClass, thumbClass) => {
+      const { container } = render(
+        <Slider label="Volume" defaultValue={50} minValue={0} maxValue={100} size={size} />,
+      );
+
+      expect(container.querySelector('[data-slot="slider"]')).toHaveAttribute('data-size', size);
+      expect(container.querySelector('[data-slot="slider-track"]')).toHaveClass(trackClass);
+      if (trackBorderClass) {
+        expect(container.querySelector('[data-slot="slider-track"]')).toHaveClass(trackBorderClass);
+      }
+      expect(container.querySelector('[data-slot="slider-thumb"]')).toHaveClass(thumbClass);
+    },
+  );
+
+  it('applies explicit vertical sizing to the v3 track and thumb anatomy', () => {
+    const { container } = render(
+      <Slider
+        aria-label="Vertical volume"
+        defaultValue={50}
+        minValue={0}
+        maxValue={100}
+        orientation="vertical"
+        size="lg"
+      />,
+    );
+
+    expect(container.querySelector('[data-slot="slider-track"]')).toHaveClass('w-6', 'border-y-[1rem]');
+    expect(container.querySelector('[data-slot="slider-thumb"]')).toHaveClass('h-8');
+  });
+
+  it('uses getTooltipValue for a focus, hover, and drag-visible thumb tooltip', () => {
+    const getTooltipValue = vi.fn((value: number | number[]) => `Formatted ${value}`);
+    const { container } = render(
+      <Slider
+        label="Volume"
+        defaultValue={25}
+        minValue={0}
+        maxValue={100}
+        showTooltip
+        getTooltipValue={getTooltipValue}
+      />,
+    );
+
+    expect(getTooltipValue).toHaveBeenCalledWith(25);
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip).toHaveTextContent('Formatted 25');
+    expect(tooltip).toHaveClass(
+      'invisible',
+      'group-hover/slider-thumb:visible',
+      'group-focus-within/slider-thumb:visible',
+      'group-data-[dragging=true]/slider-thumb:visible',
+      'opacity-0',
+      'group-hover/slider-thumb:opacity-100',
+      'group-focus-within/slider-thumb:opacity-100',
+      'group-data-[dragging=true]/slider-thumb:opacity-100',
+    );
+
+    fireEvent.keyDown(screen.getByRole('slider'), { key: 'ArrowRight' });
+    expect(getTooltipValue).toHaveBeenLastCalledWith(26);
+    expect(tooltip).toHaveTextContent('Formatted 26');
+  });
+
   // Range slider (two thumbs)
   it('renders two sliders for a range value array', () => {
     render(<Slider label="Range" defaultValue={[20, 80]} minValue={0} maxValue={100} />);

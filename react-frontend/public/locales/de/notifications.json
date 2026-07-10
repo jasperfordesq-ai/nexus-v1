@@ -31,7 +31,9 @@
     "empty": "Noch keine Benachrichtigungen",
     "view_all": "Alle Benachrichtigungen ansehen",
     "close": "Benachrichtigungen schließen",
-    "unread_dot_aria": "Ungelesen"
+    "unread_dot_aria": "Ungelesen",
+    "bell_unread_aria_one": "Benachrichtigungen, {{count}} ungelesen",
+    "bell_unread_aria_other": "Benachrichtigungen, {{count}} ungelesen"
   },
   "type": {
     "message": "Nachricht",
@@ -96,5 +98,11 @@
   },
   "page_meta": {
     "title": "Notifications"
-  }
+  },
+  "unread_badge_one": "{{count}} neu",
+  "unread_badge_other": "{{count}} neu",
+  "filter_unread_one": "Ungelesen ({{count}})",
+  "filter_unread_other": "Ungelesen ({{count}})",
+  "and_others_one": "und {{count}} weitere",
+  "and_others_other": "und {{count}} weitere"
 }

@@ -111,7 +111,9 @@
     "service_type_physical": "Nur vor Ort",
     "service_type_physical_hint": "Benötigt einen gemeinsamen physischen Ort",
     "service_type_remote": "Nur online",
-    "service_type_remote_hint": "Kann per Telefon, Chat oder Video stattfinden"
+    "service_type_remote_hint": "Kann per Telefon, Chat oder Video stattfinden",
+    "character_count_one": "{{count}}/{{max}}",
+    "character_count_other": "{{count}}/{{max}}"
   },
   "page_subtitle": "Dienstleistungen und Gesuche der Gemeinschaft durchsuchen",
   "hero_eyebrow": "Community-Tauschbörse",
@@ -247,7 +249,9 @@
     "placeholder": "Eine Fähigkeit eingeben und Enter drücken...",
     "aria_add": "Fähigkeits-Tag hinzufügen",
     "aria_add_count": "Skill-Tag hinzufügen ({{current}} von {{max}})",
-    "aria_results": "{{count}}-Skill-Vorschläge verfügbar"
+    "aria_results": "{{count}}-Skill-Vorschläge verfügbar",
+    "aria_results_one": "{{count}}-Skill-Vorschläge verfügbar",
+    "aria_results_other": "{{count}}-Skill-Vorschläge verfügbar"
   },
   "more_filters": "Weitere Filter",
   "filters_label": "Filter",
@@ -269,7 +273,11 @@
     "load_error": "Analysen konnten nicht geladen werden",
     "retry": "Erneut versuchen",
     "no_data": "Noch keine Aufrufe — schauen Sie wieder vorbei, sobald Ihr Inserat Aufmerksamkeit erhält",
-    "bar_label": "{{date}}: {{count}} Aufrufe"
+    "bar_label": "{{date}}: {{count}} Aufrufe",
+    "unique_viewers_one": "{{count}} eindeutig",
+    "unique_viewers_other": "{{count}} eindeutig",
+    "bar_label_one": "{{date}}: {{count}} Aufrufe",
+    "bar_label_other": "{{date}}: {{count}} Aufrufe"
   },
   "filter_hours": "Dauer",
   "filter_any_duration": "Jede Dauer",

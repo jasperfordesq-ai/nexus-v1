@@ -40,5 +40,11 @@
   },
   "page_meta": {
     "title": "Chat de IA"
-  }
+  },
+  "card_wallet_transactions_many": "{{count}} transações nos últimos 30 dias",
+  "card_wallet_transactions_one": "{{count}} transações nos últimos 30 dias",
+  "card_wallet_transactions_other": "{{count}} transações nos últimos 30 dias",
+  "limits_left_today_many": "{{count}} restantes hoje",
+  "limits_left_today_one": "{{count}} restantes hoje",
+  "limits_left_today_other": "{{count}} restantes hoje"
 }

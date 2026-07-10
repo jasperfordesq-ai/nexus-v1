@@ -44,7 +44,10 @@
     "no_deadline": "Keine Frist",
     "evaluation_criteria": "Bewertungskriterien",
     "outcome": "Ergebnis",
-    "team_links": "Projektteams"
+    "team_links": "Projektteams",
+    "ideas_count_other": "{{count}} Ideen",
+    "max_ideas_one": "Max. {{count}} Ideen pro Person",
+    "max_ideas_other": "Max. {{count}} Ideen pro Person"
   },
   "challenges": {
     "title": "Wettbewerbe",
@@ -87,7 +90,10 @@
     "draft_created": "Erstellt {{date}}",
     "new_idea": "Neue Idee",
     "sort_label": "Ideen sortieren",
-    "loading": "Ideen werden geladen..."
+    "loading": "Ideen werden geladen...",
+    "your_ideas_one": "Ihre Ideen: {{count}}/{{max}}",
+    "your_ideas_other": "Ihre Ideen: {{count}}/{{max}}",
+    "comments_other": "{{count}} Kommentare"
   },
   "idea_detail": {
     "page_title": "Ideendetails",
@@ -321,7 +327,8 @@
     "fallback_title": "Kampagne",
     "feature_not_available": "Ideensammlung nicht verfügbar",
     "feature_not_available_desc": "Die Ideensammlungsfunktion ist für diese Community nicht aktiviert. Wende dich an deinen Zeitbank-Administrator, um mehr zu erfahren.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "challenges_count_other": "{{count}} Wettbewerbe"
   },
   "templates": {
     "title": "Wettbewerbsvorlagen",

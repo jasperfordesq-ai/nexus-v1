@@ -409,7 +409,7 @@ export function MatchDebugPanel() {
                   }`}>
                     {match.match_score}
                   </div>
-                  <div className="text-xs text-muted">/ 100</div>
+                  <div className="text-xs text-muted">{t('score_out_of', { maximum: 100 })}</div>
                 </div>
               </CardHeader>
 

@@ -345,6 +345,22 @@
     "days_ago": "vor {{count}} Tagen",
     "hours_ago": "vor {{count}} Stunden",
     "just_now": "Just Now",
-    "minutes_ago": "vor {{count}} Minuten"
+    "minutes_ago": "vor {{count}} Minuten",
+    "loss_between_stages_one": "{{count}}zwischen den Phasen verloren",
+    "loss_between_stages_other": "{{count}}zwischen den Phasen verloren",
+    "lost_since_previous_stage_one": "{{count}}seit der vorherigen Phase verloren",
+    "lost_since_previous_stage_other": "{{count}}seit der vorherigen Phase verloren",
+    "members_lost_at_step_one": "{{count}}-Mitglieder gehen bei diesem Schritt verloren.",
+    "members_lost_at_step_other": "{{count}}-Mitglieder gehen bei diesem Schritt verloren.",
+    "tasks_total_count_one": "{{count}}Aufgaben insgesamt",
+    "tasks_total_count_other": "{{count}}Aufgaben insgesamt",
+    "activity_type_login": "Login",
+    "activity_type_signup": "Melden Sie sich an",
+    "activity_type_listing_created": "Eintrag erstellt",
+    "activity_type_exchange_completed": "Austausch abgeschlossen",
+    "activity_type_note_added": "Hinweis hinzugefügt",
+    "activity_type_task_created": "Aufgabe erstellt",
+    "activity_type_profile_updated": "Profil aktualisiert",
+    "activity_type_group_joined": "Gruppe ist beigetreten"
   }
 }

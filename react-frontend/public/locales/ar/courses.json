@@ -19,7 +19,15 @@
     "lessons_one": "{{count}} الدرس",
     "lessons_other": "{{count}} الدروس",
     "enrolled_one": "تم تسجيل {{count}}",
-    "enrolled_other": "تم تسجيل {{count}}"
+    "enrolled_other": "تم تسجيل {{count}}",
+    "lessons_few": "{{count}} الدروس",
+    "lessons_many": "{{count}} الدروس",
+    "lessons_two": "{{count}} الدروس",
+    "lessons_zero": "{{count}} الدروس",
+    "enrolled_few": "تم تسجيل {{count}}",
+    "enrolled_many": "تم تسجيل {{count}}",
+    "enrolled_two": "تم تسجيل {{count}}",
+    "enrolled_zero": "تم تسجيل {{count}}"
   },
   "detail": {
     "about": "حول هذه الدورة",
@@ -169,7 +177,17 @@
     "rate_n_stars": "قيِّم {{count}} من 5 نجوم",
     "submit_error": "تعذّر إرسال مراجعتك. يرجى المحاولة مرة أخرى.",
     "count_one": "مراجعة {{count}}",
-    "count_other": "{{count}} التعليقات"
+    "count_other": "{{count}} التعليقات",
+    "rate_n_stars_few": "قيِّم {{count}} من 5 نجوم",
+    "rate_n_stars_many": "قيِّم {{count}} من 5 نجوم",
+    "rate_n_stars_one": "قيِّم {{count}} من 5 نجوم",
+    "rate_n_stars_other": "قيِّم {{count}} من 5 نجوم",
+    "rate_n_stars_two": "قيِّم {{count}} من 5 نجوم",
+    "rate_n_stars_zero": "قيِّم {{count}} من 5 نجوم",
+    "count_few": "{{count}} التعليقات",
+    "count_many": "{{count}} التعليقات",
+    "count_two": "{{count}} التعليقات",
+    "count_zero": "{{count}} التعليقات"
   },
   "admin": {
     "title": "الدورات",

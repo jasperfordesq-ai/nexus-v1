@@ -781,7 +781,13 @@
     "option_marketplace_listing_duration_days_label": "Durée d'inscription (jours)",
     "option_marketplace_listing_duration_days_desc": "Nombre de jours avant l'expiration automatique des fiches Marketplace",
     "option_identity_verification_fee_cents_label": "Frais de vérification (cents)",
-    "option_identity_verification_fee_cents_desc": "Frais uniques facturés pour la vérification de l'identité. Réglez sur 0 pour une vérification gratuite. Valeur en centimes (ex: 500 = 5,00 €)"
+    "option_identity_verification_fee_cents_desc": "Frais uniques facturés pour la vérification de l'identité. Réglez sur 0 pour une vérification gratuite. Valeur en centimes (ex: 500 = 5,00 €)",
+    "option_count_many": "Options{{count}}",
+    "option_count_one": "Options{{count}}",
+    "option_count_other": "Options{{count}}",
+    "planned_count_many": "{{count}}prévu",
+    "planned_count_one": "{{count}}prévu",
+    "planned_count_other": "{{count}}prévu"
   },
   "tenant_features": {
     "refresh": "Actualiser",

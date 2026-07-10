@@ -128,11 +128,12 @@ describe('SuperAdminRoute', () => {
     expect(screen.getByTestId('outlet')).toBeInTheDocument();
   });
 
-  it('renders Outlet for user with is_tenant_super_admin flag', async () => {
+  it('redirects tenant-scoped super-admins to their tenant admin panel', async () => {
     mockAuth.user = { id: 6, role: 'member', is_tenant_super_admin: true };
     const { SuperAdminRoute } = await import('./SuperAdminRoute');
     render(<SuperAdminRoute />);
-    expect(screen.getByTestId('outlet')).toBeInTheDocument();
+    expect(screen.getByTestId('redirect')).toHaveAttribute('data-to', '/test/admin');
+    expect(screen.queryByTestId('outlet')).not.toBeInTheDocument();
   });
 
   it('renders Outlet for user with is_god flag', async () => {

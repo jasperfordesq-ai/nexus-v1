@@ -31,7 +31,6 @@ import type {
   MatchApprovalDetail,
   MatchApprovalStats,
   SmartMatchingConfig,
-  MatchingStatsResponse,
   TimebankingStats,
   FraudAlert,
   OrgWallet,
@@ -551,7 +550,7 @@ export const adminMatching = {
     api.put<{ success: boolean }>('/v2/admin/matching/config', data),
 
   getMatchingStats: () =>
-    api.get<MatchingStatsResponse>('/v2/admin/matching/stats'),
+    api.get<unknown>('/v2/admin/matching/stats'),
 
   getApprovals: (params: { status?: string; page?: number } = {}) =>
     api.get<PaginatedResponse<MatchApproval>>(

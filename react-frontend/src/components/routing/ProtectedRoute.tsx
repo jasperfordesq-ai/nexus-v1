@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { LoadingScreen } from '@/components/feedback/LoadingScreen';
+import { Button } from '@/components/ui/Button';
 import { useLegalGate } from '@/hooks/useLegalGate';
 
 const LegalAcceptanceGate = lazy(() =>
@@ -37,7 +38,15 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, status, user } = useAuth();
   const { tenantPath, tenant } = useTenant();
   const location = useLocation();
-  const { hasPending, pendingDocs, acceptAll, isAccepting, isLoading: legalLoading } = useLegalGate();
+  const {
+    hasPending,
+    pendingDocs,
+    acceptAll,
+    isAccepting,
+    isLoading: legalLoading,
+    error: legalError,
+    refresh: refreshLegalStatus,
+  } = useLegalGate();
 
   // Show loading while checking auth status
   if (isLoading || status === 'loading') {
@@ -85,22 +94,47 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   // Legal gate: block protected pages when user has unaccepted legal documents.
   // Skip the gate on legal/onboarding pages so users can read docs before accepting.
   const isLegalBypassPath = LEGAL_GATE_BYPASS_SEGMENTS.has(lastSegment);
-  const showLegalGate = !legalLoading && hasPending && !isLegalBypassPath;
+  const protectedContent = children ? <>{children}</> : <Outlet />;
 
-  return (
-    <>
-      {showLegalGate && (
-        <Suspense fallback={null}>
-          <LegalAcceptanceGate
-            pendingDocs={pendingDocs}
-            onAcceptAll={acceptAll}
-            isAccepting={isAccepting}
-          />
-        </Suspense>
-      )}
-      {children ? <>{children}</> : <Outlet />}
-    </>
-  );
+  if (isLegalBypassPath) {
+    return protectedContent;
+  }
+
+  if (legalLoading) {
+    return <LoadingScreen message={t('checking_authentication')} />;
+  }
+
+  if (legalError) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center px-4" role="alert">
+        <div className="max-w-sm text-center">
+          <h1 className="text-xl font-semibold text-theme-primary">
+            {t('errors.unexpected')}
+          </h1>
+          <p className="mt-2 text-sm text-theme-muted">
+            {t('errors.connection_failed_detail')}
+          </p>
+          <Button className="mt-5" onPress={refreshLegalStatus}>
+            {t('actions.retry')}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (hasPending) {
+    return (
+      <Suspense fallback={<LoadingScreen message={t('loading')} />}>
+        <LegalAcceptanceGate
+          pendingDocs={pendingDocs}
+          onAcceptAll={acceptAll}
+          isAccepting={isAccepting}
+        />
+      </Suspense>
+    );
+  }
+
+  return protectedContent;
 }
 
 export default ProtectedRoute;

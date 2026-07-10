@@ -24,7 +24,7 @@ import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 
 interface SpotlightMember {
   id: number;
@@ -152,7 +152,9 @@ export default function MemberSpotlightTab() {
                 <div className="flex items-center gap-2 text-sm">
                   <span className="text-accent font-medium">{member.recent_activity}</span>
                   {member.xp > 0 && (
-                    <span className="text-muted text-xs">{member.xp.toLocaleString()} XP</span>
+                    <span className="text-muted text-xs">
+                      {t('achievements.xp_value', { xp: member.xp.toLocaleString(getFormattingLocale()) })}
+                    </span>
                   )}
                 </div>
 

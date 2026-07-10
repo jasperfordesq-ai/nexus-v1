@@ -76,7 +76,11 @@
     "no_achievements": "لا توجد إنجازات بعد",
     "no_achievements_own": "ابدأ بالمشاركة لكسب الشارات والإنجازات!",
     "no_achievements_other": "لم يكسب هذا المستخدم أي إنجازات بعد",
-    "view_badges": "عرض الشارات المتاحة"
+    "view_badges": "عرض الشارات المتاحة",
+    "badges_few": "{{count}} شارة مكتسبة",
+    "badges_many": "{{count}} شارة مكتسبة",
+    "badges_two": "{{count}} شارة مكتسبة",
+    "badges_zero": "{{count}} شارة مكتسبة"
   },
   "toast": {
     "request_sent_title": "تم إرسال الطلب",
@@ -134,7 +138,13 @@
     "characters_count": "{{count}}/{{max}} حرف",
     "cancel": "إلغاء",
     "submit": "أرسل المراجعة",
-    "submit_failed_fallback": "فشل في إرسال المراجعة"
+    "submit_failed_fallback": "فشل في إرسال المراجعة",
+    "characters_count_few": "{{count}}/{{max}} حرف",
+    "characters_count_many": "{{count}}/{{max}} حرف",
+    "characters_count_one": "{{count}}/{{max}} حرف",
+    "characters_count_other": "{{count}}/{{max}} حرف",
+    "characters_count_two": "{{count}}/{{max}} حرف",
+    "characters_count_zero": "{{count}}/{{max}} حرف"
   },
   "page_meta": {
     "title": "الملف الشخصي",
@@ -185,5 +195,15 @@
   "read_more": "اقرأ المزيد",
   "read_less": "اقرأ أقل",
   "hours_abbrev": "{{hours}}س",
-  "not_available_abbrev": "غ/م"
+  "not_available_abbrev": "غ/م",
+  "show_more_skills_few": "عرض {{count}} أكثر",
+  "show_more_skills_many": "عرض {{count}} أكثر",
+  "show_more_skills_one": "عرض {{count}} أكثر",
+  "show_more_skills_other": "عرض {{count}} أكثر",
+  "show_more_skills_two": "عرض {{count}} أكثر",
+  "show_more_skills_zero": "عرض {{count}} أكثر",
+  "reviews_count_few": "مراجعات {{count}}",
+  "reviews_count_many": "مراجعات {{count}}",
+  "reviews_count_two": "مراجعات {{count}}",
+  "reviews_count_zero": "مراجعات {{count}}"
 }

@@ -89,7 +89,13 @@
     "no_members_found": "No se encontraron miembros que coincidan con tu búsqueda.",
     "done": "Listo",
     "aria_exchange_participants": "Participantes del intercambio",
-    "aria_hour_split": "Division de horas"
+    "aria_hour_split": "Division de horas",
+    "participants_heading_many": "Participantes ({{count}})",
+    "participants_heading_one": "Participantes ({{count}})",
+    "participants_heading_other": "Participantes ({{count}})",
+    "hours_amount_many": "{{count}} h",
+    "hours_amount_one": "{{count}} h",
+    "hours_amount_other": "{{count}} h"
   },
   "create": {
     "page_title": "Crear Intercambio Grupal",
@@ -148,7 +154,13 @@
     "step_of_named": "Paso {{current}} de {{total}}: {{name}}",
     "hours_value": "{{hours}} h",
     "hours_suffix": "h",
-    "weight_suffix": "incógnita"
+    "weight_suffix": "incógnita",
+    "providers_count_many": "Proveedores ({{count}})",
+    "providers_count_one": "Proveedores ({{count}})",
+    "providers_count_other": "Proveedores ({{count}})",
+    "receivers_count_many": "Receptores ({{count}})",
+    "receivers_count_one": "Receptores ({{count}})",
+    "receivers_count_other": "Receptores ({{count}})"
   },
   "toast": {
     "exchange_started": "Intercambio iniciado",
@@ -189,5 +201,7 @@
     }
   },
   "role_provider": "Provider",
-  "role_receiver": "Receiver"
+  "role_receiver": "Receiver",
+  "participants_count_many": "{{count}} participantes",
+  "hours_count_many": "{{count}} horas"
 }

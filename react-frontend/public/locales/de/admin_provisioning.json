@@ -116,7 +116,8 @@
       "intended_use": "Verwendungszweck",
       "rejection_reason": "Ablehnungsgrund",
       "provisioning_log": "Bereitstellungsprotokoll"
-    }
+    },
+    "loading": "Bereitstellungsanfragen werden geladen…"
   },
   "loading": "Loading",
   "refresh": "Aktualisieren"

@@ -57,6 +57,7 @@ export { Kbd, type KbdProps } from './Kbd';
 export { ScrollShadow, type ScrollShadowProps } from './ScrollShadow';
 export { Checkbox, CheckboxGroup, type CheckboxProps, type CheckboxGroupProps } from './Checkbox';
 export { Radio, RadioGroup, type RadioProps, type RadioGroupProps } from './Radio';
+export { StarRating, type StarRatingProps } from './StarRating';
 export { Input, type InputProps } from './Input';
 export { InputGroup, type InputGroupProps } from './InputGroup';
 export { TextField, type TextFieldProps } from './TextField';
@@ -82,7 +83,18 @@ export { Switch, type SwitchProps } from './Switch';
 export { Slider, type SliderProps } from './Slider';
 export { Tabs, Tab, type TabsProps, type TabProps } from './Tabs';
 export { Tooltip, type TooltipProps } from './Tooltip';
-export { Popover, PopoverTrigger, PopoverContent, type PopoverProps, type PopoverTriggerProps, type PopoverContentProps } from './Popover';
+export {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverDialog,
+  PopoverHeading,
+  PopoverArrow,
+  type PopoverProps,
+  type PopoverTriggerProps,
+  type PopoverContentProps,
+  type PopoverDialogProps,
+} from './Popover';
 export { Pagination, type PaginationProps } from './Pagination';
 export {
   Table,
@@ -120,10 +132,12 @@ export {
   Modal,
   ModalContent,
   ModalHeader,
+  ModalHeading,
   ModalBody,
   ModalFooter,
   type ModalProps,
   type ModalContentProps,
+  type ModalHeadingProps,
   type ModalSectionProps,
 } from './Modal';
 export {

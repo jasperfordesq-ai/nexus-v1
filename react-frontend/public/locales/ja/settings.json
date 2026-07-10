@@ -278,7 +278,9 @@
     "linked": "リンク済み",
     "connected_accounts": "接続済み",
     "safeguarding": "セーフガーディング",
-    "translation": "翻訳"
+    "translation": "翻訳",
+    "linked-accounts": "リンクされたアカウント",
+    "connected-accounts": "接続されたアカウント"
   },
   "safeguarding": {
     "page_title": "セーフガーディングの設定",
@@ -588,7 +590,8 @@
     "unblocked_desc": "{{name}}のブロックを解除しました。",
     "unblock_error": "ユーザーのブロック解除に失敗しました",
     "blocked_on": "{{date}}をブロックしました",
-    "link": "ブロックされたユーザー"
+    "link": "ブロックされたユーザー",
+    "count_other": "{{count}} 件ブロック中"
   },
   "block_user": {
     "title": "{{name}}をブロックしますか？",
@@ -615,5 +618,8 @@
   "push_campaign_opt_in": "プロモーションのプッシュ通知を受け取る",
   "push_campaign_opt_in_description": "地域のビジネスや団体がターゲット型プッシュ通知を送信することを許可します。いつでも解除できます。",
   "tabs_aria": "設定セクション",
-  "twofa_loading_setup": "2 要素セットアップをロードしています..."
+  "twofa_loading_setup": "2 要素セットアップをロードしています...",
+  "biometric_all_removed_other": "{{count}} パスキーを削除しました。",
+  "biometric_enabled_other": "{{count}} パスキーが登録されました",
+  "twofa_backup_remaining_other": "{{count}} バックアップコードが残っています"
 }

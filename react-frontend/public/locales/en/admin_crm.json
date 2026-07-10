@@ -345,6 +345,22 @@
     "days_ago": "{{count}} days ago",
     "hours_ago": "{{count}} hours ago",
     "just_now": "Just now",
-    "minutes_ago": "{{count}} minutes ago"
+    "minutes_ago": "{{count}} minutes ago",
+    "activity_type_login": "Login",
+    "activity_type_signup": "Sign-up",
+    "activity_type_listing_created": "Listing created",
+    "activity_type_exchange_completed": "Exchange completed",
+    "activity_type_note_added": "Note added",
+    "activity_type_task_created": "Task created",
+    "activity_type_profile_updated": "Profile updated",
+    "activity_type_group_joined": "Group joined",
+    "loss_between_stages_one": "{{count}} lost between stages",
+    "loss_between_stages_other": "{{count}} lost between stages",
+    "lost_since_previous_stage_one": "{{count}} lost since previous stage",
+    "lost_since_previous_stage_other": "{{count}} lost since previous stage",
+    "members_lost_at_step_one": "{{count}} members are lost at this step.",
+    "members_lost_at_step_other": "{{count}} members are lost at this step.",
+    "tasks_total_count_one": "{{count}} Tasks Total",
+    "tasks_total_count_other": "{{count}} Tasks Total"
   }
 }

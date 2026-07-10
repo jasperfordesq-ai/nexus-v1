@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -578,5 +579,5 @@ function formatDate(value?: string | null) {
     return '';
   }
 
-  return new Date(value).toLocaleString();
+  return new Date(value).toLocaleString(getFormattingLocale());
 }

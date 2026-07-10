@@ -116,7 +116,8 @@
       "intended_use": "Przeznaczenie",
       "rejection_reason": "Powód odrzucenia",
       "provisioning_log": "Dziennik udostępniania"
-    }
+    },
+    "loading": "Ładowanie żądań udostępnienia…"
   },
   "loading": "Loading",
   "refresh": "Odśwież"

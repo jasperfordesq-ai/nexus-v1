@@ -178,7 +178,9 @@
         "episode_missing_audio_url": "Bij een aflevering ontbreekt een geldige HTTP-audio-URL.",
         "episode_missing_audio_length": "Bij een aflevering ontbreekt de bestandsgrootte van de audio.",
         "episode_missing_audio_mime": "Bij een aflevering ontbreekt het MIME-type van de audio."
-      }
+      },
+      "skipped_episodes_one": "{{count}} aflevering(en) zouden buiten de feed vallen totdat hun audio is hersteld.",
+      "skipped_episodes_other": "{{count}} aflevering(en) zouden buiten de feed vallen totdat hun audio is hersteld."
     },
     "stats": {
       "title": "Luisterstatistieken",
@@ -188,7 +190,9 @@
       "subscribers": "Abonnees",
       "top_episodes": "Topafleveringen",
       "listen_count": "{{count}} weergaven",
-      "last_days": "De luisteractiviteit beslaat de laatste {{days}} dagen."
+      "last_days": "De luisteractiviteit beslaat de laatste {{days}} dagen.",
+      "listen_count_one": "{{count}} weergaven",
+      "listen_count_other": "{{count}} weergaven"
     }
   },
   "fields": {

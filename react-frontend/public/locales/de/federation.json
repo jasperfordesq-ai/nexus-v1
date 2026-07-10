@@ -82,7 +82,11 @@
     "quick_link_7_title": "Föderationseinstellungen",
     "quick_link_7_description": "Konfigurieren Sie die Datenschutz- und Kommunikationseinstellungen Ihres Verbunds.",
     "quick_link_6_title": "Föderationsverbindungen",
-    "quick_link_6_description": "Verwalte deine Verbindungsanfragen über Partnergemeinschaften hinweg."
+    "quick_link_6_description": "Verwalte deine Verbindungsanfragen über Partnergemeinschaften hinweg.",
+    "view_all_one": "Alle anzeigen ({{count}})",
+    "view_all_other": "Alle anzeigen ({{count}})",
+    "member_count_one": "{{count}}-Mitglieder",
+    "member_count_other": "{{count}}-Mitglieder"
   },
   "partners": {
     "page_title": "Partnergemeinschaften",
@@ -115,7 +119,9 @@
     "browse_members": "Durchsuchen Sie Mitglieder",
     "browse_listings": "Einträge durchsuchen",
     "close": "Schließen",
-    "view_details": "Details anzeigen"
+    "view_details": "Details anzeigen",
+    "member_count_one": "{{count}}-Mitglieder",
+    "member_count_other": "{{count}}-Mitglieder"
   },
   "members": {
     "page_title": "Föderationsmitglieder",
@@ -156,7 +162,13 @@
     "external_profile_title": "Externes Mitglied",
     "external_profile_message": "Dieses Mitglied befindet sich auf einer externen Partnerplattform. Eine direkte Profilansicht ist nicht verfügbar.",
     "external_member": "Externes Mitglied",
-    "member_fallback": "Mitglied"
+    "member_fallback": "Mitglied",
+    "external_source_note_external_only_one": "Zeigt {{count}} Ergebnisse von externen Partnern.",
+    "external_source_note_external_only_other": "Zeigt {{count}} Ergebnisse von externen Partnern.",
+    "external_source_note_one": "Enthält {{count}} Ergebnisse von externen Partnern; „Mehr laden“ fährt mit internen Partnerergebnissen fort.",
+    "external_source_note_other": "Enthält {{count}} Ergebnisse von externen Partnern; „Mehr laden“ fährt mit internen Partnerergebnissen fort.",
+    "more_skills_one": "+{{count}} mehr",
+    "more_skills_other": "+{{count}} mehr"
   },
   "messages": {
     "page_title": "Föderationsnachrichten",
@@ -227,7 +239,11 @@
     "thread_aria_unread": "Konversation mit {{name}} von {{tenant}}, {{count}} ungelesene Nachricht",
     "thread_aria_unread_plural": "Konversation mit {{name}} von {{tenant}}, {{count}} ungelesene Nachrichten",
     "recipient_fallback": "Empfänger",
-    "user_number": "Benutzer #{{id}}"
+    "user_number": "Benutzer #{{id}}",
+    "thread_aria_unread_plural_one": "Konversation mit {{name}} von {{tenant}}, {{count}} ungelesene Nachrichten",
+    "thread_aria_unread_plural_other": "Konversation mit {{name}} von {{tenant}}, {{count}} ungelesene Nachrichten",
+    "thread_aria_unread_one": "Konversation mit {{name}} von {{tenant}}, {{count}} ungelesene Nachricht",
+    "thread_aria_unread_other": "Konversation mit {{name}} von {{tenant}}, {{count}} ungelesene Nachricht"
   },
   "listings": {
     "page_title": "Föderationseinträge",
@@ -259,7 +275,11 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "Profil anzeigen",
     "contact_author": "Kontakt",
-    "close": "Schließen"
+    "close": "Schließen",
+    "external_source_note_external_only_one": "Zeigt {{count}} Einträge von externen Partnern.",
+    "external_source_note_external_only_other": "Zeigt {{count}} Einträge von externen Partnern.",
+    "external_source_note_one": "Enthält {{count}} Einträge von externen Partnern; „Mehr laden“ fährt mit internen Partnereinträgen fort.",
+    "external_source_note_other": "Enthält {{count}} Einträge von externen Partnern; „Mehr laden“ fährt mit internen Partnereinträgen fort."
   },
   "settings": {
     "page_title": "Föderationseinstellungen",
@@ -364,7 +384,9 @@
     "load_more_error": "Es konnten keine weiteren Gruppen geladen werden.",
     "member_count": "{{count}}-Mitglied",
     "member_count_plural": "{{count}}-Mitglieder",
-    "private": "Privat"
+    "private": "Privat",
+    "member_count_one": "{{count}}-Mitglied",
+    "member_count_other": "{{count}}-Mitglied"
   },
   "connections": {
     "page_title": "Föderationsverbindungen",
@@ -495,7 +517,9 @@
     "partners_available_other": "{{count}} Partner-Communitys verfügbar",
     "member_count_one": "{{count}} Mitglied",
     "member_count_other": "{{count}} Mitglieder",
-    "and_more": "+{{count}} weitere"
+    "and_more": "+{{count}} weitere",
+    "and_more_one": "+{{count}} weitere",
+    "and_more_other": "+{{count}} weitere"
   },
   "member_profile": {
     "page_title": "Mitgliederprofil",
@@ -544,7 +568,15 @@
     "tooltip_federated": "Aggregierte Reputation über {{count}}-Partner-Communities hinweg",
     "tooltip_local": "Basierend auf {{count}}-Bewertungen in dieser Community",
     "chip_label": "{{score}} ({{count}})",
-    "aria_label": "Verbundreputation {{score}} aus {{count}}-Bewertungen"
+    "aria_label": "Verbundreputation {{score}} aus {{count}}-Bewertungen",
+    "tooltip_federated_one": "Aggregierte Reputation über {{count}}-Partner-Communities hinweg",
+    "tooltip_federated_other": "Aggregierte Reputation über {{count}}-Partner-Communities hinweg",
+    "tooltip_local_one": "Basierend auf {{count}}-Bewertungen in dieser Community",
+    "tooltip_local_other": "Basierend auf {{count}}-Bewertungen in dieser Community",
+    "chip_label_one": "{{score}} ({{count}})",
+    "chip_label_other": "{{score}} ({{count}})",
+    "aria_label_one": "Verbundreputation {{score}} aus {{count}}-Bewertungen",
+    "aria_label_other": "Verbundreputation {{score}} aus {{count}}-Bewertungen"
   },
   "reviews": {
     "unavailable": "Für dieses Verbundmitglied sind noch keine Bewertungen verfügbar",

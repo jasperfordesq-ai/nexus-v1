@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Spinner, Button, Chip, Textarea, Input, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 
@@ -530,7 +531,7 @@ export function ModerationQueuePage() {
                 )}
               </TableCell>
               <TableCell className="text-sm text-muted">
-                {new Date(item.submitted_at).toLocaleDateString()}
+                {new Date(item.submitted_at).toLocaleDateString(getFormattingLocale())}
               </TableCell>
               <TableCell>
                 {(item.status === 'pending' || item.status === 'flagged') && (

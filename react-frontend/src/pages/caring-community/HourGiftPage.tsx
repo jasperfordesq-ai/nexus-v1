@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 
@@ -440,7 +441,7 @@ export function HourGiftPage() {
                             </p>
                             <p className="text-sm text-theme-muted">
                               {t('hour_gift.inbox.received_at', {
-                                date: new Date(g.created_at).toLocaleDateString(),
+                                date: new Date(g.created_at).toLocaleDateString(getFormattingLocale()),
                               })}
                             </p>
                           </div>
@@ -535,7 +536,7 @@ export function HourGiftPage() {
                               {t('hour_gift.sent.to', { name: g.partner.name })}
                             </p>
                             <p className="text-sm text-theme-muted">
-                              {new Date(g.created_at).toLocaleDateString()}
+                              {new Date(g.created_at).toLocaleDateString(getFormattingLocale())}
                             </p>
                           </div>
                         </div>

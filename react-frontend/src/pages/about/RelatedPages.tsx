@@ -66,14 +66,14 @@ export function RelatedPages({ current }: RelatedPagesProps) {
           {links.map((link) => (
             <Link key={link.href} to={tenantPath(link.href)}>
               <GlassCard className="p-4 flex items-center gap-3 group hover:scale-[1.01] transition-transform h-full">
-                <div className="flex-shrink-0 p-2 rounded-lg bg-indigo-500/10">
-                  <link.icon className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
+                <div className="flex-shrink-0 p-2 rounded-lg bg-accent/10">
+                  <link.icon className="w-4 h-4 text-accent dark:text-accent" aria-hidden="true" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-theme-primary truncate">{t(`related.link_${link.href.replace('/', '')}_label`)}</p>
                   <p className="text-xs text-theme-subtle truncate">{t(`related.link_${link.href.replace('/', '')}_description`)}</p>
                 </div>
-                <ArrowRight className="w-4 h-4 text-theme-subtle group-hover:text-indigo-500 transition-colors flex-shrink-0" aria-hidden="true" />
+                <ArrowRight className="w-4 h-4 text-theme-subtle group-hover:text-accent transition-colors flex-shrink-0" aria-hidden="true" />
               </GlassCard>
             </Link>
           ))}

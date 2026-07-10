@@ -82,7 +82,9 @@
     "quick_link_7_title": "フェデレーション設定",
     "quick_link_7_description": "フェデレーションのプライバシーと通信の設定を構成します。",
     "quick_link_6_title": "フェデレーションのつながり",
-    "quick_link_6_description": "パートナーコミュニティ間のつながりリクエストを管理します。"
+    "quick_link_6_description": "パートナーコミュニティ間のつながりリクエストを管理します。",
+    "view_all_other": "すべて表示 ({{count}})",
+    "member_count_other": "{{count}} メンバー"
   },
   "partners": {
     "page_title": "パートナーコミュニティ",
@@ -115,7 +117,8 @@
     "browse_members": "メンバーを参照",
     "browse_listings": "リストを参照する",
     "close": "近い",
-    "view_details": "詳細を見る"
+    "view_details": "詳細を見る",
+    "member_count_other": "{{count}} メンバー"
   },
   "members": {
     "page_title": "連盟メンバー",
@@ -156,7 +159,10 @@
     "external_profile_title": "外部会員",
     "external_profile_message": "このメンバーは外部パートナー プラットフォーム上にいます。プロフィールを直接表示することはできません。",
     "external_member": "外部会員",
-    "member_fallback": "メンバー"
+    "member_fallback": "メンバー",
+    "external_source_note_external_only_other": "{{count}} 件の外部パートナー結果を表示しています。",
+    "external_source_note_other": "{{count}} 件の外部パートナー結果を含みます。さらに読み込むと内部パートナーの結果を続けます。",
+    "more_skills_other": "+{{count}} 詳細"
   },
   "messages": {
     "page_title": "フェデレーションメッセージ",
@@ -227,7 +233,9 @@
     "thread_aria_unread": "{{tenant}} からの {{name}} との会話、{{count}} の未読メッセージ",
     "thread_aria_unread_plural": "{{tenant}}、{{count}} の未読メッセージからの {{name}} との会話",
     "recipient_fallback": "受信者",
-    "user_number": "ユーザー #{{id}}"
+    "user_number": "ユーザー #{{id}}",
+    "thread_aria_unread_plural_other": "{{tenant}}、{{count}} の未読メッセージからの {{name}} との会話",
+    "thread_aria_unread_other": "{{tenant}} からの {{name}} との会話、{{count}} の未読メッセージ"
   },
   "listings": {
     "page_title": "フェデレーションのリスト",
@@ -259,7 +267,9 @@
     "hours_estimated": "~{{hours}}h",
     "view_profile": "プロフィールを見る",
     "contact_author": "接触",
-    "close": "近い"
+    "close": "近い",
+    "external_source_note_external_only_other": "{{count}} 件の外部パートナー掲載を表示しています。",
+    "external_source_note_other": "{{count}} 件の外部パートナー掲載を含みます。さらに読み込むと内部パートナーの掲載を続けます。"
   },
   "settings": {
     "page_title": "フェデレーション設定",
@@ -364,7 +374,8 @@
     "load_more_error": "これ以上グループをロードできませんでした。",
     "member_count": "{{count}}メンバー",
     "member_count_plural": "{{count}} メンバー",
-    "private": "プライベート"
+    "private": "プライベート",
+    "member_count_other": "{{count}}メンバー"
   },
   "connections": {
     "page_title": "フェデレーション接続",
@@ -495,7 +506,8 @@
     "partners_available_other": "{{count}} 件のパートナーコミュニティが利用可能",
     "member_count_one": "{{count}} 人のメンバー",
     "member_count_other": "{{count}} 人のメンバー",
-    "and_more": "ほか {{count}} 件"
+    "and_more": "ほか {{count}} 件",
+    "and_more_other": "ほか {{count}} 件"
   },
   "member_profile": {
     "page_title": "メンバープロフィール",
@@ -544,7 +556,11 @@
     "tooltip_federated": "{{count}} パートナー コミュニティ全体で集約された評判",
     "tooltip_local": "このコミュニティの {{count}} レビューに基づく",
     "chip_label": "{{score}} ({{count}})",
-    "aria_label": "{{count}} レビューからの {{score}} のフェデレーション評価"
+    "aria_label": "{{count}} レビューからの {{score}} のフェデレーション評価",
+    "tooltip_federated_other": "{{count}} パートナー コミュニティ全体で集約された評判",
+    "tooltip_local_other": "このコミュニティの {{count}} レビューに基づく",
+    "chip_label_other": "{{score}} ({{count}})",
+    "aria_label_other": "{{count}} レビューからの {{score}} のフェデレーション評価"
   },
   "reviews": {
     "unavailable": "このフェデレーション メンバーのレビューはまだ利用できません",

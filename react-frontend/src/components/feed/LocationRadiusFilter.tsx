@@ -37,7 +37,7 @@ export function LocationRadiusFilter({
       variant={isNearby ? 'flat' : 'light'}
       className={
         isNearby
-          ? 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20'
+          ? 'bg-accent/10 text-accent border border-accent/20'
           : 'text-[var(--text-muted)]'
       }
       startContent={isNearby ? <MapPin className="w-3.5 h-3.5" /> : <Globe className="w-3.5 h-3.5" />}
@@ -78,7 +78,7 @@ export function LocationRadiusFilter({
             aria-label={t('location.radius')}
             classNames={{
               track: 'bg-[var(--border-default)]',
-              filler: 'bg-gradient-to-r from-indigo-500 to-purple-500',
+              filler: 'bg-gradient-to-r from-accent to-accent-gradient-end',
               thumb: 'bg-white shadow-md',
             }}
           />

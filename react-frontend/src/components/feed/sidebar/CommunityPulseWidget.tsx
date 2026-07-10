@@ -7,6 +7,7 @@
  * CommunityPulseWidget - Shows community stats in a compact 2x2 grid
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Link } from 'react-router-dom';
 import HeartPulse from 'lucide-react/icons/heart-pulse';
 import Users from 'lucide-react/icons/users';
@@ -38,8 +39,8 @@ export function CommunityPulseWidget({ stats }: CommunityPulseWidgetProps) {
       count: stats.members,
       label: t('sidebar.pulse.members'),
       path: '/members',
-      color: 'text-indigo-500',
-      bg: 'bg-indigo-500/10',
+      color: 'text-accent',
+      bg: 'bg-accent/10',
     },
     {
       icon: Tag,
@@ -85,7 +86,7 @@ export function CommunityPulseWidget({ stats }: CommunityPulseWidgetProps) {
           >
             <item.icon className={`w-4 h-4 ${item.color}`} aria-hidden="true" />
             <p className={`text-sm font-bold ${item.color}`}>
-              {(item.count ?? 0).toLocaleString()}
+              {(item.count ?? 0).toLocaleString(getFormattingLocale())}
             </p>
             <p className="text-[10px] text-[var(--text-muted)]">{item.label}</p>
           </Link>

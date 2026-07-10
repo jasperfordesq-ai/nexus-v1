@@ -210,6 +210,9 @@
     "top_earners": "Principais ganhadores",
     "top_spenders": "Principais gastadores",
     "user_report_desc": "Veja um relatório detalhado de crédito de tempo para um membro individual",
-    "user_report_title": "Relatório do usuário"
+    "user_report_title": "Relatório do usuário",
+    "hours_value_many": "{{count}}h",
+    "hours_value_one": "{{count}}h",
+    "hours_value_other": "{{count}}h"
   }
 }

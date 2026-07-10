@@ -11,6 +11,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody } from '@/components/ui/Card';
 import { Chip } from '@/components/ui/Chip';
+import { OverlayActionButton } from '@/components/ui/OverlayActionButton';
 import { Progress } from '@/components/ui/Progress';
 import { SearchField } from '@/components/ui/SearchField';
 import { Skeleton } from '@/components/ui/Skeleton';
@@ -50,7 +51,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useApi } from '@/hooks/useApi';
 import { useTenant, useAuth } from '@/contexts';
-import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
+import { resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import apiClient from '@/lib/api';
 import { ExploreSection, ExploreStatCard, HorizontalScroll } from '@/components/explore';
 
@@ -376,12 +377,12 @@ function EmptyState({ icon: Icon, message, cta, onAction }: {
 // Format a date to a short readable format
 const formatDate = (dateStr: string) => {
   const date = new Date(dateStr);
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  return date.toLocaleDateString(getFormattingLocale(), { month: 'short', day: 'numeric' });
 };
 
 const formatDateTime = (dateStr: string) => {
   const date = new Date(dateStr);
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(getFormattingLocale(), {
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
@@ -1111,7 +1112,7 @@ export default function ExplorePage() {
                   </span>
                   <span className="text-[10px] text-[var(--text-muted)] flex items-center gap-0.5">
                     <Trophy className="w-3 h-3" aria-hidden="true" />
-                    {user.xp.toLocaleString()} XP
+                    {t('gamification:achievements.xp_value', { xp: user.xp.toLocaleString(getFormattingLocale()) })}
                   </span>
                 </Link>
               ))}
@@ -1220,17 +1221,15 @@ export default function ExplorePage() {
                   </Card>
                 </Link>
                 {/* Dismiss button */}
-                <Button
-                  isIconOnly
-                  size="sm"
+                <OverlayActionButton
                   variant="tertiary"
                   radius="full"
-                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity min-w-6 w-6 h-6 bg-[var(--surface-elevated)] hover:bg-[var(--surface-hover)]"
+                  className="absolute -top-2 -right-2 rounded-full bg-[var(--surface-elevated)] shadow-sm transition-opacity [--button-bg-hover:var(--surface-hover)]"
                   onPress={() => handleDismiss('listing', listing.id, 'not_relevant')}
                   aria-label={t('dismiss')}
                 >
-                  <X className="w-3.5 h-3.5 text-[var(--text-muted)]" aria-hidden="true" />
-                </Button>
+                  <X className="size-4 text-[var(--text-muted)]" aria-hidden="true" />
+                </OverlayActionButton>
               </div>
             ))}
           </div>

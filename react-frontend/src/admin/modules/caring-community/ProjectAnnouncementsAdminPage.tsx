@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Progress, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -45,7 +46,7 @@ function unwrapData<T>(raw: { data?: T } | T): T {
 
 function formatDate(value: string | null, fallback: string): string {
   if (!value) return fallback;
-  return new Date(value).toLocaleDateString();
+  return new Date(value).toLocaleDateString(getFormattingLocale());
 }
 
 function statusColor(status: ProjectStatus): 'accent' | 'warning' | 'success' | 'default' | 'danger' {

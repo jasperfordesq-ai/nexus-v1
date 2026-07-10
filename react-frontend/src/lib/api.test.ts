@@ -319,6 +319,122 @@ describe('API Client', () => {
       expect(response.error).toBe('Upload rejected');
       expect(response.code).toBe('UPLOAD_REJECTED');
     });
+
+    it('stops fetch upload after one refresh when the retry remains unauthorized', async () => {
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('refresh-token');
+      vi.mocked(fetch)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+          json: () => Promise.resolve({ error: 'Unauthorized' }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          headers: new Headers(),
+          json: () => Promise.resolve({ success: true, access_token: 'new-token' }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+          json: () => Promise.resolve({ error: 'Still unauthorized' }),
+        } as Response);
+
+      const response = await api.upload('/v2/files', new File(['x'], 'x.txt'));
+
+      expect(response.code).toBe('SESSION_EXPIRED');
+      expect(fetch).toHaveBeenCalledTimes(3);
+      expect(tokenManager.getAccessToken()).toBeNull();
+    });
+
+    it('stops progress-aware XHR upload after one refresh when the retry remains unauthorized', async () => {
+      class FakeXMLHttpRequest {
+        static instances: FakeXMLHttpRequest[] = [];
+        status = 0;
+        responseText = '';
+        timeout = 0;
+        withCredentials = false;
+        upload: { onprogress: ((event: ProgressEvent) => void) | null } = { onprogress: null };
+        onload: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        ontimeout: (() => void) | null = null;
+        onabort: (() => void) | null = null;
+
+        constructor() {
+          FakeXMLHttpRequest.instances.push(this);
+        }
+
+        open(): void {}
+        setRequestHeader(): void {}
+        send(): void {}
+        abort(): void { this.onabort?.(); }
+
+        respond(status: number, body: Record<string, unknown>): void {
+          this.status = status;
+          this.responseText = JSON.stringify(body);
+          this.onload?.();
+        }
+      }
+
+      vi.stubGlobal('XMLHttpRequest', FakeXMLHttpRequest);
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('refresh-token');
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        headers: new Headers(),
+        json: () => Promise.resolve({ success: true, access_token: 'new-token' }),
+      } as Response);
+
+      const responsePromise = api.upload(
+        '/v2/files',
+        new File(['x'], 'x.txt'),
+        'file',
+        { onUploadProgress: vi.fn() },
+      );
+      FakeXMLHttpRequest.instances[0]?.respond(401, { error: 'Unauthorized' });
+      await vi.waitFor(() => expect(FakeXMLHttpRequest.instances).toHaveLength(2));
+      FakeXMLHttpRequest.instances[1]?.respond(401, { error: 'Still unauthorized' });
+
+      const response = await responsePromise;
+      expect(response.code).toBe('SESSION_EXPIRED');
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(FakeXMLHttpRequest.instances).toHaveLength(2);
+      expect(tokenManager.getAccessToken()).toBeNull();
+    });
+  });
+
+  describe('file downloads', () => {
+    it('stops after one refresh when the retried download remains unauthorized', async () => {
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('refresh-token');
+      vi.mocked(fetch)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          headers: new Headers(),
+          json: () => Promise.resolve({ success: true, access_token: 'new-token' }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+        } as Response);
+
+      await expect(api.download('/v2/export')).rejects.toThrow('Session expired');
+
+      expect(fetch).toHaveBeenCalledTimes(3);
+      expect(tokenManager.getAccessToken()).toBeNull();
+      expect(tokenManager.getRefreshToken()).toBeNull();
+    });
   });
 
   describe('PUT requests', () => {
@@ -413,6 +529,57 @@ describe('API Client', () => {
 
       window.removeEventListener(API_ERROR_EVENT, eventHandler);
     });
+
+    it('returns caller cancellation without dispatching a global timeout error', async () => {
+      const eventHandler = vi.fn();
+      window.addEventListener(API_ERROR_EVENT, eventHandler);
+      const controller = new AbortController();
+      controller.abort();
+      vi.mocked(fetch).mockRejectedValueOnce(new DOMException('Aborted', 'AbortError'));
+
+      const response = await api.get('/v2/test', { signal: controller.signal });
+
+      expect(response).toEqual({ success: false, code: 'CANCELLED' });
+      expect(eventHandler).not.toHaveBeenCalled();
+      window.removeEventListener(API_ERROR_EVENT, eventHandler);
+    });
+
+    it('still classifies the client timeout controller as TIMEOUT', async () => {
+      const eventHandler = vi.fn();
+      window.addEventListener(API_ERROR_EVENT, eventHandler);
+      vi.mocked(fetch).mockImplementationOnce((_url, init) => new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => {
+          reject(new DOMException('Aborted', 'AbortError'));
+        }, { once: true });
+      }));
+
+      const response = await api.get('/v2/test', { timeout: 1 });
+
+      expect(response.code).toBe('TIMEOUT');
+      expect(eventHandler).toHaveBeenCalledTimes(1);
+      window.removeEventListener(API_ERROR_EVENT, eventHandler);
+    });
+
+    it('preserves an explicit maintenance response code and backend message on 503', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: false,
+        status: 503,
+        headers: new Headers(),
+        json: () => Promise.resolve({
+          success: false,
+          code: 'MAINTENANCE_MODE',
+          error: 'Localized maintenance message',
+        }),
+      } as Response);
+
+      const response = await api.get('/v2/test');
+
+      expect(response).toEqual({
+        success: false,
+        code: 'MAINTENANCE_MODE',
+        error: 'Localized maintenance message',
+      });
+    });
   });
 
   describe('401 handling and token refresh', () => {
@@ -496,6 +663,160 @@ describe('API Client', () => {
 
       expect(response.success).toBe(false);
       expect(fetch).toHaveBeenCalledTimes(1); // No refresh attempt
+    });
+
+    it.each([
+      ['network failure', new Error('offline')],
+      ['abort-like transport failure', new DOMException('Aborted', 'AbortError')],
+    ])('preserves credentials when token refresh has a transient %s', async (_label, failure) => {
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('refresh-token');
+      vi.mocked(fetch)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+          json: () => Promise.resolve({ error: 'Unauthorized' }),
+        } as Response)
+        .mockRejectedValueOnce(failure);
+
+      const response = await api.get('/v2/users/me');
+
+      expect(response).toEqual({ success: false, code: 'AUTH_REFRESH_UNAVAILABLE' });
+      expect(tokenManager.getAccessToken()).toBe('old-token');
+      expect(tokenManager.getRefreshToken()).toBe('refresh-token');
+      expect(fetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('preserves credentials when the refresh endpoint returns 5xx', async () => {
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('refresh-token');
+      vi.mocked(fetch)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+          json: () => Promise.resolve({ error: 'Unauthorized' }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 503,
+          headers: new Headers(),
+          json: () => Promise.resolve({ error: 'Unavailable' }),
+        } as Response);
+
+      const response = await api.get('/v2/users/me');
+
+      expect(response.code).toBe('AUTH_REFRESH_UNAVAILABLE');
+      expect(tokenManager.getAccessToken()).toBe('old-token');
+      expect(tokenManager.getRefreshToken()).toBe('refresh-token');
+      expect(fetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('expires after one refresh when the retried standard request is still 401', async () => {
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('refresh-token');
+      vi.mocked(fetch)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+          json: () => Promise.resolve({ error: 'Unauthorized' }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          headers: new Headers(),
+          json: () => Promise.resolve({ success: true, access_token: 'new-token' }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+          json: () => Promise.resolve({ error: 'Still unauthorized' }),
+        } as Response);
+
+      const response = await api.get('/v2/users/me');
+
+      expect(response.code).toBe('SESSION_EXPIRED');
+      expect(fetch).toHaveBeenCalledTimes(3);
+      expect(tokenManager.getAccessToken()).toBeNull();
+      expect(tokenManager.getRefreshToken()).toBeNull();
+    });
+
+    it('observes a cross-tab refresh that completes during lock handoff without waiting', async () => {
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('refresh-token');
+      localStorage.setItem('nexus_token_refresh_lock', String(Date.now()));
+
+      const originalGetItem = Storage.prototype.getItem;
+      let raced = false;
+      const getItemSpy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(function (key: string) {
+        const value = originalGetItem.call(this, key);
+        if (key === 'nexus_token_refresh_lock' && !raced) {
+          raced = true;
+          localStorage.setItem('nexus_access_token', 'other-tab-token');
+          localStorage.removeItem('nexus_token_refresh_lock');
+        }
+        return value;
+      });
+
+      vi.mocked(fetch)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+          json: () => Promise.resolve({ error: 'Unauthorized' }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          headers: new Headers(),
+          json: () => Promise.resolve({ data: { id: 1 } }),
+        } as Response);
+
+      const response = await api.get('/v2/users/me');
+
+      getItemSpy.mockRestore();
+      expect(response.success).toBe(true);
+      expect(fetch).toHaveBeenCalledTimes(2);
+      const retryHeaders = vi.mocked(fetch).mock.calls[1]?.[1]?.headers as Headers;
+      expect(retryHeaders.get('Authorization')).toBe('Bearer other-tab-token');
+    });
+
+    it('resumes immediately when a refreshing tab publishes a new token storage event', async () => {
+      tokenManager.setAccessToken('old-token');
+      tokenManager.setRefreshToken('refresh-token');
+      localStorage.setItem('nexus_token_refresh_lock', String(Date.now()));
+      vi.mocked(fetch)
+        .mockResolvedValueOnce({
+          ok: false,
+          status: 401,
+          headers: new Headers(),
+          json: () => Promise.resolve({ error: 'Unauthorized' }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          headers: new Headers(),
+          json: () => Promise.resolve({ data: { id: 1 } }),
+        } as Response);
+
+      const responsePromise = api.get('/v2/users/me');
+      await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(1));
+      localStorage.setItem('nexus_access_token', 'published-token');
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'nexus_access_token',
+        oldValue: 'old-token',
+        newValue: 'published-token',
+        storageArea: localStorage,
+      }));
+
+      const response = await responsePromise;
+      expect(response.success).toBe(true);
+      expect(fetch).toHaveBeenCalledTimes(2);
+      const retryHeaders = vi.mocked(fetch).mock.calls[1]?.[1]?.headers as Headers;
+      expect(retryHeaders.get('Authorization')).toBe('Bearer published-token');
     });
   });
 

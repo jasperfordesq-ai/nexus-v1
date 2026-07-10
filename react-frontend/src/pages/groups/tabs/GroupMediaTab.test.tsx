@@ -28,7 +28,9 @@ vi.mock('@/lib/api', () => ({
 
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
+  cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   formatRelativeTime: () => '2 days ago',
+  responsiveThumbnailProps: (url: string) => ({ src: url }),
   resolveThumbnailUrl: (url: string | null | undefined) => url ?? '',
 }));
 
@@ -41,6 +43,92 @@ vi.mock('@/contexts', () =>
     useToast: () => mockToast,
   })
 );
+
+vi.mock('@/components/ui/ConfirmDialog', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/components/ui/ConfirmDialog')>()),
+  useConfirm: () => mockConfirm,
+}));
+
+vi.mock('@/components/ui/useDisclosure', () => ({
+  useDisclosure: () => ({
+    isOpen: false,
+    onOpen: vi.fn(),
+    onClose: vi.fn(),
+  }),
+}));
+
+vi.mock('@/components/ui/Button', () => ({
+  Button: ({
+    children,
+    className,
+    isDisabled,
+    isLoading,
+    isPending,
+    onPress,
+    'aria-label': ariaLabel,
+  }: {
+    children?: React.ReactNode | ((state: { isPending: boolean }) => React.ReactNode);
+    className?: string;
+    isDisabled?: boolean;
+    isLoading?: boolean;
+    isPending?: boolean;
+    onPress?: () => void;
+    'aria-label'?: string;
+  }) => (
+    <button
+      type="button"
+      className={className}
+      disabled={isDisabled}
+      aria-label={ariaLabel}
+      onClick={onPress}
+    >
+      {typeof children === 'function'
+        ? children({ isPending: Boolean(isLoading || isPending) })
+        : children}
+    </button>
+  ),
+}));
+
+vi.mock('@/components/ui/GlassCard', () => ({
+  GlassCard: ({ children, onClick }: { children?: React.ReactNode; onClick?: () => void }) => (
+    <div data-testid="glass-card" onClick={onClick}>{children}</div>
+  ),
+}));
+
+vi.mock('@/components/ui/Modal', () => ({
+  Modal: ({ children, isOpen }: { children?: React.ReactNode; isOpen?: boolean }) =>
+    isOpen ? <div role="dialog" aria-label="Dialog">{children}</div> : null,
+  ModalContent: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+  ModalBody: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
+}));
+
+vi.mock('@/components/ui/Spinner', () => ({
+  Spinner: ({ size }: { size?: string }) => (
+    <div role="status" aria-busy="true" aria-label="loading" data-size={size} />
+  ),
+}));
+
+vi.mock('@/components/ui/ToggleButtonGroup', () => ({
+  ToggleButtonGroup: ({ children, onSelectionChange, selectedKeys }: {
+    children?: React.ReactNode;
+    onSelectionChange?: (keys: Set<string>) => void;
+    selectedKeys?: Set<string>;
+  }) => (
+    <div data-testid="toggle-group" data-selected={[...(selectedKeys ?? [])].join(',')}>
+      {React.Children.map(children, (child) => {
+        if (!React.isValidElement<{ id?: string }>(child)) return child;
+        return React.cloneElement(child, {
+          onClick: () => onSelectionChange?.(new Set([child.props.id ?? ''])),
+        } as { onClick: () => void });
+      })}
+    </div>
+  ),
+  ToggleButton: ({ children, id, onClick }: {
+    children?: React.ReactNode;
+    id?: string;
+    onClick?: () => void;
+  }) => <button data-testid={`filter-${id}`} onClick={onClick}>{children}</button>,
+}));
 
 // ── Stub HeroUI heavy components ──────────────────────────────────────────────
 vi.mock('@/components/ui', async (importOriginal) => {
@@ -259,6 +347,14 @@ describe('GroupMediaTab', () => {
         (b) => b.getAttribute('aria-label')?.toLowerCase().includes('delete')
       );
       expect(deleteBtn).toBeDefined();
+      expect(deleteBtn).toHaveClass('size-11', 'min-h-11', 'min-w-11');
+      expect(deleteBtn).toHaveClass(
+        'pointer-coarse:opacity-100',
+        'pointer-fine:opacity-0',
+        'pointer-fine:group-hover:opacity-100',
+        'group-focus-within:opacity-100',
+        'focus-visible:opacity-100',
+      );
     });
   });
 

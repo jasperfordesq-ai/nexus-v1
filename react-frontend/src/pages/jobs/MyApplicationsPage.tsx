@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -243,7 +244,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
       deadlineLabel = (
         <span className='flex items-center gap-1 text-xs text-theme-muted'>
           <Calendar size={12} />
-          {deadlineDate.toLocaleDateString()}
+          {deadlineDate.toLocaleDateString(getFormattingLocale())}
         </span>
       );
     }
@@ -301,9 +302,9 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
 
         {/* Dates row */}
         <div className='flex flex-wrap gap-3 mb-3 text-xs text-theme-muted'>
-          <span>{t('my_applications.applied_date', { date: appliedDate.toLocaleDateString() })}</span>
+          <span>{t('my_applications.applied_date', { date: appliedDate.toLocaleDateString(getFormattingLocale()) })}</span>
           {datesAreDifferent && (
-            <span>{t('my_applications.updated_date', { date: updatedDate.toLocaleDateString() })}</span>
+            <span>{t('my_applications.updated_date', { date: updatedDate.toLocaleDateString(getFormattingLocale()) })}</span>
           )}
         </div>
 
@@ -353,7 +354,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               <div className='flex items-center gap-2 text-sm font-medium text-accent dark:text-accent'>
                 <Video size={14} aria-hidden="true" />
                 {t('interview_inline', {
-                  date: new Date(application.interview.scheduled_at).toLocaleString(undefined, {
+                  date: new Date(application.interview.scheduled_at).toLocaleString(getFormattingLocale(), {
                     year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
                   }),
                   type: application.interview.interview_type === 'video'
@@ -452,7 +453,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               <div className='text-sm font-medium text-success-700 dark:text-success-300'>
                 {application.offer.salary_offered
                   ? t('offer_inline', {
-                      salary: `${application.offer.salary_currency} ${Number(application.offer.salary_offered).toLocaleString()} / ${t(`salary.${application.offer.salary_type}`)}`,
+                      salary: `${application.offer.salary_currency} ${Number(application.offer.salary_offered).toLocaleString(getFormattingLocale())} / ${t(`salary.${application.offer.salary_type}`)}`,
                     })
                   : t('offer.title')}
               </div>
@@ -471,7 +472,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
             {application.offer.start_date && (
               <div className='text-xs text-success-600 dark:text-success-400 mt-1'>
                 {t('offer_start_date', {
-                  date: new Date(application.offer.start_date).toLocaleDateString(),
+                  date: new Date(application.offer.start_date).toLocaleDateString(getFormattingLocale()),
                 })}
               </div>
             )}
@@ -594,7 +595,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                               <p className='text-xs text-muted italic mt-0.5'>{entry.notes}</p>
                             )}
                             <div className='text-xs text-muted mt-0.5'>
-                              {new Date(entry.changed_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                              {new Date(entry.changed_at).toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'short', day: 'numeric' })}
                               {entry.changed_by_name && <span className='ml-1'>{t('history.by', { name: entry.changed_by_name })}</span>}
                             </div>
                           </div>

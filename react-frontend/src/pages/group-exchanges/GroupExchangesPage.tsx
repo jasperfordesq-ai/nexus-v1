@@ -40,7 +40,7 @@ import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl } from '@/lib/helpers';
+import { resolveAvatarUrl, getFormattingLocale } from '@/lib/helpers';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -214,14 +214,12 @@ export function GroupExchangesPage() {
             {t('subtitle')}
           </p>
         </div>
-        <Link to={tenantPath('/group-exchanges/create')}>
-          <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-            startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
-          >
-            {t('new_exchange')}
-          </Button>
-        </Link>
+        <Button as={Link} to={tenantPath('/group-exchanges/create')}
+          className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
+          startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
+        >
+          {t('new_exchange')}
+        </Button>
       </div>
 
       {/* Tabs */}
@@ -251,7 +249,7 @@ export function GroupExchangesPage() {
           <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h3>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
-            className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+            className="bg-gradient-to-r from-accent to-accent-gradient-end text-white"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadExchanges()}
           >
@@ -279,11 +277,9 @@ export function GroupExchangesPage() {
                   : t('empty_description_filtered')
               }
               action={
-                <Link to={tenantPath('/group-exchanges/create')}>
-                  <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white">
-                    {t('create_exchange')}
-                  </Button>
-                </Link>
+                <Button as={Link} to={tenantPath('/group-exchanges/create')} className="bg-gradient-to-r from-accent to-accent-gradient-end text-white">
+                  {t('create_exchange')}
+                </Button>
               }
             />
           ) : (
@@ -298,7 +294,7 @@ export function GroupExchangesPage() {
                       className="block"
                       aria-label={t('card_aria', { title: exchange.title, status: t('status.' + exchange.status) })}
                     >
-                      <GlassCard className="p-4 sm:p-6 hover:border-indigo-500/30 transition-colors cursor-pointer">
+                      <GlassCard className="p-4 sm:p-6 hover:border-accent/30 transition-colors cursor-pointer">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                           {/* Organizer Avatar */}
                           <Avatar
@@ -335,7 +331,7 @@ export function GroupExchangesPage() {
                               <span className="flex items-center gap-1">
                                 <Calendar className="w-4 h-4" aria-hidden="true" />
                                 <time dateTime={exchange.created_at}>
-                                  {new Date(exchange.created_at).toLocaleDateString()}
+                                  {new Date(exchange.created_at).toLocaleDateString(getFormattingLocale())}
                                 </time>
                               </span>
                             </div>
@@ -346,7 +342,7 @@ export function GroupExchangesPage() {
                                 size="sm"
                                 variant="flat"
                                 className={isOrganizer
-                                  ? 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-400'
+                                  ? 'bg-accent/20 text-accent dark:text-accent'
                                   : 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'}
                               >
                                 {isOrganizer ? t('role_organizer') : t('role_participant')}

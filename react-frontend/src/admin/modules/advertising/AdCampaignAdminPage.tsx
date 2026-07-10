@@ -34,7 +34,7 @@ import Plus from 'lucide-react/icons/plus';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { responsiveThumbnailProps } from '@/lib/helpers';
+import { responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import { PageHeader } from '../../components/PageHeader';
 import { DataTable, type Column } from '../../components/DataTable';
 import { StatCard } from '../../components/StatCard';
@@ -142,7 +142,7 @@ function ctr(impressions: number, clicks: number): string {
 
 function formatDate(iso: string | null): string {
   if (!iso) return '—';
-  return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  return new Date(iso).toLocaleDateString(getFormattingLocale(), { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 const EMPTY_FORM: CreateCampaignForm = {
@@ -408,7 +408,7 @@ export function AdCampaignAdminPage() {
       label: t('advertising.shared.columns.impressions'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-foreground">{item.impression_count.toLocaleString()}</span>
+        <span className="text-sm text-foreground">{item.impression_count.toLocaleString(getFormattingLocale())}</span>
       ),
     },
     {
@@ -416,7 +416,7 @@ export function AdCampaignAdminPage() {
       label: t('advertising.shared.columns.clicks'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-foreground">{item.click_count.toLocaleString()}</span>
+        <span className="text-sm text-foreground">{item.click_count.toLocaleString(getFormattingLocale())}</span>
       ),
     },
     {
@@ -633,11 +633,11 @@ export function AdCampaignAdminPage() {
                         <p className="text-sm font-semibold text-foreground mb-2">{t('advertising.ad.performance_30_days')}</p>
                         <div className="grid grid-cols-3 gap-3">
                           <div className="rounded-lg bg-surface-secondary p-3 text-center">
-                            <p className="text-2xl font-bold text-foreground">{detailCampaign.stats.impressions.toLocaleString()}</p>
+                            <p className="text-2xl font-bold text-foreground">{detailCampaign.stats.impressions.toLocaleString(getFormattingLocale())}</p>
                             <p className="mt-0.5 text-xs text-muted">{t('advertising.shared.columns.impressions')}</p>
                           </div>
                           <div className="rounded-lg bg-surface-secondary p-3 text-center">
-                            <p className="text-2xl font-bold text-foreground">{detailCampaign.stats.clicks.toLocaleString()}</p>
+                            <p className="text-2xl font-bold text-foreground">{detailCampaign.stats.clicks.toLocaleString(getFormattingLocale())}</p>
                             <p className="mt-0.5 text-xs text-muted">{t('advertising.shared.columns.clicks')}</p>
                           </div>
                           <div className="rounded-lg bg-surface-secondary p-3 text-center">

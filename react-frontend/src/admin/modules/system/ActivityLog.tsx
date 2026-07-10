@@ -9,6 +9,7 @@
  * Parity: PHP AdminController::activityLogs()
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useCallback, useEffect } from 'react';
 
 import Activity from 'lucide-react/icons/activity';
@@ -57,7 +58,7 @@ function getActionColor(action: string): 'success' | 'warning' | 'danger' | 'pri
 function formatDate(dateStr: string): string {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
-  return d.toLocaleDateString(undefined, {
+  return d.toLocaleDateString(getFormattingLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

@@ -100,5 +100,8 @@
   "page_meta": {
     "title": "Encuestas"
   },
-  "category_filter_label": "Filtrar por categoría"
+  "category_filter_label": "Filtrar por categoría",
+  "total_ballots_many": "Total de papeletas: {{count}}",
+  "total_ballots_one": "Total de papeletas: {{count}}",
+  "total_ballots_other": "Total de papeletas: {{count}}"
 }

@@ -37,5 +37,9 @@
   "page_meta": {
     "title": "Połączenia"
   },
-  "loading": "Ładowanie połączeń..."
+  "loading": "Ładowanie połączeń...",
+  "pending_count_few": "{{count}} oczekujące",
+  "pending_count_many": "{{count}} oczekujące",
+  "pending_count_one": "{{count}} oczekujące",
+  "pending_count_other": "{{count}} oczekujące"
 }

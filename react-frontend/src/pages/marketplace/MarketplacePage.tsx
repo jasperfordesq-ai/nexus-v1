@@ -15,6 +15,7 @@
  * - Featured listings section
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
@@ -287,9 +288,9 @@ export function MarketplacePage() {
           icon={<ShoppingBag className="h-6 w-6" aria-hidden="true" />}
           accent="emerald"
           stats={[
-            { label: t('hub.categories_stat'), value: categories.length.toLocaleString() },
-            { label: t('hub.listings_stat'), value: listings.length.toLocaleString() },
-            { label: t('hub.featured_stat'), value: featuredListings.length.toLocaleString() },
+            { label: t('hub.categories_stat'), value: categories.length.toLocaleString(getFormattingLocale()) },
+            { label: t('hub.listings_stat'), value: listings.length.toLocaleString(getFormattingLocale()) },
+            { label: t('hub.featured_stat'), value: featuredListings.length.toLocaleString(getFormattingLocale()) },
           ]}
           action={
             isAuthenticated ? (

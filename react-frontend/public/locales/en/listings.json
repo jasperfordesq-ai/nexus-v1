@@ -111,7 +111,9 @@
     "service_type_physical": "In-person only",
     "service_type_physical_hint": "Needs a shared physical place",
     "service_type_remote": "Remote only",
-    "service_type_remote_hint": "Can happen by phone, chat, or video"
+    "service_type_remote_hint": "Can happen by phone, chat, or video",
+    "character_count_one": "{{count}}/{{max}}",
+    "character_count_other": "{{count}}/{{max}}"
   },
   "page_subtitle": "Browse services and requests from the community",
   "hero_eyebrow": "Community exchange board",
@@ -247,7 +249,9 @@
     "placeholder": "Type a skill and press Enter...",
     "aria_add": "Add skill tag",
     "aria_add_count": "Add skill tag ({{current}} of {{max}})",
-    "aria_results": "{{count}} skill suggestions available"
+    "aria_results": "{{count}} skill suggestions available",
+    "aria_results_one": "{{count}} skill suggestions available",
+    "aria_results_other": "{{count}} skill suggestions available"
   },
   "more_filters": "More filters",
   "filters_label": "Filters",
@@ -269,7 +273,11 @@
     "load_error": "Failed to load analytics",
     "retry": "Retry",
     "no_data": "No views yet — check back after your listing gets some traffic",
-    "bar_label": "{{date}}: {{count}} views"
+    "bar_label": "{{date}}: {{count}} views",
+    "unique_viewers_one": "{{count}} unique",
+    "unique_viewers_other": "{{count}} unique",
+    "bar_label_one": "{{date}}: {{count}} views",
+    "bar_label_other": "{{date}}: {{count}} views"
   },
   "filter_hours": "Duration",
   "filter_any_duration": "Any duration",

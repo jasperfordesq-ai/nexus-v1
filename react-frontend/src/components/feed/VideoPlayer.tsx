@@ -12,7 +12,8 @@
  * - Poster from thumbnail_url if available.
  */
 
-import { useRef, useState, useEffect, useCallback, type KeyboardEvent } from 'react';import Play from 'lucide-react/icons/play';
+import { useRef, useState, useEffect, useCallback } from 'react';
+import Play from 'lucide-react/icons/play';
 import Volume2 from 'lucide-react/icons/volume-2';
 import VolumeX from 'lucide-react/icons/volume-x';
 import VideoOff from 'lucide-react/icons/video-off';
@@ -73,8 +74,7 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
     }
   }, []);
 
-  const handleToggleMute = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleToggleMute = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
     video.muted = !video.muted;
@@ -97,17 +97,6 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
     setShowPlayOverlay(false);
   }, []);
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLDivElement>) => {
-      if (hasError) return;
-      if (e.key === ' ' || e.key === 'Enter') {
-        e.preventDefault();
-        handlePlayPause();
-      }
-    },
-    [hasError, handlePlayPause]
-  );
-
   const posterUrl = media.thumbnail_url
     ? resolveThumbnailUrl(media.thumbnail_url, { width: 1200, height: 675 })
     : undefined;
@@ -129,12 +118,7 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
   return (
     <div
       ref={containerRef}
-      className={`relative overflow-hidden rounded-xl bg-black/5 dark:bg-white/5 group cursor-pointer ${className}`}
-      onClick={handlePlayPause}
-      onKeyDown={handleKeyDown}
-      role="button"
-      tabIndex={0}
-      aria-label={isPlaying ? t('video.pause') : t('video.play')}
+      className={`relative overflow-hidden rounded-xl bg-black/5 dark:bg-white/5 group ${className}`}
     >
       <video
         ref={videoRef}
@@ -151,6 +135,13 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
         onError={handleError}
       />
 
+      <Button
+        variant="ghost"
+        className="absolute inset-0 z-10 h-full w-full min-w-0 rounded-xl p-0 [--button-bg:transparent] [--button-bg-hover:transparent] [--button-bg-pressed:transparent]"
+        onPress={handlePlayPause}
+        aria-label={isPlaying ? t('video.pause') : t('video.play')}
+      />
+
       {/* Play overlay — shown when paused */}
       {showPlayOverlay && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -165,8 +156,8 @@ export function VideoPlayer({ media, className = '' }: VideoPlayerProps) {
         isIconOnly
         variant="flat"
         size="sm"
-        className="absolute bottom-3 right-3 bg-black/40 backdrop-blur-sm text-white rounded-full min-w-[44px] min-h-[44px] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 transition-opacity duration-200"
-        onClick={handleToggleMute}
+        className="absolute bottom-3 right-3 z-20 bg-black/40 backdrop-blur-sm text-white rounded-full min-w-[44px] min-h-[44px] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100 transition-opacity duration-200"
+        onPress={handleToggleMute}
         aria-label={isMuted ? t('video.unmute') : t('video.mute')}
       >
         {isMuted ? (

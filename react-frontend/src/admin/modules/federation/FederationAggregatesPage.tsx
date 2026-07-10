@@ -3,6 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Spinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -183,7 +184,9 @@ export default function FederationAggregatesPage() {
                 <div>
                   <div className="font-medium">{t('federation_aggregates.consent.enable_label')}</div>
                   <div className="text-sm text-muted">
-                    {t('federation_aggregates.consent.endpoint_prefix')} <code>/api/v2/federation/aggregates</code>{' '}
+                    {t('federation_aggregates.consent.endpoint_prefix')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- API endpoint must remain verbatim. */}
+                    <code>/api/v2/federation/aggregates</code>{' '}
                     {t('federation_aggregates.consent.endpoint_suffix')}
                   </div>
                 </div>
@@ -212,7 +215,7 @@ export default function FederationAggregatesPage() {
                 </Chip>
                 {consent?.last_rotated_at ? (
                   <span className="text-muted">
-                    {t('federation_aggregates.status.last_rotated', { date: new Date(consent.last_rotated_at).toLocaleString() })}
+                    {t('federation_aggregates.status.last_rotated', { date: new Date(consent.last_rotated_at).toLocaleString(getFormattingLocale()) })}
                   </span>
                 ) : (
                   <span className="text-muted">{t('federation_aggregates.status.never_rotated')}</span>
@@ -281,7 +284,7 @@ export default function FederationAggregatesPage() {
                 <TableBody emptyContent={t('federation_aggregates.audit.empty')}>
                   {auditEntries.map((e) => (
                     <TableRow key={e.id}>
-                      <TableCell>{new Date(e.created_at).toLocaleString()}</TableCell>
+                      <TableCell>{new Date(e.created_at).toLocaleString(getFormattingLocale())}</TableCell>
                       <TableCell className="font-mono text-xs">
                         {e.requester_origin ?? t('federation_aggregates.audit.unknown_requester')}
                       </TableCell>

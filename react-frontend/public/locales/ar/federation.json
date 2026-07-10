@@ -82,7 +82,19 @@
     "quick_link_7_title": "إعدادات الاتحاد",
     "quick_link_7_description": "قم بتكوين تفضيلات الخصوصية والاتصال الخاصة بالاتحاد الخاص بك.",
     "quick_link_6_title": "اتصالات الاتحاد",
-    "quick_link_6_description": "أدر طلبات الاتصال الخاصة بك عبر المجتمعات الشريكة."
+    "quick_link_6_description": "أدر طلبات الاتصال الخاصة بك عبر المجتمعات الشريكة.",
+    "view_all_few": "عرض الكل ({{count}})",
+    "view_all_many": "عرض الكل ({{count}})",
+    "view_all_one": "عرض الكل ({{count}})",
+    "view_all_other": "عرض الكل ({{count}})",
+    "view_all_two": "عرض الكل ({{count}})",
+    "view_all_zero": "عرض الكل ({{count}})",
+    "member_count_few": "أعضاء {{count}}",
+    "member_count_many": "أعضاء {{count}}",
+    "member_count_one": "أعضاء {{count}}",
+    "member_count_other": "أعضاء {{count}}",
+    "member_count_two": "أعضاء {{count}}",
+    "member_count_zero": "أعضاء {{count}}"
   },
   "partners": {
     "page_title": "المجتمعات الشريكة",
@@ -115,7 +127,13 @@
     "browse_members": "تصفح الأعضاء",
     "browse_listings": "تصفح القوائم",
     "close": "يغلق",
-    "view_details": "عرض التفاصيل"
+    "view_details": "عرض التفاصيل",
+    "member_count_few": "أعضاء {{count}}",
+    "member_count_many": "أعضاء {{count}}",
+    "member_count_one": "أعضاء {{count}}",
+    "member_count_other": "أعضاء {{count}}",
+    "member_count_two": "أعضاء {{count}}",
+    "member_count_zero": "أعضاء {{count}}"
   },
   "members": {
     "page_title": "أعضاء الاتحاد",
@@ -156,7 +174,25 @@
     "external_profile_title": "عضو خارجي",
     "external_profile_message": "هذا العضو موجود على منصة شريك خارجي. عرض الملف الشخصي المباشر غير متاح.",
     "external_member": "عضو خارجي",
-    "member_fallback": "عضو"
+    "member_fallback": "عضو",
+    "external_source_note_external_only_few": "يعرض {{count}} نتيجة من شركاء خارجيين.",
+    "external_source_note_external_only_many": "يعرض {{count}} نتيجة من شركاء خارجيين.",
+    "external_source_note_external_only_one": "يعرض {{count}} نتيجة من شركاء خارجيين.",
+    "external_source_note_external_only_other": "يعرض {{count}} نتيجة من شركاء خارجيين.",
+    "external_source_note_external_only_two": "يعرض {{count}} نتيجة من شركاء خارجيين.",
+    "external_source_note_external_only_zero": "يعرض {{count}} نتيجة من شركاء خارجيين.",
+    "external_source_note_few": "يتضمن {{count}} نتيجة من شركاء خارجيين؛ تحميل المزيد يتابع نتائج الشركاء الداخليين.",
+    "external_source_note_many": "يتضمن {{count}} نتيجة من شركاء خارجيين؛ تحميل المزيد يتابع نتائج الشركاء الداخليين.",
+    "external_source_note_one": "يتضمن {{count}} نتيجة من شركاء خارجيين؛ تحميل المزيد يتابع نتائج الشركاء الداخليين.",
+    "external_source_note_other": "يتضمن {{count}} نتيجة من شركاء خارجيين؛ تحميل المزيد يتابع نتائج الشركاء الداخليين.",
+    "external_source_note_two": "يتضمن {{count}} نتيجة من شركاء خارجيين؛ تحميل المزيد يتابع نتائج الشركاء الداخليين.",
+    "external_source_note_zero": "يتضمن {{count}} نتيجة من شركاء خارجيين؛ تحميل المزيد يتابع نتائج الشركاء الداخليين.",
+    "more_skills_few": "+{{count}} المزيد",
+    "more_skills_many": "+{{count}} المزيد",
+    "more_skills_one": "+{{count}} المزيد",
+    "more_skills_other": "+{{count}} المزيد",
+    "more_skills_two": "+{{count}} المزيد",
+    "more_skills_zero": "+{{count}} المزيد"
   },
   "messages": {
     "page_title": "رسائل الاتحاد",
@@ -227,7 +263,19 @@
     "thread_aria_unread": "محادثة مع {{name}} من {{tenant}}، رسالة {{count}} غير مقروءة",
     "thread_aria_unread_plural": "محادثة مع {{name}} من {{tenant}}، رسائل {{count}} غير مقروءة",
     "recipient_fallback": "المستلم",
-    "user_number": "العضو رقم {{id}}"
+    "user_number": "العضو رقم {{id}}",
+    "thread_aria_unread_plural_few": "محادثة مع {{name}} من {{tenant}}، رسائل {{count}} غير مقروءة",
+    "thread_aria_unread_plural_many": "محادثة مع {{name}} من {{tenant}}، رسائل {{count}} غير مقروءة",
+    "thread_aria_unread_plural_one": "محادثة مع {{name}} من {{tenant}}، رسائل {{count}} غير مقروءة",
+    "thread_aria_unread_plural_other": "محادثة مع {{name}} من {{tenant}}، رسائل {{count}} غير مقروءة",
+    "thread_aria_unread_plural_two": "محادثة مع {{name}} من {{tenant}}، رسائل {{count}} غير مقروءة",
+    "thread_aria_unread_plural_zero": "محادثة مع {{name}} من {{tenant}}، رسائل {{count}} غير مقروءة",
+    "thread_aria_unread_few": "محادثة مع {{name}} من {{tenant}}، رسالة {{count}} غير مقروءة",
+    "thread_aria_unread_many": "محادثة مع {{name}} من {{tenant}}، رسالة {{count}} غير مقروءة",
+    "thread_aria_unread_one": "محادثة مع {{name}} من {{tenant}}، رسالة {{count}} غير مقروءة",
+    "thread_aria_unread_other": "محادثة مع {{name}} من {{tenant}}، رسالة {{count}} غير مقروءة",
+    "thread_aria_unread_two": "محادثة مع {{name}} من {{tenant}}، رسالة {{count}} غير مقروءة",
+    "thread_aria_unread_zero": "محادثة مع {{name}} من {{tenant}}، رسالة {{count}} غير مقروءة"
   },
   "listings": {
     "page_title": "قوائم الاتحاد",
@@ -259,7 +307,19 @@
     "hours_estimated": "~{{hours}}ح",
     "view_profile": "عرض الملف الشخصي",
     "contact_author": "اتصال",
-    "close": "يغلق"
+    "close": "يغلق",
+    "external_source_note_external_only_few": "يعرض {{count}} قائمة من شركاء خارجيين.",
+    "external_source_note_external_only_many": "يعرض {{count}} قائمة من شركاء خارجيين.",
+    "external_source_note_external_only_one": "يعرض {{count}} قائمة من شركاء خارجيين.",
+    "external_source_note_external_only_other": "يعرض {{count}} قائمة من شركاء خارجيين.",
+    "external_source_note_external_only_two": "يعرض {{count}} قائمة من شركاء خارجيين.",
+    "external_source_note_external_only_zero": "يعرض {{count}} قائمة من شركاء خارجيين.",
+    "external_source_note_few": "يتضمن {{count}} قائمة من شركاء خارجيين؛ تحميل المزيد يتابع قوائم الشركاء الداخليين.",
+    "external_source_note_many": "يتضمن {{count}} قائمة من شركاء خارجيين؛ تحميل المزيد يتابع قوائم الشركاء الداخليين.",
+    "external_source_note_one": "يتضمن {{count}} قائمة من شركاء خارجيين؛ تحميل المزيد يتابع قوائم الشركاء الداخليين.",
+    "external_source_note_other": "يتضمن {{count}} قائمة من شركاء خارجيين؛ تحميل المزيد يتابع قوائم الشركاء الداخليين.",
+    "external_source_note_two": "يتضمن {{count}} قائمة من شركاء خارجيين؛ تحميل المزيد يتابع قوائم الشركاء الداخليين.",
+    "external_source_note_zero": "يتضمن {{count}} قائمة من شركاء خارجيين؛ تحميل المزيد يتابع قوائم الشركاء الداخليين."
   },
   "settings": {
     "page_title": "إعدادات الاتحاد",
@@ -343,7 +403,11 @@
     "date_at_time": "{{date}} الساعة {{time}}",
     "attendees_going_one": "{{count}} مشارك",
     "attendees_going_other": "{{count}} مشاركين",
-    "organizer_fallback": "المنظم"
+    "organizer_fallback": "المنظم",
+    "attendees_going_few": "{{count}} مشاركين",
+    "attendees_going_many": "{{count}} مشاركين",
+    "attendees_going_two": "{{count}} مشاركين",
+    "attendees_going_zero": "{{count}} مشاركين"
   },
   "groups": {
     "page_title": "مجموعات الاتحاد",
@@ -364,7 +428,13 @@
     "load_more_error": "تعذر تحميل المزيد من المجموعات.",
     "member_count": "عضو {{count}}",
     "member_count_plural": "أعضاء {{count}}",
-    "private": "خاص"
+    "private": "خاص",
+    "member_count_few": "عضو {{count}}",
+    "member_count_many": "عضو {{count}}",
+    "member_count_one": "عضو {{count}}",
+    "member_count_other": "عضو {{count}}",
+    "member_count_two": "عضو {{count}}",
+    "member_count_zero": "عضو {{count}}"
   },
   "connections": {
     "page_title": "اتصالات الاتحاد",
@@ -416,7 +486,11 @@
     "level_prefix": "المستوى {{level}}",
     "member_count_one": "{{count}} عضو",
     "member_count_other": "{{count}} عضوًا",
-    "partner_since": "شريك منذ {{date}}"
+    "partner_since": "شريك منذ {{date}}",
+    "member_count_few": "{{count}} عضوًا",
+    "member_count_many": "{{count}} عضوًا",
+    "member_count_two": "{{count}} عضوًا",
+    "member_count_zero": "{{count}} عضوًا"
   },
   "onboarding": {
     "page_title": "إعداد الاتحاد",
@@ -495,7 +569,21 @@
     "partners_available_other": "{{count}} مجتمعات شريكة متاحة",
     "member_count_one": "{{count}} عضو",
     "member_count_other": "{{count}} عضوًا",
-    "and_more": "+{{count}} المزيد"
+    "and_more": "+{{count}} المزيد",
+    "partners_available_few": "{{count}} مجتمعات شريكة متاحة",
+    "partners_available_many": "{{count}} مجتمعات شريكة متاحة",
+    "partners_available_two": "{{count}} مجتمعات شريكة متاحة",
+    "partners_available_zero": "{{count}} مجتمعات شريكة متاحة",
+    "member_count_few": "{{count}} عضوًا",
+    "member_count_many": "{{count}} عضوًا",
+    "member_count_two": "{{count}} عضوًا",
+    "member_count_zero": "{{count}} عضوًا",
+    "and_more_few": "+{{count}} المزيد",
+    "and_more_many": "+{{count}} المزيد",
+    "and_more_one": "+{{count}} المزيد",
+    "and_more_other": "+{{count}} المزيد",
+    "and_more_two": "+{{count}} المزيد",
+    "and_more_zero": "+{{count}} المزيد"
   },
   "member_profile": {
     "page_title": "الملف الشخصي للعضو",
@@ -544,7 +632,31 @@
     "tooltip_federated": "تم تجميع السمعة عبر المجتمعات الشريكة لـ {{count}}",
     "tooltip_local": "بناءً على مراجعات {{count}} في هذا المجتمع",
     "chip_label": "{{score}} ({{count}})",
-    "aria_label": "السمعة الموحدة {{score}} من مراجعات {{count}}"
+    "aria_label": "السمعة الموحدة {{score}} من مراجعات {{count}}",
+    "tooltip_federated_few": "تم تجميع السمعة عبر المجتمعات الشريكة لـ {{count}}",
+    "tooltip_federated_many": "تم تجميع السمعة عبر المجتمعات الشريكة لـ {{count}}",
+    "tooltip_federated_one": "تم تجميع السمعة عبر المجتمعات الشريكة لـ {{count}}",
+    "tooltip_federated_other": "تم تجميع السمعة عبر المجتمعات الشريكة لـ {{count}}",
+    "tooltip_federated_two": "تم تجميع السمعة عبر المجتمعات الشريكة لـ {{count}}",
+    "tooltip_federated_zero": "تم تجميع السمعة عبر المجتمعات الشريكة لـ {{count}}",
+    "tooltip_local_few": "بناءً على مراجعات {{count}} في هذا المجتمع",
+    "tooltip_local_many": "بناءً على مراجعات {{count}} في هذا المجتمع",
+    "tooltip_local_one": "بناءً على مراجعات {{count}} في هذا المجتمع",
+    "tooltip_local_other": "بناءً على مراجعات {{count}} في هذا المجتمع",
+    "tooltip_local_two": "بناءً على مراجعات {{count}} في هذا المجتمع",
+    "tooltip_local_zero": "بناءً على مراجعات {{count}} في هذا المجتمع",
+    "chip_label_few": "{{score}} ({{count}})",
+    "chip_label_many": "{{score}} ({{count}})",
+    "chip_label_one": "{{score}} ({{count}})",
+    "chip_label_other": "{{score}} ({{count}})",
+    "chip_label_two": "{{score}} ({{count}})",
+    "chip_label_zero": "{{score}} ({{count}})",
+    "aria_label_few": "السمعة الموحدة {{score}} من مراجعات {{count}}",
+    "aria_label_many": "السمعة الموحدة {{score}} من مراجعات {{count}}",
+    "aria_label_one": "السمعة الموحدة {{score}} من مراجعات {{count}}",
+    "aria_label_other": "السمعة الموحدة {{score}} من مراجعات {{count}}",
+    "aria_label_two": "السمعة الموحدة {{score}} من مراجعات {{count}}",
+    "aria_label_zero": "السمعة الموحدة {{score}} من مراجعات {{count}}"
   },
   "reviews": {
     "unavailable": "المراجعات ليست متاحة بعد لهذا العضو المتحد",

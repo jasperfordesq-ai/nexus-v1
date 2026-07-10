@@ -360,7 +360,12 @@
     "geocode_description": "Suíomhanna grúpa geochóid chun taispeáint léarscáileanna agus fionnachtain chianbhunaithe a chumasú.",
     "geocode_not_migrated_desc": "Groups have not been migrated to the geocoding system yet.",
     "detail_tabs_aria": "Rannóga mionsonraí an ghrúpa",
-    "status_tabs_aria": "Scagaire stádais grúpa"
+    "status_tabs_aria": "Scagaire stádais grúpa",
+    "selected_count_few": "{{count}}roghnaithe",
+    "selected_count_many": "{{count}}roghnaithe",
+    "selected_count_one": "{{count}}roghnaithe",
+    "selected_count_other": "{{count}}roghnaithe",
+    "selected_count_two": "{{count}}roghnaithe"
   },
   "group_organization": {
     "page_title": "Eagrú Grúpaí",

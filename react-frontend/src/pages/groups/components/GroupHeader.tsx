@@ -140,9 +140,9 @@ export function GroupHeader({
             <Avatar
               src={avatarImage}
               name={group.name}
-              className="h-24 w-24 flex-shrink-0 border-4 border-[var(--surface-elevated)] bg-gradient-to-br from-purple-500/20 to-indigo-500/20 text-theme-primary shadow-lg"
+              className="h-24 w-24 flex-shrink-0 border-4 border-[var(--surface-elevated)] bg-gradient-to-br from-accent/20 to-accent-gradient-end/20 text-theme-primary shadow-lg"
               imgProps={{ alt: t('detail.group_image_alt', { name: group.name }) }}
-              fallback={<Users className="h-10 w-10 text-purple-400" aria-hidden="true" />}
+              fallback={<Users className="h-10 w-10 text-accent" aria-hidden="true" />}
             />
             <div className="min-w-0 pb-1">
               <div className="flex flex-wrap items-center gap-2">
@@ -210,7 +210,7 @@ export function GroupHeader({
               <Button
                 className={userIsMember
                   ? 'min-w-0 flex-1 bg-theme-hover text-theme-primary sm:flex-none'
-                  : 'min-w-0 flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white sm:flex-none'
+                  : 'min-w-0 flex-1 bg-gradient-to-r from-accent to-accent-gradient-end text-white sm:flex-none'
                 }
                 startContent={userIsMember ? <UserMinus className="w-4 h-4" aria-hidden="true" /> : <UserPlus className="w-4 h-4" aria-hidden="true" />}
                 onPress={onJoinLeave}

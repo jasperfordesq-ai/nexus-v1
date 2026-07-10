@@ -524,7 +524,33 @@
     "select_all_rows": "Select all rows",
     "no_data": "データなし",
     "no_data_available": "利用可能なデータがありません",
-    "select_row": "Select row {{id}}"
+    "select_row": "Select row {{id}}",
+    "total_count_other": "{{count}}合計",
+    "statuses": {
+      "active": "有効",
+      "approved": "承認済み",
+      "banned": "禁止済み",
+      "bulk_tenants_updated": "テナントを更新済み",
+      "bulk_users_moved": "ユーザーを移動済み",
+      "completed": "完了",
+      "draft": "下書き",
+      "failed": "失敗",
+      "federation_lockdown": "フェデレーションをロックダウン",
+      "federation_updated": "フェデレーションを更新済み",
+      "idle": "待機中",
+      "inactive": "無効",
+      "pending": "保留中",
+      "published": "公開済み",
+      "rejected": "却下済み",
+      "scheduled": "予定済み",
+      "sent": "送信済み",
+      "suspended": "停止中",
+      "tenant_created": "テナントを作成済み",
+      "tenant_updated": "テナントを更新済み",
+      "user_created": "ユーザーを作成済み",
+      "user_moved": "ユーザーを移動済み",
+      "unknown": "不明"
+    }
   },
   "help_drawer": {
     "aria_label": "ヘルプ: {{title}}",
@@ -541,7 +567,9 @@
     "confirm_message": "{{action}} {{count}} アイテムを取得してもよろしいですか?",
     "destructive_warning": "この操作は元に戻すことができません。",
     "reason_label": "理由",
-    "reason_placeholder": "このアクションの理由を入力してください"
+    "reason_placeholder": "このアクションの理由を入力してください",
+    "selected_count_other": "{{count}} が選択されました",
+    "confirm_message_other": "{{action}} {{count}} アイテムを取得してもよろしいですか?"
   },
   "common": {
     "cancel": "キャンセル"
@@ -586,5 +614,6 @@
       "group_exchanges": "グループ交流",
       "search": "検索"
     }
-  }
+  },
+  "support_requests_count_other": "未対応のサポートリクエスト {{count}} 件"
 }

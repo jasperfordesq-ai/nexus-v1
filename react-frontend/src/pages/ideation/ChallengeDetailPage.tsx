@@ -68,7 +68,7 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, resolveAssetUrl, resolveThumbnailUrl, formatRelativeTime } from '@/lib/helpers';
+import { resolveAvatarUrl, resolveAssetUrl, resolveThumbnailUrl, formatRelativeTime, getFormattingLocale } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -190,7 +190,7 @@ const IMPLEMENTATION_STATUS_COLORS: Record<string, 'default' | 'warning' | 'succ
 const formatDate = (dateStr: string | null) => {
   if (!dateStr) return null;
   try {
-    return new Date(dateStr).toLocaleDateString(undefined, {
+    return new Date(dateStr).toLocaleDateString(getFormattingLocale(), {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -1369,8 +1369,8 @@ export function ChallengeDetailPage() {
                         </p>
                         <p className="text-xs text-[var(--color-text-tertiary)]">
                           {draft.updated_at
-                            ? t('ideas.draft_updated', { date: new Date(draft.updated_at).toLocaleDateString() })
-                            : t('ideas.draft_created', { date: new Date(draft.created_at).toLocaleDateString() })}
+                            ? t('ideas.draft_updated', { date: new Date(draft.updated_at).toLocaleDateString(getFormattingLocale()) })
+                            : t('ideas.draft_created', { date: new Date(draft.created_at).toLocaleDateString(getFormattingLocale()) })}
                         </p>
                       </div>
                       <Chip size="sm" variant="flat" color="warning">{t('ideas.draft')}</Chip>

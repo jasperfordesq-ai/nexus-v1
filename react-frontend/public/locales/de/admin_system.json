@@ -266,7 +266,9 @@
       "resume_success": "Die Registrierung für diese Community wurde fortgesetzt.",
       "resume_failed": "Die Registrierung konnte nicht fortgesetzt werden.",
       "threshold_prefix": "Der Schwellenwert wird auf Plattformebene über konfiguriert",
-      "threshold_suffix": "Wenn es ausgelöst wird, wird dieses Banner rot und hier wird eine Schaltfläche zum Fortsetzen mit einem Klick angezeigt."
+      "threshold_suffix": "Wenn es ausgelöst wird, wird dieses Banner rot und hier wird eine Schaltfläche zum Fortsetzen mit einem Klick angezeigt.",
+      "signups_this_hour_one": "{{count}} von {{threshold}} Anmeldungen diese Stunde",
+      "signups_this_hour_other": "{{count}} von {{threshold}} Anmeldungen diese Stunde"
     },
     "col_action": "Aktion",
     "col_date": "Datum",
@@ -621,7 +623,9 @@
       "welcome_text": "Willkommenstext",
       "welcome_text_desc": "Willkommensnachricht, die neuen Mitgliedern zu Beginn des Onboardings angezeigt wird",
       "welcome_text_placeholder": "Willkommensnachricht...",
-      "your_community": "Deine Community"
+      "your_community": "Deine Community",
+      "n_active_one": "{{count}}aktiv",
+      "n_active_other": "{{count}}aktiv"
     },
     "overdue_jobs": "Überfällige Aufträge",
     "page_title": "System",
@@ -764,7 +768,13 @@
       "waitlist_info": "Mitglieder auf der Warteliste werden manuell von einem Administrator genehmigt",
       "webhook_desc": "Wird verwendet, um die Authentizität eingehender Webhook-Nutzlasten zu überprüfen",
       "your_community": "Deine Community",
-      "credentials_remove_confirm": "Diese Anmeldeinformationen entfernen? Dies kann nicht rückgängig gemacht werden."
+      "credentials_remove_confirm": "Diese Anmeldeinformationen entfernen? Dies kann nicht rückgängig gemacht werden.",
+      "n_configured_one": "{{count}}konfiguriert",
+      "n_configured_other": "{{count}}konfiguriert",
+      "n_available_one": "{{count}}verfügbar",
+      "n_available_other": "{{count}}verfügbar",
+      "total_codes_count_one": "Gesamtcodes: {{count}}",
+      "total_codes_count_other": "Gesamtcodes: {{count}}"
     },
     "registration_policy_saved_successfully": "Registrierungsrichtlinie erfolgreich gespeichert",
     "registration_policy_settings_title": "Registration Policy Settings",
@@ -1107,7 +1117,37 @@
     "partner_logo_link_url": "Partner Logo Link URL",
     "partner_logo_link_url_description": "Optionaler Website-Link für das Partnerlogo im Footer.",
     "label_inactivity_timeout": "Inaktivitäts-Timeout (Minuten)",
-    "desc_inactivity_timeout": "Mitglieder nach so vielen Minuten ohne Aktivität automatisch abmelden. 0 deaktiviert das Timeout; zulässiger Bereich ist 5–480 Minuten. Empfohlen: 120."
+    "desc_inactivity_timeout": "Mitglieder nach so vielen Minuten ohne Aktivität automatisch abmelden. 0 deaktiviert das Timeout; zulässiger Bereich ist 5–480 Minuten. Empfohlen: 120.",
+    "generated_data_for_one": "Daten für {{count}} ausgewählte Datentypen generiert",
+    "generated_data_for_other": "Daten für {{count}} ausgewählte Datentypen generiert",
+    "avg_completion_seconds_one": "Durchschnittliche Abschlusssekunden",
+    "avg_completion_seconds_other": "Durchschnittliche Abschlusssekunden",
+    "avg_completion_minutes_one": "Durchschnittliche Fertigstellungsminuten",
+    "avg_completion_minutes_other": "Durchschnittliche Fertigstellungsminuten",
+    "sessions_count_one": "{{count}}-Sitzungen",
+    "sessions_count_other": "{{count}}-Sitzungen",
+    "passed_count_one": "{{count}}bestanden",
+    "passed_count_other": "{{count}}bestanden",
+    "failed_count_one": "{{count}}ist fehlgeschlagen",
+    "failed_count_other": "{{count}}ist fehlgeschlagen",
+    "cron_connection_ok_one": "Verbindung OK –{{count}}-Jobs verfügbar",
+    "cron_connection_ok_other": "Verbindung OK –{{count}}-Jobs verfügbar",
+    "minutes_ago_one": "{{count}}vor m",
+    "minutes_ago_other": "{{count}}vor m",
+    "hours_ago_one": "{{count}}vor h",
+    "hours_ago_other": "{{count}}vor h",
+    "days_ago_one": "{{count}}vor d",
+    "days_ago_other": "{{count}}vor d",
+    "blog_posts_restored_one": "{{count}}-Blogbeiträge wurden von{{filename}}wiederhergestellt",
+    "blog_posts_restored_other": "{{count}}-Blogbeiträge wurden von{{filename}}wiederhergestellt",
+    "available_backups_one": "Verfügbare Sicherungen ({{count}})",
+    "available_backups_other": "Verfügbare Sicherungen ({{count}})",
+    "test_runner": {
+      "api_unavailable": "API für Zustandsprüfung nicht verfügbar",
+      "run_all": "Alle Tests ausführen",
+      "suites": "Testsammlungen",
+      "unknown_test": "Diagnose: {{name}}"
+    }
   },
   "verification": {
     "approve": "Genehmigen",
@@ -1171,7 +1211,11 @@
     "total_events": "{{count}}-Ereignisse",
     "user_approved_activated": "Vom Benutzer genehmigt und aktiviert",
     "user_verification_rejected": "Benutzerbestätigung abgelehnt",
-    "user_with_id": "Benutzer #{{id}}"
+    "user_with_id": "Benutzer #{{id}}",
+    "n_pending_one": "{{count}} ausstehend",
+    "n_pending_other": "{{count}} ausstehend",
+    "total_events_one": "{{count}}-Ereignisse",
+    "total_events_other": "{{count}}-Ereignisse"
   },
   "cancel": "Abbrechen"
 }

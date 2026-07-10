@@ -143,7 +143,10 @@ export function BrokerCommandPalette({ isOpen, onClose }: BrokerCommandPalettePr
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="lg" placement="top">
-      <ModalContent className="overflow-hidden p-0">
+      <ModalContent
+        aria-label={t('palette.aria_label')}
+        className="overflow-hidden p-0"
+      >
         <div className="flex items-center gap-3 border-b border-divider px-4 py-3">
           <SearchIcon size={18} className="shrink-0 text-muted" aria-hidden="true" />
           <input

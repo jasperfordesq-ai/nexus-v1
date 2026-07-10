@@ -1343,7 +1343,9 @@
     "resync_stripe": "Stripe に再同期する",
     "sync_to_stripe": "ストライプに同期",
     "sync_stripe": "ストライプに同期",
-    "stripe_sync_description": "このプランの Stripe 製品と価格を作成または更新します。 STRIPE_SECRET_KEY が必要です。"
+    "stripe_sync_description": "このプランの Stripe 製品と価格を作成または更新します。 STRIPE_SECRET_KEY が必要です。",
+    "active_tenants_cannot_delete_other": "{{count}}アクティブなテナント - 削除できません",
+    "filter_all_other": "すべて ({{count}})"
   },
   "data_table": {
     "admin_data_table": "データ",

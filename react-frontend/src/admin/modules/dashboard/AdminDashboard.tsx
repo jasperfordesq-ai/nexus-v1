@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Card, CardBody, CardHeader, Spinner, Button, Chip } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
@@ -387,7 +388,7 @@ export function AdminDashboard() {
                         <span className="text-muted">{entry.description}</span>
                       </p>
                       <p className="text-xs text-muted">
-                        {new Date(entry.created_at).toLocaleString()}
+                        {new Date(entry.created_at).toLocaleString(getFormattingLocale())}
                       </p>
                     </div>
                   </div>

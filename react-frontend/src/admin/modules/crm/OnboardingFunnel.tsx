@@ -1,3 +1,4 @@
+import { getFormattingLocale } from '@/lib/helpers';
 import { Button, Card, CardBody, CardHeader, Chip, Spinner, Progress } from '@/components/ui';
 import {
   useCallback,
@@ -84,7 +85,7 @@ interface SnapshotCardProps {
 }
 
 function formatPercent(value: number, maximumFractionDigits = 1): string {
-  return `${Number(value.toFixed(maximumFractionDigits)).toLocaleString(undefined, {
+  return `${Number(value.toFixed(maximumFractionDigits)).toLocaleString(getFormattingLocale(), {
     maximumFractionDigits,
     minimumFractionDigits: 0,
   })}%`;
@@ -94,7 +95,7 @@ function formatSignedPercent(value: number, maximumFractionDigits = 1): string {
   const absolute = Math.abs(value);
   const sign = value > 0 ? '+' : value < 0 ? '-' : '';
 
-  return `${sign}${Number(absolute.toFixed(maximumFractionDigits)).toLocaleString(undefined, {
+  return `${sign}${Number(absolute.toFixed(maximumFractionDigits)).toLocaleString(getFormattingLocale(), {
     maximumFractionDigits,
     minimumFractionDigits: 0,
   })}%`;
@@ -113,7 +114,7 @@ function formatMonthLabel(value: string): string {
     return value;
   }
 
-  return parsed.toLocaleDateString(undefined, {
+  return parsed.toLocaleDateString(getFormattingLocale(), {
     month: 'short',
     year: 'numeric',
   });
@@ -398,7 +399,7 @@ export default function OnboardingFunnel() {
   const heroStats = [
     {
       label: t('crm.entry_stage'),
-      value: entryStage?.count.toLocaleString() ?? '0',
+      value: entryStage?.count.toLocaleString(getFormattingLocale()) ?? '0',
     },
     {
       label: t('crm.overall_conversion'),
@@ -406,7 +407,7 @@ export default function OnboardingFunnel() {
     },
     {
       label: t('crm.latest_month'),
-      value: latestMonth ? latestMonth.count.toLocaleString() : '0',
+      value: latestMonth ? latestMonth.count.toLocaleString(getFormattingLocale()) : '0',
     },
   ];
 
@@ -436,17 +437,17 @@ export default function OnboardingFunnel() {
       eyebrow: t('crm.snapshot_conversion_title'),
       value: formatPercent(overallConversion),
       body: t('crm.snapshot_conversion_body', {
-        members: finalStage?.count.toLocaleString() ?? '0',
+        members: finalStage?.count.toLocaleString(getFormattingLocale()) ?? '0',
         stage: finalStage?.name ?? t('crm.no_stages_available'),
       }),
       accentClassName: 'bg-success/10 text-success',
     },
     {
       eyebrow: t('crm.snapshot_volume_title'),
-      value: latestMonth?.count.toLocaleString() ?? '0',
+      value: latestMonth?.count.toLocaleString(getFormattingLocale()) ?? '0',
       body: latestMonth
         ? `${t('crm.snapshot_volume_body', {
-            members: latestMonth.count.toLocaleString(),
+            members: latestMonth.count.toLocaleString(getFormattingLocale()),
             month: formatMonthLabel(latestMonth.month),
           })}${
             monthOverMonthChange !== null
@@ -465,7 +466,7 @@ export default function OnboardingFunnel() {
         : t('crm.not_enough_stages'),
       body: biggestDropoff
         ? t('crm.snapshot_priority_body', {
-            loss: biggestDropoff.loss.toLocaleString(),
+            loss: biggestDropoff.loss.toLocaleString(getFormattingLocale()),
             rate: formatPercent(biggestDropoff.rate),
           })
         : t('crm.no_stages_available'),
@@ -559,21 +560,21 @@ export default function OnboardingFunnel() {
         <MetricCard
           icon={Users}
           label={t('crm.entry_stage')}
-          value={entryStage?.count.toLocaleString() ?? '0'}
+          value={entryStage?.count.toLocaleString(getFormattingLocale()) ?? '0'}
           caption={entryStage?.name ?? t('crm.no_stages_available')}
           accentClassName="bg-accent/10 text-accent"
         />
         <MetricCard
           icon={Target}
           label={t('crm.completed_journey')}
-          value={finalStage?.count.toLocaleString() ?? '0'}
+          value={finalStage?.count.toLocaleString(getFormattingLocale()) ?? '0'}
           caption={finalStage?.name ?? t('crm.no_stages_available')}
           accentClassName="bg-success/10 text-success"
         />
         <MetricCard
           icon={TrendingDown}
           label={t('crm.biggest_dropoff')}
-          value={biggestDropoff?.loss.toLocaleString() ?? '0'}
+          value={biggestDropoff?.loss.toLocaleString(getFormattingLocale()) ?? '0'}
           caption={
             biggestDropoff
               ? `${biggestDropoff.from.name} -> ${biggestDropoff.to.name}`
@@ -584,7 +585,7 @@ export default function OnboardingFunnel() {
         <MetricCard
           icon={CalendarDays}
           label={t('crm.latest_month')}
-          value={latestMonth?.count.toLocaleString() ?? '0'}
+          value={latestMonth?.count.toLocaleString(getFormattingLocale()) ?? '0'}
           caption={
             latestMonth
               ? previousMonth && monthOverMonthChange !== null
@@ -687,7 +688,7 @@ export default function OnboardingFunnel() {
                                 </Chip>
                               )}
                               <p className="text-2xl font-semibold tracking-tight text-foreground">
-                                {stage.count.toLocaleString()}
+                                {stage.count.toLocaleString(getFormattingLocale())}
                               </p>
                               <p className="text-sm text-muted">{t('crm.members')}</p>
                             </div>
@@ -766,7 +767,7 @@ export default function OnboardingFunnel() {
                     {t('crm.biggest_dropoff')}
                   </p>
                   <Chip color="danger" variant="soft">
-                    {biggestDropoff?.loss.toLocaleString() ?? '0'}
+                    {biggestDropoff?.loss.toLocaleString(getFormattingLocale()) ?? '0'}
                   </Chip>
                 </div>
                 <p className="mt-3 text-base font-semibold text-foreground">
@@ -866,7 +867,7 @@ export default function OnboardingFunnel() {
                         <div className="mb-3 flex items-center justify-between gap-3 text-sm text-muted">
                           <span>{t('crm.members_lost_at_step', { count: transition.loss })}</span>
                           <Chip size="sm" color={tone.chipColor} variant="soft">
-                            {transition.loss.toLocaleString()} {t('crm.dropped_off')}
+                            {transition.loss.toLocaleString(getFormattingLocale())} {t('crm.dropped_off')}
                           </Chip>
                         </div>
 
@@ -916,7 +917,7 @@ export default function OnboardingFunnel() {
                   <div className="rounded-2xl border border-border bg-surface-secondary p-4">
                     <p className="text-sm font-medium text-muted">{t('crm.latest_month')}</p>
                     <p className="mt-2 text-2xl font-semibold text-foreground">
-                      {latestMonth?.count.toLocaleString() ?? '0'}
+                      {latestMonth?.count.toLocaleString(getFormattingLocale()) ?? '0'}
                     </p>
                     <p className="mt-1 text-sm text-muted">
                       {latestMonth ? formatMonthLabel(latestMonth.month) : t('crm.no_registration_data')}
@@ -955,7 +956,7 @@ export default function OnboardingFunnel() {
                       <Tooltip
                         labelFormatter={(value) => formatMonthLabel(String(value))}
                         formatter={(value) => [
-                          Number(value ?? 0).toLocaleString(),
+                          Number(value ?? 0).toLocaleString(getFormattingLocale()),
                           t('crm.members'),
                         ] as [string, string]}
                         contentStyle={{
@@ -1018,7 +1019,7 @@ export default function OnboardingFunnel() {
                       <div className="mb-4 flex items-start justify-between gap-3">
                         <div>
                           <p className="font-semibold text-foreground">{stage.name}</p>
-                          <p className="text-sm text-muted">{stage.count.toLocaleString()}</p>
+                          <p className="text-sm text-muted">{stage.count.toLocaleString(getFormattingLocale())}</p>
                         </div>
                         <Chip
                           color={index === 0 ? 'accent' : tone.chipColor}

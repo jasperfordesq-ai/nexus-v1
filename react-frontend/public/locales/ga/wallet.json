@@ -159,5 +159,20 @@
   "refresh": "Athnuaigh",
   "no_filtered_transactions": "Níl aon idirbheart comhoiriúnach",
   "no_filtered_transactions_desc": "Bain triail as scagaire eile chun níos mó gníomhaíochta sparáin a fheiceáil.",
-  "transaction_fallback": "Idirbheart sparáin"
+  "transaction_fallback": "Idirbheart sparáin",
+  "pending_in_few": "+{{count}}u ar feitheamh",
+  "pending_in_many": "+{{count}}u ar feitheamh",
+  "pending_in_one": "+{{count}}u ar feitheamh",
+  "pending_in_other": "+{{count}}u ar feitheamh",
+  "pending_in_two": "+{{count}}u ar feitheamh",
+  "signed_hours_value_few": "{{sign}}{{count}}u",
+  "signed_hours_value_many": "{{sign}}{{count}}u",
+  "signed_hours_value_one": "{{sign}}{{count}}u",
+  "signed_hours_value_other": "{{sign}}{{count}}u",
+  "signed_hours_value_two": "{{sign}}{{count}}u",
+  "hours_value_few": "{{count}}u",
+  "hours_value_many": "{{count}}u",
+  "hours_value_one": "{{count}}u",
+  "hours_value_other": "{{count}}u",
+  "hours_value_two": "{{count}}u"
 }

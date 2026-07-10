@@ -906,7 +906,11 @@
       "bulk_approved_count": "Goedgekeurd{{count}}-partnerschapsverzoek",
       "bulk_approved_count_plural": "Goedgekeurde{{count}}-partnerschapsverzoeken",
       "bulk_rejected_count": "{{count}}-partnerschapsverzoek afgewezen",
-      "bulk_rejected_count_plural": "{{count}}-partnerschapsverzoeken afgewezen"
+      "bulk_rejected_count_plural": "{{count}}-partnerschapsverzoeken afgewezen",
+      "bulk_approved_count_one": "Goedgekeurd{{count}}-partnerschapsverzoek",
+      "bulk_approved_count_other": "Goedgekeurd{{count}}-partnerschapsverzoek",
+      "bulk_rejected_count_one": "{{count}}-partnerschapsverzoek afgewezen",
+      "bulk_rejected_count_other": "{{count}}-partnerschapsverzoek afgewezen"
     },
     "api_docs_tabs_aria": "API-voorbeeldtaalkiezer",
     "partnership_detail_tabs_aria": "Partnerschapsdetailsecties",
@@ -965,7 +969,23 @@
     "event_type_partnership_changed": "Partnerschap bijgewerkt",
     "event_type_partnership_terminated": "Partnerschap beëindigd",
     "event_type_profile_viewed": "Profiel bekeken",
-    "event_type_federated_search": "Zoeken naar partners"
+    "event_type_federated_search": "Zoeken naar partners",
+    "bulk_selected_one": "{{count}} geselecteerd",
+    "bulk_selected_other": "{{count}} geselecteerd",
+    "directory_results_count_one": "{{count}}-community gevonden",
+    "directory_results_count_other": "{{count}}-community gevonden",
+    "directory_member_count_one": "{{count}} lid",
+    "directory_member_count_other": "{{count}} lid",
+    "directory_more_topics_one": "+{{count}} meer",
+    "directory_more_topics_other": "+{{count}} meer",
+    "members_count_value_one": "{{count}} leden",
+    "members_count_value_other": "{{count}} leden",
+    "topics_selected_count_one": "{{count}} onderwerp geselecteerd",
+    "topics_selected_count_other": "{{count}} onderwerp geselecteerd",
+    "primary_topics_count_one": "{{count}} primair",
+    "primary_topics_count_other": "{{count}} primair",
+    "recent_errors_count_one": "Recente fouten: {{count}}",
+    "recent_errors_count_other": "Recente fouten: {{count}}"
   },
   "federation_admin_guidance": {
     "shared": {
@@ -1218,5 +1238,11 @@
       "load_audit_failed": "Kan het auditlogboek niet laden.",
       "load_preview_failed": "Kan het voorbeeld niet laden."
     }
+  },
+  "api_docs": {
+    "aria_hmac_headers": "HMAC-headers",
+    "aria_rate_limit_headers": "Kopteksten met snelheidslimiet",
+    "aria_parameters": "API-parameters",
+    "aria_api_documentation_sections": "API-documentatiesecties"
   }
 }

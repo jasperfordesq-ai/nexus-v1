@@ -62,12 +62,28 @@
     "minutes_ago": "{{count}}m temu",
     "hours_ago": "{{count}}h temu",
     "days_ago": "{{count}}d temu",
-    "last_seen": "Ostatnio widziano {{time}}"
+    "last_seen": "Ostatnio widziano {{time}}",
+    "minutes_ago_few": "{{count}}m temu",
+    "minutes_ago_many": "{{count}}m temu",
+    "minutes_ago_one": "{{count}}m temu",
+    "minutes_ago_other": "{{count}}m temu",
+    "hours_ago_few": "{{count}}h temu",
+    "hours_ago_many": "{{count}}h temu",
+    "hours_ago_one": "{{count}}h temu",
+    "hours_ago_other": "{{count}}h temu",
+    "days_ago_few": "{{count}}d temu",
+    "days_ago_many": "{{count}}d temu",
+    "days_ago_one": "{{count}}d temu",
+    "days_ago_other": "{{count}}d temu"
   },
   "mention": {
     "suggestions_aria": "Sugestie wzmiankowania, {{count}} wyniki",
     "no_users": "Nie znaleziono użytkowników",
-    "connected": "Połączony"
+    "connected": "Połączony",
+    "suggestions_aria_few": "Sugestie wzmiankowania, {{count}} wyniki",
+    "suggestions_aria_many": "Sugestie wzmiankowania, {{count}} wyniki",
+    "suggestions_aria_one": "Sugestie wzmiankowania, {{count}} wyniki",
+    "suggestions_aria_other": "Sugestie wzmiankowania, {{count}} wyniki"
   },
   "status": {
     "set_status": "Ustaw status",
@@ -153,7 +169,11 @@
     "collection_description": "Opis (opcjonalnie)",
     "cancel": "Anuluj",
     "save": "Zapisz",
-    "create": "Utwórz"
+    "create": "Utwórz",
+    "count_few": "{{count}} zapisanych przedmiotów",
+    "count_many": "{{count}} zapisanych przedmiotów",
+    "count_one": "{{count}} zapisanych przedmiotów",
+    "count_other": "{{count}} zapisanych przedmiotów"
   },
   "verified": "Zweryfikowany",
   "hover_card": {
@@ -163,7 +183,19 @@
     "message": "Wiadomość",
     "hours_given": "{{count}} godz. podarowanych",
     "connections": "{{count}} połączeń",
-    "listings": "{{count}} ogłoszeń"
+    "listings": "{{count}} ogłoszeń",
+    "hours_given_few": "{{count}} godz. podarowanych",
+    "hours_given_many": "{{count}} godz. podarowanych",
+    "hours_given_one": "{{count}} godz. podarowanych",
+    "hours_given_other": "{{count}} godz. podarowanych",
+    "connections_few": "{{count}} połączeń",
+    "connections_many": "{{count}} połączeń",
+    "connections_one": "{{count}} połączeń",
+    "connections_other": "{{count}} połączeń",
+    "listings_few": "{{count}} ogłoszeń",
+    "listings_many": "{{count}} ogłoszeń",
+    "listings_one": "{{count}} ogłoszeń",
+    "listings_other": "{{count}} ogłoszeń"
   },
   "reactions_tabs_aria": "Filtr typu reakcji",
   "content_type_tabs_aria": "Filtr typu zawartości zakładek",
@@ -175,5 +207,9 @@
     "image_alt_domain": "Podgląd z {{domain}}",
     "favicon_alt": "Ikona {{site}}",
     "video_fallback": "Wideo"
-  }
+  },
+  "likes_count_few": "{{count}} polubień",
+  "likes_count_many": "{{count}} polubień",
+  "comments_count_few": "{{count}} komentarzy",
+  "comments_count_many": "{{count}} komentarzy"
 }

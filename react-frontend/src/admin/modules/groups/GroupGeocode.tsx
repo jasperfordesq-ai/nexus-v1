@@ -45,6 +45,7 @@ export function GroupGeocode() {
               {t('groups.geocode_not_migrated_desc')}
             </p>
           </div>
+          {/* eslint-disable-next-line i18next/no-literal-string -- CLI command must remain verbatim. */}
           <Code className="text-xs">php artisan groups:geocode</Code>
         </CardBody>
       </Card>

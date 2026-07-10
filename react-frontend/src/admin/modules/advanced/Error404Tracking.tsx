@@ -8,6 +8,7 @@
  * Monitor and manage 404 error occurrences across the platform.
  */
 
+import { getFormattingLocale } from '@/lib/helpers';
 import { useState, useEffect, useCallback, useRef } from 'react';import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
@@ -116,7 +117,7 @@ export function Error404Tracking() {
       key: 'last_seen',
       label: t('col_last_seen'),
       sortable: true,
-      render: (item) => new Date(item.last_seen).toLocaleDateString(),
+      render: (item) => new Date(item.last_seen).toLocaleDateString(getFormattingLocale()),
     },
     {
       key: 'actions',

@@ -62,12 +62,32 @@
     "minutes_ago": "{{count}}n ó shin",
     "hours_ago": "{{count}}u ó shin",
     "days_ago": "{{count}}l ó shin",
-    "last_seen": "Feicthe go deireanach {{time}}"
+    "last_seen": "Feicthe go deireanach {{time}}",
+    "minutes_ago_few": "{{count}}n ó shin",
+    "minutes_ago_many": "{{count}}n ó shin",
+    "minutes_ago_one": "{{count}}n ó shin",
+    "minutes_ago_other": "{{count}}n ó shin",
+    "minutes_ago_two": "{{count}}n ó shin",
+    "hours_ago_few": "{{count}}u ó shin",
+    "hours_ago_many": "{{count}}u ó shin",
+    "hours_ago_one": "{{count}}u ó shin",
+    "hours_ago_other": "{{count}}u ó shin",
+    "hours_ago_two": "{{count}}u ó shin",
+    "days_ago_few": "{{count}}l ó shin",
+    "days_ago_many": "{{count}}l ó shin",
+    "days_ago_one": "{{count}}l ó shin",
+    "days_ago_other": "{{count}}l ó shin",
+    "days_ago_two": "{{count}}l ó shin"
   },
   "mention": {
     "suggestions_aria": "Moltaí luaite, {{count}} toradh",
     "no_users": "Níor aimsíodh úsáideoirí",
-    "connected": "Ceangailte"
+    "connected": "Ceangailte",
+    "suggestions_aria_few": "Moltaí luaite, {{count}} toradh",
+    "suggestions_aria_many": "Moltaí luaite, {{count}} toradh",
+    "suggestions_aria_one": "Moltaí luaite, {{count}} toradh",
+    "suggestions_aria_other": "Moltaí luaite, {{count}} toradh",
+    "suggestions_aria_two": "Moltaí luaite, {{count}} toradh"
   },
   "status": {
     "set_status": "Socraigh stádas",
@@ -153,7 +173,12 @@
     "collection_description": "Cur síos (roghnach)",
     "cancel": "Cealaigh",
     "save": "Sábháil",
-    "create": "Cruthaigh"
+    "create": "Cruthaigh",
+    "count_few": "{{count}} mír shábháilte",
+    "count_many": "{{count}} mír shábháilte",
+    "count_one": "{{count}} mír shábháilte",
+    "count_other": "{{count}} mír shábháilte",
+    "count_two": "{{count}} mír shábháilte"
   },
   "verified": "Fíoraithe",
   "hover_card": {
@@ -163,7 +188,22 @@
     "message": "Teachtaireacht",
     "hours_given": "{{count}} uair tugtha",
     "connections": "{{count}} nasc",
-    "listings": "{{count}} liostú"
+    "listings": "{{count}} liostú",
+    "hours_given_few": "{{count}} uair tugtha",
+    "hours_given_many": "{{count}} uair tugtha",
+    "hours_given_one": "{{count}} uair tugtha",
+    "hours_given_other": "{{count}} uair tugtha",
+    "hours_given_two": "{{count}} uair tugtha",
+    "connections_few": "{{count}} nasc",
+    "connections_many": "{{count}} nasc",
+    "connections_one": "{{count}} nasc",
+    "connections_other": "{{count}} nasc",
+    "connections_two": "{{count}} nasc",
+    "listings_few": "{{count}} liostú",
+    "listings_many": "{{count}} liostú",
+    "listings_one": "{{count}} liostú",
+    "listings_other": "{{count}} liostú",
+    "listings_two": "{{count}} liostú"
   },
   "reactions_tabs_aria": "Scagaire cineál imoibrithe",
   "content_type_tabs_aria": "Scagaire cineál ábhair leabharmharc",
@@ -175,5 +215,11 @@
     "image_alt_domain": "Réamhamharc ó {{domain}}",
     "favicon_alt": "Deilbhín {{site}}",
     "video_fallback": "Físeán"
-  }
+  },
+  "likes_count_few": "{{count}} is maith liom",
+  "likes_count_many": "{{count}} is maith liom",
+  "likes_count_two": "{{count}} is maith liom",
+  "comments_count_few": "{{count}} trácht",
+  "comments_count_many": "{{count}} trácht",
+  "comments_count_two": "{{count}} trácht"
 }

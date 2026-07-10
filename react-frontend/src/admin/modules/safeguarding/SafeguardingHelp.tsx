@@ -129,7 +129,9 @@ export function SafeguardingHelp() {
                   </p>
                   <p>
                     {t('safeguarding.help.flagging.self_identification_prefix')} <em>{t('safeguarding.help.flagging.example_vulnerable')}</em>, {t('safeguarding.help.flagging.or')}{' '}
-                    <em>{t('safeguarding.help.flagging.example_vetted')}</em>. {t('safeguarding.help.flagging.self_identification_suffix')} <code>user_messaging_restrictions</code>.
+                    <em>{t('safeguarding.help.flagging.example_vetted')}</em>. {t('safeguarding.help.flagging.self_identification_suffix')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Database table name must remain verbatim. */}
+                    <code>user_messaging_restrictions</code>.
                   </p>
                   <p className="italic mt-2">
                     {t('safeguarding.help.flagging.self_revoke_prefix')} <em>{t('safeguarding.help.flagging.settings_safeguarding')}</em> {t('safeguarding.help.flagging.self_revoke_suffix')}
@@ -244,11 +246,14 @@ export function SafeguardingHelp() {
                   </li>
                   <li>
                     <strong>{t('safeguarding.help.assignments.consent_label')}</strong> {t('safeguarding.help.assignments.consent_prefix')}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Database column name must remain verbatim. */}
                     <code>consent_given_at</code>. {t('safeguarding.help.assignments.consent_middle')} <em>{t('safeguarding.help.assignments.active')}</em>
                     {t('safeguarding.help.assignments.consent_suffix')}
                   </li>
                   <li>
-                    <strong>{t('safeguarding.help.assignments.revoke_label')}</strong> {t('safeguarding.help.assignments.revoke_prefix')} <code>revoked_at</code>{t('safeguarding.help.assignments.revoke_suffix')}
+                    <strong>{t('safeguarding.help.assignments.revoke_label')}</strong> {t('safeguarding.help.assignments.revoke_prefix')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Database column name must remain verbatim. */}
+                    <code>revoked_at</code>{t('safeguarding.help.assignments.revoke_suffix')}
                   </li>
                 </ul>
                 <p>
@@ -311,7 +316,11 @@ export function SafeguardingHelp() {
                 <ul className="list-disc pl-5 space-y-1">
                   <li>{t('safeguarding.help.autonomy.trigger_reevaluation')}</li>
                   <li>{t('safeguarding.help.autonomy.admin_notification')}</li>
-                  <li>{t('safeguarding.help.autonomy.audit_log_prefix')} <code>action = 'safeguarding_consent_revoked'</code>.</li>
+                  <li>
+                    {t('safeguarding.help.autonomy.audit_log_prefix')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Audit query predicate must remain verbatim. */}
+                    <code>action = 'safeguarding_consent_revoked'</code>.
+                  </li>
                 </ul>
                 <p>
                   {t('safeguarding.help.autonomy.coercion_note')}
@@ -332,18 +341,29 @@ export function SafeguardingHelp() {
             >
               <div className="text-sm leading-relaxed text-foreground dark:text-muted space-y-3">
                 <p>
-                  {t('safeguarding.help.annual_review.intro_prefix')} <code>safeguarding:review-flags</code> {t('safeguarding.help.annual_review.intro_suffix')}
+                  {t('safeguarding.help.annual_review.intro_prefix')}{' '}
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Scheduler command must remain verbatim. */}
+                  <code>safeguarding:review-flags</code> {t('safeguarding.help.annual_review.intro_suffix')}
                 </p>
                 <ol className="list-decimal pl-5 space-y-1">
-                  <li>{t('safeguarding.help.annual_review.step_reminder')} <code>review_reminder_sent_at</code>.</li>
+                  <li>
+                    {t('safeguarding.help.annual_review.step_reminder')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Database column name must remain verbatim. */}
+                    <code>review_reminder_sent_at</code>.
+                  </li>
                   <li>{t('safeguarding.help.annual_review.step_wait')}</li>
-                  <li>{t('safeguarding.help.annual_review.step_escalate')} <code>review_escalated_at</code>.</li>
+                  <li>
+                    {t('safeguarding.help.annual_review.step_escalate')}{' '}
+                    {/* eslint-disable-next-line i18next/no-literal-string -- Database column name must remain verbatim. */}
+                    <code>review_escalated_at</code>.
+                  </li>
                 </ol>
                 <p>
                   <strong>{t('safeguarding.help.annual_review.flag_stays_active')}</strong> {t('safeguarding.help.annual_review.escalation_note')}
                 </p>
                 <p>
                   {t('safeguarding.help.annual_review.settings_prefix')} <em>{t('safeguarding.help.flagging.settings_safeguarding')}</em> {t('safeguarding.help.annual_review.settings_suffix')}
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Database column name must remain verbatim. */}
                   <code> review_confirmed_at</code> {t('safeguarding.help.annual_review.settings_tail')}
                 </p>
               </div>
@@ -362,7 +382,10 @@ export function SafeguardingHelp() {
             >
               <div className="text-sm leading-relaxed text-foreground dark:text-muted space-y-3">
                 <p>
-                  {t('safeguarding.help.audit.intro_prefix')} <code>activity_log</code> {t('safeguarding.help.audit.intro_middle')}
+                  {t('safeguarding.help.audit.intro_prefix')}{' '}
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Database table name must remain verbatim. */}
+                  <code>activity_log</code> {t('safeguarding.help.audit.intro_middle')}
+                  {/* eslint-disable-next-line i18next/no-literal-string -- Audit query predicate must remain verbatim. */}
                   <code> action_type = 'safeguarding'</code>. {t('safeguarding.help.audit.intro_suffix')}
                 </p>
                 <ul className="list-disc pl-5 space-y-1">

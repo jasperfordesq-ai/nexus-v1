@@ -23,7 +23,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Flag from 'lucide-react/icons/flag';
 import { Button } from '@/components/ui/Button';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui/Modal';
+import { Modal, ModalContent, ModalHeader, ModalHeading, ModalBody, ModalFooter } from '@/components/ui/Modal';
 import { Textarea } from '@/components/ui/Textarea';
 import { useDisclosure } from '@/components/ui/useDisclosure';
 import { PageMeta } from '@/components/seo';
@@ -268,15 +268,13 @@ export function PostDetailPage() {
       <h1 className="sr-only">{t('post_detail.title')}</h1>
       <div className="space-y-4 max-w-2xl mx-auto">
         <div>
-          <Link to={tenantPath('/feed')}>
-            <Button
-              variant="light"
-              startContent={<ArrowLeft className="w-4 h-4" />}
-              className="text-theme-muted hover:text-theme-primary -ml-2"
-            >
-              {t('post_detail.back')}
-            </Button>
-          </Link>
+          <Button as={Link} to={tenantPath('/feed')}
+            variant="light"
+            startContent={<ArrowLeft className="w-4 h-4" />}
+            className="text-theme-muted hover:text-theme-primary -ml-2"
+          >
+            {t('post_detail.back')}
+          </Button>
         </div>
 
         {isLoading ? (
@@ -285,11 +283,9 @@ export function PostDetailPage() {
           <GlassCard className="p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
             <p className="text-theme-muted">{error}</p>
-            <Link to={tenantPath('/feed')} className="mt-4 inline-block">
-              <Button variant="flat" className="bg-theme-elevated text-theme-primary">
-                {t('post_detail.back')}
-              </Button>
-            </Link>
+            <Button as={Link} to={tenantPath('/feed')} variant="flat" className="mt-4 inline-block bg-theme-elevated text-theme-primary">
+              {t('post_detail.back')}
+            </Button>
           </GlassCard>
         ) : item ? (
           <FeedCard
@@ -326,13 +322,11 @@ export function PostDetailPage() {
         }}
       >
         <ModalContent>
-          <ModalHeader className="text-[var(--text-primary)]">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
-                <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
-              </div>
-              {t('report.title')}
+          <ModalHeader className="flex items-center gap-3 text-[var(--text-primary)]">
+            <div className="w-8 h-8 rounded-lg bg-danger/10 flex items-center justify-center">
+              <Flag className="w-4 h-4 text-danger" aria-hidden="true" />
             </div>
+            <ModalHeading>{t('report.title')}</ModalHeading>
           </ModalHeader>
           <ModalBody>
             <p className="text-sm text-[var(--text-muted)] mb-3">

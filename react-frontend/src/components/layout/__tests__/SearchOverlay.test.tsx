@@ -4,16 +4,19 @@
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Tests for SearchOverlay component (portal-based implementation)
- * Covers rendering, keyboard navigation, suggestion selection, and accessibility.
+ * HeroUI Modal integration tests for the SearchOverlay command palette.
+ * Async search behavior lives in the adjacent SearchOverlay.test.tsx suite.
  */
 
+import { useState } from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import searchOverlaySource from '../SearchOverlay.tsx?raw';
 
 // Mock navigate
 const mockNavigate = vi.fn();
 const mockHasFeature = vi.fn(() => true);
+const mockToggleTheme = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
@@ -27,6 +30,7 @@ const i18nMap: Record<string, string> = {
   'search.placeholder': 'Search...',
   'search.suggestions': 'Suggestions',
   'search.searching': 'Searching...',
+  'search.actions': 'Actions',
   'search.quick_links': 'Quick Links',
   'search.clear': 'Clear',
   'search.type_listing': 'Listing',
@@ -38,10 +42,17 @@ const i18nMap: Record<string, string> = {
   'nav.events': 'Events',
   'support.help_center': 'Help',
   'accessibility.close': 'Close (ESC)',
+  'aria.clear': 'Clear search',
 };
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string) => i18nMap[key] ?? fallback ?? key,
+    t: (key: string, options?: string | Record<string, unknown>) => {
+      if (key === 'aria.search_results' && typeof options === 'object') {
+        return `${options.count ?? 0} results available`;
+      }
+
+      return i18nMap[key] ?? (typeof options === 'string' ? options : key);
+    },
     i18n: { language: 'en', changeLanguage: vi.fn() },
   }),
   initReactI18next: { type: '3rdParty', init: () => {} },
@@ -58,7 +69,7 @@ vi.mock('@/contexts', () => ({
   }),
   useTheme: () => ({
     resolvedTheme: 'light',
-    toggleTheme: vi.fn(),
+    toggleTheme: mockToggleTheme,
   }),
 
   useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
@@ -85,108 +96,135 @@ function renderOverlay(isOpen = true, onClose = vi.fn()) {
   return { ...render(<SearchOverlay isOpen={isOpen} onClose={onClose} />), onClose };
 }
 
-describe('SearchOverlay', () => {
+function SearchOverlayHarness() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <>
+      <button onClick={() => setIsOpen(true)}>Open search</button>
+      <SearchOverlay isOpen={isOpen} onClose={() => setIsOpen(false)} />
+    </>
+  );
+}
+
+describe('SearchOverlay — HeroUI Modal integration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockHasFeature.mockReturnValue(true);
   });
 
-  describe('Rendering', () => {
-    it('renders nothing when closed', () => {
-      const { container } = renderOverlay(false);
-      expect(container.innerHTML).toBe('');
-    });
+  it('renders nothing when closed', () => {
+    const { container } = renderOverlay(false);
+    expect(container.innerHTML).toBe('');
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
 
-    it('renders search input when open', () => {
-      renderOverlay();
-      expect(screen.getByPlaceholderText('Search...')).toBeTruthy();
-    });
+  it('renders through the HeroUI Modal anatomy as a named modal dialog', () => {
+    renderOverlay();
+    const dialog = screen.getByRole('dialog', { name: 'Search...' });
 
-    it('renders ESC keyboard hint', () => {
-      renderOverlay();
-      expect(screen.getByText('ESC')).toBeTruthy();
-    });
+    expect(dialog).toHaveAttribute('data-slot', 'modal-dialog');
+    expect(document.querySelector('[data-slot="modal-backdrop"]')).toBeInTheDocument();
+    expect(document.querySelector('[data-slot="modal-container"]')).toBeInTheDocument();
+    expect(screen.getByText('ESC')).toBeInTheDocument();
+  });
 
-    it('renders quick links when no query entered', () => {
-      renderOverlay();
-      expect(screen.getByText('Quick Links')).toBeTruthy();
-      expect(screen.getByText('Listings')).toBeTruthy();
-      expect(screen.getByText('Members')).toBeTruthy();
-      expect(screen.getByText('Events')).toBeTruthy();
-      expect(screen.getByText('Help')).toBeTruthy();
+  it('autofocuses the combobox and lets HeroUI dismiss on Escape', async () => {
+    const onClose = vi.fn();
+    renderOverlay(true, onClose);
+    const input = screen.getByRole('combobox');
+
+    expect(input).toHaveFocus();
+    fireEvent.keyDown(input, { key: 'Escape' });
+
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce());
+  });
+
+  it('keeps HeroUI backdrop dismissal enabled', async () => {
+    const onClose = vi.fn();
+    renderOverlay(true, onClose);
+    const backdrop = document.querySelector<HTMLElement>('[data-slot="modal-backdrop"]');
+    expect(backdrop).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+
+    await waitFor(() => expect(onClose).toHaveBeenCalledOnce());
+  });
+
+  it('restores focus to the opener after Escape closes the controlled modal', async () => {
+    render(<SearchOverlayHarness />);
+    const opener = screen.getByRole('button', { name: 'Open search' });
+    opener.focus();
+    fireEvent.click(opener);
+    const input = screen.getByRole('combobox');
+    expect(input).toHaveFocus();
+
+    fireEvent.keyDown(input, { key: 'Escape' });
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(opener).toHaveFocus();
     });
   });
 
-  describe('Input behavior', () => {
-    it('updates search query on typing', () => {
-      renderOverlay();
-      const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
-      fireEvent.change(input, { target: { value: 'test' } });
-      expect(input.value).toBe('test');
-    });
-
-    it('shows clear button when query is non-empty', () => {
-      renderOverlay();
-      const input = screen.getByPlaceholderText('Search...');
-      fireEvent.change(input, { target: { value: 'test' } });
-      expect(screen.getByLabelText('aria.clear')).toBeTruthy();
-    });
+  it('dismisses through the explicit translated close action', () => {
+    const onClose = vi.fn();
+    renderOverlay(true, onClose);
+    fireEvent.click(screen.getByLabelText('Close (ESC)'));
+    expect(onClose).toHaveBeenCalledOnce();
   });
 
-  describe('Keyboard navigation', () => {
-    it('calls onClose when ESC is pressed', () => {
-      const onClose = vi.fn();
-      renderOverlay(true, onClose);
-      fireEvent.keyDown(document, { key: 'Escape' });
-      expect(onClose).toHaveBeenCalled();
-    });
+  it('implements input-owned listbox navigation without moving DOM focus', () => {
+    renderOverlay();
+    const input = screen.getByRole('combobox');
+    fireEvent.change(input, { target: { value: '>' } });
+    const options = screen.getAllByRole('option');
+    const listbox = screen.getByRole('listbox', { name: 'Actions' });
+
+    expect(input).toHaveAttribute('aria-controls', listbox.id);
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    expect(input).not.toHaveAttribute('aria-activedescendant');
+
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    expect(input).toHaveAttribute('aria-activedescendant', options[0]?.id);
+    expect(options[0]).toHaveAttribute('aria-selected', 'true');
+    expect(input).toHaveFocus();
+
+    fireEvent.keyDown(input, { key: 'ArrowUp' });
+    expect(input).toHaveAttribute('aria-activedescendant', options.at(-1)?.id);
+    expect(options.at(-1)).toHaveAttribute('aria-selected', 'true');
+    expect(input).toHaveFocus();
   });
 
-  describe('Close behavior', () => {
-    it('has a close button with aria-label', () => {
-      renderOverlay();
-      expect(screen.getByLabelText('Close (ESC)')).toBeTruthy();
-    });
+  it('activates the active command with Enter', () => {
+    const onClose = vi.fn();
+    renderOverlay(true, onClose);
+    const input = screen.getByRole('combobox');
+    fireEvent.change(input, { target: { value: '>' } });
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    fireEvent.keyDown(input, { key: 'Enter' });
 
-    it('calls onClose when close button is clicked', () => {
-      const onClose = vi.fn();
-      renderOverlay(true, onClose);
-      fireEvent.click(screen.getByLabelText('Close (ESC)'));
-      expect(onClose).toHaveBeenCalled();
-    });
+    expect(mockToggleTheme).toHaveBeenCalledOnce();
+    expect(onClose).toHaveBeenCalledOnce();
   });
 
-  describe('Accessibility', () => {
-    it('search input is focusable', () => {
-      renderOverlay();
-      const input = screen.getByPlaceholderText('Search...');
-      expect(input.tagName).toBe('INPUT');
-    });
+  it('renders the default quick links and respects the connections feature gate', () => {
+    const { rerender } = renderOverlay();
+    expect(screen.getByText('Listings')).toBeInTheDocument();
+    expect(screen.getByText('Members')).toBeInTheDocument();
+    expect(screen.getByText('Events')).toBeInTheDocument();
+    expect(screen.getByText('Help')).toBeInTheDocument();
 
-    it('renders as a portal to document.body', () => {
-      renderOverlay();
-      // The overlay should be rendered to document.body, not inside the container
-      const overlay = document.body.querySelector('.fixed.inset-0');
-      expect(overlay).toBeTruthy();
-    });
+    mockHasFeature.mockImplementation((feature: string) => feature !== 'connections');
+    rerender(<SearchOverlay isOpen onClose={vi.fn()} />);
+    expect(screen.queryByText('Members')).toBeNull();
   });
 
-  describe('Quick link rendering', () => {
-    it('renders all quick link buttons', () => {
-      renderOverlay();
-      expect(screen.getByText('Listings')).toBeTruthy();
-      expect(screen.getByText('Members')).toBeTruthy();
-      expect(screen.getByText('Events')).toBeTruthy();
-      expect(screen.getByText('Help')).toBeTruthy();
-    });
-
-    it('hides Members quick link when connections feature is disabled', () => {
-      mockHasFeature.mockImplementation((feature: string) => feature !== 'connections');
-      renderOverlay();
-      expect(screen.getByText('Listings')).toBeTruthy();
-      expect(screen.queryByText('Members')).toBeNull();
-      expect(screen.getByText('Events')).toBeTruthy();
-      expect(screen.getByText('Help')).toBeTruthy();
-    });
+  it('delegates portal, focus, Escape, and scroll-lock behavior to Modal', () => {
+    expect(searchOverlaySource).toContain('<Modal');
+    expect(searchOverlaySource).toContain('isDismissable');
+    expect(searchOverlaySource).not.toContain('createPortal');
+    expect(searchOverlaySource).not.toContain('FocusScope');
+    expect(searchOverlaySource).not.toContain('document.addEventListener');
+    expect(searchOverlaySource).not.toContain('document.body.style.overflow');
   });
 });

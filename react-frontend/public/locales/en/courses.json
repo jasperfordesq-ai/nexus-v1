@@ -169,7 +169,9 @@
     "rate_n_stars": "Rate {{count}} out of 5 stars",
     "submit_error": "Couldn't submit your review. Please try again.",
     "count_one": "{{count}} review",
-    "count_other": "{{count}} reviews"
+    "count_other": "{{count}} reviews",
+    "rate_n_stars_one": "Rate {{count}} out of 5 stars",
+    "rate_n_stars_other": "Rate {{count}} out of 5 stars"
   },
   "admin": {
     "title": "Courses",

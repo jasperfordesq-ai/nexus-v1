@@ -108,7 +108,10 @@
       "create": "Não foi possível criar a solicitação de cobertura",
       "candidates": "Não foi possível carregar candidatos substitutos",
       "assign": "O substituto não pôde ser correspondido"
-    }
+    },
+    "skill_matches_many": "Habilidades de correspondência{{count}}",
+    "skill_matches_one": "Habilidades de correspondência{{count}}",
+    "skill_matches_other": "Habilidades de correspondência{{count}}"
   },
   "providers": {
     "title": "Diretório de prestadores de cuidados",
@@ -488,7 +491,8 @@
         "maximum_discount": "Desconto máximo por pedido (%)",
         "maximum_discount_description": "Limite de quanto do total do pedido pode ser pago em créditos de tempo.",
         "save": "Salvar configurações",
-        "view_only": "Os usuários somente visualização não podem alterar as configurações de fidelidade."
+        "view_only": "Os usuários somente visualização não podem alterar as configurações de fidelidade.",
+        "per_hour_short": "/ h"
       },
       "ledger": {
         "title": "Resgates recentes",
@@ -534,6 +538,9 @@
         "pending": "Pendente",
         "applied": "Aplicado",
         "reversed": "Invertido"
+      },
+      "table": {
+        "empty_value": "-"
       }
     },
     "hour_transfers": {
@@ -808,7 +815,11 @@
         "days_ago_one": "{{count}}há alguns dias",
         "days_ago_other": "{{count}}há alguns dias",
         "months_ago_one": "{{count}}meses atrás",
-        "months_ago_other": "{{count}}meses atrás"
+        "months_ago_other": "{{count}}meses atrás",
+        "minutes_ago_many": "{{count}}há um mês",
+        "hours_ago_many": "{{count}}horas atrás",
+        "days_ago_many": "{{count}}há alguns dias",
+        "months_ago_many": "{{count}}meses atrás"
       },
       "messages": {
         "triage_saved": "Triagem salva",
@@ -944,7 +955,8 @@
       },
       "errors": {
         "load": "Falha ao carregar o círculo de destinatários. Verifique o ID do membro e tente novamente."
-      }
+      },
+      "safeguarding_flags_many": "{{count}} protegendo bandeiras"
     },
     "safeguarding_reports": {
       "meta_title": "Protegendo Relatórios - Administrador",

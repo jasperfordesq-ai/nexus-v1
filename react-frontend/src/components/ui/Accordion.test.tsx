@@ -146,4 +146,57 @@ describe('Accordion', () => {
 
     expect(screen.getByTestId('start-icon')).toBeInTheDocument();
   });
+
+  it('propagates root itemClasses to every documented item slot and merges local classes', () => {
+    const { container } = render(
+      <Accordion
+        defaultExpandedKeys={['styled']}
+        itemClasses={{
+          base: 'root-base',
+          content: 'root-content',
+          heading: 'root-heading',
+          indicator: 'root-indicator',
+          subtitle: 'root-subtitle',
+          title: 'root-title',
+          trigger: 'min-h-[48px] root-trigger',
+        }}
+      >
+        <AccordionItem
+          id="styled"
+          title="Styled title"
+          subtitle="Styled subtitle"
+          classNames={{ base: 'local-base', trigger: 'local-trigger' }}
+        >
+          Styled content
+        </AccordionItem>
+      </Accordion>,
+    );
+
+    expect(container.querySelector('[data-slot="accordion-item"]')).toHaveClass('root-base', 'local-base');
+    expect(container.querySelector('[data-slot="accordion-heading"]')).toHaveClass('root-heading');
+    expect(container.querySelector('[data-slot="accordion-trigger"]')).toHaveClass(
+      'min-h-[48px]',
+      'root-trigger',
+      'local-trigger',
+    );
+    expect(screen.getByText('Styled title')).toHaveClass('root-title');
+    expect(screen.getByText('Styled subtitle')).toHaveClass('root-subtitle');
+    expect(container.querySelector('[data-slot="accordion-indicator"]')).toHaveClass('root-indicator');
+    expect(screen.getByText('Styled content')).toHaveClass('root-content');
+  });
+
+  it('preserves the legacy splitted contract with separated surface items and no dividers', () => {
+    const { container } = render(
+      <Accordion variant="splitted">
+        <AccordionItem id="split-1" title="First split item">First body</AccordionItem>
+        <AccordionItem id="split-2" title="Second split item">Second body</AccordionItem>
+      </Accordion>,
+    );
+
+    expect(container.querySelector('[data-slot="accordion"]')).toHaveClass('space-y-2');
+    container.querySelectorAll('[data-slot="accordion-item"]').forEach((item) => {
+      expect(item).toHaveClass('overflow-hidden', 'rounded-2xl', 'bg-surface', 'shadow-surface');
+      expect(item).toHaveAttribute('data-hide-separator', 'true');
+    });
+  });
 });

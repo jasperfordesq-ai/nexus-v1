@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Modal, ModalContent, ModalBody } from '@/components/ui/Modal';
+import { OverlayActionButton } from '@/components/ui/OverlayActionButton';
 import { Spinner } from '@/components/ui/Spinner';
 import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGroup';
 import { useDisclosure } from '@/components/ui/useDisclosure';
@@ -375,23 +376,23 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                   </p>
                 </div>
 
-                {/* Delete button on hover (admin or uploader) */}
+                {/* Persistently discoverable on touch; hover/focus reveal on fine pointers. */}
                 {canDelete(item) && (
-                  <Button
-                    isIconOnly
-                    variant="flat"
-                    size="sm"
-                    className="absolute top-2 right-2 w-8 h-8 rounded-full bg-danger/80 hover:bg-danger text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 min-w-0"
+                  <OverlayActionButton
+                    variant="danger"
+                    className="absolute top-2 right-2 rounded-full bg-danger/80 text-white transition-opacity duration-200 [--button-bg-hover:var(--danger)]"
                     onPress={() => handleDelete(item.id)}
                     isDisabled={deleting === item.id}
                     aria-label={t('media.delete_aria')}
                   >
                     {deleting === item.id ? (
-                      <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center py-4"><Spinner size="sm" color="current" /></div>
+                      <span role="status" aria-busy="true" aria-label={t('common:loading')} className="flex items-center justify-center">
+                        <Spinner size="sm" color="current" />
+                      </span>
                     ) : (
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="size-4" aria-hidden="true" />
                     )}
-                  </Button>
+                  </OverlayActionButton>
                 )}
               </div>
             </GlassCard>
@@ -421,31 +422,35 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
         }}
         hideCloseButton
       >
-        <ModalContent>
+        <ModalContent
+          aria-label={currentItem?.type === 'video'
+            ? t('media.video_player')
+            : t('media.fullsize_alt')}
+        >
           {currentItem && (
             <ModalBody>
               <div className="relative flex flex-col items-center">
                 {/* Close button */}
                 <Button
                   isIconOnly
-                  variant="flat"
-                  className="absolute top-2 right-2 z-50 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors min-w-0"
+                  variant="ghost"
+                  className="absolute top-2 right-2 z-50 size-11 min-h-11 min-w-11 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors p-0"
                   onPress={lightbox.onClose}
                   aria-label={t('media.close_lightbox')}
                 >
-                  <X className="w-5 h-5" />
+                  <X className="size-5" aria-hidden="true" />
                 </Button>
 
                 {/* Navigation: previous */}
                 {items.length > 1 && (
                   <Button
                     isIconOnly
-                    variant="flat"
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors min-w-0"
+                    variant="ghost"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 z-50 size-11 min-h-11 min-w-11 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors p-0"
                     onPress={() => navigateLightbox(-1)}
                     aria-label={t('media.prev')}
                   >
-                    <ChevronLeft className="w-6 h-6" />
+                    <ChevronLeft className="size-6" aria-hidden="true" />
                   </Button>
                 )}
 
@@ -453,12 +458,12 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                 {items.length > 1 && (
                   <Button
                     isIconOnly
-                    variant="flat"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-50 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors min-w-0"
+                    variant="ghost"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 z-50 size-11 min-h-11 min-w-11 rounded-full bg-black/50 hover:bg-black/70 text-white transition-colors p-0"
                     onPress={() => navigateLightbox(1)}
                     aria-label={t('media.next')}
                   >
-                    <ChevronRight className="w-6 h-6" />
+                    <ChevronRight className="size-6" aria-hidden="true" />
                   </Button>
                 )}
 
@@ -496,10 +501,9 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                   {/* Delete in lightbox */}
                   {canDelete(currentItem) && (
                     <Button
-                      color="danger"
-                      variant="flat"
+                      variant="danger-soft"
                       size="sm"
-                      className="mt-3"
+                      className="mt-3 min-h-11"
                       startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                       onPress={() => handleDelete(currentItem.id)}
                       isLoading={deleting === currentItem.id}

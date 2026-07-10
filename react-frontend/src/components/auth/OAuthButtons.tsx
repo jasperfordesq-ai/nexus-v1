@@ -35,6 +35,7 @@ const PROVIDERS: ReadonlyArray<{ id: Provider; Icon: typeof GoogleIcon; key: str
 
 export function OAuthButtons({ intent = 'login', enabledProviders, tenantId }: OAuthButtonsProps) {
   const { t } = useTranslation('common');
+  const [flowError, setFlowError] = useState<string | null>(null);
 
   // If parent didn't pass enabledProviders, ask the backend which providers are enabled.
   // Backend returns [] when OAUTH_ENABLED is off — buttons hide entirely.
@@ -65,6 +66,7 @@ export function OAuthButtons({ intent = 'login', enabledProviders, tenantId }: O
   }
 
   function startFlow(provider: Provider) {
+    setFlowError(null);
     const params = new URLSearchParams({ intent });
     if (tenantId) params.set('tenant_id', String(tenantId));
     // The redirect endpoint returns JSON `{ redirect_url }` — fetch it then navigate.
@@ -78,14 +80,19 @@ export function OAuthButtons({ intent = 'login', enabledProviders, tenantId }: O
         if (data?.success && data.redirect_url) {
           window.location.href = data.redirect_url;
         } else {
-          alert(data?.message || t('oauth.callback_failed'));
+          setFlowError(t('oauth.callback_failed'));
         }
       })
-      .catch(() => alert(t('oauth.callback_failed')));
+      .catch(() => setFlowError(t('oauth.callback_failed')));
   }
 
   return (
     <div className="space-y-3">
+      {flowError && (
+        <p role="alert" className="rounded-lg border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-danger">
+          {flowError}
+        </p>
+      )}
       {visible.map(({ id, Icon, key }) => (
         <Button
           key={id}

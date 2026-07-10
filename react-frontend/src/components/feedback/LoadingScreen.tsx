@@ -42,7 +42,7 @@ export function LoadingScreen({ message }: LoadingScreenProps) {
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-              className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20"
+              className="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-accent/20 to-cyan-500/20"
               aria-hidden="true"
             >
               <Spinner size="lg" />

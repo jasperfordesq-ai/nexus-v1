@@ -107,6 +107,8 @@
     "status_completed": "Vollendet",
     "status_unknown": "Unbekannt",
     "try_adjusting_search": "Versuchen Sie, Ihre Suche anzupassen",
-    "yes": "Ja"
+    "yes": "Ja",
+    "showing_of_total_one": "{{count}} von {{total}} wird angezeigt",
+    "showing_of_total_other": "{{count}} von {{total}} wird angezeigt"
   }
 }

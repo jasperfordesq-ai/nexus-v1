@@ -464,7 +464,7 @@ export function MyProfile() {
                                   variant="tertiary"
                                   size="sm"
                                   className="flex items-center min-w-0 w-auto min-h-10 p-0"
-                                  onClick={(e) => { e.stopPropagation(); togglePrimary(topic.id); }}
+                                  onPress={() => togglePrimary(topic.id)}
                                   aria-label={isPrimary ? t('federation.remove_primary') : t('federation.set_as_primary')}
                                 >
                                   <Star size={12} className={isPrimary ? 'fill-current' : 'opacity-40'} />

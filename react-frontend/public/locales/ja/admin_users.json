@@ -218,7 +218,9 @@
     "smart_search_text_chip": "クエリ: {{query}}",
     "role_super_admin": "スーパー管理者",
     "permissions_editor_unavailable_title": "この画面では権限は読み取り専用です",
-    "permissions_editor_unavailable_desc": "このページではユーザーのロールと付与された権限を表示しますが、変更はできません。アクセス権はユーザー編集ページでロールを変更して管理してください。"
+    "permissions_editor_unavailable_desc": "このページではユーザーのロールと付与された権限を表示しますが、変更はできません。アクセス権はユーザー編集ページでロールを変更して管理してください。",
+    "role_unknown": "不明なロール",
+    "role_tenant_super_admin": "テナントのスーパー管理者"
   },
   "user_edit": {
     "actions": {

@@ -138,5 +138,10 @@
   },
   "stats_mutual_matches": "Mutual Matches",
   "filter_people_listings": "Listings",
-  "source_event": "Event"
+  "source_event": "Event",
+  "reasons_more_few": "+{{count}} eile",
+  "reasons_more_many": "+{{count}} eile",
+  "reasons_more_one": "+{{count}} eile",
+  "reasons_more_other": "+{{count}} eile",
+  "reasons_more_two": "+{{count}} eile"
 }
