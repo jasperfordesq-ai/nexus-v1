@@ -14,7 +14,6 @@ use App\Services\SocialNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -751,18 +750,32 @@ trait ResourcesParity
     /**
      * Whether the current user is a resources admin (mirrors the React check:
      * role in [admin, super_admin, tenant_admin] OR is_super_admin).
+     *
+     * Keyed on currentUserId() + a tenant-scoped users lookup, NOT Auth::user():
+     * the accessible frontend authenticates with a stateless auth_token cookie
+     * and never populates a Laravel guard, so Auth::user() is always null here
+     * (which previously made this return false for every user, including admins).
      */
     private function resourcesUserIsAdmin(): bool
     {
-        $user = Auth::user();
-        if ($user === null) {
+        $userId = $this->currentUserId();
+        if ($userId === null) {
             return false;
         }
-        $role = (string) ($user->role ?? 'member');
-        if (in_array($role, ['admin', 'super_admin', 'tenant_admin'], true)) {
+
+        $row = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', TenantContext::getId())
+            ->first(['role', 'is_super_admin']);
+        if ($row === null) {
+            return false;
+        }
+
+        if (in_array((string) ($row->role ?? 'member'), ['admin', 'super_admin', 'tenant_admin'], true)) {
             return true;
         }
-        return (bool) ($user->is_super_admin ?? false);
+
+        return (bool) ($row->is_super_admin ?? false);
     }
 
     /**

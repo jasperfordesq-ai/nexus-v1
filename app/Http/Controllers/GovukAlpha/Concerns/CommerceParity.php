@@ -152,6 +152,12 @@ trait CommerceParity
                 ->withInput()->with('commerceListingErrors', $errors);
         }
 
+        // Editing content must never change the listing's lifecycle status. The
+        // shared input builder sets status='active' for the create path; leaving
+        // it in the update payload silently re-activates (and makes re-purchasable)
+        // a sold/expired/removed listing. Status changes only via the renew flow.
+        unset($data['status']);
+
         $ok = false;
         try {
             MarketplaceListingService::update($listing, $data);
@@ -744,6 +750,26 @@ trait CommerceParity
     //  Marketplace — Orders dashboards
     // =================================================================
 
+    /**
+     * Map an orders-dashboard tab to the marketplace_orders status value(s) to
+     * filter on (a comma-separated list becomes a whereIn inside
+     * MarketplaceOrderService). Mirrors the React TAB_STATUS_MAP in
+     * BuyerOrdersPage/SellerOrdersPage: tab names are UI groupings, NOT raw enum
+     * statuses, so passing them through verbatim matched zero rows — e.g. the
+     * buyer "Active" tab (status='active', not a real enum value) was always empty.
+     */
+    private function commerceOrderStatusFilter(string $tab): ?string
+    {
+        return match ($tab) {
+            'active' => 'paid,shipped',
+            'paid' => 'paid',
+            'shipped' => 'shipped',
+            'completed' => 'completed,delivered',
+            'cancelled' => 'cancelled,refunded',
+            default => null, // 'all' — no status filter
+        };
+    }
+
     /** Buyer's purchase orders. */
     public function commerceBuyerOrders(Request $request, string $tenantSlug): Response|RedirectResponse
     {
@@ -755,7 +781,7 @@ trait CommerceParity
         }
 
         $tab = $this->allowed(self::asStr($request->query('tab')), ['all', 'active', 'completed', 'cancelled'], 'all');
-        $statusFilter = $tab === 'all' ? null : $tab;
+        $statusFilter = $this->commerceOrderStatusFilter($tab);
 
         $orders = [];
         try {
@@ -787,8 +813,8 @@ trait CommerceParity
             return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
         }
 
-        $tab = $this->allowed(self::asStr($request->query('tab')), ['all', 'paid', 'shipped', 'completed'], 'all');
-        $statusFilter = $tab === 'all' ? null : $tab;
+        $tab = $this->allowed(self::asStr($request->query('tab')), ['all', 'paid', 'shipped', 'completed', 'cancelled'], 'all');
+        $statusFilter = $this->commerceOrderStatusFilter($tab);
 
         $orders = [];
         try {

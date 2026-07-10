@@ -9,7 +9,7 @@
         $communityName = $tenant['name'] ?? $tenantSlug;
         $isSeller = ($orderRole ?? 'buyer') === 'seller';
         $activeTab = $tab ?? 'all';
-        $tabKeys = $isSeller ? ['all', 'paid', 'shipped', 'completed'] : ['all', 'active', 'completed', 'cancelled'];
+        $tabKeys = $isSeller ? ['all', 'paid', 'shipped', 'completed', 'cancelled'] : ['all', 'active', 'completed', 'cancelled'];
         $tabRoute = $isSeller ? 'govuk-alpha.marketplace.orders.seller' : 'govuk-alpha.marketplace.orders.buyer';
         $statusMessages = [
             'ordered' => __('govuk_alpha_commerce.orders.status_ordered'),

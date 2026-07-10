@@ -4901,7 +4901,7 @@ class AlphaController extends Controller
 
     public function joinGroup(Request $request, string $tenantSlug, int $id): RedirectResponse
     {
-        $userId = $this->geGuard($tenantSlug);
+        $userId = $this->alphaAuthGuard($tenantSlug);
         if (is_object($userId)) {
             return $userId;
         }
@@ -4919,7 +4919,7 @@ class AlphaController extends Controller
 
     public function leaveGroup(Request $request, string $tenantSlug, int $id): RedirectResponse
     {
-        $userId = $this->geGuard($tenantSlug);
+        $userId = $this->alphaAuthGuard($tenantSlug);
         if (is_object($userId)) {
             return $userId;
         }
@@ -5788,7 +5788,7 @@ class AlphaController extends Controller
 
     public function storeGoal(Request $request, string $tenantSlug): RedirectResponse
     {
-        $userId = $this->geGuard($tenantSlug);
+        $userId = $this->alphaAuthGuard($tenantSlug);
         if (is_object($userId)) {
             return $userId;
         }
@@ -5820,7 +5820,7 @@ class AlphaController extends Controller
 
     public function incrementGoal(Request $request, string $tenantSlug, int $id): RedirectResponse
     {
-        $userId = $this->geGuard($tenantSlug);
+        $userId = $this->alphaAuthGuard($tenantSlug);
         if (is_object($userId)) {
             return $userId;
         }
@@ -5842,7 +5842,7 @@ class AlphaController extends Controller
 
     public function completeGoal(Request $request, string $tenantSlug, int $id): RedirectResponse
     {
-        $userId = $this->geGuard($tenantSlug);
+        $userId = $this->alphaAuthGuard($tenantSlug);
         if (is_object($userId)) {
             return $userId;
         }
@@ -5984,7 +5984,7 @@ class AlphaController extends Controller
 
     public function storeOrganisation(Request $request, string $tenantSlug): RedirectResponse
     {
-        $userId = $this->geGuard($tenantSlug);
+        $userId = $this->alphaAuthGuard($tenantSlug);
         if (is_object($userId)) {
             return $userId;
         }
@@ -9221,6 +9221,26 @@ class AlphaController extends Controller
         return $userId;
     }
 
+    /**
+     * Feature-agnostic auth guard: assert the slug and resolve the current user,
+     * redirecting to login when absent. Callers MUST apply their own module gate
+     * (hasFeature/hasModule) immediately after. This exists because geGuard()
+     * also enforces the 'group_exchanges' feature and must stay reserved for
+     * group-exchange handlers — using it as a generic auth guard 403s unrelated
+     * actions (group join/leave, goals, organisation registration) whenever a
+     * tenant disables the group-exchanges feature.
+     */
+    private function alphaAuthGuard(string $tenantSlug): int|RedirectResponse
+    {
+        $this->assertTenantSlug($tenantSlug);
+        $userId = $this->currentUserId();
+        if ($userId === null) {
+            return redirect()->route('govuk-alpha.login', ['tenantSlug' => $tenantSlug, 'status' => 'auth-required']);
+        }
+
+        return $userId;
+    }
+
     private function geRedirect(string $tenantSlug, int $id, string $status): RedirectResponse
     {
         return redirect()->route('govuk-alpha.group-exchanges.show', [
@@ -11295,13 +11315,19 @@ class AlphaController extends Controller
 
     private function currentUserId(): ?int
     {
+        // Every branch resolves an identity to a validated tenant member: the id
+        // must belong to the current tenant, be active, and be approved (or an
+        // admin role). Without this, an identity established under another tenant
+        // (web guard / native session) would act under this tenant's URL slug,
+        // and a suspended/unapproved user with a live session would not be
+        // re-blocked. Mirrors the token branches below.
         $user = Auth::user();
         if ($user) {
-            return (int) $user->id;
+            return $this->validatedTenantUserId((int) $user->id);
         }
 
         if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id'])) {
-            return (int) $_SESSION['user_id'];
+            return $this->validatedTenantUserId((int) $_SESSION['user_id']);
         }
 
         $token = request()->bearerToken() ?: request()->cookie('auth_token');
