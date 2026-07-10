@@ -405,6 +405,8 @@
     "platform_chip": "Ardán Project NEXUS",
     "provider_notice_title": "Fógra Soláthraí Ardáin",
     "provider_notice_body": "Rialaíonn an doiciméad seo an gaol idir tú féin agus Project NEXUS (soláthraí an ardáin). Tá sé ar leithligh ó aon téarmaí arna mbunú ag {{tenant}} (oibreoir do phobail).",
+    "authoritative_notice_title": "Leagan údarásach Béarla",
+    "authoritative_notice_body": "Is é an téacs dlíthiúil substainteach ar an leathanach seo an leagan údarásach Béarla. Aistríodh an fógra seo ar mhaithe le háisiúlacht; má bhíonn difríocht idir aistriúchán agus an téacs Béarla, is é an téacs Béarla atá i réim.",
     "view_tenant_legal": "Féach ar dhoiciméid dhlíthiúla {{tenant}}",
     "contents": "Clár Ábhar",
     "related_documents": "Doiciméid Ghaolmhara Ardáin",

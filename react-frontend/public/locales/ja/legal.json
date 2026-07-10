@@ -401,6 +401,8 @@
     "platform_chip": "プロジェクトNEXUSプラットフォーム",
     "provider_notice_title": "プラットフォーム提供者のお知らせ",
     "provider_notice_body": "この文書は、あなたとプロジェクトNEXUS（プラットフォーム提供者）との関係を規定します。これは、{{tenant}}（あなたのコミュニティオペレーター）によって定められた条件とは別のものです。",
+    "authoritative_notice_title": "正式な英語版",
+    "authoritative_notice_body": "このページの実質的な法的本文は正式な英語版です。このお知らせは便宜のために翻訳されています。翻訳に相違がある場合は、英語の本文が優先されます。",
     "view_tenant_legal": "{{tenant}}の法的文書を表示",
     "contents": "コンテンツ",
     "related_documents": "関連プラットフォーム文書",

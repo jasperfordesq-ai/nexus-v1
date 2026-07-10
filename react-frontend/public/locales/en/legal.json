@@ -402,6 +402,8 @@
     "platform_chip": "Project NEXUS Platform",
     "provider_notice_title": "Platform Provider Notice",
     "provider_notice_body": "This document governs the relationship between you and Project NEXUS (the platform provider). It is separate from any terms established by {{tenant}} (your community operator).",
+    "authoritative_notice_title": "Authoritative English version",
+    "authoritative_notice_body": "The substantive legal text on this page is the authoritative English version. This notice is translated for convenience; if a translation differs, the English text controls.",
     "view_tenant_legal": "View {{tenant}}'s legal documents",
     "contents": "Contents",
     "related_documents": "Related Platform Documents",

@@ -42623,6 +42623,8 @@ export default interface Resources {
       }
     },
     "platform": {
+      "authoritative_notice_body": "The substantive legal text on this page is the authoritative English version. This notice is translated for convenience; if a translation differs, the English text controls.",
+      "authoritative_notice_title": "Authoritative English version",
       "contact_tenant": "Contact {{tenant}}",
       "contents": "Contents",
       "cta_body": "If you have questions about this platform-level document, contact the Project NEXUS team. For questions about your community's policies, contact {{tenant}} directly.",

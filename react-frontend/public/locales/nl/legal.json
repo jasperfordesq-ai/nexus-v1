@@ -402,6 +402,8 @@
     "platform_chip": "Project NEXUS-platform",
     "provider_notice_title": "Kennisgeving van de platformprovider",
     "provider_notice_body": "Dit document regelt de relatie tussen jou en Project NEXUS (de platformprovider). Het is afzonderlijk van de voorwaarden die zijn vastgesteld door {{tenant}} (jouw communityoperator).",
+    "authoritative_notice_title": "Autoritatieve Engelse versie",
+    "authoritative_notice_body": "De inhoudelijke juridische tekst op deze pagina is de autoritatieve Engelse versie. Deze kennisgeving is voor het gemak vertaald; bij verschillen is de Engelse tekst leidend.",
     "view_tenant_legal": "Bekijk de juridische documenten van {{tenant}}",
     "contents": "Inhoud",
     "related_documents": "Gerelateerde platformdocumenten",

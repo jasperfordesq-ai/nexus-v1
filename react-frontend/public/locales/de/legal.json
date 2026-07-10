@@ -402,6 +402,8 @@
     "platform_chip": "Project NEXUS Plattform",
     "provider_notice_title": "Plattform-Anbieterhinweis",
     "provider_notice_body": "Dieses Dokument regelt die Beziehung zwischen Ihnen und Project NEXUS (dem Plattformanbieter). Es ist von den Bedingungen von {{tenant}} (Ihrem Gemeinschaftsbetreiber) getrennt.",
+    "authoritative_notice_title": "Verbindliche englische Fassung",
+    "authoritative_notice_body": "Der maßgebliche Rechtstext auf dieser Seite ist die englische Fassung. Dieser Hinweis wurde zur Unterstützung übersetzt; bei Abweichungen ist der englische Text maßgeblich.",
     "view_tenant_legal": "Rechtsdokumente von {{tenant}} ansehen",
     "contents": "Inhaltsverzeichnis",
     "related_documents": "Verwandte Plattform-Dokumente",

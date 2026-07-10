@@ -132,6 +132,12 @@ export function PlatformLegalPage({
               <p className="text-sm text-theme-muted">
                 {t('platform.provider_notice_body', { tenant: tenantName })}
               </p>
+              <p className="mt-3 border-t border-blue-500/20 pt-3 text-xs text-theme-subtle">
+                <strong className="font-semibold text-theme-muted">
+                  {t('platform.authoritative_notice_title')}:
+                </strong>{' '}
+                {t('platform.authoritative_notice_body')}
+              </p>
               <Link
                 to={tenantPath('/legal')}
                 className="inline-flex items-center gap-1 mt-2 text-sm text-blue-600 dark:text-blue-400 hover:underline"

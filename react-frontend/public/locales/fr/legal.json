@@ -403,6 +403,8 @@
     "platform_chip": "Plateforme Project NEXUS",
     "provider_notice_title": "Avis du fournisseur de la plateforme",
     "provider_notice_body": "Ce document régit la relation entre vous et Project NEXUS (le fournisseur de la plateforme). Il est distinct de tout accord établi par {{tenant}} (l’opérateur de votre communauté).",
+    "authoritative_notice_title": "Version anglaise faisant foi",
+    "authoritative_notice_body": "Le texte juridique substantiel de cette page est la version anglaise faisant foi. Cet avis est traduit par commodité ; en cas de différence, le texte anglais prévaut.",
     "view_tenant_legal": "Voir les documents juridiques de {{tenant}}",
     "contents": "Sommaire",
     "related_documents": "Documents de plateforme connexes",
