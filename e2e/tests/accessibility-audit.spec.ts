@@ -71,6 +71,21 @@ async function visit(page: Page, path: string): Promise<void> {
 }
 
 async function audit(page: Page, label: string): Promise<void> {
+  // Freeze CSS transitions/animations and let any in-flight ones jump to their
+  // end state before axe samples the page. Several pages fade content in via
+  // the motion shim (opacity 0 -> 1); sampling mid-transition read text (e.g.
+  // the dashboard empty states) at partial opacity and produced false
+  // color-contrast failures even though the token colours pass at full opacity.
+  // A genuinely fixed low-opacity element is unaffected by this and would still
+  // be flagged, so this settles animation timing without masking real issues.
+  await page.addStyleTag({
+    content: `*, *::before, *::after {
+      transition: none !important;
+      animation: none !important;
+    }`,
+  });
+  await page.waitForTimeout(200);
+
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze();
