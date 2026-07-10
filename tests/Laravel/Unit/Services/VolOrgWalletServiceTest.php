@@ -124,6 +124,32 @@ class VolOrgWalletServiceTest extends TestCase
         $this->assertEquals(0, DB::table('vol_org_transactions')->where('vol_organization_id', $orgId)->count());
     }
 
+    /**
+     * 2026-07-10 audit M2: the suspended-org deposit freeze lived only in the
+     * React controller (VolunteerController::orgWalletDeposit), so the
+     * accessible frontend — which calls this service directly — let owners
+     * keep depositing into a suspended org's wallet. The freeze must live in
+     * the service so every caller inherits it.
+     */
+    public function test_deposit_rejects_non_approved_org_at_service_level(): void
+    {
+        $user = User::factory()->forTenant(2)->create(['balance' => 100]);
+        $orgId = $this->makeOrg(2, 0);
+        $this->pinTenant();
+        DB::table('vol_organizations')->where('id', $orgId)->update(['status' => 'suspended']);
+
+        $result = VolOrgWalletService::depositFromUser($user->id, $orgId, 10);
+
+        $this->assertFalse($result['success'], 'Deposit into a suspended org must be rejected');
+        $this->assertEquals(100, (int) DB::table('users')->where('id', $user->id)->value('balance'));
+        $this->assertEquals(0.00, (float) DB::table('vol_organizations')->where('id', $orgId)->value('balance'));
+        $this->assertEquals(0, DB::table('vol_org_transactions')->where('vol_organization_id', $orgId)->count());
+
+        // Pending (not-yet-approved) orgs are frozen too.
+        DB::table('vol_organizations')->where('id', $orgId)->update(['status' => 'pending']);
+        $this->assertFalse(VolOrgWalletService::depositFromUser($user->id, $orgId, 10)['success']);
+    }
+
     public function test_deposit_rejects_insufficient_balance(): void
     {
         $user = User::factory()->forTenant(2)->create(['balance' => 5]);

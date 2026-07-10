@@ -199,12 +199,20 @@ class VolOrgWalletService
 
             // Lock org row BEFORE validating user balance (prevent race condition on org balance_after)
             $org = DB::selectOne(
-                "SELECT id, name, balance FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
+                "SELECT id, name, balance, status FROM vol_organizations WHERE id = ? AND tenant_id = ? FOR UPDATE",
                 [$volOrgId, $tenantId]
             );
 
             if (!$org) {
                 return ['success' => false, 'message' => __('svc_notifications_2.vol_org_wallet.organization_not_found')];
+            }
+
+            // Hard-freeze: a suspended/pending (non-approved) org cannot take on
+            // new value movements. Enforced HERE — not only in the React
+            // controller — so every caller (accessible frontend included)
+            // inherits the block (2026-07-10 audit M2).
+            if (!VolunteerService::isApprovedOrganizationStatus($org->status ?? null)) {
+                return ['success' => false, 'message' => __('api.volunteer_org_not_active')];
             }
 
             // Whole-number amounts only (fractional deposits are rejected
