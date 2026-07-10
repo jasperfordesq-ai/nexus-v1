@@ -797,9 +797,27 @@ class WebAuthnController extends BaseApiController
         $candidates = [
             $tenant['domain'] ?? null,
             $tenant['accessible_domain'] ?? null,
-            config('webauthn.rp_id'),
-            'localhost',
         ];
+
+        // Slug-only sub-tenants (tenants.parent_id set, no domain of their own)
+        // are served at the PARENT's custom domain (e.g. tenant `stratford` at
+        // uk.timebank.global/stratford), so the parent's domains are valid RP
+        // IDs for them too. Mirrors TenantContext::getFrontendUrl()'s parent
+        // lookup. Credentials stay tenant-scoped in webauthn_credentials, so
+        // sharing the parent's RP ID cannot cross-authenticate tenants.
+        if (empty($tenant['domain']) && !empty($tenant['parent_id'])) {
+            $parent = DB::selectOne(
+                "SELECT domain, accessible_domain FROM tenants WHERE id = ? AND is_active = 1",
+                [(int) $tenant['parent_id']]
+            );
+            if ($parent) {
+                $candidates[] = $parent->domain;
+                $candidates[] = $parent->accessible_domain;
+            }
+        }
+
+        $candidates[] = config('webauthn.rp_id');
+        $candidates[] = 'localhost';
 
         $rpIds = [];
         foreach ($candidates as $candidate) {

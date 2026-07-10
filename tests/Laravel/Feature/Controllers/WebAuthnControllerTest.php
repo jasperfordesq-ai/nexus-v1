@@ -82,6 +82,37 @@ class WebAuthnControllerTest extends TestCase
         $this->assertSame('hour-timebank.ie', $response->json('data.rpId'));
     }
 
+    public function test_auth_challenge_uses_multi_label_custom_domain_as_rp_id(): void
+    {
+        // Time Banking UK: tenant domain is itself a subdomain of another
+        // tenant's domain (uk.timebank.global under timebank.global). The
+        // exact-host match must win, keeping credentials scoped per tenant.
+        config(['webauthn.rp_id' => 'project-nexus.ie']);
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['domain' => 'uk.timebank.global']);
+        TenantContext::setById($this->testTenantId);
+
+        $response = $this->apiPost('/webauthn/auth-challenge', [], ['Origin' => 'https://uk.timebank.global']);
+
+        $response->assertStatus(200);
+        $this->assertSame('uk.timebank.global', $response->json('data.rpId'));
+    }
+
+    public function test_auth_challenge_sub_tenant_inherits_parent_domain_rp_id(): void
+    {
+        // Slug-only sub-tenant served at the parent's custom domain
+        // (e.g. stratford at uk.timebank.global/stratford): the sub-tenant has
+        // no domain of its own, so the parent's domain must be accepted.
+        config(['webauthn.rp_id' => 'project-nexus.ie']);
+        DB::table('tenants')->where('id', 999)->update(['domain' => 'uk.timebank.global']);
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['domain' => null, 'parent_id' => 999]);
+        TenantContext::setById($this->testTenantId);
+
+        $response = $this->apiPost('/webauthn/auth-challenge', [], ['Origin' => 'https://uk.timebank.global']);
+
+        $response->assertStatus(200);
+        $this->assertSame('uk.timebank.global', $response->json('data.rpId'));
+    }
+
     public function test_auth_challenge_uses_platform_rp_id_on_platform_domain(): void
     {
         config(['webauthn.rp_id' => 'project-nexus.ie']);
