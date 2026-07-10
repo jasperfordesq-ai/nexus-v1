@@ -3253,8 +3253,6 @@ return [
                 'requires_vetted_interaction' => 'Alleen gescreende leden kunnen met u in contact komen',
             ],
         ],
-        'privacy_contact_label' => 'Andere leden toestaan mij rechtstreeks te contacteren',
-        'privacy_contact_hint' => 'Leden kunnen u een bericht sturen ook als u niet verbonden bent.',
         'skills' => [
             'title' => 'Uw vaardigheden',
             'description' => 'Vermeld de vaardigheden die u kunt aanbieden of waarnaar u op zoek bent. Ze verschijnen op uw openbaar profiel en helpen bij het koppelen.',

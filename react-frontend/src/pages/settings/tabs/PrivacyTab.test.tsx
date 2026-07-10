@@ -35,7 +35,6 @@ vi.mock('@/contexts', () => ({
 const defaultPrivacy: PrivacySettings = {
   profile_visibility: 'public',
   search_indexing: true,
-  contact_permission: true,
 };
 
 const defaultProps = {
@@ -163,11 +162,6 @@ describe('PrivacyTab', () => {
   it('renders search indexing toggle', () => {
     render(<PrivacyTab {...defaultProps} />);
     expect(screen.getByText('Search Engine Indexing')).toBeDefined();
-  });
-
-  it('renders contact preferences toggle', () => {
-    render(<PrivacyTab {...defaultProps} />);
-    expect(screen.getByText('Allow Contact')).toBeDefined();
   });
 
   it('shows isSavingPrivacy loading state on save button', () => {

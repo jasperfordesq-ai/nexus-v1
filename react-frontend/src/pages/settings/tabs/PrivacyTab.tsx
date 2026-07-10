@@ -11,7 +11,6 @@ import { Switch } from '@/components/ui/Switch';
 import Save from 'lucide-react/icons/save';
 import Eye from 'lucide-react/icons/eye';
 import Search from 'lucide-react/icons/search';
-import MessageSquare from 'lucide-react/icons/message-square';
 import FileText from 'lucide-react/icons/file-text';
 import Download from 'lucide-react/icons/download';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -52,7 +51,6 @@ const selectClassNames = {
 export interface PrivacySettings {
   profile_visibility: 'public' | 'members' | 'connections';
   search_indexing: boolean;
-  contact_permission: boolean;
 }
 
 export interface UserInsuranceCert {
@@ -197,21 +195,6 @@ export function PrivacyTab({
               description={t('privacy_descriptions.search_indexing')}
               checked={privacy.search_indexing}
               onChange={(checked) => onPrivacyChange((prev) => ({ ...prev, search_indexing: checked }))}
-            />
-          </div>
-
-          {/* Contact Preferences */}
-          <div className="pt-4 border-t border-theme-default space-y-4">
-            <h3 className="text-sm font-medium text-theme-muted flex items-center gap-2">
-              <MessageSquare className="w-4 h-4" aria-hidden="true" />
-              {t('privacy_sections.contact_preferences')}
-            </h3>
-
-            <SettingToggle
-              label={t('privacy_prefs.allow_contact')}
-              description={t('privacy_descriptions.allow_contact')}
-              checked={privacy.contact_permission}
-              onChange={(checked) => onPrivacyChange((prev) => ({ ...prev, contact_permission: checked }))}
             />
           </div>
 

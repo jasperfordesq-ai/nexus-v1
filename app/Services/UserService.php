@@ -724,7 +724,7 @@ class UserService
         }
 
         try {
-            $allowed = ['privacy_profile', 'privacy_search', 'privacy_contact'];
+            $allowed = ['privacy_profile', 'privacy_search'];
             $filtered = collect($privacyData)->only($allowed)->all();
 
             if (empty($filtered)) {
@@ -1025,7 +1025,6 @@ class UserService
             $profile['is_approved']             = (bool) ($user->is_approved ?? false);
             $profile['privacy_profile']         = $user->privacy_profile ?? 'public';
             $profile['privacy_search']          = (bool) ($user->privacy_search ?? true);
-            $profile['privacy_contact']         = (bool) ($user->privacy_contact ?? true);
             $profile['onboarding_completed']    = (bool) ($user->onboarding_completed ?? false);
             $profile['preferred_language']       = $user->preferred_language ?? 'en';
             $profile['has_2fa_enabled']          = (bool) ($user->totp_enabled ?? false);

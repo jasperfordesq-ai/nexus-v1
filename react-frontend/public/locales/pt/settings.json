@@ -236,8 +236,7 @@
   },
   "privacy_prefs": {
     "profile_visibility": "Quem pode ver o seu perfil",
-    "search_indexing": "Indexação por Motores de Busca",
-    "allow_contact": "Permitir Contacto"
+    "search_indexing": "Indexação por Motores de Busca"
   },
   "password": {
     "current": "Palavra-passe Atual",
@@ -357,12 +356,10 @@
   "privacy_sections": {
     "title": "Definições de Privacidade",
     "profile_visibility": "Visibilidade do Perfil",
-    "search_discovery": "Pesquisa e Descoberta",
-    "contact_preferences": "Preferências de Contacto"
+    "search_discovery": "Pesquisa e Descoberta"
   },
   "privacy_descriptions": {
-    "search_indexing": "Permitir que motores de busca indexem o seu perfil",
-    "allow_contact": "Permitir que outros membros me contactem"
+    "search_indexing": "Permitir que motores de busca indexem o seu perfil"
   },
   "visibility_options": {
     "public": "Público - Qualquer pessoa pode ver",

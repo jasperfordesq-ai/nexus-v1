@@ -236,8 +236,7 @@
   },
   "privacy_prefs": {
     "profile_visibility": "Wie kan jouw profiel zien",
-    "search_indexing": "Zoekmachine-indexering",
-    "allow_contact": "Contact toestaan"
+    "search_indexing": "Zoekmachine-indexering"
   },
   "password": {
     "current": "Huidig wachtwoord",
@@ -357,12 +356,10 @@
   "privacy_sections": {
     "title": "Privacy Instellingen",
     "profile_visibility": "Profiel Zichtbaarheid",
-    "search_discovery": "Zoeken & Ontdekking",
-    "contact_preferences": "Contactvoorkeuren"
+    "search_discovery": "Zoeken & Ontdekking"
   },
   "privacy_descriptions": {
-    "search_indexing": "Sta zoekmachines toe om je profiel te indexeren",
-    "allow_contact": "Sta andere leden toe om contact met mij op te nemen"
+    "search_indexing": "Sta zoekmachines toe om je profiel te indexeren"
   },
   "visibility_options": {
     "public": "Openbaar - Iedereen kan het bekijken",

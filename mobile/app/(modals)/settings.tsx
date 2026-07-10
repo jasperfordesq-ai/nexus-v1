@@ -43,7 +43,6 @@ type PrivacyVisibility = 'public' | 'members' | 'connections';
 interface PrivacyPrefs {
   privacy_profile: PrivacyVisibility;
   privacy_search: boolean;
-  privacy_contact: boolean;
 }
 
 interface PreferencesResponse {
@@ -278,15 +277,6 @@ export default function SettingsScreen() {
               onToggle={() => {
                 if (!currentPrivacy) return;
                 void updatePrivacy({ ...currentPrivacy, privacy_search: !currentPrivacy.privacy_search });
-              }}
-              disabled={isLoadingPreferences || savingPrivacy || !currentPrivacy}
-            />
-            <SettingRow
-              label={t('privacy.contactPermission')}
-              value={currentPrivacy?.privacy_contact ?? true}
-              onToggle={() => {
-                if (!currentPrivacy) return;
-                void updatePrivacy({ ...currentPrivacy, privacy_contact: !currentPrivacy.privacy_contact });
               }}
               disabled={isLoadingPreferences || savingPrivacy || !currentPrivacy}
             />

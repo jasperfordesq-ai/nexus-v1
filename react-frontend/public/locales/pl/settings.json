@@ -236,8 +236,7 @@
   },
   "privacy_prefs": {
     "profile_visibility": "Kto może zobaczyć Twój profil",
-    "search_indexing": "Indeksowanie w wyszukiwarkach",
-    "allow_contact": "Zezwól na kontakt"
+    "search_indexing": "Indeksowanie w wyszukiwarkach"
   },
   "password": {
     "current": "Aktualne hasło",
@@ -357,12 +356,10 @@
   "privacy_sections": {
     "title": "Ustawienia prywatności",
     "profile_visibility": "Widoczność profilu",
-    "search_discovery": "Wyszukiwanie i odkrywanie",
-    "contact_preferences": "Preferencje kontaktu"
+    "search_discovery": "Wyszukiwanie i odkrywanie"
   },
   "privacy_descriptions": {
-    "search_indexing": "Zezwól wyszukiwarkom na indeksowanie Twojego profilu",
-    "allow_contact": "Pozwól innym członkom skontaktować się ze mną"
+    "search_indexing": "Zezwól wyszukiwarkom na indeksowanie Twojego profilu"
   },
   "visibility_options": {
     "public": "Publiczny - Każdy może przeglądać",

@@ -3253,8 +3253,6 @@ return [
                 'requires_vetted_interaction' => '審査済みのメンバーのみがあなたとやり取りできます',
             ],
         ],
-        'privacy_contact_label' => '他のメンバーが直接連絡できるようにする',
-        'privacy_contact_hint' => 'つながっていないメンバーでもメッセージを送ることができます。',
         'skills' => [
             'title' => 'あなたのスキル',
             'description' => '提供できるスキルや求めているスキルを一覧にしてください。公開プロフィールに表示され、マッチングに役立ちます。',

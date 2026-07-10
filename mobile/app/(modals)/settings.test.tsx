@@ -30,7 +30,6 @@ jest.mock('react-i18next', () => ({
         'privacy.profileVisibility': 'Profile visibility',
         'privacy.changeVisibility': 'Change',
         'privacy.searchIndexing': 'Appear in member search',
-        'privacy.contactPermission': 'Allow member contact',
         'privacy.saveError': 'Could not save privacy settings. Please try again.',
         'privacy.visibility.public': 'Visible publicly',
         'privacy.visibility.members': 'Visible to signed-in members',
@@ -167,7 +166,6 @@ const preferencesState = {
       privacy: {
         privacy_profile: 'members',
         privacy_search: true,
-        privacy_contact: false,
       },
     },
   },
@@ -236,7 +234,6 @@ describe('SettingsScreen', () => {
       privacy: {
         privacy_profile: 'connections',
         privacy_search: true,
-        privacy_contact: false,
       },
     });
   });

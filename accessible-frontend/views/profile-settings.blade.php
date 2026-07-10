@@ -297,11 +297,6 @@
                                 <input class="govuk-checkboxes__input" id="privacy_search" name="privacy_search" type="checkbox" value="1" @checked($privacySearch)>
                                 <label class="govuk-label govuk-checkboxes__label" for="privacy_search">{{ __('govuk_alpha.profile_settings.privacy_search_label') }}</label>
                             </div>
-                            <div class="govuk-checkboxes__item">
-                                <input class="govuk-checkboxes__input" id="privacy_contact" name="privacy_contact" type="checkbox" value="1" @checked($privacyContact ?? false) aria-describedby="privacy_contact-hint">
-                                <label class="govuk-label govuk-checkboxes__label" for="privacy_contact">{{ __('govuk_alpha.profile_settings.privacy_contact_label') }}</label>
-                                <div id="privacy_contact-hint" class="govuk-hint govuk-checkboxes__hint">{{ __('govuk_alpha.profile_settings.privacy_contact_hint') }}</div>
-                            </div>
                         </div>
                     </div>
                 </fieldset>

@@ -3253,8 +3253,6 @@ return [
                 'requires_vetted_interaction' => 'Solo i membri verificati possono interagire con te',
             ],
         ],
-        'privacy_contact_label' => 'Consenti agli altri membri di contattarmi direttamente',
-        'privacy_contact_hint' => 'Gli altri membri possono inviarti un messaggio anche se non siete connessi.',
         'skills' => [
             'title' => 'Le tue competenze',
             'description' => 'Elenca le competenze che puoi offrire o che stai cercando. Vengono mostrate nel tuo profilo pubblico e aiutano con l\'abbinamento.',

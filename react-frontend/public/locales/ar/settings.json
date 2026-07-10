@@ -236,8 +236,7 @@
   },
   "privacy_prefs": {
     "profile_visibility": "من يمكنه رؤية ملفك الشخصي",
-    "search_indexing": "فهرسة محركات البحث",
-    "allow_contact": "السماح بالاتصال"
+    "search_indexing": "فهرسة محركات البحث"
   },
   "password": {
     "current": "كلمة المرور الحالية",
@@ -357,12 +356,10 @@
   "privacy_sections": {
     "title": "إعدادات الخصوصية",
     "profile_visibility": "رؤية الملف الشخصي",
-    "search_discovery": "البحث والاكتشاف",
-    "contact_preferences": "تفضيلات الاتصال"
+    "search_discovery": "البحث والاكتشاف"
   },
   "privacy_descriptions": {
-    "search_indexing": "السماح لمحركات البحث بفهرسة ملفك الشخصي",
-    "allow_contact": "السماح لأعضاء آخرين بالاتصال بي"
+    "search_indexing": "السماح لمحركات البحث بفهرسة ملفك الشخصي"
   },
   "visibility_options": {
     "public": "عام - يمكن لأي شخص المشاهدة",

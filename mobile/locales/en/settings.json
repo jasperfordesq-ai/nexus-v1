@@ -117,7 +117,6 @@
     "profileVisibility": "Profile visibility",
     "changeVisibility": "Change",
     "searchIndexing": "Appear in member search",
-    "contactPermission": "Allow member contact",
     "saveError": "Could not save privacy settings. Please try again.",
     "visibility": {
       "public": "Visible publicly",

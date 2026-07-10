@@ -215,6 +215,39 @@ class UsersControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * Regression: privacy toggles saved via PUT /preferences must actually persist.
+     *
+     * privacy_profile/privacy_search were missing from User::$fillable, so
+     * UserService::updatePrivacy()'s fill()/save() silently dropped them — the React
+     * settings page reported "saved" while the DB never changed (profile visibility +
+     * search indexing reverted). Guards the $fillable declaration on the User model.
+     */
+    public function test_update_preferences_persists_privacy_toggles(): void
+    {
+        $user = $this->authenticatedUser();
+
+        // Establish a known starting point directly (independent of fill semantics).
+        DB::table('users')->where('id', $user->id)->update([
+            'privacy_profile' => 'public',
+            'privacy_search'  => 1,
+        ]);
+
+        $response = $this->apiPut('/v2/users/me/preferences', [
+            'privacy' => [
+                'privacy_profile' => 'connections',
+                'privacy_search'  => false,
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonPath('data.privacy.privacy_profile', 'connections');
+
+        $row = DB::table('users')->where('id', $user->id)->first();
+        $this->assertSame('connections', $row->privacy_profile);
+        $this->assertSame(0, (int) $row->privacy_search);
+    }
+
     // ================================================================
     // PREFERENCES — Authentication required
     // ================================================================

@@ -3273,8 +3273,6 @@ return [
                 'requires_vetted_interaction' => 'Only vetted members can interact with you',
             ],
         ],
-        'privacy_contact_label' => 'Allow other members to contact me directly',
-        'privacy_contact_hint' => 'Members can send you a message even if you are not connected.',
         'skills' => [
             'title' => 'Your skills',
             'description' => 'List the skills you can offer or are looking for. They appear on your public profile and help with matching.',

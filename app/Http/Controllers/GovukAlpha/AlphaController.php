@@ -10189,7 +10189,7 @@ class AlphaController extends Controller
             ->where('id', $userId)
             ->where('tenant_id', TenantContext::getId())
             ->select(
-                'newsletter_opt_in', 'email', 'preferred_language', 'privacy_contact',
+                'newsletter_opt_in', 'email', 'preferred_language',
                 'prefers_chronological_feed', 'auto_translate_ugc', 'auto_translate_target_locale'
             )
             ->first();
@@ -10202,7 +10202,6 @@ class AlphaController extends Controller
             'displayName' => $this->profileDisplayName($profile),
             'avatarUrl' => $profile['avatar_url'] ?? $profile['avatar'] ?? null,
             'marketingOptIn' => (bool) ($account->newsletter_opt_in ?? false),
-            'privacyContact' => (bool) ($account->privacy_contact ?? false),
             'currentEmail' => (string) ($account->email ?? ''),
             'currentLanguage' => (string) ($account->preferred_language ?? app()->getLocale()),
             'locales' => self::ALPHA_LOCALES,
@@ -10821,8 +10820,6 @@ class AlphaController extends Controller
                 'name' => trim($data['first_name'] . ' ' . $data['last_name']) ?: ($data['organization_name'] ?: __('govuk_alpha.members.unknown_member')),
                 'privacy_profile' => $privacyProfile,
                 'privacy_search' => $request->boolean('privacy_search'),
-                // Whether other members may contact this member directly.
-                'privacy_contact' => $request->boolean('privacy_contact'),
                 // GDPR marketing consent — recipient-controlled newsletter opt-in.
                 'newsletter_opt_in' => $request->boolean('newsletter_opt_in'),
                 'updated_at' => now(),

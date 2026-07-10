@@ -3253,8 +3253,6 @@ return [
                 'requires_vetted_interaction' => 'Ní féidir ach le comhaltaí fíoraithe idirghníomhú leat',
             ],
         ],
-        'privacy_contact_label' => 'Ceadaigh do chomhaltaí eile teagmháil dhíreach a dhéanamh liom',
-        'privacy_contact_hint' => 'Is féidir le comhaltaí teachtaireacht a chur chugat fiú mura bhfuil tú nasctha leo.',
         'skills' => [
             'title' => 'Do chuid scileanna',
             'description' => 'Liostaigh na scileanna is féidir leat a thairiscint nó a bhfuil tú ag lorg. Feictear ar do phróifíl phoiblí iad agus cabhraíonn siad le meaitseáil.',

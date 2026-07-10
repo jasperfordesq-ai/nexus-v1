@@ -237,7 +237,6 @@ class UsersController extends BaseApiController
             'privacy' => [
                 'privacy_profile' => $profile['privacy_profile'] ?? 'public',
                 'privacy_search'  => (bool) ($profile['privacy_search'] ?? true),
-                'privacy_contact' => (bool) ($profile['privacy_contact'] ?? true),
             ],
             'notifications' => $profile['notification_preferences'] ?? [],
             'accessibility' => [
@@ -317,7 +316,6 @@ class UsersController extends BaseApiController
             'privacy' => [
                 'privacy_profile' => $profile['privacy_profile'] ?? 'public',
                 'privacy_search'  => $profile['privacy_search'] ?? true,
-                'privacy_contact' => $profile['privacy_contact'] ?? true,
             ],
             'notifications' => $profile['notification_preferences'] ?? [],
             'feed' => [

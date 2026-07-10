@@ -236,8 +236,7 @@
   },
   "privacy_prefs": {
     "profile_visibility": "Cé a fheiceann do phróifíl",
-    "search_indexing": "Innéacsú Inneall Cuardaigh",
-    "allow_contact": "Ceadaigh Teagmháil"
+    "search_indexing": "Innéacsú Inneall Cuardaigh"
   },
   "password": {
     "current": "Pasfhocal Reatha",
@@ -357,12 +356,10 @@
   "privacy_sections": {
     "title": "Socruithe Príobháideachais",
     "profile_visibility": "Infheictheacht Phróifíle",
-    "search_discovery": "Cuardach & Aimsiú",
-    "contact_preferences": "Roghanna Teagmhála"
+    "search_discovery": "Cuardach & Aimsiú"
   },
   "privacy_descriptions": {
-    "search_indexing": "Ceadaigh d'innill chuardaigh do phróifíl a innéacsú",
-    "allow_contact": "Ceadaigh do bhaill eile teagmháil a dhéanamh liom"
+    "search_indexing": "Ceadaigh d'innill chuardaigh do phróifíl a innéacsú"
   },
   "visibility_options": {
     "public": "Poiblí - Is féidir le haon duine féachaint",

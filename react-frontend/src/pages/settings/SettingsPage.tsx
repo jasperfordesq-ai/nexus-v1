@@ -233,7 +233,6 @@ export function SettingsPage() {
   const [privacy, setPrivacy] = useState<PrivacySettings>({
     profile_visibility: 'members',
     search_indexing: true,
-    contact_permission: true,
   });
   const [isSavingPrivacy, setIsSavingPrivacy] = useState(false);
 
@@ -358,13 +357,12 @@ export function SettingsPage() {
 
   const loadPrivacySettings = useCallback(async () => {
     try {
-      const response = await api.get<{ privacy: { privacy_profile: string; privacy_search: boolean; privacy_contact: boolean } }>('/v2/users/me/preferences');
+      const response = await api.get<{ privacy: { privacy_profile: string; privacy_search: boolean } }>('/v2/users/me/preferences');
       if (response.success && response.data?.privacy) {
         const p = response.data.privacy;
         setPrivacy({
           profile_visibility: (p.privacy_profile as 'public' | 'members' | 'connections') || 'members',
           search_indexing: p.privacy_search ?? true,
-          contact_permission: p.privacy_contact ?? true,
         });
       }
     } catch (error) {
@@ -555,7 +553,6 @@ export function SettingsPage() {
         privacy: {
           privacy_profile: privacy.profile_visibility,
           privacy_search: privacy.search_indexing,
-          privacy_contact: privacy.contact_permission,
         },
       });
       if (response.success) {

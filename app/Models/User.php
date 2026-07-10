@@ -27,6 +27,12 @@ class User extends Authenticatable
         'phone', 'is_verified', 'is_approved',
         'onboarding_completed', 'date_of_birth',
         'profile_type', 'organization_name', 'totp_enabled',
+        // Privacy toggles — written by UserService::updatePrivacy() via fill()/save().
+        // Without these here, mass-assignment protection silently drops them and the
+        // React settings page's "save" writes nothing (profile visibility + search
+        // indexing revert). updatePrivacy() strictly whitelists + validates these and
+        // is self-scoped to the authenticated user.
+        'privacy_profile', 'privacy_search',
         // notification_preferences intentionally excluded from $fillable —
         // it is a sensitive JSON blob mass-assignable only via the explicit
         // updateNotificationPreferences(int $userId, array $prefs) static method
@@ -173,7 +179,7 @@ class User extends Authenticatable
             'organization_name', 'email', 'role', 'status', 'profile_type', 'balance', 'bio', 'tagline',
             'location', 'latitude', 'longitude', 'skills', 'phone', 'avatar_url',
             'created_at', 'tenant_id', 'is_approved', 'preferred_language',
-            'privacy_profile', 'privacy_search', 'privacy_contact',
+            'privacy_profile', 'privacy_search',
             'is_super_admin', 'is_god', 'is_tenant_super_admin', 'onboarding_completed',
             DB::raw('COALESCE(xp, 0) as xp'),
             DB::raw('COALESCE(level, 1) as level'),

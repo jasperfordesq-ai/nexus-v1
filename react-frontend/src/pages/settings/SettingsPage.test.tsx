@@ -305,7 +305,6 @@ describe('SettingsPage', () => {
             privacy: {
               profile_visibility: 'members',
               search_indexing: true,
-              contact_permission: true,
             },
           },
         });

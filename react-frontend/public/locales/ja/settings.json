@@ -236,8 +236,7 @@
   },
   "privacy_prefs": {
     "profile_visibility": "プロフィールを見られる人",
-    "search_indexing": "検索エンジンのインデックス作成",
-    "allow_contact": "連絡を許可する"
+    "search_indexing": "検索エンジンのインデックス作成"
   },
   "password": {
     "current": "現在のパスワード",
@@ -357,12 +356,10 @@
   "privacy_sections": {
     "title": "プライバシー設定",
     "profile_visibility": "プロフィールの可視性",
-    "search_discovery": "検索 & 発見",
-    "contact_preferences": "連絡先の好み"
+    "search_discovery": "検索 & 発見"
   },
   "privacy_descriptions": {
-    "search_indexing": "検索エンジンがあなたのプロフィールをインデックスすることを許可する",
-    "allow_contact": "他のメンバーが私に連絡できるようにする"
+    "search_indexing": "検索エンジンがあなたのプロフィールをインデックスすることを許可する"
   },
   "visibility_options": {
     "public": "公開 - 誰でも閲覧可能",

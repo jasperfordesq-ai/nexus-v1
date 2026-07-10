@@ -3253,8 +3253,6 @@ return [
                 'requires_vetted_interaction' => 'Solo los miembros verificados pueden interactuar con usted',
             ],
         ],
-        'privacy_contact_label' => 'Permitir que otros miembros me contacten directamente',
-        'privacy_contact_hint' => 'Los miembros pueden enviarle un mensaje aunque no estén conectados con usted.',
         'skills' => [
             'title' => 'Sus habilidades',
             'description' => 'Indique las habilidades que puede ofrecer o que está buscando. Aparecen en su perfil público y ayudan con los emparejamientos.',
