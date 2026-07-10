@@ -22,7 +22,13 @@ class PollRankingService
     public function submitRanking(int $pollId, int $userId, array $rankings): bool
     {
         // Validates tenant ownership via HasTenantScope global scope
-        Poll::findOrFail($pollId);
+        $poll = Poll::findOrFail($pollId);
+
+        // Only ranked-type polls accept ranked-choice ballots (the GET page
+        // hides the ballot for standard polls; the POST must enforce the same).
+        if (($poll->poll_type ?? 'standard') !== 'ranked') {
+            return false;
+        }
 
         $exists = DB::table('poll_rankings')
             ->where('poll_id', $pollId)
@@ -30,6 +36,20 @@ class PollRankingService
             ->exists();
 
         if ($exists) {
+            return false;
+        }
+
+        // Every submitted option must belong to THIS poll. $pollId is already
+        // tenant-verified above, so filtering options by poll_id is tenant-safe;
+        // without this, arbitrary option ids would insert and inflate the voter
+        // count and per-option tallies in calculateResults().
+        $validOptionIds = DB::table('poll_options')
+            ->where('poll_id', $pollId)
+            ->pluck('id')
+            ->map(static fn ($id): int => (int) $id)
+            ->all();
+        $submittedOptionIds = array_map(static fn ($r): int => (int) ($r['option_id'] ?? 0), $rankings);
+        if ($submittedOptionIds === [] || array_diff($submittedOptionIds, $validOptionIds) !== []) {
             return false;
         }
 

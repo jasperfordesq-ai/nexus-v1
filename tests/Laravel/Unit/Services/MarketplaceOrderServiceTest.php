@@ -144,7 +144,7 @@ class MarketplaceOrderServiceTest extends TestCase
         $order->status = 'shipped';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot cancel an order that has already been shipped');
+        $this->expectExceptionMessage('Only an unpaid order can be cancelled');
 
         MarketplaceOrderService::cancel($order, 'changed mind');
     }
@@ -155,7 +155,7 @@ class MarketplaceOrderServiceTest extends TestCase
         $order->status = 'completed';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot cancel an order that has already been shipped or completed');
+        $this->expectExceptionMessage('Only an unpaid order can be cancelled');
 
         MarketplaceOrderService::cancel($order, 'too late');
     }
@@ -166,9 +166,22 @@ class MarketplaceOrderServiceTest extends TestCase
         $order->status = 'refunded';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot cancel');
+        $this->expectExceptionMessage('Only an unpaid order can be cancelled');
 
         MarketplaceOrderService::cancel($order, 'too late');
+    }
+
+    public function test_cancel_throwsWhenOrderIsPaid(): void
+    {
+        // A paid order must be refunded, not cancelled — cancel() moves no money,
+        // so voiding it would leave the buyer charged with no goods and no refund.
+        $order = Mockery::mock(MarketplaceOrder::class)->makePartial();
+        $order->status = 'paid';
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only an unpaid order can be cancelled');
+
+        MarketplaceOrderService::cancel($order, 'changed mind');
     }
 
     // -----------------------------------------------------------------

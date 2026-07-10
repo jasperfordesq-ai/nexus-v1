@@ -8117,7 +8117,15 @@ class AlphaController extends Controller
                 ->with(['reviewer:id,first_name,last_name,avatar_url,organization_name,profile_type'])
                 ->where('receiver_id', $memberId)
                 ->where(function ($q) use ($memberTenantId) {
-                    $q->where('receiver_tenant_id', $memberTenantId)
+                    // Federated reviews targeting this tenant are only visible when
+                    // the review is federated AND the reviewer opted into cross-tenant
+                    // display (mirrors Review::scopeWithFederated); without these two
+                    // conditions an opted-out reviewer's rating still leaked across.
+                    $q->where(function ($q2) use ($memberTenantId) {
+                        $q2->where('receiver_tenant_id', $memberTenantId)
+                           ->where('review_type', 'federated')
+                           ->where('show_cross_tenant', 1);
+                    })
                       ->orWhere(function ($q2) use ($memberTenantId) {
                           $q2->where('tenant_id', $memberTenantId)
                              ->whereNull('receiver_tenant_id');
@@ -8198,7 +8206,15 @@ class AlphaController extends Controller
                 ->withoutGlobalScope(\App\Scopes\TenantScope::class)
                 ->where('receiver_id', $memberId)
                 ->where(function ($q) use ($memberTenantId) {
-                    $q->where('receiver_tenant_id', $memberTenantId)
+                    // Federated reviews targeting this tenant are only visible when
+                    // the review is federated AND the reviewer opted into cross-tenant
+                    // display (mirrors Review::scopeWithFederated); without these two
+                    // conditions an opted-out reviewer's rating still leaked across.
+                    $q->where(function ($q2) use ($memberTenantId) {
+                        $q2->where('receiver_tenant_id', $memberTenantId)
+                           ->where('review_type', 'federated')
+                           ->where('show_cross_tenant', 1);
+                    })
                       ->orWhere(function ($q2) use ($memberTenantId) {
                           $q2->where('tenant_id', $memberTenantId)
                              ->whereNull('receiver_tenant_id');

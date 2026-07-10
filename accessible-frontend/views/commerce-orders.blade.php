@@ -152,8 +152,8 @@
                     <p class="govuk-body-s nexus-alpha-meta">{{ __('govuk_alpha_commerce.orders.pay_by_card_hint') }}</p>
                 @endif
 
-                {{-- Cancel (both, before shipping) --}}
-                @if (in_array($oStatus, ['pending_payment', 'paid'], true))
+                {{-- Cancel (both, before payment only — a paid order must be refunded, not cancelled) --}}
+                @if (in_array($oStatus, ['pending_payment'], true))
                     <details class="govuk-details" data-module="govuk-details">
                         <summary class="govuk-details__summary"><span class="govuk-details__summary-text">{{ __('govuk_alpha_commerce.orders.action_cancel') }}</span></summary>
                         <div class="govuk-details__text">

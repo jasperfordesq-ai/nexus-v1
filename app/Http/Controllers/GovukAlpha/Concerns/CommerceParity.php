@@ -1126,11 +1126,22 @@ trait CommerceParity
         }
 
         // The lesson must belong to this course (defence-in-depth).
-        $lessonBelongs = \Illuminate\Support\Facades\DB::table('course_lessons')
-            ->where('id', $lessonId)
+        $lesson = \App\Models\CourseLesson::where('id', $lessonId)
             ->where('course_id', $id)
-            ->exists();
-        abort_unless($lessonBelongs, 404);
+            ->first();
+        abort_if($lesson === null, 404);
+
+        // Drip gate: a lesson locked by the course's drip schedule cannot be
+        // completed yet. Mirrors CourseEnrollmentController::completeLesson so the
+        // accessible frontend can't be used to skip ahead of the schedule.
+        $availability = \App\Services\CourseLessonService::availability($lesson, $enrollment->enrolled_at);
+        if (empty($availability['available'])) {
+            return redirect()->route('govuk-alpha.courses.learn', [
+                'tenantSlug' => $tenantSlug,
+                'id' => $id,
+                'status' => 'lesson-locked',
+            ]);
+        }
 
         $completed = false;
         try {

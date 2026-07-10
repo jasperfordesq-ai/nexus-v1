@@ -307,8 +307,12 @@ class MarketplaceOrderService
      */
     public static function cancel(MarketplaceOrder $order, string $reason): MarketplaceOrder
     {
-        if (in_array($order->status, ['shipped', 'delivered', 'completed', 'refunded'], true)) {
-            throw new \InvalidArgumentException('Cannot cancel an order that has already been shipped or completed.');
+        // A paid order must be REFUNDED, not cancelled. cancel() moves no money,
+        // so silently voiding a paid order would leave the buyer charged with no
+        // goods and no refund. Only a pre-payment order can be cancelled here;
+        // refunding a captured payment goes through MarketplacePaymentService::processRefund.
+        if (in_array($order->status, ['paid', 'shipped', 'delivered', 'completed', 'refunded'], true)) {
+            throw new \InvalidArgumentException('Only an unpaid order can be cancelled; a paid order must be refunded.');
         }
 
         $order = self::withOrderTenant($order, function () use ($order, $reason): MarketplaceOrder {

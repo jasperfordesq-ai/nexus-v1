@@ -20,6 +20,8 @@
             'quiz-failed' => ['error', __('govuk_alpha_commerce.learn.quiz_failed_status')],
             'quiz-no-attempts' => ['error', __('govuk_alpha_commerce.learn.quiz_no_attempts_status')],
             'quiz-error' => ['error', __('govuk_alpha_commerce.learn.quiz_error_status')],
+            // Drip gate: attempted to complete a lesson still locked by the schedule.
+            'lesson-locked' => ['error', __('govuk_alpha_commerce.learn.lesson_locked')],
         ];
         $contentTypeLabels = [
             'video' => __('govuk_alpha_commerce.learn.content_type_video'),

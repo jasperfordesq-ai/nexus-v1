@@ -401,6 +401,23 @@ class ReviewService
             'transaction_id' => ['nullable', 'integer', Rule::exists('transactions', 'id')->where('tenant_id', $tenantId)],
         ])->validate();
 
+        // A review attached to a transaction must be BETWEEN the two parties of
+        // that transaction. Without this, any member could attach a review of
+        // anyone to any tenant transaction id — fabricating reviews for exchanges
+        // they never took part in, and bypassing the 24h no-transaction throttle
+        // below by cycling through transaction ids (review-bombing).
+        $transactionId = (int) ($data['transaction_id'] ?? 0);
+        if ($transactionId > 0) {
+            $txn = DB::table('transactions')
+                ->where('id', $transactionId)
+                ->where('tenant_id', $tenantId)
+                ->first(['sender_id', 'receiver_id']);
+            $parties = $txn ? [(int) $txn->sender_id, (int) $txn->receiver_id] : [];
+            if (! $txn || ! in_array($reviewerId, $parties, true) || ! in_array($receiverId, $parties, true)) {
+                throw new \RuntimeException('You can only review the other party of a transaction you took part in');
+            }
+        }
+
         // Prevent duplicate reviews for same transaction
         if (! empty($data['transaction_id'])) {
             $exists = $this->review->newQuery()
