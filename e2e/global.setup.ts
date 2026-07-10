@@ -128,8 +128,12 @@ async function authenticateViaApi(
 
   console.log(`   Authenticating admin via API at ${apiBaseUrl}/api/auth/login...`);
 
-  // Call the auth API directly to get JWT tokens
-  const loginResponse = await authPage.request.post(`${apiBaseUrl}/api/auth/login`, {
+  // Call the auth API directly to get JWT tokens. The E2E Smoke job runs
+  // several Playwright invocations back-to-back and each global setup logs in
+  // (member + admin), so the login throttle can be briefly exhausted by the
+  // later invocations (429 rate_limited, short retry_after). Retry on 429
+  // instead of failing the whole run.
+  const doLogin = () => authPage.request.post(`${apiBaseUrl}/api/auth/login`, {
     data: {
       email: credentials.email,
       password: credentials.password,
@@ -140,6 +144,22 @@ async function authenticateViaApi(
       'X-Tenant-Slug': TENANT_SLUG,
     },
   });
+
+  let loginResponse = await doLogin();
+  for (let attempt = 0; attempt < 6 && loginResponse.status() === 429; attempt++) {
+    let retryAfter = 2;
+    try {
+      const parsed = Number((await loginResponse.json())?.retry_after);
+      if (Number.isFinite(parsed) && parsed > 0) {
+        retryAfter = parsed;
+      }
+    } catch {
+      // non-JSON body — use the default backoff
+    }
+    console.log(`   Login throttled (429); retrying in ${retryAfter}s (attempt ${attempt + 1})...`);
+    await sleep(Math.min(retryAfter, 10) * 1000 + 500);
+    loginResponse = await doLogin();
+  }
 
   if (!loginResponse.ok()) {
     const body = await loginResponse.text();
