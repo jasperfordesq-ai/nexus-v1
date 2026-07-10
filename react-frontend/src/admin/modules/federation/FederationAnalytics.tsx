@@ -320,7 +320,7 @@ export function FederationAnalytics() {
                       color={row.response_code >= 500 ? 'danger' : 'warning'}
                       variant="tertiary"
                     >
-                      {row.response_code || 'â€”'}
+                      {row.response_code || '—'}
                     </Chip>
                   </TableCell>
                   <TableCell>

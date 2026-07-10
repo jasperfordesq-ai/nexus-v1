@@ -1161,5 +1161,62 @@
         "step_3_body": "タイムスタンプと関連分析を使用して、集計が現在のパートナーのアクティビティを反映していることを確認します。"
       }
     }
+  },
+  "federation_aggregates": {
+    "meta": {
+      "title": "フェデレーション集計データ",
+      "description": "匿名化されたコミュニティ統計をパートナーネットワークと共有し、署名付き公開フィードを管理します。"
+    },
+    "consent": {
+      "title": "集計データ共有の同意",
+      "loading": "同意設定を読み込んでいます…",
+      "enable_label": "匿名化された集計統計を共有する",
+      "endpoint_prefix": "有効にすると、",
+      "endpoint_suffix": "の署名付き公開フィードが匿名化された月次集計データをパートナーネットワークに返します。"
+    },
+    "status": {
+      "enabled": "有効",
+      "disabled": "無効",
+      "signing_secret_present": "署名キーあり",
+      "no_signing_secret": "署名キーなし",
+      "last_rotated": "キーの最終交換: {{date}}",
+      "never_rotated": "キーは一度も交換されていません"
+    },
+    "actions": {
+      "rotate_secret": "署名キーを交換",
+      "preview_payload": "ペイロードをプレビュー",
+      "show_audit_log": "監査ログ",
+      "refresh": "更新",
+      "close": "閉じる"
+    },
+    "audit": {
+      "title": "集計フィードの監査ログ",
+      "loading": "監査ログを読み込んでいます…",
+      "empty": "まだ集計クエリは記録されていません。",
+      "table_aria": "最近の集計フィードクエリ",
+      "columns": {
+        "time": "時刻",
+        "requester": "リクエスト元",
+        "period": "期間",
+        "signature": "署名"
+      },
+      "unknown_requester": "不明",
+      "period_range": "{{from}}〜{{to}}"
+    },
+    "preview": {
+      "title": "集計ペイロードのプレビュー",
+      "loading": "プレビューを準備しています…",
+      "empty": "プレビューはありません。"
+    },
+    "toasts": {
+      "load_consent_failed": "集計データ共有の設定を読み込めませんでした。",
+      "enabled": "集計データ共有を有効にしました。",
+      "disabled": "集計データ共有を無効にしました。",
+      "update_failed": "集計データ共有を更新できませんでした。",
+      "secret_rotated": "署名キーを交換しました。",
+      "rotate_failed": "署名キーを交換できませんでした。",
+      "load_audit_failed": "監査ログを読み込めませんでした。",
+      "load_preview_failed": "プレビューを読み込めませんでした。"
+    }
   }
 }

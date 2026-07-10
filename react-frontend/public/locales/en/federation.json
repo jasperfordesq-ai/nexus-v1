@@ -43,8 +43,8 @@
     "quick_link_3_description": "Browse offers and requests from partner communities.",
     "quick_link_4_title": "Federation Events",
     "quick_link_4_description": "Discover events happening across partner communities.",
-    "quick_link_5_title": "Federation Settings",
-    "quick_link_5_description": "Configure your federation privacy and communication preferences.",
+    "quick_link_5_title": "Federation Groups",
+    "quick_link_5_description": "Browse groups shared by partner communities.",
     "partner_communities": "Partner Communities",
     "no_partners_yet": "No partner communities yet",
     "no_partners_description": "Your community will appear here once partnerships are established.",
@@ -78,7 +78,11 @@
     "toast_disabled_description": "You have been disconnected from the federation network.",
     "toast_disable_error_title": "Failed to Disable",
     "toast_disable_error_description": "Could not disable federation. Please try again.",
-    "toast_disable_error_generic": "An unexpected error occurred."
+    "toast_disable_error_generic": "An unexpected error occurred.",
+    "quick_link_7_title": "Federation Settings",
+    "quick_link_7_description": "Configure your federation privacy and communication preferences.",
+    "quick_link_6_title": "Federation Connections",
+    "quick_link_6_description": "Manage your connection requests across partner communities."
   },
   "partners": {
     "page_title": "Partner Communities",
@@ -221,7 +225,9 @@
     "send_message": "Send Message",
     "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
     "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
-    "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages"
+    "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages",
+    "recipient_fallback": "Recipient",
+    "user_number": "User #{{id}}"
   },
   "listings": {
     "page_title": "Federation Listings",
@@ -310,7 +316,9 @@
     "save_failed_title": "Save Failed",
     "save_failed_description": "Could not save settings. Please try again.",
     "save_failed_retry": "A network error occurred. Please try again.",
-    "kilometers_short": "km"
+    "kilometers_short": "km",
+    "action_enabled": "enabled",
+    "action_disabled": "disabled"
   },
   "events": {
     "page_title": "Federation Events",
@@ -334,7 +342,8 @@
     "online": "Online",
     "date_at_time": "{{date}} at {{time}}",
     "attendees_going_one": "{{count}} going",
-    "attendees_going_other": "{{count}} going"
+    "attendees_going_other": "{{count}} going",
+    "organizer_fallback": "Organizer"
   },
   "groups": {
     "page_title": "Federation Groups",
@@ -542,6 +551,14 @@
     "anonymous": "Anonymous",
     "rating_label": "Rated {{rating}} out of 5",
     "from_partner": "via {{partner}}",
-    "title": "Reviews"
+    "title": "Reviews",
+    "empty": "This member has no reviews yet.",
+    "load_error": "Could not load reviews. Please try again.",
+    "verified": "Verified"
+  },
+  "optin_notice": {
+    "title": "Federation Opt-In Required",
+    "description": "You need to opt into federation to see content from partner communities.",
+    "cta": "Set Up Federation"
   }
 }

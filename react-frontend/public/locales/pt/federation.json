@@ -43,8 +43,8 @@
     "quick_link_3_description": "Procure ofertas e solicitações de comunidades parceiras.",
     "quick_link_4_title": "Eventos da Federação",
     "quick_link_4_description": "Descubra eventos que acontecem em comunidades parceiras.",
-    "quick_link_5_title": "Configurações de Federação",
-    "quick_link_5_description": "Configure suas preferências de privacidade e comunicação da federação.",
+    "quick_link_5_title": "Grupos da federação",
+    "quick_link_5_description": "Explore os grupos compartilhados pelas comunidades parceiras.",
     "partner_communities": "Comunidades parceiras",
     "no_partners_yet": "Ainda não há comunidades parceiras",
     "no_partners_description": "Sua comunidade aparecerá aqui assim que as parcerias forem estabelecidas.",
@@ -78,7 +78,11 @@
     "toast_disabled_description": "Você foi desconectado da rede da federação.",
     "toast_disable_error_title": "Falha ao desativar",
     "toast_disable_error_description": "Não foi possível desativar a federação. Por favor, tente novamente.",
-    "toast_disable_error_generic": "Ocorreu um erro inesperado."
+    "toast_disable_error_generic": "Ocorreu um erro inesperado.",
+    "quick_link_7_title": "Configurações de Federação",
+    "quick_link_7_description": "Configure suas preferências de privacidade e comunicação da federação.",
+    "quick_link_6_title": "Conexões da federação",
+    "quick_link_6_description": "Gerencie suas solicitações de conexão entre comunidades parceiras."
   },
   "partners": {
     "page_title": "Comunidades parceiras",
@@ -221,7 +225,9 @@
     "send_message": "Enviar mensagem",
     "thread_aria_no_unread": "Conversa com {{name}} de {{tenant}}",
     "thread_aria_unread": "Conversa com {{name}} de {{tenant}}, {{count}} mensagem não lida",
-    "thread_aria_unread_plural": "Conversa com {{name}} de {{tenant}}, {{count}} mensagens não lidas"
+    "thread_aria_unread_plural": "Conversa com {{name}} de {{tenant}}, {{count}} mensagens não lidas",
+    "recipient_fallback": "Destinatário",
+    "user_number": "Usuário #{{id}}"
   },
   "listings": {
     "page_title": "Listagens da Federação",
@@ -310,7 +316,9 @@
     "save_failed_title": "Falha ao salvar",
     "save_failed_description": "Não foi possível salvar as configurações. Por favor, tente novamente.",
     "save_failed_retry": "Ocorreu um erro de rede. Por favor, tente novamente.",
-    "kilometers_short": "quilômetros"
+    "kilometers_short": "quilômetros",
+    "action_enabled": "ativada",
+    "action_disabled": "desativada"
   },
   "events": {
     "page_title": "Eventos da Federação",
@@ -334,7 +342,8 @@
     "online": "On-line",
     "date_at_time": "{{date}} às {{time}}",
     "attendees_going_one": "{{count}} participante",
-    "attendees_going_other": "{{count}} participantes"
+    "attendees_going_other": "{{count}} participantes",
+    "organizer_fallback": "Organizador"
   },
   "groups": {
     "page_title": "Grupos da Federação",
@@ -542,6 +551,14 @@
     "anonymous": "Anônimo",
     "rating_label": "Avaliado {{rating}} em 5",
     "from_partner": "através de {{partner}}",
-    "title": "Avaliações"
+    "title": "Avaliações",
+    "empty": "Este membro ainda não tem avaliações.",
+    "load_error": "Não foi possível carregar as avaliações. Tente novamente.",
+    "verified": "Verificada"
+  },
+  "optin_notice": {
+    "title": "Obrigação de adesão da federação",
+    "description": "Você precisa aderir à federação para ver o conteúdo das comunidades parceiras.",
+    "cta": "Configurar Federação"
   }
 }

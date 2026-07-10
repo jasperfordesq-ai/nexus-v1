@@ -51,6 +51,7 @@ import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
+import { fetchUserFederationOptIn } from '@/lib/federationStatus';
 import { logError } from '@/lib/logger';
 import type { FederationPartner } from '@/types/api';
 
@@ -131,16 +132,10 @@ export function FederationOnboardingPage() {
   // Idempotency check: redirect already opted-in users straight to the hub
   useEffect(() => {
     let cancelled = false;
-    api.get<{ enabled?: boolean; user_opted_in?: boolean; status?: { user_optin?: boolean } }>('/v2/federation/status').then((res) => {
+    fetchUserFederationOptIn().then((optedIn) => {
       if (cancelled) return;
-      if (res.success && res.data) {
-        const isOptedIn =
-          res.data.enabled === true ||
-          res.data.user_opted_in === true ||
-          res.data.status?.user_optin === true;
-        if (isOptedIn) {
-          navigate(tenantPath('/federation'), { replace: true });
-        }
+      if (optedIn) {
+        navigate(tenantPath('/federation'), { replace: true });
       }
     }).catch(() => {
       // Non-critical â€” if the check fails, let the wizard proceed normally
@@ -600,7 +595,7 @@ export function FederationOnboardingPage() {
                       {t('onboarding.service_reach')}
                     </h3>
                     <p className="text-theme-primary">
-                      {t(`onboarding.reach_label_${settings.service_reach}`)}
+                      {t(`onboarding.reach_${settings.service_reach}`)}
                       {settings.service_reach === 'travel_ok' && (
                         <span className="text-theme-subtle"> {t('onboarding.up_to_km', { km: settings.travel_radius_km })}</span>
                       )}

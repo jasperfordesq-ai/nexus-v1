@@ -47,6 +47,7 @@ import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { FederationOptInNotice } from '@/components/federation/FederationOptInNotice';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import type { FederatedListing, FederationPartner } from '@/types/api';
@@ -88,6 +89,7 @@ export function FederationListingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [optInRequired, setOptInRequired] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [sourceMeta, setSourceMeta] = useState<FederationSourceMeta | null>(null);
@@ -179,6 +181,7 @@ export function FederationListingsPage() {
         if (controller.signal.aborted) return;
 
         if (response.success && response.data) {
+          if (!append) setOptInRequired(false);
           if (append) {
             setListings((prev) => [...prev, ...response.data!]);
           } else {
@@ -201,7 +204,12 @@ export function FederationListingsPage() {
         } else {
           if (!append) setListings([]);
           setHasMore(false);
-          if (!append) setSourceMeta(null);
+          if (!append) {
+            setSourceMeta(null);
+            // The backend 403s with FEDERATION_NOT_ENABLED when the viewer has
+            // not opted in — show the opt-in CTA instead of "nothing found".
+            setOptInRequired(response.code === 'FEDERATION_NOT_ENABLED');
+          }
         }
       } catch (error) {
         if (controller.signal.aborted) return;
@@ -385,8 +393,11 @@ export function FederationListingsPage() {
         </GlassCard>
       )}
 
+      {/* Opt-in required */}
+      {!isLoading && !loadError && optInRequired && <FederationOptInNotice />}
+
       {/* Empty State */}
-      {!isLoading && !loadError && listings.length === 0 && (
+      {!isLoading && !loadError && !optInRequired && listings.length === 0 && (
         <EmptyState
           icon={<Search className="w-12 h-12" />}
           title={t('listings.no_listings_found')}

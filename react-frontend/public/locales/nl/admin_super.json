@@ -996,7 +996,8 @@
     "tenant_removed_from_whitelist": "Huurder verwijderd van witte lijst",
     "view": "Bekijk",
     "whitelisted_tenants_aria": "Witte lijst huurders",
-    "whitelisted_tenants_count": "Toegestane tenants ({{count}})"
+    "whitelisted_tenants_count": "Toegestane tenants ({{count}})",
+    "failed_to_load": "Kan de witte lijst niet laden"
   },
   "pilot_inquiry_admin": {
     "page_title": "Vragen van piloten",

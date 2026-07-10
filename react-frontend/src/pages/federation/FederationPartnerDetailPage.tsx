@@ -53,19 +53,19 @@ interface FederationLevelMeta {
 
 const FEDERATION_LEVELS: Record<number, FederationLevelMeta> = {
   1: {
-    label: 'partner_detail.level_discovery',
+    label: 'partners.level_discovery',
     className: 'bg-blue-500/20 text-blue-600 dark:text-blue-400',
   },
   2: {
-    label: 'partner_detail.level_social',
+    label: 'partners.level_social',
     className: 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
   },
   3: {
-    label: 'partner_detail.level_economic',
+    label: 'partners.level_economic',
     className: 'bg-purple-500/20 text-purple-600 dark:text-purple-400',
   },
   4: {
-    label: 'partner_detail.level_integrated',
+    label: 'partners.level_integrated',
     className: 'bg-amber-500/20 text-amber-600 dark:text-amber-400',
   },
 };
@@ -234,7 +234,7 @@ export function FederationPartnerDetailPage() {
                 className={`mt-3 ${levelMeta?.className || 'bg-theme-hover text-theme-muted'}`}
               >
                 {t('partner_detail.level_prefix', { level: partner.federation_level })} &mdash;{' '}
-                {partner.federation_level_name || t(levelMeta?.label || 'partner_detail.level_unknown')}
+                {levelMeta ? t(levelMeta.label) : partner.federation_level_name || t('partners.level_unknown')}
               </Chip>
 
               {/* Meta row */}
@@ -319,7 +319,7 @@ export function FederationPartnerDetailPage() {
                     className="bg-theme-hover text-theme-muted"
                     startContent={<Icon className="w-3.5 h-3.5" aria-hidden="true" />}
                   >
-                    {meta ? t(`partner_detail.permission_${perm}`) : perm}
+                    {meta ? t(`partners.permission_${perm}`) : perm}
                   </Chip>
                 );
               })}

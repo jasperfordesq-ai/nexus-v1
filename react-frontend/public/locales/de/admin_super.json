@@ -996,7 +996,8 @@
     "tenant_removed_from_whitelist": "Mieter von der Whitelist entfernt",
     "view": "Ansicht",
     "whitelisted_tenants_aria": "Mieter auf der Whitelist",
-    "whitelisted_tenants_count": "Zugelassene Mandanten ({{count}})"
+    "whitelisted_tenants_count": "Zugelassene Mandanten ({{count}})",
+    "failed_to_load": "Weiße Liste konnte nicht geladen werden"
   },
   "pilot_inquiry_admin": {
     "page_title": "Pilotenanfragen",

@@ -996,7 +996,8 @@
     "tenant_removed_from_whitelist": "Tionónta bainte den liosta bán",
     "view": "Amharc",
     "whitelisted_tenants_aria": "Tionóntaí ar an liosta bán",
-    "whitelisted_tenants_count": "Tionóntaí ar an liosta ceadaithe ({{count}})"
+    "whitelisted_tenants_count": "Tionóntaí ar an liosta ceadaithe ({{count}})",
+    "failed_to_load": "Theip ar lódáil an liosta bháin"
   },
   "pilot_inquiry_admin": {
     "page_title": "Fiosrúcháin Phíolótacha",

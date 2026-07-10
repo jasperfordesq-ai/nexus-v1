@@ -43,8 +43,8 @@
     "quick_link_3_description": "Blader door aanbiedingen en verzoeken van partnergemeenschappen.",
     "quick_link_4_title": "Federatie-evenementen",
     "quick_link_4_description": "Ontdek evenementen die plaatsvinden in partnergemeenschappen.",
-    "quick_link_5_title": "Federatie-instellingen",
-    "quick_link_5_description": "Configureer uw federatieprivacy- en communicatievoorkeuren.",
+    "quick_link_5_title": "Federatiegroepen",
+    "quick_link_5_description": "Bekijk groepen die door partnergemeenschappen worden gedeeld.",
     "partner_communities": "Partnergemeenschappen",
     "no_partners_yet": "Nog geen partnergemeenschappen",
     "no_partners_description": "Uw community wordt hier weergegeven zodra partnerschappen tot stand zijn gebracht.",
@@ -78,7 +78,11 @@
     "toast_disabled_description": "De verbinding met het federatienetwerk is verbroken.",
     "toast_disable_error_title": "Kan niet worden uitgeschakeld",
     "toast_disable_error_description": "Kan federatie niet uitschakelen. Probeer het opnieuw.",
-    "toast_disable_error_generic": "Er is een onverwachte fout opgetreden."
+    "toast_disable_error_generic": "Er is een onverwachte fout opgetreden.",
+    "quick_link_7_title": "Federatie-instellingen",
+    "quick_link_7_description": "Configureer uw federatieprivacy- en communicatievoorkeuren.",
+    "quick_link_6_title": "Federatieverbindingen",
+    "quick_link_6_description": "Beheer je verbindingsverzoeken tussen partnergemeenschappen."
   },
   "partners": {
     "page_title": "Partnergemeenschappen",
@@ -221,7 +225,9 @@
     "send_message": "Bericht verzenden",
     "thread_aria_no_unread": "Gesprek met {{name}} van {{tenant}}",
     "thread_aria_unread": "Gesprek met {{name}} van {{tenant}}, {{count}} ongelezen bericht",
-    "thread_aria_unread_plural": "Gesprek met {{name}} van {{tenant}}, {{count}} ongelezen berichten"
+    "thread_aria_unread_plural": "Gesprek met {{name}} van {{tenant}}, {{count}} ongelezen berichten",
+    "recipient_fallback": "Ontvanger",
+    "user_number": "Gebruiker #{{id}}"
   },
   "listings": {
     "page_title": "Federatie-vermeldingen",
@@ -310,7 +316,9 @@
     "save_failed_title": "Opslaan mislukt",
     "save_failed_description": "Kan instellingen niet opslaan. Probeer het opnieuw.",
     "save_failed_retry": "Er is een netwerkfout opgetreden. Probeer het opnieuw.",
-    "kilometers_short": "km"
+    "kilometers_short": "km",
+    "action_enabled": "ingeschakeld",
+    "action_disabled": "uitgeschakeld"
   },
   "events": {
     "page_title": "Federatie-evenementen",
@@ -334,7 +342,8 @@
     "online": "Online",
     "date_at_time": "{{date}} om {{time}}",
     "attendees_going_one": "{{count}} gaat",
-    "attendees_going_other": "{{count}} gaan"
+    "attendees_going_other": "{{count}} gaan",
+    "organizer_fallback": "Organisator"
   },
   "groups": {
     "page_title": "Federatie groepen",
@@ -542,6 +551,14 @@
     "anonymous": "Anoniem",
     "rating_label": "Beoordeeld {{rating}} uit 5",
     "from_partner": "via {{partner}}",
-    "title": "Beoordelingen"
+    "title": "Beoordelingen",
+    "empty": "Dit lid heeft nog geen beoordelingen.",
+    "load_error": "Kon beoordelingen niet laden. Probeer het opnieuw.",
+    "verified": "Geverifieerd"
+  },
+  "optin_notice": {
+    "title": "Federatie-opt-in vereist",
+    "description": "Je moet je aanmelden voor federatie om inhoud van partnergemeenschappen te zien.",
+    "cta": "Federatie instellen"
   }
 }

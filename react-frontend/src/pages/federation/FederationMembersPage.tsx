@@ -22,7 +22,7 @@ import { ToggleButton, ToggleButtonGroup } from '@/components/ui/ToggleButtonGro
  */
 
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from '@/lib/motion';
 
 import Globe from 'lucide-react/icons/globe';
@@ -40,6 +40,7 @@ import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { FederatedTrustBadge } from '@/components/federation';
+import { FederationOptInNotice } from '@/components/federation/FederationOptInNotice';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
@@ -97,6 +98,7 @@ export function FederationMembersPage() {
   const { isAuthenticated } = useAuth();
   const { hasFeature, tenantPath } = useTenant();
   const toast = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Redirect if federation not enabled
   const federationEnabled = hasFeature('federation');
@@ -113,18 +115,23 @@ export function FederationMembersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [optInRequired, setOptInRequired] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
   const [sourceMeta, setSourceMeta] = useState<FederationSourceMeta | null>(null);
 
-  // Filter state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [selectedPartner, setSelectedPartner] = useState<string>('');
-  const [serviceReach, setServiceReach] = useState<ServiceReachFilter>('all');
-  const [skillsFilter, setSkillsFilter] = useState('');
-  const [debouncedSkillsFilter, setDebouncedSkillsFilter] = useState('');
+  // Filter state — initialised from URL params so links like
+  // /federation/members?partner_id=X (partner detail "Browse Members") apply the filter
+  const initialReach = searchParams.get('service_reach') as ServiceReachFilter | null;
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
+  const [selectedPartner, setSelectedPartner] = useState<string>(searchParams.get('partner_id') || '');
+  const [serviceReach, setServiceReach] = useState<ServiceReachFilter>(
+    initialReach && SERVICE_REACH_OPTIONS.some((option) => option.key === initialReach) ? initialReach : 'all'
+  );
+  const [skillsFilter, setSkillsFilter] = useState(searchParams.get('skills') || '');
+  const [debouncedSkillsFilter, setDebouncedSkillsFilter] = useState(skillsFilter);
 
   // Debounce refs
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -221,6 +228,7 @@ export function FederationMembersPage() {
       if (controller.signal.aborted) return;
 
       if (response.success && response.data) {
+        if (!append) setOptInRequired(false);
         if (append) {
           setMembers((prev) => [...prev, ...response.data!]);
         } else {
@@ -247,7 +255,14 @@ export function FederationMembersPage() {
         }
       } else {
         if (!append) {
-          setError(tRef.current('members.load_error'));
+          if (response.code === 'FEDERATION_NOT_ENABLED') {
+            // The viewer has not opted in — show the opt-in CTA instead of an
+            // un-retryable error card.
+            setOptInRequired(true);
+            setMembers([]);
+          } else {
+            setError(tRef.current('members.load_error'));
+          }
           setSourceMeta(null);
         } else {
           toastRef.current.error(tRef.current('members.load_more_error'));
@@ -287,6 +302,16 @@ export function FederationMembersPage() {
     if (isLoadingMore || !hasMore) return;
     loadMembers(true, cursor);
   }, [isLoadingMore, hasMore, loadMembers, cursor]);
+
+  // Sync filters back to URL params (mirrors FederationListingsPage)
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('q', searchQuery);
+    if (selectedPartner) params.set('partner_id', selectedPartner);
+    if (serviceReach !== 'all') params.set('service_reach', serviceReach);
+    if (skillsFilter) params.set('skills', skillsFilter);
+    setSearchParams(params, { replace: true });
+  }, [searchQuery, selectedPartner, serviceReach, skillsFilter, setSearchParams]);
 
   const externalResultCount = sourceMeta?.source_counts?.external_returned ?? 0;
   const visibleResultCount = sourceMeta?.pagination_scope === 'external_partner'
@@ -481,8 +506,11 @@ export function FederationMembersPage() {
         </div>
       )}
 
+      {/* Opt-in required */}
+      {!isLoading && !error && optInRequired && <FederationOptInNotice />}
+
       {/* Empty States */}
-      {!isLoading && !error && members.length === 0 && (
+      {!isLoading && !error && !optInRequired && members.length === 0 && (
         <>
           {partners.length === 0 ? (
             <EmptyState
@@ -687,7 +715,11 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
             {t('members.view_profile')}
           </Button>
         )}
-        {isAuthenticated && (
+        {/* Hide the compose button when the member has federated messaging off —
+            the backend 403s (MESSAGING_DISABLED) only after the user composes.
+            External members omit the field (partner-level gating), so only an
+            explicit false hides it. */}
+        {isAuthenticated && member.messaging_enabled !== false && (
           <Button
             size="sm"
             variant="primary"

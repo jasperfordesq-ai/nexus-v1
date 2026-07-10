@@ -40,6 +40,7 @@ import Shield from 'lucide-react/icons/shield';
 import Zap from 'lucide-react/icons/zap';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import UserPlus from 'lucide-react/icons/user-plus';
+import UsersRound from 'lucide-react/icons/users-round';
 import Send from 'lucide-react/icons/send';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -129,6 +130,18 @@ const quickLinks = [
     href: '/federation/events',
     tone: 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-200',
   },
+  // Labels are index-based (hub.quick_link_<index>_*): groups=5, connections=6,
+  // settings=7 — keep this array order in sync with the locale keys.
+  {
+    icon: UsersRound,
+    href: '/federation/groups',
+    tone: 'bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-200',
+  },
+  {
+    icon: UserPlus,
+    href: '/federation/connections',
+    tone: 'bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-200',
+  },
   {
     icon: Settings,
     href: '/federation/settings',
@@ -150,6 +163,15 @@ const federationLevelColors: Record<number, 'default' | 'primary' | 'secondary' 
   2: 'primary',
   3: 'secondary',
   4: 'success',
+};
+
+// Translation-first level labels: the backend's federation_level_name is
+// always English, so it is only a fallback for unmapped levels (e.g. external).
+const federationLevelLabelKeys: Record<number, string> = {
+  1: 'partners.level_discovery',
+  2: 'partners.level_social',
+  3: 'partners.level_economic',
+  4: 'partners.level_integrated',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -476,7 +498,9 @@ function PartnerCommunitiesSection({ partners }: { partners: FederationPartner[]
 
               <div className="flex items-center gap-2 mb-3 mt-auto">
                 <Chip size="sm" variant="flat" color={federationLevelColors[partner.federation_level] || 'default'}>
-                  {partner.federation_level_name}
+                  {federationLevelLabelKeys[partner.federation_level]
+                    ? t(federationLevelLabelKeys[partner.federation_level]!)
+                    : partner.federation_level_name || t('partners.level_unknown')}
                 </Chip>
                 <span className="text-xs text-muted">
                   {t('hub.member_count', { count: partner.member_count })}
@@ -631,7 +655,7 @@ export default function FederationHubPage() {
 
     try {
       // Fetch status first to determine if opted in
-      const statusRes = await api.get<FederationStatus>('/v2/federation/status');
+      const statusRes = await api.get<FederationStatus>('/v2/federation/status', { signal: controller.signal });
 
       if (controller.signal.aborted) return;
 
@@ -656,8 +680,8 @@ export default function FederationHubPage() {
       // If opted in, load additional data in parallel
       if (status.enabled) {
         const [partnersRes, activityRes] = await Promise.all([
-          api.get<FederationPartner[]>('/v2/federation/partners'),
-          api.get<FederationActivityItem[]>('/v2/federation/activity'),
+          api.get<FederationPartner[]>('/v2/federation/partners', { signal: controller.signal }),
+          api.get<FederationActivityItem[]>('/v2/federation/activity', { signal: controller.signal }),
         ]);
 
         if (controller.signal.aborted) return;
@@ -689,6 +713,7 @@ export default function FederationHubPage() {
 
   useEffect(() => {
     loadData();
+    return () => abortRef.current?.abort();
   }, [loadData]);
 
   // ─── Opt in ───

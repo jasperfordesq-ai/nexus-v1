@@ -996,7 +996,8 @@
     "tenant_removed_from_whitelist": "Najemca usunięty z białej listy",
     "view": "Zobacz",
     "whitelisted_tenants_aria": "Najemcy na białej liście",
-    "whitelisted_tenants_count": "Dozwoleni tenantowie ({{count}})"
+    "whitelisted_tenants_count": "Dozwoleni tenantowie ({{count}})",
+    "failed_to_load": "Nie udało się wczytać białej listy"
   },
   "pilot_inquiry_admin": {
     "page_title": "Zapytania pilotażowe",

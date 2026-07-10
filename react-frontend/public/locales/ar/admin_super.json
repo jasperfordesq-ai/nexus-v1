@@ -996,7 +996,8 @@
     "tenant_removed_from_whitelist": "تمت إزالة المستأجر من القائمة البيضاء",
     "view": "منظر",
     "whitelisted_tenants_aria": "المستأجرين المدرجين في القائمة البيضاء",
-    "whitelisted_tenants_count": "المستأجرون المدرجون في القائمة البيضاء ({{count}})"
+    "whitelisted_tenants_count": "المستأجرون المدرجون في القائمة البيضاء ({{count}})",
+    "failed_to_load": "فشل تحميل القائمة البيضاء"
   },
   "pilot_inquiry_admin": {
     "page_title": "استفسارات الطيارين",

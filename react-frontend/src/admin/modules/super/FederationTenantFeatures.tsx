@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Switch } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 
@@ -21,10 +26,6 @@ import { PageHeader } from '../../components/PageHeader';
 import { StatusBadge } from '../../components/DataTable';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import type { FederationWhitelistEntry, FederationPartnership } from '../../api/types';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * Federation Tenant Features

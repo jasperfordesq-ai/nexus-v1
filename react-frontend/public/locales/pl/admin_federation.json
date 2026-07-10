@@ -1161,5 +1161,62 @@
         "step_3_body": "Użyj znaczników czasu i powiązanych analiz, aby potwierdzić, że dane zbiorcze odzwierciedlają bieżącą aktywność partnera."
       }
     }
+  },
+  "federation_aggregates": {
+    "meta": {
+      "title": "Agregaty federacji",
+      "description": "Udostępniaj zanonimizowane statystyki społeczności sieciom partnerskim i zarządzaj podpisanym publicznym kanałem."
+    },
+    "consent": {
+      "title": "Zgoda na udostępnianie agregatów",
+      "loading": "Wczytywanie ustawień zgody…",
+      "enable_label": "Udostępniaj zanonimizowane statystyki zbiorcze",
+      "endpoint_prefix": "Po włączeniu podpisany publiczny kanał pod adresem",
+      "endpoint_suffix": "zwraca zanonimizowane miesięczne agregaty sieciom partnerskim."
+    },
+    "status": {
+      "enabled": "Włączone",
+      "disabled": "Wyłączone",
+      "signing_secret_present": "Klucz podpisujący obecny",
+      "no_signing_secret": "Brak klucza podpisującego",
+      "last_rotated": "Klucz ostatnio wymieniony: {{date}}",
+      "never_rotated": "Klucz nigdy nie był wymieniany"
+    },
+    "actions": {
+      "rotate_secret": "Wymień klucz podpisujący",
+      "preview_payload": "Podgląd ładunku",
+      "show_audit_log": "Dziennik audytu",
+      "refresh": "Odśwież",
+      "close": "Zamknij"
+    },
+    "audit": {
+      "title": "Dziennik audytu kanału agregatów",
+      "loading": "Wczytywanie dziennika audytu…",
+      "empty": "Nie zarejestrowano jeszcze żadnych zapytań o agregaty.",
+      "table_aria": "Ostatnie zapytania do kanału agregatów",
+      "columns": {
+        "time": "Czas",
+        "requester": "Żądający",
+        "period": "Okres",
+        "signature": "Podpis"
+      },
+      "unknown_requester": "Nieznany",
+      "period_range": "od {{from}} do {{to}}"
+    },
+    "preview": {
+      "title": "Podgląd ładunku agregatów",
+      "loading": "Przygotowywanie podglądu…",
+      "empty": "Podgląd nie jest dostępny."
+    },
+    "toasts": {
+      "load_consent_failed": "Nie udało się wczytać ustawień udostępniania agregatów.",
+      "enabled": "Udostępnianie agregatów włączone.",
+      "disabled": "Udostępnianie agregatów wyłączone.",
+      "update_failed": "Nie udało się zaktualizować udostępniania agregatów.",
+      "secret_rotated": "Klucz podpisujący został wymieniony.",
+      "rotate_failed": "Nie udało się wymienić klucza podpisującego.",
+      "load_audit_failed": "Nie udało się wczytać dziennika audytu.",
+      "load_preview_failed": "Nie udało się wczytać podglądu."
+    }
   }
 }

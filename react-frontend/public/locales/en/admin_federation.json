@@ -1161,5 +1161,62 @@
         "step_3_body": "Use timestamps and related analytics to confirm the aggregate reflects current partner activity."
       }
     }
+  },
+  "federation_aggregates": {
+    "meta": {
+      "title": "Federation aggregates",
+      "description": "Share anonymised community statistics with partner networks and control the signed public feed."
+    },
+    "consent": {
+      "title": "Aggregate sharing consent",
+      "loading": "Loading consent settings…",
+      "enable_label": "Share anonymised aggregate statistics",
+      "endpoint_prefix": "When enabled, the signed public feed at",
+      "endpoint_suffix": "returns anonymised monthly aggregates to partner networks."
+    },
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "signing_secret_present": "Signing key present",
+      "no_signing_secret": "No signing key",
+      "last_rotated": "Key last replaced {{date}}",
+      "never_rotated": "Key never replaced"
+    },
+    "actions": {
+      "rotate_secret": "Replace signing key",
+      "preview_payload": "Preview payload",
+      "show_audit_log": "Audit log",
+      "refresh": "Refresh",
+      "close": "Close"
+    },
+    "audit": {
+      "title": "Aggregate feed audit log",
+      "loading": "Loading audit log…",
+      "empty": "No aggregate queries recorded yet.",
+      "table_aria": "Recent aggregate feed queries",
+      "columns": {
+        "time": "Time",
+        "requester": "Requester",
+        "period": "Period",
+        "signature": "Signature"
+      },
+      "unknown_requester": "Unknown",
+      "period_range": "{{from}} to {{to}}"
+    },
+    "preview": {
+      "title": "Aggregate payload preview",
+      "loading": "Preparing preview…",
+      "empty": "No preview available."
+    },
+    "toasts": {
+      "load_consent_failed": "Could not load the aggregate sharing settings.",
+      "enabled": "Aggregate sharing enabled.",
+      "disabled": "Aggregate sharing disabled.",
+      "update_failed": "Could not update aggregate sharing.",
+      "secret_rotated": "Signing key replaced.",
+      "rotate_failed": "Could not replace the signing key.",
+      "load_audit_failed": "Could not load the audit log.",
+      "load_preview_failed": "Could not load the preview."
+    }
   }
 }

@@ -1,8 +1,9 @@
-import { Card, CardBody, Chip, Avatar, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+
+import { Card, CardBody, Chip, Avatar, Skeleton } from '@/components/ui';
 
 /**
  * FederationReviewsPanel
@@ -133,6 +134,10 @@ export function FederationReviewsPanel({ memberId, tenantId }: FederationReviews
   const [error, setError] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
+  // Keep `t` out of the load deps: its identity changes when the i18n
+  // namespace finishes loading, which would trigger a duplicate fetch.
+  const tRef = useRef(t);
+  tRef.current = t;
 
   const load = useCallback(async () => {
     abortRef.current?.abort();
@@ -151,30 +156,26 @@ export function FederationReviewsPanel({ memberId, tenantId }: FederationReviews
       if (response.success && Array.isArray(response.data)) {
         setReviews(response.data);
       } else {
-        // Treat 404 / missing endpoint as "not yet available"
-        const err = (response as { error?: string; status?: number }).error ?? '';
-        const status = (response as { status?: number }).status;
-        if (status === 404 || /not\s?found/i.test(err)) {
+        // Treat 404 / missing endpoint as "not yet available". The api client's
+        // failure envelope carries a `code` (backend code or HTTP_<status>),
+        // never a `status` field — and never a locale-dependent message.
+        const code = response.code ?? '';
+        if (code === 'NOT_FOUND' || code === 'HTTP_404') {
           setUnavailable(true);
         } else {
-          setError(t('reviews.load_error'));
+          setError(tRef.current('reviews.load_error'));
         }
       }
     } catch (err) {
       if (controller.signal.aborted) return;
-      // Typical fetch/Axios-style error shapes
-      const status = (err as { status?: number; response?: { status?: number } })?.status
-        ?? (err as { response?: { status?: number } })?.response?.status;
-      if (status === 404) {
-        setUnavailable(true);
-      } else {
-        logError('Failed to load federation reviews', err);
-        setError(t('reviews.load_error'));
-      }
+      // api.get resolves with a failure envelope rather than throwing; this
+      // only catches unexpected runtime errors.
+      logError('Failed to load federation reviews', err);
+      setError(tRef.current('reviews.load_error'));
     } finally {
       if (!controller.signal.aborted) setIsLoading(false);
     }
-  }, [memberId, tenantId, t]);
+  }, [memberId, tenantId]);
 
   useEffect(() => {
     load();

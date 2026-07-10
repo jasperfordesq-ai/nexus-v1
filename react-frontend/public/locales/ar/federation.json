@@ -43,8 +43,8 @@
     "quick_link_3_description": "تصفح العروض والطلبات من المجتمعات الشريكة.",
     "quick_link_4_title": "أحداث الاتحاد",
     "quick_link_4_description": "اكتشف الأحداث التي تحدث عبر المجتمعات الشريكة.",
-    "quick_link_5_title": "إعدادات الاتحاد",
-    "quick_link_5_description": "قم بتكوين تفضيلات الخصوصية والاتصال الخاصة بالاتحاد الخاص بك.",
+    "quick_link_5_title": "مجموعات الاتحاد",
+    "quick_link_5_description": "تصفح المجموعات المشتركة من المجتمعات الشريكة.",
     "partner_communities": "المجتمعات الشريكة",
     "no_partners_yet": "لا توجد مجتمعات شريكة حتى الآن",
     "no_partners_description": "سيظهر مجتمعك هنا بمجرد إنشاء الشراكات.",
@@ -78,7 +78,11 @@
     "toast_disabled_description": "لقد تم قطع اتصالك بشبكة الاتحاد.",
     "toast_disable_error_title": "فشل في التعطيل",
     "toast_disable_error_description": "لا يمكن تعطيل الاتحاد. يرجى المحاولة مرة أخرى.",
-    "toast_disable_error_generic": "حدث خطأ غير متوقع."
+    "toast_disable_error_generic": "حدث خطأ غير متوقع.",
+    "quick_link_7_title": "إعدادات الاتحاد",
+    "quick_link_7_description": "قم بتكوين تفضيلات الخصوصية والاتصال الخاصة بالاتحاد الخاص بك.",
+    "quick_link_6_title": "اتصالات الاتحاد",
+    "quick_link_6_description": "أدر طلبات الاتصال الخاصة بك عبر المجتمعات الشريكة."
   },
   "partners": {
     "page_title": "المجتمعات الشريكة",
@@ -221,7 +225,9 @@
     "send_message": "أرسل رسالة",
     "thread_aria_no_unread": "محادثة مع {{name}} من {{tenant}}",
     "thread_aria_unread": "محادثة مع {{name}} من {{tenant}}، رسالة {{count}} غير مقروءة",
-    "thread_aria_unread_plural": "محادثة مع {{name}} من {{tenant}}، رسائل {{count}} غير مقروءة"
+    "thread_aria_unread_plural": "محادثة مع {{name}} من {{tenant}}، رسائل {{count}} غير مقروءة",
+    "recipient_fallback": "المستلم",
+    "user_number": "العضو رقم {{id}}"
   },
   "listings": {
     "page_title": "قوائم الاتحاد",
@@ -310,7 +316,9 @@
     "save_failed_title": "فشل الحفظ",
     "save_failed_description": "لا يمكن حفظ الإعدادات. يرجى المحاولة مرة أخرى.",
     "save_failed_retry": "حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى.",
-    "kilometers_short": "كم"
+    "kilometers_short": "كم",
+    "action_enabled": "مفعّل",
+    "action_disabled": "معطّل"
   },
   "events": {
     "page_title": "أحداث الاتحاد",
@@ -334,7 +342,8 @@
     "online": "متصل",
     "date_at_time": "{{date}} الساعة {{time}}",
     "attendees_going_one": "{{count}} مشارك",
-    "attendees_going_other": "{{count}} مشاركين"
+    "attendees_going_other": "{{count}} مشاركين",
+    "organizer_fallback": "المنظم"
   },
   "groups": {
     "page_title": "مجموعات الاتحاد",
@@ -542,6 +551,14 @@
     "anonymous": "مجهول",
     "rating_label": "تم تقييمه بـ {{rating}} من أصل 5",
     "from_partner": "عبر {{partner}}",
-    "title": "التقييمات"
+    "title": "التقييمات",
+    "empty": "لا توجد تقييمات لهذا العضو بعد.",
+    "load_error": "تعذر تحميل التقييمات. يرجى المحاولة مرة أخرى.",
+    "verified": "موثّق"
+  },
+  "optin_notice": {
+    "title": "الاشتراك في الاتحاد مطلوب",
+    "description": "يجب عليك الانضمام إلى الاتحاد لعرض المحتوى من المجتمعات الشريكة.",
+    "cta": "إنشاء الاتحاد"
   }
 }

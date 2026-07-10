@@ -1161,5 +1161,62 @@
         "step_3_body": "Utilisez des horodatages et des analyses associées pour confirmer que l'agrégat reflète l'activité actuelle du partenaire."
       }
     }
+  },
+  "federation_aggregates": {
+    "meta": {
+      "title": "Agrégats de fédération",
+      "description": "Partagez des statistiques communautaires anonymisées avec les réseaux partenaires et contrôlez le flux public signé."
+    },
+    "consent": {
+      "title": "Consentement au partage des agrégats",
+      "loading": "Chargement des paramètres de consentement…",
+      "enable_label": "Partager des statistiques agrégées anonymisées",
+      "endpoint_prefix": "Lorsqu'il est activé, le flux public signé à l'adresse",
+      "endpoint_suffix": "renvoie des agrégats mensuels anonymisés aux réseaux partenaires."
+    },
+    "status": {
+      "enabled": "Activé",
+      "disabled": "Désactivé",
+      "signing_secret_present": "Clé de signature présente",
+      "no_signing_secret": "Aucune clé de signature",
+      "last_rotated": "Dernier remplacement de la clé : {{date}}",
+      "never_rotated": "Clé jamais remplacée"
+    },
+    "actions": {
+      "rotate_secret": "Remplacer la clé de signature",
+      "preview_payload": "Aperçu de la charge utile",
+      "show_audit_log": "Journal d'audit",
+      "refresh": "Actualiser",
+      "close": "Fermer"
+    },
+    "audit": {
+      "title": "Journal d'audit du flux d'agrégats",
+      "loading": "Chargement du journal d'audit…",
+      "empty": "Aucune requête d'agrégats enregistrée pour le moment.",
+      "table_aria": "Requêtes récentes du flux d'agrégats",
+      "columns": {
+        "time": "Heure",
+        "requester": "Demandeur",
+        "period": "Période",
+        "signature": "Signature"
+      },
+      "unknown_requester": "Inconnu",
+      "period_range": "{{from}} à {{to}}"
+    },
+    "preview": {
+      "title": "Aperçu de la charge utile des agrégats",
+      "loading": "Préparation de l'aperçu…",
+      "empty": "Aucun aperçu disponible."
+    },
+    "toasts": {
+      "load_consent_failed": "Impossible de charger les paramètres de partage des agrégats.",
+      "enabled": "Partage des agrégats activé.",
+      "disabled": "Partage des agrégats désactivé.",
+      "update_failed": "Impossible de mettre à jour le partage des agrégats.",
+      "secret_rotated": "Clé de signature remplacée.",
+      "rotate_failed": "Impossible de remplacer la clé de signature.",
+      "load_audit_failed": "Impossible de charger le journal d'audit.",
+      "load_preview_failed": "Impossible de charger l'aperçu."
+    }
   }
 }

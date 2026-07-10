@@ -996,7 +996,8 @@
     "tenant_removed_from_whitelist": "Inquilino removido da lista de permissões",
     "view": "Ver",
     "whitelisted_tenants_aria": "Inquilinos na lista de permissões",
-    "whitelisted_tenants_count": "Inquilinos permitidos ({{count}})"
+    "whitelisted_tenants_count": "Inquilinos permitidos ({{count}})",
+    "failed_to_load": "Falha ao carregar a lista de permissões"
   },
   "pilot_inquiry_admin": {
     "page_title": "Consultas piloto",

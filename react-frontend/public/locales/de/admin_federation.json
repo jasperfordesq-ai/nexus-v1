@@ -1161,5 +1161,62 @@
         "step_3_body": "Verwenden Sie Zeitstempel und zugehörige Analysen, um zu bestätigen, dass die Gesamtheit die aktuelle Partneraktivität widerspiegelt."
       }
     }
+  },
+  "federation_aggregates": {
+    "meta": {
+      "title": "Föderations-Aggregate",
+      "description": "Teile anonymisierte Community-Statistiken mit Partnernetzwerken und steuere den signierten öffentlichen Feed."
+    },
+    "consent": {
+      "title": "Einwilligung zur Aggregat-Freigabe",
+      "loading": "Einwilligungseinstellungen werden geladen…",
+      "enable_label": "Anonymisierte Aggregatstatistiken teilen",
+      "endpoint_prefix": "Wenn aktiviert, liefert der signierte öffentliche Feed unter",
+      "endpoint_suffix": "anonymisierte monatliche Aggregate an Partnernetzwerke."
+    },
+    "status": {
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert",
+      "signing_secret_present": "Signaturschlüssel vorhanden",
+      "no_signing_secret": "Kein Signaturschlüssel",
+      "last_rotated": "Schlüssel zuletzt ersetzt: {{date}}",
+      "never_rotated": "Schlüssel nie ersetzt"
+    },
+    "actions": {
+      "rotate_secret": "Signaturschlüssel ersetzen",
+      "preview_payload": "Payload-Vorschau",
+      "show_audit_log": "Audit-Log",
+      "refresh": "Aktualisieren",
+      "close": "Schließen"
+    },
+    "audit": {
+      "title": "Audit-Log des Aggregat-Feeds",
+      "loading": "Audit-Log wird geladen…",
+      "empty": "Noch keine Aggregat-Abfragen aufgezeichnet.",
+      "table_aria": "Letzte Abfragen des Aggregat-Feeds",
+      "columns": {
+        "time": "Zeit",
+        "requester": "Anfragender",
+        "period": "Zeitraum",
+        "signature": "Signatur"
+      },
+      "unknown_requester": "Unbekannt",
+      "period_range": "{{from}} bis {{to}}"
+    },
+    "preview": {
+      "title": "Vorschau der Aggregat-Payload",
+      "loading": "Vorschau wird vorbereitet…",
+      "empty": "Keine Vorschau verfügbar."
+    },
+    "toasts": {
+      "load_consent_failed": "Die Einstellungen zur Aggregat-Freigabe konnten nicht geladen werden.",
+      "enabled": "Aggregat-Freigabe aktiviert.",
+      "disabled": "Aggregat-Freigabe deaktiviert.",
+      "update_failed": "Aggregat-Freigabe konnte nicht aktualisiert werden.",
+      "secret_rotated": "Signaturschlüssel ersetzt.",
+      "rotate_failed": "Signaturschlüssel konnte nicht ersetzt werden.",
+      "load_audit_failed": "Audit-Log konnte nicht geladen werden.",
+      "load_preview_failed": "Vorschau konnte nicht geladen werden."
+    }
   }
 }

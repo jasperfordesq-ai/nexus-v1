@@ -1161,5 +1161,62 @@
         "step_3_body": "Use carimbos de data/hora e análises relacionadas para confirmar se o agregado reflete a atividade atual do parceiro."
       }
     }
+  },
+  "federation_aggregates": {
+    "meta": {
+      "title": "Agregados de federação",
+      "description": "Partilhe estatísticas comunitárias anonimizadas com redes parceiras e controle o feed público assinado."
+    },
+    "consent": {
+      "title": "Consentimento de partilha de agregados",
+      "loading": "A carregar as definições de consentimento…",
+      "enable_label": "Partilhar estatísticas agregadas anonimizadas",
+      "endpoint_prefix": "Quando ativado, o feed público assinado em",
+      "endpoint_suffix": "devolve agregados mensais anonimizados às redes parceiras."
+    },
+    "status": {
+      "enabled": "Ativado",
+      "disabled": "Desativado",
+      "signing_secret_present": "Chave de assinatura presente",
+      "no_signing_secret": "Sem chave de assinatura",
+      "last_rotated": "Última substituição da chave: {{date}}",
+      "never_rotated": "Chave nunca substituída"
+    },
+    "actions": {
+      "rotate_secret": "Substituir chave de assinatura",
+      "preview_payload": "Pré-visualizar payload",
+      "show_audit_log": "Registo de auditoria",
+      "refresh": "Atualizar",
+      "close": "Fechar"
+    },
+    "audit": {
+      "title": "Registo de auditoria do feed de agregados",
+      "loading": "A carregar o registo de auditoria…",
+      "empty": "Ainda não foram registadas consultas de agregados.",
+      "table_aria": "Consultas recentes ao feed de agregados",
+      "columns": {
+        "time": "Hora",
+        "requester": "Requerente",
+        "period": "Período",
+        "signature": "Assinatura"
+      },
+      "unknown_requester": "Desconhecido",
+      "period_range": "{{from}} a {{to}}"
+    },
+    "preview": {
+      "title": "Pré-visualização do payload de agregados",
+      "loading": "A preparar a pré-visualização…",
+      "empty": "Nenhuma pré-visualização disponível."
+    },
+    "toasts": {
+      "load_consent_failed": "Não foi possível carregar as definições de partilha de agregados.",
+      "enabled": "Partilha de agregados ativada.",
+      "disabled": "Partilha de agregados desativada.",
+      "update_failed": "Não foi possível atualizar a partilha de agregados.",
+      "secret_rotated": "Chave de assinatura substituída.",
+      "rotate_failed": "Não foi possível substituir a chave de assinatura.",
+      "load_audit_failed": "Não foi possível carregar o registo de auditoria.",
+      "load_preview_failed": "Não foi possível carregar a pré-visualização."
+    }
   }
 }

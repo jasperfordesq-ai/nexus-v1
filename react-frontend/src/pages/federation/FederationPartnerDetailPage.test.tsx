@@ -145,8 +145,8 @@ describe('FederationPartnerDetailPage', () => {
     render(<FederationPartnerDetailPage />);
     await waitFor(() => {
       expect(screen.getAllByText('Cork Timebank').length).toBeGreaterThanOrEqual(1);
-      expect(screen.getByText('partner_detail.permission_profiles')).toBeInTheDocument();
-      expect(screen.getByText('partner_detail.permission_messaging')).toBeInTheDocument();
+      expect(screen.getByText('partners.permission_profiles')).toBeInTheDocument();
+      expect(screen.getByText('partners.permission_messaging')).toBeInTheDocument();
     });
   });
 

@@ -315,8 +315,11 @@ export function FederationPartnersPage() {
                       }
                     >
                       {t('partners.level_prefix', { level: selectedPartner.federation_level })} &mdash;{' '}
-                      {selectedPartner.federation_level_name ||
-                        t(FEDERATION_LEVELS[selectedPartner.federation_level]?.label || 'partners.level_unknown')}
+                      {selectedPartner.is_external
+                        ? t('external')
+                        : FEDERATION_LEVELS[selectedPartner.federation_level]
+                          ? t(FEDERATION_LEVELS[selectedPartner.federation_level]!.label)
+                          : selectedPartner.federation_level_name || t('partners.level_unknown')}
                     </Chip>
                   </div>
 
@@ -452,7 +455,11 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
             variant="flat"
             className={levelMeta?.className || 'bg-theme-hover text-theme-muted'}
           >
-            {t(levelMeta?.label || 'partners.level_unknown') || partner.federation_level_name || t('partners.level_prefix', { level: partner.federation_level })}
+            {partner.is_external
+              ? t('external')
+              : levelMeta
+                ? t(levelMeta.label)
+                : partner.federation_level_name || t('partners.level_unknown')}
           </Chip>
           {partner.is_external && (
             <Chip

@@ -44,6 +44,7 @@ import { FederatedTrustBadge, FederationReviewsPanel } from '@/components/federa
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { fetchUserFederationOptIn } from '@/lib/federationStatus';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import type { FederatedMember } from '@/types/api';
@@ -154,19 +155,10 @@ export function FederationMemberProfilePage() {
       return;
     }
     let cancelled = false;
-    api.get<{ enabled?: boolean; federation_optin?: boolean; status?: { user_optin?: boolean } }>('/v2/federation/status').then((res) => {
-      if (cancelled) return;
-      if (res.success && res.data) {
-        const isOptedIn =
-          res.data.enabled === true ||
-          res.data.federation_optin === true ||
-          res.data.status?.user_optin === true;
-        setUserOptedIn(isOptedIn);
-      } else {
-        setUserOptedIn(false);
-      }
+    fetchUserFederationOptIn().then((optedIn) => {
+      if (!cancelled) setUserOptedIn(optedIn);
     }).catch(() => {
-      setUserOptedIn(false);
+      if (!cancelled) setUserOptedIn(false);
     });
     return () => { cancelled = true; };
   }, [isAuthenticated]);

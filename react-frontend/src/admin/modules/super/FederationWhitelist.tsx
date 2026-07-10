@@ -1,5 +1,10 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Button, Textarea, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 import Plus from 'lucide-react/icons/plus';
@@ -11,11 +16,6 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast, useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import type { FederationWhitelistEntry, SuperAdminTenant } from '../../api/types';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
 
 interface WhitelistEntry {
   id: number;
@@ -57,6 +57,12 @@ export default function FederationWhitelist() {
   const [loading, setLoading] = useState(true);
   const [removing, setRemoving] = useState<number | null>(null);
 
+  // Stable refs so loadData does not re-create (and re-fetch) on i18n load.
+  const tRef = useRef(t);
+  tRef.current = t;
+  const toastRef = useRef(toast);
+  toastRef.current = toast;
+
   const loadData = useCallback(async () => {
     setLoading(true);
     const [whitelistRes, tenantsRes] = await Promise.all([
@@ -66,6 +72,9 @@ export default function FederationWhitelist() {
     if (whitelistRes.success && whitelistRes.data) {
       const mapped = (Array.isArray(whitelistRes.data) ? whitelistRes.data : []).map(mapWhitelistEntry);
       setEntries(mapped);
+    } else if (!whitelistRes.success) {
+      // Surface the failure instead of silently rendering an empty whitelist.
+      toastRef.current.error(whitelistRes.error || tRef.current('federation_whitelist.failed_to_load'));
     }
     if (tenantsRes.success && tenantsRes.data) {
       const tenants = (Array.isArray(tenantsRes.data) ? tenantsRes.data : []) as SuperAdminTenant[];
@@ -107,7 +116,12 @@ export default function FederationWhitelist() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div
+        role="status"
+        aria-busy="true"
+        aria-label={t('common.loading')}
+        className="flex items-center justify-center min-h-[400px]"
+      >
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
       </div>
     );

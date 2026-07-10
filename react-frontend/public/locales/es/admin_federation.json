@@ -1161,5 +1161,62 @@
         "step_3_body": "Use timestamps and related analytics to confirm the aggregate reflects current partner activity."
       }
     }
+  },
+  "federation_aggregates": {
+    "meta": {
+      "title": "Agregados de federación",
+      "description": "Comparte estadísticas comunitarias anonimizadas con redes asociadas y controla el feed público firmado."
+    },
+    "consent": {
+      "title": "Consentimiento para compartir agregados",
+      "loading": "Cargando la configuración de consentimiento…",
+      "enable_label": "Compartir estadísticas agregadas anonimizadas",
+      "endpoint_prefix": "Cuando está activado, el feed público firmado en",
+      "endpoint_suffix": "devuelve agregados mensuales anonimizados a las redes asociadas."
+    },
+    "status": {
+      "enabled": "Activado",
+      "disabled": "Desactivado",
+      "signing_secret_present": "Clave de firma presente",
+      "no_signing_secret": "Sin clave de firma",
+      "last_rotated": "Clave sustituida por última vez: {{date}}",
+      "never_rotated": "La clave nunca se ha sustituido"
+    },
+    "actions": {
+      "rotate_secret": "Sustituir clave de firma",
+      "preview_payload": "Vista previa de la carga útil",
+      "show_audit_log": "Registro de auditoría",
+      "refresh": "Actualizar",
+      "close": "Cerrar"
+    },
+    "audit": {
+      "title": "Registro de auditoría del feed de agregados",
+      "loading": "Cargando el registro de auditoría…",
+      "empty": "Aún no se han registrado consultas de agregados.",
+      "table_aria": "Consultas recientes del feed de agregados",
+      "columns": {
+        "time": "Hora",
+        "requester": "Solicitante",
+        "period": "Periodo",
+        "signature": "Firma"
+      },
+      "unknown_requester": "Desconocido",
+      "period_range": "{{from}} a {{to}}"
+    },
+    "preview": {
+      "title": "Vista previa de la carga útil de agregados",
+      "loading": "Preparando la vista previa…",
+      "empty": "No hay vista previa disponible."
+    },
+    "toasts": {
+      "load_consent_failed": "No se pudo cargar la configuración de uso compartido de agregados.",
+      "enabled": "Uso compartido de agregados activado.",
+      "disabled": "Uso compartido de agregados desactivado.",
+      "update_failed": "No se pudo actualizar el uso compartido de agregados.",
+      "secret_rotated": "Clave de firma sustituida.",
+      "rotate_failed": "No se pudo sustituir la clave de firma.",
+      "load_audit_failed": "No se pudo cargar el registro de auditoría.",
+      "load_preview_failed": "No se pudo cargar la vista previa."
+    }
   }
 }

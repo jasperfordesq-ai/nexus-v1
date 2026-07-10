@@ -996,7 +996,8 @@
     "tenant_removed_from_whitelist": "Locataire supprimé de la liste blanche",
     "view": "Voir",
     "whitelisted_tenants_aria": "Locataires sur liste blanche",
-    "whitelisted_tenants_count": "Locataires autorisés ({{count}})"
+    "whitelisted_tenants_count": "Locataires autorisés ({{count}})",
+    "failed_to_load": "Échec du chargement de la liste blanche"
   },
   "pilot_inquiry_admin": {
     "page_title": "Enquêtes pilotes",

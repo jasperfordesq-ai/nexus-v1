@@ -44,6 +44,7 @@ import { PageMeta } from '@/components/seo';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
+import { FederationOptInNotice } from '@/components/federation/FederationOptInNotice';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, responsiveThumbnailProps } from '@/lib/helpers';
 import type { FederatedEvent, FederationPartner } from '@/types/api';
@@ -66,6 +67,7 @@ export function FederationEventsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [optInRequired, setOptInRequired] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
 
@@ -145,6 +147,7 @@ export function FederationEventsPage() {
         if (controller.signal.aborted) return;
 
         if (response.success && response.data) {
+          if (!append) setOptInRequired(false);
           if (append) {
             setEvents((prev) => [...prev, ...response.data!]);
           } else {
@@ -154,7 +157,12 @@ export function FederationEventsPage() {
           setCursor(nextCursor);
           setHasMore(response.meta?.has_more ?? response.data.length >= PER_PAGE);
         } else {
-          if (!append) setEvents([]);
+          if (!append) {
+            setEvents([]);
+            // The backend 403s with FEDERATION_NOT_ENABLED when the viewer has
+            // not opted in — show the opt-in CTA instead of "nothing found".
+            setOptInRequired(response.code === 'FEDERATION_NOT_ENABLED');
+          }
           setHasMore(false);
         }
       } catch (error) {
@@ -307,8 +315,11 @@ export function FederationEventsPage() {
         </GlassCard>
       )}
 
+      {/* Opt-in required */}
+      {!isLoading && !loadError && optInRequired && <FederationOptInNotice />}
+
       {/* Empty State */}
-      {!isLoading && !loadError && events.length === 0 && (
+      {!isLoading && !loadError && !optInRequired && events.length === 0 && (
         <EmptyState
           icon={<Calendar className="w-12 h-12" />}
           title={t('events.empty_title')}
@@ -469,7 +480,7 @@ function FederatedEventCard({ event }: FederatedEventCardProps) {
               <div className="flex items-center gap-2 min-w-0">
                 <Avatar
                   src={avatarSrc}
-                  name={event.organizer?.name || 'Organizer'}
+                  name={event.organizer?.name || t('events.organizer_fallback')}
                   size="sm"
                   className="flex-shrink-0 w-6 h-6"
                 />

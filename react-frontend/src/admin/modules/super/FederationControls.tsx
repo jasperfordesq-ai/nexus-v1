@@ -1,3 +1,8 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Button, Chip, Input, Spinner, Code, Snippet, Accordion, AccordionItem, Switch } from '@/components/ui';
 import {
   useState,
@@ -30,10 +35,6 @@ import { ConfirmModal } from '../../components/ConfirmModal';
 import { StatCard } from '../../components/StatCard';
 import type { FederationSystemControls as FederationSystemControlsType, FederationWhitelistEntry, FederationPartnership } from '../../api/types';
 import { useTranslation } from 'react-i18next';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
 
 /**
  * Federation Control Center

@@ -996,7 +996,8 @@
     "tenant_removed_from_whitelist": "テナントがホワイトリストから削除されました",
     "view": "見る",
     "whitelisted_tenants_aria": "ホワイトリストに登録されたテナント",
-    "whitelisted_tenants_count": "ホワイトリスト登録済みテナント ({{count}})"
+    "whitelisted_tenants_count": "ホワイトリスト登録済みテナント ({{count}})",
+    "failed_to_load": "ホワイトリストの読み込みに失敗しました"
   },
   "pilot_inquiry_admin": {
     "page_title": "パイロットに関するお問い合わせ",

@@ -1161,5 +1161,62 @@
         "step_3_body": "Úsáid stampaí ama agus anailísíocht ghaolmhar chun a dhearbhú go léiríonn an comhiomlán gníomhaíocht reatha na gcomhpháirtithe."
       }
     }
+  },
+  "federation_aggregates": {
+    "meta": {
+      "title": "Comhiomláin chónaidhme",
+      "description": "Comhroinn staitisticí pobail anaithnidithe le líonraí comhpháirtíochta agus rialaigh an fotha poiblí sínithe."
+    },
+    "consent": {
+      "title": "Toiliú maidir le comhroinnt comhiomlán",
+      "loading": "Socruithe toilithe á lódáil…",
+      "enable_label": "Comhroinn staitisticí comhiomlána anaithnidithe",
+      "endpoint_prefix": "Nuair a bhíonn sé cumasaithe, tugann an fotha poiblí sínithe ag",
+      "endpoint_suffix": "comhiomláin mhíosúla anaithnidithe ar ais do líonraí comhpháirtíochta."
+    },
+    "status": {
+      "enabled": "Cumasaithe",
+      "disabled": "Díchumasaithe",
+      "signing_secret_present": "Eochair shínithe i láthair",
+      "no_signing_secret": "Gan eochair shínithe",
+      "last_rotated": "Eochair athsholáthraithe go deireanach: {{date}}",
+      "never_rotated": "Níor athsholáthraíodh an eochair riamh"
+    },
+    "actions": {
+      "rotate_secret": "Athsholáthair an eochair shínithe",
+      "preview_payload": "Réamhamharc ar an ualach sonraí",
+      "show_audit_log": "Loga iniúchta",
+      "refresh": "Athnuaigh",
+      "close": "Dún"
+    },
+    "audit": {
+      "title": "Loga iniúchta an fhotha comhiomlán",
+      "loading": "Loga iniúchta á lódáil…",
+      "empty": "Níl aon fhiosruithe comhiomlán taifeadta fós.",
+      "table_aria": "Fiosruithe le déanaí ar an bhfotha comhiomlán",
+      "columns": {
+        "time": "Am",
+        "requester": "Iarrthóir",
+        "period": "Tréimhse",
+        "signature": "Síniú"
+      },
+      "unknown_requester": "Anaithnid",
+      "period_range": "{{from}} go {{to}}"
+    },
+    "preview": {
+      "title": "Réamhamharc ar ualach sonraí na gcomhiomlán",
+      "loading": "Réamhamharc á ullmhú…",
+      "empty": "Níl réamhamharc ar fáil."
+    },
+    "toasts": {
+      "load_consent_failed": "Níorbh fhéidir socruithe comhroinnte na gcomhiomlán a lódáil.",
+      "enabled": "Comhroinnt comhiomlán cumasaithe.",
+      "disabled": "Comhroinnt comhiomlán díchumasaithe.",
+      "update_failed": "Níorbh fhéidir comhroinnt na gcomhiomlán a nuashonrú.",
+      "secret_rotated": "Athsholáthraíodh an eochair shínithe.",
+      "rotate_failed": "Níorbh fhéidir an eochair shínithe a athsholáthar.",
+      "load_audit_failed": "Níorbh fhéidir an loga iniúchta a lódáil.",
+      "load_preview_failed": "Níorbh fhéidir an réamhamharc a lódáil."
+    }
   }
 }

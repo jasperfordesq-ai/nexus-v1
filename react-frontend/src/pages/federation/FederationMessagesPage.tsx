@@ -47,6 +47,7 @@ import { usePageTitle } from '@/hooks';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePusherOptional } from '@/contexts/PusherContext';
 import { api } from '@/lib/api';
+import { fetchUserFederationOptIn } from '@/lib/federationStatus';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { safeLocalStorageGetJSON, safeLocalStorageSetJSON } from '@/lib/safeStorage';
@@ -347,12 +348,30 @@ export function FederationMessagesPage() {
         return [...prev, synthetic];
       });
 
-      // If the sender's thread is not currently open, show a toast notification
+      // If the sender's thread is not currently open, show a toast notification.
+      // If it IS open, the user is reading it — mark the new message read
+      // immediately so the unread badge doesn't stick until the next re-open.
       setActiveThreadKey((current) => {
         if (current !== partnerKey) {
           toastRef.current.info(
             tRef.current('messages.realtime_new_message', { name: data.sender_name ?? tRef.current('messages.someone') }),
           );
+        } else {
+          api.post('/v2/federation/messages/mark-read-batch', { ids: [data.message_id] })
+            .then((res) => {
+              if (res.success) {
+                setAllMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === data.message_id
+                      ? { ...m, status: 'read' as const, read_at: new Date().toISOString() }
+                      : m
+                  )
+                );
+              }
+            })
+            .catch(() => {
+              // Non-critical — the message stays unread until the thread reopens.
+            });
         }
         return current;
       });
@@ -751,19 +770,10 @@ export function FederationMessagesPage() {
   // Check opt-in status on mount (proactive gate — avoids 403 on Send)
   useEffect(() => {
     let cancelled = false;
-    api.get<{ enabled?: boolean; federation_optin?: boolean; status?: { user_optin?: boolean } }>('/v2/federation/status').then((res) => {
-      if (cancelled) return;
-      if (res.success && res.data) {
-        const isOptedIn =
-          res.data.enabled === true ||
-          res.data.federation_optin === true ||
-          res.data.status?.user_optin === true;
-        setUserOptedIn(isOptedIn);
-      } else {
-        setUserOptedIn(false);
-      }
+    fetchUserFederationOptIn().then((optedIn) => {
+      if (!cancelled) setUserOptedIn(optedIn);
     }).catch(() => {
-      setUserOptedIn(false);
+      if (!cancelled) setUserOptedIn(false);
     });
     return () => { cancelled = true; };
   }, []);
@@ -1326,13 +1336,13 @@ export function FederationMessagesPage() {
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated">
                     <Avatar
                       src={resolveAvatarUrl(selectedRecipient.avatar)}
-                      name={selectedRecipient.name || 'Recipient'}
+                      name={selectedRecipient.name || t('messages.recipient_fallback')}
                       size="sm"
                       className="ring-2 ring-theme-default"
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-theme-primary truncate">
-                        {selectedRecipient.name || (selectedRecipient.is_external ? t('members.external_member') : `User #${selectedRecipient.id}`)}
+                        {selectedRecipient.name || (selectedRecipient.is_external ? t('members.external_member') : t('messages.user_number', { id: selectedRecipient.id }))}
                       </p>
                       {selectedRecipient.tenant_name && (
                         <Chip

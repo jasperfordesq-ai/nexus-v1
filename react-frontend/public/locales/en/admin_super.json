@@ -996,7 +996,8 @@
     "tenant_removed_from_whitelist": "Tenant removed from whitelist",
     "view": "View",
     "whitelisted_tenants_aria": "Whitelisted tenants",
-    "whitelisted_tenants_count": "Whitelisted tenants ({{count}})"
+    "whitelisted_tenants_count": "Whitelisted tenants ({{count}})",
+    "failed_to_load": "Failed to load the whitelist"
   },
   "pilot_inquiry_admin": {
     "page_title": "Pilot Inquiries",

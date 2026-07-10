@@ -1161,5 +1161,62 @@
         "step_3_body": "Gebruik tijdstempels en gerelateerde analyses om te bevestigen dat het totaal de huidige partneractiviteit weerspiegelt."
       }
     }
+  },
+  "federation_aggregates": {
+    "meta": {
+      "title": "Federatie-aggregaten",
+      "description": "Deel geanonimiseerde communitystatistieken met partnernetwerken en beheer de ondertekende openbare feed."
+    },
+    "consent": {
+      "title": "Toestemming voor het delen van aggregaten",
+      "loading": "Toestemmingsinstellingen laden…",
+      "enable_label": "Geanonimiseerde aggregaatstatistieken delen",
+      "endpoint_prefix": "Indien ingeschakeld retourneert de ondertekende openbare feed op",
+      "endpoint_suffix": "geanonimiseerde maandelijkse aggregaten aan partnernetwerken."
+    },
+    "status": {
+      "enabled": "Ingeschakeld",
+      "disabled": "Uitgeschakeld",
+      "signing_secret_present": "Ondertekeningssleutel aanwezig",
+      "no_signing_secret": "Geen ondertekeningssleutel",
+      "last_rotated": "Sleutel laatst vervangen: {{date}}",
+      "never_rotated": "Sleutel nooit vervangen"
+    },
+    "actions": {
+      "rotate_secret": "Ondertekeningssleutel vervangen",
+      "preview_payload": "Voorbeeld van payload",
+      "show_audit_log": "Auditlogboek",
+      "refresh": "Vernieuwen",
+      "close": "Sluiten"
+    },
+    "audit": {
+      "title": "Auditlogboek van de aggregatenfeed",
+      "loading": "Auditlogboek laden…",
+      "empty": "Nog geen aggregaatquery's geregistreerd.",
+      "table_aria": "Recente query's op de aggregatenfeed",
+      "columns": {
+        "time": "Tijd",
+        "requester": "Aanvrager",
+        "period": "Periode",
+        "signature": "Handtekening"
+      },
+      "unknown_requester": "Onbekend",
+      "period_range": "{{from}} tot {{to}}"
+    },
+    "preview": {
+      "title": "Voorbeeld van aggregaat-payload",
+      "loading": "Voorbeeld voorbereiden…",
+      "empty": "Geen voorbeeld beschikbaar."
+    },
+    "toasts": {
+      "load_consent_failed": "Kan de instellingen voor het delen van aggregaten niet laden.",
+      "enabled": "Delen van aggregaten ingeschakeld.",
+      "disabled": "Delen van aggregaten uitgeschakeld.",
+      "update_failed": "Kan het delen van aggregaten niet bijwerken.",
+      "secret_rotated": "Ondertekeningssleutel vervangen.",
+      "rotate_failed": "Kan de ondertekeningssleutel niet vervangen.",
+      "load_audit_failed": "Kan het auditlogboek niet laden.",
+      "load_preview_failed": "Kan het voorbeeld niet laden."
+    }
   }
 }

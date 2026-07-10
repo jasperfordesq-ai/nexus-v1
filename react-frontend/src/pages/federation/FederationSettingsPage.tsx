@@ -192,12 +192,14 @@ export function FederationSettingsPage() {
 
   const handleToggleFederation = useCallback(async () => {
     const endpoint = federationOptedIn ? '/v2/federation/opt-out' : '/v2/federation/opt-in';
-    const action = federationOptedIn ? 'disabled' : 'enabled';
 
     try {
       setIsTogglingStatus(true);
       const response = await api.post(endpoint);
       if (response.success) {
+        // Translate the interpolated action word — a hardcoded English
+        // 'enabled'/'disabled' produced mixed-language toasts in other locales.
+        const action = tRef.current(federationOptedIn ? 'settings.action_disabled' : 'settings.action_enabled');
         setFederationOptedIn(!federationOptedIn);
         toastRef.current.success(
           tRef.current('settings.federation_toggled_title', { action }),

@@ -43,8 +43,8 @@
     "quick_link_3_description": "パートナー コミュニティからのオファーやリクエストを参照します。",
     "quick_link_4_title": "連盟のイベント",
     "quick_link_4_description": "パートナー コミュニティ全体で開催されるイベントを発見します。",
-    "quick_link_5_title": "フェデレーション設定",
-    "quick_link_5_description": "フェデレーションのプライバシーと通信の設定を構成します。",
+    "quick_link_5_title": "フェデレーショングループ",
+    "quick_link_5_description": "パートナーコミュニティが共有するグループを閲覧します。",
     "partner_communities": "パートナーコミュニティ",
     "no_partners_yet": "パートナー コミュニティはまだありません",
     "no_partners_description": "パートナーシップが確立されると、コミュニティがここに表示されます。",
@@ -78,7 +78,11 @@
     "toast_disabled_description": "フェデレーション ネットワークから切断されました。",
     "toast_disable_error_title": "無効化に失敗しました",
     "toast_disable_error_description": "フェデレーションを無効にできませんでした。もう一度試してください。",
-    "toast_disable_error_generic": "予期しないエラーが発生しました。"
+    "toast_disable_error_generic": "予期しないエラーが発生しました。",
+    "quick_link_7_title": "フェデレーション設定",
+    "quick_link_7_description": "フェデレーションのプライバシーと通信の設定を構成します。",
+    "quick_link_6_title": "フェデレーションのつながり",
+    "quick_link_6_description": "パートナーコミュニティ間のつながりリクエストを管理します。"
   },
   "partners": {
     "page_title": "パートナーコミュニティ",
@@ -221,7 +225,9 @@
     "send_message": "メッセージを送信する",
     "thread_aria_no_unread": "{{tenant}} からの {{name}} との会話",
     "thread_aria_unread": "{{tenant}} からの {{name}} との会話、{{count}} の未読メッセージ",
-    "thread_aria_unread_plural": "{{tenant}}、{{count}} の未読メッセージからの {{name}} との会話"
+    "thread_aria_unread_plural": "{{tenant}}、{{count}} の未読メッセージからの {{name}} との会話",
+    "recipient_fallback": "受信者",
+    "user_number": "ユーザー #{{id}}"
   },
   "listings": {
     "page_title": "フェデレーションのリスト",
@@ -310,7 +316,9 @@
     "save_failed_title": "保存に失敗しました",
     "save_failed_description": "設定を保存できませんでした。もう一度試してください。",
     "save_failed_retry": "ネットワークエラーが発生しました。もう一度試してください。",
-    "kilometers_short": "km"
+    "kilometers_short": "km",
+    "action_enabled": "有効",
+    "action_disabled": "無効"
   },
   "events": {
     "page_title": "連盟のイベント",
@@ -334,7 +342,8 @@
     "online": "オンライン",
     "date_at_time": "{{date}} {{time}}",
     "attendees_going_one": "{{count}} 人参加予定",
-    "attendees_going_other": "{{count}} 人参加予定"
+    "attendees_going_other": "{{count}} 人参加予定",
+    "organizer_fallback": "主催者"
   },
   "groups": {
     "page_title": "フェデレーショングループ",
@@ -542,6 +551,14 @@
     "anonymous": "匿名",
     "rating_label": "5 段階中 {{rating}} と評価されました",
     "from_partner": "{{partner}}経由",
-    "title": "レビュー"
+    "title": "レビュー",
+    "empty": "このメンバーにはまだレビューがありません。",
+    "load_error": "レビューを読み込めませんでした。もう一度お試しください。",
+    "verified": "確認済み"
+  },
+  "optin_notice": {
+    "title": "フェデレーションのオプトインが必要です",
+    "description": "パートナーコミュニティのコンテンツを表示するには、フェデレーションへの参加が必要です。",
+    "cta": "フェデレーションのセットアップ"
   }
 }

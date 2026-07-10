@@ -43,8 +43,8 @@
     "quick_link_3_description": "Brabhsáil tairiscintí agus iarratais ó phobail chomhpháirtíochta.",
     "quick_link_4_title": "Imeachtaí Cónaidhme",
     "quick_link_4_description": "Faigh amach faoi imeachtaí atá ar siúl ar fud na bpobal comhpháirtíochta.",
-    "quick_link_5_title": "Socruithe Cónaidhme",
-    "quick_link_5_description": "Cumraigh do phríobháideacht chónaidhme agus roghanna cumarsáide.",
+    "quick_link_5_title": "Grúpaí cónaidhme",
+    "quick_link_5_description": "Brabhsáil grúpaí atá roinnte ag comhphobail chomhpháirtíochta.",
     "partner_communities": "Pobail Chomhpháirtithe",
     "no_partners_yet": "Níl pobail chomhpháirtíochta ar bith fós",
     "no_partners_description": "Beidh do phobal le feiceáil anseo nuair a bheidh comhpháirtíochtaí bunaithe.",
@@ -78,7 +78,11 @@
     "toast_disabled_description": "Tá tú dícheangailte ó líonra na Cónaidhme.",
     "toast_disable_error_title": "Theip ar Dhíchumasú",
     "toast_disable_error_description": "Níorbh fhéidir an chónaidhm a dhíchumasú. Bain triail eile as.",
-    "toast_disable_error_generic": "Tharla earráid gan choinne."
+    "toast_disable_error_generic": "Tharla earráid gan choinne.",
+    "quick_link_7_title": "Socruithe Cónaidhme",
+    "quick_link_7_description": "Cumraigh do phríobháideacht chónaidhme agus roghanna cumarsáide.",
+    "quick_link_6_title": "Naisc chónaidhme",
+    "quick_link_6_description": "Bainistigh d'iarratais naisc ar fud na gcomhphobal comhpháirtíochta."
   },
   "partners": {
     "page_title": "Pobail Chomhpháirtithe",
@@ -221,7 +225,9 @@
     "send_message": "Seol Teachtaireacht",
     "thread_aria_no_unread": "Comhrá le {{name}} ó {{tenant}}",
     "thread_aria_unread": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireacht neamhléite",
-    "thread_aria_unread_plural": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireachtaí neamhléite"
+    "thread_aria_unread_plural": "Comhrá le {{name}} ó {{tenant}}, {{count}} teachtaireachtaí neamhléite",
+    "recipient_fallback": "Faighteoir",
+    "user_number": "Úsáideoir #{{id}}"
   },
   "listings": {
     "page_title": "Liostaí Cónaidhme",
@@ -310,7 +316,9 @@
     "save_failed_title": "Theip ar shábháil",
     "save_failed_description": "Níorbh fhéidir na socruithe a shábháil. Bain triail eile as.",
     "save_failed_retry": "Tharla earráid líonra. Bain triail eile as.",
-    "kilometers_short": "km"
+    "kilometers_short": "km",
+    "action_enabled": "cumasaithe",
+    "action_disabled": "díchumasaithe"
   },
   "events": {
     "page_title": "Imeachtaí Cónaidhme",
@@ -334,7 +342,8 @@
     "online": "Ar líne",
     "date_at_time": "{{date}} ag {{time}}",
     "attendees_going_one": "{{count}} ag dul",
-    "attendees_going_other": "{{count}} ag dul"
+    "attendees_going_other": "{{count}} ag dul",
+    "organizer_fallback": "Eagraí"
   },
   "groups": {
     "page_title": "Grúpaí Cónaidhme",
@@ -542,6 +551,14 @@
     "anonymous": "Gan ainm",
     "rating_label": "Rátáilte {{rating}} as 5",
     "from_partner": "trí {{partner}}",
-    "title": "Léirmheasanna"
+    "title": "Léirmheasanna",
+    "empty": "Níl aon léirmheasanna ag an mball seo fós.",
+    "load_error": "Níorbh fhéidir na léirmheasanna a luchtú. Bain triail eile as.",
+    "verified": "Fíoraithe"
+  },
+  "optin_notice": {
+    "title": "Cónaidhm rogha an diúltaithe ag teastáil",
+    "description": "Ní mór duit rogha an chónaidhm a ghlacadh chun ábhar ó chomhphobail chomhpháirtíochta a fheiceáil.",
+    "cta": "Bunú Cónaidhm"
   }
 }

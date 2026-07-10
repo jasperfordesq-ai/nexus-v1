@@ -301,7 +301,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
                     <TableCell>
                       <Chip size="sm" variant="flat">{t(`verein_federation.scope_${row.sharing_scope}`)}</Chip>
                     </TableCell>
-                    <TableCell>{row.municipality_code ?? 'â€”'}</TableCell>
+                    <TableCell>{row.municipality_code ?? '—'}</TableCell>
                     <TableCell>
                       {(consent?.sharing_scope === 'events' || consent?.sharing_scope === 'both') ? (
                         <Button
@@ -346,7 +346,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
                       <div className="flex-1">
                         <p className="font-medium">{s.title}</p>
                         <p className="text-xs text-muted">
-                          {t('verein_federation.calendar.from_label')}: {s.source_name ?? 'â€”'}
+                          {t('verein_federation.calendar.from_label')}: {s.source_name ?? '—'}
                           {s.start_time ? ` Â· ${new Date(s.start_time).toLocaleString()}` : ''}
                         </p>
                       </div>

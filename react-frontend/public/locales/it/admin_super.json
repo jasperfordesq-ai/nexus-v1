@@ -996,7 +996,8 @@
     "tenant_removed_from_whitelist": "Tenant rimosso dalla whitelist",
     "view": "Visualizza",
     "whitelisted_tenants_aria": "Inquilini autorizzati",
-    "whitelisted_tenants_count": "Tenant autorizzati ({{count}})"
+    "whitelisted_tenants_count": "Tenant autorizzati ({{count}})",
+    "failed_to_load": "Impossibile caricare la lista bianca"
   },
   "pilot_inquiry_admin": {
     "page_title": "Richieste pilota",

@@ -43,8 +43,8 @@
     "quick_link_3_description": "Durchsuchen Sie Angebote und Anfragen von Partner-Communities.",
     "quick_link_4_title": "Föderationsveranstaltungen",
     "quick_link_4_description": "Entdecken Sie Veranstaltungen, die in Partnergemeinschaften stattfinden.",
-    "quick_link_5_title": "Föderationseinstellungen",
-    "quick_link_5_description": "Konfigurieren Sie die Datenschutz- und Kommunikationseinstellungen Ihres Verbunds.",
+    "quick_link_5_title": "Föderationsgruppen",
+    "quick_link_5_description": "Durchsuche Gruppen, die von Partnergemeinschaften geteilt werden.",
     "partner_communities": "Partnergemeinschaften",
     "no_partners_yet": "Noch keine Partnergemeinden",
     "no_partners_description": "Ihre Community wird hier angezeigt, sobald Partnerschaften etabliert sind.",
@@ -78,7 +78,11 @@
     "toast_disabled_description": "Ihre Verbindung zum Verbundnetzwerk wurde getrennt.",
     "toast_disable_error_title": "Deaktivierung fehlgeschlagen",
     "toast_disable_error_description": "Der Verbund konnte nicht deaktiviert werden. Bitte versuchen Sie es erneut.",
-    "toast_disable_error_generic": "Es ist ein unerwarteter Fehler aufgetreten."
+    "toast_disable_error_generic": "Es ist ein unerwarteter Fehler aufgetreten.",
+    "quick_link_7_title": "Föderationseinstellungen",
+    "quick_link_7_description": "Konfigurieren Sie die Datenschutz- und Kommunikationseinstellungen Ihres Verbunds.",
+    "quick_link_6_title": "Föderationsverbindungen",
+    "quick_link_6_description": "Verwalte deine Verbindungsanfragen über Partnergemeinschaften hinweg."
   },
   "partners": {
     "page_title": "Partnergemeinschaften",
@@ -221,7 +225,9 @@
     "send_message": "Nachricht senden",
     "thread_aria_no_unread": "Unterhaltung mit {{name}} von {{tenant}}",
     "thread_aria_unread": "Konversation mit {{name}} von {{tenant}}, {{count}} ungelesene Nachricht",
-    "thread_aria_unread_plural": "Konversation mit {{name}} von {{tenant}}, {{count}} ungelesene Nachrichten"
+    "thread_aria_unread_plural": "Konversation mit {{name}} von {{tenant}}, {{count}} ungelesene Nachrichten",
+    "recipient_fallback": "Empfänger",
+    "user_number": "Benutzer #{{id}}"
   },
   "listings": {
     "page_title": "Föderationseinträge",
@@ -310,7 +316,9 @@
     "save_failed_title": "Speichern fehlgeschlagen",
     "save_failed_description": "Einstellungen konnten nicht gespeichert werden. Bitte versuchen Sie es erneut.",
     "save_failed_retry": "Ein Netzwerkfehler ist aufgetreten. Bitte versuchen Sie es erneut.",
-    "kilometers_short": "km"
+    "kilometers_short": "km",
+    "action_enabled": "aktiviert",
+    "action_disabled": "deaktiviert"
   },
   "events": {
     "page_title": "Föderationsveranstaltungen",
@@ -334,7 +342,8 @@
     "online": "Online",
     "date_at_time": "{{date}} um {{time}}",
     "attendees_going_one": "{{count}} nimmt teil",
-    "attendees_going_other": "{{count}} nehmen teil"
+    "attendees_going_other": "{{count}} nehmen teil",
+    "organizer_fallback": "Organisator"
   },
   "groups": {
     "page_title": "Föderationsgruppen",
@@ -542,6 +551,14 @@
     "anonymous": "Anonym",
     "rating_label": "Bewertet mit {{rating}} von 5",
     "from_partner": "über {{partner}}",
-    "title": "Bewertungen"
+    "title": "Bewertungen",
+    "empty": "Für dieses Mitglied liegen noch keine Bewertungen vor.",
+    "load_error": "Bewertungen konnten nicht geladen werden. Bitte erneut versuchen.",
+    "verified": "Verifiziert"
+  },
+  "optin_notice": {
+    "title": "Föderations-Opt-In erforderlich",
+    "description": "Du musst der Föderation beitreten, um Inhalte von Partnergemeinschaften zu sehen.",
+    "cta": "Föderation einrichten"
   }
 }

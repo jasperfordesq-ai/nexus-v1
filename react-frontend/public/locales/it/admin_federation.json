@@ -1161,5 +1161,62 @@
         "step_3_body": "Utilizza timestamp e analisi correlate per confermare che l'aggregato riflette l'attività attuale del partner."
       }
     }
+  },
+  "federation_aggregates": {
+    "meta": {
+      "title": "Aggregati di federazione",
+      "description": "Condividi statistiche comunitarie anonimizzate con le reti partner e controlla il feed pubblico firmato."
+    },
+    "consent": {
+      "title": "Consenso alla condivisione degli aggregati",
+      "loading": "Caricamento delle impostazioni di consenso…",
+      "enable_label": "Condividi statistiche aggregate anonimizzate",
+      "endpoint_prefix": "Quando è attivata, il feed pubblico firmato all'indirizzo",
+      "endpoint_suffix": "restituisce aggregati mensili anonimizzati alle reti partner."
+    },
+    "status": {
+      "enabled": "Attivato",
+      "disabled": "Disattivato",
+      "signing_secret_present": "Chiave di firma presente",
+      "no_signing_secret": "Nessuna chiave di firma",
+      "last_rotated": "Ultima sostituzione della chiave: {{date}}",
+      "never_rotated": "Chiave mai sostituita"
+    },
+    "actions": {
+      "rotate_secret": "Sostituisci chiave di firma",
+      "preview_payload": "Anteprima del payload",
+      "show_audit_log": "Registro di audit",
+      "refresh": "Aggiorna",
+      "close": "Chiudi"
+    },
+    "audit": {
+      "title": "Registro di audit del feed degli aggregati",
+      "loading": "Caricamento del registro di audit…",
+      "empty": "Nessuna query sugli aggregati registrata finora.",
+      "table_aria": "Query recenti del feed degli aggregati",
+      "columns": {
+        "time": "Ora",
+        "requester": "Richiedente",
+        "period": "Periodo",
+        "signature": "Firma"
+      },
+      "unknown_requester": "Sconosciuto",
+      "period_range": "da {{from}} a {{to}}"
+    },
+    "preview": {
+      "title": "Anteprima del payload degli aggregati",
+      "loading": "Preparazione dell'anteprima…",
+      "empty": "Nessuna anteprima disponibile."
+    },
+    "toasts": {
+      "load_consent_failed": "Impossibile caricare le impostazioni di condivisione degli aggregati.",
+      "enabled": "Condivisione degli aggregati attivata.",
+      "disabled": "Condivisione degli aggregati disattivata.",
+      "update_failed": "Impossibile aggiornare la condivisione degli aggregati.",
+      "secret_rotated": "Chiave di firma sostituita.",
+      "rotate_failed": "Impossibile sostituire la chiave di firma.",
+      "load_audit_failed": "Impossibile caricare il registro di audit.",
+      "load_preview_failed": "Impossibile caricare l'anteprima."
+    }
   }
 }
