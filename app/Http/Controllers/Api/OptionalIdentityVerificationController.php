@@ -451,20 +451,23 @@ class OptionalIdentityVerificationController extends BaseApiController
 
         $mismatches = [];
 
-        // Compare first name (case-insensitive)
+        // Compare first name. A document's first-name field carries the FULL
+        // given names ("SARAH JANE"), while a profile usually stores only the
+        // first ("Sarah") - Stripe Identity has no separate middle-name field.
+        // Match tolerantly (extra given/middle names and honorifics allowed on
+        // either side) instead of demanding exact string equality, which
+        // rejected every member whose ID lists a middle name. See namesMatch().
         $docFirstName = $stripeStatus['verified_first_name'] ?? null;
-        if ($docFirstName && $user->first_name) {
-            if (mb_strtolower(trim($docFirstName)) !== mb_strtolower(trim($user->first_name))) {
-                $mismatches[] = 'first name';
-            }
+        if (self::namesMatch($docFirstName, $user->first_name) === false) {
+            $mismatches[] = 'first name';
         }
 
-        // Compare last name (case-insensitive)
+        // Compare last name (same tolerant match - also covers hyphenated /
+        // multi-part surnames and a provider mis-splitting a middle name into
+        // the last-name field).
         $docLastName = $stripeStatus['verified_last_name'] ?? null;
-        if ($docLastName && $user->last_name) {
-            if (mb_strtolower(trim($docLastName)) !== mb_strtolower(trim($user->last_name))) {
-                $mismatches[] = 'last name';
-            }
+        if (self::namesMatch($docLastName, $user->last_name) === false) {
+            $mismatches[] = 'last name';
         }
 
         // Compare DOB
@@ -496,5 +499,98 @@ class OptionalIdentityVerificationController extends BaseApiController
         }
 
         return null; // All matches
+    }
+
+    /**
+     * Normalise a name into lowercase, accent-folded word tokens for tolerant
+     * matching. Leading honorifics (Mr/Mrs/Ms/Miss/...) are dropped and every
+     * non-letter (hyphen, apostrophe, dot) is treated as a word separator, so
+     * "Mrs Sarah-Jane O'Brien" becomes ['sarah', 'jane', 'o', 'brien'].
+     *
+     * @return list<string> Ordered name tokens (possibly empty for non-Latin scripts).
+     */
+    private static function normaliseNameTokens(?string $name): array
+    {
+        if ($name === null) {
+            return [];
+        }
+
+        // Lowercase (multibyte-safe), then fold common Latin diacritics so
+        // "Jose" matches "Jose\u{0301}" and "Muller" matches "Mu\u{0308}ller".
+        // Keys use \u escapes to keep this source ASCII-only.
+        $lower = mb_strtolower(trim($name), 'UTF-8');
+        $lower = strtr($lower, [
+            "\u{00E1}" => 'a', "\u{00E0}" => 'a', "\u{00E2}" => 'a', "\u{00E4}" => 'a', "\u{00E3}" => 'a', "\u{00E5}" => 'a', "\u{0101}" => 'a',
+            "\u{00E9}" => 'e', "\u{00E8}" => 'e', "\u{00EA}" => 'e', "\u{00EB}" => 'e', "\u{0113}" => 'e',
+            "\u{00ED}" => 'i', "\u{00EC}" => 'i', "\u{00EE}" => 'i', "\u{00EF}" => 'i', "\u{012B}" => 'i',
+            "\u{00F3}" => 'o', "\u{00F2}" => 'o', "\u{00F4}" => 'o', "\u{00F6}" => 'o', "\u{00F5}" => 'o', "\u{00F8}" => 'o', "\u{014D}" => 'o',
+            "\u{00FA}" => 'u', "\u{00F9}" => 'u', "\u{00FB}" => 'u', "\u{00FC}" => 'u', "\u{016B}" => 'u',
+            "\u{00F1}" => 'n', "\u{00E7}" => 'c', "\u{00DF}" => 'ss', "\u{00FD}" => 'y', "\u{00FF}" => 'y',
+        ]);
+
+        // Any non-letter becomes a separator; collapse to single-space tokens.
+        $lower = preg_replace('/[^a-z]+/', ' ', $lower) ?? '';
+        $tokens = array_values(array_filter(
+            explode(' ', trim($lower)),
+            static fn (string $t): bool => $t !== ''
+        ));
+
+        // Drop leading honorific titles ("mrs sarah jane" -> "sarah jane").
+        static $titles = [
+            'mr', 'mrs', 'ms', 'miss', 'mx', 'dr', 'prof',
+            'sir', 'dame', 'lady', 'lord', 'rev', 'fr', 'mstr',
+        ];
+        while (isset($tokens[0]) && in_array($tokens[0], $titles, true)) {
+            array_shift($tokens);
+        }
+
+        return array_values($tokens);
+    }
+
+    /**
+     * Tolerant identity name match. Returns true when the document and profile
+     * names plausibly refer to the same person (allowing extra given/middle
+     * names or an honorific on either side), false on a genuine mismatch, and
+     * null when either side is empty - the caller treats null as "no mismatch",
+     * preserving the pre-existing skip-when-absent behaviour.
+     *
+     * The match succeeds when one side's token set is fully contained in the
+     * other's (order-independent). It deliberately does NOT fuzzy-match typos or
+     * alternative spellings - only additional or omitted name parts are
+     * tolerated, so a genuinely different name (e.g. "Mallory" vs "Alice") still
+     * fails. For non-Latin scripts that tokenise to nothing it falls back to the
+     * original strict case-insensitive comparison rather than skipping the gate.
+     */
+    private static function namesMatch(?string $docName, ?string $profileName): ?bool
+    {
+        $docRaw     = $docName !== null ? trim($docName) : '';
+        $profileRaw = $profileName !== null ? trim($profileName) : '';
+
+        if ($docRaw === '' || $profileRaw === '') {
+            return null; // Missing on one side - cannot compare.
+        }
+
+        $doc     = self::normaliseNameTokens($docName);
+        $profile = self::normaliseNameTokens($profileName);
+
+        // Untokenisable (e.g. non-Latin) on either side: fall back to a strict
+        // case-insensitive comparison of the raw values rather than skipping.
+        if (empty($doc) || empty($profile)) {
+            return mb_strtolower($docRaw, 'UTF-8') === mb_strtolower($profileRaw, 'UTF-8');
+        }
+
+        if ($doc === $profile) {
+            return true;
+        }
+
+        $docSet     = array_values(array_unique($doc));
+        $profileSet = array_values(array_unique($profile));
+
+        // profile subset of doc -> document carries extra given/middle names.
+        // doc subset of profile -> profile carries extra names the document omits.
+        $profileInDoc = array_diff($profileSet, $docSet) === [];
+        $docInProfile = array_diff($docSet, $profileSet) === [];
+
+        return $profileInDoc || $docInProfile;
     }
 }

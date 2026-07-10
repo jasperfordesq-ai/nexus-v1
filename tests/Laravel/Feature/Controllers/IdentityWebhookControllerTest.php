@@ -135,6 +135,120 @@ class IdentityWebhookControllerTest extends TestCase
         $this->assertTrue($hasIdBadge, 'A matching name/DOB must grant the id_verified badge');
     }
 
+    /**
+     * Regression (tenant 11 / Time Banking UK, user 264): a UK driving licence
+     * lists all given names ("SARAH JANE") in the first-name field while the
+     * profile carries only "Sarah". Stripe verified the document; the name gate
+     * must tolerate the extra middle name and still grant the badge.
+     */
+    public function test_verified_webhook_allows_document_with_extra_middle_name(): void
+    {
+        TenantContext::setById($this->testTenantId);
+
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name'    => 'Sarah',
+            'last_name'     => 'Bird',
+            'date_of_birth' => '1990-05-15',
+        ]);
+        TenantContext::setById($this->testTenantId);
+
+        $slug = 'test_middle_name_idp';
+        IdentityProviderRegistry::register($this->makeFakeProvider($slug, [
+            'status'              => 'passed',
+            'verified_first_name' => 'SARAH JANE',
+            'verified_last_name'  => 'BIRD',
+            'verified_dob'        => ['year' => 1990, 'month' => 5, 'day' => 15],
+        ]));
+
+        $sessionId = IdentityVerificationSessionService::create(
+            $this->testTenantId, (int) $user->id, $slug, 'document_only', ['provider_session_id' => 'sess_middle']
+        );
+
+        $this->apiPost("/v2/webhooks/identity/{$slug}", [
+            'session_id' => 'sess_middle',
+            'result'     => 'passed',
+        ])->assertOk();
+
+        $badges = app(MemberVerificationBadgeService::class)->getUserBadges((int) $user->id);
+        $hasIdBadge = collect($badges)->contains(fn ($b) => ($b['badge_type'] ?? null) === 'id_verified');
+        $this->assertTrue($hasIdBadge, 'A document with an extra middle name must still grant the badge');
+
+        $status = DB::table('identity_verification_sessions')->where('id', $sessionId)->value('status');
+        $this->assertSame('passed', $status, 'An extra middle name is not a mismatch');
+    }
+
+    /** A leading honorific on the document ("Mrs Sarah Jane") must be ignored. */
+    public function test_verified_webhook_ignores_honorific_prefix_on_document(): void
+    {
+        TenantContext::setById($this->testTenantId);
+
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name'    => 'Sarah',
+            'last_name'     => 'Bird',
+            'date_of_birth' => '1990-05-15',
+        ]);
+        TenantContext::setById($this->testTenantId);
+
+        $slug = 'test_honorific_idp';
+        IdentityProviderRegistry::register($this->makeFakeProvider($slug, [
+            'status'              => 'passed',
+            'verified_first_name' => 'Mrs Sarah Jane',
+            'verified_last_name'  => 'Bird',
+            'verified_dob'        => ['year' => 1990, 'month' => 5, 'day' => 15],
+        ]));
+
+        $sessionId = IdentityVerificationSessionService::create(
+            $this->testTenantId, (int) $user->id, $slug, 'document_only', ['provider_session_id' => 'sess_honorific']
+        );
+
+        $this->apiPost("/v2/webhooks/identity/{$slug}", [
+            'session_id' => 'sess_honorific',
+            'result'     => 'passed',
+        ])->assertOk();
+
+        $status = DB::table('identity_verification_sessions')->where('id', $sessionId)->value('status');
+        $this->assertSame('passed', $status, 'A leading honorific must not count as a mismatch');
+    }
+
+    /**
+     * Guard against over-loosening: a document whose first name shares no token
+     * with the profile (not merely an extra middle name) must still be rejected.
+     */
+    public function test_verified_webhook_still_fails_on_unrelated_first_name(): void
+    {
+        TenantContext::setById($this->testTenantId);
+
+        $user = User::factory()->forTenant($this->testTenantId)->create([
+            'first_name'    => 'Sarah',
+            'last_name'     => 'Bird',
+            'date_of_birth' => '1990-05-15',
+        ]);
+        TenantContext::setById($this->testTenantId);
+
+        $slug = 'test_unrelated_first_idp';
+        IdentityProviderRegistry::register($this->makeFakeProvider($slug, [
+            'status'              => 'passed',
+            'verified_first_name' => 'Michael',
+            'verified_last_name'  => 'Bird',
+            'verified_dob'        => ['year' => 1990, 'month' => 5, 'day' => 15],
+        ]));
+
+        $sessionId = IdentityVerificationSessionService::create(
+            $this->testTenantId, (int) $user->id, $slug, 'document_only', ['provider_session_id' => 'sess_unrelated']
+        );
+
+        $this->apiPost("/v2/webhooks/identity/{$slug}", [
+            'session_id' => 'sess_unrelated',
+            'result'     => 'passed',
+        ])->assertOk();
+
+        $badges = app(MemberVerificationBadgeService::class)->getUserBadges((int) $user->id);
+        $hasIdBadge = collect($badges)->contains(fn ($b) => ($b['badge_type'] ?? null) === 'id_verified');
+        $this->assertFalse($hasIdBadge, 'A genuinely different first name must NOT grant the badge');
+
+        $status = DB::table('identity_verification_sessions')->where('id', $sessionId)->value('status');
+        $this->assertSame('failed', $status, 'An unrelated first name is still a mismatch');
+    }
     private function makeFakeProvider(string $slug, array $verifiedOutputs): IdentityVerificationProviderInterface
     {
         return new class($slug, $verifiedOutputs) implements IdentityVerificationProviderInterface {
