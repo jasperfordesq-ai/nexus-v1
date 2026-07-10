@@ -94,24 +94,98 @@ class StripeDonationStateMachineTest extends TestCase
         $this->assertSame('completed', DB::table('vol_donations')->where('id', $donationId)->value('status'));
     }
 
-    public function test_partial_refund_is_ignored(): void
+    private function partialRefundCharge(string $pi, int $amount, int $amountRefunded): object
+    {
+        return (object) [
+            'payment_intent' => $pi,
+            'metadata' => (object) ['nexus_tenant_id' => (string) $this->testTenantId],
+            'amount' => $amount,
+            'amount_refunded' => $amountRefunded,
+            'currency' => 'eur',
+        ];
+    }
+
+    /**
+     * 2026-07-10 audit M1: partial refunds used to be ignored entirely — the
+     * donation stayed completed at its full amount and the giving day stayed
+     * overstated. The refunded slice must now be delta-applied, idempotently
+     * (Stripe reports amount_refunded cumulatively and redelivers events).
+     */
+    public function test_partial_refund_keeps_donation_completed_but_accounts_the_refunded_slice(): void
     {
         TenantContext::setById($this->testTenantId);
         $gd = $this->seedGivingDay(10.0);
         $donationId = $this->seedDonation('completed', $gd, 'pi_partial_1', 10.0);
 
-        // Charge of 1000 minor units, only 400 refunded.
-        $charge = (object) [
-            'payment_intent' => 'pi_partial_1',
-            'metadata' => (object) ['nexus_tenant_id' => (string) $this->testTenantId],
-            'amount' => 1000,
-            'amount_refunded' => 400,
-        ];
-        StripeDonationService::handleChargeRefunded($charge);
+        // First partial refund: 400 of 1000 minor units.
+        StripeDonationService::handleChargeRefunded($this->partialRefundCharge('pi_partial_1', 1000, 400));
 
-        // Not refunded; giving day total untouched.
-        $this->assertSame('completed', DB::table('vol_donations')->where('id', $donationId)->value('status'));
-        $this->assertEquals(10.0, (float) DB::table('vol_giving_days')->where('id', $gd)->value('raised_amount'));
+        $row = DB::table('vol_donations')->where('id', $donationId)->first();
+        $this->assertSame('completed', $row->status, 'partial refund must not flip status');
+        $this->assertEqualsWithDelta(4.0, (float) $row->amount_refunded, 0.001);
+        $this->assertEqualsWithDelta(6.0, (float) DB::table('vol_giving_days')->where('id', $gd)->value('raised_amount'), 0.001);
+
+        // Replayed delivery of the same cumulative total: no double decrement.
+        StripeDonationService::handleChargeRefunded($this->partialRefundCharge('pi_partial_1', 1000, 400));
+        $this->assertEqualsWithDelta(6.0, (float) DB::table('vol_giving_days')->where('id', $gd)->value('raised_amount'), 0.001);
+
+        // Second partial refund: cumulative 700 → only the 300 delta comes off.
+        StripeDonationService::handleChargeRefunded($this->partialRefundCharge('pi_partial_1', 1000, 700));
+        $row = DB::table('vol_donations')->where('id', $donationId)->first();
+        $this->assertSame('completed', $row->status);
+        $this->assertEqualsWithDelta(7.0, (float) $row->amount_refunded, 0.001);
+        $this->assertEqualsWithDelta(3.0, (float) DB::table('vol_giving_days')->where('id', $gd)->value('raised_amount'), 0.001);
+
+        // Final full refund: only the unaccounted remainder (3.00) comes off.
+        StripeDonationService::handleChargeRefunded($this->partialRefundCharge('pi_partial_1', 1000, 1000));
+        $row = DB::table('vol_donations')->where('id', $donationId)->first();
+        $this->assertSame('refunded', $row->status);
+        $this->assertEqualsWithDelta(10.0, (float) $row->amount_refunded, 0.001);
+        $this->assertEqualsWithDelta(0.0, (float) DB::table('vol_giving_days')->where('id', $gd)->value('raised_amount'), 0.001);
+    }
+
+    public function test_partial_refund_nets_the_gift_aid_export_and_overview(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $gd = $this->seedGivingDay(10.0);
+        $donationId = $this->seedDonation('completed', $gd, 'pi_partial_ga_1', 10.0);
+        DB::table('vol_donations')->where('id', $donationId)->update([
+            'gift_aid_claim_status' => 'ready',
+            'gift_aid_declaration_name' => 'Partial Refund Donor',
+            'currency' => 'GBP',
+        ]);
+
+        StripeDonationService::handleChargeRefunded($this->partialRefundCharge('pi_partial_ga_1', 1000, 400));
+
+        // Still claimable, but only for the retained 6.00 — never the full 10.00.
+        $rows = \App\Services\DonationOperationsService::giftAidExportRows($this->testTenantId);
+        $exported = collect($rows)->firstWhere('donation_id', $donationId);
+        $this->assertNotNull($exported, 'partially refunded ready row must still export its retained slice');
+        $this->assertSame('6.00', $exported['amount']);
+
+        // A fully refunded donation leaves the export via its status.
+        StripeDonationService::handleChargeRefunded($this->partialRefundCharge('pi_partial_ga_1', 1000, 1000));
+        $secondIds = array_column(\App\Services\DonationOperationsService::giftAidExportRows($this->testTenantId), 'donation_id');
+        $this->assertNotContains($donationId, $secondIds);
+    }
+
+    public function test_partial_refund_of_claimed_donation_is_flagged_for_hmrc_adjustment(): void
+    {
+        TenantContext::setById($this->testTenantId);
+        $gd = $this->seedGivingDay(10.0);
+        $donationId = $this->seedDonation('completed', $gd, 'pi_partial_claimed_1', 10.0);
+        DB::table('vol_donations')->where('id', $donationId)->update([
+            'gift_aid_claim_status' => 'claimed',
+            'gift_aid_claimed_at' => now(),
+            'currency' => 'GBP',
+        ]);
+
+        StripeDonationService::handleChargeRefunded($this->partialRefundCharge('pi_partial_claimed_1', 1000, 400));
+
+        $row = DB::table('vol_donations')->where('id', $donationId)->first();
+        $this->assertSame('completed', $row->status, 'partially refunded donation stays completed');
+        $this->assertSame('refund_after_claim', $row->gift_aid_claim_status);
+        $this->assertNotNull($row->gift_aid_claimed_at, 'claimed_at kept as evidence');
     }
 
     public function test_full_refund_of_pending_donation_does_not_go_negative(): void

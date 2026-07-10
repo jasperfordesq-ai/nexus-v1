@@ -76,7 +76,10 @@ class DonationOperationsService
                 'tenant_connect_count' => (int) $connect->count(),
             ],
             'gift_aid' => [
-                'ready_cents' => self::sumCents($giftAidReady),
+                // Net of partial refunds, matching giftAidExportRows(): only
+                // the retained slice of a partially refunded donation may be
+                // claimed with HMRC.
+                'ready_cents' => self::sumCents($giftAidReady, self::netAmountExpression()),
                 'ready_count' => (int) $giftAidReady->count(),
                 // Claimed donations refunded afterwards need an HMRC adjustment
                 // on the next claim — surface them so admins can act.
@@ -109,6 +112,27 @@ class DonationOperationsService
             return [];
         }
 
+        $hasRefunded = Schema::hasColumn('vol_donations', 'amount_refunded');
+
+        $columns = [
+            'id',
+            'donor_name',
+            'donor_email',
+            'amount',
+            'currency',
+            'gift_aid_declaration_name',
+            'gift_aid_address_line1',
+            'gift_aid_address_line2',
+            'gift_aid_town',
+            'gift_aid_postcode',
+            'gift_aid_country',
+            'gift_aid_consented_at',
+            'created_at',
+        ];
+        if ($hasRefunded) {
+            $columns[] = 'amount_refunded';
+        }
+
         return DB::table('vol_donations')
             ->where('tenant_id', $tenantId)
             ->where('status', 'completed')
@@ -119,26 +143,16 @@ class DonationOperationsService
             // StripeDonationService::normalizeGiftAidDeclaration() existed.
             ->whereRaw('UPPER(currency) = ?', ['GBP'])
             ->orderBy('created_at')
-            ->get([
-                'id',
-                'donor_name',
-                'donor_email',
-                'amount',
-                'currency',
-                'gift_aid_declaration_name',
-                'gift_aid_address_line1',
-                'gift_aid_address_line2',
-                'gift_aid_town',
-                'gift_aid_postcode',
-                'gift_aid_country',
-                'gift_aid_consented_at',
-                'created_at',
-            ])
+            ->get($columns)
+            // A partially refunded donation is only a gift for the RETAINED
+            // slice — HMRC may only be asked for Gift Aid on amount minus
+            // amount_refunded, and a fully netted-out row must not export.
+            ->filter(fn ($row): bool => self::netAmount($row) > 0)
             ->map(fn ($row): array => [
                 'donation_id' => (int) $row->id,
                 'donor_name' => (string) ($row->donor_name ?? ''),
                 'donor_email' => (string) ($row->donor_email ?? ''),
-                'amount' => number_format((float) $row->amount, 2, '.', ''),
+                'amount' => number_format(self::netAmount($row), 2, '.', ''),
                 'currency' => strtoupper((string) $row->currency),
                 'declaration_name' => (string) ($row->gift_aid_declaration_name ?? ''),
                 'address_line1' => (string) ($row->gift_aid_address_line1 ?? ''),
@@ -203,7 +217,7 @@ class DonationOperationsService
             'payment_method',
             'created_at',
         ];
-        foreach (['fund_code', 'payment_route', 'stripe_account_id', 'stripe_payment_intent_id', 'gift_aid_claim_status'] as $column) {
+        foreach (['fund_code', 'payment_route', 'stripe_account_id', 'stripe_payment_intent_id', 'gift_aid_claim_status', 'amount_refunded'] as $column) {
             if (Schema::hasColumn('vol_donations', $column)) {
                 $columns[] = $column;
             }
@@ -216,6 +230,7 @@ class DonationOperationsService
                 'donor_name' => (string) ($row->donor_name ?? ''),
                 'donor_email' => (string) ($row->donor_email ?? ''),
                 'amount' => number_format((float) $row->amount, 2, '.', ''),
+                'amount_refunded' => number_format((float) ($row->amount_refunded ?? 0), 2, '.', ''),
                 'currency' => strtoupper((string) $row->currency),
                 'status' => (string) $row->status,
                 'payment_method' => (string) ($row->payment_method ?? ''),
@@ -301,9 +316,28 @@ class DonationOperationsService
             ->all();
     }
 
-    private static function sumCents($query): int
+    private static function sumCents($query, ?string $rawExpression = null): int
     {
-        return (int) round(((float) $query->sum('amount')) * 100);
+        $column = $rawExpression !== null ? DB::raw($rawExpression) : 'amount';
+
+        return (int) round(((float) $query->sum($column)) * 100);
+    }
+
+    /**
+     * SQL expression for the claimable (retained) amount of a donation, or
+     * null to fall back to the plain amount column pre-migration.
+     */
+    private static function netAmountExpression(): ?string
+    {
+        return Schema::hasColumn('vol_donations', 'amount_refunded')
+            ? 'GREATEST(amount - amount_refunded, 0)'
+            : null;
+    }
+
+    /** Retained amount of a donation row: amount minus any partial refunds. */
+    private static function netAmount(object $row): float
+    {
+        return round((float) $row->amount - (float) ($row->amount_refunded ?? 0), 2);
     }
 
     /**

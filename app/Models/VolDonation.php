@@ -26,6 +26,7 @@ class VolDonation extends Model
         'giving_day_id',
         'fund_code',
         'amount',
+        'amount_refunded',
         'currency',
         'payment_method',
         'payment_reference',
@@ -53,6 +54,7 @@ class VolDonation extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'amount_refunded' => 'decimal:2',
         'is_anonymous' => 'boolean',
         'created_at' => 'datetime',
         'gift_aid_consented_at' => 'datetime',

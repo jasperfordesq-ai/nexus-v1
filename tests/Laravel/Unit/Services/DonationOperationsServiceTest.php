@@ -168,6 +168,43 @@ class DonationOperationsServiceTest extends TestCase
         $this->assertNull(DB::table('vol_donations')->where('id', $eurId)->value('gift_aid_claimed_at'));
     }
 
+    public function test_gift_aid_ready_totals_and_export_net_partial_refunds(): void
+    {
+        $tenantId = $this->operationsTenantId;
+
+        DB::table('vol_donations')->insert([
+            'tenant_id' => $tenantId,
+            'user_id' => 501,
+            'amount' => 20.00,
+            'amount_refunded' => 5.00,
+            'currency' => 'GBP',
+            'payment_method' => 'stripe',
+            'payment_reference' => '',
+            'payment_route' => 'platform_default',
+            'stripe_payment_intent_id' => 'pi_ga_partial_' . uniqid(),
+            'status' => 'completed',
+            'donor_name' => 'Partial Refund Donor',
+            'donor_email' => 'partial-refund@example.test',
+            'gift_aid_claim_status' => 'ready',
+            'gift_aid_declaration_name' => 'Partial Refund Donor',
+            'gift_aid_address_line1' => '1 Test Street',
+            'gift_aid_postcode' => 'SW1A 1AA',
+            'gift_aid_country' => 'GB',
+            'gift_aid_consented_at' => '2026-04-01 10:00:00',
+            'created_at' => '2026-04-05 12:00:00',
+        ]);
+
+        // Only the retained 15.00 may be claimed with HMRC (2026-07-10 audit M1);
+        // the overview must mirror what the export will emit.
+        $overview = DonationOperationsService::overview($tenantId);
+        $this->assertSame(1500, $overview['gift_aid']['ready_cents']);
+        $this->assertSame(1, $overview['gift_aid']['ready_count']);
+
+        $rows = DonationOperationsService::giftAidExportRows($tenantId);
+        $this->assertCount(1, $rows);
+        $this->assertSame('15.00', $rows[0]['amount']);
+    }
+
     public function test_record_stripe_dispute_is_tenant_scoped_and_idempotent(): void
     {
         $tenantId = $this->operationsTenantId;

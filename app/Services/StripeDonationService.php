@@ -15,6 +15,7 @@ use App\Models\VolGivingDay;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * StripeDonationService — Stripe payment processing for monetary donations.
@@ -59,6 +60,25 @@ class StripeDonationService
         }
 
         return (int) round($amount * 100);
+    }
+
+    /**
+     * Inverse of toStripeMinorUnits(): convert a Stripe smallest-unit integer
+     * back to the decimal amount stored on vol_donations.amount.
+     */
+    private static function fromStripeMinorUnits(int $minorUnits, string $currency): float
+    {
+        $currency = strtolower($currency);
+
+        if (in_array($currency, self::ZERO_DECIMAL_CURRENCIES, true)) {
+            return (float) $minorUnits;
+        }
+
+        if (in_array($currency, self::THREE_DECIMAL_CURRENCIES, true)) {
+            return $minorUnits / 1000;
+        }
+
+        return $minorUnits / 100;
     }
 
     /**
@@ -633,18 +653,28 @@ class StripeDonationService
             return;
         }
 
-        // charge.refunded also fires for PARTIAL refunds. Only treat the
-        // donation as refunded when Stripe reports the full charge refunded —
-        // a partial refund must not drop it out of completed/gift-aid reporting
-        // or decrement the giving day by the full amount.
+        // charge.refunded also fires for PARTIAL refunds. A partial refund must
+        // not flip the donation to refunded (it is still partly a live gift),
+        // but the refunded slice has to leave the money reporting: the giving
+        // day total is decremented by the delta and the Gift Aid layer claims
+        // only the retained amount (2026-07-10 audit M1 — over-claim risk).
         $amountRefunded = (int) ($charge->amount_refunded ?? 0);
         $chargeAmount = (int) ($charge->amount ?? 0);
-        if ($chargeAmount <= 0 || $amountRefunded < $chargeAmount) {
-            Log::info('Stripe donation: partial refund ignored (not fully refunded)', [
+        if ($chargeAmount <= 0 || $amountRefunded <= 0) {
+            Log::warning('Stripe donation: charge.refunded with no usable amounts', [
                 'donation_id' => $donation->id,
                 'amount_refunded' => $amountRefunded,
                 'charge_amount' => $chargeAmount,
             ]);
+            return;
+        }
+
+        if ($amountRefunded < $chargeAmount) {
+            $currency = strtolower((string) ($charge->currency ?? $donation->currency ?? ''));
+            self::applyPartialDonationRefund(
+                $donation,
+                self::fromStripeMinorUnits($amountRefunded, $currency)
+            );
             return;
         }
 
@@ -684,6 +714,9 @@ class StripeDonationService
             $wasCompleted = $locked->status === 'completed';
 
             $update = ['status' => 'refunded'];
+            if (property_exists($locked, 'amount_refunded')) {
+                $update['amount_refunded'] = (float) $locked->amount;
+            }
             // A declaration already submitted to HMRC needs an adjustment on the
             // next claim — flag it (keeping gift_aid_claimed_at as evidence).
             if (($locked->gift_aid_claim_status ?? null) === 'claimed') {
@@ -696,11 +729,85 @@ class StripeDonationService
                 ->update($update);
 
             if ($wasCompleted && !empty($locked->giving_day_id)) {
+                // A prior PARTIAL refund already took its slice out of the
+                // giving day — only the still-unaccounted remainder comes off
+                // now, or the two paths together would over-decrement.
+                $alreadyRefunded = (float) ($locked->amount_refunded ?? 0);
+                $remainder = round((float) $locked->amount - $alreadyRefunded, 2);
+                if ($remainder > 0) {
+                    DB::table('vol_giving_days')
+                        ->where('id', $locked->giving_day_id)
+                        ->where('tenant_id', $donation->tenant_id)
+                        ->decrement('raised_amount', $remainder);
+                }
+            }
+        });
+    }
+
+    /**
+     * Idempotently record a PARTIAL refund. Stripe's charge.amount_refunded is
+     * cumulative across all refunds of a charge, so each webhook delivery is
+     * delta-applied under a row lock: replays and repeated partial refunds
+     * decrement the giving day exactly once per refunded slice. The donation
+     * deliberately stays `completed` — only the refunded portion leaves the
+     * reporting (Gift Aid nets amount_refunded out at the export layer).
+     *
+     * @param object $donation       Pre-read vol_donations row
+     * @param float  $refundedTotal  Cumulative refunded amount in donation currency
+     */
+    private static function applyPartialDonationRefund(object $donation, float $refundedTotal): void
+    {
+        if (!Schema::hasColumn('vol_donations', 'amount_refunded')) {
+            Log::warning('Stripe donation: partial refund received but vol_donations.amount_refunded is missing — run migrations; reporting stays overstated', [
+                'donation_id' => $donation->id,
+            ]);
+            return;
+        }
+
+        DB::transaction(function () use ($donation, $refundedTotal) {
+            $locked = DB::table('vol_donations')
+                ->where('id', $donation->id)
+                ->where('tenant_id', $donation->tenant_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$locked || $locked->status === 'refunded') {
+                return;
+            }
+
+            $newTotal = min(round($refundedTotal, 2), (float) $locked->amount);
+            $delta = round($newTotal - (float) ($locked->amount_refunded ?? 0), 2);
+            if ($delta <= 0) {
+                return;
+            }
+
+            $update = ['amount_refunded' => $newTotal];
+            // Already submitted to HMRC → the next claim needs an adjustment,
+            // exactly as for full refunds. A still-'ready' row stays ready: the
+            // export claims amount − amount_refunded, so it can never over-claim.
+            if (($locked->gift_aid_claim_status ?? null) === 'claimed') {
+                $update['gift_aid_claim_status'] = 'refund_after_claim';
+            }
+
+            DB::table('vol_donations')
+                ->where('id', $donation->id)
+                ->where('tenant_id', $donation->tenant_id)
+                ->update($update);
+
+            // Only a completed donation ever incremented the giving day, so only
+            // then is there anything to take back out.
+            if ($locked->status === 'completed' && !empty($locked->giving_day_id)) {
                 DB::table('vol_giving_days')
                     ->where('id', $locked->giving_day_id)
                     ->where('tenant_id', $donation->tenant_id)
-                    ->decrement('raised_amount', (float) $locked->amount);
+                    ->decrement('raised_amount', $delta);
             }
+
+            Log::info('Stripe donation: partial refund recorded', [
+                'donation_id' => $donation->id,
+                'amount_refunded_total' => $newTotal,
+                'delta' => $delta,
+            ]);
         });
     }
 
