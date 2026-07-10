@@ -204,12 +204,17 @@
                     @foreach ($feedItems as $item)
                         @php
                             $itemType = $item['type'] ?? 'post';
+                            $itemId = (int) ($item['id'] ?? 0);
                             $itemTitle = $item['title'] ?? $feedItemTypeLabel($itemType);
                             $authorName = $item['author']['name'] ?? $item['author_name'] ?? __('govuk_alpha.feed.unknown_author');
+                            // Posts have a permalink page; other feed item types fall back to the feed index.
+                            $itemHref = ($itemType === 'post' && $itemId > 0)
+                                ? route('govuk-alpha.feed.posts.show', ['tenantSlug' => $tenantSlug, 'id' => $itemId])
+                                : route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]);
                         @endphp
                         <article class="nexus-alpha-card">
                             <strong class="govuk-tag govuk-tag--grey">{{ $feedItemTypeLabel($itemType) }}</strong>
-                            <h3 class="govuk-heading-m govuk-!-margin-top-2 govuk-!-margin-bottom-2"><a class="govuk-link" href="{{ route('govuk-alpha.feed', ['tenantSlug' => $tenantSlug]) }}">{{ $itemTitle }}</a></h3>
+                            <h3 class="govuk-heading-m govuk-!-margin-top-2 govuk-!-margin-bottom-2"><a class="govuk-link" href="{{ $itemHref }}">{{ $itemTitle }}</a></h3>
                             <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">
                                 @if (!empty($item['author']['avatar_url']))
                                     <img class="nexus-alpha-avatar nexus-alpha-avatar--small" src="{{ $item['author']['avatar_url'] }}" alt="" loading="lazy" decoding="async" width="32" height="32">

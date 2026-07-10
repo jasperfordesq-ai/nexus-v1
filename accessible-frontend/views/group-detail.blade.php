@@ -23,6 +23,8 @@
         $pinnedAnnouncements = $pinnedAnnouncements ?? [];
     @endphp
 
+    <a class="govuk-back-link" href="{{ route('govuk-alpha.groups.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_groups') }}</a>
+
     {{-- GOV.UK pattern: h1 (caption + heading) BEFORE notification banners --}}
     <span class="govuk-caption-xl">{{ __('govuk_alpha.groups.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <div class="nexus-alpha-module-row">

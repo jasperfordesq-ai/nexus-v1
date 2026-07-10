@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <div class="govuk-button-group">
-                    <a class="govuk-link" href="{{ request()->getRequestUri() }}" role="button">{{ __('govuk_alpha.cookie_banner.hide') }}</a>
+                    <a class="govuk-link" href="{{ request()->getRequestUri() }}">{{ __('govuk_alpha.cookie_banner.hide') }}</a>
                 </div>
             </div>
         @else

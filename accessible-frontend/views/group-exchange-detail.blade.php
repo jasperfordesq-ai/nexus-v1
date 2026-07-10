@@ -26,6 +26,8 @@
             : (float) ($p['hours'] ?? 0);
     @endphp
 
+    <a class="govuk-back-link" href="{{ route('govuk-alpha.group-exchanges.index', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.actions.back_to_exchanges') }}</a>
+
     <span class="govuk-caption-xl" id="group-exchange-top">{{ __('govuk_alpha.group_exchanges.caption', ['community' => $tenant['name'] ?? $tenantSlug]) }}</span>
     <div class="nexus-alpha-module-row">
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ ($exchange['title'] ?? '') ?: __('govuk_alpha.group_exchanges.title') }}</h1>

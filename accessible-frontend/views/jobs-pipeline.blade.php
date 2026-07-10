@@ -27,7 +27,7 @@
 
     <span class="govuk-caption-xl">{{ $jobTitle }}</span>
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha_jobs.pipeline.title') }}</h1>
-    <p class="govuk-body-l">{!! __('govuk_alpha_jobs.pipeline.description') !!}</p>
+    <p class="govuk-body-l">{{ __('govuk_alpha_jobs.pipeline.description') }}</p>
 
     @if (($status ?? null) === 'status-updated')
         <div class="govuk-notification-banner govuk-notification-banner--success" data-module="govuk-notification-banner" role="alert" aria-labelledby="pl-status">

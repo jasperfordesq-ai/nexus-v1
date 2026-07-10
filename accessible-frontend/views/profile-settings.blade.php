@@ -487,11 +487,25 @@
                                 </div>
                                 <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.passkeys.rename_submit') }}</button>
                             </form>
-                            <form method="post" action="{{ route('govuk-alpha.profile.passkeys.remove', ['tenantSlug' => $tenantSlug]) }}">
-                                @csrf
-                                <input type="hidden" name="credential_id" value="{{ $pk['credential_id'] ?? '' }}">
-                                <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.passkeys.remove_submit') }}<span class="govuk-visually-hidden"> {{ $pkName }}</span></button>
-                            </form>
+                            <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
+                                <summary class="govuk-details__summary">
+                                    <span class="govuk-details__summary-text">{{ __('govuk_alpha.profile_settings.passkeys.remove_submit') }}<span class="govuk-visually-hidden"> {{ $pkName }}</span></span>
+                                </summary>
+                                <div class="govuk-details__text">
+                                    <div class="govuk-warning-text">
+                                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                        <strong class="govuk-warning-text__text">
+                                            <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning_prefix') }}</span>
+                                            {{ __('govuk_alpha.ux.confirm_irreversible') }}
+                                        </strong>
+                                    </div>
+                                    <form method="post" action="{{ route('govuk-alpha.profile.passkeys.remove', ['tenantSlug' => $tenantSlug]) }}">
+                                        @csrf
+                                        <input type="hidden" name="credential_id" value="{{ $pk['credential_id'] ?? '' }}">
+                                        <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.profile_settings.passkeys.remove_submit') }}<span class="govuk-visually-hidden"> {{ $pkName }}</span></button>
+                                    </form>
+                                </div>
+                            </details>
                         </div>
                     @endforeach
                 @endif
@@ -523,9 +537,12 @@
                             @foreach ($sessions as $sessionRow)
                                 @php
                                     $ua = (string) ($sessionRow['user_agent'] ?? '');
-                                    $deviceLabel = trim((string) ($sessionRow['device_type'] ?? '')) !== '' && ($sessionRow['device_type'] ?? '') !== 'unknown'
-                                        ? \Illuminate\Support\Str::headline((string) $sessionRow['device_type'])
-                                        : __('govuk_alpha.profile_settings.sessions.unknown_device');
+                                    $deviceLabel = match (strtolower(trim((string) ($sessionRow['device_type'] ?? '')))) {
+                                        'web' => __('govuk_alpha.ux.device_web'),
+                                        'mobile' => __('govuk_alpha.ux.device_mobile'),
+                                        'pwa' => __('govuk_alpha.ux.device_pwa'),
+                                        default => __('govuk_alpha.ux.device_unknown'),
+                                    };
                                     $lastActive = !empty($sessionRow['last_active']) || !empty($sessionRow['last_activity'])
                                         ? \Illuminate\Support\Carbon::parse($sessionRow['last_active'] ?? $sessionRow['last_activity'])->translatedFormat('j F Y, g:ia')
                                         : null;

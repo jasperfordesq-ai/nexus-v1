@@ -7041,6 +7041,7 @@ class AlphaController extends Controller
             'activeNav' => 'explore',
             'tiers' => $tiers,
             'currentTier' => is_array($currentTier) ? $currentTier : null,
+            'currency' => \App\Core\TenantContext::getCurrency(),
             'status' => self::asStr($request->query('status')) ?: null,
         ]);
     }

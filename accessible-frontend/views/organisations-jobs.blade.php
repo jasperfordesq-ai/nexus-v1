@@ -13,7 +13,8 @@
         $jobs = isset($orgJobs) && is_array($orgJobs) ? $orgJobs : [];
 
         // Schema.org Organization JSON-LD (parity with the React detail page Helmet).
-        // Built from already-escaped scalar fields; emitted via e()-escaped JSON.
+        // Emitted as raw JSON with JSON_HEX_TAG/AMP/APOS/QUOT so it stays valid
+        // JSON for crawlers while preventing </script> breakout.
         $oDesc = trim((string) ($org['description'] ?? ''));
         $oWebsite = trim((string) ($org['website'] ?? ''));
         $oEmail = trim((string) ($org['email'] ?? ($org['contact_email'] ?? '')));
@@ -44,7 +45,7 @@
     @endphp
 
     @push('alpha_head')
-        <script type="application/ld+json">{!! e(json_encode($ld, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)) !!}</script>
+        <script type="application/ld+json">{!! json_encode($ld, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}</script>
     @endpush
 
     @if ($orgId > 0)

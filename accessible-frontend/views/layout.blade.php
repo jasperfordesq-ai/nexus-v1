@@ -82,9 +82,11 @@
 
     <header class="nexus-alpha-header" role="banner">
         <div class="govuk-width-container nexus-alpha-header__container">
-            @php($brandText = !empty($tenantSlug) ? ($tenant['name'] ?? $tenantSlug) : __('govuk_alpha.service_name'))
-            {{-- Header is always dark, so prefer the dark-background logo variant. --}}
-            @php($brandLogo = ($tenantLogoDarkUrl ?? null) ?: ($tenantLogoUrl ?? null))
+            @php
+                $brandText = !empty($tenantSlug) ? ($tenant['name'] ?? $tenantSlug) : __('govuk_alpha.service_name');
+                // Header is always dark, so prefer the dark-background logo variant.
+                $brandLogo = ($tenantLogoDarkUrl ?? null) ?: ($tenantLogoUrl ?? null);
+            @endphp
             <a class="nexus-alpha-header__brand govuk-!-font-size-24" href="{{ $tenantSlug ? route('govuk-alpha.home', ['tenantSlug' => $tenantSlug]) : route('govuk-alpha.tenant-chooser') }}">
                 @if (!empty($brandLogo))
                     {{-- No fixed width/height: logos vary per tenant; CSS (.nexus-alpha-header__logo--*) drives the height by shape. A hardcoded height defeats that sizing. --}}

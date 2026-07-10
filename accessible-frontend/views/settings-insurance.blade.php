@@ -97,7 +97,9 @@
 
                 <form method="post" action="{{ route('govuk-alpha.settings.insurance.upload', ['tenantSlug' => $tenantSlug]) }}" enctype="multipart/form-data" novalidate>
                     @csrf
-                    @php($typeError = ($errorAnchors[$status ?? ''] ?? null) === 'insurance_type')
+                    @php
+                        $typeError = ($errorAnchors[$status ?? ''] ?? null) === 'insurance_type';
+                    @endphp
                     <div class="govuk-form-group {{ $typeError ? 'govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="insurance_type">{{ __('govuk_alpha_settings.insurance.type_label') }}</label>
                         @if ($typeError)
@@ -129,7 +131,9 @@
                         <input class="govuk-input govuk-input--width-10" id="expiry_date" name="expiry_date" type="date" aria-describedby="expiry-date-hint">
                     </div>
 
-                    @php($fileError = ($errorAnchors[$status ?? ''] ?? null) === 'certificate_file')
+                    @php
+                        $fileError = ($errorAnchors[$status ?? ''] ?? null) === 'certificate_file';
+                    @endphp
                     <div class="govuk-form-group {{ $fileError ? 'govuk-form-group--error' : '' }}">
                         <label class="govuk-label" for="certificate_file">{{ __('govuk_alpha_settings.insurance.file_label') }}</label>
                         <div id="certificate-file-hint" class="govuk-hint">{{ __('govuk_alpha_settings.insurance.file_hint') }}</div>

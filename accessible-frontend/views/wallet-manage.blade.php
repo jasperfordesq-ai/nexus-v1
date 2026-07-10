@@ -178,6 +178,14 @@
                                 <div id="note-hint-{{ $recipient['id'] }}" class="govuk-hint">{{ __('govuk_alpha_wallet.transfer.note_hint') }}</div>
                                 <input class="govuk-input" id="note-{{ $recipient['id'] }}" name="note" type="text" maxlength="255" aria-describedby="note-hint-{{ $recipient['id'] }}">
                             </div>
+                            <div class="govuk-form-group govuk-!-margin-bottom-3">
+                                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="confirm-{{ $recipient['id'] }}" name="confirm" type="checkbox" value="1" required>
+                                        <label class="govuk-label govuk-checkboxes__label" for="confirm-{{ $recipient['id'] }}">{{ __('govuk_alpha.ux.transfer_confirm_label') }}</label>
+                                    </div>
+                                </div>
+                            </div>
                             <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_wallet.transfer.send_button', ['name' => $recipientName]) }}</button>
                         </form>
                     </div>

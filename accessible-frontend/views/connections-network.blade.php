@@ -151,10 +151,24 @@
                                 <a class="govuk-button govuk-button--secondary" data-module="govuk-button" role="button" draggable="false" href="{{ route('govuk-alpha.messages.new', ['tenantSlug' => $tenantSlug, 'userId' => $p['id']]) }}">{{ __('govuk_alpha_connections.network.message') }}</a>
                                 <a class="govuk-link govuk-link--no-visited-state" href="{{ route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $p['id']]) }}">{{ __('govuk_alpha_connections.network.view_profile') }}</a>
                             @endif
-                            <form method="post" action="{{ route('govuk-alpha.connections.remove', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}">
-                                @csrf
-                                <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('govuk_alpha_connections.network.disconnect') }}</button>
-                            </form>
+                            <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
+                                <summary class="govuk-details__summary">
+                                    <span class="govuk-details__summary-text">{{ __('govuk_alpha_connections.network.disconnect') }}</span>
+                                </summary>
+                                <div class="govuk-details__text">
+                                    <div class="govuk-warning-text">
+                                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                        <strong class="govuk-warning-text__text">
+                                            <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning_prefix') }}</span>
+                                            {{ __('govuk_alpha.ux.confirm_irreversible') }}
+                                        </strong>
+                                    </div>
+                                    <form method="post" action="{{ route('govuk-alpha.connections.remove', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}">
+                                        @csrf
+                                        <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_connections.network.disconnect') }}</button>
+                                    </form>
+                                </div>
+                            </details>
                         </div>
                     </article>
                 @endforeach
@@ -250,10 +264,24 @@
                             @if (!empty($p['id']))
                                 <a class="govuk-link govuk-link--no-visited-state" href="{{ route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $p['id']]) }}">{{ __('govuk_alpha_connections.network.view_profile') }}</a>
                             @endif
-                            <form method="post" action="{{ route('govuk-alpha.connections.remove', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}">
-                                @csrf
-                                <button class="govuk-button govuk-button--secondary" data-module="govuk-button">{{ __('govuk_alpha_connections.network.cancel_request') }}</button>
-                            </form>
+                            <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
+                                <summary class="govuk-details__summary">
+                                    <span class="govuk-details__summary-text">{{ __('govuk_alpha_connections.network.cancel_request') }}</span>
+                                </summary>
+                                <div class="govuk-details__text">
+                                    <div class="govuk-warning-text">
+                                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                        <strong class="govuk-warning-text__text">
+                                            <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning_prefix') }}</span>
+                                            {{ __('govuk_alpha.ux.confirm_irreversible') }}
+                                        </strong>
+                                    </div>
+                                    <form method="post" action="{{ route('govuk-alpha.connections.remove', ['tenantSlug' => $tenantSlug, 'id' => $cid]) }}">
+                                        @csrf
+                                        <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_connections.network.cancel_request') }}</button>
+                                    </form>
+                                </div>
+                            </details>
                         </div>
                     </article>
                 @endforeach

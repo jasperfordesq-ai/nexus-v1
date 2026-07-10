@@ -93,9 +93,12 @@
 
             <form method="post" action="{{ route('govuk-alpha.login.store', ['tenantSlug' => $tenantSlug]) }}" novalidate>
                 @csrf
-                <div class="govuk-form-group">
+                <div class="govuk-form-group{{ ($status ?? '') === 'login-failed' ? ' govuk-form-group--error' : '' }}">
                     <label class="govuk-label" for="email">{{ __('govuk_alpha.auth.email_label') }}</label>
-                    <input class="govuk-input" id="email" name="email" type="email" autocomplete="email" value="{{ old('email') }}" required>
+                    @if (($status ?? '') === 'login-failed')
+                        <p class="govuk-error-message" id="email-error"><span class="govuk-visually-hidden">{{ __('govuk_alpha.states.error_title') }}:</span> {{ $loginErrorMessage ?? __('govuk_alpha.auth.login_failed') }}</p>
+                    @endif
+                    <input class="govuk-input{{ ($status ?? '') === 'login-failed' ? ' govuk-input--error' : '' }}" id="email" name="email" type="email" autocomplete="email" value="{{ old('email') }}" @if (($status ?? '') === 'login-failed') aria-describedby="email-error" @endif required>
                 </div>
 
                 <div class="govuk-form-group">

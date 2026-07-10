@@ -88,6 +88,7 @@
         <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha_groups.invite.pending_empty') }}</p></div>
     @else
         <table class="govuk-table">
+            <caption class="govuk-table__caption govuk-table__caption--s govuk-visually-hidden">{{ __('govuk_alpha_groups.invite.pending_heading') }}</caption>
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header">{{ __('govuk_alpha_groups.invite.pending_email') }}</th>

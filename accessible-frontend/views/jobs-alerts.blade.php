@@ -140,10 +140,24 @@
                                 <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.jobs_t4.resume_button') }}</button>
                             </form>
                         @endif
-                        <form method="post" action="{{ route('govuk-alpha.jobs.alerts.delete', ['tenantSlug' => $tenantSlug, 'alertId' => $aId]) }}" class="nexus-alpha-linkform" onsubmit="return confirm('{{ __('govuk_alpha.jobs_t4.delete_confirm') }}');">
-                            @csrf
-                            <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.jobs_t4.delete_button') }}</button>
-                        </form>
+                        <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
+                            <summary class="govuk-details__summary">
+                                <span class="govuk-details__summary-text">{{ __('govuk_alpha.jobs_t4.delete_button') }}</span>
+                            </summary>
+                            <div class="govuk-details__text">
+                                <div class="govuk-warning-text">
+                                    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                    <strong class="govuk-warning-text__text">
+                                        <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning_prefix') }}</span>
+                                        {{ __('govuk_alpha.jobs_t4.delete_confirm') }}
+                                    </strong>
+                                </div>
+                                <form method="post" action="{{ route('govuk-alpha.jobs.alerts.delete', ['tenantSlug' => $tenantSlug, 'alertId' => $aId]) }}" class="nexus-alpha-linkform">
+                                    @csrf
+                                    <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.ux.confirm_delete_button') }}</button>
+                                </form>
+                            </div>
+                        </details>
                     </div>
                 </article>
             @endforeach

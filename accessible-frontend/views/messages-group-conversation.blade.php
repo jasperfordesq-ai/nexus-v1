@@ -74,10 +74,24 @@
                     <strong class="govuk-tag govuk-tag--turquoise">{{ __('govuk_alpha_messages.conversation.online_badge') }}</strong>
                 @endif
                 @if ($isAdmin && !$pIsYou)
-                    <form method="post" action="{{ route('govuk-alpha.messages.groups.members.remove', ['tenantSlug' => $tenantSlug, 'conversationId' => $conversationId, 'targetUserId' => $pId]) }}" style="display:inline">
-                        @csrf
-                        <button type="submit" class="govuk-link" style="background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;color:#d4351c">{{ __('govuk_alpha_messages.manage.remove_button') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha_messages.manage.remove_hidden', ['name' => $pName]) }}</span></button>
-                    </form>
+                    <details class="govuk-details govuk-!-margin-bottom-0" data-module="govuk-details">
+                        <summary class="govuk-details__summary">
+                            <span class="govuk-details__summary-text">{{ __('govuk_alpha_messages.manage.remove_button') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha_messages.manage.remove_hidden', ['name' => $pName]) }}</span></span>
+                        </summary>
+                        <div class="govuk-details__text">
+                            <div class="govuk-warning-text">
+                                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                <strong class="govuk-warning-text__text">
+                                    <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning_prefix') }}</span>
+                                    {{ __('govuk_alpha.ux.confirm_irreversible') }}
+                                </strong>
+                            </div>
+                            <form method="post" action="{{ route('govuk-alpha.messages.groups.members.remove', ['tenantSlug' => $tenantSlug, 'conversationId' => $conversationId, 'targetUserId' => $pId]) }}">
+                                @csrf
+                                <button type="submit" class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha_messages.manage.remove_button') }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha_messages.manage.remove_hidden', ['name' => $pName]) }}</span></button>
+                            </form>
+                        </div>
+                    </details>
                 @endif
             </li>
         @endforeach

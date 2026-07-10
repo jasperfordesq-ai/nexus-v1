@@ -20,7 +20,7 @@
 
     @if ($status === 'enrolled')
         <div class="govuk-panel govuk-panel--confirmation govuk-!-margin-bottom-6">
-            <h1 class="govuk-panel__title">{{ __('govuk_alpha.states.success_title') }}</h1>
+            <h2 class="govuk-panel__title">{{ __('govuk_alpha.states.success_title') }}</h2>
             <div class="govuk-panel__body">{{ __('govuk_alpha.courses.states.enrolled') }}</div>
         </div>
     @elseif ($status === 'review-saved')

@@ -317,7 +317,7 @@
                 <div class="govuk-radios" data-module="govuk-radios">
                     @foreach (['going', 'interested', 'not_going'] as $rsvpStatus)
                         <div class="govuk-radios__item">
-                            <input class="govuk-radios__input" id="status-{{ $rsvpStatus }}" name="status" type="radio" value="{{ $rsvpStatus }}" @checked(($currentRsvp ?? 'going') === $rsvpStatus)>
+                            <input class="govuk-radios__input" id="status-{{ $rsvpStatus }}" name="status" type="radio" value="{{ $rsvpStatus }}" required @checked(($currentRsvp ?? null) === $rsvpStatus)>
                             <label class="govuk-label govuk-radios__label" for="status-{{ $rsvpStatus }}">{{ __('govuk_alpha.events.rsvp_status.' . $rsvpStatus) }}</label>
                         </div>
                     @endforeach
@@ -386,6 +386,7 @@
                             @foreach ($options as $opt)
                                 @php
                                     $pct = (float) ($opt['percentage'] ?? 0);
+                                    $pctRounded = max(0, min(100, (int) round($pct)));
                                     $cnt = (int) ($opt['vote_count'] ?? 0);
                                     $isMine = $votedOptionId !== null && (int) ($opt['id'] ?? 0) === (int) $votedOptionId;
                                     $isLeading = $totalVotes > 0 && $cnt === $maxVotes;
@@ -397,8 +398,8 @@
                                         @if ($isLeading)<strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.events.poll_leading') }}</strong>@endif
                                         @if ($isMine)<strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.events.poll_your_choice') }}</strong>@endif
                                     </p>
-                                    <progress max="100" value="{{ $pct }}" aria-label="{{ $optLabel }}: {{ $pct }}%">{{ $pct }}%</progress>
-                                    <span class="govuk-body-s">{{ $pct }}% — {{ trans_choice('govuk_alpha.events.poll_per_option_votes', $cnt, ['count' => $cnt]) }}</span>
+                                    <progress max="100" value="{{ $pct }}" aria-label="{{ $optLabel }}: {{ $pctRounded }}%">{{ $pctRounded }}%</progress>
+                                    <span class="govuk-body-s">{{ $pctRounded }}% — {{ trans_choice('govuk_alpha.events.poll_per_option_votes', $cnt, ['count' => $cnt]) }}</span>
                                 </div>
                             @endforeach
                         @else
@@ -461,37 +462,33 @@
             <section class="govuk-!-margin-bottom-6" aria-labelledby="checkin-heading">
                 <h3 class="govuk-heading-m" id="checkin-heading">{{ __('govuk_alpha.events.polish_events.checkin_heading') }}</h3>
                 <p class="govuk-body">{{ __('govuk_alpha.events.polish_events.checkin_intro') }}</p>
-                @if (empty($attendees))
-                    <p class="govuk-body">{{ __('govuk_alpha.events.polish_events.checkin_empty') }}</p>
-                @else
-                    <dl class="govuk-summary-list">
-                        @foreach ($attendees as $attendee)
-                            @php
-                                $attendeeName = trim((string) ($attendee['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
-                                $attendeeId = (int) ($attendee['id'] ?? $attendee['user_id'] ?? 0);
-                                $isAttended = ($attendee['rsvp_status'] ?? '') === 'attended';
-                            @endphp
-                            <div class="govuk-summary-list__row">
-                                <dt class="govuk-summary-list__key">{{ $attendeeName }}</dt>
-                                <dd class="govuk-summary-list__value">
-                                    @if ($isAttended)
-                                        <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.events.polish_events.checkin_done_tag') }}</strong>
-                                    @else
-                                        <strong class="govuk-tag govuk-tag--grey">{{ __('govuk_alpha.events.rsvp_status.going') }}</strong>
-                                    @endif
-                                </dd>
-                                <dd class="govuk-summary-list__actions">
-                                    @unless($isAttended)
-                                        <form method="post" action="{{ route('govuk-alpha.events.checkin', ['tenantSlug' => $tenantSlug, 'id' => $event['id'], 'attendeeId' => $attendeeId]) }}">
-                                            @csrf
-                                            <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.polish_events.checkin_button') }}</button>
-                                        </form>
-                                    @endunless
-                                </dd>
-                            </div>
-                        @endforeach
-                    </dl>
-                @endif
+                <dl class="govuk-summary-list">
+                    @foreach ($attendees as $attendee)
+                        @php
+                            $attendeeName = trim((string) ($attendee['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
+                            $attendeeId = (int) ($attendee['id'] ?? $attendee['user_id'] ?? 0);
+                            $isAttended = ($attendee['rsvp_status'] ?? '') === 'attended';
+                        @endphp
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">{{ $attendeeName }}</dt>
+                            <dd class="govuk-summary-list__value">
+                                @if ($isAttended)
+                                    <strong class="govuk-tag govuk-tag--green">{{ __('govuk_alpha.events.polish_events.checkin_done_tag') }}</strong>
+                                @else
+                                    <strong class="govuk-tag govuk-tag--grey">{{ __('govuk_alpha.events.rsvp_status.going') }}</strong>
+                                @endif
+                            </dd>
+                            <dd class="govuk-summary-list__actions">
+                                @unless($isAttended)
+                                    <form method="post" action="{{ route('govuk-alpha.events.checkin', ['tenantSlug' => $tenantSlug, 'id' => $event['id'], 'attendeeId' => $attendeeId]) }}">
+                                        @csrf
+                                        <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.events.polish_events.checkin_button') }}</button>
+                                    </form>
+                                @endunless
+                            </dd>
+                        </div>
+                    @endforeach
+                </dl>
             </section>
         @endif
 

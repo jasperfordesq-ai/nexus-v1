@@ -215,12 +215,12 @@
                                         <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha.messages.delete_legend') }}</legend>
                                         <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
                                             <div class="govuk-radios__item">
-                                                <input class="govuk-radios__input" id="delete-self-{{ $messageId }}" name="scope" type="radio" value="self" aria-describedby="delete-self-hint-{{ $messageId }}">
+                                                <input class="govuk-radios__input" id="delete-self-{{ $messageId }}" name="scope" type="radio" value="self" checked aria-describedby="delete-self-hint-{{ $messageId }}">
                                                 <label class="govuk-label govuk-radios__label" for="delete-self-{{ $messageId }}">{{ __('govuk_alpha.messages.delete_scope_self') }}</label>
                                                 <div id="delete-self-hint-{{ $messageId }}" class="govuk-hint govuk-radios__hint">{{ __('govuk_alpha.messages.delete_scope_self_hint') }}</div>
                                             </div>
                                             <div class="govuk-radios__item">
-                                                <input class="govuk-radios__input" id="delete-everyone-{{ $messageId }}" name="scope" type="radio" value="everyone" checked aria-describedby="delete-everyone-hint-{{ $messageId }}">
+                                                <input class="govuk-radios__input" id="delete-everyone-{{ $messageId }}" name="scope" type="radio" value="everyone" aria-describedby="delete-everyone-hint-{{ $messageId }}">
                                                 <label class="govuk-label govuk-radios__label" for="delete-everyone-{{ $messageId }}">{{ __('govuk_alpha.messages.delete_scope_everyone') }}</label>
                                                 <div id="delete-everyone-hint-{{ $messageId }}" class="govuk-hint govuk-radios__hint">{{ __('govuk_alpha.messages.delete_scope_everyone_hint') }}</div>
                                             </div>

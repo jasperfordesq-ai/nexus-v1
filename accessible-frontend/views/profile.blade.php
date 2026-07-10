@@ -197,7 +197,7 @@
                                     <div class="govuk-radios govuk-radios--inline govuk-radios--small" data-module="govuk-radios">
                                         @for ($star = 5; $star >= 1; $star--)
                                             <div class="govuk-radios__item">
-                                                <input class="govuk-radios__input" id="profile-rating-{{ $memberId }}-{{ $star }}" name="rating" type="radio" value="{{ $star }}" @if ($star === 5) checked @endif>
+                                                <input class="govuk-radios__input" id="profile-rating-{{ $memberId }}-{{ $star }}" name="rating" type="radio" value="{{ $star }}" required>
                                                 <label class="govuk-label govuk-radios__label" for="profile-rating-{{ $memberId }}-{{ $star }}">
                                                     {{ $star }}<span class="govuk-visually-hidden"> {{ __('govuk_alpha.polish_members.write_review_rating_label', ['n' => $star]) }}</span>
                                                 </label>
@@ -238,6 +238,14 @@
                                     <label class="govuk-label govuk-label--s" for="profile-transfer-note-{{ $memberId }}">{{ __('govuk_alpha.polish_members.send_credits_note_label') }}</label>
                                     <div id="profile-transfer-note-hint-{{ $memberId }}" class="govuk-hint">{{ __('govuk_alpha.polish_members.send_credits_note_hint') }}</div>
                                     <input class="govuk-input" type="text" id="profile-transfer-note-{{ $memberId }}" name="note" maxlength="255" aria-describedby="profile-transfer-note-hint-{{ $memberId }}">
+                                </div>
+                                <div class="govuk-form-group govuk-!-margin-bottom-3">
+                                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                        <div class="govuk-checkboxes__item">
+                                            <input class="govuk-checkboxes__input" id="confirm-{{ $memberId }}" name="confirm" type="checkbox" value="1" required>
+                                            <label class="govuk-label govuk-checkboxes__label" for="confirm-{{ $memberId }}">{{ __('govuk_alpha.ux.transfer_confirm_label') }}</label>
+                                        </div>
+                                    </div>
                                 </div>
                                 <button class="govuk-button" data-module="govuk-button">{{ __('govuk_alpha.polish_members.send_credits_submit') }}</button>
                             </form>
@@ -371,7 +379,7 @@
                         <article class="nexus-alpha-card">
                             <h3 class="govuk-heading-m govuk-!-margin-bottom-1">{{ __('govuk_alpha.profile.review_by', ['name' => $reviewerName]) }}</h3>
                             <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-2">
-                            <strong class="govuk-tag govuk-tag--blue">{{ (int) $review['rating'] }} / 5</strong>
+                            <strong class="govuk-tag govuk-tag--blue">{{ __('govuk_alpha.ux.rating_out_of', ['rating' => (int) $review['rating']]) }}</strong>
                             <span class="govuk-visually-hidden">{{ __('govuk_alpha.polish_members.rating_accessible', ['n' => (int) $review['rating']]) }}</span>
                         </p>
                             @if (!empty($review['comment']))

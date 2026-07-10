@@ -231,6 +231,14 @@
                                 <div id="note-hint-{{ $recipient['id'] }}" class="govuk-hint">{{ __('govuk_alpha.wallet.note_hint') }}</div>
                                 <input class="govuk-input" id="note-{{ $recipient['id'] }}" name="note" type="text" maxlength="255" aria-describedby="note-hint-{{ $recipient['id'] }}">
                             </div>
+                            <div class="govuk-form-group govuk-!-margin-bottom-3">
+                                <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                    <div class="govuk-checkboxes__item">
+                                        <input class="govuk-checkboxes__input" id="confirm-{{ $recipient['id'] }}" name="confirm" type="checkbox" value="1" required>
+                                        <label class="govuk-label govuk-checkboxes__label" for="confirm-{{ $recipient['id'] }}">{{ __('govuk_alpha.ux.transfer_confirm_label') }}</label>
+                                    </div>
+                                </div>
+                            </div>
                             <button class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.wallet.send_button', ['name' => $recipientName]) }}</button>
                         </form>
                     </div>
@@ -248,25 +256,26 @@
             <span class="govuk-hint govuk-!-display-inline">— {{ __('govuk_alpha.wallet_t1.export_description') }}</span>
         </p>
 
-        {{-- WAVE T1-WALLET: server-rendered filter tabs (plain links, no JS panels) --}}
-        <div class="govuk-tabs govuk-!-margin-top-4" aria-label="{{ __('govuk_alpha.wallet_t1.filter_heading') }}">
-            <h3 class="govuk-tabs__title">{{ __('govuk_alpha.wallet_t1.filter_heading') }}</h3>
-            <ul class="govuk-tabs__list">
-                @php
-                    $filterTabs = [
-                        'all' => __('govuk_alpha.wallet_t1.filter_all'),
-                        'earned' => __('govuk_alpha.wallet_t1.filter_earned'),
-                        'spent' => __('govuk_alpha.wallet_t1.filter_spent'),
-                        'pending' => __('govuk_alpha.wallet_t1.filter_pending'),
-                    ];
-                @endphp
+        {{-- WAVE T1-WALLET: server-rendered filter sub-navigation (plain links, no JS panels) --}}
+        @php
+            $filterTabs = [
+                'all' => __('govuk_alpha.wallet_t1.filter_all'),
+                'earned' => __('govuk_alpha.wallet_t1.filter_earned'),
+                'spent' => __('govuk_alpha.wallet_t1.filter_spent'),
+                'pending' => __('govuk_alpha.wallet_t1.filter_pending'),
+            ];
+        @endphp
+        <nav class="govuk-!-margin-top-4 govuk-!-margin-bottom-4" aria-label="{{ __('govuk_alpha.wallet_t1.filter_heading') }}">
+            <ul class="govuk-list" style="display:flex;gap:1rem;flex-wrap:wrap;list-style:none;padding:0;margin:0 0 1rem">
                 @foreach ($filterTabs as $tabKey => $tabLabel)
-                    <li class="govuk-tabs__list-item{{ $activeFilter === $tabKey ? ' govuk-tabs__list-item--selected' : '' }}">
-                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.wallet.index', $tabKey === 'all' ? ['tenantSlug' => $tenantSlug] : ['tenantSlug' => $tenantSlug, 'filter' => $tabKey]) }}#transactions" @if ($activeFilter === $tabKey) aria-current="page" @endif>{{ $tabLabel }}</a>
+                    <li>
+                        <a class="govuk-link{{ $activeFilter === $tabKey ? ' govuk-link--no-visited-state' : '' }}"
+                           href="{{ route('govuk-alpha.wallet.index', $tabKey === 'all' ? ['tenantSlug' => $tenantSlug] : ['tenantSlug' => $tenantSlug, 'filter' => $tabKey]) }}#transactions"
+                           @if ($activeFilter === $tabKey) aria-current="page" @endif>{{ $tabLabel }}</a>
                     </li>
                 @endforeach
             </ul>
-        </div>
+        </nav>
 
         @if (empty($transactions))
             <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.wallet.history_empty') }}</p></div>

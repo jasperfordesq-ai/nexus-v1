@@ -67,7 +67,7 @@ return [
     'pipeline' => [
         'title' => 'Application pipeline',
         'caption' => 'Move candidates through your hiring stages',
-        'description' => 'Candidates are grouped by stage. Change a candidate&rsquo;s stage to move them through your pipeline.',
+        'description' => 'Candidates are grouped by stage. Change a candidate’s stage to move them through your pipeline.',
         'column_applied' => 'Applied',
         'column_screening' => 'Screening',
         'column_interview' => 'Interview',

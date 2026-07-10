@@ -372,17 +372,24 @@
             {{-- Delete is a clearly-warned, CSRF-protected action (route is owner-gated). --}}
             <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--m govuk-!-margin-top-4">
             <h3 class="govuk-heading-s">{{ __('govuk_alpha_listings.detail.delete_heading') }}</h3>
-            <div class="govuk-warning-text">
-                <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-                <strong class="govuk-warning-text__text">
-                    <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning') }}</span>
-                    {{ __('govuk_alpha_listings.detail.delete_warning') }}
-                </strong>
-            </div>
-            <form method="post" action="{{ route('govuk-alpha.listings.delete', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">
-                @csrf
-                <button class="govuk-button govuk-button--warning" data-module="govuk-button">{{ __('govuk_alpha_listings.detail.delete_button') }}</button>
-            </form>
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">{{ __('govuk_alpha_listings.detail.delete_button') }}</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <div class="govuk-warning-text">
+                        <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                        <strong class="govuk-warning-text__text">
+                            <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning') }}</span>
+                            {{ __('govuk_alpha_listings.detail.delete_warning') }}
+                        </strong>
+                    </div>
+                    <form method="post" action="{{ route('govuk-alpha.listings.delete', ['tenantSlug' => $tenantSlug, 'id' => $listing['id']]) }}">
+                        @csrf
+                        <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.ux.confirm_delete_button') }}</button>
+                    </form>
+                </div>
+            </details>
         @elseif ($exchangeWorkflowEnabled)
             @if ($activeExchange)
                 <div class="govuk-inset-text">

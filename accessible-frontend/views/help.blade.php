@@ -45,9 +45,9 @@
                                     </div>
                                     <div id="help-{{ $groupIndex }}-{{ $faqIndex }}-content" class="govuk-accordion__section-content">
                                         {{-- FAQ answers are admin-authored rich HTML (managed in the admin
-                                             panel, same trust model as blog/legal content), rendered unescaped
-                                             to preserve formatting. They are not member-supplied input. --}}
-                                        <div class="govuk-body">{!! $faq['answer'] ?? '' !!}</div>
+                                             panel, same trust model as blog/legal content). They are
+                                             sanitized again at render time as defence-in-depth. --}}
+                                        <div class="govuk-body">{!! \App\Helpers\HtmlSanitizer::sanitizeCms((string) ($faq['answer'] ?? '')) !!}</div>
                                     </div>
                                 </div>
                             @endforeach

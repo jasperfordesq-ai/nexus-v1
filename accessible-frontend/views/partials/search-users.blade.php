@@ -9,7 +9,7 @@
     <div class="nexus-alpha-card-list">
         @foreach ($items as $user)
             @php
-                $uName = trim((string) ($user['name'] ?? '')) ?: __('govuk_alpha_search.results.section_users');
+                $uName = trim((string) ($user['name'] ?? '')) ?: __('govuk_alpha.members.unknown_member');
                 $uId = (int) ($user['id'] ?? 0);
                 $uHref = ($uId > 0 && \Illuminate\Support\Facades\Route::has('govuk-alpha.members.show'))
                     ? route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $uId])
@@ -20,21 +20,21 @@
             @endphp
             <article class="nexus-alpha-card">
                 <div class="nexus-alpha-module-row">
-                    <span class="nexus-alpha-actions">
+                    <div class="nexus-alpha-actions">
                         @if ($uAvatar !== '')
                             <img class="nexus-alpha-avatar" src="{{ $uAvatar }}" alt="{{ __('govuk_alpha_search.results.image_alt', ['title' => $uName]) }}">
                         @else
                             <span class="nexus-alpha-avatar nexus-alpha-avatar--placeholder" aria-hidden="true">{{ mb_strtoupper(mb_substr($uName, 0, 1)) }}</span>
                         @endif
-                        <span>
+                        <div>
                             <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
                                 @if ($uHref)<a class="govuk-link" href="{{ $uHref }}">{{ $uName }}</a>@else{{ $uName }}@endif
                             </h3>
                             @if ($uLocation !== '')
                                 <span class="govuk-body-s nexus-alpha-meta">{{ $uLocation }}</span>
                             @endif
-                        </span>
-                    </span>
+                        </div>
+                    </div>
                 </div>
 
                 @if ($uTagline !== '')

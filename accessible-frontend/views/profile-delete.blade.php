@@ -22,8 +22,8 @@
 
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl">{{ __('govuk_alpha.delete_account.title') }}</h1>
-
+            {{-- GOV.UK: the error summary must come before the <h1>, at the top
+                 of the page content, so it receives focus on page load. --}}
             @if ($currentError)
                 <div class="govuk-error-summary" data-module="govuk-error-summary" tabindex="-1">
                     <div role="alert">
@@ -36,6 +36,8 @@
                     </div>
                 </div>
             @endif
+
+            <h1 class="govuk-heading-xl">{{ __('govuk_alpha.delete_account.title') }}</h1>
 
             <div class="govuk-warning-text">
                 <span class="govuk-warning-text__icon" aria-hidden="true">!</span>

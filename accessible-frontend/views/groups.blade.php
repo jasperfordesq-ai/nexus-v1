@@ -68,7 +68,7 @@
             $groupsTotalPages = $groupsPerPage > 0 ? (int) ceil($groupsTotal / $groupsPerPage) : 1;
         @endphp
         @if ($groupsTotalPages > 1)
-            <nav class="govuk-pagination govuk-!-margin-top-6" role="navigation" aria-label="{{ __('govuk_alpha.groups.pagination_label') }}">
+            <nav class="govuk-pagination govuk-!-margin-top-6" aria-label="{{ __('govuk_alpha.groups.pagination_label') }}">
                 @if ($groupsPage > 1)
                     <div class="govuk-pagination__prev">
                         <a class="govuk-link govuk-pagination__link" href="{{ route('govuk-alpha.groups.index', array_filter(['tenantSlug' => $tenantSlug, 'page' => $groupsPage - 1, 'q' => request('q'), 'filter' => request('filter')])) }}" rel="prev">

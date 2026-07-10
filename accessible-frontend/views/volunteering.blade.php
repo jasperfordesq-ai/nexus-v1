@@ -191,26 +191,36 @@
                 <li><a class="govuk-link" href="{{ route('govuk-alpha.volunteering.donations', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha_volunteering.donations.nav_link') }}</a></li>
             </ul>
 
-            <div class="govuk-tabs govuk-!-margin-top-6">
-                <h2 class="govuk-tabs__title">{{ __('govuk_alpha.volunteering.tabs_title') }}</h2>
-                <ul class="govuk-tabs__list">
-                    <li class="govuk-tabs__list-item{{ $selectedTab === 'opportunities' ? ' govuk-tabs__list-item--selected' : '' }}">
-                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}" @if ($selectedTab === 'opportunities') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.tabs.opportunities') }}</a>
+            {{-- Server-side section switching (no JS) — sub-navigation of links,
+                 not govuk-tabs, which is reserved for in-page panel switching.
+                 Same pattern as partials/messages-subnav.blade.php. --}}
+            <nav class="govuk-!-margin-top-6 govuk-!-margin-bottom-4" aria-label="{{ __('govuk_alpha.volunteering.tabs_title') }}">
+                <ul class="govuk-list" style="display:flex;flex-wrap:wrap;gap:1rem;list-style:none;padding:0;margin:0 0 1rem">
+                    <li>
+                        <a class="govuk-link{{ $selectedTab === 'opportunities' ? ' govuk-link--no-visited-state' : '' }}"
+                           href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug]) }}"
+                           @if ($selectedTab === 'opportunities') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.tabs.opportunities') }}</a>
                     </li>
-                    <li class="govuk-tabs__list-item{{ $selectedTab === 'applications' ? ' govuk-tabs__list-item--selected' : '' }}">
-                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'applications']) }}" @if ($selectedTab === 'applications') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.tabs.applications') }}</a>
+                    <li>
+                        <a class="govuk-link{{ $selectedTab === 'applications' ? ' govuk-link--no-visited-state' : '' }}"
+                           href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'applications']) }}"
+                           @if ($selectedTab === 'applications') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.tabs.applications') }}</a>
                     </li>
-                    <li class="govuk-tabs__list-item{{ $selectedTab === 'recommended' ? ' govuk-tabs__list-item--selected' : '' }}">
-                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'recommended']) }}" @if ($selectedTab === 'recommended') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.tabs.recommended') }}</a>
+                    <li>
+                        <a class="govuk-link{{ $selectedTab === 'recommended' ? ' govuk-link--no-visited-state' : '' }}"
+                           href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'recommended']) }}"
+                           @if ($selectedTab === 'recommended') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.tabs.recommended') }}</a>
                     </li>
-                    <li class="govuk-tabs__list-item{{ $selectedTab === 'community_projects' ? ' govuk-tabs__list-item--selected' : '' }}">
-                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'community_projects']) }}" @if ($selectedTab === 'community_projects') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.community_projects_tab') }}</a>
+                    <li>
+                        <a class="govuk-link{{ $selectedTab === 'community_projects' ? ' govuk-link--no-visited-state' : '' }}"
+                           href="{{ route('govuk-alpha.volunteering.index', ['tenantSlug' => $tenantSlug, 'tab' => 'community_projects']) }}"
+                           @if ($selectedTab === 'community_projects') aria-current="page" @endif>{{ __('govuk_alpha.volunteering.community_projects_tab') }}</a>
                     </li>
-                    <li class="govuk-tabs__list-item">
-                        <a class="govuk-tabs__tab" href="{{ route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.tabs.hours') }}</a>
+                    <li>
+                        <a class="govuk-link" href="{{ route('govuk-alpha.volunteering.hours', ['tenantSlug' => $tenantSlug]) }}">{{ __('govuk_alpha.volunteering.tabs.hours') }}</a>
                     </li>
                 </ul>
-            </div>
+            </nav>
         @endif
 
         @if (!$requiresAuth && $selectedTab === 'applications')
@@ -381,11 +391,19 @@
                             $cpProposer = trim((string) ($project['proposer_name'] ?? ($project['proposer_first_name'] ?? '') . ' ' . ($project['proposer_last_name'] ?? '')));
                             $cpSupporters = (int) ($project['supporter_count'] ?? 0);
                             $cpStatusTag = $cpStatus === 'completed' ? 'govuk-tag--green' : ($cpStatus === 'active' ? 'govuk-tag--turquoise' : 'govuk-tag--blue');
+                            // Public projects should only carry whitelisted statuses;
+                            // headline() is a defensive fallback for anything else.
+                            $cpStatusLabel = match ($cpStatus) {
+                                'approved' => __('govuk_alpha.ux.project_status_approved'),
+                                'active' => __('govuk_alpha.ux.project_status_active'),
+                                'completed' => __('govuk_alpha.ux.project_status_completed'),
+                                default => \Illuminate\Support\Str::headline($cpStatus),
+                            };
                         @endphp
                         <article class="nexus-alpha-card">
                             <div class="nexus-alpha-module-row">
                                 <h3 class="govuk-heading-m govuk-!-margin-bottom-1">{{ $cpTitle }}</h3>
-                                @if ($cpStatus !== '')<strong class="govuk-tag {{ $cpStatusTag }}">{{ \Illuminate\Support\Str::headline($cpStatus) }}</strong>@endif
+                                @if ($cpStatus !== '')<strong class="govuk-tag {{ $cpStatusTag }}">{{ $cpStatusLabel }}</strong>@endif
                             </div>
                             @if ($cpProposer !== '')
                                 <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.volunteering.community_project_proposed_by', ['name' => $cpProposer]) }}</p>

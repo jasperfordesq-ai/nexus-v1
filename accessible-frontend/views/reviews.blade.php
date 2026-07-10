@@ -83,7 +83,7 @@
     <dl class="govuk-summary-list govuk-!-margin-bottom-8">
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">{{ __('govuk_alpha.reviews_page.average_label') }}</dt>
-            <dd class="govuk-summary-list__value">{{ $total > 0 ? number_format($avg, 1) . ' / 5' : '—' }}</dd>
+            <dd class="govuk-summary-list__value">{{ $total > 0 ? __('govuk_alpha.ux.rating_out_of', ['rating' => number_format($avg, 1)]) : '—' }}</dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">{{ __('govuk_alpha.reviews_page.total_label') }}</dt>
@@ -199,8 +199,8 @@
                                         <div class="govuk-radios govuk-radios--inline govuk-radios--small" data-module="govuk-radios">
                                             @for ($star = 5; $star >= 1; $star--)
                                                 <div class="govuk-radios__item">
-                                                    <input class="govuk-radios__input" id="rating-{{ $exId }}-{{ $star }}" name="rating" type="radio" value="{{ $star }}" @if ($star === 5) checked @endif>
-                                                    <label class="govuk-label govuk-radios__label" for="rating-{{ $exId }}-{{ $star }}">{{ $star }}</label>
+                                                    <input class="govuk-radios__input" id="rating-{{ $exId }}-{{ $star }}" name="rating" type="radio" value="{{ $star }}" required>
+                                                    <label class="govuk-label govuk-radios__label" for="rating-{{ $exId }}-{{ $star }}"><span aria-hidden="true">{{ $star }}</span><span class="govuk-visually-hidden">{{ __('govuk_alpha.ux.rating_out_of', ['rating' => $star]) }}</span></label>
                                                 </div>
                                             @endfor
                                         </div>

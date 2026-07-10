@@ -256,6 +256,7 @@
                     <label class="govuk-label" for="rating">{{ __('govuk_alpha.exchanges.review_rating_label') }}</label>
                     <div id="rating-hint" class="govuk-hint">{{ __('govuk_alpha.exchanges.review_rating_hint') }}</div>
                     <select class="govuk-select govuk-input--width-10" id="rating" name="rating" aria-describedby="rating-hint" required>
+                        <option value="" disabled selected>{{ __('govuk_alpha.ux.rating_choose') }}</option>
                         @foreach ([5, 4, 3, 2, 1] as $ratingOption)
                             <option value="{{ $ratingOption }}">{{ __('govuk_alpha.exchanges.review_rating_value', ['rating' => $ratingOption]) }}</option>
                         @endforeach

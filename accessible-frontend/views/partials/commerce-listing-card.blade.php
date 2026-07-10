@@ -43,9 +43,6 @@
             @if ($cardLoc !== '')
                 <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-0">{{ $cardLoc }}</p>
             @endif
-            @isset($cardActions)
-                <div class="nexus-alpha-actions govuk-!-margin-top-2">{!! $cardActions !!}</div>
-            @endisset
         </div>
     </div>
 </article>

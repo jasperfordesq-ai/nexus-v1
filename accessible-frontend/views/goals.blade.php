@@ -59,7 +59,7 @@
                         <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.polish_gamify.goals_streak_label', ['count' => $streak]) }}</p>
                     @endif
                     <p class="govuk-body-s nexus-alpha-meta govuk-!-margin-bottom-1">{{ __('govuk_alpha.goals.progress_label', ['current' => rtrim(rtrim(number_format($cur, 2), '0'), '.'), 'target' => rtrim(rtrim(number_format($tgt, 2), '0'), '.')]) }}</p>
-                    <progress max="100" value="{{ $pct }}" aria-label="{{ $pct }}%">{{ $pct }}%</progress>
+                    <progress max="100" value="{{ $pct }}" aria-label="{{ $gTitle }}: {{ $pct }}%">{{ $pct }}%</progress>
                 </article>
             @endforeach
         </div>

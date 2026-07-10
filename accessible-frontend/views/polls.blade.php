@@ -234,10 +234,24 @@
                     @if (!empty($poll['is_creator']) && $pollId > 0 && \Illuminate\Support\Facades\Route::has('govuk-alpha.gamification.poll.delete'))
                         {{-- Owner delete — reuses the existing gamification poll-delete
                              endpoint (PollService::delete enforces owner + tenant). --}}
-                        <form method="post" action="{{ route('govuk-alpha.gamification.poll.delete', ['tenantSlug' => $tenantSlug, 'pollId' => $pollId]) }}" class="govuk-!-margin-top-3">
-                            @csrf
-                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.polls.delete_button') }}</button>
-                        </form>
+                        <details class="govuk-details govuk-!-margin-top-3 govuk-!-margin-bottom-0" data-module="govuk-details">
+                            <summary class="govuk-details__summary">
+                                <span class="govuk-details__summary-text">{{ __('govuk_alpha.polls.delete_button') }}</span>
+                            </summary>
+                            <div class="govuk-details__text">
+                                <div class="govuk-warning-text">
+                                    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                    <strong class="govuk-warning-text__text">
+                                        <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning_prefix') }}</span>
+                                        {{ __('govuk_alpha.ux.confirm_irreversible') }}
+                                    </strong>
+                                </div>
+                                <form method="post" action="{{ route('govuk-alpha.gamification.poll.delete', ['tenantSlug' => $tenantSlug, 'pollId' => $pollId]) }}">
+                                    @csrf
+                                    <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.ux.confirm_delete_button') }}</button>
+                                </form>
+                            </div>
+                        </details>
                     @endif
                 </article>
             @endforeach
@@ -301,10 +315,24 @@
                     @if (!empty($poll['is_creator']) && $pollId > 0 && \Illuminate\Support\Facades\Route::has('govuk-alpha.gamification.poll.delete'))
                         {{-- Owner delete — reuses the existing gamification poll-delete
                              endpoint (PollService::delete enforces owner + tenant). --}}
-                        <form method="post" action="{{ route('govuk-alpha.gamification.poll.delete', ['tenantSlug' => $tenantSlug, 'pollId' => $pollId]) }}" class="govuk-!-margin-top-3">
-                            @csrf
-                            <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.polls.delete_button') }}</button>
-                        </form>
+                        <details class="govuk-details govuk-!-margin-top-3 govuk-!-margin-bottom-0" data-module="govuk-details">
+                            <summary class="govuk-details__summary">
+                                <span class="govuk-details__summary-text">{{ __('govuk_alpha.polls.delete_button') }}</span>
+                            </summary>
+                            <div class="govuk-details__text">
+                                <div class="govuk-warning-text">
+                                    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+                                    <strong class="govuk-warning-text__text">
+                                        <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning_prefix') }}</span>
+                                        {{ __('govuk_alpha.ux.confirm_irreversible') }}
+                                    </strong>
+                                </div>
+                                <form method="post" action="{{ route('govuk-alpha.gamification.poll.delete', ['tenantSlug' => $tenantSlug, 'pollId' => $pollId]) }}">
+                                    @csrf
+                                    <button class="govuk-button govuk-button--warning govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.ux.confirm_delete_button') }}</button>
+                                </form>
+                            </div>
+                        </details>
                     @endif
                 </article>
             @endforeach

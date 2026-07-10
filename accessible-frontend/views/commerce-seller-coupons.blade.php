@@ -71,6 +71,7 @@
         <p class="govuk-inset-text">{{ __('govuk_alpha_commerce.coupons.empty') }}</p>
     @else
         <table class="govuk-table">
+            <caption class="govuk-table__caption govuk-table__caption--s govuk-visually-hidden">{{ __('govuk_alpha_commerce.coupons.title') }}</caption>
             <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header">{{ __('govuk_alpha_commerce.coupons.code_label') }}</th>

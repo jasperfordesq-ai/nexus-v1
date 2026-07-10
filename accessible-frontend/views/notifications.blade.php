@@ -36,7 +36,6 @@
                 str_contains($t, 'security') || str_contains($t, 'password') || str_contains($t, '2fa') || str_contains($t, 'passkey') => 'security',
                 str_contains($t, 'like') || str_contains($t, 'comment') || str_contains($t, 'reaction') || str_contains($t, 'mention') || str_contains($t, 'post') => 'social',
                 str_contains($t, 'idea') => 'ideation',
-                str_contains($t, 'event') => 'events',
                 $t === 'system' || str_contains($t, 'announce') || str_contains($t, 'welcome') || str_contains($t, 'badge') || str_contains($t, 'achievement') || str_contains($t, 'level') => 'system',
                 default => 'other',
             };
@@ -92,7 +91,7 @@
                     <div class="govuk-warning-text">
                         <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
                         <strong class="govuk-warning-text__text">
-                            <span class="govuk-warning-text__assistive">{{ __('govuk_alpha.states.warning_prefix') }}</span>
+                            <span class="govuk-visually-hidden">{{ __('govuk_alpha.states.warning_prefix') }}</span>
                             {{ __('govuk_alpha.polish_discovery.notifications_delete_confirm_warning') }}
                         </strong>
                     </div>
@@ -124,7 +123,7 @@
                 $nCat = $category((string) ($n['type'] ?? 'system'));
                 $nColour = $catColour[$nCat] ?? 'grey';
                 $nLink = trim((string) ($n['link'] ?? ''));
-                $nHref = $nLink !== '' ? url('/' . $tenantSlug . '/alpha' . (\Illuminate\Support\Str::startsWith($nLink, '/') ? $nLink : '/' . $nLink)) : null;
+                $nHref = $nLink !== '' ? url('/' . $tenantSlug . '/accessible' . (\Illuminate\Support\Str::startsWith($nLink, '/') ? $nLink : '/' . $nLink)) : null;
             @endphp
             <div class="nexus-alpha-card govuk-!-margin-bottom-3">
                 <div class="nexus-alpha-module-row">

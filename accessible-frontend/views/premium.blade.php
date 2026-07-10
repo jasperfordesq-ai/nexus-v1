@@ -6,16 +6,16 @@
 
 @section('content')
     @php
-        $money = fn ($cents): string => number_format(((int) $cents) / 100, 2);
-        // Determine whether any tier has both intervals so we know whether to
-        // render the global interval selector at all.
-        $hasBothIntervals = false;
-        foreach ($tiers as $tier) {
-            if ((int) ($tier['monthly_price_cents'] ?? 0) > 0 && (int) ($tier['yearly_price_cents'] ?? 0) > 0) {
-                $hasBothIntervals = true;
-                break;
-            }
-        }
+        // Format cents with the tenant's currency. Known codes render as a
+        // symbol prefix; any other ISO code renders as "CODE 12.00".
+        $currencyCode = strtoupper(trim((string) ($currency ?? '')));
+        $currencyPrefix = match ($currencyCode) {
+            'EUR' => '€',
+            'USD' => '$',
+            'GBP' => '£',
+            default => $currencyCode !== '' ? $currencyCode . ' ' : '',
+        };
+        $money = fn ($cents): string => $currencyPrefix . number_format(((int) $cents) / 100, 2);
     @endphp
 
     @if ($status === 'subscribe-failed')
@@ -39,38 +39,6 @@
     @if (empty($tiers))
         <div class="govuk-inset-text"><p class="govuk-body">{{ __('govuk_alpha.premium.empty') }}</p></div>
     @else
-        {{-- Global billing-interval toggle: shown when at least one tier has both intervals. --}}
-        @if ($hasBothIntervals)
-            <fieldset class="govuk-fieldset govuk-!-margin-bottom-6" id="global-interval-fieldset">
-                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
-                    <h2 class="govuk-fieldset__heading">{{ __('govuk_alpha.polish_commerce.premium_interval_heading') }}</h2>
-                </legend>
-                <div class="govuk-radios govuk-radios--inline" data-module="govuk-radios" id="global-interval-radios">
-                    <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="global-interval-monthly" name="global_interval" type="radio" value="monthly" checked>
-                        <label class="govuk-label govuk-radios__label" for="global-interval-monthly">{{ __('govuk_alpha.polish_commerce.premium_interval_monthly') }}</label>
-                    </div>
-                    <div class="govuk-radios__item">
-                        <input class="govuk-radios__input" id="global-interval-yearly" name="global_interval" type="radio" value="yearly">
-                        <label class="govuk-label govuk-radios__label" for="global-interval-yearly">{{ __('govuk_alpha.polish_commerce.premium_interval_yearly') }}</label>
-                    </div>
-                </div>
-            </fieldset>
-            <script>
-                (function () {
-                    var radios = document.querySelectorAll('#global-interval-radios input[type="radio"]');
-                    function syncHiddenInputs() {
-                        var chosen = document.querySelector('#global-interval-radios input[type="radio"]:checked');
-                        var interval = chosen ? chosen.value : 'monthly';
-                        document.querySelectorAll('.nexus-premium-interval-input').forEach(function (el) {
-                            el.value = interval;
-                        });
-                    }
-                    radios.forEach(function (r) { r.addEventListener('change', syncHiddenInputs); });
-                }());
-            </script>
-        @endif
-
         <div class="nexus-alpha-card-list">
             @foreach ($tiers as $tier)
                 @php
@@ -79,8 +47,10 @@
                     $yearly = (int) ($tier['yearly_price_cents'] ?? 0);
                     $features = is_array($tier['features'] ?? null) ? array_filter(array_map('strval', $tier['features'])) : [];
                     $tid = (int) ($tier['id'] ?? 0);
-                    // Determine the default interval for this tier's hidden input.
-                    // If only yearly: 'yearly'. If only monthly or both: 'monthly' (global toggle will update it).
+                    // Tiers offering both intervals get a per-form radio group
+                    // (works without JavaScript). Single-interval tiers post a
+                    // hidden input with their only available interval.
+                    $tierHasBoth = $monthly > 0 && $yearly > 0;
                     $defaultInterval = ($yearly > 0 && $monthly === 0) ? 'yearly' : 'monthly';
                 @endphp
                 <article class="nexus-alpha-card">
@@ -103,8 +73,25 @@
                     <form method="post" action="{{ route('govuk-alpha.premium.subscribe', ['tenantSlug' => $tenantSlug]) }}">
                         @csrf
                         <input type="hidden" name="tier_id" value="{{ $tid }}">
-                        {{-- The interval hidden input is updated by the global toggle via JS. --}}
-                        <input type="hidden" name="interval" value="{{ $defaultInterval }}" class="nexus-premium-interval-input">
+                        @if ($tierHasBoth)
+                            <div class="govuk-form-group">
+                                <fieldset class="govuk-fieldset">
+                                    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ __('govuk_alpha.polish_commerce.premium_interval_heading') }}</legend>
+                                    <div class="govuk-radios govuk-radios--small" data-module="govuk-radios">
+                                        <div class="govuk-radios__item">
+                                            <input class="govuk-radios__input" id="interval-{{ $tid }}-monthly" name="interval" type="radio" value="monthly" checked>
+                                            <label class="govuk-label govuk-radios__label" for="interval-{{ $tid }}-monthly">{{ __('govuk_alpha.polish_commerce.premium_interval_monthly') }} — {{ $money($monthly) }}</label>
+                                        </div>
+                                        <div class="govuk-radios__item">
+                                            <input class="govuk-radios__input" id="interval-{{ $tid }}-yearly" name="interval" type="radio" value="yearly">
+                                            <label class="govuk-label govuk-radios__label" for="interval-{{ $tid }}-yearly">{{ __('govuk_alpha.polish_commerce.premium_interval_yearly') }} — {{ $money($yearly) }}</label>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        @else
+                            <input type="hidden" name="interval" value="{{ $defaultInterval }}">
+                        @endif
                         <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-module="govuk-button">{{ __('govuk_alpha.premium.subscribe_button') }}</button>
                     </form>
                 </article>
