@@ -135,10 +135,10 @@ docker compose --profile docker-frontend up -d frontend
 
 ### WebAuthn / Passkeys — Windows Dev Environment
 
-**RP ID:** `project-nexus.ie` (covers `app.project-nexus.ie`, `api.project-nexus.ie`, and `accessible.project-nexus.ie`)
-- Production/Azure: set `WEBAUTHN_RP_ID=project-nexus.ie` in `.env`
-- Local dev: set `WEBAUTHN_RP_ID=localhost`
-- Production Docker env (`compose.prod.yml`) derives it correctly from HTTP_ORIGIN fallback
+**RP ID is derived per tenant.** `WebAuthnController::getRpId()` reads the request's `Origin` header and validates it against the tenant's registered domains (`tenants.domain`, `tenants.accessible_domain`) plus the platform default — a tenant on a custom domain (e.g. `hour-timebank.ie`) gets its own domain as RP ID, because WebAuthn requires the RP ID to be a registrable suffix of the page's domain. Passkeys are scoped to the RP ID they were registered under, so a passkey created on `app.project-nexus.ie` does not work on a tenant custom domain and vice versa.
+- `WEBAUTHN_RP_ID` is the **platform default**, used for `*.project-nexus.ie` origins and as the fallback for unrecognised origins: `project-nexus.ie` in production (set as a container env var, not in compose files), `localhost` in local dev
+- The `HTTP_HOST` code fallback (when `WEBAUTHN_RP_ID` is unset) sees the **API** host, never the frontend's custom domain — do not rely on it in production
+- Regression tests: `tests/Laravel/Feature/Controllers/WebAuthnControllerTest.php` (RP ID derivation section)
 
 **Windows Hello requirement:** Chrome uses the native Windows WebAuthn API which requires `WbioSrvc` (Windows Biometric Service) to be **running** at the moment the passkey dialog opens. This service idles down and stops automatically — if it's stopped, Chrome's "Choose a passkey" dialog will show NO "This Windows device" / Windows Hello option.
 

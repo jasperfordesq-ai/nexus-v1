@@ -158,6 +158,8 @@
   "passkey_setup_tooltip": "Taispeáin treoir socraithe paskey",
   "passkey_show_instructions": "Taispeáin treoracha socraithe paskey",
   "passkey_registration_failed": "Theip ar an gclárú",
+  "passkey_error_domain": "Níl pas-eochracha ar fáil ag seoladh an tsuímh seo go fóill. Déan teagmháil le riarthóir do phobail, le do thoil.",
+  "passkey_cancelled": "Cuireadh socrú na pas-eochrach ar ceal.",
   "passkey_remove_failed": "Níorbh fhéidir an passkey a bhaint",
   "passkey_remove_all_failed": "Níorbh fhéidir na passkeys a bhaint",
   "passkey_remove_all_title": "Bain Gach Paskey",

@@ -158,6 +158,8 @@
   "passkey_setup_tooltip": "パスキー設定ガイドを表示する",
   "passkey_show_instructions": "パスキーの設定手順を表示する",
   "passkey_registration_failed": "登録に失敗しました",
+  "passkey_error_domain": "このサイトのアドレスではパスキーはまだ利用できません。コミュニティの管理者にお問い合わせください。",
+  "passkey_cancelled": "パスキーの設定がキャンセルされました。",
   "passkey_remove_failed": "資格情報の削除に失敗しました",
   "passkey_remove_all_failed": "資格情報の削除に失敗しました",
   "passkey_remove_all_title": "すべてのパスキーを削除する",

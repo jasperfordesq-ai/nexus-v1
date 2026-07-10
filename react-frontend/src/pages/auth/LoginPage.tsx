@@ -294,11 +294,21 @@ export function LoginPage() {
 
     if (result.success) {
       navigate(from, { replace: true });
-    } else if (result.error?.includes('cancelled')) {
+    } else if (result.errorCode === 'cancelled' || result.error?.includes('cancelled')) {
       // User cancelled — do nothing
+    } else if (result.errorCode === 'domain_not_allowed') {
+      // Server issued an RP ID that isn't valid for this domain — a platform
+      // configuration problem, not something the user can fix locally.
+      console.error('[webauthn] RP ID rejected for this origin:', result.error);
+      toast.error(t('passkey_error_domain'));
     } else if (result.error?.includes('not found') || result.error?.includes('Credential not found')) {
       // No passkey registered for this account
       toast.error(t('passkey_not_found'));
+    } else {
+      // Anything else (expired challenge, network failure, server rejection)
+      // must surface — silently dropping it reads as "the button does nothing".
+      console.error('[webauthn] login failed:', result.error);
+      toast.error(t('passkey_login_failed'));
     }
   };
 

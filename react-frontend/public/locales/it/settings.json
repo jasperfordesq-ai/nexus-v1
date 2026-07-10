@@ -158,6 +158,8 @@
   "passkey_setup_tooltip": "Mostra la guida alla configurazione della passkey",
   "passkey_show_instructions": "Mostra le istruzioni per la configurazione della passkey",
   "passkey_registration_failed": "Registrazione fallita",
+  "passkey_error_domain": "Le passkey non sono ancora disponibili su questo indirizzo del sito. Contatta l'amministrazione della tua community.",
+  "passkey_cancelled": "La configurazione della passkey è stata annullata.",
   "passkey_remove_failed": "Impossibile rimuovere il passkey",
   "passkey_remove_all_failed": "Impossibile rimuovere i passkey",
   "passkey_remove_all_title": "Rimuovi tutte le passkey",

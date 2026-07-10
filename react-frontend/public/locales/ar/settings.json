@@ -158,6 +158,8 @@
   "passkey_setup_tooltip": "عرض دليل إعداد مفتاح المرور",
   "passkey_show_instructions": "عرض تعليمات إعداد مفتاح المرور",
   "passkey_registration_failed": "فشل التسجيل",
+  "passkey_error_domain": "مفاتيح المرور غير متوفرة بعد على عنوان هذا الموقع. يرجى التواصل مع مسؤول مجتمعك.",
+  "passkey_cancelled": "تم إلغاء إعداد مفتاح المرور.",
   "passkey_remove_failed": "فشل في إزالة الاعتماد",
   "passkey_remove_all_failed": "فشل في إزالة الاعتمادات",
   "passkey_remove_all_title": "إزالة كافة مفاتيح المرور",

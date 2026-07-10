@@ -158,6 +158,8 @@
   "passkey_setup_tooltip": "Mostrar guia de configuração de senha",
   "passkey_show_instructions": "Mostrar instruções de configuração da senha",
   "passkey_registration_failed": "Registo falhado",
+  "passkey_error_domain": "As chaves de acesso ainda não estão disponíveis neste endereço do site. Contate a administração da sua comunidade.",
+  "passkey_cancelled": "A configuração da chave de acesso foi cancelada.",
   "passkey_remove_failed": "Não foi possível remover a passkey",
   "passkey_remove_all_failed": "Não foi possível remover as passkeys",
   "passkey_remove_all_title": "Remover todas as chaves de acesso",

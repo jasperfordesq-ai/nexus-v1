@@ -158,6 +158,8 @@
   "passkey_setup_tooltip": "Show passkey setup guide",
   "passkey_show_instructions": "Show passkey setup instructions",
   "passkey_registration_failed": "Registration failed",
+  "passkey_error_domain": "Passkeys aren't available on this site's address yet. Please contact your community admin.",
+  "passkey_cancelled": "Passkey setup was cancelled.",
   "passkey_remove_failed": "Failed to remove credential",
   "passkey_remove_all_failed": "Failed to remove credentials",
   "passkey_remove_all_title": "Remove All Passkeys",

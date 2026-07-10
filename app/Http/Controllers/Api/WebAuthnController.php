@@ -43,8 +43,10 @@ class WebAuthnController extends BaseApiController
 
         $userId = $this->requireAuth();
 
-        // Per-user rate limit to prevent user ID enumeration
-        $this->rateLimit("webauthn_register_user_{$userId}", 3, 600);
+        // Per-user rate limit on challenge generation. Generous enough that a
+        // user retrying after client-side ceremony failures (browser rejection,
+        // cancelled Windows Hello prompt) isn't locked out for 10 minutes.
+        $this->rateLimit("webauthn_register_user_{$userId}", 10, 600);
         $user = $this->getWebAuthnUser($userId);
 
         if (!$user) {
@@ -711,10 +713,33 @@ class WebAuthnController extends BaseApiController
     }
 
     /**
-     * Get the Relying Party ID (domain).
+     * Get the Relying Party ID (domain) for the current request.
+     *
+     * Multi-tenant: tenants can serve the React frontend from their own custom
+     * domain (tenants.domain, e.g. hour-timebank.ie). WebAuthn requires the RP
+     * ID to be a registrable suffix of the page's domain, so the platform-wide
+     * WEBAUTHN_RP_ID (project-nexus.ie) is only valid on *.project-nexus.ie —
+     * on a custom domain the browser rejects the ceremony before it starts.
+     * Derive the RP ID from the request's Origin header, validated against the
+     * domains registered for this tenant plus the platform default.
+     *
+     * A forged Origin header cannot be abused to mint tokens: the browser
+     * enforces that the RP ID is a suffix of the page's real domain, and at
+     * verify time lbuchs/WebAuthn checks the browser-signed clientDataJSON
+     * origin against this same RP ID. Credentials are additionally scoped to
+     * the RP ID they were registered under.
      */
     private function getRpId(): string
     {
+        $originHost = $this->getRequestOriginHost();
+        if ($originHost !== null) {
+            foreach ($this->allowedRpIds() as $candidate) {
+                if ($originHost === $candidate || str_ends_with($originHost, '.' . $candidate)) {
+                    return $candidate;
+                }
+            }
+        }
+
         // config() (not $_ENV/getenv): direct superglobal reads come back
         // empty under config:cache and under SAPIs that don't populate $_ENV,
         // silently shifting the RP ID to the HTTP_HOST fallback.
@@ -740,6 +765,50 @@ class WebAuthnController extends BaseApiController
         }
 
         return $host;
+    }
+
+    /**
+     * Host component of the request's Origin header, lowercased.
+     * Browsers always send Origin on the (POST) WebAuthn endpoints.
+     */
+    private function getRequestOriginHost(): ?string
+    {
+        $origin = request()->headers->get('Origin');
+        if (!is_string($origin) || $origin === '') {
+            return null;
+        }
+
+        $host = parse_url($origin, PHP_URL_HOST);
+
+        return is_string($host) && $host !== '' ? strtolower($host) : null;
+    }
+
+    /**
+     * RP IDs the current tenant is allowed to use, most specific first.
+     * Tenant custom domains take priority so their credentials are scoped to
+     * their own domain rather than the shared platform domain.
+     *
+     * @return list<string>
+     */
+    private function allowedRpIds(): array
+    {
+        $tenant = TenantContext::get() ?? [];
+
+        $candidates = [
+            $tenant['domain'] ?? null,
+            $tenant['accessible_domain'] ?? null,
+            config('webauthn.rp_id'),
+            'localhost',
+        ];
+
+        $rpIds = [];
+        foreach ($candidates as $candidate) {
+            if (is_string($candidate) && $candidate !== '') {
+                $rpIds[] = strtolower($candidate);
+            }
+        }
+
+        return array_values(array_unique($rpIds));
     }
 
     private function base64UrlEncode(string $data): string

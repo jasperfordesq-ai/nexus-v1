@@ -157,7 +157,20 @@ export function BiometricSettings() {
     if (result.success) {
       toast.success(t('biometric_registered'));
       loadCredentials();
+    } else if (result.errorCode === 'domain_not_allowed') {
+      // Server issued an RP ID that isn't valid for this domain — a platform
+      // configuration problem, not something the user can fix locally.
+      console.error('[webauthn] RP ID rejected for this origin:', result.error);
+      toast.error(t('passkey_error_domain'));
+    } else if (result.errorCode === 'cancelled') {
+      toast.error(t('passkey_cancelled'));
+    } else if (result.errorCode === 'unknown') {
+      // Raw browser exception text is untranslated and cryptic — log it for
+      // diagnostics, show the user a translated generic failure.
+      console.error('[webauthn] registration failed:', result.error);
+      toast.error(t('passkey_registration_failed'));
     } else {
+      // No errorCode: the failure came from our API (already localized).
       toast.error(result.error || t('passkey_registration_failed'));
     }
   };

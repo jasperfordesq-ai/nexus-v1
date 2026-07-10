@@ -113,6 +113,22 @@ function captureTelemetryAuthEvent(
   queueSentryAuthEvent(event, userId, context);
 }
 
+const INVALID_SESSION_CODES = new Set([
+  'SESSION_EXPIRED',
+  'AUTH_TOKEN_EXPIRED',
+  'AUTH_TOKEN_INVALID',
+  'AUTH_TOKEN_MISSING',
+  'AUTH_ACCOUNT_SUSPENDED',
+  'INVALID_TOKEN',
+  'UNAUTHENTICATED',
+  'AUTH_UNAUTHENTICATED',
+  'HTTP_401',
+]);
+
+function isInvalidSessionCode(code: string | undefined): boolean {
+  return Boolean(code && INVALID_SESSION_CODES.has(code));
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Provider
 // ─────────────────────────────────────────────────────────────────────────────
@@ -202,8 +218,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
           twoFactorToken: null,
           twoFactorMethods: [],
         });
-      } else {
-        // Token invalid or expired
+      } else if (isInvalidSessionCode(response.code)) {
+        // Only an explicit authentication-invalid response may destroy a
+        // persisted session. The API client resolves transport failures rather
+        // than throwing, so generic success:false is not proof of invalidity.
         tokenManager.clearTokens();
         setTelemetryUser(null);
         setState({
@@ -213,12 +231,38 @@ export function AuthProvider({ children }: AuthProviderProps) {
           twoFactorToken: null,
           twoFactorMethods: [],
         });
+      } else if (tokenManager.hasAccessToken()) {
+        // Preserve the authenticated shell when it already has user data. On a
+        // cold start, remain in the recoverable auth-check state so protected
+        // routes do not redirect merely because the network is unavailable.
+        setState((prev) => ({
+          ...prev,
+          status: prev.user ? 'authenticated' : 'loading',
+          error: null,
+        }));
+      } else {
+        // The access token disappeared independently (for example, an explicit
+        // logout in another tab). Reflect the local state without deleting a
+        // refresh-only credential solely because this request was transient.
+        setState({
+          user: null,
+          status: 'idle',
+          error: null,
+          twoFactorToken: null,
+          twoFactorMethods: [],
+        });
       }
     } catch (err) {
-      // Network or unexpected error — preserve existing user/token state so a
-      // transient connectivity blip doesn't silently log the user out.
+      // Defensive fallback for unexpected throws. Production transport errors
+      // normally arrive as resolved failure envelopes.
       logError('refreshUser failed', err);
-      setState((prev) => ({ ...prev, status: 'idle' }));
+      setState((prev) => ({
+        ...prev,
+        status: prev.user
+          ? 'authenticated'
+          : tokenManager.hasAccessToken() ? 'loading' : 'idle',
+        error: null,
+      }));
     }
   }, []);
 
@@ -332,13 +376,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     if (!result.success || !result.data) {
       // User cancelled the biometric prompt — return to idle silently
-      const wasCancelled = result.error?.includes('cancelled');
+      const wasCancelled = result.errorCode === 'cancelled' || result.error?.includes('cancelled');
       setState((prev) => ({
         ...prev,
         status: wasCancelled ? 'idle' : 'error',
         error: wasCancelled ? null : (result.error ?? 'Biometric login failed'),
       }));
-      return { success: false, requires2FA: false, error: wasCancelled ? undefined : result.error };
+      return {
+        success: false,
+        requires2FA: false,
+        error: wasCancelled ? undefined : result.error,
+        errorCode: result.errorCode,
+      };
     }
 
     const { user, access_token, refresh_token } = result.data;
@@ -707,6 +756,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     refreshUser();
   }, [refreshUser]);
+
+  // A cold-start session check that failed offline remains recoverable instead
+  // of redirecting to login. Retry automatically when connectivity returns.
+  useEffect(() => {
+    const retrySessionCheck = () => {
+      if (state.status === 'loading' && tokenManager.hasAccessToken()) {
+        void refreshUser();
+      }
+    };
+
+    window.addEventListener('online', retrySessionCheck);
+    return () => window.removeEventListener('online', retrySessionCheck);
+  }, [refreshUser, state.status]);
 
   // ─────────────────────────────────────────────────────────────────────────
   // Context Value

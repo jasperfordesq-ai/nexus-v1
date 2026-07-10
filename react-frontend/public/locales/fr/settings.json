@@ -158,6 +158,8 @@
   "passkey_setup_tooltip": "Afficher le guide de configuration du mot de passe",
   "passkey_show_instructions": "Afficher les instructions de configuration du mot de passe",
   "passkey_registration_failed": "Échec de l'enregistrement",
+  "passkey_error_domain": "Les clés d'accès ne sont pas encore disponibles à cette adresse du site. Veuillez contacter l'administration de votre communauté.",
+  "passkey_cancelled": "La configuration de la clé d'accès a été annulée.",
   "passkey_remove_failed": "Impossible de supprimer le passkey",
   "passkey_remove_all_failed": "Impossible de supprimer les passkeys",
   "passkey_remove_all_title": "Supprimer tous les mots de passe",

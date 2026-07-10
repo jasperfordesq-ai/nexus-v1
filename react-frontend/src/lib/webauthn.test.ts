@@ -313,28 +313,52 @@ describe("registerBiometric", () => {
     mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_CHALLENGE_DATA });
     mockStartRegistration.mockRejectedValueOnce(new Error("The operation was cancelled"));
     const result = await registerBiometric("PC", "platform");
-    expect(result).toEqual({ success: false, error: "Biometric registration was cancelled." });
+    expect(result).toEqual({ success: false, error: "Biometric registration was cancelled.", errorCode: "cancelled" });
   });
 
   it("treats denied as cancelled error", async () => {
     mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_CHALLENGE_DATA });
     mockStartRegistration.mockRejectedValueOnce(new Error("User denied the request"));
     const result = await registerBiometric();
-    expect(result).toEqual({ success: false, error: "Biometric registration was cancelled." });
+    expect(result).toEqual({ success: false, error: "Biometric registration was cancelled.", errorCode: "cancelled" });
+  });
+
+  it("classifies SimpleWebAuthn ERROR_INVALID_RP_ID as domain_not_allowed", async () => {
+    mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_CHALLENGE_DATA });
+    const rpIdError = Object.assign(new Error('The RP ID "project-nexus.ie" is invalid for this domain'), {
+      code: "ERROR_INVALID_RP_ID",
+    });
+    mockStartRegistration.mockRejectedValueOnce(rpIdError);
+    const result = await registerBiometric();
+    expect(result.success).toBe(false);
+    expect(result.errorCode).toBe("domain_not_allowed");
+  });
+
+  it("classifies NotAllowedError carried on error.cause as cancelled", async () => {
+    mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_CHALLENGE_DATA });
+    const cause = new Error("The operation either timed out or was not allowed");
+    cause.name = "NotAllowedError";
+    const wrapped = Object.assign(new Error("Registration failed"), {
+      code: "ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY",
+      cause,
+    });
+    mockStartRegistration.mockRejectedValueOnce(wrapped);
+    const result = await registerBiometric();
+    expect(result.errorCode).toBe("cancelled");
   });
 
   it("returns generic error message for unknown errors", async () => {
     mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_CHALLENGE_DATA });
     mockStartRegistration.mockRejectedValueOnce(new Error("Some unknown failure"));
     const result = await registerBiometric();
-    expect(result).toEqual({ success: false, error: "Some unknown failure" });
+    expect(result).toEqual({ success: false, error: "Some unknown failure", errorCode: "unknown" });
   });
 
   it("returns fallback message for non-Error throws", async () => {
     mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_CHALLENGE_DATA });
     mockStartRegistration.mockRejectedValueOnce("string error");
     const result = await registerBiometric();
-    expect(result).toEqual({ success: false, error: "Biometric registration failed" });
+    expect(result).toEqual({ success: false, error: "Biometric registration failed", errorCode: "unknown" });
   });
 });
 
@@ -382,21 +406,32 @@ describe("authenticateWithBiometric", () => {
     mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_AUTH_CHALLENGE });
     mockStartAuthentication.mockRejectedValueOnce(new Error("NotAllowedError: not allowed"));
     const result = await authenticateWithBiometric();
-    expect(result).toEqual({ success: false, error: "Biometric login was cancelled." });
+    expect(result).toEqual({ success: false, error: "Biometric login was cancelled.", errorCode: "cancelled" });
   });
 
   it("returns cancelled error on cancelled message", async () => {
     mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_AUTH_CHALLENGE });
     mockStartAuthentication.mockRejectedValueOnce(new Error("The operation was cancelled"));
     const result = await authenticateWithBiometric();
-    expect(result).toEqual({ success: false, error: "Biometric login was cancelled." });
+    expect(result).toEqual({ success: false, error: "Biometric login was cancelled.", errorCode: "cancelled" });
+  });
+
+  it("classifies SimpleWebAuthn ERROR_INVALID_RP_ID as domain_not_allowed", async () => {
+    mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_AUTH_CHALLENGE });
+    const rpIdError = Object.assign(new Error('The RP ID "project-nexus.ie" is invalid for this domain'), {
+      code: "ERROR_INVALID_RP_ID",
+    });
+    mockStartAuthentication.mockRejectedValueOnce(rpIdError);
+    const result = await authenticateWithBiometric();
+    expect(result.success).toBe(false);
+    expect(result.errorCode).toBe("domain_not_allowed");
   });
 
   it("returns generic error for unknown failures", async () => {
     mockApiPost.mockResolvedValueOnce({ success: true, data: MOCK_AUTH_CHALLENGE });
     mockStartAuthentication.mockRejectedValueOnce(new Error("Hardware failure"));
     const result = await authenticateWithBiometric();
-    expect(result).toEqual({ success: false, error: "Hardware failure" });
+    expect(result).toEqual({ success: false, error: "Hardware failure", errorCode: "unknown" });
   });
 });
 

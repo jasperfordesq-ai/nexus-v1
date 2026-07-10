@@ -35,8 +35,17 @@ class WebAuthnChallengeStore
         $challengeId = self::generateChallengeId();
         $key = self::getKey($challengeId);
 
+        // Bind the challenge to the resolved tenant. The React SPA uses
+        // stateless token auth, so $_SESSION['tenant_id'] is unset there —
+        // reading only the session left tenant_id null and silently disabled
+        // the cross-tenant replay checks in WebAuthnController.
         $tenantId = null;
-        if (isset($_SESSION['tenant_id'])) {
+        try {
+            $tenantId = \App\Core\TenantContext::getId();
+        } catch (\Throwable) {
+            // Tenant not resolvable (e.g. bare unit test) — fall through.
+        }
+        if ($tenantId === null && isset($_SESSION['tenant_id'])) {
             $tenantId = $_SESSION['tenant_id'];
         }
 

@@ -70,6 +70,46 @@ interface WebAuthnStatus {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Error Classification
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Stable failure codes the UI can map to translated messages. */
+export type WebAuthnFailureCode = 'cancelled' | 'domain_not_allowed' | 'unknown';
+
+/**
+ * Classify a ceremony exception into a stable code.
+ *
+ * SimpleWebAuthn wraps DOMExceptions in a WebAuthnError carrying a structured
+ * `code` (e.g. ERROR_INVALID_RP_ID when the server's RP ID isn't valid for the
+ * page's domain). Duck-type on `code` rather than `instanceof` so unit-test
+ * mocks of the library don't break classification.
+ */
+function classifyWebAuthnError(err: unknown): { code: WebAuthnFailureCode; message: string } {
+  const message = err instanceof Error ? err.message : '';
+  const libraryCode = (err as { code?: string } | null | undefined)?.code;
+
+  if (libraryCode === 'ERROR_INVALID_RP_ID' || libraryCode === 'ERROR_INVALID_DOMAIN') {
+    return { code: 'domain_not_allowed', message };
+  }
+
+  // Error.cause via index access — the project's TS lib target predates it.
+  const cause = (err as { cause?: { name?: unknown } } | null | undefined)?.cause;
+  const causeName = typeof cause?.name === 'string' ? cause.name : undefined;
+  if (
+    libraryCode === 'ERROR_CEREMONY_ABORTED' ||
+    (err instanceof Error && (err.name === 'NotAllowedError' || err.name === 'AbortError')) ||
+    causeName === 'NotAllowedError' ||
+    message.includes('NotAllowedError') ||
+    message.includes('cancelled') ||
+    message.includes('denied')
+  ) {
+    return { code: 'cancelled', message };
+  }
+
+  return { code: 'unknown', message };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Device / Platform Detection
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -109,7 +149,7 @@ export type AuthenticatorAttachment = 'platform' | 'cross-platform' | undefined;
 export async function registerBiometric(
   deviceName?: string,
   attachment?: AuthenticatorAttachment,
-): Promise<{ success: boolean; error?: string }> {
+): Promise<{ success: boolean; error?: string; errorCode?: WebAuthnFailureCode }> {
   try {
     // Modal registration supersedes any pending autofill request — see
     // authenticateWithBiometric.
@@ -210,12 +250,11 @@ export async function registerBiometric(
 
     return { success: true };
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Biometric registration failed';
-    // User cancelled or browser error
-    if (message.includes('NotAllowedError') || message.includes('cancelled') || message.includes('denied')) {
-      return { success: false, error: 'Biometric registration was cancelled.' };
+    const { code, message } = classifyWebAuthnError(err);
+    if (code === 'cancelled') {
+      return { success: false, error: 'Biometric registration was cancelled.', errorCode: code };
     }
-    return { success: false, error: message };
+    return { success: false, error: message || 'Biometric registration failed', errorCode: code };
   }
 }
 
@@ -234,6 +273,7 @@ export async function authenticateWithBiometric(
     expires_in: number;
   };
   error?: string;
+  errorCode?: WebAuthnFailureCode;
 }> {
   try {
     // This modal ceremony supersedes any pending autofill request (the
@@ -297,11 +337,11 @@ export async function authenticateWithBiometric(
 
     return { success: true, data: verifyRes.data };
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Biometric authentication failed';
-    if (message.includes('NotAllowedError') || message.includes('cancelled') || message.includes('denied')) {
-      return { success: false, error: 'Biometric login was cancelled.' };
+    const { code, message } = classifyWebAuthnError(err);
+    if (code === 'cancelled') {
+      return { success: false, error: 'Biometric login was cancelled.', errorCode: code };
     }
-    return { success: false, error: message };
+    return { success: false, error: message || 'Biometric authentication failed', errorCode: code };
   }
 }
 

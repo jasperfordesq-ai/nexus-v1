@@ -8,7 +8,9 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+use App\Core\TenantContext;
 use App\Models\User;
 
 /**
@@ -57,6 +59,67 @@ class WebAuthnControllerTest extends TestCase
                 'userVerification',
             ],
         ]);
+    }
+
+    // ------------------------------------------------------------------
+    //  RP ID derivation (multi-tenant custom domains)
+    //
+    //  Tenants can serve the React frontend from their own domain
+    //  (tenants.domain). The RP ID must match the page's domain or the
+    //  browser rejects the ceremony — a single platform-wide RP ID broke
+    //  passkeys entirely on custom-domain tenants.
+    // ------------------------------------------------------------------
+
+    public function test_auth_challenge_uses_tenant_custom_domain_as_rp_id(): void
+    {
+        config(['webauthn.rp_id' => 'project-nexus.ie']);
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['domain' => 'hour-timebank.ie']);
+        TenantContext::setById($this->testTenantId);
+
+        $response = $this->apiPost('/webauthn/auth-challenge', [], ['Origin' => 'https://hour-timebank.ie']);
+
+        $response->assertStatus(200);
+        $this->assertSame('hour-timebank.ie', $response->json('data.rpId'));
+    }
+
+    public function test_auth_challenge_uses_platform_rp_id_on_platform_domain(): void
+    {
+        config(['webauthn.rp_id' => 'project-nexus.ie']);
+
+        $response = $this->apiPost('/webauthn/auth-challenge', [], ['Origin' => 'https://app.project-nexus.ie']);
+
+        $response->assertStatus(200);
+        $this->assertSame('project-nexus.ie', $response->json('data.rpId'));
+    }
+
+    public function test_auth_challenge_ignores_unrecognised_origin(): void
+    {
+        config(['webauthn.rp_id' => 'project-nexus.ie']);
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['domain' => 'hour-timebank.ie']);
+        TenantContext::setById($this->testTenantId);
+
+        $response = $this->apiPost('/webauthn/auth-challenge', [], ['Origin' => 'https://evil.example.com']);
+
+        $response->assertStatus(200);
+        $this->assertSame('project-nexus.ie', $response->json('data.rpId'));
+    }
+
+    public function test_register_challenge_uses_tenant_custom_domain_as_rp_id(): void
+    {
+        config(['webauthn.rp_id' => 'project-nexus.ie']);
+        DB::table('tenants')->where('id', $this->testTenantId)->update(['domain' => 'hour-timebank.ie']);
+        TenantContext::setById($this->testTenantId);
+        $this->authenticatedUser();
+
+        $response = $this->apiPost('/webauthn/register-challenge', [], ['Origin' => 'https://hour-timebank.ie']);
+
+        if ($response->getStatusCode() === 200) {
+            $this->assertSame('hour-timebank.ie', $response->json('data.rp.id'));
+        } else {
+            // Environments without full session support return 500 here (see
+            // test_register_challenge_returns_options) — nothing to assert.
+            $this->assertSame(500, $response->getStatusCode());
+        }
     }
 
     // ------------------------------------------------------------------

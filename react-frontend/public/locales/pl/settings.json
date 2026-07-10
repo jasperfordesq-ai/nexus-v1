@@ -158,6 +158,8 @@
   "passkey_setup_tooltip": "Pokaż instrukcję konfiguracji klucza dostępu",
   "passkey_show_instructions": "Pokaż instrukcje konfiguracji klucza dostępu",
   "passkey_registration_failed": "Rejestracja nie powiodła się",
+  "passkey_error_domain": "Klucze dostępu nie są jeszcze dostępne pod tym adresem witryny. Skontaktuj się z administratorem swojej społeczności.",
+  "passkey_cancelled": "Konfiguracja klucza dostępu została anulowana.",
   "passkey_remove_failed": "Nie udało się usunąć poświadczenia",
   "passkey_remove_all_failed": "Nie udało się usunąć poświadczeń",
   "passkey_remove_all_title": "Usuń wszystkie klucze",

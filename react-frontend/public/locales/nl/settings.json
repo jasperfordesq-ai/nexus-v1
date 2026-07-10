@@ -158,6 +158,8 @@
   "passkey_setup_tooltip": "Installatiehandleiding voor wachtwoord tonen",
   "passkey_show_instructions": "Toon instructies voor het instellen van de wachtwoordcode",
   "passkey_registration_failed": "Registratie mislukt",
+  "passkey_error_domain": "Passkeys zijn nog niet beschikbaar op dit siteadres. Neem contact op met de beheerder van je community.",
+  "passkey_cancelled": "Het instellen van de passkey is geannuleerd.",
   "passkey_remove_failed": "Verwijderen van referentie mislukt",
   "passkey_remove_all_failed": "Verwijderen van referenties mislukt",
   "passkey_remove_all_title": "Verwijder alle toegangscodes",
