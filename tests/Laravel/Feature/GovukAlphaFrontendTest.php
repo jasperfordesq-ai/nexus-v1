@@ -2161,7 +2161,11 @@ class GovukAlphaFrontendTest extends TestCase
         $index->assertOk();
         $index->assertSee('class="govuk-fieldset"', false);
         $index->assertSee('class="govuk-checkboxes ', false);
-        $index->assertSee('class="govuk-tabs ', false);
+        // Section sub-navigation renders as a semantic <nav> of links (aria-
+        // labelled), not a govuk-tabs JS panel component — govuk-tabs is
+        // reserved for in-page panel switching (see volunteering.blade.php).
+        $index->assertSee(__('govuk_alpha.volunteering.tabs_title'));
+        $index->assertSee(__('govuk_alpha.volunteering.tabs.opportunities'));
         $index->assertSee('Alpha volunteering opportunity');
         $index->assertSee('Alpha Volunteer Organisation');
         $index->assertSee(route('govuk-alpha.volunteering.show', ['tenantSlug' => $this->testTenantSlug, 'id' => $opportunityId]), false);
