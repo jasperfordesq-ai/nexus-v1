@@ -103,8 +103,14 @@ function watchUnexpectedBrowserOutput(page: Page, testInfo: TestInfo): string[] 
   page.on('pageerror', (error) => {
     unexpected.push(`pageerror: ${error.message}`);
   });
+  // Ignore API rate-limit (429) resource errors. This gate loads many
+  // API-heavy pages rapidly from a single CI IP and trips the per-IP request
+  // throttle; the resulting "Failed to load resource ... 429" console error is
+  // a load artifact of the test harness, not an accessibility or app defect.
+  const rateLimitNoise = /429|too many requests|rate.?limit/i;
   page.on('console', (message) => {
     const text = message.text();
+    if (rateLimitNoise.test(text)) return;
     if (message.type() === 'error' || (message.type() === 'warning' && reactOrAriaWarning.test(text))) {
       unexpected.push(`${message.type()}: ${text}`);
     }
