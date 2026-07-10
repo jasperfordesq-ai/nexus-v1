@@ -30,8 +30,17 @@ test.describe('production PWA lifecycle', () => {
     const href = await page.locator('link[rel="manifest"]').getAttribute('href');
     expect(href).toContain('/api/v2/pwa/manifest?path=');
 
-    const response = await page.request.get(href!);
-    expect(response.ok()).toBe(true);
+    // The gate loads many pages that each fetch this manifest via
+    // <link rel="manifest">, so the manifest route's per-IP throttle can be
+    // briefly exhausted when this explicit fetch runs. Retry on 429, and
+    // surface the real status if it still isn't ok (so a non-throttle failure
+    // is diagnosable rather than a bare "expected true, received false").
+    let response = await page.request.get(href!);
+    for (let attempt = 0; attempt < 5 && response.status() === 429; attempt++) {
+      await page.waitForTimeout(3000);
+      response = await page.request.get(href!);
+    }
+    expect(response.ok(), `manifest ${href} returned HTTP ${response.status()}`).toBe(true);
     expect(response.headers()['content-type']).toContain('application/manifest+json');
     const manifest = await response.json();
 
