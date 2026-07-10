@@ -127,17 +127,30 @@ class FederationNativeIngestController extends BaseApiController
                 'Request body must be a non-empty JSON object', null, 400);
         }
 
-        // Resolve the external partner record (if any) — federation_api_keys
-        // may or may not link to federation_external_partners depending on how
-        // the key was provisioned. We best-effort log against partner.platform_id.
+        // Resolve the external partner record (if any). SECURITY: the partner
+        // identity — and with it the per-partner allow_* permission flags —
+        // must come from the AUTHENTICATED key row, never from a client
+        // header. The old X-Federation-Partner-ID header path (constrained
+        // only to same tenant) let a key issued for partner A impersonate
+        // partner B: write/overwrite/mass-retract B's federated entities under
+        // B's permissions (2026-07-10 audit M3). An unlinked key resolves no
+        // partner, so every allow_* flag below defaults false — fail closed.
         $externalPartner = null;
         try {
-            $platformId = $partner['platform_id'] ?? null;
             $query = DB::table('federation_external_partners')->where('tenant_id', $tenantId);
-            $requestedPartnerId = $request->header('X-Federation-Partner-ID')
-                ?? $request->header('X-Webhook-Partner-ID');
-            if (is_scalar($requestedPartnerId) && (int) $requestedPartnerId > 0) {
-                $externalPartner = $query->where('id', (int) $requestedPartnerId)->first();
+
+            $linkedPartnerId = null;
+            $keyId = (int) ($partner['id'] ?? 0);
+            if ($keyId > 0 && \Illuminate\Support\Facades\Schema::hasColumn('federation_api_keys', 'external_partner_id')) {
+                $linkedPartnerId = DB::table('federation_api_keys')
+                    ->where('id', $keyId)
+                    ->where('tenant_id', $tenantId)
+                    ->value('external_partner_id');
+            }
+
+            $platformId = $partner['platform_id'] ?? null;
+            if ((int) $linkedPartnerId > 0) {
+                $externalPartner = $query->where('id', (int) $linkedPartnerId)->first();
             } elseif ($platformId && \Illuminate\Support\Facades\Schema::hasColumn('federation_external_partners', 'platform_id')) {
                 $externalPartner = $query->where('platform_id', $platformId)->first();
             }

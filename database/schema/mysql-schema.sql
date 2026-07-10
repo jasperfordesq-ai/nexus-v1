@@ -3850,6 +3850,7 @@ CREATE TABLE `federation_api_keys` (
   `signing_secret` varchar(64) DEFAULT NULL COMMENT 'HMAC-SHA256 signing secret (hex encoded)',
   `signing_enabled` tinyint(1) DEFAULT 0 COMMENT 'Whether HMAC signing is required for this key',
   `platform_id` varchar(100) DEFAULT NULL COMMENT 'External platform identifier',
+  `external_partner_id` int(10) unsigned DEFAULT NULL COMMENT 'federation_external_partners.id this key acts as; NULL = unlinked',
   `permissions` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '[]' COMMENT 'Array of permission strings' CHECK (json_valid(`permissions`)),
   `rate_limit` int(10) unsigned DEFAULT 1000 COMMENT 'Requests per hour',
   `request_count` int(10) unsigned DEFAULT 0 COMMENT 'Current hour request count',
@@ -3868,6 +3869,7 @@ CREATE TABLE `federation_api_keys` (
   KEY `idx_prefix` (`key_prefix`),
   KEY `idx_platform` (`platform_id`),
   KEY `idx_rate_limit_hour` (`rate_limit_hour`),
+  KEY `idx_fak_external_partner` (`external_partner_id`),
   CONSTRAINT `federation_api_keys_ibfk_1` FOREIGN KEY (`tenant_id`) REFERENCES `tenants` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -7132,7 +7134,7 @@ CREATE TABLE `laravel_migrations` (
   `migration` varchar(255) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=332 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=333 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `leaderboard_cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -14860,7 +14862,8 @@ INSERT INTO `laravel_migrations` VALUES
 (328,'2026_07_08_010000_add_db_audit_hot_path_indexes',91),
 (329,'2026_07_09_000001_normalize_retired_user_roles',92),
 (330,'2026_07_09_000002_merge_tenant_admin_into_admin',92),
-(331,'2026_07_10_000001_add_amount_refunded_to_vol_donations',92);
+(331,'2026_07_10_000001_add_amount_refunded_to_vol_donations',92),
+(332,'2026_07_10_000002_add_external_partner_id_to_federation_api_keys',93);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

@@ -1001,7 +1001,10 @@ class AdminFederationController extends BaseApiController
         if (!$this->tableExists('federation_api_keys')) { return $this->respondWithData([]); }
 
         try {
-            $keyRows = DB::select("SELECT id, name, key_prefix, status, permissions, last_used_at, expires_at, created_at FROM federation_api_keys WHERE tenant_id = ? ORDER BY created_at DESC", [$tenantId]);
+            $partnerCol = \Illuminate\Support\Facades\Schema::hasColumn('federation_api_keys', 'external_partner_id')
+                ? ', external_partner_id'
+                : '';
+            $keyRows = DB::select("SELECT id, name, key_prefix, status, permissions, last_used_at, expires_at, created_at{$partnerCol} FROM federation_api_keys WHERE tenant_id = ? ORDER BY created_at DESC", [$tenantId]);
             $keys = array_map(function($k) { $arr = (array)$k; $arr['scopes'] = !empty($arr['permissions']) ? (json_decode($arr['permissions'], true) ?: []) : []; unset($arr['permissions']); return $arr; }, $keyRows);
             return $this->respondWithData($keys);
         } catch (\Exception $e) { return $this->respondWithData([]); }
@@ -1033,15 +1036,30 @@ class AdminFederationController extends BaseApiController
 
         $expiresAt = $this->input('expires_at');
 
+        // Optional binding to a federation_external_partners row: the native
+        // ingest endpoints resolve the acting partner (and its allow_* flags)
+        // from this server-side link — never from a client header (audit M3).
+        // Must reference a partner in THIS tenant.
+        $externalPartnerId = (int) $this->input('external_partner_id', 0);
+        if ($externalPartnerId > 0) {
+            $partnerExists = DB::table('federation_external_partners')
+                ->where('id', $externalPartnerId)
+                ->where('tenant_id', $tenantId)
+                ->exists();
+            if (!$partnerExists) {
+                return $this->respondWithError('NOT_FOUND', __('api.federation.partner_not_found'), 'external_partner_id', 404);
+            }
+        }
+
         try {
             $keyValue = bin2hex(random_bytes(32));
             $prefix = substr($keyValue, 0, 8);
             DB::insert(
-                "INSERT INTO federation_api_keys (tenant_id, name, key_hash, key_prefix, permissions, status, expires_at, created_by, created_at) VALUES (?, ?, ?, ?, ?, 'active', ?, ?, NOW())",
-                [$tenantId, $name, hash('sha256', $keyValue), $prefix, json_encode($scopes), $expiresAt ?: null, $this->getUserId()]
+                "INSERT INTO federation_api_keys (tenant_id, name, key_hash, key_prefix, permissions, status, expires_at, external_partner_id, created_by, created_at) VALUES (?, ?, ?, ?, ?, 'active', ?, ?, ?, NOW())",
+                [$tenantId, $name, hash('sha256', $keyValue), $prefix, json_encode($scopes), $expiresAt ?: null, $externalPartnerId > 0 ? $externalPartnerId : null, $this->getUserId()]
             );
-            \Illuminate\Support\Facades\Log::info('[Federation] API key created', ['tenant_id' => $tenantId, 'key_prefix' => $prefix, 'created_by' => $this->getUserId()]);
-            return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'name' => $name, 'api_key' => $keyValue, 'key_prefix' => $prefix, 'warning' => __('api_controllers_1.admin_federation.api_key_shown_once_warning')], null, 201);
+            \Illuminate\Support\Facades\Log::info('[Federation] API key created', ['tenant_id' => $tenantId, 'key_prefix' => $prefix, 'external_partner_id' => $externalPartnerId ?: null, 'created_by' => $this->getUserId()]);
+            return $this->respondWithData(['id' => DB::getPdo()->lastInsertId(), 'name' => $name, 'api_key' => $keyValue, 'key_prefix' => $prefix, 'external_partner_id' => $externalPartnerId ?: null, 'warning' => __('api_controllers_1.admin_federation.api_key_shown_once_warning')], null, 201);
         } catch (\Exception $e) { return $this->respondWithError('CREATE_FAILED', __('api_controllers_1.admin_federation.api_key_create_failed')); }
     }
 

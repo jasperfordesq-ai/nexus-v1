@@ -38,7 +38,13 @@ class FederationNativeIngestControllerTest extends TestCase
         parent::tearDown();
     }
 
-    private function createFederationApiKey(array $permissions = ['*']): string
+    /**
+     * @param int|null $externalPartnerId Server-side partner binding — since the
+     *                                    2026-07-10 M3 fix this link (not any
+     *                                    client header) decides which partner
+     *                                    the key acts as.
+     */
+    private function createFederationApiKey(array $permissions = ['*'], ?int $externalPartnerId = null): string
     {
         $this->enableFederationForTenant($this->testTenantId);
 
@@ -51,6 +57,7 @@ class FederationNativeIngestControllerTest extends TestCase
                 'key_hash' => hash('sha256', $apiKey),
                 'key_prefix' => substr($apiKey, 0, 8),
                 'platform_id' => 'native-ingest-' . bin2hex(random_bytes(4)),
+                'external_partner_id' => $externalPartnerId,
                 'permissions' => json_encode($permissions),
                 'rate_limit' => 1000,
                 'status' => 'active',
@@ -67,19 +74,28 @@ class FederationNativeIngestControllerTest extends TestCase
         return $apiKey;
     }
 
-    private function nativeAuthHeaders(string $apiKey, object $externalPartner): array
+    /**
+     * @param object|null $claimedPartner When set, sends the (now-untrusted)
+     *                                    X-Federation-Partner-ID header claiming
+     *                                    to act as that partner.
+     */
+    private function nativeAuthHeaders(string $apiKey, ?object $claimedPartner = null): array
     {
         $_SERVER['HTTP_AUTHORIZATION'] = 'Bearer ' . $apiKey;
         $_SERVER['REQUEST_METHOD'] = 'POST';
         $_SERVER['REQUEST_URI'] = '/api/v2/federation/ingest';
         $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 
-        return [
+        $headers = [
             'Authorization' => 'Bearer ' . $apiKey,
-            'X-Federation-Partner-ID' => (string) $externalPartner->id,
             'Accept' => 'application/json',
             'Content-Type' => 'application/json',
         ];
+        if ($claimedPartner !== null) {
+            $headers['X-Federation-Partner-ID'] = (string) $claimedPartner->id;
+        }
+
+        return $headers;
     }
 
     public function test_controller_exists(): void
@@ -182,8 +198,8 @@ class FederationNativeIngestControllerTest extends TestCase
 
     public function test_disabled_external_partner_permission_rejects_native_listing_push_without_shadow_write(): void
     {
-        $apiKey = $this->createFederationApiKey();
         $externalPartner = $this->setupPartner('nexus', $this->testTenantId);
+        $apiKey = $this->createFederationApiKey(['*'], (int) $externalPartner->id);
         DB::table('federation_external_partners')
             ->where('id', $externalPartner->id)
             ->update(['allow_listing_search' => 0]);
@@ -196,7 +212,7 @@ class FederationNativeIngestControllerTest extends TestCase
                 'title' => 'Native denied listing',
                 'description' => 'This should not be mirrored.',
             ],
-            $this->nativeAuthHeaders($apiKey, $externalPartner)
+            $this->nativeAuthHeaders($apiKey)
         );
 
         $response->assertOk();
@@ -208,10 +224,78 @@ class FederationNativeIngestControllerTest extends TestCase
         ]);
     }
 
+    /**
+     * 2026-07-10 audit M3: the acting partner used to be chosen from the
+     * client-supplied X-Federation-Partner-ID header (constrained only to the
+     * same tenant), so a key issued for partner A could impersonate partner B
+     * and inherit B's allow_* permissions. The header must now be ignored:
+     * identity comes only from the key row's external_partner_id binding.
+     */
+    public function test_partner_id_header_cannot_impersonate_another_partner(): void
+    {
+        $partnerA = $this->setupPartner('nexus', $this->testTenantId);
+        $partnerB = $this->setupPartner('nexus', $this->testTenantId);
+        // Partner A may not push listings; partner B may.
+        DB::table('federation_external_partners')
+            ->where('id', $partnerA->id)
+            ->update(['allow_listing_search' => 0]);
+
+        // Key bound to partner A, header claims partner B.
+        $apiKey = $this->createFederationApiKey(['*'], (int) $partnerA->id);
+        $externalId = 'native-impersonation-' . uniqid();
+        $response = $this->apiPost(
+            '/v2/federation/ingest/listings',
+            [
+                'external_id' => $externalId,
+                'title' => 'Impersonated listing',
+                'description' => 'Must be rejected under partner A permissions.',
+            ],
+            $this->nativeAuthHeaders($apiKey, $partnerB)
+        );
+
+        $response->assertOk();
+        $this->assertSame('rejected', $response->json('data.result.status'),
+            'Key bound to partner A must act as A (listings disallowed) regardless of the header');
+        foreach ([$partnerA->id, $partnerB->id] as $pid) {
+            $this->assertDatabaseMissing('federation_listings', [
+                'tenant_id' => $this->testTenantId,
+                'external_partner_id' => $pid,
+                'external_id' => $externalId,
+            ]);
+        }
+    }
+
+    public function test_unlinked_key_cannot_claim_partner_via_header(): void
+    {
+        $partnerB = $this->setupPartner('nexus', $this->testTenantId);
+
+        // Key with NO partner binding, header claims partner B (all-allowed).
+        $apiKey = $this->createFederationApiKey(['*'], null);
+        $externalId = 'native-unlinked-claim-' . uniqid();
+        $response = $this->apiPost(
+            '/v2/federation/ingest/listings',
+            [
+                'external_id' => $externalId,
+                'title' => 'Unlinked-key listing',
+                'description' => 'Must fail closed: no partner, no allow flags.',
+            ],
+            $this->nativeAuthHeaders($apiKey, $partnerB)
+        );
+
+        $response->assertOk();
+        $this->assertSame('rejected', $response->json('data.result.status'),
+            'An unlinked key resolves no partner and must fail closed');
+        $this->assertDatabaseMissing('federation_listings', [
+            'tenant_id' => $this->testTenantId,
+            'external_partner_id' => $partnerB->id,
+            'external_id' => $externalId,
+        ]);
+    }
+
     public function test_native_ingest_log_redacts_sensitive_request_fields(): void
     {
-        $apiKey = $this->createFederationApiKey();
         $externalPartner = $this->setupPartner('nexus', $this->testTenantId);
+        $apiKey = $this->createFederationApiKey(['*'], (int) $externalPartner->id);
         $externalId = 'native-redacted-member-' . uniqid();
 
         $response = $this->apiPost(
@@ -224,7 +308,7 @@ class FederationNativeIngestControllerTest extends TestCase
                 'password' => 'native-secret-password',
                 'metadata' => ['token' => 'native-nested-token'],
             ],
-            $this->nativeAuthHeaders($apiKey, $externalPartner)
+            $this->nativeAuthHeaders($apiKey)
         );
 
         $response->assertOk();
