@@ -138,6 +138,13 @@ class EventsControllerTest extends TestCase
             'is_approved' => true,
         ]);
         $categoryId = $this->seedCategory();
+        // Use a dynamic future window: the public index filters to
+        // start_time >= now() (EventService::61), so hardcoded calendar dates
+        // silently drop out of the listing once that date passes.
+        $start = now()->addDays(7)->setTime(10, 0, 0);
+        $end = $start->copy()->setTime(12, 0, 0);
+        $startStr = $start->format('Y-m-d H:i:s');
+        $endStr = $end->format('Y-m-d H:i:s');
         $eventId = $this->createEvent($user->id, [
             'category_id' => $categoryId,
             'title' => 'Community repair morning',
@@ -146,8 +153,8 @@ class EventsControllerTest extends TestCase
             'latitude' => null,
             'longitude' => null,
             'image_url' => '/uploads/tenants/hour-timebank/events/repair.jpg',
-            'start_time' => '2026-07-10 10:00:00',
-            'end_time' => '2026-07-10 12:00:00',
+            'start_time' => $startStr,
+            'end_time' => $endStr,
         ]);
 
         $response = $this->apiGet('/v2/events?per_page=1', [
@@ -192,8 +199,8 @@ class EventsControllerTest extends TestCase
         $this->assertNull($contract['location']['latitude']);
         $this->assertNull($contract['location']['longitude']);
         $this->assertSame('Event Organiser', $contract['organiser']['display_name']);
-        $this->assertSame('2026-07-10T10:00:00+00:00', $contract['start_at']);
-        $this->assertSame('2026-07-10T12:00:00+00:00', $contract['end_at']);
+        $this->assertSame(\Illuminate\Support\Carbon::parse($startStr, 'UTC')->toIso8601String(), $contract['start_at']);
+        $this->assertSame(\Illuminate\Support\Carbon::parse($endStr, 'UTC')->toIso8601String(), $contract['end_at']);
         $this->assertSame('active', $contract['status']);
     }
 
