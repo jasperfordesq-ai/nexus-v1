@@ -72,6 +72,22 @@ class WalletService
             // federation_transactions table may not exist in older tenants — ignore
         }
 
+        // Internal (same-platform) federated inbound credits: the canonical ledger
+        // row lives in the SENDER's tenant (transactions.tenant_id = sender tenant),
+        // so the tenant-scoped stats query above can never count them for the receiver.
+        $internalFed = DB::table('transactions')
+            ->where('is_federated', 1)
+            ->where('receiver_id', $userId)
+            ->where('receiver_tenant_id', TenantContext::getId())
+            ->whereColumn('tenant_id', '!=', 'receiver_tenant_id')
+            ->where('status', 'completed')
+            ->selectRaw('COALESCE(SUM(amount), 0) as fed_earned, COUNT(*) as fed_count')
+            ->first();
+        if ($internalFed) {
+            $totalEarned += (float) $internalFed->fed_earned;
+            $txCount += (int) $internalFed->fed_count;
+        }
+
         return [
             'balance'           => (float) ($user->balance ?? 0),
             'total_earned'      => $totalEarned,
@@ -140,11 +156,16 @@ class WalletService
         // Format each transaction into the standard API shape expected by the frontend
         $formatted = $items->map(fn (Transaction $txn) => $this->formatTransaction($txn, $userId))->all();
 
-        // Merge federation_transactions (inbound from external partners) on the first page only.
+        // Merge federated inbound credits on the first page only: external partner
+        // rows from federation_transactions AND internal cross-tenant rows recorded
+        // in the sender's tenant (invisible to the tenant-scoped native query above).
         // Cursor pagination stays keyed to the native transactions table; federation rows
         // appear as an overlay on page 1, re-sorted by created_at so they interleave correctly.
         if ($cursor === null && $type !== 'sent') {
-            $fedItems = $this->getFederationTransactions($userId, $limit);
+            $fedItems = array_merge(
+                $this->getFederationTransactions($userId, $limit),
+                $this->getInternalFederatedInbound($userId, $limit)
+            );
             if (!empty($fedItems)) {
                 $merged = array_merge($formatted, $fedItems);
                 usort($merged, static function (array $a, array $b): int {
@@ -289,6 +310,101 @@ class WalletService
             return $items;
         } catch (\Throwable $e) {
             \Log::warning('Failed to fetch federation transactions for wallet', ['error' => $e->getMessage()]);
+            return [];
+        }
+    }
+
+    /**
+     * Fetch internal (same-platform, cross-tenant) federated inbound credits for
+     * the receiver's wallet. The canonical ledger row for an internal federated
+     * transfer lives in the SENDER's tenant (transactions.tenant_id = sender
+     * tenant, is_federated = 1 — see FederationInternalLedgerService), so the
+     * receiver's tenant-scoped native query can never surface it. This overlay
+     * deliberately bypasses the Transaction model's tenant scope but stays
+     * receiver-scoped via receiver_tenant_id = the viewer's tenant.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function getInternalFederatedInbound(int $userId, int $limit, ?int $onlyId = null): array
+    {
+        try {
+            $tenantId = TenantContext::getId();
+            $query = DB::table('transactions as tx')
+                ->leftJoin('users as su', function ($join) {
+                    $join->on('su.id', '=', 'tx.sender_id')
+                         ->on('su.tenant_id', '=', 'tx.sender_tenant_id');
+                })
+                ->leftJoin('tenants as st', 'st.id', '=', 'tx.sender_tenant_id')
+                ->where('tx.is_federated', 1)
+                ->where('tx.receiver_id', $userId)
+                ->where('tx.receiver_tenant_id', $tenantId)
+                ->whereColumn('tx.tenant_id', '!=', 'tx.receiver_tenant_id')
+                ->where('tx.status', 'completed')
+                ->where('tx.deleted_for_receiver', false);
+
+            if ($onlyId !== null) {
+                $query->where('tx.id', $onlyId);
+            }
+
+            $rows = $query->orderByDesc('tx.created_at')
+                ->limit($limit)
+                ->get([
+                    'tx.id',
+                    'tx.amount',
+                    'tx.description',
+                    'tx.status',
+                    'tx.created_at',
+                    'tx.sender_id',
+                    'tx.sender_tenant_id',
+                    'su.first_name',
+                    'su.last_name',
+                    'su.organization_name',
+                    'su.profile_type',
+                    'su.avatar_url',
+                    'st.name as partner_name',
+                ]);
+
+            $items = [];
+            foreach ($rows as $r) {
+                $senderName = (($r->profile_type ?? null) === 'organisation' && !empty($r->organization_name))
+                    ? (string) $r->organization_name
+                    : trim(((string) ($r->first_name ?? '')) . ' ' . ((string) ($r->last_name ?? '')));
+                if ($senderName === '') {
+                    $senderName = __('api.external_user_fallback');
+                }
+                $partnerName = $r->partner_name ?: __('api.external_partner_fallback');
+                $createdAt = $r->created_at ? \Carbon\Carbon::parse($r->created_at)->toIso8601String() : null;
+                $senderParty = [
+                    'id'     => (int) ($r->sender_id ?? 0),
+                    'name'   => $senderName . ' (' . $partnerName . ')',
+                    'avatar' => $r->avatar_url ?? null,
+                ];
+                // Positive native transactions id — showTransaction() resolves it via
+                // the internal-federated fallback when the tenant-scoped lookup misses.
+                $items[] = [
+                    'id'               => (int) $r->id,
+                    'source'           => 'federation',
+                    'type'             => 'credit',
+                    'status'           => $r->status ?? 'completed',
+                    'amount'           => (float) $r->amount,
+                    'description'      => $r->description,
+                    'transaction_type' => 'federation',
+                    'sender'           => $senderParty,
+                    'receiver'         => ['id' => $userId, 'name' => '', 'avatar' => null],
+                    'other_user'       => $senderParty,
+                    'balance_after'    => null,
+                    'created_at'       => $createdAt,
+                    'federation'       => [
+                        'transaction_id'       => (int) $r->id,
+                        'partner_id'           => (int) $r->sender_tenant_id,
+                        'partner_name'         => $partnerName,
+                        'external_sender_name' => $senderName,
+                    ],
+                ];
+            }
+            return $items;
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to fetch internal federated inbound transactions for wallet', ['error' => $e->getMessage()]);
             return [];
         }
     }
@@ -520,7 +636,12 @@ class WalletService
             ->first();
 
         if (! $txn) {
-            return null;
+            // Internal federated inbound rows are recorded in the sender's tenant
+            // and invisible to the tenant-scoped query above — resolve them for
+            // the receiver via the receiver-scoped overlay.
+            $items = $this->getInternalFederatedInbound($userId, 1, $transactionId);
+
+            return $items[0] ?? null;
         }
 
         return $this->formatTransaction($txn, $userId);

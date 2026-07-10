@@ -59,8 +59,11 @@ class FederationV2Controller extends BaseApiController
      */
     private function parsePartnerFilter(): ?array
     {
-        $raw = $this->query('partner_id', '');
-        if ($raw === '' || $raw === null) {
+        // Laravel returns an array for ?partner_id[]=1 — treat any non-scalar
+        // value as "no filter" instead of letting str_starts_with() throw a
+        // TypeError before the endpoint's try/catch (uncaught 500).
+        $raw = $this->queryScalar('partner_id');
+        if ($raw === '') {
             return null;
         }
         if (str_starts_with($raw, 'ext-')) {
@@ -69,6 +72,16 @@ class FederationV2Controller extends BaseApiController
         }
         $id = (int) $raw;
         return $id > 0 ? ['type' => 'internal', 'id' => $id] : null;
+    }
+
+    /**
+     * Read a query parameter that must be a scalar string. Array-valued input
+     * (?key[]=x) is coerced to the default rather than fataling downstream.
+     */
+    private function queryScalar(string $key, string $default = ''): string
+    {
+        $raw = $this->query($key, $default);
+        return is_scalar($raw) ? (string) $raw : $default;
     }
 
     /**
@@ -873,7 +886,7 @@ class FederationV2Controller extends BaseApiController
 
         $tenantId = $this->getTenantId();
 
-        $q = $this->query('q', '');
+        $q = $this->queryScalar('q');
         $partnerFilter = $this->parsePartnerFilter();
         $upcoming = $this->queryBool('upcoming', false);
         $perPage = $this->queryInt('per_page', 20, 1, 100);
@@ -993,7 +1006,7 @@ class FederationV2Controller extends BaseApiController
 
         $tenantId = $this->getTenantId();
 
-        $q = $this->query('q', '');
+        $q = $this->queryScalar('q');
         $partnerFilter = $this->parsePartnerFilter();
         $perPage = $this->queryInt('per_page', 20, 1, 100);
         $cursorParam = $this->query('cursor');
@@ -1169,8 +1182,8 @@ class FederationV2Controller extends BaseApiController
 
         $tenantId = $this->getTenantId();
 
-        $q = $this->query('q', '');
-        $type = $this->query('type', '');
+        $q = $this->queryScalar('q');
+        $type = $this->queryScalar('type');
         $partnerFilter = $this->parsePartnerFilter();
         $perPage = $this->queryInt('per_page', 20, 1, 100);
         $cursorParam = $this->query('cursor');
@@ -1457,10 +1470,10 @@ class FederationV2Controller extends BaseApiController
 
         $tenantId = $this->getTenantId();
 
-        $q = $this->query('q', '');
+        $q = $this->queryScalar('q');
         $partnerFilter = $this->parsePartnerFilter();
-        $serviceReach = $this->query('service_reach', '');
-        $skills = $this->query('skills', '');
+        $serviceReach = $this->queryScalar('service_reach');
+        $skills = $this->queryScalar('skills');
         $perPage = $this->queryInt('per_page', 20, 1, 100);
         $limit = $this->queryInt('limit');
         if ($limit && $limit < $perPage) {
@@ -1835,7 +1848,15 @@ class FederationV2Controller extends BaseApiController
                 // local + cross-tenant reviews so reputation follows the user).
                 $aggregate = DB::table('reviews')
                     ->where('receiver_id', (int) $m['id'])
-                    ->where('receiver_tenant_id', (int) $m['tenant_id'])
+                    ->where(function ($q) use ($m) {
+                        // Same predicate as memberReviews(): home-tenant rows,
+                        // including legacy rows where receiver_tenant_id is null.
+                        $q->where('receiver_tenant_id', (int) $m['tenant_id'])
+                          ->orWhere(function ($q2) use ($m) {
+                              $q2->where('tenant_id', (int) $m['tenant_id'])
+                                 ->whereNull('receiver_tenant_id');
+                          });
+                    })
                     ->where(function ($q) {
                         $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
                     })
@@ -2116,7 +2137,7 @@ class FederationV2Controller extends BaseApiController
                     'created_at' => $r->created_at?->toIso8601String(),
                     'reviewer'   => [
                         'id'     => $isAnon ? null : ($reviewer?->id ?? null),
-                        'name'   => $isAnon ? 'Anonymous' : $reviewerName,
+                        'name'   => $isAnon ? __('api.fed_review_anonymous') : $reviewerName,
                         'avatar' => $isAnon ? null : ($reviewer?->avatar_url ?? null),
                     ],
                     'partner'    => $partner,
@@ -3156,6 +3177,11 @@ class FederationV2Controller extends BaseApiController
         if (empty($description)) $errors[] = ['code' => 'VALIDATION_ERROR', 'message' => __('api.fed_description_required'), 'field' => 'description'];
         if (!empty($errors)) return $this->respondWithErrors($errors);
 
+        // Whole hours only: a fractional amount like "5.9" must be rejected,
+        // not silently truncated to 5 (which rounds in the sender's favor).
+        if (!is_numeric($amount) || (float) $amount !== floor((float) $amount)) {
+            return $this->respondWithErrors([['code' => 'VALIDATION_ERROR', 'message' => __('api.fed_amount_range'), 'field' => 'amount']]);
+        }
         $amount = (int) $amount;
         if ($amount < 1 || $amount > 100) {
             return $this->respondWithError('INVALID_AMOUNT', __('api.fed_amount_range'), null, 400);
@@ -3246,7 +3272,17 @@ class FederationV2Controller extends BaseApiController
                 return $this->respondWithError('INSUFFICIENT_BALANCE', __('api.fed_insufficient_balance'), null, 400);
             }
 
-            DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?", [$amount, $receiverIdInt, $receiverTenantIdInt]);
+            // Guard the credit like the debit above: if the receiver row vanished
+            // between the SELECT and this UPDATE, roll back rather than debiting
+            // the sender with no matching credit.
+            $credited = DB::update("UPDATE users SET balance = balance + ? WHERE id = ? AND tenant_id = ?", [$amount, $receiverIdInt, $receiverTenantIdInt]);
+            if ($credited === 0) {
+                DB::rollBack();
+                if ($idemCacheKey !== null) {
+                    try { \Illuminate\Support\Facades\Cache::forget($idemCacheKey); } catch (\Throwable $e) {}
+                }
+                return $this->respondWithError('RECIPIENT_NOT_FOUND', __('api.fed_recipient_not_found'), null, 404);
+            }
 
             DB::insert(
                 "INSERT INTO transactions (tenant_id, sender_id, receiver_id, amount, description, status, is_federated, sender_tenant_id, receiver_tenant_id, created_at)

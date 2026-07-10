@@ -442,9 +442,9 @@ Route::get('/v2/users/{id}/verification-badges', [\App\Http\Controllers\Api\Memb
 // NOTE: Admin badge management routes moved to admin middleware group below
 // Federation (user-facing — NOT admin-only)
 Route::get('/v2/federation/status', [\App\Http\Controllers\Api\FederationV2Controller::class, 'status']);
-Route::post('/v2/federation/opt-in', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optIn']);
-Route::post('/v2/federation/setup', [\App\Http\Controllers\Api\FederationV2Controller::class, 'setup']);
-Route::post('/v2/federation/opt-out', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optOut']);
+Route::post('/v2/federation/opt-in', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optIn'])->middleware('throttle:10,1');
+Route::post('/v2/federation/setup', [\App\Http\Controllers\Api\FederationV2Controller::class, 'setup'])->middleware('throttle:10,1');
+Route::post('/v2/federation/opt-out', [\App\Http\Controllers\Api\FederationV2Controller::class, 'optOut'])->middleware('throttle:10,1');
 Route::get('/v2/federation/partners', [\App\Http\Controllers\Api\FederationV2Controller::class, 'partners']);
 Route::get('/v2/federation/partners/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'partnerDetail'])
     ->where('id', '(?:[0-9]+|ext-[0-9]+)');
@@ -459,17 +459,17 @@ Route::get('/v2/federation/members/{id}/reviews', [\App\Http\Controllers\Api\Fed
     ->where('id', '.*');
 Route::get('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'messages']);
 Route::post('/v2/federation/messages', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendMessage'])->middleware('throttle:20,1');
-Route::post('/v2/federation/messages/mark-read-batch', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessagesReadBatch']);
-Route::post('/v2/federation/messages/{id}/mark-read', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessageRead']);
+Route::post('/v2/federation/messages/mark-read-batch', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessagesReadBatch'])->middleware('throttle:60,1');
+Route::post('/v2/federation/messages/{id}/mark-read', [\App\Http\Controllers\Api\FederationV2Controller::class, 'markMessageRead'])->middleware('throttle:60,1');
 Route::post('/v2/federation/messages/{id}/translate', [\App\Http\Controllers\Api\FederationV2Controller::class, 'translateMessage']);
 Route::post('/v2/federation/transactions', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendTransaction'])->middleware('throttle:20,1');
 Route::get('/v2/federation/settings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'getSettings']);
-Route::put('/v2/federation/settings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'updateSettings']);
+Route::put('/v2/federation/settings', [\App\Http\Controllers\Api\FederationV2Controller::class, 'updateSettings'])->middleware('throttle:20,1');
 Route::get('/v2/federation/connections', [\App\Http\Controllers\Api\FederationV2Controller::class, 'connections']);
 Route::post('/v2/federation/connections', [\App\Http\Controllers\Api\FederationV2Controller::class, 'sendConnectionRequest'])->middleware('throttle:10,1');
-Route::post('/v2/federation/connections/{id}/accept', [\App\Http\Controllers\Api\FederationV2Controller::class, 'acceptConnection']);
-Route::post('/v2/federation/connections/{id}/reject', [\App\Http\Controllers\Api\FederationV2Controller::class, 'rejectConnection']);
-Route::delete('/v2/federation/connections/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'removeConnection']);
+Route::post('/v2/federation/connections/{id}/accept', [\App\Http\Controllers\Api\FederationV2Controller::class, 'acceptConnection'])->middleware('throttle:20,1');
+Route::post('/v2/federation/connections/{id}/reject', [\App\Http\Controllers\Api\FederationV2Controller::class, 'rejectConnection'])->middleware('throttle:20,1');
+Route::delete('/v2/federation/connections/{id}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'removeConnection'])->middleware('throttle:20,1');
 Route::get('/v2/federation/connections/status/{userId}/{tenantId}', [\App\Http\Controllers\Api\FederationV2Controller::class, 'connectionStatus']);
 // Sub-Accounts
 Route::get('/v2/users/me/sub-accounts', [\App\Http\Controllers\Api\SubAccountController::class, 'getChildAccounts']);

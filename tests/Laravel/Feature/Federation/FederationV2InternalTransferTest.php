@@ -213,6 +213,80 @@ class FederationV2InternalTransferTest extends TestCase
             ->count());
     }
 
+    public function test_fractional_amount_is_rejected_not_truncated(): void
+    {
+        $sender   = $this->makeFederatedUser(self::SOURCE_TENANT_ID, 25);
+        $receiver = $this->makeFederatedUser($this->destinationTenantId, 4);
+
+        // "5.9" must be rejected outright — the old `(int) $amount` coercion
+        // silently transferred 5 (rounding in the sender's favor).
+        $response = $this->callSendTransaction($sender, $receiver, $this->destinationTenantId, '5.9', 'Fractional hours');
+
+        $this->assertSame(400, $response->getStatusCode(), (string) $response->getContent());
+        $this->assertSame('VALIDATION_ERROR', $this->errorCode($response));
+        $this->assertEqualsWithDelta(25, $this->balanceOf($sender), 0.001);
+        $this->assertEqualsWithDelta(4, $this->balanceOf($receiver), 0.001);
+        $this->assertSame(0, (int) DB::table('transactions')
+            ->where('sender_id', $sender)
+            ->where('is_federated', 1)
+            ->count());
+    }
+
+    public function test_receiver_wallet_surfaces_internal_federated_credit(): void
+    {
+        $sender   = $this->makeFederatedUser(self::SOURCE_TENANT_ID, 25);
+        $receiver = $this->makeFederatedUser($this->destinationTenantId, 4);
+
+        $response = $this->callSendTransaction($sender, $receiver, $this->destinationTenantId, 10, 'Helped move a sofa');
+        $this->assertSame(201, $response->getStatusCode(), (string) $response->getContent());
+
+        // Balance moved.
+        $this->assertEqualsWithDelta(14, $this->balanceOf($receiver), 0.001);
+
+        $txId = (int) DB::table('transactions')
+            ->where('sender_id', $sender)
+            ->where('is_federated', 1)
+            ->value('id');
+        $this->assertGreaterThan(0, $txId);
+
+        // The receiver views their wallet from THEIR tenant: the canonical ledger
+        // row lives in the sender's tenant, so without the internal-federated
+        // overlay the credit is invisible (balance rose with no ledger line).
+        TenantContext::setById($this->destinationTenantId);
+        $wallet = $this->app->make(\App\Services\WalletService::class);
+
+        $list = $wallet->getTransactions($receiver, ['limit' => 20]);
+        $fedRows = array_values(array_filter(
+            $list['items'],
+            static fn (array $item): bool => ($item['source'] ?? null) === 'federation' && (int) $item['id'] === $txId
+        ));
+        $this->assertCount(1, $fedRows, 'Receiver wallet list must show the internal federated credit');
+        $this->assertSame('credit', $fedRows[0]['type']);
+        $this->assertEqualsWithDelta(10.0, $fedRows[0]['amount'], 0.001);
+        $this->assertStringContainsString('Fed Member', $fedRows[0]['other_user']['name']);
+
+        // Detail view resolves the sender-tenant row for the receiver.
+        $detail = $wallet->getTransaction($txId, $receiver);
+        $this->assertNotNull($detail, 'Receiver must be able to open the federated credit detail');
+        $this->assertSame('federation', $detail['source'] ?? null);
+        $this->assertEqualsWithDelta(10.0, $detail['amount'], 0.001);
+
+        // Balance summary counts the inbound credit in total_earned.
+        $summary = $wallet->getBalance($receiver);
+        $this->assertEqualsWithDelta(10.0, $summary['total_earned'], 0.001);
+
+        // And the SENDER's wallet must NOT show a duplicate overlay row —
+        // their native tenant-scoped row already covers it.
+        TenantContext::setById(self::SOURCE_TENANT_ID);
+        $senderList = $wallet->getTransactions($sender, ['limit' => 20]);
+        $senderRows = array_values(array_filter(
+            $senderList['items'],
+            static fn (array $item): bool => (int) $item['id'] === $txId
+        ));
+        $this->assertCount(1, $senderRows, 'Sender must see exactly one row for the transfer');
+        $this->assertSame('debit', $senderRows[0]['type']);
+    }
+
     public function test_double_submit_does_not_double_debit(): void
     {
         $sender   = $this->makeFederatedUser(self::SOURCE_TENANT_ID, 25);

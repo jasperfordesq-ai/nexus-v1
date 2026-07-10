@@ -969,6 +969,8 @@ return [
     'credit_agreements_fetch_failed'       => 'Failed to load credit agreements',
     'credit_agreement_create_failed'       => 'Failed to create credit agreement',
     'credit_agreement_update_failed'       => 'Failed to update credit agreement',
+    'credit_agreement_invalid_transition' => 'This action is not allowed from the agreement\'s current status.',
+    'credit_agreement_partnership_required' => 'An active partnership with this community is required before the agreement can be activated.',
     'transactions_fetch_failed'            => 'Failed to load transactions',
     'external_user_fallback'               => 'External User',
     'external_partner_fallback'            => 'External Partner',
@@ -1437,6 +1439,7 @@ return [
     'fed_partner_no_transactions'          => 'This partner does not allow transactions.',
     'fed_external_partner_rejected'        => 'External partner rejected the transaction.',
     'fed_external_partner_message_rejected' => 'External partner rejected the message.',
+    'fed_review_anonymous'                 => 'Anonymous',
 
     // ============================================
     // USER-FACING — USERS / PROFILE (additional)

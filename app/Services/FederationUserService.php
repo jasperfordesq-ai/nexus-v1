@@ -304,16 +304,30 @@ class FederationUserService
         try {
             $tenantId = $tenantId ?? \App\Core\TenantContext::getId();
 
-            // Review component (up to 40 points)
-            $reviewCount = (int) DB::table('reviews')
-                ->where('receiver_id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->count();
+            // Review component (up to 40 points).
+            // Reviews are about the member in their HOME tenant, so scope by
+            // receiver_tenant_id (with a legacy fallback for old rows where
+            // receiver_tenant_id is null) — the same predicate the member
+            // profile's review list and reputation aggregate use, so
+            // trust_score and reputation_score can never disagree.
+            $reviewScope = function ($query) use ($userId, $tenantId) {
+                return $query
+                    ->where('receiver_id', $userId)
+                    ->where(function ($q) use ($tenantId) {
+                        $q->where('receiver_tenant_id', $tenantId)
+                          ->orWhere(function ($q2) use ($tenantId) {
+                              $q2->where('tenant_id', $tenantId)
+                                 ->whereNull('receiver_tenant_id');
+                          });
+                    })
+                    ->where(function ($q) {
+                        $q->whereNull('status')->orWhereIn('status', ['active', 'approved']);
+                    });
+            };
 
-            $avgRating = (float) (DB::table('reviews')
-                ->where('receiver_id', $userId)
-                ->where('tenant_id', $tenantId)
-                ->avg('rating') ?? 0);
+            $reviewCount = (int) $reviewScope(DB::table('reviews'))->count();
+
+            $avgRating = (float) ($reviewScope(DB::table('reviews'))->avg('rating') ?? 0);
 
             $reviewScore = min(40, ($reviewCount * 2) + ($avgRating * 4));
 
