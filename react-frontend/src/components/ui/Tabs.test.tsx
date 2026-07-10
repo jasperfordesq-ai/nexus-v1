@@ -172,3 +172,81 @@ describe('Tabs component', () => {
     expect(screen.getByRole('tablist')).toBeInTheDocument();
   });
 });
+
+describe('Tabs scrollAffordance', () => {
+  // The two edge scroll buttons are the only aria-hidden, non-focusable buttons
+  // the wrapper adds — a stable selector regardless of how React Aria renders tabs.
+  const scrollButtons = (container: HTMLElement) =>
+    container.querySelectorAll('button[aria-hidden="true"][tabindex="-1"]');
+
+  it('does NOT render scroll buttons by default', () => {
+    const { container } = render(
+      <Tabs aria-label="Test tabs">
+        <Tab title="Alpha">Content A</Tab>
+        <Tab title="Beta">Content B</Tab>
+      </Tabs>,
+    );
+    expect(scrollButtons(container)).toHaveLength(0);
+  });
+
+  it('renders two edge scroll buttons when scrollAffordance is set', () => {
+    const { container } = render(
+      <Tabs aria-label="Test tabs" scrollAffordance>
+        <Tab title="Alpha">Content A</Tab>
+        <Tab title="Beta">Content B</Tab>
+      </Tabs>,
+    );
+    expect(scrollButtons(container)).toHaveLength(2);
+  });
+
+  it('scroll buttons are hidden from AT and non-focusable (no duplicate tab stops)', () => {
+    const { container } = render(
+      <Tabs aria-label="Test tabs" scrollAffordance>
+        <Tab title="Alpha">Content A</Tab>
+        <Tab title="Beta">Content B</Tab>
+      </Tabs>,
+    );
+    scrollButtons(container).forEach((btn) => {
+      expect(btn).toHaveAttribute('aria-hidden', 'true');
+      expect(btn).toHaveAttribute('tabindex', '-1');
+    });
+    // The tab triggers themselves remain the real, accessible controls.
+    expect(screen.getAllByRole('tab')).toHaveLength(2);
+  });
+
+  it('applies the hidden-scrollbar class to the real scroll container', () => {
+    const { container } = render(
+      <Tabs aria-label="Test tabs" scrollAffordance>
+        <Tab title="Alpha">Content A</Tab>
+        <Tab title="Beta">Content B</Tab>
+      </Tabs>,
+    );
+    const scroller = container.querySelector('[data-slot="tabs-list-container"]');
+    expect(scroller?.className).toContain('scrollbar-hide');
+  });
+
+  it('wraps the scroller in a min-w-0 flex item so it can clamp to the viewport', () => {
+    // Regression guard: the wrapper is a flex item of HeroUI's column `.tabs`
+    // flexbox. Without `min-w-0` its `min-width: auto` expands to the full
+    // content width and the inner overflow-x-auto scroller never scrolls —
+    // i.e. the exact "can't reach the later tabs on mobile" bug this fixes.
+    const { container } = render(
+      <Tabs aria-label="Test tabs" scrollAffordance>
+        <Tab title="Alpha">Content A</Tab>
+        <Tab title="Beta">Content B</Tab>
+      </Tabs>,
+    );
+    const wrapper = container.querySelector('[data-slot="tabs-list-container"]')?.parentElement;
+    expect(wrapper?.className).toContain('min-w-0');
+  });
+
+  it('ignores scrollAffordance for vertical orientation', () => {
+    const { container } = render(
+      <Tabs aria-label="Vertical tabs" isVertical scrollAffordance>
+        <Tab title="Vert1">Vert content 1</Tab>
+        <Tab title="Vert2">Vert content 2</Tab>
+      </Tabs>,
+    );
+    expect(scrollButtons(container)).toHaveLength(0);
+  });
+});

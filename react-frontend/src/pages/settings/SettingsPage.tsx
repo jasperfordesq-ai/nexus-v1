@@ -954,15 +954,16 @@ export function SettingsPage() {
       {/* Tabs */}
       <motion.div
         variants={itemVariants}
-        className="relative max-w-full rounded-2xl border border-theme-default bg-theme-surface p-2 after:pointer-events-none after:absolute after:inset-y-2 after:right-2 after:w-10 after:rounded-r-xl after:bg-gradient-to-l after:from-[var(--background)] after:via-[var(--background)]/80 after:to-transparent sm:after:hidden"
+        className="relative max-w-full rounded-2xl border border-theme-default bg-theme-surface p-2"
       >
         <Tabs
           aria-label={t('tabs_aria')}
           selectedKey={activeTab}
           onSelectionChange={handleTabSelection}
+          scrollAffordance
           classNames={{
             base: 'w-full max-w-full',
-            tabList: 'w-full max-w-full justify-start gap-1 bg-transparent p-0 overflow-x-auto flex-nowrap overscroll-x-contain scrollbar-hide',
+            tabList: 'w-full max-w-full justify-start gap-1 bg-transparent p-0',
             cursor: 'bg-theme-elevated shadow-sm',
             tab: 'w-auto flex-none px-2.5 sm:px-3 text-sm text-theme-muted data-[selected=true]:text-theme-primary',
             tabContent: 'whitespace-nowrap',
