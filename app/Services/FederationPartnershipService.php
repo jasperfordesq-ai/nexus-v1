@@ -635,6 +635,30 @@ class FederationPartnershipService
             return ['success' => false, 'error' => 'Only a partner tenant can update permissions on this partnership'];
         }
 
+        // Only a live, mutually-consented partnership can have its permissions
+        // edited — pending/rejected/suspended/terminated rows must stay frozen.
+        if (($partnership['status'] ?? null) !== 'active') {
+            return ['success' => false, 'error' => 'Permissions can only be updated on an active partnership'];
+        }
+
+        // Whitelist the permission keys: unknown keys are a caller bug and must
+        // fail loudly instead of being silently ignored.
+        $validKeys = ['profiles', 'messaging', 'transactions', 'listings', 'events', 'groups'];
+        $unknownKeys = array_diff(array_keys($permissions), $validKeys);
+        if (!empty($unknownKeys)) {
+            return ['success' => false, 'error' => 'Unknown permission keys: ' . implode(', ', $unknownKeys)];
+        }
+
+        // Level cap: a flag may never be switched on beyond what the
+        // partnership's federation_level grants by default — e.g. a level-1
+        // (discovery) partnership must not gain transactions_enabled.
+        $levelCap = self::getDefaultPermissions((int) ($partnership['federation_level'] ?? self::LEVEL_DISCOVERY));
+        foreach ($permissions as $key => $value) {
+            if ($value && empty($levelCap[$key])) {
+                return ['success' => false, 'error' => "Permission '{$key}' is not available at this partnership's federation level"];
+            }
+        }
+
         try {
             DB::table('federation_partnerships')->where('id', $partnershipId)->update([
                 'profiles_enabled' => isset($permissions['profiles']) ? ($permissions['profiles'] ? 1 : 0) : $partnership['profiles_enabled'],

@@ -246,4 +246,100 @@ class AdminFederationDataTest extends TestCase
         $response = $this->apiPost('/v2/admin/federation/data/purge', ['days' => 365]);
         $response->assertStatus(403);
     }
+
+    // ─── Import (audit C3: no fabricated counterparty requests) ─────────────
+
+    private function importJson(array $payload, bool $dryRun): \Illuminate\Testing\TestResponse
+    {
+        $file = \Illuminate\Http\UploadedFile::fake()->createWithContent(
+            'federation-import.json',
+            (string) json_encode($payload)
+        );
+
+        return $this->post(
+            '/api/v2/admin/federation/data/import',
+            ['file' => $file, 'dry_run' => $dryRun ? '1' : '0'],
+            $this->withTenantHeader(['Accept' => 'application/json'])
+        );
+    }
+
+    public function test_import_skips_partnership_rows_initiated_by_another_tenant(): void
+    {
+        $admin = $this->superAdmin();
+        Sanctum::actingAs($admin);
+
+        $otherTenantId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'Import Victim',
+            'slug' => 'import-victim-' . substr(uniqid(), -8),
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // A row claiming the OTHER tenant requested a partnership with us. If
+        // imported, it would appear as a "pending request from them" that this
+        // tenant could immediately self-approve to active — a partnership the
+        // counterparty never asked for.
+        $response = $this->importJson([
+            'meta' => ['format_version' => 1],
+            'partnerships' => [[
+                'tenant_id' => $otherTenantId,
+                'partner_tenant_id' => $this->testTenantId,
+                'status' => 'active',
+                'federation_level' => 4,
+                'transactions_enabled' => 1,
+            ]],
+        ], false);
+
+        $response->assertStatus(200);
+        $summary = $response->json('data');
+        $this->assertSame(0, (int) ($summary['partnerships']['new'] ?? -1), 'Counterparty-initiated row must not be imported');
+        $this->assertSame(1, (int) ($summary['partnerships']['skipped'] ?? -1));
+
+        $this->assertSame(0, (int) DB::table('federation_partnerships')
+            ->where(function ($q) use ($otherTenantId) {
+                $q->where('tenant_id', $otherTenantId)->where('partner_tenant_id', $this->testTenantId);
+            })
+            ->orWhere(function ($q) use ($otherTenantId) {
+                $q->where('tenant_id', $this->testTenantId)->where('partner_tenant_id', $otherTenantId);
+            })
+            ->count());
+    }
+
+    public function test_import_accepts_own_initiated_row_as_pending_only(): void
+    {
+        $admin = $this->superAdmin();
+        Sanctum::actingAs($admin);
+
+        $otherTenantId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'Import Target',
+            'slug' => 'import-target-' . substr(uniqid(), -8),
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Our own outbound request imports — but coerced to 'pending', so the
+        // counterparty still has to genuinely approve it.
+        $response = $this->importJson([
+            'meta' => ['format_version' => 1],
+            'partnerships' => [[
+                'tenant_id' => $this->testTenantId,
+                'partner_tenant_id' => $otherTenantId,
+                'status' => 'active',
+                'federation_level' => 2,
+            ]],
+        ], false);
+
+        $response->assertStatus(200);
+        $summary = $response->json('data');
+        $this->assertSame(1, (int) ($summary['partnerships']['new'] ?? -1));
+
+        $row = DB::table('federation_partnerships')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('partner_tenant_id', $otherTenantId)
+            ->first();
+        $this->assertNotNull($row);
+        $this->assertSame('pending', (string) $row->status);
+    }
 }

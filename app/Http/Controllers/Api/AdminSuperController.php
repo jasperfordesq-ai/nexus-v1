@@ -1312,7 +1312,7 @@ class AdminSuperController extends BaseApiController
     /** PUT /api/v2/super-admin/federation/system-controls */
     public function federationUpdateSystemControls(): JsonResponse
     {
-        $userId = $this->requireSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
 
         $input = $this->getAllInput();
 
@@ -1372,7 +1372,10 @@ class AdminSuperController extends BaseApiController
     /** POST /api/v2/super-admin/federation/emergency-lockdown */
     public function federationEmergencyLockdown(): JsonResponse
     {
-        $userId = $this->requireSuperAdmin();
+        // Platform-wide action: defense-in-depth beyond the route middleware —
+        // a tenant-scoped super-admin must never reach this even if the
+        // middleware stack changes.
+        $userId = $this->requirePlatformSuperAdmin();
 
         $input = $this->getAllInput();
         $reason = $input['reason'] ?? 'Emergency lockdown triggered via API';
@@ -1389,7 +1392,7 @@ class AdminSuperController extends BaseApiController
     /** POST /api/v2/super-admin/federation/lift-lockdown */
     public function federationLiftLockdown(): JsonResponse
     {
-        $userId = $this->requireSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
 
         $result = $this->federationFeatureService->liftEmergencyLockdown($userId);
 
@@ -1413,7 +1416,7 @@ class AdminSuperController extends BaseApiController
     /** POST /api/v2/super-admin/federation/whitelist */
     public function federationAddToWhitelist(): JsonResponse
     {
-        $userId = $this->requireSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
 
         $input = $this->getAllInput();
         $tenantId = (int) ($input['tenant_id'] ?? 0);
@@ -1435,7 +1438,7 @@ class AdminSuperController extends BaseApiController
     /** DELETE /api/v2/super-admin/federation/whitelist/{tenantId} */
     public function federationRemoveFromWhitelist($tenantId): JsonResponse
     {
-        $userId = $this->requireSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
 
         $tenantId = (int) $tenantId;
 
@@ -1469,7 +1472,7 @@ class AdminSuperController extends BaseApiController
     /** POST /api/v2/super-admin/federation/partnerships/{id}/suspend */
     public function federationSuspendPartnership($id): JsonResponse
     {
-        $userId = $this->requireSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
 
         $partnershipId = (int) $id;
 
@@ -1493,7 +1496,7 @@ class AdminSuperController extends BaseApiController
     /** POST /api/v2/admin/super/federation/partnerships/{id}/reactivate */
     public function federationReactivatePartnership($id): JsonResponse
     {
-        $userId = $this->requireSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
 
         $partnershipId = (int) $id;
 
@@ -1514,7 +1517,7 @@ class AdminSuperController extends BaseApiController
     /** POST /api/v2/super-admin/federation/partnerships/{id}/terminate */
     public function federationTerminatePartnership($id): JsonResponse
     {
-        $userId = $this->requireSuperAdmin();
+        $userId = $this->requirePlatformSuperAdmin();
 
         $partnershipId = (int) $id;
 

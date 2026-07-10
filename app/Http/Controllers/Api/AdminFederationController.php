@@ -521,6 +521,15 @@ class AdminFederationController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.level_must_be_1_to_4'), 'level');
         }
 
+        // Clamp to the system-wide maximum federation level: acceptance copies
+        // counter_proposed_level straight into federation_level, so an
+        // uncapped counter-proposal would bypass the platform ceiling.
+        // (0 means "no ceiling configured" — skip the clamp in that case.)
+        $maxLevel = app(FederationFeatureService::class)->getMaxFederationLevel();
+        if ($maxLevel >= 1 && $level > $maxLevel) {
+            $level = $maxLevel;
+        }
+
         try {
             $result = FederationPartnershipService::counterPropose($id, $adminId, $level, $permissions, $message);
             if ($result['success']) {
@@ -740,7 +749,9 @@ class AdminFederationController extends BaseApiController
                 $directoryUpdate['display_name'] = substr(trim((string) $input['name']), 0, 200);
             }
             if (isset($profileInput['description'])) {
-                $directoryUpdate['description'] = trim((string) $profileInput['description']);
+                // Clamp like display_name/website — this text is published to
+                // other tenants' directory UIs and must not be unbounded.
+                $directoryUpdate['description'] = substr(trim((string) $profileInput['description']), 0, 2000);
             }
             if (isset($profileInput['website'])) {
                 $directoryUpdate['website_url'] = substr(trim((string) $profileInput['website']), 0, 500);

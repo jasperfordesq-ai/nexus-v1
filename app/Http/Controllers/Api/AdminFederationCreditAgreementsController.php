@@ -121,15 +121,6 @@ class AdminFederationCreditAgreementsController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_action', ['actions' => implode(', ', $validActions)]), 'action');
         }
 
-        $statusMap = [
-            'approve'    => 'active',
-            'reject'     => 'terminated',
-            'suspend'    => 'suspended',
-            'activate'   => 'active',
-            'reactivate' => 'active',
-            'terminate'  => 'terminated',
-        ];
-
         try {
             // Fetch agreement first so we can determine the partner tenant for notifications
             $agreement = DB::selectOne(
@@ -141,13 +132,54 @@ class AdminFederationCreditAgreementsController extends BaseApiController
                 return $this->respondWithError('NOT_FOUND', __('api.credit_agreement_not_found'), null, 404);
             }
 
-            $updated = DB::update(
-                "UPDATE federation_credit_agreements SET status = ?, updated_at = NOW() WHERE id = ? AND (from_tenant_id = ? OR to_tenant_id = ?)",
-                [$statusMap[$action], $id, $tenantId, $tenantId]
-            );
+            $partnerTenantId = ((int) $agreement->from_tenant_id === $tenantId)
+                ? (int) $agreement->to_tenant_id
+                : (int) $agreement->from_tenant_id;
 
-            if ($updated === 0) {
-                return $this->respondWithError('UPDATE_FAILED', __('api.credit_agreement_update_failed'), null, 500);
+            if ($action === 'approve') {
+                // Dual consent: 'approve' only records THIS party's consent —
+                // FederationCreditService::approveAgreement() activates the
+                // agreement only once BOTH from/to sides have approved (with
+                // TOCTOU guards and a row lock on the activation step). The
+                // creating tenant can therefore never self-activate.
+                //
+                // Activation also requires a live, consented partnership between
+                // the two tenants — an agreement must not outrank the partnership.
+                $partnership = app(\App\Services\FederationPartnershipService::class)
+                    ->getPartnership($tenantId, $partnerTenantId);
+                if (!$partnership || ($partnership['status'] ?? null) !== 'active') {
+                    return $this->respondWithError('PARTNERSHIP_REQUIRED', __('api.credit_agreement_partnership_required'), null, 409);
+                }
+
+                $result = (new \App\Services\FederationCreditService())->approveAgreement($id, $adminId);
+                if (!($result['success'] ?? false)) {
+                    return $this->respondWithError('INVALID_TRANSITION', __('api.credit_agreement_invalid_transition'), null, 409);
+                }
+                $newStatus = (string) ($result['status'] ?? 'pending');
+            } else {
+                // State machine: legal transitions only. No resurrecting a
+                // terminated agreement, and no direct 'activate' of a pending
+                // one (that path requires the dual approval above).
+                $transitions = [
+                    'reject'     => ['from' => ['pending'], 'to' => 'terminated'],
+                    'suspend'    => ['from' => ['active'], 'to' => 'suspended'],
+                    'activate'   => ['from' => ['suspended'], 'to' => 'active'],
+                    'reactivate' => ['from' => ['suspended'], 'to' => 'active'],
+                    'terminate'  => ['from' => ['pending', 'active', 'suspended'], 'to' => 'terminated'],
+                ];
+                $transition = $transitions[$action];
+                $placeholders = implode(',', array_fill(0, count($transition['from']), '?'));
+
+                $updated = DB::update(
+                    "UPDATE federation_credit_agreements SET status = ?, updated_at = NOW()
+                     WHERE id = ? AND (from_tenant_id = ? OR to_tenant_id = ?) AND status IN ({$placeholders})",
+                    array_merge([$transition['to'], $id, $tenantId, $tenantId], $transition['from'])
+                );
+
+                if ($updated === 0) {
+                    return $this->respondWithError('INVALID_TRANSITION', __('api.credit_agreement_invalid_transition'), null, 409);
+                }
+                $newStatus = $transition['to'];
             }
 
             try {
@@ -156,7 +188,7 @@ class AdminFederationCreditAgreementsController extends BaseApiController
                     $tenantId,
                     null,
                     $adminId,
-                    ['agreement_id' => $id, 'new_status' => $statusMap[$action]]
+                    ['agreement_id' => $id, 'new_status' => $newStatus]
                 );
             } catch (\Exception $e) {
                 // Audit logging failure should not block the operation
@@ -164,10 +196,6 @@ class AdminFederationCreditAgreementsController extends BaseApiController
 
             // Notify partner tenant admins about the status change
             try {
-                $partnerTenantId = ((int) $agreement->from_tenant_id === $tenantId)
-                    ? (int) $agreement->to_tenant_id
-                    : (int) $agreement->from_tenant_id;
-
                 $tenantName = 'A partner community';
                 try {
                     $tenant = DB::selectOne("SELECT name FROM tenants WHERE id = ?", [$tenantId]);
@@ -214,7 +242,7 @@ class AdminFederationCreditAgreementsController extends BaseApiController
                 ]);
             }
 
-            return $this->respondWithData(['success' => true]);
+            return $this->respondWithData(['success' => true, 'status' => $newStatus]);
         } catch (\Exception $e) {
             return $this->respondWithError('UPDATE_FAILED', __('api.credit_agreement_update_failed'), null, 500);
         }

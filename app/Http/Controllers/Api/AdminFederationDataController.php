@@ -184,7 +184,13 @@ class AdminFederationDataController extends BaseApiController
             'external_partners' => ['new' => 0, 'skipped' => 0, 'invalid' => 0],
         ];
 
-        // Partnerships: only import rows where tenant_id or partner_tenant_id == current tenant.
+        // Partnerships: only import rows where the CURRENT tenant is the
+        // INITIATING side (tenant_id). Accepting rows with the counterparty in
+        // tenant_id would fabricate a "pending request from them" that this
+        // tenant could then self-approve via approvePartnership() — creating an
+        // active partnership the counterparty never requested. Rows where the
+        // current tenant is only the receiver are skipped: the counterparty
+        // must send a genuine request through requestPartnership().
         if (!empty($data['partnerships']) && is_array($data['partnerships'])) {
             $hasCanonicalPair = $this->columnExists('federation_partnerships', 'canonical_pair');
             foreach ($data['partnerships'] as $row) {
@@ -193,8 +199,7 @@ class AdminFederationDataController extends BaseApiController
                     continue;
                 }
                 $ownTenant = (int) $row['tenant_id'] === $tenantId;
-                $isPartnerLinked = $ownTenant || (int) $row['partner_tenant_id'] === $tenantId;
-                if (!$isPartnerLinked) {
+                if (!$ownTenant) {
                     $summary['partnerships']['skipped']++;
                     continue;
                 }
