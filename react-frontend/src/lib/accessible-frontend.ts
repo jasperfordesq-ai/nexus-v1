@@ -26,11 +26,11 @@ export function buildAccessibleFrontendUrl(
     .replace(/\/+$/, '');
   if (customDomain) {
     // The custom accessible domain is the clean public entry point: the host
-    // resolves the tenant server-side and redirects the root to the canonical
-    // alpha home, so the entry link is the bare domain (matches the value set
-    // in the admin panel). Deep links still target the /alpha route namespace.
+    // resolves the tenant server-side, so every route is served slug-less at
+    // the bare root (mirroring React custom domains). Deep links are bare
+    // paths too — the server registers the same routes without any prefix.
     return normalizedPath
-      ? `https://${customDomain}/alpha${normalizedPath}`
+      ? `https://${customDomain}${normalizedPath}`
       : `https://${customDomain}`;
   }
 
@@ -39,5 +39,5 @@ export function buildAccessibleFrontendUrl(
 
   const normalizedBaseUrl = (baseUrl.trim() || DEFAULT_ACCESSIBLE_FRONTEND_BASE_URL).replace(/\/+$/, '');
 
-  return `${normalizedBaseUrl}/${encodeURIComponent(slug)}/alpha${normalizedPath}`;
+  return `${normalizedBaseUrl}/${encodeURIComponent(slug)}/accessible${normalizedPath}`;
 }

@@ -97,9 +97,9 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $groupId = $this->groupsParityCreateGroup($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/invite");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/invite");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_groups_notifications_page_requires_login(): void
@@ -108,9 +108,9 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $groupId = $this->groupsParityCreateGroup($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/notifications");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/notifications");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_groups_image_page_requires_login(): void
@@ -119,9 +119,9 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $groupId = $this->groupsParityCreateGroup($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/image");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/image");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     // ================================================================
@@ -134,7 +134,7 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $owner = $this->groupsParityUser();
         $groupId = $this->groupsParityCreateGroup($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/invite");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/invite");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_groups.invite.title'));
@@ -150,7 +150,7 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $member = $this->groupsParityUser();
         $this->groupsParityAddMember($groupId, $member->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/invite");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/invite");
 
         $resp->assertForbidden();
     }
@@ -160,7 +160,7 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $this->groupsParityEnableFeature();
         $this->groupsParityUser();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/99999999/invite");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/99999999/invite");
 
         $resp->assertNotFound();
     }
@@ -171,9 +171,9 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $owner = $this->groupsParityUser();
         $groupId = $this->groupsParityCreateGroup($owner->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/invite/link");
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/invite/link");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/groups/{$groupId}/invite?status=invite-link-created");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/groups/{$groupId}/invite?status=invite-link-created");
         $this->assertDatabaseHas('group_invites', [
             'group_id' => $groupId,
             'invited_by' => $owner->id,
@@ -188,12 +188,12 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $owner = $this->groupsParityUser();
         $groupId = $this->groupsParityCreateGroup($owner->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/invite/email", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/invite/email", [
             'emails' => 'newcomer@example.com',
             'message' => 'Please join us.',
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/groups/{$groupId}/invite?status=invite-emails-sent");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/groups/{$groupId}/invite?status=invite-emails-sent");
         $this->assertDatabaseHas('group_invites', [
             'group_id' => $groupId,
             'invite_type' => 'email',
@@ -208,11 +208,11 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $owner = $this->groupsParityUser();
         $groupId = $this->groupsParityCreateGroup($owner->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/invite/email", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/invite/email", [
             'emails' => '   ',
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/groups/{$groupId}/invite?status=invite-emails-required");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/groups/{$groupId}/invite?status=invite-emails-required");
     }
 
     public function test_groups_invite_revoke_marks_invite_revoked(): void
@@ -233,9 +233,9 @@ class GroupsParityTest extends GovukAlphaFrontendTest
             'updated_at' => now(),
         ]);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/invite/{$inviteId}/revoke");
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/invite/{$inviteId}/revoke");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/groups/{$groupId}/invite?status=invite-revoked");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/groups/{$groupId}/invite?status=invite-revoked");
         $this->assertDatabaseHas('group_invites', [
             'id' => $inviteId,
             'status' => 'revoked',
@@ -254,7 +254,7 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $member = $this->groupsParityUser();
         $this->groupsParityAddMember($groupId, $member->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/notifications");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/notifications");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_groups.notifications.title'));
@@ -269,7 +269,7 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         // A logged-in user who is neither a member nor an admin.
         $this->groupsParityUser();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/notifications");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/notifications");
 
         $resp->assertForbidden();
     }
@@ -282,13 +282,13 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $member = $this->groupsParityUser();
         $this->groupsParityAddMember($groupId, $member->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/notifications", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/notifications", [
             'frequency' => 'muted',
             'email_enabled' => '1',
             // push_enabled intentionally omitted → should persist as false.
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/groups/{$groupId}/notifications?status=prefs-saved");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/groups/{$groupId}/notifications?status=prefs-saved");
         $this->assertDatabaseHas('group_notification_preferences', [
             'group_id' => $groupId,
             'user_id' => $member->id,
@@ -308,7 +308,7 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $owner = $this->groupsParityUser();
         $groupId = $this->groupsParityCreateGroup($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/image");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/image");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_groups.image.avatar_heading'));
@@ -323,7 +323,7 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $member = $this->groupsParityUser();
         $this->groupsParityAddMember($groupId, $member->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/image");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/image");
 
         $resp->assertForbidden();
     }
@@ -334,11 +334,11 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $owner = $this->groupsParityUser();
         $groupId = $this->groupsParityCreateGroup($owner->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/image", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/image", [
             'type' => 'avatar',
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/groups/{$groupId}/image?status=image-missing");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/groups/{$groupId}/image?status=image-missing");
     }
 
     // ================================================================
@@ -357,7 +357,7 @@ class GroupsParityTest extends GovukAlphaFrontendTest
             'parent_id' => $parentId,
         ]);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$parentId}");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$parentId}");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_groups.subgroups.heading'));
@@ -371,7 +371,7 @@ class GroupsParityTest extends GovukAlphaFrontendTest
         $owner = $this->groupsParityUser();
         $parentId = $this->groupsParityCreateGroup($owner->id, ['name' => 'Standalone Group']);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$parentId}");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$parentId}");
 
         $resp->assertOk();
         $resp->assertDontSee(__('govuk_alpha_groups.subgroups.heading'));

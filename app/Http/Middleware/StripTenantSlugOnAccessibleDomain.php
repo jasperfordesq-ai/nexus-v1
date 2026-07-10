@@ -12,16 +12,16 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * On a custom accessible domain, strips the "/{slug}/alpha" prefix from every
- * generated accessible URL so the address bar shows clean, slug-less paths —
- * mirroring how the React custom domains work.
+ * On a custom accessible domain, strips the "/{slug}/accessible" prefix from
+ * every generated accessible URL so the address bar shows clean, slug-less
+ * paths — mirroring how the React custom domains work.
  *
  * The accessible views build links with route('govuk-alpha.*', ['tenantSlug' =>
- * $slug]), which always produce /{slug}/alpha/... URLs. Rather than rewrite the
- * ~1,194 link sites, we rewrite the generated output here, centrally. This is a
- * no-op on every other host (shared platform domain, API), so those keep the
- * slug exactly as before — the slug is only dropped for tenants WITH a custom
- * accessible domain.
+ * $slug]), which always produce /{slug}/accessible/... URLs. Rather than
+ * rewrite the ~1,194 link sites, we rewrite the generated output here,
+ * centrally. This is a no-op on every other host (shared platform domain,
+ * API), so those keep the slug exactly as before — the slug is only dropped
+ * for tenants WITH a custom accessible domain.
  */
 class StripTenantSlugOnAccessibleDomain
 {
@@ -38,7 +38,7 @@ class StripTenantSlugOnAccessibleDomain
             return $response;
         }
 
-        $base = '/' . $slug . '/alpha';
+        $base = '/' . $slug . '/accessible';
 
         // Redirect Location header (after login/logout/form posts, etc.).
         $location = $response->headers->get('Location');
@@ -63,9 +63,10 @@ class StripTenantSlugOnAccessibleDomain
     }
 
     /**
-     * Replace every "/{slug}/alpha" prefix with "/". The longer "/{slug}/alpha/"
-     * form is replaced first so sub-paths collapse cleanly (".../alpha/login" →
-     * "/login") and the bare home ("/{slug}/alpha") maps to "/".
+     * Replace every "/{slug}/accessible" prefix with "/". The longer
+     * "/{slug}/accessible/" form is replaced first so sub-paths collapse
+     * cleanly (".../accessible/login" → "/login") and the bare home
+     * ("/{slug}/accessible") maps to "/".
      */
     private function strip(string $value, string $base): string
     {

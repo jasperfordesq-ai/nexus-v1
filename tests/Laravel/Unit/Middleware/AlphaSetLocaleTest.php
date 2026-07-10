@@ -47,7 +47,7 @@ class AlphaSetLocaleTest extends TestCase
      * Build a request with a real Laravel session store attached so that
      * $request->hasSession() is true and session operations work.
      */
-    private function makeSessionRequest(string $uri = '/alpha/feed', string $method = 'GET', array $query = []): Request
+    private function makeSessionRequest(string $uri = '/accessible/feed', string $method = 'GET', array $query = []): Request
     {
         $request = Request::create($uri, $method, $query);
         // Attach a real session store backed by the array driver
@@ -63,7 +63,7 @@ class AlphaSetLocaleTest extends TestCase
 
     public function test_sets_locale_from_query_param(): void
     {
-        $request = $this->makeSessionRequest('/alpha/feed', 'GET', ['locale' => 'de']);
+        $request = $this->makeSessionRequest('/accessible/feed', 'GET', ['locale' => 'de']);
 
         $this->middleware->handle($request, $this->makeNext());
 
@@ -72,7 +72,7 @@ class AlphaSetLocaleTest extends TestCase
 
     public function test_query_param_locale_is_persisted_to_session(): void
     {
-        $request = $this->makeSessionRequest('/alpha/feed', 'GET', ['locale' => 'fr']);
+        $request = $this->makeSessionRequest('/accessible/feed', 'GET', ['locale' => 'fr']);
 
         $this->middleware->handle($request, $this->makeNext());
 
@@ -81,7 +81,7 @@ class AlphaSetLocaleTest extends TestCase
 
     public function test_ignores_unsupported_query_locale(): void
     {
-        $request = $this->makeSessionRequest('/alpha/feed', 'GET', ['locale' => 'zz']);
+        $request = $this->makeSessionRequest('/accessible/feed', 'GET', ['locale' => 'zz']);
 
         $this->middleware->handle($request, $this->makeNext());
 
@@ -93,7 +93,7 @@ class AlphaSetLocaleTest extends TestCase
     {
         foreach (AlphaSetLocale::SUPPORTED_LOCALES as $locale) {
             App::setLocale('en');
-            $request = $this->makeSessionRequest('/alpha/feed', 'GET', ['locale' => $locale]);
+            $request = $this->makeSessionRequest('/accessible/feed', 'GET', ['locale' => $locale]);
 
             $this->middleware->handle($request, $this->makeNext());
 
@@ -107,7 +107,7 @@ class AlphaSetLocaleTest extends TestCase
 
     public function test_uses_session_locale_when_no_query_param(): void
     {
-        $request = $this->makeSessionRequest('/alpha/feed');
+        $request = $this->makeSessionRequest('/accessible/feed');
         $request->session()->put('locale', 'es');
 
         $this->middleware->handle($request, $this->makeNext());
@@ -117,7 +117,7 @@ class AlphaSetLocaleTest extends TestCase
 
     public function test_session_locale_ignored_if_unsupported(): void
     {
-        $request = $this->makeSessionRequest('/alpha/feed');
+        $request = $this->makeSessionRequest('/accessible/feed');
         $request->session()->put('locale', 'xyz'); // not a supported locale
 
         // No user, no token — should leave App locale at whatever it was (fallback)
@@ -130,7 +130,7 @@ class AlphaSetLocaleTest extends TestCase
 
     public function test_query_param_overrides_session_locale(): void
     {
-        $request = $this->makeSessionRequest('/alpha/feed', 'GET', ['locale' => 'nl']);
+        $request = $this->makeSessionRequest('/accessible/feed', 'GET', ['locale' => 'nl']);
         $request->session()->put('locale', 'it');
 
         $this->middleware->handle($request, $this->makeNext());
@@ -163,7 +163,7 @@ class AlphaSetLocaleTest extends TestCase
             ->method('validateToken')
             ->willReturn(['user_id' => $userId]);
 
-        $request = $this->makeSessionRequest('/alpha/feed');
+        $request = $this->makeSessionRequest('/accessible/feed');
         $request->headers->set('Authorization', 'Bearer valid-token-123');
 
         $this->middleware->handle($request, $this->makeNext());
@@ -189,7 +189,7 @@ class AlphaSetLocaleTest extends TestCase
             ->method('validateToken')
             ->willReturn(['user_id' => $userId]);
 
-        $request = $this->makeSessionRequest('/alpha/feed');
+        $request = $this->makeSessionRequest('/accessible/feed');
         $request->headers->set('Authorization', 'Bearer valid-token-abc');
 
         $this->middleware->handle($request, $this->makeNext());
@@ -204,7 +204,7 @@ class AlphaSetLocaleTest extends TestCase
             ->method('validateToken')
             ->willThrowException(new \RuntimeException('invalid token'));
 
-        $request = $this->makeSessionRequest('/alpha/feed');
+        $request = $this->makeSessionRequest('/accessible/feed');
         $request->headers->set('Authorization', 'Bearer bad-token');
 
         // No session locale, no query param — should leave locale at 'en'
@@ -221,7 +221,7 @@ class AlphaSetLocaleTest extends TestCase
     {
         App::setLocale('en');
 
-        $request = $this->makeSessionRequest('/alpha/feed');
+        $request = $this->makeSessionRequest('/accessible/feed');
         // No query param, no session, no token
 
         $this->middleware->handle($request, $this->makeNext());
@@ -242,7 +242,7 @@ class AlphaSetLocaleTest extends TestCase
             return response('ok', 200);
         };
 
-        $request = $this->makeSessionRequest('/alpha/feed');
+        $request = $this->makeSessionRequest('/accessible/feed');
         $this->middleware->handle($request, $next);
 
         $this->assertTrue($called);
@@ -252,7 +252,7 @@ class AlphaSetLocaleTest extends TestCase
     {
         $next = fn ($req) => response()->json(['alpha' => true], 202);
 
-        $request = $this->makeSessionRequest('/alpha/profile');
+        $request = $this->makeSessionRequest('/accessible/profile');
         $response = $this->middleware->handle($request, $next);
 
         $this->assertEquals(202, $response->getStatusCode());

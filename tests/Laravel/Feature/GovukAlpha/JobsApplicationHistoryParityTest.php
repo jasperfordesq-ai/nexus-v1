@@ -90,7 +90,7 @@ class JobsApplicationHistoryParityTest extends TestCase
         $this->seedHistory($app->id, null, 'applied');
         $this->seedHistory($app->id, 'applied', 'interview');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/jobs/applications/{$app->id}/history");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/jobs/applications/{$app->id}/history");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_jobs.history.title'));
         $res->assertSee(__('govuk_alpha.jobs_t2.app_status_interview'));
@@ -107,7 +107,7 @@ class JobsApplicationHistoryParityTest extends TestCase
         $stranger = $this->authenticatedUser();
         Sanctum::actingAs($stranger, ['*']);
 
-        $this->get("/{$this->testTenantSlug}/alpha/jobs/applications/{$app->id}/history")->assertNotFound();
+        $this->get("/{$this->testTenantSlug}/accessible/jobs/applications/{$app->id}/history")->assertNotFound();
     }
 
     public function test_interview_add_to_calendar_link_renders(): void
@@ -131,7 +131,7 @@ class JobsApplicationHistoryParityTest extends TestCase
         ]);
 
         Sanctum::actingAs($applicant, ['*']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/jobs/responses");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/jobs/responses");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_jobs.responses.add_to_calendar'));
         $res->assertSee('calendar.google.com/calendar/render', false);

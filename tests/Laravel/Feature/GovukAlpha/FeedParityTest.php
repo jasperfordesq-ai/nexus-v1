@@ -113,7 +113,7 @@ class FeedParityTest extends TestCase
         $post = $this->feedPostWithActivity($user->id, 'Post about gardening #garden');
         $this->tagPost($post->id, 'gardenparity');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/feed/hashtags");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/feed/hashtags");
 
         $response->assertOk();
         $response->assertHeader('content-type', 'text/html; charset=UTF-8');
@@ -132,7 +132,7 @@ class FeedParityTest extends TestCase
         $this->tagPost($a->id, 'communityplan');
         $this->tagPost($b->id, 'sportsday');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/feed/hashtags?q=community");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/feed/hashtags?q=community");
 
         $response->assertOk();
         $response->assertSee('#communityplan');
@@ -149,7 +149,7 @@ class FeedParityTest extends TestCase
         $post = $this->feedPostWithActivity($user->id, 'Tagged feed post body');
         $this->tagPost($post->id, 'taggedtopic');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/feed/hashtag/taggedtopic");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/feed/hashtag/taggedtopic");
 
         $response->assertOk();
         $response->assertSee('#taggedtopic');
@@ -162,7 +162,7 @@ class FeedParityTest extends TestCase
     {
         $this->feedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/feed/hashtag/nonexistenttag");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/feed/hashtag/nonexistenttag");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_feed.hashtag.empty_title'));
@@ -177,7 +177,7 @@ class FeedParityTest extends TestCase
         $user = $this->feedUser();
         $post = $this->feedPostWithActivity($user->id, 'Polymorphic permalink post');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/feed/item/post/{$post->id}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/feed/item/post/{$post->id}");
 
         $response->assertOk();
         $response->assertSee('Polymorphic permalink post');
@@ -209,7 +209,7 @@ class FeedParityTest extends TestCase
             'created_at' => now()->addMinute(),
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/feed/item/event/{$eventId}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/feed/item/event/{$eventId}");
 
         $response->assertOk();
         $response->assertSee('Polymorphic feed event');
@@ -220,7 +220,7 @@ class FeedParityTest extends TestCase
     {
         $this->feedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/feed/item/badtype/1");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/feed/item/badtype/1");
 
         $response->assertNotFound();
     }
@@ -229,7 +229,7 @@ class FeedParityTest extends TestCase
     {
         $this->feedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/feed/item/post/99999999");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/feed/item/post/99999999");
 
         $response->assertNotFound();
     }
@@ -246,7 +246,7 @@ class FeedParityTest extends TestCase
         // Act as a different member so the not-interested write is meaningful.
         $viewer = $this->feedUser(['name' => 'Viewer One']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/feed/items/post/{$post->id}/not-interested");
+        $response = $this->post("/{$this->testTenantSlug}/accessible/feed/items/post/{$post->id}/not-interested");
 
         $response->assertRedirectContains('status=not-interested');
         $this->assertDatabaseHas('feed_hidden', [
@@ -260,7 +260,7 @@ class FeedParityTest extends TestCase
     public function test_feed_item_not_interested_requires_authentication(): void
     {
         // No authenticated user — the POST must redirect (not write a row).
-        $response = $this->post("/{$this->testTenantSlug}/alpha/feed/items/post/1/not-interested");
+        $response = $this->post("/{$this->testTenantSlug}/accessible/feed/items/post/1/not-interested");
 
         $response->assertRedirectContains('status=auth-required');
         $this->assertDatabaseMissing('feed_hidden', [
@@ -280,7 +280,7 @@ class FeedParityTest extends TestCase
 
         $reactor = $this->feedUser(['name' => 'Reactor']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/feed/items/post/{$post->id}/react", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/feed/items/post/{$post->id}/react", [
             'emoji' => 'love',
         ]);
 
@@ -300,7 +300,7 @@ class FeedParityTest extends TestCase
 
         $this->feedUser(['name' => 'Reactor 2']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/feed/items/post/{$post->id}/react", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/feed/items/post/{$post->id}/react", [
             'emoji' => 'not-a-real-reaction',
         ]);
 

@@ -56,15 +56,15 @@ class WalletParityTest extends TestCase
 
     public function test_wallet_manage_requires_auth(): void
     {
-        $this->get("/{$this->testTenantSlug}/alpha/wallet/manage")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/wallet/manage")
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_wallet_manage_renders_for_member(): void
     {
         $this->authenticatedUser(['balance' => 12]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/wallet/manage");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/wallet/manage");
         $res->assertOk();
         $res->assertHeader('content-type', 'text/html; charset=UTF-8');
         $res->assertSee(__('govuk_alpha_wallet.manage.title'));
@@ -91,7 +91,7 @@ class WalletParityTest extends TestCase
             'created_at' => now(),
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/wallet/manage");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/wallet/manage");
         $res->assertOk();
         // The yellow pending tag should appear (count 4) rather than the "no pending" grey tag.
         $res->assertSee('govuk-tag--yellow', false);
@@ -102,7 +102,7 @@ class WalletParityTest extends TestCase
     {
         $this->authenticatedUser(['balance' => 5]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/wallet/manage");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/wallet/manage");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_wallet.balance.no_pending'));
     }
@@ -121,7 +121,7 @@ class WalletParityTest extends TestCase
             'last_name' => 'Target',
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/wallet/manage?to={$recipient->id}");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/wallet/manage?to={$recipient->id}");
         $res->assertOk();
         // The pre-selected recipient surfaces in the transfer section with a notice.
         $res->assertSee('Prefill Target');
@@ -155,7 +155,7 @@ class WalletParityTest extends TestCase
             'last_name' => 'User',
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/wallet/manage?to={$foreign->id}");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/wallet/manage?to={$foreign->id}");
         $res->assertOk();
         $res->assertDontSee('Foreign User');
         // With no recipient resolved, the member donate radio is disabled.
@@ -170,7 +170,7 @@ class WalletParityTest extends TestCase
     {
         $user = $this->authenticatedUser(['balance' => 25]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/wallet/donate", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/wallet/donate", [
             'target' => 'community_fund',
             'amount' => 3,
             'message' => 'For the pool',
@@ -193,7 +193,7 @@ class WalletParityTest extends TestCase
             'balance' => 0,
         ]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/wallet/donate", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/wallet/donate", [
             'target' => 'user',
             'recipient_id' => $recipient->id,
             'amount' => 6,
@@ -220,7 +220,7 @@ class WalletParityTest extends TestCase
             'balance' => 0,
         ]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/wallet/transfer", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/wallet/transfer", [
             'recipient_id' => $recipient->id,
             'amount' => 5,
             'note' => 'Manage-hub transfer',

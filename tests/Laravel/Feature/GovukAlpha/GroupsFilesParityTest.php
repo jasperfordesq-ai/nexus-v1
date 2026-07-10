@@ -120,7 +120,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
         $owner   = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $groupId = $this->groupsFilesCreateGroup($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files");
 
         $resp->assertRedirect();
         $this->assertStringContainsString('status=auth-required', $resp->headers->get('location') ?? '');
@@ -138,7 +138,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
 
         $this->groupsFilesInsertRecord($groupId, $owner->id, ['file_name' => 'meeting-notes.pdf']);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files");
 
         $resp->assertOk();
         $resp->assertSee('meeting-notes.pdf');
@@ -150,7 +150,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
         $owner   = $this->groupsFilesUser();
         $groupId = $this->groupsFilesCreateGroup($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files");
 
         $resp->assertOk();
         // Empty state inset text should appear
@@ -165,7 +165,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
 
         $this->groupsFilesUser(); // authenticated but NOT a member
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files");
         $resp->assertForbidden();
     }
 
@@ -178,7 +178,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
         $member = $this->groupsFilesUser();
         $this->groupsFilesAddMember($groupId, $member->id, 'member');
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files");
 
         $resp->assertOk();
         // Upload form is visible to all members
@@ -191,7 +191,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
         $owner   = $this->groupsFilesUser();
         $groupId = $this->groupsFilesCreateGroup($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files");
 
         $resp->assertOk();
         $resp->assertSee('file-input');
@@ -213,7 +213,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
         // Member uploads their own file
         $this->groupsFilesInsertRecord($groupId, $member->id, ['file_name' => 'my-file.pdf']);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files");
 
         $resp->assertOk();
         // Delete form action should appear since current user is the uploader
@@ -234,7 +234,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
         $member = $this->groupsFilesUser();
         $this->groupsFilesAddMember($groupId, $member->id, 'member');
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files");
 
         $resp->assertOk();
         // Delete button should NOT appear because viewer is not uploader or admin
@@ -251,7 +251,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
         $other   = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $this->groupsFilesInsertRecord($groupId, $other->id, ['file_name' => 'someone-elses.pdf']);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files");
 
         $resp->assertOk();
         $resp->assertSee('/delete', false);
@@ -267,7 +267,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
         $owner   = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $groupId = $this->groupsFilesCreateGroup($owner->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files", [
             '_token' => csrf_token(),
         ]);
 
@@ -281,7 +281,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
         $owner   = $this->groupsFilesUser();
         $groupId = $this->groupsFilesCreateGroup($owner->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files", [
             '_token' => csrf_token(),
         ]);
 
@@ -300,7 +300,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
         $member  = $this->groupsFilesUser();
         $this->groupsFilesAddMember($groupId, $member->id, 'member');
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files", [
             '_token' => csrf_token(),
             'file'   => UploadedFile::fake()->create('report.pdf', 100, 'application/pdf'),
         ]);
@@ -324,7 +324,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
 
         $this->groupsFilesUser(); // NOT a member
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files", [
             '_token' => csrf_token(),
             'file'   => UploadedFile::fake()->create('report.pdf', 100, 'application/pdf'),
         ]);
@@ -346,7 +346,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
 
         $fileId  = $this->groupsFilesInsertRecord($groupId, $admin->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files/{$fileId}/delete", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files/{$fileId}/delete", [
             '_token' => csrf_token(),
         ]);
 
@@ -370,7 +370,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
         $member  = $this->groupsFilesUser();
         $this->groupsFilesAddMember($groupId, $member->id, 'member');
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files/{$fileId}/delete", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files/{$fileId}/delete", [
             '_token' => csrf_token(),
         ]);
 
@@ -387,7 +387,7 @@ class GroupsFilesParityTest extends GovukAlphaFrontendTest
         $groupId = $this->groupsFilesCreateGroup($owner->id);
         $fileId  = $this->groupsFilesInsertRecord($groupId, $owner->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/files/{$fileId}/delete", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/files/{$fileId}/delete", [
             '_token' => csrf_token(),
         ]);
 

@@ -297,9 +297,9 @@ See [react-frontend/CLAUDE.md](react-frontend/CLAUDE.md) for full styling rules,
 
 ### Accessible Frontend (GOV.UK-Based)
 
-The accessible frontend is an explicitly approved UI track that complements, but does not replace, `react-frontend/`. It is the only maintained exception to the React-primary UI rule and is intended for users who benefit from a highly accessible, HTML-first experience. The public-facing track is now Beta; the `GovukAlpha`, `govuk_alpha`, and `/alpha/...` names remain as compatibility code-path names until a deliberate route/namespace migration is done.
+The accessible frontend is an explicitly approved UI track that complements, but does not replace, `react-frontend/`. It is the only maintained exception to the React-primary UI rule and is intended for users who benefit from a highly accessible, HTML-first experience. The public-facing track is now Beta and served under `/{tenantSlug}/accessible/...` (legacy `/alpha/...` URLs permanently redirect); the `GovukAlpha`, `govuk_alpha`, and `govuk-alpha.*` names remain as internal code-path names (namespaces, translation files, route names) until a deliberate namespace migration is done.
 
-- Keep it isolated under root-level `accessible-frontend/`, `app/Http/Controllers/GovukAlpha/`, and `/{tenantSlug}/alpha/...` routes.
+- Keep it isolated under root-level `accessible-frontend/`, `app/Http/Controllers/GovukAlpha/`, and `/{tenantSlug}/accessible/...` routes.
 - Preferred public subdomain: `accessible.project-nexus.ie`.
 - Deploy it through the Laravel/PHP blue-green app container, not the React container. Run `npm run build:accessible-frontend`, `npm run test:accessible-frontend:php`, and `npm run test:accessible-frontend:a11y` before deployment.
 - Use official `govuk-frontend` first. The project currently installs `govuk-frontend@6.1.0`; npm latest stable was verified as `6.3.0` on 2026-06-23 and should be upgraded only after a compatibility pass.

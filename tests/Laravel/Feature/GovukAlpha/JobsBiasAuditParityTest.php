@@ -51,12 +51,12 @@ class JobsBiasAuditParityTest extends TestCase
 
     public function test_jobs_bias_audit_requires_authentication(): void
     {
-        $url      = "/{$this->testTenantSlug}/alpha/jobs/bias-audit";
+        $url      = "/{$this->testTenantSlug}/accessible/jobs/bias-audit";
         $response = $this->get($url);
 
         $response->assertRedirect();
         $this->assertStringContainsString(
-            "/{$this->testTenantSlug}/alpha/login",
+            "/{$this->testTenantSlug}/accessible/login",
             $response->headers->get('Location') ?? ''
         );
     }
@@ -69,7 +69,7 @@ class JobsBiasAuditParityTest extends TestCase
     {
         $this->authenticatedAdmin();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/bias-audit");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/bias-audit");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_jobs.bias_audit.title'));
@@ -84,7 +84,7 @@ class JobsBiasAuditParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/bias-audit");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/bias-audit");
 
         $response->assertForbidden();
     }
@@ -98,7 +98,7 @@ class JobsBiasAuditParityTest extends TestCase
         $this->disableJobsFeature();
         $this->authenticatedAdmin();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/bias-audit");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/bias-audit");
 
         $response->assertForbidden();
     }
@@ -112,7 +112,7 @@ class JobsBiasAuditParityTest extends TestCase
         $this->authenticatedAdmin();
 
         $response = $this->get(
-            "/{$this->testTenantSlug}/alpha/jobs/bias-audit?from=2026-01-01&to=2026-06-30&job_id=999999"
+            "/{$this->testTenantSlug}/accessible/jobs/bias-audit?from=2026-01-01&to=2026-06-30&job_id=999999"
         );
 
         // Should render (200) even when job_id matches nothing — empty state shown

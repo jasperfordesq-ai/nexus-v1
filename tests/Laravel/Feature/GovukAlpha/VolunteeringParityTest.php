@@ -53,7 +53,7 @@ class VolunteeringParityTest extends TestCase
 
     public function test_volunteering_parity_pages_require_authentication(): void
     {
-        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+        $loginPath = "/{$this->testTenantSlug}/accessible/login";
 
         foreach ([
             '/volunteering/my-organisations',
@@ -66,7 +66,7 @@ class VolunteeringParityTest extends TestCase
             '/volunteering/group-signups',
             '/volunteering/expenses',
         ] as $path) {
-            $response = $this->get("/{$this->testTenantSlug}/alpha{$path}");
+            $response = $this->get("/{$this->testTenantSlug}/accessible{$path}");
             $response->assertRedirect();
             $this->assertStringContainsString($loginPath, $response->headers->get('Location') ?? '');
         }
@@ -80,7 +80,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/my-organisations");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/my-organisations");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.my_orgs.title'));
@@ -92,7 +92,7 @@ class VolunteeringParityTest extends TestCase
         // to assistive tech), and the hints must not hardcode euro.
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/donations");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/donations");
 
         $response->assertOk();
         $response->assertDontSee('&euro;', false);
@@ -105,7 +105,7 @@ class VolunteeringParityTest extends TestCase
         $user = $this->authenticatedUser();
         $orgId = $this->createVolOrg((int) $user->id, 'My Owned Org', 'approved');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/my-organisations");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/my-organisations");
 
         $response->assertOk();
         $response->assertSee('My Owned Org');
@@ -122,7 +122,7 @@ class VolunteeringParityTest extends TestCase
         $user = $this->authenticatedUser();
         $orgId = $this->createVolOrg((int) $user->id, 'Dashboard Org', 'approved');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$orgId}/dashboard");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/organisations/{$orgId}/dashboard");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.org_dashboard.title'));
@@ -136,7 +136,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/organisations/99999999/dashboard");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/organisations/99999999/dashboard");
 
         $response->assertNotFound();
     }
@@ -150,7 +150,7 @@ class VolunteeringParityTest extends TestCase
         // A different, authenticated user (not owner / not org member).
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$orgId}/dashboard");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/organisations/{$orgId}/dashboard");
 
         $response->assertForbidden();
     }
@@ -164,7 +164,7 @@ class VolunteeringParityTest extends TestCase
         $user = $this->authenticatedUser();
         $orgId = $this->createVolOrg((int) $user->id, 'Settings Org', 'approved');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$orgId}/settings");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/organisations/{$orgId}/settings");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.org_settings.title'));
@@ -176,7 +176,7 @@ class VolunteeringParityTest extends TestCase
         $user = $this->authenticatedUser();
         $orgId = $this->createVolOrg((int) $user->id, 'Before Name', 'approved');
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$orgId}/settings", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/organisations/{$orgId}/settings", [
             'name' => 'After Name',
             'description' => 'Updated description',
             'contact_email' => 'team@example.org',
@@ -197,7 +197,7 @@ class VolunteeringParityTest extends TestCase
         $user = $this->authenticatedUser();
         $orgId = $this->createVolOrg((int) $user->id, 'Keep This Name', 'approved');
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$orgId}/settings", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/organisations/{$orgId}/settings", [
             'name' => '',
         ]);
 
@@ -216,7 +216,7 @@ class VolunteeringParityTest extends TestCase
         $user = $this->authenticatedUser();
         $orgId = $this->createVolOrg((int) $user->id, 'Wallet Org', 'approved');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$orgId}/wallet");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/organisations/{$orgId}/wallet");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.org_wallet.title'));
@@ -235,7 +235,7 @@ class VolunteeringParityTest extends TestCase
             ->update(['auto_pay_enabled' => 0]);
 
         $response = $this->withSession(['_token' => 'test-csrf-token'])
-            ->post("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$orgId}/wallet/auto-pay", [
+            ->post("/{$this->testTenantSlug}/accessible/volunteering/organisations/{$orgId}/wallet/auto-pay", [
                 '_token' => 'test-csrf-token',
                 'enabled' => '1',
             ]);
@@ -257,7 +257,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/opportunities/create");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/opportunities/create");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.create_opp.title'));
@@ -268,7 +268,7 @@ class VolunteeringParityTest extends TestCase
         $user = $this->authenticatedUser();
         $orgId = $this->createVolOrg((int) $user->id, 'Posting Org', 'approved');
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/opportunities/create", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/opportunities/create", [
             'organization_id' => $orgId,
             'title' => 'Park Clean-up Helper',
             'description' => 'Help tidy the community park on Saturday mornings.',
@@ -288,7 +288,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/opportunities/create", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/opportunities/create", [
             'organization_id' => 0,
             'title' => '',
             'description' => '',
@@ -306,7 +306,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/emergency-alerts");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/emergency-alerts");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.emergency.title'));
@@ -317,7 +317,7 @@ class VolunteeringParityTest extends TestCase
         $this->authenticatedUser();
 
         // No recipient row for this user → service returns false → respond-failed.
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/emergency-alerts/99999999/respond", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/emergency-alerts/99999999/respond", [
             'response' => 'accepted',
         ]);
 
@@ -333,7 +333,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/credentials");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/credentials");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.credentials.title'));
@@ -343,7 +343,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/credentials", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/credentials", [
             'credential_type' => '',
         ]);
 
@@ -368,7 +368,7 @@ class VolunteeringParityTest extends TestCase
         ]);
         $credId = (int) DB::getPdo()->lastInsertId();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/credentials/{$credId}/delete");
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/credentials/{$credId}/delete");
 
         $response->assertRedirect();
         // The other user's credential still exists (ownership-scoped DELETE no-op).
@@ -384,7 +384,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/wellbeing");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/wellbeing");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.wellbeing.title'));
@@ -394,7 +394,7 @@ class VolunteeringParityTest extends TestCase
     {
         $user = $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/wellbeing/checkin", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/wellbeing/checkin", [
             'mood' => 4,
             'note' => 'Feeling good after my shift.',
         ]);
@@ -411,7 +411,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/wellbeing/checkin", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/wellbeing/checkin", [
             'mood' => 9,
         ]);
 
@@ -427,7 +427,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/recommended-shifts");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/recommended-shifts");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.recommended.title'));
@@ -441,7 +441,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/donations");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/donations");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.donations.title'));
@@ -460,7 +460,7 @@ class VolunteeringParityTest extends TestCase
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/donations");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/donations");
 
         $response->assertForbidden();
     }
@@ -469,7 +469,7 @@ class VolunteeringParityTest extends TestCase
     {
         $user = $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/donations", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/donations", [
             '_token' => csrf_token(),
             'amount' => '25.50',
             'payment_method' => 'bank_transfer',
@@ -496,7 +496,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/donations", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/donations", [
             '_token' => csrf_token(),
             'amount' => '0',
             'payment_method' => 'paypal',
@@ -518,7 +518,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/group-signups");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/group-signups");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.group_signups.title'));
@@ -530,7 +530,7 @@ class VolunteeringParityTest extends TestCase
         $orgId = $this->createVolOrg((int) $user->id, 'Group Org', 'approved');
         $this->createGroupReservation((int) $user->id, $orgId, 'Saturday Park Crew');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/group-signups");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/group-signups");
 
         $response->assertOk();
         $response->assertSee('Saturday Park Crew');
@@ -542,7 +542,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/group-signups/123/members", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/group-signups/123/members", [
             'user_id' => 0,
         ]);
 
@@ -555,7 +555,7 @@ class VolunteeringParityTest extends TestCase
         $this->authenticatedUser();
 
         // No such reservation → service returns false → cancel-failed flag.
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/group-signups/99999999/cancel");
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/group-signups/99999999/cancel");
 
         $response->assertRedirect();
         $this->assertStringContainsString('status=reservation-cancel-failed', $response->headers->get('Location') ?? '');
@@ -569,7 +569,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/expenses");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/expenses");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.expenses.title'));
@@ -586,7 +586,7 @@ class VolunteeringParityTest extends TestCase
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/expenses");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/expenses");
 
         $response->assertForbidden();
     }
@@ -596,7 +596,7 @@ class VolunteeringParityTest extends TestCase
         $user = $this->authenticatedUser();
         $orgId = $this->createVolOrg((int) $user->id, 'Expense Org', 'approved');
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/expenses", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/expenses", [
             'organization_id' => $orgId,
             'expense_type' => 'travel',
             'amount' => '12.50',
@@ -619,7 +619,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/expenses", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/expenses", [
             'organization_id' => 0,
             'expense_type' => 'travel',
             'amount' => '10',
@@ -635,7 +635,7 @@ class VolunteeringParityTest extends TestCase
         $user = $this->authenticatedUser();
         $orgId = $this->createVolOrg((int) $user->id, 'Zero Org', 'approved');
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/expenses", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/expenses", [
             'organization_id' => $orgId,
             'expense_type' => 'meals',
             'amount' => '0',
@@ -665,7 +665,7 @@ class VolunteeringParityTest extends TestCase
         $user = $this->authenticatedUser();
         $this->createVolOrg((int) $user->id, 'Door Owner Org', 'approved');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha.vol_org.door_eyebrow'));
@@ -679,7 +679,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha.vol_org.door_register_title'));
@@ -691,7 +691,7 @@ class VolunteeringParityTest extends TestCase
         $user = $this->authenticatedUser();
         $this->createVolOrg((int) $user->id, 'Pending Door Org', 'pending');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha.vol_org.awaiting_approval'));
@@ -703,7 +703,7 @@ class VolunteeringParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering");
 
         $response->assertOk();
         // The redundant Organisations tab was removed in favour of the org door.

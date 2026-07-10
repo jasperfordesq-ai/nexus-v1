@@ -9,7 +9,7 @@ import path from 'path';
 const laravelOrigin = (process.env.ACCESSIBLE_FRONTEND_LARAVEL_ORIGIN || process.env.APP_URL || 'http://127.0.0.1:8090')
   .replace(/\/+$/, '');
 
-const pageRoutePattern = /^\/([a-zA-Z0-9_-]+)(\/alpha(?:\/.*)?|\/?)$/;
+const pageRoutePattern = /^\/([a-zA-Z0-9_-]+)((?:\/accessible|\/alpha)(?:\/.*)?|\/?)$/;
 
 export default defineConfig({
   build: {
@@ -48,9 +48,13 @@ export default defineConfig({
           }
 
           const tenantSlug = match[1];
-          const alphaPath = match[2].startsWith('/alpha') ? match[2] : '/alpha';
+          // Legacy /alpha deep links are forwarded as-is — Laravel serves the
+          // permanent redirect to the /accessible prefix.
+          const accessiblePath = match[2].startsWith('/accessible') || match[2].startsWith('/alpha')
+            ? match[2]
+            : '/accessible';
           res.statusCode = 302;
-          res.setHeader('Location', `${laravelOrigin}/${tenantSlug}${alphaPath}${requestUrl.search}`);
+          res.setHeader('Location', `${laravelOrigin}/${tenantSlug}${accessiblePath}${requestUrl.search}`);
           res.end();
         });
       },

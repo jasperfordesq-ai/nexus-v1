@@ -126,10 +126,10 @@ class SearchParityTest extends TestCase
     {
         $this->enableAlphaFeatures(['search']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/search/advanced");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/search/advanced");
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/login');
+        $res->assertRedirectContains('/accessible/login');
     }
 
     public function test_search_advanced_renders_filters_for_authenticated_user(): void
@@ -137,7 +137,7 @@ class SearchParityTest extends TestCase
         $this->enableAlphaFeatures(['search']);
         $this->authenticatedUser();
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/search/advanced");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/search/advanced");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_search.advanced.title'));
@@ -163,7 +163,7 @@ class SearchParityTest extends TestCase
         $user = $this->authenticatedUser();
         $this->seedListing($user->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/search/advanced?q=Zebra");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/search/advanced?q=Zebra");
 
         $res->assertOk();
         $res->assertSee('Zebra Carpentry Helper');
@@ -178,7 +178,7 @@ class SearchParityTest extends TestCase
         $this->disableMeiliSearch();
         $this->authenticatedUser();
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/search/advanced?q=ZZnomatchquery");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/search/advanced?q=ZZnomatchquery");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_search.states.empty_title'));
@@ -191,7 +191,7 @@ class SearchParityTest extends TestCase
         $this->authenticatedUser();
 
         // type + sort = 2 active filters.
-        $res = $this->get("/{$this->testTenantSlug}/alpha/search/advanced?q=help&type=listings&sort=newest");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/search/advanced?q=help&type=listings&sort=newest");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_search.filters.summary_with_count', ['count' => 2]));
@@ -207,7 +207,7 @@ class SearchParityTest extends TestCase
         $user = $this->authenticatedUser();
         $this->seedSavedSearch($user->id, ['name' => 'Find a gardener']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/search/advanced");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/search/advanced");
 
         $res->assertOk();
         $res->assertSee('Find a gardener');
@@ -219,7 +219,7 @@ class SearchParityTest extends TestCase
         $this->enableAlphaFeatures(['search']);
         $user = $this->authenticatedUser();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/search/saved", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/search/saved", [
             'name' => 'Plumbing offers',
             'q' => 'plumbing',
             'type' => 'listings',
@@ -241,7 +241,7 @@ class SearchParityTest extends TestCase
         $this->enableAlphaFeatures(['search']);
         $user = $this->authenticatedUser();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/search/saved", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/search/saved", [
             'name' => '',
             'q' => 'plumbing',
         ]);
@@ -268,7 +268,7 @@ class SearchParityTest extends TestCase
             'query_params' => json_encode(['q' => 'carpentry', 'type' => 'listings']),
         ]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/search/saved/{$id}/run");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/search/saved/{$id}/run");
 
         $res->assertStatus(302);
         $res->assertRedirectContains('q=carpentry');
@@ -293,7 +293,7 @@ class SearchParityTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/search/saved/{$id}/run");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/search/saved/{$id}/run");
 
         $res->assertStatus(404);
     }
@@ -307,7 +307,7 @@ class SearchParityTest extends TestCase
         // A different user in the same tenant tries to run it.
         $this->authenticatedUser();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/search/saved/{$id}/run");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/search/saved/{$id}/run");
 
         $res->assertStatus(403);
     }
@@ -322,7 +322,7 @@ class SearchParityTest extends TestCase
         $user = $this->authenticatedUser();
         $id = $this->seedSavedSearch($user->id, ['name' => 'Delete me']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/search/saved/{$id}/delete");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/search/saved/{$id}/delete");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_search.saved.delete_title'));
@@ -339,7 +339,7 @@ class SearchParityTest extends TestCase
 
         $this->authenticatedUser();
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/search/saved/{$id}/delete");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/search/saved/{$id}/delete");
 
         $res->assertStatus(403);
     }
@@ -350,7 +350,7 @@ class SearchParityTest extends TestCase
         $user = $this->authenticatedUser();
         $id = $this->seedSavedSearch($user->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/search/saved/{$id}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/search/saved/{$id}/delete");
 
         $res->assertStatus(302);
         $res->assertRedirectContains('status=search-deleted');
@@ -372,7 +372,7 @@ class SearchParityTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/search/saved/{$id}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/search/saved/{$id}/delete");
 
         $res->assertStatus(404);
     }

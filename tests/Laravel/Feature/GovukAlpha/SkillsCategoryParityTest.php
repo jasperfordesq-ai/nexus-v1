@@ -86,7 +86,7 @@ class SkillsCategoryParityTest extends TestCase
         $this->authenticatedUser();
         $catId = $this->seedCategory('Gardening Parity');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/skills");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/skills");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha.skills.browse_by_category'));
@@ -107,7 +107,7 @@ class SkillsCategoryParityTest extends TestCase
         $this->seedSkill($offerer->id, $catId, 'Plumbing Parity', ['is_offering' => 1, 'is_requesting' => 0]);
         $this->seedSkill($requester->id, $catId, 'Plumbing Parity', ['is_offering' => 0, 'is_requesting' => 1]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/skills?category={$catId}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/skills?category={$catId}");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha.skills.skills_in', ['category' => 'Repairs Parity']));
@@ -130,7 +130,7 @@ class SkillsCategoryParityTest extends TestCase
             'is_requesting' => 1,
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/skills?skill=" . urlencode('Algebra Parity'));
+        $response = $this->get("/{$this->testTenantSlug}/accessible/skills?skill=" . urlencode('Algebra Parity'));
 
         $response->assertOk();
         $response->assertSee('Skillful Member');

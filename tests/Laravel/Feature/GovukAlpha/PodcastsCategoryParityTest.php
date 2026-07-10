@@ -71,7 +71,7 @@ class PodcastsCategoryParityTest extends TestCase
         $this->seedShow($owner->id, 'Tech Talk Weekly', 'Technology');
         $this->seedShow($owner->id, 'Garden Hour', 'Gardening');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/podcasts?category=Technology");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/podcasts?category=Technology");
         $res->assertOk();
         $res->assertSee('Tech Talk Weekly');
         $res->assertDontSee('Garden Hour');
@@ -83,7 +83,7 @@ class PodcastsCategoryParityTest extends TestCase
         $this->seedShow($owner->id, 'Tech Talk', 'Technology');
         $this->seedShow($owner->id, 'Garden Hour', 'Gardening');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/podcasts");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/podcasts");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.polish_commerce.podcast_category_label'));
         $res->assertSee('name="category"', false);
@@ -96,7 +96,7 @@ class PodcastsCategoryParityTest extends TestCase
         $owner = $this->authenticatedUser();
         $this->seedShow($owner->id, 'Only Show', 'Technology');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/podcasts?category=DoesNotExist");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/podcasts?category=DoesNotExist");
         $res->assertOk();
         $res->assertSee('Only Show');
     }

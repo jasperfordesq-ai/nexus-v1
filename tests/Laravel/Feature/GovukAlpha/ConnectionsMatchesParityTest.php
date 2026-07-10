@@ -55,9 +55,9 @@ class ConnectionsMatchesParityTest extends TestCase
 
     public function test_connections_network_requires_authentication(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/connections/network");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/connections/network");
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_connections_network_renders_three_sections_with_data(): void
@@ -73,7 +73,7 @@ class ConnectionsMatchesParityTest extends TestCase
             ['tenant_id' => $this->testTenantId, 'requester_id' => $friend->id, 'receiver_id' => $me->id, 'status' => 'accepted', 'created_at' => now()->subMonths(3), 'updated_at' => now()],
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/connections/network");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/connections/network");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_connections.network.title'));
@@ -94,7 +94,7 @@ class ConnectionsMatchesParityTest extends TestCase
             ['tenant_id' => $this->testTenantId, 'requester_id' => $friend->id, 'receiver_id' => $me->id, 'status' => 'accepted', 'created_at' => now()->subMonths(2), 'updated_at' => now()],
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/connections/network");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/connections/network");
 
         $response->assertOk();
         // Connected-since label (the date string is locale-formatted; assert the key prefix).
@@ -119,7 +119,7 @@ class ConnectionsMatchesParityTest extends TestCase
             ['tenant_id' => $this->testTenantId, 'requester_id' => $friend->id, 'receiver_id' => $me->id, 'status' => 'accepted', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/connections/network");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/connections/network");
 
         $response->assertOk();
         // HTML is stripped from the stored bio before rendering (parity with
@@ -143,7 +143,7 @@ class ConnectionsMatchesParityTest extends TestCase
             ['tenant_id' => $this->testTenantId, 'requester_id' => $friend->id, 'receiver_id' => $me->id, 'status' => 'accepted', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/connections");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/connections");
 
         $response->assertOk();
         $response->assertSee('Cycling buddy and bread baker.');
@@ -160,7 +160,7 @@ class ConnectionsMatchesParityTest extends TestCase
             ['tenant_id' => $this->testTenantId, 'requester_id' => $drop->id, 'receiver_id' => $me->id, 'status' => 'accepted', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/connections/network?q=Wanted");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/connections/network?q=Wanted");
 
         $response->assertOk();
         $response->assertSee('Wendy Wanted');
@@ -179,7 +179,7 @@ class ConnectionsMatchesParityTest extends TestCase
         }
         DB::table('connections')->insert($rows);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/connections/network");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/connections/network");
 
         $response->assertOk();
         // The accepted section offers a cursor-driven "Show more".
@@ -191,7 +191,7 @@ class ConnectionsMatchesParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'Empty Me']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/connections/network");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/connections/network");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_connections.network_empty.accepted_title'));
@@ -207,9 +207,9 @@ class ConnectionsMatchesParityTest extends TestCase
 
     public function test_connections_matches_board_requires_authentication(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/matches/board");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/matches/board");
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_connections_matches_board_renders_stats_and_source_tabs(): void
@@ -217,7 +217,7 @@ class ConnectionsMatchesParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Board Viewer']);
 
         // Renders whether or not the engine returns matches (degrades to empty state).
-        $response = $this->get("/{$this->testTenantSlug}/alpha/matches/board");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/matches/board");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_connections.matches.title'));
@@ -237,7 +237,7 @@ class ConnectionsMatchesParityTest extends TestCase
         $this->seedActiveListing($owner->id, ['title' => 'Beginner guitar lessons offer', 'description' => 'I can teach guitar', 'type' => 'offer', 'service_type' => 'remote_only']);
         $this->seedActiveListing($viewer->id, ['title' => 'Want guitar lessons', 'description' => 'Looking for guitar help', 'type' => 'request', 'service_type' => 'remote_only']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/matches/board");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/matches/board");
 
         $response->assertOk();
         // Source filter tabs are always present in the legend even when empty.
@@ -268,7 +268,7 @@ class ConnectionsMatchesParityTest extends TestCase
         ]);
         Sanctum::actingAs($user, ['*']);
 
-        $response = $this->get("/{$emptyTenantSlug}/alpha/matches/board");
+        $response = $this->get("/{$emptyTenantSlug}/accessible/matches/board");
 
         $response->assertOk();
         // With no matches, the empty state and Browse Listings CTA render.
@@ -286,7 +286,7 @@ class ConnectionsMatchesParityTest extends TestCase
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $listingId = $this->seedActiveListing($owner->id, ['title' => 'Painting offer']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/matches/board/{$listingId}/dismiss", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/matches/board/{$listingId}/dismiss", [
             'reason' => 'too_far',
             'source' => 'listing',
         ]);
@@ -314,7 +314,7 @@ class ConnectionsMatchesParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'Board Dismiss 404']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/matches/board/999999/dismiss", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/matches/board/999999/dismiss", [
             'reason' => 'not_relevant',
         ]);
 
@@ -323,11 +323,11 @@ class ConnectionsMatchesParityTest extends TestCase
 
     public function test_connections_dismiss_match_requires_authentication(): void
     {
-        $response = $this->post("/{$this->testTenantSlug}/alpha/matches/board/1/dismiss", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/matches/board/1/dismiss", [
             'reason' => 'not_relevant',
         ]);
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     // =====================================================================

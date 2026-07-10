@@ -95,7 +95,7 @@ class CoursesPrereqCertParityTest extends TestCase
         $viewer = $this->authenticatedUser();
         Sanctum::actingAs($viewer, ['*']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/{$courseId}");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses/{$courseId}");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.courses.prerequisites_label'));
         $res->assertSee('Intro Prerequisite');
@@ -110,7 +110,7 @@ class CoursesPrereqCertParityTest extends TestCase
         Sanctum::actingAs($learner, ['*']);
         $this->seedEnrolment($courseId, $learner->id, 'active');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/{$courseId}/certificate");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses/{$courseId}/certificate");
         $res->assertRedirect();
         $res->assertRedirectContains('status=certificate-locked');
     }
@@ -124,7 +124,7 @@ class CoursesPrereqCertParityTest extends TestCase
         Sanctum::actingAs($learner, ['*']);
         $this->seedEnrolment($courseId, $learner->id, 'completed');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/{$courseId}/certificate");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses/{$courseId}/certificate");
         $res->assertOk();
         $this->assertStringContainsString('text/html', $res->headers->get('Content-Type'));
         $res->assertSee('Completed Masterclass');

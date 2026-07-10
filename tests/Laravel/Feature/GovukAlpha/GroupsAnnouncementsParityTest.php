@@ -113,7 +113,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $owner   = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $groupId = $this->groupsAnnCreateGroup($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements");
 
         $resp->assertRedirect();
         $this->assertStringContainsString('status=auth-required', $resp->headers->get('location') ?? '');
@@ -131,7 +131,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
 
         $this->groupsAnnInsert($groupId, $owner->id, ['title' => 'Welcome post', 'content' => 'Hello everyone.']);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements");
 
         $resp->assertOk();
         $resp->assertSee('Welcome post');
@@ -146,7 +146,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
 
         $this->groupsAnnInsert($groupId, $owner->id, ['title' => 'Pinned post', 'is_pinned' => 1]);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements");
 
         $resp->assertOk();
         $resp->assertSee('Pinned post');
@@ -158,11 +158,11 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $owner   = $this->groupsAnnUser();
         $groupId = $this->groupsAnnCreateGroup($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements");
 
         $resp->assertOk();
         // Create form action present
-        $resp->assertSee("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements", false);
+        $resp->assertSee("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements", false);
         $resp->assertSee('ann-title');
     }
 
@@ -175,7 +175,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $member = $this->groupsAnnUser();
         $this->groupsAnnAddMember($groupId, $member->id, 'member');
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements");
 
         $resp->assertOk();
         // Create form should NOT appear for plain members
@@ -190,7 +190,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
 
         $this->groupsAnnUser(); // authenticated but not a member
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements");
         $resp->assertForbidden();
     }
 
@@ -204,7 +204,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $owner   = $this->groupsAnnUser();
         $groupId = $this->groupsAnnCreateGroup($owner->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements", [
             '_token'  => csrf_token(),
             'title'   => 'New Announcement',
             'content' => 'Details here.',
@@ -229,7 +229,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $member = $this->groupsAnnUser();
         $this->groupsAnnAddMember($groupId, $member->id, 'member');
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements", [
             '_token'  => csrf_token(),
             'title'   => 'Sneaky',
             'content' => 'I should not be allowed.',
@@ -248,7 +248,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $owner   = $this->groupsAnnUser();
         $groupId = $this->groupsAnnCreateGroup($owner->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements", [
             '_token'  => csrf_token(),
             'title'   => '',
             'content' => 'Content without title.',
@@ -269,7 +269,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $groupId = $this->groupsAnnCreateGroup($owner->id);
         $annId   = $this->groupsAnnInsert($groupId, $owner->id, ['title' => 'Editable Post']);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements/{$annId}/edit");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements/{$annId}/edit");
 
         $resp->assertOk();
         $resp->assertSee('Editable Post');
@@ -285,7 +285,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $member = $this->groupsAnnUser();
         $this->groupsAnnAddMember($groupId, $member->id, 'member');
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements/{$annId}/edit");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements/{$annId}/edit");
         $resp->assertForbidden();
     }
 
@@ -300,7 +300,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $groupId = $this->groupsAnnCreateGroup($owner->id);
         $annId   = $this->groupsAnnInsert($groupId, $owner->id, ['title' => 'Old Title', 'content' => 'Old content.']);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements/{$annId}/edit", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements/{$annId}/edit", [
             '_token'  => csrf_token(),
             'title'   => 'Updated Title',
             'content' => 'Updated content.',
@@ -326,7 +326,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $groupId = $this->groupsAnnCreateGroup($owner->id);
         $annId   = $this->groupsAnnInsert($groupId, $owner->id, ['title' => 'To Be Deleted']);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements/{$annId}/delete", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements/{$annId}/delete", [
             '_token' => csrf_token(),
         ]);
 
@@ -348,7 +348,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $member = $this->groupsAnnUser();
         $this->groupsAnnAddMember($groupId, $member->id, 'member');
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements/{$annId}/delete", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements/{$annId}/delete", [
             '_token' => csrf_token(),
         ]);
 
@@ -367,7 +367,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $groupId = $this->groupsAnnCreateGroup($owner->id);
         $annId   = $this->groupsAnnInsert($groupId, $owner->id, ['is_pinned' => 0]);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements/{$annId}/pin", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements/{$annId}/pin", [
             '_token'    => csrf_token(),
             'is_pinned' => '1',
         ]);
@@ -387,7 +387,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $groupId = $this->groupsAnnCreateGroup($owner->id);
         $annId   = $this->groupsAnnInsert($groupId, $owner->id, ['is_pinned' => 1]);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements/{$annId}/pin", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements/{$annId}/pin", [
             '_token'    => csrf_token(),
             'is_pinned' => '0',
         ]);
@@ -410,7 +410,7 @@ class GroupsAnnouncementsParityTest extends GovukAlphaFrontendTest
         $member = $this->groupsAnnUser();
         $this->groupsAnnAddMember($groupId, $member->id, 'member');
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/groups/{$groupId}/announcements/{$annId}/pin", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/groups/{$groupId}/announcements/{$annId}/pin", [
             '_token'    => csrf_token(),
             'is_pinned' => '1',
         ]);

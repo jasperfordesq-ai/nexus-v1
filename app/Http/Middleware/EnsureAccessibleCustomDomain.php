@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
  * domains drop the tenant slug), so without this guard they would also match on
  * the shared platform domain and the API host. Any request that did NOT resolve
  * via a tenant's accessible_domain 404s here — those hosts use the canonical
- * /{tenantSlug}/alpha routes instead.
+ * /{tenantSlug}/accessible routes instead.
  */
 class EnsureAccessibleCustomDomain
 {

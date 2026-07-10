@@ -86,7 +86,7 @@ class CoursesReviewsParityTest extends TestCase
 
         $viewer = $this->authenticatedUser();
         Sanctum::actingAs($viewer, ['*']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/{$courseId}");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses/{$courseId}");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.courses.reviews_label'));
         $res->assertSee('Brilliant course, learned loads.');
@@ -101,7 +101,7 @@ class CoursesReviewsParityTest extends TestCase
         Sanctum::actingAs($learner, ['*']);
         $this->seedEnrolment($courseId, $learner->id, 'active');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/{$courseId}/reviews", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/{$courseId}/reviews", [
             'rating' => 4, 'body' => 'Really useful, recommend it.',
         ]);
         $res->assertRedirect();
@@ -120,7 +120,7 @@ class CoursesReviewsParityTest extends TestCase
         $stranger = $this->authenticatedUser();
         Sanctum::actingAs($stranger, ['*']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/{$courseId}/reviews", ['rating' => 5, 'body' => 'x']);
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/{$courseId}/reviews", ['rating' => 5, 'body' => 'x']);
         $res->assertRedirect();
         $res->assertRedirectContains('status=review-not-enrolled');
         $this->assertDatabaseMissing('course_reviews', ['course_id' => $courseId, 'user_id' => $stranger->id]);
@@ -134,7 +134,7 @@ class CoursesReviewsParityTest extends TestCase
         Sanctum::actingAs($learner, ['*']);
         $this->seedEnrolment($courseId, $learner->id, 'completed');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/{$courseId}/reviews", ['rating' => 9, 'body' => 'x']);
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/{$courseId}/reviews", ['rating' => 9, 'body' => 'x']);
         $res->assertRedirect();
         $res->assertRedirectContains('status=review-invalid');
         $this->assertDatabaseMissing('course_reviews', ['course_id' => $courseId, 'user_id' => $learner->id]);

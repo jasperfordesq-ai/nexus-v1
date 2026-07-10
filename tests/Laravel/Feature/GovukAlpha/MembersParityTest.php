@@ -78,10 +78,10 @@ class MembersParityTest extends TestCase
     {
         $member = $this->makeVisibleMember();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/{$member->id}/insights");
 
         $response->assertRedirect();
-        $response->assertRedirectContains('/alpha/login');
+        $response->assertRedirectContains('/accessible/login');
     }
 
     public function test_members_insights_renders_stats_grid_with_groups_and_events(): void
@@ -91,7 +91,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/{$member->id}/insights");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_members.insights.heading'));
@@ -126,7 +126,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/{$member->id}/insights");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_members.insights.nexus_score_title'));
@@ -143,7 +143,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/{$member->id}/insights");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_members.insights.nexus_empty'));
@@ -164,7 +164,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/{$member->id}/insights");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_members.insights.verification_title'));
@@ -178,7 +178,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/{$member->id}/insights");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_members.insights.verification_empty'));
@@ -207,7 +207,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$member->id}/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/{$member->id}/insights");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_members.insights.badges_title'));
@@ -225,7 +225,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$other->id}/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/{$other->id}/insights");
 
         $response->assertNotFound();
     }
@@ -256,7 +256,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/{$viewer->id}/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/{$viewer->id}/insights");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_members.insights.intro_own'));
@@ -269,7 +269,7 @@ class MembersParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'Quick Filter Viewer']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members");
 
         $response->assertOk();
         // All/New/Active quick filters point at the core members.index route.
@@ -286,10 +286,10 @@ class MembersParityTest extends TestCase
 
     public function test_members_discover_redirects_anonymous_to_login(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/discover");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/discover");
 
         $response->assertRedirect();
-        $response->assertRedirectContains('/alpha/login');
+        $response->assertRedirectContains('/accessible/login');
     }
 
     public function test_members_discover_renders_for_authenticated_member(): void
@@ -299,7 +299,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/discover");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/discover");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_members.discover.heading'));
@@ -314,7 +314,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/discover");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/discover");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_members.discover.heading'));
@@ -324,10 +324,10 @@ class MembersParityTest extends TestCase
 
     public function test_members_nearby_redirects_anonymous_to_login(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/nearby");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/nearby");
 
         $response->assertRedirect();
-        $response->assertRedirectContains('/alpha/login');
+        $response->assertRedirectContains('/accessible/login');
     }
 
     public function test_members_nearby_shows_no_location_prompt_when_viewer_has_no_coordinates(): void
@@ -340,7 +340,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/nearby");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/nearby");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_members.nearby.no_location_title'));
@@ -366,7 +366,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/nearby?radius=25");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/nearby?radius=25");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_members.nearby.heading'));
@@ -393,7 +393,7 @@ class MembersParityTest extends TestCase
 
         Sanctum::actingAs($viewer, ['*']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/members/nearby?radius=5");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/members/nearby?radius=5");
 
         $response->assertOk();
         $response->assertDontSee('Far Away Member');

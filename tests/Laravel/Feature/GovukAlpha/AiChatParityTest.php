@@ -37,22 +37,22 @@ class AiChatParityTest extends TestCase
     public function test_ai_chat_requires_authentication(): void
     {
         $this->setAiChat(true);
-        $this->get("/{$this->testTenantSlug}/alpha/chat")
-            ->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $this->get("/{$this->testTenantSlug}/accessible/chat")
+            ->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_ai_chat_gated_off_without_feature(): void
     {
         $this->authedUser();
         $this->setAiChat(false);
-        $this->get("/{$this->testTenantSlug}/alpha/chat")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/chat")->assertStatus(403);
     }
 
     public function test_ai_chat_renders_for_member(): void
     {
         $this->authedUser();
         $this->setAiChat(true);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/chat");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/chat");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_aichat.title'));
         $res->assertSee('name="message"', false);
@@ -81,7 +81,7 @@ class AiChatParityTest extends TestCase
             ['conversation_id' => $conversationId, 'role' => 'assistant', 'content' => 'Try the Listings page.', 'created_at' => now()],
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/chat?c={$conversationId}");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/chat?c={$conversationId}");
         $res->assertOk();
         $res->assertSee('How do I find a gardener?');
         $res->assertSee('Try the Listings page.');
@@ -95,8 +95,8 @@ class AiChatParityTest extends TestCase
     {
         $this->authedUser();
         $this->setAiChat(true);
-        $this->post("/{$this->testTenantSlug}/alpha/chat", ['message' => '   '])
-            ->assertRedirect("/{$this->testTenantSlug}/alpha/chat?status=empty");
+        $this->post("/{$this->testTenantSlug}/accessible/chat", ['message' => '   '])
+            ->assertRedirect("/{$this->testTenantSlug}/accessible/chat?status=empty");
     }
 
     public function test_ai_chat_send_creates_conversation_and_messages(): void
@@ -104,7 +104,7 @@ class AiChatParityTest extends TestCase
         $user = $this->authedUser();
         $this->setAiChat(true);
 
-        $this->post("/{$this->testTenantSlug}/alpha/chat", ['message' => 'How do I find a gardener?'])
+        $this->post("/{$this->testTenantSlug}/accessible/chat", ['message' => 'How do I find a gardener?'])
             ->assertRedirect();
 
         $conv = DB::table('ai_conversations')

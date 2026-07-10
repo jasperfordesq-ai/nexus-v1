@@ -19,9 +19,9 @@ Deployment target: the Laravel/PHP blue-green app container, not the React front
 - `views/`: Blade page templates loaded through Laravel's `accessible-frontend::` view namespace.
 - Built assets are emitted to `httpdocs/build/accessible-frontend/`.
 
-The public-facing accessible frontend is now Beta. The Laravel route namespace currently remains `/{tenantSlug}/alpha/...` for compatibility until a deliberate route migration is done.
+The public-facing accessible frontend is now Beta and served under `/{tenantSlug}/accessible/...`. Legacy `/{tenantSlug}/alpha/...` URLs permanently redirect (301 for GET, 308 otherwise). The internal names (`GovukAlpha` controllers, `govuk_alpha` translations, `govuk-alpha.*` route names) remain until a deliberate namespace migration is done.
 
-The generic root path `/` renders a tenant chooser for shared hosts such as local development and `accessible.project-nexus.ie`. Tenant-scoped pages continue under `/{tenantSlug}/alpha/...`.
+The generic root path `/` renders a tenant chooser for shared hosts such as local development and `accessible.project-nexus.ie`. Tenant-scoped pages continue under `/{tenantSlug}/accessible/...`; tenants with a dedicated accessible custom domain serve the same routes slug-less at the bare root.
 
 ## Deployment Checks
 

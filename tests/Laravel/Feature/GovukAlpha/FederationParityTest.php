@@ -183,10 +183,10 @@ class FederationParityTest extends TestCase
     {
         $this->enableFederationForTenant();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/federation/onboarding");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/federation/onboarding");
 
         $response->assertRedirect();
-        $response->assertRedirectContains('/alpha/login');
+        $response->assertRedirectContains('/accessible/login');
     }
 
     public function test_federation_onboarding_renders_welcome_step(): void
@@ -194,7 +194,7 @@ class FederationParityTest extends TestCase
         $this->enableFederationForTenant();
         $this->authenticatedUser(['name' => 'Welcome Member']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/federation/onboarding");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/federation/onboarding");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_federation.onboarding.welcome_title'));
@@ -209,7 +209,7 @@ class FederationParityTest extends TestCase
         $this->enableFederationForTenant();
         $this->authenticatedUser(['name' => 'Privacy Member']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/federation/onboarding?step=privacy");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/federation/onboarding?step=privacy");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_federation.onboarding.privacy_heading'));
@@ -222,7 +222,7 @@ class FederationParityTest extends TestCase
         $this->enableFederationForTenant();
         $this->authenticatedUser(['name' => 'Comms Member']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/federation/onboarding?step=communication");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/federation/onboarding?step=communication");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_federation.onboarding.communication_heading'));
@@ -235,7 +235,7 @@ class FederationParityTest extends TestCase
         $this->enableFederationForTenant();
         $this->authenticatedUser(['name' => 'Confirm Member']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/federation/onboarding?step=confirm");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/federation/onboarding?step=confirm");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_federation.onboarding.confirm_heading'));
@@ -249,7 +249,7 @@ class FederationParityTest extends TestCase
         $this->enableFederationForTenant();
         $this->authenticatedUser(['name' => 'Fallback Member']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/federation/onboarding?step=not-a-real-step");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/federation/onboarding?step=not-a-real-step");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_federation.onboarding.welcome_title'));
@@ -262,7 +262,7 @@ class FederationParityTest extends TestCase
         $csrfToken = 'test-csrf-token';
 
         $response = $this->withSession(['_token' => $csrfToken])
-            ->post("/{$this->testTenantSlug}/alpha/federation/onboarding", [
+            ->post("/{$this->testTenantSlug}/accessible/federation/onboarding", [
                 'step' => 'welcome',
                 '_token' => $csrfToken,
             ]);
@@ -284,7 +284,7 @@ class FederationParityTest extends TestCase
         // Walk the privacy + communication steps so the session bag carries the
         // member's choices into the final confirm submit.
         $this->withSession(['_token' => $csrfToken])
-            ->post("/{$this->testTenantSlug}/alpha/federation/onboarding", [
+            ->post("/{$this->testTenantSlug}/accessible/federation/onboarding", [
                 'step' => 'privacy',
                 '_token' => $csrfToken,
                 'profile_visible_federated' => '1',
@@ -294,7 +294,7 @@ class FederationParityTest extends TestCase
                 'show_reviews_federated' => '1',
             ])->assertRedirect();
 
-        $this->post("/{$this->testTenantSlug}/alpha/federation/onboarding", [
+        $this->post("/{$this->testTenantSlug}/accessible/federation/onboarding", [
             'step' => 'communication',
             '_token' => $csrfToken,
             'messaging_enabled_federated' => '1',
@@ -304,7 +304,7 @@ class FederationParityTest extends TestCase
             'travel_radius_km' => '40',
         ])->assertRedirect();
 
-        $finish = $this->post("/{$this->testTenantSlug}/alpha/federation/onboarding", [
+        $finish = $this->post("/{$this->testTenantSlug}/accessible/federation/onboarding", [
             'step' => 'confirm',
             '_token' => $csrfToken,
         ]);
@@ -334,7 +334,7 @@ class FederationParityTest extends TestCase
             'profile_visible_federated' => true,
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/federation/onboarding");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/federation/onboarding");
 
         $response->assertRedirect(
             route('govuk-alpha.federation.index', ['tenantSlug' => $this->testTenantSlug])
@@ -366,7 +366,7 @@ class FederationParityTest extends TestCase
 
         $this->authenticatedUser(['name' => 'No Feature Member']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/federation/onboarding");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/federation/onboarding");
 
         $response->assertForbidden();
     }
@@ -380,7 +380,7 @@ class FederationParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Opted Out Member']);
         // No federation_user_settings row → the member is opted out.
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/federation");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/federation");
 
         $response->assertOk();
         $onboardingUrl = route('govuk-alpha.federation.onboarding', ['tenantSlug' => $this->testTenantSlug]);
@@ -426,7 +426,7 @@ class FederationParityTest extends TestCase
             ],
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/federation");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/federation");
 
         $response->assertOk();
         $response->assertSeeInOrder([
@@ -487,7 +487,7 @@ class FederationParityTest extends TestCase
         }
         DB::table('federation_messages')->insert($rows);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/federation");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/federation");
 
         $response->assertOk();
         $response->assertSeeInOrder([
@@ -505,22 +505,22 @@ class FederationParityTest extends TestCase
         $expectedRedirect = route('govuk-alpha.federation.opt-in', ['tenantSlug' => $this->testTenantSlug]);
 
         foreach ([
-            "/{$this->testTenantSlug}/alpha/federation/members",
-            "/{$this->testTenantSlug}/alpha/federation/members/123",
-            "/{$this->testTenantSlug}/alpha/federation/members/123/transfer",
-            "/{$this->testTenantSlug}/alpha/federation/listings",
-            "/{$this->testTenantSlug}/alpha/federation/listings/99/123",
-            "/{$this->testTenantSlug}/alpha/federation/events",
-            "/{$this->testTenantSlug}/alpha/federation/groups",
-            "/{$this->testTenantSlug}/alpha/federation/connections",
-            "/{$this->testTenantSlug}/alpha/federation/messages",
-            "/{$this->testTenantSlug}/alpha/federation/messages/conversation/123",
+            "/{$this->testTenantSlug}/accessible/federation/members",
+            "/{$this->testTenantSlug}/accessible/federation/members/123",
+            "/{$this->testTenantSlug}/accessible/federation/members/123/transfer",
+            "/{$this->testTenantSlug}/accessible/federation/listings",
+            "/{$this->testTenantSlug}/accessible/federation/listings/99/123",
+            "/{$this->testTenantSlug}/accessible/federation/events",
+            "/{$this->testTenantSlug}/accessible/federation/groups",
+            "/{$this->testTenantSlug}/accessible/federation/connections",
+            "/{$this->testTenantSlug}/accessible/federation/messages",
+            "/{$this->testTenantSlug}/accessible/federation/messages/conversation/123",
         ] as $path) {
             $this->get($path)->assertRedirect($expectedRedirect);
         }
 
-        $this->get("/{$this->testTenantSlug}/alpha/federation")->assertOk();
-        $this->get("/{$this->testTenantSlug}/alpha/federation/partners")->assertOk();
+        $this->get("/{$this->testTenantSlug}/accessible/federation")->assertOk();
+        $this->get("/{$this->testTenantSlug}/accessible/federation/partners")->assertOk();
     }
 
     public function test_accessible_federation_transfer_is_idempotent_and_stores_raw_description(): void
@@ -547,11 +547,11 @@ class FederationParityTest extends TestCase
         ];
 
         $this->withSession(['_token' => $csrfToken])
-            ->post("/{$this->testTenantSlug}/alpha/federation/members/{$receiver->id}/transfer", $payload)
+            ->post("/{$this->testTenantSlug}/accessible/federation/members/{$receiver->id}/transfer", $payload)
             ->assertRedirect();
 
         $this->withSession(['_token' => $csrfToken])
-            ->post("/{$this->testTenantSlug}/alpha/federation/members/{$receiver->id}/transfer", $payload)
+            ->post("/{$this->testTenantSlug}/accessible/federation/members/{$receiver->id}/transfer", $payload)
             ->assertRedirect();
 
         $rows = DB::table('transactions')
@@ -582,7 +582,7 @@ class FederationParityTest extends TestCase
 
         $csrfToken = 'message-csrf-token';
         $this->withSession(['_token' => $csrfToken])
-            ->post("/{$this->testTenantSlug}/alpha/federation/messages", [
+            ->post("/{$this->testTenantSlug}/accessible/federation/messages", [
                 '_token' => $csrfToken,
                 'receiver_id' => $receiver->id,
                 'receiver_tenant_id' => $partnerTenantId,

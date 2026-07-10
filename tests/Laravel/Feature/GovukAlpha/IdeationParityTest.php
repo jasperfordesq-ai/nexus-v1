@@ -101,18 +101,18 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($author->id);
         $ideaId = $this->ideationCreateIdea($challengeId, $author->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$ideaId}");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/ideas/{$ideaId}");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_ideation_campaigns_requires_login(): void
     {
         $this->ideationEnableFeature();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/campaigns");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/campaigns");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     // ================================================================
@@ -126,7 +126,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($viewer->id);
         $ideaId = $this->ideationCreateIdea($challengeId, $viewer->id, ['title' => 'Bike racks everywhere']);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$ideaId}");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/ideas/{$ideaId}");
 
         $resp->assertOk();
         $resp->assertSee('Bike racks everywhere');
@@ -142,7 +142,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $ideaId = $this->ideationCreateIdea($challengeA, $viewer->id);
 
         // Idea belongs to challengeA but the URL references challengeB → 404.
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeB}/ideas/{$ideaId}");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/{$challengeB}/ideas/{$ideaId}");
 
         $resp->assertNotFound();
     }
@@ -153,7 +153,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $viewer = $this->ideationUser();
         $challengeId = $this->ideationCreateChallenge($viewer->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/99999999");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/ideas/99999999");
 
         $resp->assertNotFound();
     }
@@ -166,7 +166,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($author->id);
         $ideaId = $this->ideationCreateIdea($challengeId, $author->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$ideaId}/comments", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/ideas/{$ideaId}/comments", [
             'comment_body' => 'A really helpful comment.',
         ]);
 
@@ -185,7 +185,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($viewer->id);
         $ideaId = $this->ideationCreateIdea($challengeId, $viewer->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$ideaId}/comments", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/ideas/{$ideaId}/comments", [
             'comment_body' => '   ',
         ]);
 
@@ -201,7 +201,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($author->id);
         $ideaId = $this->ideationCreateIdea($challengeId, $author->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$ideaId}/toggle-vote");
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/ideas/{$ideaId}/toggle-vote");
 
         $resp->assertRedirect();
         $this->assertDatabaseHas('challenge_idea_votes', [
@@ -217,7 +217,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($admin->id);
         $ideaId = $this->ideationCreateIdea($challengeId, $admin->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$ideaId}/status", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/ideas/{$ideaId}/status", [
             'idea_status' => 'winner',
         ]);
 
@@ -232,7 +232,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($member->id);
         $ideaId = $this->ideationCreateIdea($challengeId, $member->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$ideaId}/status", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/ideas/{$ideaId}/status", [
             'idea_status' => 'winner',
         ]);
 
@@ -247,7 +247,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($owner->id);
         $ideaId = $this->ideationCreateIdea($challengeId, $owner->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$ideaId}/delete");
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/ideas/{$ideaId}/delete");
 
         $resp->assertRedirect();
         $this->assertDatabaseMissing('challenge_ideas', ['id' => $ideaId]);
@@ -260,7 +260,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($owner->id);
         $ideaId = $this->ideationCreateIdea($challengeId, $owner->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$ideaId}/media", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/ideas/{$ideaId}/media", [
             'media_type' => 'link',
             'media_url' => 'https://example.com/mockup',
             'media_caption' => 'Concept mockup',
@@ -282,7 +282,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $this->ideationEnableFeature();
         $this->ideationAdmin();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/new");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/new");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_ideation.form.create_title'));
@@ -293,7 +293,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $this->ideationEnableFeature();
         $this->ideationUser();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/new");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/new");
 
         $resp->assertForbidden();
     }
@@ -303,7 +303,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $this->ideationEnableFeature();
         $admin = $this->ideationAdmin();
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/new", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/new", [
             'title' => 'Brand new challenge',
             'description' => 'Describe the brand new challenge.',
             'challenge_status' => 'open',
@@ -323,12 +323,12 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $this->ideationEnableFeature();
         $this->ideationAdmin();
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/new", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/new", [
             'title' => '',
             'description' => 'Has a description but no title.',
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/new?status=challenge-invalid");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/ideation/new?status=challenge-invalid");
         $this->assertDatabaseMissing('ideation_challenges', [
             'description' => 'Has a description but no title.',
         ]);
@@ -340,7 +340,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $admin = $this->ideationAdmin();
         $challengeId = $this->ideationCreateChallenge($admin->id, ['title' => 'Editable challenge']);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/edit");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/edit");
 
         $resp->assertOk();
         $resp->assertSee('Editable challenge');
@@ -352,7 +352,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $admin = $this->ideationAdmin();
         $challengeId = $this->ideationCreateChallenge($admin->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/edit", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/edit", [
             'title' => 'Renamed challenge',
             'description' => 'Updated description text.',
             'challenge_status' => 'open',
@@ -375,7 +375,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $admin = $this->ideationAdmin();
         $challengeId = $this->ideationCreateChallenge($admin->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/manage");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/manage");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_ideation.manage.heading'));
@@ -387,7 +387,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $member = $this->ideationUser();
         $challengeId = $this->ideationCreateChallenge($member->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/manage");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/manage");
 
         $resp->assertForbidden();
     }
@@ -399,7 +399,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         // draft → open is a valid transition.
         $challengeId = $this->ideationCreateChallenge($admin->id, ['status' => 'draft']);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/status", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/status", [
             'challenge_status' => 'open',
         ]);
 
@@ -413,7 +413,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $user = $this->ideationUser();
         $challengeId = $this->ideationCreateChallenge($user->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/favorite");
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/favorite");
 
         $resp->assertRedirect();
         $this->assertDatabaseHas('challenge_favorites', [
@@ -428,9 +428,9 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $admin = $this->ideationAdmin();
         $challengeId = $this->ideationCreateChallenge($admin->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/delete");
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/delete");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation?status=challenge-deleted");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/ideation?status=challenge-deleted");
         $this->assertDatabaseMissing('ideation_challenges', ['id' => $challengeId]);
     }
 
@@ -440,7 +440,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $member = $this->ideationUser();
         $challengeId = $this->ideationCreateChallenge($member->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/delete");
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/delete");
 
         $resp->assertForbidden();
         $this->assertDatabaseHas('ideation_challenges', ['id' => $challengeId]);
@@ -452,7 +452,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $admin = $this->ideationAdmin();
         $challengeId = $this->ideationCreateChallenge($admin->id, ['title' => 'Original']);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/duplicate");
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/duplicate");
 
         $resp->assertRedirect();
         // The duplicate is a draft copy with a "[Copy]" prefixed title.
@@ -473,7 +473,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $admin = $this->ideationAdmin();
         $this->ideationCreateCampaign($admin->id, ['title' => 'Listed campaign']);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/campaigns");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/campaigns");
 
         $resp->assertOk();
         $resp->assertSee('Listed campaign');
@@ -484,7 +484,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $this->ideationEnableFeature();
         $this->ideationAdmin();
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/campaigns", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/campaigns", [
             'title' => 'New 2026 campaign',
             'description' => 'Our flagship campaign.',
             'campaign_status' => 'active',
@@ -502,7 +502,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $this->ideationEnableFeature();
         $this->ideationUser();
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/campaigns", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/campaigns", [
             'title' => 'Sneaky campaign',
         ]);
 
@@ -516,7 +516,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $admin = $this->ideationAdmin();
         $campaignId = $this->ideationCreateCampaign($admin->id, ['title' => 'Detailed campaign']);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/campaigns/{$campaignId}");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/campaigns/{$campaignId}");
 
         $resp->assertOk();
         $resp->assertSee('Detailed campaign');
@@ -527,7 +527,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $this->ideationEnableFeature();
         $this->ideationUser();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/campaigns/99999999");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/campaigns/99999999");
 
         $resp->assertNotFound();
     }
@@ -539,7 +539,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($admin->id);
         $campaignId = $this->ideationCreateCampaign($admin->id);
 
-        $link = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/link-campaign", [
+        $link = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/link-campaign", [
             'campaign_id' => $campaignId,
         ]);
         $link->assertRedirect();
@@ -548,7 +548,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
             'challenge_id' => $challengeId,
         ]);
 
-        $unlink = $this->post("/{$this->testTenantSlug}/alpha/ideation/campaigns/{$campaignId}/challenges/{$challengeId}/unlink");
+        $unlink = $this->post("/{$this->testTenantSlug}/accessible/ideation/campaigns/{$campaignId}/challenges/{$challengeId}/unlink");
         $unlink->assertRedirect();
         $this->assertDatabaseMissing('campaign_challenges', [
             'campaign_id' => $campaignId,
@@ -562,9 +562,9 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $admin = $this->ideationAdmin();
         $campaignId = $this->ideationCreateCampaign($admin->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/campaigns/{$campaignId}/delete");
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/campaigns/{$campaignId}/delete");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/campaigns?status=campaign-deleted");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/ideation/campaigns?status=campaign-deleted");
         $this->assertDatabaseMissing('campaigns', ['id' => $campaignId]);
     }
 
@@ -577,7 +577,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $this->ideationEnableFeature();
         $this->ideationUser();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/outcomes");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/outcomes");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_ideation.outcomes.title'));
@@ -589,7 +589,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $member = $this->ideationUser();
         $challengeId = $this->ideationCreateChallenge($member->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/outcome");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/outcome");
 
         $resp->assertForbidden();
     }
@@ -602,12 +602,12 @@ class IdeationParityTest extends GovukAlphaFrontendTest
 
         // Save status + impact only (no winning idea). The winning-idea path is
         // covered separately by test_ideation_admin_can_save_outcome_with_winning_idea.
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/outcome", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/outcome", [
             'outcome_status' => 'implemented',
             'impact_description' => 'Trees were planted across the town.',
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/outcome?status=outcome-saved");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/outcome?status=outcome-saved");
         $this->assertDatabaseHas('challenge_outcomes', [
             'challenge_id' => $challengeId,
             'tenant_id' => $this->testTenantId,
@@ -630,13 +630,13 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         // accessible frontends. If that clause is reintroduced, upsert() catches
         // the SQL error and returns null, flipping this to ?status=outcome-failed
         // with no persisted row — failing both assertions below.
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/outcome", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/outcome", [
             'outcome_status' => 'implemented',
             'impact_description' => 'The winning idea was rolled out town-wide.',
             'winning_idea_id' => $ideaId,
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/outcome?status=outcome-saved");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/outcome?status=outcome-saved");
         $this->assertDatabaseHas('challenge_outcomes', [
             'challenge_id' => $challengeId,
             'tenant_id' => $this->testTenantId,
@@ -656,12 +656,12 @@ class IdeationParityTest extends GovukAlphaFrontendTest
 
         // The remaining ->where('challenge_id', ...) filter must still reject a
         // mismatched winner; dropping the tenant_id clause must not weaken this.
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeA}/outcome", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeA}/outcome", [
             'outcome_status' => 'implemented',
             'winning_idea_id' => $foreignIdeaId,
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeA}/outcome?status=outcome-failed");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/ideation/{$challengeA}/outcome?status=outcome-failed");
         $this->assertDatabaseMissing('challenge_outcomes', ['challenge_id' => $challengeA]);
     }
 
@@ -684,9 +684,9 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $author = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $challengeId = $this->ideationCreateChallenge($author->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/drafts");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_ideation_drafts_page_lists_only_own_drafts(): void
@@ -698,7 +698,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $this->ideationCreateDraft($challengeId, $member->id, ['title' => 'My own draft']);
         $this->ideationCreateDraft($challengeId, $other->id, ['title' => 'Someone elses draft']);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/drafts");
 
         $resp->assertOk();
         $resp->assertSee('My own draft');
@@ -710,7 +710,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $this->ideationEnableFeature();
         $this->ideationUser();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/99999999/drafts");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/99999999/drafts");
 
         $resp->assertNotFound();
     }
@@ -722,13 +722,13 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($member->id);
         $draftId = $this->ideationCreateDraft($challengeId, $member->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts/{$draftId}", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/drafts/{$draftId}", [
             'draft_title' => 'Now with a better title',
             'draft_description' => 'Still working on the detail.',
             'draft_action' => 'save',
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts?status=draft-saved");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/drafts?status=draft-saved");
         $this->assertDatabaseHas('challenge_ideas', [
             'id' => $draftId,
             'title' => 'Now with a better title',
@@ -743,13 +743,13 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($member->id);
         $draftId = $this->ideationCreateDraft($challengeId, $member->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts/{$draftId}", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/drafts/{$draftId}", [
             'draft_title' => 'Ready to share',
             'draft_description' => 'A fully formed idea with detail.',
             'draft_action' => 'publish',
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/ideas/{$draftId}?status=idea-submitted");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/ideas/{$draftId}?status=idea-submitted");
         $this->assertDatabaseHas('challenge_ideas', [
             'id' => $draftId,
             'title' => 'Ready to share',
@@ -764,12 +764,12 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         $challengeId = $this->ideationCreateChallenge($member->id);
         $draftId = $this->ideationCreateDraft($challengeId, $member->id, ['title' => 'Original title']);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts/{$draftId}", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/drafts/{$draftId}", [
             'draft_title' => '   ',
             'draft_action' => 'save',
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts?status=draft-invalid");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/drafts?status=draft-invalid");
         $this->assertDatabaseHas('challenge_ideas', ['id' => $draftId, 'title' => 'Original title']);
     }
 
@@ -783,12 +783,12 @@ class IdeationParityTest extends GovukAlphaFrontendTest
         // A different member attempts to edit it — the service rejects (not owner),
         // so the title must be unchanged and we land on draft-failed.
         $this->ideationUser();
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts/{$draftId}", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/drafts/{$draftId}", [
             'draft_title' => 'Hijacked title',
             'draft_action' => 'save',
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/ideation/{$challengeId}/drafts?status=draft-failed");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/ideation/{$challengeId}/drafts?status=draft-failed");
         $this->assertDatabaseHas('challenge_ideas', ['id' => $draftId, 'title' => 'Owners draft']);
     }
 
@@ -800,9 +800,9 @@ class IdeationParityTest extends GovukAlphaFrontendTest
     {
         $this->ideationEnableFeature();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/tags");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/tags");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_ideation_tags_page_renders_popular_tags(): void
@@ -824,7 +824,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
             'tag_id' => $tagId,
         ]);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/tags");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/tags");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_ideation.tags.popular_heading'));
@@ -845,7 +845,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
             'tags' => json_encode([]),
         ]);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/tags?tag=climate");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/tags?tag=climate");
 
         $resp->assertOk();
         $resp->assertSee('Tagged climate challenge');
@@ -863,7 +863,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
 
         $this->ideationUser();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/tags");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/tags");
 
         $resp->assertForbidden();
     }
@@ -884,7 +884,7 @@ class IdeationParityTest extends GovukAlphaFrontendTest
 
         $this->ideationUser();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/ideation/campaigns");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/ideation/campaigns");
 
         $resp->assertForbidden();
     }

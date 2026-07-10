@@ -28,7 +28,9 @@
         $periodTo   = $period['to'] ?? null;
     @endphp
 
-    <a href="{{ url('/' . $tenantSlug . '/alpha/admin') }}" class="govuk-back-link">{{ __('govuk_alpha_jobs.bias_audit.back_to_admin') }}</a>
+    {{-- The old target (/{slug}/alpha/admin) never existed in the accessible
+         frontend — admin lives in the React app. Back goes to the jobs index. --}}
+    <a href="{{ route('govuk-alpha.jobs.index', ['tenantSlug' => $tenantSlug]) }}" class="govuk-back-link">{{ __('govuk_alpha_jobs.shared.back_to_jobs') }}</a>
 
     <h1 class="govuk-heading-xl">{{ __('govuk_alpha_jobs.bias_audit.title') }}</h1>
     <p class="govuk-body-l">{{ __('govuk_alpha_jobs.bias_audit.description') }}</p>

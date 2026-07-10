@@ -1300,8 +1300,9 @@ export interface TenantConfig {
   domain?: string;
   /**
    * Optional dedicated custom domain for the accessible (GOV.UK) frontend.
-   * When set, the "Accessible version" link points at https://{accessible_domain}/alpha
-   * (slug-less) instead of the shared accessible.project-nexus.ie/{slug}/alpha.
+   * When set, the "Accessible version" link points at https://{accessible_domain}
+   * (slug-less bare paths) instead of the shared
+   * accessible.project-nexus.ie/{slug}/accessible.
    */
   accessible_domain?: string;
 }

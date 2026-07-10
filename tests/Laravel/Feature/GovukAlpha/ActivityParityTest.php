@@ -16,7 +16,7 @@ use Tests\Laravel\TestCase;
 /**
  * Activity insights parity (accessible GOV.UK frontend).
  *
- * Covers the React-parity GET /{tenantSlug}/alpha/activity/insights surface
+ * Covers the React-parity GET /{tenantSlug}/accessible/activity/insights surface
  * (AlphaController::activityInsights via the ActivityParity trait), which renders
  * MemberActivityService::getDashboardData() with activity-type badges, skill
  * offering/requesting tags + endorsements, a dual-bar monthly chart, sign-aware
@@ -49,11 +49,11 @@ class ActivityParityTest extends TestCase
 
     public function test_activity_insights_redirects_to_login_when_anonymous(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/activity/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/activity/insights");
 
         $response->assertRedirect();
         $this->assertStringContainsString(
-            '/alpha/login',
+            '/accessible/login',
             $response->headers->get('Location') ?? ''
         );
     }
@@ -62,7 +62,7 @@ class ActivityParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/activity/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/activity/insights");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_activity.insights.heading'));
@@ -82,7 +82,7 @@ class ActivityParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/activity/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/activity/insights");
 
         $response->assertOk();
         // A brand-new member has no posts/transactions, so the timeline empty
@@ -121,7 +121,7 @@ class ActivityParityTest extends TestCase
             $this->markTestSkipped('user_skills / skill_endorsements not available in test schema: ' . $e->getMessage());
         }
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/activity/insights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/activity/insights");
 
         $response->assertOk();
         $response->assertSee('Gardening');
@@ -137,7 +137,7 @@ class ActivityParityTest extends TestCase
         // insights heading must never appear under a mismatched slug. (Unknown
         // slugs may surface as 404 or a tenant-resolution error; the security
         // guarantee under test is "page not served", not the exact status code.)
-        $response = $this->get('/no-such-tenant-xyz/alpha/activity/insights');
+        $response = $this->get('/no-such-tenant-xyz/accessible/activity/insights');
 
         $this->assertNotSame(200, $response->getStatusCode());
         $response->assertDontSee(__('govuk_alpha_activity.insights.heading'));
@@ -147,7 +147,7 @@ class ActivityParityTest extends TestCase
     {
         $url = route('govuk-alpha.activity.insights', ['tenantSlug' => $this->testTenantSlug]);
 
-        $this->assertStringContainsString('/alpha/activity/insights', $url);
+        $this->assertStringContainsString('/accessible/activity/insights', $url);
     }
 
     /**

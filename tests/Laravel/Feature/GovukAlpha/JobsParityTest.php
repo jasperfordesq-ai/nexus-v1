@@ -57,7 +57,7 @@ class JobsParityTest extends TestCase
 
     public function test_jobs_parity_pages_require_authentication(): void
     {
-        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+        $loginPath = "/{$this->testTenantSlug}/accessible/login";
 
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $job = $this->createJob((int) $owner->id, ['status' => 'open']);
@@ -70,7 +70,7 @@ class JobsParityTest extends TestCase
             "/jobs/talent-search/{$owner->id}",
             "/jobs/employers/{$owner->id}",
         ] as $path) {
-            $response = $this->get("/{$this->testTenantSlug}/alpha{$path}");
+            $response = $this->get("/{$this->testTenantSlug}/accessible{$path}");
             $response->assertRedirect();
             $this->assertStringContainsString($loginPath, $response->headers->get('Location') ?? '');
         }
@@ -85,7 +85,7 @@ class JobsParityTest extends TestCase
         $owner = $this->authenticatedUser();
         $job = $this->createJob((int) $owner->id, ['status' => 'open']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/{$job->id}/analytics");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/{$job->id}/analytics");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_jobs.analytics.title'));
@@ -100,7 +100,7 @@ class JobsParityTest extends TestCase
         // A different, non-admin member cannot see another member's analytics.
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/{$job->id}/analytics");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/{$job->id}/analytics");
         $response->assertForbidden();
     }
 
@@ -108,7 +108,7 @@ class JobsParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/99999001/analytics");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/99999001/analytics");
         $response->assertNotFound();
     }
 
@@ -121,7 +121,7 @@ class JobsParityTest extends TestCase
         $owner = $this->authenticatedUser();
         $job = $this->createJob((int) $owner->id, ['status' => 'open']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/{$job->id}/pipeline");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/{$job->id}/pipeline");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_jobs.pipeline.title'));
@@ -135,7 +135,7 @@ class JobsParityTest extends TestCase
 
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/{$job->id}/pipeline");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/{$job->id}/pipeline");
         $response->assertForbidden();
     }
 
@@ -157,7 +157,7 @@ class JobsParityTest extends TestCase
         ]);
 
         // The pipeline reuses the existing applicants.status route to persist a move.
-        $response = $this->post("/{$this->testTenantSlug}/alpha/jobs/{$job->id}/applications/{$appId}/status", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/jobs/{$job->id}/applications/{$appId}/status", [
             'app_status' => 'interview',
         ]);
         $response->assertRedirect();
@@ -180,7 +180,7 @@ class JobsParityTest extends TestCase
         // Any member may run the assessment against an open vacancy.
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/{$job->id}/qualified");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/{$job->id}/qualified");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_jobs.qualification.title'));
@@ -191,7 +191,7 @@ class JobsParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/99999002/qualified");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/99999002/qualified");
         $response->assertNotFound();
     }
 
@@ -205,7 +205,7 @@ class JobsParityTest extends TestCase
         $owner = $this->authenticatedUser();
         $this->createJob((int) $owner->id, ['status' => 'open']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/talent-search");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/talent-search");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_jobs.talent.title'));
@@ -217,7 +217,7 @@ class JobsParityTest extends TestCase
         // A member who owns no vacancy and is not an admin cannot search talent.
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/talent-search");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/talent-search");
         $response->assertForbidden();
     }
 
@@ -235,7 +235,7 @@ class JobsParityTest extends TestCase
             'skills' => 'gardening, mentoring',
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/talent-search?keywords=Searchable");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/talent-search?keywords=Searchable");
 
         $response->assertOk();
         $response->assertSee('Searchable Candidate');
@@ -254,7 +254,7 @@ class JobsParityTest extends TestCase
             'resume_searchable' => 1,
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/talent-search/{$candidate->id}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/talent-search/{$candidate->id}");
 
         $response->assertOk();
         $response->assertSee('Profile Person');
@@ -271,7 +271,7 @@ class JobsParityTest extends TestCase
             'resume_searchable' => 0,
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/talent-search/{$candidate->id}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/talent-search/{$candidate->id}");
         $response->assertNotFound();
     }
 
@@ -291,7 +291,7 @@ class JobsParityTest extends TestCase
 
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/employers/{$employer->id}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/employers/{$employer->id}");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_jobs.employer.open_jobs_heading'));
@@ -322,7 +322,7 @@ class JobsParityTest extends TestCase
 
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/employers/{$otherTenantUser->id}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/employers/{$otherTenantUser->id}");
         $response->assertNotFound();
     }
 
@@ -334,7 +334,7 @@ class JobsParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/employer-onboarding");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/employer-onboarding");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_jobs.onboarding.title'));
@@ -343,10 +343,10 @@ class JobsParityTest extends TestCase
 
     public function test_jobs_onboarding_requires_authentication(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/employer-onboarding");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/employer-onboarding");
         $response->assertRedirect();
         $this->assertStringContainsString(
-            "/{$this->testTenantSlug}/alpha/login",
+            "/{$this->testTenantSlug}/accessible/login",
             $response->headers->get('Location') ?? ''
         );
     }
@@ -364,7 +364,7 @@ class JobsParityTest extends TestCase
         $this->createInterview((int) $job->id, (int) $application->id, (int) $poster->id, 'proposed');
         $this->createOffer((int) $job->id, (int) $application->id, (int) $candidate->id, 'pending');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/responses");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/responses");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_jobs.responses.title'));
@@ -377,7 +377,7 @@ class JobsParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/responses");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/responses");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_jobs.responses.no_interviews'));
@@ -386,10 +386,10 @@ class JobsParityTest extends TestCase
 
     public function test_jobs_responses_requires_authentication(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/jobs/responses");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/jobs/responses");
         $response->assertRedirect();
         $this->assertStringContainsString(
-            "/{$this->testTenantSlug}/alpha/login",
+            "/{$this->testTenantSlug}/accessible/login",
             $response->headers->get('Location') ?? ''
         );
     }
@@ -402,7 +402,7 @@ class JobsParityTest extends TestCase
         $application = $this->jobsSeedApplication((int) $job->id, (int) $candidate->id);
         $interview = $this->createInterview((int) $job->id, (int) $application->id, (int) $poster->id, 'proposed');
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/jobs/interviews/{$interview->id}/accept", ['note' => '']);
+        $response = $this->post("/{$this->testTenantSlug}/accessible/jobs/interviews/{$interview->id}/accept", ['note' => '']);
 
         $response->assertRedirect();
         $this->assertStringContainsString('status=interview-accepted', $response->headers->get('Location') ?? '');
@@ -417,7 +417,7 @@ class JobsParityTest extends TestCase
         $application = $this->jobsSeedApplication((int) $job->id, (int) $candidate->id);
         $interview = $this->createInterview((int) $job->id, (int) $application->id, (int) $poster->id, 'proposed');
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/jobs/interviews/{$interview->id}/decline", ['note' => '']);
+        $response = $this->post("/{$this->testTenantSlug}/accessible/jobs/interviews/{$interview->id}/decline", ['note' => '']);
 
         $response->assertRedirect();
         $this->assertSame('declined', JobInterview::find($interview->id)->status);
@@ -436,7 +436,7 @@ class JobsParityTest extends TestCase
         // Authenticate as a DIFFERENT member (not the applicant).
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/jobs/interviews/{$interview->id}/accept", ['note' => '']);
+        $response = $this->post("/{$this->testTenantSlug}/accessible/jobs/interviews/{$interview->id}/accept", ['note' => '']);
 
         $response->assertRedirect();
         $this->assertStringContainsString('status=interview-failed', $response->headers->get('Location') ?? '');
@@ -451,7 +451,7 @@ class JobsParityTest extends TestCase
         $application = $this->jobsSeedApplication((int) $job->id, (int) $candidate->id);
         $offer = $this->createOffer((int) $job->id, (int) $application->id, (int) $candidate->id, 'pending');
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/jobs/offers/{$offer->id}/reject");
+        $response = $this->post("/{$this->testTenantSlug}/accessible/jobs/offers/{$offer->id}/reject");
 
         $response->assertRedirect();
         $this->assertSame('rejected', JobOffer::find($offer->id)->status);

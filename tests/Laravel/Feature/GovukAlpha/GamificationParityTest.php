@@ -53,14 +53,14 @@ class GamificationParityTest extends TestCase
 
     public function test_gamification_shop_requires_auth(): void
     {
-        $this->get("/{$this->testTenantSlug}/alpha/achievements/shop")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/achievements/shop")
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_gamification_shop_renders_with_balance(): void
     {
         $this->authenticatedUser(['name' => 'Shopper One']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/achievements/shop");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/achievements/shop");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.shop.title'));
         $res->assertSee(__('govuk_alpha_gamification.shop.balance_label'));
@@ -70,7 +70,7 @@ class GamificationParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'Shopper Buy']);
         // No such item → the purchase fails gracefully and redirects back.
-        $res = $this->post("/{$this->testTenantSlug}/alpha/achievements/shop/purchase", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/achievements/shop/purchase", [
             'item_id' => 999999,
         ]);
         $res->assertRedirect();
@@ -84,7 +84,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_collections_renders(): void
     {
         $this->authenticatedUser(['name' => 'Collector One']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/achievements/collections");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/achievements/collections");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.collections.title'));
     }
@@ -96,7 +96,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_showcase_renders(): void
     {
         $this->authenticatedUser(['name' => 'Showcase One']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/achievements/showcase");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/achievements/showcase");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.showcase.title'));
     }
@@ -113,7 +113,7 @@ class GamificationParityTest extends TestCase
             'awarded_at' => now(),
         ]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/achievements/showcase", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/achievements/showcase", [
             'badge_keys' => ['vol_1h'],
         ]);
         $res->assertRedirect();
@@ -131,7 +131,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_showcase_rejects_more_than_five(): void
     {
         $this->authenticatedUser(['name' => 'Showcase Many']);
-        $res = $this->post("/{$this->testTenantSlug}/alpha/achievements/showcase", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/achievements/showcase", [
             'badge_keys' => ['a', 'b', 'c', 'd', 'e', 'f'],
         ]);
         $res->assertRedirect();
@@ -146,7 +146,7 @@ class GamificationParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'Badge Viewer']);
         // vol_1h is a static badge definition.
-        $res = $this->get("/{$this->testTenantSlug}/alpha/achievements/badges/vol_1h");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/achievements/badges/vol_1h");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.badge.not_earned_status'));
     }
@@ -154,7 +154,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_badge_detail_404_for_unknown_badge(): void
     {
         $this->authenticatedUser(['name' => 'Badge Missing']);
-        $this->get("/{$this->testTenantSlug}/alpha/achievements/badges/no_such_badge_key")
+        $this->get("/{$this->testTenantSlug}/accessible/achievements/badges/no_such_badge_key")
             ->assertStatus(404);
     }
 
@@ -165,7 +165,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_engagement_renders(): void
     {
         $this->authenticatedUser(['name' => 'Engaged One']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/achievements/engagement");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/achievements/engagement");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.engagement.title'));
     }
@@ -177,7 +177,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_competitive_renders_with_metric_filter(): void
     {
         $this->authenticatedUser(['name' => 'Competitor One']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/leaderboard/competitive");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/leaderboard/competitive");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.competitive.title'));
         // The nexus_score metric (missing from the legacy leaderboard) is offered here.
@@ -187,15 +187,15 @@ class GamificationParityTest extends TestCase
     public function test_gamification_competitive_accepts_nexus_score_type(): void
     {
         $this->authenticatedUser(['name' => 'Competitor Nexus']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/leaderboard/competitive?type=nexus_score&period=all");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/leaderboard/competitive?type=nexus_score&period=all");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.competitive.metrics.nexus_score'));
     }
 
     public function test_gamification_competitive_requires_auth(): void
     {
-        $this->get("/{$this->testTenantSlug}/alpha/leaderboard/competitive")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/leaderboard/competitive")
+            ->assertRedirectContains('/accessible/login');
     }
 
     // ==================================================================
@@ -205,7 +205,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_seasons_renders(): void
     {
         $this->authenticatedUser(['name' => 'Season One']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/leaderboard/seasons");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/leaderboard/seasons");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.seasons.title'));
     }
@@ -213,7 +213,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_journey_renders(): void
     {
         $this->authenticatedUser(['name' => 'Journey One']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/leaderboard/journey");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/leaderboard/journey");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.journey.title'));
     }
@@ -221,7 +221,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_spotlight_renders(): void
     {
         $this->authenticatedUser(['name' => 'Spotlight One']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/leaderboard/spotlight");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/leaderboard/spotlight");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.spotlight.title'));
     }
@@ -233,7 +233,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_tier_ladder_renders(): void
     {
         $this->authenticatedUser(['name' => 'Tier One']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/nexus-score/tiers");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/nexus-score/tiers");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.tiers.title'));
         $res->assertSee(__('govuk_alpha_gamification.tiers.names.legendary'));
@@ -246,7 +246,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_poll_create_form_renders(): void
     {
         $this->authenticatedUser(['name' => 'Poll Author']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/polls/parity/create");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/polls/parity/create");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.poll_create.title'));
         // The correct ranked enum is offered (the legacy form sends 'multiple').
@@ -256,7 +256,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_store_ranked_poll_persists(): void
     {
         $user = $this->authenticatedUser(['name' => 'Ranked Author']);
-        $res = $this->post("/{$this->testTenantSlug}/alpha/polls/parity/create", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/polls/parity/create", [
             'question' => 'Pick a meeting time, ranked',
             'options' => ['Morning', 'Afternoon', 'Evening'],
             'poll_type' => 'ranked',
@@ -277,7 +277,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_store_poll_validation_redirects_back(): void
     {
         $this->authenticatedUser(['name' => 'Poll Blank']);
-        $res = $this->post("/{$this->testTenantSlug}/alpha/polls/parity/create", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/polls/parity/create", [
             'question' => '',
             'options' => ['only-one'],
             'poll_type' => 'standard',
@@ -296,7 +296,7 @@ class GamificationParityTest extends TestCase
         $pollId = $this->seedRankedPoll($creator->id);
 
         $this->authenticatedUser(['name' => 'Ranked Voter']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/polls/{$pollId}/rank");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/polls/{$pollId}/rank");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.ranked.badge'));
         $res->assertSee(__('govuk_alpha_gamification.ranked.submit_button'));
@@ -311,7 +311,7 @@ class GamificationParityTest extends TestCase
         ]);
 
         $this->authenticatedUser(['name' => 'Confused Voter']);
-        $this->get("/{$this->testTenantSlug}/alpha/polls/{$pollId}/rank")->assertStatus(404);
+        $this->get("/{$this->testTenantSlug}/accessible/polls/{$pollId}/rank")->assertStatus(404);
     }
 
     public function test_gamification_store_ranked_vote_persists(): void
@@ -320,7 +320,7 @@ class GamificationParityTest extends TestCase
         [$pollId, $optA, $optB] = $this->seedRankedPollWithOptions($creator->id);
 
         $voter = $this->authenticatedUser(['name' => 'Rank Submitter']);
-        $res = $this->post("/{$this->testTenantSlug}/alpha/polls/{$pollId}/rank", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/polls/{$pollId}/rank", [
             'rank' => [$optA => 1, $optB => 2],
         ]);
         $res->assertRedirect();
@@ -341,7 +341,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_manage_polls_renders(): void
     {
         $this->authenticatedUser(['name' => 'Manager One']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/polls/parity/manage");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/polls/parity/manage");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.poll_manage.title'));
     }
@@ -357,7 +357,7 @@ class GamificationParityTest extends TestCase
         // A different member cannot delete it (service ownership check → fails).
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         Sanctum::actingAs($other, ['*']);
-        $res = $this->post("/{$this->testTenantSlug}/alpha/polls/{$pollId}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/polls/{$pollId}/delete");
         $res->assertRedirectContains('status=poll-delete-failed');
 
         TenantContext::reset();
@@ -366,7 +366,7 @@ class GamificationParityTest extends TestCase
 
         // The owner can delete it.
         Sanctum::actingAs($owner, ['*']);
-        $res2 = $this->post("/{$this->testTenantSlug}/alpha/polls/{$pollId}/delete");
+        $res2 = $this->post("/{$this->testTenantSlug}/accessible/polls/{$pollId}/delete");
         $res2->assertRedirectContains('status=poll-deleted');
 
         TenantContext::reset();
@@ -384,7 +384,7 @@ class GamificationParityTest extends TestCase
 
         // A non-owner gets a 404 (PollExportService returns null → abort 404).
         $this->authenticatedUser(['name' => 'Export Stranger']);
-        $this->get("/{$this->testTenantSlug}/alpha/polls/{$pollId}/export")->assertStatus(404);
+        $this->get("/{$this->testTenantSlug}/accessible/polls/{$pollId}/export")->assertStatus(404);
     }
 
     public function test_gamification_export_poll_returns_csv_for_owner(): void
@@ -399,7 +399,7 @@ class GamificationParityTest extends TestCase
             ['tenant_id' => $this->testTenantId, 'poll_id' => $pollId, 'label' => 'No', 'votes' => 0],
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/polls/{$pollId}/export");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/polls/{$pollId}/export");
         $res->assertOk();
         $res->assertHeader('content-type', 'text/csv; charset=utf-8');
     }
@@ -412,7 +412,7 @@ class GamificationParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'Comp Viewer']);
         // A larger limit window still renders the page (mirrors React load-more).
-        $res = $this->get("/{$this->testTenantSlug}/alpha/leaderboard/competitive?type=xp&period=all&limit=40");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/leaderboard/competitive?type=xp&period=all&limit=40");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.competitive.title'));
     }
@@ -425,15 +425,15 @@ class GamificationParityTest extends TestCase
     {
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'PD Owner']);
         $pollId = $this->seedStandardPoll($owner->id);
-        $this->get("/{$this->testTenantSlug}/alpha/polls/{$pollId}")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/polls/{$pollId}")
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_gamification_poll_detail_renders(): void
     {
         $owner = $this->authenticatedUser(['name' => 'PD Author']);
         $pollId = $this->seedStandardPoll($owner->id);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/polls/{$pollId}");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/polls/{$pollId}");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_gamification.poll_detail.social_heading'));
         $res->assertSee(__('govuk_alpha_gamification.poll_detail.comments_heading'));
@@ -442,7 +442,7 @@ class GamificationParityTest extends TestCase
     public function test_gamification_poll_detail_404_for_missing_poll(): void
     {
         $this->authenticatedUser(['name' => 'PD Missing']);
-        $this->get("/{$this->testTenantSlug}/alpha/polls/9999999")->assertStatus(404);
+        $this->get("/{$this->testTenantSlug}/accessible/polls/9999999")->assertStatus(404);
     }
 
     public function test_gamification_poll_like_persists_a_like_row(): void
@@ -451,7 +451,7 @@ class GamificationParityTest extends TestCase
         $pollId = $this->seedStandardPoll($owner->id);
 
         $liker = $this->authenticatedUser(['name' => 'Liker One']);
-        $res = $this->post("/{$this->testTenantSlug}/alpha/polls/{$pollId}/like");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/polls/{$pollId}/like");
         $res->assertRedirectContains('status=poll-liked');
 
         $this->assertDatabaseHas('likes', [
@@ -462,7 +462,7 @@ class GamificationParityTest extends TestCase
         ]);
 
         // A second toggle removes the like.
-        $res2 = $this->post("/{$this->testTenantSlug}/alpha/polls/{$pollId}/like");
+        $res2 = $this->post("/{$this->testTenantSlug}/accessible/polls/{$pollId}/like");
         $res2->assertRedirectContains('status=poll-unliked');
         $this->assertDatabaseMissing('likes', [
             'target_type' => 'poll',
@@ -478,7 +478,7 @@ class GamificationParityTest extends TestCase
         $pollId = $this->seedStandardPoll($owner->id);
 
         $commenter = $this->authenticatedUser(['name' => 'Commenter One']);
-        $res = $this->post("/{$this->testTenantSlug}/alpha/polls/{$pollId}/comment", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/polls/{$pollId}/comment", [
             'content' => 'Great poll, thanks for setting this up.',
         ]);
         $res->assertRedirectContains('status=poll-comment-created');
@@ -497,7 +497,7 @@ class GamificationParityTest extends TestCase
         $pollId = $this->seedStandardPoll($owner->id);
 
         $this->authenticatedUser(['name' => 'Empty Commenter']);
-        $res = $this->post("/{$this->testTenantSlug}/alpha/polls/{$pollId}/comment", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/polls/{$pollId}/comment", [
             'content' => '   ',
         ]);
         $res->assertRedirectContains('status=poll-comment-empty');

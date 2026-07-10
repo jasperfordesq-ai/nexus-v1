@@ -163,7 +163,7 @@ class CoursesFiltersQuizParityTest extends TestCase
         $this->seedCategory('Web Skills');
         $this->seedCourse($author->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.courses.category_label'));
@@ -178,7 +178,7 @@ class CoursesFiltersQuizParityTest extends TestCase
         $this->seedCourse($author->id, ['title' => 'Beginner Basics', 'level' => 'beginner']);
         $this->seedCourse($author->id, ['title' => 'Advanced Wizardry', 'level' => 'advanced']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses?level=advanced");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses?level=advanced");
 
         $res->assertOk();
         $res->assertSee('Advanced Wizardry');
@@ -195,7 +195,7 @@ class CoursesFiltersQuizParityTest extends TestCase
         Sanctum::actingAs($learner, ['*']);
         $this->seedEnrolment($courseId, $learner->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/{$courseId}/learn?lesson={$ids['lesson_id']}");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses/{$courseId}/learn?lesson={$ids['lesson_id']}");
 
         $res->assertOk();
         $res->assertSee('What is 2 + 2?');
@@ -213,7 +213,7 @@ class CoursesFiltersQuizParityTest extends TestCase
         Sanctum::actingAs($learner, ['*']);
         $enrolId = $this->seedEnrolment($courseId, $learner->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/{$courseId}/lessons/{$ids['lesson_id']}/quiz", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/{$courseId}/lessons/{$ids['lesson_id']}/quiz", [
             'answers' => [(string) $this->firstQuestionId($ids['quiz_id']) => 'b'],
         ]);
 

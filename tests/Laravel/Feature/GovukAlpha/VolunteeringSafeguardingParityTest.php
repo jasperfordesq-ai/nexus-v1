@@ -51,9 +51,9 @@ class VolunteeringSafeguardingParityTest extends TestCase
 
     public function test_volunteering_safeguarding_training_requires_authentication(): void
     {
-        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+        $loginPath = "/{$this->testTenantSlug}/accessible/login";
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/training");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/training");
 
         $response->assertRedirect();
         $this->assertStringContainsString($loginPath, $response->headers->get('Location') ?? '');
@@ -61,9 +61,9 @@ class VolunteeringSafeguardingParityTest extends TestCase
 
     public function test_volunteering_safeguarding_incidents_requires_authentication(): void
     {
-        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+        $loginPath = "/{$this->testTenantSlug}/accessible/login";
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/incidents");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/incidents");
 
         $response->assertRedirect();
         $this->assertStringContainsString($loginPath, $response->headers->get('Location') ?? '');
@@ -71,9 +71,9 @@ class VolunteeringSafeguardingParityTest extends TestCase
 
     public function test_volunteering_safeguarding_post_training_requires_authentication(): void
     {
-        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+        $loginPath = "/{$this->testTenantSlug}/accessible/login";
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/training", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/training", [
             'training_type' => 'first_aid',
             'training_name' => 'Some Course',
             'completed_at'  => '2026-01-15',
@@ -85,9 +85,9 @@ class VolunteeringSafeguardingParityTest extends TestCase
 
     public function test_volunteering_safeguarding_post_incident_requires_authentication(): void
     {
-        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+        $loginPath = "/{$this->testTenantSlug}/accessible/login";
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/incidents", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/incidents", [
             'title'       => 'Concern',
             'description' => 'A detailed description of the concern that is at least twenty characters long.',
             'severity'    => 'low',
@@ -105,7 +105,7 @@ class VolunteeringSafeguardingParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/training");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/training");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.safeguarding.title'));
@@ -117,7 +117,7 @@ class VolunteeringSafeguardingParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/incidents");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/incidents");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_volunteering.safeguarding.title'));
@@ -133,7 +133,7 @@ class VolunteeringSafeguardingParityTest extends TestCase
     {
         $user = $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/training", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/training", [
             'training_type' => 'first_aid',
             'training_name' => 'Emergency First Aid at Work',
             'provider'      => 'Red Cross',
@@ -159,7 +159,7 @@ class VolunteeringSafeguardingParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/training", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/training", [
             'training_type' => 'first_aid',
             'training_name' => '',
             'completed_at'  => '2026-01-10',
@@ -174,7 +174,7 @@ class VolunteeringSafeguardingParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/training", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/training", [
             'training_type' => '',
             'training_name' => 'Some Course',
             'completed_at'  => '2026-01-10',
@@ -189,7 +189,7 @@ class VolunteeringSafeguardingParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/training", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/training", [
             'training_type' => 'first_aid',
             'training_name' => 'Some Course',
             'completed_at'  => '',
@@ -206,7 +206,7 @@ class VolunteeringSafeguardingParityTest extends TestCase
         // offending field, not just a bare paragraph.
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/training?status=training-type-required");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/training?status=training-type-required");
 
         $response->assertStatus(200);
         $response->assertSee('govuk-error-summary__list', false);
@@ -221,7 +221,7 @@ class VolunteeringSafeguardingParityTest extends TestCase
     {
         $user = $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/incidents", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/incidents", [
             'title'       => 'Near-miss during shift',
             'description' => 'A volunteer tripped on uneven paving outside the community centre. No injury occurred but the hazard was noted.',
             'severity'    => 'medium',
@@ -245,7 +245,7 @@ class VolunteeringSafeguardingParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/incidents", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/incidents", [
             'title'       => '',
             'description' => 'A detailed description of the concern that is at least twenty characters long.',
             'severity'    => 'low',
@@ -260,7 +260,7 @@ class VolunteeringSafeguardingParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/volunteering/incidents", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/volunteering/incidents", [
             'title'       => 'A concern',
             'description' => 'Too short',
             'severity'    => 'low',
@@ -294,7 +294,7 @@ class VolunteeringSafeguardingParityTest extends TestCase
             'updated_at'    => now(),
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/volunteering/training");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/volunteering/training");
 
         $response->assertOk();
         $response->assertSee('Children First Awareness');

@@ -72,8 +72,8 @@ class MarketplaceCardCheckoutParityTest extends TestCase
 
     public function test_card_pay_requires_auth(): void
     {
-        $this->post("/{$this->testTenantSlug}/alpha/marketplace/orders/1/pay")
-            ->assertRedirectContains('/alpha/login');
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/orders/1/pay")
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_card_pay_forbidden_for_non_buyer(): void
@@ -84,7 +84,7 @@ class MarketplaceCardCheckoutParityTest extends TestCase
 
         $stranger = $this->user();
         Sanctum::actingAs($stranger, ['*']);
-        $this->post("/{$this->testTenantSlug}/alpha/marketplace/orders/{$orderId}/pay")->assertStatus(403);
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/orders/{$orderId}/pay")->assertStatus(403);
     }
 
     public function test_card_pay_rejects_non_pending_order(): void
@@ -94,7 +94,7 @@ class MarketplaceCardCheckoutParityTest extends TestCase
         $orderId = $this->seedOrder($buyer->id, $seller->id, ['status' => 'paid']);
         Sanctum::actingAs($buyer, ['*']);
 
-        $this->post("/{$this->testTenantSlug}/alpha/marketplace/orders/{$orderId}/pay")
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/orders/{$orderId}/pay")
             ->assertRedirectContains('status=pay-not-pending');
     }
 
@@ -105,7 +105,7 @@ class MarketplaceCardCheckoutParityTest extends TestCase
         $orderId = $this->seedOrder($buyer->id, $seller->id, ['total_price' => 0, 'unit_price' => 0]);
         Sanctum::actingAs($buyer, ['*']);
 
-        $this->post("/{$this->testTenantSlug}/alpha/marketplace/orders/{$orderId}/pay")
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/orders/{$orderId}/pay")
             ->assertRedirectContains('status=pay-not-required');
     }
 
@@ -118,7 +118,7 @@ class MarketplaceCardCheckoutParityTest extends TestCase
         $orderId = $this->seedOrder($buyer->id, $seller->id);
         Sanctum::actingAs($buyer, ['*']);
 
-        $this->post("/{$this->testTenantSlug}/alpha/marketplace/orders/{$orderId}/pay")
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/orders/{$orderId}/pay")
             ->assertRedirectContains('status=pay-unavailable');
     }
 

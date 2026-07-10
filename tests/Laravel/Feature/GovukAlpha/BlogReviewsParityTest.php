@@ -142,10 +142,10 @@ class BlogReviewsParityTest extends TestCase
         $this->enableAlphaFeatures(['blog']);
         $post = $this->seedBlogPost();
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/blog/{$post['slug']}/comments");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/blog/{$post['slug']}/comments");
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/login');
+        $res->assertRedirectContains('/accessible/login');
     }
 
     public function test_blogreviews_comments_returns_403_when_feature_disabled(): void
@@ -156,7 +156,7 @@ class BlogReviewsParityTest extends TestCase
         TenantContext::setById($this->testTenantId);
         $post = $this->seedBlogPost();
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/blog/{$post['slug']}/comments");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/blog/{$post['slug']}/comments");
 
         $res->assertStatus(403);
     }
@@ -166,7 +166,7 @@ class BlogReviewsParityTest extends TestCase
         $this->authenticatedUser();
         $this->enableAlphaFeatures(['blog']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/blog/no-such-post-zzz/comments");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/blog/no-such-post-zzz/comments");
 
         $res->assertStatus(404);
     }
@@ -178,7 +178,7 @@ class BlogReviewsParityTest extends TestCase
         $post = $this->seedBlogPost();
         $this->seedComment('blog', $post['id'], $user->id, ['content' => 'A visible parity comment']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/blog/{$post['slug']}/comments");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/blog/{$post['slug']}/comments");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_blogreviews.comments.heading'));
@@ -193,7 +193,7 @@ class BlogReviewsParityTest extends TestCase
         $this->enableAlphaFeatures(['blog']);
         $post = $this->seedBlogPost();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/blog/{$post['slug']}/comments", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/blog/{$post['slug']}/comments", [
             'body' => 'My new accessible comment',
         ]);
 
@@ -218,7 +218,7 @@ class BlogReviewsParityTest extends TestCase
         // blogReviewsStorePostComment at /comments/add (the base
         // /blog/{slug}/comments form is flat and does not thread). Posting the
         // reply to the flat endpoint would silently drop parent_id.
-        $res = $this->post("/{$this->testTenantSlug}/alpha/blog/{$post['slug']}/comments/add", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/blog/{$post['slug']}/comments/add", [
             'body'      => 'A threaded reply',
             'parent_id' => $parentId,
         ]);
@@ -238,7 +238,7 @@ class BlogReviewsParityTest extends TestCase
         $this->enableAlphaFeatures(['blog']);
         $post = $this->seedBlogPost();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/blog/{$post['slug']}/comments", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/blog/{$post['slug']}/comments", [
             'body' => '   ',
         ]);
 
@@ -253,7 +253,7 @@ class BlogReviewsParityTest extends TestCase
         $post = $this->seedBlogPost();
         $commentId = $this->seedComment('blog', $post['id'], $user->id, ['content' => 'before edit']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/blog/comments/{$commentId}/update", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/blog/comments/{$commentId}/update", [
             'slug'    => $post['slug'],
             'content' => 'after edit',
         ]);
@@ -270,7 +270,7 @@ class BlogReviewsParityTest extends TestCase
         // Owned by a different user.
         $commentId = $this->seedComment('blog', $post['id'], $this->authorId(), ['content' => 'untouched']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/blog/comments/{$commentId}/update", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/blog/comments/{$commentId}/update", [
             'slug'    => $post['slug'],
             'content' => 'hacked content',
         ]);
@@ -287,7 +287,7 @@ class BlogReviewsParityTest extends TestCase
         $post = $this->seedBlogPost();
         $commentId = $this->seedComment('blog', $post['id'], $user->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/blog/comments/{$commentId}/delete", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/blog/comments/{$commentId}/delete", [
             'slug' => $post['slug'],
         ]);
 
@@ -309,7 +309,7 @@ class BlogReviewsParityTest extends TestCase
         $post = $this->seedBlogPost();
         $commentId = $this->seedComment('blog', $post['id'], $this->authorId());
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/blog/comments/{$commentId}/delete", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/blog/comments/{$commentId}/delete", [
             'slug' => $post['slug'],
         ]);
 
@@ -325,7 +325,7 @@ class BlogReviewsParityTest extends TestCase
         $commentId = $this->seedComment('blog', $post['id'], $this->authorId());
 
         // Add
-        $this->post("/{$this->testTenantSlug}/alpha/blog/comments/{$commentId}/react", [
+        $this->post("/{$this->testTenantSlug}/accessible/blog/comments/{$commentId}/react", [
             'slug'  => $post['slug'],
             'emoji' => 'like',
         ])->assertStatus(302);
@@ -339,7 +339,7 @@ class BlogReviewsParityTest extends TestCase
         ]);
 
         // Toggle off
-        $this->post("/{$this->testTenantSlug}/alpha/blog/comments/{$commentId}/react", [
+        $this->post("/{$this->testTenantSlug}/accessible/blog/comments/{$commentId}/react", [
             'slug'  => $post['slug'],
             'emoji' => 'like',
         ])->assertStatus(302);
@@ -359,7 +359,7 @@ class BlogReviewsParityTest extends TestCase
         $post = $this->seedBlogPost();
         $commentId = $this->seedComment('blog', $post['id'], $this->authorId());
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/blog/comments/{$commentId}/react", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/blog/comments/{$commentId}/react", [
             'slug'  => $post['slug'],
             'emoji' => 'time_credit', // valid backend type but NOT in the curated alpha set
         ]);
@@ -382,7 +382,7 @@ class BlogReviewsParityTest extends TestCase
         $this->enableAlphaFeatures(['blog']);
         $post = $this->seedBlogPost();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/blog/{$post['slug']}/react", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/blog/{$post['slug']}/react", [
             'emoji' => 'love',
         ]);
 
@@ -410,7 +410,7 @@ class BlogReviewsParityTest extends TestCase
             'created_at'  => now(),
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/blog/{$post['slug']}/likers/like");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/blog/{$post['slug']}/likers/like");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_blogreviews.likers.title'));
@@ -421,10 +421,10 @@ class BlogReviewsParityTest extends TestCase
         $this->enableAlphaFeatures(['blog']);
         $post = $this->seedBlogPost();
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/blog/{$post['slug']}/likers/like");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/blog/{$post['slug']}/likers/like");
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/login');
+        $res->assertRedirectContains('/accessible/login');
     }
 
     // ===============================================================
@@ -435,10 +435,10 @@ class BlogReviewsParityTest extends TestCase
     {
         $this->enableAlphaFeatures(['reviews']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/reviews/list");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/reviews/list");
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/login');
+        $res->assertRedirectContains('/accessible/login');
     }
 
     public function test_blogreviews_reviews_list_returns_403_when_feature_disabled(): void
@@ -448,7 +448,7 @@ class BlogReviewsParityTest extends TestCase
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/reviews/list");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/reviews/list");
 
         $res->assertStatus(403);
     }
@@ -460,7 +460,7 @@ class BlogReviewsParityTest extends TestCase
         $reviewer = $this->authorId();
         $this->seedReview($reviewer, $user->id, ['comment' => 'Received parity review']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/reviews/list?tab=received");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/reviews/list?tab=received");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_blogreviews.reviews_list.title'));
@@ -474,7 +474,7 @@ class BlogReviewsParityTest extends TestCase
         $receiver = $this->authorId();
         $this->seedReview($user->id, $receiver, ['comment' => 'Given parity review']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/reviews/list?tab=given");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/reviews/list?tab=given");
 
         $res->assertOk();
         $res->assertSee('Given parity review');
@@ -491,7 +491,7 @@ class BlogReviewsParityTest extends TestCase
         $this->enableAlphaFeatures(['reviews']);
         $reviewId = $this->seedReview($this->authorId(), $user->id, ['comment' => 'Reviewed work']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/reviews/{$reviewId}/comments");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/reviews/{$reviewId}/comments");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_blogreviews.review_comments.heading'));
@@ -505,7 +505,7 @@ class BlogReviewsParityTest extends TestCase
         // Review belongs to a different tenant — the tenant-scoped getById returns null.
         $reviewId = $this->seedReview($this->authorId(), $this->authorId(), ['tenant_id' => 999]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/reviews/{$reviewId}/comments");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/reviews/{$reviewId}/comments");
 
         $res->assertStatus(404);
     }
@@ -516,7 +516,7 @@ class BlogReviewsParityTest extends TestCase
         $this->enableAlphaFeatures(['reviews']);
         $reviewId = $this->seedReview($this->authorId(), $user->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/reviews/{$reviewId}/comments", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/reviews/{$reviewId}/comments", [
             'body' => 'A moderation note on this review',
         ]);
 
@@ -536,7 +536,7 @@ class BlogReviewsParityTest extends TestCase
         $this->enableAlphaFeatures(['reviews']);
         $reviewId = $this->seedReview($this->authorId(), $user->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/reviews/{$reviewId}/react", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/reviews/{$reviewId}/react", [
             'emoji' => 'celebrate',
         ]);
 

@@ -56,14 +56,14 @@ class MessagesParityTest extends TestCase
 
     public function test_messages_groups_index_requires_authentication(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/messages/groups");
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/messages/groups");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_messages_create_group_form_requires_authentication(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/messages/groups/new");
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/messages/groups/new");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     // ----------------------------------------------------------------------
@@ -74,7 +74,7 @@ class MessagesParityTest extends TestCase
     {
         $this->messagesAuthedUser(['name' => 'Group Viewer']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/messages/groups");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/messages/groups");
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_messages.groups.title'));
         $response->assertSee(__('govuk_alpha_messages.groups.empty_title'));
@@ -88,7 +88,7 @@ class MessagesParityTest extends TestCase
         [$a, $b] = $this->messagesTwoMembers();
         $group = $this->messagesCreateGroup($owner->id, [$a->id, $b->id], 'Weekend Project');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/messages/groups");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/messages/groups");
         $response->assertOk();
         $response->assertSee('Weekend Project');
         $response->assertSee(route('govuk-alpha.messages.groups.show', [
@@ -106,7 +106,7 @@ class MessagesParityTest extends TestCase
             'status' => 'active', 'is_approved' => true, 'privacy_search' => 1,
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/messages/groups/new");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/messages/groups/new");
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_messages.create.title'));
         $response->assertSee('name="member_ids[]"', false);
@@ -122,7 +122,7 @@ class MessagesParityTest extends TestCase
         $owner = $this->messagesAuthedUser(['name' => 'Maker']);
         [$a, $b] = $this->messagesTwoMembers();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/groups", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/groups", [
             'name' => 'Project Falcon',
             'member_ids' => [$a->id, $b->id],
         ]);
@@ -142,7 +142,7 @@ class MessagesParityTest extends TestCase
         $this->messagesAuthedUser(['name' => 'Maker Solo']);
         [$a] = $this->messagesTwoMembers();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/groups", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/groups", [
             'name' => 'Too Small',
             'member_ids' => [$a->id],
         ]);
@@ -165,7 +165,7 @@ class MessagesParityTest extends TestCase
         [$a, $b] = $this->messagesTwoMembers();
         $group = $this->messagesCreateGroup($owner->id, [$a->id, $b->id], 'Show Group');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/messages/groups/{$group['id']}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/messages/groups/{$group['id']}");
         $response->assertOk();
         $response->assertSee('Show Group');
         $response->assertSee(__('govuk_alpha_messages.conversation.members_heading'));
@@ -183,7 +183,7 @@ class MessagesParityTest extends TestCase
         // A logged-in member who is NOT in the group.
         $this->messagesAuthedUser(['name' => 'Outsider']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/messages/groups/{$group['id']}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/messages/groups/{$group['id']}");
         $response->assertNotFound();
     }
 
@@ -191,7 +191,7 @@ class MessagesParityTest extends TestCase
     {
         $this->messagesAuthedUser(['name' => 'Seeker']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/messages/groups/99999999");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/messages/groups/99999999");
         $response->assertNotFound();
     }
 
@@ -205,7 +205,7 @@ class MessagesParityTest extends TestCase
         [$a, $b] = $this->messagesTwoMembers();
         $group = $this->messagesCreateGroup($owner->id, [$a->id, $b->id], 'Chatty Group');
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/groups/{$group['id']}", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/groups/{$group['id']}", [
             'body' => 'Hello to the whole group.',
         ]);
 
@@ -225,7 +225,7 @@ class MessagesParityTest extends TestCase
         [$a, $b] = $this->messagesTwoMembers();
         $group = $this->messagesCreateGroup($owner->id, [$a->id, $b->id], 'Empty Group');
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/groups/{$group['id']}", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/groups/{$group['id']}", [
             'body' => '   ',
         ]);
 
@@ -246,7 +246,7 @@ class MessagesParityTest extends TestCase
             'name' => 'Newcomer', 'status' => 'active', 'is_approved' => true,
         ]);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/groups/{$group['id']}/members", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/groups/{$group['id']}/members", [
             'user_id' => $newcomer->id,
         ]);
 
@@ -273,7 +273,7 @@ class MessagesParityTest extends TestCase
             'name' => 'Hopeful', 'status' => 'active', 'is_approved' => true,
         ]);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/groups/{$group['id']}/members", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/groups/{$group['id']}/members", [
             'user_id' => $newcomer->id,
         ]);
 
@@ -295,9 +295,9 @@ class MessagesParityTest extends TestCase
 
         Sanctum::actingAs($leaver, ['*']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/groups/{$group['id']}/members/{$leaver->id}/remove");
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/groups/{$group['id']}/members/{$leaver->id}/remove");
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/messages/groups?status=group-left");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/messages/groups?status=group-left");
         $this->assertDatabaseMissing('conversation_participants', [
             'conversation_id' => $group['id'],
             'user_id' => $leaver->id,
@@ -319,7 +319,7 @@ class MessagesParityTest extends TestCase
         $messageId = (int) ($sent['id'] ?? 0);
         $this->assertGreaterThan(0, $messageId);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/groups/{$group['id']}/m/{$messageId}/react", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/groups/{$group['id']}/m/{$messageId}/react", [
             'emoji' => '👍',
         ]);
 
@@ -341,7 +341,7 @@ class MessagesParityTest extends TestCase
         $sent = GroupConversationService::sendGroupMessage($group['id'], $owner->id, 'No bad reactions');
         $messageId = (int) ($sent['id'] ?? 0);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/groups/{$group['id']}/m/{$messageId}/react", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/groups/{$group['id']}/m/{$messageId}/react", [
             'emoji' => 'not-an-emoji',
         ]);
 
@@ -367,7 +367,7 @@ class MessagesParityTest extends TestCase
         GroupConversationService::sendGroupMessage($group['id'], $owner->id, 'apples are tasty');
         GroupConversationService::sendGroupMessage($group['id'], $owner->id, 'bananas are yellow');
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/messages/groups/{$group['id']}?q=apples");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/messages/groups/{$group['id']}?q=apples");
         $response->assertOk();
         // The matched term "apples" is wrapped in <mark> for highlighting, so the
         // raw phrase "apples are tasty" is split; assert the un-highlighted tail.
@@ -381,8 +381,8 @@ class MessagesParityTest extends TestCase
 
     public function test_messages_translate_requires_authentication(): void
     {
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/5/m/9/translate");
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/5/m/9/translate");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_messages_conversation_shows_translate_button_for_a_text_message(): void
@@ -399,7 +399,7 @@ class MessagesParityTest extends TestCase
         ]);
         $this->assertNotEmpty($message, 'Failed to seed 1-to-1 message: ' . json_encode(MessageService::getErrors()));
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/messages/{$other->id}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/messages/{$other->id}");
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_messages.translate.button'));
         $response->assertSee(route('govuk-alpha.messages.translate', [
@@ -428,7 +428,7 @@ class MessagesParityTest extends TestCase
         // The viewer is neither sender nor receiver.
         $this->messagesAuthedUser(['name' => 'Nosy Viewer']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/{$recipient->id}/m/{$message['id']}/translate");
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/{$recipient->id}/m/{$message['id']}/translate");
         $response->assertRedirect();
         $this->assertStringContainsString('status=translate-failed', $response->headers->get('Location'));
     }
@@ -445,9 +445,9 @@ class MessagesParityTest extends TestCase
 
     public function test_voice_message_requires_authentication(): void
     {
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/123/voice", []);
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/123/voice", []);
         $response->assertRedirect();
-        $this->assertStringContainsString("/{$this->testTenantSlug}/alpha/login", $response->headers->get('Location') ?? '');
+        $this->assertStringContainsString("/{$this->testTenantSlug}/accessible/login", $response->headers->get('Location') ?? '');
     }
 
     public function test_voice_message_without_file_redirects_back_to_conversation(): void
@@ -460,9 +460,9 @@ class MessagesParityTest extends TestCase
         // No 'voice' file present → the handler must redirect back to the
         // conversation (voice-required, or message-disabled if DMs are off),
         // never 500.
-        $response = $this->post("/{$this->testTenantSlug}/alpha/messages/{$other->id}/voice", []);
+        $response = $this->post("/{$this->testTenantSlug}/accessible/messages/{$other->id}/voice", []);
         $response->assertRedirect();
-        $this->assertStringContainsString("/{$this->testTenantSlug}/alpha/messages/{$other->id}", $response->headers->get('Location') ?? '');
+        $this->assertStringContainsString("/{$this->testTenantSlug}/accessible/messages/{$other->id}", $response->headers->get('Location') ?? '');
     }
 
     private function messagesAuthedUser(array $overrides = []): User

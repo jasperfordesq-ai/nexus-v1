@@ -68,7 +68,7 @@ class NotificationsGroupingParityTest extends TestCase
         // A different target → its own single row.
         $this->seedNotification($owner->id, 'message', '/messages/9', $a1->id, 'Alice sent you a message');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/notifications");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/notifications");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.notifications.group_tag', ['count' => 3]));
         $res->assertSee(__('govuk_alpha.notifications.mark_group_read'));
@@ -86,7 +86,7 @@ class NotificationsGroupingParityTest extends TestCase
         $this->seedNotification($owner->id, 'like', '/posts/7', $a1->id, 'Alice liked your post');
         $this->seedNotification($owner->id, 'like', '/posts/7', $a2->id, 'Bob liked your post');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/notifications/group/read", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/notifications/group/read", [
             'group_key' => 'like:/posts/7',
         ]);
         $res->assertRedirect();

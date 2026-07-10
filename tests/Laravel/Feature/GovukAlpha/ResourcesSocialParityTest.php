@@ -121,10 +121,10 @@ class ResourcesSocialParityTest extends TestCase
         $user = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $resourceId = $this->seedResource($user->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/{$resourceId}/comments");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/{$resourceId}/comments");
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/login');
+        $res->assertRedirectContains('/accessible/login');
     }
 
     public function test_resources_social_react_redirects_anonymous_to_login(): void
@@ -133,10 +133,10 @@ class ResourcesSocialParityTest extends TestCase
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $resourceId = $this->seedResource($owner->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/{$resourceId}/react", ['emoji' => 'like']);
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/{$resourceId}/react", ['emoji' => 'like']);
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/login');
+        $res->assertRedirectContains('/accessible/login');
     }
 
     // ---------------------------------------------------------------
@@ -151,7 +151,7 @@ class ResourcesSocialParityTest extends TestCase
         TenantContext::setById($this->testTenantId);
         $resourceId = $this->seedResource($user->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/{$resourceId}/comments");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/{$resourceId}/comments");
 
         $res->assertStatus(403);
     }
@@ -167,7 +167,7 @@ class ResourcesSocialParityTest extends TestCase
         $resourceId = $this->seedResource($user->id);
         $this->seedComment($resourceId, $user->id, 'A visible parity comment on resource');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/{$resourceId}/comments");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/{$resourceId}/comments");
 
         $res->assertOk();
         $res->assertSee('A visible parity comment on resource');
@@ -186,7 +186,7 @@ class ResourcesSocialParityTest extends TestCase
         $this->enableResources();
         $resourceId = $this->seedResource($user->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/{$resourceId}/react", ['emoji' => 'like']);
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/{$resourceId}/react", ['emoji' => 'like']);
 
         $res->assertStatus(302);
         $this->assertDatabaseHas('reactions', [
@@ -206,7 +206,7 @@ class ResourcesSocialParityTest extends TestCase
         $this->seedReaction($resourceId, $user->id, 'like');
 
         // Toggle again — same emoji should remove it.
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/{$resourceId}/react", ['emoji' => 'like']);
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/{$resourceId}/react", ['emoji' => 'like']);
 
         $res->assertStatus(302);
         $this->assertDatabaseMissing('reactions', [
@@ -226,7 +226,7 @@ class ResourcesSocialParityTest extends TestCase
         $this->enableResources();
         $resourceId = $this->seedResource($user->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/{$resourceId}/comments/add", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/{$resourceId}/comments/add", [
             'body' => 'My new resource comment',
         ]);
 
@@ -246,7 +246,7 @@ class ResourcesSocialParityTest extends TestCase
         $this->enableResources();
         $resourceId = $this->seedResource($user->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/{$resourceId}/comments/add", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/{$resourceId}/comments/add", [
             'body' => '   ',
         ]);
 
@@ -265,7 +265,7 @@ class ResourcesSocialParityTest extends TestCase
         $resourceId = $this->seedResource($user->id);
         $commentId = $this->seedComment($resourceId, $user->id, 'To be deleted');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/{$resourceId}/comments/{$commentId}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/{$resourceId}/comments/{$commentId}/delete");
 
         $res->assertStatus(302);
         $res->assertRedirectContains('status=comment-deleted');
@@ -281,7 +281,7 @@ class ResourcesSocialParityTest extends TestCase
         $resourceId = $this->seedResource($owner->id);
         $commentId = $this->seedComment($resourceId, $owner->id, 'Protected comment');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/{$resourceId}/comments/{$commentId}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/{$resourceId}/comments/{$commentId}/delete");
 
         // CommentService::delete is owner-scoped — returns 0 rows deleted → comment-delete-failed redirect.
         $res->assertStatus(302);
@@ -301,7 +301,7 @@ class ResourcesSocialParityTest extends TestCase
         $this->seedComment($resourceId, $user->id, 'Library count comment');
         $this->seedReaction($resourceId, $user->id, 'like');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/library");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/library");
 
         $res->assertOk();
         // Like form should be present for the resource.

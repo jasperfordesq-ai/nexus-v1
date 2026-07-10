@@ -15,7 +15,7 @@ use Tests\Laravel\TestCase;
  * The accessible (GOV.UK) frontend must behave like the React custom domains:
  * on a tenant's dedicated accessible custom domain the tenant is resolved by
  * the HOST and every URL is slug-less (bare paths). The tenant slug only appears
- * for tenants WITHOUT a custom domain (the shared /{tenantSlug}/alpha routes).
+ * for tenants WITHOUT a custom domain (the shared /{tenantSlug}/accessible routes).
  *
  * The request is driven through the tenant's accessible_domain host so the
  * ResolveTenant middleware resolves it exactly as in production.
@@ -50,7 +50,7 @@ class AccessibleCustomDomainRootTest extends TestCase
 
     private function slugPrefix(): string
     {
-        return '/' . $this->testTenantSlug . '/alpha';
+        return '/' . $this->testTenantSlug . '/accessible';
     }
 
     public function test_root_renders_home_with_no_slug_in_the_page(): void
@@ -59,13 +59,13 @@ class AccessibleCustomDomainRootTest extends TestCase
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha.home.title'));
-        // No /{slug}/alpha anywhere — every link is slug-less.
+        // No /{slug}/accessible anywhere — every link is slug-less.
         $response->assertDontSee($this->slugPrefix());
     }
 
     public function test_bare_login_path_works_and_is_slug_less(): void
     {
-        // No slug, no /alpha — just like a React custom domain.
+        // No slug, no /accessible — just like a React custom domain.
         $response = $this->getOnAccessibleDomain('/login');
 
         $response->assertOk();

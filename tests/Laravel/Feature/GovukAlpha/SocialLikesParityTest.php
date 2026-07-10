@@ -95,14 +95,14 @@ class SocialLikesParityTest extends TestCase
         Sanctum::actingAs($liker, ['*']);
 
         // Like
-        $res = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/like");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/listings/{$listing->id}/like");
         $res->assertRedirect();
         $this->assertDatabaseHas('likes', [
             'user_id' => $liker->id, 'target_type' => 'listing', 'target_id' => $listing->id, 'tenant_id' => $this->testTenantId,
         ]);
 
         // Unlike (toggle off)
-        $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/like");
+        $this->post("/{$this->testTenantSlug}/accessible/listings/{$listing->id}/like");
         $this->assertDatabaseMissing('likes', [
             'user_id' => $liker->id, 'target_type' => 'listing', 'target_id' => $listing->id, 'tenant_id' => $this->testTenantId,
         ]);
@@ -118,7 +118,7 @@ class SocialLikesParityTest extends TestCase
         $viewer = $this->authenticatedUser();
         Sanctum::actingAs($viewer, ['*']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/listings/{$listing->id}");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_listings.detail.like'));
     }
@@ -132,7 +132,7 @@ class SocialLikesParityTest extends TestCase
         $liker = $this->authenticatedUser();
         Sanctum::actingAs($liker, ['*']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/blog/{$post['slug']}/like");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/blog/{$post['slug']}/like");
         $res->assertRedirect();
         $this->assertDatabaseHas('likes', [
             'user_id' => $liker->id, 'target_type' => 'blog', 'target_id' => $post['id'], 'tenant_id' => $this->testTenantId,

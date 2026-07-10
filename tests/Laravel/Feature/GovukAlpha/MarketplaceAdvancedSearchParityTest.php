@@ -69,7 +69,7 @@ class MarketplaceAdvancedSearchParityTest extends TestCase
     public function test_advanced_search_form_renders(): void
     {
         $this->authenticatedUser();
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/search");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/search");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.marketplace_advanced.title'));
         $res->assertSee(__('govuk_alpha_commerce.marketplace_advanced.condition_label'));
@@ -83,7 +83,7 @@ class MarketplaceAdvancedSearchParityTest extends TestCase
         $this->seedItem($owner->id, 'Brand New Phone', ['condition' => 'new']);
         $this->seedItem($owner->id, 'Worn Out Boots', ['condition' => 'poor']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/search?condition[]=new");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/search?condition[]=new");
         $res->assertOk();
         $res->assertSee('Brand New Phone');
         $res->assertDontSee('Worn Out Boots');
@@ -96,7 +96,7 @@ class MarketplaceAdvancedSearchParityTest extends TestCase
         $this->seedItem($owner->id, 'Pricey Laptop', ['price' => 900.00]);
 
         // price_min triggers the SQL (faceted) path.
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/search?price_min=100");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/search?price_min=100");
         $res->assertOk();
         $res->assertSee('Pricey Laptop');
         $res->assertDontSee('Cheap Mug');

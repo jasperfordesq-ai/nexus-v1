@@ -88,7 +88,7 @@ class EventsParityTest extends GovukAlphaFrontendTest
 
     public function test_events_browse_page_renders(): void
     {
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/browse");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/browse");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_events.browse.title'));
@@ -115,7 +115,7 @@ class EventsParityTest extends GovukAlphaFrontendTest
         $owner = $this->eventsParityUser();
         $eventId = $this->eventsParitySeedEvent($owner->id, ['latitude' => 53.349805, 'longitude' => -6.26031]);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/map");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/map");
 
         $resp->assertForbidden();
     }
@@ -130,7 +130,7 @@ class EventsParityTest extends GovukAlphaFrontendTest
             'is_online' => 0,
         ]);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/map");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/map");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_events.map.title'));
@@ -143,7 +143,7 @@ class EventsParityTest extends GovukAlphaFrontendTest
         $this->eventsParityEnableMaps();
         $this->eventsParityUser();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/99999999/map");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/99999999/map");
 
         $resp->assertNotFound();
     }
@@ -157,9 +157,9 @@ class EventsParityTest extends GovukAlphaFrontendTest
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $eventId = $this->eventsParitySeedEvent($owner->id, ['is_recurring_template' => 1]);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/recurring-edit");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/recurring-edit");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_events_recurring_edit_forbids_non_owner(): void
@@ -170,7 +170,7 @@ class EventsParityTest extends GovukAlphaFrontendTest
         // A different, authenticated member is not the organiser.
         $this->eventsParityUser();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/recurring-edit");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/recurring-edit");
 
         $resp->assertForbidden();
     }
@@ -180,7 +180,7 @@ class EventsParityTest extends GovukAlphaFrontendTest
         $owner = $this->eventsParityUser();
         $eventId = $this->eventsParitySeedEvent($owner->id, ['is_recurring_template' => 1]);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/recurring-edit");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/recurring-edit");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_events.recurring_edit.title'));
@@ -194,7 +194,7 @@ class EventsParityTest extends GovukAlphaFrontendTest
         // Plain (non-recurring) event.
         $eventId = $this->eventsParitySeedEvent($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/recurring-edit");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/recurring-edit");
 
         $resp->assertRedirect(route('govuk-alpha.events.edit', ['tenantSlug' => $this->testTenantSlug, 'id' => $eventId]));
     }
@@ -204,14 +204,14 @@ class EventsParityTest extends GovukAlphaFrontendTest
         $owner = $this->eventsParityUser();
         $eventId = $this->eventsParitySeedEvent($owner->id, ['is_recurring_template' => 1]);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/recurring-edit", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/events/{$eventId}/recurring-edit", [
             'title' => 'Updated recurring title',
             'description' => 'Updated recurring description.',
             'start_time' => now()->addDays(7)->format('Y-m-d\TH:i'),
             'scope' => 'single',
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/events/{$eventId}?status=event-updated");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/events/{$eventId}?status=event-updated");
         $this->assertSame('Updated recurring title', DB::table('events')->where('id', $eventId)->value('title'));
         // scope=single detaches the occurrence from its parent.
         $this->assertNull(DB::table('events')->where('id', $eventId)->value('parent_event_id'));
@@ -226,9 +226,9 @@ class EventsParityTest extends GovukAlphaFrontendTest
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $eventId = $this->eventsParitySeedEvent($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/polls");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/polls");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_events_polls_page_forbids_non_owner(): void
@@ -238,7 +238,7 @@ class EventsParityTest extends GovukAlphaFrontendTest
 
         $this->eventsParityUser();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/polls");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/polls");
 
         $resp->assertForbidden();
     }
@@ -249,7 +249,7 @@ class EventsParityTest extends GovukAlphaFrontendTest
         $eventId = $this->eventsParitySeedEvent($owner->id);
         $this->eventsParitySeedPoll($owner->id, ['question' => 'Morning or afternoon?']);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/polls");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/polls");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_events.polls.title'));
@@ -263,15 +263,15 @@ class EventsParityTest extends GovukAlphaFrontendTest
         $pollId = $this->eventsParitySeedPoll($owner->id);
 
         // Attach.
-        $attach = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/polls", [
+        $attach = $this->post("/{$this->testTenantSlug}/accessible/events/{$eventId}/polls", [
             'poll_ids' => [$pollId],
         ]);
-        $attach->assertRedirect("/{$this->testTenantSlug}/alpha/events/{$eventId}/polls?status=polls-updated");
+        $attach->assertRedirect("/{$this->testTenantSlug}/accessible/events/{$eventId}/polls?status=polls-updated");
         $this->assertSame($eventId, (int) DB::table('polls')->where('id', $pollId)->value('event_id'));
 
         // Detach (empty selection).
-        $detach = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/polls", []);
-        $detach->assertRedirect("/{$this->testTenantSlug}/alpha/events/{$eventId}/polls?status=polls-updated");
+        $detach = $this->post("/{$this->testTenantSlug}/accessible/events/{$eventId}/polls", []);
+        $detach->assertRedirect("/{$this->testTenantSlug}/accessible/events/{$eventId}/polls?status=polls-updated");
         $this->assertNull(DB::table('polls')->where('id', $pollId)->value('event_id'));
     }
 
@@ -284,11 +284,11 @@ class EventsParityTest extends GovukAlphaFrontendTest
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $foreignPoll = $this->eventsParitySeedPoll($other->id);
 
-        $resp = $this->post("/{$this->testTenantSlug}/alpha/events/{$eventId}/polls", [
+        $resp = $this->post("/{$this->testTenantSlug}/accessible/events/{$eventId}/polls", [
             'poll_ids' => [$foreignPoll],
         ]);
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/events/{$eventId}/polls?status=polls-failed");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/events/{$eventId}/polls?status=polls-failed");
         $this->assertNull(DB::table('polls')->where('id', $foreignPoll)->value('event_id'));
     }
 
@@ -301,9 +301,9 @@ class EventsParityTest extends GovukAlphaFrontendTest
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $eventId = $this->eventsParitySeedEvent($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/translate");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/translate");
 
-        $resp->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $resp->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_events_translate_page_renders_language_chooser(): void
@@ -311,7 +311,7 @@ class EventsParityTest extends GovukAlphaFrontendTest
         $owner = $this->eventsParityUser();
         $eventId = $this->eventsParitySeedEvent($owner->id);
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/{$eventId}/translate");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/{$eventId}/translate");
 
         $resp->assertOk();
         $resp->assertSee(__('govuk_alpha_events.translate.title'));
@@ -323,7 +323,7 @@ class EventsParityTest extends GovukAlphaFrontendTest
     {
         $this->eventsParityUser();
 
-        $resp = $this->get("/{$this->testTenantSlug}/alpha/events/99999999/translate");
+        $resp = $this->get("/{$this->testTenantSlug}/accessible/events/99999999/translate");
 
         $resp->assertNotFound();
     }

@@ -22,7 +22,7 @@ use Tests\Laravel\TestCase;
  * Mirrors GoalsParityTest's base class, traits and helpers. Every method is
  * prefixed test_goals_history_ to be globally unique across the suite.
  *
- * Route tested: GET /{tenantSlug}/alpha/goals/{id}/history
+ * Route tested: GET /{tenantSlug}/accessible/goals/{id}/history
  * Name:         govuk-alpha.goals.history
  * Controller:   AlphaController::goalsHistory (via GoalsParity trait)
  * Backing service: GoalProgressService::getProgressHistory()
@@ -124,8 +124,8 @@ class GoalsHistoryParityTest extends TestCase
         $owner  = $this->makeUser(['name' => 'History Anon Owner']);
         $goalId = $this->seedGoal($owner->id);
 
-        $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/history")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/history")
+            ->assertRedirectContains('/accessible/login');
     }
 
     // ==================================================================
@@ -138,7 +138,7 @@ class GoalsHistoryParityTest extends TestCase
         $goalId = $this->seedGoal($owner->id);
         $this->seedCheckin($goalId, $owner->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/history");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/history");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_goals.history.title'));
@@ -161,7 +161,7 @@ class GoalsHistoryParityTest extends TestCase
             ->where('goal_id', $goalId)
             ->delete();
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/history");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/history");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_goals.history.empty'));
@@ -177,7 +177,7 @@ class GoalsHistoryParityTest extends TestCase
             ->where('id', $goalId)
             ->update(['mentor_id' => $buddy->id]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/history");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/history");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_goals.history.title'));
     }
@@ -190,7 +190,7 @@ class GoalsHistoryParityTest extends TestCase
         // A third member who is neither owner nor buddy can view a public goal's history.
         $this->authenticatedUser(['name' => 'History Public Viewer']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/history");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/history");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_goals.history.title'));
     }
@@ -206,7 +206,7 @@ class GoalsHistoryParityTest extends TestCase
 
         $this->authenticatedUser(['name' => 'History Stranger']);
 
-        $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/history")
+        $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/history")
             ->assertStatus(403);
     }
 
@@ -214,7 +214,7 @@ class GoalsHistoryParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'History Missing User']);
 
-        $this->get("/{$this->testTenantSlug}/alpha/goals/99999801/history")
+        $this->get("/{$this->testTenantSlug}/accessible/goals/99999801/history")
             ->assertStatus(404);
     }
 
@@ -244,7 +244,7 @@ class GoalsHistoryParityTest extends TestCase
         TenantContext::setById($this->testTenantId);
         $this->authenticatedUser(['name' => 'Cross Tenant Viewer']);
 
-        $this->get("/{$this->testTenantSlug}/alpha/goals/{$crossGoalId}/history")
+        $this->get("/{$this->testTenantSlug}/accessible/goals/{$crossGoalId}/history")
             ->assertStatus(404);
     }
 }

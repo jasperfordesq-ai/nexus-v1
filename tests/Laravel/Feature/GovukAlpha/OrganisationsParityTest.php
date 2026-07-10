@@ -125,10 +125,10 @@ class OrganisationsParityTest extends TestCase
     {
         $this->enableAlphaFeatures(['volunteering']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/browse");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/browse");
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/login');
+        $res->assertRedirectContains('/accessible/login');
     }
 
     public function test_organisations_browse_renders_for_authenticated_user(): void
@@ -137,7 +137,7 @@ class OrganisationsParityTest extends TestCase
         $this->enableAlphaFeatures(['volunteering']);
         $this->seedOrganisation(['name' => 'Parity Browse Org']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/browse");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/browse");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_organisations.browse.title'));
@@ -150,7 +150,7 @@ class OrganisationsParityTest extends TestCase
         $this->authenticatedUser();
         $this->enableAlphaFeatures(['volunteering']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/browse?q=zzz-no-such-org-zzz");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/browse?q=zzz-no-such-org-zzz");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_organisations.browse.empty_title'));
@@ -162,7 +162,7 @@ class OrganisationsParityTest extends TestCase
         $this->authenticatedUser();
         $this->disableAlphaFeatures(['volunteering']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/browse");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/browse");
 
         $res->assertStatus(403);
     }
@@ -176,7 +176,7 @@ class OrganisationsParityTest extends TestCase
         $this->authenticatedUser();
         $this->enableAlphaFeatures(['volunteering']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/register");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/register");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_organisations.register.heading'));
@@ -189,7 +189,7 @@ class OrganisationsParityTest extends TestCase
         $this->authenticatedUser();
         $this->enableAlphaFeatures(['volunteering']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/register?status=org-name-invalid");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/register?status=org-name-invalid");
 
         $res->assertOk();
         $res->assertSee('govuk-form-group--error', false);
@@ -204,7 +204,7 @@ class OrganisationsParityTest extends TestCase
         $this->enableAlphaFeatures(['volunteering']);
 
         $token = 'test-csrf-token';
-        $res = $this->withSession(['_token' => $token])->post("/{$this->testTenantSlug}/alpha/organisations/register", [
+        $res = $this->withSession(['_token' => $token])->post("/{$this->testTenantSlug}/accessible/organisations/register", [
             '_token'       => $token,
             'name'         => 'no',
             'description'  => 'This description is definitely long enough to pass.',
@@ -222,7 +222,7 @@ class OrganisationsParityTest extends TestCase
         $this->enableAlphaFeatures(['volunteering']);
 
         $token = 'test-csrf-token';
-        $res = $this->withSession(['_token' => $token])->post("/{$this->testTenantSlug}/alpha/organisations/register", [
+        $res = $this->withSession(['_token' => $token])->post("/{$this->testTenantSlug}/accessible/organisations/register", [
             '_token'      => $token,
             'name'        => 'A Valid Organisation Name',
             'description' => 'This description is definitely long enough to pass validation.',
@@ -242,7 +242,7 @@ class OrganisationsParityTest extends TestCase
         $name = 'My Parity Community Group ' . uniqid();
 
         $token = 'test-csrf-token';
-        $res = $this->withSession(['_token' => $token])->post("/{$this->testTenantSlug}/alpha/organisations/register", [
+        $res = $this->withSession(['_token' => $token])->post("/{$this->testTenantSlug}/accessible/organisations/register", [
             '_token'       => $token,
             'name'         => $name,
             'description'  => 'We organise community litter picks and gardening days.',
@@ -270,10 +270,10 @@ class OrganisationsParityTest extends TestCase
     {
         $this->enableAlphaFeatures(['volunteering']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/manage");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/manage");
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/login');
+        $res->assertRedirectContains('/accessible/login');
     }
 
     public function test_organisations_manage_lists_owned_organisation(): void
@@ -282,7 +282,7 @@ class OrganisationsParityTest extends TestCase
         $this->enableAlphaFeatures(['volunteering']);
         $this->seedOrganisation(['user_id' => $owner->id, 'name' => 'Owned Manage Org', 'status' => 'active']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/manage");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/manage");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_organisations.manage.title'));
@@ -295,7 +295,7 @@ class OrganisationsParityTest extends TestCase
         $this->authenticatedUser();
         $this->enableAlphaFeatures(['volunteering']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/manage");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/manage");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_organisations.manage.empty_title'));
@@ -311,7 +311,7 @@ class OrganisationsParityTest extends TestCase
         $this->enableAlphaFeatures(['volunteering', 'job_vacancies']);
         $orgId = $this->seedOrganisation(['name' => 'Jobs Parity Org']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/{$orgId}/jobs");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/{$orgId}/jobs");
 
         $res->assertOk();
         $res->assertSee('Jobs Parity Org');
@@ -327,7 +327,7 @@ class OrganisationsParityTest extends TestCase
         $this->enableAlphaFeatures(['volunteering', 'job_vacancies']);
         $orgId = $this->seedOrganisation(['tenant_id' => 999, 'name' => 'Other Tenant Org']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/{$orgId}/jobs");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/{$orgId}/jobs");
 
         $res->assertStatus(404);
     }
@@ -338,7 +338,7 @@ class OrganisationsParityTest extends TestCase
         $this->enableAlphaFeatures(['volunteering', 'job_vacancies']);
         $orgId = $this->seedOrganisation(['name' => 'Pending Jobs Org', 'status' => 'pending']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/{$orgId}/jobs");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/{$orgId}/jobs");
 
         $res->assertStatus(404);
     }
@@ -350,7 +350,7 @@ class OrganisationsParityTest extends TestCase
         $this->disableAlphaFeatures(['job_vacancies']);
         $orgId = $this->seedOrganisation();
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/{$orgId}/jobs");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/{$orgId}/jobs");
 
         $res->assertStatus(403);
     }
@@ -366,7 +366,7 @@ class OrganisationsParityTest extends TestCase
         $orgId = $this->seedOrganisation(['name' => 'Apply Parity Org']);
         $oppId = $this->seedOpportunity($orgId, ['title' => 'Apply Parity Opportunity']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/opportunities/{$oppId}/apply");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/opportunities/{$oppId}/apply");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_organisations.apply.heading'));
@@ -383,7 +383,7 @@ class OrganisationsParityTest extends TestCase
         $orgId = $this->seedOrganisation(['tenant_id' => 999]);
         $oppId = $this->seedOpportunity($orgId, ['tenant_id' => 999]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/opportunities/{$oppId}/apply");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/opportunities/{$oppId}/apply");
 
         $res->assertStatus(404);
     }
@@ -394,9 +394,9 @@ class OrganisationsParityTest extends TestCase
         $orgId = $this->seedOrganisation();
         $oppId = $this->seedOpportunity($orgId);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/organisations/opportunities/{$oppId}/apply");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/organisations/opportunities/{$oppId}/apply");
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/login');
+        $res->assertRedirectContains('/accessible/login');
     }
 }

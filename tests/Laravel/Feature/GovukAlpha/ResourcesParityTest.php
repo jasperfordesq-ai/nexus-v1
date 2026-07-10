@@ -103,10 +103,10 @@ class ResourcesParityTest extends TestCase
     {
         $this->enableAlphaFeatures(['resources']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/library");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/library");
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/login');
+        $res->assertRedirectContains('/accessible/login');
     }
 
     public function test_resources_library_renders_for_authenticated_user(): void
@@ -115,7 +115,7 @@ class ResourcesParityTest extends TestCase
         $this->enableAlphaFeatures(['resources']);
         $this->seedResource(['title' => 'Parity Library Item', 'downloads' => 5]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/library");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/library");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_resources.library.title'));
@@ -130,7 +130,7 @@ class ResourcesParityTest extends TestCase
         $this->enableAlphaFeatures(['resources']);
 
         // Search for something guaranteed to match nothing.
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/library?q=zzz-no-such-resource-zzz");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/library?q=zzz-no-such-resource-zzz");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_resources.empty.tips_title'));
@@ -145,7 +145,7 @@ class ResourcesParityTest extends TestCase
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/library");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/library");
 
         $res->assertStatus(403);
     }
@@ -165,7 +165,7 @@ class ResourcesParityTest extends TestCase
             'created_at' => now(),
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/library");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/library");
 
         $res->assertOk();
         $res->assertSee('Parity Guides');
@@ -181,7 +181,7 @@ class ResourcesParityTest extends TestCase
         $this->authenticatedUser();
         $this->enableAlphaFeatures(['resources']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/upload");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/upload");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_resources.upload.title'));
@@ -194,7 +194,7 @@ class ResourcesParityTest extends TestCase
         $this->authenticatedUser();
         $this->enableAlphaFeatures(['resources']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/upload", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/upload", [
             'title' => '',
         ]);
 
@@ -209,14 +209,14 @@ class ResourcesParityTest extends TestCase
 
         $file = UploadedFile::fake()->createWithContent('notes.txt', "hello world\n");
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/upload", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/upload", [
             'title'       => 'My Uploaded Notes',
             'description' => 'Test upload',
             'file'        => $file,
         ]);
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/resources/library');
+        $res->assertRedirectContains('/accessible/resources/library');
 
         $this->assertDatabaseHas('resources', [
             'tenant_id' => $this->testTenantId,
@@ -235,7 +235,7 @@ class ResourcesParityTest extends TestCase
         $this->enableAlphaFeatures(['resources']);
         $id = $this->seedResource(['user_id' => $owner->id, 'title' => 'Owned Resource']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/{$id}/delete");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/{$id}/delete");
 
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_resources.delete.title'));
@@ -249,7 +249,7 @@ class ResourcesParityTest extends TestCase
         // Owned by user id 1, viewer is a different member.
         $id = $this->seedResource(['user_id' => 999999]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/{$id}/delete");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/{$id}/delete");
 
         $res->assertStatus(403);
     }
@@ -261,7 +261,7 @@ class ResourcesParityTest extends TestCase
         // Resource belongs to a different tenant.
         $id = $this->seedResource(['tenant_id' => 999]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/{$id}/delete");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/{$id}/delete");
 
         $res->assertStatus(404);
     }
@@ -272,10 +272,10 @@ class ResourcesParityTest extends TestCase
         $this->enableAlphaFeatures(['resources']);
         $id = $this->seedResource(['user_id' => $owner->id]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/{$id}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/{$id}/delete");
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/resources/library');
+        $res->assertRedirectContains('/accessible/resources/library');
         $this->assertDatabaseMissing('resources', ['id' => $id]);
     }
 
@@ -285,7 +285,7 @@ class ResourcesParityTest extends TestCase
         $this->enableAlphaFeatures(['resources']);
         $id = $this->seedResource(['user_id' => 999999]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/{$id}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/{$id}/delete");
 
         $res->assertStatus(403);
         $this->assertDatabaseHas('resources', ['id' => $id]);
@@ -297,7 +297,7 @@ class ResourcesParityTest extends TestCase
         $this->enableAlphaFeatures(['resources']);
         $id = $this->seedResource(['user_id' => 999999]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/{$id}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/{$id}/delete");
 
         $res->assertStatus(302);
         $this->assertDatabaseMissing('resources', ['id' => $id]);
@@ -314,7 +314,7 @@ class ResourcesParityTest extends TestCase
         // file_path points at a file that does not exist on disk → 404.
         $id = $this->seedResource(['file_path' => 'does-not-exist-' . uniqid() . '.txt']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/{$id}/download");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/{$id}/download");
 
         $res->assertStatus(404);
     }
@@ -324,10 +324,10 @@ class ResourcesParityTest extends TestCase
         $this->enableAlphaFeatures(['resources']);
         $id = $this->seedResource();
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/resources/{$id}/download");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/resources/{$id}/download");
 
         $res->assertStatus(302);
-        $res->assertRedirectContains('/alpha/login');
+        $res->assertRedirectContains('/accessible/login');
     }
 
     // ---------------------------------------------------------------
@@ -340,7 +340,7 @@ class ResourcesParityTest extends TestCase
         $this->enableAlphaFeatures(['resources']);
         $id = $this->seedResource();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/reorder", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/reorder", [
             'resource_id' => $id,
             'direction'   => 'down',
         ]);
@@ -359,7 +359,7 @@ class ResourcesParityTest extends TestCase
         $second = $this->seedResource(['title' => 'Second', 'sort_order' => 0]);
         // higher id (second) sorts first by id-desc tiebreak.
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/resources/reorder", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/resources/reorder", [
             'resource_id' => $second,
             'direction'   => 'down',
         ]);

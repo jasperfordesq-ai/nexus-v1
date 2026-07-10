@@ -50,12 +50,12 @@ class ListingsParityTest extends TestCase
 
     public function test_listings_analytics_requires_authentication(): void
     {
-        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+        $loginPath = "/{$this->testTenantSlug}/accessible/login";
 
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $listing = $this->createListing((int) $owner->id);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/analytics");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/listings/{$listing->id}/analytics");
         $response->assertRedirect();
         $this->assertStringContainsString($loginPath, $response->headers->get('Location') ?? '');
     }
@@ -69,7 +69,7 @@ class ListingsParityTest extends TestCase
         $owner = $this->authenticatedUser();
         $listing = $this->createListing((int) $owner->id, ['title' => 'Analytics owner listing']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/analytics");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/listings/{$listing->id}/analytics");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_listings.analytics.title'));
@@ -88,7 +88,7 @@ class ListingsParityTest extends TestCase
         // A different, non-admin member cannot see another member's analytics.
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/analytics");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/listings/{$listing->id}/analytics");
         $response->assertForbidden();
     }
 
@@ -96,7 +96,7 @@ class ListingsParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/99999001/analytics");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/listings/99999001/analytics");
         $response->assertNotFound();
     }
 
@@ -113,7 +113,7 @@ class ListingsParityTest extends TestCase
 
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$foreignListing->id}/analytics");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/listings/{$foreignListing->id}/analytics");
         $response->assertNotFound();
     }
 
@@ -123,7 +123,7 @@ class ListingsParityTest extends TestCase
         $listing = $this->createListing((int) $owner->id);
 
         // A valid window renders; the chosen radio is selected.
-        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/analytics?days=7");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/listings/{$listing->id}/analytics?days=7");
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_listings.analytics.period_days', ['count' => 7]));
     }
@@ -134,12 +134,12 @@ class ListingsParityTest extends TestCase
 
     public function test_listings_comments_requires_authentication(): void
     {
-        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+        $loginPath = "/{$this->testTenantSlug}/accessible/login";
 
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $listing = $this->createListing((int) $owner->id);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/comments");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/listings/{$listing->id}/comments");
         $response->assertRedirect();
         $this->assertStringContainsString($loginPath, $response->headers->get('Location') ?? '');
     }
@@ -150,7 +150,7 @@ class ListingsParityTest extends TestCase
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $listing = $this->createListing((int) $owner->id, ['title' => 'Commentable listing']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/comments");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/listings/{$listing->id}/comments");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_listings.comments.heading'));
@@ -163,7 +163,7 @@ class ListingsParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/99999002/comments");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/listings/99999002/comments");
         $response->assertNotFound();
     }
 
@@ -179,7 +179,7 @@ class ListingsParityTest extends TestCase
 
         $this->authenticatedUser();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$foreignListing->id}/comments");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/listings/{$foreignListing->id}/comments");
         $response->assertNotFound();
     }
 
@@ -189,7 +189,7 @@ class ListingsParityTest extends TestCase
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $listing = $this->createListing((int) $owner->id);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/comments", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/listings/{$listing->id}/comments", [
             'body' => 'A genuinely helpful comment about this listing.',
         ]);
 
@@ -210,7 +210,7 @@ class ListingsParityTest extends TestCase
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $listing = $this->createListing((int) $owner->id);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/comments", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/listings/{$listing->id}/comments", [
             'body' => '   ',
         ]);
 
@@ -220,11 +220,11 @@ class ListingsParityTest extends TestCase
 
     public function test_listings_store_comment_requires_authentication(): void
     {
-        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+        $loginPath = "/{$this->testTenantSlug}/accessible/login";
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $listing = $this->createListing((int) $owner->id);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listing->id}/comments", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/listings/{$listing->id}/comments", [
             'body' => 'Should not persist.',
         ]);
 
@@ -243,9 +243,9 @@ class ListingsParityTest extends TestCase
 
     public function test_listings_generate_description_requires_authentication(): void
     {
-        $loginPath = "/{$this->testTenantSlug}/alpha/login";
+        $loginPath = "/{$this->testTenantSlug}/accessible/login";
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/generate-description", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/listings/generate-description", [
             'title' => 'A listing title',
             'type' => 'offer',
         ]);
@@ -258,7 +258,7 @@ class ListingsParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/listings/generate-description", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/listings/generate-description", [
             'title' => '',
             'type' => 'offer',
         ]);
@@ -267,7 +267,7 @@ class ListingsParityTest extends TestCase
         $location = $response->headers->get('Location') ?? '';
         // Empty title cannot produce a suggestion — bounce back to create with the prompt.
         $this->assertStringContainsString('status=ai-title-required', $location);
-        $this->assertStringContainsString("/{$this->testTenantSlug}/alpha/listings/new", $location);
+        $this->assertStringContainsString("/{$this->testTenantSlug}/accessible/listings/new", $location);
     }
 
     // =====================================================================
@@ -279,7 +279,7 @@ class ListingsParityTest extends TestCase
         $owner = $this->authenticatedUser();
         $listing = $this->createListing((int) $owner->id);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/listings/{$listing->id}");
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_listings.detail.delete_button'));
         // Owner-gated delete form posts to the existing delete route.
@@ -292,7 +292,7 @@ class ListingsParityTest extends TestCase
         $owner = $this->authenticatedUser();
         $listing = $this->createListing((int) $owner->id);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listing->id}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/listings/{$listing->id}");
         $response->assertOk();
         $commentsHref = route('govuk-alpha.listings.comments', ['tenantSlug' => $this->testTenantSlug, 'id' => $listing->id]);
         $response->assertSee($commentsHref, false);

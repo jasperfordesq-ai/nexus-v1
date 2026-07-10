@@ -93,7 +93,7 @@ class VolunteeringOrgRosterParityTest extends TestCase
         $this->seedApplication($oppId, $pending->id, 'pending');
 
         Sanctum::actingAs($owner, ['*']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$orgId}/volunteers");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/volunteering/organisations/{$orgId}/volunteers");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_volunteering.org_volunteers.title'));
         $res->assertSee('Approved Annie');
@@ -105,7 +105,7 @@ class VolunteeringOrgRosterParityTest extends TestCase
         $owner = $this->authenticatedUser();
         $orgId = $this->createVolOrg($owner->id, 'Empty Org');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$orgId}/volunteers");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/volunteering/organisations/{$orgId}/volunteers");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_volunteering.org_volunteers.empty'));
     }
@@ -118,7 +118,7 @@ class VolunteeringOrgRosterParityTest extends TestCase
         $stranger = $this->authenticatedUser();
         Sanctum::actingAs($stranger, ['*']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering/organisations/{$orgId}/volunteers");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/volunteering/organisations/{$orgId}/volunteers");
         // The org gate blocks non-managers (403 or a redirect away from the roster).
         $this->assertContains($res->getStatusCode(), [403, 302]);
         if ($res->getStatusCode() === 200) {

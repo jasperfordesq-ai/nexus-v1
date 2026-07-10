@@ -171,7 +171,7 @@ class AccessibleBugfixesParityTest extends TestCase
     {
         $user = $this->authenticatedUser(); // is_verified = true, no id badge
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/profile");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/profile");
 
         $response->assertOk();
         // The email-verified column must NOT light up the green identity tag.
@@ -183,7 +183,7 @@ class AccessibleBugfixesParityTest extends TestCase
         $user = $this->authenticatedUser();
         $this->grantIdVerifiedBadge($user->id);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/profile");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/profile");
 
         $response->assertOk();
         $response->assertSee('govuk-tag govuk-tag--green', false);
@@ -197,7 +197,7 @@ class AccessibleBugfixesParityTest extends TestCase
         $this->authenticatedUser();
         $this->setModule('notifications', true);
 
-        $this->get("/{$this->testTenantSlug}/alpha/notifications")->assertOk();
+        $this->get("/{$this->testTenantSlug}/accessible/notifications")->assertOk();
     }
 
     public function test_notifications_page_403_when_module_disabled(): void
@@ -205,7 +205,7 @@ class AccessibleBugfixesParityTest extends TestCase
         $this->authenticatedUser();
         $this->setModule('notifications', false);
 
-        $this->get("/{$this->testTenantSlug}/alpha/notifications")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/notifications")->assertStatus(403);
     }
 
     public function test_account_hub_hides_notifications_link_when_module_disabled(): void
@@ -213,7 +213,7 @@ class AccessibleBugfixesParityTest extends TestCase
         $this->authenticatedUser();
         $this->setModule('notifications', false);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/account");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/account");
         $response->assertOk();
         $response->assertDontSee(route('govuk-alpha.notifications.index', ['tenantSlug' => $this->testTenantSlug]), false);
     }
@@ -223,7 +223,7 @@ class AccessibleBugfixesParityTest extends TestCase
         $this->authenticatedUser();
         $this->setModule('dashboard', false);
 
-        $this->get("/{$this->testTenantSlug}/alpha/dashboard")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/dashboard")->assertStatus(403);
     }
 
     // ── Bug 3: "exchanges need your attention" banner = exchange workflow ────
@@ -246,7 +246,7 @@ class AccessibleBugfixesParityTest extends TestCase
         // Workflow ON so the silence is genuinely "no actionable exchange", not "workflow off".
         $this->enableExchangeWorkflow();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/dashboard");
         $response->assertOk();
 
         // No banner, and never a link to /reviews or the old exchanges completed tab.
@@ -264,7 +264,7 @@ class AccessibleBugfixesParityTest extends TestCase
         $this->seedExchange($requester->id, $provider->id, 'pending_provider');
         $this->enableExchangeWorkflow();
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/dashboard");
         $response->assertOk();
 
         $response->assertSee('dashboard-reviews-title', false);
@@ -284,7 +284,7 @@ class AccessibleBugfixesParityTest extends TestCase
         $this->seedExchange($requester->id, $provider->id, 'pending_provider');
         // NOTE: exchange workflow left at its default (disabled).
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/dashboard");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/dashboard");
         $response->assertOk();
         $response->assertDontSee('dashboard-reviews-title', false);
     }
@@ -351,7 +351,7 @@ class AccessibleBugfixesParityTest extends TestCase
         $this->authenticatedUser();
         $this->setFeature('gamification', false);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/account");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/account");
         $response->assertOk();
         $response->assertDontSee(route('govuk-alpha.achievements', ['tenantSlug' => $this->testTenantSlug]), false);
         $response->assertDontSee(route('govuk-alpha.leaderboard', ['tenantSlug' => $this->testTenantSlug]), false);

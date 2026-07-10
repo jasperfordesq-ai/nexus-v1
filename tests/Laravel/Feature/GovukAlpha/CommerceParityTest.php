@@ -52,14 +52,14 @@ class CommerceParityTest extends TestCase
     public function test_commerce_create_listing_form_requires_auth(): void
     {
         $this->enableAlphaFeatures(['marketplace']);
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/create")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/create")
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_commerce_create_listing_gated_off_by_default(): void
     {
         $this->authenticatedUser();
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/create")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/create")->assertStatus(403);
     }
 
     public function test_commerce_create_listing_form_renders(): void
@@ -67,7 +67,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Seller One']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/create");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/create");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.listing_form.title_create'));
         $res->assertSee('name="title"', false);
@@ -79,7 +79,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['marketplace']);
         $this->disableMeiliSearch();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/create", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/create", [
             'title' => 'Hand-knitted scarf',
             'description' => 'A warm woollen scarf, barely used.',
             'price_type' => 'free',
@@ -100,7 +100,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Seller Blank']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/create", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/create", [
             'title' => '',
             'description' => '',
             'price_type' => 'free',
@@ -116,12 +116,12 @@ class CommerceParityTest extends TestCase
         $id = $this->seedListing($owner->id);
 
         // Owner can open the edit form.
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/{$id}/edit")->assertOk();
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$id}/edit")->assertOk();
 
         // Another member in the same tenant is forbidden.
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         Sanctum::actingAs($other, ['*']);
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/{$id}/edit")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$id}/edit")->assertStatus(403);
     }
 
     public function test_commerce_update_listing_persists_changes(): void
@@ -131,7 +131,7 @@ class CommerceParityTest extends TestCase
         $this->disableMeiliSearch();
         $id = $this->seedListing($owner->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/{$id}/update", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$id}/update", [
             'title' => 'Updated title',
             'description' => 'Updated description text.',
             'price_type' => 'free',
@@ -149,7 +149,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['marketplace']);
         $id = $this->seedListing($owner->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/{$id}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$id}/delete");
         $res->assertRedirectContains('status=deleted');
 
         TenantContext::reset();
@@ -164,7 +164,7 @@ class CommerceParityTest extends TestCase
         $this->disableMeiliSearch();
         $this->seedListing($owner->id, ['title' => 'My Active Item']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/mine");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/mine");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.my_listings.title'));
         $res->assertSee('My Active Item');
@@ -182,7 +182,7 @@ class CommerceParityTest extends TestCase
         $this->disableMeiliSearch();
         $id = $this->seedListing($owner->id, ['title' => 'Saveable Item']);
 
-        $this->post("/{$this->testTenantSlug}/alpha/marketplace/{$id}/save")
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$id}/save")
             ->assertRedirectContains("/marketplace/{$id}");
 
         TenantContext::reset();
@@ -192,7 +192,7 @@ class CommerceParityTest extends TestCase
             'marketplace_listing_id' => $id,
         ]);
 
-        $saved = $this->get("/{$this->testTenantSlug}/alpha/marketplace/saved");
+        $saved = $this->get("/{$this->testTenantSlug}/accessible/marketplace/saved");
         $saved->assertOk();
         $saved->assertSee('Saveable Item');
     }
@@ -202,7 +202,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Saver 404']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $this->post("/{$this->testTenantSlug}/alpha/marketplace/99999999/save")->assertStatus(404);
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/99999999/save")->assertStatus(404);
     }
 
     public function test_commerce_free_items_page_renders(): void
@@ -213,7 +213,7 @@ class CommerceParityTest extends TestCase
         $this->disableMeiliSearch();
         $this->seedListing($owner->id, ['title' => 'Free Couch', 'price_type' => 'free']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/free");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/free");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.free_items.title'));
     }
@@ -229,7 +229,7 @@ class CommerceParityTest extends TestCase
         $this->disableMeiliSearch();
         $this->seedListing($seller->id, ['title' => 'Sellers Item']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/seller/{$seller->id}");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/seller/{$seller->id}");
         $res->assertOk();
         $res->assertSee('Pat Seller');
         $res->assertSee('Sellers Item');
@@ -239,7 +239,7 @@ class CommerceParityTest extends TestCase
     {
         $this->authenticatedUser();
         $this->enableAlphaFeatures(['marketplace']);
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/seller/99999999")->assertStatus(404);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/seller/99999999")->assertStatus(404);
     }
 
     // ==================================================================
@@ -253,7 +253,7 @@ class CommerceParityTest extends TestCase
         $id = $this->seedListing($owner->id, ['title' => 'Own Item', 'price_type' => 'negotiable']);
 
         // Owner cannot offer on their own listing.
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/{$id}/offer")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$id}/offer")->assertStatus(403);
     }
 
     public function test_commerce_store_offer_creates_offer(): void
@@ -267,7 +267,7 @@ class CommerceParityTest extends TestCase
             'price' => 25.00,
         ]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/{$id}/offer", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$id}/offer", [
             'amount' => '20',
             'message' => 'Would you take twenty?',
         ]);
@@ -289,7 +289,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['marketplace']);
         $id = $this->seedListing($owner->id, ['price_type' => 'negotiable', 'price' => 10.00]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/{$id}/offer", ['amount' => '0']);
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$id}/offer", ['amount' => '0']);
         $res->assertRedirect();
         $res->assertSessionHas('commerceOfferErrors');
     }
@@ -305,7 +305,7 @@ class CommerceParityTest extends TestCase
             'price' => 15.00,
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/{$id}/buy");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$id}/buy");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.buy.title'));
         $res->assertSee('Fixed Price Kettle');
@@ -319,7 +319,7 @@ class CommerceParityTest extends TestCase
         $id = $this->seedListing($owner->id, ['price_type' => 'free']);
 
         // Free listings are not purchasable via buy-now.
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/{$id}/buy")->assertStatus(404);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$id}/buy")->assertStatus(404);
     }
 
     public function test_commerce_report_form_and_submission(): void
@@ -329,11 +329,11 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['marketplace']);
         $id = $this->seedListing($owner->id, ['title' => 'Dodgy Item']);
 
-        $form = $this->get("/{$this->testTenantSlug}/alpha/marketplace/{$id}/report");
+        $form = $this->get("/{$this->testTenantSlug}/accessible/marketplace/{$id}/report");
         $form->assertOk();
         $form->assertSee(__('govuk_alpha_commerce.report.title'));
 
-        $submit = $this->post("/{$this->testTenantSlug}/alpha/marketplace/{$id}/report", [
+        $submit = $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$id}/report", [
             'reason' => 'misleading',
             'description' => 'The description does not match the item shown.',
         ]);
@@ -347,7 +347,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['marketplace']);
         $id = $this->seedListing($owner->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/{$id}/report", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/{$id}/report", [
             'reason' => '',
             'description' => '',
         ]);
@@ -364,7 +364,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Offer Viewer']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/offers");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/offers");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.offers.title'));
     }
@@ -374,7 +374,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Order Viewer']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/orders");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/orders");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.orders_buyer.title'));
     }
@@ -384,7 +384,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Sales Viewer']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/sales");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/sales");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.orders_seller.title'));
     }
@@ -413,7 +413,7 @@ class CommerceParityTest extends TestCase
 
         // A stranger cannot confirm someone else's order.
         $stranger = $this->authenticatedUser(['name' => 'Stranger']);
-        $this->post("/{$this->testTenantSlug}/alpha/marketplace/orders/{$orderId}/confirm")->assertStatus(403);
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/orders/{$orderId}/confirm")->assertStatus(403);
     }
 
     // ==================================================================
@@ -425,7 +425,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Learner Empty']);
         $this->enableAlphaFeatures(['courses']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/mine");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses/mine");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.my_learning.title'));
         $res->assertSee(__('govuk_alpha_commerce.my_learning.empty'));
@@ -439,7 +439,7 @@ class CommerceParityTest extends TestCase
         $courseId = $this->seedCourse($author->id);
 
         // Not enrolled → redirected to the course detail page.
-        $this->get("/{$this->testTenantSlug}/alpha/courses/{$courseId}/learn")
+        $this->get("/{$this->testTenantSlug}/accessible/courses/{$courseId}/learn")
             ->assertRedirectContains("/courses/{$courseId}");
     }
 
@@ -452,7 +452,7 @@ class CommerceParityTest extends TestCase
         $lessonId = $this->seedLesson($courseId);
         $this->seedEnrolment($courseId, $learner->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/{$courseId}/learn");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses/{$courseId}/learn");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.learn.lessons_heading'));
     }
@@ -466,7 +466,7 @@ class CommerceParityTest extends TestCase
         $lessonId = $this->seedLesson($courseId);
         $enrolmentId = $this->seedEnrolment($courseId, $learner->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/{$courseId}/lessons/{$lessonId}/complete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/{$courseId}/lessons/{$lessonId}/complete");
         $res->assertRedirectContains("/courses/{$courseId}/learn");
 
         TenantContext::reset();
@@ -487,7 +487,7 @@ class CommerceParityTest extends TestCase
         $this->seedEnrolment($courseId, $learner->id);
 
         // A lesson id that does not belong to this course → 404.
-        $this->post("/{$this->testTenantSlug}/alpha/courses/{$courseId}/lessons/99999999/complete")
+        $this->post("/{$this->testTenantSlug}/accessible/courses/{$courseId}/lessons/99999999/complete")
             ->assertStatus(404);
     }
 
@@ -512,7 +512,7 @@ class CommerceParityTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/premium");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/premium");
 
         $res->assertOk();
         $res->assertSee('Donate');
@@ -526,7 +526,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'No Sub']);
         $this->enableAlphaFeatures(['member_premium']);
 
-        $this->get("/{$this->testTenantSlug}/alpha/premium/manage")
+        $this->get("/{$this->testTenantSlug}/accessible/premium/manage")
             ->assertRedirectContains('status=no-subscription');
     }
 
@@ -556,7 +556,7 @@ class CommerceParityTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/premium/manage");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/premium/manage");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.premium_manage.title'));
         $res->assertSee('Gold');
@@ -565,7 +565,7 @@ class CommerceParityTest extends TestCase
     public function test_commerce_premium_gated_off_by_default(): void
     {
         $this->authenticatedUser();
-        $this->get("/{$this->testTenantSlug}/alpha/premium/manage")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/premium/manage")->assertStatus(403);
     }
 
     // ==================================================================
@@ -575,14 +575,14 @@ class CommerceParityTest extends TestCase
     public function test_commerce_instructor_courses_requires_auth(): void
     {
         $this->enableAlphaFeatures(['courses']);
-        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/courses/instructor")
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_commerce_instructor_courses_gated_off_by_default(): void
     {
         $this->authenticatedUser();
-        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/courses/instructor")->assertStatus(403);
     }
 
     public function test_commerce_instructor_courses_lists_authored(): void
@@ -591,7 +591,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['courses']);
         $this->seedCourse($user->id, 'My Taught Course');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/instructor");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses/instructor");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.instructor.title'));
         $res->assertSee('My Taught Course');
@@ -602,7 +602,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Teacher Form']);
         $this->enableAlphaFeatures(['courses']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/new");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses/instructor/new");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.instructor.title_create'));
         $res->assertSee('name="title"', false);
@@ -614,7 +614,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['courses']);
         $this->disableMeiliSearch();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/new", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/new", [
             'title' => 'Intro to Timebanking',
             'summary' => 'A short course about timebanking.',
             'level' => 'beginner',
@@ -639,7 +639,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Teacher Blank']);
         $this->enableAlphaFeatures(['courses']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/new", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/new", [
             'title' => '',
         ]);
         $res->assertRedirect();
@@ -653,12 +653,12 @@ class CommerceParityTest extends TestCase
         $id = $this->seedCourse($owner->id, 'Owned Course');
 
         // Owner can open the edit form.
-        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/edit")->assertOk();
+        $this->get("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/edit")->assertOk();
 
         // Another member in the same tenant is forbidden.
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         Sanctum::actingAs($other, ['*']);
-        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/edit")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/edit")->assertStatus(403);
     }
 
     public function test_commerce_edit_course_cross_tenant_404(): void
@@ -682,7 +682,7 @@ class CommerceParityTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$foreignId}/edit")->assertStatus(404);
+        $this->get("/{$this->testTenantSlug}/accessible/courses/instructor/{$foreignId}/edit")->assertStatus(404);
     }
 
     public function test_commerce_update_course_persists_changes(): void
@@ -692,7 +692,7 @@ class CommerceParityTest extends TestCase
         $this->disableMeiliSearch();
         $id = $this->seedCourse($owner->id, 'Before Title');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/update", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/update", [
             'title' => 'After Title',
             'summary' => 'Updated summary.',
             'level' => 'intermediate',
@@ -731,7 +731,7 @@ class CommerceParityTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/publish")->assertRedirect();
+        $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/publish")->assertRedirect();
 
         TenantContext::reset();
         TenantContext::setById($this->testTenantId);
@@ -743,7 +743,7 @@ class CommerceParityTest extends TestCase
         // A non-owner cannot publish.
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         Sanctum::actingAs($other, ['*']);
-        $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/unpublish")->assertStatus(403);
+        $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/unpublish")->assertStatus(403);
     }
 
     public function test_commerce_delete_course_owner_only(): void
@@ -753,7 +753,7 @@ class CommerceParityTest extends TestCase
         $this->disableMeiliSearch();
         $id = $this->seedCourse($owner->id, 'To Delete');
 
-        $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/delete")
+        $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/delete")
             ->assertRedirect();
 
         TenantContext::reset();
@@ -768,7 +768,7 @@ class CommerceParityTest extends TestCase
         $id = $this->seedCourse($owner->id, 'Measured Course');
         $this->seedEnrolment($id, $owner->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/analytics");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/analytics");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.analytics.total_enrollments'));
         $res->assertSee('Measured Course');
@@ -782,7 +782,7 @@ class CommerceParityTest extends TestCase
 
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         Sanctum::actingAs($other, ['*']);
-        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/analytics")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/analytics")->assertStatus(403);
     }
 
     // ==================================================================
@@ -795,7 +795,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['courses']);
         $id = $this->seedCourse($owner->id, 'Buildable Course');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/edit");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/edit");
         $res->assertOk();
         $res->assertSee('name="section_title"', false);
         $res->assertSee('name="lesson_title"', false);
@@ -807,7 +807,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['courses']);
         $id = $this->seedCourse($owner->id, 'Course With Section');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/sections", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/sections", [
             'section_title' => 'Week One',
         ]);
         $res->assertRedirect();
@@ -827,7 +827,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['courses']);
         $id = $this->seedCourse($owner->id, 'No Title Section');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/sections", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/sections", [
             'section_title' => '',
         ]);
         $res->assertRedirect();
@@ -843,7 +843,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['courses']);
         $id = $this->seedCourse($owner->id, 'Course With Lesson');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/lessons", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/lessons", [
             'lesson_title' => 'Introduction',
             'content_type' => 'text',
             'body' => 'Welcome to the course.',
@@ -867,7 +867,7 @@ class CommerceParityTest extends TestCase
         $id = $this->seedCourse($owner->id, 'Course Delete Lesson');
         $lessonId = $this->seedLesson($id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/lessons/{$lessonId}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/lessons/{$lessonId}/delete");
         $res->assertRedirect();
 
         TenantContext::reset();
@@ -883,7 +883,7 @@ class CommerceParityTest extends TestCase
 
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         Sanctum::actingAs($other, ['*']);
-        $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$id}/sections", [
+        $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/{$id}/sections", [
             'section_title' => 'Sneaky',
         ])->assertStatus(403);
     }
@@ -895,8 +895,8 @@ class CommerceParityTest extends TestCase
     public function test_commerce_category_page_requires_auth(): void
     {
         $this->enableAlphaFeatures(['marketplace']);
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/category/some-slug")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/category/some-slug")
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_commerce_category_unknown_slug_404(): void
@@ -905,7 +905,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['marketplace']);
         $this->disableMeiliSearch();
 
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/category/no-such-category-xyz")
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/category/no-such-category-xyz")
             ->assertStatus(404);
     }
 
@@ -918,7 +918,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Pickup Buyer']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/pickups");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/pickups");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.pickups.title'));
     }
@@ -926,8 +926,8 @@ class CommerceParityTest extends TestCase
     public function test_commerce_my_pickups_requires_auth(): void
     {
         $this->enableAlphaFeatures(['marketplace']);
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/pickups")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/pickups")
+            ->assertRedirectContains('/accessible/login');
     }
 
     // ==================================================================
@@ -937,14 +937,14 @@ class CommerceParityTest extends TestCase
     public function test_commerce_seller_pickup_slots_requires_auth(): void
     {
         $this->enableAlphaFeatures(['marketplace']);
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/slots")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/slots")
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_commerce_seller_pickup_slots_gated_off_by_default(): void
     {
         $this->authenticatedUser(['name' => 'Slot Gated']);
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/slots")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/slots")->assertStatus(403);
     }
 
     public function test_commerce_seller_pickup_slots_lists(): void
@@ -954,7 +954,7 @@ class CommerceParityTest extends TestCase
         $profileId = $this->seedSellerProfile($user->id);
         $this->seedPickupSlot($profileId);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/slots");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/slots");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.slots.title'));
         $res->assertSee('name="capacity"', false);
@@ -968,7 +968,7 @@ class CommerceParityTest extends TestCase
         $start = now()->addDay()->format('Y-m-d\TH:i');
         $end = now()->addDay()->addHour()->format('Y-m-d\TH:i');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/slots", [
             'slot_start' => $start,
             'slot_end' => $end,
             'capacity' => '8',
@@ -996,7 +996,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Bad Slot']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/slots", [
             'slot_start' => '',
             'slot_end' => '',
             'capacity' => '5',
@@ -1012,7 +1012,7 @@ class CommerceParityTest extends TestCase
         $profileId = $this->seedSellerProfile($user->id);
         $slotId = $this->seedPickupSlot($profileId);
 
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/slots/{$slotId}/edit")->assertOk();
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/slots/{$slotId}/edit")->assertOk();
     }
 
     public function test_commerce_edit_pickup_slot_cross_seller_404(): void
@@ -1026,7 +1026,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Other Seller']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/slots/{$foreignSlotId}/edit")->assertStatus(404);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/slots/{$foreignSlotId}/edit")->assertStatus(404);
     }
 
     public function test_commerce_update_pickup_slot_persists_changes(): void
@@ -1039,7 +1039,7 @@ class CommerceParityTest extends TestCase
         $start = now()->addDays(2)->format('Y-m-d\TH:i');
         $end = now()->addDays(2)->addHours(2)->format('Y-m-d\TH:i');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots/{$slotId}/update", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/slots/{$slotId}/update", [
             'slot_start' => $start,
             'slot_end' => $end,
             'capacity' => '12',
@@ -1064,7 +1064,7 @@ class CommerceParityTest extends TestCase
         $profileId = $this->seedSellerProfile($user->id);
         $slotId = $this->seedPickupSlot($profileId);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots/{$slotId}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/slots/{$slotId}/delete");
         $res->assertRedirect();
 
         TenantContext::reset();
@@ -1079,14 +1079,14 @@ class CommerceParityTest extends TestCase
     public function test_commerce_course_grading_requires_auth(): void
     {
         $this->enableAlphaFeatures(['courses']);
-        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/1/grading")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/courses/instructor/1/grading")
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_commerce_course_grading_gated_off_by_default(): void
     {
         $this->authenticatedUser(['name' => 'Grading Gated']);
-        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/1/grading")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/courses/instructor/1/grading")->assertStatus(403);
     }
 
     public function test_commerce_course_grading_owner_only(): void
@@ -1095,11 +1095,11 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['courses']);
         $courseId = $this->seedCourse($owner->id, 'Gradable Course');
 
-        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$courseId}/grading")->assertOk();
+        $this->get("/{$this->testTenantSlug}/accessible/courses/instructor/{$courseId}/grading")->assertOk();
 
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         Sanctum::actingAs($other, ['*']);
-        $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$courseId}/grading")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/courses/instructor/{$courseId}/grading")->assertStatus(403);
     }
 
     public function test_commerce_course_grading_lists_pending(): void
@@ -1111,7 +1111,7 @@ class CommerceParityTest extends TestCase
         $learner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Learner Smith']);
         $this->seedQuizAttempt($quizId, $learner->id, 'pending_review');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/courses/instructor/{$courseId}/grading");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/courses/instructor/{$courseId}/grading");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.grading.title'));
         $res->assertSee('Learner Smith');
@@ -1126,7 +1126,7 @@ class CommerceParityTest extends TestCase
         $learner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $attemptId = $this->seedQuizAttempt($quizId, $learner->id, 'pending_review');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$courseId}/grading/{$attemptId}", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/{$courseId}/grading/{$attemptId}", [
             'score_percent' => '85',
             'passed' => '1',
             'feedback' => 'Good work, minor improvements needed.',
@@ -1154,7 +1154,7 @@ class CommerceParityTest extends TestCase
         $attemptB = $this->seedQuizAttempt($quizB, $learner->id, 'pending_review');
 
         // Attempt belongs to Course B, but we grade it via Course A → 404.
-        $this->post("/{$this->testTenantSlug}/alpha/courses/instructor/{$courseA}/grading/{$attemptB}", [
+        $this->post("/{$this->testTenantSlug}/accessible/courses/instructor/{$courseA}/grading/{$attemptB}", [
             'score_percent' => '50',
             'passed' => '0',
         ])->assertStatus(404);
@@ -1169,7 +1169,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'New Seller']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/onboarding");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/onboarding");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.onboarding.title'));
         $res->assertSee('name="display_name"', false);
@@ -1180,7 +1180,7 @@ class CommerceParityTest extends TestCase
         $user = $this->authenticatedUser(['name' => 'Onboarding Seller']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/onboarding", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/onboarding", [
             'seller_type' => 'business',
             'business_name' => 'Acme Crafts',
             'display_name' => 'Acme',
@@ -1202,7 +1202,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Blank Onboarding']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/onboarding", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/onboarding", [
             'seller_type' => 'private',
             'display_name' => '',
         ]);
@@ -1219,7 +1219,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Coupon Gated']);
         // marketplace on but merchant_coupons off → 403
         $this->enableAlphaFeatures(['marketplace']);
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/coupons")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/coupons")->assertStatus(403);
     }
 
     public function test_commerce_seller_coupons_requires_seller_profile(): void
@@ -1227,7 +1227,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'No Profile Coupon']);
         $this->enableAlphaFeatures(['marketplace', 'merchant_coupons']);
         // No seller profile → 403
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/coupons")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/coupons")->assertStatus(403);
     }
 
     public function test_commerce_seller_coupons_lists_for_seller(): void
@@ -1236,7 +1236,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['marketplace', 'merchant_coupons']);
         $this->seedSellerProfile($user->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/coupons");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/coupons");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.coupons.title'));
     }
@@ -1247,7 +1247,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['marketplace', 'merchant_coupons']);
         $profileId = $this->seedSellerProfile($user->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/coupons/new", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/coupons/new", [
             'title' => 'Spring Sale',
             'code' => 'SPRING10',
             'discount_type' => 'percent',
@@ -1272,7 +1272,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['marketplace', 'merchant_coupons']);
         $this->seedSellerProfile($user->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/coupons/new", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/coupons/new", [
             'title' => '',
             'discount_type' => 'percent',
             'discount_value' => '10',
@@ -1306,7 +1306,7 @@ class CommerceParityTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $this->get("/{$this->testTenantSlug}/alpha/marketplace/coupons/{$couponId}/edit")->assertStatus(404);
+        $this->get("/{$this->testTenantSlug}/accessible/marketplace/coupons/{$couponId}/edit")->assertStatus(404);
     }
 
     public function test_commerce_delete_coupon_removes_it(): void
@@ -1329,7 +1329,7 @@ class CommerceParityTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/marketplace/coupons/{$couponId}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/marketplace/coupons/{$couponId}/delete");
         $res->assertRedirect();
 
         TenantContext::reset();
@@ -1344,8 +1344,8 @@ class CommerceParityTest extends TestCase
     public function test_commerce_podcast_studio_requires_auth(): void
     {
         $this->enableAlphaFeatures(['podcasts']);
-        $this->get("/{$this->testTenantSlug}/alpha/podcasts/studio")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio")
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_commerce_podcast_studio_renders_for_authoring_member(): void
@@ -1357,7 +1357,7 @@ class CommerceParityTest extends TestCase
         // exercised by the requires_auth test and the controller abort_unless.)
         $this->enableAlphaFeatures(['podcasts']);
         $this->authenticatedUser(['name' => 'Podcaster']);
-        $this->get("/{$this->testTenantSlug}/alpha/podcasts/studio")->assertOk();
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio")->assertOk();
     }
 
     public function test_commerce_podcast_studio_renders(): void
@@ -1365,7 +1365,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Podcaster']);
         $this->enableAlphaFeatures(['podcasts']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/podcasts/studio");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.podcast_studio.title'));
     }
@@ -1375,7 +1375,7 @@ class CommerceParityTest extends TestCase
         $user = $this->authenticatedUser(['name' => 'Show Creator']);
         $this->enableAlphaFeatures(['podcasts']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/podcasts/studio/new", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/podcasts/studio/new", [
             'title' => 'Community Voices',
             'summary' => 'Stories from our timebank.',
             'visibility' => 'public',
@@ -1397,7 +1397,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Blank Show']);
         $this->enableAlphaFeatures(['podcasts']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/podcasts/studio/new", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/podcasts/studio/new", [
             'title' => '',
         ]);
         $res->assertRedirect();
@@ -1410,11 +1410,11 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['podcasts']);
         $showId = $this->seedPodcastShow($owner->id, 'Owned Show');
 
-        $this->get("/{$this->testTenantSlug}/alpha/podcasts/studio/{$showId}")->assertOk();
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/{$showId}")->assertOk();
 
         $other = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         Sanctum::actingAs($other, ['*']);
-        $this->get("/{$this->testTenantSlug}/alpha/podcasts/studio/{$showId}")->assertStatus(403);
+        $this->get("/{$this->testTenantSlug}/accessible/podcasts/studio/{$showId}")->assertStatus(403);
     }
 
     public function test_commerce_store_podcast_episode_persists(): void
@@ -1423,7 +1423,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['podcasts']);
         $showId = $this->seedPodcastShow($owner->id, 'Show With Episode');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/podcasts/studio/{$showId}/episodes", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/podcasts/studio/{$showId}/episodes", [
             'episode_title' => 'Episode One',
             'audio_url' => 'https://example.com/audio/ep1.mp3',
         ]);
@@ -1444,7 +1444,7 @@ class CommerceParityTest extends TestCase
         $this->enableAlphaFeatures(['podcasts']);
         $showId = $this->seedPodcastShow($owner->id, 'Show No Audio');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/podcasts/studio/{$showId}/episodes", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/podcasts/studio/{$showId}/episodes", [
             'episode_title' => 'Episode Without Audio',
         ]);
         $res->assertRedirect();
@@ -1466,7 +1466,7 @@ class CommerceParityTest extends TestCase
         $foreignEpisodeId = $this->seedPodcastEpisode($otherShowId, $owner->id);
 
         // Episode belongs to Show B, but we ask via Show A → 404.
-        $this->post("/{$this->testTenantSlug}/alpha/podcasts/studio/{$showId}/episodes/{$foreignEpisodeId}/delete")
+        $this->post("/{$this->testTenantSlug}/accessible/podcasts/studio/{$showId}/episodes/{$foreignEpisodeId}/delete")
             ->assertStatus(404);
     }
 
@@ -1649,7 +1649,7 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser(['name' => 'Slot Seller']);
         $this->enableAlphaFeatures(['marketplace']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/marketplace/slots");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/marketplace/slots");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_commerce.slots.scan_heading'));
         $res->assertSee(route('govuk-alpha.marketplace.slots.scan', ['tenantSlug' => $this->testTenantSlug]), false);
@@ -1659,8 +1659,8 @@ class CommerceParityTest extends TestCase
     public function test_commerce_pickup_scan_requires_auth(): void
     {
         $this->enableAlphaFeatures(['marketplace']);
-        $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots/scan", ['qr_code' => 'ABC123'])
-            ->assertRedirectContains('/alpha/login');
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/slots/scan", ['qr_code' => 'ABC123'])
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_commerce_pickup_scan_empty_code_redirects_with_failure(): void
@@ -1668,8 +1668,8 @@ class CommerceParityTest extends TestCase
         $this->authenticatedUser();
         $this->enableAlphaFeatures(['marketplace']);
 
-        $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots/scan", ['qr_code' => '  '])
-            ->assertRedirect("/{$this->testTenantSlug}/alpha/marketplace/slots?status=pickup-scan-failed");
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/slots/scan", ['qr_code' => '  '])
+            ->assertRedirect("/{$this->testTenantSlug}/accessible/marketplace/slots?status=pickup-scan-failed");
     }
 
     public function test_commerce_pickup_scan_invalid_code_redirects_with_failure(): void
@@ -1679,8 +1679,8 @@ class CommerceParityTest extends TestCase
 
         // An unknown code is rejected by MarketplacePickupSlotService::scanQr
         // (DomainException) and surfaced as the failure status, not a 500.
-        $this->post("/{$this->testTenantSlug}/alpha/marketplace/slots/scan", ['qr_code' => 'NOPE-NOT-A-REAL-CODE'])
-            ->assertRedirect("/{$this->testTenantSlug}/alpha/marketplace/slots?status=pickup-scan-failed");
+        $this->post("/{$this->testTenantSlug}/accessible/marketplace/slots/scan", ['qr_code' => 'NOPE-NOT-A-REAL-CODE'])
+            ->assertRedirect("/{$this->testTenantSlug}/accessible/marketplace/slots?status=pickup-scan-failed");
     }
 
     private function enableAlphaFeatures(array $features): void

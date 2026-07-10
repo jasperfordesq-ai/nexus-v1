@@ -15,7 +15,7 @@
 | **Controller** | `app/Http/Controllers/GovukAlpha/AlphaController.php` (composed via `Concerns/` traits) |
 | **Routes** | `routes/govuk-alpha.php` + `routes/govuk-alpha-parity/*.php` (glob-loaded) |
 | **Translations** | `lang/en/govuk_alpha.php` and per-module `lang/en/govuk_alpha_*.php` files |
-| **URL pattern** | `/{tenantSlug}/alpha/...` (named prefix `govuk-alpha.`) |
+| **URL pattern** | `/{tenantSlug}/accessible/...` (named prefix `govuk-alpha.`; legacy `/alpha` URLs 301/308-redirect) |
 | **Public subdomain** | `accessible.project-nexus.ie` |
 | **Deployment target** | Laravel/PHP blue-green container (not the React container) |
 
@@ -186,7 +186,7 @@ lang/en/
 
 1. **Controller logic** — add a new `Concerns/YourModuleParity.php` trait. Use the module-prefixed method-name convention (`yourModuleIndex`, `yourModuleShow`, etc.). Compose it into `AlphaController` with `use Concerns\YourModuleParity;`.
 
-2. **Routes** — add `routes/govuk-alpha-parity/yourmodule.php`. It is loaded automatically by the glob inside the `{tenantSlug}/alpha` route group and inherits its prefix and middleware. Register static segments before wildcards within the file.
+2. **Routes** — add `routes/govuk-alpha-parity/yourmodule.php`. It is loaded automatically by the glob inside the `{tenantSlug}/accessible` route group and inherits its prefix and middleware. Register static segments before wildcards within the file.
 
 3. **Views** — add `accessible-frontend/views/yourmodule.blade.php` (and partials as needed). Extend the layout:
 

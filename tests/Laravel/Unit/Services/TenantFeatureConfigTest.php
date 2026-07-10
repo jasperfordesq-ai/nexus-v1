@@ -100,7 +100,7 @@ class TenantFeatureConfigTest extends TestCase
 
     public function test_core_modules_default_enabled(): void
     {
-        // Core modules are always-on; opt-in/alpha features (caring_community,
+        // Core modules are always-on; opt-in/accessible features (caring_community,
         // marketplace, courses, etc.) intentionally default to false.
         foreach (TenantFeatureConfig::MODULE_DEFAULTS as $key => $value) {
             $this->assertTrue($value, "Module default for '{$key}' should be true");

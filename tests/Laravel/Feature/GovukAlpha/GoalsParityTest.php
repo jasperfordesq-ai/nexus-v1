@@ -106,8 +106,8 @@ class GoalsParityTest extends TestCase
         $owner = $this->makeUser(['name' => 'Insights Owner Anon']);
         $goalId = $this->seedGoal($owner->id);
 
-        $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/insights")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/insights")
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_goals_insights_renders_for_owner(): void
@@ -115,7 +115,7 @@ class GoalsParityTest extends TestCase
         $owner = $this->authenticatedUser(['name' => 'Insights Owner']);
         $goalId = $this->seedGoal($owner->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/insights");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/insights");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_goals.insights.title'));
         $res->assertSee(__('govuk_alpha_goals.insights.current_streak'));
@@ -128,14 +128,14 @@ class GoalsParityTest extends TestCase
         $goalId = $this->seedGoal($owner->id, ['is_public' => false]);
 
         $this->authenticatedUser(['name' => 'Insights Stranger']);
-        $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/insights")
+        $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/insights")
             ->assertStatus(403);
     }
 
     public function test_goals_insights_404_for_unknown_goal(): void
     {
         $this->authenticatedUser(['name' => 'Insights Missing']);
-        $this->get("/{$this->testTenantSlug}/alpha/goals/99999001/insights")
+        $this->get("/{$this->testTenantSlug}/accessible/goals/99999001/insights")
             ->assertStatus(404);
     }
 
@@ -148,7 +148,7 @@ class GoalsParityTest extends TestCase
         $owner = $this->authenticatedUser(['name' => 'Checkin Owner']);
         $goalId = $this->seedGoal($owner->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/checkin");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/checkin");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_goals.checkin.title'));
         $res->assertSee(__('govuk_alpha_goals.checkin.mood_legend'));
@@ -162,7 +162,7 @@ class GoalsParityTest extends TestCase
 
         // A public goal is viewable, but only the owner may log a check-in.
         $this->authenticatedUser(['name' => 'Checkin Stranger']);
-        $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/checkin")
+        $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/checkin")
             ->assertStatus(403);
     }
 
@@ -171,7 +171,7 @@ class GoalsParityTest extends TestCase
         $owner = $this->authenticatedUser(['name' => 'Checkin Saver']);
         $goalId = $this->seedGoal($owner->id, ['target_value' => 100, 'current_value' => 0]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/checkin", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/goals/{$goalId}/checkin", [
             'progress_percent' => 40,
             'mood' => 'motivated',
             'note' => 'Halfway-ish, feeling good',
@@ -196,7 +196,7 @@ class GoalsParityTest extends TestCase
         $goalId = $this->seedGoal($owner->id, ['is_public' => true]);
 
         $this->authenticatedUser(['name' => 'Checkin POST Stranger']);
-        $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/checkin", [
+        $this->post("/{$this->testTenantSlug}/accessible/goals/{$goalId}/checkin", [
             'progress_percent' => 50,
         ])->assertStatus(403);
     }
@@ -210,7 +210,7 @@ class GoalsParityTest extends TestCase
         $owner = $this->authenticatedUser(['name' => 'Reminder Owner']);
         $goalId = $this->seedGoal($owner->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/reminder");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/reminder");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_goals.reminder.title'));
         $res->assertSee(__('govuk_alpha_goals.reminder.frequency_legend'));
@@ -221,7 +221,7 @@ class GoalsParityTest extends TestCase
         $owner = $this->authenticatedUser(['name' => 'Reminder Saver']);
         $goalId = $this->seedGoal($owner->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/reminder", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/goals/{$goalId}/reminder", [
             'frequency' => 'daily',
             'enabled' => '1',
         ]);
@@ -252,7 +252,7 @@ class GoalsParityTest extends TestCase
         TenantContext::setById($this->testTenantId);
         $this->assertDatabaseHas('goal_reminders', ['goal_id' => $goalId, 'user_id' => $owner->id]);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/reminder/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/goals/{$goalId}/reminder/delete");
         $res->assertRedirect();
         $res->assertRedirectContains('status=reminder-removed');
 
@@ -273,7 +273,7 @@ class GoalsParityTest extends TestCase
         $buddy = $this->authenticatedUser(['name' => 'The Buddy']);
         $this->assignBuddy($goalId, $buddy->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/buddy-actions");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/buddy-actions");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_goals.buddy.title'));
         $res->assertSee(__('govuk_alpha_goals.buddy_type.offer_help'));
@@ -287,7 +287,7 @@ class GoalsParityTest extends TestCase
 
         // A signed-in member who is not the buddy is forbidden.
         $this->authenticatedUser(['name' => 'Not The Buddy']);
-        $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/buddy-actions")
+        $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/buddy-actions")
             ->assertStatus(403);
     }
 
@@ -299,7 +299,7 @@ class GoalsParityTest extends TestCase
         $buddy = $this->authenticatedUser(['name' => 'Note Buddy']);
         $this->assignBuddy($goalId, $buddy->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/buddy-actions", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/goals/{$goalId}/buddy-actions", [
             'type' => 'offer_help',
             'message' => 'Happy to walk with you on Saturday',
         ]);
@@ -323,7 +323,7 @@ class GoalsParityTest extends TestCase
 
         // No buddy assigned → createBuddyNote returns null → failure status.
         $this->authenticatedUser(['name' => 'Reject Buddy']);
-        $res = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/buddy-actions", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/goals/{$goalId}/buddy-actions", [
             'type' => 'nudge',
         ]);
         $res->assertRedirect();
@@ -339,8 +339,8 @@ class GoalsParityTest extends TestCase
         $owner = $this->makeUser(['name' => 'Social Owner Anon']);
         $goalId = $this->seedGoal($owner->id, ['is_public' => true]);
 
-        $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/social")
-            ->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/social")
+            ->assertRedirectContains('/accessible/login');
     }
 
     public function test_goals_social_renders_for_owner(): void
@@ -348,7 +348,7 @@ class GoalsParityTest extends TestCase
         $owner = $this->authenticatedUser(['name' => 'Social Owner']);
         $goalId = $this->seedGoal($owner->id);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/social");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/social");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_goals.social.title'));
         $res->assertSee(__('govuk_alpha_goals.social.likes_heading'));
@@ -362,14 +362,14 @@ class GoalsParityTest extends TestCase
         $goalId = $this->seedGoal($owner->id, ['is_public' => false]);
 
         $this->authenticatedUser(['name' => 'Social Stranger']);
-        $this->get("/{$this->testTenantSlug}/alpha/goals/{$goalId}/social")
+        $this->get("/{$this->testTenantSlug}/accessible/goals/{$goalId}/social")
             ->assertStatus(403);
     }
 
     public function test_goals_social_404_for_unknown_goal(): void
     {
         $this->authenticatedUser(['name' => 'Social Ghost']);
-        $this->get("/{$this->testTenantSlug}/alpha/goals/99999999/social")
+        $this->get("/{$this->testTenantSlug}/accessible/goals/99999999/social")
             ->assertStatus(404);
     }
 
@@ -381,7 +381,7 @@ class GoalsParityTest extends TestCase
         $liker = $this->authenticatedUser(['name' => 'Goal Liker']);
 
         // First toggle = like.
-        $res = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/like");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/goals/{$goalId}/like");
         $res->assertRedirect();
         $res->assertRedirectContains('status=liked');
 
@@ -395,7 +395,7 @@ class GoalsParityTest extends TestCase
         ]);
 
         // Second toggle = unlike.
-        $res = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/like");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/goals/{$goalId}/like");
         $res->assertRedirect();
         $res->assertRedirectContains('status=unliked');
 
@@ -415,7 +415,7 @@ class GoalsParityTest extends TestCase
 
         $commenter = $this->authenticatedUser(['name' => 'Goal Commenter']);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/comments", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/goals/{$goalId}/comments", [
             'body' => 'Brilliant goal, keep it up!',
         ]);
         $res->assertRedirect();
@@ -436,7 +436,7 @@ class GoalsParityTest extends TestCase
         $owner = $this->authenticatedUser(['name' => 'Empty Comment Owner']);
         $goalId = $this->seedGoal($owner->id);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/comments", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/goals/{$goalId}/comments", [
             'body' => '   ',
         ]);
         $res->assertRedirect();
@@ -462,7 +462,7 @@ class GoalsParityTest extends TestCase
         $commentId = (int) ($result['comment']['id'] ?? 0);
         $this->assertGreaterThan(0, $commentId);
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/comments/{$commentId}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/goals/{$goalId}/comments/{$commentId}/delete");
         $res->assertRedirect();
         $res->assertRedirectContains('status=comment-deleted');
 
@@ -493,7 +493,7 @@ class GoalsParityTest extends TestCase
 
         // A different member tries to delete it → service returns 0 → failure.
         $this->authenticatedUser(['name' => 'Comment Thief']);
-        $res = $this->post("/{$this->testTenantSlug}/alpha/goals/{$goalId}/comments/{$commentId}/delete");
+        $res = $this->post("/{$this->testTenantSlug}/accessible/goals/{$goalId}/comments/{$commentId}/delete");
         $res->assertRedirect();
         $res->assertRedirectContains('status=comment-delete-failed');
 

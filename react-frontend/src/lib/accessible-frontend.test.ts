@@ -7,21 +7,21 @@ import { describe, expect, it } from 'vitest';
 import { buildAccessibleFrontendUrl } from './accessible-frontend';
 
 describe('buildAccessibleFrontendUrl', () => {
-  it('builds the public tenant alpha home URL', () => {
+  it('builds the public tenant accessible home URL', () => {
     expect(buildAccessibleFrontendUrl('hour-timebank')).toBe(
-      'https://accessible.project-nexus.ie/hour-timebank/alpha',
+      'https://accessible.project-nexus.ie/hour-timebank/accessible',
     );
   });
 
   it('trims a configured base URL before adding the tenant path', () => {
     expect(buildAccessibleFrontendUrl('hour-timebank', '/', 'https://example.test/')).toBe(
-      'https://example.test/hour-timebank/alpha',
+      'https://example.test/hour-timebank/accessible',
     );
   });
 
-  it('appends accessible frontend subpaths under the tenant alpha namespace', () => {
+  it('appends accessible frontend subpaths under the tenant accessible namespace', () => {
     expect(buildAccessibleFrontendUrl('hour-timebank', '/listings', 'https://example.test')).toBe(
-      'https://example.test/hour-timebank/alpha/listings',
+      'https://example.test/hour-timebank/accessible/listings',
     );
   });
 
@@ -36,10 +36,10 @@ describe('buildAccessibleFrontendUrl', () => {
     ).toBe('https://accessible.example.org');
   });
 
-  it('appends subpaths on the accessible custom domain under the /alpha namespace', () => {
+  it('appends subpaths on the accessible custom domain as bare slug-less paths', () => {
     expect(
       buildAccessibleFrontendUrl('hour-timebank', '/listings', undefined, 'accessible.example.org'),
-    ).toBe('https://accessible.example.org/alpha/listings');
+    ).toBe('https://accessible.example.org/listings');
   });
 
   it('strips scheme and trailing slash from a configured accessible domain', () => {

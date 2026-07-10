@@ -101,7 +101,7 @@ class MediumGapsBatchAParityTest extends TestCase
         $this->seedGroup($owner->id, 'Public Garden Club', 'public');
         $this->seedGroup($owner->id, 'Private Inner Circle', 'private');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/groups?filter=private");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/groups?filter=private");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.groups.filter_label'));
         $res->assertSee('Private Inner Circle');
@@ -118,7 +118,7 @@ class MediumGapsBatchAParityTest extends TestCase
         $this->seedPoll($viewer->id, 'My Own Poll Question', 'governance');
         $this->seedPoll($other->id, 'Someone Elses Poll', 'social');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/polls?mine=1");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/polls?mine=1");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.polls.my_polls_label'));
         $res->assertSee('My Own Poll Question');
@@ -131,7 +131,7 @@ class MediumGapsBatchAParityTest extends TestCase
         $viewer = $this->authenticatedUser();
         $this->seedPoll($viewer->id, 'Governance Poll', 'governance');
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/polls");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/polls");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.polls.category_label'));
         $res->assertSee('governance');
@@ -142,7 +142,7 @@ class MediumGapsBatchAParityTest extends TestCase
         $this->enableFeatures(['group_exchanges']);
         $this->authenticatedUser();
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/group-exchanges");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/group-exchanges");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.group_exchanges.filter_all'));
         $res->assertSee('state=active', false);
@@ -153,7 +153,7 @@ class MediumGapsBatchAParityTest extends TestCase
         $this->enableModule('wallet');
         $this->authenticatedUser();
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/wallet");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/wallet");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.wallet.balance_label'));
     }

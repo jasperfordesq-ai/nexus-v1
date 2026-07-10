@@ -54,9 +54,9 @@ class SavedCollectionsParityTest extends TestCase
 
     public function test_saved_my_collections_requires_authentication(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/me/collections");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/me/collections");
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_saved_my_collections_renders_owned_collections(): void
@@ -66,7 +66,7 @@ class SavedCollectionsParityTest extends TestCase
         $colId = $this->seedCollection($me->id, ['name' => 'Skills to learn', 'description' => 'A reading list', 'is_public' => true, 'items_count' => 3]);
         $this->seedCollection($me->id, ['name' => 'Private stash', 'is_public' => false]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/me/collections");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/me/collections");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_saved.collections.title'));
@@ -80,7 +80,7 @@ class SavedCollectionsParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'Empty Collector']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/me/collections");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/me/collections");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_saved.collections.empty_title'));
@@ -91,7 +91,7 @@ class SavedCollectionsParityTest extends TestCase
     {
         $me = $this->authenticatedUser(['name' => 'Maker Me']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/me/collections", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/me/collections", [
             'name' => 'Brand new list',
             'description' => 'Things I want to do',
             'is_public' => '1',
@@ -117,7 +117,7 @@ class SavedCollectionsParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'No Name Me']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/me/collections", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/me/collections", [
             'name' => '   ',
         ]);
 
@@ -137,7 +137,7 @@ class SavedCollectionsParityTest extends TestCase
         $colId = $this->seedCollection($me->id, ['name' => 'Saved listings', 'items_count' => 1]);
         $this->seedItem($colId, $me->id, ['item_type' => 'listing', 'item_id' => 123, 'note' => 'Looks useful']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/me/collections/{$colId}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/me/collections/{$colId}");
 
         $response->assertOk();
         $response->assertSee('Saved listings');
@@ -151,7 +151,7 @@ class SavedCollectionsParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'Detail 404']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/me/collections/99999999");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/me/collections/99999999");
 
         $response->assertNotFound();
     }
@@ -164,7 +164,7 @@ class SavedCollectionsParityTest extends TestCase
         // A different, authenticated user tries to view the private collection.
         $this->authenticatedUser(['name' => 'Nosy Viewer']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/me/collections/{$colId}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/me/collections/{$colId}");
 
         $response->assertForbidden();
     }
@@ -176,7 +176,7 @@ class SavedCollectionsParityTest extends TestCase
 
         $this->authenticatedUser(['name' => 'Other Viewer']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/me/collections/{$colId}");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/me/collections/{$colId}");
 
         $response->assertOk();
         $response->assertSee('Shared picks');
@@ -190,7 +190,7 @@ class SavedCollectionsParityTest extends TestCase
         $colId = $this->seedCollection($me->id, ['name' => 'Trim me', 'items_count' => 1]);
         $itemId = $this->seedItem($colId, $me->id, ['item_type' => 'event', 'item_id' => 55]);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/me/collections/{$colId}/items/{$itemId}/remove");
+        $response = $this->post("/{$this->testTenantSlug}/accessible/me/collections/{$colId}/items/{$itemId}/remove");
 
         $response->assertRedirect(route('govuk-alpha.saved.collection-detail', [
             'tenantSlug' => $this->testTenantSlug,
@@ -206,7 +206,7 @@ class SavedCollectionsParityTest extends TestCase
         $me = $this->authenticatedUser(['name' => 'Editor Me']);
         $colId = $this->seedCollection($me->id, ['name' => 'Old name', 'is_public' => false]);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/me/collections/{$colId}/update", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/me/collections/{$colId}/update", [
             'name' => 'New name',
             'description' => 'Updated description',
             'is_public' => '1',
@@ -235,7 +235,7 @@ class SavedCollectionsParityTest extends TestCase
 
         $this->authenticatedUser(['name' => 'Hijacker']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/me/collections/{$colId}/update", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/me/collections/{$colId}/update", [
             'name' => 'Hijacked',
         ]);
 
@@ -247,7 +247,7 @@ class SavedCollectionsParityTest extends TestCase
         $me = $this->authenticatedUser(['name' => 'Deleter Me']);
         $colId = $this->seedCollection($me->id, ['name' => 'Bin me']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/me/collections/{$colId}/delete");
+        $response = $this->post("/{$this->testTenantSlug}/accessible/me/collections/{$colId}/delete");
 
         $response->assertRedirect(route('govuk-alpha.saved.collections', [
             'tenantSlug' => $this->testTenantSlug,
@@ -265,9 +265,9 @@ class SavedCollectionsParityTest extends TestCase
     {
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/users/{$owner->id}/collections");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/users/{$owner->id}/collections");
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_saved_public_collections_shows_only_public(): void
@@ -278,7 +278,7 @@ class SavedCollectionsParityTest extends TestCase
 
         $this->authenticatedUser(['name' => 'Public Viewer']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/users/{$owner->id}/collections");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/users/{$owner->id}/collections");
 
         $response->assertOk();
         $response->assertSee('Visible to all');
@@ -289,7 +289,7 @@ class SavedCollectionsParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'Pub 404']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/users/99999999/collections");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/users/99999999/collections");
 
         $response->assertNotFound();
     }
@@ -302,9 +302,9 @@ class SavedCollectionsParityTest extends TestCase
     {
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/users/{$owner->id}/appreciations");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/users/{$owner->id}/appreciations");
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_saved_appreciation_wall_renders_public_notes(): void
@@ -315,7 +315,7 @@ class SavedCollectionsParityTest extends TestCase
 
         $this->authenticatedUser(['name' => 'Wall Viewer']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/users/{$owner->id}/appreciations");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/users/{$owner->id}/appreciations");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_saved.wall.heading', ['name' => 'Wall Owner']));
@@ -331,7 +331,7 @@ class SavedCollectionsParityTest extends TestCase
     {
         $me = $this->authenticatedUser(['name' => 'Self Wall']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/users/{$me->id}/appreciations");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/users/{$me->id}/appreciations");
 
         $response->assertOk();
         $response->assertDontSee(__('govuk_alpha_saved.send.submit'));
@@ -341,7 +341,7 @@ class SavedCollectionsParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'Wall 404']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/users/99999999/appreciations");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/users/99999999/appreciations");
 
         $response->assertNotFound();
     }
@@ -351,7 +351,7 @@ class SavedCollectionsParityTest extends TestCase
         $me = $this->authenticatedUser(['name' => 'Sender Me']);
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true, 'name' => 'Recipient']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/users/{$owner->id}/appreciations", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/users/{$owner->id}/appreciations", [
             'message' => 'You were brilliant, thank you so much',
             'is_public' => '1',
         ]);
@@ -378,7 +378,7 @@ class SavedCollectionsParityTest extends TestCase
         $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $this->authenticatedUser(['name' => 'Blank Sender']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/users/{$owner->id}/appreciations", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/users/{$owner->id}/appreciations", [
             'message' => '   ',
         ]);
 
@@ -393,7 +393,7 @@ class SavedCollectionsParityTest extends TestCase
     {
         $me = $this->authenticatedUser(['name' => 'Self Sender']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/users/{$me->id}/appreciations", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/users/{$me->id}/appreciations", [
             'message' => 'Thanking myself',
         ]);
 
@@ -418,7 +418,7 @@ class SavedCollectionsParityTest extends TestCase
         $sender = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active', 'is_approved' => true]);
         $apprId = $this->seedAppreciation($sender->id, $owner->id, ['message' => 'Cheers', 'is_public' => true]);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/appreciations/{$apprId}/react", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/appreciations/{$apprId}/react", [
             'reaction_type' => 'heart',
             'owner_id' => $owner->id,
         ]);
@@ -444,7 +444,7 @@ class SavedCollectionsParityTest extends TestCase
     {
         $this->authenticatedUser(['name' => 'React 404']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/appreciations/99999999/react", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/appreciations/99999999/react", [
             'reaction_type' => 'heart',
         ]);
 
@@ -453,11 +453,11 @@ class SavedCollectionsParityTest extends TestCase
 
     public function test_saved_react_appreciation_requires_authentication(): void
     {
-        $response = $this->post("/{$this->testTenantSlug}/alpha/appreciations/1/react", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/appreciations/1/react", [
             'reaction_type' => 'heart',
         ]);
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     // =====================================================================

@@ -43,7 +43,7 @@ class SettingsAvailabilityParityTest extends TestCase
     public function test_availability_page_renders(): void
     {
         $this->authenticatedUser();
-        $res = $this->get("/{$this->testTenantSlug}/alpha/settings/availability");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/settings/availability");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha_settings.availability.title'));
         $res->assertSee('Monday');
@@ -52,14 +52,14 @@ class SettingsAvailabilityParityTest extends TestCase
 
     public function test_requires_auth(): void
     {
-        $this->get("/{$this->testTenantSlug}/alpha/settings/availability")->assertRedirectContains('/alpha/login');
+        $this->get("/{$this->testTenantSlug}/accessible/settings/availability")->assertRedirectContains('/accessible/login');
     }
 
     public function test_post_saves_recurring_slots_with_correct_day_index(): void
     {
         $user = $this->authenticatedUser();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/settings/availability", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/settings/availability", [
             'slots' => [
                 1 => [['start' => '09:00', 'end' => '17:00']], // Monday
                 5 => [['start' => '14:00', 'end' => '18:00']], // Friday
@@ -83,7 +83,7 @@ class SettingsAvailabilityParityTest extends TestCase
     {
         $user = $this->authenticatedUser();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/settings/availability", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/settings/availability", [
             'slots' => [
                 1 => [['start' => '17:00', 'end' => '09:00']], // end before start
             ],
@@ -98,12 +98,12 @@ class SettingsAvailabilityParityTest extends TestCase
         $user = $this->authenticatedUser();
 
         // First save.
-        $this->post("/{$this->testTenantSlug}/alpha/settings/availability", [
+        $this->post("/{$this->testTenantSlug}/accessible/settings/availability", [
             'slots' => [1 => [['start' => '09:00', 'end' => '17:00']]],
         ])->assertRedirect();
 
         // Second save: Monday changes, no other days.
-        $this->post("/{$this->testTenantSlug}/alpha/settings/availability", [
+        $this->post("/{$this->testTenantSlug}/accessible/settings/availability", [
             'slots' => [1 => [['start' => '08:00', 'end' => '12:00']]],
         ])->assertRedirect();
 

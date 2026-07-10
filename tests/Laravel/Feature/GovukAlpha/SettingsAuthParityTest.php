@@ -56,25 +56,25 @@ class SettingsAuthParityTest extends TestCase
 
     public function test_settings_linked_accounts_requires_authentication(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/linked-accounts");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/settings/linked-accounts");
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_settings_linked_accounts_request_requires_authentication(): void
     {
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/linked-accounts/request", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/linked-accounts/request", [
             'email' => 'someone@example.com',
         ]);
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_settings_linked_accounts_page_renders_empty_state(): void
     {
         $this->authenticatedUser(['name' => 'Linker One']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/linked-accounts");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/settings/linked-accounts");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_settings.linked.title'));
@@ -102,7 +102,7 @@ class SettingsAuthParityTest extends TestCase
             ],
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/linked-accounts");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/settings/linked-accounts");
 
         $response->assertOk();
         $response->assertSee('Childy McChild');
@@ -116,7 +116,7 @@ class SettingsAuthParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/linked-accounts/request", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/linked-accounts/request", [
             'email' => 'not-an-email',
         ]);
 
@@ -128,7 +128,7 @@ class SettingsAuthParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/linked-accounts/request", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/linked-accounts/request", [
             'email' => 'nobody-here-' . uniqid() . '@example.com',
         ]);
 
@@ -143,7 +143,7 @@ class SettingsAuthParityTest extends TestCase
             'status' => 'active', 'is_approved' => true, 'email' => 'link-child-' . uniqid() . '@example.com',
         ]);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/linked-accounts/request", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/linked-accounts/request", [
             'email' => $child->email,
             'relationship_type' => 'family',
             'perm_can_view_activity' => '1',
@@ -169,7 +169,7 @@ class SettingsAuthParityTest extends TestCase
             'status' => 'pending', 'approved_at' => null, 'created_at' => now(), 'updated_at' => now(),
         ]);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/linked-accounts/approve", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/linked-accounts/approve", [
             'relationship_id' => $relationshipId,
         ]);
 
@@ -192,7 +192,7 @@ class SettingsAuthParityTest extends TestCase
             'status' => 'active', 'approved_at' => now(), 'created_at' => now(), 'updated_at' => now(),
         ]);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/linked-accounts/permissions", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/linked-accounts/permissions", [
             'relationship_id' => $relationshipId,
             'perm_can_view_activity' => '1',
             'perm_can_manage_listings' => '1',
@@ -217,7 +217,7 @@ class SettingsAuthParityTest extends TestCase
             'status' => 'active', 'approved_at' => now(), 'created_at' => now(), 'updated_at' => now(),
         ]);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/linked-accounts/revoke", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/linked-accounts/revoke", [
             'relationship_id' => $relationshipId,
         ]);
 
@@ -237,9 +237,9 @@ class SettingsAuthParityTest extends TestCase
 
     public function test_settings_appearance_requires_authentication(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/appearance");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/settings/appearance");
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_settings_appearance_page_renders_with_current_theme(): void
@@ -247,7 +247,7 @@ class SettingsAuthParityTest extends TestCase
         $me = $this->authenticatedUser(['name' => 'Theme Me']);
         DB::table('users')->where('id', $me->id)->update(['preferred_theme' => 'light']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/appearance");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/settings/appearance");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_settings.appearance.title'));
@@ -264,11 +264,11 @@ class SettingsAuthParityTest extends TestCase
     {
         $me = $this->authenticatedUser(['name' => 'Save Theme Me']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/appearance", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/appearance", [
             'theme' => 'dark',
         ]);
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/settings/appearance?status=appearance-saved");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/settings/appearance?status=appearance-saved");
         $this->assertDatabaseHas('users', [
             'id' => $me->id,
             'preferred_theme' => 'dark',
@@ -280,11 +280,11 @@ class SettingsAuthParityTest extends TestCase
         $me = $this->authenticatedUser(['name' => 'Bad Theme Me']);
         DB::table('users')->where('id', $me->id)->update(['preferred_theme' => 'system']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/appearance", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/appearance", [
             'theme' => 'neon-rainbow',
         ]);
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/settings/appearance?status=appearance-invalid");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/settings/appearance?status=appearance-invalid");
         // Unchanged.
         $this->assertDatabaseHas('users', [
             'id' => $me->id,
@@ -298,25 +298,25 @@ class SettingsAuthParityTest extends TestCase
 
     public function test_settings_data_rights_requires_authentication(): void
     {
-        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/data-rights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/settings/data-rights");
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_settings_data_rights_request_requires_authentication(): void
     {
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/data-rights", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/data-rights", [
             'request_type' => 'rectification',
         ]);
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_settings_data_rights_page_renders_request_types(): void
     {
         $this->authenticatedUser(['name' => 'Rights Me']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/data-rights");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/settings/data-rights");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_settings.gdpr.title'));
@@ -331,7 +331,7 @@ class SettingsAuthParityTest extends TestCase
     {
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/data-rights", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/data-rights", [
             'request_type' => 'erasure', // not one of the four self-service types here
         ]);
 
@@ -343,7 +343,7 @@ class SettingsAuthParityTest extends TestCase
     {
         $me = $this->authenticatedUser(['name' => 'Submit Rights Me']);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/data-rights", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/data-rights", [
             'request_type' => 'rectification',
             'notes' => 'My surname is misspelled.',
         ]);
@@ -373,7 +373,7 @@ class SettingsAuthParityTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/data-rights", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/data-rights", [
             'request_type' => 'objection',
         ]);
 
@@ -388,9 +388,9 @@ class SettingsAuthParityTest extends TestCase
     public function test_settings_insurance_requires_authentication(): void
     {
         $this->enableInsurance();
-        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/insurance");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/settings/insurance");
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_settings_insurance_404_when_disabled(): void
@@ -398,7 +398,7 @@ class SettingsAuthParityTest extends TestCase
         $this->disableInsurance();
         $this->authenticatedUser(['name' => 'No Insurance Me']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/insurance");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/settings/insurance");
 
         $response->assertNotFound();
     }
@@ -408,7 +408,7 @@ class SettingsAuthParityTest extends TestCase
         $this->enableInsurance();
         $this->authenticatedUser(['name' => 'Insurance Me']);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/insurance");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/settings/insurance");
 
         $response->assertOk();
         $response->assertSee(__('govuk_alpha_settings.insurance.title'));
@@ -430,7 +430,7 @@ class SettingsAuthParityTest extends TestCase
             'created_at' => now(),
         ]);
 
-        $response = $this->get("/{$this->testTenantSlug}/alpha/settings/insurance");
+        $response = $this->get("/{$this->testTenantSlug}/accessible/settings/insurance");
 
         $response->assertOk();
         $response->assertSee('Acme Cover Ltd');
@@ -441,11 +441,11 @@ class SettingsAuthParityTest extends TestCase
     public function test_settings_insurance_upload_requires_authentication(): void
     {
         $this->enableInsurance();
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/insurance", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/insurance", [
             'insurance_type' => 'public_liability',
         ]);
 
-        $response->assertRedirect("/{$this->testTenantSlug}/alpha/login?status=auth-required");
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
     }
 
     public function test_settings_insurance_upload_404_when_disabled(): void
@@ -453,7 +453,7 @@ class SettingsAuthParityTest extends TestCase
         $this->disableInsurance();
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/insurance", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/insurance", [
             'insurance_type' => 'public_liability',
         ]);
 
@@ -465,7 +465,7 @@ class SettingsAuthParityTest extends TestCase
         $this->enableInsurance();
         $this->authenticatedUser();
 
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/insurance", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/insurance", [
             'insurance_type' => 'public_liability',
         ]);
 
@@ -485,7 +485,7 @@ class SettingsAuthParityTest extends TestCase
 
         // The uploaded file must travel in the data array — Laravel's test client
         // extracts UploadedFile instances from there (post() has no separate files arg).
-        $response = $this->post("/{$this->testTenantSlug}/alpha/settings/insurance", [
+        $response = $this->post("/{$this->testTenantSlug}/accessible/settings/insurance", [
             'insurance_type' => 'professional_indemnity',
             'provider_name' => 'Indemnity Co',
             'certificate_file' => $file,

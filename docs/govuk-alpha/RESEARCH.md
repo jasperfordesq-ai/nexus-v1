@@ -4,11 +4,11 @@
 
 Project NEXUS Accessible Frontend is an approved exception to the React-primary UI rule. It is an isolated, HTML-first Laravel frontend that complements `react-frontend/` and does not replace it. It follows GOV.UK Frontend implementation standards for accessibility and resilience, but it is not a GOV.UK service and must not look or read like one.
 
-The public-facing accessible frontend is now Beta. The `GovukAlpha`, `govuk_alpha`, and `/alpha/...` names remain as compatibility code-path names until a deliberate route/namespace migration is done.
+The public-facing accessible frontend is now Beta and served under `/{tenantSlug}/accessible/...` (legacy `/alpha/...` URLs permanently redirect). The `GovukAlpha`, `govuk_alpha`, and `govuk-alpha.*` names remain as internal code-path names until a deliberate namespace migration is done.
 
 The accessible frontend uses:
 
-- Laravel routes under `/{tenantSlug}/alpha/...`
+- Laravel routes under `/{tenantSlug}/accessible/...`
 - Controllers under `app/Http/Controllers/GovukAlpha/`
 - Frontend source under root-level `accessible-frontend/`
 - Blade views under `accessible-frontend/views/`

@@ -74,7 +74,7 @@ class ListingsSkillTagsParityTest extends TestCase
         $this->authenticatedUser();
         $categoryId = $this->seedCategory();
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/listings/new", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/listings/new", [
             'title'       => 'Help with the garden please',
             'description' => 'I can offer help with general gardening and planting work.',
             'type'        => 'offer',
@@ -101,7 +101,7 @@ class ListingsSkillTagsParityTest extends TestCase
 
         // Create through the real flow so the tags persist under the request's
         // tenant binding (matches production), then edit it.
-        $this->post("/{$this->testTenantSlug}/alpha/listings/new", [
+        $this->post("/{$this->testTenantSlug}/accessible/listings/new", [
             'title'       => 'Editable Listing Item',
             'description' => 'An initial description for the editable listing item.',
             'type'        => 'offer',
@@ -116,13 +116,13 @@ class ListingsSkillTagsParityTest extends TestCase
         $this->assertGreaterThan(0, $listingId);
 
         // Edit form prefills existing tags (getTags returns them sorted).
-        $res = $this->get("/{$this->testTenantSlug}/alpha/listings/{$listingId}/edit");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/listings/{$listingId}/edit");
         $res->assertOk();
         $res->assertSee('name="skill_tags"', false);
         $res->assertSee('electrical, plumbing', false);
 
         // Update replaces them.
-        $upd = $this->post("/{$this->testTenantSlug}/alpha/listings/{$listingId}/edit", [
+        $upd = $this->post("/{$this->testTenantSlug}/accessible/listings/{$listingId}/edit", [
             'title'       => 'Editable Listing Item',
             'description' => 'An updated description for the editable listing item.',
             'type'        => 'offer',

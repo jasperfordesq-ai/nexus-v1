@@ -67,7 +67,7 @@ class VolunteeringCommunityProjectsParityTest extends TestCase
             'created_at'  => now(),
         ]);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering?tab=community_projects");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/volunteering?tab=community_projects");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.volunteering.community_projects_title'));
         $res->assertSee('Riverside Cleanup Project');
@@ -77,7 +77,7 @@ class VolunteeringCommunityProjectsParityTest extends TestCase
     public function test_community_projects_tab_shows_in_nav(): void
     {
         $this->authenticatedUser();
-        $res = $this->get("/{$this->testTenantSlug}/alpha/volunteering");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/volunteering");
         $res->assertOk();
         $res->assertSee(__('govuk_alpha.volunteering.community_projects_tab'));
         $res->assertSee('tab=community_projects', false);

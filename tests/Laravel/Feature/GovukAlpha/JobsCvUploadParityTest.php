@@ -92,7 +92,7 @@ class JobsCvUploadParityTest extends TestCase
 
         $cv = UploadedFile::fake()->create('resume.pdf', 80, 'application/pdf');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/jobs/{$job->id}/apply", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/jobs/{$job->id}/apply", [
             'cover_letter' => 'I would be a great fit.',
             'cv'           => $cv,
         ]);
@@ -122,7 +122,7 @@ class JobsCvUploadParityTest extends TestCase
 
         $cv = UploadedFile::fake()->create('notes.txt', 10, 'text/plain');
 
-        $res = $this->post("/{$this->testTenantSlug}/alpha/jobs/{$job->id}/apply", [
+        $res = $this->post("/{$this->testTenantSlug}/accessible/jobs/{$job->id}/apply", [
             'cover_letter' => 'Trying a disallowed file.',
             'cv'           => $cv,
         ]);
@@ -157,7 +157,7 @@ class JobsCvUploadParityTest extends TestCase
 
         // Poster downloads.
         Sanctum::actingAs($owner, ['*']);
-        $res = $this->get("/{$this->testTenantSlug}/alpha/jobs/applications/{$application->id}/cv");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/jobs/applications/{$application->id}/cv");
         $res->assertOk();
         $res->assertDownload('resume.pdf');
     }
@@ -186,7 +186,7 @@ class JobsCvUploadParityTest extends TestCase
         $stranger = $this->authenticatedUser(['role' => 'member']);
         Sanctum::actingAs($stranger, ['*']);
 
-        $res = $this->get("/{$this->testTenantSlug}/alpha/jobs/applications/{$application->id}/cv");
+        $res = $this->get("/{$this->testTenantSlug}/accessible/jobs/applications/{$application->id}/cv");
         $res->assertForbidden();
     }
 }
