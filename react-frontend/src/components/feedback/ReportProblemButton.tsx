@@ -22,7 +22,7 @@ import {
   SelectItem,
   Textarea,
 } from '@/components/ui';
-import { useAuth, useToast } from '@/contexts';
+import { useAuthOptional, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { getSupportDiagnosticsSnapshot } from '@/lib/supportDiagnostics';
 
@@ -49,7 +49,11 @@ const IMPACT_OPTIONS: Impact[] = ['blocked', 'major', 'minor', 'cosmetic'];
 export function ReportProblemButton({ className, mode = 'button' }: ReportProblemButtonProps) {
   const { t } = useTranslation('common');
   const toast = useToast();
-  const { isAuthenticated } = useAuth();
+  // Non-throwing: this button renders inside the top-level ErrorBoundary
+  // fallback, which sits ABOVE AuthProvider (provided per-route in TenantShell).
+  // A throwing useAuth() there re-crashes the fallback and escalates to the bare
+  // root boundary. No provider ⇒ treat as unauthenticated (already handled below).
+  const isAuthenticated = useAuthOptional()?.isAuthenticated ?? false;
   const [isOpen, setIsOpen] = useState(false);
   const [summary, setSummary] = useState('');
   const [description, setDescription] = useState('');

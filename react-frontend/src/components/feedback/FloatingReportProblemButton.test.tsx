@@ -53,6 +53,14 @@ vi.mock('@/contexts', () =>
   }),
 );
 
+// FloatingReportProblemButton imports useAuth from the direct module path
+// (@/contexts/AuthContext), not the @/contexts barrel — so it must be mocked
+// here too, matching Navbar/MobileDrawer tests. Without this the real,
+// throwing useAuth runs (no AuthProvider in the test tree).
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ isAuthenticated: authState.isAuthenticated }),
+}));
+
 // ─── Stub heavy HeroUI overlays + form controls ───────────────────────────────
 vi.mock('@/components/ui', async (importOriginal) => {
   const orig = await importOriginal<typeof import('@/components/ui')>();

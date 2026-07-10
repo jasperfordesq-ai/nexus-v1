@@ -82,7 +82,7 @@ vi.mock('@/lib/api', () => ({
   SESSION_EXPIRED_EVENT: 'nexus:session_expired',
 }));
 
-import { AuthProvider, useAuth } from '../AuthContext';
+import { AuthProvider, useAuth, useAuthOptional } from '../AuthContext';
 import { authenticateWithBiometric } from '@/lib/webauthn';
 
 const mockAuthenticateWithBiometric = vi.mocked(authenticateWithBiometric);
@@ -142,6 +142,19 @@ describe('AuthContext', () => {
       expect(() => {
         renderHook(() => useAuth(), { wrapper });
       }).toThrowError('useAuth must be used within an AuthProvider');
+    });
+  });
+
+  describe('useAuthOptional() outside provider', () => {
+    it('returns null instead of throwing (safe for error-boundary fallbacks)', () => {
+      const { result } = renderHook(() => useAuthOptional(), { wrapper });
+      expect(result.current).toBeNull();
+    });
+
+    it('returns the context value when used inside AuthProvider', () => {
+      const { result } = renderHook(() => useAuthOptional(), { wrapper: authWrapper });
+      expect(result.current).not.toBeNull();
+      expect(result.current?.isAuthenticated).toBe(false);
     });
   });
 

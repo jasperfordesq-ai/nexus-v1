@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-export { AuthProvider, useAuth } from './AuthContext';
+export { AuthProvider, useAuth, useAuthOptional } from './AuthContext';
 export { TenantProvider, useTenant, useFeature, useModule } from './TenantContext';
 export { ToastProvider, useToast } from './ToastContext';
 export { NotificationsProvider, useNotifications, useNotificationsOptional } from './NotificationsContext';

@@ -35,6 +35,20 @@ const DEFAULTS = {
     status: 'idle' as const,
     error: null,
   }),
+  // Non-throwing variant used by components that may render outside AuthProvider
+  // (e.g. the ErrorBoundary fallback). Defaults to unauthenticated; the factory
+  // mirrors an overridden useAuth into it so per-test auth state carries over.
+  useAuthOptional: () => ({
+    user: null,
+    isAuthenticated: false,
+    login: vi.fn(),
+    logout: vi.fn(),
+    register: vi.fn(),
+    updateUser: vi.fn(),
+    refreshUser: vi.fn(),
+    status: 'idle' as const,
+    error: null,
+  }),
 
   // TenantContext
   useTenant: () => ({
@@ -115,5 +129,12 @@ type ContextOverrides = Partial<typeof DEFAULTS>;
  * Any hook not explicitly overridden gets the safe default above.
  */
 export function createMockContexts(overrides: ContextOverrides = {}) {
-  return { ...DEFAULTS, ...overrides };
+  const merged = { ...DEFAULTS, ...overrides };
+  // Keep the non-throwing auth variant in sync: a test that overrides useAuth to
+  // set a specific auth state should see the same state through useAuthOptional
+  // unless it deliberately overrides that too.
+  if (overrides.useAuth && !overrides.useAuthOptional) {
+    merged.useAuthOptional = overrides.useAuth;
+  }
+  return merged;
 }

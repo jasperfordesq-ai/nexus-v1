@@ -809,4 +809,20 @@ export function useAuth(): AuthContextValue {
   return context;
 }
 
+/**
+ * Non-throwing variant of {@link useAuth}. Returns `null` when there is no
+ * `AuthProvider` ancestor instead of throwing.
+ *
+ * Use this ONLY in components that can legitimately render outside the provider
+ * tree — most importantly error-boundary fallbacks. In NEXUS the top-level
+ * `ErrorBoundary` (App.tsx) sits *above* `AuthProvider` (which is provided
+ * per-route inside `TenantShell`), so any fallback it renders has no auth
+ * context. A hard-throwing `useAuth()` there re-crashes the fallback and
+ * escalates to the bare root boundary — defeating the recovery UI exactly when
+ * it is needed. Regular feature code should keep using `useAuth()`.
+ */
+export function useAuthOptional(): AuthContextValue | null {
+  return use(AuthContext);
+}
+
 export default AuthContext;

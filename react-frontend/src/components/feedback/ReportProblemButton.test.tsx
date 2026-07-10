@@ -21,6 +21,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/contexts', () => ({
   useAuth: () => ({ isAuthenticated: true }),
+  useAuthOptional: () => ({ isAuthenticated: true }),
   useToast: () => mocks.toast,
 }));
 
