@@ -16,10 +16,12 @@ HTML="$TEST_ROOT/html"
 PRERENDERED="$HTML/prerendered"
 mkdir -p "$PRERENDERED/example.test/about" \
     "$PRERENDERED/example.test/gone" \
+    "$HTML/locales/en" \
     "$TEST_ROOT/nginx"
 
 printf '%s\n' 'SPA-SHELL' > "$HTML/index.html"
 cp "$HTML/index.html" "$HTML/_spa.html"
+printf '%s\n' '{"locale":"ok"}' > "$HTML/locales/en/common.json"
 printf '%s\n' 'ROOT-SNAPSHOT' > "$PRERENDERED/example.test/index.html"
 printf '%s\n' 'ABOUT-SNAPSHOT' > "$PRERENDERED/example.test/about/index.html"
 printf '%s\n' '# ABOUT-MARKDOWN' > "$PRERENDERED/example.test/about/index.md"
@@ -77,6 +79,8 @@ BOT='Googlebot/2.1'
 AI_BOT='GPTBot/1.0'
 
 request 200 SPA-SHELL -H 'Host: example.test' "$BASE/about"
+request 200 '"locale":"ok"' -H 'Host: example.test' "$BASE/locales/en/common.json?v=test-build"
+grep -Fqi 'content-type: application/json' "$TEST_ROOT/headers"
 request 200 ROOT-SNAPSHOT -A "$BOT" -H 'Host: example.test' "$BASE/"
 request 200 ABOUT-SNAPSHOT -A "$BOT" -H 'Host: example.test' "$BASE/about"
 request 200 ABOUT-MARKDOWN -A "$AI_BOT" -H 'Host: example.test' "$BASE/about"

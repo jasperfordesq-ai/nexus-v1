@@ -23,6 +23,8 @@ fi
 grep -Fq 'location @prerender_page_snapshot' "$CONF"
 grep -Fq 'root /usr/share/nginx/html/prerendered;' "$CONF"
 grep -Fq 'location ^~ /prerendered/' "$CONF"
+grep -Fq 'location ^~ /locales/' "$CONF"
+grep -Fq 'try_files $uri =404;' "$CONF"
 grep -Fq 'if (!-f /usr/share/nginx/html/prerendered/.tenant-identity-v1)' "$CONF"
 grep -Fq 'error_page 503 =503 @prerender_send_body;' "$CONF"
 if grep -Fq '$request_uri/index.html' "$CONF"; then
