@@ -10541,15 +10541,20 @@ CREATE TABLE `prerender_jobs` (
   `log_excerpt` mediumtext DEFAULT NULL,
   `error_message` varchar(1024) DEFAULT NULL,
   `queued_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fence_state` varchar(16) NOT NULL DEFAULT 'ready',
+  `fence_ready_at` timestamp NULL DEFAULT current_timestamp(),
   `claimed_at` timestamp NULL DEFAULT NULL,
   `started_at` timestamp NULL DEFAULT NULL,
+  `heartbeat_at` timestamp NULL DEFAULT NULL COMMENT 'Renewable worker lease; started_at remains immutable',
   `finished_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_prerender_jobs_status_queued` (`status`,`queued_at`),
   KEY `idx_prerender_jobs_tenant` (`tenant_id`),
   KEY `idx_prerender_jobs_requested_by` (`requested_by`),
   KEY `idx_prerender_jobs_finished` (`finished_at`),
-  KEY `idx_prerender_jobs_claim` (`status`,`priority`,`queued_at`)
+  KEY `idx_prerender_jobs_claim` (`status`,`priority`,`queued_at`),
+  KEY `idx_prerender_jobs_running_lease` (`status`,`heartbeat_at`,`started_at`),
+  KEY `idx_prerender_jobs_fence_claim` (`status`,`fence_state`,`fence_ready_at`,`priority`,`queued_at`)
 ) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `progress_notifications`;
@@ -14863,7 +14868,9 @@ INSERT INTO `laravel_migrations` VALUES
 (329,'2026_07_09_000001_normalize_retired_user_roles',92),
 (330,'2026_07_09_000002_merge_tenant_admin_into_admin',92),
 (331,'2026_07_10_000001_add_amount_refunded_to_vol_donations',92),
-(332,'2026_07_10_000002_add_external_partner_id_to_federation_api_keys',93);
+(332,'2026_07_10_000002_add_external_partner_id_to_federation_api_keys',93),
+(333,'2026_07_10_000003_add_heartbeat_at_to_prerender_jobs',94),
+(334,'2026_07_10_000004_add_fence_ready_at_to_prerender_jobs',95);
 /*!40000 ALTER TABLE `laravel_migrations` ENABLE KEYS */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

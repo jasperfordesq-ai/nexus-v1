@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use App\Core\TenantContext;
 use App\Services\PrerenderService;
 use App\Services\SitemapService;
 use Illuminate\Console\Command;
@@ -22,14 +23,14 @@ use Illuminate\Support\Facades\DB;
  * orchestrator can read every (tenant, route) pair without re-implementing
  * the sitemap traversal in shell.
  *
- * The bash script's hardcoded PUBLIC_ROUTES remains as a fallback if this
- * command is unavailable or errors out — we never want a stale build to lose
- * the ability to prerender the static floor.
+ * Planning fails closed. The bash orchestrator must not substitute a generic
+ * route list because that would omit tenant-owned content and can publish a
+ * snapshot built with the wrong tenant configuration.
  */
 class PrerenderPlanRoutes extends Command
 {
     /** Hard cap to keep one tenant's plan from blowing up the run. */
-    private const MAX_ROUTES_PER_TENANT = 5000;
+    private const MAX_ROUTES_PER_TENANT = 50000;
 
     protected $signature = 'prerender:plan-routes '
         . '{--tenant= : Limit to a single tenant slug} '
@@ -54,8 +55,14 @@ class PrerenderPlanRoutes extends Command
         $includeStatic  = (int) $this->option('include-static') === 1;
         $includeSitemap = (int) $this->option('include-sitemap') === 1;
 
-        $appHost = parse_url((string) env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST)
-                   ?: 'app.project-nexus.ie';
+        $appHost = PrerenderService::normalizeHost((string) (
+            parse_url((string) env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST)
+            ?: 'app.project-nexus.ie'
+        ));
+        if ($appHost === null) {
+            $this->error('FRONTEND_URL contains an invalid host.');
+            return self::FAILURE;
+        }
 
         $query = DB::table('tenants')
             ->where('is_active', 1)
@@ -76,14 +83,23 @@ class PrerenderPlanRoutes extends Command
             ->where('c.is_active', 1)
             ->whereNotNull('p.domain')
             ->where('p.domain', '<>', '')
-            ->whereNull('c.domain')
+            ->where(function ($q) {
+                $q->whereNull('c.domain')->orWhere('c.domain', '');
+            })
             ->pluck('p.domain', 'c.id')
-            ->map(fn ($d) => trim((string) $d))
+            ->map(fn ($d) => PrerenderService::normalizeHost((string) $d) ?? trim((string) $d))
             ->toArray(); // [child_id => parent_domain]
 
         $tenants = [];
         foreach ($query->get(['id', 'slug', 'domain', 'features', 'configuration']) as $t) {
-            $domain = trim((string) ($t->domain ?? ''));
+            if (TenantContext::isReservedPathSegment((string) $t->slug)) {
+                $this->error("Route planning failed for tenant {$t->slug}: slug collides with a reserved platform path");
+                return self::FAILURE;
+            }
+            $rawDomain = trim((string) ($t->domain ?? ''));
+            $domain = $rawDomain === ''
+                ? ''
+                : (PrerenderService::normalizeHost($rawDomain) ?? $rawDomain);
             $parentDomain = $parentDomainMap[(int) $t->id] ?? '';
             if ($domain !== '') {
                 $host   = $domain;
@@ -94,6 +110,11 @@ class PrerenderPlanRoutes extends Command
             } else {
                 $host   = $appHost;
                 $prefix = '/' . $t->slug;
+            }
+            $host = PrerenderService::normalizeHost((string) $host);
+            if ($host === null) {
+                $this->error("Route planning failed for tenant {$t->slug}: invalid canonical host");
+                return self::FAILURE;
             }
 
             $routes = [];
@@ -106,10 +127,28 @@ class PrerenderPlanRoutes extends Command
                 }
             }
             if ($includeSitemap) {
-                foreach ($this->routesFromSitemap((int) $t->id, $host, $prefix) as $r) {
+                try {
+                    $sitemapRoutes = $this->routesFromSitemap((int) $t->id, $host, $prefix);
+                } catch (\Throwable $e) {
+                    $this->error("Route planning failed for tenant {$t->slug}: {$e->getMessage()}");
+                    return self::FAILURE;
+                }
+                foreach ($sitemapRoutes as $r) {
                     if (!isset($routes[$r])) $routes[$r] = true;
                     if (count($routes) >= $limit) break;
                 }
+            }
+
+            // SitemapService applies the protocol's 50,000-URL ceiling. Treat
+            // reaching either that ceiling or an operator-supplied lower
+            // limit as an incomplete plan rather than silently publishing a
+            // partial tenant generation.
+            if (count($routes) >= $limit) {
+                $this->error(
+                    "Route planning reached the {$limit}-route safety limit for tenant {$t->slug}; "
+                    . 'refusing to emit a partial plan.'
+                );
+                return self::FAILURE;
             }
 
             $tenants[] = [
@@ -137,38 +176,79 @@ class PrerenderPlanRoutes extends Command
      */
     private function routesFromSitemap(int $tenantId, string $host, string $prefix): array
     {
+        // Build the sitemap as it would be served from the tenant's own base
+        // URL. Failures propagate so the command cannot emit an incomplete,
+        // static-only plan that would hide missing custom content.
+        $baseUrl = 'https://' . $host . $prefix;
+        $previousFreshSetting = config('prerender.runtime_force_fresh_sitemap', false);
+        $previousBypassSetting = config('prerender.runtime_bypass_sitemap_cache', false);
+        config([
+            'prerender.runtime_force_fresh_sitemap' => true,
+            'prerender.runtime_bypass_sitemap_cache' => true,
+        ]);
         try {
-            // Build the sitemap as it would be served from the tenant's own
-            // base URL. This is the same data Google would crawl.
-            $baseUrl = 'https://' . $host . $prefix;
             $xml = $this->sitemap->generateForTenant($tenantId, $baseUrl);
-        } catch (\Throwable $e) {
-            // Sitemap generation is best-effort here. Fall back to static-only.
-            return [];
+        } finally {
+            config([
+                'prerender.runtime_force_fresh_sitemap' => $previousFreshSetting,
+                'prerender.runtime_bypass_sitemap_cache' => $previousBypassSetting,
+            ]);
         }
 
         $routes = [];
-        $base = 'https://' . $host;
-        // Quick parse — Sitemaps are simple <loc> elements; XPath would also work.
-        if (!preg_match_all('#<loc>([^<]+)</loc>#i', $xml, $m)) return [];
+        // Quick parse — Sitemaps are simple <loc> elements; XPath would also
+        // work. Every valid tenant sitemap contains at least its homepage, so
+        // no locations means the plan is incomplete and must fail closed.
+        if (!preg_match_all('#<loc>([^<]+)</loc>#i', $xml, $m)) {
+            throw new \RuntimeException('Tenant sitemap contains no route locations');
+        }
+        $rejected = [];
         foreach ($m[1] as $loc) {
             $loc = trim(html_entity_decode($loc, ENT_XML1 | ENT_QUOTES, 'UTF-8'));
-            if (!str_starts_with($loc, $base)) continue;
-            $path = substr($loc, strlen($base));
+            $parts = parse_url($loc);
+            if (!is_array($parts)) {
+                $rejected[] = [$loc, 'invalid URL'];
+                continue;
+            }
+            $locHost = PrerenderService::normalizeHost((string) ($parts['host'] ?? ''));
+            if (($parts['scheme'] ?? '') !== 'https' || $locHost !== $host) {
+                $rejected[] = [$loc, 'wrong scheme or host'];
+                continue;
+            }
+            $path = (string) ($parts['path'] ?? '/');
             // Strip tenant prefix; routes in the orchestrator are tenant-local
             // (the prefix gets re-applied during URL assembly).
             if ($prefix !== '' && str_starts_with($path, $prefix . '/')) {
                 $path = substr($path, strlen($prefix));
             } elseif ($prefix !== '' && $path === $prefix) {
                 $path = '/';
+            } elseif ($prefix !== '') {
+                $rejected[] = [$loc, 'outside tenant path prefix'];
+                continue;
             }
             if ($path === '') $path = '/';
-            if ($path[0] !== '/') continue;
+            $path = PrerenderService::normalizeRoute($path);
+            if ($path === null) {
+                $rejected[] = [$loc, 'unsafe or unrepresentable route'];
+                continue;
+            }
             // Reject anything that has unsafe characters — the bash side
             // re-validates with the same regex.
-            if (!preg_match('#^/[A-Za-z0-9._~/%:@!$()*+,;=\-]*$#', $path)) continue;
             $routes[] = $path;
         }
-        return array_values(array_unique($routes));
+        if ($rejected !== []) {
+            [$firstLocation, $firstReason] = $rejected[0];
+            throw new \RuntimeException(sprintf(
+                'Tenant sitemap rejected %d route location(s); first: %s (%s)',
+                count($rejected),
+                mb_strimwidth((string) $firstLocation, 0, 240, '…', 'UTF-8'),
+                $firstReason
+            ));
+        }
+        $routes = array_values(array_unique($routes));
+        if ($routes === []) {
+            throw new \RuntimeException('Tenant sitemap contains no routes for its canonical host');
+        }
+        return $routes;
     }
 }

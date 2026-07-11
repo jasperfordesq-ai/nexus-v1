@@ -11,6 +11,8 @@ namespace App\Console\Commands;
 use App\Services\PrerenderService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Reaps prerender_jobs rows whose worker died mid-flight.
@@ -49,21 +51,36 @@ class PrerenderReapStale extends Command
         $now = now();
         $claimedCutoff = $now->copy()->subMinutes($claimedMinutes);
         $runningCutoff = $now->copy()->subMinutes($runningMinutes);
+        $hasHeartbeat = Schema::hasColumn('prerender_jobs', 'heartbeat_at');
 
         $stuckClaimed = DB::table('prerender_jobs')
             ->where('status', 'claimed')
             ->where('claimed_at', '<', $claimedCutoff)
-            ->get(['id', 'tenant_id', 'routes', 'claimed_at', 'claimed_by']);
+            ->get(['id', 'tenant_id', 'routes', 'claimed_at', 'claimed_by', 'error_message']);
 
+        $runningColumns = ['id', 'tenant_id', 'routes', 'started_at', 'claimed_by', 'error_message'];
+        if ($hasHeartbeat) $runningColumns[] = 'heartbeat_at';
         $stuckRunning = DB::table('prerender_jobs')
             ->where('status', 'running')
-            ->where('started_at', '<', $runningCutoff)
-            ->get(['id', 'tenant_id', 'routes', 'started_at', 'claimed_by']);
+            ->where(function ($lease) use ($runningCutoff, $hasHeartbeat): void {
+                if ($hasHeartbeat) {
+                    $lease->whereRaw(
+                        'COALESCE(heartbeat_at, started_at) < ?',
+                        [$runningCutoff]
+                    )->orWhere(function ($missing): void {
+                        $missing->whereNull('heartbeat_at')->whereNull('started_at');
+                    });
+                } else {
+                    $lease->where('started_at', '<', $runningCutoff)
+                        ->orWhereNull('started_at');
+                }
+            })
+            ->get($runningColumns);
 
         $total = $stuckClaimed->count() + $stuckRunning->count();
         if ($total === 0) {
             $this->info('No stuck prerender jobs.');
-            return self::SUCCESS;
+            return $this->successfulRun();
         }
 
         foreach ($stuckClaimed as $row) {
@@ -73,15 +90,20 @@ class PrerenderReapStale extends Command
             ));
         }
         foreach ($stuckRunning as $row) {
+            $leaseAt = $hasHeartbeat ? ($row->heartbeat_at ?? $row->started_at) : $row->started_at;
             $this->line(sprintf(
-                'RUNNING #%d tenant=%s started_at=%s by=%s',
-                $row->id, $row->tenant_id ?? 'all', $row->started_at, $row->claimed_by ?? '?'
+                'RUNNING #%d tenant=%s started_at=%s lease_at=%s by=%s',
+                $row->id,
+                $row->tenant_id ?? 'all',
+                $row->started_at ?? '?',
+                $leaseAt ?? '?',
+                $row->claimed_by ?? '?'
             ));
         }
 
         if ($dryRun) {
             $this->info("Dry run: {$total} row(s) would be reaped.");
-            return self::SUCCESS;
+            return $this->successfulRun();
         }
 
         // To avoid an infinite reap-requeue-die loop on a poison job, only
@@ -90,33 +112,65 @@ class PrerenderReapStale extends Command
         $reapedCount = 0;
         foreach ([$stuckClaimed, $stuckRunning] as $set) {
             foreach ($set as $row) {
+                $isRunning = property_exists($row, 'started_at');
+                $leaseColumn = $isRunning && $hasHeartbeat ? 'heartbeat_at' : ($isRunning ? 'started_at' : 'claimed_at');
+                $leaseValue = $row->{$leaseColumn} ?? null;
                 if ($requeue) {
-                    $existing = DB::table('prerender_jobs')
-                        ->where('id', $row->id)
-                        ->value('error_message');
-                    if ($existing === null || $existing === '') {
-                        DB::table('prerender_jobs')->where('id', $row->id)->update([
+                    if ($row->error_message === null || $row->error_message === '') {
+                        $query = DB::table('prerender_jobs')
+                            ->where('id', $row->id)
+                            ->where('status', $isRunning ? 'running' : 'claimed')
+                            ->where('claimed_by', $row->claimed_by);
+                        $leaseValue === null
+                            ? $query->whereNull($leaseColumn)
+                            : $query->where($leaseColumn, $leaseValue);
+                        $values = [
                             'status'        => 'queued',
                             'claimed_at'    => null,
                             'claimed_by'    => null,
                             'started_at'    => null,
                             'error_message' => 'reaped: requeued once after stuck',
-                        ]);
-                        $reapedCount++;
+                        ];
+                        if ($hasHeartbeat) $values['heartbeat_at'] = null;
+                        $updated = $query->update($values);
+                        if ($updated > 0) {
+                            $reapedCount++;
+                            $this->service->releaseJobLease((int) $row->id, (string) $row->claimed_by);
+                            $this->service->broadcastJob((int) $row->id);
+                        }
                         continue;
                     }
                 }
-                DB::table('prerender_jobs')->where('id', $row->id)->update([
+                $query = DB::table('prerender_jobs')
+                    ->where('id', $row->id)
+                    ->where('status', $isRunning ? 'running' : 'claimed')
+                    ->where('claimed_by', $row->claimed_by);
+                $leaseValue === null
+                    ? $query->whereNull($leaseColumn)
+                    : $query->where($leaseColumn, $leaseValue);
+                $updated = $query->update([
                     'status'        => 'failed',
                     'finished_at'   => $now,
                     'error_message' => 'reaped: worker did not finalise within timeout',
                 ]);
-                $reapedCount++;
-                $this->service->broadcastJob((int) $row->id);
+                if ($updated > 0) {
+                    $reapedCount++;
+                    $this->service->releaseJobLease((int) $row->id, (string) $row->claimed_by);
+                    $this->service->broadcastJob((int) $row->id);
+                }
             }
         }
 
         $this->info("Reaped {$reapedCount} row(s).");
+        return $this->successfulRun();
+    }
+
+    private function successfulRun(): int
+    {
+        // The stale-job reaper runs from host cron, not the in-container
+        // Laravel scheduler. Stamp its own liveness contract on every clean
+        // completion so the health panel reflects the actual runtime path.
+        Cache::put('prerender:sched:prerender-reap-stale:last_ok_at', time(), 86400);
         return self::SUCCESS;
     }
 }

@@ -468,6 +468,19 @@
     "provider_sendgrid": "SendGrid",
     "provider_smtp": "SMTP",
     "prerender": {
+      "reset_all": {
+        "button": "Alle zurücksetzen und neu erstellen",
+        "title": "Alle Snapshots zurücksetzen und neu erstellen",
+        "description": "Brechen Sie ältere Prerender-Aufträge ab und starten Sie einen neuen mandantenbezogenen Neuaufbau aller öffentlichen Seiten, einschließlich der Startseite, der benutzerdefinierten Seiten und der Blog-Inhalte jedes Mandanten.",
+        "safety": "Der aktuelle vollständige Cache bleibt aktiv, bis der neue Routenplan erfolgreich gerendert und validiert wurde. Fehlgeschlagene Neuaufbauten ersetzen nicht die letzte fehlerfreie Generation.",
+        "confirmation_label": "Bestätigung",
+        "confirmation_help": "Geben Sie {{phrase}} ein, um fortzufahren.",
+        "confirmation_phrase": "ALLE SNAPSHOTS ZURÜCKSETZEN",
+        "cancel": "Abbrechen",
+        "confirm": "Vollständigen Neuaufbau starten",
+        "queued": "Neuaufbau #{{id}} für {{tenants}} Mandanten und {{routes}} Routen in die Warteschlange gestellt.",
+        "failed": "Der Neuaufbau konnte nicht eingeplant werden. Es wurden keine aktiven Snapshots entfernt."
+      },
       "description": "Nur vom Bot gerenderte Snapshots. Überwachen Sie die Abdeckung, erkennen Sie veraltete Daten und erzwingen Sie Aktualisierungen.",
       "guide": {
         "title": "Leitfaden in einfacher englischer Sprache",
@@ -648,6 +661,8 @@
         },
         "no_output": "(keine Ausgabe)",
         "purge_ungated": {
+          "confirm_title": "Unerwartete Snapshots entfernen?",
+          "confirm_message": "Dadurch werden gespeicherte Seiten, die nicht im aktuellen Routenplan ihres Mandanten enthalten sind, dauerhaft gelöscht. Bestätigen Sie, dass Sie zuerst die Vorschau geprüft haben.",
           "description": "Sweep-Snapshots, deren Route nicht in einem vom Mandanten erwarteten Satz enthalten ist. Wird häufig nach dem Ausschalten einer Funktion oder zum Bereinigen statischer Routen verwendet, die ohne Funktionsflags vorgerendert wurden. Dynamische Content-Routen bleiben unberücksichtigt.",
           "title": "Nicht gesicherte Snapshots löschen (404-Bereinigung pro Mandant)"
         },
@@ -706,7 +721,10 @@
         }
       },
       "inventory": {
+        "truncated": "Das Inventar hat das Sicherheitslimit von {{count}} Snapshots erreicht. Grenzen Sie den Mandantenfilter ein, bevor Sie eine Massenaktion ausführen.",
+        "unknown_tenant": "Unbekannter Mandant",
         "actions": {
+          "open_live_url": "Live-Seite öffnen (kein gespeicherter Snapshot)",
           "close": "Schließen",
           "inspect": "Überprüfen",
           "inspect_snapshot": "Überprüfen Sie {{path}}",
@@ -756,6 +774,8 @@
           "bulk_recache_other": "Ungültige {{count}}-Snapshots und Recache in der Warteschlange"
         },
         "inspect": {
+          "load_failed": "Dieser Snapshot konnte nicht geladen werden. Die vorherigen Prüfdaten wurden gelöscht.",
+          "no_snapshot": "Kein Snapshot ausgewählt.",
           "age": "Alter",
           "all_valid": "alles gültig",
           "asset_references": "Asset-Referenzen ({{count}})",
@@ -833,6 +853,7 @@
           "duration": "Dauer",
           "error": "Fehler",
           "exit_code": "Exit-Code",
+          "fence_ready_at": "Publisher-Sperre bereit",
           "finished_at": "Fertig um",
           "log_tail": "Baumstamm (Schwanz)",
           "queued_at": "In der Warteschlange",
@@ -854,6 +875,7 @@
           "cancelled": "Abgesagt",
           "failed": "Fehlgeschlagen",
           "partial": "Teilweise",
+          "pending_fence": "Sperre wird aktiviert",
           "queued": "In der Warteschlange",
           "running": "Läuft",
           "status": "Status",
@@ -880,6 +902,16 @@
         },
         "scope": {
           "all_tenants": "alle Mieter"
+        },
+        "statuses": {
+          "cancelled": "Abgesagt",
+          "claimed": "Übernommen",
+          "failed": "Fehlgeschlagen",
+          "partial": "Teilweise",
+          "pending_fence": "Sperre wird aktiviert",
+          "queued": "In der Warteschlange",
+          "running": "Läuft",
+          "succeeded": "Erfolgreich"
         },
         "table_aria": "Jobs"
       },
@@ -934,6 +966,7 @@
       "live_connected": "Live-Updates verbunden",
       "audit": {
         "actions": {
+          "reset_all": "Alle zurücksetzen und neu erstellen",
           "auto_recache": "Auto-recache",
           "cancel": "Auftrag abbrechen",
           "detect_drift": "Drift erkennen",
@@ -958,6 +991,10 @@
           "when": "Wann"
         },
         "empty": "Keine Audit-Einträge.",
+        "errors": {
+          "export": "Auditverlauf konnte nicht exportiert werden",
+          "load": "Auditverlauf konnte nicht geladen werden"
+        },
         "fallbacks": {
           "all": "alle",
           "system": "System"
@@ -976,11 +1013,13 @@
       },
       "overview": {
         "actions": {
+          "download_metrics": "Metriken herunterladen",
           "queue_job": "Warteschlangenjob",
           "refresh": "Aktualisieren"
         },
         "empty_summary": "Keine Zusammenfassung verfügbar.",
         "errors": {
+          "download_metrics": "Metriken konnten nicht heruntergeladen werden",
           "enqueue_job": "Job konnte nicht in die Warteschlange gestellt werden",
           "load_summary": "Zusammenfassung konnte nicht geladen werden"
         },
@@ -995,6 +1034,7 @@
           "title": "Aktualisierung erzwingen"
         },
         "health": {
+          "cache_read_only": "Der Cache ist schreibgeschützt",
           "cache_unreachable": "Cache nicht erreichbar",
           "healthy": "Gesund",
           "missing": "{{count}} fehlt",
@@ -1005,6 +1045,7 @@
           "stale_other": "{{count}} veraltet"
         },
         "hints": {
+          "unexpected": "Gespeicherte Snapshots außerhalb der aktuellen Mandanten-Routenpläne",
           "active_jobs": "{{count}} aktiv",
           "aging": "{{count}} Alterung (>7 Tage)",
           "asset_broken": "Referenzen tot /assets/*",
@@ -1029,6 +1070,7 @@
           "coverage": "Abdeckung",
           "metrics": "Metriken",
           "missing": "Fehlen",
+          "unexpected": "Unerwartet",
           "queued_jobs": "Aufträge in der Warteschlange",
           "recent_failures": "Aktuelle Misserfolge",
           "status": "Status"
@@ -1160,9 +1202,10 @@
           "tenant_slug": "Stunden-Zeitbank"
         },
         "sections": {
-          "dynamic_routes": "Dynamische Routen (maximal 1.000)",
+          "dynamic_routes": "Dynamische Routen",
           "static_routes": "Statische Routen"
         },
+        "tenant": "Mandant {{slug}} (#{{id}})",
         "title": "Sitemap-Explorer"
       },
       "readonly": {
@@ -1220,6 +1263,8 @@
           "sitemap": "Sitemap"
         },
         "sections": {
+          "attention_limited": "Angezeigt werden {{shown}} von {{total}} gespeicherten Snapshots mit Handlungsbedarf.",
+          "missing_routes": "Fehlende Routen ({{count}})",
           "attention": "Gegenstände, die Aufmerksamkeit erfordern"
         },
         "empty": "Betreten Sie einen Mieter-Slug, um dessen Routenplan und gespeicherte Snapshots zu überprüfen.",

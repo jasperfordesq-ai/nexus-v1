@@ -38,7 +38,7 @@ class ResourceItemPrerenderObserverTest extends TestCase
     // saved() — with primary key
     // -------------------------------------------------------------------------
 
-    public function test_saved_invalidates_resources_index_and_detail_route(): void
+    public function test_saved_invalidates_only_resources_index(): void
     {
         $model = new ResourceItem();
         $model->id        = 5;
@@ -47,10 +47,7 @@ class ResourceItemPrerenderObserverTest extends TestCase
         $this->prerenderMock
             ->shouldReceive('invalidateRoutes')
             ->once()
-            ->with(2, Mockery::on(function (array $routes): bool {
-                return in_array('/resources', $routes, true)
-                    && in_array('/resources/5', $routes, true);
-            }), true);
+            ->with(2, ['/resources'], true);
 
         (new ResourceItemPrerenderObserver())->saved($model);
 
@@ -83,7 +80,7 @@ class ResourceItemPrerenderObserverTest extends TestCase
     // deleted() — with primary key
     // -------------------------------------------------------------------------
 
-    public function test_deleted_invalidates_resources_index_and_detail_route(): void
+    public function test_deleted_invalidates_only_resources_index(): void
     {
         $model = new ResourceItem();
         $model->id        = 8;
@@ -92,10 +89,7 @@ class ResourceItemPrerenderObserverTest extends TestCase
         $this->prerenderMock
             ->shouldReceive('invalidateRoutes')
             ->once()
-            ->with(2, Mockery::on(function (array $routes): bool {
-                return in_array('/resources', $routes, true)
-                    && in_array('/resources/8', $routes, true);
-            }), true);
+            ->with(2, ['/resources'], true);
 
         (new ResourceItemPrerenderObserver())->deleted($model);
 
@@ -159,10 +153,10 @@ class ResourceItemPrerenderObserverTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // Route format verification
+    // Unsupported detail routes are never submitted for invalidation
     // -------------------------------------------------------------------------
 
-    public function test_saved_embeds_id_literally_in_detail_route(): void
+    public function test_saved_does_not_submit_nonexistent_detail_route(): void
     {
         $model = new ResourceItem();
         $model->id        = 17;
@@ -179,7 +173,6 @@ class ResourceItemPrerenderObserverTest extends TestCase
 
         (new ResourceItemPrerenderObserver())->saved($model);
 
-        $this->assertContains('/resources', $captured);
-        $this->assertContains('/resources/17', $captured);
+        $this->assertSame(['/resources'], $captured);
     }
 }

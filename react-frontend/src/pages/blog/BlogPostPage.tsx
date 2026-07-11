@@ -33,6 +33,7 @@ import { PageMeta } from '@/components/seo';
 import { SocialInteractionPanel } from '@/components/social/SocialInteractionPanel';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { usePrerenderReady } from '@/hooks/usePrerenderReady';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAssetUrl, resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
@@ -135,6 +136,7 @@ export function BlogPostPage() {
   usePageTitle(post?.title || t('page_title'));
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  usePrerenderReady(!isLoading && error === null && post !== null);
 
   // AbortController refs to cancel stale requests
   const abortPostRef = useRef<AbortController | null>(null);

@@ -468,6 +468,19 @@
     "provider_sendgrid": "EnvoyerGrille",
     "provider_smtp": "SMTP",
     "prerender": {
+      "reset_all": {
+        "button": "Tout réinitialiser et reconstruire",
+        "title": "Réinitialiser et reconstruire tous les instantanés",
+        "description": "Annulez les anciennes tâches de pré-rendu et lancez une nouvelle reconstruction de toutes les pages publiques, adaptée à chaque locataire, y compris sa page d’accueil, ses pages personnalisées et le contenu de son blog.",
+        "safety": "Le cache complet actuel reste en ligne jusqu’à ce que le nouveau plan de routes soit rendu et validé avec succès. Les reconstructions qui échouent ne remplacent pas la dernière génération valide.",
+        "confirmation_label": "Confirmation",
+        "confirmation_help": "Pour continuer, saisissez {{phrase}}.",
+        "confirmation_phrase": "RÉINITIALISER TOUS LES INSTANTANÉS",
+        "cancel": "Annuler",
+        "confirm": "Lancer la nouvelle reconstruction",
+        "queued": "La nouvelle reconstruction #{{id}} a été mise en file d’attente pour {{tenants}} locataires et {{routes}} routes.",
+        "failed": "La nouvelle reconstruction n’a pas pu être planifiée. Aucun instantané en ligne n’a été supprimé."
+      },
       "description": "Instantanés rendus par le serveur uniquement par des robots. Surveillez la couverture, détectez l’obsolescence et forcez les actualisations.",
       "guide": {
         "title": "Guide en anglais simple",
@@ -656,6 +669,8 @@
         },
         "no_output": "(pas de sortie)",
         "purge_ungated": {
+          "confirm_title": "Supprimer les instantanés inattendus ?",
+          "confirm_message": "Cette action supprime définitivement les pages enregistrées qui ne figurent pas dans le plan de routes actuel de leur locataire. Confirmez que vous avez d’abord vérifié l’aperçu.",
           "description": "Balayez les instantanés dont l’itinéraire ne se trouve pas dans un ensemble attendu par le locataire. Courant après la désactivation d'une fonctionnalité ou pour le nettoyage des routes statiques pré-rendues sans indicateurs de fonctionnalité. Les itinéraires de contenu dynamique sont laissés seuls.",
           "title": "Purger les instantanés non sécurisés (nettoyage 404 par locataire)"
         },
@@ -718,7 +733,10 @@
         "issue_count_many": "Problèmes {{count}}"
       },
       "inventory": {
+        "truncated": "L’inventaire a atteint la limite de sécurité de {{count}} instantanés. Affinez le filtre des locataires avant d’effectuer une action groupée.",
+        "unknown_tenant": "Locataire inconnu",
         "actions": {
+          "open_live_url": "Ouvrir la page en ligne (pas l’instantané enregistré)",
           "close": "Fermer",
           "inspect": "Inspecter",
           "inspect_snapshot": "Inspecter {{path}}",
@@ -770,6 +788,8 @@
           "bulk_recache_other": "Instantanés {{count}} invalidés et remise en cache en file d'attente"
         },
         "inspect": {
+          "load_failed": "Impossible de charger cet instantané. Les données de l’inspection précédente ont été effacées.",
+          "no_snapshot": "Aucun instantané n’est sélectionné.",
           "age": "Âge",
           "all_valid": "tous valides",
           "asset_references": "Références d'actifs ({{count}})",
@@ -852,6 +872,7 @@
           "duration": "Durée",
           "error": "Erreur",
           "exit_code": "Code de sortie",
+          "fence_ready_at": "Barrière de publication prête",
           "finished_at": "Terminé à",
           "log_tail": "Bûche (queue)",
           "queued_at": "En file d'attente à",
@@ -873,6 +894,7 @@
           "cancelled": "Annulé",
           "failed": "Échoué",
           "partial": "Partiel",
+          "pending_fence": "Activation de la barrière",
           "queued": "En file d'attente",
           "running": "En cours d'exécution",
           "status": "Statut",
@@ -900,6 +922,16 @@
         },
         "scope": {
           "all_tenants": "tous les locataires"
+        },
+        "statuses": {
+          "cancelled": "Annulé",
+          "claimed": "Pris en charge",
+          "failed": "Échoué",
+          "partial": "Partiel",
+          "pending_fence": "Activation de la barrière",
+          "queued": "En file d'attente",
+          "running": "En cours d'exécution",
+          "succeeded": "Réussi"
         },
         "table_aria": "Emplois"
       },
@@ -955,6 +987,7 @@
       "live_connected": "Mises à jour en direct connectées",
       "audit": {
         "actions": {
+          "reset_all": "Tout réinitialiser et reconstruire",
           "auto_recache": "Auto-recache",
           "cancel": "Annuler le travail",
           "detect_drift": "Détecter la dérive",
@@ -979,6 +1012,10 @@
           "when": "Quand"
         },
         "empty": "Aucune entrée d'audit.",
+        "errors": {
+          "export": "Échec de l’exportation de l’historique d’audit",
+          "load": "Échec du chargement de l’historique d’audit"
+        },
         "fallbacks": {
           "all": "tous",
           "system": "système"
@@ -997,11 +1034,13 @@
       },
       "overview": {
         "actions": {
+          "download_metrics": "Télécharger les métriques",
           "queue_job": "Travail en file d'attente",
           "refresh": "Rafraîchir"
         },
         "empty_summary": "Aucun résumé disponible.",
         "errors": {
+          "download_metrics": "Échec du téléchargement des métriques",
           "enqueue_job": "Échec de la mise en file d'attente du travail",
           "load_summary": "Échec du chargement du résumé"
         },
@@ -1016,6 +1055,7 @@
           "title": "Forcer l'actualisation"
         },
         "health": {
+          "cache_read_only": "Le cache est en lecture seule",
           "cache_unreachable": "Cache inaccessible",
           "healthy": "En bonne santé",
           "missing": "{{count}} manquant",
@@ -1028,6 +1068,7 @@
           "stale_other": "{{count}} périmé"
         },
         "hints": {
+          "unexpected": "Instantanés enregistrés en dehors des plans de routes actuels des locataires",
           "active_jobs": "{{count}} actif",
           "aging": "Vieillissement {{count}} (>7j)",
           "asset_broken": "Références décédées /actifs/*",
@@ -1054,6 +1095,7 @@
           "coverage": "Couverture",
           "metrics": "Métrique",
           "missing": "Manquant",
+          "unexpected": "Inattendus",
           "queued_jobs": "Travaux en file d'attente",
           "recent_failures": "Échecs récents",
           "status": "Statut"
@@ -1196,9 +1238,10 @@
           "tenant_slug": "banque d'heures"
         },
         "sections": {
-          "dynamic_routes": "Itinéraires dynamiques (plafonnés à 1 000)",
+          "dynamic_routes": "Routes dynamiques",
           "static_routes": "Itinéraires statiques"
         },
+        "tenant": "Locataire {{slug}} (#{{id}})",
         "title": "Explorateur de plan du site"
       },
       "readonly": {
@@ -1257,6 +1300,8 @@
           "sitemap": "Sitemap"
         },
         "sections": {
+          "attention_limited": "Affichage de {{shown}} sur {{total}} instantanés enregistrés nécessitant une intervention.",
+          "missing_routes": "Routes manquantes ({{count}})",
           "attention": "Éléments nécessitant une attention particulière"
         },
         "empty": "Entrez un slug de locataire pour inspecter son plan d'itinéraire et ses instantanés enregistrés.",

@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Schema;
  *
  * Read paths (filesystem):
  *   - The Playwright worker writes snapshots into the named volume
- *     `nexus-php-prerendered`, mounted RO into this container at
+ *     `nexus-php-prerendered`, mounted read/write into this container at
  *     PRERENDER_CACHE_PATH (default /var/www/html/storage/prerendered).
  *     Layout: {host}/{route}/index.html, plus `.last-run.json`,
  *     `.last-manifest.json`, `.failures.tsv`.
@@ -38,7 +38,10 @@ use Illuminate\Support\Facades\Schema;
  *     channel `private-admin-prerender`, event `job.updated`. UI subscribes
  *     to replace polling.
  *
- * All filesystem operations are read-only; nothing here mutates rendered HTML.
+ * Filesystem reads inspect the published cache. Controlled mutation paths
+ * quarantine stale tenant-owned snapshots, rotate the publisher epoch, and
+ * coordinate authoritative rebuilds under the shared mutation lock; rendered
+ * HTML is produced and published by the host worker, not by this service.
  */
 class PrerenderService
 {
@@ -59,10 +62,9 @@ class PrerenderService
         '/timebanking-guide', '/regional-analytics', '/platform/terms', '/platform/privacy',
         '/platform/disclaimer', '/resources', '/kb', '/features', '/changelog',
         '/events', '/groups', '/jobs', '/coupons', '/marketplace', '/volunteering',
+        '/courses', '/podcasts',
         '/organisations', '/pilot-inquiry', '/pilot-apply', '/developers', '/developers/auth',
         '/developers/endpoints', '/developers/webhooks',
-        '/partner', '/social-prescribing', '/impact-report',
-        '/impact-summary', '/strategic-plan',
     ];
 
     /**
@@ -76,7 +78,7 @@ class PrerenderService
      * CPU and clutters the inventory.
      */
     private const ALWAYS_PUBLIC_ROUTES = [
-        '/', '/about', '/faq', '/contact', '/help', '/explore',
+        '/', '/about', '/faq', '/contact', '/help',
         '/terms', '/privacy', '/accessibility', '/cookies',
         '/community-guidelines', '/trust-and-safety', '/acceptable-use',
         '/legal', '/terms/versions', '/privacy/versions', '/accessibility/versions',
@@ -84,14 +86,19 @@ class PrerenderService
         '/timebanking-guide', '/regional-analytics',
         '/platform/terms', '/platform/privacy', '/platform/disclaimer',
         '/features', '/changelog', '/developers', '/developers/auth',
-        '/developers/endpoints', '/developers/webhooks', '/development-status',
+        '/developers/endpoints', '/developers/webhooks',
         '/pilot-inquiry', '/pilot-apply',
-        // Tenant-gated marketing pages — the React app's TenantSlugGate
-        // decides whether to render the actual content or a fallback for the
-        // wrong tenant; either way the response is 200, so it's safe to
-        // prerender for every tenant.
-        '/partner', '/social-prescribing',
-        '/impact-report', '/impact-summary', '/strategic-plan',
+    ];
+
+    /**
+     * Public routes whose React components redirect for every other tenant.
+     * Planning them globally makes final-URL validation reject the snapshot.
+     */
+    private const TENANT_SLUG_ROUTES = [
+        'hour-timebank' => [
+            '/partner', '/social-prescribing', '/impact-summary',
+            '/impact-report', '/strategic-plan',
+        ],
     ];
 
     /**
@@ -102,6 +109,7 @@ class PrerenderService
      * Format: feature_name => [route, route, ...]
      */
     private const FEATURE_GATED_ROUTES = [
+        'explore'             => ['/explore'],
         'blog'                => ['/blog'],
         'events'              => ['/events'],
         'groups'              => ['/groups'],
@@ -110,7 +118,11 @@ class PrerenderService
         'volunteering'        => ['/volunteering', '/organisations'],
         'ideation_challenges' => ['/ideation'],
         'resources'           => ['/resources', '/kb'],
-        'marketplace'         => ['/marketplace', '/marketplace/free', '/marketplace/map'],
+        'courses'             => ['/courses'],
+        'podcasts'            => ['/podcasts'],
+        // /marketplace/map also depends on a build-time maps key and redirects
+        // when unavailable, so it is intentionally not a snapshot route.
+        'marketplace'         => ['/marketplace', '/marketplace/free'],
     ];
 
     /**
@@ -123,6 +135,7 @@ class PrerenderService
 
     public const STALE_AGE_SECONDS = 14 * 24 * 3600;
     public const WARN_AGE_SECONDS  = 7  * 24 * 3600;
+    public const MAX_PLANNED_ROUTES_PER_TENANT = 50000;
 
     public const REALTIME_CHANNEL = 'private-admin-prerender';
     public const REALTIME_EVENT   = 'job.updated';
@@ -130,6 +143,7 @@ class PrerenderService
     private string $cachePath;
     private string $eventLogPath;
     private string $assetsPath;
+    private ?bool $jobFenceSchemaCompatibleCache = null;
 
     public function __construct()
     {
@@ -175,11 +189,21 @@ class PrerenderService
             60,
             fn () => $this->inventory(null, true)
         );
+        $inventoryTruncated = count(array_filter(
+            $inventory,
+            fn ($row) => !empty($row['__truncated'])
+        )) > 0;
         $inventoryRows = array_values(array_filter(
             $inventory,
             fn ($row) => empty($row['__truncated'])
         ));
-        $expected = $this->expectedSnapshotCount($tenants);
+        $coverage = $this->coverageFor($tenants, $inventoryRows);
+        $expected = array_sum(array_column($coverage, 'expected'));
+        $expectedPresent = array_sum(array_column($coverage, 'rendered'));
+        $planErrorCount = count(array_filter(
+            $coverage,
+            fn (array $row) => !empty($row['plan_error'])
+        ));
         $present = count($inventoryRows);
 
         $oldest = null; $newest = null; $stale = 0; $warn = 0; $totalSize = 0;
@@ -204,21 +228,33 @@ class PrerenderService
         $queuedJobs = 0;
         if (\Illuminate\Support\Facades\Schema::hasTable('prerender_jobs')) {
             $activeJobs = (int) DB::table('prerender_jobs')->whereIn('status', ['claimed', 'running'])->count();
-            $queuedJobs = (int) DB::table('prerender_jobs')->where('status', 'queued')->count();
+            $queuedQuery = DB::table('prerender_jobs')->where('status', 'queued');
+            if ($this->hasJobFenceColumn()) {
+                $queuedQuery->orWhere('fence_state', self::FENCE_STATE_PENDING);
+            }
+            $queuedJobs = (int) $queuedQuery->count();
         }
 
         return [
             'cache_readable'        => $this->cacheReadable(),
+            'cache_writable'        => $this->cacheWritable(),
             'cache_path'            => $this->cachePath,
+            'inventory_truncated'   => $inventoryTruncated,
+            'inventory_hard_cap'    => self::INVENTORY_HARD_CAP,
             'total_snapshots'       => $present,
             'total_size_bytes'      => $totalSize,
             'oldest_age_s'          => $oldest,
             'newest_age_s'          => $newest,
             'stale_count'           => $stale,
             'warn_count'            => $warn,
-            'missing_count'         => max(0, $expected - $present),
+            'missing_count'         => max(0, $expected - $expectedPresent),
             'expected_count'        => $expected,
-            'coverage_pct'          => $expected > 0 ? round(($present / $expected) * 100, 1) : 0.0,
+            'expected_rendered_count' => $expectedPresent,
+            'plan_error_count'      => $planErrorCount,
+            'unexpected_count'      => max(0, $present - $expectedPresent),
+            'coverage_pct'          => $expected > 0
+                ? round((min($expectedPresent, $expected) / $expected) * 100, 1)
+                : 0.0,
             'last_run'              => $lastRun,
             'recent_failures'       => count($failures),
             'active_jobs'           => $activeJobs,
@@ -252,12 +288,19 @@ class PrerenderService
      */
     public const INVENTORY_HARD_CAP = 50_000;
 
-    public function inventory(?string $tenantSlug = null, bool $deep = true): array
+    public function inventory(
+        ?string $tenantSlug = null,
+        bool $deep = true,
+        ?callable $bundleFingerprintSelector = null
+    ): array
     {
         if (!$this->cacheReadable()) return [];
+        $cacheLock = $this->acquireCacheLock(LOCK_SH);
+        try {
 
         $tenantTargets = $this->loadTenantTargets();
         $targetsByHost = $this->tenantTargetsByHost($tenantTargets);
+        $tenantIdentityEnforced = is_file($this->cachePath . '/.tenant-identity-v1');
         $tenantFilter = null;
         if ($tenantSlug !== null && $tenantSlug !== '') {
             $tenantFilter = $this->tenantTargetFromList($tenantTargets, $tenantSlug);
@@ -271,11 +314,18 @@ class PrerenderService
 
         $rows = [];
         $truncated = false;
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator(
+        $directory = new \RecursiveDirectoryIterator(
                 $this->cachePath,
                 \FilesystemIterator::SKIP_DOTS
+        );
+        $visibleTrees = new \RecursiveCallbackFilterIterator(
+            $directory,
+            static fn (\SplFileInfo $entry): bool => !(
+                $entry->isDir() && str_starts_with($entry->getFilename(), '.')
             )
+        );
+        $it = new \RecursiveIteratorIterator(
+            $visibleTrees
         );
 
         foreach ($it as $file) {
@@ -289,7 +339,10 @@ class PrerenderService
 
             $firstSlash = strpos($rel, '/');
             if ($firstSlash === false) continue;
-            $host = substr($rel, 0, $firstSlash);
+            // DNS hostnames are case-insensitive. Cache publication always
+            // canonicalises them to lowercase, so attribution must do the
+            // same even when an older directory used mixed case.
+            $host = strtolower(substr($rel, 0, $firstSlash));
             $remainder = substr($rel, $firstSlash);
             $route = preg_replace('#/index\.html$#', '', $remainder) ?: '/';
 
@@ -297,9 +350,7 @@ class PrerenderService
 
             if ($tenantFilter !== null) {
                 if ($host !== $tenantFilter['host']) continue;
-                if (!$this->routeMatchesTenantTarget($route, $tenantFilter)) continue;
-                $tenantTarget = $tenantFilter;
-                $tenantRoute = $this->tenantLocalRoute($route, $tenantFilter);
+                if ((int) ($tenantTarget['tenant_id'] ?? 0) !== (int) $tenantFilter['tenant_id']) continue;
             }
 
             $mtime = $file->getMTime();
@@ -330,8 +381,15 @@ class PrerenderService
             if ($contentStale && $staleness === 'warn') $staleness = 'stale';
 
             $statusCode = $this->readStatusSidecar(dirname($absPath));
+            $snapshotIdentity = $this->readTenantIdentitySidecar(dirname($absPath));
+            $identityMissing = $snapshotIdentity === null;
+            $identityMismatch = ($identityMissing && $tenantIdentityEnforced)
+                || (!$identityMissing && (
+                    (int) ($snapshotIdentity['tenant_id'] ?? 0) !== (int) ($tenantTarget['tenant_id'] ?? 0)
+                    || (string) ($snapshotIdentity['tenant_slug'] ?? '') !== (string) ($tenantTarget['slug'] ?? '')
+                ));
 
-            $rows[] = [
+            $row = [
                 'host'             => $host,
                 'route'            => $route,
                 'tenant_id'        => $tenantTarget['tenant_id'] ?? null,
@@ -348,7 +406,16 @@ class PrerenderService
                 'content_stale'    => $contentStale,
                 'content_stale_reason' => $contentStaleReason,
                 'http_status'      => $statusCode,
+                'snapshot_tenant_id' => $snapshotIdentity['tenant_id'] ?? null,
+                'snapshot_tenant_slug' => $snapshotIdentity['tenant_slug'] ?? null,
+                'tenant_identity_missing' => $identityMissing,
+                'tenant_identity_enforced' => $tenantIdentityEnforced,
+                'tenant_identity_mismatch' => $identityMismatch,
             ];
+            if ($bundleFingerprintSelector !== null && $bundleFingerprintSelector($row)) {
+                $row['_bundle_fingerprint'] = $this->snapshotBundleFingerprint($absPath);
+            }
+            $rows[] = $row;
         }
 
         usort($rows, fn($a, $b) => $b['mtime'] <=> $a['mtime']);
@@ -362,6 +429,10 @@ class PrerenderService
             ]);
         }
         return $rows;
+        } finally {
+            flock($cacheLock, LOCK_UN);
+            fclose($cacheLock);
+        }
     }
 
     /**
@@ -375,8 +446,8 @@ class PrerenderService
         $safe = $this->safeCachePath($cachePath);
         if ($safe === null) return null;
 
-        $abs = $this->cachePath . '/' . $safe;
-        if (!is_file($abs) || !is_readable($abs)) return null;
+        $abs = $this->resolveExistingCacheFile($this->cachePath . '/' . $safe);
+        if ($abs === null || !is_readable($abs)) return null;
 
         $html = (string) file_get_contents($abs);
         $mtime = (int) filemtime($abs);
@@ -511,10 +582,20 @@ class PrerenderService
     {
         $tenants = $this->loadTenantTargets();
         if (empty($tenants)) return [];
-        $inventory = $this->inventory(null, true);
+        return $this->coverageFor($tenants, $this->inventory(null, true));
+    }
+
+    /**
+     * @param list<array<string,mixed>> $tenants
+     * @param list<array<string,mixed>> $inventory
+     * @return list<array<string,mixed>>
+     */
+    private function coverageFor(array $tenants, array $inventory): array
+    {
 
         $byHost = [];
         foreach ($inventory as $row) {
+            if (!empty($row['__truncated'])) continue;
             $byHost[$row['host']][$row['route']] = $row;
         }
 
@@ -524,17 +605,31 @@ class PrerenderService
             $prefix = $t['prefix'];
             // Resolve THIS tenant's expected static route set — features they
             // don't have aren't expected to be rendered.
-            $tObj = (object) ['features' => $t['features'], 'configuration' => $t['configuration']];
-            $tenantRoutes = $this->routesForTenant($tObj);
+            $planError = null;
+            try {
+                $tenantRoutes = $this->expectedRoutesForTenant(
+                    $t,
+                    self::MAX_PLANNED_ROUTES_PER_TENANT,
+                    true
+                );
+            } catch (\Throwable $e) {
+                $planError = substr($e->getMessage(), 0, 500);
+                Log::warning('Prerender coverage route plan failed', [
+                    'tenant_id' => $t['tenant_id'] ?? null,
+                    'tenant_slug' => $t['slug'] ?? null,
+                    'error' => $planError,
+                ]);
+                $tenantRoutes = $this->routesForTenant((object) $t);
+            }
 
             $rendered = 0; $missing = []; $stale = []; $invalidAssets = [];
             foreach ($tenantRoutes as $route) {
-                $expectedRoute = $prefix . $route;
+                $expectedRoute = $route === '/' && $prefix !== '' ? $prefix : $prefix . $route;
                 $found = $byHost[$host][$expectedRoute] ?? null;
-                if ($found === null) { $missing[] = $expectedRoute; continue; }
+                if ($found === null) { $missing[] = $route; continue; }
                 $rendered++;
-                if ($found['staleness'] !== 'fresh') $stale[] = $expectedRoute;
-                if (!empty($found['asset_issues'])) $invalidAssets[] = $expectedRoute;
+                if ($found['staleness'] !== 'fresh') $stale[] = $route;
+                if (!empty($found['asset_issues'])) $invalidAssets[] = $route;
             }
             $rows[] = [
                 'tenant_id'      => $t['tenant_id'],
@@ -546,6 +641,7 @@ class PrerenderService
                 'missing_routes' => $missing,
                 'stale_routes'   => $stale,
                 'asset_invalid_routes' => $invalidAssets,
+                'plan_error'     => $planError,
             ];
         }
         usort($rows, fn($a, $b) => strcmp($a['slug'], $b['slug']));
@@ -848,13 +944,13 @@ class PrerenderService
         $host = $target['host'];
         $prefix = $target['prefix'];
 
-        $routes = array_values(array_unique(array_filter(
-            $routes,
-            fn($r) => is_string($r)
-                && $r !== ''
-                && $r[0] === '/'
-                && preg_match(self::ROUTE_REGEX, $r)
-        )));
+        $normalisedRoutes = [];
+        foreach ($routes as $route) {
+            if (!is_string($route)) continue;
+            $normalised = self::normalizeRoute($route);
+            if ($normalised !== null) $normalisedRoutes[] = $normalised;
+        }
+        $routes = array_values(array_unique($normalisedRoutes));
         if (empty($routes)) return 0;
 
         $recacheRoutes = array_values(array_filter(
@@ -862,14 +958,44 @@ class PrerenderService
             fn (string $route) => $this->tenantRouteCanBePrerendered($tenantId, $route, $target)
         ));
 
-        $deleted = 0;
+        // Serialize durable replacement intent and deletion with publication.
+        // A fast worker may render immediately after enqueue, but it cannot
+        // publish until this critical section has removed the old snapshot.
+        return $this->withCacheMutationLock(function () use (
+            $enqueueRecache,
+            $recacheRoutes,
+            $tenantId,
+            $routes,
+            $host,
+            $prefix
+        ): int {
+
+        $statusBearingSnapshot = false;
         foreach ($routes as $route) {
-            $outRoute = $prefix . $route;
-            $rel = $route === '/' ? $host . '/index.html' : $host . $outRoute . '/index.html';
-            $abs = $this->cachePath . '/' . $rel;
-            if ($this->deleteSnapshotBundle($abs)) {
-                $deleted++;
+            $outRoute = $route === '/' && $prefix !== '' ? $prefix : $prefix . $route;
+            $rel = $outRoute === '/' ? $host . '/index.html' : $host . $outRoute . '/index.html';
+            if ($this->hasCompiledStatusSidecar(dirname($this->cachePath . '/' . $rel))) {
+                $statusBearingSnapshot = true;
+                break;
             }
+        }
+
+        if ($statusBearingSnapshot) {
+            // Nginx compiles status sidecars into a map that changes only on
+            // reload. Targeted deletion/replacement would split HTML from its
+            // HTTP status, so leave the live generation intact and schedule a
+            // complete authoritative build instead.
+            if ($enqueueRecache) {
+                $this->enqueueJob(
+                    null,
+                    null,
+                    true,
+                    false,
+                    null,
+                    self::PRIORITY_HIGH
+                );
+            }
+            return 0;
         }
 
         if ($enqueueRecache && $recacheRoutes !== []) {
@@ -885,21 +1011,64 @@ class PrerenderService
             if ($burstCount === 1) {
                 \Illuminate\Support\Facades\Cache::put($burstKey, 1, 60);
             }
-            $routesArg = $burstCount > 50 ? null : implode(',', $recacheRoutes);
+            $routeChunks = $burstCount > 50
+                ? [null]
+                : $this->chunkRoutesForJobs($recacheRoutes);
 
             // NORMAL priority: a content save is a user-initiated event with a
             // human waiting for the public page to update. Background sweeps
             // run at LOW; observer-triggered work belongs ahead of them.
-            $this->enqueueJob(
-                $tenantId,
-                $routesArg,
-                false, // force (snapshots are gone — they'll be re-rendered)
-                false,
-                null,
-                self::PRIORITY_NORMAL
-            );
+            foreach ($routeChunks as $routesArg) {
+                $this->enqueueJob(
+                    $tenantId,
+                    $routesArg,
+                    false,
+                    false,
+                    null,
+                    self::PRIORITY_NORMAL
+                );
+            }
         }
-        return $deleted;
+
+        // Only remove the live snapshot after durable replacement intent has
+        // been written. If enqueueing fails, the known-good (albeit stale)
+        // page remains available instead of becoming a cache miss forever.
+            $count = 0;
+            foreach ($routes as $route) {
+                $outRoute = $route === '/' && $prefix !== '' ? $prefix : $prefix . $route;
+                $rel = $outRoute === '/' ? $host . '/index.html' : $host . $outRoute . '/index.html';
+                $abs = $this->cachePath . '/' . $rel;
+                if ($this->deleteSnapshotBundle($abs)) $count++;
+            }
+            return $count;
+        });
+    }
+
+    /**
+     * @param list<string> $routes
+     * @return list<string>
+     */
+    private function chunkRoutesForJobs(array $routes, int $maxBytes = 1900): array
+    {
+        $chunks = [];
+        $current = [];
+        $bytes = 0;
+        foreach ($routes as $route) {
+            $routeBytes = strlen($route) + ($current === [] ? 0 : 1);
+            if ($routeBytes > $maxBytes) {
+                throw new \InvalidArgumentException("Prerender route exceeds the {$maxBytes}-byte chunk limit");
+            }
+            if ($current !== [] && $bytes + $routeBytes > $maxBytes) {
+                $chunks[] = implode(',', $current);
+                $current = [];
+                $bytes = 0;
+                $routeBytes = strlen($route);
+            }
+            $current[] = $route;
+            $bytes += $routeBytes;
+        }
+        if ($current !== []) $chunks[] = implode(',', $current);
+        return $chunks;
     }
 
     // -------------------------------------------------------------------------
@@ -944,22 +1113,30 @@ class PrerenderService
         $globRegex = $this->globToRegex($pattern, $allowDoubleStar);
         $deleted = [];
 
-        foreach ($this->inventory(null, false) as $row) {
-            if ($tenantTarget !== null) {
-                if (($row['host'] ?? '') !== $tenantTarget['host']) continue;
-                if (!$this->routeMatchesTenantTarget((string) ($row['route'] ?? ''), $tenantTarget)) continue;
-            }
+        $inventory = $this->inventory($tenantSlug, false);
+        if (count(array_filter($inventory, fn ($row) => !empty($row['__truncated']))) > 0) {
+            throw new \RuntimeException('Snapshot inventory reached its safety cap; narrow the tenant scope before purging');
+        }
 
-            $matchRoute = $tenantTarget !== null
-                ? (string) ($row['tenant_route'] ?? $this->tenantLocalRoute((string) ($row['route'] ?? ''), $tenantTarget))
-                : (string) ($row['route'] ?? '');
-            if (!preg_match($globRegex, $matchRoute)) continue;
+        $deleteRows = function () use ($inventory, $tenantTarget, $globRegex, $dryRun, &$deleted): void {
+            foreach ($inventory as $row) {
+                if (!empty($row['__truncated'])) continue;
+                if ($tenantTarget !== null
+                    && (int) ($row['tenant_id'] ?? 0) !== (int) $tenantTarget['tenant_id']) continue;
 
-            $abs = $this->cachePath . '/' . $row['cache_path'];
-            if (!$dryRun && is_file($abs)) {
-                $this->deleteSnapshotBundle($abs);
+                // Match tenant-local routes for both scoped and all-tenant purges.
+                $matchRoute = (string) ($row['tenant_route'] ?? $row['route'] ?? '');
+                if (!preg_match($globRegex, $matchRoute)) continue;
+
+                $abs = $this->cachePath . '/' . $row['cache_path'];
+                if (!$dryRun && is_file($abs) && !$this->deleteSnapshotBundle($abs)) continue;
+                $deleted[] = $row['cache_path'];
             }
-            $deleted[] = $row['cache_path'];
+        };
+        if ($dryRun) {
+            $deleteRows();
+        } else {
+            $this->withCacheMutationLock($deleteRows);
         }
 
         return [
@@ -972,18 +1149,153 @@ class PrerenderService
 
     private function deleteSnapshotBundle(string $indexPath): bool
     {
-        if (!str_ends_with($indexPath, '/index.html') || !is_file($indexPath)) {
+        // Resolve the existing file before deletion. This is an independent
+        // containment boundary: route validation protects callers, while
+        // realpath also defeats symlink escapes and future call sites that
+        // accidentally concatenate an unsafe relative path.
+        $indexPath = $this->resolveExistingCacheFile($indexPath);
+        if ($indexPath === null || basename($indexPath) !== 'index.html') {
             return false;
         }
 
         $dir = dirname($indexPath);
-        @unlink($indexPath);
+        if ($this->hasCompiledStatusSidecar($dir)) {
+            // `_status` is compiled into nginx's shared status map. Only the
+            // authoritative publisher can change HTML + map + nginx reload as
+            // one rollback-capable operation.
+            return false;
+        }
+        $deleted = @unlink($indexPath);
         @unlink($dir . '/index.html.sha256');
-        @unlink($dir . '/_status');
         @unlink($dir . '/index.md');
+        @unlink($dir . '/_status');
+        @unlink($dir . '/_tenant.json');
         @rmdir($dir);
 
+        if ($deleted) {
+            Cache::forget('prerender:summary:inventory');
+        }
+
+        return $deleted && !is_file($indexPath);
+    }
+
+    /**
+     * Remove the bytes for a status-bearing snapshot while deliberately
+     * retaining `_status` for the authoritative publisher to replace with the
+     * compiled nginx map. Any failed unlink is fatal: reporting a quarantine
+     * that left cross-tenant HTML live would be worse than failing the action.
+     */
+    private function quarantineStatusSnapshotHtml(string $indexPath): bool
+    {
+        $indexPath = $this->resolveExistingCacheFile($indexPath);
+        if ($indexPath === null || basename($indexPath) !== 'index.html') {
+            return false;
+        }
+
+        $dir = dirname($indexPath);
+        if (!$this->hasCompiledStatusSidecar($dir)) {
+            return false;
+        }
+
+        $this->markAuthoritativeRepairRequired('status_snapshot_quarantined');
+
+        foreach ([$indexPath, $dir . '/index.html.sha256', $dir . '/index.md', $dir . '/_tenant.json'] as $path) {
+            if ((file_exists($path) || is_link($path)) && !@unlink($path)) {
+                throw new \RuntimeException("Unable to quarantine prerender snapshot file: {$path}");
+            }
+        }
+        if (is_file($indexPath)) {
+            throw new \RuntimeException("Prerender snapshot remained after quarantine: {$indexPath}");
+        }
+
+        Cache::forget('prerender:summary:inventory');
         return true;
+    }
+
+    private function markAuthoritativeRepairRequired(string $reason): void
+    {
+        $path = $this->cachePath . '/.authoritative-repair-required';
+        $temp = $path . '.tmp.' . bin2hex(random_bytes(8));
+        $payload = json_encode([
+            'version' => 1,
+            'reason' => $reason,
+            'marked_at' => gmdate(DATE_ATOM),
+        ], JSON_UNESCAPED_SLASHES) . "\n";
+        if (@file_put_contents($temp, $payload, LOCK_EX) === false
+            || !@chmod($temp, 0664)
+            || !@rename($temp, $path)) {
+            @unlink($temp);
+            throw new \RuntimeException('Could not persist authoritative prerender repair requirement');
+        }
+    }
+
+    public function authoritativeRepairRequired(): bool
+    {
+        return is_file($this->cachePath . '/.authoritative-repair-required');
+    }
+
+    /**
+     * Fingerprint the complete publishable bundle, not HTML alone. Ownership
+     * and status sidecars are part of the snapshot's meaning; a destructive
+     * preview must be invalidated if any of them changes before execution.
+     */
+    private function snapshotBundleFingerprint(string $indexPath): ?string
+    {
+        $indexPath = $this->resolveExistingCacheFile($indexPath);
+        if ($indexPath === null || basename($indexPath) !== 'index.html') {
+            return null;
+        }
+
+        $dir = dirname($indexPath);
+        $parts = [];
+        foreach (['index.html', 'index.html.sha256', 'index.md', '_status', '_tenant.json'] as $name) {
+            $path = $dir . '/' . $name;
+            if (!is_file($path) || is_link($path)) {
+                $parts[$name] = null;
+                continue;
+            }
+            $hash = @hash_file('sha256', $path);
+            if (!is_string($hash)) {
+                throw new \RuntimeException("Unable to fingerprint prerender snapshot file: {$path}");
+            }
+            $parts[$name] = [
+                'bytes' => (int) filesize($path),
+                'sha256' => $hash,
+            ];
+        }
+
+        return hash('sha256', (string) json_encode($parts, JSON_UNESCAPED_SLASHES));
+    }
+
+    /** Serialize cache mutations with the host publisher's volume lock. */
+    private function withCacheMutationLock(callable $operation, float $timeoutSeconds = 120.0): mixed
+    {
+        if (!is_dir($this->cachePath) && !@mkdir($this->cachePath, 0775, true) && !is_dir($this->cachePath)) {
+            throw new \RuntimeException('Prerender cache root is unavailable for mutation');
+        }
+        $handle = $this->acquireCacheLock(LOCK_EX, $timeoutSeconds);
+        try {
+            return $operation();
+        } finally {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
+    }
+
+    /** @return resource */
+    private function acquireCacheLock(int $mode, float $timeoutSeconds = 120.0)
+    {
+        $handle = @fopen($this->cachePath . '/.mutation.lock', 'c+');
+        if ($handle === false) {
+            throw new \RuntimeException('Prerender cache mutation lock is unavailable');
+        }
+        $deadline = microtime(true) + max(0.0, $timeoutSeconds);
+        do {
+            if (flock($handle, $mode | LOCK_NB)) return $handle;
+            usleep(100_000);
+        } while (microtime(true) < $deadline);
+        fclose($handle);
+        throw new \RuntimeException('Timed out acquiring the prerender cache lock');
     }
 
     private function globToRegex(string $glob, bool $allowDoubleStar): string
@@ -1016,13 +1328,72 @@ class PrerenderService
     public const PRIORITY_NORMAL = 5;
     public const PRIORITY_LOW    = 7;
 
-    /**
-     * Route regex used everywhere (controller, webhook, observer-injected
-     * routes). Routes flow through to a bash shell `eval` in the host job
-     * processor, so input validation is a defence-in-depth requirement, not
-     * a UX nicety.
-     */
+    private const FENCE_STATE_PENDING = 'pending';
+    private const FENCE_STATE_READY = 'ready';
+    private const FENCE_STATE_ACTIVATED = 'activated';
+    // Existing blue/green workers claim only status='queued'. Keeping a
+    // not-yet-fenced intent in an existing terminal enum state makes the
+    // additive migration rolling-safe without altering the live status ENUM.
+    private const FENCE_PENDING_STORAGE_STATUS = 'failed';
+
+    /** Allowed character floor for public routes. Use isValidRoute(), which
+     * also rejects traversal, ambiguous separators, and dangerous encodings. */
     public const ROUTE_REGEX = '#^/[A-Za-z0-9._~/%:@!$()*+,;=\-]*$#';
+
+    public static function normalizeRoute(string $route): ?string
+    {
+        if ($route === '' || strlen($route) > 1024 || preg_match(self::ROUTE_REGEX, $route) !== 1) {
+            return null;
+        }
+
+        // Treat a conventional trailing slash as the same route, but never
+        // allow empty interior segments. This keeps CMS webhook payloads
+        // friendly without letting aliases delete a snapshot and then miss
+        // the matching recache eligibility check.
+        if ($route !== '/') {
+            $route = rtrim($route, '/');
+        }
+        if ($route === '') $route = '/';
+
+        // Empty path segments and dot segments are ambiguous across URL,
+        // proxy, framework, and filesystem normalisation layers.
+        if (str_contains($route, '//')
+            || preg_match('#(?:^|/)\.{1,2}(?:/|$)#', $route) === 1) {
+            return null;
+        }
+
+        // Percent escapes must be well formed. Encoded NUL, percent, dot, or
+        // path separators can be decoded by a downstream layer into a second
+        // traversal or separator, so reject them at the protocol boundary.
+        if (preg_match('/%(?![0-9A-Fa-f]{2})/', $route) === 1
+            || preg_match('/%(?:00|25|2e|2f|5c)/i', $route) === 1) {
+            return null;
+        }
+
+        return $route;
+    }
+
+    public static function isValidRoute(string $route): bool
+    {
+        return self::normalizeRoute($route) === $route;
+    }
+
+    /** Canonical filesystem/URL host form used by planners and cache keys. */
+    public static function normalizeHost(string $host): ?string
+    {
+        $host = strtolower(rtrim(trim($host), '.'));
+        if ($host === '' || strlen($host) > 253) return null;
+        if ($host === 'localhost' || filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return $host;
+        }
+        if (preg_match(
+            '/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$/',
+            $host
+        ) !== 1) {
+            return null;
+        }
+        return $host;
+    }
 
     public static function routeRequiresTenantScope(string $route): bool
     {
@@ -1040,6 +1411,9 @@ class PrerenderService
             '#^/volunteering/opportunities/[^/]+$#',
             '#^/marketplace/(?!free$|map$|category/)[^/]+$#',
             '#^/marketplace/category/[^/]+$#',
+            '#^/courses/[^/]+$#',
+            '#^/podcasts/[^/]+$#',
+            '#^/podcasts/[^/]+/[^/]+$#',
         ];
 
         foreach ($patterns as $pattern) {
@@ -1066,7 +1440,10 @@ class PrerenderService
     ): int {
         $priority = max(1, min(9, $priority));
         if ($routes !== null) {
-            $routes = substr(trim($routes), 0, 2000);
+            $routes = trim($routes);
+            if (strlen($routes) > 2000) {
+                throw new \InvalidArgumentException('Prerender route set exceeds the 2000-byte job limit; split it into deterministic chunks');
+            }
             if ($routes === '') {
                 $routes = null;
             } else {
@@ -1076,9 +1453,11 @@ class PrerenderService
                 // dynamic routesFor() could land unsafe characters in a shell
                 // eval. Reject those here.
                 $tokens = array_filter(array_map('trim', explode(',', $routes)));
-                foreach ($tokens as $tok) {
-                    if (!preg_match(self::ROUTE_REGEX, $tok)) {
-                        throw new \InvalidArgumentException("Invalid route in enqueueJob: {$tok}");
+                $normalisedTokens = [];
+                foreach ($tokens as $rawToken) {
+                    $tok = self::normalizeRoute($rawToken);
+                    if ($tok === null) {
+                        throw new \InvalidArgumentException("Invalid route in enqueueJob: {$rawToken}");
                     }
                     if (
                         $tenantId === null
@@ -1089,8 +1468,9 @@ class PrerenderService
                     if ($tenantId !== null && !$this->tenantRouteCanBePrerendered($tenantId, $tok)) {
                         throw new \InvalidArgumentException("Route is not available for tenant in enqueueJob: {$tok}");
                     }
+                    $normalisedTokens[] = $tok;
                 }
-                $routes = implode(',', $tokens);
+                $routes = implode(',', array_values(array_unique($normalisedTokens)));
                 if ($routes === '') $routes = null;
             }
         }
@@ -1113,12 +1493,13 @@ class PrerenderService
                 // If a higher-priority caller is enqueueing a dup, promote it.
                 if ($priority < (int) ($existing->priority ?? self::PRIORITY_NORMAL)) {
                     DB::table('prerender_jobs')->where('id', $existing->id)->update(['priority' => $priority]);
-                    $this->broadcastJob((int) $existing->id);
+                    $existingId = (int) $existing->id;
+                    DB::afterCommit(fn () => $this->broadcastJob($existingId));
                 }
                 return (int) $existing->id;
             }
 
-            $id = (int) DB::table('prerender_jobs')->insertGetId([
+            $values = [
                 'requested_by'  => $requestedBy,
                 'tenant_id'     => $tenantId,
                 'routes'        => $routes,
@@ -1127,25 +1508,573 @@ class PrerenderService
                 'priority'      => $priority,
                 'status'        => 'queued',
                 'queued_at'     => date('Y-m-d H:i:s'),
-            ]);
+            ];
+            if ($this->hasJobFenceColumn()) {
+                $values['fence_state'] = self::FENCE_STATE_READY;
+                $values['fence_ready_at'] = date('Y-m-d H:i:s');
+            }
+            $id = (int) DB::table('prerender_jobs')->insertGetId($values);
 
-            $this->broadcastJob($id);
+            // Enqueue is frequently nested inside a content/configuration
+            // transaction. Never publish a realtime job that can still roll
+            // back and disappear from the database.
+            DB::afterCommit(fn () => $this->broadcastJob($id));
             return $id;
         });
     }
 
     public function cancelJob(int $id): bool
     {
-        $rows = DB::table('prerender_jobs')
+        $query = DB::table('prerender_jobs')
             ->where('id', $id)
-            ->where('status', 'queued')
-            ->update([
-                'status'        => 'cancelled',
-                'finished_at'   => date('Y-m-d H:i:s'),
-                'error_message' => 'cancelled by admin',
-            ]);
+            ->where(function ($state): void {
+                if ($this->hasJobFenceColumn()) {
+                    $state->where(function ($ordinary): void {
+                        $ordinary->where('status', 'queued')
+                            ->where('fence_state', '<>', self::FENCE_STATE_ACTIVATED);
+                    })->orWhere('fence_state', self::FENCE_STATE_PENDING);
+                    return;
+                }
+                $state->where('status', 'queued');
+            });
+        $values = [
+            'status'        => 'cancelled',
+            'finished_at'   => date('Y-m-d H:i:s'),
+            'error_message' => 'cancelled by admin',
+        ];
+        if ($this->hasJobFenceColumn()) {
+            $values['fence_state'] = self::FENCE_STATE_READY;
+            $values['fence_ready_at'] = date('Y-m-d H:i:s');
+        }
+        $rows = $query->update($values);
         if ($rows > 0) $this->broadcastJob($id);
         return $rows > 0;
+    }
+
+    /**
+     * Fence all older work and enqueue one authoritative, tenant-aware rebuild.
+     * Existing snapshots remain live until the host worker has rendered and
+     * validated the complete new plan; the shell then reconciles obsolete
+     * routes only after a fully successful global force run.
+     *
+     * @return array{job_id:int,cancelled_jobs:int,cancelled_active_jobs:int,tenant_count:int,planned_routes:int}
+     */
+    public function resetAllSnapshots(
+        ?int $requestedBy,
+        ?string $ip = null,
+        ?string $userAgent = null
+    ): array
+    {
+        if (!Schema::hasTable('prerender_jobs')) {
+            throw new \RuntimeException('Prerender job queue table is unavailable');
+        }
+
+        $targets = $this->loadTenantTargets();
+        if ($targets === []) {
+            throw new \RuntimeException('No active tenant render targets are available');
+        }
+
+        $plannedRoutes = 0;
+        $previousFreshSetting = config('prerender.runtime_force_fresh_sitemap', false);
+        $previousBypassSetting = config('prerender.runtime_bypass_sitemap_cache', false);
+        config([
+            'prerender.runtime_force_fresh_sitemap' => true,
+            'prerender.runtime_bypass_sitemap_cache' => true,
+        ]);
+        try {
+            foreach ($targets as $target) {
+                $plannedRoutes += count($this->expectedRoutesForTenant(
+                    $target,
+                    self::MAX_PLANNED_ROUTES_PER_TENANT,
+                    true
+                ));
+            }
+        } finally {
+            config([
+                'prerender.runtime_force_fresh_sitemap' => $previousFreshSetting,
+                'prerender.runtime_bypass_sitemap_cache' => $previousBypassSetting,
+            ]);
+        }
+        if ($plannedRoutes <= 0) {
+            throw new \RuntimeException('Authoritative route plan is empty');
+        }
+
+        $result = DB::transaction(function () use (
+            $requestedBy,
+            $ip,
+            $userAgent,
+            $targets,
+            $plannedRoutes
+        ): array {
+            $intent = $this->enqueueAuthoritativeRebuildIntent($requestedBy);
+            $result = [
+                ...$intent,
+                'tenant_count' => count($targets),
+                'planned_routes' => $plannedRoutes,
+            ];
+
+            // A successful reset is an enterprise control-plane action: its
+            // durable intent and success audit must either both commit or both
+            // roll back. All other audit calls remain deliberately best-effort.
+            $this->persistAudit(
+                'reset_all',
+                $requestedBy,
+                null,
+                $result['job_id'],
+                'ok',
+                $result,
+                $ip,
+                $userAgent
+            );
+
+            return $result;
+        });
+
+        DB::afterCommit(function (): void {
+            try {
+                app(SitemapService::class)->clearCache();
+                Cache::forget('prerender:summary:inventory');
+            } catch (\Throwable $e) {
+                Log::warning('Post-commit reset sitemap invalidation failed', [
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        });
+
+        return $result;
+    }
+
+    /**
+     * Write only the authoritative queue intent. This method is safe inside a
+     * tenant/configuration transaction: filesystem lease revocation, the
+     * publisher barrier, cache changes, and broadcasts are deferred until the
+     * outermost database commit succeeds.
+     *
+     * @return array{job_id:int,cancelled_jobs:int,cancelled_active_jobs:int}
+     */
+    public function enqueueAuthoritativeRebuildIntent(?int $requestedBy): array
+    {
+        if (!Schema::hasTable('prerender_jobs')) {
+            throw new \RuntimeException('Prerender job queue table is unavailable');
+        }
+        if (!$this->jobFenceSchemaCompatible()) {
+            throw new \RuntimeException('Prerender fence activation migration is required');
+        }
+
+        $activeCount = 0;
+        $cancelledActive = 0;
+        $jobId = 0;
+
+        DB::transaction(function () use (
+            &$activeCount,
+            &$cancelledActive,
+            &$jobId,
+            $requestedBy
+        ): void {
+            $rows = DB::table('prerender_jobs')
+                ->where(function ($state): void {
+                    $state->whereIn('status', ['queued', 'claimed', 'running'])
+                        ->orWhere('fence_state', self::FENCE_STATE_PENDING);
+                })
+                ->lockForUpdate()
+                ->get(['id', 'status', 'fence_state']);
+            $activeCount = $rows->count();
+            $cancelledActive = $rows->filter(
+                fn ($row) => in_array($row->status, ['claimed', 'running'], true)
+            )->count();
+
+            $existing = DB::table('prerender_jobs')
+                ->where('fence_state', self::FENCE_STATE_PENDING)
+                ->whereNull('fence_ready_at')
+                ->whereNull('tenant_id')
+                ->whereNull('routes')
+                ->where('force_render', 1)
+                ->orderByDesc('id')
+                ->lockForUpdate()
+                ->first();
+            if ($existing) {
+                $jobId = (int) $existing->id;
+                $activeCount = max(0, $activeCount - 1);
+                return;
+            }
+
+            // A NULL fence timestamp is a durable, non-claimable outbox row.
+            // No filesystem or existing-job state changes until the outermost
+            // caller transaction commits successfully.
+            $jobId = (int) DB::table('prerender_jobs')->insertGetId([
+                'requested_by' => $requestedBy,
+                'tenant_id' => null,
+                'routes' => null,
+                'force_render' => 1,
+                'dry_run' => 0,
+                'priority' => self::PRIORITY_HIGH,
+                'status' => self::FENCE_PENDING_STORAGE_STATUS,
+                'queued_at' => date('Y-m-d H:i:s'),
+                'fence_state' => self::FENCE_STATE_PENDING,
+                'fence_ready_at' => null,
+                'error_message' => 'pending publisher fence activation',
+            ]);
+        });
+
+        DB::afterCommit(function () use ($jobId): void {
+            try {
+                // The API must acknowledge the durable intent promptly even
+                // when a publisher currently owns the volume lock. The host
+                // queue worker retries pending activation with the normal
+                // long lock budget before it claims ordinary work.
+                $this->activatePendingAuthoritativeJob($jobId, 0.25);
+            } catch (\Throwable $e) {
+                DB::table('prerender_jobs')
+                    ->where('id', $jobId)
+                    ->where('fence_state', self::FENCE_STATE_PENDING)
+                    ->whereNull('fence_ready_at')
+                    ->update(['error_message' => substr(
+                        'publisher fence activation deferred: ' . $e->getMessage(),
+                        0,
+                        1024
+                    )]);
+                Log::warning('Authoritative prerender fence activation deferred', [
+                    'job_id' => $jobId,
+                    'error' => $e->getMessage(),
+                ]);
+                $this->broadcastJob($jobId);
+            }
+        });
+
+        return [
+            'job_id' => $jobId,
+            'cancelled_jobs' => $activeCount,
+            'cancelled_active_jobs' => $cancelledActive,
+        ];
+    }
+
+    /** Activate one committed authoritative outbox row under the volume fence. */
+    private function activatePendingAuthoritativeJob(int $jobId, float $lockTimeoutSeconds = 120.0): bool
+    {
+        if ($jobId <= 0 || !$this->hasJobFenceColumn()) return false;
+        $pending = DB::table('prerender_jobs')
+            ->where('id', $jobId)
+            ->where('fence_state', self::FENCE_STATE_PENDING)
+            ->whereNull('fence_ready_at')
+            ->exists();
+        if (!$pending) return false;
+
+        $cancelledIds = [];
+        $cancelledActive = 0;
+        $activated = false;
+        $this->withCacheMutationLock(function () use (
+            $jobId,
+            &$cancelledIds,
+            &$cancelledActive,
+            &$activated
+        ): void {
+            DB::transaction(function () use (
+                $jobId,
+                &$cancelledIds,
+                &$cancelledActive,
+                &$activated
+            ): void {
+                $pending = DB::table('prerender_jobs')
+                    ->where('id', $jobId)
+                    ->where('fence_state', self::FENCE_STATE_PENDING)
+                    ->whereNull('fence_ready_at')
+                    ->lockForUpdate()
+                    ->first();
+                if (!$pending) return;
+
+                // The row lock and volume lock are both held before epoch
+                // rotation. Concurrent activation/cancellation cannot turn an
+                // idempotent retry into an unrelated publisher fence.
+                $this->rotatePublisherEpoch();
+
+                $rows = DB::table('prerender_jobs')
+                    ->where('id', '<>', $jobId)
+                    ->where(function ($state): void {
+                        $state->whereIn('status', ['queued', 'claimed', 'running'])
+                            ->orWhere('fence_state', self::FENCE_STATE_PENDING);
+                    })
+                    ->lockForUpdate()
+                    ->get(['id', 'status', 'fence_state']);
+                $cancelledIds = $rows->pluck('id')->map(fn ($id) => (int) $id)->all();
+                $cancelledActive = $rows->filter(
+                    fn ($row) => in_array($row->status, ['claimed', 'running'], true)
+                )->count();
+                if ($cancelledIds !== []) {
+                    DB::table('prerender_jobs')
+                        ->whereIn('id', $cancelledIds)
+                        ->where(function ($state): void {
+                            $state->whereIn('status', ['queued', 'claimed', 'running'])
+                                ->orWhere('fence_state', self::FENCE_STATE_PENDING);
+                        })
+                        ->update([
+                            'status' => 'cancelled',
+                            'fence_state' => self::FENCE_STATE_READY,
+                            'fence_ready_at' => date('Y-m-d H:i:s'),
+                            'finished_at' => date('Y-m-d H:i:s'),
+                            'error_message' => 'superseded by authoritative reset',
+                        ]);
+                }
+                $activated = DB::table('prerender_jobs')
+                    ->where('id', $jobId)
+                    ->where('fence_state', self::FENCE_STATE_PENDING)
+                    ->whereNull('fence_ready_at')
+                    ->update([
+                        'status' => 'queued',
+                        'fence_state' => self::FENCE_STATE_ACTIVATED,
+                        'fence_ready_at' => date('Y-m-d H:i:s'),
+                        'error_message' => null,
+                    ]) === 1;
+            });
+
+            if ($activated) {
+                foreach ($cancelledIds as $id) $this->releaseJobLease((int) $id);
+            }
+        }, $lockTimeoutSeconds);
+
+        if (!$activated) return false;
+        foreach ($cancelledIds as $id) $this->broadcastJob((int) $id);
+        $this->broadcastJob($jobId);
+        $this->resetBreaker();
+        Cache::forget('prerender:summary:inventory');
+        if ($cancelledActive > 0) {
+            Log::info('Activated authoritative prerender fence', [
+                'job_id' => $jobId,
+                'cancelled_active_jobs' => $cancelledActive,
+            ]);
+        }
+        return true;
+    }
+
+    private function rotatePublisherEpoch(): string
+    {
+        if (!is_dir($this->cachePath)
+            && !@mkdir($this->cachePath, 0775, true)
+            && !is_dir($this->cachePath)) {
+            throw new \RuntimeException('Prerender cache root is unavailable for publisher fencing');
+        }
+
+        $epoch = bin2hex(random_bytes(16));
+        $path = $this->cachePath . '/.publish-epoch';
+        $temp = $path . '.tmp.' . bin2hex(random_bytes(8));
+        if (@file_put_contents($temp, $epoch . "\n", LOCK_EX) === false
+            || !@rename($temp, $path)) {
+            @unlink($temp);
+            throw new \RuntimeException('Could not atomically rotate the prerender publisher epoch');
+        }
+        return $epoch;
+    }
+
+    /**
+     * Fingerprint cache paths while holding the publisher-compatible read lock.
+     * The result is stored only in the short-lived, server-side purge preview.
+     *
+     * @param list<string> $cachePaths
+     * @return array<string,string>
+     */
+    public function fingerprintCachePaths(array $cachePaths): array
+    {
+        $safePaths = $this->normaliseExactCachePaths($cachePaths);
+        if ($safePaths === []) {
+            return [];
+        }
+
+        $handle = $this->acquireCacheLock(LOCK_SH);
+        try {
+            $fingerprints = [];
+            foreach (array_keys($safePaths) as $safe) {
+                $resolved = $this->resolveExistingCacheFile($this->cachePath . '/' . $safe);
+                if ($resolved === null || basename($resolved) !== 'index.html') {
+                    continue;
+                }
+                $fingerprint = $this->snapshotBundleFingerprint($resolved);
+                if ($fingerprint === null) {
+                    throw new \RuntimeException('Unable to fingerprint a previewed snapshot');
+                }
+                $fingerprints[$safe] = $fingerprint;
+            }
+            return $fingerprints;
+        } finally {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
+    }
+
+    /**
+     * Remove HTML whose persisted tenant identity no longer matches the
+     * current host/prefix owner. Called only after a routing transaction
+     * commits, before its authoritative rebuild is allowed to take over.
+     *
+     * Status-bearing rows keep `_status` until the authoritative publisher can
+     * replace HTML and the compiled nginx map together, but their old HTML is
+     * quarantined immediately so it cannot leak across tenants.
+     *
+     * @return array{quarantined:int,status_bearing:int}
+     */
+    public function quarantineMismatchedSnapshotOwnership(): array
+    {
+        $inventory = $this->inventory(null, false);
+        if (count(array_filter($inventory, fn ($row) => !empty($row['__truncated']))) > 0) {
+            throw new \RuntimeException('Snapshot inventory reached its safety cap; ownership quarantine was not applied');
+        }
+
+        $candidates = array_values(array_filter(
+            $inventory,
+            fn (array $row): bool => !empty($row['tenant_identity_mismatch'])
+        ));
+        if ($candidates === []) return ['quarantined' => 0, 'status_bearing' => 0];
+
+        return $this->withCacheMutationLock(function () use ($candidates): array {
+            $targetsByHost = $this->tenantTargetsByHost($this->loadTenantTargets());
+            $quarantined = 0;
+            $statusBearing = 0;
+
+            // A routing-ownership mismatch always needs a complete host-tree
+            // replacement, even when the affected page is ordinary HTTP 200.
+            // Persist this before the first unlink so drift can self-heal if
+            // the already-enqueued authoritative job later fails or cancels.
+            $this->markAuthoritativeRepairRequired('tenant_ownership_quarantine');
+
+            foreach ($candidates as $row) {
+                $safe = $this->safeCachePath((string) ($row['cache_path'] ?? ''));
+                if ($safe === null) continue;
+                $indexPath = $this->resolveExistingCacheFile($this->cachePath . '/' . $safe);
+                if ($indexPath === null || basename($indexPath) !== 'index.html') continue;
+
+                $host = strtolower((string) ($row['host'] ?? ''));
+                $route = (string) ($row['route'] ?? '/');
+                [$currentTarget] = $this->tenantAttributionForRoute(
+                    $host,
+                    $route,
+                    $targetsByHost
+                );
+                $identity = $this->readTenantIdentitySidecar(dirname($indexPath));
+                $matches = $identity !== null
+                    && (int) ($identity['tenant_id'] ?? 0) === (int) ($currentTarget['tenant_id'] ?? 0)
+                    && (string) ($identity['tenant_slug'] ?? '') === (string) ($currentTarget['slug'] ?? '');
+                if ($matches) continue;
+
+                $dir = dirname($indexPath);
+                if ($this->hasCompiledStatusSidecar($dir)) {
+                    if ($this->quarantineStatusSnapshotHtml($indexPath)) {
+                        $statusBearing++;
+                        $quarantined++;
+                    }
+                    continue;
+                }
+
+                if ($this->deleteSnapshotBundle($indexPath)) $quarantined++;
+            }
+
+            if ($quarantined > 0) Cache::forget('prerender:summary:inventory');
+            return ['quarantined' => $quarantined, 'status_bearing' => $statusBearing];
+        });
+    }
+
+    /**
+     * Delete only cache paths previously returned by a server-side preview.
+     * Newly matching routes and same-path replacement snapshots can never be
+     * swept into the live action.
+     *
+     * @param list<string> $cachePaths
+     * @param array<string,string>|null $expectedFingerprints
+     * @return list<string>
+     */
+    public function purgeExactCachePaths(
+        array $cachePaths,
+        ?array $expectedFingerprints = null,
+        ?int &$authoritativeJobId = null
+    ): array
+    {
+        $authoritativeJobId = null;
+        $safePaths = $this->normaliseExactCachePaths($cachePaths);
+        if ($safePaths === []) {
+            return [];
+        }
+
+        $deleted = $this->withCacheMutationLock(function () use (
+            $safePaths,
+            $expectedFingerprints,
+            &$authoritativeJobId
+        ): array {
+            if ($expectedFingerprints !== null) {
+                // Validate the complete set before deleting anything so a
+                // single concurrently refreshed snapshot makes the entire
+                // one-use preview fail closed without a partial purge.
+                foreach (array_keys($safePaths) as $safe) {
+                    $expected = $expectedFingerprints[$safe] ?? null;
+                    $resolved = $this->resolveExistingCacheFile($this->cachePath . '/' . $safe);
+                    $current = $resolved !== null && basename($resolved) === 'index.html'
+                        ? $this->snapshotBundleFingerprint($resolved)
+                        : null;
+                    if (!is_string($expected)
+                        || preg_match('/^[a-f0-9]{64}$/', $expected) !== 1
+                        || !is_string($current)
+                        || !hash_equals($expected, $current)) {
+                        throw new \UnexpectedValueException('A previewed snapshot changed before deletion');
+                    }
+                }
+            }
+
+            $statusBearingPaths = [];
+            foreach (array_keys($safePaths) as $safe) {
+                $resolved = $this->resolveExistingCacheFile($this->cachePath . '/' . $safe);
+                if ($resolved !== null && $this->hasCompiledStatusSidecar(dirname($resolved))) {
+                    $statusBearingPaths[$safe] = $resolved;
+                }
+            }
+            if ($statusBearingPaths !== []) {
+                // Commit durable repair intent before changing any bytes. The
+                // cache lock prevents a fast worker from publishing until the
+                // quarantine below has completed.
+                $authoritativeJobId = $this->enqueueJob(
+                    null,
+                    null,
+                    true,
+                    false,
+                    null,
+                    self::PRIORITY_HIGH
+                );
+            }
+
+            $deleted = [];
+            foreach (array_keys($safePaths) as $safe) {
+                if (isset($statusBearingPaths[$safe])) {
+                    if ($this->quarantineStatusSnapshotHtml($statusBearingPaths[$safe])) {
+                        $deleted[] = $safe;
+                    }
+                    continue;
+                }
+                if ($this->deleteSnapshotBundle($this->cachePath . '/' . $safe)) {
+                    $deleted[] = $safe;
+                }
+            }
+            return $deleted;
+        });
+
+        return $deleted;
+    }
+
+    /**
+     * @param list<string> $cachePaths
+     * @return array<string,true>
+     */
+    private function normaliseExactCachePaths(array $cachePaths): array
+    {
+        if (count($cachePaths) > self::INVENTORY_HARD_CAP) {
+            throw new \RuntimeException('Exact purge exceeds the snapshot inventory safety cap');
+        }
+
+        $safePaths = [];
+        foreach ($cachePaths as $cachePath) {
+            if (!is_string($cachePath)) continue;
+            $safe = $this->safeCachePath($cachePath);
+            if ($safe === null) {
+                throw new \InvalidArgumentException('Exact purge contains an unsafe cache path');
+            }
+            $safePaths[$safe] = true;
+        }
+
+        return $safePaths;
     }
 
     public function listJobs(int $limit = 50, ?string $status = null): array
@@ -1165,7 +2094,18 @@ class PrerenderService
             )
             ->orderByDesc('j.id')
             ->limit(max(1, min(500, $limit)));
-        if ($status !== null && $status !== '') $q->where('j.status', $status);
+        if ($status !== null && $status !== '') {
+            if ($status === 'pending_fence') {
+                $this->hasJobFenceColumn()
+                    ? $q->where('j.fence_state', self::FENCE_STATE_PENDING)
+                    : $q->whereRaw('1 = 0');
+            } else {
+                $q->where('j.status', $status);
+                if ($status === self::FENCE_PENDING_STORAGE_STATUS && $this->hasJobFenceColumn()) {
+                    $q->where('j.fence_state', '<>', self::FENCE_STATE_PENDING);
+                }
+            }
+        }
         return $q->get()->map(fn($r) => $this->normaliseJob((array) $r))->toArray();
     }
 
@@ -1237,6 +2177,36 @@ class PrerenderService
      */
     public function claimNextJob(string $claimedBy): ?array
     {
+        // A pending fence is an after-commit outbox. Never activate it from
+        // this connection while an outer transaction is still open: the row
+        // may subsequently roll back even though filesystem epoch rotation
+        // cannot. Normal host workers run at transaction level zero and retry
+        // any durable activation left behind by a prior process failure.
+        if ($this->hasJobFenceColumn() && DB::transactionLevel() === 0) {
+            $pendingId = (int) (DB::table('prerender_jobs')
+                ->where('fence_state', self::FENCE_STATE_PENDING)
+                ->whereNull('fence_ready_at')
+                ->whereNull('tenant_id')
+                ->where('force_render', 1)
+                ->orderByDesc('id')
+                ->value('id') ?? 0);
+            if ($pendingId > 0) {
+                try {
+                    $this->activatePendingAuthoritativeJob($pendingId);
+                } catch (\Throwable $e) {
+                    Log::critical('Pending authoritative prerender activation retry failed', [
+                        'job_id' => $pendingId,
+                        'error' => $e->getMessage(),
+                    ]);
+                    return null;
+                }
+            }
+        }
+
+        // Authoritative fence recovery runs before this check because a reset
+        // intentionally clears the breaker after superseding older work. A
+        // crash between commit and activation must not strand that reset for
+        // the remainder of the prior breaker's cooldown.
         if ($this->breakerTrippedUntil() !== null) {
             return null;
         }
@@ -1258,6 +2228,11 @@ class PrerenderService
                 ->orderBy('id')
                 ->lockForUpdate();
 
+            if ($this->hasJobFenceColumn()) {
+                $q->whereIn('fence_state', [self::FENCE_STATE_READY, self::FENCE_STATE_ACTIVATED])
+                    ->whereNotNull('fence_ready_at');
+            }
+
             if (!empty($busy)) {
                 // Skip rows whose tenant is over the cap. NULL tenant_id
                 // (all-tenants jobs) still claimable — those serialise via
@@ -1278,7 +2253,11 @@ class PrerenderService
                 ]);
 
             $this->broadcastJob((int) $row->id);
-            return (array) $row;
+            return array_merge((array) $row, [
+                'status' => 'claimed',
+                'claimed_at' => date('Y-m-d H:i:s'),
+                'claimed_by' => substr($claimedBy, 0, 128),
+            ]);
         });
     }
 
@@ -1286,13 +2265,114 @@ class PrerenderService
      * Transition a claimed job to running. Used by the artisan command before
      * invoking the underlying prerender script.
      */
-    public function markRunning(int $id): void
+    public function markRunning(int $id, ?string $claimedBy = null): bool
     {
-        DB::table('prerender_jobs')->where('id', $id)->update([
+        $owner = $claimedBy ?? (string) DB::table('prerender_jobs')
+            ->where('id', $id)
+            ->where('status', 'claimed')
+            ->value('claimed_by');
+        if ($owner === '' || !$this->writeJobLease($id, $owner)) {
+            return false;
+        }
+
+        $query = DB::table('prerender_jobs')
+            ->where('id', $id)
+            ->where('status', 'claimed')
+            ->where('claimed_by', $owner);
+        $now = date('Y-m-d H:i:s');
+        $values = [
             'status'     => 'running',
-            'started_at' => date('Y-m-d H:i:s'),
-        ]);
+            'started_at' => $now,
+        ];
+        if ($this->hasJobHeartbeatColumn()) $values['heartbeat_at'] = $now;
+        $updated = $query->update($values);
+        if ($updated === 0) {
+            // A reset/reaper may have cancelled the claim after the token was
+            // created. Remove only this owner's independently revocable token.
+            $this->releaseJobLease($id, $owner);
+            return false;
+        }
         $this->broadcastJob($id);
+        return true;
+    }
+
+    /**
+     * Renew the lease for a running job.
+     *
+     * heartbeat_at is separate from the immutable started_at history field.
+     * During a rolling migration the code falls back to started_at until the
+     * nullable heartbeat column is available. Both the job id and immutable
+     * claim owner must still match, so a superseded worker cannot keep a
+     * cancelled or re-claimed job alive.
+     */
+    public function heartbeatJob(int $id, string $claimedBy): bool
+    {
+        if ($id <= 0 || $claimedBy === '') return false;
+
+        $leaseColumn = $this->hasJobHeartbeatColumn() ? 'heartbeat_at' : 'started_at';
+        $query = DB::table('prerender_jobs')
+            ->where('id', $id)
+            ->where('status', 'running')
+            ->where('claimed_by', $claimedBy);
+        $updated = (clone $query)->update([$leaseColumn => date('Y-m-d H:i:s')]);
+
+        // MySQL reports zero affected rows when two heartbeats land within
+        // the same timestamp second. Ownership still exists in that case.
+        $owned = $updated > 0 || $query->exists();
+        return $owned && $this->jobLeaseOwnedBy($id, $claimedBy);
+    }
+
+    private function hasJobHeartbeatColumn(): bool
+    {
+        return Schema::hasTable('prerender_jobs')
+            && Schema::hasColumn('prerender_jobs', 'heartbeat_at');
+    }
+
+    private function hasJobFenceColumn(): bool
+    {
+        return Schema::hasTable('prerender_jobs')
+            && Schema::hasColumn('prerender_jobs', 'fence_state')
+            && Schema::hasColumn('prerender_jobs', 'fence_ready_at');
+    }
+
+    /**
+     * The default values are part of the rolling-deploy contract: an old
+     * writer omits both additive columns, yet its queued row must remain ready
+     * and claimable by the new worker.
+     */
+    private function jobFenceSchemaCompatible(): bool
+    {
+        if ($this->jobFenceSchemaCompatibleCache !== null) {
+            return $this->jobFenceSchemaCompatibleCache;
+        }
+        if (!$this->hasJobFenceColumn()) {
+            return $this->jobFenceSchemaCompatibleCache = false;
+        }
+
+        try {
+            if (DB::connection()->getDriverName() !== 'mysql') {
+                return $this->jobFenceSchemaCompatibleCache = true;
+            }
+            $rows = DB::select(
+                "SELECT COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE
+                   FROM information_schema.COLUMNS
+                  WHERE TABLE_SCHEMA = DATABASE()
+                    AND TABLE_NAME = 'prerender_jobs'
+                    AND COLUMN_NAME IN ('fence_state', 'fence_ready_at')"
+            );
+            $columns = [];
+            foreach ($rows as $row) $columns[(string) $row->COLUMN_NAME] = $row;
+            $stateDefault = trim((string) ($columns['fence_state']->COLUMN_DEFAULT ?? ''), "'\"");
+            $readyDefault = strtolower((string) ($columns['fence_ready_at']->COLUMN_DEFAULT ?? ''));
+            $readyNullable = strtoupper((string) ($columns['fence_ready_at']->IS_NULLABLE ?? '')) === 'YES';
+
+            return $this->jobFenceSchemaCompatibleCache = $stateDefault === self::FENCE_STATE_READY
+                && $readyNullable
+                && str_contains($readyDefault, 'current_timestamp');
+        } catch (\Throwable $e) {
+            Log::warning('Could not verify prerender fence schema defaults', ['error' => $e->getMessage()]);
+            return $this->jobFenceSchemaCompatibleCache = false;
+        }
     }
 
     /**
@@ -1308,33 +2388,49 @@ class PrerenderService
         ?int $exitCode,
         int $durationS,
         ?string $logExcerpt,
-        ?string $errorMessage = null
-    ): void {
+        ?string $errorMessage = null,
+        string $claimedBy = ''
+    ): bool {
+        if ($id <= 0 || $claimedBy === '') return false;
         $logExcerpt = $logExcerpt !== null ? substr($logExcerpt, -262_144) : null;
-        DB::table('prerender_jobs')->where('id', $id)->update([
-            'status'         => $status,
-            'planned_count'  => $planned,
-            'rendered_count' => $rendered,
-            'invalid_count'  => $invalid ?? 0,
-            'duration_s'     => $durationS,
-            'exit_code'      => $exitCode,
-            'log_excerpt'    => $logExcerpt,
-            'error_message'  => $errorMessage,
-            'finished_at'    => date('Y-m-d H:i:s'),
-        ]);
+        $query = DB::table('prerender_jobs')
+            ->where('id', $id)
+            ->whereIn('status', ['claimed', 'running'])
+            ->where('claimed_by', $claimedBy);
+        $updated = $query->update([
+                'status'         => $status,
+                'planned_count'  => $planned,
+                'rendered_count' => $rendered,
+                'invalid_count'  => $invalid ?? 0,
+                'duration_s'     => $durationS,
+                'exit_code'      => $exitCode,
+                'log_excerpt'    => $logExcerpt,
+                'error_message'  => $errorMessage,
+                'finished_at'    => date('Y-m-d H:i:s'),
+            ]);
+        if ($updated === 0) return false;
+        $this->releaseJobLease($id, $claimedBy);
         $this->broadcastJob($id);
 
         // Circuit breaker. Count recent failures inside the window; trip if
         // we cross the threshold. A succeeded/partial job resets the streak.
         if ($status === 'failed') {
-            $recentFails = DB::table('prerender_jobs')
-                ->where('status', 'failed')
+            $recentStatuses = DB::table('prerender_jobs')
+                ->whereIn('status', ['succeeded', 'partial', 'failed'])
                 ->where('finished_at', '>=', date('Y-m-d H:i:s', time() - self::BREAKER_WINDOW_SECONDS))
-                ->count();
-            if ($recentFails >= self::BREAKER_FAILURE_THRESHOLD) {
+                ->orderByDesc('finished_at')
+                ->orderByDesc('id')
+                ->limit(self::BREAKER_FAILURE_THRESHOLD)
+                ->pluck('status')
+                ->all();
+            if (
+                count($recentStatuses) >= self::BREAKER_FAILURE_THRESHOLD
+                && count(array_filter($recentStatuses, fn ($value) => $value === 'failed')) === self::BREAKER_FAILURE_THRESHOLD
+            ) {
                 $this->tripBreaker();
             }
         }
+        return true;
     }
 
     // -------------------------------------------------------------------------
@@ -1360,8 +2456,11 @@ class PrerenderService
         };
 
         $g('nexus_prerender_cache_readable',     $s['cache_readable'], 'Cache mount reachable from app');
+        $g('nexus_prerender_cache_writable',     $s['cache_writable'], 'Cache mount writable from app');
+        $g('nexus_prerender_inventory_truncated',$s['inventory_truncated'], 'Inventory scan reached its safety cap');
+        $g('nexus_prerender_plan_errors',        $s['plan_error_count'], 'Tenant route plans that could not be completed');
         $g('nexus_prerender_snapshots_total',    $s['total_snapshots'], 'Snapshot files on disk');
-        $g('nexus_prerender_snapshots_expected', $s['expected_count'], 'Tenant_count * route_count');
+        $g('nexus_prerender_snapshots_expected', $s['expected_count'], 'Total tenant-specific planned routes');
         $g('nexus_prerender_snapshots_missing',  $s['missing_count'], 'Routes without a snapshot');
         $g('nexus_prerender_snapshots_stale',    $s['stale_count'], 'Snapshots older than stale threshold');
         $g('nexus_prerender_snapshots_aging',    $s['warn_count'], 'Snapshots older than warn threshold');
@@ -1371,12 +2470,14 @@ class PrerenderService
         $g('nexus_prerender_jobs_queued',        $s['queued_jobs'], 'Jobs awaiting processor');
         $g('nexus_prerender_jobs_active',        $s['active_jobs'], 'Jobs claimed or running');
         $g('nexus_prerender_failures_recent',    $s['recent_failures'], 'Cache paths inside failure-backoff window');
-        $g('nexus_prerender_coverage_ratio',     $s['expected_count'] > 0 ? round($s['total_snapshots'] / $s['expected_count'], 4) : 0,
+        $g('nexus_prerender_coverage_ratio',     $s['expected_count'] > 0 ? round(min(1, $s['expected_rendered_count'] / $s['expected_count']), 4) : 0,
            'Snapshots present / expected (0..1)');
         $hasJobsTable = Schema::hasTable('prerender_jobs');
         $g('nexus_prerender_job_table_available', $hasJobsTable ? 1 : 0, 'prerender_jobs table exists and can be queried');
+        $g('nexus_prerender_job_fence_available', $this->jobFenceSchemaCompatible() ? 1 : 0, 'Durable authoritative publisher-fence activation is available');
 
-        // Per-status job counts (counters reflect lifetime, not since-reboot).
+        // Current per-status job populations. These can decrease as rows move
+        // through the lifecycle, so Prometheus must treat them as gauges.
         $statusCounts = $hasJobsTable
             ? DB::table('prerender_jobs')
                 ->select('status', DB::raw('COUNT(*) as n'))
@@ -1384,9 +2485,19 @@ class PrerenderService
                 ->pluck('n', 'status')
                 ->toArray()
             : [];
-        $lines[] = '# HELP nexus_prerender_jobs_total Lifetime job counts by status';
-        $lines[] = '# TYPE nexus_prerender_jobs_total counter';
-        foreach (['queued','claimed','running','succeeded','partial','failed','cancelled'] as $st) {
+        $pendingFenceCount = $hasJobsTable && $this->hasJobFenceColumn()
+            ? (int) DB::table('prerender_jobs')
+                ->where('fence_state', self::FENCE_STATE_PENDING)
+                ->count()
+            : 0;
+        $statusCounts['pending_fence'] = $pendingFenceCount;
+        $statusCounts[self::FENCE_PENDING_STORAGE_STATUS] = max(
+            0,
+            (int) ($statusCounts[self::FENCE_PENDING_STORAGE_STATUS] ?? 0) - $pendingFenceCount
+        );
+        $lines[] = '# HELP nexus_prerender_jobs_total Current job rows by status';
+        $lines[] = '# TYPE nexus_prerender_jobs_total gauge';
+        foreach (['pending_fence','queued','claimed','running','succeeded','partial','failed','cancelled'] as $st) {
             $n = (int) ($statusCounts[$st] ?? 0);
             $lines[] = sprintf('nexus_prerender_jobs_total{status="%s"} %d', $st, $n);
         }
@@ -1424,9 +2535,14 @@ class PrerenderService
         $g('nexus_prerender_breaker_until_seconds', $breakerUntil ?? 0, 'Unix ts when breaker auto-resumes (0 = closed)');
 
         // Oldest queued job age in seconds — the most useful queue-health number.
-        $oldestQueuedRaw = $hasJobsTable
-            ? DB::table('prerender_jobs')->where('status', 'queued')->min('queued_at')
-            : null;
+        $oldestQueuedRaw = null;
+        if ($hasJobsTable) {
+            $oldestQueueQuery = DB::table('prerender_jobs')->where('status', 'queued');
+            if ($this->hasJobFenceColumn()) {
+                $oldestQueueQuery->orWhere('fence_state', self::FENCE_STATE_PENDING);
+            }
+            $oldestQueuedRaw = $oldestQueueQuery->min('queued_at');
+        }
         $oldestQueuedAge = $oldestQueuedRaw ? max(0, time() - strtotime($oldestQueuedRaw)) : 0;
         $g('nexus_prerender_queue_oldest_age_seconds', $oldestQueuedAge, 'Age of the oldest queued job (0 if queue empty)');
 
@@ -1493,32 +2609,217 @@ class PrerenderService
             $row = DB::table('tenants')
                 ->where('id', $tenant)
                 ->where('is_active', 1)
-                ->select('id', 'features', 'configuration')
+                ->select('id', 'slug', 'features', 'configuration')
                 ->first();
             if (!$row) return [];
             $tenant = $row;
         }
 
-        $features = $this->decodeJsonColumn($tenant->features ?? null);
+        $features = TenantFeatureConfig::mergeFeatures(
+            $this->decodeJsonColumn($tenant->features ?? null)
+        );
         $configuration = $this->decodeJsonColumn($tenant->configuration ?? null);
-        $modules = is_array($configuration['modules'] ?? null) ? $configuration['modules'] : [];
+        $modules = TenantFeatureConfig::mergeModules(
+            is_array($configuration['modules'] ?? null) ? $configuration['modules'] : []
+        );
 
         $routes = self::ALWAYS_PUBLIC_ROUTES;
 
-        // Features default to TRUE per TenantFeatureConfig::FEATURE_DEFAULTS,
-        // so an unset feature key means "on". Modules also default on.
+        $slug = strtolower(trim((string) ($tenant->slug ?? '')));
+        foreach (self::TENANT_SLUG_ROUTES[$slug] ?? [] as $route) {
+            $routes[] = $route;
+        }
+
         foreach (self::FEATURE_GATED_ROUTES as $feature => $featureRoutes) {
-            if (($features[$feature] ?? true) === true || ($features[$feature] ?? true) === 1) {
+            if (($features[$feature] ?? false) === true) {
                 foreach ($featureRoutes as $r) $routes[] = $r;
             }
         }
         foreach (self::MODULE_GATED_ROUTES as $module => $moduleRoutes) {
-            if (($modules[$module] ?? true) === true || ($modules[$module] ?? true) === 1) {
+            if (($modules[$module] ?? false) === true) {
                 foreach ($moduleRoutes as $r) $routes[] = $r;
             }
         }
 
         return array_values(array_unique($routes));
+    }
+
+    private function jobLeasePath(int $id, string $claimedBy): string
+    {
+        $ownerKey = rtrim(strtr(base64_encode($claimedBy), '+/', '-_'), '=');
+        return $this->cachePath . '/.leases/' . $id . '.' . $ownerKey . '.token';
+    }
+
+    private function writeJobLease(int $id, string $claimedBy): bool
+    {
+        if ($id <= 0 || $claimedBy === '' || !preg_match('/^[A-Za-z0-9_.:-]+$/', $claimedBy)) return false;
+        $dir = $this->cachePath . '/.leases';
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) return false;
+        $path = $this->jobLeasePath($id, $claimedBy);
+        $tmp = @tempnam($dir, '.lease-');
+        if ($tmp === false) return false;
+        $ok = @file_put_contents($tmp, $claimedBy . "\n", LOCK_EX) !== false
+            && @chmod($tmp, 0664)
+            && @rename($tmp, $path);
+        if (!$ok) @unlink($tmp);
+        return $ok;
+    }
+
+    private function jobLeaseOwnedBy(int $id, string $claimedBy): bool
+    {
+        $path = $this->jobLeasePath($id, $claimedBy);
+        return is_file($path) && trim((string) @file_get_contents($path)) === $claimedBy;
+    }
+
+    /** Remove a shared publication fence, optionally only for its owner. */
+    public function releaseJobLease(int $id, ?string $claimedBy = null): void
+    {
+        if ($id <= 0) return;
+        if ($claimedBy !== null) {
+            $path = $this->jobLeasePath($id, $claimedBy);
+            if (is_file($path) && trim((string) @file_get_contents($path)) === $claimedBy) {
+                @unlink($path);
+            }
+            return;
+        }
+
+        // Job ids are never reused. Owner-qualified filenames let a reset
+        // revoke active publishers without waiting for `.mutation.lock` and
+        // without racing a different owner's token.
+        foreach (glob($this->cachePath . '/.leases/' . $id . '.*.token') ?: [] as $path) {
+            if (is_file($path)) @unlink($path);
+        }
+    }
+
+    /**
+     * Return the complete authoritative route plan for one tenant: the
+     * feature/module-gated static floor plus every public URL in its sitemap.
+     *
+     * @param array{tenant_id:int,slug:string,host:string,prefix:string,features:mixed,configuration:mixed} $target
+     * @return list<string>
+     */
+    public function expectedRoutesForTenant(
+        array $target,
+        int $limit = self::MAX_PLANNED_ROUTES_PER_TENANT,
+        bool $strict = false
+    ): array {
+        $limit = max(1, min(self::MAX_PLANNED_ROUTES_PER_TENANT, $limit));
+        $tenantObject = (object) [
+            'slug' => $target['slug'] ?? null,
+            'features' => $target['features'] ?? null,
+            'configuration' => $target['configuration'] ?? null,
+        ];
+        $routes = array_fill_keys($this->routesForTenant($tenantObject), true);
+
+        try {
+            $host = strtolower(trim((string) ($target['host'] ?? '')));
+            $prefix = rtrim((string) ($target['prefix'] ?? ''), '/');
+            $tenantId = (int) ($target['tenant_id'] ?? 0);
+            if ($host === '' || $tenantId <= 0) {
+                throw new \RuntimeException('Tenant target is missing host or tenant id');
+            }
+
+            $xml = app(SitemapService::class)->generateForTenant(
+                $tenantId,
+                'https://' . $host . $prefix
+            );
+            if (!preg_match_all('#<loc>([^<]+)</loc>#i', $xml, $matches)) {
+                $message = 'Tenant sitemap contains no route locations';
+                if ($strict) throw new \RuntimeException($message);
+                Log::warning($message, [
+                    'tenant_id' => $tenantId,
+                    'tenant_slug' => $target['slug'] ?? null,
+                ]);
+                return array_keys($routes);
+            }
+
+            $truncated = false;
+            $acceptedSitemapRoutes = 0;
+            $rejectedLocations = [];
+            foreach ($matches[1] as $rawLocation) {
+                $location = trim(html_entity_decode(
+                    (string) $rawLocation,
+                    ENT_XML1 | ENT_QUOTES,
+                    'UTF-8'
+                ));
+                $parts = parse_url($location);
+                $locationHost = is_array($parts)
+                    ? self::normalizeHost((string) ($parts['host'] ?? ''))
+                    : null;
+                $path = is_array($parts) ? (string) ($parts['path'] ?? '') : '';
+                if (!is_array($parts) || ($parts['scheme'] ?? '') !== 'https') {
+                    $rejectedLocations[] = ['location' => $location, 'reason' => 'invalid or non-HTTPS URL'];
+                    continue;
+                }
+                if ($locationHost !== $host || $path === '') {
+                    $rejectedLocations[] = ['location' => $location, 'reason' => 'wrong host or empty path'];
+                    continue;
+                }
+
+                if ($prefix !== '' && $path === $prefix) {
+                    $path = '/';
+                } elseif ($prefix !== '' && str_starts_with($path, $prefix . '/')) {
+                    $path = substr($path, strlen($prefix));
+                } elseif ($prefix !== '') {
+                    $rejectedLocations[] = ['location' => $location, 'reason' => 'outside tenant path prefix'];
+                    continue;
+                }
+
+                if ($path === '') $path = '/';
+                $path = self::normalizeRoute($path);
+                if ($path === null) {
+                    $rejectedLocations[] = ['location' => $location, 'reason' => 'unsafe or unrepresentable route'];
+                    continue;
+                }
+                $routes[$path] = true;
+                $acceptedSitemapRoutes++;
+                if (count($routes) >= $limit) {
+                    $truncated = true;
+                    break;
+                }
+            }
+            if ($rejectedLocations !== []) {
+                $first = $rejectedLocations[0];
+                $message = sprintf(
+                    'Tenant sitemap rejected %d route location(s); first: %s (%s)',
+                    count($rejectedLocations),
+                    mb_strimwidth((string) $first['location'], 0, 240, '…', 'UTF-8'),
+                    $first['reason']
+                );
+                if ($strict) throw new \RuntimeException($message);
+                Log::warning($message, [
+                    'tenant_id' => $tenantId,
+                    'tenant_slug' => $target['slug'] ?? null,
+                    'rejected_count' => count($rejectedLocations),
+                ]);
+            }
+            if ($acceptedSitemapRoutes === 0) {
+                $message = 'Tenant sitemap contains no routes for its canonical host';
+                if ($strict) throw new \RuntimeException($message);
+                Log::warning($message, [
+                    'tenant_id' => $tenantId,
+                    'tenant_slug' => $target['slug'] ?? null,
+                    'host' => $host,
+                ]);
+            }
+            if ($truncated) {
+                $message = "Tenant route plan reached the {$limit}-route safety limit";
+                if ($strict) throw new \RuntimeException($message);
+                Log::warning($message, [
+                    'tenant_id' => $tenantId,
+                    'tenant_slug' => $target['slug'] ?? null,
+                ]);
+            }
+        } catch (\Throwable $e) {
+            if ($strict) throw $e;
+            Log::warning('Prerender tenant sitemap planning failed', [
+                'tenant_id' => $target['tenant_id'] ?? null,
+                'tenant_slug' => $target['slug'] ?? null,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        return array_keys($routes);
     }
 
     private function routeEligibilityReason(string $route, object $tenant, string $source): array
@@ -1533,10 +2834,12 @@ class PrerenderService
             return ['key' => 'always_public', 'value' => null];
         }
 
-        $features = $this->decodeJsonColumn($tenant->features ?? null);
+        $features = TenantFeatureConfig::mergeFeatures(
+            $this->decodeJsonColumn($tenant->features ?? null)
+        );
         foreach (self::FEATURE_GATED_ROUTES as $feature => $routes) {
             if (!in_array($route, $routes, true)) continue;
-            $enabled = ($features[$feature] ?? true) === true || ($features[$feature] ?? true) === 1;
+            $enabled = ($features[$feature] ?? false) === true;
             return [
                 'key' => $enabled ? 'feature_enabled' : 'feature_disabled',
                 'value' => $feature,
@@ -1544,10 +2847,12 @@ class PrerenderService
         }
 
         $configuration = $this->decodeJsonColumn($tenant->configuration ?? null);
-        $modules = is_array($configuration['modules'] ?? null) ? $configuration['modules'] : [];
+        $modules = TenantFeatureConfig::mergeModules(
+            is_array($configuration['modules'] ?? null) ? $configuration['modules'] : []
+        );
         foreach (self::MODULE_GATED_ROUTES as $module => $routes) {
             if (!in_array($route, $routes, true)) continue;
-            $enabled = ($modules[$module] ?? true) === true || ($modules[$module] ?? true) === 1;
+            $enabled = ($modules[$module] ?? false) === true;
             return [
                 'key' => $enabled ? 'module_enabled' : 'module_disabled',
                 'value' => $module,
@@ -1573,6 +2878,7 @@ class PrerenderService
         $rows = DB::table('tenants')
             ->leftJoin('tenants as p', function ($join) {
                 $join->on('p.id', '=', 'tenants.parent_id')
+                    ->where('p.id', '<>', 1)
                     ->where('p.is_active', '=', 1);
             })
             ->where('tenants.is_active', 1)
@@ -1590,8 +2896,12 @@ class PrerenderService
 
         $out = [];
         foreach ($rows as $r) {
-            $domain = trim((string) $r->domain);
-            $parentDomain = trim((string) ($r->parent_domain ?? ''));
+            $rawDomain = trim((string) $r->domain);
+            $rawParentDomain = trim((string) ($r->parent_domain ?? ''));
+            $domain = $rawDomain === '' ? '' : (self::normalizeHost($rawDomain) ?? strtolower($rawDomain));
+            $parentDomain = $rawParentDomain === ''
+                ? ''
+                : (self::normalizeHost($rawParentDomain) ?? strtolower($rawParentDomain));
             if ($domain !== '') {
                 $host = $domain;
                 $prefix = '';
@@ -1625,160 +2935,164 @@ class PrerenderService
      * whether to also enqueue recaches (none needed — the deleted snapshots
      * shouldn't exist for these tenants in the first place).
      *
-     * @return array{deleted_total:int, by_tenant:array<string,list<string>>, dry_run:bool}
+     * @return array{deleted_total:int, by_tenant:array<string,list<string>>, cache_paths:list<string>, dry_run:bool, authoritative_job_id:?int}
      */
-    public function purgeUnexpectedSnapshots(bool $dryRun = false): array
+    public function purgeUnexpectedSnapshots(bool $dryRun = false, ?int $onlyTenantId = null): array
     {
         $tenants = $this->loadTenantTargets();
-        // Build a (host, route)-keyed expected set. Inventory rows store the
-        // route WITH the tenant prefix for app-host tenants (e.g.
-        // /partner-demo/about), so we must apply the prefix here too or the
-        // purge would shred every legitimate prefixed snapshot.
-        // Multiple tenants can share a host (the app host), so we union the
-        // expected sets across tenants per host.
-        $expectedByHost = [];
-        $slugByHostRoute = []; // For reporting only — which tenant "owned" the missing route.
-        // List of known tenant prefixes per host. Used to strip the tenant
-        // prefix off an inventory route BEFORE the dynamic-content check —
-        // otherwise an inventory like "/partner-demo/blog/foo" looks like a
-        // static route, not a dynamic blog post.
-        $prefixesByHost = [];
-        foreach ($tenants as $t) {
-            $tObj = (object) ['features' => $t['features'], 'configuration' => $t['configuration']];
-            $tenantRoutes = $this->routesForTenant($tObj);
-            $prefix = $t['prefix']; // '' for custom-domain tenants, '/slug' for app-host
-            if ($prefix !== '') {
-                $prefixesByHost[$t['host']][] = $prefix;
+        if ($onlyTenantId !== null) {
+            $tenants = array_values(array_filter(
+                $tenants,
+                fn (array $tenant) => (int) $tenant['tenant_id'] === $onlyTenantId
+            ));
+        }
+        $expectedByTenant = [];
+        $slugByTenant = [];
+        $previousFreshSetting = config('prerender.runtime_force_fresh_sitemap', false);
+        $previousBypassSetting = config('prerender.runtime_bypass_sitemap_cache', false);
+        config([
+            'prerender.runtime_force_fresh_sitemap' => true,
+            'prerender.runtime_bypass_sitemap_cache' => true,
+        ]);
+        try {
+            foreach ($tenants as $t) {
+                $tenantId = (int) $t['tenant_id'];
+                $slugByTenant[$tenantId] = (string) $t['slug'];
+                $expectedByTenant[$tenantId] = array_fill_keys(
+                    $this->expectedRoutesForTenant(
+                        $t,
+                        self::MAX_PLANNED_ROUTES_PER_TENANT,
+                        true
+                    ),
+                    true
+                );
             }
-            foreach ($tenantRoutes as $r) {
-                $prefixed = $prefix . $r;
-                // Normalise the homepage entry: inventory drops the trailing
-                // slash from "/partner-demo/index.html" → "/partner-demo",
-                // while $prefix . '/' produces "/partner-demo/". Treat both
-                // forms as the homepage so the comparison hits.
-                if ($r === '/' && $prefix !== '') {
-                    $expectedByHost[$t['host']][$prefix] = true;
-                    $slugByHostRoute[$t['host']][$prefix] = $t['slug'];
-                } else {
-                    $expectedByHost[$t['host']][$prefixed] = true;
-                    $slugByHostRoute[$t['host']][$prefixed] = $t['slug'];
-                }
-            }
+        } finally {
+            config([
+                'prerender.runtime_force_fresh_sitemap' => $previousFreshSetting,
+                'prerender.runtime_bypass_sitemap_cache' => $previousBypassSetting,
+            ]);
         }
 
         $byTenant = [];
+        $cachePaths = [];
         $deletedTotal = 0;
-        foreach ($this->inventory(null, false) as $row) {
-            $hostExpected = $expectedByHost[$row['host']] ?? null;
-            if ($hostExpected === null) continue;
+        $inventorySlug = $onlyTenantId !== null && count($tenants) === 1
+            ? (string) $tenants[0]['slug']
+            : null;
+        $isUnexpected = static function (array $row) use ($expectedByTenant, $onlyTenantId): bool {
+            $tenantId = (int) ($row['tenant_id'] ?? 0);
+            $orphaned = $tenantId <= 0 || !isset($expectedByTenant[$tenantId]);
+            if ($orphaned && $onlyTenantId !== null) return false;
+            $tenantRoute = (string) ($row['tenant_route'] ?? '');
+            return $orphaned
+                || !empty($row['tenant_identity_mismatch'])
+                || $tenantRoute === ''
+                || !isset($expectedByTenant[$tenantId][$tenantRoute]);
+        };
+        // Hash only destructive candidates while inventory still holds its
+        // shared lock. A 50k-page healthy cache must not pay a full-volume
+        // SHA-256 pass merely because the reconciler is running.
+        $inventory = $this->inventory($inventorySlug, false, $isUnexpected);
+        if (count(array_filter($inventory, fn ($row) => !empty($row['__truncated']))) > 0) {
+            throw new \RuntimeException('Snapshot inventory reached its safety cap; purge-unexpected was not applied');
+        }
+        $authoritativeJobId = null;
+        $process = function () use (
+            $inventory,
+            $expectedByTenant,
+            $slugByTenant,
+            $dryRun,
+            $onlyTenantId,
+            $isUnexpected,
+            &$byTenant,
+            &$cachePaths,
+            &$deletedTotal,
+            &$authoritativeJobId
+        ): void {
+            $candidates = [];
+            foreach ($inventory as $row) {
+                if (!$isUnexpected($row)) continue;
+                $tenantId = (int) ($row['tenant_id'] ?? 0);
+                $orphaned = $tenantId <= 0 || !isset($expectedByTenant[$tenantId]);
+                $tenantRoute = (string) ($row['tenant_route'] ?? '');
 
-            // Strip tenant prefix before the dynamic check. Match against the
-            // KNOWN tenant prefixes for this host (collected above) — never
-            // guess from a regex, because routes like /marketplace/free would
-            // otherwise be misread as a tenant prefix.
-            $tenantLocalRoute = $row['route'];
-            $snapshotTenantId = null;
-            $snapshotTenantSlug = null;
-            foreach ($prefixesByHost[$row['host']] ?? [] as $tenantPrefix) {
-                if (str_starts_with($tenantLocalRoute, $tenantPrefix . '/')) {
-                    $tenantLocalRoute = substr($tenantLocalRoute, strlen($tenantPrefix));
-                    $snapshotTenantSlug = ltrim($tenantPrefix, '/');
-                    break;
-                }
-                if ($tenantLocalRoute === $tenantPrefix) {
-                    $tenantLocalRoute = '/';
-                    $snapshotTenantSlug = ltrim($tenantPrefix, '/');
-                    break;
-                }
+                $slug = $orphaned
+                    ? 'orphan@' . ((string) ($row['host'] ?? 'unknown-host'))
+                    : ($slugByTenant[$tenantId] ?? '(unknown)');
+                $byTenant[$slug][] = $tenantRoute !== '' ? $tenantRoute : (string) $row['route'];
+                $cachePaths[] = (string) $row['cache_path'];
+                $candidates[] = $row;
             }
-            foreach ($tenants as $tenantTarget) {
-                if ($tenantTarget['host'] !== $row['host']) continue;
-                if ($snapshotTenantSlug !== null && $tenantTarget['slug'] !== $snapshotTenantSlug) continue;
-                if ($snapshotTenantSlug === null && $tenantTarget['prefix'] !== '') continue;
-                $snapshotTenantId = $tenantTarget['tenant_id'];
-                if ($snapshotTenantSlug === null) $snapshotTenantSlug = $tenantTarget['slug'];
-                break;
+
+            if ($dryRun) {
+                $deletedTotal = count($candidates);
+                return;
             }
 
-            if (
-                $this->isDynamicContentRoute($tenantLocalRoute)
-                && !$this->tenantRouteCanBePrerendered((int) $snapshotTenantId, $tenantLocalRoute)
-            ) {
-                $byTenant[$snapshotTenantSlug ?? '(unknown)'][] = $row['route'];
-                $deletedTotal++;
-
-                if (!$dryRun) {
-                    $abs = $this->cachePath . '/' . $row['cache_path'];
-                    $this->deleteSnapshotBundle($abs);
+            $statusBearingPaths = [];
+            $requiresAuthoritative = false;
+            foreach ($candidates as $row) {
+                $safe = $this->safeCachePath((string) ($row['cache_path'] ?? ''));
+                if ($safe === null) {
+                    throw new \RuntimeException('Snapshot inventory produced an unsafe purge path');
                 }
-                continue;
+                $abs = $this->resolveExistingCacheFile($this->cachePath . '/' . $safe);
+                $expected = $row['_bundle_fingerprint'] ?? null;
+                $current = $abs !== null ? $this->snapshotBundleFingerprint($abs) : null;
+                if (!is_string($expected) || !is_string($current) || !hash_equals($expected, $current)) {
+                    throw new \UnexpectedValueException('A candidate snapshot changed during purge planning');
+                }
+                if ($this->hasCompiledStatusSidecar(dirname($abs))) {
+                    $statusBearingPaths[$safe] = $abs;
+                    $requiresAuthoritative = true;
+                }
+                if (!empty($row['tenant_identity_mismatch'])) $requiresAuthoritative = true;
             }
 
-            // Skip dynamic-content routes — they're not in the static
-            // expected set but they ARE legitimate snapshots. The drift
-            // detector keeps them fresh from DB state.
-            if ($this->isDynamicContentRoute($tenantLocalRoute)) continue;
+            if ($requiresAuthoritative) {
+                // Make the only operation that can reconcile the compiled
+                // status map durable before deleting any discoverable HTML.
+                // The shared cache lock prevents the worker overtaking us.
+                $authoritativeJobId = $this->enqueueJob(
+                    null,
+                    null,
+                    true,
+                    false,
+                    null,
+                    self::PRIORITY_HIGH
+                );
+                $this->markAuthoritativeRepairRequired('unexpected_snapshot_quarantine');
+            }
 
-            if (isset($hostExpected[$row['route']])) continue;
-
-            // Resolve which tenant this prefixed orphan most likely belonged
-            // to. For app-host tenants the prefix is the slug; for
-            // custom-domain tenants there's only one tenant per host so use
-            // any expected entry.
-            $slug = '(unknown)';
-            $firstSeg = '';
-            if (preg_match('#^/([A-Za-z0-9_-]+)#', $row['route'], $m)) $firstSeg = $m[1];
-            if ($firstSeg !== '') {
-                // Look up any prefix match in the host's expected map.
-                foreach ($slugByHostRoute[$row['host']] ?? [] as $eRoute => $eSlug) {
-                    if (str_starts_with($eRoute, '/' . $firstSeg . '/') || $eRoute === '/' . $firstSeg) {
-                        $slug = $eSlug;
-                        break;
+            foreach ($candidates as $row) {
+                $safe = (string) $row['cache_path'];
+                $abs = $this->cachePath . '/' . $safe;
+                if (isset($statusBearingPaths[$safe])) {
+                    // Remove stale/cross-tenant bytes immediately. Keep the
+                    // status sidecar/map until the authoritative job can swap
+                    // the host tree and reload nginx transactionally.
+                    if ($this->quarantineStatusSnapshotHtml($statusBearingPaths[$safe])) {
+                        $deletedTotal++;
                     }
+                    continue;
                 }
+                if ($this->deleteSnapshotBundle($abs)) $deletedTotal++;
             }
-            if ($slug === '(unknown)') {
-                // Fall back to whatever tenant is on this host (single-tenant case).
-                $slug = reset($slugByHostRoute[$row['host']]) ?: '(unknown)';
-            }
-
-            // This static route isn't expected for this tenant — purge it.
-            $byTenant[$slug][] = $row['route'];
-            $deletedTotal++;
-
-            if (!$dryRun) {
-                $abs = $this->cachePath . '/' . $row['cache_path'];
-                $this->deleteSnapshotBundle($abs);
-            }
+        };
+        if ($dryRun) {
+            $process();
+        } else {
+            $this->withCacheMutationLock($process);
         }
 
         return [
             'deleted_total' => $deletedTotal,
             'by_tenant'     => $byTenant,
+            'cache_paths'   => array_values(array_unique($cachePaths)),
             'dry_run'       => $dryRun,
+            'authoritative_job_id' => $authoritativeJobId,
         ];
-    }
-
-    /**
-     * Returns true for routes that represent dynamic, content-table-backed
-     * URLs (blog posts, listings, events, etc). Used by purgeUnexpectedSnapshots
-     * to avoid deleting legitimately-rendered detail pages just because they
-     * aren't in the static floor.
-     */
-    private function isDynamicContentRoute(string $route): bool
-    {
-        static $prefixes = [
-            '/blog/', '/listings/', '/events/', '/jobs/', '/marketplace/',
-            '/marketplace/category/', '/groups/', '/profile/', '/volunteering/',
-            '/volunteering/opportunities/', '/organisations/',
-            '/ideation/', '/kb/', '/page/',
-        ];
-        foreach ($prefixes as $p) {
-            if (str_starts_with($route, $p) && strlen($route) > strlen($p)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private function cmsPageExistsForTenant(int $tenantId, string $tenantLocalRoute): bool
@@ -1923,6 +3237,53 @@ class PrerenderService
                     ->exists();
         }
 
+        if (preg_match('#^/courses/([^/]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('courses')
+                && DB::table('courses')
+                    ->where('tenant_id', $tenantId)
+                    ->where(function ($query) use ($m) {
+                        $query->where('slug', $m[1]);
+                        if (ctype_digit($m[1])) $query->orWhere('id', (int) $m[1]);
+                    })
+                    ->where('status', 'published')
+                    ->where('moderation_status', 'approved')
+                    ->where('visibility', 'public')
+                    ->exists();
+        }
+
+        if (preg_match('#^/podcasts/([^/]+)/([^/]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('podcast_shows')
+                && Schema::hasTable('podcast_episodes')
+                && DB::table('podcast_episodes as e')
+                    ->join('podcast_shows as s', function ($join) {
+                        $join->on('s.id', '=', 'e.show_id')->whereColumn('s.tenant_id', 'e.tenant_id');
+                    })
+                    ->where('e.tenant_id', $tenantId)
+                    ->where('s.slug', $m[1])
+                    ->where('e.slug', $m[2])
+                    ->where('s.status', 'published')
+                    ->where('s.moderation_status', 'approved')
+                    ->where('s.visibility', 'public')
+                    ->where('e.status', 'published')
+                    ->where('e.moderation_status', 'approved')
+                    ->whereIn('e.visibility', ['inherit', 'public'])
+                    ->where(function ($query) {
+                        $query->whereNull('e.scheduled_for')->orWhere('e.scheduled_for', '<=', now());
+                    })
+                    ->exists();
+        }
+
+        if (preg_match('#^/podcasts/([^/]+)$#', $tenantLocalRoute, $m) === 1) {
+            return Schema::hasTable('podcast_shows')
+                && DB::table('podcast_shows')
+                    ->where('tenant_id', $tenantId)
+                    ->where('slug', $m[1])
+                    ->where('status', 'published')
+                    ->where('moderation_status', 'approved')
+                    ->where('visibility', 'public')
+                    ->exists();
+        }
+
         return false;
     }
 
@@ -1935,10 +3296,6 @@ class PrerenderService
             return false;
         }
 
-        if (self::routeRequiresTenantScope($tenantLocalRoute)) {
-            return $this->tenantOwnedRouteExistsForTenant($tenantId, $tenantLocalRoute);
-        }
-
         if ($tenantTarget === null) {
             $tenantTarget = $this->tenantTargetById($tenantId);
         }
@@ -1946,7 +3303,16 @@ class PrerenderService
             return false;
         }
 
+        if (!$this->dynamicRouteGateAllows($tenantLocalRoute, $tenantTarget)) {
+            return false;
+        }
+
+        if (self::routeRequiresTenantScope($tenantLocalRoute)) {
+            return $this->tenantOwnedRouteExistsForTenant($tenantId, $tenantLocalRoute);
+        }
+
         $tenantObject = (object) [
+            'slug' => $tenantTarget['slug'] ?? null,
             'features' => $tenantTarget['features'] ?? null,
             'configuration' => $tenantTarget['configuration'] ?? null,
         ];
@@ -1959,14 +3325,60 @@ class PrerenderService
         // React has a public /resources listing and /resources/{id}/download API,
         // but no visible /resources/{id} page. Keep resource changes scoped to
         // the listing snapshot instead of queuing snapshots that can only 404.
-        return (bool) preg_match('#^/resources/[^/]+$#', $route);
+        // Profiles are deliberately excluded from sitemaps because the current
+        // profile model has no explicit public-SEO consent contract.
+        return (bool) preg_match('#^/(?:resources|profile)/[^/]+$#', $route);
+    }
+
+    /**
+     * Apply the same tenant feature/module gates to detail routes that we use
+     * for their listing pages. Existing records must not keep a route public
+     * after the owning feature is disabled.
+     *
+     * @param array<string,mixed> $tenantTarget
+     */
+    private function dynamicRouteGateAllows(string $route, array $tenantTarget): bool
+    {
+        $featurePrefixes = [
+            'blog' => ['/blog/'],
+            'events' => ['/events/'],
+            'groups' => ['/groups/'],
+            'job_vacancies' => ['/jobs/'],
+            'volunteering' => ['/volunteering/', '/organisations/'],
+            'ideation_challenges' => ['/ideation/'],
+            'resources' => ['/kb/'],
+            'marketplace' => ['/marketplace/'],
+            'courses' => ['/courses/'],
+            'podcasts' => ['/podcasts/'],
+        ];
+        $features = TenantFeatureConfig::mergeFeatures(
+            $this->decodeJsonColumn($tenantTarget['features'] ?? null)
+        );
+        foreach ($featurePrefixes as $feature => $prefixes) {
+            foreach ($prefixes as $prefix) {
+                if (str_starts_with($route, $prefix)) {
+                    return ($features[$feature] ?? false) === true;
+                }
+            }
+        }
+
+        if (str_starts_with($route, '/listings/')) {
+            $configuration = $this->decodeJsonColumn($tenantTarget['configuration'] ?? null);
+            $modules = TenantFeatureConfig::mergeModules(
+                is_array($configuration['modules'] ?? null) ? $configuration['modules'] : []
+            );
+            return ($modules['listings'] ?? false) === true;
+        }
+
+        return true;
     }
 
     private function frontendHost(): string
     {
         $url = (string) env('FRONTEND_URL', 'https://app.project-nexus.ie');
         $parts = parse_url($url);
-        return $parts['host'] ?? 'app.project-nexus.ie';
+        $host = (string) ($parts['host'] ?? 'app.project-nexus.ie');
+        return self::normalizeHost($host) ?? 'app.project-nexus.ie';
     }
 
     private function resolveTenantHost(string $slug): ?string
@@ -1983,6 +3395,7 @@ class PrerenderService
     {
         $byHost = [];
         foreach ($targets as $target) {
+            $target['host'] = strtolower(rtrim((string) $target['host'], '.'));
             $byHost[$target['host']][] = $target;
         }
         foreach ($byHost as &$hostTargets) {
@@ -2032,6 +3445,7 @@ class PrerenderService
      */
     private function tenantAttributionForRoute(string $host, string $route, array $targetsByHost): array
     {
+        $host = strtolower(rtrim($host, '.'));
         foreach ($targetsByHost[$host] ?? [] as $target) {
             if ($this->routeMatchesTenantTarget($route, $target)) {
                 return [$target, $this->tenantLocalRoute($route, $target)];
@@ -2065,22 +3479,6 @@ class PrerenderService
         return $route;
     }
 
-    private function expectedSnapshotCount(array $tenants): int
-    {
-        // Sum each tenant's per-tenant expected route count rather than
-        // multiplying by a global constant. Tenants with features disabled
-        // legitimately have fewer expected static snapshots.
-        $total = 0;
-        foreach ($tenants as $t) {
-            $tObj = (object) [
-                'features' => $t['features'] ?? null,
-                'configuration' => $t['configuration'] ?? null,
-            ];
-            $total += count($this->routesForTenant($tObj));
-        }
-        return $total;
-    }
-
     private function safeCachePath(string $rel): ?string
     {
         $rel = ltrim(str_replace('\\', '/', $rel), '/');
@@ -2090,6 +3488,27 @@ class PrerenderService
         // above plus the /index.html suffix guarantee path safety.
         if (!preg_match('#^[A-Za-z0-9._~/%:@!$()+,;=\-]+/index\.html$#', $rel)) return null;
         return $rel;
+    }
+
+    /**
+     * Resolve an existing cache file and prove its final target is contained
+     * by the configured cache root. The trailing separator prevents a sibling
+     * such as `/prerendered-evil` from satisfying the prefix check.
+     */
+    private function resolveExistingCacheFile(string $candidate): ?string
+    {
+        $root = realpath($this->cachePath);
+        $resolved = realpath($candidate);
+        if ($root === false || $resolved === false || !is_file($resolved)) {
+            return null;
+        }
+
+        $root = rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        if (!str_starts_with($resolved, $root)) {
+            return null;
+        }
+
+        return $resolved;
     }
 
     /**
@@ -2208,6 +3627,32 @@ class PrerenderService
         return ($n >= 100 && $n < 600) ? $n : 200;
     }
 
+    /** True only for sidecars that the nginx status-map compiler serves. */
+    private function hasCompiledStatusSidecar(string $dir): bool
+    {
+        $path = $dir . '/_status';
+        return is_file($path)
+            && !is_link($path)
+            && in_array($this->readStatusSidecar($dir), [404, 410, 503], true);
+    }
+
+    /** @return array{tenant_id:int,tenant_slug:string}|null */
+    private function readTenantIdentitySidecar(string $dir): ?array
+    {
+        $path = $dir . '/_tenant.json';
+        if (!is_readable($path)) return null;
+        $decoded = json_decode((string) @file_get_contents($path), true);
+        if (!is_array($decoded)) return null;
+
+        $tenantId = (int) ($decoded['tenantId'] ?? 0);
+        $tenantSlug = (string) ($decoded['tenantSlug'] ?? '');
+        if ($tenantId <= 0 || preg_match('/^[A-Za-z0-9_-]{1,64}$/', $tenantSlug) !== 1) {
+            return null;
+        }
+
+        return ['tenant_id' => $tenantId, 'tenant_slug' => $tenantSlug];
+    }
+
     private function readJsonFile(string $path): ?array
     {
         if (!is_readable($path)) return null;
@@ -2292,15 +3737,27 @@ class PrerenderService
         $out = [];
 
         $queries = [
-            '/blog'         => ['table' => 'posts',             'col' => 'updated_at'],
-            '/events'       => ['table' => 'events',            'col' => 'updated_at'],
-            '/listings'     => ['table' => 'listings',          'col' => 'updated_at'],
-            '/groups'       => ['table' => 'groups',            'col' => 'updated_at'],
-            '/volunteering' => ['table' => 'vol_opportunities', 'col' => 'updated_at'],
-            '/organisations' => ['table' => 'vol_organizations', 'col' => 'updated_at'],
+            ['route' => '/blog',          'table' => 'posts',                    'col' => 'updated_at'],
+            ['route' => '/events',        'table' => 'events',                   'col' => 'updated_at'],
+            ['route' => '/listings',      'table' => 'listings',                 'col' => 'updated_at'],
+            ['route' => '/groups',        'table' => 'groups',                   'col' => 'updated_at'],
+            ['route' => '/jobs',          'table' => 'job_vacancies',            'col' => 'updated_at'],
+            ['route' => '/volunteering',  'table' => 'vol_opportunities',        'col' => 'updated_at'],
+            ['route' => '/organisations', 'table' => 'vol_organizations',        'col' => 'updated_at'],
+            ['route' => '/ideation',      'table' => 'ideation_challenges',      'col' => 'updated_at'],
+            ['route' => '/kb',            'table' => 'knowledge_base_articles',  'col' => 'updated_at'],
+            ['route' => '/marketplace',   'table' => 'marketplace_listings',     'col' => 'updated_at'],
+            ['route' => '/courses',       'table' => 'courses',                  'col' => 'updated_at'],
+            ['route' => '/courses',       'table' => 'course_sections',          'col' => 'updated_at'],
+            ['route' => '/courses',       'table' => 'course_lessons',           'col' => 'updated_at'],
+            ['route' => '/courses',       'table' => 'course_reviews',           'col' => 'updated_at'],
+            ['route' => '/podcasts',      'table' => 'podcast_shows',            'col' => 'updated_at'],
+            ['route' => '/podcasts',      'table' => 'podcast_episodes',         'col' => 'updated_at'],
+            ['route' => '/podcasts',      'table' => 'podcast_episode_chapters', 'col' => 'updated_at'],
         ];
 
-        foreach ($queries as $route => $q) {
+        foreach ($queries as $q) {
+            $route = $q['route'];
             if (!Schema::hasTable($q['table'])) continue;
             if (!Schema::hasColumn($q['table'], $q['col'])) continue;
             $timestampExpr = Schema::hasColumn($q['table'], 'created_at')
@@ -2377,6 +3834,9 @@ class PrerenderService
 
     private function normaliseJob(array $r): array
     {
+        $status = ($r['fence_state'] ?? null) === self::FENCE_STATE_PENDING
+            ? 'pending_fence'
+            : (string) $r['status'];
         $user = null;
         if (!empty($r['requested_by'])) {
             $user = [
@@ -2387,12 +3847,17 @@ class PrerenderService
         }
         return [
             'id'             => (int) $r['id'],
-            'status'         => (string) $r['status'],
+            'status'         => $status,
             'tenant_id'      => $r['tenant_id'] !== null ? (int) $r['tenant_id'] : null,
             'tenant_slug'    => $r['tenant_slug'] ?? null,
             'routes'         => $r['routes'] ?? null,
             'force'          => (bool) $r['force_render'],
             'dry_run'        => (bool) $r['dry_run'],
+            'authoritative_reset' => in_array(
+                $r['fence_state'] ?? null,
+                [self::FENCE_STATE_PENDING, self::FENCE_STATE_ACTIVATED],
+                true
+            ),
             'priority'       => isset($r['priority']) ? (int) $r['priority'] : self::PRIORITY_NORMAL,
             'planned_count'  => $r['planned_count'] !== null ? (int) $r['planned_count'] : null,
             'rendered_count' => $r['rendered_count'] !== null ? (int) $r['rendered_count'] : null,
@@ -2403,6 +3868,7 @@ class PrerenderService
             'error_message'  => $r['error_message'] ?? null,
             'claimed_by'     => $r['claimed_by'] ?? null,
             'queued_at'      => $r['queued_at'] ?? null,
+            'fence_ready_at' => $r['fence_ready_at'] ?? null,
             'claimed_at'     => $r['claimed_at'] ?? null,
             'started_at'     => $r['started_at'] ?? null,
             'finished_at'    => $r['finished_at'] ?? null,
@@ -2576,28 +4042,68 @@ class PrerenderService
         ?string $userAgent = null
     ): void {
         try {
-            $detailsJson = $details === null ? null : json_encode(
-                $this->sanitiseAuditDetails($details),
-                JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+            $this->persistAudit(
+                $action,
+                $actorUserId,
+                $tenantId,
+                $jobId,
+                $outcome,
+                $details,
+                $ip,
+                $userAgent
             );
-            if (is_string($detailsJson) && strlen($detailsJson) > 8192) {
-                $detailsJson = substr($detailsJson, 0, 8192);
-            }
-            DB::table('prerender_audit_log')->insert([
-                'actor_user_id' => $actorUserId,
-                'action'        => substr($action, 0, 64),
-                'tenant_id'     => $tenantId,
-                'job_id'        => $jobId,
-                'outcome'       => in_array($outcome, ['ok', 'denied', 'error'], true) ? $outcome : 'ok',
-                'details'       => $detailsJson,
-                'ip'            => $ip !== null ? substr($ip, 0, 64) : null,
-                'user_agent'    => $userAgent !== null ? substr($userAgent, 0, 255) : null,
-                'created_at'    => date('Y-m-d H:i:s'),
-            ]);
         } catch (\Throwable $e) {
             // Auditing failures must NEVER block the underlying operation.
             Log::warning('Prerender audit insert failed', ['error' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Persist one audit row without swallowing storage failures. The reset-all
+     * success path calls this inside its intent transaction; public audit()
+     * wraps it to preserve best-effort behaviour everywhere else.
+     */
+    private function persistAudit(
+        string $action,
+        ?int $actorUserId,
+        ?int $tenantId = null,
+        ?int $jobId = null,
+        string $outcome = 'ok',
+        ?array $details = null,
+        ?string $ip = null,
+        ?string $userAgent = null
+    ): void {
+        $detailsJson = $details === null ? null : json_encode(
+            $this->sanitiseAuditDetails($details),
+            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+        );
+        if (is_string($detailsJson) && strlen($detailsJson) > 8192) {
+            // Never byte-slice JSON: the audit UI would receive malformed
+            // data. Preserve a bounded, valid structural summary instead.
+            $detailsJson = json_encode([
+                'truncated' => true,
+                'original_bytes' => strlen($detailsJson),
+                'keys' => array_slice(array_map('strval', array_keys($details ?? [])), 0, 100),
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
+        if ($outcome === 'failed') $outcome = 'error';
+        $this->insertAuditRow([
+            'actor_user_id' => $actorUserId,
+            'action'        => substr($action, 0, 64),
+            'tenant_id'     => $tenantId,
+            'job_id'        => $jobId,
+            'outcome'       => in_array($outcome, ['ok', 'denied', 'error'], true) ? $outcome : 'ok',
+            'details'       => $detailsJson,
+            'ip'            => $ip !== null ? substr($ip, 0, 64) : null,
+            'user_agent'    => $userAgent !== null ? substr($userAgent, 0, 255) : null,
+            'created_at'    => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    /** @param array<string, mixed> $row */
+    protected function insertAuditRow(array $row): void
+    {
+        DB::table('prerender_audit_log')->insert($row);
     }
 
     /**
@@ -2712,7 +4218,11 @@ class PrerenderService
             $sampled = array_slice($targets, 0, 5);
             $empty = [];
             foreach ($sampled as $target) {
-                if ($this->routesForTenant((object) $target) === []) {
+                if ($this->expectedRoutesForTenant(
+                    $target,
+                    self::MAX_PLANNED_ROUTES_PER_TENANT,
+                    true
+                ) === []) {
                     $empty[] = $target['slug'];
                 }
             }
@@ -2758,6 +4268,20 @@ class PrerenderService
                 'action' => 'Run migrations before enabling the worker',
             ];
             $bump('yellow');
+        } elseif (!$this->jobFenceSchemaCompatible()) {
+            $checks[] = [
+                'name'   => 'job_fence_schema',
+                'status' => 'red',
+                'detail' => 'The authoritative publisher fence migration is not installed',
+                'action' => 'Run database migrations before using Reset all and rebuild',
+            ];
+            $bump('red');
+        } else {
+            $checks[] = [
+                'name'   => 'job_fence_schema',
+                'status' => 'green',
+                'detail' => 'Durable publisher-fence activation is available',
+            ];
         }
 
         // 3. Circuit breaker.
@@ -2775,9 +4299,14 @@ class PrerenderService
         }
 
         // 4. Queue draining. Oldest queued row should be < 5 minutes old.
-        $oldestQueued = $hasJobsTable
-            ? DB::table('prerender_jobs')->where('status', 'queued')->min('queued_at')
-            : null;
+        $oldestQueued = null;
+        if ($hasJobsTable) {
+            $oldestQueueQuery = DB::table('prerender_jobs')->where('status', 'queued');
+            if ($this->hasJobFenceColumn()) {
+                $oldestQueueQuery->orWhere('fence_state', self::FENCE_STATE_PENDING);
+            }
+            $oldestQueued = $oldestQueueQuery->min('queued_at');
+        }
         if ($oldestQueued !== null) {
             $ageS = max(0, time() - strtotime($oldestQueued));
             if ($ageS > 600) {
@@ -2828,16 +4357,40 @@ class PrerenderService
             $checks[] = ['name' => 'recent_failures', 'status' => 'green', 'detail' => 'No recent failures'];
         }
 
-        // 6. Stuck claimed/running rows.
+        // 6. Stuck claimed/running rows. heartbeat_at is the renewable lease;
+        // COALESCE preserves compatibility for pre-migration running rows.
         $stuckCutoff = date('Y-m-d H:i:s', time() - 1800);
+        $hasHeartbeat = $hasJobsTable && $this->hasJobHeartbeatColumn();
         $stuck = $hasJobsTable
-            ? DB::table('prerender_jobs')->whereIn('status', ['claimed', 'running'])->where('claimed_at', '<', $stuckCutoff)->count()
+            ? DB::table('prerender_jobs')
+                ->where(function ($query) use ($stuckCutoff, $hasHeartbeat): void {
+                    $query->where(function ($claimed) use ($stuckCutoff): void {
+                        $claimed->where('status', 'claimed')
+                            ->where('claimed_at', '<', $stuckCutoff);
+                    })->orWhere(function ($running) use ($stuckCutoff, $hasHeartbeat): void {
+                        $running->where('status', 'running')
+                            ->where(function ($lease) use ($stuckCutoff, $hasHeartbeat): void {
+                                if ($hasHeartbeat) {
+                                    $lease->whereRaw(
+                                        'COALESCE(heartbeat_at, started_at) < ?',
+                                        [$stuckCutoff]
+                                    )->orWhere(function ($missing): void {
+                                        $missing->whereNull('heartbeat_at')->whereNull('started_at');
+                                    });
+                                } else {
+                                    $lease->where('started_at', '<', $stuckCutoff)
+                                        ->orWhereNull('started_at');
+                                }
+                            });
+                    });
+                })
+                ->count()
             : 0;
         if ($stuck > 0) {
             $checks[] = [
                 'name'   => 'stuck_jobs',
                 'status' => 'yellow',
-                'detail' => "{$stuck} jobs claimed >30m without finishing",
+                'detail' => "{$stuck} jobs have not renewed their lease for >30m",
                 'action' => 'Run: docker exec nexus-php-app php artisan prerender:reap-stale',
             ];
             $bump('yellow');
@@ -2915,11 +4468,14 @@ class PrerenderService
             }
             $ageS = time() - $lastOk;
             if ($ageS > $interval * 3) {
+                $remediation = $name === 'prerender-reap-stale'
+                    ? 'Verify /etc/cron.d/nexus-prerender-processor and the host reaper log'
+                    : 'Verify the Laravel scheduler is running (supervisord nexus-scheduler unit)';
                 $checks[] = [
                     'name'   => 'sched_' . $name,
                     'status' => 'red',
                     'detail' => "Last successful run {$ageS}s ago (expected every {$interval}s)",
-                    'action' => 'Verify the Laravel scheduler is running (supervisord nexus-scheduler unit)',
+                    'action' => $remediation,
                 ];
                 $bump('red');
             } elseif ($ageS > $interval * 2) {

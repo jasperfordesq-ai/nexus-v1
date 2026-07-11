@@ -553,6 +553,12 @@ class TenantContext
         ];
     }
 
+    /** Shared backend contract for slugs that collide with platform routes. */
+    public static function isReservedPathSegment(string $slug): bool
+    {
+        return in_array(strtolower(trim($slug)), self::getReservedPaths(), true);
+    }
+
     /**
      * Get the tenant slug prefix for building frontend URLs (e.g. "/hour-timebank").
      * Unlike getBasePath(), this always derives the prefix from the tenant slug,

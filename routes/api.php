@@ -32,6 +32,11 @@ Route::get('/laravel/health', function () {
     ]);
 });
 Route::get('/v2/health', fn () => response()->json(['status' => 'ok']));
+// External prerender invalidation webhook. Authentication is performed by the
+// controller using the configured bearer/HMAC secret, so this route must stay
+// outside the Sanctum admin group.
+Route::post('/v2/prerender/invalidate', [\App\Http\Controllers\Api\AdminPrerenderController::class, 'invalidate'])
+    ->middleware('throttle:60,1');
 Route::post('/v2/sales/orders', [\App\Http\Controllers\Api\SalesOrderController::class, 'submit'])
     ->middleware('throttle:5,1');
 
@@ -2415,6 +2420,7 @@ Route::get('/v2/admin/prerender/health',           [\App\Http\Controllers\Api\Ad
 Route::get('/v2/admin/prerender/audit',            [\App\Http\Controllers\Api\AdminPrerenderController::class, 'auditLog']);
 Route::post('/v2/admin/prerender/reset-breaker',   [\App\Http\Controllers\Api\AdminPrerenderController::class, 'resetBreaker']);
 Route::post('/v2/admin/prerender/reset-queue',     [\App\Http\Controllers\Api\AdminPrerenderController::class, 'resetQueue']);
+Route::post('/v2/admin/prerender/reset-all',       [\App\Http\Controllers\Api\AdminPrerenderController::class, 'resetAll']);
 // Round 3 — CSV export + TTL inspector.
 Route::get('/v2/admin/prerender/export/{kind}.csv', [\App\Http\Controllers\Api\AdminPrerenderController::class, 'exportCsv'])
     ->where('kind', 'audit|inventory|jobs');

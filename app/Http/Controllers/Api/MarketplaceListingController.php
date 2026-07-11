@@ -16,6 +16,7 @@ use App\Services\ImageUploadService;
 use App\Services\MarketplaceConfigurationService;
 use App\Services\MarketplaceListingService;
 use App\Services\MarketplaceSellerService;
+use App\Services\PrerenderContentInvalidator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -86,6 +87,31 @@ class MarketplaceListingController extends BaseApiController
         }
 
         return $listing;
+    }
+
+    /** Refresh every public snapshot that can display this listing. */
+    private function refreshListingSnapshots(MarketplaceListing $listing): void
+    {
+        try {
+            $tenantId = (int) TenantContext::getId();
+            $routes = ['/marketplace', '/marketplace/free', '/marketplace/' . $listing->getKey()];
+            $categoryId = (int) ($listing->category_id ?? 0);
+            if ($categoryId > 0) {
+                $slug = DB::table('marketplace_categories')
+                    ->where('tenant_id', $tenantId)
+                    ->where('id', $categoryId)
+                    ->value('slug');
+                if (is_string($slug) && $slug !== '') {
+                    $routes[] = '/marketplace/category/' . $slug;
+                }
+            }
+            app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, $routes);
+        } catch (\Throwable $e) {
+            Log::warning('Marketplace snapshot refresh failed', [
+                'listing_id' => $listing->getKey(),
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 
     // =====================================================================
@@ -463,6 +489,7 @@ class MarketplaceListingController extends BaseApiController
         }
 
         MarketplaceListingService::addImages($listing, $uploadedImages);
+        $this->refreshListingSnapshots($listing);
 
         // Reload images to return current state
         $listing->load(['images' => fn ($q) => $q->orderBy('sort_order')]);
@@ -499,6 +526,7 @@ class MarketplaceListingController extends BaseApiController
         ]);
 
         MarketplaceListingService::reorderImages($listing, $data['image_ids']);
+        $this->refreshListingSnapshots($listing);
 
         return $this->respondWithData(['reordered' => true]);
     }
@@ -520,6 +548,8 @@ class MarketplaceListingController extends BaseApiController
         if (!$deleted) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api_controllers_2.marketplace_listing.image_not_found'), null, 404);
         }
+
+        $this->refreshListingSnapshots($listing);
 
         return $this->noContent();
     }

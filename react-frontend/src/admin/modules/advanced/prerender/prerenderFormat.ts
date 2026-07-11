@@ -59,6 +59,7 @@ export function httpStatusColor(n: number): 'default' | 'success' | 'warning' | 
 
 export function jobStatusColor(status: PrerenderJob['status']): 'default' | 'primary' | 'success' | 'warning' | 'danger' {
   switch (status) {
+    case 'pending_fence': return 'warning';
     case 'queued': return 'default';
     case 'claimed':
     case 'running': return 'primary';

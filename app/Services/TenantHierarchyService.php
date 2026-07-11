@@ -24,6 +24,106 @@ class TenantHierarchyService
     }
 
     /**
+     * Normalize and validate routing fields shared by tenant-management and
+     * general-settings endpoints. A malformed/reserved/duplicate route key can
+     * make both tenant resolution and authoritative prerendering ambiguous.
+     *
+     * @return array{success:bool,data?:array<string,string|null>,error?:string}
+     */
+    public static function validateRoutingUpdate(int $tenantId, array $data, ?object $tenant = null): array
+    {
+        $tenant ??= DB::table('tenants')
+            ->where('id', $tenantId)
+            ->select('id', 'slug', 'domain', 'accessible_domain')
+            ->first();
+        if (!$tenant) {
+            return ['success' => false, 'error' => 'Tenant not found'];
+        }
+
+        $normalized = [];
+        if (array_key_exists('slug', $data)) {
+            $slug = strtolower(trim((string) $data['slug']));
+            if (!preg_match('/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/', $slug)) {
+                return ['success' => false, 'error' => __('api.slug_format_invalid')];
+            }
+            if (\App\Core\TenantContext::isReservedPathSegment($slug)) {
+                return ['success' => false, 'error' => __('api.slug_reserved_short', ['slug' => $slug])];
+            }
+            if (DB::table('tenants')->where('slug', $slug)->where('id', '!=', $tenantId)->exists()) {
+                return ['success' => false, 'error' => "Slug '{$slug}' is already in use"];
+            }
+            $normalized['slug'] = $slug;
+        }
+
+        foreach (['domain', 'accessible_domain'] as $field) {
+            if (!array_key_exists($field, $data)) continue;
+            $host = strtolower(rtrim(trim((string) ($data[$field] ?? '')), '.'));
+            if ($host !== ''
+                && !preg_match('/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/', $host)) {
+                return ['success' => false, 'error' => __('api.domain_format_invalid')];
+            }
+            if ($host !== '' && self::isReservedPlatformHost($host)) {
+                return ['success' => false, 'error' => __('api.domain_format_invalid')];
+            }
+            $normalized[$field] = $host === '' ? null : $host;
+        }
+
+        $effectiveDomain = array_key_exists('domain', $normalized)
+            ? (string) ($normalized['domain'] ?? '')
+            : strtolower(rtrim((string) ($tenant->domain ?? ''), '.'));
+        $effectiveAccessible = array_key_exists('accessible_domain', $normalized)
+            ? (string) ($normalized['accessible_domain'] ?? '')
+            : strtolower(rtrim((string) ($tenant->accessible_domain ?? ''), '.'));
+        if ($effectiveDomain !== '' && $effectiveAccessible !== ''
+            && strcasecmp($effectiveDomain, $effectiveAccessible) === 0) {
+            return ['success' => false, 'error' => 'Primary and accessible domains must be different'];
+        }
+
+        foreach (['domain', 'accessible_domain'] as $field) {
+            $host = $normalized[$field] ?? null;
+            if ($host !== null && DB::table('tenants')
+                ->where('id', '!=', $tenantId)
+                ->where(function ($query) use ($host) {
+                    $query->where('domain', $host)->orWhere('accessible_domain', $host);
+                })
+                ->exists()) {
+                return ['success' => false, 'error' => "Domain '{$host}' is already in use"];
+            }
+        }
+
+        return ['success' => true, 'data' => $normalized];
+    }
+
+    /** Core service hosts can never be assigned as a tenant custom domain. */
+    private static function isReservedPlatformHost(string $host): bool
+    {
+        $host = strtolower(rtrim($host, '.'));
+        if (filter_var($host, FILTER_VALIDATE_IP) !== false) return true;
+
+        $reserved = [
+            'project-nexus.ie',
+            'www.project-nexus.ie',
+            'app.project-nexus.ie',
+            'api.project-nexus.ie',
+            'accessible.project-nexus.ie',
+        ];
+        foreach ([
+            config('app.url'),
+            config('app.frontend_url'),
+            config('app.accessible_frontend_url'),
+            config('app.sales_site_url'),
+        ] as $url) {
+            if (!is_string($url) || trim($url) === '') continue;
+            $configuredHost = parse_url($url, PHP_URL_HOST);
+            if (is_string($configuredHost) && $configuredHost !== '') {
+                $reserved[] = strtolower(rtrim($configuredHost, '.'));
+            }
+        }
+
+        return in_array($host, array_unique($reserved), true);
+    }
+
+    /**
      * Create a new tenant under the given parent.
      *
      * @return array{success: bool, tenant_id?: int, error?: string}
@@ -54,9 +154,15 @@ class TenantHierarchyService
             }
 
             // Generate slug if not provided
-            $slug = trim($data['slug'] ?? '');
+            $slug = strtolower(trim($data['slug'] ?? ''));
             if (empty($slug)) {
                 $slug = self::generateSlug($name);
+            }
+            if (!preg_match('/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/', $slug)) {
+                return ['success' => false, 'error' => __('api.slug_format_invalid')];
+            }
+            if (\App\Core\TenantContext::isReservedPathSegment($slug)) {
+                return ['success' => false, 'error' => __('api.slug_reserved_short', ['slug' => $slug])];
             }
 
             // Check slug uniqueness
@@ -69,8 +175,17 @@ class TenantHierarchyService
             // (domain) and the accessible/GOV.UK custom domain (accessible_domain)
             // share ONE global hostname namespace — a host may belong to exactly
             // one tenant, on exactly one of the two columns.
-            $domain = trim($data['domain'] ?? '');
-            $accessibleDomain = trim($data['accessible_domain'] ?? '');
+            $domain = strtolower(rtrim(trim($data['domain'] ?? ''), '.'));
+            $accessibleDomain = strtolower(rtrim(trim($data['accessible_domain'] ?? ''), '.'));
+
+            foreach ([$domain, $accessibleDomain] as $host) {
+                if ($host !== '' && !preg_match('/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/', $host)) {
+                    return ['success' => false, 'error' => __('api.domain_format_invalid')];
+                }
+                if ($host !== '' && self::isReservedPlatformHost($host)) {
+                    return ['success' => false, 'error' => __('api.domain_format_invalid')];
+                }
+            }
 
             if ($domain !== '' && $accessibleDomain !== '' && strcasecmp($domain, $accessibleDomain) === 0) {
                 return ['success' => false, 'error' => 'Primary and accessible domains must be different'];
@@ -178,6 +293,9 @@ class TenantHierarchyService
             );
 
             self::bustBootstrapCache($parentId);
+            if ((int) ($data['is_active'] ?? 1) === 1) {
+                app(PrerenderContentInvalidator::class)->refreshTenant($tenantId);
+            }
 
             return ['success' => true, 'tenant_id' => $tenantId];
         } catch (\Throwable $e) {
@@ -199,14 +317,26 @@ class TenantHierarchyService
                 return ['success' => false, 'error' => 'Tenant not found'];
             }
 
+            $routingInput = array_intersect_key(
+                $data,
+                array_flip(['slug', 'domain', 'accessible_domain'])
+            );
+            if ($routingInput !== []) {
+                $routingValidation = self::validateRoutingUpdate($tenantId, $routingInput, $tenant);
+                if (!$routingValidation['success']) {
+                    return ['success' => false, 'error' => $routingValidation['error'] ?? __('api.no_valid_fields_to_update')];
+                }
+                $data = array_replace($data, $routingValidation['data'] ?? []);
+            }
+
             // A host cannot serve as BOTH the React and the accessible frontend of
             // the same tenant. Validate against the effective post-update values.
             $effectiveDomain = array_key_exists('domain', $data)
-                ? trim((string) $data['domain'])
-                : (string) ($tenant->domain ?? '');
+                ? strtolower(rtrim(trim((string) $data['domain']), '.'))
+                : strtolower(rtrim((string) ($tenant->domain ?? ''), '.'));
             $effectiveAccessible = array_key_exists('accessible_domain', $data)
-                ? trim((string) $data['accessible_domain'])
-                : (string) ($tenant->accessible_domain ?? '');
+                ? strtolower(rtrim(trim((string) $data['accessible_domain']), '.'))
+                : strtolower(rtrim((string) ($tenant->accessible_domain ?? ''), '.'));
             if ($effectiveDomain !== '' && $effectiveAccessible !== ''
                 && strcasecmp($effectiveDomain, $effectiveAccessible) === 0) {
                 return ['success' => false, 'error' => 'Primary and accessible domains must be different'];
@@ -247,6 +377,15 @@ class TenantHierarchyService
                 }
 
                 // Check slug uniqueness if being changed
+                if ($field === 'slug') {
+                    $value = strtolower(trim((string) $value));
+                    if (!preg_match('/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/', $value)) {
+                        return ['success' => false, 'error' => __('api.slug_format_invalid')];
+                    }
+                    if (\App\Core\TenantContext::isReservedPathSegment($value)) {
+                        return ['success' => false, 'error' => __('api.slug_reserved_short', ['slug' => $value])];
+                    }
+                }
                 if ($field === 'slug' && $value !== ($tenant->slug ?? '')) {
                     $existingSlug = DB::table('tenants')
                         ->where('slug', $value)
@@ -261,7 +400,13 @@ class TenantHierarchyService
                 // multiple "no custom domain" tenants — MySQL allows many NULLs
                 // in a unique index but not many empty strings.
                 if (in_array($field, ['domain', 'accessible_domain'], true)) {
-                    $value = ($value === '' || $value === null) ? null : trim((string) $value);
+                    $value = ($value === '' || $value === null)
+                        ? null
+                        : strtolower(rtrim(trim((string) $value), '.'));
+                    if ($value !== null
+                        && !preg_match('/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+$/', $value)) {
+                        return ['success' => false, 'error' => __('api.domain_format_invalid')];
+                    }
                 }
 
                 // Check cross-column domain uniqueness if being changed. A host
@@ -288,8 +433,28 @@ class TenantHierarchyService
             }
 
             $update['updated_at'] = now();
+            $routingFields = ['slug', 'domain', 'is_active'];
+            $routingChanged = array_intersect(array_keys($update), $routingFields) !== [];
+            $purgeUnexpected = array_intersect(array_keys($update), ['features', 'configuration']) !== [];
 
-            DB::table('tenants')->where('id', $tenantId)->update($update);
+            DB::transaction(function () use (
+                $tenantId,
+                $tenant,
+                $update,
+                $routingChanged,
+                $purgeUnexpected
+            ): void {
+                DB::table('tenants')->where('id', $tenantId)->update($update);
+
+                $invalidator = app(PrerenderContentInvalidator::class);
+                if ($routingChanged) {
+                    // Old hosts/prefixes can only be removed by a complete
+                    // generation whose queue intent commits with this update.
+                    $invalidator->refreshAllOrFail();
+                } elseif ((int) ($tenant->is_active ?? 0) === 1) {
+                    $invalidator->refreshTenantOrFail($tenantId, true, $purgeUnexpected);
+                }
+            });
 
             // Audit
             SuperAdminAuditService::log(
@@ -359,12 +524,11 @@ class TenantHierarchyService
                 return ['success' => false, 'error' => 'Cannot delete a tenant with active sub-tenants. Deactivate or move them first.'];
             }
 
-            if ($hardDelete) {
-                // Hard delete is wrapped in a transaction to prevent partial cleanup.
-                // WARNING: This only moves users and child tenants. Other tenant-scoped
-                // data (listings, transactions, messages, events, groups, etc.) will be
-                // orphaned. Hard delete should only be used for empty/test tenants.
-                DB::transaction(function () use ($tenantId, $tenant) {
+            DB::transaction(function () use ($tenantId, $tenant, $hardDelete): void {
+                if ($hardDelete) {
+                    // WARNING: This only moves users and child tenants. Other tenant-scoped
+                    // data (listings, transactions, messages, events, groups, etc.) will be
+                    // orphaned. Hard delete should only be used for empty/test tenants.
                     $parentId = $tenant->parent_id ?? 1;
 
                     // Move users to parent tenant before deleting
@@ -381,13 +545,15 @@ class TenantHierarchyService
                     DB::table('federation_tenant_features')->where('tenant_id', $tenantId)->delete();
 
                     DB::table('tenants')->where('id', $tenantId)->delete();
-                });
-            } else {
-                DB::table('tenants')->where('id', $tenantId)->update([
-                    'is_active' => 0,
-                    'updated_at' => now(),
-                ]);
-            }
+                } else {
+                    DB::table('tenants')->where('id', $tenantId)->update([
+                        'is_active' => 0,
+                        'updated_at' => now(),
+                    ]);
+                }
+
+                app(PrerenderContentInvalidator::class)->refreshAllOrFail();
+            });
 
             // Audit
             SuperAdminAuditService::log(
@@ -450,29 +616,39 @@ class TenantHierarchyService
             $newDepth = ($newParent->depth ?? 0) + 1;
             $newPath = ($newParent->path ?? ('/' . $newParentId . '/')) . $tenantId . '/';
 
-            DB::table('tenants')->where('id', $tenantId)->update([
-                'parent_id'  => $newParentId,
-                'depth'      => $newDepth,
-                'path'       => $newPath,
-                'updated_at' => now(),
-            ]);
+            DB::transaction(function () use (
+                $tenantId,
+                $newParentId,
+                $newDepth,
+                $newPath,
+                $oldPath
+            ): void {
+                DB::table('tenants')->where('id', $tenantId)->update([
+                    'parent_id'  => $newParentId,
+                    'depth'      => $newDepth,
+                    'path'       => $newPath,
+                    'updated_at' => now(),
+                ]);
 
-            // Update materialized paths and depth for all descendants
-            if ($oldPath) {
-                $descendants = DB::table('tenants')
-                    ->where('path', 'LIKE', $oldPath . '%')
-                    ->where('id', '!=', $tenantId)
-                    ->get();
+                // Update materialized paths and depth for all descendants.
+                if ($oldPath) {
+                    $descendants = DB::table('tenants')
+                        ->where('path', 'LIKE', $oldPath . '%')
+                        ->where('id', '!=', $tenantId)
+                        ->get();
 
-                foreach ($descendants as $desc) {
-                    $updatedPath = str_replace($oldPath, $newPath, $desc->path);
-                    $updatedDepth = substr_count(trim($updatedPath, '/'), '/');
-                    DB::table('tenants')->where('id', $desc->id)->update([
-                        'path'  => $updatedPath,
-                        'depth' => $updatedDepth,
-                    ]);
+                    foreach ($descendants as $desc) {
+                        $updatedPath = str_replace($oldPath, $newPath, $desc->path);
+                        $updatedDepth = substr_count(trim($updatedPath, '/'), '/');
+                        DB::table('tenants')->where('id', $desc->id)->update([
+                            'path'  => $updatedPath,
+                            'depth' => $updatedDepth,
+                        ]);
+                    }
                 }
-            }
+
+                app(PrerenderContentInvalidator::class)->refreshAllOrFail();
+            });
 
             // Audit
             SuperAdminAuditService::log(

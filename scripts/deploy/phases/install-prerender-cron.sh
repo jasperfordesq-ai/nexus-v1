@@ -18,6 +18,9 @@ DEPLOY_DIR="${DEPLOY_DIR:-/opt/nexus-php}"
 CRON_FILE="${PRERENDER_CRON_FILE:-/etc/cron.d/nexus-prerender-processor}"
 LOG_DIR="${PRERENDER_LOG_DIR:-$DEPLOY_DIR/logs}"
 PROCESSOR_SCRIPT="$DEPLOY_DIR/scripts/prerender-job-processor.sh"
+REAPER_SCRIPT="$DEPLOY_DIR/scripts/prerender-reap-stale.sh"
+RESOLVER_SCRIPT="$DEPLOY_DIR/scripts/resolve-active-container.sh"
+STATE_FILE="${NEXUS_BLUEGREEN_STATE_FILE:-$DEPLOY_DIR/.bluegreen-active}"
 REAPER_INTERVAL_MINUTES="${PRERENDER_REAPER_INTERVAL_MINUTES:-5}"
 
 log() { echo "[$(date -Is)] install-prerender-cron: $*"; }
@@ -27,21 +30,31 @@ if [ ! -f "$PROCESSOR_SCRIPT" ]; then
     exit 0
 fi
 
+if [ ! -f "$REAPER_SCRIPT" ] || [ ! -f "$RESOLVER_SCRIPT" ]; then
+    log "WARN: prerender reaper/resolver scripts are incomplete - skipping cron install"
+    exit 0
+fi
+
 # Cron files in /etc/cron.d need a trailing newline and 0644 perms.
 # We also install a quick reaper that runs every $REAPER_INTERVAL_MINUTES
-# minutes and unsticks jobs whose worker died (claimed/running > 30m).
+# minutes and unsticks jobs whose renewable lease expired.
 read -r -d '' DESIRED <<EOF || true
 # Project NEXUS — prerender job processor (auto-installed by deploy)
 # Edits to this file are overwritten on every deploy. Source of truth:
 #   scripts/deploy/phases/install-prerender-cron.sh
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+DEPLOY_DIR=$DEPLOY_DIR
+NEXUS_BLUEGREEN_STATE_FILE=$STATE_FILE
 
 # Claim & process the next queued prerender job every minute (host-side).
-* * * * * root flock -n /opt/nexus-php/.prerender-job-processor.lock $PROCESSOR_SCRIPT >> $LOG_DIR/prerender-job-processor.log 2>&1
+# The processor acquires this lock internally. Wrapping it in a second `flock`
+# on the same file makes the child contend with its parent's lock and causes
+# every cron tick to exit without claiming a job.
+* * * * * root /bin/bash $PROCESSOR_SCRIPT >> $LOG_DIR/prerender-job-processor.log 2>&1
 
 # Reap stale claimed/running rows whose worker died.
-*/$REAPER_INTERVAL_MINUTES * * * * root docker exec \$(docker ps --format '{{.Names}}' | grep -E '^nexus-(blue|green)-php-app\$' | head -1) php artisan prerender:reap-stale >> $LOG_DIR/prerender-reap-stale.log 2>&1
+*/$REAPER_INTERVAL_MINUTES * * * * root /bin/bash $REAPER_SCRIPT >> $LOG_DIR/prerender-reap-stale.log 2>&1
 EOF
 
 # Idempotency: only rewrite if content differs.

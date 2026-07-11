@@ -41,8 +41,8 @@ class PrerenderAutoRecache extends Command
     public function handle(): int
     {
         $cfg = config('prerender.auto_recache', []);
-        $maxTenants = (int) ($this->option('max-tenants') ?? $cfg['max_tenants_per_run'] ?? 10);
-        $maxRoutes  = (int) ($this->option('max-routes')  ?? $cfg['max_routes_per_tenant'] ?? 50);
+        $maxTenants = max(0, (int) ($this->option('max-tenants') ?? $cfg['max_tenants_per_run'] ?? 10));
+        $maxRoutes  = max(0, (int) ($this->option('max-routes')  ?? $cfg['max_routes_per_tenant'] ?? 50));
         $minStale   = (int) ($this->option('min-stale-seconds') ?? $cfg['min_stale_seconds'] ?? 300);
         $includeTtl     = (int) $this->option('include-ttl') === 1;
         $includeContent = (int) $this->option('include-content') === 1;
@@ -66,7 +66,7 @@ class PrerenderAutoRecache extends Command
         $targetsByHost = [];
         $targetsBySlug = [];
         foreach ($tenants as $t) {
-            $targetsByHost[$t['host']][] = $t;
+            $targetsByHost[strtolower((string) $t['host'])][] = $t;
             $targetsBySlug[$t['slug']] = $t;
         }
         foreach ($targetsByHost as &$targets) {
@@ -77,12 +77,18 @@ class PrerenderAutoRecache extends Command
         // Group stale routes by tenant slug.
         $byTenant = [];
         $reasons = [];
+        $inventoryTruncated = false;
         foreach ($inventory as $row) {
+            if (!empty($row['__truncated'])) {
+                $inventoryTruncated = true;
+                continue;
+            }
             if ($row['age_s'] < $minStale) continue;
+            $snapshotHost = strtolower((string) $row['host']);
             [$slug, $tenantLocalRoute] = $this->resolveSnapshotTenantRoute(
-                $row['host'],
+                $snapshotHost,
                 $row['route'],
-                $targetsByHost[$row['host']] ?? []
+                $targetsByHost[$snapshotHost] ?? []
             );
             if ($slug === null || $tenantLocalRoute === null) continue; // Snapshot for a host we don't recognise.
             $tenantId = (int) ($targetsBySlug[$slug]['tenant_id'] ?? 0);
@@ -107,6 +113,11 @@ class PrerenderAutoRecache extends Command
 
             $byTenant[$slug][] = $tenantLocalRoute;
             $reasons[$slug . ':' . $tenantLocalRoute] = $why;
+        }
+
+        if ($inventoryTruncated) {
+            $this->error('Snapshot inventory hit its safety limit; freshness pass was incomplete.');
+            return self::FAILURE;
         }
 
         if (empty($byTenant)) {
@@ -153,20 +164,22 @@ class PrerenderAutoRecache extends Command
                 continue;
             }
 
-            $routesCsv = implode(',', $routes);
-            $jobId = null;
+            $jobIds = [];
             if (!$dryRun) {
-                $jobId = $this->service->enqueueJob(
-                    $tenantId,
-                    $routesCsv,
-                    false,   // force (no — only stale routes get recached)
-                    false,   // dry_run on the job itself
-                    null,    // requested_by (system)
-                    PrerenderService::PRIORITY_LOW
-                );
+                foreach ($this->chunkRoutes($routes) as $routesCsv) {
+                    $jobIds[] = $this->service->enqueueJob(
+                        $tenantId,
+                        $routesCsv,
+                        false,   // force (no — only stale routes get recached)
+                        false,   // dry_run on the job itself
+                        null,    // requested_by (system)
+                        PrerenderService::PRIORITY_LOW
+                    );
+                }
             }
             $enqueued[$slug] = [
-                'job_id' => $jobId,
+                'job_id' => $jobIds[0] ?? null,
+                'job_ids' => $jobIds,
                 'route_count' => count($routes),
                 'sample_routes' => array_slice($routes, 0, 5),
             ];
@@ -177,17 +190,45 @@ class PrerenderAutoRecache extends Command
             'dry_run'  => $dryRun,
             'enqueued' => $enqueued,
             'skipped'  => $skipped,
+            'inventory_truncated' => $inventoryTruncated,
         ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-        return self::SUCCESS;
+        return $inventoryTruncated ? self::FAILURE : self::SUCCESS;
+    }
+
+    /** @param list<string> $routes @return list<string> */
+    private function chunkRoutes(array $routes, int $maxBytes = 1900): array
+    {
+        $chunks = [];
+        $current = [];
+        $bytes = 0;
+        foreach ($routes as $route) {
+            $routeBytes = strlen($route);
+            if ($routeBytes > $maxBytes) {
+                throw new \RuntimeException("Prerender route exceeds {$maxBytes} bytes");
+            }
+            $added = $routeBytes + ($current === [] ? 0 : 1);
+            if ($current !== [] && $bytes + $added > $maxBytes) {
+                $chunks[] = implode(',', $current);
+                $current = [];
+                $bytes = 0;
+                $added = $routeBytes;
+            }
+            $current[] = $route;
+            $bytes += $added;
+        }
+        if ($current !== []) $chunks[] = implode(',', $current);
+        return $chunks;
     }
 
     /**
-     * @param list<array{slug:string,prefix:string}> $targets
+     * @param list<array{slug:string,host:string,prefix:string}> $targets
      * @return array{0:?string,1:?string}
      */
     private function resolveSnapshotTenantRoute(string $host, string $route, array $targets): array
     {
+        $host = strtolower($host);
         foreach ($targets as $target) {
+            if (strtolower((string) ($target['host'] ?? '')) !== $host) continue;
             $prefix = (string) ($target['prefix'] ?? '');
             if ($prefix === '') {
                 return [(string) $target['slug'], $route];

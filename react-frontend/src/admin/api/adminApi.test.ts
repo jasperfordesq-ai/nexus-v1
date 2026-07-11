@@ -1748,6 +1748,31 @@ describe('adminPrerender', () => {
     expect(mockPost).toHaveBeenCalledWith('/v2/admin/prerender/reset-queue', {});
   });
 
+  it('resetAll posts the typed confirmation phrase', async () => {
+    mockPost.mockResolvedValueOnce({ success: true, data: {} });
+    await adminPrerender.resetAll('RESET ALL SNAPSHOTS');
+    expect(mockPost).toHaveBeenCalledWith('/v2/admin/prerender/reset-all', {
+      confirmation: 'RESET ALL SNAPSHOTS',
+    });
+  });
+
+  it('downloadMetrics uses an authenticated API download', async () => {
+    mockDownload.mockResolvedValueOnce(undefined);
+    await adminPrerender.downloadMetrics();
+    expect(mockDownload).toHaveBeenCalledWith('/v2/admin/prerender/metrics', {
+      filename: 'nexus-prerender-metrics.txt',
+    });
+  });
+
+  it('exportCsv uses an authenticated API download with encoded filters', async () => {
+    mockDownload.mockResolvedValueOnce(undefined);
+    await adminPrerender.exportCsv('audit', 'reset all');
+    expect(mockDownload).toHaveBeenCalledWith(
+      '/v2/admin/prerender/export/audit.csv?action=reset%20all',
+      { filename: 'prerender-audit.csv' },
+    );
+  });
+
   it('ttlInspector encodes route', async () => {
     mockGet.mockResolvedValueOnce({ success: true, data: {} });
     await adminPrerender.ttlInspector('/about');

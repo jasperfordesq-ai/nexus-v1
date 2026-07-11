@@ -1107,6 +1107,11 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\IdeationChallenge::observe(\App\Observers\IdeationChallengePrerenderObserver::class);
         \App\Models\Page::observe(\App\Observers\PagePrerenderObserver::class);
         \App\Models\ResourceItem::observe(\App\Observers\ResourceItemPrerenderObserver::class);
+        \App\Models\Course::observe(\App\Observers\CoursePrerenderObserver::class);
+        \App\Models\CourseSection::observe(\App\Observers\CourseSectionPrerenderObserver::class);
+        \App\Models\CourseLesson::observe(\App\Observers\CourseLessonPrerenderObserver::class);
+        \App\Models\PodcastShow::observe(\App\Observers\PodcastShowPrerenderObserver::class);
+        \App\Models\PodcastEpisode::observe(\App\Observers\PodcastEpisodePrerenderObserver::class);
         // Organization + KnowledgeBaseArticle are sitemap-included but raw-DB
         // (no Eloquent model). They rely on the drift detector for freshness;
         // see prerender:detect-drift.

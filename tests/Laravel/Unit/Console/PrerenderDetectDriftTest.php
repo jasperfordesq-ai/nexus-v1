@@ -10,6 +10,7 @@ namespace Tests\Laravel\Unit\Console;
 
 use App\Services\PrerenderService;
 use App\Services\SitemapService;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 use Mockery;
@@ -94,6 +95,10 @@ class PrerenderDetectDriftTest extends TestCase
                 'updated_at' => now(),
             ]
         );
+        // A committed row left by an interrupted local run must not make the
+        // command silently skip this test tenant as "active_job_exists".
+        DB::table('prerender_jobs')->where('tenant_id', self::TENANT_ID)->delete();
+        DB::table('prerender_jobs')->whereNull('tenant_id')->delete();
 
         \App\Core\TenantContext::setById(self::TENANT_ID);
 
@@ -101,6 +106,24 @@ class PrerenderDetectDriftTest extends TestCase
         // picks them up automatically.
         $this->prerenderMock = Mockery::mock(PrerenderService::class);
         $this->sitemapMock   = Mockery::mock(SitemapService::class);
+
+        // The reconciler now compares inventory with the exact static +
+        // dynamic tenant plan so deleted/disabled routes can be purged. Most
+        // tests below exercise stale/missing behavior and provide their
+        // dynamic routes through the sitemap, so an empty static floor is the
+        // neutral default; purge-specific tests override it explicitly.
+        $this->prerenderMock
+            ->shouldReceive('routesForTenant')
+            ->byDefault()
+            ->andReturn([]);
+        $this->prerenderMock
+            ->shouldReceive('purgeUnexpectedSnapshots')
+            ->byDefault()
+            ->andReturn(['deleted_total' => 0, 'by_tenant' => [], 'dry_run' => false]);
+        $this->prerenderMock
+            ->shouldReceive('authoritativeRepairRequired')
+            ->byDefault()
+            ->andReturn(false);
 
         $this->app->instance(PrerenderService::class, $this->prerenderMock);
         $this->app->instance(SitemapService::class,   $this->sitemapMock);
@@ -161,6 +184,25 @@ class PrerenderDetectDriftTest extends TestCase
             ->assertExitCode(0);
     }
 
+    public function test_fails_closed_when_snapshot_inventory_is_truncated(): void
+    {
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([['__truncated' => true]]);
+        $this->sitemapMock->shouldNotReceive('generateForTenant');
+        $this->prerenderMock->shouldNotReceive('enqueueJob');
+
+        $this->artisan('prerender:detect-drift')
+            ->expectsOutputToContain('drift pass was incomplete')
+            ->assertExitCode(1);
+    }
+
     // =========================================================================
     // No stale / missing routes → enqueueJob never called.
     // =========================================================================
@@ -194,12 +236,16 @@ class PrerenderDetectDriftTest extends TestCase
             ->shouldReceive('generateForTenant')
             ->once()
             ->with(self::TENANT_ID, Mockery::type('string'))
-            ->andReturn($this->sitemapXml(['/about' => $lastmodStr]));
+            ->andReturnUsing(function () use ($lastmodStr): string {
+                $this->assertTrue((bool) config('prerender.runtime_force_fresh_sitemap'));
+                return $this->sitemapXml(['/about' => $lastmodStr]);
+            });
 
         $this->prerenderMock->shouldNotReceive('enqueueJob');
 
         $this->artisan('prerender:detect-drift')
             ->assertExitCode(0);
+        $this->assertFalse((bool) config('prerender.runtime_force_fresh_sitemap'));
     }
 
     // =========================================================================
@@ -359,10 +405,10 @@ class PrerenderDetectDriftTest extends TestCase
     }
 
     // =========================================================================
-    // Sitemap error → tenant is skipped; no enqueueJob.
+    // Sitemap errors fail the reconciliation pass; no enqueueJob.
     // =========================================================================
 
-    public function test_skips_tenant_when_sitemap_throws(): void
+    public function test_fails_pass_when_sitemap_throws(): void
     {
         $this->prerenderMock
             ->shouldReceive('loadTenantTargets')
@@ -383,7 +429,8 @@ class PrerenderDetectDriftTest extends TestCase
         $this->prerenderMock->shouldNotReceive('enqueueJob');
 
         $this->artisan('prerender:detect-drift')
-            ->assertExitCode(0);
+            ->expectsOutputToContain('planning_errors')
+            ->assertExitCode(1);
     }
 
     // =========================================================================
@@ -466,9 +513,11 @@ class PrerenderDetectDriftTest extends TestCase
             ->once()
             ->andReturn($this->sitemapXml([]));
 
-        $this->artisan('prerender:detect-drift')
-            ->expectsOutputToContain('snapshot_count')
-            ->assertExitCode(0);
+        $exit = Artisan::call('prerender:detect-drift');
+        $output = Artisan::output();
+        $this->assertSame(1, $exit, $output);
+        $this->assertStringContainsString('snapshot_count', $output);
+        $this->assertStringContainsString('sitemap_empty', $output);
     }
 
     // =========================================================================
@@ -556,6 +605,131 @@ class PrerenderDetectDriftTest extends TestCase
             ->andReturn(1004);
 
         $this->artisan('prerender:detect-drift')
+            ->assertExitCode(0);
+    }
+
+    public function test_purges_snapshot_that_is_outside_exact_tenant_plan(): void
+    {
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([
+                [
+                    'host' => self::TENANT_HOST,
+                    'route' => '/' . self::TENANT_SLUG . '/deleted-page',
+                    'mtime' => time(),
+                ],
+            ]);
+
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->once()
+            ->andReturn($this->sitemapXml(['/about' => date('Y-m-d')]));
+
+        $this->prerenderMock
+            ->shouldReceive('routesForTenant')
+            ->once()
+            ->with(self::TENANT_ID)
+            ->andReturn(['/']);
+        $this->prerenderMock->shouldNotReceive('enqueueJob');
+        $this->prerenderMock
+            ->shouldReceive('invalidateRoutes')
+            ->once()
+            ->with(self::TENANT_ID, ['/deleted-page'], false)
+            ->andReturn(1);
+
+        $this->artisan('prerender:detect-drift', [
+            '--include-missing' => '0',
+            '--purge-unexpected' => '1',
+        ])->assertExitCode(0);
+    }
+
+    public function test_purge_unexpected_off_does_not_load_static_plan_or_delete_snapshot(): void
+    {
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([
+                [
+                    'host' => self::TENANT_HOST,
+                    'route' => '/' . self::TENANT_SLUG . '/deleted-page',
+                    'mtime' => time(),
+                ],
+            ]);
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->once()
+            ->andReturn($this->sitemapXml(['/about' => date('Y-m-d')]));
+
+        $this->prerenderMock->shouldNotReceive('routesForTenant');
+        $this->prerenderMock->shouldNotReceive('invalidateRoutes');
+        $this->prerenderMock->shouldNotReceive('enqueueJob');
+
+        $this->artisan('prerender:detect-drift', [
+            '--include-missing' => '0',
+            '--purge-unexpected' => '0',
+        ])->assertExitCode(0);
+    }
+
+    public function test_orphan_host_triggers_global_unexpected_reconciliation(): void
+    {
+        $this->prerenderMock
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([$this->makeTenantTarget()]);
+        $this->prerenderMock
+            ->shouldReceive('inventory')
+            ->once()
+            ->with(null, false)
+            ->andReturn([
+                ['host' => 'retired-tenant.example', 'route' => '/', 'mtime' => time()],
+            ]);
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->once()
+            ->andReturn($this->sitemapXml(['/about' => date('Y-m-d')]));
+        $this->prerenderMock->shouldNotReceive('enqueueJob');
+        $this->prerenderMock
+            ->shouldReceive('purgeUnexpectedSnapshots')
+            ->once()
+            ->with(false)
+            ->andReturn(['deleted_total' => 1, 'by_tenant' => ['orphan@retired-tenant.example' => ['/']], 'dry_run' => false]);
+
+        $this->artisan('prerender:detect-drift', ['--include-missing' => '0'])
+            ->expectsOutputToContain('"orphan_snapshot_count": 1')
+            ->assertExitCode(0);
+    }
+
+    public function test_active_authoritative_global_job_suppresses_drift_work(): void
+    {
+        DB::table('prerender_jobs')->insert([
+            'tenant_id' => null,
+            'force_render' => 1,
+            'dry_run' => 0,
+            'priority' => 1,
+            'status' => 'running',
+            'queued_at' => now(),
+            'started_at' => now(),
+        ]);
+
+        $this->prerenderMock->shouldNotReceive('loadTenantTargets');
+        $this->prerenderMock->shouldNotReceive('inventory');
+        $this->sitemapMock->shouldNotReceive('generateForTenant');
+        $this->prerenderMock->shouldNotReceive('enqueueJob');
+
+        $this->artisan('prerender:detect-drift')
+            ->expectsOutputToContain('authoritative_global_job_exists')
             ->assertExitCode(0);
     }
 }

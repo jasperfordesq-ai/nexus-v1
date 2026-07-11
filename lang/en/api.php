@@ -23,6 +23,17 @@ return [
     // RATE LIMITING
     // ============================================
     'rate_limit_exceeded'          => 'Rate limit exceeded. Please try again later.',
+    'prerender_plan_unavailable'   => 'The tenant pre-render route plan is unavailable.',
+    'prerender_boolean_required'   => ':field must be a boolean.',
+    'prerender_routes_limit'       => 'routes[] may contain at most :max entries.',
+    'prerender_purge_failed'       => 'Snapshot purge could not be completed safely.',
+    'prerender_unexpected_purge_failed' => 'Unexpected snapshot purge could not be completed safely.',
+    'prerender_reset_confirmation' => 'Reset confirmation did not match.',
+    'prerender_reset_rate_limited' => 'Too many reset requests. Wait five minutes.',
+    'prerender_reset_failed'       => 'The fresh pre-render rebuild could not be scheduled.',
+    'prerender_preview_required'   => 'A current server-issued preview is required before deletion.',
+    'prerender_preview_mismatch'   => 'The preview is missing, expired, or does not match these inputs.',
+    'prerender_preview_stale'      => 'The snapshot set changed. Run a new preview before deleting.',
 
     // ============================================
     // AG44 — TENANT PROVISIONING

@@ -450,16 +450,6 @@ $app = Application::configure(basePath: dirname(__DIR__))
             ->onSuccess($stampOk('prerender-auto-recache'))
             ->name('prerender-auto-recache');
 
-        //   Stale-job reaper: unsticks rows whose worker died (host reboot,
-        //   OOM kill, deploy-time SIGTERM that missed the finalise step).
-        //   Belt-and-braces: the host cron file also runs this every 5 minutes
-        //   in case the in-container scheduler is down.
-        $schedule->command('prerender:reap-stale')
-            ->everyFiveMinutes()
-            ->withoutOverlapping(5)
-            ->runInBackground()
-            ->onSuccess($stampOk('prerender-reap-stale'))
-            ->name('prerender-reap-stale');
     })
     ->withRouting(
         // Routes loaded by RouteServiceProvider (no /api prefix).

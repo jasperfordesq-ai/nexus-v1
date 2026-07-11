@@ -345,6 +345,11 @@ class AdminMarketplaceController extends BaseApiController
             ->where('status', 'active')
             ->update(['status' => 'removed', 'moderation_status' => 'rejected']);
 
+        app(\App\Services\PrerenderContentInvalidator::class)->refreshRoutes(
+            (int) TenantContext::getId(),
+            ['/marketplace', '/marketplace/free']
+        );
+
         // Tell the seller their account was suspended — previously silent. This
         // is an account-level notice (no specific listing); points to support.
         try {

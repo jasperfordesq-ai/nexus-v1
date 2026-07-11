@@ -468,6 +468,19 @@
     "provider_sendgrid": "SeolGrid",
     "provider_smtp": "SMTP",
     "prerender": {
+      "reset_all": {
+        "button": "Athshocraigh agus atóg iad uile",
+        "title": "Athshocraigh agus atóg gach cóip",
+        "description": "Cealaigh obair réamhrindreála níos sine agus cuir tús le hatógáil úr amháin ar gach leathanach poiblí, agus tionóntaí á gcur san áireamh, lena n-áirítear leathanach tuirlingthe, leathanaigh shaincheaptha agus ábhar blag gach tionónta.",
+        "safety": "Fanann an taisce iomlán reatha beo go dtí go ndéantar an plean bealaí nua a rindreáil agus a bhailíochtú go rathúil. Ní ghlacann atógálacha teipthe áit an leagain fhónta dheireanaigh atá ar eolas.",
+        "confirmation_label": "Deimhniú",
+        "confirmation_help": "Clóscríobh {{phrase}} chun leanúint ar aghaidh.",
+        "confirmation_phrase": "ATHSHOCRAIGH GACH CÓIP",
+        "cancel": "Cealaigh",
+        "confirm": "Cuir tús le hatógáil úr",
+        "queued": "Cuireadh atógáil úr #{{id}} sa scuaine do {{tenants}} tionónta agus {{routes}} bealach.",
+        "failed": "Níorbh fhéidir an atógáil úr a sceidealú. Níor baineadh aon chóip bheo."
+      },
       "description": "Grianghraif a rinne an freastalaí le bot amháin. Monatóireacht a dhéanamh ar chlúdach, staleness a bhrath, agus athnuachan bhfeidhm.",
       "guide": {
         "title": "Treoir Béarla saor in aisce,",
@@ -672,6 +685,8 @@
         },
         "no_output": "(gan aschur)",
         "purge_ungated": {
+          "confirm_title": "Cóipeanna gan choinne a bhaint?",
+          "confirm_message": "Scriosann sé seo go buan leathanaigh shábháilte nach bhfuil i bplean bealaí reatha an tionónta lena mbaineann siad. Deimhnigh gur athbhreithnigh tú an réamhamharc ar dtús.",
           "description": "Grianghraif scuabtha nach bhfuil a mbealach laistigh de shraith ionchais tionónta. Go coitianta tar éis gné a scoránú, nó chun bealaí statacha a ghlanadh a dhéantar gan bratacha gné. Fágtar bealaí ábhar dinimiciúil leo féin.",
           "title": "Glan na pictiúir neamháitithe (glanta 404 in aghaidh an tionónta)"
         },
@@ -742,7 +757,10 @@
         "issue_count_two": "{{count}} saincheisteanna"
       },
       "inventory": {
+        "truncated": "Shroich an fardal teorainn sábháilteachta {{count}} cóip. Cúngaigh scagaire na dtionóntaí sula ndéanann tú ollghníomh.",
+        "unknown_tenant": "Tionónta anaithnid",
         "actions": {
+          "open_live_url": "Oscail an leathanach beo (ní an chóip shábháilte)",
           "close": "Dún",
           "inspect": "Iniúchadh",
           "inspect_snapshot": "Déan iniúchadh ar {{path}}",
@@ -798,6 +816,8 @@
           "bulk_recache_two": "Neamhbhailíochtú pictiúir {{count}} agus reache scuaine"
         },
         "inspect": {
+          "load_failed": "Níorbh fhéidir an chóip seo a lódáil. Glanadh na sonraí iniúchta roimhe seo.",
+          "no_snapshot": "Níl aon chóip roghnaithe.",
           "age": "Aois",
           "all_valid": "ar fad bailí",
           "asset_references": "Tagairtí sócmhainní ({{count}})",
@@ -890,6 +910,7 @@
           "duration": "Fad",
           "error": "Earráid",
           "exit_code": "Cód scoir",
+          "fence_ready_at": "Fál an fhoilsitheora réidh",
           "finished_at": "Críochnaithe ag",
           "log_tail": "Log (eireaball)",
           "queued_at": "Ciúáilte ag",
@@ -911,6 +932,7 @@
           "cancelled": "Ar ceal",
           "failed": "Theip",
           "partial": "Páirteach",
+          "pending_fence": "Fál á ghníomhachtú",
           "queued": "Ciúáilte",
           "running": "Ag rith",
           "status": "Stádas",
@@ -940,6 +962,16 @@
         },
         "scope": {
           "all_tenants": "gach tionónta"
+        },
+        "statuses": {
+          "cancelled": "Ar ceal",
+          "claimed": "Éilithe",
+          "failed": "Theip",
+          "partial": "Páirteach",
+          "pending_fence": "Fál á ghníomhachtú",
+          "queued": "Ciúáilte",
+          "running": "Ag rith",
+          "succeeded": "D'éirigh leis"
         },
         "table_aria": "Poist"
       },
@@ -997,6 +1029,7 @@
       "live_connected": "Nuashonruithe beo ceangailte",
       "audit": {
         "actions": {
+          "reset_all": "Athshocraigh agus atóg iad uile",
           "auto_recache": "Auto-recache",
           "cancel": "Cealaigh post",
           "detect_drift": "Braith sruth",
@@ -1021,6 +1054,10 @@
           "when": "Cathain"
         },
         "empty": "Uimh iontrálacha iniúchta.",
+        "errors": {
+          "export": "Theip ar stair an iniúchta a easpórtáil",
+          "load": "Theip ar stair an iniúchta a lódáil"
+        },
         "fallbacks": {
           "all": "go léir",
           "system": "córas"
@@ -1039,11 +1076,13 @@
       },
       "overview": {
         "actions": {
+          "download_metrics": "Íoslódáil méadrachtaí",
           "queue_job": "Post scuaine",
           "refresh": "Athnuaigh"
         },
         "empty_summary": "Níl achoimre ar fáil.",
         "errors": {
+          "download_metrics": "Theip ar na méadrachtaí a íoslódáil",
           "enqueue_job": "Theip ar an bpost a chur i scuaine",
           "load_summary": "Theip ar an achoimre a lódáil"
         },
@@ -1058,6 +1097,7 @@
           "title": "Déan athnuachan"
         },
         "health": {
+          "cache_read_only": "Tá an taisce inléite amháin",
           "cache_unreachable": "Ní féidir teacht ar thaisce",
           "healthy": "sláintiúil",
           "missing": "{{count}} in easnamh",
@@ -1074,6 +1114,7 @@
           "stale_two": "{{count}} sean"
         },
         "hints": {
+          "unexpected": "Cóipeanna sábháilte lasmuigh de phleananna bealaí reatha na dtionóntaí",
           "active_jobs": "{{count}} gníomhach",
           "aging": "{{count}} ag dul in aois (>7d)",
           "asset_broken": "Tagairtí marbh /sócmhainní/*",
@@ -1104,6 +1145,7 @@
           "coverage": "Clúdach",
           "metrics": "Méadracht",
           "missing": "Ar iarraidh",
+          "unexpected": "Gan choinne",
           "queued_jobs": "Poist ciúáilte",
           "recent_failures": "Teipeanna le déanaí",
           "status": "Stádas"
@@ -1268,9 +1310,10 @@
           "tenant_slug": "banc uair-ama"
         },
         "sections": {
-          "dynamic_routes": "Bealaí dinimiciúla (uasmhéid de 1,000)",
+          "dynamic_routes": "Bealaí dinimiciúla",
           "static_routes": "Bealaí statacha"
         },
+        "tenant": "Tionónta {{slug}} (#{{id}})",
         "title": "Insamhlóir léarscáil an tsuímh"
       },
       "readonly": {
@@ -1331,6 +1374,8 @@
           "sitemap": "Sitemap"
         },
         "sections": {
+          "attention_limited": "Tá {{shown}} as {{total}} cóip shábháilte a bhfuil aird de dhíth orthu á dtaispeáint.",
+          "missing_routes": "Bealaí ar iarraidh ({{count}})",
           "attention": "Míreanna ar gá aird a thabhairt orthu"
         },
         "empty": "Cuir isteach slug tionónta chun a phlean bealaigh a iniúchadh agus pictiúir shábháilte.",

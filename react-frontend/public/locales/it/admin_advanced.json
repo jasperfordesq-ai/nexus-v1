@@ -468,6 +468,19 @@
     "provider_sendgrid": "SendGrid",
     "provider_smtp": "SMTP",
     "prerender": {
+      "reset_all": {
+        "button": "Reimposta e ricostruisci tutto",
+        "title": "Reimposta e ricostruisci tutti gli snapshot",
+        "description": "Annulla i precedenti processi di pre-rendering e avvia una nuova ricostruzione, specifica per ciascun tenant, di tutte le pagine pubbliche, incluse la pagina iniziale, le pagine personalizzate e i contenuti del blog di ogni tenant.",
+        "safety": "La cache completa attuale rimane online finché il nuovo piano delle route non viene renderizzato e convalidato correttamente. Le ricostruzioni non riuscite non sostituiscono l’ultima generazione valida.",
+        "confirmation_label": "Conferma",
+        "confirmation_help": "Digita {{phrase}} per continuare.",
+        "confirmation_phrase": "REIMPOSTA TUTTI GLI SNAPSHOT",
+        "cancel": "Annulla",
+        "confirm": "Avvia nuova ricostruzione",
+        "queued": "Nuova ricostruzione #{{id}} accodata per {{tenants}} tenant e {{routes}} route.",
+        "failed": "Non è stato possibile pianificare la nuova ricostruzione. Nessuno snapshot attivo è stato rimosso."
+      },
       "description": "Snapshot sottoposti a rendering del server solo per bot. Monitora la copertura, rileva i problemi obsoleti e forza gli aggiornamenti.",
       "guide": {
         "title": "Plain-English guide",
@@ -656,6 +669,8 @@
         },
         "no_output": "(nessuna uscita)",
         "purge_ungated": {
+          "confirm_title": "Rimuovere gli snapshot imprevisti?",
+          "confirm_message": "Questa operazione elimina definitivamente le pagine salvate che non rientrano nell’attuale piano delle route dei rispettivi tenant. Conferma di aver prima controllato l’anteprima.",
           "description": "Sweep snapshot il cui percorso non è presente in un set previsto dal tenant. Comune dopo aver disattivato una funzionalità o per la pulizia di percorsi statici sottoposti a prerendering senza flag di funzionalità. I percorsi dei contenuti dinamici vengono lasciati soli.",
           "title": "Eliminazione degli snapshot non controllati (pulizia 404 per tenant)"
         },
@@ -718,7 +733,10 @@
         "issue_count_many": "Problemi di {{count}}"
       },
       "inventory": {
+        "truncated": "L’inventario ha raggiunto il limite di sicurezza di {{count}} snapshot. Restringi il filtro dei tenant prima di eseguire un’azione in blocco.",
+        "unknown_tenant": "Tenant sconosciuto",
         "actions": {
+          "open_live_url": "Apri pagina online (non lo snapshot salvato)",
           "close": "Vicino",
           "inspect": "Ispezionare",
           "inspect_snapshot": "Ispeziona {{path}}",
@@ -770,6 +788,8 @@
           "bulk_recache_other": "Istantanee {{count}} e ricodifica in coda non valide"
         },
         "inspect": {
+          "load_failed": "Non è stato possibile caricare questo snapshot. I dati dell’ispezione precedente sono stati cancellati.",
+          "no_snapshot": "Nessuno snapshot selezionato.",
           "age": "Età",
           "all_valid": "tutto valido",
           "asset_references": "Riferimenti delle risorse ({{count}})",
@@ -852,6 +872,7 @@
           "duration": "Durata",
           "error": "Errore",
           "exit_code": "Codice di uscita",
+          "fence_ready_at": "Barriera di pubblicazione pronta",
           "finished_at": "Finito alle",
           "log_tail": "Tronco (coda)",
           "queued_at": "In coda a",
@@ -873,6 +894,7 @@
           "cancelled": "Annullato",
           "failed": "Fallito",
           "partial": "Parziale",
+          "pending_fence": "Attivazione della barriera",
           "queued": "In coda",
           "running": "Corsa",
           "status": "Stato",
@@ -900,6 +922,16 @@
         },
         "scope": {
           "all_tenants": "tutti gli inquilini"
+        },
+        "statuses": {
+          "cancelled": "Annullato",
+          "claimed": "Preso in carico",
+          "failed": "Fallito",
+          "partial": "Parziale",
+          "pending_fence": "Attivazione della barriera",
+          "queued": "In coda",
+          "running": "In esecuzione",
+          "succeeded": "Riuscito"
         },
         "table_aria": "Lavori"
       },
@@ -955,6 +987,7 @@
       "live_connected": "Aggiornamenti in tempo reale collegati",
       "audit": {
         "actions": {
+          "reset_all": "Reimposta e ricostruisci tutto",
           "auto_recache": "Auto-recache",
           "cancel": "Cancel job",
           "detect_drift": "Detect drift",
@@ -979,6 +1012,10 @@
           "when": "Quando"
         },
         "empty": "Nessuna voce di controllo.",
+        "errors": {
+          "export": "Impossibile esportare la cronologia di audit",
+          "load": "Impossibile caricare la cronologia di audit"
+        },
         "fallbacks": {
           "all": "Tutto",
           "system": "sistema"
@@ -997,11 +1034,13 @@
       },
       "overview": {
         "actions": {
+          "download_metrics": "Scarica metriche",
           "queue_job": "Lavoro in coda",
           "refresh": "Aggiorna"
         },
         "empty_summary": "Nessun riepilogo disponibile.",
         "errors": {
+          "download_metrics": "Impossibile scaricare le metriche",
           "enqueue_job": "Impossibile accodare il lavoro",
           "load_summary": "Impossibile caricare il riepilogo"
         },
@@ -1016,6 +1055,7 @@
           "title": "Forza l'aggiornamento"
         },
         "health": {
+          "cache_read_only": "La cache è in sola lettura",
           "cache_unreachable": "Cache irraggiungibile",
           "healthy": "Salutare",
           "missing": "{{count}} mancante",
@@ -1028,6 +1068,7 @@
           "stale_other": "{{count}} stantio"
         },
         "hints": {
+          "unexpected": "Snapshot salvati al di fuori degli attuali piani delle route dei tenant",
           "active_jobs": "{{count}} attivo",
           "aging": "{{count}} invecchiamento (>7d)",
           "asset_broken": "Riferimenti morti /assets/*",
@@ -1054,6 +1095,7 @@
           "coverage": "Copertura",
           "metrics": "Metrica",
           "missing": "Mancante",
+          "unexpected": "Imprevisti",
           "queued_jobs": "Lavori in coda",
           "recent_failures": "Fallimenti recenti",
           "status": "Stato"
@@ -1196,9 +1238,10 @@
           "tenant_slug": "banca del tempo"
         },
         "sections": {
-          "dynamic_routes": "Percorsi dinamici (limitato a 1.000)",
+          "dynamic_routes": "Route dinamiche",
           "static_routes": "Percorsi statici"
         },
+        "tenant": "Istanza {{slug}} (#{{id}})",
         "title": "Esploratore della mappa del sito"
       },
       "readonly": {
@@ -1257,6 +1300,8 @@
           "sitemap": "Sitemap"
         },
         "sections": {
+          "attention_limited": "Vengono mostrati {{shown}} dei {{total}} snapshot salvati che richiedono attenzione.",
+          "missing_routes": "Route mancanti ({{count}})",
           "attention": "Items needing attention"
         },
         "empty": "Enter a tenant slug to inspect its route plan and saved snapshots.",

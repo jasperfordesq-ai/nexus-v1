@@ -246,12 +246,12 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
 
 CMD ["sh", "-c", "umask 0002; \
     mkdir -p /var/www/html/storage/logs /var/www/html/storage/framework/cache/data /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/bootstrap/cache /var/www/html/httpdocs/uploads/tenants /var/www/html/httpdocs/uploads/posts; \
-    if ! chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache; then echo '[WARN] startup chown failed — log writes may fail'; fi; \
-    if ! find /var/www/html/storage /var/www/html/bootstrap/cache -type d -exec chmod 2775 {} +; then echo '[WARN] startup chmod dirs failed'; fi; \
-    if ! find /var/www/html/storage /var/www/html/bootstrap/cache -type f -exec chmod 664 {} +; then echo '[WARN] startup chmod files failed'; fi; \
+    if ! find /var/www/html/storage /var/www/html/bootstrap/cache -path /var/www/html/storage/prerendered -prune -o -exec chown www-data:www-data {} +; then echo '[WARN] startup chown failed — log writes may fail'; fi; \
+    if ! find /var/www/html/storage /var/www/html/bootstrap/cache -path /var/www/html/storage/prerendered -prune -o -type d -exec chmod 2775 {} +; then echo '[WARN] startup chmod dirs failed'; fi; \
+    if ! find /var/www/html/storage /var/www/html/bootstrap/cache -path /var/www/html/storage/prerendered -prune -o -type f -exec chmod 664 {} +; then echo '[WARN] startup chmod files failed'; fi; \
     if ! chown -R www-data:www-data /var/www/html/httpdocs/uploads; then echo '[WARN] startup upload chown failed - uploads may fail'; fi; \
     if ! chmod -R ug+rwX,o+rX /var/www/html/httpdocs/uploads; then echo '[WARN] startup upload chmod failed - uploads may fail'; fi; \
     php artisan optimize || { echo '[FATAL] artisan optimize failed'; exit 1; }; \
     php artisan horizon:publish 2>/dev/null || true; \
-    chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true; \
+    find /var/www/html/storage /var/www/html/bootstrap/cache -path /var/www/html/storage/prerendered -prune -o -exec chown www-data:www-data {} + 2>/dev/null || true; \
     exec apache2-foreground"]

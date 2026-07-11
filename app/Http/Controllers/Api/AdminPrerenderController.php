@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Support\CsvExportSanitizer;
 use App\Services\PrerenderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -52,10 +53,22 @@ class AdminPrerenderController extends BaseApiController
         } else {
             $tenantSlug = null;
         }
+        $items = $this->service->inventory($tenantSlug);
+        $truncated = false;
+        $items = array_values(array_filter($items, function (array $item) use (&$truncated): bool {
+            if (!empty($item['__truncated'])) {
+                $truncated = true;
+                return false;
+            }
+            return true;
+        }));
+
         return $this->respondWithData([
             'cache_readable' => $this->service->cacheReadable(),
             'cache_path'     => $this->service->cachePath(),
-            'items'          => $this->service->inventory($tenantSlug),
+            'items'          => $items,
+            'truncated'      => $truncated,
+            'hard_cap'       => PrerenderService::INVENTORY_HARD_CAP,
         ]);
     }
 
@@ -96,11 +109,16 @@ class AdminPrerenderController extends BaseApiController
         if ($slug === '' || !preg_match('/^[A-Za-z0-9_-]{1,64}$/', $slug)) {
             return $this->error('Valid tenant slug required', 400, 'VALIDATION_INVALID');
         }
-        $tenant = \DB::table('tenants')->where('slug', $slug)->where('is_active', 1)->first();
-        if (!$tenant) return $this->error('Tenant not found', 404, 'NOT_FOUND');
+        $target = collect($this->service->loadTenantTargets())->firstWhere('slug', $slug);
+        if (!is_array($target)) return $this->error(__('api.tenant_not_found'), 404, 'NOT_FOUND');
 
-        $staticRoutes = $this->service->routesForTenant((int) $tenant->id);
-        $plannedRoutes = $this->plannedRoutesForTenant($slug);
+        $staticRoutes = $this->service->routesForTenant((object) $target);
+        try {
+            $plannedRoutes = $this->service->expectedRoutesForTenant($target, PrerenderService::MAX_PLANNED_ROUTES_PER_TENANT, true);
+        } catch (\Throwable $e) {
+            report($e);
+            return $this->error(__('api.prerender_plan_unavailable'), 503, 'PRERENDER_PLAN_UNAVAILABLE');
+        }
         $dynamicRoutes = array_values(array_filter(
             $plannedRoutes,
             fn ($route) => is_string($route) && $route !== '' && $route[0] === '/' && !in_array($route, $staticRoutes, true)
@@ -279,9 +297,14 @@ class AdminPrerenderController extends BaseApiController
             $tenantId = (int) $row->id;
         }
 
-        $dryRun = (bool) ($payload['dry_run'] ?? false);
-        $recache = (bool) ($payload['recache'] ?? false);
-        $confirmAllTenants = (bool) ($payload['confirm_all_tenants'] ?? false);
+        foreach (['dry_run', 'recache', 'confirm_all_tenants'] as $booleanField) {
+            if (array_key_exists($booleanField, $payload) && !is_bool($payload[$booleanField])) {
+                return $this->error(__('api.prerender_boolean_required', ['field' => $booleanField]), 422, 'VALIDATION_INVALID');
+            }
+        }
+        $dryRun = $payload['dry_run'] ?? false;
+        $recache = $payload['recache'] ?? false;
+        $confirmAllTenants = $payload['confirm_all_tenants'] ?? false;
         if (!$dryRun && $tenantId === null && !$confirmAllTenants) {
             return $this->error(
                 'confirm_all_tenants is required when deleting snapshots across all tenants',
@@ -290,14 +313,92 @@ class AdminPrerenderController extends BaseApiController
             );
         }
 
-        $result = $this->service->purgePattern(
-            $pattern,
-            is_string($tenantSlug) && $tenantSlug !== '' ? $tenantSlug : null,
-            $dryRun
-        );
+        $previewToken = $payload['preview_token'] ?? null;
+        if (!$dryRun && (!is_string($previewToken) || !preg_match('/^[a-f0-9]{48}$/', $previewToken))) {
+            return $this->error(__('api.prerender_preview_required'), 409, 'PRERENDER_PREVIEW_REQUIRED');
+        }
 
-        $jobId = null;
-        if ($recache && !$dryRun && !empty($result['deleted'])) {
+        $preview = null;
+        $previewFingerprints = [];
+        try {
+            if (!$dryRun) {
+                $preview = Cache::pull('prerender:purge-preview:' . $previewToken);
+                if (!is_array($preview)
+                    || (int) ($preview['user_id'] ?? 0) !== $userId
+                    || (string) ($preview['pattern'] ?? '') !== $pattern
+                    || (string) ($preview['tenant_slug'] ?? '') !== (string) ($tenantSlug ?? '')) {
+                    return $this->error(__('api.prerender_preview_mismatch'), 409, 'PRERENDER_PREVIEW_REQUIRED');
+                }
+
+                $current = $this->service->purgePattern(
+                    $pattern,
+                    is_string($tenantSlug) && $tenantSlug !== '' ? $tenantSlug : null,
+                    true
+                );
+                if (!hash_equals((string) ($preview['hash'] ?? ''), $this->previewHash($current['deleted'] ?? []))) {
+                    return $this->error(__('api.prerender_preview_stale'), 409, 'PRERENDER_PREVIEW_STALE');
+                }
+            }
+
+            if ($dryRun) {
+                $result = $this->service->purgePattern(
+                    $pattern,
+                    is_string($tenantSlug) && $tenantSlug !== '' ? $tenantSlug : null,
+                    true
+                );
+                $previewFingerprints = $this->service->fingerprintCachePaths(
+                    array_values($result['deleted'] ?? [])
+                );
+            } else {
+                $authoritativeJobId = null;
+                $deleted = $this->service->purgeExactCachePaths(
+                    is_array($preview['paths'] ?? null) ? $preview['paths'] : [],
+                    is_array($preview['fingerprints'] ?? null) ? $preview['fingerprints'] : [],
+                    $authoritativeJobId
+                );
+                $result = [
+                    'deleted' => $deleted,
+                    'dry_run' => false,
+                    'pattern' => $pattern,
+                    'tenant_slug' => $tenantSlug,
+                    'authoritative_job_id' => $authoritativeJobId,
+                ];
+            }
+        } catch (\UnexpectedValueException $e) {
+            $this->service->audit(
+                'purge', $userId, $tenantId, null, 'rejected',
+                ['pattern' => $pattern, 'dry_run' => $dryRun, 'reason' => 'preview_stale'],
+                $r->ip(), substr((string) $r->userAgent(), 0, 255)
+            );
+            return $this->error(__('api.prerender_preview_stale'), 409, 'PRERENDER_PREVIEW_STALE');
+        } catch (\Throwable $e) {
+            report($e);
+            $this->service->audit(
+                'purge', $userId, $tenantId, null, 'error',
+                ['pattern' => $pattern, 'dry_run' => $dryRun, 'error' => substr($e->getMessage(), 0, 1000)],
+                $r->ip(), substr((string) $r->userAgent(), 0, 255)
+            );
+            return $this->error(__('api.prerender_purge_failed'), 503, 'PRERENDER_PURGE_FAILED');
+        }
+
+        $issuedPreviewToken = null;
+        if ($dryRun) {
+            $issuedPreviewToken = bin2hex(random_bytes(24));
+            $previewPaths = array_values($result['deleted'] ?? []);
+            Cache::put('prerender:purge-preview:' . $issuedPreviewToken, [
+                'user_id' => $userId,
+                'pattern' => $pattern,
+                'tenant_slug' => (string) ($tenantSlug ?? ''),
+                'hash' => $this->previewHash($previewPaths),
+                'paths' => $previewPaths,
+                'fingerprints' => $previewFingerprints,
+            ], 600);
+        }
+
+        $jobId = isset($result['authoritative_job_id'])
+            ? (int) $result['authoritative_job_id']
+            : null;
+        if ($recache && !$dryRun && !empty($result['deleted']) && $jobId === null) {
             // Enqueue a low-priority recache. We can't pass a glob to
             // prerender-tenants.sh; the worker discovers missing snapshots
             // on the next pass, so a force-render of the same tenant scope
@@ -329,8 +430,10 @@ class AdminPrerenderController extends BaseApiController
             'tenant_slug'  => $tenantSlug,
             'dry_run'      => $dryRun,
             'deleted_count'=> count($result['deleted']),
-            'deleted'      => array_slice($result['deleted'], 0, 500),
+            'deleted'      => array_values($result['deleted']),
             'recache_job_id' => $jobId,
+            'preview_token' => $issuedPreviewToken,
+            'preview_expires_in' => $issuedPreviewToken !== null ? 600 : null,
         ]);
     }
 
@@ -380,17 +483,13 @@ class AdminPrerenderController extends BaseApiController
         if ($token !== '') {
             $bearer = (string) $r->bearerToken();
             if ($bearer !== '' && hash_equals($token, $bearer)) {
-                $replayKey = 'prerender:webhook:bearer:' . hash('sha256', $r->getContent());
-                if (Cache::add($replayKey, 1, 300)) {
-                    $authed = true;
-                    $authMode = 'bearer';
-                } else {
-                    $this->service->audit(
-                        'invalidate', null, null, null, 'denied',
-                        ['reason' => 'webhook_bearer_replay'],
-                        $r->ip(), substr((string) $r->userAgent(), 0, 255)
-                    );
-                }
+                // Bearer calls are intentionally repeatable and idempotent.
+                // A CMS may publish the same URL twice within five minutes;
+                // body-hash replay blocking would discard the second, newer
+                // invalidation. One-time replay protection remains on signed
+                // timestamped HMAC requests below.
+                $authed = true;
+                $authMode = 'bearer';
             } else {
                 $sig = (string) $r->header('X-Nexus-Signature', '');
                 $tsHeader = (string) $r->header('X-Nexus-Timestamp', '');
@@ -449,13 +548,32 @@ class AdminPrerenderController extends BaseApiController
         if (!is_array($routes) || empty($routes)) {
             return $this->error('routes[] is required and must be non-empty', 400, 'VALIDATION_REQUIRED_FIELD');
         }
-        // Same regex the rest of the engine uses.
+        if (count($routes) > 500) {
+            return $this->error(__('api.prerender_routes_limit', ['max' => 500]), 422, 'VALIDATION_INVALID');
+        }
+        // Canonicalise conventional trailing slashes, but reject traversal,
+        // ambiguous separators, malformed escapes, and encoded dot/slash
+        // aliases before any route reaches a filesystem or job payload.
+        $normalisedRoutes = [];
         foreach ($routes as $r2) {
-            if (!is_string($r2) || !preg_match('#^/[A-Za-z0-9._~/%:@!$()*+,;=\-]*$#', $r2)) {
+            $normalised = is_string($r2)
+                ? PrerenderService::normalizeRoute($r2)
+                : null;
+            if ($normalised === null) {
                 return $this->error("Invalid route: " . (is_string($r2) ? $r2 : '(non-string)'), 400, 'VALIDATION_INVALID');
             }
+            $normalisedRoutes[] = $normalised;
         }
-        $recache = (bool) ($payload['recache'] ?? true);
+        $routes = array_values(array_unique($normalisedRoutes));
+        if (array_key_exists('recache', $payload) && !is_bool($payload['recache'])) {
+            return $this->error(__('api.prerender_boolean_required', ['field' => 'recache']), 422, 'VALIDATION_INVALID');
+        }
+        $recache = $payload['recache'] ?? true;
+
+        $tenantTarget = collect($this->service->loadTenantTargets())->firstWhere('tenant_id', $tenantId);
+        if (!is_array($tenantTarget)) {
+            return $this->error(__('api.tenant_not_found'), 404, 'NOT_FOUND');
+        }
 
         if ($actorUserId === null && !$this->checkExternalInvalidateRate($r, $tenantId, $authMode)) {
             return $this->error(__('api.rate_limit_exceeded'), 429, 'RATE_LIMITED');
@@ -520,12 +638,13 @@ class AdminPrerenderController extends BaseApiController
         }
         $apply = (bool) $r->json('apply', false);
         $exit = \Artisan::call('prerender:auto-recache', $apply ? [] : ['--dry-run' => true]);
-        $this->service->audit('auto_recache', $userId, null, null, 'ok', ['applied' => $apply, 'exit_code' => $exit]);
+        $outcome = $exit === 0 ? 'ok' : 'error';
+        $this->service->audit('auto_recache', $userId, null, null, $outcome, ['applied' => $apply, 'exit_code' => $exit]);
         return $this->respondWithData([
             'exit_code' => $exit,
             'output'    => \Artisan::output(),
             'applied'   => $apply,
-        ]);
+        ], null, $exit === 0 ? 200 : 500);
     }
 
     /**
@@ -543,12 +662,13 @@ class AdminPrerenderController extends BaseApiController
         }
         $apply = (bool) $r->json('apply', false);
         $exit = \Artisan::call('prerender:detect-drift', $apply ? [] : ['--dry-run' => true]);
-        $this->service->audit('detect_drift', $userId, null, null, 'ok', ['applied' => $apply, 'exit_code' => $exit]);
+        $outcome = $exit === 0 ? 'ok' : 'error';
+        $this->service->audit('detect_drift', $userId, null, null, $outcome, ['applied' => $apply, 'exit_code' => $exit]);
         return $this->respondWithData([
             'exit_code' => $exit,
             'output'    => \Artisan::output(),
             'applied'   => $apply,
-        ]);
+        ], null, $exit === 0 ? 200 : 500);
     }
 
     /**
@@ -570,13 +690,89 @@ class AdminPrerenderController extends BaseApiController
         if (!$this->checkActionRate($userId, 'purge_unexpected', 5, 60)) {
             return $this->error('Too many requests', 429, 'RATE_LIMITED');
         }
-        $apply = (bool) $r->json('apply', false);
-        $result = $this->service->purgeUnexpectedSnapshots(!$apply);
+        $applyInput = $r->json('apply', false);
+        if (!is_bool($applyInput)) {
+            return $this->error(__('api.prerender_boolean_required', ['field' => 'apply']), 422, 'VALIDATION_INVALID');
+        }
+        $apply = $applyInput;
+        $previewToken = $r->json('preview_token');
+        if ($apply && (!is_string($previewToken) || !preg_match('/^[a-f0-9]{48}$/', $previewToken))) {
+            return $this->error(__('api.prerender_preview_required'), 409, 'PRERENDER_PREVIEW_REQUIRED');
+        }
+        $preview = null;
+        $previewFingerprints = [];
+        try {
+            if ($apply) {
+                $preview = Cache::pull('prerender:unexpected-preview:' . $previewToken);
+                if (!is_array($preview) || (int) ($preview['user_id'] ?? 0) !== $userId) {
+                    return $this->error(__('api.prerender_preview_mismatch'), 409, 'PRERENDER_PREVIEW_REQUIRED');
+                }
+                $current = $this->service->purgeUnexpectedSnapshots(true);
+                if (!hash_equals(
+                    (string) ($preview['hash'] ?? ''),
+                    $this->previewHash($this->unexpectedPreviewPaths($current))
+                )) {
+                    return $this->error(__('api.prerender_preview_stale'), 409, 'PRERENDER_PREVIEW_STALE');
+                }
+            }
+            if ($apply) {
+                $authoritativeJobId = null;
+                $deleted = $this->service->purgeExactCachePaths(
+                    is_array($preview['paths'] ?? null) ? $preview['paths'] : [],
+                    is_array($preview['fingerprints'] ?? null) ? $preview['fingerprints'] : [],
+                    $authoritativeJobId
+                );
+                $result = [
+                    'deleted_total' => count($deleted),
+                    'by_tenant' => is_array($preview['by_tenant'] ?? null) ? $preview['by_tenant'] : [],
+                    'cache_paths' => $deleted,
+                    'dry_run' => false,
+                    'authoritative_job_id' => $authoritativeJobId,
+                ];
+            } else {
+                $result = $this->service->purgeUnexpectedSnapshots(true);
+                $previewFingerprints = $this->service->fingerprintCachePaths(
+                    array_values($result['cache_paths'] ?? [])
+                );
+            }
+        } catch (\UnexpectedValueException $e) {
+            $this->service->audit(
+                'purge_unexpected', $userId, null, null, 'rejected',
+                ['applied' => $apply, 'reason' => 'preview_stale'],
+                $r->ip(), substr((string) $r->userAgent(), 0, 255)
+            );
+            return $this->error(__('api.prerender_preview_stale'), 409, 'PRERENDER_PREVIEW_STALE');
+        } catch (\Throwable $e) {
+            report($e);
+            $this->service->audit(
+                'purge_unexpected', $userId, null, null, 'error',
+                ['applied' => $apply, 'error' => substr($e->getMessage(), 0, 1000)],
+                $r->ip(), substr((string) $r->userAgent(), 0, 255)
+            );
+            return $this->error(__('api.prerender_unexpected_purge_failed'), 503, 'PRERENDER_PURGE_FAILED');
+        }
+        if (!$apply) {
+            $issuedPreviewToken = bin2hex(random_bytes(24));
+            $previewPaths = array_values($result['cache_paths'] ?? []);
+            Cache::put('prerender:unexpected-preview:' . $issuedPreviewToken, [
+                'user_id' => $userId,
+                'hash' => $this->previewHash($this->unexpectedPreviewPaths($result)),
+                'paths' => $previewPaths,
+                'fingerprints' => $previewFingerprints,
+                'by_tenant' => $result['by_tenant'] ?? [],
+            ], 600);
+            $result['preview_token'] = $issuedPreviewToken;
+            $result['preview_expires_in'] = 600;
+        } else {
+            $result['preview_token'] = null;
+            $result['preview_expires_in'] = null;
+        }
         $this->service->audit(
             'purge_unexpected', $userId, null, null, 'ok',
             ['applied' => $apply, 'deleted_total' => $result['deleted_total'] ?? 0],
             $r->ip(), substr((string) $r->userAgent(), 0, 255)
         );
+        unset($result['cache_paths']);
         return $this->respondWithData($result);
     }
 
@@ -696,18 +892,57 @@ class AdminPrerenderController extends BaseApiController
 
         // Anything older than 30 min in claimed/running is fair game.
         $cutoff = date('Y-m-d H:i:s', time() - 1800);
-        $reset = \DB::table('prerender_jobs')
+        $hasHeartbeat = Schema::hasColumn('prerender_jobs', 'heartbeat_at');
+        $query = \DB::table('prerender_jobs')
             ->whereIn('status', ['claimed', 'running'])
-            ->where(function ($q) use ($cutoff) {
+            ->where(function ($q) use ($cutoff, $hasHeartbeat) {
+                if ($hasHeartbeat) {
+                    $q->whereRaw('COALESCE(heartbeat_at, started_at, claimed_at) IS NULL')
+                        ->orWhereRaw('COALESCE(heartbeat_at, started_at, claimed_at) < ?', [$cutoff]);
+                    return;
+                }
                 $q->whereNull('claimed_at')->orWhere('claimed_at', '<', $cutoff);
-            })
-            ->update([
-                'status'        => 'queued',
-                'claimed_at'    => null,
-                'claimed_by'    => null,
-                'started_at'    => null,
-                'error_message' => 'reset by admin via /reset-queue',
-            ]);
+            });
+        $updates = [
+            'status'        => 'queued',
+            'claimed_at'    => null,
+            'claimed_by'    => null,
+            'started_at'    => null,
+            'error_message' => 'reset by admin via /reset-queue',
+        ];
+        if ($hasHeartbeat) $updates['heartbeat_at'] = null;
+        $candidates = (clone $query)->get(['id', 'status', 'claimed_by']);
+        $reset = 0;
+
+        foreach ($candidates as $candidate) {
+            $candidateId = (int) $candidate->id;
+            $owner = (string) ($candidate->claimed_by ?? '');
+            $candidateQuery = \DB::table('prerender_jobs')
+                ->where('id', $candidateId)
+                ->where('status', (string) $candidate->status)
+                ->where(function ($q) use ($cutoff, $hasHeartbeat) {
+                    if ($hasHeartbeat) {
+                        $q->whereRaw('COALESCE(heartbeat_at, started_at, claimed_at) IS NULL')
+                            ->orWhereRaw('COALESCE(heartbeat_at, started_at, claimed_at) < ?', [$cutoff]);
+                        return;
+                    }
+                    $q->whereNull('claimed_at')->orWhere('claimed_at', '<', $cutoff);
+                });
+            if ($owner === '') {
+                $candidateQuery->whereNull('claimed_by');
+            } else {
+                $candidateQuery->where('claimed_by', $owner);
+            }
+
+            $updated = $candidateQuery->update($updates);
+            if ($updated === 1) {
+                $reset++;
+                // Revoke the exact old owner even if the minute processor has
+                // already reclaimed the now-queued row with a different token.
+                if ($owner !== '') $this->service->releaseJobLease($candidateId, $owner);
+                $this->service->broadcastJob($candidateId);
+            }
+        }
 
         $this->service->resetBreaker();
 
@@ -721,6 +956,42 @@ class AdminPrerenderController extends BaseApiController
             'rows_reset'      => $reset,
             'breaker_cleared' => true,
         ]);
+    }
+
+    /**
+     * POST /api/v2/admin/prerender/reset-all
+     *
+     * Cancel/fence every older job, preflight a fresh tenant-aware route plan,
+     * and enqueue one authoritative global force rebuild. Live snapshots are
+     * retained until the new run validates completely.
+     */
+    public function resetAll(Request $r): JsonResponse
+    {
+        $userId = $this->requirePlatformSuperAdmin();
+        if ((string) $r->json('confirmation', '') !== 'RESET ALL SNAPSHOTS') {
+            return $this->error(__('api.prerender_reset_confirmation'), 422, 'VALIDATION_INVALID');
+        }
+        if (!$this->checkActionRate($userId, 'reset_all', 1, 300)) {
+            return $this->error(__('api.prerender_reset_rate_limited'), 429, 'RATE_LIMITED');
+        }
+
+        try {
+            $result = $this->service->resetAllSnapshots(
+                $userId,
+                $r->ip(),
+                substr((string) $r->userAgent(), 0, 255)
+            );
+        } catch (\Throwable $e) {
+            report($e);
+            $this->service->audit(
+                'reset_all', $userId, null, null, 'error',
+                ['error' => substr($e->getMessage(), 0, 1000)],
+                $r->ip(), substr((string) $r->userAgent(), 0, 255)
+            );
+            return $this->error(__('api.prerender_reset_failed'), 503, 'PRERENDER_RESET_FAILED');
+        }
+
+        return $this->respondWithData($result, null, 202);
     }
 
     /**
@@ -752,7 +1023,7 @@ class AdminPrerenderController extends BaseApiController
             if ($kind === 'audit') {
                 fputcsv($out, ['id', 'created_at', 'action', 'outcome', 'actor_email', 'tenant_slug', 'job_id', 'ip', 'details']);
                 foreach ($this->service->recentAudit(5000, $r->query('action')) as $row) {
-                    fputcsv($out, [
+                    fputcsv($out, CsvExportSanitizer::row([
                         $row['id'] ?? '',
                         $row['created_at'] ?? '',
                         $row['action'] ?? '',
@@ -762,14 +1033,14 @@ class AdminPrerenderController extends BaseApiController
                         $row['job_id'] ?? '',
                         $row['ip'] ?? '',
                         is_array($row['details'] ?? null) ? json_encode($row['details']) : '',
-                    ]);
+                    ]));
                 }
             } elseif ($kind === 'inventory') {
                 fputcsv($out, ['host', 'route', 'cache_path', 'size_bytes', 'mtime', 'age_s', 'staleness', 'http_status', 'content_stale', 'asset_issues']);
                 $items = $this->service->inventory($r->query('tenant'));
                 foreach (array_slice($items, 0, 5000) as $row) {
                     if (!empty($row['__truncated'])) continue;
-                    fputcsv($out, [
+                    fputcsv($out, CsvExportSanitizer::row([
                         $row['host'] ?? '',
                         $row['route'] ?? '',
                         $row['cache_path'] ?? '',
@@ -780,13 +1051,13 @@ class AdminPrerenderController extends BaseApiController
                         $row['http_status'] ?? '',
                         ($row['content_stale'] ?? false) ? '1' : '0',
                         is_array($row['asset_issues'] ?? null) ? implode('|', $row['asset_issues']) : '',
-                    ]);
+                    ]));
                 }
             } else { // jobs
-                fputcsv($out, ['id', 'status', 'priority', 'tenant_slug', 'routes', 'force', 'dry_run', 'queued_at', 'started_at', 'finished_at', 'duration_s', 'exit_code', 'rendered_count', 'planned_count', 'requested_by']);
+                fputcsv($out, ['id', 'status', 'priority', 'tenant_slug', 'routes', 'force', 'dry_run', 'queued_at', 'fence_ready_at', 'started_at', 'finished_at', 'duration_s', 'exit_code', 'rendered_count', 'planned_count', 'requested_by']);
                 $rows = $this->service->listJobs(5000, $r->query('status'));
                 foreach ($rows as $row) {
-                    fputcsv($out, [
+                    fputcsv($out, CsvExportSanitizer::row([
                         $row['id'] ?? '',
                         $row['status'] ?? '',
                         $row['priority'] ?? '',
@@ -795,6 +1066,7 @@ class AdminPrerenderController extends BaseApiController
                         ($row['force'] ?? false) ? '1' : '0',
                         ($row['dry_run'] ?? false) ? '1' : '0',
                         $row['queued_at'] ?? '',
+                        $row['fence_ready_at'] ?? '',
                         $row['started_at'] ?? '',
                         $row['finished_at'] ?? '',
                         $row['duration_s'] ?? '',
@@ -802,7 +1074,7 @@ class AdminPrerenderController extends BaseApiController
                         $row['rendered_count'] ?? '',
                         $row['planned_count'] ?? '',
                         is_array($row['requested_by'] ?? null) ? ($row['requested_by']['email'] ?? '') : '',
-                    ]);
+                    ]));
                 }
             }
 
@@ -833,7 +1105,7 @@ class AdminPrerenderController extends BaseApiController
 
         $original = $this->service->getJob($id);
         if (!$original) return $this->error('Job not found', 404, 'NOT_FOUND');
-        if (in_array($original['status'] ?? '', ['queued', 'claimed', 'running'], true)) {
+        if (in_array($original['status'] ?? '', ['pending_fence', 'queued', 'claimed', 'running'], true)) {
             return $this->error('Job is still in flight — cancel it before retrying', 409, 'CONFLICT');
         }
 
@@ -874,29 +1146,33 @@ class AdminPrerenderController extends BaseApiController
         if ($slug === '' || !preg_match('/^[A-Za-z0-9_-]{1,64}$/', $slug)) {
             return $this->error('Valid tenant slug required', 400, 'VALIDATION_INVALID');
         }
-        $tenant = \DB::table('tenants')->where('slug', $slug)->where('is_active', 1)->first();
-        if (!$tenant) return $this->error('Tenant not found', 404, 'NOT_FOUND');
+        $target = collect($this->service->loadTenantTargets())->firstWhere('slug', $slug);
+        if (!is_array($target)) return $this->error(__('api.tenant_not_found'), 404, 'NOT_FOUND');
 
-        $staticRoutes  = $this->service->routesForTenant((int) $tenant->id);
-        $dynamicRoutes = [];
+        $staticRoutes  = $this->service->routesForTenant((object) $target);
         try {
-            $routes = $this->plannedRoutesForTenant($slug);
+            $routes = $this->service->expectedRoutesForTenant(
+                $target,
+                PrerenderService::MAX_PLANNED_ROUTES_PER_TENANT,
+                true
+            );
             $staticLookup = array_fill_keys($staticRoutes, true);
             $dynamicRoutes = array_values(array_filter(
                 array_map('strval', $routes),
                 fn($route) => $route !== '' && $route[0] === '/' && !isset($staticLookup[$route])
             ));
-            $dynamicRoutes = array_slice($dynamicRoutes, 0, 1000);
         } catch (\Throwable $e) {
-            // Fallback: just return the static floor.
+            report($e);
+            return $this->error(__('api.prerender_plan_unavailable'), 503, 'PRERENDER_PLAN_UNAVAILABLE');
         }
 
         return $this->respondWithData([
             'tenant_slug'    => $slug,
-            'tenant_id'      => (int) $tenant->id,
+            'tenant_id'      => (int) $target['tenant_id'],
             'static_routes'  => $staticRoutes,
             'dynamic_routes' => $dynamicRoutes,
             'total_count'    => count($staticRoutes) + count($dynamicRoutes),
+            'truncated'      => false,
         ]);
     }
 
@@ -907,34 +1183,32 @@ class AdminPrerenderController extends BaseApiController
         if ($route === '' || $route[0] !== '/') {
             return $this->error('route must start with "/"', 400, 'VALIDATION_INVALID');
         }
-        if (!preg_match(\App\Services\PrerenderService::ROUTE_REGEX, $route)) {
+        $route = PrerenderService::normalizeRoute($route);
+        if ($route === null) {
             return $this->error('Invalid route', 400, 'VALIDATION_INVALID');
         }
         return $this->respondWithData($this->service->describeTtlForRoute($route));
     }
 
-    /**
-     * @return list<string>
-     */
-    private function plannedRoutesForTenant(string $slug): array
+    /** @param array<int|string,mixed> $paths */
+    private function previewHash(array $paths): string
     {
-        \Artisan::call('prerender:plan-routes', ['--tenant' => $slug]);
-        $out = trim(\Artisan::output());
-        $planned = json_decode($out, true);
-        if (!is_array($planned)) return [];
+        $normalized = array_values(array_unique(array_map('strval', $paths)));
+        sort($normalized, SORT_STRING);
+        return hash('sha256', json_encode($normalized, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+    }
 
-        if (isset($planned['routes']) && is_array($planned['routes'])) {
-            return array_values(array_map('strval', $planned['routes']));
+    /** @return list<string> */
+    private function unexpectedPreviewPaths(array $result): array
+    {
+        $paths = [];
+        foreach (($result['by_tenant'] ?? []) as $slug => $routes) {
+            if (!is_array($routes)) continue;
+            foreach ($routes as $route) {
+                $paths[] = (string) $slug . "\0" . (string) $route;
+            }
         }
-
-        foreach (($planned['tenants'] ?? []) as $tenantPlan) {
-            if (!is_array($tenantPlan)) continue;
-            if (($tenantPlan['slug'] ?? null) !== $slug) continue;
-            $routes = $tenantPlan['routes'] ?? [];
-            return is_array($routes) ? array_values(array_map('strval', $routes)) : [];
-        }
-
-        return [];
+        return $paths;
     }
 
     /**

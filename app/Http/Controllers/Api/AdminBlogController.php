@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Models\ActivityLog;
 use App\Services\AuditLogService;
+use App\Services\PrerenderContentInvalidator;
 
 /**
  * AdminBlogController -- Admin blog post management.
@@ -220,6 +221,10 @@ class AdminBlogController extends BaseApiController
         }
 
         ActivityLog::create(['user_id' => $adminId, 'action' => 'admin_create_blog_post', 'details' => "Created blog post #{$newId}: {$title}"]);
+        app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, [
+            '/blog',
+            "/blog/{$slug}",
+        ]);
 
         return $this->respondWithData([
             'id' => (int) $newId,
@@ -239,7 +244,7 @@ class AdminBlogController extends BaseApiController
 
         // Verify post exists and belongs to tenant
         $post = DB::selectOne(
-            "SELECT id, title, slug FROM posts WHERE id = ? AND tenant_id = ?",
+            "SELECT id, title, slug, status FROM posts WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         );
 
@@ -335,6 +340,12 @@ class AdminBlogController extends BaseApiController
         }
 
         ActivityLog::create(['user_id' => $adminId, 'action' => 'admin_update_blog_post', 'details' => "Updated blog post #{$id}: " . ($data['title'] ?? $post->title)]);
+        $newSlug = (string) ($updates['slug'] ?? $post->slug);
+        app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, array_values(array_unique([
+            '/blog',
+            "/blog/{$post->slug}",
+            "/blog/{$newSlug}",
+        ])));
 
         // Return updated post
         return $this->show($id);
@@ -349,7 +360,7 @@ class AdminBlogController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $post = DB::selectOne(
-            "SELECT id, title FROM posts WHERE id = ? AND tenant_id = ?",
+            "SELECT id, title, slug FROM posts WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         );
 
@@ -360,6 +371,10 @@ class AdminBlogController extends BaseApiController
         DB::delete("DELETE FROM posts WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         ActivityLog::create(['user_id' => $adminId, 'action' => 'admin_delete_blog_post', 'details' => "Deleted blog post #{$id}: {$post->title}"]);
+        app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, [
+            '/blog',
+            "/blog/{$post->slug}",
+        ]);
 
         return $this->respondWithData(['deleted' => true, 'id' => $id]);
     }
@@ -373,7 +388,7 @@ class AdminBlogController extends BaseApiController
         $tenantId = $this->getTenantId();
 
         $post = DB::selectOne(
-            "SELECT id, title, status FROM posts WHERE id = ? AND tenant_id = ?",
+            "SELECT id, title, slug, status FROM posts WHERE id = ? AND tenant_id = ?",
             [$id, $tenantId]
         );
 
@@ -389,6 +404,10 @@ class AdminBlogController extends BaseApiController
         );
 
         ActivityLog::create(['user_id' => $adminId, 'action' => 'admin_toggle_blog_status', 'details' => "Changed blog post #{$id} status: {$post->status} -> {$newStatus}"]);
+        app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, [
+            '/blog',
+            "/blog/{$post->slug}",
+        ]);
 
         return $this->respondWithData([
             'id' => (int) $id,
@@ -438,10 +457,14 @@ class AdminBlogController extends BaseApiController
 
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $eligibleRows = DB::select(
-            "SELECT id FROM posts WHERE tenant_id = ? AND id IN ({$placeholders})",
+            "SELECT id, slug FROM posts WHERE tenant_id = ? AND id IN ({$placeholders})",
             array_merge([$tenantId], $ids)
         );
         $eligibleIds = array_map(static fn ($r) => (int) $r->id, $eligibleRows);
+        $eligibleSlugs = array_values(array_filter(array_map(
+            static fn ($r) => trim((string) ($r->slug ?? '')),
+            $eligibleRows
+        )));
         $skippedIds = array_values(array_diff($ids, $eligibleIds));
 
         $success = 0;
@@ -474,6 +497,11 @@ class AdminBlogController extends BaseApiController
             'success' => $success,
             'failed' => $failed,
         ]);
+        if ($success > 0) {
+            $routes = ['/blog'];
+            foreach ($eligibleSlugs as $slug) $routes[] = '/blog/' . $slug;
+            app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, $routes);
+        }
 
         return $this->respondWithData([
             'success' => $success,
@@ -540,6 +568,7 @@ class AdminBlogController extends BaseApiController
             'success' => $success,
             'failed' => $failed,
         ]);
+        if ($success > 0) app(PrerenderContentInvalidator::class)->refreshTenant($tenantId);
 
         return $this->respondWithData([
             'success' => $success,

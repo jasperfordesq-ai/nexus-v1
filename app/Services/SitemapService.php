@@ -44,7 +44,7 @@ class SitemapService
                 "SELECT t.id, t.slug, t.domain, t.parent_id, t.updated_at,
                         p.domain as parent_domain
                  FROM tenants t
-                 LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1
+                 LEFT JOIN tenants p ON p.id = t.parent_id AND p.id <> 1 AND p.is_active = 1
                  WHERE t.is_active = 1 ORDER BY t.id"
             );
 
@@ -80,7 +80,7 @@ class SitemapService
     {
         $version = (int) Cache::get($this->tenantVersionKey($tenantId), 1);
         $cacheKey = self::CACHE_PREFIX . "tenant:{$tenantId}:v{$version}" . ($overrideBaseUrl ? ':' . md5($overrideBaseUrl) : '');
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($tenantId, $overrideBaseUrl) {
+        $generate = function () use ($tenantId, $overrideBaseUrl): string {
             $tenant = DB::selectOne(
                 "SELECT id, slug, domain, parent_id, features, configuration FROM tenants WHERE id = ? AND is_active = 1",
                 [$tenantId]
@@ -91,7 +91,18 @@ class SitemapService
             }
 
             return $this->buildTenantSitemap($tenant, $overrideBaseUrl);
-        });
+        };
+
+        // Authoritative planners must observe their transaction's current DB
+        // state without publishing uncommitted or rollback-prone bytes into
+        // the public one-hour sitemap cache.
+        if ((bool) config('prerender.runtime_bypass_sitemap_cache', false)) {
+            return $generate();
+        }
+        if ((bool) config('prerender.runtime_force_fresh_sitemap', false)) {
+            Cache::forget($cacheKey);
+        }
+        return Cache::remember($cacheKey, self::CACHE_TTL, $generate);
     }
 
     /**
@@ -106,7 +117,7 @@ class SitemapService
                 "SELECT t.id, t.slug, t.domain, t.parent_id, t.features, t.configuration,
                         p.domain as parent_domain
                  FROM tenants t
-                 LEFT JOIN tenants p ON p.id = t.parent_id AND p.is_active = 1
+                 LEFT JOIN tenants p ON p.id = t.parent_id AND p.id <> 1 AND p.is_active = 1
                  WHERE t.is_active = 1 ORDER BY t.id"
             );
 
@@ -149,7 +160,7 @@ class SitemapService
 
         if ($tenantId !== null) {
             Cache::forget(self::CACHE_PREFIX . "tenant:{$tenantId}");
-            Cache::forever($this->tenantVersionKey($tenantId), (int) Cache::get($this->tenantVersionKey($tenantId), 1) + 1);
+            $this->bumpTenantVersion($tenantId);
             $cleared++;
         } else {
             // Clear all tenant caches
@@ -157,7 +168,7 @@ class SitemapService
             foreach ($tenants as $tenant) {
                 Cache::forget(self::CACHE_PREFIX . "tenant:{$tenant->id}");
                 $tid = (int) $tenant->id;
-                Cache::forever($this->tenantVersionKey($tid), (int) Cache::get($this->tenantVersionKey($tid), 1) + 1);
+                $this->bumpTenantVersion($tid);
                 $cleared++;
             }
         }
@@ -167,6 +178,16 @@ class SitemapService
         $cleared++;
 
         return $cleared;
+    }
+
+    /** Advance the version under a distributed lock so invalidations cannot collapse. */
+    private function bumpTenantVersion(int $tenantId): void
+    {
+        $versionKey = $this->tenantVersionKey($tenantId);
+        Cache::lock($versionKey . ':lock', 10)->block(5, function () use ($versionKey): void {
+            $current = max(1, (int) Cache::get($versionKey, 1));
+            Cache::forever($versionKey, $current + 1);
+        });
     }
 
     /**
@@ -217,6 +238,16 @@ class SitemapService
                 'url_count' => count($urls),
                 'max' => self::MAX_URLS_PER_SITEMAP,
             ]);
+            // Public sitemap responses retain the protocol-compatible slice,
+            // but authoritative/drift planning must never mistake that slice
+            // for a complete tenant inventory and delete the omitted tail.
+            if ((bool) config('prerender.runtime_force_fresh_sitemap', false)) {
+                throw new \RuntimeException(sprintf(
+                    'Tenant sitemap contains %d URLs and exceeds the %d-route authoritative safety limit',
+                    count($urls),
+                    self::MAX_URLS_PER_SITEMAP
+                ));
+            }
             $urls = array_slice($urls, 0, self::MAX_URLS_PER_SITEMAP);
         }
 
@@ -279,6 +310,13 @@ class SitemapService
             $methods['marketplace_listings'] = fn (int $tid, string $base) => $this->getMarketplaceListingUrls($tid, $base);
             $methods['marketplace_categories'] = fn (int $tid, string $base) => $this->getMarketplaceCategoryUrls($tid, $base);
         }
+        if ($this->hasFeature($tenant, 'courses')) {
+            $methods['courses'] = fn (int $tid, string $base) => $this->getCourseUrls($tid, $base);
+        }
+        if ($this->hasFeature($tenant, 'podcasts')) {
+            $methods['podcast_shows'] = fn (int $tid, string $base) => $this->getPodcastShowUrls($tid, $base);
+            $methods['podcast_episodes'] = fn (int $tid, string $base) => $this->getPodcastEpisodeUrls($tid, $base);
+        }
         $methods['cms_pages'] = fn (int $tid, string $base) => $this->getCmsPageUrls($tid, $base);
 
         // EXCLUDED: profiles (personal data, requires per-user opt-in consent)
@@ -298,12 +336,14 @@ class SitemapService
         // Homepage (highest priority — refreshes daily)
         $urls[] = $this->url($baseUrl, '/', $now, 'daily', '1.0');
 
-        // About, help, explore, contact, FAQ (always present)
+        // About, help, contact, FAQ (always present)
         $urls[] = $this->url($baseUrl, '/about', $now, 'monthly', '0.6');
         $urls[] = $this->url($baseUrl, '/help', $now, 'monthly', '0.5');
-        $urls[] = $this->url($baseUrl, '/explore', $now, 'weekly', '0.7');
         $urls[] = $this->url($baseUrl, '/contact', $now, 'yearly', '0.4');
         $urls[] = $this->url($baseUrl, '/faq', $now, 'monthly', '0.5');
+        if ($this->hasFeature($tenant, 'explore')) {
+            $urls[] = $this->url($baseUrl, '/explore', $now, 'weekly', '0.7');
+        }
 
         // Legal pages
         foreach (['terms', 'privacy', 'cookies', 'accessibility', 'acceptable-use', 'community-guidelines'] as $page) {
@@ -329,13 +369,18 @@ class SitemapService
         $urls[] = $this->url($baseUrl, '/features', $now, 'monthly', '0.5');
         $urls[] = $this->url($baseUrl, '/changelog', $now, 'weekly', '0.4');
 
-        // Public pilot and partner-facing pages are prerendered and should be
-        // discoverable from the tenant sitemap when enabled in React.
+        // Public pilot pages are available for every tenant.
         foreach (['pilot-inquiry', 'pilot-apply'] as $page) {
             $urls[] = $this->url($baseUrl, "/{$page}", $now, 'monthly', '0.5');
         }
-        foreach (['partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan'] as $page) {
-            $urls[] = $this->url($baseUrl, "/{$page}", $now, 'monthly', '0.5');
+
+        // These pages are implemented behind React's hour-timebank slug gate.
+        // Other tenants redirect to /about, so publishing them elsewhere would
+        // create sitemap aliases and make final-URL validation fail.
+        if (strtolower(trim((string) ($tenant->slug ?? ''))) === 'hour-timebank') {
+            foreach (['partner', 'social-prescribing', 'impact-summary', 'impact-report', 'strategic-plan'] as $page) {
+                $urls[] = $this->url($baseUrl, "/{$page}", $now, 'monthly', '0.5');
+            }
         }
 
         // Public Partner API developer documentation.
@@ -383,7 +428,12 @@ class SitemapService
         if ($this->hasFeature($tenant, 'marketplace')) {
             $urls[] = $this->url($baseUrl, '/marketplace', $now, 'daily', '0.8');
             $urls[] = $this->url($baseUrl, '/marketplace/free', $now, 'weekly', '0.6');
-            $urls[] = $this->url($baseUrl, '/marketplace/map', $now, 'weekly', '0.5');
+        }
+        if ($this->hasFeature($tenant, 'courses')) {
+            $urls[] = $this->url($baseUrl, '/courses', $now, 'daily', '0.7');
+        }
+        if ($this->hasFeature($tenant, 'podcasts')) {
+            $urls[] = $this->url($baseUrl, '/podcasts', $now, 'daily', '0.7');
         }
 
         return $urls;
@@ -431,7 +481,7 @@ class SitemapService
         // Include both future and past active/completed events for SEO archival value.
         // Exclude cancelled and draft events.
         $rows = DB::select(
-            "SELECT id, created_at AS lastmod
+            "SELECT id, COALESCE(updated_at, created_at) AS lastmod
              FROM events
              WHERE tenant_id = ? AND (status IS NULL OR status IN ('active', 'completed'))
              ORDER BY start_time DESC",
@@ -440,6 +490,102 @@ class SitemapService
 
         return array_map(
             fn ($r) => $this->url($baseUrl, "/events/{$r->id}", $this->formatDate($r->lastmod), 'weekly', '0.7'),
+            $rows
+        );
+    }
+
+    private function getCourseUrls(int $tenantId, string $baseUrl): array
+    {
+        $rows = DB::select(
+            "SELECT c.slug,
+                    GREATEST(
+                        COALESCE(c.updated_at, c.created_at),
+                        COALESCE((SELECT MAX(s.updated_at) FROM course_sections s
+                                  WHERE s.tenant_id = c.tenant_id AND s.course_id = c.id), c.created_at),
+                        COALESCE((SELECT MAX(l.updated_at) FROM course_lessons l
+                                  WHERE l.tenant_id = c.tenant_id AND l.course_id = c.id), c.created_at),
+                        COALESCE((SELECT MAX(r.updated_at) FROM course_reviews r
+                                  WHERE r.tenant_id = c.tenant_id
+                                    AND r.course_id = c.id
+                                    AND r.status = 'approved'), c.created_at)
+                    ) AS lastmod
+             FROM courses c
+             WHERE c.tenant_id = ?
+               AND c.status = 'published'
+               AND c.moderation_status = 'approved'
+               AND c.visibility = 'public'
+             ORDER BY COALESCE(c.published_at, c.created_at) DESC",
+            [$tenantId]
+        );
+
+        return array_map(
+            fn ($r) => $this->url($baseUrl, "/courses/{$r->slug}", $this->formatDate($r->lastmod), 'weekly', '0.7'),
+            $rows
+        );
+    }
+
+    private function getPodcastShowUrls(int $tenantId, string $baseUrl): array
+    {
+        $rows = DB::select(
+            "SELECT s.slug,
+                    GREATEST(
+                        COALESCE(s.updated_at, s.created_at),
+                        COALESCE((SELECT MAX(e.updated_at) FROM podcast_episodes e
+                                  WHERE e.tenant_id = s.tenant_id
+                                    AND e.show_id = s.id
+                                    AND e.status = 'published'
+                                    AND e.moderation_status = 'approved'
+                                    AND e.visibility IN ('inherit', 'public')
+                                    AND (e.scheduled_for IS NULL OR e.scheduled_for <= NOW())), s.created_at)
+                    ) AS lastmod
+             FROM podcast_shows s
+             WHERE s.tenant_id = ?
+               AND s.status = 'published'
+               AND s.moderation_status = 'approved'
+               AND s.visibility = 'public'
+             ORDER BY COALESCE(s.published_at, s.created_at) DESC",
+            [$tenantId]
+        );
+
+        return array_map(
+            fn ($r) => $this->url($baseUrl, "/podcasts/{$r->slug}", $this->formatDate($r->lastmod), 'weekly', '0.7'),
+            $rows
+        );
+    }
+
+    private function getPodcastEpisodeUrls(int $tenantId, string $baseUrl): array
+    {
+        $rows = DB::select(
+            "SELECT s.slug AS show_slug, e.slug AS episode_slug,
+                    GREATEST(
+                        COALESCE(s.updated_at, s.created_at),
+                        COALESCE(e.updated_at, e.created_at),
+                        COALESCE((SELECT MAX(ch.updated_at) FROM podcast_episode_chapters ch
+                                  WHERE ch.tenant_id = e.tenant_id AND ch.episode_id = e.id), e.created_at)
+                    ) AS lastmod
+             FROM podcast_episodes e
+             INNER JOIN podcast_shows s
+                ON s.id = e.show_id AND s.tenant_id = e.tenant_id
+             WHERE e.tenant_id = ?
+               AND s.status = 'published'
+               AND s.moderation_status = 'approved'
+               AND s.visibility = 'public'
+               AND e.status = 'published'
+               AND e.moderation_status = 'approved'
+               AND e.visibility IN ('inherit', 'public')
+               AND (e.scheduled_for IS NULL OR e.scheduled_for <= NOW())
+             ORDER BY COALESCE(e.published_at, e.created_at) DESC",
+            [$tenantId]
+        );
+
+        return array_map(
+            fn ($r) => $this->url(
+                $baseUrl,
+                "/podcasts/{$r->show_slug}/{$r->episode_slug}",
+                $this->formatDate($r->lastmod),
+                'weekly',
+                '0.7'
+            ),
             $rows
         );
     }
@@ -718,7 +864,7 @@ class SitemapService
         }
 
         // Sub-tenant: use parent's domain if available (e.g. timebanking.uk/cardiff)
-        if (!empty($tenant->parent_id)) {
+        if (!empty($tenant->parent_id) && (int) $tenant->parent_id !== 1) {
             $parentDomain = DB::selectOne(
                 "SELECT domain FROM tenants WHERE id = ? AND is_active = 1",
                 [(int) $tenant->parent_id]
@@ -756,8 +902,9 @@ class SitemapService
     private function hasFeature(object $tenant, string $feature): bool
     {
         $features = json_decode($tenant->features ?? '{}', true) ?: [];
+        $features = TenantFeatureConfig::mergeFeatures($features);
 
-        return (bool) ($features[$feature] ?? true);
+        return ($features[$feature] ?? false) === true;
     }
 
     /**
@@ -767,9 +914,11 @@ class SitemapService
     private function hasModule(object $tenant, string $module): bool
     {
         $config = json_decode($tenant->configuration ?? '{}', true) ?: [];
-        $modules = $config['modules'] ?? [];
+        $modules = TenantFeatureConfig::mergeModules(
+            is_array($config['modules'] ?? null) ? $config['modules'] : []
+        );
 
-        return (bool) ($modules[$module] ?? true);
+        return ($modules[$module] ?? false) === true;
     }
 
     private function tenantVersionKey(int $tenantId): string
@@ -778,7 +927,8 @@ class SitemapService
     }
 
     /**
-     * Format a date/datetime string to ISO 8601 date (YYYY-MM-DD).
+     * Format a date/datetime string as an ISO 8601 timestamp. Internal drift
+     * detection relies on same-day edits retaining their time component.
      */
     private function formatDate(?string $datetime): ?string
     {
@@ -787,7 +937,9 @@ class SitemapService
         }
 
         try {
-            return date('Y-m-d', strtotime($datetime));
+            $timestamp = strtotime($datetime);
+            if ($timestamp === false) return null;
+            return date(DATE_ATOM, $timestamp);
         } catch (\Throwable $e) {
             Log::debug('[SitemapService] formatDate failed for value: ' . $e->getMessage());
             return null;

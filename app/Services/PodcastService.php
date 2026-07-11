@@ -482,6 +482,25 @@ class PodcastService
             try {
                 TenantContext::runForTenant((int) $episode->tenant_id, function () use ($episode): void {
                     self::announceEpisode($episode);
+
+                    // The scheduled release is time-driven: no Eloquent save
+                    // occurs when the embargo expires, so model observers cannot
+                    // discover that this route has just become public. Refresh it
+                    // explicitly or the sitemap/show/episode snapshots can remain
+                    // stale until the next drift sweep.
+                    $showSlug = trim((string) ($episode->show?->slug ?? ''));
+                    $episodeSlug = trim((string) $episode->slug);
+                    $routes = ['/podcasts'];
+                    if ($showSlug !== '') {
+                        $routes[] = "/podcasts/{$showSlug}";
+                        if ($episodeSlug !== '') {
+                            $routes[] = "/podcasts/{$showSlug}/{$episodeSlug}";
+                        }
+                    }
+                    app(PrerenderContentInvalidator::class)->refreshRoutes(
+                        (int) $episode->tenant_id,
+                        $routes
+                    );
                 });
                 $released++;
             } catch (\Throwable $e) {

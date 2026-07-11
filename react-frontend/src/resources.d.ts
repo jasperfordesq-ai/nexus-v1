@@ -1317,6 +1317,7 @@ export default interface Resources {
             "invalidate": "Invalidate route",
             "purge": "Delete snapshots",
             "purge_unexpected": "Clean unexpected snapshots",
+            "reset_all": "Reset and rebuild all",
             "reset_breaker": "Reset safety breaker",
             "reset_queue": "Repair stuck queue"
           },
@@ -1335,6 +1336,10 @@ export default interface Resources {
           },
           "details_empty": "No extra details",
           "empty": "No audit entries.",
+          "errors": {
+            "export": "Failed to export audit history",
+            "load": "Failed to load audit history"
+          },
           "fallbacks": {
             "all": "all",
             "system": "system"
@@ -1474,6 +1479,8 @@ export default interface Resources {
           },
           "no_output": "(no output)",
           "purge_ungated": {
+            "confirm_message": "This permanently deletes saved pages that are outside their tenant's current route plan. Confirm that you reviewed the preview first.",
+            "confirm_title": "Remove unexpected snapshots?",
             "description": "Removes saved pages that the tenant should not have, such as pages left behind after a feature was turned off. Use preview first; tenant-owned dynamic pages are protected.",
             "title": "Remove snapshots that should not exist"
           },
@@ -1556,6 +1563,7 @@ export default interface Resources {
             "close": "Close",
             "inspect": "Inspect",
             "inspect_snapshot": "Inspect {{path}}",
+            "open_live_url": "Open live page (not saved snapshot)",
             "open_rendered_url": "Open rendered URL",
             "recache_selected": "Recache selected ({{count}})",
             "recache_selected_one": "Recache selected ({{count}})",
@@ -1617,6 +1625,7 @@ export default interface Resources {
             "integrity_unreadable": "sha256 sidecar exists but is malformed",
             "invalid_present": "INVALID PRESENT",
             "json_ld": "JSON-LD ({{blocks}} blocks, {{status}})",
+            "load_failed": "This snapshot could not be loaded. Previous inspection data has been cleared.",
             "meta_description": "Meta description",
             "missing": "- missing -",
             "modal_title": "Snapshot inspection",
@@ -1624,6 +1633,7 @@ export default interface Resources {
             "must_fix": "Must fix ({{count}})",
             "must_fix_one": "Must fix ({{count}})",
             "must_fix_other": "Must fix ({{count}})",
+            "no_snapshot": "No snapshot is selected.",
             "no_structured_data": "No structured data",
             "no_type": "(no @type)",
             "none": "(none)",
@@ -1651,7 +1661,9 @@ export default interface Resources {
             "content_drifted": "content drifted"
           },
           "summary": "{{filtered}} of {{total}} snapshots",
-          "table_aria": "Snapshot inventory"
+          "table_aria": "Snapshot inventory",
+          "truncated": "Inventory reached the {{count}}-snapshot safety limit. Narrow the tenant filter before taking bulk action.",
+          "unknown_tenant": "Unknown tenant"
         },
         "jobs": {
           "actions": {
@@ -1732,11 +1744,13 @@ export default interface Resources {
         "live_connected": "Live updates connected",
         "overview": {
           "actions": {
+            "download_metrics": "Download metrics",
             "queue_job": "Queue job",
             "refresh": "Refresh"
           },
           "empty_summary": "No summary available.",
           "errors": {
+            "download_metrics": "Failed to download metrics",
             "enqueue_job": "Failed to enqueue job",
             "load_summary": "Failed to load summary"
           },
@@ -1751,6 +1765,7 @@ export default interface Resources {
             "title": "Queue a refresh"
           },
           "health": {
+            "cache_read_only": "Cache is read-only",
             "cache_unreachable": "Cache unreachable",
             "healthy": "Healthy",
             "missing": "{{count}} missing",
@@ -1774,7 +1789,8 @@ export default interface Resources {
             "event_at": "Event {{time}}",
             "no_events": "No events",
             "prometheus": "Prometheus text format",
-            "tenants_routes": "{{tenants}} tenants x {{routes}} routes"
+            "tenants_routes": "{{tenants}} tenants x {{routes}} routes",
+            "unexpected": "Saved snapshots outside the current tenant route plans"
           },
           "kpi": {
             "age_stale": "Age stale (>14d)",
@@ -1787,7 +1803,8 @@ export default interface Resources {
             "missing": "Missing",
             "queued_jobs": "Queued jobs",
             "recent_failures": "Recent failures",
-            "status": "Status"
+            "status": "Status",
+            "unexpected": "Unexpected"
           },
           "last_run": "Last completed run",
           "messages": {
@@ -1862,6 +1879,19 @@ export default interface Resources {
           "role": "platform super-admin",
           "suffix": "account to enqueue jobs, purge snapshots, or trigger drift detection."
         },
+        "reset_all": {
+          "button": "Reset and rebuild all",
+          "cancel": "Cancel",
+          "confirm": "Start fresh rebuild",
+          "confirmation_help": "Type {{phrase}} to continue.",
+          "confirmation_label": "Confirmation",
+          "confirmation_phrase": "RESET ALL SNAPSHOTS",
+          "description": "Cancel older prerender work and start one fresh, tenant-aware rebuild of every public page, including each tenant's landing page, custom pages, and blog content.",
+          "failed": "The fresh rebuild could not be scheduled. No live snapshots were removed.",
+          "queued": "Fresh rebuild #{{id}} queued for {{tenants}} tenants and {{routes}} routes.",
+          "safety": "The current complete cache stays live unless the new route plan renders and validates successfully. Failed rebuilds do not replace the last known-good generation.",
+          "title": "Reset and rebuild every snapshot"
+        },
         "sitemap_explorer": {
           "actions": {
             "explore": "Explore"
@@ -1888,9 +1918,10 @@ export default interface Resources {
             "tenant_slug": "hour-timebank"
           },
           "sections": {
-            "dynamic_routes": "Dynamic routes (capped at 1,000)",
+            "dynamic_routes": "Dynamic routes",
             "static_routes": "Static routes"
           },
+          "tenant": "Tenant {{slug}} (#{{id}})",
           "title": "Tenant route list"
         },
         "tabs": {
@@ -1968,7 +1999,9 @@ export default interface Resources {
             "unexpected": "Saved for this tenant, but not present in the current static route set or sitemap plan."
           },
           "sections": {
-            "attention": "Items needing attention"
+            "attention": "Items needing attention",
+            "attention_limited": "Showing {{shown}} of {{total}} saved snapshots needing attention.",
+            "missing_routes": "Missing routes ({{count}})"
           },
           "sources": {
             "sitemap": "Sitemap route",

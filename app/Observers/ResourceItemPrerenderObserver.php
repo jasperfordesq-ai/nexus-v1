@@ -14,9 +14,8 @@ class ResourceItemPrerenderObserver extends PrerenderInvalidationObserver
 {
     protected function routesFor(Model $model): array
     {
-        $routes = ['/resources'];
-        $id = $model->getKey();
-        if ($id !== null) $routes[] = '/resources/' . $id;
-        return $routes;
+        // React exposes the public resource index and authenticated download
+        // endpoints, but no visible /resources/{id} page to snapshot.
+        return ['/resources'];
     }
 }

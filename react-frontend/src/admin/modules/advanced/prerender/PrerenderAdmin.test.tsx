@@ -52,6 +52,8 @@ const { mockAdminPrerender } = vi.hoisted(() => ({
     sitemapExplorer: vi.fn(),
     resetBreaker: vi.fn(),
     resetQueue: vi.fn(),
+    resetAll: vi.fn(),
+    downloadMetrics: vi.fn(),
     retryFailed: vi.fn(),
     retryJob: vi.fn(),
     exportCsv: vi.fn(),
@@ -110,7 +112,9 @@ vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 
 // ─── Stub child tab components ─────────────────────────────────────────────────
 vi.mock('../../../components', () => ({
-  PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
+  PageHeader: ({ title, actions }: { title: string; actions?: React.ReactNode }) => (
+    <div><h1>{title}</h1>{actions}</div>
+  ),
   ConfirmModal: ({ isOpen, onConfirm, onCancel, children }: {
     isOpen?: boolean;
     onConfirm?: () => void;
@@ -130,6 +134,32 @@ vi.mock('@/components/ui', async (importOriginal) => {
   const orig = await importOriginal<typeof import('@/components/ui')>();
   return {
     ...orig,
+    Button: ({ children, onPress, isDisabled, isLoading }: {
+      children: React.ReactNode;
+      onPress?: () => void;
+      isDisabled?: boolean;
+      isLoading?: boolean;
+    }) => (
+      <button type="button" onClick={onPress} disabled={isDisabled || isLoading}>{children}</button>
+    ),
+    Input: ({ label, description, value, onValueChange, isDisabled }: {
+      label?: string;
+      description?: string;
+      value?: string;
+      onValueChange?: (value: string) => void;
+      isDisabled?: boolean;
+    }) => (
+      <label>
+        {label}
+        <input
+          aria-label={label}
+          value={value || ''}
+          onChange={(event) => onValueChange?.(event.target.value)}
+          disabled={isDisabled}
+        />
+        {description && <span>{description}</span>}
+      </label>
+    ),
     Table: ({ children }: { children: React.ReactNode }) => <table>{children}</table>,
     TableHeader: ({ children }: { children: React.ReactNode }) => <thead><tr>{children}</tr></thead>,
     TableColumn: ({ children }: { children: React.ReactNode }) => <th>{children}</th>,
@@ -234,6 +264,7 @@ const makeJobList = () => ({
 describe('PrerenderAdmin', () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    window.history.replaceState({}, '', '/admin/advanced/prerender');
 
     const defaultResolved = { success: true, data: null };
     mockAdminPrerender.health.mockResolvedValue(makeHealth());
@@ -290,6 +321,11 @@ describe('PrerenderAdmin', () => {
     mockAdminPrerender.retryJob.mockResolvedValue(defaultResolved);
     mockAdminPrerender.resetBreaker.mockResolvedValue(defaultResolved);
     mockAdminPrerender.resetQueue.mockResolvedValue(defaultResolved);
+    mockAdminPrerender.resetAll.mockResolvedValue({
+      success: true,
+      data: { job_id: 99, tenant_count: 3, planned_routes: 42 },
+    });
+    mockAdminPrerender.downloadMetrics.mockResolvedValue(undefined);
 
     // api.get used by OverviewTab / HealthBanner directly
     mockApi.get.mockResolvedValue({ success: true, data: null });
@@ -300,6 +336,22 @@ describe('PrerenderAdmin', () => {
     render(<PrerenderAdmin />);
     // Should not throw
     expect(document.body).toBeInTheDocument();
+  });
+
+  it('uses URL navigation as the source of truth for tab history', async () => {
+    window.history.replaceState({}, '', '/admin/advanced/prerender?tab=coverage');
+    const { PrerenderAdmin } = await import('./PrerenderAdmin');
+    render(<PrerenderAdmin />);
+
+    const coverageTab = await screen.findByRole('tab', { name: /coverage/i });
+    expect(coverageTab).toHaveAttribute('aria-selected', 'true');
+
+    window.history.pushState({}, '', '/admin/advanced/prerender?tab=jobs');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('tab', { name: /jobs/i })).toHaveAttribute('aria-selected', 'true');
+    });
   });
 
   it('renders the tabs navigation', async () => {
@@ -361,6 +413,74 @@ describe('PrerenderAdmin', () => {
     });
   });
 
+  it('requires the exact phrase before scheduling a full reset', async () => {
+    const { PrerenderAdmin } = await import('./PrerenderAdmin');
+    render(<PrerenderAdmin />);
+
+    fireEvent.click(screen.getByRole('button', { name: /reset and rebuild all/i }));
+    const confirmButton = screen.getByRole('button', { name: /start fresh rebuild/i });
+    expect(confirmButton).toBeDisabled();
+
+    fireEvent.change(screen.getByLabelText(/confirmation/i), {
+      target: { value: 'RESET ALL SNAPSHOTS' },
+    });
+    expect(confirmButton).toBeEnabled();
+    fireEvent.click(confirmButton);
+
+    await waitFor(() => {
+      expect(mockAdminPrerender.resetAll).toHaveBeenCalledWith('RESET ALL SNAPSHOTS');
+    });
+  });
+
+  it('renders an authoritative job waiting for fence activation as an active state', async () => {
+    window.history.replaceState({}, '', '/admin/advanced/prerender?tab=jobs');
+    mockAdminPrerender.listJobs.mockResolvedValueOnce({
+      success: true,
+      data: {
+        items: [{
+          ...makeJobList().data.items[0],
+          id: 99,
+          status: 'pending_fence' as const,
+          fence_ready_at: null,
+          finished_at: null,
+        }],
+      },
+    });
+
+    const { PrerenderAdmin } = await import('./PrerenderAdmin');
+    render(<PrerenderAdmin />);
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Activating fence').length).toBeGreaterThanOrEqual(2);
+    });
+    expect(screen.getByRole('option', { name: 'Activating fence' })).toBeInTheDocument();
+  });
+
+  it('clears destructive confirmation when the reset dialog is closed', async () => {
+    const { PrerenderAdmin } = await import('./PrerenderAdmin');
+    render(<PrerenderAdmin />);
+
+    fireEvent.click(screen.getByRole('button', { name: /reset and rebuild all/i }));
+    fireEvent.change(screen.getByLabelText(/confirmation/i), {
+      target: { value: 'RESET ALL SNAPSHOTS' },
+    });
+    expect(screen.getByRole('button', { name: /start fresh rebuild/i })).toBeEnabled();
+
+    fireEvent.click(screen.getByRole('button', { name: /^cancel$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /reset and rebuild all/i }));
+
+    expect(screen.getByLabelText(/confirmation/i)).toHaveValue('');
+    expect(screen.getByRole('button', { name: /start fresh rebuild/i })).toBeDisabled();
+  });
+
+  it('shows an explicit error instead of stale green health when health loading fails', async () => {
+    mockAdminPrerender.getHealth.mockRejectedValueOnce(new Error('offline'));
+    const { PrerenderAdmin } = await import('./PrerenderAdmin');
+    render(<PrerenderAdmin />);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/loading data error/i);
+  });
+
   it('renders the tenant safety workflow and tab', async () => {
     const { PrerenderAdmin } = await import('./PrerenderAdmin');
     render(<PrerenderAdmin />);
@@ -381,11 +501,13 @@ describe('PrerenderAdmin', () => {
 
     const tabs = screen.queryAllByRole('tab');
     const inventoryTab = tabs.find((t) => t.textContent?.toLowerCase().includes('inventor'));
-    if (inventoryTab) {
-      fireEvent.click(inventoryTab);
-    }
+    expect(inventoryTab).toBeDefined();
+    fireEvent.click(inventoryTab!);
     // After click the tab selection changes — no crash
-    expect(document.body).toBeInTheDocument();
+    await waitFor(() => {
+      expect(inventoryTab).toHaveAttribute('aria-selected', 'true');
+      expect(new URLSearchParams(window.location.search).get('tab')).toBe('inventory');
+    });
   });
 
   it('renders the coverage tab', async () => {

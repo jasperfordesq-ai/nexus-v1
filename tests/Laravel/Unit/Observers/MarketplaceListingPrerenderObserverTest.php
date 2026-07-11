@@ -10,6 +10,7 @@ use App\Models\MarketplaceListing;
 use App\Observers\MarketplaceListingPrerenderObserver;
 use App\Services\PrerenderService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Mockery;
 use Tests\Laravel\TestCase;
 
@@ -45,7 +46,7 @@ class MarketplaceListingPrerenderObserverTest extends TestCase
             ->with(2, Mockery::on(function (array $routes): bool {
                 return in_array('/marketplace', $routes, true)
                     && in_array('/marketplace/free', $routes, true)
-                    && in_array('/marketplace/map', $routes, true)
+                    && !in_array('/marketplace/map', $routes, true)
                     && in_array('/marketplace/42', $routes, true);
             }), true);
 
@@ -70,7 +71,7 @@ class MarketplaceListingPrerenderObserverTest extends TestCase
             ->with(2, Mockery::on(function (array $routes): bool {
                 return in_array('/marketplace', $routes, true)
                     && in_array('/marketplace/free', $routes, true)
-                    && in_array('/marketplace/map', $routes, true)
+                    && !in_array('/marketplace/map', $routes, true)
                     && !in_array('/marketplace/', $routes, true);
             }), true);
 
@@ -95,7 +96,7 @@ class MarketplaceListingPrerenderObserverTest extends TestCase
             ->with(2, Mockery::on(function (array $routes): bool {
                 return in_array('/marketplace', $routes, true)
                     && in_array('/marketplace/free', $routes, true)
-                    && in_array('/marketplace/map', $routes, true)
+                    && !in_array('/marketplace/map', $routes, true)
                     && in_array('/marketplace/7', $routes, true);
             }), true);
 
@@ -161,10 +162,10 @@ class MarketplaceListingPrerenderObserverTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // Route count sanity — always at least 3 index routes
+    // Route sanity — only the two snapshot-safe index routes
     // -------------------------------------------------------------------------
 
-    public function test_saved_always_includes_all_three_index_routes(): void
+    public function test_saved_includes_only_snapshot_safe_index_routes(): void
     {
         $model = new MarketplaceListing();
         $model->id        = 99;
@@ -183,6 +184,39 @@ class MarketplaceListingPrerenderObserverTest extends TestCase
 
         $this->assertContains('/marketplace', $captured);
         $this->assertContains('/marketplace/free', $captured);
-        $this->assertContains('/marketplace/map', $captured);
+        $this->assertNotContains('/marketplace/map', $captured);
+    }
+
+    public function test_saved_invalidates_old_and_new_category_pages(): void
+    {
+        $model = new MarketplaceListing();
+        $model->setRawAttributes([
+            'id' => 101,
+            'tenant_id' => 2,
+            'category_id' => 8,
+        ], true);
+        $model->category_id = 9;
+
+        $query = Mockery::mock();
+        DB::shouldReceive('table')->once()->with('marketplace_categories')->andReturn($query);
+        $query->shouldReceive('where')->once()->with('tenant_id', 2)->andReturnSelf();
+        $query->shouldReceive('whereIn')->once()->with('id', Mockery::on(function (array $ids): bool {
+            sort($ids);
+            return $ids === [8, 9];
+        }))->andReturnSelf();
+        $query->shouldReceive('pluck')->once()->with('slug')->andReturn(collect(['old-category', 'new-category']));
+
+        $this->prerenderMock
+            ->shouldReceive('invalidateRoutes')
+            ->once()
+            ->with(2, Mockery::on(function (array $routes): bool {
+                return in_array('/marketplace/category/old-category', $routes, true)
+                    && in_array('/marketplace/category/new-category', $routes, true)
+                    && in_array('/marketplace/101', $routes, true);
+            }), true);
+
+        (new MarketplaceListingPrerenderObserver())->saved($model);
+
+        $this->assertTrue(true);
     }
 }

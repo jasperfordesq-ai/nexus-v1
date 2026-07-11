@@ -25,7 +25,7 @@
 #   ACTIVE_COLOR  - source color to copy from (e.g. "blue")
 #   TARGET_COLOR  - destination color to copy to (e.g. "green")
 #
-# Exit code is always 0 — warmup failure must never block a deploy.
+# A continuity failure exits non-zero so the caller can abort before cutover.
 
 set -eo pipefail
 
@@ -35,6 +35,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ACTIVE_COLOR="${ACTIVE_COLOR:-${1:-}}"
 TARGET_COLOR="${TARGET_COLOR:-${2:-}}"
 PRERENDER_DIR_INSIDE_CONTAINER="/usr/share/nginx/html/prerendered"
+PRERENDER_STATUS_LIST="$PRERENDER_DIR_INSIDE_CONTAINER/.status-overrides.list"
 PRERENDER_EVENT_LOG="${PRERENDER_EVENT_LOG:-$DEPLOY_DIR/logs/prerender-events.jsonl}"
 
 emit_warmup_event() {
@@ -91,8 +92,20 @@ ACTIVE_MOUNT="$(mount_source_for "$ACTIVE_CONTAINER")"
 TARGET_MOUNT="$(mount_source_for "$TARGET_CONTAINER")"
 
 if [ -n "$ACTIVE_MOUNT" ] && [ -n "$TARGET_MOUNT" ] && [ "$ACTIVE_MOUNT" = "$TARGET_MOUNT" ]; then
-    log_info "Warmup: both colors share prerender volume ($ACTIVE_MOUNT) — copy not needed"
-    emit_warmup_event "skip" "\"reason\":\"shared_volume\",\"mount\":\"$ACTIVE_MOUNT\""
+    # nginx compiles map includes on start/reload. A target started before the
+    # last publication can still hold an older shared map in memory.
+    if ! docker exec "$TARGET_CONTAINER" sh -eu -c '
+        status_list="$1"
+        [ -f "$status_list" ] && [ ! -L "$status_list" ]
+        nginx -t
+        nginx -s reload
+    ' sh "$PRERENDER_STATUS_LIST"; then
+        log_err "Warmup: target could not load the shared prerender status map"
+        emit_warmup_event "fail" "\"stage\":\"shared_status_reload\",\"mount\":\"$ACTIVE_MOUNT\""
+        exit 1
+    fi
+    log_info "Warmup: shared snapshots and status map verified in $TARGET_CONTAINER"
+    emit_warmup_event "success" "\"reason\":\"shared_volume\",\"mount\":\"$ACTIVE_MOUNT\""
     exit 0
 fi
 
@@ -116,24 +129,26 @@ trap 'rm -rf "$TMP_DIR" 2>/dev/null || true' EXIT
 # Stage 1: ensure source dir exists and copy out to host. docker cp will
 # create the snapshot subtree under $TMP_DIR/prerendered.
 if ! docker cp "${ACTIVE_CONTAINER}:${PRERENDER_DIR_INSIDE_CONTAINER}/." "$TMP_DIR/" 2>/dev/null; then
-    log_warn "Warmup: docker cp from active container failed — skipping"
+    log_err "Warmup: docker cp from active container failed"
     emit_warmup_event "fail" "\"stage\":\"cp_from_active\""
-    exit 0
+    exit 1
 fi
 
 # Stage 2: ensure destination dir exists in target, then copy in.
 docker exec "$TARGET_CONTAINER" mkdir -p "$PRERENDER_DIR_INSIDE_CONTAINER" 2>/dev/null || true
 
 if ! docker cp "$TMP_DIR/." "${TARGET_CONTAINER}:${PRERENDER_DIR_INSIDE_CONTAINER}/" 2>/dev/null; then
-    log_warn "Warmup: docker cp to target container failed — skipping"
+    log_err "Warmup: docker cp to target container failed"
     emit_warmup_event "fail" "\"stage\":\"cp_to_target\""
-    exit 0
+    exit 1
 fi
 
-# Stage 3: nginx must reload to pick up new files for try_files. Reload is
-# zero-downtime; if it fails, files are still on disk for the next reload.
-docker exec "$TARGET_CONTAINER" nginx -s reload 2>/dev/null || \
-    log_warn "Warmup: nginx reload in target failed — files copied but may not serve until next reload"
+# Stage 3: validate both the copied files and status include before cutover.
+if ! docker exec "$TARGET_CONTAINER" sh -eu -c 'nginx -t && nginx -s reload' 2>/dev/null; then
+    log_err "Warmup: target nginx rejected the copied snapshot/status generation"
+    emit_warmup_event "fail" "\"stage\":\"target_reload\""
+    exit 1
+fi
 
 DURATION=$(($(date +%s) - START_TS))
 log_ok "Warmup: copied snapshots into $TARGET_CONTAINER in ${DURATION}s"

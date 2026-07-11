@@ -17,15 +17,194 @@
 import { chromium } from 'playwright';
 import { writeFileSync, mkdirSync, readFileSync } from 'fs';
 import { createHash } from 'crypto';
-import { dirname } from 'path';
+import { lookup } from 'dns/promises';
+import { isIP } from 'net';
+import { dirname, resolve, sep } from 'path';
+import { pathToFileURL } from 'url';
 
 const TIMEOUT = 30000;
 const SETTLE_TIME = 2000; // Wait for React hydration + API calls
 const CONCURRENCY = Math.max(1, Number.parseInt(process.env.PRERENDER_CONCURRENCY || '4', 10) || 4);
-// Status codes we accept from the React app via <meta name="prerender-status-code">.
-// Anything else (e.g. 500) is downgraded to 200 — pre-rendering soft-errors is
-// useless, and emitting 5xx from cached snapshots would make Google deindex.
-const ALLOWED_STATUS_CODES = new Set([200, 301, 302, 404, 410, 503]);
+// The publish contract below accepts only complete 200 documents. Any other
+// status from <meta name="prerender-status-code"> is retained and rejected.
+const ALLOW_PRIVATE_HOSTS = process.env.PRERENDER_ALLOW_PRIVATE_HOSTS === '1';
+const PUBLIC_HOST_CACHE = new Map();
+const PUBLIC_HOST_CACHE_MS = 30000;
+const OUTPUT_ROOT = resolve('/output');
+const ROUTE_RE = /^\/[A-Za-z0-9._~/%:@!$()*+,;=\-]*$/;
+const MAINTENANCE_AUTH_SECRET = '/run/secrets/nexus-prerender-maintenance';
+
+function readMaintenanceAuthToken(path = MAINTENANCE_AUTH_SECRET) {
+  try {
+    const token = readFileSync(path, 'utf-8').trim();
+    if (!/^[A-Za-z0-9+/=]{48,256}$/.test(token)) {
+      throw new Error('private maintenance render credential has an invalid format');
+    }
+    return token;
+  } catch (error) {
+    if (error?.code === 'ENOENT') return null;
+    throw error;
+  }
+}
+
+function maintenanceAuthHeaders(entry, requestUrl, currentHeaders, token) {
+  if (!token) return null;
+  const requested = new URL(requestUrl);
+  const canonical = new URL(entry.canonicalUrl);
+  if (requested.origin !== canonical.origin) return null;
+
+  return {
+    ...currentHeaders,
+    authorization: `Basic ${Buffer.from(`prerender:${token}`, 'utf-8').toString('base64')}`,
+  };
+}
+
+function normalizeManifestRoute(route) {
+  if (typeof route !== 'string' || route.length > 1024 || !ROUTE_RE.test(route)) return null;
+  if (route !== '/') route = route.replace(/\/+$/, '');
+  route ||= '/';
+  if (route.includes('//') || /(?:^|\/)\.{1,2}(?:\/|$)/.test(route)) return null;
+  if (/%(?![0-9A-Fa-f]{2})/.test(route) || /%(?:00|25|2e|2f|5c)/i.test(route)) return null;
+  return route;
+}
+
+function validateManifestEntry(entry) {
+  if (!entry || typeof entry !== 'object') throw new Error('manifest entry must be an object');
+  if (!/^[1-9][0-9]*$/.test(String(entry.tenantId || ''))) {
+    throw new Error('manifest entry has an invalid tenantId');
+  }
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(String(entry.tenantSlug || ''))) {
+    throw new Error('manifest entry has an invalid tenantSlug');
+  }
+  if (normalizeManifestRoute(entry.route) !== entry.route) {
+    throw new Error(`manifest entry has an unsafe or non-canonical route: ${entry.route}`);
+  }
+
+  let canonical;
+  let renderUrl;
+  try {
+    canonical = new URL(entry.canonicalUrl);
+    renderUrl = new URL(entry.url);
+  } catch {
+    throw new Error('manifest entry contains an invalid URL');
+  }
+  const host = String(entry.host || '').toLowerCase().replace(/\.$/, '');
+  if (!/^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$/.test(host) || host.includes('..')) {
+    throw new Error(`manifest entry has an unsafe host: ${entry.host}`);
+  }
+  if (canonical.protocol !== 'https:' || canonical.hostname.toLowerCase() !== host
+      || renderUrl.hostname.toLowerCase() !== host
+      || normalizedDocumentUrl(renderUrl.href) !== normalizedDocumentUrl(canonical.href)) {
+    throw new Error('manifest URL, canonical URL, and host do not identify the same document');
+  }
+
+  let canonicalPath = canonical.pathname;
+  if (canonicalPath !== '/') canonicalPath = canonicalPath.replace(/\/+$/, '');
+  canonicalPath ||= '/';
+  if (normalizeManifestRoute(canonicalPath) !== canonicalPath) {
+    throw new Error(`manifest canonical path is unsafe: ${canonical.pathname}`);
+  }
+  const expectedCachePath = `${host}${canonicalPath === '/' ? '' : canonicalPath}/index.html`;
+  if (entry.cachePath !== expectedCachePath) {
+    throw new Error(`manifest cachePath mismatch: expected ${expectedCachePath}`);
+  }
+  const expectedOutput = `${OUTPUT_ROOT}${sep}${expectedCachePath.split('/').join(sep)}`;
+  const resolvedOutput = resolve(String(entry.output || ''));
+  if (resolvedOutput !== expectedOutput || !resolvedOutput.startsWith(`${OUTPUT_ROOT}${sep}`)) {
+    throw new Error('manifest output escapes /output or does not match cachePath');
+  }
+  return entry;
+}
+
+function validateManifest(manifest) {
+  if (!manifest || !Array.isArray(manifest.urls) || manifest.urls.length === 0) {
+    throw new Error('No URLs in manifest');
+  }
+  const cachePaths = new Set();
+  const outputs = new Set();
+  for (const entry of manifest.urls) {
+    validateManifestEntry(entry);
+    if (cachePaths.has(entry.cachePath) || outputs.has(entry.output)) {
+      throw new Error(`duplicate manifest output: ${entry.cachePath}`);
+    }
+    cachePaths.add(entry.cachePath);
+    outputs.add(entry.output);
+  }
+  return manifest;
+}
+
+function isNonPublicAddress(address) {
+  const value = String(address || '').toLowerCase().split('%')[0];
+  const mappedV4 = value.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/)?.[1];
+  if (mappedV4) return isNonPublicAddress(mappedV4);
+
+  if (isIP(value) === 4) {
+    const octets = value.split('.').map(Number);
+    const [a, b, c] = octets;
+    return a === 0
+      || a === 10
+      || a === 127
+      || (a === 100 && b >= 64 && b <= 127)
+      || (a === 169 && b === 254)
+      || (a === 172 && b >= 16 && b <= 31)
+      || (a === 192 && b === 0)
+      || (a === 192 && b === 168)
+      || (a === 192 && b === 88 && c === 99)
+      || (a === 198 && (b === 18 || b === 19))
+      || (a === 198 && b === 51 && c === 100)
+      || (a === 203 && b === 0 && c === 113)
+      || a >= 224;
+  }
+
+  if (isIP(value) === 6) {
+    if (value === '::' || value === '::1') return true;
+    if (/^(?:fc|fd|fe[89ab]|ff)/.test(value)) return true;
+    if (/^2001:(?:db8|0?10|0?2):/.test(value)) return true;
+    const first = Number.parseInt(value.split(':')[0] || '0', 16);
+    return !Number.isFinite(first) || first < 0x2000 || first > 0x3fff;
+  }
+
+  return true;
+}
+
+async function assertPublicHostname(hostname) {
+  if (ALLOW_PRIVATE_HOSTS) return;
+  const host = String(hostname || '').trim().toLowerCase().replace(/\.$/, '');
+  if (!host || host === 'localhost' || host.endsWith('.localhost')
+      || host.endsWith('.local') || host.endsWith('.internal')) {
+    throw new Error(`non-public hostname is not allowed: ${host || '(empty)'}`);
+  }
+
+  const cached = PUBLIC_HOST_CACHE.get(host);
+  if (cached && cached.expiresAt > Date.now()) {
+    await cached.verification;
+    return;
+  }
+
+  const verification = (async () => {
+    const resolved = isIP(host)
+      ? [{ address: host }]
+      : await lookup(host, { all: true, verbatim: true });
+    if (!resolved.length || resolved.some(({ address }) => isNonPublicAddress(address))) {
+      throw new Error(`hostname resolves to a non-public address: ${host}`);
+    }
+  })();
+  PUBLIC_HOST_CACHE.set(host, { expiresAt: Date.now() + PUBLIC_HOST_CACHE_MS, verification });
+  try {
+    await verification;
+  } catch (error) {
+    PUBLIC_HOST_CACHE.delete(host);
+    throw error;
+  }
+}
+
+async function assertPublicUrl(value) {
+  const parsed = new URL(value);
+  if (!['http:', 'https:'].includes(parsed.protocol)) {
+    throw new Error(`unsupported URL protocol: ${parsed.protocol}`);
+  }
+  await assertPublicHostname(parsed.hostname);
+}
 
 async function waitForUsefulRender(page) {
   // Honour an app-level readiness signal if the page provides one. Patterns:
@@ -46,7 +225,8 @@ async function waitForUsefulRender(page) {
 /**
  * Extract the page's intended HTTP status code from a meta tag emitted by
  * the React app (e.g. NotFoundPage, TenantShell community-not-found,
- * MaintenancePage). Returns 200 if absent or unrecognised.
+ * MaintenancePage). Returns 200 only when the tag is absent. Invalid or
+ * unsupported values are returned to the publish contract and rejected.
  */
 async function extractStatusCode(page) {
   try {
@@ -56,10 +236,10 @@ async function extractStatusCode(page) {
     });
     if (!raw) return 200;
     const n = Number.parseInt(raw, 10);
-    if (!Number.isFinite(n)) return 200;
-    return ALLOWED_STATUS_CODES.has(n) ? n : 200;
+    if (!Number.isFinite(n)) return null;
+    return n;
   } catch {
-    return 200;
+    return null;
   }
 }
 
@@ -86,8 +266,27 @@ async function extractRedirectTarget(page, status) {
   }
 }
 
-async function renderPage(page, url) {
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
+function isApiPath(pathname) {
+  return /\/(?:api\/)?v2(?:\/|$)/.test(String(pathname || ''));
+}
+
+async function waitForApiSettlement(page, pendingApiRequests, timeoutMs = 15000) {
+  const deadline = Date.now() + timeoutMs;
+  let emptySince = null;
+  while (Date.now() < deadline) {
+    if (pendingApiRequests.size === 0) {
+      emptySince ??= Date.now();
+      if (Date.now() - emptySince >= 500) return true;
+    } else {
+      emptySince = null;
+    }
+    await page.waitForTimeout(100);
+  }
+  return pendingApiRequests.size === 0;
+}
+
+async function renderPage(page, url, pendingApiRequests = new Map()) {
+  const navigationResponse = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: TIMEOUT });
 
   const readiness = await waitForUsefulRender(page);
 
@@ -101,6 +300,11 @@ async function renderPage(page, url) {
 
   // Extra settle time for tenant bootstrap + content rendering
   await page.waitForTimeout(SETTLE_TIME);
+
+  // `networkidle` is deliberately best-effort because third-party widgets can
+  // remain chatty, but every first-party API request must finish. Otherwise a
+  // loading skeleton can satisfy the old text-length heuristic and be cached.
+  const apiSettled = await waitForApiSettlement(page, pendingApiRequests);
 
   // Strip dynamically injected Google Maps assets. They are added at runtime
   // by APIProvider. Leaving them in the prerendered HTML causes double-loading
@@ -126,9 +330,137 @@ async function renderPage(page, url) {
 
   const status = await extractStatusCode(page);
   const redirect = await extractRedirectTarget(page, status);
+  const pageContract = await page.evaluate(() => ({
+    canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href') || null,
+    errorBoundary: document.querySelector('[data-prerender-error-boundary="true"]') !== null,
+    robots: document.querySelector('meta[name="robots"]')?.getAttribute('content') || null,
+    title: (document.title || '').trim(),
+    bodyTextLength: (document.body?.innerText || '').trim().length,
+  }));
   const html = stripNonCoreModulePreloads(await page.content());
   const markdown = status === 200 ? await extractMarkdown(page) : null;
-  return { html, status, redirect, readiness, markdown };
+  return {
+    html,
+    status,
+    redirect,
+    readiness,
+    markdown,
+    pageContract,
+    navigationStatus: navigationResponse?.status() ?? null,
+    finalUrl: page.url(),
+    apiSettled,
+    pendingApiPaths: [...pendingApiRequests.values()].slice(0, 10),
+  };
+}
+
+async function renderedTenantIdentity(page) {
+  return page.evaluate(() => ({
+    id: window.localStorage.getItem('nexus_tenant_id'),
+    slug: window.localStorage.getItem('nexus_tenant_slug'),
+  }));
+}
+
+function assertExpectedTenant(entry, identity) {
+  const expectedId = String(entry.tenantId ?? '');
+  const expectedSlug = String(entry.tenantSlug ?? '');
+  if (!expectedId || !expectedSlug) {
+    throw new Error('manifest entry is missing tenant identity');
+  }
+  if (String(identity.id ?? '') !== expectedId || String(identity.slug ?? '') !== expectedSlug) {
+    throw new Error(
+      `tenant identity mismatch (expected ${expectedSlug}#${expectedId}, got ${identity.slug || '-'}#${identity.id || '-'})`,
+    );
+  }
+}
+
+function normalizedDocumentUrl(value) {
+  const parsed = new URL(value);
+  parsed.search = '';
+  parsed.hash = '';
+  parsed.hostname = parsed.hostname.toLowerCase();
+  if (parsed.pathname.length > 1) parsed.pathname = parsed.pathname.replace(/\/+$/, '');
+  return parsed.toString();
+}
+
+function isCriticalApiPath(entryRoute, pathname) {
+  if (/\/(?:api\/)?v2\/tenant\/bootstrap(?:\/|$)/.test(pathname)) return true;
+  if (entryRoute === '/blog') {
+    return /\/(?:api\/)?v2\/blog(?:\/categories)?(?:\/|$|\?)/.test(pathname);
+  }
+  if (/^\/blog\/[^/]+$/.test(entryRoute)) {
+    return /\/(?:api\/)?v2\/blog\/[^/]+/.test(pathname);
+  }
+  if (/^\/page\/[^/]+$/.test(entryRoute)) {
+    return /\/(?:api\/)?v2\/pages\/[^/]+/.test(pathname);
+  }
+  return false;
+}
+
+function assertRenderContract(
+  entry,
+  render,
+  apiServerErrors,
+  blockedRequests,
+  pageErrors = [],
+  failedCriticalRequests = [],
+) {
+  if (!render.readiness) throw new Error('render readiness timed out');
+  if (!render.apiSettled) {
+    throw new Error(`first-party API requests did not settle (${render.pendingApiPaths.join(', ')})`);
+  }
+  if (render.navigationStatus !== null && render.navigationStatus >= 400) {
+    throw new Error(`navigation returned HTTP ${render.navigationStatus}`);
+  }
+  // Complete 200 documents and the platform's explicit tenant-maintenance
+  // 503 page are publishable. Redirects and content-level 404/410 pages are
+  // never cached as successful documents. The publisher installs 503 status
+  // sidecars and nginx mappings in the same host-tree transaction.
+  if (![200, 503].includes(render.status)) {
+    throw new Error(`page declared non-publishable status ${render.status}`);
+  }
+  if (render.status === 503 && render.redirect) {
+    throw new Error('maintenance snapshot must not redirect');
+  }
+  if (render.pageContract.errorBoundary) throw new Error('React error boundary rendered');
+  if (render.status === 200 && /(?:^|[,\s])noindex(?:[,\s]|$)/i.test(render.pageContract.robots || '')) {
+    throw new Error('planned 200 route rendered a noindex document');
+  }
+  if (!render.pageContract.title) throw new Error('rendered document has no title');
+  if (render.pageContract.bodyTextLength < 200) throw new Error('rendered document has insufficient visible content');
+  if (apiServerErrors.length > 0) {
+    throw new Error(`API error during render (${apiServerErrors.slice(0, 3).join(', ')})`);
+  }
+  if (blockedRequests.length > 0) {
+    throw new Error(`blocked non-public request during render (${blockedRequests.slice(0, 3).join(', ')})`);
+  }
+  if (pageErrors.length > 0) {
+    throw new Error(`page error during render (${pageErrors.slice(0, 3).join(', ')})`);
+  }
+  if (failedCriticalRequests.length > 0) {
+    throw new Error(`critical API request failed during render (${failedCriticalRequests.slice(0, 3).join(', ')})`);
+  }
+
+  const expected = normalizedDocumentUrl(entry.canonicalUrl || entry.url);
+  const actual = normalizedDocumentUrl(render.finalUrl);
+  if (actual !== expected) {
+    throw new Error(`final URL mismatch (expected ${expected}, got ${actual})`);
+  }
+
+  // Canonicals are tenant-configurable. When a tenant explicitly disables
+  // them, absence is valid; when present they must still identify this exact
+  // route and must never leak the renderer bypass parameter.
+  if (render.pageContract.canonical) {
+    const canonical = new URL(render.pageContract.canonical, render.finalUrl);
+    if (!['http:', 'https:'].includes(canonical.protocol)) {
+      throw new Error(`invalid canonical protocol ${canonical.protocol}`);
+    }
+    if (canonical.searchParams.has('nexus_prerender_bypass')) {
+      throw new Error('canonical URL contains the prerender bypass parameter');
+    }
+    if (normalizedDocumentUrl(canonical.toString()) !== expected) {
+      throw new Error(`canonical URL mismatch (expected ${expected}, got ${normalizedDocumentUrl(canonical.toString())})`);
+    }
+  }
 }
 
 function stripNonCoreModulePreloads(html) {
@@ -317,18 +649,21 @@ async function extractMarkdown(page) {
 
 async function main() {
   const input = readFileSync('/dev/stdin', 'utf-8');
-  const manifest = JSON.parse(input);
-
-  if (!manifest.urls || !manifest.urls.length) {
-    console.error('No URLs in manifest');
-    process.exit(1);
-  }
+  const manifest = validateManifest(JSON.parse(input));
+  const maintenanceAuthToken = readMaintenanceAuthToken();
 
   console.log(`Pre-rendering ${manifest.urls.length} pages with concurrency ${CONCURRENCY}...`);
 
   const browser = await chromium.launch({
     headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--disable-webrtc',
+      '--force-webrtc-ip-handling-policy=disable_non_proxied_udp',
+    ],
   });
 
   // Viewport variant. Default desktop; flip to mobile via PRERENDER_VIEWPORT=mobile.
@@ -339,14 +674,15 @@ async function main() {
   // can be staged independently of the routing flip.
   const variant = (process.env.PRERENDER_VIEWPORT || 'desktop').toLowerCase();
   const isMobile = variant === 'mobile';
-  const context = await browser.newContext({
+  const contextOptions = {
+    serviceWorkers: 'block',
     userAgent: isMobile
       ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 NexusPrerender/1.0'
       : 'NexusPrerender/1.0 (internal; deploy-time rendering)',
     viewport: isMobile ? { width: 414, height: 896 } : { width: 1280, height: 720 },
     isMobile,
     hasTouch: isMobile,
-  });
+  };
   console.log(`Viewport: ${isMobile ? 'mobile (414x896)' : 'desktop (1280x720)'}`);
 
   const results = {
@@ -365,10 +701,106 @@ async function main() {
   let nextIndex = 0;
 
   async function renderEntry(entry) {
+    // One isolated context per entry is intentional. Path-hosted tenants share
+    // an origin, and therefore localStorage; concurrent pages in one context
+    // can overwrite nexus_tenant_id while sibling API calls are still active.
+    const context = await browser.newContext(contextOptions);
     const page = await context.newPage();
     const label = entry.canonicalUrl || entry.url;
+    const apiServerErrors = [];
+    const blockedRequests = [];
+    const pageErrors = [];
+    const failedCriticalRequests = [];
+    const pendingApiRequests = new Map();
+    const pendingApiInspections = new Set();
+    page.on('pageerror', (error) => pageErrors.push(String(error?.message || error)));
+    page.on('request', (request) => {
+      try {
+        const parsed = new URL(request.url());
+        if (isApiPath(parsed.pathname)) pendingApiRequests.set(request, parsed.pathname);
+      } catch {
+        // The request route guard rejects malformed URLs.
+      }
+    });
+    page.on('requestfinished', (request) => pendingApiRequests.delete(request));
+    page.on('requestfailed', (request) => {
+      try {
+        const parsed = new URL(request.url());
+        if (isApiPath(parsed.pathname)) {
+          failedCriticalRequests.push(`${request.failure()?.errorText || 'request failed'} ${parsed.pathname}`);
+        }
+      } catch {
+        // URL validation at the request boundary handles malformed values.
+      } finally {
+        pendingApiRequests.delete(request);
+      }
+    });
+    await page.route('**/*', async (route) => {
+      const requestUrl = route.request().url();
+      try {
+        const parsed = new URL(requestUrl);
+        if (['http:', 'https:'].includes(parsed.protocol)) {
+          await assertPublicHostname(parsed.hostname);
+        }
+        const authenticatedHeaders = maintenanceAuthHeaders(
+          entry,
+          requestUrl,
+          route.request().headers(),
+          maintenanceAuthToken,
+        );
+        await route.continue(authenticatedHeaders ? { headers: authenticatedHeaders } : undefined);
+      } catch (error) {
+        blockedRequests.push(`${requestUrl} (${error.message})`);
+        await route.abort('blockedbyclient');
+      }
+    });
+    page.on('response', (response) => {
+      try {
+        const parsed = new URL(response.url());
+        if (isApiPath(parsed.pathname) && response.status() >= 400) {
+          apiServerErrors.push(`${response.status()} ${parsed.pathname}`);
+        }
+        if (isApiPath(parsed.pathname)
+            && response.status() >= 200
+            && response.status() < 300
+            && response.status() !== 204
+            && /json/i.test(response.headers()['content-type'] || '')) {
+          const inspection = response.json()
+            .then((payload) => {
+              if (payload && typeof payload === 'object'
+                  && payload.success === false
+                  && payload.requires_2fa !== true) {
+                apiServerErrors.push(`logical failure ${parsed.pathname}`);
+              }
+            })
+            .catch(() => apiServerErrors.push(`invalid JSON ${parsed.pathname}`))
+            .finally(() => pendingApiInspections.delete(inspection));
+          pendingApiInspections.add(inspection);
+        }
+        if (response.status() >= 400 && isCriticalApiPath(entry.route, parsed.pathname)) {
+          failedCriticalRequests.push(`${response.status()} ${parsed.pathname}`);
+        }
+      } catch {
+        // Ignore malformed third-party response URLs; navigation validation
+        // below still protects the snapshot being published.
+      }
+    });
     try {
-      const { html, status, redirect, readiness, markdown } = await renderPage(page, entry.url);
+      await assertPublicUrl(entry.url);
+      if (entry.canonicalUrl) await assertPublicUrl(entry.canonicalUrl);
+      const render = await renderPage(page, entry.url, pendingApiRequests);
+      await Promise.allSettled([...pendingApiInspections]);
+      const { html, status, redirect, readiness, markdown } = render;
+      const tenantIdentity = await renderedTenantIdentity(page);
+      assertExpectedTenant(entry, tenantIdentity);
+      assertRenderContract(
+        entry,
+        render,
+        apiServerErrors,
+        blockedRequests,
+        pageErrors,
+        failedCriticalRequests,
+      );
       const size = Buffer.byteLength(html, 'utf-8');
 
       if (size < 3000) {
@@ -396,6 +828,14 @@ async function main() {
       // so an operator can verify by hand.
       const sha = createHash('sha256').update(html, 'utf-8').digest('hex');
       writeFileSync(`${outputDir}/index.html.sha256`, `${sha}  ${Buffer.byteLength(html, 'utf-8')}`, 'utf-8');
+      // Persist immutable ownership beside the snapshot. Hostnames and path
+      // prefixes can later be reassigned; reconciliation must distinguish an
+      // old tenant's HTML from a valid snapshot for the new owner.
+      writeFileSync(`${outputDir}/_tenant.json`, JSON.stringify({
+        tenantId: Number(entry.tenantId),
+        tenantSlug: String(entry.tenantSlug),
+        host: String(entry.host).toLowerCase(),
+      }), 'utf-8');
 
       // Sidecar Markdown for AI crawlers (Phase 5). LLMs ingest Markdown
       // more efficiently than HTML — fewer tokens, less chrome noise. Only
@@ -429,6 +869,8 @@ async function main() {
         httpStatus: status,
         redirectLocation: redirect || null,
         readiness: readiness || 'timeout',
+        tenantId: tenantIdentity.id,
+        tenantSlug: tenantIdentity.slug,
         bytes: size,
       });
       if (entry.cachePath) successfulCachePaths.push(entry.cachePath);
@@ -444,7 +886,7 @@ async function main() {
       });
       if (entry.cachePath) failedCachePaths.push(entry.cachePath);
     } finally {
-      await page.close();
+      await context.close();
     }
   }
 
@@ -472,4 +914,18 @@ async function main() {
   process.exit(results.failed > 0 ? 1 : 0);
 }
 
-main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main();
+}
+
+export {
+  assertRenderContract,
+  isApiPath,
+  isNonPublicAddress,
+  isCriticalApiPath,
+  maintenanceAuthHeaders,
+  normalizeManifestRoute,
+  normalizedDocumentUrl,
+  validateManifest,
+  validateManifestEntry,
+};

@@ -58,12 +58,18 @@ export function TenantSafetyTab({
     }
   };
 
+  const attentionSnapshots = report?.snapshots
+    .filter((row) => !row.expected || row.staleness !== 'fresh' || row.content_stale || row.asset_issues.length > 0) ?? [];
   const needsAttention = report
-    ? report.counts.missing + report.counts.stale + report.counts.asset_invalid + report.counts.unexpected
+    ? new Set([
+      ...report.missing_routes,
+      ...report.stale_routes,
+      ...report.asset_invalid_routes,
+      ...report.unexpected_routes,
+      ...attentionSnapshots.map((row) => row.route),
+    ]).size
     : 0;
-  const topSnapshots = report?.snapshots
-    .filter((row) => !row.expected || row.staleness !== 'fresh' || row.content_stale || row.asset_issues.length > 0)
-    .slice(0, 12) ?? [];
+  const visibleAttentionSnapshots = attentionSnapshots.slice(0, 100);
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -85,7 +91,7 @@ export function TenantSafetyTab({
               value={tenant}
               onValueChange={setTenant}
             />
-            <div className="flex items-end gap-2">
+            <div className="flex flex-wrap items-end gap-2">
               <Button
                 color="primary"
                 startContent={<Search size={16} />}
@@ -141,8 +147,20 @@ export function TenantSafetyTab({
               </div>
 
               <div>
+                {report.missing_routes.length > 0 && (
+                  <div className="mb-4 rounded-md border border-danger/30 bg-danger/5 p-3">
+                    <h4 className="text-sm font-semibold text-danger">
+                      {t('sections.missing_routes', { count: report.missing_routes.length })}
+                    </h4>
+                    <div className="mt-2 max-h-56 space-y-1 overflow-auto">
+                      {report.missing_routes.map((route) => (
+                        <Code key={route} className="block text-xs">{route}</Code>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <h4 className="mb-2 text-sm font-semibold">{t('sections.attention')}</h4>
-                {topSnapshots.length === 0 ? (
+                {visibleAttentionSnapshots.length === 0 ? (
                   <p className="rounded-md border border-success-200 bg-success-50 px-3 py-2 text-sm text-success-800">
                     {t('empty_attention')}
                   </p>
@@ -156,7 +174,7 @@ export function TenantSafetyTab({
                         <TableColumn>{t('columns.why')}</TableColumn>
                       </TableHeader>
                       <TableBody>
-                        {topSnapshots.map((row) => (
+                        {visibleAttentionSnapshots.map((row) => (
                           <TableRow key={row.cache_path}>
                             <TableCell>
                               <Code className="text-xs">{row.route}</Code>
@@ -186,6 +204,14 @@ export function TenantSafetyTab({
                       </TableBody>
                     </Table>
                   </div>
+                )}
+                {attentionSnapshots.length > visibleAttentionSnapshots.length && (
+                  <p className="mt-2 text-xs text-muted">
+                    {t('sections.attention_limited', {
+                      shown: visibleAttentionSnapshots.length,
+                      total: attentionSnapshots.length,
+                    })}
+                  </p>
                 )}
               </div>
             </>

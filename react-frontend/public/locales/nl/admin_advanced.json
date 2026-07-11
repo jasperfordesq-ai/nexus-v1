@@ -468,6 +468,19 @@
     "provider_sendgrid": "VerzendGrid",
     "provider_smtp": "SMTP",
     "prerender": {
+      "reset_all": {
+        "button": "Alles resetten en opnieuw opbouwen",
+        "title": "Alle snapshots resetten en opnieuw opbouwen",
+        "description": "Annuleer oudere prerender-taken en start één nieuwe herbouw van alle openbare pagina's met behoud van de tenantcontext, inclusief de landingspagina, aangepaste pagina's en bloginhoud van elke tenant.",
+        "safety": "De huidige volledige cache blijft actief totdat het nieuwe routeplan met succes is gerenderd en gevalideerd. Mislukte herbouwpogingen vervangen de laatst bekende goede generatie niet.",
+        "confirmation_label": "Bevestiging",
+        "confirmation_help": "Typ {{phrase}} om door te gaan.",
+        "confirmation_phrase": "ALLE SNAPSHOTS RESETTEN",
+        "cancel": "Annuleren",
+        "confirm": "Nieuwe herbouw starten",
+        "queued": "Nieuwe herbouw #{{id}} in de wachtrij geplaatst voor {{tenants}} tenants en {{routes}} routes.",
+        "failed": "De nieuwe herbouw kon niet worden gepland. Er zijn geen actieve snapshots verwijderd."
+      },
       "description": "Bot-only server-gerenderde snapshots. Bewaak de dekking, detecteer veroudering en forceer vernieuwingen.",
       "guide": {
         "title": "Plain-English guide",
@@ -648,6 +661,8 @@
         },
         "no_output": "(geen uitvoer)",
         "purge_ungated": {
+          "confirm_title": "Onverwachte snapshots verwijderen?",
+          "confirm_message": "Hiermee worden opgeslagen pagina's die buiten het huidige routeplan van hun tenant vallen, permanent verwijderd. Bevestig dat je eerst het voorbeeld hebt gecontroleerd.",
           "description": "Opruimmomentopnamen waarvan de route zich niet in de verwachte set van een tenant bevindt. Vaak na het uitschakelen van een functie, of voor het opschonen van statische routes die vooraf zijn weergegeven zonder functievlaggen. Dynamische contentroutes worden met rust gelaten.",
           "title": "Niet-geregistreerde momentopnamen opschonen (opschonen per tenant 404)"
         },
@@ -706,7 +721,10 @@
         }
       },
       "inventory": {
+        "truncated": "De inventaris heeft de veiligheidslimiet van {{count}} snapshots bereikt. Verfijn het tenantfilter voordat je een bulkactie uitvoert.",
+        "unknown_tenant": "Onbekende tenant",
         "actions": {
+          "open_live_url": "Livepagina openen (niet de opgeslagen snapshot)",
           "close": "Dichtbij",
           "inspect": "Inspecteren",
           "inspect_snapshot": "Inspecteer {{path}}",
@@ -756,6 +774,8 @@
           "bulk_recache_other": "Ongeldige {{count}}-snapshots en opnieuw cachen in de wachtrij"
         },
         "inspect": {
+          "load_failed": "Deze snapshot kon niet worden geladen. Eerdere inspectiegegevens zijn gewist.",
+          "no_snapshot": "Er is geen snapshot geselecteerd.",
           "age": "Leeftijd",
           "all_valid": "allemaal geldig",
           "asset_references": "Assetreferenties ({{count}})",
@@ -833,6 +853,7 @@
           "duration": "Duur",
           "error": "Fout",
           "exit_code": "Afsluitcode",
+          "fence_ready_at": "Publicatievergrendeling gereed",
           "finished_at": "Klaar om",
           "log_tail": "Stam (staart)",
           "queued_at": "In de rij gestaan ​​bij",
@@ -854,6 +875,7 @@
           "cancelled": "Geannuleerd",
           "failed": "Mislukt",
           "partial": "Gedeeltelijk",
+          "pending_fence": "Vergrendeling activeren",
           "queued": "In de wachtrij",
           "running": "Rennen",
           "status": "Status",
@@ -880,6 +902,16 @@
         },
         "scope": {
           "all_tenants": "alle huurders"
+        },
+        "statuses": {
+          "cancelled": "Geannuleerd",
+          "claimed": "Geclaimd",
+          "failed": "Mislukt",
+          "partial": "Gedeeltelijk",
+          "pending_fence": "Vergrendeling activeren",
+          "queued": "In de wachtrij",
+          "running": "Wordt uitgevoerd",
+          "succeeded": "Geslaagd"
         },
         "table_aria": "Banen"
       },
@@ -934,6 +966,7 @@
       "live_connected": "Live-updates verbonden",
       "audit": {
         "actions": {
+          "reset_all": "Alles resetten en opnieuw opbouwen",
           "auto_recache": "Auto-recache",
           "cancel": "Cancel job",
           "detect_drift": "Detect drift",
@@ -958,6 +991,10 @@
           "when": "Wanneer"
         },
         "empty": "Geen auditgegevens.",
+        "errors": {
+          "export": "Exporteren van auditgeschiedenis mislukt",
+          "load": "Auditgeschiedenis laden mislukt"
+        },
         "fallbacks": {
           "all": "alle",
           "system": "systeem"
@@ -976,11 +1013,13 @@
       },
       "overview": {
         "actions": {
+          "download_metrics": "Metrieken downloaden",
           "queue_job": "Wachtrij taak",
           "refresh": "Vernieuwen"
         },
         "empty_summary": "Geen samenvatting beschikbaar.",
         "errors": {
+          "download_metrics": "Downloaden van metrieken mislukt",
           "enqueue_job": "Kan de taak niet in de wachtrij plaatsen",
           "load_summary": "Kan samenvatting niet laden"
         },
@@ -995,6 +1034,7 @@
           "title": "Forceer vernieuwing"
         },
         "health": {
+          "cache_read_only": "De cache is alleen-lezen",
           "cache_unreachable": "Cache onbereikbaar",
           "healthy": "Gezond",
           "missing": "{{count}} ontbreekt",
@@ -1005,6 +1045,7 @@
           "stale_other": "{{count}} oud"
         },
         "hints": {
+          "unexpected": "Opgeslagen snapshots buiten de huidige routeplannen van tenants",
           "active_jobs": "{{count}} actief",
           "aging": "{{count}} veroudering (>7d)",
           "asset_broken": "Referenties dood /assets/*",
@@ -1029,6 +1070,7 @@
           "coverage": "Dekking",
           "metrics": "Statistieken",
           "missing": "Ontbreekt",
+          "unexpected": "Onverwacht",
           "queued_jobs": "Taken in de wachtrij",
           "recent_failures": "Recente mislukkingen",
           "status": "Status"
@@ -1160,9 +1202,10 @@
           "tenant_slug": "uren-tijdbank"
         },
         "sections": {
-          "dynamic_routes": "Dynamische routes (maximaal 1.000)",
+          "dynamic_routes": "Dynamische routes",
           "static_routes": "Statische routes"
         },
+        "tenant": "Omgeving {{slug}} (#{{id}})",
         "title": "Sitemapverkenner"
       },
       "readonly": {
@@ -1220,6 +1263,8 @@
           "sitemap": "Sitemap"
         },
         "sections": {
+          "attention_limited": "Er worden {{shown}} van de {{total}} opgeslagen snapshots weergegeven die aandacht vereisen.",
+          "missing_routes": "Ontbrekende routes ({{count}})",
           "attention": "Items needing attention"
         },
         "empty": "Enter a tenant slug to inspect its route plan and saved snapshots.",

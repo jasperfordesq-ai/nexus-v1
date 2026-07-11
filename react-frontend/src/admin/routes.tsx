@@ -437,7 +437,9 @@ export function AdminRoutes() {
       <Route path="seo" element={<Lazy><SeoOverview /></Lazy>} />
       <Route path="seo/audit" element={<Lazy><SeoAudit /></Lazy>} />
       <Route path="seo/redirects" element={<Lazy><Redirects /></Lazy>} />
-      <Route path="seo/prerender" element={<Lazy><PrerenderAdmin /></Lazy>} />
+      <Route element={<SuperAdminRoute />}>
+        <Route path="seo/prerender" element={<Lazy><PrerenderAdmin /></Lazy>} />
+      </Route>
       <Route path="404-errors" element={<Lazy><Error404Tracking /></Lazy>} />
       <Route path="match-debug" element={<Lazy><MatchDebugPanel /></Lazy>} />
 

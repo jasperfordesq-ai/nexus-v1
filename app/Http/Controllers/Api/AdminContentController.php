@@ -13,6 +13,7 @@ use App\Core\TenantContext;
 use App\Models\ActivityLog;
 use App\Models\Page;
 use App\Services\RedisCache;
+use App\Services\PrerenderContentInvalidator;
 use App\Services\StripeSubscriptionService;
 
 /**
@@ -206,6 +207,7 @@ class AdminContentController extends BaseApiController
         try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {
             \Log::warning('Failed to invalidate tenant_bootstrap cache on page create', ['tenant_id' => $tenantId, 'error' => $e->getMessage()]);
         }
+        app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, ["/page/{$slug}"]);
 
         return $this->respondWithData($row, null, 201);
     }
@@ -220,7 +222,7 @@ class AdminContentController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_page_id'), 'id', 400);
         }
 
-        $existing = DB::selectOne("SELECT id FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        $existing = DB::selectOne("SELECT id, slug FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$existing) {
             return $this->respondWithError('NOT_FOUND', __('api.page_not_found'), 'id', 404);
         }
@@ -297,6 +299,11 @@ class AdminContentController extends BaseApiController
         try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {
             \Log::warning('Failed to invalidate tenant_bootstrap cache on page update', ['tenant_id' => $tenantId, 'error' => $e->getMessage()]);
         }
+        $newSlug = (string) ($row['slug'] ?? $existing->slug);
+        app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, array_values(array_unique([
+            "/page/{$existing->slug}",
+            "/page/{$newSlug}",
+        ])));
 
         return $this->respondWithData($row);
     }
@@ -311,7 +318,7 @@ class AdminContentController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', __('api.invalid_page_id'), 'id', 400);
         }
 
-        $existing = DB::selectOne("SELECT id, title FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
+        $existing = DB::selectOne("SELECT id, title, slug FROM pages WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         if (!$existing) {
             return $this->respondWithError('NOT_FOUND', __('api.page_not_found'), 'id', 404);
         }
@@ -324,6 +331,7 @@ class AdminContentController extends BaseApiController
         try { $this->redisCache->delete('tenant_bootstrap', $tenantId); } catch (\Exception $e) {
             \Log::warning('Failed to invalidate tenant_bootstrap cache on page delete', ['tenant_id' => $tenantId, 'error' => $e->getMessage()]);
         }
+        app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, ["/page/{$existing->slug}"]);
 
         return $this->respondWithData(['deleted' => true]);
     }
@@ -397,6 +405,7 @@ class AdminContentController extends BaseApiController
 
         $result = DB::selectOne("SELECT id, tenant_id, name, slug, description, location, layout, min_plan_tier, is_active, created_at, updated_at FROM menus WHERE id = ? AND tenant_id = ?", [DB::getPdo()->lastInsertId(), $tenantId]);
         $menu = (array)$result;
+        app(PrerenderContentInvalidator::class)->refreshTenant($tenantId);
 
         return $this->respondWithData($menu, null, 201);
     }
@@ -439,6 +448,7 @@ class AdminContentController extends BaseApiController
 
         $result = DB::selectOne("SELECT id, tenant_id, name, slug, description, location, layout, min_plan_tier, is_active, created_at, updated_at FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
         $menu = (array)$result;
+        app(PrerenderContentInvalidator::class)->refreshTenant($tenantId);
 
         return $this->respondWithData($menu);
     }
@@ -458,6 +468,7 @@ class AdminContentController extends BaseApiController
         DB::delete("DELETE FROM menus WHERE id = ? AND tenant_id = ?", [$id, $tenantId]);
 
         ActivityLog::log($adminId, 'admin_delete_menu', "Deleted menu #{$id}: " . ($existing->name ?? ''));
+        app(PrerenderContentInvalidator::class)->refreshTenant($tenantId);
 
         return $this->respondWithData(['deleted' => true]);
     }
@@ -528,6 +539,7 @@ class AdminContentController extends BaseApiController
         if ($item && $item['visibility_rules']) {
             $item['visibility_rules'] = json_decode($item['visibility_rules'], true);
         }
+        app(PrerenderContentInvalidator::class)->refreshTenant($tenantId);
 
         return $this->respondWithData($item, null, 201);
     }
@@ -576,6 +588,7 @@ class AdminContentController extends BaseApiController
             DB::rollBack();
             throw $e;
         }
+        app(PrerenderContentInvalidator::class)->refreshTenant($tenantId);
 
         return $this->respondWithData($this->buildMenuItemTree($menuId));
     }
@@ -655,6 +668,7 @@ class AdminContentController extends BaseApiController
         if ($item && $item['visibility_rules']) {
             $item['visibility_rules'] = json_decode($item['visibility_rules'], true);
         }
+        app(PrerenderContentInvalidator::class)->refreshTenant($tenantId);
 
         return $this->respondWithData($item);
     }
@@ -675,6 +689,7 @@ class AdminContentController extends BaseApiController
 
         DB::delete("DELETE FROM menu_items WHERE parent_id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
         DB::delete("DELETE FROM menu_items WHERE id = ? AND menu_id IN (SELECT id FROM menus WHERE tenant_id = ?)", [$id, $tenantId]);
+        app(PrerenderContentInvalidator::class)->refreshTenant($tenantId);
 
         return $this->respondWithData(['deleted' => true]);
     }

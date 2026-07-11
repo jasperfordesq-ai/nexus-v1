@@ -71,6 +71,28 @@ class PrerenderAutoRecacheTest extends TestCase
             ->assertExitCode(0);
     }
 
+    public function test_fails_closed_when_inventory_is_truncated(): void
+    {
+        $this->service
+            ->shouldReceive('inventory')
+            ->once()
+            ->andReturn([['__truncated' => true]]);
+        $this->service
+            ->shouldReceive('loadTenantTargets')
+            ->once()
+            ->andReturn([[
+                'tenant_id' => self::TENANT_ID,
+                'host' => 'example.local',
+                'prefix' => '/test',
+                'slug' => 'test-auto-recache-' . self::TENANT_ID,
+            ]]);
+        $this->service->shouldNotReceive('enqueueJob');
+
+        $this->artisan('prerender:auto-recache')
+            ->expectsOutputToContain('freshness pass was incomplete')
+            ->assertExitCode(1);
+    }
+
     // -------------------------------------------------------------------------
     // All rows below min-stale-seconds threshold → no enqueue
     // -------------------------------------------------------------------------
@@ -325,6 +347,40 @@ class PrerenderAutoRecacheTest extends TestCase
             ->andReturn(1);
 
         $this->artisan('prerender:auto-recache', ['--max-tenants' => '1'])
+            ->assertExitCode(0);
+    }
+
+    public function test_large_route_sets_are_split_below_the_job_payload_limit(): void
+    {
+        $slug = 'test-auto-recache-' . self::TENANT_ID;
+        $inventory = [];
+        for ($i = 0; $i < 20; $i++) {
+            $inventory[] = [
+                'host' => 'example.local',
+                'route' => '/page/' . str_repeat(chr(97 + ($i % 26)), 140) . $i,
+                'age_s' => 600,
+                'content_stale' => true,
+            ];
+        }
+
+        $this->service->shouldReceive('inventory')->once()->andReturn($inventory);
+        $this->service->shouldReceive('loadTenantTargets')->once()->andReturn([[
+            'tenant_id' => self::TENANT_ID,
+            'host' => 'example.local',
+            'prefix' => '',
+            'slug' => $slug,
+        ]]);
+        $this->service
+            ->shouldReceive('enqueueJob')
+            ->twice()
+            ->withArgs(fn (int $tenantId, ?string $routes, ...$rest) =>
+                $tenantId === self::TENANT_ID
+                && is_string($routes)
+                && strlen($routes) <= 1900
+            )
+            ->andReturn(100, 101);
+
+        $this->artisan('prerender:auto-recache')
             ->assertExitCode(0);
     }
 }

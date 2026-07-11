@@ -36,6 +36,7 @@ import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
+import { usePrerenderReady } from '@/hooks/usePrerenderReady';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -96,6 +97,7 @@ export function BlogPage() {
   usePageTitle(t('page_title'));
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [categories, setCategories] = useState<BlogCategory[]>([]);
+  const [categoriesReady, setCategoriesReady] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -118,8 +120,10 @@ export function BlogPage() {
         const response = await api.get<BlogCategory[]>('/v2/blog/categories');
         if (response.success && response.data) {
           setCategories(Array.isArray(response.data) ? response.data : []);
+          setCategoriesReady(true);
         }
       } catch (err) {
+        setCategoriesReady(false);
         logError('Failed to load blog categories', err);
       }
     };
@@ -184,6 +188,8 @@ export function BlogPage() {
     cursorRef.current = undefined;
     loadPosts();
   }, [searchQuery, selectedCategory, loadPosts]);
+
+  usePrerenderReady(!isLoading && error === null && categoriesReady);
 
   return (
     <div className="space-y-6">

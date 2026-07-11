@@ -31,7 +31,8 @@ use Illuminate\Support\Facades\Schema;
  *     detector runs every 2 minutes and closes that window.
  *
  * Designed to be cheap enough to run frequently:
- *   - One sitemap fetch per tenant (cached for an hour by SitemapService).
+ *   - One fresh sitemap build per tenant so raw DB/import writes cannot hide
+ *     behind the public sitemap's one-hour response cache.
  *   - Walks the snapshot inventory once.
  *   - O(urls + snapshots) per pass, no DB writes for fresh routes.
  *
@@ -45,6 +46,7 @@ class PrerenderDetectDrift extends Command
         . '{--max-routes= : Cap routes per tenant per pass} '
         . '{--min-drift-seconds=60 : Sitemap lastmod must lead snapshot mtime by at least this} '
         . '{--include-missing=1 : Also enqueue URLs in the sitemap with no snapshot at all} '
+        . '{--purge-unexpected=1 : Remove snapshots no longer present in the exact tenant route plan} '
         . '{--priority=3 : Job priority (3=high, 5=normal, 7=low)} '
         . '{--dry-run : Print plan without enqueueing}';
 
@@ -60,10 +62,11 @@ class PrerenderDetectDrift extends Command
     public function handle(): int
     {
         $cfg = config('prerender.auto_recache', []);
-        $maxTenants = (int) ($this->option('max-tenants') ?? 20);
-        $maxRoutes  = (int) ($this->option('max-routes')  ?? 100);
+        $maxTenants = max(0, (int) ($this->option('max-tenants') ?? 20));
+        $maxRoutes  = max(0, (int) ($this->option('max-routes')  ?? 100));
         $minDrift   = max(0, (int) ($this->option('min-drift-seconds') ?? 60));
         $includeMissing = (int) $this->option('include-missing') === 1;
+        $purgeUnexpected = (int) $this->option('purge-unexpected') === 1;
         $priority   = max(1, min(9, (int) ($this->option('priority') ?? PrerenderService::PRIORITY_HIGH)));
         $dryRun     = (bool) $this->option('dry-run');
 
@@ -72,15 +75,82 @@ class PrerenderDetectDrift extends Command
             return self::FAILURE;
         }
 
+        $globalActive = DB::table('prerender_jobs')
+            ->whereNull('tenant_id')
+            ->where(function ($state): void {
+                $state->whereIn('status', ['queued', 'claimed', 'running']);
+                if (Schema::hasColumn('prerender_jobs', 'fence_state')) {
+                    $state->orWhere('fence_state', 'pending');
+                }
+            });
+        if ($globalActive->exists()) {
+            $this->line(json_encode([
+                'dry_run' => $dryRun,
+                'priority' => $priority,
+                'enqueued' => [],
+                'skipped' => ['*' => 'authoritative_global_job_exists'],
+                'planning_errors' => 0,
+                'inventory_truncated' => false,
+                'snapshot_count' => 0,
+            ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            return self::SUCCESS;
+        }
+
+        if ($this->prerender->authoritativeRepairRequired()) {
+            try {
+                $jobId = $dryRun ? null : $this->prerender->enqueueJob(
+                    null,
+                    null,
+                    true,
+                    false,
+                    null,
+                    PrerenderService::PRIORITY_HIGH
+                );
+            } catch (\Throwable $e) {
+                $this->error('Could not requeue required authoritative repair: ' . $e->getMessage());
+                return self::FAILURE;
+            }
+            $this->line(json_encode([
+                'dry_run' => $dryRun,
+                'priority' => PrerenderService::PRIORITY_HIGH,
+                'authoritative_repair_required' => true,
+                'authoritative_job_id' => $jobId,
+                'enqueued' => [],
+                'skipped' => [],
+                'planning_errors' => 0,
+                'inventory_truncated' => false,
+                'snapshot_count' => 0,
+            ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+            return self::SUCCESS;
+        }
+
         // Build a host → tenant lookup and a (host,route) → snapshot mtime map.
         $tenants = $this->prerender->loadTenantTargets();
         if (empty($tenants)) {
             $this->info('No active tenants.');
-            return self::SUCCESS;
+            try {
+                $orphanPurge = $purgeUnexpected
+                    ? $this->prerender->purgeUnexpectedSnapshots($dryRun)
+                    : null;
+                $this->line(json_encode([
+                    'dry_run' => $dryRun,
+                    'priority' => $priority,
+                    'enqueued' => [],
+                    'skipped' => [],
+                    'planning_errors' => 0,
+                    'inventory_truncated' => false,
+                    'snapshot_count' => 0,
+                    'orphan_purge' => $orphanPurge,
+                ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                return self::SUCCESS;
+            } catch (\Throwable $e) {
+                $this->error('Orphan snapshot purge failed: ' . $e->getMessage());
+                return self::FAILURE;
+            }
         }
         $targetsByHost = [];
         foreach ($tenants as $t) {
-            $targetsByHost[$t['host']][] = $t;
+            $targetsByHost[strtolower((string) $t['host'])][] = $t;
         }
         foreach ($targetsByHost as &$targets) {
             usort($targets, fn ($a, $b) => strlen($b['prefix']) <=> strlen($a['prefix']));
@@ -90,14 +160,40 @@ class PrerenderDetectDrift extends Command
         // SHALLOW inventory — we only need mtimes, not asset/content drift flags.
         $inventory = $this->prerender->inventory(null, false);
         $snapMtime = [];
+        $identityBackfill = [];
+        $inventoryTruncated = false;
+        $orphanSnapshotCount = 0;
         foreach ($inventory as $row) {
+            if (!empty($row['__truncated'])) {
+                $inventoryTruncated = true;
+                continue;
+            }
+            if (!empty($row['tenant_identity_mismatch'])) {
+                $orphanSnapshotCount++;
+                continue;
+            }
+            $snapshotHost = strtolower((string) $row['host']);
             [$slug, $tenantLocalRoute] = $this->resolveSnapshotTenantRoute(
-                $row['host'],
+                $snapshotHost,
                 $row['route'],
-                $targetsByHost[$row['host']] ?? []
+                $targetsByHost[$snapshotHost] ?? []
             );
-            if ($slug === null || $tenantLocalRoute === null) continue;
+            if ($slug === null || $tenantLocalRoute === null) {
+                $orphanSnapshotCount++;
+                continue;
+            }
             $snapMtime[$slug][$tenantLocalRoute] = (int) $row['mtime'];
+            if (!empty($row['tenant_identity_missing'])) {
+                // Legacy snapshots remain last-known-good until the first
+                // complete identity-bearing generation commits. Backfill them
+                // with forced targeted renders; never classify absence alone
+                // as cross-tenant ownership before the activation marker.
+                $identityBackfill[$slug][$tenantLocalRoute] = true;
+            }
+        }
+        if ($inventoryTruncated) {
+            $this->error('Snapshot inventory hit its safety limit; drift pass was incomplete.');
+            return self::FAILURE;
         }
 
         // Active-job skip list to avoid pile-up.
@@ -112,6 +208,7 @@ class PrerenderDetectDrift extends Command
         $enqueued = [];
         $skipped = [];
         $tenantCount = 0;
+        $planningErrors = 0;
 
         foreach ($tenants as $t) {
             if ($tenantCount >= $maxTenants) {
@@ -127,23 +224,28 @@ class PrerenderDetectDrift extends Command
             $host = $t['host'];
             $prefix = $t['prefix'];
 
-            // Fetch the tenant's sitemap. SitemapService caches the result for
-            // an hour so repeated runs are cheap.
+            // Deliberately bypass the public one-hour sitemap cache. Raw DB
+            // writes are the reason this reconciler exists and do not bump the
+            // cache version the way Eloquent/admin invalidators do.
             try {
                 $baseUrl = 'https://' . $host . $prefix;
-                $xml = $this->sitemap->generateForTenant($tenantId, $baseUrl);
+                $xml = $this->generateFreshSitemap($tenantId, $baseUrl);
+                $entries = $this->parseSitemap($xml, 'https://' . $host, $prefix);
             } catch (\Throwable $e) {
                 $skipped[$t['slug']] = 'sitemap_error: ' . substr($e->getMessage(), 0, 80);
+                $planningErrors++;
                 continue;
             }
 
-            $entries = $this->parseSitemap($xml, 'https://' . $host, $prefix);
             if (empty($entries)) {
+                $skipped[$t['slug']] = 'sitemap_empty';
+                $planningErrors++;
                 continue;
             }
 
             $staleRoutes = [];
             $missingRoutes = [];
+            $identityBackfillRoutes = [];
             foreach ($entries as $route => $lastmodTs) {
                 $snap = $snapMtime[$t['slug']][$route] ?? null;
                 if ($snap === null) {
@@ -153,35 +255,94 @@ class PrerenderDetectDrift extends Command
                 if ($lastmodTs > 0 && $lastmodTs > $snap + $minDrift) {
                     $staleRoutes[] = $route;
                 }
-                if (count($staleRoutes) + count($missingRoutes) >= $maxRoutes) break;
+                if (isset($identityBackfill[$t['slug']][$route])) {
+                    $identityBackfillRoutes[] = $route;
+                }
+                if (count(array_unique(array_merge(
+                    $staleRoutes,
+                    $missingRoutes,
+                    $identityBackfillRoutes
+                ))) >= $maxRoutes) break;
             }
 
-            $allRoutes = array_values(array_unique(array_merge($staleRoutes, $missingRoutes)));
-            if (empty($allRoutes)) continue;
+            $unexpectedRoutes = [];
+            if ($purgeUnexpected) {
+                $expectedRoutes = array_fill_keys(array_merge(
+                    $this->prerender->routesForTenant((int) $tenantId),
+                    array_keys($entries)
+                ), true);
+                $unexpectedRoutes = array_values(array_diff(
+                    array_keys($snapMtime[$t['slug']] ?? []),
+                    array_keys($expectedRoutes)
+                ));
+            }
+            if (count($unexpectedRoutes) > $maxRoutes) {
+                $unexpectedRoutes = array_slice($unexpectedRoutes, 0, $maxRoutes);
+            }
+
+            $allRoutes = array_values(array_unique(array_merge(
+                $staleRoutes,
+                $missingRoutes,
+                $identityBackfillRoutes
+            )));
+            if (empty($allRoutes) && empty($unexpectedRoutes)) continue;
 
             // Cap routes per tenant so we don't generate a giant single job.
             if (count($allRoutes) > $maxRoutes) {
                 $allRoutes = array_slice($allRoutes, 0, $maxRoutes);
             }
 
-            $jobId = null;
+            $jobIds = [];
+            $purgedCount = 0;
             if (!$dryRun) {
-                $jobId = $this->prerender->enqueueJob(
-                    $tenantId,
-                    implode(',', $allRoutes),
-                    false,
-                    false,
-                    null,
-                    $priority
-                );
+                foreach ($this->chunkRoutes($allRoutes) as $routesCsv) {
+                    $jobIds[] = $this->prerender->enqueueJob(
+                        $tenantId,
+                        $routesCsv,
+                        $identityBackfillRoutes !== [],
+                        false,
+                        null,
+                        $priority
+                    );
+                }
+                if ($unexpectedRoutes !== []) {
+                    $purgedCount = $this->prerender->invalidateRoutes(
+                        (int) $tenantId,
+                        $unexpectedRoutes,
+                        false
+                    );
+                    if ($purgedCount !== count($unexpectedRoutes)) {
+                        $planningErrors++;
+                    }
+                }
+            } else {
+                $purgedCount = count($unexpectedRoutes);
             }
             $enqueued[$t['slug']] = [
-                'job_id'        => $jobId,
+                'job_id'        => $jobIds[0] ?? null,
+                'job_ids'       => $jobIds,
                 'stale_routes'  => count($staleRoutes),
                 'missing_routes'=> count($missingRoutes),
+                'identity_backfill_routes' => count($identityBackfillRoutes),
+                'unexpected_routes' => count($unexpectedRoutes),
+                'purged_routes' => $purgedCount,
                 'sample'        => array_slice($allRoutes, 0, 5),
             ];
             $tenantCount++;
+        }
+
+        $orphanPurge = null;
+        if ($purgeUnexpected && $orphanSnapshotCount > 0) {
+            try {
+                // Re-inventory and re-attribute through the service's hardened
+                // deletion path. This catches retired custom-domain and
+                // inactive/deleted-tenant trees that cannot be assigned to an
+                // active tenant in the per-tenant loop above.
+                $orphanPurge = $this->prerender->purgeUnexpectedSnapshots($dryRun);
+            } catch (\Throwable $e) {
+                $planningErrors++;
+                $orphanPurge = ['error' => substr($e->getMessage(), 0, 200)];
+            }
         }
 
         $this->line(json_encode([
@@ -189,9 +350,52 @@ class PrerenderDetectDrift extends Command
             'priority'  => $priority,
             'enqueued'  => $enqueued,
             'skipped'   => $skipped,
+            'planning_errors' => $planningErrors,
+            'inventory_truncated' => $inventoryTruncated,
             'snapshot_count' => count($inventory),
+            'orphan_snapshot_count' => $orphanSnapshotCount,
+            'orphan_purge' => $orphanPurge,
         ], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-        return self::SUCCESS;
+        return $planningErrors === 0 ? self::SUCCESS : self::FAILURE;
+    }
+
+    /** @param list<string> $routes @return list<string> */
+    private function chunkRoutes(array $routes, int $maxBytes = 1900): array
+    {
+        $chunks = [];
+        $current = [];
+        $bytes = 0;
+        foreach ($routes as $route) {
+            $routeBytes = strlen($route);
+            if ($routeBytes > $maxBytes) {
+                throw new \RuntimeException("Prerender route exceeds {$maxBytes} bytes");
+            }
+            $added = $routeBytes + ($current === [] ? 0 : 1);
+            if ($current !== [] && $bytes + $added > $maxBytes) {
+                $chunks[] = implode(',', $current);
+                $current = [];
+                $bytes = 0;
+                $added = $routeBytes;
+            }
+            $current[] = $route;
+            $bytes += $added;
+        }
+        if ($current !== []) $chunks[] = implode(',', $current);
+        return $chunks;
+    }
+
+    private function generateFreshSitemap(int $tenantId, string $baseUrl): string
+    {
+        $key = 'prerender.runtime_force_fresh_sitemap';
+        $previous = config($key, false);
+        $bypassKey = 'prerender.runtime_bypass_sitemap_cache';
+        $previousBypass = config($bypassKey, false);
+        config([$key => true, $bypassKey => true]);
+        try {
+            return $this->sitemap->generateForTenant($tenantId, $baseUrl);
+        } finally {
+            config([$key => $previous, $bypassKey => $previousBypass]);
+        }
     }
 
     /**
@@ -204,19 +408,49 @@ class PrerenderDetectDrift extends Command
     {
         $out = [];
         if (!preg_match_all('#<url>\s*(.*?)\s*</url>#is', $xml, $blocks)) return $out;
+        $baseParts = parse_url($base);
+        $expectedHost = is_array($baseParts)
+            ? PrerenderService::normalizeHost((string) ($baseParts['host'] ?? ''))
+            : null;
+        if ($expectedHost === null) {
+            throw new \RuntimeException('Drift sitemap base URL has an invalid host');
+        }
+
+        $rejected = [];
         foreach ($blocks[1] as $block) {
-            if (!preg_match('#<loc>([^<]+)</loc>#i', $block, $lm)) continue;
+            if (!preg_match('#<loc>([^<]+)</loc>#i', $block, $lm)) {
+                $rejected[] = 'URL entry has no location';
+                continue;
+            }
             $loc = trim(html_entity_decode($lm[1], ENT_XML1 | ENT_QUOTES, 'UTF-8'));
-            if (!str_starts_with($loc, $base)) continue;
-            $path = substr($loc, strlen($base));
+            $parts = parse_url($loc);
+            $locationHost = is_array($parts)
+                ? PrerenderService::normalizeHost((string) ($parts['host'] ?? ''))
+                : null;
+            if (!is_array($parts)
+                || ($parts['scheme'] ?? '') !== 'https'
+                || $locationHost !== $expectedHost
+                || isset($parts['query'])
+                || isset($parts['fragment'])) {
+                $rejected[] = "Invalid or off-host location: {$loc}";
+                continue;
+            }
+
+            $path = (string) ($parts['path'] ?? '');
             if ($prefix !== '' && str_starts_with($path, $prefix . '/')) {
                 $path = substr($path, strlen($prefix));
             } elseif ($prefix !== '' && $path === $prefix) {
                 $path = '/';
+            } elseif ($prefix !== '') {
+                $rejected[] = "Location is outside the tenant prefix: {$loc}";
+                continue;
             }
             if ($path === '') $path = '/';
-            if ($path[0] !== '/') continue;
-            if (!preg_match('#^/[A-Za-z0-9._~/%:@!$()*+,;=\-]*$#', $path)) continue;
+            $path = PrerenderService::normalizeRoute($path);
+            if ($path === null) {
+                $rejected[] = "Location has an unsafe route: {$loc}";
+                continue;
+            }
 
             $lastmod = 0;
             if (preg_match('#<lastmod>([^<]+)</lastmod>#i', $block, $lmm)) {
@@ -226,16 +460,26 @@ class PrerenderDetectDrift extends Command
             // stripping (shouldn't, but defensive). Keep the newest lastmod.
             $out[$path] = max($out[$path] ?? 0, $lastmod);
         }
+
+        if ($rejected !== []) {
+            throw new \RuntimeException(sprintf(
+                'Drift sitemap rejected %d route location(s); first: %s',
+                count($rejected),
+                mb_strimwidth($rejected[0], 0, 240, '…', 'UTF-8')
+            ));
+        }
         return $out;
     }
 
     /**
-     * @param list<array{slug:string,prefix:string}> $targets
+     * @param list<array{slug:string,host:string,prefix:string}> $targets
      * @return array{0:?string,1:?string}
      */
     private function resolveSnapshotTenantRoute(string $host, string $route, array $targets): array
     {
+        $host = strtolower($host);
         foreach ($targets as $target) {
+            if (strtolower((string) ($target['host'] ?? '')) !== $host) continue;
             $prefix = (string) $target['prefix'];
             if ($prefix === '') {
                 return [(string) $target['slug'], $route];

@@ -12,6 +12,7 @@ use App\Services\PrerenderService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Mockery;
 use Tests\Laravel\TestCase;
 
@@ -24,7 +25,8 @@ use Tests\Laravel\TestCase;
  *
  * The prerender_jobs table has no updated_at column, so handle() must NOT set
  * one in its UPDATE payloads — it writes only the columns that exist
- * (status / claimed_at / claimed_by / started_at / finished_at / error_message).
+ * (status / claimed_at / claimed_by / started_at / heartbeat_at when present /
+ * finished_at / error_message).
  * The reap-path tests below assert the stuck rows are actually transitioned
  * (failed by default, queued under --requeue); the dry-run tests assert no
  * mutation occurs.
@@ -54,6 +56,7 @@ class PrerenderReapStaleTest extends TestCase
         \App\Core\TenantContext::setById(self::TENANT_ID);
 
         $this->service = Mockery::mock(PrerenderService::class);
+        $this->service->shouldReceive('releaseJobLease')->zeroOrMoreTimes();
         $this->app->instance(PrerenderService::class, $this->service);
     }
 
@@ -125,6 +128,24 @@ class PrerenderReapStaleTest extends TestCase
     {
         // Only 10 minutes old; default running_minutes=45 → not stale.
         $id = $this->insertJob('running', now()->subMinutes(10));
+
+        $this->service->shouldNotReceive('broadcastJob');
+
+        $this->artisan('prerender:reap-stale')
+            ->assertExitCode(0);
+
+        $this->assertSame('running', DB::table('prerender_jobs')->where('id', $id)->value('status'));
+    }
+
+    public function test_recent_heartbeat_keeps_a_long_running_job_alive(): void
+    {
+        $id = $this->insertJob('running', now()->subHours(3));
+        $leaseColumn = Schema::hasColumn('prerender_jobs', 'heartbeat_at')
+            ? 'heartbeat_at'
+            : 'started_at';
+        DB::table('prerender_jobs')->where('id', $id)->update([
+            $leaseColumn => now()->subMinute()->toDateTimeString(),
+        ]);
 
         $this->service->shouldNotReceive('broadcastJob');
 
@@ -283,14 +304,14 @@ class PrerenderReapStaleTest extends TestCase
 
     // -------------------------------------------------------------------------
     // --requeue (real run): a never-requeued stuck row is reset to queued and
-    // its claim fields cleared. The requeue path does not broadcast.
+    // its claim fields cleared. Requeue broadcasts so the admin UI updates.
     // -------------------------------------------------------------------------
 
     public function test_requeue_resets_stale_claimed_row_to_queued(): void
     {
         $id = $this->insertJob('claimed', now()->subMinutes(20), null);
 
-        $this->service->shouldNotReceive('broadcastJob');
+        $this->service->shouldReceive('broadcastJob')->once()->with($id);
 
         $this->artisan('prerender:reap-stale', ['--requeue' => true])
             ->assertExitCode(0);

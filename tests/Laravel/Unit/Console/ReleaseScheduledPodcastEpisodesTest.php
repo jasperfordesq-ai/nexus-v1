@@ -10,6 +10,7 @@ namespace Tests\Laravel\Unit\Console;
 
 use App\Core\TenantContext;
 use App\Services\EmailDispatchService;
+use App\Services\PrerenderContentInvalidator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
@@ -369,5 +370,33 @@ class ReleaseScheduledPodcastEpisodesTest extends TestCase
             ->count();
 
         $this->assertSame(3, $releasedCount, 'All 3 due episodes must be released in one run');
+    }
+
+    public function test_due_release_refreshes_podcast_list_show_and_episode_snapshots(): void
+    {
+        $episodeId = $this->insertEpisode([
+            'slug' => 'scheduled-prerender-episode',
+            'scheduled_for' => now()->subMinute(),
+            'announced_at' => null,
+        ]);
+        $showSlug = (string) DB::table('podcast_shows')->where('id', $this->showId)->value('slug');
+
+        $invalidator = \Mockery::mock(PrerenderContentInvalidator::class);
+        $invalidator->shouldReceive('refreshRoutes')
+            ->once()
+            ->with(self::TENANT_ID, [
+                '/podcasts',
+                "/podcasts/{$showSlug}",
+                "/podcasts/{$showSlug}/scheduled-prerender-episode",
+            ]);
+        $this->app->instance(PrerenderContentInvalidator::class, $invalidator);
+
+        $this->artisan('podcasts:release-due')
+            ->expectsOutputToContain('Released 1 scheduled podcast episode(s).')
+            ->assertExitCode(0);
+
+        $this->assertNotNull(
+            DB::table('podcast_episodes')->where('id', $episodeId)->value('announced_at')
+        );
     }
 }

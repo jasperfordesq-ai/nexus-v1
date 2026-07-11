@@ -28,11 +28,11 @@ export function PurgeControls({
   const [confirmAllTenants, setConfirmAllTenants] = useState(false);
   const [confirmText, setConfirmText] = useState('');
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ deleted_count: number; deleted: string[]; dry_run: boolean; recache_job_id?: number | null } | null>(null);
-  const [lastPreview, setLastPreview] = useState<{ pattern: string; tenant: string; count: number } | null>(null);
+  const [result, setResult] = useState<{ deleted_count: number; deleted: string[]; dry_run: boolean; recache_job_id?: number | null; preview_token?: string | null } | null>(null);
+  const [lastPreview, setLastPreview] = useState<{ pattern: string; tenant: string; count: number; token: string } | null>(null);
   const isAllTenantDelete = !dryRun && tenant.trim() === '';
   const liveTenant = tenant.trim();
-  const confirmationPhrase = liveTenant || 'ALL TENANTS';
+  const confirmationPhrase = liveTenant || t('all_tenants_warning.title');
   const hasMatchingPreview = Boolean(
     lastPreview
     && lastPreview.pattern === pattern.trim()
@@ -74,22 +74,29 @@ export function PurgeControls({
         dry_run: dryRun,
         recache,
         confirm_all_tenants: isAllTenantDelete && confirmAllTenants,
+        preview_token: !dryRun ? lastPreview?.token : undefined,
       });
       if (res.data) {
         setResult(res.data);
-        if (res.data.dry_run) {
+        if (res.data.dry_run && res.data.preview_token) {
           setLastPreview({
             pattern: pattern.trim(),
             tenant: tenant.trim(),
             count: res.data.deleted_count,
+            token: res.data.preview_token,
           });
         }
         toast.success(dryRun
           ? t('messages.dry_run', { count: res.data.deleted_count })
           : t('messages.purged', { count: res.data.deleted_count, job: res.data.recache_job_id ? ` #${res.data.recache_job_id}` : '' }));
-        if (!dryRun) onActed();
+        if (!dryRun) {
+          setLastPreview(null);
+          setConfirmText('');
+          onActed();
+        }
       }
     } catch {
+      if (!dryRun) setLastPreview(null);
       toast.error(t('errors.purge_failed'));
     } finally {
       setLoading(false);

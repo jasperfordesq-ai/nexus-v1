@@ -7,6 +7,7 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
+use App\Services\PrerenderService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -135,6 +136,37 @@ class AdminPrerenderControllerTest extends TestCase
         ])->assertStatus(400);
     }
 
+    public function test_live_purge_requires_current_server_preview_token(): void
+    {
+        Sanctum::actingAs($this->makeSuperAdmin());
+
+        $this->apiPost('/v2/admin/prerender/purge', [
+            'pattern' => '/about',
+            'tenant_slug' => $this->testTenantSlug,
+            'dry_run' => false,
+        ])->assertStatus(409)
+            ->assertJsonPath('code', 'PRERENDER_PREVIEW_REQUIRED');
+    }
+
+    public function test_matching_preview_token_authorizes_exact_live_purge(): void
+    {
+        Sanctum::actingAs($this->makeSuperAdmin());
+        $preview = $this->apiPost('/v2/admin/prerender/purge', [
+            'pattern' => '/about',
+            'tenant_slug' => $this->testTenantSlug,
+            'dry_run' => true,
+        ])->assertStatus(200);
+        $token = $preview->json('data.preview_token');
+        $this->assertIsString($token);
+
+        $this->apiPost('/v2/admin/prerender/purge', [
+            'pattern' => '/about',
+            'tenant_slug' => $this->testTenantSlug,
+            'dry_run' => false,
+            'preview_token' => $token,
+        ])->assertStatus(200);
+    }
+
     public function test_cancel_marks_queued_job_cancelled(): void
     {
         Sanctum::actingAs($this->makeSuperAdmin());
@@ -203,6 +235,186 @@ class AdminPrerenderControllerTest extends TestCase
         $this->assertNull($row->claimed_at);
         $this->assertNull($row->claimed_by);
         $this->assertNull($row->started_at);
+    }
+
+    public function test_reset_queue_preserves_long_running_job_with_recent_heartbeat(): void
+    {
+        if (!Schema::hasColumn('prerender_jobs', 'heartbeat_at')) {
+            $this->markTestSkipped('heartbeat_at migration is not available');
+        }
+
+        Sanctum::actingAs($this->makeSuperAdmin());
+        $jobId = DB::table('prerender_jobs')->insertGetId([
+            'status' => 'running',
+            'priority' => 5,
+            'tenant_id' => $this->testTenantId,
+            'routes' => '/about',
+            'force_render' => 0,
+            'dry_run' => 0,
+            'claimed_at' => now()->subHours(2),
+            'claimed_by' => 'healthy-worker-token',
+            'started_at' => now()->subHours(2),
+            'heartbeat_at' => now()->subMinute(),
+            'queued_at' => now()->subHours(2),
+        ]);
+
+        $this->apiPost('/v2/admin/prerender/reset-queue')
+            ->assertStatus(200)
+            ->assertJsonPath('data.rows_reset', 0);
+
+        $row = DB::table('prerender_jobs')->where('id', $jobId)->first();
+        $this->assertSame('running', $row->status);
+        $this->assertSame('healthy-worker-token', $row->claimed_by);
+        $this->assertNotNull($row->heartbeat_at);
+    }
+
+    public function test_reset_all_requires_exact_confirmation(): void
+    {
+        Sanctum::actingAs($this->makeSuperAdmin());
+
+        $this->apiPost('/v2/admin/prerender/reset-all', [
+            'confirmation' => 'reset',
+        ])->assertStatus(422);
+    }
+
+    public function test_reset_all_schedules_authoritative_rebuild(): void
+    {
+        Sanctum::actingAs($this->makeSuperAdmin());
+        $this->mock(PrerenderService::class, function ($mock): void {
+            $mock->shouldReceive('resetAllSnapshots')
+                ->once()
+                ->andReturn([
+                    'job_id' => 4321,
+                    'cancelled_jobs' => 2,
+                    'cancelled_active_jobs' => 1,
+                    'tenant_count' => 3,
+                    'planned_routes' => 99,
+                ]);
+            $mock->shouldNotReceive('audit');
+        });
+
+        $this->apiPost('/v2/admin/prerender/reset-all', [
+            'confirmation' => 'RESET ALL SNAPSHOTS',
+        ])->assertStatus(202)
+            ->assertJsonPath('data.job_id', 4321)
+            ->assertJsonPath('data.planned_routes', 99);
+    }
+
+    public function test_reset_all_returns_failure_and_best_effort_logs_failed_attempt(): void
+    {
+        Sanctum::actingAs($this->makeSuperAdmin());
+        $this->mock(PrerenderService::class, function ($mock): void {
+            $mock->shouldReceive('resetAllSnapshots')
+                ->once()
+                ->andThrow(new \RuntimeException('required success audit insert failed'));
+            $mock->shouldReceive('audit')
+                ->once()
+                ->withArgs(function (
+                    string $action,
+                    int $actorUserId,
+                    ?int $tenantId,
+                    ?int $jobId,
+                    string $outcome,
+                    array $details,
+                    ?string $ip,
+                    ?string $userAgent
+                ): bool {
+                    unset($ip, $userAgent);
+                    return $action === 'reset_all'
+                        && $actorUserId > 0
+                        && $tenantId === null
+                        && $jobId === null
+                        && $outcome === 'error'
+                        && str_contains((string) ($details['error'] ?? ''), 'audit insert failed');
+                });
+        });
+
+        $this->apiPost('/v2/admin/prerender/reset-all', [
+            'confirmation' => 'RESET ALL SNAPSHOTS',
+        ])->assertStatus(503)
+            ->assertJsonPath('code', 'PRERENDER_RESET_FAILED');
+    }
+
+    public function test_csv_export_neutralizes_spreadsheet_formulas(): void
+    {
+        Sanctum::actingAs($this->makeSuperAdmin());
+        $this->mock(PrerenderService::class, function ($mock): void {
+            $mock->shouldReceive('recentAudit')->once()->andReturn([[
+                'id' => 1,
+                'created_at' => '2026-07-10 12:00:00',
+                'action' => 'enqueue',
+                'outcome' => 'ok',
+                'actor_email' => '=HYPERLINK("https://attacker.invalid")',
+                'tenant_slug' => '+cmd|calc',
+                'job_id' => 9,
+                'ip' => '@SUM(1+1)',
+                'details' => ['routes' => '-2+3'],
+            ]]);
+        });
+
+        $response = $this->apiGet('/v2/admin/prerender/export/audit.csv');
+        $response->assertStatus(200);
+        $csv = (string) $response->streamedContent();
+
+        $this->assertStringContainsString("'=HYPERLINK", $csv);
+        $this->assertStringContainsString("'+cmd|calc", $csv);
+        $this->assertStringContainsString("'@SUM(1+1)", $csv);
+    }
+
+    public function test_public_invalidation_webhook_requires_its_shared_secret(): void
+    {
+        config(['prerender.webhook_token' => 'test-prerender-webhook-secret']);
+
+        $this->apiPost('/v2/prerender/invalidate', [
+            'tenant_id' => $this->testTenantId,
+            'routes' => ['/about'],
+            'recache' => false,
+        ])->assertStatus(401);
+    }
+
+    public function test_public_invalidation_webhook_bearer_is_repeatable_for_newer_publishes(): void
+    {
+        config(['prerender.webhook_token' => 'test-prerender-webhook-secret']);
+        $payload = [
+            'tenant_id' => $this->testTenantId,
+            'routes' => ['/about'],
+            'recache' => false,
+        ];
+        $headers = ['Authorization' => 'Bearer test-prerender-webhook-secret'];
+
+        $this->apiPost('/v2/prerender/invalidate', $payload, $headers)
+            ->assertStatus(200)
+            ->assertJsonPath('data.tenant_id', $this->testTenantId);
+
+        $this->apiPost('/v2/prerender/invalidate', $payload, $headers)
+            ->assertStatus(200)
+            ->assertJsonPath('data.tenant_id', $this->testTenantId);
+    }
+
+    public function test_public_invalidation_webhook_rejects_traversal_and_encoded_aliases(): void
+    {
+        config(['prerender.webhook_token' => 'test-prerender-webhook-traversal-secret']);
+        $headers = ['Authorization' => 'Bearer test-prerender-webhook-traversal-secret'];
+
+        foreach (['/../../../httpdocs', '/./blog', '//blog', '/%2e%2e/httpdocs', '/blog%2fpost'] as $route) {
+            $this->apiPost('/v2/prerender/invalidate', [
+                'tenant_id' => $this->testTenantId,
+                'routes' => [$route],
+                'recache' => false,
+            ], $headers)->assertStatus(400);
+        }
+    }
+
+    public function test_public_invalidation_webhook_rejects_unknown_tenant(): void
+    {
+        config(['prerender.webhook_token' => 'test-prerender-webhook-secret']);
+
+        $this->apiPost('/v2/prerender/invalidate', [
+            'tenant_id' => 999999999,
+            'routes' => ['/about'],
+            'recache' => false,
+        ], ['Authorization' => 'Bearer test-prerender-webhook-secret'])
+            ->assertStatus(404);
     }
 
     private function makeSuperAdmin(): User

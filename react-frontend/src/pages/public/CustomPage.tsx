@@ -26,6 +26,7 @@ import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { usePrerenderReady } from '@/hooks/usePrerenderReady';
 
 interface PageData {
   id: number;
@@ -62,6 +63,7 @@ export function CustomPage() {
   const [page, setPage] = useState<PageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  usePrerenderReady(!tenantLoading && !loading && !notFound && page !== null);
 
   // tenantId captured as primitive to avoid object reference churn in deps
   const tenantId = tenant?.id ?? null;

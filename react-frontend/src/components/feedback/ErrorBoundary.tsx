@@ -116,7 +116,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       }
 
       return (
-        <div role="alert" className="min-h-screen flex items-center justify-center p-4">
+        <div
+          role="alert"
+          data-prerender-error-boundary="true"
+          className="min-h-screen flex items-center justify-center p-4"
+        >
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}

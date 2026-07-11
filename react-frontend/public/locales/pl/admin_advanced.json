@@ -468,6 +468,19 @@
     "provider_sendgrid": "Wyślij siatkę",
     "provider_smtp": "SMTP",
     "prerender": {
+      "reset_all": {
+        "button": "Zresetuj i przebuduj wszystko",
+        "title": "Zresetuj i przebuduj wszystkie migawki",
+        "description": "Anuluj starsze zadania prerenderowania i rozpocznij nową przebudowę wszystkich stron publicznych z uwzględnieniem tenantów, w tym strony docelowej, stron niestandardowych i treści bloga każdego tenantu.",
+        "safety": "Bieżąca kompletna pamięć podręczna pozostanie aktywna, dopóki nowy plan tras nie zostanie pomyślnie wyrenderowany i zweryfikowany. Nieudane przebudowy nie zastępują ostatniej znanej poprawnej generacji.",
+        "confirmation_label": "Potwierdzenie",
+        "confirmation_help": "Wpisz {{phrase}}, aby kontynuować.",
+        "confirmation_phrase": "ZRESETUJ WSZYSTKIE MIGAWKI",
+        "cancel": "Anuluj",
+        "confirm": "Rozpocznij nową przebudowę",
+        "queued": "Dodano do kolejki nową przebudowę #{{id}} — tenanty: {{tenants}}, trasy: {{routes}}.",
+        "failed": "Nie udało się zaplanować nowej przebudowy. Nie usunięto żadnych aktywnych migawek."
+      },
       "description": "Migawki renderowane przez serwer tylko przez boty. Monitoruj zasięg, wykrywaj nieaktualności i wymuszaj odświeżenia.",
       "guide": {
         "title": "Przewodnik w prostym języku angielskim",
@@ -664,6 +677,8 @@
         },
         "no_output": "(brak wyjścia)",
         "purge_ungated": {
+          "confirm_title": "Usunąć nieoczekiwane migawki?",
+          "confirm_message": "Spowoduje to trwałe usunięcie zapisanych stron znajdujących się poza bieżącym planem tras ich tenantu. Potwierdź, że podgląd został najpierw sprawdzony.",
           "description": "Przeglądaj migawki, których trasa nie znajduje się w oczekiwanym zestawie dzierżawcy. Często po wyłączeniu funkcji lub w celu oczyszczenia tras statycznych wstępnie renderowanych bez flag funkcji. Trasy zawartości dynamicznej pozostają w spokoju.",
           "title": "Usuń niezablokowane migawki (czyszczenie 404 dla poszczególnych dzierżawców)"
         },
@@ -730,7 +745,10 @@
         "issue_count_many": "Problemy z {{count}}"
       },
       "inventory": {
+        "truncated": "Spis osiągnął bezpieczny limit liczby migawek: {{count}}. Zawęź filtr tenantów przed wykonaniem operacji zbiorczej.",
+        "unknown_tenant": "Nieznany tenant",
         "actions": {
+          "open_live_url": "Otwórz stronę online (nie zapisaną migawkę)",
           "close": "Zamknąć",
           "inspect": "Sprawdzać",
           "inspect_snapshot": "Sprawdź {{path}}",
@@ -784,6 +802,8 @@
           "bulk_recache_other": "Nieprawidłowe migawki {{count}} i pamięć podręczna w kolejce"
         },
         "inspect": {
+          "load_failed": "Nie udało się wczytać tej migawki. Poprzednie dane inspekcji zostały wyczyszczone.",
+          "no_snapshot": "Nie wybrano migawki.",
           "age": "Wiek",
           "all_valid": "wszystko aktualne",
           "asset_references": "Referencje zasobów ({{count}})",
@@ -871,6 +891,7 @@
           "duration": "Czas trwania",
           "error": "Błąd",
           "exit_code": "Kod wyjścia",
+          "fence_ready_at": "Blokada publikowania gotowa",
           "finished_at": "Skończono o godz",
           "log_tail": "Kłoda (ogon)",
           "queued_at": "W kolejce o godz",
@@ -892,6 +913,7 @@
           "cancelled": "Odwołany",
           "failed": "Przegrany",
           "partial": "Częściowy",
+          "pending_fence": "Aktywowanie blokady",
           "queued": "W kolejce",
           "running": "Działanie",
           "status": "Stan",
@@ -920,6 +942,16 @@
         },
         "scope": {
           "all_tenants": "wszyscy najemcy"
+        },
+        "statuses": {
+          "cancelled": "Anulowane",
+          "claimed": "Przejęte",
+          "failed": "Nieudane",
+          "partial": "Częściowe",
+          "pending_fence": "Aktywowanie blokady",
+          "queued": "W kolejce",
+          "running": "W toku",
+          "succeeded": "Zakończone"
         },
         "table_aria": "Praca"
       },
@@ -976,6 +1008,7 @@
       "live_connected": "Połączono aktualizacje na żywo",
       "audit": {
         "actions": {
+          "reset_all": "Zresetuj i przebuduj wszystko",
           "auto_recache": "Auto-recache",
           "cancel": "Anuluj zadanie",
           "detect_drift": "Wykryj dryf",
@@ -1000,6 +1033,10 @@
           "when": "Gdy"
         },
         "empty": "Brak wpisów audytu.",
+        "errors": {
+          "export": "Nie udało się wyeksportować historii audytu",
+          "load": "Nie udało się wczytać historii audytu"
+        },
         "fallbacks": {
           "all": "Wszystko",
           "system": "system"
@@ -1018,11 +1055,13 @@
       },
       "overview": {
         "actions": {
+          "download_metrics": "Pobierz metryki",
           "queue_job": "Praca w kolejce",
           "refresh": "Odświeżać"
         },
         "empty_summary": "Brak podsumowania.",
         "errors": {
+          "download_metrics": "Nie udało się pobrać metryk",
           "enqueue_job": "Nie udało się umieścić zadania w kolejce",
           "load_summary": "Nie udało się załadować podsumowania"
         },
@@ -1037,6 +1076,7 @@
           "title": "Wymuś odświeżenie"
         },
         "health": {
+          "cache_read_only": "Pamięć podręczna jest tylko do odczytu",
           "cache_unreachable": "Pamięć podręczna nieosiągalna",
           "healthy": "Zdrowy",
           "missing": "Brak {{count}}",
@@ -1051,6 +1091,7 @@
           "stale_other": "{{count}} jest nieaktualny"
         },
         "hints": {
+          "unexpected": "Zapisane migawki spoza bieżących planów tras tenantów",
           "active_jobs": "{{count}} aktywny",
           "aging": "{{count}} starzenie się (>7 dni)",
           "asset_broken": "Referencje martwe /aktywa/*",
@@ -1079,6 +1120,7 @@
           "coverage": "Zasięg",
           "metrics": "Metryka",
           "missing": "Zaginiony",
+          "unexpected": "Nieoczekiwane",
           "queued_jobs": "Zadania w kolejce",
           "recent_failures": "Ostatnie awarie",
           "status": "Stan"
@@ -1232,9 +1274,10 @@
           "tenant_slug": "bank czasu"
         },
         "sections": {
-          "dynamic_routes": "Trasy dynamiczne (ograniczone do 1000)",
+          "dynamic_routes": "Trasy dynamiczne",
           "static_routes": "Trasy statyczne"
         },
+        "tenant": "Instancja {{slug}} (#{{id}})",
         "title": "Eksplorator mapy witryny"
       },
       "readonly": {
@@ -1294,6 +1337,8 @@
           "sitemap": "Sitemap"
         },
         "sections": {
+          "attention_limited": "Wyświetlono {{shown}} z {{total}} zapisanych migawek wymagających uwagi.",
+          "missing_routes": "Brakujące trasy ({{count}})",
           "attention": "Przedmioty wymagające uwagi"
         },
         "empty": "Wprowadź informację o najemcy, aby sprawdzić jej plan trasy i zapisane migawki.",

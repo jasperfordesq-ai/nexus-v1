@@ -153,7 +153,9 @@ function ScrollAffordance({
     const el = getScroller();
     if (!el) return;
     const selected = el.querySelector('[data-slot="tabs-tab"][data-selected="true"]') as HTMLElement | null;
-    selected?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
+    if (selected && typeof selected.scrollIntoView === 'function') {
+      selected.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
+    }
     const id = window.setTimeout(update, 350);
     return () => window.clearTimeout(id);
   }, [selectedKey, getScroller, update]);

@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\PrerenderContentInvalidator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
@@ -145,6 +146,7 @@ class ResourceCategoryController extends BaseApiController
         ]);
 
         $category = $this->getCategoryById($categoryId, $tenantId);
+        app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, ['/resources']);
 
         return $this->respondWithData($category, null, 201);
     }
@@ -207,6 +209,9 @@ class ResourceCategoryController extends BaseApiController
         }
 
         $category = $this->getCategoryById($id, $tenantId);
+        if ($updates !== []) {
+            app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, ['/resources']);
+        }
 
         return $this->respondWithData($category);
     }
@@ -254,6 +259,8 @@ class ResourceCategoryController extends BaseApiController
             ->where('id', $id)
             ->where('tenant_id', $tenantId)
             ->delete();
+
+        app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, ['/resources']);
 
         return $this->noContent();
     }
@@ -315,6 +322,7 @@ class ResourceCategoryController extends BaseApiController
             }
 
             DB::commit();
+            app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, ['/resources']);
         } catch (\Throwable $e) {
             DB::rollBack();
             return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api.failed_reorder_resources'), null, 500);

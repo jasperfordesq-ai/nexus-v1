@@ -101,6 +101,18 @@ class PrerenderPlanRoutesTest extends TestCase
         return null;
     }
 
+    private function expectValidHomepageSitemap(): void
+    {
+        $this->sitemapMock
+            ->shouldReceive('generateForTenant')
+            ->andReturnUsing(static function (int $tenantId, ?string $baseUrl): string {
+                $home = rtrim((string) $baseUrl, '/') . '/';
+                return '<urlset><url><loc>'
+                    . htmlspecialchars($home, ENT_XML1 | ENT_QUOTES, 'UTF-8')
+                    . '</loc></url></urlset>';
+            });
+    }
+
     // =========================================================================
     // Output structure always contains a "tenants" key.
     // =========================================================================
@@ -108,7 +120,7 @@ class PrerenderPlanRoutesTest extends TestCase
     public function test_output_is_valid_json_with_tenants_key(): void
     {
         $this->prerenderMock->shouldReceive('routesForTenant')->andReturn([]);
-        $this->sitemapMock->shouldReceive('generateForTenant')->andReturn('<urlset></urlset>');
+        $this->expectValidHomepageSitemap();
 
         $decoded = $this->callAndDecode();
         $this->assertArrayHasKey('tenants', $decoded);
@@ -121,7 +133,7 @@ class PrerenderPlanRoutesTest extends TestCase
     public function test_plan_includes_test_tenant_with_correct_fields(): void
     {
         $this->prerenderMock->shouldReceive('routesForTenant')->andReturn(['/']);
-        $this->sitemapMock->shouldReceive('generateForTenant')->andReturn('<urlset></urlset>');
+        $this->expectValidHomepageSitemap();
 
         $decoded = $this->callAndDecode();
         $row = $this->findRow($decoded);
@@ -143,7 +155,7 @@ class PrerenderPlanRoutesTest extends TestCase
         $staticRoutes = ['/', '/about', '/privacy'];
 
         $this->prerenderMock->shouldReceive('routesForTenant')->andReturn($staticRoutes);
-        $this->sitemapMock->shouldReceive('generateForTenant')->andReturn('<urlset></urlset>');
+        $this->expectValidHomepageSitemap();
 
         $decoded = $this->callAndDecode(['--tenant' => self::TENANT_SLUG]);
         $row = $decoded['tenants'][0] ?? null;
@@ -161,7 +173,7 @@ class PrerenderPlanRoutesTest extends TestCase
     public function test_include_static_off_skips_routes_for_tenant(): void
     {
         $this->prerenderMock->shouldNotReceive('routesForTenant');
-        $this->sitemapMock->shouldReceive('generateForTenant')->andReturn('<urlset></urlset>');
+        $this->expectValidHomepageSitemap();
 
         $this->artisan('prerender:plan-routes', ['--include-static' => '0'])
             ->assertExitCode(0);
@@ -220,7 +232,7 @@ class PrerenderPlanRoutesTest extends TestCase
     public function test_tenant_filter_limits_to_one_tenant(): void
     {
         $this->prerenderMock->shouldReceive('routesForTenant')->andReturn(['/']);
-        $this->sitemapMock->shouldReceive('generateForTenant')->andReturn('<urlset></urlset>');
+        $this->expectValidHomepageSitemap();
 
         $decoded = $this->callAndDecode(['--tenant' => self::TENANT_SLUG]);
 
@@ -243,10 +255,10 @@ class PrerenderPlanRoutesTest extends TestCase
     }
 
     // =========================================================================
-    // --limit cap respected: routes list never exceeds the limit.
+    // --limit cap is fail-closed: a partial tenant plan is never emitted.
     // =========================================================================
 
-    public function test_limit_caps_routes_per_tenant(): void
+    public function test_limit_rejects_partial_tenant_plan(): void
     {
         // Static floor with 3 routes.
         $this->prerenderMock->shouldReceive('routesForTenant')->andReturn(['/', '/about', '/privacy']);
@@ -263,17 +275,25 @@ class PrerenderPlanRoutesTest extends TestCase
 
         $this->sitemapMock->shouldReceive('generateForTenant')->andReturn($sitemapXml);
 
-        $decoded = $this->callAndDecode(['--tenant' => self::TENANT_SLUG, '--limit' => '5']);
-        $row     = $decoded['tenants'][0] ?? null;
-        $this->assertIsArray($row);
-        $this->assertLessThanOrEqual(5, count($row['routes']), 'Routes must not exceed --limit');
+        $exit = Artisan::call('prerender:plan-routes', [
+            '--tenant' => self::TENANT_SLUG,
+            '--limit' => '5',
+        ]);
+
+        $this->assertSame(
+            \Illuminate\Console\Command::FAILURE,
+            $exit,
+            'Reaching the route limit must fail instead of emitting a partial tenant plan'
+        );
+        $this->assertStringContainsString('refusing to emit a partial plan', Artisan::output());
+        $this->assertNull(json_decode(trim(Artisan::output()), true));
     }
 
     // =========================================================================
-    // Sitemap error is swallowed; tenant still appears with static routes only.
+    // Sitemap errors fail closed; no incomplete static-only plan is emitted.
     // =========================================================================
 
-    public function test_sitemap_error_falls_back_to_static_routes(): void
+    public function test_sitemap_error_fails_without_emitting_partial_plan(): void
     {
         $staticRoutes = ['/', '/about'];
 
@@ -281,13 +301,35 @@ class PrerenderPlanRoutesTest extends TestCase
         $this->sitemapMock->shouldReceive('generateForTenant')
             ->andThrow(new \RuntimeException('sitemap unavailable'));
 
-        $decoded = $this->callAndDecode(['--tenant' => self::TENANT_SLUG]);
-        $this->assertNotEmpty($decoded['tenants']);
+        $exit = Artisan::call('prerender:plan-routes', ['--tenant' => self::TENANT_SLUG]);
+        $this->assertSame(\Illuminate\Console\Command::FAILURE, $exit);
+        $this->assertNull(json_decode(trim(Artisan::output()), true));
+    }
 
-        $row = $decoded['tenants'][0];
-        foreach ($staticRoutes as $route) {
-            $this->assertContains($route, $row['routes'], "Static route {$route} must survive sitemap error");
-        }
+    public function test_sitemap_without_locations_fails_closed(): void
+    {
+        $this->prerenderMock->shouldReceive('routesForTenant')->andReturn(['/']);
+        $this->sitemapMock->shouldReceive('generateForTenant')->andReturn('<urlset></urlset>');
+
+        $exit = Artisan::call('prerender:plan-routes', ['--tenant' => self::TENANT_SLUG]);
+
+        $this->assertSame(\Illuminate\Console\Command::FAILURE, $exit);
+        $this->assertStringContainsString('contains no route locations', Artisan::output());
+        $this->assertNull(json_decode(trim(Artisan::output()), true));
+    }
+
+    public function test_sitemap_with_only_off_host_locations_fails_closed(): void
+    {
+        $this->prerenderMock->shouldReceive('routesForTenant')->andReturn(['/']);
+        $this->sitemapMock->shouldReceive('generateForTenant')->andReturn(
+            '<urlset><url><loc>https://wrong-tenant.example/blog/post</loc></url></urlset>'
+        );
+
+        $exit = Artisan::call('prerender:plan-routes', ['--tenant' => self::TENANT_SLUG]);
+
+        $this->assertSame(\Illuminate\Console\Command::FAILURE, $exit);
+        $this->assertStringContainsString('wrong scheme or host', Artisan::output());
+        $this->assertNull(json_decode(trim(Artisan::output()), true));
     }
 
     // =========================================================================
@@ -317,7 +359,7 @@ class PrerenderPlanRoutesTest extends TestCase
         );
 
         $this->prerenderMock->shouldReceive('routesForTenant')->andReturn(['/']);
-        $this->sitemapMock->shouldReceive('generateForTenant')->andReturn('<urlset></urlset>');
+        $this->expectValidHomepageSitemap();
 
         $decoded = $this->callAndDecode(['--tenant' => $domainSlug]);
         $this->assertNotEmpty($decoded['tenants']);
@@ -334,7 +376,7 @@ class PrerenderPlanRoutesTest extends TestCase
     public function test_no_domain_tenant_uses_app_host_and_slug_prefix(): void
     {
         $this->prerenderMock->shouldReceive('routesForTenant')->andReturn(['/']);
-        $this->sitemapMock->shouldReceive('generateForTenant')->andReturn('<urlset></urlset>');
+        $this->expectValidHomepageSitemap();
 
         $decoded = $this->callAndDecode(['--tenant' => self::TENANT_SLUG]);
         $row     = $decoded['tenants'][0] ?? null;
@@ -345,5 +387,54 @@ class PrerenderPlanRoutesTest extends TestCase
         // Host must be a non-empty, non-slug string.
         $this->assertNotEmpty($row['host']);
         $this->assertNotSame(self::TENANT_SLUG, $row['host']);
+    }
+
+    public function test_child_with_empty_domain_inherits_active_parent_domain(): void
+    {
+        $parentId = 99718;
+        $childId = 99719;
+        $childSlug = 'child-plan-99719';
+        $parentDomain = 'parent-99718.example.com';
+
+        DB::table('tenants')->updateOrInsert(
+            ['id' => $parentId],
+            [
+                'name' => 'Parent Plan Tenant 99718',
+                'slug' => 'parent-plan-99718',
+                'domain' => $parentDomain,
+                'is_active' => 1,
+                'depth' => 0,
+                'allows_subtenants' => 1,
+                'features' => '{}',
+                'configuration' => '{"modules":{}}',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+        DB::table('tenants')->updateOrInsert(
+            ['id' => $childId],
+            [
+                'name' => 'Child Plan Tenant 99719',
+                'slug' => $childSlug,
+                'domain' => '',
+                'parent_id' => $parentId,
+                'is_active' => 1,
+                'depth' => 1,
+                'allows_subtenants' => 0,
+                'features' => '{}',
+                'configuration' => '{"modules":{}}',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        );
+
+        $this->prerenderMock->shouldReceive('routesForTenant')->andReturn(['/']);
+        $this->expectValidHomepageSitemap();
+
+        $decoded = $this->callAndDecode(['--tenant' => $childSlug]);
+        $row = $decoded['tenants'][0] ?? null;
+        $this->assertIsArray($row);
+        $this->assertSame($parentDomain, $row['host']);
+        $this->assertSame('/' . $childSlug, $row['prefix']);
     }
 }

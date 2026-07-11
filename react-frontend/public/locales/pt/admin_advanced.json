@@ -468,6 +468,19 @@
     "provider_sendgrid": "SendGrid",
     "provider_smtp": "SMTP",
     "prerender": {
+      "reset_all": {
+        "button": "Redefinir e reconstruir tudo",
+        "title": "Redefinir e reconstruir todos os snapshots",
+        "description": "Cancele as tarefas de pré-renderização anteriores e inicie uma nova reconstrução de todas as páginas públicas, específica para cada locatário, incluindo a página de destino, as páginas personalizadas e o conteúdo do blog de cada locatário.",
+        "safety": "O cache completo atual permanece ativo até que o novo plano de rotas seja renderizado e validado com sucesso. Reconstruções com falha não substituem a última geração válida.",
+        "confirmation_label": "Confirmação",
+        "confirmation_help": "Digite {{phrase}} para continuar.",
+        "confirmation_phrase": "REDEFINIR TODOS OS SNAPSHOTS",
+        "cancel": "Cancelar",
+        "confirm": "Iniciar nova reconstrução",
+        "queued": "Nova reconstrução #{{id}} enfileirada para {{tenants}} locatários e {{routes}} rotas.",
+        "failed": "Não foi possível agendar a nova reconstrução. Nenhum snapshot ativo foi removido."
+      },
       "description": "Instantâneos renderizados pelo servidor somente para bot. Monitore a cobertura, detecte inatividade e force atualizações.",
       "guide": {
         "title": "Guia em inglês simples",
@@ -656,6 +669,8 @@
         },
         "no_output": "(sem saída)",
         "purge_ungated": {
+          "confirm_title": "Remover snapshots inesperados?",
+          "confirm_message": "Isso exclui permanentemente as páginas salvas que não fazem parte do plano de rotas atual do respectivo locatário. Confirme que revisou primeiro a prévia.",
           "description": "Varrer instantâneos cuja rota não está em um conjunto esperado do locatário. Comum após desativar um recurso ou para limpeza de rotas estáticas pré-renderizadas sem sinalizadores de recurso. As rotas de conteúdo dinâmico são deixadas de lado.",
           "title": "Limpar snapshots não bloqueados (limpeza 404 por locatário)"
         },
@@ -718,7 +733,10 @@
         "issue_count_many": "Problemas com {{count}}"
       },
       "inventory": {
+        "truncated": "O inventário atingiu o limite de segurança de {{count}} snapshots. Restrinja o filtro de locatários antes de executar uma ação em massa.",
+        "unknown_tenant": "Locatário desconhecido",
         "actions": {
+          "open_live_url": "Abrir página online (não o snapshot salvo)",
           "close": "Fechar",
           "inspect": "Inspecionar",
           "inspect_snapshot": "Inspecione {{path}}",
@@ -770,6 +788,8 @@
           "bulk_recache_other": "Instantâneos {{count}} invalidados e recache em fila"
         },
         "inspect": {
+          "load_failed": "Não foi possível carregar este snapshot. Os dados da inspeção anterior foram limpos.",
+          "no_snapshot": "Nenhum snapshot está selecionado.",
           "age": "Idade",
           "all_valid": "tudo válido",
           "asset_references": "Referências de ativos ({{count}})",
@@ -852,6 +872,7 @@
           "duration": "Duração",
           "error": "Erro",
           "exit_code": "Código de saída",
+          "fence_ready_at": "Barreira de publicação pronta",
           "finished_at": "Terminou em",
           "log_tail": "Registro (cauda)",
           "queued_at": "Na fila em",
@@ -873,6 +894,7 @@
           "cancelled": "Cancelado",
           "failed": "Fracassado",
           "partial": "Parcial",
+          "pending_fence": "A ativar a barreira",
           "queued": "Na fila",
           "running": "Correndo",
           "status": "Estado",
@@ -900,6 +922,16 @@
         },
         "scope": {
           "all_tenants": "todos os inquilinos"
+        },
+        "statuses": {
+          "cancelled": "Cancelado",
+          "claimed": "Assumido",
+          "failed": "Falhou",
+          "partial": "Parcial",
+          "pending_fence": "A ativar a barreira",
+          "queued": "Na fila",
+          "running": "Em execução",
+          "succeeded": "Concluído"
         },
         "table_aria": "Empregos"
       },
@@ -955,6 +987,7 @@
       "live_connected": "Atualizações ao vivo conectadas",
       "audit": {
         "actions": {
+          "reset_all": "Redefinir e reconstruir tudo",
           "auto_recache": "Auto-recache",
           "cancel": "Cancelar trabalho",
           "detect_drift": "Detectar desvio",
@@ -979,6 +1012,10 @@
           "when": "Quando"
         },
         "empty": "Nenhuma entrada de auditoria.",
+        "errors": {
+          "export": "Não foi possível exportar o histórico de auditoria",
+          "load": "Não foi possível carregar o histórico de auditoria"
+        },
         "fallbacks": {
           "all": "todos",
           "system": "sistema"
@@ -997,11 +1034,13 @@
       },
       "overview": {
         "actions": {
+          "download_metrics": "Baixar métricas",
           "queue_job": "Trabalho na fila",
           "refresh": "Atualizar"
         },
         "empty_summary": "Nenhum resumo disponível.",
         "errors": {
+          "download_metrics": "Não foi possível baixar as métricas",
           "enqueue_job": "Falha ao enfileirar o trabalho",
           "load_summary": "Falha ao carregar o resumo"
         },
@@ -1016,6 +1055,7 @@
           "title": "Forçar atualização"
         },
         "health": {
+          "cache_read_only": "O cache é somente leitura",
           "cache_unreachable": "Cache inacessível",
           "healthy": "Saudável",
           "missing": "{{count}} ausente",
@@ -1028,6 +1068,7 @@
           "stale_other": "{{count}} obsoleto"
         },
         "hints": {
+          "unexpected": "Snapshots salvos fora dos planos de rotas atuais dos locatários",
           "active_jobs": "{{count}} ativo",
           "aging": "Envelhecimento {{count}} (>7d)",
           "asset_broken": "Referências mortas /assets/*",
@@ -1054,6 +1095,7 @@
           "coverage": "Cobertura",
           "metrics": "Métricas",
           "missing": "Ausente",
+          "unexpected": "Inesperados",
           "queued_jobs": "Trabalhos em fila",
           "recent_failures": "Falhas recentes",
           "status": "Estado"
@@ -1196,9 +1238,10 @@
           "tenant_slug": "banco de horas"
         },
         "sections": {
-          "dynamic_routes": "Rotas dinâmicas (limitadas a 1.000)",
+          "dynamic_routes": "Rotas dinâmicas",
           "static_routes": "Rotas estáticas"
         },
+        "tenant": "Locatário {{slug}} (#{{id}})",
         "title": "Explorador de mapa do site"
       },
       "readonly": {
@@ -1257,6 +1300,8 @@
           "sitemap": "Sitemap"
         },
         "sections": {
+          "attention_limited": "Exibindo {{shown}} de {{total}} snapshots salvos que precisam de atenção.",
+          "missing_routes": "Rotas ausentes ({{count}})",
           "attention": "Itens que precisam de atenção"
         },
         "empty": "Insira um slug de locatário para inspecionar seu plano de rota e instantâneos salvos.",

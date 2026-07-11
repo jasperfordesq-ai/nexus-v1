@@ -15,11 +15,13 @@ import { useTranslation } from 'react-i18next';
 import { PageMeta } from '@/components/seo';
 import { LandingPageRenderer } from '@/components/landing';
 import { useTenant } from '@/contexts/TenantContext';
+import { usePrerenderReady } from '@/hooks/usePrerenderReady';
 import { MasterTenantChooser } from './MasterTenantChooser';
 
 export function HomePage() {
   const { t } = useTranslation('public');
-  const { tenant } = useTenant();
+  const { tenant, isLoading, error } = useTenant();
+  usePrerenderReady(!isLoading && tenant != null && error === null);
 
   // The master tenant (id 1) is the platform root, not a working community.
   // Its home is a "Choose your community" directory so visitors who land here

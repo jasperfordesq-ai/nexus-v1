@@ -468,6 +468,19 @@
     "provider_sendgrid": "EnviarGrid",
     "provider_smtp": "SMTP",
     "prerender": {
+      "reset_all": {
+        "button": "Restablecer y reconstruir todo",
+        "title": "Restablecer y reconstruir todas las instantáneas",
+        "description": "Cancele las tareas de prerenderizado anteriores e inicie una nueva reconstrucción de todas las páginas públicas, adaptada a cada inquilino, incluidas la página de destino, las páginas personalizadas y el contenido del blog de cada inquilino.",
+        "safety": "La caché completa actual permanece activa hasta que el nuevo plan de rutas se renderice y valide correctamente. Las reconstrucciones fallidas no sustituyen la última generación válida.",
+        "confirmation_label": "Confirmación",
+        "confirmation_help": "Escriba {{phrase}} para continuar.",
+        "confirmation_phrase": "RESTABLECER TODAS LAS INSTANTÁNEAS",
+        "cancel": "Cancelar",
+        "confirm": "Iniciar reconstrucción desde cero",
+        "queued": "La nueva reconstrucción #{{id}} se puso en cola para {{tenants}} inquilinos y {{routes}} rutas.",
+        "failed": "No se pudo programar la nueva reconstrucción. No se eliminó ninguna instantánea activa."
+      },
       "description": "Instantáneas renderizadas por el servidor solo para bots. Supervise la cobertura, detecte estancamiento y fuerce actualizaciones.",
       "guide": {
         "title": "Plain-English guide",
@@ -656,6 +669,8 @@
         },
         "no_output": "(sin salida)",
         "purge_ungated": {
+          "confirm_title": "¿Eliminar las instantáneas inesperadas?",
+          "confirm_message": "Esto elimina de forma permanente las páginas guardadas que no forman parte del plan de rutas actual del inquilino correspondiente. Confirme que primero revisó la vista previa.",
           "description": "Barrido de instantáneas cuya ruta no se encuentra en un conjunto esperado de inquilinos. Común después de desactivar una función o para limpiar rutas estáticas renderizadas previamente sin indicadores de función. Las rutas de contenido dinámico se dejan en paz.",
           "title": "Purgar instantáneas no cerradas (limpieza 404 por inquilino)"
         },
@@ -718,7 +733,10 @@
         "issue_count_many": "Problemas con {{count}}"
       },
       "inventory": {
+        "truncated": "El inventario alcanzó el límite de seguridad de {{count}} instantáneas. Restrinja el filtro de inquilinos antes de ejecutar una acción masiva.",
+        "unknown_tenant": "Inquilino desconocido",
         "actions": {
+          "open_live_url": "Abrir la página en vivo (no la instantánea guardada)",
           "close": "Cerca",
           "inspect": "Inspeccionar",
           "inspect_snapshot": "Inspeccionar {{path}}",
@@ -770,6 +788,8 @@
           "bulk_recache_other": "Instantáneas de {{count}} no validadas y recuperación de caché en cola"
         },
         "inspect": {
+          "load_failed": "No se pudo cargar esta instantánea. Se borraron los datos de la inspección anterior.",
+          "no_snapshot": "No hay ninguna instantánea seleccionada.",
           "age": "Edad",
           "all_valid": "todo válido",
           "asset_references": "Referencias de activos ({{count}})",
@@ -852,6 +872,7 @@
           "duration": "Duración",
           "error": "error",
           "exit_code": "código de salida",
+          "fence_ready_at": "Barrera de publicación lista",
           "finished_at": "Terminado en",
           "log_tail": "Registro (cola)",
           "queued_at": "En cola en",
@@ -873,6 +894,7 @@
           "cancelled": "Cancelado",
           "failed": "Fallido",
           "partial": "Parcial",
+          "pending_fence": "Activando barrera",
           "queued": "En cola",
           "running": "Correr",
           "status": "Estado",
@@ -900,6 +922,16 @@
         },
         "scope": {
           "all_tenants": "todos los inquilinos"
+        },
+        "statuses": {
+          "cancelled": "Cancelado",
+          "claimed": "Reclamado",
+          "failed": "Fallido",
+          "partial": "Parcial",
+          "pending_fence": "Activando barrera",
+          "queued": "En cola",
+          "running": "En ejecución",
+          "succeeded": "Completado"
         },
         "table_aria": "Empleos"
       },
@@ -955,6 +987,7 @@
       "live_connected": "Actualizaciones en vivo conectadas",
       "audit": {
         "actions": {
+          "reset_all": "Restablecer y reconstruir todo",
           "auto_recache": "Auto-recache",
           "cancel": "Cancel job",
           "detect_drift": "Detect drift",
@@ -979,6 +1012,10 @@
           "when": "Cuando"
         },
         "empty": "No hay entradas de auditoría.",
+        "errors": {
+          "export": "No se pudo exportar el historial de auditoría",
+          "load": "No se pudo cargar el historial de auditoría"
+        },
         "fallbacks": {
           "all": "todo",
           "system": "sistema"
@@ -997,11 +1034,13 @@
       },
       "overview": {
         "actions": {
+          "download_metrics": "Descargar métricas",
           "queue_job": "Trabajo en cola",
           "refresh": "Refrescar"
         },
         "empty_summary": "No hay resumen disponible.",
         "errors": {
+          "download_metrics": "No se pudieron descargar las métricas",
           "enqueue_job": "No se pudo poner en cola el trabajo",
           "load_summary": "No se pudo cargar el resumen"
         },
@@ -1016,6 +1055,7 @@
           "title": "Forzar actualización"
         },
         "health": {
+          "cache_read_only": "La caché es de solo lectura",
           "cache_unreachable": "Caché inalcanzable",
           "healthy": "Saludable",
           "missing": "Falta {{count}}",
@@ -1028,6 +1068,7 @@
           "stale_other": "{{count}} obsoleto"
         },
         "hints": {
+          "unexpected": "Instantáneas guardadas fuera de los planes de rutas actuales de los inquilinos",
           "active_jobs": "{{count}} activo",
           "aging": "Antigüedad del {{count}} (>7d)",
           "asset_broken": "Referencias muertas /activos/*",
@@ -1054,6 +1095,7 @@
           "coverage": "Cobertura",
           "metrics": "Métrica",
           "missing": "Desaparecido",
+          "unexpected": "Inesperadas",
           "queued_jobs": "Trabajos en cola",
           "recent_failures": "Fallos recientes",
           "status": "Estado"
@@ -1196,9 +1238,10 @@
           "tenant_slug": "banco de horas"
         },
         "sections": {
-          "dynamic_routes": "Rutas dinámicas (con un límite de 1000)",
+          "dynamic_routes": "Rutas dinámicas",
           "static_routes": "Rutas estáticas"
         },
+        "tenant": "Inquilino {{slug}} (#{{id}})",
         "title": "Explorador de mapas del sitio"
       },
       "readonly": {
@@ -1257,6 +1300,8 @@
           "sitemap": "Sitemap"
         },
         "sections": {
+          "attention_limited": "Se muestran {{shown}} de {{total}} instantáneas guardadas que requieren atención.",
+          "missing_routes": "Rutas que faltan ({{count}})",
           "attention": "Items needing attention"
         },
         "empty": "Enter a tenant slug to inspect its route plan and saved snapshots.",

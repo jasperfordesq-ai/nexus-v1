@@ -85,7 +85,7 @@ Broadcast::channel('tenant.{tenantId}.chat.{chatId}', function (User $user, int 
 Broadcast::channel('admin-prerender', function (User $user) {
     return ($user->is_super_admin ?? false)
         || ($user->is_god ?? false)
-        || ($user->role ?? null) === 'super_admin';
+        || in_array(($user->role ?? null), ['super_admin', 'god'], true);
 });
 
 // Presence channel for online members in a tenant

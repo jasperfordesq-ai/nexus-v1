@@ -468,6 +468,19 @@
     "provider_sendgrid": "送信グリッド",
     "provider_smtp": "SMTP",
     "prerender": {
+      "reset_all": {
+        "button": "すべてをリセットして再構築",
+        "title": "すべてのスナップショットをリセットして再構築",
+        "description": "古いプリレンダー処理をキャンセルし、各テナントのランディングページ、カスタムページ、ブログコンテンツを含むすべての公開ページを、テナント単位で新たに再構築します。",
+        "safety": "現在の完全なキャッシュは、新しいルートプランのレンダリングと検証が成功するまでそのまま稼働します。再構築に失敗しても、最後に正常だったキャッシュ世代は置き換えられません。",
+        "confirmation_label": "確認",
+        "confirmation_help": "{{phrase}} と入力して続行してください。",
+        "confirmation_phrase": "すべてのスナップショットをリセット",
+        "cancel": "キャンセル",
+        "confirm": "新規再構築を開始",
+        "queued": "新規再構築 #{{id}} をキューに追加しました（テナント: {{tenants}}、ルート: {{routes}}）。",
+        "failed": "新規再構築をスケジュールできませんでした。稼働中のスナップショットは削除されていません。"
+      },
       "description": "ボットのみのサーバーでレンダリングされたスナップショット。カバレッジを監視し、古くなったものを検出し、強制的に更新します。",
       "guide": {
         "title": "Plain-English guide",
@@ -640,6 +653,8 @@
         },
         "no_output": "(出力なし)",
         "purge_ungated": {
+          "confirm_title": "想定外のスナップショットを削除しますか？",
+          "confirm_message": "これにより、各テナントの現在のルートプラン外にある保存済みページが完全に削除されます。先にプレビューを確認済みであることを確認してください。",
           "description": "ルートがテナントの予期されるセットに含まれていないスナップショットをスイープします。機能をオフに切り替えた後、または機能フラグなしで事前レンダリングされた静的ルートのクリーンアップによく使用されます。動的コンテンツのルートはそのまま残されます。",
           "title": "ゲートされていないスナップショットのパージ (テナントごとの 404 クリーンアップ)"
         },
@@ -696,7 +711,10 @@
         }
       },
       "inventory": {
+        "truncated": "インベントリがスナップショット {{count}} 件の安全上限に達しました。一括操作を行う前にテナントフィルターを絞り込んでください。",
+        "unknown_tenant": "不明なテナント",
         "actions": {
+          "open_live_url": "公開中のページを開く（保存済みスナップショットではありません）",
           "close": "近い",
           "inspect": "検査する",
           "inspect_snapshot": "{{path}} を検査する",
@@ -744,6 +762,8 @@
           "bulk_recache_other": "無効化された {{count}} スナップショットとキューに入れられた再キャッシュ"
         },
         "inspect": {
+          "load_failed": "このスナップショットを読み込めませんでした。以前の検査データは消去されました。",
+          "no_snapshot": "スナップショットが選択されていません。",
           "age": "年",
           "all_valid": "すべて有効です",
           "asset_references": "アセット参照 ({{count}})",
@@ -816,6 +836,7 @@
           "duration": "間隔",
           "error": "エラー",
           "exit_code": "終了コード",
+          "fence_ready_at": "公開フェンス準備完了",
           "finished_at": "終了時刻",
           "log_tail": "ログ（尾部）",
           "queued_at": "でキューに入れられました",
@@ -837,6 +858,7 @@
           "cancelled": "キャンセル",
           "failed": "失敗した",
           "partial": "部分的",
+          "pending_fence": "フェンスを有効化中",
           "queued": "キューに入れられました",
           "running": "ランニング",
           "status": "状態",
@@ -862,6 +884,16 @@
         },
         "scope": {
           "all_tenants": "すべてのテナント"
+        },
+        "statuses": {
+          "cancelled": "キャンセル済み",
+          "claimed": "取得済み",
+          "failed": "失敗",
+          "partial": "一部完了",
+          "pending_fence": "フェンスを有効化中",
+          "queued": "キュー待ち",
+          "running": "実行中",
+          "succeeded": "成功"
         },
         "table_aria": "求人"
       },
@@ -915,6 +947,7 @@
       "live_connected": "ライブアップデートが接続されています",
       "audit": {
         "actions": {
+          "reset_all": "すべてをリセットして再構築",
           "auto_recache": "Auto-recache",
           "cancel": "Cancel job",
           "detect_drift": "Detect drift",
@@ -939,6 +972,10 @@
           "when": "いつ"
         },
         "empty": "監査エントリはありません。",
+        "errors": {
+          "export": "監査履歴をエクスポートできませんでした",
+          "load": "監査履歴を読み込めませんでした"
+        },
         "fallbacks": {
           "all": "全て",
           "system": "システム"
@@ -957,11 +994,13 @@
       },
       "overview": {
         "actions": {
+          "download_metrics": "メトリクスをダウンロード",
           "queue_job": "ジョブをキューに入れる",
           "refresh": "リフレッシュ"
         },
         "empty_summary": "要約はありません。",
         "errors": {
+          "download_metrics": "メトリクスをダウンロードできませんでした",
           "enqueue_job": "ジョブをキューに入れることができませんでした",
           "load_summary": "概要の読み込みに失敗しました"
         },
@@ -976,6 +1015,7 @@
           "title": "強制リフレッシュ"
         },
         "health": {
+          "cache_read_only": "キャッシュは読み取り専用です",
           "cache_unreachable": "キャッシュに到達できません",
           "healthy": "健康",
           "missing": "{{count}} がありません",
@@ -984,6 +1024,7 @@
           "stale_other": "{{count}} が古い"
         },
         "hints": {
+          "unexpected": "現在のテナントルートプラン外に保存されているスナップショット",
           "active_jobs": "{{count}} アクティブ",
           "aging": "{{count}} のエージング (7 日以上)",
           "asset_broken": "参照が無効になっています /assets/*",
@@ -1006,6 +1047,7 @@
           "coverage": "カバレッジ",
           "metrics": "メトリクス",
           "missing": "ない",
+          "unexpected": "想定外",
           "queued_jobs": "キューに入れられたジョブ",
           "recent_failures": "最近の失敗",
           "status": "状態"
@@ -1126,9 +1168,10 @@
           "tenant_slug": "時間銀行"
         },
         "sections": {
-          "dynamic_routes": "動的ルート (上限は 1,000)",
+          "dynamic_routes": "動的ルート",
           "static_routes": "静的ルート"
         },
+        "tenant": "テナント {{slug}}（#{{id}}）",
         "title": "サイトマップエクスプローラー"
       },
       "readonly": {
@@ -1185,6 +1228,8 @@
           "sitemap": "Sitemap"
         },
         "sections": {
+          "attention_limited": "対応が必要な保存済みスナップショット全 {{total}} 件のうち {{shown}} 件を表示しています。",
+          "missing_routes": "不足しているルート（{{count}}）",
           "attention": "Items needing attention"
         },
         "empty": "Enter a tenant slug to inspect its route plan and saved snapshots.",

@@ -7,7 +7,9 @@
 namespace Tests\Laravel\Feature\Controllers;
 
 use App\Models\User;
+use App\Services\PrerenderContentInvalidator;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -139,6 +141,161 @@ class AdminConfigControllerTest extends TestCase
         $response = $this->apiGet('/v2/admin/settings');
 
         $response->assertStatus(403);
+    }
+
+    public function test_settings_validate_every_field_before_mutating_tenant_routing(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
+        Sanctum::actingAs($admin);
+        $originalSlug = (string) DB::table('tenants')->where('id', $this->testTenantId)->value('slug');
+
+        $this->apiPut('/v2/admin/settings', [
+            'slug' => 'should-not-persist',
+            'welcome_credits' => 101,
+        ])->assertStatus(422);
+
+        $this->assertSame(
+            $originalSlug,
+            (string) DB::table('tenants')->where('id', $this->testTenantId)->value('slug')
+        );
+    }
+
+    public function test_settings_reject_reserved_tenant_slug(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
+        Sanctum::actingAs($admin);
+
+        $this->apiPut('/v2/admin/settings', ['slug' => 'about'])
+            ->assertStatus(422);
+    }
+
+    public function test_routing_setting_schedules_authoritative_prerender_refresh(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
+        Sanctum::actingAs($admin);
+        $this->mock(PrerenderContentInvalidator::class, function ($mock): void {
+            $mock->shouldReceive('refreshAllOrFail')->once()->andReturn(987);
+        });
+
+        $slug = 'config-route-' . $this->testTenantId;
+        $this->apiPut('/v2/admin/settings', ['slug' => $slug])
+            ->assertStatus(200);
+
+        $this->assertSame($slug, DB::table('tenants')->where('id', $this->testTenantId)->value('slug'));
+    }
+
+    public function test_tenant_admin_cannot_change_tenant_routing_identity(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+
+        $this->apiPut('/v2/admin/settings', ['domain' => 'tenant-admin.example'])
+            ->assertStatus(403);
+    }
+
+    public function test_platform_service_host_cannot_be_claimed_as_tenant_domain(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create(['is_super_admin' => true]);
+        Sanctum::actingAs($admin);
+
+        $this->apiPut('/v2/admin/settings', ['domain' => 'api.project-nexus.ie'])
+            ->assertStatus(422);
+    }
+
+    public function test_render_affecting_setting_schedules_tenant_prerender_refresh(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+        $this->mock(PrerenderContentInvalidator::class, function ($mock): void {
+            $mock->shouldReceive('refreshTenantOrFail')
+                ->once()
+                ->with($this->testTenantId, true)
+                ->andReturn(988);
+        });
+
+        $this->apiPut('/v2/admin/settings', ['tagline' => 'Fresh tenant tagline'])
+            ->assertStatus(200);
+    }
+
+    public function test_settings_roll_back_when_durable_prerender_intent_cannot_be_written(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+        $original = DB::table('tenants')->where('id', $this->testTenantId)->value('tagline');
+        $this->mock(PrerenderContentInvalidator::class, function ($mock): void {
+            $mock->shouldReceive('refreshTenantOrFail')
+                ->once()
+                ->andThrow(new \RuntimeException('queue unavailable'));
+        });
+
+        $this->apiPut('/v2/admin/settings', ['tagline' => 'Must roll back'])
+            ->assertStatus(503)
+            ->assertJsonPath('errors.0.code', 'PRERENDER_REFRESH_FAILED');
+
+        $this->assertSame(
+            $original,
+            DB::table('tenants')->where('id', $this->testTenantId)->value('tagline')
+        );
+    }
+
+    public function test_landing_page_config_rolls_back_when_rebuild_intent_fails(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'landing_page.config'],
+            ['setting_value' => json_encode(['sections' => []]), 'setting_type' => 'json']
+        );
+        $original = DB::table('tenant_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('setting_key', 'landing_page.config')
+            ->value('setting_value');
+
+        $this->mock(PrerenderContentInvalidator::class, function ($mock): void {
+            $mock->shouldReceive('refreshTenantOrFail')
+                ->once()
+                ->with($this->testTenantId, true)
+                ->andThrow(new \RuntimeException('queue unavailable'));
+        });
+
+        $this->apiPut('/v2/admin/config/landing-page', [
+            'config' => [
+                'sections' => [[
+                    'id' => 'hero',
+                    'type' => 'hero',
+                    'enabled' => true,
+                    'order' => 0,
+                ]],
+            ],
+        ])->assertStatus(503);
+
+        $this->assertSame(
+            $original,
+            DB::table('tenant_settings')
+                ->where('tenant_id', $this->testTenantId)
+                ->where('setting_key', 'landing_page.config')
+                ->value('setting_value')
+        );
+    }
+
+    public function test_feature_toggle_rolls_back_when_rebuild_intent_fails(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->admin()->create();
+        Sanctum::actingAs($admin);
+        $original = DB::table('tenants')->where('id', $this->testTenantId)->value('features');
+        $this->mock(PrerenderContentInvalidator::class, function ($mock): void {
+            $mock->shouldReceive('refreshTenantOrFail')
+                ->once()
+                ->with($this->testTenantId, true, true)
+                ->andThrow(new \RuntimeException('queue unavailable'));
+        });
+
+        $this->apiPut('/v2/admin/config/features', [
+            'feature' => 'events',
+            'enabled' => false,
+        ])->assertStatus(503);
+
+        $this->assertSame($original, DB::table('tenants')->where('id', $this->testTenantId)->value('features'));
     }
 
     // ================================================================

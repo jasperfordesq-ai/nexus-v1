@@ -10,6 +10,7 @@ namespace App\Observers;
 
 use App\Services\PrerenderService;
 use App\Services\SitemapService;
+use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -35,7 +36,7 @@ use Illuminate\Support\Facades\Log;
  * need to be present even if a model has no per-instance public URL — the
  * base class always invalidates the index route, which is the common case.
  */
-abstract class PrerenderInvalidationObserver
+abstract class PrerenderInvalidationObserver implements ShouldHandleEventsAfterCommit
 {
     public function saved(Model $model): void
     {

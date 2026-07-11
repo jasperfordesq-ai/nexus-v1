@@ -468,6 +468,19 @@
     "provider_sendgrid": "SendGrid",
     "provider_smtp": "SMTP",
     "prerender": {
+      "reset_all": {
+        "button": "Reset and rebuild all",
+        "title": "Reset and rebuild every snapshot",
+        "description": "Cancel older prerender work and start one fresh, tenant-aware rebuild of every public page, including each tenant's landing page, custom pages, and blog content.",
+        "safety": "The current complete cache stays live unless the new route plan renders and validates successfully. Failed rebuilds do not replace the last known-good generation.",
+        "confirmation_label": "Confirmation",
+        "confirmation_help": "Type {{phrase}} to continue.",
+        "confirmation_phrase": "RESET ALL SNAPSHOTS",
+        "cancel": "Cancel",
+        "confirm": "Start fresh rebuild",
+        "queued": "Fresh rebuild #{{id}} queued for {{tenants}} tenants and {{routes}} routes.",
+        "failed": "The fresh rebuild could not be scheduled. No live snapshots were removed."
+      },
       "description": "Bot-only server-rendered snapshots. Monitor coverage, detect staleness, and force refreshes.",
       "guide": {
         "title": "Plain-English guide",
@@ -648,6 +661,8 @@
         },
         "no_output": "(no output)",
         "purge_ungated": {
+          "confirm_title": "Remove unexpected snapshots?",
+          "confirm_message": "This permanently deletes saved pages that are outside their tenant's current route plan. Confirm that you reviewed the preview first.",
           "description": "Removes saved pages that the tenant should not have, such as pages left behind after a feature was turned off. Use preview first; tenant-owned dynamic pages are protected.",
           "title": "Remove snapshots that should not exist"
         },
@@ -706,7 +721,10 @@
         }
       },
       "inventory": {
+        "truncated": "Inventory reached the {{count}}-snapshot safety limit. Narrow the tenant filter before taking bulk action.",
+        "unknown_tenant": "Unknown tenant",
         "actions": {
+          "open_live_url": "Open live page (not saved snapshot)",
           "close": "Close",
           "inspect": "Inspect",
           "inspect_snapshot": "Inspect {{path}}",
@@ -756,6 +774,8 @@
           "bulk_recache_other": "Invalidated {{count}} snapshots and queued recache"
         },
         "inspect": {
+          "load_failed": "This snapshot could not be loaded. Previous inspection data has been cleared.",
+          "no_snapshot": "No snapshot is selected.",
           "age": "Age",
           "all_valid": "all valid",
           "asset_references": "Asset references ({{count}})",
@@ -833,6 +853,7 @@
           "duration": "Duration",
           "error": "Error",
           "exit_code": "Exit code",
+          "fence_ready_at": "Publisher fence ready",
           "finished_at": "Finished at",
           "log_tail": "Log (tail)",
           "queued_at": "Queued at",
@@ -854,6 +875,7 @@
           "cancelled": "Cancelled",
           "failed": "Failed",
           "partial": "Partial",
+          "pending_fence": "Activating fence",
           "queued": "Queued",
           "running": "Running",
           "status": "Status",
@@ -880,6 +902,16 @@
         },
         "scope": {
           "all_tenants": "all tenants"
+        },
+        "statuses": {
+          "cancelled": "Cancelled",
+          "claimed": "Claimed",
+          "failed": "Failed",
+          "partial": "Partial",
+          "pending_fence": "Activating fence",
+          "queued": "Queued",
+          "running": "Running",
+          "succeeded": "Succeeded"
         },
         "table_aria": "Jobs"
       },
@@ -934,6 +966,7 @@
       "live_connected": "Live updates connected",
       "audit": {
         "actions": {
+          "reset_all": "Reset and rebuild all",
           "auto_recache": "Auto-recache",
           "cancel": "Cancel job",
           "detect_drift": "Detect drift",
@@ -958,6 +991,10 @@
           "when": "When"
         },
         "empty": "No audit entries.",
+        "errors": {
+          "export": "Failed to export audit history",
+          "load": "Failed to load audit history"
+        },
         "fallbacks": {
           "all": "all",
           "system": "system"
@@ -976,11 +1013,13 @@
       },
       "overview": {
         "actions": {
+          "download_metrics": "Download metrics",
           "queue_job": "Queue job",
           "refresh": "Refresh"
         },
         "empty_summary": "No summary available.",
         "errors": {
+          "download_metrics": "Failed to download metrics",
           "enqueue_job": "Failed to enqueue job",
           "load_summary": "Failed to load summary"
         },
@@ -995,6 +1034,7 @@
           "title": "Queue a refresh"
         },
         "health": {
+          "cache_read_only": "Cache is read-only",
           "cache_unreachable": "Cache unreachable",
           "healthy": "Healthy",
           "missing": "{{count}} missing",
@@ -1005,6 +1045,7 @@
           "stale_other": "{{count}} stale"
         },
         "hints": {
+          "unexpected": "Saved snapshots outside the current tenant route plans",
           "active_jobs": "{{count}} active",
           "aging": "{{count}} aging (>7d)",
           "asset_broken": "References dead /assets/*",
@@ -1029,6 +1070,7 @@
           "coverage": "Coverage",
           "metrics": "Metrics",
           "missing": "Missing",
+          "unexpected": "Unexpected",
           "queued_jobs": "Queued jobs",
           "recent_failures": "Recent failures",
           "status": "Status"
@@ -1160,9 +1202,10 @@
           "tenant_slug": "hour-timebank"
         },
         "sections": {
-          "dynamic_routes": "Dynamic routes (capped at 1,000)",
+          "dynamic_routes": "Dynamic routes",
           "static_routes": "Static routes"
         },
+        "tenant": "Tenant {{slug}} (#{{id}})",
         "title": "Tenant route list"
       },
       "readonly": {
@@ -1220,6 +1263,8 @@
           "sitemap": "Sitemap"
         },
         "sections": {
+          "attention_limited": "Showing {{shown}} of {{total}} saved snapshots needing attention.",
+          "missing_routes": "Missing routes ({{count}})",
           "attention": "Items needing attention"
         },
         "empty": "Enter a tenant slug to inspect its route plan and saved snapshots.",

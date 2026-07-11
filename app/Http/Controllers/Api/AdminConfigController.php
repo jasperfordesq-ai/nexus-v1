@@ -13,6 +13,7 @@ use App\Services\JobConfigurationService;
 use App\Services\ListingConfigurationService;
 use App\Services\ListingRankingService;
 use App\Services\PodcastConfigurationService;
+use App\Services\PrerenderContentInvalidator;
 use App\Services\VolunteeringConfigurationService;
 use App\Services\MemberRankingService;
 use App\Services\RedisCache;
@@ -20,10 +21,12 @@ use App\Services\SearchService;
 use App\Services\SmartMatchingEngine;
 use App\Services\TenantFeatureConfig;
 use App\Services\TenantSettingsService;
+use App\Services\TenantHierarchyService;
 use App\Support\OutboundUrlGuard;
 use App\Jobs\RunAdminCronJob;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use App\Core\TenantContext;
 
 /**
@@ -243,14 +246,23 @@ class AdminConfigController extends BaseApiController
         $features = ($tenant && !empty($tenant->features)) ? (json_decode($tenant->features, true) ?: []) : [];
         $features[$featureName] = (bool) $enabled;
 
-        DB::update("UPDATE tenants SET features = ? WHERE id = ?", [json_encode($features), $tenantId]);
+        try {
+            DB::transaction(function () use ($features, $tenantId, $featureName, $enabled): void {
+                DB::update("UPDATE tenants SET features = ? WHERE id = ?", [json_encode($features), $tenantId]);
 
-        if ($featureName === 'federation') {
-            if ((bool) $enabled) {
-                $this->federationFeatureService->enableTenantFeature(FederationFeatureService::TENANT_FEDERATION_ENABLED, $tenantId);
-            } else {
-                $this->federationFeatureService->disableTenantFeature(FederationFeatureService::TENANT_FEDERATION_ENABLED, $tenantId);
-            }
+                if ($featureName === 'federation') {
+                    if ((bool) $enabled) {
+                        $this->federationFeatureService->enableTenantFeature(FederationFeatureService::TENANT_FEDERATION_ENABLED, $tenantId);
+                    } else {
+                        $this->federationFeatureService->disableTenantFeature(FederationFeatureService::TENANT_FEDERATION_ENABLED, $tenantId);
+                    }
+                }
+
+                app(PrerenderContentInvalidator::class)->refreshTenantOrFail($tenantId, true, true);
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return $this->respondWithError('PRERENDER_REFRESH_FAILED', __('api.prerender_reset_failed'), null, 503);
         }
 
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
@@ -284,7 +296,15 @@ class AdminConfigController extends BaseApiController
         }
         $config['modules'][$moduleName] = (bool) $enabled;
 
-        DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
+        try {
+            DB::transaction(function () use ($config, $tenantId): void {
+                DB::update("UPDATE tenants SET configuration = ? WHERE id = ?", [json_encode($config), $tenantId]);
+                app(PrerenderContentInvalidator::class)->refreshTenantOrFail($tenantId, true, true);
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return $this->respondWithError('PRERENDER_REFRESH_FAILED', __('api.prerender_reset_failed'), null, 503);
+        }
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
 
         return $this->respondWithData(['module' => $moduleName, 'enabled' => (bool) $enabled]);
@@ -824,10 +844,13 @@ class AdminConfigController extends BaseApiController
             $imageUrl = \App\Core\ImageUploader::upload($fileArray, 'partner-logos');
 
             // Persist as a general setting
-            DB::table('tenant_settings')->updateOrInsert(
-                ['tenant_id' => $tenantId, 'setting_key' => 'general.partner_logo_url'],
-                ['setting_value' => $imageUrl, 'updated_at' => now()]
-            );
+            DB::transaction(function () use ($tenantId, $imageUrl): void {
+                DB::table('tenant_settings')->updateOrInsert(
+                    ['tenant_id' => $tenantId, 'setting_key' => 'general.partner_logo_url'],
+                    ['setting_value' => $imageUrl, 'updated_at' => now()]
+                );
+                app(PrerenderContentInvalidator::class)->refreshTenantOrFail($tenantId, true);
+            });
 
             // Bust the cached bootstrap payload so the footer picks up the new
             // logo immediately instead of serving stale cached config (10-min TTL).
@@ -890,10 +913,13 @@ class AdminConfigController extends BaseApiController
             $imageUrl   = \App\Core\ImageUploader::upload($fileArray, 'powered-by-images');
             $settingKey = "general.powered_by_image_{$variant}";
 
-            DB::table('tenant_settings')->updateOrInsert(
-                ['tenant_id' => $tenantId, 'setting_key' => $settingKey],
-                ['setting_value' => $imageUrl, 'updated_at' => now()]
-            );
+            DB::transaction(function () use ($tenantId, $settingKey, $imageUrl): void {
+                DB::table('tenant_settings')->updateOrInsert(
+                    ['tenant_id' => $tenantId, 'setting_key' => $settingKey],
+                    ['setting_value' => $imageUrl, 'updated_at' => now()]
+                );
+                app(PrerenderContentInvalidator::class)->refreshTenantOrFail($tenantId, true);
+            });
 
             // Bust the cached bootstrap payload so the footer (and the SPA's
             // refreshTenant()) pick up the new image immediately instead of
@@ -967,8 +993,16 @@ class AdminConfigController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', 'Accent colour must be a valid hex value like #0053BE.', 'accent_color', 422);
         }
 
-        $this->setTenantConfigValue($tenantId, 'header_bg_color', $bg);
-        $this->setTenantConfigValue($tenantId, 'header_accent_color', $accent);
+        try {
+            DB::transaction(function () use ($tenantId, $bg, $accent): void {
+                $this->setTenantConfigValue($tenantId, 'header_bg_color', $bg);
+                $this->setTenantConfigValue($tenantId, 'header_accent_color', $accent);
+                app(PrerenderContentInvalidator::class)->refreshTenantOrFail($tenantId, true);
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return $this->respondWithError('PRERENDER_REFRESH_FAILED', __('api.prerender_reset_failed'), null, 503);
+        }
 
         return $this->respondWithData([
             'header_bg_color' => $bg,
@@ -1051,7 +1085,10 @@ class AdminConfigController extends BaseApiController
                 ? \App\Core\SvgUploader::save($fileArray, 'tenant-logos')
                 : \App\Core\ImageUploader::upload($fileArray, 'tenant-logos');
 
-            $this->setTenantConfigValue($tenantId, $configKey, $imageUrl);
+            DB::transaction(function () use ($tenantId, $configKey, $imageUrl): void {
+                $this->setTenantConfigValue($tenantId, $configKey, $imageUrl);
+                app(PrerenderContentInvalidator::class)->refreshTenantOrFail($tenantId, true);
+            });
 
             return $this->respondWithData(['url' => $imageUrl]);
         } catch (\Exception $e) {
@@ -1074,7 +1111,15 @@ class AdminConfigController extends BaseApiController
         $tenantId = TenantContext::getId();
         $configKey = $variant === 'dark' ? 'logo_dark_url' : 'logo_url';
 
-        $this->setTenantConfigValue($tenantId, $configKey, null);
+        try {
+            DB::transaction(function () use ($tenantId, $configKey): void {
+                $this->setTenantConfigValue($tenantId, $configKey, null);
+                app(PrerenderContentInvalidator::class)->refreshTenantOrFail($tenantId, true);
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return $this->respondWithError('PRERENDER_REFRESH_FAILED', __('api.prerender_reset_failed'), null, 503);
+        }
 
         return $this->respondWithData(['url' => null]);
     }
@@ -1155,30 +1200,31 @@ class AdminConfigController extends BaseApiController
             $this->requireSuperAdmin();
         }
 
-        if (!empty($directUpdates)) {
-            $setClauses = [];
-            $params = [];
-            foreach ($directUpdates as $col => $val) {
-                $setClauses[] = "`{$col}` = ?";
-                $params[] = $val;
+        $routingFields = array_intersect_key($directUpdates, array_flip(['slug', 'domain']));
+        if ($routingFields !== []) {
+            try {
+                // A slug/domain changes global routing and can claim a shared
+                // platform host. Tenant admins may edit branding, but only a
+                // platform super-admin may change routing identity.
+                $this->requirePlatformSuperAdmin();
+            } catch (\Throwable) {
+                return $this->respondWithError(
+                    'AUTH_INSUFFICIENT_PERMISSIONS',
+                    __('api.super_admin_required'),
+                    null,
+                    403
+                );
             }
-            $params[] = $tenantId;
-            DB::update("UPDATE tenants SET " . implode(', ', $setClauses) . " WHERE id = ?", $params);
-
-            // Domain changed → bust direct children's bootstrap caches.
-            // Children expose parent_domain in their bootstrap response; a stale value
-            // would route the SPA to the old domain until the TTL expires.
-            if (array_key_exists('domain', $directUpdates)) {
-                $childIds = DB::table('tenants')
-                    ->where('parent_id', $tenantId)
-                    ->where('is_active', 1)
-                    ->pluck('id')
-                    ->map(fn ($id) => (int) $id)
-                    ->toArray();
-                foreach ($childIds as $childId) {
-                    $this->redisCache->delete('tenant_bootstrap', $childId);
-                }
+            $validation = TenantHierarchyService::validateRoutingUpdate($tenantId, $routingFields);
+            if (!$validation['success']) {
+                return $this->respondWithError(
+                    'VALIDATION_ERROR',
+                    (string) ($validation['error'] ?? __('api.no_valid_fields_to_update')),
+                    null,
+                    422
+                );
             }
+            $directUpdates = array_replace($directUpdates, $validation['data'] ?? []);
         }
 
         if (isset($kvUpdates['welcome_credits'])) {
@@ -1285,8 +1331,67 @@ class AdminConfigController extends BaseApiController
             $kvUpdates['default_currency'] = $cur;
         }
 
-        foreach ($kvUpdates as $key => $value) {
-            $this->upsertSetting($tenantId, 'general.' . $key, (string) $value, $adminId);
+        // Validate the complete request before its first write. Previously a
+        // direct slug/domain update happened above the KV validators, so a
+        // later 422 could leave routing changed with caches and snapshots live
+        // at the old identity.
+        $childIdsToBust = [];
+        $routingIdentityChanged = $routingFields !== [];
+        $requiresAuthoritativeRefresh = $routingIdentityChanged
+            || array_key_exists('maintenance_mode', $kvUpdates);
+        $prerenderJobId = 0;
+        try {
+            DB::transaction(function () use (
+                $directUpdates,
+                $kvUpdates,
+                $tenantId,
+                $adminId,
+                $requiresAuthoritativeRefresh,
+                $routingIdentityChanged,
+                &$childIdsToBust,
+                &$prerenderJobId
+            ): void {
+                if ($directUpdates !== []) {
+                    $setClauses = [];
+                    $params = [];
+                    foreach ($directUpdates as $col => $val) {
+                        $setClauses[] = "`{$col}` = ?";
+                        $params[] = $val;
+                    }
+                    $params[] = $tenantId;
+                    DB::update("UPDATE tenants SET " . implode(', ', $setClauses) . " WHERE id = ?", $params);
+
+                    if (array_key_exists('domain', $directUpdates)) {
+                        $childIdsToBust = DB::table('tenants')
+                            ->where('parent_id', $tenantId)
+                            ->where('is_active', 1)
+                            ->pluck('id')
+                            ->map(fn ($id) => (int) $id)
+                            ->toArray();
+                    }
+                }
+
+                foreach ($kvUpdates as $key => $value) {
+                    $this->upsertSetting($tenantId, 'general.' . $key, (string) $value, $adminId);
+                }
+
+                $invalidator = app(PrerenderContentInvalidator::class);
+                $prerenderJobId = $requiresAuthoritativeRefresh
+                    ? $invalidator->refreshAllOrFail($routingIdentityChanged)
+                    : $invalidator->refreshTenantOrFail($tenantId, true);
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return $this->respondWithError(
+                'PRERENDER_REFRESH_FAILED',
+                __('api.fed_settings_update_failed'),
+                null,
+                503
+            );
+        }
+
+        foreach ($childIdsToBust as $childId) {
+            $this->redisCache->delete('tenant_bootstrap', $childId);
         }
 
         // Audit log for settings changes
@@ -1304,6 +1409,7 @@ class AdminConfigController extends BaseApiController
             'updated' => true,
             'direct_columns_updated' => array_keys($directUpdates),
             'settings_updated' => array_keys($kvUpdates),
+            'prerender_job_id' => $prerenderJobId,
         ]);
     }
 
@@ -1594,11 +1700,12 @@ class AdminConfigController extends BaseApiController
         $this->ensureTenantSettingsTable();
 
         $updated = [];
+        $settingUpdates = [];
 
         foreach ($input as $key => $value) {
             if (array_key_exists($key, self::SEO_DEFAULTS)) {
                 $storeValue = is_bool($value) ? ($value ? '1' : '0') : (string) $value;
-                $this->upsertSetting($tenantId, $key, $storeValue, $adminId, is_bool($value) ? 'boolean' : 'string');
+                $settingUpdates[$key] = [$storeValue, is_bool($value) ? 'boolean' : 'string'];
                 $updated[] = $key;
             }
         }
@@ -1618,19 +1725,30 @@ class AdminConfigController extends BaseApiController
             }
         }
 
-        if (!empty($directUpdates)) {
-            $setClauses = [];
-            $params = [];
-            foreach ($directUpdates as $col => $val) {
-                $setClauses[] = "`{$col}` = ?";
-                $params[] = $val;
-            }
-            $params[] = $tenantId;
-            DB::update("UPDATE tenants SET " . implode(', ', $setClauses) . " WHERE id = ?", $params);
-        }
-
         if (empty($updated)) {
             return $this->respondWithError('VALIDATION_ERROR', __('api.no_recognized_seo_settings'), null, 422);
+        }
+
+        try {
+            DB::transaction(function () use ($settingUpdates, $directUpdates, $tenantId, $adminId): void {
+                foreach ($settingUpdates as $key => [$value, $type]) {
+                    $this->upsertSetting($tenantId, $key, $value, $adminId, $type);
+                }
+                if ($directUpdates !== []) {
+                    $setClauses = [];
+                    $params = [];
+                    foreach ($directUpdates as $col => $value) {
+                        $setClauses[] = "`{$col}` = ?";
+                        $params[] = $value;
+                    }
+                    $params[] = $tenantId;
+                    DB::update("UPDATE tenants SET " . implode(', ', $setClauses) . " WHERE id = ?", $params);
+                }
+                app(PrerenderContentInvalidator::class)->refreshTenantOrFail($tenantId, true);
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return $this->respondWithError('PRERENDER_REFRESH_FAILED', __('api.prerender_reset_failed'), null, 503);
         }
 
         $this->redisCache->delete('tenant_bootstrap', $tenantId);
@@ -2204,28 +2322,13 @@ class AdminConfigController extends BaseApiController
 
     private function ensureTenantSettingsTable(): void
     {
-        try {
-            DB::statement("
-                CREATE TABLE IF NOT EXISTS `tenant_settings` (
-                    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-                    `tenant_id` INT UNSIGNED NOT NULL,
-                    `setting_key` VARCHAR(255) NOT NULL,
-                    `setting_value` TEXT NULL,
-                    `setting_type` ENUM('string','boolean','integer','float','json','array') DEFAULT 'string',
-                    `description` TEXT NULL,
-                    `is_encrypted` TINYINT(1) NOT NULL DEFAULT 0,
-                    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-                    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    `created_by` INT UNSIGNED NULL,
-                    `updated_by` INT UNSIGNED NULL,
-                    PRIMARY KEY (`id`),
-                    UNIQUE KEY `unique_tenant_setting` (`tenant_id`, `setting_key`),
-                    KEY `idx_tenant_id` (`tenant_id`),
-                    KEY `idx_setting_key` (`setting_key`)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-            ");
-        } catch (\Throwable $e) {
-            // Already exists
+        // Runtime DDL causes an implicit MySQL commit even for
+        // CREATE TABLE IF NOT EXISTS. That used to break the atomic settings +
+        // prerender-job transaction: if enqueueing failed, the tenant update
+        // could survive its rollback. Schema belongs to migrations; fail
+        // explicitly if an installation has not applied them.
+        if (!Schema::hasTable('tenant_settings')) {
+            throw new \RuntimeException('tenant_settings table is missing; run database migrations');
         }
     }
 
@@ -2861,34 +2964,29 @@ class AdminConfigController extends BaseApiController
             }
         }
 
-        if ($config === null) {
-            // Delete the setting to revert to defaults
-            DB::table('tenant_settings')
-                ->where('tenant_id', $tenantId)
-                ->where('setting_key', 'landing_page.config')
-                ->delete();
-        } else {
-            // Upsert the setting
-            $existing = DB::table('tenant_settings')
-                ->where('tenant_id', $tenantId)
-                ->where('setting_key', 'landing_page.config')
-                ->exists();
+        try {
+            DB::transaction(function () use ($config, $tenantId): void {
+                if ($config === null) {
+                    // Delete the setting to revert to defaults.
+                    DB::table('tenant_settings')
+                        ->where('tenant_id', $tenantId)
+                        ->where('setting_key', 'landing_page.config')
+                        ->delete();
+                } else {
+                    $jsonValue = json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                    DB::table('tenant_settings')->updateOrInsert(
+                        ['tenant_id' => $tenantId, 'setting_key' => 'landing_page.config'],
+                        ['setting_value' => $jsonValue, 'setting_type' => 'json']
+                    );
+                }
 
-            $jsonValue = json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-
-            if ($existing) {
-                DB::table('tenant_settings')
-                    ->where('tenant_id', $tenantId)
-                    ->where('setting_key', 'landing_page.config')
-                    ->update(['setting_value' => $jsonValue]);
-            } else {
-                DB::table('tenant_settings')->insert([
-                    'tenant_id' => $tenantId,
-                    'setting_key' => 'landing_page.config',
-                    'setting_value' => $jsonValue,
-                    'setting_type' => 'json',
-                ]);
-            }
+                // The landing page is tenant-specific; commit its replacement
+                // job intent with the customization itself.
+                app(PrerenderContentInvalidator::class)->refreshTenantOrFail($tenantId, true);
+            });
+        } catch (\Throwable $e) {
+            report($e);
+            return $this->respondWithError('PRERENDER_REFRESH_FAILED', __('api.prerender_reset_failed'), null, 503);
         }
 
         // Clear tenant bootstrap cache so changes take effect immediately

@@ -1890,7 +1890,10 @@ export const adminTools = {
 
 export interface PrerenderSummary {
   cache_readable: boolean;
+  cache_writable: boolean;
   cache_path: string;
+  inventory_truncated: boolean;
+  inventory_hard_cap: number;
   total_snapshots: number;
   total_size_bytes: number;
   oldest_age_s: number | null;
@@ -1899,6 +1902,9 @@ export interface PrerenderSummary {
   warn_count: number;
   missing_count: number;
   expected_count: number;
+  expected_rendered_count: number;
+  plan_error_count: number;
+  unexpected_count: number;
   coverage_pct: number;
   last_run: Record<string, unknown> | null;
   recent_failures: number;
@@ -1943,6 +1949,7 @@ export interface PrerenderCoverageRow {
   missing_routes: string[];
   stale_routes: string[];
   asset_invalid_routes: string[];
+  plan_error: string | null;
 }
 
 export interface PrerenderTenantSafety {
@@ -2032,12 +2039,13 @@ export interface PrerenderInspect {
 
 export interface PrerenderJob {
   id: number;
-  status: 'queued' | 'claimed' | 'running' | 'succeeded' | 'failed' | 'partial' | 'cancelled';
+  status: 'pending_fence' | 'queued' | 'claimed' | 'running' | 'succeeded' | 'failed' | 'partial' | 'cancelled';
   tenant_id: number | null;
   tenant_slug: string | null;
   routes: string | null;
   force: boolean;
   dry_run: boolean;
+  authoritative_reset?: boolean;
   priority: number;
   planned_count: number | null;
   rendered_count: number | null;
@@ -2048,6 +2056,7 @@ export interface PrerenderJob {
   error_message: string | null;
   claimed_by: string | null;
   queued_at: string | null;
+  fence_ready_at?: string | null;
   claimed_at: string | null;
   started_at: string | null;
   finished_at: string | null;
@@ -2098,7 +2107,7 @@ export const adminPrerender = {
     api.get<PrerenderSummary>('/v2/admin/prerender/summary'),
 
   getInventory: (tenant?: string) =>
-    api.get<{ cache_readable: boolean; cache_path: string; items: PrerenderInventoryItem[] }>(
+    api.get<{ cache_readable: boolean; cache_path: string; items: PrerenderInventoryItem[]; truncated: boolean; hard_cap: number }>(
       `/v2/admin/prerender/inventory${tenant ? `?tenant=${encodeURIComponent(tenant)}` : ''}`,
     ),
 
@@ -2145,7 +2154,7 @@ export const adminPrerender = {
   realtimeChannel: () =>
     api.get<{ channel: string; event: string }>('/v2/admin/prerender/realtime-channel'),
 
-  purge: (payload: { pattern: string; tenant_slug?: string; dry_run?: boolean; recache?: boolean; confirm_all_tenants?: boolean }) =>
+  purge: (payload: { pattern: string; tenant_slug?: string; dry_run?: boolean; recache?: boolean; confirm_all_tenants?: boolean; preview_token?: string }) =>
     api.post<{
       pattern: string;
       tenant_slug: string | null;
@@ -2153,6 +2162,9 @@ export const adminPrerender = {
       deleted_count: number;
       deleted: string[];
       recache_job_id: number | null;
+      preview_token: string | null;
+      preview_expires_in: number | null;
+      authoritative_job_id?: number | null;
     }>('/v2/admin/prerender/purge', payload),
 
   invalidate: (payload: { tenant_id: number; routes: string[]; recache?: boolean }) =>
@@ -2181,12 +2193,14 @@ export const adminPrerender = {
       { apply },
     ),
 
-  purgeUnexpected: (apply: boolean) =>
+  purgeUnexpected: (apply: boolean, previewToken?: string) =>
     api.post<{
       deleted_total: number;
       by_tenant: Record<string, string[]>;
       dry_run: boolean;
-    }>('/v2/admin/prerender/purge-unexpected', { apply }),
+      preview_token: string | null;
+      preview_expires_in: number | null;
+    }>('/v2/admin/prerender/purge-unexpected', { apply, preview_token: previewToken }),
 
   // Round 2: health / audit / breaker / reset queue.
   getHealth: () =>
@@ -2209,6 +2223,25 @@ export const adminPrerender = {
       '/v2/admin/prerender/reset-queue', {},
     ),
 
+  resetAll: (confirmation: string) =>
+    api.post<{
+      job_id: number;
+      cancelled_jobs: number;
+      cancelled_active_jobs: number;
+      tenant_count: number;
+      planned_routes: number;
+    }>('/v2/admin/prerender/reset-all', { confirmation }),
+
+  downloadMetrics: () =>
+    api.download('/v2/admin/prerender/metrics', { filename: 'nexus-prerender-metrics.txt' }),
+
+  exportCsv: (kind: 'audit' | 'inventory' | 'jobs', action?: string) => {
+    const query = action ? `?action=${encodeURIComponent(action)}` : '';
+    return api.download(`/v2/admin/prerender/export/${kind}.csv${query}`, {
+      filename: `prerender-${kind}.csv`,
+    });
+  },
+
   ttlInspector: (route: string) =>
     api.get<PrerenderTtlInspect>(
       `/v2/admin/prerender/ttl-inspector?route=${encodeURIComponent(route)}`,
@@ -2226,6 +2259,7 @@ export const adminPrerender = {
       static_routes: string[];
       dynamic_routes: string[];
       total_count: number;
+      truncated: boolean;
     }>(`/v2/admin/prerender/sitemap-explorer?tenant=${encodeURIComponent(tenantSlug)}`),
 
   /** Returns Prometheus text-format metrics. URL only — not invoked by UI. */

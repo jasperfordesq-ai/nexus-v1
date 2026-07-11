@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Services\SitemapService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\Laravel\TestCase;
 
 /**
@@ -95,6 +96,42 @@ class SitemapServiceTest extends TestCase
         $this->assertSame($xml1, $xml2);
     }
 
+    public function test_aggregate_sitemaps_ignore_master_domain_but_honor_real_parent_domain(): void
+    {
+        $topology = $this->seedParentDomainParityTopology();
+
+        try {
+            Cache::flush();
+            $indexXml = $this->service->generateIndex();
+            $appDomainXml = $this->service->generateForAppDomain();
+            $frontendBase = rtrim((string) env('FRONTEND_URL', 'https://app.project-nexus.ie'), '/');
+
+            $this->assertStringContainsString(
+                "{$frontendBase}/sitemap-{$topology['master_child_slug']}.xml",
+                $indexXml
+            );
+            $this->assertStringNotContainsString(
+                "https://{$topology['master_domain']}/sitemap-{$topology['master_child_slug']}.xml",
+                $indexXml
+            );
+            $this->assertStringContainsString(
+                "https://{$topology['real_parent_domain']}/sitemap-{$topology['real_child_slug']}.xml",
+                $indexXml
+            );
+
+            $this->assertStringContainsString(
+                "<loc>{$frontendBase}/{$topology['master_child_slug']}/</loc>",
+                $appDomainXml
+            );
+            $this->assertStringNotContainsString(
+                "/{$topology['real_child_slug']}/</loc>",
+                $appDomainXml
+            );
+        } finally {
+            $this->cleanupParentDomainParityTopology($topology);
+        }
+    }
+
     // =========================================================================
     // generateForTenant()
     // =========================================================================
@@ -117,6 +154,30 @@ class SitemapServiceTest extends TestCase
         $this->assertStringContainsString('<priority>1.0</priority>', $xml);
     }
 
+    public function test_tenant_base_url_ignores_master_domain_but_inherits_real_parent_domain(): void
+    {
+        $topology = $this->seedParentDomainParityTopology();
+
+        try {
+            Cache::flush();
+            $masterChildXml = $this->service->generateForTenant($topology['master_child_id']);
+            $realChildXml = $this->service->generateForTenant($topology['real_child_id']);
+            $frontendBase = rtrim((string) env('FRONTEND_URL', 'https://app.project-nexus.ie'), '/');
+
+            $this->assertStringContainsString(
+                "<loc>{$frontendBase}/{$topology['master_child_slug']}/</loc>",
+                $masterChildXml
+            );
+            $this->assertStringNotContainsString($topology['master_domain'], $masterChildXml);
+            $this->assertStringContainsString(
+                "<loc>https://{$topology['real_parent_domain']}/{$topology['real_child_slug']}/</loc>",
+                $realChildXml
+            );
+        } finally {
+            $this->cleanupParentDomainParityTopology($topology);
+        }
+    }
+
     public function test_generateForTenant_includes_static_pages(): void
     {
         $xml = $this->service->generateForTenant($this->testTenantId);
@@ -125,6 +186,124 @@ class SitemapServiceTest extends TestCase
         $this->assertStringContainsString('/help', $xml);
         $this->assertStringContainsString('/terms', $xml);
         $this->assertStringContainsString('/privacy', $xml);
+    }
+
+    public function test_static_sitemap_matches_tenant_slug_and_redirecting_feature_routes(): void
+    {
+        $original = DB::table('tenants')->where('id', $this->testTenantId)->first(['slug', 'features']);
+        $this->assertNotNull($original);
+
+        try {
+            DB::table('tenants')->where('id', $this->testTenantId)->update([
+                'slug' => 'sitemap-other-tenant',
+                'features' => json_encode([
+                    'marketplace' => true,
+                    'courses' => true,
+                    'podcasts' => true,
+                ]),
+            ]);
+            Cache::flush();
+            $xml = $this->service->generateForTenant($this->testTenantId, 'https://tenant.example');
+
+            $this->assertStringContainsString('/marketplace/free', $xml);
+            $this->assertStringNotContainsString('/marketplace/map', $xml);
+            $this->assertStringContainsString('/courses', $xml);
+            $this->assertStringContainsString('/podcasts', $xml);
+            $this->assertStringNotContainsString('/impact-report', $xml);
+            $this->assertStringNotContainsString('/development-status', $xml);
+        } finally {
+            DB::table('tenants')->where('id', $this->testTenantId)->update([
+                'slug' => $original->slug,
+                'features' => $original->features,
+            ]);
+            Cache::flush();
+        }
+    }
+
+    public function test_hour_timebank_sitemap_includes_its_tenant_specific_marketing_pages(): void
+    {
+        $originalSlug = DB::table('tenants')->where('id', $this->testTenantId)->value('slug');
+        try {
+            DB::table('tenants')->where('id', $this->testTenantId)->update(['slug' => 'hour-timebank']);
+            Cache::flush();
+            $xml = $this->service->generateForTenant($this->testTenantId, 'https://hour.example');
+            foreach (['/partner', '/social-prescribing', '/impact-summary', '/impact-report', '/strategic-plan'] as $route) {
+                $this->assertStringContainsString($route, $xml);
+            }
+        } finally {
+            DB::table('tenants')->where('id', $this->testTenantId)->update(['slug' => $originalSlug]);
+            Cache::flush();
+        }
+    }
+
+    public function test_sitemap_includes_public_course_and_podcast_detail_routes(): void
+    {
+        foreach (['courses', 'course_sections', 'course_lessons', 'course_reviews', 'podcast_shows', 'podcast_episodes', 'podcast_episode_chapters'] as $table) {
+            if (!Schema::hasTable($table)) $this->markTestSkipped("{$table} table is unavailable");
+        }
+
+        $suffix = strtolower(str_replace('.', '', uniqid('', true)));
+        $originalFeatures = DB::table('tenants')->where('id', $this->testTenantId)->value('features');
+        $courseId = null;
+        $showId = null;
+        $episodeId = null;
+        try {
+            $features = json_decode((string) $originalFeatures, true) ?: [];
+            $features['courses'] = true;
+            $features['podcasts'] = true;
+            DB::table('tenants')->where('id', $this->testTenantId)->update(['features' => json_encode($features)]);
+
+            $courseId = DB::table('courses')->insertGetId([
+                'tenant_id' => $this->testTenantId,
+                'author_user_id' => $this->userId,
+                'title' => 'Public sitemap course',
+                'slug' => "sitemap-course-{$suffix}",
+                'visibility' => 'public',
+                'status' => 'published',
+                'moderation_status' => 'approved',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $showId = DB::table('podcast_shows')->insertGetId([
+                'tenant_id' => $this->testTenantId,
+                'owner_user_id' => $this->userId,
+                'title' => 'Public sitemap show',
+                'slug' => "sitemap-show-{$suffix}",
+                'visibility' => 'public',
+                'status' => 'published',
+                'moderation_status' => 'approved',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $episodeId = DB::table('podcast_episodes')->insertGetId([
+                'tenant_id' => $this->testTenantId,
+                'show_id' => $showId,
+                'author_user_id' => $this->userId,
+                'title' => 'Public sitemap episode',
+                'slug' => "sitemap-episode-{$suffix}",
+                'audio_url' => 'https://cdn.example.test/episode.mp3',
+                'visibility' => 'inherit',
+                'status' => 'published',
+                'moderation_status' => 'approved',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            Cache::flush();
+            $xml = $this->service->generateForTenant($this->testTenantId, 'https://learning.example');
+            $this->assertStringContainsString("/courses/sitemap-course-{$suffix}", $xml);
+            $this->assertStringContainsString("/podcasts/sitemap-show-{$suffix}", $xml);
+            $this->assertStringContainsString(
+                "/podcasts/sitemap-show-{$suffix}/sitemap-episode-{$suffix}",
+                $xml
+            );
+        } finally {
+            if ($episodeId) DB::table('podcast_episodes')->where('id', $episodeId)->delete();
+            if ($showId) DB::table('podcast_shows')->where('id', $showId)->delete();
+            if ($courseId) DB::table('courses')->where('id', $courseId)->delete();
+            DB::table('tenants')->where('id', $this->testTenantId)->update(['features' => $originalFeatures]);
+            Cache::flush();
+        }
     }
 
     public function test_generateForTenant_returns_empty_for_nonexistent_tenant(): void
@@ -345,6 +524,26 @@ class SitemapServiceTest extends TestCase
         $this->assertStringContainsString("/organisations/{$orgId}", $fresh);
     }
 
+    public function test_runtime_force_fresh_sitemap_bypasses_cached_tenant_variant(): void
+    {
+        [$tenantId, $userId] = $this->seedSitemapTenant(['volunteering' => true]);
+        $overrideBaseUrl = 'https://fresh-sitemap.example.test';
+
+        Cache::flush();
+        $before = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
+        $orgId = $this->seedVolunteerOrganization($tenantId, $userId, 'active');
+        $this->assertSame($before, $this->service->generateForTenant($tenantId, $overrideBaseUrl));
+
+        config(['prerender.runtime_force_fresh_sitemap' => true]);
+        try {
+            $fresh = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
+        } finally {
+            config(['prerender.runtime_force_fresh_sitemap' => false]);
+        }
+
+        $this->assertStringContainsString("/organisations/{$orgId}", $fresh);
+    }
+
     public function test_generateForTenant_excludes_profiles(): void
     {
         Cache::flush();
@@ -423,8 +622,9 @@ class SitemapServiceTest extends TestCase
 
         preg_match_all('/<lastmod>([^<]+)<\/lastmod>/', $xml, $matches);
         foreach ($matches[1] as $date) {
-            // Should be ISO 8601 date format (YYYY-MM-DD)
-            $this->assertMatchesRegularExpression('/^\d{4}-\d{2}-\d{2}$/', $date, "Invalid lastmod date: {$date}");
+            // Full W3C/ISO-8601 timestamps preserve same-day edit precision for
+            // the prerender drift detector.
+            $this->assertNotFalse(\DateTimeImmutable::createFromFormat(DATE_ATOM, $date), "Invalid lastmod timestamp: {$date}");
         }
     }
 
@@ -542,6 +742,126 @@ class SitemapServiceTest extends TestCase
         ]);
 
         return [$tenantId, (int) $user->id];
+    }
+
+    /**
+     * @return array{
+     *     master_existed:bool,
+     *     master_original:?object,
+     *     master_domain:string,
+     *     real_parent_id:int,
+     *     real_parent_domain:string,
+     *     master_child_id:int,
+     *     master_child_slug:string,
+     *     real_child_id:int,
+     *     real_child_slug:string
+     * }
+     */
+    private function seedParentDomainParityTopology(): array
+    {
+        $now = now();
+        $suffix = strtolower(str_replace('.', '', uniqid('', true)));
+        $masterOriginal = DB::table('tenants')->where('id', 1)->first([
+            'domain',
+            'is_active',
+        ]);
+        $masterDomain = "master-parent-{$suffix}.example.test";
+        $realParentDomain = "real-parent-{$suffix}.example.test";
+
+        if ($masterOriginal !== null) {
+            DB::table('tenants')->where('id', 1)->update([
+                'domain' => $masterDomain,
+                'is_active' => true,
+            ]);
+        } else {
+            DB::table('tenants')->insert([
+                'id' => 1,
+                'name' => 'Master',
+                'slug' => '',
+                'domain' => $masterDomain,
+                'is_active' => true,
+                'depth' => 0,
+                'allows_subtenants' => true,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
+
+        $realParentId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'Real Sitemap Parent',
+            'slug' => "real-parent-{$suffix}",
+            'domain' => $realParentDomain,
+            'is_active' => true,
+            'depth' => 0,
+            'allows_subtenants' => true,
+            'features' => '{}',
+            'configuration' => '{}',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $masterChildSlug = "master-child-{$suffix}";
+        $masterChildId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'Master Parent Sitemap Child',
+            'slug' => $masterChildSlug,
+            'domain' => null,
+            'parent_id' => 1,
+            'is_active' => true,
+            'depth' => 1,
+            'allows_subtenants' => false,
+            'features' => '{}',
+            'configuration' => '{}',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $realChildSlug = "real-child-{$suffix}";
+        $realChildId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'Real Parent Sitemap Child',
+            'slug' => $realChildSlug,
+            'domain' => null,
+            'parent_id' => $realParentId,
+            'is_active' => true,
+            'depth' => 1,
+            'allows_subtenants' => false,
+            'features' => '{}',
+            'configuration' => '{}',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        return [
+            'master_existed' => $masterOriginal !== null,
+            'master_original' => $masterOriginal,
+            'master_domain' => $masterDomain,
+            'real_parent_id' => $realParentId,
+            'real_parent_domain' => $realParentDomain,
+            'master_child_id' => $masterChildId,
+            'master_child_slug' => $masterChildSlug,
+            'real_child_id' => $realChildId,
+            'real_child_slug' => $realChildSlug,
+        ];
+    }
+
+    /** @param array<string, mixed> $topology */
+    private function cleanupParentDomainParityTopology(array $topology): void
+    {
+        DB::table('tenants')->whereIn('id', [
+            $topology['master_child_id'],
+            $topology['real_child_id'],
+        ])->delete();
+        DB::table('tenants')->where('id', $topology['real_parent_id'])->delete();
+
+        if ($topology['master_existed']) {
+            DB::table('tenants')->where('id', 1)->update([
+                'domain' => $topology['master_original']->domain,
+                'is_active' => $topology['master_original']->is_active,
+            ]);
+        } else {
+            DB::table('tenants')->where('id', 1)->delete();
+        }
+
+        Cache::flush();
     }
 
     private function seedVolunteerOrganization(int $tenantId, int $userId, string $status): int

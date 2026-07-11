@@ -6,6 +6,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Services\PrerenderContentInvalidator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Core\TenantContext;
@@ -256,6 +257,7 @@ class ResourcePublicController extends BaseApiController
         ]);
 
         $newId = (int) DB::getPdo()->lastInsertId();
+        app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, ['/resources']);
         $baseUrl = UrlHelper::getBaseUrl();
 
         return $this->respondWithData([
@@ -397,6 +399,8 @@ class ResourcePublicController extends BaseApiController
             ->where('tenant_id', $tenantId)
             ->first();
 
+        app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, ['/resources']);
+
         return $this->respondWithData([
             'id'           => (int) $updated->id,
             'title'        => $updated->title,
@@ -451,6 +455,7 @@ class ResourcePublicController extends BaseApiController
         }
 
         DB::table('resources')->where('id', $id)->where('tenant_id', $tenantId)->delete();
+        app(PrerenderContentInvalidator::class)->refreshRoutes($tenantId, ['/resources']);
 
         return $this->respondWithData(['deleted' => true, 'id' => $id]);
     }

@@ -64,6 +64,39 @@ class PrerenderServiceTest extends TestCase
         $this->assertSame([], $service->inventory(null, true));
     }
 
+    public function test_static_route_floor_matches_tenant_slug_and_effective_features(): void
+    {
+        $service = new PrerenderService();
+        $regular = (object) [
+            'slug' => 'another-community',
+            'features' => json_encode([
+                'marketplace' => true,
+                'courses' => true,
+                'podcasts' => true,
+            ]),
+            'configuration' => json_encode(['modules' => []]),
+        ];
+        $routes = $service->routesForTenant($regular);
+
+        $this->assertContains('/marketplace', $routes);
+        $this->assertContains('/courses', $routes);
+        $this->assertContains('/podcasts', $routes);
+        $this->assertNotContains('/marketplace/map', $routes);
+        $this->assertNotContains('/development-status', $routes);
+        $this->assertNotContains('/impact-report', $routes);
+
+        $hourRoutes = $service->routesForTenant((object) [
+            'slug' => 'hour-timebank',
+            'features' => '{}',
+            'configuration' => '{}',
+        ]);
+        $this->assertContains('/partner', $hourRoutes);
+        $this->assertContains('/social-prescribing', $hourRoutes);
+        $this->assertContains('/impact-summary', $hourRoutes);
+        $this->assertContains('/impact-report', $hourRoutes);
+        $this->assertContains('/strategic-plan', $hourRoutes);
+    }
+
     public function test_inventory_lists_snapshot_with_age_staleness(): void
     {
         $this->writeSnapshot('example.com/about/index.html', '<html><body><h1>Hi</h1></body></html>');
@@ -163,13 +196,311 @@ HTML;
         $this->assertSame($a, $b);
     }
 
+    public function test_authoritative_reset_cancels_older_work_and_enqueues_one_fresh_global_job(): void
+    {
+        $this->mock(SitemapService::class, function ($mock): void {
+            $mock->shouldReceive('clearCache')->once();
+            $mock->shouldReceive('generateForTenant')
+                ->atLeast()->once()
+                ->andReturnUsing(static function (int $tenantId, ?string $baseUrl = null): string {
+                    unset($tenantId);
+                    $base = rtrim((string) $baseUrl, '/');
+                    return '<urlset><url><loc>'
+                        . htmlspecialchars($base . '/', ENT_XML1 | ENT_QUOTES, 'UTF-8')
+                        . '</loc></url></urlset>';
+                });
+        });
+
+        $service = new PrerenderService();
+        $queuedId = $service->enqueueJob(null, '/about', false, false, null);
+        $activeId = $service->enqueueJob(null, '/faq', false, false, null);
+        DB::table('prerender_jobs')->where('id', $activeId)->update([
+            'status' => 'running',
+            'claimed_at' => now(),
+            'started_at' => now(),
+            'claimed_by' => 'old-worker-token',
+        ]);
+
+        // Add a real caller transaction inside the test harness wrapper. The
+        // testing transaction manager otherwise executes afterCommit callbacks
+        // immediately when only its own isolation transaction is open.
+        $result = DB::transaction(function () use ($service, $queuedId, $activeId): array {
+            $result = $service->resetAllSnapshots(
+                1,
+                '203.0.113.19',
+                'Prerender reset integration test'
+            );
+
+            $this->assertSame(2, $result['cancelled_jobs']);
+            $this->assertSame(1, $result['cancelled_active_jobs']);
+            $this->assertGreaterThan(0, $result['tenant_count']);
+            $this->assertGreaterThanOrEqual($result['tenant_count'], $result['planned_routes']);
+            $this->assertSame('queued', DB::table('prerender_jobs')->where('id', $queuedId)->value('status'));
+            $this->assertSame('running', DB::table('prerender_jobs')->where('id', $activeId)->value('status'));
+            $this->assertSame(
+                'failed',
+                DB::table('prerender_jobs')->where('id', $result['job_id'])->value('status'),
+                'Old blue/green workers must see a non-claimable storage status until commit'
+            );
+            $this->assertSame('pending', DB::table('prerender_jobs')->where('id', $result['job_id'])->value('fence_state'));
+            $this->assertSame('pending_fence', $service->getJob($result['job_id'])['status']);
+            $this->assertFileDoesNotExist($this->tmpCache . '/.publish-epoch');
+
+            return $result;
+        });
+
+        $this->assertSame('cancelled', DB::table('prerender_jobs')->where('id', $queuedId)->value('status'));
+        $this->assertSame('cancelled', DB::table('prerender_jobs')->where('id', $activeId)->value('status'));
+
+        $fresh = DB::table('prerender_jobs')->where('id', $result['job_id'])->first();
+        $this->assertNotNull($fresh);
+        $this->assertSame('queued', $fresh->status);
+        $this->assertSame('activated', $fresh->fence_state);
+        $this->assertNotNull($fresh->fence_ready_at);
+        $this->assertNull($fresh->tenant_id);
+        $this->assertNull($fresh->routes);
+        $this->assertSame(1, (int) $fresh->force_render);
+        $this->assertSame(PrerenderService::PRIORITY_HIGH, (int) $fresh->priority);
+        $this->assertFileExists($this->tmpCache . '/.publish-epoch');
+        $this->assertTrue($service->getJob((int) $result['job_id'])['authoritative_reset']);
+        $audit = DB::table('prerender_audit_log')
+            ->where('action', 'reset_all')
+            ->where('job_id', $result['job_id'])
+            ->first();
+        $this->assertNotNull($audit);
+        $this->assertSame('ok', $audit->outcome);
+        $this->assertSame('203.0.113.19', $audit->ip);
+        $this->assertSame('Prerender reset integration test', $audit->user_agent);
+        $auditDetails = json_decode((string) $audit->details, true);
+        $this->assertSame($result['job_id'], $auditDetails['job_id'] ?? null);
+        $this->assertSame($result['planned_routes'], $auditDetails['planned_routes'] ?? null);
+        $this->assertFalse(
+            $service->cancelJob((int) $result['job_id']),
+            'An activated authoritative replacement must not be cancellable after it supersedes older work'
+        );
+
+        $activatedEpoch = file_get_contents($this->tmpCache . '/.publish-epoch');
+        $claimed = $service->claimNextJob('worker-after-activation');
+        $this->assertNotNull($claimed);
+        $this->assertSame((int) $result['job_id'], (int) $claimed['id']);
+        $this->assertSame(
+            $activatedEpoch,
+            file_get_contents($this->tmpCache . '/.publish-epoch'),
+            'Retrying queue claim after activation must not rotate the epoch twice'
+        );
+    }
+
+    public function test_reset_all_rolls_back_new_intent_when_required_success_audit_fails(): void
+    {
+        $this->mock(SitemapService::class, function ($mock): void {
+            $mock->shouldReceive('clearCache')->never();
+            $mock->shouldReceive('generateForTenant')
+                ->atLeast()->once()
+                ->andReturnUsing(static function (int $tenantId, ?string $baseUrl = null): string {
+                    unset($tenantId);
+                    $base = rtrim((string) $baseUrl, '/');
+                    return '<urlset><url><loc>'
+                        . htmlspecialchars($base . '/', ENT_XML1 | ENT_QUOTES, 'UTF-8')
+                        . '</loc></url></urlset>';
+                });
+        });
+
+        $service = new class extends PrerenderService {
+            protected function insertAuditRow(array $row): void
+            {
+                throw new \RuntimeException('simulated prerender audit storage outage');
+            }
+        };
+        $oldJobId = $service->enqueueJob(null, '/about', false, false, null);
+        $jobCountBefore = DB::table('prerender_jobs')->count();
+        $auditCountBefore = DB::table('prerender_audit_log')->count();
+
+        try {
+            $service->resetAllSnapshots(1, '203.0.113.20', 'Audit outage test');
+            $this->fail('The required success audit failure must abort reset-all');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('simulated prerender audit storage outage', $e->getMessage());
+        }
+
+        $this->assertSame($jobCountBefore, DB::table('prerender_jobs')->count());
+        $this->assertSame('queued', DB::table('prerender_jobs')->where('id', $oldJobId)->value('status'));
+        $this->assertSame($auditCountBefore, DB::table('prerender_audit_log')->count());
+        $this->assertFalse(
+            DB::table('prerender_jobs')
+                ->where('fence_state', 'pending')
+                ->whereNull('fence_ready_at')
+                ->exists()
+        );
+        $this->assertFileDoesNotExist($this->tmpCache . '/.publish-epoch');
+
+        // Existing callers retain non-blocking audit semantics.
+        $service->audit('ordinary_best_effort_action', 1, null, null, 'ok');
+        $this->assertSame($auditCountBefore, DB::table('prerender_audit_log')->count());
+    }
+
+    public function test_pending_authoritative_intent_does_not_mutate_filesystem_or_old_jobs_inside_outer_transaction(): void
+    {
+        $service = new PrerenderService();
+        $oldId = $service->enqueueJob(null, '/about', false, false, null);
+
+        $intent = null;
+        try {
+            DB::transaction(function () use ($service, $oldId, &$intent): void {
+                $intent = $service->enqueueAuthoritativeRebuildIntent(1);
+                $reusedIntent = $service->enqueueAuthoritativeRebuildIntent(1);
+
+                $this->assertSame('queued', DB::table('prerender_jobs')->where('id', $oldId)->value('status'));
+                $this->assertSame($intent['job_id'], $reusedIntent['job_id']);
+                $this->assertSame(1, $reusedIntent['cancelled_jobs']);
+                $this->assertSame(
+                    'pending',
+                    DB::table('prerender_jobs')->where('id', $intent['job_id'])->value('fence_state')
+                );
+                $this->assertSame(
+                    'pending_fence',
+                    $service->getJob($intent['job_id'])['status']
+                );
+                $this->assertSame(
+                    'failed',
+                    DB::table('prerender_jobs')->where('id', $intent['job_id'])->value('status')
+                );
+                $this->assertNull(
+                    DB::table('prerender_jobs')->where('id', $intent['job_id'])->value('fence_ready_at')
+                );
+                $this->assertArrayHasKey('fence_ready_at', $service->getJob($intent['job_id']));
+                $this->assertFileDoesNotExist($this->tmpCache . '/.publish-epoch');
+
+                // A same-connection claim attempt must not accidentally execute
+                // the pending outbox while this transaction can still roll back.
+                $claimed = $service->claimNextJob('worker-before-commit');
+                $this->assertNotNull($claimed);
+                $this->assertSame($oldId, (int) $claimed['id']);
+                $this->assertSame(
+                    'pending_fence',
+                    $service->getJob($intent['job_id'])['status']
+                );
+                $this->assertFileDoesNotExist($this->tmpCache . '/.publish-epoch');
+
+                throw new \RuntimeException('rollback pending fence probe');
+            });
+            $this->fail('The rollback probe should throw');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('rollback pending fence probe', $e->getMessage());
+        }
+
+        $this->assertIsArray($intent);
+        $this->assertFalse(DB::table('prerender_jobs')->where('id', $intent['job_id'])->exists());
+        $this->assertSame('queued', DB::table('prerender_jobs')->where('id', $oldId)->value('status'));
+        $this->assertFileDoesNotExist($this->tmpCache . '/.publish-epoch');
+    }
+
+    public function test_contended_after_commit_activation_returns_quickly_and_remains_recoverable(): void
+    {
+        $service = new PrerenderService();
+        $lock = fopen($this->tmpCache . '/.mutation.lock', 'c+');
+        $this->assertIsResource($lock);
+        $this->assertTrue(flock($lock, LOCK_EX | LOCK_NB));
+        $intent = null;
+
+        try {
+            $started = microtime(true);
+            $intent = $service->enqueueAuthoritativeRebuildIntent(1);
+            $elapsed = microtime(true) - $started;
+
+            $this->assertLessThan(2.0, $elapsed, 'The API path must not wait for a long-running publisher');
+            $this->assertSame('pending_fence', $service->getJob($intent['job_id'])['status']);
+            $this->assertTrue($service->getJob($intent['job_id'])['authoritative_reset']);
+            $this->assertSame($intent['job_id'], $service->listJobs(10, 'pending_fence')[0]['id']);
+            $this->assertSame([], $service->listJobs(10, 'failed'));
+            $this->assertStringContainsString(
+                'publisher fence activation deferred',
+                (string) DB::table('prerender_jobs')->where('id', $intent['job_id'])->value('error_message')
+            );
+            $this->assertFileDoesNotExist($this->tmpCache . '/.publish-epoch');
+        } finally {
+            flock($lock, LOCK_UN);
+            fclose($lock);
+        }
+
+        $this->assertIsArray($intent);
+        $activate = new \ReflectionMethod($service, 'activatePendingAuthoritativeJob');
+        $this->assertTrue($activate->invoke($service, $intent['job_id'], 1.0));
+        $this->assertSame('queued', $service->getJob($intent['job_id'])['status']);
+        $this->assertFileExists($this->tmpCache . '/.publish-epoch');
+    }
+
+    public function test_pending_fence_recovery_precedes_a_tripped_breaker(): void
+    {
+        // This path must run at transaction level zero, as the host processor
+        // does. Temporarily end the test wrapper transaction, then restore it
+        // after removing the committed probe row.
+        DB::commit();
+        $jobId = 0;
+        try {
+            $jobId = (int) DB::table('prerender_jobs')->insertGetId([
+                'requested_by' => null,
+                'tenant_id' => null,
+                'routes' => null,
+                'force_render' => 1,
+                'dry_run' => 0,
+                'priority' => PrerenderService::PRIORITY_HIGH,
+                'status' => 'failed',
+                'queued_at' => now(),
+                'fence_state' => 'pending',
+                'fence_ready_at' => null,
+                'error_message' => 'pending publisher fence activation',
+            ]);
+
+            $service = new PrerenderService();
+            $service->tripBreaker(900);
+            $claimed = $service->claimNextJob('breaker-recovery-worker');
+
+            $this->assertNotNull($claimed);
+            $this->assertSame($jobId, (int) $claimed['id']);
+            $this->assertNull($service->breakerTrippedUntil());
+            $this->assertFileExists($this->tmpCache . '/.publish-epoch');
+        } finally {
+            \Illuminate\Support\Facades\Cache::forget(PrerenderService::BREAKER_CACHE_KEY);
+            if ($jobId > 0) DB::table('prerender_jobs')->where('id', $jobId)->delete();
+            DB::beginTransaction();
+        }
+    }
+
+    public function test_rolling_deploy_insert_without_fence_timestamp_remains_claimable(): void
+    {
+        $legacyId = (int) DB::table('prerender_jobs')->insertGetId([
+            'requested_by' => null,
+            'tenant_id' => null,
+            'routes' => '/about',
+            'force_render' => 0,
+            'dry_run' => 0,
+            'priority' => PrerenderService::PRIORITY_NORMAL,
+            'status' => 'queued',
+            'queued_at' => now(),
+            // Deliberately omit fence_ready_at, as an old blue/green writer does.
+        ]);
+
+        $this->assertNotNull(
+            DB::table('prerender_jobs')->where('id', $legacyId)->value('fence_ready_at')
+        );
+        $this->assertSame(
+            'ready',
+            DB::table('prerender_jobs')->where('id', $legacyId)->value('fence_state')
+        );
+        $claimed = (new PrerenderService())->claimNextJob('legacy-compatible-worker');
+        $this->assertNotNull($claimed);
+        $this->assertSame($legacyId, (int) $claimed['id']);
+    }
+
     public function test_finalise_job_records_counters_and_status(): void
     {
         $service = new PrerenderService();
         $id = $service->enqueueJob(null, null, true, false, 1);
         $service->claimNextJob('w');
-        $service->markRunning($id);
-        $service->finaliseJob($id, 'succeeded', 10, 9, 1, 0, 42, 'log tail here');
+        $service->markRunning($id, 'w');
+        $this->assertTrue($service->finaliseJob(
+            $id, 'succeeded', 10, 9, 1, 0, 42, 'log tail here', null, 'w'
+        ));
 
         $row = DB::table('prerender_jobs')->where('id', $id)->first();
         $this->assertSame('succeeded', $row->status);
@@ -185,12 +516,12 @@ HTML;
     {
         $log = "[INFO] Planning cache refresh...\n"
              . "[INFO] Planned 27 page(s) to refresh out of 35 candidate page(s)\n"
-             . "[OK]   13 pre-rendered page(s) injected into nexus-react-prod\n"
-             . "[WARN] 2 rendered page(s) discarded because their asset references were stale\n";
+             . "[OK]   13 pre-rendered page(s) published as complete host-tree generation(s) in nexus-react-prod\n"
+             . "[WARN] 2 rendered page(s) reference assets outside the active manifest\n";
         [$planned, $rendered, $invalid] = PrerenderProcessQueue::parseCounters($log);
         $this->assertSame(27, $planned);
         $this->assertSame(13, $rendered);
-        $this->assertSame(2, $invalid);
+        $this->assertNull($invalid);
     }
 
     public function test_prometheus_metrics_emit_required_series(): void
@@ -200,7 +531,9 @@ HTML;
         $body = $service->prometheusMetrics();
 
         $this->assertStringContainsString('# TYPE nexus_prerender_snapshots_total gauge', $body);
-        $this->assertStringContainsString('# TYPE nexus_prerender_jobs_total counter', $body);
+        $this->assertStringContainsString('# TYPE nexus_prerender_jobs_total gauge', $body);
+        $this->assertStringContainsString('nexus_prerender_job_fence_available 1', $body);
+        $this->assertStringContainsString('nexus_prerender_jobs_total{status="pending_fence"} 0', $body);
         $this->assertMatchesRegularExpression('/nexus_prerender_jobs_total\{status="queued"\} 1/', $body);
         $this->assertStringContainsString('nexus_prerender_coverage_ratio', $body);
     }
@@ -267,6 +600,48 @@ HTML;
         $svc = new PrerenderService();
         $result = $svc->purgePattern('/blog/**', null, dryRun: true);
         $this->assertCount(2, $result['deleted']);
+    }
+
+    public function test_exact_preview_purge_deletes_unchanged_snapshots(): void
+    {
+        $paths = [
+            'example.com/blog/post-1/index.html',
+            'example.com/blog/post-2/index.html',
+        ];
+        foreach ($paths as $index => $path) {
+            $this->writeSnapshot($path, '<html><body>' . $index . '</body></html>');
+        }
+
+        $service = new PrerenderService();
+        $fingerprints = $service->fingerprintCachePaths($paths);
+        $deleted = $service->purgeExactCachePaths($paths, $fingerprints);
+
+        $this->assertEqualsCanonicalizing($paths, $deleted);
+        foreach ($paths as $path) {
+            $this->assertFileDoesNotExist($this->tmpCache . '/' . $path);
+        }
+    }
+
+    public function test_exact_preview_purge_rejects_same_path_replacement_without_partial_delete(): void
+    {
+        $first = 'example.com/blog/post-1/index.html';
+        $second = 'example.com/blog/post-2/index.html';
+        $this->writeSnapshot($first, '<html><body>original first</body></html>');
+        $this->writeSnapshot($second, '<html><body>original second</body></html>');
+
+        $service = new PrerenderService();
+        $fingerprints = $service->fingerprintCachePaths([$first, $second]);
+        $this->writeSnapshot($second, '<html><body>fresh replacement</body></html>');
+
+        try {
+            $service->purgeExactCachePaths([$first, $second], $fingerprints);
+            $this->fail('A same-path replacement must invalidate the destructive preview.');
+        } catch (\UnexpectedValueException $e) {
+            $this->assertStringContainsString('changed before deletion', $e->getMessage());
+        }
+
+        $this->assertFileExists($this->tmpCache . '/' . $first);
+        $this->assertFileExists($this->tmpCache . '/' . $second);
     }
 
     public function test_purge_pattern_scopes_to_shared_host_tenant_prefix(): void
@@ -474,12 +849,12 @@ HTML;
         $this->assertNull($service->breakerTrippedUntil(), 'breaker should start closed');
 
         // Pump 5 failed finalises inside the window — trips the breaker.
-        $routes = ['/about', '/faq', '/contact', '/help', '/explore'];
+        $routes = ['/about', '/faq', '/contact', '/help', '/changelog'];
         for ($i = 0; $i < PrerenderService::BREAKER_FAILURE_THRESHOLD; $i++) {
             $id = $service->enqueueJob(null, $routes[$i], false, false, 1);
             $service->claimNextJob('w');
-            $service->markRunning($id);
-            $service->finaliseJob($id, 'failed', 0, 0, 0, 1, 5, null, 'boom');
+            $service->markRunning($id, 'w');
+            $service->finaliseJob($id, 'failed', 0, 0, 0, 1, 5, null, 'boom', 'w');
         }
 
         $this->assertNotNull($service->breakerTrippedUntil(), 'breaker should trip');
@@ -518,7 +893,7 @@ HTML;
         $this->assertSame($id3, (int) $second['id'], 'tenant B should be picked over busy tenant A');
 
         // After finishing tenant 99's first job, tenant 99 should be claimable again.
-        $service->finaliseJob($id1, 'succeeded', 1, 1, 0, 0, 1, null);
+        $service->finaliseJob($id1, 'succeeded', 1, 1, 0, 0, 1, null, null, 'w');
         $third = $service->claimNextJob('w');
         $this->assertNotNull($third);
         $this->assertSame($id2, (int) $third['id']);
@@ -582,6 +957,31 @@ HTML;
         $stuck = collect($h['checks'])->firstWhere('name', 'stuck_jobs');
         $this->assertNotNull($stuck);
         $this->assertSame('yellow', $stuck['status']);
+    }
+
+    public function test_health_does_not_flag_a_long_job_with_a_recent_heartbeat(): void
+    {
+        if (!Schema::hasColumn('prerender_jobs', 'heartbeat_at')) {
+            $this->markTestSkipped('heartbeat_at migration is not applied.');
+        }
+
+        $service = new PrerenderService();
+        $service->resetBreaker();
+        DB::table('prerender_jobs')->insert([
+            'tenant_id'   => null,
+            'routes'      => '/long-running',
+            'status'      => 'running',
+            'priority'    => 5,
+            'claimed_at'  => date('Y-m-d H:i:s', time() - 7200),
+            'started_at'  => date('Y-m-d H:i:s', time() - 7200),
+            'heartbeat_at' => date('Y-m-d H:i:s', time() - 30),
+            'queued_at'   => date('Y-m-d H:i:s', time() - 7300),
+        ]);
+
+        $health = $service->health();
+        $stuck = collect($health['checks'])->firstWhere('name', 'stuck_jobs');
+        $this->assertNotNull($stuck);
+        $this->assertSame('green', $stuck['status']);
     }
 
     public function test_verify_integrity_matches_sidecar(): void
@@ -816,6 +1216,226 @@ HTML;
         );
     }
 
+    public function test_route_normalization_canonicalizes_trailing_slash_and_rejects_traversal_aliases(): void
+    {
+        $this->assertSame('/blog', PrerenderService::normalizeRoute('/blog/'));
+        $this->assertSame('/blog/caf%C3%A9', PrerenderService::normalizeRoute('/blog/caf%C3%A9'));
+        foreach (['/./blog', '/../x', '/a/../../x', '//blog', '/blog//post', '/%2e%2e/x', '/a%2fb', '/bad%ZZ'] as $route) {
+            $this->assertNull(PrerenderService::normalizeRoute($route), $route);
+        }
+    }
+
+    public function test_enqueue_canonicalizes_and_deduplicates_route_aliases(): void
+    {
+        [$tenantId] = $this->seedCmsTenantPair('canonical-route-owner', 'canonical-route-other');
+        $jobId = (new PrerenderService())->enqueueJob(
+            $tenantId,
+            '/about/,/about',
+            false,
+            false,
+            null
+        );
+
+        $this->assertSame('/about', DB::table('prerender_jobs')->where('id', $jobId)->value('routes'));
+    }
+
+    public function test_snapshot_deletion_refuses_symlink_escape_from_cache_root(): void
+    {
+        [$tenantId] = $this->seedCmsTenantPair('symlink-owner', 'symlink-other');
+        $target = collect((new PrerenderService())->loadTenantTargets())->firstWhere('tenant_id', $tenantId);
+        $this->assertIsArray($target);
+
+        $outside = $this->tmpCache . '-outside-' . uniqid();
+        mkdir($outside, 0777, true);
+        file_put_contents($outside . '/index.html', '<html><body>must survive</body></html>');
+        $link = $this->tmpCache . '/' . $target['host'] . $target['prefix'] . '/about';
+        mkdir(dirname($link), 0777, true);
+        if (!@symlink($outside, $link)) {
+            $this->rrmdir($outside);
+            $this->markTestSkipped('Filesystem does not permit symlink creation');
+        }
+
+        try {
+            $deleted = (new PrerenderService())->invalidateRoutes($tenantId, ['/about'], false);
+            $this->assertSame(0, $deleted);
+            $this->assertFileExists($outside . '/index.html');
+        } finally {
+            @unlink($link);
+            $this->rrmdir($outside);
+        }
+    }
+
+    public function test_tenant_targets_normalize_custom_and_inherited_hosts_to_lowercase(): void
+    {
+        $suffix = strtolower(uniqid());
+        $parentId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'Uppercase parent host',
+            'slug' => "upper-parent-{$suffix}",
+            'domain' => "Parent-{$suffix}.Example.TEST",
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $childId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'Inherited uppercase host',
+            'slug' => "upper-child-{$suffix}",
+            'domain' => null,
+            'parent_id' => $parentId,
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $targets = collect((new PrerenderService())->loadTenantTargets());
+        $this->assertSame(
+            strtolower("Parent-{$suffix}.Example.TEST"),
+            $targets->firstWhere('tenant_id', $parentId)['host'] ?? null
+        );
+        $this->assertSame(
+            strtolower("Parent-{$suffix}.Example.TEST"),
+            $targets->firstWhere('tenant_id', $childId)['host'] ?? null
+        );
+    }
+
+    public function test_invalidate_path_tenant_homepage_deletes_prefixed_snapshot(): void
+    {
+        [$tenantId, , $slug] = $this->seedCmsTenantPair('home-owner', 'home-other');
+        $path = $this->writeSnapshot(
+            $this->frontendHost() . "/{$slug}/index.html",
+            '<html><body>old landing page</body></html>'
+        );
+
+        $deleted = (new PrerenderService())->invalidateRoutes($tenantId, ['/']);
+
+        $this->assertSame(1, $deleted);
+        $this->assertFileDoesNotExist($path);
+        $this->assertDatabaseHas('prerender_jobs', [
+            'tenant_id' => $tenantId,
+            'routes' => '/',
+            'status' => 'queued',
+        ]);
+    }
+
+    public function test_custom_domain_parent_filter_never_includes_path_child_snapshots(): void
+    {
+        $suffix = uniqid();
+        $domain = "parent-{$suffix}.example.test";
+        $parentSlug = "parent-{$suffix}";
+        $childSlug = "child-{$suffix}";
+        $parentId = (int) DB::table('tenants')->insertGetId([
+            'name' => 'Parent custom domain',
+            'slug' => $parentSlug,
+            'domain' => $domain,
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('tenants')->insert([
+            'name' => 'Path child',
+            'slug' => $childSlug,
+            'domain' => null,
+            'parent_id' => $parentId,
+            'is_active' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $this->writeSnapshot("{$domain}/blog/parent/index.html", '<html><body>parent</body></html>');
+        $this->writeSnapshot("{$domain}/{$childSlug}/blog/child/index.html", '<html><body>child</body></html>');
+
+        $service = new PrerenderService();
+        $inventory = $service->inventory($parentSlug, false);
+        $purge = $service->purgePattern('/blog/**', $parentSlug, true);
+
+        $this->assertCount(1, $inventory);
+        $this->assertSame($parentId, $inventory[0]['tenant_id']);
+        $this->assertSame('/blog/parent', $inventory[0]['tenant_route']);
+        $this->assertSame(["{$domain}/blog/parent/index.html"], $purge['deleted']);
+    }
+
+    public function test_profile_routes_are_never_prerenderable_without_public_seo_consent(): void
+    {
+        [$tenantId] = $this->seedCmsTenantPair('profile-owner', 'profile-other');
+        $user = User::factory()->forTenant($tenantId)->create(['is_approved' => 1]);
+
+        $this->assertFalse(
+            (new PrerenderService())->tenantRouteCanBePrerendered($tenantId, "/profile/{$user->id}")
+        );
+    }
+
+    public function test_dynamic_blog_route_is_rejected_when_blog_feature_is_disabled(): void
+    {
+        [$tenantId] = $this->seedCmsTenantPair('disabled-blog-owner', 'disabled-blog-other');
+        $postSlug = $this->seedBlogPost($tenantId);
+        DB::table('tenants')->where('id', $tenantId)->update([
+            'features' => json_encode(['blog' => false]),
+        ]);
+
+        $this->assertFalse(
+            (new PrerenderService())->tenantRouteCanBePrerendered($tenantId, "/blog/{$postSlug}")
+        );
+    }
+
+    public function test_late_finaliser_cannot_overwrite_a_new_claim_owner(): void
+    {
+        $service = new PrerenderService();
+        $jobId = $service->enqueueJob(null, '/about', true, false, null);
+        $service->claimNextJob('worker-old');
+        $service->markRunning($jobId, 'worker-old');
+        DB::table('prerender_jobs')->where('id', $jobId)->update([
+            'status' => 'running',
+            'claimed_by' => 'worker-new',
+        ]);
+
+        $this->assertFalse($service->finaliseJob(
+            $jobId, 'failed', 1, 0, 1, 1, 5, null, 'late result', 'worker-old'
+        ));
+
+        $this->assertFalse(
+            $service->finaliseJob($jobId, 'failed', 1, 0, 1, 1, 5, null, 'unfenced result')
+        );
+
+        $row = DB::table('prerender_jobs')->where('id', $jobId)->first();
+        $this->assertSame('running', $row->status);
+        $this->assertSame('worker-new', $row->claimed_by);
+    }
+
+    public function test_running_job_heartbeat_is_fenced_by_claim_owner(): void
+    {
+        $service = new PrerenderService();
+        $jobId = $service->enqueueJob(null, '/about', true, false, null);
+        $service->claimNextJob('worker-current');
+        $service->markRunning($jobId, 'worker-current');
+        $oldLease = now()->subHours(2)->toDateTimeString();
+        $hasHeartbeat = Schema::hasColumn('prerender_jobs', 'heartbeat_at');
+        $oldValues = [
+            'started_at' => $oldLease,
+        ];
+        if ($hasHeartbeat) $oldValues['heartbeat_at'] = $oldLease;
+        DB::table('prerender_jobs')->where('id', $jobId)->update($oldValues);
+
+        $this->assertFalse($service->heartbeatJob($jobId, 'worker-stale'));
+        $this->assertSame(
+            $oldLease,
+            DB::table('prerender_jobs')->where('id', $jobId)->value('started_at')
+        );
+
+        $this->assertTrue($service->heartbeatJob($jobId, 'worker-current'));
+        $row = DB::table('prerender_jobs')->where('id', $jobId)->first();
+        $leaseValue = $hasHeartbeat ? $row->heartbeat_at : $row->started_at;
+        $this->assertGreaterThan(strtotime($oldLease), strtotime((string) $leaseValue));
+        if ($hasHeartbeat) {
+            $this->assertSame($oldLease, $row->started_at, 'heartbeat must not rewrite true start time');
+        }
+    }
+
+    public function test_enqueue_rejects_oversized_route_sets_instead_of_truncating(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('exceeds the 2000-byte job limit');
+
+        (new PrerenderService())->enqueueJob(null, str_repeat('/about,', 400), false, false, null);
+    }
+
     public function test_invalidate_routes_deletes_snapshot_bundle_for_hidden_dynamic_route(): void
     {
         [$tenantId, , $slug] = $this->seedCmsTenantPair('hidden-vol-owner', 'hidden-vol-other');
@@ -836,6 +1456,35 @@ HTML;
         $this->assertFalse(
             DB::table('prerender_jobs')->where('tenant_id', $tenantId)->where('routes', '/volunteering/opportunities/987654')->exists(),
             'Hidden/deleted dynamic routes should be purged without recache.'
+        );
+    }
+
+    public function test_invalidate_preserves_live_non_200_bundle_and_schedules_authoritative_rebuild(): void
+    {
+        [$tenantId, , $slug] = $this->seedCmsTenantPair('status-vol-owner', 'status-vol-other');
+        $host = $this->frontendHost();
+        $indexPath = $this->writeSnapshot(
+            "{$host}/{$slug}/volunteering/opportunities/987655/index.html",
+            '<html><body>gone</body></html>'
+        );
+        file_put_contents(dirname($indexPath) . '/_status', '410');
+
+        $deleted = (new PrerenderService())->invalidateRoutes(
+            $tenantId,
+            ['/volunteering/opportunities/987655']
+        );
+
+        $this->assertSame(0, $deleted);
+        $this->assertFileExists($indexPath);
+        $this->assertFileExists(dirname($indexPath) . '/_status');
+        $this->assertTrue(
+            DB::table('prerender_jobs')
+                ->whereNull('tenant_id')
+                ->whereNull('routes')
+                ->where('force_render', 1)
+                ->where('status', 'queued')
+                ->exists(),
+            'Status-map changes must be published through one authoritative generation'
         );
     }
 
@@ -909,6 +1558,53 @@ HTML;
         $this->assertNotContains("/page/{$pageSlug}", $otherRoutes);
     }
 
+    public function test_strict_route_plan_rejects_sitemap_with_only_off_host_urls(): void
+    {
+        $this->mock(SitemapService::class, function ($mock): void {
+            $mock->shouldReceive('generateForTenant')
+                ->once()
+                ->andReturn('<urlset><url><loc>https://wrong.example/page/other</loc></url></urlset>');
+        });
+
+        $service = new PrerenderService();
+        $target = collect($service->loadTenantTargets())
+            ->first();
+        $this->assertIsArray($target);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('rejected 1 route location');
+        $service->expectedRoutesForTenant(
+            $target,
+            PrerenderService::MAX_PLANNED_ROUTES_PER_TENANT,
+            true
+        );
+    }
+
+    public function test_strict_route_plan_rejects_one_bad_location_among_valid_routes(): void
+    {
+        $service = new PrerenderService();
+        $target = collect($service->loadTenantTargets())->first();
+        $this->assertIsArray($target);
+        $base = 'https://' . $target['host'] . $target['prefix'];
+
+        $this->mock(SitemapService::class, function ($mock) use ($base): void {
+            $mock->shouldReceive('generateForTenant')->once()->andReturn(
+                '<urlset>'
+                . '<url><loc>' . htmlspecialchars($base . '/about', ENT_XML1) . '</loc></url>'
+                . '<url><loc>https://wrong.example/blog/stale</loc></url>'
+                . '</urlset>'
+            );
+        });
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('rejected 1 route location');
+        $service->expectedRoutesForTenant(
+            $target,
+            PrerenderService::MAX_PLANNED_ROUTES_PER_TENANT,
+            true
+        );
+    }
+
     public function test_auto_recache_does_not_enqueue_wrong_tenant_cms_snapshot(): void
     {
         [$ownerId, $otherId, $ownerSlug, $otherSlug, $pageSlug] = $this->seedCmsTenantPair('recache-owner', 'recache-other');
@@ -979,14 +1675,56 @@ HTML;
         $service = new PrerenderService();
         $dryRun = $service->purgeUnexpectedSnapshots(true);
 
-        $this->assertContains("/{$otherSlug}/page/{$pageSlug}", $dryRun['by_tenant'][$otherSlug] ?? []);
-        $this->assertNotContains("/{$ownerSlug}/page/{$pageSlug}", $dryRun['by_tenant'][$ownerSlug] ?? []);
+        $this->assertContains("/page/{$pageSlug}", $dryRun['by_tenant'][$otherSlug] ?? []);
+        $this->assertNotContains("/page/{$pageSlug}", $dryRun['by_tenant'][$ownerSlug] ?? []);
 
         $result = $service->purgeUnexpectedSnapshots(false);
 
         $this->assertSame(1, $result['deleted_total']);
         $this->assertFileExists($this->tmpCache . "/{$host}/{$ownerSlug}/page/{$pageSlug}/index.html");
         $this->assertFileDoesNotExist($this->tmpCache . "/{$host}/{$otherSlug}/page/{$pageSlug}/index.html");
+    }
+
+    public function test_purge_unexpected_can_reconcile_exactly_one_tenant(): void
+    {
+        [$tenantId, , $tenantSlug, $otherSlug] = $this->seedCmsTenantPair(
+            'scoped-clean-owner',
+            'scoped-clean-other'
+        );
+        $host = $this->frontendHost();
+        $ownerPath = $this->writeSnapshot(
+            "{$host}/{$tenantSlug}/obsolete-feature-route/index.html",
+            '<html><body>owner stale route</body></html>'
+        );
+        $otherPath = $this->writeSnapshot(
+            "{$host}/{$otherSlug}/obsolete-feature-route/index.html",
+            '<html><body>other stale route</body></html>'
+        );
+
+        $result = (new PrerenderService())->purgeUnexpectedSnapshots(false, $tenantId);
+
+        $this->assertSame(1, $result['deleted_total']);
+        $this->assertFileDoesNotExist($ownerPath);
+        $this->assertFileExists($otherPath);
+    }
+
+    public function test_global_purge_removes_snapshot_for_retired_unattributed_host(): void
+    {
+        $orphanPath = $this->writeSnapshot(
+            'retired-tenant.example/old-page/index.html',
+            '<html><body>retired tenant</body></html>'
+        );
+
+        $service = new PrerenderService();
+        $dryRun = $service->purgeUnexpectedSnapshots(true);
+
+        $this->assertContains('/old-page', $dryRun['by_tenant']['orphan@retired-tenant.example'] ?? []);
+        $this->assertFileExists($orphanPath);
+
+        $result = $service->purgeUnexpectedSnapshots(false);
+
+        $this->assertSame(1, $result['deleted_total']);
+        $this->assertFileDoesNotExist($orphanPath);
     }
 
     public function test_purge_unexpected_removes_cross_tenant_blog_snapshot(): void
@@ -1000,8 +1738,8 @@ HTML;
         $service = new PrerenderService();
         $dryRun = $service->purgeUnexpectedSnapshots(true);
 
-        $this->assertContains("/{$otherSlug}/blog/{$slug}", $dryRun['by_tenant'][$otherSlug] ?? []);
-        $this->assertNotContains("/{$ownerSlug}/blog/{$slug}", $dryRun['by_tenant'][$ownerSlug] ?? []);
+        $this->assertContains("/blog/{$slug}", $dryRun['by_tenant'][$otherSlug] ?? []);
+        $this->assertNotContains("/blog/{$slug}", $dryRun['by_tenant'][$ownerSlug] ?? []);
 
         $result = $service->purgeUnexpectedSnapshots(false);
 

@@ -1129,12 +1129,17 @@ cmd_deploy() {
     # Pre-cutover snapshot warmup: copy existing prerendered HTML from the
     # currently-active color into the target color so bots see continuity at
     # the moment of traffic switch instead of falling back to the SPA shell
-    # while the detached post-cutover prerender catches up. Failure here is
-    # non-fatal — bots simply get the SPA fallback during the gap.
+    # while the detached post-cutover prerender catches up. This is also the
+    # shared status-map handoff; failure must stop the cutover.
     if [ "$SKIP_PRERENDER" != "1" ] && [ -f "$SELF_DIR/phases/warmup-prerender-snapshots.sh" ]; then
         phase "Pre-Cutover Snapshot Warmup" "$active" "$target" "$commit"
-        ACTIVE_COLOR="$active" TARGET_COLOR="$target" \
-            bash "$SELF_DIR/phases/warmup-prerender-snapshots.sh" || true
+        if ! ACTIVE_COLOR="$active" TARGET_COLOR="$target" \
+            bash "$SELF_DIR/phases/warmup-prerender-snapshots.sh"; then
+            log_err "Prerender snapshot/status handoff failed; aborting before cutover"
+            stop_workers_for_color "$target"
+            restart_existing_workers_for_color "$active"
+            exit 1
+        fi
     fi
 
     write_apache_routes "$target"

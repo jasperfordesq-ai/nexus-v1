@@ -1,5 +1,10 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Input, Select, SelectItem, useDisclosure, Code, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tabs, Tab, Tooltip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Checkbox } from '@/components/ui';
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { Separator } from '@/components/ui';
@@ -20,10 +25,12 @@ import Bot from 'lucide-react/icons/bot';
 import Gauge from 'lucide-react/icons/gauge';
 import Zap from 'lucide-react/icons/zap';
 import ShieldCheck from 'lucide-react/icons/shield-check';
+import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useAuth } from '@/contexts';
 import { usePusherOptional } from '@/contexts/PusherContext';
+import { isPlatformSuperAdminUser } from '@/lib/access';
 import { PageHeader } from '../../../components/PageHeader';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import {
@@ -54,10 +61,21 @@ import {
   stalenessColor,
 } from './prerenderFormat';
 import type { ToastShape } from './prerenderAdminTypes';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
+
+// Backend protocol token. The phrase shown and typed by the operator is
+// localized; only the confirmed request payload uses this invariant value.
+const RESET_ALL_API_CONFIRMATION = 'RESET ALL SNAPSHOTS';
+const PRERENDER_TAB_KEYS = new Set([
+  'overview',
+  'tenant-safety',
+  'inventory',
+  'coverage',
+  'jobs',
+  'analytics',
+  'events',
+  'failures',
+  'history',
+]);
 
 /**
  * Prerender Admin — control panel for the bot-only prerender engine.
@@ -87,10 +105,15 @@ function useJobUpdates(): { lastUpdate: number; live: boolean } {
   const pusher = usePusherOptional();
   const [lastUpdate, setLastUpdate] = useState(0);
   const [live, setLive] = useState(false);
+  const client = pusher?.client;
+  const connected = pusher?.isConnected ?? false;
 
   useEffect(() => {
-    if (!pusher?.client) return;
-    const ch = pusher.client.subscribe('private-admin-prerender');
+    if (!client || !connected) {
+      setLive(false);
+      return;
+    }
+    const ch = client.subscribe('private-admin-prerender');
     const onSub = () => setLive(true);
     const onErr = () => setLive(false);
     const onEvent = () => setLastUpdate(Date.now());
@@ -101,9 +124,9 @@ function useJobUpdates(): { lastUpdate: number; live: boolean } {
       ch.unbind('job.updated', onEvent);
       ch.unbind('pusher:subscription_succeeded', onSub);
       ch.unbind('pusher:subscription_error', onErr);
-      try { pusher.client?.unsubscribe('private-admin-prerender'); } catch { /* noop */ }
+      try { client.unsubscribe('private-admin-prerender'); } catch { /* noop */ }
     };
-  }, [pusher]);
+  }, [client, connected]);
 
   return { lastUpdate, live };
 }
@@ -116,35 +139,125 @@ export function PrerenderAdmin() {
   // PLATFORM super-admin only — the engine runs cross-tenant operations.
   // is_tenant_super_admin is intentionally NOT accepted (matches the backend
   // requirePlatformSuperAdmin gate and the private-admin-prerender channel auth).
-  const isSuperAdmin = Boolean(
-    user?.is_super_admin || user?.is_god || user?.role === 'super_admin',
-  );
+  const isSuperAdmin = isPlatformSuperAdminUser(user);
 
   // Tell tenant admins WHY they can't use the action buttons. The greyed-out
   // state alone was confusing — buttons just appeared broken.
   const readOnly = !isSuperAdmin;
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const [tab, setTab] = useState<string>(() => searchParams.get('tab') || 'overview');
-  const [coverageFilter, setCoverageFilter] = useState<string | null>(() => searchParams.get('tenant'));
+  const requestedTab = searchParams.get('tab') || 'overview';
+  const tab = PRERENDER_TAB_KEYS.has(requestedTab) ? requestedTab : 'overview';
+  const coverageFilter = searchParams.get('tenant');
+  const [resetOpen, setResetOpen] = useState(false);
+  const [resetConfirmation, setResetConfirmation] = useState('');
+  const [resetting, setResetting] = useState(false);
 
-  // Keep tab and tenant filter in the URL so refresh and back/forward work.
-  useEffect(() => {
-    const next = new URLSearchParams(searchParams);
-    if (tab && tab !== 'overview') next.set('tab', tab); else next.delete('tab');
-    if (coverageFilter) next.set('tenant', coverageFilter); else next.delete('tenant');
-    const currentStr = searchParams.toString();
-    const nextStr = next.toString();
-    if (currentStr !== nextStr) setSearchParams(next, { replace: true });
-  }, [tab, coverageFilter, searchParams, setSearchParams]);
+  const closeReset = useCallback(() => {
+    if (resetting) return;
+    setResetOpen(false);
+    // Never retain destructive confirmation across modal sessions.
+    setResetConfirmation('');
+  }, [resetting]);
+
+  // URL state is the single source of truth. This avoids the two-effect race
+  // where a tab click could be overwritten by the previous search params and
+  // makes browser back/forward navigation deterministic.
+  const navigateAdmin = useCallback((nextTab: string, tenant?: string | null, replace = false) => {
+    const safeTab = PRERENDER_TAB_KEYS.has(nextTab) ? nextTab : 'overview';
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      if (safeTab === 'overview') next.delete('tab'); else next.set('tab', safeTab);
+      if (tenant !== undefined) {
+        if (tenant) next.set('tenant', tenant); else next.delete('tenant');
+      }
+      return next;
+    }, { replace });
+  }, [setSearchParams]);
+
+  const clearCoverageFilter = useCallback(() => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.delete('tenant');
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
   const { lastUpdate, live } = useJobUpdates();
+
+  const resetAll = async () => {
+    setResetting(true);
+    try {
+      const response = await adminPrerender.resetAll(RESET_ALL_API_CONFIRMATION);
+      if (response.data) {
+        toast.success(t('reset_all.queued', {
+          id: response.data.job_id,
+          tenants: response.data.tenant_count,
+          routes: response.data.planned_routes,
+        }));
+        setResetOpen(false);
+        setResetConfirmation('');
+        navigateAdmin('jobs');
+      }
+    } catch {
+      toast.error(t('reset_all.failed'));
+    } finally {
+      setResetting(false);
+    }
+  };
 
   return (
     <div>
       <PageHeader
         title={t('title')}
         description={t('description')}
+        actions={(
+          <Button
+            variant="danger"
+            startContent={<RotateCcw size={16} />}
+            onPress={() => {
+              setResetConfirmation('');
+              setResetOpen(true);
+            }}
+            isDisabled={!isSuperAdmin}
+          >
+            {t('reset_all.button')}
+          </Button>
+        )}
       />
+
+      <Modal isOpen={resetOpen} onClose={closeReset}>
+        <ModalContent>
+          <ModalHeader>{t('reset_all.title')}</ModalHeader>
+          <ModalBody className="gap-4">
+            <p className="text-sm text-muted">{t('reset_all.description')}</p>
+            <div className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm text-warning-foreground">
+              {t('reset_all.safety')}
+            </div>
+            <Input
+              label={t('reset_all.confirmation_label')}
+              description={t('reset_all.confirmation_help', { phrase: t('reset_all.confirmation_phrase') })}
+              value={resetConfirmation}
+              onValueChange={setResetConfirmation}
+              autoComplete="off"
+              isDisabled={resetting}
+            />
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="tertiary" onPress={closeReset} isDisabled={resetting}>
+              {t('reset_all.cancel')}
+            </Button>
+            <Button
+              variant="danger"
+              startContent={<RotateCcw size={16} />}
+              onPress={resetAll}
+              isLoading={resetting}
+              isDisabled={resetConfirmation !== t('reset_all.confirmation_phrase')}
+            >
+              {t('reset_all.confirm')}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {readOnly && (
         <div className="mb-3 rounded-md border border-warning-200 bg-warning-50 text-warning-800 px-3 py-2 text-sm">
@@ -157,7 +270,7 @@ export function PrerenderAdmin() {
       <HealthBanner isSuperAdmin={isSuperAdmin} toast={toast} lastUpdate={lastUpdate} />
       <OperatorGuide />
       <GuidedWorkflows
-        onSelect={(nextTab) => setTab(nextTab)}
+        onSelect={(nextTab) => navigateAdmin(nextTab)}
       />
 
       <div className="flex justify-end mb-2">
@@ -173,8 +286,9 @@ export function PrerenderAdmin() {
 
       <Tabs
         aria-label={t('tabs_aria')}
+        scrollAffordance
         selectedKey={tab}
-        onSelectionChange={(k) => setTab(String(k))}
+        onSelectionChange={(k) => navigateAdmin(String(k))}
         variant="underlined"
         classNames={{ tabList: 'mb-4' }}
       >
@@ -191,14 +305,14 @@ export function PrerenderAdmin() {
           <TenantSafetyTab
             isSuperAdmin={isSuperAdmin}
             toast={toast}
-            onOpenInventory={(slug) => { setCoverageFilter(slug); setTab('inventory'); }}
+            onOpenInventory={(slug) => navigateAdmin('inventory', slug)}
           />
         </Tab>
         <Tab
           key="inventory"
           title={<span className="flex items-center gap-2"><HardDrive size={16} />{t('tabs.inventory')}</span>}
         >
-          <InventoryTab presetTenant={coverageFilter} onPresetConsumed={() => setCoverageFilter(null)} />
+          <InventoryTab presetTenant={coverageFilter} onPresetConsumed={clearCoverageFilter} />
         </Tab>
         <Tab
           key="coverage"
@@ -207,7 +321,7 @@ export function PrerenderAdmin() {
           <CoverageTab
             isSuperAdmin={isSuperAdmin}
             toast={toast}
-            onDrillDown={(slug) => { setCoverageFilter(slug); setTab('inventory'); }}
+            onDrillDown={(slug) => navigateAdmin('inventory', slug)}
           />
         </Tab>
         <Tab
@@ -300,13 +414,27 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
     }
   };
 
+  const downloadMetrics = async () => {
+    try {
+      await adminPrerender.downloadMetrics();
+    } catch {
+      toast.error(t('errors.download_metrics'));
+    }
+  };
+
   if (loading && !summary) {
     return <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>;
   }
   if (!summary) return <p className="text-muted">{t('empty_summary')}</p>;
 
-  const healthBadge = !summary.cache_readable
+  const healthBadge = summary.plan_error_count > 0
+    ? <Chip color="danger" variant="soft">{summary.plan_error_count} × {tAdmin('advanced.prerender.sitemap_explorer.error')}</Chip>
+    : summary.inventory_truncated
+      ? <Chip color="danger" variant="soft">{tAdmin('advanced.prerender.inventory.truncated', { count: summary.inventory_hard_cap })}</Chip>
+    : !summary.cache_readable
     ? <Chip color="danger" variant="soft">{t('health.cache_unreachable')}</Chip>
+    : !summary.cache_writable
+      ? <Chip color="danger" variant="soft">{t('health.cache_read_only')}</Chip>
     : summary.missing_count > 0
       ? <Chip color="warning" variant="soft">{t('health.missing', { count: summary.missing_count })}</Chip>
       : summary.stale_count > 0
@@ -315,10 +443,21 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
 
   return (
     <div className="space-y-4">
+      {(summary.plan_error_count > 0 || summary.inventory_truncated) && (
+        <div role="alert" className="rounded-lg border border-danger/40 bg-danger/10 p-3 text-sm text-danger-foreground">
+          {summary.plan_error_count > 0 && (
+            <p>{summary.plan_error_count} × {tAdmin('advanced.prerender.sitemap_explorer.error')}</p>
+          )}
+          {summary.inventory_truncated && (
+            <p>{tAdmin('advanced.prerender.inventory.truncated', { count: summary.inventory_hard_cap })}</p>
+          )}
+        </div>
+      )}
       {/* KPI grid — 11 cards, breakpoints chosen so every row fills cleanly. */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-3">
-        <KpiCard label={t('kpi.coverage')} value={`${summary.coverage_pct}%`} hint={`${summary.total_snapshots} / ${summary.expected_count}`} />
+        <KpiCard label={t('kpi.coverage')} value={`${summary.coverage_pct}%`} hint={`${summary.expected_rendered_count} / ${summary.expected_count}`} />
         <KpiCard label={t('kpi.missing')} value={summary.missing_count} hint={t('hints.tenants_routes', { tenants: summary.tenant_count, routes: summary.expected_routes.length })} tone={summary.missing_count > 0 ? 'warning' : 'default'} />
+        <KpiCard label={t('kpi.unexpected')} value={summary.unexpected_count} hint={t('hints.unexpected')} tone={summary.unexpected_count > 0 ? 'warning' : 'default'} />
         <KpiCard label={t('kpi.age_stale')} value={summary.stale_count} hint={t('hints.aging', { count: summary.warn_count })} tone={summary.stale_count > 0 ? 'warning' : 'default'} />
         <KpiCard label={t('kpi.content_stale')} value={summary.content_stale_count} hint={t('hints.content_stale')} tone={summary.content_stale_count > 0 ? 'warning' : 'default'} />
         <KpiCard label={t('kpi.asset_broken')} value={summary.asset_invalid_count} hint={t('hints.asset_broken')} tone={summary.asset_invalid_count > 0 ? 'danger' : 'default'} />
@@ -331,8 +470,9 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
           label={t('kpi.metrics')}
           value={
             <>
-              {/* eslint-disable-next-line i18next/no-literal-string -- Metrics route must remain verbatim. */}
-              <a href="/api/v2/admin/prerender/metrics" target="_blank" rel="noopener noreferrer" className="text-accent text-sm hover:underline">/metrics</a>
+              <Button size="sm" variant="tertiary" onPress={downloadMetrics}>
+                {t('actions.download_metrics')}
+              </Button>
             </>
           }
           hint={t('hints.prometheus')}
@@ -433,24 +573,29 @@ function FreshnessControls({
   const [driftLoading, setDriftLoading] = useState(false);
   const [driftOutput, setDriftOutput] = useState<string>('');
   const [purgeLoading, setPurgeLoading] = useState(false);
-  const [purgeOutput, setPurgeOutput] = useState<{ deleted_total: number; by_tenant: Record<string, string[]>; dry_run: boolean } | null>(null);
+  const [confirmPurgeOpen, setConfirmPurgeOpen] = useState(false);
+  const [purgeOutput, setPurgeOutput] = useState<{ deleted_total: number; by_tenant: Record<string, string[]>; dry_run: boolean; preview_token?: string | null } | null>(null);
+  const [purgePreviewToken, setPurgePreviewToken] = useState<string | null>(null);
 
   const runPurgeUnexpected = async (apply: boolean) => {
     setPurgeLoading(true);
     setPurgeOutput(null);
     try {
-      const res = await adminPrerender.purgeUnexpected(apply);
+      const res = await adminPrerender.purgeUnexpected(apply, apply ? purgePreviewToken ?? undefined : undefined);
       if (res.data) {
         setPurgeOutput(res.data);
+        setPurgePreviewToken(apply ? null : (res.data.preview_token ?? null));
         toast.success(apply
           ? t('messages.purged_ungated', { count: res.data.deleted_total, tenants: Object.keys(res.data.by_tenant).length })
           : t('messages.purge_dry_run', { count: res.data.deleted_total }));
         if (apply) onActed();
       }
     } catch {
+      if (apply) setPurgePreviewToken(null);
       toast.error(t('errors.purge_unexpected'));
     } finally {
       setPurgeLoading(false);
+      if (apply) setConfirmPurgeOpen(false);
     }
   };
 
@@ -489,6 +634,7 @@ function FreshnessControls({
   };
 
   return (
+    <>
     <Card>
       <CardHeader>
         <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -586,9 +732,9 @@ function FreshnessControls({
               {t('actions.dry_run')}
             </Button>
             <Button variant="danger"
-              onPress={() => runPurgeUnexpected(true)}
+              onPress={() => setConfirmPurgeOpen(true)}
               isLoading={purgeLoading}
-              isDisabled={!isSuperAdmin}
+              isDisabled={!isSuperAdmin || !purgePreviewToken}
               size="sm"
               startContent={<Trash size={14} />}
             >
@@ -614,6 +760,17 @@ function FreshnessControls({
         </div>
       </CardBody>
     </Card>
+    <ConfirmModal
+      isOpen={confirmPurgeOpen}
+      onClose={() => setConfirmPurgeOpen(false)}
+      onConfirm={() => runPurgeUnexpected(true)}
+      title={t('purge_ungated.confirm_title')}
+      message={t('purge_ungated.confirm_message')}
+      confirmLabel={t('actions.apply')}
+      confirmColor="danger"
+      isLoading={purgeLoading}
+    />
+    </>
   );
 }
 
@@ -636,8 +793,8 @@ function KpiCard({
     <Card className="p-2">
       <CardBody className="py-3">
         <p className="text-xs text-muted uppercase tracking-wide">{label}</p>
-        <p className={`text-2xl font-semibold ${toneClass} truncate`}>{value}</p>
-        {hint && <p className="text-xs text-muted mt-1 truncate">{hint}</p>}
+        <div className={`text-2xl font-semibold ${toneClass} break-words`}>{value}</div>
+        {hint && <p className="text-xs text-muted mt-1 break-all">{hint}</p>}
       </CardBody>
     </Card>
   );
@@ -650,14 +807,18 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
   const { t: tAdmin } = useTranslation('admin_advanced');
   const toast = useToast();
   const { user } = useAuth();
-  const isSuperAdmin = Boolean(user?.is_super_admin || user?.is_god || user?.role === 'super_admin');
+  const isSuperAdmin = isPlatformSuperAdminUser(user);
   const [items, setItems] = useState<PrerenderInventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [truncated, setTruncated] = useState(false);
+  const [hardCap, setHardCap] = useState(0);
   const [filter, setFilter] = useState('');
   const [stalenessFilter, setStalenessFilter] = useState<string>('all');
   const [issueFilter, setIssueFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [tenant, setTenant] = useState('');
+  const [tenant, setTenant] = useState(() => presetTenant ?? '');
+  const [appliedTenant, setAppliedTenant] = useState(() => presetTenant ?? '');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
 
@@ -665,20 +826,49 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
   useEffect(() => {
     if (presetTenant) {
       setTenant(presetTenant);
+      setAppliedTenant(presetTenant);
       onPresetConsumed();
     }
   }, [presetTenant, onPresetConsumed]);
   const [inspecting, setInspecting] = useState<PrerenderInspect | null>(null);
   const [inspectLoading, setInspectLoading] = useState(false);
+  const [inspectError, setInspectError] = useState(false);
   const inspectModal = useDisclosure();
+  const inventoryRequest = useRef(0);
+  const inspectRequest = useRef(0);
 
   const load = useCallback(() => {
+    const requestId = ++inventoryRequest.current;
     setLoading(true);
-    adminPrerender.getInventory(tenant.trim() || undefined)
-      .then((res) => { if (res.data) setItems(res.data.items); })
-      .catch(() => toast.error(t('errors.load')))
-      .finally(() => setLoading(false));
-  }, [t, tenant, toast]);
+    setLoadError(false);
+    // A tenant switch must never leave the previous tenant's actionable rows
+    // visible while the replacement request is in flight.
+    setItems([]);
+    setSelected(new Set());
+    setTruncated(false);
+    setHardCap(0);
+    adminPrerender.getInventory(appliedTenant || undefined)
+      .then((res) => {
+        if (requestId !== inventoryRequest.current || !res.data) return;
+        setItems(res.data.items);
+        setTruncated(res.data.truncated);
+        setHardCap(res.data.hard_cap);
+        setSelected(new Set());
+      })
+      .catch(() => {
+        if (requestId === inventoryRequest.current) {
+          setItems([]);
+          setSelected(new Set());
+          setTruncated(false);
+          setHardCap(0);
+          setLoadError(true);
+          toast.error(t('errors.load'));
+        }
+      })
+      .finally(() => {
+        if (requestId === inventoryRequest.current) setLoading(false);
+      });
+  }, [t, appliedTenant, toast]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -710,7 +900,9 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
     setBulkLoading(true);
     try {
       const byTenant = new Map<number, string[]>();
-      const itemMap = new Map(filtered.map((i) => [i.cache_path, i] as const));
+      // Selection may span filter changes; resolve against the authoritative
+      // loaded inventory so hidden selections are not silently skipped.
+      const itemMap = new Map(items.map((i) => [i.cache_path, i] as const));
 
       for (const cachePath of selected) {
         const it = itemMap.get(cachePath);
@@ -767,15 +959,22 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
   };
 
   const openInspect = async (item: PrerenderInventoryItem) => {
+    const requestId = ++inspectRequest.current;
+    setInspecting(null);
+    setInspectError(false);
     setInspectLoading(true);
     inspectModal.onOpen();
     try {
       const res = await adminPrerender.inspect(item.cache_path);
-      if (res.data) setInspecting(res.data as PrerenderInspect);
+      if (requestId === inspectRequest.current && res.data) setInspecting(res.data as PrerenderInspect);
     } catch {
-      toast.error(t('errors.inspect'));
+      if (requestId === inspectRequest.current) {
+        setInspecting(null);
+        setInspectError(true);
+        toast.error(t('errors.inspect'));
+      }
     } finally {
-      setInspectLoading(false);
+      if (requestId === inspectRequest.current) setInspectLoading(false);
     }
   };
 
@@ -834,7 +1033,15 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
             onValueChange={setTenant}
             className="max-w-xs"
           />
-          <Button variant="tertiary" onPress={load} startContent={<RefreshCw size={14} />}>
+          <Button
+            variant="tertiary"
+            onPress={() => {
+              const nextTenant = tenant.trim();
+              if (nextTenant === appliedTenant) load();
+              else setAppliedTenant(nextTenant);
+            }}
+            startContent={<RefreshCw size={14} />}
+          >
             {t('actions.reload')}
           </Button>
           <span className="text-sm text-muted ml-auto self-center">
@@ -859,7 +1066,18 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
         </CardBody>
       </Card>
 
-      {loading ? (
+      {truncated && (
+        <div className="rounded-lg border border-warning/40 bg-warning/10 p-3 text-sm text-warning">
+          {t('truncated', { count: hardCap })}
+        </div>
+      )}
+
+      {loadError ? (
+        <div role="alert" className="flex flex-wrap items-center gap-3 rounded-lg border border-danger-200 bg-danger-50 p-3 text-sm text-danger-800">
+          <span>{t('errors.load')}</span>
+          <Button size="sm" variant="tertiary" onPress={load}>{t('actions.reload')}</Button>
+        </div>
+      ) : loading ? (
         <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>
       ) : (
         <Table aria-label={t('table_aria')} removeWrapper isStriped>
@@ -898,7 +1116,10 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                     />
                   ) : null}
                 </TableCell>
-                <TableCell className="text-xs">{it.host}</TableCell>
+                <TableCell className="text-xs">
+                  <span className="block">{it.host}</span>
+                  <span className="block text-muted">{it.tenant_slug ?? t('unknown_tenant')}</span>
+                </TableCell>
                 <TableCell className="text-xs font-mono">{it.route}</TableCell>
                 <TableCell>
                   <Chip color={httpStatusColor(it.http_status)} variant="soft" size="sm">
@@ -931,12 +1152,12 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                         <Search size={14} />
                       </Button>
                     </Tooltip>
-                    <Tooltip content={t('actions.open_rendered_url')}>
+                    <Tooltip content={t('actions.open_live_url')}>
                       <Button
                         isIconOnly
                         size="sm"
                         variant="tertiary"
-                        aria-label={t('actions.open_rendered_url')}
+                        aria-label={t('actions.open_live_url')}
                         as="a"
                         href={`https://${it.host}${it.route === '/' ? '' : it.route}`}
                         target="_blank"
@@ -959,8 +1180,14 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
             <>
               <ModalHeader>{t('inspect.modal_title')}</ModalHeader>
               <ModalBody>
-                {inspectLoading || !inspecting ? (
+                {inspectLoading ? (
                   <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>
+                ) : inspectError ? (
+                  <div role="alert" className="rounded-lg border border-danger/40 bg-danger/10 p-4 text-danger">
+                    {t('inspect.load_failed')}
+                  </div>
+                ) : !inspecting ? (
+                  <p className="text-sm text-muted">{t('inspect.no_snapshot')}</p>
                 ) : (
                   <div className="space-y-3 text-sm">
                     {/* SEO score header — at the top so it's the first thing reviewers see. */}
@@ -1157,15 +1384,25 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
   const { t: tAdmin } = useTranslation('admin_advanced');
   const [rows, setRows] = useState<PrerenderCoverageRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [enqueuingFor, setEnqueuingFor] = useState<string | null>(null);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [confirmRecacheOpen, setConfirmRecacheOpen] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
+    setLoadError(false);
+    setRows([]);
     adminPrerender.getCoverage()
-      .then((r) => { if (r.data) setRows(r.data.rows); })
-      .catch(() => toast.error(t('errors.load')))
+      .then((r) => {
+        if (r.data) setRows(r.data.rows);
+        else setLoadError(true);
+      })
+      .catch(() => {
+        setRows([]);
+        setLoadError(true);
+        toast.error(t('errors.load'));
+      })
       .finally(() => setLoading(false));
   }, [t, toast]);
 
@@ -1185,12 +1422,12 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
 
   /**
    * Bulk-enqueue recache for every tenant that has missing or stale routes.
-   * Targets only the affected routes (not a full force-rerender) so the cost
-   * is bounded.
+   * Uses one tenant-wide force job per affected tenant. This avoids route-list
+   * truncation and guarantees newly discovered custom pages are included.
    */
   const refreshAllStale = async () => {
     const needsWork = rows.filter(
-      (r) => r.missing_routes.length > 0 || r.stale_routes.length > 0 || r.asset_invalid_routes.length > 0,
+      (r) => Boolean(r.plan_error) || r.missing_routes.length > 0 || r.stale_routes.length > 0 || r.asset_invalid_routes.length > 0,
     );
     if (needsWork.length === 0) {
       toast.success(t('messages.no_stale'));
@@ -1201,15 +1438,9 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
     let queued = 0;
     try {
       for (const r of needsWork) {
-        const allRoutes = Array.from(new Set([
-          ...r.missing_routes,
-          ...r.stale_routes,
-          ...r.asset_invalid_routes,
-        ]));
-        if (allRoutes.length === 0) continue;
         await adminPrerender.enqueueJob({
           tenant_slug: r.slug,
-          routes: allRoutes.join(','),
+          force: true,
         });
         queued++;
       }
@@ -1223,10 +1454,16 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
     }
   };
 
+  if (loadError) return (
+    <div role="alert" className="flex flex-wrap items-center gap-3 rounded-lg border border-danger-200 bg-danger-50 p-3 text-sm text-danger-800">
+      <span>{t('errors.load')}</span>
+      <Button size="sm" variant="tertiary" onPress={load}>{tAdmin('common.retry')}</Button>
+    </div>
+  );
   if (loading) return <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>;
 
   const totalNeedingWork = rows.filter(
-    (r) => r.missing_routes.length > 0 || r.stale_routes.length > 0 || r.asset_invalid_routes.length > 0,
+    (r) => Boolean(r.plan_error) || r.missing_routes.length > 0 || r.stale_routes.length > 0 || r.asset_invalid_routes.length > 0,
   ).length;
 
   return (
@@ -1270,7 +1507,7 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
       <TableBody emptyContent={t('empty')}>
         {rows.map((r) => {
           const pct = r.expected > 0 ? Math.round((r.rendered / r.expected) * 100) : 0;
-          const color = pct >= 95 ? 'success' : pct >= 70 ? 'warning' : 'danger';
+          const color = pct === 100 ? 'success' : pct >= 70 ? 'warning' : 'danger';
           return (
             <TableRow key={r.slug}>
               <TableCell>
@@ -1286,9 +1523,17 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
               </TableCell>
               <TableCell className="text-xs">{r.host}</TableCell>
               <TableCell>
-                <Chip color={color} variant="soft" size="sm">
-                  {r.rendered}/{r.expected} ({pct}%)
-                </Chip>
+                {r.plan_error ? (
+                  <Tooltip content={r.plan_error}>
+                    <Chip color="danger" variant="soft" size="sm">
+                      {tAdmin('advanced.prerender.sitemap_explorer.error')}
+                    </Chip>
+                  </Tooltip>
+                ) : (
+                  <Chip color={color} variant="soft" size="sm">
+                    {r.rendered}/{r.expected} ({pct}%)
+                  </Chip>
+                )}
               </TableCell>
               <TableCell>
                 {r.stale_routes.length > 0 ? (
@@ -1541,7 +1786,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
   useEffect(() => { if (lastUpdate > 0) load(); }, [lastUpdate, load]);
   useEffect(() => {
     if (live) return;
-    const hasActive = jobs.some((j) => j.status === 'queued' || j.status === 'claimed' || j.status === 'running');
+    const hasActive = jobs.some((j) => j.status === 'pending_fence' || j.status === 'queued' || j.status === 'claimed' || j.status === 'running');
     if (!hasActive) return;
     const id = setInterval(load, 5000);
     return () => clearInterval(id);
@@ -1584,7 +1829,9 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
             className="max-w-[180px]"
           >
             <SelectItem key="all" id="all">{t('filters.all')}</SelectItem>
+            <SelectItem key="pending_fence" id="pending_fence">{t('filters.pending_fence')}</SelectItem>
             <SelectItem key="queued" id="queued">{t('filters.queued')}</SelectItem>
+            <SelectItem key="claimed" id="claimed">{t('statuses.claimed')}</SelectItem>
             <SelectItem key="running" id="running">{t('filters.running')}</SelectItem>
             <SelectItem key="succeeded" id="succeeded">{t('filters.succeeded')}</SelectItem>
             <SelectItem key="partial" id="partial">{t('filters.partial')}</SelectItem>
@@ -1618,7 +1865,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                 <TableCell className="text-xs font-mono">{j.id}</TableCell>
                 <TableCell>
                   <Chip color={jobStatusColor(j.status)} variant="soft" size="sm">
-                    {j.status}
+                    {t(`statuses.${j.status}`)}
                   </Chip>
                 </TableCell>
                 <TableCell>
@@ -1656,7 +1903,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                     <Button size="sm" variant="tertiary" isIconOnly onPress={() => openDetail(j)} aria-label={t('actions.view_details', { id: j.id })}>
                       <Search size={14} />
                     </Button>
-                    {j.status === 'queued' && (
+                    {(j.status === 'pending_fence' || (j.status === 'queued' && !j.authoritative_reset)) && (
                       <Button
                         size="sm"
                         variant="danger"
@@ -1699,13 +1946,14 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                 {expanded && (
                   <div className="space-y-2 text-sm">
                     <div className="grid grid-cols-2 gap-2">
-                      <Info label={t('detail.status')} value={expanded.status} />
+                      <Info label={t('detail.status')} value={t(`statuses.${expanded.status}`)} />
                       <Info label={t('detail.tenant')} value={expanded.tenant_slug || t('detail.all')} />
                       <Info label={t('detail.routes')} value={expanded.routes || t('detail.all')} mono />
                       <Info label={t('detail.exit_code')} value={String(expanded.exit_code ?? '—')} />
                       <Info label={t('detail.duration')} value={expanded.duration_s != null ? `${expanded.duration_s}s` : '—'} />
                       <Info label={t('detail.claimed_by')} value={expanded.claimed_by || '—'} />
                       <Info label={t('detail.queued_at')} value={formatTs(expanded.queued_at)} />
+                      <Info label={t('detail.fence_ready_at')} value={formatTs(expanded.fence_ready_at ?? null)} />
                       <Info label={t('detail.started_at')} value={formatTs(expanded.started_at)} />
                       <Info label={t('detail.finished_at')} value={formatTs(expanded.finished_at)} />
                       <Info label={t('detail.requested_by')} value={expanded.requested_by?.name || '—'} />
@@ -1843,12 +2091,22 @@ function FailuresTab() {
   const toast = useToast();
   const [items, setItems] = useState<PrerenderFailure[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
+    setLoadError(false);
+    setItems([]);
     adminPrerender.getFailures()
-      .then((r) => { if (r.data) setItems(r.data.items); })
-      .catch(() => toast.error(t('errors.load')))
+      .then((r) => {
+        if (r.data) setItems(r.data.items);
+        else setLoadError(true);
+      })
+      .catch(() => {
+        setItems([]);
+        setLoadError(true);
+        toast.error(t('errors.load'));
+      })
       .finally(() => setLoading(false));
   }, [t, toast]);
 
@@ -1866,7 +2124,12 @@ function FailuresTab() {
           </p>
         </CardBody>
       </Card>
-      {loading ? (
+      {loadError ? (
+        <div role="alert" className="flex flex-wrap items-center gap-3 rounded-lg border border-danger-200 bg-danger-50 p-3 text-sm text-danger-800">
+          <span>{t('errors.load')}</span>
+          <Button size="sm" variant="tertiary" onPress={load}>{tAdmin('common.retry')}</Button>
+        </div>
+      ) : loading ? (
         <div role="status" aria-busy="true" aria-label={tAdmin('common.loading')} className="flex justify-center py-8"><Spinner /></div>
       ) : items.length === 0 ? (
         <Card>
@@ -1958,15 +2221,28 @@ function HealthCheckList({
 
 function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boolean; toast: ToastShape; lastUpdate: number }) {
   const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.health_banner' });
+  const { t: tAdmin } = useTranslation('admin_advanced');
   const [health, setHealth] = useState<PrerenderHealth | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const load = useCallback(() => {
     adminPrerender.getHealth()
-      .then((res) => { if (res.data) setHealth(res.data as PrerenderHealth); })
-      .catch(() => { /* silent — banner just disappears */ });
+      .then((res) => {
+        if (res.data) {
+          setHealth(res.data as PrerenderHealth);
+          setLoadError(false);
+        } else {
+          setHealth(null);
+          setLoadError(true);
+        }
+      })
+      .catch(() => {
+        setHealth(null);
+        setLoadError(true);
+      });
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -1997,11 +2273,21 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
     finally { setBusy(false); }
   };
 
-  if (!health) return null;
+  if (loadError) return (
+    <div role="alert" className="mb-3 flex flex-wrap items-center gap-3 rounded-md border border-danger-200 bg-danger-50 px-3 py-2 text-sm text-danger-800">
+      <span>{tAdmin('common.error_loading_data')}</span>
+      <Button size="sm" variant="tertiary" onPress={load}>{tAdmin('common.retry')}</Button>
+    </div>
+  );
+  if (!health) return (
+    <div role="status" aria-live="polite" className="mb-3 text-sm text-muted">
+      {tAdmin('common.loading')}
+    </div>
+  );
   if (health.status === 'green') {
     return (
-      <div className="mb-3 rounded-md border border-success-200 bg-success-50 px-3 py-2 text-sm text-success-800 dark:border-success-900/40 dark:bg-success-950/20 dark:text-success-200">
-        <div className="flex items-center gap-2">
+      <div role="status" aria-live="polite" className="mb-3 rounded-md border border-success-200 bg-success-50 px-3 py-2 text-sm text-success-800 dark:border-success-900/40 dark:bg-success-950/20 dark:text-success-200">
+        <div className="flex flex-wrap items-center gap-2">
           <CheckCircle size={14} className="text-success" />
           {t('engine_healthy')}
           <Button size="sm" variant="tertiary" className="ml-auto h-7 text-xs" onPress={() => setExpanded((v) => !v)}>
@@ -2025,8 +2311,8 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
   const failing = health.checks.filter((c) => c.status !== 'green');
 
   return (
-    <div className={`mb-3 rounded-md border px-3 py-2 text-sm ${HEALTH_BANNER_CLASSES[tone]}`}>
-      <div className="flex items-center gap-2">
+    <div role="alert" className={`mb-3 rounded-md border px-3 py-2 text-sm ${HEALTH_BANNER_CLASSES[tone]}`}>
+      <div className="flex flex-wrap items-center gap-2">
         <Chip size="sm" color={tone} variant="soft">{health.status.toUpperCase()}</Chip>
         <span className="font-medium">{t('issue_count', { count: failing.length })}</span>
         <Button size="sm" variant="tertiary" className="ml-auto h-7 text-xs" onPress={() => setExpanded((v) => !v)}>
@@ -2086,21 +2372,34 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
 function AuditTab() {
   const { t } = useTranslation('admin_advanced', { keyPrefix: 'advanced.prerender.audit' });
   const { t: tAdmin } = useTranslation('admin_advanced');
+  const toast = useToast();
   const [items, setItems] = useState<PrerenderAuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
   const [filter, setFilter] = useState('');
 
   const load = useCallback(() => {
     setLoading(true);
     adminPrerender.getAudit(filter || undefined, 200)
       .then((res) => { if (res.data) setItems(res.data.items); })
+      .catch(() => toast.error(t('errors.load')))
       .finally(() => setLoading(false));
-  }, [filter]);
+  }, [filter, t, toast]);
 
   useEffect(() => { load(); }, [load]);
 
   const actionLabel = (action: string) => t(`actions.${action}`, { defaultValue: action });
   const outcomeLabel = (outcome: string) => t(`outcomes.${outcome}`, { defaultValue: outcome });
+  const exportAudit = async () => {
+    setExporting(true);
+    try {
+      await adminPrerender.exportCsv('audit', filter || undefined);
+    } catch {
+      toast.error(t('errors.export'));
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <div className="space-y-3">
@@ -2122,6 +2421,7 @@ function AuditTab() {
           <SelectItem key="detect_drift" id="detect_drift">{t('actions.detect_drift')}</SelectItem>
           <SelectItem key="reset_breaker" id="reset_breaker">{t('actions.reset_breaker')}</SelectItem>
           <SelectItem key="reset_queue" id="reset_queue">{t('actions.reset_queue')}</SelectItem>
+          <SelectItem key="reset_all" id="reset_all">{t('actions.reset_all')}</SelectItem>
         </Select>
         <Button size="sm" variant="tertiary" onPress={load} isDisabled={loading} startContent={<RefreshCw size={14} />}>
           {t('buttons.refresh')}
@@ -2129,8 +2429,8 @@ function AuditTab() {
         <Button
           size="sm"
           variant="tertiary"
-          as="a"
-          href={`/api/v2/admin/prerender/export/audit.csv${filter ? `?action=${encodeURIComponent(filter)}` : ''}`}
+          onPress={exportAudit}
+          isLoading={exporting}
           startContent={<ExternalLink size={14} />}
         >
           {t('buttons.export_csv')}
@@ -2287,6 +2587,7 @@ function SitemapExplorer() {
     static_routes: string[];
     dynamic_routes: string[];
     total_count: number;
+    truncated: boolean;
   } | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -2295,10 +2596,12 @@ function SitemapExplorer() {
     if (!slug.trim()) return;
     setLoading(true);
     setError(null);
+    setData(null);
     try {
       const res = await adminPrerender.sitemapExplorer(slug.trim());
       if (res.data) setData(res.data);
     } catch {
+      setData(null);
       setError(t('error'));
     } finally {
       setLoading(false);
@@ -2324,7 +2627,11 @@ function SitemapExplorer() {
             placeholder={t('placeholders.tenant_slug')}
             variant="secondary"
             value={slug}
-            onChange={(e) => setSlug(e.target.value)}
+            onValueChange={(value) => {
+              setSlug(value);
+              setData(null);
+              setError(null);
+            }}
             className="max-w-sm"
           />
           <Button onPress={submit} isLoading={loading}>
@@ -2334,6 +2641,7 @@ function SitemapExplorer() {
         {error && <p className="text-danger text-sm" role="alert">{error}</p>}
         {data && (
           <div className="space-y-3">
+            <p className="text-sm font-medium">{t('tenant', { slug: data.tenant_slug, id: data.tenant_id })}</p>
             <div className="flex gap-2">
               <Chip color="accent" variant="soft" size="sm">{t('counts.static', { count: data.static_routes.length })}</Chip>
               <Chip color="default" variant="soft" size="sm">{t('counts.dynamic', { count: data.dynamic_routes.length })}</Chip>
