@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -34,6 +35,11 @@ class IdeationChallengesControllerTest extends TestCase
     //  GET /v2/ideation-challenges
     // ------------------------------------------------------------------
 
+    public function test_index_requires_authentication(): void
+    {
+        $this->apiGet('/v2/ideation-challenges')->assertStatus(401);
+    }
+
     public function test_index_returns_data(): void
     {
         $this->authenticatedUser();
@@ -41,6 +47,36 @@ class IdeationChallengesControllerTest extends TestCase
         $response = $this->apiGet('/v2/ideation-challenges');
 
         $response->assertStatus(200);
+    }
+
+    public function test_member_cannot_enumerate_draft_challenges_by_filter_or_id(): void
+    {
+        $viewer = $this->authenticatedUser();
+        $creator = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $draftId = DB::table('ideation_challenges')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $creator->id,
+            'title' => 'Private draft challenge',
+            'description' => 'This draft must remain hidden.',
+            'status' => 'draft',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('ideation_challenges')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $creator->id,
+            'title' => 'Published open challenge',
+            'description' => 'This challenge is member-visible.',
+            'status' => 'open',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $list = $this->apiGet('/v2/ideation-challenges?status=draft');
+        $list->assertOk();
+        $this->assertNotContains($draftId, array_map('intval', array_column($list->json('data'), 'id')));
+        $this->apiGet("/v2/ideation-challenges/{$draftId}")->assertNotFound();
+        $this->assertNotSame($viewer->id, $creator->id);
     }
 
     // ------------------------------------------------------------------
@@ -87,6 +123,11 @@ class IdeationChallengesControllerTest extends TestCase
     // ------------------------------------------------------------------
     //  GET /v2/ideation-challenges/{id}
     // ------------------------------------------------------------------
+
+    public function test_show_requires_authentication(): void
+    {
+        $this->apiGet('/v2/ideation-challenges/1')->assertStatus(401);
+    }
 
     // ------------------------------------------------------------------
     //  GET /v2/ideation-challenges/{id}/ideas

@@ -1,4 +1,4 @@
-// Copyright © 2024–2026 Jasper Ford
+﻿// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -14,6 +14,50 @@ const tenantShellSource = readFileSync(path.resolve(__dirname, 'components/routi
 const protectedRoutesStart = appSource.indexOf('{/* Protected Routes */}');
 const protectedRoutesEnd = appSource.indexOf('{/* Admin Panel', protectedRoutesStart);
 const protectedRoutesSource = appSource.slice(protectedRoutesStart, protectedRoutesEnd);
+const identityBearingProtectedRoutes = [
+  'explore',
+  'listings',
+  'listings/:id',
+  'events',
+  'events/:id',
+  'groups',
+  'groups/:id',
+  'jobs',
+  'jobs/:id',
+  'courses',
+  'courses/:idOrSlug',
+  'podcasts',
+  'podcasts/:showSlug',
+  'podcasts/:showSlug/:episodeSlug',
+  'marketplace',
+  'marketplace/search',
+  'marketplace/map',
+  'marketplace/seller/:id',
+  'marketplace/category/:slug',
+  'marketplace/my-listings',
+  'marketplace/my-offers',
+  'marketplace/collections',
+  'marketplace/free',
+  'marketplace/:id',
+  'volunteering',
+  'volunteering/opportunities/:id',
+  'resources',
+  'kb',
+  'kb/:id',
+  'organisations',
+  'organisations/:id',
+  'ideation',
+  'ideation/:id',
+  'ideation/:challengeId/ideas/:id',
+] as const;
+const guardDriftProtectedRoutes = [
+  'settings/data-export',
+  'clubs/:id/admin/import',
+  'clubs/:id/admin/dues',
+  'me/verein-dues',
+  'me/verein-invitations',
+  'municipality-calendar',
+] as const;
 
 describe('App route feature gates', () => {
   it('gates matches routes behind the listings module', () => {
@@ -87,9 +131,47 @@ describe('App route feature gates', () => {
     expect(protectedRoutesSource).toMatch(/path="marketplace\/:id\/edit"[\s\S]*?<FeatureGate feature="marketplace"/);
   });
 
-  it('keeps public marketplace profile/list routes in the public route registry', () => {
-    expect(publicRoutesSource).toContain('path="marketplace/seller/:id"');
-    expect(publicRoutesSource).toContain('path="marketplace/my-listings"');
-    expect(publicRoutesSource).toContain('path="marketplace/my-offers"');
+  it('keeps every audited identity-bearing route inside the authenticated tree only', () => {
+    expect(protectedRoutesStart).toBeGreaterThan(-1);
+    expect(protectedRoutesEnd).toBeGreaterThan(protectedRoutesStart);
+
+    for (const routePath of identityBearingProtectedRoutes) {
+      const declaration = `path="${routePath}"`;
+      expect(protectedRoutesSource).toContain(declaration);
+      expect(appSource.split(declaration)).toHaveLength(2);
+      expect(publicRoutesSource).not.toContain(declaration);
+    }
+  });
+
+  it('keeps guard-drift and marketplace account routes behind the route boundary', () => {
+    for (const routePath of guardDriftProtectedRoutes) {
+      const declaration = `path="${routePath}"`;
+      expect(protectedRoutesSource).toContain(declaration);
+      expect(appSource.split(declaration)).toHaveLength(2);
+      expect(publicRoutesSource).not.toContain(declaration);
+    }
+
+    expect(protectedRoutesSource).toContain('path="marketplace/my-listings"');
+    expect(protectedRoutesSource).toContain('path="marketplace/my-offers"');
+  });
+
+  it('keeps only the token verification route in the shared public feature registry', () => {
+    expect(publicRoutesSource).toContain('renderSharedPublicFeatureRoutes()');
+    expect(publicRoutesSource).not.toContain('@/pages/explore/ExplorePage');
+    expect(tenantShellSource).toContain('^volunteering\\/guardian-consent\\/verify\\/[^/]+$');
+    expect(tenantShellSource).not.toContain('timebanking-guide|explore|partner');
+    expect(tenantShellSource).not.toContain('^marketplace$');
+  });
+
+  it('keeps sanitized blog index and article URLs in the anonymous public registry', () => {
+    for (const routePath of ['blog', 'blog/:slug'] as const) {
+      const declaration = `path="${routePath}"`;
+      expect(publicRoutesSource).toContain(declaration);
+      expect(appSource).not.toContain(declaration);
+    }
+
+    expect(publicRoutesSource).toContain("import('@/pages/blog/BlogPage')");
+    expect(publicRoutesSource).toContain("import('@/pages/blog/BlogPostPage')");
+    expect(tenantShellSource).toContain('^blog(\\/[^/]+)?$');
   });
 });

@@ -19,9 +19,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Calendar from 'lucide-react/icons/calendar';
 import Clock from 'lucide-react/icons/clock';
 import Eye from 'lucide-react/icons/eye';
-import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
-import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -33,7 +31,7 @@ import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
+import { responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { usePrerenderReady } from '@/hooks/usePrerenderReady';
@@ -50,11 +48,6 @@ interface BlogPost {
   created_at: string;
   views: number;
   reading_time: number;
-  author: {
-    id: number;
-    name: string;
-    avatar: string | null;
-  };
   category: {
     id: number;
     name: string;
@@ -403,10 +396,6 @@ function FeaturedPostCard({ post, categoryColors }: PostCardProps) {
 
             <div className="flex items-center gap-4 text-xs text-theme-subtle">
               <span className="flex items-center gap-1">
-                <Avatar name={post.author.name} src={resolveAvatarUrl(post.author.avatar)} size="sm" className="w-5 h-5" />
-                {post.author.name}
-              </span>
-              <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3" aria-hidden="true" />
                 {new Date(post.published_at).toLocaleDateString(getFormattingLocale(), { day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
@@ -472,10 +461,6 @@ function BlogPostCard({ post, categoryColors }: PostCardProps) {
           <p className="text-sm text-theme-muted mb-4 flex-1 line-clamp-3">{post.excerpt}</p>
 
           <div className="flex items-center justify-between text-xs text-theme-subtle mt-auto pt-3 border-t border-theme-default">
-            <span className="flex items-center gap-1">
-              <User className="w-3 h-3" aria-hidden="true" />
-              {post.author.name}
-            </span>
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1">
                 <Clock className="w-3 h-3" aria-hidden="true" />

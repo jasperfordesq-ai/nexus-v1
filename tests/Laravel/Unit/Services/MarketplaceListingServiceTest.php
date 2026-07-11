@@ -47,6 +47,87 @@ class MarketplaceListingServiceTest extends TestCase
         $this->assertNull($result);
     }
 
+    public function test_getById_hides_unpublished_listing_but_owner_preview_can_access_it(): void
+    {
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $tenantId = TenantContext::getId();
+        $seller = User::factory()->forTenant($tenantId)->create(['status' => 'active']);
+        $listingId = DB::table('marketplace_listings')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $seller->id,
+            'title' => 'Pending private listing',
+            'description' => 'Must not be returned by ordinary detail lookup.',
+            'price_currency' => 'EUR',
+            'price_type' => 'fixed',
+            'quantity' => 1,
+            'shipping_available' => 0,
+            'local_pickup' => 1,
+            'delivery_method' => 'pickup',
+            'seller_type' => 'private',
+            'status' => 'draft',
+            'moderation_status' => 'pending',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        TenantContext::reset();
+        TenantContext::setById($tenantId);
+        $this->assertTrue(MarketplaceListing::query()->whereKey($listingId)->exists());
+        $this->assertNull(MarketplaceListingService::getById($listingId, $seller->id));
+        $this->assertSame(
+            $listingId,
+            MarketplaceListingService::getByIdForOwner($listingId, $seller->id)['id'] ?? null
+        );
+        $this->assertNull(MarketplaceListingService::getByIdForOwner($listingId, $seller->id + 9999));
+    }
+
+    public function test_getAll_does_not_treat_arbitrary_user_filter_as_owner_preview(): void
+    {
+        TenantContext::reset();
+        TenantContext::setById($this->testTenantId);
+        $tenantId = TenantContext::getId();
+        $seller = User::factory()->forTenant($tenantId)->create(['status' => 'active']);
+        $viewer = User::factory()->forTenant($tenantId)->create(['status' => 'active']);
+
+        foreach ([['Published', 'active', 'approved'], ['Draft', 'draft', 'pending']] as [$title, $status, $moderation]) {
+            DB::table('marketplace_listings')->insert([
+                'tenant_id' => $tenantId,
+                'user_id' => $seller->id,
+                'title' => "{$title} seller listing",
+                'description' => 'Visibility regression fixture.',
+                'price_currency' => 'EUR',
+                'price_type' => 'fixed',
+                'quantity' => 1,
+                'shipping_available' => 0,
+                'local_pickup' => 1,
+                'delivery_method' => 'pickup',
+                'seller_type' => 'private',
+                'status' => $status,
+                'moderation_status' => $moderation,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        TenantContext::reset();
+        TenantContext::setById($tenantId);
+
+        $otherView = MarketplaceListingService::getAll([
+            'user_id' => $seller->id,
+            'current_user_id' => $viewer->id,
+            'limit' => 20,
+        ]);
+        $ownerView = MarketplaceListingService::getAll([
+            'user_id' => $seller->id,
+            'current_user_id' => $seller->id,
+            'limit' => 20,
+        ]);
+
+        $this->assertSame(['Published seller listing'], array_column($otherView['items'], 'title'));
+        $this->assertContains('Draft seller listing', array_column($ownerView['items'], 'title'));
+    }
+
     public function test_getAll_price_sort_cursor_uses_price_and_id_tiebreaker(): void
     {
         TenantContext::setById($this->testTenantId);

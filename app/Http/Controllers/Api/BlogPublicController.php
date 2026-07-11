@@ -39,7 +39,7 @@ class BlogPublicController extends BaseApiController
             $filters['category_id'] = $this->queryInt('category_id');
         }
 
-        $result = $this->blogService->getAll($filters);
+        $result = $this->blogService->getPublicPosts($filters);
 
         return $this->respondWithCollection(
             $result['items'],
@@ -60,7 +60,7 @@ class BlogPublicController extends BaseApiController
     /** GET /api/v2/blog/{slug} */
     public function show(string $slug): JsonResponse
     {
-        $post = $this->blogService->getBySlug($slug, $this->getTenantId());
+        $post = $this->blogService->getPublicPostBySlug($slug, $this->getTenantId());
 
         if ($post === null) {
             return $this->respondWithError('NOT_FOUND', __('api.blog_post_not_found'), null, 404);

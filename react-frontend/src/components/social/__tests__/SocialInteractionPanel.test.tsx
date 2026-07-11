@@ -14,6 +14,7 @@ import { MemoryRouter } from 'react-router-dom';
 import type { ReactElement } from 'react';
 
 const useSocialInteractionsMock = vi.hoisted(() => vi.fn());
+const mockAuthState = vi.hoisted(() => ({ isAuthenticated: true }));
 
 vi.mock('@/hooks/useSocialInteractions', () => ({
   useSocialInteractions: useSocialInteractionsMock,
@@ -21,15 +22,15 @@ vi.mock('@/hooks/useSocialInteractions', () => ({
 
 vi.mock('@/contexts', () => ({
   useAuth: vi.fn(() => ({
-    isAuthenticated: true,
-    user: {
+    isAuthenticated: mockAuthState.isAuthenticated,
+    user: mockAuthState.isAuthenticated ? {
       id: 7,
       name: 'Test User',
       first_name: 'Test',
       last_name: 'User',
       avatar_url: null,
       avatar: null,
-    },
+    } : null,
   })),
   useTenant: vi.fn(() => ({
     tenantPath: (path: string) => `/test${path}`,
@@ -116,6 +117,7 @@ function makeSocial(overrides: Record<string, unknown> = {}) {
 describe('SocialInteractionPanel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAuthState.isAuthenticated = true;
     window.history.replaceState(null, '', '/test/feed');
     useSocialInteractionsMock.mockReturnValue(makeSocial());
   });
@@ -128,6 +130,21 @@ describe('SocialInteractionPanel', () => {
     expect(screen.getByRole('button', { name: 'Toggle like' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Open comments' })).toBeInTheDocument();
     expect(screen.getByTestId('share-button')).toBeInTheDocument();
+    expect(useSocialInteractionsMock).toHaveBeenCalledWith(expect.objectContaining({ enabled: true }));
+  });
+
+  it('does not load identity-bearing social data while anonymous', async () => {
+    mockAuthState.isAuthenticated = false;
+    const loadComments = vi.fn().mockResolvedValue(undefined);
+    useSocialInteractionsMock.mockReturnValue(makeSocial({ loadComments }));
+    window.history.replaceState(null, '', '/test/events/42#comment-123');
+
+    renderPanel(<SocialInteractionPanel targetType="event" targetId={42} />);
+
+    expect(useSocialInteractionsMock).toHaveBeenCalledWith(expect.objectContaining({ enabled: false }));
+    expect(screen.getByRole('button', { name: 'Open comments' })).toBeDisabled();
+    expect(loadComments).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('comments-section')).not.toBeInTheDocument();
   });
 
   it('toggles likes through the shared hook', async () => {

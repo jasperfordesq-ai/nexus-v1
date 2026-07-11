@@ -78,13 +78,13 @@ class GroupsControllerTest extends TestCase
         $response->assertJsonStructure(['data']);
     }
 
-    public function test_index_works_without_authentication(): void
+    public function test_index_requires_authentication(): void
     {
         $this->createGroup(['visibility' => 'public']);
 
         $response = $this->apiGet('/v2/groups');
 
-        $response->assertStatus(200);
+        $response->assertStatus(401);
     }
 
     public function test_index_is_tenant_scoped(): void
@@ -345,6 +345,21 @@ class GroupsControllerTest extends TestCase
         $response = $this->apiGet('/v2/groups/999999/members');
 
         $response->assertStatus(404);
+    }
+
+    public function test_non_member_cannot_enumerate_public_group_roster(): void
+    {
+        $viewer = $this->authenticatedUser();
+        $owner = User::factory()->forTenant($this->testTenantId)->create();
+        $group = $this->createGroup([
+            'owner_id' => $owner->id,
+            'visibility' => 'public',
+        ]);
+
+        $this->assertNotSame($owner->id, $viewer->id);
+
+        $this->apiGet("/v2/groups/{$group->id}/members")
+            ->assertForbidden();
     }
 
     // ------------------------------------------------------------------

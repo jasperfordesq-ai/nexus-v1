@@ -21,6 +21,7 @@ const MOCK_USER_DATA = vi.hoisted(() => ({
   connection_status: 'none' as const,
   stats: { total_hours_given: 10, connections_count: 5, listings_count: 2 },
 }));
+const mockAuthState = vi.hoisted(() => ({ isAuthenticated: true }));
 
 // ── mock @/lib/api ────────────────────────────────────────────────────────────
 
@@ -57,6 +58,18 @@ vi.mock('./PresenceIndicator', () => ({
 
 vi.mock('@/contexts', () =>
   createMockContexts({
+    useAuth: () => ({
+      user: mockAuthState.isAuthenticated ? { id: 10, name: 'Signed-in Member' } : null,
+      isAuthenticated: mockAuthState.isAuthenticated,
+      isLoading: false,
+      status: 'idle' as const,
+      login: vi.fn(),
+      logout: vi.fn(),
+      register: vi.fn(),
+      updateUser: vi.fn(),
+      refreshUser: vi.fn(),
+      error: null,
+    }),
     useTenant: () => ({
       tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
       tenantPath: (p: string) => `/test${p}`,
@@ -105,6 +118,7 @@ function stubNonTouchDevice() {
 describe('UserHoverCard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockAuthState.isAuthenticated = true;
     stubNonTouchDevice();
     mockApiObj.get.mockResolvedValue({ success: true, data: MOCK_USER_DATA });
     // Flush the module-level cache so each test starts fresh
@@ -119,6 +133,19 @@ describe('UserHoverCard', () => {
     );
     expect(screen.getByTestId('trigger')).toBeInTheDocument();
     expect(mockApiObj.get).not.toHaveBeenCalled();
+  });
+
+  it('does not mount a hover-card identity boundary or fetch while anonymous', () => {
+    mockAuthState.isAuthenticated = false;
+
+    render(
+      <UserHoverCard userId={99} openOnMount>
+        <span data-testid="anonymous-trigger">Member</span>
+      </UserHoverCard>,
+    );
+
+    expect(mockApiObj.get).not.toHaveBeenCalled();
+    expect(screen.queryByText('Alice Smith')).not.toBeInTheDocument();
   });
 
   it('fetches user data after hover (mouseenter on trigger span)', async () => {
@@ -147,8 +174,8 @@ describe('UserHoverCard', () => {
     await userEvent.hover(trigger);
 
     await waitFor(() => {
-      // Name should appear inside the popover content
-      expect(screen.getByText('Alice Smith')).toBeInTheDocument();
+      // The visible profile link and screen-reader heading both carry the name.
+      expect(screen.getAllByText('Alice Smith').length).toBeGreaterThanOrEqual(1);
     });
   });
 

@@ -19,7 +19,7 @@ import UserCheck from 'lucide-react/icons/user-check';
 import Check from 'lucide-react/icons/check';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { useTranslation } from 'react-i18next';
-import { useTenant } from '@/contexts';
+import { useAuth, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
@@ -73,6 +73,7 @@ export const UserHoverCard = memo(function UserHoverCard({
 }: UserHoverCardProps) {
   const { t } = useTranslation('social');
   const { tenantPath } = useTenant();
+  const { isAuthenticated } = useAuth();
   // Don't render hover card on touch devices
   const isTouch = useRef(isTouchDevice());
 
@@ -84,6 +85,7 @@ export const UserHoverCard = memo(function UserHoverCard({
   const leaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const fetchUserData = useCallback(async () => {
+    if (!isAuthenticated) return;
     // Return cached data
     if (userCache.has(userId)) {
       setUserData(userCache.get(userId)!);
@@ -102,13 +104,13 @@ export const UserHoverCard = memo(function UserHoverCard({
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
+  }, [isAuthenticated, userId]);
 
   useEffect(() => {
-    if (!openOnMount || isTouch.current) return;
+    if (!isAuthenticated || !openOnMount || isTouch.current) return;
     setIsOpen(true);
     fetchUserData();
-  }, [fetchUserData, openOnMount]);
+  }, [fetchUserData, isAuthenticated, openOnMount]);
 
   const clearTimers = useCallback(() => {
     if (hoverTimeoutRef.current) {
@@ -181,7 +183,7 @@ export const UserHoverCard = memo(function UserHoverCard({
   }, []);
 
   const handleConnect = useCallback(async () => {
-    if (!userData || isConnecting) return;
+    if (!isAuthenticated || !userData || isConnecting) return;
     setIsConnecting(true);
     try {
       const res = await api.post('/v2/connections/request', { user_id: userId });
@@ -200,10 +202,11 @@ export const UserHoverCard = memo(function UserHoverCard({
     } finally {
       setIsConnecting(false);
     }
-  }, [userData, userId, isConnecting]);
+  }, [isAuthenticated, userData, userId, isConnecting]);
 
-  // On touch devices, just render children without hover card
-  if (isTouch.current) {
+  // Anonymous and touch users get the original link/avatar only. Member data
+  // must never be fetched or restored from the in-memory hover-card cache.
+  if (!isAuthenticated || isTouch.current) {
     return <>{children}</>;
   }
 
@@ -240,6 +243,8 @@ export const UserHoverCard = memo(function UserHoverCard({
     >
       <PopoverTrigger>
         <span
+          onPointerEnter={handleMouseEnter}
+          onPointerLeave={handleMouseLeave}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
           className="inline-flex"

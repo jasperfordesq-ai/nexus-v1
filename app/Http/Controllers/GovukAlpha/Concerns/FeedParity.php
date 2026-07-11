@@ -71,8 +71,8 @@ trait FeedParity
      * Mirrors HashtagsDiscoveryPage.tsx: a list of trending tags (post counts)
      * plus a no-JS search box. Trending is the tenant's most-used tags in the
      * recent window; search is an indexed prefix LIKE. Both queries are
-     * tenant-scoped and read-only, so this page is open to anonymous viewers
-     * (the React page is mounted behind the feed module, which we gate on).
+     * tenant-scoped and read-only. The route-level accessible authentication
+     * boundary prevents account-derived hashtag posts being reached anonymously.
      */
     public function feedHashtagsDiscovery(Request $request, string $tenantSlug): Response
     {

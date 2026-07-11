@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 use App\Http\Controllers\GovukAlpha\AlphaController;
+use App\Http\Controllers\GovukAlpha\Middleware\RequireAccessibleAuthentication;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Route;
  * before any wildcard within each path.
  */
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // --- Blog post comment thread (edit / delete / reply / reactions) ---------
 
 // Comment-level actions (numeric id) — registered before the {slug} thread so
@@ -75,3 +77,4 @@ Route::post('/reviews/{id}/react', [AlphaController::class, 'blogReviewsReviewRe
     ->whereNumber('id')
     ->middleware('throttle:60,1')
     ->name('blogreviews.reviews.react');
+});

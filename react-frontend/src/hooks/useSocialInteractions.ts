@@ -15,6 +15,7 @@ import { REACTION_EMOJI_MAP, type ReactionType } from '@/components/social/react
 export interface SocialInteractionsOptions {
   targetType: string;
   targetId: number;
+  enabled?: boolean;
   initialLiked?: boolean;
   initialLikesCount?: number;
   initialCommentsCount?: number;
@@ -87,7 +88,14 @@ function normalizeCommentReactionResponse(data: CommentReactionResponse): {
 /* ─── Hook ──────────────────────────────────────────────────── */
 
 export function useSocialInteractions(options: SocialInteractionsOptions) {
-  const { targetType, targetId, initialLiked = false, initialLikesCount = 0, initialCommentsCount = 0 } = options;
+  const {
+    targetType,
+    targetId,
+    enabled = false,
+    initialLiked = false,
+    initialLikesCount = 0,
+    initialCommentsCount = 0,
+  } = options;
 
   // Like state
   const [isLiked, setIsLiked] = useState(initialLiked);
@@ -138,7 +146,7 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
   /* ───── Like ───── */
 
   const toggleLike = useCallback(async () => {
-    if (isLiking) return;
+    if (!enabled || isLiking) return;
     // Optimistic update
     const wasLiked = isLiked;
     const previousLikesCount = likesCount;
@@ -168,12 +176,12 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
     } finally {
       setIsLiking(false);
     }
-  }, [targetType, targetId, isLiked, isLiking, likesCount]);
+  }, [targetType, targetId, enabled, isLiked, isLiking, likesCount]);
 
   /* ───── Comments ───── */
 
   const loadComments = useCallback(async () => {
-    if (loadingRef.current) return;
+    if (!enabled || loadingRef.current) return;
     loadingRef.current = true;
     setCommentsLoading(true);
     try {
@@ -191,10 +199,10 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
       setCommentsLoaded(true);
       loadingRef.current = false;
     }
-  }, [targetType, targetId]);
+  }, [targetType, targetId, enabled]);
 
   const submitComment = useCallback(async (content: string, parentId?: number): Promise<boolean> => {
-    if (!content.trim()) return false;
+    if (!enabled || !content.trim()) return false;
     try {
       const res = await api.post('/v2/comments', {
         target_type: targetType,
@@ -215,10 +223,10 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
       logError('Failed to submit comment', err);
       return false;
     }
-  }, [targetType, targetId, loadComments]);
+  }, [targetType, targetId, enabled, loadComments]);
 
   const editComment = useCallback(async (commentId: number, content: string): Promise<boolean> => {
-    if (!content.trim()) return false;
+    if (!enabled || !content.trim()) return false;
     try {
       const res = await api.put<{ content?: string }>(`/v2/comments/${commentId}`, { content: content.trim() });
       if (res.success) {
@@ -238,9 +246,10 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
       logError('Failed to edit comment', err);
       return false;
     }
-  }, []);
+  }, [enabled]);
 
   const deleteComment = useCallback(async (commentId: number): Promise<boolean> => {
+    if (!enabled) return false;
     try {
       const res = await api.delete<{ deleted_count?: number }>(`/v2/comments/${commentId}`);
       if (res.success) {
@@ -268,11 +277,12 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
       logError('Failed to delete comment', err);
       return false;
     }
-  }, [comments, targetId, targetType]);
+  }, [comments, enabled, targetId, targetType]);
 
   /* ───── Reactions ───── */
 
   const toggleReaction = useCallback(async (commentId: number, reactionType: string) => {
+    if (!enabled) return;
     try {
       const res = await api.post<CommentReactionResponse>(
         `/v2/comments/${commentId}/reactions`,
@@ -293,11 +303,12 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
     } catch (err) {
       logError('Failed to toggle reaction', err);
     }
-  }, []);
+  }, [enabled]);
 
   /* ───── Share ───── */
 
   const shareToFeed = useCallback(async (content?: string): Promise<boolean> => {
+    if (!enabled) return false;
     try {
       const res = await api.post('/v2/shares', {
         type: targetType,
@@ -309,12 +320,12 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
       logError('Failed to share', err);
       return false;
     }
-  }, [targetType, targetId]);
+  }, [targetType, targetId, enabled]);
 
   /* ───── Mention Search ───── */
 
   const searchMentions = useCallback(async (query: string): Promise<MentionUser[]> => {
-    if (!query.trim()) return [];
+    if (!enabled || !query.trim()) return [];
     try {
       // Try V2 endpoint first (GET /v2/mentions/search?q=...)
       const res = await api.get<MentionUser[]>(`/v2/mentions/search?q=${encodeURIComponent(query.trim())}`);
@@ -328,11 +339,12 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
       logError('Failed to search mentions', err);
       return [];
     }
-  }, []);
+  }, [enabled]);
 
   /* ───── Likers ───── */
 
   const loadLikers = useCallback(async (page = 1): Promise<LikersResult> => {
+    if (!enabled) return { likers: [], total_count: 0, has_more: false };
     try {
       const res = await api.post<LikersResult>('/social/likers', {
         target_type: targetType,
@@ -348,7 +360,7 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
       logError('Failed to load likers', err);
       return { likers: [], total_count: 0, has_more: false };
     }
-  }, [targetType, targetId]);
+  }, [targetType, targetId, enabled]);
 
   return {
     // Like
@@ -358,10 +370,10 @@ export function useSocialInteractions(options: SocialInteractionsOptions) {
     toggleLike,
 
     // Comments
-    comments,
+    comments: enabled ? comments : [],
     commentsCount,
     commentsLoading,
-    commentsLoaded,
+    commentsLoaded: enabled ? commentsLoaded : false,
     loadComments,
     submitComment,
     editComment,

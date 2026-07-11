@@ -89,16 +89,16 @@ class MarketplaceSellerControllerTest extends TestCase
         $this->assertLessThan(500, $response->status());
     }
 
-    public function test_show_public_smoke(): void
+    public function test_show_requires_authentication(): void
     {
         $response = $this->apiGet('/v2/marketplace/sellers/1');
-        $this->assertLessThan(500, $response->status());
+        $response->assertStatus(401);
     }
 
-    public function test_listings_public_smoke(): void
+    public function test_listings_require_authentication(): void
     {
         $response = $this->apiGet('/v2/marketplace/sellers/1/listings');
-        $this->assertLessThan(500, $response->status());
+        $response->assertStatus(401);
     }
 
     public function test_public_shipping_options_returns_active_options_for_seller_user_id(): void
@@ -108,6 +108,7 @@ class MarketplaceSellerControllerTest extends TestCase
         }
 
         $this->enableMarketplaceFeature();
+        $this->authenticatedUser();
         $seller = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',
             'is_approved' => true,

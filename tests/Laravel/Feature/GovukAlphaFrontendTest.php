@@ -424,6 +424,8 @@ class GovukAlphaFrontendTest extends TestCase
 
     public function test_kb_and_blog_indexes_render_and_unknown_detail_404s(): void
     {
+        $this->authenticatedUser(['name' => 'Content Reader']);
+
         $kb = $this->get("/{$this->testTenantSlug}/accessible/kb");
         $kb->assertOk();
         $kb->assertSee(__('govuk_alpha.kb.title'));
@@ -483,7 +485,7 @@ class GovukAlphaFrontendTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        // The feed is public (no auth required).
+        // The public feed remains available when the fixture author is signed in.
         $feed = $this->get("/{$this->testTenantSlug}/accessible/blog/feed.xml");
         $feed->assertOk();
         $feed->assertHeader('Content-Type', 'application/rss+xml; charset=UTF-8');
@@ -813,25 +815,12 @@ class GovukAlphaFrontendTest extends TestCase
         $noReason->assertRedirectContains('status=');
     }
 
-    public function test_feed_page_has_html_auth_required_state_when_unauthenticated(): void
+    public function test_feed_page_redirects_to_login_when_unauthenticated(): void
     {
-        // Pin the tenant display name so the community-name assertion does not depend
-        // on whatever name a persistent (non-transactional) local test DB happens to hold.
-        DB::table('tenants')->where('id', $this->testTenantId)->update(['name' => 'hOUR Timebank']);
-        TenantContext::reset();
-        TenantContext::setById($this->testTenantId);
-
         $response = $this->get("/{$this->testTenantSlug}/accessible/feed");
 
-        $response->assertOk();
-        $response->assertSee(__('govuk_alpha.states.auth_required'));
-        $response->assertSee(__('govuk_alpha.feed.auth_required_detail', ['community' => 'hOUR Timebank']));
-        $response->assertSee('class="govuk-notification-banner"', false);
-        $response->assertSee(route('govuk-alpha.login', ['tenantSlug' => $this->testTenantSlug]), false);
-        $response->assertSee(route('govuk-alpha.register', ['tenantSlug' => $this->testTenantSlug]), false);
-        $response->assertDontSee('name="content"', false);
-        $response->assertSee('class="govuk-select"', false);
-        $response->assertSee(__('govuk_alpha.feed.empty'));
+        $response->assertRedirect("/{$this->testTenantSlug}/accessible/login?status=auth-required");
+        $this->assertStringContainsString('no-store', (string) $response->headers->get('Cache-Control'));
     }
 
     public function test_feed_poll_vote_records_a_vote_and_rejects_a_second(): void
@@ -1124,6 +1113,8 @@ class GovukAlphaFrontendTest extends TestCase
 
     public function test_listings_page_renders_module_disabled_state(): void
     {
+        $this->authenticatedUser();
+
         DB::table('tenants')
             ->where('id', $this->testTenantId)
             ->update(['configuration' => json_encode(['modules' => ['listings' => false]])]);
@@ -3383,6 +3374,198 @@ class GovukAlphaFrontendTest extends TestCase
         $revoke->assertRedirectContains('status=safeguarding-revoked');
         $this->assertNotNull(DB::table('user_safeguarding_preferences')
             ->where('option_id', $optionId)->where('user_id', $user->id)->value('revoked_at'));
+    }
+
+    public function test_profile_settings_shows_private_metadata_only_vetting_status(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Vetted Member']);
+        $broker = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'role' => 'broker',
+        ]);
+        $policyVersion = $this->configureEnglandWalesSafeguardingPolicy((int) $broker->id);
+
+        DB::table('member_vetting_attestations')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'scheme_code' => 'dbs_england_wales',
+            'attestation_code' => 'dbs_enhanced',
+            'purpose_code' => 'safeguarded_member_contact',
+            'scope_type' => 'tenant',
+            'scope_identifier' => '',
+            'decision' => 'confirmed',
+            'confirmed_by' => $broker->id,
+            'confirmed_at' => now(),
+            'policy_version' => $policyVersion,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $page = $this->get("/{$this->testTenantSlug}/accessible/profile/settings");
+
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.profile_settings.safeguarding.vetting.title'));
+        $page->assertSee(__('safeguarding.attestations.dbs_enhanced'));
+        $page->assertSee(__('govuk_alpha.profile_settings.safeguarding.vetting.no_documents'));
+        $page->assertDontSee(
+            route('govuk-alpha.profile.safeguarding.vetting-review', ['tenantSlug' => $this->testTenantSlug]),
+            false,
+        );
+    }
+
+    public function test_profile_vetting_review_is_empty_body_only_and_never_stores_evidence(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Review Request Member']);
+        $this->configureEnglandWalesSafeguardingPolicy((int) $user->id);
+
+        $page = $this->get("/{$this->testTenantSlug}/accessible/profile/settings");
+        $page->assertOk();
+        $action = route('govuk-alpha.profile.safeguarding.vetting-review', ['tenantSlug' => $this->testTenantSlug]);
+        $page->assertSee($action, false);
+
+        $html = $page->getContent();
+        $matched = preg_match(
+            '#<form method="post" action="' . preg_quote($action, '#') . '">(.*?)</form>#s',
+            $html,
+            $formMatch,
+        );
+        $this->assertSame(1, $matched);
+        $this->assertStringNotContainsString('type="file"', $formMatch[1]);
+        $this->assertStringNotContainsString('name="document', $formMatch[1]);
+        $this->assertStringNotContainsString('name="certificate', $formMatch[1]);
+        $this->assertStringNotContainsString('name="reference', $formMatch[1]);
+        $this->assertStringNotContainsString('name="evidence', $formMatch[1]);
+
+        $review = $this->post("/{$this->testTenantSlug}/accessible/profile/safeguarding/vetting-review");
+        $review->assertRedirectContains('status=vetting-review-requested');
+
+        $stored = DB::table('safeguarding_vetting_review_requests')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->first();
+        $this->assertNotNull($stored);
+        $this->assertSame('pending', $stored->status);
+        foreach (['document', 'certificate', 'reference', 'result', 'notes', 'evidence'] as $prohibitedColumn) {
+            $this->assertArrayNotHasKey($prohibitedColumn, (array) $stored);
+        }
+
+        $unexpectedText = $this->post("/{$this->testTenantSlug}/accessible/profile/safeguarding/vetting-review", [
+            'certificate_reference' => 'must-not-be-accepted',
+        ]);
+        $unexpectedText->assertRedirectContains('status=vetting-review-evidence-prohibited');
+
+        $unexpectedFile = $this->post("/{$this->testTenantSlug}/accessible/profile/safeguarding/vetting-review", [
+            'certificate' => UploadedFile::fake()->create('dbs-certificate.pdf', 10, 'application/pdf'),
+        ]);
+        $unexpectedFile->assertRedirectContains('status=vetting-review-evidence-prohibited');
+        $this->assertSame(1, DB::table('safeguarding_vetting_review_requests')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->count());
+    }
+
+    public function test_profile_safeguarding_policy_review_acknowledgement_updates_consent_metadata_only(): void
+    {
+        $user = $this->authenticatedUser(['name' => 'Policy Review Member']);
+        $optionId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'policy_review_test',
+            'label' => 'Policy review test preference',
+            'description' => null,
+            'triggers' => json_encode(['restricts_messaging' => true]),
+            'is_active' => 1,
+            'sort_order' => 1,
+            'created_at' => now(),
+        ]);
+        $oldConsent = now()->subYear();
+        DB::table('user_safeguarding_preferences')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'option_id' => $optionId,
+            'selected_value' => '1',
+            'consent_given_at' => $oldConsent,
+            'policy_review_required_at' => now()->subDay(),
+            'policy_review_reason_code' => 'jurisdiction_changed',
+            'created_at' => $oldConsent,
+        ]);
+
+        $page = $this->get("/{$this->testTenantSlug}/accessible/profile/settings");
+        $page->assertOk();
+        $page->assertSee(__('govuk_alpha.profile_settings.safeguarding.policy_review_title'));
+        $page->assertSee(
+            route('govuk-alpha.profile.safeguarding.policy-review', ['tenantSlug' => $this->testTenantSlug]),
+            false,
+        );
+
+        $confirm = $this->post("/{$this->testTenantSlug}/accessible/profile/safeguarding/policy-review");
+        $confirm->assertRedirectContains('status=safeguarding-policy-reviewed');
+
+        $preference = DB::table('user_safeguarding_preferences')
+            ->where('tenant_id', $this->testTenantId)
+            ->where('user_id', $user->id)
+            ->where('option_id', $optionId)
+            ->first();
+        $this->assertNull($preference->policy_review_required_at);
+        $this->assertNull($preference->policy_review_reason_code);
+        $this->assertGreaterThan($oldConsent->timestamp, \Illuminate\Support\Carbon::parse($preference->consent_given_at)->timestamp);
+    }
+
+    public function test_accessible_endorsement_surfaces_safeguarding_restriction_and_policy_unavailability(): void
+    {
+        $sender = $this->authenticatedUser(['name' => 'Unvetted Sender']);
+        $recipient = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+            'name' => 'Protected Recipient',
+        ]);
+        $this->configureEnglandWalesSafeguardingPolicy((int) $sender->id);
+        $optionId = DB::table('tenant_safeguarding_options')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'option_key' => 'vetted_contact_only',
+            'label' => 'Vetted contact only',
+            'description' => null,
+            'triggers' => json_encode([
+                'requires_vetted_interaction' => true,
+                'vetting_type_required' => 'dbs_enhanced',
+            ]),
+            'is_active' => 1,
+            'sort_order' => 1,
+            'created_at' => now(),
+        ]);
+        DB::table('user_safeguarding_preferences')->insert([
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $recipient->id,
+            'option_id' => $optionId,
+            'selected_value' => '1',
+            'consent_given_at' => now(),
+            'created_at' => now(),
+        ]);
+
+        $restricted = $this->post("/{$this->testTenantSlug}/accessible/members/{$recipient->id}/endorse", [
+            'action' => 'endorse',
+            'skill_name' => 'Gardening',
+        ]);
+        $restricted->assertRedirectContains('status=endorsement-safeguarding-restricted');
+        $this->assertDatabaseMissing('skill_endorsements', [
+            'endorser_id' => $sender->id,
+            'endorsed_id' => $recipient->id,
+        ]);
+
+        DB::table('tenant_safeguarding_settings')
+            ->where('tenant_id', $this->testTenantId)
+            ->update([
+                'jurisdiction' => 'ireland',
+                'policy_version' => 'accessible-test-ireland-v1',
+                'updated_at' => now(),
+            ]);
+        app(\App\Services\SafeguardingJurisdictionService::class)->forget($this->testTenantId);
+
+        $unavailable = $this->post("/{$this->testTenantSlug}/accessible/members/{$recipient->id}/endorse", [
+            'action' => 'endorse',
+            'skill_name' => 'Gardening',
+        ]);
+        $unavailable->assertRedirectContains('status=endorsement-safeguarding-unavailable');
     }
 
     public function test_profile_settings_passkey_can_be_renamed_and_removed(): void
@@ -6082,6 +6265,25 @@ class GovukAlphaFrontendTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         return $user;
+    }
+
+    private function configureEnglandWalesSafeguardingPolicy(int $actorUserId): string
+    {
+        $policyVersion = 'accessible-test-policy-v1';
+        DB::table('tenant_safeguarding_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId],
+            [
+                'jurisdiction' => 'england_wales',
+                'policy_version' => $policyVersion,
+                'configured_by' => $actorUserId,
+                'configured_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        );
+        app(\App\Services\SafeguardingJurisdictionService::class)->forget($this->testTenantId);
+
+        return $policyVersion;
     }
 
     private function alphaText(string $locale, string $key, array $replace = []): string

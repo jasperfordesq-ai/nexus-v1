@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 use App\Http\Controllers\GovukAlpha\AlphaController;
+use App\Http\Controllers\GovukAlpha\Middleware\RequireAccessibleAuthentication;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Route;
  * segments are registered BEFORE wildcard {id} routes within this file.
  */
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // --- Category toggle-button browse (static segment, before any {id}) ---
 Route::get('/events/browse', [AlphaController::class, 'eventsBrowse'])
     ->name('events.browse');
@@ -49,3 +51,4 @@ Route::get('/events/{id}/translate', [AlphaController::class, 'eventsTranslate']
     ->whereNumber('id')->name('events.translate');
 Route::post('/events/{id}/translate', [AlphaController::class, 'eventsRunTranslate'])
     ->whereNumber('id')->middleware('throttle:30,1')->name('events.translate.run');
+});

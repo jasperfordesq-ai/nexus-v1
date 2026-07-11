@@ -86,11 +86,11 @@ class ExploreServiceTest extends TestCase
     public function test_getExploreData_uses_per_section_cache(): void
     {
         // When a section is cached, it returns cached data without DB query
-        $cachedPosts = [['id' => 1, 'excerpt' => 'Cached post']];
+        $cachedListings = [['id' => 1, 'title' => 'Cached listing']];
 
         Cache::shouldReceive('get')
-            ->with("nexus:explore:{$this->testTenantId}:trending_posts")
-            ->andReturn($cachedPosts);
+            ->with("nexus:explore:{$this->testTenantId}:popular_listings")
+            ->andReturn($cachedListings);
 
         // Other sections: cache miss
         Cache::shouldReceive('get')->andReturn(null);
@@ -106,24 +106,13 @@ class ExploreServiceTest extends TestCase
 
         $result = $this->service->getExploreData(1);
 
-        // Trending posts should use cached value
-        $this->assertEquals($cachedPosts, $result['trending_posts']);
+        $this->assertEquals($cachedListings, $result['popular_listings']);
     }
 
-    public function test_getExploreData_unauthenticated_returns_empty_personalized(): void
+    public function test_getExploreData_rejects_unauthenticated_user_id(): void
     {
-        Cache::shouldReceive('get')->andReturn(null);
-        Cache::shouldReceive('put')->zeroOrMoreTimes();
-        DB::shouldReceive('select')->andReturn([]);
-        DB::shouldReceive('selectOne')->andReturn((object) ['cnt' => 0, 'total' => 0]);
-
-        $result = $this->service->getExploreData(0);
-
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('recommended_listings', $result);
-        $this->assertEquals([], $result['recommended_listings']);
-        $this->assertEquals([], $result['near_you_listings']);
-        $this->assertEquals([], $result['suggested_connections']);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->service->getExploreData(0);
     }
 
     // ------------------------------------------------------------------
@@ -153,7 +142,7 @@ class ExploreServiceTest extends TestCase
                 ],
             ]);
 
-        $result = $this->service->getTrendingPostsPaginated($this->testTenantId, 1, 20);
+        $result = $this->service->getTrendingPostsPaginated($this->testTenantId, 99, 1, 20);
 
         $this->assertArrayHasKey('items', $result);
         $this->assertArrayHasKey('total', $result);
@@ -186,7 +175,7 @@ class ExploreServiceTest extends TestCase
                 ],
             ]);
 
-        $result = $this->service->getTrendingPostsPaginated($this->testTenantId);
+        $result = $this->service->getTrendingPostsPaginated($this->testTenantId, 99);
         $item = $result['items'][0];
 
         $this->assertEquals(42, $item['id']);
@@ -210,7 +199,7 @@ class ExploreServiceTest extends TestCase
             })
             ->andReturn([]);
 
-        $result = $this->service->getTrendingPostsPaginated($this->testTenantId, 3, 10);
+        $result = $this->service->getTrendingPostsPaginated($this->testTenantId, 99, 3, 10);
 
         $this->assertEquals(3, $result['page']);
         $this->assertEquals(10, $result['per_page']);
@@ -227,7 +216,7 @@ class ExploreServiceTest extends TestCase
                 return str_contains($msg, 'getTrendingPostsPaginated');
             });
 
-        $result = $this->service->getTrendingPostsPaginated($this->testTenantId);
+        $result = $this->service->getTrendingPostsPaginated($this->testTenantId, 99);
 
         $this->assertEquals([], $result['items']);
         $this->assertEquals(0, $result['total']);
@@ -560,7 +549,7 @@ class ExploreServiceTest extends TestCase
 
         Cache::shouldReceive('put')->zeroOrMoreTimes();
 
-        $result = $this->service->getExploreData(0);
+        $result = $this->service->getExploreData(1);
 
         // All sections should exist even if empty
         $this->assertArrayHasKey('trending_posts', $result);
@@ -596,17 +585,10 @@ class ExploreServiceTest extends TestCase
         $this->assertEquals(20, $result['per_page']);
     }
 
-    public function test_getForYouFeed_unauthenticated_returns_popular_mix(): void
+    public function test_getForYouFeed_rejects_unauthenticated_user_id(): void
     {
-        Cache::shouldReceive('get')->andReturn(null);
-        Cache::shouldReceive('put')->zeroOrMoreTimes();
-        DB::shouldReceive('select')->andReturn([]);
-        DB::shouldReceive('selectOne')->andReturn((object) ['cnt' => 0, 'total' => 0]);
-
-        $result = $this->service->getForYouFeed($this->testTenantId, 0, 1, 20);
-
-        $this->assertArrayHasKey('items', $result);
-        $this->assertIsArray($result['items']);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->service->getForYouFeed($this->testTenantId, 0, 1, 20);
     }
 
     public function test_getForYouFeed_handles_db_error_gracefully(): void
@@ -644,7 +626,7 @@ class ExploreServiceTest extends TestCase
             })
             ->andReturn([]);
 
-        $result = $this->service->getTrendingPostsPaginated($tenantId);
+        $result = $this->service->getTrendingPostsPaginated($tenantId, 123);
 
         $this->assertEquals(0, $result['total']);
     }
@@ -711,7 +693,7 @@ class ExploreServiceTest extends TestCase
                 ],
             ]);
 
-        $result = $this->service->getTrendingPostsPaginated($this->testTenantId);
+        $result = $this->service->getTrendingPostsPaginated($this->testTenantId, 99);
         // trim() on "  Jane     Doe  " = "Jane     Doe" (inner spaces preserved, outer trimmed)
         $this->assertStringStartsNotWith(' ', $result['items'][0]['author_name']);
         $this->assertStringEndsNotWith(' ', $result['items'][0]['author_name']);
@@ -742,7 +724,7 @@ class ExploreServiceTest extends TestCase
                 ],
             ]);
 
-        $result = $this->service->getTrendingPostsPaginated($this->testTenantId);
+        $result = $this->service->getTrendingPostsPaginated($this->testTenantId, 99);
 
         $this->assertIsInt($result['total']);
         $this->assertIsInt($result['items'][0]['likes_count']);

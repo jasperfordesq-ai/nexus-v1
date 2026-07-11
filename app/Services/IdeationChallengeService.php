@@ -21,6 +21,9 @@ use Illuminate\Support\Facades\Log;
  */
 class IdeationChallengeService
 {
+    private const MEMBER_VISIBLE_STATUSES = ['open', 'voting', 'evaluating', 'closed'];
+    private const MANAGEABLE_STATUSES = ['draft', 'open', 'voting', 'evaluating', 'closed', 'archived'];
+
     private array $errors = [];
 
     public function getErrors(): array
@@ -43,14 +46,28 @@ class IdeationChallengeService
         $cursor = $filters['cursor'] ?? null;
 
         $tenantId = TenantContext::getId();
+        $viewerId = !empty($filters['viewer_id']) ? (int) $filters['viewer_id'] : null;
+        $canManage = $viewerId !== null && $this->isAdmin($viewerId, $tenantId);
 
         $query = DB::table('ideation_challenges as c')
             ->leftJoin('users as u', 'c.user_id', '=', 'u.id')
             ->where('c.tenant_id', $tenantId)
             ->select('c.*', 'u.first_name', 'u.last_name', 'u.avatar_url');
 
-        if (! empty($filters['status'])) {
-            $query->where('c.status', $filters['status']);
+        $requestedStatus = !empty($filters['status']) ? (string) $filters['status'] : null;
+        if ($canManage) {
+            if ($requestedStatus !== null && in_array($requestedStatus, self::MANAGEABLE_STATUSES, true)) {
+                $query->where('c.status', $requestedStatus);
+            } elseif ($requestedStatus !== null) {
+                $query->whereRaw('1 = 0');
+            }
+        } else {
+            $query->whereIn('c.status', self::MEMBER_VISIBLE_STATUSES);
+            if ($requestedStatus !== null && in_array($requestedStatus, self::MEMBER_VISIBLE_STATUSES, true)) {
+                $query->where('c.status', $requestedStatus);
+            } elseif ($requestedStatus !== null) {
+                $query->whereRaw('1 = 0');
+            }
         }
 
         if ($cursor !== null) {
@@ -86,7 +103,7 @@ class IdeationChallengeService
     /**
      * Get a single challenge by ID with idea count.
      */
-    public function getById(int $id): ?array
+    public function getById(int $id, ?int $viewerId = null): ?array
     {
         $challenge = DB::table('ideation_challenges')
             ->where('tenant_id', TenantContext::getId())
@@ -94,6 +111,10 @@ class IdeationChallengeService
             ->first();
 
         if (! $challenge) {
+            return null;
+        }
+
+        if (!$this->canViewChallengeRecord($challenge, $viewerId)) {
             return null;
         }
 
@@ -124,6 +145,10 @@ class IdeationChallengeService
             ->first();
 
         if (! $challenge) {
+            return null;
+        }
+
+        if (!$this->canViewChallengeRecord($challenge, $userId)) {
             return null;
         }
 
@@ -1131,6 +1156,23 @@ class IdeationChallengeService
             ->value('role');
 
         return in_array($role ?? '', ['admin', 'tenant_admin', 'tenant_super_admin', 'super_admin']);
+    }
+
+    private function canViewChallengeRecord(object $challenge, ?int $viewerId): bool
+    {
+        if (in_array((string) ($challenge->status ?? ''), self::MEMBER_VISIBLE_STATUSES, true)) {
+            return true;
+        }
+
+        if ($viewerId === null) {
+            return false;
+        }
+
+        if ((int) ($challenge->user_id ?? 0) === $viewerId) {
+            return true;
+        }
+
+        return $this->isAdmin($viewerId, TenantContext::getId());
     }
 
     // ================================================================

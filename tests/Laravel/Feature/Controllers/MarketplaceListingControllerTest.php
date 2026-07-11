@@ -113,16 +113,16 @@ class MarketplaceListingControllerTest extends TestCase
         $this->assertContains($response->status(), [401, 403]);
     }
 
-    public function test_index_public_smoke(): void
+    public function test_index_requires_authentication(): void
     {
-        // Public endpoint (outside auth middleware group)
         $response = $this->apiGet('/v2/marketplace/listings');
-        $this->assertLessThan(500, $response->status());
+        $response->assertStatus(401);
     }
 
     public function test_index_keeps_marketplace_public_contract_opt_in(): void
     {
         $this->enableMarketplaceFeature();
+        $this->authenticatedUser();
         $seller = User::factory()->forTenant($this->testTenantId)->create([
             'first_name' => 'Market',
             'last_name' => 'Seller',
@@ -192,6 +192,7 @@ class MarketplaceListingControllerTest extends TestCase
     public function test_show_keeps_marketplace_public_contract_opt_in(): void
     {
         $this->enableMarketplaceFeature();
+        $this->authenticatedUser();
         $seller = User::factory()->forTenant($this->testTenantId)->create([
             'first_name' => 'Detail',
             'last_name' => 'Seller',
@@ -239,6 +240,7 @@ class MarketplaceListingControllerTest extends TestCase
     public function test_category_listings_public_endpoint_filters_by_slug(): void
     {
         $this->enableMarketplaceFeature();
+        $this->authenticatedUser();
 
         $seller = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',
@@ -310,6 +312,7 @@ class MarketplaceListingControllerTest extends TestCase
     public function test_category_listings_unknown_slug_does_not_fall_back_to_all_listings(): void
     {
         $this->enableMarketplaceFeature();
+        $this->authenticatedUser();
 
         $seller = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',

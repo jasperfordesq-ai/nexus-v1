@@ -7,7 +7,6 @@
 @php
     $communityName = $tenant['name'] ?? $tenantSlug;
     $post = $post ?? [];
-    $author = $post['author'] ?? null;
     $published = $post['published_at'] ?? null;
     $updated = $post['updated_at'] ?? null;
     $blogHref = route('govuk-alpha.blog.index', ['tenantSlug' => $tenantSlug]);
@@ -35,7 +34,7 @@
         'image' => $ogImage !== '' ? $ogImage : null,
         'datePublished' => $published ? \Illuminate\Support\Carbon::parse($published)->toIso8601String() : null,
         'dateModified' => $updated ? \Illuminate\Support\Carbon::parse($updated)->toIso8601String() : null,
-        'author' => !empty($author['name']) ? ['@type' => 'Person', 'name' => $author['name']] : null,
+        'author' => ['@type' => 'Organization', 'name' => $communityName],
         'publisher' => ['@type' => 'Organization', 'name' => $communityName],
     ]), JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
 @endpush
@@ -50,10 +49,6 @@
 
             <p class="govuk-body-s nexus-alpha-meta">
                 @if (! empty($post['category']['name'])){{ $post['category']['name'] }} · @endif
-                @if (! empty($author['name']))
-                    {{ __('govuk_alpha.blog.author_label') }}
-                    @if (!empty($author['id']) && (int) $author['id'] > 0)<a class="govuk-link" href="{{ route('govuk-alpha.members.show', ['tenantSlug' => $tenantSlug, 'id' => $author['id']]) }}">{{ $author['name'] }}</a>@else{{ $author['name'] }}@endif ·
-                @endif
                 @if ($fmtDate($published)){{ __('govuk_alpha.blog.published_label') }}: {{ $fmtDate($published) }}@endif
                 @if (! empty($post['reading_time'])) · {{ __('govuk_alpha.blog.read_time', ['count' => (int) $post['reading_time']]) }}@endif
             </p>

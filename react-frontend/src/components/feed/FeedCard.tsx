@@ -385,6 +385,7 @@ const FeedCard = React.memo(function FeedCard({
   const social = useSocialInteractions({
     targetType: item.type,
     targetId: item.id,
+    enabled: isAuthenticated,
     initialLiked: item.is_liked,
     initialLikesCount: item.likes_count,
     initialCommentsCount: item.comments_count,

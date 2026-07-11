@@ -232,6 +232,10 @@ class PrerenderPlanRoutes extends Command
                 $rejected[] = [$loc, 'unsafe or unrepresentable route'];
                 continue;
             }
+            if (PrerenderService::routeRequiresAuthentication($path)) {
+                $rejected[] = [$loc, 'route requires authentication'];
+                continue;
+            }
             // Reject anything that has unsafe characters — the bash side
             // re-validates with the same regex.
             $routes[] = $path;

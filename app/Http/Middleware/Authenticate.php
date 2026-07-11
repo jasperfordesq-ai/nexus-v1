@@ -119,7 +119,7 @@ class Authenticate
                 if ($user) {
                     Log::shareContext(['user_id' => (int) $user->id]);
                 }
-                return $next($request);
+                return $this->preventSharedCaching($next($request));
             }
         }
 
@@ -134,7 +134,7 @@ class Authenticate
                 if ($user) {
                     Log::shareContext(['user_id' => (int) $user->id]);
                 }
-                return $next($request);
+                return $this->preventSharedCaching($next($request));
             }
         }
 
@@ -248,5 +248,19 @@ class Authenticate
             || !empty($user->is_god)
             || !empty($user->is_tenant_super_admin)
             || in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin', 'god'], true);
+    }
+
+    /**
+     * Authenticated API payloads can contain member identity and personalized
+     * state. Never allow a browser, proxy, or CDN to reuse them for another
+     * session, even if an individual controller forgets cache headers.
+     */
+    private function preventSharedCaching(Response $response): Response
+    {
+        $response->headers->set('Cache-Control', 'private, no-store, max-age=0');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Vary', 'Authorization, Cookie');
+
+        return $response;
     }
 }

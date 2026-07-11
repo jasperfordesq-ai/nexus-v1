@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\EventService;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -32,6 +33,20 @@ class EventsControllerTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         return $user;
+    }
+
+    protected function apiGet(string $uri, array $headers = []): \Illuminate\Testing\TestResponse
+    {
+        if (str_starts_with($uri, '/v2/events') && Auth::guard('sanctum')->guest()) {
+            $this->authenticatedUser();
+        }
+
+        return parent::apiGet($uri, $headers);
+    }
+
+    private function unauthenticatedEventsGet(string $uri): \Illuminate\Testing\TestResponse
+    {
+        return parent::apiGet($uri);
     }
 
     private function seedCategory(): int
@@ -205,17 +220,16 @@ class EventsControllerTest extends TestCase
     }
 
     // ================================================================
-    // INDEX — Public (no auth required)
+    // INDEX — Authentication required
     // ================================================================
 
-    public function test_index_is_public_without_auth(): void
+    public function test_event_read_endpoints_require_authentication(): void
     {
-        // GET /v2/events is intentionally public (->withoutMiddleware('auth:sanctum')
-        // in routes/api.php) — community event listings are browsable by anyone,
-        // consistent with the public show/nearby/attendees endpoints.
-        $response = $this->apiGet('/v2/events');
-
-        $response->assertStatus(200);
+        // Controller-level checks remain authoritative even if route middleware
+        // is accidentally relaxed in a later routing change.
+        foreach (['/v2/events', '/v2/events/1', '/v2/events/nearby?lat=53&lon=-6'] as $uri) {
+            $this->unauthenticatedEventsGet($uri)->assertStatus(401);
+        }
     }
 
     // ================================================================
@@ -232,6 +246,26 @@ class EventsControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
         $this->assertArrayNotHasKey('public_contract', $response->json('data'));
+    }
+
+    public function test_show_returns_counts_without_embedded_rsvp_users(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $attendee = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $eventId = $this->createEvent($organizer->id);
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'going',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $response = $this->apiGet("/v2/events/{$eventId}");
+
+        $response->assertOk()->assertJsonPath('data.attendee_count', 1);
+        $this->assertArrayNotHasKey('rsvps', $response->json('data'));
     }
 
     public function test_public_show_returns_full_next_public_event_contract_when_opted_in(): void
@@ -681,6 +715,29 @@ class EventsControllerTest extends TestCase
         $response->assertJsonStructure(['data']);
     }
 
+    public function test_attendee_roster_rejects_null_and_unrelated_viewers(): void
+    {
+        $organizer = $this->authenticatedUser();
+        $attendee = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $unrelated = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $eventId = $this->createEvent($organizer->id);
+        DB::table('event_rsvps')->insert([
+            'tenant_id' => $this->testTenantId,
+            'event_id' => $eventId,
+            'user_id' => $attendee->id,
+            'status' => 'going',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        \App\Core\TenantContext::setById($this->testTenantId);
+        $this->assertSame([], EventService::getAttendees($eventId, [], null)['items']);
+        $this->assertNull(EventService::getAttendanceRecords($eventId, null));
+        $organizerRoster = EventService::getAttendees($eventId, [], $organizer->id);
+        $this->assertCount(1, $organizerRoster['items']);
+        $this->assertSame([], EventService::getAttendees($eventId, [], $unrelated->id)['items']);
+    }
+
     // ================================================================
     // CANCEL — Authentication required
     // ================================================================
@@ -779,6 +836,57 @@ class EventsControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure(['data']);
+    }
+
+    public function test_nearby_hides_private_group_events_until_viewer_is_a_member(): void
+    {
+        $owner = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $viewer = $this->authenticatedUser();
+        $groupId = DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_id' => $owner->id,
+            'name' => 'Private nearby event group',
+            'slug' => 'private-nearby-' . uniqid(),
+            'visibility' => 'private',
+            'is_active' => 1,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $privateEventId = $this->createEvent($owner->id, [
+            'title' => 'Private group nearby event',
+            'group_id' => $groupId,
+            'latitude' => 53.3498,
+            'longitude' => -6.2603,
+        ]);
+        $publicEventId = $this->createEvent($owner->id, [
+            'title' => 'Visible nearby event',
+            'latitude' => 53.3499,
+            'longitude' => -6.2604,
+        ]);
+
+        $first = $this->apiGet('/v2/events/nearby?lat=53.3498&lon=-6.2603&radius_km=5&per_page=100');
+        $first->assertOk();
+        $firstIds = array_map('intval', array_column($first->json('data'), 'id'));
+        $this->assertContains($publicEventId, $firstIds);
+        $this->assertNotContains($privateEventId, $firstIds);
+
+        DB::table('group_members')->insert([
+            'tenant_id' => $this->testTenantId,
+            'group_id' => $groupId,
+            'user_id' => $viewer->id,
+            'role' => 'member',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $second = $this->apiGet('/v2/events/nearby?lat=53.3498&lon=-6.2603&radius_km=5&per_page=100');
+        $second->assertOk();
+        $this->assertContains(
+            $privateEventId,
+            array_map('intval', array_column($second->json('data'), 'id'))
+        );
     }
 
     // ================================================================

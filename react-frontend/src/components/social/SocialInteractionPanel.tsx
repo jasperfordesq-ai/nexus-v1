@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from 'react';import { AnimatePresenc
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts';
 import { useSocialInteractions } from '@/hooks/useSocialInteractions';
 import { cn } from '@/lib/helpers';
 import { CommentsSection } from './CommentsSection';
@@ -87,6 +87,7 @@ export function SocialInteractionPanel({
   const social = useSocialInteractions({
     targetType,
     targetId,
+    enabled: isAuthenticated,
     initialLiked,
     initialLikesCount,
     initialCommentsCount,
@@ -112,14 +113,15 @@ export function SocialInteractionPanel({
   }, [targetType, targetId]);
 
   useEffect(() => {
-    if (showComments && !commentsLoaded && !commentsLoading) {
+    if (isAuthenticated && showComments && !commentsLoaded && !commentsLoading) {
       void loadComments();
     }
-  }, [showComments, commentsLoaded, commentsLoading, loadComments]);
+  }, [isAuthenticated, showComments, commentsLoaded, commentsLoading, loadComments]);
 
   const toggleComments = useCallback(() => {
+    if (!isAuthenticated) return;
     setShowComments((current) => !current);
-  }, []);
+  }, [isAuthenticated]);
 
   const currentUserName = getUserName(user, t('you'));
   const currentUserAvatar = user?.avatar_url ?? user?.avatar ?? undefined;
@@ -135,7 +137,10 @@ export function SocialInteractionPanel({
                 variant="ghost"
                 size="sm"
                 className="min-h-[28px] px-0 py-0 text-xs text-theme-subtle hover:text-theme-primary"
-                onPress={() => setIsLikersOpen(true)}
+                isDisabled={!isAuthenticated}
+                onPress={() => {
+                  if (isAuthenticated) setIsLikersOpen(true);
+                }}
                 aria-label={t('view_likes')}
               >
                 <span className="inline-flex items-center gap-1.5">
@@ -153,8 +158,11 @@ export function SocialInteractionPanel({
               variant="ghost"
               size="sm"
               className="min-h-[28px] px-0 py-0 text-xs text-theme-subtle hover:text-theme-primary"
-              onPress={() => setShowComments(true)}
-              aria-expanded={showComments}
+              isDisabled={!isAuthenticated}
+              onPress={() => {
+                if (isAuthenticated) setShowComments(true);
+              }}
+              aria-expanded={isAuthenticated && showComments}
             >
               {t('comments_count', { count: social.commentsCount })}
             </Button>
@@ -195,8 +203,9 @@ export function SocialInteractionPanel({
             showComments && 'bg-accent/10 text-accent',
           )}
           startContent={<MessageCircle className="h-4 w-4" aria-hidden="true" />}
-          aria-expanded={showComments}
-          aria-label={showComments ? t('close_comments') : t('open_comments')}
+          aria-expanded={isAuthenticated && showComments}
+          aria-label={isAuthenticated && showComments ? t('close_comments') : t('open_comments')}
+          isDisabled={!isAuthenticated}
           onPress={toggleComments}
         >
           {t('comment_action')}
@@ -216,7 +225,7 @@ export function SocialInteractionPanel({
       </div>
 
       <AnimatePresence initial={false}>
-        {showComments && (
+        {isAuthenticated && showComments && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -245,7 +254,7 @@ export function SocialInteractionPanel({
       </AnimatePresence>
 
       <LikersModal
-        isOpen={isLikersOpen}
+        isOpen={isAuthenticated && isLikersOpen}
         onClose={() => setIsLikersOpen(false)}
         loadLikers={social.loadLikers}
         likesCount={social.likesCount}

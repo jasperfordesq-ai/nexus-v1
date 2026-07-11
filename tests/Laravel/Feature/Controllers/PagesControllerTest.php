@@ -6,6 +6,7 @@
 
 namespace Tests\Laravel\Feature\Controllers;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
@@ -114,6 +115,92 @@ class PagesControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonPath('data.slug', $slug);
         $response->assertJsonPath('data.title', 'Privacy Policy');
+    }
+
+    public function test_show_preserves_static_editorial_attribution(): void
+    {
+        $slug = 'editorial-attribution-' . uniqid();
+        $this->createPublishedPage($slug, [
+            'content' => '<blockquote>A static testimonial.</blockquote><cite>Published with consent</cite>',
+        ]);
+
+        $response = $this->apiGet("/v2/pages/{$slug}");
+
+        $response->assertOk();
+        $response->assertJsonPath('data.slug', $slug);
+    }
+
+    /**
+     * @dataProvider memberIdentitySurfaceProvider
+     */
+    public function test_show_fails_closed_for_account_derived_member_surfaces(string $content): void
+    {
+        $slug = 'member-surface-' . uniqid();
+        $this->createPublishedPage($slug, ['content' => $content]);
+
+        $response = $this->apiGet("/v2/pages/{$slug}");
+
+        $response->assertNotFound();
+        $response->assertJsonMissing(['content' => $content]);
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function memberIdentitySurfaceProvider(): array
+    {
+        return [
+            'profile link' => ['<a href="/profile/42">Account profile</a>'],
+            'tenant-prefixed member link' => ['<a href="/community/members/42">Account profile</a>'],
+            'encoded profile link' => ['<a href="&#x2F;profile&#x2F;42">Account profile</a>'],
+            'legacy rendered member card' => ['<div class="pb-member-card">Account card</div>'],
+            'account identifier attribute' => ['<div data-user-id="42">Account card</div>'],
+        ];
+    }
+
+    public function test_show_fails_closed_when_legacy_page_contains_members_grid_block(): void
+    {
+        $slug = 'member-block-' . uniqid();
+        $this->createPublishedPage($slug);
+        $pageId = (int) DB::table('pages')->where('tenant_id', $this->testTenantId)->where('slug', $slug)->value('id');
+
+        DB::table('page_blocks')->insert([
+            'page_id' => $pageId,
+            'block_type' => 'members-grid',
+            'block_data' => json_encode(['limit' => 6, 'columns' => 3], JSON_THROW_ON_ERROR),
+            'sort_order' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $this->apiGet("/v2/pages/{$slug}")->assertNotFound();
+    }
+
+    public function test_show_fails_closed_when_builder_design_contains_members_grid(): void
+    {
+        $slug = 'member-design-' . uniqid();
+        $this->createPublishedPage($slug, [
+            'design_json' => json_encode([
+                'blocks' => [['type' => 'members-grid', 'data' => ['limit' => 6]]],
+            ], JSON_THROW_ON_ERROR),
+        ]);
+
+        $this->apiGet("/v2/pages/{$slug}")->assertNotFound();
+    }
+
+    public function test_show_fails_closed_when_page_embeds_an_account_avatar(): void
+    {
+        $avatarUrl = '/uploads/avatars/account-only-' . uniqid() . '.png';
+        User::factory()->forTenant($this->testTenantId)->create(['avatar_url' => $avatarUrl]);
+
+        $slug = 'account-avatar-' . uniqid();
+        $content = '<img src="' . $avatarUrl . '" alt="Editorial image">';
+        $this->createPublishedPage($slug, ['content' => $content]);
+
+        $response = $this->apiGet("/v2/pages/{$slug}");
+
+        $response->assertNotFound();
+        $response->assertJsonMissing(['content' => $content]);
     }
 
     // ================================================================

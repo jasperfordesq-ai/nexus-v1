@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 use App\Http\Controllers\GovukAlpha\AlphaController;
+use App\Http\Controllers\GovukAlpha\Middleware\RequireAccessibleAuthentication;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Route;
  * here. Static segments are registered before the numeric wildcard.
  */
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // Full-featured library (tree sidebar, filters, pagination, metadata, reorder).
 Route::get('/resources/library', [AlphaController::class, 'resourcesLibrary'])
     ->name('resources.library');
@@ -64,3 +66,4 @@ Route::post('/resources/{id}/comments/{commentId}/delete', [AlphaController::cla
     ->whereNumber('commentId')
     ->middleware('throttle:30,1')
     ->name('resources.comments.delete');
+});

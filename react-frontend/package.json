@@ -30,7 +30,7 @@
     "i18n:lint": "i18next-cli lint",
     "i18n:types": "i18next-cli types",
     "i18n:interpolation-parity": "node scripts/check-i18n-interpolation-parity.mjs",
-    "prebuild": "npm run check:nested-interactive && npm run check:locale-formatting && npm run check:design-tokens && npm run check:admin-i18n && npm run copy-locales && npm run copy-changelog",
+    "prebuild": "node --test scripts/prerender-privacy-policy.test.mjs && npm run check:nested-interactive && npm run check:locale-formatting && npm run check:design-tokens && npm run check:admin-i18n && npm run copy-locales && npm run copy-changelog",
     "build": "vite build",
     "build:laravel": "cross-env VITE_BACKEND_TARGET=laravel npm run build -- --mode laravel",
     "build:dotnet": "cross-env VITE_BACKEND_TARGET=dotnet VITE_API_URL=http://localhost:5080 npm run build -- --mode dotnet",

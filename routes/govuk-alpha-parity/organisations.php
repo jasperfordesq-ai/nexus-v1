@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 use App\Http\Controllers\GovukAlpha\AlphaController;
+use App\Http\Controllers\GovukAlpha\Middleware\RequireAccessibleAuthentication;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -24,6 +25,7 @@ use Illuminate\Support\Facades\Route;
  * route (routes/govuk-alpha.php); no new apply route is defined here.
  */
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // Paginated browse list (cursor "load more"). Static before {id}.
 Route::get('/organisations/browse', [AlphaController::class, 'organisationsBrowse'])
     ->name('organisations.browse');
@@ -48,3 +50,4 @@ Route::get('/organisations/opportunities/{id}/apply', [AlphaController::class, '
 Route::get('/organisations/{id}/jobs', [AlphaController::class, 'organisationsJobs'])
     ->whereNumber('id')
     ->name('organisations.jobs');
+});

@@ -22,6 +22,36 @@ class BlogService
         'aenean-sed-pulvinar-et-diam',
     ];
 
+    /**
+     * Explicit columns permitted in anonymous blog projections.
+     *
+     * author_id is deliberately absent: public editorial content must never
+     * turn the linked platform account into a public member directory entry.
+     */
+    private const PUBLIC_SUMMARY_COLUMNS = [
+        'id',
+        'title',
+        'slug',
+        'excerpt',
+        'featured_image',
+        'category_id',
+        'created_at',
+        'updated_at',
+    ];
+
+    private const PUBLIC_DETAIL_COLUMNS = [
+        'id',
+        'title',
+        'slug',
+        'excerpt',
+        'content',
+        'html_render',
+        'featured_image',
+        'category_id',
+        'created_at',
+        'updated_at',
+    ];
+
     public function __construct(
         private readonly Post $post,
         private readonly Category $category,
@@ -34,12 +64,23 @@ class BlogService
      */
     public function getAll(array $filters = []): array
     {
+        return $this->getPublicPosts($filters);
+    }
+
+    /**
+     * Get the anonymous-safe public blog index projection.
+     *
+     * @return array{items: array, cursor: string|null, has_more: bool}
+     */
+    public function getPublicPosts(array $filters = []): array
+    {
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $cursor = $filters['cursor'] ?? null;
 
         $query = $this->post->newQuery()
+            ->select(self::PUBLIC_SUMMARY_COLUMNS)
             ->published()
-            ->with(['author:id,first_name,last_name,avatar_url', 'category:id,name,slug,color', 'seoMetadata']);
+            ->with(['category:id,name,slug,color', 'seoMetadata']);
         $this->excludePlaceholderPosts($query);
 
         if (! empty($filters['category_id'])) {
@@ -86,8 +127,9 @@ class BlogService
     public function getPosts(int $tenantId, int $page = 1, int $perPage = 20, ?int $categoryId = null): array
     {
         $query = $this->post->newQuery()
+            ->select(self::PUBLIC_SUMMARY_COLUMNS)
             ->published()
-            ->with(['author:id,first_name,last_name,avatar_url', 'category:id,name,slug,color', 'seoMetadata']);
+            ->with(['category:id,name,slug,color', 'seoMetadata']);
         $this->excludePlaceholderPosts($query);
 
         if ($categoryId) {
@@ -113,9 +155,18 @@ class BlogService
      */
     public function getBySlug(string $slug, ?int $tenantId = null): ?array
     {
+        return $this->getPublicPostBySlug($slug, $tenantId);
+    }
+
+    /**
+     * Get the anonymous-safe public projection for one published blog post.
+     */
+    public function getPublicPostBySlug(string $slug, ?int $tenantId = null): ?array
+    {
         $post = $this->post->newQuery()
+            ->select(self::PUBLIC_DETAIL_COLUMNS)
             ->published()
-            ->with(['author:id,first_name,last_name,avatar_url', 'category:id,name,slug,color', 'seoMetadata'])
+            ->with(['category:id,name,slug,color', 'seoMetadata'])
             ->whereNotIn('slug', self::PLACEHOLDER_BLOG_SLUGS)
             ->whereRaw("LOWER(CONCAT_WS(' ', title, excerpt, content, html_render)) NOT LIKE ?", ['%lorem ipsum%'])
             ->where('slug', $slug)
@@ -152,7 +203,6 @@ class BlogService
             'canonical_url'    => $seo?->canonical_url ?: null,
             'og_image_url'     => $seo?->og_image_url ?: null,
             'noindex'          => (bool) ($seo?->noindex ?? false),
-            'author'           => $this->formatAuthor($post->author, $baseUrl),
             'category'         => $post->category ? [
                 'id'    => $post->category->id,
                 'name'  => $post->category->name,
@@ -210,25 +260,11 @@ class BlogService
             'reading_time'   => 3,
             'meta_title'     => $seo?->meta_title ?: null,
             'meta_description' => $seo?->meta_description ?: null,
-            'author'         => $this->formatAuthor($post->author, $baseUrl),
             'category'       => $post->category ? [
                 'id'    => $post->category->id,
                 'name'  => $post->category->name,
                 'color' => $post->category->color ?? 'blue',
             ] : null,
-        ];
-    }
-
-    private function formatAuthor($author, string $baseUrl): array
-    {
-        if (! $author) {
-            return ['id' => 0, 'name' => 'Unknown', 'avatar' => null];
-        }
-
-        return [
-            'id'     => $author->id,
-            'name'   => trim(($author->first_name ?? '') . ' ' . ($author->last_name ?? '')),
-            'avatar' => $this->resolveImageUrl($author->avatar_url, $baseUrl),
         ];
     }
 

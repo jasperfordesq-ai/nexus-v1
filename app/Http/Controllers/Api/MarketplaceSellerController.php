@@ -17,8 +17,8 @@ use Illuminate\Http\JsonResponse;
  * MarketplaceSellerController — Seller profiles and dashboard for the marketplace module.
  *
  * Endpoints (v2):
- *   GET  /v2/marketplace/sellers/{id}           show()          — public seller profile
- *   GET  /v2/marketplace/sellers/{id}/listings   listings()      — seller's public listings
+ *   GET  /v2/marketplace/sellers/{id}           show()          — authenticated seller profile
+ *   GET  /v2/marketplace/sellers/{id}/listings   listings()      — authenticated seller listings
  *   POST /v2/marketplace/seller/profile          updateProfile() — create/update own profile (auth)
  *   GET  /v2/marketplace/seller/dashboard        dashboard()     — seller dashboard stats (auth)
  *   GET  /v2/marketplace/seller/onboard/status   onboardStatus() — Stripe onboarding status (auth)
@@ -44,11 +44,12 @@ class MarketplaceSellerController extends BaseApiController
     // -----------------------------------------------------------------
 
     /**
-     * Get a public seller profile.
+     * Get a seller profile for an authenticated marketplace member.
      */
     public function show(int $id): JsonResponse
     {
         $this->ensureFeature();
+        $this->requireAuth();
         $this->rateLimit('marketplace_seller_view', 60, 60);
 
         // The frontend passes user_id (from listing.user.id), so try looking
@@ -56,7 +57,7 @@ class MarketplaceSellerController extends BaseApiController
         $profileByUser = MarketplaceSellerService::getByUserId($id);
         $profileId = $profileByUser ? $profileByUser->id : $id;
 
-        $profile = MarketplaceSellerService::getPublicProfile($profileId);
+        $profile = MarketplaceSellerService::getMemberProfile($profileId);
 
         if ($profile === null) {
             return $this->respondWithError('NOT_FOUND', 'Seller profile not found.', null, 404);
@@ -70,11 +71,12 @@ class MarketplaceSellerController extends BaseApiController
     // -----------------------------------------------------------------
 
     /**
-     * Get a seller's public listings.
+     * Get a seller's listings for an authenticated marketplace member.
      */
     public function listings(int $id): JsonResponse
     {
         $this->ensureFeature();
+        $userId = $this->requireAuth();
         $this->rateLimit('marketplace_seller_listings', 60, 60);
 
         // The frontend passes the user_id (from listing.user.id), so look up
@@ -88,7 +90,7 @@ class MarketplaceSellerController extends BaseApiController
         $limit = $this->queryInt('per_page', 20, 1, 100);
         $cursor = $this->query('cursor');
 
-        $result = MarketplaceSellerService::getSellerListings($profile->user_id, $limit, $cursor);
+        $result = MarketplaceSellerService::getSellerListings($profile->user_id, $userId, $limit, $cursor);
 
         return $this->respondWithCollection(
             $result['items'] ?? [],
@@ -104,6 +106,7 @@ class MarketplaceSellerController extends BaseApiController
     public function shippingOptionsForSeller(int $id): JsonResponse
     {
         $this->ensureFeature();
+        $this->requireAuth();
         $this->rateLimit('marketplace_seller_shipping_public', 60, 60);
 
         // Buyer-facing components pass user_id from listing.seller, while

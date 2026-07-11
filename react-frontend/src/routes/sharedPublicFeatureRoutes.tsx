@@ -12,10 +12,9 @@ import { lazyWithRetry } from './lazyWithRetry';
 const GuardianConsentVerifyPage = lazyWithRetry(
   () => import('@/pages/volunteering/GuardianConsentVerifyPage'),
 );
-const ExplorePage = lazyWithRetry(() => import('@/pages/explore/ExplorePage'));
 
 interface SharedPublicFeatureRoutePolicy {
-  id: 'guardian-consent-verify' | 'explore';
+  id: 'guardian-consent-verify';
   path: string;
   auth: 'public';
   feature: keyof TenantFeatures;
@@ -33,17 +32,10 @@ export const SHARED_PUBLIC_FEATURE_ROUTE_POLICIES = [
     auth: 'public',
     feature: 'volunteering',
   },
-  {
-    id: 'explore',
-    path: 'explore',
-    auth: 'public',
-    feature: 'explore',
-  },
 ] as const satisfies readonly SharedPublicFeatureRoutePolicy[];
 
 const routePages = {
   'guardian-consent-verify': GuardianConsentVerifyPage,
-  explore: ExplorePage,
 } as const;
 
 export function renderSharedPublicFeatureRoutes() {

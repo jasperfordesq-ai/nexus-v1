@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 use App\Http\Controllers\GovukAlpha\AlphaController;
+use App\Http\Controllers\GovukAlpha\Middleware\RequireAccessibleAuthentication;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 | declared in routes/govuk-alpha.php.
 */
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // ===== Marketplace — seller listing management (static before wildcards) =====
 Route::get('/marketplace/create', [AlphaController::class, 'commerceCreateListingForm'])->name('marketplace.create');
 Route::post('/marketplace/create', [AlphaController::class, 'commerceStoreListing'])->middleware('throttle:10,1')->name('marketplace.store');
@@ -62,18 +64,22 @@ Route::get('/marketplace/{id}/offer', [AlphaController::class, 'commerceOfferFor
 Route::post('/marketplace/{id}/offer', [AlphaController::class, 'commerceStoreOffer'])->whereNumber('id')->middleware('throttle:10,1')->name('marketplace.offer.store');
 Route::get('/marketplace/{id}/report', [AlphaController::class, 'commerceReportForm'])->whereNumber('id')->name('marketplace.report');
 Route::post('/marketplace/{id}/report', [AlphaController::class, 'commerceStoreReport'])->whereNumber('id')->middleware('throttle:5,60')->name('marketplace.report.store');
+});
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // ===== Courses — learner dashboard + lesson player =====
 Route::get('/courses/mine', [AlphaController::class, 'commerceMyLearning'])->name('courses.mine');
 Route::get('/courses/{id}/learn', [AlphaController::class, 'commerceCourseLearn'])->whereNumber('id')->name('courses.learn');
 Route::post('/courses/{id}/lessons/{lessonId}/complete', [AlphaController::class, 'commerceCompleteLesson'])->whereNumber('id')->whereNumber('lessonId')->middleware('throttle:30,1')->name('courses.lessons.complete');
 Route::post('/courses/{id}/lessons/{lessonId}/quiz', [AlphaController::class, 'commerceCourseQuizSubmit'])->whereNumber('id')->whereNumber('lessonId')->middleware('throttle:20,1')->name('courses.quiz.submit');
+});
 
 // ===== Premium — subscription management =====
 Route::get('/premium/manage', [AlphaController::class, 'commercePremiumManage'])->name('premium.manage');
 Route::post('/premium/cancel', [AlphaController::class, 'commercePremiumCancel'])->middleware('throttle:5,1')->name('premium.cancel');
 Route::post('/premium/portal', [AlphaController::class, 'commercePremiumPortal'])->middleware('throttle:10,1')->name('premium.portal');
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // ===== Courses — instructor / creator suite =====
 // `instructor` and `new` are non-numeric, so they never collide with the
 // existing /courses/{id} (whereNumber) route in routes/govuk-alpha.php. Static
@@ -99,7 +105,9 @@ Route::post('/courses/instructor/{id}/sections/{sectionId}/delete', [AlphaContro
 Route::post('/courses/instructor/{id}/lessons', [AlphaController::class, 'commerceStoreCourseLesson'])->whereNumber('id')->middleware('throttle:30,1')->name('courses.instructor.lessons.store');
 Route::post('/courses/instructor/{id}/lessons/{lessonId}/update', [AlphaController::class, 'commerceUpdateCourseLesson'])->whereNumber('id')->whereNumber('lessonId')->middleware('throttle:30,1')->name('courses.instructor.lessons.update');
 Route::post('/courses/instructor/{id}/lessons/{lessonId}/delete', [AlphaController::class, 'commerceDeleteCourseLesson'])->whereNumber('id')->whereNumber('lessonId')->middleware('throttle:30,1')->name('courses.instructor.lessons.delete');
+});
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // ===== Marketplace — category browse + buyer pickups + merchant onboarding =====
 // Static segments — declared here so they win over the numeric {id} wildcard
 // (which is whereNumber-constrained, so 'category'/'onboarding'/'pickups' could
@@ -127,7 +135,9 @@ Route::post('/marketplace/coupons/new', [AlphaController::class, 'commerceStoreC
 Route::get('/marketplace/coupons/{id}/edit', [AlphaController::class, 'commerceEditCouponForm'])->whereNumber('id')->name('marketplace.coupons.edit');
 Route::post('/marketplace/coupons/{id}/update', [AlphaController::class, 'commerceUpdateCoupon'])->whereNumber('id')->middleware('throttle:20,1')->name('marketplace.coupons.update');
 Route::post('/marketplace/coupons/{id}/delete', [AlphaController::class, 'commerceDeleteCoupon'])->whereNumber('id')->middleware('throttle:10,1')->name('marketplace.coupons.delete');
+});
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // ===== Podcasts — studio: show create/edit + episode management =====
 // `studio` is non-numeric so it never collides with the public /podcasts/{id}
 // (whereNumber) route in routes/govuk-alpha.php. Static before numeric sub-paths.
@@ -141,3 +151,4 @@ Route::post('/podcasts/studio/{id}/delete', [AlphaController::class, 'commerceDe
 Route::post('/podcasts/studio/{id}/episodes', [AlphaController::class, 'commerceStorePodcastEpisode'])->whereNumber('id')->middleware('throttle:20,1')->name('podcasts.studio.episodes.store');
 Route::post('/podcasts/studio/{id}/episodes/{episodeId}/publish', [AlphaController::class, 'commercePublishPodcastEpisode'])->whereNumber('id')->whereNumber('episodeId')->middleware('throttle:20,1')->name('podcasts.studio.episodes.publish');
 Route::post('/podcasts/studio/{id}/episodes/{episodeId}/delete', [AlphaController::class, 'commerceDeletePodcastEpisode'])->whereNumber('id')->whereNumber('episodeId')->middleware('throttle:10,1')->name('podcasts.studio.episodes.delete');
+});

@@ -51,6 +51,17 @@ class FeedParityTest extends TestCase
         \Illuminate\Support\Facades\Cache::flush();
     }
 
+    public function post($uri, array $data = [], array $headers = []): \Illuminate\Testing\TestResponse
+    {
+        if (is_string($uri) && str_contains($uri, '/accessible')) {
+            $token = (string) ($data['_token'] ?? 'govuk-alpha-feed-parity-token');
+            $data['_token'] = $token;
+            $this->withSession(['_token' => $token]);
+        }
+
+        return parent::post($uri, $data, $headers);
+    }
+
     private function feedUser(array $overrides = []): User
     {
         $user = User::factory()->forTenant($this->testTenantId)->create(array_merge([

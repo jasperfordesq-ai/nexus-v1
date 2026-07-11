@@ -145,8 +145,6 @@ const OrganisationDetailPage = lazyWithRetry(() => import('@/pages/organisations
 const RegisterOrganisationPage = lazyWithRetry(() => import('@/pages/organisations/RegisterOrganisationPage'));
 const FeedPage = lazyWithRetry(() => import('@/pages/feed/FeedPage'));
 const BookmarksPage = lazyWithRetry(() => import('@/pages/bookmarks/BookmarksPage'));
-const BlogPage = lazyWithRetry(() => import('@/pages/blog/BlogPage'));
-const BlogPostPage = lazyWithRetry(() => import('@/pages/blog/BlogPostPage'));
 const ResourcesPage = lazyWithRetry(() => import('@/pages/resources/ResourcesPage'));
 const KnowledgeBasePage = lazyWithRetry(() => import('@/pages/kb/KnowledgeBasePage'));
 const KBArticlePage = lazyWithRetry(() => import('@/pages/kb/KBArticlePage'));
@@ -177,6 +175,7 @@ const ActivityDashboardPage = lazyWithRetry(() => import('@/pages/activity/Activ
 const HashtagPage = lazyWithRetry(() => import('@/pages/feed/HashtagPage'));
 const HashtagsDiscoveryPage = lazyWithRetry(() => import('@/pages/feed/HashtagsDiscoveryPage'));
 const PostDetailPage = lazyWithRetry(() => import('@/pages/feed/PostDetailPage'));
+const ExplorePage = lazyWithRetry(() => import('@/pages/explore/ExplorePage'));
 
 // Marketplace Pages
 const MarketplacePage = lazyWithRetry(() => import('@/pages/marketplace/MarketplacePage'));
@@ -347,261 +346,6 @@ export function AppRoutes() {
         {/* Dynamic CMS pages created via admin Page Builder */}
         <Route path="page/:slug" element={<ErrorBoundary><CustomPage /></ErrorBoundary>} />
 
-        {/* Public: Blog (feature-gated) */}
-        <Route path="blog" element={
-          <FeatureGate feature="blog" redirect="/">
-            <FeatureErrorBoundary featureName="Blog">
-              <BlogPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="blog/:slug" element={
-          <FeatureGate feature="blog" redirect="/">
-            <FeatureErrorBoundary featureName="Blog">
-              <BlogPostPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* Public but can show auth-specific content (module-gated) */}
-        <Route path="listings" element={
-          <FeatureGate module="listings" redirect="/">
-            <FeatureErrorBoundary featureName="Listings">
-              <ListingsPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="listings/:id" element={
-          <FeatureGate module="listings" redirect="/">
-            <FeatureErrorBoundary featureName="Listings">
-              <ListingDetailPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* Public: Events (feature-gated, view-only) */}
-        <Route path="events" element={
-          <FeatureGate feature="events" fallback={<ComingSoonPage feature={t('coming_soon.features.events')} />}>
-            <FeatureErrorBoundary featureName="Events">
-              <EventsPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="events/:id" element={
-          <FeatureGate feature="events" redirect="/">
-            <FeatureErrorBoundary featureName="Events">
-              <EventDetailPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* Public: Groups (feature-gated, view-only) */}
-        <Route path="groups" element={
-          <FeatureGate feature="groups" fallback={<ComingSoonPage feature={t('coming_soon.features.groups')} />}>
-            <FeatureErrorBoundary featureName="Groups">
-              <GroupsPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="groups/:id" element={
-          <FeatureGate feature="groups" redirect="/">
-            <FeatureErrorBoundary featureName="Groups">
-              <GroupDetailPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* Public: Job Vacancies (feature-gated, view-only) */}
-        <Route path="jobs" element={
-          <FeatureGate feature="job_vacancies" fallback={<ComingSoonPage feature={t('coming_soon.features.job_vacancies')} />}>
-            <FeatureErrorBoundary featureName="Job Vacancies">
-              <JobsPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="jobs/:id" element={
-          <FeatureGate feature="job_vacancies" redirect="/">
-            <FeatureErrorBoundary featureName="Job Vacancies">
-              <JobDetailPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* Courses Module (alpha) â€” feature-gated */}
-        <Route path="courses" element={
-          <FeatureGate feature="courses" redirect="/">
-            <FeatureErrorBoundary featureName="Courses">
-              <CoursesPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="courses/my-learning" element={
-          <ProtectedRoute>
-            <FeatureGate feature="courses" redirect="/">
-              <FeatureErrorBoundary featureName="Courses">
-                <MyLearningPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          </ProtectedRoute>
-        } />
-        <Route path="courses/instructor" element={
-          <ProtectedRoute>
-            <FeatureGate feature="courses" redirect="/">
-              <FeatureErrorBoundary featureName="Courses">
-                <InstructorDashboardPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          </ProtectedRoute>
-        } />
-        <Route path="courses/instructor/new" element={
-          <ProtectedRoute>
-            <FeatureGate feature="courses" redirect="/">
-              <FeatureErrorBoundary featureName="Courses">
-                <CreateCoursePage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          </ProtectedRoute>
-        } />
-        <Route path="courses/instructor/:id/edit" element={
-          <ProtectedRoute>
-            <FeatureGate feature="courses" redirect="/">
-              <FeatureErrorBoundary featureName="Courses">
-                <CreateCoursePage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          </ProtectedRoute>
-        } />
-        <Route path="courses/instructor/:id/analytics" element={
-          <ProtectedRoute>
-            <FeatureGate feature="courses" redirect="/">
-              <FeatureErrorBoundary featureName="Courses">
-                <CourseAnalyticsPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          </ProtectedRoute>
-        } />
-        <Route path="courses/instructor/:id/grading" element={
-          <ProtectedRoute>
-            <FeatureGate feature="courses" redirect="/">
-              <FeatureErrorBoundary featureName="Courses">
-                <CourseGradingPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          </ProtectedRoute>
-        } />
-        <Route path="courses/:id/learn" element={
-          <ProtectedRoute>
-            <FeatureGate feature="courses" redirect="/">
-              <FeatureErrorBoundary featureName="Courses">
-                <CoursePlayerPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          </ProtectedRoute>
-        } />
-        <Route path="courses/:idOrSlug" element={
-          <FeatureGate feature="courses" redirect="/">
-            <FeatureErrorBoundary featureName="Courses">
-              <CourseDetailPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* Podcasts Module â€” feature-gated */}
-        <Route path="podcasts" element={
-          <FeatureGate feature="podcasts" redirect="/">
-            <FeatureErrorBoundary featureName="Podcasts">
-              <PodcastsPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="podcasts/studio" element={
-          <ProtectedRoute>
-            <FeatureGate feature="podcasts" redirect="/">
-              <FeatureErrorBoundary featureName="Podcasts">
-                <PodcastStudioPage />
-              </FeatureErrorBoundary>
-            </FeatureGate>
-          </ProtectedRoute>
-        } />
-        <Route path="podcasts/:showSlug" element={
-          <FeatureGate feature="podcasts" redirect="/">
-            <FeatureErrorBoundary featureName="Podcasts">
-              <PodcastShowPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="podcasts/:showSlug/:episodeSlug" element={
-          <FeatureGate feature="podcasts" redirect="/">
-            <FeatureErrorBoundary featureName="Podcasts">
-              <PodcastEpisodePage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* Public: Marketplace (feature-gated, view-only) */}
-        <Route path="marketplace" element={
-          <FeatureGate feature="marketplace" fallback={<ComingSoonPage feature={t('coming_soon.features.marketplace')} />}>
-            <FeatureErrorBoundary featureName="Marketplace">
-              <MarketplacePage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="marketplace/search" element={
-          <FeatureGate feature="marketplace" redirect="/">
-            <FeatureErrorBoundary featureName="Marketplace">
-              <MarketplaceSearchPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="marketplace/map" element={
-          <FeatureGate feature="marketplace" redirect="/">
-            <FeatureErrorBoundary featureName="Marketplace">
-              <MarketplaceMapSearchPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="marketplace/seller/:id" element={
-          <FeatureGate feature="marketplace" redirect="/">
-            <FeatureErrorBoundary featureName="Marketplace">
-              <SellerProfilePage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="marketplace/category/:slug" element={
-          <FeatureGate feature="marketplace" redirect="/">
-            <FeatureErrorBoundary featureName="Marketplace">
-              <MarketplaceCategoryPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="marketplace/my-listings" element={
-          <FeatureGate feature="marketplace" redirect="/">
-            <FeatureErrorBoundary featureName="Marketplace">
-              <MyListingsPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="marketplace/my-offers" element={
-          <FeatureGate feature="marketplace" redirect="/">
-            <FeatureErrorBoundary featureName="Marketplace">
-              <MyOffersPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="marketplace/collections" element={
-          <FeatureGate feature="marketplace" redirect="/">
-            <FeatureErrorBoundary featureName="Marketplace">
-              <MarketplaceCollectionsPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="marketplace/free" element={
-          <FeatureGate feature="marketplace" fallback={<ComingSoonPage feature={t('coming_soon.features.marketplace')} />}>
-            <FeatureErrorBoundary featureName="Marketplace">
-              <FreeItemsPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
         <Route path="coupons" element={
           <FeatureGate feature="merchant_coupons" fallback={<ComingSoonPage feature={t('coming_soon.features.coupons')} />}>
             <FeatureErrorBoundary featureName="Coupons">
@@ -616,14 +360,6 @@ export function AppRoutes() {
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
-        <Route path="marketplace/:id" element={
-          <FeatureGate feature="marketplace" redirect="/">
-            <FeatureErrorBoundary featureName="Marketplace">
-              <MarketplaceListingPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
         {/* Public: Caring Community (feature-gated hub) */}
         <Route path={CARING_COMMUNITY_ROUTE.path} element={
           <FeatureGate feature={CARING_COMMUNITY_ROUTE.feature} fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
@@ -838,50 +574,8 @@ export function AppRoutes() {
         } />
         </Route>
 
-        {/* GDPR member data export (R3) */}
-        <Route path="settings/data-export" element={<ErrorBoundary><DataExportPage /></ErrorBoundary>} />
-
         {/* Clubs & Associations directory (AG15) â€” public, no feature gate */}
         <Route path="clubs" element={<ErrorBoundary><ClubsPage /></ErrorBoundary>} />
-        <Route path="clubs/:id/admin/import" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
-            <FeatureErrorBoundary featureName="Verein Import">
-              <VereinMembersImportPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* AG54 â€” Verein membership dues */}
-        <Route path="clubs/:id/admin/dues" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
-            <FeatureErrorBoundary featureName="Verein Dues">
-              <VereinDuesManagementPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="me/verein-dues" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
-            <FeatureErrorBoundary featureName="My Verein Dues">
-              <MyVereinDuesPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* AG55 â€” Verein-to-Verein federation */}
-        <Route path="me/verein-invitations" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
-            <FeatureErrorBoundary featureName="Verein Invitations">
-              <MyVereinInvitationsPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="municipality-calendar" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
-            <FeatureErrorBoundary featureName="Municipality Calendar">
-              <MunicipalityCalendarPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
 
         {/* Advertiser self-serve portal (AG56/AG57) */}
         <Route path="advertise/campaigns" element={
@@ -902,88 +596,348 @@ export function AppRoutes() {
         {/* Public: Caring Community invite redemption â€” no auth, no feature gate needed */}
         <Route path="join/:code" element={<ErrorBoundary><InviteRedemptionPage /></ErrorBoundary>} />
 
-        {/* Public: Volunteering (feature-gated, view-only) */}
-        <Route path="volunteering" element={
-          <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={t('coming_soon.features.volunteering')} />}>
-            <FeatureErrorBoundary featureName="Volunteering">
-              <VolunteeringPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="volunteering/opportunities/:id" element={
-          <FeatureGate feature="volunteering" redirect="/">
-            <FeatureErrorBoundary featureName="Volunteering">
-              <OpportunityDetailPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* Public: Resources (feature-gated) */}
-        <Route path="resources" element={
-          <FeatureGate feature="resources" fallback={<ComingSoonPage feature={t('coming_soon.features.resources')} />}>
-            <FeatureErrorBoundary featureName="Resources">
-              <ResourcesPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* Public: Knowledge Base (feature-gated) */}
-        <Route path="kb" element={
-          <FeatureGate feature="resources" fallback={<ComingSoonPage feature={t('coming_soon.features.knowledge_base')} />}>
-            <FeatureErrorBoundary featureName="Knowledge Base">
-              <KnowledgeBasePage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="kb/:id" element={
-          <FeatureGate feature="resources" redirect="/">
-            <FeatureErrorBoundary featureName="Knowledge Base">
-              <KBArticlePage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* Public: Organisations (feature-gated, view-only) */}
-        <Route path="organisations" element={
-          <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={t('coming_soon.features.volunteering')} />}>
-            <FeatureErrorBoundary featureName="Organisations">
-              <OrganisationsPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="organisations/:id" element={
-          <FeatureGate feature="volunteering" redirect="/">
-            <FeatureErrorBoundary featureName="Organisations">
-              <OrganisationDetailPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
-        {/* Public: Ideation (feature-gated, view-only) */}
-        <Route path="ideation" element={
-          <FeatureGate feature="ideation_challenges" fallback={<ComingSoonPage feature={t('coming_soon.features.ideation_challenges')} />}>
-            <FeatureErrorBoundary featureName="Ideation Challenges">
-              <IdeationPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="ideation/:id" element={
-          <FeatureGate feature="ideation_challenges" redirect="/">
-            <FeatureErrorBoundary featureName="Ideation Challenges">
-              <ChallengeDetailPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-        <Route path="ideation/:challengeId/ideas/:id" element={
-          <FeatureGate feature="ideation_challenges" redirect="/">
-            <FeatureErrorBoundary featureName="Ideation Challenges">
-              <IdeaDetailPage />
-            </FeatureErrorBoundary>
-          </FeatureGate>
-        } />
-
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
+          {/* Member identity-bearing discovery and content routes */}
+          <Route path="explore" element={
+            <FeatureGate feature="explore" redirect="/">
+              <FeatureErrorBoundary featureName="Explore">
+                <ExplorePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="listings" element={
+            <FeatureGate module="listings" redirect="/">
+              <FeatureErrorBoundary featureName="Listings">
+                <ListingsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="listings/:id" element={
+            <FeatureGate module="listings" redirect="/">
+              <FeatureErrorBoundary featureName="Listings">
+                <ListingDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="events" element={
+            <FeatureGate feature="events" fallback={<ComingSoonPage feature={t('coming_soon.features.events')} />}>
+              <FeatureErrorBoundary featureName="Events">
+                <EventsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="events/:id" element={
+            <FeatureGate feature="events" redirect="/">
+              <FeatureErrorBoundary featureName="Events">
+                <EventDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="groups" element={
+            <FeatureGate feature="groups" fallback={<ComingSoonPage feature={t('coming_soon.features.groups')} />}>
+              <FeatureErrorBoundary featureName="Groups">
+                <GroupsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="groups/:id" element={
+            <FeatureGate feature="groups" redirect="/">
+              <FeatureErrorBoundary featureName="Groups">
+                <GroupDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="jobs" element={
+            <FeatureGate feature="job_vacancies" fallback={<ComingSoonPage feature={t('coming_soon.features.job_vacancies')} />}>
+              <FeatureErrorBoundary featureName="Job Vacancies">
+                <JobsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="jobs/:id" element={
+            <FeatureGate feature="job_vacancies" redirect="/">
+              <FeatureErrorBoundary featureName="Job Vacancies">
+                <JobDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+
+          {/* Courses and podcasts expose account-derived authorship. */}
+          <Route path="courses" element={
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <CoursesPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="courses/my-learning" element={
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <MyLearningPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="courses/instructor" element={
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <InstructorDashboardPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="courses/instructor/new" element={
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <CreateCoursePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="courses/instructor/:id/edit" element={
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <CreateCoursePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="courses/instructor/:id/analytics" element={
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <CourseAnalyticsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="courses/instructor/:id/grading" element={
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <CourseGradingPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="courses/:id/learn" element={
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <CoursePlayerPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="courses/:idOrSlug" element={
+            <FeatureGate feature="courses" redirect="/">
+              <FeatureErrorBoundary featureName="Courses">
+                <CourseDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="podcasts" element={
+            <FeatureGate feature="podcasts" redirect="/">
+              <FeatureErrorBoundary featureName="Podcasts">
+                <PodcastsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="podcasts/studio" element={
+            <FeatureGate feature="podcasts" redirect="/">
+              <FeatureErrorBoundary featureName="Podcasts">
+                <PodcastStudioPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="podcasts/:showSlug" element={
+            <FeatureGate feature="podcasts" redirect="/">
+              <FeatureErrorBoundary featureName="Podcasts">
+                <PodcastShowPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="podcasts/:showSlug/:episodeSlug" element={
+            <FeatureGate feature="podcasts" redirect="/">
+              <FeatureErrorBoundary featureName="Podcasts">
+                <PodcastEpisodePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+
+          {/* Marketplace pages can expose seller account identity. */}
+          <Route path="marketplace" element={
+            <FeatureGate feature="marketplace" fallback={<ComingSoonPage feature={t('coming_soon.features.marketplace')} />}>
+              <FeatureErrorBoundary featureName="Marketplace">
+                <MarketplacePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/search" element={
+            <FeatureGate feature="marketplace" redirect="/">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <MarketplaceSearchPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/map" element={
+            <FeatureGate feature="marketplace" redirect="/">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <MarketplaceMapSearchPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/seller/:id" element={
+            <FeatureGate feature="marketplace" redirect="/">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <SellerProfilePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/category/:slug" element={
+            <FeatureGate feature="marketplace" redirect="/">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <MarketplaceCategoryPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/my-listings" element={
+            <FeatureGate feature="marketplace" redirect="/">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <MyListingsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/my-offers" element={
+            <FeatureGate feature="marketplace" redirect="/">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <MyOffersPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/collections" element={
+            <FeatureGate feature="marketplace" redirect="/">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <MarketplaceCollectionsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/free" element={
+            <FeatureGate feature="marketplace" fallback={<ComingSoonPage feature={t('coming_soon.features.marketplace')} />}>
+              <FeatureErrorBoundary featureName="Marketplace">
+                <FreeItemsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="marketplace/:id" element={
+            <FeatureGate feature="marketplace" redirect="/">
+              <FeatureErrorBoundary featureName="Marketplace">
+                <MarketplaceListingPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+
+          {/* Volunteering, resources, organisations, and ideation include member attribution. */}
+          <Route path="volunteering" element={
+            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={t('coming_soon.features.volunteering')} />}>
+              <FeatureErrorBoundary featureName="Volunteering">
+                <VolunteeringPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="volunteering/opportunities/:id" element={
+            <FeatureGate feature="volunteering" redirect="/">
+              <FeatureErrorBoundary featureName="Volunteering">
+                <OpportunityDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="resources" element={
+            <FeatureGate feature="resources" fallback={<ComingSoonPage feature={t('coming_soon.features.resources')} />}>
+              <FeatureErrorBoundary featureName="Resources">
+                <ResourcesPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="kb" element={
+            <FeatureGate feature="resources" fallback={<ComingSoonPage feature={t('coming_soon.features.knowledge_base')} />}>
+              <FeatureErrorBoundary featureName="Knowledge Base">
+                <KnowledgeBasePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="kb/:id" element={
+            <FeatureGate feature="resources" redirect="/">
+              <FeatureErrorBoundary featureName="Knowledge Base">
+                <KBArticlePage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="organisations" element={
+            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={t('coming_soon.features.volunteering')} />}>
+              <FeatureErrorBoundary featureName="Organisations">
+                <OrganisationsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="organisations/:id" element={
+            <FeatureGate feature="volunteering" redirect="/">
+              <FeatureErrorBoundary featureName="Organisations">
+                <OrganisationDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="ideation" element={
+            <FeatureGate feature="ideation_challenges" fallback={<ComingSoonPage feature={t('coming_soon.features.ideation_challenges')} />}>
+              <FeatureErrorBoundary featureName="Ideation Challenges">
+                <IdeationPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="ideation/:id" element={
+            <FeatureGate feature="ideation_challenges" redirect="/">
+              <FeatureErrorBoundary featureName="Ideation Challenges">
+                <ChallengeDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="ideation/:challengeId/ideas/:id" element={
+            <FeatureGate feature="ideation_challenges" redirect="/">
+              <FeatureErrorBoundary featureName="Ideation Challenges">
+                <IdeaDetailPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+
+          {/* Sensitive member and club administration routes. */}
+          <Route path="settings/data-export" element={<ErrorBoundary><DataExportPage /></ErrorBoundary>} />
+          <Route path="clubs/:id/admin/import" element={
+            <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
+              <FeatureErrorBoundary featureName="Verein Import">
+                <VereinMembersImportPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="clubs/:id/admin/dues" element={
+            <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
+              <FeatureErrorBoundary featureName="Verein Dues">
+                <VereinDuesManagementPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="me/verein-dues" element={
+            <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
+              <FeatureErrorBoundary featureName="My Verein Dues">
+                <MyVereinDuesPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="me/verein-invitations" element={
+            <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
+              <FeatureErrorBoundary featureName="Verein Invitations">
+                <MyVereinInvitationsPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+          <Route path="municipality-calendar" element={
+            <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
+              <FeatureErrorBoundary featureName="Municipality Calendar">
+                <MunicipalityCalendarPage />
+              </FeatureErrorBoundary>
+            </FeatureGate>
+          } />
+
           {/* Core Features (module-gated) */}
           <Route path="dashboard" element={
             <FeatureGate module="dashboard" redirect="/">

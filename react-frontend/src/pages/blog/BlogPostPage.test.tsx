@@ -27,6 +27,7 @@ vi.mock('@/contexts', () => ({
   })),
   useTenant: vi.fn(() => ({
     tenantPath: (p: string) => `/test${p}`,
+    branding: { name: 'Test Community', logo: '/tenant-logo.png' },
   })),
   useToast: vi.fn(() => ({
     success: vi.fn(),
@@ -51,6 +52,7 @@ vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: vi.fn((url) => url || ''),
   resolveThumbnailUrl: vi.fn((url) => url || ''),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
+  getFormattingLocale: vi.fn(() => 'en-GB'),
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
 }));
 
@@ -61,7 +63,7 @@ vi.mock('@/components/navigation', () => ({
 
 vi.mock('@/components/ui', async () => (await import('@/test/uiMock')).uiMock);
 
-vi.mock('@/components/social', () => ({
+vi.mock('@/components/social/SocialInteractionPanel', () => ({
   SocialInteractionPanel: ({ targetType, targetId }: { targetType: string; targetId: number }) => (
     <div data-testid="social-panel" data-target-type={targetType} data-target-id={targetId} />
   ),
@@ -159,7 +161,7 @@ describe('BlogPostPage', () => {
     });
   });
 
-  it('renders the author name', async () => {
+  it('does not render account-derived author identity or profile links', async () => {
     mockApiGet.mockImplementation((url: string) => {
       if (url.includes('/v2/blog/')) {
         return Promise.resolve({ success: true, data: mockPost });
@@ -170,8 +172,31 @@ describe('BlogPostPage', () => {
     render(<BlogPostPage />);
 
     await waitFor(() => {
-      expect(screen.getByText('Jane Doe')).toBeInTheDocument();
+      expect(screen.getByText('How Timebanking Works')).toBeInTheDocument();
     });
+    expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
+    expect(document.querySelector('a[href*="/profile/5"]')).toBeNull();
+  });
+
+  it('uses the tenant organization, never a member Person, in Article JSON-LD', async () => {
+    mockApiGet.mockImplementation((url: string) => {
+      if (url.includes('/v2/blog/')) {
+        return Promise.resolve({ success: true, data: mockPost });
+      }
+      return Promise.resolve({ success: true, data: null });
+    });
+
+    render(<BlogPostPage />);
+
+    await waitFor(() => {
+      expect(document.querySelector('script[type="application/ld+json"]')).not.toBeNull();
+    });
+    const structuredData = document.querySelector('script[type="application/ld+json"]')?.textContent ?? '';
+    expect(structuredData).toContain('"@type":"Organization"');
+    expect(structuredData).toContain('Test Community');
+    expect(structuredData).not.toContain('"@type":"Person"');
+    expect(structuredData).not.toContain('Jane Doe');
+    expect(structuredData).not.toContain('/profile/5');
   });
 
   it('renders the shared social panel for blog comments', async () => {

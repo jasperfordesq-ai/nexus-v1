@@ -384,6 +384,70 @@ describe('TenantShell', () => {
       expect(await screen.findByTestId('tenant-app-providers')).toBeInTheDocument();
       expect(screen.queryByTestId('tenant-public-providers')).not.toBeInTheDocument();
     });
+
+    it.each([
+      '/explore',
+      '/listings/42',
+      '/events/42',
+      '/groups/42',
+      '/jobs/42',
+      '/courses/community-skills',
+      '/podcasts/show/episode',
+      '/marketplace/my-listings',
+      '/volunteering/opportunities/42',
+      '/resources',
+      '/kb/42',
+      '/organisations/42',
+      '/ideation/42/ideas/9',
+      '/settings/data-export',
+      '/clubs/42/admin/import',
+      '/clubs/42/admin/dues',
+      '/me/verein-dues',
+      '/me/verein-invitations',
+      '/municipality-calendar',
+    ])('loads the authenticated app registry for %s', async (path) => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
+
+      renderWithRouter(path);
+
+      expect(await screen.findByTestId('app-routes')).toBeInTheDocument();
+      expect(screen.queryByTestId('public-routes')).not.toBeInTheDocument();
+      expect(mockLoadRouteRegistry).toHaveBeenCalledWith('app');
+    });
+
+    it('loads the authenticated registry for tenant-prefixed member content', async () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: 'hour-timebank', source: 'path' });
+
+      renderWithRouter('/hour-timebank/listings/42');
+
+      expect(await screen.findByTestId('app-routes')).toBeInTheDocument();
+      expect(mockLoadRouteRegistry).toHaveBeenCalledWith('app');
+    });
+
+    it.each([
+      '/about',
+      '/blog',
+      '/blog/community-update',
+      '/volunteering/guardian-consent/verify/test-token',
+    ])('keeps identity-free route %s in the public registry', async (path) => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: null, source: null });
+
+      renderWithRouter(path);
+
+      expect(await screen.findByTestId('public-routes')).toBeInTheDocument();
+      expect(screen.queryByTestId('app-routes')).not.toBeInTheDocument();
+      expect(mockLoadRouteRegistry).toHaveBeenCalledWith('public');
+    });
+
+    it('keeps tenant-prefixed blog articles in the public registry', async () => {
+      mockDetectTenantFromUrl.mockReturnValue({ slug: 'hour-timebank', source: 'path' });
+
+      renderWithRouter('/hour-timebank/blog/community-update');
+
+      expect(await screen.findByTestId('public-routes')).toBeInTheDocument();
+      expect(screen.queryByTestId('app-routes')).not.toBeInTheDocument();
+      expect(mockLoadRouteRegistry).toHaveBeenCalledWith('public');
+    });
   });
 
   describe('Community Not Found', () => {

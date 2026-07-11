@@ -13,19 +13,13 @@ import {
 } from './sharedPublicFeatureRoutes';
 
 describe('shared public feature routes', () => {
-  it('keeps exact public auth and feature policies in one registry', () => {
+  it('keeps only identity-free token routes in the shared public registry', () => {
     expect(SHARED_PUBLIC_FEATURE_ROUTE_POLICIES).toEqual([
       {
         id: 'guardian-consent-verify',
         path: 'volunteering/guardian-consent/verify/:token',
         auth: 'public',
         feature: 'volunteering',
-      },
-      {
-        id: 'explore',
-        path: 'explore',
-        auth: 'public',
-        feature: 'explore',
       },
     ]);
   });

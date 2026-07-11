@@ -11,6 +11,27 @@
 //   { title, body, url, icon, badge, tag, type, ... }
 // All fields except title+body are optional.
 
+// These caches were created by older workers that allowed arbitrary SPA
+// navigations or member media to survive offline. Purge every historical HTML
+// shell generation (the replacement is deliberately named
+// `nexus-public-html-shell-*`) plus the former media-thumbnail cache.
+const LEGACY_IDENTITY_CACHE_NAMES = new Set([
+  'nexus-media-thumbnails',
+]);
+
+function isLegacyIdentityCacheName(cacheName) {
+  return LEGACY_IDENTITY_CACHE_NAMES.has(cacheName)
+    || /^nexus-html-shell(?:-|$)/.test(cacheName);
+}
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil((async () => {
+    const cacheNames = await caches.keys();
+    const legacyCacheNames = cacheNames.filter(isLegacyIdentityCacheName);
+    await Promise.all(legacyCacheNames.map((cacheName) => caches.delete(cacheName)));
+  })());
+});
+
 function normalizeTenantPath(value) {
   if (typeof value !== 'string') return '';
 

@@ -39,15 +39,8 @@ class ExploreController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $userId = $this->getOptionalUserId();
-        $tenantId = $this->getTenantId();
-
-        if ($userId) {
-            $data = $this->exploreService->getExploreData($userId);
-        } else {
-            // Unauthenticated users get global data without personalized recommendations
-            $data = $this->exploreService->getExploreData(0);
-        }
+        $userId = $this->requireAuth();
+        $data = $this->exploreService->getExploreData($userId);
 
         return $this->respondWithData($data);
     }
@@ -58,12 +51,12 @@ class ExploreController extends BaseApiController
      */
     public function forYou(): JsonResponse
     {
-        $userId = $this->getOptionalUserId();
+        $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 20, 1, 50);
 
-        $result = $this->exploreService->getForYouFeed($tenantId, $userId ?? 0, $page, $perPage);
+        $result = $this->exploreService->getForYouFeed($tenantId, $userId, $page, $perPage);
 
         return $this->respondWithPaginatedCollection(
             $result['items'],
@@ -78,11 +71,12 @@ class ExploreController extends BaseApiController
      */
     public function trending(): JsonResponse
     {
+        $userId = $this->requireAuth();
         $tenantId = $this->getTenantId();
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 20, 1, 100);
 
-        $result = $this->exploreService->getTrendingPostsPaginated($tenantId, $page, $perPage);
+        $result = $this->exploreService->getTrendingPostsPaginated($tenantId, $userId, $page, $perPage);
 
         return $this->respondWithPaginatedCollection(
             $result['items'],
@@ -97,6 +91,7 @@ class ExploreController extends BaseApiController
      */
     public function popularListings(): JsonResponse
     {
+        $this->requireAuth();
         $tenantId = $this->getTenantId();
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 20, 1, 100);
@@ -116,6 +111,7 @@ class ExploreController extends BaseApiController
      */
     public function category(string $slug): JsonResponse
     {
+        $this->requireAuth();
         $tenantId = $this->getTenantId();
         $page = $this->queryInt('page', 1, 1);
         $perPage = $this->queryInt('per_page', 20, 1, 100);

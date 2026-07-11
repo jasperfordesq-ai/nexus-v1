@@ -20,7 +20,7 @@ use RuntimeException;
 /**
  * AG62 — Municipality Survey & Feedback Tool controller.
  *
- * Member-facing endpoints (public/authenticated):
+ * Member-facing endpoints (authenticated):
  *   GET  /v2/caring-community/surveys              → activeSurveys()
  *   GET  /v2/caring-community/surveys/{id}         → getSurvey()
  *   POST /v2/caring-community/surveys/{id}/respond → submitSurvey()
@@ -87,7 +87,7 @@ class MunicipalSurveyController extends BaseApiController
 
     /**
      * Return all currently active (and not-yet-expired) surveys.
-     * No authentication required — surveys are public within the tenant.
+     * Authentication is enforced at the route boundary.
      */
     public function activeSurveys(): JsonResponse
     {
@@ -107,7 +107,7 @@ class MunicipalSurveyController extends BaseApiController
 
     /**
      * Return a single survey with its questions.
-     * No authentication required.
+     * Authentication is enforced at the route boundary.
      */
     public function getSurvey(int $id): JsonResponse
     {

@@ -23,33 +23,13 @@ return [
         '/'             => 6 * 3600,
 
         // Index pages bounce when their underlying collections change.
+        // Blog reads are public and use an author-free editorial projection.
         '/blog'         => 12 * 3600,
-        '/listings'     => 6 * 3600,
-        '/events'       => 6 * 3600,
-        '/jobs'         => 6 * 3600,
-        '/volunteering' => 12 * 3600,
-        '/marketplace'  => 6 * 3600,
-        '/groups'       => 24 * 3600,
-        '/resources'    => 7 * 24 * 3600,
-        '/organisations'=> 7 * 24 * 3600,
-        '/ideation'     => 24 * 3600,
-        '/kb'           => 24 * 3600,
-
-        // Individual content items — refresh weekly unless a content-change
-        // hook explicitly invalidates them sooner.
         '/blog/**'      => 7 * 24 * 3600,
-        '/listings/*'   => 24 * 3600,
-        '/events/*'     => 24 * 3600,
-        '/jobs/*'       => 24 * 3600,
-        '/marketplace/*'=> 24 * 3600,
-        '/marketplace/category/*' => 7 * 24 * 3600,
-        '/groups/*'     => 7 * 24 * 3600,
-        '/resources/*'  => 14 * 24 * 3600,
-        '/organisations/*' => 14 * 24 * 3600,
-        '/kb/*'         => 7 * 24 * 3600,
+
+        // Other member-authored feature routes require authentication and are
+        // deliberately absent. PrerenderService rejects them independently.
         '/page/*'       => 7 * 24 * 3600,
-        '/volunteering/opportunities/*' => 24 * 3600,
-        '/ideation/*'   => 7 * 24 * 3600,
 
         // Legal / static pages — rarely change, refresh monthly.
         '/about'        => 30 * 24 * 3600,

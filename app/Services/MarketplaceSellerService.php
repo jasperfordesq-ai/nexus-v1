@@ -74,10 +74,69 @@ class MarketplaceSellerService
      */
     public static function getPublicProfile(int $sellerId): ?array
     {
-        $profile = MarketplaceSellerProfile::with('user:id,first_name,last_name,avatar_url,is_verified,created_at,location')
+        $profile = MarketplaceSellerProfile::query()
+            ->where(function ($query) {
+                $query->whereNull('is_suspended')->orWhere('is_suspended', false);
+            })
             ->find($sellerId);
 
         if (!$profile) {
+            return null;
+        }
+
+        $displayName = trim((string) ($profile->display_name ?? ''));
+        if ($displayName === '' && $profile->seller_type === 'business') {
+            $displayName = trim((string) ($profile->business_name ?? ''));
+        }
+
+        // A public DTO may use only an explicitly supplied marketplace/trading
+        // name. It must never infer a public identity from the member account.
+        if ($displayName === '') {
+            return null;
+        }
+
+        $listingCount = MarketplaceListing::where('user_id', $profile->user_id)
+            ->where('status', 'active')
+            ->where('moderation_status', 'approved')
+            ->count();
+
+        return [
+            'id' => $profile->id,
+            'display_name' => $displayName,
+            'bio' => $profile->bio,
+            'avatar_url' => $profile->avatar_url,
+            'cover_image_url' => $profile->cover_image_url,
+            'seller_type' => $profile->seller_type,
+            'business_name' => $profile->seller_type === 'business' ? $profile->business_name : null,
+            'business_verified' => $profile->business_verified,
+            'is_community_endorsed' => $profile->is_community_endorsed,
+            'community_trust_score' => $profile->community_trust_score,
+            'avg_rating' => $profile->avg_rating,
+            'total_ratings' => $profile->total_ratings,
+            'total_sales' => $profile->total_sales,
+            'response_time_avg' => $profile->response_time_avg,
+            'response_rate' => $profile->response_rate,
+            'active_listings' => $listingCount,
+            'joined_marketplace_at' => $profile->joined_marketplace_at?->toISOString(),
+            'marketplace_partner_badge_at' => $profile->marketplace_partner_badge_at?->toISOString(),
+        ];
+    }
+
+    /**
+     * Authenticated marketplace profile, including member-account fallbacks
+     * needed by the signed-in seller experience.
+     */
+    public static function getMemberProfile(int $sellerId): ?array
+    {
+        $profile = MarketplaceSellerProfile::with(
+            'user:id,first_name,last_name,avatar_url,is_verified,created_at,location,status'
+        )
+            ->where(function ($query) {
+                $query->whereNull('is_suspended')->orWhere('is_suspended', false);
+            })
+            ->find($sellerId);
+
+        if (!$profile || !$profile->user || $profile->user->status !== 'active') {
             return null;
         }
 
@@ -114,12 +173,18 @@ class MarketplaceSellerService
     }
 
     /**
-     * Get seller's listings (public view).
+     * Get a seller's listings for an authenticated viewer.
      */
-    public static function getSellerListings(int $userId, int $limit = 20, ?string $cursor = null): array
+    public static function getSellerListings(
+        int $userId,
+        int $viewerId,
+        int $limit = 20,
+        ?string $cursor = null
+    ): array
     {
         return MarketplaceListingService::getAll([
             'user_id' => $userId,
+            'current_user_id' => $viewerId,
             'limit' => $limit,
             'cursor' => $cursor,
         ]);

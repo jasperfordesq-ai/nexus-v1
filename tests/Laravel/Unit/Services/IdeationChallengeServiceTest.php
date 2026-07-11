@@ -30,6 +30,7 @@ class IdeationChallengeServiceTest extends TestCase
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('leftJoin')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('orderByDesc')->andReturnSelf();
         DB::shouldReceive('limit')->andReturnSelf();
@@ -51,6 +52,7 @@ class IdeationChallengeServiceTest extends TestCase
         DB::shouldReceive('table')->andReturnSelf();
         DB::shouldReceive('leftJoin')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
+        DB::shouldReceive('whereIn')->andReturnSelf();
         DB::shouldReceive('select')->andReturnSelf();
         DB::shouldReceive('orderByDesc')->andReturnSelf();
         DB::shouldReceive('limit')->andReturnSelf();
@@ -73,7 +75,12 @@ class IdeationChallengeServiceTest extends TestCase
     {
         DB::shouldReceive('table')->with('ideation_challenges')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();
-        DB::shouldReceive('first')->andReturn((object) ['id' => 1, 'title' => 'Challenge']);
+        DB::shouldReceive('first')->andReturn((object) [
+            'id' => 1,
+            'user_id' => 10,
+            'title' => 'Challenge',
+            'status' => 'open',
+        ]);
 
         DB::shouldReceive('table')->with('challenge_ideas')->andReturnSelf();
         DB::shouldReceive('where')->andReturnSelf();

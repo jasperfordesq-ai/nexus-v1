@@ -9,6 +9,8 @@ namespace Tests\Laravel\Feature\Controllers;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
 use Tests\Laravel\TestCase;
 
@@ -16,11 +18,11 @@ use Tests\Laravel\TestCase;
  * Feature tests for ExploreController — discover/explore page API endpoints.
  *
  * Endpoints:
- *   GET  /api/v2/explore                    index (public, optional auth)
- *   GET  /api/v2/explore/for-you            forYou (public, optional auth)
- *   GET  /api/v2/explore/trending           trending (public)
- *   GET  /api/v2/explore/popular-listings   popularListings (public)
- *   GET  /api/v2/explore/category/{slug}    category (public)
+ *   GET  /api/v2/explore                    index (auth required)
+ *   GET  /api/v2/explore/for-you            forYou (auth required)
+ *   GET  /api/v2/explore/trending           trending (auth required)
+ *   GET  /api/v2/explore/popular-listings   popularListings (auth required)
+ *   GET  /api/v2/explore/category/{slug}    category (auth required)
  *   POST /api/v2/explore/track              track (auth required)
  *   POST /api/v2/explore/dismiss            dismiss (auth required)
  */
@@ -38,6 +40,24 @@ class ExploreControllerTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         return $user;
+    }
+
+    /**
+     * Existing Explore success cases are authenticated by default. Tests of the
+     * anonymous contract call unauthenticatedExploreGet() explicitly.
+     */
+    protected function apiGet(string $uri, array $headers = []): \Illuminate\Testing\TestResponse
+    {
+        if (str_starts_with($uri, '/v2/explore') && Auth::guard('sanctum')->guest()) {
+            $this->authenticatedUser();
+        }
+
+        return parent::apiGet($uri, $headers);
+    }
+
+    private function unauthenticatedExploreGet(string $uri): \Illuminate\Testing\TestResponse
+    {
+        return parent::apiGet($uri);
     }
 
     /**
@@ -92,12 +112,22 @@ class ExploreControllerTest extends TestCase
     //  INDEX — GET /api/v2/explore
     // ------------------------------------------------------------------
 
-    public function test_index_returns_200_for_unauthenticated_user(): void
+    public function test_index_returns_401_for_unauthenticated_user(): void
     {
-        $response = $this->apiGet('/v2/explore');
+        $response = $this->unauthenticatedExploreGet('/v2/explore');
 
-        $response->assertStatus(200);
-        $response->assertJsonStructure(['data']);
+        $response->assertStatus(401);
+    }
+
+    public function test_all_explore_read_variants_require_authentication(): void
+    {
+        foreach ([
+            '/v2/explore/trending',
+            '/v2/explore/popular-listings',
+            '/v2/explore/category/gardening',
+        ] as $uri) {
+            $this->unauthenticatedExploreGet($uri)->assertStatus(401);
+        }
     }
 
     public function test_index_returns_200_for_authenticated_user(): void
@@ -130,6 +160,110 @@ class ExploreControllerTest extends TestCase
         $this->assertArrayHasKey('featured_challenges', $data);
         $this->assertArrayHasKey('community_stats', $data);
         $this->assertArrayHasKey('recommended_listings', $data);
+    }
+
+    public function test_member_discovery_respects_search_and_connection_privacy(): void
+    {
+        $viewer = $this->authenticatedUser([
+            'xp' => 500000, 'privacy_search' => false, 'privacy_profile' => 'connections',
+            'created_at' => now()->addMinutes(5),
+        ]);
+        $publicMember = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'xp' => 400000, 'privacy_search' => true, 'privacy_profile' => 'public',
+            'created_at' => now()->addMinutes(4),
+        ]);
+        $connectedMember = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'xp' => 300000, 'privacy_search' => true, 'privacy_profile' => 'connections',
+            'created_at' => now()->addMinutes(3),
+        ]);
+        $unconnectedMember = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'xp' => 200000, 'privacy_search' => true, 'privacy_profile' => 'connections',
+            'created_at' => now()->addMinutes(2),
+        ]);
+        $searchHiddenMember = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active', 'xp' => 100000, 'privacy_search' => false, 'privacy_profile' => 'public',
+            'created_at' => now()->addMinute(),
+        ]);
+        DB::table('connections')->insert([
+            'tenant_id' => $this->testTenantId,
+            'requester_id' => $viewer->id,
+            'receiver_id' => $connectedMember->id,
+            'status' => 'accepted',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Cache::forget("nexus:explore:{$this->testTenantId}:top_contributors:{$viewer->id}");
+        Cache::forget("nexus:explore:{$this->testTenantId}:new_members:{$viewer->id}");
+
+        $response = $this->apiGet('/v2/explore');
+
+        $response->assertOk();
+        foreach (['top_contributors', 'new_members'] as $section) {
+            $ids = array_map('intval', array_column($response->json("data.{$section}"), 'id'));
+            $this->assertContains($viewer->id, $ids);
+            $this->assertContains($publicMember->id, $ids);
+            $this->assertContains($connectedMember->id, $ids);
+            $this->assertNotContains($unconnectedMember->id, $ids);
+            $this->assertNotContains($searchHiddenMember->id, $ids);
+        }
+    }
+
+    public function test_global_explore_sections_exclude_private_groups_and_their_events(): void
+    {
+        $viewer = $this->authenticatedUser();
+        $publicGroupId = DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_id' => $viewer->id,
+            'name' => 'Visible Explore Group',
+            'slug' => 'visible-explore-' . uniqid(),
+            'visibility' => 'public',
+            'is_active' => 1,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $privateGroupId = DB::table('groups')->insertGetId([
+            'tenant_id' => $this->testTenantId,
+            'owner_id' => $viewer->id,
+            'name' => 'Hidden Explore Group',
+            'slug' => 'hidden-explore-' . uniqid(),
+            'visibility' => 'private',
+            'is_active' => 1,
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $insertEvent = function (string $title, ?int $groupId, int $minutes) use ($viewer): int {
+            return DB::table('events')->insertGetId([
+                'tenant_id' => $this->testTenantId,
+                'user_id' => $viewer->id,
+                'group_id' => $groupId,
+                'title' => $title,
+                'description' => 'Explore event group-visibility fixture.',
+                'start_time' => now()->addMinutes($minutes),
+                'end_time' => now()->addMinutes($minutes + 60),
+                'status' => 'active',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        };
+        $publicGroupEventId = $insertEvent('Public group Explore event', $publicGroupId, 1);
+        $privateGroupEventId = $insertEvent('Private group Explore event', $privateGroupId, 2);
+        $communityEventId = $insertEvent('Community Explore event', null, 3);
+
+        Cache::forget("nexus:explore:{$this->testTenantId}:active_groups");
+        Cache::forget("nexus:explore:{$this->testTenantId}:upcoming_events");
+        $response = $this->apiGet('/v2/explore');
+
+        $response->assertOk();
+        $groupIds = array_map('intval', array_column($response->json('data.active_groups'), 'id'));
+        $eventIds = array_map('intval', array_column($response->json('data.upcoming_events'), 'id'));
+        $this->assertNotContains($privateGroupId, $groupIds);
+        $this->assertNotContains('private', array_column($response->json('data.active_groups'), 'privacy'));
+        $this->assertContains($publicGroupEventId, $eventIds);
+        $this->assertContains($communityEventId, $eventIds);
+        $this->assertNotContains($privateGroupEventId, $eventIds);
     }
 
     public function test_index_community_stats_has_expected_keys(): void
@@ -205,6 +339,72 @@ class ExploreControllerTest extends TestCase
         $meta = $response->json('meta');
         $this->assertEquals(1, $meta['current_page']);
         $this->assertEquals(20, $meta['per_page']);
+    }
+
+    public function test_trending_enforces_publication_and_viewer_audience(): void
+    {
+        $viewer = $this->authenticatedUser();
+        $connectedAuthor = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+        $otherAuthor = User::factory()->forTenant($this->testTenantId)->create(['status' => 'active']);
+
+        DB::table('connections')->insert([
+            'tenant_id' => $this->testTenantId,
+            'requester_id' => $viewer->id,
+            'receiver_id' => $connectedAuthor->id,
+            'status' => 'accepted',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $publicId = $this->seedFeedPost($otherAuthor->id, [
+            'content' => 'Visible public explore post',
+            'visibility' => 'public',
+            'publish_status' => 'published',
+        ]);
+        $ownPrivateId = $this->seedFeedPost($viewer->id, [
+            'content' => 'Visible own private explore post',
+            'visibility' => 'private',
+            'publish_status' => 'published',
+        ]);
+        $connectedId = $this->seedFeedPost($connectedAuthor->id, [
+            'content' => 'Visible connected explore post',
+            'visibility' => 'friends',
+            'publish_status' => 'published',
+        ]);
+        $privateId = $this->seedFeedPost($otherAuthor->id, [
+            'content' => 'Hidden private explore post',
+            'visibility' => 'private',
+            'publish_status' => 'published',
+        ]);
+        $draftId = $this->seedFeedPost($otherAuthor->id, [
+            'content' => 'Hidden draft explore post',
+            'visibility' => 'public',
+            'publish_status' => 'draft',
+        ]);
+        $scheduledId = $this->seedFeedPost($otherAuthor->id, [
+            'content' => 'Hidden scheduled explore post',
+            'visibility' => 'public',
+            'publish_status' => 'scheduled',
+            'scheduled_at' => now()->addDay(),
+        ]);
+        $deletedId = $this->seedFeedPost($otherAuthor->id, [
+            'content' => 'Hidden deleted explore post',
+            'visibility' => 'public',
+            'publish_status' => 'published',
+            'deleted_at' => now(),
+        ]);
+
+        $response = $this->apiGet('/v2/explore/trending?per_page=100');
+
+        $response->assertOk();
+        $ids = array_map('intval', array_column($response->json('data'), 'id'));
+        $this->assertContains($publicId, $ids);
+        $this->assertContains($ownPrivateId, $ids);
+        $this->assertContains($connectedId, $ids);
+        $this->assertNotContains($privateId, $ids);
+        $this->assertNotContains($draftId, $ids);
+        $this->assertNotContains($scheduledId, $ids);
+        $this->assertNotContains($deletedId, $ids);
     }
 
     public function test_trending_clamps_per_page_to_max_100(): void
@@ -482,13 +682,11 @@ class ExploreControllerTest extends TestCase
         $this->assertEquals(5, $meta['per_page']);
     }
 
-    public function test_for_you_works_for_unauthenticated_user(): void
+    public function test_for_you_requires_authentication(): void
     {
-        // forYou uses getOptionalUserId — should still return data without auth
-        $response = $this->apiGet('/v2/explore/for-you');
+        $response = $this->unauthenticatedExploreGet('/v2/explore/for-you');
 
-        $response->assertStatus(200);
-        $response->assertJsonStructure(['data']);
+        $response->assertStatus(401);
     }
 
     public function test_for_you_defaults_to_page_1_per_page_20(): void

@@ -280,46 +280,15 @@ class SitemapService
     {
         $methods = [];
 
-        // ── PUBLIC content pages (no auth required — crawlers CAN access these) ──
+        // Published blog content is public and uses an author-free projection.
         if ($this->hasFeature($tenant, 'blog')) {
             $methods['blog_posts'] = fn (int $tid, string $base) => $this->getBlogUrls($tid, $base);
         }
-        if ($this->hasModule($tenant, 'listings')) {
-            $methods['listings'] = fn (int $tid, string $base) => $this->getListingUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'events')) {
-            $methods['events'] = fn (int $tid, string $base) => $this->getEventUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'groups')) {
-            $methods['groups'] = fn (int $tid, string $base) => $this->getGroupUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'job_vacancies')) {
-            $methods['job_vacancies'] = fn (int $tid, string $base) => $this->getJobUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'volunteering')) {
-            $methods['volunteering'] = fn (int $tid, string $base) => $this->getVolunteeringUrls($tid, $base);
-            $methods['organisations'] = fn (int $tid, string $base) => $this->getOrganizationUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'ideation_challenges')) {
-            $methods['ideation'] = fn (int $tid, string $base) => $this->getIdeationUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'resources')) {
-            $methods['kb_articles'] = fn (int $tid, string $base) => $this->getKbArticleUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'marketplace')) {
-            $methods['marketplace_listings'] = fn (int $tid, string $base) => $this->getMarketplaceListingUrls($tid, $base);
-            $methods['marketplace_categories'] = fn (int $tid, string $base) => $this->getMarketplaceCategoryUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'courses')) {
-            $methods['courses'] = fn (int $tid, string $base) => $this->getCourseUrls($tid, $base);
-        }
-        if ($this->hasFeature($tenant, 'podcasts')) {
-            $methods['podcast_shows'] = fn (int $tid, string $base) => $this->getPodcastShowUrls($tid, $base);
-            $methods['podcast_episodes'] = fn (int $tid, string $base) => $this->getPodcastEpisodeUrls($tid, $base);
-        }
-        $methods['cms_pages'] = fn (int $tid, string $base) => $this->getCmsPageUrls($tid, $base);
 
-        // EXCLUDED: profiles (personal data, requires per-user opt-in consent)
+        // Other member-authored feature pages require login and must never be
+        // discoverable through a public sitemap. CMS pages remain public after
+        // their separate content/consent review.
+        $methods['cms_pages'] = fn (int $tid, string $base) => $this->getCmsPageUrls($tid, $base);
 
         return $methods;
     }
@@ -341,10 +310,6 @@ class SitemapService
         $urls[] = $this->url($baseUrl, '/help', $now, 'monthly', '0.5');
         $urls[] = $this->url($baseUrl, '/contact', $now, 'yearly', '0.4');
         $urls[] = $this->url($baseUrl, '/faq', $now, 'monthly', '0.5');
-        if ($this->hasFeature($tenant, 'explore')) {
-            $urls[] = $this->url($baseUrl, '/explore', $now, 'weekly', '0.7');
-        }
-
         // Legal pages
         foreach (['terms', 'privacy', 'cookies', 'accessibility', 'acceptable-use', 'community-guidelines'] as $page) {
             $urls[] = $this->url($baseUrl, "/{$page}", $now, 'yearly', '0.2');
@@ -391,49 +356,15 @@ class SitemapService
         // NOTE: /members and /leaderboard are PROTECTED routes (require auth).
         // Do NOT add them to the sitemap — crawlers cannot access them.
 
-        // Knowledge base listing shares the React resources feature gate.
-        if ($this->hasFeature($tenant, 'resources')) {
-            $urls[] = $this->url($baseUrl, '/kb', $now, 'weekly', '0.5');
-        }
-
-        // Public content listing pages (all now accessible without login)
-        if ($this->hasModule($tenant, 'listings')) {
-            $urls[] = $this->url($baseUrl, '/listings', $now, 'daily', '0.8');
-        }
+        // The sanitized blog index is public acquisition content.
         if ($this->hasFeature($tenant, 'blog')) {
             $urls[] = $this->url($baseUrl, '/blog', $now, 'daily', '0.8');
         }
-        if ($this->hasFeature($tenant, 'events')) {
-            $urls[] = $this->url($baseUrl, '/events', $now, 'daily', '0.8');
-        }
-        if ($this->hasFeature($tenant, 'groups')) {
-            $urls[] = $this->url($baseUrl, '/groups', $now, 'weekly', '0.7');
-        }
-        if ($this->hasFeature($tenant, 'job_vacancies')) {
-            $urls[] = $this->url($baseUrl, '/jobs', $now, 'daily', '0.8');
-        }
+
+        // Other member-authored modules are authenticated and intentionally
+        // excluded. Coupons are organization-level public content.
         if ($this->hasFeature($tenant, 'merchant_coupons')) {
             $urls[] = $this->url($baseUrl, '/coupons', $now, 'daily', '0.6');
-        }
-        if ($this->hasFeature($tenant, 'volunteering')) {
-            $urls[] = $this->url($baseUrl, '/volunteering', $now, 'daily', '0.7');
-            $urls[] = $this->url($baseUrl, '/organisations', $now, 'weekly', '0.6');
-        }
-        if ($this->hasFeature($tenant, 'ideation_challenges')) {
-            $urls[] = $this->url($baseUrl, '/ideation', $now, 'weekly', '0.6');
-        }
-        if ($this->hasFeature($tenant, 'resources')) {
-            $urls[] = $this->url($baseUrl, '/resources', $now, 'weekly', '0.6');
-        }
-        if ($this->hasFeature($tenant, 'marketplace')) {
-            $urls[] = $this->url($baseUrl, '/marketplace', $now, 'daily', '0.8');
-            $urls[] = $this->url($baseUrl, '/marketplace/free', $now, 'weekly', '0.6');
-        }
-        if ($this->hasFeature($tenant, 'courses')) {
-            $urls[] = $this->url($baseUrl, '/courses', $now, 'daily', '0.7');
-        }
-        if ($this->hasFeature($tenant, 'podcasts')) {
-            $urls[] = $this->url($baseUrl, '/podcasts', $now, 'daily', '0.7');
         }
 
         return $urls;

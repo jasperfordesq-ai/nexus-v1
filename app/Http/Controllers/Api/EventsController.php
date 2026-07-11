@@ -38,11 +38,12 @@ class EventsController extends BaseApiController
      */
     public function index(): JsonResponse
     {
-        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+        $userId = $this->requireAuth();
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
             'when'  => $this->query('when', 'upcoming'),
+            'viewer_id' => $userId,
         ];
 
         if ($this->query('category_id')) {
@@ -81,21 +82,13 @@ class EventsController extends BaseApiController
         $result = $this->eventService->getAll($filters);
 
         // Batch-load user RSVP statuses (single query instead of N+1).
-        // Anonymous viewers always get null — never fall through to a per-event lookup.
         if (!empty($result['items'])) {
-            if ($userId) {
-                $eventIds = array_column($result['items'], 'id');
-                $rsvpMap = $this->eventService->getUserRsvpsBatch($eventIds, $userId);
-                foreach ($result['items'] as &$event) {
-                    $event['user_rsvp'] = $rsvpMap[(int) $event['id']] ?? null;
-                }
-                unset($event);
-            } else {
-                foreach ($result['items'] as &$event) {
-                    $event['user_rsvp'] = null;
-                }
-                unset($event);
+            $eventIds = array_column($result['items'], 'id');
+            $rsvpMap = $this->eventService->getUserRsvpsBatch($eventIds, $userId);
+            foreach ($result['items'] as &$event) {
+                $event['user_rsvp'] = $rsvpMap[(int) $event['id']] ?? null;
             }
+            unset($event);
         }
 
         return $this->respondWithCollection(
@@ -111,7 +104,7 @@ class EventsController extends BaseApiController
      */
     public function show(int $id): JsonResponse
     {
-        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
+        $userId = $this->requireAuth();
 
         $event = $this->eventService->getById($id, $userId);
 
@@ -127,6 +120,7 @@ class EventsController extends BaseApiController
      */
     public function nearby(): JsonResponse
     {
+        $userId = $this->requireAuth();
         $lat = $this->query('lat');
         $lon = $this->query('lon');
 
@@ -155,7 +149,7 @@ class EventsController extends BaseApiController
             $filters['category'] = $this->query('category');
         }
 
-        $result = $this->eventService->getNearby($lat, $lon, $filters);
+        $result = $this->eventService->getNearby($lat, $lon, $filters, $userId);
 
         return $this->respondWithData($result['items'], [
             'search' => [
@@ -491,7 +485,7 @@ class EventsController extends BaseApiController
         $id = (int) $id;
         $userId = $this->requireAuth();
 
-        $event = $this->eventService->getById($id);
+        $event = $this->eventService->getById($id, $userId);
         if (!$event) {
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }
@@ -528,7 +522,7 @@ class EventsController extends BaseApiController
         $tenantId = TenantContext::getId();
 
         // Verify event exists
-        $event = $this->eventService->getById($id);
+        $event = $this->eventService->getById($id, $userId);
         if (!$event) {
             return $this->respondWithError('NOT_FOUND', __('api.event_not_found'), null, 404);
         }

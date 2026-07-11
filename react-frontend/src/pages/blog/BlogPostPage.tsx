@@ -22,7 +22,6 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { useTranslation } from 'react-i18next';
-import { Avatar } from '@/components/ui/Avatar';
 import { Button } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -36,7 +35,7 @@ import { usePageTitle } from '@/hooks';
 import { usePrerenderReady } from '@/hooks/usePrerenderReady';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { resolveAssetUrl, resolveAvatarUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
+import { resolveAssetUrl, responsiveThumbnailProps, getFormattingLocale } from '@/lib/helpers';
 
 /* ───────────────────────── Types ───────────────────────── */
 
@@ -58,11 +57,6 @@ interface BlogPostDetail {
   canonical_url?: string | null;
   og_image_url?: string | null;
   noindex?: boolean;
-  author: {
-    id: number;
-    name: string;
-    avatar: string | null;
-  };
   category: {
     id: number;
     name: string;
@@ -77,17 +71,19 @@ interface ArticleStructuredDataOptions {
   origin: string;
   pathname: string;
   canonicalUrl?: string;
-  profileUrl: (path: string) => string;
   publisherName: string;
   publisherLogo?: string | null;
-  fallbackAuthorName: string;
 }
 
 function buildArticleStructuredData(post: BlogPostDetail, options: ArticleStructuredDataOptions) {
   const canonicalUrl = options.canonicalUrl || `${options.origin}${options.pathname}`;
-  const authorName = post.author?.name || options.fallbackAuthorName;
   const imageUrl = post.featured_image ? resolveAssetUrl(post.featured_image) : undefined;
   const publisherLogo = options.publisherLogo ? resolveAssetUrl(options.publisherLogo) : undefined;
+  const organization = {
+    '@type': 'Organization',
+    name: options.publisherName,
+    ...(publisherLogo ? { logo: { '@type': 'ImageObject', url: publisherLogo } } : {}),
+  };
 
   return {
     '@context': 'https://schema.org',
@@ -102,17 +98,8 @@ function buildArticleStructuredData(post: BlogPostDetail, options: ArticleStruct
     dateModified: post.updated_at || post.published_at || post.created_at,
     ...(post.category?.name ? { articleSection: post.category.name } : {}),
     ...(post.reading_time ? { timeRequired: `PT${post.reading_time}M` } : {}),
-    author: {
-      '@type': 'Person',
-      name: authorName,
-      ...(post.author?.id ? { url: `${options.origin}${options.profileUrl(`/profile/${post.author.id}`)}` } : {}),
-      ...(post.author?.avatar ? { image: resolveAvatarUrl(post.author.avatar) } : {}),
-    },
-    publisher: {
-      '@type': 'Organization',
-      name: options.publisherName,
-      ...(publisherLogo ? { logo: { '@type': 'ImageObject', url: publisherLogo } } : {}),
-    },
+    author: organization,
+    publisher: organization,
   };
 }
 
@@ -250,10 +237,8 @@ export function BlogPostPage() {
     origin: window.location.origin,
     pathname: window.location.pathname,
     canonicalUrl,
-    profileUrl: tenantPath,
     publisherName: branding?.name || 'NEXUS',
     publisherLogo: branding?.logo,
-    fallbackAuthorName: t('post.unknown_author'),
   });
 
   return (
@@ -322,19 +307,6 @@ export function BlogPostPage() {
 
           {/* Meta */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-theme-muted pb-6 border-b border-theme-default">
-            <Link
-              to={tenantPath(`/profile/${post.author.id}`)}
-              className="flex items-center gap-2 hover:text-theme-primary transition-colors"
-            >
-              <Avatar
-                name={post.author.name}
-                src={resolveAvatarUrl(post.author.avatar)}
-                size="sm"
-                className="w-8 h-8"
-              />
-              <span>{post.author.name}</span>
-            </Link>
-
             <span className="flex items-center gap-1">
               <Calendar className="w-4 h-4" aria-hidden="true" />
               {new Date(post.published_at).toLocaleDateString(getFormattingLocale(), {
@@ -405,7 +377,6 @@ export function BlogPostPage() {
               initialCommentsCount={post.comments_count ?? 0}
               title={post.title}
               description={post.excerpt}
-              targetOwnerId={post.author.id}
               defaultShowComments={typeof window !== 'undefined' && /^#comment-\d+$/.test(window.location.hash)}
             />
           </GlassCard>

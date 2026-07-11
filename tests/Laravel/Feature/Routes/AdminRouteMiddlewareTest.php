@@ -20,8 +20,8 @@ use Tests\Laravel\TestCase;
  * middleware layer — which also enforces token↔tenant binding and account
  * status — blocks requests before any controller runs.
  *
- * Deliberately-public endpoints (ad serving/beacons, survey listing,
- * pilot-inquiry submission) must stay reachable without a token.
+ * Deliberately-public endpoints (ad serving/beacons and pilot-inquiry
+ * submission) must stay reachable without a token.
  */
 class AdminRouteMiddlewareTest extends TestCase
 {
@@ -52,6 +52,8 @@ class AdminRouteMiddlewareTest extends TestCase
             'residency status'     => ['GET', '/v2/me/residency-verification'],
             'my ad campaigns'      => ['GET', '/v2/me/ad-campaigns'],
             'my push campaigns'    => ['GET', '/v2/me/push-campaigns'],
+            'municipal surveys'    => ['GET', '/v2/caring-community/surveys'],
+            'municipal survey'     => ['GET', '/v2/caring-community/surveys/1'],
         ];
     }
 
@@ -111,10 +113,9 @@ class AdminRouteMiddlewareTest extends TestCase
 
     public function test_deliberately_public_endpoints_stay_public(): void
     {
-        // Ad serving + survey listing serve logged-out visitors; the
-        // pilot-inquiry POST is a public (throttled) lead-capture form.
+        // Ad serving serves logged-out visitors; the pilot-inquiry POST is a
+        // public (throttled) lead-capture form.
         $this->assertNotSame(401, $this->apiGet('/v2/ads/active')->getStatusCode());
-        $this->assertNotSame(401, $this->apiGet('/v2/caring-community/surveys')->getStatusCode());
         $this->assertNotSame(401, $this->apiPost('/v2/pilot-inquiry', [])->getStatusCode());
     }
 }

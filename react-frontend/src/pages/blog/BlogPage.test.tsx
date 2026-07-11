@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@/test/test-utils';
+import { render, screen, waitFor } from '@/test/test-utils';
 
 vi.mock('@/lib/api', () => ({
   api: {
@@ -41,11 +41,13 @@ vi.mock('@/contexts', () => ({
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
+vi.mock('@/components/seo/PageMeta', () => ({ PageMeta: () => null }));
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
   resolveAssetUrl: vi.fn((url) => url || ''),
   resolveThumbnailUrl: vi.fn((url) => url || ''),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
+  getFormattingLocale: vi.fn(() => 'en-GB'),
 }));
 vi.mock('@/components/feedback', () => ({
   EmptyState: ({ title }: { title: string }) => <div data-testid="empty-state">{title}</div>,
@@ -53,6 +55,9 @@ vi.mock('@/components/feedback', () => ({
 vi.mock('@/lib/motion', () => {  const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport']);  const filterMotion = (props: Record<string, unknown>) => {    const filtered: Record<string, unknown> = {};    for (const [k, v] of Object.entries(props)) {      if (!motionProps.has(k)) filtered[k] = v;    }    return filtered;  };  return {    motion: {      div: ({ children, ...props }: Record<string, unknown>) => <div {...filterMotion(props)}>{children}</div>,    },    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,  };});
 
 import { BlogPage } from './BlogPage';
+import { api } from '@/lib/api';
+
+const mockApiGet = vi.mocked(api.get);
 
 describe('BlogPage', () => {
   beforeEach(() => { vi.clearAllMocks(); });
@@ -65,5 +70,34 @@ describe('BlogPage', () => {
   it('shows search input', () => {
     render(<BlogPage />);
     expect(screen.getByPlaceholderText(/Search/i)).toBeInTheDocument();
+  });
+
+  it('does not render account-derived author identity from a public blog response', async () => {
+    mockApiGet.mockImplementation((url: string) => Promise.resolve({
+      success: true,
+      data: url.includes('/categories') ? [] : [{
+        id: 9,
+        title: 'Community update',
+        slug: 'community-update',
+        excerpt: 'News from the community.',
+        featured_image: null,
+        published_at: '2026-07-11T09:00:00Z',
+        created_at: '2026-07-11T09:00:00Z',
+        views: 12,
+        reading_time: 2,
+        author: { id: 987, name: 'Private Member Name', avatar: '/member-avatar.jpg' },
+        category: null,
+      }],
+      meta: {},
+    }));
+
+    render(<BlogPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Community update')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Private Member Name')).not.toBeInTheDocument();
+    expect(document.querySelector('a[href*="/profile/"]')).toBeNull();
+    expect(document.querySelector('img[src*="member-avatar"]')).toBeNull();
   });
 });

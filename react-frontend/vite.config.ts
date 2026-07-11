@@ -145,7 +145,7 @@ export default defineConfig(({ command, mode }) => {
             urlPattern: ({ request, url }) => (
               request.method === 'GET'
               && url.origin === self.location.origin
-              && url.pathname === '/api/v2/tenant/bootstrap'
+              && url.pathname.toLowerCase().replace(/\/+$/, '') === '/api/v2/tenant/bootstrap'
             ),
             handler: 'NetworkFirst',
             options: {
@@ -155,31 +155,75 @@ export default defineConfig(({ command, mode }) => {
               cacheableResponse: { statuses: [200] },
             },
           },
-          // HTML shell — NetworkFirst with a 3s timeout. Online: every nav
-          // gets the freshly deployed shell. Slow network or offline: falls
-          // back to the most recent cached HTML so the app still loads.
-              // Excludes API, health, and the emergency recovery
-          // URLs — they MUST always go to the network so nginx can return
-          // the real response (Clear-Site-Data header on /api/sw-reset and
-          // /clear-site-data; live data on /api/* etc.).
+          // Published blog reads use an account-free public projection, so
+          // articles remain fast and available to visitors and search engines.
+          // The narrow matcher excludes comment, reaction, and mutation URLs.
+          {
+            urlPattern: ({ request, url }) => {
+              if (request.method !== 'GET' || url.origin !== self.location.origin) return false;
+              const pathname = url.pathname.toLowerCase().replace(/\/+$/, '');
+              return /^\/api\/v2\/blog(?:\/[^/]+)?$/.test(pathname);
+            },
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'nexus-public-blog-api-v1',
+              networkTimeoutSeconds: 3,
+              expiration: { maxEntries: 128, maxAgeSeconds: 24 * 3600 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+          // Private API data must never survive logout in a service-worker
+          // cache. Only tenant bootstrap and sanitized blog reads are public.
+          {
+            urlPattern: ({ request, url }) => {
+              if (request.method !== 'GET' || url.origin !== self.location.origin) return false;
+              const pathname = url.pathname.toLowerCase();
+              const isApiPath = pathname === '/api' || pathname.startsWith('/api/');
+              const isPublicBootstrap = pathname.replace(/\/+$/, '') === '/api/v2/tenant/bootstrap';
+              const isPublicBlogRead = /^\/api\/v2\/blog(?:\/[^/]+)?$/.test(pathname.replace(/\/+$/, ''));
+              return isApiPath && !isPublicBootstrap && !isPublicBlogRead;
+            },
+            handler: 'NetworkOnly',
+            options: {
+              fetchOptions: { cache: 'no-store', credentials: 'same-origin' },
+            },
+          },
+          // Protected, auth/token, CMS, tenant-root, and unknown navigations
+          // are deliberately network-only. This prevents identity-bearing
+          // HTML or structured metadata from being replayed after logout.
+          {
+            urlPattern: ({ request, url }) => {
+              if (request.mode !== 'navigate' || url.origin !== self.location.origin) return false;
+              const pathname = url.pathname.toLowerCase().split('/').filter(Boolean).join('/');
+              const isCacheablePublicPath = /^(?:|features|changelog|development-status|about|faq|contact|pilot-inquiry|pilot-apply|help|terms|privacy|accessibility|cookies|community-guidelines|trust-and-safety|acceptable-use|legal|timebanking-guide|regional-analytics|partner|social-prescribing|impact-summary|impact-report|strategic-plan|pricing|blog(?:\/[^/]+)?|(?:terms|privacy|accessibility|cookies|community-guidelines|acceptable-use)\/versions|platform\/(?:terms|privacy|disclaimer)|developers(?:\/(?:auth|endpoints|webhooks))?)$/.test(pathname);
+              return !isCacheablePublicPath;
+            },
+            handler: 'NetworkOnly',
+            options: {
+              fetchOptions: { cache: 'no-store', credentials: 'same-origin' },
+            },
+          },
+          // Identity-free public HTML shell only. Online requests get the
+          // freshly deployed shell; slow/offline requests may use this cache.
+          // API, health, recovery, authenticated, token, CMS, tenant-prefixed,
+          // and unknown URLs never reach this handler.
           {
             urlPattern: ({ request, url }) => {
               if (request.mode !== 'navigate') return false;
+              if (url.origin !== self.location.origin) return false;
               const p = url.pathname;
               if (p.startsWith('/api/')) return false;
               if (p === '/health.php') return false;
               // /api/sw-reset is the emergency recovery URL — must always
-              // hit the network so nginx can return Clear-Site-Data + the
+              // hit the network so the web server can return Clear-Site-Data + the
               // inline unregister script.
               if (p === '/api/sw-reset') return false;
-              return true;
+              const pathname = p.toLowerCase().split('/').filter(Boolean).join('/');
+              return /^(?:|features|changelog|development-status|about|faq|contact|pilot-inquiry|pilot-apply|help|terms|privacy|accessibility|cookies|community-guidelines|trust-and-safety|acceptable-use|legal|timebanking-guide|regional-analytics|partner|social-prescribing|impact-summary|impact-report|strategic-plan|pricing|blog(?:\/[^/]+)?|(?:terms|privacy|accessibility|cookies|community-guidelines|acceptable-use)\/versions|platform\/(?:terms|privacy|disclaimer)|developers(?:\/(?:auth|endpoints|webhooks))?)$/.test(pathname);
             },
             handler: 'NetworkFirst',
             options: {
-              // v2 intentionally abandons the older runtime cache, which could
-              // contain prerendered/offline-looking HTML shells from before the
-              // clean /_spa.html fallback existed.
-              cacheName: 'nexus-html-shell-v2',
+              cacheName: 'nexus-public-html-shell-v3',
               networkTimeoutSeconds: 3,
               expiration: { maxEntries: 16, maxAgeSeconds: 7 * 86400 },
               matchOptions: { ignoreSearch: true },
@@ -202,15 +246,6 @@ export default defineConfig(({ command, mode }) => {
             options: {
               cacheName: 'nexus-locales',
               expiration: { maxEntries: 250, maxAgeSeconds: 30 * 86400 },
-            },
-          },
-          {
-            urlPattern: ({ url }) => url.pathname === '/api/v2/media/thumbnail',
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'nexus-media-thumbnails',
-              expiration: { maxEntries: 750, maxAgeSeconds: 365 * 86400 },
-              cacheableResponse: { statuses: [0, 200] },
             },
           },
         ],

@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 use App\Http\Controllers\GovukAlpha\AlphaController;
+use App\Http\Controllers\GovukAlpha\Middleware\RequireAccessibleAuthentication;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Route;
  * rate-limited. Numeric route params use ->whereNumber('id').
  */
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // ----- Member-facing volunteering features -----
 Route::get('/volunteering/my-organisations', [AlphaController::class, 'volunteeringMyOrganisations'])
     ->name('volunteering.my-organisations');
@@ -106,3 +108,4 @@ Route::get('/volunteering/incidents', [AlphaController::class, 'volunteeringSafe
     ->name('volunteering.incidents');
 Route::post('/volunteering/incidents', [AlphaController::class, 'volunteeringSafeguardingReportIncident'])
     ->middleware('throttle:10,1')->name('volunteering.incidents.store');
+});

@@ -205,6 +205,7 @@ export function ListingDetailPage() {
   const social = useSocialInteractions({
     targetType: 'listing',
     targetId: Number(id) || 0,
+    enabled: isAuthenticated,
     initialLiked: socialInit.liked,
     initialLikesCount: socialInit.likes,
     initialCommentsCount: socialInit.comments,

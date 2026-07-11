@@ -85,11 +85,13 @@ Route::get('/v2/seo/redirects', [\App\Http\Controllers\Api\SeoController::class,
 // PUBLIC ROUTES — Explore / Discover
 // Supports both authenticated (personalized) and anonymous (global) access
 // ============================================
-Route::get('/v2/explore', [\App\Http\Controllers\Api\ExploreController::class, 'index']);
-Route::get('/v2/explore/for-you', [\App\Http\Controllers\Api\ExploreController::class, 'forYou']);
-Route::get('/v2/explore/trending', [\App\Http\Controllers\Api\ExploreController::class, 'trending']);
-Route::get('/v2/explore/popular-listings', [\App\Http\Controllers\Api\ExploreController::class, 'popularListings']);
-Route::get('/v2/explore/category/{slug}', [\App\Http\Controllers\Api\ExploreController::class, 'category']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/v2/explore', [\App\Http\Controllers\Api\ExploreController::class, 'index']);
+    Route::get('/v2/explore/for-you', [\App\Http\Controllers\Api\ExploreController::class, 'forYou']);
+    Route::get('/v2/explore/trending', [\App\Http\Controllers\Api\ExploreController::class, 'trending']);
+    Route::get('/v2/explore/popular-listings', [\App\Http\Controllers\Api\ExploreController::class, 'popularListings']);
+    Route::get('/v2/explore/category/{slug}', [\App\Http\Controllers\Api\ExploreController::class, 'category']);
+});
 
 // ============================================
 // Categories — public read-only (used by listings, explore, search pages)
@@ -125,9 +127,11 @@ Route::get('/v2/categories', function (\Illuminate\Http\Request $request) {
 // Public group routes (optional auth — viewer_membership populated when Bearer token present)
 // These are outside the auth:sanctum group so Sanctum middleware doesn't interfere.
 // ============================================
-Route::get('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'index']);
-Route::get('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'show']);
-Route::get('/v2/groups/{id}/members', [\App\Http\Controllers\Api\GroupsController::class, 'members']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/v2/groups', [\App\Http\Controllers\Api\GroupsController::class, 'index']);
+    Route::get('/v2/groups/{id}', [\App\Http\Controllers\Api\GroupsController::class, 'show']);
+    Route::get('/v2/groups/{id}/members', [\App\Http\Controllers\Api\GroupsController::class, 'members']);
+});
 
 // ============================================
 // AG44 — Public self-service tenant provisioning (NO auth — anyone may apply)
@@ -185,15 +189,15 @@ Route::get('/v2/presence/online-count', [\App\Http\Controllers\Api\PresenceContr
 // MIGRATED ROUTES — Events
 // Source: httpdocs/routes/events.php
 // ============================================
-Route::get('/v2/events', [\App\Http\Controllers\Api\EventsController::class, 'index'])->withoutMiddleware('auth:sanctum');
-Route::get('/v2/events/nearby', [\App\Http\Controllers\Api\EventsController::class, 'nearby'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/events', [\App\Http\Controllers\Api\EventsController::class, 'index']);
+Route::get('/v2/events/nearby', [\App\Http\Controllers\Api\EventsController::class, 'nearby']);
 Route::post('/v2/events', [\App\Http\Controllers\Api\EventsController::class, 'store']);
-Route::get('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'show'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'show']);
 Route::put('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'update']);
 Route::delete('/v2/events/{id}', [\App\Http\Controllers\Api\EventsController::class, 'destroy']);
 Route::post('/v2/events/{id}/rsvp', [\App\Http\Controllers\Api\EventsController::class, 'rsvp']);
 Route::delete('/v2/events/{id}/rsvp', [\App\Http\Controllers\Api\EventsController::class, 'removeRsvp']);
-Route::get('/v2/events/{id}/attendees', [\App\Http\Controllers\Api\EventsController::class, 'attendees'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/events/{id}/attendees', [\App\Http\Controllers\Api\EventsController::class, 'attendees']);
 Route::post('/v2/events/{id}/attendees/{attendeeId}/check-in', [\App\Http\Controllers\Api\EventsController::class, 'checkIn']);
 Route::post('/v2/events/{id}/cancel', [\App\Http\Controllers\Api\EventsController::class, 'cancel']);
 Route::post('/v2/events/{id}/waitlist', [\App\Http\Controllers\Api\EventsController::class, 'joinWaitlist']);
@@ -209,15 +213,15 @@ Route::post('/v2/events/{id}/image', [\App\Http\Controllers\Api\EventsController
 // returns JsonResponse from every method, and handles validation via Laravel's
 // ValidationException. Use it as the reference implementation pattern.
 Route::middleware('module:listings')->group(function () {
-    Route::get('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'index'])->withoutMiddleware('auth:sanctum');
-    Route::get('/v2/listings/nearby', [\App\Http\Controllers\Api\ListingsController::class, 'nearby'])->withoutMiddleware('auth:sanctum');
+    Route::get('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'index']);
+    Route::get('/v2/listings/nearby', [\App\Http\Controllers\Api\ListingsController::class, 'nearby']);
     Route::get('/v2/listings/saved', [\App\Http\Controllers\Api\ListingsController::class, 'getSavedListings']);
-    Route::get('/v2/listings/featured', [\App\Http\Controllers\Api\ListingsController::class, 'featured'])->withoutMiddleware('auth:sanctum');
+    Route::get('/v2/listings/featured', [\App\Http\Controllers\Api\ListingsController::class, 'featured']);
     Route::get('/v2/listings/tags/popular', [\App\Http\Controllers\Api\ListingsController::class, 'popularTags'])->withoutMiddleware('auth:sanctum');
     Route::get('/v2/listings/tags/autocomplete', [\App\Http\Controllers\Api\ListingsController::class, 'autocompleteTags'])->withoutMiddleware('auth:sanctum');
     Route::post('/v2/listings', [\App\Http\Controllers\Api\ListingsController::class, 'store'])->middleware('onboarding-required');
     Route::post('/v2/listings/generate-description', [\App\Http\Controllers\Api\ListingsController::class, 'generateDescription']);
-    Route::get('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'show'])->withoutMiddleware('auth:sanctum');
+    Route::get('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'show']);
     Route::put('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'update']);
     Route::delete('/v2/listings/{id}', [\App\Http\Controllers\Api\ListingsController::class, 'destroy']);
     Route::post('/v2/listings/{id}/save', [\App\Http\Controllers\Api\ListingsController::class, 'saveListing'])->middleware('throttle:30,1');
@@ -629,7 +633,7 @@ Route::get('/v2/polls/{id}/export', [\App\Http\Controllers\Api\PollsController::
 // MIGRATED ROUTES — Content (Jobs, Ideation, Goals, Gamification, Volunteering, Comments, Blog, Help, Pages, Resources, KB)
 // Source: httpdocs/routes/content.php
 // ============================================
-Route::get('/v2/jobs', [\App\Http\Controllers\Api\JobVacanciesController::class, 'index'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/jobs', [\App\Http\Controllers\Api\JobVacanciesController::class, 'index']);
 Route::post('/v2/jobs', [\App\Http\Controllers\Api\JobVacanciesController::class, 'store']);
 Route::get('/v2/jobs/recommended', [\App\Http\Controllers\Api\JobVacanciesController::class, 'recommended']);
 Route::get('/v2/jobs/applications/{id}/cv', [\App\Http\Controllers\Api\JobVacanciesController::class, 'downloadCv']);
@@ -648,7 +652,7 @@ Route::delete('/v2/jobs/alerts/{id}', [\App\Http\Controllers\Api\JobVacanciesCon
 Route::put('/v2/jobs/alerts/{id}/unsubscribe', [\App\Http\Controllers\Api\JobVacanciesController::class, 'unsubscribeAlert']);
 Route::put('/v2/jobs/alerts/{id}/resubscribe', [\App\Http\Controllers\Api\JobVacanciesController::class, 'resubscribeAlert']);
 // Employer reviews
-Route::get('/v2/jobs/employer-reviews/{userId}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'employerReviews'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/jobs/employer-reviews/{userId}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'employerReviews']);
 Route::post('/v2/jobs/employer-reviews', [\App\Http\Controllers\Api\JobVacanciesController::class, 'createEmployerReview']);
 // Saved profile — static literal routes BEFORE {id} wildcard
 Route::get('/v2/jobs/saved-profile', [\App\Http\Controllers\Api\JobVacanciesController::class, 'getSavedProfile']);
@@ -680,7 +684,7 @@ Route::post('/v2/jobs/{id}/ai-rank', [\App\Http\Controllers\Api\JobVacanciesCont
 // Static literal routes MUST come before {id} wildcard to avoid mismatching
 Route::get('/v2/jobs/my-interviews', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myInterviews']);
 Route::get('/v2/jobs/my-offers', [\App\Http\Controllers\Api\JobVacanciesController::class, 'myOffers']);
-Route::get('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'show'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'show']);
 Route::put('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'update']);
 Route::delete('/v2/jobs/{id}', [\App\Http\Controllers\Api\JobVacanciesController::class, 'destroy']);
 Route::post('/v2/jobs/{id}/apply', [\App\Http\Controllers\Api\JobVacanciesController::class, 'apply']);
@@ -734,7 +738,7 @@ Route::delete('/v2/jobs/interview-slots/{slotId}', [\App\Http\Controllers\Api\Jo
 Route::get('/v2/jobs/{id}/audit-trail', [\App\Http\Controllers\Api\JobVacanciesController::class, 'auditTrail']);
 Route::post('/v2/jobs/{id}/ai-chat', [\App\Http\Controllers\Api\JobVacanciesController::class, 'aiJobChat']);
 Route::get('/v2/jobs/{id}/predictions', [\App\Http\Controllers\Api\JobVacanciesController::class, 'predictions']);
-Route::get('/v2/ideation-challenges', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'index'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/ideation-challenges', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'index']);
 Route::post('/v2/ideation-challenges', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'store']);
 Route::get('/v2/ideation-ideas/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'showIdea']);
 Route::put('/v2/ideation-ideas/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'updateIdea']);
@@ -745,7 +749,7 @@ Route::put('/v2/ideation-ideas/{id}/status', [\App\Http\Controllers\Api\Ideation
 Route::get('/v2/ideation-ideas/{id}/comments', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'comments']);
 Route::post('/v2/ideation-ideas/{id}/comments', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'addComment']);
 Route::delete('/v2/ideation-comments/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'deleteComment']);
-Route::get('/v2/ideation-challenges/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'show'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/ideation-challenges/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'show']);
 Route::put('/v2/ideation-challenges/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'update']);
 Route::delete('/v2/ideation-challenges/{id}', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'destroy']);
 Route::put('/v2/ideation-challenges/{id}/status', [\App\Http\Controllers\Api\IdeationChallengesController::class, 'updateStatus']);
@@ -797,9 +801,9 @@ Route::get('/v2/gamification/community-dashboard', [\App\Http\Controllers\Api\Ga
 Route::get('/v2/gamification/personal-journey', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'personalJourney']);
 Route::get('/v2/gamification/member-spotlight', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'memberSpotlight']);
 Route::get('/v2/gamification/engagement-history', [\App\Http\Controllers\Api\GamificationV2Controller::class, 'engagementHistory']);
-Route::get('/v2/volunteering/opportunities', [\App\Http\Controllers\Api\VolunteerController::class, 'opportunities'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/volunteering/opportunities', [\App\Http\Controllers\Api\VolunteerController::class, 'opportunities']);
 Route::post('/v2/volunteering/opportunities', [\App\Http\Controllers\Api\VolunteerController::class, 'createOpportunity']);
-Route::get('/v2/volunteering/opportunities/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'showOpportunity'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/volunteering/opportunities/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'showOpportunity']);
 Route::put('/v2/volunteering/opportunities/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'updateOpportunity']);
 Route::delete('/v2/volunteering/opportunities/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'deleteOpportunity']);
 Route::get('/v2/volunteering/opportunities/{id}/shifts', [\App\Http\Controllers\Api\VolunteerController::class, 'shifts']);
@@ -817,9 +821,9 @@ Route::get('/v2/volunteering/hours/summary', [\App\Http\Controllers\Api\Voluntee
 Route::get('/v2/volunteering/hours/pending-review', [\App\Http\Controllers\Api\VolunteerController::class, 'pendingHoursReview']);
 Route::put('/v2/volunteering/hours/{id}/verify', [\App\Http\Controllers\Api\VolunteerController::class, 'verifyHours']);
 Route::get('/v2/volunteering/my-organisations', [\App\Http\Controllers\Api\VolunteerController::class, 'myOrganisations']);
-Route::get('/v2/volunteering/organisations', [\App\Http\Controllers\Api\VolunteerController::class, 'organisations'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/volunteering/organisations', [\App\Http\Controllers\Api\VolunteerController::class, 'organisations']);
 Route::post('/v2/volunteering/organisations', [\App\Http\Controllers\Api\VolunteerController::class, 'createOrganisation']);
-Route::get('/v2/volunteering/organisations/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'showOrganisation'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/volunteering/organisations/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'showOrganisation']);
 // Organisation dashboard & wallet endpoints (org owner/admin only)
 //
 // Authorization enforced via VolunteerController::ensureOrgAccess() per-org
@@ -838,7 +842,7 @@ Route::get('/v2/volunteering/organisations/{id}/applications', [\App\Http\Contro
 Route::get('/v2/volunteering/organisations/{id}/hours/pending', [\App\Http\Controllers\Api\VolunteerController::class, 'orgHoursPending']);
 Route::put('/v2/volunteering/organisations/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'updateOrganisation']);
 Route::post('/v2/volunteering/reviews', [\App\Http\Controllers\Api\VolunteerController::class, 'createReview']);
-Route::get('/v2/volunteering/reviews/organization/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'getOrganizationReviews'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/volunteering/reviews/organization/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'getOrganizationReviews']);
 Route::get('/v2/volunteering/reviews/{type}/{id}', [\App\Http\Controllers\Api\VolunteerController::class, 'getReviews']);
 Route::get('/v2/comments', [\App\Http\Controllers\Api\CommentsController::class, 'index']);
 Route::post('/v2/comments', [\App\Http\Controllers\Api\CommentsController::class, 'store']);
@@ -860,7 +864,7 @@ Route::get('/v2/public-page-content/{pageKey}', [\App\Http\Controllers\Api\Stati
     ->where('pageKey', '[a-z0-9-]+')
     ->withoutMiddleware('auth:sanctum');
 Route::get('/v2/pages/{slug}', [\App\Http\Controllers\Api\PagesPublicController::class, 'show'])->withoutMiddleware('auth:sanctum');
-Route::get('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController::class, 'index'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController::class, 'index']);
 Route::get('/v2/resources/categories', [\App\Http\Controllers\Api\ResourcePublicController::class, 'categories']);
 Route::get('/v2/resources/categories/tree', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'tree']);
 Route::post('/v2/resources/categories', [\App\Http\Controllers\Api\ResourceCategoryController::class, 'store'])->middleware('admin');
@@ -871,16 +875,16 @@ Route::post('/v2/resources', [\App\Http\Controllers\Api\ResourcePublicController
 Route::get('/v2/resources/{id}/download', [\App\Http\Controllers\Api\ResourcePublicController::class, 'download']);
 Route::put('/v2/resources/{id}', [\App\Http\Controllers\Api\ResourcePublicController::class, 'update']);
 Route::delete('/v2/resources/{id}', [\App\Http\Controllers\Api\ResourcePublicController::class, 'destroy']);
-Route::get('/v2/kb', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'index'])->withoutMiddleware('auth:sanctum');
-Route::get('/v2/kb/search', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'search'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/kb', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'index']);
+Route::get('/v2/kb/search', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'search']);
 Route::post('/v2/kb', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'store']);
-Route::get('/v2/kb/slug/{slug}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'showBySlug'])->withoutMiddleware('auth:sanctum');
-Route::get('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'show'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/kb/slug/{slug}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'showBySlug']);
+Route::get('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'show']);
 Route::put('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'update']);
 Route::delete('/v2/kb/{id}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'destroy']);
 Route::post('/v2/kb/{id}/feedback', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'feedback']);
 Route::post('/v2/kb/{id}/attachments', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'uploadAttachment']);
-Route::get('/v2/kb/{id}/attachments/{attachmentId}/download', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'downloadAttachment'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/kb/{id}/attachments/{attachmentId}/download', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'downloadAttachment']);
 Route::delete('/v2/kb/{id}/attachments/{attachmentId}', [\App\Http\Controllers\Api\KnowledgeBaseController::class, 'deleteAttachment']);
 
 // ============================================
@@ -1159,19 +1163,26 @@ Route::post('/v2/podcasts/episodes/{episodeId}/report', [\App\Http\Controllers\A
 
 }); // End Route::middleware('auth:sanctum')
 
+// Identity-free analytics acknowledgement. Public episode/show payloads and
+// media remain authenticated below; this endpoint returns only {recorded:true}
+// and preserves anonymous listening metrics for an already-known episode ID.
+Route::post('/v2/podcasts/episodes/{episodeId}/listen', [\App\Http\Controllers\Api\PodcastController::class, 'listen'])
+    ->where('episodeId', '[0-9]+')
+    ->withoutMiddleware('auth:sanctum');
+
 // ============================================
-// Courses Module (ALPHA) — Public routes (no auth required)
+// Courses, podcasts, and marketplace contain member identity and require auth.
 // ============================================
+Route::middleware('auth:sanctum')->group(function () {
 Route::get('/v2/courses', [\App\Http\Controllers\Api\CourseController::class, 'index']);
 Route::get('/v2/courses/categories', [\App\Http\Controllers\Api\CourseController::class, 'categories']);
 Route::get('/v2/courses/{id}/reviews', [\App\Http\Controllers\Api\CourseController::class, 'reviews'])->where('id', '[0-9]+');
 Route::get('/v2/courses/{idOrSlug}', [\App\Http\Controllers\Api\CourseController::class, 'show']);
 
 // ============================================
-// Podcasts Module — Public routes (no auth required)
+// Podcasts Module — authenticated content routes
 // ============================================
 Route::get('/v2/podcasts', [\App\Http\Controllers\Api\PodcastController::class, 'index']);
-Route::post('/v2/podcasts/episodes/{episodeId}/listen', [\App\Http\Controllers\Api\PodcastController::class, 'listen'])->where('episodeId', '[0-9]+');
 Route::get('/v2/podcasts/media/{tenantId}/{episodeId}/audio', [\App\Http\Controllers\Api\PodcastController::class, 'audio'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])->middleware('throttle:podcast-media');
 Route::get('/v2/podcasts/transcripts/{tenantId}/{episodeId}.txt', [\App\Http\Controllers\Api\PodcastController::class, 'transcript'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])->middleware('throttle:60,1');
 Route::get('/v2/podcasts/chapters/{tenantId}/{episodeId}.json', [\App\Http\Controllers\Api\PodcastController::class, 'chapters'])->where(['tenantId' => '[0-9]+', 'episodeId' => '[0-9]+'])->middleware('throttle:60,1');
@@ -1181,7 +1192,7 @@ Route::get('/v2/podcasts/{showSlug}', [\App\Http\Controllers\Api\PodcastControll
 Route::get('/v2/podcasts/{showSlug}/{episodeSlug}', [\App\Http\Controllers\Api\PodcastController::class, 'episode']);
 
 // ============================================
-// Marketplace Module — Public routes (no auth required)
+// Marketplace Module — authenticated content routes
 // ============================================
 Route::get('/v2/marketplace/listings', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'index']);
 Route::get('/v2/marketplace/listings/nearby', [\App\Http\Controllers\Api\MarketplaceListingController::class, 'nearby']);
@@ -1196,6 +1207,7 @@ Route::get('/v2/marketplace/sellers/{id}', [\App\Http\Controllers\Api\Marketplac
 Route::get('/v2/marketplace/sellers/{id}/listings', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'listings']);
 Route::get('/v2/marketplace/sellers/{id}/shipping-options', [\App\Http\Controllers\Api\MarketplaceSellerController::class, 'shippingOptionsForSeller']);
 Route::get('/v2/marketplace/listings/{id}/pickup-slots', [\App\Http\Controllers\Api\MarketplacePickupSlotController::class, 'listForListing']);
+});
 
 // ============================================
 // Federation cross-node aggregates (R1+R2 — Caring Community federation)
@@ -2927,8 +2939,8 @@ Route::post('/v2/events/{id}/series', [\App\Http\Controllers\Api\EventsControlle
 Route::get('/v2/volunteering/recommended-shifts', [\App\Http\Controllers\Api\VolunteerController::class, 'recommendedShifts']);
 Route::get('/v2/volunteering/certificates', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'myCertificates']);
 Route::post('/v2/volunteering/certificates', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'generateCertificate']);
-Route::get('/v2/volunteering/certificates/verify/{code}', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'verifyCertificate'])->withoutMiddleware('auth:sanctum');
-Route::get('/v2/volunteering/certificates/{code}/html', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'certificateHtml'])->withoutMiddleware('auth:sanctum');
+Route::get('/v2/volunteering/certificates/verify/{code}', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'verifyCertificate'])->middleware('auth:sanctum');
+Route::get('/v2/volunteering/certificates/{code}/html', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'certificateHtml'])->middleware('auth:sanctum');
 Route::get('/v2/volunteering/credentials', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'myCredentials']);
 Route::post('/v2/volunteering/credentials', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'uploadCredential'])->middleware('throttle:20,1');
 Route::get('/v2/volunteering/credentials/{id}/download', [\App\Http\Controllers\Api\VolunteerCertificateController::class, 'downloadCredential']);
@@ -3318,10 +3330,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 });
 
 // AG62 — Municipality Survey & Feedback Tool
-Route::get('/v2/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'activeSurveys']);
-Route::get('/v2/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'getSurvey']);
-Route::post('/v2/caring-community/surveys/{id}/respond', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'submitSurvey'])
-    ->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/v2/caring-community/surveys', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'activeSurveys']);
+    Route::get('/v2/caring-community/surveys/{id}', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'getSurvey']);
+    Route::post('/v2/caring-community/surveys/{id}/respond', [\App\Http\Controllers\Api\MunicipalSurveyController::class, 'submitSurvey']);
+});
 // Deliberately auth-only (no `admin` middleware): these methods self-check via
 // hasAnnouncerAccess(), which also grants the non-admin `municipality_announcer`
 // role. Adding `admin` here would lock announcers out of survey management.

@@ -8,6 +8,7 @@ namespace Tests\Laravel\Unit\PageBuilder\Renderers;
 
 use App\PageBuilder\Renderers\BlockRendererInterface;
 use App\PageBuilder\Renderers\MembersGridRenderer;
+use Illuminate\Support\Facades\DB;
 use Tests\Laravel\TestCase;
 
 class MembersGridRendererTest extends TestCase
@@ -25,21 +26,11 @@ class MembersGridRendererTest extends TestCase
         $this->assertInstanceOf(BlockRendererInterface::class, $this->renderer);
     }
 
-    public function test_validate_requires_valid_limit_and_columns(): void
+    public function test_member_grid_is_disabled_for_public_cms_rendering(): void
     {
-        $this->assertTrue($this->renderer->validate(['limit' => 6, 'columns' => 3]));
-        $this->assertFalse($this->renderer->validate(['limit' => 0, 'columns' => 3]));
-        $this->assertFalse($this->renderer->validate(['limit' => 101, 'columns' => 3]));
-        $this->assertFalse($this->renderer->validate(['limit' => 6, 'columns' => 5]));
-    }
+        DB::shouldReceive('select')->never();
 
-    public function test_validate_allows_valid_column_counts(): void
-    {
-        foreach ([1, 2, 3, 4, 6] as $cols) {
-            $this->assertTrue(
-                $this->renderer->validate(['limit' => 6, 'columns' => $cols]),
-                "Columns value {$cols} should be valid"
-            );
-        }
+        $this->assertFalse($this->renderer->validate(['limit' => 6, 'columns' => 3]));
+        $this->assertSame('', $this->renderer->render(['limit' => 6, 'columns' => 3]));
     }
 }

@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 use App\Http\Controllers\GovukAlpha\AlphaController;
+use App\Http\Controllers\GovukAlpha\Middleware\RequireAccessibleAuthentication;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Route;
  * throttled. Numeric route params use whereNumber().
  */
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // --- Campaigns (static prefix before challenge {id}) ---
 Route::get('/ideation/campaigns', [AlphaController::class, 'ideationCampaigns'])
     ->name('ideation.campaigns');
@@ -89,3 +91,4 @@ Route::post('/ideation/{id}/ideas/{ideaId}/media', [AlphaController::class, 'ide
     ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:20,1')->name('ideation.idea.media.store');
 Route::post('/ideation/{id}/ideas/{ideaId}/convert', [AlphaController::class, 'ideationConvertToGroup'])
     ->whereNumber('id')->whereNumber('ideaId')->middleware('throttle:10,1')->name('ideation.idea.convert');
+});

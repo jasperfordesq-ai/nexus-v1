@@ -45,6 +45,10 @@ class ExploreService
      */
     public function getExploreData(int $userId): array
     {
+        if ($userId <= 0) {
+            throw new \InvalidArgumentException('Explore data requires an authenticated user.');
+        }
+
         $tenantId = TenantContext::getId();
 
         // ─── Global sections — granular per-section caching (Phase 5) ───
@@ -52,13 +56,15 @@ class ExploreService
         // Fast-changing sections (trending, stats): 5 min
         // Slow-changing sections (orgs, resources, skills): 15 min
         $globalData = [
-            'trending_posts'             => $this->cachedSection($tenantId, 'trending_posts',    fn() => $this->getTrendingPosts($tenantId)),
+            // Viewer-sensitive identity/audience sections are intentionally not
+            // cached: privacy and membership changes must apply immediately.
+            'trending_posts'             => $this->getTrendingPosts($tenantId, $userId),
             'popular_listings'           => $this->cachedSection($tenantId, 'popular_listings',   fn() => $this->getPopularListings($tenantId)),
             'active_groups'              => $this->cachedSection($tenantId, 'active_groups',      fn() => $this->getActiveGroups($tenantId)),
             'upcoming_events'            => $this->cachedSection($tenantId, 'upcoming_events',    fn() => $this->getUpcomingEvents($tenantId), 600),
-            'top_contributors'           => $this->cachedSection($tenantId, 'top_contributors',   fn() => $this->getTopContributors($tenantId), self::CACHE_TTL_SLOW),
+            'top_contributors'           => $this->getTopContributors($tenantId, $userId),
             'trending_hashtags'          => $this->cachedSection($tenantId, 'trending_hashtags',  fn() => $this->getTrendingHashtags($tenantId)),
-            'new_members'                => $this->cachedSection($tenantId, 'new_members',        fn() => $this->getNewMembers($tenantId), 1800),
+            'new_members'                => $this->getNewMembers($tenantId, $userId),
             'featured_challenges'        => $this->cachedSection($tenantId, 'featured_challenges',fn() => $this->getFeaturedChallenges($tenantId), self::CACHE_TTL_SLOW),
             'community_stats'            => $this->cachedSection($tenantId, 'community_stats',    fn() => $this->getCommunityStats($tenantId), self::CACHE_TTL_SLOW),
             // Phase 2 — new content sections
@@ -154,9 +160,14 @@ class ExploreService
      * Velocity = recent engagement (last 6h) / age-expected engagement rate
      * This detects content gaining engagement unusually fast, not just raw volume.
      */
-    private function getTrendingPosts(int $tenantId): array
+    private function getTrendingPosts(int $tenantId, int $viewerId): array
     {
+        if ($viewerId <= 0) {
+            return [];
+        }
+
         try {
+            [$visibilitySql, $visibilityBindings] = $this->trendingPostVisibilitySql($tenantId, $viewerId);
             $rows = DB::select("
                 SELECT
                     fp.id,
@@ -178,10 +189,17 @@ class ExploreService
                 JOIN users u ON u.id = fp.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE fp.tenant_id = ?
                     AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 365 DAY)
-                    AND fp.is_hidden = 0
+                    AND (fp.is_hidden = 0 OR fp.is_hidden IS NULL)
+                    AND fp.deleted_at IS NULL
+                    AND (fp.publish_status = 'published' OR fp.publish_status IS NULL)
+                    AND (fp.scheduled_at IS NULL OR fp.scheduled_at <= NOW())
+                    {$visibilitySql}
                 ORDER BY engagement DESC
                 LIMIT 30
-            ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId]);
+            ", array_merge(
+                [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId],
+                $visibilityBindings
+            ));
 
             // Compute velocity-weighted trending score
             $scored = [];
@@ -223,6 +241,73 @@ class ExploreService
             Log::warning('ExploreService::getTrendingPosts failed', ['error' => $e->getMessage()]);
             return [];
         }
+    }
+
+    /**
+     * Build the viewer-dependent audience and private-group eligibility clause
+     * used by both Explore trending queries.
+     *
+     * @return array{0: string, 1: array<int, int>}
+     */
+    private function trendingPostVisibilitySql(int $tenantId, int $viewerId): array
+    {
+        return [
+            "AND (
+                fp.user_id = ?
+                OR fp.visibility IS NULL
+                OR fp.visibility = 'public'
+                OR (
+                    fp.visibility IN ('friends', 'connections')
+                    AND EXISTS (
+                        SELECT 1
+                        FROM connections conn
+                        WHERE conn.tenant_id = ?
+                          AND conn.status = 'accepted'
+                          AND (
+                              (conn.requester_id = ? AND conn.receiver_id = fp.user_id)
+                              OR (conn.receiver_id = ? AND conn.requester_id = fp.user_id)
+                          )
+                    )
+                )
+            )
+            AND (
+                fp.group_id IS NULL
+                OR EXISTS (
+                    SELECT 1
+                    FROM groups grp
+                    WHERE grp.id = fp.group_id
+                      AND grp.tenant_id = ?
+                      AND (grp.status IS NULL OR grp.status = 'active')
+                      AND grp.visibility = 'public'
+                )
+                OR EXISTS (
+                    SELECT 1
+                    FROM groups owned_grp
+                    WHERE owned_grp.id = fp.group_id
+                      AND owned_grp.tenant_id = ?
+                      AND owned_grp.owner_id = ?
+                )
+                OR EXISTS (
+                    SELECT 1
+                    FROM group_members gm
+                    WHERE gm.group_id = fp.group_id
+                      AND gm.tenant_id = ?
+                      AND gm.user_id = ?
+                      AND gm.status = 'active'
+                )
+            )",
+            [
+                $viewerId,
+                $tenantId,
+                $viewerId,
+                $viewerId,
+                $tenantId,
+                $tenantId,
+                $viewerId,
+                $tenantId,
+                $viewerId,
+            ],
+        ];
     }
 
     /**
@@ -301,6 +386,8 @@ class ExploreService
                 FROM `groups` g
                 WHERE g.tenant_id = ?
                     AND g.is_active = 1
+                    AND g.visibility = 'public'
+                    AND (g.status IS NULL OR g.status = 'active')
                 ORDER BY member_count DESC
                 LIMIT 6
             ", [$tenantId]);
@@ -342,9 +429,20 @@ class ExploreService
                 WHERE e.tenant_id = ?
                     AND e.start_time > NOW()
                     AND e.status = 'active'
+                    AND (
+                        e.group_id IS NULL
+                        OR EXISTS (
+                            SELECT 1 FROM groups event_group
+                            WHERE event_group.id = e.group_id
+                              AND event_group.tenant_id = ?
+                              AND event_group.is_active = 1
+                              AND (event_group.status IS NULL OR event_group.status = 'active')
+                              AND event_group.visibility = 'public'
+                        )
+                    )
                 ORDER BY e.start_time ASC
                 LIMIT 8
-            ", [$tenantId]);
+            ", [$tenantId, $tenantId]);
 
             return array_map(fn($row) => [
                 'id' => $row->id,
@@ -367,7 +465,7 @@ class ExploreService
     /**
      * Top 6 users by XP earned in last 30 days.
      */
-    private function getTopContributors(int $tenantId): array
+    private function getTopContributors(int $tenantId, int $viewerId): array
     {
         try {
             $rows = DB::select("
@@ -382,10 +480,32 @@ class ExploreService
                 FROM users u
                 WHERE u.tenant_id = ?
                     AND u.status = 'active'
+                    AND (
+                        u.id = ?
+                        OR (
+                            (u.privacy_search = 1 OR u.privacy_search IS NULL)
+                            AND (
+                                u.privacy_profile IS NULL
+                                OR u.privacy_profile IN ('public', 'members')
+                                OR (
+                                    u.privacy_profile = 'connections'
+                                    AND EXISTS (
+                                        SELECT 1 FROM connections privacy_conn
+                                        WHERE privacy_conn.tenant_id = ?
+                                          AND privacy_conn.status = 'accepted'
+                                          AND (
+                                              (privacy_conn.requester_id = ? AND privacy_conn.receiver_id = u.id)
+                                              OR (privacy_conn.receiver_id = ? AND privacy_conn.requester_id = u.id)
+                                          )
+                                    )
+                                )
+                            )
+                        )
+                    )
                     AND u.xp > 0
                 ORDER BY u.xp DESC
                 LIMIT 6
-            ", [$tenantId]);
+            ", [$tenantId, $viewerId, $tenantId, $viewerId, $viewerId]);
 
             return array_map(fn($row) => [
                 'id' => $row->id,
@@ -435,7 +555,7 @@ class ExploreService
     /**
      * 8 newest members joined in last 14 days.
      */
-    private function getNewMembers(int $tenantId): array
+    private function getNewMembers(int $tenantId, int $viewerId): array
     {
         try {
             $rows = DB::select("
@@ -449,10 +569,32 @@ class ExploreService
                 FROM users u
                 WHERE u.tenant_id = ?
                     AND u.status = 'active'
+                    AND (
+                        u.id = ?
+                        OR (
+                            (u.privacy_search = 1 OR u.privacy_search IS NULL)
+                            AND (
+                                u.privacy_profile IS NULL
+                                OR u.privacy_profile IN ('public', 'members')
+                                OR (
+                                    u.privacy_profile = 'connections'
+                                    AND EXISTS (
+                                        SELECT 1 FROM connections privacy_conn
+                                        WHERE privacy_conn.tenant_id = ?
+                                          AND privacy_conn.status = 'accepted'
+                                          AND (
+                                              (privacy_conn.requester_id = ? AND privacy_conn.receiver_id = u.id)
+                                              OR (privacy_conn.receiver_id = ? AND privacy_conn.requester_id = u.id)
+                                          )
+                                    )
+                                )
+                            )
+                        )
+                    )
                     AND u.created_at >= DATE_SUB(NOW(), INTERVAL 14 DAY)
                 ORDER BY u.created_at DESC
                 LIMIT 8
-            ", [$tenantId]);
+            ", [$tenantId, $viewerId, $tenantId, $viewerId, $viewerId]);
 
             return array_map(fn($row) => [
                 'id' => $row->id,
@@ -1424,14 +1566,7 @@ class ExploreService
     public function getForYouFeed(int $tenantId, int $userId, int $page = 1, int $perPage = 20): array
     {
         if ($userId <= 0) {
-            // Unauthenticated: return popular content mix
-            return $this->getPopularMixedFeed($tenantId, $page, $perPage);
-        }
-
-        $cacheKey = "nexus:explore:foryou:{$tenantId}:{$userId}:{$page}";
-        $cached = Cache::get($cacheKey);
-        if ($cached !== null) {
-            return $cached;
+            throw new \InvalidArgumentException('Explore recommendations require an authenticated user.');
         }
 
         try {
@@ -1466,7 +1601,7 @@ class ExploreService
 
             // ─── Source 2: Trending posts (velocity-weighted) ───
             try {
-                $trendingPosts = $this->getTrendingPosts($tenantId);
+                $trendingPosts = $this->getTrendingPosts($tenantId, $userId);
                 foreach ($trendingPosts as $post) {
                     $score = 40 + min(30, (int) $post['engagement']); // 40-70 base
                     if (!empty($post['is_hot'])) {
@@ -1614,8 +1749,6 @@ class ExploreService
                 'per_page' => $perPage,
             ];
 
-            Cache::put($cacheKey, $result, self::CACHE_TTL_SECONDS);
-
             return $result;
         } catch (\Throwable $e) {
             Log::warning('ExploreService::getForYouFeed failed', ['error' => $e->getMessage()]);
@@ -1626,12 +1759,12 @@ class ExploreService
     /**
      * Popular mixed content feed for unauthenticated users.
      */
-    private function getPopularMixedFeed(int $tenantId, int $page, int $perPage): array
+    private function getPopularMixedFeed(int $tenantId, int $viewerId, int $page, int $perPage): array
     {
         $candidates = [];
 
         try {
-            foreach ($this->getTrendingPosts($tenantId) as $post) {
+            foreach ($this->getTrendingPosts($tenantId, $viewerId) as $post) {
                 $candidates[] = [
                     'content_type' => 'post', 'id' => $post['id'], 'title' => $post['excerpt'],
                     'subtitle' => $post['author_name'], 'image_url' => $post['image_url'] ?? null,
@@ -1909,19 +2042,28 @@ class ExploreService
     /**
      * Get trending posts with pagination (for "see more" view).
      */
-    public function getTrendingPostsPaginated(int $tenantId, int $page = 1, int $perPage = 20): array
+    public function getTrendingPostsPaginated(int $tenantId, int $viewerId, int $page = 1, int $perPage = 20): array
     {
+        if ($viewerId <= 0) {
+            throw new \InvalidArgumentException('Trending posts require an authenticated user.');
+        }
+
         $offset = ($page - 1) * $perPage;
 
         try {
+            [$visibilitySql, $visibilityBindings] = $this->trendingPostVisibilitySql($tenantId, $viewerId);
             $total = DB::selectOne("
                 SELECT COUNT(*) AS cnt
                 FROM feed_posts fp
                 JOIN users u ON u.id = fp.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE fp.tenant_id = ?
                     AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 365 DAY)
-                    AND fp.is_hidden = 0
-            ", [$tenantId, $tenantId]);
+                    AND (fp.is_hidden = 0 OR fp.is_hidden IS NULL)
+                    AND fp.deleted_at IS NULL
+                    AND (fp.publish_status = 'published' OR fp.publish_status IS NULL)
+                    AND (fp.scheduled_at IS NULL OR fp.scheduled_at <= NOW())
+                    {$visibilitySql}
+            ", array_merge([$tenantId, $tenantId], $visibilityBindings));
 
             $rows = DB::select("
                 SELECT
@@ -1939,13 +2081,21 @@ class ExploreService
                 JOIN users u ON u.id = fp.user_id AND u.tenant_id = ? AND u.status = 'active'
                 WHERE fp.tenant_id = ?
                     AND fp.created_at >= DATE_SUB(NOW(), INTERVAL 365 DAY)
-                    AND fp.is_hidden = 0
+                    AND (fp.is_hidden = 0 OR fp.is_hidden IS NULL)
+                    AND fp.deleted_at IS NULL
+                    AND (fp.publish_status = 'published' OR fp.publish_status IS NULL)
+                    AND (fp.scheduled_at IS NULL OR fp.scheduled_at <= NOW())
+                    {$visibilitySql}
                 ORDER BY (
                     (SELECT COUNT(*) FROM likes lk WHERE lk.target_type = 'post' AND lk.target_id = fp.id AND lk.tenant_id = ?)
                     + (SELECT COUNT(*) FROM comments c WHERE c.target_type = 'post' AND c.target_id = fp.id AND c.tenant_id = ?)
                 ) DESC, fp.created_at DESC
                 LIMIT ? OFFSET ?
-            ", [$tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $tenantId, $perPage, $offset]);
+            ", array_merge(
+                [$tenantId, $tenantId, $tenantId, $tenantId],
+                $visibilityBindings,
+                [$tenantId, $tenantId, $perPage, $offset]
+            ));
 
             return [
                 'items' => array_map(fn($row) => [

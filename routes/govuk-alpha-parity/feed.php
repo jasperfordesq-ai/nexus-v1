@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 use App\Http\Controllers\GovukAlpha\AlphaController;
+use App\Http\Controllers\GovukAlpha\Middleware\RequireAccessibleAuthentication;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,29 +28,31 @@ use Illuminate\Support\Facades\Route;
  * routes sit on distinct suffixes from the existing core feed.items.* routes.
  */
 
-// ===== Hashtag discovery + browse =====
-Route::get('/feed/hashtags', [AlphaController::class, 'feedHashtagsDiscovery'])
-    ->name('feed.hashtags');
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
+    // ===== Hashtag discovery + browse =====
+    Route::get('/feed/hashtags', [AlphaController::class, 'feedHashtagsDiscovery'])
+        ->name('feed.hashtags');
 
-Route::get('/feed/hashtag/{tag}', [AlphaController::class, 'feedHashtag'])
-    ->where('tag', '[A-Za-z0-9_]{1,100}')
-    ->name('feed.hashtag');
+    Route::get('/feed/hashtag/{tag}', [AlphaController::class, 'feedHashtag'])
+        ->where('tag', '[A-Za-z0-9_]{1,100}')
+        ->name('feed.hashtag');
 
-// ===== Polymorphic feed-item permalink =====
-Route::get('/feed/item/{type}/{id}', [AlphaController::class, 'feedItemDetail'])
-    ->where('type', '[a-z]+')
-    ->whereNumber('id')
-    ->name('feed.item');
+    // ===== Polymorphic feed-item permalink =====
+    Route::get('/feed/item/{type}/{id}', [AlphaController::class, 'feedItemDetail'])
+        ->where('type', '[a-z]+')
+        ->whereNumber('id')
+        ->name('feed.item');
 
-// ===== Typed-item engagement (parity with FeedCard on non-post cards) =====
-Route::post('/feed/items/{type}/{id}/not-interested', [AlphaController::class, 'feedItemNotInterested'])
-    ->where('type', '[a-z]+')
-    ->whereNumber('id')
-    ->middleware('throttle:30,1')
-    ->name('feed.items.not-interested');
+    // ===== Typed-item engagement (parity with FeedCard on non-post cards) =====
+    Route::post('/feed/items/{type}/{id}/not-interested', [AlphaController::class, 'feedItemNotInterested'])
+        ->where('type', '[a-z]+')
+        ->whereNumber('id')
+        ->middleware('throttle:30,1')
+        ->name('feed.items.not-interested');
 
-Route::post('/feed/items/{type}/{id}/react', [AlphaController::class, 'feedItemReaction'])
-    ->where('type', '[a-z]+')
-    ->whereNumber('id')
-    ->middleware('throttle:60,1')
-    ->name('feed.items.react');
+    Route::post('/feed/items/{type}/{id}/react', [AlphaController::class, 'feedItemReaction'])
+        ->where('type', '[a-z]+')
+        ->whereNumber('id')
+        ->middleware('throttle:60,1')
+        ->name('feed.items.react');
+});

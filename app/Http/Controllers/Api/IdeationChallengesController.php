@@ -89,13 +89,12 @@ class IdeationChallengesController extends BaseApiController
     public function index(): JsonResponse
     {
         $this->ensureFeature();
+        $userId = $this->requireAuth();
         $this->rateLimit('ideation_list', 60, 60);
-
-        // Optional auth — allow unauthenticated browsing
-        $this->getOptionalUserId();
 
         $filters = [
             'limit' => $this->queryInt('per_page', 20, 1, 100),
+            'viewer_id' => $userId,
         ];
 
         if ($this->query('status')) {
@@ -125,9 +124,10 @@ class IdeationChallengesController extends BaseApiController
     public function show(int $id): JsonResponse
     {
         $this->ensureFeature();
+        $userId = $this->requireAuth();
         $this->rateLimit('ideation_show', 120, 60);
 
-        $challenge = $this->challengeService->getById($id);
+        $challenge = $this->challengeService->getById($id, $userId);
 
         if (!$challenge) {
             return $this->respondWithError('RESOURCE_NOT_FOUND', __('api.challenge_not_found'), null, 404);
@@ -150,7 +150,7 @@ class IdeationChallengesController extends BaseApiController
             return $this->respondWithError('VALIDATION_ERROR', $e->getMessage(), null, 422);
         }
 
-        $challenge = $this->challengeService->getById($challengeId);
+        $challenge = $this->challengeService->getById($challengeId, $userId);
 
         // Record feed activity
         try {
@@ -316,7 +316,7 @@ class IdeationChallengesController extends BaseApiController
     public function showIdea($id): JsonResponse
     {
         $this->ensureFeature();
-        $userId = $this->getOptionalUserId();
+        $userId = $this->requireAuth();
 
         $idea = $this->challengeService->getIdeaById((int) $id, $userId);
 

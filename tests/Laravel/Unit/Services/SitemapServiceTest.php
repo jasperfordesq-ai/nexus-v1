@@ -188,7 +188,7 @@ class SitemapServiceTest extends TestCase
         $this->assertStringContainsString('/privacy', $xml);
     }
 
-    public function test_static_sitemap_matches_tenant_slug_and_redirecting_feature_routes(): void
+    public function test_static_sitemap_excludes_authenticated_feature_routes(): void
     {
         $original = DB::table('tenants')->where('id', $this->testTenantId)->first(['slug', 'features']);
         $this->assertNotNull($original);
@@ -205,10 +205,10 @@ class SitemapServiceTest extends TestCase
             Cache::flush();
             $xml = $this->service->generateForTenant($this->testTenantId, 'https://tenant.example');
 
-            $this->assertStringContainsString('/marketplace/free', $xml);
+            $this->assertStringNotContainsString('/marketplace/free', $xml);
             $this->assertStringNotContainsString('/marketplace/map', $xml);
-            $this->assertStringContainsString('/courses', $xml);
-            $this->assertStringContainsString('/podcasts', $xml);
+            $this->assertStringNotContainsString('/courses', $xml);
+            $this->assertStringNotContainsString('/podcasts', $xml);
             $this->assertStringNotContainsString('/impact-report', $xml);
             $this->assertStringNotContainsString('/development-status', $xml);
         } finally {
@@ -236,7 +236,7 @@ class SitemapServiceTest extends TestCase
         }
     }
 
-    public function test_sitemap_includes_public_course_and_podcast_detail_routes(): void
+    public function test_sitemap_excludes_authenticated_course_and_podcast_detail_routes(): void
     {
         foreach (['courses', 'course_sections', 'course_lessons', 'course_reviews', 'podcast_shows', 'podcast_episodes', 'podcast_episode_chapters'] as $table) {
             if (!Schema::hasTable($table)) $this->markTestSkipped("{$table} table is unavailable");
@@ -291,9 +291,9 @@ class SitemapServiceTest extends TestCase
 
             Cache::flush();
             $xml = $this->service->generateForTenant($this->testTenantId, 'https://learning.example');
-            $this->assertStringContainsString("/courses/sitemap-course-{$suffix}", $xml);
-            $this->assertStringContainsString("/podcasts/sitemap-show-{$suffix}", $xml);
-            $this->assertStringContainsString(
+            $this->assertStringNotContainsString("/courses/sitemap-course-{$suffix}", $xml);
+            $this->assertStringNotContainsString("/podcasts/sitemap-show-{$suffix}", $xml);
+            $this->assertStringNotContainsString(
                 "/podcasts/sitemap-show-{$suffix}/sitemap-episode-{$suffix}",
                 $xml
             );
@@ -314,7 +314,7 @@ class SitemapServiceTest extends TestCase
         $this->assertStringNotContainsString('<url>', $xml);
     }
 
-    public function test_generateForTenant_includes_blog_posts(): void
+    public function test_generateForTenant_includes_published_blog_posts(): void
     {
         // Blog data lives in the `posts` table (not `blog_posts`)
         DB::table('posts')->insertOrIgnore([
@@ -387,7 +387,7 @@ class SitemapServiceTest extends TestCase
         $this->assertStringNotContainsString('placeholder-ipsum-sitemap', $xml);
     }
 
-    public function test_generateForTenant_includes_active_listings(): void
+    public function test_generateForTenant_excludes_authenticated_active_listings(): void
     {
         $id = DB::table('listings')->insertGetId([
             'tenant_id' => $this->testTenantId,
@@ -401,7 +401,7 @@ class SitemapServiceTest extends TestCase
 
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
-        $this->assertStringContainsString("/listings/{$id}", $xml);
+        $this->assertStringNotContainsString("/listings/{$id}", $xml);
     }
 
     public function test_generateForTenant_excludes_expired_listings(): void
@@ -422,10 +422,10 @@ class SitemapServiceTest extends TestCase
         $this->assertStringNotContainsString("/listings/{$id}", $xml);
     }
 
-    // Content types are now public (routes moved outside ProtectedRoute)
-    // and included in the sitemap.
+    // Member-authored content types require authentication and stay out of the
+    // public sitemap even when their records use a historical "public" flag.
 
-    public function test_generateForTenant_includes_public_groups(): void
+    public function test_generateForTenant_excludes_authenticated_groups(): void
     {
         // getGroupUrls() selects public + active groups for the tenant. The clean
         // CI DB has none, so seed one to exercise the per-group URL path.
@@ -441,25 +441,24 @@ class SitemapServiceTest extends TestCase
 
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
-        $this->assertStringContainsString("/groups/{$id}", $xml);
+        $this->assertStringNotContainsString("/groups/{$id}", $xml);
     }
 
-    public function test_generateForTenant_includes_events_listing(): void
+    public function test_generateForTenant_excludes_events_listing(): void
     {
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
-        $this->assertStringContainsString('/events', $xml);
+        $this->assertStringNotContainsString('/events', $xml);
     }
 
-    public function test_generateForTenant_includes_kb_articles(): void
+    public function test_generateForTenant_excludes_knowledge_base_routes(): void
     {
         Cache::flush();
         $xml = $this->service->generateForTenant($this->testTenantId);
-        // KB listing page should be present
-        $this->assertStringContainsString('/kb', $xml);
+        $this->assertStringNotContainsString('/kb', $xml);
     }
 
-    public function test_generateForTenant_includes_volunteer_organisations_when_volunteering_enabled(): void
+    public function test_generateForTenant_excludes_volunteer_organisations_when_volunteering_enabled(): void
     {
         [$tenantId, $userId] = $this->seedSitemapTenant([
             'volunteering' => true,
@@ -470,8 +469,8 @@ class SitemapServiceTest extends TestCase
         Cache::flush();
         $xml = $this->service->generateForTenant($tenantId);
 
-        $this->assertStringContainsString('/organisations', $xml);
-        $this->assertStringContainsString("/organisations/{$orgId}", $xml);
+        $this->assertStringNotContainsString('/organisations', $xml);
+        $this->assertStringNotContainsString("/organisations/{$orgId}", $xml);
     }
 
     public function test_generateForTenant_excludes_volunteer_organisations_when_volunteering_disabled(): void
@@ -489,7 +488,7 @@ class SitemapServiceTest extends TestCase
         $this->assertStringNotContainsString("/organisations/{$orgId}", $xml);
     }
 
-    public function test_generateForTenant_includes_only_public_volunteer_opportunities(): void
+    public function test_generateForTenant_excludes_all_volunteer_opportunities(): void
     {
         [$tenantId, $userId] = $this->seedSitemapTenant(['volunteering' => true]);
         $activeOrgId = $this->seedVolunteerOrganization($tenantId, $userId, 'approved');
@@ -501,47 +500,73 @@ class SitemapServiceTest extends TestCase
         Cache::flush();
         $xml = $this->service->generateForTenant($tenantId);
 
-        $this->assertStringContainsString("/volunteering/opportunities/{$activeOpportunityId}", $xml);
+        $this->assertStringNotContainsString("/volunteering/opportunities/{$activeOpportunityId}", $xml);
         $this->assertStringNotContainsString("/volunteering/opportunities/{$pendingOrgOpportunityId}", $xml);
         $this->assertStringNotContainsString("/volunteering/opportunities/{$closedOpportunityId}", $xml);
     }
 
     public function test_clearCache_invalidates_override_base_url_tenant_sitemap_variants(): void
     {
-        [$tenantId, $userId] = $this->seedSitemapTenant(['volunteering' => true]);
+        [$tenantId] = $this->seedSitemapTenant([]);
         $overrideBaseUrl = 'https://sitemap-variant.example.test';
+        $slug = 'sitemap-cache-page-' . strtolower(str_replace('.', '', uniqid('', true)));
 
         Cache::flush();
         $before = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
-        $orgId = $this->seedVolunteerOrganization($tenantId, $userId, 'active');
-        $stale = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
+        $pageId = DB::table('pages')->insertGetId([
+            'tenant_id' => $tenantId,
+            'title' => 'Sitemap cache page',
+            'slug' => $slug,
+            'content' => 'Public CMS cache test',
+            'is_published' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
-        $this->assertSame($before, $stale);
+        try {
+            $stale = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
+            $this->assertSame($before, $stale);
 
-        $this->service->clearCache($tenantId);
-        $fresh = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
+            $this->service->clearCache($tenantId);
+            $fresh = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
 
-        $this->assertStringContainsString("/organisations/{$orgId}", $fresh);
+            $this->assertStringContainsString("/page/{$slug}", $fresh);
+        } finally {
+            DB::table('pages')->where('id', $pageId)->delete();
+        }
     }
 
     public function test_runtime_force_fresh_sitemap_bypasses_cached_tenant_variant(): void
     {
-        [$tenantId, $userId] = $this->seedSitemapTenant(['volunteering' => true]);
+        [$tenantId] = $this->seedSitemapTenant([]);
         $overrideBaseUrl = 'https://fresh-sitemap.example.test';
+        $slug = 'fresh-sitemap-page-' . strtolower(str_replace('.', '', uniqid('', true)));
 
         Cache::flush();
         $before = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
-        $orgId = $this->seedVolunteerOrganization($tenantId, $userId, 'active');
+        $pageId = DB::table('pages')->insertGetId([
+            'tenant_id' => $tenantId,
+            'title' => 'Fresh sitemap page',
+            'slug' => $slug,
+            'content' => 'Public CMS fresh-cache test',
+            'is_published' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
         $this->assertSame($before, $this->service->generateForTenant($tenantId, $overrideBaseUrl));
 
-        config(['prerender.runtime_force_fresh_sitemap' => true]);
         try {
-            $fresh = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
-        } finally {
-            config(['prerender.runtime_force_fresh_sitemap' => false]);
-        }
+            config(['prerender.runtime_force_fresh_sitemap' => true]);
+            try {
+                $fresh = $this->service->generateForTenant($tenantId, $overrideBaseUrl);
+            } finally {
+                config(['prerender.runtime_force_fresh_sitemap' => false]);
+            }
 
-        $this->assertStringContainsString("/organisations/{$orgId}", $fresh);
+            $this->assertStringContainsString("/page/{$slug}", $fresh);
+        } finally {
+            DB::table('pages')->where('id', $pageId)->delete();
+        }
     }
 
     public function test_generateForTenant_excludes_profiles(): void

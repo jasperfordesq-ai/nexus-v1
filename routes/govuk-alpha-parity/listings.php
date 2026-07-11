@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 use App\Http\Controllers\GovukAlpha\AlphaController;
+use App\Http\Controllers\GovukAlpha\Middleware\RequireAccessibleAuthentication;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 | /listings/{id} detail route, so there is no wildcard collision.
 */
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 Route::get('/listings/{id}/analytics', [AlphaController::class, 'listingsAnalytics'])
     ->whereNumber('id')
     ->name('listings.analytics');
@@ -40,3 +42,4 @@ Route::post('/listings/{id}/comments', [AlphaController::class, 'listingsStoreCo
     ->whereNumber('id')
     ->middleware('throttle:20,1')
     ->name('listings.comments.store');
+});

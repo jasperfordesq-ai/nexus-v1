@@ -207,10 +207,10 @@ class PrerenderPlanRoutesTest extends TestCase
                    ?: 'app.project-nexus.ie';
         $prefix  = '/' . self::TENANT_SLUG;
 
-        // Sitemap includes /about (duplicate) and /blog/post-1 (new).
+        // Sitemap includes /about (duplicate) and a public CMS page (new).
         $sitemapXml = "<?xml version=\"1.0\"?><urlset>"
             . "<url><loc>https://{$appHost}{$prefix}/about</loc></url>"
-            . "<url><loc>https://{$appHost}{$prefix}/blog/post-1</loc></url>"
+            . "<url><loc>https://{$appHost}{$prefix}/page/post-1</loc></url>"
             . "</urlset>";
 
         $this->sitemapMock->shouldReceive('generateForTenant')->andReturn($sitemapXml);
@@ -222,7 +222,41 @@ class PrerenderPlanRoutesTest extends TestCase
         $routes = $row['routes'];
         // /about must appear exactly once (dedup).
         $this->assertSame(1, count(array_filter($routes, fn ($r) => $r === '/about')));
-        $this->assertContains('/blog/post-1', $routes);
+        $this->assertContains('/page/post-1', $routes);
+    }
+
+    public function test_public_blog_detail_from_sitemap_is_included_in_plan(): void
+    {
+        $this->prerenderMock->shouldReceive('routesForTenant')->andReturn(['/', '/blog']);
+
+        $appHost = parse_url((string) env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST)
+            ?: 'app.project-nexus.ie';
+        $prefix = '/' . self::TENANT_SLUG;
+        $this->sitemapMock->shouldReceive('generateForTenant')->andReturn(
+            "<urlset><url><loc>https://{$appHost}{$prefix}/blog/public-editorial-post</loc></url></urlset>"
+        );
+
+        $decoded = $this->callAndDecode(['--tenant' => self::TENANT_SLUG]);
+
+        $this->assertContains('/blog', $decoded['tenants'][0]['routes'] ?? []);
+        $this->assertContains('/blog/public-editorial-post', $decoded['tenants'][0]['routes'] ?? []);
+    }
+
+    public function test_sitemap_authenticated_route_fails_closed(): void
+    {
+        $this->prerenderMock->shouldReceive('routesForTenant')->andReturn(['/']);
+
+        $appHost = parse_url((string) env('FRONTEND_URL', 'https://app.project-nexus.ie'), PHP_URL_HOST)
+            ?: 'app.project-nexus.ie';
+        $prefix = '/' . self::TENANT_SLUG;
+        $this->sitemapMock->shouldReceive('generateForTenant')->andReturn(
+            "<urlset><url><loc>https://{$appHost}{$prefix}/events/123</loc></url></urlset>"
+        );
+
+        $exit = Artisan::call('prerender:plan-routes', ['--tenant' => self::TENANT_SLUG]);
+
+        $this->assertSame(\Illuminate\Console\Command::FAILURE, $exit);
+        $this->assertStringContainsString('route requires authentication', Artisan::output());
     }
 
     // =========================================================================
@@ -269,7 +303,7 @@ class PrerenderPlanRoutesTest extends TestCase
         $prefix   = '/' . self::TENANT_SLUG;
         $urlParts = '';
         for ($i = 1; $i <= 10; $i++) {
-            $urlParts .= "<url><loc>https://{$appHost}{$prefix}/blog/post-{$i}</loc></url>";
+            $urlParts .= "<url><loc>https://{$appHost}{$prefix}/page/post-{$i}</loc></url>";
         }
         $sitemapXml = "<?xml version=\"1.0\"?><urlset>{$urlParts}</urlset>";
 

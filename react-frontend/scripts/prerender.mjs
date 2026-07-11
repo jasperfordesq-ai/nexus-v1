@@ -57,8 +57,6 @@ const PUBLIC_ROUTES = [
   '/faq',
   '/contact',
   '/help',
-  '/explore',
-  '/listings',
   '/blog',
   '/terms',
   '/privacy',
@@ -85,15 +83,13 @@ const PUBLIC_ROUTES = [
   '/developers/auth',
   '/developers/endpoints',
   '/developers/webhooks',
-  '/resources',
-  '/kb',
   '/coupons',
 ];
 
+// Published blog articles use an account-free public projection and are the
+// only dynamic feature URLs this build-time sitemap fallback may select.
 const DYNAMIC_ROUTE_PATTERNS = [
   /^\/(?:[a-z0-9-]+\/)?blog\/[^/?#]+$/i,
-  /^\/(?:[a-z0-9-]+\/)?listings\/[^/?#]+$/i,
-  /^\/(?:[a-z0-9-]+\/)?groups\/[^/?#]+$/i,
 ];
 
 function shouldSkipPrerender() {

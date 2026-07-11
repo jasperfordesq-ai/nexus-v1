@@ -46,6 +46,8 @@ class EventService
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $when = $filters['when'] ?? 'upcoming';
         $cursor = $filters['cursor'] ?? null;
+        $viewerId = !empty($filters['viewer_id']) ? (int) $filters['viewer_id'] : null;
+        $tenantId = TenantContext::getId();
 
         $query = Event::query()
             ->with([
@@ -56,6 +58,45 @@ class EventService
             ->where(function (Builder $q) {
                 $q->whereNull('status')->orWhere('status', 'active');
             });
+
+        if (!self::isTenantAdmin($viewerId, $tenantId)) {
+            $query->where(function (Builder $visibility) use ($viewerId, $tenantId) {
+                $visibility->whereNull('events.group_id')
+                    ->orWhereExists(function ($group) use ($tenantId) {
+                        $group->selectRaw('1')
+                            ->from('groups as visible_groups')
+                            ->whereColumn('visible_groups.id', 'events.group_id')
+                            ->where('visible_groups.tenant_id', $tenantId)
+                            ->where(function ($status) {
+                                $status->whereNull('visible_groups.status')
+                                    ->orWhere('visible_groups.status', 'active');
+                            })
+                            ->where(function ($audience) {
+                                $audience->whereNull('visible_groups.visibility')
+                                    ->orWhere('visible_groups.visibility', 'public');
+                            });
+                    });
+
+                if ($viewerId !== null) {
+                    $visibility->orWhere('events.user_id', $viewerId)
+                        ->orWhereExists(function ($ownedGroup) use ($tenantId, $viewerId) {
+                            $ownedGroup->selectRaw('1')
+                                ->from('groups as owned_groups')
+                                ->whereColumn('owned_groups.id', 'events.group_id')
+                                ->where('owned_groups.tenant_id', $tenantId)
+                                ->where('owned_groups.owner_id', $viewerId);
+                        })
+                        ->orWhereExists(function ($membership) use ($tenantId, $viewerId) {
+                            $membership->selectRaw('1')
+                                ->from('group_members as event_group_members')
+                                ->whereColumn('event_group_members.group_id', 'events.group_id')
+                                ->where('event_group_members.tenant_id', $tenantId)
+                                ->where('event_group_members.user_id', $viewerId)
+                                ->where('event_group_members.status', 'active');
+                        });
+                }
+            });
+        }
 
         if ($when === 'upcoming') {
             $query->where('start_time', '>=', now());
@@ -253,7 +294,7 @@ class EventService
     }
 
     /**
-     * Get a single event by ID with attendees.
+     * Get a single event by ID without embedding attendee identities.
      */
     public static function getById(int $id, ?int $currentUserId = null): ?array
     {
@@ -263,11 +304,15 @@ class EventService
                 'user:id,first_name,last_name,organization_name,profile_type,avatar_url',
                 'category',
                 'group',
-                'rsvps.user:id,first_name,last_name,avatar_url',
             ])
             ->find($id);
 
-        if (! $event) {
+        $tenantId = TenantContext::getId();
+        if (! $event || !self::canViewEventGroup(
+            $event->group_id !== null ? (int) $event->group_id : null,
+            $currentUserId,
+            $tenantId
+        )) {
             return null;
         }
 
@@ -285,8 +330,18 @@ class EventService
                 'avatar_url' => $eventUser->avatar_url,
             ];
         }
-        $goingCount = $event->rsvps->where('status', 'going')->count();
-        $interestedCount = $event->rsvps->where('status', 'interested')->count();
+        // Counts remain useful on event detail, but RSVP rows and user
+        // relationships are deliberately never serialized into the event DTO.
+        unset($data['rsvps']);
+        $rsvpCounts = DB::table('event_rsvps')
+            ->where('event_id', $id)
+            ->where('tenant_id', $tenantId)
+            ->whereIn('status', ['going', 'interested'])
+            ->selectRaw('status, COUNT(*) AS aggregate')
+            ->groupBy('status')
+            ->pluck('aggregate', 'status');
+        $goingCount = (int) ($rsvpCounts['going'] ?? 0);
+        $interestedCount = (int) ($rsvpCounts['interested'] ?? 0);
         $maxAttendees = $event->max_attendees;
 
         // Frontend field names (with legacy aliases)
@@ -298,15 +353,16 @@ class EventService
         $data['is_full'] = $maxAttendees ? ($goingCount >= $maxAttendees) : false;
 
         if ($currentUserId) {
-            $data['my_rsvp'] = $event->rsvps
+            $data['my_rsvp'] = DB::table('event_rsvps')
+                ->where('event_id', $id)
+                ->where('tenant_id', $tenantId)
                 ->where('user_id', $currentUserId)
-                ->first()?->status;
+                ->value('status');
         }
 
         // Recurring-series metadata + upcoming dates so the detail page can show
         // the full schedule that the collapsed list card links through to.
         if (! empty($event->is_recurring_template) || ! empty($event->parent_event_id)) {
-            $tenantId = \App\Core\TenantContext::getId();
             $rootId = (int) ($event->parent_event_id ?? $event->id);
             $data['is_series'] = true;
 
@@ -1044,7 +1100,7 @@ class EventService
 
         // Roster privacy: only organizers/admins or fellow RSVPed attendees may
         // enumerate who is going to an event.
-        if ($viewerId !== null && !self::canViewEventRoster($eventId, $viewerId, $tenantId)) {
+        if ($viewerId === null || !self::canViewEventRoster($eventId, $viewerId, $tenantId)) {
             return [
                 'items' => [],
                 'cursor' => null,
@@ -1072,7 +1128,7 @@ class EventService
             "SELECT r.id as rsvp_id, r.user_id, r.status, r.created_at as rsvp_at,
                    u.name, u.first_name, u.last_name, u.avatar_url
             FROM event_rsvps r
-            JOIN users u ON r.user_id = u.id
+             JOIN users u ON r.user_id = u.id AND u.tenant_id = r.tenant_id AND u.status = 'active'
             WHERE r.event_id = ? AND {$statusSql} AND r.tenant_id = ?{$cursorSql}
             ORDER BY r.id ASC LIMIT ?",
             $params
@@ -1114,11 +1170,21 @@ class EventService
      *
      * @return array{items: array, has_more: bool}
      */
-    public static function getNearby(float $lat, float $lon, array $filters = []): array
+    public static function getNearby(
+        float $lat,
+        float $lon,
+        array $filters = [],
+        ?int $viewerId = null
+    ): array
     {
         $radiusKm = (float) ($filters['radius_km'] ?? 25);
         $limit = min((int) ($filters['limit'] ?? 20), 100);
         $tenantId = \App\Core\TenantContext::getId();
+        [$groupVisibilitySql, $groupVisibilityBindings] = self::eventGroupVisibilitySql(
+            'e',
+            $viewerId,
+            $tenantId
+        );
 
         $query = "
             SELECT e.id, e.title, e.description, e.location, e.latitude, e.longitude,
@@ -1135,18 +1201,23 @@ class EventService
                        sin(radians(?)) * sin(radians(e.latitude))
                    )) AS distance_km
             FROM events e
-            JOIN users u ON e.user_id = u.id
+            JOIN users u ON e.user_id = u.id AND u.tenant_id = e.tenant_id AND u.status = 'active'
             LEFT JOIN categories c ON e.category_id = c.id
             WHERE e.tenant_id = ?
               AND e.latitude IS NOT NULL AND e.longitude IS NOT NULL
               AND e.start_time >= NOW()
               AND (e.status IS NULL OR e.status = 'active')
+              {$groupVisibilitySql}
             HAVING distance_km <= ?
             ORDER BY distance_km ASC
             LIMIT ?
         ";
 
-        $params = [$lat, $lon, $lat, $tenantId, $radiusKm, $limit + 1];
+        $params = array_merge(
+            [$lat, $lon, $lat, $tenantId],
+            $groupVisibilityBindings,
+            [$radiusKm, $limit + 1]
+        );
 
         if (!empty($filters['category_id'])) {
             // Rebuild with category filter injected before HAVING
@@ -1165,18 +1236,23 @@ class EventService
                            sin(radians(?)) * sin(radians(e.latitude))
                        )) AS distance_km
                 FROM events e
-                JOIN users u ON e.user_id = u.id
+                JOIN users u ON e.user_id = u.id AND u.tenant_id = e.tenant_id AND u.status = 'active'
                 LEFT JOIN categories c ON e.category_id = c.id
                 WHERE e.tenant_id = ?
                   AND e.latitude IS NOT NULL AND e.longitude IS NOT NULL
                   AND e.start_time >= NOW()
                   AND (e.status IS NULL OR e.status = 'active')
+                  {$groupVisibilitySql}
                   AND e.category_id = ?
                 HAVING distance_km <= ?
                 ORDER BY distance_km ASC
                 LIMIT ?
             ";
-            $params = [$lat, $lon, $lat, $tenantId, (int) $filters['category_id'], $radiusKm, $limit + 1];
+            $params = array_merge(
+                [$lat, $lon, $lat, $tenantId],
+                $groupVisibilityBindings,
+                [(int) $filters['category_id'], $radiusKm, $limit + 1]
+            );
         }
 
         $rows = DB::select($query, $params);
@@ -1564,9 +1640,119 @@ class EventService
         }
 
         return DB::selectOne(
-            "SELECT 1 FROM event_rsvps WHERE event_id = ? AND user_id = ? AND tenant_id = ? LIMIT 1",
+            "SELECT 1 FROM event_rsvps
+             WHERE event_id = ? AND user_id = ? AND tenant_id = ?
+               AND status IN ('going', 'interested', 'invited', 'attended')
+             LIMIT 1",
             [$eventId, $viewerId, $tenantId]
         ) !== null;
+    }
+
+    /**
+     * Build a tenant-scoped private-group audience clause for raw event queries.
+     *
+     * @return array{0: string, 1: array<int, int>}
+     */
+    private static function eventGroupVisibilitySql(
+        string $eventAlias,
+        ?int $viewerId,
+        int $tenantId
+    ): array {
+        if (self::isTenantAdmin($viewerId, $tenantId)) {
+            return ['', []];
+        }
+
+        $sql = "AND (
+            {$eventAlias}.group_id IS NULL
+            OR EXISTS (
+                SELECT 1 FROM groups visible_event_groups
+                WHERE visible_event_groups.id = {$eventAlias}.group_id
+                  AND visible_event_groups.tenant_id = ?
+                  AND (visible_event_groups.status IS NULL OR visible_event_groups.status = 'active')
+                  AND (visible_event_groups.visibility IS NULL OR visible_event_groups.visibility = 'public')
+            )";
+        $bindings = [$tenantId];
+
+        if ($viewerId !== null) {
+            $sql .= "
+            OR {$eventAlias}.user_id = ?
+            OR EXISTS (
+                SELECT 1 FROM groups owned_event_groups
+                WHERE owned_event_groups.id = {$eventAlias}.group_id
+                  AND owned_event_groups.tenant_id = ?
+                  AND owned_event_groups.owner_id = ?
+            )
+            OR EXISTS (
+                SELECT 1 FROM group_members visible_event_memberships
+                WHERE visible_event_memberships.group_id = {$eventAlias}.group_id
+                  AND visible_event_memberships.tenant_id = ?
+                  AND visible_event_memberships.user_id = ?
+                  AND visible_event_memberships.status = 'active'
+            )";
+            array_push($bindings, $viewerId, $tenantId, $viewerId, $tenantId, $viewerId);
+        }
+
+        $sql .= ')';
+
+        return [$sql, $bindings];
+    }
+
+    private static function canViewEventGroup(?int $groupId, ?int $viewerId, int $tenantId): bool
+    {
+        if ($groupId === null) {
+            return true;
+        }
+
+        $group = DB::table('groups')
+            ->where('id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->where(function ($query) {
+                $query->whereNull('status')->orWhere('status', 'active');
+            })
+            ->select(['id', 'owner_id', 'visibility'])
+            ->first();
+
+        if (!$group) {
+            return false;
+        }
+
+        if (($group->visibility ?? 'public') === 'public') {
+            return true;
+        }
+
+        if ($viewerId === null) {
+            return false;
+        }
+
+        if ((int) $group->owner_id === $viewerId || self::isTenantAdmin($viewerId, $tenantId)) {
+            return true;
+        }
+
+        return DB::table('group_members')
+            ->where('group_id', $groupId)
+            ->where('tenant_id', $tenantId)
+            ->where('user_id', $viewerId)
+            ->where('status', 'active')
+            ->exists();
+    }
+
+    private static function isTenantAdmin(?int $userId, int $tenantId): bool
+    {
+        if ($userId === null) {
+            return false;
+        }
+
+        $user = DB::table('users')
+            ->where('id', $userId)
+            ->where('tenant_id', $tenantId)
+            ->select(['role', 'is_super_admin', 'is_tenant_super_admin'])
+            ->first();
+
+        return $user !== null && (
+            in_array($user->role ?? '', ['admin', 'tenant_admin', 'super_admin', 'god'], true)
+            || !empty($user->is_super_admin)
+            || !empty($user->is_tenant_super_admin)
+        );
     }
 
     private static function canManageEventAttendance(int $eventId, int $userId, int $tenantId): bool
@@ -1602,7 +1788,7 @@ class EventService
     {
         $tenantId = \App\Core\TenantContext::getId();
 
-        if ($viewerId !== null && !self::canManageEventAttendance($eventId, $viewerId, $tenantId)) {
+        if ($viewerId === null || !self::canManageEventAttendance($eventId, $viewerId, $tenantId)) {
             return null;
         }
 

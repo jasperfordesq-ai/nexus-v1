@@ -6,13 +6,19 @@
 
 namespace Tests\Laravel\Unit\Services;
 
+use App\Core\TenantContext;
 use App\Models\MarketplaceSellerProfile;
+use App\Models\User;
 use App\Services\MarketplaceSellerService;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Mockery;
 use Tests\Laravel\TestCase;
 
 class MarketplaceSellerServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     // ── update: copies only whitelisted fields ───────────────────────
 
     public function test_update_writes_only_whitelisted_fields_to_profile(): void
@@ -83,5 +89,33 @@ class MarketplaceSellerServiceTest extends TestCase
         foreach ($data as $k => $v) {
             $this->assertSame($v, $profile->{$k}, "Field {$k} was not copied");
         }
+    }
+
+    public function test_public_profile_never_falls_back_to_member_account_name(): void
+    {
+        $tenantId = TenantContext::getId();
+        $user = User::factory()->forTenant($tenantId)->create([
+            'first_name' => 'Private',
+            'last_name' => 'Member',
+            'status' => 'active',
+        ]);
+        $profileId = DB::table('marketplace_seller_profiles')->insertGetId([
+            'tenant_id' => $tenantId,
+            'user_id' => $user->id,
+            'display_name' => null,
+            'seller_type' => 'private',
+            'is_suspended' => false,
+            'joined_marketplace_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        TenantContext::reset();
+        TenantContext::setById($tenantId);
+        $this->assertNull(MarketplaceSellerService::getPublicProfile($profileId));
+        $this->assertSame(
+            'Private Member',
+            MarketplaceSellerService::getMemberProfile($profileId)['display_name'] ?? null
+        );
     }
 }

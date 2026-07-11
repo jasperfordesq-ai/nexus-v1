@@ -9,6 +9,7 @@ namespace App\Http\Controllers\GovukAlpha;
 use App\Core\TenantContext;
 use App\Core\Validator;
 use App\Http\Controllers\Api\CoreController;
+use App\Http\Controllers\GovukAlpha\Support\AccessibleIdentityResolver;
 use App\Models\Category;
 use App\Models\ListingImage;
 use App\Models\User;
@@ -27,7 +28,6 @@ use App\Services\OnboardingConfigService;
 use App\Services\RegistrationService;
 use App\Services\SearchService;
 use App\Services\SocialNotificationService;
-use App\Services\TokenService;
 use App\Services\UserService;
 use App\Services\VolunteerService;
 use App\Support\FeedItemTables;
@@ -36,11 +36,9 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use Laravel\Sanctum\PersonalAccessToken;
 
 class AlphaController extends Controller
 {
@@ -203,7 +201,7 @@ class AlphaController extends Controller
             }
 
             return redirect()
-                ->route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug])
+                ->intended(route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]))
                 ->withCookie(cookie(
                     'auth_token',
                     $token,
@@ -397,7 +395,7 @@ class AlphaController extends Controller
             }
 
             return redirect()
-                ->route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug])
+                ->intended(route('govuk-alpha.dashboard', ['tenantSlug' => $tenantSlug]))
                 ->withCookie(cookie('auth_token', $accessToken, 60 * 24 * 7, '/', null, $request->isSecure(), true, false, 'Lax'));
         }
 
@@ -1276,9 +1274,9 @@ class AlphaController extends Controller
     }
 
     /**
-     * RSS 2.0 feed of the community's recent published blog posts. Public and
-     * gated only on the blog feature. Registered before the /blog/{slug} route
-     * so "feed.xml" is never captured as a post slug.
+     * Public RSS 2.0 feed of the community's recent published blog posts. The
+     * route is registered before /blog/{slug}, so "feed.xml" is never captured
+     * as a post slug. Items use the author-free public BlogService projection.
      */
     public function blogFeed(Request $request, string $tenantSlug): Response
     {
@@ -11334,65 +11332,7 @@ class AlphaController extends Controller
 
     private function currentUserId(): ?int
     {
-        // Every branch resolves an identity to a validated tenant member: the id
-        // must belong to the current tenant, be active, and be approved (or an
-        // admin role). Without this, an identity established under another tenant
-        // (web guard / native session) would act under this tenant's URL slug,
-        // and a suspended/unapproved user with a live session would not be
-        // re-blocked. Mirrors the token branches below.
-        $user = Auth::user();
-        if ($user) {
-            return $this->validatedTenantUserId((int) $user->id);
-        }
-
-        if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['user_id'])) {
-            return $this->validatedTenantUserId((int) $_SESSION['user_id']);
-        }
-
-        $token = request()->bearerToken() ?: request()->cookie('auth_token');
-        if (!$token) {
-            return null;
-        }
-
-        try {
-            $payload = app(TokenService::class)->validateToken($token);
-            $userId = (int) ($payload['user_id'] ?? $payload['sub'] ?? 0);
-            if ($userId > 0) {
-                return $this->validatedTenantUserId($userId);
-            }
-        } catch (\Throwable) {
-            // Try Sanctum tokens below.
-        }
-
-        try {
-            $accessToken = PersonalAccessToken::findToken($token);
-            $tokenable = $accessToken?->tokenable;
-            if ($tokenable && isset($tokenable->id)) {
-                return $this->validatedTenantUserId((int) $tokenable->id);
-            }
-        } catch (\Throwable) {
-            return null;
-        }
-
-        return null;
-    }
-
-    private function validatedTenantUserId(int $userId): ?int
-    {
-        $user = DB::table('users')
-            ->where('id', $userId)
-            ->where('tenant_id', TenantContext::getId())
-            ->where('status', 'active')
-            ->where(function ($query) {
-                $query->where('is_approved', 1)
-                    ->orWhereIn('role', ['admin', 'tenant_admin', 'super_admin', 'god'])
-                    ->orWhere('is_tenant_super_admin', 1)
-                    ->orWhere('is_super_admin', 1)
-                    ->orWhere('is_god', 1);
-            })
-            ->first(['id']);
-
-        return $user ? (int) $user->id : null;
+        return app(AccessibleIdentityResolver::class)->userId(request());
     }
 
     private function profileForViewer(int $profileUserId, int $viewerId): ?array

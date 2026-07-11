@@ -81,6 +81,14 @@ class AccessibleCustomDomainRootTest extends TestCase
         $response->assertDontSee($this->slugPrefix());
     }
 
+    public function test_member_only_path_redirects_to_slug_less_login(): void
+    {
+        $response = $this->getOnAccessibleDomain('/listings');
+
+        $response->assertRedirectContains('/login?status=auth-required');
+        $this->assertStringNotContainsString($this->slugPrefix(), (string) $response->headers->get('Location'));
+    }
+
     public function test_slug_routes_still_carry_the_slug_without_a_custom_domain(): void
     {
         // Default (non-accessible) host → the canonical slug route still works and

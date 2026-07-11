@@ -64,12 +64,13 @@ class PrerenderServiceTest extends TestCase
         $this->assertSame([], $service->inventory(null, true));
     }
 
-    public function test_static_route_floor_matches_tenant_slug_and_effective_features(): void
+    public function test_static_route_floor_excludes_authenticated_feature_routes(): void
     {
         $service = new PrerenderService();
         $regular = (object) [
             'slug' => 'another-community',
             'features' => json_encode([
+                'blog' => true,
                 'marketplace' => true,
                 'courses' => true,
                 'podcasts' => true,
@@ -78,12 +79,15 @@ class PrerenderServiceTest extends TestCase
         ];
         $routes = $service->routesForTenant($regular);
 
-        $this->assertContains('/marketplace', $routes);
-        $this->assertContains('/courses', $routes);
-        $this->assertContains('/podcasts', $routes);
+        $this->assertNotContains('/marketplace', $routes);
+        $this->assertNotContains('/courses', $routes);
+        $this->assertNotContains('/podcasts', $routes);
         $this->assertNotContains('/marketplace/map', $routes);
         $this->assertNotContains('/development-status', $routes);
         $this->assertNotContains('/impact-report', $routes);
+        $this->assertContains('/blog', $routes);
+        $this->assertFalse(PrerenderService::routeRequiresAuthentication('/blog'));
+        $this->assertFalse(PrerenderService::routeRequiresAuthentication('/blog/public-post'));
 
         $hourRoutes = $service->routesForTenant((object) [
             'slug' => 'hour-timebank',
@@ -95,6 +99,11 @@ class PrerenderServiceTest extends TestCase
         $this->assertContains('/impact-summary', $hourRoutes);
         $this->assertContains('/impact-report', $hourRoutes);
         $this->assertContains('/strategic-plan', $hourRoutes);
+
+        foreach (['explore', 'listings', 'events', 'groups', 'jobs', 'volunteering', 'organisations', 'ideation', 'resources', 'kb', 'marketplace', 'courses', 'podcasts'] as $prefix) {
+            $this->assertTrue(PrerenderService::routeRequiresAuthentication("/{$prefix}"));
+            $this->assertNotContains("/{$prefix}", $routes);
+        }
     }
 
     public function test_inventory_lists_snapshot_with_age_staleness(): void
@@ -1169,10 +1178,13 @@ HTML;
         $service->enqueueJob($otherId, "/page/{$pageSlug}", false, false, null);
     }
 
-    public function test_tenant_scoped_blog_route_must_belong_to_that_tenant(): void
+    public function test_published_blog_route_is_prerenderable_only_for_its_tenant(): void
     {
         [$ownerId, $otherId] = $this->seedCmsTenantPair('blog-owner', 'blog-other');
         $slug = $this->seedBlogPost($ownerId);
+        DB::table('tenants')->whereIn('id', [$ownerId, $otherId])->update([
+            'features' => json_encode(['blog' => true]),
+        ]);
 
         $service = new PrerenderService();
         $jobId = $service->enqueueJob($ownerId, "/blog/{$slug}", false, false, null);
@@ -1180,7 +1192,6 @@ HTML;
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Route is not available for tenant');
-
         $service->enqueueJob($otherId, "/blog/{$slug}", false, false, null);
     }
 
@@ -1362,7 +1373,7 @@ HTML;
         );
     }
 
-    public function test_dynamic_blog_route_is_rejected_when_blog_feature_is_disabled(): void
+    public function test_dynamic_blog_route_requires_the_blog_feature(): void
     {
         [$tenantId] = $this->seedCmsTenantPair('disabled-blog-owner', 'disabled-blog-other');
         $postSlug = $this->seedBlogPost($tenantId);
@@ -1371,6 +1382,14 @@ HTML;
         ]);
 
         $this->assertFalse(
+            (new PrerenderService())->tenantRouteCanBePrerendered($tenantId, "/blog/{$postSlug}")
+        );
+
+        DB::table('tenants')->where('id', $tenantId)->update([
+            'features' => json_encode(['blog' => true]),
+        ]);
+
+        $this->assertTrue(
             (new PrerenderService())->tenantRouteCanBePrerendered($tenantId, "/blog/{$postSlug}")
         );
     }
@@ -1727,10 +1746,13 @@ HTML;
         $this->assertFileDoesNotExist($orphanPath);
     }
 
-    public function test_purge_unexpected_removes_cross_tenant_blog_snapshot(): void
+    public function test_purge_unexpected_retains_owned_public_blog_snapshot_only(): void
     {
         [$ownerId, , $ownerSlug, $otherSlug] = $this->seedCmsTenantPair('blog-clean-owner', 'blog-clean-other');
         $slug = $this->seedBlogPost($ownerId);
+        DB::table('tenants')->where('id', $ownerId)->update([
+            'features' => json_encode(['blog' => true]),
+        ]);
         $host = $this->frontendHost();
         $this->writeSnapshot("{$host}/{$ownerSlug}/blog/{$slug}/index.html", '<html><body>owner</body></html>');
         $this->writeSnapshot("{$host}/{$otherSlug}/blog/{$slug}/index.html", '<html><body>wrong tenant</body></html>');

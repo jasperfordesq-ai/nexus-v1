@@ -25,19 +25,7 @@ class CourseControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    /**
-     * Defensively reset auth + tenant state leaked by earlier tests in the full suite.
-     *
-     * Hypothesis for the polluted failure of test_members_only_course_detail_requires_authenticated_member:
-     * the test first requests a members-only course ANONYMOUSLY and asserts 404. The course
-     * detail endpoint uses optional auth (BaseApiController::getOptionalUserId →
-     * resolveSanctumUserOptionally → Auth::guard('sanctum')->user()). A stale Sanctum actingAs()
-     * user leaked from a prior test makes that "anonymous" request resolve as an authenticated
-     * member, so the members-only course is returned with 200 instead of the expected 404.
-     *
-     * forgetGuards() drops the leaked guard user so the anonymous request is genuinely anonymous,
-     * exactly as it is when this file runs on its own.
-     */
+    /** Defensively reset auth + tenant state leaked by earlier tests. */
     protected function setUp(): void
     {
         parent::setUp();
@@ -66,12 +54,7 @@ class CourseControllerTest extends TestCase
         return $user;
     }
 
-    /**
-     * Public course endpoints use optional auth, so exercise the same bearer
-     * token path the React API client sends for logged-in users.
-     *
-     * @return array<string,string>
-     */
+    /** @return array<string,string> */
     private function authHeaders(User $user): array
     {
         return ['Authorization' => 'Bearer ' . $user->createToken('courses-test')->plainTextToken];
@@ -110,22 +93,23 @@ class CourseControllerTest extends TestCase
     public function test_browse_returns_403_when_feature_disabled(): void
     {
         $this->enableCourses(false);
+        $this->authenticatedUser();
         $response = $this->apiGet('/v2/courses');
         $this->assertSame(403, $response->status());
     }
 
-    public function test_browse_public_smoke_when_enabled(): void
+    public function test_browse_requires_authentication_when_enabled(): void
     {
         $this->enableCourses(true);
         $response = $this->apiGet('/v2/courses');
-        $this->assertLessThan(500, $response->status());
+        $this->assertSame(401, $response->status());
     }
 
-    public function test_categories_public_smoke_when_enabled(): void
+    public function test_categories_require_authentication_when_enabled(): void
     {
         $this->enableCourses(true);
         $response = $this->apiGet('/v2/courses/categories');
-        $this->assertLessThan(500, $response->status());
+        $this->assertSame(401, $response->status());
     }
 
     public function test_create_requires_auth(): void
@@ -157,7 +141,7 @@ class CourseControllerTest extends TestCase
         $course = $this->publishedCourse(['visibility' => 'members']);
 
         $anonymous = $this->apiGet('/v2/courses/' . $course->slug);
-        $this->assertSame(404, $anonymous->status());
+        $this->assertSame(401, $anonymous->status());
 
         $memberUser = User::factory()->forTenant($this->testTenantId)->create([
             'status' => 'active',
@@ -187,7 +171,7 @@ class CourseControllerTest extends TestCase
         $this->linkCourseToGroup($course, $group);
 
         $anonymous = $this->apiGet('/v2/courses/' . $course->slug);
-        $this->assertSame(404, $anonymous->status());
+        $this->assertSame(401, $anonymous->status());
 
         $notMember = $this->apiGet('/v2/courses/' . $course->slug, $this->authHeaders($outsider));
         $this->assertSame(404, $notMember->status());

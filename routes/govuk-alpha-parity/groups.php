@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 use App\Http\Controllers\GovukAlpha\AlphaController;
+use App\Http\Controllers\GovukAlpha\Middleware\RequireAccessibleAuthentication;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\Route;
  * Every POST is throttled. Numeric route params use whereNumber().
  */
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // --- Invite members (owner/admin) ---
 Route::get('/groups/{id}/invite', [AlphaController::class, 'groupsInvite'])
     ->whereNumber('id')->name('groups.invite');
@@ -63,3 +65,4 @@ Route::post('/groups/{id}/announcements/{annId}/delete', [AlphaController::class
     ->whereNumber('id')->whereNumber('annId')->middleware('throttle:30,1')->name('groups.announcements.delete');
 Route::post('/groups/{id}/announcements/{annId}/pin', [AlphaController::class, 'groupsPinAnnouncement'])
     ->whereNumber('id')->whereNumber('annId')->middleware('throttle:30,1')->name('groups.announcements.pin');
+});

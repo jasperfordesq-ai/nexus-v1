@@ -115,7 +115,7 @@ class MarketplaceListingController extends BaseApiController
     }
 
     // =====================================================================
-    //  Browse / Search (public)
+    //  Browse / Search (authenticated)
     // =====================================================================
 
     /**
@@ -127,9 +127,8 @@ class MarketplaceListingController extends BaseApiController
     public function index(): JsonResponse
     {
         $this->ensureFeature();
+        $userId = $this->requireAuth();
         $this->rateLimit('marketplace_browse', 60, 60);
-
-        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
 
         $limit = $this->queryInt('limit', 20, 1, 100);
 
@@ -201,15 +200,14 @@ class MarketplaceListingController extends BaseApiController
     /**
      * GET /v2/marketplace/listings/{id} — Single listing detail.
      *
-     * Public endpoint. Increments view count. Returns full detail
+     * Authenticated endpoint. Increments view count. Returns full detail
      * including all images, seller info, and saved status.
      */
     public function show(int $id): JsonResponse
     {
         $this->ensureFeature();
+        $userId = $this->requireAuth();
         $this->rateLimit('marketplace_show', 60, 60);
-
-        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
 
         $listing = MarketplaceListingService::getById($id, $userId);
 
@@ -283,7 +281,7 @@ class MarketplaceListingController extends BaseApiController
             return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api_controllers_2.marketplace_listing.create_failed'), null, 500);
         }
 
-        $detail = MarketplaceListingService::getById($listing->id, $userId);
+        $detail = MarketplaceListingService::getByIdForOwner($listing->id, $userId);
 
         $meta = null;
         if ($listing->moderation_status === 'pending') {
@@ -343,7 +341,7 @@ class MarketplaceListingController extends BaseApiController
             return $this->respondWithError('SERVER_INTERNAL_ERROR', __('api_controllers_2.marketplace_listing.update_failed'), null, 500);
         }
 
-        $detail = MarketplaceListingService::getById($id, $userId);
+        $detail = MarketplaceListingService::getByIdForOwner($id, $userId);
 
         return $this->respondWithData($detail);
     }
@@ -662,7 +660,7 @@ class MarketplaceListingController extends BaseApiController
         $days = $this->inputInt('duration_days', 30, 1, 90);
 
         $updated = MarketplaceListingService::renew($listing, $days);
-        $detail = MarketplaceListingService::getById($updated->id, $userId);
+        $detail = MarketplaceListingService::getByIdForOwner($updated->id, $userId);
 
         return $this->respondWithData($detail);
     }
@@ -736,7 +734,7 @@ class MarketplaceListingController extends BaseApiController
     }
 
     // =====================================================================
-    //  Specialty Browse (public)
+    //  Specialty Browse (authenticated)
     // =====================================================================
 
     /**
@@ -747,6 +745,7 @@ class MarketplaceListingController extends BaseApiController
     public function nearby(): JsonResponse
     {
         $this->ensureFeature();
+        $this->requireAuth();
         $this->rateLimit('marketplace_browse', 60, 60);
 
         $lat = $this->query('latitude');
@@ -781,9 +780,8 @@ class MarketplaceListingController extends BaseApiController
     public function featured(): JsonResponse
     {
         $this->ensureFeature();
+        $userId = $this->requireAuth();
         $this->rateLimit('marketplace_browse', 60, 60);
-
-        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
         $limit = $this->queryInt('limit', 20, 1, 50);
 
         $result = MarketplaceListingService::getAll([
@@ -807,9 +805,8 @@ class MarketplaceListingController extends BaseApiController
     public function free(): JsonResponse
     {
         $this->ensureFeature();
+        $userId = $this->requireAuth();
         $this->rateLimit('marketplace_browse', 60, 60);
-
-        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
         $limit = $this->queryInt('limit', 20, 1, 100);
         $cursor = $this->query('cursor');
 
@@ -831,14 +828,13 @@ class MarketplaceListingController extends BaseApiController
     /**
      * GET /v2/marketplace/categories/{slug}/listings — Listings for a category slug.
      *
-     * Public, read-only browse endpoint for shadow-rendered category pages.
+     * Authenticated read-only browse endpoint.
      */
     public function categoryListings(string $slug): JsonResponse
     {
         $this->ensureFeature();
+        $userId = $this->requireAuth();
         $this->rateLimit('marketplace_browse', 60, 60);
-
-        $userId = $this->getOptionalUserId() ?? $this->resolveSanctumUserOptionally();
         $limit = $this->queryInt('limit', 20, 1, 100);
         $cursor = $this->query('cursor');
         $categoryId = DB::table('marketplace_categories')

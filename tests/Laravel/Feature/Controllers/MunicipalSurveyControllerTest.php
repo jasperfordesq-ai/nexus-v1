@@ -126,10 +126,17 @@ class MunicipalSurveyControllerTest extends TestCase
     {
         $this->requireSurveyTables();
         $this->setCaringCommunityFeature(false);
+        Sanctum::actingAs(User::factory()->forTenant($this->testTenantId)->create());
 
         $response = $this->apiGet('/v2/caring-community/surveys');
 
         $response->assertStatus(403);
         $response->assertJsonPath('errors.0.code', 'FEATURE_DISABLED');
+    }
+
+    public function test_member_survey_reads_require_authentication(): void
+    {
+        $this->apiGet('/v2/caring-community/surveys')->assertUnauthorized();
+        $this->apiGet('/v2/caring-community/surveys/1')->assertUnauthorized();
     }
 }

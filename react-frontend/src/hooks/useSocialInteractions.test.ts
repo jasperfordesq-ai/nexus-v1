@@ -31,6 +31,7 @@ const mockApi = api as unknown as {
 const defaultOptions = {
   targetType: 'post',
   targetId: 42,
+  enabled: true,
   initialLiked: false,
   initialLikesCount: 5,
   initialCommentsCount: 3,
@@ -78,6 +79,31 @@ describe('useSocialInteractions', () => {
       expect(result.current.comments).toEqual([]);
       expect(result.current.commentsLoaded).toBe(false);
       expect(result.current.commentsCount).toBe(3);
+    });
+  });
+
+  describe('disabled privacy boundary', () => {
+    it('does not issue comment, liker, mention, reaction, or write requests', async () => {
+      const { result } = renderHook(() => useSocialInteractions({ ...defaultOptions, enabled: false }));
+
+      await act(async () => {
+        await result.current.loadComments();
+        await result.current.loadLikers();
+        await result.current.searchMentions('member');
+        await result.current.toggleLike();
+        await result.current.submitComment('Comment');
+        await result.current.editComment(1, 'Edited');
+        await result.current.deleteComment(1);
+        await result.current.toggleReaction(1, 'like');
+        await result.current.shareToFeed('Share');
+      });
+
+      expect(mockApi.get).not.toHaveBeenCalled();
+      expect(mockApi.post).not.toHaveBeenCalled();
+      expect(mockApi.put).not.toHaveBeenCalled();
+      expect(mockApi.delete).not.toHaveBeenCalled();
+      expect(result.current.comments).toEqual([]);
+      expect(result.current.commentsLoaded).toBe(false);
     });
   });
 

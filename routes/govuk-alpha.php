@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 use App\Http\Controllers\GovukAlpha\AlphaController;
+use App\Http\Controllers\GovukAlpha\Middleware\RequireAccessibleAuthentication;
 use Illuminate\Support\Facades\Route;
 
 Route::pattern('tenantSlug', '[a-zA-Z0-9_-]+');
@@ -56,13 +57,17 @@ $alphaRoutes = function (bool $hostMode) {
 
         // Help centre, knowledge base and blog (native, server-rendered).
         Route::get('/help', [AlphaController::class, 'help'])->name('help');
-        Route::get('/kb', [AlphaController::class, 'kb'])->name('kb.index');
-        Route::get('/kb/{id}', [AlphaController::class, 'kbArticle'])->whereNumber('id')->name('kb.show');
+        // Published blog content is an intentional public SEO surface. The
+        // BlogService public projection omits the linked member account.
         Route::get('/blog', [AlphaController::class, 'blog'])->name('blog.index');
         Route::get('/blog/feed.xml', [AlphaController::class, 'blogFeed'])->name('blog.feed');
         Route::get('/blog/{slug}', [AlphaController::class, 'blogPost'])->where('slug', '[a-zA-Z0-9_-]+')->name('blog.show');
-        Route::post('/blog/{slug}/comments', [AlphaController::class, 'storeBlogComment'])->where('slug', '[a-zA-Z0-9_-]+')->middleware('throttle:20,1')->name('blog.comments.store');
-        Route::post('/blog/{slug}/like', [AlphaController::class, 'blogTogglePostLike'])->where('slug', '[a-zA-Z0-9_-]+')->middleware('throttle:60,1')->name('blog.like');
+        Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
+            Route::get('/kb', [AlphaController::class, 'kb'])->name('kb.index');
+            Route::get('/kb/{id}', [AlphaController::class, 'kbArticle'])->whereNumber('id')->name('kb.show');
+            Route::post('/blog/{slug}/comments', [AlphaController::class, 'storeBlogComment'])->where('slug', '[a-zA-Z0-9_-]+')->middleware('throttle:20,1')->name('blog.comments.store');
+            Route::post('/blog/{slug}/like', [AlphaController::class, 'blogTogglePostLike'])->where('slug', '[a-zA-Z0-9_-]+')->middleware('throttle:60,1')->name('blog.like');
+        });
         Route::get('/login', [AlphaController::class, 'login'])->name('login');
         Route::post('/login', [AlphaController::class, 'storeLogin'])->middleware('throttle:30,1')->name('login.store');
         Route::post('/login/resend-verification', [AlphaController::class, 'resendVerification'])->middleware('throttle:5,5')->name('login.resend');
@@ -85,6 +90,9 @@ $alphaRoutes = function (bool $hostMode) {
         Route::get('/onboarding/{step}', [AlphaController::class, 'onboardingStep'])->where('step', '[a-z]+')->name('onboarding.step');
         Route::post('/onboarding/avatar', [AlphaController::class, 'onboardingAvatar'])->middleware('throttle:20,1')->name('onboarding.avatar');
         Route::post('/onboarding/{step}', [AlphaController::class, 'onboardingStepPost'])->where('step', '[a-z]+')->middleware('throttle:30,1')->name('onboarding.step.post');
+        // Community content is member-only. This centralized boundary runs
+        // before controllers/services can load any account-derived identity.
+        Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
         Route::get('/events', [AlphaController::class, 'events'])->name('events.index');
         Route::get('/events/new', [AlphaController::class, 'createEvent'])->name('events.create');
         Route::post('/events/new', [AlphaController::class, 'storeEvent'])->middleware('throttle:10,1')->name('events.store');
@@ -152,6 +160,7 @@ $alphaRoutes = function (bool $hostMode) {
         Route::get('/listings/{listingId}/exchange-request', [AlphaController::class, 'requestExchange'])->whereNumber('listingId')->name('exchanges.request');
         Route::post('/listings/{listingId}/exchange-request', [AlphaController::class, 'storeExchangeRequest'])->middleware('throttle:20,1')->whereNumber('listingId')->name('exchanges.request.store');
         Route::get('/listings/{id}', [AlphaController::class, 'listing'])->whereNumber('id')->name('listings.show');
+        });
         Route::get('/exchanges', [AlphaController::class, 'exchanges'])->name('exchanges.index');
         Route::get('/exchanges/{id}', [AlphaController::class, 'exchange'])->whereNumber('id')->name('exchanges.show');
         Route::post('/exchanges/{id}', [AlphaController::class, 'storeExchangeAction'])->middleware('throttle:30,1')->whereNumber('id')->name('exchanges.action.store');
@@ -212,9 +221,12 @@ $alphaRoutes = function (bool $hostMode) {
         Route::get('/activity', [AlphaController::class, 'activity'])->name('activity');
         Route::get('/reviews', [AlphaController::class, 'reviews'])->name('reviews.index');
         Route::post('/reviews', [AlphaController::class, 'storeReview'])->middleware('throttle:10,1')->name('reviews.store');
-        Route::get('/explore', [AlphaController::class, 'explore'])->name('explore');
+        Route::get('/explore', [AlphaController::class, 'explore'])
+            ->middleware(RequireAccessibleAuthentication::class)
+            ->name('explore');
         Route::get('/search', [AlphaController::class, 'search'])->name('search');
         Route::get('/skills', [AlphaController::class, 'skills'])->name('skills.index');
+        Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
         Route::get('/groups', [AlphaController::class, 'groups'])->name('groups.index');
         // Static segments BEFORE the {id} catch-all so /groups/new is not swallowed.
         Route::get('/groups/new', [AlphaController::class, 'createGroup'])->name('groups.create');
@@ -239,6 +251,7 @@ $alphaRoutes = function (bool $hostMode) {
         // Read tabs (events + feed) render inline on groups.show; this is the
         // members-only compose endpoint for the group feed.
         Route::post('/groups/{id}/feed', [AlphaController::class, 'storeGroupFeedPost'])->whereNumber('id')->middleware('throttle:30,1')->name('groups.feed.store');
+        });
         Route::get('/goals', [AlphaController::class, 'goals'])->name('goals.index');
         Route::post('/goals', [AlphaController::class, 'storeGoal'])->middleware('throttle:15,1')->name('goals.store');
         // Static goal sub-routes declared before /goals/{id} so they are never
@@ -256,12 +269,17 @@ $alphaRoutes = function (bool $hostMode) {
         Route::post('/goals/{id}/buddy-nudge', [AlphaController::class, 'buddyNudge'])->whereNumber('id')->middleware('throttle:10,1')->name('goals.buddy-nudge');
         Route::post('/goals/{id}/progress', [AlphaController::class, 'incrementGoal'])->whereNumber('id')->middleware('throttle:30,1')->name('goals.progress');
         Route::post('/goals/{id}/complete', [AlphaController::class, 'completeGoal'])->whereNumber('id')->middleware('throttle:15,1')->name('goals.complete');
+        Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
         Route::get('/organisations', [AlphaController::class, 'organisations'])->name('organisations.index');
         Route::post('/organisations', [AlphaController::class, 'storeOrganisation'])->middleware('throttle:5,5')->name('organisations.store');
         Route::get('/organisations/{id}', [AlphaController::class, 'organisation'])->whereNumber('id')->name('organisations.show');
+        });
         Route::get('/saved', [AlphaController::class, 'saved'])->name('saved.index');
         Route::post('/saved/destroy', [AlphaController::class, 'destroySaved'])->middleware('throttle:30,1')->name('saved.destroy');
-        Route::get('/resources', [AlphaController::class, 'resources'])->name('resources.index');
+        Route::get('/resources', [AlphaController::class, 'resources'])
+            ->middleware(RequireAccessibleAuthentication::class)
+            ->name('resources.index');
+        Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
         Route::get('/jobs', [AlphaController::class, 'jobs'])->name('jobs.index');
         // Static segments are registered before the {id} wildcard so they always win.
         Route::get('/jobs/saved', [AlphaController::class, 'savedJobs'])->name('jobs.saved');
@@ -300,6 +318,7 @@ $alphaRoutes = function (bool $hostMode) {
         Route::post('/courses/{id}/reviews', [AlphaController::class, 'submitCourseReview'])->whereNumber('id')->middleware('throttle:10,1')->name('courses.reviews.store');
         Route::get('/podcasts', [AlphaController::class, 'podcasts'])->name('podcasts.index');
         Route::get('/podcasts/{id}', [AlphaController::class, 'podcast'])->whereNumber('id')->name('podcasts.show');
+        });
         Route::get('/coupons', [AlphaController::class, 'coupons'])->name('coupons.index');
         Route::get('/premium', [AlphaController::class, 'premium'])->name('premium.index');
         Route::post('/premium/subscribe', [AlphaController::class, 'subscribePremium'])->middleware('throttle:10,1')->name('premium.subscribe');
@@ -361,6 +380,8 @@ $alphaRoutes = function (bool $hostMode) {
         Route::post('/profile/skills/add', [AlphaController::class, 'addProfileSkill'])->middleware('throttle:30,1')->name('profile.skills.add');
         Route::post('/profile/skills/remove', [AlphaController::class, 'removeProfileSkill'])->middleware('throttle:30,1')->name('profile.skills.remove');
         Route::post('/profile/safeguarding/revoke', [AlphaController::class, 'revokeProfileSafeguarding'])->middleware('throttle:20,1')->name('profile.safeguarding.revoke');
+        Route::post('/profile/safeguarding/vetting-review', [AlphaController::class, 'requestProfileVettingReview'])->middleware('throttle:5,60')->name('profile.safeguarding.vetting-review');
+        Route::post('/profile/safeguarding/policy-review', [AlphaController::class, 'confirmProfileSafeguardingPolicyReview'])->middleware('throttle:10,1')->name('profile.safeguarding.policy-review');
         Route::post('/profile/data-export', [AlphaController::class, 'requestDataExport'])->middleware('throttle:3,60')->name('profile.data-export');
         Route::get('/profile/delete-account', [AlphaController::class, 'confirmDeleteAccount'])->name('profile.delete');
         Route::post('/profile/delete-account', [AlphaController::class, 'deleteAccount'])->middleware('throttle:5,60')->name('profile.delete.store');
@@ -375,6 +396,7 @@ $alphaRoutes = function (bool $hostMode) {
         // routes are required for WAVE O.
 
         // ===== WAVE V2: Volunteering depth =====
+        Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
         Route::get('/volunteering/certificates', [AlphaController::class, 'volunteeringCertificates'])->name('volunteering.certificates');
         Route::post('/volunteering/certificates/generate', [AlphaController::class, 'generateVolunteerCertificate'])->middleware('throttle:10,1')->name('volunteering.certificates.generate');
         Route::get('/volunteering/certificates/{code}/download', [AlphaController::class, 'downloadVolunteerCertificate'])->where('code', '[A-Za-z0-9]+')->name('volunteering.certificates.download');
@@ -384,23 +406,26 @@ $alphaRoutes = function (bool $hostMode) {
         Route::post('/volunteering/swaps', [AlphaController::class, 'requestVolunteerSwap'])->middleware('throttle:10,1')->name('volunteering.swaps.request');
         Route::post('/volunteering/swaps/{id}/respond', [AlphaController::class, 'respondVolunteerSwap'])->whereNumber('id')->middleware('throttle:20,1')->name('volunteering.swaps.respond');
         Route::post('/volunteering/swaps/{id}/cancel', [AlphaController::class, 'cancelVolunteerSwap'])->whereNumber('id')->middleware('throttle:20,1')->name('volunteering.swaps.cancel');
+        });
 
         // ===== WAVE POLISH-COMMERCE =====
         // Static segments are declared before any {id} wildcards so they always win.
         Route::get('/premium/return', [AlphaController::class, 'premiumReturn'])->name('premium.return');
-        Route::post('/podcasts/{id}/subscribe', [AlphaController::class, 'podcastSubscribe'])->whereNumber('id')->middleware('throttle:30,1')->name('podcasts.subscribe');
-        Route::get('/podcasts/{showId}/episodes/{id}', [AlphaController::class, 'podcastEpisode'])->whereNumber('showId')->whereNumber('id')->name('podcasts.episode');
+        Route::post('/podcasts/{id}/subscribe', [AlphaController::class, 'podcastSubscribe'])->whereNumber('id')->middleware([RequireAccessibleAuthentication::class, 'throttle:30,1'])->name('podcasts.subscribe');
+        Route::get('/podcasts/{showId}/episodes/{id}', [AlphaController::class, 'podcastEpisode'])->whereNumber('showId')->whereNumber('id')->middleware(RequireAccessibleAuthentication::class)->name('podcasts.episode');
         Route::get('/coupons/{id}', [AlphaController::class, 'couponShow'])->whereNumber('id')->name('coupons.show');
 
         // ===== WAVE NIGHT-LISTINGS: save/unsave, renew, report, matches dismiss =====
         // Static segments (save, unsave, renew, report) declared before {id} wildcard
         // to prevent any routing collision. POSTs are rate-limited.
+        Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
         Route::post('/listings/{id}/like', [AlphaController::class, 'listingsToggleLike'])->whereNumber('id')->middleware('throttle:60,1')->name('listings.like');
         Route::post('/listings/{id}/save', [AlphaController::class, 'saveListing'])->whereNumber('id')->middleware('throttle:30,1')->name('listings.save');
         Route::post('/listings/{id}/unsave', [AlphaController::class, 'unsaveListing'])->whereNumber('id')->middleware('throttle:30,1')->name('listings.unsave');
         Route::post('/listings/{id}/renew', [AlphaController::class, 'renewListing'])->whereNumber('id')->middleware('throttle:10,1')->name('listings.renew');
         Route::get('/listings/{id}/report', [AlphaController::class, 'listingReport'])->whereNumber('id')->name('listings.report');
         Route::post('/listings/{id}/report', [AlphaController::class, 'storeListingReport'])->whereNumber('id')->middleware('throttle:5,60')->name('listings.report.store');
+        });
         Route::post('/matches/{id}/dismiss', [AlphaController::class, 'dismissMatch'])->whereNumber('id')->middleware('throttle:60,1')->name('matches.dismiss');
         // ===== WAVE NIGHT-MEMBERS: profile review + transfer, review delete =====
         // Static `/reviews/delete` segment before member wildcard `/members/{id}` is safe

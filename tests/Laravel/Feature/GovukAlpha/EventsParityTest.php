@@ -88,6 +88,8 @@ class EventsParityTest extends GovukAlphaFrontendTest
 
     public function test_events_browse_page_renders(): void
     {
+        $this->eventsParityUser();
+
         $resp = $this->get("/{$this->testTenantSlug}/accessible/events/browse");
 
         $resp->assertOk();

@@ -5,6 +5,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 use App\Http\Controllers\GovukAlpha\AlphaController;
+use App\Http\Controllers\GovukAlpha\Middleware\RequireAccessibleAuthentication;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 | are distinct paths from the core /jobs/{id} route so there is no collision.
 */
 
+Route::middleware(RequireAccessibleAuthentication::class)->group(function () {
 // Bias audit — admin-only hiring-fairness analytics (static, before wildcards).
 // Throttled to match the API (AdminJobsController::biasAudit, 10/min) — caps
 // rapid re-querying that could harvest PII patterns from the aggregations.
@@ -97,3 +99,4 @@ Route::post('/jobs/offers/{offerId}/reject', [AlphaController::class, 'jobsRejec
     ->whereNumber('offerId')
     ->middleware('throttle:20,1')
     ->name('jobs.offers.reject');
+});

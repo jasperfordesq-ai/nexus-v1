@@ -87,17 +87,10 @@ class GroupsController extends BaseApiController
 
     /**
      * GET /api/v2/groups/{id}
-     *
-     * Public endpoint (registered outside auth:sanctum group).
-     * Resolves authenticated user via Auth::guard('api') when Bearer token is
-     * present, so viewer_membership is populated for logged-in users.
      */
     public function show(int $id): JsonResponse
     {
-        // This route is outside the auth:sanctum middleware group, so use the
-        // base controller helper that falls back to manual token lookup when
-        // the Sanctum guard fails for stateful-domain requests.
-        $userId = $this->resolveSanctumUserOptionally();
+        $userId = $this->requireAuth();
 
         $group = $this->groupService->getById($id, $userId, true);
 
@@ -311,26 +304,20 @@ class GroupsController extends BaseApiController
     public function members($id): JsonResponse
     {
         $id = (int) $id;
+        $userId = $this->requireAuth();
 
-        $group = $this->groupService->getById($id);
+        $group = $this->groupService->getById($id, $userId, true);
         if (!$group) {
             return $this->respondWithError('NOT_FOUND', __('api.group_not_found'), null, 404);
         }
 
-        // For private groups, only members can view the member list
-        if (($group['visibility'] ?? 'public') === 'private') {
-            $userId = $this->resolveSanctumUserOptionally();
-            if (!$userId) {
-                return $this->respondWithError('FORBIDDEN', __('api.private_group_members_only'), null, 403);
-            }
-            $isMember = \Illuminate\Support\Facades\DB::table('group_members')
-                ->where('group_id', $id)
-                ->where('user_id', $userId)
-                ->where('status', 'active')
-                ->exists();
-            if (!$isMember) {
-                return $this->respondWithError('FORBIDDEN', __('api.private_group_members_only'), null, 403);
-            }
+        // A group roster reveals a membership relationship. Login alone is not
+        // enough: only an active member, the group owner, or an admin may list it.
+        $canViewRoster = (int) ($group['owner_id'] ?? 0) === $userId
+            || $this->groupService->isActiveMember($id, $userId)
+            || $this->callerIsAdminTier();
+        if (!$canViewRoster) {
+            return $this->respondWithError('FORBIDDEN', __('api.forbidden'), null, 403);
         }
 
         $filters = [

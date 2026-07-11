@@ -193,10 +193,19 @@ class MarketplaceListingService
             ->withCount('images')
             ;
 
-        // When browsing own listings, show all statuses; otherwise only active+approved
-        if (!empty($filters['user_id'])) {
-            $query->where('user_id', (int) $filters['user_id']);
-            // Optionally filter by status if specified
+        // Only the authenticated owner may expand a user_id browse beyond
+        // active + approved listings. A requested user_id alone is not proof
+        // of ownership and must never become an unpublished-listing preview.
+        $requestedUserId = !empty($filters['user_id']) ? (int) $filters['user_id'] : null;
+        $isOwnListings = $requestedUserId !== null
+            && $currentUserId !== null
+            && $requestedUserId === $currentUserId;
+
+        if ($requestedUserId !== null) {
+            $query->where('user_id', $requestedUserId);
+        }
+
+        if ($isOwnListings) {
             if (!empty($filters['status'])) {
                 $query->where('status', $filters['status']);
             }
@@ -385,14 +394,43 @@ class MarketplaceListingService
      */
     public static function getById(int $id, ?int $currentUserId = null): ?array
     {
-        $listing = MarketplaceListing::query()
+        $listing = self::listingDetailQuery()
+            ->where('status', 'active')
+            ->where('moderation_status', 'approved')
+            ->find($id);
+
+        return self::formatLoadedListingDetail($listing, $id, $currentUserId);
+    }
+
+    /**
+     * Owner-only preview used after create/update/renew operations. This is kept
+     * separate from getById() so ordinary detail lookups cannot reveal drafts,
+     * pending moderation records, suspended listings, or removed listings.
+     */
+    public static function getByIdForOwner(int $id, int $ownerId): ?array
+    {
+        $listing = self::listingDetailQuery()
+            ->where('user_id', $ownerId)
+            ->find($id);
+
+        return self::formatLoadedListingDetail($listing, $id, $ownerId);
+    }
+
+    private static function listingDetailQuery(): Builder
+    {
+        return MarketplaceListing::query()
             ->with([
                 'user:id,first_name,last_name,avatar_url,is_verified,created_at',
                 'category:id,name,slug,icon',
                 'images' => fn ($q) => $q->orderBy('sort_order'),
-            ])
-            ->find($id);
+            ]);
+    }
 
+    private static function formatLoadedListingDetail(
+        ?MarketplaceListing $listing,
+        int $id,
+        ?int $currentUserId
+    ): ?array {
         if (!$listing) {
             return null;
         }

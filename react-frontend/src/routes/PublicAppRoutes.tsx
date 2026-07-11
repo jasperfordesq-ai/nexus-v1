@@ -23,46 +23,13 @@ import { renderSharedPublicFeatureRoutes } from './sharedPublicFeatureRoutes';
 
 const Layout = lazyWithRetry(() => import('@/components/layout/Layout'));
 const HomePage = lazyWithRetry(() => import('@/pages/public/HomePage'));
-const ListingsPage = lazyWithRetry(() => import('@/pages/listings/ListingsPage'));
-const ListingDetailPage = lazyWithRetry(() => import('@/pages/listings/ListingDetailPage'));
-const EventsPage = lazyWithRetry(() => import('@/pages/events/EventsPage'));
-const EventDetailPage = lazyWithRetry(() => import('@/pages/events/EventDetailPage'));
-const GroupsPage = lazyWithRetry(() => import('@/pages/groups/GroupsPage'));
-const GroupDetailPage = lazyWithRetry(() => import('@/pages/groups/GroupDetailPage'));
-const JobsPage = lazyWithRetry(() => import('@/pages/jobs/JobsPage'));
-const JobDetailPage = lazyWithRetry(() => import('@/pages/jobs/JobDetailPage'));
-const CoursesPage = lazyWithRetry(() => import('@/pages/courses/CoursesPage'));
-const CourseDetailPage = lazyWithRetry(() => import('@/pages/courses/CourseDetailPage'));
-const PodcastsPage = lazyWithRetry(() => import('@/pages/podcasts/PodcastsPage'));
-const PodcastShowPage = lazyWithRetry(() => import('@/pages/podcasts/PodcastShowPage'));
-const PodcastEpisodePage = lazyWithRetry(() => import('@/pages/podcasts/PodcastEpisodePage'));
-const MarketplacePage = lazyWithRetry(() => import('@/pages/marketplace/MarketplacePage'));
-const MarketplaceListingPage = lazyWithRetry(() => import('@/pages/marketplace/MarketplaceListingPage'));
-const MarketplaceSearchPage = lazyWithRetry(() => import('@/pages/marketplace/MarketplaceSearchPage'));
-const SellerProfilePage = lazyWithRetry(() => import('@/pages/marketplace/SellerProfilePage'));
-const MarketplaceCategoryPage = lazyWithRetry(() => import('@/pages/marketplace/MarketplaceCategoryPage'));
-const MyListingsPage = lazyWithRetry(() => import('@/pages/marketplace/MyListingsPage'));
-const MyOffersPage = lazyWithRetry(() => import('@/pages/marketplace/MyOffersPage'));
-const MarketplaceCollectionsPage = lazyWithRetry(() => import('@/pages/marketplace/MarketplaceCollectionsPage'));
-const MarketplaceMapSearchPage = lazyWithRetry(() => import('@/pages/marketplace/MarketplaceMapSearchPage'));
-const FreeItemsPage = lazyWithRetry(() => import('@/pages/marketplace/FreeItemsPage'));
+const BlogPage = lazyWithRetry(() => import('@/pages/blog/BlogPage'));
+const BlogPostPage = lazyWithRetry(() => import('@/pages/blog/BlogPostPage'));
 const CouponsPage = lazyWithRetry(() => import('@/pages/coupons/CouponsPage'));
 const CouponDetailPage = lazyWithRetry(() => import('@/pages/coupons/CouponDetailPage'));
 const PricingPage = lazyWithRetry(() => import('@/pages/premium/PricingPage'));
-const VolunteeringPage = lazyWithRetry(() => import('@/pages/volunteering/VolunteeringPage'));
-const OpportunityDetailPage = lazyWithRetry(() => import('@/pages/volunteering/OpportunityDetailPage'));
-const ResourcesPage = lazyWithRetry(() => import('@/pages/resources/ResourcesPage'));
-const KnowledgeBasePage = lazyWithRetry(() => import('@/pages/kb/KnowledgeBasePage'));
-const KBArticlePage = lazyWithRetry(() => import('@/pages/kb/KBArticlePage'));
-const OrganisationsPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationsPage'));
-const OrganisationDetailPage = lazyWithRetry(() => import('@/pages/organisations/OrganisationDetailPage'));
-const IdeationPage = lazyWithRetry(() => import('@/pages/ideation/IdeationPage'));
-const ChallengeDetailPage = lazyWithRetry(() => import('@/pages/ideation/ChallengeDetailPage'));
-const IdeaDetailPage = lazyWithRetry(() => import('@/pages/ideation/IdeaDetailPage'));
 const CaringCommunityPage = lazyWithRetry(() => import('@/pages/caring-community/CaringCommunityPage'));
 const InviteRedemptionPage = lazyWithRetry(() => import('@/pages/caring-community/InviteRedemptionPage'));
-const BlogPage = lazyWithRetry(() => import('@/pages/blog/BlogPage'));
-const BlogPostPage = lazyWithRetry(() => import('@/pages/blog/BlogPostPage'));
 const NewsletterUnsubscribePage = lazyWithRetry(() => import('@/pages/newsletter/NewsletterUnsubscribePage'));
 const NotFoundPage = lazyWithRetry(() => import('@/pages/errors/NotFoundPage'));
 const ComingSoonPage = lazyWithRetry(() => import('@/pages/errors/ComingSoonPage'));
@@ -164,44 +131,11 @@ export function PublicAppRoutes() {
 
         <Route path="blog" element={<FeatureGate feature="blog" redirect="/"><FeatureErrorBoundary featureName={navLabel('blog')}><BlogPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="blog/:slug" element={<FeatureGate feature="blog" redirect="/"><FeatureErrorBoundary featureName={navLabel('blog')}><BlogPostPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="listings" element={<FeatureGate module="listings" redirect="/"><FeatureErrorBoundary featureName={navLabel('listings')}><ListingsPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="listings/:id" element={<FeatureGate module="listings" redirect="/"><FeatureErrorBoundary featureName={navLabel('listings')}><ListingDetailPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="events" element={<FeatureGate feature="events" fallback={<ComingSoonPage feature={label('events')} />}><FeatureErrorBoundary featureName={label('events')}><EventsPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="events/:id" element={<FeatureGate feature="events" redirect="/"><FeatureErrorBoundary featureName={label('events')}><EventDetailPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="groups" element={<FeatureGate feature="groups" fallback={<ComingSoonPage feature={label('groups')} />}><FeatureErrorBoundary featureName={label('groups')}><GroupsPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="groups/:id" element={<FeatureGate feature="groups" redirect="/"><FeatureErrorBoundary featureName={label('groups')}><GroupDetailPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="jobs" element={<FeatureGate feature="job_vacancies" fallback={<ComingSoonPage feature={label('job_vacancies')} />}><FeatureErrorBoundary featureName={label('job_vacancies')}><JobsPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="jobs/:id" element={<FeatureGate feature="job_vacancies" redirect="/"><FeatureErrorBoundary featureName={label('job_vacancies')}><JobDetailPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="courses" element={<FeatureGate feature="courses" redirect="/"><FeatureErrorBoundary featureName={navLabel('courses')}><CoursesPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="courses/:idOrSlug" element={<FeatureGate feature="courses" redirect="/"><FeatureErrorBoundary featureName={navLabel('courses')}><CourseDetailPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="podcasts" element={<FeatureGate feature="podcasts" redirect="/"><FeatureErrorBoundary featureName={navLabel('podcasts')}><PodcastsPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="podcasts/:showSlug" element={<FeatureGate feature="podcasts" redirect="/"><FeatureErrorBoundary featureName={navLabel('podcasts')}><PodcastShowPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="podcasts/:showSlug/:episodeSlug" element={<FeatureGate feature="podcasts" redirect="/"><FeatureErrorBoundary featureName={navLabel('podcasts')}><PodcastEpisodePage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="marketplace" element={<FeatureGate feature="marketplace" fallback={<ComingSoonPage feature={label('marketplace')} />}><FeatureErrorBoundary featureName={label('marketplace')}><MarketplacePage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="marketplace/search" element={<FeatureGate feature="marketplace" redirect="/"><FeatureErrorBoundary featureName={label('marketplace')}><MarketplaceSearchPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="marketplace/map" element={<FeatureGate feature="marketplace" redirect="/"><FeatureErrorBoundary featureName={label('marketplace')}><MarketplaceMapSearchPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="marketplace/seller/:id" element={<FeatureGate feature="marketplace" redirect="/"><FeatureErrorBoundary featureName={label('marketplace')}><SellerProfilePage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="marketplace/category/:slug" element={<FeatureGate feature="marketplace" redirect="/"><FeatureErrorBoundary featureName={label('marketplace')}><MarketplaceCategoryPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="marketplace/my-listings" element={<FeatureGate feature="marketplace" redirect="/"><FeatureErrorBoundary featureName={label('marketplace')}><MyListingsPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="marketplace/my-offers" element={<FeatureGate feature="marketplace" redirect="/"><FeatureErrorBoundary featureName={label('marketplace')}><MyOffersPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="marketplace/collections" element={<FeatureGate feature="marketplace" redirect="/"><FeatureErrorBoundary featureName={label('marketplace')}><MarketplaceCollectionsPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="marketplace/free" element={<FeatureGate feature="marketplace" fallback={<ComingSoonPage feature={label('marketplace')} />}><FeatureErrorBoundary featureName={label('marketplace')}><FreeItemsPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="marketplace/:id" element={<FeatureGate feature="marketplace" redirect="/"><FeatureErrorBoundary featureName={label('marketplace')}><MarketplaceListingPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="coupons" element={<FeatureGate feature="merchant_coupons" fallback={<ComingSoonPage feature={label('coupons')} />}><FeatureErrorBoundary featureName={label('coupons')}><CouponsPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="coupons/:id" element={<FeatureGate feature="merchant_coupons" redirect="/coupons"><FeatureErrorBoundary featureName={label('coupons')}><CouponDetailPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="pricing" element={<ErrorBoundary><PricingPage /></ErrorBoundary>} />
         <Route path={CARING_COMMUNITY_ROUTE.path} element={<FeatureGate feature={CARING_COMMUNITY_ROUTE.feature} fallback={<ComingSoonPage feature={label('caring_community')} />}><FeatureErrorBoundary featureName={label('caring_community')}><CaringCommunityPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="join/:code" element={<ErrorBoundary><InviteRedemptionPage /></ErrorBoundary>} />
-        <Route path="volunteering" element={<FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={label('volunteering')} />}><FeatureErrorBoundary featureName={label('volunteering')}><VolunteeringPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="volunteering/opportunities/:id" element={<FeatureGate feature="volunteering" redirect="/"><FeatureErrorBoundary featureName={label('volunteering')}><OpportunityDetailPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="resources" element={<FeatureGate feature="resources" fallback={<ComingSoonPage feature={label('resources')} />}><FeatureErrorBoundary featureName={label('resources')}><ResourcesPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="kb" element={<FeatureGate feature="resources" fallback={<ComingSoonPage feature={label('knowledge_base')} />}><FeatureErrorBoundary featureName={label('knowledge_base')}><KnowledgeBasePage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="kb/:id" element={<FeatureGate feature="resources" redirect="/"><FeatureErrorBoundary featureName={label('knowledge_base')}><KBArticlePage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="organisations" element={<FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={label('organisations')} />}><FeatureErrorBoundary featureName={label('organisations')}><OrganisationsPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="organisations/:id" element={<FeatureGate feature="volunteering" redirect="/"><FeatureErrorBoundary featureName={label('organisations')}><OrganisationDetailPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="ideation" element={<FeatureGate feature="ideation_challenges" fallback={<ComingSoonPage feature={label('ideation_challenges')} />}><FeatureErrorBoundary featureName={label('ideation_challenges')}><IdeationPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="ideation/:id" element={<FeatureGate feature="ideation_challenges" redirect="/"><FeatureErrorBoundary featureName={label('ideation_challenges')}><ChallengeDetailPage /></FeatureErrorBoundary></FeatureGate>} />
-        <Route path="ideation/:challengeId/ideas/:id" element={<FeatureGate feature="ideation_challenges" redirect="/"><FeatureErrorBoundary featureName={label('ideation_challenges')}><IdeaDetailPage /></FeatureErrorBoundary></FeatureGate>} />
         <Route path="*" element={<ErrorBoundary><NotFoundPage /></ErrorBoundary>} />
       </Route>
     </>

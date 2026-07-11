@@ -54,16 +54,14 @@ class PrerenderService
      * the tenant-aware resolver.
      */
     public const EXPECTED_ROUTES = [
-        '/', '/about', '/faq', '/contact', '/help', '/explore', '/listings',
-        '/blog', '/terms', '/privacy', '/accessibility', '/cookies',
+        '/', '/about', '/faq', '/contact', '/help', '/blog',
+        '/terms', '/privacy', '/accessibility', '/cookies',
         '/community-guidelines', '/trust-and-safety', '/acceptable-use',
         '/legal', '/terms/versions', '/privacy/versions', '/accessibility/versions',
         '/cookies/versions', '/community-guidelines/versions', '/acceptable-use/versions',
         '/timebanking-guide', '/regional-analytics', '/platform/terms', '/platform/privacy',
-        '/platform/disclaimer', '/resources', '/kb', '/features', '/changelog',
-        '/events', '/groups', '/jobs', '/coupons', '/marketplace', '/volunteering',
-        '/courses', '/podcasts',
-        '/organisations', '/pilot-inquiry', '/pilot-apply', '/developers', '/developers/auth',
+        '/platform/disclaimer', '/features', '/changelog', '/coupons',
+        '/pilot-inquiry', '/pilot-apply', '/developers', '/developers/auth',
         '/developers/endpoints', '/developers/webhooks',
     ];
 
@@ -109,29 +107,15 @@ class PrerenderService
      * Format: feature_name => [route, route, ...]
      */
     private const FEATURE_GATED_ROUTES = [
-        'explore'             => ['/explore'],
-        'blog'                => ['/blog'],
-        'events'              => ['/events'],
-        'groups'              => ['/groups'],
-        'job_vacancies'       => ['/jobs'],
-        'merchant_coupons'    => ['/coupons'],
-        'volunteering'        => ['/volunteering', '/organisations'],
-        'ideation_challenges' => ['/ideation'],
-        'resources'           => ['/resources', '/kb'],
-        'courses'             => ['/courses'],
-        'podcasts'            => ['/podcasts'],
-        // /marketplace/map also depends on a build-time maps key and redirects
-        // when unavailable, so it is intentionally not a snapshot route.
-        'marketplace'         => ['/marketplace', '/marketplace/free'],
+        'blog'             => ['/blog'],
+        'merchant_coupons' => ['/coupons'],
     ];
 
     /**
      * Module-gated static routes (modules live in tenants.configuration.modules,
      * features in tenants.features — different storage, same idea).
      */
-    private const MODULE_GATED_ROUTES = [
-        'listings' => ['/listings'],
-    ];
+    private const MODULE_GATED_ROUTES = [];
 
     public const STALE_AGE_SECONDS = 14 * 24 * 3600;
     public const WARN_AGE_SECONDS  = 7  * 24 * 3600;
@@ -1423,6 +1407,18 @@ class PrerenderService
         }
 
         return false;
+    }
+
+    /**
+     * Member-authored feature routes require authentication and must never be
+     * planned, queued, or restored as anonymous prerender snapshots.
+     */
+    public static function routeRequiresAuthentication(string $route): bool
+    {
+        return preg_match(
+            '#^/(?:explore|listings|events|groups|jobs|volunteering|organisations|ideation|resources|kb|marketplace|courses|podcasts)(?:/|$)#',
+            $route
+        ) === 1;
     }
 
     public static function routeCanBeGlobalExplicit(string $route): bool
@@ -2771,6 +2767,10 @@ class PrerenderService
                     $rejectedLocations[] = ['location' => $location, 'reason' => 'unsafe or unrepresentable route'];
                     continue;
                 }
+                if (self::routeRequiresAuthentication($path)) {
+                    $rejectedLocations[] = ['location' => $location, 'reason' => 'route requires authentication'];
+                    continue;
+                }
                 $routes[$path] = true;
                 $acceptedSitemapRoutes++;
                 if (count($routes) >= $limit) {
@@ -3290,6 +3290,9 @@ class PrerenderService
     public function tenantRouteCanBePrerendered(int $tenantId, string $tenantLocalRoute, ?array $tenantTarget = null): bool
     {
         if ($tenantId <= 0 || $tenantLocalRoute === '' || $tenantLocalRoute[0] !== '/') {
+            return false;
+        }
+        if (self::routeRequiresAuthentication($tenantLocalRoute)) {
             return false;
         }
         if ($this->isUnsupportedPublicRoute($tenantLocalRoute)) {

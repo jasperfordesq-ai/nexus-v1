@@ -30,6 +30,7 @@ class BlogServiceTest extends TestCase
     public function test_getAll_returns_expected_structure(): void
     {
         $mockQuery = Mockery::mock(Builder::class);
+        $mockQuery->shouldReceive('select')->andReturnSelf();
         $mockQuery->shouldReceive('published')->andReturnSelf();
         $mockQuery->shouldReceive('with')->andReturnSelf();
         $mockQuery->shouldReceive('whereNotIn')->andReturnSelf();
@@ -55,6 +56,7 @@ class BlogServiceTest extends TestCase
     public function test_getBySlug_returns_null_when_not_found(): void
     {
         $mockQuery = Mockery::mock();
+        $mockQuery->shouldReceive('select')->andReturnSelf();
         $mockQuery->shouldReceive('published')->andReturnSelf();
         $mockQuery->shouldReceive('with')->andReturnSelf();
         $mockQuery->shouldReceive('whereNotIn')->andReturnSelf();
@@ -71,6 +73,7 @@ class BlogServiceTest extends TestCase
     public function test_getPosts_returns_expected_structure(): void
     {
         $mockQuery = Mockery::mock(Builder::class);
+        $mockQuery->shouldReceive('select')->andReturnSelf();
         $mockQuery->shouldReceive('published')->andReturnSelf();
         $mockQuery->shouldReceive('with')->andReturnSelf();
         $mockQuery->shouldReceive('whereNotIn')->andReturnSelf();
