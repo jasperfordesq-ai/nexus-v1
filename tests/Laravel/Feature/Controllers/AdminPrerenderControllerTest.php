@@ -375,6 +375,16 @@ class AdminPrerenderControllerTest extends TestCase
     public function test_public_invalidation_webhook_bearer_is_repeatable_for_newer_publishes(): void
     {
         config(['prerender.webhook_token' => 'test-prerender-webhook-secret']);
+        $this->mock(PrerenderService::class, function ($mock): void {
+            $mock->shouldReceive('loadTenantTargets')
+                ->twice()
+                ->andReturn([['tenant_id' => $this->testTenantId]]);
+            $mock->shouldReceive('invalidateRoutes')
+                ->twice()
+                ->with($this->testTenantId, ['/about'], false)
+                ->andReturn(0);
+            $mock->shouldReceive('audit')->twice();
+        });
         $payload = [
             'tenant_id' => $this->testTenantId,
             'routes' => ['/about'],
